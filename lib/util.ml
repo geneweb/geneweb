@@ -100,17 +100,20 @@ let escape_html s : Adef.escaped_string =
 let esc x = (escape_html x :> Adef.safe_string)
 
 (** [escape_attribute str] only escapes double quote and ampersand.
-    Since we will return normalized HTML, ['"'] should be the only
+    Since we will return normalized HTML, ['"' and '\''] should be the only
     dangerous character here. *)
 let escape_attribute =
   escape_aux
-    (function '&' | '"' -> 5 (* "&#xx;" *) | _ -> 1)
+    (function '&' | '"' | '\'' -> 5 (* "&#xx;" *) | _ -> 1)
     (fun buf ibuf istr loop -> function
       | '&' ->
           Bytes.blit_string "&#38;" 0 buf ibuf 5;
           loop (istr + 1) (ibuf + 5)
       | '"' ->
           Bytes.blit_string "&#34;" 0 buf ibuf 5;
+          loop (istr + 1) (ibuf + 5)
+      | '\'' ->
+          Bytes.blit_string "&#39;" 0 buf ibuf 5;
           loop (istr + 1) (ibuf + 5)
       | c ->
           Bytes.unsafe_set buf ibuf c;
@@ -559,7 +562,7 @@ let safe_html_allowed_tags =
 
    Markup.ml automatically return tags names in lowercase.
 *)
-let safe_html_aux escape_text s =
+let safe_html_aux escape_text escape_attribute s =
   let open Markup in
   let stack = ref [] in
   let make_safe = function
@@ -599,7 +602,7 @@ let safe_html_aux escape_text s =
   |> to_string
 
 let safe_html s =
-  Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
+  Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) escape_attribute s)
 
 (* Clean HTML tags from a string. Block tags are replaced by a space,
    and inline tags are replaced by an empty string. *)
