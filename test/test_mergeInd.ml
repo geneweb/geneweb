@@ -36,16 +36,21 @@ let test_is_ancestor =
   let child = Gwdb.poi base (iper 0) in
   let father = Gwdb.poi base (iper 1) in
   let mother = Gwdb.poi base (iper 2) in
-  let test exp p1 p2 _ =
-    OUnit2.assert_equal exp (Geneweb.MergeInd.is_ancestor base p1 p2)
+  let test ~__POS__ ~msg exp p1 p2 _ =
+    Alcotest.check' ~pos:__POS__ Alcotest.bool ~msg ~expected:exp
+      ~actual:(Geneweb.MergeInd.is_ancestor base p1 p2)
   in
-  let open OUnit2 in
   [
-    "is_ancetor child father" >:: test false child father;
-    "is_ancetor father child" >:: test true father child;
-    "is_ancetor mother child" >:: test true mother child;
+    test ~__POS__ ~msg:"is_ancetor child father" false child father;
+    test ~__POS__ ~msg:"is_ancetor father child" true father child;
+    test ~__POS__ ~msg:"is_ancetor mother child" true mother child;
   ]
 
 let suite =
-  let open OUnit2 in
-  [ "MergeInd.is_ancestor" >::: test_is_ancestor ]
+  [
+    ( "merge-individuals",
+      [
+        Alcotest.test_case "MergeInd.is_ancestor" `Quick (fun () ->
+            List.iter (fun check -> check ()) test_is_ancestor);
+      ] );
+  ]
