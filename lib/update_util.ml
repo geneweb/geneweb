@@ -58,7 +58,8 @@ let reconstitute_somebody removed_string conf var =
   (first_name, surname, occ, create, var)
 
 let sort_families_array_by_date base fam_arr =
-  let cmp_date d1_o d2_o = match d1_o, d2_o with
+  let cmp_date d1_o d2_o =
+    match (d1_o, d2_o) with
     | None, None -> 0
     | Some d1, Some d2 -> Date.compare_date d1 d2
     | None, Some _ -> -1
