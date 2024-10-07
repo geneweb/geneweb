@@ -409,6 +409,8 @@ type base_func = {
   commit_patches : unit -> unit;
   (* Update content (second arg) of the notes' file (first arg) if exists. *)
   commit_notes : string -> string -> unit;
+  (* Update content (second arg) of the notes' file (first arg) if exists. *)
+  commit_wiznotes : string -> string -> unit;
   (* Close every opened channel. *)
   cleanup : unit -> unit;
   (* Returns real number of persons inside the base (without empty persons).

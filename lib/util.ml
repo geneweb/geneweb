@@ -1906,12 +1906,18 @@ let find_person_in_env_pref conf base pref =
     (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
+  let auth, fn, sn =
+    match person_of_key base fn sn oc with
+    | Some ip ->
+        if authorized_age conf base (pget conf base ip) then
+          let p = poi base ip in
+          (true, sou base (get_first_name p), sou base (get_surname p))
+        else (false, "x", "x")
+    | None -> (false, fn, sn)
+  in
   match List.assoc_opt "red_if_not_exist" conf.base_env with
-  | Some "off" -> true
-  | Some _ | None -> (
-      match person_of_key base fn sn oc with
-      | Some ip -> authorized_age conf base (pget conf base ip)
-      | None -> false)
+  | Some "off" -> (true, fn, sn)
+  | Some _ | None -> (auth, fn, sn)
 
 let default_sosa_ref conf base =
   match List.assoc_opt "default_sosa_ref" conf.base_env with
@@ -2296,10 +2302,12 @@ let rec in_text case_sens s m =
     else if m.[i] = '[' && i + 1 < String.length m && m.[i + 1] = '[' then
       match NotesLinks.misc_notes_link m i with
       | NotesLinks.WLpage (j, _, _, _, text)
-      | NotesLinks.WLperson (j, _, text, _)
+      | NotesLinks.WLperson (j, _, Some text, _)
       | NotesLinks.WLwizard (j, _, text) ->
           if in_text case_sens s text then true else loop false j
-      | NotesLinks.WLnone -> loop false (i + 1)
+      | NotesLinks.WLperson (j, (fn, sn, _), None, _) ->
+          if in_text case_sens s (fn ^ " " ^ sn) then true else loop false j
+      | NotesLinks.WLnone (j, _) -> loop false j
     else
       match start_equiv_with case_sens s m i with
       | Some _ -> true

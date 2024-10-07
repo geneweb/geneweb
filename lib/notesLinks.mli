@@ -1,8 +1,8 @@
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * Def.NLDB.key * string * string option
+  | WLperson of int * Def.NLDB.key * string option * string option
   | WLwizard of int * string * string
-  | WLnone
+  | WLnone of int * string
 
 val char_dir_sep : char
 val check_file_name : string -> (string list * string) option

@@ -2597,9 +2597,9 @@ pl:
 fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins).
 pl:
 
-    name changed. update linked pages
-en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
-fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
+    name changed. updated linked pages
+en: The first name, name or occurrence of this person has changed. The pages linked to the old key listed below have been updated.
+fr: Le prénom, nom ou occurrence de cette personne a changé. Les pages ci-dessous liées à l’ancienne clé ont été mises à jour.
 pl:
 
     naturalisation

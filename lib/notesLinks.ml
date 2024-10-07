@@ -24,12 +24,24 @@ let check_file_name s =
 
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * key * string * string option
+  | WLperson of int * key * string option * string option
   | WLwizard of int * string * string
-  | WLnone
+  | WLnone of int * string
 
 let misc_notes_link s i =
   let slen = String.length s in
+  let cut j = String.sub s i (j - i) in
+  let rec wlnone j =
+    (* assume no link up to [j] and find next link position *)
+    if j < slen then
+      match s.[j] with
+      | '%' -> wlnone (j + 2)
+      | '[' ->
+          if j + 1 < slen && s.[j + 1] = '[' then WLnone (j, cut j)
+          else wlnone (j + 1)
+      | _ -> wlnone (j + 1)
+    else WLnone (slen, cut slen)
+  in
   if i < slen - 2 && s.[i] = '[' && s.[i + 1] = '[' then
     if s.[i + 2] = '[' then
       let j =
@@ -61,12 +73,12 @@ let misc_notes_link s i =
         in
         match check_file_name fname with
         | Some pg_path -> WLpage (j, pg_path, fname, anchor, text)
-        | None -> WLnone
-      else WLnone
+        | None -> wlnone j
+      else wlnone j
     else
       let j =
         let rec loop j =
-          if j = slen then i
+          if j = slen then j
           else if j <= slen - 2 && s.[j] = ']' && s.[j + 1] = ']' then j + 2
           else loop (j + 1)
         in
@@ -118,20 +130,17 @@ let misc_notes_link s i =
                 in
                 let oc1 = try int_of_string name with Failure _ -> -1 in
                 let oc = try int_of_string oc with Failure _ -> 0 in
-                if oc1 = -1 then (fn, sn, oc, name)
-                  (* else if not Wiki.wi_person_exists (fn, sn, oc1) then (fn, sn, oc, fn ^ " " ^ sn) *)
-                else (fn, sn, oc1, fn ^ " " ^ sn)
+                if oc1 = -1 then (fn, sn, oc, Some name) else (fn, sn, oc1, None)
               with Not_found ->
                 let sn = String.sub b k (String.length b - k) in
-                let name = fn ^ " " ^ sn in
-                (fn, sn, 0, name)
+                (fn, sn, 0, None)
             in
             let fn = Name.lower fn in
             let sn = Name.lower sn in
             WLperson (j, (fn, sn, oc), name, text)
-          with Not_found -> WLnone
-      else WLnone
-  else WLnone
+          with Not_found -> wlnone j
+      else wlnone j
+  else wlnone (i+1)
 
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in
