@@ -1,13 +1,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-open Gwdb
-
 let designation base p =
-  let first_name = p_first_name base p in
-  let nom = p_surname base p in
+  let first_name = Gwdb.p_first_name base p in
+  let nom = Gwdb.p_surname base p in
   Mutil.iso_8859_1_of_utf_8
-    (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
+    (first_name ^ "." ^ string_of_int (Gwdb.get_occ p) ^ " " ^ nom)
 
 let father = Adef.father
 let mother = Adef.mother
@@ -18,16 +15,17 @@ let couple multi fath moth =
 let parent_array = Adef.parent_array
 
 let spouse ip cpl =
-  if ip = get_father cpl then get_mother cpl else get_father cpl
+  if ip = Gwdb.get_father cpl then Gwdb.get_mother cpl else Gwdb.get_father cpl
 
 let person_is_key base p k =
   let k = Name.crush_lower k in
-  if k = Name.crush_lower (p_first_name base p ^ " " ^ p_surname base p) then
-    true
+  if
+    k = Name.crush_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
+  then true
   else if
     List.exists
       (fun x -> k = Name.crush_lower x)
-      (person_misc_names base p get_titles)
+      (Gwdb.person_misc_names base p Gwdb.get_titles)
   then true
   else false
 
@@ -62,7 +60,7 @@ let person_of_string_key base s =
   let rec loop i =
     match split_key s i with
     | Some (i, first_name, occ, surname) -> (
-        match person_of_key base first_name surname occ with
+        match Gwdb.person_of_key base first_name surname occ with
         | Some ip -> Some ip
         | None -> loop (i + 1))
     | None -> None
@@ -88,14 +86,15 @@ let rsplit_key s =
 
 let person_of_string_dot_key base s =
   match rsplit_key s with
-  | Some (first_name, occ, surname) -> person_of_key base first_name surname occ
+  | Some (first_name, occ, surname) ->
+      Gwdb.person_of_key base first_name surname occ
   | None -> None
 
 let person_not_a_key_find_all base s =
-  let ipl = persons_of_name base s in
+  let ipl = Gwdb.persons_of_name base s in
   let rec select = function
     | ip :: ipl ->
-        if person_is_key base (poi base ip) s then
+        if person_is_key base (Gwdb.poi base ip) s then
           let ipl = select ipl in
           if List.mem ip ipl then ipl else ip :: ipl
         else select ipl
@@ -109,23 +108,23 @@ let person_ht_find_all base s =
   | None -> person_not_a_key_find_all base s
 
 let find_same_name base p =
-  let f = p_first_name base p in
-  let s = p_surname base p in
+  let f = Gwdb.p_first_name base p in
+  let s = Gwdb.p_surname base p in
   let ipl = person_ht_find_all base (f ^ " " ^ s) in
   let f = Name.strip_lower f in
   let s = Name.strip_lower s in
   let pl =
     List.fold_left
       (fun pl ip ->
-        let p = poi base ip in
+        let p = Gwdb.poi base ip in
         if
-          Name.strip_lower (p_first_name base p) = f
-          && Name.strip_lower (p_surname base p) = s
+          Name.strip_lower (Gwdb.p_first_name base p) = f
+          && Name.strip_lower (Gwdb.p_surname base p) = s
         then p :: pl
         else pl)
       [] ipl
   in
-  List.sort (fun p1 p2 -> compare (get_occ p1) (get_occ p2)) pl
+  List.sort (fun p1 p2 -> compare (Gwdb.get_occ p1) (Gwdb.get_occ p2)) pl
 
 let trim_trailing_spaces s =
   let len = String.length s in
@@ -194,12 +193,7 @@ let alphabetic_iso_8859_1 n1 n2 =
   if n1 = n2 then 0 else loop (Mutil.initial n1) (Mutil.initial n2)
 
 (* ??? *)
-let alphabetic n1 n2 =
-  (*
-    if Mutil.utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
-  *)
-  alphabetic_iso_8859_1 n1 n2
-
+let alphabetic n1 n2 = alphabetic_iso_8859_1 n1 n2
 let alphabetic_order n1 n2 = alphabetic_utf_8 n1 n2
 
 let arg_list_of_string line =
@@ -221,37 +215,39 @@ let arg_list_of_string line =
 
 let sort_person_list_aux sort base =
   let default p1 p2 =
-    match alphabetic (p_surname base p1) (p_surname base p2) with
+    match alphabetic (Gwdb.p_surname base p1) (Gwdb.p_surname base p2) with
     | 0 -> (
-        match alphabetic (p_first_name base p1) (p_first_name base p2) with
+        match
+          alphabetic (Gwdb.p_first_name base p1) (Gwdb.p_first_name base p2)
+        with
         | 0 -> (
-            match compare (get_occ p1) (get_occ p2) with
-            | 0 -> compare (get_iper p1) (get_iper p2)
+            match compare (Gwdb.get_occ p1) (Gwdb.get_occ p2) with
+            | 0 -> compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
             | c -> c)
         | c -> c)
     | c -> c
   in
   sort (fun p1 p2 ->
-      if get_iper p1 = get_iper p2 then 0
+      if Gwdb.get_iper p1 = Gwdb.get_iper p2 then 0
       else
         match
           match
-            ( Date.od_of_cdate (get_birth p1),
-              get_death p1,
-              Date.od_of_cdate (get_birth p2),
-              get_death p2 )
+            ( Date.od_of_cdate (Gwdb.get_birth p1),
+              Gwdb.get_death p1,
+              Date.od_of_cdate (Gwdb.get_birth p2),
+              Gwdb.get_death p2 )
           with
           | Some d1, _, Some d2, _ -> Date.compare_date d1 d2
-          | Some d1, _, _, Death (_, d2) ->
+          | Some d1, _, _, Def.Death (_, d2) ->
               Date.compare_date d1 (Date.date_of_cdate d2)
-          | _, Death (_, d1), Some d2, _ ->
+          | _, Def.Death (_, d1), Some d2, _ ->
               Date.compare_date (Date.date_of_cdate d1) d2
-          | _, Death (_, d1), _, Death (_, d2) ->
+          | _, Def.Death (_, d1), _, Def.Death (_, d2) ->
               Date.compare_date (Date.date_of_cdate d1) (Date.date_of_cdate d2)
           | Some _, _, _, _ -> 1
-          | _, Death (_, _), _, _ -> 1
+          | _, Def.Death (_, _), _, _ -> 1
           | _, _, Some _, _ -> -1
-          | _, _, _, Death (_, _) -> -1
+          | _, _, _, Def.Death (_, _) -> -1
           | _ -> 0
         with
         | 0 -> default p1 p2
@@ -260,43 +256,44 @@ let sort_person_list_aux sort base =
 let sort_person_list = sort_person_list_aux List.sort
 let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
 
+let homonyms ~base ~first_name ~surname =
+  let ipl = Gwdb.persons_of_name base (first_name ^ " " ^ surname) in
+  let first_name = Name.lower first_name in
+  let surname = Name.lower surname in
+  ipl
+  |> List.filter_map (fun ip ->
+         let p = Gwdb.poi base ip in
+         Ext_option.return_if
+           (first_name = Name.lower (Gwdb.p_first_name base p)
+           && surname = Name.lower (Gwdb.p_surname base p))
+           (fun () -> ip))
+
+let get_all_occurrence_numbers ~base ~first_name ~surname =
+  let ipl = homonyms ~base ~first_name ~surname in
+  ipl
+  |> List.map (fun ip ->
+         let p = Gwdb.poi base ip in
+         Gwdb.get_occ p)
+  |> Ext_int.Set.of_list
+
 let find_free_occ base f s =
-  let ipl = persons_of_name base (f ^ " " ^ s) in
-  let first_name = Name.lower f in
-  let surname = Name.lower s in
-  let list_occ =
-    let rec loop list = function
-      | ip :: ipl ->
-          let p = poi base ip in
-          if
-            (not (List.mem (get_occ p) list))
-            && first_name = Name.lower (p_first_name base p)
-            && surname = Name.lower (p_surname base p)
-          then loop (get_occ p :: list) ipl
-          else loop list ipl
-      | [] -> list
-    in
-    loop [] ipl
+  let occurrence_numbers =
+    get_all_occurrence_numbers ~base ~first_name:f ~surname:s
   in
-  let list_occ = List.sort compare list_occ in
-  let rec loop cnt1 = function
-    | cnt2 :: list -> if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
-    | [] -> cnt1
-  in
-  loop 0 list_occ
+  Occurrence_number.smallest_free occurrence_numbers
 
 let get_birth_death_date p =
   let birth_date, approx =
-    match Date.od_of_cdate (get_birth p) with
-    | None -> (Date.od_of_cdate (get_baptism p), true)
+    match Date.od_of_cdate (Gwdb.get_birth p) with
+    | None -> (Date.od_of_cdate (Gwdb.get_baptism p), true)
     | x -> (x, false)
   in
   let death_date, approx =
-    match Date.date_of_death (get_death p) with
+    match Date.date_of_death (Gwdb.get_death p) with
     | Some d -> (Some d, approx)
     | None -> (
-        match get_burial p with
-        | Buried cd | Cremated cd -> (Date.od_of_cdate cd, true)
-        | UnknownBurial -> (None, approx))
+        match Gwdb.get_burial p with
+        | Def.Buried cd | Def.Cremated cd -> (Date.od_of_cdate cd, true)
+        | Def.UnknownBurial -> (None, approx))
   in
   (birth_date, death_date, approx)
