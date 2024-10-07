@@ -9,7 +9,7 @@ let person i =
   { (Mutil.empty_person empty_string quest_string) with occ = i; key_index = i }
 
 let family i = { (Mutil.empty_family empty_string) with fam_index = i }
-let iper (i : int) : Gwdb.iper = Obj.magic i
+let iper (i : int) : Gwdb.iper = i |> Int.to_string |> Gwdb.iper_of_string
 
 let test_is_ancestor =
   let child = person 0 in
