@@ -116,7 +116,7 @@ let print_portrait conf base p =
 
 let print_source conf f =
   let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
-  let fname = Image.source_filename conf fname in
+  let fname = Filename.concat (!GWPARAM.images_d conf.bname) fname in
   if (conf.wizard || conf.friend) || Image.is_not_private_img conf fname then
     Result.fold ~ok:ignore
       ~error:(fun _ -> Hutil.incorrect_request conf)

@@ -6,9 +6,8 @@ open Util
 module StrSet = Mutil.StrSet
 
 let file_path conf base fname =
-  Util.bpath
-    (List.fold_left Filename.concat (conf.bname ^ ".gwb")
-       [ base_notes_dir base; fname ^ ".txt" ])
+  String.concat Filename.dir_sep
+    [ Util.bpath conf.bname; base_notes_dir base; fname ^ ".txt" ]
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -155,9 +154,8 @@ let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    List.fold_left Filename.concat
-      (Util.bpath (conf.bname ^ ".gwb"))
-      [ base_notes_dir base; fname ]
+    String.concat Filename.dir_sep
+      [ Util.bpath conf.bname; base_notes_dir base; fname ]
   in
   Mutil.mkdir_p (Filename.dirname fpath);
   Gwdb.commit_notes base fname s;

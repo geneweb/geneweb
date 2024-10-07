@@ -119,7 +119,7 @@ let fixbase_ok conf base =
   let process () =
     ignore @@ Unix.alarm 0;
     (* cancel timeout *)
-    let base' = Gwdb.open_base @@ Util.base_path [] (bname base ^ ".gwb") in
+    let base' = Gwdb.open_base @@ !GWPARAM.bpath conf.bname in
     let ipers = ref [] in
     let ifams = ref [] in
     let istrs = ref [] in
@@ -378,7 +378,7 @@ let fixbase_ok conf base =
     in
     let tstab () =
       if UI.enabled conf "tstab" then (
-        let bname = Util.base_path [] (bname base ^ ".gwb") in
+        let bname = !GWPARAM.bpath conf.bname in
         Mutil.rm (Filename.concat bname "tstab_visitor");
         Mutil.rm (Filename.concat bname "tstab");
         Output.print_sstring conf {|<p>|};
@@ -418,7 +418,7 @@ let fixbase_ok conf base =
   if dry_run then process ()
   else
     Lock.control
-      (Mutil.lock_file @@ Util.base_path [] (conf.bname ^ ".gwb"))
+      (Mutil.lock_file @@ !GWPARAM.bpath conf.bname)
       false
       ~onerror:(fun () -> !GWPARAM.output_error conf Def.Service_Unavailable)
       process

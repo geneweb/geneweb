@@ -48,7 +48,6 @@ let month_number_dates = ref NoMonthNumberDates
 let no_public_if_titles = ref false
 let first_names_brackets = ref None
 let untreated_in_notes = ref false
-let force = ref false
 let default_source = ref ""
 let relation_status = ref Married
 let no_picture = ref false
@@ -3177,12 +3176,18 @@ let finish_base (persons, families, strings, _) =
 
 (* Main *)
 
+let in_file = ref ""
 let out_file = ref "a"
 
 let speclist =
-  [ ( "-o", Arg.String (fun s -> out_file := s)
-    , "<file> Output database (default: \"a\"). Alphanumerics and -" )
-  ; ( "-f", Arg.Set force
+  [ ( "-bd",
+      Arg.String Secure.set_base_dir,
+      "<DIR> Specify where the “bases” directory with databases is installed \
+       (default if empty is “.”)." )
+  ; ( "-o", Arg.Set_string out_file,
+      "<file> Output database (default: <input file name>.gwb, a.gwb if not \
+       available). Alphanumerics and -" )
+  ; ( "-f", Arg.Set Geneweb.GWPARAM.force
     , " Remove database if already existing" )
   ; ( "-log", Arg.String (fun s -> log_oc := open_out s)
     , "<file> Redirect log trace to this file." )
@@ -3270,6 +3275,7 @@ let speclist =
   ; ( "-particles"
     , Arg.String (fun s -> particles := Mutil.input_particles s)
     , "<FILE> Use the given file as list of particles" )
+  ; ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
   ] |> List.sort compare |> Arg.align
 
 let anonfun s =
@@ -3280,6 +3286,12 @@ let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
 
 let main () =
   Arg.parse speclist anonfun errmsg;
+  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  in_file :=
+    if !in_file <> "" then
+      Filename.remove_extension (Filename.basename !in_file)
+    else !in_file;
+  if !in_file <> "" && (not (Array.mem "-o" Sys.argv)) then out_file := !in_file;
   if not (Mutil.good_name (Filename.basename !out_file)) then (
     (* Util.transl conf not available !*)
     Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
@@ -3287,7 +3299,10 @@ let main () =
     Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
     flush stderr;
     exit 2);
+  let bname = Filename.remove_extension (Filename.basename !out_file) in
+  Geneweb.GWPARAM.init bname;
   Secure.set_base_dir (Filename.dirname !out_file);
+  Geneweb.GWPARAM.test_base bname;
   let arrays = make_arrays !in_file in
   Gc.compact ();
   let arrays = make_subarrays arrays in
