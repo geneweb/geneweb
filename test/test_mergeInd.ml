@@ -36,7 +36,7 @@ let test_is_ancestor =
   let child = Gwdb.poi base (iper 0) in
   let father = Gwdb.poi base (iper 1) in
   let mother = Gwdb.poi base (iper 2) in
-  let test ~__POS__ ~msg exp p1 p2 _ =
+  let test ~__POS__ ~msg exp p1 p2 () =
     Alcotest.check' ~pos:__POS__ Alcotest.bool ~msg ~expected:exp
       ~actual:(Geneweb.MergeInd.is_ancestor base p1 p2)
   in
