@@ -482,6 +482,10 @@ let open_base bname =
 let make bname _particles
     ((persons, ascends, unions), (families, couples, descends), strings, _) =
   let base =
+    let bname =
+      let suffix = ".gwb" in
+      if Filename.check_suffix bname suffix then bname else bname ^ suffix
+    in
     {
       persons;
       ascends;
