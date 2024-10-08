@@ -1,7 +1,3 @@
-open Geneweb
-open OUnit2
-open Def
-
 let empty_string = 0
 let quest_string = 1
 let ascend parents = { Gwdb.no_ascend with Def.parents }
@@ -13,7 +9,7 @@ let person i =
   { (Mutil.empty_person empty_string quest_string) with occ = i; key_index = i }
 
 let family i = { (Mutil.empty_family empty_string) with fam_index = i }
-let iper (i : int) : Gwdb.iper = Obj.magic i
+let iper (i : int) : Gwdb.iper = i |> Int.to_string |> Gwdb.iper_of_string
 
 let test_is_ancestor =
   let child = person 0 in
@@ -27,7 +23,7 @@ let test_is_ancestor =
   let descends = [| descend [| 0 |] |] in
   let strings = [| ""; "?" |] in
   let base_notes =
-    { nread = (fun _ _ -> ""); norigin_file = ""; efiles = (fun () -> []) }
+    { Def.nread = (fun _ _ -> ""); norigin_file = ""; efiles = (fun () -> []) }
   in
   let data =
     ( (persons, ascends, unions),
@@ -36,14 +32,25 @@ let test_is_ancestor =
       base_notes )
   in
   let base = Gwdb.make "" [] data in
+  let () = Gwdb.load_ascends_array base in
   let child = Gwdb.poi base (iper 0) in
   let father = Gwdb.poi base (iper 1) in
   let mother = Gwdb.poi base (iper 2) in
-  let test exp p1 p2 _ = assert_equal exp (MergeInd.is_ancestor base p1 p2) in
+  let test ~__POS__ ~msg exp p1 p2 () =
+    Alcotest.check' ~pos:__POS__ Alcotest.bool ~msg ~expected:exp
+      ~actual:(Geneweb.MergeInd.is_ancestor base p1 p2)
+  in
   [
-    "is_ancetor child father" >:: test false child father;
-    "is_ancetor father child" >:: test true father child;
-    "is_ancetor mother child" >:: test true mother child;
+    test ~__POS__ ~msg:"is_ancestor child father" false child father;
+    test ~__POS__ ~msg:"is_ancestor father child" true father child;
+    test ~__POS__ ~msg:"is_ancestor mother child" true mother child;
   ]
 
-let suite = [ "MergeInd.is_ancestor" >::: test_is_ancestor ]
+let v =
+  [
+    ( "merge-individuals",
+      [
+        Alcotest.test_case "MergeInd.is_ancestor" `Quick (fun () ->
+            List.iter (fun check -> check ()) test_is_ancestor);
+      ] );
+  ]

@@ -3,7 +3,7 @@
 GeneWeb is an open source genealogy software written in OCaml. It comes
 with a Web interface and can be used off-line or as a Web service.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/5a5yk7jvxk332pxu/branch/master?svg=true)](https://ci.appveyor.com/project/geneweb/geneweb/branch/master)
+[![build status](https://github.com/geneweb/geneweb/workflows/ci/badge.svg)](https://github.com/geneweb/geneweb/actions)
 
 ## Documentation
 
@@ -91,7 +91,7 @@ See [Contributor guidelines](CONTRIBUTING.md).
 
 ### Installation (for developpers)
 
-See [AppVeyor](appveyor.yml).
+See [geneweb.opam](./geneweb.opam).
 
 ### Build instructions
 
