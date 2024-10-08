@@ -96,28 +96,26 @@
 %define;list_witness_of_kind(kindx)
   %reset_count;
   %foreach;event_witness;
-    %if;(event_witness_kind = [kindx]0)
+    %if;(witness_kind="kindx")
       %incr_count;
     %end;
   %end;
   %let;k_cnt;%count;%in;
   %reset_count;
-  %foreach;event_witness;
-    %incr_count;
-  %end;
-  %let;w_cnt;%count;%in;
-  %if;(k_cnt>1)
-    [*kindx]2[:]
-  %elseif;(k_cnt=1)
-    %foreach;event_witness
-      %if;(event_witness_kind=[kindx]0)
-        %if;(event_witness.sex=1)<br>[*kindx]1%else;[*kindx]0%end;[:]
-      %end;
+  %if;(k_cnt>0)<br>%end;
+  %if;(k_cnt>=1)
+    %if;("kindx"="")[*witness/witness/witnesses]2[:]
+    %elseif;("kindx"="offi")[*civil registrar/civil registrar/civil registrar]2[:]
+    %elseif;("kindx"="reli")[*parrish registrar/parrish registrar/parrish registrar]2[:]
+    %elseif;("kindx"="info")[*informant/informant/informant]2[:]
+    %elseif;("kindx"="pres")[*present/present/present]2[:]
+    %elseif;("kindx"="ment")[*mentioned/mentioned/mentioned]2[:]
+    %elseif;("kindx"="othe")[*other/other/other]2[:]
     %end;
   %end;
   %reset_count;
   %foreach;event_witness;
-    %if;(event_witness_kind = [kindx]0)
+    %if;(witness_kind="kindx")
       %incr_count;
       <span class="text-nowrap">%nn;
       %apply;short_display_person("event_witness")%nn;
@@ -521,14 +519,14 @@
           </td>
         </tr>
         %if;(oneline=0)
-        <tr class="align-top">
-          <td>
             %if;(item.10!="")
               %if;(item.8="new_event_sorted")
                 %reset_count2;
                 %foreach;event;
                   %incr_count2;
                   %if;(item.6=count2)
+                  <tr class="align-top">
+                    <td>
                     %if;(event.name=[baptism])
                       %if;has_relations;
                         %foreach;relation;
@@ -553,24 +551,24 @@
                         %end;
                       %end;
                     %end;
-                    %if;(event.name=[baptism] and has_relations and event.has_witnesses)
-                      <br>
-                    %end;
                     %if;event.has_witnesses;
-                      %apply;list_witness_of_kind("witness/witness/witnesses")
-                      %apply;list_witness_of_kind("officer/officer/officers")
+                      %apply;list_witness_of_kind("offi")
+                      %apply;list_witness_of_kind("reli")
+                      %apply;list_witness_of_kind("")
+                      %apply;list_witness_of_kind("ment")
+                      %apply;list_witness_of_kind("atte")
+                      %apply;list_witness_of_kind("info")
+                      %apply;list_witness_of_kind("othe")
                     %end;
+                    %if;(item.11!="")
+                      <br><span class="mt-1">%item.11;</span> %( note %)
+                    %end;
+                    </td>
+                  </tr>
                   %end;
                 %end;
-              %else;
-                %item.10; %( godparents and witness %)
               %end;
             %end;
-            %if;(item.11!="")
-             <span class="mt-1">%item.11;</span> %( note %)
-            %end;
-          </td>
-        </tr>
         %else;
           %if;(item.9!="" or item.10!="" or item.11!="")
             <tr></tr>

@@ -389,7 +389,7 @@
           <option value="link"%if;(fwitness.create="link") selected%end;>[*link]0</option>
         </select>
       </div>
-      <div id="excnt_witnwcnt_p_selct_kind" class="col-4">
+      <div class="col-4">
         <select class="form-control" name="excnt_witnwcnt_kind">
           <option value=""%if;(fwitness_kind="") selected%end;>[*witness/witnesses]0</option>
           <option value="info"%if;(fwitness_kind="info") selected%end;>[*informant/informant/informant]2</option>

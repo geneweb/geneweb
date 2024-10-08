@@ -118,15 +118,12 @@ document.addEventListener('DOMContentLoaded', () => {
 %( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)
 $(document).ready(function() {
   $("[id$=_selct]").on('change', function() {
-    var pre = this.id;
-    var all = '#' + pre + '_data,#' + pre + '_sex,#' + pre + '_kind';
-    var mod = '#' + pre + '_mod';
-    if (this.value == "link") {
-      $(all).hide();
-      $(mod).show();}
-    else {
-      $(all).show();
-      $(mod).hide();}
+    var pre = '#' + this.id;
+    var all = pre + '_data, ' + pre + '_sex';
+    var mod = pre + '_mod';
+    var isLink = this.value === "link";
+    $(all).toggle(!isLink);
+    $(mod).toggle(isLink);
   }).change();
 });
 

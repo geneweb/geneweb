@@ -375,7 +375,7 @@
           <option value="link"%if;(witness.link) selected%end;>[*link]0</option>
         </select>
       </div>
-      <div id="excnt_witnwcnt_p_selct_kind" class="col-4">
+      <div class="col-4">
         <select class="form-control" name="excnt_witnwcnt_kind">
           <option value=""%if;(witness_kind="") selected%end;>[*witness/witnesses]0</option>
           <option value="godp"%if;(witness_kind="godp" or "evt_name"="#bapt" and witness_kind!="") selected%end;%if;("evt_name" != "#bapt") class="d-none"%end;>[*godfather/godmother/godparents]2</option>
