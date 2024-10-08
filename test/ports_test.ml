@@ -5,8 +5,9 @@
 open Alcotest
 
 let ged_import filename base_name =
+  let () = Ged2gwb_lib.State.in_file := filename in
+  let () = Ged2gwb_lib.State.out_file := base_name in
   let state = Ged2gwb_lib.State.make () in
-  let state = { state with in_file = filename; out_file = base_name } in
   Ged2gwb_lib.make_base state
 
 let ged_export base outfile =
