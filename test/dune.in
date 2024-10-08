@@ -27,7 +27,7 @@
     util_test
     wiki_test
     ports_test
-    test_mergeInd
+    merge_ind_test
     )
   (deps assets/royal92.ged assets/abc.ged)
 )

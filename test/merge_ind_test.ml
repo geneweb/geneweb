@@ -46,7 +46,7 @@ let test_is_ancestor =
     test ~__POS__ ~msg:"is_ancestor mother child" true mother child;
   ]
 
-let suite =
+let v =
   [
     ( "merge-individuals",
       [
