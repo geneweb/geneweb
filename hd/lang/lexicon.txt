@@ -14014,7 +14014,7 @@ de: religiöser Amtsträger/religiöser Amtsträger/religiöser Amtsträger
 en: parish registrar/parish registrar/parish registrar
 es: oficiante religioso/oficiante religioso/oficiante religioso
 fi: seurakunnan rekisterinpitäjä/seurakunnan rekisterinpitäjä/seurakunnan rekisterinpitäjä
-fr: officiant religieux/officiante religieuse/officiant(e) religieux(se)
+fr: officiant religieux/officiante religieuse/officiant religieux
 it: officiante religioso/officiante religioso/officiante religioso
 nl: geestelijk celebrant/geestelijk celebrant/geestelijk celebrant
 no: sogneregistrator/sogneregistrator/sogneregistrator

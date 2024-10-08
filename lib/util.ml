@@ -1140,6 +1140,20 @@ let string_of_witness_kind conf sex witness_kind =
   in
   Adef.safe @@ transl_nth conf s n
 
+let string_of_witness_kind_raw witness_kind =
+  let s =
+    match witness_kind with
+    | Witness -> ""
+    | Witness_CivilOfficer -> "offi"
+    | Witness_GodParent -> "godp"
+    | Witness_ReligiousOfficer -> "reli"
+    | Witness_Informant -> "info"
+    | Witness_Attending -> "atte"
+    | Witness_Mentioned -> "ment"
+    | Witness_Other -> "othe"
+  in
+  Adef.safe s
+
 let base_path pref bname = !GWPARAM.base_path pref bname
 let bpath bname = !GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)

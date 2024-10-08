@@ -356,6 +356,11 @@ val string_of_witness_kind : config -> sex -> witness_kind -> Adef.safe_string
     Return the string corresponding to wk according to [sex] and [conf].
 *)
 
+val string_of_witness_kind_raw : witness_kind -> Adef.safe_string
+(** [string_of_witness_kind_raw conf wk]
+    Return the string corresponding to generic coding of wk .
+*)
+
 val relation_txt : config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format
 val string_of_decimal_num : config -> float -> string
 

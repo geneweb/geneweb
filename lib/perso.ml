@@ -4630,10 +4630,12 @@ let print_foreach conf base print_ast eval_expr =
           Array.iteri
             (fun i (ip, wk) ->
               let p = pget conf base ip in
-              let wk = Util.string_of_witness_kind conf (get_sex p) wk in
+              let wk_s = Util.string_of_witness_kind conf (get_sex p) wk in
+              let wk_r = Util.string_of_witness_kind_raw wk in
               let env =
                 ("event_witness", Vind p)
-                :: ("event_witness_kind", Vstring (wk :> string))
+                :: ("witness_kind", Vstring (wk_r :> string))
+                :: ("event_witness_kind", Vstring (wk_s :> string))
                 :: ("first", Vbool (i = 0))
                 :: env
               in
@@ -4690,13 +4692,13 @@ let print_foreach conf base print_ast eval_expr =
             (fun (i, first) (ip, wk) ->
               let p = pget conf base ip in
               (* TODO if witness_kind = Witness, we might want wk = "" *)
-              let wks =
+              let wk_s =
                 if witness_kind = Witness && wk = Witness then ""
                 else (Util.string_of_witness_kind conf (get_sex p) wk :> string)
               in
               let env =
                 ("witness", Vind p) :: ("first", Vbool first)
-                :: ("witness_kind", Vstring wks)
+                :: ("witness_kind", Vstring wk_s)
                 :: env
               in
               if witness_kind = Witness || witness_kind = wk then (
