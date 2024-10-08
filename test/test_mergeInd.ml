@@ -41,9 +41,9 @@ let test_is_ancestor =
       ~actual:(Geneweb.MergeInd.is_ancestor base p1 p2)
   in
   [
-    test ~__POS__ ~msg:"is_ancetor child father" false child father;
-    test ~__POS__ ~msg:"is_ancetor father child" true father child;
-    test ~__POS__ ~msg:"is_ancetor mother child" true mother child;
+    test ~__POS__ ~msg:"is_ancestor child father" false child father;
+    test ~__POS__ ~msg:"is_ancestor father child" true father child;
+    test ~__POS__ ~msg:"is_ancestor mother child" true mother child;
   ]
 
 let suite =
