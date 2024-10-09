@@ -66,9 +66,7 @@ val compute_relationship :
   option
 
 val simplify_path :
-  Gwdb_driver.base ->
-  (Gwdb_driver.iper * famlink) list ->
-  (Gwdb_driver.iper * famlink) list
+  Gwdb.base -> (Gwdb.iper * famlink) list -> (Gwdb.iper * famlink) list
 
 (* ----------- *)
 (* TODO put them in perso.ml? *)

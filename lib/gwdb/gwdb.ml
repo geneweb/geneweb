@@ -1,4 +1,3 @@
-open Def
 include Gwdb_driver
 
 (** [insert_person base p a u]
@@ -8,7 +7,7 @@ include Gwdb_driver
 *)
 let insert_person base p a u =
   let iper = Gwdb_driver.new_iper base in
-  let p = { p with key_index = iper } in
+  let p = { p with Def.key_index = iper } in
   Gwdb_driver.insert_ascend base iper a;
   Gwdb_driver.insert_union base iper u;
   Gwdb_driver.insert_person base iper p;
@@ -33,7 +32,6 @@ let get_gen_person = getp Gwdb_driver.gen_person_of_person
 let get_gen_ascend = getp Gwdb_driver.gen_ascend_of_person
 let get_gen_union = getp Gwdb_driver.gen_union_of_person
 let getf fn b i = fn @@ Gwdb_driver.foi b i
-let get_gen_family = getf Gwdb_driver.gen_family_of_family
 let get_gen_couple = getf Gwdb_driver.gen_couple_of_family
 let get_gen_descend = getf Gwdb_driver.gen_descend_of_family
 
@@ -48,13 +46,13 @@ let rec delete_person excl base ip =
   (* if person is the single child and their parents are empty persons
      then [ipers] contains father and mother and [ifams] contains family *)
   let ipers, ifams =
-    match a.parents with
+    match a.Def.parents with
     | Some ifam ->
         (* delete ascendants *)
         Gwdb_driver.delete_ascend base ip;
         (* remove person id from family descendants *)
         let children =
-          (get_gen_descend base ifam).children |> Mutil.array_except ip
+          (get_gen_descend base ifam).Def.children |> Mutil.array_except ip
         in
         Gwdb_driver.patch_descend base ifam { children };
         if children = [| ip |] then
@@ -69,7 +67,7 @@ let rec delete_person excl base ip =
   in
   let del, ipers, ifams =
     let u = get_gen_union base ip in
-    if u.family = [||] then (true, [], [])
+    if u.Def.family = [||] then (true, [], [])
     else
       Array.fold_left
         (fun (del, ipers, ifams) ifam ->
@@ -79,7 +77,7 @@ let rec delete_person excl base ip =
           let moth = Adef.mother cpl in
           if fath = ip || moth = ip then
             let d = get_gen_descend base ifam in
-            if Array.length d.children > 1 then (false, ipers, ifams)
+            if Array.length d.Def.children > 1 then (false, ipers, ifams)
             else
               let sp = if ip = fath then moth else fath in
               if List.mem sp iexcl then (del, ipers, ifams)
@@ -91,7 +89,7 @@ let rec delete_person excl base ip =
                It is likely to happen when merging persons. *)
             rm_union base ifam ip;
             (del, ipers, ifams)))
-        (true, ipers, ifams) u.family
+        (true, ipers, ifams) u.Def.family
   in
   if del then Gwdb_driver.delete_person base ip
   else
@@ -105,8 +103,8 @@ let rec delete_person excl base ip =
   List.fold_left (fun excl ifam -> delete_family excl base ifam) excl ifams
 
 and is_empty_p ?ifam base sp =
-  (get_gen_ascend base sp).parents = None
-  && ((get_gen_union base sp).family
+  (get_gen_ascend base sp).Def.parents = None
+  && ((get_gen_union base sp).Def.family
      = match ifam with Some i -> [| i |] | None -> [||])
   && get_gen_person base sp
      = { (no_person sp) with first_name = quest_string; surname = quest_string }
@@ -148,7 +146,7 @@ and delete_family excl base ifam =
     excl children
 
 and rm_union base ifam iper =
-  { family = (get_gen_union base iper).family |> Mutil.array_except ifam }
+  { Def.family = (get_gen_union base iper).family |> Mutil.array_except ifam }
   |> patch_union base iper
 
 (** [delete_person base iper] and [delete_family base ifam]
@@ -177,8 +175,8 @@ let nobtitles base allowed_titles denied_titles p =
       let list =
         List.fold_right
           (fun t l ->
-            let id = Name.lower (sou base t.t_ident) in
-            let pl = Name.lower (sou base t.t_place) in
+            let id = Name.lower (sou base t.Def.t_ident) in
+            let pl = Name.lower (sou base t.Def.t_place) in
             if pl = "" then if List.mem id allowed_titles then t :: l else l
             else if
               List.mem (id ^ "/" ^ pl) allowed_titles
@@ -192,8 +190,8 @@ let nobtitles base allowed_titles denied_titles p =
       | denied_titles ->
           List.filter
             (fun t ->
-              let id = Name.lower (sou base t.t_ident) in
-              let pl = Name.lower (sou base t.t_place) in
+              let id = Name.lower (sou base t.Def.t_ident) in
+              let pl = Name.lower (sou base t.Def.t_place) in
               if
                 List.mem (id ^ "/" ^ pl) denied_titles
                 || List.mem ("*/" ^ pl) denied_titles
@@ -211,7 +209,7 @@ let p_surname base p = Mutil.nominative (sou base (get_surname p))
     First element of a couple in the array is husband's surname,
     second - is a husband's surname aliases *)
 let husbands base gp =
-  let p = poi base gp.key_index in
+  let p = poi base gp.Def.key_index in
   Array.map
     (fun ifam ->
       let fam = foi base ifam in
@@ -223,7 +221,7 @@ let husbands base gp =
 
 (** Return person's father titles *)
 let father_titles_places base p (nobtit : person -> title list) =
-  match get_parents (poi base p.key_index) with
+  match get_parents (poi base p.Def.key_index) with
   | Some ifam ->
       let fam = foi base ifam in
       let fath = poi base (get_father fam) in
@@ -231,10 +229,10 @@ let father_titles_places base p (nobtit : person -> title list) =
   | None -> []
 
 let gen_gen_person_misc_names base p nobtit nobtit_fun =
-  Futil.gen_person_misc_names (sou base) empty_string quest_string p.first_name
-    p.surname p.public_name p.qualifiers p.aliases p.first_names_aliases
-    p.surnames_aliases nobtit
-    (if p.sex = Female then husbands base p else [||])
+  Futil.gen_person_misc_names (sou base) empty_string quest_string
+    p.Def.first_name p.Def.surname p.Def.public_name p.Def.qualifiers
+    p.Def.aliases p.Def.first_names_aliases p.Def.surnames_aliases nobtit
+    (if p.Def.sex = Def.Female then husbands base p else [||])
     (father_titles_places base p nobtit_fun)
   |> List.map Name.lower
 
