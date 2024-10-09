@@ -57,7 +57,7 @@ let print_mod_ok conf base =
     | Some n ->
         let n = int_of_string n in
         if n > 50000 then default_max_updates else n
-    | _ -> default_max_updates
+    | None -> default_max_updates
   in
   if nb_pers <> 0 && data_modified then (
     UpdateData.update_person_list conf base new_input list nb_pers max_updates;
