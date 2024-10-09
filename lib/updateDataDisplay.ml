@@ -48,7 +48,6 @@ let print_mod_ok conf base =
     List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
   in
   let data_modified = List.for_all (fun (old, _) -> new_input <> old) list in
-  (* Indication : 1000 fiches prend environ 1 seconde de traitement. *)
   (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
   (* pour ne pas dépasser le time out du serveur.                    *)
   let max_updates =
