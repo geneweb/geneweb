@@ -7,7 +7,7 @@ open Util
 
 type date_search = JustSelf | AddSpouse | AddChildren
 
-module StrSet = Mutil.StrSet
+module StrSet = Ext_string.Set
 
 let date_interval conf base t x =
   let d1 =

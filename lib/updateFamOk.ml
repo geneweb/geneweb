@@ -24,9 +24,9 @@ let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
 let reconstitute_parent_or_child conf var default_surname =
-  let first_name = only_printable (getn conf var "fn") in
+  let first_name = Ext_string.only_printable (getn conf var "fn") in
   let surname =
-    let surname = only_printable (getn conf var "sn") in
+    let surname = Ext_string.only_printable (getn conf var "sn") in
     if surname = "" && first_name <> "" then default_surname else surname
   in
   (* S'il y a des caractères interdits, on les supprime *)
@@ -43,7 +43,7 @@ let reconstitute_parent_or_child conf var default_surname =
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
     let dpl = getn conf (var ^ "d") "pl" in
-    let occupation = only_printable (getn conf var "occupation") in
+    let occupation = Ext_string.only_printable (getn conf var "occupation") in
     let public = getn conf (var ^ "b") "yyyy" = "p" in
     {
       ci_birth_date = b;
@@ -152,25 +152,26 @@ let rec reconstitute_events conf ext cnt =
         | "#marl" -> Efam_MarriageLicense
         | "#pacs" -> Efam_PACS
         | "#resi" -> Efam_Residence
-        | n -> Efam_Name (only_printable n)
+        | n -> Efam_Name (Ext_string.only_printable n)
       in
       let efam_date =
         Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
       in
       let efam_place =
         match get_nth conf "e_place" cnt with
-        | Some place -> only_printable place
+        | Some place -> Ext_string.only_printable place
         | None -> ""
       in
       let efam_note =
         match get_nth conf "e_note" cnt with
         | Some note ->
-            only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
+            Ext_string.only_printable_or_nl
+              (Ext_string.strip_all_trailing_spaces note)
         | None -> ""
       in
       let efam_src =
         match get_nth conf "e_src" cnt with
-        | Some src -> only_printable src
+        | Some src -> Ext_string.only_printable src
         | None -> ""
       in
       let witnesses, ext =
@@ -444,9 +445,10 @@ let reconstitute_family conf base nsck =
     loop 1 ext
   in
   let comment =
-    only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "comment"))
+    Ext_string.only_printable_or_nl
+      (Ext_string.strip_all_trailing_spaces (get conf "comment"))
   in
-  let fsources = only_printable (get conf "src") in
+  let fsources = Ext_string.only_printable (get conf "src") in
   let origin_file =
     Option.value ~default:"" (p_getenv conf.env "origin_file")
   in

@@ -175,7 +175,9 @@ let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
 
 let output_particles_file particles fname =
   let oc = open_out fname in
-  List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  List.iter
+    (fun s -> Printf.fprintf oc "%s\n" (Ext_string.tr ' ' '_' s))
+    particles;
   close_out oc
 
 let output ?(save_mem = false) base =

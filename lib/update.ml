@@ -859,8 +859,8 @@ let error_digest conf =
   Output.print_string conf (string_of_error conf err);
   Output.print_sstring conf "</p>"
 
-let digest_person p = Marshal.to_string p [] |> Mutil.digest
-let digest_family f = Marshal.to_string f [] |> Mutil.digest
+let digest_person p = Marshal.to_string p [] |> Ext_string.digest
+let digest_family f = Marshal.to_string f [] |> Ext_string.digest
 
 let get var key env =
   match p_getenv env (var ^ "_" ^ key) with
@@ -1089,7 +1089,7 @@ let reconstitute_date conf var =
   | None, _ -> (
       match p_getenv conf.env (var ^ "_text") with
       | Some _ ->
-          let txt = only_printable (get var "text" conf.env) in
+          let txt = Ext_string.only_printable (get var "text" conf.env) in
           if txt = "" then None else Some (Dtext txt)
       | None -> None)
 
@@ -1238,7 +1238,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             burial_src = empty_string;
             pevents = [];
             notes = empty_string;
-            psources = Gwdb.insert_string base (only_printable src);
+            psources = Gwdb.insert_string base (Ext_string.only_printable src);
             key_index = Gwdb.dummy_iper;
           }
         in

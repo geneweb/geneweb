@@ -300,7 +300,6 @@ val message_to_wizard : Config.config -> unit
     {i <basename>/etc/mess_wizzard_<user>.txt} (messages destinated to considered wizard). *)
 
 val of_course_died : Config.config -> Gwdb.person -> bool
-val hexa_string : string -> string
 
 val surname_particle : Gwdb.base -> string -> string
 (** [surname_particle base sn]
@@ -472,12 +471,6 @@ val old_sosa_of_branch :
   Config.config -> Gwdb.base -> (Gwdb.iper * Def.sex) list -> Sosa.t
 (** @deprecated Use [sosa_of_branch] instead *)
 
-val only_printable : string -> string
-(** Trims and remplaces all non-printable characters by spaces in the given string. *)
-
-val only_printable_or_nl : string -> string
-(** Same as [only_printable] but also accepts '\n'. *)
-
 val relation_type_text :
   Config.config -> Def.relation_type -> Def.sex -> Adef.safe_string
 
@@ -555,9 +548,6 @@ val name_key : Gwdb.base -> string -> string
 (** [name_key base name] is [name],
     with particles put at the end of the string instead of the beginning.
 *)
-
-val nb_char_occ : char -> string -> int
-(** [nb_char_occ c s] return the number of times [c] appears in [s]. *)
 
 val escape_html : string -> Adef.escaped_string
 (** [escape_html str] replaces '&', '"', '\'', '<' and '>'
@@ -668,12 +658,6 @@ val auth_warning :
 val name_with_roman_number : string -> string option
 (** Convert arabic numerals to roman numerals.
     [Some result] is returned if there are numerals, [None] if not.
-*)
-
-val cut_words : string -> string list
-(** [cut_words str]
-    Same output as
-    [String.split_on_char ' ' s |> List.map String.trim |> List.filter ((<>) "")]
 *)
 
 val designation : Gwdb.base -> Gwdb.person -> Adef.escaped_string

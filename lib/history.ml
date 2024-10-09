@@ -33,7 +33,7 @@ let ext_flags =
     [Retour] : string
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let slash_name_of_key fn sn occ =
-  let space_to_unders = Mutil.tr ' ' '_' in
+  let space_to_unders = Ext_string.tr ' ' '_' in
   let fn = space_to_unders (Name.lower fn) in
   let sn = space_to_unders (Name.lower sn) in
   sn ^ "/" ^ fn ^ "/" ^ string_of_int occ

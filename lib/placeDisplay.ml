@@ -27,7 +27,7 @@ let print_html_places_surnames conf base
   in
   let print_sn_list (snl : (string * iper list) list) =
     let snl =
-      List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl
+      List.sort (fun (sn1, _) (sn2, _) -> Utf8.alphabetic_order sn1 sn2) snl
     in
     Output.print_sstring conf "<li>\n";
     Ext_list.iter_first
@@ -91,7 +91,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       (fun x -> x)
       max_int
   in
-  Array.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) array;
+  Array.sort (fun (s1, _) (s2, _) -> Utf8.alphabetic_order s1 s2) array;
   let title _ =
     Output.print_sstring conf (Utf8.capitalize_fst (transl conf "place"))
   in
@@ -160,7 +160,7 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
     | _, [] -> 1
     | [], _ -> -1
     | s1 :: pl11, s2 :: pl22 -> (
-        match Gutil.alphabetic_order s1 s2 with
+        match Utf8.alphabetic_order s1 s2 with
         | 0 -> sort_place_utf8 pl11 pl22
         | x -> x)
   in

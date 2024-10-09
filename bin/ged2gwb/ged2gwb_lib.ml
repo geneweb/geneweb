@@ -314,11 +314,11 @@ let ascii_of_macintosh s =
 
 let utf8_of_string s =
   match !state.charset with
-  | Ansel -> Mutil.utf_8_of_iso_8859_1 (Geneweb.Ansel.to_iso_8859_1 s)
-  | Ansi -> Mutil.utf_8_of_iso_8859_1 s
-  | Ascii -> Mutil.utf_8_of_iso_8859_1 s
-  | Msdos -> Mutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
-  | MacIntosh -> Mutil.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
+  | Ansel -> Utf8.utf_8_of_iso_8859_1 (Geneweb.Ansel.to_iso_8859_1 s)
+  | Ansi -> Utf8.utf_8_of_iso_8859_1 s
+  | Ascii -> Utf8.utf_8_of_iso_8859_1 s
+  | Msdos -> Utf8.utf_8_of_iso_8859_1 (ascii_of_msdos s)
+  | MacIntosh -> Utf8.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
   | Utf8 -> s
 
 let rec get_lev n =

@@ -14,7 +14,7 @@ type gen_record = {
 
 (* Le nom du fichier historique (à partir de la clé personne). *)
 let history_file fn sn occ =
-  let space_to_unders = Mutil.tr ' ' '_' in
+  let space_to_unders = Ext_string.tr ' ' '_' in
   let f = space_to_unders (Name.lower fn) in
   let s = space_to_unders (Name.lower sn) in
   f ^ "." ^ string_of_int occ ^ "." ^ s
