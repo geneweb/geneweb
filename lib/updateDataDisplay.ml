@@ -51,11 +51,11 @@ let print_mod_ok conf base =
   (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
   (* pour ne pas dépasser le time out du serveur.                    *)
   let max_updates =
-    let default_max_updates = 5000 in
+    let default_max_updates = 5_000 in
     match List.assoc_opt "max_nb_update" conf.base_env with
     | Some n ->
         let n = int_of_string n in
-        if n > 50000 then default_max_updates else n
+        if n > 50_000 then default_max_updates else n
     | None -> default_max_updates
   in
   if nb_pers <> 0 && data_modified then (
