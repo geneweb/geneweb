@@ -27,19 +27,6 @@ let translate_in_your_tree conf nb =
   in
   Utf8.capitalize_fst result
 
-(* ******************************************************************** *)
-(*  [Fonc] print_mod_ok : config -> base -> unit                        *)
-
-(* ******************************************************************** *)
-
-(** [Description] : Met à jour toutes les personnes en relation avec
-                    la donnée que l'on veut modifié.
-    [Args] :
-    - conf : configuration
-    - base : base
-      [Retour] :
-    - unit
-      [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_mod_ok conf base =
   let ini_of_update_data ini new_input =
     let len = String.length ini in
