@@ -88,7 +88,12 @@ let print_mod_ok conf base =
       Output.print_sstring conf ".");
     Output.print_sstring conf "</p>";
     if nb_pers > max_updates then (
-      Output.printf conf {|<form method="post" action="%s"><p>|} conf.command;
+      Output.printf conf
+        {|<form method="post"
+                action="%s"
+                onsubmit="this.querySelector('[type=\'submit\']').setAttribute('disabled', '')">
+          <p>|}
+        conf.command;
       Util.hidden_env conf;
       Util.hidden_input conf "key" (List.assoc "key" conf.env);
       Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
