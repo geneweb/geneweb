@@ -101,6 +101,7 @@ let print_mod_ok conf base =
       Output.print_sstring conf {|" id="data">|};
       Output.print_sstring conf
         (Utf8.capitalize_fst (Util.transl conf "continue correcting"));
+      Output.print_sstring conf " ";
       Output.print_sstring conf
         {|<button type="submit" class="btn btn-secondary btn-lg">|};
       Output.print_sstring conf
