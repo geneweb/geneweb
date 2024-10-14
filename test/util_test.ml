@@ -1,7 +1,7 @@
 open Alcotest
 open Geneweb
 
-let mutil_contains () =
+let ext_string_contains () =
   let str = "foo bar" in
   let test t b = (check bool) t b (Ext_string.contains str t) in
   test "foo" true;
@@ -13,7 +13,7 @@ let mutil_contains () =
   test "r" true;
   test "" true
 
-let mutil_start_with () =
+let ext_string_start_with () =
   check_raises "" (Invalid_argument "start_with") (fun () ->
       ignore @@ Ext_string.start_with "foo" (-1) "foo");
   check_raises "" (Invalid_argument "start_with") (fun () ->
@@ -181,10 +181,13 @@ let datedisplay_string_of_date _ =
 
 let v =
   [
+    ( "ext-string",
+      [
+        test_case "Ext_string.contains" `Quick ext_string_contains;
+        test_case "Ext_string.start_with" `Quick ext_string_start_with;
+      ] );
     ( "mutil",
       [
-        test_case "Mutil.contains" `Quick mutil_contains;
-        test_case "Mutil.start_with" `Quick mutil_start_with;
         test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         test_case "Mutil particule" `Quick mutil_compare_after_particle;
         test_case "Mutil.string_of_int_sep" `Quick mutil_compare_after_particle;
