@@ -455,7 +455,8 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
       match op with
       | "and" -> VVbool (if bool e1 then bool e2 else false)
       | "or" -> VVbool (if bool e1 then true else bool e2)
-      | "is_substr" | "in" -> VVbool (Mutil.contains (string e2) (string e1))
+      | "is_substr" | "in" ->
+          VVbool (Ext_string.contains (string e2) (string e1))
       | "=" -> VVbool (eval_expr ceva e1 = eval_expr ceva e2)
       | "<" -> VVbool (int e1 < int e2)
       | ">" -> VVbool (int e1 > int e2)

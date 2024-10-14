@@ -299,7 +299,7 @@ let input_a_line state (ic, encoding) =
   let line = input_line0 state ic in
   match encoding with
   | E_utf_8 -> line
-  | E_iso_8859_1 -> Mutil.utf_8_of_iso_8859_1 line
+  | E_iso_8859_1 -> Utf8.utf_8_of_iso_8859_1 line
 
 (** Read a line. If line is empty or only contains a comment, then read next line  *)
 let rec input_real_line state ic =
@@ -964,7 +964,7 @@ let read_notes state ic =
       loop (input_a_line state ic)
     with End_of_file -> failwith "end of file"
   in
-  Mutil.strip_all_trailing_spaces notes
+  Ext_string.strip_all_trailing_spaces notes
 
 (* from version 5.00 *)
 
@@ -987,7 +987,7 @@ let read_notes_db state ic end_txt =
       loop (input_a_line state ic)
     with End_of_file -> failwith "end of file"
   in
-  Mutil.strip_all_trailing_spaces notes
+  Ext_string.strip_all_trailing_spaces notes
 
 (** Parsing status of .gw block  *)
 type 'a read_family =
@@ -1013,7 +1013,7 @@ let aux_loop_note state tag line ic =
   let acc, line = loop [] line in
   let note =
     String.concat "\n" (List.rev @@ ("" :: acc))
-    |> Mutil.strip_all_trailing_spaces
+    |> Ext_string.strip_all_trailing_spaces
   in
   (note, line)
 

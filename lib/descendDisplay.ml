@@ -86,10 +86,10 @@ let display_descendants_level conf base max_level ancestor =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
+        let c = Ext_string.alphabetic (p_surname base p2) (p_surname base p1) in
         if c = 0 then
           let c =
-            Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
+            Ext_string.alphabetic (p_first_name base p2) (p_first_name base p1)
           in
           if c = 0 then compare (get_occ p2) (get_occ p1) else c
         else c)
@@ -119,7 +119,8 @@ let display_descendants_level conf base max_level ancestor =
   print_alphab_list conf
     (fun (p, _) ->
       if is_empty_person p then "?"
-      else String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
+      else
+        String.sub (p_surname base p) (Ext_string.initial (p_surname base p)) 1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
       Output.print_string conf (referenced_person_title_text conf base p);
@@ -493,9 +494,9 @@ let sort_and_display conf base paths precision list =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
+        let c = Ext_string.alphabetic (p_surname base p2) (p_surname base p1) in
         if c = 0 then
-          Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
+          Ext_string.alphabetic (p_first_name base p2) (p_first_name base p1)
         else c)
       list
   in

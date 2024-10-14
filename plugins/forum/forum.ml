@@ -402,7 +402,8 @@ let get conf key =
   | None -> failwith (key ^ " unbound")
 
 let get1 conf key =
-  only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf key))
+  Ext_string.only_printable_or_nl
+    (Ext_string.strip_all_trailing_spaces (get conf key))
 
 let forum_add conf _base moderated mess =
   let access =

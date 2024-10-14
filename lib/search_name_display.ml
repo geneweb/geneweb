@@ -202,7 +202,7 @@ let name_unaccent s =
   let rec copy i len =
     if i = String.length s then Buff.get len
     else
-      let t, j = Name.unaccent_utf_8 false s i in
+      let t, j = Utf8.unaccent false s i in
       copy j (Buff.mstore len t)
   in
   copy 0 0
@@ -213,7 +213,8 @@ let first_name_print_list conf base x1 xl liste =
       List.sort
         (fun x1 x2 ->
           match
-            Gutil.alphabetic (Gwdb.p_surname base x1) (Gwdb.p_surname base x2)
+            Ext_string.alphabetic (Gwdb.p_surname base x1)
+              (Gwdb.p_surname base x2)
           with
           | 0 -> (
               match
@@ -230,7 +231,7 @@ let first_name_print_list conf base x1 xl liste =
       (fun l x ->
         let px = Gwdb.p_surname base x in
         match l with
-        | (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
+        | (p, l1) :: l when Ext_string.alphabetic px p = 0 -> (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
       [] l
   in
@@ -248,7 +249,7 @@ let first_name_print_list conf base x1 xl liste =
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
-        (Mutil.StrSet.elements xl)
+        (Ext_string.Set.elements xl)
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -296,7 +297,7 @@ let select_first_name conf n list =
         (fun first str ->
           if not first then Output.print_sstring conf ", ";
           Output.print_string conf (Util.escape_html str))
-        (Mutil.StrSet.elements strl);
+        (Ext_string.Set.elements strl);
       Output.print_sstring conf "</a>\n")
     list;
   Output.print_sstring conf "</ul>\n";
@@ -306,7 +307,7 @@ let rec merge_insert ((sstr, (strl, iperl)) as x) = function
   | ((sstr1, (strl1, iperl1)) as y) :: l ->
       if sstr < sstr1 then x :: y :: l
       else if sstr > sstr1 then y :: merge_insert x l
-      else (sstr, (Mutil.StrSet.union strl strl1, iperl @ iperl1)) :: l
+      else (sstr, (Ext_string.Set.union strl strl1, iperl @ iperl1)) :: l
   | [] -> [ x ]
 
 let persons_of_absolute base_strings_of persons_of get_field conf base x =
@@ -353,7 +354,7 @@ let first_name_print conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -434,7 +435,7 @@ let unselected_bullets conf =
       with Failure _ -> sl)
     [] conf.Config.env
 
-let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
+let alphabetic1 n1 n2 = Utf8.alphabetic_order n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
@@ -590,7 +591,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
-        (Mutil.StrSet.elements xl)
+        (Ext_string.Set.elements xl)
   in
   let br = Util.p_getint conf.Config.env "br" in
   Hutil.header conf title;
@@ -688,10 +689,10 @@ let print_family_alphabetic x conf base liste =
     in
     let set =
       List.fold_left
-        (fun set istr -> Mutil.StrSet.add (Gwdb.sou base istr) set)
-        Mutil.StrSet.empty list
+        (fun set istr -> Ext_string.Set.add (Gwdb.sou base istr) set)
+        Ext_string.Set.empty list
     in
-    List.sort compare (Mutil.StrSet.elements set)
+    List.sort compare (Ext_string.Set.elements set)
   in
   let liste =
     let l =
@@ -811,7 +812,7 @@ let surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -884,7 +885,7 @@ let search_surname conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -932,7 +933,7 @@ let search_surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -1003,7 +1004,7 @@ let search_first_name conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
       list
   in
   List.fold_right merge_insert list []
@@ -1023,7 +1024,7 @@ let search_first_name_print conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Mutil.StrSet.add str Mutil.StrSet.empty, iperl)))
+        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in

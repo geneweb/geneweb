@@ -16,7 +16,7 @@ let digest_children base ipl =
       ^ string_of_int (get_occ p)
       ^ "\n")
     "" ipl
-  |> Mutil.digest
+  |> Ext_string.digest
 
 let check_digest conf digest =
   match p_getenv conf.env "digest" with
@@ -43,13 +43,13 @@ let change_child conf base parent_surname changed ip =
   let var = "c" ^ string_of_iper (get_iper p) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
-    | Some x -> only_printable x
+    | Some x -> Ext_string.only_printable x
     | _ -> p_first_name base p
   in
   let new_surname =
     match p_getenv conf.env (var ^ "_surname") with
     | Some x ->
-        let x = only_printable x in
+        let x = Ext_string.only_printable x in
         if x = "" then parent_surname else x
     | _ -> p_surname base p
   in

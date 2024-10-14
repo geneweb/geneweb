@@ -3,7 +3,7 @@
 open Config
 open Gwdb
 open Util
-module StrSet = Mutil.StrSet
+module StrSet = Ext_string.Set
 
 let file_path conf base fname =
   Util.bpath
@@ -122,7 +122,7 @@ let notes_links_db conf base eliminate_unlinked =
   in
   List.sort
     (fun (s1, _) (s2, _) ->
-      Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
+      Utf8.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 
 let update_notes_links_db base fnotes s =

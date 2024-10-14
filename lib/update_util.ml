@@ -46,8 +46,8 @@ let rec reconstitute_sorted_events conf cnt =
   | _ -> []
 
 let reconstitute_somebody removed_string conf var =
-  let first_name = only_printable (getn conf var "fn") in
-  let surname = only_printable (getn conf var "sn") in
+  let first_name = Ext_string.only_printable (getn conf var "fn") in
+  let surname = Ext_string.only_printable (getn conf var "sn") in
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname =
     get_purged_fn_sn removed_string first_name surname

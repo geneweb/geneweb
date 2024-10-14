@@ -66,3 +66,38 @@ val compare : string -> string -> int
     Here is an exemple of how letters would be sorted:
     [A À Á Â B C Ç Č D E É L Ł Ô Ö Ø Œ P Q R * . ?]
  *)
+
+val utf_8_of_iso_8859_1 : string -> string
+(** Convert encoded string with ISO 8859-1 to UTF 8 *)
+
+val iso_8859_1_of_utf_8 : string -> string
+(** Convert encoded string with UTF 8 to ISO 8859-1 *)
+
+val start_with_wildcard : ?ignore_case:bool -> string -> int -> string -> bool
+(** [start_with_wildcard ~ignore_case prefix off str]
+    Test if [str] starts with [prefix] (at offset [off]) ignoring the
+    case according to the value of [ignore_case] (default [false]).
+    Occurrences of ['_'] in [prefix] will match both ['_']
+    and [' '] in [str] and trailing ['_'] of [prefix]
+    is treated as an optional ['_'] [' '].
+
+    Raise [Invalid_argument] if [off] is not a valid index in [str].
+*)
+
+val normalize : string -> string
+(** [normalize s]
+    Return [s] normalized using
+    {{:http://www.unicode.org/glossary/#normalization_form_c}NFC}
+    with all malformed UTF-8 character replaced by
+    {{:http://unicode.org/glossary/#replacement_character}the replacement character}
+*)
+
+val unaccent : bool -> string -> int -> string * int
+(** [unaccent lower s i] checks UTF-8 characher that starts at position [i] inside [s]
+    and returns couple (cs,np) where [cs] is ASCII representation of this character (characters
+    between 0x00 and 0x7F) and [np] it's a position of next utf8 character inside [s]. If [lower]
+    is true then [cs] will contain only lowercase letters.
+    Example : unaccent "aÈa" 1 -> ("e",3) *)
+
+val alphabetic_order : string -> string -> int
+(** Compare two UTF-8 encoded strings by alphabetic order *)

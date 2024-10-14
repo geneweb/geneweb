@@ -4,9 +4,6 @@ val verbose : bool ref
 (** Global variable that indicates either
     servers should be in verbose mode. *)
 
-val strip_all_trailing_spaces : string -> string
-(** Remove all trailing spaces in string *)
-
 (* [decline dform dformat] encode name that could be declined (like in the czech language)
    and its declination form in more comprehensible for computer format.
    Declination form [dform] is one of the follows:
@@ -25,9 +22,6 @@ val nominative : string -> string
 (** Encodes name for nominative declination format.
     @deprecated *)
 
-val initial : string -> int
-(** Returns position of first capital letter in the name (0 if no capitals). *)
-
 val input_particles : string -> string list
 (** [input_particles fname] read file and returns list of lines.
     Empty lines are skipped. *)
@@ -37,12 +31,6 @@ val surnames_pieces : string -> string list
     forms one piece. Words that contains less than 4 characters or words "saint" and "sainte"
     are considered as the particles and are attached to the another word to form a piece.
     If string contains less than two pieces, returns an empty list. *)
-
-val utf_8_of_iso_8859_1 : string -> string
-(** Convert encoded string with ISO 8859-1 to UTF 8 *)
-
-val iso_8859_1_of_utf_8 : string -> string
-(** Convert encoded string with UTF 8 to ISO 8859-1 *)
 
 val roman_of_arabian : int -> string
 (** Convert arabic number (int) to roman (string). Number should be < 4000. *)
@@ -58,20 +46,6 @@ val input_lexicon :
     a coresponding traduction associated to a [lang] language code.
     If traduction line has a form [->: kw] it associates to the current section name the value
     associated to [kw] section name inside [ht] (keyword alias). *)
-
-module StrSet : Set.S with type elt = string
-(** Set of strings *)
-
-val tr : char -> char -> string -> string
-(** [tr c1 c2 str]
-    Return a new string which is the same as [str] with all occurences of [c1]
-    replaced by [c2]. If [str] does not contain [c1] [str] is returned untouched.
- *)
-
-val unsafe_tr : char -> char -> string -> string
-(** [unsafe_tr c1 c2 str]
-    Update [str] in place. Replace all occurences of [c1] by [c2].
- *)
 
 val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
 (** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
@@ -92,28 +66,6 @@ val array_assoc : 'k -> ('k * 'v) array -> 'v
     That is, [array_assoc k [| ... ; (k,v) ; ... |] = v]
     if [(k,v)] is the leftmost binding of a in array [arr].
     Raise [Not_found] if there is no value associated with [k] in [arr]. *)
-
-val start_with : string -> int -> string -> bool
-(** [start_with prefix off str]
-    Test if [str] starts with [prefix] (at offset [off]).
-
-    Raise [Invalid_argument] if [off] is not a valid index in [str].
-*)
-
-val start_with_wildcard : ?ignore_case:bool -> string -> int -> string -> bool
-(** [start_with_wildcard ~ignore_case prefix off str]
-    Test if [str] starts with [prefix] (at offset [off]) ignoring the
-    case according to the value of [ignore_case] (default [false]).
-    Occurrences of ['_'] in [prefix] will match both ['_']
-    and [' '] in [str] and trailing ['_'] of [prefix]
-    is treated as an optional ['_'] [' '].
-
-    Raise [Invalid_argument] if [off] is not a valid index in [str].
-*)
-
-val contains : string -> string -> bool
-(** [contains str sub] Test [sub] is contained in [str].
-*)
 
 val compile_particles : string list -> Re.re
 (** [compile_particles list]
@@ -175,14 +127,6 @@ val input_file_ic : in_channel -> string
 
 val read_file_content : string -> string
 (** [read_file_content filename] Reads the content of the file with full path [filename]. *)
-
-val normalize_utf_8 : string -> string
-(** [normalize_utf_8 s]
-    Return [s] normalized using
-    {{:http://www.unicode.org/glossary/#normalization_form_c}NFC}
-    with all malformed UTF-8 character replaced by
-    {{:http://unicode.org/glossary/#replacement_character}the replacement character}
-*)
 
 val bench : string -> (unit -> 'a) -> 'a
 (** [bench name fn]
@@ -246,11 +190,6 @@ val eq_key : string * string * int -> string * string * int -> bool
 (** [eq_key (fn1, sn1, oc1) (fn2, sn2, oc2)]
     Tests if two persons would have the same key
 *)
-
-val digest : string -> string
-(** [digest s]
-    Returns the (128 bits long, using MD5 algorithm) digest of [s].
-  *)
 
 val empty_person : 'string -> 'string -> (unit, _, 'string) Def.gen_person
 (** [empty_person empty quest] returns a Def.gen_person with

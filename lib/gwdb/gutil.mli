@@ -30,18 +30,6 @@ val find_same_name : Gwdb.base -> Gwdb.person -> Gwdb.person list
 val designation : Gwdb.base -> Gwdb.person -> string
 (** Returns person's key that has form {i "firstname.occ surname"} *)
 
-val trim_trailing_spaces : string -> string
-(** Trim at the end of string *)
-
-val alphabetic_utf_8 : string -> string -> int
-(** Compare two UTF-8 encoded strings by alphabetic order *)
-
-val alphabetic : string -> string -> int
-(** Compare two ISO-8859-1 encoded strings by alphabetic order *)
-
-val alphabetic_order : string -> string -> int
-(** Same as [alphabetic_utf_8] *)
-
 val arg_list_of_string : string -> string list
 (** Parse line and extract separated arguments ("" and '' are used to indlude spaces
     inside the argument) *)

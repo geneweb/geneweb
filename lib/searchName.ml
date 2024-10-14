@@ -75,7 +75,7 @@ let search_by_name conf base n =
                   Name.abbrev
                     (Name.lower (Gwdb.sou base (Gwdb.get_first_name p)))
                 in
-                if List.mem fn (Util.cut_words fn1) then p :: pl else pl)
+                if List.mem fn (Ext_string.cut_words fn1) then p :: pl else pl)
             pl ipl)
         [] list
   | None -> []

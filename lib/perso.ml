@@ -950,12 +950,12 @@ let build_surnames_list conf base v p =
   List.sort
     (fun (s1, _) (s2, _) ->
       match
-        Gutil.alphabetic_order
+        Utf8.alphabetic_order
           (Util.surname_without_particle base s1)
           (Util.surname_without_particle base s2)
       with
       | 0 ->
-          Gutil.alphabetic_order
+          Utf8.alphabetic_order
             (Util.surname_particle base s1)
             (Util.surname_particle base s2)
       | x -> x)
@@ -1078,18 +1078,18 @@ let build_list_eclair conf base v p =
   List.sort
     (fun (s1, pl1, _, _, _, _) (s2, pl2, _, _, _, _) ->
       match
-        Gutil.alphabetic_order
+        Utf8.alphabetic_order
           (Util.surname_without_particle base s1)
           (Util.surname_without_particle base s2)
       with
       | 0 -> (
           match
-            Gutil.alphabetic_order
+            Utf8.alphabetic_order
               (Util.surname_particle base s1)
               (Util.surname_particle base s2)
           with
           | 0 ->
-              Gutil.alphabetic_order
+              Utf8.alphabetic_order
                 (pl1 : Adef.escaped_string :> string)
                 (pl2 : Adef.escaped_string :> string)
           | x -> x)
@@ -1194,7 +1194,7 @@ let rec compare_ls sl1 sl2 =
       (* les performances à cause du try..with.                *)
       let c =
         try Stdlib.compare (int_of_string s1) (int_of_string s2)
-        with Failure _ -> Gutil.alphabetic_order s1 s2
+        with Failure _ -> Utf8.alphabetic_order s1 s2
       in
       if c = 0 then compare_ls sl1 sl2 else c
   | _ :: _, [] -> 1
@@ -4444,7 +4444,7 @@ let eval_predefined_apply conf env f vl =
           l := SortedList.add sl !l;
           ""
       | _ -> raise Not_found)
-  | "hexa", [ s ] -> Util.hexa_string s
+  | "hexa", [ s ] -> Ext_string.hexa_string s
   | "initial", [ s ] ->
       if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
   | "lazy_print", [ v ] -> (

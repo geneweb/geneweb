@@ -96,7 +96,7 @@ let search_in_assets = search_in_path Secure.assets
 
 let start_with_vowel s =
   if String.length s > 0 then
-    let s, _ = Name.unaccent_utf_8 true s 0 in
+    let s, _ = Utf8.unaccent true s 0 in
     match s.[0] with 'a' | 'e' | 'i' | 'o' | 'u' -> true | _ -> false
   else false
 
@@ -493,7 +493,8 @@ let safe_html_aux escape_text s =
                     || String.get k 0 <> 'o'
                     || String.get k 1 <> 'n')
                     && not
-                         (Mutil.contains (String.lowercase_ascii v) "javascript"))
+                         (Ext_string.contains (String.lowercase_ascii v)
+                            "javascript"))
               attrs
           in
           stack := `OK :: !stack;
@@ -1501,14 +1502,6 @@ let trimmed_string_of_place place =
 let menu_threshold = 20
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
-let hexa_string s =
-  let s' = Bytes.create (2 * String.length s) in
-  for i = 0 to String.length s - 1 do
-    Bytes.set s' (2 * i) "0123456789ABCDEF".[Char.code s.[i] / 16];
-    Bytes.set s' ((2 * i) + 1) "0123456789ABCDEF".[Char.code s.[i] mod 16]
-  done;
-  Bytes.unsafe_to_string s'
-
 let print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
   if len > menu_threshold then (
@@ -1521,7 +1514,8 @@ let print_alphab_list conf crit print_elem liste =
              match last with Some t1 -> t = t1 | _ -> false
            in
            if not same_than_last then
-             Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
+             Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
+               (Ext_string.hexa_string t) t;
            Some t)
          None liste
      in
@@ -1543,7 +1537,8 @@ let print_alphab_list conf crit print_elem liste =
            | _ -> ());
            if not same_than_last then (
              Output.print_sstring conf "<li>\n";
-             Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
+             Output.printf conf "<a id=\"ai%s\">%s</a>\n"
+               (Ext_string.hexa_string t) t;
              Output.print_sstring conf "<ul>\n"));
          Output.print_sstring conf "<li>\n  ";
          print_elem e;
@@ -1962,23 +1957,6 @@ let old_sosa_of_branch conf base (ipl : (Gwdb.iper * Def.sex) list) =
 let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
   |> Option.map @@ List.map (fun p -> (Gwdb.get_iper p, Gwdb.get_sex p))
-
-let gen_only_printable or_nl s =
-  let s' =
-    let conv_char i =
-      if Char.code s.[i] > 127 then s.[i]
-      else
-        match s.[i] with
-        | ' ' .. '~' | '\160' .. '\255' -> s.[i]
-        | '\n' -> if or_nl then '\n' else ' '
-        | _ -> ' '
-    in
-    String.init (String.length s) conv_char
-  in
-  String.trim s'
-
-let only_printable_or_nl = gen_only_printable true
-let only_printable = gen_only_printable false
 
 let relation_type_text conf t sex =
   let s =
@@ -2545,11 +2523,6 @@ let array_mem_witn base ip witnesses wnotes =
   in
   loop 0
 
-let nb_char_occ c s =
-  let cnt = ref 0 in
-  String.iter (fun x -> if x = c then incr cnt) s;
-  !cnt
-
 module IperSet = Set.Make (struct
   type t = Gwdb.iper
 
@@ -2705,19 +2678,6 @@ let name_with_roman_number str =
       | c -> loop found (Buff.store len c) (i + 1)
   in
   loop false 0 0
-
-let cut_words str =
-  let rec loop beg i =
-    if i < String.length str then
-      match str.[i] with
-      | ' ' ->
-          if beg = i then loop (succ beg) (succ i)
-          else String.sub str beg (i - beg) :: loop (succ i) (succ i)
-      | _ -> loop beg (succ i)
-    else if beg = i then []
-    else [ String.sub str beg (i - beg) ]
-  in
-  loop 0 0
 
 let designation base p = Gutil.designation base p |> escape_html
 
