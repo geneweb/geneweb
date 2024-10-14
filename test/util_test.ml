@@ -1,9 +1,8 @@
-open Alcotest
-open Geneweb
-
 let ext_string_contains () =
   let str = "foo bar" in
-  let test t b = (check bool) t b (Ext_string.contains str t) in
+  let test t b =
+    (Alcotest.check Alcotest.bool) t b (Ext_string.contains str t)
+  in
   test "foo" true;
   test "baz" false;
   test "foo_b" false;
@@ -14,22 +13,27 @@ let ext_string_contains () =
   test "" true
 
 let ext_string_start_with () =
-  check_raises "" (Invalid_argument "start_with") (fun () ->
+  Alcotest.check_raises "" (Invalid_argument "start_with") (fun () ->
       ignore @@ Ext_string.start_with "foo" (-1) "foo");
-  check_raises "" (Invalid_argument "start_with") (fun () ->
+  Alcotest.check_raises "" (Invalid_argument "start_with") (fun () ->
       ignore @@ Ext_string.start_with "foo" 4 "foo");
-  (check bool) "Ext_string.start_with \"foo\" 0 \"foo\"" true
+  (Alcotest.check Alcotest.bool)
+    "Ext_string.start_with \"foo\" 0 \"foo\"" true
     (Ext_string.start_with "foo" 0 "foo");
-  (check bool) "not (Ext_string.start_with \"bar\" 0 \"foo\")" true
+  (Alcotest.check Alcotest.bool)
+    "not (Ext_string.start_with \"bar\" 0 \"foo\")" true
     (not @@ Ext_string.start_with "bar" 0 "foo");
-  (check bool) "Ext_string.start_with \"\" 0 \"foo\"" true
+  (Alcotest.check Alcotest.bool)
+    "Ext_string.start_with \"\" 0 \"foo\"" true
     (Ext_string.start_with "" 0 "foo");
   ()
 
 let mutil_arabian_romian _ =
   let test a r =
-    (check int) "arabian_of_roman" a (Mutil.arabian_of_roman r);
-    (check string) "roman_of_arabian" r (Mutil.roman_of_arabian a)
+    (Alcotest.check Alcotest.int)
+      "arabian_of_roman" a (Mutil.arabian_of_roman r);
+    (Alcotest.check Alcotest.string)
+      "roman_of_arabian" r (Mutil.roman_of_arabian a)
   in
   test 39 "XXXIX";
   test 246 "CCXLVI";
@@ -58,7 +62,7 @@ let mutil_compare_after_particle _ =
   let test a b =
     let test exp a b =
       let cmp = Mutil.compare_after_particle particles in
-      (check int) "" exp (cmp a b)
+      (Alcotest.check Alcotest.int) "" exp (cmp a b)
     in
     test (-1) a b;
     test 1 b a;
@@ -75,7 +79,7 @@ let mutil_compare_after_particle _ =
 
 let mutil_string_of_int_sep _ =
   let test sep exp int =
-    (check string) "" exp (Mutil.string_of_int_sep sep int)
+    (Alcotest.check Alcotest.string) "" exp (Mutil.string_of_int_sep sep int)
   in
   test "," "1" 1;
   test "," "10" 10;
@@ -86,14 +90,16 @@ let mutil_string_of_int_sep _ =
   test "," "1,000,000" 1000000
 
 let name_title _ =
-  let test exp = List.iter (fun s -> (check string) "" exp (Name.title s)) in
+  let test exp =
+    List.iter (fun s -> (Alcotest.check Alcotest.string) "" exp (Name.title s))
+  in
   test "Jean-Baptiste"
     [ "jean-baptiste"; "JEAN-baptiste"; "Jean-Baptiste"; "jeaN-baptistE" ]
 
 let utf8_sub _ =
   let test ?pad e s i j =
     let i = Utf8.get s i in
-    (check string) "" e (Utf8.sub ?pad s i j)
+    (Alcotest.check Alcotest.string) "" e (Utf8.sub ?pad s i j)
   in
   test "日" "日本語" 0 1;
   test "日本語" "日本語" 0 3;
@@ -107,7 +113,11 @@ let utf8_sub _ =
   test "a" "švédčina" 7 1
 
 let util_name_with_roman_number _ =
-  let test r a = (check (option string)) "" r (Util.name_with_roman_number a) in
+  let test r a =
+    (Alcotest.check (Alcotest.option Alcotest.string))
+      "" r
+      (Geneweb.Util.name_with_roman_number a)
+  in
   test (Some "XXXIX XXXIX") "39 39";
   test (Some "XXXIX x XXXIX") "39 x 39";
   test (Some "foo CCXLVI") "foo 246";
@@ -120,41 +130,44 @@ let printer_encoded x = (x : Adef.encoded_string :> string)
 let printer_escaped x = (x : Adef.escaped_string :> string)
 
 let util_safe_html _ =
-  (check string) ""
-    {|<a href="localhost:2318/foo_w?lang=fr&#38;acte=123">foo</a>|}
-    (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&acte=123">foo</a>|}
+  (Alcotest.check Alcotest.string)
+    "" {|<a href="localhost:2318/foo_w?lang=fr&#38;acte=123">foo</a>|}
+    (Geneweb.Util.safe_html
+       {|<a href="localhost:2318/foo_w?lang=fr&acte=123">foo</a>|}
       :> string);
-  (check string) ""
-    {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
-    (Util.safe_html {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|}
+  (Alcotest.check Alcotest.string)
+    "" {|<a href="localhost:2318/foo_w?lang=fr&#38;image=on">foo</a>|}
+    (Geneweb.Util.safe_html
+       {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|}
       :> string)
 
 let util_transl_a_of_b _ =
-  let conf = Config.empty in
+  let conf = Geneweb.Config.empty in
   let conf = { conf with env = ("lang", Adef.encoded "fr") :: conf.env } in
   Hashtbl.add conf.lexicon "%1 of %2" "%1 d[e |']%2";
   let test aaa (s1, s2, s2_raw) =
-    let bbb = Util.transl_a_of_b conf s1 s2 s2_raw in
-    (check string) "" aaa bbb
+    let bbb = Geneweb.Util.transl_a_of_b conf s1 s2 s2_raw in
+    (Alcotest.check Alcotest.string) "" aaa bbb
   in
   test "naissance de <b>Jean</b>" ("naissance", "<b>Jean</b>", "Jean");
   test "naissance d'<b>André</b>" ("naissance", "<b>André</b>", "André")
 
 let util_string_with_macros _ =
-  let conf = Config.empty in
-  (check string) ""
-    {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
-    (Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
+  let conf = Geneweb.Config.empty in
+  (Alcotest.check Alcotest.string)
+    "" {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
+    (Geneweb.Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
 
 let util_escape_html _ =
-  (check string) ""
+  (Alcotest.check Alcotest.string)
+    ""
     {|&#60;a href=&#34;mailto:jean@dupond.net&#34;&#62;jean@dupond.net&#60;/a&#62; - le 1 &#38;amp; 2|}
-    (Util.escape_html
+    (Geneweb.Util.escape_html
        {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
       :> string)
 
 let datedisplay_string_of_date _ =
-  let conf = Config.empty in
+  let conf = Geneweb.Config.empty in
   let conf = { conf with env = ("lang", Adef.encoded "co") :: conf.env } in
   Hashtbl.add conf.lexicon "(date)"
     "1<sup>u</sup> d[i |']%m %y/%d d[i |']%m %y/d[i |']%m %y/in u %y";
@@ -164,8 +177,8 @@ let datedisplay_string_of_date _ =
     let date =
       Date.Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
     in
-    let bbb :> string = DateDisplay.string_of_date conf date in
-    (check string) "" aaa bbb
+    let bbb :> string = Geneweb.DateDisplay.string_of_date conf date in
+    (Alcotest.check Alcotest.string) "" aaa bbb
   in
   test "4 d'aostu 1974" Dgregorian (4, 8, 1974);
   test "4 di sittembre 1974" Dgregorian (4, 9, 1974);
@@ -183,31 +196,34 @@ let v =
   [
     ( "ext-string",
       [
-        test_case "Ext_string.contains" `Quick ext_string_contains;
-        test_case "Ext_string.start_with" `Quick ext_string_start_with;
+        Alcotest.test_case "Ext_string.contains" `Quick ext_string_contains;
+        Alcotest.test_case "Ext_string.start_with" `Quick ext_string_start_with;
       ] );
     ( "mutil",
       [
-        test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
-        test_case "Mutil particule" `Quick mutil_compare_after_particle;
-        test_case "Mutil.string_of_int_sep" `Quick mutil_compare_after_particle;
+        Alcotest.test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
+        Alcotest.test_case "Mutil particule" `Quick mutil_compare_after_particle;
+        Alcotest.test_case "Mutil.string_of_int_sep" `Quick
+          mutil_compare_after_particle;
       ] );
-    ("name", [ test_case "Name.title" `Quick name_title ]);
+    ("name", [ Alcotest.test_case "Name.title" `Quick name_title ]);
     ( "utf8",
       [
-        test_case "Utf8.sub" `Quick utf8_sub;
-        test_case "Utf8.name_with_roman_number" `Quick
+        Alcotest.test_case "Utf8.sub" `Quick utf8_sub;
+        Alcotest.test_case "Utf8.name_with_roman_number" `Quick
           util_name_with_roman_number;
       ] );
     ( "util",
       [
-        test_case "Util.safe_html" `Quick util_safe_html;
-        test_case "Util.transl_a_of_b" `Quick util_transl_a_of_b;
-        test_case "Util.string_with_macros" `Quick util_string_with_macros;
-        test_case "Util.escape_html" `Quick util_escape_html;
+        Alcotest.test_case "Util.safe_html" `Quick util_safe_html;
+        Alcotest.test_case "Util.transl_a_of_b" `Quick util_transl_a_of_b;
+        Alcotest.test_case "Util.string_with_macros" `Quick
+          util_string_with_macros;
+        Alcotest.test_case "Util.escape_html" `Quick util_escape_html;
       ] );
     ( "date-display",
       [
-        test_case "DateDisplay.string_of_date" `Quick datedisplay_string_of_date;
+        Alcotest.test_case "DateDisplay.string_of_date" `Quick
+          datedisplay_string_of_date;
       ] );
   ]
