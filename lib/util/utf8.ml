@@ -301,8 +301,10 @@ let alphabetic_utf_8 n1 n2 =
       let cv2, ii2 = unaccent false n2 i2 in
       let c =
         if cv1 = cv2 then
-          compare (String.sub n1 i1 (ii1 - i1)) (String.sub n2 i2 (ii2 - i2))
-        else compare cv1 cv2
+          Stdlib.compare
+            (String.sub n1 i1 (ii1 - i1))
+            (String.sub n2 i2 (ii2 - i2))
+        else Stdlib.compare cv1 cv2
       in
       if c = 0 then loop ii1 ii2 else c
   in
