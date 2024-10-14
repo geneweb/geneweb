@@ -1,9 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
-open Def
-open Gwdb
-
 let int_of_iper =
   let ht = Hashtbl.create 0 in
   fun i ->
@@ -86,7 +82,7 @@ let ged_month cal m =
 
 let encode opts s =
   match opts.Gwexport.charset with
-  | Gwexport.Ansel -> Ansel.of_iso_8859_1 @@ Utf8.iso_8859_1_of_utf_8 s
+  | Gwexport.Ansel -> Geneweb.Ansel.of_iso_8859_1 @@ Utf8.iso_8859_1_of_utf_8 s
   | Gwexport.Ascii | Gwexport.Ansi -> Utf8.iso_8859_1_of_utf_8 s
   | Gwexport.Utf8 -> s
 
@@ -110,7 +106,9 @@ let find_br s ini_i =
   in
   loop 0 ini_i
 
-let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
+let oc opts =
+  let _, oc, _ = opts.Gwexport.oc in
+  oc
 
 (** [display_note_aux opts tagn s len i] outputs text [s] with CONT/CONC
     tag. GEDCOM lines are limited to 255 characters. However, the
@@ -228,7 +226,7 @@ let write_base_notes opts base =
     (* TODO WIKI base_notes should be a file in base notes folder `base.gwb/notes_d`;
        currently by default it is the file `base.gwb/notes`;
        rename it "index.txt" or "index.wiki" *)
-    let main_notes = ("notes", base_notes_read base "") in
+    let main_notes = ("notes", Gwdb.base_notes_read base "") in
     (* main notes should be first in gedcom *)
     main_notes :: wiki_pages
   in
@@ -240,11 +238,11 @@ let write_base_notes opts base =
 
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
-  Printf.ksprintf (oc opts) "1 SOUR GeneWeb\n";
-  Printf.ksprintf (oc opts) "2 VERS %s\n" Version.txt;
-  Printf.ksprintf (oc opts) "2 NAME %s\n" (Filename.basename Sys.argv.(0));
-  Printf.ksprintf (oc opts) "2 CORP INRIA\n";
-  Printf.ksprintf (oc opts) "3 ADDR http://www.geneweb.org\n";
+  Printf.ksprintf (oc opts) "1 SOUR Geneanet\n";
+  Printf.ksprintf (oc opts) "2 NAME GeneWeb\n";
+  Printf.ksprintf (oc opts) "2 VERS %s\n" Geneweb.Version.txt;
+  Printf.ksprintf (oc opts) "2 CORP Geneanet\n";
+  Printf.ksprintf (oc opts) "3 ADDR https://www.geneanet.org/\n";
   Printf.ksprintf (oc opts) "2 DATA %s\n"
     (let fname = Filename.basename ifile in
      if Filename.check_suffix fname ".gwb" then fname else fname ^ ".gwb");
@@ -281,10 +279,10 @@ let sub_string_index s t =
   loop 0 0
 
 let ged_1st_name base p =
-  let fn = sou base (get_first_name p) in
-  match get_first_names_aliases p with
+  let fn = Gwdb.sou base (Gwdb.get_first_name p) in
+  match Gwdb.get_first_names_aliases p with
   | n :: _ -> (
-      let fna = sou base n in
+      let fna = Gwdb.sou base n in
       match sub_string_index fna fn with
       | Some i ->
           let j = i + String.length fn in
@@ -301,33 +299,34 @@ let string_of_list =
   loop ""
 
 let ged_index opts per =
-  Printf.ksprintf (oc opts) "1 _GWID %s\n" (Gwdb.string_of_iper (get_iper per))
+  Printf.ksprintf (oc opts) "1 _GWID %s\n"
+    (Gwdb.string_of_iper (Gwdb.get_iper per))
 
 let ged_name opts base per =
   Printf.ksprintf (oc opts) "1 NAME %s /%s/\n"
     (encode opts (Mutil.nominative (ged_1st_name base per)))
-    (encode opts (Mutil.nominative (sou base (get_surname per))));
-  let n = sou base (get_public_name per) in
+    (encode opts (Mutil.nominative (Gwdb.sou base (Gwdb.get_surname per))));
+  let n = Gwdb.sou base (Gwdb.get_public_name per) in
   if n <> "" then Printf.ksprintf (oc opts) "2 GIVN %s\n" (encode opts n);
-  (match get_qualifiers per with
+  (match Gwdb.get_qualifiers per with
   | nn :: _ ->
-      Printf.ksprintf (oc opts) "2 NICK %s\n" (encode opts (sou base nn))
+      Printf.ksprintf (oc opts) "2 NICK %s\n" (encode opts (Gwdb.sou base nn))
   | [] -> ());
-  (match get_surnames_aliases per with
+  (match Gwdb.get_surnames_aliases per with
   | [] -> ()
   | list ->
-      let list = List.map (fun n -> encode opts (sou base n)) list in
+      let list = List.map (fun n -> encode opts (Gwdb.sou base n)) list in
       Printf.ksprintf (oc opts) "2 SURN %s\n" (string_of_list list));
   List.iter
     (fun s ->
-      Printf.ksprintf (oc opts) "1 NAME %s\n" (encode opts (sou base s)))
-    (get_aliases per)
+      Printf.ksprintf (oc opts) "1 NAME %s\n" (encode opts (Gwdb.sou base s)))
+    (Gwdb.get_aliases per)
 
 let ged_sex opts per =
-  match get_sex per with
-  | Male -> Printf.ksprintf (oc opts) "1 SEX M\n"
-  | Female -> Printf.ksprintf (oc opts) "1 SEX F\n"
-  | Neuter -> ()
+  match Gwdb.get_sex per with
+  | Def.Male -> Printf.ksprintf (oc opts) "1 SEX M\n"
+  | Def.Female -> Printf.ksprintf (oc opts) "1 SEX F\n"
+  | Def.Neuter -> ()
 
 let ged_calendar opts = function
   | Date.Dgregorian -> ()
@@ -363,7 +362,7 @@ let ged_date_dmy opts dt cal =
       if dmy2.month2 <> 0 then
         Printf.ksprintf (oc opts) "%s " (ged_month cal dmy2.month2);
       Printf.ksprintf (oc opts) "%d" dmy2.year2
-  | _ -> ()
+  | Sure | About | Maybe | Before | After -> ()
 
 let ged_date opts = function
   | Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
@@ -396,80 +395,90 @@ let ged_ev_detail opts n typ d pl note src =
 
 let ged_tag_pevent base evt_name =
   match evt_name with
-  | Epers_Birth -> "BIRT"
-  | Epers_Baptism -> "BAPM"
-  | Epers_Death -> "DEAT"
-  | Epers_Burial -> "BURI"
-  | Epers_Cremation -> "CREM"
-  | Epers_Accomplishment -> "Accomplishment"
-  | Epers_Acquisition -> "Acquisition"
-  | Epers_Adhesion -> "Membership"
-  | Epers_BaptismLDS -> "BAPL"
-  | Epers_BarMitzvah -> "BARM"
-  | Epers_BatMitzvah -> "BASM"
-  | Epers_Benediction -> "BLES"
-  | Epers_ChangeName -> "Change name"
-  | Epers_Circumcision -> "Circumcision"
-  | Epers_Confirmation -> "CONF"
-  | Epers_ConfirmationLDS -> "CONL"
-  | Epers_Decoration -> "Award"
-  | Epers_DemobilisationMilitaire -> "Military discharge"
-  | Epers_Diploma -> "Degree"
-  | Epers_Distinction -> "Distinction"
-  | Epers_Dotation -> "ENDL"
-  | Epers_DotationLDS -> "DotationLDS"
-  | Epers_Education -> "EDUC"
-  | Epers_Election -> "Election"
-  | Epers_Emigration -> "EMIG"
-  | Epers_Excommunication -> "Excommunication"
-  | Epers_FamilyLinkLDS -> "Family link LDS"
-  | Epers_FirstCommunion -> "FCOM"
-  | Epers_Funeral -> "Funeral"
-  | Epers_Graduate -> "GRAD"
-  | Epers_Hospitalisation -> "Hospitalization"
-  | Epers_Illness -> "Illness"
-  | Epers_Immigration -> "IMMI"
-  | Epers_ListePassenger -> "Passenger list"
-  | Epers_MilitaryDistinction -> "Military distinction"
-  | Epers_MilitaryPromotion -> "Military promotion"
-  | Epers_MilitaryService -> "Military service"
-  | Epers_MobilisationMilitaire -> "Military mobilization"
-  | Epers_Naturalisation -> "NATU"
-  | Epers_Occupation -> "OCCU"
-  | Epers_Ordination -> "ORDN"
-  | Epers_Property -> "PROP"
-  | Epers_Recensement -> "CENS"
-  | Epers_Residence -> "RESI"
-  | Epers_Retired -> "RETI"
-  | Epers_ScellentChildLDS -> "SLGC"
-  | Epers_ScellentParentLDS -> "Scellent parent LDS"
-  | Epers_ScellentSpouseLDS -> "SLGS"
-  | Epers_VenteBien -> "Property sale"
-  | Epers_Will -> "WILL"
-  | Epers_Name n -> sou base n
+  | Def.Epers_Birth -> "BIRT"
+  | Def.Epers_Baptism -> "BAPM"
+  | Def.Epers_Death -> "DEAT"
+  | Def.Epers_Burial -> "BURI"
+  | Def.Epers_Cremation -> "CREM"
+  | Def.Epers_Accomplishment -> "Accomplishment"
+  | Def.Epers_Acquisition -> "Acquisition"
+  | Def.Epers_Adhesion -> "Membership"
+  | Def.Epers_BaptismLDS -> "BAPL"
+  | Def.Epers_BarMitzvah -> "BARM"
+  | Def.Epers_BatMitzvah -> "BASM"
+  | Def.Epers_Benediction -> "BLES"
+  | Def.Epers_ChangeName -> "Change name"
+  | Def.Epers_Circumcision -> "Circumcision"
+  | Def.Epers_Confirmation -> "CONF"
+  | Def.Epers_ConfirmationLDS -> "CONL"
+  | Def.Epers_Decoration -> "Award"
+  | Def.Epers_DemobilisationMilitaire -> "Military discharge"
+  | Def.Epers_Diploma -> "Degree"
+  | Def.Epers_Distinction -> "Distinction"
+  | Def.Epers_Dotation -> "ENDL"
+  | Def.Epers_DotationLDS -> "DotationLDS"
+  | Def.Epers_Education -> "EDUC"
+  | Def.Epers_Election -> "Election"
+  | Def.Epers_Emigration -> "EMIG"
+  | Def.Epers_Excommunication -> "Excommunication"
+  | Def.Epers_FamilyLinkLDS -> "Family link LDS"
+  | Def.Epers_FirstCommunion -> "FCOM"
+  | Def.Epers_Funeral -> "Funeral"
+  | Def.Epers_Graduate -> "GRAD"
+  | Def.Epers_Hospitalisation -> "Hospitalization"
+  | Def.Epers_Illness -> "Illness"
+  | Def.Epers_Immigration -> "IMMI"
+  | Def.Epers_ListePassenger -> "Passenger list"
+  | Def.Epers_MilitaryDistinction -> "Military distinction"
+  | Def.Epers_MilitaryPromotion -> "Military promotion"
+  | Def.Epers_MilitaryService -> "Military service"
+  | Def.Epers_MobilisationMilitaire -> "Military mobilization"
+  | Def.Epers_Naturalisation -> "NATU"
+  | Def.Epers_Occupation -> "OCCU"
+  | Def.Epers_Ordination -> "ORDN"
+  | Def.Epers_Property -> "PROP"
+  | Def.Epers_Recensement -> "CENS"
+  | Def.Epers_Residence -> "RESI"
+  | Def.Epers_Retired -> "RETI"
+  | Def.Epers_ScellentChildLDS -> "SLGC"
+  | Def.Epers_ScellentParentLDS -> "Scellent parent LDS"
+  | Def.Epers_ScellentSpouseLDS -> "SLGS"
+  | Def.Epers_VenteBien -> "Property sale"
+  | Def.Epers_Will -> "WILL"
+  | Def.Epers_Name n -> Gwdb.sou base n
 
 let is_primary_pevents = function
-  | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
-  | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
-  | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Dotation
-  | Epers_Education | Epers_Emigration | Epers_FirstCommunion | Epers_Graduate
-  | Epers_Immigration | Epers_Naturalisation | Epers_Occupation
-  | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
-  | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentSpouseLDS
-  | Epers_Will ->
+  | Def.Epers_Birth | Def.Epers_Baptism | Def.Epers_Death | Def.Epers_Burial
+  | Def.Epers_Cremation | Def.Epers_BaptismLDS | Def.Epers_BarMitzvah
+  | Def.Epers_BatMitzvah | Def.Epers_Benediction | Def.Epers_Confirmation
+  | Def.Epers_ConfirmationLDS | Def.Epers_Dotation | Def.Epers_Education
+  | Def.Epers_Emigration | Def.Epers_FirstCommunion | Def.Epers_Graduate
+  | Def.Epers_Immigration | Def.Epers_Naturalisation | Def.Epers_Occupation
+  | Def.Epers_Ordination | Def.Epers_Property | Def.Epers_Recensement
+  | Def.Epers_Residence | Def.Epers_Retired | Def.Epers_ScellentChildLDS
+  | Def.Epers_ScellentSpouseLDS | Def.Epers_Will ->
       true
-  | _ -> false
+  | Def.Epers_Accomplishment | Def.Epers_Acquisition | Def.Epers_Adhesion
+  | Def.Epers_ChangeName | Def.Epers_Circumcision | Def.Epers_Decoration
+  | Def.Epers_DemobilisationMilitaire | Def.Epers_Diploma
+  | Def.Epers_Distinction | Def.Epers_DotationLDS | Def.Epers_Election
+  | Def.Epers_Excommunication | Def.Epers_FamilyLinkLDS | Def.Epers_Funeral
+  | Def.Epers_Hospitalisation | Def.Epers_Illness | Def.Epers_ListePassenger
+  | Def.Epers_MilitaryDistinction | Def.Epers_MilitaryPromotion
+  | Def.Epers_MilitaryService | Def.Epers_MobilisationMilitaire
+  | Def.Epers_ScellentParentLDS | Def.Epers_VenteBien | Def.Epers_Name _ ->
+      false
 
 let relation_format_of_witness_kind :
-    witness_kind -> ('a, unit, string, unit) format4 = function
-  | Witness -> "3 RELA Witness"
-  | Witness_GodParent -> "3 RELA GODP"
-  | Witness_CivilOfficer -> "3 RELA Civil officer"
-  | Witness_ReligiousOfficer -> "3 RELA Religious officer"
-  | Witness_Informant -> "3 RELA Informant"
-  | Witness_Attending -> "3 RELA Attending"
-  | Witness_Mentioned -> "3 RELA Mentioned"
-  | Witness_Other -> "3 RELA Other"
+    Def.witness_kind -> ('a, unit, string, unit) format4 = function
+  | Def.Witness -> "3 RELA Witness"
+  | Def.Witness_GodParent -> "3 RELA GODP"
+  | Def.Witness_CivilOfficer -> "3 RELA Civil officer"
+  | Def.Witness_ReligiousOfficer -> "3 RELA Religious officer"
+  | Def.Witness_Informant -> "3 RELA Informant"
+  | Def.Witness_Attending -> "3 RELA Attending"
+  | Def.Witness_Mentioned -> "3 RELA Mentioned"
+  | Def.Witness_Other -> "3 RELA Other"
 
 let oc' opts s = Printf.ksprintf (oc opts) (s ^^ "\n")
 let oc_witness_kind opts wk = oc' opts (relation_format_of_witness_kind wk)
@@ -479,10 +488,10 @@ let witness_format opts base per_sel (ip, wk, wnote) =
     Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
   Printf.ksprintf (oc opts) "3 TYPE INDI\n";
   oc_witness_kind opts wk;
-  display_note opts 3 (sou base wnote)
+  display_note opts 3 (Gwdb.sou base wnote)
 
 let ged_pevent opts base per_sel evt =
-  let name = get_pevent_name evt in
+  let name = Gwdb.get_pevent_name evt in
   let typ =
     if is_primary_pevents name then (
       let tag = ged_tag_pevent base name in
@@ -492,12 +501,12 @@ let ged_pevent opts base per_sel evt =
       Printf.ksprintf (oc opts) "1 EVEN";
       ged_tag_pevent base name)
   in
-  let date = Date.od_of_cdate (get_pevent_date evt) in
-  let place = sou base (get_pevent_place evt) in
-  let note = sou base (get_pevent_note evt) in
-  let src = sou base (get_pevent_src evt) in
+  let date = Date.od_of_cdate (Gwdb.get_pevent_date evt) in
+  let place = Gwdb.sou base (Gwdb.get_pevent_place evt) in
+  let note = Gwdb.sou base (Gwdb.get_pevent_note evt) in
+  let src = Gwdb.sou base (Gwdb.get_pevent_src evt) in
   ged_ev_detail opts 2 typ date place note src;
-  let witnesses = get_pevent_witnesses_and_notes evt in
+  let witnesses = Gwdb.get_pevent_witnesses_and_notes evt in
   Array.iter (witness_format opts base per_sel) witnesses
 
 let adop_fam_list = ref []
@@ -506,24 +515,24 @@ let ged_fam_adop opts i (fath, moth, _) =
   Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" i;
   (match fath with
   | Some i -> Printf.ksprintf (oc opts) "1 HUSB @I%d@\n" (int_of_iper i + 1)
-  | _ -> ());
+  | None -> ());
   match moth with
   | Some i -> Printf.ksprintf (oc opts) "1 WIFE @I%d@\n" (int_of_iper i + 1)
-  | _ -> ()
+  | None -> ()
 
 let ged_ind_ev_str opts base per per_sel =
-  List.iter (ged_pevent opts base per_sel) (get_pevents per)
+  List.iter (ged_pevent opts base per_sel) (Gwdb.get_pevents per)
 
 let ged_title opts base per tit =
   Printf.ksprintf (oc opts) "1 TITL ";
-  Printf.ksprintf (oc opts) "%s" (encode opts (sou base tit.t_ident));
-  (match sou base tit.t_place with
+  Printf.ksprintf (oc opts) "%s" (encode opts (Gwdb.sou base tit.Def.t_ident));
+  (match Gwdb.sou base tit.Def.t_place with
   | "" -> ()
   | pl -> Printf.ksprintf (oc opts) ", %s" (encode opts pl));
-  if tit.t_nth <> 0 then Printf.ksprintf (oc opts) ", %d" tit.t_nth;
+  if tit.Def.t_nth <> 0 then Printf.ksprintf (oc opts) ", %d" tit.Def.t_nth;
   Printf.ksprintf (oc opts) "\n";
   (match
-     (Date.od_of_cdate tit.t_date_start, Date.od_of_cdate tit.t_date_end)
+     (Date.od_of_cdate tit.Def.t_date_start, Date.od_of_cdate tit.Def.t_date_end)
    with
   | None, None -> ()
   | Some sd, None ->
@@ -540,22 +549,22 @@ let ged_title opts base per tit =
       Printf.ksprintf (oc opts) " TO ";
       ged_date opts sd2;
       Printf.ksprintf (oc opts) "\n");
-  match tit.t_name with
-  | Tmain ->
+  match tit.Def.t_name with
+  | Def.Tmain ->
       Printf.ksprintf (oc opts) "2 NOTE %s\n"
-        (encode opts (sou base (get_public_name per)))
-  | Tname n ->
-      Printf.ksprintf (oc opts) "2 NOTE %s\n" (encode opts (sou base n))
-  | Tnone -> ()
+        (encode opts (Gwdb.sou base (Gwdb.get_public_name per)))
+  | Def.Tname n ->
+      Printf.ksprintf (oc opts) "2 NOTE %s\n" (encode opts (Gwdb.sou base n))
+  | Def.Tnone -> ()
 
 let ged_ind_attr_str opts base per =
-  (match sou base (get_occupation per) with
+  (match Gwdb.sou base (Gwdb.get_occupation per) with
   | "" -> ()
   | occu -> Printf.ksprintf (oc opts) "1 OCCU %s\n" (encode opts occu));
-  List.iter (ged_title opts base per) (get_titles per)
+  List.iter (ged_title opts base per) (Gwdb.get_titles per)
 
 let ged_famc opts fam_sel asc =
-  match get_parents asc with
+  match Gwdb.get_parents asc with
   | Some ifam ->
       if fam_sel ifam then
         Printf.ksprintf (oc opts) "1 FAMC @F%d@\n" (int_of_ifam ifam + 1)
@@ -582,33 +591,33 @@ let ged_witness opts fam_sel ifam =
 let ged_asso opts base (per_sel, fam_sel) per =
   List.iter
     (fun r ->
-      if r.r_type = GodParent then (
-        ged_godparent opts per_sel "GODF" r.r_fath;
-        ged_godparent opts per_sel "GODM" r.r_moth))
-    (get_rparents per);
+      if r.Def.r_type = Def.GodParent then (
+        ged_godparent opts per_sel "GODF" r.Def.r_fath;
+        ged_godparent opts per_sel "GODM" r.Def.r_moth))
+    (Gwdb.get_rparents per);
   List.iter
     (fun ic ->
-      let c = poi base ic in
-      if get_sex c = Male then
+      let c = Gwdb.poi base ic in
+      if Gwdb.get_sex c = Def.Male then
         List.iter
           (fun ifam ->
-            let fam = foi base ifam in
-            if Array.mem (get_iper per) (get_witnesses fam) then
+            let fam = Gwdb.foi base ifam in
+            if Array.mem (Gwdb.get_iper per) (Gwdb.get_witnesses fam) then
               ged_witness opts fam_sel ifam)
-          (Array.to_list (get_family c)))
-    (get_related per)
+          (Array.to_list (Gwdb.get_family c)))
+    (Gwdb.get_related per)
 
 let ged_psource opts base per =
   match opts.Gwexport.source with
   | Some "" -> ()
   | Some s -> print_sour opts 1 (encode opts s)
   | None -> (
-      match sou base (get_psources per) with
+      match Gwdb.sou base (Gwdb.get_psources per) with
       | "" -> ()
       | s -> print_sour opts 1 (encode opts s))
 
 let has_image_file opts base p =
-  let s = Image.default_portrait_filename base p in
+  let s = Geneweb.Image.default_portrait_filename base p in
   let f = Filename.concat opts.Gwexport.img_base_path s in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
@@ -616,7 +625,7 @@ let has_image_file opts base p =
   else None
 
 let ged_multimedia_link opts base per =
-  match sou base (get_image per) with
+  match Gwdb.sou base (Gwdb.get_image per) with
   | "" -> (
       if (not opts.Gwexport.no_picture) && opts.Gwexport.picture_path then
         match has_image_file opts base per with
@@ -629,33 +638,36 @@ let ged_multimedia_link opts base per =
         Printf.ksprintf (oc opts) "1 OBJE\n";
         Printf.ksprintf (oc opts) "2 FILE %s\n" s)
 
-let ged_note opts base per = display_note opts 1 (sou base (get_notes per))
+let ged_note opts base per =
+  display_note opts 1 (Gwdb.sou base (Gwdb.get_notes per))
 
 let ged_tag_fevent base evt_name =
   match evt_name with
-  | Efam_Marriage -> "MARR"
-  | Efam_NoMarriage -> "unmarried"
-  | Efam_NoMention -> "nomen"
-  | Efam_Engage -> "ENGA"
-  | Efam_Divorce -> "DIV"
-  | Efam_Separated -> "SEP"
-  | Efam_Annulation -> "ANUL"
-  | Efam_MarriageBann -> "MARB"
-  | Efam_MarriageContract -> "MARC"
-  | Efam_MarriageLicense -> "MARL"
-  | Efam_PACS -> "pacs"
-  | Efam_Residence -> "residence"
-  | Efam_Name n -> sou base n
+  | Def.Efam_Marriage -> "MARR"
+  | Def.Efam_NoMarriage -> "unmarried"
+  | Def.Efam_NoMention -> "nomen"
+  | Def.Efam_Engage -> "ENGA"
+  | Def.Efam_Divorce -> "DIV"
+  | Def.Efam_Separated -> "SEP"
+  | Def.Efam_Annulation -> "ANUL"
+  | Def.Efam_MarriageBann -> "MARB"
+  | Def.Efam_MarriageContract -> "MARC"
+  | Def.Efam_MarriageLicense -> "MARL"
+  | Def.Efam_PACS -> "pacs"
+  | Def.Efam_Residence -> "residence"
+  | Def.Efam_Name n -> Gwdb.sou base n
 
 let is_primary_fevents = function
-  | Efam_Marriage | Efam_Engage | Efam_Divorce | Efam_Separated
-  | Efam_Annulation | Efam_MarriageBann | Efam_MarriageContract
-  | Efam_MarriageLicense ->
+  | Def.Efam_Marriage | Def.Efam_Engage | Def.Efam_Divorce | Def.Efam_Separated
+  | Def.Efam_Annulation | Def.Efam_MarriageBann | Def.Efam_MarriageContract
+  | Def.Efam_MarriageLicense ->
       true
-  | _ -> false
+  | Def.Efam_NoMarriage | Def.Efam_NoMention | Def.Efam_PACS
+  | Def.Efam_Residence | Def.Efam_Name _ ->
+      false
 
 let ged_fevent opts base per_sel evt =
-  let name = get_fevent_name evt in
+  let name = Gwdb.get_fevent_name evt in
   let typ =
     if is_primary_fevents name then (
       let tag = ged_tag_fevent base name in
@@ -665,12 +677,12 @@ let ged_fevent opts base per_sel evt =
       Printf.ksprintf (oc opts) "1 EVEN";
       ged_tag_fevent base name)
   in
-  let date = Date.od_of_cdate (get_fevent_date evt) in
-  let place = sou base (get_fevent_place evt) in
-  let note = sou base (get_fevent_note evt) in
-  let src = sou base (get_fevent_src evt) in
+  let date = Date.od_of_cdate (Gwdb.get_fevent_date evt) in
+  let place = Gwdb.sou base (Gwdb.get_fevent_place evt) in
+  let note = Gwdb.sou base (Gwdb.get_fevent_note evt) in
+  let src = Gwdb.sou base (Gwdb.get_fevent_src evt) in
   ged_ev_detail opts 2 typ date place note src;
-  let witnesses = get_fevent_witnesses_and_notes evt in
+  let witnesses = Gwdb.get_fevent_witnesses_and_notes evt in
   Array.iter (witness_format opts base per_sel) witnesses
 
 let ged_child opts per_sel chil =
@@ -682,24 +694,26 @@ let ged_fsource opts base fam =
   | Some "" -> ()
   | Some s -> print_sour opts 1 (encode opts s)
   | None -> (
-      match sou base (get_fsources fam) with
+      match Gwdb.sou base (Gwdb.get_fsources fam) with
       | "" -> ()
       | s -> print_sour opts 1 (encode opts s))
 
-let ged_comment opts base fam = display_note opts 1 (sou base (get_comment fam))
+let ged_comment opts base fam =
+  display_note opts 1 (Gwdb.sou base (Gwdb.get_comment fam))
 
 let has_personal_infos base per =
-  get_parents per <> None
-  || sou base (get_first_name per) <> "?"
-  || sou base (get_surname per) <> "?"
-  || get_birth per <> Date.cdate_None
-  || sou base (get_birth_place per) <> ""
-  || (get_death per <> NotDead && get_death per <> DontKnowIfDead)
-  || sou base (get_occupation per) <> ""
-  || get_titles per <> []
+  Gwdb.get_parents per <> None
+  || Gwdb.sou base (Gwdb.get_first_name per) <> "?"
+  || Gwdb.sou base (Gwdb.get_surname per) <> "?"
+  || Gwdb.get_birth per <> Date.cdate_None
+  || Gwdb.sou base (Gwdb.get_birth_place per) <> ""
+  || Gwdb.get_death per <> Def.NotDead
+     && Gwdb.get_death per <> Def.DontKnowIfDead
+  || Gwdb.sou base (Gwdb.get_occupation per) <> ""
+  || Gwdb.get_titles per <> []
 
 let ged_ind_record with_indexes opts base ((per_sel, fam_sel) as sel) i =
-  let per = poi base i in
+  let per = Gwdb.poi base i in
   if has_personal_infos base per then (
     Printf.ksprintf (oc opts) "0 @I%d@ INDI\n" (int_of_iper i + 1);
     ged_name opts base per;
@@ -708,27 +722,29 @@ let ged_ind_record with_indexes opts base ((per_sel, fam_sel) as sel) i =
     ged_ind_ev_str opts base per per_sel;
     ged_ind_attr_str opts base per;
     ged_famc opts fam_sel per;
-    Array.iter (ged_fams opts fam_sel) (get_family per);
+    Array.iter (ged_fams opts fam_sel) (Gwdb.get_family per);
     ged_asso opts base sel per;
     ged_psource opts base per;
     ged_multimedia_link opts base per;
     ged_note opts base per)
 
 let ged_fam_record opts base (per_sel, _fam_sel) ifam =
-  let fam = foi base ifam in
+  let fam = Gwdb.foi base ifam in
   Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" (int_of_ifam ifam + 1);
-  List.iter (ged_fevent opts base per_sel) (get_fevents fam);
+  List.iter (ged_fevent opts base per_sel) (Gwdb.get_fevents fam);
   if
-    per_sel (get_father fam)
-    && has_personal_infos base (poi base (get_father fam))
+    per_sel (Gwdb.get_father fam)
+    && has_personal_infos base (Gwdb.poi base (Gwdb.get_father fam))
   then
-    Printf.ksprintf (oc opts) "1 HUSB @I%d@\n" (int_of_iper (get_father fam) + 1);
+    Printf.ksprintf (oc opts) "1 HUSB @I%d@\n"
+      (int_of_iper (Gwdb.get_father fam) + 1);
   if
-    per_sel (get_mother fam)
-    && has_personal_infos base (poi base (get_mother fam))
+    per_sel (Gwdb.get_mother fam)
+    && has_personal_infos base (Gwdb.poi base (Gwdb.get_mother fam))
   then
-    Printf.ksprintf (oc opts) "1 WIFE @I%d@\n" (int_of_iper (get_mother fam) + 1);
-  Array.iter (ged_child opts per_sel) (get_children fam);
+    Printf.ksprintf (oc opts) "1 WIFE @I%d@\n"
+      (int_of_iper (Gwdb.get_mother fam) + 1);
+  Array.iter (ged_child opts per_sel) (Gwdb.get_children fam);
   ged_fsource opts base fam;
   ged_comment opts base fam
 
@@ -737,10 +753,10 @@ let gwb2ged with_indexes opts ((per_sel, fam_sel) as sel) =
   | Some (ifile, base) ->
       let ofile, oc, close = opts.Gwexport.oc in
       if not opts.Gwexport.mem then (
-        load_ascends_array base;
-        load_unions_array base;
-        load_couples_array base;
-        load_descends_array base);
+        Gwdb.load_ascends_array base;
+        Gwdb.load_unions_array base;
+        Gwdb.load_couples_array base;
+        Gwdb.load_descends_array base);
       ged_header opts base ifile ofile;
       Gwdb.Collection.iter
         (fun i -> if per_sel i then ged_ind_record with_indexes opts base sel i)
@@ -754,7 +770,7 @@ let gwb2ged with_indexes opts ((per_sel, fam_sel) as sel) =
             ged_fam_adop opts i adop;
             i + 1)
           !adop_fam_list
-          (nb_of_families base + 1)
+          (Gwdb.nb_of_families base + 1)
       in
       Printf.ksprintf oc "0 TRLR\n";
       close ()
