@@ -3,7 +3,7 @@ open Geneweb
 
 let mutil_contains () =
   let str = "foo bar" in
-  let test t b = (check bool) t b (Mutil.contains str t) in
+  let test t b = (check bool) t b (Ext_string.contains str t) in
   test "foo" true;
   test "baz" false;
   test "foo_b" false;
@@ -15,15 +15,15 @@ let mutil_contains () =
 
 let mutil_start_with () =
   check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Mutil.start_with "foo" (-1) "foo");
+      ignore @@ Ext_string.start_with "foo" (-1) "foo");
   check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Mutil.start_with "foo" 4 "foo");
-  (check bool) "Mutil.start_with \"foo\" 0 \"foo\"" true
-    (Mutil.start_with "foo" 0 "foo");
-  (check bool) "not (Mutil.start_with \"bar\" 0 \"foo\")" true
-    (not @@ Mutil.start_with "bar" 0 "foo");
-  (check bool) "Mutil.start_with \"\" 0 \"foo\"" true
-    (Mutil.start_with "" 0 "foo");
+      ignore @@ Ext_string.start_with "foo" 4 "foo");
+  (check bool) "Ext_string.start_with \"foo\" 0 \"foo\"" true
+    (Ext_string.start_with "foo" 0 "foo");
+  (check bool) "not (Ext_string.start_with \"bar\" 0 \"foo\")" true
+    (not @@ Ext_string.start_with "bar" 0 "foo");
+  (check bool) "Ext_string.start_with \"\" 0 \"foo\"" true
+    (Ext_string.start_with "" 0 "foo");
   ()
 
 let mutil_arabian_romian _ =
