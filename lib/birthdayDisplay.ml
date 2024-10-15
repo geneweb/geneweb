@@ -162,7 +162,7 @@ let f_scan conf base =
   let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
   fun () ->
     match next () with
-    | Some i -> (pget conf base i, referenced_person_title_text)
+    | Some i -> (pget conf base i, NameDisplay.referenced_person_title_text)
     | None -> raise Not_found
 
 let print_birth conf base mois =
@@ -271,13 +271,13 @@ let list_aux conf base list cb =
     (fun (fam, year) ->
       Output.print_sstring conf "<li>";
       Output.print_string conf
-        (referenced_person_title_text conf base
+        (NameDisplay.referenced_person_title_text conf base
            (pget conf base (get_father fam)));
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl_nth conf "and" 0);
       Output.print_sstring conf " ";
       Output.print_string conf
-        (referenced_person_title_text conf base
+        (NameDisplay.referenced_person_title_text conf base
            (pget conf base (get_mother fam)));
       Output.print_sstring conf ", <em>";
       Output.print_sstring conf (transl conf "in (year)");
@@ -432,7 +432,7 @@ let print_menu_birth conf base =
     let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
     fun () ->
       match next () with
-      | Some i -> (pget conf base i, referenced_person_title_text)
+      | Some i -> (pget conf base i, NameDisplay.referenced_person_title_text)
       | None -> raise Not_found
   in
   let mode () =
@@ -514,7 +514,7 @@ let print_menu_dead conf base =
     let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
     fun () ->
       match next () with
-      | Some i -> (pget conf base i, referenced_person_title_text)
+      | Some i -> (pget conf base i, NameDisplay.referenced_person_title_text)
       | None -> raise Not_found
   in
   gen_print_menu_dead conf base f_scan (fun () ->

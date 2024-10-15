@@ -95,7 +95,7 @@ type item = Item of person * Adef.safe_string
 
 let string_of_item conf base = function
   | Item (p, s) ->
-      Util.referenced_person_title_text conf base p
+      NameDisplay.referenced_person_title_text conf base p
       ^^^ DateDisplay.short_dates_text conf base p
       ^^^ if (s :> string) = "" then Adef.safe "" else " " ^<^ s
 
