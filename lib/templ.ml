@@ -278,6 +278,7 @@ let substr_start_aux n s =
   loop 0 n ""
 
 let rec eval_variable conf = function
+  | [ "base"; "name" ] -> conf.bname
   | [ "lang"; "full" ] ->
       let rec func x lst c =
         match lst with

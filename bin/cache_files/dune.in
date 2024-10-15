@@ -2,5 +2,5 @@
   (names cache_files)
   (public_names geneweb.cache_files)
   (modules cache_files)
-  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries camlzip unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
 )

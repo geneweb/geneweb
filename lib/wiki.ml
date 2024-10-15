@@ -91,7 +91,7 @@ let str_start_with str i x =
 type wiki_info = {
   wi_mode : string;
   wi_file_path : string -> string;
-  wi_person_exists : string * string * int -> bool;
+  wi_person_exists : string * string * int -> bool * string * string;
   wi_always_show_link : bool;
 }
 
@@ -187,9 +187,14 @@ let syntax_links conf wi s =
               (encode wi.wi_mode) (encode fname) anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
-      | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
+      | NotesLinks.WLperson (j, (fn, sn, oc), name, _text) ->
+          let exists, fn0, sn0 = wi.wi_person_exists (fn, sn, oc) in
+          let name =
+            if name = Name.lower fn0 ^ " " ^ Name.lower sn0 then fn0 ^ " " ^ sn0
+            else name
+          in
           let t =
-            if wi.wi_person_exists (fn, sn, oc) then
+            if exists then
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
                 (commd conf :> string)
                 (encode fn) (encode sn)

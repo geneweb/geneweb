@@ -6,16 +6,21 @@ open UpdateData
 
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in
-  let title =
+  let book_name =
     match p_getenv conf.env "data" with
     | Some "occu" -> transl_nth conf "occupation/occupations" plural
     | Some "place" -> transl_nth conf "place/places" plural
     | Some "src" -> transl_nth conf "source/sources" plural
     | Some "fn" -> transl_nth conf "first name/first names" plural
     | Some "sn" -> transl_nth conf "surname/surnames" plural
-    | _ -> ""
+    | Some "alias" -> transl_nth conf "alias/aliases" plural
+    | Some "qual" -> transl_nth conf "qualifier/qualifiers" plural
+    | Some "pubn" -> transl_nth conf "public name/public names" plural
+    | Some "title" -> transl_nth conf "title/titles" plural
+    | Some "domain" -> transl_nth conf "domain/domains" plural
+    | _ -> "unknown"
   in
-  (Printf.sprintf (ftransl conf "book of %s") title, title)
+  (Printf.sprintf (ftransl conf "book of %s") book_name, book_name)
 
 (* ******************************************************************** *)
 (*  [Fonc] print_mod_ok : config -> base -> unit                        *)
@@ -218,8 +223,9 @@ and eval_simple_var conf base env xx = function
       let istr, p_list = List.hd (get_person_from_data conf base) in
       (* same code as in place.ml *)
       let head =
-        Printf.sprintf "<a href=\"%sm=L%s&k=%s&nb=%d"
+        Printf.sprintf "<a href=\"%sm=L%s%s&k=%s&nb=%d"
           (commd conf :> string)
+          (Format.sprintf "&data=%s" data)
           "&bi=on&ba=on&ma=on&de=on&bu=on&parents=0"
           (Mutil.encode (sou base istr) :> string)
           (List.length p_list)
@@ -269,8 +275,6 @@ and eval_simple_str_var conf _base env _xx = function
         match String.rindex_opt s '(' with
         | Some i ->
             let part = String.sub s (i + 1) (String.length s - i - 2) in
-            if Mutil.contains s "OEREN" then
-              Printf.eprintf "Part: %s (%s) %d\n" s part (String.length part);
             let part =
               if
                 part.[String.length part - 1] = '\''
@@ -315,12 +319,10 @@ and eval_simple_str_var conf _base env _xx = function
   | "substr" -> eval_string_env "substr" env
   | "tail" -> eval_string_env "tail" env
   | "title" ->
-      let len =
-        match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
-      in
-      let book_of, _ = translate_title conf len in
+      let book_of, _ = translate_title conf 2 in
+      (* book of is always plural *)
       Utf8.capitalize_fst book_of
-  | "subtitle" ->
+  | "subtitle" -> (
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
@@ -329,18 +331,15 @@ and eval_simple_str_var conf _base env _xx = function
           (transl conf "(thousand separator)")
           (Sosa.of_int len)
       in
-      let _, title = translate_title conf len in
-      let result =
-        match p_getenv conf.env "s" with
-        | Some ini ->
-            if ini = "" then Printf.sprintf "%s %s" len2 title
-            else
-              Printf.sprintf
-                (ftransl conf "%s %s starting with %s")
-                len2 title ini
-        | None -> Printf.sprintf "%s %s" len2 title
-      in
-      result
+      let _, book_name = translate_title conf len in
+      match p_getenv conf.env "s" with
+      | Some ini ->
+          if ini = "" then Printf.sprintf "%s %s" len2 book_name
+          else
+            Printf.sprintf
+              (ftransl conf "%s %s starting with %s")
+              len2 book_name ini
+      | None -> Printf.sprintf "%s %s" len2 book_name)
   | _ -> raise Not_found
 
 and eval_compound_var conf base env xx sl =
