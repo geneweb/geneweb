@@ -23,7 +23,7 @@ let input_templ conf fname =
 
 let sort_apply_parameters loc f_expr xl vl =
   let named_vl, unnamed_vl =
-    List.partition (fun (id, v) -> Option.is_some id) vl
+    List.partition (fun (id, _) -> Option.is_some id) vl
   in
   let named_vl = List.map (fun (id, ast) -> (Option.get id, ast)) named_vl in
   let unnamed_vl = List.map snd unnamed_vl in

@@ -58,7 +58,7 @@ let map_first_name_data :
     Gwdb.base ->
     Gwdb.person ->
     a =
- fun f conf base person ->
+ fun f _ base person ->
   let first_name =
     match Gwdb.sou base (Gwdb.get_public_name person) with
     | "" -> Gwdb.p_first_name base person
@@ -89,10 +89,6 @@ let first_name_str_of_person conf base person =
       (hidden_or_restricted_fullname_string conf :> string))
     ~on_visible_name:(map_first_name_data gen_first_name_str)
     ~conf ~base ~person
-
-let map_fullname_data f conf base person =
-  let surname = Gwdb.p_surname base person in
-  map_first_name_data (f ~surname) conf base person
 
 let gen_fullname ?(p_surname = Gwdb.p_surname) gen_fn fsurname conf base person
     =
