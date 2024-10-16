@@ -58,7 +58,7 @@ val split_title_and_text : string -> (string * string) list * string
    This function calculates each Key/value pair and puts it in a list;
    except for the key TITLE, that is the second element of the returned tuple.
    If there is no title defined, checks if the first line is not empty and does
-   not start with '=' nor contains '<' nor '[', in which case it is choosen as a
+   not start with '=' nor contains '<' nor '\[', in which case it is choosen as a
    first line. Otherwise, the title is the empty string.
 *)
 
