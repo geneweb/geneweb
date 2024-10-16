@@ -27,19 +27,6 @@ let translate_in_your_tree conf nb =
   in
   Utf8.capitalize_fst result
 
-(* ******************************************************************** *)
-(*  [Fonc] print_mod_ok : config -> base -> unit                        *)
-
-(* ******************************************************************** *)
-
-(** [Description] : Met à jour toutes les personnes en relation avec
-                    la donnée que l'on veut modifié.
-    [Args] :
-    - conf : configuration
-    - base : base
-      [Retour] :
-    - unit
-      [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_mod_ok conf base =
   let ini_of_update_data ini new_input =
     let len = String.length ini in
@@ -61,15 +48,15 @@ let print_mod_ok conf base =
     List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
   in
   let data_modified = List.for_all (fun (old, _) -> new_input <> old) list in
-  (* Indication : 1000 fiches prend environ 1 seconde de traitement. *)
   (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
   (* pour ne pas dépasser le time out du serveur.                    *)
   let max_updates =
+    let default_max_updates = 1_000 in
     match List.assoc_opt "max_nb_update" conf.base_env with
     | Some n ->
         let n = int_of_string n in
-        if n > 50000 then 5000 else n
-    | _ -> 5000
+        if n > 50_000 then default_max_updates else n
+    | None -> default_max_updates
   in
   if nb_pers <> 0 && data_modified then (
     UpdateData.update_person_list conf base new_input list nb_pers max_updates;
@@ -101,7 +88,12 @@ let print_mod_ok conf base =
       Output.print_sstring conf ".");
     Output.print_sstring conf "</p>";
     if nb_pers > max_updates then (
-      Output.printf conf {|<form method="post" action="%s"><p>|} conf.command;
+      Output.printf conf
+        {|<form method="post"
+                action="%s"
+                onsubmit="this.querySelector('[type=\'submit\']').setAttribute('disabled', '')">
+          <p>|}
+        conf.command;
       Util.hidden_env conf;
       Util.hidden_input conf "key" (List.assoc "key" conf.env);
       Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
@@ -112,8 +104,8 @@ let print_mod_ok conf base =
       Output.print_string conf
         (Util.escape_html (Ext_string.only_printable new_input));
       Output.print_sstring conf {|" id="data">|};
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (Util.transl conf "continue correcting"));
+      Output.print_sstring conf (Util.transl conf "continue correcting");
+      Output.print_sstring conf " ";
       Output.print_sstring conf
         {|<button type="submit" class="btn btn-secondary btn-lg">|};
       Output.print_sstring conf
