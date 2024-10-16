@@ -172,8 +172,7 @@ let on_timeout = ref default_timeout
 let set_on_timeout timeout_f = on_timeout := timeout_f
 let timeout_wrapper = ref (fun tmout -> !on_timeout tmout)
 
-let treat_connection tmout callback addr fd =
-  printing_state := Nothing;
+let set_timeout tmout =
   if Sys.unix && tmout > 0 then (
     ignore @@ Sys.signal Sys.sigalrm
     @@ Sys.Signal_handle
@@ -181,7 +180,11 @@ let treat_connection tmout callback addr fd =
            !timeout_wrapper tmout;
            wflush ();
            exit 0);
-    ignore @@ Unix.alarm tmout);
+    ignore @@ Unix.alarm tmout)
+
+let treat_connection tmout callback addr fd =
+  printing_state := Nothing;
+  set_timeout tmout;
   let request, path, query =
     let request, query =
       let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
