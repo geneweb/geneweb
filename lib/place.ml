@@ -1,8 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Gwdb
-open Util
-
 let suburb_aux sub nosub s =
   let len = String.length s in
   if len = 0 then nosub ""
@@ -131,13 +128,13 @@ exception List_too_long
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
     (fold_place : string -> 'a) (filter : 'a -> bool)
-    (mk_value : 'b option -> person -> 'b) (fn : 'b -> 'c) (max_length : int) :
-    ('a * 'c) array =
+    (mk_value : 'b option -> Gwdb.person -> 'b) (fn : 'b -> 'c)
+    (max_length : int) : ('a * 'c) array =
   let ht_size = 2048 in
   (* FIXME: find the good heuristic *)
   let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
   let ht_add istr p =
-    let key : 'a = sou base istr |> normalize |> fold_place in
+    let key : 'a = Gwdb.sou base istr |> normalize |> fold_place in
     if filter key then
       match Hashtbl.find_opt ht key with
       | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
@@ -149,26 +146,29 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
    let aux b fn p =
      if b then
        let x = fn p in
-       if not (is_empty_string x) then ht_add x p
+       if not (Gwdb.is_empty_string x) then ht_add x p
    in
    Gwdb.Collection.iter
      (fun i ->
-       let p = pget conf base i in
-       if authorized_age conf base p then (
-         aux add_birth get_birth_place p;
-         aux add_baptism get_baptism_place p;
-         aux add_death get_death_place p;
-         aux add_burial get_burial_place p))
+       let p = Util.pget conf base i in
+       if Util.authorized_age conf base p then (
+         aux add_birth Gwdb.get_birth_place p;
+         aux add_baptism Gwdb.get_baptism_place p;
+         aux add_death Gwdb.get_death_place p;
+         aux add_burial Gwdb.get_burial_place p))
      (Gwdb.ipers base));
   if add_marriage then
     Gwdb.Collection.iter
       (fun i ->
-        let fam = foi base i in
-        let pl_ma = get_marriage_place fam in
-        if not (is_empty_string pl_ma) then
-          let fath = pget conf base (get_father fam) in
-          let moth = pget conf base (get_mother fam) in
-          if authorized_age conf base fath && authorized_age conf base moth then (
+        let fam = Gwdb.foi base i in
+        let pl_ma = Gwdb.get_marriage_place fam in
+        if not (Gwdb.is_empty_string pl_ma) then
+          let fath = Util.pget conf base (Gwdb.get_father fam) in
+          let moth = Util.pget conf base (Gwdb.get_mother fam) in
+          if
+            Util.authorized_age conf base fath
+            && Util.authorized_age conf base moth
+          then (
             ht_add pl_ma fath;
             ht_add pl_ma moth))
       (Gwdb.ifams base);
