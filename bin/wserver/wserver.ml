@@ -173,13 +173,14 @@ let set_on_timeout timeout_f = on_timeout := timeout_f
 let timeout_wrapper = ref (fun tmout -> !on_timeout tmout)
 
 let set_timeout tmout =
-  if Sys.unix && tmout > 0 then (
-    ignore @@ Sys.signal Sys.sigalrm
-    @@ Sys.Signal_handle
-         (fun _ ->
-           !timeout_wrapper tmout;
-           wflush ();
-           exit 0);
+  if Sys.unix then (
+    if tmout > 0 then
+      ignore @@ Sys.signal Sys.sigalrm
+      @@ Sys.Signal_handle
+           (fun _ ->
+             !timeout_wrapper tmout;
+             wflush ();
+             exit 0);
     ignore @@ Unix.alarm tmout)
 
 let treat_connection tmout callback addr fd =
