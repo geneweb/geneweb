@@ -84,6 +84,7 @@ val stop_server : string ref
 
 val request_timeout : unit -> unit
 val set_on_timeout : (int -> unit) -> unit
+val set_timeout : int -> unit
 
 val cgi : bool ref
 (** CGI (Common Gateway Interface) mode (default false). *)
