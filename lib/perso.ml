@@ -1738,6 +1738,10 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> VVstring "")
   | "carrousel_img" -> (
       match get_env "carrousel_img" env with
+      | Vstring s -> str_val (Util.uri_encode s)
+      | _ -> null_val)
+  | "carrousel_img_raw" -> (
+      match get_env "carrousel_img" env with
       | Vstring s -> str_val s
       | _ -> null_val)
   | "carrousel_note" -> (
