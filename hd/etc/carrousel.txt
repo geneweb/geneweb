@@ -228,33 +228,33 @@
               href=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img;"%end;
               target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong>
-                     <br><span class="small">%carrousel_img;</span>
+                     <br><span class="small">%carrousel_img_raw;</span>
                      <br><img class="rounded my-1"
               src=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img;"%end;
                      width="185px">
                      '>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a role="button" href="#" id="source_%img_cnt;" class="text-%if;(carrousel_img_src="")danger%else;primary%end;"
-              onclick='get_source(%img_cnt;, "%carrousel_img;"); return false;' data-source="%carrousel_img_src;"
+              onclick='get_source(%img_cnt;, "%carrousel_img_raw;"); return false;' data-source="%carrousel_img_src;"
               data-toggle="tooltip" data-html="true" data-placement="bottom"
               title='<strong><i class="far fa-file fa-fw mr-1"></i>
                      %if;(carrousel_img_src="")[*add source]%else;[*modify source]%end;</strong>
                      <br><span class="small"><br>%carrousel_img_src;</span>'>
               <i class="far fa-file-zipper fa-fw"></i></a>
             <a role="button" href="#" id="note_%img_cnt;" class="text-%if;(carrousel_img_note="")danger%else;primary%end;"
-              onclick='get_note(%img_cnt;, "%carrousel_img;"); return false;' data-note="%carrousel_img_note;"
+              onclick='get_note(%img_cnt;, "%carrousel_img_raw;"); return false;' data-note="%carrousel_img_note;"
               data-toggle="tooltip" data-html="true" data-placement="bottom"
               title='<strong><i class="far fa-file fa-fw mr-1"></i>
                      %if;(carrousel_img_note="")[*add note]%else;[*modify note]%end;</strong>
                      <br><span class="small"><br>%carrousel_img_note;</span>'>
               <i class="far fa-file-lines fa-fw"></i></a>
-            <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img;">%carrousel_img;</samp>
+            <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img;">%carrousel_img_raw;</samp>
             <div class="ml-auto col-1">
               <a role="button"
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%carrousel_img;&mode=others&idigest=%idigest;"
                 data-toggle="tooltip" data-html="true" data-placement="left"
                 title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete image]</strong>
-                       <br><span class="small">%carrousel_img;</span>
+                       <br><span class="small">%carrousel_img_raw;</span>
                        <br><img class="rounded my-1"
                 src=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img;"%end;
                 width="185px">'>
@@ -276,7 +276,7 @@
               href=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;"%end;
               target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [saved images]0</strong>
-                     <br><span class="small">%carrousel_img;</span>
+                     <br><span class="small">%carrousel_img_raw;</span>
                      <br><img class="rounded my-1"
               src=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;"%end;
               width="185px">'>
@@ -285,7 +285,7 @@
                %if;(url_in_env!="")%else;data-toggle="tooltip" data-html="true" data-placement="top"%end;
                title="[*restore image saved]">
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i></a>
-            <samp class="text-truncate ml-1" title="%images_store;%X;old%X;%carrousel_img;">%carrousel_img;</samp>
+            <samp class="text-truncate ml-1" title="%images_store;%X;old%X;%carrousel_img;">%carrousel_img_raw;</samp>
             <div class="ml-auto col-1">
               <a role="button"
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index%nn;
@@ -293,7 +293,7 @@
                   &delete=on"%sp;
                 data-toggle="tooltip" data-html="true" data-placement="left"
                 title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete image saved]</strong>
-                         <br><span class="small">%carrousel_img;</span>
+                         <br><span class="small">%carrousel_img_raw;</span>
                          <br><img class="rounded my-1"
                 src=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;"%end;
                 width="185px">'>
