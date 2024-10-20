@@ -360,6 +360,7 @@ and eval_compound_var conf base env xx sl =
     | "encode" :: sl -> (Mutil.encode (loop sl) :> string) (* FIXME? *)
     | ("escape" | "html_encode") :: sl ->
         (Util.escape_html (loop sl) :> string) (* FIXME? *)
+    | [ "uri_encode"; s ] -> Util.uri_encode s
     | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
     | [ "subs"; n; s ] -> (
         match int_of_string_opt n with
