@@ -268,7 +268,7 @@ let parameters_3 =
     function
       (k, s) :: env ->
         let k = strip_spaces (decode k) in
-        if k = "" then loop comm env
+        if k = "" || k = "opt" then loop comm env
         else if k = "anon" && s <> "" then
           loop (comm ^ " " ^ stringify s) env
         else if k = "bd" && s <> "" then
