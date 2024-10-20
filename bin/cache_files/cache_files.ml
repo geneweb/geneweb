@@ -21,7 +21,14 @@ let width = ref 50
 
 (* Attention: cache files are reorg independant *)
 let set_cache_dir bname =
-  String.concat Filename.dir_sep [ Secure.base_dir (); "etc"; bname; "cache" ]
+  let cache_dir =
+    String.concat Filename.dir_sep [ Secure.base_dir (); "etc"; bname; "cache" ]
+  in
+  try
+    if not (Sys.file_exists cache_dir) then Unix.mkdir bname 0o755;
+    cache_dir
+  with
+    _ -> Printf.eprintf "Error while creating cache dir %s\n" cache_dir; cache_dir
 
 let cache_dir = ref ""
 
@@ -57,8 +64,8 @@ let write_cache_file bname fname list =
       Sys.remove temp_file;
       raise exn
   with exn ->
-    Printf.printf "Debug: Exception occurred: %s\n" (Printexc.to_string exn);
-    Printf.printf "Debug: Stack trace:\n%s\n" (Printexc.get_backtrace ());
+    Printf.eprintf "Debug: Exception occurred: %s\n" (Printexc.to_string exn);
+    Printf.eprintf "Debug: Stack trace:\n%s\n" (Printexc.get_backtrace ());
     raise exn
 
 let places_all base bname fname =
@@ -74,7 +81,7 @@ let places_all base bname fname =
   in
   let len = nb_of_persons base in
   if !prog then (
-    Printf.printf "\nplaces\n";
+    Printf.eprintf "\nplaces\n";
     flush stdout;
     ProgrBar.full := '*';
     ProgrBar.start ());
@@ -124,6 +131,8 @@ let places_all base bname fname =
   in
   Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
     (List.length places_list) "places" (stop -. start);
+  Format.eprintf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
+    (List.length places_list) "places" (stop -. start);
   flush stderr
 
 let names_all base bname fname alias =
@@ -132,7 +141,7 @@ let names_all base bname fname alias =
   let nb_ind = nb_of_persons base in
   flush stderr;
   if !prog then (
-    Printf.printf "\n%s\n" fname;
+    Printf.eprintf "\n%s\n" fname;
     flush stdout;
     ProgrBar.full := '*';
     ProgrBar.start ());
@@ -212,6 +221,8 @@ let names_all base bname fname alias =
     Filename.concat !cache_dir (bname ^ "_" ^ fname ^ ".cache.gz")
   in
   Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
+    (List.length name_list) fname (stop -. start);
+  Format.eprintf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
     (List.length name_list) fname (stop -. start);
   flush stderr
 
