@@ -229,7 +229,8 @@ let print_alphabetic conf base is_surnames =
     match Util.p_getenv conf.Config.env "k" with Some k -> k | _ -> ""
   in
   if
-    List.assoc_opt "fast_alphabetic" conf.Config.base_env = Some "yes"
+    (List.assoc_opt "fast_alphabetic" conf.Config.base_env = Some "yes"
+     || Gwdb.nb_of_persons base >= 100_000)
     && ini = ""
   then (
     Gwdb.load_strings_array base;
