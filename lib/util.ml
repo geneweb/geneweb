@@ -602,7 +602,8 @@ let safe_html_aux escape_text escape_attribute s =
   |> to_string
 
 let safe_html s =
-  Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) escape_attribute s)
+  Adef.safe
+    (safe_html_aux (fun s -> (escape_html s :> string)) escape_attribute s)
 
 (* Clean HTML tags from a string. Block tags are replaced by a space,
    and inline tags are replaced by an empty string. *)
@@ -1031,10 +1032,11 @@ let rec skip_spaces s i =
 
 let create_env s =
   let s = (s : Adef.encoded_string :> string) in
+  let use_amp = not (Mutil.contains s "content-disposition") in
   let rec get_assoc beg i =
     if i = String.length s then
       if i = beg then [] else [ String.sub s beg (i - beg) ]
-    else if s.[i] = ';' || s.[i] = '&' then
+    else if s.[i] = ';' || (s.[i] = '&' && use_amp) then
       let next_i = skip_spaces s (succ i) in
       String.sub s beg (i - beg) :: get_assoc next_i next_i
     else get_assoc beg (succ i)
