@@ -125,7 +125,7 @@ let print_possible_continue_merging conf base =
           in
           if s1 <^> Adef.encoded "" || s2 <^> Adef.encoded "" then (
             let p = Gwdb.poi base ip in
-            let s = Util.gen_person_text conf base p in
+            let s = NameDisplay.fullname_html_of_person conf base p in
             Output.print_sstring conf {|<p><a href="|};
             Output.print_string conf (Util.commd conf);
             Output.print_sstring conf {|m=MRG_DUP&ip=|};
@@ -140,7 +140,7 @@ let print_possible_continue_merging conf base =
             Output.print_sstring conf
               (Util.transl_a_of_b conf
                  (Util.transl conf "possible duplications")
-                 (Util.reference conf base p s :> string)
+                 (NameDisplay.reference conf base p s :> string)
                  (s :> string));
             Output.print_sstring conf {|)</p>|})
       | None -> ())
