@@ -100,17 +100,20 @@ let escape_html s : Adef.escaped_string =
 let esc x = (escape_html x :> Adef.safe_string)
 
 (** [escape_attribute str] only escapes double quote and ampersand.
-    Since we will return normalized HTML, ['"'] should be the only
+    Since we will return normalized HTML, ['"' and '\''] should be the only
     dangerous character here. *)
 let escape_attribute =
   escape_aux
-    (function '&' | '"' -> 5 (* "&#xx;" *) | _ -> 1)
+    (function '&' | '"' | '\'' -> 5 (* "&#xx;" *) | _ -> 1)
     (fun buf ibuf istr loop -> function
       | '&' ->
           Bytes.blit_string "&#38;" 0 buf ibuf 5;
           loop (istr + 1) (ibuf + 5)
       | '"' ->
           Bytes.blit_string "&#34;" 0 buf ibuf 5;
+          loop (istr + 1) (ibuf + 5)
+      | '\'' ->
+          Bytes.blit_string "&#39;" 0 buf ibuf 5;
           loop (istr + 1) (ibuf + 5)
       | c ->
           Bytes.unsafe_set buf ibuf c;
@@ -559,7 +562,7 @@ let safe_html_allowed_tags =
 
    Markup.ml automatically return tags names in lowercase.
 *)
-let safe_html_aux escape_text s =
+let safe_html_aux escape_text escape_attribute s =
   let open Markup in
   let stack = ref [] in
   let make_safe = function
@@ -599,7 +602,8 @@ let safe_html_aux escape_text s =
   |> to_string
 
 let safe_html s =
-  Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
+  Adef.safe
+    (safe_html_aux (fun s -> (escape_html s :> string)) escape_attribute s)
 
 (* Clean HTML tags from a string. Block tags are replaced by a space,
    and inline tags are replaced by an empty string. *)
@@ -1028,10 +1032,11 @@ let rec skip_spaces s i =
 
 let create_env s =
   let s = (s : Adef.encoded_string :> string) in
+  let use_amp = not (Mutil.contains s "content-disposition") in
   let rec get_assoc beg i =
     if i = String.length s then
       if i = beg then [] else [ String.sub s beg (i - beg) ]
-    else if s.[i] = ';' || s.[i] = '&' then
+    else if s.[i] = ';' || (s.[i] = '&' && use_amp) then
       let next_i = skip_spaces s (succ i) in
       String.sub s beg (i - beg) :: get_assoc next_i next_i
     else get_assoc beg (succ i)
@@ -1136,6 +1141,20 @@ let string_of_witness_kind conf sex witness_kind =
     | Witness_Other -> "other/other/other"
   in
   Adef.safe @@ transl_nth conf s n
+
+let string_of_witness_kind_raw witness_kind =
+  let s =
+    match witness_kind with
+    | Witness -> ""
+    | Witness_CivilOfficer -> "offi"
+    | Witness_GodParent -> "godp"
+    | Witness_ReligiousOfficer -> "reli"
+    | Witness_Informant -> "info"
+    | Witness_Attending -> "atte"
+    | Witness_Mentioned -> "ment"
+    | Witness_Other -> "othe"
+  in
+  Adef.safe s
 
 let base_path pref bname = !GWPARAM.base_path pref bname
 let bpath bname = !GWPARAM.bpath bname
@@ -1906,12 +1925,18 @@ let find_person_in_env_pref conf base pref =
     (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
+  let auth, fn, sn =
+    match person_of_key base fn sn oc with
+    | Some ip ->
+        if authorized_age conf base (pget conf base ip) then
+          let p = poi base ip in
+          (true, sou base (get_first_name p), sou base (get_surname p))
+        else (false, "x", "x")
+    | None -> (false, fn, sn)
+  in
   match List.assoc_opt "red_if_not_exist" conf.base_env with
-  | Some "off" -> true
-  | Some _ | None -> (
-      match person_of_key base fn sn oc with
-      | Some ip -> authorized_age conf base (pget conf base ip)
-      | None -> false)
+  | Some "off" -> (true, fn, sn)
+  | Some _ | None -> (auth, fn, sn)
 
 let default_sosa_ref conf base =
   match List.assoc_opt "default_sosa_ref" conf.base_env with
