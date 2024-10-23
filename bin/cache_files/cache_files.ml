@@ -27,8 +27,9 @@ let set_cache_dir bname =
   try
     if not (Sys.file_exists cache_dir) then Unix.mkdir bname 0o755;
     cache_dir
-  with
-    _ -> Printf.eprintf "Error while creating cache dir %s\n" cache_dir; cache_dir
+  with _ ->
+    Printf.eprintf "Error while creating cache dir %s\n" cache_dir;
+    cache_dir
 
 let cache_dir = ref ""
 
