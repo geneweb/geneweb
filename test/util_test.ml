@@ -203,12 +203,7 @@ let v =
           mutil_string_of_int_sep;
       ] );
     ("name", [ Alcotest.test_case "Name.title" `Quick name_title ]);
-    ( "utf8",
-      [
-        Alcotest.test_case "Utf8.sub" `Quick utf8_sub;
-        Alcotest.test_case "Utf8.name_with_roman_number" `Quick
-          util_name_with_roman_number;
-      ] );
+    ("utf8", [ Alcotest.test_case "Utf8.sub" `Quick utf8_sub ]);
     ( "util",
       [
         Alcotest.test_case "Util.safe_html" `Quick util_safe_html;
@@ -216,6 +211,8 @@ let v =
         Alcotest.test_case "Util.string_with_macros" `Quick
           util_string_with_macros;
         Alcotest.test_case "Util.escape_html" `Quick util_escape_html;
+        Alcotest.test_case "Utf8.name_with_roman_number" `Quick
+          util_name_with_roman_number;
       ] );
     ( "date-display",
       [
