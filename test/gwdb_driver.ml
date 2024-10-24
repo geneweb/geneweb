@@ -52,8 +52,6 @@ module Utils = struct
 end
 
 module Person = struct
-  open Def
-
   let create_empty_person empty what iper =
     {
       Def.first_name = what;
@@ -96,55 +94,53 @@ module Person = struct
   let empty_person (base : base) (iper : iper) : person =
     (base, create_empty_person empty_string empty_string iper)
 
-  let get_first_name (_, p) = p.first_name
-  let get_surname (_, p) = p.surname
-  let get_occ (_, p) = p.occ
-  let get_public_name (_, p) = p.public_name
-  let get_image (_, p) = p.image
-  let get_qualifiers (_, p) = p.qualifiers
-  let get_first_names_aliases (_, p) = p.first_names_aliases
-  let get_surnames_aliases (_, p) = p.surnames_aliases
-  let get_aliases (_, p) = p.aliases
-  let get_access (_, p) = p.access
-  let get_birth (_, p) = p.birth
-  let get_birth_note (_, p) = p.birth_note
-  let get_birth_place (_, p) = p.birth_place
-  let get_birth_src (_, p) = p.birth_src
-  let get_baptism (_, p) = p.baptism
-  let get_baptism_note (_, p) = p.baptism_note
-  let get_baptism_place (_, p) = p.baptism_place
-  let get_baptism_src (_, p) = p.baptism_src
-  let get_burial (_, p) = p.burial
-  let get_burial_note (_, p) = p.burial_note
-  let get_burial_place (_, p) = p.burial_place
-  let get_burial_src (_, p) = p.burial_src
-  let get_death (_, p) = p.death
-  let get_death_note (_, p) = p.death_note
-  let get_death_place (_, p) = p.death_place
-  let get_death_src (_, p) = p.death_src
-  let get_iper (_, p) = p.key_index
-  let get_notes (_, p) = p.notes
-  let get_occupation (_, p) = p.occupation
-  let get_consang (base, p) = base.ascends.(p.key_index).consang
-  let get_family (base, p) = base.unions.(p.key_index).family
-  let get_parents (base, p) = base.ascends.(p.key_index).parents
-  let get_pevents (_, p) = p.pevents
-  let get_psources (_, p) = p.psources
-  let get_related (_, p) = p.related
-  let get_rparents (_, p) = p.rparents
-  let get_sex (_, p) = p.sex
-  let get_titles (_, p) = p.titles
+  let get_first_name (_, p) = p.Def.first_name
+  let get_surname (_, p) = p.Def.surname
+  let get_occ (_, p) = p.Def.occ
+  let get_public_name (_, p) = p.Def.public_name
+  let get_image (_, p) = p.Def.image
+  let get_qualifiers (_, p) = p.Def.qualifiers
+  let get_first_names_aliases (_, p) = p.Def.first_names_aliases
+  let get_surnames_aliases (_, p) = p.Def.surnames_aliases
+  let get_aliases (_, p) = p.Def.aliases
+  let get_access (_, p) = p.Def.access
+  let get_birth (_, p) = p.Def.birth
+  let get_birth_note (_, p) = p.Def.birth_note
+  let get_birth_place (_, p) = p.Def.birth_place
+  let get_birth_src (_, p) = p.Def.birth_src
+  let get_baptism (_, p) = p.Def.baptism
+  let get_baptism_note (_, p) = p.Def.baptism_note
+  let get_baptism_place (_, p) = p.Def.baptism_place
+  let get_baptism_src (_, p) = p.Def.baptism_src
+  let get_burial (_, p) = p.Def.burial
+  let get_burial_note (_, p) = p.Def.burial_note
+  let get_burial_place (_, p) = p.Def.burial_place
+  let get_burial_src (_, p) = p.Def.burial_src
+  let get_death (_, p) = p.Def.death
+  let get_death_note (_, p) = p.Def.death_note
+  let get_death_place (_, p) = p.Def.death_place
+  let get_death_src (_, p) = p.Def.death_src
+  let get_iper (_, p) = p.Def.key_index
+  let get_notes (_, p) = p.Def.notes
+  let get_occupation (_, p) = p.Def.occupation
+  let get_consang (base, p) = base.ascends.(p.Def.key_index).consang
+  let get_family (base, p) = base.unions.(p.Def.key_index).family
+  let get_parents (base, p) = base.ascends.(p.Def.key_index).parents
+  let get_pevents (_, p) = p.Def.pevents
+  let get_psources (_, p) = p.Def.psources
+  let get_related (_, p) = p.Def.related
+  let get_rparents (_, p) = p.Def.rparents
+  let get_sex (_, p) = p.Def.sex
+  let get_titles (_, p) = p.Def.titles
   let gen_person_of_person (_, p) = p
-  let gen_ascend_of_person (base, p) = base.ascends.(p.key_index)
-  let gen_union_of_person (base, p) = base.unions.(p.key_index)
+  let gen_ascend_of_person (base, p) = base.ascends.(p.Def.key_index)
+  let gen_union_of_person (base, p) = base.unions.(p.Def.key_index)
   let person_of_gen_person base (p, _a, _u) = (base, p)
   let poi base iper = (base, base.persons.(iper))
   let no_person ip = create_empty_person empty_string empty_string ip
 end
 
 module Family = struct
-  open Def
-
   let create_empty_family empty ifam =
     {
       Def.marriage = Date.cdate_None;
@@ -162,27 +158,27 @@ module Family = struct
     }
 
   let empty_family base ifam = (base, create_empty_family empty_string ifam)
-  let get_marriage (_, f) = f.marriage
-  let get_marriage_place (_, f) = f.marriage_place
-  let get_marriage_note (_, f) = f.marriage_note
-  let get_marriage_src (_, f) = f.marriage_src
-  let get_witnesses (_, f) = f.witnesses
-  let get_relation (_, f) = f.relation
-  let get_divorce (_, f) = f.divorce
-  let get_fevents (_, f) = f.fevents
-  let get_comment (_, f) = f.comment
-  let get_origin_file (_, f) = f.origin_file
-  let get_fsources (_, f) = f.fsources
-  let get_ifam (_, f) = f.fam_index
-  let get_children (base, f) = base.descends.(f.fam_index).children
-  let get_father (base, f) = base.couples.(f.fam_index) |> Adef.father
-  let get_mother (base, f) = base.couples.(f.fam_index) |> Adef.mother
+  let get_marriage (_, f) = f.Def.marriage
+  let get_marriage_place (_, f) = f.Def.marriage_place
+  let get_marriage_note (_, f) = f.Def.marriage_note
+  let get_marriage_src (_, f) = f.Def.marriage_src
+  let get_witnesses (_, f) = f.Def.witnesses
+  let get_relation (_, f) = f.Def.relation
+  let get_divorce (_, f) = f.Def.divorce
+  let get_fevents (_, f) = f.Def.fevents
+  let get_comment (_, f) = f.Def.comment
+  let get_origin_file (_, f) = f.Def.origin_file
+  let get_fsources (_, f) = f.Def.fsources
+  let get_ifam (_, f) = f.Def.fam_index
+  let get_children (base, f) = base.descends.(f.Def.fam_index).children
+  let get_father (base, f) = base.couples.(f.Def.fam_index) |> Adef.father
+  let get_mother (base, f) = base.couples.(f.Def.fam_index) |> Adef.mother
 
   let get_parent_array (base, f) =
-    base.couples.(f.fam_index) |> Adef.parent_array
+    base.couples.(f.Def.fam_index) |> Adef.parent_array
 
-  let gen_couple_of_family (base, f) = base.couples.(f.fam_index)
-  let gen_descend_of_family (base, f) = base.descends.(f.fam_index)
+  let gen_couple_of_family (base, f) = base.couples.(f.Def.fam_index)
+  let gen_descend_of_family (base, f) = base.descends.(f.Def.fam_index)
   let gen_family_of_family (_, f) = f
   let family_of_gen_family base (f, _c, _d) = (base, f)
   let foi base ifam = (base, base.families.(ifam))
@@ -190,48 +186,44 @@ module Family = struct
 end
 
 module PersEvent = struct
-  open Def
-
   type pers_event = (iper, istr) Def.gen_pers_event
 
-  let get_pevent_name pe = pe.epers_name
-  let get_pevent_date pe = pe.epers_date
-  let get_pevent_place pe = pe.epers_place
-  let get_pevent_reason pe = pe.epers_reason
-  let get_pevent_note pe = pe.epers_note
-  let get_pevent_src pe = pe.epers_src
+  let get_pevent_name pe = pe.Def.epers_name
+  let get_pevent_date pe = pe.Def.epers_date
+  let get_pevent_place pe = pe.Def.epers_place
+  let get_pevent_reason pe = pe.Def.epers_reason
+  let get_pevent_note pe = pe.Def.epers_note
+  let get_pevent_src pe = pe.Def.epers_src
 
   let get_pevent_witnesses pe =
-    Array.map (fun (w, wk, _) -> (w, wk)) pe.epers_witnesses
+    Array.map (fun (w, wk, _) -> (w, wk)) pe.Def.epers_witnesses
 
   let get_pevent_witness_notes pe =
-    Array.map (fun (_, _, note) -> note) pe.epers_witnesses
+    Array.map (fun (_, _, note) -> note) pe.Def.epers_witnesses
 
-  let get_pevent_witnesses_and_notes pe = pe.epers_witnesses
+  let get_pevent_witnesses_and_notes pe = pe.Def.epers_witnesses
   let gen_pevent_of_pers_event pe = pe
   let pers_event_of_gen_pevent _base pe = pe
   let eq_pevent _ _ = assert false
 end
 
 module FamEvent = struct
-  open Def
-
   type fam_event = (iper, istr) Def.gen_fam_event
 
-  let get_fevent_name pe = pe.efam_name
-  let get_fevent_date pe = pe.efam_date
-  let get_fevent_place pe = pe.efam_place
-  let get_fevent_reason pe = pe.efam_reason
-  let get_fevent_note pe = pe.efam_note
-  let get_fevent_src pe = pe.efam_src
+  let get_fevent_name pe = pe.Def.efam_name
+  let get_fevent_date pe = pe.Def.efam_date
+  let get_fevent_place pe = pe.Def.efam_place
+  let get_fevent_reason pe = pe.Def.efam_reason
+  let get_fevent_note pe = pe.Def.efam_note
+  let get_fevent_src pe = pe.Def.efam_src
 
   let get_fevent_witnesses pe =
-    Array.map (fun (w, wk, _) -> (w, wk)) pe.efam_witnesses
+    Array.map (fun (w, wk, _) -> (w, wk)) pe.Def.efam_witnesses
 
   let get_fevent_witness_notes pe =
-    Array.map (fun (_, _, note) -> note) pe.efam_witnesses
+    Array.map (fun (_, _, note) -> note) pe.Def.efam_witnesses
 
-  let get_fevent_witnesses_and_notes pe = pe.efam_witnesses
+  let get_fevent_witnesses_and_notes pe = pe.Def.efam_witnesses
   let gen_fevent_of_fam_event pe = pe
   let fam_event_of_gen_fevent _base pe = pe
   let eq_fevent _ _ = assert false
