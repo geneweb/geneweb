@@ -1,17 +1,3 @@
-(*
-let pp_wiki_link = function
-  | WLpage (a, b, c, d, e) ->
-      "WLpage "
-      ^ [%show: int * (string list * string) * string * string * string]
-          (a, b, c, d, e)
-  | WLperson (a, b, c, d) ->
-      "WLperson"
-      ^ [%show: int * (string * string * int) * string * string option]
-          (a, Obj.magic b, c, d)
-  | WLwizard (a, b, c) -> "WLwizard" ^ [%show: int * string * string] (a, b, c)
-  | WLnone -> "WLnone"
-  *)
-
 open Alcotest
 open Geneweb
 open NotesLinks

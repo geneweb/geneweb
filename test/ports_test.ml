@@ -144,7 +144,6 @@ let marriage_date = Geneweb.Event.get_date marriage
 
 let marriage_witness, marriage_witness_kind, marriage_wnote =
   let witnesses = Geneweb.Event.get_witnesses_and_notes marriage in
-  (*(check int) "Array witness length" 1 (Array.length witnesses);*)
   assert (Array.length witnesses = 1);
   let w, wk, wnote = witnesses.(0) in
   (Gwdb.poi base w, wk, Gwdb.sou base wnote)
@@ -171,7 +170,6 @@ let diploma =
 
 let _w, diploma_witness_kind, diploma_wnote =
   let witnesses = Geneweb.Event.get_witnesses_and_notes diploma in
-  (*(check int) "array witness len" 1 (Array.length witnesses);*)
   assert (Array.length witnesses = 1);
   let w, wk, wnote = witnesses.(0) in
   (w, wk, Gwdb.sou base wnote)
