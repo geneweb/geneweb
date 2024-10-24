@@ -125,10 +125,6 @@ let util_name_with_roman_number _ =
   test (Some "bar CLX baz CCVII") "bar 160 baz 207";
   test None "foo bar baz"
 
-let printer_safe x = (x : Adef.safe_string :> string)
-let printer_encoded x = (x : Adef.encoded_string :> string)
-let printer_escaped x = (x : Adef.escaped_string :> string)
-
 let util_safe_html _ =
   (Alcotest.check Alcotest.string)
     "" {|<a href="localhost:2318/foo_w?lang=fr&#38;acte=123">foo</a>|}
