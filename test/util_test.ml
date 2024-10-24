@@ -28,7 +28,7 @@ let ext_string_start_with () =
     (Ext_string.start_with "" 0 "foo");
   ()
 
-let mutil_arabian_romian _ =
+let mutil_arabian_romian () =
   let test a r =
     (Alcotest.check Alcotest.int)
       "arabian_of_roman" a (Mutil.arabian_of_roman r);
@@ -57,7 +57,7 @@ let test_particles =
     "von_";
   ]
 
-let mutil_compare_after_particle _ =
+let mutil_compare_after_particle () =
   let particles = Mutil.compile_particles test_particles in
   let test a b =
     let test exp a b =
@@ -77,7 +77,7 @@ let mutil_compare_after_particle _ =
   test "d'aboville" "d'artagnan";
   test "descartes" "dupont"
 
-let mutil_string_of_int_sep _ =
+let mutil_string_of_int_sep () =
   let test sep exp int =
     (Alcotest.check Alcotest.string) "" exp (Mutil.string_of_int_sep sep int)
   in
@@ -89,14 +89,14 @@ let mutil_string_of_int_sep _ =
   test "," "100,000" 100000;
   test "," "1,000,000" 1000000
 
-let name_title _ =
+let name_title () =
   let test exp =
     List.iter (fun s -> (Alcotest.check Alcotest.string) "" exp (Name.title s))
   in
   test "Jean-Baptiste"
     [ "jean-baptiste"; "JEAN-baptiste"; "Jean-Baptiste"; "jeaN-baptistE" ]
 
-let utf8_sub _ =
+let utf8_sub () =
   let test ?pad e s i j =
     let i = Utf8.get s i in
     (Alcotest.check Alcotest.string) "" e (Utf8.sub ?pad s i j)
@@ -112,7 +112,7 @@ let utf8_sub _ =
   test "švédčina" "švédčina" 0 8;
   test "a" "švédčina" 7 1
 
-let util_name_with_roman_number _ =
+let util_name_with_roman_number () =
   let test r a =
     (Alcotest.check (Alcotest.option Alcotest.string))
       "" r
@@ -125,7 +125,7 @@ let util_name_with_roman_number _ =
   test (Some "bar CLX baz CCVII") "bar 160 baz 207";
   test None "foo bar baz"
 
-let util_safe_html _ =
+let util_safe_html () =
   (Alcotest.check Alcotest.string)
     "" {|<a href="localhost:2318/foo_w?lang=fr&#38;acte=123">foo</a>|}
     (Geneweb.Util.safe_html
@@ -137,7 +137,7 @@ let util_safe_html _ =
        {|<a href="localhost:2318/foo_w?lang=fr&image=on">foo</a>|}
       :> string)
 
-let util_transl_a_of_b _ =
+let util_transl_a_of_b () =
   let conf = Geneweb.Config.empty in
   let conf = { conf with env = ("lang", Adef.encoded "fr") :: conf.env } in
   Hashtbl.add conf.lexicon "%1 of %2" "%1 d[e |']%2";
@@ -148,13 +148,13 @@ let util_transl_a_of_b _ =
   test "naissance de <b>Jean</b>" ("naissance", "<b>Jean</b>", "Jean");
   test "naissance d'<b>André</b>" ("naissance", "<b>André</b>", "André")
 
-let util_string_with_macros _ =
+let util_string_with_macros () =
   let conf = Geneweb.Config.empty in
   (Alcotest.check Alcotest.string)
     "" {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
     (Geneweb.Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
 
-let util_escape_html _ =
+let util_escape_html () =
   (Alcotest.check Alcotest.string)
     ""
     {|&#60;a href=&#34;mailto:jean@dupond.net&#34;&#62;jean@dupond.net&#60;/a&#62; - le 1 &#38;amp; 2|}
@@ -162,7 +162,7 @@ let util_escape_html _ =
        {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
       :> string)
 
-let datedisplay_string_of_date _ =
+let datedisplay_string_of_date () =
   let conf = Geneweb.Config.empty in
   let conf = { conf with env = ("lang", Adef.encoded "co") :: conf.env } in
   Hashtbl.add conf.lexicon "(date)"
