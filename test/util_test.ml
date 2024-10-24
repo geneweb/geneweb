@@ -112,6 +112,53 @@ let utf8_sub () =
   test "švédčina" "švédčina" 0 8;
   test "a" "švédčina" 7 1
 
+let utf8_alphabetical_order () =
+  let test ~__POS__ ~expected s s' =
+    let testable =
+      let same_sign x y = x = y || (x < 0 && y < 0) || (x > 0 && y > 0) in
+      Alcotest.testable Format.pp_print_int same_sign
+    in
+    let expected =
+      match expected with `Before -> -1 | `Same -> 0 | `After -> 1
+    in
+    Alcotest.check' ~pos:__POS__ testable ~msg:"same sign" ~expected
+      ~actual:(Utf8.alphabetic_order s s')
+  in
+  let test_printable_ascii_characters () =
+    let first_ascii_character = String.make 1 (Char.chr 0) in
+    let last_ascii_character = String.make 1 (Char.chr 128) in
+    let printable_ascii_characters =
+      List.init 95 (fun i -> String.make 1 (Char.chr (i + 32)))
+    in
+    ignore
+      (List.fold_left
+         (fun previous_character current_character ->
+           test ~__POS__ ~expected:`Before previous_character current_character;
+           current_character)
+         first_ascii_character printable_ascii_characters);
+    ignore
+      (List.fold_right
+         (fun current_character next_character ->
+           test ~__POS__ ~expected:`After next_character current_character;
+           current_character)
+         printable_ascii_characters last_ascii_character)
+  in
+  test ~__POS__ ~expected:`Same "" "";
+  test ~__POS__ ~expected:`Before "" "a";
+  test ~__POS__ ~expected:`After "a" "";
+  test ~__POS__ ~expected:`Same "a" "a";
+  test ~__POS__ ~expected:`After "a" "A";
+  test ~__POS__ ~expected:`After "prefix" "Suffix";
+  test ~__POS__ ~expected:`Before "Pre" "Prefix";
+  test ~__POS__ ~expected:`After "suf" "prefix";
+  test_printable_ascii_characters ();
+  test ~__POS__ ~expected:`Before "a" "à";
+  test ~__POS__ ~expected:`Before "A" "À";
+  test ~__POS__ ~expected:`Before "À" "a";
+  test ~__POS__ ~expected:`After "VANÉAU" "VANEAU";
+  test ~__POS__ ~expected:`Before "Saint-Lô" "Saint-Lomer";
+  test ~__POS__ ~expected:`Before "VANÉAU" "VANEBU"
+
 let util_name_with_roman_number () =
   let test r a =
     (Alcotest.check (Alcotest.option Alcotest.string))
@@ -203,7 +250,11 @@ let v =
           mutil_string_of_int_sep;
       ] );
     ("name", [ Alcotest.test_case "Name.title" `Quick name_title ]);
-    ("utf8", [ Alcotest.test_case "Utf8.sub" `Quick utf8_sub ]);
+    ( "utf8",
+      [
+        Alcotest.test_case "Utf8.sub" `Quick utf8_sub;
+        Alcotest.test_case "alphabetical-order" `Quick utf8_alphabetical_order;
+      ] );
     ( "util",
       [
         Alcotest.test_case "Util.safe_html" `Quick util_safe_html;
