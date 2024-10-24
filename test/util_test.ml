@@ -204,7 +204,7 @@ let v =
         Alcotest.test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         Alcotest.test_case "Mutil particule" `Quick mutil_compare_after_particle;
         Alcotest.test_case "Mutil.string_of_int_sep" `Quick
-          mutil_compare_after_particle;
+          mutil_string_of_int_sep;
       ] );
     ("name", [ Alcotest.test_case "Name.title" `Quick name_title ]);
     ( "utf8",

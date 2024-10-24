@@ -62,6 +62,6 @@ let v =
       [ test_case "Place split suburb" `Quick split_suburb ] );
     ("place-only-suburb", [ test_case "Place only suburb" `Quick only_suburb ]);
     ( "place-without-suburb",
-      [ test_case "Place without suburb" `Quick only_suburb ] );
+      [ test_case "Place without suburb" `Quick without_suburb ] );
     ("place-compare", [ test_case "Place compare" `Quick compare_places ]);
   ]
