@@ -1,9 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-open Config
-open Util
-
 (* TLSW: Text Language Stolen to Wikipedia
    = title level 1 =
    == title level 2 ==
@@ -50,9 +46,10 @@ let section_level s len =
 
 let notes_aliases conf =
   let fname =
-    match List.assoc_opt "notes_alias_file" conf.base_env with
+    match List.assoc_opt "notes_alias_file" conf.Config.base_env with
     | Some f -> Util.bpath f
-    | None -> Filename.concat (Util.bpath (conf.bname ^ ".gwb")) "notes.alias"
+    | None ->
+        Filename.concat (Util.bpath (conf.Config.bname ^ ".gwb")) "notes.alias"
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic ->
@@ -183,7 +180,7 @@ let syntax_links conf wi s =
           let anchor = if anchor = "" then "" else "#" ^ encode anchor in
           let t =
             Printf.sprintf {|<a href="%sm=%s&f=%s%s"%s>%s</a>|}
-              (commd conf : Adef.escaped_string :> string)
+              (Util.commd conf : Adef.escaped_string :> string)
               (encode wi.wi_mode) (encode fname) anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
@@ -191,7 +188,7 @@ let syntax_links conf wi s =
           let t =
             if wi.wi_person_exists (fn, sn, oc) then
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
-                (commd conf :> string)
+                (Util.commd conf :> string)
                 (encode fn) (encode sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
                 name
@@ -199,16 +196,18 @@ let syntax_links conf wi s =
               let s = " style=\"color:red\"" in
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\"%s>%s</a>"
                 pos
-                (commd conf :> string)
+                (Util.commd conf :> string)
                 (encode fn) (encode sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
                 s name
             else
               Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
-                (commd conf :> string)
+                (Util.commd conf :> string)
                 (* TODO how do we know this person is private here?
                    TODO should be is_hidden (?) *)
-                (if conf.hide_private_names && not (conf.wizard || conf.friend)
+                (if
+                 conf.Config.hide_private_names
+                 && not (conf.Config.wizard || conf.Config.friend)
                 then "x x"
                 else escape name)
           in
@@ -217,7 +216,7 @@ let syntax_links conf wi s =
           let t =
             let s = if name <> "" then name else wiz in
             Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>"
-              (commd conf :> string)
+              (Util.commd conf :> string)
               (encode wiz) s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
@@ -249,7 +248,7 @@ let adjust_ul_level rev_lines old_lev new_lev =
     in
     loop rev_lines old_lev
 
-let message_txt conf i = transl_nth conf "visualize/show/hide/summary" i
+let message_txt conf i = Util.transl_nth conf "visualize/show/hide/summary" i
 
 let sections_nums_of_tlsw_lines lines =
   let _, _, _, rev_sections_nums =
@@ -353,7 +352,8 @@ let summary_of_tlsw_lines conf short lines =
     in
     let lines =
       ({|<dl><dd><table id="summary" cellpadding="10"><tr><td align="|}
-     ^ conf.left ^ {|"><div style="text-align:center" id="toctoggleanchor"><b>|}
+     ^ conf.Config.left
+     ^ {|"><div style="text-align:center" id="toctoggleanchor"><b>|}
       ^ Utf8.capitalize_fst (message_txt conf 3)
       ^ {|</b></div><div class="summary" id="tocinside">|})
       :: List.rev_append rev_summary [ "</div></td></tr></table></dd></dl>" ]
@@ -361,11 +361,11 @@ let summary_of_tlsw_lines conf short lines =
     (lines, sections_nums)
 
 let string_of_modify_link conf cnt empty = function
-  | Some (can_edit, mode, sfn) when conf.wizard ->
+  | Some (can_edit, mode, sfn) when conf.Config.wizard ->
       (if empty then "<p>"
       else {|<div style="font-size:80%;float:right;margin-left:3em">|})
       ^ {|(<a href="|}
-      ^ (commd conf :> string)
+      ^ (Util.commd conf :> string)
       ^ "m="
       ^ (if can_edit then "MOD" else "VIEW")
       ^ "_"
@@ -373,8 +373,8 @@ let string_of_modify_link conf cnt empty = function
       ^ "&v=" ^ string_of_int cnt
       ^ (if sfn = "" then "" else "&f=" ^ (Mutil.encode sfn :> string))
       ^ {|">|}
-      ^ (if can_edit then transl_decline conf "modify" ""
-        else transl conf "view source")
+      ^ (if can_edit then Util.transl_decline conf "modify" ""
+        else Util.transl conf "view source")
       ^ "</a>)"
       ^ if empty then "</p>" else "</div>"
   | _ -> ""
@@ -633,7 +633,7 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
   Output.print_sstring conf "<p>";
   if cnt0 >= first_cnt then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_sstring conf (commd conf :> string);
+    Output.print_sstring conf (Util.commd conf :> string);
     Output.print_sstring conf {|m=|};
     Output.print_string conf edit_mode;
     Output.print_string conf sfn;
@@ -642,14 +642,14 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     Output.print_sstring conf {|">|};
     Output.print_sstring conf {|&lt;&lt;</a> |});
   Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (commd conf);
+  Output.print_string conf (Util.commd conf);
   Output.print_sstring conf {|m=|};
   Output.print_string conf edit_mode;
   Output.print_string conf sfn;
   Output.print_sstring conf {|">^^</a>|};
   if not is_empty then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=";
     Output.print_string conf edit_mode;
     Output.print_string conf sfn;
@@ -680,7 +680,10 @@ let print_sub_part_text conf wi edit_opt cnt0 lines =
 let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
   let edit_opt = Some (can_edit, edit_mode, sub_fname) in
   let sfn =
-    if sub_fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode sub_fname
+    if sub_fname = "" then Adef.encoded ""
+    else
+      let open Def in
+      "&f=" ^<^ Mutil.encode sub_fname
   in
   print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 (lines = []);
   print_sub_part_text conf wi edit_opt cnt0 lines
@@ -689,23 +692,28 @@ let print_mod_view_page conf can_edit mode fname title env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
   let mode_pref = Mutil.encode (if can_edit then "MOD_" else "VIEW_") in
   let has_v, v =
-    match p_getint conf.env "v" with Some v -> (true, v) | None -> (false, 0)
+    match Util.p_getint conf.Config.env "v" with
+    | Some v -> (true, v)
+    | None -> (false, 0)
   in
   let sub_part =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
   let is_empty = sub_part = "" in
   let sfn =
-    if fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode fname
+    if fname = "" then Adef.encoded ""
+    else
+      let open Def in
+      "&f=" ^<^ Mutil.encode fname
   in
   Hutil.header conf title;
   if can_edit then (
     Output.print_sstring conf {|<div style="font-size:80%;float:|};
-    Output.print_sstring conf conf.right;
+    Output.print_sstring conf conf.Config.right;
     Output.print_sstring conf {|;margin-|};
-    Output.print_sstring conf conf.left;
+    Output.print_sstring conf conf.Config.left;
     Output.print_sstring conf {|:3em">(<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=|};
     Output.print_string conf mode;
     if has_v then (
@@ -716,13 +724,16 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf (message_txt conf 0);
     Output.print_sstring conf "</a>)</div>");
   Hutil.print_link_to_welcome conf true;
-  if can_edit && has_v then
-    print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
+  (if can_edit && has_v then
+   let open Def in
+   print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty);
   Output.print_sstring conf {|<form name="form_notes" method="POST" action="|};
-  Output.print_sstring conf conf.command;
+  Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
-  if can_edit then Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK");
+  (if can_edit then
+   let open Def in
+   Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK"));
   if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
   if fname <> "" then Util.hidden_input conf "f" (Mutil.encode fname);
   if can_edit then
@@ -740,7 +751,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf
       {|<button type="submit" class="btn btn-outline-primary btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3">|};
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+      (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
     Output.print_sstring conf "</button>");
   Output.print_sstring conf {|<div class="d-inline col-9 py-1">|};
   Util.include_template conf [ ("name", Adef.encoded "notes") ] "accent" ignore;
@@ -838,7 +849,7 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   title ();
   Output.print_sstring conf {| --- </div>|};
   Hutil.print_link_to_welcome conf true;
-  let get_v = Util.p_getint conf.env "v" in
+  let get_v = Util.p_getint conf.Config.env "v" in
   let v = match get_v with Some v -> v | None -> 0 in
   let title, s =
     if v = 0 && title_is_1st then
@@ -850,12 +861,12 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   let lines =
     if v = 0 && title <> "" then ("<h1>" ^ title ^ "</h1>") :: lines else lines
   in
-  print_sub_part conf wi conf.wizard edit_mode fname v lines;
+  print_sub_part conf wi conf.Config.wizard edit_mode fname v lines;
   Hutil.trailer conf
 
 let print_mod_ok conf wi edit_mode fname read_string commit string_filter
     title_is_1st =
-  let fname = fname (Util.p_getenv conf.env "f") in
+  let fname = fname (Util.p_getenv conf.Config.env "f") in
   match edit_mode fname with
   | Some edit_mode ->
       let old_string =
@@ -863,17 +874,19 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
         List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
       in
       let sub_part =
-        match Util.p_getenv conf.env "notes" with
+        match Util.p_getenv conf.Config.env "notes" with
         | Some v -> Ext_string.strip_all_trailing_spaces v
         | None -> failwith "notes unbound"
       in
       let digest =
-        match Util.p_getenv conf.env "digest" with Some s -> s | None -> ""
+        match Util.p_getenv conf.Config.env "digest" with
+        | Some s -> s
+        | None -> ""
       in
       if digest <> Ext_string.digest old_string then Update.error_digest conf
       else
         let s =
-          match Util.p_getint conf.env "v" with
+          match Util.p_getint conf.Config.env "v" with
           | Some v -> insert_sub_part old_string v sub_part
           | None -> sub_part
         in

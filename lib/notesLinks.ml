@@ -1,5 +1,3 @@
-open Def.NLDB
-
 let char_dir_sep = ':'
 
 let check_file_name s =
@@ -24,7 +22,7 @@ let check_file_name s =
 
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * key * string * string option
+  | WLperson of int * Def.NLDB.key * string * string option
   | WLwizard of int * string * string
   | WLnone
 

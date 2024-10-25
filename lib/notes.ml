@@ -1,14 +1,12 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Gwdb
-open Util
 module StrSet = Ext_string.Set
 
 let file_path conf base fname =
   Util.bpath
-    (List.fold_left Filename.concat (conf.bname ^ ".gwb")
-       [ base_notes_dir base; fname ^ ".txt" ])
+    (List.fold_left Filename.concat
+       (conf.Config.bname ^ ".gwb")
+       [ Gwdb.base_notes_dir base; fname ^ ".txt" ])
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -17,7 +15,7 @@ let path_of_fnotes fnotes =
 
 let read_notes base fnotes =
   let fnotes = path_of_fnotes fnotes in
-  let s = base_notes_read base fnotes in
+  let s = Gwdb.base_notes_read base fnotes in
   Wiki.split_title_and_text s
 
 let merge_possible_aliases conf db =
@@ -68,13 +66,13 @@ let notes_links_db conf base eliminate_unlinked =
     List.fold_left
       (fun db2 (pg, (sl, _il)) ->
         let record_it =
-          let open Def.NLDB in
           match pg with
-          | PgInd ip -> pget conf base ip |> authorized_age conf base
-          | PgFam ifam ->
-              foi base ifam |> get_father |> pget conf base
-              |> authorized_age conf base
-          | PgNotes | PgMisc _ | PgWizard _ -> true
+          | Def.NLDB.PgInd ip ->
+              Util.pget conf base ip |> Util.authorized_age conf base
+          | Def.NLDB.PgFam ifam ->
+              Gwdb.foi base ifam |> Gwdb.get_father |> Util.pget conf base
+              |> Util.authorized_age conf base
+          | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
         in
         if record_it then
           List.fold_left
@@ -92,11 +90,11 @@ let notes_links_db conf base eliminate_unlinked =
   let set =
     List.fold_left
       (fun set (pg, (sl, _il)) ->
-        let open Def.NLDB in
         match pg with
-        | PgInd _ | PgFam _ | PgNotes | PgWizard _ ->
+        | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes
+        | Def.NLDB.PgWizard _ ->
             List.fold_left (fun set s -> StrSet.add s set) set sl
-        | PgMisc s ->
+        | Def.NLDB.PgMisc s ->
             Hashtbl.add misc s sl;
             set)
       StrSet.empty db
@@ -156,12 +154,14 @@ let commit_notes conf base fnotes s =
   let fname = path_of_fnotes fnotes in
   let fpath =
     List.fold_left Filename.concat
-      (Util.bpath (conf.bname ^ ".gwb"))
-      [ base_notes_dir base; fname ]
+      (Util.bpath (conf.Config.bname ^ ".gwb"))
+      [ Gwdb.base_notes_dir base; fname ]
   in
   Files.mkdir_p (Filename.dirname fpath);
   Gwdb.commit_notes base fname s;
-  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
+  History.record conf base
+    (Def.U_Notes (Util.p_getint conf.Config.env "v", fnotes))
+    "mn";
   update_notes_links_db base pg s
 
 let wiki_aux pp conf base env str =
@@ -172,7 +172,7 @@ let wiki_aux pp conf base env str =
       Wiki.wi_mode = "NOTES";
       Wiki.wi_file_path = file_path conf base;
       Wiki.wi_person_exists = Util.person_exists conf base;
-      Wiki.wi_always_show_link = conf.wizard || conf.friend;
+      Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
     }
   in
   String.concat "\n" lines |> Wiki.syntax_links conf wi |> Util.safe_html
