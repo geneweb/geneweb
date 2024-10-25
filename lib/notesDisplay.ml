@@ -362,7 +362,6 @@ let print_misc_notes conf base =
     Output.print_sstring conf "<ul>";
     if d <> "" then (
       Output.print_sstring conf {|<li class="parent">|};
-      (* Output.printf conf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf) ; *)
       Output.print_sstring conf {|<a href="|};
       Output.print_string conf (Util.commd conf);
       Output.print_sstring conf "m=MISC_NOTES";
