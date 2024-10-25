@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module StrSet = Ext_string.Set
-
 let file_path conf base fname =
   Util.bpath
     (List.fold_left Filename.concat
@@ -93,11 +91,11 @@ let notes_links_db conf base eliminate_unlinked =
         match pg with
         | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes
         | Def.NLDB.PgWizard _ ->
-            List.fold_left (fun set s -> StrSet.add s set) set sl
+            List.fold_left (fun set s -> Ext_string.Set.add s set) set sl
         | Def.NLDB.PgMisc s ->
             Hashtbl.add misc s sl;
             set)
-      StrSet.empty db
+      Ext_string.Set.empty db
   in
   let mark = Hashtbl.create 1 in
   (let rec loop = function
@@ -109,7 +107,7 @@ let notes_links_db conf base eliminate_unlinked =
            loop (List.rev_append sl1 sl))
      | [] -> ()
    in
-   loop (StrSet.elements set));
+   loop (Ext_string.Set.elements set));
   let is_referenced s = Hashtbl.mem mark s in
   let db2 =
     if eliminate_unlinked then
