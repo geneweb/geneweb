@@ -2,6 +2,8 @@ open Config
 open TemplAst
 
 exception Exc_located of loc * exn
+exception BadApplyArity
+exception NamedArgumentNotMatched of string
 
 let raise_with_loc loc = function
   | Exc_located (_, _) as e ->
@@ -20,6 +22,33 @@ let input_templ conf fname =
           let r = Templ_parser.parse_templ conf lex in
           close_in ic;
           Some r)
+
+let sort_apply_parameters loc f_expr xl vl =
+  let named_vl, unnamed_vl =
+    List.partition (fun (id, _v) -> Option.is_some id) vl
+  in
+  let named_vl = List.map (fun (id, ast) -> (Option.get id, ast)) named_vl in
+  let unnamed_vl = List.map snd unnamed_vl in
+  let vl, named_vl, unnamed_vl =
+    List.fold_left
+      (fun (vl, named_vl, unnamed_vl) (id, ast) ->
+        match (List.assoc_opt id named_vl, ast) with
+        | Some v, _ -> (v :: vl, List.remove_assoc id named_vl, unnamed_vl)
+        | None, None when unnamed_vl <> [] ->
+            let v = List.hd unnamed_vl in
+            let unnamed_vl = List.tl unnamed_vl in
+            (v :: vl, named_vl, unnamed_vl)
+        | None, None -> raise_with_loc loc BadApplyArity
+        | None, Some ast -> (f_expr ast :: vl, named_vl, unnamed_vl))
+      ([], named_vl, unnamed_vl) xl
+  in
+  (match (named_vl, unnamed_vl) with
+  | [], [] -> ()
+  | (id, _) :: _, _ -> raise_with_loc loc (NamedArgumentNotMatched id)
+  | _, _ :: _ -> raise_with_loc loc BadApplyArity);
+  let xl = List.map fst xl in
+  let vl = List.rev vl in
+  (xl, vl)
 
 (* Common evaluation functions *)
 
@@ -77,8 +106,16 @@ let rec subst sf = function
   | Afor (i, min, max, al) ->
       Afor (sf i, subst sf min, subst sf max, substl sf al)
   | Adefine (f, xl, al, alk) ->
-      Adefine (sf f, List.map sf xl, substl sf al, substl sf alk)
-  | Aapply (loc, f, all) -> Aapply (loc, sf f, List.map (substl sf) all)
+      Adefine
+        ( sf f,
+          List.map (fun (x, ast) -> (sf x, Option.map (subst sf) ast)) xl,
+          substl sf al,
+          substl sf alk )
+  | Aapply (loc, f, all) ->
+      Aapply
+        ( loc,
+          sf f,
+          List.map (fun (x, asts) -> (Option.map sf x, substl sf asts)) all )
   | Alet (k, v, al) -> Alet (sf k, substl sf v, substl sf al)
   | Ainclude (file, al) -> Ainclude (sf file, substl sf al)
   | Aint (loc, s) -> Aint (loc, s)
@@ -847,12 +884,13 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
   | Aapply (loc, s, ell) ->
       let vl =
         List.map
-          (fun el ->
-            match List.map (eval_expr ceva) el with
-            | [ e ] -> e
-            | el ->
-                let sl = List.map string_of_expr_val el in
-                VVstring (String.concat "" sl))
+          (fun (id, el) ->
+            ( id,
+              match List.map (eval_expr ceva) el with
+              | [ e ] -> e
+              | el ->
+                  let sl = List.map string_of_expr_val el in
+                  VVstring (String.concat "" sl) ))
           ell
       in
       VVstring (eval_apply loc s vl)
@@ -938,7 +976,7 @@ let print_body_prop conf =
   Output.print_sstring conf (s ^ Util.body_prop conf)
 
 type 'a vother =
-  | Vdef of string list * ast list
+  | Vdef of (string * ast option) list * ast list
   | Vval of 'a expr_val
   | Vbind of string * Adef.encoded_string
 
@@ -1179,7 +1217,9 @@ let rec interp_ast :
     | Atransl (_, upp, s, n) -> VVstring (ifun.eval_transl env upp s n)
     | Aif (e, alt, ale) -> VVstring (eval_if env ep e alt ale)
     | Aapply (loc, f, all) ->
-        let vl = List.map (eval_ast_expr_list env ep) all in
+        let vl =
+          List.map (fun (id, ast) -> (id, eval_ast_expr_list env ep ast)) all
+        in
         VVstring (eval_apply env ep loc f vl)
     | Afor (i, min, max, al) -> VVstring (eval_for env ep i min max al)
     | x -> VVstring (eval_expr env ep x)
@@ -1203,6 +1243,12 @@ let rec interp_ast :
   and eval_apply env ep loc f vl =
     match get_def ifun.get_vother f env with
     | Some (xl, al) ->
+        let xl, vl =
+          sort_apply_parameters loc
+            (fun ast -> VVstring (eval_expr env ep ast))
+            xl vl
+        in
+
         let env, al =
           List.fold_right
             (fun a (env, al) ->
@@ -1214,55 +1260,61 @@ let rec interp_ast :
         String.concat "" sl
     | None -> (
         match (f, vl) with
-        | "capitalize", [ VVstring s ] -> Utf8.capitalize_fst s
-        | "capitalize_words", [ VVstring s ] ->
+        | "capitalize", [ (None, VVstring s) ] -> Utf8.capitalize_fst s
+        | "capitalize_words", [ (None, VVstring s) ] ->
             let wl = String.split_on_char ' ' s in
             (* TODO handle particles !
                let w = Util.surname_particle base w not available *)
             let wl = List.map (fun w -> Utf8.capitalize_fst w) wl in
             String.concat " " wl
-        | "interp", [ VVstring s ] ->
+        | "interp", [ (None, VVstring s) ] ->
             let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
             String.concat "" (eval_ast_list env ep astl)
-        | "language_name", [ VVstring s ] ->
+        | "language_name", [ (None, VVstring s) ] ->
             Translate.language_name s (Util.transl conf "!languages")
-        | "url_set", [ VVstring s1 ] ->
+        | "url_set", [ (None, VVstring s1) ] ->
             let s1 = String.split_on_char '/' s1 in
             url_set_aux conf s1 []
-        | "url_set", [ VVstring s1; VVstring s2 ] ->
+        | "url_set", [ (None, VVstring s1); (None, VVstring s2) ] ->
             let s1 = String.split_on_char '/' s1 in
             let s2 = String.split_on_char '/' s2 in
             url_set_aux conf s1 s2
-        | "nth", [ VVstring s1; VVstring s2 ] ->
+        | "nth", [ (None, VVstring s1); (None, VVstring s2) ] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             Util.translate_eval (Util.nth_field s1 n)
-        | "nth_0", [ VVstring s1; VVstring s2 ] ->
+        | "nth_0", [ (None, VVstring s1); (None, VVstring s2) ] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             if Util.nth_field s1 n = "" then "0" else Util.nth_field s1 n
-        | "nth_c", [ VVstring s1; VVstring s2 ] -> (
+        | "nth_c", [ (None, VVstring s1); (None, VVstring s2) ] -> (
             let n = try int_of_string s2 with Failure _ -> 0 in
             try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
-        | "1000sep", [ VVstring s ] ->
+        | "1000sep", [ (None, VVstring s) ] ->
             let n = try int_of_string s with Failure _ -> 0 in
             let sep = Util.transl conf "(thousand separator)" in
             string_of_expr_val (VVstring (Mutil.string_of_int_sep sep n))
-        | "red_of_hsv", [ VVstring h; VVstring s; VVstring v ] -> (
+        | ( "red_of_hsv",
+            [ (None, VVstring h); (None, VVstring s); (None, VVstring v) ] )
+          -> (
             try
               let r, _, _ = rgb_of_str_hsv h s v in
               string_of_int r
             with Failure _ -> "red_of_hsv bad params")
-        | "green_of_hsv", [ VVstring h; VVstring s; VVstring v ] -> (
+        | ( "green_of_hsv",
+            [ (None, VVstring h); (None, VVstring s); (None, VVstring v) ] )
+          -> (
             try
               let _, g, _ = rgb_of_str_hsv h s v in
               string_of_int g
             with Failure _ -> "green_of_hsv bad params")
-        | "blue_of_hsv", [ VVstring h; VVstring s; VVstring v ] -> (
+        | ( "blue_of_hsv",
+            [ (None, VVstring h); (None, VVstring s); (None, VVstring v) ] )
+          -> (
             try
               let _, _, b = rgb_of_str_hsv h s v in
               string_of_int b
             with Failure _ -> "blue_of_hsv bad params")
         | _ -> (
-            try ifun.eval_predefined_apply env f vl
+            try ifun.eval_predefined_apply env f (List.map snd vl)
             with Not_found -> Printf.sprintf "%%apply;%s?" f))
   and eval_if env ep e alt ale =
     let eval_var = eval_var conf ifun env ep in
@@ -1328,10 +1380,20 @@ let rec interp_ast :
     let env = set_def ifun.set_vother f xl al env in
     print_ast_list env ep alk
   and print_apply env ep loc f ell =
-    let vl = List.map (eval_ast_expr_list env ep) ell in
+    let vl =
+      List.map (fun (id, asts) -> (id, eval_ast_expr_list env ep asts)) ell
+    in
     match get_def ifun.get_vother f env with
     | Some (xl, al) ->
+      begin try
+        let xl, vl =
+          sort_apply_parameters loc
+            (fun e -> VVstring (eval_expr env ep e))
+            xl vl
+        in
         templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
+        with e -> print_error loc e
+      end
     | None -> Output.print_sstring conf (eval_apply env ep loc f vl)
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
