@@ -79,7 +79,7 @@ module Default : sig
     Config.config ->
     Def.httpStatus ->
     unit
-  (** If [?content] is not set, sends page content from {/etc/<status-code>-<lang>.html}.
+  (** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
       If the current lang is not available, use `en` *)
 
   val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool

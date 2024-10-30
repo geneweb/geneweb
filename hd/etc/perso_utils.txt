@@ -593,7 +593,7 @@
           <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="1px">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <span class="ml-1">%apply;married_to("child", "lower")</span>
+        <span class="ml-1">%apply;married_to("child", 0)</span>
         %apply;short_display_person("spouse")
       %end;
     %end;
@@ -626,7 +626,7 @@
           <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="" title="">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        %sp;<em>%apply;married_to("child", "lower")</em>
+        %sp;<em>%apply;married_to("child", 0)</em>
         %apply;short_display_person_f("spouse")
       %end;
     %end;

@@ -10,8 +10,8 @@ type ast =
   | Aif of ast * ast list * ast list
   | Aforeach of (loc * string * string list) * ast list list * ast list
   | Afor of string * ast * ast * ast list
-  | Adefine of string * string list * ast list * ast list
-  | Aapply of loc * string * ast list list
+  | Adefine of string * (string * ast option) list * ast list * ast list
+  | Aapply of loc * string * (string option * ast list) list
   | Alet of string * ast list * ast list
   | Aop1 of loc * string * ast
   | Aop2 of loc * string * ast * ast
