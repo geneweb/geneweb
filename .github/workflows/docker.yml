@@ -65,7 +65,7 @@ jobs:
           password: ${{ github.token }}
 
       - name: Build and push ${{ env.IMAGE_NAME }} Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           target: container
           context: docker/
