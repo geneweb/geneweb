@@ -1,18 +1,12 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
-open Config
-open Def
-open Gwdb
-open Util
-
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
-  if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p) then
+  if k = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p) then
     true
   else if
     List.exists (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
+      (Gwdb.person_misc_names base p (Geneweb.Util.nobtit conf base))
   then
     true
   else false
@@ -23,23 +17,23 @@ let select_std_eq conf base pl k =
     []
 
 let find_all conf base an =
-  let sosa_ref = Util.find_sosa_ref conf base in
+  let sosa_ref = Geneweb.Util.find_sosa_ref conf base in
   let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
   match sosa_ref, sosa_nb with
   | Some p, Some n ->
     if n <> Sosa.zero then
-      match Util.branch_of_sosa conf base n p with
+      match Geneweb.Util.branch_of_sosa conf base n p with
         Some (p :: _) -> [p], true
       | _ -> [], false
     else [], false
   | _ ->
-    let acc = SearchName.search_by_key conf base an in
+    let acc = Geneweb.SearchName.search_by_key conf base an in
     if acc <> [] then acc, false
     else
-      ( SearchName.search_key_aux begin fun conf base acc an ->
+      ( Geneweb.SearchName.search_key_aux begin fun conf base acc an ->
             let spl = select_std_eq conf base acc an in
             if spl = [] then
-              if acc = [] then SearchName.search_by_name conf base an
+              if acc = [] then Geneweb.SearchName.search_by_name conf base an
               else acc
             else spl
           end conf base an
@@ -47,24 +41,24 @@ let find_all conf base an =
 
 let relation_print conf base p =
   let p1 =
-    match p_getenv conf.senv "ei" with
+    match Geneweb.Util.p_getenv conf.Geneweb.Config.senv "ei" with
     | Some i ->
       conf.senv <- [] ;
-      let i = iper_of_string i in
+      let i = Gwdb.iper_of_string i in
       if Gwdb.iper_exists base i
-      then Some (pget conf base i)
+      then Some (Geneweb.Util.pget conf base i)
       else None
     | None ->
-      match find_person_in_env conf base "1" with
+      match Geneweb.Util.find_person_in_env conf base "1" with
       | Some p1 ->
         conf.senv <- [];
         Some p1
       | None -> None
   in
-  RelationDisplay.print conf base p p1
+  Geneweb.RelationDisplay.print conf base p p1
 
 let specify conf base n pl =
-  let title _ = Output.printf conf "%s : %s" n (transl conf "specify") in
+  let title _ = Geneweb.Output.printf conf "%s : %s" n (Geneweb.Util.transl conf "specify") in
   let n = Name.crush_lower n in
   let ptll =
     List.map
@@ -75,8 +69,8 @@ let specify conf base n pl =
              let rec add_rec =
                function
                  t1 :: tl1 ->
-                 if eq_istr t1.t_ident t.t_ident &&
-                    eq_istr t1.t_place t.t_place
+                 if Gwdb.eq_istr t1.Def.t_ident t.Def.t_ident &&
+                    Gwdb.eq_istr t1.t_place t.t_place
                  then
                    t1 :: tl1
                  else t1 :: add_rec tl1
@@ -85,151 +79,152 @@ let specify conf base n pl =
              add_rec !tl
          in
          let compare_and_add t pn =
-           let pn = sou base pn in
+           let pn = Gwdb.sou base pn in
            if Name.crush_lower pn = n then add_tl t
            else
-             match get_qualifiers p with
+             match Gwdb.get_qualifiers p with
                nn :: _ ->
-               let nn = sou base nn in
+               let nn = Gwdb.sou base nn in
                if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t
              | _ -> ()
          in
          List.iter
            (fun t ->
-              match t.t_name, get_public_name p with
+              match t.Def.t_name, Gwdb.get_public_name p with
                 Tname s, _ -> compare_and_add t s
-              | _, pn when sou base pn <> "" -> compare_and_add t pn
+              | _, pn when Gwdb.sou base pn <> "" -> compare_and_add t pn
               | _ -> ())
-           (nobtit conf base p);
+           (Geneweb.Util.nobtit conf base p);
          p, !tl)
       pl
   in
+  Geneweb.Hutil.header conf title;
 
-  Hutil.header conf title;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
-  Util.print_tips_relationship conf;
-  Output.print_sstring conf "<ul>\n";
+  Geneweb.Util.print_tips_relationship conf;
+  Geneweb.Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
-  let () = SosaCache.build_sosa_ht conf base in
+  let () = Geneweb.SosaCache.build_sosa_ht conf base in
   List.iter
     (fun (p, _tl) ->
-       Output.print_sstring conf "<li>\n";
-       SosaCache.print_sosa conf base p true;
-       Update.print_person_parents_and_spouses conf base p;
-       Output.print_sstring conf "</li>\n"
+       Geneweb.Output.print_sstring conf "<li>\n";
+       Geneweb.SosaCache.print_sosa conf base p true;
+       Geneweb.Update.print_person_parents_and_spouses conf base p;
+       Geneweb.Output.print_sstring conf "</li>\n"
     ) ptll;
-  Output.print_sstring conf "</ul>\n";
-  Hutil.trailer conf
+  Geneweb.Output.print_sstring conf "</ul>\n";
+  Geneweb.Hutil.trailer conf
 
 let incorrect_request ?(comment = "") conf =
-  Hutil.incorrect_request ~comment:comment conf
+  Geneweb.Hutil.incorrect_request ~comment:comment conf
 
 let person_selected conf base p =
-  match p_getenv conf.senv "em" with
+  match Geneweb.Util.p_getenv conf.Geneweb.Config.senv "em" with
     Some "R" -> relation_print conf base p
   | Some _ -> incorrect_request conf ~comment:"incorrect em= value"
-  | None -> record_visited conf (get_iper p); Perso.print conf base p
+  | None -> Geneweb.Util.record_visited conf (Gwdb.get_iper p); Geneweb.Perso.print conf base p
 
 let person_selected_with_redirect conf base p =
-  match p_getenv conf.senv "em" with
+  match Geneweb.Util.p_getenv conf.Geneweb.Config.senv "em" with
   | Some "R" -> relation_print conf base p
   | Some _ -> incorrect_request conf ~comment:"Incorrect em= value"
   | None ->
+    let open Def in
     Wserver.http_redirect_temporarily
-      (commd conf ^^^ Util.acces conf base p :> string)
+      (Geneweb.Util.commd conf ^^^ Geneweb.Util.acces conf base p :> string)
 
-let updmenu_print = Perso.interp_templ "updmenu"
+let updmenu_print = Geneweb.Perso.interp_templ "updmenu"
 
 let very_unknown conf _ =
-  match p_getenv conf.env "n", p_getenv conf.env "p" with
+  match Geneweb.Util.p_getenv conf.Geneweb.Config.env "n", Geneweb.Util.p_getenv conf.env "p" with
   | Some sname, Some fname ->
     let title _ =
-      transl conf "not found"
+      Geneweb.Util.transl conf "not found"
       |> Utf8.capitalize_fst
-      |> Output.print_sstring conf ;
-      Output.print_sstring conf (transl conf ":") ;
-      Output.print_sstring conf {| "|} ;
-      Output.print_string conf (Util.escape_html fname) ;
-      Output.print_sstring conf {| |} ;
-      Output.print_string conf (Util.escape_html sname) ;
-      Output.print_sstring conf {|"|} ;
+      |> Geneweb.Output.print_sstring conf ;
+      Geneweb.Output.print_sstring conf (Geneweb.Util.transl conf ":") ;
+      Geneweb.Output.print_sstring conf {| "|} ;
+      Geneweb.Output.print_string conf (Geneweb.Util.escape_html fname) ;
+      Geneweb.Output.print_sstring conf {| |} ;
+      Geneweb.Output.print_string conf (Geneweb.Util.escape_html sname) ;
+      Geneweb.Output.print_sstring conf {|"|} ;
     in
-    Output.status conf Def.Not_Found;
-    Hutil.header ~error:true conf title;
-    Hutil.trailer conf
+    Geneweb.Output.status conf Def.Not_Found;
+    Geneweb.Hutil.header ~error:true conf title;
+    Geneweb.Hutil.trailer conf
   | _ ->
-    match p_getenv conf.env "i" with
+    match Geneweb.Util.p_getenv conf.env "i" with
     | Some i ->
       let title _ =
-        Output.print_sstring conf "<kbd>" ;
-        Output.print_string conf (Util.escape_html i) ;
-        Output.print_sstring conf "</kbd>" ;
-        Output.print_sstring conf (transl conf ":") ;
-        Output.print_sstring conf " " ;
-        transl conf "not found"
+        Geneweb.Output.print_sstring conf "<kbd>" ;
+        Geneweb.Output.print_string conf (Geneweb.Util.escape_html i) ;
+        Geneweb.Output.print_sstring conf "</kbd>" ;
+        Geneweb.Output.print_sstring conf (Geneweb.Util.transl conf ":") ;
+        Geneweb.Output.print_sstring conf " " ;
+        Geneweb.Util.transl conf "not found"
         |> Utf8.capitalize_fst
-        |> Output.print_sstring conf ;
+        |> Geneweb.Output.print_sstring conf ;
       in
-      Output.status conf Def.Not_Found;
-      Hutil.header ~error:true conf title;
-      Hutil.trailer conf
-    | None -> Hutil.incorrect_request conf ~comment:"Missing p=, n= and i="
+      Geneweb.Output.status conf Def.Not_Found;
+      Geneweb.Hutil.header ~error:true conf title;
+      Geneweb.Hutil.trailer conf
+    | None -> Geneweb.Hutil.incorrect_request conf ~comment:"Missing p=, n= and i="
 
 (* Print Not found page *)
 let unknown conf n =
   let title _ =
-    transl conf "not found"
+    Geneweb.Util.transl conf "not found"
     |> Utf8.capitalize_fst
-    |> Output.print_sstring conf ;
-    Output.print_sstring conf (transl conf ":") ;
-    Output.print_sstring conf {| "|} ;
-    Output.print_string conf (Util.escape_html n) ;
-    Output.print_sstring conf {|"|} ;
+    |> Geneweb.Output.print_sstring conf ;
+    Geneweb.Output.print_sstring conf (Geneweb.Util.transl conf ":") ;
+    Geneweb.Output.print_sstring conf {| "|} ;
+    Geneweb.Output.print_string conf (Geneweb.Util.escape_html n) ;
+    Geneweb.Output.print_sstring conf {|"|} ;
   in
-  Output.status conf Def.Not_Found;
-  Hutil.header ~error:true conf title;
-  Hutil.trailer conf
+  Geneweb.Output.status conf Def.Not_Found;
+  Geneweb.Hutil.header ~error:true conf title;
+  Geneweb.Hutil.trailer conf
 
 let make_henv conf base =
   let conf =
-    match Util.find_sosa_ref conf base with
+    match Geneweb.Util.find_sosa_ref conf base with
     | Some p ->
       let x =
-        let first_name = p_first_name base p in
-        let surname = p_surname base p in
-        if Util.accessible_by_key conf base p first_name surname then
+        let first_name = Gwdb.p_first_name base p in
+        let surname = Gwdb.p_surname base p in
+        if Geneweb.Util.accessible_by_key conf base p first_name surname then
           [ "pz", Name.lower first_name |> Mutil.encode
           ; "nz", Name.lower surname |> Mutil.encode
-          ; "ocz", get_occ p |> string_of_int |> Mutil.encode
+          ; "ocz", Gwdb.get_occ p |> string_of_int |> Mutil.encode
           ]
-        else [ "iz", get_iper p |> string_of_iper |> Mutil.encode ]
+        else [ "iz", Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode ]
       in
       { conf with henv = conf.henv @ x }
     | None -> conf
   in
   let conf =
-    match p_getenv conf.env "dsrc" with
+    match Geneweb.Util.p_getenv conf.env "dsrc" with
     | Some "" | None -> conf
     | Some s -> { conf with henv = conf.henv @ ["dsrc", Mutil.encode s] }
   in
   let conf =
-    match p_getenv conf.env "templ" with
+    match Geneweb.Util.p_getenv conf.env "templ" with
     | None -> conf
     | Some s -> { conf with henv = conf.henv @ ["templ", Mutil.encode s] }
   in
   let conf =
-    match Util.p_getenv conf.env "escache" with
-    | Some _ -> { conf with henv = conf.henv @ ["escache", escache_value base] }
+    match Geneweb.Util.p_getenv conf.env "escache" with
+    | Some _ -> { conf with henv = conf.henv @ ["escache", Geneweb.Util.escache_value base] }
     | None -> conf
   in
   let conf =
-    if Util.p_getenv conf.env "manitou" = Some "off"
+    if Geneweb.Util.p_getenv conf.env "manitou" = Some "off"
     then { conf with henv = conf.henv @ ["manitou", Adef.encoded "off"] }
     else conf
   in
   let aux param conf =
-    match Util.p_getenv conf.env param with
+    match Geneweb.Util.p_getenv conf.Geneweb.Config.env param with
     | Some s -> { conf with henv = conf.henv @ [param, Mutil.encode s] }
     | None -> conf
   in
@@ -249,30 +244,30 @@ let only_special_env env = List.for_all (fun (x, _) -> List.mem x special_vars) 
 let make_senv conf base =
   let set_senv conf vm vi =
     let aux k v conf =
-      if p_getenv conf.env k = Some v
+      if Geneweb.Util.p_getenv conf.Geneweb.Config.env k = Some v
       then { conf with senv = conf.senv @ [ k, Mutil.encode v ] }
       else conf
     in
     let conf =
-      { conf with senv = ["em", vm; "ei", vi] }
+      { conf with Geneweb.Config.senv = ["em", vm; "ei", vi] }
       |> aux "long" "on"
     in
     let conf =
-      match p_getenv conf.env "et" with
+      match Geneweb.Util.p_getenv conf.env "et" with
       | Some x -> { conf with senv = conf.senv @ ["et", Mutil.encode x] }
       | _ -> conf
     in
     let conf = aux "cgl" "on" conf in
     let conf =
-      match p_getenv conf.env "bd" with
+      match Geneweb.Util.p_getenv conf.env "bd" with
       | None | Some ("0" | "") -> conf
       | Some x -> { conf with senv = conf.senv @ ["bd", Mutil.encode x] }
     in
-    match p_getenv conf.env "color" with
+    match Geneweb.Util.p_getenv conf.env "color" with
     | Some x -> { conf with senv = conf.senv @ ["color", Mutil.encode x] }
     | _ -> conf
   in
-  let get x = Util.p_getenv conf.env x in
+  let get x = Geneweb.Util.p_getenv conf.Geneweb.Config.env x in
   match get "em", get "ei", get "ep", get "en", get "eoc" with
   | Some vm, Some vi, _, _, _ -> set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | Some vm, None, Some vp, Some vn, voco ->
@@ -282,39 +277,39 @@ let make_senv conf base =
       | None -> 0
     in
     let ip =
-      match person_of_key base vp vn voc with
+      match Gwdb.person_of_key base vp vn voc with
       | Some ip -> ip
-      | None -> Hutil.incorrect_request conf
+      | None -> Geneweb.Hutil.incorrect_request conf
           ~comment:"Incorrect em=, ei=, ep=, en=, eoc= configuration"; raise Exit
     in
-    let vi = string_of_iper ip in
+    let vi = Gwdb.string_of_iper ip in
     set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
 let propose_base conf =
-  let title _ = Output.print_sstring conf "Base" in
-  Hutil.header conf title;
-  Output.print_sstring conf {|<ul><li><form method="GET" action="|} ;
-  Output.print_sstring conf conf.indep_command ;
-  Output.print_sstring conf {|">|} ;
-  Output.print_sstring conf {|<input name="b" size="40"> =&gt; |} ;
-  Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg">|} ;
-  transl_nth conf "validate/delete" 0
+  let title _ = Geneweb.Output.print_sstring conf "Base" in
+  Geneweb.Hutil.header conf title;
+  Geneweb.Output.print_sstring conf {|<ul><li><form method="GET" action="|} ;
+  Geneweb.Output.print_sstring conf conf.indep_command ;
+  Geneweb.Output.print_sstring conf {|">|} ;
+  Geneweb.Output.print_sstring conf {|<input name="b" size="40"> =&gt; |} ;
+  Geneweb.Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg">|} ;
+  Geneweb.Util.transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst
-  |> Output.print_sstring conf ;
-  Output.print_sstring conf "</button></li></ul>";
-  Hutil.trailer conf
+  |> Geneweb.Output.print_sstring conf ;
+  Geneweb.Output.print_sstring conf "</button></li></ul>";
+  Geneweb.Hutil.trailer conf
 
 let try_plugin list conf base_name m =
   let fn =
     if List.mem "*" list
     then (fun ( _, fn) -> fn conf base_name)
-    else (fun (ns, fn) -> (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name)
+    else (fun (ns, fn) -> (List.mem ns conf.Geneweb.Config.forced_plugins || List.mem ns list) && fn conf base_name)
   in
   List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
 
 let w_lock ~onerror fn conf (base_name : string option) =
-  let bfile = Util.bpath (conf.bname ^ ".gwb") in
+  let bfile = Geneweb.Util.bpath (conf.Geneweb.Config.bname ^ ".gwb") in
   Lock.control
     (Mutil.lock_file bfile) true
     ~onerror:(fun () -> onerror conf base_name)
@@ -330,8 +325,8 @@ let w_base ~none fn conf (bfile : string option) =
      | Some base ->
         let conf = make_henv conf base in
         let conf = make_senv conf base in
-        let conf = match Util.default_sosa_ref conf base with
-          | Some p -> { conf with default_sosa_ref = get_iper p, Some p;
+        let conf = match Geneweb.Util.default_sosa_ref conf base with
+          | Some p -> { conf with default_sosa_ref = Gwdb.get_iper p, Some p;
               nb_of_persons = Gwdb.nb_of_persons base;
               nb_of_families = Gwdb.nb_of_families base}
           | None -> { conf with
@@ -341,15 +336,15 @@ let w_base ~none fn conf (bfile : string option) =
         fn conf base
 
 let w_person ~none fn conf base =
-  match find_person_in_env conf base "" with
+  match Geneweb.Util.find_person_in_env conf base "" with
   | Some p -> fn conf base p
   | _ -> none conf base
 
 let output_error ?headers ?content conf code =
-  !GWPARAM.output_error ?headers ?content conf code
+  !Geneweb.GWPARAM.output_error ?headers ?content conf code
 
 let w_wizard fn conf base =
-  if conf.wizard then
+  if conf.Geneweb.Config.wizard then
     fn conf base
   else if conf.just_friend_wizard then
     output_error conf Def.Forbidden
@@ -358,10 +353,10 @@ let w_wizard fn conf base =
     output_error conf Def.Unauthorized
 
 let treat_request =
-  let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
+  let w_lock = w_lock ~onerror:(fun conf _ -> Geneweb.Update.error_locked conf) in
   let w_base =
     let none conf =
-      if conf.bname = "" then output_error conf Def.Bad_Request
+      if conf.Geneweb.Config.bname = "" then output_error conf Def.Bad_Request
       else output_error conf Def.Not_Found
     in
     w_base ~none
@@ -369,9 +364,9 @@ let treat_request =
   let w_person = w_person ~none:very_unknown in
   fun conf ->
   let bfile =
-    if conf.bname = "" then None
+    if conf.Geneweb.Config.bname = "" then None
     else
-      let bfile = Util.bpath (conf.bname ^ ".gwb") in
+      let bfile = Geneweb.Util.bpath (conf.bname ^ ".gwb") in
       if Sys.file_exists bfile
       then Some bfile
       else None
@@ -391,7 +386,7 @@ let treat_request =
     end ;
 #endif
     let plugins =
-      match List.assoc_opt "plugins" conf.Config.base_env with
+      match List.assoc_opt "plugins" conf.Geneweb.Config.base_env with
       | None -> []
       | Some list -> String.split_on_char ',' list |> List.map String.trim
     in
@@ -399,7 +394,7 @@ let treat_request =
       List.iter (fun (_ , fn) -> fn conf bfile) !GwdPlugin.se
     else
       List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile) !GwdPlugin.se ;
-    let m = Option.value ~default:"" (p_getenv conf.env "m") in
+    let m = Option.value ~default:"" (Geneweb.Util.p_getenv conf.env "m") in
     if not @@ try_plugin plugins conf bfile m
     then begin
         if List.assoc_opt "counter" conf.base_env <> Some "no" &&
@@ -407,8 +402,8 @@ let treat_request =
         then begin
           match
             if only_special_env conf.env
-            then SrcfileDisplay.incr_welcome_counter conf
-            else SrcfileDisplay.incr_request_counter conf
+            then Geneweb.SrcfileDisplay.incr_welcome_counter conf
+            else Geneweb.SrcfileDisplay.incr_request_counter conf
           with
           | Some (welcome_cnt, request_cnt, start_date) ->
             GwdLog.log begin fun oc ->
@@ -423,11 +418,11 @@ let treat_request =
           incorrect_request ~comment:comment conf
         in
         let doc_aux conf base print =
-          match Util.p_getenv conf.env "s" with
+          match Geneweb.Util.p_getenv conf.Geneweb.Config.env "s" with
           | Some f ->
                 if Filename.check_suffix f ".txt" then
                   let f = Filename.chop_suffix f ".txt" in
-                  SrcfileDisplay.print_source conf base f
+                  Geneweb.SrcfileDisplay.print_source conf base f
                 else print conf f
           | _ -> incorrect_request conf ~comment:"Missing s= for m=DOC" base
         in
@@ -440,202 +435,202 @@ let treat_request =
           in
           if base <> None then
             w_base @@
-            if only_special_env conf.env then SrcfileDisplay.print_start
+            if only_special_env conf.env then Geneweb.SrcfileDisplay.print_start
             else w_person @@ fun conf base p ->
-              match p_getenv conf.env "ptempl" with
+              match Geneweb.Util.p_getenv conf.env "ptempl" with
               | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
-                Perso.interp_templ t conf base p
+                Geneweb.Perso.interp_templ t conf base p
               | _ -> person_selected conf base p
           else if conf.bname = ""
-          then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
+          then fun conf _ -> Geneweb.Util.include_template conf [] "index" (fun () -> propose_base conf)
           else
             w_base begin (* print_start -> welcome.txt *)
-              if only_special_env conf.env then SrcfileDisplay.print_start
+              if only_special_env conf.env then Geneweb.SrcfileDisplay.print_start
               else w_person @@ fun conf base p ->
-                match p_getenv conf.env "ptempl" with
+                match Geneweb.Util.p_getenv conf.env "ptempl" with
                 | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
-                  Perso.interp_templ t conf base p
+                  Geneweb.Perso.interp_templ t conf base p
                 | _ -> person_selected conf base p
             end
         | "A" ->
-          AscendDisplay.print |> w_person |> w_base
+          Geneweb.AscendDisplay.print |> w_person |> w_base
         | "ADD_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_add
+          w_wizard @@ w_base @@ Geneweb.UpdateFam.print_add
         | "ADD_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateFamOk.print_add
         | "ADD_IND" ->
-          w_wizard @@ w_base @@ UpdateInd.print_add
+          w_wizard @@ w_base @@ Geneweb.UpdateInd.print_add
         | "ADD_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_add
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateIndOk.print_add
         | "ADD_PAR" ->
-          w_wizard @@ w_base @@ UpdateFam.print_add_parents
+          w_wizard @@ w_base @@ Geneweb.UpdateFam.print_add_parents
         | "ADD_PAR_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateFamOk.print_add_parents
         | "ANM" ->
-          w_base @@ fun conf _ -> BirthdayDisplay.print_anniversaries conf
+          w_base @@ fun conf _ -> Geneweb.BirthdayDisplay.print_anniversaries conf
         | "AN" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some x -> BirthdayDisplay.print_birth conf base (int_of_string x)
-            | _ -> BirthdayDisplay.print_menu_birth conf base
+          w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
+            | Some x -> Geneweb.BirthdayDisplay.print_birth conf base (int_of_string x)
+            | _ -> Geneweb.BirthdayDisplay.print_menu_birth conf base
           end
         | "AD" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some x -> BirthdayDisplay.print_dead conf base (int_of_string x)
-            | _ -> BirthdayDisplay.print_menu_dead conf base
+          w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
+            | Some x -> Geneweb.BirthdayDisplay.print_dead conf base (int_of_string x)
+            | _ -> Geneweb.BirthdayDisplay.print_menu_dead conf base
           end
         | "AM" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some x -> BirthdayDisplay.print_marriage conf base (int_of_string x)
-            | _ -> BirthdayDisplay.print_menu_marriage conf base
+           w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
+            | Some x -> Geneweb.BirthdayDisplay.print_marriage conf base (int_of_string x)
+            | _ -> Geneweb.BirthdayDisplay.print_menu_marriage conf base
           end
         | "AS" ->
           w_base @@ fun conf base ->
-            SrcfileDisplay.print conf base "advanced"
+            Geneweb.SrcfileDisplay.print conf base "advanced"
         | "AS_OK" ->
-          w_base @@ AdvSearchOkDisplay.print
+          w_base @@ Geneweb.AdvSearchOkDisplay.print
         | "C" ->
-          w_base @@ w_person @@ CousinsDisplay.print
-        | "CAL" -> w_base @@ Hutil.print_calendar
+          w_base @@ w_person @@ Geneweb.CousinsDisplay.print
+        | "CAL" -> w_base @@ Geneweb.Hutil.print_calendar
         | "CHG_CHN" when conf.wizard ->
-          w_wizard @@ w_base @@ ChangeChildrenDisplay.print
+          w_wizard @@ w_base @@ Geneweb.ChangeChildrenDisplay.print
         | "CHG_CHN_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ChangeChildrenDisplay.print_ok
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.ChangeChildrenDisplay.print_ok
         | "CHG_EVT_IND_ORD" ->
-          w_wizard @@ w_base @@ UpdateInd.print_change_event_order
+          w_wizard @@ w_base @@ Geneweb.UpdateInd.print_change_event_order
         | "CHG_EVT_IND_ORD_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_change_event_order
+           w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateIndOk.print_change_event_order
         | "CHG_EVT_FAM_ORD" ->
-          w_wizard @@ w_base @@ UpdateFam.print_change_event_order
+          w_wizard @@ w_base @@ Geneweb.UpdateFam.print_change_event_order
         | "CHG_EVT_FAM_ORD_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_event_order
+           w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateFamOk.print_change_event_order
         | "CHG_FAM_ORD" ->
-          w_wizard @@ w_base @@ UpdateFam.print_change_order
+          w_wizard @@ w_base @@ Geneweb.UpdateFam.print_change_order
         | "CHG_FAM_ORD_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_order_ok
+           w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateFamOk.print_change_order_ok
         | "CONN_WIZ" ->
-          w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
+          w_wizard @@ w_base @@ Geneweb.WiznotesDisplay.connected_wizards
         | "D" ->
-          w_base @@ w_person @@ DescendDisplay.print
+          w_base @@ w_person @@ Geneweb.DescendDisplay.print
         | "DAG" ->
-          w_base @@ DagDisplay.print
+          w_base @@ Geneweb.DagDisplay.print
         | "DEL_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_del
+          w_wizard @@ w_base @@ Geneweb.UpdateFam.print_del
         | "DEL_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateFamOk.print_del
         | "DEL_IMAGE" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.ImageCarrousel.print_del
         | "DEL_IMAGE_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del_ok
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.ImageCarrousel.print_del_ok
         | "DEL_IMAGE_C_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.ImageCarrousel.print_main_c
         | "DEL_IND" ->
-          w_wizard @@ w_base @@ UpdateInd.print_del
+          w_wizard @@ w_base @@ Geneweb.UpdateInd.print_del
         | "DEL_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateIndOk.print_del
         | "DOC" ->
           w_base @@ fun conf base -> doc_aux conf base
-            ImageDisplay.print_source
+            Geneweb.ImageDisplay.print_source
         | "DOCH" ->
           w_base @@ fun conf base -> doc_aux conf base
-            (fun conf _base -> ImageDisplay.print_html conf)
+            (fun conf _base -> Geneweb.ImageDisplay.print_html conf)
         | "F" ->
-          w_base @@ w_person @@ Perso.interp_templ "family"
+          w_base @@ w_person @@ Geneweb.Perso.interp_templ "family"
         | "H" ->
           w_wizard @@ w_base @@ fun conf base ->
-            ( match p_getenv conf.env "v" with
-            | Some f -> SrcfileDisplay.print conf base f
+            ( match Geneweb.Util.p_getenv conf.env "v" with
+            | Some f -> Geneweb.SrcfileDisplay.print conf base f
             | None -> incorrect_request conf base ~comment:"Missing v= for m=H")
         | "HIST" ->
-          w_base @@ History.print
+          w_base @@ Geneweb.History.print
         | "HIST_CLEAN" ->
-          w_wizard @@ w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean conf
+          w_wizard @@ w_base @@ fun conf _ -> Geneweb.HistoryDiffDisplay.print_clean conf
         | "HIST_CLEAN_OK" ->
-          w_wizard @@ w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean_ok conf
+          w_wizard @@ w_base @@ fun conf _ -> Geneweb.HistoryDiffDisplay.print_clean_ok conf
         | "HIST_DIFF" ->
-          w_base @@ HistoryDiffDisplay.print
+          w_base @@ Geneweb.HistoryDiffDisplay.print
         | "HIST_SEARCH" ->
-          w_base @@ History.print_search
+          w_base @@ Geneweb.History.print_search
         | "IM_C" ->
-          w_base @@ ImageCarrousel.print_c ~saved:false
+          w_base @@ Geneweb.ImageCarrousel.print_c ~saved:false
         | "IM_C_S" ->
-          w_base @@ ImageCarrousel.print_c ~saved:true
+          w_base @@ Geneweb.ImageCarrousel.print_c ~saved:true
         | "IM" ->
-          w_base @@ ImageDisplay.print
+          w_base @@ Geneweb.ImageDisplay.print
         | "IMH" ->
-          w_base @@ fun conf _ -> ImageDisplay.print_html conf
+          w_base @@ fun conf _ -> Geneweb.ImageDisplay.print_html conf
         | "INV_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_inv
+          w_wizard @@ w_base @@ Geneweb.UpdateFam.print_inv
         | "INV_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateFamOk.print_inv
         | "KILL_ANC" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
-        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base 
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeIndDisplay.print_kill_ancestors
+        | "L" -> w_base @@ fun conf base -> Geneweb.Perso.interp_templ "list" conf base 
               (Gwdb.empty_person base Gwdb.dummy_iper) 
         | "LB" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_birth
+          w_base @@ Geneweb.BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_death
+          w_base @@ Geneweb.BirthDeathDisplay.print_death
         | "LINKED" ->
-          w_base @@ w_person @@ Perso.print_what_links
+          w_base @@ w_person @@ Geneweb.Perso.print_what_links
         | "LL" ->
-          w_base @@ BirthDeathDisplay.print_longest_lived
+          w_base @@ Geneweb.BirthDeathDisplay.print_longest_lived
         | "LM" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_marriage
+          w_base @@ Geneweb.BirthDeathDisplay.print_marriage
         | "MISC_NOTES" ->
-          w_base @@ NotesDisplay.print_misc_notes
+          w_base @@ Geneweb.NotesDisplay.print_misc_notes
         | "MISC_NOTES_SEARCH" ->
-          w_base @@ NotesDisplay.print_misc_notes_search
+          w_base @@ Geneweb.NotesDisplay.print_misc_notes_search
         | "MOD_DATA" ->
-          w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
+          w_wizard @@ w_base @@ Geneweb.UpdateDataDisplay.print_mod
         | "MOD_DATA_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateDataDisplay.print_mod_ok
         | "MOD_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_mod
+          w_wizard @@ w_base @@ Geneweb.UpdateFam.print_mod
         | "MOD_FAM_OK" when conf.wizard ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateFamOk.print_mod
         | "MOD_IND" ->
-          w_wizard @@ w_base @@ UpdateInd.print_mod
+          w_wizard @@ w_base @@ Geneweb.UpdateInd.print_mod
         | "MOD_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.UpdateIndOk.print_mod
         | "MOD_NOTES" ->
-          w_wizard @@ w_base @@ NotesDisplay.print_mod
+          w_wizard @@ w_base @@ Geneweb.NotesDisplay.print_mod
         | "MOD_NOTES_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.NotesDisplay.print_mod_ok
         | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
-          w_base @@ WiznotesDisplay.print_mod
+          w_base @@ Geneweb.WiznotesDisplay.print_mod
         | "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
-          w_lock @@ w_base @@ WiznotesDisplay.print_mod_ok
+          w_lock @@ w_base @@ Geneweb.WiznotesDisplay.print_mod_ok
         | "MRG" ->
-          w_wizard @@ w_base @@ w_person @@ MergeDisplay.print
+          w_wizard @@ w_base @@ w_person @@ Geneweb.MergeDisplay.print
         | "MRG_DUP" ->
-          w_wizard @@ w_base @@ MergeDupDisplay.main_page
+          w_wizard @@ w_base @@ Geneweb.MergeDupDisplay.main_page
         | "MRG_DUP_IND_Y_N" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_ind_y_n
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeDupDisplay.answ_ind_y_n
         | "MRG_DUP_FAM_Y_N" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_fam_y_n
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeDupDisplay.answ_fam_y_n
         | "MRG_FAM" ->
-          w_wizard @@ w_base @@ MergeFamDisplay.print
+          w_wizard @@ w_base @@ Geneweb.MergeFamDisplay.print
         | "MRG_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_merge
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeFamOk.print_merge
         | "MRG_MOD_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_mod_merge
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeFamOk.print_mod_merge
         | "MRG_IND" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeIndDisplay.print
         | "MRG_IND_OK" -> (* despite the _OK suffix, this one does not actually update databse *)
-          w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
+          w_wizard @@ w_base @@ Geneweb.MergeIndOkDisplay.print_merge
         | "MRG_MOD_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeIndOkDisplay.print_mod_merge
+           w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeIndOkDisplay.print_mod_merge
         | "N" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.search_surname_print conf base Some.surname_not_found v
-            | _ -> AllnDisplay.print_surnames conf base
+          w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
+            | Some v -> Geneweb.Some.search_surname_print conf base Geneweb.Some.surname_not_found v
+            | _ -> Geneweb.AllnDisplay.print_surnames conf base
           end
         | "NG" -> w_base @@ begin fun conf base ->
             (* Rétro-compatibilité <= 6.06 *)
             let env =
-              match p_getenv conf.env "n" with
+              match Geneweb.Util.p_getenv conf.env "n" with
                 Some n ->
-                begin match p_getenv conf.env "t" with
+                begin match Geneweb.Util.p_getenv conf.env "t" with
                     Some "P" -> ("fn", Mutil.encode n) :: conf.env
                   | Some "N" -> ("sn", Mutil.encode n) :: conf.env
                   | _ -> ("v", Mutil.encode n) :: conf.env
@@ -644,11 +639,11 @@ let treat_request =
             in
             let conf = {conf with env = env} in
             (* Nouveau mode de recherche. *)
-            match p_getenv conf.env "select" with
+            match Geneweb.Util.p_getenv conf.env "select" with
             | Some "input" | None ->
               (* Récupère le contenu non vide de la recherche. *)
               let real_input label =
-                match p_getenv conf.env label with
+                match Geneweb.Util.p_getenv conf.env label with
                 | Some s -> if s = "" then None else Some s
                 | None -> None
               in
@@ -657,7 +652,7 @@ let treat_request =
                 let (pl, sosa_acc) = find_all conf base n in
                 match pl with
                 | [] ->
-                  Some.search_surname_print conf base unknown n
+                  Geneweb.Some.search_surname_print conf base unknown n
                 | [p] ->
                   if sosa_acc
                   || Gutil.person_of_string_key base n <> None
@@ -672,97 +667,96 @@ let treat_request =
                   match real_input "fn", real_input "sn" with
                     Some fn, Some sn -> search (fn ^ " " ^ sn)
                   | Some fn, None ->
-                    Some.search_first_name_print conf base fn
+                    Geneweb.Some.search_first_name_print conf base fn
                   | None, Some sn ->
-                    Some.search_surname_print conf base unknown sn
+                    Geneweb.Some.search_surname_print conf base unknown sn
                   | None, None -> incorrect_request conf base
                     ~comment:"Missing fn= and sn= for m=NG"
               end
             | Some i ->
               relation_print conf base
-                (pget conf base (iper_of_string i))
+                (Geneweb.Util.pget conf base (Gwdb.iper_of_string i))
           end
         | "NOTES" ->
-          w_base @@ NotesDisplay.print
+          w_base @@ Geneweb.NotesDisplay.print
         | "OA" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_oldest_alive
+          w_base @@ Geneweb.BirthDeathDisplay.print_oldest_alive
         | "OE" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_oldest_engagements
+          w_base @@ Geneweb.BirthDeathDisplay.print_oldest_engagements
         | "P" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.search_first_name_print conf base v
-            | None -> AllnDisplay.print_first_names conf base
+          w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
+            | Some v -> Geneweb.Some.search_first_name_print conf base v
+            | None -> Geneweb.AllnDisplay.print_first_names conf base
           end
         | "PERSO" ->
           w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
 
         | "POP_PYR" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_population_pyramid
+          w_base @@ Geneweb.BirthDeathDisplay.print_population_pyramid
         | "PS" ->
-          w_base @@ PlaceDisplay.print_all_places_surnames
+          w_base @@ Geneweb.PlaceDisplay.print_all_places_surnames
         | "PPS" ->
-          w_base @@ Place.print_all_places_surnames
+          w_base @@ Geneweb.Place.print_all_places_surnames
         | "R" ->
           w_base @@ w_person @@ relation_print
         | "REFRESH" ->
-          w_base @@ w_person @@ Perso.interp_templ "carrousel"
+          w_base @@ w_person @@ Geneweb.Perso.interp_templ "carrousel"
         | "REQUEST" ->
           w_wizard @@ fun _ _ ->
-            Output.status conf Def.OK;
-            Output.header conf "Content-type: text";
+            Geneweb.Output.status conf Def.OK;
+            Geneweb.Output.header conf "Content-type: text";
             List.iter begin fun s ->
-              Output.print_sstring conf s ;
-              Output.print_sstring conf "\n"
-            end conf.Config.request ;
+              Geneweb.Output.print_sstring conf s ;
+              Geneweb.Output.print_sstring conf "\n"
+            end conf.Geneweb.Config.request ;
 
         | "RESET_IMAGE_C_OK" ->
-          w_base @@ ImageCarrousel.print_main_c
-
+          w_base @@ Geneweb.ImageCarrousel.print_main_c
         | "RL" ->
-          w_base @@ RelationLink.print
+          w_base @@ Geneweb.RelationLink.print
         | "RLM" ->
-          w_base @@ RelationDisplay.print_multi
+          w_base @@ Geneweb.RelationDisplay.print_multi
         | "S" ->
-          w_base @@ fun conf base -> SearchName.print conf base specify unknown
+          w_base @@ fun conf base -> Geneweb.SearchName.print conf base specify unknown
 
-        | "SND_IMAGE" -> w_wizard @@w_lock @@ w_base @@ ImageCarrousel.print
+        | "SND_IMAGE" -> w_wizard @@w_lock @@ w_base @@ Geneweb.ImageCarrousel.print
         | "SND_IMAGE_OK" ->
-           w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_send_ok
+           w_wizard @@ w_lock @@ w_base @@ Geneweb.ImageCarrousel.print_send_ok
         | "SND_IMAGE_C" ->
-          w_base @@ w_person @@ Perso.interp_templ "carrousel"
+          w_base @@ w_person @@ Geneweb.Perso.interp_templ "carrousel"
         | "SND_IMAGE_C_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.ImageCarrousel.print_main_c
 
         | "SRC" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some f -> SrcfileDisplay.print_source conf base f
+          w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
+            | Some f -> Geneweb.SrcfileDisplay.print_source conf base f
             | _ -> incorrect_request conf base ~comment:"Missing v= for m=SRC"
           end
         | "STAT" ->
-          w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
+           w_base @@ fun conf _ -> Geneweb.BirthDeathDisplay.print_statistics conf
         | "CHANGE_WIZ_VIS" ->
-          w_wizard @@ w_lock @@ w_base @@ WiznotesDisplay.change_wizard_visibility
+          w_wizard @@ w_lock @@ w_base @@ Geneweb.WiznotesDisplay.change_wizard_visibility
         | "TP" ->
           w_base @@ fun conf base ->
-            begin match Util.p_getenv conf.env "v" with
+            begin match Geneweb.Util.p_getenv conf.env "v" with
             | Some f ->
-              begin match Util.find_person_in_env conf base "" with
-              | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
-              | _ -> Perso.interp_templ ("tp0_" ^ f) conf base
+              begin match Geneweb.Util.find_person_in_env conf base "" with
+              | Some p -> Geneweb.Perso.interp_templ ("tp_" ^ f) conf base p
+              | _ -> Geneweb.Perso.interp_templ ("tp0_" ^ f) conf base
                        (Gwdb.empty_person base Gwdb.dummy_iper)
               end
             | None -> incorrect_request conf base ~comment:"Missing v= for m=TP"
             end
         | "TT" ->
-          w_base @@ TitleDisplay.print
+          w_base @@ Geneweb.TitleDisplay.print
         | "U" ->
           w_wizard @@ w_base @@ w_person @@ updmenu_print
         | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
-          w_wizard @@ w_base @@ WiznotesDisplay.print_view
+          w_wizard @@ w_base @@ Geneweb.WiznotesDisplay.print_view
         | "WIZNOTES" when conf.authorized_wizards_notes ->
-          w_base @@ WiznotesDisplay.print
+          w_base @@ Geneweb.WiznotesDisplay.print
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
-          w_base @@ WiznotesDisplay.print_search
+          w_base @@ Geneweb.WiznotesDisplay.print_search
         | _ ->
             w_base @@ fun conf base ->
             let str = Format.sprintf "m=%s is not available here" m in
@@ -771,17 +765,17 @@ let treat_request =
   end else begin
     let title _ =
       Printf.sprintf "%s %s %s"
-      (transl conf "base" |> Utf8.capitalize_fst)
+      (Geneweb.Util.transl conf "base" |> Utf8.capitalize_fst)
       conf.bname
-      (transl conf "reserved to friends or wizards")
-      |> Output.print_sstring conf
+      (Geneweb.Util.transl conf "reserved to friends or wizards")
+      |> Geneweb.Output.print_sstring conf
     in
-    Hutil.rheader conf title ;
+    Geneweb.Hutil.rheader conf title ;
     let base_name =
       if conf.cgi then (Printf.sprintf "b=%s&" conf.bname) else ""
     in
-    let user = transl_nth conf "user/password/cancel" 0 in
-    let passwd = transl_nth conf "user/password/cancel" 1 in
+    let user = Geneweb.Util.transl_nth conf "user/password/cancel" 0 in
+    let passwd = Geneweb.Util.transl_nth conf "user/password/cancel" 1 in
     let body =
       if conf.cgi then
         Printf.sprintf {|
@@ -793,8 +787,8 @@ let treat_request =
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">OK</button>
             </div>|}
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+            (Geneweb.Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+            (Geneweb.Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
             passwd user passwd user passwd
       else
         Printf.sprintf {|
@@ -804,14 +798,14 @@ let treat_request =
               <li>%s%s <a href="%s?%sw=w"> %s</a></li>
               </ul>
             </div> |}
-            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
+            (Geneweb.Util.transl conf "access" |> Utf8.capitalize_fst) (Geneweb.Util.transl conf ":")
             (conf.command :> string) base_name
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
-            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
+            (Geneweb.Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+            (Geneweb.Util.transl conf "access" |> Utf8.capitalize_fst) (Geneweb.Util.transl conf ":")
             (conf.command :> string) base_name
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+            (Geneweb.Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
     in
-    Output.print_sstring conf 
+    Geneweb.Output.print_sstring conf 
       (Printf.sprintf {|
         <form class="form-inline" method="post" action="%s">
           <div class="input-group mt-1">
@@ -821,11 +815,11 @@ let treat_request =
         </form>
       |} (conf.command :> string) (conf.bname) body
       );
-    Hutil.trailer conf
+    Geneweb.Hutil.trailer conf
   end
   in
   if conf.debug then Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
   else process ()
 
 let treat_request conf =
-  try treat_request conf with Update.ModErr _ -> Output.flush conf
+  try treat_request conf with Geneweb.Update.ModErr _ -> Geneweb.Output.flush conf

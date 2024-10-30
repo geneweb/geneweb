@@ -1,24 +1,19 @@
-open Config
-open Def
-open Gwdb
-open Util
-
 module PersMap = Map.Make (struct
-  type t = istr
+  type t = Gwdb.istr
 
   let compare = compare
 end)
 
 module PersSet = Set.Make (struct
-  type t = person
+  type t = Gwdb.person
 
-  let compare p1 p2 = compare (get_iper p1) (get_iper p2)
+  let compare p1 p2 = compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 end)
 
 module StringSet = Set.Make (String)
 
 module IstrSet = Set.Make (struct
-  type t = istr
+  type t = Gwdb.istr
 
   let compare = compare
 end)
@@ -29,41 +24,46 @@ end)
 *)
 
 let get_data conf =
-  match p_getenv conf.env "data" with
-  | Some "occu" -> ([ get_occupation ], [], [], [])
+  match Util.p_getenv conf.Config.env "data" with
+  | Some "occu" -> ([ Gwdb.get_occupation ], [], [], [])
   | Some "place" ->
-      ( [ get_birth_place; get_baptism_place; get_death_place; get_burial_place ],
-        [ (fun evt -> evt.epers_place) ],
-        [ get_marriage_place ],
-        [ (fun evt -> evt.efam_place) ] )
+      ( [
+          Gwdb.get_birth_place;
+          Gwdb.get_baptism_place;
+          Gwdb.get_death_place;
+          Gwdb.get_burial_place;
+        ],
+        [ (fun evt -> evt.Def.epers_place) ],
+        [ Gwdb.get_marriage_place ],
+        [ (fun evt -> evt.Def.efam_place) ] )
   | Some "src" ->
       ( [
-          get_birth_src;
-          get_baptism_src;
-          get_death_src;
-          get_burial_src;
-          get_psources;
+          Gwdb.get_birth_src;
+          Gwdb.get_baptism_src;
+          Gwdb.get_death_src;
+          Gwdb.get_burial_src;
+          Gwdb.get_psources;
         ],
-        [ (fun evt -> evt.epers_src) ],
-        [ get_marriage_src; get_fsources ],
-        [ (fun evt -> evt.efam_src) ] )
-  | Some "fn" -> ([ get_first_name ], [], [], [])
-  | Some "sn" -> ([ get_surname ], [], [], [])
+        [ (fun evt -> evt.Def.epers_src) ],
+        [ Gwdb.get_marriage_src; Gwdb.get_fsources ],
+        [ (fun evt -> evt.Def.efam_src) ] )
+  | Some "fn" -> ([ Gwdb.get_first_name ], [], [], [])
+  | Some "sn" -> ([ Gwdb.get_surname ], [], [], [])
   | _ -> ([], [], [], [])
 
 let get_all_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
-  let aux : 'a. 'a -> IstrSet.t -> ('a -> istr) -> IstrSet.t =
+  let aux : 'a. 'a -> IstrSet.t -> ('a -> Gwdb.istr) -> IstrSet.t =
    fun arg acc get ->
     let istr = get arg in
-    if not (is_empty_string istr) then IstrSet.add istr acc else acc
+    if not (Gwdb.is_empty_string istr) then IstrSet.add istr acc else acc
   in
   let acc =
     Gwdb.Collection.fold
       (fun acc i ->
-        let p = pget conf base i in
+        let p = Util.pget conf base i in
         let acc = List.fold_left (aux p) acc get_p in
-        let pevents = get_pevents p in
+        let pevents = Gwdb.get_pevents p in
         List.fold_left
           (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc pevents)
           acc get_pe)
@@ -74,9 +74,9 @@ let get_all_data conf base =
     else
       Gwdb.Collection.fold
         (fun acc i ->
-          let f = foi base i in
+          let f = Gwdb.foi base i in
           let acc = List.fold_left (aux f) acc get_f in
-          let fevents = get_fevents f in
+          let fevents = Gwdb.get_fevents f in
           List.fold_left
             (fun acc fn ->
               List.fold_left (fun acc e -> aux e acc fn) acc fevents)
@@ -88,24 +88,24 @@ let get_all_data conf base =
 let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
-  Printf.eprintf "get_person_from_data: key= %s, %s\n" (string_of_istr istr)
-    (sou base istr);
-  let add acc (istr : istr) p =
+  Printf.eprintf "get_person_from_data: key= %s, %s\n"
+    (Gwdb.string_of_istr istr) (Gwdb.sou base istr);
+  let add acc (istr : Gwdb.istr) p =
     try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
     with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
   in
-  let aux (fn : PersSet.t PersMap.t -> istr -> PersSet.t PersMap.t) arg acc get
-      =
+  let aux (fn : PersSet.t PersMap.t -> Gwdb.istr -> PersSet.t PersMap.t) arg acc
+      get =
     let istr' = get arg in
     if istr = istr' then fn acc istr else acc
   in
   let acc =
     Gwdb.Collection.fold
       (fun acc i ->
-        let p = pget conf base i in
+        let p = Util.pget conf base i in
         let add acc istr = add acc istr p in
         let acc = List.fold_left (aux add p) acc get_p in
-        let pevents = get_pevents p in
+        let pevents = Gwdb.get_pevents p in
         List.fold_left
           (fun acc fn ->
             List.fold_left (fun acc e -> aux add e acc fn) acc pevents)
@@ -117,15 +117,15 @@ let get_person_from_data conf base =
     else
       Gwdb.Collection.fold
         (fun acc i ->
-          let f = foi base i in
+          let f = Gwdb.foi base i in
           let add acc istr =
             add
-              (add acc istr (pget conf base (get_father f)))
+              (add acc istr (Util.pget conf base (Gwdb.get_father f)))
               istr
-              (pget conf base (get_mother f))
+              (Util.pget conf base (Gwdb.get_mother f))
           in
           let acc = List.fold_left (aux add f) acc get_f in
-          let fevents = get_fevents f in
+          let fevents = Gwdb.get_fevents f in
           List.fold_left
             (fun acc fn ->
               List.fold_left (fun acc e -> aux add e acc fn) acc fevents)
@@ -186,23 +186,23 @@ let reduce_cpl_list size list =
       - gen_person iper istr : gen_person avec les champs modifiés
     [Rem] : Non exporté en clair hors de ce module.                           *)
 let update_person conf base old new_input p =
-  match p_getenv conf.env "data" with
+  match Util.p_getenv conf.Config.env "data" with
   | Some "occu" ->
-      let new_istr = Gwdb.insert_string base (only_printable new_input) in
-      let occupation = get_occupation p in
-      let s_occupation = sou base occupation in
+      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let occupation = Gwdb.get_occupation p in
+      let s_occupation = Gwdb.sou base occupation in
       let occupation = if old = s_occupation then new_istr else occupation in
-      { (gen_person_of_person p) with occupation }
+      { (Gwdb.gen_person_of_person p) with occupation }
   | Some "place" ->
-      let new_istr = Gwdb.insert_string base (only_printable new_input) in
-      let pl_bi = get_birth_place p in
-      let s_bi = sou base pl_bi in
-      let pl_bp = get_baptism_place p in
-      let s_bp = sou base pl_bp in
-      let pl_de = get_death_place p in
-      let s_de = sou base pl_de in
-      let pl_bu = get_burial_place p in
-      let s_bu = sou base pl_bu in
+      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let pl_bi = Gwdb.get_birth_place p in
+      let s_bi = Gwdb.sou base pl_bi in
+      let pl_bp = Gwdb.get_baptism_place p in
+      let s_bp = Gwdb.sou base pl_bp in
+      let pl_de = Gwdb.get_death_place p in
+      let s_de = Gwdb.sou base pl_de in
+      let pl_bu = Gwdb.get_burial_place p in
+      let s_bu = Gwdb.sou base pl_bu in
       let birth_place = if old = s_bi then new_istr else pl_bi in
       let baptism_place = if old = s_bp then new_istr else pl_bp in
       let death_place = if old = s_de then new_istr else pl_de in
@@ -210,14 +210,14 @@ let update_person conf base old new_input p =
       let pevents =
         List.map
           (fun evt ->
-            let pl_evt = evt.epers_place in
-            let s_evt = sou base pl_evt in
+            let pl_evt = evt.Def.epers_place in
+            let s_evt = Gwdb.sou base pl_evt in
             let place = if old = s_evt then new_istr else pl_evt in
-            { evt with epers_place = place })
-          (get_pevents p)
+            { evt with Def.epers_place = place })
+          (Gwdb.get_pevents p)
       in
       {
-        (gen_person_of_person p) with
+        (Gwdb.gen_person_of_person p) with
         birth_place;
         baptism_place;
         death_place;
@@ -225,17 +225,17 @@ let update_person conf base old new_input p =
         pevents;
       }
   | Some "src" ->
-      let new_istr = Gwdb.insert_string base (only_printable new_input) in
-      let src_bi = get_birth_src p in
-      let s_bi = sou base src_bi in
-      let src_bp = get_baptism_src p in
-      let s_bp = sou base src_bp in
-      let src_de = get_death_src p in
-      let s_de = sou base src_de in
-      let src_bu = get_burial_src p in
-      let s_bu = sou base src_bu in
-      let src_p = get_psources p in
-      let s_p = sou base src_p in
+      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let src_bi = Gwdb.get_birth_src p in
+      let s_bi = Gwdb.sou base src_bi in
+      let src_bp = Gwdb.get_baptism_src p in
+      let s_bp = Gwdb.sou base src_bp in
+      let src_de = Gwdb.get_death_src p in
+      let s_de = Gwdb.sou base src_de in
+      let src_bu = Gwdb.get_burial_src p in
+      let s_bu = Gwdb.sou base src_bu in
+      let src_p = Gwdb.get_psources p in
+      let s_p = Gwdb.sou base src_p in
       let birth_src = if old = s_bi then new_istr else src_bi in
       let baptism_src = if old = s_bp then new_istr else src_bp in
       let death_src = if old = s_de then new_istr else src_de in
@@ -244,14 +244,14 @@ let update_person conf base old new_input p =
       let pevents =
         List.map
           (fun evt ->
-            let src_evt = evt.epers_src in
-            let s_evt = sou base src_evt in
+            let src_evt = evt.Def.epers_src in
+            let s_evt = Gwdb.sou base src_evt in
             let src = if old = s_evt then new_istr else src_evt in
             { evt with epers_src = src })
-          (get_pevents p)
+          (Gwdb.get_pevents p)
       in
       {
-        (gen_person_of_person p) with
+        (Gwdb.gen_person_of_person p) with
         birth_src;
         baptism_src;
         death_src;
@@ -260,64 +260,70 @@ let update_person conf base old new_input p =
         pevents;
       }
   | Some "fn" ->
-      let new_istr = Gwdb.insert_string base (only_printable new_input) in
-      let first_name = get_first_name p in
-      let s_first_name = sou base first_name in
+      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let first_name = Gwdb.get_first_name p in
+      let s_first_name = Gwdb.sou base first_name in
       let s_first_name_lower = Name.lower s_first_name in
       let new_input_lower = Name.lower new_input in
       let first_name, occ =
-        if new_input_lower = s_first_name_lower then (new_istr, get_occ p)
+        if new_input_lower = s_first_name_lower then (new_istr, Gwdb.get_occ p)
         else if old = s_first_name then
           ( new_istr,
-            Gutil.find_free_occ base (sou base new_istr)
-              (sou base (get_surname p)) )
-        else (first_name, get_occ p)
+            Gutil.find_free_occ base (Gwdb.sou base new_istr)
+              (Gwdb.sou base (Gwdb.get_surname p)) )
+        else (first_name, Gwdb.get_occ p)
       in
-      let first_names_aliases = get_first_names_aliases p in
+      let first_names_aliases = Gwdb.get_first_names_aliases p in
       let first_names_aliases =
-        if p_getenv conf.env "first_name_aliases" = Some "yes" then
+        if Util.p_getenv conf.env "first_name_aliases" = Some "yes" then
           let has_first_name_alias =
             List.fold_left
               (fun has_first_name alias ->
                 has_first_name
-                || s_first_name_lower = Name.lower (sou base alias))
+                || s_first_name_lower = Name.lower (Gwdb.sou base alias))
               false first_names_aliases
           in
           if has_first_name_alias then first_names_aliases
-          else get_first_name p :: first_names_aliases
+          else Gwdb.get_first_name p :: first_names_aliases
         else first_names_aliases
       in
-      { (gen_person_of_person p) with first_name; occ; first_names_aliases }
+      {
+        (Gwdb.gen_person_of_person p) with
+        first_name;
+        occ;
+        first_names_aliases;
+      }
   | Some "sn" ->
-      let new_istr = Gwdb.insert_string base (only_printable new_input) in
-      let surname = get_surname p in
-      let s_surname = sou base surname in
+      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let surname = Gwdb.get_surname p in
+      let s_surname = Gwdb.sou base surname in
       let s_surname_lower = Name.lower s_surname in
       let new_input_lower = Name.lower new_input in
       let surname, occ =
-        if new_input_lower = s_surname_lower then (new_istr, get_occ p)
+        if new_input_lower = s_surname_lower then (new_istr, Gwdb.get_occ p)
         else if old = s_surname then
           ( new_istr,
             Gutil.find_free_occ base
-              (sou base (get_first_name p))
-              (sou base new_istr) )
-        else (surname, get_occ p)
+              (Gwdb.sou base (Gwdb.get_first_name p))
+              (Gwdb.sou base new_istr) )
+        else (surname, Gwdb.get_occ p)
       in
-      let surnames_aliases = get_surnames_aliases p in
+      let surnames_aliases = Gwdb.get_surnames_aliases p in
       let surnames_aliases =
-        if p_getenv conf.env "surname_aliases" = Some "yes" then
+        if Util.p_getenv conf.env "surname_aliases" = Some "yes" then
           let has_surname_alias =
             List.fold_left
               (fun has_surname alias ->
-                has_surname || s_surname_lower = Name.lower (sou base alias))
+                has_surname
+                || s_surname_lower = Name.lower (Gwdb.sou base alias))
               false surnames_aliases
           in
           if has_surname_alias then surnames_aliases
-          else get_surname p :: surnames_aliases
+          else Gwdb.get_surname p :: surnames_aliases
         else surnames_aliases
       in
-      { (gen_person_of_person p) with surname; occ; surnames_aliases }
-  | _ -> gen_person_of_person p
+      { (Gwdb.gen_person_of_person p) with surname; occ; surnames_aliases }
+  | _ -> Gwdb.gen_person_of_person p
 
 (* ************************************************************************** *)
 (* [Fonc] update_family : conf -> base -> string -> string -> person ->
@@ -336,41 +342,41 @@ let update_person conf base old new_input p =
       - gen_family ifam istr : gen_family avec les champs modifiés
     [Rem] : Non exporté en clair hors de ce module.                           *)
 let update_family conf base old new_istr fam =
-  match p_getenv conf.env "data" with
+  match Util.p_getenv conf.Config.env "data" with
   | Some "place" ->
-      let new_istr = Gwdb.insert_string base (only_printable new_istr) in
-      let p_ma = get_marriage_place fam in
-      let s_ma = sou base p_ma in
+      let new_istr = Gwdb.insert_string base (Util.only_printable new_istr) in
+      let p_ma = Gwdb.get_marriage_place fam in
+      let s_ma = Gwdb.sou base p_ma in
       let marriage_place = if old = s_ma then new_istr else p_ma in
       let fevents =
         List.map
           (fun evt ->
-            let pl_evt = evt.efam_place in
-            let s_evt = sou base pl_evt in
+            let pl_evt = evt.Def.efam_place in
+            let s_evt = Gwdb.sou base pl_evt in
             let place = if old = s_evt then new_istr else pl_evt in
-            { evt with efam_place = place })
-          (get_fevents fam)
+            { evt with Def.efam_place = place })
+          (Gwdb.get_fevents fam)
       in
-      { (gen_family_of_family fam) with marriage_place; fevents }
+      { (Gwdb.gen_family_of_family fam) with marriage_place; fevents }
   | Some "src" ->
-      let new_istr = Gwdb.insert_string base (only_printable new_istr) in
-      let src_ma = get_marriage_src fam in
-      let s_ma = sou base src_ma in
-      let src_f = get_fsources fam in
-      let s_f = sou base src_f in
+      let new_istr = Gwdb.insert_string base (Util.only_printable new_istr) in
+      let src_ma = Gwdb.get_marriage_src fam in
+      let s_ma = Gwdb.sou base src_ma in
+      let src_f = Gwdb.get_fsources fam in
+      let s_f = Gwdb.sou base src_f in
       let marriage_src = if old = s_ma then new_istr else src_ma in
       let fsources = if old = s_f then new_istr else src_f in
       let fevents =
         List.map
           (fun evt ->
-            let src_evt = evt.efam_src in
-            let s_evt = sou base src_evt in
+            let src_evt = evt.Def.efam_src in
+            let s_evt = Gwdb.sou base src_evt in
             let src = if old = s_evt then new_istr else src_evt in
-            { evt with efam_src = src })
-          (get_fevents fam)
+            { evt with Def.efam_src = src })
+          (Gwdb.get_fevents fam)
       in
-      { (gen_family_of_family fam) with marriage_src; fsources; fevents }
-  | _ -> gen_family_of_family fam
+      { (Gwdb.gen_family_of_family fam) with marriage_src; fsources; fevents }
+  | _ -> Gwdb.gen_family_of_family fam
 
 (* ********************************************************************** *)
 (* [Fonc] update_person_list :
@@ -395,7 +401,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
     match get_data conf with _, _, [], [] -> false | _ -> true
   in
   let action =
-    match p_getenv conf.env "data" with
+    match Util.p_getenv conf.env "data" with
     | Some "occu" -> "co"
     | Some "place" -> "cp"
     | Some "src" -> "cs"
@@ -413,31 +419,36 @@ let update_person_list conf base new_input list nb_pers max_updates =
       List.iter
         (fun p ->
           if
-            sou base (get_first_name p) <> "?"
-            || sou base (get_surname p) <> "?"
+            Gwdb.sou base (Gwdb.get_first_name p) <> "?"
+            || Gwdb.sou base (Gwdb.get_surname p) <> "?"
           then (
             incr cnt;
-            let o_p = Util.string_gen_person base (gen_person_of_person p) in
+            let o_p =
+              Util.string_gen_person base (Gwdb.gen_person_of_person p)
+            in
             let np = update_person conf base old new_input p in
             (if action = "fn" || action = "sn" then
              let pi = np.key_index in
-             let op = poi base pi in
+             let op = Gwdb.poi base pi in
              let sp =
-               Futil.map_person_ps (fun ip -> ip) (fun istr -> sou base istr) np
+               Futil.map_person_ps
+                 (fun ip -> ip)
+                 (fun istr -> Gwdb.sou base istr)
+                 np
              in
              Image.rename_portrait conf base op
                (sp.first_name, sp.surname, sp.occ));
-            patch_person base np.key_index np;
+            Gwdb.patch_person base np.key_index np;
             if test_family then
               Array.iter
                 (fun ifam ->
-                  let fam = foi base ifam in
+                  let fam = Gwdb.foi base ifam in
                   let nfam = update_family conf base old new_input fam in
-                  patch_family base nfam.fam_index nfam)
-                (get_family p);
+                  Gwdb.patch_family base nfam.fam_index nfam)
+                (Gwdb.get_family p);
             (* On met aussi à jour l'historique. *)
             let changed =
-              U_Multi
+              Def.U_Multi
                 ( o_p,
                   Util.string_gen_person base np,
                   if action = "fn" || action = "sn" then true else false )
@@ -460,23 +471,23 @@ let move_particle base s =
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   let list = get_all_data conf base in
   if ini <> "" then
     Mutil.filter_map
       (fun istr ->
-        let str = sou base istr |> move_particle base in
+        let str = Gwdb.sou base istr |> move_particle base in
         if Mutil.start_with_wildcard ini 0 @@ Place.without_suburb str then
           Some (istr, str)
         else None)
       list
   else
     List.filter_map
-      (fun istr -> Some (istr, sou base istr |> move_particle base))
+      (fun istr -> Some (istr, Gwdb.sou base istr |> move_particle base))
       (List.rev list)
 
 let build_list_short conf list =
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -508,7 +519,7 @@ let build_list_short conf list =
   in
   build_ini list (String.length ini)
 
-let build_list_long conf list : (string * (istr * string) list) list =
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+let build_list_long conf list : (string * (Gwdb.istr * string) list) list =
+  let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   let list = combine_by_ini ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list
