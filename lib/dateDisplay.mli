@@ -55,7 +55,7 @@ val prec_text : config -> dmy -> string
 val month_text : dmy -> string
 (** Returns textual representation of date's month number. *)
 
-val year_text : dmy -> string
+val year_text : config -> dmy -> string
 (** Returns textual representation of date's year. *)
 
 val short_dates_text : config -> base -> person -> Adef.safe_string
