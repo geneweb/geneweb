@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                      STAGE 1: Build geneweb
 ###############################################################################
-FROM ocaml/opam:debian-12-ocaml-4.14 AS builder
+FROM ocaml/opam:debian-12-ocaml-5.4 AS builder
 ENV OPAMYES=yes
 
 # Install required packages for build
