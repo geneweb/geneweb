@@ -91,10 +91,10 @@ let display_descendants_level conf base max_level ancestor =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Ext_string.alphabetic (p_surname base p2) (p_surname base p1) in
+        let c = Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
         if c = 0 then
           let c =
-            Ext_string.alphabetic (p_first_name base p2) (p_first_name base p1)
+            Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
           in
           if c = 0 then compare (get_occ p2) (get_occ p1) else c
         else c)
@@ -503,9 +503,9 @@ let sort_and_display conf base paths precision list =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Ext_string.alphabetic (p_surname base p2) (p_surname base p1) in
+        let c = Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
         if c = 0 then
-          Ext_string.alphabetic (p_first_name base p2) (p_first_name base p1)
+          Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
         else c)
       list
   in

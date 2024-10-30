@@ -213,7 +213,7 @@ let first_name_print_list conf base x1 xl liste =
       List.sort
         (fun x1 x2 ->
           match
-            Ext_string.alphabetic (Gwdb.p_surname base x1)
+            Utf8.alphabetic_order (Gwdb.p_surname base x1)
               (Gwdb.p_surname base x2)
           with
           | 0 -> (
@@ -231,7 +231,7 @@ let first_name_print_list conf base x1 xl liste =
       (fun l x ->
         let px = Gwdb.p_surname base x in
         match l with
-        | (p, l1) :: l when Ext_string.alphabetic px p = 0 -> (p, x :: l1) :: l
+        | (p, l1) :: l when Utf8.alphabetic_order px p = 0 -> (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
       [] l
   in

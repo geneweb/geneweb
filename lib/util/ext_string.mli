@@ -53,6 +53,3 @@ val digest : string -> string
 
 val trim_trailing_spaces : string -> string
 (** Trim at the end of string *)
-
-val alphabetic : string -> string -> int
-(** Compare two ISO-8859-1 encoded strings by alphabetic order *)

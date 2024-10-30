@@ -146,11 +146,11 @@ let arg_list_of_string line =
 let sort_person_list_aux sort base =
   let default p1 p2 =
     match
-      Ext_string.alphabetic (Gwdb.p_surname base p1) (Gwdb.p_surname base p2)
+      Utf8.alphabetic_order (Gwdb.p_surname base p1) (Gwdb.p_surname base p2)
     with
     | 0 -> (
         match
-          Ext_string.alphabetic
+          Utf8.alphabetic_order
             (Gwdb.p_first_name base p1)
             (Gwdb.p_first_name base p2)
         with
