@@ -712,9 +712,11 @@ EXTEND
   ;
   int:
     [ [ i = INT ->
-          (try int_of_string i with Failure _ -> raise Stream.Failure)
-      |i = INT; ID "BCE" ->
-          (try (- int_of_string i) with  Failure _ -> raise Stream.Failure) ] ]
+        (try int_of_string i with Failure _ -> raise Stream.Failure)
+      | "-"; i = INT ->
+        (try (- int_of_string i) with  Failure _ -> raise Stream.Failure)
+      | i = INT; ID "BCE" ->
+        (try (- int_of_string i) with  Failure _ -> raise Stream.Failure) ] ]
   ;
 END
 [@@@ocaml.warning "+27"]
