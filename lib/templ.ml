@@ -1384,16 +1384,15 @@ let rec interp_ast :
       List.map (fun (id, asts) -> (id, eval_ast_expr_list env ep asts)) ell
     in
     match get_def ifun.get_vother f env with
-    | Some (xl, al) ->
-      begin try
-        let xl, vl =
-          sort_apply_parameters loc
-            (fun e -> VVstring (eval_expr env ep e))
-            xl vl
-        in
-        templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
-        with e -> print_error loc e
-      end
+    | Some (xl, al) -> (
+        try
+          let xl, vl =
+            sort_apply_parameters loc
+              (fun e -> VVstring (eval_expr env ep e))
+              xl vl
+          in
+          templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
+        with e -> print_error loc e)
     | None -> Output.print_sstring conf (eval_apply env ep loc f vl)
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
