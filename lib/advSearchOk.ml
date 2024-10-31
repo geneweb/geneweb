@@ -208,16 +208,6 @@ end = struct
         match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
     | None, None -> default
 
-  let do_compare ~p ~places ~get ~cmp =
-    let s = abbrev_lower @@ get p in
-    List.exists (fun s' -> cmp (abbrev_lower s') s) places
-
-  let apply_to_field_places_raw ~cmp ~p ~places ~get ~default =
-    if places = [] then default else do_compare ~p ~places ~get ~cmp
-
-  let apply_to_field_places ~get ~cmp ~base =
-    apply_to_field_places_raw ~get:(fun p -> sou base @@ get p) ~cmp
-
   let match_sex ~p ~sex = if sex = Def.Neuter then true else get_sex p = sex
 
   let married_cmp p = function
@@ -228,24 +218,23 @@ end = struct
   let match_married ~p ~married =
     if married = "" then true else married_cmp p married
 
-  let exact_place_wrapper f ~exact_place =
-    let cmp = if exact_place then ( = ) else string_incl in
-    f ~cmp
+  let exact_place_wrapper ~get ~exact_place ~base ~p ~places ~default =
+    if places = [] then default
+    else
+      let cmp =
+        if exact_place then fun base str istr ->
+          abbrev_lower (Gwdb.sou base istr) = str
+        else fun base str istr ->
+          string_incl (abbrev_lower (Gwdb.sou base istr)) str
+      in
+      List.exists (fun s' -> cmp base s' (get p)) (List.map abbrev_lower places)
 
-  let match_baptism_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_baptism_place
-
-  let match_birth_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_birth_place
-
-  let match_death_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_death_place
-
-  let match_burial_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_burial_place
-
-  let match_other_event_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:Event.get_place
+  let match_baptism_place = exact_place_wrapper ~get:get_baptism_place
+  let match_birth_place = exact_place_wrapper ~get:get_birth_place
+  let match_death_place = exact_place_wrapper ~get:get_death_place
+  let match_burial_place = exact_place_wrapper ~get:get_burial_place
+  let match_other_event_place = exact_place_wrapper ~get:Event.get_place
+  let match_marriage_place = exact_place_wrapper ~get:get_marriage_place
 
   let match_other_events_place ~exact_place ~conf ~base ~p ~places ~default =
     if places = [] then default
@@ -255,7 +244,7 @@ end = struct
           match_other_event_place ~exact_place ~base ~places ~default:false ~p:e)
         (Event.other_events conf base p)
 
-  let match_marriage ~cmp ~conf ~base ~p ~places ~default ~dates =
+  let match_marriage ~exact_place ~conf ~base ~p ~places ~default ~dates =
     let d1, d2 = dates in
     let test_date_place df =
       Array.exists
@@ -264,10 +253,8 @@ end = struct
           let sp = poi base @@ Gutil.spouse (get_iper p) fam in
           if authorized_age conf base sp then
             df fam
-            && (places = []
-               || do_compare ~p:fam ~places
-                    ~get:(fun f -> sou base @@ get_marriage_place f)
-                    ~cmp)
+            && match_marriage_place ~exact_place ~default:true ~base ~p:fam
+                 ~places
           else false)
         (get_family p)
     in
@@ -292,8 +279,6 @@ end = struct
             | None -> false)
     | None, None ->
         if places = [] then default else test_date_place (fun _ -> true)
-
-  let match_marriage = exact_place_wrapper match_marriage
 
   let match_occupation ~base ~p ~occupation =
     if occupation = "" then true
