@@ -2018,6 +2018,15 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
       else None
   | _ -> (
       match (p_getenv conf.env env_p, p_getenv conf.env env_n) with
+      | None, Some n -> (
+          match Gutil.person_of_string_key base n with
+          | Some ip ->
+              let p = pget conf base ip in
+              if is_hidden p then None
+              else if (not (is_hide_names conf p)) || authorized_age conf base p
+              then Some p
+              else None
+          | None -> None)
       | Some p, Some n -> (
           let occ = Option.value ~default:0 (p_getint conf.env env_occ) in
           match person_of_key base p n occ with
