@@ -144,13 +144,78 @@ input:placeholder-shown {
 .src-list-bg li:nth-child(even) {
   background-color: #e4f5df;
 }
-
+a.stretched-link.sup-char, a.stretched-link.sub-char {
+    color: #0050a6 !important
+}
+a.stretched-link.sup-char:hover, a.stretched-link.sub-char:hover {
+    color: #003366 !important;
+}
+.sup-char-div {
+    background-color: #cff9ffb0 !important
+}
+.sup-char-div:hover {
+    background-color: #e6f7ff !important;
+}
+.sup-char-div .bottom-book-arrow a:hover .book-arrow {
+    color: #89CAFE !important;
+}
+.arabic-char {
+    background-color: #ccecf1 !important
+}
+.armenian-char {
+    background-color: #27fff32e !important
+}
+.cyrillic-char {
+    background-color: #9ef7c5ab !important
+}
+.ethiopic-char {
+    background-color: #05fb9033 !important
+}
+.georgian-char {
+    background-color: #B0C4DE !important
+}
 .greek-char {
     background-color: #6edf5e54 !important
 }
+.hebrew-char {
+    background-color: #AFEEEE !important
+}
+.khmer-char {
+    background-color: #a2df7882 !important
+}
+.arabic-char:hover {
+    background-color: #d9f0f7 !important;
+}
 
-.cyrillic-char {
-    background-color: #9ef7c5ab !important
+.armenian-char:hover {
+    background-color: #33fffa47 !important;
+}
+
+.cyrillic-char:hover {
+    background-color: #b7f7d5ab !important;
+}
+
+.ethiopic-char:hover {
+    background-color: #08fb9047 !important;
+}
+
+.georgian-char:hover {
+    background-color: #c6d9e8 !important;
+}
+
+.greek-char:hover {
+    background-color: #87e07768 !important;
+}
+
+.hebrew-char:hover {
+    background-color: #c6e8e8 !important;
+}
+
+.khmer-char:hover {
+    background-color: #b4df8c99 !important;
+}
+a.book-arrow:hover {
+    color: white;
 }
 
 #book {
