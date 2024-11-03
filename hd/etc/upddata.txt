@@ -79,7 +79,7 @@
                       <span class="bottom-book-arrow">
                         <a href="#_%entry_ini;" title="%apply;subsection%with;“%entry_ini;”%end;"
                           aria-label="%apply;subsection%with;“%entry_ini;”%end;" tabindex="%expr(len_s+(2*cnt)+6)">
-                          <i class="fa-solid fa-sort-down fa-2xs p-0 text-white"></i>
+                          <i class="fa-solid fa-sort-down fa-2xs p-0 book-arrow"></i>
                         </a>
                       </span>
                     %end;
@@ -382,7 +382,7 @@ window.addEventListener('DOMContentLoaded', updateInputField);
 <script>
 // Highlight greek and cyrillic initials to avoid confusion with similar latin letters
 const {regex} = Regex;
-const scripts = ['Greek', 'Cyrillic'];
+const scripts = ['Arabic', 'Armenian', 'Cyrillic', 'Ethiopic', 'Georgian', 'Greek', 'Hebrew', 'Khmer'];
 
 function highlightNonLatinChars() {
   const divs = document.querySelectorAll('.sup-char-div');
@@ -395,7 +395,9 @@ function highlightNonLatinChars() {
 
     scripts.forEach(script => {
       if (regex`\p{Script=${script}}`.test(char)) {
-        div.classList.add(`${script.toLowerCase()}-char`);
+        scriptName = script.toLowerCase();
+        div.classList.add(`${scriptName}-char`);
+        link.title += ` (${scriptName})`;
       }
     });
   });
