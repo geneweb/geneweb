@@ -52,6 +52,10 @@ let nb_of_persons base = base.data.persons.len
 let nb_of_real_persons base = base.func.nb_of_real_persons ()
 let nb_of_families base = base.data.families.len
 let insert_string base s = base.func.Dbdisk.insert_string @@ Utf8.normalize s
+
+let find_opt_string_istr base s =
+  base.func.Dbdisk.find_opt_string_istr @@ Utf8.normalize s
+
 let commit_patches base = base.func.Dbdisk.commit_patches ()
 let commit_notes base s = base.func.Dbdisk.commit_notes s
 let person_of_key base = base.func.Dbdisk.person_of_key

@@ -274,6 +274,14 @@ let insert_string base s =
   base.strings <- a;
   len
 
+let find_opt_string_istr base s =
+  let rec loop i =
+    if i > Array.length base.strings then None
+    else if base.strings.(i) = s then Some i
+    else loop (i + 1)
+  in
+  loop 0
+
 let commit_patches _base = ()
 let commit_notes _base _fname _s = () (* TODO *)
 let new_iper base = Array.length base.persons

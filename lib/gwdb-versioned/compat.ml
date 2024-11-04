@@ -409,6 +409,10 @@ module type Driver_S = sig
   (** Modify/add couple of a family with a giving id. Modification stay blocked until
     call of [commit_patches]. *)
 
+  val find_opt_string_istr : base -> string -> istr option
+  (** Find if a given string already exsits in the base and returns its istr if it does,
+      None otherwise *)
+
   val insert_string : base -> string -> istr
   (** Modify/add string with a giving id. If string already exists return its id.
     Modification stay blocked until call of [commit_patches]. *)
@@ -1196,6 +1200,10 @@ struct
   let patch_family = Util.wrap_base Legacy.patch_family Current.patch_family
   let patch_descend = Util.wrap_base Legacy.patch_descend Current.patch_descend
   let patch_couple = Util.wrap_base Legacy.patch_couple Current.patch_couple
+
+  let find_opt_string_istr =
+    Util.wrap_base Legacy.find_opt_string_istr Current.find_opt_string_istr
+
   let insert_string = Util.wrap_base Legacy.insert_string Current.insert_string
 
   let commit_patches =
