@@ -187,7 +187,7 @@ let print_elem conf base is_surname (p, xl) =
       Output.print_sstring conf "</a>";
       Output.print_string conf (DateDisplay.short_dates_text conf base x);
       Output.print_sstring conf "<em>";
-      Util.specify_homonymous conf base x true;
+      NameDisplay.specify_homonymous conf base x true;
       Output.print_sstring conf "</em>")
     xl
 
@@ -470,20 +470,22 @@ let print_branch conf base psn name =
     let print_elem p with_link with_id with_sn =
       let render p =
         if with_link then
-          if with_id then Util.reference conf base p
-          else Util.reference_noid conf base p
+          if with_id then NameDisplay.reference conf base p
+          else NameDisplay.reference_noid conf base p
         else fun s -> s
       in
       SosaCache.print_sosa conf base p with_link;
       Output.print_sstring conf @@ if with_link then "<strong>" else "<em>";
       Output.print_string conf
         (render p
-           (if
-            Util.is_hide_names conf p && not (Util.authorized_age conf base p)
-           then Adef.safe "x"
-           else if (not psn) && (not with_sn) && Gwdb.p_surname base p = name
-          then Util.gen_person_text ~sn:false conf base p
-           else Util.gen_person_text conf base p));
+           (NameDisplay.map_person_name_visibility
+              ~on_hidden_name:(fun _ _ _ ->
+                NameDisplay.hidden_or_restricted_fullname_string conf)
+              ~on_visible_name:(fun conf base p ->
+                if (not psn) && (not with_sn) && Gwdb.p_surname base p = name
+                then NameDisplay.first_name_html_of_person conf base p
+                else NameDisplay.fullname_html_of_person conf base p)
+              conf base p));
       Output.print_sstring conf @@ if with_link then "</strong>" else "</em>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf "\n"

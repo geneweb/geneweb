@@ -36,7 +36,8 @@ let print_birth conf base =
            Output.print_string conf month_txt;
            Output.print_sstring conf "<ul>");
          Output.print_sstring conf "<li><b>";
-         Output.print_string conf (referenced_person_text conf base p);
+         Output.print_string conf
+           (NameDisplay.referenced_person_text conf base p);
          Output.print_sstring conf "</b>, ";
          if future then (
            Output.print_sstring conf "<em>";
@@ -102,7 +103,8 @@ let print_death conf base =
                 else (None, ages_sum, ages_nb)
           in
           Output.print_sstring conf "<li><b>";
-          Output.print_string conf (referenced_person_text conf base p);
+          Output.print_string conf
+            (NameDisplay.referenced_person_text conf base p);
           Output.print_sstring conf "</b>, ";
           Output.print_sstring conf
             (transl_nth conf "died" (index_of_sex (get_sex p)));
@@ -209,7 +211,7 @@ let print_oldest_alive conf base =
   List.iter
     (fun (p, d, cal) ->
       Output.print_sstring conf "<li><b>";
-      Output.print_string conf (referenced_person_text conf base p);
+      Output.print_string conf (NameDisplay.referenced_person_text conf base p);
       Output.print_sstring conf "</b>, ";
       Output.print_sstring conf
         (transl_nth conf "born" (index_of_sex (get_sex p)));
@@ -249,7 +251,7 @@ let print_longest_lived conf base =
   List.iter
     (fun (p, d, _) ->
       Output.print_sstring conf "<li><strong>";
-      Output.print_string conf (referenced_person_text conf base p);
+      Output.print_string conf (NameDisplay.referenced_person_text conf base p);
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf " (";
@@ -284,12 +286,14 @@ let print_marr_or_eng conf base title list =
            Output.print_sstring conf "<ul>");
          Output.print_sstring conf "<li><b>";
          Output.print_string conf
-           (referenced_person_text conf base (pget conf base (get_father fam)));
+           (NameDisplay.referenced_person_text conf base
+              (pget conf base (get_father fam)));
          Output.print_sstring conf "</b> ";
          Output.print_sstring conf (transl_nth conf "and" 0);
          Output.print_sstring conf " <b>";
          Output.print_string conf
-           (referenced_person_text conf base (pget conf base (get_mother fam)));
+           (NameDisplay.referenced_person_text conf base
+              (pget conf base (get_mother fam)));
          Output.print_sstring conf "</b>, ";
          if future then (
            Output.print_sstring conf "<em>";

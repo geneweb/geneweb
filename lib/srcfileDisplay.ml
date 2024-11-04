@@ -174,7 +174,7 @@ let string_of_int_sep_aux conf n =
 let macro conf base = function
   | 'a' -> (
       match Util.find_sosa_ref conf base with
-      | Some p -> referenced_person_title_text conf base p
+      | Some p -> NameDisplay.referenced_person_title_text conf base p
       | None -> Adef.safe "")
   | 'b' ->
       let s =
@@ -523,7 +523,7 @@ let eval_var conf base env () _loc = function
           match Lazy.force v with
           | Some p ->
               VVstring
-                (referenced_person_title_text conf base p
+                (NameDisplay.referenced_person_title_text conf base p
                   : Adef.safe_string
                   :> string)
           | None -> raise Not_found)

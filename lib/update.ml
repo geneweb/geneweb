@@ -173,11 +173,11 @@ let print_person_parents_and_spouse conf base p =
   Output.print_string conf (escape_html @@ p_surname base p);
   Output.print_sstring conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
-  let cop = Util.child_of_parent conf base p in
+  let cop = NameDisplay.child_of_parent conf base p in
   if String.length (cop :> string) > 0 then (
     Output.print_sstring conf ", ";
     Output.print_string conf cop);
-  let hbw = Util.husband_wife conf base p true in
+  let hbw = NameDisplay.husband_wife conf base p true in
   if String.length (hbw :> string) > 0 then (
     Output.print_sstring conf ", ";
     Output.print_string conf hbw);
@@ -327,7 +327,9 @@ let string_of_error conf =
       Printf.sprintf
         (fcapitale (ftransl conf "%t already has parents"))
         (fun _ ->
-          (Util.referenced_person_text conf base p : Adef.safe_string :> string))
+          (NameDisplay.referenced_person_text conf base p
+            : Adef.safe_string
+            :> string))
       |> Adef.safe
   | UERR_missing_first_name s when s = Adef.safe "" ->
       transl conf "first name missing" |> Utf8.capitalize_fst |> Adef.safe

@@ -135,7 +135,7 @@ let print_linked_list conf base pgl =
           let p = pget conf base ip in
           Output.print_sstring conf "<span class=\"mx-2\">";
           Output.print_string conf
-            (Util.referenced_person_title_text conf base p);
+            (NameDisplay.referenced_person_title_text conf base p);
           Output.print_string conf (DateDisplay.short_dates_text conf base p);
           Output.print_sstring conf "</span></tt>"
       | Def.NLDB.PgFam ifam ->
@@ -155,11 +155,11 @@ let print_linked_list conf base pgl =
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf "<span class=\"mx-2\">";
           Output.print_string conf
-            (Util.referenced_person_title_text conf base fath);
+            (NameDisplay.referenced_person_title_text conf base fath);
           Output.print_string conf (DateDisplay.short_dates_text conf base fath);
           Output.print_sstring conf " &amp; ";
           Output.print_string conf
-            (Util.referenced_person_title_text conf base moth);
+            (NameDisplay.referenced_person_title_text conf base moth);
           Output.print_sstring conf " ";
           Output.print_string conf (DateDisplay.short_dates_text conf base moth);
           Output.print_sstring conf "</span></tt>"

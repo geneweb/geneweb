@@ -112,13 +112,13 @@ let specify conf base n pl =
     begin match tl with
       | [] ->
         Geneweb.Output.print_sstring conf " " ;
-        Geneweb.Output.print_string conf (Geneweb.Util.referenced_person_title_text conf base p)
+        Geneweb.Output.print_string conf (Geneweb.NameDisplay.referenced_person_title_text conf base p)
       | t :: _ ->
         Geneweb.Output.print_sstring conf {|<a href="|} ;
         Geneweb.Output.print_string conf (Geneweb.Util.commd conf) ;
         Geneweb.Output.print_string conf (Geneweb.Util.acces conf base p) ;
         Geneweb.Output.print_sstring conf {|"> |};
-        Geneweb.Output.print_string conf (Geneweb.Util.titled_person_text conf base p t);
+        Geneweb.Output.print_string conf (Geneweb.NameDisplay.title_html_of_person conf base p t);
         Geneweb.Output.print_sstring conf "</a> ";
         List.iter (fun t -> Geneweb.Output.print_string conf (Geneweb.Util.one_title_text base t)) tl
     end;
@@ -148,8 +148,8 @@ let specify conf base n pl =
         let open Def in
         Geneweb.Output.print_sstring conf ", <em>&amp; " ;
         List.fold_left
-          (fun s h -> s ^^^ ",\n" ^<^ Geneweb.Util.person_title_text conf base h)
-          (Geneweb.Util.person_title_text conf base h) hl
+          (fun s h -> s ^^^ ",\n" ^<^ Geneweb.NameDisplay.person_title_text conf base h)
+          (Geneweb.NameDisplay.person_title_text conf base h) hl
         |> Geneweb.Output.print_string conf ;
         Geneweb.Output.print_sstring conf "</em>"
     end ;

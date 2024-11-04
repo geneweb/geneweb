@@ -3048,6 +3048,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       (* TODO why is it not Util.is_restricted *)
       Util.is_empty_person p
   | "is_contemporary" -> GWPARAM.is_contemporary conf base p
+  | "name_is_hidden" -> NameDisplay.is_hidden conf base p
+  | "name_is_restricted" -> NameDisplay.is_restricted conf base p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
@@ -3130,9 +3132,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             |> Gwdb.p_surname base
             |> ( <> ) (Gwdb.p_surname base p)
       in
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x x"
-      else if force_surname then Util.gen_person_text conf base p |> safe_val
-      else Util.gen_person_text ~sn:false ~chk:false conf base p |> safe_val
+      if force_surname then
+        NameDisplay.fullname_html_of_person conf base p |> safe_val
+      else NameDisplay.first_name_html_of_person conf base p |> safe_val
   | "consanguinity" ->
       if p_auth then
         Util.string_of_decimal_num conf
@@ -3172,7 +3174,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "father_age_at_birth" ->
       string_of_parent_age conf base ep Gwdb.get_father |> safe_val
   | "first_name" ->
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x"
+      if (not p_auth) && Util.is_hide_names conf p then
+        str_val (NameDisplay.hidden_first_name_txt :> string)
       else Gwdb.p_first_name base p |> Util.escape_html |> safe_val
   | "first_name_key" ->
       if Util.is_hide_names conf p && not p_auth then null_val
@@ -3183,6 +3186,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "first_name_key_strip" ->
       if Util.is_hide_names conf p && not p_auth then null_val
       else Name.strip_c (Gwdb.p_first_name base p) '"' |> str_val
+  | "hidden_fullname" ->
+      safe_val (NameDisplay.hidden_or_restricted_fullname_string conf)
   | "history_file" ->
       if not p_auth then null_val
       else
@@ -3426,7 +3431,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vstring s -> safe_val (Notes.source_note conf base p s)
       | _ -> raise Not_found)
   | "surname" ->
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x"
+      if (not p_auth) && Util.is_hide_names conf p then
+        str_val (NameDisplay.hidden_surname_txt :> string)
       else Gwdb.p_surname base p |> Util.escape_html |> safe_val
   | "surname_begin" ->
       if (not p_auth) && Util.is_hide_names conf p then null_val
@@ -3434,7 +3440,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         Gwdb.p_surname base p |> Util.surname_particle base |> Util.escape_html
         |> safe_val
   | "surname_end" ->
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x"
+      if (not p_auth) && Util.is_hide_names conf p then
+        str_val (NameDisplay.hidden_surname_txt :> string)
       else
         Gwdb.p_surname base p
         |> Util.surname_without_particle base
@@ -3525,12 +3532,9 @@ and eval_str_family_field env (ifam, _, _, _) = function
   | _ -> raise Not_found
 
 and simple_person_text conf base p p_auth : Adef.safe_string =
-  if p_auth then
-    match Util.main_title conf base p with
-    | Some t -> Util.titled_person_text conf base p t
-    | None -> Util.gen_person_text conf base p
-  else if Util.is_hide_names conf p then Adef.safe "x x"
-  else Util.gen_person_text conf base p
+  match Util.main_title conf base p with
+  | Some t when p_auth -> NameDisplay.title_html_of_person conf base p t
+  | Some _ | None -> NameDisplay.fullname_html_of_person conf base p
 
 and string_of_died conf p p_auth =
   Adef.safe

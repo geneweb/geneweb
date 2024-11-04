@@ -28,9 +28,13 @@ let rec dump_ast trk depth =
   | Afor (a, b, c, d) ->
     "(Afor " ^ trk a ^ "," ^ dump_ast b ^ "," ^ dump_ast c ^ "," ^ dump_ast_list d ^ ")"
   | Adefine (a, b, c, d) ->
-    "(Adefine " ^ trk a ^ "," ^ String.concat "." b ^ "," ^ dump_ast_list c ^ "," ^ dump_ast_list d ^ ")"
+    "(Adefine " ^ trk a ^ "," ^ String.concat "." (List.map (fun (a, dft) -> a ^
+    	      match dft with None -> "" | Some dft -> "=" ^ dump_ast dft) b) ^ "," ^ dump_ast_list c ^ "," ^ dump_ast_list d ^ ")"
   | Aapply (_, a, b) ->
-    "(Aapply " ^ trk a ^ "," ^ dump_ast_list_list b ^ ")"
+    "(Aapply " ^ trk a ^ "," ^ (String.concat "," (List.map (fun (id, ast) ->
+    match id with
+    | Some id -> id ^ ":" ^ dump_ast_list ast
+    | None -> dump_ast_list ast) b)) ^ ")"
   | Alet (a, b, c) ->
     "(Alet " ^ trk a ^ "," ^ dump_ast_list b ^ "," ^ dump_ast_list c ^ ")"
   | Aop1 (_, a, b) ->
@@ -355,7 +359,7 @@ and parse_simple_expr = parse
       let pos = pos lexbuf in
       let [@warning "-8"] hd :: tl = String.split_on_char '.' id in
       try
-        Aapply (pos, hd, parse_tuple lexbuf)
+        Aapply (pos, hd, List.map (fun v -> None, v) (parse_tuple lexbuf))
       with _ -> Avar (pos, hd, tl)
     }
 
@@ -369,6 +373,30 @@ and parse_simple_expr_1 = parse
 and discard_RPAREN = parse
   | ws* ')' {
       ()
+    }
+
+and parse_apply_tuple = parse
+  | ws* '(' ws* ')' {
+      []
+    }
+  | ws* '(' {
+     parse_apply_tuple_1 lexbuf
+  }
+and parse_apply_tuple_1 = parse
+  | ws* (r_ident as id) ws* ':' {
+      let e = parse_expr_3 lexbuf in
+      (Some id, [e]) :: parse_apply_tuple_2 lexbuf
+    }
+  | ws* {
+     let e = parse_expr_3 lexbuf in
+     (None, [e]) :: parse_apply_tuple_2 lexbuf
+    }
+and parse_apply_tuple_2 = parse
+  | ws* ',' {
+    parse_apply_tuple_1 lexbuf
+    }
+  | ws* ')' {
+      []
     }
 
 and parse_tuple = parse
@@ -523,15 +551,23 @@ and parse_define conf b closing ast = parse
       (List.rev (Adefine (f, args, a, k) :: ast), t)
     }
 and parse_params = parse
+  | ws* (r_ident as a) ws* '=' ws* {
+      let e = parse_simple_expr lexbuf in
+      (a, Some e) :: parse_params_1 lexbuf
+    }
   | ws* (r_ident as a) {
-      a :: parse_params_1 lexbuf
+      (a, None) :: parse_params_1 lexbuf
     }
   | ws* ')' ws* {
       []
     }
 and parse_params_1 = parse
+  | ws* ',' ws* (r_ident as a) ws* '=' {
+      let e = parse_simple_expr lexbuf in
+      (a, Some e) :: parse_params_1 lexbuf
+    }
   | ws* ',' ws* (r_ident as a) {
-      a :: parse_params_1 lexbuf
+      (a, None) :: parse_params_1 lexbuf
     }
   | ws* ')' ws* {
       []
@@ -579,11 +615,11 @@ and parse_apply conf b = parse
           | a, _ -> [ a ]
         in loop ()
       in
-      Aapply (pos, f, app)
+      Aapply (pos, f, List.map (fun v -> None, v) app)
     }
   | (r_ident as f) {
       let pos = pos lexbuf in
-      let app = parse_tuple lexbuf in
+      let app = parse_apply_tuple lexbuf in
       Aapply (pos, f, app)
     }
 

@@ -155,113 +155,19 @@ val string_gen_family :
   (Gwdb.iper, Gwdb.ifam, string) Def.gen_family
 (** Remplaces string ids inside family's entry by their actual string value. *)
 
-val gen_person_text :
-  ?escape:bool ->
-  ?html:bool ->
-  ?sn:bool ->
-  ?chk:bool ->
-  ?p_first_name:(Gwdb.base -> Gwdb.person -> string) ->
-  ?p_surname:(Gwdb.base -> Gwdb.person -> string) ->
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Adef.safe_string
-(** Returns person's first name and surname HTML description depending on :
-    - his public name
-    - his qualifiers
-  If person is hiden returns ".....". If person's names are hiden
-  or access to them is denied returns "x x"
-  - if [html=false], doesn't encapsulates description in HTML tag <em>.
-  - if [sn=false], doesn't display surname
-  - if [chk=false], returns HTML description even if person's names are hiden
-    or access to them is denied (don't print "x x")
-*)
-
-val gen_person_title_text :
-  (Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Adef.safe_string ->
-  Adef.safe_string) ->
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Adef.safe_string
-(** [gen_person_title_text reference paccess conf base p] returns HTML structure
-    of person that describes person's first name surname and main title. [reference]
-    is used to either encapsulate structure in the link (or other type
-    of maniplations). *)
-
-val person_text_without_title :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
-(** Makes call to [gen_person_text_without_title] with [std_access] *)
-
 val main_title : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title option
 (** Returns main person's title. If person doesn't have it, then returns first title
     from the list. *)
 
 val max_ancestor_level : Config.config -> Gwdb.base -> Gwdb.iper -> int -> int
 
-val titled_person_text :
-  Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title -> Adef.safe_string
-(** Returns person's first name and surname text description depending on
-    person's title *)
-
 val one_title_text : Gwdb.base -> Gwdb.title -> Adef.safe_string
 (** Returns HTML representation of title's identifier with its place (if exists) *)
-
-val person_title_text :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
-(** Returns HTML structure of person that describes person's first name surname
-    and main title. Calls [gen_person_title_text] with [no_reference]. *)
 
 val person_title : Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 (** Returns HTML representation of person's main title (or first title if
     main doesn't exists). If person doesn't have a title or if access to
     person isn't granted returns empty string *)
-
-val child_of_parent :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
-
-val reference :
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Adef.safe_string ->
-  Adef.safe_string
-(** [reference conf base p desc] returns HTML link to the person
-    where [desc] is content of the link (generaly his first name and
-    surname description). If person is hidden returns [desc] (do not
-    create link). *)
-
-val reference_noid :
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Adef.safe_string ->
-  Adef.safe_string
-(** Same as [reference] but link doesn't has "id" field *)
-
-val no_reference :
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Adef.safe_string ->
-  Adef.safe_string
-(** [reference conf base p desc] returns [desc] without creating a link *)
-
-val referenced_person_title_text :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
-(** Retruns HTML link to the person that contains its first name, surname and person's
-    nobility title. Calls [gen_person_title_text] with [reference]. *)
-
-val referenced_person_text :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
-(** Returns HTML link to the person that contains its first name and surname. *)
-
-val referenced_person_text_without_surname :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
-(** Returns HTML link to the person that contains its first name. *)
 
 val update_family_loop :
   Config.config ->
@@ -310,9 +216,6 @@ val surname_without_particle : Gwdb.base -> string -> string
 (** [surname_without_particle base sn]
     Remove the particle of [sn] if there is one.
     The list of particles to use is defined in [base]. *)
-
-val specify_homonymous :
-  Config.config -> Gwdb.base -> Gwdb.person -> bool -> unit
 
 val get_approx_birth_date_place :
   Gwdb.base -> Gwdb.person -> Date.date option * Adef.safe_string
@@ -405,9 +308,6 @@ val relation_txt :
 
 val string_of_decimal_num : Config.config -> float -> string
 val person_exists : Config.config -> Gwdb.base -> string * string * int -> bool
-
-val husband_wife :
-  Config.config -> Gwdb.base -> Gwdb.person -> bool -> Adef.safe_string
 
 val find_person_in_env :
   Config.config -> Gwdb.base -> string -> Gwdb.person option

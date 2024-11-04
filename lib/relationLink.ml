@@ -224,7 +224,7 @@ let find_prev_branch conf base dist ia sa ipl =
 
 let someone_text conf base ip =
   let p = pget conf base ip in
-  referenced_person_title_text conf base p
+  NameDisplay.referenced_person_title_text conf base p
   ^^^ DateDisplay.short_dates_text conf base p
 
 let spouse_text conf base end_sp ip ipl =
