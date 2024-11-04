@@ -44,6 +44,7 @@
     uucp
     uunf
     uutf
+    yojson
     zarith
   )
   (depopts

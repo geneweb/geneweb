@@ -28,6 +28,8 @@ type wiki_link =
   | WLwizard of int * string * string
   | WLnone of int * string
 
+(* search in a note (s) wiki references
+   to persons [[fn/sn/oc/txt]] or pages [[[page/text]]] *)
 let misc_notes_link s i =
   let slen = String.length s in
   let cut j = String.sub s i (j - i) in
