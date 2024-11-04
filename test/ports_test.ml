@@ -2,8 +2,6 @@
 
 (* TODO use https://gedcom.io/tools/#example-familysearch-gedcom-70-files to test gedcom v7.0 *)
 
-open Alcotest
-
 let ged_import filename base_name =
   let () = Ged2gwb_lib.State.in_file := filename in
   let () = Ged2gwb_lib.State.out_file := base_name in
@@ -80,19 +78,22 @@ let ( nb_real_persons_1,
     nb_families_3 )
 
 let test_royal_ged () =
-  (check int) "nb_real_persons_1 = 3010" 3010 nb_real_persons_1;
-  (check int) "nb_families_1 = 1425" 1425 nb_families_1;
-  (check int) "nb_real_persons_1 = nb_real_persons_2" nb_real_persons_1
-    nb_real_persons_2;
-  (check int) "nb_families_1 = nb_families_2" nb_families_1 nb_families_2;
+  (Alcotest.check Alcotest.int)
+    "nb_real_persons_1 = 3010" 3010 nb_real_persons_1;
+  (Alcotest.check Alcotest.int) "nb_families_1 = 1425" 1425 nb_families_1;
+  (Alcotest.check Alcotest.int)
+    "nb_real_persons_1 = nb_real_persons_2" nb_real_persons_1 nb_real_persons_2;
+  (Alcotest.check Alcotest.int)
+    "nb_families_1 = nb_families_2" nb_families_1 nb_families_2;
   ()
 
 let test_royal_gw () =
   (* TODO base_3 has 13 more persons
      is it related to https://github.com/geneweb/geneweb/issues/800 ? *)
-  (check int) "nb_real_persons_1 = nb_real_persons_3" nb_real_persons_1
-    nb_real_persons_3;
-  (check int) "nb_families_1 = nb_families_3" nb_families_1 nb_families_3;
+  (Alcotest.check Alcotest.int)
+    "nb_real_persons_1 = nb_real_persons_3" nb_real_persons_1 nb_real_persons_3;
+  (Alcotest.check Alcotest.int)
+    "nb_families_1 = nb_families_3" nb_families_1 nb_families_3;
   ()
 
 (* -- tests on abc.ged -- *)
@@ -144,7 +145,6 @@ let marriage_date = Geneweb.Event.get_date marriage
 
 let marriage_witness, marriage_witness_kind, marriage_wnote =
   let witnesses = Geneweb.Event.get_witnesses_and_notes marriage in
-  (*(check int) "Array witness length" 1 (Array.length witnesses);*)
   assert (Array.length witnesses = 1);
   let w, wk, wnote = witnesses.(0) in
   (Gwdb.poi base w, wk, Gwdb.sou base wnote)
@@ -171,7 +171,6 @@ let diploma =
 
 let _w, diploma_witness_kind, diploma_wnote =
   let witnesses = Geneweb.Event.get_witnesses_and_notes diploma in
-  (*(check int) "array witness len" 1 (Array.length witnesses);*)
   assert (Array.length witnesses = 1);
   let w, wk, wnote = witnesses.(0) in
   (w, wk, Gwdb.sou base wnote)
@@ -194,7 +193,7 @@ let () = Gwdb.close_base base
 (* -- *)
 
 let test_abc_number () =
-  (check int) "nb_of_persons = 3" 3 nb_of_persons;
+  (Alcotest.check Alcotest.int) "nb_of_persons = 3" 3 nb_of_persons;
   ()
 
 let test_abc_birth_event () =
@@ -205,9 +204,11 @@ let test_abc_birth_event () =
         Date.compare_dmy dmy
           { day = 1; month = 1; year = 1990; prec = Date.Sure; delta = 0 }
         = 0));
-  (check string) "birth note" "This is a note on a birth event" birth_note;
-  (check string) "birth source" "This is a source on a birth event" birth_source;
-  (check string) "birth place" "Paris" birth_place;
+  (Alcotest.check Alcotest.string)
+    "birth note" "This is a note on a birth event" birth_note;
+  (Alcotest.check Alcotest.string)
+    "birth source" "This is a source on a birth event" birth_source;
+  (Alcotest.check Alcotest.string) "birth place" "Paris" birth_place;
   ()
 
 (* check family marriage event *)
@@ -215,41 +216,50 @@ let test_abc_marriage () =
   (match Date.cdate_to_dmy_opt marriage_date with
   | None -> failwith "no marriage date"
   | Some dmy ->
-      (check bool) "compare dmy" true
+      (Alcotest.check Alcotest.bool)
+        "compare dmy" true
         (Date.compare_dmy dmy
            { day = 18; month = 05; year = 2013; prec = Date.Sure; delta = 0 }
         = 0));
-  (check string) "note on marriage event" "This is a note on a marriage event"
-    marriage_note;
-  (check string) "source on marriage event"
-    "This is a source on a marriage event" marriage_source;
-  (check string) "place marriage" "Lyon" marriage_place;
-  (check string) "first_name_witness" "c" marriage_witness_fn;
-  (check string) "surname_witness" "C" marriage_witness_sn;
-  (check bool) "witness kind" true
+  (Alcotest.check Alcotest.string)
+    "note on marriage event" "This is a note on a marriage event" marriage_note;
+  (Alcotest.check Alcotest.string)
+    "source on marriage event" "This is a source on a marriage event"
+    marriage_source;
+  (Alcotest.check Alcotest.string) "place marriage" "Lyon" marriage_place;
+  (Alcotest.check Alcotest.string) "first_name_witness" "c" marriage_witness_fn;
+  (Alcotest.check Alcotest.string) "surname_witness" "C" marriage_witness_sn;
+  (Alcotest.check Alcotest.bool)
+    "witness kind" true
     (marriage_witness_kind = Def.Witness_Attending);
-  (check string) "marriage_wnote" "This is a witness note on a marriage event"
-    marriage_wnote;
+  (Alcotest.check Alcotest.string)
+    "marriage_wnote" "This is a witness note on a marriage event" marriage_wnote;
   ()
 
 (* check Degree event *)
 let test_abc_degree_event () =
-  (check string) "note" "This is a note on a diploma event" diploma_note;
-  (check string) "source" "This is a source on a diploma event" diploma_source;
-  (check bool) "witness kind" true (diploma_witness_kind = Def.Witness);
-  (check string) "wnote" "This is a witness note on a diploma event"
-    diploma_wnote;
+  (Alcotest.check Alcotest.string)
+    "note" "This is a note on a diploma event" diploma_note;
+  (Alcotest.check Alcotest.string)
+    "source" "This is a source on a diploma event" diploma_source;
+  (Alcotest.check Alcotest.bool)
+    "witness kind" true
+    (diploma_witness_kind = Def.Witness);
+  (Alcotest.check Alcotest.string)
+    "wnote" "This is a witness note on a diploma event" diploma_wnote;
   ()
 
 let test_abc_title () =
-  (check string) "this is a title" "This is a title" title_ident;
-  (check string) "this is a fief" "This is a Fief" title_place;
-  (check bool) "title name" true title_name_b;
-  (check int) "title nth" 1 title.t_nth
+  (Alcotest.check Alcotest.string)
+    "this is a title" "This is a title" title_ident;
+  (Alcotest.check Alcotest.string) "this is a fief" "This is a Fief" title_place;
+  (Alcotest.check Alcotest.bool) "title name" true title_name_b;
+  (Alcotest.check Alcotest.int) "title nth" 1 title.t_nth
 
 let test_abc_br () =
   (* TODO <br> bug at import https://github.com/geneweb/geneweb/issues/1002 *)
-  (check string) "comment fam"
+  (Alcotest.check Alcotest.string)
+    "comment fam"
     "This is a comment on a family\n\nthis is a line after an empty line"
     fam_comment;
   ()
@@ -279,25 +289,26 @@ I also like [[[geneweb]]]
 '''GeneWeb''' est un logiciel de généalogie libre et gratuit doté d'une
 interface web, utilisable aussi bien sur un ordinateur non connecté à Internet qu'en service web. Initialement conçu en 1997 par Daniel de Rauglaudre, il utilise des techniques de calcul de parenté et de consanguinité innovantes, mises au point par Daniel de Rauglaudre et Didier Rémy, directeur de recherche à l'Institut national de recherche en informatique et en automatique.|}
   in
-  (check string) "wiki notes" s wiki;
+  (Alcotest.check Alcotest.string) "wiki notes" s wiki;
   ()
 
 let v =
   [
-    ("gedcom-royal", [ test_case "Gedcom import export" `Quick test_royal_ged ]);
-    ("gw-royal", [ test_case "Gw from gedcom" `Quick test_royal_gw ]);
+    ( "gedcom-royal",
+      [ Alcotest.test_case "Gedcom import export" `Quick test_royal_ged ] );
+    ("gw-royal", [ Alcotest.test_case "Gw from gedcom" `Quick test_royal_gw ]);
     ( "abc",
       [
-        test_case "Abc number" `Quick test_abc_number;
-        test_case "Abc birth event" `Quick test_abc_birth_event;
-        test_case "Abc marriage event" `Quick test_abc_marriage;
-        test_case "Abc Degree event" `Quick test_abc_degree_event;
-        test_case "Abc title" `Quick test_abc_title;
+        Alcotest.test_case "Abc number" `Quick test_abc_number;
+        Alcotest.test_case "Abc birth event" `Quick test_abc_birth_event;
+        Alcotest.test_case "Abc marriage event" `Quick test_abc_marriage;
+        Alcotest.test_case "Abc Degree event" `Quick test_abc_degree_event;
+        Alcotest.test_case "Abc title" `Quick test_abc_title;
       ] );
     ( "notes-br",
       [
         (* TODO <br> are inserted at gedcom import, removed at gedcom export, but not at gw export *)
-        test_case "Abc <br> in notes" `Quick test_abc_br;
-        test_case "Abc base notes" `Quick test_abc_base_notes;
+        Alcotest.test_case "Abc <br> in notes" `Quick test_abc_br;
+        Alcotest.test_case "Abc base notes" `Quick test_abc_base_notes;
       ] );
   ]
