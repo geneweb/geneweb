@@ -379,6 +379,19 @@ let string_of_modify_link conf cnt empty = function
       ^ if empty then "</p>" else "</div>"
   | _ -> ""
 
+let sub_sub_list lev tag2 s1 =
+  if tag2 = "dt" && String.contains s1 ':' then
+    let i = String.index s1 ':' in
+    let s = String.sub s1 0 i in
+    let ss =
+      "\n"
+      ^ tab (lev + 1) "<dd>"
+      ^ String.sub s1 (i + 1) (String.length s1 - i - 1)
+      ^ "</dd>"
+    in
+    (s, ss)
+  else (s1, "")
+
 let rec tlsw_list tag1 tag2 lev list sl =
   let btag2 = "<" ^ tag2 ^ ">" in
   let etag2 = "</" ^ tag2 ^ ">" in
@@ -401,19 +414,6 @@ let rec tlsw_list tag1 tag2 lev list sl =
     loop list sl
   in
   tab lev ("</" ^ tag1 ^ ">") :: list
-
-and sub_sub_list lev tag2 s1 =
-  if tag2 = "dt" && String.contains s1 ':' then
-    let i = String.index s1 ':' in
-    let s = String.sub s1 0 i in
-    let ss =
-      "\n"
-      ^ tab (lev + 1) "<dd>"
-      ^ String.sub s1 (i + 1) (String.length s1 - i - 1)
-      ^ "</dd>"
-    in
-    (s, ss)
-  else (s1, "")
 
 and do_sub_list prompt lev list sl =
   let tag1, tag2 =
@@ -442,6 +442,31 @@ and do_sub_list prompt lev list sl =
         do_sub_list s.[0] lev list sl
       else (list, sl)
   | [] -> (list, sl)
+
+let rec select_list_lines conf prompt list = function
+  | s :: sl ->
+      let len = String.length s in
+      if len > 0 && s.[0] = '=' then (List.rev list, s :: sl)
+      else if len > 0 && s.[0] = prompt then
+        let s = String.sub s 1 (len - 1) in
+        let s, sl =
+          let rec loop s1 = function
+            | "" :: s :: sl
+              when String.length s > 1 && s.[0] = prompt && s.[1] = prompt ->
+                let br = "<br" ^ ">" in
+                loop (s1 ^ br ^ br) (s :: sl)
+            | s :: sl ->
+                if String.length s > 0 && s.[0] = '=' then (s1, s :: sl)
+                else if String.length s > 0 && s.[0] <> prompt then
+                  loop (s1 ^ "\n" ^ s) sl
+                else (s1, s :: sl)
+            | [] -> (s1, [])
+          in
+          loop s sl
+        in
+        select_list_lines conf prompt (s :: list) sl
+      else (List.rev list, s :: sl)
+  | [] -> (List.rev list, [])
 
 let rec hotl conf wlo cnt edit_opt sections_nums list = function
   | "__NOTOC__" :: sl -> hotl conf wlo cnt edit_opt sections_nums list sl
@@ -536,31 +561,6 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
             hotl conf wlo (cnt + 1) edit_opt sections_nums list (s :: sl)
           else hotl conf wlo cnt edit_opt sections_nums (s :: list) sl)
   | [] -> List.rev list
-
-and select_list_lines conf prompt list = function
-  | s :: sl ->
-      let len = String.length s in
-      if len > 0 && s.[0] = '=' then (List.rev list, s :: sl)
-      else if len > 0 && s.[0] = prompt then
-        let s = String.sub s 1 (len - 1) in
-        let s, sl =
-          let rec loop s1 = function
-            | "" :: s :: sl
-              when String.length s > 1 && s.[0] = prompt && s.[1] = prompt ->
-                let br = "<br" ^ ">" in
-                loop (s1 ^ br ^ br) (s :: sl)
-            | s :: sl ->
-                if String.length s > 0 && s.[0] = '=' then (s1, s :: sl)
-                else if String.length s > 0 && s.[0] <> prompt then
-                  loop (s1 ^ "\n" ^ s) sl
-                else (s1, s :: sl)
-            | [] -> (s1, [])
-          in
-          loop s sl
-        in
-        select_list_lines conf prompt (s :: list) sl
-      else (List.rev list, s :: sl)
-  | [] -> (List.rev list, [])
 
 let html_of_tlsw conf s =
   let lines, _ = lines_list_of_string s in
