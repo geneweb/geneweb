@@ -121,6 +121,8 @@ end = struct
 end
 
 module AdvancedSearchMatch : sig
+  type place = string * Gwdb.istr option
+
   val match_name :
     search_list:string list list -> exact:bool -> string list -> bool
 
@@ -143,7 +145,7 @@ module AdvancedSearchMatch : sig
     conf:Config.config ->
     base:Gwdb.base ->
     p:Gwdb.person ->
-    places:string list ->
+    places:place list ->
     default:bool ->
     dates:Date.dmy option * Date.dmy option ->
     bool
@@ -153,7 +155,7 @@ module AdvancedSearchMatch : sig
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -161,7 +163,7 @@ module AdvancedSearchMatch : sig
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -169,7 +171,7 @@ module AdvancedSearchMatch : sig
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -177,7 +179,7 @@ module AdvancedSearchMatch : sig
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -186,7 +188,7 @@ module AdvancedSearchMatch : sig
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:place list ->
       exact_place:bool ->
       bool
   end
@@ -194,6 +196,8 @@ module AdvancedSearchMatch : sig
   module And : Match
   module Or : Match
 end = struct
+  type place = string * Gwdb.istr option
+
   (* Check if the date matches with the person event. *)
   let match_date ~p ~df ~default ~dates =
     let d1, d2 = dates in
@@ -218,16 +222,21 @@ end = struct
   let match_married ~p ~married =
     if married = "" then true else married_cmp p married
 
-  let exact_place_wrapper ~get ~exact_place ~base ~p ~places ~default =
+  let exact_place_wrapper ~get ~exact_place ~base ~p ~(places : place list)
+      ~default =
     if places = [] then default
+    else if exact_place then
+      List.exists
+        (fun (_, istr_o) ->
+          match istr_o with
+          | None -> false
+          | Some istr -> Gwdb.compare_istr istr (get p) = 0)
+        places
     else
-      let cmp =
-        if exact_place then fun base str istr ->
-          abbrev_lower (Gwdb.sou base istr) = str
-        else fun base str istr ->
-          string_incl (abbrev_lower (Gwdb.sou base istr)) str
-      in
-      List.exists (fun s' -> cmp base s' (get p)) (List.map abbrev_lower places)
+      List.exists
+        (fun (str, _) ->
+          string_incl (abbrev_lower str) (abbrev_lower (Gwdb.sou base (get p))))
+        places
 
   let match_baptism_place = exact_place_wrapper ~get:get_baptism_place
   let match_birth_place = exact_place_wrapper ~get:get_birth_place
@@ -380,7 +389,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:(string * Gwdb.istr option) list ->
       exact_place:bool ->
       bool
 
@@ -388,7 +397,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:(string * Gwdb.istr option) list ->
       exact_place:bool ->
       bool
 
@@ -396,7 +405,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:(string * Gwdb.istr option) list ->
       exact_place:bool ->
       bool
 
@@ -404,7 +413,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:(string * Gwdb.istr option) list ->
       exact_place:bool ->
       bool
 
@@ -413,14 +422,14 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:string list ->
+      places:(string * Gwdb.istr option) list ->
       exact_place:bool ->
       bool
   end
 
   module And = struct
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
-        ~(places : string list) ~(exact_place : bool) =
+        ~(places : (string * Gwdb.istr option) list) ~(exact_place : bool) =
       date_f ~p ~default:true ~dates
       && place_f ~exact_place ~base ~p ~places ~default:true
 
@@ -437,7 +446,7 @@ end = struct
 
   module Or = struct
     let match_or date_f place_f ~(base : Gwdb.base) ~p ~dates
-        ~(places : string list) ~(exact_place : bool) =
+        ~(places : place list) ~(exact_place : bool) =
       date_f ~p ~default:false ~dates
       || place_f ~exact_place ~base ~p ~places ~default:false
 
@@ -497,6 +506,13 @@ let advanced_search conf base max_answers =
       Hashtbl.add hs x v;
       v
   in
+
+  let exact_place = "on" = gets "exact_place" in
+
+  let places_with_istrs =
+    List.map (fun str -> (str, Gwdb.find_opt_string_istr base str))
+  in
+
   let getss x =
     let y = gets x in
     if y <> "" then [ y ]
@@ -526,8 +542,6 @@ let advanced_search conf base max_answers =
   in
   let search_type = get_search_type gets in
 
-  let exact_place = "on" = gets "exact_place" in
-
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
     let auth = authorized_age conf base p in
@@ -547,11 +561,13 @@ let advanced_search conf base max_answers =
           let match_f ~date_field ~place_field or_f and_f =
             or_f ~base ~p
               ~dates:(getd @@ date_field ~gets ~search_type)
-              ~places:(getss @@ place_field ~gets ~search_type)
+              ~places:
+                (places_with_istrs @@ getss @@ place_field ~gets ~search_type)
               ~exact_place
             && and_f ~base ~p
                  ~dates:(getd @@ date_field ~gets ~search_type)
-                 ~places:(getss @@ place_field ~gets ~search_type)
+                 ~places:
+                   (places_with_istrs @@ getss @@ place_field ~gets ~search_type)
                  ~exact_place
           in
           Lazy.force civil_match
@@ -569,7 +585,9 @@ let advanced_search conf base max_answers =
              || match_f ~date_field:Fields.death_date
                   ~place_field:Fields.death_place Or.match_death And.match_death
              || match_marriage ~conf ~base ~p ~exact_place ~default:false
-                  ~places:(getss @@ Fields.marriage_place ~gets ~search_type)
+                  ~places:
+                    (places_with_istrs @@ getss
+                    @@ Fields.marriage_place ~gets ~search_type)
                   ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
              || match_f ~date_field:Fields.other_events_date
                   ~place_field:Fields.other_events_place
@@ -579,22 +597,34 @@ let advanced_search conf base max_answers =
           Lazy.force civil_match
           && And.match_baptism ~base ~p ~exact_place
                ~dates:(getd @@ Fields.bapt_date ~gets ~search_type)
-               ~places:(getss @@ Fields.bapt_place ~gets ~search_type)
+               ~places:
+                 (places_with_istrs @@ getss
+                 @@ Fields.bapt_place ~gets ~search_type)
           && And.match_birth ~base ~p ~exact_place
                ~dates:(getd @@ Fields.birth_date ~gets ~search_type)
-               ~places:(getss @@ Fields.birth_place ~gets ~search_type)
+               ~places:
+                 (places_with_istrs @@ getss
+                 @@ Fields.birth_place ~gets ~search_type)
           && And.match_burial ~base ~p ~exact_place
                ~dates:(getd @@ Fields.burial_date ~gets ~search_type)
-               ~places:(getss @@ Fields.burial_place ~gets ~search_type)
+               ~places:
+                 (places_with_istrs @@ getss
+                 @@ Fields.burial_place ~gets ~search_type)
           && And.match_death ~base ~p ~exact_place
                ~dates:(getd @@ Fields.death_date ~gets ~search_type)
-               ~places:(getss @@ Fields.death_place ~gets ~search_type)
+               ~places:
+                 (places_with_istrs @@ getss
+                 @@ Fields.death_place ~gets ~search_type)
           && match_marriage ~conf ~base ~p ~exact_place ~default:true
-               ~places:(getss @@ Fields.marriage_place ~gets ~search_type)
+               ~places:
+                 (places_with_istrs @@ getss
+                 @@ Fields.marriage_place ~gets ~search_type)
                ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
           && And.match_other_events ~conf ~base ~p ~exact_place
                ~dates:(getd @@ Fields.other_events_date ~gets ~search_type)
-               ~places:(getss @@ Fields.other_events_place ~gets ~search_type)
+               ~places:
+                 (places_with_istrs @@ getss
+                 @@ Fields.other_events_place ~gets ~search_type)
     in
     if pmatch then (p :: list, len + 1) else acc
   in
