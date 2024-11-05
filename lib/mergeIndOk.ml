@@ -439,6 +439,75 @@ let redirect_added_families base p ip2 p2_family =
     patch_couple base ifam cpl
   done
 
+let merge_carrousel conf base o_p1 o_p2 p =
+  (* move files of dir2 into dir1 *)
+  let rec move_files dir1 dir2 =
+    Array.iter
+      (fun entry ->
+        let full_path1 = Filename.concat dir1 entry in
+        let full_path2 = Filename.concat dir2 entry in
+        if (Unix.stat full_path2).st_kind = Unix.S_REG then
+          try
+            Sys.rename full_path2
+              (full_path1 ^ if full_path1 = full_path2 then "-copy" else "")
+          with e ->
+            Printf.eprintf "Error rename path2 (merge) %s\n"
+              (Printexc.to_string e)
+        else if
+          (Unix.stat full_path2).st_kind = Unix.S_DIR
+          && entry <> "." && entry <> ".."
+        then
+          if not (Sys.file_exists full_path1) then (
+            try Unix.mkdir full_path1 0o755
+            with e ->
+              Printf.eprintf "Error create save1 (merge) %s\n"
+                (Printexc.to_string e);
+              move_files full_path1 full_path2)
+          else ())
+      (Sys.readdir dir2)
+  in
+  let full_dir file = Filename.concat (!GWPARAM.images_d conf.bname) file in
+  let ofn = p.first_name in
+  let osn = p.surname in
+  let oocc = p.occ in
+  let ofn1 = sou base (get_first_name o_p1) in
+  let osn1 = sou base (get_surname o_p1) in
+  let oocc1 = get_occ o_p1 in
+  let ofn2 = sou base (get_first_name o_p2) in
+  let osn2 = sou base (get_surname o_p2) in
+  let oocc2 = get_occ o_p2 in
+  let dir0 = Printf.sprintf "%s.%d.%s" ofn oocc osn in
+  let dir1 = Printf.sprintf "%s.%d.%s" ofn1 oocc1 osn1 in
+  let dir2 = Printf.sprintf "%s.%d.%s" ofn2 oocc2 osn2 in
+  let dir0 = full_dir dir0 in
+  let dir1 = full_dir dir1 in
+  let dir2 = full_dir dir2 in
+  match (Sys.file_exists dir1, Sys.file_exists dir2) with
+  | true, true ->
+      if dir0 = dir1 then (
+        move_files dir0 dir2;
+        try Mutil.rm_rf dir2
+        with e ->
+          Printf.eprintf "Error delete dir2 (merge) %s\n" (Printexc.to_string e));
+      if dir0 = dir2 then (
+        move_files dir0 dir1;
+        try Mutil.rm_rf dir1
+        with e ->
+          Printf.eprintf "Error delete dir1 (merge) %s\n" (Printexc.to_string e))
+  | true, false -> (
+      if dir1 <> dir0 then
+        try Sys.rename dir1 dir0
+        with e ->
+          Printf.eprintf "Error rename dir1 (merge) %s\n" (Printexc.to_string e)
+      )
+  | false, true -> (
+      if dir2 <> dir0 then
+        try Sys.rename dir2 dir0
+        with e ->
+          Printf.eprintf "Error rename dir2 (merge) %s\n" (Printexc.to_string e)
+      )
+  | false, false -> ()
+
 let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let conf = Update.update_conf o_conf in
   let p_family = get_family (poi base sp.key_index) in
