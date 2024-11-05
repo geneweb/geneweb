@@ -1,4 +1,17 @@
 (* TODOOCP *)
+
+val merge_carrousel :
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  Gwdb.person ->
+  ( Gwdb.iper,
+    string * string * int * Update.create * string,
+    string )
+  Def.gen_person ->
+  unit
+(** merge person 1 and 2 carrousel into third *)
+
 val reconstitute :
   Config.config ->
   Gwdb.base ->
