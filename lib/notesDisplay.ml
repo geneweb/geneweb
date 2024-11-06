@@ -191,13 +191,12 @@ let linked_page_rows conf base pg =
            (Utf8.capitalize (transl conf "base notes"))
            (Util.safe_html fnote_title :> string))
   | Def.NLDB.PgMisc fnotes, typ ->
+      let nenv, _ = read_notes base fnotes in
+      let n_type = try List.assoc "TYPE" nenv with Not_found -> "" in
       if
         match typ with
-        | Some t ->
-            let nenv, _ = read_notes base fnotes in
-            let n_type = try List.assoc "TYPE" nenv with Not_found -> "" in
-            t = n_type
-        | None -> true
+        | Some t when t = "" -> t = n_type
+        | _ -> true
       then (
         let fnote_title = fmt_fnote_title conf base fnotes in
         if conf.wizard then
@@ -206,10 +205,14 @@ let linked_page_rows conf base pg =
                {|
 <td class="text-center">
   <a href="%sm=MOD_NOTES&f=%s" title="%s">
-    <i class="far fa-file-lines"></i></a></td>|}
+    <i class="%s"></i></a></td>|}
                (commd conf :> string)
                (Util.uri_encode fnotes)
-               (Utf8.capitalize_fst (transl conf "modify note")));
+               (Utf8.capitalize_fst (transl conf 
+               (if n_type = "gallery" then "modify gallery"
+                else "modify note")))
+               (if n_type = "gallery" then "far fa-image"
+                else "far fa-file-lines"));
         Output.print_sstring conf
           (Format.sprintf
              {|
