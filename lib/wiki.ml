@@ -1,34 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* TLSW: Text Language Stolen to Wikipedia
-   = title level 1 =
-   == title level 2 ==
-   ...
-   ====== title level 6 ======
-   * list ul/li item
-   * list ul/li item
-   ** list ul/li item 2nd level
-   ** list ul/li item 2nd level
-   ...
-   # list ol/li item
-   : indentation list dl/dd item
-   ; list dl dt item ; dd item
-   ''italic''
-   '''bold'''
-   '''''bold+italic'''''
-   [[first_name/surname/oc/text]] link; 'text' displayed
-   [[first_name/surname/text]] link (oc = 0); 'text' displayed
-   [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
-   [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
-   [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
-   empty line : new paragraph
-   lines starting with space : displayed as they are (providing 1/ there
-     are at least two 2/ there is empty lines before and after the group
-     of lines).
-   __TOC__ : summary
-   __SHORT_TOC__ : short summary (unnumbered)
-   __NOTOC__ : no (automatic) numbered summary *)
-
 module Buff2 = Buff.Make ()
 module Buff = Buff.Make ()
 
