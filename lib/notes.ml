@@ -1,5 +1,9 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+let limit_display_length =
+  let max_display_length = 4 * 1_000_000 in
+  fun s -> String.sub s 0 (min (String.length s) max_display_length)
+
 let file_path conf base fname =
   Util.bpath
     (List.fold_left Filename.concat
@@ -11,9 +15,12 @@ let path_of_fnotes fnotes =
   | Some (dl, f) -> List.fold_right Filename.concat dl f
   | None -> ""
 
-let read_notes base fnotes =
+let read_notes ?(limit = true) base fnotes =
   let fnotes = path_of_fnotes fnotes in
-  let s = Gwdb.base_notes_read base fnotes in
+  let s =
+    (if limit then limit_display_length else Fun.id)
+    @@ Gwdb.base_notes_read base fnotes
+  in
   Wiki.split_title_and_text s
 
 let merge_possible_aliases conf db =
@@ -163,7 +170,7 @@ let commit_notes conf base fnotes s =
   update_notes_links_db base pg s
 
 let wiki_aux pp conf base env str =
-  let s = Util.string_with_macros conf env str in
+  let s = Util.string_with_macros conf env (limit_display_length str) in
   let lines = pp (Wiki.html_of_tlsw conf s) in
   let wi =
     {

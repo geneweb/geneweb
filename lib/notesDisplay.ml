@@ -270,7 +270,7 @@ let print_mod conf base =
       conf.Config.bname
       (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let env, s = Notes.read_notes base fnotes in
+  let env, s = Notes.read_notes ~limit:false base fnotes in
   Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title env s
 
 let print_mod_ok conf base =
@@ -280,7 +280,7 @@ let print_mod_ok conf base =
   in
   let edit_mode _ = if conf.Config.wizard then Some "NOTES" else None in
   let mode = "NOTES" in
-  let read_string = Notes.read_notes base in
+  let read_string = Notes.read_notes ~limit:false base in
   let commit = Notes.commit_notes conf base in
   let string_filter = Util.string_with_macros conf [] in
   let file_path = Notes.file_path conf base in

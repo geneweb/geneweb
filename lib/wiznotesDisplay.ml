@@ -35,7 +35,7 @@ let read_auth_file fname =
       (au.Util.au_user, (wizname, (wizorder, islash))))
     data
 
-let read_wizard_notes fname =
+let read_wizard_notes ?(limit = true) fname =
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | None -> ("", 0.)
   | Some ic ->
@@ -58,7 +58,8 @@ let read_wizard_notes fname =
             len
       in
       let len = loop len in
-      (Buff.get len, date)
+      ( (if limit then Notes.limit_display_length else Fun.id) @@ Buff.get len,
+        date )
 
 let write_wizard_notes fname nn =
   if nn = "" then Files.rm fname
@@ -471,7 +472,7 @@ let print_mod conf base =
       if can_edit then
         let title = wizard_page_title conf (Util.escape_html wz) in
         let wfile = wzfile (dir conf base) wz in
-        let s, _ = read_wizard_notes wfile in
+        let s, _ = read_wizard_notes ~limit:false wfile in
         Wiki.print_mod_view_page conf true (Adef.encoded "WIZNOTES") wz title []
           s
       else Hutil.incorrect_request conf)
@@ -505,7 +506,7 @@ let print_mod_ok conf base =
     in
     let mode = "NOTES" in
     let read_string wz =
-      ([], fst (read_wizard_notes (wzfile (dir conf base) wz)))
+      ([], fst (read_wizard_notes ~limit:false (wzfile (dir conf base) wz)))
     in
     let commit = commit_wiznotes conf base in
     let string_filter s = Util.string_with_macros conf [] s in

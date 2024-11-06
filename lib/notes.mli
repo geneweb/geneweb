@@ -11,7 +11,9 @@ val update_notes_links_db :
   Gwdb.base -> (Gwdb.iper, Gwdb.ifam) Def.NLDB.page -> string -> unit
 
 val file_path : Config.config -> Gwdb.base -> string -> string
-val read_notes : Gwdb.base -> string -> (string * string) list * string
+
+val read_notes :
+  ?limit:bool -> Gwdb.base -> string -> (string * string) list * string
 
 val merge_possible_aliases :
   Config.config ->
@@ -59,3 +61,5 @@ val source_note_with_env :
 (** [source_note_with_env conf base env str]
     Interprets wiki syntax in a "source" context with a predefined env.
 *)
+
+val limit_display_length : string -> string
