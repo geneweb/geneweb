@@ -693,11 +693,16 @@ let advanced_search conf base max_answers =
               l
       in
       loop ([], 0) list
-    else
-      Gwdb.Collection.fold_until
-        (fun (_, len) -> len <= max_answers)
-        (fun acc i -> match_person acc (pget conf base i) search_type)
-        ([], 0) (Gwdb.ipers base)
+    else (
+      Gwdb.load_persons_array base;
+      let result =
+        Gwdb.Collection.fold_until
+          (fun (_, len) -> len <= max_answers)
+          (fun acc i -> match_person acc (pget conf base i) search_type)
+          ([], 0) (Gwdb.ipers base)
+      in
+      Gwdb.clear_persons_array base;
+      result)
   in
   (List.rev list, len)
 
