@@ -2392,3 +2392,8 @@ let has_children base u =
       let des = Gwdb.foi base ifam in
       Array.length (Gwdb.get_children des) > 0)
     (Gwdb.get_family u)
+
+module StrMap = Map.Make (struct
+    type t = string
+    let compare = String.compare
+  end)

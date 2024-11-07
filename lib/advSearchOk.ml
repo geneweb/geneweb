@@ -34,22 +34,39 @@ let rec skip_no_spaces x i =
   else if String.unsafe_get x i != ' ' then skip_no_spaces x (i + 1)
   else i
 
-let string_incl x y =
-  let rec loop j_ini =
-    if j_ini = String.length y then false
-    else
-      let rec loop1 i j =
-        if i = String.length x then
-          if j = String.length y then true
-          else String.unsafe_get y j = ' ' || String.unsafe_get y (j - 1) = ' '
-        else if
-          j < String.length y && String.unsafe_get x i = String.unsafe_get y j
-        then loop1 (i + 1) (j + 1)
-        else loop (skip_spaces y (skip_no_spaces y j_ini))
-      in
-      loop1 0 j_ini
-  in
-  loop 0
+let string_incl =
+  let memo : (string, bool Util.StrMap.t) Hashtbl.t = Hashtbl.create 10 in
+  fun x y ->
+    let rec loop j_ini =
+      if j_ini = String.length y then false
+      else
+        let rec loop1 i j =
+          if i = String.length x then
+            if j = String.length y then true
+            else String.unsafe_get y j = ' ' || String.unsafe_get y (j - 1) = ' '
+          else if
+            j < String.length y && String.unsafe_get x i = String.unsafe_get y j
+          then loop1 (i + 1) (j + 1)
+          else loop (skip_spaces y (skip_no_spaces y j_ini))
+        in
+        loop1 0 j_ini
+    in
+
+    match Hashtbl.find_opt memo x with
+    | Some map -> begin
+        match StrMap.find_opt y map with
+        | Some b -> b
+        | None ->
+          let b = loop 0 in
+          let map = Util.StrMap.add y b map in
+          Hashtbl.replace memo x map;
+          b
+      end
+    | None ->
+      let b = loop 0 in
+      let map = Util.StrMap.add y b Util.StrMap.empty in
+      Hashtbl.replace memo x map;
+      b
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
 let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
@@ -121,7 +138,7 @@ end = struct
 end
 
 module AdvancedSearchMatch : sig
-  type place = string * Gwdb.istr option
+  type place = string * (string * Gwdb.istr option)
 
   val match_name :
     search_list:string list list -> exact:bool -> string list -> bool
@@ -196,7 +213,7 @@ module AdvancedSearchMatch : sig
   module And : Match
   module Or : Match
 end = struct
-  type place = string * Gwdb.istr option
+  type place = string * (string * Gwdb.istr option)
 
   (* Check if the date matches with the person event. *)
   let match_date ~p ~df ~default ~dates =
@@ -227,15 +244,15 @@ end = struct
     if places = [] then default
     else if exact_place then
       List.exists
-        (fun (_, istr_o) ->
+        (fun (_, (_, istr_o)) ->
           match istr_o with
           | None -> false
           | Some istr -> Gwdb.compare_istr istr (get p) = 0)
         places
     else
       List.exists
-        (fun (str, _) ->
-          string_incl (abbrev_lower str) (abbrev_lower (Gwdb.sou base (get p))))
+        (fun (_, (abbreved_str, _)) ->
+          string_incl abbreved_str (abbrev_lower (Gwdb.sou base (get p))))
         places
 
   let match_baptism_place = exact_place_wrapper ~get:get_baptism_place
@@ -389,7 +406,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:(string * Gwdb.istr option) list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -397,7 +414,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:(string * Gwdb.istr option) list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -405,7 +422,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:(string * Gwdb.istr option) list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -413,7 +430,7 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:(string * Gwdb.istr option) list ->
+      places:place list ->
       exact_place:bool ->
       bool
 
@@ -422,14 +439,14 @@ end = struct
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.dmy option * Date.dmy option ->
-      places:(string * Gwdb.istr option) list ->
+      places:place list ->
       exact_place:bool ->
       bool
   end
 
   module And = struct
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
-        ~(places : (string * Gwdb.istr option) list) ~(exact_place : bool) =
+        ~(places : place list) ~(exact_place : bool) =
       date_f ~p ~default:true ~dates
       && place_f ~exact_place ~base ~p ~places ~default:true
 
@@ -510,13 +527,16 @@ let advanced_search conf base max_answers =
   let exact_place = "on" = gets "exact_place" in
 
   let places_with_istrs =
-    let memo : (string * Gwdb.istr option) list ref = ref [] in
+    let memo : (string * (string * Gwdb.istr option)) list ref = ref [] in
     fun places ->
       List.map
         (fun str ->
           try (str, List.assoc str !memo)
           with Not_found ->
-            let res = (str, Gwdb.find_opt_string_istr base str) in
+            let abbreved_str = abbrev_lower str in
+            let res =
+              (str, (abbreved_str, Gwdb.find_opt_string_istr base str))
+            in
             memo := res :: !memo;
             res)
         places
