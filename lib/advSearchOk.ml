@@ -510,7 +510,16 @@ let advanced_search conf base max_answers =
   let exact_place = "on" = gets "exact_place" in
 
   let places_with_istrs =
-    List.map (fun str -> (str, Gwdb.find_opt_string_istr base str))
+    let memo : (string * Gwdb.istr option) list ref = ref [] in
+    fun places ->
+      List.map
+        (fun str ->
+          try (str, List.assoc str !memo)
+          with Not_found ->
+            let res = (str, Gwdb.find_opt_string_istr base str) in
+            memo := res :: !memo;
+            res)
+        places
   in
 
   let getss x =
@@ -542,6 +551,16 @@ let advanced_search conf base max_answers =
   in
   let search_type = get_search_type gets in
 
+  let place_searched place_field =
+    lazy (places_with_istrs @@ getss @@ place_field ~gets ~search_type)
+  in
+  let birth_place_searched = place_searched Fields.birth_place in
+  let bapt_place_searched = place_searched Fields.birth_place in
+  let burial_place_searched = place_searched Fields.birth_place in
+  let death_place_searched = place_searched Fields.birth_place in
+  let marriage_place_searched = place_searched Fields.birth_place in
+  let other_events_place_searched = place_searched Fields.other_events_place in
+
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
     let auth = authorized_age conf base p in
@@ -561,70 +580,54 @@ let advanced_search conf base max_answers =
           let match_f ~date_field ~place_field or_f and_f =
             or_f ~base ~p
               ~dates:(getd @@ date_field ~gets ~search_type)
-              ~places:
-                (places_with_istrs @@ getss @@ place_field ~gets ~search_type)
-              ~exact_place
+              ~places:(Lazy.force place_field) ~exact_place
             && and_f ~base ~p
                  ~dates:(getd @@ date_field ~gets ~search_type)
-                 ~places:
-                   (places_with_istrs @@ getss @@ place_field ~gets ~search_type)
-                 ~exact_place
+                 ~places:(Lazy.force place_field) ~exact_place
           in
           Lazy.force civil_match
           && (getss "place" = []
               && gets "date2_yyyy" = ""
               && gets "date1_yyyy" = ""
              || match_f ~date_field:Fields.bapt_date
-                  ~place_field:Fields.bapt_place Or.match_baptism
+                  ~place_field:bapt_place_searched Or.match_baptism
                   And.match_baptism
              || match_f ~date_field:Fields.birth_date
-                  ~place_field:Fields.birth_place Or.match_birth And.match_birth
+                  ~place_field:birth_place_searched Or.match_birth
+                  And.match_birth
              || match_f ~date_field:Fields.burial_date
-                  ~place_field:Fields.burial_place Or.match_burial
+                  ~place_field:burial_place_searched Or.match_burial
                   And.match_burial
              || match_f ~date_field:Fields.death_date
-                  ~place_field:Fields.death_place Or.match_death And.match_death
+                  ~place_field:death_place_searched Or.match_death
+                  And.match_death
              || match_marriage ~conf ~base ~p ~exact_place ~default:false
-                  ~places:
-                    (places_with_istrs @@ getss
-                    @@ Fields.marriage_place ~gets ~search_type)
+                  ~places:(Lazy.force marriage_place_searched)
                   ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
              || match_f ~date_field:Fields.other_events_date
-                  ~place_field:Fields.other_events_place
+                  ~place_field:other_events_place_searched
                   (Or.match_other_events ~conf)
                   (And.match_other_events ~conf))
       | _ ->
           Lazy.force civil_match
           && And.match_baptism ~base ~p ~exact_place
                ~dates:(getd @@ Fields.bapt_date ~gets ~search_type)
-               ~places:
-                 (places_with_istrs @@ getss
-                 @@ Fields.bapt_place ~gets ~search_type)
+               ~places:(Lazy.force bapt_place_searched)
           && And.match_birth ~base ~p ~exact_place
                ~dates:(getd @@ Fields.birth_date ~gets ~search_type)
-               ~places:
-                 (places_with_istrs @@ getss
-                 @@ Fields.birth_place ~gets ~search_type)
+               ~places:(Lazy.force birth_place_searched)
           && And.match_burial ~base ~p ~exact_place
                ~dates:(getd @@ Fields.burial_date ~gets ~search_type)
-               ~places:
-                 (places_with_istrs @@ getss
-                 @@ Fields.burial_place ~gets ~search_type)
+               ~places:(Lazy.force burial_place_searched)
           && And.match_death ~base ~p ~exact_place
                ~dates:(getd @@ Fields.death_date ~gets ~search_type)
-               ~places:
-                 (places_with_istrs @@ getss
-                 @@ Fields.death_place ~gets ~search_type)
+               ~places:(Lazy.force death_place_searched)
           && match_marriage ~conf ~base ~p ~exact_place ~default:true
-               ~places:
-                 (places_with_istrs @@ getss
-                 @@ Fields.marriage_place ~gets ~search_type)
+               ~places:(Lazy.force marriage_place_searched)
                ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
           && And.match_other_events ~conf ~base ~p ~exact_place
                ~dates:(getd @@ Fields.other_events_date ~gets ~search_type)
-               ~places:
-                 (places_with_istrs @@ getss
-                 @@ Fields.other_events_place ~gets ~search_type)
+               ~places:(Lazy.force other_events_place_searched)
     in
     if pmatch then (p :: list, len + 1) else acc
   in
