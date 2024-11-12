@@ -409,7 +409,7 @@ val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
     call of [commit_patches]. *)
 
 val find_opt_string_istr : base -> string -> istr option
-(** Find if a given string already exsits in the base and returns its istr if it does,
+(** Find if a given string already exists in the base and returns its istr if it does,
     None otherwise *)
 
 val insert_string : base -> string -> istr
