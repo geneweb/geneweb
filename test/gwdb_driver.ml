@@ -275,10 +275,12 @@ let insert_string base s =
   len
 
 let find_opt_string_istr base s =
-  let rec loop i =
-    if i > Array.length base.strings then None
-    else if base.strings.(i) = s then Some i
-    else loop (i + 1)
+  let rec loop =
+    let length = Array.length base.strings in
+    fun i ->
+      if i > length then None
+      else if base.strings.(i) = s then Some i
+      else loop (i + 1)
   in
   loop 0
 
