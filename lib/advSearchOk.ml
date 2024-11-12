@@ -575,10 +575,10 @@ let advanced_search conf base max_answers =
     lazy (places_with_istrs @@ getss @@ place_field ~gets ~search_type)
   in
   let birth_place_searched = place_searched Fields.birth_place in
-  let bapt_place_searched = place_searched Fields.birth_place in
-  let burial_place_searched = place_searched Fields.birth_place in
-  let death_place_searched = place_searched Fields.birth_place in
-  let marriage_place_searched = place_searched Fields.birth_place in
+  let bapt_place_searched = place_searched Fields.bapt_place in
+  let burial_place_searched = place_searched Fields.burial_place in
+  let death_place_searched = place_searched Fields.death_place in
+  let marriage_place_searched = place_searched Fields.marriage_place in
   let other_events_place_searched = place_searched Fields.other_events_place in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
