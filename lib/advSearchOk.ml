@@ -43,7 +43,8 @@ let string_incl =
         let rec loop1 i j =
           if i = String.length x then
             if j = String.length y then true
-            else String.unsafe_get y j = ' ' || String.unsafe_get y (j - 1) = ' '
+            else
+              String.unsafe_get y j = ' ' || String.unsafe_get y (j - 1) = ' '
           else if
             j < String.length y && String.unsafe_get x i = String.unsafe_get y j
           then loop1 (i + 1) (j + 1)
@@ -53,20 +54,19 @@ let string_incl =
     in
 
     match Hashtbl.find_opt memo x with
-    | Some map -> begin
+    | Some map -> (
         match StrMap.find_opt y map with
         | Some b -> b
         | None ->
-          let b = loop 0 in
-          let map = Util.StrMap.add y b map in
-          Hashtbl.replace memo x map;
-          b
-      end
+            let b = loop 0 in
+            let map = Util.StrMap.add y b map in
+            Hashtbl.replace memo x map;
+            b)
     | None ->
-      let b = loop 0 in
-      let map = Util.StrMap.add y b Util.StrMap.empty in
-      Hashtbl.replace memo x map;
-      b
+        let b = loop 0 in
+        let map = Util.StrMap.add y b Util.StrMap.empty in
+        Hashtbl.replace memo x map;
+        b
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
 let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter

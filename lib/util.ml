@@ -2394,6 +2394,7 @@ let has_children base u =
     (Gwdb.get_family u)
 
 module StrMap = Map.Make (struct
-    type t = string
-    let compare = String.compare
-  end)
+  type t = string
+
+  let compare = String.compare
+end)
