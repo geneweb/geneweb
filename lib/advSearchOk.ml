@@ -35,7 +35,7 @@ let rec skip_no_spaces x i =
   else i
 
 let string_incl =
-  let memo : (string, bool Util.StrMap.t) Hashtbl.t = Hashtbl.create 10 in
+  let memo : (string * string, bool) Hashtbl.t = Hashtbl.create 10 in
   fun x y ->
     let rec loop j_ini =
       if j_ini = String.length y then false
@@ -52,20 +52,11 @@ let string_incl =
         in
         loop1 0 j_ini
     in
-
-    match Hashtbl.find_opt memo x with
-    | Some map -> (
-        match StrMap.find_opt y map with
-        | Some b -> b
-        | None ->
-            let b = loop 0 in
-            let map = Util.StrMap.add y b map in
-            Hashtbl.replace memo x map;
-            b)
+    match Hashtbl.find_opt memo (x, y) with
+    | Some b -> b
     | None ->
         let b = loop 0 in
-        let map = Util.StrMap.add y b Util.StrMap.empty in
-        Hashtbl.replace memo x map;
+        Hashtbl.replace memo (x, y) b;
         b
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
