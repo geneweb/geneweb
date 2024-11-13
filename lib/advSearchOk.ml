@@ -531,12 +531,13 @@ let advanced_search conf base max_answers =
     fun places ->
       List.map
         (fun str ->
-          try List.assoc str !memo
-          with Not_found ->
-            let abbreved_str = abbrev_lower str in
-            let res = (abbreved_str, Gwdb.find_opt_string_istr base str) in
-            memo := (str, res) :: !memo;
-            res)
+          match List.assoc_opt str !memo with
+          | Some place -> place
+          | None ->
+              let abbreved_str = abbrev_lower str in
+              let res = (abbreved_str, Gwdb.find_opt_string_istr base str) in
+              memo := (str, res) :: !memo;
+              res)
         places
   in
 
