@@ -138,7 +138,7 @@ end = struct
 end
 
 module AdvancedSearchMatch : sig
-  type place = string * (string * Gwdb.istr option)
+  type place = string * Gwdb.istr option
 
   val match_name :
     search_list:string list list -> exact:bool -> string list -> bool
@@ -213,7 +213,7 @@ module AdvancedSearchMatch : sig
   module And : Match
   module Or : Match
 end = struct
-  type place = string * (string * Gwdb.istr option)
+  type place = string * Gwdb.istr option
 
   (* Check if the date matches with the person event. *)
   let match_date ~p ~df ~default ~dates =
@@ -244,14 +244,14 @@ end = struct
     if places = [] then default
     else if exact_place then
       List.exists
-        (fun (_, (_, istr_o)) ->
+        (fun (_, istr_o) ->
           match istr_o with
           | None -> false
           | Some istr -> Gwdb.compare_istr istr (get p) = 0)
         places
     else
       List.exists
-        (fun (_, (abbreved_str, _)) ->
+        (fun (abbreved_str, _) ->
           string_incl abbreved_str (abbrev_lower (Gwdb.sou base (get p))))
         places
 
@@ -531,13 +531,11 @@ let advanced_search conf base max_answers =
     fun places ->
       List.map
         (fun str ->
-          try (str, List.assoc str !memo)
+          try List.assoc str !memo
           with Not_found ->
             let abbreved_str = abbrev_lower str in
-            let res =
-              (str, (abbreved_str, Gwdb.find_opt_string_istr base str))
-            in
-            memo := res :: !memo;
+            let res = (abbreved_str, Gwdb.find_opt_string_istr base str) in
+            memo := (str, res) :: !memo;
             res)
         places
   in
