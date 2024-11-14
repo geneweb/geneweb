@@ -1,21 +1,16 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-open Config
-open Util
-open Notes
-
 let print_search_form conf from_note =
   Output.print_sstring conf "<table>\n";
   Output.print_sstring conf "<tr>\n";
-  Output.printf conf "<td align=\"%s\">\n" conf.right;
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<td align=\"%s\">\n" conf.Config.right;
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.Config.command;
   Output.print_sstring conf "<p>\n";
-  hidden_env conf;
+  Util.hidden_env conf;
   Output.print_sstring conf
     {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
   Output.print_sstring conf {|<input name="s" size="30" maxlength="40" value="|};
-  (match p_getenv conf.env "s" with
+  (match Util.p_getenv conf.Config.env "s" with
   | Some s -> Output.print_string conf (Util.escape_html s)
   | None -> ());
   Output.print_sstring conf {|">|};
@@ -28,14 +23,14 @@ let print_search_form conf from_note =
   Output.print_sstring conf "<br>\n";
   Output.print_sstring conf "<label>\n";
   Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s>\n"
-    (match p_getenv conf.env "c" with
+    (match Util.p_getenv conf.Config.env "c" with
     | Some "on" -> " checked=\"checked\""
     | Some _ | None -> "");
-  Output.printf conf "%s\n" (transl_nth conf "search/case sensitive" 1);
+  Output.printf conf "%s\n" (Util.transl_nth conf "search/case sensitive" 1);
   Output.print_sstring conf "</label>\n";
   Output.print_sstring conf
     {|<button type="submit" class="btn btn-secondary btn-lg">|};
-  transl_nth conf "search/case sensitive" 0
+  Util.transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></p></form></td></tr></table>"
 
@@ -47,11 +42,11 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   let what_links_page () =
     if fnotes <> "" then (
       Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       Output.print_sstring conf {|m=NOTES&f=|};
       Output.print_string conf (Mutil.encode fnotes);
       Output.print_sstring conf {|&ref=on" class="mx-2">(|};
-      Output.print_sstring conf (transl conf "linked pages");
+      Output.print_sstring conf (Util.transl conf "linked pages");
       Output.print_sstring conf ")</a>\n")
   in
   Hutil.gen_print_link_to_welcome what_links_page conf true;
@@ -59,7 +54,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     let title =
       match ho with
       | Some (case_sens, h) ->
-          html_highlight case_sens h (title : Adef.safe_string :> string)
+          Util.html_highlight case_sens h (title : Adef.safe_string :> string)
           |> Adef.safe
       | None -> title
     in
@@ -67,16 +62,16 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     Output.print_string conf title;
     Output.print_sstring conf {|</h1>|});
   Util.include_template conf [] "summary" (fun () -> ());
-  let file_path = file_path conf base in
-  let s = string_with_macros conf [] s in
-  let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
+  let file_path = Notes.file_path conf base in
+  let s = Util.string_with_macros conf [] s in
+  let edit_opt = Some (conf.Config.wizard, "NOTES", fnotes) in
   let s =
     let wi =
       {
         Wiki.wi_mode = "NOTES";
         Wiki.wi_file_path = file_path;
-        Wiki.wi_person_exists = person_exists conf base;
-        Wiki.wi_always_show_link = conf.wizard || conf.friend;
+        Wiki.wi_person_exists = Util.person_exists conf base;
+        Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
       }
     in
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
@@ -85,7 +80,8 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   let s =
     match ho with
     | Some (case_sens, h) ->
-        html_highlight case_sens h (s : Adef.safe_string :> string) |> Adef.safe
+        Util.html_highlight case_sens h (s : Adef.safe_string :> string)
+        |> Adef.safe
     | None -> s
   in
   Output.print_string conf s;
@@ -103,18 +99,18 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
     Output.print_sstring conf "<br><br><h1>";
     Output.print_string conf title;
     Output.print_sstring conf "</h1>");
-  let s = string_with_macros conf [] s in
+  let s = Util.string_with_macros conf [] s in
   let lines = Wiki.extract_sub_part s cnt0 in
   let mode = "NOTES" in
   let wi =
     {
       Wiki.wi_mode = mode;
-      Wiki.wi_file_path = file_path conf base;
-      Wiki.wi_person_exists = person_exists conf base;
-      Wiki.wi_always_show_link = conf.wizard || conf.friend;
+      Wiki.wi_file_path = Notes.file_path conf base;
+      Wiki.wi_person_exists = Util.person_exists conf base;
+      Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
     }
   in
-  Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
+  Wiki.print_sub_part conf wi conf.Config.wizard mode fnotes cnt0 lines;
   Hutil.trailer conf
 
 let print_linked_list conf base pgl =
@@ -125,14 +121,14 @@ let print_linked_list conf base pgl =
       (match pg with
       | Def.NLDB.PgInd ip ->
           Output.print_sstring conf "<tt>";
-          if conf.wizard then (
+          if conf.Config.wizard then (
             Output.print_sstring conf {|<a href="|};
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf "&i=";
             Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
-          let p = pget conf base ip in
+          let p = Util.pget conf base ip in
           Output.print_sstring conf "<span class=\"mx-2\">";
           Output.print_string conf
             (NameDisplay.referenced_person_title_text conf base p);
@@ -140,12 +136,12 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "</span></tt>"
       | Def.NLDB.PgFam ifam ->
           let fam = Gwdb.foi base ifam in
-          let fath = pget conf base (Gwdb.get_father fam) in
-          let moth = pget conf base (Gwdb.get_mother fam) in
+          let fath = Util.pget conf base (Gwdb.get_father fam) in
+          let moth = Util.pget conf base (Gwdb.get_mother fam) in
           Output.print_sstring conf "<tt>";
-          if conf.wizard then (
+          if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf "m=MOD_FAM&i=";
             Output.print_string conf (Gwdb.string_of_ifam ifam |> Mutil.encode);
             Output.print_sstring conf "&ip=";
@@ -165,30 +161,30 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "</span></tt>"
       | Def.NLDB.PgNotes ->
           Output.print_sstring conf "<tt>";
-          if conf.wizard then (
+          if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf
               {|m=MOD_NOTES"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf "<a class=\"mx-2\" href=\"";
-          Output.print_string conf (commd conf);
+          Output.print_string conf (Util.commd conf);
           Output.print_sstring conf "m=NOTES\">";
-          Output.print_sstring conf (transl_nth conf "note/notes" 1);
+          Output.print_sstring conf (Util.transl_nth conf "note/notes" 1);
           Output.print_sstring conf "</a></tt>"
       | Def.NLDB.PgMisc fnotes ->
-          let nenv, _ = read_notes base fnotes in
+          let nenv, _ = Notes.read_notes base fnotes in
           let title = try List.assoc "TITLE" nenv with Not_found -> "" in
           let title = Util.safe_html title in
           Output.print_sstring conf "<tt>";
-          if conf.wizard then (
+          if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf {|m=MOD_NOTES&f=|};
             Output.print_string conf (Mutil.encode fnotes);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf {|<a class="mx-2" href="|};
-          Output.print_string conf (commd conf);
+          Output.print_string conf (Util.commd conf);
           Output.print_sstring conf {|m=NOTES&f=|};
           Output.print_string conf (Mutil.encode fnotes);
           Output.print_sstring conf {|">|};
@@ -201,22 +197,22 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "</tt>"
       | Def.NLDB.PgWizard wizname ->
           Output.print_sstring conf "<tt>";
-          if conf.wizard then (
+          if conf.Config.wizard then (
             Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf {|m=MOD_WIZNOTES&f=|};
             Output.print_string conf (Mutil.encode wizname);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf {|<a class="mx-2" href="|};
-          Output.print_string conf (commd conf);
+          Output.print_string conf (Util.commd conf);
           Output.print_sstring conf {|m=WIZNOTES&f=|};
           Output.print_string conf (Mutil.encode wizname);
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html wizname);
           Output.print_sstring conf "</a><i>(";
           Output.print_sstring conf
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0);
+            (Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 0);
           Output.print_sstring conf ")</i></tt>");
       Output.print_sstring conf "</li>")
     pgl;
@@ -224,7 +220,8 @@ let print_linked_list conf base pgl =
 
 let print_what_links conf base fnotes =
   let title h =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "linked pages"));
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (Util.transl conf "linked pages"));
     Output.print_sstring conf " ";
     if h then (
       Output.print_sstring conf "[";
@@ -232,14 +229,14 @@ let print_what_links conf base fnotes =
       Output.print_sstring conf "]")
     else (
       Output.print_sstring conf {|<tt>[<a href="|};
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       Output.print_sstring conf "m=NOTES&f=";
       Output.print_string conf (Mutil.encode fnotes);
       Output.print_sstring conf {|">|};
       Output.print_string conf (Util.escape_html fnotes);
       Output.print_sstring conf "</a>]</tt>")
   in
-  let db = notes_links_db conf base false in
+  let db = Notes.notes_links_db conf base false in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db);
@@ -247,33 +244,33 @@ let print_what_links conf base fnotes =
 
 let print conf base =
   let fnotes =
-    match p_getenv conf.env "f" with
+    match Util.p_getenv conf.Config.env "f" with
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  match p_getenv conf.env "ref" with
+  match Util.p_getenv conf.Config.env "ref" with
   | Some "on" -> print_what_links conf base fnotes
   | _ -> (
-      let nenv, s = read_notes base fnotes in
+      let nenv, s = Notes.read_notes base fnotes in
       let title = try List.assoc "TITLE" nenv with Not_found -> "" in
       let title = Util.safe_html title in
-      match p_getint conf.env "v" with
+      match Util.p_getint conf.Config.env "v" with
       | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
       | None -> print_whole_notes conf base fnotes title s None)
 
 let print_mod conf base =
   let fnotes =
-    match p_getenv conf.env "f" with
+    match Util.p_getenv conf.Config.env "f" with
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
   let title _ =
     Output.printf conf "%s - %s%s"
-      (Utf8.capitalize_fst (transl conf "base notes"))
-      conf.bname
+      (Utf8.capitalize_fst (Util.transl conf "base notes"))
+      conf.Config.bname
       (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let env, s = read_notes base fnotes in
+  let env, s = Notes.read_notes base fnotes in
   Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title env s
 
 let print_mod_ok conf base =
@@ -281,18 +278,18 @@ let print_mod_ok conf base =
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  let edit_mode _ = if conf.wizard then Some "NOTES" else None in
+  let edit_mode _ = if conf.Config.wizard then Some "NOTES" else None in
   let mode = "NOTES" in
-  let read_string = read_notes base in
+  let read_string = Notes.read_notes base in
   let commit = Notes.commit_notes conf base in
-  let string_filter = string_with_macros conf [] in
-  let file_path = file_path conf base in
+  let string_filter = Util.string_with_macros conf [] in
+  let file_path = Notes.file_path conf base in
   let wi =
     {
       Wiki.wi_mode = mode;
       Wiki.wi_file_path = file_path;
-      Wiki.wi_person_exists = person_exists conf base;
-      Wiki.wi_always_show_link = conf.wizard || conf.friend;
+      Wiki.wi_person_exists = Util.person_exists conf base;
+      Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend;
     }
   in
   Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
@@ -320,16 +317,22 @@ let begin_text_without_html_tags lim s =
   loop 0 0 0
 
 let print_misc_notes conf base =
-  let d = match p_getenv conf.env "d" with Some d -> d | None -> "" in
+  let d =
+    match Util.p_getenv conf.Config.env "d" with Some d -> d | None -> ""
+  in
   let title h =
     Output.print_string conf
       (if d = "" then
-       transl conf "miscellaneous notes"
+       Util.transl conf "miscellaneous notes"
        |> Util.translate_eval |> Utf8.capitalize_fst |> Adef.escaped
-      else if h then "- " ^<^ Util.escape_html d ^>^ " -"
-      else "<tt>- " ^<^ Util.escape_html d ^>^ " -</tt>")
+      else if h then
+        let open Def in
+        "- " ^<^ Util.escape_html d ^>^ " -"
+      else
+        let open Def in
+        "<tt>- " ^<^ Util.escape_html d ^>^ " -</tt>")
   in
-  let db = notes_links_db conf base true in
+  let db = Notes.notes_links_db conf base true in
   let db =
     List.fold_right
       (fun (f, _) list ->
@@ -359,12 +362,12 @@ let print_misc_notes conf base =
     Output.print_sstring conf "<ul>";
     if d <> "" then (
       Output.print_sstring conf {|<li class="parent">|};
-      (* Output.printf conf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf) ; *)
       Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       Output.print_sstring conf "m=MISC_NOTES";
       (match String.rindex_opt d NotesLinks.char_dir_sep with
       | Some i ->
+          let open Def in
           Output.print_string conf @@ "&d=" ^<^ Mutil.encode (String.sub d 0 i)
       | None -> ());
       Output.print_sstring conf "<tt>&lt;--</tt></a></li>");
@@ -372,21 +375,22 @@ let print_misc_notes conf base =
       (function
         | r, Some f ->
             let txt =
-              let n, s = read_notes base f in
+              let n, s = Notes.read_notes base f in
               let t = try List.assoc "TITLE" n with Not_found -> "" in
               if t <> "" then Util.escape_html t
               else if s = "" then Adef.escaped ""
               else
+                let open Def in
                 "<em>"
                 ^<^ (begin_text_without_html_tags 50 s |> Util.escape_html)
                 ^>^ "</em>"
             in
             let c =
-              let f = file_path conf base (path_of_fnotes f) in
+              let f = Notes.file_path conf base (Notes.path_of_fnotes f) in
               if Sys.file_exists f then "" else " style=\"color:red\""
             in
             Output.print_sstring conf {|<li class="file"><tt>[<a href="|};
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf {|m=NOTES&f=|};
             Output.print_string conf (Mutil.encode f);
             Output.print_sstring conf {|"|};
@@ -395,13 +399,13 @@ let print_misc_notes conf base =
             Output.print_string conf (Util.escape_html r);
             Output.print_sstring conf "</a>]</tt>";
             if (txt :> string) <> "" then (
-              Output.print_sstring conf (transl conf ":");
+              Output.print_sstring conf (Util.transl conf ":");
               Output.print_sstring conf " ";
               Output.print_string conf txt);
             Output.print_sstring conf "</li>"
         | r, None ->
             Output.print_sstring conf {|<li class="folder"><tt><a href="|};
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf "m=MISC_NOTES&d=";
             if d = "" then Output.print_string conf (Mutil.encode r)
             else (
@@ -420,11 +424,11 @@ let print_misc_notes conf base =
 
 let search_text conf base s =
   let s = if s = "" then " " else s in
-  let case_sens = p_getenv conf.env "c" = Some "on" in
+  let case_sens = Util.p_getenv conf.Config.env "c" = Some "on" in
   let db =
-    let db = notes_links_db conf base true in
+    let db = Notes.notes_links_db conf base true in
     let db = "" :: List.map fst db in
-    match p_getenv conf.env "z" with
+    match Util.p_getenv conf.Config.env "z" with
     | None -> db
     | Some f ->
         let rec loop = function
@@ -436,9 +440,9 @@ let search_text conf base s =
   let noteo =
     let rec loop = function
       | fnotes :: list ->
-          let nenv, nt = read_notes base fnotes in
+          let nenv, nt = Notes.read_notes base fnotes in
           let tit = try List.assoc "TITLE" nenv with Not_found -> "" in
-          if in_text case_sens s tit || in_text case_sens s nt then
+          if Util.in_text case_sens s tit || Util.in_text case_sens s nt then
             Some (fnotes, tit, nt)
           else loop list
       | [] -> None
@@ -452,6 +456,6 @@ let search_text conf base s =
   | None -> print_misc_notes conf base
 
 let print_misc_notes_search conf base =
-  match try Some (List.assoc "s" conf.env) with Not_found -> None with
+  match try Some (List.assoc "s" conf.Config.env) with Not_found -> None with
   | Some s -> search_text conf base (Mutil.gen_decode false s)
   | None -> print_misc_notes conf base

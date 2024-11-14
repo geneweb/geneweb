@@ -1,8 +1,6 @@
 (* $Id: wiki.mli,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-
 (* TLSW: Text Language Stolen to Wikipedia
    = title level 1 =
    == title level 2 ==
@@ -39,13 +37,17 @@ type wiki_info = {
   wi_always_show_link : bool;
 }
 
-val syntax_links : config -> wiki_info -> string -> string
+val syntax_links : Config.config -> wiki_info -> string -> string
 
-val html_of_tlsw : config -> string -> string list
+val html_of_tlsw : Config.config -> string -> string list
 (** Parses a whole TLSW text to a list of strings *)
 
 val html_with_summary_of_tlsw :
-  config -> wiki_info -> (bool * string * string) option -> string -> string
+  Config.config ->
+  wiki_info ->
+  (bool * string * string) option ->
+  string ->
+  string
 (** HTML displaying a table of content for a TLSW file *)
 
 val extract_sub_part : string -> int -> string list
@@ -63,11 +65,18 @@ val split_title_and_text : string -> (string * string) list * string
 *)
 
 val print_sub_part :
-  config -> wiki_info -> bool -> string -> string -> int -> string list -> unit
+  Config.config ->
+  wiki_info ->
+  bool ->
+  string ->
+  string ->
+  int ->
+  string list ->
+  unit
 (** Prints an exctracted sub part *)
 
 val print_mod_view_page :
-  config (* conf *) ->
+  Config.config (* conf *) ->
   bool (* can_edit *) ->
   Adef.encoded_string (* mode *) ->
   string (* fname *) ->
@@ -80,7 +89,7 @@ val print_mod_view_page :
     Prints an editable part *)
 
 val print_mod_ok :
-  config (* conf *) ->
+  Config.config (* conf *) ->
   wiki_info (* wi *) ->
   (string -> string option) ->
   (* edit_mode *)
@@ -99,7 +108,7 @@ val print_mod_ok :
 
 (*S: shouldn't the following functions be defined elsewhere? *)
 
-val notes_aliases : config -> (string * string) list
+val notes_aliases : Config.config -> (string * string) list
 (** Reads the notes alias file (conf.base_env.notes_alias_file or base_path/notes.alias).
     File format is "KEY value\n...", returns the list of (KEY,value) *)
 
