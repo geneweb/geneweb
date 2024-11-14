@@ -1169,38 +1169,39 @@ let expand_ampersand buff s =
   in
   loop 0
 
-let email_addr s i =
-  let rec before_at empty i =
-    if i = String.length s then None
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' | '.' ->
-          before_at false (i + 1)
-      | '@' -> if empty then None else after_at true (i + 1)
-      | _ -> None
-  and after_at empty i =
-    if i = String.length s then None
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' ->
-          after_at false (i + 1)
-      | '.' -> if empty then None else after_dot 0 (i + 1)
-      | _ -> None
-  and after_dot len i =
-    if i = String.length s then Some (len, i)
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' | '.' ->
-          after_dot (len + 1) (i + 1)
-      | _ -> Some (len, i)
+let email_addr =
+  let email_address_regexp =
+    let alphanumeric_characters =
+      Re.alt [ Re.rg 'a' 'z'; Re.rg 'A' 'Z'; Re.rg '0' '9' ]
+    in
+    let local_part =
+      Re.rep1 @@ Re.alt [ alphanumeric_characters; Re.set "-_." ]
+    in
+    let domain =
+      Re.seq
+        [
+          Re.rep1 @@ Re.alt [ alphanumeric_characters; Re.set "-_" ];
+          Re.char '.';
+          Re.group @@ Re.rep @@ Re.alt [ alphanumeric_characters; Re.set "-_." ];
+        ]
+    in
+    Re.compile @@ Re.seq [ Re.start; local_part; Re.char '@'; domain ]
   in
-  match before_at true i with
-  | Some (len, i) ->
-      let len, i =
-        if len > 0 && s.[i - 1] = '.' then (len - 1, i - 1) else (len, i)
-      in
-      if len = 0 then None else Some i
-  | None -> None
+  fun s i ->
+    match Re.exec_opt ~pos:i email_address_regexp s with
+    | Some group ->
+        let i = try Re.Group.stop group 0 with Not_found -> assert false in
+        let len, i =
+          let len =
+            let start, end_ =
+              try Re.Group.offset group 1 with Not_found -> assert false
+            in
+            end_ - start
+          in
+          if len > 0 && s.[i - 1] = '.' then (len - 1, i - 1) else (len, i)
+        in
+        if len = 0 then None else Some i
+    | None -> None
 
 let get_variable s i =
   let rec loop len i =
