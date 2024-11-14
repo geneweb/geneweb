@@ -368,6 +368,8 @@ type base_func = {
   patch_name : string -> int -> unit;
   (* Insert new string inside the pending patches and returns its id.
      If string already exists return its id. *)
+  find_opt_string_istr : string -> int option;
+  (* Returns the string id corresponding to the given string, None otherwise *)
   insert_string : string -> int;
   (* Commit pending patches and write a patches' new state inside "patches"
      file. "nb_persons" is also updated. *)

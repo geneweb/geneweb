@@ -1120,6 +1120,9 @@ let opendb bname =
     index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
       (snd patches.h_string) (snd pending.h_string)
   in
+  let find_opt_string_istr s =
+    try Some (index_of_string s) with Not_found -> None
+  in
   let insert_string s =
     try index_of_string s
     with Not_found ->
@@ -1241,6 +1244,7 @@ let opendb bname =
       patch_couple;
       patch_descend;
       patch_name;
+      find_opt_string_istr;
       insert_string;
       commit_patches;
       commit_notes;
@@ -1315,6 +1319,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
       patch_couple = (fun _ -> assert false);
       patch_descend = (fun _ -> assert false);
       patch_name = (fun _ -> assert false);
+      find_opt_string_istr = (fun _ -> assert false);
       insert_string = (fun _ -> assert false);
       commit_patches = (fun _ -> assert false);
       commit_notes = (fun _ -> assert false);

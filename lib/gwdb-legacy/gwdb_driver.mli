@@ -387,6 +387,10 @@ val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
 (** Modify/add couple of a family with a giving id. Modification stay blocked until
     call of [commit_patches]. *)
 
+val find_opt_string_istr : base -> string -> istr option
+(** Find if a given string already exists in the base and returns its istr if it does,
+    None otherwise *)
+
 val insert_string : base -> string -> istr
 (** Modify/add string with a giving id. If string already exists return its id.
     Modification stay blocked until call of [commit_patches]. *)
