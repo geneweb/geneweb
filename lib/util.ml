@@ -1185,12 +1185,15 @@ let email_addr =
           Re.group @@ Re.rep @@ Re.alt [ alphanumeric_characters; Re.set "-_." ];
         ]
     in
-    Re.compile @@ Re.seq [ Re.start; local_part; Re.char '@'; domain ]
+    Re.compile @@ Re.seq [ local_part; Re.char '@'; domain ]
   in
-  fun s i ->
-    match Re.exec_opt ~pos:i email_address_regexp s with
-    | Some group ->
-        let end_ = try Re.Group.stop group 0 with Not_found -> assert false in
+  fun s ->
+    let groups = Re.all email_address_regexp s in
+    List.filter_map
+      (fun group ->
+        let start, end_ =
+          try Re.Group.offset group 0 with Not_found -> assert false
+        in
         let len, end_ =
           let len =
             let start, end_ =
@@ -1201,8 +1204,8 @@ let email_addr =
           if len > 0 && s.[end_ - 1] = '.' then (len - 1, end_ - 1)
           else (len, end_)
         in
-        if len = 0 then None else Some end_
-    | None -> None
+        if len = 0 then None else Some (start, end_))
+      groups
 
 let get_variable s i =
   let rec loop len i =
@@ -1259,6 +1262,7 @@ let string_with_macros conf env s =
     && String.lowercase_ascii (String.sub s i (String.length p)) = p
   in
   let buff = Buffer.create 1000 in
+  let email_addresses_positions = email_addr s in
   let rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' then
@@ -1330,7 +1334,7 @@ let string_with_macros conf env s =
                 Printf.bprintf buff "</a>";
                 loop Out j
             | None -> (
-                match email_addr s i with
+                match List.assoc_opt i email_addresses_positions with
                 | Some end_ ->
                     let x = String.sub s i (end_ - i) in
                     Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
