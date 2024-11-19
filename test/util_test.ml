@@ -197,9 +197,15 @@ let util_transl_a_of_b () =
 
 let util_string_with_macros () =
   let conf = Geneweb.Config.empty in
-  (Alcotest.check Alcotest.string)
-    "" {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
-    (Geneweb.Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
+  let test ~expected actual =
+    (Alcotest.check Alcotest.string)
+      "" expected
+      (Geneweb.Util.string_with_macros conf [] actual)
+  in
+  test
+    ~expected:
+      {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
+    {|jean@dupond.net - le 1 &amp; 2|}
 
 let util_escape_html () =
   (Alcotest.check Alcotest.string)
