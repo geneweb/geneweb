@@ -1190,17 +1190,18 @@ let email_addr =
   fun s i ->
     match Re.exec_opt ~pos:i email_address_regexp s with
     | Some group ->
-        let i = try Re.Group.stop group 0 with Not_found -> assert false in
-        let len, i =
+        let end_ = try Re.Group.stop group 0 with Not_found -> assert false in
+        let len, end_ =
           let len =
             let start, end_ =
               try Re.Group.offset group 1 with Not_found -> assert false
             in
             end_ - start
           in
-          if len > 0 && s.[i - 1] = '.' then (len - 1, i - 1) else (len, i)
+          if len > 0 && s.[end_ - 1] = '.' then (len - 1, end_ - 1)
+          else (len, end_)
         in
-        if len = 0 then None else Some i
+        if len = 0 then None else Some end_
     | None -> None
 
 let get_variable s i =
@@ -1330,10 +1331,10 @@ let string_with_macros conf env s =
                 loop Out j
             | None -> (
                 match email_addr s i with
-                | Some j ->
-                    let x = String.sub s i (j - i) in
+                | Some end_ ->
+                    let x = String.sub s i (end_ - i) in
                     Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
-                    loop Out j
+                    loop Out end_
                 | None ->
                     let tt =
                       if start_with s i "<a href=" || start_with s i "<a\nhref="
