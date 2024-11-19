@@ -1169,7 +1169,7 @@ let expand_ampersand buff s =
   in
   loop 0
 
-let email_addr =
+let email_addr_positions =
   let email_address_regexp =
     let alphanumeric_characters =
       Re.alt [ Re.rg 'a' 'z'; Re.rg 'A' 'Z'; Re.rg '0' '9' ]
@@ -1262,7 +1262,7 @@ let string_with_macros conf env s =
     && String.lowercase_ascii (String.sub s i (String.length p)) = p
   in
   let buff = Buffer.create 1000 in
-  let email_addresses_positions = email_addr s in
+  let email_addresses_positions = email_addr_positions s in
   let rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' then
