@@ -202,6 +202,19 @@ let util_string_with_macros () =
       "" expected
       (Geneweb.Util.string_with_macros conf [] actual)
   in
+  List.iter
+    (fun actual -> test ~expected:actual actual)
+    [
+      {|a@.|};
+      {|a@b|};
+      {|a@b.|};
+      {|a@.b|};
+      {|a@b..|};
+      {|<a href="mailto:a@b.c">a@b.c</a>|};
+    ];
+  test ~expected:{|abc <a href="mailto:a@b.c">a@b.c</a>|} {|abc a@b.c|};
+  test ~expected:{|<a href="mailto:a@b..">a@b..</a>.|} {|a@b...|};
+  test ~expected:{|<a href="mailto:a@b.c">a@b.c</a>.|} {|a@b.c.|};
   test
     ~expected:
       {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
