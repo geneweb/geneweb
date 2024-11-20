@@ -61,6 +61,28 @@ let merge_possible_aliases conf db =
       (pg, (sl, il)) :: list)
     [] db
 
+let links_to_ind conf base db key =
+  let l =
+    List.fold_left
+      (fun pgl (pg, (_, il)) ->
+        let record_it =
+          match pg with
+          | Def.NLDB.PgInd ip -> authorized_age conf base (pget conf base ip)
+          | Def.NLDB.PgFam ifam ->
+              authorized_age conf base
+                (pget conf base (get_father @@ foi base ifam))
+          | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
+        in
+        if record_it then
+          List.fold_left
+            (fun pgl (k, _) ->
+              if Def.NLDB.equal_key k key then pg :: pgl else pgl)
+            pgl il
+        else pgl)
+      [] db
+  in
+  List.sort_uniq compare l
+
 let notes_links_db conf base eliminate_unlinked =
   let db = Gwdb.read_nldb base in
   let db = merge_possible_aliases conf db in
@@ -145,11 +167,55 @@ let update_notes_links_db base fnotes s =
             in
             loop list_nt list_ind (pos + 1) j
         | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind pos j
-        | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1)
+        | NotesLinks.WLnone (j, _) -> loop list_nt list_ind pos j
     in
     loop [] [] 1 0
   in
   NotesLinks.update_db base fnotes (list_nt, list_ind)
+
+let update_notes_links_person base (p : _ Def.gen_person) =
+  let s =
+    let sl =
+      [
+        p.notes;
+        p.occupation;
+        p.birth_note;
+        p.birth_src;
+        p.baptism_note;
+        p.baptism_src;
+        p.death_note;
+        p.death_src;
+        p.burial_note;
+        p.burial_src;
+        p.psources;
+      ]
+    in
+    let sl =
+      let rec loop l accu =
+        match l with
+        | [] -> accu
+        | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
+      in
+      loop p.pevents sl
+    in
+    String.concat " " (List.map (sou base) sl)
+  in
+  update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
+
+let update_notes_links_family base (f : _ Def.gen_family) =
+  let s =
+    let sl = [ f.marriage_note; f.marriage_src; f.comment; f.fsources ] in
+    let sl =
+      let rec loop l accu =
+        match l with
+        | [] -> accu
+        | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
+      in
+      loop f.fevents sl
+    in
+    String.concat " " (List.map (sou base) sl)
+  in
+  update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
 
 let commit_notes conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
@@ -160,9 +226,255 @@ let commit_notes conf base fnotes s =
       [ base_notes_dir base; fname ]
   in
   Mutil.mkdir_p (Filename.dirname fpath);
-  Gwdb.commit_notes base fname s;
+  (try
+     Gwdb.commit_notes base fname s;
+     update_notes_links_db base pg s
+   with Sys_error m ->
+     Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
+  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn"
+
+let commit_wiznotes conf base fnotes s =
+  let pg = Def.NLDB.PgWizard fnotes in
+  let fname = path_of_fnotes fnotes in
+  let fpath =
+    List.fold_left Filename.concat
+      (Util.bpath (conf.bname ^ ".gwb"))
+      [ base_wiznotes_dir base; fname ]
+  in
+  Mutil.mkdir_p (Filename.dirname fpath);
+  Gwdb.commit_wiznotes base fname s;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
+
+(* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
+(* TODO adjust replacement to news capital variants *)
+let replace olds news str =
+  let olds_l = Name.lower olds in
+  let olds_u1 = Utf8.capitalize_fst olds_l in
+  let olds_u2 = Utf8.uppercase olds_l in
+  let regexp =
+    Str.regexp (olds ^ "\\|" ^ olds_l ^ "\\|" ^ olds_u1 ^ "\\|" ^ olds_u2)
+  in
+  Str.global_replace regexp news str
+
+(*
+TITLE=Test imap
+TYPE=gallery
+{"title":"Test imap","desc":"","path":"doc","img":"famille-ph-gouraud.jpg",
+ "map":
+ [{"shape":"rect","coords":"104,100.7,145,152.7",
+   "fn":"henri",
+   "sn":"gouraud",
+   "gw":"[[Henri/Gouraud/0/Henri Gouraud]]",
+   "oc":"0",
+   "alt":"Henri Gouraud",
+   "group":"1"},{...}],
+ "groups":[]}
+*)
+
+let extract_pnoc json =
+  let fn =
+    json |> Yojson.Basic.Util.member "fn" |> Yojson.Basic.Util.to_string
+  in
+  let sn =
+    json |> Yojson.Basic.Util.member "sn" |> Yojson.Basic.Util.to_string
+  in
+  let oc =
+    match json |> Yojson.Basic.Util.member "oc" with
+    | `String oc_str -> ( try int_of_string oc_str with Failure _ -> 0)
+    | `Int oc_int -> oc_int
+    | _ -> 0
+  in
+  (fn, sn, oc)
+
+let _print_key label (fn, sn, oc) =
+  Printf.eprintf "Key: %s: %s.%d %s\n" label fn oc sn
+
+let lower_key (fn, sn, oc) = (Name.lower fn, Name.lower sn, oc)
+
+let replace_person person_json (new_fn, new_sn, new_oc) =
+  `Assoc
+    (List.map
+       (function
+         | "fn", _ -> ("fn", `String new_fn)
+         | "sn", _ -> ("sn", `String new_sn)
+         | "oc", _ -> ("oc", `String (string_of_int new_oc))
+         | key, value -> (key, value) (* Preserve any other fields *))
+       (Yojson.Basic.Util.to_assoc person_json))
+
+(* Processes the map to replace target person
+   with new values if the condition is met *)
+let update_map json oldk newk =
+  let map_data =
+    json |> Yojson.Basic.Util.member "map" |> Yojson.Basic.Util.to_list
+  in
+  let updated_map =
+    List.map
+      (fun person_json ->
+        let current_person = extract_pnoc person_json |> lower_key in
+        if current_person = lower_key oldk then replace_person person_json newk
+        else person_json)
+      map_data
+  in
+  `Assoc
+    (List.map
+       (function
+         | "map", _ -> ("map", `List updated_map)
+         | field -> field (* Preserve all other top-level fields *))
+       (Yojson.Basic.Util.to_assoc json))
+
+let update_gallery s oldk newk =
+  (* assumes the json part starts at the first { *)
+  let title_part, json_part =
+    try
+      let json_start = String.index s '{' in
+      let json_end = String.rindex s '}' in
+      ( String.sub s 0 json_start,
+        String.sub s json_start (json_end - json_start + 1) )
+    with Not_found -> ("", "{}")
+  in
+  let json = Yojson.Basic.from_string json_part in
+  match json with
+  | `Assoc [] -> s
+  | _ ->
+      let updated_json = update_map json oldk newk in
+      title_part ^ Yojson.Basic.pretty_to_string updated_json ^ "\n"
+
+let rewrite_key s oldk newk _file =
+  let s =
+    if Mutil.contains s "TYPE=gallery" then update_gallery s oldk newk else s
+  in
+  let slen = String.length s in
+  let rec rebuild rs i =
+    if i >= slen then rs
+    else
+      match NotesLinks.misc_notes_link s i with
+      | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLnone (j, _) ->
+          let ss = String.sub s i (j - i) in
+          rebuild (rs ^ ss) j
+      | WLperson (j, k, name, text) ->
+          if Def.NLDB.equal_key k oldk then
+            let fn, sn, oc = newk in
+            let ofn, osn, _ooc = oldk in
+            let name =
+              match name with
+              | Some str -> Some (replace ofn fn str |> replace osn sn)
+              | None -> None
+            in
+            let ss =
+              Printf.sprintf "[[%s/%s/%d/%s%s]]" fn sn oc
+                (Option.fold
+                   ~none:(Printf.sprintf "%s %s" fn sn)
+                   ~some:(fun txt -> txt)
+                   name)
+                (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
+            in
+            rebuild (rs ^ ss) j
+          else
+            let ss = String.sub s i (j - i) in
+            rebuild (rs ^ ss) j
+  in
+  rebuild "" 0
+
+let replace_ind_key_in_str base is oldk newk p =
+  let s = sou base is in
+  let design = Gutil.designation base p in
+  let s' = rewrite_key s oldk newk design in
+  Gwdb.insert_string base s'
+
+let update_ind_key_pgind base p oldk newk =
+  let oldp = Gwdb.gen_person_of_person @@ poi base p in
+  let replace is = replace_ind_key_in_str base is oldk newk (poi base p) in
+  let notes = replace oldp.notes in
+  let occupation = replace oldp.occupation in
+  let birth_note = replace oldp.birth_note in
+  let birth_src = replace oldp.birth_src in
+  let baptism_note = replace oldp.baptism_note in
+  let baptism_src = replace oldp.baptism_src in
+  let death_note = replace oldp.death_note in
+  let death_src = replace oldp.death_src in
+  let burial_note = replace oldp.burial_note in
+  let burial_src = replace oldp.burial_src in
+  let psources = replace oldp.psources in
+  let pevents =
+    List.map
+      (fun (ev : _ Def.gen_pers_event) ->
+        {
+          ev with
+          epers_note = replace ev.epers_note;
+          epers_src = replace ev.epers_src;
+        })
+      oldp.pevents
+  in
+  let newp =
+    {
+      oldp with
+      notes;
+      occupation;
+      birth_note;
+      birth_src;
+      baptism_note;
+      baptism_src;
+      death_note;
+      death_src;
+      burial_note;
+      burial_src;
+      psources;
+      pevents;
+    }
+  in
+  Gwdb.patch_person base p newp;
+  update_notes_links_person base newp
+
+let update_ind_key_pgfam base f oldk newk =
+  let oldf = Gwdb.gen_family_of_family @@ foi base f in
+  let cpl = foi base f in
+  let fath = poi base (get_father cpl) in
+  let moth = poi base (get_mother cpl) in
+  let _family =
+    Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
+  in
+  let replace is = replace_ind_key_in_str base is oldk newk fath in
+  let marriage_note = replace oldf.marriage_note in
+  let marriage_src = replace oldf.marriage_src in
+  let comment = replace oldf.comment in
+  let fsources = replace oldf.fsources in
+  let fevents =
+    List.map
+      (fun (ev : _ Def.gen_fam_event) ->
+        {
+          ev with
+          efam_note = replace ev.efam_note;
+          efam_src = replace ev.efam_src;
+        })
+      oldf.fevents
+  in
+  let newf =
+    { oldf with marriage_note; marriage_src; comment; fsources; fevents }
+  in
+  Gwdb.patch_family base f newf;
+  update_notes_links_family base newf
+
+let update_ind_key_pgmisc conf base f oldk newk =
+  let oldn = base_notes_read base f in
+  let newn = rewrite_key oldn oldk newk f in
+  commit_notes conf base f newn
+
+let update_ind_key_pgwiz conf base f oldk newk =
+  let oldn = base_wiznotes_read base f in
+  let newn = rewrite_key oldn oldk newk f in
+  commit_wiznotes conf base f newn
+
+let update_ind_key conf base link_pages oldk newk =
+  Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
+  List.iter
+    (function
+      | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk
+      | PgFam f -> update_ind_key_pgfam base f oldk newk
+      | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
+      | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk
+      | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk)
+    link_pages
 
 let wiki_aux pp conf base env str =
   let s = Util.string_with_macros conf env str in

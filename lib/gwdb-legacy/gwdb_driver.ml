@@ -41,6 +41,7 @@ let insert_string base s =
 
 let commit_patches base = base.func.Dbdisk.commit_patches ()
 let commit_notes base s = base.func.Dbdisk.commit_notes s
+let commit_wiznotes base s = base.func.Dbdisk.commit_wiznotes s
 let person_of_key base = base.func.Dbdisk.person_of_key
 let persons_of_name base = base.func.Dbdisk.persons_of_name
 let persons_of_first_name base = base.func.Dbdisk.persons_of_first_name
@@ -249,10 +250,7 @@ let base_notes_origin_file base = base.data.bnotes.Def.norigin_file
 let base_notes_dir _base = "notes_d"
 let base_wiznotes_dir _base = "wiznotes"
 
-let base_notes_read_aux base fnotes mode =
-  let fname =
-    if fnotes = "" then "notes" else Filename.concat "notes_d" (fnotes ^ ".txt")
-  in
+let base_notes_read_file base fname mode =
   try
     let ic = Secure.open_in @@ Filename.concat base.data.bdir fname in
     let str =
@@ -264,6 +262,17 @@ let base_notes_read_aux base fnotes mode =
     close_in ic;
     str
   with Sys_error _ -> ""
+
+let base_notes_read_aux base fnotes mode =
+  let fname =
+    if fnotes = "" then "notes"
+    else Filename.concat (base_notes_dir base) (fnotes ^ ".txt")
+  in
+  base_notes_read_file base fname mode
+
+let base_wiznotes_read base fwnotes =
+  let fname = Filename.concat (base_wiznotes_dir base) (fwnotes ^ ".txt") in
+  base_notes_read_file base fname Def.RnAll
 
 let base_notes_read base fnotes = base_notes_read_aux base fnotes Def.RnAll
 

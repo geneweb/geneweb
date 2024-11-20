@@ -190,8 +190,7 @@ let syntax_links conf wi s =
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _text) ->
           let exists, fn0, sn0 = wi.wi_person_exists (fn, sn, oc) in
           let name =
-            if name = Name.lower fn0 ^ " " ^ Name.lower sn0 then fn0 ^ " " ^ sn0
-            else name
+            match name with None -> fn0 ^ " " ^ sn0 | Some name -> name
           in
           let t =
             if exists then
@@ -222,7 +221,8 @@ let syntax_links conf wi s =
               (encode wiz) s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
-      | NotesLinks.WLnone -> loop quot_lev pos (i + 1) (Buff.store len s.[i])
+      | NotesLinks.WLnone (j, none_s) ->
+          loop quot_lev pos j (Buff.mstore len none_s)
   in
   loop 0 1 0 0
 
@@ -302,15 +302,15 @@ let remove_links s =
       let len, i =
         match NotesLinks.misc_notes_link s i with
         | NotesLinks.WLpage (j, _, _, _, text) -> (Buff.mstore len text, j)
-        | NotesLinks.WLperson (j, _, name, text) ->
+        | NotesLinks.WLperson (j, (fn, sn, _), name, text) ->
             let text =
               match text with
-              | Some text -> if text = "" then name else text
-              | None -> name
+              | None | Some "" -> Option.value ~default:(fn ^ " " ^ sn) name
+              | Some text -> text
             in
             (Buff.mstore len text, j)
         | NotesLinks.WLwizard (j, _, text) -> (Buff.mstore len text, j)
-        | NotesLinks.WLnone -> (Buff.store len s.[i], i + 1)
+        | NotesLinks.WLnone (j, none_s) -> (Buff.mstore len none_s, j)
       in
       loop len i
   in

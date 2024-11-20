@@ -457,11 +457,11 @@
           %end;
           %( Linked notes bouton with count %)
           %if;has_linked_pages;
-            <li class="nav-item">
-              <a class="nav-link text-secondary" href="%url_set.m.LINKED;"
-                title="%linked_pages_nbr; [linked pages]">
+            <li class="nav-item"> %( type= will filter out the gallery pages %)
+              <a class="nav-link text-secondary" href="%url_set.m.LINKED;&type="
+                title="[*visualize/show/hide/summary]1 [linked pages]">
                 <i class="fa fa-file-lines fa-fw mr-1" aria-hidden="true"></i>%nn;
-                <sup class="small">%linked_pages_nbr;</sup>%nn;
+                <sup class="small">%expr(linked_pages_nbr-nb_linked_pages_type.gallery)</sup>%nn;
                 <span class="sr-only">file-lines icon</span>%nn;
               </a>
             </li>
