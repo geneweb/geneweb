@@ -127,8 +127,9 @@ let speclist =
         | "ANSEL" -> Ged2gwb_lib.State.charset_option := Some Ged2gwb_lib.Ansel
         | "ASCII" -> Ged2gwb_lib.State.charset_option := Some Ged2gwb_lib.Ascii
         | "MSDOS" -> Ged2gwb_lib.State.charset_option := Some Ged2gwb_lib.Msdos
+        | "UTF-8" -> Ged2gwb_lib.State.charset_option := Some Ged2gwb_lib.Utf8
         | _ -> raise (Arg.Bad "bad -charset value")),
-      "[ANSEL|ASCII|MSDOS] Force given charset decoding, overriding the \
+      "[ANSEL|ASCII|MSDOS|UTF-8] Force given charset decoding, overriding the \
        possible setting in GEDCOM" );
     ( "-particles",
       Arg.String
