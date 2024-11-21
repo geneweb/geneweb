@@ -260,7 +260,7 @@ let select_asc conf base max_gen ips =
             let cpl = Gwdb.foi base ifam in
             let set = loop_asc (gen + 1) set (Gwdb.get_father cpl) in
             loop_asc (gen + 1) set (Gwdb.get_mother cpl)
-        | _ -> set
+        | None -> set
       else set
     else set
   in
@@ -473,7 +473,7 @@ let select opts ips =
                           ifams'
                       in
                       loop ipers ifams tl
-                  | _ -> assert false
+                  | [ _ ] -> assert false
                 in
                 loop Geneweb.Util.IperSet.empty Geneweb.Util.IfamSet.empty ips
               else ((fun _ -> true), fun _ -> true)
