@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Éditeur d’image cliquable%( TODO: TRANSLATE ME%)</title>
+  <title>[*reactive image map editor]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -26,10 +26,11 @@
     .list_comma li:last-child:after { content: "."; }
     input:invalid { box-shadow: 0 0 1.5px 1px red; }
     #image { cursor: crosshair; }
-    .type { width: 10em; }
+    .w12 { min-width: 12em; }
+    #type { width: 8em; }
     input[type=number] { width: 4em; }
     table.dataTable td { vertical-align: middle; }
-    table.dataTable th { padding-left: 6px; padding-right: 0 }
+    #map_table th:not(:nth-child(9)), #grp_table th:not(:nth-child(3)) { padding-left: 8px;}
   </style>
   %include;hed
 </head>
@@ -37,24 +38,24 @@
 <div class="container-fluid">
 %include;home
 
-<h1 class="mt-1 ml-2">Éditeur d’image réactives%( TODO: TRANSLATE ME%)</h1>
+<h1 class="mt-1 ml-3">[*reactive image map editor]</h1>
 
 <div id="fd_error"></div>
 
-<form id="form" class="mt-2" method="post" action="%action;">
-  <div class="col-sm-12 col-lg-9 mr-3">
+<form id="form" class="mt-3 ml-2" method="post" action="%action;">
+  <div class="col-sm-12 col-lg-7">
     <div class="form-row">
       <label for="page_title" class="col-form-label col-sm-2">[*title/titles]0</label>
-      <input type="text" class="form-control col-sm-9" id="page_title">
+      <input type="text" class="form-control col-sm-7" id="page_title">
     </div>
     <div class="form-row mt-2">
       <label for="page_desc" class="col-form-label col-sm-2">Description</label>
-      <textarea class="form-control col-sm-9" id="page_desc" rows="1"></textarea>
+      <textarea class="form-control col-sm-7" id="page_desc" rows="1"></textarea>
     </div>
-    <fieldset class="form-group mb-0  mt-2">
+    <fieldset class="form-group mb-0 mt-2">
       <div class="form-row">
         <legend class="col-form-label col-sm-2 pt-2">Chemin</legend>
-        <div class="form-check form-check-inline col-sm-9 pl-2 pr-0">
+        <div class="form-check form-check-inline col-sm-7 pl-2 pr-0">
           <div class="custom-control custom-radio custom-control-inline">
             <input id="doc" class="custom-control-input" type="radio" name="path" value="doc" checked>
             <label for="doc" class="custom-control-label" title="m=DOC&s=…">DOC</label>
@@ -79,43 +80,43 @@
     </fieldset>
     <div class="form-row mt-2">
       <label for="fname" class="col-form-label col-sm-2">[*file]</label>
-      <div class="d-flex col-sm-9 px-0">
+      <div class="d-flex col-sm-7 px-0">
         <input id="fname" type="text" class="form-control flex-fill">
       </div>
     </div>
   </div>
-  <div class="my-2 ml-2 mr-4">
+  <div class="mt-3 my-3">
     <div id="frame" onmousedown="return false">
       <map id="map" name="map"></map>
-      <img id="image" class="img-fluid" usemap="#map">
+      <img id="image" class="img-fluid ml-2" usemap="#map">
       <div id="selection" class="m-0 p-0"></div>
       <div id="groups" class="m-0 p-0"></div>
     </div>
-    <ul id="div_legend" class="list_comma list-unstyled pl-0"></ul>
-    <div class="table-responsive-md">
+    <ul id="div_legend" class="list_comma list-unstyled pl-0 mt-2 ml-2"></ul>
+    <div class="table-responsive-md mt-2">
       <table id="map_table" class="table table-sm w-auto">
         <thead><tr>
           <th id="type">Type</th>
-          <th>[*first name/first names]0</th>
-          <th>[*surname/surnames]0</th>
-          <th>#</th>
+          <th class="w12">[*first name/first names]0</th>
+          <th class="w12">[*surname/surnames]0</th>
+          <th><span title="occ">#</span></th>
           <th>[*group/groups]0</th>
-          <th>[*note/notes]0</th>
-          <th>URL</th>
-          <th>[*comment]</th>
+          <th class="w12">[*note/notes]0</th>
+          <th class="w12">URL</th>
+          <th class="w12">[*comment]</th>
           <th><i class="fa fa-trash-can mx-1"></i></th>
         </tr></thead>
       </table>
     </div>
   </div>
   <div class="table-responsive-md">
-    <table id="grp_table" class="table table-sm">
+    <table id="grp_table" class="table table-sm w-auto">
       <thead><tr>
         <th>[*group/groups]0</th>
-        <th>[*group label]</th>
-        <th><i class="fa fa-trash-alt"></i></th>
-        </tr></thead>
-      </table>
+        <th class="w12">[*group label]</th>
+        <th><i class="fa fa-trash-can mx-1"></i></th>
+      </tr></thead>
+    </table>
   </div>
 
   %hidden;
@@ -124,7 +125,7 @@
   <input type="hidden" name="skip_ok" value="on">
   <input id="digest" type="hidden" name="digest">
   <input id="notes" type="hidden" name="notes">
-  <div class="ml-4">
+  <div class="mt-2 ml-2">
     <button type="submit" form="form" class="btn btn-primary" title="[*validate/delete]0">OK</button>
     <a class="btn btn-outline-primary" href="%url_set.notmpl.on;">[*modify] [note/notes]0</a>
     <a class="btn btn-outline-primary" onClick="add_new_group()">[*add new group]</a>
@@ -261,7 +262,7 @@ $(document).ready(function() {
           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
         }
       },
-      { "data": null, "defaultContent": '<a class="fa fa-trash-alt text-danger remove" title="[*delete]"></a>' }
+      { "data": null, "defaultContent": '<a class="fa fa-trash-alt text-danger mx-1 remove" title="[*delete]"></a>' }
       %],
       "rowCallback": function( row, r ) {
         var grp = row.id.replace(/[a-z]/g, "");
@@ -273,8 +274,6 @@ $(document).ready(function() {
       "ordering": false,
       "searching": false,
       "info": false,
-      "scrollY": "25vh",
-      "scrollCollapse": true,
       "initComplete": function( settings, json) {
         json = json.r;
 
@@ -348,7 +347,7 @@ $(document).ready(function() {
          "render": function ( data, type, row, meta ) {
            var disabled = "";
            if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' max='200' step='1'" + disabled + ">";
+           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' step='1'" + disabled + ">";
          }
        },
        {
@@ -438,8 +437,6 @@ $(document).ready(function() {
      "ordering": false,
      "searching": false,
      "info": false,
-     "scrollY": "25vh",
-     "scrollCollapse": true,
      "initComplete": function( settings, json) {
        $("#digest").val( json.digest );
        json = json.r;
@@ -472,11 +469,11 @@ $(document).ready(function() {
            var oc = get(r.oc);
            if( oc != "" && oc != 0 ) { oc = "&oc=" + oc; } else { oc = "" ; }
            var txt = "";
-           if( get(r.alt) != "" ) { txt = " (" + r.alt + ")"; }
+           if( get(r.alt) != "" ) { txt = " (" + get(r.alt) + ")"; }
            $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>"+ cnt +
               " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + r.fn + " " + r.sn + txt + "</a></span></li>" );
          } else {
-           $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
+           $("#div_legend").append("<li class='legend' id='a" + cnt + "'><span>" + cnt + (get(r.alt) != "" ? " " + get(r.alt) : "") + "</span></li>");
          }
 
          // Make sure we can find the row in table

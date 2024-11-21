@@ -14961,6 +14961,41 @@ sv: visa en slumpmässig individ
 tr: rastgele bir bireyi göster
 zh: 显示随机个体
 
+    reactive image map editor
+af: redigeerder van reaktiewe beeldkaarte
+bg: редактор на интерактивни картографски изображения
+br: kizellerez kartenn skeudennoù kenwerzhel
+ca: editor de mapes d'imatges reactives
+co: redattore di carte d'imagine reattive
+cs: editor map reaktivních obrázků
+da: editor for reaktive billedkort
+de: Editor für interaktive Bildkarten
+en: reactive image map editor
+eo: redaktilo de reagaj bildmapoj
+es: editor de mapas de imágenes reactivas
+et: reaktiivsete pildikaartide redaktor
+fi: reaktiivisten kuvakarttojen editori
+fr: éditeur de carte d’image réactive
+he: עורך מפת תמונה אינטראקטיבית
+is: ritill fyrir viðbragðskortamyndir
+it: editor di mappe di immagini reattive
+lt: reaguojančių vaizdo žemėlapių redaktorius
+lv: interaktīvo attēlu karšu redaktors
+nl: editor voor reactieve afbeeldingskaarten
+no: editor for reaktive bildekart
+oc: editor de mapas d’imatges reactivas
+pl: edytor map obrazów reaktywnych
+pt: editor de mapas de imagens reativas
+pt-br: editor de mapas de imagens reativas
+ro: editor de hărți de imagini reactive
+ru: редактор интерактивных карт изображений
+sk: editor máp reaktívnych obrázkov
+sl: urejevalnik odzivnih slikovnih kart
+sv: redigerare för reaktiva bildkartor
+tr: reaktif resim haritası düzenleyicisi
+zh: 响应式图像地图编辑器
+
+
     recensement
 co: censimentu
 de: Volkszählung
