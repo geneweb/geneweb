@@ -444,7 +444,6 @@ let select opts ips =
           (sel_per, sel_fam))
         else
           match opts.asc with
-          (* opts.ascdesc = None && opts.desc = None *)
           | Some asc ->
               let ipers = select_asc conf base asc ips in
               let per_sel i = Geneweb.Util.IperSet.mem i ipers in
