@@ -1,12 +1,9 @@
-open Geneweb
-open Gwdb
-
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
 type gwexport_opts = {
   asc : int option;
   ascdesc : int option;
-  base : (string * base) option;
+  base : (string * Gwdb.base) option;
   censor : int;
   charset : gwexport_charset;
   desc : int option;
@@ -136,8 +133,8 @@ let speclist c =
     ("-v", Arg.Unit (fun () -> c := { !c with verbose = true }), " verbose");
   ]
 
-module IPS = Util.IperSet
-module IFS = Util.IfamSet
+module IPS = Geneweb.Util.IperSet
+module IFS = Geneweb.Util.IfamSet
 
 (* S: Does it mean private persons whose birth year is before 'max_year'
    are uncensored? *)
@@ -149,17 +146,17 @@ module IFS = Util.IfamSet
     its visibility is not public
 *)
 let is_censored_person threshold p =
-  match Date.cdate_to_dmy_opt (get_birth p) with
+  match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
   | None -> false
-  | Some dmy -> dmy.year >= threshold && get_access p != Def.Public
+  | Some dmy -> dmy.year >= threshold && Gwdb.get_access p != Def.Public
 
 (** [is_censored_couple base max_year family]
     Returns [true] if either the father or the mother of a given family in the
     base is censored
 *)
 let is_censored_couple base threshold cpl =
-  (is_censored_person threshold @@ poi base (get_father cpl))
-  || (is_censored_person threshold @@ poi base (get_mother cpl))
+  (is_censored_person threshold @@ Gwdb.poi base (Gwdb.get_father cpl))
+  || (is_censored_person threshold @@ Gwdb.poi base (Gwdb.get_mother cpl))
 
 (* The following functions are utils set people as "censored" by marking them.
    Censoring a person consists in setting a mark defined as:
@@ -171,86 +168,86 @@ let is_censored_couple base threshold cpl =
 
 (** Marks a censored person *)
 let censor_person base pmark flag threshold p no_check =
-  let ps = poi base p in
+  let ps = Gwdb.poi base p in
   if no_check || is_censored_person threshold ps then
-    Marker.set pmark p (Marker.get pmark p lor flag)
+    Gwdb.Marker.set pmark p (Gwdb.Marker.get pmark p lor flag)
 
 (** Marks all the members of a family that are censored.
     If a couple is censored, its parents and all its descendants are marked.
 *)
 let rec censor_family base pmark fmark flag threshold i no_check =
   let censor_unions p =
-    let uni = poi base p in
+    let uni = Gwdb.poi base p in
     Array.iter
       (fun ifam ->
         censor_family base pmark fmark flag threshold ifam true;
         censor_person base pmark flag threshold p true)
-      (get_family uni)
+      (Gwdb.get_family uni)
   in
   let censor_descendants f =
-    let des = foi base f in
+    let des = Gwdb.foi base f in
     Array.iter
-      (fun iper -> if Marker.get pmark iper = 0 then censor_unions iper)
-      (get_children des)
+      (fun iper -> if Gwdb.Marker.get pmark iper = 0 then censor_unions iper)
+      (Gwdb.get_children des)
   in
   let all_families_censored p =
     (* FIXME: replace with forall *)
-    let uni = poi base p in
+    let uni = Gwdb.poi base p in
     Array.fold_left
-      (fun check ifam -> check && Marker.get fmark ifam = 0)
-      true (get_family uni)
+      (fun check ifam -> check && Gwdb.Marker.get fmark ifam = 0)
+      true (Gwdb.get_family uni)
   in
   let censor_spouse iper =
     if all_families_censored iper then
-      Marker.set pmark iper (Marker.get pmark iper lor flag)
+      Gwdb.Marker.set pmark iper (Gwdb.Marker.get pmark iper lor flag)
     (* S: Replace this line by `censor_person`? *)
   in
-  if Marker.get fmark i = 0 then
-    let fam = foi base i in
+  if Gwdb.Marker.get fmark i = 0 then
+    let fam = Gwdb.foi base i in
     if no_check || is_censored_couple base threshold fam then (
-      Marker.set fmark i (Marker.get fmark i lor flag);
-      censor_spouse (get_father fam);
-      censor_spouse (get_mother fam);
+      Gwdb.Marker.set fmark i (Gwdb.Marker.get fmark i lor flag);
+      censor_spouse (Gwdb.get_father fam);
+      censor_spouse (Gwdb.get_mother fam);
       censor_descendants i)
 
 (** Marks all the families that are censored in the given base. *)
 let censor_base base pmark fmark flag threshold =
-  Collection.iter
+  Gwdb.Collection.iter
     (fun i -> censor_family base pmark fmark flag threshold i false)
-    (ifams base);
-  Collection.iter
+    (Gwdb.ifams base);
+  Gwdb.Collection.iter
     (fun i -> censor_person base pmark flag threshold i false)
-    (ipers base)
+    (Gwdb.ipers base)
 
 (** Set non visible persons and families as censored *)
 let restrict_base base per_tab fam_tab flag =
   (* Starts by censoring non visible persons of the base *)
-  Collection.iter
+  Gwdb.Collection.iter
     (fun i ->
-      if base_visible_get base (fun _ -> false) i then
-        Marker.set per_tab i (Marker.get per_tab i lor flag))
+      if Gwdb.base_visible_get base (fun _ -> false) i then
+        Gwdb.Marker.set per_tab i (Gwdb.Marker.get per_tab i lor flag))
       (* S: replace by `censor_person` ? *)
-    (ipers base);
+    (Gwdb.ipers base);
 
-  Collection.iter
+  Gwdb.Collection.iter
     (fun i ->
-      let fam = foi base i in
+      let fam = Gwdb.foi base i in
       let des_visible =
         (* There exists a children of the family that is not censored *)
         (* FIXME: replace with exists *)
         Array.fold_left
-          (fun check iper -> check || Marker.get per_tab iper = 0)
-          false (get_children fam)
+          (fun check iper -> check || Gwdb.Marker.get per_tab iper = 0)
+          false (Gwdb.get_children fam)
       in
       let cpl_not_visible =
         (* Father or mother is censored *)
-        Marker.get per_tab (get_father fam) <> 0
-        || Marker.get per_tab (get_mother fam) <> 0
+        Gwdb.Marker.get per_tab (Gwdb.get_father fam) <> 0
+        || Gwdb.Marker.get per_tab (Gwdb.get_mother fam) <> 0
       in
       (* If all the children, father and mother are censored, then censor family *)
       if (not des_visible) && cpl_not_visible then
-        Marker.set fam_tab i (Marker.get fam_tab i lor flag))
-    (ifams base)
+        Gwdb.Marker.set fam_tab i (Gwdb.Marker.get fam_tab i lor flag))
+    (Gwdb.ifams base)
 
 (** [select_asc conf base max_gen ips]
     Returns all the ancestors of persons in the list `ips` up to the `max_gen`
@@ -259,13 +256,13 @@ let select_asc conf base max_gen ips =
   let rec loop_asc (gen : int) set ip =
     if not @@ IPS.mem ip set then
       let set = IPS.add ip set in
-      let p = Util.pget conf base ip in
+      let p = Geneweb.Util.pget conf base ip in
       if gen < max_gen then
-        match get_parents p with
+        match Gwdb.get_parents p with
         | Some ifam ->
-            let cpl = foi base ifam in
-            let set = loop_asc (gen + 1) set (get_father cpl) in
-            loop_asc (gen + 1) set (get_mother cpl)
+            let cpl = Gwdb.foi base ifam in
+            let set = loop_asc (gen + 1) set (Gwdb.get_father cpl) in
+            loop_asc (gen + 1) set (Gwdb.get_mother cpl)
         | _ -> set
       else set
     else set
@@ -282,27 +279,27 @@ let select_asc conf base max_gen ips =
 *)
 let select_surname base pmark fmark surname =
   let surname = Name.strip_lower surname in
-  Collection.iter
+  Gwdb.Collection.iter
     (fun i ->
-      let fam = foi base i in
-      let fath = poi base (get_father fam) in
-      let moth = poi base (get_mother fam) in
+      let fam = Gwdb.foi base i in
+      let fath = Gwdb.poi base (Gwdb.get_father fam) in
+      let moth = Gwdb.poi base (Gwdb.get_mother fam) in
       if
-        Name.strip_lower (sou base (get_surname fath)) = surname
-        || Name.strip_lower (sou base (get_surname moth)) = surname
+        Name.strip_lower (Gwdb.sou base (Gwdb.get_surname fath)) = surname
+        || Name.strip_lower (Gwdb.sou base (Gwdb.get_surname moth)) = surname
       then (
-        Marker.set fmark i true;
-        Marker.set pmark (get_father fam) true;
-        Marker.set pmark (get_mother fam) true;
+        Gwdb.Marker.set fmark i true;
+        Gwdb.Marker.set pmark (Gwdb.get_father fam) true;
+        Gwdb.Marker.set pmark (Gwdb.get_mother fam) true;
         Array.iter
           (fun ic ->
-            let p = poi base ic in
+            let p = Gwdb.poi base ic in
             if
-              (not (Marker.get pmark ic))
-              && Name.strip_lower (sou base (get_surname p)) = surname
-            then Marker.set pmark ic true)
-          (get_children fam)))
-    (ifams base)
+              (not (Gwdb.Marker.get pmark ic))
+              && Name.strip_lower (Gwdb.sou base (Gwdb.get_surname p)) = surname
+            then Gwdb.Marker.set pmark ic true)
+          (Gwdb.get_children fam)))
+    (Gwdb.ifams base)
 
 (** [select_surnames base surnames]
     Calls `select_surname` on every family that have the given surnames.
@@ -310,7 +307,7 @@ let select_surname base pmark fmark surname =
     * the first takes a person and returns `true` iff it has been selected
     * the second takes a family and returns `false` iff it has been selected
 *)
-let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
+let select_surnames base surnames : (Gwdb.iper -> bool) * (Gwdb.ifam -> bool) =
   let pmark = Gwdb.iper_marker (Gwdb.ipers base) false in
   let fmark = Gwdb.ifam_marker (Gwdb.ifams base) false in
   List.iter (select_surname base pmark fmark) surnames;
@@ -322,9 +319,11 @@ let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
     Returns the set of common descendants of ip1 and the
     ancestors of ip2 and the set of their families. *)
 let select_parentship base ip1 ip2 =
-  let conf = Config.{ empty with wizard = true; bname = Gwdb.bname base } in
+  let conf =
+    Geneweb.Config.{ empty with wizard = true; bname = Gwdb.bname base }
+  in
   let asc = select_asc conf base max_int [ ip1 ] in
-  let desc = Util.select_desc conf base (-max_int) [ (ip2, 0) ] in
+  let desc = Geneweb.Util.select_desc conf base (-max_int) [ (ip2, 0) ] in
   let ipers =
     (* S: The intersection of asc and desc *)
     if IPS.cardinal asc > Hashtbl.length desc then
@@ -344,13 +343,13 @@ let select_parentship base ip1 ip2 =
           (fun acc ifam ->
             if
               IFS.mem ifam acc (* S: useless test? *)
-              || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+              || not (IPS.mem (Gutil.spouse iper @@ Gwdb.foi base ifam) ipers)
               (* S: is the partner of the
                  person not in ipers? *)
             then acc
             else IFS.add ifam acc)
           acc
-          (get_family (poi base iper)))
+          (Gwdb.get_family (Gwdb.poi base iper)))
       ipers IFS.empty
   in
   (ipers, ifams)
@@ -379,17 +378,18 @@ let select opts ips =
       in
       let not_censor_p, not_censor_f =
         if opts.censor <> 0 then (
-          let pmark = iper_marker (ipers base) 0 in
-          let fmark = ifam_marker (ifams base) 0 in
+          let pmark = Gwdb.iper_marker (Gwdb.ipers base) 0 in
+          let fmark = Gwdb.ifam_marker (Gwdb.ifams base) 0 in
           (if opts.censor = -1 then restrict_base base pmark fmark 1
           else
             let tm = Unix.localtime (Unix.time ()) in
             let threshold = 1900 + tm.Unix.tm_year - opts.censor in
             censor_base base pmark fmark 1 threshold);
-          ((fun i -> Marker.get pmark i = 0), fun i -> Marker.get fmark i = 0))
+          ( (fun i -> Gwdb.Marker.get pmark i = 0),
+            fun i -> Gwdb.Marker.get fmark i = 0 ))
         else ((fun _ -> true), fun _ -> true)
       in
-      let conf = Config.{ empty with wizard = true } in
+      let conf = Geneweb.Config.{ empty with wizard = true } in
       let sel_per, sel_fam =
         (* S: a lot of redundant tests are done here, would be simpler with
            pattern matchings and factorization. *)
@@ -404,17 +404,17 @@ let select opts ips =
             match opts.ascdesc with
             | Some ascdesc ->
                 let ips = List.map (fun i -> (i, asc)) ips in
-                Util.select_mascdesc conf base ips ascdesc
+                Geneweb.Util.select_mascdesc conf base ips ascdesc
             | None ->
                 let ht = Hashtbl.create 0 in
                 IPS.iter
-                  (fun i -> Hashtbl.add ht i (poi base i))
+                  (fun i -> Hashtbl.add ht i (Gwdb.poi base i))
                   (select_asc conf base asc ips);
                 ht
           in
           let ht' =
             let ips = List.map (fun i -> (i, 0)) ips in
-            Util.select_desc conf base desc ips
+            Geneweb.Util.select_desc conf base desc ips
           in
           Hashtbl.iter (fun i p -> Hashtbl.replace ht i p) ht';
           let ipers =
@@ -428,11 +428,13 @@ let select opts ips =
                     if
                       IFS.mem ifam acc
                       || not
-                           (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+                           (IPS.mem
+                              (Gutil.spouse iper @@ Gwdb.foi base ifam)
+                              ipers)
                     then acc
                     else IFS.add ifam acc)
                   acc
-                  (get_family (poi base iper)))
+                  (Gwdb.get_family (Gwdb.poi base iper)))
               ipers IFS.empty
           in
           let sel_per i = IPS.mem i ipers in
@@ -445,8 +447,8 @@ let select opts ips =
               let ipers = select_asc conf base asc ips in
               let per_sel i = IPS.mem i ipers in
               let fam_sel i =
-                let f = foi base i in
-                per_sel (get_father f) && per_sel (get_mother f)
+                let f = Gwdb.foi base i in
+                per_sel (Gwdb.get_father f) && per_sel (Gwdb.get_mother f)
               in
               (per_sel, fam_sel)
           | None ->
