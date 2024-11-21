@@ -368,10 +368,6 @@ let select_from_set (ipers : Geneweb.Util.IperSet.t)
   let sel_fam i = Geneweb.Util.IfamSet.mem i ifams in
   (sel_per, sel_fam)
 
-(** [select opts ips]
-    Return filters for [iper] and [ifam] to be used when exporting
-    a (portion of a) base.
-*)
 let select opts ips =
   match opts.base with
   | None -> raise (Arg.Bad "Missing base name. Use option -help for usage")
