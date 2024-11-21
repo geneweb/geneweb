@@ -133,9 +133,6 @@ let speclist c =
     ("-v", Arg.Unit (fun () -> c := { !c with verbose = true }), " verbose");
   ]
 
-module IPS = Geneweb.Util.IperSet
-module IFS = Geneweb.Util.IfamSet
-
 (* S: Does it mean private persons whose birth year is before 'max_year'
    are uncensored? *)
 
@@ -254,8 +251,8 @@ let restrict_base base per_tab fam_tab flag =
     generation. *)
 let select_asc conf base max_gen ips =
   let rec loop_asc (gen : int) set ip =
-    if not @@ IPS.mem ip set then
-      let set = IPS.add ip set in
+    if not @@ Geneweb.Util.IperSet.mem ip set then
+      let set = Geneweb.Util.IperSet.add ip set in
       let p = Geneweb.Util.pget conf base ip in
       if gen < max_gen then
         match Gwdb.get_parents p with
@@ -267,7 +264,7 @@ let select_asc conf base max_gen ips =
       else set
     else set
   in
-  List.fold_left (loop_asc 0) IPS.empty ips
+  List.fold_left (loop_asc 0) Geneweb.Util.IperSet.empty ips
 
 (* S: only used by `select_surnames` in a List.iter *)
 (* Should it use search engine functions? *)
@@ -326,31 +323,37 @@ let select_parentship base ip1 ip2 =
   let desc = Geneweb.Util.select_desc conf base (-max_int) [ (ip2, 0) ] in
   let ipers =
     (* S: The intersection of asc and desc *)
-    if IPS.cardinal asc > Hashtbl.length desc then
+    if Geneweb.Util.IperSet.cardinal asc > Hashtbl.length desc then
       Hashtbl.fold
-        (fun k _ acc -> if IPS.mem k asc then IPS.add k acc else acc)
-        desc IPS.empty
+        (fun k _ acc ->
+          if Geneweb.Util.IperSet.mem k asc then Geneweb.Util.IperSet.add k acc
+          else acc)
+        desc Geneweb.Util.IperSet.empty
     else
-      IPS.fold
-        (fun k acc -> if Hashtbl.mem desc k then IPS.add k acc else acc)
-        asc IPS.empty
+      Geneweb.Util.IperSet.fold
+        (fun k acc ->
+          if Hashtbl.mem desc k then Geneweb.Util.IperSet.add k acc else acc)
+        asc Geneweb.Util.IperSet.empty
   in
   let ifams =
     (* S: families  *)
-    IPS.fold
+    Geneweb.Util.IperSet.fold
       (fun iper acc ->
         Array.fold_left
           (fun acc ifam ->
             if
-              IFS.mem ifam acc (* S: useless test? *)
-              || not (IPS.mem (Gutil.spouse iper @@ Gwdb.foi base ifam) ipers)
+              Geneweb.Util.IfamSet.mem ifam acc (* S: useless test? *)
+              || not
+                   (Geneweb.Util.IperSet.mem
+                      (Gutil.spouse iper @@ Gwdb.foi base ifam)
+                      ipers)
               (* S: is the partner of the
                  person not in ipers? *)
             then acc
-            else IFS.add ifam acc)
+            else Geneweb.Util.IfamSet.add ifam acc)
           acc
           (Gwdb.get_family (Gwdb.poi base iper)))
-      ipers IFS.empty
+      ipers Geneweb.Util.IfamSet.empty
   in
   (ipers, ifams)
 
@@ -359,9 +362,10 @@ let select_parentship base ip1 ip2 =
     * the first returns true if its input is in ipers
     * the second returns true if its input is in ifams
 *)
-let select_from_set (ipers : IPS.t) (ifams : IFS.t) =
-  let sel_per i = IPS.mem i ipers in
-  let sel_fam i = IFS.mem i ifams in
+let select_from_set (ipers : Geneweb.Util.IperSet.t)
+    (ifams : Geneweb.Util.IfamSet.t) =
+  let sel_per i = Geneweb.Util.IperSet.mem i ipers in
+  let sel_fam i = Geneweb.Util.IfamSet.mem i ifams in
   (sel_per, sel_fam)
 
 (** [select opts ips]
@@ -407,7 +411,7 @@ let select opts ips =
                 Geneweb.Util.select_mascdesc conf base ips ascdesc
             | None ->
                 let ht = Hashtbl.create 0 in
-                IPS.iter
+                Geneweb.Util.IperSet.iter
                   (fun i -> Hashtbl.add ht i (Gwdb.poi base i))
                   (select_asc conf base asc ips);
                 ht
@@ -418,34 +422,36 @@ let select opts ips =
           in
           Hashtbl.iter (fun i p -> Hashtbl.replace ht i p) ht';
           let ipers =
-            Hashtbl.fold (fun i _ ipers -> IPS.add i ipers) ht IPS.empty
+            Hashtbl.fold
+              (fun i _ ipers -> Geneweb.Util.IperSet.add i ipers)
+              ht Geneweb.Util.IperSet.empty
           in
           let ifams =
-            IPS.fold
+            Geneweb.Util.IperSet.fold
               (fun iper acc ->
                 Array.fold_left
                   (fun acc ifam ->
                     if
-                      IFS.mem ifam acc
+                      Geneweb.Util.IfamSet.mem ifam acc
                       || not
-                           (IPS.mem
+                           (Geneweb.Util.IperSet.mem
                               (Gutil.spouse iper @@ Gwdb.foi base ifam)
                               ipers)
                     then acc
-                    else IFS.add ifam acc)
+                    else Geneweb.Util.IfamSet.add ifam acc)
                   acc
                   (Gwdb.get_family (Gwdb.poi base iper)))
-              ipers IFS.empty
+              ipers Geneweb.Util.IfamSet.empty
           in
-          let sel_per i = IPS.mem i ipers in
-          let sel_fam i = IFS.mem i ifams in
+          let sel_per i = Geneweb.Util.IperSet.mem i ipers in
+          let sel_fam i = Geneweb.Util.IfamSet.mem i ifams in
           (sel_per, sel_fam))
         else
           match opts.asc with
           (* opts.ascdesc = None && opts.desc = None *)
           | Some asc ->
               let ipers = select_asc conf base asc ips in
-              let per_sel i = IPS.mem i ipers in
+              let per_sel i = Geneweb.Util.IperSet.mem i ipers in
               let fam_sel i =
                 let f = Gwdb.foi base i in
                 per_sel (Gwdb.get_father f) && per_sel (Gwdb.get_mother f)
@@ -458,12 +464,18 @@ let select opts ips =
                   | [] -> select_from_set ipers ifams
                   | k2 :: k1 :: tl ->
                       let ipers', ifams' = select_parentship base k1 k2 in
-                      let ipers = IPS.fold IPS.add ipers ipers' in
-                      let ifams = IFS.fold IFS.add ifams ifams' in
+                      let ipers =
+                        Geneweb.Util.IperSet.fold Geneweb.Util.IperSet.add ipers
+                          ipers'
+                      in
+                      let ifams =
+                        Geneweb.Util.IfamSet.fold Geneweb.Util.IfamSet.add ifams
+                          ifams'
+                      in
                       loop ipers ifams tl
                   | _ -> assert false
                 in
-                loop IPS.empty IFS.empty ips
+                loop Geneweb.Util.IperSet.empty Geneweb.Util.IfamSet.empty ips
               else ((fun _ -> true), fun _ -> true)
       in
       ( (fun i -> not_censor_p i && sel_per i),
