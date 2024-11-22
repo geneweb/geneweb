@@ -136,8 +136,8 @@ let speclist c =
     ("-v", Arg.Unit (fun () -> c := { !c with verbose = true }), " verbose");
   ]
 
-module IPS = Util.IperSet
-module IFS = Util.IfamSet
+module IPS = Gwdb.IperSet
+module IFS = Gwdb.IfamSet
 
 (* S: Does it mean private persons whose birth year is before 'max_year'
    are uncensored? *)

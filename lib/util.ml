@@ -2228,18 +2228,6 @@ let array_mem_witn base ip witnesses wnotes =
   in
   loop 0
 
-module IperSet = Set.Make (struct
-  type t = Gwdb.iper
-
-  let compare = Stdlib.compare
-end)
-
-module IfamSet = Set.Make (struct
-  type t = Gwdb.ifam
-
-  let compare = Stdlib.compare
-end)
-
 let select_masc conf base ips =
   let poi =
     if conf.Config.wizard || conf.Config.friend then Gwdb.poi else pget conf
