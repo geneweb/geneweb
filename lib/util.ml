@@ -2266,18 +2266,6 @@ let array_mem_witn base ip witnesses wnotes =
   in
   loop 0
 
-module IperSet = Set.Make (struct
-  type t = Gwdb.iper
-
-  let compare = Stdlib.compare
-end)
-
-module IfamSet = Set.Make (struct
-  type t = Gwdb.ifam
-
-  let compare = Stdlib.compare
-end)
-
 let select_masc conf base ips =
   let poi =
     if conf.Config.wizard || conf.Config.friend then Gwdb.poi else pget conf
@@ -2353,15 +2341,17 @@ let select_desc ?(skip_descendants = fun ~ancestors:_ ~generation:_ _ -> false)
           person_id |> Gwdb.poi base
           |> Gwdb.parents_of_person base
           |> Option.map Adef.parent_array
-          |> Option.value ~default:[||] |> Array.to_seq |> IperSet.of_seq
+          |> Option.value ~default:[||] |> Array.to_seq |> Gwdb.IperSet.of_seq
         in
         List.iter (fun person_id ->
-            let ancestors = IperSet.union ancestors (parents person_id) in
+            let ancestors = Gwdb.IperSet.union ancestors (parents person_id) in
             if not (skip_descendants ~ancestors ~generation:gen ip) then
               loop_desc ~ancestors (gen - 1) person_id)
         @@ Gwdb.children_of_p base p)
   in
-  List.iter (fun (ip, gen) -> loop_desc ~ancestors:IperSet.empty gen ip) ips;
+  List.iter
+    (fun (ip, gen) -> loop_desc ~ancestors:Gwdb.IperSet.empty gen ip)
+    ips;
   desc
 
 let select_mascdesc ?skip_descendants conf base ips gen_desc =

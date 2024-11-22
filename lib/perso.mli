@@ -78,7 +78,7 @@ val make_desc_level_table :
   Gwdb.base ->
   int ->
   Gwdb.person ->
-  (Util.IperSet.elt, int) Gwdb.Marker.t * (Gwdb.ifam, int) Gwdb.Marker.t
+  (Gwdb.IperSet.elt, int) Gwdb.Marker.t * (Gwdb.ifam, int) Gwdb.Marker.t
 
 type dup =
   | DupFam of Gwdb.ifam * Gwdb.ifam

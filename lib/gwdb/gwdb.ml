@@ -1,5 +1,17 @@
 include Gwdb_driver
 
+module IperSet = Set.Make (struct
+  type t = iper
+
+  let compare = Stdlib.compare
+end)
+
+module IfamSet = Set.Make (struct
+  type t = ifam
+
+  let compare = Stdlib.compare
+end)
+
 (** [insert_person base p a u]
     Add a new person with its union and ascendants in the [base].
     Allocate and returns the fresh new id for this person.
