@@ -651,8 +651,8 @@ let advanced_search conf base max_answers =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
           let rec loop p (set, acc) =
-            if not (Util.IperSet.mem (Gwdb.get_iper p) set) then
-              let set = Util.IperSet.add (Gwdb.get_iper p) set in
+            if not (Gwdb.IperSet.mem (Gwdb.get_iper p) set) then
+              let set = Gwdb.IperSet.add (Gwdb.get_iper p) set in
               let acc = match_person acc p search_type in
               match Gwdb.get_parents p with
               | Some ifam ->
@@ -666,7 +666,7 @@ let advanced_search conf base max_answers =
           in
           loop
             (Util.pget conf base @@ Gwdb.get_iper sosa_ref)
-            (Util.IperSet.empty, ([], 0))
+            (Gwdb.IperSet.empty, ([], 0))
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
