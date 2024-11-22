@@ -1,4 +1,4 @@
-<!-- $Id: notes_upd_gallery.txt v7.1 06/06/2024 08:50:55 $ -->
+<!-- $Id: notes_upd_gallery.txt v7.1 25/11/2024 05:52:03 $ -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,38 +10,41 @@
   <link rel="apple-touch-icon" href="%image_prefix;favicon_gwd.png">
   %include;css
   %if;(b.use_cdn="yes")
-    <link href="https://cdn.datatables.net/v/bs4/dt-2.0.8/datatables.min.css" rel="stylesheet"
-      integrity="sha256-y6SU6t0GR4VzzjinJPC44iKqr2VS/1LiXoNEcUinUso=
-                 sha384-XmEVd94K0LclM0kOoFTUlVfM2pSAwkB1jB4KCcdgPVnVmVg6t06qrCtY0xp22AGz
-                 sha512-/MMf3DMoygI189tqtdyvU1/gJNu4z4dDPX5c4mDz7xcMBTsoPYAvtz4RQvSOF8Gjs6hj0FeKuo1oa0vfdmWnaw=="
+    <link href="https://cdn.datatables.net/v/bs4/dt-2.1.8/rr-1.5.0/datatables.min.css" rel="stylesheet"
+      integrity="sha256-KPU2wRXSeg7r7IlZ6DARVH5+r4eUh1NkV9JNYiqaPLs=
+                 sha384-W9T1e24SGBgoxz++zItwdyIs1bVELnmIqIJ5bF1ZeZ0Ee2vDPBK1PmgrdxvNJGmU
+                 sha512-rTTTKtCyaaEqHmsomlAtTapRfYUxUL4Y9f5VAmi9Yf7rO50p0dk6EB/HgrpRmyKdfUXcBhQ4z6YgacgXfmyO7g=="
       crossorigin="anonymous" referrerpolicy="no-referrer">
   %else;
-    <link rel="stylesheet" href="%etc_prefix;css/datatables.min.css?version=2.0.8">
+    <link rel="stylesheet" href="%etc_prefix;css/datatables.min.css?version=dt-2.1.8+rr-1.5.0">
   %end;
   <style>
-    .in { background-color: #FFA500 !important; }
+    .in { background-color: #FFE8CC !important; }
     #selection { border: 2px solid white; background: #1B94E0; opacity: 0.4; filter: alpha(opacity=40); display: none; }
-    .list_comma, .list_comma li { display: inline; }
+    .list_comma, .list_comma li { display: inline-block; line-height: 1.2; }
     .list_comma li:not(:last-child):after { content: ", "; }
     .list_comma li:last-child:after { content: "."; }
     input:invalid { box-shadow: 0 0 1.5px 1px red; }
     #image { cursor: crosshair; }
-    .w12 { min-width: 12em; }
+    .w12 { min-width: 4em; }
     #type { width: 8em; }
-    input[type=number] { width: 4em; }
+    input[type=number] { width: 4.5em; }
+    .sort-buttons { width: 0px; }
+    tr:has(+ tr) .sort-buttons { width: 3.3em; }
     table.dataTable td { vertical-align: middle; }
-    #map_table th:not(:nth-child(9)), #grp_table th:not(:nth-child(3)) { padding-left: 8px;}
-  </style>
+    #map_table th:not(:nth-child(10)), #grp_table th:not(nth-child(3)) { padding-left: 8px;}
+    .drag-handle { cursor: grab; }
+    .drag-handle:active { cursor: grabbing; }
+    tr:first-child .btn-up { display: none; }
+    tr:last-child .btn-down { display: none; }
+</style>
   %include;hed
 </head>
 <body%body_prop;>
 <div class="container-fluid">
 %include;home
-
 <h1 class="mt-1 ml-3">[*reactive image map editor]</h1>
-
 <div id="fd_error"></div>
-
 <form id="form" class="mt-3 ml-2" method="post" action="%action;">
   <div class="col-sm-12 col-lg-7">
     <div class="form-row">
@@ -50,72 +53,63 @@
     </div>
     <div class="form-row mt-2">
       <label for="page_desc" class="col-form-label col-sm-2">Description</label>
-      <textarea class="form-control col-sm-7" id="page_desc" rows="1"></textarea>
+      <textarea class="form-control col-sm-7" id="page_desc" rows="2"></textarea>
     </div>
-    <fieldset class="form-group mb-0 mt-2">
-      <div class="form-row">
-        <legend class="col-form-label col-sm-2 pt-2">Chemin</legend>
-        <div class="form-check form-check-inline col-sm-7 pl-2 pr-0">
-          <div class="custom-control custom-radio custom-control-inline">
-            <input id="doc" class="custom-control-input" type="radio" name="path" value="doc" checked>
-            <label for="doc" class="custom-control-label" title="m=DOC&s=…">DOC</label>
-          </div>
-          <div class="custom-control custom-radio custom-control-inline">
-            <input id="public" class="custom-control-input" type="radio" name="path" value="public">
-            <label for="public" class="custom-control-label"
-              title="gallery_path=%b.gallery_path;">[*iftitles/public/private]1</label>
-          </div>
-          <div class="custom-control custom-radio custom-control-inline">
-            <input id="private" class="custom-control-input" type="radio" name="path" value="private">
-            <label for="private" class="custom-control-label"
-              title="gallery_path_private=%b.gallery_path_private;">[*iftitles/public/private]2</label>
-          </div>
-          <div class="custom-control custom-radio custom-control-inline">
-            <input id="other" class="custom-control-input" type="radio" name="path" value="other">
-            <label for="other" class="custom-control-label">Autre</label>
-          </div>
-          <input id="path" type="text" class="form-control flex-fill" placeholder="Autre chemin" disabled>
-        </div>
-      </div>
-    </fieldset>
     <div class="form-row mt-2">
       <label for="fname" class="col-form-label col-sm-2">[*file]</label>
       <div class="d-flex col-sm-7 px-0">
-        <input id="fname" type="text" class="form-control flex-fill">
+        <div class="input-group">
+          <input id="fname" type="text" class="form-control flex-fill" list="src_images">
+          <datalist id="src_images">
+            %src_images_list;
+          </datalist>
+          <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary" id="clear-image" title="Clear image field">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="mt-3 my-3">
-    <div id="frame" onmousedown="return false">
-      <map id="map" name="map"></map>
-      <img id="image" class="img-fluid ml-2" usemap="#map">
-      <div id="selection" class="m-0 p-0"></div>
-      <div id="groups" class="m-0 p-0"></div>
+  <div class="mt-3 m-3">
+    <div id="div_img_legend">
+      <div id="frame" onmousedown="return false">
+        <map id="map" name="map"></map>
+        <img id="image" usemap="#map">
+        <div id="selection" class="m-0 p-0"></div>
+        <div id="groups" class="m-0 p-0"></div>
+      </div>
+      <ul id="div_legend" class="list_comma list-unstyled pl-0"></ul>
     </div>
-    <ul id="div_legend" class="list_comma list-unstyled pl-0 mt-2 ml-2"></ul>
     <div class="table-responsive-md mt-2">
-      <table id="map_table" class="table table-sm w-auto">
-        <thead><tr>
-          <th id="type">Type</th>
-          <th class="w12">[*first name/first names]0</th>
-          <th class="w12">[*surname/surnames]0</th>
-          <th><span title="occ">#</span></th>
-          <th>[*group/groups]0</th>
-          <th class="w12">[*note/notes]0</th>
-          <th class="w12">URL</th>
-          <th class="w12">[*comment]</th>
-          <th><i class="fa fa-trash-can mx-1"></i></th>
-        </tr></thead>
+      <table id="map_table" class="table table-sm w-auto ml-0">
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+            <th id="type">Type</th>
+            <th class="w12">[*first name/first names]0</th>
+            <th class="w12">[*surname/surnames]0</th>
+            <th><span>[*number]</span></th>
+            <th>[*group/groups]0</th>
+            <th class="w12">URL</th>
+            <th class="w12">[*comment]</th>
+            <th><i class="fa fa-trash-can mx-1"></i></th>
+          </tr>
+        </thead>
       </table>
     </div>
   </div>
   <div class="table-responsive-md">
-    <table id="grp_table" class="table table-sm w-auto">
-      <thead><tr>
-        <th>[*group/groups]0</th>
-        <th class="w12">[*group label]</th>
-        <th><i class="fa fa-trash-can mx-1"></i></th>
-      </tr></thead>
+    <table id="grp_table" class="table table-sm w-auto ml-0">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="w12">[*group label]</th>
+          <th><i class="fa fa-trash-can mx-1"></i></th>
+        </tr>
+      </thead>
     </table>
   </div>
 
@@ -128,516 +122,970 @@
   <div class="mt-2 ml-2">
     <button type="submit" form="form" class="btn btn-primary" title="[*validate/delete]0">OK</button>
     <a class="btn btn-outline-primary" href="%url_set.notmpl.on;">[*modify] [note/notes]0</a>
-    <a class="btn btn-outline-primary" onClick="add_new_group()">[*add new group]</a>
+    <button type="button" id="add-group-btn" class="btn btn-outline-primary">[*add new group]</button>
+    <button type="button" class="btn btn-danger ml-5" id="clear-all" title="Clear everything: form, image and tables!">
+      Réinitialiser tout</button>
   </div>
 </form>
-
 </div>
 %include;trl
 %include;copyr
-
 </div>
 %include;js
 %if;(b.use_cdn="yes")
-  <script src="https://cdn.datatables.net/v/bs4/dt-2.0.8/datatables.min.js" 
-  integrity="sha256-L8giEO/bNvvREMEyML6g5LLiwxHGT5FJ7aOmmVivU/k=
-             sha384-f4F8uiQ2tF8dSztvc3FlhuLLLszAYYPsFS5JXR2OyfX0mnZotJH1o5PIbC3q5PNy
-             sha512-UJy2UCxUNbuXbEYnIG5IqWyzlgMZSx4+fk4twICYpc+otPn1bq6549abP7wNTvM9OGEO2K9Vb+e4nQD03J1Prg=="
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.datatables.net/v/bs4/dt-2.1.8/rr-1.5.0/datatables.min.js"
+    integrity="sha256-K9K34UCeIOBQFuVbrfi4kQaVBXYWi6SHYHUamWfbuHA=
+               sha384-BrJUYe9FafQMFfINSlrNOR8+oJJuHwBdOPAcyzC97//5IVyyNQliyxZ17l3wFXv2
+               sha512-msL+zow8mrATk2FqGH77oNNLqagj8iKqRMMolKducDvkKFsxk5+qO++GqKu+A7vs1L5JFIGdW22LXFLKiBs1nw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/maphilight@1.4.2/jquery.maphilight.min.js">
+    integrity="sha256-CMISu7vXb6gfvgekngAzo/Mk2GOoFeLy9UIqjtJrt5Y=
+               sha384-+gw07sufgVITpP4bHCQQeafUY2NQfyPBM3+931FUWejozbZ0+hCcd8dTUP4epnQK
+               sha512-1YiTT24MNHA6DRzyu+w9F5Egc8evYlyEnzSSTD4/M7q42xEb5fSpNgn0+1CPy3evubHs3xdlh8uXgae0DOhR7Q=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 %else;
-  <script src="%etc_prefix;js/datatables.min.js?version=2.0.8"></script>
+  <script src="%etc_prefix;js/datatables.min.js?version=dt-2.1.8+rr-1.5.0"></script>
+  <script src="%etc_prefix;js/jquery.maphilight.min.js?version=1.4.2"></script>
 %end;
-<script src="%etc_prefix;js/jquery.maphilight.js"></script>
-
 <script>
-function get( v ) {
-  if( typeof v !== "undefined" ) {
-    return v
-  } else {
-    return ""
-  }
-}
-
-var doc_path = "%prefix;m=DOC&s=";
-var public_path = "%b.gallery_path;";
-var private_path = "%b.gallery_path_private;";
 var mouseIsNotOverLegend = true;
-
 var table;
-
-// Selection
-var x1, y1, x2, y2;
-var selection = false;
-var gMOUSEUP = false;
-var gMOUSEDOWN = false;
-$(document).mouseup( function() {
-  gMOUSEUP = true;
-  gMOUSEDOWN = false;
-});
-$(document).mousedown( function() {
-  gMOUSEUP = false;
-  gMOUSEDOWN = true;
-});
-
 var global_cnt = 0;
 var global_grp = 0;
 
-function add_new_row( x1, y1, x2, y2 ) {
-  if( x2-x1 > 5 && y2-y1 > 5 ) {
+// Maphilight configuration for genealogical photos
+const MAPHILIGHT_CONFIG = {
+    alwaysOn: false,
+    stroke: true,
+    strokeColor: 'dba76a', // Warm amber for genealogical photos
+    strokeWidth: 2,
+    strokeOpacity: 0.7,
+    fillColor: 'ffffff',
+    fillOpacity: 0,
+    groupBy: false
+};
+
+// Utility function to safely get a value or return empty string if undefined
+const Utils = {
+    get: function(v) {
+        return (typeof v !== "undefined") ? v : "";
+    }
+};
+const get = Utils.get;
+
+// Selection area drawing and interaction
+const SelectionManager = {
+  x1: 0,
+  y1: 0,
+  x2: 0,
+  y2: 0,
+  selection: false,
+  gMOUSEUP: false,
+  gMOUSEDOWN: false,
+
+  init: function () {
+    $(document).mouseup(() => {
+      this.gMOUSEUP = true;
+      this.gMOUSEDOWN = false;
+    });
+
+    $(document).mousedown(() => {
+      this.gMOUSEUP = false;
+      this.gMOUSEDOWN = true;
+    });
+
+    // Initialize frame handlers
+    this.initFrameHandlers();
+  },
+
+  initFrameHandlers: function () {
+    $("#frame").mousedown((event) => {
+      // Start a new selection
+      this.x1 = Math.round(event.pageX);
+      this.y1 = Math.round(event.pageY);
+      this.x2 = this.x1;
+      this.y2 = this.y1;
+      this.selection = true;
+    });
+
+    $("#frame").mousemove((event) => {
+      if (this.selection) {
+        this.x2 = Math.round(event.pageX);
+        this.y2 = Math.round(event.pageY);
+
+        if (this.selection) {
+          const TOP = this.y1 < this.y2 ? this.y1 : this.y2;
+          const LEFT = this.x1 < this.x2 ? this.x1 : this.x2;
+          const WIDTH = this.x1 < this.x2 ? this.x2 - this.x1 : this.x1 - this.x2;
+          const HEIGHT = this.y1 < this.y2 ? this.y2 - this.y1 : this.y1 - this.y2;
+
+          $("#selection").css({
+            position: "absolute",
+            zIndex: 5000,
+            left: LEFT,
+            top: TOP,
+            width: WIDTH,
+            height: HEIGHT,
+          });
+          $("#selection").show();
+        }
+      }
+    });
+
+    $("#frame").mouseup(() => {
+      this.selection = false;
+      $("#selection").hide();
+
+      const pos = $("#frame").get(0).getBoundingClientRect();
+      const l_x1 = this.x1 < this.x2 ? this.x1 : this.x2;
+      const l_x2 = this.x1 < this.x2 ? this.x2 : this.x1;
+      const l_y1 = this.y1 < this.y2 ? this.y1 : this.y2;
+      const l_y2 = this.y1 < this.y2 ? this.y2 : this.y1;
+
+      add_new_row(l_x1 - (pos.left + pageXOffset), l_y1 - (pos.top + pageYOffset), l_x2 - (pos.left + pageXOffset), l_y2 - (pos.top + pageYOffset));
+    });
+
+    $("#frame").mouseenter(() => {
+      this.selection = this.gMOUSEDOWN;
+    });
+
+    $("#selection").mouseenter(() => {
+      this.selection = this.gMOUSEDOWN;
+    });
+
+    $("#frame").mouseleave(() => {
+      this.selection = false;
+    });
+  },
+};
+
+// Table row movement operations (↓↑ buttons)
+const RowManager = {
+  moveRow: function (direction) {
+    return function (event) {
+      event.preventDefault();
+      const row = $(this).closest("tr");
+      const targetRow = direction === "up" ? row.prev("tr") : row.next("tr");
+
+      if (targetRow.length) {
+        const currentRowData = table.row(row).data();
+        const targetRowData = table.row(targetRow).data();
+        table.row(row).data(targetRowData);
+        table.row(targetRow).data(currentRowData);
+        table.draw(false);
+      }
+    };
+  },
+
+  initRowMovement: function () {
+    $("#map_table").on("click", ".btn-up", this.moveRow("up"));
+    $("#map_table").on("click", ".btn-down", this.moveRow("down"));
+  },
+};
+
+// Group-related operations and UI updates
+// Add new group with next available number, calculating gaps in sequence
+const GroupManager = {
+  addNewGroup: function () {
+    var numbers = [];
+    table_grp.rows().every(function () {
+      var rowData = this.data();
+      var num = parseInt(rowData.name);
+      if (!isNaN(num)) numbers.push(num);
+    });
+
+    numbers.sort((a, b) => a - b);
+    var suggestedNumber = 1;
+    for (let num of numbers) {
+      if (num !== suggestedNumber) break;
+      suggestedNumber++;
+    }
+
+    table_grp.row
+      .add({
+        name: suggestedNumber,
+        label: "",
+      })
+      .draw();
+
+      table_grp.order(%[0, 'asc'%]).draw();
+  },
+
+  // Update group labels in UI
+  updateGroupLabels: function () {
+    table_grp.rows().every(function (rowIdx) {
+      const r = this.data();
+      const row = this.node();
+      const groupNum = row.id.replace(/[a-z_]/g, "");
+      const label = get(r.label);
+      if (label) {
+        $(`#g${groupNum}`).html(`<span>${groupNum} : ${label}</span>`);
+      }
+    });
+  },
+};
+
+// UI interaction effects and hover states
+const UIManager = {
+  init: function () {
+    // Group table interactions
+    $(document).on("mouseover", "grp_table", function (event) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $(`#g${n}`).mouseover().addClass("in");
+    });
+    $(document).on("mouseout", "grp_table", function (event) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $(`#g${n}`).mouseout().removeClass("in");
+    });
+
+    // Legend interactions
+    $(document).on("mouseover", ".legend", function (event) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $(`#area${n}`).mouseover();
+      $(`#row${n}`).addClass("in");
+    });
+    $(document).on("mouseout", ".legend", function (event) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $(`#area${n}`).mouseout();
+      $(`#row${n}`).removeClass("in");
+    });
+    $(document).on("click", "li.legend", function (event) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $(`#row${n}`).find("input").first().focus();
+    });
+
+    // Area interactions
+    $(document).on("mouseover", "area", function (event) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $(`#a${n} span`).addClass("in");
+      $(`#row${n}`).addClass("in");
+    });
+    $(document).on("mouseout", "area", function (event) {
+      var n = $(this).attr("id").replace(/[a-z]/g, "");
+      $(`#a${n} span`).removeClass("in");
+      $(`#row${n}`).removeClass("in");
+    });
+
+    // Table row interactions
+    $(document).on("mouseover", "tr", function (event) {
+      if (typeof $(this).attr("id") !== "undefined") {
+        var n = $(this).attr("id").replace(/[a-z]/g, "");
+        $(`#area${n}`).mouseover();
+        $(`#a${n} span`).addClass("in");
+      }
+    });
+    $(document).on("mouseout", "tr", function (event) {
+      if (typeof $(this).attr("id") !== "undefined") {
+        var n = $(this).attr("id").replace(/[a-z]/g, "");
+        $(`#area${n}`).mouseout();
+        $(`#a${n} span`).removeClass("in");
+      }
+    });
+  },
+};
+
+// Creates new row in map table and adds corresponding area and legend elements
+function add_new_row(x1, y1, x2, y2) {
+  if (x2 - x1 > 5 && y2 - y1 > 5) {
+    x1 = parseFloat(x1.toFixed(2));
+    y1 = parseFloat(y1.toFixed(2));
+    x2 = parseFloat(x2.toFixed(2));
+    y2 = parseFloat(y2.toFixed(2));
     var cnt = ++global_cnt;
     var coords = "" + x1 + "," + y1 + "," + x2 + "," + y2;
-    var new_row = table.row.add( {
-      "shape": "rect",
-      "coords": coords
-    }).draw(false);
-    $("#map").append( "<area id='area" + cnt + "' shape='rect' coords='" + coords + "' alt='" + cnt + "' title='" + cnt + "'>" );
-    $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
+    var new_row = table.row
+      .add({
+        shape: "rect",
+        coords: coords,
+      })
+      .draw(false);
+
+    const displayText = formatMapItemText(cnt, {});
+    $("#map").append(`<area id="area${cnt}" shape="rect" coords="${coords}"
+      alt="${cnt}" title="${cnt}">`);
+    $("#div_legend").append(`<li class="legend" id="a${cnt}">
+      <span>${cnt}</span></li>`);
     new_row.node().id = "row" + cnt;
   }
 }
 
-function g_row ( name, label) {
-  var str = "<tr><td>" + 
-    "<input class='form-control update' type='number' value='" + name + 
-    "' min='0' step='1'></td><td>" +
-    "<input class='form-control update' type='text' value='" + label +
-    "'</td><td><i class=\"fa fa-trash-alt\"></i></td></tr>";
-  return str;
+// Generates HTML markup for a group table row with name and label inputs
+function g_row(name, label) {
+  return `<tr>
+    <td><input class="form-control update" type="number"
+          value="${name}" min="0" step="1"></td>
+    <td><input class="form-control update" type="text"
+          value="${label}"></td>
+    <td><i class="fa fa-trash-alt"></i></td></tr>`;
 }
 
-function add_new_group() {
-    var grp = ++global_grp;
-    var new_row = table_grp.row.add( {
-      "name": "",
-      "label": ""
-    }).draw(false);
-    //$("#grp_table").append(g_row( "", ""));
-    new_row.node().id = "g_row" + grp;
-}
+// Format text for display in titles and legends, based on type and available data
+function formatMapItemText(cnt, data) {
+  if (!data || typeof data !== 'object') {
+    return `${cnt}.`;
+  }
 
-$(document).ready(function() {
-  $("#doc,#public,#private").click( function() {
-   $("#path").prop("disabled",true);
-  });
-  $("#other").click( function() {
-   $("#path").prop("disabled",false);
-  });
-  $("#doc,#public,#private,#other,#path,#fname").change( function() {
-   var path = $("input[name=path]:checked").val();
-   var fname = $("#fname").val();
-   if( fname != "" ) {
-     if( path == "doc" ) {
-       $("#image").attr( "src", doc_path + fname );
-     } else if( path == "private" ) {
-       $("#image").attr( "src", private_path + fname );
-     } else if( path == "public" ) {
-       $("#image").attr( "src", public_path + fname );
-     } else {
-       $("#image").attr( "src", $("#path").val() + fname );
-     }
-   }
-   $("#image").maphilight();
-  });
+  const { fn, sn, alt, t, href } = data;
+  let txt = `${cnt}. `;
 
-  table_grp = $('#grp_table').DataTable( {
-    "ajax": {
-      "url": "%url;&ajax=on",
-      "dataSrc": "r.groups"
-    },
-    "deferRender": true,
-    "columns": %[
-      {
-        "data": "name",
-        "defaultContent": "",
-        "render": function ( data, type, row, meta ) {
-          var disabled = "";
-          return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' step='1'" + disabled + ">";
+  try {
+    if (!t || t === 'p') {
+      if (fn || sn) {
+        txt += `${(fn || '').trim()} ${(sn || '').trim()}`.trim();
+        if (alt) {
+          txt += ` (${alt.trim()})`;
         }
-      },
-      {
-        "data": "label",
-        "defaultContent": "",
-        "render": function ( data, type, row, meta ) {
-          var disabled = "";
-          return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
-        }
-      },
-      { "data": null, "defaultContent": '<a class="fa fa-trash-alt text-danger mx-1 remove" title="[*delete]"></a>' }
-      %],
-      "rowCallback": function( row, r ) {
-        var grp = row.id.replace(/[a-z]/g, "");
-        var group = get(r.name);
-        var label = get(r.label);
-        $("#g"+grp).html( "<span>" + grp + " : " + label + "</span>" );
-      },
-      "paging": false,
-      "ordering": false,
-      "searching": false,
-      "info": false,
-      "initComplete": function( settings, json) {
-        json = json.r;
-
-        // Init group legend from JSON
-        json.groups.forEach( function( r ) {
-          var grp = ++global_grp;
-          var name = get(r.name);
-          var labl = get(r.label);
-          //$("#grp_table").append(g_row(name, labl));
-          table_grp.row(grp-1).node().id = "g" + grp;
-        } );
-
-       json.groups.forEach( function( r ) {
-          var grp = get(r.name);
-          var labl = get(r.label);
-          $("#group_labels").append(grp + " : " +labl + "\n");
-       });
-    }
-  } );
-
-  table = $('#map_table').DataTable( {
-     "ajax": {
-       "url": "%url;&ajax=on",
-       "dataSrc": "r.map"
-     },
-     "deferRender": true,
-     "columns": %[
-       {
-         "data": "t",
-         "defaultContent": "p",
-         "render": function ( data, type, row, meta ) {
-           var s1 = "", s2 = "", s3 = "", s4 = "";
-           if( data == "m" ) {
-             s2 = " selected";
-           } else if( data == "g" ) {
-             s3 = " selected";
-           } else if( data == "e" ) {
-             s4 = " selected";
-           } else {
-             s1 = " selected";
-           }
-           return( "<select class='form-control update type' row='" + meta.row + "'>" +
-                   "<option value='p'" + s1 + ">[*person/persons]0</option>" +
-                   "<option value='m'" + s2 + ">[*note/notes]0</option>" +
-                   "<option value='g'" + s3 + " title='%prefix; + href'>GeneWeb</option>" +
-                   "<option value='e'" + s4 + " title='href'>Autre</option>" +
-                   "</select>");
-         }
-       },
-       {
-         "data": "fn",
-         "defaultContent": "",
-         "render": function ( data, type, row, meta ) {
-           var disabled = "";
-           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
-         }
-       },
-       {
-         "data": "sn",
-         "defaultContent": "",
-         "render": function ( data, type, row, meta ) {
-           var disabled = "";
-           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
-         }
-       },
-       {
-         "data": "oc",
-         "defaultContent": "",
-         "render": function ( data, type, row, meta ) {
-           var disabled = "";
-           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' step='1'" + disabled + ">";
-         }
-       },
-       {
-         "data": "group",
-         "defaultContent": "",
-         "render": function ( data, type, row, meta ) {
-           var disabled = "";
-           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' step='1'" + disabled + ">";
-         }
-       },
-       {
-         "data": "misc",
-         "defaultContent": "",
-         "render": function ( data, type, row, meta ) {
-           var disabled = "";
-           if( row.t != "m" ) { disabled = " disabled"; }
-           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
-         }
-       },
-       {
-         "data": "href",
-         "defaultContent": "",
-         "render": function ( data, type, row, meta ) {
-           var disabled = "";
-           var placeholder = "";
-           if( row.t != "e" && row.t != "g" ) { disabled = " disabled"; }
-           if( row.t == "e" ) { placeholder = " placeholder='https://…'"; }
-           if( row.t == "g" ) { placeholder = " placeholder='m=…'"; }
-           return "<input class='form-control update' type='text' value='" + get(data) + "'" + placeholder + disabled + ">";
-         }
-       },
-       {
-         "data": "alt",
-         "defaultContent": "",
-         "render": function ( data, type, row, meta ) {
-           return "<input class='form-control update' type='text' value='" + get(data) + "'>";
-         }
-       },
-       { "data": null, "defaultContent": '<a class="fa fa-trash-can text-danger mx-1 remove" title="[*delete]"></a>' }
-     %],
-     "rowCallback": function( row, r ) {
-       var cnt = row.id.replace(/[a-z]/g, "");
-       var txt = get(r.alt);
-       if( get(r.t) == "" || r.t == "p" ) {
-         if( txt != "" ) { txt = " (" + txt + ")"; }
-         txt = get(r.fn) + (r.fn == "" ? "" : " ") + get(r.sn) + txt;
-         if( get(r.fn) != "" && get(r.sn) != "" ) {
-           var oc = get(r.oc);
-           var oc2;
-           if( oc != "" && oc != 0 ) { oc2 = "/" + oc ; oc = "&oc=" + oc; } else { oc2 = "" ; oc = "" }
-           $("#a"+cnt).html( "<span>" + cnt + " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + txt + "</a></span>" );
-           r.gw = "[" + "[" + r.fn + "/" + r.sn + oc2 + "]" + "]";
-         } else {
-           if( txt != "" ) { txt = " " + txt; }
-           $("#a"+cnt).html( "<span>" + cnt + txt + "</span>" );
-           delete r.gw;
-         }
-       } else if ( r.t == "m" ) {
-         if( get(r.misc) != "" ) {
-           $("#a"+cnt).html( "<pan>" + cnt + " <a href='%prefix;&m=NOTES&f=" + r.misc + "' target='_blank'>" + txt + "</a></span>" );
-           r.gw = "[" + "[" + "[" + r.misc + "]" + "]" + "]";
-         } else {
-           if( txt != "" ) { txt = " " + txt; }
-           $("#a"+cnt).html( cnt + txt );
-           delete r.gw;
-         }
-       } else if ( r.t == "g" ) {
-         if( get(r.href) != "" ) {
-           $("#a"+cnt).html( "<span>" + cnt + " <a href='%prefix;" + r.href + "' target='_blank'>" + txt + "</a></span>" );
-         } else {
-           if( txt != "" ) { txt = " " + txt; }
-           $("#a"+cnt).html( cnt + txt );
-         }
-         delete r.gw;
-       } else if ( r.t == "e" ) {
-         if( get(r.href) != "" ) {
-           $("#a"+cnt).html( "<span>" + cnt + " <a href='" + r.href + "' target='_blank'>" + txt + "</a></span>" );
-         } else {
-           if( txt != "" ) { txt = " " + txt; }
-           $("#a"+cnt).html( "<span>" + cnt + txt + "</span>" );
-         }
-         delete r.gw;
-       }
-     },
-     "paging": false,
-     "ordering": false,
-     "searching": false,
-     "info": false,
-     "initComplete": function( settings, json) {
-       $("#digest").val( json.digest );
-       json = json.r;
-       if( json.path == "doc" ) {
-         $("#doc").prop( "checked", true );
-       } else if( json.path == "private" ) {
-         $("#private").prop( "checked", true );
-       } else if( json.path == "public" ) {
-         $("#public").prop( "checked", true );
-       } else {
-         $("#other").prop( "checked", true );
-         $("#path")
-          .val( json.path )
-          .prop( "disabled", false );
-       }
-       $("#fname").val( json.img ).change();
-       $("#page_title").val( json.title );
-       $("#page_desc").val( json.desc );
-
-       // Init map and legend from JSON
-       json.map.forEach( function( r ) {
-         var cnt = ++global_cnt;
-
-         if(get(r.group) != 0)
-            { group = " class='group" + get(r.group) + "' data-maphilight='{\"groupBy\":\".group" + get(r.group) + "\"}'"; }
-         else { group = ""; }
-
-         $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + cnt + "' title='" + cnt + "'" + group + ">" );
-         if( get(r.fn) != "" && get(r.sn) != "" ) {
-           var oc = get(r.oc);
-           if( oc != "" && oc != 0 ) { oc = "&oc=" + oc; } else { oc = "" ; }
-           var txt = "";
-           if( get(r.alt) != "" ) { txt = " (" + get(r.alt) + ")"; }
-           $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>"+ cnt +
-              " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + r.fn + " " + r.sn + txt + "</a></span></li>" );
-         } else {
-           $("#div_legend").append("<li class='legend' id='a" + cnt + "'><span>" + cnt + (get(r.alt) != "" ? " " + get(r.alt) : "") + "</span></li>");
-         }
-
-         // Make sure we can find the row in table
-         table.row(cnt-1).node().id = "row" + cnt;
-       });
-    }
-  } );
-
-  $(document).on( "mouseover", "grp_table", function(e) {
-    var n = $(this).attr("id").replace(/[a-z]/g, "");
-    $( "#g" + n ).mouseover();
-    $( "#g" + n ).addClass( "in" );
-  });
-  $(document).on( "mouseout", "grp_table", function(e) {
-    var n = $(this).attr("id").replace(/[a-z]/g, "");
-    $( "#g" + n ).mouseout();
-    $( "#g" + n ).removeClass( "in" );
-  });
-  $(document).on( "mouseover", ".legend", function(e) {
-    var n = $(this).attr("id").replace(/[a-z]/g, "");
-    $( "#area" + n ).mouseover();
-    $( "#row" + n ).addClass( "in" );
-  });
-  $(document).on( "mouseout", ".legend", function(e) {
-    var n = $(this).attr("id").replace(/[a-z]/g, "");
-    $( "#area" + n ).mouseout();
-    $( "#row" + n ).removeClass( "in" );
-  });
-  $(document).on( "click", "li.legend", function(e) {
-    var n = $(this).attr("id").replace(/[a-z]/g, "");
-    $( "#row" + n ).find("input").first().focus();
-  });
-  $(document).on( "mouseover", "area", function(e) {
-    var n = $(this).attr("id").replace(/[a-z]/g, "");
-    $( "#a" + n + " span" ).addClass( "in" );
-    $( "#row" + n ).addClass( "in" );
-  });
-  $(document).on( "mouseout", "area", function(e) {
-    var n = $(this).attr("id").replace(/[a-z]/g, "");
-    $( "#a" + n + " span" ).removeClass( "in" );
-    $( "#row" + n ).removeClass( "in" );
-  });
-  $(document).on( "mouseover", "tr", function(e) {
-    if( typeof $(this).attr("id") !== "undefined" ) {
-      var n = $(this).attr("id").replace(/[a-z]/g, "");
-      $( "#area" + n ).mouseover();
-      $( "#a" + n + " span" ).addClass( "in" );
-    }
-  });
-  $(document).on( "mouseout", "tr", function(e) {
-    if( typeof $(this).attr("id") !== "undefined" ) {
-      var n = $(this).attr("id").replace(/[a-z]/g, "");
-      $( "#area" + n ).mouseout();
-      $( "#a" + n + " span" ).removeClass( "in" );
-    }
-  });
-
-  $(document).on( "change", ".update", function() {
-    let td = table.cell( this.closest('td') );
-    let tr = $(this).closest('tr');
-
-    // Propagate change to Datatables
-    td.data( $(this).val() ).draw();
-
-    // This is needed to update rendering on other input fields
-    if( this.nodeName == "SELECT" ) {
-      tr.find("input.update").change();
-    }
-  });
-
-  $(document).on( "click", ".remove", function (e) {
-    var tr = $(this).closest('tr');
-    var n = tr.attr("id").replace(/[a-z]/g, "");
-
-    $( "#area" + n ).remove();
-    $( "#a" + n ).remove();
-    table.row( tr ).remove().draw();
-  });
-
-  $("#frame").mousedown( function(e) {
-    // Start a new selection
-    x1 = Math.round(e.pageX);
-    y1 = Math.round(e.pageY);
-    x2 = x1;
-    y2 = y1;
-    selection = true;
-  });
-  $("#frame").mousemove( function(e) {
-    if( selection ) {
-      // Selection in progress
-      x2 = Math.round(e.pageX);
-      y2 = Math.round(e.pageY);
-
-      if( selection ) {
-        var TOP = (y1 < y2) ? y1 : y2;
-        var LEFT = (x1 < x2) ? x1 : x2;
-        var WIDTH = (x1 < x2) ? x2 - x1 : x1 - x2;
-        var HEIGHT = (y1 < y2) ? y2 - y1 : y1 - y2;
-
-        $("#selection").css({
-          position: 'absolute',
-          zIndex: 5000,
-          left: LEFT,
-          top: TOP,
-          width: WIDTH,
-          height: HEIGHT
-        });
-        $("#selection").show();
+      } else if (alt) {
+        txt += alt.trim();
+      }
+    } else if (t === 'g' || t === 'e') {
+      if (href) {
+        txt += alt ? `${href.trim()} (${alt.trim()})` : href.trim();
+      } else if (alt) {
+        txt += alt.trim();
       }
     }
-  });
-  $("#frame").mouseup( function() {
-    // Selection completed
-    selection = false;
-    $("#selection").hide();
+    return txt;
+    
+  } catch (error) {
+    handleError(error, "formatMapItemText");
+    return `${cnt}.`;
+  }
+}
 
-    var pos = $("#frame").get(0).getBoundingClientRect();
-    var l_x1 = (x1 < x2) ? x1 : x2 ; l_x1 -= pos.left + pageXOffset;
-    var l_x2 = (x1 < x2) ? x2 : x1 ; l_x2 -= pos.left + pageXOffset;
-    var l_y1 = (y1 < y2) ? y1 : y2 ; l_y1 -= pos.top + pageYOffset;
-    var l_y2 = (y1 < y2) ? y2 : y1 ; l_y2 -= pos.top + pageYOffset;
-    add_new_row( l_x1, l_y1, l_x2, l_y2 );
-  });
-  $("#frame").mouseenter( function() {
-    (gMOUSEDOWN) ? selection = true : selection = false;
-  });
-  $("#selection").mouseenter( function() {
-    (gMOUSEDOWN) ? selection = true : selection = false;
-  });
-  $("#frame").mouseleave( function() {
-    selection = false;
-  });
-
-  $( "#form" ).submit( function () {
-    event.preventDefault();
-    var res = {
-      "title": $("#page_title").val(),
-      "desc": $("#page_desc").val(),
-      "path": $("input[name=path]:checked").val(),
-      "img": $("#fname").val(),
-      "map": table.rows().data().toArray(),
-      "groups": table_grp.rows().data().toArray()
-    };
-    // Cleanup data before to save
-    for( i=0, ien=res.map.length ; i < ien ; i++ ) {
-      if( res.map[i].t == "p" ) { delete res.map[i].misc ; delete res.map[i].href ; }
-      if( res.map[i].t == "m" ) { delete res.map[i].fn ; delete res.map[i].sn ; delete res.map[i].oc ; delete res.map[i].href ; }
-      if( res.map[i].t == "g" ) { delete res.map[i].fn ; delete res.map[i].sn ; delete res.map[i].oc ; delete res.map[i].misc ; delete res.map[i].gw ; }
-      if( res.map[i].t == "e" ) { delete res.map[i].fn ; delete res.map[i].sn ; delete res.map[i].oc ; delete res.map[i].misc ; delete res.map[i].gw ; }
-      if( res.map[i].t == "" ) { delete res.map[i].t ; }
-      if( res.map[i].fn == "" ) { delete res.map[i].fn ; }
-      if( res.map[i].sn == "" ) { delete res.map[i].sn ; }
-      if( res.map[i].oc == "" ) { delete res.map[i].oc ; }
-      if( res.map[i].misc == "" ) { delete res.map[i].misc ; }
-      if( res.map[i].href == "" ) { delete res.map[i].href ; }
-      if( res.map[i].alt == "" ) { delete res.map[i].alt ; }
-      if( res.map[i].shape == "" ) { delete res.map[i].shape ; }
-      if( res.map[i].coords == "" ) { delete res.map[i].coords ; }
-      if( res.map[i].gw == "" ) { delete res.map[i].gw ; }
+// Creates HTML markup for legend entries with proper person/URL formatting and links
+function createLegendHTML(cnt, data) {
+    if (!data) {
+        return `${cnt}.`;
     }
-    var title = $("#page_title").val();
-    if( title == "" ) { title = "&hellip;" }
-    $("#notes").val( "TITLE=" + title + "\nTYPE=gallery\n" + JSON.stringify( res ) );
-    $(this).unbind('submit').submit();
+    const { fn, sn, alt, t, href, oc } = data;
+    let txt = `${cnt}. `;
+
+    // Handle person type (default case or explicit 'p')
+    if (!t || t === 'p') {
+        if (fn && sn) {
+            const occNum = (get(oc) && oc !== "0") ? `&oc=${encodeURIComponent(oc)}` : '';
+            const linkText = fn + " " + sn;
+            return `<span>${txt}<a href="%prefix;&p=${encodeURIComponent(fn)}&n=${encodeURIComponent(sn)}${occNum}">${linkText}</a>${alt ? ` (${alt})` : ''}</span>`;
+        }
+    }
+    // Handle GeneWeb or external URL types
+    else if ((t === 'g' || t === 'e') && href) {
+        const baseUrl = t === 'g' ? '%prefix;' : '';
+        const linkText = alt || href;
+        return `<span>${txt}<a href="${baseUrl}${href}">${linkText}</a></span>`;
+    }
+
+    // Fallback for cases with only alt text
+    return `<span>${txt}${alt || ''}</span>`;
+}
+
+// Updates or creates map areas and legend entries
+function updateMapAndLegend(data, cnt) {
+  const displayText = formatMapItemText(cnt, data);
+  const group = get(data.group) !== 0 ?
+    ` class="group${data.group}" data-maphilight='{"groupBy":".group${data.group}"}'` : '';
+
+  $("#map").append(`
+    <area id="area${cnt}"
+          shape="${get(data.shape)}"
+          coords="${get(data.coords)}"
+          alt="${displayText}"
+          title="${displayText}"${group}>`
+  );
+
+  $("#div_legend").append(`
+    <li class="legend" id="a${cnt}">
+      ${createLegendHTML(cnt, data)}
+    </li>`
+  );
+}
+
+// Updates the area map titles and legend entries with proper group handling
+function updateLegendLinks() {
+  table.rows().every(function(rowIdx) {
+    const r = this.data();
+    const row = this.node();
+    if (!row) {
+      return;
+    }
+
+    const cnt = row.id.replace(/[a-z]/g, "");
+    const group = get(r.group);
+    const area = $(`#area${cnt}`);
+    const legendEntry = $(`#a${cnt}`);
+
+    if (!area.length || !legendEntry.length) {
+      return;
+    }
+
+    const displayText = formatMapItemText(cnt, r);
+
+    if (area.attr("title") !== displayText) {
+      area.attr({
+        "alt": displayText,
+        "title": displayText
+      });
+    }
+
+    if (group && group !== "0") {
+      area.attr("class", `group${group}`);
+      area.attr("data-maphilight", `{"groupBy":".group${group}"}`);
+    }
+
+    const newLegendHtml = createLegendHTML(cnt, r);
+    if (legendEntry.html() !== newLegendHtml) {
+      legendEntry.html(newLegendHtml);
+    }
+  });
+}
+
+// Function to generate correct GW syntax
+function generateGwSyntax(data) {
+  if (!data.fn || !data.sn) return null;
+
+  let oc = get(data.oc);
+  let oc2 = (oc != "" && oc != 0) ? "/" + oc : "";
+  let txt = get(data.alt);
+  return "[[" + data.fn + "/" + data.sn + oc2 +
+         (txt ? "/" + data.fn + " " + data.sn : "") + "]]";
+}
+
+// Initializes main data table with configuration and event handlers
+function initMainTable() {
+  try {
+    table = $('#map_table').DataTable({
+      ajax: {
+        url: "%url;&ajax=on",
+        dataSrc: function(json) {
+          return json.r.map || [];
+        }
+      },
+      deferRender: true,
+      rowReorder: {
+        selector: 'i.drag-handle',
+        update: false
+      },
+      columns: %[
+        {
+          data: null,
+          orderable: false,
+          defaultContent: '<i class="fa fa-grip-vertical px-1 text-grey drag-handle text-muted" title="drag’n drop"></i>'
+        },
+        {
+         data: null,
+         orderable: false,
+         defaultContent: `
+           <div class="d-flex sort-buttons">
+             <div class="w-50 text-left">
+               <button type="button" 
+                       class="btn btn-sm btn-outline-secondary btn-up"
+                       title="[move up/down]0">↑</button>
+             </div>
+             <div class="w-50 text-right">
+               <button type="button"
+                       class="btn btn-sm btn-outline-secondary btn-down" 
+                       title="[move up/down]1">↓</button>
+             </div>
+           </div>`
+        },
+        {
+          data: "t",
+          defaultContent: "p",
+          render: function(data, type, row, meta) {
+            if (type === 'display') {
+              const types = {
+                p: '[*person/persons]0',
+                g: 'GeneWeb',
+                e: 'Web'
+              };
+              let html = '<select class="form-control update type" row="' + meta.row + '">';
+              Object.entries(types).forEach(([value, label]) => {
+                const selected = (data === value || (!data && value === 'p')) ? ' selected' : '';
+                html += '<option value="' + value + '"' + selected + '>' + label + '</option>';
+              });
+              html += '</select>';
+              return html;
+            }
+            return data;
+          }
+        },
+        {
+          data: "fn",
+          type: "string",
+          defaultContent: "",
+          render: function(data, type, row) {
+            if (type === 'sort' || type === 'type') {
+              return get(data).toLowerCase();
+            }
+            const disabled = (get(row.t) !== "" && row.t !== "p") ? " disabled" : "";
+            return '<input class="form-control update" type="text" value="' + get(data) + '"' + disabled + '>';
+          }
+        },
+        {
+          data: "sn",
+          type: "string",
+          defaultContent: "",
+          render: function(data, type, row) {
+            if (type === 'sort' || type === 'type') {
+              return get(data).toLowerCase();
+            }
+            const disabled = (get(row.t) !== "" && row.t !== "p") ? " disabled" : "";
+            return '<input class="form-control update" type="text" value="' + get(data) + '"' + disabled + '>';
+          }
+        },
+        {
+          data: "oc",
+          defaultContent: "",
+          orderable: false,
+          render: function(data, type, row) {
+            const disabled = (get(row.t) !== "" && row.t !== "p") ? " disabled" : "";
+            return '<input class="form-control update" type="number" value="' + get(data) + '" min="0" step="1"' + disabled + '>';
+          }
+        },
+        {
+          data: "group",
+          type: "num",
+          render: function(data, type, row) {
+            if (type === "sort") {
+              return parseInt(data) || 0;
+              }
+              return '<input class="form-control update" type="number" value="' + get(data) + '" min="0" step="1">';
+          }
+        },
+        {
+          data: "href",
+          defaultContent: "",
+          render: function(data, type, row) {
+            const disabled = (row.t !== "e" && row.t !== "g") ? " disabled" : "";
+            const placeholder = row.t === "e" ? ' placeholder="https://…"' :
+                              row.t === "g" ? ' placeholder="m=…"' : "";
+            return '<input class="form-control update" type="text" value="' + get(data) + '"' + placeholder + disabled + '>';
+          }
+        },
+        {
+          data: "alt",
+          defaultContent: "",
+          render: function(data, type, row) {
+            return '<input class="form-control update" type="text" value="' + get(data) + '">';
+          }
+        },
+        {
+          data: null,
+          orderable: false,
+          defaultContent: '<a class="fa fa-trash-can text-danger mx-1 remove" title="[*delete]"></a>'
+        },
+      %],
+      paging: false,
+      ordering: true,
+      searching: false,
+      info: false,
+      rowCallback: function(row, r) {
+          const cnt = row.id.replace(/[a-z]/g, "");
+          let txt = get(r.alt);
+
+          if(get(r.t) == "" || r.t == "p") {
+              if(get(r.fn) != "" && get(r.sn) != "") {
+                  // Build Geneweb wiki syntax key
+                  let oc = get(r.oc);
+                  let oc2 = (oc != "" && oc != 0) ? "/" + oc : "";
+                  r.gw = "%[%[" + r.fn + "/" + r.sn + oc2 + (txt ? "/" + r.fn + " " + r.sn : "") + "%]%]";
+              } else {
+                  delete r.gw;
+              }
+          } else {
+              delete r.gw;
+          }
+          table.row(row).data(r);
+        },
+      initComplete: function(settings, json) {
+        if (!json) {
+          console.error("No JSON data received");
+          return;
+        }
+
+        $("#digest").val(json.digest);
+        const data = json.r;
+
+        if (!data) {
+          console.error("No data found in JSON response");
+          return;
+        }
+
+        $("#fname").val(data.img).trigger('change');
+        $("#page_title").val(data.title || '');
+        $("#page_desc").val(data.desc || '');
+
+        // Init map and legend from JSON
+        if (Array.isArray(data.map)) {
+          data.map.forEach(function(r) {
+            const cnt = ++global_cnt;
+
+            const displayText = formatMapItemText(cnt, r);
+            $("#map").append(`
+              <area id="area${cnt}"
+                    shape="${get(r.shape)}"
+                    coords="${get(r.coords)}"
+                    alt="${displayText}"
+                    title="${displayText}">`
+            );
+
+            $("#div_legend").append(`
+              <li class="legend" id="a${cnt}">
+                ${createLegendHTML(cnt, r)}
+              </li>`
+            );
+
+            const row = table.row(cnt-1).node();
+            if (row) {
+              row.id = `row${cnt}`;
+            }
+          });
+        }
+
+        updateLegendLinks();
+        table.on('draw', updateLegendLinks);
+      }
+    });
+
+    return table;
+
+  } catch (error) {
+    console.error("Error initializing table:", error);
+    throw error;
+  }
+}
+
+// Initializes group management table with data handling and events
+function initGroupTable() {
+  try {
+    table_grp = $('#grp_table').DataTable({
+      ajax: {
+        url: "%url;&ajax=on",
+        dataSrc: function(json) {
+          return json.r.groups || [];
+        }
+      },
+      deferRender: true,
+      columns: %[
+        {
+          data: "name",
+          type: "numeric",
+          orderable: false,
+          render: function(data, type, row, meta) {
+            if (type === 'sort' || type === 'type') {
+              return parseInt(get(data)) || 0;
+            }
+            // Simply display the number in a centered div
+            return '<div class="text-center">' + get(data) + '</div>';
+          }
+        },
+        {
+          data: "label",
+          orderable: false,
+          render: function(data, type, row) {
+            return '<input class="form-control update" type="text" ' +
+                   'value="' + get(data) + '">';
+          }
+        },
+        {
+          data: null,
+          orderable: false,
+          defaultContent: '<a class="fa fa-trash-alt text-danger mx-1 remove" ' +
+                          'title="[*delete]"></a>'
+        }
+      %],
+      rowCallback: function(row, data, index) {
+        const groupNum = index + 1;
+        $(row).attr('id', 'g_row' + groupNum);
+
+        // Update group labels if label exists
+        const label = get(data.label);
+        if (label) {
+          $('#g' + groupNum).html('<span>' + groupNum + ' : ' + label + '</span>');
+        }
+      },
+      paging: false,
+      ordering: true,
+      searching: false,
+      info: false,
+      initComplete: function(settings, json) {
+        $('#grp_table thead th .dt-column-order').css('display', 'none');
+
+        if (!json || !json.r || !json.r.groups) {
+          console.warn("No groups data in JSON response");
+          return;
+        }
+
+        // Initialize group legend from JSON
+        json.r.groups.forEach(function(r, index) {
+          const grp = ++global_grp;
+          const label = get(r.label);
+          const row = table_grp.row(grp-1).node();
+
+          if (row) {
+            row.id = 'g_row' + grp;
+          }
+
+          if (label) {
+            $('#group_labels').append(grp + ' : ' + label + '\n');
+          }
+        });
+
+        // Initial update of group labels
+        GroupManager.updateGroupLabels();
+      }
+    });
+    return table_grp;
+
+  } catch (error) {
+    console.error("Error initializing group table:", error);
+    throw error;
+  }
+}
+
+// Sets up button handlers for clearing image and resetting form
+function setupButtonHandlers() {
+  $("#clear-all").click(function () {
+    $("#page_title").val("");
+    $("#page_desc").val("");
+    $("#fname").val("");
+    $("#frame").css({ width: "auto", height: "auto" });
+    $("#image").attr("src", "");
+    $("#image").parent("div").css({ background: "none", height: "auto" });
+    $("#selection").hide();
+    $("#map").empty();
+    $("#div_legend").empty();
+    table.clear().draw();
+    table_grp.clear().draw();
+    global_cnt = 0;
+  });
+
+  $("#clear-image").click(function () {
+    $("#fname").val("");
+  });
+}
+
+// Handles form submission and prepares data for saving, including proper JSON formatting
+function setupFormHandler() {
+  $("#form").submit(function(event) {
+    event.preventDefault();
+
+    var res = {
+      title: $("#page_title").val(),
+      desc: $("#page_desc").val(),
+      path: "doc",
+      img: $("#fname").val(),
+      map: table.rows().data().toArray(),
+      groups: table_grp.rows().data().toArray().map((group, index) => ({
+        name: index + 1,
+        label: group.label
+      }))
+    };
+
+    // Clean data before save
+    res.map = res.map.map(item => {
+      const clean = {...item};
+
+      // Clean based on type
+      if(clean.t === "p") {
+        delete clean.misc;
+        delete clean.href;
+        if(clean.fn && clean.sn) {
+          clean.gw = generateGwSyntax(clean);
+        }
+      } else if(clean.t === "g" || clean.t === "e") {
+        delete clean.fn;
+        delete clean.sn;
+        delete clean.oc;
+        delete clean.gw;
+      }
+
+      // Remove empty fields
+      Object.keys(clean).forEach(key => {
+        if(clean[key] === "" || clean[key] === undefined) {
+          delete clean[key];
+        }
+      });
+
+      return clean;
+    });
+
+    const title = $("#page_title").val() || "&hellip;";
+    // Format JSON with proper spacing and line breaks
+    const jsonString = JSON.stringify(res, null, 2)
+      .replace(/\[\{/g, '[\n  {')
+      .replace(/\}\]/g, '}\n]')
+      .replace(/\}\,\{/g, '},\n  {');
+
+    $("#notes").val("TITLE=" + title + "\nTYPE=gallery\n" + jsonString);
+    $(this).unbind("submit").submit();
+  });
+}
+
+$(document).ready(function () {
+  // Initialize core managers
+  SelectionManager.init();
+  RowManager.initRowMovement();
+  UIManager.init();
+
+  // Initialize Main and Group tables
+  initMainTable();
+  initGroupTable();
+
+  // Initialize UI handlers
+  setupButtonHandlers();
+  $("#add-group-btn").on("click", GroupManager.addNewGroup);
+
+  // Initialize form submission
+  setupFormHandler();
+
+  // Events bindings
+  // Update image preview when selection changes and image map after loading
+  $("#fname").on("input change", function () {
+    const fname = $(this).val();
+
+    if (fname !== "") {
+      $("#image").attr("src", "%prefix;m=DOC&s=" + fname);
+    }
+
+    $("#image").on("load", function () {
+      $(this).maphilight(MAPHILIGHT_CONFIG);
+
+      const frame = $("#frame");
+      frame.css({
+        width: $(this).width(),
+        height: $(this).height(),
+      });
+      frame.closest("#div_img_legend").css({
+        width: $(this).width(),
+      });
+    });
+  });
+
+  // Handles row reordering in the data table, ensuring consistency between
+  // table data, DOM elements, and visual elements (areas, legends)
+  //
+  // Row reorder handling required careful consideration due to DataTables returning
+  // a diff array containing all cascading position changes. The solution is to only
+  // process the move of the specifically dragged row (identified by edit.triggerRow)
+  // and ignore intermediate shifts.
+  table.on("row-reorder", function (event, diff, edit) {
+    if (!diff.length) return;
+
+    let currentData = table.rows().data().toArray();
+    const draggedRowId = edit.triggerRow.node().id;
+
+    try {
+        const draggedMove = diff.find(d => d.node.id === draggedRowId);
+        if (!draggedMove) return;
+
+        const [movedItem] = currentData.splice(draggedMove.oldPosition, 1);
+        currentData.splice(draggedMove.newPosition, 0, movedItem);
+
+        table.clear();
+        table.rows.add(currentData);
+        table.draw(false);
+
+        currentData.forEach((rowData, index) => {
+            const rowNum = index + 1;
+            const row = table.row(index).node();
+            $(row).attr("id", `row${rowNum}`);
+
+            const area = $(`#area${rowNum}`);
+            if (area.length) {
+                const displayText = formatMapItemText(rowNum, rowData);
+                area.attr({
+                    "alt": rowNum,
+                    "title": rowNum
+                });
+            }
+
+            const legend = $(`#a${rowNum}`);
+            if (legend.length) {
+                legend.attr("id", `a${rowNum}`);
+            }
+        });
+
+        updateLegendLinks();
+
+    } catch (error) {
+        table.draw(false);
+    }
+  });
+
+  table_grp.on("draw.dt", function () {
+    table_grp.columns.adjust();
+  });
+
+  // Handle input/select updates and propagate changes to DataTables
+  $(document).on("change", ".update", function() {
+      let td = $(this).closest("td");
+      let tr = $(this).closest("tr");
+      let tableId = tr.closest("table").attr("id");
+      let nextInput = null;
+
+      // Store the next input before any table updates
+      if ($(this).is(':focus')) {
+          nextInput = $('input.update').eq($('input.update').index(this) + 1);
+      }
+
+      if (tableId === "grp_table") {
+        let cell = table_grp.cell(td);
+        cell.data($(this).val());  // Remove draw here
+        GroupManager.updateGroupLabels();
+      } else {
+        let cell = table.cell(td);
+        let rowIdx = table.row(tr).index();
+        let colIdx = table.column(td).index();
+        let currentData = table.row(rowIdx).data();
+
+        if (this.nodeName === "SELECT") {
+          currentData.t = $(this).val();
+          if (currentData.t !== 'p') {
+            currentData.fn = '';
+            currentData.sn = '';
+            currentData.oc = '';
+            delete currentData.gw;
+          }
+        } else {
+          let fieldName = table.column(colIdx).dataSrc();
+          currentData[fieldName] = $(this).val();
+
+          if (currentData.t === 'p' || !currentData.t) {
+            if (currentData.fn && currentData.sn) {
+              currentData.gw = generateGwSyntax(currentData);
+            } else {
+              delete currentData.gw;
+            }
+          }
+        }
+
+        // Update data without redrawing
+        table.row(rowIdx).data(currentData);
+
+        if (currentData.group) {
+          let area = $(`#area${rowIdx + 1}`);
+          area.attr('class', `group${currentData.group}`);
+          area.attr('data-maphilight', `{"groupBy":".group${currentData.group}"}`);
+        }
+
+        updateLegendLinks();
+      }
+  });
+
+  // Simple unified delete handler for both tables
+  $(document).on("click", ".remove", function (event) {
+    var tr = $(this).closest("tr");
+    if (tr.closest("table").attr("id") === "grp_table") {
+      table_grp.row(tr).remove().draw();
+      table_grp.order(%[0, 'asc'%]).draw();
+    } else {
+      const n = tr.attr("id").replace(/[a-z]/g, "");
+      $("#area" + n).remove();
+      $("#a" + n).remove();
+      table.row(tr).remove().draw();
+    }
   });
 });
 </script>
