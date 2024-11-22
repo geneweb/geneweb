@@ -475,14 +475,6 @@ val is_empty_name : Gwdb.person -> bool
     [false] if we knwon the first name or the last name of [p].
 *)
 
-module IperSet : sig
-  include Set.S with type elt = Gwdb.iper
-end
-
-module IfamSet : sig
-  include Set.S with type elt = Gwdb.ifam
-end
-
 (**/**)
 
 val copy_from_templ_ref :
