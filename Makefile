@@ -29,13 +29,13 @@ endif
 	&& cat $< \
 	| cppo -n $(CPPO_D) \
 	| sed \
-	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
-	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
-	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
-	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
-	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
-	-e "s/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g" \
-	-e "s/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g" \
+	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
+	-e 's/%%%SOSA_PKG%%%/$(SOSA_PKG)/g' \
+	-e 's/%%%GWDB_PKG%%%/$(GWDB_PKG)/g' \
+	-e 's/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g' \
+	-e 's/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g' \
+	-e 's/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g' \
+	-e 's/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g' \
 	> $@ \
 	&& printf " Done.\n"
 
@@ -46,7 +46,7 @@ bin/gwrepl/.depend:
 	@printf " Done.\n"
 
 dune-workspace: dune-workspace.in Makefile.config
-	@cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
+	@cat $< | sed  -e 's/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g' > $@
 
 COMPIL_DATE := $(shell date +'%Y-%m-%d')
 COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
@@ -60,12 +60,12 @@ OCAMLV := $(shell ocaml --version)
 
 lib/version.ml:
 	@cp lib/version.txt $@
-	@printf "let branch = \"$(BRANCH)\"\n" >> $@
-	@printf "let src = \"$(SOURCE)\"\n" >> $@
-	@printf "let commit_id = \"$(COMMIT_ID)\"\n" >> $@
-	@printf "let commit_date = \"$(COMMIT_DATE)\"\n" >> $@
-	@printf "let compil_date = \"$(COMPIL_DATE)\"\n" >> $@
-	@printf "Generating $@… Done.\n"
+	@printf 'let branch = "$(BRANCH)"\n' >> $@
+	@printf 'let src = "$(SOURCE)"\n' >> $@
+	@printf 'let commit_id = "$(COMMIT_ID)"\n' >> $@
+	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
+	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
+	@printf 'Generating $@… Done.\n'
 
 # Patch/unpatch files for campl5 >= 8.03
 CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
@@ -73,7 +73,7 @@ CAMLP5_MAJOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 1)
 CAMLP5_MINOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 2)
 
 patch_files:
-	@if [ "$(CAMLP5_VERSION)" != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
+	@if [ '$(CAMLP5_VERSION)' != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
 	  printf "\nPatching bin/ged2gwb/dune.in and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
 	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune.in; \
 	  perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\n  \})/$$1\n  ; Token.kwds = Hashtbl.create 10$$2/' bin/ged2gwb/ged2gwb.ml; \
@@ -92,12 +92,12 @@ UNPATCH = $(MAKE) --no-print-directory unpatch_files
 unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
 
 info:
-	@printf "Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
-	@printf "Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. "
-	@printf "Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n"
-	@printf "  \033[1;1m%s\033[0m\n" '$(subst ','\'',$(COMMIT_TITLE))'
-	@if [ -n "$(COMMIT_COMMENT)" ]; then printf "  %s\n" '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80; fi
-	@printf "\n\033[1;1mGenerating configuration files\033[0m\n"
+	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n'
+	@printf 'Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. '
+	@printf 'Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n'
+	@printf '  \033[1;1m%s\033[0m\n' '$(subst ','\'',$(COMMIT_TITLE))'
+	@if [ -n '$(COMMIT_COMMENT)' ]; then printf "  %s\n" '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80; fi
+	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 .PHONY: patch_files unpatch_files info
 
 GENERATED_FILES_DEP = \
