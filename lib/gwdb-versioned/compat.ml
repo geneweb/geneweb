@@ -708,7 +708,7 @@ module type Driver_S = sig
 
   val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
 
-  val sync : ?scratch:bool -> save_mem:bool -> base -> unit
+  val sync : ?scratch:bool -> ?tasks:(unit -> unit) list -> save_mem:bool -> base -> unit
   (** [sync scratch base]
     Ensure that everything is synced on disk.
 
@@ -1527,10 +1527,10 @@ struct
   let read_nldb = Util.wrap_base Legacy.read_nldb Current.read_nldb
   let write_nldb = Util.wrap_base Legacy.write_nldb Current.write_nldb
 
-  let sync ?(scratch = false) ~save_mem =
+  let sync ?(scratch = false) ?(tasks = []) ~save_mem =
     Util.wrap_base
-      (Legacy.sync ~scratch ~save_mem)
-      (Current.sync ~scratch ~save_mem)
+      (Legacy.sync ~scratch ~tasks ~save_mem)
+      (Current.sync ~scratch ~tasks ~save_mem)
 
   let make bname particles arrays =
     let base = Current.make bname particles arrays in

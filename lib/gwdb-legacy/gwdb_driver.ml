@@ -198,10 +198,10 @@ let new_iper base = base.data.persons.len
 let new_ifam base = base.data.families.len
 
 (* FIXME: lock *)
-let sync ?(scratch = false) ~save_mem base =
+let sync ?(scratch = false) ?(tasks = []) ~save_mem base =
   if base.data.perm = RDONLY && not scratch then
     raise Def.(HttpExn (Forbidden, __LOC__))
-  else Outbase.output ~save_mem base
+  else Outbase.output ~save_mem ~tasks base
 
 let make bname particles arrays : Dbdisk.dsk_base =
   sync ~scratch:true ~save_mem:false (Database.make bname particles arrays);
