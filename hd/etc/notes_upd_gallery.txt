@@ -1,4 +1,4 @@
-<!-- $Id: notes_upd_gallery.txt v7.1 25/11/2024 05:52:03 $ -->
+<!-- $Id: notes_upd_gallery.txt v7.1 25/11/2024 09:02:13 $ -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,7 +32,7 @@
     .sort-buttons { width: 0px; }
     tr:has(+ tr) .sort-buttons { width: 3.3em; }
     table.dataTable td { vertical-align: middle; }
-    #map_table th:not(:nth-child(10)), #grp_table th:not(nth-child(3)) { padding-left: 8px;}
+    #map_table th:not(:nth-child(11)), #grp_table th:not(nth-child(3)) { padding-left: 8px;}
     .drag-handle { cursor: grab; }
     .drag-handle:active { cursor: grabbing; }
     tr:first-child .btn-up { display: none; }
@@ -86,6 +86,7 @@
       <table id="map_table" class="table table-sm w-auto ml-0">
         <thead>
           <tr>
+            <th></th>
             <th></th>
             <th></th>
             <th id="type">Type</th>
@@ -162,8 +163,20 @@ const MAPHILIGHT_CONFIG = {
     strokeOpacity: 0.7,
     fillColor: 'ffffff',
     fillOpacity: 0,
-    groupBy: false
+    groupBy: false,
+    neverOn: false 
 };
+
+// Add shape selector dropdown to the page header area, initially hidden
+const shapeSelector = `
+<div id="shape-selector" class="form-group ml-3 mb-2" style="display: none;">
+  <label for="shape-type">Shape:</label>
+  <select id="shape-type" class="form-control form-control-sm d-inline-block w-auto ml-2">
+    <option value="rect">Rectangle</option>
+    <option value="circle">Circle</option>
+    <option value="poly">Polygon</option>
+  </select>
+</div>`;
 
 // Utility function to safely get a value or return empty string if undefined
 const Utils = {
@@ -182,8 +195,18 @@ const SelectionManager = {
   selection: false,
   gMOUSEUP: false,
   gMOUSEDOWN: false,
+  redrawMode: false,
 
-  init: function () {
+  // Get rectangular coordinates
+  getCoords: function() {
+    const x1 = Math.min(this.x1, this.x2);
+    const y1 = Math.min(this.y1, this.y2);
+    const x2 = Math.max(this.x1, this.x2);
+    const y2 = Math.max(this.y1, this.y2);
+    return `${x1},${y1},${x2},${y2}`;
+  },
+
+  init: function() {
     $(document).mouseup(() => {
       this.gMOUSEUP = true;
       this.gMOUSEDOWN = false;
@@ -194,13 +217,11 @@ const SelectionManager = {
       this.gMOUSEDOWN = true;
     });
 
-    // Initialize frame handlers
     this.initFrameHandlers();
   },
 
-  initFrameHandlers: function () {
+  initFrameHandlers: function() {
     $("#frame").mousedown((event) => {
-      // Start a new selection
       this.x1 = Math.round(event.pageX);
       this.y1 = Math.round(event.pageY);
       this.x2 = this.x1;
@@ -213,37 +234,91 @@ const SelectionManager = {
         this.x2 = Math.round(event.pageX);
         this.y2 = Math.round(event.pageY);
 
-        if (this.selection) {
-          const TOP = this.y1 < this.y2 ? this.y1 : this.y2;
-          const LEFT = this.x1 < this.x2 ? this.x1 : this.x2;
-          const WIDTH = this.x1 < this.x2 ? this.x2 - this.x1 : this.x1 - this.x2;
-          const HEIGHT = this.y1 < this.y2 ? this.y2 - this.y1 : this.y1 - this.y2;
+        const TOP = Math.min(this.y1, this.y2);
+        const LEFT = Math.min(this.x1, this.x2);
+        const WIDTH = Math.abs(this.x2 - this.x1);
+        const HEIGHT = Math.abs(this.y2 - this.y1);
 
-          $("#selection").css({
-            position: "absolute",
-            zIndex: 5000,
-            left: LEFT,
-            top: TOP,
-            width: WIDTH,
-            height: HEIGHT,
-          });
-          $("#selection").show();
-        }
+        $("#selection").css({
+          position: "absolute",
+          zIndex: 5000,
+          left: LEFT,
+          top: TOP,
+          width: WIDTH,
+          height: HEIGHT,
+        }).show();
       }
     });
 
     $("#frame").mouseup(() => {
+      const pos = $("#frame").get(0).getBoundingClientRect();
+      
+      if (this.redrawMode) {
+        const rowId = $("#redraw-target").data("current-row");
+        let l_x1 = Math.min(this.x1, this.x2) - (pos.left + pageXOffset);
+        let l_x2 = Math.max(this.x1, this.x2) - (pos.left + pageXOffset);
+        let l_y1 = Math.min(this.y1, this.y2) - (pos.top + pageYOffset);
+        let l_y2 = Math.max(this.y1, this.y2) - (pos.top + pageYOffset);
+        
+        // Only update if we have a valid selection
+        if (Math.abs(l_x2 - l_x1) > 5 && Math.abs(l_y2 - l_y1) > 5) {
+          const coords = `${l_x1},${l_y1},${l_x2},${l_y2}`;
+          
+          // Find the row and update coordinates
+          const rowElement = $(`#row${rowId}`);
+          if (rowElement.length) {
+            const row = table.row(rowElement);
+            let rowData = row.data() || {};
+            
+            // Update coordinates
+            rowData.coords = coords;
+            
+            // Update table data
+            row.data(rowData).draw(false);
+            
+            // Add back the area with new coordinates
+            $("#map").append(`<area id="area${rowId}" shape="rect" coords="${coords}" alt="${rowId}" title="${rowId}">`);
+          }
+        } else {
+          // If selection was too small, restore original area
+          const originalCoords = $("#redraw-target").data("original-coords");
+          $("#map").append(`<area id="area${rowId}" shape="rect" coords="${originalCoords}" alt="${rowId}" title="${rowId}">`);
+        }
+        
+        // Reset redraw mode
+        this.redrawMode = false;
+        $("#redraw-target").removeData();
+      } else {
+        // Existing new area creation code
+        let l_x1 = Math.min(this.x1, this.x2) - (pos.left + pageXOffset);
+        let l_x2 = Math.max(this.x1, this.x2) - (pos.left + pageXOffset);
+        let l_y1 = Math.min(this.y1, this.y2) - (pos.top + pageYOffset);
+        let l_y2 = Math.max(this.y1, this.y2) - (pos.top + pageYOffset);
+
+        add_new_row(l_x1, l_y1, l_x2, l_y2);
+      }
+
       this.selection = false;
       $("#selection").hide();
-
-      const pos = $("#frame").get(0).getBoundingClientRect();
-      const l_x1 = this.x1 < this.x2 ? this.x1 : this.x2;
-      const l_x2 = this.x1 < this.x2 ? this.x2 : this.x1;
-      const l_y1 = this.y1 < this.y2 ? this.y1 : this.y2;
-      const l_y2 = this.y1 < this.y2 ? this.y2 : this.y1;
-
-      add_new_row(l_x1 - (pos.left + pageXOffset), l_y1 - (pos.top + pageYOffset), l_x2 - (pos.left + pageXOffset), l_y2 - (pos.top + pageYOffset));
     });
+
+  // Handler for clicking outside the frame to cancel redraw area
+  $(document).mouseup((e) => {
+    if (this.redrawMode && !$(e.target).closest("#frame").length) {
+      // Restore original area if click is outside frame
+      const rowId = $("#redraw-target").data("current-row");
+      const originalCoords = $("#redraw-target").data("original-coords");
+      if (rowId && originalCoords) {
+        $("#map").append(`<area id="area${rowId}" shape="rect" coords="${originalCoords}" alt="${rowId}" title="${rowId}">`);
+      }
+      
+      // Reset redraw mode
+      this.redrawMode = false;
+      $("#redraw-target").removeData();
+      this.selection = false;
+      $("#selection").hide();
+    }
+  });
 
     $("#frame").mouseenter(() => {
       this.selection = this.gMOUSEDOWN;
@@ -256,7 +331,7 @@ const SelectionManager = {
     $("#frame").mouseleave(() => {
       this.selection = false;
     });
-  },
+  }
 };
 
 // Table row movement operations (↓↑ buttons)
@@ -384,6 +459,35 @@ const UIManager = {
   },
 };
 
+// Add event handler for redraw button (add to document.ready):
+$(document).on("click", ".redraw-shape", function(e) {
+  const row = $(this).closest("tr");
+  const rowId = row.attr("id").replace(/[a-z]/g, "");
+  const rowData = table.row(row).data();
+  
+  // Store original area data before removal
+  $("#redraw-target").data({
+    "current-row": rowId,
+    "original-coords": rowData.coords
+  });
+
+  // Temporarily remove the area from DOM
+  $(`#area${rowId}`).remove();
+  
+  // Store current row ID for redraw
+  $("#redraw-target").data("current-row", rowId);
+  
+  // Clear existing selection area
+  $("#selection").hide();
+  
+  // Highlight the area being redrawn
+  $(`#area${rowId}`).data('maphilight', {...MAPHILIGHT_CONFIG, alwaysOn: true}).trigger('alwaysOn.maphilight');
+  
+  // Enable drawing mode
+  SelectionManager.selection = true;
+  SelectionManager.redrawMode = true;
+});
+
 // Creates new row in map table and adds corresponding area and legend elements
 function add_new_row(x1, y1, x2, y2) {
   if (x2 - x1 > 5 && y2 - y1 > 5) {
@@ -488,7 +592,7 @@ function updateMapAndLegend(data, cnt) {
 
   $("#map").append(`
     <area id="area${cnt}"
-          shape="${get(data.shape)}"
+          shape="rect"
           coords="${get(data.coords)}"
           alt="${displayText}"
           title="${displayText}"${group}>`
@@ -540,6 +644,28 @@ function updateLegendLinks() {
   });
 }
 
+// Add validation and adjustment of coordinates relative to image
+function validateCoords(x1, y1, x2, y2) {
+  const img = $("#image");
+  const imgWidth = img.width();
+  const imgHeight = img.height();
+  
+  // Log dimensions and coordinates for debugging
+  console.log("Image dimensions:", imgWidth, imgHeight);
+  console.log("Raw coordinates:", x1, y1, x2, y2);
+  
+  // Ensure coordinates are within image bounds
+  x1 = Math.max(0, Math.min(x1, imgWidth));
+  x2 = Math.max(0, Math.min(x2, imgWidth));
+  y1 = Math.max(0, Math.min(y1, imgHeight));
+  y2 = Math.max(0, Math.min(y2, imgHeight));
+  
+  // Log adjusted coordinates
+  console.log("Adjusted coordinates:", x1, y1, x2, y2);
+  
+  return { x1, y1, x2, y2 };
+}
+
 // Function to generate correct GW syntax
 function generateGwSyntax(data) {
   if (!data.fn || !data.sn) return null;
@@ -547,8 +673,8 @@ function generateGwSyntax(data) {
   let oc = get(data.oc);
   let oc2 = (oc != "" && oc != 0) ? "/" + oc : "";
   let txt = get(data.alt);
-  return "[[" + data.fn + "/" + data.sn + oc2 +
-         (txt ? "/" + data.fn + " " + data.sn : "") + "]]";
+  return "%[%[" + data.fn + "/" + data.sn + oc2 +
+         (txt ? "/" + data.fn + " " + data.sn : "") + "%]%]";
 }
 
 // Initializes main data table with configuration and event handlers
@@ -588,6 +714,11 @@ function initMainTable() {
                        title="[move up/down]1">↓</button>
              </div>
            </div>`
+        },
+        {
+          data: null,
+          orderable: false,
+          defaultContent: '<button type="button" class="btn btn-sm btn-outline-secondary redraw-shape" title="Redraw shape"><i class="fa fa-pen"></i></button>'
         },
         {
           data: "t",
@@ -743,8 +874,20 @@ function initMainTable() {
           });
         }
 
+    $("#image").on("load", function() {
+      $(this).maphilight(MAPHILIGHT_CONFIG);
+      console.log("Maphilight refreshed after image load");
+    });
+    
+    // Force refresh maphilight after table initialization
+    setTimeout(() => {
+      $("#image").maphilight(MAPHILIGHT_CONFIG);
+      console.log("Maphilight refreshed after delay");
+    }, 500);
+
         updateLegendLinks();
         table.on('draw', updateLegendLinks);
+        
       }
     });
 
@@ -923,7 +1066,8 @@ function setupFormHandler() {
   });
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
+  $('body').append('<div id="redraw-target" style="display:none;"></div>');
   // Initialize core managers
   SelectionManager.init();
   RowManager.initRowMovement();
