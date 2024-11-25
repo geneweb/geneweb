@@ -1170,14 +1170,17 @@ let expand_ampersand buff s =
   loop 0
 
 let email_addr_positions =
-  let email_address_regexp =
+  let email_address_regexp, domain_regexp =
     let alphanumeric_characters =
       Re.alt [ Re.rg 'a' 'z'; Re.rg 'A' 'Z'; Re.rg '0' '9' ]
     in
     let local_part =
-      Re.rep1 @@ Re.alt [ alphanumeric_characters; Re.set "-_." ]
+      Re.repn (Re.alt [ alphanumeric_characters; Re.set "-_." ]) 1 (Some 64)
     in
     let domain =
+      Re.repn (Re.alt [ alphanumeric_characters; Re.set "-_." ]) 2 (Some 255)
+    in
+    let domain_regexp =
       Re.seq
         [
           Re.rep1 @@ Re.alt [ alphanumeric_characters; Re.set "-_" ];
@@ -1185,7 +1188,8 @@ let email_addr_positions =
           Re.group @@ Re.rep @@ Re.alt [ alphanumeric_characters; Re.set "-_." ];
         ]
     in
-    Re.compile @@ Re.seq [ local_part; Re.char '@'; domain ]
+    ( Re.compile @@ Re.seq [ local_part; Re.char '@'; Re.group domain ],
+      Re.compile domain_regexp )
   in
   fun s ->
     let groups = Re.all email_address_regexp s in
@@ -1194,6 +1198,8 @@ let email_addr_positions =
         let start, end_ =
           try Re.Group.offset group 0 with Not_found -> assert false
         in
+        let ( >>= ) = Option.bind in
+        Re.Group.get_opt group 1 >>= Re.exec_opt domain_regexp >>= fun group ->
         let len, end_ =
           let len =
             let start, end_ =
