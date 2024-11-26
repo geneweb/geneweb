@@ -389,5 +389,6 @@ let output ?(save_mem = false) ?(tasks = []) base =
   (* FIXME: should not be present in this part of the code? *)
   Files.rm (Filename.concat bname "tstab");
   Files.rm (Filename.concat bname "tstab_visitor");
+  trace "perform additional tasks";
   List.iter (fun task -> task ()) tasks;
   close_base base
