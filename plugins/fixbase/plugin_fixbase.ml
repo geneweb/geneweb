@@ -161,23 +161,52 @@ let fixbase_ok conf base =
       Gwdb.load_descends_array base;
       Gwdb.load_ascends_array base);
     load_persons_array base;
-    let opt s (fn : ?report:_ -> _ -> _ -> _) =
-      if UI.enabled conf s then fn ~report progress base
-    in
+    let opt s fn fixes = if UI.enabled conf s then fn :: fixes else fixes in
     wrap conf (Util.transl conf "plugin_fixbase_FIXBASE_OK" |> Adef.safe)
     @@ fun () ->
-    opt "f_parents" Fixbase.check_families_parents;
-    opt "f_children" Fixbase.check_families_children;
-    opt "p_parents" Fixbase.check_persons_parents;
-    opt "p_NBDS" Fixbase.check_NBDS;
-    opt "p_families" Fixbase.check_persons_families;
-    opt "pevents_witnesses" Fixbase.check_pevents_witnesses;
-    opt "fevents_witnesses" Fixbase.check_fevents_witnesses;
-    opt "marriage_divorce" Fixbase.fix_marriage_divorce;
-    opt "missing_spouses" Fixbase.fix_missing_spouses;
-    opt "invalid_utf8" Fixbase.fix_utf8_sequence;
-    opt "p_key" Fixbase.fix_key;
-    opt "p_key" Fixbase.fix_key;
+    let family_fixes = [] in
+    let person_fixes = [] in
+    let family_fixes =
+      opt "f_parents" Fixbase.fix_family_parents family_fixes
+    in
+    let family_fixes =
+      opt "f_children" Fixbase.fix_family_children family_fixes
+    in
+    let person_fixes =
+      opt "p_parents" Fixbase.fix_person_parents person_fixes
+    in
+    let person_fixes = opt "p_NBDS" Fixbase.fix_nbds person_fixes in
+    let person_fixes =
+      opt "p_families" Fixbase.fix_person_unions person_fixes
+    in
+    let person_fixes =
+      opt "pevents_witnesses" Fixbase.fix_person_events_witnesses person_fixes
+    in
+    let family_fixes =
+      opt "fevents_witnesses" Fixbase.fix_family_events_witnesses family_fixes
+    in
+    let family_fixes =
+      opt "marriage_divorce" Fixbase.fix_family_divorce family_fixes
+    in
+    let family_fixes =
+      opt "missing_spouses" Fixbase.fix_family_spouses family_fixes
+    in
+    let person_fixes =
+      opt "invalid_utf8" Fixbase.fix_person_utf8_sequence person_fixes
+    in
+    let family_fixes =
+      opt "invalid_utf8" Fixbase.fix_family_utf8_sequence family_fixes
+    in
+    let person_fixes =
+      if UI.enabled conf "p_key" then
+        Fixbase.fix_person_key base :: person_fixes
+      else person_fixes
+    in
+    let person_fixes = List.rev person_fixes in
+    let family_fixes = List.rev family_fixes in
+    ignore
+    @@ Fixbase.perform_fixes ~report:(Some report) ~progress ~base ~person_fixes
+         ~family_fixes;
     clear_persons_array base;
     clear_strings_array base;
     clear_families_array base;

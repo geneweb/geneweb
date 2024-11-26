@@ -84,4 +84,4 @@ val perform_fixes :
   base:Gwdb.base ->
   person_fixes:person_fix list ->
   family_fixes:family_fix list ->
-  unit
+  int

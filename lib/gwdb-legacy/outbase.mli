@@ -1,4 +1,5 @@
-val output : ?save_mem:bool -> ?tasks:(unit -> unit) list -> Dbdisk.dsk_base -> unit
+val output :
+  ?save_mem:bool -> ?tasks:(unit -> unit) list -> Dbdisk.dsk_base -> unit
 (** [output base] uses data section of the [base] to store database on the disk in the files:
 
     - {i base} main file that stores all the arrays of the database
