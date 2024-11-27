@@ -1,0 +1,121 @@
+module IstrSet = Set.Make (struct
+  type t = Gwdb.istr
+
+  let compare = Gwdb.compare_istr
+end)
+
+type cache = {
+  lastname : IstrSet.t;
+  first_name : IstrSet.t;
+  source : IstrSet.t;
+  occupation : IstrSet.t;
+  place : IstrSet.t;
+}
+
+let add istr_set istr =
+  if not (Gwdb.is_empty_string istr) then IstrSet.add istr istr_set
+  else istr_set
+
+let add_lastname cache istr = { cache with lastname = add cache.lastname istr }
+
+let add_first_name cache istr =
+  { cache with first_name = add cache.first_name istr }
+
+let add_source cache istr = { cache with source = add cache.source istr }
+
+let add_occupation cache istr =
+  { cache with occupation = add cache.occupation istr }
+
+let add_place cache istr = { cache with place = add cache.place istr }
+
+let add_place_from_pevent cache pevent =
+  add_place cache (Gwdb.get_pevent_place pevent)
+
+let add_place_from_fevent cache fevent =
+  add_place cache (Gwdb.get_fevent_place fevent)
+
+let add_source_from_pevent cache pevent =
+  add_source cache (Gwdb.get_pevent_src pevent)
+
+let add_source_from_fevent cache fevent =
+  add_source cache (Gwdb.get_fevent_src fevent)
+
+let empty_cache =
+  {
+    lastname = IstrSet.empty;
+    first_name = IstrSet.empty;
+    source = IstrSet.empty;
+    occupation = IstrSet.empty;
+    place = IstrSet.empty;
+  }
+
+let add_person_infos_to_cache cache person =
+  let cache = add_lastname cache (Gwdb.get_surname person) in
+  let cache = add_first_name cache (Gwdb.get_first_name person) in
+  let cache = add_occupation cache (Gwdb.get_occupation person) in
+  let pevents = Gwdb.get_pevents person in
+  let cache = List.fold_left add_place_from_pevent cache pevents in
+  let cache = List.fold_left add_source_from_pevent cache pevents in
+  cache
+
+let add_family_infos_to_cache cache family =
+  let fevents = Gwdb.get_fevents family in
+  let cache = List.fold_left add_place_from_fevent cache fevents in
+  let cache = List.fold_left add_source_from_fevent cache fevents in
+  cache
+
+(** Create cache files  used by autocomplete *)
+let create_cache_data base =
+  let persons = Gwdb.persons base in
+  let cache =
+    Gwdb.Collection.fold add_person_infos_to_cache empty_cache persons
+  in
+  let families = Gwdb.families base in
+  Gwdb.Collection.fold add_family_infos_to_cache cache families
+
+let lastname_cache_fname base_file = Filename.concat base_file "cache_surname"
+
+let first_name_cache_fname base_file =
+  Filename.concat base_file "cache_first_name"
+
+let place_cache_fname base_file = Filename.concat base_file "cache_place"
+let source_cache_fname base_file = Filename.concat base_file "cache_src"
+
+let occupation_cache_fname base_file =
+  Filename.concat base_file "cache_occupation"
+
+let sorted_list_of_istr_set base cmp istr_set =
+  let str_list = List.rev_map (Gwdb.sou base) (IstrSet.elements istr_set) in
+  List.sort cmp str_list
+
+let write_cache_data fname cache_data =
+  let oc = Secure.open_out_bin fname in
+  Marshal.to_channel oc cache_data [ Marshal.No_sharing ];
+  close_out oc
+
+let node_threshold = 20_000
+
+let write_caches base () =
+  if Gwdb.nb_of_persons base > node_threshold then (
+    let cache = create_cache_data base in
+    let base_dir = Geneweb.Util.bpath (Gwdb.bname base ^ ".gwb") in
+    let lastname =
+      sorted_list_of_istr_set base Utf8.alphabetic_order cache.lastname
+    in
+    write_cache_data (lastname_cache_fname base_dir) lastname;
+    let first_name =
+      sorted_list_of_istr_set base Utf8.alphabetic_order cache.first_name
+    in
+    write_cache_data (first_name_cache_fname base_dir) first_name;
+    let occupation =
+      sorted_list_of_istr_set base Utf8.alphabetic_order cache.occupation
+    in
+    write_cache_data (occupation_cache_fname base_dir) occupation;
+    let source =
+      sorted_list_of_istr_set base Utf8.alphabetic_order cache.source
+    in
+    write_cache_data (source_cache_fname base_dir) source;
+    let place =
+      sorted_list_of_istr_set base Geneweb.Place.compare_places cache.place
+    in
+    write_cache_data (place_cache_fname base_dir) place)
