@@ -1843,7 +1843,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | "event_witness_note" :: _ -> (
       match get_env "event_witness_note" env with
-      | Vstring wnote -> TemplAst.VVstring wnote
+      | Vstring wnote -> TemplAst.VVstring (Notes.limit_display_length wnote)
       | _ -> raise Not_found)
   | [ "base"; "name" ] -> TemplAst.VVstring conf.Config.bname
   | [ "base"; "nb_persons" ] ->
@@ -3919,7 +3919,10 @@ let print_foreach conf base print_ast eval_expr =
             (fun i (ip, wk, wnote) ->
               let p = Util.pget conf base ip in
               let wk = Util.string_of_witness_kind conf (Gwdb.get_sex p) wk in
-              let wnote = Util.escape_html (Gwdb.sou base wnote) in
+              let wnote =
+                Util.escape_html
+                  (Notes.limit_display_length @@ Gwdb.sou base wnote)
+              in
               let env =
                 ("event_witness", Vind p)
                 :: ("event_witness_kind", Vstring (wk :> string))
@@ -3939,7 +3942,7 @@ let print_foreach conf base print_ast eval_expr =
       List.iter
         (fun (related_person, wk, wnote, evt) ->
           let wk = Util.string_of_witness_kind conf (Gwdb.get_sex p) wk in
-          let wnote = Util.escape_html wnote in
+          let wnote = Util.escape_html @@ Notes.limit_display_length wnote in
           let env = ("event_witnessed", Vevent (related_person, evt)) :: env in
           let env =
             ("event_witness_kind", Vstring (wk : Adef.safe_string :> string))

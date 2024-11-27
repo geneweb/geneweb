@@ -1169,38 +1169,49 @@ let expand_ampersand buff s =
   in
   loop 0
 
-let email_addr s i =
-  let rec before_at empty i =
-    if i = String.length s then None
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' | '.' ->
-          before_at false (i + 1)
-      | '@' -> if empty then None else after_at true (i + 1)
-      | _ -> None
-  and after_at empty i =
-    if i = String.length s then None
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' ->
-          after_at false (i + 1)
-      | '.' -> if empty then None else after_dot 0 (i + 1)
-      | _ -> None
-  and after_dot len i =
-    if i = String.length s then Some (len, i)
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' | '.' ->
-          after_dot (len + 1) (i + 1)
-      | _ -> Some (len, i)
+let email_addr_positions =
+  let email_address_regexp, domain_regexp =
+    let alphanumeric_characters =
+      Re.alt [ Re.rg 'a' 'z'; Re.rg 'A' 'Z'; Re.rg '0' '9' ]
+    in
+    let local_part =
+      Re.repn (Re.alt [ alphanumeric_characters; Re.set "-_." ]) 1 (Some 64)
+    in
+    let domain =
+      Re.repn (Re.alt [ alphanumeric_characters; Re.set "-_." ]) 2 (Some 255)
+    in
+    let domain_regexp =
+      Re.seq
+        [
+          Re.rep1 @@ Re.alt [ alphanumeric_characters; Re.set "-_" ];
+          Re.char '.';
+          Re.group @@ Re.rep @@ Re.alt [ alphanumeric_characters; Re.set "-_." ];
+        ]
+    in
+    ( Re.compile @@ Re.seq [ local_part; Re.char '@'; Re.group domain ],
+      Re.compile domain_regexp )
   in
-  match before_at true i with
-  | Some (len, i) ->
-      let len, i =
-        if len > 0 && s.[i - 1] = '.' then (len - 1, i - 1) else (len, i)
-      in
-      if len = 0 then None else Some i
-  | None -> None
+  fun s ->
+    let groups = Re.all email_address_regexp s in
+    List.filter_map
+      (fun group ->
+        let start, end_ =
+          try Re.Group.offset group 0 with Not_found -> assert false
+        in
+        let ( >>= ) = Option.bind in
+        Re.Group.get_opt group 1 >>= Re.exec_opt domain_regexp >>= fun group ->
+        let len, end_ =
+          let len =
+            let start, end_ =
+              try Re.Group.offset group 1 with Not_found -> assert false
+            in
+            end_ - start
+          in
+          if len > 0 && s.[end_ - 1] = '.' then (len - 1, end_ - 1)
+          else (len, end_)
+        in
+        if len = 0 then None else Some (start, end_))
+      groups
 
 let get_variable s i =
   let rec loop len i =
@@ -1257,6 +1268,7 @@ let string_with_macros conf env s =
     && String.lowercase_ascii (String.sub s i (String.length p)) = p
   in
   let buff = Buffer.create 1000 in
+  let email_addresses_positions = email_addr_positions s in
   let rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' then
@@ -1328,11 +1340,11 @@ let string_with_macros conf env s =
                 Printf.bprintf buff "</a>";
                 loop Out j
             | None -> (
-                match email_addr s i with
-                | Some j ->
-                    let x = String.sub s i (j - i) in
+                match List.assoc_opt i email_addresses_positions with
+                | Some end_ ->
+                    let x = String.sub s i (end_ - i) in
                     Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
-                    loop Out j
+                    loop Out end_
                 | None ->
                     let tt =
                       if start_with s i "<a href=" || start_with s i "<a\nhref="
