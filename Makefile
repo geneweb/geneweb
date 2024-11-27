@@ -76,6 +76,7 @@ GENERATED_FILES_DEP = \
 	lib/gwdb-legacy/dune \
 	lib/gwdb-versioned/dune \
 	benchmark/dune \
+	bin/caches/dune \
 	bin/connex/dune \
 	bin/consang/dune \
 	bin/fixbase/dune \
