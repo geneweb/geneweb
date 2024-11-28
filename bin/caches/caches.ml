@@ -95,7 +95,7 @@ let write_cache_data fname cache_data =
 
 let node_threshold = 20_000
 
-let write_caches base () =
+let write_caches base =
   if Gwdb.nb_of_persons base > node_threshold then (
     let cache = create_cache_data base in
     let base_dir = Geneweb.Util.bpath (Gwdb.bname base ^ ".gwb") in
