@@ -21,7 +21,7 @@ let bname = ref ""
 let verbosity = ref 2
 let fast = ref false
 let invalid_utf8 = ref false
-let key = ref false
+let p_key = ref false
 let index = ref false
 let dry_run = ref false
 let server = ref "localhost"
@@ -105,8 +105,8 @@ let fix_key ?report progress base =
       let f = Gwdb.p_first_name base p in
       let s = Gwdb.p_surname base p in
       if f <> "?" && s <> "?" then
-        let key = Name.concat f s in
-        let ipers = Gwdb.persons_of_name base key in
+        let p_key = Name.concat f s in
+        let ipers = Gwdb.persons_of_name base p_key in
         let f = Name.lower f in
         let s = Name.lower s in
         let list =
@@ -138,7 +138,7 @@ let fix_key ?report progress base =
           match acc with
           | [] -> (
               match list with
-              | [] -> failwith key
+              | [] -> failwith p_key
               | (ip, occ) :: tl ->
                   Gwdb.Marker.set skip ip true;
                   loop [ (ip, occ) ] tl)
@@ -355,7 +355,7 @@ let aux conf txt
   fn ?report progress base;
   if v1 then ProgrBar.finish ()
 
-let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~key ~utf8_key bname =
+let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -371,7 +371,7 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~key ~utf8_key bname =
   if !invalid_utf8 then
     aux conf "Fix invalid UTF-8 sequence" fix_utf8_sequence ~v1 ~v2 base nb_fam
       fix;
-  if !key then aux conf "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
+  if !p_key then aux conf "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
   if !utf8_key then
     aux conf "Scan for possible UTF-8 conflicts" scan_utf8_conflicts ~v1 ~v2
       base nb_ind fix;
@@ -418,9 +418,9 @@ let speclist =
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
     ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
-    ("-person-key", Arg.Set key, " missing doc");
+    ("-persons-key", Arg.Set p_key, " missing doc");
     ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
-    ("-utf8_key", Arg.Set utf8_key, " check potential utf8 key conflicts");
+    ("-utf8_key", Arg.Set utf8_key, " check potential utf8 p_key conflicts");
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enable by any other option." );
@@ -439,11 +439,11 @@ let main () =
     exit 2);
   Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
   @@ fun () ->
-  if !invalid_utf8 || !key || !utf8_key || !index then ()
+  if !invalid_utf8 || !p_key || !utf8_key || !index then ()
   else (
     invalid_utf8 := true;
-    key := true;
+    p_key := true;
     utf8_key := true);
-  check ~dry_run ~fast ~verbosity ~invalid_utf8 ~key ~utf8_key !bname
+  check ~dry_run ~fast ~verbosity ~invalid_utf8 ~p_key ~utf8_key !bname
 
 let _ = main ()
