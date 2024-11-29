@@ -2329,8 +2329,7 @@ let select_desc conf base gen_desc ips =
 let select_mascdesc conf base ips gen_desc =
   let asc = select_masc conf base ips in
   let ips = Hashtbl.fold (fun ip (gen, _) acc -> (ip, gen) :: acc) asc [] in
-  let r = select_desc conf base gen_desc ips in
-  r
+  select_desc conf base gen_desc ips
 
 let auth_warning conf base w =
   let pauth p = authorized_age conf base p in
