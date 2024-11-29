@@ -1045,6 +1045,9 @@ let gwdiff ok_file conf =
 
 let gwfixbase_check conf = print_file conf "bsi_fix.htm"
 
+let gwfixutf8_check conf =
+  print_file conf "bsi_fixutf8.htm"
+
 let gwfixbase ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
@@ -1054,7 +1057,18 @@ let gwfixbase ok_file conf =
   flush stderr;
   if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
 
-let cache_files_check conf =
+let gwfixutf8 ok_file conf =
+  let rc =
+    let comm = stringify (Filename.concat !bin_dir conf.comm) in
+    exec_f (comm ^ parameters conf.env)
+  in
+  Printf.eprintf "\n";
+  flush stderr;
+  if rc > 1 then print_file conf "bsi_err.htm"
+  else
+    print_file conf ok_file
+
+let cache_files_check conf = 
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
@@ -1730,7 +1744,14 @@ let setup_comm_ok conf = function
   | "gwfixbase" -> (
       match p_getenv conf.env "opt" with
       | Some "check" -> gwfixbase_check conf
-      | _ -> gwfixbase "gwfix_ok.htm" conf)
+      | _ -> gwfixbase "gwfix_ok.htm" conf
+      end
+  | "gwfixutf8" ->
+       begin match p_getenv conf.env "opt" with
+      | Some "check" -> gwfixbase_check conf
+      | _ -> gwfixbase "gwfixutf8_ok.htm" conf
+      end
+
   | x ->
       if
         Mutil.start_with "doc/" 0 x

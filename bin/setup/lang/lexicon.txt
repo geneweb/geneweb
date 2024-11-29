@@ -1645,6 +1645,13 @@ de: Gwfixbase Nachrichten
 en: Gwfixbase messages
 fr: Messages gwfixbase
 
+    Gwfixutf8 messages
+aa: gwfixutf8_ok.htm
+co: Messaghji gwfixbase
+de: Gwfixutf8 Nachrichten
+en: Gwfixutf8 messages
+fr: Messages gwfixutf8
+
     help.
 aa: gwfix.htm
 co: aiutu.
