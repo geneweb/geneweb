@@ -477,7 +477,6 @@ let safe_html_allowed_tags =
    Markup.ml automatically return tags names in lowercase.
 *)
 let safe_html_aux escape_text s =
-  let open Markup in
   let stack = ref [] in
   let make_safe = function
     | `Start_element (name, attrs) ->
@@ -510,11 +509,11 @@ let safe_html_aux escape_text s =
         | _ -> failwith (__FILE__ ^ " " ^ string_of_int __LINE__))
     | e -> e
   in
-  string s
-  |> parse_html ~context:(`Fragment "body")
-  |> signals |> map make_safe
-  |> write_html ~escape_text ~escape_attribute
-  |> to_string
+  Markup.string s
+  |> Markup.parse_html ~context:(`Fragment "body")
+  |> Markup.signals |> Markup.map make_safe
+  |> Markup.write_html ~escape_text ~escape_attribute
+  |> Markup.to_string
 
 let safe_html s =
   Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
