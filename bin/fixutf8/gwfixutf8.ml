@@ -269,7 +269,7 @@ let scan_utf8_conflicts ?report progress base =
 let rename_portraits _conf bname p_list dry_run =
   List.iter
     (fun (portrait, noc) ->
-    (* TODO REORG  Blasons *)
+      (* TODO REORG  Blasons *)
       match portrait with
       | Some portrait ->
           let dir = !Geneweb.GWPARAM.portraits_d bname in
@@ -320,24 +320,25 @@ let aux conf bname txt
           let db = Geneweb.Notes.merge_possible_aliases conf db in
           Geneweb.Perso.links_to_ind conf base db okey
         in
-        if pgl <> [] then (
+        if pgl <> [] then
           let dir = !Geneweb.GWPARAM.portraits_d bname in
-          let portrait = Filename.concat dir 
-            (Format.sprintf "%s.%d.%s" ofn ooc osn)
+          let portrait =
+            Filename.concat dir (Format.sprintf "%s.%d.%s" ofn ooc osn)
           in
           let exists ext =
             let fname = portrait ^ ext in
             if Sys.file_exists fname then Some fname else None
           in
           let full_portrait =
-            Mutil.array_find_map exists Geneweb.Image.authorized_image_file_extension
+            Mutil.array_find_map exists
+              Geneweb.Image.authorized_image_file_extension
           in
           let portrait_str =
             match full_portrait with
-            | Some f -> (
+            | Some f ->
                 let portrait = Filename.basename f in
-                rename_portraits conf bname [(Some portrait, noc)] !dry_run;
-                Printf.sprintf "Uptated portrait %s<br>\n" portrait)
+                rename_portraits conf bname [ (Some portrait, noc) ] !dry_run;
+                Printf.sprintf "Uptated portrait %s<br>\n" portrait
             | None -> ""
           in
           let notes_list =
@@ -346,7 +347,7 @@ let aux conf bname txt
               (Geneweb.NotesDisplay.linked_list conf base pgl)
           in
           Printf.sprintf "%sUptated occ for %s: %d -> %d%s" portrait_str
-            (string_of_p iper) ooc noc notes_list)
+            (string_of_p iper) ooc noc notes_list
         else ""
   in
   let i' = ref 0 in
@@ -381,7 +382,7 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
   let base = Gwdb.open_base bname in
-  let conf = { Geneweb.Config.empty with bname = bname } in
+  let conf = { Geneweb.Config.empty with bname } in
   let fix = ref 0 in
   let nb_fam = nb_of_families base in
   let nb_ind = nb_of_persons base in
@@ -390,12 +391,13 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
     load_strings_array base;
     load_persons_array base);
   if !invalid_utf8 then
-    aux conf bname "Fix invalid UTF-8 sequence" fix_utf8_sequence ~v1 ~v2 base nb_fam
-      fix;
-  if !p_key then aux conf bname "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
+    aux conf bname "Fix invalid UTF-8 sequence" fix_utf8_sequence ~v1 ~v2 base
+      nb_fam fix;
+  if !p_key then
+    aux conf bname "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
   if !utf8_key then
-    aux conf bname "Scan for possible UTF-8 conflicts" scan_utf8_conflicts ~v1 ~v2
-      base nb_ind fix;
+    aux conf bname "Scan for possible UTF-8 conflicts" scan_utf8_conflicts ~v1
+      ~v2 base nb_ind fix;
   if fast then (
     clear_strings_array base;
     clear_persons_array base);
@@ -409,7 +411,8 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
       if v1 then (
         Printf.printf "%n changes commited\n" !fix;
         flush stdout);
-      if !portraits_list <> [] then rename_portraits conf bname !portraits_list false;
+      if !portraits_list <> [] then
+        rename_portraits conf bname !portraits_list false;
       if v1 then (
         Printf.printf "Portraits renamed\n";
         flush stdout))
