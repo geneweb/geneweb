@@ -232,6 +232,15 @@ let linked_page_rows conf base pg =
            (wizname :> string)
            (Utf8.capitalize_fst (transl conf "base wizard notes")))
 
+let linked_list _conf base pgl =
+  List.fold_left
+    (fun acc pg ->
+      match pg with
+      | Def.NLDB.PgInd ip ->
+          acc ^ Gutil.designation base (Gwdb.poi base ip) ^ "<br>"
+      | _ -> acc)
+    "" pgl
+
 let print_linked_list conf base pgl =
   Output.print_sstring conf
     "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
