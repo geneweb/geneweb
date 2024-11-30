@@ -20,6 +20,22 @@
 </h1>
 </div>
 
+
+[
+en: This tool eliminates problems arising from poorly encoded utf8 characters.<br>
+    The option -persons-key identifies potential conflicts arising from the use of<br>
+    several possible apostrophe characters (', ’ and ‘). In case of potential conflict<br>
+    the tool modifies the occurrence number.<br>
+    This will allow migration of the base to a new version of GeneWeb where<br>
+    the three apostrophes are considered equivalent when searching.
+fr: Cet outil élimine les problèmes associés au codage utf8.<br>
+    L'option -persons-key détecte les conflits potentiels liés à l'usage des<br>
+    différentes apostrophes (', ’ et ‘). En cas de conflit, l'outil modifie<br>
+    le numéro d'occurrence. Ceci permettra de faire migrer la base vers une nouvelle<br>
+    version de GeneWeb dans laquelle les trois apostrophes sont considérées<br>
+    équivalentes pour la recherche.
+]
+
 <form method="GET" action="gwfixutf8">
 <input type="hidden" name="opt" value="check">
 <input type="hidden" name="lang" value="%l">
@@ -87,7 +103,7 @@
 <p>
 <table class="setup">
 <tr align="left">
-<td><input type="checkbox" name="person_key" value="on">   </td>
+<td><input type="checkbox" name="persons_key" value="on">   </td>
 <td>[checks for duplicate keys]
 </td>
 </tr>
