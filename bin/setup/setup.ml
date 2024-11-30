@@ -520,9 +520,40 @@ let rec copy_from_stream conf print strm =
           match Stream.peek strm with
           | Some '\n' ->
               let s = parse_upto ']' strm in
-              print
-                "Translations must be on a single line: [string to translate]";
-              print s
+              let lines = String.split_on_char '\n' s in
+              let lines =
+                let rec loop acc1 acc2 lines =
+                  match lines with
+                  | [] -> acc1 :: acc2
+                  | line :: lines ->
+                      if String.length line > 0 && line.[0] = ' ' then
+                        loop (acc1 ^ line) acc2 lines
+                      else loop line (acc1 :: acc2) lines
+                in loop "" [] lines
+              in
+              let lang, s =
+                let rec loop lines =
+                  match lines with
+                  | [] -> "", ""
+                  | line :: lines -> 
+                      let i =
+                        try String.index_from line 0 ':' with Not_found -> -1
+                      in
+                      if i > 0 && String.length line > i + 2
+                        && line.[i + 1] = ' ' then (
+                          let lang = String.sub line 0 i in
+                          if lang = conf.lang then 
+                            (lang, String.sub line (i + 2)
+                              (String.length line - i - 2))
+                          else
+                            loop lines)
+                      else loop lines
+                in loop lines
+              in
+              if lang = "" then
+                print (transl conf
+                  (String.concat " " (List.rev lines) |> String.trim))
+              else print s
           | _ ->
               let s =
                 let rec loop len =
@@ -555,11 +586,13 @@ let rec copy_from_stream conf print strm =
                       (acc ^ macro conf s.[1])
                       (String.sub s 2 (String.length s - 2))
                   else
-                    loop
-                      (acc ^ String.sub s 0 1)
-                      (String.sub s 1 (String.length s - 1))
-                in
-                loop "" s
+                    if s.[0] = '%' then 
+                      loop (acc ^ (macro conf s.[1]))
+                        (String.sub s 2 (String.length s - 2))
+                    else 
+                      loop (acc ^ (String.sub s 0 1))
+                        (String.sub s 1 (String.length s - 1))
+                in loop "" s
               in
               print (split_string "" s))
       | '%' -> (
