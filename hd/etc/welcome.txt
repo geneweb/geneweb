@@ -84,7 +84,8 @@
         %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!=""))
           or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="")))
           <a class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom"
-            href="%apply;url_encode%with;"%prefix;m=S&n=%if;(user.key!="")%user.key;%elseif;(user.name!="")%user.name;%else;%user.ident;%end;%end;"
+            %let;userk;%if;(user.key!="")%user.key;%elseif;(user.name!="")%user.name;%else;%user.ident;%end;%in;
+            href="%prefix;m=S&n=%apply;uri_encode(userk)"
             title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %username;%if;(user.key="") ([no user key])%end;">%username;</a>
           <a class="btn btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>[*disconnect]</a>
         %end;

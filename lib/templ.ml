@@ -1275,6 +1275,9 @@ let rec interp_ast :
             String.concat "" (eval_ast_list env ep astl)
         | "language_name", [ (None, VVstring s) ] ->
             Translate.language_name s (Util.transl conf "!languages")
+        | "url_encode", [ (None, VVstring s) ]
+        | "uri_encode", [ (None, VVstring s) ] ->
+            Util.uri_encode s
         | "url_set", [ (None, VVstring s1) ] ->
             let s1 = String.split_on_char '/' s1 in
             url_set_aux conf s1 []
