@@ -413,9 +413,23 @@ let select_from_set (ipers : Geneweb.Util.IperSet.t)
   let sel_fam i = Geneweb.Util.IfamSet.mem i ifams in
   (sel_per, sel_fam)
 
+let check_options options =
+  let check_base () =
+    if Option.is_some options.base then Ok () else Error "Missing base name."
+  in
+  check_base ()
+
 let select opts ips =
+  let () =
+    Result.iter_error
+      (fun error_message ->
+        raise
+        @@ Arg.Bad
+             (Printf.sprintf "%s Use option -help for usage" error_message))
+      (check_options opts)
+  in
   match opts.base with
-  | None -> raise (Arg.Bad "Missing base name. Use option -help for usage")
+  | None -> assert false
   | Some (_, base) ->
       let ips =
         List.rev_append ips
