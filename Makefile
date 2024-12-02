@@ -6,6 +6,11 @@ Makefile.config: configure.ml
 	  echo "Please run ocaml ./configure.ml first"; exit 1; \
 	fi
 include Makefile.config
+
+# Ensure that all the dune commands run with the profile choosen with the script
+# ./configure
+export DUNE_PROFILE := $(DUNE_PROFILE)
+
 endif
 
 -include Makefile.local
@@ -45,9 +50,6 @@ bin/gwrepl/.depend:
 	@dune top bin/gwrepl >> $@
 	@printf " Done.\n"
 
-dune-workspace: dune-workspace.in Makefile.config
-	@cat $< | sed  -e 's/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g' > $@
-
 COMPIL_DATE := $(shell date +'%Y-%m-%d')
 COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
@@ -86,7 +88,7 @@ unpatch_files:
 	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
 	fi
 
-BUILD = dune build -p geneweb --profile $(DUNE_PROFILE)
+BUILD = dune build -p geneweb
 UNPATCH = $(MAKE) --no-print-directory unpatch_files
 
 unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
@@ -103,7 +105,6 @@ endif
 .PHONY: patch_files unpatch_files info
 
 GENERATED_FILES_DEP = \
-	dune-workspace \
 	lib/version.ml \
 	lib/dune \
 	lib/gwdb/dune \
@@ -148,15 +149,15 @@ build: ## Build the geneweb package (libraries and binaries)
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
-	@$(call unpatch_after, dune build bin/gwd bin/gwc --profile $(DUNE_PROFILE))
+	@$(call unpatch_after, dune build bin/gwd bin/gwc)
 	@printf "Done."
 
 install: ## Install geneweb using dune
-	$(call unpatch_after, dune build @install --profile $(DUNE_PROFILE))
+	$(call unpatch_after, dune build @install)
 	dune install
 
 uninstall: ## Uninstall geneweb using dune
-	$(call unpatch_after, dune build @install --profile $(DUNE_PROFILE))
+	$(call unpatch_after, dune build @install)
 	dune uninstall
 
 distrib: info ## Build the project and copy what is necessary for distribution
