@@ -96,7 +96,9 @@ info:
 	@printf 'Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. '
 	@printf 'Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n'
 	@printf '  \033[1;1m%s\033[0m\n' '$(subst ','\'',$(COMMIT_TITLE))'
-	@if [ -n '$(COMMIT_COMMENT)' ]; then printf "  %s\n" '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80; fi
+ifneq ($(COMMIT_COMMENT),)
+	@printf '\n$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
+endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 .PHONY: patch_files unpatch_files info
 
