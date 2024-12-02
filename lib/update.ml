@@ -1144,15 +1144,15 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
           match info with
           | Some { ci_death_date = Some d; ci_death_place = dpl; _ } ->
               (Death (Unspecified, Date.cdate_of_date d), dpl)
-          | Some { ci_death_date = None; ci_death_place = dpl; _ } when dpl <> ""
-            ->
+          | Some { ci_death_date = None; ci_death_place = dpl; _ }
+            when dpl <> "" ->
               (DeadDontKnowWhen, dpl)
           | Some
               {
                 ci_death = (DeadDontKnowWhen | NotDead) as dead;
                 ci_death_date = None;
                 ci_death_place = dpl;
-                _
+                _;
               } ->
               (dead, dpl)
           | Some { ci_death = OfCourseDead; _ } -> (OfCourseDead, "")

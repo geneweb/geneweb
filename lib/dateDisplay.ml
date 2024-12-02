@@ -6,8 +6,8 @@ open Util
 open Gwdb
 
 let get_wday conf = function
-  | Dgreg (({ prec = Sure; delta = 0; _ } as d), _) when d.day <> 0 && d.month <> 0
-    ->
+  | Dgreg (({ prec = Sure; delta = 0; _ } as d), _)
+    when d.day <> 0 && d.month <> 0 ->
       let jd = Calendar.sdn_of_gregorian d in
       let wday =
         let jd_today = Calendar.sdn_of_gregorian conf.today in

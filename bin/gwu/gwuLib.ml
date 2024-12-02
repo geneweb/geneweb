@@ -1056,7 +1056,8 @@ let get_isolated_related base m list =
       match get_rparents p with
       | { r_fath = Some x; _ } :: _ when x = get_iper p_relation ->
           list @ [ (p, true) ]
-      | { r_fath = None; r_moth = Some x; _ } :: _ when x = get_iper p_relation ->
+      | { r_fath = None; r_moth = Some x; _ } :: _ when x = get_iper p_relation
+        ->
           list @ [ (p, true) ]
       | _ -> list
     else list
