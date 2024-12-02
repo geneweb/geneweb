@@ -103,29 +103,29 @@ let time_elapsed d1 d2 =
     | _ -> Maybe
   in
   match d1 with
-  | { day = 0; month = 0; year = a1 } ->
+  | { day = 0; month = 0; year = a1; _ } ->
       { day = 0; month = 0; year = d2.year - a1; prec; delta = 0 }
-  | { day = 0; month = m1; year = a1 } -> (
+  | { day = 0; month = m1; year = a1; _ } -> (
       match d2 with
-      | { day = 0; month = 0; year = a2 } ->
+      | { day = 0; month = 0; year = a2; _ } ->
           { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2 } ->
+      | { day = 0; month = m2; year = a2; _ } ->
           let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
           let year = a2 - a1 - r in
           { day = 0; month; year; prec; delta = 0 }
-      | { month = m2; year = a2 } ->
+      | { month = m2; year = a2; _ } ->
           let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
           let year = a2 - a1 - r in
           { day = 0; month; year; prec; delta = 0 })
-  | { day = j1; month = m1; year = a1 } -> (
+  | { day = j1; month = m1; year = a1; _ } -> (
       match d2 with
-      | { day = 0; month = 0; year = a2 } ->
+      | { day = 0; month = 0; year = a2; _ } ->
           { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2 } ->
+      | { day = 0; month = m2; year = a2; _ } ->
           let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
           let year = a2 - a1 - r in
           { day = 0; month; year; prec; delta = 0 }
-      | { day = j2; month = m2; year = a2 } ->
+      | { day = j2; month = m2; year = a2; _ } ->
           let day, r =
             if j1 <= j2 then (j2 - j1, 0)
             else (j2 - j1 + nb_days_in_month m1 a1, 1)

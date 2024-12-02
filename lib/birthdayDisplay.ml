@@ -300,7 +300,7 @@ let print_marriage conf base month =
     (fun ifam ->
       let fam = foi base ifam in
       match Date.cdate_to_dmy_opt (get_marriage fam) with
-      | Some { day = d; month = m; year = y; prec = Sure } when d <> 0 && m <> 0
+      | Some { day = d; month = m; year = y; prec = Sure; _ } when d <> 0 && m <> 0
         ->
           let father = pget conf base (get_father fam) in
           let mother = pget conf base (get_mother fam) in

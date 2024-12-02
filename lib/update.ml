@@ -321,9 +321,9 @@ let string_of_error conf =
       ^ transl conf ":" ^ " "
       ^
       match d with
-      | { day = 0; month = 0; year = a } -> Printf.sprintf "%d" a
-      | { day = 0; month = m; year = a } -> Printf.sprintf "%d/%d" m a
-      | { day = j; month = m; year = a } -> Printf.sprintf "%d/%d/%d" j m a)
+      | { day = 0; month = 0; year = a; _ } -> Printf.sprintf "%d" a
+      | { day = 0; month = m; year = a; _ } -> Printf.sprintf "%d/%d" m a
+      | { day = j; month = m; year = a; _ } -> Printf.sprintf "%d/%d/%d" j m a)
       |> Adef.safe
   | UERR_missing_field s -> "missing field: " ^<^ s
   | UERR_already_has_parents (base, p) ->
@@ -1134,7 +1134,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         let empty_string = Gwdb.empty_string in
         let birth, birth_place, baptism, baptism_place =
           match info with
-          | Some { ci_birth_date = b; ci_birth_place = bpl } ->
+          | Some { ci_birth_date = b; ci_birth_place = bpl; _ } ->
               if String.length bpl >= 2 && String.sub bpl 0 2 = "b/" then
                 (None, "", b, String.sub bpl 2 (String.length bpl - 2))
               else (b, bpl, None, "")
@@ -1142,9 +1142,9 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         in
         let death, death_place =
           match info with
-          | Some { ci_death_date = Some d; ci_death_place = dpl } ->
+          | Some { ci_death_date = Some d; ci_death_place = dpl; _ } ->
               (Death (Unspecified, Date.cdate_of_date d), dpl)
-          | Some { ci_death_date = None; ci_death_place = dpl } when dpl <> ""
+          | Some { ci_death_date = None; ci_death_place = dpl; _ } when dpl <> ""
             ->
               (DeadDontKnowWhen, dpl)
           | Some
@@ -1152,19 +1152,20 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
                 ci_death = (DeadDontKnowWhen | NotDead) as dead;
                 ci_death_date = None;
                 ci_death_place = dpl;
+                _
               } ->
               (dead, dpl)
-          | Some { ci_death = OfCourseDead } -> (OfCourseDead, "")
+          | Some { ci_death = OfCourseDead; _ } -> (OfCourseDead, "")
           | Some _ | None -> (infer_death_bb conf birth baptism, "")
         in
         let occupation =
           match info with
-          | Some { ci_occupation = occupation } -> occupation
+          | Some { ci_occupation = occupation; _ } -> occupation
           | None -> ""
         in
         let access =
           match info with
-          | Some { ci_public = p } -> if p then Public else IfTitles
+          | Some { ci_public = p; _ } -> if p then Public else IfTitles
           | None -> IfTitles
         in
         let p =

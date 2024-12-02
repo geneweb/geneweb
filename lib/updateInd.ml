@@ -352,7 +352,7 @@ and eval_date_var = Update_util.eval_date_var
 and eval_event_var e = function
   | [ "e_name" ] -> (
       match e with
-      | Some { epers_name = name } -> (
+      | Some { epers_name = name; _ } -> (
           match name with
           | Epers_Birth -> str_val "#birt"
           | Epers_Baptism -> str_val "#bapt"
@@ -408,17 +408,17 @@ and eval_event_var e = function
       | _ -> str_val "")
   | [ "e_place" ] -> (
       match e with
-      | Some { epers_place = x } ->
+      | Some { epers_place = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "e_note" ] -> (
       match e with
-      | Some { epers_note = x } ->
+      | Some { epers_note = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "e_src" ] -> (
       match e with
-      | Some { epers_src = x } ->
+      | Some { epers_src = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | _ -> raise Not_found
@@ -426,26 +426,26 @@ and eval_event_var e = function
 and eval_title_var t = function
   | [ "t_estate" ] -> (
       match t with
-      | Some { t_place = x } ->
+      | Some { t_place = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "t_ident" ] -> (
       match t with
-      | Some { t_ident = x } ->
+      | Some { t_ident = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "t_main" ] -> (
       match t with
-      | Some { t_name = Tmain } -> bool_val true
+      | Some { t_name = Tmain; _ } -> bool_val true
       | _ -> bool_val false)
   | [ "t_name" ] -> (
       match t with
-      | Some { t_name = Tname x } ->
+      | Some { t_name = Tname x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "t_nth" ] -> (
       match t with
-      | Some { t_nth = x } -> str_val (if x = 0 then "" else string_of_int x)
+      | Some { t_nth = x; _ } -> str_val (if x = 0 then "" else string_of_int x)
       | _ -> str_val "")
   | _ -> raise Not_found
 
@@ -453,14 +453,14 @@ and eval_relation_var base r = function
   | "r_father" :: sl ->
       let x =
         match r with
-        | Some { r_fath = Some x } -> x
+        | Some { r_fath = Some x; _ } -> x
         | _ -> ("", "", 0, Update.Create (Neuter, None), "")
       in
       eval_person_var base x sl
   | "r_mother" :: sl ->
       let x =
         match r with
-        | Some { r_moth = Some x } -> x
+        | Some { r_moth = Some x; _ } -> x
         | _ -> ("", "", 0, Update.Create (Neuter, None), "")
       in
       eval_person_var base x sl
@@ -468,7 +468,7 @@ and eval_relation_var base r = function
   | [ "rt_candidate_parent" ] -> eval_is_relation_type CandidateParent r
   | [ "rt_empty" ] -> (
       match r with
-      | Some { r_fath = None; r_moth = None } | None -> bool_val true
+      | Some { r_fath = None; r_moth = None; _ } | None -> bool_val true
       | _ -> bool_val false)
   | [ "rt_foster_parent" ] -> eval_is_relation_type FosterParent r
   | [ "rt_godparent" ] -> eval_is_relation_type GodParent r
@@ -503,8 +503,8 @@ and eval_is_death_reason dr = function
   | _ -> bool_val false
 
 and eval_is_relation_type rt = function
-  | Some { r_fath = None; r_moth = None } -> bool_val false
-  | Some { r_type = x } -> bool_val (x = rt)
+  | Some { r_fath = None; r_moth = None; _ } -> bool_val false
+  | Some { r_type = x; _ } -> bool_val (x = rt)
   | _ -> bool_val false
 
 and eval_special_var conf base = function

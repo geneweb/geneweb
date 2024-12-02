@@ -318,7 +318,7 @@ and eval_date_var = Update_util.eval_date_var
 and eval_event_var e = function
   | [ "e_name" ] -> (
       match e with
-      | Some { efam_name = name } -> (
+      | Some { efam_name = name; _ } -> (
           match name with
           | Efam_Marriage -> str_val "#marr"
           | Efam_NoMarriage -> str_val "#nmar"
@@ -336,17 +336,17 @@ and eval_event_var e = function
       | _ -> str_val "")
   | [ "e_place" ] -> (
       match e with
-      | Some { efam_place = x } ->
+      | Some { efam_place = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "e_note" ] -> (
       match e with
-      | Some { efam_note = x } ->
+      | Some { efam_note = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "e_src" ] -> (
       match e with
-      | Some { efam_src = x } ->
+      | Some { efam_src = x; _ } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
   | [ "e_w_nbr" ] -> (

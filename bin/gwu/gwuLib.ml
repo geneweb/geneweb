@@ -1054,9 +1054,9 @@ let get_isolated_related base m list =
     if List.mem_assq p list then list
     else if is_isolated p then
       match get_rparents p with
-      | { r_fath = Some x } :: _ when x = get_iper p_relation ->
+      | { r_fath = Some x; _ } :: _ when x = get_iper p_relation ->
           list @ [ (p, true) ]
-      | { r_fath = None; r_moth = Some x } :: _ when x = get_iper p_relation ->
+      | { r_fath = None; r_moth = Some x; _ } :: _ when x = get_iper p_relation ->
           list @ [ (p, true) ]
       | _ -> list
     else list
@@ -1094,7 +1094,7 @@ let get_persons_with_relations base m list =
         let p = poi base ip in
         match (get_rparents p, get_parents p) with
         | [], _ | _, Some _ -> list
-        | { r_fath = Some x } :: _, _ when x <> get_iper m.m_fath -> list
+        | { r_fath = Some x; _ } :: _, _ when x <> get_iper m.m_fath -> list
         | _ -> (p, false) :: list)
       (get_witnesses m.m_fam) list
   in

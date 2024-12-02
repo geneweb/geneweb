@@ -6,7 +6,7 @@ open Util
 open Gwdb
 
 let get_wday conf = function
-  | Dgreg (({ prec = Sure; delta = 0 } as d), _) when d.day <> 0 && d.month <> 0
+  | Dgreg (({ prec = Sure; delta = 0; _ } as d), _) when d.day <> 0 && d.month <> 0
     ->
       let jd = Calendar.sdn_of_gregorian d in
       let wday =
@@ -459,17 +459,17 @@ let string_of_age conf a =
   Adef.safe
   @@
   match a with
-  | { day = 0; month = 0; year = y } ->
+  | { day = 0; month = 0; year = y; _ } ->
       if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
       else if y = 1 then transl conf "one year old"
       else transl conf "birth"
-  | { day = 0; month = m; year = y } ->
+  | { day = 0; month = m; year = y; _ } ->
       if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
         string_of_int ((y * 12) + m) ^ " " ^ transl conf "months old"
       else if m = 1 then transl conf "one month old"
       else transl conf "less than one month old"
-  | { day = d; month = m; year = y } ->
+  | { day = d; month = m; year = y; _ } ->
       if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
         string_of_int ((y * 12) + m) ^ " " ^ transl conf "months old"
