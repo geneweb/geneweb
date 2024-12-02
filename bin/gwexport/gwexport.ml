@@ -52,35 +52,56 @@ let anonfun c s =
   else raise (Arg.Bad "Cannot treat several databases")
 
 let speclist c =
-  let int_arg ?(check = Fun.const @@ Ok ()) continue =
-    Arg.Int
+  let int_arg ?(check = Fun.const @@ Ok ()) ?(symbolic_values = []) continue =
+    Arg.String
       (fun arg ->
         let bad_arg message =
           Arg.Bad
             (Printf.sprintf "option '%s': %s" Sys.argv.(!Arg.current) message)
         in
+        let arg =
+          match int_of_string_opt arg with
+          | Some arg -> Ok arg
+          | None ->
+              let error_message =
+                let symbolic_values =
+                  symbolic_values |> List.map fst
+                  |> List.map (Printf.sprintf "'%s'")
+                in
+                Printf.sprintf
+                  "unknown symbolic value '%s', possible symbolic values are %s"
+                  arg
+                  (String.concat " " symbolic_values)
+              in
+              Option.to_result ~none:error_message
+                (List.assoc_opt arg symbolic_values)
+        in
         let ( >>= ) = Result.bind in
         Result.fold ~ok:continue
           ~error:(fun message -> raise @@ bad_arg message)
-          (check arg >>= Fun.const (Ok arg)))
+          (arg >>= check >>= Fun.const arg))
   in
-  let positive_int_arg continue =
-    int_arg
+  let positive_int_arg ?symbolic_values continue =
+    int_arg ?symbolic_values
       ~check:(fun arg ->
         if arg > 0 then Ok () else Error "positive integer expected")
       continue
   in
   [
     ( "-a",
-      positive_int_arg (fun s -> c := { !c with asc = Some s }),
-      "<N> maximum generation of the root's ascendants" );
+      positive_int_arg
+        ~symbolic_values:[ ("all", max_int) ]
+        (fun s -> c := { !c with asc = Some s }),
+      "[<N>|all] maximum generation of the root's ascendants" );
     ( "-ad",
-      Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
-      "<N> maximum generation of the root's ascendants descendants. The value \
-       is relative to the root person. Thus, for example, '0' means *down to \
-       the level of the root person*, '2' means *down to the level of the \
-       grandparents of the root person* and '-2' means *down to the level of \
-       the grandchildren of the root person*." );
+      int_arg
+        ~symbolic_values:[ ("all", -max_int) ]
+        (fun s -> c := { !c with ascdesc = Some s }),
+      "[<N>|all] maximum generation of the root's ascendants descendants. The \
+       value is relative to the root person. Thus, for example, '0' means \
+       *down to the level of the root person*, '2' means *down to the level of \
+       the grandparents of the root person* and '-2' means *down to the level \
+       of the grandchildren of the root person*." );
     ( "-key",
       Arg.String (fun s -> c := { !c with keys = s :: !c.keys }),
       "<KEY> key reference of root person. Used for -a/-d/-ad options. Can be \
@@ -106,8 +127,10 @@ let speclist c =
             }),
       "[ASCII|ANSEL|ANSI|UTF-8] set charset; default is UTF-8" );
     ( "-d",
-      positive_int_arg (fun s -> c := { !c with desc = Some s }),
-      "<N> maximum generation of the root's descendants." );
+      positive_int_arg
+        ~symbolic_values:[ ("all", max_int) ]
+        (fun s -> c := { !c with desc = Some s }),
+      "[<N>|all] maximum generation of the root's descendants." );
     ( "-mem",
       Arg.Unit (fun () -> c := { !c with mem = true }),
       " save memory space, but slower." );
