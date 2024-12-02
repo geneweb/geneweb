@@ -58,11 +58,15 @@ let speclist c =
       "<N> maximum generation of the root's ascendants" );
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
-      "<N> maximum generation of the root's ascendants descendants" );
+      "<N> maximum generation of the root's ascendants descendants. The value \
+       is relative to the root person. Thus, for example, '0' means *down to \
+       the level of the root person*, '2' means *down to the level of the \
+       grandparents of the root person* and '-2' means *down to the level of \
+       the grandchildren of the root person*." );
     ( "-key",
       Arg.String (fun s -> c := { !c with keys = s :: !c.keys }),
-      "<KEY> key reference of root person. Used for -a/-d options. Can be used \
-       multiple times. Key format is \"First Name.occ SURNAME\"" );
+      "<KEY> key reference of root person. Used for -a/-d/-ad options. Can be \
+       used multiple times. Key format is \"First Name.occ SURNAME\"" );
     ( "-c",
       Arg.Int (fun s -> c := { !c with censor = s }),
       "<NUM>: when a person is born less than <num> years ago, it is not \
