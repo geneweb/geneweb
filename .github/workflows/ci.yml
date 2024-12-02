@@ -40,7 +40,7 @@ jobs:
           opam pin ocamlformat 0.24.1
       - name: Make ocamlformat > build/distrib
         run: |
-          opam exec -- ocaml ./configure.ml --release
+          opam exec -- ocaml ./configure.ml
           opam exec -- make fmt distrib
       - name: Make CI tests
         run: opam exec -- make ci
@@ -71,9 +71,9 @@ jobs:
 
       - name: build/distrib
         run: |
-          opam exec -- ocaml ./configure.ml --release
+          opam exec -- ocaml ./configure.ml
           opam exec -- make fmt distrib
-          
+
       - name: Run gwd with cache-in-memory parameter and check output
         run: |
           output=$(distribution/gw/gwd -cache-in-memory testing 2>&1)
