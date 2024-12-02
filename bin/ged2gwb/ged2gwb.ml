@@ -1766,8 +1766,8 @@ let add_indi gen r =
   in
   let sex =
     match find_field "SEX" r.rsons with
-      Some {rval = "M"} -> Male
-    | Some {rval = "F"} -> Female
+      Some {rval = "M"; _} -> Male
+    | Some {rval = "F"; _} -> Female
     | _ -> Neuter
   in
   let image =
@@ -3078,13 +3078,13 @@ let check_parents_sex persons families couples strings =
   done
 
 let neg_year_dmy = function
-  | {day = d; month = m; year = y; prec = OrYear dmy2} ->
+  | {day = d; month = m; year = y; prec = OrYear dmy2; _} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
     {day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
-  | {day = d; month = m; year = y; prec = YearInt dmy2} ->
+  | {day = d; month = m; year = y; prec = YearInt dmy2; _} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
     {day = d; month = m; year = -abs y; prec = YearInt dmy2; delta = 0}
-  | {day = d; month = m; year = y; prec = p} ->
+  | {day = d; month = m; year = y; prec = p; _} ->
     {day = d; month = m; year = -abs y; prec = p; delta = 0}
 
 let neg_year = function

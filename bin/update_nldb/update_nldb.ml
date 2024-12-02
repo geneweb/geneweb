@@ -162,7 +162,7 @@ let compute base bdir =
           add_string @@ get_burial_src p;
           add_string @@ get_psources p;
           List.iter
-            (fun { epers_note; epers_src } ->
+            (fun { epers_note; epers_src; _ } ->
               add_string epers_note;
               add_string epers_src)
             (get_pevents p);

@@ -445,9 +445,9 @@ let possible_father warning x father =
       | Some d2 when d2.prec <> After ->
           let a2 =
             match d2 with
-            | { prec = YearInt dmy2 } -> dmy2.year2
-            | { prec = OrYear dmy2 } -> dmy2.year2
-            | { year = a } -> a
+            | { prec = YearInt dmy2; _ } -> dmy2.year2
+            | { prec = OrYear dmy2; _ } -> dmy2.year2
+            | { year = a; _ } -> a
           in
           if d1.year > a2 + 1 then warning (DeadTooEarlyToBeFather (father, x))
       | Some _ | None -> ())

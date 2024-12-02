@@ -16,14 +16,14 @@ type stats = {
 
 let birth_year p =
   match Date.cdate_to_dmy_opt (get_birth p) with
-  | Some { year; prec = Sure } -> Some year
+  | Some { year; prec = Sure; _ } -> Some year
   | Some _ | None -> None
 
 let death_year current_year p =
   match get_death p with
   | Death (_, d) -> (
       match Date.cdate_to_dmy_opt d with
-      | Some { year = y; prec = Sure } -> Some y
+      | Some { year = y; prec = Sure; _ } -> Some y
       | _ -> None)
   | NotDead -> Some current_year
   | _ -> None

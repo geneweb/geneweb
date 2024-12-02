@@ -234,9 +234,9 @@ type check_date =
 
 let min_year_of p =
   let aux = function
-    | { prec = After; year } -> CheckAfter year
-    | { prec = Before; year } -> CheckBefore year
-    | { year } -> CheckOther year
+    | { prec = After; year; _ } -> CheckAfter year
+    | { prec = Before; year; _ } -> CheckBefore year
+    | { year; _ } -> CheckOther year
   in
   Option.map aux (Date.cdate_to_dmy_opt (get_birth p))
 

@@ -1472,11 +1472,11 @@ and eval_simple_bool_var conf base env =
       | _ -> raise Not_found)
   | "has_relation_her" -> (
       match get_env "rel" env with
-      | Vrel ({ r_moth = Some _ }, None) -> true
+      | Vrel ({ r_moth = Some _; _ }, None) -> true
       | _ -> false)
   | "has_relation_him" -> (
       match get_env "rel" env with
-      | Vrel ({ r_fath = Some _ }, None) -> true
+      | Vrel ({ r_fath = Some _; _ }, None) -> true
       | _ -> false)
   | "has_witnesses" -> (
       match get_env "fam" env with
@@ -2322,19 +2322,19 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | None -> raise Not_found)
   | "related" :: sl -> (
       match get_env "rel" env with
-      | Vrel ({ r_type = rt }, Some p) ->
+      | Vrel ({ r_type = rt; _ }, Some p) ->
           eval_relation_field_var conf base env
             (index_of_sex (get_sex p), rt, get_iper p, false)
             loc sl
       | _ -> raise Not_found)
   | "relation_her" :: sl -> (
       match get_env "rel" env with
-      | Vrel ({ r_moth = Some ip; r_type = rt }, None) ->
+      | Vrel ({ r_moth = Some ip; r_type = rt; _ }, None) ->
           eval_relation_field_var conf base env (1, rt, ip, true) loc sl
       | _ -> raise Not_found)
   | "relation_him" :: sl -> (
       match get_env "rel" env with
-      | Vrel ({ r_fath = Some ip; r_type = rt }, None) ->
+      | Vrel ({ r_fath = Some ip; r_type = rt; _ }, None) ->
           eval_relation_field_var conf base env (0, rt, ip, true) loc sl
       | _ -> raise Not_found)
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
@@ -3163,8 +3163,8 @@ and eval_str_event_field conf base (p, p_auth)
           | x -> (x, false)
         in
         match (birth_date, Date.cdate_to_dmy_opt date) with
-        | ( Some ({ prec = Sure | About | Maybe } as d1),
-            Some ({ prec = Sure | About | Maybe } as d2) )
+        | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
+            Some ({ prec = Sure | About | Maybe; _ } as d2) )
           when d1 <> d2 ->
             let a = Date.time_elapsed d1 d2 in
             let s =
@@ -3279,8 +3279,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "computable_death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
-        | ( Some (Dgreg (({ prec = Sure | About | Maybe } as d1), _)),
-            Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
+        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
+            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
             _ )
           when d1 <> d2 ->
             let a = Date.time_elapsed d1 d2 in
@@ -3296,8 +3296,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               ( Date.cdate_to_dmy_opt (get_birth p),
                 Date.cdate_to_dmy_opt (get_marriage fam) )
             with
-            | ( Some ({ prec = Sure | About | Maybe } as d1),
-                Some ({ prec = Sure | About | Maybe } as d2) ) ->
+            | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
+                Some ({ prec = Sure | About | Maybe; _ } as d2) ) ->
                 let a = Date.time_elapsed d1 d2 in
                 a.year > 0
                 || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
@@ -3664,8 +3664,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
-        | ( Some (Dgreg (({ prec = Sure | About | Maybe } as d1), _)),
-            Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
+        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
+            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
             approx )
           when d1 <> d2 ->
             let a = Date.time_elapsed d1 d2 in
@@ -3797,8 +3797,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
               ( Date.cdate_to_dmy_opt (get_birth p),
                 Date.cdate_to_dmy_opt (get_marriage fam) )
             with
-            | ( Some ({ prec = Sure | About | Maybe } as d1),
-                Some ({ prec = Sure | About | Maybe } as d2) ) ->
+            | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
+                Some ({ prec = Sure | About | Maybe; _ } as d2) ) ->
                 Date.time_elapsed d1 d2
                 |> DateDisplay.string_of_age conf
                 |> safe_val

@@ -87,7 +87,7 @@ let make_dag conf base set =
       if i = Array.length nodes then nodes
       else
         match nodes.(i) with
-        | { valu = Left ip; chil } ->
+        | { valu = Left ip; chil; _ } ->
             let ifaml = Array.to_list (get_family (pget conf base ip)) in
             let nodes, n =
               let rec loop nodes = function

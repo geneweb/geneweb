@@ -786,8 +786,8 @@ let print_person_table conf base p lab =
     td (fun () ->
         (if p_auth then
          match Gutil.get_birth_death_date p with
-         | ( Some (Dgreg (({ prec = Sure | About | Maybe } as d1), _)),
-             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
+         | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
+             Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
              approx )
            when d1 <> d2 ->
              if not ((not approx) && d1.prec = Sure && d2.prec = Sure) then (

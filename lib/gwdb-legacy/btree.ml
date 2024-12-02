@@ -39,34 +39,34 @@ module Make (Ord : OrderedType) : S with type key = Ord.t = struct
   type key = Ord.t
   type 'a t = Empty | Node of { l : 'a t; v : key; d : 'a; r : 'a t; h : int }
 
-  let height = function Empty -> 0 | Node { h } -> h
+  let height = function Empty -> 0 | Node { h; _ } -> h
 
   let create l x d r =
     let hl = height l and hr = height r in
     Node { l; v = x; d; r; h = (if hl >= hr then hl + 1 else hr + 1) }
 
   let bal l x d r =
-    let hl = match l with Empty -> 0 | Node { h } -> h in
-    let hr = match r with Empty -> 0 | Node { h } -> h in
+    let hl = match l with Empty -> 0 | Node { h; _ } -> h in
+    let hr = match r with Empty -> 0 | Node { h; _ } -> h in
     if hl > hr + 2 then
       match l with
       | Empty -> invalid_arg "Map.bal"
-      | Node { l = ll; v = lv; d = ld; r = lr } -> (
+      | Node { l = ll; v = lv; d = ld; r = lr; _ } -> (
           if height ll >= height lr then create ll lv ld (create lr x d r)
           else
             match lr with
             | Empty -> invalid_arg "Map.bal"
-            | Node { l = lrl; v = lrv; d = lrd; r = lrr } ->
+            | Node { l = lrl; v = lrv; d = lrd; r = lrr; _ } ->
                 create (create ll lv ld lrl) lrv lrd (create lrr x d r))
     else if hr > hl + 2 then
       match r with
       | Empty -> invalid_arg "Map.bal"
-      | Node { l = rl; v = rv; d = rd; r = rr } -> (
+      | Node { l = rl; v = rv; d = rd; r = rr; _ } -> (
           if height rr >= height rl then create (create l x d rl) rv rd rr
           else
             match rl with
             | Empty -> invalid_arg "Map.bal"
-            | Node { l = rll; v = rlv; d = rld; r = rlr } ->
+            | Node { l = rll; v = rlv; d = rld; r = rlr; _ } ->
                 create (create l x d rll) rlv rld (create rlr rv rd rr))
     else Node { l; v = x; d; r; h = (if hl >= hr then hl + 1 else hr + 1) }
 
@@ -84,13 +84,13 @@ module Make (Ord : OrderedType) : S with type key = Ord.t = struct
 
   let rec find x = function
     | Empty -> raise Not_found
-    | Node { l; v; d; r } ->
+    | Node { l; v; d; r; _ } ->
         let c = Ord.compare x v in
         if c = 0 then d else find x (if c < 0 then l else r)
 
   let rec mem x = function
     | Empty -> false
-    | Node { l; v; r } ->
+    | Node { l; v; r; _ } ->
         let c = Ord.compare x v in
         c = 0 || mem x (if c < 0 then l else r)
 
