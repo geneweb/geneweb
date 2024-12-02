@@ -52,9 +52,27 @@ let anonfun c s =
   else raise (Arg.Bad "Cannot treat several databases")
 
 let speclist c =
+  let int_arg ?(check = Fun.const @@ Ok ()) continue =
+    Arg.Int
+      (fun arg ->
+        let bad_arg message =
+          Arg.Bad
+            (Printf.sprintf "option '%s': %s" Sys.argv.(!Arg.current) message)
+        in
+        let ( >>= ) = Result.bind in
+        Result.fold ~ok:continue
+          ~error:(fun message -> raise @@ bad_arg message)
+          (check arg >>= Fun.const (Ok arg)))
+  in
+  let positive_int_arg continue =
+    int_arg
+      ~check:(fun arg ->
+        if arg > 0 then Ok () else Error "positive integer expected")
+      continue
+  in
   [
     ( "-a",
-      Arg.Int (fun s -> c := { !c with asc = Some s }),
+      positive_int_arg (fun s -> c := { !c with asc = Some s }),
       "<N> maximum generation of the root's ascendants" );
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
@@ -88,7 +106,7 @@ let speclist c =
             }),
       "[ASCII|ANSEL|ANSI|UTF-8] set charset; default is UTF-8" );
     ( "-d",
-      Arg.Int (fun s -> c := { !c with desc = Some s }),
+      positive_int_arg (fun s -> c := { !c with desc = Some s }),
       "<N> maximum generation of the root's descendants." );
     ( "-mem",
       Arg.Unit (fun () -> c := { !c with mem = true }),
