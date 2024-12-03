@@ -3,13 +3,13 @@ include Gwdb_driver
 module IperSet = Set.Make (struct
   type t = iper
 
-  let compare = Stdlib.compare
+  let compare = compare_iper
 end)
 
 module IfamSet = Set.Make (struct
   type t = ifam
 
-  let compare = Stdlib.compare
+  let compare = compare_ifam
 end)
 
 (** [insert_person base p a u]
