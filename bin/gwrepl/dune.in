@@ -17,7 +17,7 @@
 
 (rule
   (target data.cppo.ml)
-  (deps .depend (:maker mk_data.ml))
+  (deps .depend %{lib:geneweb:geneweb.cma} (:maker mk_data.ml))
   (action (with-stdout-to %{target} (run ocaml %{maker})))
 )
 
