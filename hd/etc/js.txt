@@ -11,7 +11,7 @@
                        sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct
                        sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    %if;(e.m="A" and e.t="")
+    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
       <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
               integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=
                          sha384-d3UHjPdzJkZuk5H3qKYMLRyWLAQBJbby2yr2Q58hXXtAGF8RSNO9jpLDlKKPv5v3
@@ -33,7 +33,7 @@
   %else;
     <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
     <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=4.6.1"></script>
-    %if;(e.m="A" and e.t="")
+    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
       <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
       <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
@@ -240,57 +240,266 @@ document.addEventListener("DOMContentLoaded", function () {
 %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
 %if;(e.m!="")
 <script>
+// Enhanced clear button management for dynamic input fields
+// Add clear buttons (X) to input fields and handle DataTable updates
+// Generic clear button functionality for form inputs
 function addClearButtonToInputs() {
-    const elements = document.querySelectorAll('input[type="text"], input[type="search"]:not([id="n"]):not([id="p"]), textarea:not(#notes_comments)');
-    elements.forEach(element => {
-        // Create wrapper div
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'relative';
-        wrapper.style.display = 'inline-block';
-        wrapper.style.width = '100%';
-        element.parentNode.insertBefore(wrapper, element);
-        wrapper.appendChild(element);
-
-        // Remove padding-right from input element
-        element.style.paddingRight = '30px';
-
+    // Utility function to create and setup clear button
+    function createClearButton(element) {
         const clearButton = document.createElement('i');
-        clearButton.className = 'fas fa-xmark';
-        clearButton.style.position = 'absolute';
-        clearButton.style.right = element.tagName.toLowerCase() === 'input' && element.getAttribute('list') ? '10px' : '10px';
-        clearButton.style.top = element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%';
-        clearButton.style.transform = element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)';
-        clearButton.style.cursor = 'pointer';
-        clearButton.style.display = 'none';
-        clearButton.style.color = '#667fc9';
-        clearButton.style.fontSize = '1em';
+        clearButton.className = 'fas fa-xmark clear-button-icon';
         clearButton.title = '[*clear input]';
-
-        wrapper.appendChild(clearButton);
         
-        function toggleClearButton() {
-            clearButton.style.display = element.value ? 'block' : 'none';
+        clearButton.style.cssText = `
+            position: absolute;
+            right: 10px;
+            top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
+            transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
+            cursor: pointer;
+            color: #667fc9;
+            font-size: 1em;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+            pointer-events: auto;
+        `;
+        return clearButton;
+    }
+
+    // Initialize or update a single input
+    function initializeInput(element) {
+        // Skip if already initialized
+        if (element.dataset.clearInitialized) {
+            const existingButton = element.parentNode.querySelector('.clear-button-icon');
+            if (existingButton) {
+                existingButton.style.opacity = element.value ? '1' : '0';
+            }
+            return;
         }
-        
-        element.addEventListener('input', toggleClearButton);
-        toggleClearButton();
 
-        clearButton.addEventListener('mouseenter', () => {
-            clearButton.style.color = '#335599';
-        });
+        // Mark as initialized
+        element.dataset.clearInitialized = 'true';
 
-        clearButton.addEventListener('mouseleave', () => {
-            clearButton.style.color = '#667fc9';
-        });
+        // Create wrapper if needed
+        let wrapper = element.parentNode;
+        if (!wrapper.classList.contains('clear-button-wrapper')) {
+            wrapper = document.createElement('div');
+            wrapper.className = 'clear-button-wrapper';
+            wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
+            element.parentNode.insertBefore(wrapper, element);
+            wrapper.appendChild(element);
+        }
 
+        // Add padding for the clear button
+        element.style.paddingRight = '24px';
+
+        // Create and append clear button
+        const clearButton = createClearButton(element);
+        wrapper.appendChild(clearButton);
+
+        // Update clear button visibility
+        const updateVisibility = () => {
+            requestAnimationFrame(() => {
+                clearButton.style.opacity = element.value ? '1' : '0';
+            });
+        };
+
+        // Event listeners
+        element.addEventListener('input', updateVisibility);
+        element.addEventListener('change', updateVisibility);
+        element.addEventListener('focus', updateVisibility);
+
+        // Hover effects
+        clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
+        clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
+
+        // Handle clear button click
         clearButton.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            
+            // Clear the input
             element.value = '';
-            toggleClearButton();
             element.focus();
+            updateVisibility();
+
+            // Trigger events
+            const inputEvent = new CustomEvent('clearButton', { 
+                bubbles: true,
+                detail: { element }
+            });
+            element.dispatchEvent(inputEvent);
             element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
         });
+
+        // Initial visibility state
+        updateVisibility();
+    }
+
+    // Process all matching inputs
+    function processInputs() {
+        const selector = `
+            input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
+            input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
+            textarea:not(.no-clear-button):not([readonly]):not([disabled]),
+            .clear-button:not([readonly]):not([disabled])
+        `;
+
+        requestAnimationFrame(() => {
+            document.querySelectorAll(selector).forEach(initializeInput);
+        });
+    }
+
+    // Initial processing
+    processInputs();
+
+    // Monitor DOM changes
+    const observer = new MutationObserver((mutations) => {
+        let shouldProcess = false;
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes.length || 
+                mutation.type === 'attributes' && 
+                (mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
+                shouldProcess = true;
+            }
+        });
+        if (shouldProcess) {
+            processInputs();
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['type', 'class']
     });
 }
+</script>
+<script>
+%if;((e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
+  or ("MOD_" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1
+   or b.datalist_occupations=1 or b.datalist_sources=1
+  or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
+  or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
+// Manages datalist population and updates
+// Efficiently manages datalists with chunked loading and selection preservation
+const DatalistManager = {
+  cache: new Map(),
+  
+  populateDatalist: function(datalistId, cacheFile) {
+    const dataList = document.getElementById(datalistId);
+    if (!dataList || this.cache.has(datalistId)) return;
+
+    setTimeout(() => {
+      fetch(cacheFile)
+        .then(response => {
+          const reader = response.body.pipeThrough(new DecompressionStream('gzip')).getReader();
+          return new ReadableStream({
+            start(controller) {
+              return pump();
+              function pump() {
+                return reader.read().then(({ done, value }) => {
+                  if (done) {
+                    controller.close();
+                    return;
+                  }
+                  controller.enqueue(value);
+                  return pump();
+                });
+              }
+            }
+          });
+        })
+        .then(stream => new Response(stream))
+        .then(response => response.text())
+        .then(text => {
+          const options = text.split("\n").filter(line => line.trim());
+          this.cache.set(datalistId, options);
+          this.updateDatalistOptions(dataList, options.slice(0, 100));
+        })
+        .catch(error => console.error(`Error loading ${cacheFile}:`, error));
+    }, 1000);
+  },
+
+  updateDatalistOptions: function(dataList, options) {
+    const fragment = document.createDocumentFragment();
+    options.forEach(option => {
+      const opt = document.createElement("option");
+      opt.value = option.trim().replace("<option>", "");
+      fragment.appendChild(opt);
+    });
+    
+    dataList.textContent = '';
+    dataList.appendChild(fragment);
+  },
+
+  filterOptions: function(datalistId, input) {
+      const dataList = document.getElementById(datalistId);
+      if (!dataList || !this.cache.has(datalistId)) return;
+
+      const options = this.cache.get(datalistId);
+      let filtered;
+      
+      if (input) {
+          // First try exact filtering
+          filtered = options
+              .filter(opt => opt.toLowerCase().includes(input.toLowerCase()))
+              .slice(0, 100);
+              
+          // If no matches found, show full list (or filtered by first character)
+          if (filtered.length === 0) {
+              if (input.length > 1) {
+                  // Try matching just the first character
+                  filtered = options
+                      .filter(opt => opt.toLowerCase().startsWith(input[0].toLowerCase()))
+                      .slice(0, 100);
+              }
+              // If still empty or input is just one char, show full list
+              if (filtered.length === 0) {
+                  filtered = options.slice(0, 100);
+              }
+          }
+      } else {
+          filtered = options.slice(0, 100);
+      }
+
+      this.updateDatalistOptions(dataList, filtered);
+  }
+};
+%end;
+%if;("MOD_" in e.m)
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+  addNavigation: function() {
+    // Use event delegation for dynamically added inputs
+    $(document).on('mousedown', 'input[data-book]', function(event) {
+      if (event.ctrlKey && event.button === 0) {
+        event.preventDefault();
+        inputToBook.openBook(this.value, $(this).data('book'));
+      }
+    });
+  },
+
+  openBook: function(value, book) {
+    if (!value) return;
+    
+    let preVal = value;
+    if (book === "place") {
+      const place = value.split(/\]\s+[-–—]\s+/);
+      preVal = place.length > 1 ? place[1] : value;
+    }
+    
+    preVal = preVal.substring(0, Math.min(preVal.length, 12))
+                   .split(/[, ]+/)[0];
+                   
+    const encVal = encodeURIComponent(value);
+    const encPreVal = encodeURIComponent(preVal);
+    
+    const url = `?%if;cgi;b=%base.name;&%end;m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+    window.open(url, '_blank');
+  }
+};
+%end;
 </script>
 %end;

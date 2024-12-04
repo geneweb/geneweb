@@ -60,10 +60,10 @@
                   <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
                 <label class="sr-only" for="n">Search public name</label>
-                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
+                <input type="search" id="n" class="form-control form-control-lg no-clear-button" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
                   autofocus>
                 <label class="sr-only" for="p">Search firstname</label>
-                <input type="search" id="p" class="form-control form-control-lg mt-2" name="p" placeholder="[*first name/first names]0">
+                <input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2" name="p" placeholder="[*first name/first names]0">
               </div>
               <button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> [*search/case sensitive]0</button>
             </div>
