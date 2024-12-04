@@ -193,11 +193,7 @@ let linked_page_rows conf base pg =
   | Def.NLDB.PgMisc fnotes, typ ->
       let nenv, _ = read_notes base fnotes in
       let n_type = try List.assoc "TYPE" nenv with Not_found -> "" in
-      if
-        match typ with
-        | Some t when t = "" -> t = n_type
-        | _ -> true
-      then (
+      if match typ with Some t when t = "" -> t = n_type | _ -> true then (
         let fnote_title = fmt_fnote_title conf base fnotes in
         if conf.wizard then
           Output.print_sstring conf
@@ -208,11 +204,12 @@ let linked_page_rows conf base pg =
     <i class="%s"></i></a></td>|}
                (commd conf :> string)
                (Util.uri_encode fnotes)
-               (Utf8.capitalize_fst (transl conf 
-               (if n_type = "gallery" then "modify gallery"
-                else "modify note")))
+               (Utf8.capitalize_fst
+                  (transl conf
+                     (if n_type = "gallery" then "modify gallery"
+                     else "modify note")))
                (if n_type = "gallery" then "far fa-image"
-                else "far fa-file-lines"));
+               else "far fa-file-lines"));
         Output.print_sstring conf
           (Format.sprintf
              {|
