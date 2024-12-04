@@ -1652,6 +1652,37 @@ span.notesourcecolor {
     max-width: 40%;
 }
 
+.d-flex.flex-wrap {
+  gap: 1rem;
+}
+
+.imap-gallery {
+  width: 250px;
+  margin-bottom: 1rem;
+  background: white;
+  border-radius: .25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.imap-gallery a {
+  display: block;
+}
+
+.imap-gallery img {
+  width: 250px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: .25rem .25rem 0 0;
+}
+
+.imap-gallery a + :last-child {
+  padding: .75rem;
+  color: #212529;
+  font-size: .875rem;
+  text-align: center;
+  border-top: 1px solid #dee2e6;
+}
+
 .in { 
   background-color: coral;
 }

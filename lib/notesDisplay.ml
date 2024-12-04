@@ -241,21 +241,23 @@ let linked_page_rows conf base pg =
            (wizname :> string)
            (Utf8.capitalize_fst (transl conf "base wizard notes")))
 
+let create_gallery_item conf fnotes nenv s =
+  let img_url, img_name = Notes.json_extract_img conf s
+  and title = try List.assoc "TITLE" nenv with Not_found -> "" in
+  Printf.sprintf
+    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s"><img src="%s" \
+       title="%s | %s" alt="%s"></a>%s</div>|}
+    (commd conf :> string)
+    fnotes img_url fnotes img_name img_name title
+
 let print_linked_list_gallery conf base pgl =
-  Wserver.printf "<div class=\"d-flex flex-wrap\">\n";
+  Wserver.printf "<div class=\"d-flex flex-wrap mt-3\">\n";
   List.iter
-    (fun pg ->
-      match pg with
+    (function
       | Def.NLDB.PgMisc fnotes ->
           let nenv, s = read_notes base fnotes in
           if (try List.assoc "TYPE" nenv with Not_found -> "") = "gallery"
-          then
-            let img_url, img_name = Notes.json_extract_img conf s in
-            Wserver.printf
-              "<div class=\"item_gallery\"><a href=\"%sm=NOTES&f=%s\"><img \
-               src=\"%s\" title=\"%s | %s\"></a></div>\n"
-              (commd conf :> string)
-              fnotes img_url fnotes img_name
+          then Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
       | _ -> ())
     pgl;
   Wserver.printf "</div>\n"
