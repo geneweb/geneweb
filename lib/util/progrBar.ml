@@ -8,6 +8,44 @@ let empty = ref '.'
 let full = ref '#'
 let draw_len = String.length draw
 let pb_cnt = size * draw_rep * draw_len
+let default_width = 60
+let default_empty = '.'
+let default_full = '#'
+
+type t = {
+  ppf : Format.formatter;
+  width : int;
+  empty : char;
+  full : char;
+  disabled : bool;
+  mutable last_output : float;
+}
+
+let progress t current total =
+  if not @@ t.disabled then
+    let now = Unix.gettimeofday () in
+    if now -. t.last_output < 0.2 then ()
+    else (
+      t.last_output <- now;
+      let filled = current * t.width / total in
+      let bar =
+        Format.asprintf "%s%s"
+          (String.make filled t.full)
+          (String.make (t.width - filled) t.empty)
+      in
+      Format.fprintf t.ppf "\r[%s] %d%%" bar (current * 100 / total);
+      Format.pp_print_flush t.ppf ())
+
+let finish t =
+  Format.fprintf t.ppf "\r[%s] 100%%@." (String.make t.width t.full)
+
+let with_bar ?(width = default_width) ?(empty = default_empty)
+    ?(full = default_full) ?(disabled = false) ppf f =
+  let t = { ppf; width; empty; full; disabled; last_output = 0. } in
+  if not disabled then (
+    Format.pp_print_flush t.ppf ();
+    Fun.protect ~finally:(fun () -> finish t) @@ fun () -> f t)
+  else f t
 
 let start () =
   for _i = 1 to size do
