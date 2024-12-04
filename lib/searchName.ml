@@ -268,7 +268,7 @@ let search conf base an search_order specify unknown =
 let print conf base specify unknown =
   let real_input label =
     match p_getenv conf.env label with
-    | Some s -> if s = "" then None else Some (Name.lower s)
+    | Some s -> if s = "" then None else Some s
     | None -> None
   in
   match (real_input "p", real_input "n") with
