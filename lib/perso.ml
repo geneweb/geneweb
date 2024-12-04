@@ -5585,8 +5585,12 @@ let print_what_links conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key None in
     let title h =
-      transl conf "linked pages" |> Utf8.capitalize_fst
-      |> Output.print_sstring conf;
+      let lnkd_typ =
+        match p_getenv conf.env "type" with
+        | Some "gallery" -> "linked images"
+        | _ -> "linked pages"
+      in
+      transl conf lnkd_typ |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Util.transl conf ":" |> Output.print_sstring conf;
       Output.print_sstring conf " ";
       if h then Output.print_string conf (simple_person_text conf base p true)
