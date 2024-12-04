@@ -68,7 +68,7 @@ let move_file_to_save file dir =
   (* previous version iterated on file types *)
   try
     let save_dir = Filename.concat dir "saved" in
-    if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
+    File.create_dir ~parent:true save_dir;
     let fname = Filename.basename file in
     let orig_file = Filename.concat dir fname in
     let saved_file = Filename.concat save_dir fname in
@@ -326,7 +326,7 @@ let effective_send_ok conf base p file =
   in
   let fname = Image.default_portrait_filename base p in
   let dir = !GWPARAM.images_d conf.bname in
-  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  File.create_dir ~parent:true dir;
   let fname =
     Filename.concat dir
       (if mode = "portraits" then fname ^ extension_of_type typ else fname)
@@ -412,7 +412,7 @@ let effective_send_c_ok conf base p file file_name =
     if mode = "portraits" then !GWPARAM.portraits_d conf.bname
     else Filename.concat (!GWPARAM.images_d conf.bname) fname
   in
-  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  File.create_dir ~parent:true dir;
   let fname =
     Filename.concat dir
       (if mode = "portraits" then fname ^ extension_of_type typ else file_name)
@@ -425,7 +425,7 @@ let effective_send_c_ok conf base p file file_name =
     | Some (`Url url) -> (
         let fname = Image.default_portrait_filename base p in
         let dir = Filename.concat dir "saved" in
-        if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+        File.create_dir ~parent:true dir;
         let fname = Filename.concat dir fname ^ ".url" in
         try write_file fname url
         with _ ->
@@ -571,7 +571,7 @@ let effective_delete_c_ok conf base p =
     if mode = "portraits" then !GWPARAM.portraits_d conf.bname
     else Filename.concat (!GWPARAM.images_d conf.bname) fname
   in
-  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  File.create_dir ~parent:true dir;
   (* TODO verify we dont destroy a saved image
       having the same name as portrait! *)
   if delete then

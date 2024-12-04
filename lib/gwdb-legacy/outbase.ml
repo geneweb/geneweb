@@ -310,7 +310,7 @@ let output base =
           (fun f ->
             let s = base.data.bnotes.Def.nread f Def.RnAll in
             let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
-            Mutil.mkdir_p (Filename.dirname fname);
+            File.create_dir ~parent:true (Filename.dirname fname);
             let oc = open_out fname in
             output_string oc s;
             close_out oc)

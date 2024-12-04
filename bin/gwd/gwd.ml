@@ -1742,7 +1742,7 @@ let connection (addr, request) script_name contents0 =
           let (contents, env) = build_env request contents0 in
           if not (image_request printer_conf script_name env)
           && not (misc_request printer_conf script_name)
-          then 
+          then
             conf_and_connection from request script_name contents env
         with Exit -> ()
     end
@@ -1796,7 +1796,7 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-        Mutil.mkdir_p ~perm:0o777 !GWPARAM.cnt_dir 
+        File.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
     end;
   Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection
@@ -1883,7 +1883,7 @@ let slashify s =
   String.init (String.length s) conv_char
 
 let make_sock_dir x =
-  Mutil.mkdir_p x;
+  File.create_dir ~parent:true x;
   if Sys.unix then ()
   else
     begin
