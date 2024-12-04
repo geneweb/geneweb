@@ -1380,14 +1380,14 @@ let trimmed_string_of_place place =
 let index_threshold = 20
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
-let print_alphab_list conf crit print_elem liste =
-  let len = List.length liste in
+let print_alphab_list conf index_key print_elem list =
+  let len = List.length list in
   if len > index_threshold then (
     Output.print_sstring conf "<p>\n";
     ignore
       (List.fold_left
          (fun last e ->
-           let t = crit e in
+           let t = index_key e in
            let same_than_last =
              match last with Some t1 -> t = t1 | _ -> false
            in
@@ -1395,13 +1395,13 @@ let print_alphab_list conf crit print_elem liste =
              Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
                (Ext_string.hexa_string t) t;
            Some t)
-         None liste);
+         None list);
     Output.print_sstring conf "</p>\n");
   Output.print_sstring conf "<ul>\n";
   ignore
     (List.fold_left
        (fun last e ->
-         let t = crit e in
+         let t = index_key e in
          let same_than_last =
            match last with Some t1 -> t = t1 | _ -> false
          in
@@ -1420,7 +1420,7 @@ let print_alphab_list conf crit print_elem liste =
          print_elem e;
          Output.print_sstring conf "</li>\n";
          Some t)
-       None liste);
+       None list);
   if len > index_threshold then Output.print_sstring conf "</ul>\n</li>\n";
   Output.print_sstring conf "</ul>\n"
 
