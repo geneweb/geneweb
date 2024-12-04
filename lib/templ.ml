@@ -1489,6 +1489,22 @@ and print_simple_variable conf = function
         (String.concat ", " (Util.get_bases_list ~format_fun:format_link ()))
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
+  | "src_images_list" ->
+      let dir = !GWPARAM.images_d conf.bname in
+      let f_list = Sys.readdir dir |> Array.to_list |> List.sort compare in
+      let res =
+        List.fold_left
+          (fun acc f ->
+            let full_path = Filename.concat dir f in
+            if
+              (Unix.stat full_path).st_kind = Unix.S_REG
+              && f.[0] <> '.'
+              && f.[0] <> '~'
+            then acc ^ Format.sprintf "<option>%s\n" f
+            else acc)
+          "" f_list
+      in
+      Output.print_sstring conf res
   | _ -> raise Not_found
 
 and print_variable conf sl =
