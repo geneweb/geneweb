@@ -1,14 +1,12 @@
-open Gwdb
-open Def
-
+let bd = ref ""
 let bname = ref ""
 let trace = ref false
 let fnames = ref false
 let snames = ref false
-let alias = ref false
+let aliases = ref false
 let pub_names = ref false
-let fname_alias = ref false
-let sname_alias = ref false
+let fname_aliases = ref false
+let sname_aliases = ref false
 let places = ref false
 let estates = ref false
 let titles = ref false
@@ -18,226 +16,139 @@ let sources = ref false
 let all = ref false
 let prog = ref false
 let width = ref 50
+let cache_dir = ref ""
+let ( // ) = Filename.concat
 
 (* Attention: cache files are reorg independant *)
 let set_cache_dir bname =
-  let cache_dir =
-    String.concat Filename.dir_sep [ Secure.base_dir (); "etc"; bname; "cache" ]
-  in
-  try
-    if not (Sys.file_exists cache_dir) then Unix.mkdir bname 0o755;
-    cache_dir
-  with _ ->
-    Printf.eprintf "Error while creating cache dir %s\n" cache_dir;
-    cache_dir
+  let cache_dir = Secure.base_dir () // "etc" // bname // "cache" in
+  File.create_dir ~parent:true cache_dir;
+  cache_dir
 
-let cache_dir = ref ""
-
-let write_cache_file bname fname list =
+let write_cache_file bname fname l =
   let filename = bname ^ "_" ^ fname ^ ".cache" in
-  let file = Filename.concat !cache_dir filename in
+  let file = !cache_dir // filename in
   let gz_file = file ^ ".gz" in
-  try
-    let temp_file = Filename.temp_file "temp_" ".cache" in
-    let oc = Stdlib.open_out temp_file in
-    List.iter (fun (v, _) -> Stdlib.output_string oc (v ^ "\n")) list;
-    Stdlib.close_out oc;
-    (* Using camlzip to compress the file *)
-    let in_channel = Stdlib.open_in_bin temp_file in
-    let out_channel = Gzip.open_out gz_file in
-    try
-      let buffer = Bytes.create 8192 in
-      let rec copy_contents () =
-        let bytes_read =
-          Stdlib.input in_channel buffer 0 (Bytes.length buffer)
-        in
-        if bytes_read > 0 then (
-          Gzip.output out_channel buffer 0 bytes_read;
-          copy_contents ())
-      in
-      copy_contents ();
-      Stdlib.close_in in_channel;
-      Gzip.close_out out_channel;
-      Sys.remove temp_file
-    with exn ->
-      Stdlib.close_in_noerr in_channel;
-      Gzip.close_out out_channel;
-      Sys.remove temp_file;
-      raise exn
-  with exn ->
-    Printf.eprintf "Debug: Exception occurred: %s\n" (Printexc.to_string exn);
-    Printf.eprintf "Debug: Stack trace:\n%s\n" (Printexc.get_backtrace ());
-    raise exn
+  let oc = Gzip.open_out gz_file in
+  let finally () = try Gzip.close_out oc with Sys_error _ -> () in
+  Fun.protect ~finally @@ fun () ->
+  List.iter
+    (fun s ->
+      let s = s ^ "\n" in
+      Gzip.output_substring oc s 0 (String.length s))
+    l
 
-let places_all base bname fname =
+let with_timer f =
   let start = Unix.gettimeofday () in
-  let ht_size = 2048 in
-  (* FIXME: find the good heuristic *)
-  let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
-  let ht_add istr _p =
-    let key : 'a = sou base istr in
-    match Hashtbl.find_opt ht key with
-    | Some _ -> Hashtbl.replace ht key key
-    | None -> Hashtbl.add ht key key
-  in
-  let len = nb_of_persons base in
-  if !prog then (
-    Printf.eprintf "\nplaces\n";
-    flush stdout;
-    ProgrBar.full := '*';
-    ProgrBar.start ());
-  let aux b fn p =
-    if b then
-      let x = fn p in
-      if not (is_empty_string x) then ht_add x p
-  in
+  let r = f () in
+  let stop = Unix.gettimeofday () in
+  (r, stop -. start)
 
-  Collection.iteri
-    (fun i ip ->
-      let p = poi base ip in
-      aux true get_birth_place p;
-      aux true get_baptism_place p;
-      aux true get_death_place p;
-      aux true get_burial_place p;
-      if !prog then ProgrBar.run i len else ())
-    (Gwdb.ipers base);
+module HT = struct
+  include Hashtbl.Make (struct
+    type t = Gwdb_driver.istr
 
-  if !prog then ProgrBar.finish ();
-  let len = nb_of_families base in
-  if !prog then (
-    ProgrBar.full := '*';
-    ProgrBar.start ());
+    let equal = Gwdb_driver.eq_istr
+    let hash = Gwdb_driver.hash_istr
+  end)
 
-  Collection.iteri
+  let replace s i v = if not @@ Gwdb_driver.is_empty_string i then replace s i v
+end
+
+let fullname bname fname = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz")
+
+let iteri_places f base =
+  let ipers = Gwdb.ipers base in
+  let n_pers = Gwdb.nb_of_persons base in
+  let ifams = Gwdb.ifams base in
+  Gwdb.Collection.iteri
+    (fun i iper ->
+      let per = Gwdb.poi base iper in
+      f i (Gwdb.get_birth_place per);
+      f i (Gwdb.get_baptism_place per);
+      f i (Gwdb.get_death_place per);
+      f i (Gwdb.get_burial_place per))
+    ipers;
+  Gwdb.Collection.iteri
     (fun i ifam ->
-      let fam = foi base ifam in
-      let pl_ma = get_marriage_place fam in
-      if not (is_empty_string pl_ma) then (
-        let fath = poi base (get_father fam) in
-        let moth = poi base (get_mother fam) in
-        ht_add pl_ma fath;
-        ht_add pl_ma moth);
-      if !prog then ProgrBar.run i len else ())
-    (Gwdb.ifams base);
+      let fam = Gwdb.foi base ifam in
+      f (n_pers + i) (Gwdb.get_marriage_place fam))
+    ifams
 
-  if !prog then ProgrBar.finish ();
-  let places_list = Hashtbl.fold (fun _k v acc -> (v, 1) :: acc) ht [] in
-  let places_list =
-    List.sort (fun (v1, _) (v2, _) -> Gutil.alphabetic_utf_8 v1 v2) places_list
-  in
-  write_cache_file bname fname places_list;
-  let stop = Unix.gettimeofday () in
-  let full_name =
-    Filename.concat !cache_dir (bname ^ "_" ^ fname ^ ".cache.gz")
-  in
-  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
-    (List.length places_list) "places" (stop -. start);
-  Format.eprintf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
-    (List.length places_list) "places" (stop -. start);
-  flush stderr
+let iteri_pers f base =
+  Gwdb.Collection.iteri
+    (fun i iper -> f i (Gwdb.poi base iper))
+    (Gwdb.ipers base)
 
-let names_all base bname fname alias =
-  let start = Unix.gettimeofday () in
-  let ht = Hashtbl.create 1 in
-  let nb_ind = nb_of_persons base in
-  flush stderr;
-  if !prog then (
-    Printf.eprintf "\n%s\n" fname;
-    flush stdout;
-    ProgrBar.full := '*';
-    ProgrBar.start ());
+let collect_places base bar =
+  let len = Gwdb.nb_of_persons base + Gwdb.nb_of_families base in
+  let set : unit HT.t = HT.create 2048 in
+  iteri_places
+    (fun i istr ->
+      if !prog then ProgrBar.progress bar i len;
+      HT.replace set istr ())
+    base;
+  set
 
-  Collection.iteri
-    (fun i ip ->
-      if !prog then ProgrBar.run i nb_ind;
-      let p = poi base ip in
-      let nam =
-        match fname with
-        | "fnames" -> [ get_first_name p ]
-        | "snames" -> [ get_surname p ]
-        | "aliases" -> get_aliases p
-        | "occupations" -> [ get_occupation p ]
-        | "qualifiers" -> get_qualifiers p
-        | "pub_names" -> [ get_public_name p ]
-        | "estates" ->
-            List.fold_left (fun acc t -> t.t_place :: acc) [] (get_titles p)
-        | "titles" ->
-            List.fold_left (fun acc t -> t.t_ident :: acc) [] (get_titles p)
-        | "sources" ->
-            let p_sources =
-              List.fold_right
-                (fun evt events ->
-                  let src = evt.epers_src in
-                  src :: events)
-                (get_pevents p)
-                [ get_psources p ]
-            in
-            let ifams = Array.to_list (get_family p) in
-            let f_sources =
-              List.fold_left
-                (fun acc ifam ->
-                  List.fold_right
-                    (fun evt fam_fevents ->
-                      let src = evt.efam_src in
-                      src :: fam_fevents)
-                    (get_fevents (foi base ifam))
-                    []
-                  :: acc)
-                [] ifams
-            in
-            p_sources @ List.flatten f_sources
-        | _ -> []
-      in
-      List.iter
-        (fun nam ->
-          let key = sou base nam in
-          if not (Hashtbl.mem ht key) then Hashtbl.add ht key (key, 1)
-          else
-            let vv, i = Hashtbl.find ht key in
-            Hashtbl.replace ht key (vv, i + 1))
-        nam;
+let iter_field base p f = function
+  | `Fnames with_aliases ->
+      f (Gwdb.get_first_name p);
+      if with_aliases then List.iter f (Gwdb.get_first_names_aliases p)
+  | `Snames with_aliases ->
+      f (Gwdb.get_surname p);
+      if with_aliases then List.iter f (Gwdb.get_surnames_aliases p)
+  | `Aliases -> List.iter f (Gwdb.get_aliases p)
+  | `Occupations -> f (Gwdb.get_occupation p)
+  | `Qualifiers -> List.iter f (Gwdb.get_qualifiers p)
+  | `Pub_names -> f (Gwdb.get_public_name p)
+  | `Estates -> List.iter (fun t -> f t.Def.t_place) (Gwdb.get_titles p)
+  | `Titles -> List.iter (fun t -> f t.Def.t_ident) (Gwdb.get_titles p)
+  | `Sources ->
+      f (Gwdb.get_psources p);
+      List.iter (fun t -> f t.Def.epers_src) (Gwdb.get_pevents p);
+      Array.iter
+        (fun ifam ->
+          List.iter
+            (fun evt -> f evt.Def.efam_src)
+            (Gwdb.get_fevents (Gwdb.foi base ifam)))
+        (Gwdb.get_family p)
 
-      let nam2 =
-        match (fname, alias) with
-        | "fnames", "fna" -> get_first_names_aliases p
-        | "snames", "sna" -> get_surnames_aliases p
-        | _, _ -> []
-      in
-      List.iter
-        (fun nam ->
-          let key = sou base nam in
-          if not (Hashtbl.mem ht key) then Hashtbl.add ht key (key, 1)
-          else
-            let vv, i = Hashtbl.find ht key in
-            Hashtbl.replace ht key (vv, i + 1))
-        nam2)
-    (Gwdb.ipers base);
+let field_to_string = function
+  | `Fnames _ -> "fnames"
+  | `Snames _ -> "snames"
+  | `Aliases -> "aliases"
+  | `Occupations -> "occupations"
+  | `Qualifiers -> "qualifiers"
+  | `Pub_names -> "pub_names"
+  | `Estates -> "estates"
+  | `Titles -> "titles"
+  | `Sources -> "sources"
 
-  if !prog then ProgrBar.finish ();
-  let name_list = Hashtbl.fold (fun _k v acc -> v :: acc) ht [] in
-  let name_list = List.sort (fun v1 v2 -> compare v1 v2) name_list in
-  write_cache_file bname fname name_list;
-  let stop = Unix.gettimeofday () in
-  let full_name =
-    Filename.concat !cache_dir (bname ^ "_" ^ fname ^ ".cache.gz")
-  in
-  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
-    (List.length name_list) fname (stop -. start);
-  Format.eprintf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@," !width full_name
-    (List.length name_list) fname (stop -. start);
-  flush stderr
+let collect_names base field bar =
+  let len = Gwdb.nb_of_persons base in
+  let set : unit HT.t = HT.create 17 in
+  iteri_pers
+    (fun i p ->
+      if !prog then ProgrBar.progress bar i len;
+      iter_field base p (fun istr -> HT.replace set istr ()) field)
+    base;
+  set
+
+let process_data base set =
+  HT.fold (fun k () acc -> Gwdb.sou base k :: acc) set []
+  |> List.sort String.compare
 
 let speclist =
   [
-    ("-bd", Arg.String Secure.set_base_dir, " bases folder");
+    ("-bd", Arg.String (fun x -> bd := x), " bases folder");
     ("-fn", Arg.Set fnames, " first names");
     ("-sn", Arg.Set snames, " surnames");
-    ("-al", Arg.Set alias, " aliases");
+    ("-al", Arg.Set aliases, " aliases");
     ("-pu", Arg.Set pub_names, " public names");
-    ("-fna", Arg.Set fname_alias, " add first name aliases");
-    ("-sna", Arg.Set sname_alias, " add surname aliases");
     ("-qu", Arg.Set qualifiers, " qualifiers");
     ("-pl", Arg.Set places, " places");
+    ("-fna", Arg.Set fname_aliases, " add first name aliases");
+    ("-sna", Arg.Set sname_aliases, " add surnames aliases");
     ("-es", Arg.Set estates, " estates");
     ("-ti", Arg.Set titles, " titles");
     ("-oc", Arg.Set occupations, " occupations");
@@ -252,52 +163,64 @@ let anonfun i = bname := i
 let usage =
   "Usage: cache_files [options] base\n cd bases; before running cache_files."
 
-let main () =
-  Secure.set_base_dir ".";
+let () =
   Arg.parse speclist anonfun usage;
-  bname := Filename.remove_extension (Filename.basename !bname);
-  if !bname = "" || !bname <> Filename.basename !bname then (
-    Arg.usage speclist usage;
-    exit 2);
-  let base = Gwdb.open_base !bname in
-  bname := Filename.basename !bname;
-  cache_dir := set_cache_dir !bname;
-  if not (Sys.file_exists !cache_dir) then Mutil.mkdir_p !cache_dir;
+  let bname = Filename.remove_extension (Filename.basename !bname) in
+  let base = Gwdb.open_base (!bd // bname) in
+  Secure.set_base_dir !bd;
+  cache_dir := set_cache_dir bname;
+
   Printf.printf "Generating cache(s) compressed with gzip\n";
+  width := String.length (!cache_dir // bname) + 23;
 
-  let full_name =
-    Filename.concat !cache_dir (!bname ^ "_occupations.cache.gz")
+  let total_duration =
+    if !all || !places then (
+      if !prog then Format.printf "Generating places cache...@.";
+      let n, duration =
+        with_timer @@ fun () ->
+        ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter
+        @@ fun bar ->
+        let l = collect_places base bar |> process_data base in
+        write_cache_file bname "places" l;
+        List.length l
+      in
+      Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width
+        (fullname bname "places") n "places" duration;
+      duration)
+    else 0.
   in
-  width := String.length full_name + 2;
-  Format.printf "@[<v>";
-  let fn_alias = if !fname_alias then "fna" else "" in
-  let sn_alias = if !sname_alias then "sna" else "" in
-  (* Ouvre une boite verticale *)
-  if !places then places_all base !bname "places";
-  if !fnames then names_all base !bname "fnames" fn_alias;
-  if !snames then names_all base !bname "snames" sn_alias;
-  if !alias then names_all base !bname "aliases" "";
-  if !pub_names then names_all base !bname "pub_names" "";
-  if !estates then names_all base !bname "estates" "";
-  if !titles then names_all base !bname "titles" "";
-  if !occupations then names_all base !bname "occupations" "";
-  if !sources then names_all base !bname "sources" "";
-  if !qualifiers then names_all base !bname "qualifiers" "";
-  if !all then (
-    let fn_alias = "fna" in
-    let sn_alias = "sna" in
-    places_all base !bname "places";
-    names_all base !bname "fnames" fn_alias;
-    names_all base !bname "snames" sn_alias;
-    names_all base !bname "aliases" "";
-    names_all base !bname "pub_names" "";
-    names_all base !bname "estates" "";
-    names_all base !bname "titles" "";
-    names_all base !bname "occupations" "";
-    names_all base !bname "sources" "";
-    names_all base !bname "qualifiers" "");
-  Format.printf "@]";
-  (* Ferme la boite verticale *)
-  flush stderr
 
-let _ = main ()
+  let fds = [] in
+  let fds = if !all || !sources then `Sources :: fds else fds in
+  let fds = if !all || !qualifiers then `Qualifiers :: fds else fds in
+  let fds = if !all || !occupations then `Occupations :: fds else fds in
+  let fds = if !all || !titles then `Titles :: fds else fds in
+  let fds = if !all || !estates then `Estates :: fds else fds in
+  let fds = if !all || !pub_names then `Pub_names :: fds else fds in
+  let fds = if !all || !aliases then `Aliases :: fds else fds in
+  let fds = if !all || !snames then `Snames !sname_aliases :: fds else fds in
+  let fds = if !all || !fnames then `Fnames !fname_aliases :: fds else fds in
+
+  let total_duration =
+    List.fold_left
+      (fun total_duration field ->
+        let fname = field_to_string field in
+        if !prog then Format.printf "Generating %s cache...@." fname;
+        let n, duration =
+          with_timer @@ fun () ->
+          ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter
+          @@ fun bar ->
+          let l = collect_names base field bar |> process_data base in
+          write_cache_file bname fname l;
+          List.length l
+        in
+        Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2fs@]@." !width
+          (fullname bname fname) n fname duration;
+        total_duration +. duration)
+      total_duration fds
+  in
+  let min, sec =
+    let d = Float.to_int total_duration in
+    (d / 60, d mod 60)
+  in
+  Format.printf "Total duration: %dm %ds@." min sec
