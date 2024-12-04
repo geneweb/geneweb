@@ -68,7 +68,7 @@ let display_descendants_level conf base max_level ancestor =
             let x = Util.pget conf base ix in
             if Gwdb.Marker.get mark ix then list
             else
-              let _ = Gwdb.Marker.set mark ix true in
+              let () = Gwdb.Marker.set mark ix true in
               if Gwdb.Marker.get levt ix > max_level then list
               else if level = max_level then
                 if
@@ -961,7 +961,7 @@ let build_desc conf base l : ('a * Adef.safe_string) list =
               let fam = Gwdb.foi base ifam in
               Array.fold_left
                 (fun accu ip ->
-                  let _ = incr cnt in
+                  let () = incr cnt in
                   let open Def in
                   (Util.pget conf base ip, lab ^>^ string_of_int !cnt ^ ".")
                   :: accu)
