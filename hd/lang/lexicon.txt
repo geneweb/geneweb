@@ -1724,9 +1724,39 @@ fr: groupe/groupes
 en: group label
 fr: nom du groupe
 
-    add new group
-en: add new group
-fr: ajouter un nouveau groupe
+    add a group
+af: voeg groep by
+bg: добавяне на група
+br: ouzhpennañ ur strollad
+ca: afegir un grup
+co: aghjustà un gruppu
+cs: přidat skupinu
+da: tilføj en gruppe
+de: eine Gruppe hinzufügen
+en: add a group
+eo: aldoni grupon
+es: añadir un grupo
+et: lisa grupp
+fi: lisää ryhmä
+fr: ajouter un groupe
+he: הוסף קבוצה
+is: bæta við hópi
+it: aggiungere un gruppo
+lt: pridėti grupę
+lv: pievienot grupu
+nl: een groep toevoegen
+no: legg til en gruppe
+oc: apondre un grop
+pl: dodaj grupę
+pt: adicionar um grupo
+pt-br: adicionar um grupo
+ro: adăugați un grup
+ru: добавить группу
+sk: pridať skupinu
+sl: dodaj skupino
+sv: lägg till en grupp
+tr: bir grup ekle
+zh: 添加一个组
 
     add
 af: byvoeg
@@ -4479,8 +4509,38 @@ en: clear every filters
 fr: effacer tous les filtres
 
     clear input
-en: clean the input
+af: vee die invoer skoon
+bg: изчистване на полето за въвеждане
+br: dilamet an danvez
+ca: esborrar l’entrada
+co: sguassà l’entrata
+cs: vymazat vstup
+da: ryd inputfeltet
+de: Eingabefeld löschen
+en: clear the input
+eo: forviŝi la enigon
+es: borrar la entrada
+et: kustuta sisend
+fi: tyhjennä syöte
 fr: effacer le champ
+he: נקה את השדה
+is: hreinsa innsláttarsvæðið
+it: cancellare l’input
+lt: išvalyti įvestį
+lv: notīrīt ievadi
+nl: invoer wissen
+no: tøm inndatafeltet
+oc: escafar la donada
+pl: wyczyść pole
+pt: limpar o campo
+pt-br: limpar o campo
+ro: ștergeți intrarea
+ru: очистить поле ввода
+sk: vymazať vstup
+sl: počisti vnos
+sv: rensa inmatningsfältet
+tr: girişi temizle
+zh: 清除输入
 
     click
 af: druk
@@ -4545,6 +4605,10 @@ sk: poklepte na "%s"
 sl: kliknite na "%s"
 sv: klicka "%s"
 tr: "%s" i tıklayın
+
+    click to book
+en: to rename all the identical data,&#10;hold Ctrl and click to open the entry in the book
+fr: pour renommer toutes les données identiques,&#10;maintenir Ctrl puis cliquer sur une entrée pour l’ouvrir dans le dictionnaire
 
     close
 co: chjode
@@ -12438,13 +12502,39 @@ en: transfer the historical “comments of union” input to the adjacent “mar
 fr: transférer le champ historique « commentaires d’union » vers celui des « notes de mariage » ci-contre.
 
     move up/down
-co: ricullà/falà/ricullà u cursore/falà u cursore
-de: nach oben/nach unten/Cursor nach oben/Cursor nach unten
-en: move up/move down/move up cursor/move down cursor
-fr: remonter/descendre/remonter le curseur/descendre le curseur
-pt: subir/descer/subir o cursor/descer o cursor
-sv: flytta upp/flytta ner/flytta pekaren uppåt/flytta pekaren nedåt
-tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı
+af: skuif op/skuif af/skuif die wyser op/skuif die wyser af/glip-en-los
+bg: преместване нагоре/преместване надолу/преместване на курсора нагоре/преместване на курсора надолу/плъзгане и пускане
+br: pignat/diskenn/pignat ar c'hursor/diskenn ar c'hursor/leuskel-gweredek
+ca: moure amunt/moure avall/moure el cursor amunt/moure el cursor avall/arrossegar i deixar anar
+co: ricullà/falà/ricullà u cursore/falà u cursore/strascinà è lascià falà
+cs: posunout nahoru/posunout dolů/posunout kurzor nahoru/posunout kurzor dolů/přetáhnout a pustit
+da: flyt op/flyt ned/flyt markøren op/flyt markøren ned/træk og slip
+de: nach oben/nach unten/Cursor nach oben/Cursor nach unten/ziehen und ablegen
+en: move up/move down/move the cursor up/move the cursor down/drag and drop
+eo: movi supren/movi malsupren/movi la kursoron supren/movi la kursoron malsupren/treni kaj faligi
+es: subir/bajar/mover el cursor arriba/mover el cursor abajo/arrastrar y soltar
+et: liigu üles/liigu alla/nihuta kursor üles/nihuta kursor alla/lohista ja aseta
+fi: siirrä ylös/siirrä alas/siirrä kohdistinta ylös/siirrä kohdistinta alas/vedä ja pudota
+fr: monter/descendre/remonter le curseur/descendre le curseur/glisser-déposer
+he: הזז למעלה/הזז למטה/הזז את הסמן למעלה/הזז את הסמן למטה/גרור ושחרר
+is: færa upp/færa niður/færa bendil upp/færa bendil niður/draga og sleppa
+it: sposta su/sposta giù/sposta il cursore su/sposta il cursore giù/trascina e rilascia
+lt: perkelti aukštyn/perkelti žemyn/perkelti žymeklį aukštyn/perkelti žymeklį žemyn/tempti ir paleisti
+lv: pārvietot augšup/pārvietot lejup/pārvietot kursoru uz augšu/pārvietot kursoru uz leju/vilkt un nomest
+nl: naar boven verplaatsen/naar beneden verplaatsen/de cursor omhoog verplaatsen/de cursor omlaag verplaatsen/slepen en neerzetten
+no: flytt opp/flytt ned/flytt markøren opp/flytt markøren ned/drag og slipp
+oc: montar/davalhar/montar lo cursor/davalhar lo cursor/arrestar e daissar tombar
+pl: przenieś w górę/przenieś w dół/przenieś kursor w górę/przenieś kursor w dół/przeciągnij i upuść
+pt: subir/descer/subir o cursor/descer o cursor/arrastar e soltar
+pt-br: subir/descer/subir o cursor/descer o cursor/arrastar e soltar
+ro: mută în sus/mută în jos/mută cursorul în sus/mută cursorul în jos/tragere și eliberare
+ru: переместить вверх/переместить вниз/переместить курсор вверх/переместить курсор вниз/перетащить и отпустить
+sk: presunúť nahor/presunúť nadol/presunúť kurzor nahor/presunúť kurzor nadol/potiahnúť a pustiť
+sl: premakni gor/premakni dol/premakni kazalec gor/premakni kazalec dol/povleci in spusti
+sv: flytta upp/flytta ner/flytta pekaren uppåt/flytta pekaren nedåt/drag och släpp
+tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı/sürükle ve bırak
+zh: 向上移动/向下移动/将光标向上移动/将光标向下移动/拖放
+
 
     msg error disconnected
 co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnesse à l’altre.<br />Sta ristrizzione hè stata aghjunta da u pruprietariu di a basa di dati.
@@ -15074,6 +15164,40 @@ sl: znani oče/znana mati/znani starši
 sv: erkännande far/erkännande mor/erkännande föräldrar
 tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
 
+    redraw image area
+af: teken die area op die beeld weer
+bg: преначертаване на областта върху изображението
+br: adtreuziañ an takad war ar skeudenn
+ca: redibuixar l'àrea sobre la imatge
+co: ridisegnà l’area nant’à l’imagine
+cs: překreslit oblast na obrázku
+da: tegn området på billedet igen
+de: Bereich auf dem Bild neu zeichnen
+en: redraw the area on the image
+eo: redesi la areon sur la bildo
+es: redibujar el área en la imagen
+et: valitud ala ümber joonistamine pildil
+fi: piirrä alue uudelleen kuvan päälle
+fr: redessiner la zone sur l’image
+he: צייר מחדש את האזור על התמונה
+is: teikna svæðið á myndinni upp á ný
+it: ridisegnare l’area sull’immagine
+lt: perbraižyti sritį ant vaizdo
+lv: pārzīmēt apgabalu uz attēla
+nl: opnieuw tekenen van het gebied op de afbeelding
+no: tegn området på bildet på nytt
+oc: tornar a dessenhar l’airal sus l’imatge
+pl: przerysować obszar na obrazie
+pt: redesenhar a área na imagem
+pt-br: redesenhar a área na imagem
+ro: redesena zona pe imagine
+ru: перерисовать область на изображении
+sk: prekresliť oblasť na obrázku
+sl: znova nariši območje na sliki
+sv: rita om området på bilden
+tr: görüntü üzerindeki alanı yeniden çiz
+zh: 在图像上重绘区域
+
     reduce/increase
 co: riduce/aumentà
 de: vermindern/erhöhen
@@ -15412,6 +15536,40 @@ en: reserved to friends or wizards
 fr: réservée aux amis et magiciens
 sv: reserverat för vänner och administratörer
 tr: arkadaşlar veya sihirbazlar için ayrılmış
+
+    reset imap
+af: stel alles terug: vorm, beeld en tabelle
+bg: нулиране на всичко: формуляр, изображение и таблици
+br: adderaouiñ pep tra: furmskrid, skeudenn ha taolenn
+ca: restablir tot: formulari, imatge i taules
+co: reimpostà tuttu: formulariu, imagine è tavule
+cs: resetovat vše: formulář, obrázek a tabulky
+da: nulstil alt: formular, billede og tabeller
+de: alles zurücksetzen: Formular, Bild und Tabellen
+en: reset all/reset everything: form, image and tables
+eo: reagordi ĉion: formularo, bildo kaj tabeloj
+es: restablecer todo: formulario, imagen y tablas
+et: lähtesta kõik: vorm, pilt ja tabelid
+fi: nollaa kaikki: lomake, kuva ja taulukot
+fr: réinitialiser tout/tout réinitialiser: formulaire, image et tableaux
+he: אפס הכל: טופס, תמונה וטבלאות
+is: endurstilla allt: eyðublað, mynd og töflur
+it: reimpostare tutto: modulo, immagine e tabelle
+lt: atstatyti viską: forma, vaizdas ir lentelės
+lv: atiestatīt visu: forma, attēls un tabulas
+nl: alles resetten: formulier, afbeelding en tabellen
+no: tilbakestill alt: skjema, bilde og tabeller
+oc: tornar a inicializar tot: formulari, imatge e tablèus
+pl: zresetuj wszystko: formularz, obraz i tabele
+pt: redefinir tudo: formulário, imagem e tabelas
+pt-br: redefinir tudo: formulário, imagem e tabelas
+ro: resetați tot: formular, imagine și tabele
+ru: сбросить всё: форму, изображение и таблицы
+sk: resetovať všetko: formulár, obrázok a tabuľky
+sl: ponastavi vse: obrazec, sliko in tabele
+sv: återställ allt: formulär, bild och tabeller
+tr: her şeyi sıfırla: form, görüntü ve tablolar
+zh: 重置所有内容：表单、图像和表格
 
     reset to
 co: risturà
@@ -17221,6 +17379,40 @@ ru: таблица
 sv: tabell
 tr: tablo
 
+    table without data
+af: geen data in die tabel nie
+bg: няма данни в таблицата
+br: data ebet er gartenn
+ca: cap dada a la taula
+co: nisun dati ind’u tavulinu
+cs: žádná data v tabulce
+da: ingen data i tabellen
+de: keine Daten in der Tabelle
+en: no data in the table
+eo: neniu datumoj en la tabelo
+es: ningún dato en la tabla
+et: tabelis pole andmeid
+fi: ei tietoja taulukossa
+fr: aucune donnée dans le tableau
+he: אין נתונים בטבלה
+is: engin gögn í töflunni
+it: nessun dato nella tabella
+lt: nėra duomenų lentelėje
+lv: tabulā nav datu
+nl: geen gegevens in de tabel
+no: ingen data i tabellen
+oc: pas cap de donadas dins la taula
+pl: brak danych w tabeli
+pt: nenhum dado na tabela
+pt-br: nenhum dado na tabela
+ro: nu există date în tabel
+ru: нет данных в таблице
+sk: žiadne údaje v tabuľke
+sl: ni podatkov v tabeli
+sv: inga data i tabellen
+tr: tabloda veri yok
+zh: 表中无数据
+
     text
 af: teks
 bg: текст
@@ -18267,6 +18459,41 @@ tr: zaman çizelgesi
     domain/domains
 en: domain/domains
 fr: domaine/domaines
+
+    draw selection
+af: teken ’n reghoekige area op die beeld
+bg: начертайте правоъгълна зона върху изображението
+br: tresañ ur c’hornig war ar skeudenn
+ca: traça una zona rectangular sobre la imatge
+co: traccià una zona rettangulare nant’à l’imagine
+cs: nakreslete obdélníkovou oblast na obrázku
+da: tegn et rektangulært område på billedet
+de: zeichnen Sie einen rechteckigen Bereich auf das Bild
+en: draw a rectangular area on the image
+eo: desegnu rektangulan areon sur la bildo
+es: traza una zona rectangular en la imagen
+et: joonista ristkülikukujuline ala pildile
+fi: piirrä suorakulmainen alue kuvaan
+fr: tracer une zone rectangulaire sur l’image
+he: צייר אזור מלבני על התמונה
+is: teiknaðu rétthyrnt svæði á myndina
+it: traccia un'area rettangolare sull'immagine
+lt: nubrėžkite stačiakampę sritį ant vaizdo
+lv: uzzīmējiet taisnstūrveida apgabalu uz attēla
+nl: teken een rechthoekig gebied op de afbeelding
+no: tegn et rektangulært område på bildet
+oc: traça una zòna rectangulara sus l’imatge
+pl: narysuj prostokątny obszar na obrazie
+pt: desenhe uma área retangular na imagem
+pt-br: desenhe uma área retangular na imagem
+ro: desenează o zonă dreptunghiulară pe imagine
+ru: нарисуйте прямоугольную область на изображении
+sk: nakreslite obdĺžnikovú oblasť na obrázku
+sl: narišite pravokotno območje na sliki
+sv: rita ett rektangulärt område på bilden
+tr: görüntüde dikdörtgen bir alan çizin
+zh: 在图像上绘制矩形区域
+
 
     alias/aliases
 en: alias/aliases
