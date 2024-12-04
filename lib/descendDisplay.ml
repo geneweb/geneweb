@@ -1403,7 +1403,7 @@ let print conf base p =
     match Util.p_getenv conf.Config.env "t" with
     | Some ("F" | "L" | "M") -> "deslist"
     | Some "D" -> "deslist_hr"
-    | Some (* "H" | *) "I" (* | "A" *) -> "destable"
+    | Some "I" -> "destable"
     | Some "V" -> "destree"
     | Some _ -> ""
     | _ -> "desmenu"
@@ -1413,9 +1413,9 @@ let print conf base p =
     match
       (Util.p_getenv conf.Config.env "t", Util.p_getint conf.Config.env "v")
     with
-    | Some "A" (* "B" *), Some v -> print_aboville conf base v p
+    | Some "A", Some v -> print_aboville conf base v p
     | Some "S", Some v -> display_descendants_level conf base v p
-    | Some "H" (* "K" *), Some v -> display_descendant_with_table conf base v p
+    | Some "H", Some v -> display_descendant_with_table conf base v p
     | Some "N", Some v -> display_descendants_with_numbers conf base v p
     | Some "G", Some v -> display_descendant_index conf base v p
     | Some "C", Some v -> display_spouse_index conf base v p
