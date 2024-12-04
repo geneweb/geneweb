@@ -15,10 +15,10 @@
 %define;ttl(ss,gg)
   %if;(ss=0)
     %if;(gg=2)[a grandfather/a grandmother/a grandparent]0
-    %else;[a father/a mother]0%end;
+    %else;[father/mother]0%end;
   %else;
     %if;(gg=2)[a grandfather/a grandmother/a grandparent]1
-    %else;[a father/a mother]1%end;
+    %else;[father/mother]1%end;
   %end;
 %end;
 %( vtbr will show 2 vertical bars if one grandparents’ couple is divorced or separated
