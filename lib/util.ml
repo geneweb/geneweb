@@ -1384,8 +1384,8 @@ let print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
   if len > menu_threshold then (
     Output.print_sstring conf "<p>\n";
-    (let _ =
-       List.fold_left
+    ignore
+      (List.fold_left
          (fun last e ->
            let t = crit e in
            let same_than_last =
@@ -1395,13 +1395,11 @@ let print_alphab_list conf crit print_elem liste =
              Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
                (Ext_string.hexa_string t) t;
            Some t)
-         None liste
-     in
-     ());
+         None liste);
     Output.print_sstring conf "</p>\n");
   Output.print_sstring conf "<ul>\n";
-  (let _ =
-     List.fold_left
+  ignore
+    (List.fold_left
        (fun last e ->
          let t = crit e in
          let same_than_last =
@@ -1422,9 +1420,7 @@ let print_alphab_list conf crit print_elem liste =
          print_elem e;
          Output.print_sstring conf "</li>\n";
          Some t)
-       None liste
-   in
-   ());
+       None liste);
   if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
   Output.print_sstring conf "</ul>\n"
 
@@ -1993,8 +1989,8 @@ let print_in_columns conf ncols len_list list wprint_elem =
   begin_centered conf;
   Output.printf conf "<table width=\"95%%\" border=\"%d\">\n" conf.Config.border;
   Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.Config.left;
-  (let _ =
-     List.fold_left
+  ignore
+    (List.fold_left
        (fun list len ->
          let rec loop n list =
            if n = 0 then (
@@ -2019,9 +2015,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
              | [] -> []
          in
          loop len list)
-       list len_list
-   in
-   ());
+       list len_list);
   Output.print_sstring conf "</tr>\n";
   Output.print_sstring conf "</table>\n";
   end_centered conf
