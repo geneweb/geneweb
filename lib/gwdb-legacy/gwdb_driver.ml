@@ -17,6 +17,7 @@ let dummy_ifam = -1
 let empty_string = 0
 let quest_string = 1
 let eq_istr i1 i2 = i1 = i2
+let hash_istr i = i
 let eq_ifam i1 i2 = i1 = i2
 let eq_iper i1 i2 = i1 = i2
 let is_empty_string istr = istr = 0
