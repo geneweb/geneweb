@@ -13,49 +13,8 @@
   %apply;dl("estates")
 %end;
 <script>
-function populateDatalist(datalistId, cacheFile, book) {
-    const dataList = document.getElementById(datalistId);
-    if (!dataList) {
-        console.log(`Datalist ${datalistId} not found`);
-        return;
-    }
-    fetch(cacheFile)
-        .then(response => {
-            const reader = response.body.pipeThrough(new DecompressionStream('gzip')).getReader();
-            return new ReadableStream({
-                start(controller) {
-                    return pump();
-                    function pump() {
-                        return reader.read().then(({ done, value }) => {
-                            if (done) {
-                                controller.close();
-                                return;
-                            }
-                            controller.enqueue(value);
-                            return pump();
-                        });
-                    }
-                }
-            });
-        })
-        .then(stream => new Response(stream))
-        .then(response => response.text())
-        .then(text => {
-            const lines = text.split("\n");
-            lines.forEach(line => {
-                if (line.trim()) {
-                    const option = document.createElement("option");
-                    option.value = line.trim().replace("<option>", "");
-                    dataList.appendChild(option);
-                }
-            });
-        })
-        .catch(error => console.error(`Error while loading ${cacheFile}:`, error));
-}
-
 var baseName = "%base.name;";
 var path = baseName + "/cache/" + baseName;
-
 var datalists = %[
 %if;(b.datalist_fnames=1)    { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
 %if;(b.datalist_snames=1)    { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
@@ -71,48 +30,11 @@ var datalists = %[
 %end;
 %];
 
-%( Event listeners for input fields to open entry in book with Ctrl+left mouse button %)
-function setupInputClickListeners() {
-    const inputs = document.querySelectorAll('input%[list%]');
-    inputs.forEach(input => {
-        const datalistId = input.getAttribute('list');
-        const book = input.getAttribute('data-book');
-        if (book) {
-            input.addEventListener('mousedown', function(event) {
-                if (event.ctrlKey && event.button === 0) {
-                    event.preventDefault();
-                    openBook(this.value, book);
-                }
-            });
-        }
-    });
-}
-
-%( Open a specific book on edited input value %)
-function openBook(value, book) {
-    let preVal = value;
-    if (book === "place") {
-        const place = value.split(/\]\s+[-–—]\s+/);
-        preVal = place.length > 1 ? place[1] : value;
-    }
-    if (preVal.length > 12) {
-        preVal = preVal.substring(0, 12);
-    }
-    preVal = preVal.split(/[, ]+/)[0];
-    const encVal = encodeURIComponent(value);
-    const encPreVal = encodeURIComponent(preVal);
-    let url = `?%if;cgi;b=${baseName}&%end;m=MOD_DATA&data=${book}&s=${encPreVal}&s1=`;
-    if (encPreVal !== encVal) {
-        url += `${encVal}`;
-    }
-    window.open(url, '_blank');
-}
-
-datalists.forEach(list => populateDatalist(list.id, list.file, list.book));
+datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
 
 document.addEventListener('DOMContentLoaded', () => {
     addClearButtonToInputs();
-    setupInputClickListeners();
+    inputToBook.addNavigation();
 });
 
 %( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)

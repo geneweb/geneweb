@@ -513,6 +513,24 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   margin-bottom: 5rem;
 }
 
+/* Clear button */
+.clear-button-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.clear-button-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+input:focus, select:focus {
+    z-index: 1;
+}
+.clear-button-wrapper:hover .clear-button-icon {
+    pointer-events: auto;
+}
+
 /* Fix navigation buttons to top right corner */
 .fix_top {
   position: fixed;

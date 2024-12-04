@@ -795,8 +795,8 @@
       <div class="d-inline col-9 py-1">
       %include;toolbar
       </div>
-      <textarea class="col-9 form-control insert-character-target" id="notes_comments" name="comment" rows="16">%comment;</textarea>%sq;
-      <button type="submit" class="btn btn-primary btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+      <textarea class="col-9 form-control insert-character-target no-clear-button" id="notes_comments" name="comment" rows="16">%comment;</textarea>%sq;
+      <button type="submit" class="btn btn-primary btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3 no-clear-button" title="[*validate/delete]0" aria-label="[*validate/delete]0">
         <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
       </button>
       <div class="col my-1 mr-2">
