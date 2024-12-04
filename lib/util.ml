@@ -1243,7 +1243,7 @@ let expand_env =
   fun conf s ->
     match List.assoc_opt "expand_env" conf.Config.base_env with
     | Some "yes" ->
-        let () = (Buffer.clear buff : unit) in
+        let () = Buffer.clear buff in
         let rec loop i =
           if i = String.length s then Buffer.contents buff
           else if i + 1 < String.length s && s.[i] = '$' && s.[i + 1] = '{' then (
