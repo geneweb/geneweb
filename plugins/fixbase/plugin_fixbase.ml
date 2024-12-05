@@ -205,8 +205,8 @@ let fixbase_ok conf base =
     let person_fixes = List.rev person_fixes in
     let family_fixes = List.rev family_fixes in
     ignore
-    @@ Fixbase.perform_fixes ~report:(Some report) ~progress ~base ~person_fixes
-         ~family_fixes;
+      (Fixbase.perform_fixes ~report:(Some report) ~progress ~base ~person_fixes
+         ~family_fixes);
     clear_persons_array base;
     clear_strings_array base;
     clear_families_array base;
