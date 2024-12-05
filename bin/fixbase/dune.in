@@ -1,4 +1,5 @@
 (executable
+  (package geneweb)
   (name gwfixbase)
   (public_name geneweb.gwfixbase)
   (modules gwfixbase)
