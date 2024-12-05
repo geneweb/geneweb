@@ -1382,6 +1382,7 @@ let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
 let print_alphab_list conf index_key print_elem list =
   let len = List.length list in
+  let with_index = len > index_threshold in
   let print_index () =
     Output.print_sstring conf "<p>\n";
     ignore
@@ -1398,7 +1399,7 @@ let print_alphab_list conf index_key print_elem list =
          None list);
     Output.print_sstring conf "</p>\n"
   in
-  if len > index_threshold then print_index ();
+  if with_index then print_index ();
   Output.print_sstring conf "<ul>\n";
   ignore
     (List.fold_left
@@ -1407,7 +1408,7 @@ let print_alphab_list conf index_key print_elem list =
          let same_than_last =
            match last with Some t1 -> t = t1 | _ -> false
          in
-         if len > index_threshold || is_number t then (
+         if with_index || is_number t then (
            (match last with
            | Some _ ->
                if not same_than_last then
@@ -1423,7 +1424,7 @@ let print_alphab_list conf index_key print_elem list =
          Output.print_sstring conf "</li>\n";
          Some t)
        None list);
-  if len > index_threshold then Output.print_sstring conf "</ul>\n</li>\n";
+  if with_index then Output.print_sstring conf "</ul>\n</li>\n";
   Output.print_sstring conf "</ul>\n"
 
 let relation_txt conf sex fam =
