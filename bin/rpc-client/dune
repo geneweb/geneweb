@@ -1,0 +1,14 @@
+(executable
+  (name main)
+  (modes js)
+  (libraries
+    geneweb_rpc
+    js_of_ocaml
+    promise_jsoo
+    ojs
+    yojson)
+  (js_of_ocaml (flags --source-map --pretty --no-inline --debug-info))
+  (flags (:standard -g))
+  (preprocess
+    (pps
+      js_of_ocaml-ppx)))
