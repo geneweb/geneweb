@@ -1382,7 +1382,7 @@ let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
 let print_alphab_list conf index_key print_elem list =
   let len = List.length list in
-  if len > index_threshold then (
+  let print_index () =
     Output.print_sstring conf "<p>\n";
     ignore
       (List.fold_left
@@ -1396,7 +1396,9 @@ let print_alphab_list conf index_key print_elem list =
                (Ext_string.hexa_string t) t;
            Some t)
          None list);
-    Output.print_sstring conf "</p>\n");
+    Output.print_sstring conf "</p>\n"
+  in
+  if len > index_threshold then print_index ();
   Output.print_sstring conf "<ul>\n";
   ignore
     (List.fold_left
