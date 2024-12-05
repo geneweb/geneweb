@@ -1,4 +1,5 @@
 (executable
+  (package geneweb)
   (name consang)
   (public_name geneweb.consang)
   (modules consang)

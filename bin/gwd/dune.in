@@ -23,6 +23,7 @@
 )
 
 (executable
+  (package geneweb)
   (name gwd)
   (public_name geneweb.gwd)
   (flags -linkall)

@@ -1,4 +1,5 @@
 (executable
+  (package geneweb)
   (name gwc)
   (public_name geneweb.gwc)
   (modules gwc gwcomp db1link)

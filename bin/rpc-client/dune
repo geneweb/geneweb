@@ -1,0 +1,12 @@
+(executable
+  (name main)
+  (modes js)
+  (libraries
+    geneweb_rpc
+    js_of_ocaml
+    promise_jsoo
+    ojs
+    yojson)
+  (preprocess
+    (pps
+      js_of_ocaml-ppx)))
