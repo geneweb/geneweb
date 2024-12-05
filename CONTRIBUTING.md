@@ -35,3 +35,16 @@ Some reasons why a PR could be refused:
 
 If a PR stays in a stale/WIP/POC state for too long, it may be closed
 at any time.
+
+## Tips
+
+### Use `utop`
+Recent versions of dune support the utop toplevel. You can set it up as
+follows:
+```
+opam install utop
+ocaml ./configure.ml
+make build
+dune utop
+```
+More information [here](https://dune.readthedocs.io/en/stable/howto/toplevel.html).
