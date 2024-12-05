@@ -2,3 +2,17 @@
  (name test)
  (modules test sosa_test place_test calendar_test wiki_test merge_test util_test)
  (libraries alcotest geneweb %%%GWDB_PKG%%% %%%SOSA_PKG%%% fmt))
+
+(executable
+  (name rpc_test)
+  (public_name rpc_test)
+  (package geneweb-rpc)
+  (modules
+    rpc_test)
+  (libraries
+    fmt
+    yojson
+    geneweb_rpc
+    httpun
+    httpun-lwt-unix
+    httpun-ws))

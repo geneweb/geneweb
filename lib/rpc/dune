@@ -1,0 +1,9 @@
+(library
+  (public_name geneweb-rpc.lib)
+  (name geneweb_rpc)
+  (modes byte native)
+  (libraries
+    lwt
+    lwt.unix
+    yojson
+    fmt))

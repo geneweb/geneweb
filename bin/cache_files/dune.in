@@ -1,4 +1,5 @@
 (executables
+  (package geneweb)
   (names cache_files)
   (public_names geneweb.cache_files)
   (modules cache_files)
