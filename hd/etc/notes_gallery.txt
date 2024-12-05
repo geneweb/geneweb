@@ -18,7 +18,6 @@
   (<a href="%url;&ref=on">[linked pages]</a>)
 </div>
 <h1 id="h1" class="ml-3 mb-0">Chargement en cours…</h1>
-<h2 id="description" class="ml-3 h2"></h2>
 %if(wizard)
   <div class="small float-right mr-2">
     (<a href="%prefix;m=MOD_NOTES&f=%e.f;">[modify]</a>)
@@ -26,7 +25,10 @@
 %end;
 <div class="d-inline-flex ml-3">
 <map id="map" name="map"></map>
+<div>
 <img id="image" usemap="#map" alt=""><!-- no src, managed on javascript side -->
+<span id="description" class="ml-3 mt-3"></span>
+</div>
 <div class="d-none ml-3" id="div_legend">%nn;
   [*on this image][:]
   <a id="rlm" href="%prefix;m=RLM" title="[*relations tree]"><img src="%image_prefix;/gui_create.png" height="18" alt="Tree"></a>
