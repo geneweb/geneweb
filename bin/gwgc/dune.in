@@ -1,5 +1,6 @@
 #ifdef GENEWEB_GWDB_LEGACY
 (executable
+  (package geneweb)
   (name gwgc)
   (public_name geneweb.gwgc)
   (modules gwgc)
