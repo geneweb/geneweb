@@ -279,6 +279,8 @@ let commit_wiznotes conf base fnotes s =
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
 
+(* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
+(* TODO adjust replacement to news capital variants *)
 let replace olds news str =
   let olds_l = Name.lower olds in
   let olds_u1 = Utf8.capitalize_fst olds_l in
@@ -288,7 +290,93 @@ let replace olds news str =
   in
   Str.global_replace regexp news str
 
-let rewrite_key s oldk newk =
+(*
+TITLE=Test imap
+TYPE=gallery
+{"title":"Test imap","desc":"","path":"doc","img":"famille-ph-gouraud.jpg",
+ "map":
+ [{"shape":"rect","coords":"104,100.7,145,152.7",
+   "fn":"henri",
+   "sn":"gouraud",
+   "gw":"[[Henri/Gouraud/0/Henri Gouraud]]",
+   "oc":"0",
+   "alt":"Henri Gouraud",
+   "group":"1"},{...}],
+ "groups":[]}
+*)
+
+let extract_pnoc json =
+  let fn =
+    json |> Yojson.Basic.Util.member "fn" |> Yojson.Basic.Util.to_string
+  in
+  let sn =
+    json |> Yojson.Basic.Util.member "sn" |> Yojson.Basic.Util.to_string
+  in
+  let oc =
+    match json |> Yojson.Basic.Util.member "oc" with
+    | `String oc_str -> ( try int_of_string oc_str with Failure _ -> 0)
+    | `Int oc_int -> oc_int
+    | _ -> 0
+  in
+  (fn, sn, oc)
+
+let _print_key label (fn, sn, oc) =
+  Printf.eprintf "Key: %s: %s.%d %s\n" label fn oc sn
+
+let lower_key (fn, sn, oc) = (Name.lower fn, Name.lower sn, oc)
+
+let replace_person person_json (new_fn, new_sn, new_oc) =
+  `Assoc
+    (List.map
+       (function
+         | "fn", _ -> ("fn", `String new_fn)
+         | "sn", _ -> ("sn", `String new_sn)
+         | "oc", _ -> ("oc", `String (string_of_int new_oc))
+         | key, value -> (key, value) (* Preserve any other fields *))
+       (Yojson.Basic.Util.to_assoc person_json))
+
+(* Processes the map to replace target person
+   with new values if the condition is met *)
+let update_map json oldk newk =
+  let map_data =
+    json |> Yojson.Basic.Util.member "map" |> Yojson.Basic.Util.to_list
+  in
+  let updated_map =
+    List.map
+      (fun person_json ->
+        let current_person = extract_pnoc person_json |> lower_key in
+        if current_person = lower_key oldk then replace_person person_json newk
+        else person_json)
+      map_data
+  in
+  `Assoc
+    (List.map
+       (function
+         | "map", _ -> ("map", `List updated_map)
+         | field -> field (* Preserve all other top-level fields *))
+       (Yojson.Basic.Util.to_assoc json))
+
+let update_gallery s oldk newk =
+  (* assumes the json part starts at the first { *)
+  let title_part, json_part =
+    try
+      let json_start = String.index s '{' in
+      let json_end = String.rindex s '}' in
+      ( String.sub s 0 json_start,
+        String.sub s json_start (json_end - json_start + 1) )
+    with Not_found -> ("", "{}")
+  in
+  let json = Yojson.Basic.from_string json_part in
+  match json with
+  | `Assoc [] -> s
+  | _ ->
+      let updated_json = update_map json oldk newk in
+      title_part ^ Yojson.Basic.pretty_to_string updated_json ^ "\n"
+
+let rewrite_key s oldk newk _file =
+  let s =
+    if Mutil.contains s "TYPE=gallery" then update_gallery s oldk newk else s
+  in
   let slen = String.length s in
   let rec rebuild rs i =
     if i >= slen then rs
@@ -321,14 +409,15 @@ let rewrite_key s oldk newk =
   in
   rebuild "" 0
 
-let replace_ind_key_in_str base is oldk newk =
+let replace_ind_key_in_str base is oldk newk p =
   let s = sou base is in
-  let s' = rewrite_key s oldk newk in
+  let design = Gutil.designation base p in
+  let s' = rewrite_key s oldk newk design in
   Gwdb.insert_string base s'
 
 let update_ind_key_pgind base p oldk newk =
   let oldp = Gwdb.gen_person_of_person @@ poi base p in
-  let replace is = replace_ind_key_in_str base is oldk newk in
+  let replace is = replace_ind_key_in_str base is oldk newk (poi base p) in
   let notes = replace oldp.notes in
   let occupation = replace oldp.occupation in
   let birth_note = replace oldp.birth_note in
@@ -372,7 +461,13 @@ let update_ind_key_pgind base p oldk newk =
 
 let update_ind_key_pgfam base f oldk newk =
   let oldf = Gwdb.gen_family_of_family @@ foi base f in
-  let replace is = replace_ind_key_in_str base is oldk newk in
+  let cpl = foi base f in
+  let fath = poi base (get_father cpl) in
+  let moth = poi base (get_mother cpl) in
+  let _family =
+    Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
+  in
+  let replace is = replace_ind_key_in_str base is oldk newk fath in
   let marriage_note = replace oldf.marriage_note in
   let marriage_src = replace oldf.marriage_src in
   let comment = replace oldf.comment in
@@ -395,12 +490,12 @@ let update_ind_key_pgfam base f oldk newk =
 
 let update_ind_key_pgmisc conf base f oldk newk =
   let oldn = base_notes_read base f in
-  let newn = rewrite_key oldn oldk newk in
+  let newn = rewrite_key oldn oldk newk f in
   commit_notes conf base f newn
 
 let update_ind_key_pgwiz conf base f oldk newk =
   let oldn = base_wiznotes_read base f in
-  let newn = rewrite_key oldn oldk newk in
+  let newn = rewrite_key oldn oldk newk f in
   commit_wiznotes conf base f newn
 
 let update_ind_key conf base link_pages oldk newk =
