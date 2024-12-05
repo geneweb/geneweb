@@ -1377,12 +1377,14 @@ let trimmed_string_of_place place =
   |> String.concat (Printf.sprintf "%c " field_separator)
   |> escape_html
 
-let index_threshold = 20
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
 let print_alphab_list conf index_key print_elem list =
   let len = List.length list in
-  let with_index = len > index_threshold in
+  let with_index =
+    let index_threshold = 20 in
+    len > index_threshold
+  in
   let print_index () =
     Output.print_sstring conf "<p>\n";
     ignore
