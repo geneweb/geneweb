@@ -123,7 +123,7 @@ let display_descendants_level conf base max_level ancestor =
       (Util.translate_eval ("@(c)" ^ Util.transl_nth conf "person/persons" 1));
     Output.print_sstring conf ")");
   Output.print_sstring conf ".<p>";
-  Util.print_alphab_list conf
+  Util.print_alphabetically_indexed_list conf
     (fun (p, _) ->
       if Util.is_empty_person p then "?"
       else

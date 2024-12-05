@@ -387,7 +387,7 @@ val begin_centered : Config.config -> unit
 val end_centered : Config.config -> unit
 (** Prints on the socket end of the column and table opened by [begin_centered] *)
 
-val print_alphab_list :
+val print_alphabetically_indexed_list :
   Config.config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
 
 val short_f_month : int -> string

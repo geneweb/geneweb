@@ -1379,7 +1379,7 @@ let trimmed_string_of_place place =
 
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
-let print_alphab_list conf index_key print_elem list =
+let print_alphabetically_indexed_list conf index_key print_elem list =
   let with_index =
     let index_threshold = 20 in
     List.length list > index_threshold
