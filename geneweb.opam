@@ -39,6 +39,7 @@ depends: [
   "uutf"
   "yojson"
   "zarith"
+  "utop" {dev}
   "odoc" {with-doc}
 ]
 depopts: ["ocaml-option-nnp"]

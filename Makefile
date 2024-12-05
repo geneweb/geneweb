@@ -44,12 +44,6 @@ endif
 	> $@ \
 	&& printf " Done.\n"
 
-bin/gwrepl/.depend:
-	@printf "Generating $@…"
-	@pwd > $@
-	@dune top bin/gwrepl >> $@
-	@printf " Done.\n"
-
 COMPIL_DATE := $(shell date +'%Y-%m-%d')
 COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
@@ -122,8 +116,6 @@ GENERATED_FILES_DEP = \
 	bin/gwd/dune \
 	bin/gwdiff/dune \
 	bin/gwgc/dune \
-	bin/gwrepl/dune \
-	bin/gwrepl/.depend \
 	bin/gwu/dune \
 	bin/setup/dune \
 	bin/update_nldb/dune \
@@ -198,10 +190,6 @@ endif
 	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT)
 	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT)
 	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT)
-	@if test -f $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc ; then \
-	  printf "cp %s %s\n" "$(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc" "$(DISTRIB_DIR)/gw/gwrepl$(EXT)"; \
-	  cp $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc $(DISTRIB_DIR)/gw/gwrepl$(EXT); \
-	fi
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT)
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT)
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT)
