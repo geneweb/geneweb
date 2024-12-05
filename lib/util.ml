@@ -1377,12 +1377,12 @@ let trimmed_string_of_place place =
   |> String.concat (Printf.sprintf "%c " field_separator)
   |> escape_html
 
-let menu_threshold = 20
+let index_threshold = 20
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
 let print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
-  if len > menu_threshold then (
+  if len > index_threshold then (
     Output.print_sstring conf "<p>\n";
     ignore
       (List.fold_left
@@ -1405,7 +1405,7 @@ let print_alphab_list conf crit print_elem liste =
          let same_than_last =
            match last with Some t1 -> t = t1 | _ -> false
          in
-         if len > menu_threshold || is_number t then (
+         if len > index_threshold || is_number t then (
            (match last with
            | Some _ ->
                if not same_than_last then
@@ -1421,7 +1421,7 @@ let print_alphab_list conf crit print_elem liste =
          Output.print_sstring conf "</li>\n";
          Some t)
        None liste);
-  if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
+  if len > index_threshold then Output.print_sstring conf "</ul>\n</li>\n";
   Output.print_sstring conf "</ul>\n"
 
 let relation_txt conf sex fam =
