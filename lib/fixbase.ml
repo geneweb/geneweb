@@ -201,11 +201,14 @@ let fix_pevents ~report base pp =
       pevents;
     }
   in
-  if p <> p' then (
-    patch_person base p.key_index p';
-    Option.iter (fun fn -> fn (Fix_NBDS p.key_index)) report;
-    true)
-  else false
+  let person_changed =  p <> p' in
+  let () =
+    if person_changed then (
+      patch_person base p.key_index p';
+      Option.iter (fun fn -> fn (Fix_NBDS p.key_index)) report
+    )
+  in
+  person_changed
 
 type person_fix =
   report:(patch -> unit) option -> base:Gwdb.base -> person:Gwdb.person -> bool
