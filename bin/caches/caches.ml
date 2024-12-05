@@ -64,7 +64,7 @@ let add_family_infos_to_cache cache family =
   let cache = List.fold_left add_source_from_fevent cache fevents in
   cache
 
-(** Create cache files  used by autocomplete *)
+(** Create cache files used by autocomplete *)
 let create_cache_data base =
   let persons = Gwdb.persons base in
   let cache =
