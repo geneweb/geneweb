@@ -475,20 +475,9 @@ let fix_person_key base =
       let first_name = Gwdb.p_first_name base person in
       let surname = Gwdb.p_surname base person in
       if first_name <> "?" && surname <> "?" then (
-        let key = Name.concat first_name surname in
-        let ipers = Gwdb.persons_of_name base key in
-        let first_name = Name.lower first_name in
-        let surname = Name.lower surname in
-        let ipers =
-          List.filter
-            (fun iper ->
-              let p = Gwdb.poi base iper in
-              Name.lower (Gwdb.p_first_name base p) = first_name
-              && Name.lower (Gwdb.p_surname base p) = surname)
-            ipers
-        in
+        let homonyms = Gutil.homonyms ~base ~first_name ~surname in
+        let ipers = List.sort Gwdb.compare_iper homonyms in
         List.iter (fun iper -> Gwdb.Marker.set skip iper true) ipers;
-        let ipers = List.sort Gwdb.compare_iper ipers in
         let occ_set =
           List.fold_left
             (fun occ_set iper ->
