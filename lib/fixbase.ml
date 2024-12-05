@@ -271,6 +271,9 @@ let fix_person_parents ~report ~base ~person =
 
 let is_a_parent iper family = Array.mem iper (Gwdb.get_parent_array family)
 
+(* This fix removes the duplicated unions and the now invalid unions (the person
+   is not part of the union anymore). We want to keep the original order of the remaining
+   unions.*)
 let fix_person_unions ~report ~base ~person =
   let iper = Gwdb.get_iper person in
   let ifams = Gwdb.get_family person in
