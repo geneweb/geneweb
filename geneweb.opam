@@ -37,6 +37,7 @@ depends: [
   "uunf"
   "uutf"
   "zarith"
+  "utop" {dev}
   "odoc" {with-doc}
 ]
 depopts: ["ocaml-option-nnp" "ancient"]

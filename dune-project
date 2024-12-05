@@ -45,6 +45,7 @@
     uunf
     uutf
     zarith
+    (utop :dev)
   )
   (depopts
     ocaml-option-nnp
