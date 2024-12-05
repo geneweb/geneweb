@@ -47,8 +47,7 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     add !invalid_utf8 Geneweb.Fixbase.fix_family_utf8_sequence family_fixes
   in
   let person_fixes =
-    if !key then Geneweb.Fixbase.fix_person_key base :: person_fixes
-    else person_fixes
+    add !key (Geneweb.Fixbase.fix_person_key base) person_fixes
   in
   let person_fixes = List.rev person_fixes in
   let family_fixes = List.rev family_fixes in
