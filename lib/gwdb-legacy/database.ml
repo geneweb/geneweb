@@ -791,6 +791,7 @@ let make_record_access immut_record (plenr, patches) (_, pending) len =
       load_array = (fun () -> ignore @@ immut_record.im_array ());
       get = gen_get false;
       get_nopending = gen_get true;
+      set = (fun _ -> assert false);
       len;
       output_array =
         (fun oc ->

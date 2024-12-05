@@ -100,7 +100,7 @@ module type Driver_S = sig
   val compare_istr : istr -> istr -> int
   (** Comparison over istrs **)
 
-  val open_base : string -> base
+  val open_base : ?keep_in_memory:bool -> string -> base
   (** Open database associated with (likely situated in) the specified directory. *)
 
   val close_base : base -> unit

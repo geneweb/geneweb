@@ -474,7 +474,7 @@ let sync ?scratch:_ ?tasks:_ ~save_mem:_ base =
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
   Hashtbl.replace base_store bname base
 
-let open_base bname =
+let open_base ?keep_in_memory:_ bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in

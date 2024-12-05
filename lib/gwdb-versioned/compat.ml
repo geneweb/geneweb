@@ -100,7 +100,7 @@ module type Driver_S = sig
   val compare_istr : istr -> istr -> int
   (** Comparison over istrs **)
 
-  val open_base : string -> base
+  val open_base : ?keep_in_memory:bool -> string -> base
   (** Open database associated with (likely situated in) the specified directory. *)
 
   val close_base : base -> unit
@@ -934,7 +934,7 @@ struct
         let pe = Current.fam_event_of_gen_fevent base pe in
         Current_fevent pe
 
-  let open_base bname =
+  let open_base ?(keep_in_memory = false) bname =
     let bname =
       if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
     in
@@ -955,12 +955,12 @@ struct
     | Some version
       when List.exists (Version.eq_version version) Current.versions ->
         log "opening CURRENT";
-        let base = Current.open_base bname in
+        let base = Current.open_base ~keep_in_memory bname in
         log "CURRENT opened";
         Current_base base
     | Some version when List.exists (Version.eq_version version) Legacy.versions
       ->
-        let base = Legacy.open_base bname in
+        let base = Legacy.open_base ~keep_in_memory bname in
         Legacy_base base
     | _ -> assert false (* should not happen *)
 
