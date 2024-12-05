@@ -32,6 +32,7 @@
     gwd_lib
     str
     unix
+    threads
     wserver
     caches
     %%%GWDB_PKG%%%
