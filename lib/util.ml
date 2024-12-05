@@ -1376,54 +1376,76 @@ let trimmed_string_of_place place =
   |> String.concat (Printf.sprintf "%c " field_separator)
   |> escape_html
 
-let print_alphabetically_indexed_list conf index_key print_elem list =
-  let with_index =
-    let index_threshold = 20 in
-    List.length list > index_threshold
+let print_alphabetically_indexed_list (type entry) conf index_key print_elem
+    (list : entry list) =
+  let list =
+    let with_index =
+      let index_threshold = 20 in
+      List.length list > index_threshold
+    in
+    if not @@ with_index then `Flat_list list
+    else
+      let compare_entry =
+        let module Entry_map = Map.Make (struct
+          type t = entry
+
+          let compare = compare
+        end) in
+        fun entry entry' ->
+          let entry_ranks =
+            list
+            |> List.mapi (fun rank entry -> (entry, rank))
+            |> List.to_seq |> Entry_map.of_seq
+          in
+          compare
+            (Entry_map.find_opt entry entry_ranks)
+            (Entry_map.find_opt entry' entry_ranks)
+      in
+      `Indexed_list
+        (list
+        |> Ext_list.groupby ~key:index_key ~value:Fun.id
+        |> List.sort (fun (index_key, _) (index_key', _) ->
+               Utf8.alphabetic_order index_key index_key')
+        |> List.map (fun (index_key, entries) ->
+               (index_key, List.sort compare_entry entries)))
   in
-  let print_index () =
-    Output.print_sstring conf "<p>\n";
-    ignore
-      (List.fold_left
-         (fun last e ->
-           let t = index_key e in
-           let same_than_last =
-             match last with Some t1 -> t = t1 | _ -> false
-           in
-           if not same_than_last then
-             Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
-               (Ext_string.hexa_string t) t;
-           Some t)
-         None list);
-    Output.print_sstring conf "</p>\n"
-  in
-  if with_index then print_index ();
-  Output.print_sstring conf "<ul>\n";
-  ignore
-    (List.fold_left
-       (fun last e ->
-         let t = index_key e in
-         let same_than_last =
-           match last with Some t1 -> t = t1 | _ -> false
-         in
-         if with_index then (
-           (match last with
-           | Some _ ->
-               if not same_than_last then
-                 Output.print_sstring conf "</ul>\n</li>\n"
-           | _ -> ());
-           if not same_than_last then (
-             Output.print_sstring conf "<li>\n";
-             Output.printf conf "<a id=\"ai%s\">%s</a>\n"
-               (Ext_string.hexa_string t) t;
-             Output.print_sstring conf "<ul>\n"));
-         Output.print_sstring conf "<li>\n  ";
-         print_elem e;
-         Output.print_sstring conf "</li>\n";
-         Some t)
-       None list);
-  if with_index then Output.print_sstring conf "</ul>\n</li>\n";
-  Output.print_sstring conf "</ul>\n"
+  match list with
+  | `Flat_list list ->
+      Output.print_sstring conf "<ul>\n";
+      List.iter
+        (fun e ->
+          Output.print_sstring conf "<li>\n  ";
+          print_elem e;
+          Output.print_sstring conf "</li>\n")
+        list;
+      Output.print_sstring conf "</ul>\n"
+  | `Indexed_list list ->
+      let print_index () =
+        Output.print_sstring conf "<p>\n";
+        List.iter
+          (fun (t, _) ->
+            Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
+              (Ext_string.hexa_string t) t)
+          list;
+        Output.print_sstring conf "</p>\n"
+      in
+      print_index ();
+      Output.print_sstring conf "<ul>\n";
+      List.iter
+        (fun (t, entries) ->
+          Output.print_sstring conf "<li>\n";
+          Output.printf conf "<a id=\"ai%s\">%s</a>\n"
+            (Ext_string.hexa_string t) t;
+          Output.print_sstring conf "<ul>\n";
+          List.iter
+            (fun e ->
+              Output.print_sstring conf "<li>\n  ";
+              print_elem e;
+              Output.print_sstring conf "</li>\n")
+            entries;
+          Output.print_sstring conf "</ul>\n</li>\n")
+        list;
+      Output.print_sstring conf "</ul>\n"
 
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
