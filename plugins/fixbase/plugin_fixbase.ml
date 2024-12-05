@@ -198,9 +198,7 @@ let fixbase_ok conf base =
       opt "invalid_utf8" Fixbase.fix_family_utf8_sequence family_fixes
     in
     let person_fixes =
-      if UI.enabled conf "p_key" then
-        Fixbase.fix_person_key base :: person_fixes
-      else person_fixes
+      opt "p_key" (Fixbase.fix_person_key base) person_fixes
     in
     let person_fixes = List.rev person_fixes in
     let family_fixes = List.rev family_fixes in
