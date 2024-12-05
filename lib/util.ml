@@ -1376,8 +1376,6 @@ let trimmed_string_of_place place =
   |> String.concat (Printf.sprintf "%c " field_separator)
   |> escape_html
 
-let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
-
 let print_alphabetically_indexed_list conf index_key print_elem list =
   let with_index =
     let index_threshold = 20 in
@@ -1408,7 +1406,7 @@ let print_alphabetically_indexed_list conf index_key print_elem list =
          let same_than_last =
            match last with Some t1 -> t = t1 | _ -> false
          in
-         if with_index || is_number t then (
+         if with_index then (
            (match last with
            | Some _ ->
                if not same_than_last then
