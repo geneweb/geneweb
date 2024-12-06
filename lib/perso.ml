@@ -2893,7 +2893,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
                 let sn = Name.lower (sou base (get_surname p)) in
                 (fn, sn, get_occ p)
               in
-              string_of_int (List.length (Notes.links_to_ind conf base db key None))
+              string_of_int
+                (List.length (Notes.links_to_ind conf base db key None))
             else "0"
           in
           str_val r

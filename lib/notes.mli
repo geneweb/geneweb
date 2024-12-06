@@ -79,8 +79,9 @@ type mode = Delete | Rename | Merge
 val links_to_ind :
   Config.config ->
   Gwdb.base ->
-  ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page *
-   (string list * (Def.NLDB.key * Def.NLDB.ind) list)) list ->
+  ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page
+  * (string list * (Def.NLDB.key * Def.NLDB.ind) list))
+  list ->
   Def.NLDB.key ->
   string option ->
   (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list
@@ -88,8 +89,9 @@ val links_to_ind :
 val links_to_cache_entries :
   Config.config ->
   Gwdb.base ->
-  ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page *
-   (string list * (Def.NLDB.key * Def.NLDB.ind) list)) list ->
+  ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page
+  * (string list * (Def.NLDB.key * Def.NLDB.ind) list))
+  list ->
   Def.NLDB.key ->
   (Def.NLDB.key * Def.NLDB.ind) list
 
