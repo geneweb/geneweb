@@ -307,16 +307,26 @@ TYPE=gallery
 
 let extract_pnoc json =
   let fn =
-    json |> Yojson.Basic.Util.member "fn" |> Yojson.Basic.Util.to_string
+    try
+      json
+      |> Yojson.Basic.Util.member "fn"
+      |> Yojson.Basic.Util.to_string_option |> Option.value ~default:""
+    with _ -> ""
   in
   let sn =
-    json |> Yojson.Basic.Util.member "sn" |> Yojson.Basic.Util.to_string
+    try
+      json
+      |> Yojson.Basic.Util.member "sn"
+      |> Yojson.Basic.Util.to_string_option |> Option.value ~default:""
+    with _ -> ""
   in
   let oc =
-    match json |> Yojson.Basic.Util.member "oc" with
-    | `String oc_str -> ( try int_of_string oc_str with Failure _ -> 0)
-    | `Int oc_int -> oc_int
-    | _ -> 0
+    try
+      match json |> Yojson.Basic.Util.member "oc" with
+      | `String oc_str -> ( try int_of_string oc_str with _ -> 0)
+      | `Int oc_int -> oc_int
+      | _ -> 0
+    with _ -> 0
   in
   (fn, sn, oc)
 

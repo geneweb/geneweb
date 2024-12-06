@@ -1,6 +1,6 @@
 open Def.NLDB
 
-let char_dir_sep = ':'
+let char_dir_sep = Filename.dir_sep.[0]
 
 let check_file_name s =
   let rec loop path ibeg i =
