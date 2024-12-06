@@ -198,8 +198,16 @@ let () =
   let fds = if !all || !estates then `Estates :: fds else fds in
   let fds = if !all || !pub_names then `Pub_names :: fds else fds in
   let fds = if !all || !aliases then `Aliases :: fds else fds in
-  let fds = if !all || !snames then `Snames !sname_aliases :: fds else fds in
-  let fds = if !all || !fnames then `Fnames !fname_aliases :: fds else fds in
+  let fds =
+    if !all then `Snames true :: fds
+    else if !snames then `Snames !sname_aliases :: fds
+    else fds
+  in
+  let fds =
+    if !all then `Fnames true :: fds
+    else if !snames then `Fnames !sname_aliases :: fds
+    else fds
+  in
 
   let total_duration =
     List.fold_left
