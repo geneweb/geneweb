@@ -201,12 +201,11 @@ let fix_pevents ~report base pp =
       pevents;
     }
   in
-  let person_changed =  p <> p' in
+  let person_changed = p <> p' in
   let () =
     if person_changed then (
       patch_person base p.key_index p';
-      Option.iter (fun fn -> fn (Fix_NBDS p.key_index)) report
-    )
+      Option.iter (fun fn -> fn (Fix_NBDS p.key_index)) report)
   in
   person_changed
 
