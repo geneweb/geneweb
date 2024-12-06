@@ -36,6 +36,7 @@ val designation : base -> person -> string
 val trim_trailing_spaces : string -> string
 (** Trim at the end of string *)
 
+(* TODO: This function is very slow and should be rewritten completely. *)
 val alphabetic_utf_8 : string -> string -> int
 (** Compare two UTF-8 encoded strings by alphabetic order *)
 

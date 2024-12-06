@@ -545,7 +545,7 @@ let input_lexicon lang ht open_fname =
           key ())
   in
   key () ;
-  Hashtbl.iter (fun k k2 -> 
+  Hashtbl.iter (fun k k2 ->
       match Hashtbl.find_opt ht k2 with
       | Some entry -> Hashtbl.replace ht k entry
       | None -> ()) tmp

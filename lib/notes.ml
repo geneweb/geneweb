@@ -215,7 +215,7 @@ let commit_notes conf base fnotes s =
     String.concat Filename.dir_sep
       [ Util.bpath conf.bname; base_notes_dir base; fname ]
   in
-  Mutil.mkdir_p (Filename.dirname fpath);
+  File.create_dir ~parent:true (Filename.dirname fpath);
   try Gwdb.commit_notes base fname s
   with Sys_error m ->
     Hutil.incorrect_request conf ~comment:("explication todo: " ^ m);

@@ -67,6 +67,12 @@ val dummy_ifam : ifam
 val eq_istr : istr -> istr -> bool
 (** [true] if strings with the giving ids are equal *)
 
+val hash_istr : istr -> int
+(** Compute a hash of a [istr] value. This function is just the identity
+    because a [istr] value is already a hash.
+
+    The hash should use only on strings from a common database. *)
+
 val eq_ifam : ifam -> ifam -> bool
 (** [true] if families with the giving ids are equal *)
 
