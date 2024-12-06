@@ -1712,15 +1712,18 @@ sv: aktivera/undertrycka
 tr: etkinleştir/kaldır
 
     suppress this path
+co: squassà stu chjassu
 de: diesen Pfad verbergen
 en: suppress this path
 fr: supprimer ce chemin
 
     group/groups
+co: gruppu/gruppi
 en: group/groups
 fr: groupe/groupes
 
     group label
+co: nome di u gruppu
 en: group label
 fr: nom du groupe
 
@@ -1729,7 +1732,7 @@ af: voeg groep by
 bg: добавяне на група
 br: ouzhpennañ ur strollad
 ca: afegir un grup
-co: aghjustà un gruppu
+co: aghjunghje un gruppu
 cs: přidat skupinu
 da: tilføj en gruppe
 de: eine Gruppe hinzufügen
@@ -1870,6 +1873,7 @@ sv: lägg till bild
 tr: resim ekle
 
     must use MOD_IND
+co: u ritrattu hè un indirizzu web. Impiegà MOD_IND per mudificallu o squassallu.
 en: portrait is a url. Use MOD_IND to delete or update.
 fr: le portrait est une Url. Utiliser MOD_IND pour le corriger ou le supprimer.
 
@@ -1909,7 +1913,7 @@ ar: أضف %tإلى الرسم البياني/مسح الرسم البياني/�
 bg: добави %tкъм графиката/изчисти графиката/покажи графиката/редактирай графиката
 br: ouzhpennañ %td'ar grafik/sileiñ ar grafik/diskouez ar grafik/digentañ ar grafik
 ca: afegir %tal gràfic/esborrar el gràfic/mostrar el gràfic/editar el gràfic
-co: aghjunghje %tau graficu/sbuchjà u graficu/mustrà u graficu/mudificà u graficu
+co: aghjunghje %tà u graficu/squassà u graficu/affissà u graficu/mudificà u graficu
 cs: přidat %tdo grafu/vymazat graf/zobrazit graf/upravit graf
 da: tilføj %ttil grafen/ryd grafen/vis grafen/rediger grafen
 de: hinzufügen %tzum Graphen/den Graphen löschen/den Graphen anzeigen/den Graphen editieren
@@ -2276,6 +2280,7 @@ tr: takma ad
 
 
     search type
+co: tipu di ricerca
 de: Suchmodus
 en: search type
 fr: mode de recherche
@@ -2286,7 +2291,7 @@ ar: ربما حي
 bg: може би жив
 br: gwerzhet marteze
 ca: potser viu
-co: forse vivu
+co: forse vivu(a)
 cs: možná živý/á
 da: måske i live
 de: vielleicht lebendig
@@ -3283,6 +3288,7 @@ sv: bat mitzvah
 tr: bat mitzvah
 
     bce
+co:  nz. à C.
 en:  bce
 fr:  av. J.‑C.
 
@@ -3683,7 +3689,7 @@ ar: تم تجميعه في
 bg: компилиран на
 br: compilada em
 ca: compilada el
-co: compilatu in
+co: compilata u
 cs: zkompilována na
 da: kompileret på
 de: kompiliert am
@@ -3990,7 +3996,7 @@ tr: tarafından
 zh: 根据
 
     by couple
-co: da coppiu
+co: da coppiu/classicu
 de: nach Paar
 en: by couple/classic
 fr: par couple/classique
@@ -4513,7 +4519,7 @@ af: vee die invoer skoon
 bg: изчистване на полето за въвеждане
 br: dilamet an danvez
 ca: esborrar l’entrada
-co: sguassà l’entrata
+co: squassà a stampittera
 cs: vymazat vstup
 da: ryd inputfeltet
 de: Eingabefeld löschen
@@ -4607,6 +4613,7 @@ sv: klicka "%s"
 tr: "%s" i tıklayın
 
     click to book
+co: per rinuminà tutti i dati uguali&#10;mantene Ctrl è fà un cliccu nant’à un elementu per aprelu in u dizziunariu
 en: to rename all the identical data,&#10;hold Ctrl and click to open the entry in the book
 fr: pour renommer toutes les données identiques,&#10;maintenir Ctrl puis cliquer sur une entrée pour l’ouvrir dans le dictionnaire
 
@@ -7044,7 +7051,7 @@ ar: وصف
 bg: описание
 br: deskrivadur
 ca: descripció
-co: descrizzione
+co: discrizzione
 cs: popis
 da: beskrivelse
 de: Beschreibung
@@ -7900,7 +7907,7 @@ tr: alan
 zh: 地点
 
     event/events
-co: evenimentu/evenimenti
+co: evenimentu/evenimenti/evenimentu(i)
 de: Ereignis/Ereignisse
 en: event/events/event(s)
 es: evento/eventos
@@ -9468,11 +9475,13 @@ tr: hiyerarşik gezinmede bir giriş seçin
 zh: 在层次导航中选择一个条目
 
     high generation levels
+co: e generazioni superiore à 12
 de: der Generationen höher als 12
 en: the generation levels higher then 12
 fr: les générations supérieures à 12
 
     high generation caution
+co: fate casu ! A selezzione d’un numeru maiò di generazioni pò piglià un pezzu per ingenerassi è pò andà fin’à l’interruzzione cù u servitore.
 de: Vorsicht! Bei Auswahl höherer Generationen kann die Erzeugung mehrere Minuten dauern und zu Server-Timeouts führen.
 en: be carefull! Selecting high generation level may take minutes to generate and that can lead to server timeouts.
 fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d'attente dépassé du serveur.
@@ -9515,7 +9524,7 @@ af: sy/haar
 bg: мъж/жена
 br: eñ/hi
 ca: ell/ella
-co: ellu/ella
+co: ellu/ella/elli
 cs: on/ona
 da: han/hun
 de: er/sie
@@ -9779,7 +9788,7 @@ sv: om titlar
 tr: eğer başlıklar
 
     iftitles/public/semipublic/private
-co: s’è tituli/publicu/semi-public/privatu
+co: s’è tituli/publicu/semipublicu/privatu
 de: Adelstitel/öffentlich/half-public/privat
 en: if titles/public/half-public/private
 es: si hay títulos/público/half-public/privado
@@ -10927,7 +10936,7 @@ af: gekoppelde beelde
 bg: свързани изображения
 br: skeudennoù liammet
 ca: imatges enllaçades
-co: imagine ligate
+co: fiure ligate
 cs: propojené obrázky
 da: tilknyttede billeder
 de: verknüpfte Bilder
@@ -10959,7 +10968,7 @@ zh: 关联图像
     linked pages
 bg: свързани страници
 ca: enllaços
-co: pagine legate
+co: pagine ligate
 cs: spojený stránky
 da: lænkede sider
 de: verknüpfte Seiten
@@ -12331,6 +12340,7 @@ en: modify the note
 fr: modifier la note
 
     modify gallery
+co: mudificà a fiura (galleria)
 en: modify the image (gallery)
 fr: modifier l'image (gallerie)
 
@@ -12498,6 +12508,7 @@ sv: fler än %d svar
 tr: %d cevaptan daha fazla
 
     move union comments to notes
+co: trasferisce u campu storicu « cummenti d’unione » versu quellu cuntiguu di e « note d’unione ».
 en: transfer the historical “comments of union” input to the adjacent “marriage notes” one.
 fr: transférer le champ historique « commentaires d’union » vers celui des « notes de mariage » ci-contre.
 
@@ -12506,7 +12517,7 @@ af: skuif op/skuif af/skuif die wyser op/skuif die wyser af/glip-en-los
 bg: преместване нагоре/преместване надолу/преместване на курсора нагоре/преместване на курсора надолу/плъзгане и пускане
 br: pignat/diskenn/pignat ar c'hursor/diskenn ar c'hursor/leuskel-gweredek
 ca: moure amunt/moure avall/moure el cursor amunt/moure el cursor avall/arrossegar i deixar anar
-co: ricullà/falà/ricullà u cursore/falà u cursore/strascinà è lascià falà
+co: cullà/falà/ricullà u cursore/falà u cursore/sguillà è depone
 cs: posunout nahoru/posunout dolů/posunout kurzor nahoru/posunout kurzor dolů/přetáhnout a pustit
 da: flyt op/flyt ned/flyt markøren op/flyt markøren ned/træk og slip
 de: nach oben/nach unten/Cursor nach oben/Cursor nach unten/ziehen und ablegen
@@ -13173,6 +13184,7 @@ en: no more
 fr: pas d’autres
 
     no user key
+co: u liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu .auth
 en: the link may lead to a homonym or even fail because the user key is not defined in the .auth file
 fr: le lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier .auth
 
@@ -13409,16 +13421,19 @@ sv: summering av noteringar
 tr: notlar
 
     notes sources show help
+co: in sfondulu per affissà e
 de: den Hintergrund zum Anzeigen der
 en: the background to show the
 fr: sur l’arrière-plan pour afficher les
 
     notes sources edit on date
+co: nant’à a data à manca per mudificà st’evenimentu
 de: auf das Datum links zum Ändern dieses Ereignisses
 en: on the date on the left to modify this event
 fr: sur la date à gauche pour modifier cet événement
 
     note without title
+co: nota senza titulu
 de: Notiz ohne Titel
 en: note without title
 fr: note sans titre
@@ -14095,6 +14110,7 @@ sv: endast den valda generationen
 tr: sadece seçilen nesil
 
     on this image
+co: nant’à sta fiura
 en: on this image
 fr: sur cette image
 
@@ -14105,7 +14121,7 @@ en: open individual page
 fr: ouvrir la page individuelle
 
     open this individual page
-co: apre a pagina individuale
+co: apre sta pagina individuale
 de: diese individuelle Seite öffnen
 en: open this individual page
 fr: ouvrir la page individuelle
@@ -14824,7 +14840,7 @@ en: if an image with the same name already exists in the saved, it will be delet
 fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
 
     previous portrait
-co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu.
+co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu. Impiegà MOD_IND ùn arregistreghja micca u ritrattu.
 de: wenn schon ein gespeichertes Porträt mit dem gleichen Namen existiert, wird es gelöscht.
 en: a possible previous version of the saved portrait will be deleted. Using MOD_IND does not save the portrait.
 fr: une sauvegarde pré-existante du portrait sera supprimée.<br> Utiliser MOD_IND ne sauvegarde pas le portrait.
@@ -14949,6 +14965,7 @@ sv: offentligt
 tr: kamu
 
     public name/public names
+co: casata publica/casate publiche
 en: public name/public names
 fr: nom public/noms publics
 
@@ -15056,7 +15073,7 @@ af: redigeerder van reaktiewe beeldkaarte
 bg: редактор на интерактивни картографски изображения
 br: kizellerez kartenn skeudennoù kenwerzhel
 ca: editor de mapes d'imatges reactives
-co: redattore di carte d'imagine reattive
+co: editore di cartugrafia di fiura reattiva
 cs: editor map reaktivních obrázků
 da: editor for reaktive billedkort
 de: Editor für interaktive Bildkarten
@@ -15169,7 +15186,7 @@ af: teken die area op die beeld weer
 bg: преначертаване на областта върху изображението
 br: adtreuziañ an takad war ar skeudenn
 ca: redibuixar l'àrea sobre la imatge
-co: ridisegnà l’area nant’à l’imagine
+co: ridisegnà l’area nant’à a fiura
 cs: překreslit oblast na obrázku
 da: tegn området på billedet igen
 de: Bereich auf dem Bild neu zeichnen
@@ -15542,7 +15559,7 @@ af: stel alles terug: vorm, beeld en tabelle
 bg: нулиране на всичко: формуляр, изображение и таблици
 br: adderaouiñ pep tra: furmskrid, skeudenn ha taolenn
 ca: restablir tot: formulari, imatge i taules
-co: reimpostà tuttu: formulariu, imagine è tavule
+co: tuttu reinizià/tuttu reinizià : furmulariu, fiura è tavule
 cs: resetovat vše: formulář, obrázek a tabulky
 da: nulstil alt: formular, billede og tabeller
 de: alles zurücksetzen: Formular, Bild und Tabellen
@@ -15921,7 +15938,7 @@ sv: exakt sökning
 tr: tam arama
 
     searching all
-co: ricerca tutti i
+co: ricerca tutti l’individui
 de: suche alle
 en: search all
 es: buscar todos los
@@ -16208,6 +16225,7 @@ sv: välj en månad för att visa alla födelsedagar.
 tr: tüm yıldönümlerini görmek için bir ay seçin.
 
     select/delete an event
+co: selezziunà un evenimentu/squassà l’evenimentu
 en: select an event/delete the event
 fr: choisir un événement/supprimer l’événement
 
@@ -16594,6 +16612,7 @@ sv: borde vara man
 tr: erkek olmalı
 
     show all
+co: affissà tutti i
 de: zeige alle
 en: show all
 fr: afficher tous les
@@ -17384,7 +17403,7 @@ af: geen data in die tabel nie
 bg: няма данни в таблицата
 br: data ebet er gartenn
 ca: cap dada a la taula
-co: nisun dati ind’u tavulinu
+co: nisunu datu in a tavula
 cs: žádná data v tabulce
 da: ingen data i tabellen
 de: keine Daten in der Tabelle
@@ -18457,6 +18476,7 @@ sv: kronologi
 tr: zaman çizelgesi
 
     domain/domains
+co: duminiu/duminii
 en: domain/domains
 fr: domaine/domaines
 
@@ -18465,7 +18485,7 @@ af: teken ’n reghoekige area op die beeld
 bg: начертайте правоъгълна зона върху изображението
 br: tresañ ur c’hornig war ar skeudenn
 ca: traça una zona rectangular sobre la imatge
-co: traccià una zona rettangulare nant’à l’imagine
+co: disegnà un’area rettangulare nant’à a fiura
 cs: nakreslete obdélníkovou oblast na obrázku
 da: tegn et rektangulært område på billedet
 de: zeichnen Sie einen rechteckigen Bereich auf das Bild
@@ -18496,10 +18516,12 @@ zh: 在图像上绘制矩形区域
 
 
     alias/aliases
+co: cugnome/cugnomi
 en: alias/aliases
 fr: alias/alias
 
     qualifier/qualifiers
+co: qualificativu/qualificativi
 en: qualifier/qualifiers
 fr: sobriquet/sobriquets
 
@@ -19268,6 +19290,7 @@ sv: okänd person
 tr: bilinmeyen kişi
 
     unknown spouse
+co: cumpagni scunnisciuti
 de: fehlende(r) Ehegatte(n)
 en: unknown spouses
 fr: conjoints manquants
@@ -19337,6 +19360,7 @@ sv: upp till
 tr: kadar
 
     up to the (individuals)
+co: fin’à i
 en: up to the
 fr: jusqu’aux
 
@@ -19415,6 +19439,7 @@ en: url
 fr: url
 
     restore default_sosa_ref
+co: risturà Sosa 1 predefinitu
 en: restore default Sosa 1
 fr: restorer Sosa 1 par défault
 
@@ -19512,7 +19537,7 @@ sv: användare/lösenord/avbryt
 tr: kullanıcı/şifre/iptal
 
     v7 anywhere
-co: cuncurdanza senza custrizzione
+co: currispundenza in ogni locu
 de: ohne Einschränkung
 en: match anywhere
 fr: correspondance sans contrainte
