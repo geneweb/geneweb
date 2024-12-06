@@ -133,4 +133,5 @@ let write_caches base =
     Files.mv lastname_fname_tmp lastname_fname;
     Files.mv first_name_fname_tmp first_name_fname;
     Files.mv occupation_fname_tmp occupation_fname;
-    Files.mv source_fname_tmp source_fname)
+    Files.mv source_fname_tmp source_fname;
+    Files.mv place_fname_tmp place_fname)
