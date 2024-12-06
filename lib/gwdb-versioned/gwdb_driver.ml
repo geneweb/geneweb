@@ -668,13 +668,13 @@ module Legacy_driver = struct
     List.iter (fun (i, v) -> if i = -1 then () else Array.unsafe_set d i v) data;
     d
 
-  let sync ?(scratch = false) ~save_mem base =
+  let sync ?(scratch = false) ?(tasks = []) ~save_mem base =
     let dir = Filename.concat (bdir base) compatibility_directory in
     if scratch && Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
     PatchFam.sync build_from_scratch_fevents base;
 
-    sync ~scratch ~save_mem base;
+    sync ~scratch ~tasks ~save_mem base;
 
     PatchPer.move_data_file base;
     PatchPer.remove_patch_file base;
