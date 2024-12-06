@@ -46,6 +46,7 @@
     uutf
     yojson
     zarith
+    (utop :dev)
   )
   (depopts
     ocaml-option-nnp
