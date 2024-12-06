@@ -1243,7 +1243,7 @@ let expand_env =
   fun conf s ->
     match List.assoc_opt "expand_env" conf.Config.base_env with
     | Some "yes" ->
-        let _ = (Buffer.clear buff : unit) in
+        let () = Buffer.clear buff in
         let rec loop i =
           if i = String.length s then Buffer.contents buff
           else if i + 1 < String.length s && s.[i] = '$' && s.[i + 1] = '{' then (
@@ -1377,17 +1377,19 @@ let trimmed_string_of_place place =
   |> String.concat (Printf.sprintf "%c " field_separator)
   |> escape_html
 
-let menu_threshold = 20
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
-let print_alphab_list conf crit print_elem liste =
-  let len = List.length liste in
-  if len > menu_threshold then (
+let print_alphabetically_indexed_list conf index_key print_elem list =
+  let with_index =
+    let index_threshold = 20 in
+    List.length list > index_threshold
+  in
+  let print_index () =
     Output.print_sstring conf "<p>\n";
-    (let _ =
-       List.fold_left
+    ignore
+      (List.fold_left
          (fun last e ->
-           let t = crit e in
+           let t = index_key e in
            let same_than_last =
              match last with Some t1 -> t = t1 | _ -> false
            in
@@ -1395,19 +1397,19 @@ let print_alphab_list conf crit print_elem liste =
              Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
                (Ext_string.hexa_string t) t;
            Some t)
-         None liste
-     in
-     ());
-    Output.print_sstring conf "</p>\n");
+         None list);
+    Output.print_sstring conf "</p>\n"
+  in
+  if with_index then print_index ();
   Output.print_sstring conf "<ul>\n";
-  (let _ =
-     List.fold_left
+  ignore
+    (List.fold_left
        (fun last e ->
-         let t = crit e in
+         let t = index_key e in
          let same_than_last =
            match last with Some t1 -> t = t1 | _ -> false
          in
-         if len > menu_threshold || is_number t then (
+         if with_index || is_number t then (
            (match last with
            | Some _ ->
                if not same_than_last then
@@ -1422,10 +1424,8 @@ let print_alphab_list conf crit print_elem liste =
          print_elem e;
          Output.print_sstring conf "</li>\n";
          Some t)
-       None liste
-   in
-   ());
-  if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
+       None list);
+  if with_index then Output.print_sstring conf "</ul>\n</li>\n";
   Output.print_sstring conf "</ul>\n"
 
 let relation_txt conf sex fam =
@@ -1993,8 +1993,8 @@ let print_in_columns conf ncols len_list list wprint_elem =
   begin_centered conf;
   Output.printf conf "<table width=\"95%%\" border=\"%d\">\n" conf.Config.border;
   Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.Config.left;
-  (let _ =
-     List.fold_left
+  ignore
+    (List.fold_left
        (fun list len ->
          let rec loop n list =
            if n = 0 then (
@@ -2019,9 +2019,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
              | [] -> []
          in
          loop len list)
-       list len_list
-   in
-   ());
+       list len_list);
   Output.print_sstring conf "</tr>\n";
   Output.print_sstring conf "</table>\n";
   end_centered conf
