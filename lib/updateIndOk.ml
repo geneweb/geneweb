@@ -1162,12 +1162,12 @@ let print_mod ?prerr o_conf base =
     let op = poi base p.key_index in
     let u = { family = get_family op } in
     patch_person base p.key_index p;
-    let new_key = Util.make_key base p in 
-    if old_key <> new_key then
+    let new_key = Util.make_key base p in
+    if old_key <> new_key then (
       (* Needs the updates in this order in case of self-reference *)
       Notes.update_notes_links_person base p;
       Notes.update_ind_key conf base pgl old_key new_key;
-      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0;
+      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0);
     let wl =
       let a = poi base p.key_index in
       let a = { parents = get_parents a; consang = get_consang a } in

@@ -142,7 +142,7 @@ let misc_notes_link s i =
             WLperson (j, (fn, sn, oc), name, text)
           with Not_found -> wlnone j
       else wlnone j
-  else wlnone (i+1)
+  else wlnone (i + 1)
 
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in
