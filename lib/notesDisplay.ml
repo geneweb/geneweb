@@ -207,8 +207,9 @@ let linked_page_rows conf base pg =
                (Utf8.capitalize_fst
                   (transl conf
                      (if n_type = "gallery" then "modify gallery"
+                     else if n_type = "album" then "modify album"
                      else "modify note")))
-               (if n_type = "gallery" then "far fa-image"
+               (if n_type = "gallery" || n_type = "album" then "far fa-image"
                else "far fa-file-lines"));
         Output.print_sstring conf
           (Format.sprintf
@@ -256,8 +257,9 @@ let print_linked_list_gallery conf base pgl =
     (function
       | Def.NLDB.PgMisc fnotes ->
           let nenv, s = read_notes base fnotes in
-          if (try List.assoc "TYPE" nenv with Not_found -> "") = "gallery"
-          then Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
+          let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
+          if typ = "gallery" || typ = "album" then
+            Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
       | _ -> ())
     pgl;
   Wserver.printf "</div>\n"
@@ -276,6 +278,7 @@ let print_linked_list_standard conf base pgl =
 let print_linked_list conf base pgl =
   match p_getenv conf.env "type" with
   | Some "gallery" -> print_linked_list_gallery conf base pgl
+  | Some "album" -> print_linked_list_gallery conf base pgl
   | _ -> print_linked_list_standard conf base pgl
 
 let print_what_links conf base fnotes =
@@ -313,7 +316,7 @@ let print conf base =
       let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
       let templ, typ =
         if typ = "" then (None, "")
-        else if typ = "gallery" then
+        else if typ = "album" || typ = "gallery" then
           try (Util.open_etc_file conf "notes_gallery", typ)
           with Not_found -> (None, "")
         else (None, "")
@@ -331,6 +334,7 @@ let print conf base =
               Wserver.printf "%s"
                 (match typ with
                 | "gallery" -> Notes.safe_gallery conf s
+                | "album" -> Notes.safe_gallery conf s
                 | _ -> s)
           | _ -> Templ.copy_from_templ conf [] ic)
       | None -> (
@@ -346,11 +350,11 @@ let print_mod conf base =
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  let env, s = read_notes base fnotes in
-  let typ = try List.assoc "TYPE" env with Not_found -> "" in
+  let nenv, s = read_notes base fnotes in
+  let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
   let templ =
     if typ = "" then None
-    else if typ = "gallery" then
+    else if typ = "gallery" || typ = "album" then
       Util.open_etc_file conf ("notes_upd_" ^ typ)
     else None
   in
@@ -362,13 +366,13 @@ let print_mod conf base =
   in
   match (templ, p_getenv conf.env "notmpl") with
   | Some _, Some "on" ->
-      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title env
-        s
+      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
+        nenv s
   | Some (ic, _fname), _ -> (
       match p_getenv conf.env "ajax" with
       | Some "on" ->
           let s_digest =
-            List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s
+            List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv ^ s
           in
           let digest = Mutil.digest s_digest in
           let charset = if conf.charset = "" then "utf-8" else conf.charset in
@@ -377,8 +381,8 @@ let print_mod conf base =
           Wserver.printf "{\"digest\":\"%s\",\"r\":%s}" digest s
       | _ -> Templ.copy_from_templ conf [] ic)
   | _ ->
-      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title env
-        s
+      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
+        nenv s
 
 let print_mod_ok conf base =
   let fname = function
