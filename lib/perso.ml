@@ -5563,6 +5563,7 @@ let print_what_links conf base p =
       let lnkd_typ =
         match p_getenv conf.env "type" with
         | Some "gallery" -> "linked images"
+        | Some "album" -> "linked images"
         | _ -> "linked pages"
       in
       transl conf lnkd_typ |> Utf8.capitalize_fst |> Output.print_sstring conf;
