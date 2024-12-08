@@ -112,6 +112,12 @@ let header_without_http_nor_home conf title =
   Templ.include_hed_trl conf "hed";
   Util.message_to_wizard conf
 
+let header_without_title conf =
+  Util.html conf;
+  header_without_http_nor_home conf (fun _ -> ());
+  include_home_template conf;
+  Output.print_sstring conf "<div class=\"container\">"
+
 let header_with_title ?(error = false) ?(fluid = false) conf title =
   Util.html conf;
   header_without_http_nor_home conf title;
