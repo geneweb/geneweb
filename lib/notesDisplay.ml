@@ -37,34 +37,24 @@ let print_search_form conf from_note =
   Output.print_sstring conf "</button>\n</form>\n</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
-  Hutil.header_with_title conf (fun _ -> ());
-  (* TODO: DO†WE†NEED†ME?
-     let what_links_page () =
-       if fnotes <> "" then (
-         Output.print_sstring conf {|<a href="|};
-         Output.print_string conf (commd conf);
-         Output.print_sstring conf {|m=NOTES&f=|};
-         Output.print_string conf (Mutil.encode fnotes);
-         Output.print_sstring conf {|&ref=on" class="mx-2">(|};
-         Output.print_sstring conf (transl conf "linked pages");
-         Output.print_sstring conf ")</a>\n")
-     in*)
-  Output.print_sstring conf {|<div class="d-flex justify-content-between">|};
-  if (title :> string) <> "" then (
-    let title =
-      match ho with
-      | Some (case_sens, h) ->
-          html_highlight case_sens h (title : Adef.safe_string :> string)
-          |> Adef.safe
-      | None -> title
-    in
-    Output.print_sstring conf {|<h1 class="my-3">|};
-    Output.print_string conf title;
-    Output.print_sstring conf {|</h1>|});
-  Output.printf conf "</div>\n";
-  Util.include_template conf [] "summary" (fun () -> ());
+  Hutil.header_without_title conf;
+  let title_html =
+    if (title :> string) <> "" then
+      let title_text =
+        match ho with
+        | Some (case_sens, h) ->
+            html_highlight case_sens h (title : Adef.safe_string :> string)
+            |> Adef.safe
+        | None -> title
+      in
+      Format.sprintf "<h1>%s</h1>" (title_text :> string)
+    else ""
+  in
+  Output.printf conf
+    {|<div class="d-flex mb-3">%s%s</div>|}
+    title_html (Wiki.make_edit_button conf fnotes ());
   let file_path = file_path conf base in
-  let s = string_with_macros conf [] s in
+  let s = Util.string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
   let s =
     let wi =
@@ -78,22 +68,27 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
   let s = Util.safe_html s in
-  let s =
-    match ho with
-    | Some (case_sens, h) ->
-        html_highlight case_sens h (s : Adef.safe_string :> string) |> Adef.safe
-    | None -> s
-  in
   Output.print_string conf s;
   if ho <> None then print_search_form conf (Some fnotes);
   Hutil.trailer conf
+
+  (* TODO: DO†WE†NEED†ME?
+     let what_links_page () =
+       if fnotes <> "" then (
+         Output.print_sstring conf {|<a href="|};
+         Output.print_string conf (commd conf);
+         Output.print_sstring conf {|m=NOTES&f=|};
+         Output.print_string conf (Mutil.encode fnotes);
+         Output.print_sstring conf {|&ref=on" class="mx-2">(|};
+         Output.print_sstring conf (transl conf "linked pages");
+         Output.print_sstring conf ")</a>\n")
+     in*)
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
   Hutil.header_with_title conf (fun _ ->
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
-  Util.include_template conf [] "summary" (fun () -> ());
   if cnt0 = 0 && (title :> string) <> "" then (
     Output.print_sstring conf "<br><br><h1>";
     Output.print_string conf title;
@@ -524,7 +519,7 @@ let print_misc_notes conf base =
   Format.sprintf
     {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
     (if d <> "" then d
-    else 
+    else
       transl conf "miscellaneous notes"
       |> Util.translate_eval |> Utf8.capitalize_fst)
   |> Output.print_sstring conf;

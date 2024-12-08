@@ -339,7 +339,6 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     else wizard_page_title conf @@ Util.escape_html title
   in
   Hutil.header_without_home conf title;
-  Util.include_template conf [] "summary" (fun () -> ());
   Output.print_sstring conf {|<table border="0" width="100%"><tr><td>|};
   let s = string_with_macros conf [] s in
   let s =

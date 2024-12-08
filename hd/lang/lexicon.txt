@@ -12339,6 +12339,10 @@ de: Notiz bearbeiten
 en: modify the note
 fr: modifier la note
 
+    modify note section %d
+en: modify the section %d
+fr: modifier la section %d
+
     modify gallery
 co: mudificà a fiura (galleria)
 en: modify the image (gallery)
