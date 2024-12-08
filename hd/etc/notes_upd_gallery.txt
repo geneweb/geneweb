@@ -1362,7 +1362,11 @@ function initializePageContent(data, tableApi) {
 }
 
 function toggleTables(show) {
-    $('#map_table, #grp_table').closest('table')[show ? 'show' : 'hide']();
+    if (show || $('input#fname').val()) {
+        $('#map_table, #grp_table').closest('table').show();
+    } else {
+        $('#map_table, #grp_table').closest('table').hide();
+    }
 }
 
 // Initialize both data tables with proper error handling and state management
@@ -1377,16 +1381,9 @@ function initTables() {
         return;
       }
 
-      // Hide tables if no data at all
-      const noData = (!json.r?.map || json.r.map.length === 0) &&
-                     (!json.r?.groups || json.r.groups.length === 0);
-
-      if (noData) {
-        toggleTables(false);
-      } else {
-        toggleTables(true);
-
-      }
+      // Show tables if we have a valid image either in JSON or in form
+      const hasImage = Boolean(json.r?.img || json.img || $("#fname").val());
+      toggleTables(hasImage);
 
       // Initialize main table
       table = $('#map_table').DataTable({
@@ -1696,6 +1693,7 @@ function resetButtonHandler() {
     groupTable.clear().draw();
     toggleTables(false);
     currentAreaCount = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
 
@@ -1742,7 +1740,6 @@ function setupFormHandler() {
     var res = {
       title: $("#page_title").val(),
       desc: $("#page_desc").val(),
-      path: "doc",
       img: $("#fname").val(),
       map: mapEntries,
       groups: groupTable.rows().data().toArray().map((group, index) => ({
