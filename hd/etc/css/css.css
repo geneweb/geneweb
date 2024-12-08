@@ -66,9 +66,19 @@
   word-wrap: break-word;
 }
 
+/* Toolbar and characters panel */
 /* Light grey background color highlight for the toolbar characters.txt */
 .ch .hl {
     background-color: #ffe2e2;
+}
+
+.ch a.hl:hover {
+  background: #ffe69c;
+}
+
+.ch a:hover {
+  background: #e9ecef;
+  transform: scale(1.1);
 }
 
 .dropdown-menu-transl {
@@ -542,6 +552,10 @@ input:focus, select:focus {
   left:4px;
 }
 
+.home-xs {
+  z-index: 1031;
+}
+
 @media (max-width: 575px) {
   .home-xs.fix_left {
     left:2px;
@@ -579,6 +593,7 @@ div.anchor_upd {
     position: relative;
     width: 90%;
   }
+
   #searchmodal .modal-dialog {
     max-width: 90%;
   }
@@ -1085,12 +1100,6 @@ li.desc
 
 
 /* --------------------------------- wiki -------------------------------- */
-
-#summary
-{
-  border: ridge 3px #844404;
-}
-
 div.summary ul
 {
   padding-left: 0;

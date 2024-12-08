@@ -1286,16 +1286,20 @@
 
   <div class="card">
     %apply;card_header("notes","note/notes")
-    <div class="row ml-3">
-      <div class="d-inline col-9 py-1">
+    <div class="d-inline-flex flex-column">
+      <div class="col py-1">
         %include;toolbar
       </div>
-      <textarea class="col-9 form-control insert-character-target no-clear-button" id="notes_comments" name="notes" rows="4">%notes;</textarea>%sq;
-      <button type="submit" class="btn btn-primary btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3 no-clear-button" title="[*validate/delete]0" aria-label="[*validate/delete]0">
-        <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
-      </button>
-      <div class="col my-1 mr-2">
-        %include;characters
+      <div class="row">
+        <div class="d-flex flex-column col-9">
+          <textarea class="form-control insert-character-target no-clear-button" id="notes_comments" name="notes" rows="16">%notes;</textarea>%sq;
+          <button type="submit" class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+            <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="col mx-2 pl-0 pr-3 py-0">
+          %include;characters
+        </div>
       </div>
     </div>
   </div>
