@@ -37,34 +37,23 @@ let print_search_form conf from_note =
   Output.print_sstring conf "</button>\n</form>\n</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
-  Hutil.header_with_title conf (fun _ -> ());
-  (* TODO: DO†WE†NEED†ME?
-     let what_links_page () =
-       if fnotes <> "" then (
-         Output.print_sstring conf {|<a href="|};
-         Output.print_string conf (commd conf);
-         Output.print_sstring conf {|m=NOTES&f=|};
-         Output.print_string conf (Mutil.encode fnotes);
-         Output.print_sstring conf {|&ref=on" class="mx-2">(|};
-         Output.print_sstring conf (transl conf "linked pages");
-         Output.print_sstring conf ")</a>\n")
-     in*)
-  Output.print_sstring conf {|<div class="d-flex justify-content-between">|};
-  if (title :> string) <> "" then (
-    let title =
-      match ho with
-      | Some (case_sens, h) ->
-          html_highlight case_sens h (title : Adef.safe_string :> string)
-          |> Adef.safe
-      | None -> title
-    in
-    Output.print_sstring conf {|<h1 class="my-3">|};
-    Output.print_string conf title;
-    Output.print_sstring conf {|</h1>|});
-  Output.printf conf "</div>\n";
-  Util.include_template conf [] "summary" (fun () -> ());
+  Hutil.header_without_title conf;
+  let title_html =
+    if (title :> string) <> "" then
+      let title_text =
+        match ho with
+        | Some (case_sens, h) ->
+            html_highlight case_sens h (title : Adef.safe_string :> string)
+            |> Adef.safe
+        | None -> title
+      in
+      Format.sprintf "<h1>%s</h1>" (title_text :> string)
+    else ""
+  in
+  Output.printf conf {|<div class="d-flex mb-3">%s%s</div>|} title_html
+    (Wiki.make_edit_button conf fnotes ());
   let file_path = file_path conf base in
-  let s = string_with_macros conf [] s in
+  let s = Util.string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
   let s =
     let wi =
@@ -78,22 +67,27 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
   let s = Util.safe_html s in
-  let s =
-    match ho with
-    | Some (case_sens, h) ->
-        html_highlight case_sens h (s : Adef.safe_string :> string) |> Adef.safe
-    | None -> s
-  in
   Output.print_string conf s;
   if ho <> None then print_search_form conf (Some fnotes);
   Hutil.trailer conf
+
+(* TODO: DO†WE†NEED†ME?
+   let what_links_page () =
+     if fnotes <> "" then (
+       Output.print_sstring conf {|<a href="|};
+       Output.print_string conf (commd conf);
+       Output.print_sstring conf {|m=NOTES&f=|};
+       Output.print_string conf (Mutil.encode fnotes);
+       Output.print_sstring conf {|&ref=on" class="mx-2">(|};
+       Output.print_sstring conf (transl conf "linked pages");
+       Output.print_sstring conf ")</a>\n")
+   in*)
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
   Hutil.header_with_title conf (fun _ ->
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
-  Util.include_template conf [] "summary" (fun () -> ());
   if cnt0 = 0 && (title :> string) <> "" then (
     Output.print_sstring conf "<br><br><h1>";
     Output.print_string conf title;
@@ -429,12 +423,13 @@ let begin_text_without_html_tags lim s =
 
 (* Sorting directories first then files alphabetically *)
 let sort_entries db =
-  List.sort (fun (r1, opt1) (r2, opt2) ->
-    match (opt1, opt2) with
-    | None, Some _ -> -1
-    | Some _, None -> 1
-    | _ -> Gutil.alphabetic_order (Name.lower r1) (Name.lower r2)
-  ) db
+  List.sort
+    (fun (r1, opt1) (r2, opt2) ->
+      match (opt1, opt2) with
+      | None, Some _ -> -1
+      | Some _, None -> 1
+      | _ -> Gutil.alphabetic_order (Name.lower r1) (Name.lower r2))
+    db
 
 (* Build path hierarchy as directory entries *)
 let build_path_hierarchy d =
@@ -452,24 +447,22 @@ let build_path_hierarchy d =
 
 (* Format directory entry with proper indentation level *)
 let format_folder_entry conf depth r path_to is_current is_path =
-  Format.sprintf
-    {|<div class="my-1" style="margin-left: %.1fem;">%s</div>|}
+  Format.sprintf {|<div class="my-1" style="margin-left: %.1fem;">%s</div>|}
     (1.5 *. float_of_int depth)
     (if is_current then
-      Format.sprintf
-        {|<span class="text-muted">
+     Format.sprintf
+       {|<span class="text-muted">
              <i class="far fa-folder-open fa-fw mr-2"></i>%s
           </span>|}
-        (Util.escape_html r :> string)
+       (Util.escape_html r :> string)
     else
       let title_attr =
         let back_txt = Utf8.capitalize_fst (transl conf "back") in
         if is_path then
-          if r = ".." then
-            Format.sprintf {| title="%s .."|} back_txt
+          if r = ".." then Format.sprintf {| title="%s .."|} back_txt
           else
             Format.sprintf {| title="%s %s"|} back_txt
-            (Util.escape_html r :> string)
+              (Util.escape_html r :> string)
         else ""
       in
       Format.sprintf
@@ -484,10 +477,7 @@ let format_folder_entry conf depth r path_to is_current is_path =
 
 (* Format file entry with proper indentation level *)
 let format_file_entry conf depth d f n_type title =
-  let icon = match n_type with
-    | "gallery" -> "image"
-    | _ -> "file-lines"
-  in
+  let icon = match n_type with "gallery" -> "image" | _ -> "file-lines" in
   Format.sprintf
     {|<div class="py-1" style="margin-left: %.1fem;">
          <a href="%sm=NOTES&f=%s"><i class="far fa-%s fa-fw mr-2"></i>%s</a>
@@ -499,8 +489,9 @@ let format_file_entry conf depth d f n_type title =
     icon
     (Util.escape_html f :> string)
     (if (title :> string) <> "" then
-       Format.sprintf {|<span class="text-muted ml-2">%s</span>|} (title :> string)
-     else "")
+     Format.sprintf {|<span class="text-muted ml-2">%s</span>|}
+       (title :> string)
+    else "")
 
 (* Format back button *)
 let format_back_button conf d =
@@ -512,16 +503,15 @@ let format_back_button conf d =
       </div>|}
     (commd conf :> string)
     (match String.rindex_opt d NotesLinks.char_dir_sep with
-     | Some i -> "&d=" ^ String.sub d 0 i
-     | None -> "")
+    | Some i -> "&d=" ^ String.sub d 0 i
+    | None -> "")
     (Utf8.capitalize_fst (transl conf "back"))
 
 (* Format simple filename by removing parent directory *)
 let format_simple_filename d f =
   let prefix = d ^ String.make 1 NotesLinks.char_dir_sep in
   let prefix_len = String.length prefix in
-  if String.length f > prefix_len &&
-     String.sub f 0 prefix_len = prefix then
+  if String.length f > prefix_len && String.sub f 0 prefix_len = prefix then
     String.sub f prefix_len (String.length f - prefix_len)
   else f
 
@@ -532,7 +522,7 @@ let print_misc_notes conf base =
   Format.sprintf
     {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
     (if d <> "" then d
-    else 
+    else
       transl conf "miscellaneous notes"
       |> Util.translate_eval |> Utf8.capitalize_fst)
   |> Output.print_sstring conf;

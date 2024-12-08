@@ -12333,11 +12333,19 @@ pt: permutar os eventos da família %s
 sv: ändra ordningen för %s familjehändelser
 tr: %s ailesinin etkinliklerini değiştir
 
+    modify all note
+en: modify all the note/previous section/next section
+fr: éditer toute la note/section précédente/section suivante
+
     modify note
 co: mudificà a nota
 de: Notiz bearbeiten
 en: modify the note
 fr: modifier la note
+
+    modify note section %d
+en: modify the section %d
+fr: modifier la section %d
 
     modify gallery
 co: mudificà a fiura (galleria)

@@ -24,6 +24,11 @@ val header_fluid : config -> (bool -> unit) -> unit
 val header_with_conf_title : config -> (bool -> unit) -> unit
 (** Same as [header] but takes page title from [conf.env]. *)
 
+val header_without_title : config -> unit
+(** Similar to [header] but without any <h1> title element. Only prints HTTP header,
+    HTML page header, and opens a <div> container. Useful when you need to handle
+    title display separately. *)
+
 val header_without_home : config -> (bool -> unit) -> unit
 (** calls header_with_title, but gets its <h1> title from conf.env "p_title" *)
 

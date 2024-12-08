@@ -177,7 +177,7 @@
   -->
 </script>
 %end;
-%( Functions for toolbar.txt %)
+%( Functions for caracter.txt %)
 %if;("ADD" in e.m or "MOD" in e.m)
 <script>
   // Attach a click event listener to each anchor element within the character's list container
@@ -199,6 +199,70 @@
     t.selectionEnd = t.selectionStart;
     t.focus();
   }
+function insertTags(tagOpen, tagClose, sampleText) {
+  const textarea = document.querySelector('textarea#notes_comments');
+  if (!textarea) return false;
+
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const scrollTop = textarea.scrollTop;
+  
+  let selectedText = textarea.value.substring(start, end);
+  if (!selectedText) selectedText = sampleText;
+  
+  // Remove trailing space if exists
+  if (selectedText.endsWith(' ')) {
+    selectedText = selectedText.slice(0, -1);
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    textarea.value = before + tagOpen + selectedText + tagClose + ' ' + after;
+  } else {
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    textarea.value = before + tagOpen + selectedText + tagClose + after;
+  }
+
+  // Restore scroll position
+  textarea.scrollTop = scrollTop;
+  
+  // Set selection
+  if (start === end) {
+    // No text was selected
+    const cursorPos = start + tagOpen.length;
+    textarea.setSelectionRange(cursorPos, cursorPos + sampleText.length);
+  } else {
+    // Text was selected
+    const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+  }
+  
+  textarea.focus();
+  return false;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  const toolbar = document.querySelector('.toolbar-wrapper');
+  if (!toolbar) return;
+
+  let lastScroll = window.scrollY;
+  
+  function handleScroll() {
+    const currentScroll = window.scrollY;
+    
+    // Add shadow when scrolled
+    if (currentScroll > 0) {
+      toolbar.classList.add('is-sticky');
+    } else {
+      toolbar.classList.remove('is-sticky');
+    }
+    
+    lastScroll = currentScroll;
+  }
+
+  // Use passive listener for better scroll performance
+  window.addEventListener('scroll', handleScroll, { passive: true });
+});
 </script>
 %end;
 %( Popover functions for anc/destables %)
@@ -516,5 +580,22 @@ const inputToBook = {
   }
 };
 %end;
+</script>
+%end;
+
+%if;(e.m="NOTES" or e.m="WIZNOTES")
+<script>
+// Table of contents toggle
+$(document).ready(function() {
+  var toggleText = function() {
+    return $('#toc-content').is(':hidden')
+      ? '([visualize/show/hide/summary]1)'
+      : '([visualize/show/hide/summary]2)';
+  };
+  $('.toc-toggle').on('click', function() {
+    $('#toc-content').toggle();
+    $('.toc-toggle').text(toggleText());
+  });
+});
 </script>
 %end;
