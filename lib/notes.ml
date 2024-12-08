@@ -216,11 +216,11 @@ let commit_notes conf base fnotes s =
       [ Util.bpath conf.bname; base_notes_dir base; fname ]
   in
   File.create_dir ~parent:true (Filename.dirname fpath);
-  try Gwdb.commit_notes base fname s
-  with Sys_error m ->
-    Hutil.incorrect_request conf ~comment:("explication todo: " ^ m);
-    History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-    update_notes_links_db base pg s
+  (try Gwdb.commit_notes base fname s
+   with Sys_error m ->
+     Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
+  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
+  update_notes_links_db base pg s
 
 let wiki_aux pp conf base env str =
   let s = Util.string_with_macros conf env str in
