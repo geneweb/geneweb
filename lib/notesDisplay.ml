@@ -310,12 +310,13 @@ let print conf base =
   | Some "on" -> print_what_links conf base fnotes
   | _ -> (
       let nenv, s = read_notes base fnotes in
+      let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
       let templ, typ =
-        try
-          let typ = List.assoc "TYPE" nenv in
-          let fname = "notes_" ^ typ in
-          (Util.open_etc_file conf fname, typ)
-        with Not_found -> (None, "")
+        if typ = "" then (None, "")
+        else if typ = "gallery" then
+          try (Util.open_etc_file conf "notes_gallery", typ)
+          with Not_found -> (None, "")
+        else (None, "")
       in
       match templ with
       | Some (ic, _fname) -> (
@@ -348,8 +349,10 @@ let print_mod conf base =
   let env, s = read_notes base fnotes in
   let typ = try List.assoc "TYPE" env with Not_found -> "" in
   let templ =
-    let fname = "notes_upd_" ^ typ in
-    Util.open_etc_file conf fname
+    if typ = "" then None
+    else if typ = "gallery" then
+      Util.open_etc_file conf ("notes_upd_" ^ typ)
+    else None
   in
   let title _ =
     Output.printf conf "%s - %s%s"
