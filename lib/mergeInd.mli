@@ -4,11 +4,7 @@ exception Different_sexes of Gwdb.person * Gwdb.person
 
 (* TODOOCP *)
 val reparent_ind :
-  Gwdb.base ->
-  (CheckItem.base_warning -> unit) ->
-  Gwdb.iper ->
-  Gwdb.iper ->
-  unit
+  Gwdb.base -> (Warning.base_warning -> unit) -> Gwdb.iper -> Gwdb.iper -> unit
 
 val merge :
   Config.config ->
@@ -29,7 +25,7 @@ val merge :
   Gwdb.person ->
   Gwdb.person ->
   unit) ->
-  bool * CheckItem.base_warning list
+  bool * Warning.base_warning list
 
 val kill_ancestors :
   Config.config ->

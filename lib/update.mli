@@ -82,15 +82,11 @@ val prerr : config -> update_error -> (unit -> unit) -> 'a
 
 val string_of_error : config -> update_error -> Adef.safe_string
 val print_error : config -> update_error -> unit
-val print_warnings : config -> base -> CheckItem.base_warning list -> unit
-val print_miscs : config -> base -> CheckItem.base_misc list -> unit
+val print_warnings : config -> base -> Warning.base_warning list -> unit
+val print_miscs : config -> base -> Warning.base_misc list -> unit
 
 val print_warnings_and_miscs :
-  config ->
-  base ->
-  CheckItem.base_warning list ->
-  CheckItem.base_misc list ->
-  unit
+  config -> base -> Warning.base_warning list -> Warning.base_misc list -> unit
 
 val def_error : config -> base -> person Def.error -> unit
 val error : config -> update_error -> 'exn
