@@ -65,3 +65,258 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
 
 (** Missing sources warning *)
 type ('person, 'descend, 'title) misc = MissingSources
+
+type base_warning =
+  ( Gwdb.iper,
+    Gwdb.person,
+    Gwdb.ifam,
+    Gwdb.family,
+    Gwdb.title,
+    (Gwdb.iper, Gwdb.istr) Def.gen_pers_event,
+    (Gwdb.iper, Gwdb.istr) Def.gen_fam_event )
+  warning
+(** Database specification warning *)
+
+type base_misc = (Gwdb.person, Gwdb.family, Gwdb.title) misc
+
+let int_of_warning_tag = function
+  | PossibleDuplicateFam (_f1, _f2) -> 0
+  | PossibleDuplicateFamHomonymous (_f1, _f2, _p) -> 1
+  | BigAgeBetweenSpouses (_p1, _p2, _d) -> 2
+  | BirthAfterDeath _ -> 3
+  | IncoherentSex (_p, _s1, _s2) -> 4
+  | ChangedOrderOfChildren (_ifam, _fam, _ipers1, _ipers2) -> 5
+  | ChangedOrderOfMarriages (_p, _ifams, _ifams2) -> 6
+  | ChangedOrderOfFamilyEvents (_ifam, _fevents, _fevents2) -> 7
+  | ChangedOrderOfPersonEvents (_p, _pevents, _pevents2) -> 8
+  | ChildrenNotInOrder (ifam, fam, p1, p2) -> 9
+  | CloseChildren (ifam, p1, p2) -> 10
+  | DeadOld (_p, _d) -> 11
+  | DeadTooEarlyToBeFather (_p1, _p2) -> 12
+  | DistantChildren (_ifam, _p1, _p2) -> 13
+  | FEventOrder (_p, _fevent, _fevent2) -> 14
+  | FWitnessEventAfterDeath (_p, _fevent, _ifam) -> 15
+  | FWitnessEventBeforeBirth (_p, _fevent, _ifam) -> 16
+  | IncoherentAncestorDate (_p1, _p2) -> 17
+  | MarriageDateAfterDeath _p -> 18
+  | MarriageDateBeforeBirth _p -> 19
+  | MotherDeadBeforeChildBirth (_p1, _p2) -> 20
+  | ParentBornAfterChild (_p1, _p2) -> 21
+  | ParentTooOld (_p1, _d, _p2) -> 22
+  | ParentTooYoung (_p1, _d, _p2) -> 23
+  | PEventOrder (_p, _pevent1, _pevent2) -> 24
+  | PWitnessEventAfterDeath (_p1, _pevent, _p2) -> 25
+  | PWitnessEventBeforeBirth (_p1, _pevent, _p2) -> 26
+  | TitleDatesError (_p, _title) -> 27
+  | UndefinedSex _p -> 28
+  | YoungForMarriage (_p, _d, _ifam) -> 29
+  | OldForMarriage (_p, _d, _ifam) -> 30
+
+let normalize_warning (warning : base_warning) : base_warning =
+  match warning with
+  | PossibleDuplicateFam (f1, f2) ->
+      if Gwdb.compare_ifam f2 f1 < 0 then PossibleDuplicateFam (f2, f1)
+      else warning
+  | PossibleDuplicateFamHomonymous (f1, f2, p) ->
+      if Gwdb.compare_ifam f2 f1 < 0 then
+        PossibleDuplicateFamHomonymous (f2, f1, p)
+      else warning
+  | BigAgeBetweenSpouses (p1, p2, d) ->
+      if Gwdb.compare_iper (Gwdb.get_iper p2) (Gwdb.get_iper p1) < 0 then
+        BigAgeBetweenSpouses (p2, p1, d)
+      else warning
+  | BirthAfterDeath _ -> warning
+  | IncoherentSex (p, s1, s2) ->
+      if s2 < s1 then IncoherentSex (p, s2, s1) else warning
+  | ChangedOrderOfChildren (_ifam, _fam, _ipers1, _ipers2) -> warning
+  | ChangedOrderOfMarriages (_p, _ifams, _ifams2) -> warning
+  | ChangedOrderOfFamilyEvents (_ifam, _fevents, _fevents2) -> warning
+  | ChangedOrderOfPersonEvents (_p, _pevents, _pevents2) -> warning
+  | ChildrenNotInOrder (_ifam, _fam, _p1, _p2) -> warning
+  | CloseChildren (ifam, p1, p2) ->
+      if Gwdb.compare_iper (Gwdb.get_iper p2) (Gwdb.get_iper p1) < 0 then
+        CloseChildren (ifam, p2, p1)
+      else warning
+  | DeadOld (_p, _d) -> warning
+  | DeadTooEarlyToBeFather (_p1, _p2) -> warning
+  | DistantChildren (_ifam, _p1, _p2) -> warning
+  | FEventOrder (_p, _fevent, _fevent2) -> warning
+  | FWitnessEventAfterDeath (_p, _fevent, _ifam) -> warning
+  | FWitnessEventBeforeBirth (_p, _fevent, _ifam) -> warning
+  | IncoherentAncestorDate (_p1, _p2) -> warning
+  | MarriageDateAfterDeath _p -> warning
+  | MarriageDateBeforeBirth _p -> warning
+  | MotherDeadBeforeChildBirth (_p1, _p2) -> warning
+  | ParentBornAfterChild (_p1, _p2) -> warning
+  | ParentTooOld (_p1, _d, _p2) -> warning
+  | ParentTooYoung (_p1, _d, _p2) -> warning
+  | PEventOrder (_p, _pevent1, _pevent2) -> warning
+  | PWitnessEventAfterDeath (_p1, _pevent, _p2) -> warning
+  | PWitnessEventBeforeBirth (_p1, _pevent, _p2) -> warning
+  | TitleDatesError (_p, _title) -> warning
+  | UndefinedSex _p -> warning
+  | YoungForMarriage (_p, _d, _ifam) -> warning
+  | OldForMarriage (_p, _d, _ifam) -> warning
+
+let compare_array cmp arr1 arr2 =
+  let module M = struct
+    exception Stop of int
+  end in
+  let len1 = Array.length arr1 in
+  let len2 = Array.length arr2 in
+  if len1 = len2 then
+    try
+      Array.iter2
+        (fun v1 v2 ->
+          let c = cmp v1 v2 in
+          if c <> 0 then raise (M.Stop c))
+        arr1 arr2;
+      0
+    with M.Stop c -> c
+  else len1 - len2
+
+let first_name base p = Name.strip_lower (Gwdb.sou base (Gwdb.get_first_name p))
+let surname base p = Name.strip_lower (Gwdb.sou base (Gwdb.get_surname p))
+
+let hom_person base p1 p2 =
+  let fn1, sn1 = (first_name base p1, surname base p1) in
+  let fn2, sn2 = (first_name base p2, surname base p2) in
+  fn1 = fn2 && sn1 = sn2
+
+let hom_fam base f1 f2 =
+  let f1, f2 = (Gwdb.foi base f1, Gwdb.foi base f2) in
+  let fa1, mo1 =
+    (Gwdb.poi base (Gwdb.get_father f1), Gwdb.poi base (Gwdb.get_mother f1))
+  in
+  let fa2, mo2 =
+    (Gwdb.poi base (Gwdb.get_father f2), Gwdb.poi base (Gwdb.get_mother f2))
+  in
+  hom_person base fa1 fa2 && hom_person base mo1 mo2
+
+let compare_family f1 f2 =
+  Gwdb.compare_ifam (Gwdb.get_ifam f1) (Gwdb.get_ifam f2)
+
+let compare_person p1 p2 =
+  Gwdb.compare_iper (Gwdb.get_iper p1) (Gwdb.get_iper p2)
+
+let ( >>= ) i f = if i = 0 then f () else i
+
+let compare_gen_pers_event =
+  Def_ord.compare_gen_pers_event Gwdb.compare_iper Gwdb.compare_istr
+
+let compare_gen_fam_event =
+  Def_ord.compare_gen_fam_event Gwdb.compare_iper Gwdb.compare_istr
+
+let compare_gen_title = Def_ord.compare_gen_title Gwdb.compare_istr
+
+let compare_normalized_base_warning base (w1 : base_warning) (w2 : base_warning)
+    : int =
+  match (w1, w2) with
+  | PossibleDuplicateFam (f1, f2), PossibleDuplicateFam (f1', f2') ->
+      Gwdb.compare_ifam f1 f1' >>= fun () -> Gwdb.compare_ifam f2 f2'
+  | ( PossibleDuplicateFamHomonymous (f1, f2, _),
+      PossibleDuplicateFamHomonymous (f1', f2', _) ) ->
+      if
+        (hom_fam base f1 f1' && hom_fam base f2 f2')
+        || (hom_fam base f1 f2' && hom_fam base f2 f1')
+      then 0
+      else Gwdb.compare_ifam f1 f1' >>= fun () -> Gwdb.compare_ifam f2 f2'
+  | BigAgeBetweenSpouses (p1, p2, d), BigAgeBetweenSpouses (p1', p2', d') ->
+      compare_person p1 p1' >>= fun () ->
+      compare_person p2 p2' >>= fun () -> Date.compare_dmy d d'
+  | BirthAfterDeath p, BirthAfterDeath p' -> compare_person p p'
+  | IncoherentSex (p, s1, s2), IncoherentSex (p', s1', s2') ->
+      compare_person p p' >>= fun () ->
+      s1 - s2 >>= fun () -> s1' - s2'
+  | ( ChangedOrderOfChildren (ifam, fam, ipers1, ipers2),
+      ChangedOrderOfChildren (ifam', fam', ipers1', ipers2') ) ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () ->
+      compare_family fam fam' >>= fun () ->
+      compare_array Gwdb.compare_iper ipers1 ipers1' >>= fun () ->
+      compare_array Gwdb.compare_iper ipers2 ipers2'
+  | ( ChangedOrderOfMarriages (p, ifams, ifams2),
+      ChangedOrderOfMarriages (p', ifams', ifams2') ) ->
+      compare_person p p' >>= fun () ->
+      compare_array Gwdb.compare_ifam ifams ifams' >>= fun () ->
+      compare_array Gwdb.compare_ifam ifams2 ifams2'
+  | ( ChangedOrderOfFamilyEvents (ifam, fevents, fevents2),
+      ChangedOrderOfFamilyEvents (ifam', fevents', fevents2') ) ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () ->
+      Ext_list.compare compare_gen_fam_event fevents fevents' >>= fun () ->
+      Ext_list.compare compare_gen_fam_event fevents2 fevents2'
+  | ( ChangedOrderOfPersonEvents (p, pevents, pevents2),
+      ChangedOrderOfPersonEvents (p', pevents', pevents2') ) ->
+      compare_person p p' >>= fun () ->
+      Ext_list.compare compare_gen_pers_event pevents pevents' >>= fun () ->
+      Ext_list.compare compare_gen_pers_event pevents2 pevents2'
+  | ( ChildrenNotInOrder (ifam, fam, p1, p2),
+      ChildrenNotInOrder (ifam', fam', p1', p2') ) ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () ->
+      compare_family fam fam' >>= fun () ->
+      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | CloseChildren (ifam, p1, p2), CloseChildren (ifam', p1', p2') ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () ->
+      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | DeadOld (p, d), DeadOld (p', d') ->
+      compare_person p p' >>= fun () -> Date.compare_dmy d d'
+  | DeadTooEarlyToBeFather (p1, p2), DeadTooEarlyToBeFather (p1', p2') ->
+      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | DistantChildren (ifam, p1, p2), DistantChildren (ifam', p1', p2') ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () ->
+      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | FEventOrder (p, fevent, fevent2), FEventOrder (p', fevent', fevent2') ->
+      compare_person p p' >>= fun () ->
+      compare_gen_fam_event fevent fevent' >>= fun () ->
+      compare_gen_fam_event fevent2 fevent2'
+  | ( FWitnessEventAfterDeath (p, fevent, ifam),
+      FWitnessEventAfterDeath (p', fevent', ifam') ) ->
+      compare_person p p' >>= fun () ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () ->
+      compare_gen_fam_event fevent fevent'
+  | ( FWitnessEventBeforeBirth (p, fevent, ifam),
+      FWitnessEventBeforeBirth (p', fevent', ifam') ) ->
+      compare_person p p' >>= fun () ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () ->
+      compare_gen_fam_event fevent fevent'
+  | IncoherentAncestorDate (p1, p2), IncoherentAncestorDate (p1', p2') ->
+      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | MarriageDateAfterDeath p, MarriageDateAfterDeath p' -> compare_person p p'
+  | MarriageDateBeforeBirth p, MarriageDateBeforeBirth p' -> compare_person p p'
+  | MotherDeadBeforeChildBirth (p1, p2), MotherDeadBeforeChildBirth (p1', p2')
+    ->
+      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | ParentBornAfterChild (p1, p2), ParentBornAfterChild (p1', p2') ->
+      compare_person p1 p1' >>= fun () -> compare_person p2 p2'
+  | ParentTooOld (p1, d, p2), ParentTooOld (p1', d', p2') ->
+      compare_person p1 p1' >>= fun () ->
+      compare_person p2 p2' >>= fun () -> Date.compare_dmy d d'
+  | ParentTooYoung (p1, d, p2), ParentTooYoung (p1', d', p2') ->
+      compare_person p1 p1' >>= fun () ->
+      compare_person p2 p2' >>= fun () -> Date.compare_dmy d d'
+  | PEventOrder (p, pevent1, pevent2), PEventOrder (p', pevent1', pevent2') ->
+      compare_person p p' >>= fun () ->
+      compare_gen_pers_event pevent1 pevent1' >>= fun () ->
+      compare_gen_pers_event pevent2 pevent2'
+  | ( PWitnessEventAfterDeath (p1, pevent, p2),
+      PWitnessEventAfterDeath (p1', pevent', p2') ) ->
+      compare_person p1 p1' >>= fun () ->
+      compare_person p2 p2' >>= fun () -> compare_gen_pers_event pevent pevent'
+  | ( PWitnessEventBeforeBirth (p1, pevent, p2),
+      PWitnessEventBeforeBirth (p1', pevent', p2') ) ->
+      compare_person p1 p1' >>= fun () ->
+      compare_person p2 p2' >>= fun () -> compare_gen_pers_event pevent pevent'
+  | TitleDatesError (p, title), TitleDatesError (p', title') ->
+      compare_person p p' >>= fun () -> compare_gen_title title title'
+  | UndefinedSex p, UndefinedSex p' -> compare_person p p'
+  | YoungForMarriage (p, d, ifam), YoungForMarriage (p', d', ifam') ->
+      compare_person p p' >>= fun () ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () -> Date.compare_dmy d d'
+  | OldForMarriage (p, d, ifam), OldForMarriage (p', d', ifam') ->
+      compare_person p p' >>= fun () ->
+      Gwdb.compare_ifam ifam ifam' >>= fun () -> Date.compare_dmy d d'
+  | _ -> assert false (* should not happen *)
+
+let compare_base_warning base w1 w2 =
+  Int.compare (int_of_warning_tag w1) (int_of_warning_tag w2) >>= fun () ->
+  compare_normalized_base_warning base (normalize_warning w1)
+    (normalize_warning w2)

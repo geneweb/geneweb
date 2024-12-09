@@ -3,18 +3,6 @@ open Gwdb
 
 type base_error = person error
 
-type base_warning =
-  ( iper,
-    person,
-    ifam,
-    family,
-    title,
-    (iper, istr) Def.gen_pers_event,
-    (iper, istr) Def.gen_fam_event )
-  Warning.warning
-
-type base_misc = (person, family, title) Warning.misc
-
 (* Constants used for computing the warnings. *)
 let max_age_btw_cpl = 50
 let max_days_btw_sibl = 10
@@ -505,8 +493,8 @@ let check_order_pevents warning p =
   loop events
 
 (* TODO refacto in a check_witness_fpevents *)
-let check_witness_pevents_aux (warning : base_warning -> unit) origin evt date
-    birth_opt death_opt p witness_kind =
+let check_witness_pevents_aux (warning : Warning.base_warning -> unit) origin
+    evt date birth_opt death_opt p witness_kind =
   match birth_opt with
   | Some d when strictly_before_dmy date d ->
       warning
@@ -525,7 +513,7 @@ let check_witness_pevents_aux (warning : base_warning -> unit) origin evt date
                    (p, gen_pevent_of_pers_event evt, origin)))
       | Some _ | None -> ())
 
-let check_witness_pevents base (warning : base_warning -> unit) origin =
+let check_witness_pevents base (warning : Warning.base_warning -> unit) origin =
   List.iter
     (fun evt ->
       match Date.cdate_to_dmy_opt (get_pevent_date evt) with
@@ -541,8 +529,8 @@ let check_witness_pevents base (warning : base_warning -> unit) origin =
             (get_pevent_witnesses evt))
     (get_pevents origin)
 
-let check_witness_fevents_aux (warning : base_warning -> unit) fam evt date
-    birth_opt death_opt p witness_kind =
+let check_witness_fevents_aux (warning : Warning.base_warning -> unit) fam evt
+    date birth_opt death_opt p witness_kind =
   match birth_opt with
   | Some d when strictly_before_dmy date d ->
       warning
@@ -561,7 +549,7 @@ let check_witness_fevents_aux (warning : base_warning -> unit) fam evt date
                    (p, gen_fevent_of_fam_event evt, get_ifam fam)))
       | Some _ | None -> ())
 
-let check_witness_fevents base (warning : base_warning -> unit) fam =
+let check_witness_fevents base (warning : Warning.base_warning -> unit) fam =
   List.iter
     (fun evt ->
       match Date.cdate_to_dmy_opt (get_fevent_date evt) with
@@ -603,7 +591,8 @@ let witness_kind_of_witness_array iper witnesses =
     Some kind
   else None
 
-let check_person_dates_as_witness base (warning : base_warning -> unit) p =
+let check_person_dates_as_witness base (warning : Warning.base_warning -> unit)
+    p =
   let ip = get_iper p in
   let aux date w1 w2 evt =
     match Date.od_of_cdate (date evt) with
@@ -698,7 +687,7 @@ let check_person_dates_as_witness base (warning : base_warning -> unit) p =
             evt)
     related_pers
 
-let check_pevents base (warning : base_warning -> unit) p =
+let check_pevents base (warning : Warning.base_warning -> unit) p =
   (* check order of events *)
   check_order_pevents warning p;
   (* check person's witnesses *)
@@ -906,7 +895,7 @@ let changed_fevents_order warning (ifam, fam) =
 
 (* main *)
 
-let person ?(onchange = true) base (warning : base_warning -> unit) p =
+let person ?(onchange = true) base (warning : Warning.base_warning -> unit) p =
   (* check personal events *)
   check_pevents base warning p;
   (* check person's age *)
@@ -917,7 +906,8 @@ let person ?(onchange = true) base (warning : base_warning -> unit) p =
   if onchange then changed_pevents_order warning p;
   related_sex_is_coherent base warning p
 
-let family ?(onchange = true) base (warning : base_warning -> unit) ifam fam =
+let family ?(onchange = true) base (warning : Warning.base_warning -> unit) ifam
+    fam =
   let fath = poi base @@ get_father fam in
   let moth = poi base @@ get_mother fam in
   (* check family's witnesses *)
@@ -1037,102 +1027,9 @@ let on_person_update base warning p =
     [Rem] : Exporté en clair hors de ce module.                              *)
 let check_other_fields base misc ifam fam = check_sources base misc ifam fam
 
-let first_name base p = Name.strip_lower @@ sou base @@ get_first_name p
-let surname base p = Name.strip_lower @@ sou base @@ get_surname p
-
-let hom_person base p1 p2 =
-  let fn1, sn1 = (first_name base p1, surname base p1) in
-  let fn2, sn2 = (first_name base p2, surname base p2) in
-  fn1 = fn2 && sn1 = sn2
-
-let hom_fam base f1 f2 =
-  let f1, f2 = (foi base f1, foi base f2) in
-  let fa1, mo1 = (poi base @@ get_father f1, poi base @@ get_mother f1) in
-  let fa2, mo2 = (poi base @@ get_father f2, poi base @@ get_mother f2) in
-  hom_person base fa1 fa2 && hom_person base mo1 mo2
-
 let eq_person p1 p2 = eq_iper (get_iper p1) (get_iper p2)
 let eq_family f1 f2 = eq_ifam (get_ifam f1) (get_ifam f2)
-
-let eq_warning base w1 w2 =
-  match (w1, w2) with
-  | ( Warning.PossibleDuplicateFam (f1, f2),
-      Warning.PossibleDuplicateFam (f1', f2') ) ->
-      (eq_ifam f1 f1' && eq_ifam f2 f2') || (eq_ifam f1 f2' && eq_ifam f2 f1')
-  | ( PossibleDuplicateFamHomonymous (f1, f2, _),
-      PossibleDuplicateFamHomonymous (f1', f2', _) ) ->
-      (hom_fam base f1 f1' && hom_fam base f2 f2')
-      || (hom_fam base f1 f2' && hom_fam base f2 f1')
-  | BigAgeBetweenSpouses (p1, p2, d), BigAgeBetweenSpouses (p1', p2', d') ->
-      ((eq_person p1 p1' && eq_person p2 p2')
-      || (eq_person p1 p2' && eq_person p2 p1'))
-      && d = d'
-  | BirthAfterDeath p, BirthAfterDeath p' -> eq_person p p'
-  | IncoherentSex (p, s1, s2), IncoherentSex (p', s1', s2') ->
-      eq_person p p' && ((s1 = s1' && s2 = s2') || (s1 = s2' && s2 = s1'))
-  | ( ChangedOrderOfChildren (ifam, fam, ipers1, ipers2),
-      ChangedOrderOfChildren (ifam', fam', ipers1', ipers2') ) ->
-      eq_ifam ifam ifam' && eq_family fam fam' && ipers1 = ipers1'
-      && ipers2 = ipers2'
-  | ( ChangedOrderOfMarriages (p, ifams, ifams2),
-      ChangedOrderOfMarriages (p', ifams', ifams2') ) ->
-      eq_person p p' && ifams = ifams' && ifams2 = ifams2'
-  | ( ChangedOrderOfFamilyEvents (ifam, fevents, fevents2),
-      ChangedOrderOfFamilyEvents (ifam', fevents', fevents2') ) ->
-      eq_ifam ifam ifam' && fevents = fevents' && fevents2 = fevents2'
-  | ( ChangedOrderOfPersonEvents (p, pevents, pevents2),
-      ChangedOrderOfPersonEvents (p', pevents', pevents2') ) ->
-      eq_person p p' && pevents = pevents' && pevents2 = pevents2'
-  | ( ChildrenNotInOrder (ifam, fam, p1, p2),
-      ChildrenNotInOrder (ifam', fam', p1', p2') ) ->
-      eq_ifam ifam ifam' && eq_family fam fam' && eq_person p1 p1'
-      && eq_person p2 p2'
-  | CloseChildren (ifam, p1, p2), CloseChildren (ifam', p1', p2') ->
-      eq_ifam ifam ifam'
-      && ((eq_person p1 p1' && eq_person p2 p2')
-         || (eq_person p1 p2' && eq_person p2 p1'))
-  | DeadOld (p, d), DeadOld (p', d') -> eq_person p p' && d = d'
-  | DeadTooEarlyToBeFather (p1, p2), DeadTooEarlyToBeFather (p1', p2') ->
-      eq_person p1 p1' && eq_person p2 p2'
-  | DistantChildren (ifam, p1, p2), DistantChildren (ifam', p1', p2') ->
-      eq_ifam ifam ifam' && eq_person p1 p1' && eq_person p2 p2'
-  | FEventOrder (p, fevent, fevent2), FEventOrder (p', fevent', fevent2') ->
-      eq_person p p' && fevent = fevent' && fevent2 = fevent2'
-  | ( FWitnessEventAfterDeath (p, fevent, ifam),
-      FWitnessEventAfterDeath (p', fevent', ifam') ) ->
-      eq_person p p' && fevent = fevent' && eq_ifam ifam ifam'
-  | ( FWitnessEventBeforeBirth (p, fevent, ifam),
-      FWitnessEventBeforeBirth (p', fevent', ifam') ) ->
-      eq_person p p' && fevent = fevent' && eq_ifam ifam ifam'
-  | IncoherentAncestorDate (p1, p2), IncoherentAncestorDate (p1', p2') ->
-      eq_person p1 p1' && eq_person p2 p2'
-  | MarriageDateAfterDeath p, MarriageDateAfterDeath p' -> eq_person p p'
-  | MarriageDateBeforeBirth p, MarriageDateBeforeBirth p' -> eq_person p p'
-  | MotherDeadBeforeChildBirth (p1, p2), MotherDeadBeforeChildBirth (p1', p2')
-    ->
-      eq_person p1 p1' && eq_person p2 p2'
-  | ParentBornAfterChild (p1, p2), ParentBornAfterChild (p1', p2') ->
-      eq_person p1 p1' && eq_person p2 p2'
-  | ParentTooOld (p1, d, p2), ParentTooOld (p1', d', p2') ->
-      eq_person p1 p1' && eq_person p2 p2' && d = d'
-  | ParentTooYoung (p1, d, p2), ParentTooYoung (p1', d', p2') ->
-      eq_person p1 p1' && eq_person p2 p2' && d = d'
-  | PEventOrder (p, pevent1, pevent2), PEventOrder (p', pevent1', pevent2') ->
-      eq_person p p' && pevent1 = pevent1' && pevent2 = pevent2'
-  | ( PWitnessEventAfterDeath (p1, pevent, p2),
-      PWitnessEventAfterDeath (p1', pevent', p2') ) ->
-      eq_person p1 p1' && eq_person p2 p2' && pevent = pevent'
-  | ( PWitnessEventBeforeBirth (p1, pevent, p2),
-      PWitnessEventBeforeBirth (p1', pevent', p2') ) ->
-      eq_person p1 p1' && eq_person p2 p2' && pevent = pevent'
-  | TitleDatesError (p, title), TitleDatesError (p', title') ->
-      eq_person p p' && title = title'
-  | UndefinedSex p, UndefinedSex p' -> eq_person p p'
-  | YoungForMarriage (p, d, ifam), YoungForMarriage (p', d', ifam') ->
-      eq_person p p' && d = d' && eq_ifam ifam ifam'
-  | OldForMarriage (p, d, ifam), OldForMarriage (p', d', ifam') ->
-      eq_person p p' && d = d' && eq_ifam ifam ifam'
-  | _ -> false
+let eq_warning base w1 w2 = Warning.compare_base_warning base w1 w2 = 0
 
 let person_warnings conf base p =
   let w = ref [] in

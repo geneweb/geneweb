@@ -429,7 +429,7 @@ let someone_strong_n_short_dates conf base p =
   (someone_strong base p :> Adef.safe_string)
   ^^^ DateDisplay.short_dates_text conf base p
 
-let print_warning conf base (w : CheckItem.base_warning) =
+let print_warning conf base (w : Warning.base_warning) =
   match w with
   | Warning.BigAgeBetweenSpouses (p1, p2, a) ->
       Output.printf conf
@@ -713,13 +713,13 @@ let print_warning conf base (w : CheckItem.base_warning) =
       Output.printf conf (ftransl conf "married at age %t") (fun _ ->
           (DateDisplay.string_of_age conf a :> string))
 
-let print_warnings conf base (wl : CheckItem.base_warning list) =
+let print_warnings conf base (wl : Warning.base_warning list) =
   print_list_aux conf base "warnings" wl @@ fun conf base wl ->
   (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
   (* levé par plusieurs fonctions différents selon le context.       *)
   let wl = List.sort_uniq compare wl in
   List.iter
-    (fun (w : CheckItem.base_warning) ->
+    (fun (w : Warning.base_warning) ->
       Output.print_sstring conf "<li>";
       print_warning conf base w;
       Output.print_sstring conf "</li>")
