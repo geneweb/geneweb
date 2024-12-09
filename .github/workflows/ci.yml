@@ -1,80 +1,144 @@
-name: build
+name: GeneWeb CI
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - master
+    paths-ignore:
+      - 'etc/**'
+      - 'hd/**'
+      - 'man/**'
+      - 'CONTRIBUTING.md'
+      - 'geneweb_colab.ipynb'
+      - 'ICHANGES'
+      - 'INSTALL'
+      - 'LICENSE'
+      - 'README.md'
+      - 'CHANGES'
+      - '.gitattributes'
+      - '.gitignore'
+      - '.git-blame-ignore-revs'
+      - '.ocamlformat'
+      - '.ocamlformat-ignore'
+      - 'geneweb.iss'
+      - 'geneweb.opam.template'
   push:
     branches:
       - master
+    paths-ignore:
+      - 'etc/**'
+      - 'hd/**'
+      - 'man/**'
+      - 'CONTRIBUTING.md'
+      - 'geneweb_colab.ipynb'
+      - 'ICHANGES'
+      - 'INSTALL'
+      - 'LICENSE'
+      - 'README.md'
+      - 'CHANGES'
+      - '.gitattributes'
+      - '.gitignore'
+      - '.git-blame-ignore-revs'
+      - '.ocamlformat'
+      - '.ocamlformat-ignore'
+      - 'geneweb.iss'
+      - 'geneweb.opam.template'
+
+env:
+  OPAMYES: true
+
 jobs:
-  build:
+  build_v2:
     runs-on: ${{ matrix.os }}
+    if: true
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - macos-13
-          - ubuntu-latest
-          - windows-latest
-        ocaml-compiler:
-          - 4.08.x
+        os: [ubuntu-20.04, macos-13, windows-latest]
+        ocaml-compiler: [4.08.1]
         include:
           - os: windows-latest
-            ocaml-compiler: 4.14.x
-          - os: ubuntu-latest
-            ocaml-compiler: 5.1.x
-          - os: macos-latest
-            ocaml-compiler: 5.1.x
+            ocaml-compiler: 4.14.2
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Cache Opam dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.opam
+          key: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-v2-${{ hashFiles('*.opam') }}-cache
+          restore-keys: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-v2-
+
       - name: Setup Ocaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-      - name: Setup GeneWeb dependencies + ocamlformat
-        run: |
-          opam pin add . -y --no-action
-          opam depext -y geneweb
-          opam install -y ./*.opam --deps-only --with-test
-          opam pin ocamlformat 0.24.1
-      - name: Make ocamlformat > build/distrib
+
+      - name: Install GeneWeb dependencies
+        run: opam install . --deps-only
+
+      - name: Build Geneweb distrib
         run: |
           opam exec -- ocaml ./configure.ml
-          opam exec -- make fmt distrib
-      - name: Make CI tests
-        run: opam exec -- make ci
+          opam exec -- make distrib
 
-  build_nnp:
+  build_v3:
     runs-on: ${{ matrix.os }}
+    if: true
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - macos-13
-        ocaml-compiler:
-          - ocaml-variants.4.14.2+options,ocaml-option-nnp
+        os: [ubuntu-24.04, macos-15]
+        ocaml-compiler: [4.14.2-nnp, 5.2.1]
+
+    env:
+      FMT_CI: ${{ startsWith(matrix.os, 'ubuntu') && matrix.ocaml-compiler < '5.2' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup OCaml ${{ matrix.ocaml-compiler }} with NNP
-        uses: ocaml/setup-ocaml@v2
+      - name: Cache Opam dependencies
+        uses: actions/cache@v3
         with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          path: ~/.opam
+          key: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI && 'with-test' || 'no-test' }}-v3-${{ hashFiles('*.opam') }}-cache
+          restore-keys: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI && 'with-test' || 'no-test' }}-v3
 
-      - name: Setup GeneWeb dependencies
-        run: |
-          opam install -y ancient calendars.1.0.0 camlp-streams camlp5 camlzip cppo dune jingoo markup ocamlformat.0.24.1 oUnit ppx_blob ppx_deriving ppx_import stdlib-shims syslog unidecode.0.2.0 uri uucp uutf uunf yojson
+      - name: Setup Ocaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler == '4.14.2-nnp' && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
 
-      - name: build/distrib
+      - name: Install GeneWeb dependencies
         run: |
-          opam exec -- ocaml ./configure.ml
-          opam exec -- make fmt distrib
+          if ${{ env.FMT_CI }}; then
+            opam install . --deps-only --with-test
+          else
+            opam install . --deps-only
+          fi
+
+      - name: Install ancient for NNP
+        if: contains(matrix.ocaml-compiler, 'nnp')
+        run: opam install ancient
+
+      - name: Configure
+        run: opam exec -- ocaml ./configure.ml --sosa-zarith
+
+      - name: Build distrib
+        env:
+          SKIP_BUILD: true
+        run: |
+          if ${{ env.FMT_CI }}; then
+            opam exec -- make fmt ci distrib
+          else
+            opam exec -- make build distrib
+          fi
 
       - name: Run gwd with cache-in-memory parameter and check output
+        if: contains(matrix.ocaml-compiler, 'nnp')
         run: |
           output=$(distribution/gw/gwd -cache-in-memory testing 2>&1)
           if echo "$output" | grep -q "Caching database testing in memory"; then
