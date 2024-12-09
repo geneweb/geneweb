@@ -33,6 +33,7 @@
     str
     unix
     wserver
+    caches
     %%%GWDB_PKG%%%
     %%%SOSA_PKG%%%
   )

@@ -1,0 +1,6 @@
+(library
+ (name caches)
+ (public_name geneweb.caches)
+ (wrapped false)
+ (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+ (modules caches))

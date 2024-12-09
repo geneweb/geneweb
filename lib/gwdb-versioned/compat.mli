@@ -708,7 +708,8 @@ module type Driver_S = sig
 
   val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
 
-  val sync : ?scratch:bool -> save_mem:bool -> base -> unit
+  val sync :
+    ?scratch:bool -> ?tasks:(unit -> unit) list -> save_mem:bool -> base -> unit
   (** [sync scratch base]
     Ensure that everything is synced on disk.
 
