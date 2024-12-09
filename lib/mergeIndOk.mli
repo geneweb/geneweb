@@ -17,7 +17,7 @@ val effective_mod_merge :
   (Gwdb.iper, Update.key, string) Def.gen_person ->
   (Config.config ->
   Gwdb.base ->
-  CheckItem.base_warning list ->
+  Warning.base_warning list ->
   (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person ->
   (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
   string ->
