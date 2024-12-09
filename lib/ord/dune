@@ -1,0 +1,8 @@
+(library
+ (name geneweb_def_ord)
+ (preprocess
+  (staged_pps ppx_import ppx_deriving.ord))
+ (public_name geneweb.def_ord)
+ (libraries geneweb_def geneweb_gwdb)
+ (modules def_ord)
+ (wrapped false))
