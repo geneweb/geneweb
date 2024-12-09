@@ -286,8 +286,11 @@ clean:
 
 ci: ## Run tests, skip known failures
 ci:
-	@ocaml ./configure.ml && $(MAKE) -s clean build && GENEWEB_CI=on dune runtest
-.PHONY: ci
+ifdef SKIP_BUILD
+	@GENEWEB_CI=on dune runtest
+else
+	@ocaml ./configure.ml && $(MAKE) -s build && GENEWEB_CI=on dune runtest
+endif
 
 ocp-indent: ## Run ocp-indent (inplace edition)
 ocp-indent:
