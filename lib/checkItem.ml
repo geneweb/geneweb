@@ -1032,7 +1032,10 @@ let eq_family f1 f2 = eq_ifam (get_ifam f1) (get_ifam f2)
 let eq_warning base w1 w2 = Warning.compare_base_warning base w1 w2 = 0
 
 let person_warnings conf base p =
-  let w = ref [] in
+  let module WarningSet = Warning.Gen_BaseWarningSet (struct
+    let base = base
+  end) in
+  let w = ref WarningSet.empty in
 
   let filter_close_children =
     let is_one_of_children p p1 p2 = eq_person p p1 || eq_person p p2 in
@@ -1051,11 +1054,8 @@ let person_warnings conf base p =
   in
 
   let filter x =
-    if
-      filter_close_children x
-      && (not (List.exists (eq_warning base x) !w))
-      && Util.auth_warning conf base x
-    then w := x :: !w
+    if filter_close_children x && Util.auth_warning conf base x then
+      w := WarningSet.add x !w
   in
   ignore @@ person base filter p;
   on_person_update base filter p;
@@ -1063,4 +1063,4 @@ let person_warnings conf base p =
     (fun ifam ->
       check_siblings ~onchange:false base filter (ifam, foi base ifam) ignore)
     (get_family p);
-  !w
+  WarningSet.elements !w
