@@ -84,3 +84,5 @@ val compare_base_warning : Gwdb.base -> base_warning -> base_warning -> int
 module Gen_BaseWarningSet (M : sig
   val base : Gwdb.base
 end) : Set.S with type elt = base_warning
+
+val handle_homonymous : Gwdb.base -> base_warning list -> base_warning list

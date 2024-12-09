@@ -175,23 +175,44 @@ let compare_array cmp arr1 arr2 =
     with M.Stop c -> c
   else len1 - len2
 
-let first_name base p = Name.strip_lower (Gwdb.sou base (Gwdb.get_first_name p))
-let surname base p = Name.strip_lower (Gwdb.sou base (Gwdb.get_surname p))
+type name_info = { first_name : string; surname : string }
+type couple_name_info = { father : name_info; mother : name_info }
 
-let hom_person base p1 p2 =
-  let fn1, sn1 = (first_name base p1, surname base p1) in
-  let fn2, sn2 = (first_name base p2, surname base p2) in
-  fn1 = fn2 && sn1 = sn2
+let name_info_of_person base p =
+  let first_name base p =
+    Name.strip_lower (Gwdb.sou base (Gwdb.get_first_name p))
+  in
+  let surname base p = Name.strip_lower (Gwdb.sou base (Gwdb.get_surname p)) in
+  { first_name = first_name base p; surname = surname base p }
 
-let hom_fam base f1 f2 =
-  let f1, f2 = (Gwdb.foi base f1, Gwdb.foi base f2) in
-  let fa1, mo1 =
-    (Gwdb.poi base (Gwdb.get_father f1), Gwdb.poi base (Gwdb.get_mother f1))
-  in
-  let fa2, mo2 =
-    (Gwdb.poi base (Gwdb.get_father f2), Gwdb.poi base (Gwdb.get_mother f2))
-  in
-  hom_person base fa1 fa2 && hom_person base mo1 mo2
+let couple_name_info_of_family base fam =
+  {
+    father = name_info_of_person base (Gwdb.poi base (Gwdb.get_father fam));
+    mother = name_info_of_person base (Gwdb.poi base (Gwdb.get_mother fam));
+  }
+
+module CoupleSet = Set.Make (struct
+  type t = couple_name_info
+
+  let compare = compare
+end)
+
+let rec handle_homonymous base cpl_set result ws =
+  match ws with
+  | (PossibleDuplicateFamHomonymous (ifam1, ifam2, _) as w) :: ws ->
+      let fam1 = Gwdb.foi base ifam1 in
+      let couple_name_info1 = couple_name_info_of_family base fam1 in
+      let cpl_set' = CoupleSet.add couple_name_info1 cpl_set in
+      let fam2 = Gwdb.foi base ifam2 in
+      let couple_name_info2 = couple_name_info_of_family base fam2 in
+      let cpl_set' = CoupleSet.add couple_name_info2 cpl_set' in
+      let result = if cpl_set' == cpl_set then result else w :: result in
+      handle_homonymous base cpl_set' result ws
+  | w :: ws -> handle_homonymous base cpl_set (w :: result) ws
+  | [] -> result
+
+let handle_homonymous base warnings =
+  handle_homonymous base CoupleSet.empty [] warnings
 
 let compare_family f1 f2 =
   Gwdb.compare_ifam (Gwdb.get_ifam f1) (Gwdb.get_ifam f2)
@@ -214,13 +235,10 @@ let compare_normalized_base_warning base (w1 : base_warning) (w2 : base_warning)
   match (w1, w2) with
   | PossibleDuplicateFam (f1, f2), PossibleDuplicateFam (f1', f2') ->
       Gwdb.compare_ifam f1 f1' >>= fun () -> Gwdb.compare_ifam f2 f2'
-  | ( PossibleDuplicateFamHomonymous (f1, f2, _),
-      PossibleDuplicateFamHomonymous (f1', f2', _) ) ->
-      if
-        (hom_fam base f1 f1' && hom_fam base f2 f2')
-        || (hom_fam base f1 f2' && hom_fam base f2 f1')
-      then 0
-      else Gwdb.compare_ifam f1 f1' >>= fun () -> Gwdb.compare_ifam f2 f2'
+  | ( PossibleDuplicateFamHomonymous (ifam1, ifam2, _),
+      PossibleDuplicateFamHomonymous (ifam1', ifam2', _) ) ->
+      Gwdb.compare_ifam ifam1 ifam1' >>= fun () ->
+      Gwdb.compare_ifam ifam2 ifam2'
   | BigAgeBetweenSpouses (p1, p2, d), BigAgeBetweenSpouses (p1', p2', d') ->
       compare_person p1 p1' >>= fun () ->
       compare_person p2 p2' >>= fun () -> Date.compare_dmy d d'

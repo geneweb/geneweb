@@ -1063,4 +1063,4 @@ let person_warnings conf base p =
     (fun ifam ->
       check_siblings ~onchange:false base filter (ifam, foi base ifam) ignore)
     (get_family p);
-  WarningSet.elements !w
+  Warning.handle_homonymous base (WarningSet.elements !w)
