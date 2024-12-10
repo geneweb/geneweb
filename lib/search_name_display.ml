@@ -267,7 +267,7 @@ let first_name_print_list conf base x1 xl liste =
       liste
   in
   let list = List.sort compare list in
-  Util.print_alphab_list conf
+  Util.print_alphabetically_indexed_list conf
     (fun (ord, _, _) -> first_char ord)
     (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl))
     list;
@@ -742,7 +742,7 @@ let print_family_alphabetic x conf base liste =
       Util.print_tips_relationship conf;
       (* Menu afficher par branche/ordre alphabetique *)
       print_alphabetic_to_branch conf x;
-      Util.print_alphab_list conf
+      Util.print_alphabetically_indexed_list conf
         (fun (p, _) -> first_char p)
         (print_elem conf base false)
         liste;
