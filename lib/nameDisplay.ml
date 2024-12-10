@@ -5,6 +5,13 @@ let hidden_surname_txt = Adef.safe "HIDDEN SN"
 let hidden_or_restricted_fullname_string conf =
   Adef.safe (Util.transl conf "masked person")
 
+let html_format_hidden_name hidden_name =
+  let open Adef in
+  "<span class=\"masked-person\">" ^<^ hidden_name ^>^ "</span>"
+
+let html_formatted_hidden_or_restricted_fullname_string conf =
+  html_format_hidden_name @@ hidden_or_restricted_fullname_string conf
+
 module NameVisibilityUtil : sig
   type t = Gwdb.person
   type name_visibility = HiddenName | RestrictedName | VisibleName of t
@@ -112,11 +119,16 @@ let fullname_str_of_person conf base person =
     ~conf ~base ~person
 
 let first_name_html_of_person conf base person =
-  map_person_name_visibility ~on_visible_name:first_name_html conf base person
+  map_person_name_visibility
+    ~on_hidden_name:(fun conf _ _ ->
+      html_formatted_hidden_or_restricted_fullname_string conf)
+    ~on_visible_name:first_name_html conf base person
 
 let fullname_html_of_person ?(p_surname = Gwdb.p_surname) conf base person =
-  map_person_name_visibility ~on_visible_name:(fullname_html ~p_surname) conf
-    base person
+  map_person_name_visibility
+    ~on_hidden_name:(fun conf _ _ ->
+      html_formatted_hidden_or_restricted_fullname_string conf)
+    ~on_visible_name:(fullname_html ~p_surname) conf base person
 
 let title_html_of_person conf base p t : Adef.safe_string =
   if List.assoc_opt "print_advanced_title" conf.Config.base_env = Some "yes"
