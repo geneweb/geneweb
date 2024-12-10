@@ -1,15 +1,59 @@
-open Geneweb
-open Gwdb
+let add b f l = if b then f :: l else l
 
-let aux txt
-    (fn :
-      ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> base -> unit)
-    ~v1 ~v2 base n cnt =
+let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
+    ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
+    ~invalid_utf8 ~key bname =
+  let v1 = !verbosity >= 1 in
+  let v2 = !verbosity >= 2 in
+  if not v1 then Mutil.verbose := false;
+  let fast = !fast in
+  let base = Gwdb.open_base bname in
+  let fix = ref 0 in
+  let nb_fam = Gwdb.nb_of_families base in
+  let nb_ind = Gwdb.nb_of_persons base in
+  if fast then (
+    Gwdb.load_strings_array base;
+    Gwdb.load_persons_array base);
+  let person_fixes = [] in
+  let family_fixes = [] in
+  let family_fixes =
+    add !f_parents Geneweb.Fixbase.fix_family_parents family_fixes
+  in
+  let family_fixes =
+    add !f_children Geneweb.Fixbase.fix_family_children family_fixes
+  in
+  let person_fixes =
+    add !p_parents Geneweb.Fixbase.fix_person_parents person_fixes
+  in
+  let person_fixes = add !p_NBDS Geneweb.Fixbase.fix_nbds person_fixes in
+  let person_fixes =
+    add !p_families Geneweb.Fixbase.fix_person_unions person_fixes
+  in
+  let person_fixes =
+    add !pevents_witnesses Geneweb.Fixbase.fix_person_events_witnesses
+      person_fixes
+  in
+  let family_fixes =
+    add !fevents_witnesses Geneweb.Fixbase.fix_family_events_witnesses
+      family_fixes
+  in
+  let family_fixes =
+    add !marriage_divorce Geneweb.Fixbase.fix_family_divorce family_fixes
+  in
+  let person_fixes =
+    add !invalid_utf8 Geneweb.Fixbase.fix_person_utf8_sequence person_fixes
+  in
+  let family_fixes =
+    add !invalid_utf8 Geneweb.Fixbase.fix_family_utf8_sequence family_fixes
+  in
+  let person_fixes =
+    add !key (Geneweb.Fixbase.fix_person_key base) person_fixes
+  in
+  let person_fixes = List.rev person_fixes in
+  let family_fixes = List.rev family_fixes in
+
   let i' = ref 0 in
-  if v1 then (
-    print_endline txt;
-    flush stdout;
-    ProgrBar.start ());
+  let cnt = ref 0 in
   let progress =
     if v2 then (fun i n ->
       ProgrBar.run i n;
@@ -23,69 +67,20 @@ let aux txt
         (fun s ->
           incr cnt;
           ProgrBar.suspend ();
-          print_endline @@ "\t" ^ Fixbase.string_of_patch base s;
+          print_endline @@ "\t" ^ Geneweb.Fixbase.string_of_patch base s;
           flush stdout;
-          ProgrBar.restart !i' n)
+          ProgrBar.restart !i' (nb_ind + nb_fam))
     else Some (fun _ -> incr cnt)
   in
-  fn ?report progress base;
-  if v1 then ProgrBar.finish ()
 
-let check_NBDS = aux "Check persons' NBDS" Fixbase.check_NBDS
-
-let check_families_parents =
-  aux "Check families' parents" Fixbase.check_families_parents
-
-let check_families_children =
-  aux "Check families' children" Fixbase.check_families_children
-
-let check_persons_parents =
-  aux "Check persons' parents" Fixbase.check_persons_parents
-
-let check_persons_families =
-  aux "Check persons' families" Fixbase.check_persons_families
-
-let check_pevents_witnesses =
-  aux "Check persons' events witnesses" Fixbase.check_pevents_witnesses
-
-let check_fevents_witnesses =
-  aux "Check family events witnesses" Fixbase.check_fevents_witnesses
-
-let fix_marriage_divorce =
-  aux "Fix families' marriage and divorce" Fixbase.fix_marriage_divorce
-
-let fix_utf8_sequence =
-  aux "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
-
-let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
-
-let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
-    ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key bname =
-  let v1 = !verbosity >= 1 in
-  let v2 = !verbosity >= 2 in
-  if not v1 then Mutil.verbose := false;
-  let fast = !fast in
-  let base = Gwdb.open_base bname in
-  let fix = ref 0 in
-  let nb_fam = nb_of_families base in
-  let nb_ind = nb_of_persons base in
+  if v1 then ProgrBar.start ();
+  fix :=
+    Geneweb.Fixbase.perform_fixes ~report ~progress ~base ~person_fixes
+      ~family_fixes;
+  if v1 then ProgrBar.finish ();
   if fast then (
-    load_strings_array base;
-    load_persons_array base);
-  if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
-  if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
-  if !p_parents then check_persons_parents ~v1 ~v2 base nb_ind fix;
-  if !p_NBDS then check_NBDS base ~v1 ~v2 nb_ind fix;
-  if !p_families then check_persons_families ~v1 ~v2 base nb_ind fix;
-  if !pevents_witnesses then check_pevents_witnesses ~v1 ~v2 base nb_ind fix;
-  if !fevents_witnesses then check_fevents_witnesses ~v1 ~v2 base nb_fam fix;
-  if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
-  if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
-  if !key then fix_key ~v1 ~v2 base nb_ind fix;
-  if fast then (
-    clear_strings_array base;
-    clear_persons_array base);
+    Gwdb.clear_strings_array base;
+    Gwdb.clear_persons_array base);
   if not !dry_run then (
     if !fix <> 0 then (
       Gwdb.commit_patches base;
@@ -98,7 +93,9 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     if v1 then (
       Printf.printf "Rebuilding the indexes..\n";
       flush stdout);
-    Gwdb.sync ~save_mem:false base;
+    Gwdb.sync ~save_mem:false
+      ~tasks:[ (fun () -> Caches.write_caches base) ]
+      base;
     if v1 then (
       Printf.printf "Done";
       flush stdout))
@@ -129,7 +126,7 @@ let speclist =
     ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
     ("-families-parents", Arg.Set f_parents, " missing doc");
     ("-families-children", Arg.Set f_children, " missing doc");
-    ("-persons-NBDS", Arg.Set p_parents, " missing doc");
+    ("-persons-NBDS", Arg.Set p_NBDS, " missing doc");
     ("-persons-parents", Arg.Set p_parents, " missing doc");
     ("-persons-families", Arg.Set p_families, " missing doc");
     ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc");
@@ -173,4 +170,4 @@ let main () =
     ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
     ~invalid_utf8 ~key !bname
 
-let _ = main ()
+let () = main ()

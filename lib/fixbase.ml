@@ -79,7 +79,7 @@ let of_pevent e = (e.epers_date, e.epers_place, e.epers_note, e.epers_src)
 let find_pevent names pevents =
   List.find_opt (fun x -> List.mem x.epers_name names) pevents
 
-let fix_pevents ?report base pp =
+let fix_pevents ~report base pp =
   (* Should it use UpdateIndOk.reconstitute_from_pevents? *)
   (* TODO clean up *)
   let p = gen_person_of_person pp in
@@ -201,334 +201,341 @@ let fix_pevents ?report base pp =
       pevents;
     }
   in
-  if p <> p' then (
-    patch_person base p.key_index p';
-    match report with Some fn -> fn (Fix_NBDS p.key_index) | None -> ())
-
-let check_NBDS ?report progress base =
-  let nb_ind = nb_of_persons base in
-  Gwdb.Collection.iteri
-    (fun i p ->
-      progress i nb_ind;
-      fix_pevents ?report base p)
-    (Gwdb.persons base)
-
-let check_families_parents ?report progress base =
-  let nb_fam = nb_of_families base in
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      progress i nb_fam;
-      let ifam = get_ifam fam in
-      Array.iter
-        (fun ip ->
-          let unions = get_family (poi base ip) in
-          if not @@ Array.mem ifam unions then (
-            patch_union base ip { family = Array.append unions [| ifam |] };
-            match report with Some fn -> fn (Fix_AddedUnion ip) | None -> ()))
-        (get_parent_array fam))
-    (Gwdb.families base)
-
-let check_families_children ?report progress base =
-  let nb_fam = nb_of_families base in
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      let ifam = get_ifam fam in
-      progress i nb_fam;
-      let children = get_children fam in
-      for j = 0 to Array.length children - 1 do
-        let ip = children.(j) in
-        let a = poi base ip in
-        let parents = get_parents a in
-        if parents = Some dummy_ifam || parents = None then (
-          patch_ascend base ip { parents = Some ifam; consang = get_consang a };
-          match report with Some fn -> fn (Fix_AddedParents ip) | None -> ())
-        (* else if parents <> Some ifam && verbosity1 then begin
-         *   (\* FIXME: what to do here ? *\)
-         *   Printf.printf "\tbad parents : %s\n" (string_of_p base ip);
-         *   flush stdout
-         * end *)
-      done)
-    (Gwdb.families base)
-
-let check_persons_parents ?report progress base =
-  let nb_ind = nb_of_persons base in
-  Gwdb.Collection.iteri
-    (fun i p ->
-      progress i nb_ind;
-      get_parents p
-      |> Option.iter @@ fun ifam ->
-         let ip = get_iper p in
-         let fam = Gwdb.foi base ifam in
-         if get_ifam fam = dummy_ifam then (
-           patch_ascend base ip { parents = None; consang = Adef.no_consang };
-           match report with Some fn -> fn (Fix_ParentDeleted ip) | None -> ())
-         else
-           let children = get_children fam in
-           if not @@ Array.mem ip children then (
-             let children = Array.append children [| ip |] in
-             patch_descend base ifam { children };
-             match report with
-             | Some fn -> fn (Fix_AddedChild ifam)
-             | None -> ()))
-    (Gwdb.persons base)
-
-let check_persons_families ?report progress base =
-  let nb_ind = nb_of_persons base in
-  Gwdb.Collection.iteri
-    (fun i p ->
-      progress i nb_ind;
-      let ip = get_iper p in
-      let ifams = get_family p in
-      let ifams' =
-        Array.of_list
-        @@ Array.fold_right
-             (fun ifam acc ->
-               let cpl = foi base ifam in
-               if List.mem ifam acc then
-                 match report with
-                 | Some fn ->
-                     fn (Fix_RemovedDuplicateUnion (ip, ifam));
-                     acc
-                 | None -> acc
-               else if not @@ Array.mem ip (get_parent_array cpl) then
-                 match report with
-                 | Some fn ->
-                     fn (Fix_RemovedUnion (ip, ifam));
-                     acc
-                 | None -> acc
-               else ifam :: acc)
-             ifams []
-      in
-      if ifams' <> ifams then patch_union base ip { family = ifams' })
-    (Gwdb.persons base)
-
-let check_pevents_witnesses ?report progress base =
-  let nb_ind = nb_of_persons base in
-  Gwdb.Collection.iteri
-    (fun i p ->
-      progress i nb_ind;
-      let ip = get_iper p in
-      List.iter
-        (fun evt ->
-          let witn = Array.map fst (get_pevent_witnesses evt) in
-          for j = 0 to Array.length witn - 1 do
-            let ip2 = witn.(j) in
-            let p2 = poi base ip2 in
-            if not (List.memq ip (get_related p2)) then (
-              patch_person base ip2
-                {
-                  (gen_person_of_person p2) with
-                  related = ip :: get_related p2;
-                };
-              match report with
-              | Some fn -> fn (Fix_AddedRelatedFromPevent (ip2, ip))
-              | None -> ())
-          done)
-        (get_pevents p))
-    (Gwdb.persons base)
-
-let check_fevents_witnesses ?report progress base =
-  let nb_fam = nb_of_families base in
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      progress i nb_fam;
-      let ifath = get_father fam in
-      List.iter
-        (fun evt ->
-          let witn = Array.map fst (get_fevent_witnesses evt) in
-          for j = 0 to Array.length witn - 1 do
-            let ip = witn.(j) in
-            let p = poi base ip in
-            if not (List.memq ifath (get_related p)) then (
-              patch_person base ip
-                {
-                  (gen_person_of_person p) with
-                  related = ifath :: get_related p;
-                };
-              match report with
-              | Some fn -> fn (Fix_AddedRelatedFromFevent (ip, ifath))
-              | None -> ())
-          done)
-        (get_fevents fam))
-    (Gwdb.families base)
-
-let fix_marriage_divorce ?report progress base =
-  let nb_fam = nb_of_families base in
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      progress i nb_fam;
-      let fevents = List.map gen_fevent_of_fam_event (get_fevents fam) in
-      let relation0 = get_relation fam in
-      let marriage0 = get_marriage fam in
-      let marriage_place0 = get_marriage_place fam in
-      let marriage_note0 = get_marriage_note fam in
-      let marriage_src0 = get_marriage_src fam in
-      let divorce0 = get_divorce fam in
-      let marr_data0 =
-        (relation0, marriage0, marriage_place0, marriage_note0, marriage_src0)
-      in
-      let ( ((relation, marriage, marriage_place, marriage_note, marriage_src)
-            as marr_data),
-            divorce,
-            _ ) =
-        UpdateFamOk.reconstitute_from_fevents false (insert_string base "")
-          fevents
-      in
-      if marr_data0 <> marr_data || divorce0 <> divorce then (
-        let fam' =
-          {
-            (gen_family_of_family fam) with
-            relation;
-            marriage;
-            marriage_place;
-            marriage_note;
-            marriage_src;
-            divorce;
-          }
-        in
-        patch_family base (get_ifam fam) fam';
-        match report with
-        | Some fn -> fn (Fix_MarriageDivorce (get_ifam fam))
-        | None -> ()))
-    (Gwdb.families base)
-
-let fix_missing_spouses ?report progress base =
-  let nb_fam = nb_of_families base in
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      progress i nb_fam;
-      let aux i =
-        let p = poi base i in
-        if get_iper p = Gwdb.dummy_iper then (
-          Gwdb.patch_union base i { family = [| get_ifam fam |] };
-          Gwdb.patch_person base i
-            { (gen_person_of_person p) with key_index = i };
-          match report with
-          | Some fn -> fn (Fix_MissingSpouse (get_ifam fam, i))
-          | None -> ())
-      in
-      aux @@ get_father fam;
-      aux @@ get_mother fam)
-    (Gwdb.families base)
-
-let fix_utf8_sequence ?report progress base =
-  let normalize_utf_8_date ifam iper s =
-    let s' = Utf8.normalize s in
-    (if s <> s' then
-     match report with
-     | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, None))
-     | None -> ());
-    s'
+  let person_changed = p <> p' in
+  let () =
+    if person_changed then (
+      patch_person base p.key_index p';
+      Option.iter (fun fn -> fn (Fix_NBDS p.key_index)) report)
   in
-  let normalize_utf_8 ifam iper i =
-    let s = Gwdb.sou base i in
-    let s' = Utf8.normalize s in
-    let i' = Gwdb.insert_string base s' in
-    (if i <> i' then
-     match report with
-     | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, Some (i, i')))
-     | None -> ());
-    i'
-  in
-  let nbf = nb_of_families base in
-  let nbp = nb_of_persons base in
-  let nb = nbp + nbf in
-  let fp i = i in
-  let ff i = i in
-  let fs ifam iper i = normalize_utf_8 ifam iper i in
-  let fd ifam iper = function
-    | Date.Dtext d -> Date.Dtext (normalize_utf_8_date ifam iper d)
-    | d -> d
-  in
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      progress i nb;
-      let ifam = Gwdb.get_ifam fam in
-      let f = Gwdb.gen_family_of_family fam in
-      let f' =
-        Futil.map_family_ps ~fd:(fd (Some ifam) None) fp ff
-          (fs (Some ifam) None) f
-      in
-      if f' <> f then Gwdb.patch_family base ifam f')
-    (Gwdb.families base);
-  Gwdb.Collection.iteri
-    (fun i per ->
-      progress (nbf + i) nb;
-      let iper = Gwdb.get_iper per in
-      let p = Gwdb.gen_person_of_person per in
-      let p' =
-        Futil.map_person_ps ~fd:(fd None (Some iper)) fp (fs None (Some iper)) p
-      in
-      if p' <> p then Gwdb.patch_person base iper p')
-    (Gwdb.persons base)
+  person_changed
 
-let fix_key ?report progress base =
-  let nb_ind = nb_of_persons base in
-  let ipers = Gwdb.ipers base in
-  let skip = Gwdb.iper_marker ipers false in
-  Gwdb.Collection.iteri
-    (fun i ip ->
-      progress i nb_ind;
-      let p = poi base ip in
-      let f = Gwdb.p_first_name base p in
-      let s = Gwdb.p_surname base p in
-      if f <> "?" && s <> "?" then
-        let key = Name.concat f s in
-        let ipers = Gwdb.persons_of_name base key in
-        let f = Name.lower f in
-        let s = Name.lower s in
-        let list =
-          let rec loop acc = function
-            | ip :: tl ->
-                let p = poi base ip in
-                if
-                  Name.lower @@ p_first_name base p = f
-                  && Name.lower @@ p_surname base p = s
-                then loop ((get_iper p, get_occ p) :: acc) tl
-                else loop acc tl
-            | [] -> acc
-          in
-          loop [] ipers
+type person_fix =
+  report:(patch -> unit) option -> base:Gwdb.base -> person:Gwdb.person -> bool
+
+type family_fix =
+  report:(patch -> unit) option -> base:Gwdb.base -> family:Gwdb.family -> bool
+
+let fix_nbds ~report ~base ~person = fix_pevents ~report base person
+
+let fix_family_parents ~report ~base ~family =
+  let ifam = get_ifam family in
+  let parents = Gwdb.get_parent_array family in
+  Array.fold_left
+    (fun change ip ->
+      let unions = get_family (poi base ip) in
+      if not @@ Array.mem ifam unions then (
+        patch_union base ip { family = Array.append unions [| ifam |] };
+        Option.iter (fun fn -> fn (Fix_AddedUnion ip)) report;
+        true)
+      else change)
+    false parents
+
+let fix_family_children ~report ~base ~family =
+  let ifam = Gwdb.get_ifam family in
+  let children = get_children family in
+  Array.fold_left
+    (fun change child_iper ->
+      let child = Gwdb.poi base child_iper in
+      let parents = Gwdb.get_parents child in
+      if parents = Some dummy_ifam || parents = None then (
+        let gen_ascend = { parents = Some ifam; consang = get_consang child } in
+        Gwdb.patch_ascend base child_iper gen_ascend;
+        Option.iter (fun fn -> fn (Fix_AddedParents child_iper)) report;
+        true)
+      else change)
+    false children
+
+let fix_person_parents ~report ~base ~person =
+  let parents = Gwdb.get_parents person in
+  match parents with
+  | Some parents ->
+      let family = Gwdb.foi base parents in
+      let ifam = Gwdb.get_ifam family in
+      if ifam = Gwdb.dummy_ifam then (
+        let gen_ascend = { parents = None; consang = Adef.no_consang } in
+        let iper = Gwdb.get_iper person in
+        Gwdb.patch_ascend base iper gen_ascend;
+        Option.iter (fun fn -> fn (Fix_ParentDeleted iper)) report;
+        true)
+      else
+        let children = Gwdb.get_children family in
+        let iper = Gwdb.get_iper person in
+        if not (Array.mem iper children) then (
+          let children = Array.append children [| iper |] in
+          Gwdb.patch_descend base ifam { children };
+          Option.iter (fun fn -> fn (Fix_AddedChild ifam)) report;
+          true)
+        else false
+  | None -> false
+
+let is_a_parent iper family = Array.mem iper (Gwdb.get_parent_array family)
+
+(* This fix removes the duplicated unions and the now invalid unions (the person
+   is not part of the union anymore). We want to keep the original order of the remaining
+   unions.*)
+let fix_person_unions ~report ~base ~person =
+  let iper = Gwdb.get_iper person in
+  let ifams = Gwdb.get_family person in
+  let change, ifams, _ifam_set =
+    Array.fold_right
+      (fun ifam (change, ifams, ifam_set) ->
+        if Util.IfamSet.mem ifam ifam_set then (
+          Option.iter
+            (fun fn -> fn (Fix_RemovedDuplicateUnion (iper, ifam)))
+            report;
+          (true, ifams, ifam_set))
+        else if not (is_a_parent iper (Gwdb.foi base ifam)) then (
+          Option.iter (fun fn -> fn (Fix_RemovedUnion (iper, ifam))) report;
+          (true, ifams, ifam_set))
+        else (change, ifam :: ifams, Util.IfamSet.add ifam ifam_set))
+      ifams
+      (false, [], Util.IfamSet.empty)
+  in
+  if change then Gwdb.patch_union base iper { family = Array.of_list ifams };
+  change
+
+let fix_related report base patch_cons iper change iper_wit =
+  let witness = Gwdb.poi base iper_wit in
+  let witness_related = Gwdb.get_related witness in
+  if not (List.memq iper witness_related) then (
+    Option.iter (fun fn -> fn (patch_cons iper_wit iper)) report;
+    let gen_person =
+      {
+        (Gwdb.gen_person_of_person witness) with
+        related = iper :: witness_related;
+      }
+    in
+    Gwdb.patch_person base iper_wit gen_person;
+    true)
+  else change
+
+let added_related_from_pevent iper_wit iper =
+  Fix_AddedRelatedFromPevent (iper_wit, iper)
+
+let fix_person_events_witnesses ~report ~base ~person =
+  let iper = Gwdb.get_iper person in
+  List.fold_left
+    (fun change evt ->
+      let witnesses = Array.map fst (Gwdb.get_pevent_witnesses evt) in
+      Array.fold_left
+        (fix_related report base added_related_from_pevent iper)
+        change witnesses)
+    false (Gwdb.get_pevents person)
+
+let added_related_from_fevent iper_wit iper =
+  Fix_AddedRelatedFromFevent (iper_wit, iper)
+
+let fix_family_events_witnesses ~report ~base ~family =
+  let iper = Gwdb.get_father family in
+  List.fold_left
+    (fun change evt ->
+      let witnesses = Array.map fst (Gwdb.get_fevent_witnesses evt) in
+      Array.fold_left
+        (fix_related report base added_related_from_fevent iper)
+        change witnesses)
+    false (Gwdb.get_fevents family)
+
+let fix_family_divorce ~report ~base ~family =
+  let fevents =
+    List.map Gwdb.gen_fevent_of_fam_event (Gwdb.get_fevents family)
+  in
+  let relation' = Gwdb.get_relation family in
+  let marriage' = Gwdb.get_marriage family in
+  let marriage_place' = Gwdb.get_marriage_place family in
+  let marriage_note' = Gwdb.get_marriage_note family in
+  let marriage_src' = Gwdb.get_marriage_src family in
+  let divorce' = Gwdb.get_divorce family in
+  let marriage_data' =
+    (relation', marriage', marriage_place', marriage_note', marriage_src')
+  in
+  let ( ((relation, marriage, marriage_place, marriage_note, marriage_src) as
+        marriage_data),
+        divorce,
+        _ ) =
+    UpdateFamOk.reconstitute_from_fevents false (insert_string base "") fevents
+  in
+  if marriage_data <> marriage_data' || divorce <> divorce' then (
+    let gen_family =
+      {
+        (Gwdb.gen_family_of_family family) with
+        relation;
+        marriage;
+        marriage_place;
+        marriage_note;
+        marriage_src;
+        divorce;
+      }
+    in
+    let ifam = Gwdb.get_ifam family in
+    Gwdb.patch_family base (Gwdb.get_ifam family) gen_family;
+    Option.iter (fun fn -> fn (Fix_MarriageDivorce ifam)) report;
+    true)
+  else false
+
+let fix_family_spouses ~report ~base ~family =
+  let fix_spouse_union iper =
+    let person = Gwdb.poi base iper in
+    if Gwdb.get_iper person = Gwdb.dummy_iper then (
+      let ifam = Gwdb.get_ifam family in
+      Gwdb.patch_union base iper { family = [| ifam |] };
+      Gwdb.patch_person base iper
+        { (gen_person_of_person person) with key_index = iper };
+      Option.iter (fun fn -> fn (Fix_MissingSpouse (ifam, iper))) report;
+      true)
+    else false
+  in
+  let change_fath = fix_spouse_union (get_father family) in
+  let change_moth = fix_spouse_union (get_mother family) in
+  change_fath || change_moth
+
+let fix_map_utf8_date ~report = function
+  | Date.Dtext t ->
+      let t' = Utf8.normalize t in
+      if t <> t' then report ();
+      Date.Dtext t'
+  | d -> d
+
+let fix_map_utf8_str ~report ~base istr =
+  let s = Gwdb.sou base istr in
+  let s' = Utf8.normalize s in
+  let istr' = Gwdb.insert_string base s' in
+  if istr <> istr' then report istr istr';
+  istr'
+
+let fix_person_utf8_sequence ~report ~base ~person =
+  let iper = Gwdb.get_iper person in
+  let change = ref false in
+  let report_date () =
+    Option.iter
+      (fun fn -> fn (Fix_WrongUTF8Encoding (None, Some iper, None)))
+      report;
+    change := true
+  in
+  let report_str istr istr' =
+    Option.iter
+      (fun fn ->
+        fn (Fix_WrongUTF8Encoding (None, Some iper, Some (istr, istr'))))
+      report;
+    change := true
+  in
+  let fix_map_date = fix_map_utf8_date ~report:report_date in
+  let fix_map_str = fix_map_utf8_str ~report:report_str ~base in
+  let gen_pers = Gwdb.gen_person_of_person person in
+  let gen_pers' =
+    Futil.map_person_ps ~fd:fix_map_date Fun.id fix_map_str gen_pers
+  in
+  if gen_pers' <> gen_pers then (
+    Gwdb.patch_person base iper gen_pers';
+    true)
+  else !change
+
+let fix_family_utf8_sequence ~report ~base ~family =
+  let ifam = Gwdb.get_ifam family in
+  let change = ref false in
+  let report_date () =
+    Option.iter
+      (fun fn -> fn (Fix_WrongUTF8Encoding (Some ifam, None, None)))
+      report;
+    change := true
+  in
+  let report_str istr istr' =
+    Option.iter
+      (fun fn ->
+        fn (Fix_WrongUTF8Encoding (Some ifam, None, Some (istr, istr'))))
+      report;
+    change := true
+  in
+  let fix_map_date = fix_map_utf8_date ~report:report_date in
+  let fix_map_str = fix_map_utf8_str ~report:report_str ~base in
+  let gen_fam = Gwdb.gen_family_of_family family in
+  let gen_fam' =
+    Futil.map_family_ps ~fd:fix_map_date Fun.id Fun.id fix_map_str gen_fam
+  in
+  if gen_fam' <> gen_fam then (
+    Gwdb.patch_family base ifam gen_fam';
+    true)
+  else !change
+
+let find_free_occ occ_set =
+  let occ = ref 0 in
+  let rec loop () =
+    if Ext_int.Set.mem !occ occ_set then (
+      incr occ;
+      loop ())
+    else
+      let found_occ = !occ in
+      incr occ;
+      found_occ
+  in
+  loop
+
+let fix_person_key base =
+  let skip = Gwdb.iper_marker (Gwdb.ipers base) false in
+  fun ~report ~base ~person : bool ->
+    let iper = Gwdb.get_iper person in
+    if not (Gwdb.Marker.get skip iper) then
+      let first_name = Gwdb.p_first_name base person in
+      let surname = Gwdb.p_surname base person in
+      if first_name <> "?" && surname <> "?" then (
+        let homonyms = Gutil.homonyms ~base ~first_name ~surname in
+        let ipers = List.sort Gwdb.compare_iper homonyms in
+        List.iter (fun iper -> Gwdb.Marker.set skip iper true) ipers;
+        let occ_set =
+          List.fold_left
+            (fun occ_set iper ->
+              let p = Gwdb.poi base iper in
+              Ext_int.Set.add (Gwdb.get_occ p) occ_set)
+            Ext_int.Set.empty ipers
         in
-        let rev_list = List.sort (fun a b -> compare b a) list in
-        let cnt = ref 0 in
-        let mem_occ occ acc list =
-          List.exists (fun (_, o) -> o = occ) acc
-          || List.exists (fun (_, o) -> o = occ) list
+        let first_free_occ = find_free_occ occ_set in
+        let change, remaining_occ_set =
+          List.fold_left
+            (fun (change, remaining_occ_set) iper ->
+              let p = Gwdb.poi base iper in
+              let occ = Gwdb.get_occ p in
+              let set' = Ext_int.Set.remove occ remaining_occ_set in
+              if set' == remaining_occ_set then (
+                let occ' = first_free_occ () in
+                Gwdb.patch_person base iper
+                  { (Gwdb.gen_person_of_person p) with occ = occ' };
+                Option.iter
+                  (fun fn -> fn (Fix_UpdatedOcc (iper, occ, occ')))
+                  report;
+                (true, remaining_occ_set))
+              else (change, set'))
+            (false, occ_set) ipers
         in
-        let rec new_occ acc list =
-          if mem_occ !cnt acc list then (
-            incr cnt;
-            new_occ acc list)
-          else !cnt
-        in
-        let rec loop acc list =
-          match acc with
-          | [] -> (
-              match list with
-              | [] -> failwith key
-              | (ip, occ) :: tl ->
-                  Gwdb.Marker.set skip ip true;
-                  loop [ (ip, occ) ] tl)
-          | acc -> (
-              match list with
-              | [] -> acc
-              | (ip, occ) :: tl ->
-                  if not @@ Gwdb.Marker.get skip ip then (
-                    Gwdb.Marker.set skip ip true;
-                    if mem_occ occ acc tl then (
-                      let occ' = new_occ acc list in
-                      Gwdb.patch_person base ip
-                        {
-                          (Gwdb.gen_person_of_person (poi base ip)) with
-                          occ = occ';
-                        };
-                      (match report with
-                      | Some fn -> fn (Fix_UpdatedOcc (ip, occ, occ'))
-                      | None -> ());
-                      loop ((ip, occ') :: acc) tl)
-                    else loop ((ip, occ) :: acc) tl)
-                  else loop ((ip, occ) :: acc) tl)
-        in
-        ignore @@ loop [] rev_list)
-    ipers
+        assert (Ext_int.Set.is_empty remaining_occ_set);
+        change)
+      else false
+    else false
+
+let perform_fixes ~(report : (patch -> unit) option) ~progress ~base
+    ~(person_fixes : person_fix list) ~(family_fixes : family_fix list) =
+  if person_fixes = [] && family_fixes = [] then 0
+  else
+    let persons = Gwdb.persons base in
+    let n_persons = Gwdb.nb_of_persons base in
+    let n_families = Gwdb.nb_of_families base in
+    let end_progress = if person_fixes <> [] then n_persons else 0 in
+    let fstart_progress, end_progress =
+      if family_fixes <> [] then (end_progress, end_progress + n_families)
+      else (0, end_progress)
+    in
+    let nb_fixes = ref 0 in
+    Gwdb.Collection.iteri
+      (fun i person ->
+        progress i end_progress;
+        List.iter
+          (fun fix -> if fix ~report ~base ~person then incr nb_fixes)
+          person_fixes)
+      persons;
+    let families = Gwdb.families base in
+    Gwdb.Collection.iteri
+      (fun i family ->
+        progress (fstart_progress + i) end_progress;
+        List.iter
+          (fun fix -> if fix ~report ~base ~family then incr nb_fixes)
+          family_fixes)
+      families;
+    !nb_fixes

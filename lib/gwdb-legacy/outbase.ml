@@ -180,7 +180,7 @@ let output_particles_file particles fname =
     particles;
   close_out oc
 
-let output ?(save_mem = false) base =
+let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
   let bname = base.data.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
@@ -353,7 +353,6 @@ let output ?(save_mem = false) base =
      Files.rm tmp_strings_inx;
      Files.remove_dir tmp_notes_d;
      raise e);
-  close_base base;
   Files.rm (Filename.concat bname "base");
   Sys.rename tmp_base (Filename.concat bname "base");
   Files.rm (Filename.concat bname "base.acc");
@@ -389,4 +388,7 @@ let output ?(save_mem = false) base =
   Files.rm (Filename.concat bname "nb_persons");
   (* FIXME: should not be present in this part of the code? *)
   Files.rm (Filename.concat bname "tstab");
-  Files.rm (Filename.concat bname "tstab_visitor")
+  Files.rm (Filename.concat bname "tstab_visitor");
+  trace "perform additional tasks";
+  List.iter (fun task -> task ()) tasks;
+  close_base base

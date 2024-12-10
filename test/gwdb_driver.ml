@@ -469,7 +469,7 @@ let base_store = Hashtbl.create 1
 
 (* Should not be necessary but some of the code requires to write
    without using gwdb and expects to find the base directory. *)
-let sync ?scratch:_ ~save_mem:_ base =
+let sync ?scratch:_ ?tasks:_ ~save_mem:_ base =
   let bname = base.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
   Hashtbl.replace base_store bname base
