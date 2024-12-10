@@ -1243,7 +1243,7 @@ let expand_env =
   fun conf s ->
     match List.assoc_opt "expand_env" conf.Config.base_env with
     | Some "yes" ->
-        let _ = (Buffer.clear buff : unit) in
+        let () = Buffer.clear buff in
         let rec loop i =
           if i = String.length s then Buffer.contents buff
           else if i + 1 < String.length s && s.[i] = '$' && s.[i + 1] = '{' then (
@@ -1377,56 +1377,76 @@ let trimmed_string_of_place place =
   |> String.concat (Printf.sprintf "%c " field_separator)
   |> escape_html
 
-let menu_threshold = 20
-let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
+let print_alphabetically_indexed_list (type entry) conf index_key print_elem
+    (list : entry list) =
+  let list =
+    let with_index =
+      let index_threshold = 20 in
+      List.length list > index_threshold
+    in
+    if not @@ with_index then `Flat_list list
+    else
+      let compare_entry =
+        let module Entry_map = Map.Make (struct
+          type t = entry
 
-let print_alphab_list conf crit print_elem liste =
-  let len = List.length liste in
-  if len > menu_threshold then (
-    Output.print_sstring conf "<p>\n";
-    (let _ =
-       List.fold_left
-         (fun last e ->
-           let t = crit e in
-           let same_than_last =
-             match last with Some t1 -> t = t1 | _ -> false
-           in
-           if not same_than_last then
-             Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
-               (Ext_string.hexa_string t) t;
-           Some t)
-         None liste
-     in
-     ());
-    Output.print_sstring conf "</p>\n");
-  Output.print_sstring conf "<ul>\n";
-  (let _ =
-     List.fold_left
-       (fun last e ->
-         let t = crit e in
-         let same_than_last =
-           match last with Some t1 -> t = t1 | _ -> false
-         in
-         if len > menu_threshold || is_number t then (
-           (match last with
-           | Some _ ->
-               if not same_than_last then
-                 Output.print_sstring conf "</ul>\n</li>\n"
-           | _ -> ());
-           if not same_than_last then (
-             Output.print_sstring conf "<li>\n";
-             Output.printf conf "<a id=\"ai%s\">%s</a>\n"
-               (Ext_string.hexa_string t) t;
-             Output.print_sstring conf "<ul>\n"));
-         Output.print_sstring conf "<li>\n  ";
-         print_elem e;
-         Output.print_sstring conf "</li>\n";
-         Some t)
-       None liste
-   in
-   ());
-  if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
-  Output.print_sstring conf "</ul>\n"
+          let compare = compare
+        end) in
+        fun entry entry' ->
+          let entry_ranks =
+            list
+            |> List.mapi (fun rank entry -> (entry, rank))
+            |> List.to_seq |> Entry_map.of_seq
+          in
+          compare
+            (Entry_map.find_opt entry entry_ranks)
+            (Entry_map.find_opt entry' entry_ranks)
+      in
+      `Indexed_list
+        (list
+        |> Ext_list.groupby ~key:index_key ~value:Fun.id
+        |> List.sort (fun (index_key, _) (index_key', _) ->
+               Utf8.alphabetic_order index_key index_key')
+        |> List.map (fun (index_key, entries) ->
+               (index_key, List.sort compare_entry entries)))
+  in
+  match list with
+  | `Flat_list list ->
+      Output.print_sstring conf "<ul>\n";
+      List.iter
+        (fun e ->
+          Output.print_sstring conf "<li>\n  ";
+          print_elem e;
+          Output.print_sstring conf "</li>\n")
+        list;
+      Output.print_sstring conf "</ul>\n"
+  | `Indexed_list list ->
+      let print_index () =
+        Output.print_sstring conf "<p>\n";
+        List.iter
+          (fun (t, _) ->
+            Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
+              (Ext_string.hexa_string t) t)
+          list;
+        Output.print_sstring conf "</p>\n"
+      in
+      print_index ();
+      Output.print_sstring conf "<ul>\n";
+      List.iter
+        (fun (t, entries) ->
+          Output.print_sstring conf "<li>\n";
+          Output.printf conf "<a id=\"ai%s\">%s</a>\n"
+            (Ext_string.hexa_string t) t;
+          Output.print_sstring conf "<ul>\n";
+          List.iter
+            (fun e ->
+              Output.print_sstring conf "<li>\n  ";
+              print_elem e;
+              Output.print_sstring conf "</li>\n")
+            entries;
+          Output.print_sstring conf "</ul>\n</li>\n")
+        list;
+      Output.print_sstring conf "</ul>\n"
 
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
@@ -1993,8 +2013,8 @@ let print_in_columns conf ncols len_list list wprint_elem =
   begin_centered conf;
   Output.printf conf "<table width=\"95%%\" border=\"%d\">\n" conf.Config.border;
   Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.Config.left;
-  (let _ =
-     List.fold_left
+  ignore
+    (List.fold_left
        (fun list len ->
          let rec loop n list =
            if n = 0 then (
@@ -2019,9 +2039,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
              | [] -> []
          in
          loop len list)
-       list len_list
-   in
-   ());
+       list len_list);
   Output.print_sstring conf "</tr>\n";
   Output.print_sstring conf "</table>\n";
   end_centered conf
