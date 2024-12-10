@@ -2901,10 +2901,20 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           in
           VVbool r
       | _ -> raise Not_found)
+  (* TODO exclude TYPE gallery and album ?? *)
+  (* TODO fold link_to_ind and Notes.link_to_ind !! *)
   | [ "has_linked_pages" ] -> (
       match get_env "nldb" env with
-      | Vnldb _db -> VVbool (Notes.has_linked_pages conf base (get_iper p))
+      | Vnldb db ->
+          let key =
+            let fn = Name.lower (sou base (get_first_name p)) in
+            let sn = Name.lower (sou base (get_surname p)) in
+            (fn, sn, get_occ p)
+          in
+          VVbool (links_to_ind conf base db key None <> [])
       | _ -> raise Not_found)
+  | [ "has_linked_pages_2" ] ->
+      VVbool (Notes.linked_pages_nbr conf base (get_iper p) > 0)
   | [ "linked_pages_nbr" ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
@@ -2920,6 +2930,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           in
           str_val r
       | _ -> str_val "0")
+  | [ "linked_pages_nbr_2" ] ->
+      VVstring (string_of_int (Notes.linked_pages_nbr conf base (get_iper p)))
   | [ "nb_linked_pages_type"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
@@ -2957,12 +2969,6 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "lev_cnt" env with
       | Vint i -> str_val (string_of_int i)
       | _ -> raise Not_found)
-  | [ "linked_pages_number" ] -> (
-      match get_env "nldb" env with
-      | Vnldb _db ->
-          Notes.linked_pages_nbr conf base (get_iper p)
-          |> string_of_int |> str_val
-      | _ -> str_val "0")
   | [ "linked_page"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->

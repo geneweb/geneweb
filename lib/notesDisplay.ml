@@ -153,13 +153,13 @@ let linked_page_rows conf base pg =
           (Format.sprintf
              {|
 <td class="align-middle">
-  <a href="%sm=MOD_FAM&i=%s&ip=%s#comments" title="%s %s %s">
+  <a href="%sm=MOD_FAM&i=%s&ip=%s#events" title="%s %s %s">
     <i class="fa fa-user fa-sm"></i><i class="fa fa-user fa-sm"></i></a></td>|}
              (commd conf :> string)
              (Gwdb.string_of_ifam ifam)
              (Gwdb.get_iper fath |> Gwdb.string_of_iper)
              (Utf8.capitalize_fst (transl conf "modify"))
-             (transl conf "comment")
+             (transl_nth conf "event/events" 0)
              (transl_nth conf "family/families" 0));
       Output.print_sstring conf
         (Format.sprintf

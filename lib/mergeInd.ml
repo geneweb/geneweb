@@ -195,7 +195,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
     let pgl = Notes.links_to_ind conf base db key in
     pgl
   in
-  Notes.update_cache_linked_pages conf Notes.Merge key key pgl
+  Notes.update_cache_linked_pages conf Notes.Merge key key (List.length pgl)
 
 exception Error_loop of person
 exception Same_person

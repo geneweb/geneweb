@@ -934,7 +934,7 @@ let effective_del_commit conf base op =
   let key =
     Util.make_key base (Gwdb.gen_person_of_person (poi base op.key_index))
   in
-  Notes.update_cache_linked_pages conf Notes.Delete key key [];
+  Notes.update_cache_linked_pages conf Notes.Delete key key 0;
   Util.commit_patches conf base;
   let changed = U_Delete_person op in
   History.record conf base changed "dp"
@@ -1185,7 +1185,7 @@ let print_mod ?prerr o_conf base =
     Notes.update_notes_links_db base (Def.NLDB.PgInd p.key_index) s;
     let new_key = Util.make_key base p in
     if old_key <> new_key then
-      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key [];
+      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0;
     let wl =
       let a = poi base p.key_index in
       let a = { parents = get_parents a; consang = get_consang a } in

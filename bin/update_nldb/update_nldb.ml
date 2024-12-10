@@ -22,8 +22,14 @@ let notes_links s =
             if List.mem lfname list_nt then list_nt else lfname :: list_nt
           in
           loop list_nt list_ind pos j
-      | NotesLinks.WLperson (j, key, _, text) ->
+      | NotesLinks.WLperson (j, key, name, text) ->
           let list_ind =
+            let text =
+              match (name, text) with
+              | name, None -> Some name
+              | name, Some text when name = "" -> Some text
+              | name, Some text -> Some (name ^ ";" ^ text)
+            in
             let link = { NLDB.lnTxt = text; lnPos = pos } in
             (key, link) :: list_ind
           in
@@ -46,8 +52,7 @@ let read_file_contents fname =
       with End_of_file -> Buff.get !len)
   | None -> ""
 
-type cache_linked_pages_t =
-  (Def.NLDB.key, (Def.NLDB.key * Def.NLDB.ind) list) Hashtbl.t
+type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 
 let read_cache_linked_pages conf : cache_linked_pages_t =
   let ic = open_in_bin conf in
@@ -68,6 +73,13 @@ let compute base bdir =
   let nb_fam = nb_of_families base in
   let db = ref [] in
   let cache_linked_pages : cache_linked_pages_t = Hashtbl.create 1024 in
+
+  let update_cache_linked_pages key =
+    let current_count =
+      try Hashtbl.find cache_linked_pages key with Not_found -> 0
+    in
+    Hashtbl.replace cache_linked_pages key (current_count + 1)
+  in
 
   Printf.eprintf "--- database notes\n";
   flush stderr;
@@ -97,11 +109,20 @@ let compute base bdir =
              in
              match notes_links (read_file_contents wfile) with
              | [], [] -> ()
-             | (_list_nt, _list_ind) as list ->
+             | (_list_nt, list_ind) as list ->
                  Printf.eprintf "%s... " wizid;
                  flush stderr;
                  let pg = NLDB.PgWizard wizid in
-                 db := NotesLinks.add_in_db !db pg list
+                 db := NotesLinks.add_in_db !db pg list;
+                 let list_ind =
+                   List.fold_left
+                     (fun acc (key, l) ->
+                       if List.mem_assoc key acc then acc else (key, l) :: acc)
+                     [] list_ind
+                 in
+                 List.iter
+                   (fun (key, _) -> update_cache_linked_pages key)
+                   list_ind
        with Sys_error _ ->
          Printf.eprintf "Warning: error while reading wizardnotes %s\n"
            files.(i)
@@ -130,7 +151,7 @@ let compute base bdir =
             let file = Filename.concat dir fnotes in
             match notes_links (base_notes_read base file) with
             | [], [] -> ()
-            | (_list_nt, _list_ind) as list ->
+            | (_list_nt, list_ind) as list ->
                 let fnotes =
                   if name = "" then fnotes
                   else
@@ -139,7 +160,16 @@ let compute base bdir =
                 Printf.eprintf "%s...\n" fnotes;
                 flush stderr;
                 let pg = NLDB.PgMisc fnotes in
-                db := NotesLinks.add_in_db !db pg list)
+                db := NotesLinks.add_in_db !db pg list;
+                let list_ind =
+                  List.fold_left
+                    (fun acc (key, l) ->
+                      if List.mem_assoc key acc then acc else (key, l) :: acc)
+                    [] list_ind
+                in
+                List.iter
+                  (fun (key, _) -> update_cache_linked_pages key)
+                  list_ind)
           else
             loop (Filename.concat dir file)
               (if name = "" then file
@@ -184,11 +214,16 @@ let compute base bdir =
       (* list is: lfname :: list_nt, (key, link) :: list_ind *)
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | (_list_nt, list_ind) as list ->
-          db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
-          let p = Gwdb.gen_person_of_person p in
-          let key = Util.make_key base p in
-          Hashtbl.add cache_linked_pages key list_ind)
+      | (list_nt, list_ind) as list ->
+          (db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
+           let list_ind =
+             List.fold_left
+               (fun acc (key, l) ->
+                 if List.mem_assoc key acc then acc else (key, l) :: acc)
+               [] list_ind
+           in
+           List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
+          ProgrBar.run i nb_ind)
     (Gwdb.persons base);
   ProgrBar.finish ();
   Printf.eprintf "--- families notes\n";
@@ -209,12 +244,20 @@ let compute base bdir =
         (get_fevents fam);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | list ->
-          db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
+      | (_list_nt, list_ind) as list ->
+          (db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
+           let list_ind =
+             List.fold_left
+               (fun acc (key, l) ->
+                 if List.mem_assoc key acc then acc else (key, l) :: acc)
+               [] list_ind
+           in
+           List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
           ProgrBar.run i nb_fam)
     (Gwdb.families base);
   ProgrBar.finish ();
   write_nldb base !db;
+
   (* Save the cache_linked_pages to a file *)
   save_cache_linked_pages bdir cache_linked_pages
 

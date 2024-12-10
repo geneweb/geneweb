@@ -76,12 +76,7 @@ val linked_pages_nbr : Config.config -> Gwdb.base -> Gwdb.iper -> int
 val cache_linked_pages_name : string
 
 val update_cache_linked_pages :
-  Config.config ->
-  mode ->
-  Def.NLDB.key ->
-  Def.NLDB.key ->
-  (Def.NLDB.key * Def.NLDB.ind) list ->
-  unit
+  Config.config -> mode -> Def.NLDB.key -> Def.NLDB.key -> int -> unit
 
 val json_extract_img : Config.config -> string -> string * string
 val safe_gallery : Config.config -> string -> string
