@@ -292,7 +292,6 @@ let print_cousins conf base p lev1 lev2 =
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<div>";
-  (*include_templ conf "cousins_tools";*)
   Output.print_sstring conf "<h2>";
   title false;
   Output.print_sstring conf "</h2>";
