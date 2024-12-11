@@ -318,7 +318,7 @@ let update_cache_linked_pages conf mode old_key new_key nbr =
          try Some (Hashtbl.find ht old_key) with Not_found -> None
        in
        match entry with
-       | Some pgl ->
+       | Some _ ->
            Hashtbl.remove ht old_key;
            Hashtbl.add ht new_key nbr
        | None -> ());
