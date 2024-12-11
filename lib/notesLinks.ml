@@ -11,7 +11,7 @@ let check_file_name s =
       else None
     else
       match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' | '.' ->
+      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' | '.' | ':' ->
           loop path ibeg (i + 1)
       | c ->
           if c = char_dir_sep then
