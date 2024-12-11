@@ -205,7 +205,7 @@ let () =
   in
   let fds =
     if !all then `Fnames true :: fds
-    else if !snames then `Fnames !sname_aliases :: fds
+    else if !fnames then `Fnames !fname_aliases :: fds
     else fds
   in
 
@@ -229,6 +229,6 @@ let () =
   in
   let min, sec =
     let d = Float.to_int total_duration in
-    (d / 60, d mod 60)
+    (d / 60, mod_float total_duration 60.)
   in
-  Format.printf "Total duration: %dm %ds@." min sec
+  Format.printf "Total duration: %d min %6.2f s@." min sec
