@@ -52,17 +52,60 @@ let anonfun c s =
   else raise (Arg.Bad "Cannot treat several databases")
 
 let speclist c =
+  let int_arg ?(check = Fun.const @@ Ok ()) ?(symbolic_values = []) continue =
+    Arg.String
+      (fun arg ->
+        let bad_arg message =
+          Arg.Bad
+            (Printf.sprintf "option '%s': %s" Sys.argv.(!Arg.current) message)
+        in
+        let arg =
+          match int_of_string_opt arg with
+          | Some arg -> Ok arg
+          | None ->
+              let error_message =
+                let symbolic_values =
+                  symbolic_values |> List.map fst
+                  |> List.map (Printf.sprintf "'%s'")
+                in
+                Printf.sprintf
+                  "unknown symbolic value '%s', possible symbolic values are %s"
+                  arg
+                  (String.concat " " symbolic_values)
+              in
+              Option.to_result ~none:error_message
+                (List.assoc_opt arg symbolic_values)
+        in
+        let ( >>= ) = Result.bind in
+        Result.fold ~ok:continue
+          ~error:(fun message -> raise @@ bad_arg message)
+          (arg >>= check >>= Fun.const arg))
+  in
+  let positive_int_arg ?symbolic_values continue =
+    int_arg ?symbolic_values
+      ~check:(fun arg ->
+        if arg > 0 then Ok () else Error "positive integer expected")
+      continue
+  in
   [
     ( "-a",
-      Arg.Int (fun s -> c := { !c with asc = Some s }),
-      "<N> maximum generation of the root's ascendants" );
+      positive_int_arg
+        ~symbolic_values:[ ("all", max_int) ]
+        (fun s -> c := { !c with asc = Some s }),
+      "[<N>|all] maximum generation of the root's ascendants" );
     ( "-ad",
-      Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
-      "<N> maximum generation of the root's ascendants descendants" );
+      int_arg
+        ~symbolic_values:[ ("all", -max_int) ]
+        (fun s -> c := { !c with ascdesc = Some s }),
+      "[<N>|all] maximum generation of the root's ascendants descendants. The \
+       value is relative to the root person. Thus, for example, '0' means \
+       *down to the level of the root person*, '2' means *down to the level of \
+       the grandparents of the root person* and '-2' means *down to the level \
+       of the grandchildren of the root person*." );
     ( "-key",
       Arg.String (fun s -> c := { !c with keys = s :: !c.keys }),
-      "<KEY> key reference of root person. Used for -a/-d options. Can be used \
-       multiple times. Key format is \"First Name.occ SURNAME\"" );
+      "<KEY> key reference of root person. Used for -a/-d/-ad options. Can be \
+       used multiple times. Key format is \"First Name.occ SURNAME\"" );
     ( "-c",
       Arg.Int (fun s -> c := { !c with censor = s }),
       "<NUM>: when a person is born less than <num> years ago, it is not \
@@ -84,8 +127,10 @@ let speclist c =
             }),
       "[ASCII|ANSEL|ANSI|UTF-8] set charset; default is UTF-8" );
     ( "-d",
-      Arg.Int (fun s -> c := { !c with desc = Some s }),
-      "<N> maximum generation of the root's descendants." );
+      positive_int_arg
+        ~symbolic_values:[ ("all", max_int) ]
+        (fun s -> c := { !c with desc = Some s }),
+      "[<N>|all] maximum generation of the root's descendants." );
     ( "-mem",
       Arg.Unit (fun () -> c := { !c with mem = true }),
       " save memory space, but slower." );
@@ -368,9 +413,32 @@ let select_from_set (ipers : Geneweb.Util.IperSet.t)
   let sel_fam i = Geneweb.Util.IfamSet.mem i ifams in
   (sel_per, sel_fam)
 
+let check_options options =
+  let check_base () =
+    if Option.is_some options.base then Ok () else Error "Missing base name."
+  in
+  let check_keys () =
+    let options_requiring_key =
+      [ options.asc; options.desc; options.ascdesc ]
+    in
+    if options.keys <> [] || List.for_all Option.is_none options_requiring_key
+    then Ok ()
+    else Error "Missing root person."
+  in
+  let ( >>= ) = Result.bind in
+  check_base () >>= check_keys
+
 let select opts ips =
+  let () =
+    Result.iter_error
+      (fun error_message ->
+        raise
+        @@ Arg.Bad
+             (Printf.sprintf "%s Use option -help for usage" error_message))
+      (check_options opts)
+  in
   match opts.base with
-  | None -> raise (Arg.Bad "Missing base name. Use option -help for usage")
+  | None -> assert false
   | Some (_, base) ->
       let ips =
         List.rev_append ips
