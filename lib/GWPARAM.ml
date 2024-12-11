@@ -376,7 +376,7 @@ let init_etc bname =
 
     (if not (Sys.file_exists "cnt") then
      try
-       Unix.mkdir "etc" 0o755;
+       Unix.mkdir "cnt" 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
        !syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
