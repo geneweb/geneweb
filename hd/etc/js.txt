@@ -383,88 +383,103 @@ function addClearButtonToInputs() {
   or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
   or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
 // Manages datalist population and updates
-// Efficiently manages datalists with chunked loading and selection preservation
+// Simple datalist manager with special handling for DataTables inputs
 const DatalistManager = {
-  cache: new Map(),
-  
+  // Main populate function for regular form datalists
   populateDatalist: function(datalistId, cacheFile) {
     const dataList = document.getElementById(datalistId);
-    if (!dataList || this.cache.has(datalistId)) return;
+    if (!dataList) return;
 
-    setTimeout(() => {
-      fetch(cacheFile)
-        .then(response => {
-          const reader = response.body.pipeThrough(new DecompressionStream('gzip')).getReader();
-          return new ReadableStream({
-            start(controller) {
-              return pump();
-              function pump() {
-                return reader.read().then(({ done, value }) => {
-                  if (done) {
-                    controller.close();
-                    return;
-                  }
-                  controller.enqueue(value);
-                  return pump();
-                });
-              }
+    fetch(cacheFile)
+      .then(response => {
+        const reader = response.body
+          .pipeThrough(new DecompressionStream('gzip'))
+          .getReader();
+        return new ReadableStream({
+          start(controller) {
+            return pump();
+            function pump() {
+              return reader.read().then(({done, value}) => {
+                if (done) {
+                  controller.close();
+                  return;
+                }
+                controller.enqueue(value);
+                return pump();
+              });
             }
-          });
-        })
-        .then(stream => new Response(stream))
-        .then(response => response.text())
-        .then(text => {
-          const options = text.split("\n").filter(line => line.trim());
-          this.cache.set(datalistId, options);
-          this.updateDatalistOptions(dataList, options.slice(0, 100));
-        })
-        .catch(error => console.error(`Error loading ${cacheFile}:`, error));
-    }, 1000);
-  },
-
-  updateDatalistOptions: function(dataList, options) {
-    const fragment = document.createDocumentFragment();
-    options.forEach(option => {
-      const opt = document.createElement("option");
-      opt.value = option.trim().replace("<option>", "");
-      fragment.appendChild(opt);
-    });
-    
-    dataList.textContent = '';
-    dataList.appendChild(fragment);
-  },
-
-  filterOptions: function(datalistId, input) {
-      const dataList = document.getElementById(datalistId);
-      if (!dataList || !this.cache.has(datalistId)) return;
-
-      const options = this.cache.get(datalistId);
-      let filtered;
-      
-      if (input) {
-          // First try exact filtering
-          filtered = options
-              .filter(opt => opt.toLowerCase().includes(input.toLowerCase()))
-              .slice(0, 100);
-              
-          // If no matches found, show full list (or filtered by first character)
-          if (filtered.length === 0) {
-              if (input.length > 1) {
-                  // Try matching just the first character
-                  filtered = options
-                      .filter(opt => opt.toLowerCase().startsWith(input[0].toLowerCase()))
-                      .slice(0, 100);
-              }
-              // If still empty or input is just one char, show full list
-              if (filtered.length === 0) {
-                  filtered = options.slice(0, 100);
-              }
           }
-      } else {
-          filtered = options.slice(0, 100);
-      }
+        });
+      })
+      .then(stream => new Response(stream))
+      .then(response => response.text())
+      .then(text => {
+        const fragment = document.createDocumentFragment();
+        text.split("\n")
+            .filter(line => line.trim())
+            .forEach(option => {
+              const opt = document.createElement("option");
+              opt.value = option.trim().replace("<option>", "");
+              fragment.appendChild(opt);
+            });
+        dataList.textContent = '';
+        dataList.appendChild(fragment);
+      })
+      .catch(error => console.error(`Error loading ${cacheFile}:`, error));
+  },
 
-      this.updateDatalistOptions(dataList, filtered);
+  // Special handling for DataTables inputs
+  handleDataTableInput: function(input, listId) {
+    if (!input || !listId) return;
+    
+    const dataList = document.getElementById(listId);
+    if (!dataList) return;
+
+    // Store current cursor position and selection
+    const selStart = input.selectionStart;
+    const selEnd = input.selectionEnd;
+    const currentValue = input.value;
+
+    // Let browser handle datalist matching
+    const option = Array.from(dataList.options).find(opt => 
+      opt.value.toLowerCase() === currentValue.toLowerCase()
+    );
+
+    if (option) {
+      // Get row and cell info before any updates
+      const $row = $(input).closest('tr');
+      const $cell = $(input).closest('td');
+      const rowIndex = table.row($row).index();
+      const cellIndex = $cell.index();
+      
+      // Preserve case the user typed
+      const finalValue = currentValue;
+      
+      // Use requestAnimationFrame to handle focus after redraw
+      requestAnimationFrame(() => {
+        const $newRow = $(table.row(rowIndex).node());
+        const $newCell = $newRow.find(`td:eq(${cellIndex})`);
+        const $newInput = $newCell.find('input');
+        
+        if ($newInput.length) {
+          if ($newInput.val() !== finalValue) {
+            $newInput.val(finalValue);
+          }
+          $newInput.focus();
+          // Only select if user had selected the whole content
+          if (selStart === 0 && selEnd === currentValue.length) {
+            $newInput[0].setSelectionRange(0, finalValue.length);
+          } else {
+            $newInput[0].setSelectionRange(selStart, selEnd);
+          }
+        }
+      });
+    } else {
+      // If no match, just maintain cursor position
+      requestAnimationFrame(() => {
+        input.setSelectionRange(selStart, selEnd);
+      });
+    }
   }
 };
 %end;
