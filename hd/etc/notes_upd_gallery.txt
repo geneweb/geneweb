@@ -944,66 +944,12 @@ function initializeHandlers() {
             }
         })
         %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-        .on('focus input', 'input[list]', function() {
-            const listId = this.getAttribute('list');
-            if (!listId) return;
-            DatalistManager.filterOptions(listId, this.value);
-        })
         .on('input', 'input[list]', function(e) {
             const $input = $(this);
-            const $cell = $input.closest('td');
-            const $row = $input.closest('tr');
             const listId = this.getAttribute('list');
-            const list = document.getElementById(listId);
+            if (!listId || !$input.closest('table').hasClass('dataTable')) return;
             
-            if (!listId) return;
-
-            // Store current cursor position
-            const selStart = this.selectionStart;
-            const selEnd = this.selectionEnd;
-            const currentValue = this.value;
-
-            // Filter options case-insensitively
-            DatalistManager.filterOptions(listId, currentValue);
-
-            if (!list || !currentValue) return;
-
-            // Check for exact match (case-insensitive)
-            const option = Array.from(list.options).find(opt => 
-                opt.value.toLowerCase() === currentValue.toLowerCase()
-            );
-
-            if (option) {
-                const rowIndex = table.row($row).index();
-                const cellIndex = $cell.index();
-                
-                // Preserve the case the user typed
-                const finalValue = currentValue;
-                
-                requestAnimationFrame(() => {
-                    const $newRow = $(table.row(rowIndex).node());
-                    const $newCell = $newRow.find(`td:eq(${cellIndex})`);
-                    const $newInput = $newCell.find('input');
-                    
-                    if ($newInput.length) {
-                        if ($newInput.val() !== finalValue) {
-                            $newInput.val(finalValue);
-                        }
-                        $newInput.focus();
-                        // Only select if user has selected the whole content
-                        if (selStart === 0 && selEnd === currentValue.length) {
-                            $newInput[0].setSelectionRange(0, finalValue.length);
-                        } else {
-                            $newInput[0].setSelectionRange(selStart, selEnd);
-                        }
-                    }
-                });
-            } else {
-                // If no match, just maintain cursor position
-                requestAnimationFrame(() => {
-                    this.setSelectionRange(selStart, selEnd);
-                });
-            }
+            DatalistManager.handleDataTableInput(this, listId);
         })
         %end;
         .on("mouseover", "tr", function(e) {
