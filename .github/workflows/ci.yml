@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache Opam dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.opam
           key: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-v2-${{ hashFiles('*.opam') }}-cache
@@ -101,7 +101,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache Opam dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.opam
           key: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI && 'with-test' || 'no-test' }}-v3-${{ hashFiles('*.opam') }}-cache
