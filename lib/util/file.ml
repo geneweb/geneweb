@@ -3,8 +3,10 @@ exception File_error of string
 let raise_error ppf = Format.ksprintf (fun s -> raise (File_error s)) ppf
 
 let check_perm perm path =
-  let Unix.{ st_perm; _ } = Unix.stat path in
-  st_perm = perm
+  if Sys.win32 then true
+  else
+    let Unix.{ st_perm; _ } = Unix.stat path in
+    st_perm = perm
 
 let check_kind ~kind path =
   let Unix.{ st_kind; _ } = Unix.stat path in
