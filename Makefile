@@ -135,10 +135,8 @@ generated: $(GENERATED_FILES_DEP)
 fmt build gwd install uninstall: info patch_files generated
 
 fmt: ## Format Ocaml code
-ifneq ($(OS_TYPE),Win)
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
 	$(call unpatch_after, dune build @fmt --auto-promote)
-endif
 
 # [BEGIN] Installation / Distribution section
 
