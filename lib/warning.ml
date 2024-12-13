@@ -245,7 +245,7 @@ let compare_normalized_base_warning base (w1 : base_warning) (w2 : base_warning)
   | BirthAfterDeath p, BirthAfterDeath p' -> compare_person p p'
   | IncoherentSex (p, s1, s2), IncoherentSex (p', s1', s2') ->
       compare_person p p' >>= fun () ->
-      s1 - s2 >>= fun () -> s1' - s2'
+      s1 - s1' >>= fun () -> s2 - s2'
   | ( ChangedOrderOfChildren (ifam, fam, ipers1, ipers2),
       ChangedOrderOfChildren (ifam', fam', ipers1', ipers2') ) ->
       Gwdb.compare_ifam ifam ifam' >>= fun () ->
