@@ -342,10 +342,8 @@ let compare_base_warning base w1 w2 =
 module Gen_BaseWarningSet (M : sig
   val base : Gwdb.base
 end) =
-struct
-  include Set.Make (struct
-    type t = base_warning
+Set.Make (struct
+  type t = base_warning
 
-    let compare = compare_base_warning M.base
-  end)
-end
+  let compare = compare_base_warning M.base
+end)
