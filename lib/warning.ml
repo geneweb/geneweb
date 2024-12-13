@@ -112,6 +112,12 @@ let int_of_warning_tag = function
   | YoungForMarriage (_p, _d, _ifam) -> 29
   | OldForMarriage (_p, _d, _ifam) -> 30
 
+let compare_family f1 f2 =
+  Gwdb.compare_ifam (Gwdb.get_ifam f1) (Gwdb.get_ifam f2)
+
+let compare_person p1 p2 =
+  Gwdb.compare_iper (Gwdb.get_iper p1) (Gwdb.get_iper p2)
+
 let normalize_warning (warning : base_warning) : base_warning =
   match warning with
   | PossibleDuplicateFam (f1, f2) ->
@@ -139,7 +145,9 @@ let normalize_warning (warning : base_warning) : base_warning =
       else warning
   | DeadOld (_p, _d) -> warning
   | DeadTooEarlyToBeFather (_p1, _p2) -> warning
-  | DistantChildren (_ifam, _p1, _p2) -> warning
+  | DistantChildren (ifam, p1, p2) ->
+      if compare_person p2 p1 < 0 then DistantChildren (ifam, p2, p1)
+      else warning
   | FEventOrder (_p, _fevent, _fevent2) -> warning
   | FWitnessEventAfterDeath (_p, _fevent, _ifam) -> warning
   | FWitnessEventBeforeBirth (_p, _fevent, _ifam) -> warning
@@ -213,12 +221,6 @@ let rec handle_homonymous base cpl_set result ws =
 
 let handle_homonymous base warnings =
   handle_homonymous base CoupleSet.empty [] warnings
-
-let compare_family f1 f2 =
-  Gwdb.compare_ifam (Gwdb.get_ifam f1) (Gwdb.get_ifam f2)
-
-let compare_person p1 p2 =
-  Gwdb.compare_iper (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 
 let ( >>= ) i f = if i = 0 then f () else i
 
