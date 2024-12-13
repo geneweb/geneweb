@@ -38,7 +38,7 @@ let ( // ) = Filename.concat
 let iter_path_entries f path =
   let rec loop path =
     match (Filename.dirname path, Filename.basename path) with
-    | ("." | "/"), base -> f base
+    | ("." | "/"), _ -> f path
     | path, base ->
         loop path;
         f (path // base)
