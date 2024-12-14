@@ -59,30 +59,49 @@ jobs:
         include:
           - os: windows-latest
             ocaml-compiler: 4.14.2
-
+    outputs:
+      total_matrix_jobs: ${{ strategy.job-total || 0 }}
+      metric: ${{ steps.collect-metrics.outputs.metric }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Start Build Timer
+        uses: ./.github/actions/ci-utils
+        with:
+          command: start-timer
 
       - name: Cache Opam dependencies
-        uses: actions/cache@v3
+        id: cache-opam
+        uses: actions/cache@v4
         with:
           path: ~/.opam
-          key: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-v2-${{ hashFiles('*.opam') }}-cache
-          restore-keys: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-v2-
+          key: ${{ (runner.os == 'Windows' && 'Windows' || runner.os) }}-${{ matrix.ocaml-compiler }}-v2-${{ hashFiles('*.opam') }}-cache
+          restore-keys: ${{ (runner.os == 'Windows' && 'Windows' || runner.os) }}-${{ matrix.ocaml-compiler }}-v2-
 
       - name: Setup Ocaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - name: Install GeneWeb dependencies
+      - name: Install Geneweb dependencies
         run: opam install . --deps-only
 
-      - name: Build Geneweb distrib
+      - name: "Build Geneweb: make build distrib"
         run: |
           opam exec -- ocaml ./configure.ml
-          opam exec -- make distrib
+          opam exec -- make build distrib
+
+      - name: Collect Build Metrics
+        id: collect-metrics
+        uses: ./.github/actions/ci-utils
+        with:
+          command: collect-metrics
+          os: ${{ matrix.os }}
+          ocaml-version: ${{ matrix.ocaml-compiler }}
+          cache-hit: ${{ steps.cache-opam.outputs.cache-hit }}
 
   build_v3:
     runs-on: ${{ matrix.os }}
@@ -92,16 +111,28 @@ jobs:
       matrix:
         os: [ubuntu-24.04, macos-15]
         ocaml-compiler: [4.14.2-nnp, 5.2.1]
-
+#       include:
+#         - os: windows-latest
+#           ocaml-compiler: 4.14.2
+    outputs:
+      total_matrix_jobs: ${{ strategy.job-total || 0 }}
+      metric: ${{ steps.collect-metrics.outputs.metric }}
     env:
       FMT_CI: ${{ startsWith(matrix.os, 'ubuntu') && matrix.ocaml-compiler < '5.2' }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Start Build Timer
+        uses: ./.github/actions/ci-utils
+        with:
+          command: start-timer
 
       - name: Cache Opam dependencies
-        uses: actions/cache@v3
+        id: cache-opam
+        uses: actions/cache@v4
         with:
           path: ~/.opam
           key: ${{ runner.os }}-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI && 'with-test' || 'no-test' }}-v3-${{ hashFiles('*.opam') }}-cache
@@ -112,32 +143,30 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler == '4.14.2-nnp' && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
 
-      - name: Install GeneWeb dependencies
-        run: |
-          if ${{ env.FMT_CI }}; then
-            opam install . --deps-only --with-test
-          else
-            opam install . --deps-only
-          fi
+      - name: Install Geneweb dependencies
+        if: ${{ env.FMT_CI != 'true' }}
+        run: opam install . --deps-only
 
-      - name: Install ancient for NNP
+      - name: Install Geneweb dependencies with test
+        if: ${{ env.FMT_CI == 'true' }}
+        run: opam install . --deps-only --with-test
+
+      - name: Install ancient dependency for nnp
         if: contains(matrix.ocaml-compiler, 'nnp')
         run: opam install ancient
 
       - name: Configure
         run: opam exec -- ocaml ./configure.ml --sosa-zarith
 
-      - name: Build distrib
-        env:
-          SKIP_BUILD: true
-        run: |
-          if ${{ env.FMT_CI }}; then
-            opam exec -- make fmt ci distrib
-          else
-            opam exec -- make build distrib
-          fi
+      - name: "Build Geneweb: make build distrib"
+        if: ${{ env.FMT_CI != 'true' }}
+        run: opam exec -- make build distrib
 
-      - name: Run gwd with cache-in-memory parameter and check output
+      - name: "Build Geneweb: make fmt ci distrib"
+        if: ${{ env.FMT_CI == 'true' }}
+        run: opam exec -- make fmt ci distrib
+
+      - name: "Test Geneweb daemon with --cache-in-memory"
         if: contains(matrix.ocaml-compiler, 'nnp')
         run: |
           output=$(distribution/gw/gwd -cache-in-memory testing 2>&1)
@@ -148,3 +177,33 @@ jobs:
             echo "Caching message not found, test failed."
             exit 1
           fi
+
+      - name: Collect Build Metrics
+        id: collect-metrics
+        uses: ./.github/actions/ci-utils
+        with:
+          command: collect-metrics
+          os: ${{ matrix.os }}
+          ocaml-version: ${{ matrix.ocaml-compiler }}
+          cache-hit: ${{ steps.cache-opam.outputs.cache-hit }}
+
+  build-results:
+    needs: [build_v2, build_v3]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Calculate total builds
+        id: calc
+        run: |
+          v2_total="${{ needs.build_v2.outputs.total_matrix_jobs }}"
+          v3_total="${{ needs.build_v3.outputs.total_matrix_jobs }}"
+          echo "total=$((v2_total + v3_total))" >> $GITHUB_OUTPUT
+
+      - name: Generate Build Summary
+        uses: ./.github/actions/ci-utils
+        with:
+          command: generate-summary
+          total-builds: ${{ steps.calc.outputs.total }}
