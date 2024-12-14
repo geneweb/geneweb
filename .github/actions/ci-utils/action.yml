@@ -1,0 +1,177 @@
+name: 'CI Utilities'
+description: 'Utilities for Geneweb CI including timing, metrics collection and summaries'
+
+inputs:
+  command:
+    description: 'Command to execute (collect-metrics or generate-summary)'
+    required: true
+  os:
+    description: 'Operating system'
+    required: false
+  ocaml-version:
+    description: 'OCaml version'
+    required: false
+  cache-hit:
+    description: 'Cache hit status'
+    required: false
+    default: 'false'
+  total-builds:
+    description: 'Total number of builds'
+    required: true
+
+outputs:
+  metric:
+    description: 'Build metric in JSON format'
+    value: ${{ steps.collect.outputs.metric }}
+
+runs:
+  using: "composite"
+  steps:
+    # Timer Start
+    - if: inputs.command == 'start-timer'
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+      run: |
+        ${{ runner.os == 'Windows' && '
+          $startTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+          "start_time=$startTime" | Out-File -FilePath $env:GITHUB_ENV -Append
+        ' || 'echo "start_time=$(date +%s)" >> $GITHUB_ENV' }}
+
+    # Metrics Collection
+    - if: inputs.command == 'collect-metrics'
+      id: collect
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+      run: |
+        ${{ runner.os == 'Windows' && '
+          $startTime = [int]$env:start_time
+          $endTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+          $buildTime = $endTime - $startTime
+
+          $size = (Get-ChildItem -Recurse "distribution" -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum ?? 0
+
+          $cacheHit = if ($env:CACHE_HIT -eq "true") { "true" } else { "false" }
+
+          $metric = "{""os"":""$($env:OS_NAME)"",""ocaml"":""$($env:OCAML_VERSION)"",""duration"":$buildTime,""status"":""$($env:JOB_STATUS)"",""cache_hit"":$cacheHit,""size_bytes"":$size}"
+
+          $metric | Set-Content "metric-$env:OS_NAME-$env:OCAML_VERSION.json" -NoNewline
+          "metric=$metric" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8 -NoNewline
+        ' || '
+          end_time=$(date +%s)
+          BUILD_TIME=$((end_time - start_time))
+
+          SIZE_BYTES=0
+          if [ -d "distribution" ]; then
+            if [ "$(uname)" = "Darwin" ]; then
+              SIZE_BYTES=$(find distribution -type f -exec stat -f %z {} + 2>/dev/null | awk "{sum += \$1} END {print sum}" || echo "0")
+            else
+              SIZE_BYTES=$(du -sb distribution 2>/dev/null | cut -f1 || echo "0")
+            fi
+          fi
+
+          printf -v metric "{\"os\":\"%s\",\"ocaml\":\"%s\",\"duration\":%d,\"status\":\"%s\",\"cache_hit\":%s,\"size_bytes\":%d}" \
+            "$OS_NAME" "$OCAML_VERSION" "$BUILD_TIME" "$JOB_STATUS" "$CACHE_HIT" "$SIZE_BYTES"
+
+          echo "$metric" > "metric-$OS_NAME-$OCAML_VERSION.json"
+          echo "metric=$metric" >> $GITHUB_OUTPUT
+        ' }}
+      env:
+        OS_NAME: ${{ inputs.os }}
+        OCAML_VERSION: ${{ inputs.ocaml-version }}
+        JOB_STATUS: ${{ job.status }}
+        CACHE_HIT: ${{ inputs.cache-hit }}
+
+    # Upload Metrics
+    - if: inputs.command == 'collect-metrics'
+      uses: actions/upload-artifact@v4
+      with:
+        name: metric-${{ inputs.os }}-${{ inputs.ocaml-version }}
+        path: metric-${{ inputs.os }}-${{ inputs.ocaml-version }}.json
+
+    # Summary Generation
+    - if: inputs.command == 'generate-summary'
+      uses: actions/download-artifact@v4
+      with:
+        pattern: metric-*
+        merge-multiple: true
+        path: metrics
+
+    - if: inputs.command == 'generate-summary'
+      shell: bash
+      run: |
+        set +e
+        mkdir -p metrics
+
+        echo "# 🔨 Geneweb CI Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        branch="${GITHUB_REF#refs/*/}"
+        if [[ $GITHUB_REF == refs/pull/* ]]; then
+          PR_NUM=$(echo $branch | cut -d/ -f1)
+          echo "Pull Request: [#$PR_NUM](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/pull/$PR_NUM)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "Branch: \`$branch\`" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "Commit: [\`${GITHUB_SHA:0:7}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/$GITHUB_SHA)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📈 Build Results Statistics" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| OS | OCaml | Status | Duration | Cache | Size |" >> $GITHUB_STEP_SUMMARY
+        echo "|------------|----------------|:---------:|-----------:|:--------:|---------|" >> $GITHUB_STEP_SUMMARY
+
+        find metrics -name "metric-*.json" -type f | while read -r f; do
+          if [ ! -f "$f" ]; then continue; fi
+
+          if ! jq -e . >/dev/null 2>&1 <<<"$(cat "$f")"; then
+            echo "Warning: Invalid JSON in $f" >&2
+            continue
+          fi
+
+          # Process metrics
+          os=$(jq -r '.os' "$f")
+          ocaml=$(jq -r '.ocaml' "$f")
+          status=$(jq -r '.status' "$f")
+          duration=$(jq -r '.duration' "$f")
+          cache_hit=$(jq -r '.cache_hit' "$f")
+          size=$(jq -r '.size_bytes' "$f")
+
+          status_icon=$([ "$status" = "success" ] && echo "✅" || echo "❌")
+          cache_icon=$([ "$cache_hit" = "true" ] && echo "📦" || echo "🔄")
+
+          mins=$((duration / 60))
+          secs=$((duration % 60))
+          duration_str=$(printf "%d min %02d s" "$mins" "$secs")
+
+          if [ "$size" -ge 1073741824 ]; then
+            size_str=$(printf "%.1f Go" "$(echo "scale=1; $size/1073741824" | bc)")
+          elif [ "$size" -ge 1048576 ]; then
+            size_str=$(printf "%.1f Mo" "$(echo "scale=1; $size/1048576" | bc)")
+          else
+            size_str=$(printf "%.1f Ko" "$(echo "scale=1; $size/1024" | bc)")
+          fi
+
+          printf "| %s | %s | %s | %s | %s | %s |\n" \
+            "$os" "$ocaml" "$status_icon" "$duration_str" "$cache_icon" "$size_str"
+        done | sort -t'|' -k2,2 -k3,3 >> $GITHUB_STEP_SUMMARY
+
+        # Count builds
+        total_builds=${{ inputs.total-builds }}
+        success_builds=0
+        for f in metrics/metric-*.json; do
+          [ ! -f "$f" ] && continue
+          if jq -e '.status == "success"' "$f" >/dev/null 2>&1; then
+            ((success_builds++))
+          fi
+        done
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "$success_builds" -eq "$total_builds" ]; then
+          echo "## ✅ $success_builds/$total_builds Builds Complete" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## ⚠️ $success_builds/$total_builds Builds Complete" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        exit 0
+
+    - if: inputs.command == 'generate-summary'
+      shell: bash
+      run: rm -rf metrics/
