@@ -73,9 +73,10 @@ start() {
 	-daemon \
 	-plugins -unsafe ${GENEWEB_HOME}/share/dist/gw/plugins \
 	-trace_failed_passwd \
+	-bd ${GENEWEB_DATA_PATH} \
 	-hd ${GENEWEB_HOME}/share/dist/gw \
+	-cache-in-memory
 	-log ${GENEWEB_HOME}/log/gwd.log \
-        -bd ${GENEWEB_DATA_PATH} \
 	$AUTH_ARG 2>&1
 	gwlaunch_log "-- Started gwd!"
 
