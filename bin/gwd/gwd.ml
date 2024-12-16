@@ -2076,6 +2076,7 @@ let main () =
     with Not_found -> "" |> Adef.encoded, !force_cgi
   in
   if not !debug then Sys.enable_runtime_warnings false;
+  Util.is_welcome := false;
   if cgi then
     begin
       Wserver.cgi := true;
