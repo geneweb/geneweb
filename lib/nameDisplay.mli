@@ -2,7 +2,6 @@ val hidden_first_name_txt : Adef.safe_string
 val hidden_surname_txt : Adef.safe_string
 val is_hidden : Config.config -> Gwdb.base -> Gwdb.person -> bool
 val is_restricted : Config.config -> Gwdb.base -> Gwdb.person -> bool
-val hidden_or_restricted_fullname_string : Config.config -> Adef.safe_string
 
 val html_formatted_hidden_or_restricted_fullname_string :
   Config.config -> Adef.safe_string
