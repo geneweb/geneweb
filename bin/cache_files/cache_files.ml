@@ -1,4 +1,3 @@
-let bd = ref ""
 let bname = ref ""
 let trace = ref false
 let fnames = ref false
@@ -140,7 +139,10 @@ let process_data base set =
 
 let speclist =
   [
-    ("-bd", Arg.String (fun x -> bd := x), " bases folder");
+    ( "-bd",
+      Arg.String Secure.set_base_dir,
+      "<DIR> Specify where the 'bases' directory with databases is installed \
+       (default if empty is '.')" );
     ("-fn", Arg.Set fnames, " first names");
     ("-sn", Arg.Set snames, " surnames");
     ("-al", Arg.Set aliases, " aliases");
@@ -159,15 +161,13 @@ let speclist =
   |> List.sort compare |> Arg.align
 
 let anonfun i = bname := i
-
-let usage =
-  "Usage: cache_files [options] base\n cd bases; before running cache_files."
+let usage = "Usage: cache_files [options] base\n where [options] are:"
 
 let () =
   Arg.parse speclist anonfun usage;
+  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   let bname = Filename.remove_extension (Filename.basename !bname) in
-  let base = Gwdb.open_base (!bd // bname) in
-  Secure.set_base_dir !bd;
+  let base = Gwdb.open_base (Secure.base_dir () // bname) in
   cache_dir := set_cache_dir bname;
 
   Printf.printf "Generating cache(s) compressed with gzip\n";
