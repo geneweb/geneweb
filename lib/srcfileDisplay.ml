@@ -504,6 +504,7 @@ let eval_var conf base env () _loc = function
       | _ -> raise Not_found)
   | [ "has_history" ] -> VVbool (Sys.file_exists (History.file_name conf))
   | [ "has_misc_notes" ] -> VVbool (Gwdb.read_nldb base <> [])
+  | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "nb_accesses" ] ->
       let r = count conf in
       let s =
@@ -549,7 +550,8 @@ let eval_predefined_apply conf _env f vl =
   | "uri_decode", [ s ] -> Util.uri_decode s
   | _ -> raise Not_found
 
-let print_start conf base =
+let print_welcome conf base =
+  Util.is_welcome := true;
   let env =
     let sosa_ref_l =
       let sosa_ref () = Util.find_sosa_ref conf base in

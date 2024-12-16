@@ -4,6 +4,8 @@ open Config
 open Def
 open Gwdb
 
+let is_welcome = ref false
+
 let print_default_gwf_file bname =
   let gwf =
     [

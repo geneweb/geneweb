@@ -815,6 +815,7 @@ let templ_eval_var conf = function
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
       VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
+  | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
