@@ -2127,4 +2127,9 @@ let () =
     GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->
     GwdLog.syslog `LOG_CRIT (p ^ ": " ^ s)
-  | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)
+  | exn -> (
+      let s = Printexc.get_backtrace () in
+      GwdLog.syslog `LOG_CRIT (Printexc.to_string exn);
+      if Printexc.backtrace_status () then
+        let s = Format.sprintf "Backtrace:@ %s" s in
+        GwdLog.syslog `LOG_CRIT s)
