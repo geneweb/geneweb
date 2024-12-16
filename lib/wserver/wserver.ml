@@ -278,7 +278,7 @@ let accept_connection tmout max_clients callback s =
         if !no_fork then client_connection tmout callback addr t
         else
           match Unix.fork () with
-          | exception exn ->
+          | exception _ ->
               eprintf "Fork failed\n";
               flush stderr
           | 0 -> (
