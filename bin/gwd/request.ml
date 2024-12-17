@@ -495,6 +495,8 @@ let treat_request =
           w_base @@ AdvSearchOkDisplay.print
         | "C" ->
           w_base @@ w_person @@ CousinsDisplay.print
+        | "CHK_DATA" ->
+          w_base @@ CheckDataDisplay.print
         | "CAL" -> w_base @@ Hutil.print_calendar
         | "CHG_CHN" when conf.wizard ->
           w_wizard @@ w_base @@ ChangeChildrenDisplay.print

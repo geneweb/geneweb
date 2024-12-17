@@ -66,6 +66,23 @@
   word-wrap: break-word;
 }
 
+/* Check data */
+.hl-check-data {
+  background-color: #FFEB3B;
+  border-radius: 2px;
+  white-space: pre;
+}
+
+.hl-check-data.narrow-nbsp {
+  background-color: #ffb300;
+}
+
+.zero-width-char {
+  display: inline-block;
+  min-width: 0.5em;
+  border: 1px dashed #FF5722;
+}
+
 /* Toolbar and characters panel */
 /* Light grey background color highlight for the toolbar characters.txt */
 .ch .hl {
