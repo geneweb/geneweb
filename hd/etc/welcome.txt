@@ -280,6 +280,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
       </div>
     </div>
+
     %if;(wizard and nb_persons.v!=0)
       <div class="d-flex flex-column justify-content-lg-center mt-2 mt-lg-4">
         <div class="h4 align-self-lg-center mr-lg-2">
@@ -299,6 +300,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
             %apply;book_button("src","source/sources","box-archive")
             %apply;book_button("title","title/titles","crown")
             %apply;book_button("domain","domain/domains","chess-rook")
+            <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success ml-2"
+              title="[*data typographic checker]"><i class="fas fa-spell-check"></i>
+            </a>
           </div>
         </div>
       </div>
