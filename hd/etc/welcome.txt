@@ -425,6 +425,9 @@ fr: Mon compte associatif
         %apply;book_button("src","source/sources","box-archive")
         %apply;book_button("title","title/titles","crown")
         %apply;book_button("domain","domain/domains","chess-rook")
+        <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success ml-2"
+          title="[*data typographic checker]"><i class="fas fa-spell-check"></i>
+        </a>
       </div>
     </div>
   </div>
