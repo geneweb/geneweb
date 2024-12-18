@@ -33,8 +33,6 @@ let lwt_reporter () =
   in
   { Logs.report }
 
-let is_gwdb_file path = String.equal (Filename.extension path) ".gwb"
-
 let sha1 s = s |> Digestif.SHA1.digest_string |> Digestif.SHA1.to_raw_string
 
 let pp_sockaddr ppf = function
