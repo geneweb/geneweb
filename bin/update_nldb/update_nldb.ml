@@ -211,7 +211,7 @@ let compute base bdir =
       (* list is: lfname :: list_nt, (key, link) :: list_ind *)
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | (list_nt, list_ind) as list ->
+      | (_, list_ind) as list ->
           (db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
            let list_ind =
              List.fold_left
