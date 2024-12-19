@@ -1,7 +1,6 @@
 module Y = Yojson
 module U = Yojson.Safe.Util
 module MS = Map.Make (String)
-
 open Lwt.Infix
 
 module Desc = struct
@@ -50,8 +49,7 @@ let find = MS.find_opt
 let fold = MS.fold
 
 module PingPong = struct
-  let ping =
-    decl "ping" Desc.Syntax.(ret string) (Lwt.return "pong")
+  let ping = decl "ping" Desc.Syntax.(ret string) (Lwt.return "pong")
 
   let echo =
     decl "echo" Desc.Syntax.(string @-> ret string) (fun s -> Lwt.return s)
