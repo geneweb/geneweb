@@ -1,8 +1,10 @@
 (** This module provides type-aware functions for encoding and decoding
     JSON messages. *)
 
-type !'a t
-(* Type of encoding of the 'a value. *)
+(* The type [!'a t] would be more precise, but OCaml 4.08 does not support
+   the injectivity annotation. *)
+type 'a t
+(** Type of encoding of the 'a value. *)
 
 val val_of_json : 'a t -> Yojson.Safe.t -> 'a option
 (** [val_of_json e j] returns the value of type 'a that is encoded in [j]

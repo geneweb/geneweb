@@ -1,5 +1,7 @@
 module Desc : sig
-  type (!'a, !'r) t
+  (* The type [(!'a, !'r) t] would be more precise, but OCaml 4.08 does
+     not support the injectivity annotation. *)
+  type ('a, 'r) t
   (** Type of the encoding of an arrow of type 'a. The parametric type [r] is
       the return type of the arrow. *)
 
