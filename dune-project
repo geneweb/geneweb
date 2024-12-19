@@ -52,3 +52,23 @@
     ocaml-option-nnp
   )
 )
+
+(package
+  (name geneweb-rpc)
+  (synopsis "RPC support for GeneWeb")
+  (tags (geneweb rpc json))
+  (depends
+    lwt
+    lwt_ppx
+    tls-lwt
+    cmdliner
+    logs
+    digestif
+    httpun
+    httpun-lwt-unix
+    httpun-ws
+    js_of_ocaml
+    js_of_ocaml-ppx
+    promise_jsoo
+    yojson
+    fmt))

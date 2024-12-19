@@ -28,6 +28,7 @@
 )
 
 (executable
+ (package geneweb)
  (name gwrepl)
  (public_name gwrepl)
  (link_flags -linkall -custom)

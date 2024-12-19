@@ -88,7 +88,7 @@ unpatch_files:
 	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
 	fi
 
-BUILD = dune build -p geneweb
+BUILD = dune build
 UNPATCH = $(MAKE) --no-print-directory unpatch_files
 
 unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
