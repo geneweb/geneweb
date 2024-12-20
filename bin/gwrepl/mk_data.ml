@@ -36,6 +36,12 @@ let if_sosa_zarith out fn =
   fn ();
   Printf.fprintf out "\n#endif\n"
 
+let before_after_ocaml_version ~before ~after version =
+  (if String.compare Sys.ocaml_version version < 0 then before else after) ()
+
+let before_after_ocaml_5_1_0 ~before ~after =
+  before_after_ocaml_version "5.1.0" ~before ~after
+
 let () =
   let opam_switch_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
   let opam_switch_prefix_lib = opam_switch_prefix // "lib" in
@@ -202,9 +208,15 @@ let () =
     List.iter aux
       [
         ( Filename.dirname ocaml_stdlib_directory,
-          "ocaml" // "stublibs" // "dllcamlstr.so" );
+          "ocaml" // "stublibs"
+          // before_after_ocaml_5_1_0
+               ~before:(fun () -> "dllcamlstr.so")
+               ~after:(fun () -> "dllcamlstrbyt.so") );
         ( Filename.dirname ocaml_stdlib_directory,
-          "ocaml" // "stublibs" // "dllunix.so" );
+          "ocaml" // "stublibs"
+          // before_after_ocaml_5_1_0
+               ~before:(fun () -> "dllunix.so")
+               ~after:(fun () -> "dllunixbyt.so") );
       ];
     if_sosa_zarith out (fun () ->
         aux (opam_switch_prefix_lib, "stublibs" // "dllzarith.so")));
