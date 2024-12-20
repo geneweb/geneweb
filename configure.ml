@@ -124,7 +124,8 @@ let () =
   let ancient_lib, ancient_file =
     let no_cache = ("", "gw_ancient.dum.ml") in
     if nnp_compiler then
-      if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
+      if !caching && installed "ancient" then
+        ("ancient", "gw_ancient.wrapped.ml")
       else (
         if !caching then
           Printf.eprintf
