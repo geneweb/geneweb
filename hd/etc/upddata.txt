@@ -203,10 +203,10 @@
                         <div class="text-nowrap align-self-sm-center ml-2 ml-sm-0">%p_list;</div>
                       </div>
                   %end;
-                  <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1%if;(e.data!="place") ml-2%end;">
+                  <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1%if;(e.data!="place") ml-3%end;">
                     <div class="flex-column flex-sm-row ml-sm-2%if;is_modified; my-2%end;">
                       %if;is_modified;
-                        <div class="pl-3 pr-sm-3 text-muted">
+                        <div class="pl-2 pr-sm-2 text-muted">
                       %else;
                         <a role="button" class="ml-2"
                            href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;" data-entry="%escape.printable.entry_value_unsort;">%nn;
@@ -234,16 +234,16 @@
                           <input type="hidden" name="data" value="%e.data;">
                           <input type="hidden" name="s" value="%e.s;">
                           <input type="hidden" name="k" value="kkk">
-                          <div class="d-flex flex-column px-1">
-                            %if;(b.notextarea="yes" or e.data="fn" or e.data="sn" or e.data="place")
-                              <input type="text" class="form-control flex-grow-1" id="nx_input" name="nx_input"
+                          <div class="d-flex flex-column px-0">
+                            %if;(b.notextarea!="yes" or e.data="src" or e.data="place")
+                              <textarea class="form-control pl-2 pr-1" id="nx_input" name="nx_input" rows="1"
+                                        maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
+                                        placeholder="%escape.printable.entry_value;"%if;(e.data!="fn" or e.data!="sn") autofocus%end; required>%escape.printable.entry_value;</textarea>
+                            %else;
+                              <input type="text" class="form-control flex-grow-1 pl-2 pr-1" id="nx_input" name="nx_input"
                                      maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
                                      value="%escape.printable.entry_value_unsort;" placeholder="%escape.printable.entry_value_unsort;"
                                      %if;(e.data!="fn" or e.data!="sn") autofocus%end; aria-label="Recipient's username" required>
-                            %else;
-                              <textarea class="form-control" id="nx_input" name="nx_input" rows="1"
-                                        maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                                        placeholder="%escape.printable.entry_value;"%if;(e.data!="fn" or e.data!="sn") autofocus%end; required>%escape.printable.entry_value;</textarea>
                             %end;
                             %(%if;(e.data="place" and suburb="")
                               <div class="custom-control custom-checkbox mx-md-2 pr-3">
@@ -270,7 +270,7 @@
                           </div>
                           <div class="valid-feedback">must be different!</div>
                         </div>
-                        <button type="submit" class="btn btn-primary ml-2 my-sm-2" title="[*modify]">OK</button>
+                        <button type="submit" class="btn btn-primary ml-3 my-sm-2" title="[*modify]">OK</button>
                       </form>
                       </div>
                     %end;
@@ -302,7 +302,7 @@
     let iTrm = -1;
     let iAdd = -1;
     document.addEventListener('keydown', (event) => {
-      if (event.altKey && event.key === 't' || event.key === 't' && event.target.tagName.toLowerCase() !== 'input') {
+      if (event.altKey && event.key === 't' || event.key === 't' && !['input', 'textarea'].includes(event.target.tagName.toLowerCase())) {
         event.preventDefault();
         let len = linkTrm.length;
         if (iTrm === -1) {
@@ -314,7 +314,7 @@
         linkTrm[iTrm].focus();
         }
       }
-      if (event.altKey && event.key === 'd' || event.key === 'd' && event.target.tagName.toLowerCase() !== 'input') {
+      if (event.altKey && event.key === 'd' || event.key === 'd' && !['INPUT', 'TEXTAREA'].includes(event.target.tagName)) {
         event.preventDefault();
         if (iAdd === -1) {
           iAdd = 0;
@@ -377,7 +377,6 @@ function updateInputField() {
 window.addEventListener('load', autoSelectLink);
 window.addEventListener('DOMContentLoaded', updateInputField);
 </script>
-
 %if;(e.s="")
 <script>
 // Highlight greek and cyrillic initials to avoid confusion with similar latin letters
