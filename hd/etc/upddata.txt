@@ -203,13 +203,13 @@
                         <div class="text-nowrap align-self-sm-center ml-2 ml-sm-0">%p_list;</div>
                       </div>
                   %end;
-                  <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1%if;(e.data!="place") ml-3%end;">
+                  <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1%if;(e.data!="place" and e.data!="src") ml-3%end;">
                     <div class="flex-column flex-sm-row ml-sm-2%if;is_modified; my-2%end;">
                       %if;is_modified;
                         <div class="pl-2 pr-sm-2 text-muted">
                       %else;
-                        <a role="button" class="ml-2"
-                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;" data-entry="%escape.printable.entry_value_unsort;">%nn;
+                        <a role="button" class="ml-1"
+                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;" data-entry="%escape.printable.entry_value_unsort;">%if;(e.data="src")<i class="fa fa-pen-to-square mr-2"></i></a>%end;
                       %end;
                       %if;(e.data="place" and suburb!="")
                         %if;is_modified;%escape.entry_value;
@@ -223,9 +223,10 @@
                           %end;
                         %end;
                       %else;
-                        %escape.entry_value;
+                        %if;(e.data!="src")%escape.entry_value;%else;%entry_value;
+                        %if;(e.key!="" and is_modified and entry_value!=escape.entry_value)<hr class="my-0">%escape.entry_value;%end;%end;
                       %end;
-                      %if;is_modified;</div>%else;</a>%end;
+                      %if;is_modified;</div>%else;%if;(e.data!="src")</a>%end;%end;
                       %if;is_modified;
                         <form class="mt-1 needs-validation" method="post" action="%action;" novalidate>
                           %hidden;
