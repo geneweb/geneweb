@@ -96,7 +96,8 @@
 %end;
 %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
     or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES" or (e.m="MOD_DATA" and e.data="src"))
+    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
+    or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js"
       integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
@@ -177,7 +178,7 @@
   -->
 </script>
 %end;
-%( Functions for caracter.txt %)
+%( Functions for character.txt %)
 %if;("ADD" in e.m or "MOD" in e.m)
 <script>
   // Attach a click event listener to each anchor element within the character's list container
@@ -293,10 +294,14 @@ $.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 %if;("MOD" in e.m)
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const input = document.querySelector('input[autofocus]:not([id="n"])');
-    if (input) {
-        input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
+    const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
+    if (focusableElement) {
+        focusableElement.focus();
+        if (focusableElement.setSelectionRange) {
+            focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
+        } else if (focusableElement.value) {
+            focusableElement.value = focusableElement.value;
+        }
     }
 });
 </script>
@@ -598,6 +603,7 @@ $(document).ready(function() {
 });
 </script>
 %end;
+%if;(e.m!="MOD_DATA")
 <script>
 // Floating placeholders for all textual inputs
 function initFloatingPlaceholders() {
@@ -635,3 +641,4 @@ function initFloatingPlaceholders() {
 
 document.addEventListener('DOMContentLoaded', initFloatingPlaceholders);
 </script>
+%end;
