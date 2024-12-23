@@ -49,10 +49,10 @@ let bdir base = base.data.bdir
 let nb_of_persons base = base.data.persons.len
 let nb_of_real_persons base = base.func.nb_of_real_persons ()
 let nb_of_families base = base.data.families.len
-let insert_string base s = base.func.Dbdisk.insert_string @@ Utf8.normalize s
+let insert_string base s = base.func.Dbdisk.insert_string @@ Geneweb_util.Utf8.normalize s
 
 let find_opt_string_istr base s =
-  base.func.Dbdisk.find_opt_string_istr @@ Utf8.normalize s
+  base.func.Dbdisk.find_opt_string_istr @@ Geneweb_util.Utf8.normalize s
 
 let commit_patches base = base.func.Dbdisk.commit_patches ()
 let commit_notes base s = base.func.Dbdisk.commit_notes s
@@ -167,11 +167,11 @@ let delete_person base ip =
       occupation = empty_string;
       sex = Neuter;
       access = Private;
-      birth = Date.cdate_None;
+      birth = Geneweb_util.Date.cdate_None;
       birth_place = empty_string;
       birth_note = empty_string;
       birth_src = empty_string;
-      baptism = Date.cdate_None;
+      baptism = Geneweb_util.Date.cdate_None;
       baptism_place = empty_string;
       baptism_note = empty_string;
       baptism_src = empty_string;
@@ -197,7 +197,7 @@ let delete_union base ip = patch_union base ip { family = [||] }
 let delete_family base ifam =
   patch_family base ifam
     {
-      marriage = Date.cdate_None;
+      marriage = Geneweb_util.Date.cdate_None;
       marriage_place = empty_string;
       marriage_note = empty_string;
       marriage_src = empty_string;
@@ -277,7 +277,7 @@ let base_notes_read_aux base fnotes mode =
       match mode with
       | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
       | Def.Rn1Ln -> ( try input_line ic with End_of_file -> "")
-      | Def.RnAll -> Mutil.input_file_ic ic
+      | Def.RnAll -> Geneweb_util.Mutil.input_file_ic ic
     in
     close_in ic;
     str
@@ -564,7 +564,7 @@ let read_or_create_visible base =
     if Sys.file_exists fname then (
       let ic = Secure.open_in fname in
       let visible =
-        if Files.check_magic Mutil.executable_magic ic then input_value ic
+        if Files.check_magic Geneweb_util.Mutil.executable_magic ic then input_value ic
         else Hashtbl.create (nb_of_persons base)
       in
       close_in ic;
@@ -581,7 +581,7 @@ let base_visible_write base =
     match !visible_ref with
     | Some visible ->
         let oc = Secure.open_out fname in
-        output_string oc Mutil.executable_magic;
+        output_string oc Geneweb_util.Mutil.executable_magic;
         output_value oc visible;
         close_out oc
     | None -> ()

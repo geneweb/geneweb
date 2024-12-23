@@ -9,10 +9,10 @@ open Util
 
 (* TODO this is defined 2 times *)
 type create_info = Update.create_info = {
-  ci_birth_date : Date.date option;
+  ci_birth_date : Geneweb_util.Date.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : Date.date option;
+  ci_death_date : Geneweb_util.Date.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -35,16 +35,16 @@ let person_key base ip =
 let string_family_of conf base ifam =
   let fam = foi base ifam in
   let sfam =
-    Futil.map_family_ps (person_key base)
+    Geneweb_util.Futil.map_family_ps (person_key base)
       (fun f -> f)
       (sou base) (gen_family_of_family fam)
   in
   let scpl =
-    Futil.map_couple_p conf.multi_parents (person_key base)
+    Geneweb_util.Futil.map_couple_p conf.multi_parents (person_key base)
       (gen_couple_of_family fam)
   in
   let sdes =
-    Futil.map_descend_p (person_key base) (gen_descend_of_family fam)
+    Geneweb_util.Futil.map_descend_p (person_key base) (gen_descend_of_family fam)
   in
   (sfam, scpl, sdes)
 
@@ -148,7 +148,7 @@ and eval_divorce fam =
 (* TODO : rewrite, second case with None passed as an argument looks odd *)
 and eval_divorce' fam s =
   match fam.divorce with
-  | Divorced d -> eval_date_var (Date.od_of_cdate d) s
+  | Divorced d -> eval_date_var (Geneweb_util.Date.od_of_cdate d) s
   | NotDivorced | Separated -> eval_date_var None s
 
 and eval_is_first env =
@@ -194,10 +194,10 @@ and eval_event_str conf base env =
         let e = nth_fevent (i - 1) env in
         let name =
           Util.string_of_fevent_name' conf e.efam_name
-          |> Adef.safe_fn Utf8.capitalize_fst
+          |> Adef.safe_fn Geneweb_util.Utf8.capitalize_fst
         in
         let date =
-          match Date.od_of_cdate e.efam_date with
+          match Geneweb_util.Date.od_of_cdate e.efam_date with
           | Some d -> DateDisplay.string_of_date conf d
           | None -> Adef.safe ""
         in
@@ -274,7 +274,7 @@ and eval_fwitness_note env =
 and eval_default_var conf s = Update_util.eval_default_var conf s
 
 and eval_event_date env s =
-  let od = family_events_opt env >>= fun e -> Date.od_of_cdate e.efam_date in
+  let od = family_events_opt env >>= fun e -> Geneweb_util.Date.od_of_cdate e.efam_date in
   eval_date_var od s
 
 and eval_simple_var conf base env (fam, cpl, des) = function
@@ -290,7 +290,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | [ "is_first" ] -> eval_is_first env
   | [ "is_last" ] -> eval_is_last env
-  | [ "marriage"; s ] -> eval_date_var (Date.od_of_cdate fam.marriage) s
+  | [ "marriage"; s ] -> eval_date_var (Geneweb_util.Date.od_of_cdate fam.marriage) s
   | [ "marriage_place" ] ->
       safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
   | [ "marriage_note" ] ->
@@ -359,8 +359,8 @@ and eval_parent' conf env k = function
   | [ "himher" ] ->
       let s =
         match get_env "cnt" env with
-        | Vint 1 -> Utf8.capitalize_fst (transl_nth conf "him/her" 0)
-        | Vint 2 -> Utf8.capitalize_fst (transl_nth conf "him/her" 1)
+        | Vint 1 -> Geneweb_util.Utf8.capitalize_fst (transl_nth conf "him/her" 0)
+        | Vint 2 -> Geneweb_util.Utf8.capitalize_fst (transl_nth conf "him/her" 1)
         | Vint _ -> transl conf "him/her"
         | _ -> "???"
       in
@@ -386,7 +386,7 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
         ->
-          let dmy = Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
+          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
           if dmy.day <> 0 then string_of_int dmy.day else ""
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg ({ day = d }, _)) })
         when d <> 0 ->
@@ -398,7 +398,7 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
         ->
-          let dmy = Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
+          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
           if dmy.month <> 0 then short_f_month dmy.month else ""
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg ({ month = m }, _)) })
@@ -417,7 +417,7 @@ and eval_create c = function
       | Update.Create (_, Some ci) -> (
           match ci.ci_birth_date with
           | Some (Dgreg (dmy, calendar)) ->
-              let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
+              let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
               add_precision (string_of_int dmy.year) dmy.prec
           | Some _ -> ""
           | None -> if ci.ci_public then "p" else "")
@@ -428,7 +428,7 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         ->
-          let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
+          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
           if dmy.day <> 0 then string_of_int dmy.day else ""
       | _ -> "")
   | "death_month" -> (
@@ -437,7 +437,7 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         -> (
-          let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
+          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
           match calendar with
           | Dfrench -> short_f_month dmy.month
           | Dgregorian | Djulian | Dhebrew ->
@@ -454,7 +454,7 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         ->
-          let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
+          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
           add_precision (string_of_int dmy.year) dmy.prec
       | Update.Create (_, Some { ci_death = death; ci_death_date = None }) -> (
           match death with DeadDontKnowWhen -> "+" | NotDead -> "-" | _ -> "")
@@ -626,7 +626,7 @@ let print_del1 conf base ifam =
   let title () =
     transl_nth conf "family/families" 0
     |> transl_decline conf "delete"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let p =
     match p_getenv conf.env "ip" with
@@ -649,21 +649,21 @@ let print_del1 conf base ifam =
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
   let title () =
     transl_decline conf "invert" ""
-    |> Utf8.capitalize_fst |> Adef.safe |> Output.print_string conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe |> Output.print_string conf
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
   (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
   Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf
-    (Utf8.capitalize_fst
+    (Geneweb_util.Utf8.capitalize_fst
        (transl conf "invert the order of the following families"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf "<ul><li>";
@@ -689,7 +689,7 @@ let print_inv1 conf base p ifam1 ifam2 =
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
@@ -721,7 +721,7 @@ let print_add conf base =
   in
   let fam =
     {
-      marriage = Date.cdate_None;
+      marriage = Geneweb_util.Date.cdate_None;
       marriage_place = "";
       marriage_note = "";
       marriage_src = "";
@@ -745,7 +745,7 @@ let print_add_parents conf base =
       let p = poi base (iper_of_string i) in
       let fam =
         {
-          marriage = Date.cdate_None;
+          marriage = Geneweb_util.Date.cdate_None;
           marriage_place = "";
           marriage_note = "";
           marriage_src = "";
@@ -863,7 +863,7 @@ let print_change_order conf base =
       let before, after = (get_family p, Array.of_list after) in
       let title () =
         transl_decline conf "invert" ""
-        |> Utf8.capitalize_fst |> Output.print_sstring conf
+        |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
       in
       (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
       Perso.interp_templ_with_menu
@@ -873,7 +873,7 @@ let print_change_order conf base =
       title ();
       Output.print_sstring conf "</h2>";
       Output.print_sstring conf
-        (Utf8.capitalize_fst
+        (Geneweb_util.Utf8.capitalize_fst
            (transl conf "invert the order of the following families"));
       Update.print_order_changed conf print_list before after;
       Output.print_sstring conf {|<form method="post" action="|};
@@ -887,7 +887,7 @@ let print_change_order conf base =
       Output.print_sstring conf
         {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+        (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>";
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf

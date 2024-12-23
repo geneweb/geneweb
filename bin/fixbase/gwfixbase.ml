@@ -5,7 +5,7 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~invalid_utf8 ~key bname =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
-  if not v1 then Mutil.verbose := false;
+  if not v1 then Geneweb_util.Mutil.verbose := false;
   let fast = !fast in
   let base = Gwdb.open_base bname in
   let fix = ref 0 in
@@ -56,9 +56,9 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   let cnt = ref 0 in
   let progress =
     if v2 then (fun i n ->
-      ProgrBar.run i n;
+      Geneweb_util.ProgrBar.run i n;
       i' := i)
-    else if v1 then ProgrBar.run
+    else if v1 then Geneweb_util.ProgrBar.run
     else fun _ _ -> ()
   in
   let report =
@@ -66,18 +66,18 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
       Some
         (fun s ->
           incr cnt;
-          ProgrBar.suspend ();
+          Geneweb_util.ProgrBar.suspend ();
           print_endline @@ "\t" ^ Geneweb.Fixbase.string_of_patch base s;
           flush stdout;
-          ProgrBar.restart !i' (nb_ind + nb_fam))
+          Geneweb_util.ProgrBar.restart !i' (nb_ind + nb_fam))
     else Some (fun _ -> incr cnt)
   in
 
-  if v1 then ProgrBar.start ();
+  if v1 then Geneweb_util.ProgrBar.start ();
   fix :=
     Geneweb.Fixbase.perform_fixes ~report ~progress ~base ~person_fixes
       ~family_fixes;
-  if v1 then ProgrBar.finish ();
+  if v1 then Geneweb_util.ProgrBar.finish ();
   if fast then (
     Gwdb.clear_strings_array base;
     Gwdb.clear_persons_array base);
@@ -148,7 +148,7 @@ let main () =
   if !bname = "" then (
     Arg.usage speclist usage;
     exit 2);
-  Lock.control (Files.lock_file !bname) false ~onerror:Lock.print_try_again
+  Geneweb_util.Lock.control (Files.lock_file !bname) false ~onerror:Geneweb_util.Lock.print_try_again
   @@ fun () ->
   if
     !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses

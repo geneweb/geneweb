@@ -508,11 +508,11 @@ let old_strings_of_fsname bname strings (_, person_patches) =
           else acc
         in
         let acc =
-          List.fold_left (aux Name.split_fname) acc
+          List.fold_left (aux Geneweb_util.Name.split_fname) acc
             (p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
         in
         let acc =
-          List.fold_left (aux Name.split_sname) acc
+          List.fold_left (aux Geneweb_util.Name.split_sname) acc
             (p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
         in
         acc)
@@ -575,11 +575,11 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
       person_patches (Array.to_list r)
 
 let new_strings_of_sname =
-  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p ->
+  new_strings_of_fsname_aux 1 0 Geneweb_util.Name.split_sname (fun p ->
       p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
 
 let new_strings_of_fname =
-  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p ->
+  new_strings_of_fsname_aux 2 1 Geneweb_util.Name.split_fname (fun p ->
       p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
 
 let strings_of_sname = function
@@ -594,7 +594,7 @@ let strings_of_fname = function
 
 type visible_state = VsNone | VsTrue | VsFalse
 
-let verbose = Mutil.verbose
+let verbose = Geneweb_util.Mutil.verbose
 
 let make_visible_record_access perm bname persons =
   let visible_ref = ref None in
@@ -867,18 +867,18 @@ let input_synchro bname =
 
 let person_of_key (persons : person record_access) strings persons_of_name
     first_name surname occ =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
+  let first_name = Geneweb_util.Mutil.nominative first_name in
+  let surname = Geneweb_util.Mutil.nominative surname in
   let ipl = persons_of_name (first_name ^ " " ^ surname) in
-  let first_name = Name.lower first_name in
-  let surname = Name.lower surname in
+  let first_name = Geneweb_util.Name.lower first_name in
+  let surname = Geneweb_util.Name.lower surname in
   let rec find = function
     | ip :: ipl ->
         let p = persons.get ip in
         if
           occ = p.occ
-          && first_name = Name.lower (strings.get p.first_name)
-          && surname = Name.lower (strings.get p.surname)
+          && first_name = Geneweb_util.Name.lower (strings.get p.first_name)
+          && surname = Geneweb_util.Name.lower (strings.get p.surname)
         then Some ip
         else find ipl
     | _ -> None
@@ -920,7 +920,7 @@ let opendb ?(read_only = false) bname =
   in
   let synchro = input_synchro bname in
   let particles =
-    Mutil.input_particles (Filename.concat bname "particles.txt")
+    Geneweb_util.Mutil.input_particles (Filename.concat bname "particles.txt")
   in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
   let version =
@@ -1121,7 +1121,7 @@ let opendb ?(read_only = false) bname =
   let commit_patches =
     if perm = RDONLY then fun () -> raise (HttpExn (Forbidden, __LOC__))
     else fun () ->
-      let tm = Unix.time () |> Unix.gmtime |> Mutil.sprintf_date in
+      let tm = Unix.time () |> Unix.gmtime |> Geneweb_util.Mutil.sprintf_date in
       (* read real person number (considering pending patches) *)
       let nbp =
         Hashtbl.fold
@@ -1250,8 +1250,8 @@ let opendb ?(read_only = false) bname =
         | RnAll ->
             let rec loop len =
               match input_char ic with
-              | exception End_of_file -> Buff.get len
-              | c -> loop (Buff.store len c)
+              | exception End_of_file -> Geneweb_util.Buff.get len
+              | c -> loop (Geneweb_util.Buff.store len c)
             in
             loop 0
       in
@@ -1305,7 +1305,7 @@ let opendb ?(read_only = false) bname =
       descends;
       strings;
       particles_txt = particles;
-      particles = lazy (Mutil.compile_particles particles);
+      particles = lazy (Geneweb_util.Mutil.compile_particles particles);
       bnotes;
       bdir = bname;
       perm;
@@ -1381,7 +1381,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
       descends = record_access_of descends;
       strings = record_access_of strings;
       particles_txt = particles;
-      particles = lazy (Mutil.compile_particles particles);
+      particles = lazy (Geneweb_util.Mutil.compile_particles particles);
       bnotes;
       bdir;
       perm = RDRW;

@@ -13,9 +13,9 @@ let string_of_title ?(safe = false) ?(link = true) conf base
       let href =
         let open Def in
         "m=TT&sm=S&t="
-        ^<^ Mutil.encode (Gwdb.sou base title)
+        ^<^ Geneweb_util.Mutil.encode (Gwdb.sou base title)
         ^^^ "&p="
-        ^<^ Mutil.encode (Gwdb.sou base place)
+        ^<^ Geneweb_util.Mutil.encode (Gwdb.sou base place)
       in
       Util.geneweb_link conf
         (href : Adef.encoded_string :> Adef.escaped_string)
@@ -100,7 +100,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
              in
              let acc =
                match date_end with
-               | Some (Date.Dgreg (d, _)) ->
+               | Some (Geneweb_util.Date.Dgreg (d, _)) ->
                    if d.month <> 0 then
                      let open Def in
                      acc ^>^ " - "
@@ -129,7 +129,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
   else acc
 
 let name_equiv n1 n2 =
-  Futil.eq_title_names Gwdb.eq_istr n1 n2
+  Geneweb_util.Futil.eq_title_names Gwdb.eq_istr n1 n2
   || (n1 = Def.Tmain && n2 = Def.Tnone)
   || (n1 = Def.Tnone && n2 = Def.Tmain)
 
@@ -137,8 +137,8 @@ let nobility_titles_list conf base p =
   let titles =
     List.fold_right
       (fun t l ->
-        let t_date_start = Date.od_of_cdate t.Def.t_date_start in
-        let t_date_end = Date.od_of_cdate t.Def.t_date_end in
+        let t_date_start = Geneweb_util.Date.od_of_cdate t.Def.t_date_start in
+        let t_date_end = Geneweb_util.Date.od_of_cdate t.Def.t_date_end in
         match l with
         | (nth, name, title, place, dates) :: rl
           when (not conf.Config.is_rtl) && nth = t.Def.t_nth
@@ -221,7 +221,7 @@ let get_death_text conf p p_auth =
   let on_death_date =
     match (p_auth, Gwdb.get_death p) with
     | true, Def.Death (_, d) -> (
-        let d = Date.date_of_cdate d in
+        let d = Geneweb_util.Date.date_of_cdate d in
         match List.assoc_opt "long_date" conf.Config.base_env with
         | Some "yes" ->
             let open Def in
@@ -242,7 +242,7 @@ let get_baptism_text conf p p_auth =
     else "" |> Adef.safe
   in
   let on_baptism_date =
-    match (p_auth, Date.od_of_cdate (Gwdb.get_baptism p)) with
+    match (p_auth, Geneweb_util.Date.od_of_cdate (Gwdb.get_baptism p)) with
     | true, Some d -> (
         match List.assoc_opt "long_date" conf.Config.base_env with
         | Some "yes" ->
@@ -264,7 +264,7 @@ let get_birth_text conf p p_auth =
     else "" |> Adef.safe
   in
   let on_birth_date =
-    match (p_auth, Date.od_of_cdate (Gwdb.get_birth p)) with
+    match (p_auth, Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p)) with
     | true, Some d -> (
         match List.assoc_opt "long_date" conf.Config.base_env with
         | Some "yes" ->
@@ -278,7 +278,7 @@ let get_birth_text conf p p_auth =
   born ^^^ " " ^<^ on_birth_date
 
 let get_marriage_date_text conf fam p_auth =
-  match (p_auth, Date.od_of_cdate (Gwdb.get_marriage fam)) with
+  match (p_auth, Geneweb_util.Date.od_of_cdate (Gwdb.get_marriage fam)) with
   | true, Some d -> (
       match List.assoc_opt "long_date" conf.Config.base_env with
       | Some "yes" ->
@@ -299,7 +299,7 @@ let get_burial_text conf p p_auth =
   let on_burial_date =
     match Gwdb.get_burial p with
     | Def.Buried cod -> (
-        match (p_auth, Date.od_of_cdate cod) with
+        match (p_auth, Geneweb_util.Date.od_of_cdate cod) with
         | true, Some d -> (
             match List.assoc_opt "long_date" conf.Config.base_env with
             | Some "yes" ->
@@ -324,7 +324,7 @@ let get_cremation_text conf p p_auth =
   let on_cremation_date =
     match Gwdb.get_burial p with
     | Def.Cremated cod -> (
-        match (p_auth, Date.od_of_cdate cod) with
+        match (p_auth, Geneweb_util.Date.od_of_cdate cod) with
         | true, Some d -> (
             match List.assoc_opt "long_date" conf.Config.base_env with
             | Some "yes" ->
@@ -659,8 +659,8 @@ let tree_generation_list conf base gv p =
 let get_date_place conf base auth_for_all_anc p =
   if auth_for_all_anc || Util.authorized_age conf base p then
     let d1 =
-      match Date.od_of_cdate (Gwdb.get_birth p) with
-      | None -> Date.od_of_cdate (Gwdb.get_baptism p)
+      match Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p) with
+      | None -> Geneweb_util.Date.od_of_cdate (Gwdb.get_baptism p)
       | x -> x
     in
     let d1 =
@@ -669,15 +669,15 @@ let get_date_place conf base auth_for_all_anc p =
         Array.fold_left
           (fun d ifam ->
             if d <> None then d
-            else Date.od_of_cdate (Gwdb.get_marriage (Gwdb.foi base ifam)))
+            else Geneweb_util.Date.od_of_cdate (Gwdb.get_marriage (Gwdb.foi base ifam)))
           d1 (Gwdb.get_family p)
     in
     let d2 =
-      match Date.date_of_death (Gwdb.get_death p) with
+      match Geneweb_util.Date.date_of_death (Gwdb.get_death p) with
       | Some d -> Some d
       | None -> (
           match Gwdb.get_burial p with
-          | Def.Buried cod | Def.Cremated cod -> Date.od_of_cdate cod
+          | Def.Buried cod | Def.Cremated cod -> Geneweb_util.Date.od_of_cdate cod
           | Def.UnknownBurial -> None)
     in
     let auth_for_all_anc =
@@ -685,7 +685,7 @@ let get_date_place conf base auth_for_all_anc p =
       else
         match d2 with
         | Some (Dgreg (d, _)) ->
-            let a = Date.time_elapsed d conf.Config.today in
+            let a = Geneweb_util.Date.time_elapsed d conf.Config.today in
             Util.strictly_after_private_years conf a
         | _ -> false
     in
@@ -779,7 +779,7 @@ let first_possible_duplication base ip (iexcl, fexcl) =
       match List.assoc_opt i !cache with
       | Some s -> s
       | None ->
-          let s = Name.lower @@ Gwdb.sou base i in
+          let s = Geneweb_util.Name.lower @@ Gwdb.sou base i in
           cache := (i, s) :: !cache;
           s
   in
@@ -950,12 +950,12 @@ let build_surnames_list conf base v p =
   List.sort
     (fun (s1, _) (s2, _) ->
       match
-        Utf8.alphabetic_order
+        Geneweb_util.Utf8.alphabetic_order
           (Util.surname_without_particle base s1)
           (Util.surname_without_particle base s2)
       with
       | 0 ->
-          Utf8.alphabetic_order
+          Geneweb_util.Utf8.alphabetic_order
             (Util.surname_particle base s1)
             (Util.surname_particle base s2)
       | x -> x)
@@ -1003,7 +1003,7 @@ let build_list_eclair conf base v p =
             match db with
             | Some dd -> (
                 match d with
-                | Some d -> if Date.compare_date d dd < 0 then Some d else db
+                | Some d -> if Geneweb_util.Date.compare_date d dd < 0 then Some d else db
                 | None -> db)
             | None -> d
           in
@@ -1011,7 +1011,7 @@ let build_list_eclair conf base v p =
             match de with
             | Some dd -> (
                 match d with
-                | Some d -> if Date.compare_date d dd > 0 then Some d else de
+                | Some d -> if Geneweb_util.Date.compare_date d dd > 0 then Some d else de
                 | None -> de)
             | None -> d
           in
@@ -1024,14 +1024,14 @@ let build_list_eclair conf base v p =
     else (
       Gwdb.Marker.set mark (Gwdb.get_iper p) true;
       add_surname p surn (Gwdb.get_birth_place p)
-        (Date.od_of_cdate (Gwdb.get_birth p));
+        (Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p));
       add_surname p surn (Gwdb.get_baptism_place p)
-        (Date.od_of_cdate (Gwdb.get_baptism p));
-      let death = Date.date_of_death (Gwdb.get_death p) in
+        (Geneweb_util.Date.od_of_cdate (Gwdb.get_baptism p));
+      let death = Geneweb_util.Date.date_of_death (Gwdb.get_death p) in
       add_surname p surn (Gwdb.get_death_place p) death;
       let burial =
         match Gwdb.get_burial p with
-        | Def.Buried cod | Def.Cremated cod -> Date.od_of_cdate cod
+        | Def.Buried cod | Def.Cremated cod -> Geneweb_util.Date.od_of_cdate cod
         | Def.UnknownBurial -> None
       in
       add_surname p surn (Gwdb.get_burial_place p) burial;
@@ -1040,7 +1040,7 @@ let build_list_eclair conf base v p =
           let fam = Gwdb.foi base ifam in
           add_surname p surn
             (Gwdb.get_marriage_place fam)
-            (Date.od_of_cdate (Gwdb.get_marriage fam)))
+            (Geneweb_util.Date.od_of_cdate (Gwdb.get_marriage fam)))
         (Gwdb.get_family p))
   in
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
@@ -1078,18 +1078,18 @@ let build_list_eclair conf base v p =
   List.sort
     (fun (s1, pl1, _, _, _, _) (s2, pl2, _, _, _, _) ->
       match
-        Utf8.alphabetic_order
+        Geneweb_util.Utf8.alphabetic_order
           (Util.surname_without_particle base s1)
           (Util.surname_without_particle base s2)
       with
       | 0 -> (
           match
-            Utf8.alphabetic_order
+            Geneweb_util.Utf8.alphabetic_order
               (Util.surname_particle base s1)
               (Util.surname_particle base s2)
           with
           | 0 ->
-              Utf8.alphabetic_order
+              Geneweb_util.Utf8.alphabetic_order
                 (pl1 : Adef.escaped_string :> string)
                 (pl2 : Adef.escaped_string :> string)
           | x -> x)
@@ -1119,10 +1119,10 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                     match text with
                     | Some text ->
                         let rec loop i len =
-                          if i = String.length text then Buff.get len
+                          if i = String.length text then Geneweb_util.Buff.get len
                           else if text.[i] = '*' then
-                            loop (i + 1) (Buff.mstore len v)
-                          else loop (i + 1) (Buff.store len text.[i])
+                            loop (i + 1) (Geneweb_util.Buff.mstore len v)
+                          else loop (i + 1) (Geneweb_util.Buff.store len text.[i])
                         in
                         loop 0 0
                     | None -> v
@@ -1144,7 +1144,7 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                   (a : Adef.safe_string)
                   ^^^ {|<a href="|}
                   ^<^ (Util.commd conf ^^^ {|m=NOTES&f=|}
-                       ^<^ (Mutil.encode pg :> Adef.escaped_string)
+                       ^<^ (Geneweb_util.Mutil.encode pg :> Adef.escaped_string)
                        ^>^ {|#p_|}
                        ^ string_of_int text.Def.NLDB.lnPos
                         : Adef.escaped_string
@@ -1194,7 +1194,7 @@ let rec compare_ls sl1 sl2 =
       (* les performances à cause du try..with.                *)
       let c =
         try Stdlib.compare (int_of_string s1) (int_of_string s2)
-        with Failure _ -> Utf8.alphabetic_order s1 s2
+        with Failure _ -> Geneweb_util.Utf8.alphabetic_order s1 s2
       in
       if c = 0 then compare_ls sl1 sl2 else c
   | _ :: _, [] -> 1
@@ -1217,8 +1217,8 @@ end)
 type ancestor_surname_info =
   | Branch of
       (string
-      * Date.date option
-      * Date.date option
+      * Geneweb_util.Date.date option
+      * Geneweb_util.Date.date option
       * string
       * Gwdb.person
       * Sosa.t list
@@ -1226,8 +1226,8 @@ type ancestor_surname_info =
   | Eclair of
       (string
       * Adef.safe_string
-      * Date.date option
-      * Date.date option
+      * Geneweb_util.Date.date option
+      * Geneweb_util.Date.date option
       * Gwdb.person
       * Gwdb.iper list
       * TemplAst.loc)
@@ -1237,7 +1237,7 @@ type title_item =
   * Gwdb.istr Def.gen_title_name
   * Gwdb.istr
   * Gwdb.istr list
-  * (Date.date option * Date.date option) list
+  * (Geneweb_util.Date.date option * Geneweb_util.Date.date option) list
 
 type 'a env =
   | Vallgp of generation_person list
@@ -1337,8 +1337,8 @@ let get_linked_page conf base p s =
   let db = Gwdb.read_nldb base in
   let db = Notes.merge_possible_aliases conf db in
   let key =
-    let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-    let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+    let fn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
+    let sn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
     (fn, sn, Gwdb.get_occ p)
   in
   List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
@@ -1377,7 +1377,7 @@ let get_note_source conf base ?p auth no_note note_source =
   else Adef.safe ""
 
 let date_aux conf p_auth date =
-  match (p_auth, Date.od_of_cdate date) with
+  match (p_auth, Geneweb_util.Date.od_of_cdate date) with
   | true, Some d ->
       if List.assoc_opt "long_date" conf.Config.base_env = Some "yes" then
         let open Def in
@@ -1586,7 +1586,7 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | Vfam (_, fam, _, m_auth) -> (
           match Gwdb.get_divorce fam with
           | Def.Divorced d -> (
-              let d = Date.od_of_cdate d in
+              let d = Geneweb_util.Date.od_of_cdate d in
               match d with
               | Some d when m_auth ->
                   DateDisplay.string_slash_of_date conf d |> safe_val
@@ -1736,7 +1736,7 @@ and eval_simple_str_var conf base env (_, p_auth) = function
   | "slash_marriage_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
-          match (m_auth, Date.od_of_cdate (Gwdb.get_marriage fam)) with
+          match (m_auth, Geneweb_util.Date.od_of_cdate (Gwdb.get_marriage fam)) with
           | true, Some s -> DateDisplay.string_slash_of_date conf s |> safe_val
           | _ -> null_val)
       | _ -> raise Not_found)
@@ -1848,12 +1848,12 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "base"; "name" ] -> TemplAst.VVstring conf.Config.bname
   | [ "base"; "nb_persons" ] ->
       TemplAst.VVstring
-        (Mutil.string_of_int_sep
+        (Geneweb_util.Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
            (Gwdb.nb_of_persons base))
   | [ "base"; "real_nb_persons" ] ->
       TemplAst.VVstring
-        (Mutil.string_of_int_sep
+        (Geneweb_util.Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
            (Gwdb.nb_of_real_persons base))
   | "cell" :: sl -> (
@@ -2229,7 +2229,7 @@ and eval_ancestor_field_var conf base env gp loc = function
       | _ -> null_val)
   | [ "interval" ] -> (
       let to_string x =
-        Mutil.string_of_int_sep
+        Geneweb_util.Mutil.string_of_int_sep
           (Util.transl conf "(thousand separator)")
           (int_of_string @@ Sosa.to_string x)
       in
@@ -2294,7 +2294,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
               (fun sosa (str, n) ->
                 let open Def in
                 ( str ^^^ "&s" ^<^ string_of_int n ^<^ "="
-                  ^<^ (Sosa.to_string sosa |> Mutil.encode),
+                  ^<^ (Sosa.to_string sosa |> Geneweb_util.Mutil.encode),
                   n + 1 ))
               sosa_list
               (Adef.encoded "", 1)
@@ -2340,31 +2340,31 @@ and eval_num conf n = function
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   (* TODO factorize this *)
   | "baptism_date" :: sl -> (
-      match Date.od_of_cdate (Gwdb.get_baptism p) with
+      match Geneweb_util.Date.od_of_cdate (Gwdb.get_baptism p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
   | "birth_date" :: sl -> (
-      match Date.od_of_cdate (Gwdb.get_birth p) with
+      match Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
   | "burial_date" :: sl -> (
       match Gwdb.get_burial p with
       | Def.Buried cod when p_auth -> (
-          match Date.od_of_cdate cod with
+          match Geneweb_util.Date.od_of_cdate cod with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | Def.Buried _ | Def.Cremated _ | Def.UnknownBurial -> null_val)
   | "cremated_date" :: sl -> (
       match Gwdb.get_burial p with
       | Def.Cremated cod when p_auth -> (
-          match Date.od_of_cdate cod with
+          match Geneweb_util.Date.od_of_cdate cod with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | Def.Buried _ | Def.Cremated _ | Def.UnknownBurial -> null_val)
   | "death_date" :: sl -> (
       if not p_auth then null_val
       else
-        match Date.date_of_death (Gwdb.get_death p) with
+        match Geneweb_util.Date.date_of_death (Gwdb.get_death p) with
         | Some d -> eval_date_field_var conf d sl
         | None -> null_val)
   | "event" :: sl -> (
@@ -2392,8 +2392,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "nldb" env with
       | Vnldb db ->
           let key =
-            let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-            let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+            let fn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
+            let sn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
             (fn, sn, Gwdb.get_occ p)
           in
           let r =
@@ -2416,8 +2416,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           let r =
             if p_auth then
               let key =
-                let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-                let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+                let fn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
+                let sn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
                 (fn, sn, Gwdb.get_occ p)
               in
               links_to_ind conf base db key <> []
@@ -2447,8 +2447,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "nldb" env with
       | Vnldb db ->
           let key =
-            let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-            let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+            let fn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
+            let sn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
             (fn, sn, Gwdb.get_occ p)
           in
           List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
@@ -2457,7 +2457,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | "marriage_date" :: sl -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, true) -> (
-          match Date.od_of_cdate (Gwdb.get_marriage fam) with
+          match Geneweb_util.Date.od_of_cdate (Gwdb.get_marriage fam) with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | _ -> raise Not_found)
@@ -2560,7 +2560,7 @@ and eval_date_field_var conf d = function
   | [ "julian_day" ] -> (
       match d with
       | Dgreg (dmy, _) ->
-          let sdn = Date.to_sdn ~from:Dgregorian dmy in
+          let sdn = Geneweb_util.Date.to_sdn ~from:Dgregorian dmy in
           TemplAst.VVstring (string_of_int sdn)
       | _ -> null_val)
   | [ "month" ] -> (
@@ -2594,13 +2594,13 @@ and eval_date_field_var conf d = function
   | _ -> raise Not_found
 
 and eval_nobility_title_field_var (id, pl) = function
-  | [ "ident_key" ] -> safe_val (Mutil.encode id)
-  | [ "place_key" ] -> safe_val (Mutil.encode pl)
+  | [ "ident_key" ] -> safe_val (Geneweb_util.Mutil.encode id)
+  | [ "place_key" ] -> safe_val (Geneweb_util.Mutil.encode pl)
   | [] -> TemplAst.VVstring (if pl = "" then id else id ^ " " ^ pl)
   | _ -> raise Not_found
 
 and eval_bool_event_field base (p, p_auth) event_item = function
-  | "has_date" -> p_auth && Event.get_date event_item <> Date.cdate_None
+  | "has_date" -> p_auth && Event.get_date event_item <> Geneweb_util.Date.cdate_None
   | "has_place" -> p_auth && Gwdb.sou base (Event.get_place event_item) <> ""
   | "has_note" -> p_auth && Gwdb.sou base (Event.get_note event_item) <> ""
   | "has_src" -> p_auth && Gwdb.sou base (Event.get_src event_item) <> ""
@@ -2608,10 +2608,10 @@ and eval_bool_event_field base (p, p_auth) event_item = function
   | "has_spouse" -> p_auth && Event.get_spouse_iper event_item <> None
   | "computable_age" ->
       if p_auth then
-        match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
+        match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
         | Some d -> not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | None -> (
-            match Date.cdate_to_dmy_opt (Gwdb.get_baptism p) with
+            match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_baptism p) with
             | Some d -> not (d.day = 0 && d.month = 0 && d.prec <> Sure)
             | None -> false)
       else false
@@ -2621,17 +2621,17 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
   | "age" ->
       if p_auth then
         let birth_date, approx =
-          match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
-          | None -> (Date.cdate_to_dmy_opt (Gwdb.get_baptism p), true)
+          match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
+          | None -> (Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_baptism p), true)
           | x -> (x, false)
         in
         match
-          (birth_date, Date.cdate_to_dmy_opt (Event.get_date event_item))
+          (birth_date, Geneweb_util.Date.cdate_to_dmy_opt (Event.get_date event_item))
         with
         | ( Some ({ prec = Sure | About | Maybe } as d1),
             Some ({ prec = Sure | About | Maybe } as d2) )
           when d1 <> d2 ->
-            let a = Date.time_elapsed d1 d2 in
+            let a = Geneweb_util.Date.time_elapsed d1 d2 in
             let s =
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
               else Util.transl_decline conf "possibly (date)" "" ^ " "
@@ -2651,7 +2651,7 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
   | "date" -> (
       if not p_auth then null_val
       else
-        match Date.od_of_cdate (Event.get_date event_item) with
+        match Geneweb_util.Date.od_of_cdate (Event.get_date event_item) with
         | Some d -> DateDisplay.string_of_date conf d |> safe_val
         | None -> null_val)
   | "on_date" -> date_aux conf p_auth (Event.get_date event_item)
@@ -2669,7 +2669,7 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
 
 and eval_event_field_var conf base env (p, p_auth) event_item loc = function
   | "date" :: sl -> (
-      match (p_auth, Date.od_of_cdate (Event.get_date event_item)) with
+      match (p_auth, Geneweb_util.Date.od_of_cdate (Event.get_date event_item)) with
       | true, Some d -> eval_date_field_var conf d sl
       | _ -> null_val)
   | "spouse" :: sl -> (
@@ -2699,13 +2699,13 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       Util.accessible_by_key conf base p (Gwdb.p_first_name base p)
         (Gwdb.p_surname base p)
   | "birthday" -> (
-      match (p_auth, Date.cdate_to_dmy_opt (Gwdb.get_birth p)) with
+      match (p_auth, Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p)) with
       | true, Some d ->
           if d.prec = Sure && Gwdb.get_death p = Def.NotDead then
             d.day = conf.Config.today.day
             && d.month = conf.Config.today.month
             && d.year < conf.Config.today.year
-            || (not (Date.leap_year conf.Config.today.year))
+            || (not (Geneweb_util.Date.leap_year conf.Config.today.year))
                && d.day = 29 && d.month = 2 && conf.Config.today.day = 1
                && conf.Config.today.month = 3
           else false
@@ -2715,7 +2715,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) -> (
           match (Gwdb.get_relation fam, Gwdb.get_divorce fam) with
           | (Def.Married | Def.NoSexesCheckMarried), Def.NotDivorced -> (
-              match (m_auth, Date.cdate_to_dmy_opt (Gwdb.get_marriage fam)) with
+              match (m_auth, Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam)) with
               | true, Some d ->
                   let father = Util.pget conf base (Gwdb.get_father fam) in
                   let mother = Util.pget conf base (Gwdb.get_mother fam) in
@@ -2729,7 +2729,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                     d.day = conf.Config.today.day
                     && d.month = conf.Config.today.month
                     && d.year < conf.Config.today.year
-                    || (not (Date.leap_year conf.Config.today.year))
+                    || (not (Geneweb_util.Date.leap_year conf.Config.today.year))
                        && d.day = 29 && d.month = 2 && conf.Config.today.day = 1
                        && conf.Config.today.month = 3
                   else false
@@ -2738,7 +2738,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | _ -> false)
   | "computable_age" ->
       if p_auth then
-        match (Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p) with
+        match (Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p) with
         | Some d, Def.NotDead -> not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | _ -> false
       else false
@@ -2749,7 +2749,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
             _ )
           when d1 <> d2 ->
-            let a = Date.time_elapsed d1 d2 in
+            let a = Geneweb_util.Date.time_elapsed d1 d2 in
             a.year > 0
             || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
         | _ -> false
@@ -2759,12 +2759,12 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              ( Date.cdate_to_dmy_opt (Gwdb.get_birth p),
-                Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) )
+              ( Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p),
+                Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) )
             with
             | ( Some ({ prec = Sure | About | Maybe } as d1),
                 Some ({ prec = Sure | About | Maybe } as d2) ) ->
-                let a = Date.time_elapsed d1 d2 in
+                let a = Geneweb_util.Date.time_elapsed d1 d2 in
                 a.year > 0
                 || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
             | _ -> false
@@ -2781,7 +2781,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_aliases" ->
       if (not p_auth) && Util.is_hide_names conf p then false
       else Gwdb.get_aliases p <> []
-  | "has_baptism_date" -> p_auth && Gwdb.get_baptism p <> Date.cdate_None
+  | "has_baptism_date" -> p_auth && Gwdb.get_baptism p <> Geneweb_util.Date.cdate_None
   | "has_baptism_place" ->
       p_auth && Gwdb.sou base (Gwdb.get_baptism_place p) <> ""
   | "has_baptism_source" ->
@@ -2792,7 +2792,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_baptism_witnesses" ->
       p_auth
       && has_witness_for_event conf base p (Event.Pevent Def.Epers_Baptism)
-  | "has_birth_date" -> p_auth && Gwdb.get_birth p <> Date.cdate_None
+  | "has_birth_date" -> p_auth && Gwdb.get_birth p <> Geneweb_util.Date.cdate_None
   | "has_birth_place" -> p_auth && Gwdb.sou base (Gwdb.get_birth_place p) <> ""
   | "has_birth_source" -> p_auth && Gwdb.sou base (Gwdb.get_birth_src p) <> ""
   | "has_birth_note" ->
@@ -2803,7 +2803,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_burial_date" ->
       if p_auth then
         match Gwdb.get_burial p with
-        | Def.Buried cod -> Date.od_of_cdate cod <> None
+        | Def.Buried cod -> Geneweb_util.Date.od_of_cdate cod <> None
         | Def.Cremated _ | Def.UnknownBurial -> false
       else false
   | "has_burial_place" ->
@@ -2843,7 +2843,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_cremation_date" ->
       if p_auth then
         match Gwdb.get_burial p with
-        | Def.Cremated cod -> Date.od_of_cdate cod <> None
+        | Def.Cremated cod -> Geneweb_util.Date.od_of_cdate cod <> None
         | Def.Buried _ | Def.UnknownBurial -> false
       else false
   | "has_cremation_place" ->
@@ -3056,10 +3056,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "access" -> Util.acces conf base p |> safe_val
   | "age" -> (
       match
-        (p_auth, Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p)
+        (p_auth, Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p)
       with
       | true, Some d, Def.NotDead ->
-          Date.time_elapsed d conf.Config.today
+          Geneweb_util.Date.time_elapsed d conf.Config.today
           |> DateDisplay.string_of_age conf
           |> safe_val
       | _ -> null_val)
@@ -3157,7 +3157,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
             _approx )
           when d1 <> d2 ->
-            DateDisplay.string_of_age conf (Date.time_elapsed d1 d2) |> safe_val
+            DateDisplay.string_of_age conf (Geneweb_util.Date.time_elapsed d1 d2) |> safe_val
         | _ -> null_val
       else null_val
   | "death_place" ->
@@ -3179,13 +3179,13 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else Gwdb.p_first_name base p |> Util.escape_html |> safe_val
   | "first_name_key" ->
       if Util.is_hide_names conf p && not p_auth then null_val
-      else Gwdb.p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
+      else Gwdb.p_first_name base p |> Geneweb_util.Name.lower |> Geneweb_util.Mutil.encode |> safe_val
   | "first_name_key_val" ->
       if Util.is_hide_names conf p && not p_auth then null_val
-      else Gwdb.p_first_name base p |> Name.lower |> str_val
+      else Gwdb.p_first_name base p |> Geneweb_util.Name.lower |> str_val
   | "first_name_key_strip" ->
       if Util.is_hide_names conf p && not p_auth then null_val
-      else Name.strip_c (Gwdb.p_first_name base p) '"' |> str_val
+      else Geneweb_util.Name.strip_c (Gwdb.p_first_name base p) '"' |> str_val
   | "hidden_fullname" ->
       safe_val (NameDisplay.hidden_or_restricted_fullname_string conf)
   | "history_file" ->
@@ -3209,7 +3209,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "index" -> (
       match get_env "p_link" env with
       | Vbool _ -> null_val
-      | _ -> Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode |> safe_val)
+      | _ -> Gwdb.get_iper p |> Gwdb.string_of_iper |> Geneweb_util.Mutil.encode |> safe_val)
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->
@@ -3237,12 +3237,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              ( Date.cdate_to_dmy_opt (Gwdb.get_birth p),
-                Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) )
+              ( Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p),
+                Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) )
             with
             | ( Some ({ prec = Sure | About | Maybe } as d1),
                 Some ({ prec = Sure | About | Maybe } as d2) ) ->
-                Date.time_elapsed d1 d2
+                Geneweb_util.Date.time_elapsed d1 d2
                 |> DateDisplay.string_of_age conf
                 |> safe_val
             | _ -> null_val
@@ -3261,7 +3261,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           let first_name = Gwdb.p_first_name base p in
           let surname = Gwdb.p_surname base p in
           if first_name <> "?" && surname <> "?" then
-            (first_name ^ " " ^ surname |> Name.lower |> Util.escape_html)
+            (first_name ^ " " ^ surname |> Geneweb_util.Name.lower |> Util.escape_html)
             :: list
           else list
         in
@@ -3320,14 +3320,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "on_baptism_date" -> date_aux conf p_auth (Gwdb.get_baptism p)
   | "slash_baptism_date" ->
       if p_auth then
-        match Date.od_of_cdate (Gwdb.get_baptism p) with
+        match Geneweb_util.Date.od_of_cdate (Gwdb.get_baptism p) with
         | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
         | None -> null_val
       else null_val
   | "on_birth_date" -> date_aux conf p_auth (Gwdb.get_birth p)
   | "slash_birth_date" ->
       if p_auth then
-        match Date.od_of_cdate (Gwdb.get_birth p) with
+        match Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p) with
         | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
         | None -> null_val
       else null_val
@@ -3347,7 +3347,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if p_auth then
         match Gwdb.get_burial p with
         | Def.Buried cod -> (
-            match Date.od_of_cdate cod with
+            match Geneweb_util.Date.od_of_cdate cod with
             | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
             | None -> null_val)
         | Def.Cremated _ | Def.UnknownBurial -> raise Not_found
@@ -3359,7 +3359,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "slash_cremation_date" -> (
       match Gwdb.get_burial p with
       | Def.Cremated cod -> (
-          match (p_auth, Date.od_of_cdate cod) with
+          match (p_auth, Geneweb_util.Date.od_of_cdate cod) with
           | true, Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
           | _ -> null_val)
       | _ -> raise Not_found)
@@ -3372,7 +3372,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "slash_death_date" -> (
       match (p_auth, Gwdb.get_death p) with
       | true, Def.Death (_, d) ->
-          Date.date_of_cdate d
+          Geneweb_util.Date.date_of_cdate d
           |> DateDisplay.string_slash_of_date conf
           |> safe_val
       | _ -> null_val)
@@ -3383,17 +3383,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "prev_fam_father" -> (
       match get_env "prev_fam" env with
       | Vfam (_, _, (ifath, _, _), _) ->
-          Gwdb.string_of_iper ifath |> Mutil.encode |> safe_val
+          Gwdb.string_of_iper ifath |> Geneweb_util.Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "prev_fam_index" -> (
       match get_env "prev_fam" env with
       | Vfam (ifam, _, _, _) ->
-          Gwdb.string_of_ifam ifam |> Mutil.encode |> safe_val
+          Gwdb.string_of_ifam ifam |> Geneweb_util.Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "prev_fam_mother" -> (
       match get_env "prev_fam" env with
       | Vfam (_, _, (_, imoth, _), _) ->
-          Gwdb.string_of_iper imoth |> Mutil.encode |> safe_val
+          Gwdb.string_of_iper imoth |> Geneweb_util.Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "public_name" ->
       if (not p_auth) && Util.is_hide_names conf p then null_val
@@ -3448,13 +3448,13 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         |> Util.escape_html |> safe_val
   | "surname_key" ->
       if Util.is_hide_names conf p && not p_auth then null_val
-      else Gwdb.p_surname base p |> Name.lower |> Mutil.encode |> safe_val
+      else Gwdb.p_surname base p |> Geneweb_util.Name.lower |> Geneweb_util.Mutil.encode |> safe_val
   | "surname_key_val" ->
       if Util.is_hide_names conf p && not p_auth then null_val
-      else Gwdb.p_surname base p |> Name.lower |> str_val
+      else Gwdb.p_surname base p |> Geneweb_util.Name.lower |> str_val
   | "surname_key_strip" ->
       if Util.is_hide_names conf p && not p_auth then null_val
-      else Name.strip_c (Gwdb.p_surname base p) '"' |> str_val
+      else Geneweb_util.Name.strip_c (Gwdb.p_surname base p) '"' |> str_val
   | "title" -> Util.person_title conf base p |> safe_val
   | _ -> raise Not_found
 
@@ -3467,7 +3467,7 @@ and eval_family_field_var conf base env
           let ep = make_ep conf base ifath in
           eval_person_field_var conf base env ep loc sl)
   | "marriage_date" :: sl -> (
-      match Date.od_of_cdate (Gwdb.get_marriage fam) with
+      match Geneweb_util.Date.od_of_cdate (Gwdb.get_marriage fam) with
       | Some d when m_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
   | "mother" :: sl -> (
@@ -3579,11 +3579,11 @@ and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
       let pp = Util.pget conf base (parent cpl) in
       if p_auth && Util.authorized_age conf base pp then
         match
-          ( Date.cdate_to_dmy_opt (Gwdb.get_birth pp),
-            Date.cdate_to_dmy_opt (Gwdb.get_birth p) )
+          ( Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth pp),
+            Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p) )
         with
         | Some d1, Some d2 ->
-            Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
+            Geneweb_util.Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
         | _ -> Adef.safe ""
       else Adef.safe ""
   | None -> raise Not_found
@@ -3639,7 +3639,7 @@ let eval_transl conf base env upp s c =
         | _ -> assert false
       in
       let r = Util.translate_eval (Util.transl_nth conf s n) in
-      if upp then Utf8.capitalize_fst r else r
+      if upp then Geneweb_util.Utf8.capitalize_fst r else r
   | _ -> Templ.eval_transl conf upp s c
 
 let print_foreach conf base print_ast eval_expr =
@@ -3650,7 +3650,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first a ->
           let env = ("alias", Vstring (Gwdb.sou base a)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -3785,7 +3785,7 @@ let print_foreach conf base print_ast eval_expr =
       | Vcelll celll -> celll
       | _ -> raise Not_found
     in
-    Ext_list.iter_first
+    Geneweb_util.Ext_list.iter_first
       (fun first cell ->
         let env = ("cell", Vcell cell) :: ("first", Vbool first) :: env in
         List.iter (print_ast env ep) al)
@@ -3878,7 +3878,7 @@ let print_foreach conf base print_ast eval_expr =
     loop 0
   in
   let print_foreach_event env al ((p, _) as ep) =
-    Ext_list.iter_first
+    Geneweb_util.Ext_list.iter_first
       (fun first evt ->
         let env = ("event", Vevent (p, evt)) :: env in
         let env = ("first", Vbool first) :: env in
@@ -4055,7 +4055,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first s ->
           let env = ("first_name_alias", Vstring (Gwdb.sou base s)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4078,7 +4078,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_nobility_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first x ->
           let env = ("nobility_title", Vtitle (p, x)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4100,7 +4100,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_qualifier env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first nn ->
           let env = ("qualifier", Vstring (Gwdb.sou base nn)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4112,7 +4112,7 @@ let print_foreach conf base print_ast eval_expr =
        should be merged *)
     (* This is to print relation attached to [p] (Gwdb.get_rparents) *)
     if p_auth then
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first r ->
           let env = ("rel", Vrel (r, None)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4241,7 +4241,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_surname_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first s ->
           let env = ("surname_alias", Vstring (Gwdb.sou base s)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4451,9 +4451,9 @@ let eval_predefined_apply conf env f vl =
           l := SortedList.add sl !l;
           ""
       | _ -> raise Not_found)
-  | "hexa", [ s ] -> Ext_string.hexa_string s
+  | "hexa", [ s ] -> Geneweb_util.Ext_string.hexa_string s
   | "initial", [ s ] ->
-      if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
+      if String.length s = 0 then "" else String.sub s 0 (Geneweb_util.Utf8.next s 0)
   | "lazy_print", [ v ] -> (
       match get_env "lazy_print" env with
       | Vlazyp r ->
@@ -4664,7 +4664,7 @@ let print_ancestors_dag conf base v p =
     ^<^ options ^^^ "&" ^<^ Util.acces conf base p
   in
   let page_title =
-    Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+    Util.transl conf "tree" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
   in
   DagDisplay.make_and_print_dag conf base elem_txt vbar_txt true set []
     page_title (Adef.escaped "")
@@ -4689,8 +4689,8 @@ let print_ascend conf base p =
 let print_what_links conf base p =
   if Util.authorized_age conf base p then (
     let key =
-      let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-      let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+      let fn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
+      let sn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
       (fn, sn, Gwdb.get_occ p)
     in
     let db = Gwdb.read_nldb base in
@@ -4698,7 +4698,7 @@ let print_what_links conf base p =
     let pgl = links_to_ind conf base db key in
     let title h =
       Util.transl conf "linked pages"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Util.transl conf ":" |> Output.print_sstring conf;
       if h then Output.print_string conf (simple_person_text conf base p true)
       else (

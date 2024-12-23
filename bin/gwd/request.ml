@@ -1,11 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 let person_is_std_key conf base p k =
-  let k = Name.strip_lower k in
-  if k = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p) then
+  let k = Geneweb_util.Name.strip_lower k in
+  if k = Geneweb_util.Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p) then
     true
   else if
-    List.exists (fun n -> Name.strip n = k)
+    List.exists (fun n -> Geneweb_util.Name.strip n = k)
       (Gwdb.person_misc_names base p (Geneweb.Util.nobtit conf base))
   then
     true
@@ -59,7 +59,7 @@ let relation_print conf base p =
 
 let specify conf base n pl =
   let title _ = Geneweb.Output.printf conf "%s : %s" n (Geneweb.Util.transl conf "specify") in
-  let n = Name.crush_lower n in
+  let n = Geneweb_util.Name.crush_lower n in
   let ptll =
     List.map
       (fun p ->
@@ -80,12 +80,12 @@ let specify conf base n pl =
          in
          let compare_and_add t pn =
            let pn = Gwdb.sou base pn in
-           if Name.crush_lower pn = n then add_tl t
+           if Geneweb_util.Name.crush_lower pn = n then add_tl t
            else
              match Gwdb.get_qualifiers p with
                nn :: _ ->
                let nn = Gwdb.sou base nn in
-               if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t
+               if Geneweb_util.Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t
              | _ -> ()
          in
          List.iter
@@ -128,7 +128,7 @@ let specify conf base n pl =
       | [] -> ()
       | fnal ->
         Geneweb.Output.print_sstring conf "\n<em>(" ;
-        Ext_list.iter_first begin fun first fna ->
+        Geneweb_util.Ext_list.iter_first begin fun first fna ->
           if not first then Geneweb.Output.print_sstring conf ", ";
           Gwdb.sou base fna |> Geneweb.Util.escape_html |> Geneweb.Output.print_string conf
         end fnal ;
@@ -182,7 +182,7 @@ let very_unknown conf _ =
   | Some sname, Some fname ->
     let title _ =
       Geneweb.Util.transl conf "not found"
-      |> Utf8.capitalize_fst
+      |> Geneweb_util.Utf8.capitalize_fst
       |> Geneweb.Output.print_sstring conf ;
       Geneweb.Output.print_sstring conf (Geneweb.Util.transl conf ":") ;
       Geneweb.Output.print_sstring conf {| "|} ;
@@ -205,7 +205,7 @@ let very_unknown conf _ =
         Geneweb.Output.print_sstring conf (Geneweb.Util.transl conf ":") ;
         Geneweb.Output.print_sstring conf " " ;
         Geneweb.Util.transl conf "not found"
-        |> Utf8.capitalize_fst
+        |> Geneweb_util.Utf8.capitalize_fst
         |> Geneweb.Output.print_sstring conf ;
       in
       Geneweb.Output.status conf Def.Not_Found;
@@ -218,7 +218,7 @@ let very_unknown conf _ =
 let unknown conf n =
   let title _ =
     Geneweb.Util.transl conf "not found"
-    |> Utf8.capitalize_fst
+    |> Geneweb_util.Utf8.capitalize_fst
     |> Geneweb.Output.print_sstring conf ;
     Geneweb.Output.print_sstring conf (Geneweb.Util.transl conf ":") ;
     Geneweb.Output.print_sstring conf {| "|} ;
@@ -238,11 +238,11 @@ let make_henv conf base =
         let first_name = Gwdb.p_first_name base p in
         let surname = Gwdb.p_surname base p in
         if Geneweb.Util.accessible_by_key conf base p first_name surname then
-          [ "pz", Name.lower first_name |> Mutil.encode
-          ; "nz", Name.lower surname |> Mutil.encode
-          ; "ocz", Gwdb.get_occ p |> string_of_int |> Mutil.encode
+          [ "pz", Geneweb_util.Name.lower first_name |> Geneweb_util.Mutil.encode
+          ; "nz", Geneweb_util.Name.lower surname |> Geneweb_util.Mutil.encode
+          ; "ocz", Gwdb.get_occ p |> string_of_int |> Geneweb_util.Mutil.encode
           ]
-        else [ "iz", Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode ]
+        else [ "iz", Gwdb.get_iper p |> Gwdb.string_of_iper |> Geneweb_util.Mutil.encode ]
       in
       { conf with henv = conf.henv @ x }
     | None -> conf
@@ -250,12 +250,12 @@ let make_henv conf base =
   let conf =
     match Geneweb.Util.p_getenv conf.env "dsrc" with
     | Some "" | None -> conf
-    | Some s -> { conf with henv = conf.henv @ ["dsrc", Mutil.encode s] }
+    | Some s -> { conf with henv = conf.henv @ ["dsrc", Geneweb_util.Mutil.encode s] }
   in
   let conf =
     match Geneweb.Util.p_getenv conf.env "templ" with
     | None -> conf
-    | Some s -> { conf with henv = conf.henv @ ["templ", Mutil.encode s] }
+    | Some s -> { conf with henv = conf.henv @ ["templ", Geneweb_util.Mutil.encode s] }
   in
   let conf =
     match Geneweb.Util.p_getenv conf.env "escache" with
@@ -269,7 +269,7 @@ let make_henv conf base =
   in
   let aux param conf =
     match Geneweb.Util.p_getenv conf.Geneweb.Config.env param with
-    | Some s -> { conf with henv = conf.henv @ [param, Mutil.encode s] }
+    | Some s -> { conf with henv = conf.henv @ [param, Geneweb_util.Mutil.encode s] }
     | None -> conf
   in
   aux "alwsurn" conf
@@ -289,7 +289,7 @@ let make_senv conf base =
   let set_senv conf vm vi =
     let aux k v conf =
       if Geneweb.Util.p_getenv conf.Geneweb.Config.env k = Some v
-      then { conf with senv = conf.senv @ [ k, Mutil.encode v ] }
+      then { conf with senv = conf.senv @ [ k, Geneweb_util.Mutil.encode v ] }
       else conf
     in
     let conf =
@@ -300,22 +300,22 @@ let make_senv conf base =
     in
     let conf =
       match Geneweb.Util.p_getenv conf.env "et" with
-      | Some x -> { conf with senv = conf.senv @ ["et", Mutil.encode x] }
+      | Some x -> { conf with senv = conf.senv @ ["et", Geneweb_util.Mutil.encode x] }
       | _ -> conf
     in
     let conf = aux "cgl" "on" conf in
     let conf =
       match Geneweb.Util.p_getenv conf.env "bd" with
       | None | Some ("0" | "") -> conf
-      | Some x -> { conf with senv = conf.senv @ ["bd", Mutil.encode x] }
+      | Some x -> { conf with senv = conf.senv @ ["bd", Geneweb_util.Mutil.encode x] }
     in
     match Geneweb.Util.p_getenv conf.env "color" with
-    | Some x -> { conf with senv = conf.senv @ ["color", Mutil.encode x] }
+    | Some x -> { conf with senv = conf.senv @ ["color", Geneweb_util.Mutil.encode x] }
     | _ -> conf
   in
   let get x = Geneweb.Util.p_getenv conf.Geneweb.Config.env x in
   match get "em", get "ei", get "ep", get "en", get "eoc" with
-  | Some vm, Some vi, _, _, _ -> set_senv conf (Mutil.encode vm) (Mutil.encode vi)
+  | Some vm, Some vi, _, _, _ -> set_senv conf (Geneweb_util.Mutil.encode vm) (Geneweb_util.Mutil.encode vi)
   | Some vm, None, Some vp, Some vn, voco ->
     let voc =
       match voco with
@@ -328,7 +328,7 @@ let make_senv conf base =
       | None -> incorrect_request conf; raise Exit
     in
     let vi = Gwdb.string_of_iper ip in
-    set_senv conf (Mutil.encode vm) (Mutil.encode vi)
+    set_senv conf (Geneweb_util.Mutil.encode vm) (Geneweb_util.Mutil.encode vi)
   | _ -> conf
 
 let propose_base conf =
@@ -340,7 +340,7 @@ let propose_base conf =
   Geneweb.Output.print_sstring conf {|<input name="b" size="40"> =&gt; |} ;
   Geneweb.Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg">|} ;
   Geneweb.Util.transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst
+  |> Geneweb_util.Utf8.capitalize_fst
   |> Geneweb.Output.print_sstring conf ;
   Geneweb.Output.print_sstring conf "</button></li></ul>";
   Geneweb.Hutil.trailer conf
@@ -355,7 +355,7 @@ let try_plugin list conf base_name m =
 
 let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = Geneweb.Util.bpath (conf.Geneweb.Config.bname ^ ".gwb") in
-  Lock.control
+  Geneweb_util.Lock.control
     (Files.lock_file bfile) true
     ~onerror:(fun () -> onerror conf base_name)
     (fun () -> fn conf base_name)
@@ -438,7 +438,7 @@ let treat_request =
           with
           | Some (welcome_cnt, request_cnt, start_date) ->
             GwdLog.log begin fun oc ->
-              let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
+              let thousand oc x = output_string oc @@ Geneweb_util.Mutil.string_of_int_sep ","  x in
               Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
                 thousand (welcome_cnt + request_cnt) thousand welcome_cnt
                 start_date
@@ -631,9 +631,9 @@ let treat_request =
               match Geneweb.Util.p_getenv conf.env "n" with
                 Some n ->
                 begin match Geneweb.Util.p_getenv conf.env "t" with
-                    Some "P" -> ("fn", Mutil.encode n) :: conf.env
-                  | Some "N" -> ("sn", Mutil.encode n) :: conf.env
-                  | _ -> ("v", Mutil.encode n) :: conf.env
+                    Some "P" -> ("fn", Geneweb_util.Mutil.encode n) :: conf.env
+                  | Some "N" -> ("sn", Geneweb_util.Mutil.encode n) :: conf.env
+                  | _ -> ("v", Geneweb_util.Mutil.encode n) :: conf.env
                 end
               | None -> conf.env
             in
@@ -732,23 +732,23 @@ let treat_request =
   end else begin
     let title _ =
       Geneweb.Util.transl conf "error"
-      |> Utf8.capitalize_fst
+      |> Geneweb_util.Utf8.capitalize_fst
       |> Geneweb.Output.print_sstring conf
     in
     Geneweb.Hutil.rheader conf title ;
     Geneweb.Output.print_sstring conf "<ul><li>" ;
-    Geneweb.Util.transl conf "base" |> Utf8.capitalize_fst |> Geneweb.Output.print_sstring conf ;
+    Geneweb.Util.transl conf "base" |> Geneweb_util.Utf8.capitalize_fst |> Geneweb.Output.print_sstring conf ;
     Geneweb.Output.print_sstring conf {| "|} ;
     Geneweb.Output.print_sstring conf conf.bname ;
     Geneweb.Output.print_sstring conf {|" |} ;
     Geneweb.Util.transl conf "reserved to friends or wizards"
-    |> Utf8.capitalize_fst
+    |> Geneweb_util.Utf8.capitalize_fst
     |> Geneweb.Output.print_sstring conf ;
     Geneweb.Output.print_sstring conf ".</li></ul>" ;
     Geneweb.Hutil.trailer conf
   end
   in
-  if conf.debug then Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
+  if conf.debug then Geneweb_util.Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
   else process ()
 
 let treat_request conf =

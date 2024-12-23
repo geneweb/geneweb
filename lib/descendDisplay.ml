@@ -58,7 +58,7 @@ let descendants_title conf base p h =
        (transl conf "descendants")
        (s1 :> string)
        (s2 :> string))
-  |> Utf8.capitalize_fst |> Output.print_sstring conf
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
 
 let display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -91,10 +91,10 @@ let display_descendants_level conf base max_level ancestor =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
+        let c = Geneweb_util.Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
         if c = 0 then
           let c =
-            Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
+            Geneweb_util.Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
           in
           if c = 0 then compare (get_occ p2) (get_occ p1) else c
         else c)
@@ -112,7 +112,7 @@ let display_descendants_level conf base max_level ancestor =
   in
   Hutil.header conf (descendants_title conf base ancestor);
   (text_level conf max_level : Adef.safe_string :> string)
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   if !len > 1 then (
     Output.print_sstring conf " (";
     Output.print_sstring conf (string_of_int !len);
@@ -125,7 +125,7 @@ let display_descendants_level conf base max_level ancestor =
     (fun (p, _) ->
       if is_empty_person p then "?"
       else
-        String.sub (p_surname base p) (Ext_string.initial (p_surname base p)) 1)
+        String.sub (p_surname base p) (Geneweb_util.Ext_string.initial (p_surname base p)) 1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
       Output.print_string conf
@@ -406,7 +406,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
            (transl conf "descendants")
            (s : Adef.safe_string :> string)
            (s : Adef.safe_string :> string)
-         |> Utf8.capitalize_fst |> Adef.safe)
+         |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe)
   in
   let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
   let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
@@ -415,11 +415,11 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Output.print_string conf (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
   (if authorized_age conf base p then
-   match (Date.od_of_cdate (get_birth p), get_death p) with
+   match (Geneweb_util.Date.od_of_cdate (get_birth p), get_death p) with
    | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
    | _ -> ());
   (text_to conf max_level : Adef.safe_string :> string)
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf ".<p>";
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
@@ -427,7 +427,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   if !total > 1 then (
     Output.print_sstring conf "<p>";
     Output.printf conf "%s%s %d %s"
-      (Utf8.capitalize_fst (transl conf "total"))
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "total"))
       (Util.transl conf ":") !total
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
     if max_level > 1 then
@@ -503,9 +503,9 @@ let sort_and_display conf base paths precision list =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
+        let c = Geneweb_util.Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
         if c = 0 then
-          Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
+          Geneweb_util.Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
         else c)
       list
   in
@@ -542,7 +542,7 @@ let display_descendant_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
     let txt =
-      transl conf "index of the descendants" |> Utf8.capitalize_fst |> Adef.safe
+      transl conf "index of the descendants" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
     in
     if not h then
       wprint_geneweb_link conf
@@ -578,7 +578,7 @@ let display_spouse_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title _ =
     transl conf "index of the spouses (non descendants)"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
   let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -635,16 +635,16 @@ let print_desc_table_header conf =
   let nb_col = ref 2 in
   Output.print_sstring conf {|<tr class="descends_table_header"><th>|};
   transl conf "n° d'Aboville"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</th><th>";
   transl_nth conf "person/persons" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</th>";
   let aux get txt =
     if p_getenv conf.env get = Some "on" then (
       Output.print_sstring conf "<th>";
       incr nb_col;
-      txt |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      txt |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf "</th>")
   in
   aux "birth" (transl conf "date of birth");
@@ -774,7 +774,7 @@ let print_person_table conf base p lab =
   aux [ "marr_date" ] (fun fam spouse ->
       let mdate =
         if authorized_age conf base p && authorized_age conf base spouse then
-          match Date.od_of_cdate (get_marriage fam) with
+          match Geneweb_util.Date.od_of_cdate (get_marriage fam) with
           | Some d -> DateDisplay.string_slash_of_date conf d
           | None -> Adef.safe "&nbsp;"
         else Adef.safe "&nbsp;"
@@ -809,7 +809,7 @@ let print_person_table conf base p lab =
                transl_decline conf "possibly (date)" ""
                |> Output.print_sstring conf;
                Output.print_sstring conf " ");
-             Date.time_elapsed d1 d2
+             Geneweb_util.Date.time_elapsed d1 d2
              |> DateDisplay.string_of_age conf
              |> Output.print_string conf
          | _ -> ());
@@ -866,7 +866,7 @@ let print_person_table conf base p lab =
             if authorized_age conf base p && authorized_age conf base spouse
             then
               let fam = foi base (get_family u).(i) in
-              match Date.od_of_cdate (get_marriage fam) with
+              match Geneweb_util.Date.od_of_cdate (get_marriage fam) with
               | Some d ->
                   DateDisplay.string_slash_of_date conf d
                   |> Output.print_string conf
@@ -964,7 +964,7 @@ let display_descendant_with_table conf base max_lev p =
           Output.print_sstring conf (string_of_int nb_col);
           Output.print_sstring conf {|">|};
           transl_nth conf "generation/generations" 0
-          |> Utf8.capitalize_fst |> Output.print_sstring conf;
+          |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
           Output.print_sstring conf " ";
           Output.print_sstring conf (string_of_int lev);
           Output.print_sstring conf "</th></tr>");
@@ -975,7 +975,7 @@ let display_descendant_with_table conf base max_lev p =
   Hutil.header_fluid conf (descendants_title conf base p);
   Output.print_sstring conf "<p>";
   (text_to conf max_lev : Adef.safe_string :> string)
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|.</p><table class="descends_table">|};
   (* On affiche l'entête et on en profite pour récupèrer *)
   (* le nombre de colonnes à afficher pour les colspans. *)
@@ -985,7 +985,7 @@ let display_descendant_with_table conf base max_lev p =
     [ (p, Adef.safe "") ]
     [ (p, Adef.safe "") ];
   Output.print_sstring conf "</table><p>";
-  transl conf "total" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  transl conf "total" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf (string_of_int !nb_pers);
@@ -1256,7 +1256,7 @@ let print_aboville conf base max_level p =
   Hutil.header conf (descendants_title conf base p);
   Hutil.print_link_to_welcome conf true;
   (text_to conf max_level : Adef.safe_string :> string)
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf ".<br><p>";
   let rec loop_ind lev lab p =
     if num_aboville then (
@@ -1275,7 +1275,7 @@ let print_aboville conf base max_level p =
         Output.print_sstring conf "&amp;";
         if authorized_age conf base p && authorized_age conf base spouse then
           let fam = foi base (get_family u).(i) in
-          match Date.cdate_to_dmy_opt (get_marriage fam) with
+          match Geneweb_util.Date.cdate_to_dmy_opt (get_marriage fam) with
           | Some d ->
               Output.print_sstring conf {|<font size="-2"><em>|};
               Output.print_sstring conf (DateDisplay.prec_year_text conf d);

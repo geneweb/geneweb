@@ -60,7 +60,7 @@ let compute base bdir =
          let wfile =
            List.fold_left Filename.concat bdir [ base_wiznotes_dir base; file ]
          in
-         let content = Mutil.read_file_content wfile in
+         let content = Geneweb_util.Mutil.read_file_content wfile in
          let list = notes_links content in
          if list = ([], []) then ()
          else (
@@ -109,13 +109,13 @@ let compute base bdir =
     Buffer.add_string buffer @@ sou base istr;
     Buffer.add_char buffer ' '
   in
-  ProgrBar.full := '*';
+  Geneweb_util.ProgrBar.full := '*';
   Printf.eprintf "--- individual notes\n";
   flush stderr;
-  ProgrBar.start ();
+  Geneweb_util.ProgrBar.start ();
   Gwdb.Collection.iteri
     (fun i p ->
-      ProgrBar.run i nb_ind;
+      Geneweb_util.ProgrBar.run i nb_ind;
       Buffer.reset buffer;
       add_string @@ get_notes p;
       add_string @@ get_occupation p;
@@ -137,13 +137,13 @@ let compute base bdir =
       | [], [] -> ()
       | list -> db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list)
     (Gwdb.persons base);
-  ProgrBar.finish ();
+  Geneweb_util.ProgrBar.finish ();
   Printf.eprintf "--- families notes\n";
   flush stderr;
-  ProgrBar.start ();
+  Geneweb_util.ProgrBar.start ();
   Gwdb.Collection.iteri
     (fun i fam ->
-      ProgrBar.run i nb_fam;
+      Geneweb_util.ProgrBar.run i nb_fam;
       Buffer.reset buffer;
       add_string @@ get_comment fam;
       add_string @@ get_fsources fam;
@@ -158,9 +158,9 @@ let compute base bdir =
       | [], [] -> ()
       | list ->
           db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
-          ProgrBar.run i nb_fam)
+          Geneweb_util.ProgrBar.run i nb_fam)
     (Gwdb.families base);
-  ProgrBar.finish ();
+  Geneweb_util.ProgrBar.finish ();
   write_nldb base !db
 
 let main () =

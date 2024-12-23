@@ -70,7 +70,7 @@ let hebrew_txt =
 
 let ged_month cal m =
   match cal with
-  | Date.Dgregorian | Djulian ->
+  | Geneweb_util.Date.Dgregorian | Djulian ->
       if m >= 1 && m <= Array.length month_txt then month_txt.(m - 1)
       else failwith "ged_month"
   | Dfrench ->
@@ -82,8 +82,8 @@ let ged_month cal m =
 
 let encode opts s =
   match opts.Gwexport.charset with
-  | Gwexport.Ansel -> Geneweb.Ansel.of_iso_8859_1 @@ Utf8.iso_8859_1_of_utf_8 s
-  | Gwexport.Ascii | Gwexport.Ansi -> Utf8.iso_8859_1_of_utf_8 s
+  | Gwexport.Ansel -> Geneweb.Ansel.of_iso_8859_1 @@ Geneweb_util.Utf8.iso_8859_1_of_utf_8 s
+  | Gwexport.Ascii | Gwexport.Ansi -> Geneweb_util.Utf8.iso_8859_1_of_utf_8 s
   | Gwexport.Utf8 -> s
 
 let max_len = 78
@@ -218,7 +218,7 @@ let write_base_notes opts base =
         (fun acc filename ->
           if Filename.check_suffix filename ".txt" then
             let file = Filename.concat path filename in
-            let content = Mutil.read_file_content file in
+            let content = Geneweb_util.Mutil.read_file_content file in
             (filename, content) :: acc
           else acc)
         [] wiki_filenames
@@ -304,8 +304,8 @@ let ged_index opts per =
 
 let ged_name opts base per =
   Printf.ksprintf (oc opts) "1 NAME %s /%s/\n"
-    (encode opts (Mutil.nominative (ged_1st_name base per)))
-    (encode opts (Mutil.nominative (Gwdb.sou base (Gwdb.get_surname per))));
+    (encode opts (Geneweb_util.Mutil.nominative (ged_1st_name base per)))
+    (encode opts (Geneweb_util.Mutil.nominative (Gwdb.sou base (Gwdb.get_surname per))));
   let n = Gwdb.sou base (Gwdb.get_public_name per) in
   if n <> "" then Printf.ksprintf (oc opts) "2 GIVN %s\n" (encode opts n);
   (match Gwdb.get_qualifiers per with
@@ -329,13 +329,13 @@ let ged_sex opts per =
   | Def.Neuter -> ()
 
 let ged_calendar opts = function
-  | Date.Dgregorian -> ()
+  | Geneweb_util.Date.Dgregorian -> ()
   | Djulian -> Printf.ksprintf (oc opts) "@#DJULIAN@ "
   | Dfrench -> Printf.ksprintf (oc opts) "@#DFRENCH R@ "
   | Dhebrew -> Printf.ksprintf (oc opts) "@#DHEBREW@ "
 
 let ged_date_dmy opts dt cal =
-  (match dt.Date.prec with
+  (match dt.Geneweb_util.Date.prec with
   | Sure -> ()
   | About -> Printf.ksprintf (oc opts) "ABT "
   | Maybe -> Printf.ksprintf (oc opts) "EST "
@@ -365,13 +365,13 @@ let ged_date_dmy opts dt cal =
   | Sure | About | Maybe | Before | After -> ()
 
 let ged_date opts = function
-  | Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
+  | Geneweb_util.Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
   | Dgreg (d, Djulian) ->
-      ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Djulian d) Djulian
+      ged_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian d) Djulian
   | Dgreg (d, Dfrench) ->
-      ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dfrench d) Dfrench
+      ged_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench d) Dfrench
   | Dgreg (d, Dhebrew) ->
-      ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dhebrew d) Dhebrew
+      ged_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew d) Dhebrew
   | Dtext t -> Printf.ksprintf (oc opts) "(%s)" t
 
 let print_sour opts n s = Printf.ksprintf (oc opts) "%d SOUR %s\n" n s
@@ -501,7 +501,7 @@ let ged_pevent opts base per_sel evt =
       Printf.ksprintf (oc opts) "1 EVEN";
       ged_tag_pevent base name)
   in
-  let date = Date.od_of_cdate (Gwdb.get_pevent_date evt) in
+  let date = Geneweb_util.Date.od_of_cdate (Gwdb.get_pevent_date evt) in
   let place = Gwdb.sou base (Gwdb.get_pevent_place evt) in
   let note = Gwdb.sou base (Gwdb.get_pevent_note evt) in
   let src = Gwdb.sou base (Gwdb.get_pevent_src evt) in
@@ -532,7 +532,7 @@ let ged_title opts base per tit =
   if tit.Def.t_nth <> 0 then Printf.ksprintf (oc opts) ", %d" tit.Def.t_nth;
   Printf.ksprintf (oc opts) "\n";
   (match
-     (Date.od_of_cdate tit.Def.t_date_start, Date.od_of_cdate tit.Def.t_date_end)
+     (Geneweb_util.Date.od_of_cdate tit.Def.t_date_start, Geneweb_util.Date.od_of_cdate tit.Def.t_date_end)
    with
   | None, None -> ()
   | Some sd, None ->
@@ -677,7 +677,7 @@ let ged_fevent opts base per_sel evt =
       Printf.ksprintf (oc opts) "1 EVEN";
       ged_tag_fevent base name)
   in
-  let date = Date.od_of_cdate (Gwdb.get_fevent_date evt) in
+  let date = Geneweb_util.Date.od_of_cdate (Gwdb.get_fevent_date evt) in
   let place = Gwdb.sou base (Gwdb.get_fevent_place evt) in
   let note = Gwdb.sou base (Gwdb.get_fevent_note evt) in
   let src = Gwdb.sou base (Gwdb.get_fevent_src evt) in
@@ -705,7 +705,7 @@ let has_personal_infos base per =
   Gwdb.get_parents per <> None
   || Gwdb.sou base (Gwdb.get_first_name per) <> "?"
   || Gwdb.sou base (Gwdb.get_surname per) <> "?"
-  || Gwdb.get_birth per <> Date.cdate_None
+  || Gwdb.get_birth per <> Geneweb_util.Date.cdate_None
   || Gwdb.sou base (Gwdb.get_birth_place per) <> ""
   || Gwdb.get_death per <> Def.NotDead
      && Gwdb.get_death per <> Def.DontKnowIfDead

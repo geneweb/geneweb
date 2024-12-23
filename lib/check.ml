@@ -237,11 +237,11 @@ type check_date =
 
 let min_year_of p =
   let aux = function
-    | { Date.prec = After; year } -> CheckAfter year
+    | { Geneweb_util.Date.prec = After; year } -> CheckAfter year
     | { prec = Before; year } -> CheckBefore year
     | { year } -> CheckOther year
   in
-  Option.map aux (Date.cdate_to_dmy_opt (get_birth p))
+  Option.map aux (Geneweb_util.Date.cdate_to_dmy_opt (get_birth p))
 
 let dummy_date = CheckInfered (CheckOther max_int)
 
@@ -300,10 +300,10 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
   let year_tab = Gwdb.iper_marker (Gwdb.ipers base) dummy_date in
   if verbose then (
     Printf.eprintf "check persons\n";
-    ProgrBar.start ();
+    Geneweb_util.ProgrBar.start ();
     Gwdb.Collection.iteri
       (fun i ip ->
-        ProgrBar.run i len;
+        Geneweb_util.ProgrBar.run i len;
         let p = poi base ip in
         if Gwdb.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
@@ -311,7 +311,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
         | Some ippl -> List.iter changed_p ippl
         | None -> ())
       persons;
-    ProgrBar.finish ())
+    Geneweb_util.ProgrBar.finish ())
   else
     Gwdb.Collection.iter
       (fun ip ->
@@ -330,13 +330,13 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
   let len = Gwdb.Collection.length families in
   if verbose then (
     Printf.eprintf "check families\n";
-    ProgrBar.start ();
+    Geneweb_util.ProgrBar.start ();
     Gwdb.Collection.iteri
       (fun i ifam ->
-        ProgrBar.run i len;
+        Geneweb_util.ProgrBar.run i len;
         CheckItem.family ~onchange:false base warning ifam @@ foi base ifam)
       families;
-    ProgrBar.finish ())
+    Geneweb_util.ProgrBar.finish ())
   else
     Gwdb.Collection.iter
       (fun ifam ->

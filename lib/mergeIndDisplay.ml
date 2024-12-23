@@ -40,7 +40,7 @@ let print_differences conf base branches p1 p2 =
         Output.print_sstring conf {|</label></div>|}
       in
       Output.print_sstring conf "<h4>";
-      Output.print_string conf (Adef.safe_fn Utf8.capitalize_fst title);
+      Output.print_string conf (Adef.safe_fn Geneweb_util.Utf8.capitalize_fst title);
       Output.print_sstring conf {|</h4>|};
       aux 1 x1 chk1;
       aux 2 x2 chk2)
@@ -52,12 +52,12 @@ let print_differences conf base branches p1 p2 =
   Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND_OK");
-  Util.hidden_input conf "i1" (get_iper p1 |> string_of_iper |> Mutil.encode);
-  Util.hidden_input conf "i2" (get_iper p2 |> string_of_iper |> Mutil.encode);
+  Util.hidden_input conf "i1" (get_iper p1 |> string_of_iper |> Geneweb_util.Mutil.encode);
+  Util.hidden_input conf "i2" (get_iper p2 |> string_of_iper |> Geneweb_util.Mutil.encode);
   let rec loop = function
     | [ (ip1, ip2) ] ->
-        Util.hidden_input conf "ini1" (ip1 |> string_of_iper |> Mutil.encode);
-        Util.hidden_input conf "ini2" (ip2 |> string_of_iper |> Mutil.encode)
+        Util.hidden_input conf "ini1" (ip1 |> string_of_iper |> Geneweb_util.Mutil.encode);
+        Util.hidden_input conf "ini2" (ip2 |> string_of_iper |> Geneweb_util.Mutil.encode)
     | _ :: branches -> loop branches
     | [] -> ()
   in
@@ -69,7 +69,7 @@ let print_differences conf base branches p1 p2 =
         (fun excl ->
           match p_getenv conf.env excl with
           | None | Some "" -> ()
-          | Some s -> Util.hidden_input conf excl (Mutil.encode s))
+          | Some s -> Util.hidden_input conf excl (Geneweb_util.Mutil.encode s))
         [ "iexcl"; "fexcl" ]
   | _ -> ());
   Output.print_sstring conf "</p><p>";
@@ -121,7 +121,7 @@ let print_differences conf base branches p1 p2 =
       (transl conf trans |> Adef.safe)
       name
       (fun p ->
-        match Date.od_of_cdate (get p) with
+        match Geneweb_util.Date.od_of_cdate (get p) with
         | None -> Adef.safe ""
         | Some d -> DateDisplay.string_of_ondate conf d)
   in
@@ -152,7 +152,7 @@ let print_differences conf base branches p1 p2 =
             | Unspecified -> transl_nth conf "died" is
           in
           s ^<^ " "
-          ^<^ DateDisplay.string_of_ondate conf (Date.date_of_cdate cd)
+          ^<^ DateDisplay.string_of_ondate conf (Geneweb_util.Date.date_of_cdate cd)
       | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
       | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
       | DontKnowIfDead | OfCourseDead -> Adef.safe "");
@@ -168,32 +168,32 @@ let print_differences conf base branches p1 p2 =
       | Buried cod -> (
           transl_nth conf "buried" is
           ^<^
-          match Date.od_of_cdate cod with
+          match Geneweb_util.Date.od_of_cdate cod with
           | None -> Adef.safe ""
           | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d)
       | Cremated cod -> (
           transl_nth conf "cremated" is
           ^<^
-          match Date.od_of_cdate cod with
+          match Geneweb_util.Date.od_of_cdate cod with
           | None -> Adef.safe ""
           | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d));
   place_field "burial" (Adef.encoded "burial_place") get_burial_place;
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf {|</button></form>|}
 
 let propose_merge_ind conf base branches p1 p2 =
   let title _ =
     let s = transl_nth conf "person/persons" 1 in
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_decline conf "merge" s))
+      (Geneweb_util.Utf8.capitalize_fst (transl_decline conf "merge" s))
   in
   Hutil.header conf title;
   if branches <> [] then (
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "you must first merge"));
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "you must first merge"));
     Output.print_sstring conf (transl conf ":");
     Output.print_sstring conf "<ul><li><a href=\"";
     Output.print_string conf (commd conf);
@@ -212,7 +212,7 @@ let propose_merge_ind conf base branches p1 p2 =
   if branches <> [] then (
     Output.print_sstring conf "<p><hr></p><p>";
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_nth conf "branch/branches" 1));
+      (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "branch/branches" 1));
     Output.print_sstring conf (transl conf ":");
     Output.print_sstring conf "</p><table>";
     List.iter
@@ -236,7 +236,7 @@ let propose_merge_ind conf base branches p1 p2 =
 
 let error_loop conf base p =
   let title _ =
-    transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
@@ -256,11 +256,11 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   let title _ =
     transl_nth conf "family/families" 1
     |> transl_decline conf "merge"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
   transl conf "you must first merge the 2 families"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf "<ul><li><a href=\"";
@@ -281,10 +281,10 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
 
 let not_found_or_incorrect conf =
   let title _ =
-    transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "not found"));
+  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "not found"));
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "or");
   Output.print_sstring conf " ";
@@ -297,20 +297,20 @@ let not_found_or_incorrect conf =
 
 let same_person conf =
   let title _ =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "error"))
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
   in
   Hutil.rheader conf title;
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl conf "it is the same person!"));
+    (Geneweb_util.Utf8.capitalize_fst (transl conf "it is the same person!"));
   Hutil.trailer conf
 
 let different_sexes conf base p1 p2 =
   let title _ =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "error"))
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
   in
   Hutil.rheader conf title;
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl conf "incompatible sexes"));
+    (Geneweb_util.Utf8.capitalize_fst (transl conf "incompatible sexes"));
   Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf {|<ul><li><a href="|};
   Output.print_string conf (commd conf);
@@ -327,7 +327,7 @@ let different_sexes conf base p1 p2 =
 
 let print_merged conf base wl p =
   let title _ =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "merge done"))
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "merge done"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -340,23 +340,23 @@ let print_merged conf base wl p =
       let s1 =
         match p_getenv conf.env "iexcl" with
         | Some "" | None -> Adef.encoded ""
-        | Some s -> "&iexcl=" ^<^ Mutil.encode s
+        | Some s -> "&iexcl=" ^<^ Geneweb_util.Mutil.encode s
       in
       let s2 =
         match p_getenv conf.env "fexcl" with
         | Some "" | None -> Adef.encoded ""
-        | Some s -> "&fexcl=" ^<^ Mutil.encode s
+        | Some s -> "&fexcl=" ^<^ Geneweb_util.Mutil.encode s
       in
       Output.print_sstring conf "<p>";
       Output.print_sstring conf "<a href=";
       Output.print_string conf (commd conf);
       Output.print_sstring conf "m=MRG_DUP&ip=";
-      Output.print_string conf (string_of_iper ip |> Mutil.encode);
+      Output.print_string conf (string_of_iper ip |> Geneweb_util.Mutil.encode);
       Output.print_string conf s1;
       Output.print_string conf s2;
       Output.print_sstring conf ">";
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "continue merging"));
+        (Geneweb_util.Utf8.capitalize_fst (transl conf "continue merging"));
       Output.print_sstring conf "</a>";
       (let p = poi base ip in
        let s = NameDisplay.fullname_html_of_person conf base p in

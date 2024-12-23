@@ -90,7 +90,7 @@ val empty_family : 'string -> (_, unit, 'string) Dbdisk.gen_family
 *)
 
 val map_person_ps :
-  ?fd:(Date.date -> Date.date) ->
+  ?fd:(Geneweb_util.Date.date -> Geneweb_util.Date.date) ->
   ('b -> 'd) ->
   ('c -> 'e) ->
   ('a, 'b, 'c) Dbdisk.gen_person ->
@@ -105,7 +105,7 @@ val map_person_ps :
     Generic type that is used to represent indexation key isn't converted. *)
 
 val map_family_ps :
-  ?fd:(Date.date -> Date.date) ->
+  ?fd:(Geneweb_util.Date.date -> Geneweb_util.Date.date) ->
   ('a -> 'b) ->
   ('c -> 'd) ->
   ('e -> 'f) ->

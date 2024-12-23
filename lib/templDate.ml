@@ -6,13 +6,13 @@ open TemplAst
 open Util
 
 let rec eval_date_var conf jd = function
-  | "french" :: sl -> eval_dmy_var (Date.french_of_sdn ~prec:Sure jd) sl
-  | "gregorian" :: sl -> eval_dmy_var (Date.gregorian_of_sdn ~prec:Sure jd) sl
-  | "hebrew" :: sl -> eval_dmy_var (Date.hebrew_of_sdn ~prec:Sure jd) sl
-  | "julian" :: sl -> eval_dmy_var (Date.julian_of_sdn ~prec:Sure jd) sl
+  | "french" :: sl -> eval_dmy_var (Geneweb_util.Date.french_of_sdn ~prec:Sure jd) sl
+  | "gregorian" :: sl -> eval_dmy_var (Geneweb_util.Date.gregorian_of_sdn ~prec:Sure jd) sl
+  | "hebrew" :: sl -> eval_dmy_var (Geneweb_util.Date.hebrew_of_sdn ~prec:Sure jd) sl
+  | "julian" :: sl -> eval_dmy_var (Geneweb_util.Date.julian_of_sdn ~prec:Sure jd) sl
   | [ "julian_day" ] -> VVstring (string_of_int jd)
   | [ "julian_day"; "sep1000" ] ->
-      VVstring (Mutil.string_of_int_sep (transl conf "(thousand separator)") jd)
+      VVstring (Geneweb_util.Mutil.string_of_int_sep (transl conf "(thousand separator)") jd)
   | [ "moon_age" ] -> (
       try
         let _, md = Calendars.moon_phase_of_sdn jd in
@@ -25,12 +25,12 @@ let rec eval_date_var conf jd = function
       with Failure _ -> VVstring "")
   | [ "week_day" ] ->
       let wday =
-        let jd_today = Date.to_sdn ~from:Dgregorian conf.today in
+        let jd_today = Geneweb_util.Date.to_sdn ~from:Dgregorian conf.today in
         let x = conf.today_wd - jd_today + jd in
         if x < 0 then 6 + ((x + 1) mod 7) else x mod 7
       in
       VVstring (string_of_int wday)
-  | sl -> eval_dmy_var (Date.gregorian_of_sdn ~prec:Sure jd) sl
+  | sl -> eval_dmy_var (Geneweb_util.Date.gregorian_of_sdn ~prec:Sure jd) sl
 
 and eval_moon_phase_var mp = function
   | [ "hour" ] ->
@@ -63,6 +63,6 @@ and eval_dmy_var dmy = function
   | _ -> raise Not_found
 
 and eval_integer i = function
-  | [ "roman" ] -> VVstring (Mutil.roman_of_arabian i)
+  | [ "roman" ] -> VVstring (Geneweb_util.Mutil.roman_of_arabian i)
   | [] -> VVstring (string_of_int i)
   | _ -> raise Not_found

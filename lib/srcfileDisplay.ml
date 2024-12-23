@@ -108,7 +108,7 @@ let set_wizard_and_friend_traces conf =
 
 let incr_counter f conf =
   let lname = cnt conf ".lck" in
-  Lock.control lname true
+  Geneweb_util.Lock.control lname true
     ~onerror:(fun () -> None)
     (fun () ->
       let r = count conf in
@@ -163,12 +163,12 @@ let string_of_start_date conf =
   match extract_date r.start_date with
   | None -> Util.safe_html r.start_date
   | Some (d, m, y) ->
-      Date.Dgreg
+      Geneweb_util.Date.Dgreg
         ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, Dgregorian)
       |> DateDisplay.string_of_date conf
 
 let string_of_int_sep_aux conf n =
-  Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
+  Geneweb_util.Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
   |> Adef.safe
 
 let macro conf base = function
@@ -225,7 +225,7 @@ let macro conf base = function
   | '/' -> Adef.safe ""
   | c -> Adef.safe ("%" ^ String.make 1 c)
 
-module Lbuff = Buff.Make ()
+module Lbuff = Geneweb_util.Buff.Make ()
 
 let rec lexicon_translate conf base nomin strm first_c =
   let upp, s =
@@ -270,17 +270,17 @@ let rec lexicon_translate conf base nomin strm first_c =
           String.sub r 0 i ^ sa ^ String.sub r (i + 2) (String.length r - i - 2)
       | _ -> (if nomin then Util.translate_eval r else r) ^ c
   in
-  if upp then Utf8.capitalize_fst r else r
+  if upp then Geneweb_util.Utf8.capitalize_fst r else r
 
 let browser_cannot_handle_passwords conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
+  let user_agent = Geneweb_util.Mutil.extract_param "user-agent: " '/' conf.request in
   String.lowercase_ascii user_agent = "konqueror"
 
 let get_variable strm =
   let rec loop len =
     match Stream.next strm with
-    | ';' -> Buff.get len
-    | c -> loop (Buff.store len c)
+    | ';' -> Geneweb_util.Buff.get len
+    | c -> loop (Geneweb_util.Buff.store len c)
   in
   loop 0
 
@@ -350,8 +350,8 @@ let rec copy_from_stream conf base strm mode =
           let slash, c = if c = '/' then ("/", Stream.next strm) else ("", c) in
           let atag, c =
             let rec loop len = function
-              | ('>' | ' ' | '\n') as c -> (Buff.get len, c)
-              | c -> loop (Buff.store len c) (Stream.next strm)
+              | ('>' | ' ' | '\n') as c -> (Geneweb_util.Buff.get len, c)
+              | c -> loop (Geneweb_util.Buff.store len c) (Stream.next strm)
             in
             loop 0 c
           in
@@ -381,7 +381,7 @@ let rec copy_from_stream conf base strm mode =
               let lang =
                 let rec loop len =
                   let c = Stream.next strm in
-                  if c = ';' then Buff.get len else loop (Buff.store len c)
+                  if c = ';' then Geneweb_util.Buff.get len else loop (Geneweb_util.Buff.store len c)
                 in
                 loop 0
               in
@@ -481,12 +481,12 @@ let eval_var conf base env () _loc = function
   | [ "base"; "name" ] -> VVstring conf.bname
   | [ "base"; "nb_persons" ] ->
       VVstring
-        (Mutil.string_of_int_sep
+        (Geneweb_util.Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
            (nb_of_persons base))
   | [ "base"; "real_nb_persons" ] ->
       VVstring
-        (Mutil.string_of_int_sep
+        (Geneweb_util.Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
            (Gwdb.nb_of_real_persons base))
   | [ "browsing_with_sosa_ref" ] -> (
@@ -498,7 +498,7 @@ let eval_var conf base env () _loc = function
   | [ "nb_accesses" ] ->
       let r = count conf in
       let s =
-        Mutil.string_of_int_sep
+        Geneweb_util.Mutil.string_of_int_sep
           (Util.transl conf "(thousand separator)")
           (r.welcome_cnt + r.request_cnt)
       in
@@ -506,7 +506,7 @@ let eval_var conf base env () _loc = function
   | [ "nb_accesses_to_welcome" ] ->
       let r = count conf in
       let s =
-        Mutil.string_of_int_sep
+        Geneweb_util.Mutil.string_of_int_sep
           (Util.transl conf "(thousand separator)")
           r.welcome_cnt
       in

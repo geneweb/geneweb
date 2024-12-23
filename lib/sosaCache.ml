@@ -311,9 +311,9 @@ let print_sosa conf base p link =
           then ""
           else
             let direct_ancestor =
-              Name.strip_c (p_first_name base r) '"'
+              Geneweb_util.Name.strip_c (p_first_name base r) '"'
               ^ " "
-              ^ Name.strip_c (p_surname base r) '"'
+              ^ Geneweb_util.Name.strip_c (p_surname base r) '"'
             in
             Printf.sprintf
               (Util.fcapitale (Util.ftransl conf "direct ancestor of %s"))

@@ -5,10 +5,10 @@ open Adef
 let ns = "no_index"
 
 let url_no_index conf base pwd =
-  let scratch s = Mutil.encode (Name.lower (Gwdb.sou base s)) in
+  let scratch s = Geneweb_util.Mutil.encode (Geneweb_util.Name.lower (Gwdb.sou base s)) in
   let get_a_person v =
     try
-      let i = Gwdb.iper_of_string (Mutil.decode v) in
+      let i = Gwdb.iper_of_string (Geneweb_util.Mutil.decode v) in
       let p = Util.pget conf base i in
       if
         (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
@@ -23,7 +23,7 @@ let url_no_index conf base pwd =
   in
   let get_a_family v =
     try
-      let i = Gwdb.ifam_of_string (Mutil.decode v) in
+      let i = Gwdb.ifam_of_string (Geneweb_util.Mutil.decode v) in
       let fam = Gwdb.foi base i in
       let p = Util.pget conf base (Gwdb.get_father fam) in
       let f = scratch (Gwdb.get_first_name p) in
@@ -104,7 +104,7 @@ let url_no_index conf base pwd =
           ^^^ (if (s : Adef.encoded_string :> string) = "" then "" else "&")
           ^<^ s
         else s)
-      (("lang", Mutil.encode conf.lang) :: env)
+      (("lang", Geneweb_util.Mutil.encode conf.lang) :: env)
       (Adef.encoded "")
   in
   if conf.cgi then addr ^<^ "?b=" ^<^ conf.bname ^<^ "&" ^<^ suff

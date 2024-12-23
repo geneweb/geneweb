@@ -188,7 +188,7 @@ let speclist c =
     its visibility is not public
 *)
 let is_censored_person threshold p =
-  match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
+  match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
   | None -> false
   | Some dmy -> dmy.year >= threshold && Gwdb.get_access p != Def.Public
 
@@ -320,15 +320,15 @@ let select_asc conf base max_gen ips =
     that have this surname.
 *)
 let select_surname base pmark fmark surname =
-  let surname = Name.strip_lower surname in
+  let surname = Geneweb_util.Name.strip_lower surname in
   Gwdb.Collection.iter
     (fun i ->
       let fam = Gwdb.foi base i in
       let fath = Gwdb.poi base (Gwdb.get_father fam) in
       let moth = Gwdb.poi base (Gwdb.get_mother fam) in
       if
-        Name.strip_lower (Gwdb.sou base (Gwdb.get_surname fath)) = surname
-        || Name.strip_lower (Gwdb.sou base (Gwdb.get_surname moth)) = surname
+        Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname fath)) = surname
+        || Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname moth)) = surname
       then (
         Gwdb.Marker.set fmark i true;
         Gwdb.Marker.set pmark (Gwdb.get_father fam) true;
@@ -338,7 +338,7 @@ let select_surname base pmark fmark surname =
             let p = Gwdb.poi base ic in
             if
               (not (Gwdb.Marker.get pmark ic))
-              && Name.strip_lower (Gwdb.sou base (Gwdb.get_surname p)) = surname
+              && Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname p)) = surname
             then Gwdb.Marker.set pmark ic true)
           (Gwdb.get_children fam)))
     (Gwdb.ifams base)

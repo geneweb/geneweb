@@ -95,7 +95,7 @@ let make_dist_tab conf base ia maxlev =
   if maxlev <= !threshold then phony_dist_tab
   else
     let tstab = Util.create_topological_sort conf base in
-    let module Pq = Pqueue.Make (struct
+    let module Pq = Geneweb_util.Pqueue.Make (struct
       type t = iper
 
       let leq x y = not (tsort_leq tstab x y)
@@ -354,10 +354,10 @@ let sign_text conf base sign info b1 b2 c1 c2 =
           (if p_getenv conf.env "image" = Some "off" then "&image=off" else "")
     ^^^ (match p_getenv conf.env "bd" with
         | None | Some ("0" | "") -> Adef.escaped ""
-        | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+        | Some x -> "&bd=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string))
     ^^^ (match p_getenv conf.env "color" with
         | None | Some "" -> Adef.escaped ""
-        | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+        | Some x -> "&color=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string))
     ^^^ include_marr conf base (Adef.escaped "3")
     ^^^ include_marr conf base (Adef.escaped "4")
   in
@@ -609,7 +609,7 @@ let print_relation_path conf base info =
 let print_relation_ok conf base info =
   let title _ =
     transl_nth conf "relationship link/relationship links" 0
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
     (match (info.pb1, info.nb1) with
     | None, None -> ()
     | _ ->
@@ -686,7 +686,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
         match Util.p_getenv conf.env "color" with
         | None | Some "" -> Adef.safe ""
         | Some x ->
-            (" class=\"" ^<^ Mutil.encode x ^>^ "\"" :> Adef.safe_string)
+            (" class=\"" ^<^ Geneweb_util.Mutil.encode x ^>^ "\"" :> Adef.safe_string)
       in
       let info =
         {
@@ -759,7 +759,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
       | _ -> false
     in
     let page_title =
-      Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+      Util.transl conf "tree" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
     in
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
       page_title (Adef.escaped "")

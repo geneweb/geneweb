@@ -20,7 +20,7 @@ let print_merge conf base =
 let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     =
   Hutil.header conf (fun _ ->
-      transl conf "merge done" |> Utf8.capitalize_fst
+      transl conf "merge done" |> Geneweb_util.Utf8.capitalize_fst
       |> Output.print_sstring conf);
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf " ";
@@ -43,7 +43,7 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     Output.print_sstring conf "</div>";
     let aux n txt ofn osn oocc =
       Output.print_sstring conf {|<span class="unselectable float-left">|};
-      transl conf txt |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      transl conf txt |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       if n = "" then (
         Output.print_sstring conf " ";
         Output.print_sstring conf n);
@@ -58,7 +58,7 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
       Output.print_sstring conf {|</span>|};
       Output.print_sstring conf "<span>";
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "linked pages"));
+        (Geneweb_util.Utf8.capitalize_fst (transl conf "linked pages"));
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf "</span>"
     in

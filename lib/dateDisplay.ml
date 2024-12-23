@@ -2,16 +2,15 @@
 
 open Config
 open Def
-open Date
 open Util
 open Gwdb
 
 let get_wday conf = function
-  | Dgreg (({ prec = Sure; delta = 0 } as d), _) when d.day <> 0 && d.month <> 0
+  | Geneweb_util.Date.Dgreg (({ prec = Sure; delta = 0 } as d), _) when d.day <> 0 && d.month <> 0
     ->
-      let jd = Date.to_sdn ~from:Dgregorian d in
+      let jd = Geneweb_util.Date.to_sdn ~from:Dgregorian d in
       let wday =
-        let jd_today = Date.to_sdn ~from:Dgregorian conf.today in
+        let jd_today = Geneweb_util.Date.to_sdn ~from:Dgregorian conf.today in
         let x = conf.today_wd - jd_today + jd in
         if x < 0 then 6 + ((x + 1) mod 7) else x mod 7
       in
@@ -61,7 +60,7 @@ let code_date conf encoding d m y =
 let code_dmy conf d =
   let encoding =
     let n =
-      if d.day = 1 then 0
+      if d.Geneweb_util.Date.day = 1 then 0
       else if d.day != 0 then 1
       else if d.month != 0 then 2
       else 3
@@ -122,7 +121,7 @@ let hebrew_month conf m =
 let code_french_year conf y =
   transl_nth conf "year/month/day" 3
   ^ " "
-  ^ if y >= 1 && y < 4000 then Mutil.roman_of_arabian y else string_of_int y
+  ^ if y >= 1 && y < 4000 then Geneweb_util.Mutil.roman_of_arabian y else string_of_int y
 
 let code_french_date conf d m y =
   let s =
@@ -144,7 +143,7 @@ let code_hebrew_date conf d m y =
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 
 let string_of_on_prec_dmy_aux conf sy sy2 d =
-  match d.prec with
+  match d.Geneweb_util.Date.prec with
   | Sure ->
       if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
       else if d.day = 0 then transl_decline conf "in (month year)" sy
@@ -172,7 +171,7 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
         else if d2.day2 = 0 then transl_decline conf "in (month year)" sy2
         else transl_decline conf "on (day month year)" sy2
       in
-      s ^ " " ^ transl conf "or" ^ " " ^ Mutil.nominative s2
+      s ^ " " ^ transl conf "or" ^ " " ^ Geneweb_util.Mutil.nominative s2
   | YearInt d2 ->
       let s =
         if d.day = 0 && d.month = 0 then sy
@@ -185,13 +184,13 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
         else transl_decline conf "on (day month year)" sy2
       in
       transl conf "between (date)"
-      ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2
+      ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^ " " ^ Geneweb_util.Mutil.nominative s2
 
 let replace_spaces_by_nbsp s =
   let rec loop i len =
-    if i = String.length s then Buff.get len
-    else if s.[i] = ' ' then loop (i + 1) (Buff.mstore len "&nbsp;")
-    else loop (i + 1) (Buff.store len s.[i])
+    if i = String.length s then Geneweb_util.Buff.get len
+    else if s.[i] = ' ' then loop (i + 1) (Geneweb_util.Buff.mstore len "&nbsp;")
+    else loop (i + 1) (Geneweb_util.Buff.store len s.[i])
   in
   loop 0 0
 
@@ -202,7 +201,7 @@ let string_of_on_prec_dmy conf sy sy2 d =
   replace_spaces_by_nbsp r
 
 let string_of_on_french_dmy conf d =
-  let sy = code_french_date conf d.day d.month d.year in
+  let sy = code_french_date conf d.Geneweb_util.Date.day d.month d.year in
   let sy2 =
     match d.prec with
     | OrYear d2 | YearInt d2 -> code_french_date conf d2.day2 d2.month2 d2.year2
@@ -211,7 +210,7 @@ let string_of_on_french_dmy conf d =
   string_of_on_prec_dmy conf sy sy2 d
 
 let string_of_on_hebrew_dmy conf d =
-  let sy = code_hebrew_date conf d.day d.month d.year in
+  let sy = code_hebrew_date conf d.Geneweb_util.Date.day d.month d.year in
   let sy2 =
     match d.prec with
     | OrYear d2 | YearInt d2 -> code_hebrew_date conf d2.day2 d2.month2 d2.year2
@@ -222,22 +221,22 @@ let string_of_on_hebrew_dmy conf d =
 let string_of_prec_dmy conf s s2 d =
   Adef.safe
   @@
-  match d.prec with
-  | Sure -> Mutil.nominative s
+  match d.Geneweb_util.Date.prec with
+  | Sure -> Geneweb_util.Mutil.nominative s
   | About -> transl_decline conf "about (date)" s
   | Before -> transl_decline conf "before (date)" s
   | After -> transl_decline conf "after (date)" s
   | Maybe -> transl_decline conf "possibly (date)" s
-  | OrYear _ -> s ^ " " ^ transl conf "or" ^ " " ^ Mutil.nominative s2
+  | OrYear _ -> s ^ " " ^ transl conf "or" ^ " " ^ Geneweb_util.Mutil.nominative s2
   | YearInt _ ->
       transl conf "between (date)"
-      ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2
+      ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^ " " ^ Geneweb_util.Mutil.nominative s2
 
 let string_of_dmy_aux fn conf d =
   let sy = code_dmy conf d in
   let sy2 =
     match d.prec with
-    | OrYear d2 | YearInt d2 -> code_dmy conf (Date.dmy_of_dmy2 d2)
+    | OrYear d2 | YearInt d2 -> code_dmy conf (Geneweb_util.Date.dmy_of_dmy2 d2)
     | _ -> ""
   in
   fn conf sy sy2 d
@@ -265,7 +264,7 @@ let string_of_dmy conf d = string_of_dmy_aux string_of_prec_dmy conf d
 let translate_dmy conf (fst, snd, trd) cal short =
   let translate_month m =
     match cal with
-    | Dfrench when m <> "" ->
+    | Geneweb_util.Date.Dfrench when m <> "" ->
         if short then Util.short_f_month (int_of_string m)
         else french_month conf (int_of_string m)
     | Dhebrew when m <> "" ->
@@ -279,7 +278,7 @@ let translate_dmy conf (fst, snd, trd) cal short =
     match cal with
     | Dfrench ->
         let y1 = int_of_string y in
-        if y1 >= 1 && y1 < 4000 then Mutil.roman_of_arabian y1 else y
+        if y1 >= 1 && y1 < 4000 then Geneweb_util.Mutil.roman_of_arabian y1 else y
     | _ -> y
   in
   match transl conf "!dates order" with
@@ -297,7 +296,7 @@ let translate_dmy conf (fst, snd, trd) cal short =
 let decode_dmy conf d =
   match transl conf "!dates order" with
   | "dmyyyy" ->
-      (string_of_int d.day, string_of_int d.month, string_of_int d.year)
+      (string_of_int d.Geneweb_util.Date.day, string_of_int d.month, string_of_int d.year)
   | "mmddyyyy" -> (
       (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
       (* on rajoute les 0 nécessaires.                        *)
@@ -336,11 +335,11 @@ let decode_dmy conf d =
           (d, m, string_of_int year))
 
 let gregorian_precision conf d =
-  if d.delta = 0 then string_of_dmy conf d
+  if d.Geneweb_util.Date.delta = 0 then string_of_dmy conf d
   else
     let d2 =
-      let sdn = d.delta + Date.to_sdn ~from:Dgregorian d in
-      Date.gregorian_of_sdn ~prec:d.prec sdn
+      let sdn = d.delta + Geneweb_util.Date.to_sdn ~from:Dgregorian d in
+      Geneweb_util.Date.gregorian_of_sdn ~prec:d.prec sdn
     in
     Adef.safe
     @@ transl conf "between (date)"
@@ -356,13 +355,13 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
     @@ Printf.sprintf
          {|<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
          (commd conf :> string)
-         c d.year c d.month c d.day c
+         c d.Geneweb_util.Date.year c d.month c d.day c
          (s :> string)
   in
   function
-  | Dtext t -> "(" ^<^ (Util.escape_html t :> Adef.safe_string) ^>^ ")"
+  | Geneweb_util.Date.Dtext t -> "(" ^<^ (Util.escape_html t :> Adef.safe_string) ^>^ ")"
   | Dgreg (d, calendar) -> (
-      let d1 = Date.convert ~from:Dgregorian ~to_:calendar d in
+      let d1 = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar d in
       match calendar with
       | Dgregorian ->
           let s = dmy conf d in
@@ -405,7 +404,7 @@ let string_of_ondate ?link conf d =
   |> Util.translate_eval |> Adef.safe
 
 let string_of_date conf = function
-  | Dgreg (d, _) -> string_of_dmy conf d
+  | Geneweb_util.Date.Dgreg (d, _) -> string_of_dmy conf d
   | Dtext t -> (Util.escape_html t :> Adef.safe_string)
 
 let string_slash_of_date conf date =
@@ -415,15 +414,15 @@ let string_slash_of_date conf date =
         (fun s accu -> if s <> "" then s ^ "/" ^ accu else accu)
         [ fst; snd ] trd
     in
-    match d.prec with
+    match d.Geneweb_util.Date.prec with
     | OrYear d2 ->
         let sy = code fst snd trd in
-        let d2 = Date.dmy_of_dmy2 d2 in
+        let d2 = Geneweb_util.Date.dmy_of_dmy2 d2 in
         let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
         sy ^ " " ^ transl conf "or" ^ " " ^ sy2
     | YearInt d2 ->
         let sy = code fst snd trd in
-        let d2 = Date.dmy_of_dmy2 d2 in
+        let d2 = Geneweb_util.Date.dmy_of_dmy2 d2 in
         let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
         transl conf "between (date)"
         ^ " " ^ sy ^ " " ^ transl_nth conf "and" 0 ^ " " ^ sy2
@@ -432,9 +431,9 @@ let string_slash_of_date conf date =
         (string_of_prec_dmy conf sy "" d :> string)
   in
   match date with
-  | Dtext t -> (Util.escape_html t :> Adef.safe_string)
+  | Geneweb_util.Date.Dtext t -> (Util.escape_html t :> Adef.safe_string)
   | Dgreg (d, cal) -> (
-      let d1 = Date.convert ~from:Dgregorian ~to_:cal d in
+      let d1 = Geneweb_util.Date.convert ~from:Dgregorian ~to_:cal d in
       Adef.safe
       @@
       match cal with
@@ -456,7 +455,7 @@ let string_of_age conf a =
   Adef.safe
   @@
   match a with
-  | { day = 0; month = 0; year = y } ->
+  | { Geneweb_util.Date.day = 0; month = 0; year = y } ->
       if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
       else if y = 1 then transl conf "one year old"
       else transl conf "birth"
@@ -487,7 +486,7 @@ let string_of_age conf a =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 let prec_text conf d =
-  match d.prec with
+  match d.Geneweb_util.Date.prec with
   | About -> (
       (* On utilise le dictionnaire pour être sur *)
       (* que ce soit compréhensible de tous.      *)
@@ -509,7 +508,7 @@ let prec_text conf d =
       - d : Date.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
-let month_text d = if d.month = 0 then "" else string_of_int d.month
+let month_text d = if d.Geneweb_util.Date.month = 0 then "" else string_of_int d.month
 
 (* ************************************************************************ *)
 (*  [Fonc] year_text : Date.dmy -> string                                    *)
@@ -522,7 +521,7 @@ let month_text d = if d.month = 0 then "" else string_of_int d.month
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 let year_text d =
-  match d.prec with
+  match d.Geneweb_util.Date.prec with
   | OrYear d2 when d.year <> d2.year2 ->
       string_of_int d.year ^ "/" ^ string_of_int d2.year2
   | YearInt d2 when d.year <> d2.year2 ->
@@ -542,7 +541,7 @@ let year_text d =
     [Rem] : Exporté en clair hors de ce module.                             *)
 let prec_year_text conf d =
   let s =
-    match d.prec with
+    match d.Geneweb_util.Date.prec with
     | About -> (
         (* On utilise le dictionnaire pour être sur *)
         (* que ce soit compréhensible de tous.      *)
@@ -618,7 +617,7 @@ let short_marriage_date_text conf base fam p1 p2 =
   Adef.safe
   @@
   if authorized_age conf base p1 && authorized_age conf base p2 then
-    match Date.cdate_to_dmy_opt (get_marriage fam) with
+    match Geneweb_util.Date.cdate_to_dmy_opt (get_marriage fam) with
     | Some d ->
         "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
     | None -> ""

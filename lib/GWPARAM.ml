@@ -78,17 +78,17 @@ module Default = struct
         match d with
         | None -> none ()
         | Some d ->
-            let a = Date.time_elapsed d conf.Config.today in
-            if a.Date.year > private_years then false
+            let a = Geneweb_util.Date.time_elapsed d conf.Config.today in
+            if a.year > private_years then false
             else if a.year < private_years then true
             else a.month = 0 && a.day = 0
       in
-      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_death p |> Date.dmy_of_death) @@ fun () ->
+      check_date (Gwdb.get_birth p |> Geneweb_util.Date.cdate_to_dmy_opt) @@ fun () ->
+      check_date (Gwdb.get_baptism p |> Geneweb_util.Date.cdate_to_dmy_opt) @@ fun () ->
+      check_date (Gwdb.get_death p |> Geneweb_util.Date.dmy_of_death) @@ fun () ->
       let is_contemporary_marriage ifam =
         let marr_date_opt =
-          Date.cdate_to_dmy_opt (Gwdb.get_marriage (Gwdb.foi base ifam))
+          Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage (Gwdb.foi base ifam))
         in
         check_date marr_date_opt (fun _ -> false)
       in
@@ -146,7 +146,7 @@ module Default = struct
       | `LOG_DEBUG -> "DEBUG"
     in
     Printf.eprintf "[%s]: %s %s\n"
-      (Mutil.sprintf_date tm : Adef.safe_string :> string)
+      (Geneweb_util.Mutil.sprintf_date tm : Adef.safe_string :> string)
       level msg
 
   let wrap_output (conf : Config.config) (title : Adef.safe_string)

@@ -69,11 +69,11 @@ module Person = struct
       occupation = empty;
       sex = Neuter;
       access = IfTitles;
-      birth = Date.cdate_None;
+      birth = Geneweb_util.Date.cdate_None;
       birth_place = empty;
       birth_note = empty;
       birth_src = empty;
-      baptism = Date.cdate_None;
+      baptism = Geneweb_util.Date.cdate_None;
       baptism_place = empty;
       baptism_note = empty;
       baptism_src = empty;
@@ -143,7 +143,7 @@ end
 module Family = struct
   let create_empty_family empty ifam =
     {
-      Def.marriage = Date.cdate_None;
+      Def.marriage = Geneweb_util.Date.cdate_None;
       marriage_place = empty;
       marriage_note = empty;
       marriage_src = empty;
@@ -267,7 +267,7 @@ let patch_descend base ifam d = base.descends.(ifam) <- d
 let patch_couple base ifam c = base.couples.(ifam) <- c
 
 let insert_string base s =
-  let s = Utf8.normalize s in
+  let s = Geneweb_util.Utf8.normalize s in
   let len = Array.length base.strings in
   let a = Array.init (len + 1) (fun i -> base.strings.(i)) in
   a.(len) <- s;

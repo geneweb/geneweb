@@ -28,8 +28,8 @@ let slashify_linux_dos s =
   String.map (function '/' -> '\\' | c -> c) s
 #endif
 
-let decode s = Mutil.decode (Adef.encoded s)
-let encode s = (Mutil.encode s :> string)
+let decode s = Geneweb_util.Mutil.decode (Adef.encoded s)
+let encode s = (Geneweb_util.Mutil.encode s :> string)
 
 let rec list_remove_assoc x =
   function
@@ -82,9 +82,9 @@ let header conf title =
 
 let strip_control_m s =
   let rec loop i len =
-    if i = String.length s then Buff.get len
+    if i = String.length s then Geneweb_util.Buff.get len
     else if s.[i] = '\r' then loop (i + 1) len
-    else loop (i + 1) (Buff.store len s.[i])
+    else loop (i + 1) (Geneweb_util.Buff.store len s.[i])
   in
   loop 0 0
 
@@ -284,11 +284,11 @@ let selected env =
 let parse_upto lim =
   let rec loop len (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
-    | Some c when c = lim -> Stream.junk strm__; Buff.get len
+    | Some c when c = lim -> Stream.junk strm__; Geneweb_util.Buff.get len
     | Some c ->
       Stream.junk strm__;
       begin
-        try loop (Buff.store len c) strm__
+        try loop (Geneweb_util.Buff.store len c) strm__
         with Stream.Failure -> raise (Stream.Error "")
       end
     | _ -> raise Stream.Failure
@@ -300,11 +300,11 @@ let is_directory x =
     Unix.Unix_error (_, _, _) -> false
 
 let server_string conf =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Geneweb_util.Mutil.extract_param "host: " '\r' conf.request in
   try let i = String.rindex s ':' in String.sub s 0 i with
     Not_found -> "127.0.0.1"
 
-let referer conf = Mutil.extract_param "referer: " '\r' conf.request
+let referer conf = Geneweb_util.Mutil.extract_param "referer: " '\r' conf.request
 
 let only_file_name =
   lazy begin
@@ -352,8 +352,8 @@ let macro conf =
 let get_variable (strm : _ Stream.t) =
   let rec loop len =
      match Stream.peek strm with
-     | Some ';' -> Stream.junk strm; Buff.get len
-     | Some c -> Stream.junk strm; loop (Buff.store len c)
+     | Some ';' -> Stream.junk strm; Geneweb_util.Buff.get len
+     | Some c -> Stream.junk strm; loop (Geneweb_util.Buff.store len c)
      | _ -> raise Stream.Failure
   in
   loop 0
@@ -362,8 +362,8 @@ let get_binding strm =
   let rec loop len =
     match Stream.peek strm with
     | Some '=' ->
-      Stream.junk strm; let k = Buff.get len in k, get_variable strm
-    | Some c -> Stream.junk strm; loop (Buff.store len c)
+      Stream.junk strm; let k = Geneweb_util.Buff.get len in k, get_variable strm
+    | Some c -> Stream.junk strm; loop (Geneweb_util.Buff.store len c)
     | _ -> raise Stream.Failure
   in
   loop 0
@@ -421,8 +421,8 @@ let file_contents fname =
     let rec loop len =
       match try Some (input_char ic) with End_of_file -> None with
       | Some '\r' -> loop len
-      | Some c -> loop (Buff.store len c)
-      | None -> close_in ic ; Buff.get len
+      | Some c -> loop (Geneweb_util.Buff.store len c)
+      | None -> close_in ic ; Geneweb_util.Buff.get len
     in loop 0
   with Sys_error _ -> ""
 
@@ -469,9 +469,9 @@ let rec copy_from_stream conf print strm =
               let s =
                 let rec loop len =
                   match Stream.peek strm with
-                  | Some ']' -> Stream.junk strm; Buff.get len
-                  | Some c -> Stream.junk strm; loop (Buff.store len c)
-                  | _ -> Buff.get len
+                  | Some ']' -> Stream.junk strm; Geneweb_util.Buff.get len
+                  | Some c -> Stream.junk strm; loop (Geneweb_util.Buff.store len c)
+                  | _ -> Geneweb_util.Buff.get len
                 in
                 loop 0
               in
@@ -1683,9 +1683,9 @@ let setup_comm_ok conf =
       end
 
   | x ->
-      if Ext_string.start_with "doc/" 0 x
-      || Ext_string.start_with "images/" 0 x
-      || Ext_string.start_with "css/" 0 x
+      if Geneweb_util.Ext_string.start_with "doc/" 0 x
+      || Geneweb_util.Ext_string.start_with "images/" 0 x
+      || Geneweb_util.Ext_string.start_with "css/" 0 x
       then
         raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"")

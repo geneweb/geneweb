@@ -151,11 +151,11 @@ let sou base i = base.c_strings.(i)
 
 (** Returns first name of a [base]'s person entry [p]. [p.m_first_name] contains
     index where first name string representation is stored. *)
-let p_first_name base p = Mutil.nominative (sou base p.m_first_name)
+let p_first_name base p = Geneweb_util.Mutil.nominative (sou base p.m_first_name)
 
 (** Returns surname of a [base]'s person entry [p]. [p.m_first_name] contains
     index where surname string representation is stored. *)
-let p_surname base p = Mutil.nominative (sou base p.m_surname)
+let p_surname base p = Geneweb_util.Mutil.nominative (sou base p.m_surname)
 
 (** Returns string designation of person {i firstname.occ surname}. *)
 let designation base p =
@@ -197,7 +197,7 @@ let no_family gen =
   let empty_string = unique_string gen "" in
   let fam =
     {
-      marriage = Date.cdate_None;
+      marriage = Geneweb_util.Date.cdate_None;
       marriage_place = empty_string;
       marriage_note = empty_string;
       marriage_src = empty_string;
@@ -300,22 +300,22 @@ let title_unique_string gen t =
 
 (** Hash of person's first and last names. *)
 let person_hash first_name surname =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
-  let s = Name.crush_lower (first_name ^ " " ^ surname) in
+  let first_name = Geneweb_util.Mutil.nominative first_name in
+  let surname = Geneweb_util.Mutil.nominative surname in
+  let s = Geneweb_util.Name.crush_lower (first_name ^ " " ^ surname) in
   Hashtbl.hash s
 
 (** Returns index of a person's entry inside the [gen.base] that has the same
     first name, surname and occurence number. Raises [Not_found] if person
     is not found. *)
 let find_person_by_global_name gen first_name surname occ =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
-  let s = Name.crush_lower (first_name ^ " " ^ surname) in
+  let first_name = Geneweb_util.Mutil.nominative first_name in
+  let surname = Geneweb_util.Mutil.nominative surname in
+  let s = Geneweb_util.Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Hashtbl.find_all gen.g_names key in
-  let first_name = Name.lower first_name in
-  let surname = Name.lower surname in
+  let first_name = Geneweb_util.Name.lower first_name in
+  let surname = Geneweb_util.Name.lower surname in
   let rec loop = function
     | [] -> raise Not_found
     | ip :: ipl ->
@@ -324,8 +324,8 @@ let find_person_by_global_name gen first_name surname occ =
            occurence comparison *)
         if
           p.m_occ = occ
-          && Name.lower (p_first_name gen.g_base p) = first_name
-          && Name.lower (p_surname gen.g_base p) = surname
+          && Geneweb_util.Name.lower (p_first_name gen.g_base p) = first_name
+          && Geneweb_util.Name.lower (p_surname gen.g_base p) = surname
         then ip
         else loop ipl
   in
@@ -335,21 +335,21 @@ let find_person_by_global_name gen first_name surname occ =
     first name, surname and occurence number. Searches only persons defined
     in the current file. Raises [Not_found] if person is not found. *)
 let find_person_by_local_name gen first_name surname occ =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
-  let s = Name.crush_lower (first_name ^ " " ^ surname) in
+  let first_name = Geneweb_util.Mutil.nominative first_name in
+  let surname = Geneweb_util.Mutil.nominative surname in
+  let s = Geneweb_util.Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Hashtbl.find_all gen.g_file_info.f_local_names (key, occ) in
-  let first_name = Name.lower first_name in
-  let surname = Name.lower surname in
+  let first_name = Geneweb_util.Name.lower first_name in
+  let surname = Geneweb_util.Name.lower surname in
   let rec loop = function
     | [] -> raise Not_found
     | ip :: ipl ->
         let p = poi gen.g_base ip in
         (* refine search by fullnames comparison (without crushlower) *)
         if
-          Name.lower (p_first_name gen.g_base p) = first_name
-          && Name.lower (p_surname gen.g_base p) = surname
+          Geneweb_util.Name.lower (p_first_name gen.g_base p) = first_name
+          && Geneweb_util.Name.lower (p_surname gen.g_base p) = surname
         then ip
         else loop ipl
   in
@@ -368,7 +368,7 @@ let find_person_by_name gen first_name surname occ =
     first and last names associated to the index of their person's entry
     in [base]. *)
 let add_person_by_name gen first_name surname int =
-  let s = Name.crush_lower (Mutil.nominative (first_name ^ " " ^ surname)) in
+  let s = Geneweb_util.Name.crush_lower (Geneweb_util.Mutil.nominative (first_name ^ " " ^ surname)) in
   let key = Hashtbl.hash s in
   Hashtbl.add gen.g_names key int
 
@@ -769,10 +769,10 @@ let update_family_with_fevents gen fam =
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
-                match Date.od_of_cdate evt.efam_date with
+                match Geneweb_util.Date.od_of_cdate evt.efam_date with
                 | Some (Dgreg (dmy, cal)) ->
                     let dmy = { dmy with prec = About } in
-                    Date.cdate_of_od (Some (Dgreg (dmy, cal)))
+                    Geneweb_util.Date.cdate_of_od (Some (Dgreg (dmy, cal)))
                 | _ -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
@@ -906,7 +906,7 @@ let update_fevents_with_family gen fam =
         let evt =
           {
             efam_name = Efam_Separated;
-            efam_date = Date.cdate_None;
+            efam_date = Geneweb_util.Date.cdate_None;
             efam_place = unique_string gen "";
             efam_reason = unique_string gen "";
             efam_note = unique_string gen "";
@@ -1319,8 +1319,8 @@ let update_person_with_pevents p =
             if !found_death then loop l p
             else
               let death =
-                match Date.od_of_cdate evt.epers_date with
-                | Some d -> Death (death_reason_std_fields, Date.cdate_of_date d)
+                match Geneweb_util.Date.od_of_cdate evt.epers_date with
+                | Some d -> Death (death_reason_std_fields, Geneweb_util.Date.cdate_of_date d)
                 | None -> (
                     match death_std_fields with
                     | OfCourseDead -> OfCourseDead
@@ -1374,7 +1374,7 @@ let update_person_with_pevents p =
 let update_pevents_with_person p =
   let empty_string = 0 in
   let evt_birth =
-    match Date.od_of_cdate p.birth with
+    match Geneweb_util.Date.od_of_cdate p.birth with
     | Some _ ->
         let evt =
           {
@@ -1405,7 +1405,7 @@ let update_pevents_with_person p =
           Some evt
   in
   let evt_bapt =
-    match Date.od_of_cdate p.baptism with
+    match Geneweb_util.Date.od_of_cdate p.baptism with
     | Some _ ->
         let evt =
           {
@@ -1443,7 +1443,7 @@ let update_pevents_with_person p =
           let evt =
             {
               epers_name = Epers_Death;
-              epers_date = Date.cdate_None;
+              epers_date = Geneweb_util.Date.cdate_None;
               epers_place = p.death_place;
               epers_reason = empty_string;
               epers_note = p.death_note;
@@ -1453,7 +1453,7 @@ let update_pevents_with_person p =
           in
           Some evt
     | Death (_, cd) ->
-        let date = Date.cdate_of_od (Some (Date.date_of_cdate cd)) in
+        let date = Geneweb_util.Date.cdate_of_od (Some (Geneweb_util.Date.date_of_cdate cd)) in
         let evt =
           {
             epers_name = Epers_Death;
@@ -1470,7 +1470,7 @@ let update_pevents_with_person p =
         let evt =
           {
             epers_name = Epers_Death;
-            epers_date = Date.cdate_None;
+            epers_date = Geneweb_util.Date.cdate_None;
             epers_place = p.death_place;
             epers_reason = empty_string;
             epers_note = p.death_note;
@@ -1488,7 +1488,7 @@ let update_pevents_with_person p =
           let evt =
             {
               epers_name = Epers_Burial;
-              epers_date = Date.cdate_None;
+              epers_date = Geneweb_util.Date.cdate_None;
               epers_place = p.burial_place;
               epers_reason = empty_string;
               epers_note = p.burial_note;
@@ -1570,11 +1570,11 @@ let convert_persons per_index_ic per_ic persons =
               occupation = empty_string;
               sex = Neuter;
               access = IfTitles;
-              birth = Date.cdate_None;
+              birth = Geneweb_util.Date.cdate_None;
               birth_place = empty_string;
               birth_note = empty_string;
               birth_src = empty_string;
-              baptism = Date.cdate_None;
+              baptism = Geneweb_util.Date.cdate_None;
               baptism_place = empty_string;
               baptism_note = empty_string;
               baptism_src = empty_string;
@@ -1615,8 +1615,8 @@ let convert_persons per_index_ic per_ic persons =
 (** Returns list of particles from the file. If filename is empty string
     then returns default particles list *)
 let input_particles = function
-  | "" -> Mutil.default_particles
-  | file -> Mutil.input_particles file
+  | "" -> Geneweb_util.Mutil.default_particles
+  | file -> Geneweb_util.Mutil.input_particles file
 
 (** Empty base *)
 let empty_base : cbase =

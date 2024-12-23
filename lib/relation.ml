@@ -582,8 +582,8 @@ let get_others_related conf base p =
   in
   (* TODO don't query db in sort *)
   let get_date x =
-    match Date.od_of_cdate (get_baptism x) with
-    | None -> Date.od_of_cdate (get_birth x)
+    match Geneweb_util.Date.od_of_cdate (get_baptism x) with
+    | None -> Geneweb_util.Date.od_of_cdate (get_birth x)
     | x -> x
   in
   List.sort
@@ -591,7 +591,7 @@ let get_others_related conf base p =
       let d1 = get_date c1 in
       let d2 = get_date c2 in
       match (d1, d2) with
-      | Some d1, Some d2 -> Date.compare_date d1 d2
+      | Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2
       | _ -> -1)
     l
 

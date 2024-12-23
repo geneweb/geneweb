@@ -128,7 +128,7 @@ let title_html_of_person conf base p t : Adef.safe_string =
     (*   - le nom du titre et le premier sobriquet                       *)
     (*   - le nom de la personne (donné par son nom de domaine) en       *)
     (*     fonction du nom public et sobriquet                           *)
-    if Name.strip_lower estate = Name.strip_lower surname then
+    if Geneweb_util.Name.strip_lower estate = Geneweb_util.Name.strip_lower surname then
       match (t.Def.t_name, Gwdb.get_qualifiers p) with
       | Def.Tname n, [] -> (esc (Gwdb.sou base n) :> Adef.safe_string)
       | Def.Tname n, nn :: _ ->
@@ -276,7 +276,7 @@ let relation_date conf base fam : Adef.safe_string =
   @@
   if not @@ is_visible fam then ""
   else
-    match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+    match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
     | None -> ""
     | Some dmy ->
         " " ^ Util.transl conf "in (year)" ^ " " ^ string_of_int dmy.year

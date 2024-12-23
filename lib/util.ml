@@ -96,14 +96,14 @@ let search_in_assets = search_in_path Secure.assets
 
 let start_with_vowel s =
   if String.length s > 0 then
-    let s, _ = Utf8.unaccent true s 0 in
+    let s, _ = Geneweb_util.Utf8.unaccent true s 0 in
     match s.[0] with 'a' | 'e' | 'i' | 'o' | 'u' -> true | _ -> false
   else false
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
 let fcapitale (a : ('a, 'b, 'c, 'd) format4) : ('a, 'b, 'c, 'd) format4 =
-  Scanf.format_from_string (Utf8.capitalize_fst (string_of_format a)) a
+  Scanf.format_from_string (Geneweb_util.Utf8.capitalize_fst (string_of_format a)) a
 
 let nth_field_abs w n =
   let rec start i n =
@@ -143,7 +143,7 @@ let gen_decline_basic wt s =
   let len = String.length wt in
   if len >= 3 && wt.[len - 3] = ':' && wt.[len - 1] = ':' then
     let start = String.sub wt 0 (len - 3) in
-    start ^ Mutil.decline wt.[len - 2] s
+    start ^ Geneweb_util.Mutil.decline wt.[len - 2] s
   else
     match String.rindex_opt wt '+' with
     | Some i ->
@@ -159,9 +159,9 @@ let gen_decline_basic wt s =
           && String.get wt (i + 6) = 'e'
         then
           let start = String.sub wt 0 (i - 1) in
-          if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
-        else wt ^ Mutil.decline 'n' s1
-    | None -> wt ^ Mutil.decline 'n' s1
+          if s = "" then start else Geneweb_util.Mutil.decline 'n' s ^ " " ^ start
+        else wt ^ Geneweb_util.Mutil.decline 'n' s1
+    | None -> wt ^ Geneweb_util.Mutil.decline 'n' s1
 
 let transl_decline conf w s =
   Translate.eval (gen_decline_basic (transl conf w) s)
@@ -181,7 +181,7 @@ let gen_decline wt s1 s2 s2_raw =
         | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' -> (
             let c = wt.[i + 1] in
             match string_of wt.[i + 4] with
-            | Some s -> (Mutil.decline c s, i + 4)
+            | Some s -> (Geneweb_util.Mutil.decline c s, i + 4)
             | None -> (":", i))
         | '[' -> (
             try
@@ -244,9 +244,9 @@ let cftransl conf fmt =
           && fmt.[i + 2] = ':'
           && fmt.[i + 3] = '%'
           && fmt.[i + 4] = 's'
-        then Mutil.decline fmt.[i + 1] a ^ loop (i + 5) al
+        then Geneweb_util.Mutil.decline fmt.[i + 1] a ^ loop (i + 5) al
         else if i + 1 < String.length fmt && fmt.[i] = '%' && fmt.[i + 1] = 's'
-        then Mutil.nominative a ^ loop (i + 2) al
+        then Geneweb_util.Mutil.nominative a ^ loop (i + 2) al
         else if i < String.length fmt then
           String.make 1 fmt.[i] ^ loop (i + 1) gal
         else ""
@@ -259,12 +259,12 @@ let ftransl_nth conf s p =
   valid_format s (transl_nth conf (string_of_format s) p)
 
 let fdecline w s = valid_format w (gen_decline_basic (string_of_format w) s)
-let translate_eval s = Translate.eval (Mutil.nominative s)
+let translate_eval s = Translate.eval (Geneweb_util.Mutil.nominative s)
 
 (* *)
 
 let get_referer conf =
-  let referer = Mutil.extract_param "referer: " '\n' conf.Config.request in
+  let referer = Geneweb_util.Mutil.extract_param "referer: " '\n' conf.Config.request in
   escape_html referer
 
 let begin_centered conf =
@@ -493,7 +493,7 @@ let safe_html_aux escape_text s =
                     || String.get k 0 <> 'o'
                     || String.get k 1 <> 'n')
                     && not
-                         (Ext_string.contains (String.lowercase_ascii v)
+                         (Geneweb_util.Ext_string.contains (String.lowercase_ascii v)
                             "javascript"))
               attrs
           in
@@ -529,7 +529,7 @@ let hidden_textarea conf k v =
   Output.print_sstring conf {|<textarea style="display:none;" name="|};
   Output.print_string conf (escape_html k);
   Output.print_sstring conf {|">|};
-  Output.print_string conf (escape_html (Mutil.decode v));
+  Output.print_string conf (escape_html (Geneweb_util.Mutil.decode v));
   Output.print_sstring conf "</textarea>\n"
 
 let aux_input_s conf t k v =
@@ -542,7 +542,7 @@ let aux_input_s conf t k v =
   Output.print_sstring conf "\">\n"
 
 let hidden_input_s conf k v = aux_input_s conf (Adef.encoded "hidden") k v
-let hidden_input conf k v = hidden_input_s conf k (Mutil.decode v)
+let hidden_input conf k v = hidden_input_s conf k (Geneweb_util.Mutil.decode v)
 let hidden_env_aux conf = List.iter (fun (k, v) -> hidden_input conf k v)
 
 let hidden_env conf =
@@ -550,9 +550,9 @@ let hidden_env conf =
   hidden_env_aux conf conf.Config.senv
 
 let submit_input conf k v =
-  aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
+  aux_input_s conf (Adef.encoded "submit") k (Geneweb_util.Mutil.decode v)
 
-let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
+let p_getenv env label = Option.map Geneweb_util.Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
   try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
@@ -562,7 +562,7 @@ let nobtit conf base p =
   Gwdb.nobtitles base conf.Config.allowed_titles conf.Config.denied_titles p
 
 let strictly_after_private_years conf a =
-  if a.Date.year > conf.Config.private_years then true
+  if a.Geneweb_util.Date.year > conf.Config.private_years then true
   else if a.year < conf.Config.private_years then false
   else
     (* TODO why true if a.year = conf.private_years and unknown day or month? *)
@@ -571,20 +571,20 @@ let strictly_after_private_years conf a =
 (* TODO why do we have both is_old_person and p_auth *)
 let is_old_person conf p =
   match
-    ( Date.cdate_to_dmy_opt p.Def.birth,
-      Date.cdate_to_dmy_opt p.Def.baptism,
+    ( Geneweb_util.Date.cdate_to_dmy_opt p.Def.birth,
+      Geneweb_util.Date.cdate_to_dmy_opt p.Def.baptism,
       p.Def.death,
-      Date.dmy_of_death p.Def.death )
+      Geneweb_util.Date.dmy_of_death p.Def.death )
   with
   | _, _, Def.NotDead, _ when conf.Config.private_years > 0 -> false
   | Some d, _, _, _ ->
-      let a = Date.time_elapsed d conf.Config.today in
+      let a = Geneweb_util.Date.time_elapsed d conf.Config.today in
       strictly_after_private_years conf a
   | _, Some d, _, _ ->
-      let a = Date.time_elapsed d conf.Config.today in
+      let a = Geneweb_util.Date.time_elapsed d conf.Config.today in
       strictly_after_private_years conf a
   | _, _, _, Some d ->
-      let a = Date.time_elapsed d conf.Config.today in
+      let a = Geneweb_util.Date.time_elapsed d conf.Config.today in
       strictly_after_private_years conf a
   | None, None, Def.DontKnowIfDead, None ->
       (* TODO is_old_person is supposed to check if p is older than conf.private_years;
@@ -609,10 +609,10 @@ let pget conf base ip =
   Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
 let string_gen_person base p =
-  Futil.map_person_ps (fun p -> p) (Gwdb.sou base) p
+  Geneweb_util.Futil.map_person_ps (fun p -> p) (Gwdb.sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (fun f -> f) (Gwdb.sou base) fam
+  Geneweb_util.Futil.map_family_ps (fun p -> p) (fun f -> f) (Gwdb.sou base) fam
 
 (* TODO
    should it be is_empty_name instead? (deleted person have surname and first_name = "?")
@@ -679,9 +679,9 @@ let acces_n conf base n x : Adef.escaped_string =
   else if accessible_by_key conf base x first_name surname then
     let open Def in
     "p" ^<^ n ^^^ "="
-    ^<^ (Mutil.encode (Name.lower first_name) :> Adef.escaped_string)
+    ^<^ (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower first_name) :> Adef.escaped_string)
     ^^^ "&n" ^<^ n ^^^ "="
-    ^<^ (Mutil.encode (Name.lower surname) :> Adef.escaped_string)
+    ^<^ (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower surname) :> Adef.escaped_string)
     ^^^
     if Gwdb.get_occ x <> 0 then
       "&oc" ^<^ n ^>^ "=" ^ string_of_int (Gwdb.get_occ x)
@@ -862,14 +862,14 @@ let person_title conf base p =
   else Adef.safe ""
 
 let name_key base s =
-  let part = Mutil.get_particle (Gwdb.base_particles base) s in
+  let part = Geneweb_util.Mutil.get_particle (Gwdb.base_particles base) s in
   if part = "" then s
   else
     let i = String.length part in
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 
 let surname_particle base s =
-  let part = Mutil.get_particle (Gwdb.base_particles base) s in
+  let part = Geneweb_util.Mutil.get_particle (Gwdb.base_particles base) s in
   let len = String.length part in
   if len = 0 then ""
   else if part.[len - 1] = ' ' then " (" ^ String.sub part 0 (len - 1) ^ ")"
@@ -877,7 +877,7 @@ let surname_particle base s =
 
 let surname_without_particle base s =
   let part_len =
-    String.length (Mutil.get_particle (Gwdb.base_particles base) s)
+    String.length (Geneweb_util.Mutil.get_particle (Gwdb.base_particles base) s)
   in
   String.sub s part_len (String.length s - part_len)
 
@@ -1071,7 +1071,7 @@ let body_prop conf =
 
 let get_server_string conf =
   if not conf.Config.cgi then
-    Mutil.extract_param "host: " '\r' conf.Config.request
+    Geneweb_util.Mutil.extract_param "host: " '\r' conf.Config.request
   else
     let server_name = try Sys.getenv "SERVER_NAME" with Not_found -> "" in
     let server_port =
@@ -1080,7 +1080,7 @@ let get_server_string conf =
     if server_port = "80" then server_name else server_name ^ ":" ^ server_port
 
 let get_request_string conf =
-  if not conf.Config.cgi then Mutil.extract_param "GET " ' ' conf.Config.request
+  if not conf.Config.cgi then Geneweb_util.Mutil.extract_param "GET " ' ' conf.Config.request
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
@@ -1215,24 +1215,24 @@ let email_addr_positions =
 
 let get_variable s i =
   let rec loop len i =
-    if i = String.length s then (Buff.get len, [], i)
+    if i = String.length s then (Geneweb_util.Buff.get len, [], i)
     else
       match s.[i] with
       | ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_') as c ->
-          loop (Buff.store len c) (i + 1)
+          loop (Geneweb_util.Buff.store len c) (i + 1)
       | ':' ->
-          let v = Buff.get len in
+          let v = Geneweb_util.Buff.get len in
           let rec loop vl len i =
-            if i = String.length s then (v, List.rev (Buff.get len :: vl), i)
+            if i = String.length s then (v, List.rev (Geneweb_util.Buff.get len :: vl), i)
             else
               match s.[i] with
-              | ':' -> loop (Buff.get len :: vl) 0 (i + 1)
-              | ';' -> (v, List.rev (Buff.get len :: vl), i + 1)
-              | c -> loop vl (Buff.store len c) (i + 1)
+              | ':' -> loop (Geneweb_util.Buff.get len :: vl) 0 (i + 1)
+              | ';' -> (v, List.rev (Geneweb_util.Buff.get len :: vl), i + 1)
+              | c -> loop vl (Geneweb_util.Buff.store len c) (i + 1)
           in
           loop [] 0 (i + 1)
-      | ';' -> (Buff.get len, [], i + 1)
-      | _ -> (Buff.get len, [], i)
+      | ';' -> (Geneweb_util.Buff.get len, [], i + 1)
+      | _ -> (Geneweb_util.Buff.get len, [], i)
   in
   loop 0 i
 
@@ -1294,18 +1294,18 @@ let string_with_macros conf env s =
                   | Some s ->
                       let s =
                         let rec loop vl len i =
-                          if i = String.length s then Buff.get len
+                          if i = String.length s then Geneweb_util.Buff.get len
                           else if
                             i + 1 < String.length s
                             && s.[i] = '%'
                             && s.[i + 1] = 's'
                           then
                             match vl with
-                            | v :: vl -> loop vl (Buff.mstore len v) (i + 2)
+                            | v :: vl -> loop vl (Geneweb_util.Buff.mstore len v) (i + 2)
                             | [] ->
-                                Buff.get len
+                                Geneweb_util.Buff.get len
                                 ^ String.sub s i (String.length s - i)
-                          else loop vl (Buff.store len s.[i]) (i + 1)
+                          else loop vl (Geneweb_util.Buff.store len s.[i]) (i + 1)
                         in
                         loop vl 0 0
                       in
@@ -1361,7 +1361,7 @@ let string_with_macros conf env s =
   loop Out 0
 
 let raw_string_of_place place =
-  List.fold_left (fun s c -> Name.strip_c s c) place [ '['; ']' ]
+  List.fold_left (fun s c -> Geneweb_util.Name.strip_c s c) place [ '['; ']' ]
 
 let string_of_place place = raw_string_of_place place |> escape_html
 
@@ -1369,7 +1369,7 @@ let trimmed_string_of_place place =
   let field_separator = ',' in
   let trim field =
     let field = String.trim field in
-    Ext_option.return_if (field <> "") @@ fun () -> field
+    Geneweb_util.Ext_option.return_if (field <> "") @@ fun () -> field
   in
   place |> raw_string_of_place
   |> String.split_on_char field_separator
@@ -1393,7 +1393,7 @@ let print_alphab_list conf crit print_elem liste =
            in
            if not same_than_last then
              Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
-               (Ext_string.hexa_string t) t;
+               (Geneweb_util.Ext_string.hexa_string t) t;
            Some t)
          None liste
      in
@@ -1416,7 +1416,7 @@ let print_alphab_list conf crit print_elem liste =
            if not same_than_last then (
              Output.print_sstring conf "<li>\n";
              Output.printf conf "<a id=\"ai%s\">%s</a>\n"
-               (Ext_string.hexa_string t) t;
+               (Geneweb_util.Ext_string.hexa_string t) t;
              Output.print_sstring conf "<ul>\n"));
          Output.print_sstring conf "<li>\n  ";
          print_elem e;
@@ -1455,11 +1455,11 @@ let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string)
   | None, _, Some x, y -> if y = "" then (Some x, p1) else (Some x, p2)
 
 let get_approx_birth_date_place base p =
-  let birth = Date.od_of_cdate (Gwdb.get_birth p) in
+  let birth = Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p) in
   let birth_place =
     trimmed_string_of_place (Gwdb.sou base (Gwdb.get_birth_place p))
   in
-  let baptism = Date.od_of_cdate (Gwdb.get_baptism p) in
+  let baptism = Geneweb_util.Date.od_of_cdate (Gwdb.get_baptism p) in
   let baptism_place =
     trimmed_string_of_place (Gwdb.sou base (Gwdb.get_baptism_place p))
   in
@@ -1469,13 +1469,13 @@ let get_approx_birth_date_place base p =
     (baptism_place :> Adef.safe_string)
 
 let get_approx_death_date_place base p =
-  let death = Date.date_of_death (Gwdb.get_death p) in
+  let death = Geneweb_util.Date.date_of_death (Gwdb.get_death p) in
   let death_place =
     trimmed_string_of_place (Gwdb.sou base (Gwdb.get_death_place p))
   in
   let buri =
     match Gwdb.get_burial p with
-    | Def.Buried cd | Def.Cremated cd -> Date.od_of_cdate cd
+    | Def.Buried cd | Def.Cremated cd -> Geneweb_util.Date.od_of_cdate cd
     | Def.UnknownBurial -> None
   in
   let buri_place =
@@ -1604,9 +1604,9 @@ let create_topological_sort conf base =
         then Filename.concat bfile "tstab_visitor"
         else Filename.concat bfile "tstab"
       in
-      Files.read_or_create_value ~magic:Mutil.executable_magic tstab_file
+      Files.read_or_create_value ~magic:Geneweb_util.Mutil.executable_magic tstab_file
         (fun () ->
-          Lock.control (Files.lock_file bfile) false
+          Geneweb_util.Lock.control (Files.lock_file bfile) false
             ~onerror:(fun () ->
               let () = Gwdb.load_ascends_array base in
               let () = Gwdb.load_couples_array base in
@@ -1744,11 +1744,11 @@ let is_that_user_and_password auth_scheme user passwd =
         that_response_would_be = ds.Config.ds_response
 
 let browser_doesnt_have_tables conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.Config.request in
+  let user_agent = Geneweb_util.Mutil.extract_param "user-agent: " '/' conf.Config.request in
   String.lowercase_ascii user_agent = "lynx"
 
 let of_course_died conf p =
-  match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
+  match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
   | Some d ->
       (* TODO this value should be defined elsewhere *)
       conf.Config.today.year - d.year > 120
@@ -1777,7 +1777,7 @@ let sprintf_today conf =
         tm_isdst = false;
       }
   in
-  Mutil.sprintf_date tm
+  Geneweb_util.Mutil.sprintf_date tm
 
 let read_wf_trace fname =
   try
@@ -1890,13 +1890,13 @@ let start_equiv_with case_sens s m i =
     else if i = String.length m then None
     else if case_sens then if m.[i] = s.[j] then test (i + 1) (j + 1) else None
     else
-      match Name.next_chars_if_equiv m i s j with
+      match Geneweb_util.Name.next_chars_if_equiv m i s j with
       | Some (i, j) -> test i j
       | None -> None
   in
   if case_sens then if m.[i] = s.[0] then test (i + 1) 1 else None
   else
-    match Name.next_chars_if_equiv m i s 0 with
+    match Geneweb_util.Name.next_chars_if_equiv m i s 0 with
     | Some (i, j) -> test i j
     | None -> None
 
@@ -1922,13 +1922,13 @@ let rec in_text case_sens s m =
 let html_highlight case_sens h s =
   let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
   let rec loop in_tag i len =
-    if i = String.length s then Buff.get len
-    else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
-    else if s.[i] = '<' then loop true (i + 1) (Buff.store len s.[i])
+    if i = String.length s then Geneweb_util.Buff.get len
+    else if in_tag then loop (s.[i] <> '>') (i + 1) (Geneweb_util.Buff.store len s.[i])
+    else if s.[i] = '<' then loop true (i + 1) (Geneweb_util.Buff.store len s.[i])
     else
       match start_equiv_with case_sens h s i with
-      | Some j -> loop false j (Buff.mstore len (ht i j))
-      | None -> loop false (i + 1) (Buff.store len s.[i])
+      | Some j -> loop false j (Geneweb_util.Buff.mstore len (ht i j))
+      | None -> loop false (i + 1) (Geneweb_util.Buff.store len s.[i])
   in
   loop false 0 0
 
@@ -2058,7 +2058,7 @@ let print_reference conf fn occ sn =
   Output.print_sstring conf "<span class=\"reference\">";
   Output.printf conf " (%s %s.%d %s)"
     (transl conf "reference key")
-    (Name.lower fn) occ (Name.lower sn);
+    (Geneweb_util.Name.lower fn) occ (Geneweb_util.Name.lower sn);
   Output.print_sstring conf "</span>"
 
 (* ********************************************************************** *)
@@ -2089,7 +2089,7 @@ let print_tips_relationship conf =
     p_getenv conf.Config.env "em" = Some "R"
     || p_getenv conf.Config.env "m" = Some "C"
   then
-    Utf8.capitalize_fst (transl conf "select person to compute relationship")
+    Geneweb_util.Utf8.capitalize_fst (transl conf "select person to compute relationship")
     |> Adef.safe |> gen_print_tips conf
 
 (* ********************************************************************** *)
@@ -2119,13 +2119,13 @@ let display_options conf =
     match p_getenv conf.Config.env "bd" with
     | Some i ->
         let open Def in
-        s ^^^ "&bd=" ^<^ (Mutil.encode i :> Adef.escaped_string)
+        s ^^^ "&bd=" ^<^ (Geneweb_util.Mutil.encode i :> Adef.escaped_string)
     | None -> s
   in
   match p_getenv conf.Config.env "color" with
   | Some c ->
       let open Def in
-      s ^^^ "&color=" ^<^ (Mutil.encode c :> Adef.escaped_string)
+      s ^^^ "&color=" ^<^ (Geneweb_util.Mutil.encode c :> Adef.escaped_string)
   | None -> s
 
 (* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)
@@ -2219,7 +2219,7 @@ let record_visited conf ip =
               loop [] x l
         in
         let vl = uniq vl in
-        let vl = Ext_list.take vl 10 in
+        let vl = Geneweb_util.Ext_list.take vl 10 in
         Hashtbl.replace ht conf.Config.user vl
       with Not_found -> Hashtbl.add ht conf.Config.user [ (ip, time) ]
     in
@@ -2376,7 +2376,7 @@ let auth_warning conf base w =
 
 let name_with_roman_number str =
   let rec loop found len i =
-    if i = String.length str then if found then Some (Buff.get len) else None
+    if i = String.length str then if found then Some (Geneweb_util.Buff.get len) else None
     else
       match str.[i] with
       | '0' .. '9' as c ->
@@ -2391,8 +2391,8 @@ let name_with_roman_number str =
             in
             loop (Char.code c - Char.code '0') (i + 1)
           in
-          loop true (Buff.mstore len (Mutil.roman_of_arabian n)) i
-      | c -> loop found (Buff.store len c) (i + 1)
+          loop true (Geneweb_util.Buff.mstore len (Geneweb_util.Mutil.roman_of_arabian n)) i
+      | c -> loop found (Geneweb_util.Buff.store len c) (i + 1)
   in
   loop false 0 0
 

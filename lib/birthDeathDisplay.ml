@@ -8,11 +8,11 @@ open BirthDeath
 
 let month_txt conf d cal =
   let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
-  (d : Adef.safe_string :> string) |> Utf8.capitalize_fst |> Adef.safe
+  (d : Adef.safe_string :> string) |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
 
 let print_birth conf base =
   let list, len =
-    select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
+    select_person conf base (fun p -> Geneweb_util.Date.od_of_cdate (get_birth p)) false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -24,7 +24,7 @@ let print_birth conf base =
   @@ List.fold_left
        (fun (last_month_txt, was_future) (p, d, cal) ->
          let month_txt = month_txt conf d cal in
-         let future = Date.compare_dmy d conf.today = 1 in
+         let future = Geneweb_util.Date.compare_dmy d conf.today = 1 in
          if (not future) && was_future then (
            Output.print_sstring conf "</li></ul></li></ul><p><ul><li>";
            Output.print_string conf month_txt;
@@ -81,12 +81,12 @@ let print_death conf base =
             Output.print_string conf month_txt;
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
-            let sure d = d.Date.prec = Sure in
-            match Date.cdate_to_dmy_opt (get_birth p) with
+            let sure d = d.Geneweb_util.Date.prec = Sure in
+            match Geneweb_util.Date.cdate_to_dmy_opt (get_birth p) with
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
-                  let a = Date.time_elapsed d1 d in
+                  let a = Geneweb_util.Date.time_elapsed d1 d in
                   let ages_sum =
                     match get_sex p with
                     | Male -> (fst ages_sum + a.year, snd ages_sum)
@@ -127,7 +127,7 @@ let print_death conf base =
     let aux sex nb sum =
       if nb >= 3 then (
         transl conf "average age at death"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf;
+        |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf " (";
         Output.print_sstring conf (transl_nth conf "M/F" sex);
         Output.print_sstring conf ") : ";
@@ -182,7 +182,7 @@ let print_death conf base =
     Output.print_sstring conf
       {|<button type="submit" class="btn btn-secondary btn-lg">|};
     transl_nth conf "validate/delete" 0
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf "</button></p></form>");
   Hutil.trailer conf
 
@@ -190,9 +190,9 @@ let print_oldest_alive conf base =
   let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
   let get_oldest_alive p =
     match get_death p with
-    | NotDead -> Date.od_of_cdate (get_birth p)
+    | NotDead -> Geneweb_util.Date.od_of_cdate (get_birth p)
     | DontKnowIfDead when limit > 0 -> (
-        match Date.od_of_cdate (get_birth p) with
+        match Geneweb_util.Date.od_of_cdate (get_birth p) with
         | Some (Dgreg (d, _)) as x when conf.today.year - d.year <= limit -> x
         | Some _ | None -> None)
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
@@ -220,7 +220,7 @@ let print_oldest_alive conf base =
         (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
       Output.print_sstring conf "</em>";
       if get_death p = NotDead && d.prec = Sure then (
-        let a = Date.time_elapsed d conf.today in
+        let a = Geneweb_util.Date.time_elapsed d conf.today in
         Output.print_sstring conf " <em>(";
         Output.print_string conf (DateDisplay.string_of_age conf a);
         Output.print_sstring conf ")</em>");
@@ -232,11 +232,11 @@ let print_oldest_alive conf base =
 let print_longest_lived conf base =
   let get_longest p =
     if Util.authorized_age conf base p then
-      match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+      match (Geneweb_util.Date.cdate_to_dmy_opt (get_birth p), get_death p) with
       | Some bd, Death (_, cd) -> (
-          match Date.cdate_to_dmy_opt cd with
+          match Geneweb_util.Date.cdate_to_dmy_opt cd with
           | None -> None
-          | Some dd -> Some (Date.Dgreg (Date.time_elapsed bd dd, Dgregorian)))
+          | Some dd -> Some (Geneweb_util.Date.Dgreg (Geneweb_util.Date.time_elapsed bd dd, Dgregorian)))
       | _ -> None
     else None
   in
@@ -255,7 +255,7 @@ let print_longest_lived conf base =
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf " (";
-      Output.print_sstring conf (string_of_int d.Date.year);
+      Output.print_sstring conf (string_of_int d.Geneweb_util.Date.year);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "years old");
       Output.print_sstring conf ")";
@@ -273,7 +273,7 @@ let print_marr_or_eng conf base title list =
   @@ List.fold_left
        (fun (last_month_txt, was_future) (fam, d, cal) ->
          let month_txt = month_txt conf d cal in
-         let future = Date.compare_dmy d conf.today > 0 in
+         let future = Geneweb_util.Date.compare_dmy d conf.today > 0 in
          if (not future) && was_future then (
            Output.print_sstring conf "</ul></li></ul><ul><li>";
            Output.print_string conf month_txt;
@@ -328,7 +328,7 @@ let print_marriage conf base =
       (fun fam ->
         let rel = get_relation fam in
         if rel = Married || rel = NoSexesCheckMarried then
-          Date.od_of_cdate (get_marriage fam)
+          Geneweb_util.Date.od_of_cdate (get_marriage fam)
         else None)
       false
   in
@@ -347,7 +347,7 @@ let print_oldest_engagements conf base =
           let wife = pget conf base (get_mother fam) in
           match (get_death husb, get_death wife) with
           | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-              Date.od_of_cdate (get_marriage fam)
+              Geneweb_util.Date.od_of_cdate (get_marriage fam)
           | _ -> None
         else None)
       true
@@ -363,7 +363,7 @@ let print_oldest_engagements conf base =
 
 let old_print_statistics conf =
   let title _ =
-    transl conf "statistics" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "statistics" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env)
@@ -431,11 +431,11 @@ let print_population_pyramid conf base =
   in
   let at_year = at_date.year in
   let string_of_nb n =
-    Mutil.string_of_int_sep (transl conf "(thousand separator)") n
+    Geneweb_util.Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   in
   let title _ =
     transl conf "population pyramid"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf " (";
     Output.print_sstring conf (string_of_int at_year);
     Output.print_sstring conf ")"
@@ -519,7 +519,7 @@ let print_population_pyramid conf base =
   let sum_wom = Array.fold_left ( + ) 0 wom in
   Output.print_sstring conf "<p>";
   transl conf "number of living persons:"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf " ";
   Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
   Output.print_sstring conf {|</p><p><form method="get" action="|};

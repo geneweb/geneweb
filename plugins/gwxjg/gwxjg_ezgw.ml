@@ -83,8 +83,8 @@ module Person = struct
     let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     let key =
-      let fn = Name.lower (sou base (get_first_name p)) in
-      let sn = Name.lower (sou base (get_surname p)) in
+      let fn = Geneweb_util.Name.lower (sou base (get_first_name p)) in
+      let sn = Geneweb_util.Name.lower (sou base (get_surname p)) in
       (fn, sn, get_occ p)
     in
     List.fold_left (Perso.linked_page_text conf base p s key) (Adef.safe "") db
@@ -94,12 +94,12 @@ module Person = struct
   let related conf base p =
     List.sort (fun (c1, _) (c2, _) ->
         let mk_date c =
-          match Date.od_of_cdate (get_baptism c) with
-          | None -> Date.od_of_cdate (get_birth c)
+          match Geneweb_util.Date.od_of_cdate (get_baptism c) with
+          | None -> Geneweb_util.Date.od_of_cdate (get_birth c)
           | x -> x
         in
         match (mk_date c1, mk_date c2) with
-        | Some d1, Some d2 -> Date.compare_date d1 d2
+        | Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2
         | _ -> -1)
     @@ List.fold_left
          (fun list ic ->
@@ -159,7 +159,7 @@ module Family = struct
 
   let divorce_date (_, fam, _, auth) =
     match get_divorce fam with
-    | Divorced d when auth -> Date.od_of_cdate d
+    | Divorced d when auth -> Geneweb_util.Date.od_of_cdate d
     | _ -> None
 
   let events (_, fam, (_, _, isp), auth) =
@@ -175,7 +175,7 @@ module Family = struct
   let ifam (ifam, _, _, _) = string_of_ifam ifam
 
   let marriage_date (_, fam, (_, _, _), auth) =
-    if auth then Date.od_of_cdate (get_marriage fam) else None
+    if auth then Geneweb_util.Date.od_of_cdate (get_marriage fam) else None
 
   let marriage_place (_, fam, _, _) = get_marriage_place fam
 
@@ -273,7 +273,7 @@ module Event = struct
     | Pevent (Epers_Name _) -> "EPERS"
     | Fevent (Efam_Name _) -> "EFAM"
 
-  let date ei = Date.od_of_cdate (Event.get_date ei)
+  let date ei = Geneweb_util.Date.od_of_cdate (Event.get_date ei)
   let place = Event.get_place
 
   let note conf base e =

@@ -33,9 +33,9 @@ let ext_flags =
     [Retour] : string
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let slash_name_of_key fn sn occ =
-  let space_to_unders = Ext_string.tr ' ' '_' in
-  let fn = space_to_unders (Name.lower fn) in
-  let sn = space_to_unders (Name.lower sn) in
+  let space_to_unders = Geneweb_util.Ext_string.tr ' ' '_' in
+  let fn = space_to_unders (Geneweb_util.Name.lower fn) in
+  let sn = space_to_unders (Geneweb_util.Name.lower sn) in
   sn ^ "/" ^ fn ^ "/" ^ string_of_int occ
 
 (* ********************************************************************** *)
@@ -58,8 +58,8 @@ let diff_visibility conf base op np =
   let k = slash_name_of_key np.first_name np.surname np.occ in
   let empty_union = { family = [||] } in
   let empty_ascend = { parents = None; consang = Adef.fix (-1) } in
-  let op = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op in
-  let np = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np in
+  let op = Geneweb_util.Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op in
+  let np = Geneweb_util.Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np in
   let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
   let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
   let tmp_conf = { conf with wizard = false; friend = false } in
@@ -533,7 +533,7 @@ let print_foreach conf base print_ast eval_expr =
               if i >= k then pos
               else
                 match
-                  try Some (Mutil.rev_input_line ic pos vv)
+                  try Some (Geneweb_util.Mutil.rev_input_line ic pos vv)
                   with End_of_file -> None
                 with
                 | Some (line, pos) ->
@@ -630,7 +630,7 @@ let search_text conf base s =
         let vv = (ref (Bytes.create 0), ref 0) in
         let rec loop pos =
           match
-            try Some (Mutil.rev_input_line ic pos vv) with End_of_file -> None
+            try Some (Geneweb_util.Mutil.rev_input_line ic pos vv) with End_of_file -> None
           with
           | Some (line, pos2) -> (
               match line_fields line with
@@ -655,7 +655,7 @@ let search_text conf base s =
 let print_search conf base =
   if conf.wizard || conf.friend then
     match try Some (List.assoc "s" conf.env) with Not_found -> None with
-    | Some s -> search_text conf base (Mutil.gen_decode false s)
+    | Some s -> search_text conf base (Geneweb_util.Mutil.gen_decode false s)
     | None -> print conf base
   else print conf base
 
@@ -669,7 +669,7 @@ let filter_map_history ~conf ~skip ~n ~filter ~f =
       let rec loop skip' n' pos res =
         if n' = n then res
         else
-          match Mutil.rev_input_line ic pos (rbuf, rpos) with
+          match Geneweb_util.Mutil.rev_input_line ic pos (rbuf, rpos) with
           | line, fpos -> (
               match line_fields line with
               | None -> loop skip' n' fpos res

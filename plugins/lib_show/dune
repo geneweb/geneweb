@@ -4,7 +4,7 @@
 
 (executable
  (name plugin_lib_show)
- (embed_in_plugin_libraries geneweb.def_show)
+ (embed_in_plugin_libraries geneweb.date_show geneweb.def_show)
  (flags -linkall)
  (modes
   (native plugin)))

@@ -54,11 +54,11 @@ let compare_places s1 s2 =
   let ss1, s1 = split_suburb s1 in
   let ss2, s2 = split_suburb s2 in
   match
-    Ext_list.compare Utf8.alphabetic_order
+    Geneweb_util.Ext_list.compare Geneweb_util.Utf8.alphabetic_order
       (String.split_on_char ',' s1)
       (String.split_on_char ',' s2)
   with
-  | 0 -> Utf8.alphabetic_order ss1 ss2
+  | 0 -> Geneweb_util.Utf8.alphabetic_order ss1 ss2
   | x -> x
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].

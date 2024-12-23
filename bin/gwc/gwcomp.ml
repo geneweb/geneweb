@@ -175,7 +175,7 @@ let date_of_string s i =
   in
   let precision, i =
     match s.[i] with
-    | '~' -> (Date.About, succ i)
+    | '~' -> (Geneweb_util.Date.About, succ i)
     | '?' -> (Maybe, succ i)
     | '>' -> (After, succ i)
     | '<' -> (Before, succ i)
@@ -221,14 +221,14 @@ let date_of_string s i =
             if month < 1 || month > 13 then error 2
             else if day < 1 || day > 31 then error 3
             else
-              let d = Date.{ day; month; year; prec = precision; delta = 0 } in
-              Some (Date.Dgreg (d, Dgregorian), i)
+              let d = Geneweb_util.Date.{ day; month; year; prec = precision; delta = 0 } in
+              Some (Geneweb_util.Date.Dgreg (d, Dgregorian), i)
         | None ->
             if year = 0 then None
             else if month < 1 || month > 13 then error 4
             else
               let d =
-                Date.{ day = 0; month; year; prec = precision; delta = 0 }
+                Geneweb_util.Date.{ day = 0; month; year; prec = precision; delta = 0 }
               in
               Some (Dgreg (d, Dgregorian), i))
     | None ->
@@ -241,7 +241,7 @@ let date_of_string s i =
           else failwith ("date_of_string " ^ s)
         else
           let d =
-            Date.{ day = 0; month = 0; year; prec = precision; delta = 0 }
+            Geneweb_util.Date.{ day = 0; month = 0; year; prec = precision; delta = 0 }
           in
           Some (Dgreg (d, Dgregorian), i)
   in
@@ -252,12 +252,12 @@ let date_of_string s i =
         else if s.[i] = '|' then
           let year2, i = champ (succ i) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = Date.{ day2; month2; year2; delta2 = 0 } in
+          let dmy2 = Geneweb_util.Date.{ day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = OrYear dmy2 }, cal), i)
         else if i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
           let year2, i = champ (i + 2) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = Date.{ day2; month2; year2; delta2 = 0 } in
+          let dmy2 = Geneweb_util.Date.{ day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = YearInt dmy2 }, cal), i)
         else Some (dt, i)
     | Some ((Dtext _ as dt), i) -> Some (dt, i)
@@ -266,18 +266,18 @@ let date_of_string s i =
   let date =
     match date with
     | Some (Dgreg (d, _), i) -> (
-        if i = String.length s then Some (Date.Dgreg (d, Dgregorian), i)
+        if i = String.length s then Some (Geneweb_util.Date.Dgreg (d, Dgregorian), i)
         else
           match s.[i] with
           | 'G' -> Some (Dgreg (d, Dgregorian), i + 1)
           | 'J' ->
-              let d = Date.convert ~from:Djulian ~to_:Dgregorian d in
+              let d = Geneweb_util.Date.convert ~from:Djulian ~to_:Dgregorian d in
               Some (Dgreg (d, Djulian), i + 1)
           | 'F' ->
-              let d = Date.convert ~from:Dfrench ~to_:Dgregorian d in
+              let d = Geneweb_util.Date.convert ~from:Dfrench ~to_:Dgregorian d in
               Some (Dgreg (d, Dfrench), i + 1)
           | 'H' ->
-              let d = Date.convert ~from:Dhebrew ~to_:Dgregorian d in
+              let d = Geneweb_util.Date.convert ~from:Dhebrew ~to_:Dgregorian d in
               Some (Dgreg (d, Dhebrew), i + 1)
           | _ -> Some (Dgreg (d, Dgregorian), i))
     | d -> d
@@ -299,7 +299,7 @@ let input_a_line state (ic, encoding) =
   let line = input_line0 state ic in
   match encoding with
   | E_utf_8 -> line
-  | E_iso_8859_1 -> Utf8.utf_8_of_iso_8859_1 line
+  | E_iso_8859_1 -> Geneweb_util.Utf8.utf_8_of_iso_8859_1 line
 
 (** Read a line. If line is empty or only contains a comment, then read next line  *)
 let rec input_real_line state ic =
@@ -357,7 +357,7 @@ let get_optional_deathdate l =
             let d =
               match date_of_string x i with
               | None -> DeadDontKnowWhen
-              | Some d -> Death (dr, Date.cdate_of_date d)
+              | Some d -> Death (dr, Geneweb_util.Date.cdate_of_date d)
             in
             (Some d, l')
         | _ -> (None, l)
@@ -377,8 +377,8 @@ let get_burial l =
                 (date_of_string x i, l')
             | _ -> (None, l)
           in
-          (Buried (Date.cdate_of_od od), l)
-      | [] -> (Buried Date.cdate_None, l))
+          (Buried (Geneweb_util.Date.cdate_of_od od), l)
+      | [] -> (Buried Geneweb_util.Date.cdate_None, l))
   | "#crem" :: l -> (
       match l with
       | x :: l' ->
@@ -389,8 +389,8 @@ let get_burial l =
                 (date_of_string x i, l')
             | _ -> (None, l)
           in
-          (Cremated (Date.cdate_of_od od), l)
-      | [] -> (Cremated Date.cdate_None, l))
+          (Cremated (Geneweb_util.Date.cdate_of_od od), l)
+      | [] -> (Cremated Geneweb_util.Date.cdate_None, l))
   | _ -> (UnknownBurial, l)
 
 (** Parse sex of person *)
@@ -568,8 +568,8 @@ let scan_title t =
       t_name = name;
       t_ident = title;
       t_place = place;
-      t_date_start = Date.cdate_of_od date_start;
-      t_date_end = Date.cdate_of_od date_end;
+      t_date_start = Geneweb_util.Date.cdate_of_od date_start;
+      t_date_end = Geneweb_util.Date.cdate_of_od date_end;
       t_nth = nth;
     }
 
@@ -702,8 +702,8 @@ let get_mar_date str = function
       let mar, l =
         match x.[0] with
         | '+' ->
-            ( (if String.length x > 1 then Date.cdate_of_od (date_of_string x 1)
-              else Date.cdate_None),
+            ( (if String.length x > 1 then Geneweb_util.Date.cdate_of_od (date_of_string x 1)
+              else Geneweb_util.Date.cdate_None),
               l )
         | _ -> failwith str
       in
@@ -758,8 +758,8 @@ let get_mar_date str = function
         match l with
         | x :: l when x.[0] = '-' ->
             if String.length x > 1 then
-              (Divorced (Date.cdate_of_od (date_of_string x 1)), l)
-            else (Divorced Date.cdate_None, l)
+              (Divorced (Geneweb_util.Date.cdate_of_od (date_of_string x 1)), l)
+            else (Divorced Geneweb_util.Date.cdate_None, l)
         | "#sep" :: l -> (Separated, l)
         | _ -> (NotDivorced, l)
       in
@@ -776,7 +776,7 @@ let read_line state ic =
 
 (** Create a dummy [gen_person]. *)
 let create_person () =
-  { (Mutil.empty_person "" "") with key_index = Gwdb.dummy_iper }
+  { (Geneweb_util.Mutil.empty_person "" "") with key_index = Gwdb.dummy_iper }
 
 (** Person is unknown (bogus definition) *)
 let bogus_def p n = p = "?" || n = "?"
@@ -825,11 +825,11 @@ let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
   in
   let naissance =
     match naissance with
-    | None -> Date.cdate_None
-    | Some x -> Date.cdate_of_od x
+    | None -> Geneweb_util.Date.cdate_None
+    | Some x -> Geneweb_util.Date.cdate_of_od x
   in
   let baptism =
-    match baptism with None -> Date.cdate_None | Some x -> Date.cdate_of_od x
+    match baptism with None -> Geneweb_util.Date.cdate_None | Some x -> Geneweb_util.Date.cdate_of_od x
   in
   let burial, l = get_burial l in
   let burial_place, l = get_field "#rp" l in
@@ -964,7 +964,7 @@ let read_notes state ic =
       loop (input_a_line state ic)
     with End_of_file -> failwith "end of file"
   in
-  Ext_string.strip_all_trailing_spaces notes
+  Geneweb_util.Ext_string.strip_all_trailing_spaces notes
 
 (* from version 5.00 *)
 
@@ -987,7 +987,7 @@ let read_notes_db state ic end_txt =
       loop (input_a_line state ic)
     with End_of_file -> failwith "end of file"
   in
-  Ext_string.strip_all_trailing_spaces notes
+  Geneweb_util.Ext_string.strip_all_trailing_spaces notes
 
 (** Parsing status of .gw block  *)
 type 'a read_family =
@@ -1013,7 +1013,7 @@ let aux_loop_note state tag line ic =
   let acc, line = loop [] line in
   let note =
     String.concat "\n" (List.rev @@ ("" :: acc))
-    |> Ext_string.strip_all_trailing_spaces
+    |> Geneweb_util.Ext_string.strip_all_trailing_spaces
   in
   (note, line)
 
@@ -1146,8 +1146,8 @@ let read_family state ic fname = function
                     let src, l = get_field "#s" l in
                     let date =
                       match date with
-                      | None -> Date.cdate_None
-                      | Some x -> Date.cdate_of_od x
+                      | None -> Geneweb_util.Date.cdate_None
+                      | Some x -> Geneweb_util.Date.cdate_of_od x
                     in
                     if l <> [] then failwith str;
                     (* On récupère les témoins *)
@@ -1310,8 +1310,8 @@ let read_family state ic fname = function
                 let src, l = get_field "#s" l in
                 let date =
                   match date with
-                  | None -> Date.cdate_None
-                  | Some x -> Date.cdate_of_od x
+                  | None -> Geneweb_util.Date.cdate_None
+                  | Some x -> Geneweb_util.Date.cdate_of_od x
                 in
                 if l <> [] then failwith str;
                 (* On récupère les témoins *)

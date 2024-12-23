@@ -34,7 +34,7 @@ let import_trad ht keyword line =
         | Lexicon_parser.Str s -> loop (s :: acc) (i - 1)
         | Arg n -> loop (string_of_tvalue (arg n) :: acc) (i - 1)
         | Declension (c, n) ->
-            loop ((arg n |> string_of_tvalue |> Mutil.decline c) :: acc) (i - 1)
+            loop ((arg n |> string_of_tvalue |> Geneweb_util.Mutil.decline c) :: acc) (i - 1)
         | Elision (s1, s2) ->
             let x =
               try unbox_string @@ arg "elision" with Not_found -> List.hd acc

@@ -11,10 +11,10 @@ open Update_util
 let removed_string = ref []
 
 type create_info = Update.create_info = {
-  ci_birth_date : Date.date option;
+  ci_birth_date : Geneweb_util.Date.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : Date.date option;
+  ci_death_date : Geneweb_util.Date.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -24,9 +24,9 @@ let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
 let reconstitute_parent_or_child conf var default_surname =
-  let first_name = Ext_string.only_printable (getn conf var "fn") in
+  let first_name = Geneweb_util.Ext_string.only_printable (getn conf var "fn") in
   let surname =
-    let surname = Ext_string.only_printable (getn conf var "sn") in
+    let surname = Geneweb_util.Ext_string.only_printable (getn conf var "sn") in
     if surname = "" && first_name <> "" then default_surname else surname
   in
   (* S'il y a des caractères interdits, on les supprime *)
@@ -43,7 +43,7 @@ let reconstitute_parent_or_child conf var default_surname =
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
     let dpl = getn conf (var ^ "d") "pl" in
-    let occupation = Ext_string.only_printable (getn conf var "occupation") in
+    let occupation = Geneweb_util.Ext_string.only_printable (getn conf var "occupation") in
     let public = getn conf (var ^ "b") "yyyy" = "p" in
     {
       ci_birth_date = b;
@@ -118,7 +118,7 @@ let reconstitute_insert_event conf ext cnt el =
           let e1 =
             {
               efam_name = Efam_Name "";
-              efam_date = Date.cdate_None;
+              efam_date = Geneweb_util.Date.cdate_None;
               efam_place = "";
               efam_reason = "";
               efam_note = "";
@@ -152,26 +152,26 @@ let rec reconstitute_events conf ext cnt =
         | "#marl" -> Efam_MarriageLicense
         | "#pacs" -> Efam_PACS
         | "#resi" -> Efam_Residence
-        | n -> Efam_Name (Ext_string.only_printable n)
+        | n -> Efam_Name (Geneweb_util.Ext_string.only_printable n)
       in
       let efam_date =
         Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
       in
       let efam_place =
         match get_nth conf "e_place" cnt with
-        | Some place -> Ext_string.only_printable place
+        | Some place -> Geneweb_util.Ext_string.only_printable place
         | None -> ""
       in
       let efam_note =
         match get_nth conf "e_note" cnt with
         | Some note ->
-            Ext_string.only_printable_or_nl
-              (Ext_string.strip_all_trailing_spaces note)
+            Geneweb_util.Ext_string.only_printable_or_nl
+              (Geneweb_util.Ext_string.strip_all_trailing_spaces note)
         | None -> ""
       in
       let efam_src =
         match get_nth conf "e_src" cnt with
-        | Some src -> Ext_string.only_printable src
+        | Some src -> Geneweb_util.Ext_string.only_printable src
         | None -> ""
       in
       let witnesses, ext =
@@ -274,7 +274,7 @@ let rec reconstitute_events conf ext cnt =
       let e =
         {
           efam_name;
-          efam_date = Date.cdate_of_od efam_date;
+          efam_date = Geneweb_util.Date.cdate_of_od efam_date;
           efam_place;
           efam_reason = "";
           efam_note;
@@ -385,7 +385,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   let marr, wit =
     match !found_marriage with
     | None ->
-        ( (NoMention, Date.cdate_None, empty_string, empty_string, empty_string),
+        ( (NoMention, Geneweb_util.Date.cdate_None, empty_string, empty_string, empty_string),
           [||] )
     | Some (kind, date, place, note, src, wit) ->
         ((kind, date, place, note, src), wit)
@@ -445,10 +445,10 @@ let reconstitute_family conf base nsck =
     loop 1 ext
   in
   let comment =
-    Ext_string.only_printable_or_nl
-      (Ext_string.strip_all_trailing_spaces (get conf "comment"))
+    Geneweb_util.Ext_string.only_printable_or_nl
+      (Geneweb_util.Ext_string.strip_all_trailing_spaces (get conf "comment"))
   in
-  let fsources = Ext_string.only_printable (get conf "src") in
+  let fsources = Geneweb_util.Ext_string.only_printable (get conf "src") in
   let origin_file =
     Option.value ~default:"" (p_getenv conf.env "origin_file")
   in
@@ -466,7 +466,7 @@ let reconstitute_family conf base nsck =
       let evt =
         {
           efam_name = Efam_NoMention;
-          efam_date = Date.cdate_None;
+          efam_date = Geneweb_util.Date.cdate_None;
           efam_place = "";
           efam_reason = "";
           efam_note = "";
@@ -529,7 +529,7 @@ let reconstitute_family conf base nsck =
       fsources;
       fam_index;
     }
-  and cpl = Futil.parent conf.multi_parents (Array.of_list parents)
+  and cpl = Geneweb_util.Futil.parent conf.multi_parents (Array.of_list parents)
   and des = { children = Array.of_list children } in
   (fam, cpl, des, ext)
 
@@ -561,7 +561,7 @@ let strip_array_persons pl =
 let error_family conf err =
   Update.prerr conf err @@ fun () ->
   (err |> Update.string_of_error conf : Adef.safe_string :> string)
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "\n";
   Update.print_return conf
 
@@ -634,7 +634,7 @@ let print_err_parents conf base p =
   Output.print_string conf (Update.string_of_error conf err);
   Output.print_sstring conf "<p><ul><li>";
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl conf "first free number"));
+    (Geneweb_util.Utf8.capitalize_fst (transl conf "first free number"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf @@ string_of_int
   @@ Gutil.find_free_occ base (p_first_name base p) (p_surname base p);
@@ -649,14 +649,14 @@ let print_err_sex conf base p =
 
 let print_err conf =
   let err =
-    Update.UERR (transl conf "error" |> Utf8.capitalize_fst |> Adef.safe)
+    Update.UERR (transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () -> Update.print_return conf
 
 let print_error_disconnected conf =
   let err =
     Update.UERR
-      (transl conf "msg error disconnected" |> Utf8.capitalize_fst |> Adef.safe)
+      (transl conf "msg error disconnected" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
@@ -734,7 +734,7 @@ let fwitnesses_of_fam_event fam_events =
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
 let patch_person_with_pevents base ip =
   let p = poi base ip |> gen_person_of_person in
-  let evt ~name ?(date = Date.cdate_None) ~place ~src ~note () =
+  let evt ~name ?(date = Geneweb_util.Date.cdate_None) ~place ~src ~note () =
     {
       epers_name = name;
       epers_date = date;
@@ -754,7 +754,7 @@ let patch_person_with_pevents base ip =
       let src = p.birth_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Option.is_some (Date.od_of_cdate p.birth) then evt ~date:p.birth ()
+    if Option.is_some (Geneweb_util.Date.od_of_cdate p.birth) then evt ~date:p.birth ()
     else if sou base p.birth_place = "" then None
     else evt ()
   in
@@ -766,7 +766,7 @@ let patch_person_with_pevents base ip =
       let src = p.baptism_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Option.is_some (Date.od_of_cdate p.baptism) then evt ~date:p.baptism ()
+    if Option.is_some (Geneweb_util.Date.od_of_cdate p.baptism) then evt ~date:p.baptism ()
     else if sou base p.baptism_place = "" then None
     else evt ()
   in
@@ -778,9 +778,9 @@ let patch_person_with_pevents base ip =
       let src = p.death_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    match Date.date_of_death p.death with
+    match Geneweb_util.Date.date_of_death p.death with
     | Some cd ->
-        let date = Date.cdate_of_od (Some cd) in
+        let date = Geneweb_util.Date.cdate_of_od (Some cd) in
         evt ~date ()
     | None -> if sou base p.death_place = "" then None else evt ()
   in
@@ -856,18 +856,18 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
     match p_getenv conf.env "psrc" with Some s -> String.trim s | None -> ""
   in
   let ncpl =
-    Futil.map_couple_p conf.multi_parents
+    Geneweb_util.Futil.map_couple_p conf.multi_parents
       (Update.insert_person conf base psrc created_p)
       scpl
   in
   let nfam =
-    Futil.map_family_ps
+    Geneweb_util.Futil.map_family_ps
       (Update.insert_person conf base psrc created_p)
       (fun f -> f)
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    Geneweb_util.Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
@@ -1093,11 +1093,11 @@ let need_check_noloop (scpl, sdes, onfs) =
     match onfs with
     | Some ((opar, ochil), (npar, nchil)) ->
         (not
-           (Mutil.array_forall2
+           (Geneweb_util.Mutil.array_forall2
               (is_created_or_already_there opar)
               npar (Gutil.parent_array scpl)))
         || not
-             (Mutil.array_forall2
+             (Geneweb_util.Mutil.array_forall2
                 (is_created_or_already_there ochil)
                 nchil sdes.children)
     | None -> true
@@ -1135,7 +1135,7 @@ let print_family conf base (wl, ml) cpl des =
   (match rdsrc with
   | Some x ->
       conf.henv <- List.remove_assoc "dsrc" conf.henv;
-      if x <> "" then conf.henv <- ("dsrc", Mutil.encode x) :: conf.henv
+      if x <> "" then conf.henv <- ("dsrc", Geneweb_util.Mutil.encode x) :: conf.henv
   | None -> ());
   Output.print_sstring conf "<ul>\n";
   Output.print_sstring conf "<li>";
@@ -1161,7 +1161,7 @@ let print_family conf base (wl, ml) cpl des =
   Update.print_warnings_and_miscs conf base wl ml
 
 let print_title conf fmt _ =
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
+  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf fmt))
 
 let print_mod_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
@@ -1173,7 +1173,7 @@ let print_mod_ok conf base (wl, ml) cpl des =
       (fcapitale (ftransl conf "%s forbidden char"))
       (List.fold_left
          (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
-         " " Name.forbidden_char);
+         " " Geneweb_util.Name.forbidden_char);
     Output.print_sstring conf "</h3>\n";
     List.iter (Output.printf conf "<p>%s</p>") !removed_string);
   print_family conf base (wl, ml) cpl des;
@@ -1191,7 +1191,7 @@ let print_add_ok conf base (wl, ml) cpl des =
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
     Output.printf conf "<h2 class=\"error\">%s</h2>\n"
-      (Utf8.capitalize_fst (transl conf "forbidden char"));
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "forbidden char"));
     List.iter (Output.printf conf "<p>%s</p>") !removed_string);
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
@@ -1323,7 +1323,7 @@ let print_add_parents o_conf base =
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let sfam, scpl, sdes, _ = reconstitute_family conf base nsck in
   if
-    sfam.marriage = Date.cdate_None
+    sfam.marriage = Geneweb_util.Date.cdate_None
     && sfam.marriage_place = "" && sfam.marriage_note = ""
     && sfam.marriage_src = "" && sfam.witnesses = [||]
     && sfam.relation = Married && sfam.divorce = NotDivorced
@@ -1331,7 +1331,7 @@ let print_add_parents o_conf base =
        = [
            {
              efam_name = Efam_Marriage;
-             efam_date = Date.cdate_None;
+             efam_date = Geneweb_util.Date.cdate_None;
              efam_place = "";
              efam_reason = "";
              efam_note = "";
@@ -1547,7 +1547,7 @@ let print_change_event_order conf base =
       let fam = update_family_with_fevents conf base fam in
       patch_family base fam.fam_index fam;
       let a = foi base fam.fam_index in
-      let cpl = Futil.parent conf.multi_parents (get_parent_array a) in
+      let cpl = Geneweb_util.Futil.parent conf.multi_parents (get_parent_array a) in
       let des = { children = get_children a } in
       let wl =
         let wl = ref [] in

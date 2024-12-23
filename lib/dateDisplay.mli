@@ -1,7 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Date
+open Geneweb_util.Date
 open Gwdb
 
 val get_wday : config -> date -> string
@@ -83,10 +83,10 @@ val code_french_year : config -> int -> string
 
 val string_of_date_aux :
   ?link:bool ->
-  ?dmy:(Config.config -> Date.dmy -> Adef.safe_string) ->
+  ?dmy:(Config.config -> Geneweb_util.Date.dmy -> Adef.safe_string) ->
   ?sep:Adef.safe_string ->
   Config.config ->
-  Date.date ->
+  Geneweb_util.Date.date ->
   Adef.safe_string
 (** Same as [string_of_ondate] except :
     - Conversion function for [Date.dmy] could be passed in in [dmy] argument

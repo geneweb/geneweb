@@ -268,30 +268,30 @@ let print_aux conf pos title =
       Output.print_string conf (MF.string_of_pos pos);
       Output.print_sstring conf {|">|};
       message_txt conf 3 (* FIXME: safe_string? *)
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf {|</a>|}
   | None ->
       Output.print_sstring conf {|<a href="|};
       Output.print_string conf (commd conf);
       Output.print_sstring conf {|m=FORUM">|};
       transl conf "database forum"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf {|</a>|});
   Hutil.trailer conf
 
 let print_del_ok conf next_pos =
   print_aux conf next_pos @@ fun _ ->
   transl conf "message deleted"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
 
 let print_valid_ok conf pos del =
   print_aux conf pos @@ fun _ ->
   if del then
     transl conf "message deleted"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   else
     transl conf "message added"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
 
 let print_forum_message conf base r so =
   let env =
@@ -364,7 +364,7 @@ let print_add_ok conf base =
     let ident = String.trim (get conf "Ident") in
     let email = String.trim (get conf "Email") in
     let subject = String.trim (get conf "Subject") in
-    let text = Ext_string.trim_trailing_spaces (get1 conf "Text") in
+    let text = Geneweb_util.Ext_string.trim_trailing_spaces (get1 conf "Text") in
     {
       m_time = (time :> string);
       m_date = Dtext "";
@@ -388,7 +388,7 @@ let print_add_ok conf base =
   else
     let title _ =
       transl conf "message added"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
     in
     let mods = moderators conf in
     forum_add conf base (mods <> []) mess;
@@ -397,16 +397,16 @@ let print_add_ok conf base =
     if mods <> [] then (
       Output.print_sstring conf "<p>";
       transl conf "this forum is moderated"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf ". ";
       transl conf "your message is waiting for validation"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf ".</p>");
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf {|m=FORUM">|};
     transl conf "database forum"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf {|</a> |};
     Hutil.trailer conf
 
@@ -488,5 +488,5 @@ let search_text conf base s =
 
 let print_search conf base =
   match try Some (List.assoc "s" conf.env) with Not_found -> None with
-  | Some s -> search_text conf base (Mutil.gen_decode false s)
+  | Some s -> search_text conf base (Geneweb_util.Mutil.gen_decode false s)
   | None -> print_forum_headers conf base

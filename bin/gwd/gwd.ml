@@ -11,7 +11,7 @@ open Util
 
 open Gwd_lib
 
-module StrSet = Ext_string.Set
+module StrSet = Geneweb_util.Ext_string.Set
 
 let output_conf =
   { status = Wserver.http
@@ -96,12 +96,12 @@ type auth_report =
 
 let log_passwd_failed ar tm from request base_file =
   GwdLog.log @@ fun oc ->
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
+  let referer = Geneweb_util.Mutil.extract_param "referer: " '\n' request in
+  let user_agent = Geneweb_util.Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Printf.fprintf oc
     "%s (%d) %s_%s => failed (%s)"
-    (Mutil.sprintf_date tm :> string) (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user;
+    (Geneweb_util.Mutil.sprintf_date tm :> string) (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user;
   if !trace_failed_passwd then Printf.fprintf oc " (%s)" (String.escaped ar.ar_uauth);
   Printf.fprintf oc "\n  From: %s\n  Agent: %s\n" from user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
@@ -161,7 +161,7 @@ let rec extract_assoc key = function
   | [] -> "", []
   | (k, v as kv) :: kvl ->
     if k = key
-    then Mutil.decode v, kvl
+    then Geneweb_util.Mutil.decode v, kvl
     else
       let (v, kvl) = extract_assoc key kvl
       in v, kv :: kvl
@@ -180,7 +180,7 @@ let load_lexicon =
     | Some lex -> lex
     | None ->
       let lex =
-        Files.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
+        Files.read_or_create_value ~wait:true ~magic:Geneweb_util.Mutil.random_magic fname
           begin fun () ->
             let ht = Hashtbl.create 0 in
             let rec rev_iter fn = function
@@ -188,7 +188,7 @@ let load_lexicon =
               | hd :: tl -> rev_iter fn tl ; fn hd
             in
             rev_iter begin fun fname ->
-              Mutil.input_lexicon lang ht begin fun () ->
+              Geneweb_util.Mutil.input_lexicon lang ht begin fun () ->
                 Secure.open_in (Util.search_in_assets fname)
               end end !lexicon_list ;
             ht
@@ -289,9 +289,9 @@ let read_base_env bname =
   with Sys_error _ -> []
 
 let log_redirect from request req =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Geneweb_util.Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ()) begin fun () ->
-    let referer = Mutil.extract_param "referer: " '\n' request in
+    let referer = Geneweb_util.Mutil.extract_param "referer: " '\n' request in
     GwdLog.syslog `LOG_NOTICE @@
     Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer
   end
@@ -299,7 +299,7 @@ let log_redirect from request req =
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
   let link = "http://" ^ new_addr ^ req in
-  let env = ["link", Mutil.encode link] in
+  let env = ["link", Geneweb_util.Mutil.encode link] in
   log_redirect from request req;
   include_template conf env "redirect"
     (fun () ->
@@ -365,7 +365,7 @@ let unauth_server conf ar =
         (fun oc ->
            Printf.fprintf oc
              "\n401 unauthorized\n- date: %s\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n"
-             (Mutil.sprintf_date tm :> string)
+             (Geneweb_util.Mutil.sprintf_date tm :> string)
              (fun oc ->
                 List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) conf.request)
              ar.ar_passwd nonce ar.ar_can_stale)
@@ -525,7 +525,7 @@ let set_actlog list =
   with Sys_error _ -> ()
 
 let get_token check_from utm from_addr base_password =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Geneweb_util.Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ATnormal)
     (fun () ->
        let (list, r, changed) =
@@ -535,10 +535,10 @@ let get_token check_from utm from_addr base_password =
 
 let mkpasswd () =
   let rec loop len =
-    if len = 9 then Buff.get len
+    if len = 9 then Geneweb_util.Buff.get len
     else
       let v = Char.code 'a' + Random.int 26 in
-      loop (Buff.store len (Char.chr v))
+      loop (Geneweb_util.Buff.store len (Char.chr v))
   in
   loop 0
 
@@ -547,7 +547,7 @@ let random_self_init () =
   Random.init seed
 
 let set_token utm from_addr base_file acc user =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Geneweb_util.Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> "")
     (fun () ->
        random_self_init ();
@@ -573,15 +573,15 @@ let set_token utm from_addr base_file acc user =
        set_actlog list; x)
 
 let http_preferred_language request =
-  let v = Mutil.extract_param "accept-language: " '\n' request in
+  let v = Geneweb_util.Mutil.extract_param "accept-language: " '\n' request in
   if v = "" then ""
   else
     let s = String.lowercase_ascii v in
     let list =
       let rec loop list i len =
-        if i = String.length s then List.rev (Buff.get len :: list)
-        else if s.[i] = ',' then loop (Buff.get len :: list) (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
+        if i = String.length s then List.rev (Geneweb_util.Buff.get len :: list)
+        else if s.[i] = ',' then loop (Geneweb_util.Buff.get len :: list) (i + 1) 0
+        else loop list (i + 1) (Geneweb_util.Buff.store len s.[i])
       in
       loop [] 0 0
     in
@@ -614,7 +614,7 @@ let allowed_denied_titles key extra_line env base_env () =
             try input_line ic, false with End_of_file -> "", true
           in
           let set =
-            let line = if eof then extra_line |> Mutil.decode else line in
+            let line = if eof then extra_line |> Geneweb_util.Mutil.decode else line in
             if line = "" || line.[0] = ' ' || line.[0] = '#' then set
             else
               let line =
@@ -623,9 +623,9 @@ let allowed_denied_titles key extra_line env base_env () =
                     let len = String.length line in
                     let tit = String.sub line 0 i in
                     let pla = String.sub line (i + 1) (len - i - 1) in
-                    (if tit = "*" then tit else Name.lower tit) ^ "/" ^
-                    (if pla = "*" then pla else Name.lower pla)
-                | None -> Name.lower line
+                    (if tit = "*" then tit else Geneweb_util.Name.lower tit) ^ "/" ^
+                    (if pla = "*" then pla else Geneweb_util.Name.lower pla)
+                | None -> Geneweb_util.Name.lower line
               in
               StrSet.add line set
           in
@@ -661,15 +661,15 @@ let parse_digest s =
       Some ('A'..'Z' | 'a'..'z' as c) ->
         Stream.junk strm__;
         let len =
-          try ident_kont (Buff.store 0 c) strm__ with
+          try ident_kont (Geneweb_util.Buff.store 0 c) strm__ with
             Stream.Failure -> raise (Stream.Error "")
         in
-        Buff.get len
+        Geneweb_util.Buff.get len
     | _ -> raise Stream.Failure
   and ident_kont len (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
       Some ('A'..'Z' | 'a'..'z' as c) ->
-        Stream.junk strm__; ident_kont (Buff.store len c) strm__
+        Stream.junk strm__; ident_kont (Geneweb_util.Buff.store len c) strm__
     | _ -> len
   and spaces (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
@@ -731,14 +731,14 @@ let parse_digest s =
         v
   and string len (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
-      Some '"' -> Stream.junk strm__; Buff.get len
-    | Some c -> Stream.junk strm__; string (Buff.store len c) strm__
+      Some '"' -> Stream.junk strm__; Geneweb_util.Buff.get len
+    | Some c -> Stream.junk strm__; string (Geneweb_util.Buff.store len c) strm__
     | _ -> raise Stream.Failure
   and any_val len (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
       Some ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' as c) ->
-        Stream.junk strm__; any_val (Buff.store len c) strm__
-    | _ -> Buff.get len
+        Stream.junk strm__; any_val (Geneweb_util.Buff.store len c) strm__
+    | _ -> Geneweb_util.Buff.get len
   in
   parse_main (Stream.of_string s)
 
@@ -757,17 +757,17 @@ let basic_authorization from_addr request base_env passwd access_type utm
     try List.assoc "friend_passwd_file" base_env with Not_found -> ""
   in
   let passwd1 =
-    let auth = Mutil.extract_param "authorization: " '\r' request in
+    let auth = Geneweb_util.Mutil.extract_param "authorization: " '\r' request in
     if auth = "" then ""
     else
       let s = "Basic " in
-      if Ext_string.start_with s 0 auth then
+      if Geneweb_util.Ext_string.start_with s 0 auth then
         let i = String.length s in
         Base64.decode (String.sub auth i (String.length auth - i))
       else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
-  let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
+  let auto = Geneweb_util.Mutil.extract_param "gw-connection-type: " '\r' request in
   let uauth = if auto = "auto" then passwd1 else uauth in
   let (ok, wizard, friend, username) =
     if not !(Wserver.cgi) && (passwd = "w" || passwd = "f") then
@@ -899,10 +899,10 @@ let digest_authorization request base_env passwd utm base_file command =
      ar_user = ""; ar_name = ""; ar_wizard = true;
      ar_friend = friend_passwd = ""; ar_uauth = ""; ar_can_stale = false}
   else if passwd = "w" || passwd = "f" then
-    let auth = Mutil.extract_param "authorization: " '\r' request in
-    if Ext_string.start_with "Digest " 0 auth then
+    let auth = Geneweb_util.Mutil.extract_param "authorization: " '\r' request in
+    if Geneweb_util.Ext_string.start_with "Digest " 0 auth then
       let meth =
-        match Mutil.extract_param "GET " ' ' request with
+        match Geneweb_util.Mutil.extract_param "GET " ' ' request with
           "" -> "POST"
         | _ -> "GET"
       in
@@ -924,7 +924,7 @@ let digest_authorization request base_env passwd utm base_file command =
           (fun oc ->
              Printf.fprintf oc
                "\nanswer\n- date: %s\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n"
-               (Mutil.sprintf_date @@ Unix.localtime utm :> string)
+               (Geneweb_util.Mutil.sprintf_date @@ Unix.localtime utm :> string)
                (fun oc ->
                   List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) request)
                passwd nonce ds.ds_meth ds.ds_uri)
@@ -1032,7 +1032,7 @@ let make_conf from_addr request script_name env =
     match x with
     | "from" -> "from", env
     | "" -> "", env
-    | _ -> "", ("opt", Mutil.encode x) :: env
+    | _ -> "", ("opt", Geneweb_util.Mutil.encode x) :: env
   in
   let (threshold_test, env) = extract_assoc "threshold" env in
   if threshold_test <> ""
@@ -1156,10 +1156,10 @@ let make_conf from_addr request script_name env =
      cgi_passwd = ar.ar_passwd;
      henv =
        (if not !(Wserver.cgi) then []
-        else if ar.ar_passwd = "" then ["b", Mutil.encode base_file]
-        else ["b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd]) @
-       (if lang = "" then [] else ["lang", Mutil.encode lang]) @
-       (if from = "" then [] else ["opt", Mutil.encode from]);
+        else if ar.ar_passwd = "" then ["b", Geneweb_util.Mutil.encode base_file]
+        else ["b", Geneweb_util.Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd]) @
+       (if lang = "" then [] else ["lang", Geneweb_util.Mutil.encode lang]) @
+       (if from = "" then [] else ["opt", Geneweb_util.Mutil.encode from]);
      base_env = base_env;
      allowed_titles = Lazy.from_fun (allowed_titles env base_env);
      denied_titles = Lazy.from_fun (denied_titles env base_env);
@@ -1214,11 +1214,11 @@ let make_conf from_addr request script_name env =
 
 let log tm conf from gauth request script_name contents =
   GwdLog.log @@ fun oc ->
-  let referer = Mutil.extract_param "referer: " '\n' request in
-  let user_agent = Mutil.extract_param "user-agent: " '\n' request in
+  let referer = Geneweb_util.Mutil.extract_param "referer: " '\n' request in
+  let user_agent = Geneweb_util.Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Printf.fprintf oc
-    "%s (%d) %s?" (Mutil.sprintf_date tm :> string) (Unix.getpid ()) script_name ;
+    "%s (%d) %s?" (Geneweb_util.Mutil.sprintf_date tm :> string) (Unix.getpid ()) script_name ;
   print_and_cut_if_too_big oc contents;
   output_char oc '\n';
   Printf.fprintf oc "  From: %s\n" from;
@@ -1238,7 +1238,7 @@ let log tm conf from gauth request script_name contents =
     end
 
 let is_robot from =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Geneweb_util.Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> false)
     (fun () ->
        let (robxcl, _) = Robot.robot_excl () in
@@ -1247,7 +1247,7 @@ let is_robot from =
 let auth_err request auth_file =
   if auth_file = "" then false, ""
   else
-    let auth = Mutil.extract_param "authorization: " '\r' request in
+    let auth = Geneweb_util.Mutil.extract_param "authorization: " '\r' request in
     if auth <> "" then
       match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
         Some ic ->
@@ -1285,7 +1285,7 @@ let log_and_robot_check conf auth from request script_name contents =
   if !robot_xcl = None
   then log (Unix.time ()) conf from auth request script_name contents
   else
-    Lock.control (SrcfileDisplay.adm_file "gwd.lck") true ~onerror:ignore
+    Geneweb_util.Lock.control (SrcfileDisplay.adm_file "gwd.lck") true ~onerror:ignore
       begin fun () ->
         let tm = Unix.time () in
         begin match !robot_xcl with
@@ -1344,7 +1344,7 @@ let conf_and_connection =
           if is_robot from then Robot.robot_error conf 0 0
           else
             let tm = Unix.time () in
-            Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+            Geneweb_util.Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
               ~onerror:(fun () -> ())
               (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
@@ -1418,7 +1418,7 @@ let image_request conf script_name env =
       let _ = ImageDisplay.print_image_file conf fname in true
   | _ ->
       let s = script_name in
-      if Ext_string.start_with "images/" 0 s then
+      if Geneweb_util.Ext_string.start_with "images/" 0 s then
         let i = String.length "images/" in
         let fname = String.sub s i (String.length s - i) in
         (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)
@@ -1470,7 +1470,7 @@ let content_misc conf len misc_fname =
 
 let find_misc_file name =
   if Sys.file_exists name
-  && List.exists (fun p -> Ext_string.start_with (Filename.concat p "assets") 0 name) !plugins
+  && List.exists (fun p -> Geneweb_util.Ext_string.start_with (Filename.concat p "assets") 0 name) !plugins
   then name
   else
     let name' = search_in_assets @@ Filename.concat "etc" name in
@@ -1577,7 +1577,7 @@ let extract_multipart boundary str =
               loop i
             in
             let v = String.sub str i (i1 - i) in
-            (var ^ "_name", Mutil.encode filename)
+            (var ^ "_name", Geneweb_util.Mutil.encode filename)
             :: (var, Adef.encoded v)
             :: loop i1
         | Some var, None ->
@@ -1602,7 +1602,7 @@ let extract_multipart boundary str =
 
 let build_env request (contents : Adef.encoded_string)
   : Adef.encoded_string * (string * Adef.encoded_string) list =
-  let content_type = Mutil.extract_param "content-type: " '\n' request in
+  let content_type = Geneweb_util.Mutil.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
     let boundary = (extract_boundary (Adef.encoded content_type) : Adef.encoded_string :> string) in
     extract_multipart boundary contents
@@ -1843,7 +1843,7 @@ let main () =
       ("-hd", Arg.String Secure.add_assets, "<DIR> Directory where the directory lang is installed.")
     ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Directory where the databases are installed.")
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
-    ; ("-cache_langs", Arg.String (fun s -> List.iter (Ext_list.ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
+    ; ("-cache_langs", Arg.String (fun s -> List.iter (Geneweb_util.Ext_list.ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
     ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
@@ -1860,7 +1860,7 @@ let main () =
     ; ("-auth", Arg.String (fun x -> auth_file := x), "<FILE> Authorization file to restrict access. The file must hold lines of the form \"user:password\".")
     ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
     ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
-    ; ("-add_lexicon", Arg.String (Ext_list.ref_append lexicon_list), "<FILE> Add file as lexicon.")
+    ; ("-add_lexicon", Arg.String (Geneweb_util.Ext_list.ref_append lexicon_list), "<FILE> Add file as lexicon.")
     ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
     ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
@@ -1869,7 +1869,7 @@ let main () =
     ; ("-redirect", Arg.String (fun x -> redirected_addr := Some x), "<ADDR> Send a message to say that this service has been redirected to <ADDR>.")
     ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
     ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
-    ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
+    ; ("-nolock", Arg.Set Geneweb_util.Lock.no_lock_flag, " Do not lock files before writing.")
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
     ; ("-notify_change", Arg.String (fun x -> notify_change := Some x), "<FILE> Use given path to file as the command to be executed upon changes made in a base")
@@ -1903,7 +1903,7 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
-  Geneweb.GWPARAM.set_syslog GwdLog.syslog;
+  GWPARAM.set_syslog GwdLog.syslog;
   List.iter register_plugin !plugins ;
   GWPARAM.init () ;
   cache_lexicon () ;

@@ -99,7 +99,7 @@ val nobility_titles_list :
   * Gwdb.istr Def.gen_title_name
   * Gwdb.istr
   * Gwdb.istr list
-  * (Date.date option * Date.date option) list)
+  * (Geneweb_util.Date.date option * Geneweb_util.Date.date option) list)
   list
 
 val has_history : Config.config -> Gwdb.base -> Gwdb.person -> bool -> bool
@@ -118,6 +118,6 @@ val string_of_title :
   * Gwdb.istr Def.gen_title_name
   * Gwdb.istr
   * Gwdb.istr list
-  * (Date.date option * Date.date option) list ->
+  * (Geneweb_util.Date.date option * Geneweb_util.Date.date option) list ->
   Adef.safe_string
 (** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)

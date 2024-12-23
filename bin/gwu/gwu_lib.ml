@@ -45,7 +45,7 @@ let prepare_free_occ ?(select = fun _ -> true) base =
   (* Parce qu'on est obligé ... *)
   let sn = "?" in
   let fn = "?" in
-  let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
+  let key = Geneweb_util.Name.lower fn ^ " #@# " ^ Geneweb_util.Name.lower sn in
   Hashtbl.add ht_orig_occ key [ 0 ];
   Gwdb.Collection.iter
     (fun ip ->
@@ -55,8 +55,8 @@ let prepare_free_occ ?(select = fun _ -> true) base =
         let fn = sou base (get_first_name p) in
         if sn = "?" && fn = "?" then ()
         else
-          let fn = Name.lower fn in
-          let sn = Name.lower sn in
+          let fn = Geneweb_util.Name.lower fn in
+          let sn = Geneweb_util.Name.lower sn in
           if fn = "" || sn = "" then
             let key = fn ^ " #@# " ^ sn in
             let occ = get_occ p in
@@ -74,7 +74,7 @@ let prepare_free_occ ?(select = fun _ -> true) base =
       let p = poi base ip in
       let sn = sou base (get_surname p) in
       let fn = sou base (get_first_name p) in
-      let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
+      let key = Geneweb_util.Name.lower fn ^ " #@# " ^ Geneweb_util.Name.lower sn in
       try
         let list_occ = Hashtbl.find ht_orig_occ key in
         let rec loop list init new_list =
@@ -105,7 +105,7 @@ let soy y = if y = 0 then "-0" else string_of_int y
 let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
 
 let print_date_dmy opts d =
-  (match d.Date.prec with
+  (match d.Geneweb_util.Date.prec with
   | About -> Printf.ksprintf (oc opts) "~"
   | Maybe -> Printf.ksprintf (oc opts) "?"
   | Before -> Printf.ksprintf (oc opts) "<"
@@ -151,21 +151,21 @@ let no_newlines s =
 let gen_correct_string no_num no_colon s =
   let s = String.trim s in
   let rec loop i len =
-    if i = String.length s then Buff.get len
+    if i = String.length s then Geneweb_util.Buff.get len
     else if len = 0 && not (starting_char no_num s) then
-      loop i (Buff.store len '_')
+      loop i (Geneweb_util.Buff.store len '_')
     else
       match s.[i] with
       | ' ' | '\n' | '\t' ->
-          if i = String.length s - 1 then Buff.get len
-          else loop (i + 1) (Buff.store len '_')
-      | '_' | '\\' -> loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+          if i = String.length s - 1 then Geneweb_util.Buff.get len
+          else loop (i + 1) (Geneweb_util.Buff.store len '_')
+      | '_' | '\\' -> loop (i + 1) (Geneweb_util.Buff.store (Geneweb_util.Buff.store len '\\') s.[i])
       | ':' when no_colon ->
-          let len = Buff.store len '\\' in
-          loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+          let len = Geneweb_util.Buff.store len '\\' in
+          loop (i + 1) (Geneweb_util.Buff.store (Geneweb_util.Buff.store len '\\') s.[i])
       | c ->
           let c = if is_printable c then c else '_' in
-          loop (i + 1) (Buff.store len c)
+          loop (i + 1) (Geneweb_util.Buff.store len c)
   in
   loop 0 0
 
@@ -183,15 +183,15 @@ let correct_string_no_colon base is =
   gen_correct_string false true (sou base is)
 
 let gen_print_date opts no_colon = function
-  | Date.Dgreg (d, Dgregorian) -> print_date_dmy opts d
+  | Geneweb_util.Date.Dgreg (d, Dgregorian) -> print_date_dmy opts d
   | Dgreg (d, Djulian) ->
-      print_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Djulian d);
+      print_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian d);
       Printf.ksprintf (oc opts) "J"
   | Dgreg (d, Dfrench) ->
-      print_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dfrench d);
+      print_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench d);
       Printf.ksprintf (oc opts) "F"
   | Dgreg (d, Dhebrew) ->
-      print_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dhebrew d);
+      print_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew d);
       Printf.ksprintf (oc opts) "H"
   | Dtext t ->
       (* Dans le cas d'une date texte pour un titre, on échappe les ':' *)
@@ -232,8 +232,8 @@ let has_infos_not_dates opts base p =
 
 let has_infos opts base p =
   has_infos_not_dates opts base p
-  || get_birth p <> Date.cdate_None
-  || get_baptism p <> Date.cdate_None
+  || get_birth p <> Geneweb_util.Date.cdate_None
+  || get_baptism p <> Geneweb_util.Date.cdate_None
   || get_death p <> NotDead
 
 let print_if_not_equal_to opts x base lab is =
@@ -264,7 +264,7 @@ let print_burial opts b =
   match b with
   | Buried cod -> (
       Printf.ksprintf (oc opts) " #buri";
-      match Date.od_of_cdate cod with
+      match Geneweb_util.Date.od_of_cdate cod with
       | Some d ->
           Printf.ksprintf (oc opts) " ";
           print_date opts d;
@@ -272,7 +272,7 @@ let print_burial opts b =
       | None -> ())
   | Cremated cod -> (
       Printf.ksprintf (oc opts) " #crem";
-      match Date.od_of_cdate cod with
+      match Geneweb_util.Date.od_of_cdate cod with
       | Some d ->
           Printf.ksprintf (oc opts) " ";
           print_date opts d;
@@ -281,8 +281,8 @@ let print_burial opts b =
   | UnknownBurial -> ()
 
 let print_title opts base t =
-  let t_date_start = Date.od_of_cdate t.t_date_start in
-  let t_date_end = Date.od_of_cdate t.t_date_end in
+  let t_date_start = Geneweb_util.Date.od_of_cdate t.t_date_start in
+  let t_date_end = Geneweb_util.Date.od_of_cdate t.t_date_end in
   Printf.ksprintf (oc opts) " [";
   (match t.t_name with
   | Tmain -> Printf.ksprintf (oc opts) "*"
@@ -306,7 +306,7 @@ let print_title opts base t =
   Printf.ksprintf (oc opts) "]"
 
 let zero_birth_is_required opts base is_child p =
-  if get_baptism p <> Date.cdate_None then false
+  if get_baptism p <> Geneweb_util.Date.cdate_None then false
   else
     match get_death p with
     | Death (_, _) | DeadYoung | DeadDontKnowWhen | OfCourseDead -> true
@@ -335,7 +335,7 @@ let print_infos opts base is_child csrc cbp p =
   | Private -> Printf.ksprintf (oc opts) " #apriv");
   print_if_no_empty opts base "#occu" (get_occupation p);
   print_src_if_not_equal_to opts csrc base "#src" (get_psources p);
-  (match Date.od_of_cdate (get_birth p) with
+  (match Geneweb_util.Date.od_of_cdate (get_birth p) with
   | Some d ->
       Printf.ksprintf (oc opts) " ";
       print_date opts d
@@ -344,7 +344,7 @@ let print_infos opts base is_child csrc cbp p =
   | None -> ());
   print_if_not_equal_to opts cbp base "#bp" (get_birth_place p);
   if opts.source = None then print_if_no_empty opts base "#bs" (get_birth_src p);
-  (match Date.od_of_cdate (get_baptism p) with
+  (match Geneweb_util.Date.od_of_cdate (get_baptism p) with
   | Some d ->
       Printf.ksprintf (oc opts) " !";
       print_date opts d
@@ -361,12 +361,12 @@ let print_infos opts base is_child csrc cbp p =
       | Executed -> Printf.ksprintf (oc opts) "e"
       | Disappeared -> Printf.ksprintf (oc opts) "s"
       | _ -> ());
-      print_date opts (Date.date_of_cdate d)
+      print_date opts (Geneweb_util.Date.date_of_cdate d)
   | DeadYoung -> Printf.ksprintf (oc opts) " mj"
   | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
   | DontKnowIfDead -> (
       match
-        (Date.od_of_cdate (get_birth p), Date.od_of_cdate (get_baptism p))
+        (Geneweb_util.Date.od_of_cdate (get_birth p), Geneweb_util.Date.od_of_cdate (get_baptism p))
       with
       | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
       | _ -> ())
@@ -615,7 +615,7 @@ let print_pevent opts base gen e =
   | Epers_VenteBien -> Printf.ksprintf (oc opts) "#vteb"
   | Epers_Will -> Printf.ksprintf (oc opts) "#will"
   | Epers_Name s -> Printf.ksprintf (oc opts) "#%s" (correct_string base s));
-  let epers_date = Date.od_of_cdate (get_pevent_date e) in
+  let epers_date = Geneweb_util.Date.od_of_cdate (get_pevent_date e) in
   (match epers_date with
   | None -> ()
   | Some d ->
@@ -697,7 +697,7 @@ let print_fevent opts base gen in_comment e =
   | Efam_PACS -> Printf.ksprintf (oc opts) "#pacs"
   | Efam_Residence -> Printf.ksprintf (oc opts) "#resi"
   | Efam_Name n -> Printf.ksprintf (oc opts) "#%s" (correct_string base n));
-  let efam_date = Date.od_of_cdate (get_fevent_date e) in
+  let efam_date = Geneweb_util.Date.od_of_cdate (get_fevent_date e) in
   (match efam_date with
   | None -> ()
   | Some d ->
@@ -763,7 +763,7 @@ let print_family opts base gen m =
     Printf.ksprintf (oc opts) "fam ";
     print_parent opts base gen m.m_fath;
     Printf.ksprintf (oc opts) " +";
-    print_date_option opts (Date.od_of_cdate (get_marriage fam));
+    print_date_option opts (Geneweb_util.Date.od_of_cdate (get_marriage fam));
     let print_sexes s =
       let c x =
         match get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
@@ -789,7 +789,7 @@ let print_family opts base gen m =
     | NotDivorced -> ()
     | Separated -> Printf.ksprintf (oc opts) " #sep"
     | Divorced d ->
-        let d = Date.od_of_cdate d in
+        let d = Geneweb_util.Date.od_of_cdate d in
         Printf.ksprintf (oc opts) " -";
         print_date_option opts d);
     Printf.ksprintf (oc opts) " ";
@@ -1527,10 +1527,10 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     }
   in
   let nb_fam = nb_of_families base in
-  if !Mutil.verbose then ProgrBar.start ();
+  if !Geneweb_util.Mutil.verbose then Geneweb_util.ProgrBar.start ();
   Gwdb.Collection.iteri
     (fun i ifam ->
-      if !Mutil.verbose then ProgrBar.run i nb_fam;
+      if !Geneweb_util.Mutil.verbose then Geneweb_util.ProgrBar.run i nb_fam;
       if not (Gwdb.Marker.get gen.fam_done ifam) then
         let fam = foi base ifam in
         let ifaml = connected_families base gen.fam_sel ifam fam in
@@ -1585,8 +1585,8 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
               if
                 bogus_person base p
                 && not
-                     (get_birth p <> Date.cdate_None
-                     || get_baptism p <> Date.cdate_None
+                     (get_birth p <> Geneweb_util.Date.cdate_None
+                     || get_baptism p <> Geneweb_util.Date.cdate_None
                      || get_first_names_aliases p <> []
                      || get_surnames_aliases p <> []
                      || sou base (get_public_name p) <> ""
@@ -1615,7 +1615,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
                 Gwdb.Marker.set gen.mark i true;
                 print_isolated_relations opts base gen p)
       (Gwdb.ipers base);
-  if !Mutil.verbose then ProgrBar.finish ();
+  if !Geneweb_util.Mutil.verbose then Geneweb_util.ProgrBar.finish ();
   if opts.base_notes then (
     let s = base_notes_read base "" in
     let oc, first, _ = origin_file (base_notes_origin_file base) in
@@ -1638,7 +1638,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
              List.fold_left Filename.concat in_dir
                [ base_wiznotes_dir base; file ]
            in
-           let s = Mutil.read_file_content wfile in
+           let s = Geneweb_util.Mutil.read_file_content wfile in
            ignore
              (add_linked_files gen ("wizard \"" ^ file ^ "\"") s [] : _ list)
        done
@@ -1697,7 +1697,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             List.fold_left Filename.concat in_dir
               [ base_wiznotes_dir base; file ]
           in
-          let content = Mutil.read_file_content wfile in
+          let content = Geneweb_util.Mutil.read_file_content wfile in
           let s = String.trim content in
           Printf.ksprintf oc "\nwizard-note %s\n" wizid;
           rs_printf opts s;

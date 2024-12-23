@@ -123,8 +123,8 @@ let misc_notes_link s i =
                 let name = fn ^ " " ^ sn in
                 (fn, sn, 0, name)
             in
-            let fn = Name.lower fn in
-            let sn = Name.lower sn in
+            let fn = Geneweb_util.Name.lower fn in
+            let sn = Geneweb_util.Name.lower sn in
             WLperson (j, (fn, sn, oc), name, text)
           with Not_found -> WLnone
       else WLnone

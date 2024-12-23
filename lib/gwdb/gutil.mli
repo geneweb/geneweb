@@ -62,14 +62,14 @@ val homonyms :
   base:Gwdb.base -> first_name:string -> surname:string -> Gwdb.iper list
 
 val get_all_occurrence_numbers :
-  base:Gwdb.base -> first_name:string -> surname:string -> Ext_int.Set.t
+  base:Gwdb.base -> first_name:string -> surname:string -> Geneweb_util.Ext_int.Set.t
 
 val find_free_occ : Gwdb.base -> string -> string -> int
 (** Find first free occurence number for the person with specified first name
     and surname. *)
 
 val get_birth_death_date :
-  Gwdb.person -> Date.date option * Date.date option * bool
+  Gwdb.person -> Geneweb_util.Date.date option * Geneweb_util.Date.date option * bool
 (** [get_birth_death p]
     Return [(birth, death, approx)]. If birth/death date can not be found,
     baptism/burial date is used and [approx] is set to [true] (it is [false]

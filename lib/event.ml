@@ -176,7 +176,7 @@ let sort_events get_name get_date events =
   let dated, undated =
     List.fold_left
       (fun (dated, undated) e ->
-        match Date.cdate_to_dmy_opt (get_date e) with
+        match Geneweb_util.Date.cdate_to_dmy_opt (get_date e) with
         | None -> (dated, e :: undated)
         | Some _d -> (e :: dated, undated))
       ([], []) events
@@ -199,13 +199,13 @@ let sort_events get_name get_date events =
     let cmp_name e1 e2 =
       better_compare_event_name (get_name e1) (get_name e2)
     in
-    match Date.cdate_to_dmy_opt (get_date e1) with
+    match Geneweb_util.Date.cdate_to_dmy_opt (get_date e1) with
     | None -> cmp_name e1 e2
     | Some d1 -> (
-        match Date.cdate_to_dmy_opt (get_date e2) with
+        match Geneweb_util.Date.cdate_to_dmy_opt (get_date e2) with
         | None -> cmp_name e1 e2
         | Some d2 ->
-            let x = Date.compare_dmy d1 d2 in
+            let x = Geneweb_util.Date.compare_dmy d1 d2 in
             if x = 0 then cmp_name e1 e2 else x)
   in
 

@@ -130,10 +130,10 @@ let get_person_from_data conf base =
     acc []
 
 let combine_by_ini ~ignore_case ini list =
-  let len = Utf8.length ini + 1 in
-  Ext_list.groupby
+  let len = Geneweb_util.Utf8.length ini + 1 in
+  Geneweb_util.Ext_list.groupby
     ~key:(fun (_, s) ->
-      let normalize = if ignore_case then Utf8.capitalize else Fun.id in
+      let normalize = if ignore_case then Geneweb_util.Utf8.capitalize else Fun.id in
       normalize @@ Alln.ini len @@ Place.without_suburb s)
     ~value:(fun x -> x)
     list
@@ -159,7 +159,7 @@ let reduce_cpl_list size list =
       | [] -> reduced_list
       | (a, sl) :: l ->
           if List.length sl >= size - cnt then
-            (a, Ext_list.take sl (size - cnt)) :: reduced_list
+            (a, Geneweb_util.Ext_list.take sl (size - cnt)) :: reduced_list
           else loop size (cnt + List.length sl) ((a, sl) :: reduced_list) l
   in
   loop size 0 [] list
@@ -184,7 +184,7 @@ let update_person conf base old new_input p =
   match Util.p_getenv conf.Config.env "data" with
   | Some "occu" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_input)
+        Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable new_input)
       in
       let occupation = Gwdb.get_occupation p in
       let s_occupation = Gwdb.sou base occupation in
@@ -192,7 +192,7 @@ let update_person conf base old new_input p =
       { (Gwdb.gen_person_of_person p) with occupation }
   | Some "place" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_input)
+        Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable new_input)
       in
       let pl_bi = Gwdb.get_birth_place p in
       let s_bi = Gwdb.sou base pl_bi in
@@ -226,7 +226,7 @@ let update_person conf base old new_input p =
       }
   | Some "src" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_input)
+        Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable new_input)
       in
       let src_bi = Gwdb.get_birth_src p in
       let s_bi = Gwdb.sou base src_bi in
@@ -263,12 +263,12 @@ let update_person conf base old new_input p =
       }
   | Some "fn" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_input)
+        Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable new_input)
       in
       let first_name = Gwdb.get_first_name p in
       let s_first_name = Gwdb.sou base first_name in
-      let s_first_name_lower = Name.lower s_first_name in
-      let new_input_lower = Name.lower new_input in
+      let s_first_name_lower = Geneweb_util.Name.lower s_first_name in
+      let new_input_lower = Geneweb_util.Name.lower new_input in
       let first_name, occ =
         if new_input_lower = s_first_name_lower then (new_istr, Gwdb.get_occ p)
         else if old = s_first_name then
@@ -284,7 +284,7 @@ let update_person conf base old new_input p =
             List.fold_left
               (fun has_first_name alias ->
                 has_first_name
-                || s_first_name_lower = Name.lower (Gwdb.sou base alias))
+                || s_first_name_lower = Geneweb_util.Name.lower (Gwdb.sou base alias))
               false first_names_aliases
           in
           if has_first_name_alias then first_names_aliases
@@ -299,12 +299,12 @@ let update_person conf base old new_input p =
       }
   | Some "sn" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_input)
+        Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable new_input)
       in
       let surname = Gwdb.get_surname p in
       let s_surname = Gwdb.sou base surname in
-      let s_surname_lower = Name.lower s_surname in
-      let new_input_lower = Name.lower new_input in
+      let s_surname_lower = Geneweb_util.Name.lower s_surname in
+      let new_input_lower = Geneweb_util.Name.lower new_input in
       let surname, occ =
         if new_input_lower = s_surname_lower then (new_istr, Gwdb.get_occ p)
         else if old = s_surname then
@@ -321,7 +321,7 @@ let update_person conf base old new_input p =
             List.fold_left
               (fun has_surname alias ->
                 has_surname
-                || s_surname_lower = Name.lower (Gwdb.sou base alias))
+                || s_surname_lower = Geneweb_util.Name.lower (Gwdb.sou base alias))
               false surnames_aliases
           in
           if has_surname_alias then surnames_aliases
@@ -351,7 +351,7 @@ let update_family conf base old new_istr fam =
   match Util.p_getenv conf.Config.env "data" with
   | Some "place" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_istr)
+        Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable new_istr)
       in
       let p_ma = Gwdb.get_marriage_place fam in
       let s_ma = Gwdb.sou base p_ma in
@@ -369,7 +369,7 @@ let update_family conf base old new_istr fam =
       { (Gwdb.gen_family_of_family fam) with marriage_place; fevents }
   | Some "src" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_istr)
+        Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable new_istr)
       in
       let src_ma = Gwdb.get_marriage_src fam in
       let s_ma = Gwdb.sou base src_ma in
@@ -435,7 +435,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
            let pi = np.key_index in
            let op = Gwdb.poi base pi in
            let sp =
-             Futil.map_person_ps
+             Geneweb_util.Futil.map_person_ps
                (fun ip -> ip)
                (fun istr -> Gwdb.sou base istr)
                np
@@ -477,7 +477,7 @@ let build_list ~ignore_case conf base =
       (fun istr ->
         let str = Gwdb.sou base istr in
         if
-          Utf8.start_with_wildcard ~ignore_case ini 0
+          Geneweb_util.Utf8.start_with_wildcard ~ignore_case ini 0
           @@ Place.without_suburb str
         then Some (istr, str)
         else None)
@@ -497,7 +497,7 @@ let build_list_short conf list =
       List.rev_map
         (fun (_, s) ->
           let s = Place.without_suburb s in
-          if String.length s > i then String.sub s 0 (Utf8.next s i)
+          if String.length s > i then String.sub s 0 (Geneweb_util.Utf8.next s i)
           else s ^ String.make (i + 1 - String.length s) '_')
         l
     in
@@ -509,11 +509,11 @@ let build_list_short conf list =
            StringSet.empty list)
     in
     (* Astuce pour gérer les espaces. *)
-    let inis = List.rev_map (fun p -> Ext_string.tr ' ' '_' p) inis in
+    let inis = List.rev_map (fun p -> Geneweb_util.Ext_string.tr ' ' '_' p) inis in
     let inis = remove_dup inis in
     match inis with
     | [ ini ] -> build_ini list (String.length ini)
-    | list -> List.sort Utf8.alphabetic_order list
+    | list -> List.sort Geneweb_util.Utf8.alphabetic_order list
   in
   build_ini list (String.length ini)
 
@@ -521,4 +521,4 @@ let build_list_long ~ignore_case conf list :
     (string * (Gwdb.istr * string) list) list =
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   let list = combine_by_ini ~ignore_case ini list in
-  List.sort (fun (ini1, _) (ini2, _) -> Utf8.alphabetic_order ini1 ini2) list
+  List.sort (fun (ini1, _) (ini2, _) -> Geneweb_util.Utf8.alphabetic_order ini1 ini2) list

@@ -2,7 +2,7 @@
 
 let not_found conf txt x =
   let title _ =
-    Output.print_sstring conf (Utf8.capitalize_fst txt);
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst txt);
     Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf {| "|};
     Output.print_string conf (Util.escape_html x);
@@ -38,7 +38,7 @@ let print_branch_to_alphabetic (conf : Config.config) (x : string)
     (nb_branch : int) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst
+    (Geneweb_util.Utf8.capitalize_fst
        (Util.transl_nth conf "display by/branch/alphabetic order" 0));
   Output.print_sstring conf {|</b></td><td>|};
   print_img conf (Adef.encoded "picto_branch.png");
@@ -55,7 +55,7 @@ let print_branch_to_alphabetic (conf : Config.config) (x : string)
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=N&o=i&t=A&v=";
-    Output.print_string conf (Mutil.encode x);
+    Output.print_string conf (Geneweb_util.Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 2);
@@ -64,7 +64,7 @@ let print_branch_to_alphabetic (conf : Config.config) (x : string)
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=N&o=i&t=N&v=|};
-    Output.print_string conf (Mutil.encode x);
+    Output.print_string conf (Geneweb_util.Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 2);
@@ -82,7 +82,7 @@ let print_branch_to_alphabetic (conf : Config.config) (x : string)
 let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst
+    (Geneweb_util.Utf8.capitalize_fst
        (Util.transl_nth conf "display by/branch/alphabetic order" 0));
   Output.print_sstring conf "</b></td><td>";
   print_img conf (Adef.encoded "picto_branch.png");
@@ -91,7 +91,7 @@ let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=N&t=A&v=";
-    Output.print_string conf (Mutil.encode x);
+    Output.print_string conf (Geneweb_util.Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 1);
@@ -100,7 +100,7 @@ let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=NG&sn=";
-    Output.print_string conf (Mutil.encode x);
+    Output.print_string conf (Geneweb_util.Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
       (Util.transl_nth conf "display by/branch/alphabetic order" 1);
@@ -118,13 +118,13 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   let istrl = base_strings_of_fsname base x in
   (* selecting the persons who have this first name or surname *)
   let l =
-    let x = Name.crush_lower x in
+    let x = Geneweb_util.Name.crush_lower x in
     List.fold_right
       (fun istr l ->
-        let str = Mutil.nominative (Gwdb.sou base istr) in
+        let str = Geneweb_util.Mutil.nominative (Gwdb.sou base istr) in
         if
-          Name.crush_lower str = x
-          || List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
+          Geneweb_util.Name.crush_lower str = x
+          || List.mem x (List.map Geneweb_util.Name.crush_lower (Geneweb_util.Mutil.surnames_pieces str))
         then
           let iperl = find istr in
           (* maybe they are not the good ones because of changes in the
@@ -143,29 +143,29 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   in
   let l, name_inj =
     let l1, name_inj =
-      let x = Name.lower x in
+      let x = Geneweb_util.Name.lower x in
       ( List.fold_right
           (fun (str, istr, iperl) l ->
-            if x = Name.lower str then (str, istr, iperl) :: l else l)
+            if x = Geneweb_util.Name.lower str then (str, istr, iperl) :: l else l)
           l [],
-        Name.lower )
+        Geneweb_util.Name.lower )
     in
     let l1, name_inj =
       if l1 = [] then
-        let x = Name.strip_lower x in
+        let x = Geneweb_util.Name.strip_lower x in
         ( List.fold_right
             (fun (str, istr, iperl) l ->
-              if x = Name.strip_lower str then (str, istr, iperl) :: l else l)
+              if x = Geneweb_util.Name.strip_lower str then (str, istr, iperl) :: l else l)
             l [],
-          Name.strip_lower )
+          Geneweb_util.Name.strip_lower )
       else (l1, name_inj)
     in
-    if l1 = [] then (l, Name.crush_lower) else (l1, name_inj)
+    if l1 = [] then (l, Geneweb_util.Name.crush_lower) else (l1, name_inj)
   in
   (l, name_inj)
 
 let print_elem conf base is_surname (p, xl) =
-  Ext_list.iter_first
+  Geneweb_util.Ext_list.iter_first
     (fun first x ->
       let iper = Gwdb.get_iper x in
       if not first then Output.print_sstring conf "</li><li> ";
@@ -195,15 +195,15 @@ let first_char s =
   (* Si la personne n'a pas de prénom/nom, on renvoie '?' *)
   if s = "" then "?"
   else
-    let len = Utf8.next s 0 in
+    let len = Geneweb_util.Utf8.next s 0 in
     if len < String.length s then String.sub s 0 len else s
 
 let name_unaccent s =
   let rec copy i len =
-    if i = String.length s then Buff.get len
+    if i = String.length s then Geneweb_util.Buff.get len
     else
-      let t, j = Utf8.unaccent false s i in
-      copy j (Buff.mstore len t)
+      let t, j = Geneweb_util.Utf8.unaccent false s i in
+      copy j (Geneweb_util.Buff.mstore len t)
   in
   copy 0 0
 
@@ -213,15 +213,15 @@ let first_name_print_list conf base x1 xl liste =
       List.sort
         (fun x1 x2 ->
           match
-            Utf8.alphabetic_order (Gwdb.p_surname base x1)
+            Geneweb_util.Utf8.alphabetic_order (Gwdb.p_surname base x1)
               (Gwdb.p_surname base x2)
           with
           | 0 -> (
               match
-                ( Date.od_of_cdate (Gwdb.get_birth x1),
-                  Date.od_of_cdate (Gwdb.get_birth x2) )
+                ( Geneweb_util.Date.od_of_cdate (Gwdb.get_birth x1),
+                  Geneweb_util.Date.od_of_cdate (Gwdb.get_birth x2) )
               with
-              | Some d1, Some d2 -> Date.compare_date d1 d2
+              | Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2
               | Some _, _ -> 1
               | _ -> -1)
           | n -> -n)
@@ -231,7 +231,7 @@ let first_name_print_list conf base x1 xl liste =
       (fun l x ->
         let px = Gwdb.p_surname base x in
         match l with
-        | (p, l1) :: l when Utf8.alphabetic_order px p = 0 -> (p, x :: l1) :: l
+        | (p, l1) :: l when Geneweb_util.Utf8.alphabetic_order px p = 0 -> (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
       [] l
   in
@@ -239,17 +239,17 @@ let first_name_print_list conf base x1 xl liste =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
       Output.print_string conf (Util.escape_html x1)
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
           Output.print_string conf (Util.commd conf);
           Output.print_sstring conf {|m=P&t=A&v=|};
-          Output.print_string conf (Mutil.encode x);
+          Output.print_string conf (Geneweb_util.Mutil.encode x);
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
-        (Ext_string.Set.elements xl)
+        (Geneweb_util.Ext_string.Set.elements xl)
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -274,7 +274,7 @@ let first_name_print_list conf base x1 xl liste =
   Hutil.trailer conf
 
 let mk_specify_title conf kw n _ =
-  Output.print_sstring conf (Utf8.capitalize_fst kw);
+  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst kw);
   Output.print_sstring conf {| "|};
   Output.print_string conf (Util.escape_html n);
   Output.print_sstring conf {|"|};
@@ -291,13 +291,13 @@ let select_first_name conf n list =
       Output.print_sstring conf {|<li><a href="|};
       Output.print_string conf (Util.commd conf);
       Output.print_sstring conf {|m=P&v=|};
-      Output.print_string conf (Mutil.encode sstr);
+      Output.print_string conf (Geneweb_util.Mutil.encode sstr);
       Output.print_sstring conf {|">|};
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first str ->
           if not first then Output.print_sstring conf ", ";
           Output.print_string conf (Util.escape_html str))
-        (Ext_string.Set.elements strl);
+        (Geneweb_util.Ext_string.Set.elements strl);
       Output.print_sstring conf "</a>\n")
     list;
   Output.print_sstring conf "</ul>\n";
@@ -307,7 +307,7 @@ let rec merge_insert ((sstr, (strl, iperl)) as x) = function
   | ((sstr1, (strl1, iperl1)) as y) :: l ->
       if sstr < sstr1 then x :: y :: l
       else if sstr > sstr1 then y :: merge_insert x l
-      else (sstr, (Ext_string.Set.union strl strl1, iperl @ iperl1)) :: l
+      else (sstr, (Geneweb_util.Ext_string.Set.union strl strl1, iperl @ iperl1)) :: l
   | [] -> [ x ]
 
 let persons_of_absolute base_strings_of persons_of get_field conf base x =
@@ -354,7 +354,7 @@ let first_name_print conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
+        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -381,7 +381,7 @@ let first_name_print conf base x =
 let has_children_with_that_name conf base des name =
   let compare_name n1 n2 =
     if Util.p_getenv conf.Config.env "t" = Some "A" then n1 = n2
-    else Name.lower n1 = Name.lower n2
+    else Geneweb_util.Name.lower n1 = Geneweb_util.Name.lower n2
   in
   List.exists
     (fun ip -> compare_name (Gwdb.p_surname base (Util.pget conf base ip)) name)
@@ -431,11 +431,11 @@ let print_selection_bullet conf = function
 let unselected_bullets conf =
   List.fold_left
     (fun sl (k, v) ->
-      try if k = "u" then Gwdb.ifam_of_string (Mutil.decode v) :: sl else sl
+      try if k = "u" then Gwdb.ifam_of_string (Geneweb_util.Mutil.decode v) :: sl else sl
       with Failure _ -> sl)
     [] conf.Config.env
 
-let alphabetic1 n1 n2 = Utf8.alphabetic_order n1 n2
+let alphabetic1 n1 n2 = Geneweb_util.Utf8.alphabetic_order n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 
@@ -459,7 +459,7 @@ let print_branch conf base psn name =
           let sel = not (List.mem i unsel_list) in
           ( fam,
             c,
-            if down then Some (Mutil.encode @@ Gwdb.string_of_ifam i, sel)
+            if down then Some (Geneweb_util.Mutil.encode @@ Gwdb.string_of_ifam i, sel)
             else None ))
         (Gwdb.get_family u)
     in
@@ -555,10 +555,10 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     | Some "d" ->
         let born_before p1 p2 =
           match
-            ( Date.od_of_cdate (Gwdb.get_birth p1),
-              Date.od_of_cdate (Gwdb.get_birth p2) )
+            ( Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p1),
+              Geneweb_util.Date.od_of_cdate (Gwdb.get_birth p2) )
           with
-          | Some d1, Some d2 -> Date.compare_date d1 d2
+          | Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2
           | _, None -> -1
           | None, _ -> 1
         in
@@ -583,17 +583,17 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
       Output.print_string conf (Util.escape_html x)
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
           Output.print_string conf (Util.commd conf);
           Output.print_sstring conf {|m=N&t=A&v=|};
-          Output.print_string conf (Mutil.encode x);
+          Output.print_string conf (Geneweb_util.Mutil.encode x);
           Output.print_sstring conf {|">|};
           Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
-        (Ext_string.Set.elements xl)
+        (Geneweb_util.Ext_string.Set.elements xl)
   in
   let br = Util.p_getint conf.Config.env "br" in
   Hutil.header conf title;
@@ -612,7 +612,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
            Output.print_sstring conf {|<dt><a href="|};
            Output.print_string conf (Util.commd conf);
            Output.print_sstring conf {|m=N&v=|};
-           Output.print_string conf (Mutil.encode str);
+           Output.print_string conf (Geneweb_util.Mutil.encode str);
            Output.print_sstring conf {|&br=|};
            Output.print_sstring conf (string_of_int n);
            Output.print_sstring conf {|" rel="nofollow">|};
@@ -655,7 +655,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   let access txt sn =
     let open Def in
     Util.geneweb_link conf
-      ("m=N&v=" ^<^ Mutil.encode sn ^>^ "&t=N" :> Adef.escaped_string)
+      ("m=N&v=" ^<^ Geneweb_util.Mutil.encode sn ^>^ "&t=N" :> Adef.escaped_string)
       (Util.escape_html txt :> Adef.safe_string)
   in
   Util.wprint_in_columns conf
@@ -668,9 +668,9 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   Output.print_string conf (Util.commd conf);
   Output.print_sstring conf {|m=N&o=i&t=N&v=|};
   Output.print_string conf
-    (if List.length homonymes = 1 then Mutil.encode x else Mutil.encode fx);
+    (if List.length homonymes = 1 then Geneweb_util.Mutil.encode x else Geneweb_util.Mutil.encode fx);
   Output.print_sstring conf {|">|};
-  Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "click"));
+  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "click"));
   Output.print_sstring conf " ";
   Output.print_sstring conf (Util.transl conf "here");
   Output.print_sstring conf " ";
@@ -691,10 +691,10 @@ let print_family_alphabetic x conf base liste =
     in
     let set =
       List.fold_left
-        (fun set istr -> Ext_string.Set.add (Gwdb.sou base istr) set)
-        Ext_string.Set.empty list
+        (fun set istr -> Geneweb_util.Ext_string.Set.add (Gwdb.sou base istr) set)
+        Geneweb_util.Ext_string.Set.empty list
     in
-    List.sort compare (Ext_string.Set.elements set)
+    List.sort compare (Geneweb_util.Ext_string.Set.elements set)
   in
   let liste =
     let l =
@@ -725,11 +725,11 @@ let print_family_alphabetic x conf base liste =
           else
             let open Def in
             Util.geneweb_link conf
-              ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
+              ("m=N&o=i&v=" ^<^ Geneweb_util.Mutil.encode x ^>^ "&t=A"
                 :> Adef.escaped_string)
               (Util.escape_html x :> Adef.safe_string)
         in
-        Ext_list.iter_first
+        Geneweb_util.Ext_list.iter_first
           (fun first x ->
             if not first then Output.print_sstring conf ", ";
             Output.print_string conf (access x))
@@ -814,7 +814,7 @@ let surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
+        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -887,7 +887,7 @@ let search_surname conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
+        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -935,7 +935,7 @@ let search_surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
+        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -1006,7 +1006,7 @@ let search_first_name conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
+        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
       list
   in
   List.fold_right merge_insert list []
@@ -1026,7 +1026,7 @@ let search_first_name_print conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
+        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in

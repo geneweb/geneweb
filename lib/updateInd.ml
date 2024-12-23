@@ -15,7 +15,7 @@ let string_person_of base p =
       Update.Link,
       "" )
   in
-  Futil.map_person_ps fp (sou base) (gen_person_of_person p)
+  Geneweb_util.Futil.map_person_ps fp (sou base) (gen_person_of_person p)
 
 (* Interpretation of template file 'updind.txt' *)
 
@@ -62,14 +62,14 @@ and eval_simple_var conf env p = function
       safe_val (Util.escape_html p.baptism_note :> Adef.safe_string)
   | [ "bapt_src" ] ->
       safe_val (Util.escape_html p.baptism_src :> Adef.safe_string)
-  | [ "birth"; s ] -> eval_date_var (Date.od_of_cdate p.birth) s
+  | [ "birth"; s ] -> eval_date_var (Geneweb_util.Date.od_of_cdate p.birth) s
   | [ "birth_place" ] ->
       safe_val (Util.escape_html p.birth_place :> Adef.safe_string)
   | [ "birth_note" ] ->
       safe_val (Util.escape_html p.birth_note :> Adef.safe_string)
   | [ "birth_src" ] ->
       safe_val (Util.escape_html p.birth_src :> Adef.safe_string)
-  | [ "bapt"; s ] -> eval_date_var (Date.od_of_cdate p.baptism) s
+  | [ "bapt"; s ] -> eval_date_var (Geneweb_util.Date.od_of_cdate p.baptism) s
   | [ "bt_buried" ] ->
       bool_val (match p.burial with Buried _ -> true | _ -> false)
   | [ "bt_cremated" ] ->
@@ -78,7 +78,7 @@ and eval_simple_var conf env p = function
   | [ "burial"; s ] ->
       let od =
         match p.burial with
-        | Buried cod | Cremated cod -> Date.od_of_cdate cod
+        | Buried cod | Cremated cod -> Geneweb_util.Date.od_of_cdate cod
         | UnknownBurial -> None
       in
       eval_date_var od s
@@ -91,7 +91,7 @@ and eval_simple_var conf env p = function
   | [ "cnt" ] -> eval_int_env "cnt" env
   | [ "dead_dont_know_when" ] -> bool_val (p.death = DeadDontKnowWhen)
   | [ "death"; s ] ->
-      let od = Date.date_of_death p.death in
+      let od = Geneweb_util.Date.date_of_death p.death in
       eval_date_var od s
   | [ "death_place" ] ->
       safe_val (Util.escape_html p.death_place :> Adef.safe_string)
@@ -121,7 +121,7 @@ and eval_simple_var conf env p = function
         | Vint i -> (
             try
               let e = nth_pevent (i - 1) env in
-              Date.od_of_cdate e.epers_date
+              Geneweb_util.Date.od_of_cdate e.epers_date
             with Failure _ -> None)
         | _ -> None
       in
@@ -133,10 +133,10 @@ and eval_simple_var conf env p = function
             let e = nth_pevent (i - 1) env in
             let name =
               Util.string_of_pevent_name' conf e.epers_name
-              |> Adef.safe_fn Utf8.capitalize_fst
+              |> Adef.safe_fn Geneweb_util.Utf8.capitalize_fst
             in
             let date =
-              match Date.od_of_cdate e.epers_date with
+              match Geneweb_util.Date.od_of_cdate e.epers_date with
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
@@ -151,7 +151,7 @@ and eval_simple_var conf env p = function
       safe_val (Util.escape_html p.first_name :> Adef.safe_string)
   | [ "first_name_alias" ] -> eval_string_env "first_name_alias" env
   | [ "has_aliases" ] -> bool_val (p.aliases <> [])
-  | [ "has_birth_date" ] -> bool_val (Date.od_of_cdate p.birth <> None)
+  | [ "has_birth_date" ] -> bool_val (Geneweb_util.Date.od_of_cdate p.birth <> None)
   | [ "has_pevent_birth" ] ->
       let rec loop pevents =
         match pevents with
@@ -280,7 +280,7 @@ and eval_simple_var conf env p = function
         | Vint i -> (
             try
               let t = List.nth p.titles (i - 1) in
-              Date.od_of_cdate t.t_date_start
+              Geneweb_util.Date.od_of_cdate t.t_date_start
             with Failure _ -> None)
         | _ -> None
       in
@@ -291,7 +291,7 @@ and eval_simple_var conf env p = function
         | Vint i -> (
             try
               let t = List.nth p.titles (i - 1) in
-              Date.od_of_cdate t.t_date_end
+              Geneweb_util.Date.od_of_cdate t.t_date_end
             with Failure _ -> None)
         | _ -> None
       in
@@ -685,7 +685,7 @@ let print_del1 conf base p =
   let title () =
     let s = transl_nth conf "person/persons" 0 in
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_decline conf "delete" s))
+      (Geneweb_util.Utf8.capitalize_fst (transl_decline conf "delete" s))
   in
   Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
@@ -701,7 +701,7 @@ let print_del1 conf base p =
   Output.print_sstring conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button>\n";
   Output.print_sstring conf "</p>\n";
   Output.print_sstring conf "</form>\n";
@@ -725,11 +725,11 @@ let print_add conf base =
       occupation = "";
       sex = Neuter;
       access = IfTitles;
-      birth = Date.cdate_None;
+      birth = Geneweb_util.Date.cdate_None;
       birth_place = "";
       birth_note = "";
       birth_src = "";
-      baptism = Date.cdate_None;
+      baptism = Geneweb_util.Date.cdate_None;
       baptism_place = "";
       baptism_note = "";
       baptism_src = "";

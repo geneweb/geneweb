@@ -7,7 +7,7 @@ open Util
 open Dag
 
 let image_normal_txt conf base p fname width height =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
   let k = Image.default_portrait_filename base p in
   let r =
@@ -32,7 +32,7 @@ let image_normal_txt conf base p fname width height =
   |> Adef.safe
 
 let image_url_txt conf url_p url height : Adef.safe_string =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   Format.sprintf
     {|<a href="%s"><img src="%s" alt="%s" title="%s"
       style="%s"></a>|}
@@ -43,7 +43,7 @@ let image_url_txt conf url_p url height : Adef.safe_string =
   |> Adef.safe
 
 let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   Format.sprintf
     {|<a href="%s"><img src="%s"%s%s alt="%s" title="%s"
       style="%s %s">%s</a>|}
@@ -191,13 +191,13 @@ let displayed_next_char s i =
               | _ -> Some (i, j)
           in
           loop1 (i + 1)
-      | c -> Some (i, i + Utf8.nbc c)
+      | c -> Some (i, i + Geneweb_util.Utf8.nbc c)
   in
   loop i
 
 let buff_store_int s blen i j =
   let rec loop blen i =
-    if i = j then blen else loop (Buff.store blen s.[i]) (i + 1)
+    if i = j then blen else loop (Geneweb_util.Buff.store blen s.[i]) (i + 1)
   in
   loop blen i
 
@@ -205,7 +205,7 @@ let buff_store_int s blen i j =
 
 let strip_empty_tags s =
   let rec loop blen opened_tag i =
-    if i >= String.length s then Buff.get blen
+    if i >= String.length s then Geneweb_util.Buff.get blen
     else
       match s.[i] with
       | '<' -> (
@@ -240,7 +240,7 @@ let strip_empty_tags s =
             | Some (_, k) -> buff_store_int s blen k i
             | None -> blen
           in
-          loop (Buff.store blen c) None (i + 1)
+          loop (Geneweb_util.Buff.store blen c) None (i + 1)
   in
   loop 0 None 0
 
@@ -264,7 +264,7 @@ let displayed_sub s ibeg ilen =
         in
         loop blen (di + 1) dlen k
     | None ->
-        let s = Buff.get (buff_store_int s blen i (String.length s)) in
+        let s = Geneweb_util.Buff.get (buff_store_int s blen i (String.length s)) in
         strip_empty_tags s
   in
   loop 0 0 0 0
@@ -418,7 +418,7 @@ let try_add_vbar stra_row stra_row_max hts i col =
 let strip_troublemakers s =
   let s = (s : Adef.safe_string :> string) in
   let rec loop last_space len i =
-    if i = String.length s then Adef.safe (Buff.get len)
+    if i = String.length s then Adef.safe (Geneweb_util.Buff.get len)
     else
       match s.[i] with
       | '<' ->
@@ -445,9 +445,9 @@ let strip_troublemakers s =
           in
           loop last_space len j
       | '\n' | '\r' | ' ' ->
-          let len = if last_space then len else Buff.store len ' ' in
+          let len = if last_space then len else Geneweb_util.Buff.store len ' ' in
           loop true len (i + 1)
-      | c -> loop false (Buff.store len c) (i + 1)
+      | c -> loop false (Geneweb_util.Buff.store len c) (i + 1)
   in
   loop false 0 0
 
@@ -761,7 +761,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
 let print_slices_menu conf hts =
   let header n =
     transl_nth conf "display by slices/slice width/overlap/total width" n
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let title _ = header 0 in
   Hutil.header conf title;
@@ -776,7 +776,7 @@ let print_slices_menu conf hts =
     conf.env;
   Output.print_sstring conf {|</p><table><tr align="left"><td align="right">|};
   transl conf "don't group the common branches together"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf
     {|<input type="checkbox" name="nogroup" value="on"></td></tr><tr align="left"><td align="right">|};
   header 1;
@@ -796,7 +796,7 @@ let print_slices_menu conf hts =
   Output.print_sstring conf
     {|<p><button type="submit" class="btn btn-secondary btn-lg">|};
   transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</button></p></form>|};
   Hutil.trailer conf
 
@@ -1087,7 +1087,7 @@ let print conf base =
   let vbar_txt _ = Adef.escaped "" in
   let invert = Util.p_getenv conf.env "invert" = Some "on" in
   let page_title =
-    Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+    Util.transl conf "tree" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
   in
   make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
     (Adef.escaped "")

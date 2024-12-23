@@ -143,7 +143,7 @@ let get_request strm =
 let get_request_and_content strm =
   let request = get_request strm in
   let content =
-    match Mutil.extract_param "content-length: " ' ' request with
+    match Geneweb_util.Mutil.extract_param "content-length: " ' ' request with
     | "" -> ""
     | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
@@ -192,8 +192,8 @@ let treat_connection tmout callback addr fd =
       get_request_and_content strm
     in
     let path, query =
-      match Mutil.extract_param "GET /" ' ' request with
-      | "" -> (Mutil.extract_param "POST /" ' ' request, query)
+      match Geneweb_util.Mutil.extract_param "GET /" ' ' request with
+      | "" -> (Geneweb_util.Mutil.extract_param "POST /" ' ' request, query)
       | str -> (
           match String.index_opt str '?' with
           | Some i ->

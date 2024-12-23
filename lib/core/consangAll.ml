@@ -22,7 +22,7 @@ let trace verbosity cnt max_cnt =
   if verbosity >= 2 then (
     Printf.eprintf "%7d\008\008\008\008\008\008\008" cnt;
     flush stderr)
-  else if verbosity >= 1 then ProgrBar.run (max_cnt - cnt) max_cnt
+  else if verbosity >= 1 then Geneweb_util.ProgrBar.run (max_cnt - cnt) max_cnt
 
 let consang_array base =
   let patched = ref false in
@@ -78,7 +78,7 @@ let compute ?(verbosity = 2) base from_scratch =
        if verbosity >= 2 then (
          Printf.eprintf "Computing consanguinity...";
          flush stderr)
-       else if verbosity >= 1 then ProgrBar.start ();
+       else if verbosity >= 1 then Geneweb_util.ProgrBar.start ();
      let running = ref true in
      while !running do
        running := false;
@@ -133,7 +133,7 @@ let compute ?(verbosity = 2) base from_scratch =
        if verbosity >= 2 then (
          Printf.eprintf " done   \n";
          flush stderr)
-       else if verbosity >= 1 then ProgrBar.finish ()
+       else if verbosity >= 1 then Geneweb_util.ProgrBar.finish ()
    with Sys.Break when verbosity > 0 ->
      Printf.eprintf "\n";
      flush stderr;

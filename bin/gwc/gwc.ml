@@ -69,7 +69,7 @@ let speclist =
     ("-mem", Arg.Set save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear do_check, " No consistency check");
     ("-nofail", Arg.Set no_fail, " No failure in case of error");
-    ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
+    ("-nolock", Arg.Set Geneweb_util.Lock.no_lock_flag, " Do not lock database");
     ("-nopicture", Arg.Set no_picture, " Do not create associative pictures");
     ( "-nopublic",
       Arg.Set no_public,
@@ -78,11 +78,11 @@ let speclist =
     ( "-particles",
       Arg.Set_string particules_file,
       "<file> Particles file (default = predefined particles)" );
-    ("-q", Arg.Clear Mutil.verbose, " Quiet");
+    ("-q", Arg.Clear Geneweb_util.Mutil.verbose, " Quiet");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
     ("-stats", Arg.Set pr_stats, " Print statistics");
-    ("-v", Arg.Set Mutil.verbose, " Verbose");
+    ("-v", Arg.Set Geneweb_util.Mutil.verbose, " Verbose");
   ]
   |> List.sort compare |> Arg.align
 
@@ -104,7 +104,7 @@ let errmsg =
    and [options] are:"
 
 let main () =
-  Mutil.verbose := false;
+  Geneweb_util.Mutil.verbose := false;
   Arg.parse speclist anonfun errmsg;
   Gwc_lib.make_base ~save_mem:!save_mem (make_state ())
 

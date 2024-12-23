@@ -9,7 +9,7 @@ let print_someone conf base p =
 let print conf base p =
   let title h =
     Output.print_sstring conf
-      (Utf8.capitalize_fst (Util.transl_decline conf "merge" ""));
+      (Geneweb_util.Utf8.capitalize_fst (Util.transl_decline conf "merge" ""));
     if not h then (
       Output.print_sstring conf " ";
       print_someone conf base p;
@@ -33,7 +33,7 @@ let print conf base p =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
   Util.hidden_input conf "i"
-    (Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode);
+    (Gwdb.get_iper p |> Gwdb.string_of_iper |> Geneweb_util.Mutil.encode);
   Output.print_sstring conf
     "<span class=\"form-row align-items-center\"><span \
      class=\"col-auto\"><span class=\"custom-control custom-radio\"><input \
@@ -65,21 +65,21 @@ let print conf base p =
           "<input type=\"radio\" class=\"custom-control-input\" \
            name=\"select\" id=\"";
         Output.print_string conf
-          (Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode);
+          (Gwdb.get_iper p |> Gwdb.string_of_iper |> Geneweb_util.Mutil.encode);
         Output.print_sstring conf "\" value=\"";
         Output.print_string conf
-          (Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode);
+          (Gwdb.get_iper p |> Gwdb.string_of_iper |> Geneweb_util.Mutil.encode);
         Output.print_sstring conf "\">\n";
         Output.print_sstring conf "<label class=\"custom-control-label\" for=\"";
         Output.print_string conf
-          (Gwdb.get_iper p |> Gwdb.string_of_iper |> Mutil.encode);
+          (Gwdb.get_iper p |> Gwdb.string_of_iper |> Geneweb_util.Mutil.encode);
         Output.print_sstring conf "\">";
         Output.print_sstring conf "</label></div>")
       list;
   Output.print_sstring conf
     {|<button type="submit" class="btn btn-primary btn-lg mt-2">|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
+    (Geneweb_util.Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></form>\n";
   Hutil.trailer conf
 
@@ -96,12 +96,12 @@ let print_possible_continue_merging conf base =
       Output.print_sstring conf {|<p><a href="|};
       Output.print_string conf (Util.commd conf);
       Output.print_sstring conf {|m=MRG_IND&i=|};
-      Output.print_string conf (Gwdb.string_of_iper ini1 |> Mutil.encode);
+      Output.print_string conf (Gwdb.string_of_iper ini1 |> Geneweb_util.Mutil.encode);
       Output.print_sstring conf {|&i2=|};
-      Output.print_string conf (Gwdb.string_of_iper ini2 |> Mutil.encode);
+      Output.print_string conf (Gwdb.string_of_iper ini2 |> Geneweb_util.Mutil.encode);
       Output.print_sstring conf {|">|};
       Output.print_sstring conf
-        (Utf8.capitalize_fst (Util.transl conf "continue merging"));
+        (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "continue merging"));
       Output.print_sstring conf {|</a> |};
       print_someone conf base p1;
       Output.print_sstring conf " ";
@@ -116,12 +116,12 @@ let print_possible_continue_merging conf base =
           let s1 =
             match Util.p_getenv conf.Config.env "iexcl" with
             | Some "" | None -> Adef.encoded ""
-            | Some s -> "&iexcl=" ^<^ Mutil.encode s
+            | Some s -> "&iexcl=" ^<^ Geneweb_util.Mutil.encode s
           in
           let s2 =
             match Util.p_getenv conf.Config.env "fexcl" with
             | Some "" | None -> Adef.encoded ""
-            | Some s -> "&fexcl=" ^<^ Mutil.encode s
+            | Some s -> "&fexcl=" ^<^ Geneweb_util.Mutil.encode s
           in
           if s1 <^> Adef.encoded "" || s2 <^> Adef.encoded "" then (
             let p = Gwdb.poi base ip in
@@ -129,12 +129,12 @@ let print_possible_continue_merging conf base =
             Output.print_sstring conf {|<p><a href="|};
             Output.print_string conf (Util.commd conf);
             Output.print_sstring conf {|m=MRG_DUP&ip=|};
-            Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
+            Output.print_string conf (Gwdb.string_of_iper ip |> Geneweb_util.Mutil.encode);
             Output.print_string conf s1;
             Output.print_string conf s2;
             Output.print_sstring conf {|">|};
             Output.print_sstring conf
-              (Utf8.capitalize_fst (Util.transl conf "continue merging"));
+              (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "continue merging"));
             Output.print_sstring conf "</a>";
             Output.print_sstring conf {| (|};
             Output.print_sstring conf

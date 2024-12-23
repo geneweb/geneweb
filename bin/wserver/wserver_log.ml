@@ -28,8 +28,8 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length =
     Option.value ~default:"" @@ Option.map string_of_status resp_status
   in
   let mode, url =
-    match Mutil.extract_param "GET /" ' ' request with
-    | "" -> ("POST", Mutil.extract_param "Referer: " '\n' request)
+    match Geneweb_util.Mutil.extract_param "GET /" ' ' request with
+    | "" -> ("POST", Geneweb_util.Mutil.extract_param "Referer: " '\n' request)
     | url -> ("GET", url)
   in
   "{"
@@ -48,7 +48,7 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length =
 
 let log_request_infos ~request ~path ~resp_status ~length =
   let tm = Unix.times () in
-  let curr_tm = (Mutil.sprintf_date Unix.(time () |> localtime) :> string) in
+  let curr_tm = (Geneweb_util.Mutil.sprintf_date Unix.(time () |> localtime) :> string) in
   let json =
     json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length
   in

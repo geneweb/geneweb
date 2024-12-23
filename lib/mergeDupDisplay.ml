@@ -27,7 +27,7 @@ let print_no_candidate conf base p =
   let title _ =
     Util.transl conf "possible duplications"
     |> Util.transl_decline conf "merge"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -67,7 +67,7 @@ let print_submit conf name value =
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   let title _ =
-    Util.transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    Util.transl conf "merge" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>";
@@ -79,7 +79,7 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf "</li><li>";
   print_link conf base (Gwdb.poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
-  Util.transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Util.transl conf "merge" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf " ?\n";
   (* FIXME: trans *)
   Output.print_sstring conf {|<form method="post" action="|};
@@ -87,15 +87,15 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_IND_Y_N");
-  Util.hidden_input conf "ip" (Gwdb.string_of_iper ip |> Mutil.encode);
+  Util.hidden_input conf "ip" (Gwdb.string_of_iper ip |> Geneweb_util.Mutil.encode);
   print_input_excl conf
-    (fun x -> Gwdb.string_of_iper x |> Mutil.encode)
+    (fun x -> Gwdb.string_of_iper x |> Geneweb_util.Mutil.encode)
     ((ip1, ip2) :: iexcl) "iexcl";
   print_input_excl conf
-    (fun x -> Gwdb.string_of_ifam x |> Mutil.encode)
+    (fun x -> Gwdb.string_of_ifam x |> Geneweb_util.Mutil.encode)
     fexcl "fexcl";
-  Util.hidden_input conf "i" (Gwdb.string_of_iper ip1 |> Mutil.encode);
-  Util.hidden_input conf "select" (Gwdb.string_of_iper ip2 |> Mutil.encode);
+  Util.hidden_input conf "i" (Gwdb.string_of_iper ip1 |> Geneweb_util.Mutil.encode);
+  Util.hidden_input conf "select" (Gwdb.string_of_iper ip2 |> Geneweb_util.Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
   Output.print_sstring conf "</form></p>";
@@ -105,7 +105,7 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   let title _ =
     Util.transl_nth conf "family/families" 1
     |> Util.transl_decline conf "merge"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>";
@@ -125,22 +125,22 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_sstring conf " &amp; ";
   print_link conf base (Gwdb.poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
-  Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "merge"));
+  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "merge"));
   Output.print_sstring conf " ? ";
   Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_FAM_Y_N");
-  Util.hidden_input conf "ip" (Gwdb.string_of_iper ip |> Mutil.encode);
+  Util.hidden_input conf "ip" (Gwdb.string_of_iper ip |> Geneweb_util.Mutil.encode);
   print_input_excl conf
-    (fun x -> Gwdb.string_of_iper x |> Mutil.encode)
+    (fun x -> Gwdb.string_of_iper x |> Geneweb_util.Mutil.encode)
     iexcl "iexcl";
   print_input_excl conf
-    (fun x -> Gwdb.string_of_ifam x |> Mutil.encode)
+    (fun x -> Gwdb.string_of_ifam x |> Geneweb_util.Mutil.encode)
     ((ifam1, ifam2) :: fexcl) "fexcl";
-  Util.hidden_input conf "i" (Gwdb.string_of_ifam ifam1 |> Mutil.encode);
-  Util.hidden_input conf "i2" (Gwdb.string_of_ifam ifam2 |> Mutil.encode);
+  Util.hidden_input conf "i" (Gwdb.string_of_ifam ifam1 |> Geneweb_util.Mutil.encode);
+  Util.hidden_input conf "i2" (Gwdb.string_of_ifam ifam2 |> Geneweb_util.Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
   Output.print_sstring conf "</form></p>";

@@ -7,9 +7,9 @@ let prefix conf = Util.escape_html conf.image_prefix
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
  *)
 let default_portrait_filename_of_key first_name surname occ =
-  let space_to_unders = Ext_string.tr ' ' '_' in
-  let f = space_to_unders (Name.lower first_name) in
-  let s = space_to_unders (Name.lower surname) in
+  let space_to_unders = Geneweb_util.Ext_string.tr ' ' '_' in
+  let f = space_to_unders (Geneweb_util.Name.lower first_name) in
+  let s = space_to_unders (Geneweb_util.Name.lower surname) in
   Format.sprintf "%s.%d.%s" f occ s
 
 let default_portrait_filename base p =
@@ -179,7 +179,7 @@ let has_access_to_portrait conf base p =
   && Util.authorized_age conf base p
   && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
   && (conf.wizard || conf.friend
-     || not (Ext_string.contains (sou base img) "/private/"))
+     || not (Geneweb_util.Ext_string.contains (sou base img) "/private/"))
 (* TODO: privacy settings should be in db not in url *)
 
 let get_portrait_path conf base p =

@@ -78,7 +78,7 @@ let default_source = ref ""
 let relation_status = ref Def.Married
 let no_picture = ref false
 let do_check = ref true
-let particles = ref Mutil.default_particles
+let particles = ref Geneweb_util.Mutil.default_particles
 let in_file = ref ""
 let out_file = ref "a"
 
@@ -139,10 +139,10 @@ let rec skip_eol =
 
 let rec get_to_eoln len =
   parser
-  | [< ''\010' | '\013'; _ = skip_eol >] -> Buff.get len
-  | [< ''\t'; s >] -> get_to_eoln (Buff.store len ' ') s
-  | [< 'c; s >] -> get_to_eoln (Buff.store len c) s
-  | [< >] -> Buff.get len
+  | [< ''\010' | '\013'; _ = skip_eol >] -> Geneweb_util.Buff.get len
+  | [< ''\t'; s >] -> get_to_eoln (Geneweb_util.Buff.store len ' ') s
+  | [< 'c; s >] -> get_to_eoln (Geneweb_util.Buff.store len c) s
+  | [< >] -> Geneweb_util.Buff.get len
 
 let rec skip_to_eoln =
   parser
@@ -154,10 +154,10 @@ let eol_chars = ['\010'; '\013']
 
 let rec get_ident len =
   parser
-  | [< '' ' | '\t' >] -> Buff.get len
+  | [< '' ' | '\t' >] -> Geneweb_util.Buff.get len
   | [< 'c when not (List.mem c eol_chars); s >] ->
-      get_ident (Buff.store len c) s
-  | [< >] -> Buff.get len
+      get_ident (Geneweb_util.Buff.store len c) s
+  | [< >] -> Geneweb_util.Buff.get len
 
 let skip_space =
   parser
@@ -314,11 +314,11 @@ let ascii_of_macintosh s =
 
 let utf8_of_string s =
   match !state.charset with
-  | Ansel -> Utf8.utf_8_of_iso_8859_1 (Geneweb.Ansel.to_iso_8859_1 s)
-  | Ansi -> Utf8.utf_8_of_iso_8859_1 s
-  | Ascii -> Utf8.utf_8_of_iso_8859_1 s
-  | Msdos -> Utf8.utf_8_of_iso_8859_1 (ascii_of_msdos s)
-  | MacIntosh -> Utf8.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
+  | Ansel -> Geneweb_util.Utf8.utf_8_of_iso_8859_1 (Geneweb.Ansel.to_iso_8859_1 s)
+  | Ansi -> Geneweb_util.Utf8.utf_8_of_iso_8859_1 s
+  | Ascii -> Geneweb_util.Utf8.utf_8_of_iso_8859_1 s
+  | Msdos -> Geneweb_util.Utf8.utf_8_of_iso_8859_1 (ascii_of_msdos s)
+  | MacIntosh -> Geneweb_util.Utf8.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
   | Utf8 -> s
 
 let rec get_lev n =
@@ -389,10 +389,10 @@ let rec skip_spaces =
   | [< >] -> ()
 let rec ident_slash len =
   parser
-  | [< ''/' >] -> Buff.get len
-  | [< ''\t'; a = ident_slash (Buff.store len ' ') >] -> a
-  | [< 'c; a = ident_slash (Buff.store len c) >] -> a
-  | [< >] -> Buff.get len
+  | [< ''/' >] -> Geneweb_util.Buff.get len
+  | [< ''\t'; a = ident_slash (Geneweb_util.Buff.store len ' ') >] -> a
+  | [< 'c; a = ident_slash (Geneweb_util.Buff.store len c) >] -> a
+  | [< >] -> Geneweb_util.Buff.get len
 
 let strip c str =
   let start =
@@ -469,27 +469,27 @@ let rec find_field_with_value lab v =
 
 let rec lexing_date =
   parser
-  | [< ''0'..'9' as c; n = number (Buff.store 0 c) >] -> ("INT", n)
-  | [< ''A'..'Z' as c; i = ident (Buff.store 0 c) >] -> ("ID", i)
-  | [< ''('; len = text 0 >] -> ("TEXT", Buff.get len)
+  | [< ''0'..'9' as c; n = number (Geneweb_util.Buff.store 0 c) >] -> ("INT", n)
+  | [< ''A'..'Z' as c; i = ident (Geneweb_util.Buff.store 0 c) >] -> ("ID", i)
+  | [< ''('; len = text 0 >] -> ("TEXT", Geneweb_util.Buff.get len)
   | [< ''.' >] -> ("", ".")
   | [< '' ' | '\t' | '\013'; s >] -> lexing_date s
   | [< _ = Stream.empty >] -> ("EOI", "")
   | [< 'x >] -> ("", String.make 1 x)
 and number len =
   parser
-  | [< ''0'..'9' as c; a = number (Buff.store len c) >] -> a
-  | [< >] -> Buff.get len
+  | [< ''0'..'9' as c; a = number (Geneweb_util.Buff.store len c) >] -> a
+  | [< >] -> Geneweb_util.Buff.get len
 and ident len =
   parser
-  | [< ''A'..'Z' as c; a = ident (Buff.store len c) >] -> a
-  | [< >] -> Buff.get len
+  | [< ''A'..'Z' as c; a = ident (Geneweb_util.Buff.store len c) >] -> a
+  | [< >] -> Geneweb_util.Buff.get len
 and text len =
   parser
   | [< '')' >] -> len
-  | [< ''('; len = text (Buff.store len '('); s >] ->
-      text (Buff.store len ')') s
-  | [< 'c; s >] -> text (Buff.store len c) s
+  | [< ''('; len = text (Geneweb_util.Buff.store len '('); s >] ->
+      text (Geneweb_util.Buff.store len ')') s
+  | [< 'c; s >] -> text (Geneweb_util.Buff.store len c) s
   | [< >] -> len
 
 let make_date_lexing s = Stream.from (fun _ -> Some (lexing_date s))
@@ -529,7 +529,7 @@ let date_interval = Grammar.Entry.create date_g "date interval"
 let date_value_recover = Grammar.Entry.create date_g "date value"
 
 let is_roman_int x =
-  try let _ = Mutil.arabian_of_roman x in true with Not_found -> false
+  try let _ = Geneweb_util.Mutil.arabian_of_roman x in true with Not_found -> false
 
 let start_with_int x =
   try let s = String.sub x 0 1 in let _ = int_of_string s in true with
@@ -537,7 +537,7 @@ let start_with_int x =
 
 let roman_int =
   let p =
-    parser [< '("ID", x) when is_roman_int x >] -> Mutil.arabian_of_roman x
+    parser [< '("ID", x) when is_roman_int x >] -> Geneweb_util.Mutil.arabian_of_roman x
   in
   Grammar.Entry.of_parser date_g "roman int" p
 
@@ -571,7 +571,7 @@ let make_date n1 n2 n3 =
                 else 0, 0
       in
       let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
-      Date.{day = d; month = m; year = y; prec = Sure; delta = 0}
+      Geneweb_util.Date.{day = d; month = m; year = y; prec = Sure; delta = 0}
   | None, Some m, Some y ->
       let m =
         match m with
@@ -586,9 +586,9 @@ let make_date n1 n2 n3 =
   | _ -> raise (Stream.Error "bad date")
 
 let recover_date cal = function
-  | Date.Dgreg (d, Dgregorian) ->
-    let d = Date.convert ~from:cal ~to_:Dgregorian d in
-    Date.Dgreg (d, cal)
+  | Geneweb_util.Date.Dgreg (d, Dgregorian) ->
+    let d = Geneweb_util.Date.convert ~from:cal ~to_:Dgregorian d in
+    Geneweb_util.Date.Dgreg (d, cal)
   | d -> d
 
 [@@@ocaml.warning "-27"]
@@ -624,7 +624,7 @@ EXTEND
           | Begin (d, cal) -> Dgreg ({d with prec = After}, cal)
           | End (d, cal) -> Dgreg ({d with prec = Before}, cal)
           | BeginEnd ((d1, cal1), (d2, cal2)) ->
-            let dmy2 = {Date.dmy2_of_dmy d2 with delta2 = 0} in
+            let dmy2 = {Geneweb_util.Date.dmy2_of_dmy d2 with delta2 = 0} in
             Dgreg ({d1 with prec = YearInt dmy2}, cal1)
           end
       | (d, cal) = date -> Dgreg (d, cal)
@@ -649,11 +649,11 @@ EXTEND
   date_calendar:
     [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_greg -> (d, Dgregorian)
       | "@"; "#"; ID "DJULIAN"; "@"; d = date_greg ->
-          (Date.convert ~from:Djulian ~to_:Dgregorian d, Djulian)
+          (Geneweb_util.Date.convert ~from:Djulian ~to_:Dgregorian d, Djulian)
       | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_fren ->
-          (Date.convert ~from:Dfrench ~to_:Dgregorian d, Dfrench)
+          (Geneweb_util.Date.convert ~from:Dfrench ~to_:Dgregorian d, Dfrench)
       | "@"; "#"; ID "DHEBREW"; "@"; d = date_hebr ->
-          (Date.convert ~from:Dhebrew ~to_:Dgregorian d, Dhebrew)
+          (Geneweb_util.Date.convert ~from:Dhebrew ~to_:Dgregorian d, Dhebrew)
       | d = date_greg -> (d, Dgregorian) ] ]
   ;
   date_greg:
@@ -752,7 +752,7 @@ let preg_match pattern subject =
 
 let date_of_field d =
   if d = "" then None
-  else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Date.Dtext d)
+  else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Geneweb_util.Date.Dtext d)
   else
     let s = Stream.of_string (String.uppercase_ascii d) in
     !state.date_str <- d;
@@ -840,7 +840,7 @@ let string_quest = 1
 let string_x = 2
 
 let unknown_per i sex =
-  let p = { (Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
+  let p = { (Geneweb_util.Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
   and a = {Def.parents = None; consang = Adef.fix (-1)}
   and u = {Def.family = [| |]} in
   p, a, u
@@ -856,7 +856,7 @@ let phony_per gen sex =
 let unknown_fam gen i =
   let father = phony_per gen Def.Male in
   let mother = phony_per gen Female in
-  let f = { (Mutil.empty_family string_empty) with Def.fam_index = i }
+  let f = { (Geneweb_util.Mutil.empty_family string_empty) with Def.fam_index = i }
   and c = Adef.couple father mother
   and d = {Def.children = [| |]} in
   f, c, d
@@ -874,12 +874,12 @@ let this_year =
 
 let infer_death birth bapt =
   match birth, bapt with
-  | Some (Date.Dgreg (d, _)), _ ->
+  | Some (Geneweb_util.Date.Dgreg (d, _)), _ ->
     let a = this_year - d.year in
     if a > !state.dead_years then Def.DeadDontKnowWhen
     else if a < !state.alive_years then NotDead
     else DontKnowIfDead
-  | _, Some (Date.Dgreg (d, _)) ->
+  | _, Some (Geneweb_util.Date.Dgreg (d, _)) ->
     let a = this_year - d.year in
     if a > !state.dead_years then Def.DeadDontKnowWhen
     else if a < !state.alive_years then NotDead
@@ -940,7 +940,7 @@ let rec is_a_public_name s i =
     List.mem w public_name_word || is_a_public_name s j))
 
 
-module Buff2 = Buff.Make (struct  end)
+module Buff2 = Geneweb_util.Buff.Make (struct  end)
 
 let aux fn s =
   (* On initialise le buffer à la valeur de s. *)
@@ -970,9 +970,9 @@ let aux fn s =
   in
   loop 0 0
 
-let capitalize_name = aux Name.title
+let capitalize_name = aux Geneweb_util.Name.title
 
-let uppercase_name = aux Utf8.uppercase
+let uppercase_name = aux Geneweb_util.Utf8.uppercase
 
 let get_lev0 (strm__ : _ Stream.t) =
   let _ = line_start '0' strm__ in
@@ -1152,11 +1152,11 @@ let decode_title s =
 
 let list_of_string s =
   let rec loop i len list =
-    if i = String.length s then List.rev (Buff.get len :: list)
+    if i = String.length s then List.rev (Geneweb_util.Buff.get len :: list)
     else
       match s.[i] with
-        ',' -> loop (i + 1) 0 (Buff.get len :: list)
-      | c -> loop (i + 1) (Buff.store len c) list
+        ',' -> loop (i + 1) 0 (Geneweb_util.Buff.get len :: list)
+      | c -> loop (i + 1) (Geneweb_util.Buff.store len c) list
   in
   loop 0 0 []
 
@@ -1193,8 +1193,8 @@ let treat_indi_title gen public_name r =
     | None -> Def.Tnone, title, place
   in
   {Def.t_name = name; t_ident = add_string gen title;
-   t_place = add_string gen place; t_date_start = Date.cdate_of_od date_start;
-   t_date_end = Date.cdate_of_od date_end; t_nth = nth}
+   t_place = add_string gen place; t_date_start = Geneweb_util.Date.cdate_of_od date_start;
+   t_date_end = Geneweb_util.Date.cdate_of_od date_end; t_nth = nth}
 
 let forward_adop gen ip lab which_parent =
   Hashtbl.add
@@ -1267,25 +1267,25 @@ let indi_lab =
 
 let html_text_of_tags text rl =
   let rec tot len lev r =
-    let len = Buff.mstore len (string_of_int lev) in
-    let len = Buff.store len ' ' in
-    let len = Buff.mstore len r.rlab in
+    let len = Geneweb_util.Buff.mstore len (string_of_int lev) in
+    let len = Geneweb_util.Buff.store len ' ' in
+    let len = Geneweb_util.Buff.mstore len r.rlab in
     let len =
-      if r.rval = "" then len else Buff.mstore (Buff.store len ' ') r.rval
+      if r.rval = "" then len else Geneweb_util.Buff.mstore (Geneweb_util.Buff.store len ' ') r.rval
     in
     let len =
-      if r.rcont = "" then len else Buff.mstore (Buff.store len ' ') r.rcont
+      if r.rcont = "" then len else Geneweb_util.Buff.mstore (Geneweb_util.Buff.store len ' ') r.rcont
     in
     totl len (lev + 1) r.rsons
   and totl len lev rl =
     List.fold_left
-      (fun len r -> let len = Buff.store len '\n' in tot len lev r) len rl
+      (fun len r -> let len = Geneweb_util.Buff.store len '\n' in tot len lev r) len rl
   in
   let title =
     if text = "" then "-- GEDCOM --" else "-- GEDCOM (" ^ text ^ ") --"
   in
   let len = 0 in
-  let len = Buff.mstore len title in let len = totl len 1 rl in Buff.get len
+  let len = Geneweb_util.Buff.mstore len title in let len = totl len 1 rl in Geneweb_util.Buff.get len
 
 let rec find_all_rela nl =
   function
@@ -1461,7 +1461,7 @@ let treat_indi_pevent gen ip r =
               in
               let witnesses = find_event_witness gen ip r in
               let evt =
-                {Def.epers_name = name; epers_date = Date.cdate_of_od date;
+                {Def.epers_name = name; epers_date = Geneweb_util.Date.cdate_of_od date;
                  epers_place = add_string gen place;
                  epers_reason = add_string gen reason;
                  epers_note = add_string gen note;
@@ -1529,7 +1529,7 @@ let treat_indi_pevent gen ip r =
                in
                let witnesses = find_event_witness gen ip r in
                let evt =
-                 {Def.epers_name = name; epers_date = Date.cdate_of_od date;
+                 {Def.epers_name = name; epers_date = Geneweb_util.Date.cdate_of_od date;
                   epers_place = add_string gen place;
                   epers_reason = add_string gen reason;
                   epers_note = add_string gen note;
@@ -1600,8 +1600,8 @@ let reconstitute_from_pevents pevents bi bp de bu =
             if !found_death then loop l bi bp de bu
             else
               let death =
-                match Date.od_of_cdate evt.epers_date with
-                | Some d -> Def.Death (Unspecified, Date.cdate_of_date d)
+                match Geneweb_util.Date.od_of_cdate evt.epers_date with
+                | Some d -> Def.Death (Unspecified, Geneweb_util.Date.cdate_of_date d)
                 | None -> Def.DeadDontKnowWhen
               in
               let de =
@@ -1703,7 +1703,7 @@ let add_indi gen r =
       in
       let s = applycase_surname s in
       let r =
-        let key = Name.strip_lower (Mutil.nominative f ^ " " ^ Mutil.nominative s) in
+        let key = Geneweb_util.Name.strip_lower (Geneweb_util.Mutil.nominative f ^ " " ^ Geneweb_util.Mutil.nominative s) in
         try Hashtbl.find gen.g_hnam key
         with Not_found ->
           let r = ref (-1) in
@@ -1715,7 +1715,7 @@ let add_indi gen r =
   in
   (* S'il y a des caractères interdits, on les supprime *)
   let (first_name, surname) =
-    Name.strip_c first_name ':', Name.strip_c surname ':'
+    Geneweb_util.Name.strip_c first_name ':', Geneweb_util.Name.strip_c surname ':'
   in
   let qualifier =
     match name_sons with
@@ -1892,7 +1892,7 @@ let add_indi gen r =
           match find_field "DATE" r.rsons with
             Some r ->
             begin match date_of_field r.rval with
-              | Some d -> Def.Death (Unspecified, Date.cdate_of_date d)
+              | Some d -> Def.Death (Unspecified, Geneweb_util.Date.cdate_of_date d)
               | None -> Def.DeadDontKnowWhen
             end
           | _ -> Def.DeadDontKnowWhen
@@ -1912,7 +1912,7 @@ let add_indi gen r =
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Def.Buried Date.cdate_None, "", ("", []), ("", [])
+            Def.Buried Geneweb_util.Date.cdate_None, "", ("", []), ("", [])
           else UnknownBurial, "", ("", []), ("", [])
         else
           let d =
@@ -1926,7 +1926,7 @@ let add_indi gen r =
             | _ -> ""
           in
           let note = find_and_treat_notes gen r.rsons in
-          Def.Buried (Date.cdate_of_od d), p, (note, []), source gen r
+          Def.Buried (Geneweb_util.Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
     let (crem, crem_place, (crem_note, _), (crem_src, crem_nt)) =
@@ -1934,7 +1934,7 @@ let add_indi gen r =
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Def.Cremated Date.cdate_None, "", ("", []), ("", [])
+            Def.Cremated Geneweb_util.Date.cdate_None, "", ("", []), ("", [])
           else UnknownBurial, "", ("", []), ("", [])
         else
           let d =
@@ -1948,7 +1948,7 @@ let add_indi gen r =
             | _ -> ""
           in
           let note = find_and_treat_notes gen r.rsons in
-          Def.Cremated (Date.cdate_of_od d), p, (note, []), source gen r
+          Def.Cremated (Geneweb_util.Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
     match buri, crem with
@@ -1956,8 +1956,8 @@ let add_indi gen r =
       crem, crem_place, (crem_note, []), (crem_src, crem_nt)
     | _ -> buri, buri_place, (buri_note, []), (buri_src, buri_nt)
   in
-  let birth =Date.cdate_of_od birth in
-  let bapt =Date.cdate_of_od bapt in
+  let birth =Geneweb_util.Date.cdate_of_od birth in
+  let bapt =Geneweb_util.Date.cdate_of_od bapt in
   let (psources, psources_nt) =
     let (s, s_nt) = source gen r in
     if s = "" then !state.default_source, s_nt else s, s_nt
@@ -2157,7 +2157,7 @@ let treat_fam_fevent gen ifath r =
                 | _ -> name, place
               in
               let evt =
-                {Def.efam_name = name; efam_date = Date.cdate_of_od date;
+                {Def.efam_name = name; efam_date = Geneweb_util.Date.cdate_of_od date;
                  efam_place = add_string gen place;
                  efam_reason = add_string gen reason;
                  efam_note = add_string gen note;
@@ -2221,7 +2221,7 @@ let treat_fam_fevent gen ifath r =
                in
                let witnesses = find_fevent_witness gen ifath r in
                let evt =
-                 {Def.efam_name = name; efam_date = Date.cdate_of_od date;
+                 {Def.efam_name = name; efam_date = Geneweb_util.Date.cdate_of_od date;
                   efam_place = add_string gen place;
                   efam_reason = add_string gen reason;
                   efam_note = add_string gen note;
@@ -2280,10 +2280,10 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
-                match Date.od_of_cdate evt.efam_date with
+                match Geneweb_util.Date.od_of_cdate evt.efam_date with
                 | Some (Dgreg (dmy, cal)) ->
                     let dmy = {dmy with prec = About} in
-                    Date.cdate_of_od (Some (Dgreg (dmy, cal)))
+                    Geneweb_util.Date.cdate_of_od (Some (Dgreg (dmy, cal)))
                 | _ -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
@@ -2462,12 +2462,12 @@ let add_fam_norm gen r adop_list =
     match find_field "DIV" r.rsons with
       Some r ->
       begin match find_field "DATE" r.rsons with
-          Some d -> Def.Divorced (Date.cdate_of_od (date_of_field d.rval))
+          Some d -> Def.Divorced (Geneweb_util.Date.cdate_of_od (date_of_field d.rval))
         | _ ->
           match find_field "PLAC" r.rsons with
-            Some _ -> Def.Divorced Date.cdate_None
+            Some _ -> Def.Divorced Geneweb_util.Date.cdate_None
           | _ ->
-            if r.rval = "Y" then Def.Divorced Date.cdate_None else NotDivorced
+            if r.rval = "Y" then Def.Divorced Geneweb_util.Date.cdate_None else NotDivorced
       end
     | None -> NotDivorced
   in
@@ -2517,7 +2517,7 @@ let add_fam_norm gen r adop_list =
   in
   (* Mise à jour des évènements principaux. *)
   let (marr, marr_place, marr_note, marr_src) =
-    Date.cdate_of_od marr, add_string gen marr_place,
+    Geneweb_util.Date.cdate_of_od marr, add_string gen marr_place,
     add_string gen marr_note, add_string gen marr_src
   in
   (* On tri les évènements pour être sûr. *)
@@ -2632,7 +2632,7 @@ let sort_by_date proj array =
   then
     Array.stable_sort begin fun e1 e2 ->
       match proj e1, proj e2 with
-      | Some d1, Some d2 -> Date.compare_date d1 d2
+      | Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2
       | _ -> 1
     end array
 
@@ -2908,8 +2908,8 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
   persons, families, strings, bnotes
 
 let designation strings p =
-  let fn = Mutil.nominative strings.(p.Def.first_name) in
-  let sn = Mutil.nominative strings.(p.surname) in
+  let fn = Geneweb_util.Mutil.nominative strings.(p.Def.first_name) in
+  let sn = Geneweb_util.Mutil.nominative strings.(p.surname) in
   fn ^ "." ^ string_of_int p.occ ^ " " ^ sn
 
 let check_parents_children persons ascends unions families couples descends strings =
@@ -3056,9 +3056,9 @@ let check_parents_sex persons families couples strings =
   done
 
 let neg_year_dmy = function
-  | Date.{day = d; month = m; year = y; prec = OrYear dmy2} ->
+  | Geneweb_util.Date.{day = d; month = m; year = y; prec = OrYear dmy2} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
-    Date.{day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
+    Geneweb_util.Date.{day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
   | {day = d; month = m; year = y; prec = YearInt dmy2} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
     {day = d; month = m; year = -abs y; prec = YearInt dmy2; delta = 0}
@@ -3066,17 +3066,17 @@ let neg_year_dmy = function
     {day = d; month = m; year = -abs y; prec = p; delta = 0}
 
 let neg_year = function
-  | Date.Dgreg (d, cal) -> Date.Dgreg (neg_year_dmy d, cal)
+  | Geneweb_util.Date.Dgreg (d, cal) -> Geneweb_util.Date.Dgreg (neg_year_dmy d, cal)
   | x -> x
 
-let neg_year_cdate cd = Date.cdate_of_date (neg_year (Date.date_of_cdate cd))
+let neg_year_cdate cd = Geneweb_util.Date.cdate_of_date (neg_year (Geneweb_util.Date.date_of_cdate cd))
 
 let rec negative_date_ancestors persons ascends unions families couples i =
   let p = persons.(i) in
   let p =
     { p with
-      Def.birth = begin match Date.od_of_cdate p.Def.birth with
-        | Some d1 -> Date.cdate_of_od (Some (neg_year d1))
+      Def.birth = begin match Geneweb_util.Date.od_of_cdate p.Def.birth with
+        | Some d1 -> Geneweb_util.Date.cdate_of_od (Some (neg_year d1))
         | None -> p.Def.birth
       end ;
       death = match p.death with
@@ -3089,11 +3089,11 @@ let rec negative_date_ancestors persons ascends unions families couples i =
   for i = 0 to Array.length u.Def.family - 1 do
     let j = u.Def.family.(i) in
     let fam = families.(j) in
-    match Date.od_of_cdate fam.Def.marriage with
+    match Geneweb_util.Date.od_of_cdate fam.Def.marriage with
     | None -> ()
     | Some d ->
       let fam =
-        { fam with Def.marriage = Date.cdate_of_od (Some (neg_year d)) }
+        { fam with Def.marriage = Geneweb_util.Date.cdate_of_od (Some (neg_year d)) }
       in
       families.(j) <- fam
   done ;
@@ -3110,9 +3110,9 @@ let rec negative_date_ancestors persons ascends unions families couples i =
 let negative_dates persons ascends unions families couples =
   for i = 0 to Array.length persons - 1 do
     let p = persons.(i) in
-    match Date.cdate_to_dmy_opt p.Def.birth, Date.dmy_of_death p.death with
+    match Geneweb_util.Date.cdate_to_dmy_opt p.Def.birth, Geneweb_util.Date.dmy_of_death p.death with
     | Some d1, Some d2 ->
-      if d1.year > 0 && d2.year > 0 && Date.compare_dmy d2 d1 < 0
+      if d1.year > 0 && d2.year > 0 && Geneweb_util.Date.compare_dmy d2 d1 < 0
       then negative_date_ancestors persons ascends unions families couples i
     | _ -> ()
   done
@@ -3123,13 +3123,13 @@ let finish_base (persons, families, strings, _) =
   for i = 0 to Array.length descends - 1 do
     let des = descends.(i) in
     let children = des.Def.children in
-    sort_by_date (fun i -> Date.od_of_cdate persons.(i).Def.birth) children ;
+    sort_by_date (fun i -> Geneweb_util.Date.od_of_cdate persons.(i).Def.birth) children ;
     descends.(i) <- { Def.children }
   done ;
   for i = 0 to Array.length unions - 1 do
     let u = unions.(i) in
     let family = u.Def.family in
-    sort_by_date (fun i -> Date.od_of_cdate families.(i).Def.marriage) family ;
+    sort_by_date (fun i -> Geneweb_util.Date.od_of_cdate families.(i).Def.marriage) family ;
     unions.(i) <- { family }
   done ;
   for i = 0 to Array.length persons - 1 do

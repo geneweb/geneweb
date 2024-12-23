@@ -1,9 +1,9 @@
 val select_person :
   Config.config ->
   Gwdb.base ->
-  (Gwdb.person -> Date.date option) ->
+  (Gwdb.person -> Geneweb_util.Date.date option) ->
   bool ->
-  (Gwdb.person * Date.dmy * Date.calendar) list * int
+  (Gwdb.person * Geneweb_util.Date.dmy * Geneweb_util.Date.calendar) list * int
 (** [select_person conf base get_date find_oldest] select 20 persons
     from the base according to the one of their date (birth, death,
     marriage, specific event, etc.) that could be get with [get_date].
@@ -18,19 +18,19 @@ val select_person :
 val select_family :
   Config.config ->
   Gwdb.base ->
-  (Gwdb.family -> Date.date option) ->
+  (Gwdb.family -> Geneweb_util.Date.date option) ->
   bool ->
-  (Gwdb.family * Date.dmy * Date.calendar) list * int
+  (Gwdb.family * Geneweb_util.Date.dmy * Geneweb_util.Date.calendar) list * int
 (** Same as [select_person] but dealing with families *)
 
-val death_date : Gwdb.person -> Date.date option
+val death_date : Gwdb.person -> Geneweb_util.Date.date option
 (** Returns person's death date (if exists) *)
 
 val make_population_pyramid :
   nb_intervals:int ->
   interval:int ->
   limit:int ->
-  at_date:Date.dmy ->
+  at_date:Geneweb_util.Date.dmy ->
   Config.config ->
   Gwdb.base ->
   int array * int array

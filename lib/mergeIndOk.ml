@@ -89,10 +89,10 @@ let merge_events l1 l2 p =
                 else if e.epers_name = e1.epers_name then
                   let is_dead, date =
                     match p.death with
-                    | NotDead | DontKnowIfDead -> (false, Date.cdate_None)
+                    | NotDead | DontKnowIfDead -> (false, Geneweb_util.Date.cdate_None)
                     | Death (_, cd) -> (true, cd)
                     | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
-                        (true, Date.cdate_None)
+                        (true, Geneweb_util.Date.cdate_None)
                   in
                   let witnesses =
                     merge_event_witnesses e1.epers_witnesses e.epers_witnesses
@@ -221,21 +221,21 @@ let reconstitute conf base p1 p2 =
       aliases = list (sou base) get_aliases;
       first_names_aliases = list (sou base) get_first_names_aliases;
       surnames_aliases = list (sou base) get_surnames_aliases;
-      titles = list (Futil.map_title_strings (sou base)) get_titles;
+      titles = list (Geneweb_util.Futil.map_title_strings (sou base)) get_titles;
       rparents =
-        list (Futil.map_relation_ps (sorp base) (sou base)) get_rparents;
+        list (Geneweb_util.Futil.map_relation_ps (sorp base) (sou base)) get_rparents;
       related = [];
       occupation =
         field "occupation" (fun p -> sou base (get_occupation p)) (( = ) "");
       sex = field "sex" get_sex (( = ) Neuter);
       access = field "access" get_access (( = ) IfTitles);
-      birth = field "birth" get_birth (( = ) Date.cdate_None);
+      birth = field "birth" get_birth (( = ) Geneweb_util.Date.cdate_None);
       birth_place =
         field "birth_place" (fun p -> sou base (get_birth_place p)) (( = ) "");
       birth_note =
         merge_strings base (get_birth_note p1) "<br>\n" (get_birth_note p2);
       birth_src = merge_strings base (get_birth_src p1) ", " (get_birth_src p2);
-      baptism = field "baptism" get_baptism (( = ) Date.cdate_None);
+      baptism = field "baptism" get_baptism (( = ) Geneweb_util.Date.cdate_None);
       baptism_place =
         field "baptism_place"
           (fun p -> sou base (get_baptism_place p))
@@ -261,7 +261,7 @@ let reconstitute conf base p1 p2 =
         merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
       pevents =
         list
-          (Futil.map_pers_event (sorp base) (sou base))
+          (Geneweb_util.Futil.map_pers_event (sorp base) (sou base))
           (fun p -> List.map gen_pevent_of_pers_event (get_pevents p));
       notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
       psources = merge_strings base (get_psources p1) ", " (get_psources p2);
@@ -274,7 +274,7 @@ let reconstitute conf base p1 p2 =
     merge_primary_events
       (fun pe ->
         let pe = gen_pevent_of_pers_event pe in
-        Futil.map_pers_event (sorp base) (sou base) pe)
+        Geneweb_util.Futil.map_pers_event (sorp base) (sou base) pe)
       get_pevents p
   in
   { p with pevents }
@@ -483,12 +483,12 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let osn1 = o_p1.surname in
   let oocc1 = o_p1.occ in
   let pgl1 =
-    Perso.links_to_ind conf base db (Name.lower ofn1, Name.lower osn1, oocc1)
+    Perso.links_to_ind conf base db (Geneweb_util.Name.lower ofn1, Geneweb_util.Name.lower osn1, oocc1)
   in
   let ofn2 = o_p2.first_name in
   let osn2 = o_p2.surname in
   let oocc2 = o_p2.occ in
   let pgl2 =
-    Perso.links_to_ind conf base db (Name.lower ofn2, Name.lower osn2, oocc2)
+    Perso.links_to_ind conf base db (Geneweb_util.Name.lower ofn2, Geneweb_util.Name.lower osn2, oocc2)
   in
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2

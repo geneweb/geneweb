@@ -163,7 +163,7 @@ and dtext_eq =
     (Jg_runtime.jg_obj_lookup d1 "__str__"
     = Jg_runtime.jg_obj_lookup d2 "__str__")
 
-and mk_dmy { Date.day; month; year; delta; prec } =
+and mk_dmy { Geneweb_util.Date.day; month; year; delta; prec } =
   let day = Tint day in
   let month = Tint month in
   let year = Tint year in
@@ -179,7 +179,7 @@ and mk_dmy { Date.day; month; year; delta; prec } =
     | _ -> raise Not_found)
 
 and mk_date = function
-  | Date.Dtext s ->
+  | Geneweb_util.Date.Dtext s ->
       Tpat
         (function
         | "__str__" -> Tstr s
@@ -188,19 +188,19 @@ and mk_date = function
         | "__Dtext__" -> Tbool true
         | _ -> raise Not_found)
   | Dgreg (d, c) ->
-      let year = Tint d.Date.year in
-      let month = Tint d.Date.month in
-      let day = Tint d.Date.day in
-      let prec = to_prec d.Date.prec in
+      let year = Tint d.Geneweb_util.Date.year in
+      let month = Tint d.Geneweb_util.Date.month in
+      let day = Tint d.Geneweb_util.Date.day in
+      let prec = to_prec d.Geneweb_util.Date.prec in
       let d2 =
-        match d.Date.prec with
+        match d.Geneweb_util.Date.prec with
         | OrYear d2 | YearInt d2 ->
             mk_dmy
               {
-                Date.day = d2.Date.day2;
-                month = d2.Date.month2;
-                year = d2.Date.year2;
-                prec = Date.Sure;
+                Geneweb_util.Date.day = d2.Geneweb_util.Date.day2;
+                month = d2.Geneweb_util.Date.month2;
+                year = d2.Geneweb_util.Date.year2;
+                prec = Geneweb_util.Date.Sure;
                 delta = 0;
               }
         | _ -> Tnull
@@ -227,7 +227,7 @@ and mk_date = function
 and to_dmy d =
   let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
   {
-    Date.day = int "day";
+    Geneweb_util.Date.day = int "day";
     month = int "month";
     year = int "year";
     prec = of_prec d;
@@ -237,14 +237,14 @@ and to_dmy d =
 and to_dmy2 d =
   let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
   {
-    Date.day2 = int "day";
+    Geneweb_util.Date.day2 = int "day";
     month2 = int "month";
     year2 = int "year";
     delta2 = 0;
   }
 
 and to_prec = function
-  | Date.Sure -> Tsafe "sure"
+  | Geneweb_util.Date.Sure -> Tsafe "sure"
   | About -> Tsafe "about"
   | Maybe -> Tsafe "maybe"
   | Before -> Tsafe "before"
@@ -254,7 +254,7 @@ and to_prec = function
 
 and of_prec d =
   match Jg_runtime.jg_obj_lookup d "prec" with
-  | Tsafe "sure" -> Date.Sure
+  | Tsafe "sure" -> Geneweb_util.Date.Sure
   | Tsafe "about" -> About
   | Tsafe "maybe" -> Maybe
   | Tsafe "before" -> Before
@@ -267,17 +267,17 @@ and to_gregorian_aux calendar d =
   let d = to_dmy d in
   match calendar with
   | "Dgregorian" -> d
-  | "Djulian" -> Date.convert ~from:Djulian ~to_:Dgregorian d
-  | "Dfrench" -> Date.convert ~from:Dfrench ~to_:Dgregorian d
-  | "Dhebrew" -> Date.convert ~from:Dhebrew ~to_:Dgregorian d
+  | "Djulian" -> Geneweb_util.Date.convert ~from:Djulian ~to_:Dgregorian d
+  | "Dfrench" -> Geneweb_util.Date.convert ~from:Dfrench ~to_:Dgregorian d
+  | "Dhebrew" -> Geneweb_util.Date.convert ~from:Dhebrew ~to_:Dgregorian d
   | _ -> assert false
 
 and of_calendar d =
   match Jg_runtime.jg_obj_lookup d "calendar" with
-  | Tsafe "Dgregorian" -> Date.Dgregorian
-  | Tsafe "Djulian" -> Date.Djulian
-  | Tsafe "Dfrench" -> Date.Dfrench
-  | Tsafe "Dhebrew" -> Date.Dhebrew
+  | Tsafe "Dgregorian" -> Geneweb_util.Date.Dgregorian
+  | Tsafe "Djulian" -> Geneweb_util.Date.Djulian
+  | Tsafe "Dfrench" -> Geneweb_util.Date.Dfrench
+  | Tsafe "Dhebrew" -> Geneweb_util.Date.Dhebrew
   | _ -> assert false
 
 and module_DATE conf =
@@ -299,7 +299,7 @@ and module_DATE conf =
   let death_symbol = Tsafe (DateDisplay.death_symbol conf) in
   let string_of_date_aux fn =
     func_arg1_no_kw @@ fun d ->
-    try safe (Date.Dgreg (to_dmy d, of_calendar d) |> fn conf)
+    try safe (Geneweb_util.Date.Dgreg (to_dmy d, of_calendar d) |> fn conf)
     with e ->
       if Jg_runtime.jg_obj_lookup d "__Dtext__" = Tbool true then
         Jg_runtime.jg_obj_lookup d "__str__"
@@ -318,16 +318,16 @@ and module_DATE conf =
   in
   let sub =
     func_arg2_no_kw (fun d1 d2 ->
-        mk_dmy @@ Date.time_elapsed (to_dmy d2) (to_dmy d1))
+        mk_dmy @@ Geneweb_util.Date.time_elapsed (to_dmy d2) (to_dmy d1))
   in
   let calendar =
     func_arg2_no_kw (fun dst d ->
         let convert fn = mk_dmy @@ fn @@ to_dmy d in
         match unbox_string @@ dst with
         | "Dgregorian" -> convert Fun.id
-        | "Djulian" -> convert (Date.convert ~from:Dgregorian ~to_:Djulian)
-        | "Dfrench" -> convert (Date.convert ~from:Dgregorian ~to_:Dfrench)
-        | "Dhebrew" -> convert (Date.convert ~from:Dgregorian ~to_:Dhebrew)
+        | "Djulian" -> convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian)
+        | "Dfrench" -> convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench)
+        | "Dhebrew" -> convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew)
         | s -> failwith @@ "Unknown calendar: " ^ s)
   in
   Tpat
@@ -512,8 +512,8 @@ and mk_title base t =
     | Tnone -> Tnull
   in
   let place_raw, place = mk_place (Gwdb.sou base t.t_place) in
-  let date_start = mk_opt mk_date (Date.od_of_cdate t.t_date_start) in
-  let date_end = mk_opt mk_date (Date.od_of_cdate t.t_date_end) in
+  let date_start = mk_opt mk_date (Geneweb_util.Date.od_of_cdate t.t_date_start) in
+  let date_end = mk_opt mk_date (Geneweb_util.Date.od_of_cdate t.t_date_end) in
   let nth = Tint t.t_nth in
   Tpat
     (function
@@ -725,8 +725,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         (let db = Gwdb.read_nldb base in
          let db = Notes.merge_possible_aliases conf db in
          let key =
-           let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-           let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+           let fn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
+           let sn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
            (fn, sn, Gwdb.get_occ p)
          in
          if
@@ -1122,7 +1122,7 @@ let module_NAME base =
     | Tsafe _ -> Tsafe s
     | _ -> assert false
   in
-  let get_particle s = Mutil.get_particle (Gwdb.base_particles base) s in
+  let get_particle s = Geneweb_util.Mutil.get_particle (Gwdb.base_particles base) s in
   let particle =
     func_arg1_no_kw (function
       | (Tstr s | Tsafe s) as x -> (
@@ -1144,7 +1144,7 @@ let module_NAME base =
   in
   let lower =
     func_arg1_no_kw (function
-      | (Tstr s | Tsafe s) as x -> str_or_safe (Name.lower s) x
+      | (Tstr s | Tsafe s) as x -> str_or_safe (Geneweb_util.Name.lower s) x
       | _ -> assert false)
   in
   Tpat
@@ -1191,7 +1191,7 @@ let mk_env_no_base conf =
     (function
     | "prefix" -> prefix
     | "prefix_base" -> prefix_base
-    | x -> Tstr (Mutil.decode @@ List.assoc x conf.env))
+    | x -> Tstr (Geneweb_util.Mutil.decode @@ List.assoc x conf.env))
 
 let mk_env conf base =
   let prefix = escaped (Util.commd conf) in
@@ -1226,16 +1226,16 @@ let mk_env conf base =
     | "prefix" -> prefix
     | "prefix_base" -> prefix_base
     | "sosa_ref" -> sosa_ref
-    | x -> Tstr (Mutil.decode @@ List.assoc x conf.env))
+    | x -> Tstr (Geneweb_util.Mutil.decode @@ List.assoc x conf.env))
 
 let decode_varenv =
   func_arg1_no_kw @@ function
-  | Tstr str | Tsafe str -> Tstr (Mutil.decode (Adef.encoded str))
+  | Tstr str | Tsafe str -> Tstr (Geneweb_util.Mutil.decode (Adef.encoded str))
   | x -> Jg_types.failwith_type_error_1 "decode_varenv" x
 
 let encode_varenv =
   func_arg1_no_kw @@ function
-  | Tstr str -> encoded (Mutil.encode str)
+  | Tstr str -> encoded (Geneweb_util.Mutil.encode str)
   | Tsafe str -> safe (Adef.safe str)
   | x -> Jg_types.failwith_type_error_1 "encode_varenv" x
 
@@ -1279,7 +1279,7 @@ let trans ?(autoescape = true) (conf : Config.config) =
                  | x -> esc (Jg_runtime.string_of_tvalue x)
                else Jg_runtime.string_of_tvalue (arg n)
            | Declension (c, n) ->
-               arg n |> Jg_runtime.string_of_tvalue |> Mutil.decline c |> esc
+               arg n |> Jg_runtime.string_of_tvalue |> Geneweb_util.Mutil.decline c |> esc
            | Elision (s1, s2) ->
                let x =
                  try unbox_string @@ arg "elision" with Not_found -> acc
@@ -1329,7 +1329,7 @@ let alphabetic =
     | Tnull -> ""
     | _ -> failwith_type_error_2 "alphabetic" a b
   in
-  Tint (Utf8.compare (str a) (str b))
+  Tint (Geneweb_util.Utf8.compare (str a) (str b))
 
 let module_CAST =
   let string =

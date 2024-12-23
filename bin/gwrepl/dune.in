@@ -18,7 +18,7 @@
 
 (rule
   (target data.cppo.ml)
-  (deps .depend %{lib:geneweb:geneweb.cma} (:maker mk_data.ml))
+  (deps .depend %{lib:geneweb:geneweb.cma} %{lib:geneweb:ancient/gw_ancient.cma} (:maker mk_data.ml))
   (action (with-stdout-to %{target} (run ocaml %{maker})))
 )
 
@@ -31,14 +31,14 @@
 (executable
  (name gwrepl)
  (public_name gwrepl)
- (link_flags -linkall -custom)
- (libraries compiler-libs.toplevel unix)
+ (link_flags -linkall)
+ (libraries compiler-libs.toplevel unix ancient)
  (preprocess
   (per_module
    ((action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})) gwrepl_exe)
    ((pps ppx_blob) data)
   )
  )
- (modes byte object)
+ (modes byte_complete)
  (modules gwrepl data)
 )

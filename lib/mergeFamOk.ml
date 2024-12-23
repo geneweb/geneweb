@@ -59,7 +59,7 @@ let merge_events conf l1 l2 =
   let field x1 x2 null = if null x1 then x2 else x1 in
   let need_selection x1 x2 = x1 <> "" && x2 <> "" && x1 <> x2 in
   let string_event_date e =
-    match Date.od_of_cdate e.efam_date with
+    match Geneweb_util.Date.od_of_cdate e.efam_date with
     | None -> Adef.safe ""
     | Some d -> DateDisplay.string_of_ondate conf d
   in
@@ -87,7 +87,7 @@ let merge_events conf l1 l2 =
                   else if e.efam_name = e1.efam_name && can_merge_event e e1
                   then
                     let date =
-                      field e.efam_date e1.efam_date (( = ) Date.cdate_None)
+                      field e.efam_date e1.efam_date (( = ) Geneweb_util.Date.cdate_None)
                     in
                     let place = field e.efam_place e1.efam_place (( = ) "") in
                     let note =
@@ -115,7 +115,7 @@ let merge_events conf l1 l2 =
                   else if e.efam_name = e1.efam_name && can_merge_event e e1
                   then
                     let date =
-                      field e.efam_date e1.efam_date (( = ) Date.cdate_None)
+                      field e.efam_date e1.efam_date (( = ) Geneweb_util.Date.cdate_None)
                     in
                     let place = field e.efam_place e1.efam_place (( = ) "") in
                     let note =
@@ -169,7 +169,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
   in
   let fam =
     {
-      marriage = field "marriage" get_marriage (( = ) Date.cdate_None);
+      marriage = field "marriage" get_marriage (( = ) Geneweb_util.Date.cdate_None);
       marriage_place =
         field "marriage_place"
           (fun f -> sou base (get_marriage_place f))
@@ -184,7 +184,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
       divorce = field "divorce" get_divorce (( = ) NotDivorced);
       fevents =
         merge_possible_event
-          (Futil.map_fam_event (sorp base) (sou base))
+          (Geneweb_util.Futil.map_fam_event (sorp base) (sou base))
           (fun f -> List.map gen_fevent_of_fam_event (get_fevents f));
       comment = merge_strings base (get_comment fam1) ", " (get_comment fam2);
       origin_file = sou base (get_origin_file fam1);
@@ -214,7 +214,7 @@ let print_merge conf base =
         Update.digest_family ini_sfam
       in
       let scpl =
-        Futil.map_couple_p conf.multi_parents
+        Geneweb_util.Futil.map_couple_p conf.multi_parents
           (UpdateFam.person_key base)
           (gen_couple_of_family (foi base sfam.fam_index))
       in
@@ -223,7 +223,7 @@ let print_merge conf base =
 
 let print_mod_merge_ok conf base wl cpl des =
   let title _ =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "merge done"))
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "merge done"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;

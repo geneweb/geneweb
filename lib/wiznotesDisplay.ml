@@ -47,18 +47,18 @@ let read_wizard_notes ?(limit = true) fname =
             (float_of_string line, 0)
           else
             let s = Unix.stat fname in
-            (s.Unix.st_mtime, Buff.store (Buff.mstore 0 line) '\n')
+            (s.Unix.st_mtime, Geneweb_util.Buff.store (Geneweb_util.Buff.mstore 0 line) '\n')
         with End_of_file | Failure _ -> (0., 0)
       in
       let rec loop len =
         match try Some (input_char ic) with End_of_file -> None with
-        | Some c -> loop (Buff.store len c)
+        | Some c -> loop (Geneweb_util.Buff.store len c)
         | None ->
             close_in ic;
             len
       in
       let len = loop len in
-      ( (if limit then Notes.limit_display_length else Fun.id) @@ Buff.get len,
+      ( (if limit then Notes.limit_display_length else Fun.id) @@ Geneweb_util.Buff.get len,
         date )
 
 let write_wizard_notes fname nn =
@@ -99,7 +99,7 @@ let print_wizards_by_alphabetic_order conf list =
       Output.print_sstring conf {|<a href="|};
       Output.print_string conf (Util.commd conf);
       Output.print_sstring conf "m=WIZNOTES&f=";
-      Output.print_string conf (Mutil.encode wz);
+      Output.print_string conf (Geneweb_util.Mutil.encode wz);
       Output.printf conf "&d=%d-%02d-%02d,%02d:%02d:%02d"
         (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
@@ -126,7 +126,7 @@ let print_wizards_by_date conf list =
       ( (fun tm -> tm.Unix.tm_mon),
         fun (tm : Unix.tm) ->
           let dmy =
-            Date.
+            Geneweb_util.Date.
               {
                 year = tm.tm_year + 1900;
                 month = tm.tm_mon + 1;
@@ -135,9 +135,9 @@ let print_wizards_by_date conf list =
                 delta = 0;
               }
           in
-          Date.Dgreg (dmy, Dgregorian)
-          |> (DateDisplay.string_of_ondate conf :> Date.date -> string)
-          |> Utf8.capitalize_fst |> Output.print_sstring conf );
+          Geneweb_util.Date.Dgreg (dmy, Dgregorian)
+          |> (DateDisplay.string_of_ondate conf :> Geneweb_util.Date.date -> string)
+          |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf );
       ( (fun tm -> tm.Unix.tm_year),
         fun tm ->
           Output.print_sstring conf (string_of_int @@ (tm.Unix.tm_year + 1900))
@@ -182,7 +182,7 @@ let print_wizards_by_date conf list =
            Output.print_sstring conf {|<a href="|};
            Output.print_string conf (Util.commd conf);
            Output.print_sstring conf {|m=WIZNOTES&f=|};
-           Output.print_string conf (Mutil.encode wz);
+           Output.print_string conf (Geneweb_util.Mutil.encode wz);
            Output.print_sstring conf
              (Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d"
                 (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
@@ -201,13 +201,13 @@ let print_old_wizards conf list =
     Output.print_sstring conf (Util.transl_nth conf "and" 0);
     Output.print_sstring conf "...";
     Output.print_sstring conf "<dl><dd>";
-    Ext_list.iter_first
+    Geneweb_util.Ext_list.iter_first
       (fun first wz ->
         if not first then Output.print_sstring conf ", ";
         Output.print_sstring conf {|<a href="|};
         Output.print_string conf (Util.commd conf);
         Output.print_sstring conf {|m=WIZNOTES&f=|};
-        Output.print_string conf (Mutil.encode wz);
+        Output.print_string conf (Geneweb_util.Mutil.encode wz);
         Output.print_sstring conf {|">|};
         for i = 0 to String.length wz - 1 do
           if wz.[i] = ' ' then Output.print_sstring conf "&nbsp;"
@@ -242,7 +242,7 @@ let print_search_form conf from_wiz =
   | Some s -> Output.print_string conf (Util.escape_html s)
   | None -> ());
   Output.print_sstring conf {|">|};
-  if from_wiz <> "" then Util.hidden_input conf "z" (Mutil.encode from_wiz);
+  if from_wiz <> "" then Util.hidden_input conf "z" (Geneweb_util.Mutil.encode from_wiz);
   Output.print_sstring conf
     {|<br><label><input type="checkbox" name="c" value="on"|};
   (match Util.p_getenv conf.Config.env "c" with
@@ -253,7 +253,7 @@ let print_search_form conf from_wiz =
   Output.print_sstring conf {| |};
   Output.print_sstring conf {|</label><input type="submit" value="|};
   Util.transl_nth conf "search/case sensitive" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|"></p></form></td></tr></table>|}
 
 let print_main conf base auth_file =
@@ -262,7 +262,7 @@ let print_main conf base auth_file =
       (Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
   in
   let title _ =
-    Output.print_sstring conf (Utf8.capitalize_fst wiztxt);
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst wiztxt);
     Output.print_sstring conf " - ";
     Output.print_sstring conf
       (Util.translate_eval (Util.transl_nth conf "note/notes" 1))
@@ -272,7 +272,7 @@ let print_main conf base auth_file =
     let list = read_auth_file auth_file in
     if by_alphab_order then
       List.sort
-        (fun (_, (_, (o1, _))) (_, (_, (o2, _))) -> Utf8.alphabetic_order o1 o2)
+        (fun (_, (_, (o1, _))) (_, (_, (o2, _))) -> Geneweb_util.Utf8.alphabetic_order o1 o2)
         list
     else list
   in
@@ -301,7 +301,7 @@ let print_main conf base auth_file =
     Output.print_string conf (Util.safe_html wiztxt);
     Output.print_sstring conf "<br>";
     Output.print_sstring conf {|<em style="font-size:80%">|};
-    Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "click"));
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "click"));
     Output.print_sstring conf " ";
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);
@@ -381,7 +381,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   if Sys.file_exists wfile then (
     let tm = Unix.localtime date in
     let dmy =
-      Date.
+      Geneweb_util.Date.
         {
           day = tm.Unix.tm_mday;
           month = tm.Unix.tm_mon + 1;
@@ -543,7 +543,7 @@ let print_connected_wizard conf first wddir wz tm_user =
     Output.print_sstring conf "<a href=\"";
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=WIZNOTES&f=";
-    Output.print_string conf (Mutil.encode wz);
+    Output.print_string conf (Geneweb_util.Mutil.encode wz);
     Output.print_sstring conf
       (Printf.sprintf "&d=%d-%02d-%02d,%02d:%02d:%02d" (tm.Unix.tm_year + 1900)
          (tm.Unix.tm_mon + 1) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
@@ -554,7 +554,7 @@ let print_connected_wizard conf first wddir wz tm_user =
   Output.print_sstring conf " <a href=\"";
   Output.print_string conf (Util.commd conf);
   Output.print_sstring conf "m=HIST&k=20&wiz=";
-  Output.print_string conf (Mutil.encode wz);
+  Output.print_string conf (Geneweb_util.Mutil.encode wz);
   Output.print_sstring conf {|" style="text-decoration:none">(*)</a>|};
   let d = conf.Config.ctime -. tm_user in
   if d <> 0.0 then (
@@ -567,7 +567,7 @@ let print_connected_wizard conf first wddir wz tm_user =
 let do_connected_wizards conf base (_, _, _, wl) =
   let title _ =
     Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 1
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -696,5 +696,5 @@ let search_text conf base s =
 
 let print_search conf base =
   match try Some (List.assoc "s" conf.Config.env) with Not_found -> None with
-  | Some s -> search_text conf base (Mutil.gen_decode false s)
+  | Some s -> search_text conf base (Geneweb_util.Mutil.gen_decode false s)
   | None -> print conf base

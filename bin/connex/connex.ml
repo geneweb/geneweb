@@ -261,9 +261,9 @@ let speclist =
 let main () =
   Arg.parse speclist (fun s -> bname := s) usage;
   if !ask_for_delete > 0 then
-    Lock.control (Files.lock_file !bname) false
+    Geneweb_util.Lock.control (Files.lock_file !bname) false
       (fun () -> move (Gwdb.open_base !bname) !bname)
-      ~onerror:Lock.print_try_again
+      ~onerror:Geneweb_util.Lock.print_try_again
   else move (Gwdb.open_base !bname) !bname
 
 let _ = main ()

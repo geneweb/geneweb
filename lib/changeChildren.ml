@@ -16,7 +16,7 @@ let digest_children base ipl =
       ^ string_of_int (get_occ p)
       ^ "\n")
     "" ipl
-  |> Ext_string.digest
+  |> Geneweb_util.Ext_string.digest
 
 let check_digest conf digest =
   match p_getenv conf.env "digest" with
@@ -27,13 +27,13 @@ exception ChangeChildrenConflict of person * person
 exception FirstNameMissing of iper
 
 let check_conflict base p key new_occ ipl =
-  let name = Name.lower key in
+  let name = Geneweb_util.Name.lower key in
   List.iter
     (fun ip ->
       let p1 = poi base ip in
       if
         get_iper p1 <> get_iper p
-        && Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) = name
+        && Geneweb_util.Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) = name
         && get_occ p1 = new_occ
       then raise @@ ChangeChildrenConflict (p, p1))
     ipl
@@ -43,13 +43,13 @@ let change_child conf base parent_surname changed ip =
   let var = "c" ^ string_of_iper (get_iper p) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
-    | Some x -> Ext_string.only_printable x
+    | Some x -> Geneweb_util.Ext_string.only_printable x
     | _ -> p_first_name base p
   in
   let new_surname =
     match p_getenv conf.env (var ^ "_surname") with
     | Some x ->
-        let x = Ext_string.only_printable x in
+        let x = Geneweb_util.Ext_string.only_printable x in
         if x = "" then parent_surname else x
     | _ -> p_surname base p
   in

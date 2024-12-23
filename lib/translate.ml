@@ -1,7 +1,7 @@
 (* $Id: translate.ml,v 5.9 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Buff = Buff.Make ()
+module Buff = Geneweb_util.Buff.Make ()
 
 let skip_lang s =
   let rec loop i =

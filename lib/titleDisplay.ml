@@ -4,7 +4,7 @@ open Gwdb
 open Util
 open Title
 
-let my_alphabetic n1 n2 = compare (Name.lower n1) (Name.lower n2)
+let my_alphabetic n1 n2 = compare (Geneweb_util.Name.lower n1) (Geneweb_util.Name.lower n2)
 
 let string_cnt_list_uniq l =
   let l =
@@ -21,8 +21,8 @@ let string_cnt_list_uniq l =
 let compare_titles2 (t1, _) (t2, _) = my_alphabetic t1 t2
 
 let give_access_someone conf base (x, t) list =
-  let t_date_start = Date.cdate_to_dmy_opt t.t_date_start in
-  let t_date_end = Date.cdate_to_dmy_opt t.t_date_end in
+  let t_date_start = Geneweb_util.Date.cdate_to_dmy_opt t.t_date_start in
+  let t_date_end = Geneweb_util.Date.cdate_to_dmy_opt t.t_date_end in
   let has_dates =
     match (t_date_start, t_date_end) with
     | Some _d, _ | _, Some _d -> true
@@ -87,17 +87,17 @@ let give_access_title_aux conf xhref content =
 
 let give_access_title conf t p =
   give_access_title_aux conf
-    ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p)
-    (escape_html @@ Utf8.capitalize_fst t)
+    ("&t=" ^<^ Geneweb_util.Mutil.encode t ^^^ "&p=" ^<^ Geneweb_util.Mutil.encode p)
+    (escape_html @@ Geneweb_util.Utf8.capitalize_fst t)
 
 let give_access_all_titles conf t absolute =
   give_access_title_aux conf
-    ("&t=" ^<^ Mutil.encode t ^>^ if absolute then "&a=A" else "")
-    (escape_html @@ if absolute then t else Utf8.capitalize_fst t)
+    ("&t=" ^<^ Geneweb_util.Mutil.encode t ^>^ if absolute then "&a=A" else "")
+    (escape_html @@ if absolute then t else Geneweb_util.Utf8.capitalize_fst t)
 
 let give_access_all_places conf t =
   give_access_title_aux conf
-    ("&p=" ^<^ Mutil.encode t)
+    ("&p=" ^<^ Geneweb_util.Mutil.encode t)
     ("... " ^<^ escape_html t)
 
 let propose_tree_for_list list conf =
@@ -127,7 +127,7 @@ let propose_tree_for_list list conf =
              i + 1)
            1 list;
       Output.print_sstring conf {|&lim=6">|};
-      Output.print_sstring conf (Utf8.capitalize_fst (transl conf "tree"));
+      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "tree"));
       Output.print_sstring conf {|</a></p>|}
   | _ -> ()
 
@@ -140,16 +140,16 @@ let print_title_place_list conf base t p t_equiv list =
         Output.print_sstring conf " ";
         Output.print_string conf (escape_html p)))
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first t ->
           if not first then Output.print_sstring conf ", ";
           give_access_title_aux conf
-            ("&a=A&t=" ^<^ Mutil.encode t)
+            ("&a=A&t=" ^<^ Geneweb_util.Mutil.encode t)
             (escape_html t);
           if p <> "" then (
             Output.print_sstring conf " ";
             give_access_title_aux conf
-              ("&a=A&p=" ^<^ Mutil.encode p)
+              ("&a=A&p=" ^<^ Geneweb_util.Mutil.encode p)
               (escape_html p)))
         t_equiv
   in
@@ -208,20 +208,20 @@ let print_places_list conf base t t_equiv list =
     if h || List.length t_equiv = 1 then
       Output.print_string conf (escape_html t)
     else
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first t ->
           Output.print_sstring conf (if first then "" else ", ");
           give_access_all_titles conf t true)
         t_equiv
   in
   let order s =
-    Utf8.capitalize_fst (Name.lower (surname_without_particle base s))
+    Geneweb_util.Utf8.capitalize_fst (Geneweb_util.Name.lower (surname_without_particle base s))
   in
   let list = List.sort (fun s1 s2 -> compare (order s1) (order s2)) list in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
     give_access_title_aux conf
-      ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p
+      ("&t=" ^<^ Geneweb_util.Mutil.encode t ^^^ "&p=" ^<^ Geneweb_util.Mutil.encode p
       ^>^ if absolute then "&a=A" else "")
       (if p = "" then Adef.safe "..."
       else
@@ -260,23 +260,23 @@ let print_titles conf base p =
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=TT&sm=A&p=";
-    Output.print_string conf (Mutil.encode p);
+    Output.print_string conf (Geneweb_util.Mutil.encode p);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "the whole list"));
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "the whole list"));
     Output.print_sstring conf "</a>");
   Hutil.trailer conf
 
 let print_all_titles conf base =
   let title _ =
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "all the titles"))
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "all the titles"))
   in
   let list =
     let l = select_all_titles conf base in
     string_cnt_list_uniq (List.sort compare_titles2 l)
   in
-  let order (s, _) = Utf8.capitalize_fst (Name.lower s) in
+  let order (s, _) = Geneweb_util.Utf8.capitalize_fst (Geneweb_util.Name.lower s) in
   let wprint_elem (t, cnt) =
     give_access_all_titles conf t false;
     Output.printf conf " (%d)" cnt
@@ -288,7 +288,7 @@ let print_all_titles conf base =
 let print_all_places conf base =
   let title _ =
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "all the estates"))
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "all the estates"))
   in
   let list =
     let l = select_all_places conf base in

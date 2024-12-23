@@ -5,22 +5,22 @@ let empty_sn_or_fn base p =
   || Gwdb.is_quest_string (Gwdb.get_surname p)
   || Gwdb.is_empty_string (Gwdb.get_first_name p)
   || Gwdb.is_quest_string (Gwdb.get_first_name p)
-  || Name.lower (Gwdb.sou base (Gwdb.get_surname p)) = ""
-  || Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) = ""
+  || Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) = ""
+  || Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) = ""
 
 let person_is_misc_name conf base p k =
-  let k = Name.strip_lower k in
+  let k = Geneweb_util.Name.strip_lower k in
   if
     List.exists
-      (fun n -> Name.strip n = k)
+      (fun n -> Geneweb_util.Name.strip n = k)
       (Gwdb.person_misc_names base p (Util.nobtit conf base))
   then true
   else false
 
 let person_is_approx_key base p k =
-  let k = Name.strip_lower k in
-  let fn = Name.strip_lower (Gwdb.p_first_name base p) in
-  let sn = Name.strip_lower (Gwdb.p_surname base p) in
+  let k = Geneweb_util.Name.strip_lower k in
+  let fn = Geneweb_util.Name.strip_lower (Gwdb.p_first_name base p) in
+  let sn = Geneweb_util.Name.strip_lower (Gwdb.p_surname base p) in
   if k = fn ^ sn && fn <> "" && sn <> "" then true else false
 
 let select_approx_key conf base pl k =
@@ -53,7 +53,7 @@ let search_reject_p conf base p =
   || (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
 
 let search_by_name conf base n =
-  let n1 = Name.abbrev (Name.lower n) in
+  let n1 = Geneweb_util.Name.abbrev (Geneweb_util.Name.lower n) in
   match String.index_opt n1 ' ' with
   | Some i ->
       let fn = String.sub n1 0 i in
@@ -72,10 +72,10 @@ let search_by_name conf base n =
               if search_reject_p conf base p then pl
               else
                 let fn1 =
-                  Name.abbrev
-                    (Name.lower (Gwdb.sou base (Gwdb.get_first_name p)))
+                  Geneweb_util.Name.abbrev
+                    (Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)))
                 in
-                if List.mem fn (Ext_string.cut_words fn1) then p :: pl else pl)
+                if List.mem fn (Geneweb_util.Ext_string.cut_words fn1) then p :: pl else pl)
             pl ipl)
         [] list
   | None -> []

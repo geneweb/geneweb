@@ -89,7 +89,7 @@ type config = {
   auth_file : string;
   border : int;
   mutable n_connect : (int * int * int * (string * float) list) option;
-  today : Date.dmy;
+  today : Geneweb_util.Date.dmy;
   today_wd : int;
   time : int * int * int;
   ctime : float;
@@ -165,7 +165,7 @@ let empty =
     auth_file = "";
     border = 0;
     n_connect = None;
-    today = { Date.day = 0; month = 0; year = 0; delta = 0; prec = Date.Sure };
+    today = { Geneweb_util.Date.day = 0; month = 0; year = 0; delta = 0; prec = Geneweb_util.Date.Sure };
     today_wd = 0;
     time = (0, 0, 0);
     ctime = 0.;

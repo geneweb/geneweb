@@ -24,8 +24,8 @@ let w_base =
       Hutil.incorrect_request conf;
       true)
 
-let getenv var env = List.assoc var env |> Mutil.decode
-let getenv_opt var env = List.assoc_opt var env |> Option.map Mutil.decode
+let getenv var env = List.assoc var env |> Geneweb_util.Mutil.decode
+let getenv_opt var env = List.assoc_opt var env |> Option.map Geneweb_util.Mutil.decode
 
 let export conf base =
   assert conf.wizard;
@@ -37,7 +37,7 @@ let export conf base =
   with
   | None -> false
   | Some output ->
-      Mutil.verbose := false;
+      Geneweb_util.Mutil.verbose := false;
       let find_iper i =
         getenv ("i" ^ string_of_int i) conf.env |> Gwdb.iper_of_string
       in

@@ -109,8 +109,8 @@ let print_p_messages base1 base2 iper1 iper2 res =
 (** [compatible_names src_name dest_name_list]
     Returns true if `src_name` is in `dest_name_list` (case insensitive) *)
 let compatible_names src_name dest_name_list =
-  let src_name = Name.lower src_name in
-  let dest_name_list = List.map Name.lower dest_name_list in
+  let src_name = Geneweb_util.Name.lower src_name in
+  let dest_name_list = List.map Geneweb_util.Name.lower dest_name_list in
   List.mem src_name dest_name_list
 
 (** [compatible_str_field istr1 istr2]
@@ -126,13 +126,13 @@ let compatible_str_field istr1 istr2 =
     upper bound. *)
 let dmy_to_sdn_range_l dmy =
   let sdn_of_dmy dmy =
-    let sdn = Date.to_sdn ~from:Dgregorian dmy in
+    let sdn = Geneweb_util.Date.to_sdn ~from:Dgregorian dmy in
     let sdn = if dmy.month = 0 || dmy.day = 0 then sdn + 1 else sdn in
     let sdn2 =
       if dmy.delta != 0 then sdn + dmy.delta
       else
         let dmy2 =
-          Date.
+          Geneweb_util.Date.
             {
               year =
                 (if dmy.month = 0 || (dmy.month = 12 && dmy.day = 0) then
@@ -148,13 +148,13 @@ let dmy_to_sdn_range_l dmy =
               delta = dmy.delta;
             }
         in
-        let sdn2 = Date.to_sdn ~from:Dgregorian dmy2 in
+        let sdn2 = Geneweb_util.Date.to_sdn ~from:Dgregorian dmy2 in
         if dmy2.prec = Before then sdn2 - 1 else sdn2
     in
     (sdn, sdn2)
   in
   (* S: calls to sdn_of_dmy dmy can be factorized *)
-  match dmy.Date.prec with
+  match dmy.Geneweb_util.Date.prec with
   | Sure ->
       let sdn1, sdn2 = sdn_of_dmy dmy in
       [ (Some sdn1, Some sdn2) ]
@@ -173,11 +173,11 @@ let dmy_to_sdn_range_l dmy =
       [ (Some sdn1, None) ]
   | OrYear dmy2 ->
       let sdn11, sdn12 = sdn_of_dmy dmy in
-      let sdn21, sdn22 = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
+      let sdn21, sdn22 = sdn_of_dmy (Geneweb_util.Date.dmy_of_dmy2 dmy2) in
       [ (Some sdn11, Some sdn12); (Some sdn21, Some sdn22) ]
   | YearInt dmy2 ->
       let sdn11, _sdn12 = sdn_of_dmy dmy in
-      let _sdn21, sdn22 = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
+      let _sdn21, sdn22 = sdn_of_dmy (Geneweb_util.Date.dmy_of_dmy2 dmy2) in
       [ (Some sdn11, Some sdn22) ]
 
 (** [compatible_sdn i1 i2]
@@ -225,21 +225,21 @@ let compatible_dmys dmy1 dmy2 =
 let compatible_dates date1 date2 =
   let compatible_cals cal1 cal2 =
     match (cal1, cal2) with
-    | Date.Dgregorian, Date.Djulian | Dgregorian, Dfrench -> true
+    | Geneweb_util.Date.Dgregorian, Geneweb_util.Date.Djulian | Dgregorian, Dfrench -> true
     | _ -> cal1 = cal2
   in
   if date1 = date2 then true
   else
     match (date1, date2) with
-    | Date.Dgreg (dmy1, cal1), Date.Dgreg (dmy2, cal2) ->
+    | Geneweb_util.Date.Dgreg (dmy1, cal1), Geneweb_util.Date.Dgreg (dmy2, cal2) ->
         compatible_dmys dmy1 dmy2 && compatible_cals cal1 cal2
     | Dgreg (_, _), Dtext _ -> false
     | Dtext _, _ -> true
 
 (** Same than before, but for Adef.ctype. *)
 let compatible_cdates cdate1 cdate2 =
-  let od1 = Date.od_of_cdate cdate1 in
-  let od2 = Date.od_of_cdate cdate2 in
+  let od1 = Geneweb_util.Date.od_of_cdate cdate1 in
+  let od2 = Geneweb_util.Date.od_of_cdate cdate2 in
   match (od1, od2) with
   | Some date1, Some date2 -> compatible_dates date1 date2
   | Some _, None -> false
@@ -253,7 +253,7 @@ let compatible_cdates cdate1 cdate2 =
     If birth place are not compatible, the returned list will have MsgBirthPlace *)
 let compatible_birth p1 p2 =
   let get_birth person =
-    if person.birth = Date.cdate_None then person.baptism else person.birth
+    if person.birth = Geneweb_util.Date.cdate_None then person.baptism else person.birth
   in
   let birth1 = get_birth p1 in
   let birth2 = get_birth p2 in
@@ -272,8 +272,8 @@ let compatible_death p1 p2 =
     ||
     match (p1.death, p2.death) with
     | Death (_, cdate1), Death (_, cdate2) ->
-        let date1 = Date.date_of_cdate cdate1 in
-        let date2 = Date.date_of_cdate cdate2 in
+        let date1 = Geneweb_util.Date.date_of_cdate cdate1 in
+        let date2 = Geneweb_util.Date.date_of_cdate cdate2 in
         compatible_dates date1 date2
     | NotDead, _
     | DeadYoung, Death (_, _)

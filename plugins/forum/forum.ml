@@ -6,7 +6,7 @@ open Util
 
 type message = {
   m_time : string;
-  m_date : Date.date;
+  m_date : Geneweb_util.Date.date;
   m_hour : string;
   m_waiting : bool;
   m_from : string;
@@ -223,7 +223,7 @@ let get_var ic lab s =
     (String.sub s start (String.length s - start), MF.input_line ic)
   else ("", s)
 
-let size_of_char s i = Utf8.nbc s.[i]
+let size_of_char s i = Geneweb_util.Utf8.nbc s.[i]
 
 let string_length s i =
   let rec loop i =
@@ -238,16 +238,16 @@ let sp2nbsp lim s =
   let trunc_signature = "..." in
   let signature_length = string_length trunc_signature 0 in
   let rec loop i len lim =
-    if i >= String.length s || s.[i] = '\n' then Buff.get len
+    if i >= String.length s || s.[i] = '\n' then Geneweb_util.Buff.get len
     else if lim <= 0 && string_length s i > signature_length then
-      Buff.get len ^ trunc_signature
+      Geneweb_util.Buff.get len ^ trunc_signature
     else
       let size = size_of_char s i in
       let len =
         match s.[i] with
-        | ' ' -> Buff.mstore len "&nbsp;"
-        | '&' -> Buff.mstore len "&amp;"
-        | _ -> Buff.mstore len (String.sub s i size)
+        | ' ' -> Geneweb_util.Buff.mstore len "&nbsp;"
+        | '&' -> Geneweb_util.Buff.mstore len "&amp;"
+        | _ -> Geneweb_util.Buff.mstore len (String.sub s i size)
       in
       loop (i + size) len (lim - 1)
   in
@@ -274,7 +274,7 @@ let read_message conf ic =
         let y = int_of_string (String.sub date 0 4) in
         let m = int_of_string (String.sub date 5 2) in
         let d = int_of_string (String.sub date 8 2) in
-        Date.Dgreg
+        Geneweb_util.Date.Dgreg
           ({ year = y; month = m; day = d; prec = Sure; delta = 0 }, Dgregorian)
       with Failure _ | Invalid_argument _ -> Dtext date
     in
@@ -292,9 +292,9 @@ let read_message conf ic =
       let rec get_mess len s =
         if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
           let s = String.sub s 2 (String.length s - 2) in
-          let len = if len = 0 then len else Buff.store len '\n' in
-          get_mess (Buff.mstore len s) (MF.input_line ic)
-        else Buff.get len
+          let len = if len = 0 then len else Geneweb_util.Buff.store len '\n' in
+          get_mess (Geneweb_util.Buff.mstore len s) (MF.input_line ic)
+        else Geneweb_util.Buff.get len
       in
       get_mess 0 s
     in
@@ -402,8 +402,8 @@ let get conf key =
   | None -> failwith (key ^ " unbound")
 
 let get1 conf key =
-  Ext_string.only_printable_or_nl
-    (Ext_string.strip_all_trailing_spaces (get conf key))
+  Geneweb_util.Ext_string.only_printable_or_nl
+    (Geneweb_util.Ext_string.strip_all_trailing_spaces (get conf key))
 
 let forum_add conf _base moderated mess =
   let access =

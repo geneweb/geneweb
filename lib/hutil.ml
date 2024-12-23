@@ -5,7 +5,7 @@ open Def
 
 let link_to_referer conf =
   let referer = Util.get_referer conf in
-  let back = Utf8.capitalize_fst (Util.transl conf "back") in
+  let back = Geneweb_util.Utf8.capitalize_fst (Util.transl conf "back") in
   if (referer :> string) <> "" then
     ({|<a href="|} ^<^ referer
      ^>^ {|"><span class="fa fa-arrow-left fa-lg" title="|} ^ back
@@ -138,7 +138,7 @@ let eval_julian_day conf =
   let getint v = match Util.p_getint conf.env v with Some x -> x | _ -> 0 in
   List.fold_left
     (fun d (var, cal, max_month) ->
-      let conv d = Date.to_sdn ~from:cal d in
+      let conv d = Geneweb_util.Date.to_sdn ~from:cal d in
       let yy =
         match Util.p_getenv conf.env ("y" ^ var) with
         | Some v -> (
@@ -153,7 +153,7 @@ let eval_julian_day conf =
       let mm = getint ("m" ^ var) in
       let dd = getint ("d" ^ var) in
       let dt =
-        Date.{ day = dd; month = mm; year = yy; prec = Sure; delta = 0 }
+        Geneweb_util.Date.{ day = dd; month = mm; year = yy; prec = Sure; delta = 0 }
       in
       match Util.p_getenv conf.env ("t" ^ var) with
       | Some _ -> conv dt
@@ -187,7 +187,7 @@ let eval_julian_day conf =
           | _, _, _, _, Some _, _ -> conv { dt with day = dd - 1 }
           | _, _, _, _, _, Some _ -> conv { dt with day = dd + 1 }
           | _ -> d))
-    (Date.to_sdn ~from:Dgregorian conf.today)
+    (Geneweb_util.Date.to_sdn ~from:Dgregorian conf.today)
     [
       ("g", Dgregorian, 12);
       ("j", Djulian, 12);
@@ -212,7 +212,7 @@ let eval_var conf env jd _loc =
       | _ -> raise Not_found)
   | "date" :: sl -> TemplDate.eval_date_var conf jd sl
   | "today" :: sl ->
-      TemplDate.eval_date_var conf (Date.to_sdn ~from:Dgregorian conf.today) sl
+      TemplDate.eval_date_var conf (Geneweb_util.Date.to_sdn ~from:Dgregorian conf.today) sl
   | _ -> raise Not_found
 
 let print_foreach print_ast eval_expr =

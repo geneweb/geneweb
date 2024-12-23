@@ -40,6 +40,6 @@ val search_first_name :
   Config.config ->
   Gwdb.base ->
   string ->
-  (string * (Ext_string.Set.t * Gwdb.iper list)) list
+  (string * (Geneweb_util.Ext_string.Set.t * Gwdb.iper list)) list
 
 val search_first_name_print : Config.config -> Gwdb.base -> string -> unit

@@ -22,10 +22,10 @@ let translate_in_your_tree conf nb =
   let result =
     if ini = "" then Printf.sprintf "%d %s" nb iyt
     else
-      let ini = Mutil.decode (Adef.encoded ini) in
+      let ini = Geneweb_util.Mutil.decode (Adef.encoded ini) in
       Printf.sprintf (Util.ftransl conf "%d %s starting with %s") nb iyt ini
   in
-  Utf8.capitalize_fst result
+  Geneweb_util.Utf8.capitalize_fst result
 
 let print_mod_ok conf base =
   let ini_of_update_data ini new_input =
@@ -37,7 +37,7 @@ let print_mod_ok conf base =
   let data = Option.value ~default:"" (Util.p_getenv conf.Config.env "data") in
   let ini = Option.value ~default:"" (Util.p_getenv conf.env "s") in
   let new_input =
-    Option.fold ~none:"" ~some:Ext_string.only_printable
+    Option.fold ~none:"" ~some:Geneweb_util.Ext_string.only_printable
       (Util.p_getenv conf.env "nx_input")
   in
   let new_istr_s = Gwdb.string_of_istr (Gwdb.insert_string base new_input) in
@@ -62,13 +62,13 @@ let print_mod_ok conf base =
     UpdateData.update_person_list conf base new_input list nb_pers max_updates;
     let title _ =
       Util.transl conf "modification successful"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
     in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf "<p>";
     Util.transl conf "modification successful"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf " ";
     Output.print_sstring conf (min nb_pers max_updates |> string_of_int);
@@ -97,47 +97,47 @@ let print_mod_ok conf base =
       Util.hidden_env conf;
       Util.hidden_input conf "key" (List.assoc "key" conf.env);
       Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
-      Util.hidden_input conf "data" (Mutil.encode data);
-      Util.hidden_input conf "s" (Mutil.encode ini);
+      Util.hidden_input conf "data" (Geneweb_util.Mutil.encode data);
+      Util.hidden_input conf "s" (Geneweb_util.Mutil.encode ini);
       Output.print_sstring conf
         {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
       Output.print_string conf
-        (Util.escape_html (Ext_string.only_printable new_input));
+        (Util.escape_html (Geneweb_util.Ext_string.only_printable new_input));
       Output.print_sstring conf {|" id="data">|};
       Output.print_sstring conf (Util.transl conf "continue correcting");
       Output.print_sstring conf " ";
       Output.print_sstring conf
         {|<button type="submit" class="btn btn-secondary btn-lg">|};
       Output.print_sstring conf
-        (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
+        (Geneweb_util.Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>");
     Output.print_sstring conf {|<p><a href="|};
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=MOD_DATA&data=|};
-    Output.print_string conf (Mutil.encode data);
+    Output.print_string conf (Geneweb_util.Mutil.encode data);
     Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode new_ini);
+    Output.print_string conf (Geneweb_util.Mutil.encode new_ini);
     Output.print_sstring conf ("#entry_anchor_" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
-      (Utf8.capitalize_fst (Util.transl conf "new modification"));
+      (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "new modification"));
     Output.print_sstring conf {|</a></p>|};
     Hutil.trailer conf)
   else (
     Hutil.header conf (fun _ ->
         Util.transl conf "no modification"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf);
+        |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf);
     Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf {|<p><a href="|};
     Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=MOD_DATA&data=|};
-    Output.print_string conf (Mutil.encode data);
+    Output.print_string conf (Geneweb_util.Mutil.encode data);
     Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_string conf (Geneweb_util.Mutil.encode ini);
     Output.print_sstring conf ("#entry_anchor_" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
-      (Utf8.capitalize_fst (Util.transl conf "new modification"));
+      (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "new modification"));
     Output.print_sstring conf {|</a></p>|};
     Hutil.trailer conf)
 
@@ -189,13 +189,13 @@ and eval_simple_str_var conf _base env _xx = function
       let result =
         if ini = "" then Printf.sprintf " (%d %s)" len title
         else
-          let ini = Adef.as_string @@ Mutil.encode ini in
+          let ini = Adef.as_string @@ Geneweb_util.Mutil.encode ini in
           " - "
           ^ Printf.sprintf
               (Util.ftransl conf "%d %s starting with %s")
               len title ini
       in
-      Utf8.capitalize_fst book_of ^ result
+      Geneweb_util.Utf8.capitalize_fst book_of ^ result
   | "results_in_your_tree" ->
       let nb =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
@@ -207,11 +207,11 @@ and eval_compound_var conf base env xx sl =
   let rec loop = function
     | [ s ] -> eval_simple_str_var conf base env xx s
     | [ "evar"; s ] -> Option.value ~default:"" (Util.p_getenv conf.env s)
-    | "encode" :: sl -> (Mutil.encode (loop sl) :> string) (* FIXME? *)
+    | "encode" :: sl -> (Geneweb_util.Mutil.encode (loop sl) :> string) (* FIXME? *)
     | ("escape" | "html_encode") :: sl ->
         (Util.escape_html (loop sl) :> string) (* FIXME? *)
     | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
-    | "printable" :: sl -> Ext_string.only_printable (loop sl)
+    | "printable" :: sl -> Geneweb_util.Ext_string.only_printable (loop sl)
     | _ -> raise Not_found
   in
   str_val (loop sl)
@@ -251,8 +251,8 @@ let print_foreach ~ignore_case conf print_ast _eval_expr =
             (fun (_, s1) (_, s2) ->
               let rss1 = Place.without_suburb s1 in
               let rss2 = Place.without_suburb s2 in
-              if rss1 = rss2 then Utf8.alphabetic_order s1 s2
-              else Utf8.alphabetic_order rss1 rss2)
+              if rss1 = rss2 then Geneweb_util.Utf8.alphabetic_order s1 s2
+              else Geneweb_util.Utf8.alphabetic_order rss1 rss2)
             l
       | _ -> []
     in

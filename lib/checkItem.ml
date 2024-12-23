@@ -31,42 +31,42 @@ let max_siblings_gap = 50
 
 (* Check if d1 < d2 *)
 let strictly_before_dmy d1 d2 =
-  match Date.compare_dmy_strict d1 d2 with Some x -> x < 0 | None -> false
+  match Geneweb_util.Date.compare_dmy_strict d1 d2 with Some x -> x < 0 | None -> false
 
 let strictly_before d1 d2 =
   match (d1, d2) with
-  | Date.Dgreg (d1, _), Date.Dgreg (d2, _) -> strictly_before_dmy d1 d2
+  | Geneweb_util.Date.Dgreg (d1, _), Geneweb_util.Date.Dgreg (d2, _) -> strictly_before_dmy d1 d2
   | _ -> false
 
 let strictly_after_dmy d1 d2 =
-  match Date.compare_dmy_strict d1 d2 with Some x -> x > 0 | None -> false
+  match Geneweb_util.Date.compare_dmy_strict d1 d2 with Some x -> x > 0 | None -> false
 
 let strictly_after d1 d2 =
   match (d1, d2) with
-  | Date.Dgreg (d1, _), Date.Dgreg (d2, _) -> strictly_after_dmy d1 d2
+  | Geneweb_util.Date.Dgreg (d1, _), Geneweb_util.Date.Dgreg (d2, _) -> strictly_after_dmy d1 d2
   | _ -> false
 
 let strictly_younger age year =
-  match age.Date.prec with
+  match age.Geneweb_util.Date.prec with
   | After -> false
   | Sure | About | Maybe | Before | OrYear _ | YearInt _ -> age.year < year
 
 let strictly_older age year =
-  match age.Date.prec with
+  match age.Geneweb_util.Date.prec with
   | Before -> false
   | Sure | About | Maybe | After | OrYear _ | YearInt _ -> age.year > year
 
-let obirth x = get_birth x |> Date.cdate_to_dmy_opt
+let obirth x = get_birth x |> Geneweb_util.Date.cdate_to_dmy_opt
 
 let title_dates warning p t =
-  let t_date_start = Date.od_of_cdate t.t_date_start in
-  let t_date_end = Date.od_of_cdate t.t_date_end in
+  let t_date_start = Geneweb_util.Date.od_of_cdate t.t_date_start in
+  let t_date_end = Geneweb_util.Date.od_of_cdate t.t_date_end in
   match (t_date_start, t_date_end) with
   | None, None -> ()
   | Some d1, Some d2 when strictly_after d1 d2 ->
       warning (Warning.TitleDatesError (p, t))
   | _ -> (
-      match Date.od_of_cdate (get_birth p) with
+      match Geneweb_util.Date.od_of_cdate (get_birth p) with
       | None -> ()
       | Some d1 -> (
           match t_date_start with
@@ -80,10 +80,10 @@ let title_dates warning p t =
 
 let check_person_age warning p =
   let aux d1 d2 =
-    Date.time_elapsed_opt d1 d2
+    Geneweb_util.Date.time_elapsed_opt d1 d2
     |> Option.iter @@ fun a ->
-       if a.Date.year < 0 then warning (Warning.BirthAfterDeath p)
-       else if d2.Date.year > lim_date_death then (
+       if a.Geneweb_util.Date.year < 0 then warning (Warning.BirthAfterDeath p)
+       else if d2.Geneweb_util.Date.year > lim_date_death then (
          if strictly_older a max_death_after_lim_date_death then
            warning (DeadOld (p, a)))
        else if strictly_older a max_death_before_lim_date_death then
@@ -92,13 +92,13 @@ let check_person_age warning p =
   (* On pourrait faire un calcul sur la descendance ou l'ascendance si  *)
   (* on ne trouve rien ... mais c'est peut être un peu trop gourmand    *)
   (* juste pour un warning ?                                            *)
-  match Date.dmy_of_death (get_death p) with
+  match Geneweb_util.Date.dmy_of_death (get_death p) with
   | None -> ()
   | Some d2 -> (
-      match Date.cdate_to_dmy_opt (get_birth p) with
+      match Geneweb_util.Date.cdate_to_dmy_opt (get_birth p) with
       | Some d -> aux d d2
       | None -> (
-          match Date.cdate_to_dmy_opt (get_baptism p) with
+          match Geneweb_util.Date.cdate_to_dmy_opt (get_baptism p) with
           | Some d -> aux d d2
           | None -> ()))
 
@@ -200,9 +200,9 @@ let related_sex_is_coherent base warning p_ref =
 
 let check_difference_age_between_cpl warning fath moth =
   let find_date p =
-    match Date.cdate_to_dmy_opt (get_birth p) with
+    match Geneweb_util.Date.cdate_to_dmy_opt (get_birth p) with
     | Some d -> Some d
-    | None -> Date.cdate_to_dmy_opt (get_baptism p)
+    | None -> Geneweb_util.Date.cdate_to_dmy_opt (get_baptism p)
   in
   match find_date fath with
   | None -> ()
@@ -210,8 +210,8 @@ let check_difference_age_between_cpl warning fath moth =
       match find_date moth with
       | None -> ()
       | Some d2 ->
-          (if d1.year < d2.year then Date.time_elapsed_opt d1 d2
-          else Date.time_elapsed_opt d2 d1)
+          (if d1.year < d2.year then Geneweb_util.Date.time_elapsed_opt d1 d2
+          else Geneweb_util.Date.time_elapsed_opt d2 d1)
           |> Option.iter @@ fun a ->
              if strictly_older a max_age_btw_cpl then
                warning (Warning.BigAgeBetweenSpouses (fath, moth, a)))
@@ -234,9 +234,9 @@ let semi_sort base a before comp di =
     else
       let p1 = poi base a.(i) in
       let d1 =
-        match Date.od_of_cdate (get_birth p1) with
+        match Geneweb_util.Date.od_of_cdate (get_birth p1) with
         | Some d1 -> Some d1
-        | None -> Date.od_of_cdate (get_baptism p1)
+        | None -> Geneweb_util.Date.od_of_cdate (get_baptism p1)
       in
       match d1 with
       | Some d1 ->
@@ -245,9 +245,9 @@ let semi_sort base a before comp di =
             else
               let p2 = poi base a.(j) in
               let d2 =
-                match Date.od_of_cdate (get_birth p2) with
+                match Geneweb_util.Date.od_of_cdate (get_birth p2) with
                 | Some d2 -> Some d2
-                | None -> Date.od_of_cdate (get_baptism p2)
+                | None -> Geneweb_util.Date.od_of_cdate (get_baptism p2)
               in
               match d2 with
               | Some d2 ->
@@ -268,9 +268,9 @@ let semi_sort base a before comp di =
                             else
                               let p3 = poi base a.(k) in
                               let d3 =
-                                match Date.od_of_cdate (get_birth p3) with
+                                match Geneweb_util.Date.od_of_cdate (get_birth p3) with
                                 | Some d3 -> Some d3
-                                | None -> Date.od_of_cdate (get_baptism p3)
+                                | None -> Geneweb_util.Date.od_of_cdate (get_baptism p3)
                               in
                               match d3 with
                               | Some d3 ->
@@ -325,14 +325,14 @@ let changed_marriages_order base warning p =
       (fun (max_date, tab) ifam ->
         let fam = foi base ifam in
         let date =
-          match Date.od_of_cdate (get_marriage fam) with
+          match Geneweb_util.Date.od_of_cdate (get_marriage fam) with
           | Some d -> Some d
           | None -> max_date
         in
         let max_date =
           match (date, max_date) with
           | Some d1, Some d2 ->
-              if Date.compare_date d1 d2 = 1 then Some d1 else Some d2
+              if Geneweb_util.Date.compare_date d1 d2 = 1 then Some d1 else Some d2
           | Some d1, None -> Some d1
           | _ -> max_date
         in
@@ -341,7 +341,7 @@ let changed_marriages_order base warning p =
   in
   Array.stable_sort
     (fun (_f1, d1) (_f2, d2) ->
-      match (d1, d2) with Some d1, Some d2 -> Date.compare_date d1 d2 | _ -> 0)
+      match (d1, d2) with Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2 | _ -> 0)
     a;
   let a = Array.map (fun (f, _) -> f) a in
   if a <> b then (
@@ -358,14 +358,14 @@ let close_siblings warning x np ifam =
   match np with
   | None -> ()
   | Some (elder, d1) -> (
-      match Date.cdate_to_dmy_opt (get_birth x) with
+      match Geneweb_util.Date.cdate_to_dmy_opt (get_birth x) with
       | None -> ()
       | Some d2 ->
-          Date.time_elapsed_opt d1 d2
+          Geneweb_util.Date.time_elapsed_opt d1 d2
           |> Option.iter @@ fun d ->
              (* On vérifie les jumeaux ou naissances proches. *)
              if
-               d.Date.year = 0
+               d.Geneweb_util.Date.year = 0
                && d.month < max_month_btw_sibl
                && (d.month <> 0 || d.day >= max_days_btw_sibl)
              then warning (Warning.CloseChildren (ifam, elder, x)))
@@ -379,7 +379,7 @@ let born_after_his_elder_sibling warning x b np ifam des =
           if strictly_after_dmy d1 d2 then
             warning (Warning.ChildrenNotInOrder (ifam, des, elder, x))
       | None -> (
-          match Date.dmy_of_death (get_death x) with
+          match Geneweb_util.Date.dmy_of_death (get_death x) with
           | None -> ()
           | Some d2 ->
               if strictly_after_dmy d1 d2 then
@@ -396,18 +396,18 @@ let siblings_gap gap child = function
               if strictly_after_dmy b max then (b, child) else (max, maxp) ))
 
 let child_born_after_his_parent warning x parent =
-  match Date.cdate_to_dmy_opt (get_birth parent) with
+  match Geneweb_util.Date.cdate_to_dmy_opt (get_birth parent) with
   | None -> ()
   | Some g1 -> (
-      match Date.cdate_to_dmy_opt (get_birth x) with
+      match Geneweb_util.Date.cdate_to_dmy_opt (get_birth x) with
       | None -> (
-          match Date.dmy_of_death (get_death x) with
+          match Geneweb_util.Date.dmy_of_death (get_death x) with
           | None -> ()
           | Some g2 ->
               if strictly_after_dmy g1 g2 then
                 warning (Warning.ParentBornAfterChild (parent, x))
               else
-                Date.time_elapsed_opt g1 g2
+                Geneweb_util.Date.time_elapsed_opt g1 g2
                 |> Option.iter @@ fun a ->
                    if strictly_younger a min_parent_age then
                      warning (ParentTooYoung (parent, a, x)))
@@ -415,7 +415,7 @@ let child_born_after_his_parent warning x parent =
           if strictly_after_dmy g1 g2 then
             warning (ParentBornAfterChild (parent, x))
           else
-            Date.time_elapsed_opt g1 g2
+            Geneweb_util.Date.time_elapsed_opt g1 g2
             |> Option.iter @@ fun a ->
                if strictly_younger a min_parent_age then
                  warning (ParentTooYoung (parent, a, x))
@@ -425,19 +425,19 @@ let child_born_after_his_parent warning x parent =
                then warning (ParentTooOld (parent, a, x)))
 
 let child_born_before_mother_death warning x mother =
-  match Date.cdate_to_dmy_opt (get_birth x) with
+  match Geneweb_util.Date.cdate_to_dmy_opt (get_birth x) with
   | None -> ()
   | Some d1 -> (
-      match Date.dmy_of_death @@ get_death mother with
+      match Geneweb_util.Date.dmy_of_death @@ get_death mother with
       | None -> ()
       | Some d2 ->
           if strictly_after_dmy d1 d2 then
             warning (Warning.MotherDeadBeforeChildBirth (mother, x)))
 
 let possible_father warning x father =
-  match Date.cdate_to_dmy_opt (get_birth x) with
+  match Geneweb_util.Date.cdate_to_dmy_opt (get_birth x) with
   | Some d1 when d1.prec <> Before -> (
-      match Date.dmy_of_death (get_death father) with
+      match Geneweb_util.Date.dmy_of_death (get_death father) with
       | Some d2 when d2.prec <> After ->
           let a2 =
             match d2 with
@@ -460,13 +460,13 @@ let child_has_sex warning child =
    [ baptism at date n ; birth at date (Before n+1)]
    which will raise an invalid warning *)
 let ignore_less_than_one_day_apart_warning get_date e1 e2 =
-  let d1_opt = get_date e1 |> Date.cdate_to_dmy_opt in
-  let d2_opt = get_date e2 |> Date.cdate_to_dmy_opt in
+  let d1_opt = get_date e1 |> Geneweb_util.Date.cdate_to_dmy_opt in
+  let d2_opt = get_date e2 |> Geneweb_util.Date.cdate_to_dmy_opt in
   match (d1_opt, d2_opt) with
   | None, _ | _, None -> false
   | Some d1, Some d2 ->
-      let sdn1 = Date.to_sdn ~from:Dgregorian d1 in
-      let sdn2 = Date.to_sdn ~from:Dgregorian d2 in
+      let sdn1 = Geneweb_util.Date.to_sdn ~from:Dgregorian d1 in
+      let sdn2 = Geneweb_util.Date.to_sdn ~from:Dgregorian d2 in
       if sdn1 > sdn2 then
         (* e1 is supposed to be before e2, so this shouldn't happen *)
         false
@@ -528,15 +528,15 @@ let check_witness_pevents_aux (warning : base_warning -> unit) origin evt date
 let check_witness_pevents base (warning : base_warning -> unit) origin =
   List.iter
     (fun evt ->
-      match Date.cdate_to_dmy_opt (get_pevent_date evt) with
+      match Geneweb_util.Date.cdate_to_dmy_opt (get_pevent_date evt) with
       | None -> ()
       | Some d2 ->
           Array.iter
             (fun (iw, witness_kind) ->
               let p = poi base iw in
               check_witness_pevents_aux warning origin evt d2
-                (Date.cdate_to_dmy_opt @@ get_birth p)
-                (Date.dmy_of_death @@ get_death p)
+                (Geneweb_util.Date.cdate_to_dmy_opt @@ get_birth p)
+                (Geneweb_util.Date.dmy_of_death @@ get_death p)
                 p witness_kind)
             (get_pevent_witnesses evt))
     (get_pevents origin)
@@ -564,15 +564,15 @@ let check_witness_fevents_aux (warning : base_warning -> unit) fam evt date
 let check_witness_fevents base (warning : base_warning -> unit) fam =
   List.iter
     (fun evt ->
-      match Date.cdate_to_dmy_opt (get_fevent_date evt) with
+      match Geneweb_util.Date.cdate_to_dmy_opt (get_fevent_date evt) with
       | None -> ()
       | Some d2 ->
           Array.iter
             (fun (iw, witness_kind) ->
               let p = poi base iw in
               check_witness_fevents_aux warning fam evt d2
-                (Date.cdate_to_dmy_opt @@ get_birth p)
-                (Date.dmy_of_death @@ get_death p)
+                (Geneweb_util.Date.cdate_to_dmy_opt @@ get_birth p)
+                (Geneweb_util.Date.dmy_of_death @@ get_death p)
                 p witness_kind)
             (get_fevent_witnesses evt))
     (get_fevents fam)
@@ -606,12 +606,12 @@ let witness_kind_of_witness_array iper witnesses =
 let check_person_dates_as_witness base (warning : base_warning -> unit) p =
   let ip = get_iper p in
   let aux date w1 w2 evt =
-    match Date.od_of_cdate (date evt) with
+    match Geneweb_util.Date.od_of_cdate (date evt) with
     | Some (Dgreg (_, _) as d) -> (
-        (match Date.od_of_cdate (get_birth p) with
+        (match Geneweb_util.Date.od_of_cdate (get_birth p) with
         | Some (Dgreg (_, _) as d') -> if strictly_before d d' then w1 evt
         | _ -> ());
-        match Date.date_of_death (get_death p) with
+        match Geneweb_util.Date.date_of_death (get_death p) with
         | Some d' -> if strictly_after d d' then w2 evt
         | None -> ())
     | Some (Dtext _) | None -> ()
@@ -733,9 +733,9 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
   match gap with
   | None -> ()
   | Some ((d1, p1), (d2, p2)) ->
-      Date.time_elapsed_opt d1 d2
+      Geneweb_util.Date.time_elapsed_opt d1 d2
       |> Option.iter @@ fun e ->
-         if e.Date.year > max_siblings_gap then
+         if e.Geneweb_util.Date.year > max_siblings_gap then
            warning (DistantChildren (ifam, p1, p2))
 
 let check_children ?(onchange = true) base warning (ifam, fam) fath moth =
@@ -792,18 +792,18 @@ let check_parent_marriage_age warning fam p =
         let evt_name = get_fevent_name evt in
         match evt_name with
         | Efam_Marriage | Efam_PACS -> (
-            match Date.od_of_cdate (get_fevent_date evt) with
+            match Geneweb_util.Date.od_of_cdate (get_fevent_date evt) with
             | Some (Dgreg (g2, _) as d2) -> (
-                match Date.date_of_death (get_death p) with
+                match Geneweb_util.Date.date_of_death (get_death p) with
                 | Some d1 when strictly_after d2 d1 ->
                     warning (Warning.MarriageDateAfterDeath p)
                 | _ -> (
-                    match Date.od_of_cdate (get_birth p) with
+                    match Geneweb_util.Date.od_of_cdate (get_birth p) with
                     | Some (Dgreg (g1, _) as d1) ->
                         if strictly_before d2 d1 then
                           warning (MarriageDateBeforeBirth p)
                         else
-                          Date.time_elapsed_opt g1 g2
+                          Geneweb_util.Date.time_elapsed_opt g1 g2
                           |> Option.iter @@ fun e ->
                              if strictly_younger e min_age_marriage then
                                warning (YoungForMarriage (p, e, get_ifam fam))
@@ -821,7 +821,7 @@ let check_possible_duplicate_family ?p base warning family father mother =
   let imoth = get_mother family in
   let ifam = get_ifam family in
 
-  let name fn i = Name.strip_lower @@ sou base (fn i) in
+  let name fn i = Geneweb_util.Name.strip_lower @@ sou base (fn i) in
   let first_name = name get_first_name in
   let surname = name get_surname in
 
@@ -884,7 +884,7 @@ let changed_pevents_order warning p =
       (fun evt -> get_pevent_date evt)
       a
   in
-  let same = Ext_list.cmp eq_pevent a b in
+  let same = Geneweb_util.Ext_list.cmp eq_pevent a b in
   if not same then
     let a = List.map gen_pevent_of_pers_event a in
     let b = List.map gen_pevent_of_pers_event b in
@@ -898,7 +898,7 @@ let changed_fevents_order warning (ifam, fam) =
       (get_fevents fam)
   in
   let b = get_fevents fam in
-  let same = Ext_list.cmp eq_fevent a b in
+  let same = Geneweb_util.Ext_list.cmp eq_fevent a b in
   if not same then
     let a = List.map gen_fevent_of_fam_event a in
     let b = List.map gen_fevent_of_fam_event b in
@@ -939,7 +939,7 @@ let check_related_person_pevents warning birth_date death_date p iper related_p
     =
   List.iter
     (fun e ->
-      match Date.cdate_to_dmy_opt (get_pevent_date e) with
+      match Geneweb_util.Date.cdate_to_dmy_opt (get_pevent_date e) with
       | None -> ()
       | Some date ->
           let is_witness, only_mentioned =
@@ -960,7 +960,7 @@ let check_related_person_fevents warning base birth_date death_date p iper
       let f = foi base i in
       List.iter
         (fun e ->
-          match Date.cdate_to_dmy_opt (get_fevent_date e) with
+          match Geneweb_util.Date.cdate_to_dmy_opt (get_fevent_date e) with
           | None -> ()
           | Some date ->
               let is_witness, only_mentioned =
@@ -992,8 +992,8 @@ let on_person_update base warning p =
       child_born_after_his_parent warning p moth;
       check_siblings base warning (i, fam) ignore
   | None -> ());
-  let birth_opt = Date.cdate_to_dmy_opt (get_birth p) in
-  let death_opt = Date.dmy_of_death @@ get_death p in
+  let birth_opt = Geneweb_util.Date.cdate_to_dmy_opt (get_birth p) in
+  let death_opt = Geneweb_util.Date.dmy_of_death @@ get_death p in
   let iper = get_iper p in
   if Option.is_some birth_opt || Option.is_some death_opt then
     List.iter
@@ -1037,8 +1037,8 @@ let on_person_update base warning p =
     [Rem] : Exporté en clair hors de ce module.                              *)
 let check_other_fields base misc ifam fam = check_sources base misc ifam fam
 
-let first_name base p = Name.strip_lower @@ sou base @@ get_first_name p
-let surname base p = Name.strip_lower @@ sou base @@ get_surname p
+let first_name base p = Geneweb_util.Name.strip_lower @@ sou base @@ get_first_name p
+let surname base p = Geneweb_util.Name.strip_lower @@ sou base @@ get_surname p
 
 let hom_person base p1 p2 =
   let fn1, sn1 = (first_name base p1, surname base p1) in

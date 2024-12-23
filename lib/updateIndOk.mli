@@ -82,8 +82,8 @@ val update_relations_of_related : base -> iper -> iper list -> unit
 
 val reconstitute_death :
   config ->
-  Date.date option ->
-  Date.date option ->
+  Geneweb_util.Date.date option ->
+  Geneweb_util.Date.date option ->
   string ->
   Def.burial ->
   string ->

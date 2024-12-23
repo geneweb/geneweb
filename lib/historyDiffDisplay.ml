@@ -14,19 +14,19 @@ let print_clean conf =
   | Some f when f <> "" ->
       let title _ =
         transl conf "clean history"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf
+        |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
       Util.gen_print_tips conf
         ("select the input you want to erase from the history" |> transl conf
-       |> Utf8.capitalize_fst |> Adef.safe);
+       |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe);
       let history = load_person_history conf f in
       Output.print_sstring conf {|<form method="post" action="|};
       Output.print_sstring conf conf.command;
       Output.print_sstring conf "\">";
       Util.hidden_input conf "m" ("HIST_CLEAN_OK" |> Adef.encoded);
-      Util.hidden_input conf "f" (Mutil.encode f);
+      Util.hidden_input conf "f" (Geneweb_util.Mutil.encode f);
       Output.print_sstring conf "<ul>";
       let rec loop i = function
         | [] -> ()
@@ -45,7 +45,7 @@ let print_clean conf =
       Output.print_sstring conf
         {|</ul><button type="submit" class="btn btn-secondary btn-lg">|};
       transl_nth conf "validate/delete" 0
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf "</button></form>";
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
@@ -75,7 +75,7 @@ let print_clean_ok conf =
   | Some f when f <> "" ->
       let title _ =
         transl conf "history cleaned"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf
+        |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
       in
       Hutil.header conf title;
       Hutil.print_link_to_welcome conf true;
@@ -128,12 +128,12 @@ let person_of_iper_array conf base ipl =
   |> String.concat ", " |> Adef.safe
 
 let string_of_cdate conf cod =
-  match Date.od_of_cdate cod with
+  match Geneweb_util.Date.od_of_cdate cod with
   | Some d -> DateDisplay.string_slash_of_date conf d
   | None -> Adef.safe ""
 
 let string_of_death conf death =
-  match Date.date_of_death death with
+  match Geneweb_util.Date.date_of_death death with
   | Some cd -> DateDisplay.string_slash_of_date conf cd
   | None -> Adef.safe ""
 
@@ -196,7 +196,7 @@ let string_of_related conf base ip related : Adef.safe_string =
           in
           loop (get_rparents c)
         in
-        (Utf8.capitalize_fst (rel : Adef.safe_string :> string)
+        (Geneweb_util.Utf8.capitalize_fst (rel : Adef.safe_string :> string)
         ^<^ transl conf ":" ^<^ p)
         :: acc)
     related []
@@ -212,7 +212,7 @@ let string_of_rparents conf base rparents : Adef.safe_string =
             (Util.relation_type_text conf rp.r_type Neuter
               : Adef.safe_string
               :> string)
-            |> Utf8.capitalize_fst
+            |> Geneweb_util.Utf8.capitalize_fst
           in
           let fath = person_of_iper conf base ip1 in
           let moth = person_of_iper conf base ip2 in
@@ -226,7 +226,7 @@ let string_of_rparents conf base rparents : Adef.safe_string =
           let p = person_of_iper conf base ip in
           if (p :> string) = "" then accu
           else
-            (Utf8.capitalize_fst
+            (Geneweb_util.Utf8.capitalize_fst
                (Util.relation_type_text conf rp.r_type Neuter
                  : Adef.safe_string
                  :> string)
@@ -236,7 +236,7 @@ let string_of_rparents conf base rparents : Adef.safe_string =
           let p = person_of_iper conf base ip in
           if (p :> string) = "" then accu
           else
-            (Utf8.capitalize_fst
+            (Geneweb_util.Utf8.capitalize_fst
                (Util.relation_type_text conf rp.r_type Neuter
                  : Adef.safe_string
                  :> string)
@@ -279,123 +279,123 @@ let string_of_event_witness conf base witnesses =
 
 let string_of_epers_name conf epers_name =
   match epers_name with
-  | Epers_Birth -> Adef.safe @@ Utf8.capitalize_fst (transl conf "birth")
-  | Epers_Baptism -> Adef.safe @@ Utf8.capitalize_fst (transl conf "baptism")
-  | Epers_Death -> Adef.safe @@ Utf8.capitalize_fst (transl conf "death")
-  | Epers_Burial -> Adef.safe @@ Utf8.capitalize_fst (transl conf "burial")
+  | Epers_Birth -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "birth")
+  | Epers_Baptism -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "baptism")
+  | Epers_Death -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "death")
+  | Epers_Burial -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "burial")
   | Epers_Cremation ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "cremation")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "cremation")
   | Epers_Accomplishment ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "accomplishment")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "accomplishment")
   | Epers_Acquisition ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "acquisition")
-  | Epers_Adhesion -> Adef.safe @@ Utf8.capitalize_fst (transl conf "adhesion")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "acquisition")
+  | Epers_Adhesion -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "adhesion")
   | Epers_BaptismLDS ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "baptismLDS")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "baptismLDS")
   | Epers_BarMitzvah ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "bar mitzvah")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "bar mitzvah")
   | Epers_BatMitzvah ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "bat mitzvah")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "bat mitzvah")
   | Epers_Benediction ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "benediction")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "benediction")
   | Epers_ChangeName ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "change name")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "change name")
   | Epers_Circumcision ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "circumcision")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "circumcision")
   | Epers_Confirmation ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "confirmation")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "confirmation")
   | Epers_ConfirmationLDS ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "confirmation LDS")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "confirmation LDS")
   | Epers_Decoration ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "decoration")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "decoration")
   | Epers_DemobilisationMilitaire ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "demobilisationMilitaire")
-  | Epers_Diploma -> Adef.safe @@ Utf8.capitalize_fst (transl conf "diploma")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "demobilisationMilitaire")
+  | Epers_Diploma -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "diploma")
   | Epers_Distinction ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "distinction")
-  | Epers_Dotation -> Adef.safe @@ Utf8.capitalize_fst (transl conf "dotation")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "distinction")
+  | Epers_Dotation -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "dotation")
   | Epers_DotationLDS ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "dotationLDS")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "dotationLDS")
   | Epers_Education ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "education")
-  | Epers_Election -> Adef.safe @@ Utf8.capitalize_fst (transl conf "election")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "education")
+  | Epers_Election -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "election")
   | Epers_Emigration ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "emigration")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "emigration")
   | Epers_Excommunication ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "excommunication")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "excommunication")
   | Epers_FamilyLinkLDS ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "familyLinkLDS")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "familyLinkLDS")
   | Epers_FirstCommunion ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "firstCommunion")
-  | Epers_Funeral -> Adef.safe @@ Utf8.capitalize_fst (transl conf "funeral")
-  | Epers_Graduate -> Adef.safe @@ Utf8.capitalize_fst (transl conf "graduate")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "firstCommunion")
+  | Epers_Funeral -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "funeral")
+  | Epers_Graduate -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "graduate")
   | Epers_Hospitalisation ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "hospitalisation")
-  | Epers_Illness -> Adef.safe @@ Utf8.capitalize_fst (transl conf "illness")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "hospitalisation")
+  | Epers_Illness -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "illness")
   | Epers_Immigration ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "immigration")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "immigration")
   | Epers_ListePassenger ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "listePassenger")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "listePassenger")
   | Epers_MilitaryDistinction ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "militaryDistinction")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "militaryDistinction")
   | Epers_MilitaryPromotion ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "militaryPromotion")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "militaryPromotion")
   | Epers_MilitaryService ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "militaryService")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "militaryService")
   | Epers_MobilisationMilitaire ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "mobilisationMilitaire")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "mobilisationMilitaire")
   | Epers_Naturalisation ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "naturalisation")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "naturalisation")
   | Epers_Occupation ->
       Adef.safe
-      @@ Utf8.capitalize_fst (transl_nth conf "occupation/occupations" 0)
+      @@ Geneweb_util.Utf8.capitalize_fst (transl_nth conf "occupation/occupations" 0)
   | Epers_Ordination ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "ordination")
-  | Epers_Property -> Adef.safe @@ Utf8.capitalize_fst (transl conf "property")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "ordination")
+  | Epers_Property -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "property")
   | Epers_Recensement ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "recensement")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "recensement")
   | Epers_Residence ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "residence")
-  | Epers_Retired -> Adef.safe @@ Utf8.capitalize_fst (transl conf "retired")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "residence")
+  | Epers_Retired -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "retired")
   | Epers_ScellentChildLDS ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "scellentChildLDS")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "scellentChildLDS")
   | Epers_ScellentParentLDS ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "scellentParentLDS")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "scellentParentLDS")
   | Epers_ScellentSpouseLDS ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "scellentSpouseLDS")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "scellentSpouseLDS")
   | Epers_VenteBien ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "venteBien")
-  | Epers_Will -> Adef.safe @@ Utf8.capitalize_fst (transl conf "will")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "venteBien")
+  | Epers_Will -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "will")
   | Epers_Name n ->
       Adef.safe
-      @@ Utf8.capitalize_fst (escape_html n : Adef.safe_string :> string)
+      @@ Geneweb_util.Utf8.capitalize_fst (escape_html n : Adef.safe_string :> string)
 
 let string_of_efam_name conf efam_name =
   match efam_name with
   | Efam_Marriage ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "marriage event")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "marriage event")
   | Efam_NoMarriage ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "no marriage event")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "no marriage event")
   | Efam_NoMention ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "no mention")
-  | Efam_Engage -> Adef.safe @@ Utf8.capitalize_fst (transl conf "engage event")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "no mention")
+  | Efam_Engage -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "engage event")
   | Efam_Divorce ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "divorce event")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "divorce event")
   | Efam_Separated ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "separate event")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "separate event")
   | Efam_Annulation ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "annulation")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "annulation")
   | Efam_MarriageBann ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "marriage bann")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "marriage bann")
   | Efam_MarriageContract ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "marriage contract")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "marriage contract")
   | Efam_MarriageLicense ->
-      Adef.safe @@ Utf8.capitalize_fst (transl conf "marriage licence")
-  | Efam_PACS -> Adef.safe @@ Utf8.capitalize_fst (transl conf "PACS")
-  | Efam_Residence -> Adef.safe @@ Utf8.capitalize_fst (transl conf "residence")
+      Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "marriage licence")
+  | Efam_PACS -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "PACS")
+  | Efam_Residence -> Adef.safe @@ Geneweb_util.Utf8.capitalize_fst (transl conf "residence")
   | Efam_Name n ->
       Adef.safe
-      @@ Utf8.capitalize_fst (escape_html n : Adef.safe_string :> string)
+      @@ Geneweb_util.Utf8.capitalize_fst (escape_html n : Adef.safe_string :> string)
 
 (* ************************************************************************ *)
 (*  [Fonc] highlight_diff : char array -> bool array -> string              *)
@@ -914,7 +914,7 @@ let eval_predefined_apply conf _env f vl =
         let month = int_of_string (String.sub date_txt 5 2) in
         let day = int_of_string (String.sub date_txt 8 2) in
         let date =
-          Date.Dgreg ({ day; month; year; prec = Sure; delta = 0 }, Dgregorian)
+          Geneweb_util.Date.Dgreg ({ day; month; year; prec = Sure; delta = 0 }, Dgregorian)
         in
         let time = String.sub date_txt 11 8 in
         DateDisplay.string_of_date conf date ^>^ ", " ^ time

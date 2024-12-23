@@ -13,9 +13,9 @@ let first_letters base is_surnames =
   in
   try
     let rec loop istr list =
-      let s = Translate.eval (Mutil.nominative (Gwdb.sou base istr)) in
+      let s = Translate.eval (Geneweb_util.Mutil.nominative (Gwdb.sou base istr)) in
       let k = Util.name_key base s in
-      let c = Utf8.sub k 0 1 in
+      let c = Geneweb_util.Utf8.sub k 0 1 in
       let list =
         match list with
         | hd :: _ -> if hd = c then list else c :: list
@@ -29,20 +29,20 @@ let first_letters base is_surnames =
   with Not_found -> []
 
 let select_names conf base is_surnames ini limit =
-  let inilen = Utf8.length ini + 1 in
-  let cut k = Utf8.sub k 0 (min (Utf8.length k) inilen) in
+  let inilen = Geneweb_util.Utf8.length ini + 1 in
+  let cut k = Geneweb_util.Utf8.sub k 0 (min (Geneweb_util.Utf8.length k) inilen) in
   let name_index =
     if is_surnames then Gwdb.persons_of_surname base
     else Gwdb.persons_of_first_name base
   in
   let list, len =
-    let start_k = Ext_string.tr '_' ' ' ini in
+    let start_k = Geneweb_util.Ext_string.tr '_' ' ' ini in
     try
       let istr = Gwdb.spi_first name_index start_k in
       let rec loop istr len list =
-        let s = Translate.eval (Mutil.nominative (Gwdb.sou base istr)) in
+        let s = Translate.eval (Geneweb_util.Mutil.nominative (Gwdb.sou base istr)) in
         let k = Util.name_key base s in
-        if Utf8.start_with_wildcard ini 0 k then
+        if Geneweb_util.Utf8.start_with_wildcard ini 0 k then
           let list, len =
             if s <> "?" then
               let ips =
@@ -153,20 +153,20 @@ let select_names conf base is_surnames ini limit =
   (list, len)
 
 let ini len k =
-  let ini_k = Utf8.sub ~pad:'_' k 0 len in
+  let ini_k = Geneweb_util.Utf8.sub ~pad:'_' k 0 len in
   (* ini_k is "a fresh string": we can use unsafe. *)
-  Ext_string.unsafe_tr ' ' '_' ini_k
+  Geneweb_util.Ext_string.unsafe_tr ' ' '_' ini_k
 
 let groupby_ini len list =
   list
-  |> Ext_list.groupby
+  |> Geneweb_util.Ext_list.groupby
        ~key:(fun (k, _, _) -> ini len k)
        ~value:(fun (_, s, c) -> (s, c))
-  |> List.sort (fun (a, _) (b, _) -> Utf8.alphabetic_order a b)
+  |> List.sort (fun (a, _) (b, _) -> Geneweb_util.Utf8.alphabetic_order a b)
 
 let groupby_count = function
   | Specify _ -> assert false
   | Result list ->
       list
-      |> Ext_list.groupby ~key:(fun (_, _, c) -> c) ~value:(fun (_, s, _) -> s)
+      |> Geneweb_util.Ext_list.groupby ~key:(fun (_, _, c) -> c) ~value:(fun (_, s, _) -> s)
       |> List.sort (fun (a, _) (b, _) -> compare b a)

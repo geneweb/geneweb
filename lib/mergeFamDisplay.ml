@@ -28,7 +28,7 @@ let need_differences_selection conf base fam1 fam2 =
       | Pacs -> "pacs"
       | Residence -> "residence")
   || need_selection (fun fam ->
-         match Date.od_of_cdate (get_marriage fam) with
+         match Geneweb_util.Date.od_of_cdate (get_marriage fam) with
          | None -> ""
          | Some d -> (DateDisplay.string_of_ondate conf d :> string))
   || need_selection (fun fam -> sou base (get_marriage_place fam))
@@ -37,7 +37,7 @@ let need_differences_selection conf base fam1 fam2 =
          | NotDivorced -> "not divorced"
          | Separated -> "separated"
          | Divorced cod -> (
-             match Date.od_of_cdate cod with
+             match Geneweb_util.Date.od_of_cdate cod with
              | Some d -> (DateDisplay.string_of_ondate conf d :> string)
              | None -> "divorced"))
 
@@ -48,7 +48,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     let x2 : Adef.safe_string = proj fam2 in
     if (x1 :> string) <> "" && (x2 :> string) <> "" && x1 <> x2 then (
       Output.print_sstring conf "<h4>";
-      Output.print_string conf (Adef.safe_fn Utf8.capitalize_fst title);
+      Output.print_string conf (Adef.safe_fn Geneweb_util.Utf8.capitalize_fst title);
       Output.print_sstring conf
         "</h4><ul><li><input type=\"radio\" class=\"form-control\" name=\"";
       Output.print_string conf name;
@@ -69,7 +69,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   Util.hidden_input_s conf "i" (string_of_ifam ifam1);
   Util.hidden_input_s conf "i2" (string_of_ifam ifam2);
   (match p_getenv conf.env "ip" with
-  | Some ip -> Util.hidden_input conf "ip" (Mutil.encode ip)
+  | Some ip -> Util.hidden_input conf "ip" (Geneweb_util.Mutil.encode ip)
   | None -> ());
   (let rec loop = function
      | [ (ip1, ip2) ] ->
@@ -102,7 +102,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     (Util.translate_eval (transl_nth conf "marriage/marriages" 0) |> Adef.safe)
     (Adef.encoded "marriage")
     (fun fam ->
-      match Date.od_of_cdate (get_marriage fam) with
+      match Geneweb_util.Date.od_of_cdate (get_marriage fam) with
       | None -> Adef.safe ""
       | Some d -> DateDisplay.string_of_ondate conf d);
   string_field
@@ -120,7 +120,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
       | NotDivorced -> transl conf "not divorced" |> Adef.safe
       | Separated -> transl conf "separated" |> Adef.safe
       | Divorced cod -> (
-          match Date.od_of_cdate cod with
+          match Geneweb_util.Date.od_of_cdate cod with
           | Some d ->
               transl conf "divorced" ^<^ " "
               ^<^ DateDisplay.string_of_ondate conf d
@@ -128,14 +128,14 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></form>"
 
 let merge_fam1 conf base fam1 fam2 =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_decline conf "merge" s))
+      (Geneweb_util.Utf8.capitalize_fst (transl_decline conf "merge" s))
   in
   Hutil.header conf title;
   print_differences conf base [] fam1 fam2;

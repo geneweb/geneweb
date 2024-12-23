@@ -14,19 +14,19 @@ module State = State
 let next_family_fun_templ gwo_list fi =
   let ngwo = List.length gwo_list in
   let run =
-    if ngwo < 10 || not !Mutil.verbose then fun () -> ()
+    if ngwo < 10 || not !Geneweb_util.Mutil.verbose then fun () -> ()
     else if ngwo < 60 then (fun () ->
       Printf.eprintf ".";
       flush stderr)
     else
       let bar_cnt = ref 0 in
       let run () =
-        ProgrBar.run !bar_cnt ngwo;
+        Geneweb_util.ProgrBar.run !bar_cnt ngwo;
         incr bar_cnt
       in
-      ProgrBar.empty := 'o';
-      ProgrBar.full := '*';
-      ProgrBar.start ();
+      Geneweb_util.ProgrBar.empty := 'o';
+      Geneweb_util.ProgrBar.full := '*';
+      Geneweb_util.ProgrBar.start ();
       run
   in
   let ic_opt = ref None in
@@ -73,11 +73,11 @@ let next_family_fun_templ gwo_list fi =
               ic_opt := Some ic;
               loop ()
           | [] ->
-              if ngwo < 10 || not !Mutil.verbose then ()
+              if ngwo < 10 || not !Geneweb_util.Mutil.verbose then ()
               else if ngwo < 60 then (
                 Printf.eprintf "\n";
                 flush stderr)
-              else ProgrBar.finish ();
+              else Geneweb_util.ProgrBar.finish ();
               None)
     in
     loop ()
@@ -109,8 +109,8 @@ let make_base ~save_mem state =
         state.out_file;
       flush stdout;
       exit 2);
-    Lock.control (Files.lock_file state.out_file)
-      false ~onerror:Lock.print_error_and_exit (fun () ->
+    Geneweb_util.Lock.control (Files.lock_file state.out_file)
+      false ~onerror:Geneweb_util.Lock.print_error_and_exit (fun () ->
         let bdir =
           if Filename.check_suffix state.out_file ".gwb" then state.out_file
           else state.out_file ^ ".gwb"

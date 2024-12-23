@@ -155,7 +155,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                 (transl_nth conf "child/children" 1)
                 (s :> string)
                 (s :> string)
-              |> Util.translate_eval |> Utf8.capitalize_fst
+              |> Util.translate_eval |> Geneweb_util.Utf8.capitalize_fst
               |> Output.print_sstring conf;
               Output.print_string conf with_sp;
               Output.print_sstring conf (Util.transl conf ":");
@@ -200,7 +200,7 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
           :> string);
       ]
       |> cftransl conf "on %s's side"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf (Util.transl conf ":"));
     let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
     print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
@@ -234,7 +234,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     loop first_sosa false true
   in
   if not some then (
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "no match"));
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "no match"));
     Output.print_sstring conf ". ");
   if lev1 > 1 then Output.print_sstring conf "</ul>"
 
@@ -254,26 +254,26 @@ let print_cousins conf base p lev1 lev2 =
     in
     if lev1 = lev2 then
       let s = txt_fun (brother_label conf lev1) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 2 && lev2 = 1 then
       let s = txt_fun (transl_nth conf "an uncle/an aunt" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 3 && lev2 = 1 then
       let s = txt_fun (transl_nth conf "a great-uncle/a great-aunt" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 2 then
       let s = txt_fun (transl_nth conf "a nephew/a niece" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 3 then
       let s = txt_fun (transl_nth conf "a great-nephew/a great-niece" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else (
-      Output.print_sstring conf (Utf8.capitalize_fst (transl conf "ancestors"));
+      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "ancestors"));
       Output.print_sstring conf " ";
       Output.print_sstring conf (string_of_int lev1);
       Output.print_sstring conf " / ";
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "descendants"));
+        (Geneweb_util.Utf8.capitalize_fst (transl conf "descendants"));
       Output.print_sstring conf " ";
       Output.print_sstring conf (string_of_int lev2))
   in
@@ -295,7 +295,7 @@ let print_cousins conf base p lev1 lev2 =
   Output.print_sstring conf "<div><p>";
   if !cnt >= max_cnt then Output.print_sstring conf "etc... "
   else if !cnt > 1 then (
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "total"));
+    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "total"));
     Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf " ";
     Output.print_sstring conf (string_of_int !cnt);
@@ -364,7 +364,7 @@ let print_anniv conf base p dead_people level =
         loop set 0
   in
   let set =
-    let module P = Pqueue.Make (struct
+    let module P = Geneweb_util.Pqueue.Make (struct
       type t = iper * int * int
 
       let leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2

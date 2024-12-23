@@ -14,9 +14,9 @@ type gen_record = {
 
 (* Le nom du fichier historique (à partir de la clé personne). *)
 let history_file fn sn occ =
-  let space_to_unders = Ext_string.tr ' ' '_' in
-  let f = space_to_unders (Name.lower fn) in
-  let s = space_to_unders (Name.lower sn) in
+  let space_to_unders = Geneweb_util.Ext_string.tr ' ' '_' in
+  let f = space_to_unders (Geneweb_util.Name.lower fn) in
+  let s = space_to_unders (Geneweb_util.Name.lower sn) in
   f ^ "." ^ string_of_int occ ^ "." ^ s
 
 (* history directory path *)
@@ -237,7 +237,7 @@ let record_diff conf base changed =
                 (try Sys.rename ofname fname with Sys_error _ -> ());
                 let p = poi base ip in
                 let p =
-                  Futil.map_person_ps
+                  Geneweb_util.Futil.map_person_ps
                     (fun p -> p)
                     (sou base) (gen_person_of_person p)
                 in

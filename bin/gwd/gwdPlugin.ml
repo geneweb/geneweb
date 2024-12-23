@@ -16,4 +16,4 @@ let register ~ns list =
     list
 
 let se : (string * (Config.config -> string option -> unit)) list ref = ref []
-let register_se ~ns fn = Ext_list.ref_append se (ns, fn !assets)
+let register_se ~ns fn = Geneweb_util.Ext_list.ref_append se (ns, fn !assets)

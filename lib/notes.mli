@@ -5,7 +5,7 @@ val notes_links_db :
   Config.config ->
   Gwdb.base ->
   bool ->
-  (Ext_string.Set.elt * (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list) list
+  (Geneweb_util.Ext_string.Set.elt * (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list) list
 
 val update_notes_links_db :
   Gwdb.base -> (Gwdb.iper, Gwdb.ifam) Def.NLDB.page -> string -> unit

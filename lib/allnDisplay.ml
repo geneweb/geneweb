@@ -8,7 +8,7 @@ let particle_at_the_end base is_surnames s =
   else s
 
 let compare_particle_at_the_end base is_surnames a b =
-  Utf8.alphabetic_order
+  Geneweb_util.Utf8.alphabetic_order
     (particle_at_the_end base is_surnames a)
     (particle_at_the_end base is_surnames b)
 
@@ -26,10 +26,10 @@ let print_title conf base is_surnames ini len =
       |> Output.print_sstring conf
   else if is_surnames then
     Util.transl_nth conf "surname/surnames" 0
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   else
     Util.transl_nth conf "first name/first names" 0
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   if ini <> "" then (
     Output.print_sstring conf " ";
     Output.print_sstring conf (Util.transl conf "starting with");
@@ -45,9 +45,9 @@ let print_title conf base is_surnames ini len =
 
 let tr c1 s2 s =
   let rec loop i len =
-    if i = String.length s then Buff.get len
-    else if String.unsafe_get s i = c1 then loop (i + 1) (Buff.mstore len s2)
-    else loop (i + 1) (Buff.store len (String.unsafe_get s i))
+    if i = String.length s then Geneweb_util.Buff.get len
+    else if String.unsafe_get s i = c1 then loop (i + 1) (Geneweb_util.Buff.mstore len s2)
+    else loop (i + 1) (Geneweb_util.Buff.store len (String.unsafe_get s i))
   in
   loop 0 0
 
@@ -64,7 +64,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
         Output.print_sstring conf "m=";
         Output.print_string conf mode;
         Output.print_sstring conf "&tri=A&v=";
-        Output.print_string conf (Mutil.encode ini_k);
+        Output.print_string conf (Geneweb_util.Mutil.encode ini_k);
         Output.print_sstring conf {|">|})
       else (
         Output.print_sstring conf {|<a href="|};
@@ -72,7 +72,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
         Output.print_sstring conf "m=";
         Output.print_string conf mode;
         Output.print_sstring conf "&tri=A&k=";
-        Output.print_string conf (Mutil.encode ini_k);
+        Output.print_string conf (Geneweb_util.Mutil.encode ini_k);
         Output.print_sstring conf {|">|});
       Output.print_string conf (tr '_' "&nbsp;" ini_k |> Util.escape_html);
       Output.print_sstring conf "</a>\n")
@@ -80,7 +80,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
   if not too_big then (
     Output.print_sstring conf "</p><p>";
     Util.transl conf "the whole list"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf "</p><ul><li>";
     Output.print_sstring conf {|<a href="|};
@@ -88,7 +88,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     Output.print_sstring conf "m=";
     Output.print_string conf mode;
     Output.print_sstring conf "&tri=A&o=A&k=";
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_string conf (Geneweb_util.Mutil.encode ini);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (Util.transl conf "long display");
     Output.print_sstring conf "</a></li><li>";
@@ -97,7 +97,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     Output.print_sstring conf "m=";
     Output.print_string conf mode;
     Output.print_sstring conf "&tri=S&o=A&k=";
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_string conf (Geneweb_util.Mutil.encode ini);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (Util.transl conf "short display");
     Output.print_sstring conf "</a></li><li>";
@@ -106,7 +106,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     Output.print_sstring conf "m=";
     Output.print_string conf mode;
     Output.print_sstring conf "&tri=S&o=A&cgl=on&k=";
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_string conf (Geneweb_util.Mutil.encode ini);
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (Util.transl conf "short display");
     Output.print_sstring conf " + ";
@@ -122,25 +122,25 @@ let print_alphabetic_all conf base is_surnames ini list len =
   List.iter
     (fun (ini_k, _) ->
       Output.print_sstring conf "<a href=\"#a";
-      Output.print_string conf (Mutil.encode ini_k);
+      Output.print_string conf (Geneweb_util.Mutil.encode ini_k);
       Output.print_sstring conf "\">";
-      Output.print_string conf (Ext_string.tr '_' ' ' ini_k |> Adef.safe);
+      Output.print_string conf (Geneweb_util.Ext_string.tr '_' ' ' ini_k |> Adef.safe);
       Output.print_sstring conf "</a>\n")
     list;
   Output.print_sstring conf "</p><ul>";
   List.iter
     (fun (ini_k, l) ->
       Output.print_sstring conf "<li><a id=\"a";
-      Output.print_string conf (Mutil.encode ini_k);
+      Output.print_string conf (Geneweb_util.Mutil.encode ini_k);
       Output.print_sstring conf "\">";
-      Output.print_string conf (Ext_string.tr '_' ' ' ini_k |> Adef.safe);
+      Output.print_string conf (Geneweb_util.Ext_string.tr '_' ' ' ini_k |> Adef.safe);
       Output.print_sstring conf "</a><ul>";
       List.iter
         (fun (s, cnt) ->
           Output.print_sstring conf "<li>";
           let href =
             let open Def in
-            "m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A"
+            "m=" ^<^ mode ^^^ "&v=" ^<^ Geneweb_util.Mutil.encode s ^>^ "&t=A"
           in
           Util.wprint_geneweb_link conf
             (href :> Adef.escaped_string)
@@ -172,7 +172,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
         Output.print_sstring conf "m=";
         Output.print_string conf mode;
         Output.print_sstring conf "&v=";
-        Output.print_string conf (Mutil.encode s);
+        Output.print_string conf (Geneweb_util.Mutil.encode s);
         Output.print_sstring conf "&t=A\">";
         Output.print_string conf
           (particle_at_the_end base is_surnames s |> Util.escape_html);
@@ -205,7 +205,7 @@ let print_frequency_any conf base is_surnames list len =
             Output.print_sstring conf "m=";
             Output.print_string conf mode;
             Output.print_sstring conf "&v=";
-            Output.print_string conf (Mutil.encode (Name.lower s));
+            Output.print_string conf (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower s));
             Output.print_sstring conf "\">";
             Output.print_string conf
               (particle_at_the_end base is_surnames s |> Util.escape_html);
@@ -235,7 +235,7 @@ let print_alphabetic conf base is_surnames =
   then (
     Gwdb.load_strings_array base;
     let list = Alln.first_letters base is_surnames in
-    let list = List.sort Utf8.alphabetic_order list in
+    let list = List.sort Geneweb_util.Utf8.alphabetic_order list in
     print_alphabetic_big conf base is_surnames ini list 1 true)
   else
     let all =
@@ -249,12 +249,12 @@ let print_alphabetic conf base is_surnames =
     in
     match list with
     | Alln.Specify keys ->
-        let keys = List.sort Utf8.alphabetic_order keys in
+        let keys = List.sort Geneweb_util.Utf8.alphabetic_order keys in
         let too_big = (not all) && List.length keys > Alln.default_max_cnt in
         print_alphabetic_big conf base is_surnames ini keys len too_big
     | Alln.Result list ->
         if len >= 50 || ini = "" then
-          let list = Alln.groupby_ini (Utf8.length ini + 1) list in
+          let list = Alln.groupby_ini (Geneweb_util.Utf8.length ini + 1) list in
           print_alphabetic_all conf base is_surnames ini list len
         else print_alphabetic_small conf base is_surnames ini list len
 
@@ -270,22 +270,22 @@ let print_alphabetic_short conf base is_surnames ini list len =
     List.iter
       (fun (ini_k, _) ->
         Output.print_sstring conf "<a href=\"#a";
-        Output.print_string conf (Mutil.encode ini_k);
+        Output.print_string conf (Geneweb_util.Mutil.encode ini_k);
         Output.print_sstring conf "\">";
         Output.print_string conf
-          (Ext_string.tr '_' ' ' ini_k |> Util.escape_html);
+          (Geneweb_util.Ext_string.tr '_' ' ' ini_k |> Util.escape_html);
         Output.print_sstring conf "</a>\n")
       list;
     Output.print_sstring conf "</p>");
   List.iter
     (fun (ini_k, l) ->
       Output.print_sstring conf "<p>";
-      Ext_list.iter_first
+      Geneweb_util.Ext_list.iter_first
         (fun first (s, cnt) ->
           let href =
             let open Def in
             " href=\"" ^<^ Util.commd conf
-            ^^^ ("m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A\""
+            ^^^ ("m=" ^<^ mode ^^^ "&v=" ^<^ Geneweb_util.Mutil.encode s ^>^ "&t=A\""
                   :> Adef.escaped_string)
           in
           let name =
@@ -303,7 +303,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
           Output.print_sstring conf " (";
           Output.print_sstring conf (string_of_int cnt);
           Output.print_sstring conf ")")
-        (List.sort (fun (a, _) (b, _) -> Utf8.alphabetic_order a b) l);
+        (List.sort (fun (a, _) (b, _) -> Geneweb_util.Utf8.alphabetic_order a b) l);
       Output.print_sstring conf "</p>")
     list;
   Hutil.trailer conf
@@ -316,7 +316,7 @@ let print_short conf base is_surnames =
   match Alln.select_names conf base is_surnames ini max_int with
   | Alln.Specify _, _ -> Hutil.incorrect_request conf
   | Alln.Result list, len ->
-      let list = Alln.groupby_ini (Utf8.length ini + 1) list in
+      let list = Alln.groupby_ini (Geneweb_util.Utf8.length ini + 1) list in
       print_alphabetic_short conf base is_surnames ini list len
 
 (* main *)

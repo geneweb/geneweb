@@ -11,7 +11,7 @@ let reconstitute_date_dmy conf var =
           | Some d ->
               if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
                 Some
-                  Date.{ day = d; month = m; year = y; prec = Sure; delta = 0 }
+                  Geneweb_util.Date.{ day = d; month = m; year = y; prec = Sure; delta = 0 }
               else None
           | None ->
               if m >= 1 && m <= 12 then
@@ -55,7 +55,7 @@ let string_incl =
         Hashtbl.replace memo (x, y) b;
         b
 
-let abbrev_lower x = Name.abbrev (Name.lower x)
+let abbrev_lower x = Geneweb_util.Name.abbrev (Geneweb_util.Name.lower x)
 let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
 
 module Fields : sig
@@ -151,14 +151,14 @@ module AdvancedSearchMatch : sig
     p:Gwdb.person ->
     places:place list ->
     default:bool ->
-    dates:Date.dmy option * Date.dmy option ->
+    dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
     bool
 
   module type Match = sig
     val match_baptism :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -166,7 +166,7 @@ module AdvancedSearchMatch : sig
     val match_birth :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -174,7 +174,7 @@ module AdvancedSearchMatch : sig
     val match_burial :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -182,7 +182,7 @@ module AdvancedSearchMatch : sig
     val match_death :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -191,7 +191,7 @@ module AdvancedSearchMatch : sig
       conf:Config.config ->
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -208,12 +208,12 @@ end = struct
     match (d1, d2) with
     | Some d1, Some d2 -> (
         match df p with
-        | Some d -> Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
+        | Some d -> Geneweb_util.Date.compare_dmy d d1 >= 0 && Geneweb_util.Date.compare_dmy d d2 <= 0
         | None -> false)
     | Some d1, None -> (
-        match df p with Some d -> Date.compare_dmy d d1 >= 0 | None -> false)
+        match df p with Some d -> Geneweb_util.Date.compare_dmy d d1 >= 0 | None -> false)
     | None, Some d2 -> (
-        match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
+        match df p with Some d -> Geneweb_util.Date.compare_dmy d d2 <= 0 | None -> false)
     | None, None -> default
 
   let match_sex ~p ~sex =
@@ -275,21 +275,21 @@ end = struct
     match (d1, d2) with
     | Some d1, Some d2 ->
         test_date_place (fun fam ->
-            match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+            match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
             | Some d ->
-                if Date.compare_dmy d d1 < 0 then false
-                else if Date.compare_dmy d2 d < 0 then false
+                if Geneweb_util.Date.compare_dmy d d1 < 0 then false
+                else if Geneweb_util.Date.compare_dmy d2 d < 0 then false
                 else true
             | None -> false)
     | Some d1, None ->
         test_date_place (fun fam ->
-            match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-            | Some d -> if Date.compare_dmy d d1 < 0 then false else true
+            match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+            | Some d -> if Geneweb_util.Date.compare_dmy d d1 < 0 then false else true
             | None -> false)
     | None, Some d2 ->
         test_date_place (fun fam ->
-            match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-            | Some d -> if Date.compare_dmy d d2 > 0 then false else true
+            match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+            | Some d -> if Geneweb_util.Date.compare_dmy d d2 > 0 then false else true
             | None -> false)
     | None, None ->
         if places = [] then default else test_date_place (fun _ -> true)
@@ -301,22 +301,22 @@ end = struct
         (abbrev_lower @@ Gwdb.sou base @@ Gwdb.get_occupation p)
 
   let match_baptism_date =
-    match_date ~df:(fun p -> Date.cdate_to_dmy_opt (Gwdb.get_baptism p))
+    match_date ~df:(fun p -> Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_baptism p))
 
   let match_birth_date =
-    match_date ~df:(fun p -> Date.cdate_to_dmy_opt (Gwdb.get_birth p))
+    match_date ~df:(fun p -> Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p))
 
   let match_burial_date =
     let get_burial p =
-      (* TODO Date.cdate_of_burial *)
+      (* TODO Geneweb_util.Date.cdate_of_burial *)
       match Gwdb.get_burial p with
-      | Buried cod | Cremated cod -> Date.cdate_to_dmy_opt cod
+      | Buried cod | Cremated cod -> Geneweb_util.Date.cdate_to_dmy_opt cod
       | UnknownBurial -> None
     in
     match_date ~df:get_burial
 
   let match_death_date =
-    match_date ~df:(fun p -> Date.dmy_of_death (Gwdb.get_death p))
+    match_date ~df:(fun p -> Geneweb_util.Date.dmy_of_death (Gwdb.get_death p))
 
   let match_other_events_date ~conf ~base ~p ~default ~dates =
     if dates = (None, None) then default
@@ -324,13 +324,13 @@ end = struct
       p
       |> Event.other_events conf base
       |> List.map (fun e (* wrap value in unit -> dmy to be lazy ?*) () ->
-             Date.cdate_to_dmy_opt @@ Event.get_date e)
+             Geneweb_util.Date.cdate_to_dmy_opt @@ Event.get_date e)
       |> List.exists (fun event_date_f ->
              match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
 
   let match_name ~search_list ~exact : string list -> bool =
     let matching : string list -> string list -> bool =
-      if exact then Ext_list.elements_cmp else Ext_list.is_subset
+      if exact then Geneweb_util.Ext_list.elements_cmp else Geneweb_util.Ext_list.is_subset
     in
     fun x -> List.exists (fun s -> matching s x) search_list
 
@@ -338,15 +338,15 @@ end = struct
     if search_list = [] then fun _ -> true
     else
       let eq = match_name ~search_list ~exact in
-      fun p -> eq (List.map Name.lower @@ split @@ Gwdb.sou base @@ get p)
+      fun p -> eq (List.map Geneweb_util.Name.lower @@ split @@ Gwdb.sou base @@ get p)
 
   let match_first_name ~base ~first_name_list ~exact =
     wrap_match_name ~base ~search_list:first_name_list ~exact
-      ~get:Gwdb.get_first_name ~split:Name.split_fname
+      ~get:Gwdb.get_first_name ~split:Geneweb_util.Name.split_fname
 
   let match_surname ~base ~surname_list ~exact =
     wrap_match_name ~base ~search_list:surname_list ~exact ~get:Gwdb.get_surname
-      ~split:Name.split_sname
+      ~split:Geneweb_util.Name.split_sname
 
   let match_alias ~base ~alias_list ~exact ~kind p =
     let gets =
@@ -359,8 +359,8 @@ end = struct
     in
     let split =
       match kind with
-      | `Surname -> Name.split_sname
-      | `First_name -> Name.split_fname
+      | `Surname -> Geneweb_util.Name.split_sname
+      | `First_name -> Geneweb_util.Name.split_fname
     in
     List.exists
       (fun get ->
@@ -393,7 +393,7 @@ end = struct
     val match_baptism :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -401,7 +401,7 @@ end = struct
     val match_birth :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -409,7 +409,7 @@ end = struct
     val match_burial :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -417,7 +417,7 @@ end = struct
     val match_death :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -426,7 +426,7 @@ end = struct
       conf:Config.config ->
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.dmy option * Date.dmy option ->
+      dates:Geneweb_util.Date.dmy option * Geneweb_util.Date.dmy option ->
       places:place list ->
       exact_place:bool ->
       bool
@@ -549,12 +549,12 @@ let advanced_search conf base max_answers =
   in
   let fn_list =
     List.map
-      (fun s -> List.map Name.lower @@ Name.split_fname s)
+      (fun s -> List.map Geneweb_util.Name.lower @@ Geneweb_util.Name.split_fname s)
       (getss "first_name")
   in
   let sn_list =
     List.map
-      (fun s -> List.map Name.lower @@ Name.split_sname s)
+      (fun s -> List.map Geneweb_util.Name.lower @@ Geneweb_util.Name.split_sname s)
       (getss "surname")
   in
   let search_type = get_search_type gets in
@@ -679,8 +679,8 @@ let advanced_search conf base max_answers =
                let istrs = strings_of base x in
                List.fold_left
                  (fun acc istr ->
-                   let str = Mutil.nominative (Gwdb.sou base istr) in
-                   if eq (List.map Name.lower @@ split str) then istr :: acc
+                   let str = Geneweb_util.Mutil.nominative (Gwdb.sou base istr) in
+                   if eq (List.map Geneweb_util.Name.lower @@ split str) then istr :: acc
                    else acc)
                  [] istrs))
           n_list
@@ -693,13 +693,13 @@ let advanced_search conf base max_answers =
           ( false,
             true,
             list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-              Name.split_sname sn_list
+              Geneweb_util.Name.split_sname sn_list
               (gets "exact_surname" = "on") )
         else
           ( true,
             false,
             list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
-              Name.split_fname fn_list
+              Geneweb_util.Name.split_fname fn_list
               (gets "exact_first_name" = "on") )
       in
       let rec loop ((_, len) as acc) = function
@@ -883,28 +883,28 @@ let searching_fields conf base =
   Adef.safe @@ string_field "occu" (search ^ sep)
 
 let filter_alias ~name ~split ~matching =
-  let search_list = List.map Name.lower (split name) in
+  let search_list = List.map Geneweb_util.Name.lower (split name) in
   let matching = matching search_list in
   if search_list = [] then fun ~aliases:_ -> []
   else fun ~aliases ->
     List.filter_map
       (fun alias ->
-        let aliases = List.map Name.lower (split alias) in
-        Ext_option.return_if (matching aliases) (fun () -> alias))
+        let aliases = List.map Geneweb_util.Name.lower (split alias) in
+        Geneweb_util.Ext_option.return_if (matching aliases) (fun () -> alias))
       aliases
 
 let matching_first_name_aliases ~first_name =
-  filter_alias ~name:first_name ~split:Name.split_fname
-    ~matching:Ext_list.is_subset
+  filter_alias ~name:first_name ~split:Geneweb_util.Name.split_fname
+    ~matching:Geneweb_util.Ext_list.is_subset
 
 let exact_matching_first_name_aliases ~first_name =
-  filter_alias ~name:first_name ~split:Name.split_fname
-    ~matching:Ext_list.elements_cmp
+  filter_alias ~name:first_name ~split:Geneweb_util.Name.split_fname
+    ~matching:Geneweb_util.Ext_list.elements_cmp
 
 let matching_surname_aliases ~surname =
-  filter_alias ~name:surname ~split:Name.split_sname
-    ~matching:Ext_list.is_subset
+  filter_alias ~name:surname ~split:Geneweb_util.Name.split_sname
+    ~matching:Geneweb_util.Ext_list.is_subset
 
 let exact_matching_surname_aliases ~surname =
-  filter_alias ~name:surname ~split:Name.split_sname
-    ~matching:Ext_list.elements_cmp
+  filter_alias ~name:surname ~split:Geneweb_util.Name.split_sname
+    ~matching:Geneweb_util.Ext_list.elements_cmp

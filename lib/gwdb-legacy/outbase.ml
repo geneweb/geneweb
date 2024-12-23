@@ -8,7 +8,7 @@ let load_couples_array base = base.data.couples.load_array ()
 let load_descends_array base = base.data.descends.load_array ()
 let load_strings_array base = base.data.strings.load_array ()
 let close_base base = base.func.cleanup ()
-let verbose = Mutil.verbose
+let verbose = Geneweb_util.Mutil.verbose
 
 let trace s =
   if !verbose then (
@@ -36,7 +36,7 @@ let make_name_index base =
     (* not ? ? *)
     if p.first_name <> 1 && p.first_name <> 1 then
       List.iter (fun i -> Array.set t i @@ (p.key_index :: Array.get t i))
-      @@ Ext_list.map_sort_uniq Dutil.name_index
+      @@ Geneweb_util.Ext_list.map_sort_uniq Dutil.name_index
       @@ Dutil.dsk_person_misc_names base p (fun p -> p.titles)
   done;
   Array.map Array.of_list t
@@ -45,11 +45,11 @@ let create_name_index oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
 let make_strings_of_fsname_aux split get base =
-  let t = Array.make Dutil.table_size Ext_int.Set.empty in
+  let t = Array.make Dutil.table_size Geneweb_util.Ext_int.Set.empty in
   let add_name (key : string) (value : int) =
     let key = Dutil.name_index key in
     let set = Array.get t key in
-    let set' = Ext_int.Set.add value set in
+    let set' = Geneweb_util.Ext_int.Set.add value set in
     if set == set' then () else Array.set t key set'
   in
   for i = 0 to base.data.persons.len - 1 do
@@ -64,9 +64,9 @@ let make_strings_of_fsname_aux split get base =
   done;
   Array.map
     (fun set ->
-      let a = Array.make (Ext_int.Set.cardinal set) 0 in
+      let a = Array.make (Geneweb_util.Ext_int.Set.cardinal set) 0 in
       let i = ref 0 in
-      Ext_int.Set.iter
+      Geneweb_util.Ext_int.Set.iter
         (fun e ->
           Array.set a !i e;
           incr i)
@@ -75,11 +75,11 @@ let make_strings_of_fsname_aux split get base =
     t
 
 let make_strings_of_fname =
-  make_strings_of_fsname_aux Name.split_fname_callback (fun p ->
+  make_strings_of_fsname_aux Geneweb_util.Name.split_fname_callback (fun p ->
       p.first_name :: p.first_names_aliases)
 
 let make_strings_of_sname =
-  make_strings_of_fsname_aux Name.split_sname_callback (fun p ->
+  make_strings_of_fsname_aux Geneweb_util.Name.split_sname_callback (fun p ->
       p.surname :: p.surnames_aliases)
 
 let create_strings_of_sname oc_inx oc_inx_acc base =
@@ -176,7 +176,7 @@ let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
 let output_particles_file particles fname =
   let oc = open_out fname in
   List.iter
-    (fun s -> Printf.fprintf oc "%s\n" (Ext_string.tr ' ' '_' s))
+    (fun s -> Printf.fprintf oc "%s\n" (Geneweb_util.Ext_string.tr ' ' '_' s))
     particles;
   close_out oc
 

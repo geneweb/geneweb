@@ -82,7 +82,7 @@ val nobtit : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title list
     that respects constraints imposed by [conf.allowed_titles] and
     [conf.denied_titles] *)
 
-val strictly_after_private_years : Config.config -> Date.dmy -> bool
+val strictly_after_private_years : Config.config -> Geneweb_util.Date.dmy -> bool
 
 val authorized_age : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** Alias to GWPARAM.p_auth *)
@@ -218,10 +218,10 @@ val surname_without_particle : Gwdb.base -> string -> string
     The list of particles to use is defined in [base]. *)
 
 val get_approx_birth_date_place :
-  Gwdb.base -> Gwdb.person -> Date.date option * Adef.safe_string
+  Gwdb.base -> Gwdb.person -> Geneweb_util.Date.date option * Adef.safe_string
 
 val get_approx_death_date_place :
-  Gwdb.base -> Gwdb.person -> Date.date option * Adef.safe_string
+  Gwdb.base -> Gwdb.person -> Geneweb_util.Date.date option * Adef.safe_string
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 

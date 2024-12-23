@@ -52,7 +52,7 @@ let rec delete_person excl base ip =
         Gwdb_driver.delete_ascend base ip;
         (* remove person id from family descendants *)
         let children =
-          (get_gen_descend base ifam).Def.children |> Mutil.array_except ip
+          (get_gen_descend base ifam).Def.children |> Geneweb_util.Mutil.array_except ip
         in
         Gwdb_driver.patch_descend base ifam { children };
         if children = [| ip |] then
@@ -146,7 +146,7 @@ and delete_family excl base ifam =
     excl children
 
 and rm_union base ifam iper =
-  { Def.family = (get_gen_union base iper).family |> Mutil.array_except ifam }
+  { Def.family = (get_gen_union base iper).family |> Geneweb_util.Mutil.array_except ifam }
   |> patch_union base iper
 
 (** [delete_person base iper] and [delete_family base ifam]
@@ -175,8 +175,8 @@ let nobtitles base allowed_titles denied_titles p =
       let list =
         List.fold_right
           (fun t l ->
-            let id = Name.lower (sou base t.Def.t_ident) in
-            let pl = Name.lower (sou base t.Def.t_place) in
+            let id = Geneweb_util.Name.lower (sou base t.Def.t_ident) in
+            let pl = Geneweb_util.Name.lower (sou base t.Def.t_place) in
             if pl = "" then if List.mem id allowed_titles then t :: l else l
             else if
               List.mem (id ^ "/" ^ pl) allowed_titles
@@ -190,8 +190,8 @@ let nobtitles base allowed_titles denied_titles p =
       | denied_titles ->
           List.filter
             (fun t ->
-              let id = Name.lower (sou base t.Def.t_ident) in
-              let pl = Name.lower (sou base t.Def.t_place) in
+              let id = Geneweb_util.Name.lower (sou base t.Def.t_ident) in
+              let pl = Geneweb_util.Name.lower (sou base t.Def.t_place) in
               if
                 List.mem (id ^ "/" ^ pl) denied_titles
                 || List.mem ("*/" ^ pl) denied_titles
@@ -200,10 +200,10 @@ let nobtitles base allowed_titles denied_titles p =
             list)
 
 (** Returns first name of person *)
-let p_first_name base p = Mutil.nominative (sou base (get_first_name p))
+let p_first_name base p = Geneweb_util.Mutil.nominative (sou base (get_first_name p))
 
 (** Returns surname of person *)
-let p_surname base p = Mutil.nominative (sou base (get_surname p))
+let p_surname base p = Geneweb_util.Mutil.nominative (sou base (get_surname p))
 
 (** Returns array of surnames of person's husbands.
     First element of a couple in the array is husband's surname,
@@ -229,12 +229,12 @@ let father_titles_places base p (nobtit : person -> title list) =
   | None -> []
 
 let gen_gen_person_misc_names base p nobtit nobtit_fun =
-  Futil.gen_person_misc_names (sou base) empty_string quest_string
+  Geneweb_util.Futil.gen_person_misc_names (sou base) empty_string quest_string
     p.Def.first_name p.Def.surname p.Def.public_name p.Def.qualifiers
     p.Def.aliases p.Def.first_names_aliases p.Def.surnames_aliases nobtit
     (if p.Def.sex = Def.Female then husbands base p else [||])
     (father_titles_places base p nobtit_fun)
-  |> List.map Name.lower
+  |> List.map Geneweb_util.Name.lower
 
 (** [person_misc_names base p nobtit] computes various mix between all kind of names of a person's entry [p]
     from the database [base]. [nobtit] is used to return a title entries for passed in argument person. *)

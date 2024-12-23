@@ -18,8 +18,8 @@ let aoi base i = base.data.ascends.get i
 let uoi base i = base.data.unions.get i
 let coi base i = base.data.couples.get i
 let sou base i = base.data.strings.get i
-let p_first_name base p = Mutil.nominative (sou base p.Dbdisk.first_name)
-let p_surname base p = Mutil.nominative (sou base p.Dbdisk.surname)
+let p_first_name base p = Geneweb_util.Mutil.nominative (sou base p.Dbdisk.first_name)
+let p_surname base p = Geneweb_util.Mutil.nominative (sou base p.Dbdisk.surname)
 
 let husbands base p =
   Array.map
@@ -42,14 +42,14 @@ let father_titles_places base p (nobtit : dsk_person -> dsk_title list) =
 let dsk_person_misc_names :
     dsk_base -> dsk_person -> (dsk_person -> dsk_title list) -> string list =
  fun base p nobtit ->
-  Futil.gen_person_misc_names (sou base) 0 1 p.first_name p.surname
+  Geneweb_util.Futil.gen_person_misc_names (sou base) 0 1 p.first_name p.surname
     p.public_name p.qualifiers p.aliases p.first_names_aliases
     p.surnames_aliases (nobtit p)
     (if p.sex = Female then husbands base p else [||])
     (father_titles_places base p nobtit)
 
 let compare_snames base_data s1 s2 =
-  Mutil.compare_after_particle (Lazy.force base_data.particles) s1 s2
+  Geneweb_util.Mutil.compare_after_particle (Lazy.force base_data.particles) s1 s2
 
 let compare_snames_i base_data is1 is2 =
   if is1 = is2 then 0
@@ -76,7 +76,7 @@ module IntHT = Hashtbl.Make (struct
   let hash x = x
 end)
 
-let name_index s = Hashtbl.hash (Name.crush_lower s) mod table_size
+let name_index s = Hashtbl.hash (Geneweb_util.Name.crush_lower s) mod table_size
 
 let empty_person empty what =
   {
@@ -95,11 +95,11 @@ let empty_person empty what =
     occupation = empty;
     sex = Neuter;
     access = IfTitles;
-    birth = Date.cdate_None;
+    birth = Geneweb_util.Date.cdate_None;
     birth_place = empty;
     birth_note = empty;
     birth_src = empty;
-    baptism = Date.cdate_None;
+    baptism = Geneweb_util.Date.cdate_None;
     baptism_place = empty;
     baptism_note = empty;
     baptism_src = empty;
@@ -119,7 +119,7 @@ let empty_person empty what =
 
 let empty_family empty =
   {
-    Dbdisk.marriage = Date.cdate_None;
+    Dbdisk.marriage = Geneweb_util.Date.cdate_None;
     marriage_place = empty;
     marriage_note = empty;
     marriage_src = empty;
@@ -155,7 +155,7 @@ let map_pers_event ?(fd = identity) fp fs e =
         evt
     | Epers_Name s -> Epers_Name (fs s)
   in
-  let epers_date = Futil.map_cdate fd e.epers_date in
+  let epers_date = Geneweb_util.Futil.map_cdate fd e.epers_date in
   let epers_place = fs e.epers_place in
   let epers_reason = fs e.epers_reason in
   let epers_note = fs e.epers_note in
@@ -181,26 +181,26 @@ let map_person_ps ?(fd = identity) fp fs p =
     surnames_aliases = List.map fs p.surnames_aliases;
     public_name = fs p.public_name;
     qualifiers = List.map fs p.qualifiers;
-    titles = List.map (Futil.map_title_strings ~fd fs) p.titles;
-    rparents = List.map (Futil.map_relation_ps fp fs) p.rparents;
+    titles = List.map (Geneweb_util.Futil.map_title_strings ~fd fs) p.titles;
+    rparents = List.map (Geneweb_util.Futil.map_relation_ps fp fs) p.rparents;
     related = List.map fp p.related;
     aliases = List.map fs p.aliases;
     occupation = fs p.occupation;
     sex = p.sex;
     access = p.access;
-    birth = Futil.map_cdate fd p.birth;
+    birth = Geneweb_util.Futil.map_cdate fd p.birth;
     birth_place = fs p.birth_place;
     birth_note = fs p.birth_note;
     birth_src = fs p.birth_src;
-    baptism = Futil.map_cdate fd p.baptism;
+    baptism = Geneweb_util.Futil.map_cdate fd p.baptism;
     baptism_place = fs p.baptism_place;
     baptism_note = fs p.baptism_note;
     baptism_src = fs p.baptism_src;
-    death = Futil.map_death fd p.death;
+    death = Geneweb_util.Futil.map_death fd p.death;
     death_place = fs p.death_place;
     death_note = fs p.death_note;
     death_src = fs p.death_src;
-    burial = Futil.map_burial fd p.burial;
+    burial = Geneweb_util.Futil.map_burial fd p.burial;
     burial_place = fs p.burial_place;
     burial_note = fs p.burial_note;
     burial_src = fs p.burial_src;
@@ -220,7 +220,7 @@ let map_fam_event ?(fd = identity) fp fs e =
         evt
     | Efam_Name s -> Efam_Name (fs s)
   in
-  let efam_date = Futil.map_cdate fd e.efam_date in
+  let efam_date = Geneweb_util.Futil.map_cdate fd e.efam_date in
   let efam_place = fs e.efam_place in
   let efam_reason = fs e.efam_reason in
   let efam_note = fs e.efam_note in
@@ -240,13 +240,13 @@ let map_fam_event ?(fd = identity) fp fs e =
 
 let map_family_ps ?(fd = identity) fp ff fs fam =
   {
-    Dbdisk.marriage = Futil.map_cdate fd fam.Dbdisk.marriage;
+    Dbdisk.marriage = Geneweb_util.Futil.map_cdate fd fam.Dbdisk.marriage;
     marriage_place = fs fam.marriage_place;
     marriage_note = fs fam.marriage_note;
     marriage_src = fs fam.marriage_src;
     witnesses = Array.map fp fam.witnesses;
     relation = fam.relation;
-    divorce = Futil.map_divorce fd fam.divorce;
+    divorce = Geneweb_util.Futil.map_divorce fd fam.divorce;
     fevents = List.map (map_fam_event ~fd fp fs) fam.fevents;
     comment = fs fam.comment;
     origin_file = fs fam.origin_file;

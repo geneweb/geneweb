@@ -55,13 +55,13 @@ let subst_text x v s =
   else
     let rec loop len i i_ok =
       if i = String.length s then
-        if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
-        else Buff.get len
+        if i_ok > 0 then loop (Geneweb_util.Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+        else Geneweb_util.Buff.get len
       else if s.[i] = x.[i_ok] then
-        if i_ok = String.length x - 1 then loop (Buff.mstore len v) (i + 1) 0
+        if i_ok = String.length x - 1 then loop (Geneweb_util.Buff.mstore len v) (i + 1) 0
         else loop len (i + 1) (i_ok + 1)
-      else if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
-      else loop (Buff.store len s.[i]) (i + 1) 0
+      else if i_ok > 0 then loop (Geneweb_util.Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+      else loop (Geneweb_util.Buff.store len s.[i]) (i + 1) 0
     in
     loop 0 0 0
 
@@ -151,7 +151,7 @@ let not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 
 let setup_link conf =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Geneweb_util.Mutil.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
     let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
@@ -165,7 +165,7 @@ let rec eval_variable conf = function
   | [ "evar"; v; "ns" ] -> (
       try
         let vv = List.assoc v (conf.env @ conf.henv) in
-        Mutil.gen_decode false vv |> esc
+        Geneweb_util.Mutil.gen_decode false vv |> esc
       with Not_found -> "")
   | [ "evar"; v ] -> (
       match Util.p_getenv (conf.env @ conf.henv) v with
@@ -358,7 +358,7 @@ and eval_transl_lexicon conf upp s c =
           | Some n -> Util.transl_nth conf s n
           | None -> Util.transl conf s
         in
-        if c = "n" then s2 else Mutil.nominative s2
+        if c = "n" then s2 else Geneweb_util.Mutil.nominative s2
     | Some (s1, s2) -> (
         try
           if String.length s2 > 0 && s2.[0] = '|' then
@@ -391,7 +391,7 @@ and eval_transl_lexicon conf upp s c =
           Util.transl_decline conf s1 s3)
   in
   let r = Util.translate_eval r in
-  if upp then Utf8.capitalize_fst r else r
+  if upp then Geneweb_util.Utf8.capitalize_fst r else r
 
 let nb_errors = ref 0
 
@@ -415,7 +415,7 @@ let templ_eval_var conf = function
   | [ "false" ] -> VVbool false
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
-      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
+      VVbool (Geneweb_util.Mutil.extract_param "referer: " '\n' conf.request <> "")
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
@@ -494,7 +494,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
       | "and" -> VVbool (if bool e1 then bool e2 else false)
       | "or" -> VVbool (if bool e1 then true else bool e2)
       | "is_substr" | "in" ->
-          VVbool (Ext_string.contains (string e2) (string e1))
+          VVbool (Geneweb_util.Ext_string.contains (string e2) (string e1))
       | "=" -> VVbool (eval_expr ceva e1 = eval_expr ceva e2)
       | "<" -> VVbool (int e1 < int e2)
       | ">" -> VVbool (int e1 > int e2)
@@ -718,10 +718,10 @@ let eval_var conf ifun env ep loc sl =
         | _ -> raise Not_found)
     | [ "env"; "val"; "decoded" ] -> (
         match ifun.get_vother (List.assoc "binding" env) with
-        | Some (Vbind (_, v)) -> VVstring (Mutil.decode v)
+        | Some (Vbind (_, v)) -> VVstring (Geneweb_util.Mutil.decode v)
         | _ -> raise Not_found)
     | "today" :: sl ->
-        let sdn = Date.to_sdn ~from:Dgregorian conf.today in
+        let sdn = Geneweb_util.Date.to_sdn ~from:Dgregorian conf.today in
         TemplDate.eval_date_var conf sdn sl
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
@@ -818,7 +818,7 @@ let rec interp_ast :
         String.concat "" sl
     | None -> (
         match (f, vl) with
-        | "capitalize", [ (None, VVstring s) ] -> Utf8.capitalize_fst s
+        | "capitalize", [ (None, VVstring s) ] -> Geneweb_util.Utf8.capitalize_fst s
         | "interp", [ (None, VVstring s) ] ->
             let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
             String.concat "" (eval_ast_list env ep astl)

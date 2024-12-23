@@ -30,7 +30,7 @@ let print_child_person conf base p =
   Output.print_string conf var;
   Output.print_sstring conf {|_fn" class="mx-2 mb-0">|};
   transl_nth conf "first name/first names" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td colspan="3">|};
   Output.print_sstring conf {|<input name=\"|};
   Output.print_string conf var;
@@ -45,7 +45,7 @@ let print_child_person conf base p =
   Output.print_sstring conf {|"><label for="|};
   Output.print_string conf var;
   Output.print_sstring conf {|_occ" class="mx-2 mb-0">|};
-  transl conf "number" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  transl conf "number" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td>|};
   Output.print_sstring conf {|<input class="form-control" id="|};
   Output.print_string conf var;
@@ -61,7 +61,7 @@ let print_child_person conf base p =
   Output.print_string conf var;
   Output.print_sstring conf {|_sn" class="mx-2 mb-0">|};
   transl_nth conf "surname/surnames" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td colspan="5">|};
   Output.print_sstring conf {|<input name="|};
   Output.print_string conf var;
@@ -92,7 +92,7 @@ let print_children conf base ipl =
 let print_change conf base p =
   let title _ =
     transl conf "change children's names"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let children = children_of_p base p in
   let digest = digest_children base children in
@@ -116,7 +116,7 @@ let print_change conf base p =
   Output.print_sstring conf
     {|<button type="submit" class="btn btn-primary btn-lg ml-5 mb-2">|};
   transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></form>";
   Hutil.trailer conf
 
@@ -130,7 +130,7 @@ let print conf base =
 let print_children_list conf base u =
   Output.print_sstring conf "<h4>";
   transl_nth conf "child/children" 1
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</h4><p><ul>";
   Array.iter
     (fun ifam ->
@@ -150,7 +150,7 @@ let print_children_list conf base u =
 let print_change_done conf base p =
   let title _ =
     transl conf "children's names changed"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
   NameDisplay.fullname_html_of_person conf base p
@@ -166,10 +166,10 @@ let print_conflict conf base ip_var p =
 
 let error_person conf err =
   let title _ =
-    transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
-  Output.printf conf "%s\n" (Utf8.capitalize_fst err);
+  Output.printf conf "%s\n" (Geneweb_util.Utf8.capitalize_fst err);
   Hutil.trailer conf;
   raise
   @@ Update.ModErr

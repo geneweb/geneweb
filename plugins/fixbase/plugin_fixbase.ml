@@ -60,7 +60,7 @@ end
 let opt_password =
   match Sys.getenv_opt "GW_PLUGIN_FIXBASE_PASSWORD" with
   | Some "" | None -> None
-  | Some x -> Some (Mutil.encode x)
+  | Some x -> Some (Geneweb_util.Mutil.encode x)
 
 let opt_manitou =
   match Sys.getenv_opt "GW_PLUGIN_FIXBASE_ONLY_MANITOU" with
@@ -70,7 +70,7 @@ let opt_manitou =
 let missing_password conf =
   let args =
     [
-      ( Mutil.encode arg_password,
+      ( Geneweb_util.Mutil.encode arg_password,
         `Arg_String,
         Util.transl conf "plugin_fixbase_password_missing" |> Adef.safe );
     ]
@@ -92,7 +92,7 @@ let fixbase conf _base =
   Output.print_sstring conf {|</p>|};
   let args =
     let input name txt =
-      (Mutil.encode name, `Arg_Set, Util.transl conf txt |> Adef.safe)
+      (Geneweb_util.Mutil.encode name, `Arg_Set, Util.transl conf txt |> Adef.safe)
     in
     [
       input arg_f_parents "plugin_fixbase_f_parents";
@@ -229,7 +229,7 @@ let fixbase_ok conf base =
       in
       let mkp p =
         let p = gen_person_of_person p in
-        let p = Futil.map_person_ps string_of_iper (sou base) p in
+        let p = Geneweb_util.Futil.map_person_ps string_of_iper (sou base) p in
         { p with key_index = string_of_iper p.key_index }
       in
       let a1 = mka p in
@@ -284,14 +284,14 @@ let fixbase_ok conf base =
     in
     let dump_f f f' =
       let mkf f =
-        Futil.map_family_ps string_of_iper string_of_ifam (sou base)
+        Geneweb_util.Futil.map_family_ps string_of_iper string_of_ifam (sou base)
           (gen_family_of_family f)
       in
       let mkc f =
-        Futil.map_couple_p false string_of_iper (gen_couple_of_family f)
+        Geneweb_util.Futil.map_couple_p false string_of_iper (gen_couple_of_family f)
       in
       let mkd f =
-        Futil.map_descend_p string_of_iper (gen_descend_of_family f)
+        Geneweb_util.Futil.map_descend_p string_of_iper (gen_descend_of_family f)
       in
       let f1 = mkf f in
       let c1 = mkc f in
@@ -320,7 +320,7 @@ let fixbase_ok conf base =
     let string_of_p i =
       Printf.sprintf {|<a href="%s&i=%s">%s</a>|}
         (Util.commd conf :> string)
-        (string_of_iper i |> Mutil.encode :> string)
+        (string_of_iper i |> Geneweb_util.Mutil.encode :> string)
         (Util.designation base (poi base i) : Adef.escaped_string :> string)
       |> Adef.safe
     in
@@ -379,7 +379,7 @@ let fixbase_ok conf base =
       let opt s =
         if UI.enabled conf s then (
           Output.print_sstring conf {|<input type="hidden" name="|};
-          Output.print_string conf (Mutil.encode s);
+          Output.print_string conf (Geneweb_util.Mutil.encode s);
           Output.print_sstring conf {|" value="on">|})
       in
       opt "f_parents";
@@ -442,7 +442,7 @@ let fixbase_ok conf base =
   in
   if dry_run then process ()
   else
-    Lock.control
+    Geneweb_util.Lock.control
       (Files.lock_file @@ Util.base_path [] (conf.bname ^ ".gwb"))
       false
       ~onerror:(fun () -> GWPARAM.output_error conf Def.Service_Unavailable)
