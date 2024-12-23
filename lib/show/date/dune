@@ -1,0 +1,15 @@
+(rule
+  (target date_show.ml)
+  (deps %{lib:geneweb:util/geneweb_util.cma} (:maker mk_date_show.ml))
+  (action (copy %{maker} %{target}))
+)
+
+(library
+ (name geneweb_date_show)
+ (preprocess
+  (pps ppx_import ppx_deriving.show))
+ (public_name geneweb.date_show)
+ (libraries geneweb.util)
+ (modules date_show)
+; (wrapped false)
+ )

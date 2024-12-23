@@ -1,8 +1,9 @@
 (library
  (name geneweb_def_show)
  (preprocess
-  (staged_pps ppx_import ppx_deriving.show))
+  (pps ppx_import ppx_deriving.show))
  (public_name geneweb.def_show)
- (libraries geneweb_def geneweb_gwdb)
+ (libraries geneweb_def geneweb_date_show)
  (modules def_show)
- (wrapped false))
+ (wrapped false)
+ )
