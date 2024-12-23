@@ -740,4 +740,5 @@ module type DriverImplCompat = sig
   val compatibility_directory : string
 end
 
-module Make (_ (*Legacy*) : DriverImplCompat) (_ (*Current*) : DriverImpl) : Driver_S
+module Make (_ (*Legacy*) : DriverImplCompat) (_ (*Current*) : DriverImpl) :
+  Driver_S

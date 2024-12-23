@@ -7,7 +7,9 @@ open Util
 open Dag
 
 let image_normal_txt conf base p fname width height =
-  let image_txt = Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt =
+    Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0)
+  in
   let s = Unix.stat fname in
   let k = Image.default_portrait_filename base p in
   let r =
@@ -32,7 +34,9 @@ let image_normal_txt conf base p fname width height =
   |> Adef.safe
 
 let image_url_txt conf url_p url height : Adef.safe_string =
-  let image_txt = Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt =
+    Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0)
+  in
   Format.sprintf
     {|<a href="%s"><img src="%s" alt="%s" title="%s"
       style="%s"></a>|}
@@ -43,7 +47,9 @@ let image_url_txt conf url_p url height : Adef.safe_string =
   |> Adef.safe
 
 let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
-  let image_txt = Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt =
+    Geneweb_util.Utf8.capitalize_fst (transl_nth conf "image/images" 0)
+  in
   Format.sprintf
     {|<a href="%s"><img src="%s"%s%s alt="%s" title="%s"
       style="%s %s">%s</a>|}
@@ -264,7 +270,9 @@ let displayed_sub s ibeg ilen =
         in
         loop blen (di + 1) dlen k
     | None ->
-        let s = Geneweb_util.Buff.get (buff_store_int s blen i (String.length s)) in
+        let s =
+          Geneweb_util.Buff.get (buff_store_int s blen i (String.length s))
+        in
         strip_empty_tags s
   in
   loop 0 0 0 0
@@ -445,7 +453,9 @@ let strip_troublemakers s =
           in
           loop last_space len j
       | '\n' | '\r' | ' ' ->
-          let len = if last_space then len else Geneweb_util.Buff.store len ' ' in
+          let len =
+            if last_space then len else Geneweb_util.Buff.store len ' '
+          in
           loop true len (i + 1)
       | c -> loop false (Geneweb_util.Buff.store len c) (i + 1)
   in

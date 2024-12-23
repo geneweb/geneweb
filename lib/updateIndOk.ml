@@ -329,7 +329,8 @@ let reconstitute_relation_parent conf var key sex =
   match (getn conf var (key ^ "_fn"), getn conf var (key ^ "_sn")) with
   | ("", _ | _, "" | "?", _ | _, "?") as n ->
       let p =
-        Geneweb_util.Ext_string.only_printable (fst n) ^ Geneweb_util.Ext_string.only_printable (snd n)
+        Geneweb_util.Ext_string.only_printable (fst n)
+        ^ Geneweb_util.Ext_string.only_printable (snd n)
       in
       if p = "" || p = "??" then ()
       else deleted_relation := p :: !deleted_relation;
@@ -544,8 +545,13 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
     else pevents
   in
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
-  let bi = if not !found_birth then (Geneweb_util.Date.cdate_None, "", "", "") else bi in
-  let bp = if not !found_baptism then (Geneweb_util.Date.cdate_None, "", "", "") else bp in
+  let bi =
+    if not !found_birth then (Geneweb_util.Date.cdate_None, "", "", "") else bi
+  in
+  let bp =
+    if not !found_baptism then (Geneweb_util.Date.cdate_None, "", "", "")
+    else bp
+  in
   let de =
     if not !found_death then
       if !found_burial then (DeadDontKnowWhen, "", "", "")
@@ -569,7 +575,9 @@ let reconstitute_person conf =
         try iper_of_string (String.trim s) with Failure _ -> dummy_iper)
     | None -> dummy_iper
   in
-  let first_name = Geneweb_util.Ext_string.only_printable (get conf "first_name") in
+  let first_name =
+    Geneweb_util.Ext_string.only_printable (get conf "first_name")
+  in
   let surname = Geneweb_util.Ext_string.only_printable (get conf "surname") in
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
@@ -583,7 +591,9 @@ let reconstitute_person conf =
   let surnames_aliases, ext =
     reconstitute_string_list conf "surname_alias" ext 0
   in
-  let public_name = Geneweb_util.Ext_string.only_printable (get conf "public_name") in
+  let public_name =
+    Geneweb_util.Ext_string.only_printable (get conf "public_name")
+  in
   let qualifiers, ext = reconstitute_string_list conf "qualifier" ext 0 in
   let aliases, ext = reconstitute_string_list conf "alias" ext 0 in
   let titles, ext = reconstitute_titles conf ext 1 in
@@ -604,32 +614,47 @@ let reconstitute_person conf =
     | Some _ | None -> Neuter
   in
   let birth = Update.reconstitute_date conf "birth" in
-  let birth_place = Geneweb_util.Ext_string.only_printable (get conf "birth_place") in
+  let birth_place =
+    Geneweb_util.Ext_string.only_printable (get conf "birth_place")
+  in
   let birth_note =
     Geneweb_util.Ext_string.only_printable_or_nl
       (Geneweb_util.Ext_string.strip_all_trailing_spaces (get conf "birth_note"))
   in
-  let birth_src = Geneweb_util.Ext_string.only_printable (get conf "birth_src") in
+  let birth_src =
+    Geneweb_util.Ext_string.only_printable (get conf "birth_src")
+  in
   let bapt = Update.reconstitute_date conf "bapt" in
-  let bapt_place = Geneweb_util.Ext_string.only_printable (get conf "bapt_place") in
+  let bapt_place =
+    Geneweb_util.Ext_string.only_printable (get conf "bapt_place")
+  in
   let bapt_note =
     Geneweb_util.Ext_string.only_printable_or_nl
       (Geneweb_util.Ext_string.strip_all_trailing_spaces (get conf "bapt_note"))
   in
   let bapt_src = Geneweb_util.Ext_string.only_printable (get conf "bapt_src") in
-  let burial_place = Geneweb_util.Ext_string.only_printable (get conf "burial_place") in
+  let burial_place =
+    Geneweb_util.Ext_string.only_printable (get conf "burial_place")
+  in
   let burial_note =
     Geneweb_util.Ext_string.only_printable_or_nl
-      (Geneweb_util.Ext_string.strip_all_trailing_spaces (get conf "burial_note"))
+      (Geneweb_util.Ext_string.strip_all_trailing_spaces
+         (get conf "burial_note"))
   in
-  let burial_src = Geneweb_util.Ext_string.only_printable (get conf "burial_src") in
+  let burial_src =
+    Geneweb_util.Ext_string.only_printable (get conf "burial_src")
+  in
   let burial = reconstitute_burial conf burial_place in
-  let death_place = Geneweb_util.Ext_string.only_printable (get conf "death_place") in
+  let death_place =
+    Geneweb_util.Ext_string.only_printable (get conf "death_place")
+  in
   let death_note =
     Geneweb_util.Ext_string.only_printable_or_nl
       (Geneweb_util.Ext_string.strip_all_trailing_spaces (get conf "death_note"))
   in
-  let death_src = Geneweb_util.Ext_string.only_printable (get conf "death_src") in
+  let death_src =
+    Geneweb_util.Ext_string.only_printable (get conf "death_src")
+  in
   let death =
     reconstitute_death conf birth bapt death_place burial burial_place
   in
@@ -673,7 +698,8 @@ let reconstitute_person conf =
     match death with
     | DontKnowIfDead ->
         (* FIXME: do not use _bb version *)
-        Update.infer_death_bb conf (Geneweb_util.Date.od_of_cdate birth)
+        Update.infer_death_bb conf
+          (Geneweb_util.Date.od_of_cdate birth)
           (Geneweb_util.Date.od_of_cdate bapt)
     | NotDead | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> death
   in
@@ -730,7 +756,8 @@ let check_person conf base p =
 let error_person conf err =
   if not conf.api_mode then (
     let title _ =
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
     in
     Hutil.rheader conf title;
     Output.print_sstring conf
@@ -997,7 +1024,8 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   | _l ->
       Output.print_sstring conf "<p>\n";
       Output.printf conf "%s, %s %s %s :"
-        (Geneweb_util.Utf8.capitalize_fst (transl_nth conf "relation/relations" 0))
+        (Geneweb_util.Utf8.capitalize_fst
+           (transl_nth conf "relation/relations" 0))
         (transl conf "first name missing")
         (transl conf "or")
         (transl conf "surname missing");

@@ -48,7 +48,9 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length =
 
 let log_request_infos ~request ~path ~resp_status ~length =
   let tm = Unix.times () in
-  let curr_tm = (Geneweb_util.Mutil.sprintf_date Unix.(time () |> localtime) :> string) in
+  let curr_tm =
+    (Geneweb_util.Mutil.sprintf_date Unix.(time () |> localtime) :> string)
+  in
   let json =
     json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length
   in

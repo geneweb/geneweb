@@ -55,12 +55,15 @@ let subst_text x v s =
   else
     let rec loop len i i_ok =
       if i = String.length s then
-        if i_ok > 0 then loop (Geneweb_util.Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+        if i_ok > 0 then
+          loop (Geneweb_util.Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
         else Geneweb_util.Buff.get len
       else if s.[i] = x.[i_ok] then
-        if i_ok = String.length x - 1 then loop (Geneweb_util.Buff.mstore len v) (i + 1) 0
+        if i_ok = String.length x - 1 then
+          loop (Geneweb_util.Buff.mstore len v) (i + 1) 0
         else loop len (i + 1) (i_ok + 1)
-      else if i_ok > 0 then loop (Geneweb_util.Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+      else if i_ok > 0 then
+        loop (Geneweb_util.Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
       else loop (Geneweb_util.Buff.store len s.[i]) (i + 1) 0
     in
     loop 0 0 0
@@ -415,7 +418,8 @@ let templ_eval_var conf = function
   | [ "false" ] -> VVbool false
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
-      VVbool (Geneweb_util.Mutil.extract_param "referer: " '\n' conf.request <> "")
+      VVbool
+        (Geneweb_util.Mutil.extract_param "referer: " '\n' conf.request <> "")
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
@@ -818,7 +822,8 @@ let rec interp_ast :
         String.concat "" sl
     | None -> (
         match (f, vl) with
-        | "capitalize", [ (None, VVstring s) ] -> Geneweb_util.Utf8.capitalize_fst s
+        | "capitalize", [ (None, VVstring s) ] ->
+            Geneweb_util.Utf8.capitalize_fst s
         | "interp", [ (None, VVstring s) ] ->
             let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
             String.concat "" (eval_ast_list env ep astl)

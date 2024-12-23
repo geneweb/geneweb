@@ -84,16 +84,28 @@ let fix_pevents ~report base pp =
   (* TODO clean up *)
   let p = gen_person_of_person pp in
   let empty_bi =
-    (Geneweb_util.Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string)
+    ( Geneweb_util.Date.cdate_None,
+      Gwdb.empty_string,
+      Gwdb.empty_string,
+      Gwdb.empty_string )
   in
   let empty_bp =
-    (Geneweb_util.Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string)
+    ( Geneweb_util.Date.cdate_None,
+      Gwdb.empty_string,
+      Gwdb.empty_string,
+      Gwdb.empty_string )
   in
   let empty_de =
-    (Geneweb_util.Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string)
+    ( Geneweb_util.Date.cdate_None,
+      Gwdb.empty_string,
+      Gwdb.empty_string,
+      Gwdb.empty_string )
   in
   let empty_bu =
-    (Geneweb_util.Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string)
+    ( Geneweb_util.Date.cdate_None,
+      Gwdb.empty_string,
+      Gwdb.empty_string,
+      Gwdb.empty_string )
   in
   let pevents = p.pevents in
   let aux name date place note src empty pevents =
@@ -110,7 +122,8 @@ let fix_pevents ~report base pp =
           {
             epers_name = e.epers_name;
             epers_date =
-              (if e.epers_date = Geneweb_util.Date.cdate_None then date else e.epers_date);
+              (if e.epers_date = Geneweb_util.Date.cdate_None then date
+              else e.epers_date);
             epers_place =
               (if e.epers_place = Gwdb.empty_string then place
               else e.epers_place);
@@ -146,7 +159,8 @@ let fix_pevents ~report base pp =
   let death =
     match p.death with
     | Death _ -> p.death
-    | NotDead when death <> Geneweb_util.Date.cdate_None -> Death (Unspecified, death)
+    | NotDead when death <> Geneweb_util.Date.cdate_None ->
+        Death (Unspecified, death)
     | x -> x
   in
   let (burial, burial_place, burial_note, burial_src), pevents =
@@ -422,7 +436,8 @@ let fix_person_utf8_sequence ~report ~base ~person =
   let fix_map_str = fix_map_utf8_str ~report:report_str ~base in
   let gen_pers = Gwdb.gen_person_of_person person in
   let gen_pers' =
-    Geneweb_util.Futil.map_person_ps ~fd:fix_map_date Fun.id fix_map_str gen_pers
+    Geneweb_util.Futil.map_person_ps ~fd:fix_map_date Fun.id fix_map_str
+      gen_pers
   in
   if gen_pers' <> gen_pers then (
     Gwdb.patch_person base iper gen_pers';
@@ -449,7 +464,8 @@ let fix_family_utf8_sequence ~report ~base ~family =
   let fix_map_str = fix_map_utf8_str ~report:report_str ~base in
   let gen_fam = Gwdb.gen_family_of_family family in
   let gen_fam' =
-    Geneweb_util.Futil.map_family_ps ~fd:fix_map_date Fun.id Fun.id fix_map_str gen_fam
+    Geneweb_util.Futil.map_family_ps ~fd:fix_map_date Fun.id Fun.id fix_map_str
+      gen_fam
   in
   if gen_fam' <> gen_fam then (
     Gwdb.patch_family base ifam gen_fam';
@@ -493,7 +509,9 @@ let fix_person_key base =
             (fun (change, remaining_occ_set) iper ->
               let p = Gwdb.poi base iper in
               let occ = Gwdb.get_occ p in
-              let set' = Geneweb_util.Ext_int.Set.remove occ remaining_occ_set in
+              let set' =
+                Geneweb_util.Ext_int.Set.remove occ remaining_occ_set
+              in
               if set' == remaining_occ_set then (
                 let occ' = first_free_occ () in
                 Gwdb.patch_person base iper

@@ -234,7 +234,8 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     loop first_sosa false true
   in
   if not some then (
-    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "no match"));
+    Output.print_sstring conf
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "no match"));
     Output.print_sstring conf ". ");
   if lev1 > 1 then Output.print_sstring conf "</ul>"
 
@@ -254,21 +255,27 @@ let print_cousins conf base p lev1 lev2 =
     in
     if lev1 = lev2 then
       let s = txt_fun (brother_label conf lev1) in
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 2 && lev2 = 1 then
       let s = txt_fun (transl_nth conf "an uncle/an aunt" 4) in
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 3 && lev2 = 1 then
       let s = txt_fun (transl_nth conf "a great-uncle/a great-aunt" 4) in
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 2 then
       let s = txt_fun (transl_nth conf "a nephew/a niece" 4) in
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 3 then
       let s = txt_fun (transl_nth conf "a great-nephew/a great-niece" 4) in
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (Util.translate_eval s))
     else (
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "ancestors"));
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (transl conf "ancestors"));
       Output.print_sstring conf " ";
       Output.print_sstring conf (string_of_int lev1);
       Output.print_sstring conf " / ";
@@ -295,7 +302,8 @@ let print_cousins conf base p lev1 lev2 =
   Output.print_sstring conf "<div><p>";
   if !cnt >= max_cnt then Output.print_sstring conf "etc... "
   else if !cnt > 1 then (
-    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "total"));
+    Output.print_sstring conf
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "total"));
     Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf " ";
     Output.print_sstring conf (string_of_int !cnt);

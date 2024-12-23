@@ -225,13 +225,16 @@ let compatible_dmys dmy1 dmy2 =
 let compatible_dates date1 date2 =
   let compatible_cals cal1 cal2 =
     match (cal1, cal2) with
-    | Geneweb_util.Date.Dgregorian, Geneweb_util.Date.Djulian | Dgregorian, Dfrench -> true
+    | Geneweb_util.Date.Dgregorian, Geneweb_util.Date.Djulian
+    | Dgregorian, Dfrench ->
+        true
     | _ -> cal1 = cal2
   in
   if date1 = date2 then true
   else
     match (date1, date2) with
-    | Geneweb_util.Date.Dgreg (dmy1, cal1), Geneweb_util.Date.Dgreg (dmy2, cal2) ->
+    | Geneweb_util.Date.Dgreg (dmy1, cal1), Geneweb_util.Date.Dgreg (dmy2, cal2)
+      ->
         compatible_dmys dmy1 dmy2 && compatible_cals cal1 cal2
     | Dgreg (_, _), Dtext _ -> false
     | Dtext _, _ -> true
@@ -253,7 +256,8 @@ let compatible_cdates cdate1 cdate2 =
     If birth place are not compatible, the returned list will have MsgBirthPlace *)
 let compatible_birth p1 p2 =
   let get_birth person =
-    if person.birth = Geneweb_util.Date.cdate_None then person.baptism else person.birth
+    if person.birth = Geneweb_util.Date.cdate_None then person.baptism
+    else person.birth
   in
   let birth1 = get_birth p1 in
   let birth2 = get_birth p2 in

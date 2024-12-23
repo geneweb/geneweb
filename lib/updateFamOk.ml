@@ -24,7 +24,9 @@ let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
 let reconstitute_parent_or_child conf var default_surname =
-  let first_name = Geneweb_util.Ext_string.only_printable (getn conf var "fn") in
+  let first_name =
+    Geneweb_util.Ext_string.only_printable (getn conf var "fn")
+  in
   let surname =
     let surname = Geneweb_util.Ext_string.only_printable (getn conf var "sn") in
     if surname = "" && first_name <> "" then default_surname else surname
@@ -43,7 +45,9 @@ let reconstitute_parent_or_child conf var default_surname =
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
     let dpl = getn conf (var ^ "d") "pl" in
-    let occupation = Geneweb_util.Ext_string.only_printable (getn conf var "occupation") in
+    let occupation =
+      Geneweb_util.Ext_string.only_printable (getn conf var "occupation")
+    in
     let public = getn conf (var ^ "b") "yyyy" = "p" in
     {
       ci_birth_date = b;
@@ -385,7 +389,11 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   let marr, wit =
     match !found_marriage with
     | None ->
-        ( (NoMention, Geneweb_util.Date.cdate_None, empty_string, empty_string, empty_string),
+        ( ( NoMention,
+            Geneweb_util.Date.cdate_None,
+            empty_string,
+            empty_string,
+            empty_string ),
           [||] )
     | Some (kind, date, place, note, src, wit) ->
         ((kind, date, place, note, src), wit)
@@ -649,14 +657,16 @@ let print_err_sex conf base p =
 
 let print_err conf =
   let err =
-    Update.UERR (transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe)
+    Update.UERR
+      (transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () -> Update.print_return conf
 
 let print_error_disconnected conf =
   let err =
     Update.UERR
-      (transl conf "msg error disconnected" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe)
+      (transl conf "msg error disconnected"
+      |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
@@ -754,7 +764,8 @@ let patch_person_with_pevents base ip =
       let src = p.birth_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Option.is_some (Geneweb_util.Date.od_of_cdate p.birth) then evt ~date:p.birth ()
+    if Option.is_some (Geneweb_util.Date.od_of_cdate p.birth) then
+      evt ~date:p.birth ()
     else if sou base p.birth_place = "" then None
     else evt ()
   in
@@ -766,7 +777,8 @@ let patch_person_with_pevents base ip =
       let src = p.baptism_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Option.is_some (Geneweb_util.Date.od_of_cdate p.baptism) then evt ~date:p.baptism ()
+    if Option.is_some (Geneweb_util.Date.od_of_cdate p.baptism) then
+      evt ~date:p.baptism ()
     else if sou base p.baptism_place = "" then None
     else evt ()
   in
@@ -867,7 +879,9 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    Geneweb_util.Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    Geneweb_util.Futil.map_descend_p
+      (Update.insert_person conf base psrc created_p)
+      sdes
   in
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
@@ -1135,7 +1149,8 @@ let print_family conf base (wl, ml) cpl des =
   (match rdsrc with
   | Some x ->
       conf.henv <- List.remove_assoc "dsrc" conf.henv;
-      if x <> "" then conf.henv <- ("dsrc", Geneweb_util.Mutil.encode x) :: conf.henv
+      if x <> "" then
+        conf.henv <- ("dsrc", Geneweb_util.Mutil.encode x) :: conf.henv
   | None -> ());
   Output.print_sstring conf "<ul>\n";
   Output.print_sstring conf "<li>";
@@ -1547,7 +1562,9 @@ let print_change_event_order conf base =
       let fam = update_family_with_fevents conf base fam in
       patch_family base fam.fam_index fam;
       let a = foi base fam.fam_index in
-      let cpl = Geneweb_util.Futil.parent conf.multi_parents (get_parent_array a) in
+      let cpl =
+        Geneweb_util.Futil.parent conf.multi_parents (get_parent_array a)
+      in
       let des = { children = get_children a } in
       let wl =
         let wl = ref [] in

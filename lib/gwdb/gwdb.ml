@@ -52,7 +52,8 @@ let rec delete_person excl base ip =
         Gwdb_driver.delete_ascend base ip;
         (* remove person id from family descendants *)
         let children =
-          (get_gen_descend base ifam).Def.children |> Geneweb_util.Mutil.array_except ip
+          (get_gen_descend base ifam).Def.children
+          |> Geneweb_util.Mutil.array_except ip
         in
         Gwdb_driver.patch_descend base ifam { children };
         if children = [| ip |] then
@@ -146,7 +147,10 @@ and delete_family excl base ifam =
     excl children
 
 and rm_union base ifam iper =
-  { Def.family = (get_gen_union base iper).family |> Geneweb_util.Mutil.array_except ifam }
+  {
+    Def.family =
+      (get_gen_union base iper).family |> Geneweb_util.Mutil.array_except ifam;
+  }
   |> patch_union base iper
 
 (** [delete_person base iper] and [delete_family base ifam]
@@ -200,7 +204,8 @@ let nobtitles base allowed_titles denied_titles p =
             list)
 
 (** Returns first name of person *)
-let p_first_name base p = Geneweb_util.Mutil.nominative (sou base (get_first_name p))
+let p_first_name base p =
+  Geneweb_util.Mutil.nominative (sou base (get_first_name p))
 
 (** Returns surname of person *)
 let p_surname base p = Geneweb_util.Mutil.nominative (sou base (get_surname p))

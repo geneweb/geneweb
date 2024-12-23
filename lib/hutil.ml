@@ -153,7 +153,8 @@ let eval_julian_day conf =
       let mm = getint ("m" ^ var) in
       let dd = getint ("d" ^ var) in
       let dt =
-        Geneweb_util.Date.{ day = dd; month = mm; year = yy; prec = Sure; delta = 0 }
+        Geneweb_util.Date.
+          { day = dd; month = mm; year = yy; prec = Sure; delta = 0 }
       in
       match Util.p_getenv conf.env ("t" ^ var) with
       | Some _ -> conv dt
@@ -212,7 +213,9 @@ let eval_var conf env jd _loc =
       | _ -> raise Not_found)
   | "date" :: sl -> TemplDate.eval_date_var conf jd sl
   | "today" :: sl ->
-      TemplDate.eval_date_var conf (Geneweb_util.Date.to_sdn ~from:Dgregorian conf.today) sl
+      TemplDate.eval_date_var conf
+        (Geneweb_util.Date.to_sdn ~from:Dgregorian conf.today)
+        sl
   | _ -> raise Not_found
 
 let print_foreach print_ast eval_expr =

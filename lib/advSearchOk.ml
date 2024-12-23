@@ -11,7 +11,8 @@ let reconstitute_date_dmy conf var =
           | Some d ->
               if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
                 Some
-                  Geneweb_util.Date.{ day = d; month = m; year = y; prec = Sure; delta = 0 }
+                  Geneweb_util.Date.
+                    { day = d; month = m; year = y; prec = Sure; delta = 0 }
               else None
           | None ->
               if m >= 1 && m <= 12 then
@@ -208,12 +209,18 @@ end = struct
     match (d1, d2) with
     | Some d1, Some d2 -> (
         match df p with
-        | Some d -> Geneweb_util.Date.compare_dmy d d1 >= 0 && Geneweb_util.Date.compare_dmy d d2 <= 0
+        | Some d ->
+            Geneweb_util.Date.compare_dmy d d1 >= 0
+            && Geneweb_util.Date.compare_dmy d d2 <= 0
         | None -> false)
     | Some d1, None -> (
-        match df p with Some d -> Geneweb_util.Date.compare_dmy d d1 >= 0 | None -> false)
+        match df p with
+        | Some d -> Geneweb_util.Date.compare_dmy d d1 >= 0
+        | None -> false)
     | None, Some d2 -> (
-        match df p with Some d -> Geneweb_util.Date.compare_dmy d d2 <= 0 | None -> false)
+        match df p with
+        | Some d -> Geneweb_util.Date.compare_dmy d d2 <= 0
+        | None -> false)
     | None, None -> default
 
   let match_sex ~p ~sex =
@@ -275,7 +282,9 @@ end = struct
     match (d1, d2) with
     | Some d1, Some d2 ->
         test_date_place (fun fam ->
-            match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+            match
+              Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam)
+            with
             | Some d ->
                 if Geneweb_util.Date.compare_dmy d d1 < 0 then false
                 else if Geneweb_util.Date.compare_dmy d2 d < 0 then false
@@ -283,13 +292,19 @@ end = struct
             | None -> false)
     | Some d1, None ->
         test_date_place (fun fam ->
-            match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-            | Some d -> if Geneweb_util.Date.compare_dmy d d1 < 0 then false else true
+            match
+              Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam)
+            with
+            | Some d ->
+                if Geneweb_util.Date.compare_dmy d d1 < 0 then false else true
             | None -> false)
     | None, Some d2 ->
         test_date_place (fun fam ->
-            match Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-            | Some d -> if Geneweb_util.Date.compare_dmy d d2 > 0 then false else true
+            match
+              Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage fam)
+            with
+            | Some d ->
+                if Geneweb_util.Date.compare_dmy d d2 > 0 then false else true
             | None -> false)
     | None, None ->
         if places = [] then default else test_date_place (fun _ -> true)
@@ -301,10 +316,12 @@ end = struct
         (abbrev_lower @@ Gwdb.sou base @@ Gwdb.get_occupation p)
 
   let match_baptism_date =
-    match_date ~df:(fun p -> Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_baptism p))
+    match_date ~df:(fun p ->
+        Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_baptism p))
 
   let match_birth_date =
-    match_date ~df:(fun p -> Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p))
+    match_date ~df:(fun p ->
+        Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_birth p))
 
   let match_burial_date =
     let get_burial p =
@@ -330,7 +347,8 @@ end = struct
 
   let match_name ~search_list ~exact : string list -> bool =
     let matching : string list -> string list -> bool =
-      if exact then Geneweb_util.Ext_list.elements_cmp else Geneweb_util.Ext_list.is_subset
+      if exact then Geneweb_util.Ext_list.elements_cmp
+      else Geneweb_util.Ext_list.is_subset
     in
     fun x -> List.exists (fun s -> matching s x) search_list
 
@@ -338,7 +356,8 @@ end = struct
     if search_list = [] then fun _ -> true
     else
       let eq = match_name ~search_list ~exact in
-      fun p -> eq (List.map Geneweb_util.Name.lower @@ split @@ Gwdb.sou base @@ get p)
+      fun p ->
+        eq (List.map Geneweb_util.Name.lower @@ split @@ Gwdb.sou base @@ get p)
 
   let match_first_name ~base ~first_name_list ~exact =
     wrap_match_name ~base ~search_list:first_name_list ~exact
@@ -549,12 +568,14 @@ let advanced_search conf base max_answers =
   in
   let fn_list =
     List.map
-      (fun s -> List.map Geneweb_util.Name.lower @@ Geneweb_util.Name.split_fname s)
+      (fun s ->
+        List.map Geneweb_util.Name.lower @@ Geneweb_util.Name.split_fname s)
       (getss "first_name")
   in
   let sn_list =
     List.map
-      (fun s -> List.map Geneweb_util.Name.lower @@ Geneweb_util.Name.split_sname s)
+      (fun s ->
+        List.map Geneweb_util.Name.lower @@ Geneweb_util.Name.split_sname s)
       (getss "surname")
   in
   let search_type = get_search_type gets in
@@ -679,8 +700,11 @@ let advanced_search conf base max_answers =
                let istrs = strings_of base x in
                List.fold_left
                  (fun acc istr ->
-                   let str = Geneweb_util.Mutil.nominative (Gwdb.sou base istr) in
-                   if eq (List.map Geneweb_util.Name.lower @@ split str) then istr :: acc
+                   let str =
+                     Geneweb_util.Mutil.nominative (Gwdb.sou base istr)
+                   in
+                   if eq (List.map Geneweb_util.Name.lower @@ split str) then
+                     istr :: acc
                    else acc)
                  [] istrs))
           n_list

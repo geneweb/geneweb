@@ -92,7 +92,9 @@ let fixbase conf _base =
   Output.print_sstring conf {|</p>|};
   let args =
     let input name txt =
-      (Geneweb_util.Mutil.encode name, `Arg_Set, Util.transl conf txt |> Adef.safe)
+      ( Geneweb_util.Mutil.encode name,
+        `Arg_Set,
+        Util.transl conf txt |> Adef.safe )
     in
     [
       input arg_f_parents "plugin_fixbase_f_parents";
@@ -284,14 +286,16 @@ let fixbase_ok conf base =
     in
     let dump_f f f' =
       let mkf f =
-        Geneweb_util.Futil.map_family_ps string_of_iper string_of_ifam (sou base)
-          (gen_family_of_family f)
+        Geneweb_util.Futil.map_family_ps string_of_iper string_of_ifam
+          (sou base) (gen_family_of_family f)
       in
       let mkc f =
-        Geneweb_util.Futil.map_couple_p false string_of_iper (gen_couple_of_family f)
+        Geneweb_util.Futil.map_couple_p false string_of_iper
+          (gen_couple_of_family f)
       in
       let mkd f =
-        Geneweb_util.Futil.map_descend_p string_of_iper (gen_descend_of_family f)
+        Geneweb_util.Futil.map_descend_p string_of_iper
+          (gen_descend_of_family f)
       in
       let f1 = mkf f in
       let c1 = mkc f in

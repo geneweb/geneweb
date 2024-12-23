@@ -25,7 +25,9 @@ let w_base =
       true)
 
 let getenv var env = List.assoc var env |> Geneweb_util.Mutil.decode
-let getenv_opt var env = List.assoc_opt var env |> Option.map Geneweb_util.Mutil.decode
+
+let getenv_opt var env =
+  List.assoc_opt var env |> Option.map Geneweb_util.Mutil.decode
 
 let export conf base =
   assert conf.wizard;

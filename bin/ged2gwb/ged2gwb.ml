@@ -133,7 +133,8 @@ let speclist =
        possible setting in GEDCOM" );
     ( "-particles",
       Arg.String
-        (fun s -> Ged2gwb_lib.State.particles := Geneweb_util.Mutil.input_particles s),
+        (fun s ->
+          Ged2gwb_lib.State.particles := Geneweb_util.Mutil.input_particles s),
       "<FILE> Use the given file as list of particles" );
   ]
   |> List.sort compare |> Arg.align

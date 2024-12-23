@@ -45,14 +45,17 @@ let gen_print conf base mois f_scan dead_people =
       if dead_people then transl conf "anniversaries"
       else transl conf "birthdays"
     in
-    Output.printf conf "%s %s" (Geneweb_util.Utf8.capitalize_fst lab)
+    Output.printf conf "%s %s"
+      (Geneweb_util.Utf8.capitalize_fst lab)
       (Util.translate_eval (transl_nth conf "(month)" (mois - 1)))
   in
   (try
      while true do
        let p, txt_of = f_scan () in
        if not dead_people then
-         match (Geneweb_util.Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+         match
+           (Geneweb_util.Date.cdate_to_dmy_opt (get_birth p), get_death p)
+         with
          | Some d, (NotDead | DontKnowIfDead) ->
              if
                d.prec = Sure && d.day <> 0 && d.month <> 0 && d.month = mois
@@ -187,7 +190,8 @@ let print_birth_day conf base day_name fphrase wd dt list =
         |> Adef.safe
       in
       Output.printf conf fphrase
-        (Geneweb_util.Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
+        (Geneweb_util.Utf8.capitalize_fst
+           (day_name : Adef.safe_string :> string)
          ^<^ ",\n"
          ^<^ std_color conf ("<b>" ^<^ txt ^>^ "</b>")
           : Adef.safe_string
@@ -219,7 +223,8 @@ let propose_months conf mode =
     Output.print_sstring conf
       (if i = conf.today.month then {| selected="selected">|} else ">");
     transl_nth conf "(month)" (i - 1)
-    |> Util.translate_eval |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+    |> Util.translate_eval |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf;
     Output.print_sstring conf "</option>"
   done;
   Output.print_sstring conf "</select>";
@@ -233,7 +238,10 @@ let propose_months conf mode =
 let day_after d =
   (* TODO this should be done with Calendars and SDN instead *)
   let day, r =
-    if d.Geneweb_util.Date.day >= Geneweb_util.Date.nb_days_in_month d.month d.year then (1, 1)
+    if
+      d.Geneweb_util.Date.day
+      >= Geneweb_util.Date.nb_days_in_month d.month d.year
+    then (1, 1)
     else (succ d.day, 0)
   in
   let month, r = if d.month + r > 12 then (1, 1) else (d.month + r, 0) in
@@ -256,7 +264,8 @@ let print_anniv conf base day_name fphrase wd dt = function
         |> Adef.safe
       in
       Output.printf conf fphrase
-        (Geneweb_util.Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
+        (Geneweb_util.Utf8.capitalize_fst
+           (day_name : Adef.safe_string :> string)
          ^<^ ",\n"
          ^<^ std_color conf ("<b>" ^<^ txt ^>^ "</b>")
           : Adef.safe_string
@@ -291,7 +300,8 @@ let list_aux conf base list cb =
 let print_marriage conf base month =
   let title _ =
     let lab = transl conf "anniversaries of marriage" in
-    Output.printf conf "%s %s" (Geneweb_util.Utf8.capitalize_fst lab)
+    Output.printf conf "%s %s"
+      (Geneweb_util.Utf8.capitalize_fst lab)
       (transl_decline conf "in (month year)"
          (transl_nth conf "(month)" (month - 1)))
   in
@@ -347,7 +357,8 @@ let print_marriage_day conf base day_name fphrase wd dt = function
   | list ->
       Output.print_sstring conf "<p>";
       Output.printf conf fphrase
-        (Geneweb_util.Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
+        (Geneweb_util.Utf8.capitalize_fst
+           (day_name : Adef.safe_string :> string)
          ^<^ ",\n"
          ^<^ std_color conf
                ("<b>"
@@ -364,8 +375,8 @@ let print_marriage_day conf base day_name fphrase wd dt = function
       print_anniversaries_of_marriage conf base list
 
 let match_dates conf base p d1 d2 =
-  if d1.Geneweb_util.Date.day = d2.Geneweb_util.Date.day && d1.month = d2.month then
-    authorized_age conf base p
+  if d1.Geneweb_util.Date.day = d2.Geneweb_util.Date.day && d1.month = d2.month
+  then authorized_age conf base p
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
     && not (Geneweb_util.Date.leap_year d2.year)
@@ -374,7 +385,8 @@ let match_dates conf base p d1 d2 =
 
 let gen_print_menu_birth conf base f_scan mode =
   let title _ =
-    transl conf "birthdays" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "birthdays" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   let tom = day_after conf.today in
   let aft = day_after tom in
@@ -392,7 +404,9 @@ let gen_print_menu_birth conf base f_scan mode =
   (try
      while true do
        let p, txt_of = f_scan () in
-       match (Geneweb_util.Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+       match
+         (Geneweb_util.Date.cdate_to_dmy_opt (get_birth p), get_death p)
+       with
        | Some d, (NotDead | DontKnowIfDead) ->
            if d.prec = Sure && d.day <> 0 && d.month <> 0 then
              if match_dates conf base p d conf.today then
@@ -521,7 +535,8 @@ let print_menu_dead conf base =
       Util.hidden_input conf "m" @@ Adef.encoded "AD")
 
 let match_mar_dates conf base cpl d1 d2 =
-  if d1.Geneweb_util.Date.day = d2.Geneweb_util.Date.day && d1.month = d2.month then
+  if d1.Geneweb_util.Date.day = d2.Geneweb_util.Date.day && d1.month = d2.month
+  then
     authorized_age conf base (pget conf base (get_father cpl))
     && authorized_age conf base (pget conf base (get_mother cpl))
   else if
@@ -547,7 +562,9 @@ let print_menu_marriage conf base =
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in
-      match (Geneweb_util.Date.cdate_to_dmy_opt (get_marriage fam), get_divorce fam) with
+      match
+        (Geneweb_util.Date.cdate_to_dmy_opt (get_marriage fam), get_divorce fam)
+      with
       | Some d, NotDivorced when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
           let update_list cpl =
             if match_mar_dates conf base cpl d conf.today then

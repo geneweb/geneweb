@@ -64,7 +64,9 @@ type wiki_info = {
 }
 
 let escape (s : string) = (Util.escape_html s : Adef.escaped_string :> string)
-let encode (s : string) = (Geneweb_util.Mutil.encode s : Adef.encoded_string :> string)
+
+let encode (s : string) =
+  (Geneweb_util.Mutil.encode s : Adef.encoded_string :> string)
 
 let syntax_links conf wi s =
   let slen = String.length s in
@@ -342,7 +344,8 @@ let string_of_modify_link conf cnt empty = function
       ^ "_"
       ^ (Geneweb_util.Mutil.encode mode :> string)
       ^ "&v=" ^ string_of_int cnt
-      ^ (if sfn = "" then "" else "&f=" ^ (Geneweb_util.Mutil.encode sfn :> string))
+      ^ (if sfn = "" then ""
+        else "&f=" ^ (Geneweb_util.Mutil.encode sfn :> string))
       ^ {|">|}
       ^ (if can_edit then Util.transl_decline conf "modify" ""
         else Util.transl conf "view source")
@@ -656,12 +659,16 @@ let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
       let open Def in
       "&f=" ^<^ Geneweb_util.Mutil.encode sub_fname
   in
-  print_sub_part_links conf (Geneweb_util.Mutil.encode edit_mode) sfn cnt0 (lines = []);
+  print_sub_part_links conf
+    (Geneweb_util.Mutil.encode edit_mode)
+    sfn cnt0 (lines = []);
   print_sub_part_text conf wi edit_opt cnt0 lines
 
 let print_mod_view_page conf can_edit mode fname title env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
-  let mode_pref = Geneweb_util.Mutil.encode (if can_edit then "MOD_" else "VIEW_") in
+  let mode_pref =
+    Geneweb_util.Mutil.encode (if can_edit then "MOD_" else "VIEW_")
+  in
   let has_v, v =
     match Util.p_getint conf.Config.env "v" with
     | Some v -> (true, v)
@@ -706,9 +713,11 @@ let print_mod_view_page conf can_edit mode fname title env s =
    let open Def in
    Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK"));
   if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
-  if fname <> "" then Util.hidden_input conf "f" (Geneweb_util.Mutil.encode fname);
+  if fname <> "" then
+    Util.hidden_input conf "f" (Geneweb_util.Mutil.encode fname);
   if can_edit then
-    Util.hidden_input conf "digest" (Geneweb_util.Ext_string.digest s |> Geneweb_util.Mutil.encode);
+    Util.hidden_input conf "digest"
+      (Geneweb_util.Ext_string.digest s |> Geneweb_util.Mutil.encode);
   Output.print_sstring conf
     {|<div class="row ml-3"><div class="d-inline col-9 py-1">|};
   Util.include_template conf [ ("name", Adef.encoded "notes") ] "toolbar" ignore;
@@ -722,7 +731,8 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf
       {|<button type="submit" class="btn btn-outline-primary btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3">|};
     Output.print_sstring conf
-      (Geneweb_util.Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
+      (Geneweb_util.Utf8.capitalize_fst
+         (Util.transl_nth conf "validate/delete" 0));
     Output.print_sstring conf "</button>");
   Output.print_sstring conf {|<div class="d-inline col-9 py-1">|};
   Util.include_template conf [ ("name", Adef.encoded "notes") ] "accent" ignore;
@@ -854,7 +864,8 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
         | Some s -> s
         | None -> ""
       in
-      if digest <> Geneweb_util.Ext_string.digest old_string then Update.error_digest conf
+      if digest <> Geneweb_util.Ext_string.digest old_string then
+        Update.error_digest conf
       else
         let s =
           match Util.p_getint conf.Config.env "v" with

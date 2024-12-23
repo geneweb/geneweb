@@ -58,8 +58,12 @@ let diff_visibility conf base op np =
   let k = slash_name_of_key np.first_name np.surname np.occ in
   let empty_union = { family = [||] } in
   let empty_ascend = { parents = None; consang = Adef.fix (-1) } in
-  let op = Geneweb_util.Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op in
-  let np = Geneweb_util.Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np in
+  let op =
+    Geneweb_util.Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op
+  in
+  let np =
+    Geneweb_util.Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np
+  in
   let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
   let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
   let tmp_conf = { conf with wizard = false; friend = false } in
@@ -630,7 +634,8 @@ let search_text conf base s =
         let vv = (ref (Bytes.create 0), ref 0) in
         let rec loop pos =
           match
-            try Some (Geneweb_util.Mutil.rev_input_line ic pos vv) with End_of_file -> None
+            try Some (Geneweb_util.Mutil.rev_input_line ic pos vv)
+            with End_of_file -> None
           with
           | Some (line, pos2) -> (
               match line_fields line with

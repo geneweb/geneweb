@@ -31,19 +31,25 @@ let max_siblings_gap = 50
 
 (* Check if d1 < d2 *)
 let strictly_before_dmy d1 d2 =
-  match Geneweb_util.Date.compare_dmy_strict d1 d2 with Some x -> x < 0 | None -> false
+  match Geneweb_util.Date.compare_dmy_strict d1 d2 with
+  | Some x -> x < 0
+  | None -> false
 
 let strictly_before d1 d2 =
   match (d1, d2) with
-  | Geneweb_util.Date.Dgreg (d1, _), Geneweb_util.Date.Dgreg (d2, _) -> strictly_before_dmy d1 d2
+  | Geneweb_util.Date.Dgreg (d1, _), Geneweb_util.Date.Dgreg (d2, _) ->
+      strictly_before_dmy d1 d2
   | _ -> false
 
 let strictly_after_dmy d1 d2 =
-  match Geneweb_util.Date.compare_dmy_strict d1 d2 with Some x -> x > 0 | None -> false
+  match Geneweb_util.Date.compare_dmy_strict d1 d2 with
+  | Some x -> x > 0
+  | None -> false
 
 let strictly_after d1 d2 =
   match (d1, d2) with
-  | Geneweb_util.Date.Dgreg (d1, _), Geneweb_util.Date.Dgreg (d2, _) -> strictly_after_dmy d1 d2
+  | Geneweb_util.Date.Dgreg (d1, _), Geneweb_util.Date.Dgreg (d2, _) ->
+      strictly_after_dmy d1 d2
   | _ -> false
 
 let strictly_younger age year =
@@ -268,9 +274,13 @@ let semi_sort base a before comp di =
                             else
                               let p3 = poi base a.(k) in
                               let d3 =
-                                match Geneweb_util.Date.od_of_cdate (get_birth p3) with
+                                match
+                                  Geneweb_util.Date.od_of_cdate (get_birth p3)
+                                with
                                 | Some d3 -> Some d3
-                                | None -> Geneweb_util.Date.od_of_cdate (get_baptism p3)
+                                | None ->
+                                    Geneweb_util.Date.od_of_cdate
+                                      (get_baptism p3)
                               in
                               match d3 with
                               | Some d3 ->
@@ -332,7 +342,8 @@ let changed_marriages_order base warning p =
         let max_date =
           match (date, max_date) with
           | Some d1, Some d2 ->
-              if Geneweb_util.Date.compare_date d1 d2 = 1 then Some d1 else Some d2
+              if Geneweb_util.Date.compare_date d1 d2 = 1 then Some d1
+              else Some d2
           | Some d1, None -> Some d1
           | _ -> max_date
         in
@@ -341,7 +352,9 @@ let changed_marriages_order base warning p =
   in
   Array.stable_sort
     (fun (_f1, d1) (_f2, d2) ->
-      match (d1, d2) with Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2 | _ -> 0)
+      match (d1, d2) with
+      | Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2
+      | _ -> 0)
     a;
   let a = Array.map (fun (f, _) -> f) a in
   if a <> b then (
@@ -1037,7 +1050,9 @@ let on_person_update base warning p =
     [Rem] : Exporté en clair hors de ce module.                              *)
 let check_other_fields base misc ifam fam = check_sources base misc ifam fam
 
-let first_name base p = Geneweb_util.Name.strip_lower @@ sou base @@ get_first_name p
+let first_name base p =
+  Geneweb_util.Name.strip_lower @@ sou base @@ get_first_name p
+
 let surname base p = Geneweb_util.Name.strip_lower @@ sou base @@ get_surname p
 
 let hom_person base p1 p2 =

@@ -325,9 +325,12 @@ and module_DATE conf =
         let convert fn = mk_dmy @@ fn @@ to_dmy d in
         match unbox_string @@ dst with
         | "Dgregorian" -> convert Fun.id
-        | "Djulian" -> convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian)
-        | "Dfrench" -> convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench)
-        | "Dhebrew" -> convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew)
+        | "Djulian" ->
+            convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian)
+        | "Dfrench" ->
+            convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench)
+        | "Dhebrew" ->
+            convert (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew)
         | s -> failwith @@ "Unknown calendar: " ^ s)
   in
   Tpat
@@ -512,7 +515,9 @@ and mk_title base t =
     | Tnone -> Tnull
   in
   let place_raw, place = mk_place (Gwdb.sou base t.t_place) in
-  let date_start = mk_opt mk_date (Geneweb_util.Date.od_of_cdate t.t_date_start) in
+  let date_start =
+    mk_opt mk_date (Geneweb_util.Date.od_of_cdate t.t_date_start)
+  in
   let date_end = mk_opt mk_date (Geneweb_util.Date.od_of_cdate t.t_date_end) in
   let nth = Tint t.t_nth in
   Tpat
@@ -725,8 +730,12 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         (let db = Gwdb.read_nldb base in
          let db = Notes.merge_possible_aliases conf db in
          let key =
-           let fn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-           let sn = Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+           let fn =
+             Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p))
+           in
+           let sn =
+             Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_surname p))
+           in
            (fn, sn, Gwdb.get_occ p)
          in
          if
@@ -1122,7 +1131,9 @@ let module_NAME base =
     | Tsafe _ -> Tsafe s
     | _ -> assert false
   in
-  let get_particle s = Geneweb_util.Mutil.get_particle (Gwdb.base_particles base) s in
+  let get_particle s =
+    Geneweb_util.Mutil.get_particle (Gwdb.base_particles base) s
+  in
   let particle =
     func_arg1_no_kw (function
       | (Tstr s | Tsafe s) as x -> (
@@ -1279,7 +1290,9 @@ let trans ?(autoescape = true) (conf : Config.config) =
                  | x -> esc (Jg_runtime.string_of_tvalue x)
                else Jg_runtime.string_of_tvalue (arg n)
            | Declension (c, n) ->
-               arg n |> Jg_runtime.string_of_tvalue |> Geneweb_util.Mutil.decline c |> esc
+               arg n |> Jg_runtime.string_of_tvalue
+               |> Geneweb_util.Mutil.decline c
+               |> esc
            | Elision (s1, s2) ->
                let x =
                  try unbox_string @@ arg "elision" with Not_found -> acc

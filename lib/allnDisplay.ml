@@ -46,7 +46,8 @@ let print_title conf base is_surnames ini len =
 let tr c1 s2 s =
   let rec loop i len =
     if i = String.length s then Geneweb_util.Buff.get len
-    else if String.unsafe_get s i = c1 then loop (i + 1) (Geneweb_util.Buff.mstore len s2)
+    else if String.unsafe_get s i = c1 then
+      loop (i + 1) (Geneweb_util.Buff.mstore len s2)
     else loop (i + 1) (Geneweb_util.Buff.store len (String.unsafe_get s i))
   in
   loop 0 0
@@ -124,7 +125,8 @@ let print_alphabetic_all conf base is_surnames ini list len =
       Output.print_sstring conf "<a href=\"#a";
       Output.print_string conf (Geneweb_util.Mutil.encode ini_k);
       Output.print_sstring conf "\">";
-      Output.print_string conf (Geneweb_util.Ext_string.tr '_' ' ' ini_k |> Adef.safe);
+      Output.print_string conf
+        (Geneweb_util.Ext_string.tr '_' ' ' ini_k |> Adef.safe);
       Output.print_sstring conf "</a>\n")
     list;
   Output.print_sstring conf "</p><ul>";
@@ -133,7 +135,8 @@ let print_alphabetic_all conf base is_surnames ini list len =
       Output.print_sstring conf "<li><a id=\"a";
       Output.print_string conf (Geneweb_util.Mutil.encode ini_k);
       Output.print_sstring conf "\">";
-      Output.print_string conf (Geneweb_util.Ext_string.tr '_' ' ' ini_k |> Adef.safe);
+      Output.print_string conf
+        (Geneweb_util.Ext_string.tr '_' ' ' ini_k |> Adef.safe);
       Output.print_sstring conf "</a><ul>";
       List.iter
         (fun (s, cnt) ->
@@ -205,7 +208,8 @@ let print_frequency_any conf base is_surnames list len =
             Output.print_sstring conf "m=";
             Output.print_string conf mode;
             Output.print_sstring conf "&v=";
-            Output.print_string conf (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower s));
+            Output.print_string conf
+              (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower s));
             Output.print_sstring conf "\">";
             Output.print_string conf
               (particle_at_the_end base is_surnames s |> Util.escape_html);
@@ -285,7 +289,9 @@ let print_alphabetic_short conf base is_surnames ini list len =
           let href =
             let open Def in
             " href=\"" ^<^ Util.commd conf
-            ^^^ ("m=" ^<^ mode ^^^ "&v=" ^<^ Geneweb_util.Mutil.encode s ^>^ "&t=A\""
+            ^^^ ("m=" ^<^ mode ^^^ "&v="
+                 ^<^ Geneweb_util.Mutil.encode s
+                 ^>^ "&t=A\""
                   :> Adef.escaped_string)
           in
           let name =
@@ -303,7 +309,9 @@ let print_alphabetic_short conf base is_surnames ini list len =
           Output.print_sstring conf " (";
           Output.print_sstring conf (string_of_int cnt);
           Output.print_sstring conf ")")
-        (List.sort (fun (a, _) (b, _) -> Geneweb_util.Utf8.alphabetic_order a b) l);
+        (List.sort
+           (fun (a, _) (b, _) -> Geneweb_util.Utf8.alphabetic_order a b)
+           l);
       Output.print_sstring conf "</p>")
     list;
   Hutil.trailer conf

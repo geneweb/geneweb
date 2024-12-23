@@ -11,9 +11,14 @@ module StrSet = Geneweb_util.Ext_string.Set
 
 let date_interval conf base t x =
   let d1 =
-    ref Geneweb_util.Date.{ day = 0; month = 0; year = max_int; prec = Sure; delta = 0 }
+    ref
+      Geneweb_util.Date.
+        { day = 0; month = 0; year = max_int; prec = Sure; delta = 0 }
   in
-  let d2 = ref Geneweb_util.Date.{ day = 0; month = 0; year = 0; prec = Sure; delta = 0 } in
+  let d2 =
+    ref
+      Geneweb_util.Date.{ day = 0; month = 0; year = 0; prec = Sure; delta = 0 }
+  in
   let found = ref false in
   let rec loop t x =
     let set d =
@@ -69,7 +74,8 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
       match Geneweb_util.Date.compare_dmy d1 d2 with
       | 0 -> (
           match
-            (Geneweb_util.Date.od_of_cdate t1.t_date_end, Geneweb_util.Date.od_of_cdate t2.t_date_end)
+            ( Geneweb_util.Date.od_of_cdate t1.t_date_end,
+              Geneweb_util.Date.od_of_cdate t2.t_date_end )
           with
           | Some d1, Some d2 -> Geneweb_util.Date.compare_date d1 d2
           | _ -> -1)
@@ -78,10 +84,12 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
     ->
       Geneweb_util.Date.compare_date d1 d2
   | (_, _, _, Death (_, d1)), (_, Some d2, _, _)
-    when Geneweb_util.Date.compare_date (Geneweb_util.Date.date_of_cdate d1) d2 <= 0 ->
+    when Geneweb_util.Date.compare_date (Geneweb_util.Date.date_of_cdate d1) d2
+         <= 0 ->
       -1
   | (_, Some (Dgreg (_, _) as d1), _, _), (_, _, _, Death (_, d2))
-    when Geneweb_util.Date.compare_date d1 (Geneweb_util.Date.date_of_cdate d2) > 0 ->
+    when Geneweb_util.Date.compare_date d1 (Geneweb_util.Date.date_of_cdate d2)
+         > 0 ->
       1
   | _ -> (
       match
@@ -174,7 +182,9 @@ let select_title conf base ~absolute title =
   let title2 = Geneweb_util.Name.lower title in
   let add_place t =
     let tn = sou base t.t_ident in
-    if (absolute && tn = title) || ((not absolute) && Geneweb_util.Name.lower tn = title2)
+    if
+      (absolute && tn = title)
+      || ((not absolute) && Geneweb_util.Name.lower tn = title2)
     then (
       let pn = sou base t.t_place in
       if not (StrSet.mem pn !set) then (

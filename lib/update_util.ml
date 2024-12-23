@@ -20,7 +20,10 @@ let get_purged_fn_sn removed_string first_name surname =
     || Geneweb_util.Name.contains_forbidden_char surname
   then (
     removed_string :=
-      (Geneweb_util.Name.purge first_name ^ " " ^ Geneweb_util.Name.purge surname) :: !removed_string;
+      (Geneweb_util.Name.purge first_name
+      ^ " "
+      ^ Geneweb_util.Name.purge surname)
+      :: !removed_string;
     (Geneweb_util.Name.purge first_name, Geneweb_util.Name.purge surname))
   else (first_name, surname)
 
@@ -46,7 +49,9 @@ let rec reconstitute_sorted_events conf cnt =
   | _ -> []
 
 let reconstitute_somebody removed_string conf var =
-  let first_name = Geneweb_util.Ext_string.only_printable (getn conf var "fn") in
+  let first_name =
+    Geneweb_util.Ext_string.only_printable (getn conf var "fn")
+  in
   let surname = Geneweb_util.Ext_string.only_printable (getn conf var "sn") in
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname =
@@ -68,7 +73,9 @@ let sort_families_array_by_date base fam_arr =
   let cmp_ifam ifam1 ifam2 =
     let d1 = Gwdb.get_marriage (Gwdb.foi base ifam1) in
     let d2 = Gwdb.get_marriage (Gwdb.foi base ifam2) in
-    cmp_date (Geneweb_util.Date.od_of_cdate d1) (Geneweb_util.Date.od_of_cdate d2)
+    cmp_date
+      (Geneweb_util.Date.od_of_cdate d1)
+      (Geneweb_util.Date.od_of_cdate d2)
   in
   Array.sort cmp_ifam fam_arr
 
@@ -112,7 +119,8 @@ let eval_is_cal cal = function
   | Some (Dtext _) | None -> ""
 
 let eval_is_prec cond = function
-  | Some (Geneweb_util.Date.Dgreg ({ prec = x }, _)) -> if cond x then "1" else ""
+  | Some (Geneweb_util.Date.Dgreg ({ prec = x }, _)) ->
+      if cond x then "1" else ""
   | Some (Dtext _) | None -> ""
 
 (* TODO : rewrite, looks bad *)

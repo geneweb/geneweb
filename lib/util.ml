@@ -103,7 +103,9 @@ let start_with_vowel s =
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
 let fcapitale (a : ('a, 'b, 'c, 'd) format4) : ('a, 'b, 'c, 'd) format4 =
-  Scanf.format_from_string (Geneweb_util.Utf8.capitalize_fst (string_of_format a)) a
+  Scanf.format_from_string
+    (Geneweb_util.Utf8.capitalize_fst (string_of_format a))
+    a
 
 let nth_field_abs w n =
   let rec start i n =
@@ -159,7 +161,8 @@ let gen_decline_basic wt s =
           && String.get wt (i + 6) = 'e'
         then
           let start = String.sub wt 0 (i - 1) in
-          if s = "" then start else Geneweb_util.Mutil.decline 'n' s ^ " " ^ start
+          if s = "" then start
+          else Geneweb_util.Mutil.decline 'n' s ^ " " ^ start
         else wt ^ Geneweb_util.Mutil.decline 'n' s1
     | None -> wt ^ Geneweb_util.Mutil.decline 'n' s1
 
@@ -264,7 +267,9 @@ let translate_eval s = Translate.eval (Geneweb_util.Mutil.nominative s)
 (* *)
 
 let get_referer conf =
-  let referer = Geneweb_util.Mutil.extract_param "referer: " '\n' conf.Config.request in
+  let referer =
+    Geneweb_util.Mutil.extract_param "referer: " '\n' conf.Config.request
+  in
   escape_html referer
 
 let begin_centered conf =
@@ -493,8 +498,8 @@ let safe_html_aux escape_text s =
                     || String.get k 0 <> 'o'
                     || String.get k 1 <> 'n')
                     && not
-                         (Geneweb_util.Ext_string.contains (String.lowercase_ascii v)
-                            "javascript"))
+                         (Geneweb_util.Ext_string.contains
+                            (String.lowercase_ascii v) "javascript"))
               attrs
           in
           stack := `OK :: !stack;
@@ -552,7 +557,8 @@ let hidden_env conf =
 let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Geneweb_util.Mutil.decode v)
 
-let p_getenv env label = Option.map Geneweb_util.Mutil.decode (List.assoc_opt label env)
+let p_getenv env label =
+  Option.map Geneweb_util.Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
   try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
@@ -679,9 +685,11 @@ let acces_n conf base n x : Adef.escaped_string =
   else if accessible_by_key conf base x first_name surname then
     let open Def in
     "p" ^<^ n ^^^ "="
-    ^<^ (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower first_name) :> Adef.escaped_string)
+    ^<^ (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower first_name)
+          :> Adef.escaped_string)
     ^^^ "&n" ^<^ n ^^^ "="
-    ^<^ (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower surname) :> Adef.escaped_string)
+    ^<^ (Geneweb_util.Mutil.encode (Geneweb_util.Name.lower surname)
+          :> Adef.escaped_string)
     ^^^
     if Gwdb.get_occ x <> 0 then
       "&oc" ^<^ n ^>^ "=" ^ string_of_int (Gwdb.get_occ x)
@@ -1080,7 +1088,8 @@ let get_server_string conf =
     if server_port = "80" then server_name else server_name ^ ":" ^ server_port
 
 let get_request_string conf =
-  if not conf.Config.cgi then Geneweb_util.Mutil.extract_param "GET " ' ' conf.Config.request
+  if not conf.Config.cgi then
+    Geneweb_util.Mutil.extract_param "GET " ' ' conf.Config.request
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
@@ -1223,7 +1232,8 @@ let get_variable s i =
       | ':' ->
           let v = Geneweb_util.Buff.get len in
           let rec loop vl len i =
-            if i = String.length s then (v, List.rev (Geneweb_util.Buff.get len :: vl), i)
+            if i = String.length s then
+              (v, List.rev (Geneweb_util.Buff.get len :: vl), i)
             else
               match s.[i] with
               | ':' -> loop (Geneweb_util.Buff.get len :: vl) 0 (i + 1)
@@ -1301,11 +1311,13 @@ let string_with_macros conf env s =
                             && s.[i + 1] = 's'
                           then
                             match vl with
-                            | v :: vl -> loop vl (Geneweb_util.Buff.mstore len v) (i + 2)
+                            | v :: vl ->
+                                loop vl (Geneweb_util.Buff.mstore len v) (i + 2)
                             | [] ->
                                 Geneweb_util.Buff.get len
                                 ^ String.sub s i (String.length s - i)
-                          else loop vl (Geneweb_util.Buff.store len s.[i]) (i + 1)
+                          else
+                            loop vl (Geneweb_util.Buff.store len s.[i]) (i + 1)
                         in
                         loop vl 0 0
                       in
@@ -1393,7 +1405,8 @@ let print_alphab_list conf crit print_elem liste =
            in
            if not same_than_last then
              Output.printf conf "<a href=\"#ai%s\">%s</a>\n"
-               (Geneweb_util.Ext_string.hexa_string t) t;
+               (Geneweb_util.Ext_string.hexa_string t)
+               t;
            Some t)
          None liste
      in
@@ -1416,7 +1429,8 @@ let print_alphab_list conf crit print_elem liste =
            if not same_than_last then (
              Output.print_sstring conf "<li>\n";
              Output.printf conf "<a id=\"ai%s\">%s</a>\n"
-               (Geneweb_util.Ext_string.hexa_string t) t;
+               (Geneweb_util.Ext_string.hexa_string t)
+               t;
              Output.print_sstring conf "<ul>\n"));
          Output.print_sstring conf "<li>\n  ";
          print_elem e;
@@ -1604,8 +1618,8 @@ let create_topological_sort conf base =
         then Filename.concat bfile "tstab_visitor"
         else Filename.concat bfile "tstab"
       in
-      Files.read_or_create_value ~magic:Geneweb_util.Mutil.executable_magic tstab_file
-        (fun () ->
+      Files.read_or_create_value ~magic:Geneweb_util.Mutil.executable_magic
+        tstab_file (fun () ->
           Geneweb_util.Lock.control (Files.lock_file bfile) false
             ~onerror:(fun () ->
               let () = Gwdb.load_ascends_array base in
@@ -1744,7 +1758,9 @@ let is_that_user_and_password auth_scheme user passwd =
         that_response_would_be = ds.Config.ds_response
 
 let browser_doesnt_have_tables conf =
-  let user_agent = Geneweb_util.Mutil.extract_param "user-agent: " '/' conf.Config.request in
+  let user_agent =
+    Geneweb_util.Mutil.extract_param "user-agent: " '/' conf.Config.request
+  in
   String.lowercase_ascii user_agent = "lynx"
 
 let of_course_died conf p =
@@ -1923,8 +1939,10 @@ let html_highlight case_sens h s =
   let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
   let rec loop in_tag i len =
     if i = String.length s then Geneweb_util.Buff.get len
-    else if in_tag then loop (s.[i] <> '>') (i + 1) (Geneweb_util.Buff.store len s.[i])
-    else if s.[i] = '<' then loop true (i + 1) (Geneweb_util.Buff.store len s.[i])
+    else if in_tag then
+      loop (s.[i] <> '>') (i + 1) (Geneweb_util.Buff.store len s.[i])
+    else if s.[i] = '<' then
+      loop true (i + 1) (Geneweb_util.Buff.store len s.[i])
     else
       match start_equiv_with case_sens h s i with
       | Some j -> loop false j (Geneweb_util.Buff.mstore len (ht i j))
@@ -2058,7 +2076,9 @@ let print_reference conf fn occ sn =
   Output.print_sstring conf "<span class=\"reference\">";
   Output.printf conf " (%s %s.%d %s)"
     (transl conf "reference key")
-    (Geneweb_util.Name.lower fn) occ (Geneweb_util.Name.lower sn);
+    (Geneweb_util.Name.lower fn)
+    occ
+    (Geneweb_util.Name.lower sn);
   Output.print_sstring conf "</span>"
 
 (* ********************************************************************** *)
@@ -2089,7 +2109,8 @@ let print_tips_relationship conf =
     p_getenv conf.Config.env "em" = Some "R"
     || p_getenv conf.Config.env "m" = Some "C"
   then
-    Geneweb_util.Utf8.capitalize_fst (transl conf "select person to compute relationship")
+    Geneweb_util.Utf8.capitalize_fst
+      (transl conf "select person to compute relationship")
     |> Adef.safe |> gen_print_tips conf
 
 (* ********************************************************************** *)
@@ -2376,7 +2397,8 @@ let auth_warning conf base w =
 
 let name_with_roman_number str =
   let rec loop found len i =
-    if i = String.length str then if found then Some (Geneweb_util.Buff.get len) else None
+    if i = String.length str then
+      if found then Some (Geneweb_util.Buff.get len) else None
     else
       match str.[i] with
       | '0' .. '9' as c ->
@@ -2391,7 +2413,10 @@ let name_with_roman_number str =
             in
             loop (Char.code c - Char.code '0') (i + 1)
           in
-          loop true (Geneweb_util.Buff.mstore len (Geneweb_util.Mutil.roman_of_arabian n)) i
+          loop true
+            (Geneweb_util.Buff.mstore len
+               (Geneweb_util.Mutil.roman_of_arabian n))
+            i
       | c -> loop found (Geneweb_util.Buff.store len c) (i + 1)
   in
   loop false 0 0

@@ -45,7 +45,8 @@ let print_child_person conf base p =
   Output.print_sstring conf {|"><label for="|};
   Output.print_string conf var;
   Output.print_sstring conf {|_occ" class="mx-2 mb-0">|};
-  transl conf "number" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+  transl conf "number" |> Geneweb_util.Utf8.capitalize_fst
+  |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td>|};
   Output.print_sstring conf {|<input class="form-control" id="|};
   Output.print_string conf var;
@@ -166,7 +167,8 @@ let print_conflict conf base ip_var p =
 
 let error_person conf err =
   let title _ =
-    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Output.printf conf "%s\n" (Geneweb_util.Utf8.capitalize_fst err);

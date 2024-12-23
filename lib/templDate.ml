@@ -6,13 +6,20 @@ open TemplAst
 open Util
 
 let rec eval_date_var conf jd = function
-  | "french" :: sl -> eval_dmy_var (Geneweb_util.Date.french_of_sdn ~prec:Sure jd) sl
-  | "gregorian" :: sl -> eval_dmy_var (Geneweb_util.Date.gregorian_of_sdn ~prec:Sure jd) sl
-  | "hebrew" :: sl -> eval_dmy_var (Geneweb_util.Date.hebrew_of_sdn ~prec:Sure jd) sl
-  | "julian" :: sl -> eval_dmy_var (Geneweb_util.Date.julian_of_sdn ~prec:Sure jd) sl
+  | "french" :: sl ->
+      eval_dmy_var (Geneweb_util.Date.french_of_sdn ~prec:Sure jd) sl
+  | "gregorian" :: sl ->
+      eval_dmy_var (Geneweb_util.Date.gregorian_of_sdn ~prec:Sure jd) sl
+  | "hebrew" :: sl ->
+      eval_dmy_var (Geneweb_util.Date.hebrew_of_sdn ~prec:Sure jd) sl
+  | "julian" :: sl ->
+      eval_dmy_var (Geneweb_util.Date.julian_of_sdn ~prec:Sure jd) sl
   | [ "julian_day" ] -> VVstring (string_of_int jd)
   | [ "julian_day"; "sep1000" ] ->
-      VVstring (Geneweb_util.Mutil.string_of_int_sep (transl conf "(thousand separator)") jd)
+      VVstring
+        (Geneweb_util.Mutil.string_of_int_sep
+           (transl conf "(thousand separator)")
+           jd)
   | [ "moon_age" ] -> (
       try
         let _, md = Calendars.moon_phase_of_sdn jd in

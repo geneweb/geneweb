@@ -4,7 +4,8 @@ open Gwdb
 open Util
 open Title
 
-let my_alphabetic n1 n2 = compare (Geneweb_util.Name.lower n1) (Geneweb_util.Name.lower n2)
+let my_alphabetic n1 n2 =
+  compare (Geneweb_util.Name.lower n1) (Geneweb_util.Name.lower n2)
 
 let string_cnt_list_uniq l =
   let l =
@@ -87,7 +88,10 @@ let give_access_title_aux conf xhref content =
 
 let give_access_title conf t p =
   give_access_title_aux conf
-    ("&t=" ^<^ Geneweb_util.Mutil.encode t ^^^ "&p=" ^<^ Geneweb_util.Mutil.encode p)
+    ("&t="
+    ^<^ Geneweb_util.Mutil.encode t
+    ^^^ "&p="
+    ^<^ Geneweb_util.Mutil.encode p)
     (escape_html @@ Geneweb_util.Utf8.capitalize_fst t)
 
 let give_access_all_titles conf t absolute =
@@ -127,7 +131,8 @@ let propose_tree_for_list list conf =
              i + 1)
            1 list;
       Output.print_sstring conf {|&lim=6">|};
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "tree"));
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (transl conf "tree"));
       Output.print_sstring conf {|</a></p>|}
   | _ -> ()
 
@@ -215,13 +220,17 @@ let print_places_list conf base t t_equiv list =
         t_equiv
   in
   let order s =
-    Geneweb_util.Utf8.capitalize_fst (Geneweb_util.Name.lower (surname_without_particle base s))
+    Geneweb_util.Utf8.capitalize_fst
+      (Geneweb_util.Name.lower (surname_without_particle base s))
   in
   let list = List.sort (fun s1 s2 -> compare (order s1) (order s2)) list in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
     give_access_title_aux conf
-      ("&t=" ^<^ Geneweb_util.Mutil.encode t ^^^ "&p=" ^<^ Geneweb_util.Mutil.encode p
+      ("&t="
+      ^<^ Geneweb_util.Mutil.encode t
+      ^^^ "&p="
+      ^<^ Geneweb_util.Mutil.encode p
       ^>^ if absolute then "&a=A" else "")
       (if p = "" then Adef.safe "..."
       else
@@ -276,7 +285,9 @@ let print_all_titles conf base =
     let l = select_all_titles conf base in
     string_cnt_list_uniq (List.sort compare_titles2 l)
   in
-  let order (s, _) = Geneweb_util.Utf8.capitalize_fst (Geneweb_util.Name.lower s) in
+  let order (s, _) =
+    Geneweb_util.Utf8.capitalize_fst (Geneweb_util.Name.lower s)
+  in
   let wprint_elem (t, cnt) =
     give_access_all_titles conf t false;
     Output.printf conf " (%d)" cnt

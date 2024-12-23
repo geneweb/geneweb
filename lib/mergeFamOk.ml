@@ -87,7 +87,8 @@ let merge_events conf l1 l2 =
                   else if e.efam_name = e1.efam_name && can_merge_event e e1
                   then
                     let date =
-                      field e.efam_date e1.efam_date (( = ) Geneweb_util.Date.cdate_None)
+                      field e.efam_date e1.efam_date
+                        (( = ) Geneweb_util.Date.cdate_None)
                     in
                     let place = field e.efam_place e1.efam_place (( = ) "") in
                     let note =
@@ -115,7 +116,8 @@ let merge_events conf l1 l2 =
                   else if e.efam_name = e1.efam_name && can_merge_event e e1
                   then
                     let date =
-                      field e.efam_date e1.efam_date (( = ) Geneweb_util.Date.cdate_None)
+                      field e.efam_date e1.efam_date
+                        (( = ) Geneweb_util.Date.cdate_None)
                     in
                     let place = field e.efam_place e1.efam_place (( = ) "") in
                     let note =
@@ -169,7 +171,8 @@ let reconstitute conf base ifam1 fam1 fam2 =
   in
   let fam =
     {
-      marriage = field "marriage" get_marriage (( = ) Geneweb_util.Date.cdate_None);
+      marriage =
+        field "marriage" get_marriage (( = ) Geneweb_util.Date.cdate_None);
       marriage_place =
         field "marriage_place"
           (fun f -> sou base (get_marriage_place f))
@@ -223,7 +226,8 @@ let print_merge conf base =
 
 let print_mod_merge_ok conf base wl cpl des =
   let title _ =
-    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "merge done"))
+    Output.print_sstring conf
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "merge done"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;

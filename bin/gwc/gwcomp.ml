@@ -221,14 +221,18 @@ let date_of_string s i =
             if month < 1 || month > 13 then error 2
             else if day < 1 || day > 31 then error 3
             else
-              let d = Geneweb_util.Date.{ day; month; year; prec = precision; delta = 0 } in
+              let d =
+                Geneweb_util.Date.
+                  { day; month; year; prec = precision; delta = 0 }
+              in
               Some (Geneweb_util.Date.Dgreg (d, Dgregorian), i)
         | None ->
             if year = 0 then None
             else if month < 1 || month > 13 then error 4
             else
               let d =
-                Geneweb_util.Date.{ day = 0; month; year; prec = precision; delta = 0 }
+                Geneweb_util.Date.
+                  { day = 0; month; year; prec = precision; delta = 0 }
               in
               Some (Dgreg (d, Dgregorian), i))
     | None ->
@@ -241,7 +245,8 @@ let date_of_string s i =
           else failwith ("date_of_string " ^ s)
         else
           let d =
-            Geneweb_util.Date.{ day = 0; month = 0; year; prec = precision; delta = 0 }
+            Geneweb_util.Date.
+              { day = 0; month = 0; year; prec = precision; delta = 0 }
           in
           Some (Dgreg (d, Dgregorian), i)
   in
@@ -266,18 +271,25 @@ let date_of_string s i =
   let date =
     match date with
     | Some (Dgreg (d, _), i) -> (
-        if i = String.length s then Some (Geneweb_util.Date.Dgreg (d, Dgregorian), i)
+        if i = String.length s then
+          Some (Geneweb_util.Date.Dgreg (d, Dgregorian), i)
         else
           match s.[i] with
           | 'G' -> Some (Dgreg (d, Dgregorian), i + 1)
           | 'J' ->
-              let d = Geneweb_util.Date.convert ~from:Djulian ~to_:Dgregorian d in
+              let d =
+                Geneweb_util.Date.convert ~from:Djulian ~to_:Dgregorian d
+              in
               Some (Dgreg (d, Djulian), i + 1)
           | 'F' ->
-              let d = Geneweb_util.Date.convert ~from:Dfrench ~to_:Dgregorian d in
+              let d =
+                Geneweb_util.Date.convert ~from:Dfrench ~to_:Dgregorian d
+              in
               Some (Dgreg (d, Dfrench), i + 1)
           | 'H' ->
-              let d = Geneweb_util.Date.convert ~from:Dhebrew ~to_:Dgregorian d in
+              let d =
+                Geneweb_util.Date.convert ~from:Dhebrew ~to_:Dgregorian d
+              in
               Some (Dgreg (d, Dhebrew), i + 1)
           | _ -> Some (Dgreg (d, Dgregorian), i))
     | d -> d
@@ -702,7 +714,8 @@ let get_mar_date str = function
       let mar, l =
         match x.[0] with
         | '+' ->
-            ( (if String.length x > 1 then Geneweb_util.Date.cdate_of_od (date_of_string x 1)
+            ( (if String.length x > 1 then
+               Geneweb_util.Date.cdate_of_od (date_of_string x 1)
               else Geneweb_util.Date.cdate_None),
               l )
         | _ -> failwith str
@@ -829,7 +842,9 @@ let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
     | Some x -> Geneweb_util.Date.cdate_of_od x
   in
   let baptism =
-    match baptism with None -> Geneweb_util.Date.cdate_None | Some x -> Geneweb_util.Date.cdate_of_od x
+    match baptism with
+    | None -> Geneweb_util.Date.cdate_None
+    | Some x -> Geneweb_util.Date.cdate_of_od x
   in
   let burial, l = get_burial l in
   let burial_place, l = get_field "#rp" l in

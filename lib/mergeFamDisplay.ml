@@ -48,7 +48,8 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     let x2 : Adef.safe_string = proj fam2 in
     if (x1 :> string) <> "" && (x2 :> string) <> "" && x1 <> x2 then (
       Output.print_sstring conf "<h4>";
-      Output.print_string conf (Adef.safe_fn Geneweb_util.Utf8.capitalize_fst title);
+      Output.print_string conf
+        (Adef.safe_fn Geneweb_util.Utf8.capitalize_fst title);
       Output.print_sstring conf
         "</h4><ul><li><input type=\"radio\" class=\"form-control\" name=\"";
       Output.print_string conf name;

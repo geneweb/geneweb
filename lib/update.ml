@@ -189,7 +189,8 @@ let print_same_name conf base p =
   | pl ->
       Output.print_sstring conf "<p>";
       Output.print_sstring conf
-      @@ Geneweb_util.Utf8.capitalize_fst (transl conf "persons having the same name");
+      @@ Geneweb_util.Utf8.capitalize_fst
+           (transl conf "persons having the same name");
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf "<ul>";
       List.iter
@@ -241,14 +242,16 @@ let print_return conf =
     (Adef.encoded @@ Geneweb_util.Utf8.capitalize_fst @@ transl conf "back")
 
 let print_continue conf
-    ?(continue = Adef.encoded @@ Geneweb_util.Utf8.capitalize_fst @@ transl conf "continue")
+    ?(continue =
+      Adef.encoded @@ Geneweb_util.Utf8.capitalize_fst @@ transl conf "continue")
     param value =
   print_aux conf param value continue
 
 let prerr conf _err fn =
   if not conf.api_mode then (
     let title _ =
-      Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
+      Output.print_sstring conf
+        (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
     in
     Hutil.rheader conf title;
     fn ();
@@ -271,7 +274,8 @@ let string_of_error conf =
   function
   | UERR s -> s
   | UERR_sex_married _ ->
-      Geneweb_util.Utf8.capitalize_fst (transl conf "cannot change sex of a married person")
+      Geneweb_util.Utf8.capitalize_fst
+        (transl conf "cannot change sex of a married person")
       |> Adef.safe
   | UERR_sex_incoherent (base, p) ->
       (Geneweb_util.Utf8.capitalize_fst (fso_p base p :> string)
@@ -332,7 +336,8 @@ let string_of_error conf =
             :> string))
       |> Adef.safe
   | UERR_missing_first_name s when s = Adef.safe "" ->
-      transl conf "first name missing" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
+      transl conf "first name missing"
+      |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
   | UERR_missing_first_name x ->
       (transl conf "first name missing" |> Geneweb_util.Utf8.capitalize_fst)
       ^<^ transl conf ":" ^<^ " "
@@ -411,7 +416,8 @@ let print_someone_ref_text conf base p =
 
 let print_list_aux conf base title list printer =
   if list <> [] then (
-    Output.printf conf "%s\n<ul>" (Geneweb_util.Utf8.capitalize_fst (transl conf title));
+    Output.printf conf "%s\n<ul>"
+      (Geneweb_util.Utf8.capitalize_fst (transl conf title));
     printer conf base list;
     Output.print_sstring conf "</ul>")
 
@@ -466,7 +472,8 @@ let print_warning conf base (w : CheckItem.base_warning) =
           arr
       in
       Output.print_sstring conf
-        (Geneweb_util.Utf8.capitalize_fst (transl conf "changed order of children"));
+        (Geneweb_util.Utf8.capitalize_fst
+           (transl conf "changed order of children"));
       Output.print_sstring conf "\n";
       print_someone_ref_text conf base fath;
       Output.print_sstring conf " ";
@@ -509,7 +516,8 @@ let print_warning conf base (w : CheckItem.base_warning) =
           arr
       in
       Output.print_sstring conf
-        (Geneweb_util.Utf8.capitalize_fst (transl conf "changed order of marriages"));
+        (Geneweb_util.Utf8.capitalize_fst
+           (transl conf "changed order of marriages"));
       print_order_changed conf print_list before after
   | ChangedOrderOfFamilyEvents (_, before, after) ->
       let print_list arr diff_arr =
@@ -527,7 +535,8 @@ let print_warning conf base (w : CheckItem.base_warning) =
       let before = Array.of_list before in
       let after = Array.of_list after in
       Output.printf conf "%s\n"
-        (Geneweb_util.Utf8.capitalize_fst (transl conf "changed order of family's events"));
+        (Geneweb_util.Utf8.capitalize_fst
+           (transl conf "changed order of family's events"));
       print_order_changed conf print_list before after
   | ChangedOrderOfPersonEvents (_, before, after) ->
       let print_list arr diff_arr =
@@ -543,7 +552,8 @@ let print_warning conf base (w : CheckItem.base_warning) =
           arr
       in
       Output.print_sstring conf
-        (Geneweb_util.Utf8.capitalize_fst (transl conf "changed order of person's events"));
+        (Geneweb_util.Utf8.capitalize_fst
+           (transl conf "changed order of person's events"));
       Output.print_sstring conf " -&gt; ";
       let before = Array.of_list before in
       let after = Array.of_list after in
@@ -783,7 +793,8 @@ let print_miscs conf base ml =
     [Rem] : Exporté en clair hors de ce module.                              *)
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then (
-    Output.printf conf "%s\n" (Geneweb_util.Utf8.capitalize_fst (transl conf "warnings"));
+    Output.printf conf "%s\n"
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "warnings"));
     Output.print_sstring conf "<ul>\n";
     List.iter
       (fun w ->
@@ -836,7 +847,8 @@ let error_locked conf =
   (* just to see in the traces... *)
   Util.hidden_input conf "retry" (Geneweb_util.Mutil.encode conf.user);
   Util.hidden_input conf "submit"
-    (transl conf "try again" |> Geneweb_util.Utf8.capitalize_fst |> Geneweb_util.Mutil.encode);
+    (transl conf "try again" |> Geneweb_util.Utf8.capitalize_fst
+   |> Geneweb_util.Mutil.encode);
   Output.print_sstring conf {|</form></td><td><form method="get" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|">|};
@@ -906,11 +918,15 @@ let reconstitute_date_dmy2 conf var =
   match get_number var "oryear" conf.env with
   | Some y -> (
       match m with
-      | None -> Geneweb_util.Date.{ day2 = 0; month2 = 0; year2 = y; delta2 = 0 }
+      | None ->
+          Geneweb_util.Date.{ day2 = 0; month2 = 0; year2 = y; delta2 = 0 }
       | Some m -> (
           match get_number var "orday" conf.env with
           | Some d ->
-              let dmy2 = Geneweb_util.Date.{ day2 = d; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 =
+                Geneweb_util.Date.
+                  { day2 = d; month2 = m; year2 = y; delta2 = 0 }
+              in
               if
                 dmy2.day2 >= 1 && dmy2.day2 <= 31 && dmy2.month2 >= 1
                 && dmy2.month2 <= 13
@@ -919,7 +935,10 @@ let reconstitute_date_dmy2 conf var =
                 let d = Geneweb_util.Date.dmy_of_dmy2 dmy2 in
                 bad_date conf d
           | None ->
-              let dmy2 = Geneweb_util.Date.{ day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 =
+                Geneweb_util.Date.
+                  { day2 = 0; month2 = m; year2 = y; delta2 = 0 }
+              in
               if dmy2.month2 >= 1 && dmy2.month2 <= 13 then dmy2
               else
                 let d = Geneweb_util.Date.dmy_of_dmy2 dmy2 in
@@ -985,17 +1004,24 @@ let reconstitute_date_dmy conf var =
           | Some _ | None -> Sure
         in
         match m with
-        | None -> Some Geneweb_util.Date.{ day = 0; month = 0; year = y; prec; delta = 0 }
+        | None ->
+            Some
+              Geneweb_util.Date.
+                { day = 0; month = 0; year = y; prec; delta = 0 }
         | Some m -> (
             match get_number var "dd" conf.env with
             | Some day ->
-                let d = Geneweb_util.Date.{ day; month = m; year = y; prec; delta = 0 } in
+                let d =
+                  Geneweb_util.Date.
+                    { day; month = m; year = y; prec; delta = 0 }
+                in
                 if d.day >= 1 && d.day <= 31 && d.month >= 1 && d.month <= 13
                 then Some d
                 else bad_date conf d
             | None ->
                 let d =
-                  Geneweb_util.Date.{ day = 0; month = m; year = y; prec; delta = 0 }
+                  Geneweb_util.Date.
+                    { day = 0; month = m; year = y; prec; delta = 0 }
                 in
                 if d.month >= 1 && d.month <= 13 then Some d
                 else bad_date conf d))
@@ -1069,7 +1095,8 @@ let check_missing_witnesses_names conf get list =
   loop list
 
 let check_greg_day conf d =
-  if d.Geneweb_util.Date.day > Geneweb_util.Date.nb_days_in_month d.month d.year then bad_date conf d
+  if d.Geneweb_util.Date.day > Geneweb_util.Date.nb_days_in_month d.month d.year
+  then bad_date conf d
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
@@ -1087,11 +1114,15 @@ let reconstitute_date conf var =
       let date = Geneweb_util.Date.convert ~from:calendar ~to_:Dgregorian d in
       Some (Geneweb_util.Date.Dgreg (date, calendar))
   | Some d, true ->
-      Some (Dgreg (Geneweb_util.Date.convert ~from:Dfrench ~to_:Dgregorian d, Dfrench))
+      Some
+        (Dgreg
+           (Geneweb_util.Date.convert ~from:Dfrench ~to_:Dgregorian d, Dfrench))
   | None, _ -> (
       match p_getenv conf.env (var ^ "_text") with
       | Some _ ->
-          let txt = Geneweb_util.Ext_string.only_printable (get var "text" conf.env) in
+          let txt =
+            Geneweb_util.Ext_string.only_printable (get var "text" conf.env)
+          in
           if txt = "" then None else Some (Dtext txt)
       | None -> None)
 
@@ -1112,8 +1143,10 @@ let print_create_conflict conf base p var =
   in
   aux conf.henv;
   aux conf.env;
-  if var <> "" then Util.hidden_input conf "field" (Geneweb_util.Mutil.encode var);
-  Util.hidden_input conf "free_occ" (Geneweb_util.Mutil.encode @@ string_of_int free_n);
+  if var <> "" then
+    Util.hidden_input conf "field" (Geneweb_util.Mutil.encode var);
+  Util.hidden_input conf "free_occ"
+    (Geneweb_util.Mutil.encode @@ string_of_int free_n);
   Output.print_sstring conf "<ul><li>";
   transl conf "first free number"
   |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -1127,7 +1160,8 @@ let print_create_conflict conf base p var =
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "to try again with this number");
   Output.print_sstring conf ".</li><li>";
-  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "or"));
+  Output.print_sstring conf
+    (Geneweb_util.Utf8.capitalize_fst (transl conf "or"));
   Output.print_sstring conf " ";
   Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
   Output.print_sstring conf " ";
@@ -1135,7 +1169,8 @@ let print_create_conflict conf base p var =
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "change it (the number) yourself");
   Output.print_sstring conf ".</li><li>";
-  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "or"));
+  Output.print_sstring conf
+    (Geneweb_util.Utf8.capitalize_fst (transl conf "or"));
   Output.print_sstring conf " ";
   Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
   Output.print_sstring conf " ";
@@ -1240,7 +1275,9 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             burial_src = empty_string;
             pevents = [];
             notes = empty_string;
-            psources = Gwdb.insert_string base (Geneweb_util.Ext_string.only_printable src);
+            psources =
+              Gwdb.insert_string base
+                (Geneweb_util.Ext_string.only_printable src);
             key_index = Gwdb.dummy_iper;
           }
         in

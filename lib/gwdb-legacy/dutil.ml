@@ -18,7 +18,10 @@ let aoi base i = base.data.ascends.get i
 let uoi base i = base.data.unions.get i
 let coi base i = base.data.couples.get i
 let sou base i = base.data.strings.get i
-let p_first_name base p = Geneweb_util.Mutil.nominative (sou base p.Dbdisk.first_name)
+
+let p_first_name base p =
+  Geneweb_util.Mutil.nominative (sou base p.Dbdisk.first_name)
+
 let p_surname base p = Geneweb_util.Mutil.nominative (sou base p.Dbdisk.surname)
 
 let husbands base p =
@@ -49,7 +52,9 @@ let dsk_person_misc_names :
     (father_titles_places base p nobtit)
 
 let compare_snames base_data s1 s2 =
-  Geneweb_util.Mutil.compare_after_particle (Lazy.force base_data.particles) s1 s2
+  Geneweb_util.Mutil.compare_after_particle
+    (Lazy.force base_data.particles)
+    s1 s2
 
 let compare_snames_i base_data is1 is2 =
   if is1 = is2 then 0

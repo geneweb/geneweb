@@ -168,7 +168,9 @@ let string_of_start_date conf =
       |> DateDisplay.string_of_date conf
 
 let string_of_int_sep_aux conf n =
-  Geneweb_util.Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
+  Geneweb_util.Mutil.string_of_int_sep
+    (Util.transl conf "(thousand separator)")
+    n
   |> Adef.safe
 
 let macro conf base = function
@@ -273,7 +275,9 @@ let rec lexicon_translate conf base nomin strm first_c =
   if upp then Geneweb_util.Utf8.capitalize_fst r else r
 
 let browser_cannot_handle_passwords conf =
-  let user_agent = Geneweb_util.Mutil.extract_param "user-agent: " '/' conf.request in
+  let user_agent =
+    Geneweb_util.Mutil.extract_param "user-agent: " '/' conf.request
+  in
   String.lowercase_ascii user_agent = "konqueror"
 
 let get_variable strm =
@@ -381,7 +385,8 @@ let rec copy_from_stream conf base strm mode =
               let lang =
                 let rec loop len =
                   let c = Stream.next strm in
-                  if c = ';' then Geneweb_util.Buff.get len else loop (Geneweb_util.Buff.store len c)
+                  if c = ';' then Geneweb_util.Buff.get len
+                  else loop (Geneweb_util.Buff.store len c)
                 in
                 loop 0
               in

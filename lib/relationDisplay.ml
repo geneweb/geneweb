@@ -61,7 +61,8 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
     let invert = Util.p_getenv conf.env "invert" = Some "on" in
     let set = ind_set_of_relation_path base path in
     let page_title =
-      transl conf "relationship" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
+      transl conf "relationship" |> Geneweb_util.Utf8.capitalize_fst
+      |> Adef.safe
     in
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set []
       page_title next_txt
@@ -75,7 +76,8 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   let color =
     match p_getenv conf.env "color" with
     | None -> Adef.escaped ""
-    | Some x -> "&color=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string)
+    | Some x ->
+        "&color=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string)
   in
   let sl, _ =
     List.fold_left
@@ -531,7 +533,8 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
         Output.print_sstring conf {|<a href="|};
         Output.print_string conf href;
         Output.print_sstring conf {|">|};
-        transl conf "see" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+        transl conf "see" |> Geneweb_util.Utf8.capitalize_fst
+        |> Output.print_sstring conf;
         if n > 1 && not propose_dag then
           Output.print_sstring conf (transl conf " the first branch");
         Output.print_sstring conf "</a>");
@@ -546,7 +549,8 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
     @@ if p_getenv conf.env "image" = Some "off" then "&image=off" else ""
   in
   Output.print_sstring conf {|<ul class="li_relationship"><li>|};
-  transl conf "indeed," |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+  transl conf "indeed," |> Geneweb_util.Utf8.capitalize_fst
+  |> Output.print_sstring conf;
   Output.print_sstring conf " <ul>";
   List.iter
     (fun (a, n) ->
@@ -582,7 +586,8 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
         Output.print_sstring conf {|<a href="|};
         Output.print_string conf href;
         Output.print_sstring conf {|">|};
-        transl conf "see" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+        transl conf "see" |> Geneweb_util.Utf8.capitalize_fst
+        |> Output.print_sstring conf;
         Output.print_sstring conf "</a>");
       Output.print_sstring conf "</li>")
     list;
@@ -760,7 +765,8 @@ let print_propose_upto conf base p1 p2 rl =
         (NameDisplay.person_title_text conf base p : Adef.safe_string :> string)
       in
       transl_a_of_b conf (transl conf "ancestors") s s
-      |> translate_eval |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+      |> translate_eval |> Geneweb_util.Utf8.capitalize_fst
+      |> Output.print_sstring conf;
       Output.print_sstring conf " ";
       (NameDisplay.person_title_text conf base a : Adef.safe_string :> string)
       |> transl_decline conf "up to"
@@ -775,7 +781,8 @@ let print_propose_upto conf base p1 p2 rl =
       Output.print_sstring conf "&l=";
       Output.print_sstring conf (string_of_int maxlen);
       Output.print_sstring conf {|">|};
-      transl conf "see" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+      transl conf "see" |> Geneweb_util.Utf8.capitalize_fst
+      |> Output.print_sstring conf;
       Output.print_sstring conf "</a></span></p>"
   | _ -> ()
 
@@ -797,7 +804,8 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
         match Util.p_getenv conf.env "color" with
         | None | Some "" -> Adef.safe ""
         | Some x ->
-            (" class=\"" ^<^ Geneweb_util.Mutil.encode x ^>^ "\"" :> Adef.safe_string)
+            (" class=\"" ^<^ Geneweb_util.Mutil.encode x ^>^ "\""
+              :> Adef.safe_string)
       in
       let info =
         RelationLink.
@@ -856,17 +864,20 @@ let print_main_relationship conf base long p1 p2 rel =
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   (match p_getenv conf.env "spouse" with
-  | Some "on" -> conf.senv <- conf.senv @ [ ("spouse", Geneweb_util.Mutil.encode "on") ]
+  | Some "on" ->
+      conf.senv <- conf.senv @ [ ("spouse", Geneweb_util.Mutil.encode "on") ]
   | _ -> ());
   (match p_getenv conf.env "cgl" with
-  | Some "on" -> conf.senv <- conf.senv @ [ ("cgl", Geneweb_util.Mutil.encode "on") ]
+  | Some "on" ->
+      conf.senv <- conf.senv @ [ ("cgl", Geneweb_util.Mutil.encode "on") ]
   | _ -> ());
   (match p_getenv conf.env "bd" with
   | None | Some ("0" | "") -> ()
   | Some x -> conf.senv <- conf.senv @ [ ("bd", Geneweb_util.Mutil.encode x) ]);
   (match p_getenv conf.env "color" with
   | None | Some "" -> ()
-  | Some x -> conf.senv <- conf.senv @ [ ("color", Geneweb_util.Mutil.encode x) ]);
+  | Some x ->
+      conf.senv <- conf.senv @ [ ("color", Geneweb_util.Mutil.encode x) ]);
   (match rel with
   | None ->
       if get_iper p1 = get_iper p2 then (
@@ -921,7 +932,8 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
             let acc =
               try
                 "&t" ^<^ string_of_int n ^<^ "="
-                ^<^ (get_iper p |> Hashtbl.find assoc_txt |> Geneweb_util.Mutil.encode
+                ^<^ (get_iper p |> Hashtbl.find assoc_txt
+                     |> Geneweb_util.Mutil.encode
                       :> Adef.escaped_string)
                 ^^^ acc
               with Not_found -> acc
@@ -941,7 +953,8 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
 
 let print_no_relationship conf base pl =
   let title _ =
-    transl conf "tree" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "tree" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul>";
@@ -1010,7 +1023,8 @@ let print_multi_relation conf base pl lim assoc_txt =
 
 let print_base_loop conf base p =
   let title _ =
-    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Output.printf conf

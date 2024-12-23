@@ -128,7 +128,10 @@ let title_html_of_person conf base p t : Adef.safe_string =
     (*   - le nom du titre et le premier sobriquet                       *)
     (*   - le nom de la personne (donné par son nom de domaine) en       *)
     (*     fonction du nom public et sobriquet                           *)
-    if Geneweb_util.Name.strip_lower estate = Geneweb_util.Name.strip_lower surname then
+    if
+      Geneweb_util.Name.strip_lower estate
+      = Geneweb_util.Name.strip_lower surname
+    then
       match (t.Def.t_name, Gwdb.get_qualifiers p) with
       | Def.Tname n, [] -> (esc (Gwdb.sou base n) :> Adef.safe_string)
       | Def.Tname n, nn :: _ ->

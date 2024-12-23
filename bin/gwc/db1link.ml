@@ -151,7 +151,8 @@ let sou base i = base.c_strings.(i)
 
 (** Returns first name of a [base]'s person entry [p]. [p.m_first_name] contains
     index where first name string representation is stored. *)
-let p_first_name base p = Geneweb_util.Mutil.nominative (sou base p.m_first_name)
+let p_first_name base p =
+  Geneweb_util.Mutil.nominative (sou base p.m_first_name)
 
 (** Returns surname of a [base]'s person entry [p]. [p.m_first_name] contains
     index where surname string representation is stored. *)
@@ -368,7 +369,10 @@ let find_person_by_name gen first_name surname occ =
     first and last names associated to the index of their person's entry
     in [base]. *)
 let add_person_by_name gen first_name surname int =
-  let s = Geneweb_util.Name.crush_lower (Geneweb_util.Mutil.nominative (first_name ^ " " ^ surname)) in
+  let s =
+    Geneweb_util.Name.crush_lower
+      (Geneweb_util.Mutil.nominative (first_name ^ " " ^ surname))
+  in
   let key = Hashtbl.hash s in
   Hashtbl.add gen.g_names key int
 
@@ -1320,7 +1324,10 @@ let update_person_with_pevents p =
             else
               let death =
                 match Geneweb_util.Date.od_of_cdate evt.epers_date with
-                | Some d -> Death (death_reason_std_fields, Geneweb_util.Date.cdate_of_date d)
+                | Some d ->
+                    Death
+                      ( death_reason_std_fields,
+                        Geneweb_util.Date.cdate_of_date d )
                 | None -> (
                     match death_std_fields with
                     | OfCourseDead -> OfCourseDead
@@ -1453,7 +1460,10 @@ let update_pevents_with_person p =
           in
           Some evt
     | Death (_, cd) ->
-        let date = Geneweb_util.Date.cdate_of_od (Some (Geneweb_util.Date.date_of_cdate cd)) in
+        let date =
+          Geneweb_util.Date.cdate_of_od
+            (Some (Geneweb_util.Date.date_of_cdate cd))
+        in
         let evt =
           {
             epers_name = Epers_Death;

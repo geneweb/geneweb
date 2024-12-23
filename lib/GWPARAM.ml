@@ -83,12 +83,16 @@ module Default = struct
             else if a.year < private_years then true
             else a.month = 0 && a.day = 0
       in
-      check_date (Gwdb.get_birth p |> Geneweb_util.Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_baptism p |> Geneweb_util.Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_death p |> Geneweb_util.Date.dmy_of_death) @@ fun () ->
+      check_date (Gwdb.get_birth p |> Geneweb_util.Date.cdate_to_dmy_opt)
+      @@ fun () ->
+      check_date (Gwdb.get_baptism p |> Geneweb_util.Date.cdate_to_dmy_opt)
+      @@ fun () ->
+      check_date (Gwdb.get_death p |> Geneweb_util.Date.dmy_of_death)
+      @@ fun () ->
       let is_contemporary_marriage ifam =
         let marr_date_opt =
-          Geneweb_util.Date.cdate_to_dmy_opt (Gwdb.get_marriage (Gwdb.foi base ifam))
+          Geneweb_util.Date.cdate_to_dmy_opt
+            (Gwdb.get_marriage (Gwdb.foi base ifam))
         in
         check_date marr_date_opt (fun _ -> false)
       in

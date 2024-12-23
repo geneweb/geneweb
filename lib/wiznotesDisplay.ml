@@ -47,7 +47,8 @@ let read_wizard_notes ?(limit = true) fname =
             (float_of_string line, 0)
           else
             let s = Unix.stat fname in
-            (s.Unix.st_mtime, Geneweb_util.Buff.store (Geneweb_util.Buff.mstore 0 line) '\n')
+            ( s.Unix.st_mtime,
+              Geneweb_util.Buff.store (Geneweb_util.Buff.mstore 0 line) '\n' )
         with End_of_file | Failure _ -> (0., 0)
       in
       let rec loop len =
@@ -58,7 +59,8 @@ let read_wizard_notes ?(limit = true) fname =
             len
       in
       let len = loop len in
-      ( (if limit then Notes.limit_display_length else Fun.id) @@ Geneweb_util.Buff.get len,
+      ( (if limit then Notes.limit_display_length else Fun.id)
+        @@ Geneweb_util.Buff.get len,
         date )
 
 let write_wizard_notes fname nn =
@@ -136,7 +138,8 @@ let print_wizards_by_date conf list =
               }
           in
           Geneweb_util.Date.Dgreg (dmy, Dgregorian)
-          |> (DateDisplay.string_of_ondate conf :> Geneweb_util.Date.date -> string)
+          |> (DateDisplay.string_of_ondate conf
+               :> Geneweb_util.Date.date -> string)
           |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf );
       ( (fun tm -> tm.Unix.tm_year),
         fun tm ->
@@ -242,7 +245,8 @@ let print_search_form conf from_wiz =
   | Some s -> Output.print_string conf (Util.escape_html s)
   | None -> ());
   Output.print_sstring conf {|">|};
-  if from_wiz <> "" then Util.hidden_input conf "z" (Geneweb_util.Mutil.encode from_wiz);
+  if from_wiz <> "" then
+    Util.hidden_input conf "z" (Geneweb_util.Mutil.encode from_wiz);
   Output.print_sstring conf
     {|<br><label><input type="checkbox" name="c" value="on"|};
   (match Util.p_getenv conf.Config.env "c" with
@@ -272,7 +276,8 @@ let print_main conf base auth_file =
     let list = read_auth_file auth_file in
     if by_alphab_order then
       List.sort
-        (fun (_, (_, (o1, _))) (_, (_, (o2, _))) -> Geneweb_util.Utf8.alphabetic_order o1 o2)
+        (fun (_, (_, (o1, _))) (_, (_, (o2, _))) ->
+          Geneweb_util.Utf8.alphabetic_order o1 o2)
         list
     else list
   in
@@ -301,7 +306,8 @@ let print_main conf base auth_file =
     Output.print_string conf (Util.safe_html wiztxt);
     Output.print_sstring conf "<br>";
     Output.print_sstring conf {|<em style="font-size:80%">|};
-    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "click"));
+    Output.print_sstring conf
+      (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "click"));
     Output.print_sstring conf " ";
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (Util.commd conf);

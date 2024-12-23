@@ -125,7 +125,8 @@ let print_linked_list conf base pgl =
             Output.print_sstring conf {|<a href="|};
             Output.print_string conf (Util.commd conf);
             Output.print_sstring conf "&i=";
-            Output.print_string conf (Gwdb.string_of_iper ip |> Geneweb_util.Mutil.encode);
+            Output.print_string conf
+              (Gwdb.string_of_iper ip |> Geneweb_util.Mutil.encode);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           let p = Util.pget conf base ip in
@@ -143,10 +144,12 @@ let print_linked_list conf base pgl =
             Output.print_sstring conf {|<a class="mx-2" href="|};
             Output.print_string conf (Util.commd conf);
             Output.print_sstring conf "m=MOD_FAM&i=";
-            Output.print_string conf (Gwdb.string_of_ifam ifam |> Geneweb_util.Mutil.encode);
+            Output.print_string conf
+              (Gwdb.string_of_ifam ifam |> Geneweb_util.Mutil.encode);
             Output.print_sstring conf "&ip=";
             Output.print_string conf
-              (Gwdb.get_iper fath |> Gwdb.string_of_iper |> Geneweb_util.Mutil.encode);
+              (Gwdb.get_iper fath |> Gwdb.string_of_iper
+             |> Geneweb_util.Mutil.encode);
             Output.print_sstring conf
               {|"><sup><i class="fa fa-cog"></i></sup></a>|});
           Output.print_sstring conf "<span class=\"mx-2\">";
@@ -298,7 +301,8 @@ let print_mod_ok conf base =
 let begin_text_without_html_tags lim s =
   let rec loop i size len =
     if i >= String.length s then Geneweb_util.Buff.get len
-    else if size > lim && String.length s > i + 3 then Geneweb_util.Buff.get len ^ "..."
+    else if size > lim && String.length s > i + 3 then
+      Geneweb_util.Buff.get len ^ "..."
     else if s.[i] = '<' then
       let i =
         let rec loop i =
@@ -312,7 +316,8 @@ let begin_text_without_html_tags lim s =
     else if s.[i] = '=' then loop (i + 1) size len
     else
       let nbc = Geneweb_util.Utf8.nbc s.[i] in
-      loop (i + nbc) (size + 1) (Geneweb_util.Buff.mstore len (String.sub s i nbc))
+      loop (i + nbc) (size + 1)
+        (Geneweb_util.Buff.mstore len (String.sub s i nbc))
   in
   loop 0 0 0
 
@@ -324,7 +329,8 @@ let print_misc_notes conf base =
     Output.print_string conf
       (if d = "" then
        Util.transl conf "miscellaneous notes"
-       |> Util.translate_eval |> Geneweb_util.Utf8.capitalize_fst |> Adef.escaped
+       |> Util.translate_eval |> Geneweb_util.Utf8.capitalize_fst
+       |> Adef.escaped
       else if h then
         let open Def in
         "- " ^<^ Util.escape_html d ^>^ " -"
@@ -368,7 +374,8 @@ let print_misc_notes conf base =
       (match String.rindex_opt d NotesLinks.char_dir_sep with
       | Some i ->
           let open Def in
-          Output.print_string conf @@ "&d=" ^<^ Geneweb_util.Mutil.encode (String.sub d 0 i)
+          Output.print_string conf @@ "&d="
+          ^<^ Geneweb_util.Mutil.encode (String.sub d 0 i)
       | None -> ());
       Output.print_sstring conf "<tt>&lt;--</tt></a></li>");
     List.iter
@@ -407,7 +414,8 @@ let print_misc_notes conf base =
             Output.print_sstring conf {|<li class="folder"><tt><a href="|};
             Output.print_string conf (Util.commd conf);
             Output.print_sstring conf "m=MISC_NOTES&d=";
-            if d = "" then Output.print_string conf (Geneweb_util.Mutil.encode r)
+            if d = "" then
+              Output.print_string conf (Geneweb_util.Mutil.encode r)
             else (
               Output.print_string conf (Geneweb_util.Mutil.encode d);
               Output.print_sstring conf (String.make 1 NotesLinks.char_dir_sep);

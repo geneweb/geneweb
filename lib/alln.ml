@@ -13,7 +13,9 @@ let first_letters base is_surnames =
   in
   try
     let rec loop istr list =
-      let s = Translate.eval (Geneweb_util.Mutil.nominative (Gwdb.sou base istr)) in
+      let s =
+        Translate.eval (Geneweb_util.Mutil.nominative (Gwdb.sou base istr))
+      in
       let k = Util.name_key base s in
       let c = Geneweb_util.Utf8.sub k 0 1 in
       let list =
@@ -30,7 +32,9 @@ let first_letters base is_surnames =
 
 let select_names conf base is_surnames ini limit =
   let inilen = Geneweb_util.Utf8.length ini + 1 in
-  let cut k = Geneweb_util.Utf8.sub k 0 (min (Geneweb_util.Utf8.length k) inilen) in
+  let cut k =
+    Geneweb_util.Utf8.sub k 0 (min (Geneweb_util.Utf8.length k) inilen)
+  in
   let name_index =
     if is_surnames then Gwdb.persons_of_surname base
     else Gwdb.persons_of_first_name base
@@ -40,7 +44,9 @@ let select_names conf base is_surnames ini limit =
     try
       let istr = Gwdb.spi_first name_index start_k in
       let rec loop istr len list =
-        let s = Translate.eval (Geneweb_util.Mutil.nominative (Gwdb.sou base istr)) in
+        let s =
+          Translate.eval (Geneweb_util.Mutil.nominative (Gwdb.sou base istr))
+        in
         let k = Util.name_key base s in
         if Geneweb_util.Utf8.start_with_wildcard ini 0 k then
           let list, len =
@@ -168,5 +174,7 @@ let groupby_count = function
   | Specify _ -> assert false
   | Result list ->
       list
-      |> Geneweb_util.Ext_list.groupby ~key:(fun (_, _, c) -> c) ~value:(fun (_, s, _) -> s)
+      |> Geneweb_util.Ext_list.groupby
+           ~key:(fun (_, _, c) -> c)
+           ~value:(fun (_, s, _) -> s)
       |> List.sort (fun (a, _) (b, _) -> compare b a)

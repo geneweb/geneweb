@@ -73,9 +73,12 @@ let search_by_name conf base n =
               else
                 let fn1 =
                   Geneweb_util.Name.abbrev
-                    (Geneweb_util.Name.lower (Gwdb.sou base (Gwdb.get_first_name p)))
+                    (Geneweb_util.Name.lower
+                       (Gwdb.sou base (Gwdb.get_first_name p)))
                 in
-                if List.mem fn (Geneweb_util.Ext_string.cut_words fn1) then p :: pl else pl)
+                if List.mem fn (Geneweb_util.Ext_string.cut_words fn1) then
+                  p :: pl
+                else pl)
             pl ipl)
         [] list
   | None -> []

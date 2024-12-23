@@ -327,8 +327,10 @@ let select_surname base pmark fmark surname =
       let fath = Gwdb.poi base (Gwdb.get_father fam) in
       let moth = Gwdb.poi base (Gwdb.get_mother fam) in
       if
-        Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname fath)) = surname
-        || Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname moth)) = surname
+        Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname fath))
+        = surname
+        || Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname moth))
+           = surname
       then (
         Gwdb.Marker.set fmark i true;
         Gwdb.Marker.set pmark (Gwdb.get_father fam) true;
@@ -338,7 +340,9 @@ let select_surname base pmark fmark surname =
             let p = Gwdb.poi base ic in
             if
               (not (Gwdb.Marker.get pmark ic))
-              && Geneweb_util.Name.strip_lower (Gwdb.sou base (Gwdb.get_surname p)) = surname
+              && Geneweb_util.Name.strip_lower
+                   (Gwdb.sou base (Gwdb.get_surname p))
+                 = surname
             then Gwdb.Marker.set pmark ic true)
           (Gwdb.get_children fam)))
     (Gwdb.ifams base)

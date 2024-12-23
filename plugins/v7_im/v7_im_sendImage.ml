@@ -21,7 +21,8 @@ let incorrect conf =
 
 let incorrect_content_type conf base p s =
   let title _ =
-    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
@@ -41,7 +42,8 @@ let incorrect_content_type conf base p s =
 
 let error_too_big_image conf base p len max_len =
   let title _ =
-    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
@@ -68,9 +70,11 @@ let print_link_delete_image conf base p =
     Output.print_sstring conf {|<p><a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=DEL_IMAGE&i=";
-    Output.print_string conf (get_iper p |> string_of_iper |> Geneweb_util.Mutil.encode);
+    Output.print_string conf
+      (get_iper p |> string_of_iper |> Geneweb_util.Mutil.encode);
     Output.print_sstring conf {|">|};
-    transl conf "delete" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+    transl conf "delete" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf;
     Output.print_sstring conf {| |};
     transl_nth conf "image/images" 0 |> Output.print_sstring conf;
     Output.print_sstring conf "</a></p>")
@@ -108,9 +112,11 @@ let print_send_image conf base p =
   Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_OK");
-  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Geneweb_util.Mutil.encode);
+  Util.hidden_input conf "i"
+    (get_iper p |> string_of_iper |> Geneweb_util.Mutil.encode);
   Util.hidden_input conf "digest" (Geneweb_util.Mutil.encode digest);
-  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "file"));
+  Output.print_sstring conf
+    (Geneweb_util.Utf8.capitalize_fst (transl conf "file"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf
@@ -164,7 +170,8 @@ let print_delete_image conf base p =
   Output.printf conf "<form method=\"post\" action=\"%s\">" conf.command;
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK");
-  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Geneweb_util.Mutil.encode);
+  Util.hidden_input conf "i"
+    (get_iper p |> string_of_iper |> Geneweb_util.Mutil.encode);
   Output.print_sstring conf
     {|<p><button type="submit" class="btn btn-secondary btn-lg">|};
   transl_nth conf "validate/delete" 0

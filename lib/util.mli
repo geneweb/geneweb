@@ -82,7 +82,8 @@ val nobtit : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title list
     that respects constraints imposed by [conf.allowed_titles] and
     [conf.denied_titles] *)
 
-val strictly_after_private_years : Config.config -> Geneweb_util.Date.dmy -> bool
+val strictly_after_private_years :
+  Config.config -> Geneweb_util.Date.dmy -> bool
 
 val authorized_age : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** Alias to GWPARAM.p_auth *)

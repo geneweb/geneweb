@@ -98,7 +98,9 @@ let notes_links_db conf base eliminate_unlinked =
         match pg with
         | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes
         | Def.NLDB.PgWizard _ ->
-            List.fold_left (fun set s -> Geneweb_util.Ext_string.Set.add s set) set sl
+            List.fold_left
+              (fun set s -> Geneweb_util.Ext_string.Set.add s set)
+              set sl
         | Def.NLDB.PgMisc s ->
             Hashtbl.add misc s sl;
             set)
@@ -125,7 +127,9 @@ let notes_links_db conf base eliminate_unlinked =
   in
   List.sort
     (fun (s1, _) (s2, _) ->
-      Geneweb_util.Utf8.alphabetic_order (Geneweb_util.Name.lower s1) (Geneweb_util.Name.lower s2))
+      Geneweb_util.Utf8.alphabetic_order
+        (Geneweb_util.Name.lower s1)
+        (Geneweb_util.Name.lower s2))
     db2
 
 let update_notes_links_db base fnotes s =

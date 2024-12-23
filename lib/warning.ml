@@ -2,10 +2,8 @@
 
 (** Database warnings attached to the specification of the person, family, relation, etc. *)
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
-  | BigAgeBetweenSpouses of
-      'person
-      * 'person
-      * Geneweb_util.Date.dmy (* Age differece between couples is greater then 50 years *)
+  | BigAgeBetweenSpouses of 'person * 'person * Geneweb_util.Date.dmy
+    (* Age differece between couples is greater then 50 years *)
   | BirthAfterDeath of 'person  (** Person is born after his death *)
   | IncoherentSex of 'person * int * int  (** Incoherent sex of person *)
   | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array

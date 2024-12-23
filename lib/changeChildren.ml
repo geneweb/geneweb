@@ -33,7 +33,9 @@ let check_conflict base p key new_occ ipl =
       let p1 = poi base ip in
       if
         get_iper p1 <> get_iper p
-        && Geneweb_util.Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) = name
+        && Geneweb_util.Name.lower
+             (p_first_name base p1 ^ " " ^ p_surname base p1)
+           = name
         && get_occ p1 = new_occ
       then raise @@ ChangeChildrenConflict (p, p1))
     ipl

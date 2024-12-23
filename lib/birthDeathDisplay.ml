@@ -8,11 +8,14 @@ open BirthDeath
 
 let month_txt conf d cal =
   let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
-  (d : Adef.safe_string :> string) |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
+  (d : Adef.safe_string :> string)
+  |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
 
 let print_birth conf base =
   let list, len =
-    select_person conf base (fun p -> Geneweb_util.Date.od_of_cdate (get_birth p)) false
+    select_person conf base
+      (fun p -> Geneweb_util.Date.od_of_cdate (get_birth p))
+      false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -236,7 +239,10 @@ let print_longest_lived conf base =
       | Some bd, Death (_, cd) -> (
           match Geneweb_util.Date.cdate_to_dmy_opt cd with
           | None -> None
-          | Some dd -> Some (Geneweb_util.Date.Dgreg (Geneweb_util.Date.time_elapsed bd dd, Dgregorian)))
+          | Some dd ->
+              Some
+                (Geneweb_util.Date.Dgreg
+                   (Geneweb_util.Date.time_elapsed bd dd, Dgregorian)))
       | _ -> None
     else None
   in
@@ -363,7 +369,8 @@ let print_oldest_engagements conf base =
 
 let old_print_statistics conf =
   let title _ =
-    transl conf "statistics" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "statistics" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env)

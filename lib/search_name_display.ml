@@ -124,7 +124,9 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
         let str = Geneweb_util.Mutil.nominative (Gwdb.sou base istr) in
         if
           Geneweb_util.Name.crush_lower str = x
-          || List.mem x (List.map Geneweb_util.Name.crush_lower (Geneweb_util.Mutil.surnames_pieces str))
+          || List.mem x
+               (List.map Geneweb_util.Name.crush_lower
+                  (Geneweb_util.Mutil.surnames_pieces str))
         then
           let iperl = find istr in
           (* maybe they are not the good ones because of changes in the
@@ -146,7 +148,8 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
       let x = Geneweb_util.Name.lower x in
       ( List.fold_right
           (fun (str, istr, iperl) l ->
-            if x = Geneweb_util.Name.lower str then (str, istr, iperl) :: l else l)
+            if x = Geneweb_util.Name.lower str then (str, istr, iperl) :: l
+            else l)
           l [],
         Geneweb_util.Name.lower )
     in
@@ -155,7 +158,9 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
         let x = Geneweb_util.Name.strip_lower x in
         ( List.fold_right
             (fun (str, istr, iperl) l ->
-              if x = Geneweb_util.Name.strip_lower str then (str, istr, iperl) :: l else l)
+              if x = Geneweb_util.Name.strip_lower str then
+                (str, istr, iperl) :: l
+              else l)
             l [],
           Geneweb_util.Name.strip_lower )
       else (l1, name_inj)
@@ -231,7 +236,8 @@ let first_name_print_list conf base x1 xl liste =
       (fun l x ->
         let px = Gwdb.p_surname base x in
         match l with
-        | (p, l1) :: l when Geneweb_util.Utf8.alphabetic_order px p = 0 -> (p, x :: l1) :: l
+        | (p, l1) :: l when Geneweb_util.Utf8.alphabetic_order px p = 0 ->
+            (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
       [] l
   in
@@ -307,7 +313,9 @@ let rec merge_insert ((sstr, (strl, iperl)) as x) = function
   | ((sstr1, (strl1, iperl1)) as y) :: l ->
       if sstr < sstr1 then x :: y :: l
       else if sstr > sstr1 then y :: merge_insert x l
-      else (sstr, (Geneweb_util.Ext_string.Set.union strl strl1, iperl @ iperl1)) :: l
+      else
+        (sstr, (Geneweb_util.Ext_string.Set.union strl strl1, iperl @ iperl1))
+        :: l
   | [] -> [ x ]
 
 let persons_of_absolute base_strings_of persons_of get_field conf base x =
@@ -354,7 +362,9 @@ let first_name_print conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
+        ( Geneweb_util.Name.lower str,
+          ( Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty,
+            iperl ) ))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -431,7 +441,9 @@ let print_selection_bullet conf = function
 let unselected_bullets conf =
   List.fold_left
     (fun sl (k, v) ->
-      try if k = "u" then Gwdb.ifam_of_string (Geneweb_util.Mutil.decode v) :: sl else sl
+      try
+        if k = "u" then Gwdb.ifam_of_string (Geneweb_util.Mutil.decode v) :: sl
+        else sl
       with Failure _ -> sl)
     [] conf.Config.env
 
@@ -459,7 +471,8 @@ let print_branch conf base psn name =
           let sel = not (List.mem i unsel_list) in
           ( fam,
             c,
-            if down then Some (Geneweb_util.Mutil.encode @@ Gwdb.string_of_ifam i, sel)
+            if down then
+              Some (Geneweb_util.Mutil.encode @@ Gwdb.string_of_ifam i, sel)
             else None ))
         (Gwdb.get_family u)
     in
@@ -655,7 +668,8 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   let access txt sn =
     let open Def in
     Util.geneweb_link conf
-      ("m=N&v=" ^<^ Geneweb_util.Mutil.encode sn ^>^ "&t=N" :> Adef.escaped_string)
+      ("m=N&v=" ^<^ Geneweb_util.Mutil.encode sn ^>^ "&t=N"
+        :> Adef.escaped_string)
       (Util.escape_html txt :> Adef.safe_string)
   in
   Util.wprint_in_columns conf
@@ -668,9 +682,11 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   Output.print_string conf (Util.commd conf);
   Output.print_sstring conf {|m=N&o=i&t=N&v=|};
   Output.print_string conf
-    (if List.length homonymes = 1 then Geneweb_util.Mutil.encode x else Geneweb_util.Mutil.encode fx);
+    (if List.length homonymes = 1 then Geneweb_util.Mutil.encode x
+    else Geneweb_util.Mutil.encode fx);
   Output.print_sstring conf {|">|};
-  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "click"));
+  Output.print_sstring conf
+    (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "click"));
   Output.print_sstring conf " ";
   Output.print_sstring conf (Util.transl conf "here");
   Output.print_sstring conf " ";
@@ -691,7 +707,8 @@ let print_family_alphabetic x conf base liste =
     in
     let set =
       List.fold_left
-        (fun set istr -> Geneweb_util.Ext_string.Set.add (Gwdb.sou base istr) set)
+        (fun set istr ->
+          Geneweb_util.Ext_string.Set.add (Gwdb.sou base istr) set)
         Geneweb_util.Ext_string.Set.empty list
     in
     List.sort compare (Geneweb_util.Ext_string.Set.elements set)
@@ -814,7 +831,9 @@ let surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
+        ( Geneweb_util.Name.lower str,
+          ( Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty,
+            iperl ) ))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -887,7 +906,9 @@ let search_surname conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
+        ( Geneweb_util.Name.lower str,
+          ( Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty,
+            iperl ) ))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -935,7 +956,9 @@ let search_surname_print conf base not_found_fun x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
+        ( Geneweb_util.Name.lower str,
+          ( Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty,
+            iperl ) ))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -1006,7 +1029,9 @@ let search_first_name conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
+        ( Geneweb_util.Name.lower str,
+          ( Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty,
+            iperl ) ))
       list
   in
   List.fold_right merge_insert list []
@@ -1026,7 +1051,9 @@ let search_first_name_print conf base x =
   let list =
     List.map
       (fun (str, _, iperl) ->
-        (Geneweb_util.Name.lower str, (Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty, iperl)))
+        ( Geneweb_util.Name.lower str,
+          ( Geneweb_util.Ext_string.Set.add str Geneweb_util.Ext_string.Set.empty,
+            iperl ) ))
       list
   in
   let list = List.fold_right merge_insert list [] in

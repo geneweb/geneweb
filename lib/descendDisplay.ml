@@ -91,10 +91,14 @@ let display_descendants_level conf base max_level ancestor =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Geneweb_util.Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
+        let c =
+          Geneweb_util.Utf8.alphabetic_order (p_surname base p2)
+            (p_surname base p1)
+        in
         if c = 0 then
           let c =
-            Geneweb_util.Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
+            Geneweb_util.Utf8.alphabetic_order (p_first_name base p2)
+              (p_first_name base p1)
           in
           if c = 0 then compare (get_occ p2) (get_occ p1) else c
         else c)
@@ -125,7 +129,9 @@ let display_descendants_level conf base max_level ancestor =
     (fun (p, _) ->
       if is_empty_person p then "?"
       else
-        String.sub (p_surname base p) (Geneweb_util.Ext_string.initial (p_surname base p)) 1)
+        String.sub (p_surname base p)
+          (Geneweb_util.Ext_string.initial (p_surname base p))
+          1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
       Output.print_string conf
@@ -503,9 +509,13 @@ let sort_and_display conf base paths precision list =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Geneweb_util.Utf8.alphabetic_order (p_surname base p2) (p_surname base p1) in
+        let c =
+          Geneweb_util.Utf8.alphabetic_order (p_surname base p2)
+            (p_surname base p1)
+        in
         if c = 0 then
-          Geneweb_util.Utf8.alphabetic_order (p_first_name base p2) (p_first_name base p1)
+          Geneweb_util.Utf8.alphabetic_order (p_first_name base p2)
+            (p_first_name base p1)
         else c)
       list
   in
@@ -542,7 +552,8 @@ let display_descendant_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
     let txt =
-      transl conf "index of the descendants" |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
+      transl conf "index of the descendants"
+      |> Geneweb_util.Utf8.capitalize_fst |> Adef.safe
     in
     if not h then
       wprint_geneweb_link conf
@@ -985,7 +996,8 @@ let display_descendant_with_table conf base max_lev p =
     [ (p, Adef.safe "") ]
     [ (p, Adef.safe "") ];
   Output.print_sstring conf "</table><p>";
-  transl conf "total" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf;
+  transl conf "total" |> Geneweb_util.Utf8.capitalize_fst
+  |> Output.print_sstring conf;
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf (string_of_int !nb_pers);

@@ -20,7 +20,9 @@ let spouse ip cpl =
 let person_is_key base p k =
   let k = Geneweb_util.Name.crush_lower k in
   if
-    k = Geneweb_util.Name.crush_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
+    k
+    = Geneweb_util.Name.crush_lower
+        (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
   then true
   else if
     List.exists
@@ -129,14 +131,17 @@ let find_same_name base p =
 let arg_list_of_string line =
   let rec loop list i len quote =
     if i = String.length line then
-      if len = 0 then List.rev list else List.rev (Geneweb_util.Buff.get len :: list)
+      if len = 0 then List.rev list
+      else List.rev (Geneweb_util.Buff.get len :: list)
     else
       match (quote, line.[i]) with
       | Some c1, c2 ->
           if c1 = c2 then loop list (i + 1) len None
           else loop list (i + 1) (Geneweb_util.Buff.store len c2) quote
       | None, ' ' ->
-          let list = if len = 0 then list else Geneweb_util.Buff.get len :: list in
+          let list =
+            if len = 0 then list else Geneweb_util.Buff.get len :: list
+          in
           loop list (i + 1) 0 quote
       | None, (('"' | '\'') as c) -> loop list (i + 1) 0 (Some c)
       | None, c -> loop list (i + 1) (Geneweb_util.Buff.store len c) None
@@ -146,7 +151,8 @@ let arg_list_of_string line =
 let sort_person_list_aux sort base =
   let default p1 p2 =
     match
-      Geneweb_util.Utf8.alphabetic_order (Gwdb.p_surname base p1) (Gwdb.p_surname base p2)
+      Geneweb_util.Utf8.alphabetic_order (Gwdb.p_surname base p1)
+        (Gwdb.p_surname base p2)
     with
     | 0 -> (
         match
@@ -173,11 +179,16 @@ let sort_person_list_aux sort base =
           with
           | Some d1, _, Some d2, _ -> Geneweb_util.Date.compare_date d1 d2
           | Some d1, _, _, Def.Death (_, d2) ->
-              Geneweb_util.Date.compare_date d1 (Geneweb_util.Date.date_of_cdate d2)
+              Geneweb_util.Date.compare_date d1
+                (Geneweb_util.Date.date_of_cdate d2)
           | _, Def.Death (_, d1), Some d2, _ ->
-              Geneweb_util.Date.compare_date (Geneweb_util.Date.date_of_cdate d1) d2
+              Geneweb_util.Date.compare_date
+                (Geneweb_util.Date.date_of_cdate d1)
+                d2
           | _, Def.Death (_, d1), _, Def.Death (_, d2) ->
-              Geneweb_util.Date.compare_date (Geneweb_util.Date.date_of_cdate d1) (Geneweb_util.Date.date_of_cdate d2)
+              Geneweb_util.Date.compare_date
+                (Geneweb_util.Date.date_of_cdate d1)
+                (Geneweb_util.Date.date_of_cdate d2)
           | Some _, _, _, _ -> 1
           | _, Def.Death (_, _), _, _ -> 1
           | _, _, Some _, _ -> -1
@@ -227,7 +238,8 @@ let get_birth_death_date p =
     | Some d -> (Some d, approx)
     | None -> (
         match Gwdb.get_burial p with
-        | Def.Buried cd | Def.Cremated cd -> (Geneweb_util.Date.od_of_cdate cd, true)
+        | Def.Buried cd | Def.Cremated cd ->
+            (Geneweb_util.Date.od_of_cdate cd, true)
         | Def.UnknownBurial -> (None, approx))
   in
   (birth_date, death_date, approx)

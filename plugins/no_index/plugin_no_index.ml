@@ -5,7 +5,9 @@ open Adef
 let ns = "no_index"
 
 let url_no_index conf base pwd =
-  let scratch s = Geneweb_util.Mutil.encode (Geneweb_util.Name.lower (Gwdb.sou base s)) in
+  let scratch s =
+    Geneweb_util.Mutil.encode (Geneweb_util.Name.lower (Gwdb.sou base s))
+  in
   let get_a_person v =
     try
       let i = Gwdb.iper_of_string (Geneweb_util.Mutil.decode v) in

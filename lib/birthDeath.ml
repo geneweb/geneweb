@@ -13,15 +13,18 @@ let get_k conf =
       with Not_found | Failure _ -> 20)
 
 let select (type a)
-    (module Q : Geneweb_util.Pqueue.S with type elt = a * Geneweb_util.Date.dmy * Geneweb_util.Date.calendar) nb_of
-    iterator get get_date conf base =
+    (module Q : Geneweb_util.Pqueue.S
+      with type elt = a * Geneweb_util.Date.dmy * Geneweb_util.Date.calendar)
+    nb_of iterator get get_date conf base =
   let n = min (max 0 (get_k conf)) (nb_of base) in
   let ref_date =
     match p_getint conf.env "by" with
     | Some by ->
         let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
         let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
-        Some Geneweb_util.Date.{ day = bd; month = bm; year = by; prec = Sure; delta = 0 }
+        Some
+          Geneweb_util.Date.
+            { day = bd; month = bm; year = by; prec = Sure; delta = 0 }
     | None -> None
   in
   let q, len =

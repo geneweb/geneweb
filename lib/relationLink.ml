@@ -354,10 +354,12 @@ let sign_text conf base sign info b1 b2 c1 c2 =
           (if p_getenv conf.env "image" = Some "off" then "&image=off" else "")
     ^^^ (match p_getenv conf.env "bd" with
         | None | Some ("0" | "") -> Adef.escaped ""
-        | Some x -> "&bd=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string))
+        | Some x ->
+            "&bd=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string))
     ^^^ (match p_getenv conf.env "color" with
         | None | Some "" -> Adef.escaped ""
-        | Some x -> "&color=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string))
+        | Some x ->
+            "&color=" ^<^ (Geneweb_util.Mutil.encode x :> Adef.escaped_string))
     ^^^ include_marr conf base (Adef.escaped "3")
     ^^^ include_marr conf base (Adef.escaped "4")
   in
@@ -686,7 +688,8 @@ let print_relation_no_dag conf base po ip1 ip2 =
         match Util.p_getenv conf.env "color" with
         | None | Some "" -> Adef.safe ""
         | Some x ->
-            (" class=\"" ^<^ Geneweb_util.Mutil.encode x ^>^ "\"" :> Adef.safe_string)
+            (" class=\"" ^<^ Geneweb_util.Mutil.encode x ^>^ "\""
+              :> Adef.safe_string)
       in
       let info =
         {

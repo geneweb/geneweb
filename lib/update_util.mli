@@ -24,4 +24,6 @@ val bool_val : bool -> _ TemplAst.expr_val
 val str_val : string -> _ TemplAst.expr_val
 val safe_val : Adef.safe_string -> _ TemplAst.expr_val
 val eval_default_var : Config.config -> string -> _ TemplAst.expr_val
-val eval_date_var : Geneweb_util.Date.date option -> string -> _ TemplAst.expr_val
+
+val eval_date_var :
+  Geneweb_util.Date.date option -> string -> _ TemplAst.expr_val

@@ -37,7 +37,12 @@ type create = Create of sex * create_info option | Link
 type key = string * string * int * create * string
 
 val infer_death : config -> base -> person -> death
-val infer_death_bb : config -> Geneweb_util.Date.date option -> Geneweb_util.Date.date option -> death
+
+val infer_death_bb :
+  config ->
+  Geneweb_util.Date.date option ->
+  Geneweb_util.Date.date option ->
+  death
 
 val infer_death_from_parents : config -> base -> family -> death
 (** [infer_death_from_parents conf base fam] infer death status for a new children in this family *)

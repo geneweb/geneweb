@@ -109,7 +109,8 @@ let print_mod_ok conf base =
       Output.print_sstring conf
         {|<button type="submit" class="btn btn-secondary btn-lg">|};
       Output.print_sstring conf
-        (Geneweb_util.Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
+        (Geneweb_util.Utf8.capitalize_fst
+           (Util.transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>");
     Output.print_sstring conf {|<p><a href="|};
     Output.print_string conf (Util.commd conf);
@@ -207,7 +208,8 @@ and eval_compound_var conf base env xx sl =
   let rec loop = function
     | [ s ] -> eval_simple_str_var conf base env xx s
     | [ "evar"; s ] -> Option.value ~default:"" (Util.p_getenv conf.env s)
-    | "encode" :: sl -> (Geneweb_util.Mutil.encode (loop sl) :> string) (* FIXME? *)
+    | "encode" :: sl ->
+        (Geneweb_util.Mutil.encode (loop sl) :> string) (* FIXME? *)
     | ("escape" | "html_encode") :: sl ->
         (Util.escape_html (loop sl) :> string) (* FIXME? *)
     | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)

@@ -508,11 +508,15 @@ let old_strings_of_fsname bname strings (_, person_patches) =
           else acc
         in
         let acc =
-          List.fold_left (aux Geneweb_util.Name.split_fname) acc
+          List.fold_left
+            (aux Geneweb_util.Name.split_fname)
+            acc
             (p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
         in
         let acc =
-          List.fold_left (aux Geneweb_util.Name.split_sname) acc
+          List.fold_left
+            (aux Geneweb_util.Name.split_sname)
+            acc
             (p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
         in
         acc)

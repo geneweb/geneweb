@@ -49,7 +49,9 @@ let bdir base = base.data.bdir
 let nb_of_persons base = base.data.persons.len
 let nb_of_real_persons base = base.func.nb_of_real_persons ()
 let nb_of_families base = base.data.families.len
-let insert_string base s = base.func.Dbdisk.insert_string @@ Geneweb_util.Utf8.normalize s
+
+let insert_string base s =
+  base.func.Dbdisk.insert_string @@ Geneweb_util.Utf8.normalize s
 
 let find_opt_string_istr base s =
   base.func.Dbdisk.find_opt_string_istr @@ Geneweb_util.Utf8.normalize s
@@ -564,7 +566,8 @@ let read_or_create_visible base =
     if Sys.file_exists fname then (
       let ic = Secure.open_in fname in
       let visible =
-        if Files.check_magic Geneweb_util.Mutil.executable_magic ic then input_value ic
+        if Files.check_magic Geneweb_util.Mutil.executable_magic ic then
+          input_value ic
         else Hashtbl.create (nb_of_persons base)
       in
       close_in ic;

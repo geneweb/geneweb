@@ -40,7 +40,8 @@ let print_differences conf base branches p1 p2 =
         Output.print_sstring conf {|</label></div>|}
       in
       Output.print_sstring conf "<h4>";
-      Output.print_string conf (Adef.safe_fn Geneweb_util.Utf8.capitalize_fst title);
+      Output.print_string conf
+        (Adef.safe_fn Geneweb_util.Utf8.capitalize_fst title);
       Output.print_sstring conf {|</h4>|};
       aux 1 x1 chk1;
       aux 2 x2 chk2)
@@ -52,12 +53,16 @@ let print_differences conf base branches p1 p2 =
   Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND_OK");
-  Util.hidden_input conf "i1" (get_iper p1 |> string_of_iper |> Geneweb_util.Mutil.encode);
-  Util.hidden_input conf "i2" (get_iper p2 |> string_of_iper |> Geneweb_util.Mutil.encode);
+  Util.hidden_input conf "i1"
+    (get_iper p1 |> string_of_iper |> Geneweb_util.Mutil.encode);
+  Util.hidden_input conf "i2"
+    (get_iper p2 |> string_of_iper |> Geneweb_util.Mutil.encode);
   let rec loop = function
     | [ (ip1, ip2) ] ->
-        Util.hidden_input conf "ini1" (ip1 |> string_of_iper |> Geneweb_util.Mutil.encode);
-        Util.hidden_input conf "ini2" (ip2 |> string_of_iper |> Geneweb_util.Mutil.encode)
+        Util.hidden_input conf "ini1"
+          (ip1 |> string_of_iper |> Geneweb_util.Mutil.encode);
+        Util.hidden_input conf "ini2"
+          (ip2 |> string_of_iper |> Geneweb_util.Mutil.encode)
     | _ :: branches -> loop branches
     | [] -> ()
   in
@@ -152,7 +157,8 @@ let print_differences conf base branches p1 p2 =
             | Unspecified -> transl_nth conf "died" is
           in
           s ^<^ " "
-          ^<^ DateDisplay.string_of_ondate conf (Geneweb_util.Date.date_of_cdate cd)
+          ^<^ DateDisplay.string_of_ondate conf
+                (Geneweb_util.Date.date_of_cdate cd)
       | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
       | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
       | DontKnowIfDead | OfCourseDead -> Adef.safe "");
@@ -236,7 +242,8 @@ let propose_merge_ind conf base branches p1 p2 =
 
 let error_loop conf base p =
   let title _ =
-    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf true;
@@ -281,10 +288,12 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
 
 let not_found_or_incorrect conf =
   let title _ =
-    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst |> Output.print_sstring conf
+    transl conf "error" |> Geneweb_util.Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
-  Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "not found"));
+  Output.print_sstring conf
+    (Geneweb_util.Utf8.capitalize_fst (transl conf "not found"));
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "or");
   Output.print_sstring conf " ";
@@ -297,7 +306,8 @@ let not_found_or_incorrect conf =
 
 let same_person conf =
   let title _ =
-    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
+    Output.print_sstring conf
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
   in
   Hutil.rheader conf title;
   Output.print_sstring conf
@@ -306,7 +316,8 @@ let same_person conf =
 
 let different_sexes conf base p1 p2 =
   let title _ =
-    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
+    Output.print_sstring conf
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "error"))
   in
   Hutil.rheader conf title;
   Output.print_sstring conf
@@ -327,7 +338,8 @@ let different_sexes conf base p1 p2 =
 
 let print_merged conf base wl p =
   let title _ =
-    Output.print_sstring conf (Geneweb_util.Utf8.capitalize_fst (transl conf "merge done"))
+    Output.print_sstring conf
+      (Geneweb_util.Utf8.capitalize_fst (transl conf "merge done"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;

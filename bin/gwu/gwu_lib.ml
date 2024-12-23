@@ -74,7 +74,9 @@ let prepare_free_occ ?(select = fun _ -> true) base =
       let p = poi base ip in
       let sn = sou base (get_surname p) in
       let fn = sou base (get_first_name p) in
-      let key = Geneweb_util.Name.lower fn ^ " #@# " ^ Geneweb_util.Name.lower sn in
+      let key =
+        Geneweb_util.Name.lower fn ^ " #@# " ^ Geneweb_util.Name.lower sn
+      in
       try
         let list_occ = Hashtbl.find ht_orig_occ key in
         let rec loop list init new_list =
@@ -159,10 +161,13 @@ let gen_correct_string no_num no_colon s =
       | ' ' | '\n' | '\t' ->
           if i = String.length s - 1 then Geneweb_util.Buff.get len
           else loop (i + 1) (Geneweb_util.Buff.store len '_')
-      | '_' | '\\' -> loop (i + 1) (Geneweb_util.Buff.store (Geneweb_util.Buff.store len '\\') s.[i])
+      | '_' | '\\' ->
+          loop (i + 1)
+            (Geneweb_util.Buff.store (Geneweb_util.Buff.store len '\\') s.[i])
       | ':' when no_colon ->
           let len = Geneweb_util.Buff.store len '\\' in
-          loop (i + 1) (Geneweb_util.Buff.store (Geneweb_util.Buff.store len '\\') s.[i])
+          loop (i + 1)
+            (Geneweb_util.Buff.store (Geneweb_util.Buff.store len '\\') s.[i])
       | c ->
           let c = if is_printable c then c else '_' in
           loop (i + 1) (Geneweb_util.Buff.store len c)
@@ -185,13 +190,16 @@ let correct_string_no_colon base is =
 let gen_print_date opts no_colon = function
   | Geneweb_util.Date.Dgreg (d, Dgregorian) -> print_date_dmy opts d
   | Dgreg (d, Djulian) ->
-      print_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian d);
+      print_date_dmy opts
+        (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian d);
       Printf.ksprintf (oc opts) "J"
   | Dgreg (d, Dfrench) ->
-      print_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench d);
+      print_date_dmy opts
+        (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench d);
       Printf.ksprintf (oc opts) "F"
   | Dgreg (d, Dhebrew) ->
-      print_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew d);
+      print_date_dmy opts
+        (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew d);
       Printf.ksprintf (oc opts) "H"
   | Dtext t ->
       (* Dans le cas d'une date texte pour un titre, on échappe les ':' *)
@@ -366,7 +374,8 @@ let print_infos opts base is_child csrc cbp p =
   | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
   | DontKnowIfDead -> (
       match
-        (Geneweb_util.Date.od_of_cdate (get_birth p), Geneweb_util.Date.od_of_cdate (get_baptism p))
+        ( Geneweb_util.Date.od_of_cdate (get_birth p),
+          Geneweb_util.Date.od_of_cdate (get_baptism p) )
       with
       | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
       | _ -> ())

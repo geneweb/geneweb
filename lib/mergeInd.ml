@@ -4,7 +4,9 @@ open Def
 open Gwdb
 
 let compatible_cdates cd1 cd2 =
-  cd1 = cd2 || cd2 = Geneweb_util.Date.cdate_None || cd1 = Geneweb_util.Date.cdate_None
+  cd1 = cd2
+  || cd2 = Geneweb_util.Date.cdate_None
+  || cd1 = Geneweb_util.Date.cdate_None
 
 let compatible_death_reasons dr1 dr2 = dr1 = dr2 || dr2 = Unspecified
 
@@ -37,11 +39,14 @@ let compatible_divorces d1 d2 = d1 = d2
 let compatible_relation_kinds rk1 rk2 = rk1 = rk2
 
 let compatible_titles t1 t2 =
-  Geneweb_util.Ext_list.cmp (Geneweb_util.Futil.eq_titles eq_istr) t1 t2 || t2 = []
+  Geneweb_util.Ext_list.cmp (Geneweb_util.Futil.eq_titles eq_istr) t1 t2
+  || t2 = []
 
 let compatible_pevents pevt1 pevt2 = pevt1 = [] && pevt2 = []
 let compatible_fevents fevt1 fevt2 = fevt1 = [] && fevt2 = []
-let compatible_strings_lists sl1 sl2 = sl2 = [] || Geneweb_util.Ext_list.cmp eq_istr sl1 sl2
+
+let compatible_strings_lists sl1 sl2 =
+  sl2 = [] || Geneweb_util.Ext_list.cmp eq_istr sl1 sl2
 
 let compatible_notes base s1 s2 =
   compatible_strings s1 s2 || sou base s1 = sou base s2
@@ -135,7 +140,8 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
       (gen_person_of_person p1) with
       sex = (if get_sex p2 <> Neuter then get_sex p2 else get_sex p1);
       birth =
-        (if get_birth p1 = Geneweb_util.Date.cdate_None then get_birth p2 else get_birth p1);
+        (if get_birth p1 = Geneweb_util.Date.cdate_None then get_birth p2
+        else get_birth p1);
       birth_place = get_string get_birth_place;
       birth_src = get_string get_birth_src;
       baptism =
@@ -233,7 +239,8 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
     {
       (gen_family_of_family fam1) with
       marriage =
-        (if get_marriage fam1 = Geneweb_util.Date.cdate_None then get_marriage fam2
+        (if get_marriage fam1 = Geneweb_util.Date.cdate_None then
+         get_marriage fam2
         else get_marriage fam1);
       marriage_place =
         (if is_empty_string (get_marriage_place fam1) then

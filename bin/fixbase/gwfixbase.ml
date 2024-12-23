@@ -148,7 +148,8 @@ let main () =
   if !bname = "" then (
     Arg.usage speclist usage;
     exit 2);
-  Geneweb_util.Lock.control (Files.lock_file !bname) false ~onerror:Geneweb_util.Lock.print_try_again
+  Geneweb_util.Lock.control (Files.lock_file !bname) false
+    ~onerror:Geneweb_util.Lock.print_try_again
   @@ fun () ->
   if
     !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses

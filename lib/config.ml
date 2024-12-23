@@ -165,7 +165,14 @@ let empty =
     auth_file = "";
     border = 0;
     n_connect = None;
-    today = { Geneweb_util.Date.day = 0; month = 0; year = 0; delta = 0; prec = Geneweb_util.Date.Sure };
+    today =
+      {
+        Geneweb_util.Date.day = 0;
+        month = 0;
+        year = 0;
+        delta = 0;
+        prec = Geneweb_util.Date.Sure;
+      };
     today_wd = 0;
     time = (0, 0, 0);
     ctime = 0.;

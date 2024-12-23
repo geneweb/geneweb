@@ -79,7 +79,8 @@ let print conf base p =
   Output.print_sstring conf
     {|<button type="submit" class="btn btn-primary btn-lg mt-2">|};
   Output.print_sstring conf
-    (Geneweb_util.Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
+    (Geneweb_util.Utf8.capitalize_fst
+       (Util.transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></form>\n";
   Hutil.trailer conf
 
@@ -96,9 +97,11 @@ let print_possible_continue_merging conf base =
       Output.print_sstring conf {|<p><a href="|};
       Output.print_string conf (Util.commd conf);
       Output.print_sstring conf {|m=MRG_IND&i=|};
-      Output.print_string conf (Gwdb.string_of_iper ini1 |> Geneweb_util.Mutil.encode);
+      Output.print_string conf
+        (Gwdb.string_of_iper ini1 |> Geneweb_util.Mutil.encode);
       Output.print_sstring conf {|&i2=|};
-      Output.print_string conf (Gwdb.string_of_iper ini2 |> Geneweb_util.Mutil.encode);
+      Output.print_string conf
+        (Gwdb.string_of_iper ini2 |> Geneweb_util.Mutil.encode);
       Output.print_sstring conf {|">|};
       Output.print_sstring conf
         (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "continue merging"));
@@ -129,12 +132,14 @@ let print_possible_continue_merging conf base =
             Output.print_sstring conf {|<p><a href="|};
             Output.print_string conf (Util.commd conf);
             Output.print_sstring conf {|m=MRG_DUP&ip=|};
-            Output.print_string conf (Gwdb.string_of_iper ip |> Geneweb_util.Mutil.encode);
+            Output.print_string conf
+              (Gwdb.string_of_iper ip |> Geneweb_util.Mutil.encode);
             Output.print_string conf s1;
             Output.print_string conf s2;
             Output.print_sstring conf {|">|};
             Output.print_sstring conf
-              (Geneweb_util.Utf8.capitalize_fst (Util.transl conf "continue merging"));
+              (Geneweb_util.Utf8.capitalize_fst
+                 (Util.transl conf "continue merging"));
             Output.print_sstring conf "</a>";
             Output.print_sstring conf {| (|};
             Output.print_sstring conf

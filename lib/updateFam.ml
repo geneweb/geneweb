@@ -44,7 +44,8 @@ let string_family_of conf base ifam =
       (gen_couple_of_family fam)
   in
   let sdes =
-    Geneweb_util.Futil.map_descend_p (person_key base) (gen_descend_of_family fam)
+    Geneweb_util.Futil.map_descend_p (person_key base)
+      (gen_descend_of_family fam)
   in
   (sfam, scpl, sdes)
 
@@ -274,7 +275,9 @@ and eval_fwitness_note env =
 and eval_default_var conf s = Update_util.eval_default_var conf s
 
 and eval_event_date env s =
-  let od = family_events_opt env >>= fun e -> Geneweb_util.Date.od_of_cdate e.efam_date in
+  let od =
+    family_events_opt env >>= fun e -> Geneweb_util.Date.od_of_cdate e.efam_date
+  in
   eval_date_var od s
 
 and eval_simple_var conf base env (fam, cpl, des) = function
@@ -290,7 +293,8 @@ and eval_simple_var conf base env (fam, cpl, des) = function
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | [ "is_first" ] -> eval_is_first env
   | [ "is_last" ] -> eval_is_last env
-  | [ "marriage"; s ] -> eval_date_var (Geneweb_util.Date.od_of_cdate fam.marriage) s
+  | [ "marriage"; s ] ->
+      eval_date_var (Geneweb_util.Date.od_of_cdate fam.marriage) s
   | [ "marriage_place" ] ->
       safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
   | [ "marriage_note" ] ->
@@ -359,8 +363,10 @@ and eval_parent' conf env k = function
   | [ "himher" ] ->
       let s =
         match get_env "cnt" env with
-        | Vint 1 -> Geneweb_util.Utf8.capitalize_fst (transl_nth conf "him/her" 0)
-        | Vint 2 -> Geneweb_util.Utf8.capitalize_fst (transl_nth conf "him/her" 1)
+        | Vint 1 ->
+            Geneweb_util.Utf8.capitalize_fst (transl_nth conf "him/her" 0)
+        | Vint 2 ->
+            Geneweb_util.Utf8.capitalize_fst (transl_nth conf "him/her" 1)
         | Vint _ -> transl conf "him/her"
         | _ -> "???"
       in
@@ -386,7 +392,9 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
         ->
-          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
+          let dmy =
+            Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench dmy
+          in
           if dmy.day <> 0 then string_of_int dmy.day else ""
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg ({ day = d }, _)) })
         when d <> 0 ->
@@ -398,7 +406,9 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
         ->
-          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
+          let dmy =
+            Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench dmy
+          in
           if dmy.month <> 0 then short_f_month dmy.month else ""
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg ({ month = m }, _)) })
@@ -417,7 +427,9 @@ and eval_create c = function
       | Update.Create (_, Some ci) -> (
           match ci.ci_birth_date with
           | Some (Dgreg (dmy, calendar)) ->
-              let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
+              let dmy =
+                Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy
+              in
               add_precision (string_of_int dmy.year) dmy.prec
           | Some _ -> ""
           | None -> if ci.ci_public then "p" else "")
@@ -428,7 +440,9 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         ->
-          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
+          let dmy =
+            Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy
+          in
           if dmy.day <> 0 then string_of_int dmy.day else ""
       | _ -> "")
   | "death_month" -> (
@@ -437,7 +451,9 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         -> (
-          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
+          let dmy =
+            Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy
+          in
           match calendar with
           | Dfrench -> short_f_month dmy.month
           | Dgregorian | Djulian | Dhebrew ->
@@ -454,7 +470,9 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         ->
-          let dmy = Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy in
+          let dmy =
+            Geneweb_util.Date.convert ~from:Dgregorian ~to_:calendar dmy
+          in
           add_precision (string_of_int dmy.year) dmy.prec
       | Update.Create (_, Some { ci_death = death; ci_death_date = None }) -> (
           match death with DeadDontKnowWhen -> "+" | NotDead -> "-" | _ -> "")

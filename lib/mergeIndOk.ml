@@ -89,7 +89,8 @@ let merge_events l1 l2 p =
                 else if e.epers_name = e1.epers_name then
                   let is_dead, date =
                     match p.death with
-                    | NotDead | DontKnowIfDead -> (false, Geneweb_util.Date.cdate_None)
+                    | NotDead | DontKnowIfDead ->
+                        (false, Geneweb_util.Date.cdate_None)
                     | Death (_, cd) -> (true, cd)
                     | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
                         (true, Geneweb_util.Date.cdate_None)
@@ -223,7 +224,9 @@ let reconstitute conf base p1 p2 =
       surnames_aliases = list (sou base) get_surnames_aliases;
       titles = list (Geneweb_util.Futil.map_title_strings (sou base)) get_titles;
       rparents =
-        list (Geneweb_util.Futil.map_relation_ps (sorp base) (sou base)) get_rparents;
+        list
+          (Geneweb_util.Futil.map_relation_ps (sorp base) (sou base))
+          get_rparents;
       related = [];
       occupation =
         field "occupation" (fun p -> sou base (get_occupation p)) (( = ) "");
@@ -483,12 +486,14 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let osn1 = o_p1.surname in
   let oocc1 = o_p1.occ in
   let pgl1 =
-    Perso.links_to_ind conf base db (Geneweb_util.Name.lower ofn1, Geneweb_util.Name.lower osn1, oocc1)
+    Perso.links_to_ind conf base db
+      (Geneweb_util.Name.lower ofn1, Geneweb_util.Name.lower osn1, oocc1)
   in
   let ofn2 = o_p2.first_name in
   let osn2 = o_p2.surname in
   let oocc2 = o_p2.occ in
   let pgl2 =
-    Perso.links_to_ind conf base db (Geneweb_util.Name.lower ofn2, Geneweb_util.Name.lower osn2, oocc2)
+    Perso.links_to_ind conf base db
+      (Geneweb_util.Name.lower ofn2, Geneweb_util.Name.lower osn2, oocc2)
   in
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2

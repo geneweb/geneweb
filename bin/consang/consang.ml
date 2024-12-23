@@ -16,7 +16,9 @@ let speclist =
     ( "-mem",
       Arg.Set save_mem,
       ": Save memory, but slower when rewritting database" );
-    ("-nolock", Arg.Set Geneweb_util.Lock.no_lock_flag, ": do not lock database.");
+    ( "-nolock",
+      Arg.Set Geneweb_util.Lock.no_lock_flag,
+      ": do not lock database." );
   ]
 
 let anonfun s =
@@ -33,8 +35,8 @@ let main () =
   if !verbosity = 0 then Geneweb_util.Mutil.verbose := false;
   Secure.set_base_dir (Filename.dirname !fname);
 
-  Geneweb_util.Lock.control_retry (Files.lock_file !fname) ~onerror:Geneweb_util.Lock.print_error_and_exit
-    (fun () ->
+  Geneweb_util.Lock.control_retry (Files.lock_file !fname)
+    ~onerror:Geneweb_util.Lock.print_error_and_exit (fun () ->
       let base = Gwdb.open_base !fname in
       if !fast then (
         Gwdb.load_persons_array base;

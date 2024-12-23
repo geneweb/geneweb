@@ -82,7 +82,8 @@ let ged_month cal m =
 
 let encode opts s =
   match opts.Gwexport.charset with
-  | Gwexport.Ansel -> Geneweb.Ansel.of_iso_8859_1 @@ Geneweb_util.Utf8.iso_8859_1_of_utf_8 s
+  | Gwexport.Ansel ->
+      Geneweb.Ansel.of_iso_8859_1 @@ Geneweb_util.Utf8.iso_8859_1_of_utf_8 s
   | Gwexport.Ascii | Gwexport.Ansi -> Geneweb_util.Utf8.iso_8859_1_of_utf_8 s
   | Gwexport.Utf8 -> s
 
@@ -305,7 +306,8 @@ let ged_index opts per =
 let ged_name opts base per =
   Printf.ksprintf (oc opts) "1 NAME %s /%s/\n"
     (encode opts (Geneweb_util.Mutil.nominative (ged_1st_name base per)))
-    (encode opts (Geneweb_util.Mutil.nominative (Gwdb.sou base (Gwdb.get_surname per))));
+    (encode opts
+       (Geneweb_util.Mutil.nominative (Gwdb.sou base (Gwdb.get_surname per))));
   let n = Gwdb.sou base (Gwdb.get_public_name per) in
   if n <> "" then Printf.ksprintf (oc opts) "2 GIVN %s\n" (encode opts n);
   (match Gwdb.get_qualifiers per with
@@ -367,11 +369,17 @@ let ged_date_dmy opts dt cal =
 let ged_date opts = function
   | Geneweb_util.Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
   | Dgreg (d, Djulian) ->
-      ged_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian d) Djulian
+      ged_date_dmy opts
+        (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Djulian d)
+        Djulian
   | Dgreg (d, Dfrench) ->
-      ged_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench d) Dfrench
+      ged_date_dmy opts
+        (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dfrench d)
+        Dfrench
   | Dgreg (d, Dhebrew) ->
-      ged_date_dmy opts (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew d) Dhebrew
+      ged_date_dmy opts
+        (Geneweb_util.Date.convert ~from:Dgregorian ~to_:Dhebrew d)
+        Dhebrew
   | Dtext t -> Printf.ksprintf (oc opts) "(%s)" t
 
 let print_sour opts n s = Printf.ksprintf (oc opts) "%d SOUR %s\n" n s
@@ -532,7 +540,8 @@ let ged_title opts base per tit =
   if tit.Def.t_nth <> 0 then Printf.ksprintf (oc opts) ", %d" tit.Def.t_nth;
   Printf.ksprintf (oc opts) "\n";
   (match
-     (Geneweb_util.Date.od_of_cdate tit.Def.t_date_start, Geneweb_util.Date.od_of_cdate tit.Def.t_date_end)
+     ( Geneweb_util.Date.od_of_cdate tit.Def.t_date_start,
+       Geneweb_util.Date.od_of_cdate tit.Def.t_date_end )
    with
   | None, None -> ()
   | Some sd, None ->

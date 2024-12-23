@@ -56,7 +56,9 @@ let gc ?(dry_run = true) ~save_mem base =
       markp i;
       let _ = Dutil.map_person_ps markp marks p in
       let _ = Geneweb_util.Futil.map_union_f markf @@ base.data.unions.get i in
-      let _ = Geneweb_util.Futil.map_ascend_f markf @@ base.data.ascends.get i in
+      let _ =
+        Geneweb_util.Futil.map_ascend_f markf @@ base.data.ascends.get i
+      in
       ())
   done;
   for i = 0 to base.data.families.len - 1 do
@@ -65,8 +67,12 @@ let gc ?(dry_run = true) ~save_mem base =
       (* if family wasn't deleted *)
       if f.fam_index <> dummy_ifam then
         let _ = Dutil.map_family_ps markp markf marks f in
-        let _ = Geneweb_util.Futil.map_couple_p false markp @@ base.data.couples.get i in
-        let _ = Geneweb_util.Futil.map_descend_p markp @@ base.data.descends.get i in
+        let _ =
+          Geneweb_util.Futil.map_couple_p false markp @@ base.data.couples.get i
+        in
+        let _ =
+          Geneweb_util.Futil.map_descend_p markp @@ base.data.descends.get i
+        in
         ()
   done;
   (* [p1;p2:p3;p4] [true;false;true;false] -> [0;0;1;1] *)
@@ -130,11 +136,13 @@ let gc ?(dry_run = true) ~save_mem base =
     in
     let ascends =
       Array.init lenp @@ fun i ->
-      Geneweb_util.Futil.map_ascend_f dst_ifam @@ base.data.ascends.get @@ src_iper i
+      Geneweb_util.Futil.map_ascend_f dst_ifam
+      @@ base.data.ascends.get @@ src_iper i
     in
     let unions =
       Array.init lenp @@ fun i ->
-      Geneweb_util.Futil.map_union_f dst_ifam @@ base.data.unions.get @@ src_iper i
+      Geneweb_util.Futil.map_union_f dst_ifam
+      @@ base.data.unions.get @@ src_iper i
     in
     let families =
       Array.init lenf @@ fun i ->
@@ -143,11 +151,13 @@ let gc ?(dry_run = true) ~save_mem base =
     in
     let couples =
       Array.init lenf @@ fun i ->
-      Geneweb_util.Futil.map_couple_p false dst_iper @@ base.data.couples.get @@ src_ifam i
+      Geneweb_util.Futil.map_couple_p false dst_iper
+      @@ base.data.couples.get @@ src_ifam i
     in
     let descends =
       Array.init lenf @@ fun i ->
-      Geneweb_util.Futil.map_descend_p dst_iper @@ base.data.descends.get @@ src_ifam i
+      Geneweb_util.Futil.map_descend_p dst_iper
+      @@ base.data.descends.get @@ src_ifam i
     in
     let strings =
       Array.init lens (fun i -> base.data.strings.get @@ src_istr i)
