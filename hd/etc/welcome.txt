@@ -19,6 +19,11 @@
 %let;datalist_titles; list="datalist_titles" data-book="title"%in;
 %let;datalist_estates; list="datalist_estates" data-book="domain"%in;
 %define;book_of(xx)[book of %s:::xx]%end;
+%define;dl2(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
+%apply;dl2("fnames")
+%apply;dl2("snames")
+%apply;dl2("titles")
+%apply;dl2("estates")
 %define;display_sosa_ref(xx)
   [*sosa reference][:]
   <href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
@@ -497,87 +502,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 </div>
 %base_trailer;
 %include;copyr
-
-%define;dl2(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
-%apply;dl2("fnames")
-%apply;dl2("snames")
-%apply;dl2("titles")
-%apply;dl2("estates")
 </div>
 %include;js
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Configuration des formulaires
-  const searchForms = {
-    main: document.getElementById('main-search'),
-    title: document.getElementById('title-search')
-  };
-  const searchBtn = document.getElementById('global-search');
-
-  // Vérifie si un formulaire a des entrées
-  function hasInput(form) {
-    return Array.from(form.querySelectorAll('input[type="search"]'))
-                .some(input => input.value.trim() !== '');
-  }
-
-  // Gestion du tooltip dynamique
-  function getTooltip() {
-    if (hasInput(searchForms.main)) {
-      return '[*search/case sensitive]0 [person/persons]0';
-    }
-    if (hasInput(searchForms.title)) {
-      return '[*search/case sensitive]0 [title/titles]0/[estate]0';
-    }
-    return '';
-  }
-
-  // Configuration du tooltip sur le bouton
-  $(searchBtn).tooltip({
-    title: getTooltip,
-    placement: 'bottom',
-    trigger: 'hover'
-  });
-
-  // Mise à jour du tooltip sur changement des inputs
-  Object.values(searchForms).forEach(form => {
-    form.querySelectorAll('input[type="search"]').forEach(input => {
-      input.addEventListener('input', () => {
-        $(searchBtn).tooltip('hide')
-                   .attr('data-original-title', getTooltip())
-                   .tooltip('show');
-      });
-    });
-
-    // Validation à l’appui sur Entrée
-    form.addEventListener('keypress', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (hasInput(form)) form.submit();
-      }
-    });
-  });
-
-  // Gestion du clic sur le bouton de recherche
-  searchBtn.addEventListener('click', () => {
-    if (hasInput(searchForms.main)) searchForms.main.submit();
-    else if (hasInput(searchForms.title)) searchForms.title.submit();
-  });
-});
-
-%define;dl(xxx)
-  %if;(b.datalist_xxx=1)
-    DatalistManager.populateDatalist("datalist_xxx", path + "_xxx.cache.gz");
-  %end;
-%end;
-
-$(document).ready(function() {
-  const path = "%base.name;/cache/%base.name;";
-  %apply;dl("snames")
-  %apply;dl("fnames")
-  %apply;dl("titles")
-  %apply;dl("estates")
-  inputToBook.addNavigation();
-});
-</script>
 </body>
 </html>
