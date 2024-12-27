@@ -405,12 +405,12 @@
               %end;
               <!-- Relationship graph builder -->
               <div class="dropdown-divider"></div>
-              <span class="dropdown-header pt-0" id="RLM"%if;cgi; data-eb="%e.b;"%end;%if;(b.access_by_key="yes") data-accessbykey="1"%end;
-                data-i="%index;" data-p="%first_name_key;" data-n="%surname_key"%if;(occ!=0) data-oc="%occ;"%end;
+              <span class="dropdown-header pt-0" id="RLM"%if;cgi; data-eb="%e.b;"%end;%if;(b.access_by_key="yes") data-accessbykey="1"%end;%sp;
+                data-i="%index;" data-p="%first_name_key;" data-n="%surname_key"%if;(occ!=0) data-oc="%occ;"%end;%sp;
                 data-self="%self; %dates_notag;">[*multi relations graph]</span>
               <div class="form-group px-3 mb-2">
                 <label for="description" class="sr-only">[*description]</label>
-                <input type="text" id="description" class="form-control" placeholder="[*description]" title="&t=…"></input>
+                <input type="text" id="description" class="form-control" placeholder="[*description]" title="&t=…">
               </div>
               <div class="btn-group d-flex pr-3" role="group">
                 <button class="dropdown-item flex-grow-1" title="%apply;addgraph%with;%self; %end;" id="saveButton">
