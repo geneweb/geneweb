@@ -5704,6 +5704,7 @@ fr: 9×-arrière-grands-parents
 
     cousins.11.0 tt
 de: Stammgroßeltern
+fr: neuf-fois-arrière-grands-parents<br>décaïeuls
 
     cousins.12.0
 de: Ur<sup>(×10)</sup>-Großeltern
@@ -5826,7 +5827,7 @@ fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et pet
 ->: 2nd cousins
 
     cousins.3.3 tt
-fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)
+fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)<br>cousins sous germain
 
     cousins.3.4
 de: Neffen und Nichten 3. Grades
