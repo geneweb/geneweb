@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 02/12/2023 12:35:50 $ -->
+<!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
@@ -44,16 +44,8 @@
   %if;(e.m="A" and e.t="T" and e.t1="CT")
     <script src="%etc_prefix;js/jquery.line.js"></script>
   %end;
-  %if;(e.m!="MOD_DATA")
-  <script>
-    $('#load_once_p_mod').one('click', function() {
-      $.getScript('%etc_prefix;js/p_mod.js');
-    });
-    $('#load_once_copylink').one('click', function() {
-      $.getScript('%etc_prefix;js/copylink.js');
-    });
-  </script>
-  %end;
+%end;
+%if;(not is_welcome and e.m!="MOD_DATA")
   %if;wizard;
     %if;(e.m="MOD_DATA_OK" and e.data!="")
       <script>
@@ -120,13 +112,6 @@
   });
 </script>
 %end;
-%if;(e.templ="")
-<script><!-- focus on found autofocus input in opening BS modal -->
-  $('.modal').on('shown.bs.modal', function() {
-  $(this).find('[autofocus]').focus();
-});
-</script>
-%end;
 %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
 <script%if;(e.templ!="") type="text/javascript"%end;>
  <!--
@@ -182,7 +167,7 @@
 %if;("ADD" in e.m or "MOD" in e.m)
 <script>
   // Attach a click event listener to each anchor element within the character's list container
-  document.addEventListener("DOMContentLoaded", function () {
+  function setupCharacterInsertion() {
     document.querySelectorAll('.ch a').forEach(function (element) {
       element.addEventListener('click', function (event) {
         event.preventDefault();
@@ -190,7 +175,8 @@
         insertCharacter(textarea, this.innerText);
       });
     });
-  });
+  }
+
   // Function to insert a character at the current cursor position in a textarea
   function insertCharacter(t, v) {
     var startPos = t.selectionStart;
@@ -242,7 +228,8 @@ function insertTags(tagOpen, tagClose, sampleText) {
   textarea.focus();
   return false;
 }
-document.addEventListener('DOMContentLoaded', function() {
+// Toolbar sticky behavior
+function setupToolbarSticky() {
   const toolbar = document.querySelector('.toolbar-wrapper');
   if (!toolbar) return;
 
@@ -250,20 +237,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function handleScroll() {
     const currentScroll = window.scrollY;
-
-    // Add shadow when scrolled
     if (currentScroll > 0) {
       toolbar.classList.add('is-sticky');
     } else {
       toolbar.classList.remove('is-sticky');
     }
-
     lastScroll = currentScroll;
   }
 
-  // Use passive listener for better scroll performance
   window.addEventListener('scroll', handleScroll, { passive: true });
-});
+}
 </script>
 %end;
 %( Popover functions for anc/destables %)
@@ -282,35 +265,13 @@ $.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
 $.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 </script>
 %end;
-%( RML builder script in menubar %)
-<script>
-  $('#load_once_rlm_builder').one('click', function() {
-    $.getScript('%etc_prefix;js/rlm_builder.js', function() {
-      initializeRLMBuilder();
-    });
-  });
-</script>
-%( Place the cursor at the end an autofocused input %)
-%if;("MOD" in e.m)
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
-    if (focusableElement) {
-        focusableElement.focus();
-        if (focusableElement.setSelectionRange) {
-            focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
-        } else if (focusableElement.value) {
-            focusableElement.value = focusableElement.value;
-        }
-    }
-});
-</script>
-%end;
 %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
+%if;(not is_welcome)
 <script>
 // Enhanced clear button management for dynamic input fields
 // Add clear buttons (X) to input fields and handle DataTable updates
 // Generic clear button functionality for form inputs
+
 function addClearButtonToInputs() {
     // Utility function to create and setup clear button
     function createClearButton(element) {
@@ -444,11 +405,170 @@ function addClearButtonToInputs() {
     });
 }
 </script>
+%end;
 <script>
+%if;(wizard and (is_welcome or "MOD_" in e.m))
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+  addNavigation: function() {
+    // Use event delegation for dynamically added inputs
+    $(document).on('mousedown', 'input[data-book]', function(event) {
+      if (event.ctrlKey && event.button === 0) {
+        event.preventDefault();
+        inputToBook.openBook(this.value, $(this).data('book'));
+      }
+    });
+  },
+
+  openBook: function(value, book) {
+    if (!value) return;
+
+    let preVal = value;
+    if (book === "place") {
+      const place = value.split(/\]\s+[-–—]\s+/);
+      preVal = place.length > 1 ? place[1] : value;
+    }
+
+    preVal = preVal.substring(0, Math.min(preVal.length, 12))
+                   .split(/[, ]+/)[0];
+
+    const encVal = encodeURIComponent(value);
+    const encPreVal = encodeURIComponent(preVal);
+
+    const url = `?%if;cgi;b=%base.name;&%end;m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+    window.open(url, '_blank');
+  }
+};
+%end;
+%if;is_welcome;
+function initializeWelcomeSearchFunctionality() {
+  const searchForms = {
+    main: document.getElementById('main-search'),
+    title: document.getElementById('title-search')
+  };
+  const searchBtn = document.getElementById('global-search');
+
+  function hasInput(form) {
+    return Array.from(form.querySelectorAll('input[type="search"]'))
+                .some(input => input.value.trim() !== '');
+  }
+
+  function getTooltip() {
+    if (hasInput(searchForms.main)) {
+      return '[*search/case sensitive]0 [person/persons]0';
+    }
+    if (hasInput(searchForms.title)) {
+      return '[*search/case sensitive]0 [title/titles]0/[estate]0';
+    }
+    return '';
+  }
+
+  $(searchBtn).tooltip({
+    title: getTooltip,
+    placement: 'bottom',
+    trigger: 'hover'
+  });
+
+  Object.values(searchForms).forEach(form => {
+    form.querySelectorAll('input[type="search"]').forEach(input => {
+      input.addEventListener('input', () => {
+        $(searchBtn).tooltip('hide')
+                   .attr('data-original-title', getTooltip())
+                   .tooltip('show');
+      });
+    });
+
+    form.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (hasInput(form)) form.submit();
+      }
+    });
+  });
+
+  searchBtn.addEventListener('click', () => {
+    if (hasInput(searchForms.main)) searchForms.main.submit();
+    else if (hasInput(searchForms.title)) searchForms.title.submit();
+  });
+}
+%end;
+%if;(not is_welcome and e.m!="MOD_DATA")
+function initializeLazyModules() {
+  $('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
+  $('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
+  $('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+}
+%end;
+%if;(e.templ="" and not is_welcome)
+// Focus on found autofocus input in opening BS modal
+function setupModalAutofocus() {
+  $('.modal').on('shown.bs.modal', function() {
+    $(this).find('[autofocus]').focus();
+  });
+}
+%end;
+%if;(e.m!="MOD_DATA")
+// Floating placeholders for all textual inputs
+function setupFloatingPlaceholders() {
+  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="search"][placeholder]');
+  
+  inputs.forEach(input => {
+    const hadFocus = document.activeElement === input;
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'input-wrapper';
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    const placeholder = document.createElement('span');
+    placeholder.className = 'floating-placeholder';
+    placeholder.textContent = input.placeholder;
+    wrapper.appendChild(placeholder);
+
+    input.addEventListener('focus', () => placeholder.classList.add('active'));
+    input.addEventListener('blur', () => placeholder.classList.remove('active'));
+
+    if (hadFocus || input.hasAttribute('autofocus')) {
+      requestAnimationFrame(() => {
+        input.focus();
+        placeholder.classList.add('active');
+      });
+    }
+  });
+}
+%end;
+%if;(e.m="NOTES" or e.m="WIZNOTES")
+// TOC toggle for NOTES and WIZNOTES
+function setupTocToggle() {
+  const toggleTocText = function() {
+    return $('#toc-content').is(':hidden')
+      ? '([visualize/show/hide/summary]1)'
+      : '([visualize/show/hide/summary]2)';
+  };
+  $('.toc-toggle').on('click', function() {
+    $('#toc-content').toggle();
+    $('.toc-toggle').text(toggleTocText());
+  });
+}
+%end;
+%( Place the cursor at the end an autofocused input %)
+%if;("MOD" in e.m)
+function setupAutofocusInput() {
+  const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
+  if (focusableElement) {
+    focusableElement.focus();
+    if (focusableElement.setSelectionRange) {
+      focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
+    } else if (focusableElement.value) {
+      focusableElement.value = focusableElement.value;
+    }
+  }
+}
+%end;
 %if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
     or b.datalist_titles=1 or b.datalist_estates=1))
   or (e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
-  or ("MOD_" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1
+  or ("IND" in e.m or "FAM" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1
     or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
     or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
     or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
@@ -497,7 +617,7 @@ const DatalistManager = {
       })
       .catch(error => console.error(`Error loading ${cacheFile}:`, error));
   },
-
+  %if;(e.m="MOD_NOTES")
   // Special handling for DataTables inputs
   handleDataTableInput: function(input, listId) {
     if (!input || !listId) return;
@@ -551,94 +671,74 @@ const DatalistManager = {
       });
     }
   }
-};
 %end;
-%if;(wizard and (is_welcome or "MOD_" in e.m))
-// Manages enhanced input field behaviors (navigation, interaction)
-const inputToBook = {
-  addNavigation: function() {
-    // Use event delegation for dynamically added inputs
-    $(document).on('mousedown', 'input[data-book]', function(event) {
-      if (event.ctrlKey && event.button === 0) {
-        event.preventDefault();
-        inputToBook.openBook(this.value, $(this).data('book'));
-      }
-    });
-  },
+};
 
-  openBook: function(value, book) {
-    if (!value) return;
+function populateDatalists() {
+  const baseName = "%base.name;";
+  const path = baseName + "/cache/" + baseName;
+  const datalists = %[
+  %if;(is_welcome or e.m="MOD_NOTES" or "IND" in e.m or "FAM" in e.m)
+    %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
+    %if;(b.datalist_fnames=1)  { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
+    %if;("IND" in e.m or "FAM" in e.m)
+      %if;(b.datalist_places=1)  { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
+      %if;(b.datalist_occupations=1)  { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
+      %if;(b.datalist_sources=1)  { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
+    %end;
+  %end;
+  %if;(is_welcome or "IND" in e.m)
+    %if;is_welcome;
+      %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
+      %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
+    %else;
+      %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
+      %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
+      %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
+    %end;
+  %end;
+  %];
 
-    let preVal = value;
-    if (book === "place") {
-      const place = value.split(/\]\s+[-–—]\s+/);
-      preVal = place.length > 1 ? place[1] : value;
-    }
+  datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
+}
+%end;
 
-    preVal = preVal.substring(0, Math.min(preVal.length, 12))
-                   .split(/[, ]+/)[0];
-
-    const encVal = encodeURIComponent(value);
-    const encPreVal = encodeURIComponent(preVal);
-
-    const url = `?%if;cgi;b=%base.name;&%end;m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
-    window.open(url, '_blank');
+function safeInitialize(fn) {
+  try {
+    fn();
+  } catch (error) {
+    console.error('Initialization error:', error);
   }
-};
+}
+%( Initialize on DOM Content Loaded %)
+document.addEventListener('DOMContentLoaded', () => {
+%if;is_welcome;
+  initializeWelcomeSearchFunctionality();
+  %if;wizard;
+    inputToBook.addNavigation();
+  %end;
+  %if;(b.datalist_fnames=1 or b.datalist_snames=1)
+    populateDatalists();
+  %end;
 %end;
-</script>
-%if;(e.m="NOTES" or e.m="WIZNOTES")
-<script>
-// Table of contents toggle
-$(document).ready(function() {
-  var toggleText = function() {
-    return $('#toc-content').is(':hidden')
-      ? '([visualize/show/hide/summary]1)'
-      : '([visualize/show/hide/summary]2)';
-  };
-  $('.toc-toggle').on('click', function() {
-    $('#toc-content').toggle();
-    $('.toc-toggle').text(toggleText());
-  });
-});
-</script>
+%if;(not is_welcome and e.m!="MOD_DATA")
+  initializeLazyModules();
+%end;
+%if;(e.templ="" and not is_welcome)
+  setupModalAutofocus();
 %end;
 %if;(e.m!="MOD_DATA")
-<script>
-// Floating placeholders for all textual inputs
-function initFloatingPlaceholders() {
-  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="search"][placeholder]');
-  
-  inputs.forEach(input => {
-    const hadFocus = document.activeElement === input;
-    
-    const wrapper = document.createElement('div');
-    wrapper.className = 'input-wrapper';
-    input.parentNode.insertBefore(wrapper, input);
-    wrapper.appendChild(input);
-
-    const placeholder = document.createElement('span');
-    placeholder.className = 'floating-placeholder';
-    placeholder.textContent = input.placeholder;
-    wrapper.appendChild(placeholder);
-
-    input.addEventListener('focus', () => {
-      placeholder.classList.add('active');
-    });
-    
-    input.addEventListener('blur', () => {
-      placeholder.classList.remove('active');
-    });
-
-    if (hadFocus || input.hasAttribute('autofocus')) {
-      requestAnimationFrame(() => {
-        input.focus();
-        placeholder.classList.add('active');
-      });
-    }
-  });
-}
-
-document.addEventListener('DOMContentLoaded', initFloatingPlaceholders);
-</script>
+  setupFloatingPlaceholders();
 %end;
+%if;("ADD" in e.m or "MOD" in e.m)
+  setupToolbarSticky();
+  setupCharacterInsertion();
+%end;
+%if;(e.m="NOTES" or e.m="WIZNOTES")
+  setupTocToggle();
+%end;
+%if;("MOD" in e.m)
+  setupAutofocusInput();
+%end;
+});
+</script>
