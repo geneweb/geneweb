@@ -255,7 +255,7 @@
               >&nbsp;-</a>
             %end;
           </div>
-          <input class="col-3 text-center" title="[*width]" value="%evartw; ─" disabled></input>
+          <input class="col-3 text-center" title="[*width]" value="%evartw; ─" disabled>
           <div class="input-group-append">
               <a href="%apply;url_set%with;twidth%and;%expr(evartw+2);%end;"
                 class="btn btn-outline-secondary"
