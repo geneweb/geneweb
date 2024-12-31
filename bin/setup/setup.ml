@@ -348,7 +348,7 @@ let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 let only_file_name =
   lazy begin
     if !only_file = "" then Filename.concat !setup_dir "only.txt"
-    else !only_file
+    else Filename.concat !setup_dir !only_file
   end
 
 (* this set of macros are used within translations, hence the repeat of some *)
