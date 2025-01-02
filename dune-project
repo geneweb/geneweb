@@ -31,7 +31,6 @@
     (fmt :with-test)
     jingoo
     markup
-    num
     (ocaml (>= 4.08))
     (ocamlformat (and :with-test (= "0.24.1")))
     ounit

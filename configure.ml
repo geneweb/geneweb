@@ -31,10 +31,6 @@ let set_sosa_zarith () =
   assert (!sosa = `None);
   sosa := `Zarith
 
-let set_sosa_num () =
-  assert (!sosa = `None);
-  sosa := `Num
-
 let set_gwdb_legacy () =
   assert (!gwdb = `None);
   gwdb := `Legacy
@@ -56,9 +52,6 @@ let speclist =
     ( "--sosa-legacy",
       Arg.Unit set_sosa_legacy,
       " Use legacy Sosa module implementation" );
-    ( "--sosa-num",
-      Arg.Unit set_sosa_num,
-      " Use Sosa module implementation based on `num` library" );
     ( "--sosa-zarith",
       Arg.Unit set_sosa_zarith,
       " Use Sosa module implementation based on `zarith` library" );
@@ -77,22 +70,14 @@ let () =
     match !syslog with true -> (" -D SYSLOG", "syslog") | false -> ("", "")
   in
   if !sosa = `None then
-    if installed "zarith" then set_sosa_zarith ()
-    else if installed "num" then set_sosa_num ()
-    else set_sosa_legacy ();
+    if installed "zarith" then set_sosa_zarith () else set_sosa_legacy ();
   let sosa_d, sosa_pkg =
     match !sosa with
     | `Legacy ->
-        exclude_dir "sosa_num";
         exclude_dir "sosa_zarith";
         ("", "geneweb_sosa_array")
-    | `Num ->
-        exclude_dir "sosa_array";
-        exclude_dir "sosa_zarith";
-        (" -D SOSA_NUM ", "geneweb_sosa_num")
     | `Zarith ->
         exclude_dir "sosa_array";
-        exclude_dir "sosa_num";
         (" -D SOSA_ZARITH ", "geneweb_sosa_zarith")
     | `None -> assert false
   in
