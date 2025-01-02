@@ -138,7 +138,7 @@ val is_public : config -> base -> person -> bool
     - is_old_person) *)
 
 val is_semi_public : config -> base -> person -> bool
-(** tells if person is semi_public
+(** Tells if person is semi_public
     - access = SemiPublic *)
 
 val pget : config -> base -> iper -> person
