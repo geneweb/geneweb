@@ -197,12 +197,18 @@ let test_abc_number () =
   ()
 
 let test_abc_birth_event () =
-  (match Date.cdate_to_dmy_opt birth_cdate with
+  (match Geneweb_util.Date.cdate_to_dmy_opt birth_cdate with
   | None -> failwith {|no birth date for person "a A"|}
   | Some dmy ->
       assert (
-        Date.compare_dmy dmy
-          { day = 1; month = 1; year = 1990; prec = Date.Sure; delta = 0 }
+        Geneweb_util.Date.compare_dmy dmy
+          {
+            day = 1;
+            month = 1;
+            year = 1990;
+            prec = Geneweb_util.Date.Sure;
+            delta = 0;
+          }
         = 0));
   (Alcotest.check Alcotest.string)
     "birth note" "This is a note on a birth event" birth_note;
@@ -213,13 +219,19 @@ let test_abc_birth_event () =
 
 (* check family marriage event *)
 let test_abc_marriage () =
-  (match Date.cdate_to_dmy_opt marriage_date with
+  (match Geneweb_util.Date.cdate_to_dmy_opt marriage_date with
   | None -> failwith "no marriage date"
   | Some dmy ->
       (Alcotest.check Alcotest.bool)
         "compare dmy" true
-        (Date.compare_dmy dmy
-           { day = 18; month = 05; year = 2013; prec = Date.Sure; delta = 0 }
+        (Geneweb_util.Date.compare_dmy dmy
+           {
+             day = 18;
+             month = 05;
+             year = 2013;
+             prec = Geneweb_util.Date.Sure;
+             delta = 0;
+           }
         = 0));
   (Alcotest.check Alcotest.string)
     "note on marriage event" "This is a note on a marriage event" marriage_note;

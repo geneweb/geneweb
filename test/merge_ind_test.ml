@@ -6,9 +6,15 @@ let union family = { Def.family }
 let couple a b = Adef.couple a b
 
 let person i =
-  { (Mutil.empty_person empty_string quest_string) with occ = i; key_index = i }
+  {
+    (Geneweb_util.Mutil.empty_person empty_string quest_string) with
+    occ = i;
+    key_index = i;
+  }
 
-let family i = { (Mutil.empty_family empty_string) with fam_index = i }
+let family i =
+  { (Geneweb_util.Mutil.empty_family empty_string) with fam_index = i }
+
 let iper (i : int) : Gwdb.iper = i |> Int.to_string |> Gwdb.iper_of_string
 
 let test_is_ancestor =

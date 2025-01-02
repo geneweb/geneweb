@@ -1,13 +1,16 @@
 let data_sure =
   [
-    Date.{ day = 1; month = 1; year = 1900; delta = 0; prec = Sure };
-    Date.{ day = 2; month = 1; year = 1900; delta = 0; prec = Sure };
-    Date.{ day = 3; month = 2; year = 1900; delta = 0; prec = Sure };
+    Geneweb_util.Date.
+      { day = 1; month = 1; year = 1900; delta = 0; prec = Sure };
+    Geneweb_util.Date.
+      { day = 2; month = 1; year = 1900; delta = 0; prec = Sure };
+    Geneweb_util.Date.
+      { day = 3; month = 2; year = 1900; delta = 0; prec = Sure };
   ]
 
 let data_oryear =
   [
-    Date.
+    Geneweb_util.Date.
       {
         day = 1;
         month = 1;
@@ -15,7 +18,7 @@ let data_oryear =
         delta = 0;
         prec = OrYear { day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
       };
-    Date.
+    Geneweb_util.Date.
       {
         day = 1;
         month = 1;
@@ -23,7 +26,7 @@ let data_oryear =
         delta = 0;
         prec = OrYear { day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
       };
-    Date.
+    Geneweb_util.Date.
       {
         day = 1;
         month = 1;
@@ -37,48 +40,61 @@ let data_oryear =
    they should not exists in geneweb *)
 let data_incomplete =
   [
-    Date.{ day = 0; month = 1; year = 1900; delta = 0; prec = Sure };
-    Date.{ day = 0; month = 12; year = 1900; delta = 0; prec = Sure };
-    Date.{ day = 0; month = 0; year = 1900; delta = 0; prec = Sure };
-    Date.
+    Geneweb_util.Date.
+      { day = 0; month = 1; year = 1900; delta = 0; prec = Sure };
+    Geneweb_util.Date.
+      { day = 0; month = 12; year = 1900; delta = 0; prec = Sure };
+    Geneweb_util.Date.
+      { day = 0; month = 0; year = 1900; delta = 0; prec = Sure };
+    Geneweb_util.Date.
       {
         day = 1;
         month = 2;
         year = 1900;
         delta = 0;
-        prec = OrYear Date.{ day2 = 3; month2 = 4; year2 = 1900; delta2 = 6 };
+        prec =
+          OrYear
+            Geneweb_util.Date.{ day2 = 3; month2 = 4; year2 = 1900; delta2 = 6 };
       };
-    Date.
+    Geneweb_util.Date.
       {
         day = 0;
         month = 2;
         year = 1900;
         delta = 0;
-        prec = OrYear Date.{ day2 = 3; month2 = 4; year2 = 1900; delta2 = 6 };
+        prec =
+          OrYear
+            Geneweb_util.Date.{ day2 = 3; month2 = 4; year2 = 1900; delta2 = 6 };
       };
-    Date.
+    Geneweb_util.Date.
       {
         day = 0;
         month = 2;
         year = 1900;
         delta = 0;
-        prec = OrYear Date.{ day2 = 0; month2 = 4; year2 = 1860; delta2 = 0 };
+        prec =
+          OrYear
+            Geneweb_util.Date.{ day2 = 0; month2 = 4; year2 = 1860; delta2 = 0 };
       };
-    Date.
+    Geneweb_util.Date.
       {
         day = 0;
         month = 0;
         year = 1900;
         delta = 0;
-        prec = OrYear Date.{ day2 = 0; month2 = 4; year2 = 1986; delta2 = 0 };
+        prec =
+          OrYear
+            Geneweb_util.Date.{ day2 = 0; month2 = 4; year2 = 1986; delta2 = 0 };
       };
-    Date.
+    Geneweb_util.Date.
       {
         day = 0;
         month = 0;
         year = 1900;
         delta = 0;
-        prec = OrYear Date.{ day2 = 0; month2 = 0; year2 = 1986; delta2 = 0 };
+        prec =
+          OrYear
+            Geneweb_util.Date.{ day2 = 0; month2 = 0; year2 = 1986; delta2 = 0 };
       };
   ]
 
@@ -103,56 +119,68 @@ let v =
       [
         Alcotest.test_case "Calendar gregorian <-> sdn" `Quick
           (round_trip
-             (Date.gregorian_of_sdn ~prec:Date.Sure)
-             (Date.to_sdn ~from:Date.Dgregorian)
+             (Geneweb_util.Date.gregorian_of_sdn ~prec:Geneweb_util.Date.Sure)
+             (Geneweb_util.Date.to_sdn ~from:Geneweb_util.Date.Dgregorian)
              data_sure);
         Alcotest.test_case "Date julian <-> sdn" `Quick
           (round_trip
-             (Date.julian_of_sdn ~prec:Date.Sure)
-             (Date.to_sdn ~from:Date.Djulian)
+             (Geneweb_util.Date.julian_of_sdn ~prec:Geneweb_util.Date.Sure)
+             (Geneweb_util.Date.to_sdn ~from:Geneweb_util.Date.Djulian)
              data_sure);
         Alcotest.test_case "Date french <-> sdn" `Quick
           (round_trip
-             (Date.french_of_sdn ~prec:Date.Sure)
-             (Date.to_sdn ~from:Date.Dfrench)
+             (Geneweb_util.Date.french_of_sdn ~prec:Geneweb_util.Date.Sure)
+             (Geneweb_util.Date.to_sdn ~from:Geneweb_util.Date.Dfrench)
              data_sure);
         Alcotest.test_case "Date hebrew <-> sdn" `Quick
           (round_trip
-             (Date.hebrew_of_sdn ~prec:Date.Sure)
-             (Date.to_sdn ~from:Date.Dhebrew)
+             (Geneweb_util.Date.hebrew_of_sdn ~prec:Geneweb_util.Date.Sure)
+             (Geneweb_util.Date.to_sdn ~from:Geneweb_util.Date.Dhebrew)
              data_sure);
       ] );
     ( "date-greg",
       [
         Alcotest.test_case "Date gregorian <-> julian" `Quick
           (round_trip
-             (Date.convert ~from:Date.Dgregorian ~to_:Date.Djulian)
-             (Date.convert ~from:Date.Djulian ~to_:Date.Dgregorian)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dgregorian
+                ~to_:Geneweb_util.Date.Djulian)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Djulian
+                ~to_:Geneweb_util.Date.Dgregorian)
              (data_sure @ data_oryear));
         Alcotest.test_case "Date gregorian <-> french" `Quick
           (round_trip
-             (Date.convert ~from:Date.Dgregorian ~to_:Date.Dfrench)
-             (Date.convert ~from:Date.Dfrench ~to_:Date.Dgregorian)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dgregorian
+                ~to_:Geneweb_util.Date.Dfrench)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dfrench
+                ~to_:Geneweb_util.Date.Dgregorian)
              (data_sure @ data_oryear));
         Alcotest.test_case "Date gregorian <-> hebrew" `Quick
           (round_trip
-             (Date.convert ~from:Date.Dgregorian ~to_:Date.Dhebrew)
-             (Date.convert ~from:Date.Dhebrew ~to_:Date.Dgregorian)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dgregorian
+                ~to_:Geneweb_util.Date.Dhebrew)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dhebrew
+                ~to_:Geneweb_util.Date.Dgregorian)
              (data_sure @ data_oryear));
       ] );
     ( "date-incomplete",
       [
         Alcotest.test_case "Date incomplete gregorian <-> julian" `Quick
           (incomplete_date
-             (Date.convert ~from:Date.Dgregorian ~to_:Date.Djulian)
-             (Date.convert ~from:Date.Djulian ~to_:Date.Dgregorian));
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dgregorian
+                ~to_:Geneweb_util.Date.Djulian)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Djulian
+                ~to_:Geneweb_util.Date.Dgregorian));
         Alcotest.test_case "Date incomplete gregorian <-> french" `Quick
           (incomplete_date
-             (Date.convert ~from:Date.Dgregorian ~to_:Date.Dfrench)
-             (Date.convert ~from:Date.Dfrench ~to_:Date.Dgregorian));
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dgregorian
+                ~to_:Geneweb_util.Date.Dfrench)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dfrench
+                ~to_:Geneweb_util.Date.Dgregorian));
         Alcotest.test_case "Date incomplete gregorian <-> hebrew" `Quick
           (incomplete_date
-             (Date.convert ~from:Date.Dgregorian ~to_:Date.Dhebrew)
-             (Date.convert ~from:Date.Dhebrew ~to_:Date.Dgregorian));
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dgregorian
+                ~to_:Geneweb_util.Date.Dhebrew)
+             (Geneweb_util.Date.convert ~from:Geneweb_util.Date.Dhebrew
+                ~to_:Geneweb_util.Date.Dgregorian));
       ] );
   ]

@@ -1,7 +1,7 @@
 let ext_string_contains () =
   let str = "foo bar" in
   let test t b =
-    (Alcotest.check Alcotest.bool) t b (Ext_string.contains str t)
+    (Alcotest.check Alcotest.bool) t b (Geneweb_util.Ext_string.contains str t)
   in
   test "foo" true;
   test "baz" false;
@@ -14,26 +14,28 @@ let ext_string_contains () =
 
 let ext_string_start_with () =
   Alcotest.check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Ext_string.start_with "foo" (-1) "foo");
+      ignore @@ Geneweb_util.Ext_string.start_with "foo" (-1) "foo");
   Alcotest.check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Ext_string.start_with "foo" 4 "foo");
+      ignore @@ Geneweb_util.Ext_string.start_with "foo" 4 "foo");
   (Alcotest.check Alcotest.bool)
-    "Ext_string.start_with \"foo\" 0 \"foo\"" true
-    (Ext_string.start_with "foo" 0 "foo");
+    "Geneweb_util.Ext_string.start_with \"foo\" 0 \"foo\"" true
+    (Geneweb_util.Ext_string.start_with "foo" 0 "foo");
   (Alcotest.check Alcotest.bool)
-    "not (Ext_string.start_with \"bar\" 0 \"foo\")" true
-    (not @@ Ext_string.start_with "bar" 0 "foo");
+    "not (Geneweb_util.Ext_string.start_with \"bar\" 0 \"foo\")" true
+    (not @@ Geneweb_util.Ext_string.start_with "bar" 0 "foo");
   (Alcotest.check Alcotest.bool)
-    "Ext_string.start_with \"\" 0 \"foo\"" true
-    (Ext_string.start_with "" 0 "foo");
+    "Geneweb_util.Ext_string.start_with \"\" 0 \"foo\"" true
+    (Geneweb_util.Ext_string.start_with "" 0 "foo");
   ()
 
 let mutil_arabian_romian () =
   let test a r =
     (Alcotest.check Alcotest.int)
-      "arabian_of_roman" a (Mutil.arabian_of_roman r);
+      "arabian_of_roman" a
+      (Geneweb_util.Mutil.arabian_of_roman r);
     (Alcotest.check Alcotest.string)
-      "roman_of_arabian" r (Mutil.roman_of_arabian a)
+      "roman_of_arabian" r
+      (Geneweb_util.Mutil.roman_of_arabian a)
   in
   test 39 "XXXIX";
   test 246 "CCXLVI";
@@ -58,10 +60,10 @@ let test_particles =
   ]
 
 let mutil_compare_after_particle () =
-  let particles = Mutil.compile_particles test_particles in
+  let particles = Geneweb_util.Mutil.compile_particles test_particles in
   let test a b =
     let test exp a b =
-      let cmp = Mutil.compare_after_particle particles in
+      let cmp = Geneweb_util.Mutil.compare_after_particle particles in
       (Alcotest.check Alcotest.int) "" exp (cmp a b)
     in
     test (-1) a b;
@@ -79,7 +81,9 @@ let mutil_compare_after_particle () =
 
 let mutil_string_of_int_sep () =
   let test sep exp int =
-    (Alcotest.check Alcotest.string) "" exp (Mutil.string_of_int_sep sep int)
+    (Alcotest.check Alcotest.string)
+      "" exp
+      (Geneweb_util.Mutil.string_of_int_sep sep int)
   in
   test "," "1" 1;
   test "," "10" 10;
@@ -91,15 +95,16 @@ let mutil_string_of_int_sep () =
 
 let name_title () =
   let test exp =
-    List.iter (fun s -> (Alcotest.check Alcotest.string) "" exp (Name.title s))
+    List.iter (fun s ->
+        (Alcotest.check Alcotest.string) "" exp (Geneweb_util.Name.title s))
   in
   test "Jean-Baptiste"
     [ "jean-baptiste"; "JEAN-baptiste"; "Jean-Baptiste"; "jeaN-baptistE" ]
 
 let utf8_sub () =
   let test ?pad e s i j =
-    let i = Utf8.get s i in
-    (Alcotest.check Alcotest.string) "" e (Utf8.sub ?pad s i j)
+    let i = Geneweb_util.Utf8.get s i in
+    (Alcotest.check Alcotest.string) "" e (Geneweb_util.Utf8.sub ?pad s i j)
   in
   test "日" "日本語" 0 1;
   test "日本語" "日本語" 0 3;
@@ -122,7 +127,7 @@ let utf8_alphabetical_order () =
       match expected with `Before -> -1 | `Same -> 0 | `After -> 1
     in
     Alcotest.check' ~pos:__POS__ testable ~msg:"same sign" ~expected
-      ~actual:(Utf8.alphabetic_order s s')
+      ~actual:(Geneweb_util.Utf8.alphabetic_order s s')
   in
   let test_printable_ascii_characters () =
     let first_ascii_character = String.make 1 (Char.chr 0) in
@@ -237,7 +242,8 @@ let datedisplay_string_of_date () =
     "ghjennaghju/ferraghju/marzu/aprile/maghju/ghjugnu/lugliu/aostu/sittembre/uttobre/nuvembre/dicembre";
   let test aaa cal (d, m, y) =
     let date =
-      Date.Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
+      Geneweb_util.Date.Dgreg
+        ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
     in
     let bbb :> string = Geneweb.DateDisplay.string_of_date conf date in
     (Alcotest.check Alcotest.string) "" aaa bbb
@@ -258,8 +264,10 @@ let v =
   [
     ( "ext-string",
       [
-        Alcotest.test_case "Ext_string.contains" `Quick ext_string_contains;
-        Alcotest.test_case "Ext_string.start_with" `Quick ext_string_start_with;
+        Alcotest.test_case "Geneweb_util.Ext_string.contains" `Quick
+          ext_string_contains;
+        Alcotest.test_case "Geneweb_util.Ext_string.start_with" `Quick
+          ext_string_start_with;
       ] );
     ( "mutil",
       [
