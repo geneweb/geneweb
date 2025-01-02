@@ -33,7 +33,7 @@ val all_checks_person :
   (iper, iper, istr) gen_person ->
   ifam gen_ascend ->
   ifam gen_union ->
-  CheckItem.base_warning list
+  Warning.base_warning list
 (** Patches the informations of a person by checking the order of events:
     for example, a birth should happen before the death of a mother. *)
 
