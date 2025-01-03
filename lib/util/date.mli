@@ -127,3 +127,9 @@ val french_of_sdn : prec:precision -> int -> dmy
 
 val hebrew_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to [dmy] in hebrew calendar *)
+
+val partial_date_lower_bound :
+  day:int -> month:int -> year:int -> int * int * int
+
+val make_date_error_message :
+  prefix:string -> 'a Calendars.erroneous_date -> string
