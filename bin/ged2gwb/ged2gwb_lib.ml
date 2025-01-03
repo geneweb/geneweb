@@ -542,13 +542,7 @@ let roman_int =
   Grammar.Entry.of_parser date_g "roman int" p
 
 let make_date n1 n2 n3 =
-  let n3 =
-    if !state.no_negative_dates then
-      match n3 with
-        Some n3 -> Some (abs n3)
-      | None -> None
-    else n3
-  in
+  let n3 = if !state.no_negative_dates then Option.map abs n3 else n3 in
   match n1, n2, n3 with
     Some d, Some m, Some y ->
       let (d, m) =
