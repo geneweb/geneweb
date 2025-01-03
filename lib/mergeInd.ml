@@ -143,7 +143,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
       birth_src = get_string get_birth_src;
       baptism =
         (if get_baptism p1 = Date.cdate_None then get_baptism p2
-        else get_baptism p1);
+         else get_baptism p1);
       baptism_place = get_string get_baptism_place;
       baptism_src = get_string get_baptism_src;
       death =
@@ -244,17 +244,17 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
       (gen_family_of_family fam1) with
       marriage =
         (if get_marriage fam1 = Date.cdate_None then get_marriage fam2
-        else get_marriage fam1);
+         else get_marriage fam1);
       marriage_place =
         (if is_empty_string (get_marriage_place fam1) then
-         get_marriage_place fam2
-        else get_marriage_place fam1);
+           get_marriage_place fam2
+         else get_marriage_place fam1);
       marriage_src =
         (if is_empty_string (get_marriage_src fam1) then get_marriage_src fam2
-        else get_marriage_src fam1);
+         else get_marriage_src fam1);
       fsources =
         (if is_empty_string (get_fsources fam1) then get_fsources fam2
-        else get_fsources fam1);
+         else get_fsources fam1);
     }
   in
   let des1 =
@@ -335,12 +335,12 @@ let merge conf base p1 p2 propose_merge_ind propose_merge_fam =
   in
   if changes_done then Util.commit_patches conf base;
   (if ok then
-   let changed =
-     let p1 = Util.string_gen_person base (gen_person_of_person p1) in
-     let p2 = Util.string_gen_person base (gen_person_of_person p2) in
-     U_Merge_person (p2, p1, p1)
-   in
-   History.record conf base changed "fp");
+     let changed =
+       let p1 = Util.string_gen_person base (gen_person_of_person p1) in
+       let p2 = Util.string_gen_person base (gen_person_of_person p2) in
+       U_Merge_person (p2, p1, p1)
+     in
+     History.record conf base changed "fp");
   Update.delete_topological_sort conf base;
   (ok, List.rev !rev_wl)
 

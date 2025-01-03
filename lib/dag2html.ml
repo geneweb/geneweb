@@ -988,12 +988,12 @@ let fall t =
                 else
                   t.table.(i1).(l) <-
                     (if
-                     l = j
-                     || t.table.(i1 - 1).(l - 1).span
-                        <> t.table.(i1 - 1).(l).span
-                    then
-                     { elem = Ghost (new_ghost_id ()); span = new_span_id () }
-                    else copy_data t.table.(i1).(l - 1))
+                       l = j
+                       || t.table.(i1 - 1).(l - 1).span
+                          <> t.table.(i1 - 1).(l).span
+                     then
+                       { elem = Ghost (new_ghost_id ()); span = new_span_id () }
+                     else copy_data t.table.(i1).(l - 1))
               done);
             loop (j2 + 1)
         | _ -> loop (j + 1)
@@ -1007,14 +1007,14 @@ let fall2_cool_right t i1 i2 j1 j2 =
     for j = j1 to j2 - 1 do
       t.table.(i).(j) <-
         (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-        else { elem = Nothing; span = new_span_id () })
+         else { elem = Nothing; span = new_span_id () })
     done
   done;
   for i = Array.length t.table - 1 downto 0 do
     for j = j2 to Array.length t.table.(i) - 1 do
       t.table.(i).(j) <-
         (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-        else { elem = Nothing; span = new_span_id () })
+         else { elem = Nothing; span = new_span_id () })
     done
   done;
   let old_span = t.table.(i2 - 1).(j1).span in
@@ -1032,14 +1032,14 @@ let fall2_cool_left t i1 i2 j1 j2 =
     for j = j1 + 1 to j2 do
       t.table.(i).(j) <-
         (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-        else { elem = Nothing; span = new_span_id () })
+         else { elem = Nothing; span = new_span_id () })
     done
   done;
   for i = Array.length t.table - 1 downto 0 do
     for j = j1 downto 0 do
       t.table.(i).(j) <-
         (if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-        else { elem = Nothing; span = new_span_id () })
+         else { elem = Nothing; span = new_span_id () })
     done
   done;
   let old_span = t.table.(i2 - 1).(j2).span in

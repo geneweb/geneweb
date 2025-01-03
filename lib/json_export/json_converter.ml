@@ -46,7 +46,7 @@ module Make (D : ConverterDriver) = struct
   let bool = D.bool
   let opt fn = function Some x -> fn x | None -> null
 
-  (** gwdb to json  *)
+  (** gwdb to json *)
 
   let conv_dmy dmy =
     obj

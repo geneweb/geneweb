@@ -13,8 +13,8 @@ module Make () = struct
   let unsafe_gstore len s si slen =
     let newlen = len + slen in
     (if newlen > Bytes.length !buff then
-     let more = max slen (Bytes.length !buff) in
-     buff := Bytes.extend !buff 0 more);
+       let more = max slen (Bytes.length !buff) in
+       buff := Bytes.extend !buff 0 more);
     Bytes.blit_string s si !buff len slen;
     newlen
 

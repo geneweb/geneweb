@@ -39,7 +39,8 @@ val infer_death : config -> base -> person -> death
 val infer_death_bb : config -> date option -> date option -> death
 
 val infer_death_from_parents : config -> base -> family -> death
-(** [infer_death_from_parents conf base fam] infer death status for a new children in this family *)
+(** [infer_death_from_parents conf base fam] infer death status for a new
+    children in this family *)
 
 val print_same_name : config -> base -> person -> unit
 val print_person_parents_and_spouses : config -> base -> person -> unit
@@ -57,8 +58,8 @@ val delete_topological_sort : config -> base -> unit
 val update_related_pointers : base -> iper -> iper list -> iper list -> unit
 
 val print_return : config -> unit
-(** Helper function printing a hidden form containing current env,
-    with a submit button "return", plus a hidden field [return=on].  *)
+(** Helper function printing a hidden form containing current env, with a submit
+    button "return", plus a hidden field [return=on]. *)
 
 val print_continue :
   config ->
@@ -66,18 +67,15 @@ val print_continue :
   string ->
   Adef.encoded_string ->
   unit
-(** [print_continue conf param value]
-    Helper function printing a hidden form containing current env,
-    with a submit button "continue", plus a hidden field [param=value].
-    Optionnal [continue] parameter is the label used for the submit button.
-*)
+(** [print_continue conf param value] Helper function printing a hidden form
+    containing current env, with a submit button "continue", plus a hidden field
+    [param=value]. Optionnal [continue] parameter is the label used for the
+    submit button. *)
 
 val prerr : config -> update_error -> (unit -> unit) -> 'a
-(** [prerr conf err callback]
-    Regular mode: print error page using [callback] (wrapped in header/trailer)
-    and and raise [ModErr err]
-    API mode: only raise [ModErr err]
-*)
+(** [prerr conf err callback] Regular mode: print error page using [callback]
+    (wrapped in header/trailer) and and raise [ModErr err] API mode: only raise
+    [ModErr err] *)
 
 val string_of_error : config -> update_error -> Adef.safe_string
 val print_error : config -> update_error -> unit
@@ -116,14 +114,12 @@ val check_missing_name :
   base -> (Gwdb.iper, 'b, string) Def.gen_person -> update_error option
 
 val print_create_conflict : config -> base -> person -> string -> 'exn
-(** [print_create_conflict conf base p var]
-    Print a message because a personne with same key already exists,
-    and display a form with two options:
+(** [print_create_conflict conf base p var] Print a message because a personne
+    with same key already exists, and display a form with two options:
     - create a personne with the next occurence number available
     - go back to the previous pre-filled form.
 
-    [var] is used for the input with name "field". Leave it empty if unused.
- *)
+    [var] is used for the input with name "field". Leave it empty if unused. *)
 
 val print_order_changed :
   config -> ('a array -> bool array -> unit) -> 'a array -> 'a array -> unit

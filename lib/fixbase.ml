@@ -67,7 +67,7 @@ let fix_pevents ?report base pp =
               (if e.epers_date = Date.cdate_None then date else e.epers_date);
             epers_place =
               (if e.epers_place = Gwdb.empty_string then place
-              else e.epers_place);
+               else e.epers_place);
             epers_reason = e.epers_reason;
             epers_note =
               (if e.epers_note = Gwdb.empty_string then note else e.epers_note);
@@ -323,7 +323,7 @@ let fix_marriage_divorce ?report progress base =
         (relation0, marriage0, marriage_place0, marriage_note0, marriage_src0)
       in
       let ( ((relation, marriage, marriage_place, marriage_note, marriage_src)
-            as marr_data),
+             as marr_data),
             divorce,
             _ ) =
         UpdateFamOk.reconstitute_from_fevents false (insert_string base "")
@@ -370,9 +370,9 @@ let fix_utf8_sequence ?report progress base =
   let normalize_utf_8_date ifam iper s =
     let s' = Mutil.normalize_utf_8 s in
     (if s <> s' then
-     match report with
-     | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, None))
-     | None -> ());
+       match report with
+       | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, None))
+       | None -> ());
     s'
   in
   let normalize_utf_8 ifam iper i =
@@ -380,9 +380,9 @@ let fix_utf8_sequence ?report progress base =
     let s' = Mutil.normalize_utf_8 s in
     let i' = Gwdb.insert_string base s' in
     (if i <> i' then
-     match report with
-     | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, Some (i, i')))
-     | None -> ());
+       match report with
+       | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, Some (i, i')))
+       | None -> ());
     i'
   in
   let nbf = nb_of_families base in

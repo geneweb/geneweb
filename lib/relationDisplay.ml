@@ -529,16 +529,16 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
              ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
              ^<^ acces_n conf base (Adef.escaped "2") dp2
              ^^^ (if pp1 = None then Adef.escaped ""
-                 else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
+                  else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
              ^^^ (if pp2 = None then Adef.escaped ""
-                 else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
+                  else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
              ^^^ (if propose_dag then Adef.escaped "&dag=on"
-                 else Adef.escaped "")
+                  else Adef.escaped "")
              ^>^ if img then "" else "&im=0"
               :> string)
             (transl conf "see" |> Utf8.capitalize_fst)
             (if n > 1 && not propose_dag then transl conf " the first branch"
-            else "")
+             else "")
         in
         Output.print_sstring conf str)
     list;
@@ -575,9 +575,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
           ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
           ^<^ acces_n conf base (Adef.escaped "2") dp2
           ^^^ (if pp1 = None then Adef.escaped ""
-              else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
+               else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
           ^^^ (if pp2 = None then Adef.escaped ""
-              else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
+               else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
           ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
           ^>^ if img then "" else "&im=0"
         in

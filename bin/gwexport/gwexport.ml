@@ -132,19 +132,15 @@ module IFS = Util.IfamSet
 (* S: Does it mean private persons whose birth year is before 'max_year'
    are uncensored? *)
 
-(** [is_censored_person max_year person_name]
-    Returns [true] iff the person has a birth date that is after max_year and
-    its visibility is not public
-*)
+(** [is_censored_person max_year person_name] Returns [true] iff the person has
+    a birth date that is after max_year and its visibility is not public *)
 let is_censored_person threshold p =
   match Date.cdate_to_dmy_opt (get_birth p) with
   | None -> false
   | Some dmy -> dmy.Adef.year >= threshold && get_access p != Def.Public
 
-(** [is_censored_couple base max_year family]
-    Returns [true] if either the father or the mother of a given family in the
-    base is censored
-*)
+(** [is_censored_couple base max_year family] Returns [true] if either the
+    father or the mother of a given family in the base is censored *)
 let is_censored_couple base threshold cpl =
   (is_censored_person threshold @@ poi base (get_father cpl))
   || (is_censored_person threshold @@ poi base (get_mother cpl))
@@ -163,9 +159,8 @@ let censor_person base pmark flag threshold p no_check =
   if no_check || is_censored_person threshold ps then
     Marker.set pmark p (Marker.get pmark p lor flag)
 
-(** Marks all the members of a family that are censored.
-    If a couple is censored, its parents and all its descendants are marked.
-*)
+(** Marks all the members of a family that are censored. If a couple is
+    censored, its parents and all its descendants are marked. *)
 let rec censor_family base pmark fmark flag threshold i no_check =
   let censor_unions p =
     let uni = poi base p in
@@ -240,9 +235,8 @@ let restrict_base base per_tab fam_tab flag =
         Marker.set fam_tab i (Marker.get fam_tab i lor flag))
     (ifams base)
 
-(** [select_asc conf base max_gen ips]
-    Returns all the ancestors of persons in the list `ips` up to the `max_gen`
-    generation. *)
+(** [select_asc conf base max_gen ips] Returns all the ancestors of persons in
+    the list `ips` up to the `max_gen` generation. *)
 let select_asc conf base max_gen ips =
   let rec loop_asc (gen : int) set ip =
     if not @@ IPS.mem ip set then
@@ -263,11 +257,9 @@ let select_asc conf base max_gen ips =
 (* S: only used by `select_surnames` in a List.iter *)
 (* Should it use search engine functions? *)
 
-(** [select_surname nase pmark fmark surname]
-    Sets a `true` marker to families whose mother or father that
-    match the given surname. Propagates the mark to children
-    that have this surname.
-*)
+(** [select_surname nase pmark fmark surname] Sets a `true` marker to families
+    whose mother or father that match the given surname. Propagates the mark to
+    children that have this surname. *)
 let select_surname base pmark fmark surname =
   let surname = Name.strip_lower surname in
   Collection.iter
@@ -292,12 +284,10 @@ let select_surname base pmark fmark surname =
           (get_children fam)))
     (ifams base)
 
-(** [select_surnames base surnames]
-    Calls `select_surname` on every family that have the given surnames.
-    Returns two functions:
-    * the first takes a person and returns `true` iff it has been selected
-    * the second takes a family and returns `false` iff it has been selected
-*)
+(** [select_surnames base surnames] Calls `select_surname` on every family that
+    have the given surnames. Returns two functions: * the first takes a person
+    and returns `true` iff it has been selected * the second takes a family and
+    returns `false` iff it has been selected *)
 let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
   let pmark = Gwdb.iper_marker (Gwdb.ipers base) false in
   let fmark = Gwdb.ifam_marker (Gwdb.ifams base) false in
@@ -306,9 +296,8 @@ let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
 
 (**/**)
 
-(** [select_parentship base ip1 ip2]
-    Returns the set of common descendants of ip1 and the
-    ancestors of ip2 and the set of their families. *)
+(** [select_parentship base ip1 ip2] Returns the set of common descendants of
+    ip1 and the ancestors of ip2 and the set of their families. *)
 let select_parentship base ip1 ip2 =
   let conf = Config.{ empty with wizard = true; bname = Gwdb.bname base } in
   let asc = select_asc conf base max_int [ ip1 ] in
@@ -343,20 +332,16 @@ let select_parentship base ip1 ip2 =
   in
   (ipers, ifams)
 
-(** [select_from_set ipers ifams]
-    Returns two functions :
-    * the first returns true if its input is in ipers
-    * the second returns true if its input is in ifams
-*)
+(** [select_from_set ipers ifams] Returns two functions : * the first returns
+    true if its input is in ipers * the second returns true if its input is in
+    ifams *)
 let select_from_set (ipers : IPS.t) (ifams : IFS.t) =
   let sel_per i = IPS.mem i ipers in
   let sel_fam i = IFS.mem i ifams in
   (sel_per, sel_fam)
 
-(** [select opts ips]
-    Return filters for [iper] and [ifam] to be used when exporting
-    a (portion of a) base.
-*)
+(** [select opts ips] Return filters for [iper] and [ifam] to be used when
+    exporting a (portion of a) base. *)
 let select opts ips =
   match opts.base with
   | None -> raise (Arg.Bad "Missing base name. Use option -help for usage")
@@ -370,10 +355,10 @@ let select opts ips =
           let pmark = iper_marker (ipers base) 0 in
           let fmark = ifam_marker (ifams base) 0 in
           (if opts.censor = -1 then restrict_base base pmark fmark 1
-          else
-            let tm = Unix.localtime (Unix.time ()) in
-            let threshold = 1900 + tm.Unix.tm_year - opts.censor in
-            censor_base base pmark fmark 1 threshold);
+           else
+             let tm = Unix.localtime (Unix.time ()) in
+             let threshold = 1900 + tm.Unix.tm_year - opts.censor in
+             censor_base base pmark fmark 1 threshold);
           ((fun i -> Marker.get pmark i = 0), fun i -> Marker.get fmark i = 0))
         else ((fun _ -> true), fun _ -> true)
       in

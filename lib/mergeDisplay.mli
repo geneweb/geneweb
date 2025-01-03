@@ -11,4 +11,5 @@ val print : config -> base -> person -> unit
 (** Displays a menu for merging two persons *)
 
 val print_possible_continue_merging : config -> base -> unit
-(** Prints link on the page to continue merging two persons (or two duplications). *)
+(** Prints link on the page to continue merging two persons (or two
+    duplications). *)

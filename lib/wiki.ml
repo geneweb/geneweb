@@ -620,13 +620,14 @@ let rev_extract_sub_part (s : string) (v : int) : string list =
             (* S: previous condition is a strange way to write `if v = 0` *)
           else
             let nlev = section_level s len in
-            if cnt = v (*  *) then loop (s :: lines) nlev (cnt + 1) sl
+            if cnt = v (* *) then loop (s :: lines) nlev (cnt + 1) sl
             else if cnt > v then
               if nlev > lev then loop (s :: lines) lev (cnt + 1) sl else lines
             else loop lines lev (cnt + 1) sl
-        else if (* This line is not a title *)
-                cnt <= v then
-          loop lines lev cnt sl (* Line is in an ignored section *)
+        else if
+          (* This line is not a title *)
+          cnt <= v
+        then loop lines lev cnt sl (* Line is in an ignored section *)
         else loop (s :: lines) lev cnt sl (* Keeping the line *)
     | [] -> lines
   in

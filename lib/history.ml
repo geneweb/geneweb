@@ -20,13 +20,11 @@ let ext_flags =
 
 (* ********************************************************************** *)
 
-(** [Description] : Renvoie la clé nom/prénom/occ.
-    [Args] :
-      - fn  : string
-      - sn  : string
-      - occ : int
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Renvoie la clé nom/prénom/occ. [Args] :
+    - fn : string
+    - sn : string
+    - occ : int [Retour] : string [Rem] : Non exporté en clair hors de ce
+      module. *)
 let slash_name_of_key fn sn occ =
   let space_to_unders = Mutil.tr ' ' '_' in
   let fn = space_to_unders (Name.lower fn) in
@@ -39,16 +37,14 @@ let slash_name_of_key fn sn occ =
 
 (* ********************************************************************** *)
 
-(** [Description] : Si la visibilité de la personne a changé (entre
-                    l'ancienne et la nouvelle), alors on revoie un tableau
-                    avec la nouvelle visibilité.
+(** [Description] : Si la visibilité de la personne a changé (entre l'ancienne
+    et la nouvelle), alors on revoie un tableau avec la nouvelle visibilité.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - op   : la person avant les modifications
-      - np   : la person après les modifications
-    [Retour] : string array
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - op : la person avant les modifications
+    - np : la person après les modifications [Retour] : string array [Rem] : Non
+      exporté en clair hors de ce module. *)
 let diff_visibility conf base op np =
   let k = slash_name_of_key np.first_name np.surname np.occ in
   let empty_union = { family = [||] } in
@@ -75,12 +71,10 @@ type kind_diff =
 (* ********************************************************************** *)
 
 (** [Description] : Si la clé de la personne a changé, alors on renvoie un
-                    tableau avec l'ancienne clé et la nouvelle clé.
-    [Args] :
-      - op   : la person avant les modifications
-      - np   : la person après les modifications
-    [Retour] : string array
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+    tableau avec l'ancienne clé et la nouvelle clé. [Args] :
+    - op : la person avant les modifications
+    - np : la person après les modifications [Retour] : string array [Rem] : Non
+      exporté en clair hors de ce module. *)
 let diff_key d =
   match d with
   | Diff_person (op, np) ->
@@ -98,16 +92,14 @@ let diff_key d =
 
 (* ********************************************************************** *)
 
-(** [Description] : Fonction qui ajouté des paramètres passés dans la
-                    ligne de commande de notify_change. Elle permet de
-                    savoir quelle genre de modifications ont été faites.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - op   : la person avant les modifications
-      - np   : la person après les modifications
-    [Retour] : string array
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Fonction qui ajouté des paramètres passés dans la ligne de
+    commande de notify_change. Elle permet de savoir quelle genre de
+    modifications ont été faites. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - op : la person avant les modifications
+    - np : la person après les modifications [Retour] : string array [Rem] : Non
+      exporté en clair hors de ce module. *)
 let diff_person conf base changed =
   match changed with
   | U_Add_person _ | U_Delete_person _ -> [||]
@@ -150,14 +142,12 @@ let diff_person conf base changed =
 (* ************************************************************************ *)
 
 (** [Description] : Appel le script défini par la variable notify_change du
-                    fichier gwf.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - changed : le type de modification (voir def.mli)
-      - action : le code du type de modification
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    fichier gwf. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - changed : le type de modification (voir def.mli)
+    - action : le code du type de modification [Retour] : Néant [Rem] : Non
+      exporté en clair hors de ce module. *)
 let notify_change conf base changed action =
   if Sys.unix then
     match List.assoc_opt "notify_change" conf.base_env with
@@ -204,16 +194,14 @@ let notify_change conf base changed action =
 (* ************************************************************************ *)
 
 (** [Description] : Enregistre dans le fichier historique si la variable
-      "hitory" du fichier gwf est valorisée à "yes". Le fait qu'on ait des
-      gen_person, nous permet de pouvoir faire un diff entre avant et après
-      la modification d'une personne.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - changed : le type de modification (voir def.mli)
-      - action : le code du type de modification
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    "hitory" du fichier gwf est valorisée à "yes". Le fait qu'on ait des
+    gen_person, nous permet de pouvoir faire un diff entre avant et après la
+    modification d'une personne. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - changed : le type de modification (voir def.mli)
+    - action : le code du type de modification [Retour] : Néant [Rem] : Non
+      exporté en clair hors de ce module. *)
 let gen_record conf base changed action =
   (match List.assoc_opt "history" conf.base_env with
   | Some "yes" when not conf.manitou -> (
@@ -268,17 +256,15 @@ let gen_record conf base changed action =
 (* ************************************************************************ *)
 
 (** [Description] : Suite à la mise à jour de la base, on réalise les
-      traitements suivant :
-        - mise à jour (si nécessaire) du fichier gwf pour le sosa_ref
-        - mise à jour du fichier historique
-        - appel du script notify_change
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - changed : le type de modification (voir def.mli)
-      - action : le code du type de modification
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    traitements suivant :
+    - mise à jour (si nécessaire) du fichier gwf pour le sosa_ref
+    - mise à jour du fichier historique
+    - appel du script notify_change [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - changed : le type de modification (voir def.mli)
+    - action : le code du type de modification [Retour] : Néant [Rem] : Non
+      exporté en clair hors de ce module. *)
 let record conf base changed action =
   (* Mise à jour du fichier gwf si le sosa_ref a changé. *)
   (match changed with
@@ -306,15 +292,13 @@ let record conf base changed action =
 
 (* ************************************************************************ *)
 
-(** [Description] : Appel explicite de notify_change suite à une modification
-                    de masse de la base (typiquement, le dico des lieux).
-                    On évite comme ça la création de 5000 processus.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - action : le code du type de modification
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Appel explicite de notify_change suite à une modification de
+    masse de la base (typiquement, le dico des lieux). On évite comme ça la
+    création de 5000 processus. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - action : le code du type de modification [Retour] : Néant [Rem] : Non
+      exporté en clair hors de ce module. *)
 let notify conf base action =
   let empty_person = Gwdb.empty_person base Gwdb.dummy_iper in
   let empty_person =

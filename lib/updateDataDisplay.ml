@@ -27,14 +27,11 @@ let translate_title conf len =
 
 (* ******************************************************************** *)
 
-(** [Description] : Met à jour toutes les personnes en relation avec
-                    la donnée que l'on veut modifié.
-    [Args] :
+(** [Description] : Met à jour toutes les personnes en relation avec la donnée
+    que l'on veut modifié. [Args] :
     - conf : configuration
-    - base : base
-      [Retour] :
-    - unit
-      [Rem] : Non exporté en clair hors de ce module.                     *)
+    - base : base [Retour] :
+    - unit [Rem] : Non exporté en clair hors de ce module. *)
 let print_mod_ok conf base =
   let sn = p_getenv conf.env "data" = Some "sn" in
   let ini_of_update_data ini new_input =

@@ -153,7 +153,9 @@ let print_anniversary_list conf base dead_people dt liste =
       else (
         Output.print_string conf (txt_of conf base p);
         (* TODO year of birth *)
-        match get_death p with NotDead -> print_age conf a_ref a | _ -> ());
+        match get_death p with
+        | NotDead -> print_age conf a_ref a
+        | _ -> ());
       Output.print_sstring conf "</li>")
     liste;
   Output.print_sstring conf "</ul>"

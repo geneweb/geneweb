@@ -26,4 +26,5 @@ val events : Config.config -> base -> person -> istr event_item list
 (** [events conf base p] is the list of [p]'s events *)
 
 val sorted_events : Config.config -> base -> person -> istr event_item list
-(** [sorted_events conf base p] is the list of [p]'s events, sorted by Checkitem.sorted_events *)
+(** [sorted_events conf base p] is the list of [p]'s events, sorted by
+    Checkitem.sorted_events *)

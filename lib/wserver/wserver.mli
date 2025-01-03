@@ -19,24 +19,21 @@ val f :
   int option ->
   (Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit) ->
   unit
-(** [ Wserver.f syslog addr port tmout maxc g ]
-    Starts an elementary httpd server at port [port] in the current
-    machine. The variable [addr] is [Some the-address-to-use] or
-    [None] for any of the available addresses of the present machine.
-    The port number is any number greater than 1024 (to create a
-    client < 1024, you must be root). At each connection, the function
-    [g] is called: [g (addr, request) path query] where [addr] is the
-    client identification socket, [request] the browser request, [path]
-    the part of the [request] before the query part and [query] the query content.
-    The function [g] has [tmout] seconds to answer some
-    text on standard output. If [maxc] is [Some n], maximum [n]
-    clients can be treated at the same time; [None] means no limit.
-    [syslog] is the function used to log errors or debug info. It is
-    called syslog because it is used with the same gravity levels, but
-    it can be anything.
+(** [ Wserver.f syslog addr port tmout maxc g ] Starts an elementary httpd
+    server at port [port] in the current machine. The variable [addr] is
+    [Some the-address-to-use] or [None] for any of the available addresses of
+    the present machine. The port number is any number greater than 1024 (to
+    create a client < 1024, you must be root). At each connection, the function
+    [g] is called: [g (addr, request) path query] where [addr] is the client
+    identification socket, [request] the browser request, [path] the part of the
+    [request] before the query part and [query] the query content. The function
+    [g] has [tmout] seconds to answer some text on standard output. If [maxc] is
+    [Some n], maximum [n] clients can be treated at the same time; [None] means
+    no limit. [syslog] is the function used to log errors or debug info. It is
+    called syslog because it is used with the same gravity levels, but it can be
+    anything.
 
-    See the example below.
-*)
+    See the example below. *)
 
 val close_connection : unit -> unit
 (** Closes the current socket *)
@@ -50,7 +47,8 @@ val print_string : string -> unit
 (* To be called to print page contents. *)
 
 val header : string -> unit
-(** Prints a header; cannot be called if part of content part already has been sent *)
+(** Prints a header; cannot be called if part of content part already has been
+    sent *)
 (* To print an http header line *)
 
 val wflush : unit -> unit
@@ -58,8 +56,8 @@ val wflush : unit -> unit
 (* To flush page contents print. *)
 
 val http : Def.httpStatus -> unit
-(** [Output.status conf answer] sends the http header where [answer]
-    represents the answer status. *)
+(** [Output.status conf answer] sends the http header where [answer] represents
+    the answer status. *)
 
 val http_redirect_temporarily : string -> unit
 (** [Output.status conf_redirect url] sends the http header where [url]
@@ -75,17 +73,16 @@ val woc : unit -> out_channel
 (** Return the out_channel associated to the socket *)
 
 val sock_in : string ref
-(** Names of the files used in windows implementation to communicate
-    http requests and html answers. Default "wserver.sin" and
-    "wserver.sou". Can have relative or absolute paths. *)
+(** Names of the files used in windows implementation to communicate http
+    requests and html answers. Default "wserver.sin" and "wserver.sou". Can have
+    relative or absolute paths. *)
 
 val sock_out : string ref
 
 val stop_server : string ref
-(** Name of the file whose presence tells the server to stop (at least
-    one request is necessary to unfreeze the server to make it check
-    that this file exits. Default "STOP_SERVER". Can have relative
-    or absolute path. *)
+(** Name of the file whose presence tells the server to stop (at least one
+    request is necessary to unfreeze the server to make it check that this file
+    exits. Default "STOP_SERVER". Can have relative or absolute path. *)
 
 val cgi : bool ref
 (** CGI (Common Gateway Interface) mode (default false). *)

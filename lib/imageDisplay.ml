@@ -20,14 +20,12 @@ let print_placeholder_gendered_portrait conf p size =
 (* ************************************************************************** *)
 
 (** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
-                    image, pdf ou html sur le flux HTTP sortant de Wserver.
-    [Args] :
-      - ct : le content_type MIME du fichier, par exemple "image/png",
-             "image/jpeg" ou "application/pdf"
-      - len : la taille en octet du fichier
-      - fname : le nom du fichier
-    [Retour] : aucun
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+    image, pdf ou html sur le flux HTTP sortant de Wserver. [Args] :
+    - ct : le content_type MIME du fichier, par exemple "image/png",
+      "image/jpeg" ou "application/pdf"
+    - len : la taille en octet du fichier
+    - fname : le nom du fichier [Retour] : aucun [Rem] : Ne pas utiliser en
+      dehors de ce module. *)
 let content conf ct len fname =
   Output.status conf Def.OK;
   Output.header conf "Content-type: %s" ct;
@@ -90,13 +88,11 @@ let print_image_file conf fname =
 (*  [Fonc] print_portrait : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
 (* ************************************************************************** *)
 
-(** [Description] : Affiche l'image d'une personne en réponse HTTP.
-    [Args] :
-      - conf : configuration de la requête
-      - base : base de donnée sélectionnée
-      - p : personne dans la base dont il faut afficher l'image
-    [Retour] : aucun
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+(** [Description] : Affiche l'image d'une personne en réponse HTTP. [Args] :
+    - conf : configuration de la requête
+    - base : base de donnée sélectionnée
+    - p : personne dans la base dont il faut afficher l'image [Retour] : aucun
+      [Rem] : Ne pas utiliser en dehors de ce module. *)
 let print_portrait conf base p =
   match Image.get_portrait conf base p with
   | Some (`Path path) ->

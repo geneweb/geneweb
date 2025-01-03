@@ -70,7 +70,7 @@ let give_access_someone conf base (x, t) list =
     Output.print_sstring conf " (";
     Output.print_sstring conf
       (if t.t_nth >= 100 then string_of_int t.t_nth
-      else transl_nth conf "nth" t.t_nth);
+       else transl_nth conf "nth" t.t_nth);
     Output.print_sstring conf ")");
   if List.mem x list then Output.print_sstring conf "</em>"
   else Output.print_sstring conf "</a>"
@@ -223,10 +223,10 @@ let print_places_list conf base t t_equiv list =
       ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p
       ^>^ if absolute then "&a=A" else "")
       (if p = "" then Adef.safe "..."
-      else
-        ((escape_html @@ surname_without_particle base p)
-         ^^^ escape_html @@ surname_particle base p
-          :> Adef.safe_string))
+       else
+         ((escape_html @@ surname_without_particle base p)
+          ^^^ escape_html @@ surname_particle base p
+           :> Adef.safe_string))
   in
   Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;

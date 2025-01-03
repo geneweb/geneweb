@@ -399,9 +399,9 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Output.print_string conf (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
   (if authorized_age conf base p then
-   match (Date.od_of_cdate (get_birth p), get_death p) with
-   | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
-   | _ -> ());
+     match (Date.od_of_cdate (get_birth p), get_death p) with
+     | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
+     | _ -> ());
   (text_to conf max_level : Adef.safe_string :> string)
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf ".<p>";
@@ -610,14 +610,12 @@ let display_spouse_index conf base max_level ancestor =
 
 (* *********************************************************************** *)
 
-(** [Description] : Affiche en fonction des options qui sont sélectionnées
-                    le header du tableau de descendance.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - Le nombre de colonnes à afficher (nombre d'options sélectionnées).
-    [Rem] : Non exporté en clair hors de ce module.                        *)
+(** [Description] : Affiche en fonction des options qui sont sélectionnées le
+    header du tableau de descendance. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée [Retour] :
+    - Le nombre de colonnes à afficher (nombre d'options sélectionnées). [Rem] :
+      Non exporté en clair hors de ce module. *)
 let print_desc_table_header conf =
   let nb_col = ref 2 in
   Output.print_sstring conf {|<tr class="descends_table_header"><th>|};
@@ -652,16 +650,13 @@ let print_desc_table_header conf =
 
 (* *********************************************************************** *)
 
-(** [Description] : Affiche en fonction des options qui sont sélectionnées
-                    les informations d'une personne (correspond à une ligne
-                    du tableau).
-    [Args] :
+(** [Description] : Affiche en fonction des options qui sont sélectionnées les
+    informations d'une personne (correspond à une ligne du tableau). [Args] :
     - conf : configuration de la base
     - base : base de donnée
-    - p    : person
-    - lab  : numéro d'Aboville de p
-      [Retour] : Néant
-      [Rem] : Non exporté en clair hors de ce module.                        *)
+    - p : person
+    - lab : numéro d'Aboville de p [Retour] : Néant [Rem] : Non exporté en clair
+      hors de ce module. *)
 let print_person_table conf base p lab =
   let p_auth = Util.authorized_age conf base p in
   let nb_families = Array.length (get_family p) in
@@ -785,19 +780,19 @@ let print_person_table conf base p lab =
   if p_getenv conf.env "death_age" = Some "on" then
     td (fun () ->
         (if p_auth then
-         match Gutil.get_birth_death_date p with
-         | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
-             Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
-             approx )
-           when d1 <> d2 ->
-             if not ((not approx) && d1.prec = Sure && d2.prec = Sure) then (
-               transl_decline conf "possibly (date)" ""
-               |> Output.print_sstring conf;
-               Output.print_sstring conf " ");
-             Date.time_elapsed d1 d2
-             |> DateDisplay.string_of_age conf
-             |> Output.print_string conf
-         | _ -> ());
+           match Gutil.get_birth_death_date p with
+           | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
+               Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+               approx )
+             when d1 <> d2 ->
+               if not ((not approx) && d1.prec = Sure && d2.prec = Sure) then (
+                 transl_decline conf "possibly (date)" ""
+                 |> Output.print_sstring conf;
+                 Output.print_sstring conf " ");
+               Date.time_elapsed d1 d2
+               |> DateDisplay.string_of_age conf
+               |> Output.print_string conf
+           | _ -> ());
         Output.print_sstring conf " &nbsp;");
   if p_getenv conf.env "occu" = Some "on" then
     td (fun () ->
@@ -877,15 +872,12 @@ let print_person_table conf base p lab =
 
 (* ********************************************************************** *)
 
-(** [Description] : Construit la liste des descendants de la liste des
-                    personnes (passée en paramètre). Correspond à un
-                    parcours en largeur.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - l    : person list
-    [Retour] : person list
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Construit la liste des descendants de la liste des personnes
+    (passée en paramètre). Correspond à un parcours en largeur. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - l : person list [Retour] : person list [Rem] : Non exporté en clair hors
+      de ce module. *)
 let build_desc conf base l : ('a * Adef.safe_string) list =
   let rec loop l accu =
     match l with
@@ -919,15 +911,13 @@ let build_desc conf base l : ('a * Adef.safe_string) list =
 
 (* ********************************************************************** *)
 
-(** [Description] : Affiche sous la forme d'un tableau la descendance
-                    d'une personne.
-    [Args] :
-      - conf    : configuration de la base
-      - base    : base de donnée
-      - max_lev : le nombre de générations à afficher
-      - p       : person
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Affiche sous la forme d'un tableau la descendance d'une
+    personne. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - max_lev : le nombre de générations à afficher
+    - p : person [Retour] : Néant [Rem] : Non exporté en clair hors de ce
+      module. *)
 let display_descendant_with_table conf base max_lev p =
   let max_lev = min (Perso.limit_desc conf) max_lev in
   let nb_pers = ref 0 in
@@ -1154,8 +1144,8 @@ let make_tree_hts conf base gv p =
                 in
                 "&amp;"
                 ^<^ (if auth then
-                     DateDisplay.short_marriage_date_text conf base fam p sp
-                    else Adef.safe "")
+                       DateDisplay.short_marriage_date_text conf base fam p sp
+                     else Adef.safe "")
                 ^^^ "&nbsp;" ^<^ txt
                 ^^^ DagDisplay.image_txt conf base sp
               in
@@ -1286,8 +1276,9 @@ let print_aboville conf base max_level p =
             else (
               loop_ind (lev + 1)
                 (if num_aboville then lab ^>^ string_of_int cnt_chil ^ "."
-                else
-                  lab ^>^ {|<span class="descends_aboville_pipe">&nbsp;</span>|})
+                 else
+                   lab
+                   ^>^ {|<span class="descends_aboville_pipe">&nbsp;</span>|})
                 (pget conf base (get_children des).(j));
               loop_chil (cnt_chil + 1) (j + 1))
           in

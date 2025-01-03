@@ -11,9 +11,8 @@ val w_base :
   Config.config ->
   string option ->
   'a
-(** [w_lock ~none callback conf base]
-    Acquire a write lock on the base and call [callback], or fail with [none].
-*)
+(** [w_lock ~none callback conf base] Acquire a write lock on the base and call
+    [callback], or fail with [none]. *)
 
 val w_lock :
   onerror:(Config.config -> string option -> 'a) ->
@@ -21,16 +20,13 @@ val w_lock :
   Config.config ->
   string option ->
   'a
-(** [w_lock ~onerror callback conf base]
-    Acquire a write lock on the base and call the callback, or fail with [onerror].
-*)
+(** [w_lock ~onerror callback conf base] Acquire a write lock on the base and
+    call the callback, or fail with [onerror]. *)
 
 val w_wizard :
   (Config.config -> Gwdb.base -> unit) -> Config.config -> Gwdb.base -> unit
-(** [w_wizard callback conf base]
-    Run [callback conf base] if conf has wizard rights or
-    return [Forbidden] or [Unauthorized].
-*)
+(** [w_wizard callback conf base] Run [callback conf base] if conf has wizard
+    rights or return [Forbidden] or [Unauthorized]. *)
 
 val w_person :
   none:(Config.config -> Gwdb.base -> 'a) ->
@@ -38,9 +34,8 @@ val w_person :
   Config.config ->
   Gwdb.base ->
   'a
-(** [w_person ~none callback conf base]
-    Find a person in environement and call [callback], or fail with [none].
-*)
+(** [w_person ~none callback conf base] Find a person in environement and call
+    [callback], or fail with [none]. *)
 
 (**/**)
 
