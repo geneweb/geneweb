@@ -1767,3 +1767,38 @@ span.notesourcecolor {
     display: inline;
 }
 */
+
+.image-arbre-famille {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  object-position: center 35%
+}
+.image-arbre-placeholder {
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+.text-overflow-ellipsis {
+  text-overflow: ellipsis;
+}
+
+.text-truncate-narrow {
+  max-width: min(170px, 100%);
+}
+
+.text-truncate-wide {
+  max-width: min(235px, 100%);
+}
+
+
+.name-container {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1;
+}

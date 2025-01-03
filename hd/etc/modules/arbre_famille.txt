@@ -41,20 +41,23 @@
                   %end;
   %in;
   
-  <div class="d-flex pl-0 pr-0 %if;(e.im!=0)py-0%end; w-100 justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
+  <div class="d-flex justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; %if;("xxx"="mother" or "xxx"="spouse.mother")ml-1%elseif;("xxx"="father" or "xxx"="spouse.father")mr-1%else;pr-0 w-100%end;%if;(e.im!=0) pl-0 py-0%end;
+  %if;("xxx"="father.father" or "xxx"="mother.father") translate-left-1
+  %elseif;("xxx"="spouse.father.father" or "xxx"="spouse.mother.father") translate-right-1
+  %end;">
     %if;(not (cancel_links or xxx.is_restricted))
       <a href="%prefix;%xxx.access;&m=F%if;(e.sp=0)&sp=0%end;%if;(e.half=0)&half=0%end;%if;(e.im=0)&im=0%end;"
         class="big_anchor list-group-item-action" title="[*navigation] %xxx;%personinfo;">
       </a>
     %end;
+    <div class="d-flex align-items-center">
     %if;(e.im!=0 and ("yyy"="yes" or "yyy"="force"))
       %if;xxx.has_image;
         %if;not cancel_links;
           <a href="%xxx.image_url;" class="normal_anchor" %nn;
             target="_blank" title="[*image/images]0 %xxx;%personinfo;">%nn;
         %end;
-          <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0" %nn;
-            src="%xxx.image_url;" alt="[image/images]0">%nn;
+          <img class="image-arbre-famille %if;not cancel_links;fade_image%end; rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0">%nn;
         %if;not cancel_links;</a>%end;
       %elseif;(b.default_image="yes")
         %if;(wizard and not cancel_links)
@@ -62,23 +65,29 @@
             class="normal_anchor" target="_blank" %nn;
             title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">%nn;
         %end;
-        <img class="small_image align-self-center rounded ml-0"
+        <img class="image-arbre-famille rounded ml-0"
           src="%images_prefix;img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
           alt="[missing image]">
         %if;(wizard and not cancel_links)</a>%end;
       %else;
-        <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-0 pb-2">?</span>
+        <span class="image-arbre-placeholder ml-0 pb-2">?</span>
       %end;
     %end;
-    <span class="align-self-center ml-2">
+    </div>
+    <div class="d-flex flex-column justify-content-center overflow-hidden ml-2">
     %(%if;(xxx.has_sosa)%apply;display_sosa("xxx")%end;
       %apply;image_MF("xxx")%)
       %if;(not (cancel_links or xxx.is_restricted))
       <a class="normal_anchor" %nn;
         href="%prefix;%xxx.access;"
-        title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx;%end;%end;%personinfo;">%nn;
+        title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx.first_name; %xxx.surname;%end;%end;%personinfo;">%nn;
       %end;
-      %xxx;
+      <span class="name-container
+        %if;("xxx"="father" or "xxx"="mother" or
+          "xxx"="father.father" or "xxx"="father.mother" or
+          "xxx"="mother.father" or "xxx"="mother.mother")text-truncate-narrow%end;">
+         %xxx.first_name; %xxx.surname;
+      </span>
       %if;(not (cancel_links or xxx.is_restricted))
       </a>
       %end;
@@ -86,7 +95,7 @@
         <a class="normal_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;" %nn;
           title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;%personinfo;">%nn;
       %end;
-      <span class="text-nowrap font-italic">%nn;
+      <span class="text-muted">%nn;
         %if;(xxx.dates!="")%xxx.dates;%nn;
         %elseif;(wizard and not cancel_links)-%nn;
         %elseif;(cancel_links)<br>
@@ -94,6 +103,7 @@
       </span>%nn;
       %if;(wizard and not cancel_links)</a>%end;
     </span>
+    </div>
   </div>
 %end;
 
@@ -242,6 +252,12 @@
            [*visualize/show/hide/summary]1%end; [spouse/spouses]1">
         <i class="fa fa-user-plus fa-flip-horizontal" aria-hidden="true"></i>
       </a>
+      <a href="%if;(e.fn!=0)%url_set.fn.0;%else;%url_set.fn;%end;"
+        class="btn btn-outline-%if;(e.fn=0)primary%else;danger%end;"
+        title="%if;(e.fn!=0)[*visualize/show/hide/summary]2%else;%nn;
+           [*visualize/show/hide/summary]1%end; [first name/first names]1">
+        <i class="fa fa-child fa-fw" aria-hidden="true"></i>
+      </a>
     </div>
   </div>
 %end;
@@ -261,7 +277,7 @@
                   %apply;ancestorlv4("ancestor",8,9,10,11)
                 </div>
               %end;
-              <div class="list-group mr-1">
+              <div class="list-group mr-1 d-flex align-items-stretch">
                 %apply;short_display_person_image("father.father", "yes", "")
                 %apply;short_display_person_image("father.mother", "yes", "")
               </div>
