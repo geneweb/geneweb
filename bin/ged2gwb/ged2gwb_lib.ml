@@ -577,7 +577,9 @@ let make_date n1 n2 n3 =
       {day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | Some y, None, None ->
       {day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | _ -> raise (Stream.Error "bad date")
+  | Some _, None, Some _ | Some _, Some _, None | None, Some _, None |
+    None, None, None ->
+      raise (Stream.Error "bad date")
 
 let recover_date cal = function
   | Date.Dgreg (d, Dgregorian) ->
