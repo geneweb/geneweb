@@ -543,43 +543,44 @@ let roman_int =
 
 let make_date n1 n2 n3 =
   let n3 = if !state.no_negative_dates then Option.map abs n3 else n3 in
-  match n1, n2, n3 with
-    Some d, Some m, Some y ->
-      let (d, m) =
-        match m with
-          Def.Right m -> d, m
-        | Left m ->
-            match !state.month_number_dates with
-              DayMonthDates -> check_month m; d, m
-            | MonthDayDates -> check_month d; m, d
-            | _ ->
-                if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
-                  if d > 13 && m <= 13 then d, m
-                  else if m > 13 && d <= 13 then m, d
-                  else if d > 13 && m > 13 then 0, 0
-                  else
-                    begin
-                      !state.month_number_dates <- MonthNumberHappened !state.date_str;
-                      0, 0
-                    end
-                else 0, 0
-      in
-      let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
-      Date.{day = d; month = m; year = y; prec = Sure; delta = 0}
-  | None, Some m, Some y ->
-      let m =
-        match m with
-          Def.Right m -> m
-        | Left m -> m
-      in
-      {day = 0; month = m; year = y; prec = Sure; delta = 0}
-  | None, None, Some y ->
-      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | Some y, None, None ->
-      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | Some _, None, Some _ | Some _, Some _, None | None, Some _, None |
-    None, None, None ->
-      raise (Stream.Error "bad date")
+  let day, month, year =
+    match n1, n2, n3 with
+      Some d, Some m, Some y ->
+        let (d, m) =
+          match m with
+            Def.Right m -> d, m
+          | Left m ->
+              match !state.month_number_dates with
+                DayMonthDates -> check_month m; d, m
+              | MonthDayDates -> check_month d; m, d
+              | _ ->
+                  if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
+                    if d > 13 && m <= 13 then d, m
+                    else if m > 13 && d <= 13 then m, d
+                    else if d > 13 && m > 13 then 0, 0
+                    else
+                      begin
+                        !state.month_number_dates <- MonthNumberHappened !state.date_str;
+                        0, 0
+                      end
+                  else 0, 0
+        in
+        let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
+        (d, m, y)
+    | None, Some m, Some y ->
+        let m =
+          match m with
+            Def.Right m -> m
+          | Left m -> m
+        in
+        (0, m, y)
+    | None, None, Some y -> (0, 0, y)
+    | Some y, None, None -> (0, 0, y)
+    | Some _, None, Some _ | Some _, Some _, None | None, Some _, None |
+      None, None, None ->
+        raise (Stream.Error "bad date")
+  in
+  Date.{day; month; year; prec = Sure; delta = 0}
 
 let recover_date cal = function
   | Date.Dgreg (d, Dgregorian) ->
