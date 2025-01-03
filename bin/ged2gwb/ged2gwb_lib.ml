@@ -541,7 +541,7 @@ let roman_int =
   in
   Grammar.Entry.of_parser date_g "roman int" p
 
-let make_date n1 n2 n3 =
+let make_date ~kind n1 n2 n3 =
   let n3 = if !state.no_negative_dates then Option.map abs n3 else n3 in
   let day, month, year =
     match n1, n2, n3 with
@@ -580,7 +580,30 @@ let make_date n1 n2 n3 =
       None, None, None ->
         raise (Stream.Error "bad date")
   in
-  Date.{day; month; year; prec = Sure; delta = 0}
+  let rec validate_date_components ~day ~month ~year =
+    let delta = 0 in
+    let unknown_day = 0 in
+    let unknown_month = 0 in
+    let date =
+      let day, month, year = Date.partial_date_lower_bound ~day ~month ~year
+      in
+      Calendars.make ~day ~month ~year ~delta kind
+    in
+    match date with
+    | Ok _ -> Ok Date.{day; month; year; prec = Sure; delta}
+    | Error {Calendars.kind = Calendars.Invalid_year} as error -> error
+    | Error {Calendars.kind = Calendars.Invalid_day} ->
+       validate_date_components ~day:unknown_day ~month ~year
+    | Error {Calendars.kind = Calendars.Invalid_month} ->
+       validate_date_components ~day ~month:unknown_month ~year
+  in
+  match validate_date_components ~day ~month ~year with
+  | Ok date -> date
+  | Error erroneous_date ->
+     let error_message =
+       Date.make_date_error_message ~prefix:"bad date" erroneous_date
+     in
+     raise @@ Stream.Error error_message
 
 let recover_date cal = function
   | Date.Dgreg (d, Dgregorian) ->
@@ -656,13 +679,15 @@ EXTEND
   date_greg:
     [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ]; n2 = OPT gen_month;
         LIST0 [ "." | "/" ]; n3 = OPT int; LIST0 "." ->
-          make_date n1 n2 n3 ] ]
+          make_date ~kind:Calendars.Gregorian n1 n2 n3 ] ]
   ;
   date_fren:
     [ [ LIST0 "."; n1 = int; (n2, n3) = date_fren_kont ->
-          make_date (Some n1) n2 n3
-      | LIST0 "."; n1 = year_fren -> make_date (Some n1) None None
-      | LIST0 "."; (n2, n3) = date_fren_kont -> make_date None n2 n3 ] ]
+          make_date ~kind:Calendars.French (Some n1) n2 n3
+      | LIST0 "."; n1 = year_fren ->
+          make_date ~kind:Calendars.French (Some n1) None None
+      | LIST0 "."; (n2, n3) = date_fren_kont ->
+          make_date ~kind:Calendars.French None n2 n3 ] ]
   ;
   date_fren_kont:
     [ [ LIST0 [ "." | "/" ]; n2 = OPT gen_french; LIST0 [ "." | "/" ];
@@ -672,7 +697,7 @@ EXTEND
   date_hebr:
     [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ]; n2 = OPT gen_hebr;
         LIST0 [ "." | "/" ]; n3 = OPT int; LIST0 "." ->
-          make_date n1 n2 n3 ] ]
+          make_date ~kind:Calendars.Hebrew n1 n2 n3 ] ]
   ;
   gen_month:
     [ [ i = int -> Left (abs i)
