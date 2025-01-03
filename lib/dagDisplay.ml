@@ -26,11 +26,11 @@ let image_normal_txt conf base p fname width height =
       (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   in
   (if p_getenv conf.env "cgl" = Some "on" then r
-  else
-    Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
-      (commd conf : Adef.escaped_string :> string)
-      (acces conf base p : Adef.escaped_string :> string)
-      k r)
+   else
+     Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
+       (commd conf : Adef.escaped_string :> string)
+       (acces conf base p : Adef.escaped_string :> string)
+       k r)
   |> Adef.safe
 
 let image_url_txt conf url_p url ~width ~height =
@@ -1011,11 +1011,11 @@ let rec eval_var conf base env _xx _loc = function
       match get_env "vars" env with
       | Vvars lv ->
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
@@ -1027,11 +1027,11 @@ let rec eval_var conf base env _xx _loc = function
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   (* TODO set real values *)
@@ -1107,11 +1107,11 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
       match get_env "vars" env with
       | Vvars lv ->
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
@@ -1123,11 +1123,11 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   | _ -> raise Not_found
@@ -1216,9 +1216,9 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
           else displayed_sub outs (pos1 - pos) (pos2 - pos1)
       in
       (if clipped_outs <> "" then
-       let v = Vdcellp clipped_outs in
-       let print_ast = print_ast (("dag_cell_pre", v) :: env) () in
-       List.iter print_ast al);
+         let v = Vdcellp clipped_outs in
+         let print_ast = print_ast (("dag_cell_pre", v) :: env) () in
+         List.iter print_ast al);
       loop (pos + sz) (col + colspan) (j + 1)
   in
   loop 0 0 0

@@ -17,9 +17,9 @@ val with_bar :
   Format.formatter ->
   (t -> 'a) ->
   'a
-(** [with_bar ppf f] wraps the call to [f] with a progress
-    bar printed on the formatter [ppf]. The function [step] can be call to
-    change the progression of the bar in [f].
+(** [with_bar ppf f] wraps the call to [f] with a progress bar printed on the
+    formatter [ppf]. The function [step] can be call to change the progression
+    of the bar in [f].
 
     To work properly, one should not print anything on [ppf] in [f].
 
@@ -51,5 +51,5 @@ val suspend : unit -> unit
 (** Stop printing progression bar and prints a new line. *)
 
 val restart : int -> int -> unit
-(** [restart i len] restart progression bar. It's equivalent to call successively
-    [run] from 0 to [i]. *)
+(** [restart i len] restart progression bar. It's equivalent to call
+    successively [run] from 0 to [i]. *)

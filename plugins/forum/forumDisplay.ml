@@ -52,7 +52,7 @@ let print_foreach conf _base print_ast eval_expr =
             | None -> MF.not_a_pos
         in
         (if to_pos = MF.not_a_pos then ()
-        else try MF.rseek_in ic to_pos with Sys_error _ -> ());
+         else try MF.rseek_in ic to_pos with Sys_error _ -> ());
         let pos = loop None 0 in
         (match get_env "pos" env with Vpos r -> r := pos | _ -> ());
         MF.close_in ic

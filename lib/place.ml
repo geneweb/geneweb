@@ -269,20 +269,20 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
           if Hashtbl.length ht > max_length && long then raise List_too_long
   in
   (if add_birth || add_death || add_baptism || add_burial then
-   let aux b fn p =
-     if b then
-       let x = fn p in
-       if not (is_empty_string x) then ht_add x p
-   in
-   Gwdb.Collection.iter
-     (fun i ->
-       let p = pget conf base i in
-       if authorized_age conf base p then (
-         aux add_birth get_birth_place p;
-         aux add_baptism get_baptism_place p;
-         aux add_death get_death_place p;
-         aux add_burial get_burial_place p))
-     (Gwdb.ipers base));
+     let aux b fn p =
+       if b then
+         let x = fn p in
+         if not (is_empty_string x) then ht_add x p
+     in
+     Gwdb.Collection.iter
+       (fun i ->
+         let p = pget conf base i in
+         if authorized_age conf base p then (
+           aux add_birth get_birth_place p;
+           aux add_baptism get_baptism_place p;
+           aux add_death get_death_place p;
+           aux add_burial get_burial_place p))
+       (Gwdb.ipers base));
   if add_marriage then
     Gwdb.Collection.iter
       (fun i ->

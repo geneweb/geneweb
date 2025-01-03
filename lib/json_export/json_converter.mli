@@ -4,7 +4,7 @@ module type ConverterDriver = sig
   (** Json value *)
 
   val str : string -> t
-  (** Convert to JSON string  *)
+  (** Convert to JSON string *)
 
   val int : int -> t
   (** Convert to JSON integer *)

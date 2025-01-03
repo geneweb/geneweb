@@ -33,11 +33,9 @@ val update_ind_key :
   unit
 
 val source : Config.config -> Gwdb.base -> string -> Adef.safe_string
-(** [source conf base str]
-    Interprets wiki syntax in a "source" context:
+(** [source conf base str] Interprets wiki syntax in a "source" context:
     - supposed to be one line
-    - no <p> surrounding tag
-*)
+    - no <p> surrounding tag *)
 
 val note :
   Config.config ->
@@ -45,24 +43,22 @@ val note :
   (char * (unit -> string)) list ->
   string ->
   Adef.safe_string
-(** [note conf base env str]
-    Interprets wiki syntax in a "note" context:
-    - [env] is available during [str] interpretation
-*)
+(** [note conf base env str] Interprets wiki syntax in a "note" context:
+    - [env] is available during [str] interpretation *)
 
 val person_note :
   Config.config -> Gwdb.base -> Gwdb.person -> string -> Adef.safe_string
-(** [person_note conf base person str]
-    Interprets wiki syntax in a "note" context:
-    - env is available during [str] interpretation with [i] variable bound to person image
-*)
+(** [person_note conf base person str] Interprets wiki syntax in a "note"
+    context:
+    - env is available during [str] interpretation with [i] variable bound to
+      person image *)
 
 val source_note :
   Config.config -> Gwdb.base -> Gwdb.person -> string -> Adef.safe_string
-(** [source_note conf base person str]
-    Interprets wiki syntax in a "source" context:
-    - env is available during [str] interpretation with [i] variable bound to person image
-*)
+(** [source_note conf base person str] Interprets wiki syntax in a "source"
+    context:
+    - env is available during [str] interpretation with [i] variable bound to
+      person image *)
 
 val source_note_with_env :
   Config.config ->
@@ -70,9 +66,8 @@ val source_note_with_env :
   (char * (unit -> string)) list ->
   string ->
   Adef.safe_string
-(** [source_note_with_env conf base env str]
-    Interprets wiki syntax in a "source" context with a predefined env.
-*)
+(** [source_note_with_env conf base env str] Interprets wiki syntax in a
+    "source" context with a predefined env. *)
 
 type mode = Delete | Rename | Merge
 

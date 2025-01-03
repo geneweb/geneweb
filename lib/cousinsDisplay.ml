@@ -372,8 +372,8 @@ let print_anniv conf base p dead_people level =
         :> string)
       (sosa_of_persons conf base down_br)
       (if spouse = None then
-       "&" ^ (acces_n conf base (Adef.escaped "4") c :> string)
-      else "")
+         "&" ^ (acces_n conf base (Adef.escaped "4") c :> string)
+       else "")
       (person_title_text conf base c :> string)
     |> Adef.safe
   in

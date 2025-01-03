@@ -86,9 +86,9 @@ let compute base bdir =
   flush stderr;
   let list = notes_links (base_notes_read base "") in
   (if list = ([], []) then ()
-  else
-    let pg = NLDB.PgNotes in
-    db := NotesLinks.add_in_db !db pg list);
+   else
+     let pg = NLDB.PgNotes in
+     db := NotesLinks.add_in_db !db pg list);
 
   Printf.eprintf "--- wizard notes\n";
   flush stderr;
@@ -170,7 +170,7 @@ let compute base bdir =
           else
             loop (Filename.concat dir file)
               (if name = "" then file
-              else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
+               else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
       done;
       flush stderr
     with Sys_error _ ->

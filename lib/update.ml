@@ -153,14 +153,11 @@ let rec infer_death conf base p =
 (* ************************************************************************** *)
 
 (** [Description] : Print several information to distinguish homonyms. The
-      information includes name of the person, name of the parents,
-      name of the spouse.
-    [Args] :
-      - conf : configuration of the base
-      - base : base
-      - p    : person
-    [Retour] : unit
-    [Rem] : Not visible.                                                      *)
+    information includes name of the person, name of the parents, name of the
+    spouse. [Args] :
+    - conf : configuration of the base
+    - base : base
+    - p : person [Retour] : unit [Rem] : Not visible. *)
 let print_person_parents_and_spouses conf base p =
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (commd conf);
@@ -208,14 +205,11 @@ let print_same_name conf base p =
 
 (* ************************************************************************* *)
 
-(** [Description] : Test si le label contient le mot 'note' pour savoir si
-      dans les évènement secondaires, il faut traiter la note comme un
-      textarea.
-    [Args] :
-      - lbl : le label
-    [Retour] :
-      - bool
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Test si le label contient le mot 'note' pour savoir si dans
+    les évènement secondaires, il faut traiter la note comme un textarea. [Args]
+    :
+    - lbl : le label [Retour] :
+    - bool [Rem] : Non exporté en clair hors de ce module. *)
 let is_label_note lbl =
   let rec loop i =
     if i = String.length lbl then false
@@ -380,7 +374,7 @@ let someone_strong base p =
   "<strong>"
   ^<^ escape_html (p_first_name base p)
   ^^^ (if get_occ p = 0 then Adef.escaped ""
-      else Adef.escaped @@ "." ^ string_of_int (get_occ p))
+       else Adef.escaped @@ "." ^ string_of_int (get_occ p))
   ^^^ " "
   ^<^ escape_html (p_surname base p)
   ^>^ "</strong>"
@@ -723,14 +717,11 @@ let print_warnings conf base wl =
 
 (* ************************************************************************* *)
 
-(** [Description] : Fonction d'impression des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - fun  : Def.misc (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Fonction d'impression des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - fun : Def.misc (miscellaneous) [Retour] :
+    - unit [Rem] : Non exporté en clair hors de ce module. *)
 let print_misc conf _base = function
   | MissingSources ->
       Output.print_sstring conf "<em>";
@@ -743,14 +734,11 @@ let print_misc conf _base = function
 
 (* ************************************************************************* *)
 
-(** [Description] : Affiche la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                          *)
+(** [Description] : Affiche la liste des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - ml : Def.misc list (miscellaneous) [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_miscs conf base ml =
   print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
   List.iter (fun m ->
@@ -764,16 +752,13 @@ let print_miscs conf base ml =
 
 (* ************************************************************************* *)
 
-(** [Description] : Affiche sous la même rubrique, la liste des warnings
-                    et la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - wl   : Def.warning list
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Affiche sous la même rubrique, la liste des warnings et la
+    liste des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - wl : Def.warning list
+    - ml : Def.misc list (miscellaneous) [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then (
     Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "warnings"));

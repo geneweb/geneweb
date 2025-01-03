@@ -93,7 +93,7 @@ let header_without_http_nor_home conf title =
 <link rel="apple-touch-icon" href="%s/favicon_gwd.png">
 |}
       (if robot then {|<meta name="robots" content="index,follow">|}
-      else {|<meta name="robots" content="none">|})
+       else {|<meta name="robots" content="none">|})
       conf.charset
       (Util.images_prefix conf :> string)
       (Util.images_prefix conf :> string)
@@ -125,7 +125,7 @@ let header_with_title ?(error = false) ?(fluid = false) conf title =
   (* balancing </div> in gen_trailer *)
   Output.print_sstring conf
     (if fluid then "<div class=\"container-fluid\">"
-    else "<div class=\"container\">");
+     else "<div class=\"container\">");
   Output.print_sstring conf (if error then "<h1 class = \"error\">" else "<h1>");
   title false;
   Output.print_sstring conf "</h1>\n"

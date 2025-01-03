@@ -317,8 +317,8 @@ type 'a record_access = {
   (* Remove array from the memory *)
   clear_array : unit -> unit;
 }
-(** Type that define the functions to use to access and manipulate with
-    database arrays. *)
+(** Type that define the functions to use to access and manipulate with database
+    arrays. *)
 
 type string_person_index = {
   (* Find all person's ids that has giving surname/first name. *)
@@ -330,8 +330,8 @@ type string_person_index = {
      name by alphabetical order *)
   next : int -> int;
 }
-(** Data structure for optimised search throughout index by name
-    (surname or first name). Considers also patched persons. *)
+(** Data structure for optimised search throughout index by name (surname or
+    first name). Considers also patched persons. *)
 
 type visible_record_access = {
   v_write : unit -> unit;
@@ -423,9 +423,10 @@ type base_func = {
      Pending patches are also considered. *)
   ifam_exists : int -> bool;
 }
-(** Functionality part of database. Every modification of the base is stored in {i patches} file.
-    Note that, every modification firstly is pendent and should be commited
-    to apply them and to update {i patches} file with [commit_patches]. *)
+(** Functionality part of database. Every modification of the base is stored in
+    {i patches} file. Note that, every modification firstly is pendent and
+    should be commited to apply them and to update {i patches} file with
+    [commit_patches]. *)
 
 (** Geneweb database version *)
 type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024

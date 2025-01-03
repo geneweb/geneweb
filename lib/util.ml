@@ -135,8 +135,8 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
 </script>|}
            query_time nb_errors
            (if errors_undef <> [] then
-            Printf.sprintf "Unbound variable(s): %s. " err_list1
-           else "")
+              Printf.sprintf "Unbound variable(s): %s. " err_list1
+            else "")
            err_list2)
 
 let escape_aux count blit str =
@@ -154,8 +154,8 @@ let escape_aux count blit str =
   in
   loop 0 0
 
-(** [escape_html str] replaces '&', '"', '<' and '>'
-    with their corresponding character entities (using entity number) *)
+(** [escape_html str] replaces '&', '"', '<' and '>' with their corresponding
+    character entities (using entity number) *)
 let escape_html s : Adef.escaped_string =
   escape_aux
     (function '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *) | _ -> 1)
@@ -183,9 +183,9 @@ let escape_html s : Adef.escaped_string =
 
 let esc x = (escape_html x :> Adef.safe_string)
 
-(** [escape_attribute str] only escapes double quote and ampersand.
-    Since we will return normalized HTML, ['"' and '\''] should be the only
-    dangerous character here. *)
+(** [escape_attribute str] only escapes double quote and ampersand. Since we
+    will return normalized HTML, ['"' and '\''] should be the only dangerous
+    character here. *)
 let escape_attribute =
   escape_aux
     (function '&' | '"' | '\'' -> 5 (* "&#xx;" *) | _ -> 1)
@@ -602,30 +602,30 @@ let default_safe_html_allowed_tags =
 let safe_html_allowed_tags =
   lazy
     (if !allowed_tags_file = "" then default_safe_html_allowed_tags
-    else if Sys.file_exists !allowed_tags_file then
-      let ic = open_in !allowed_tags_file in
-      let rec loop tags =
-        match input_line ic with
-        | tag ->
-            let ns, tag =
-              match String.split_on_char ' ' tag with
-              | [ ns; tag ] -> (ns, tag)
-              | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
-              | _ -> assert false
-            in
-            loop ((ns, String.lowercase_ascii tag) :: tags)
-        | exception End_of_file ->
-            close_in ic;
-            tags
-      in
-      loop []
-    else
-      let str =
-        Printf.sprintf "Requested allowed_tags file (%s) absent"
-          !allowed_tags_file
-      in
-      !GWPARAM.syslog `LOG_WARNING str;
-      default_safe_html_allowed_tags)
+     else if Sys.file_exists !allowed_tags_file then
+       let ic = open_in !allowed_tags_file in
+       let rec loop tags =
+         match input_line ic with
+         | tag ->
+             let ns, tag =
+               match String.split_on_char ' ' tag with
+               | [ ns; tag ] -> (ns, tag)
+               | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
+               | _ -> assert false
+             in
+             loop ((ns, String.lowercase_ascii tag) :: tags)
+         | exception End_of_file ->
+             close_in ic;
+             tags
+       in
+       loop []
+     else
+       let str =
+         Printf.sprintf "Requested allowed_tags file (%s) absent"
+           !allowed_tags_file
+       in
+       !GWPARAM.syslog `LOG_WARNING str;
+       default_safe_html_allowed_tags)
 
 (* Few notes:
 
@@ -806,17 +806,15 @@ let is_semi_public _conf _base p = get_access p = SemiPublic
 
 (* ********************************************************************** *)
 
-(** [Description] : Vrai si la personne est accessible par sa clé,
-                    Faux sinon.
+(** [Description] : Vrai si la personne est accessible par sa clé, Faux sinon.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-      - fn   : prénom de la personne
-      - sn   : patronyme de la personne
-    [Retour] :
-      - bool : Vrai si la personne est accessible par sa clé, faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : person
+    - fn : prénom de la personne
+    - sn : patronyme de la personne [Retour] :
+    - bool : Vrai si la personne est accessible par sa clé, faux sinon. [Rem] :
+      Exporté en clair hors de ce module. *)
 let accessible_by_key conf base p fn sn =
   conf.access_by_key
   && (not (fn = "?" || sn = "?"))
@@ -828,15 +826,13 @@ let accessible_by_key conf base p fn sn =
 
 (* ********************************************************************** *)
 
-(** [Description] : Renvoie les paramètres URL pour l'accès à la nième
-                    personne.
+(** [Description] : Renvoie les paramètres URL pour l'accès à la nième personne.
     [Args] :
     - conf : configuration de la base
     - base : base de donnée
-    - n    : la nième personne (e.g. : calcul de parenté entre p1 et p2)
-    - p    : person
-      [Retour] : string
-      [Rem] : Exporté en clair hors de ce module.                           *)
+    - n : la nième personne (e.g. : calcul de parenté entre p1 et p2)
+    - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let acces_n conf base n x : Adef.escaped_string =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
@@ -864,11 +860,10 @@ let acces_n conf base n x : Adef.escaped_string =
 
 (** [Description] : Renvoie les paramètres URL pour l'accès à la personne.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let acces conf base x = acces_n conf base (Adef.escaped "") x
 
 (**/**)
@@ -951,12 +946,10 @@ let titled_person_text conf base p t : Adef.safe_string =
 (* *********************************************************************** *)
 
 (** [Description] : Renvoie la chaîne de caractère du titre ainsi que le
-                    domaine.
-    [Args] :
-      - base : base de donnée
-      - t    : le titre de noblesse que l'on veut afficher
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                        *)
+    domaine. [Args] :
+    - base : base de donnée
+    - t : le titre de noblesse que l'on veut afficher [Retour] : string [Rem] :
+      Non exporté en clair hors de ce module. *)
 let one_title_text base t : Adef.safe_string =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
@@ -1008,19 +1001,17 @@ let reference_noid = reference_flags false
 
 (* ************************************************************************* *)
 
-(** [Description] : Essaie de déterminer dans quelle famille il peut y avoir
-                    une boucle. Si il n'y a pas d'ambiguité, alors on renvoie
-                    un lien vers la famille à modifier, sinon, on renvoie un
-                    lien vers le menu général de mise à jour.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - p    : person
-      - s    : la clé de la personne sous forme de string
-    [Retour] :
-      - string : retourne un lien de mise à jour soit vers la famille
-                 contenant la boucle, soit vers le menu de mise à jour.
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Essaie de déterminer dans quelle famille il peut y avoir une
+    boucle. Si il n'y a pas d'ambiguité, alors on renvoie un lien vers la
+    famille à modifier, sinon, on renvoie un lien vers le menu général de mise à
+    jour. [Args] :
+    - conf : configuration
+    - base : base
+    - p : person
+    - s : la clé de la personne sous forme de string [Retour] :
+    - string : retourne un lien de mise à jour soit vers la famille contenant la
+      boucle, soit vers le menu de mise à jour. [Rem] : Exporté en clair hors de
+      ce module. *)
 let update_family_loop conf base p s =
   if is_hidden p then s
   else
@@ -1272,25 +1263,21 @@ let include_end = include_begin_end_aux (Adef.safe "end")
 
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie le chemin vers le fichier de template passé
-                    en paramètre.
-    [Args] :
-      - conf  : configuration de la base
-      - fname : le fichier de template
-    [Retour] :
-      - string : le chemin vers le fichier de template
+(** [Description] : Renvoie le chemin vers le fichier de template passé en
+    paramètre. [Args] :
+    - conf : configuration de la base
+    - fname : le fichier de template [Retour] :
+    - string : le chemin vers le fichier de template
 
-    On cherche le fichier dans cet ordre :
-    etc_d vaut :
-    - bases/etc/mybase       en mode classique
-    - bases/mybase.gwb/etc/  en mode reorg
-    on cherche dans :
-    - etc_d/templx/name.txt  (base specific)
-    - etc_d/name.txt         (base specific)
+    On cherche le fichier dans cet ordre : etc_d vaut :
+    - bases/etc/mybase en mode classique
+    - bases/mybase.gwb/etc/ en mode reorg on cherche dans :
+    - etc_d/templx/name.txt (base specific)
+    - etc_d/name.txt (base specific)
     - gw/etc/templx/name.txt (distribution)
-    - gw/etc/name.txt        (distribution)
+    - gw/etc/name.txt (distribution)
 
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    [Rem] : Exporté en clair hors de ce module. *)
 
 let etc_file_name conf fname =
   (* On recherche si dans le nom du fichier, on a specifié son *)
@@ -1304,7 +1291,7 @@ let etc_file_name conf fname =
     let fn =
       String.concat Filename.dir_sep
         (if dir <> "" then [ !GWPARAM.etc_d conf.bname; dir; fname ^ ".txt" ]
-        else [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ])
+         else [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ])
     in
     if Sys.file_exists fn then fn
     else
@@ -1321,7 +1308,7 @@ let etc_file_name conf fname =
           search_in_assets
             (String.concat Filename.dir_sep
                (if dir <> "" then [ "etc"; dir; fname ^ ".txt" ]
-               else [ "etc"; fname ^ ".txt" ]))
+                else [ "etc"; fname ^ ".txt" ]))
         in
         if Sys.file_exists fn then fn
         else
@@ -2361,10 +2348,10 @@ let test_cnt_d conf =
   let config_d = !GWPARAM.config_d conf.bname in
   let cnt_d = !GWPARAM.cnt_d conf.bname in
   (if not (Sys.file_exists config_d) then
-   try Unix.mkdir config_d 0o755
-   with Unix.Unix_error (_, _, _) ->
-     !GWPARAM.syslog `LOG_WARNING
-       (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
+     try Unix.mkdir config_d 0o755
+     with Unix.Unix_error (_, _, _) ->
+       !GWPARAM.syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
   if not (Sys.file_exists cnt_d) then
     try Unix.mkdir cnt_d 0o755
     with Unix.Unix_error (_, _, _) ->
@@ -2574,7 +2561,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
                    Output.printf conf "<h3 class=\"subtitle mx-3\">%s%s</h3>\n"
                      (if ord = "" then "..." else String.make 1 ord.[0])
                      (if !kind = HeadElem then ""
-                     else " (" ^ transl conf "continued" ^ ")");
+                      else " (" ^ transl conf "continued" ^ ")");
                    Output.print_sstring conf "<ul>\n");
                  Output.print_sstring conf "<li>";
                  wprint_elem elem;
@@ -2609,14 +2596,12 @@ let wprint_in_columns conf order wprint_elem list =
 
 (* ********************************************************************** *)
 
-(** [Description] : Retourne la sous liste de taille size composée des
-                    éléments 0 à (size - 1)
-    [Args] :
-      - size : la taille de la nouvelle liste
-      - list : la liste originiale
-    [Retour] :
-      - list : la nouvelle liste de taille size
-    [Rem] : Exporté en clair hors de ce module.                           *)
+(** [Description] : Retourne la sous liste de taille size composée des éléments
+    0 à (size - 1) [Args] :
+    - size : la taille de la nouvelle liste
+    - list : la liste originiale [Retour] :
+    - list : la nouvelle liste de taille size [Rem] : Exporté en clair hors de
+      ce module. *)
 let reduce_list size list =
   let rec loop size cnt reduced_list list =
     if cnt >= size then reduced_list
@@ -2633,12 +2618,10 @@ let reduce_list size list =
 
 (* ********************************************************************** *)
 
-(** [Description] : Affiche un tips.
-    [Args] :
-      - conf : configuration de la base
-      - s    : le contenu du tips
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Affiche un tips. [Args] :
+    - conf : configuration de la base
+    - s : le contenu du tips [Retour] : Néant [Rem] : Non exporté en clair hors
+      de ce module. *)
 let gen_print_tips conf s =
   Output.print_sstring conf "<div class=\"tips alert alert-warning\"";
   Output.print_sstring conf " role=\"alert\">";
@@ -2678,11 +2661,9 @@ let get_opt conf evar default =
   | _ -> failwith "bad get_opt parameter"
 
 (** [Description] : Recherche dans l'URL les options d'affichage qui sont
-                    données et renvoie la concaténation de ces options.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    données et renvoie la concaténation de ces options. [Args] :
+    - conf : configuration de la base [Retour] : string [Rem] : Exporté en clair
+      hors de ce module. *)
 let display_options conf =
   let img = get_opt conf "im" true in
   let mar = get_opt conf "ma" true in
@@ -2706,11 +2687,9 @@ type cache_visited_t = (string, (iper * string) list) Hashtbl.t
 
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie le chemin du fichier de cache.
-    [Args] :
-      - config : configuration de la base
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Renvoie le chemin du fichier de cache. [Args] :
+    - config : configuration de la base [Retour] : unit [Rem] : Exporté en clair
+      hors de ce module. *)
 let cache_visited conf =
   let bname =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
@@ -2725,9 +2704,9 @@ let cache_visited conf =
 
 (** [Description] : List le fichier de cache des dernières fiches visités.
     [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-    [Retour] : Hashtbl des user => dernières visites
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    - fname : le fichier de cache (qui se trouve dans base.gwb) [Retour] :
+      Hashtbl des user => dernières visites [Rem] : Exporté en clair hors de ce
+      module. *)
 let read_visited conf =
   let fname = cache_visited conf in
   try
@@ -2742,12 +2721,10 @@ let read_visited conf =
 
 (* ************************************************************************ *)
 
-(** [Description] : Met à jour le fichier de cache des visites.
-    [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-      - ht    : le compteur de visite
-    [Retour] : unit
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Met à jour le fichier de cache des visites. [Args] :
+    - fname : le fichier de cache (qui se trouve dans base.gwb)
+    - ht : le compteur de visite [Retour] : unit [Rem] : Non exporté en clair
+      hors de ce module. *)
 let write_visited conf ht =
   let fname = cache_visited conf in
   try
@@ -2761,13 +2738,10 @@ let write_visited conf ht =
 
 (* ************************************************************************ *)
 
-(** [Description] : Vérifie si le user est ami ou magicien et met à jour
-                    le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-      - ip   : iper
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Vérifie si le user est ami ou magicien et met à jour le
+    fichier de cache. [Args] :
+    - conf : configuration de la base
+    - ip : iper [Retour] : unit [Rem] : Exporté en clair hors de ce module. *)
 let record_visited conf ip =
   if conf.friend || conf.wizard then
     let ht = read_visited conf in

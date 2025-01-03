@@ -537,8 +537,8 @@ let print_two_branches_with_pre conf base info =
   then (
     Output.print_sstring conf "\n";
     (if info.pb1 <> None || info.nb1 <> None then
-     let s = prev_next_1_text conf base info info.pb1 info.nb1 in
-     print_pre_left conf sz s);
+       let s = prev_next_1_text conf base info info.pb1 info.nb1 in
+       print_pre_left conf sz s);
     if info.pb2 <> None || info.nb2 <> None then
       let s = prev_next_2_text conf base info info.pb2 info.nb2 in
       print_pre_right conf sz s);

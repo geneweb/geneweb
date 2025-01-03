@@ -302,10 +302,10 @@ let output base =
         output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
         let s = base.data.bnotes.Def.nread "" Def.RnAll in
         (if s = "" then ()
-        else
-          let oc_not = Secure.open_out tmp_notes in
-          output_string oc_not s;
-          close_out oc_not);
+         else
+           let oc_not = Secure.open_out tmp_notes in
+           output_string oc_not s;
+           close_out oc_not);
         List.iter
           (fun f ->
             let s = base.data.bnotes.Def.nread f Def.RnAll in

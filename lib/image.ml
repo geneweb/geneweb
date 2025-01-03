@@ -4,10 +4,10 @@ open Gwdb
 let portrait_folder conf = !GWPARAM.portraits_d conf.bname
 let carrousel_folder conf = !GWPARAM.images_d conf.bname
 
-(** [default_portrait_filename_of_key fn sn occ] is the default filename
- of the corresponding person's portrait. WITHOUT its file extenssion.
- e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
- *)
+(** [default_portrait_filename_of_key fn sn occ] is the default filename of the
+    corresponding person's portrait. WITHOUT its file extenssion. e.g:
+    default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is
+    "jean_claude.3.dupond" *)
 let default_portrait_filename_of_key first_name surname occ =
   let space_to_unders = Mutil.tr ' ' '_' in
   let f = space_to_unders (Name.lower first_name) in
@@ -171,7 +171,8 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 let is_not_private_img _conf fname =
   not (Mutil.contains fname ("private" ^ Filename.dir_sep))
 
-(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
+(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait.
+*)
 let has_access_to_portrait conf base p =
   let img = get_image p in
   (conf.wizard || conf.friend)
@@ -272,12 +273,12 @@ let rename_portrait conf base p (nfn, nsn, noc) =
         String.concat Filename.dir_sep [ portrait_folder conf; "saved"; old_s ]
       in
       (if Sys.file_exists (old_s_f ^ old_ext) then
-       try Sys.rename (old_s_f ^ old_ext) (new_s_f ^ old_ext)
-       with Sys_error e ->
-         !GWPARAM.syslog `LOG_ERR
-           (Format.sprintf
-              "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
-              new_f e));
+         try Sys.rename (old_s_f ^ old_ext) (new_s_f ^ old_ext)
+         with Sys_error e ->
+           !GWPARAM.syslog `LOG_ERR
+             (Format.sprintf
+                "Error renaming old portrait: old_path=%s new_path=%s : %s"
+                old_f new_f e));
       let new_s_f =
         String.concat Filename.dir_sep [ carrousel_folder conf; new_s ]
       in

@@ -19,8 +19,8 @@ module In_channel : sig
 
   val with_open_bin : string -> (t -> 'a) -> 'a
   (** [with_open_bin fn f] opens a channel [ic] on file [fn] and returns [f ic].
-      After [f] returns, either with a value or by raising an exception, [ic]
-      is guaranteed to be closed.
+      After [f] returns, either with a value or by raising an exception, [ic] is
+      guaranteed to be closed.
 
       @since 4.14 *)
 
@@ -43,8 +43,8 @@ module Out_channel : sig
 
   val with_open_bin : string -> (t -> 'a) -> 'a
   (** [with_open_bin fn f] opens a channel [oc] on file [fn] and returns [f oc].
-      After [f] returns, either with a value or by raising an exception, [oc]
-      is guaranteed to be closed.
+      After [f] returns, either with a value or by raising an exception, [oc] is
+      guaranteed to be closed.
 
       @since 4.14 *)
 

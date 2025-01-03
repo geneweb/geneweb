@@ -33,7 +33,7 @@
     markup
     num
     (ocaml (>= 4.08))
-    (ocamlformat (and :with-test (= "0.24.1")))
+    (ocamlformat (and :with-test (= "0.27.0")))
     ounit
     ppx_blob
     ppx_deriving

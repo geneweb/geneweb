@@ -134,13 +134,10 @@ let strip s = strip_c s ' '
 (* ******************************************************************** *)
 
 (** [Description] : Supprime tous les caractères interdits (défini par
-                    forbidden_char) présents dans la chaine passée en
-                    argument.
-    [Args] :
-      - s : string que l'on veut purger
-    [Retour] :
-      - string : retourne la chaîne délestée des caractères interdits
-    [Rem] : Exporté en clair hors de ce module.                         *)
+    forbidden_char) présents dans la chaine passée en argument. [Args] :
+    - s : string que l'on veut purger [Retour] :
+    - string : retourne la chaîne délestée des caractères interdits [Rem] :
+      Exporté en clair hors de ce module. *)
 let purge s = List.fold_left strip_c s forbidden_char
 
 (* Name.crush *)
