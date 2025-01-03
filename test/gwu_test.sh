@@ -14,11 +14,11 @@ exit 1
 
 setenv_file="./test-gw-vars.txt"
 
-REFTESTGW='testgalichet' # reference gw file
+REFTESTGW='galichet' # reference gw file
 #=== hardcoded vars (start) ===
 # assumes we are running in the repo folder
 # ./test/testgwu.sh
-TESTGW='testgalichet' # name of gw file input to gwc (w/o extension)
+TESTGW='galichet' # name of gw file input to gwc (w/o extension)
 BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
