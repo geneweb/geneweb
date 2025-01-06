@@ -104,8 +104,8 @@ let speclist c =
        of the grandchildren of the root person*." );
     ( "-key",
       Arg.String (fun s -> c := { !c with keys = s :: !c.keys }),
-      "<KEY> key reference of root person. Used for -a/-d/-ad options. Can be \
-       used multiple times. Key format is \"First Name.occ SURNAME\"" );
+      "<KEY> key reference of person. Used for -a/-d/-ad/-parentship options. \
+       Can be used multiple times. Key format is \"First Name.occ SURNAME\"" );
     ( "-c",
       Arg.Int (fun s -> c := { !c with censor = s }),
       "<NUM>: when a person is born less than <num> years ago, it is not \
