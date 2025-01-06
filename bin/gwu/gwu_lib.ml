@@ -318,68 +318,10 @@ let zero_birth_is_required opts base is_child p =
         true
     | _ -> false
 
-let print_infos opts base is_child csrc cbp p =
-  List.iter (print_first_name_alias opts base) (get_first_names_aliases p);
-  List.iter (print_surname_alias opts base) (get_surnames_aliases p);
-  (match get_public_name p with
-  | s when sou base s <> "" ->
-      Printf.ksprintf (oc opts) " (%s)" (correct_string base s)
-  | _ -> ());
-  if not opts.no_picture then print_if_no_empty opts base "#image" (get_image p);
-  List.iter (print_qualifier opts base) (get_qualifiers p);
-  List.iter (print_alias opts base) (get_aliases p);
-  List.iter (print_title opts base) (get_titles p);
-  (match get_access p with
-  | IfTitles -> ()
-  | Public -> Printf.ksprintf (oc opts) " #apubl"
-  | Private -> Printf.ksprintf (oc opts) " #apriv");
-  print_if_no_empty opts base "#occu" (get_occupation p);
-  print_src_if_not_equal_to opts csrc base "#src" (get_psources p);
-  (match Date.od_of_cdate (get_birth p) with
-  | Some d ->
-      Printf.ksprintf (oc opts) " ";
-      print_date opts d
-  | _ when zero_birth_is_required opts base is_child p ->
-      Printf.ksprintf (oc opts) " 0"
-  | None -> ());
-  print_if_not_equal_to opts cbp base "#bp" (get_birth_place p);
-  if opts.source = None then print_if_no_empty opts base "#bs" (get_birth_src p);
-  (match Date.od_of_cdate (get_baptism p) with
-  | Some d ->
-      Printf.ksprintf (oc opts) " !";
-      print_date opts d
-  | None -> ());
-  print_if_no_empty opts base "#pp" (get_baptism_place p);
-  if opts.source = None then
-    print_if_no_empty opts base "#ps" (get_baptism_src p);
-  (match get_death p with
-  | Death (dr, d) ->
-      Printf.ksprintf (oc opts) " ";
-      (match dr with
-      | Killed -> Printf.ksprintf (oc opts) "k"
-      | Murdered -> Printf.ksprintf (oc opts) "m"
-      | Executed -> Printf.ksprintf (oc opts) "e"
-      | Disappeared -> Printf.ksprintf (oc opts) "s"
-      | _ -> ());
-      print_date opts (Date.date_of_cdate d)
-  | DeadYoung -> Printf.ksprintf (oc opts) " mj"
-  | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
-  | DontKnowIfDead -> (
-      match
-        (Date.od_of_cdate (get_birth p), Date.od_of_cdate (get_baptism p))
-      with
-      | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
-      | _ -> ())
-  | OfCourseDead -> Printf.ksprintf (oc opts) " od"
-  | NotDead -> ());
-  print_if_no_empty opts base "#dp" (get_death_place p);
-  if opts.source = None then print_if_no_empty opts base "#ds" (get_death_src p);
-  print_burial opts (get_burial p);
-  print_if_no_empty opts base "#rp" (get_burial_place p);
-  if opts.source = None then
-    print_if_no_empty opts base "#rs" (get_burial_src p)
-
 type gen = {
+  pevents_done : (iper, bool) Gwdb.Marker.t;
+  infos_done : (iper, bool) Gwdb.Marker.t;
+  notes_done : (iper, bool) Gwdb.Marker.t;
   mark : (iper, bool) Gwdb.Marker.t;
   mark_rel : (iper, bool) Gwdb.Marker.t;
   per_sel : iper -> bool;
@@ -390,6 +332,73 @@ type gen = {
   mutable notes_alias : (string * string) list;
   mutable pevents_pl_p : person list;
 }
+
+let print_infos gen opts base is_child csrc cbp p =
+  let is_marked = Gwdb.Marker.get gen.infos_done (Gwdb.get_iper p) in
+  if not is_marked then (
+    Gwdb.Marker.set gen.infos_done (Gwdb.get_iper p) true;
+    List.iter (print_first_name_alias opts base) (get_first_names_aliases p);
+    List.iter (print_surname_alias opts base) (get_surnames_aliases p);
+    (match get_public_name p with
+    | s when sou base s <> "" ->
+        Printf.ksprintf (oc opts) " (%s)" (correct_string base s)
+    | _ -> ());
+    if not opts.no_picture then
+      print_if_no_empty opts base "#image" (get_image p);
+    List.iter (print_qualifier opts base) (get_qualifiers p);
+    List.iter (print_alias opts base) (get_aliases p);
+    List.iter (print_title opts base) (get_titles p);
+    (match get_access p with
+    | IfTitles -> ()
+    | Public -> Printf.ksprintf (oc opts) " #apubl"
+    | Private -> Printf.ksprintf (oc opts) " #apriv");
+    print_if_no_empty opts base "#occu" (get_occupation p);
+    print_src_if_not_equal_to opts csrc base "#src" (get_psources p);
+    (match Date.od_of_cdate (get_birth p) with
+    | Some d ->
+        Printf.ksprintf (oc opts) " ";
+        print_date opts d
+    | _ when zero_birth_is_required opts base is_child p ->
+        Printf.ksprintf (oc opts) " 0"
+    | None -> ());
+    print_if_not_equal_to opts cbp base "#bp" (get_birth_place p);
+    if opts.source = None then
+      print_if_no_empty opts base "#bs" (get_birth_src p);
+    (match Date.od_of_cdate (get_baptism p) with
+    | Some d ->
+        Printf.ksprintf (oc opts) " !";
+        print_date opts d
+    | None -> ());
+    print_if_no_empty opts base "#pp" (get_baptism_place p);
+    if opts.source = None then
+      print_if_no_empty opts base "#ps" (get_baptism_src p);
+    (match get_death p with
+    | Death (dr, d) ->
+        Printf.ksprintf (oc opts) " ";
+        (match dr with
+        | Killed -> Printf.ksprintf (oc opts) "k"
+        | Murdered -> Printf.ksprintf (oc opts) "m"
+        | Executed -> Printf.ksprintf (oc opts) "e"
+        | Disappeared -> Printf.ksprintf (oc opts) "s"
+        | _ -> ());
+        print_date opts (Date.date_of_cdate d)
+    | DeadYoung -> Printf.ksprintf (oc opts) " mj"
+    | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
+    | DontKnowIfDead -> (
+        match
+          (Date.od_of_cdate (get_birth p), Date.od_of_cdate (get_baptism p))
+        with
+        | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
+        | _ -> ())
+    | OfCourseDead -> Printf.ksprintf (oc opts) " od"
+    | NotDead -> ());
+    print_if_no_empty opts base "#dp" (get_death_place p);
+    if opts.source = None then
+      print_if_no_empty opts base "#ds" (get_death_src p);
+    print_burial opts (get_burial p);
+    print_if_no_empty opts base "#rp" (get_burial_place p);
+    if opts.source = None then
+      print_if_no_empty opts base "#rs" (get_burial_src p))
 
 let add_linked_files gen from s some_linked_files =
   let slen = String.length s in
@@ -454,11 +463,11 @@ let print_parent opts base gen p =
     else if get_new_occ p = 0 then ""
     else "." ^ string_of_int (get_new_occ p));
   if pr then
-    if has_infos then print_infos opts base false "" "" p
+    if has_infos then print_infos gen opts base false "" "" p
     else if first_name <> "?" && surname <> "?" then
       Printf.ksprintf (oc opts) " 0"
 
-let print_child opts base fam_surname csrc cbp p =
+let print_child gen opts base fam_surname csrc cbp p =
   Printf.ksprintf (oc opts) "-";
   (match get_sex p with
   | Male -> Printf.ksprintf (oc opts) " h"
@@ -472,7 +481,7 @@ let print_child opts base fam_surname csrc cbp p =
   if not (eq_istr (get_surname p) fam_surname) then
     Printf.ksprintf (oc opts) " %s"
       (s_correct_string_nonum (sou base (get_surname p)));
-  print_infos opts base true csrc cbp p;
+  print_infos gen opts base true csrc cbp p;
   Printf.ksprintf (oc opts) "\n"
 
 let bogus_person base p = p_first_name base p = "?" && p_surname base p = "?"
@@ -531,7 +540,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
       && not (Gwdb.Marker.get gen.mark (get_iper p))
     then (
       Gwdb.Marker.set gen.mark (get_iper p) true;
-      if has_infos opts base p then print_infos opts base false "" "" p
+      if has_infos opts base p then print_infos gen opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
       (match sou base (get_notes p) with
       | "" ->
@@ -649,15 +658,17 @@ let get_persons_with_pevents m list =
     m.m_chil list
 
 let print_pevents_for_person opts base gen p =
-  let pevents = get_pevents p in
-  let surn = s_correct_string (p_surname base p) in
-  let fnam = s_correct_string (p_first_name base p) in
-  if pevents <> [] && surn <> "?" && fnam <> "?" then (
-    Printf.ksprintf (oc opts) "\n";
-    Printf.ksprintf (oc opts) "pevt %s %s%s\n" surn fnam
-      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
-    List.iter (print_pevent opts base gen) pevents;
-    Printf.ksprintf (oc opts) "end pevt\n")
+  if not (Gwdb.Marker.get gen.pevents_done (Gwdb.get_iper p)) then (
+    Gwdb.Marker.set gen.pevents_done (Gwdb.get_iper p) true;
+    let pevents = get_pevents p in
+    let surn = s_correct_string (p_surname base p) in
+    let fnam = s_correct_string (p_first_name base p) in
+    if pevents <> [] && surn <> "?" && fnam <> "?" then (
+      Printf.ksprintf (oc opts) "\n";
+      Printf.ksprintf (oc opts) "pevt %s %s%s\n" surn fnam
+        (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
+      List.iter (print_pevent opts base gen) pevents;
+      Printf.ksprintf (oc opts) "end pevt\n"))
 
 let rec list_memf f x = function
   | [] -> false
@@ -747,11 +758,11 @@ let print_comment_for_family opts base gen fam =
       fevents;
     Printf.ksprintf (oc opts) "\n")
 
-let print_empty_family opts base p =
+let print_empty_family gen opts base p =
   let string_quest = Gwdb.insert_string base "?" in
   Printf.ksprintf (oc opts) "fam ? ?.0 + #noment ? ?.0\n";
   Printf.ksprintf (oc opts) "beg\n";
-  print_child opts base string_quest "" "" p;
+  print_child gen opts base string_quest "" "" p;
   Printf.ksprintf (oc opts) "end\n"
 
 let print_family opts base gen m =
@@ -833,7 +844,7 @@ let print_family opts base gen m =
         Array.iter
           (fun p ->
             if gen.per_sel (get_iper p) then
-              print_child opts base fam_surname csrc cbp p)
+              print_child gen opts base fam_surname csrc cbp p)
           m.m_chil;
         Printf.ksprintf (oc opts) "end\n");
     Gwdb.Marker.set gen.fam_done m.m_ifam true;
@@ -907,92 +918,94 @@ let notes_aliases bdir =
   | None -> []
 
 let print_notes_for_person opts base gen p =
-  let notes = if opts.Gwexport.notes then sou base (get_notes p) else "" in
-  let surn = s_correct_string (p_surname base p) in
-  let fnam = s_correct_string (p_first_name base p) in
-  (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
-  if (notes <> "" || put_events_in_notes base p) && surn <> "?" && fnam <> "?"
-  then (
-    Printf.ksprintf (oc opts) "\n";
-    Printf.ksprintf (oc opts) "notes %s %s%s\n" surn fnam
-      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
-    Printf.ksprintf (oc opts) "beg\n";
-    if notes <> "" then Printf.ksprintf (oc opts) "%s\n" notes;
-    (if put_events_in_notes base p then
-     let rec loop pevents =
-       match pevents with
-       | [] -> ()
-       | evt :: events -> (
-           match get_pevent_name evt with
-           | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-           | Epers_Cremation ->
-               let name =
-                 (* TODO use Check.string_of_epers_name instead? *)
-                 match get_pevent_name evt with
-                 | Epers_Birth -> "birth"
-                 | Epers_Baptism -> "baptism"
-                 | Epers_Death -> "death"
-                 | Epers_Burial -> "burial"
-                 | Epers_Cremation -> "cremation"
-                 | _ -> ""
-               in
-               let notes =
-                 if opts.Gwexport.notes then sou base (get_pevent_note evt)
-                 else ""
-               in
-               if notes <> "" then
-                 Printf.ksprintf (oc opts) "%s: %s\n" name notes;
-               print_witnesses opts base gen ~use_per_sel:false
-                 (get_pevent_witnesses_and_notes evt);
-               loop events
-           | _ ->
-               print_pevent opts base gen evt;
-               loop events)
-     in
-     loop (get_pevents p));
-    Printf.ksprintf (oc opts) "end notes\n");
-  let from =
-    Printf.sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
-      (p_surname base p)
-  in
-  let s =
-    let aux g = sou base (g p) in
-    let sl =
-      if opts.Gwexport.notes then
-        [
-          aux get_notes;
-          aux get_birth_note;
-          aux get_baptism_note;
-          aux get_death_note;
-          aux get_burial_note;
-        ]
-      else []
+  if not (Gwdb.Marker.get gen.notes_done (Gwdb.get_iper p)) then (
+    Gwdb.Marker.set gen.notes_done (Gwdb.get_iper p) true;
+    let notes = if opts.Gwexport.notes then sou base (get_notes p) else "" in
+    let surn = s_correct_string (p_surname base p) in
+    let fnam = s_correct_string (p_first_name base p) in
+    (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
+    if (notes <> "" || put_events_in_notes base p) && surn <> "?" && fnam <> "?"
+    then (
+      Printf.ksprintf (oc opts) "\n";
+      Printf.ksprintf (oc opts) "notes %s %s%s\n" surn fnam
+        (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
+      Printf.ksprintf (oc opts) "beg\n";
+      if notes <> "" then Printf.ksprintf (oc opts) "%s\n" notes;
+      (if put_events_in_notes base p then
+       let rec loop pevents =
+         match pevents with
+         | [] -> ()
+         | evt :: events -> (
+             match get_pevent_name evt with
+             | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+             | Epers_Cremation ->
+                 let name =
+                   (* TODO use Check.string_of_epers_name instead? *)
+                   match get_pevent_name evt with
+                   | Epers_Birth -> "birth"
+                   | Epers_Baptism -> "baptism"
+                   | Epers_Death -> "death"
+                   | Epers_Burial -> "burial"
+                   | Epers_Cremation -> "cremation"
+                   | _ -> ""
+                 in
+                 let notes =
+                   if opts.Gwexport.notes then sou base (get_pevent_note evt)
+                   else ""
+                 in
+                 if notes <> "" then
+                   Printf.ksprintf (oc opts) "%s: %s\n" name notes;
+                 print_witnesses opts base gen ~use_per_sel:false
+                   (get_pevent_witnesses_and_notes evt);
+                 loop events
+             | _ ->
+                 print_pevent opts base gen evt;
+                 loop events)
+       in
+       loop (get_pevents p));
+      Printf.ksprintf (oc opts) "end notes\n");
+    let from =
+      Printf.sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
+        (p_surname base p)
     in
-    let sl =
-      match opts.source with
-      | Some "" -> sl
-      | Some src -> src :: sl
-      | None ->
-          aux get_birth_src :: aux get_baptism_src :: aux get_death_src
-          :: aux get_burial_src :: aux get_psources :: sl
+    let s =
+      let aux g = sou base (g p) in
+      let sl =
+        if opts.Gwexport.notes then
+          [
+            aux get_notes;
+            aux get_birth_note;
+            aux get_baptism_note;
+            aux get_death_note;
+            aux get_burial_note;
+          ]
+        else []
+      in
+      let sl =
+        match opts.source with
+        | Some "" -> sl
+        | Some src -> src :: sl
+        | None ->
+            aux get_birth_src :: aux get_baptism_src :: aux get_death_src
+            :: aux get_burial_src :: aux get_psources :: sl
+      in
+      if (not !old_gw) && opts.source = None then
+        List.fold_left
+          (fun acc e ->
+            let acc =
+              if opts.Gwexport.notes then sou base (get_pevent_note e) :: acc
+              else acc
+            in
+            let acc =
+              if opts.source = None then sou base (get_pevent_src e) :: acc
+              else acc
+            in
+            acc)
+          sl (get_pevents p)
+      else sl
     in
-    if (not !old_gw) && opts.source = None then
-      List.fold_left
-        (fun acc e ->
-          let acc =
-            if opts.Gwexport.notes then sou base (get_pevent_note e) :: acc
-            else acc
-          in
-          let acc =
-            if opts.source = None then sou base (get_pevent_src e) :: acc
-            else acc
-          in
-          acc)
-        sl (get_pevents p)
-    else sl
-  in
-  let s = String.concat " " s in
-  ignore (add_linked_files gen from s [] : _ list)
+    let s = String.concat " " s in
+    ignore (add_linked_files gen from s [] : _ list))
 
 let print_notes opts base gen ml =
   let pl = List.fold_right get_persons_with_notes ml gen.notes_pl_p in
@@ -1069,7 +1082,7 @@ let get_persons_with_relations base m list =
       match get_rparents p with [] -> list | _ -> (p, false) :: list)
     m.m_chil list
 
-let print_relation_parent opts base mark defined_p p =
+let print_relation_parent gen opts base defined_p p =
   Printf.ksprintf (oc opts) "%s %s%s"
     (correct_string base (get_surname p))
     (correct_string base (get_first_name p))
@@ -1077,10 +1090,10 @@ let print_relation_parent opts base mark defined_p p =
   if
     Array.length (get_family p) = 0
     && get_parents p = None
-    && not (Gwdb.Marker.get mark (get_iper p))
+    && not (Gwdb.Marker.get gen.mark (get_iper p))
   then (
-    Gwdb.Marker.set mark (get_iper p) true;
-    if has_infos opts base p then print_infos opts base false "" "" p
+    Gwdb.Marker.set gen.mark (get_iper p) true;
+    if has_infos opts base p then print_infos gen opts base false "" "" p
     else Printf.ksprintf (oc opts) " 0";
     defined_p := p :: !defined_p)
 
@@ -1123,7 +1136,7 @@ let print_relation_for_person opts base gen def_p r =
     if get_sex p = Male then Printf.ksprintf (oc opts) " fath"
     else Printf.ksprintf (oc opts) " moth";
     Printf.ksprintf (oc opts) ": ";
-    print_relation_parent opts base gen.mark def_p p;
+    print_relation_parent gen opts base def_p p;
     Printf.ksprintf (oc opts) "\n"
   in
   match (fath, moth) with
@@ -1153,21 +1166,21 @@ let print_relation_for_person opts base gen def_p r =
         | _ -> ());
         Printf.ksprintf (oc opts) ": ";
         (match (fath, moth) with
-        | Some fath, None -> print_relation_parent opts base gen.mark def_p fath
-        | None, Some moth -> print_relation_parent opts base gen.mark def_p moth
+        | Some fath, None -> print_relation_parent gen opts base def_p fath
+        | None, Some moth -> print_relation_parent gen opts base def_p moth
         | Some fath, Some moth ->
             if get_sex fath = Male && get_sex moth = Female then (
-              print_relation_parent opts base gen.mark def_p fath;
+              print_relation_parent gen opts base def_p fath;
               Printf.ksprintf (oc opts) " + ";
-              print_relation_parent opts base gen.mark def_p moth)
+              print_relation_parent gen opts base def_p moth)
             else (
-              print_relation_parent opts base gen.mark def_p moth;
+              print_relation_parent gen opts base def_p moth;
               Printf.ksprintf (oc opts) " + ";
-              print_relation_parent opts base gen.mark def_p fath)
+              print_relation_parent gen opts base def_p fath)
         | _ -> ());
         Printf.ksprintf (oc opts) "\n")
 
-let print_relations_for_person opts base gen def_p is_definition p =
+let print_relations_for_person mark opts base gen def_p is_definition p =
   let surn = correct_string base (get_surname p) in
   let fnam = correct_string base (get_first_name p) in
   let exist_relation =
@@ -1189,14 +1202,16 @@ let print_relations_for_person opts base gen def_p is_definition p =
     Printf.ksprintf (oc opts) "rel %s %s%s" surn fnam
       (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
     if is_definition then (
+      let already_marked = Gwdb.Marker.get gen.mark (get_iper p) in
       Gwdb.Marker.set gen.mark (get_iper p) true;
       def_p := p :: !def_p;
-      if has_infos opts base p then print_infos opts base false "" "" p
+      if has_infos opts base p then print_infos mark opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
-      match get_sex p with
-      | Male -> Printf.ksprintf (oc opts) " #h"
-      | Female -> Printf.ksprintf (oc opts) " #f"
-      | Neuter -> ());
+      if not already_marked then
+        match get_sex p with
+        | Male -> Printf.ksprintf (oc opts) " #h"
+        | Female -> Printf.ksprintf (oc opts) " #f"
+        | Neuter -> ());
     Printf.ksprintf (oc opts) "\n";
     Printf.ksprintf (oc opts) "beg\n";
     List.iter (print_relation_for_person opts base gen def_p) (get_rparents p);
@@ -1215,7 +1230,7 @@ let print_relations opts base gen ml =
     | (p, if_def) :: pl ->
         let def_p = ref [] in
         if get_rparents p <> [] && gen.per_sel (get_iper p) then (
-          print_relations_for_person opts base gen def_p if_def p;
+          print_relations_for_person gen opts base gen def_p if_def p;
           List.iter (print_notes_for_person opts base gen) !def_p;
           if not !old_gw then
             List.iter (print_pevents_for_person opts base gen) !def_p);
@@ -1235,7 +1250,7 @@ let print_isolated_relations opts base gen p =
     | (p, if_def) :: pl ->
         let def_p = ref [] in
         if get_rparents p <> [] && gen.per_sel (get_iper p) then (
-          print_relations_for_person opts base gen def_p if_def p;
+          print_relations_for_person gen opts base gen def_p if_def p;
           List.iter (print_notes_for_person opts base gen) !def_p);
         loop (pl @ List.map (fun p -> (p, false)) !def_p)
   in
@@ -1511,10 +1526,16 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         x
   in
   let gen =
+    let pevents_done = Gwdb.iper_marker (Gwdb.ipers base) false in
+    let infos_done = Gwdb.iper_marker (Gwdb.ipers base) false in
+    let notes_done = Gwdb.iper_marker (Gwdb.ipers base) false in
     let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
     let mark_rel = Gwdb.iper_marker (Gwdb.ipers base) false in
     let fam_done = Gwdb.ifam_marker (Gwdb.ifams base) false in
     {
+      notes_done;
+      infos_done;
+      pevents_done;
       mark;
       mark_rel;
       per_sel;
@@ -1610,7 +1631,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
               else
                 let oc, _first, _ = origin_file (base_notes_origin_file base) in
                 Printf.ksprintf oc "\n";
-                print_empty_family opts base p;
+                print_empty_family gen opts base p;
                 print_notes_for_person opts base gen p;
                 Gwdb.Marker.set gen.mark i true;
                 print_isolated_relations opts base gen p)
