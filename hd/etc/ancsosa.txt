@@ -1010,12 +1010,12 @@
 %( Ancêtre %)
   <td%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;%sp;
       class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
-    %if;(e.ns=1)
+    %if;(e.ns=1 and not cancel_links)
         %if;(ancestor.has_notes) note%if;(ancestor.has_psources)source%end;%elseif;(ancestor.has_psources) source%end;
     %end;
     %if;(e.hl=1 and ("?" is_substr ancestor or ancestor.first_name="N." or ancestor.first_name="Nn"
               or ancestor.first_name="Xx" or ancestor.first_name="Yy" or ancestor.first_name="Xy")) bg-ly-incomplete%end;"%sp;
-    %if;(e.ns=1 and (ancestor.has_notes or ancestor.has_psources)) tabindex="0"
+    %if;(e.ns=1 and not cancel_links and (ancestor.has_notes or ancestor.has_psources)) tabindex="0"
       title="[*click] [notes sources show help]%sp;
              %if;(ancestor.has_notes)[note/notes]1%if;(ancestor.has_psources) [and] [source/sources]1%end;
              %elseif;(ancestor.has_psources)[source/sources]1%end;."
@@ -1096,12 +1096,12 @@
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle%if;(are_divorced or are_separated) divorced-side-border%end;
-          %if;(e.ns=1)
+          %if;(e.ns=1 and not cancel_links)
             %if;has_marriage_note; note%if;has_marriage_source;source%end;%elseif;has_marriage_source; source%end;
           %end;
           %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"%sp;
           title="TODO"
-          %if;(e.ns=1 and (has_marriage_note or has_marriage_source))
+          %if;(e.ns=1 and not cancel_links and (has_marriage_note or has_marriage_source))
             tabindex="0" %apply;popover_params("bottom")
             data-content='%if;has_marriage_note;%apply;clean_comment_tags(marriage_note)
                             %if;has_marriage_source;<hr>%end;%end;
@@ -1128,11 +1128,11 @@
         %foreach;ancestor.family;
           %if;(family_cnt = 1)
             <td class="align-middle text-center
-                  %if;(e.ns=1)
+                  %if;(e.ns=1 and not cancel_links)
                     %if;has_fnotes; note%if;has_fsources;source%end;
                     %elseif;has_fsources; source%end;
                   %end;"
-                %if;(e.ns=1 and (has_fsources or has_fnotes)) tabindex="0" %apply;popover_params("bottom")
+                %if;(e.ns=1 and not cancel_links and (has_fsources or has_fnotes)) tabindex="0" %apply;popover_params("bottom")
                 data-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
                               %if;has_fsources;%if;has_fnotes;<hr>%end;%fsources;%end;'
                 data-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
@@ -1180,7 +1180,7 @@
         <tr>
           %if;(e.marr="on")
             <td class="align-middle
-                %if;(e.ns=1)
+                %if;(e.ns=1 and not cancel_links)
                   %if;(spouse.has_pnotes and not spouse.has_psources) note%nn;
                   %elseif;(not spouse.has_pnotes and spouse.has_psources) source%nn;
                   %elseif;(spouse.has_pnotes and spouse.has_psources) notesource%nn;
@@ -1188,7 +1188,7 @@
                 %end;
                 %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
               or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;"
-              %if;(e.ns=1 and (spouse.has_psources or spouse.has_pnotes)) tabindex="0" %apply;popover_params("bottom")
+              %if;(e.ns=1 and not cancel_links and (spouse.has_psources or spouse.has_pnotes)) tabindex="0" %apply;popover_params("bottom")
               data-content='%if;(spouse.has_pnotes)%apply;clean_comment_tags(spouse.pnotes)%end;
                             %if;(spouse.has_psources)
                               %if;(spouse.has_pnotes)<hr>%end;
@@ -1227,14 +1227,14 @@
           %end;
           %if;(e.marr_place="on")
             <td class="align-middle%if;(are_divorced or are_separated) divorced-side-border%end;
-              %if;(e.ns=1)
+              %if;(e.ns=1 and not cancel_links)
                 %if;(has_marriage_note and not has_marriage_source) note%nn;
                 %elseif;(not has_marriage_note and has_marriage_source) source%nn;
                 %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
                 %end;
               %end;
               %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"
-              %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0" %apply;popover_params("bottom")
+              %if;(e.ns=1 and not cancel_links and (has_marriage_note or has_marriage_source)) tabindex="0" %apply;popover_params("bottom")
                 data-content='%if;(has_marriage_note)%apply;clean_comment_tags(marriage_note)%end;
                               %if;(has_marriage_source)
                                 %if;(has_marriage_note)<hr>%end;
@@ -1257,13 +1257,13 @@
           %end;
           %if;(e.child="on")
             <td class="text-center align-middle%nn;
-              %if;(e.ns=1)
+              %if;(e.ns=1 and not cancel_links)
                 %if;(has_fnotes and not has_fsources) note%nn;
                 %elseif;(not has_fnotes and has_fsources) source%nn;
                 %elseif;(has_fnotes and has_fsources) notesource%nn;
                 %end;
               %end;"%sp;
-              %if;(e.ns=1 and (has_fnotes or has_fsources)) tabindex="0" %apply;popover_params("bottom")
+              %if;(e.ns=1 and not cancel_links and (has_fnotes or has_fsources)) tabindex="0" %apply;popover_params("bottom")
                 data-content='%if;(has_fnotes)%apply;clean_comment_tags(fnotes)%end;
                               %if;(has_fsources)
                                 %if;(has_fnotes)<hr>%end;

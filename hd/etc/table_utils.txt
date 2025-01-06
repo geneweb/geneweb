@@ -190,15 +190,15 @@
     <td%sp;
       %if;(("xxx"="ancestor" or ("xxx"!="ancestor" and e.t="H" and nb_families>1)) and xxx.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on" or e.child="on"))rowspan="%xxx.nb_families;" %end;
       class="align-middle%nn;
-        %if;(e.ns=1)
+        %if;(e.ns=1 and not cancel_links)
           %if;(xxx.has_yyy_note) note%if;(xxx.has_yyy_source)source%end;%elseif;(xxx.has_yyy_source) source%end;
         %end;
         %if;(e.hl=1)
           %if;(not xxx.has_yyy_place and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) bg-ly-incomplete
           %elseif;(not xxx.is_dead and "yyy"="death") bg-lg%end;
         %end;"
-        %if;(e.ns=1 or e.yyy="on")title="[*click]%sp;%end;
-               %if;(e.ns=1 and (xxx.has_yyy_source or xxx.has_yyy_note))%nn;
+        %if;((e.ns=1 and not cancel_links) or e.yyy="on")title="[*click]%sp;%end;
+               %if;(e.ns=1 and not cancel_links and (xxx.has_yyy_source or xxx.has_yyy_note))%nn;
                  [notes sources show help]%sp;
                  %if;(xxx.has_yyy_note or xxx.has_yyy_source)
                    %apply;place_title("xxx","yyy",0)
@@ -206,8 +206,8 @@
                  %if;(e.yyy="on" and wizard)&#010;[or] %end;
                %end;
                %if;(e.yyy="on" and wizard)[notes sources edit on date]%end;
-        %if;(e.ns=1 or e.yyy="on")."%end;
-        %if;(e.ns=1 and (xxx.has_yyy_note or xxx.has_yyy_source)) tabindex="0"
+        %if;((e.ns=1 and not cancel_links) or e.yyy="on")."%end;
+        %if;(e.ns=1 and not cancel_links and (xxx.has_yyy_note or xxx.has_yyy_source)) tabindex="0"
           %apply;popover_params("bottom")
           data-content='%if;xxx.has_yyy_note;%apply;clean_comment_tags%with;%apply;capitalize(xxx.yyy_note)%end;%end;
                         %if;xxx.has_yyy_source;
