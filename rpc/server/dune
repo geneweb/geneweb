@@ -4,6 +4,8 @@
   (public_name geneweb-rpc.server)
   (libraries
     geneweb_rpc
+    geneweb_search
+    geneweb_util
     lwt
     cmdliner
     httpun

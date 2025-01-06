@@ -107,7 +107,7 @@ fmt: ## Format Ocaml code
 
 # [BEGIN] Installation / Distribution section
 build:
-	@$(call unpatch_after, dune build)
+	$(call unpatch_after, dune build)
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
