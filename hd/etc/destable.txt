@@ -94,12 +94,12 @@
   %if;(famx=1)
     %if;("yyy"="desc")
       <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
-        %if;(e.ns=1)
+        %if;(e.ns=1 and not cancel_links)
           %if;has_notes; note%if;has_psources;source%end;%elseif;has_psources; source%end;
         %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
               or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) bg-ly-incomplete%end;"%nn;
         %rowspan;
-        %if;(e.ns=1 and (has_notes or has_psources)) tabindex="0"
+        %if;(e.ns=1  and not cancel_links and (has_notes or has_psources)) tabindex="0"
           title="[*click] [notes sources show help]%sp;
                  %if;has_notes;[note/notes]1%if;has_psources; [and] [source/sources]1%end;
                  %elseif;has_psources;[source/sources]1%end;."
@@ -124,14 +124,14 @@
       </td>
     %elseif;(e.t="I")
       <td class="align-middle text-right%if;(e.nowrap="on") text-nowrap%end;%nn;
-        %if;(e.ns=1)
+        %if;(e.ns=1 and not cancel_links)
           %if;(xxx.has_notes and not xxx.has_psources) notespouse%nn;
           %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
           %elseif;(xxx.has_notes and xxx.has_psources) notesourcespouse%nn;
           %end;
         %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
               or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) bg-ly-incomplete%end;"%nn;
-        %if;(e.ns=1 and (xxx.has_notes or xxx.has_psources)) tabindex="0" %apply;popover_params("right")
+        %if;(e.ns=1 and not cancel_links and (xxx.has_notes or xxx.has_psources)) tabindex="0" %apply;popover_params("right")
           data-content='%if;(xxx.has_notes)%apply;clean_comment_tags(xxx.notes)%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
                         %if;(xxx.has_psources)%apply;capitalize(xxx.psources)%end;'
@@ -173,12 +173,12 @@
       %foreach;xxx.family;
         %if;(family_cnt=fam_cnt)
           <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
-          %if;(e.ns=1)
+          %if;(e.ns=1 and not cancel_links)
             %if;(spouse.has_notes) note%if;(spouse.has_psources)source%end;
             %elseif;(spouse.has_psources) source%end;
           %end;
           %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;"%nn;
-          %if;(e.ns=1 and (spouse.has_notes or spouse.has_psources)) tabindex="0" %apply;popover_params("bottom")
+          %if;(e.ns=1 and not cancel_links and (spouse.has_notes or spouse.has_psources)) tabindex="0" %apply;popover_params("bottom")
             data-content='%if;(spouse.has_notes)%apply;clean_comment_tags(spouse.notes)%end;
                           %if;(spouse.has_psources)%if;(spouse.has_notes)<hr>%end;%apply;capitalize(spouse.psources)%end;'
             title="%if;(spouse.has_notes)[*note/notes]1%if;(spouse.has_psources) [and] [source/sources]1%end;
@@ -240,13 +240,13 @@
               ((xxx.spouse=zzz and ddd=family.index) or
                 (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
           <td class="align-middle%if;(are_divorced or are_separated) divorced-side-border%end;
-            %if;(e.ns=1)
+            %if;(e.ns=1 and not cancel_links)
               %if;has_marriage_note; note%if;has_marriage_source;source%end;%elseif;has_marriage_source; source%end;
             %end;
             %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"
             title="TODO"
-            %if;(e.ns=1 and (has_marriage_note or has_marriage_source))
+            %if;(e.ns=1 and not cancel_links and (has_marriage_note or has_marriage_source))
               tabindex="0" %apply;popover_params("bottom")
               data-content='%if;has_marriage_note;%apply;clean_comment_tags(marriage_note)
                               %if;has_marriage_source;<hr>%end;%end;
@@ -312,11 +312,11 @@
             ((xxx.spouse=zzz and (ddd=family.index)) or
              (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
           <td class="align-middle text-center%if;(e.nowrap="on") text-nowrap%end; px-1
-            %if;(e.ns=1)
+            %if;(e.ns=1 and not cancel_links)
               %if;has_fnotes; note%if;has_fsources;source%end;%elseif;has_fsources; source%end;
             %end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"%nn;
-            %if;(e.ns=1 and (has_fnotes or has_fsources)) tabindex="0" %apply;popover_params("bottom")
+            %if;(e.ns=1 and not cancel_links and (has_fnotes or has_fsources)) tabindex="0" %apply;popover_params("bottom")
               data-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
                             %if;has_fsources;%if;has_fnotes;<hr>%end;%apply;capitalize(fsources)%end;'
               data-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
