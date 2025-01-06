@@ -5,41 +5,75 @@
     <title>Test RPC client</title>
   </head>
   <body>
-    <form id="form">
-      <label for="input">Enter any text:</label>
-      <input type="text" name="input" id="input" required>
-    </form>
-    <div id="output">ICI</div>
+    <div>
+      <form id="form-ping">
+        <label for="input-ping">Enter any text:</label>
+        <input type="text-ping" name="input-ping" id="input-ping" required>
+      </form>
+      <div id="output-ping">waiting...</div>
+    </div>
+    <div>
+      <form id="form-search">
+        <label for="input-search">Enter any text:</label>
+        <input type="text-search" name="input-search" id="input-search" required>
+      </form>
+      <ul id="output-search" style="list-style-type: none"></ul>
+    </div>
     <script src="../_build/default/bin/rpc-client/main.bc.js"></script>
     <script>
-      const client = new Rpc("ws://localhost:8080/pingpong");
-      const form = document.getElementById("form");
-      const input = document.getElementById("input");
-      const output = document.getElementById("output");
-
       // TODO : can we write this function in js_of_ocaml?
       function add_method(client, meth) {
-        client[meth] = function (...args) {
+        client[meth] = async function (...args) {
           const jargs = args.map((a) => { return JSON.stringify(a); });
-          return client.call(meth, jargs);
+          const response = await client.call(meth, jargs);
+          console.log(response);
+          return JSON.parse(response);
         }
       }
 
-      add_method(client, "ping");
-      add_method(client, "echo");
+      const client1 = new Rpc("ws://localhost:8080/pingpong");
+      add_method(client1, "ping");
+      add_method(client1, "echo");
 
-      async function main() {
-        const msg = await client.ping();
-        console.log(msg);
-      }
 
-      async function callback() {
-        const msg = await client.echo(input.value);
+      async function ping_callback() {
+        const input = document.getElementById("input-ping");
+        const msg = await client1.echo(input.value);
         console.log(msg);
+        const output = document.getElementById("output-ping");
         output.innerText = msg;
       }
 
-      input.addEventListener("input", callback);
+      document.getElementById("input-ping")
+              .addEventListener("input", ping_callback);
+
+
+      async function main() {
+        const msg = await client1.ping();
+        console.log(msg);
+      }
+
+      const client2 = new Rpc("ws://localhost:8080/search");
+      add_method(client2, "lookup");
+
+      async function search_callback() {
+        const input = document.getElementById("input-search");
+        const msg = await client2.lookup(["test.cache", input.value]);
+        console.log(msg);
+        console.log(Array.isArray(msg));
+        console.log(typeof msg);
+        console.log(Object.prototype.toString.call(msg));
+        const output = document.getElementById("output-search");
+        output.innerHTML = "";
+        msg.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          output.appendChild(li);
+        });
+      }
+
+      document.getElementById("input-search")
+              .addEventListener("input", search_callback);
     </script>
   </body>
 </html>

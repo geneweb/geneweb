@@ -83,7 +83,7 @@ unpatch_files:
 	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
 	fi
 
-BUILD = dune build -p geneweb
+BUILD = dune build
 UNPATCH = $(MAKE) --no-print-directory unpatch_files
 
 unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
@@ -112,7 +112,7 @@ fmt: ## Format Ocaml code
 	$(call unpatch_after, dune build @fmt --auto-promote)
 
 # [BEGIN] Installation / Distribution section
-build: build-geneweb build-rpc-support # Build all the project
+build: build-geneweb # Build all the project
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
