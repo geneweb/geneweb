@@ -546,7 +546,10 @@ let select opts =
                   | [ _ ] -> assert false
                 in
                 loop Geneweb.Util.IperSet.empty Geneweb.Util.IfamSet.empty ips
-              else ((fun _ -> true), fun _ -> true)
+              else
+                ( (fun person_id ->
+                    ips = [] || List.exists (Gwdb.eq_iper person_id) ips),
+                  fun _ -> ips = [] )
       in
       ( (fun i -> not_censor_p i && sel_per i),
         fun i -> not_censor_f i && sel_fam i )
