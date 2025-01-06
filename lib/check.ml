@@ -90,7 +90,7 @@ let print_base_error oc base = function
   | BadSexOfMarriedPerson p ->
       Printf.fprintf oc "%s bad sex for a married person\n" (designation base p)
 
-let print_base_warning oc base (w : CheckItem.base_warning) =
+let print_base_warning oc base (w : Warning.base_warning) =
   let get_fevent_name e = e.efam_name in
   let get_pevent_name e = e.epers_name in
   match w with

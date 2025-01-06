@@ -42,12 +42,12 @@ val all_checks_family :
   Update.key Def.gen_couple
   * Update.key Def.gen_descend
   * (('i array * 'j array) * ('i array * 'j array)) option ->
-  CheckItem.base_warning list * CheckItem.base_misc list
+  Warning.base_warning list * Warning.base_misc list
 
 val print_family :
   Config.config ->
   Gwdb.base ->
-  CheckItem.base_warning list * CheckItem.base_misc list ->
+  Warning.base_warning list * Warning.base_misc list ->
   Gwdb.iper Adef.gen_couple ->
   Gwdb.iper Def.gen_descend ->
   unit

@@ -880,7 +880,7 @@ and mk_warning conf base =
       List.iteri (fun i x -> a.(i) <- fn x) l;
       a
   in
-  fun (warning : CheckItem.base_warning) ->
+  fun (warning : Warning.base_warning) ->
     match warning with
     | Warning.BigAgeBetweenSpouses (f, m, a) ->
         Tset

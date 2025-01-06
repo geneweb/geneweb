@@ -82,7 +82,7 @@ let compatible_fam fam1 fam2 =
   && compatible_divorces (get_divorce fam1) (get_divorce fam2)
   && compatible_strings (get_fsources fam1) (get_fsources fam2)
 
-let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
+let reparent_ind base (warning : Warning.base_warning -> unit) ip1 ip2 =
   let a1 = poi base ip1 in
   let a2 = poi base ip2 in
   match (get_parents a1, get_parents a2) with
@@ -107,8 +107,8 @@ let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
       | None -> ())
   | _ -> ()
 
-let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
-    p2 =
+let effective_merge_ind conf base (warning : Warning.base_warning -> unit) p1 p2
+    =
   let u2 = poi base (get_iper p2) in
   if Array.length (get_family u2) <> 0 then (
     for i = 0 to Array.length (get_family u2) - 1 do
