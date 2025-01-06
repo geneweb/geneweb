@@ -46,6 +46,16 @@ module In_channel : sig
 
       @raise Invalid_argument if [pos] and [len] do not designate a valid range of
       [buf]. *)
+
+  val input_line : t -> string option
+  (** [input_line ic] reads characters from [ic] until a newline or the end of
+      file is reached.  Returns the string of all characters read, without the
+      newline (if any).  Returns [None] if the end of the file has been reached.
+      In particular, this will be the case if the last line of input is empty.
+
+      A newline is the character [\n] unless the file is open in text mode and
+      {!Sys.win32} is [true] in which case it is the sequence of characters
+      [\r\n]. *)
 end
 
 module Out_channel : sig
@@ -97,4 +107,27 @@ module List : sig
       first.
 
       @since OCaml 4.12 *)
+end
+
+module Seq : sig
+  val take : int -> 'a Seq.t -> 'a Seq.t
+  (** [take n xs] is the sequence of the first [n] elements of [xs].
+
+      If [xs] has fewer than [n] elements,
+      then [take n xs] is equivalent to [xs].
+
+      [n] must be nonnegative.
+
+      @raise Invalid_argument if [n] is negative.
+
+      @since 4.14 *)
+
+  val concat : 'a Seq.t Seq.t -> 'a Seq.t
+  (** If [xss] is a sequence of sequences,
+      then [concat xss] is its concatenation.
+
+      If [xss] is the sequence [xs0; xs1; ...] then
+      [concat xss] is the sequence [xs0 @ xs1 @ ...].
+
+      @since 4.13 *)
 end
