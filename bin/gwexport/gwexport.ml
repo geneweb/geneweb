@@ -417,7 +417,7 @@ let check_options options =
   let check_base () =
     if Option.is_some options.base then Ok () else Error "Missing base name."
   in
-  let check_keys () =
+  let check_root_person_keys () =
     let options_requiring_key =
       [ options.asc; options.desc; options.ascdesc ]
     in
@@ -426,7 +426,7 @@ let check_options options =
     else Error "Missing root person."
   in
   let ( >>= ) = Result.bind in
-  check_base () >>= check_keys
+  check_base () >>= check_root_person_keys
 
 let select opts ips =
   let () =
