@@ -414,6 +414,9 @@ let select_from_set (ipers : Geneweb.Util.IperSet.t)
   (sel_per, sel_fam)
 
 let check_options options =
+  let conditional_check ~condition check =
+    if not @@ condition () then Ok () else check ()
+  in
   let check_base () =
     if Option.is_some options.base then Ok () else Error "Missing base name."
   in
@@ -425,8 +428,15 @@ let check_options options =
     then Ok ()
     else Error "Missing root person."
   in
+  let check_parentship_keys () =
+    if options.keys <> [] && List.length options.keys mod 2 = 0 then Ok ()
+    else Error "Missing person."
+  in
   let ( >>= ) = Result.bind in
-  check_base () >>= check_root_person_keys
+  check_base () >>= check_root_person_keys >>= fun () ->
+  conditional_check
+    ~condition:(fun () -> options.parentship)
+    check_parentship_keys
 
 let select opts =
   let () =
