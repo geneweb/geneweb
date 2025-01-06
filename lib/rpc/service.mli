@@ -49,3 +49,8 @@ module PingPong : sig
   val echo : (string -> string Lwt.t, string) meth
   val srv : t
 end
+
+module Search : sig
+  val make : (string * Geneweb_search.Index.Default.t) list -> t
+  (** Prepare the search service with a list of inversed index. *)
+end

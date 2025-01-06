@@ -16,3 +16,17 @@
     httpun
     httpun-lwt-unix
     httpun-ws))
+
+(test
+  (deps (:dict ./dict.txt))
+  (name search_test)
+  (package geneweb)
+  (modules search_test)
+  (libraries
+    alcotest
+    fmt
+    qcheck
+    qcheck-alcotest
+    geneweb_util
+    geneweb_search)
+  (action (run %{test} %{dict})))
