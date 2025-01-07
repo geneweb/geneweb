@@ -15,7 +15,7 @@ let ged_export base outfile =
     (outfile, output_string oc, fun () -> close_out oc)
   in
   let opts = { opts with base = Some (outfile, base); oc } in
-  let select = Gwexport.select opts [] in
+  let select = Gwexport.select opts in
   Gwb2ged_lib.gwb2ged false opts select
 
 let gw_export base outfile =

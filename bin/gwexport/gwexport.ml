@@ -428,7 +428,7 @@ let check_options options =
   let ( >>= ) = Result.bind in
   check_base () >>= check_root_person_keys
 
-let select opts ips =
+let select opts =
   let () =
     Result.iter_error
       (fun error_message ->
@@ -440,10 +440,7 @@ let select opts ips =
   match opts.base with
   | None -> assert false
   | Some (_, base) ->
-      let ips =
-        List.rev_append ips
-        @@ List.filter_map (Gutil.person_of_string_key base) opts.keys
-      in
+      let ips = List.filter_map (Gutil.person_of_string_key base) opts.keys in
       let not_censor_p, not_censor_f =
         if opts.censor <> 0 then (
           let pmark = Gwdb.iper_marker (Gwdb.ipers base) 0 in
