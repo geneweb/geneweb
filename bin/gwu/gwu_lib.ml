@@ -640,8 +640,6 @@ let print_pevent opts base gen e =
       Printf.ksprintf (oc opts) " ";
       print_date opts d);
   print_if_no_empty opts base "#p" (Gwdb.get_pevent_place e);
-  (* TODO *)
-  (*print_if_no_empty opts base "#c" e.epers_cause;*)
   if opts.source = None then
     print_if_no_empty opts base "#s" (Gwdb.get_pevent_src e);
   Printf.ksprintf (oc opts) "\n";
@@ -728,7 +726,6 @@ let print_fevent opts base gen in_comment e =
       Printf.ksprintf (oc opts) " ";
       print_date opts d);
   print_if_no_empty opts base "#p" (Gwdb.get_fevent_place e);
-  (*print_if_no_empty opts base "#c" e.efam_cause;*)
   if opts.source = None then
     print_if_no_empty opts base "#s" (Gwdb.get_fevent_src e);
   print_sep ();
@@ -1324,41 +1321,6 @@ let rec merge_families ifaml1f ifaml2f =
       else ifam1 :: merge_families ifaml1 ifaml2
   | ifaml1, [] -> ifaml1
   | [], ifaml2 -> ifaml2
-
-(* let connected_families base fam_sel ifam cpl =
- *   let rec loop ifaml scanned =
- *     function
- *     | ip :: ipl ->
- *       let scanned = ip :: scanned in
- *       let ipl, ifaml =
- *         Array.fold_right begin fun i (acci, accf) ->
- *           if fam_sel i && not @@ List.mem i accf
- *           then
- *             let accf = i :: accf in
- *             let cpl = foi base ifam in
- *             let fa = get_father cpl in
- *             let mo = get_mother cpl in
- *             let acci =
- *               if not @@ List.mem fa acci
- *               && not @@ List.mem fa scanned
- *               then fa :: acci
- *               else acci
- *             in
- *             let acci =
- *               if not @@ List.mem mo acci
- *               && not @@ List.mem mo scanned
- *               then mo :: acci
- *               else acci
- *             in
- *             (acci, accf)
- *           else (acci, accf)
- *         end (get_family @@ poi base ip) (ipl, ifaml)
- *       in
- *       loop ifaml scanned ipl
- *     | [] -> ifaml
- *   in
- *   loop [ ifam ] [] [ get_father cpl ; get_mother cpl ]
- *   |> List.sort_uniq compare *)
 
 let rec filter f = function
   | x :: l -> if f x then x :: filter f l else filter f l
