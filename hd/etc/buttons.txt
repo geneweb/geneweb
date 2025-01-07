@@ -170,7 +170,7 @@
         </a>
       %end;
       %if;(istable=1)
-      <a role="button" class="btn btn-link px-0" title="[*cancel GeneWeb links]" href="%url_set.cgl.on;">%nn;
+      <a role="button" class="btn btn-link px-0" title="[*cancel GeneWeb links]" href="%url_set.cgl.on;" target="_blank">%nn;
         <i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i>%nn;
       </a>
       %end;
