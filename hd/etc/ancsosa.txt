@@ -1035,10 +1035,10 @@
         %end;
       </div>
       %if;(e.im="" and ancestor.has_image)
-        <a href="%ancestor.image_url;" target="_blank" title="TEST">
+        %if;not cancel_links;<a href="%ancestor.image_url;" target="_blank" title="TEST">%end;
           <img src="%ancestor.image_url;" class="rounded align-self-center ml-1 table-img-max-width"
             height="%if;(e.px!="")%e.px;%else;60%end;" alt="%ancestor;">
-        </a>
+        %if;not cancel_links;</a>%end;
       %end;
     </div>
   </td>
