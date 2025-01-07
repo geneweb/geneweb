@@ -51,7 +51,7 @@ val check_other_fields :
   base -> (Warning.base_misc -> unit) -> ifam -> family -> unit
 (** Cheks if family, father and mother have sources. Otherwise call [misc] on [base_misc] *)
 
-val eq_warning : base -> Warning.base_warning -> Warning.base_warning -> bool
+val eq_warning : Warning.base_warning -> Warning.base_warning -> bool
 (** equality between base_warnings *)
 
 val person_warnings :

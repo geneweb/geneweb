@@ -83,7 +83,7 @@ let capitalize s =
 
 let initial n =
   let exception Found of int in
-  let find_uppercase uppercase_position position character =
+  let find_uppercase () position character =
     let is_uppercase =
       match character with
       | `Uchar c -> Uucp.Case.is_upper c
