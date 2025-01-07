@@ -1028,13 +1028,10 @@ let on_person_update base warning p =
 let check_other_fields base misc ifam fam = check_sources base misc ifam fam
 
 let eq_person p1 p2 = eq_iper (get_iper p1) (get_iper p2)
-let eq_family f1 f2 = eq_ifam (get_ifam f1) (get_ifam f2)
-let eq_warning base w1 w2 = Warning.compare_base_warning base w1 w2 = 0
+let eq_warning w1 w2 = Warning.compare_base_warning w1 w2 = 0
 
 let person_warnings conf base p =
-  let module WarningSet = Warning.Gen_BaseWarningSet (struct
-    let base = base
-  end) in
+  let module WarningSet = Warning.BaseWarningSet in
   let w = ref WarningSet.empty in
 
   let filter_close_children =
