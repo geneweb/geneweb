@@ -1321,10 +1321,6 @@ let rec merge_families ifaml1f ifaml2f =
   | ifaml1, [] -> ifaml1
   | [], ifaml2 -> ifaml2
 
-let rec filter f = function
-  | x :: l -> if f x then x :: filter f l else filter f l
-  | [] -> []
-
 let connected_families base fam_sel ifam cpl =
   let rec loop ifaml ipl_scanned = function
     | ip :: ipl ->
@@ -1332,7 +1328,7 @@ let connected_families base fam_sel ifam cpl =
         else
           let u = Gwdb.poi base ip in
           let ifaml1 = Array.to_list (Gwdb.get_family u) in
-          let ifaml1 = filter fam_sel ifaml1 in
+          let ifaml1 = List.filter fam_sel ifaml1 in
           let ifaml = merge_families ifaml ifaml1 in
           let ipl =
             List.fold_right
