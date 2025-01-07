@@ -157,7 +157,7 @@ let starting_char no_num s =
   (*'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' *)
   | 'a' .. 'z' | 'A' .. 'Z' | '\xE0' .. '\xFD' | '\xC0' .. '\xDD' -> true
   | '0' .. '9' -> not no_num
-  | '?' -> if s = "?" then true else false
+  | '?' -> s = "?"
   | _ -> false
 
 let no_newlines s =
