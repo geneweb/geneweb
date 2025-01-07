@@ -311,12 +311,11 @@ let zero_birth_is_required opts base is_child p =
     | Def.Death (_, _) | Def.DeadYoung | Def.DeadDontKnowWhen | Def.OfCourseDead
       ->
         true
-    | Def.DontKnowIfDead
-      when (not is_child)
-           && (not (has_infos_not_dates opts base p))
-           && Gwdb.p_first_name base p <> "?"
-           && Gwdb.p_surname base p <> "?" ->
-        true
+    | Def.DontKnowIfDead ->
+        (not is_child)
+        && (not (has_infos_not_dates opts base p))
+        && Gwdb.p_first_name base p <> "?"
+        && Gwdb.p_surname base p <> "?"
     | _ -> false
 
 type gen = {
