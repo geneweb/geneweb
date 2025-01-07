@@ -29,7 +29,26 @@ let put_events_in_notes base p =
                 || Gwdb.get_pevent_witnesses evt <> [||]
               then true
               else loop events
-          | _ -> true)
+          | Def.Epers_Accomplishment | Def.Epers_Acquisition
+          | Def.Epers_Adhesion | Def.Epers_BaptismLDS | Def.Epers_BarMitzvah
+          | Def.Epers_BatMitzvah | Def.Epers_Benediction | Def.Epers_ChangeName
+          | Def.Epers_Circumcision | Def.Epers_Confirmation
+          | Def.Epers_ConfirmationLDS | Def.Epers_Decoration
+          | Def.Epers_DemobilisationMilitaire | Def.Epers_Diploma
+          | Def.Epers_Distinction | Def.Epers_Dotation | Def.Epers_DotationLDS
+          | Def.Epers_Education | Def.Epers_Election | Def.Epers_Emigration
+          | Def.Epers_Excommunication | Def.Epers_FamilyLinkLDS
+          | Def.Epers_FirstCommunion | Def.Epers_Funeral | Def.Epers_Graduate
+          | Def.Epers_Hospitalisation | Def.Epers_Illness
+          | Def.Epers_Immigration | Def.Epers_ListePassenger
+          | Def.Epers_MilitaryDistinction | Def.Epers_MilitaryPromotion
+          | Def.Epers_MilitaryService | Def.Epers_MobilisationMilitaire
+          | Def.Epers_Naturalisation | Def.Epers_Occupation
+          | Def.Epers_Ordination | Def.Epers_Property | Def.Epers_Recensement
+          | Def.Epers_Residence | Def.Epers_Retired | Def.Epers_ScellentChildLDS
+          | Def.Epers_ScellentParentLDS | Def.Epers_ScellentSpouseLDS
+          | Def.Epers_VenteBien | Def.Epers_Will | Def.Epers_Name _ ->
+              true)
     in
     loop (Gwdb.get_pevents p)
   else false
@@ -129,7 +148,7 @@ let print_date_dmy opts d =
           Printf.ksprintf (oc opts) "..%d/%d/%s" d2.day2 d2.month2
             (soy d2.year2)
       else Printf.ksprintf (oc opts) "..%s" (soy d2.year2)
-  | _ -> ()
+  | Sure | About | Maybe | Before | After -> ()
 
 let is_printable = function '\000' .. '\031' -> false | _ -> true
 
@@ -316,7 +335,7 @@ let zero_birth_is_required opts base is_child p =
         && (not (has_infos_not_dates opts base p))
         && Gwdb.p_first_name base p <> "?"
         && Gwdb.p_surname base p <> "?"
-    | _ -> false
+    | Def.NotDead -> false
 
 let print_infos opts base is_child csrc cbp p =
   List.iter (print_first_name_alias opts base) (Gwdb.get_first_names_aliases p);
@@ -362,7 +381,7 @@ let print_infos opts base is_child csrc cbp p =
       | Def.Murdered -> Printf.ksprintf (oc opts) "m"
       | Def.Executed -> Printf.ksprintf (oc opts) "e"
       | Def.Disappeared -> Printf.ksprintf (oc opts) "s"
-      | _ -> ());
+      | Def.Unspecified -> ());
       print_date opts (Date.date_of_cdate d)
   | Def.DeadYoung -> Printf.ksprintf (oc opts) " mj"
   | Def.DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
@@ -469,7 +488,7 @@ let print_child opts base fam_surname csrc cbp p =
   (match Gwdb.get_sex p with
   | Def.Male -> Printf.ksprintf (oc opts) " h"
   | Def.Female -> Printf.ksprintf (oc opts) " f"
-  | _ -> ());
+  | Def.Neuter -> ());
   Printf.ksprintf (oc opts) " %s"
     (s_correct_string (Gwdb.sou base (Gwdb.get_first_name p)));
   if Gwdb.p_first_name base p = "?" && Gwdb.p_surname base p = "?" then ()
@@ -557,7 +576,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
         (match Gwdb.get_sex p with
         | Def.Male -> Printf.ksprintf (oc opts) " m"
         | Def.Female -> Printf.ksprintf (oc opts) " f"
-        | _ -> ());
+        | Def.Neuter -> ());
         Printf.ksprintf (oc opts) ": ";
         let sk = string_of_witness_kind wk in
         (match sk with
@@ -744,7 +763,10 @@ let print_comment_for_family opts base gen fam =
         | Def.Efam_Divorce | Def.Efam_Engage | Def.Efam_Marriage
         | Def.Efam_NoMarriage | Def.Efam_NoMention | Def.Efam_Separated ->
             false
-        | _ -> true)
+        | Def.Efam_Annulation | Def.Efam_MarriageBann
+        | Def.Efam_MarriageContract | Def.Efam_MarriageLicense | Def.Efam_PACS
+        | Def.Efam_Residence | Def.Efam_Name _ ->
+            true)
       (Gwdb.get_fevents fam)
   in
   let has_evt =
@@ -834,14 +856,14 @@ let print_family opts base gen m =
       | Some s ->
           Printf.ksprintf (oc opts) "csrc %s\n" (s_correct_string s);
           s
-      | _ -> ""
+      | None -> ""
     in
     let cbp =
       match common_children_birth_place base m.m_chil with
       | Some s ->
           Printf.ksprintf (oc opts) "cbp %s\n" (s_correct_string s);
           s
-      | _ -> ""
+      | None -> ""
     in
     print_comment_for_family opts base gen fam;
     if (not !old_gw) && Gwdb.get_fevents fam <> [] then (
@@ -965,7 +987,30 @@ let print_notes_for_person opts base gen p =
                  | Def.Epers_Death -> "death"
                  | Def.Epers_Burial -> "burial"
                  | Def.Epers_Cremation -> "cremation"
-                 | _ -> ""
+                 | Def.Epers_Accomplishment | Def.Epers_Acquisition
+                 | Def.Epers_Adhesion | Def.Epers_BaptismLDS
+                 | Def.Epers_BarMitzvah | Def.Epers_BatMitzvah
+                 | Def.Epers_Benediction | Def.Epers_ChangeName
+                 | Def.Epers_Circumcision | Def.Epers_Confirmation
+                 | Def.Epers_ConfirmationLDS | Def.Epers_Decoration
+                 | Def.Epers_DemobilisationMilitaire | Def.Epers_Diploma
+                 | Def.Epers_Distinction | Def.Epers_Dotation
+                 | Def.Epers_DotationLDS | Def.Epers_Education
+                 | Def.Epers_Election | Def.Epers_Emigration
+                 | Def.Epers_Excommunication | Def.Epers_FamilyLinkLDS
+                 | Def.Epers_FirstCommunion | Def.Epers_Funeral
+                 | Def.Epers_Graduate | Def.Epers_Hospitalisation
+                 | Def.Epers_Illness | Def.Epers_Immigration
+                 | Def.Epers_ListePassenger | Def.Epers_MilitaryDistinction
+                 | Def.Epers_MilitaryPromotion | Def.Epers_MilitaryService
+                 | Def.Epers_MobilisationMilitaire | Def.Epers_Naturalisation
+                 | Def.Epers_Occupation | Def.Epers_Ordination
+                 | Def.Epers_Property | Def.Epers_Recensement
+                 | Def.Epers_Residence | Def.Epers_Retired
+                 | Def.Epers_ScellentChildLDS | Def.Epers_ScellentParentLDS
+                 | Def.Epers_ScellentSpouseLDS | Def.Epers_VenteBien
+                 | Def.Epers_Will | Def.Epers_Name _ ->
+                     ""
                in
                let notes =
                  if opts.Gwexport.notes then
@@ -977,7 +1022,26 @@ let print_notes_for_person opts base gen p =
                print_witnesses opts base gen ~use_per_sel:false
                  (Gwdb.get_pevent_witnesses_and_notes evt);
                loop events
-           | _ ->
+           | Def.Epers_Accomplishment | Def.Epers_Acquisition
+           | Def.Epers_Adhesion | Def.Epers_BaptismLDS | Def.Epers_BarMitzvah
+           | Def.Epers_BatMitzvah | Def.Epers_Benediction | Def.Epers_ChangeName
+           | Def.Epers_Circumcision | Def.Epers_Confirmation
+           | Def.Epers_ConfirmationLDS | Def.Epers_Decoration
+           | Def.Epers_DemobilisationMilitaire | Def.Epers_Diploma
+           | Def.Epers_Distinction | Def.Epers_Dotation | Def.Epers_DotationLDS
+           | Def.Epers_Education | Def.Epers_Election | Def.Epers_Emigration
+           | Def.Epers_Excommunication | Def.Epers_FamilyLinkLDS
+           | Def.Epers_FirstCommunion | Def.Epers_Funeral | Def.Epers_Graduate
+           | Def.Epers_Hospitalisation | Def.Epers_Illness
+           | Def.Epers_Immigration | Def.Epers_ListePassenger
+           | Def.Epers_MilitaryDistinction | Def.Epers_MilitaryPromotion
+           | Def.Epers_MilitaryService | Def.Epers_MobilisationMilitaire
+           | Def.Epers_Naturalisation | Def.Epers_Occupation
+           | Def.Epers_Ordination | Def.Epers_Property | Def.Epers_Recensement
+           | Def.Epers_Residence | Def.Epers_Retired
+           | Def.Epers_ScellentChildLDS | Def.Epers_ScellentParentLDS
+           | Def.Epers_ScellentSpouseLDS | Def.Epers_VenteBien | Def.Epers_Will
+           | Def.Epers_Name _ ->
                print_pevent opts base gen evt;
                loop events)
      in
@@ -1110,7 +1174,7 @@ let get_persons_with_relations base m list =
   in
   Array.fold_right
     (fun p list ->
-      match Gwdb.get_rparents p with [] -> list | _ -> (p, false) :: list)
+      match Gwdb.get_rparents p with [] -> list | _ :: _ -> (p, false) :: list)
     m.m_chil list
 
 let print_relation_parent opts base mark defined_p p =
@@ -1391,7 +1455,7 @@ let mark_someone base mark s =
       Printf.eprintf "Error: \"%s\" is not found\n" s;
       flush stderr;
       exit 2
-  | _ ->
+  | _ :: _ :: _ ->
       Printf.eprintf "Error: several answers for \"%s\"\n" s;
       flush stderr;
       exit 2
@@ -1416,12 +1480,12 @@ let scan_connex_component base test_action len ifam =
     let len =
       match Gwdb.get_parents fath with
       | Some ifam -> test_action loop len ifam
-      | _ -> len
+      | None -> len
     in
     let len =
       match Gwdb.get_parents moth with
       | Some ifam -> test_action loop len ifam
-      | _ -> len
+      | None -> len
     in
     let children = Gwdb.get_children fam in
     Array.fold_left
