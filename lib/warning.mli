@@ -79,10 +79,8 @@ type base_warning =
 
 type base_misc = (Gwdb.person, Gwdb.family, Gwdb.title) misc
 
-val compare_base_warning : Gwdb.base -> base_warning -> base_warning -> int
+val compare_base_warning : base_warning -> base_warning -> int
 
-module Gen_BaseWarningSet (M : sig
-  val base : Gwdb.base
-end) : Set.S with type elt = base_warning
+module BaseWarningSet : Set.S with type elt = base_warning
 
 val handle_homonymous : Gwdb.base -> base_warning list -> base_warning list

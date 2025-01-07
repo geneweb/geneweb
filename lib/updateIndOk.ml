@@ -1063,7 +1063,7 @@ let relation_sex_is_coherent base warning p =
 let all_checks_person base p a u =
   let wl = ref [] in
   let warning w =
-    if not (List.exists (CheckItem.eq_warning base w) !wl) then wl := w :: !wl
+    if not (List.exists (CheckItem.eq_warning w) !wl) then wl := w :: !wl
   in
   let pp = person_of_gen_person base (p, a, u) in
   ignore @@ CheckItem.person base warning pp;

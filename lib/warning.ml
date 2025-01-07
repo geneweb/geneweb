@@ -89,8 +89,8 @@ let int_of_warning_tag = function
   | ChangedOrderOfMarriages (_p, _ifams, _ifams2) -> 6
   | ChangedOrderOfFamilyEvents (_ifam, _fevents, _fevents2) -> 7
   | ChangedOrderOfPersonEvents (_p, _pevents, _pevents2) -> 8
-  | ChildrenNotInOrder (ifam, fam, p1, p2) -> 9
-  | CloseChildren (ifam, p1, p2) -> 10
+  | ChildrenNotInOrder (_ifam, _fam, _p1, _p2) -> 9
+  | CloseChildren (_ifam, _p1, _p2) -> 10
   | DeadOld (_p, _d) -> 11
   | DeadTooEarlyToBeFather (_p1, _p2) -> 12
   | DistantChildren (_ifam, _p1, _p2) -> 13
@@ -232,8 +232,8 @@ let compare_gen_fam_event =
 
 let compare_gen_title = Def_ord.compare_gen_title Gwdb.compare_istr
 
-let compare_normalized_base_warning base (w1 : base_warning) (w2 : base_warning)
-    : int =
+let compare_normalized_base_warning (w1 : base_warning) (w2 : base_warning) :
+    int =
   match (w1, w2) with
   | PossibleDuplicateFam (f1, f2), PossibleDuplicateFam (f1', f2') ->
       Gwdb.compare_ifam f1 f1' >>= fun () -> Gwdb.compare_ifam f2 f2'
@@ -336,16 +336,12 @@ let compare_normalized_base_warning base (w1 : base_warning) (w2 : base_warning)
       Gwdb.compare_ifam ifam ifam' >>= fun () -> Date.compare_dmy d d'
   | _ -> assert false (* should not happen *)
 
-let compare_base_warning base w1 w2 =
+let compare_base_warning w1 w2 =
   Int.compare (int_of_warning_tag w1) (int_of_warning_tag w2) >>= fun () ->
-  compare_normalized_base_warning base (normalize_warning w1)
-    (normalize_warning w2)
+  compare_normalized_base_warning (normalize_warning w1) (normalize_warning w2)
 
-module Gen_BaseWarningSet (M : sig
-  val base : Gwdb.base
-end) =
-Set.Make (struct
+module BaseWarningSet = Set.Make (struct
   type t = base_warning
 
-  let compare = compare_base_warning M.base
+  let compare = compare_base_warning
 end)
