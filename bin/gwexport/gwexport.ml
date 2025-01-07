@@ -104,8 +104,8 @@ let speclist c =
        of the grandchildren of the root person*." );
     ( "-key",
       Arg.String (fun s -> c := { !c with keys = s :: !c.keys }),
-      "<KEY> key reference of root person. Used for -a/-d/-ad options. Can be \
-       used multiple times. Key format is \"First Name.occ SURNAME\"" );
+      "<KEY> key reference of person. Used for -a/-d/-ad/-parentship options. \
+       Can be used multiple times. Key format is \"First Name.occ SURNAME\"" );
     ( "-c",
       Arg.Int (fun s -> c := { !c with censor = s }),
       "<NUM>: when a person is born less than <num> years ago, it is not \
@@ -414,10 +414,13 @@ let select_from_set (ipers : Geneweb.Util.IperSet.t)
   (sel_per, sel_fam)
 
 let check_options options =
+  let conditional_check ~condition check =
+    if not @@ condition () then Ok () else check ()
+  in
   let check_base () =
     if Option.is_some options.base then Ok () else Error "Missing base name."
   in
-  let check_keys () =
+  let check_root_person_keys () =
     let options_requiring_key =
       [ options.asc; options.desc; options.ascdesc ]
     in
@@ -425,10 +428,17 @@ let check_options options =
     then Ok ()
     else Error "Missing root person."
   in
+  let check_parentship_keys () =
+    if options.keys <> [] && List.length options.keys mod 2 = 0 then Ok ()
+    else Error "Missing person."
+  in
   let ( >>= ) = Result.bind in
-  check_base () >>= check_keys
+  check_base () >>= check_root_person_keys >>= fun () ->
+  conditional_check
+    ~condition:(fun () -> options.parentship)
+    check_parentship_keys
 
-let select opts ips =
+let select opts =
   let () =
     Result.iter_error
       (fun error_message ->
@@ -440,10 +450,7 @@ let select opts ips =
   match opts.base with
   | None -> assert false
   | Some (_, base) ->
-      let ips =
-        List.rev_append ips
-        @@ List.filter_map (Gutil.person_of_string_key base) opts.keys
-      in
+      let ips = List.filter_map (Gutil.person_of_string_key base) opts.keys in
       let not_censor_p, not_censor_f =
         if opts.censor <> 0 then (
           let pmark = Gwdb.iper_marker (Gwdb.ipers base) 0 in
@@ -539,7 +546,10 @@ let select opts ips =
                   | [ _ ] -> assert false
                 in
                 loop Geneweb.Util.IperSet.empty Geneweb.Util.IfamSet.empty ips
-              else ((fun _ -> true), fun _ -> true)
+              else
+                ( (fun person_id ->
+                    ips = [] || List.exists (Gwdb.eq_iper person_id) ips),
+                  fun _ -> ips = [] )
       in
       ( (fun i -> not_censor_p i && sel_per i),
         fun i -> not_censor_f i && sel_fam i )

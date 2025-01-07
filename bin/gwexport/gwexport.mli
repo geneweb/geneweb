@@ -47,8 +47,7 @@ val errmsg : Arg.usage_msg
 (** Default error message.
     This is the third argument of Arg.parse. *)
 
-val select :
-  gwexport_opts -> Gwdb.iper list -> (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
-(** [select opts ips]
+val select : gwexport_opts -> (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
+(** [select opts]
     Return filters for [iper] and [ifam] to be used when exporting a (portion of a) base.
 *)

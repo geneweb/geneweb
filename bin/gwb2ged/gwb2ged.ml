@@ -9,7 +9,7 @@ let main () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) (Gwexport.anonfun opts) Gwexport.errmsg;
   let opts = !opts in
-  let select = Gwexport.select opts [] in
+  let select = Gwexport.select opts in
   Gwb2ged_lib.gwb2ged !with_indexes opts select
 
 let () = Printexc.catch main ()

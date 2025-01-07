@@ -1710,7 +1710,7 @@ let gwu_simple ~export_isolated opts =
   match opts.Gwexport.base with
   | None -> assert false
   | Some (ifile, base) ->
-      let select = Gwexport.select opts [] in
+      let select = Gwexport.select opts in
       let in_dir =
         if Filename.check_suffix ifile ".gwb" then ifile else ifile ^ ".gwb"
       in
