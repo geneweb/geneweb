@@ -1031,8 +1031,7 @@ let eq_person p1 p2 = eq_iper (get_iper p1) (get_iper p2)
 let eq_warning w1 w2 = Warning.compare_base_warning w1 w2 = 0
 
 let person_warnings conf base p =
-  let module WarningSet = Warning.BaseWarningSet in
-  let w = ref WarningSet.empty in
+  let w = ref Warning.BaseWarningSet.empty in
 
   let filter_close_children =
     let is_one_of_children p p1 p2 = eq_person p p1 || eq_person p p2 in
@@ -1052,7 +1051,7 @@ let person_warnings conf base p =
 
   let filter x =
     if filter_close_children x && Util.auth_warning conf base x then
-      w := WarningSet.add x !w
+      w := Warning.BaseWarningSet.add x !w
   in
   ignore @@ person base filter p;
   on_person_update base filter p;
@@ -1060,4 +1059,4 @@ let person_warnings conf base p =
     (fun ifam ->
       check_siblings ~onchange:false base filter (ifam, foi base ifam) ignore)
     (get_family p);
-  Warning.handle_homonymous base (WarningSet.elements !w)
+  Warning.handle_homonymous base (Warning.BaseWarningSet.elements !w)
