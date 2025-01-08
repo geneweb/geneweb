@@ -221,7 +221,6 @@ let syntax_links conf wi s =
             if wi.wi_mark_if_not_public (fn, sn, oc) then "style=\"color:red\""
             else ""
           in
-          Printf.eprintf "color: %s, %s;\n" color color1;
           let t =
             if cancel_links || name = "x x" then name
             else if wi.wi_person_exists (fn, sn, oc) then
