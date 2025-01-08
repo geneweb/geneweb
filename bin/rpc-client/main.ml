@@ -17,16 +17,24 @@ let onmessage tbl (ev : WS.webSocket WS.messageEvent Js.t) =
   try
     let j = Y.from_string (Js.to_string ev##.data) in
     match Json_rpc.Response.of_json j with
-    | Some r -> (
+    | Ok r -> (
         match r.id with
         | Some id ->
             let callback = H.find tbl id in
             H.remove tbl id;
             callback r;
             Js._true
-        | None -> Js._false)
-    | _ -> Js._false
-  with U.Type_error _ -> Js._false
+        | None ->
+            let err = Result.get_error r.result in
+            let msg = Fmt.str "%a" Json_rpc.Response.Error.pp err in
+            Firebug.console##log (Js.string msg);
+            Js._false)
+    | Error err ->
+        Firebug.console##error (Js.string err);
+        Js._false
+  with U.Type_error _ ->
+    Firebug.console##error (Js.string "not a valid JSON message");
+    Js._false
 
 let websocket_promise ~uri ~onmessage =
   Promise.make (fun ~resolve ~reject ->

@@ -26,9 +26,10 @@ let route l =
               Lwt.return @@ Response.(error ~id @@ Error.method_not_found ())
           | Some (Service.Binding (desc, f)) -> (
               match%lwt Service.Desc.eval desc f params with
-              | Some r -> Lwt.return @@ Response.ok ~id r
-              | None ->
-                  Lwt.return @@ Response.(error ~id @@ Error.invalid_params ()))
+              | Ok r -> Lwt.return @@ Response.ok ~id r
+              | Error e ->
+                  Lwt.return
+                  @@ Response.(error ~id @@ Error.server_error ~code:10 e))
         in
         match params with
         | Some (`List l) -> call l

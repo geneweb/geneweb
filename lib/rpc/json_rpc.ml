@@ -1,9 +1,17 @@
 module Y = Yojson.Safe
 module U = Yojson.Safe.Util
 
-let ( let* ) = Option.bind
+let ( let* ) = Result.bind
 
 type json = Yojson.Safe.t
+
+module type Serializable = sig
+  type t
+
+  val to_json : t -> json
+  val of_json : json -> (t, string) result
+  val pp : t Fmt.t
+end
 
 (* According to the specification, a valid JSON-RPC v2.0 must contain
    a field "jsonrpc" whose the value is exactly this string. *)
@@ -31,9 +39,9 @@ module Id = struct
   let to_json t = (t :> json)
 
   let of_json = function
-    | `String s -> Some (`String s)
-    | `Int i -> Some (`Int i)
-    | #json -> None
+    | `String s -> Ok (`String s)
+    | `Int i -> Ok (`Int i)
+    | #json -> Error "unexpected identifier type"
 
   let pp ppf t = Y.pretty_print ppf @@ to_json t
 end
@@ -44,12 +52,14 @@ module Structured = struct
   let to_json t = (t :> json)
 
   let of_json = function
-    | `Assoc l -> Some (`Assoc l)
-    | `List l -> Some (`List l)
-    | #json -> None
+    | `Assoc l -> Ok (`Assoc l)
+    | `List l -> Ok (`List l)
+    | #json -> Error "unexpected type for structured object"
 
   let pp ppf t = Y.pretty_print ppf @@ to_json t
 end
+
+let err_illformed_msg = "ill-formed JSON-RPC 2.0 message"
 
 module Notification = struct
   type t = { meth : string; params : Structured.t option }
@@ -63,16 +73,16 @@ module Notification = struct
     | None -> to_msg [ ("method", `String t.meth) ]
 
   let of_json j =
-    if not @@ is_jsonrpc j then None
+    if not @@ is_jsonrpc j then Error err_illformed_msg
     else
       try
         match (U.member "id" j, U.member "method" j, U.member "params" j) with
-        | `Null, `String meth, `Null -> Some (make meth)
+        | `Null, `String meth, `Null -> Ok (make meth)
         | `Null, `String meth, p ->
             let* params = Structured.of_json p in
-            Some (make ~params meth)
-        | _ -> None
-      with U.Type_error _ -> None
+            Ok (make ~params meth)
+        | _ -> Error err_illformed_msg
+      with U.Type_error _ -> Error err_illformed_msg
 
   let pp ppf t = Y.pretty_print ppf @@ to_json t
 end
@@ -94,17 +104,17 @@ module Request = struct
     | None -> to_msg [ ("id", Id.to_json t.id); ("method", `String t.meth) ]
 
   let of_json j =
-    if not @@ is_jsonrpc j then None
+    if not @@ is_jsonrpc j then Error err_illformed_msg
     else
       try
         let* id = U.member "id" j |> Id.of_json in
         match (U.member "method" j, U.member "params" j) with
-        | `String meth, `Null -> Some (make id meth)
+        | `String meth, `Null -> Ok (make id meth)
         | `String meth, p ->
             let* params = Structured.of_json p in
-            Some (make ~params id meth)
-        | _ -> None
-      with U.Type_error _ -> None
+            Ok (make ~params id meth)
+        | _ -> Error err_illformed_msg
+      with U.Type_error _ -> Error err_illformed_msg
 
   let pp ppf t = Y.pretty_print ppf @@ to_json t
 end
@@ -132,7 +142,7 @@ module Response = struct
     let internal_error ?data () = error ?data (-32603) "Internal JSON-RPC error"
 
     let server_error ?data ~code msg =
-      if code < -32_099 || code > -32_000 then Fmt.invalid_arg "internal_error";
+      if code < -32_099 || code > -32_000 then Fmt.invalid_arg "server_error";
       error ?data code msg
 
     let to_json { code; message; data } =
@@ -147,12 +157,11 @@ module Response = struct
     let of_json j =
       try
         match (U.member "code" j, U.member "message" j, U.member "data" j) with
-        | `Int code, `String message, `Null ->
-            Some { code; message; data = None }
+        | `Int code, `String message, `Null -> Ok { code; message; data = None }
         | `Int code, `String message, data ->
-            Some { code; message; data = Some data }
-        | _ -> None
-      with U.Type_error _ -> None
+            Ok { code; message; data = Some data }
+        | _ -> Error "ill-formed error message"
+      with U.Type_error _ -> Error "ill-formed error message"
 
     let pp ppf t = Y.pretty_print ppf @@ to_json t
   end
@@ -173,20 +182,27 @@ module Response = struct
         assert false
 
   let of_json j =
-    if not @@ is_jsonrpc j then None
+    if not @@ is_jsonrpc j then Error "ill-formed response message"
     else
       try
-        let error_opt = U.member "error" j |> Error.of_json in
+        let error_opt =
+          match U.member "error" j with
+          | `Null -> None
+          | j -> Some (Error.of_json j)
+        in
         match (U.member "id" j, U.member "result" j, error_opt) with
-        | `Null, `Null, Some e -> Some (error e)
+        | `Null, `Null, Some e ->
+            let* e = e in
+            Ok (error e)
         | id, `Null, Some e ->
             let* id = Id.of_json id in
-            Some (error ~id e)
+            let* e = e in
+            Ok (error ~id e)
         | id, obj, None when obj <> `Null ->
             let* id = Id.of_json id in
-            Some (ok ~id obj)
-        | _ -> None
-      with U.Type_error _ -> None
+            Ok (ok ~id obj)
+        | _ -> Error "ill-formed response message"
+      with U.Type_error _ -> Error "ill-formed response message"
 
   let pp ppf t = Y.pretty_print ppf @@ to_json t
 end

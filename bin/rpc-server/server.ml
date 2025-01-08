@@ -28,7 +28,7 @@ let rpc_handler handler sockaddr target content =
   try
     let j = Y.from_string content in
     match Json_rpc.Request.of_json j with
-    | Some request ->
+    | Ok request ->
         Logs_lwt.debug (fun k ->
             k "Received the Request object from %a:@ %a" Util.pp_sockaddr
               sockaddr Json_rpc.Request.pp request)
@@ -38,10 +38,10 @@ let rpc_handler handler sockaddr target content =
             k "Response message to %a:@ %a" Util.pp_sockaddr sockaddr
               Json_rpc.Response.pp response)
         >>= fun () -> Lwt.return @@ response_to_string response
-    | None ->
+    | Error e ->
         Logs_lwt.debug (fun k ->
-            k "The client sent an invalid Request object:@ %a"
-              (Y.pretty_print ~std:true) j)
+            k "The client sent an invalid Request object:@ %a@ error: %s"
+              (Y.pretty_print ~std:true) j e)
         >>= fun () ->
         let err = Json_rpc.Response.(error @@ Error.invalid_request ()) in
         Lwt.return @@ response_to_string err

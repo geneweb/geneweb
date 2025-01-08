@@ -6,7 +6,9 @@
 type 'a t
 (** Type of encoding of the 'a value. *)
 
-val val_of_json : 'a t -> Yojson.Safe.t -> 'a option
+type 'a res = ('a, string) result
+
+val val_of_json : 'a t -> Yojson.Safe.t -> 'a res
 (** [val_of_json e j] returns the value of type 'a that is encoded in [j]
     or a string error if [j] does not encode such a value. *)
 
@@ -24,7 +26,7 @@ val enum : name:string -> ('a * string) list -> 'a t
 
 val generic :
   to_json:('a -> Yojson.Safe.t) ->
-  of_json:(Yojson.Safe.t -> 'a option) ->
+  of_json:(Yojson.Safe.t -> 'a res) ->
   pp:unit Fmt.t ->
   'a t
 (** [generic ~to_json ~of_jon ~pp] creates a encoding for the type ['a]

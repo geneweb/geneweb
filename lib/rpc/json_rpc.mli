@@ -6,38 +6,43 @@
 
 type json = Yojson.Safe.t
 
+module type Serializable = sig
+  type t
+
+  val to_json : t -> json
+  val of_json : json -> (t, string) result
+  val pp : t Fmt.t
+end
+
 module Id : sig
   type t = [ `String of string | `Int of int ]
 
   val hash : t -> int
   val equal : t -> t -> bool
-  val to_json : t -> json
-  val pp : t Fmt.t
+
+  include Serializable with type t := t
 end
 
 module Structured : sig
   type t = [ `Assoc of (string * json) list | `List of json list ]
 
-  val to_json : t -> json
-  val pp : t Fmt.t
+  include Serializable with type t := t
 end
 
 module Notification : sig
   type t = private { meth : string; params : Structured.t option }
 
   val make : ?params:Structured.t -> string -> t
-  val to_json : t -> json
-  val of_json : json -> t option
-  val pp : t Fmt.t
+
+  include Serializable with type t := t
 end
 
 module Request : sig
   type t = private { id : Id.t; meth : string; params : Structured.t option }
 
   val make : ?params:Structured.t -> Id.t -> string -> t
-  val to_json : t -> json
-  val of_json : json -> t option
-  val pp : t Fmt.t
+
+  include Serializable with type t := t
 end
 
 module Response : sig
@@ -65,16 +70,13 @@ module Response : sig
 
         @raise Failwith if the code is not between -32099 and -32000. *)
 
-    val to_json : t -> json
-    val of_json : json -> t option
-    val pp : t Fmt.t
+    include Serializable with type t := t
   end
 
   type t = private { id : Id.t option; result : (json, Error.t) Result.t }
 
   val ok : id:Id.t -> json -> t
   val error : ?id:Id.t -> Error.t -> t
-  val to_json : t -> json
-  val of_json : json -> t option
-  val pp : t Fmt.t
+
+  include Serializable with type t := t
 end

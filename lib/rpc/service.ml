@@ -3,9 +3,11 @@ module U = Yojson.Safe.Util
 module MS = Map.Make (String)
 open Lwt.Infix
 
+type 'a res = ('a, string) Lwt_result.t
+
 module Desc = struct
   type ('a, 'r) t =
-    | R : 'a Encoding.t -> ('a Lwt.t, 'a) t
+    | R : 'a Encoding.t -> ('a res, 'a) t
     | N : 'a Encoding.t * ('b, 'r) t -> ('a -> 'b, 'r) t
 
   let rec pp_desc : type a r. (a, r) t Fmt.t =
@@ -14,16 +16,19 @@ module Desc = struct
     | R a -> Encoding.pp ppf a
     | N (a, r) -> Fmt.pf ppf "%a -> %a" Encoding.pp a pp_desc r
 
-  let rec eval :
-      type a b. (a, b) t -> a -> Y.Safe.t list -> Y.Safe.t option Lwt.t =
+  let rec eval : type a b. (a, b) t -> a -> Y.Safe.t list -> Y.Safe.t res =
    fun desc f l ->
     match (desc, l) with
-    | R a, [] -> f >>= fun f -> Lwt.return (Some (Encoding.val_to_json a f))
+    | R a, [] -> (
+        f >>= fun f ->
+        match f with
+        | Ok f -> Lwt_result.return (Encoding.val_to_json a f)
+        | Error e -> Lwt_result.fail e)
     | N (a, g), x :: xs -> (
         match Encoding.val_of_json a x with
-        | Some y -> eval g (f y) xs
-        | None -> Lwt.return None)
-    | _ -> Lwt.return None
+        | Ok y -> eval g (f y) xs
+        | Error e -> Lwt_result.fail e)
+    | _ -> Lwt_result.fail "TODO"
 
   let rec arity : type a b. (a, b) t -> int =
    fun desc -> match desc with R _ -> 0 | N (_, g) -> 1 + arity g
@@ -49,10 +54,12 @@ let find = MS.find_opt
 let fold = MS.fold
 
 module PingPong = struct
-  let ping = decl "ping" Desc.Syntax.(ret string) (Lwt.return "pong")
+  let ping = decl "ping" Desc.Syntax.(ret string) (Lwt_result.return "pong")
 
   let echo =
-    decl "echo" Desc.Syntax.(string @-> ret string) (fun s -> Lwt.return s)
+    decl "echo"
+      Desc.Syntax.(string @-> ret string)
+      (fun s -> Lwt_result.return s)
 
   let srv = empty |> add ping |> add echo
 end

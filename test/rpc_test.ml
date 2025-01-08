@@ -10,8 +10,8 @@ let rpc_handler content =
   try
     let j = Y.from_string content in
     match Json_rpc.Response.of_json j with
-    | Some r -> Fmt.pr "%a@." Json_rpc.Response.pp r
-    | None -> Fmt.pr "Cannot understand the answer!@."
+    | Ok r -> Fmt.pr "%a@." Json_rpc.Response.pp r
+    | Error err -> Fmt.pr "%s@." err
   with U.Type_error (s, _) ->
     Fmt.pr "The server sent an invalid JSON message:@ %s@ Parser error:@ %s@."
       content s

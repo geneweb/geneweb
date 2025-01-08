@@ -1,22 +1,36 @@
 module Y = Yojson
 module U = Yojson.Safe.Util
 
-let ( let* ) = Option.bind
+type 'a res = ('a, string) result
 
-let rec map_bind (f : 'a -> 'b option) (l : 'a list) : 'b list option =
+let ( let* ) = Result.bind
+
+let rec map_bind (f : 'a -> 'b res) (l : 'a list) : 'b list res =
   match l with
-  | [] -> Some []
+  | [] -> Ok []
   | x :: xs ->
       let* y = f x in
       let* ys = map_bind f xs in
-      Some (y :: ys)
+      Ok (y :: ys)
 
-let to_list_option (json : Y.Safe.t) : Y.Safe.t list option =
-  try Some (U.to_list json) with Y.Json_error _ -> None
+let to_list_res (json : Y.Safe.t) : Y.Safe.t list res =
+  try Ok (U.to_list json) with Y.Json_error _ -> Error "invalid list"
+
+let to_bool_res (json : Y.Safe.t) : bool res =
+  try Ok (U.to_bool json) with Y.Json_error _ -> Error "invalid bool"
+
+let to_float_res (json : Y.Safe.t) : float res =
+  try Ok (U.to_float json) with Y.Json_error _ -> Error "invalid float"
+
+let to_int_res (json : Y.Safe.t) : int res =
+  try Ok (U.to_int json) with Y.Json_error _ -> Error "invalid integer"
+
+let to_string_res (json : Y.Safe.t) : string res =
+  try Ok (U.to_string json) with Y.Json_error _ -> Error "invalid string"
 
 type 'a generic = {
   to_json : 'a -> Y.Safe.t;
-  of_json : Y.Safe.t -> 'a option;
+  of_json : Y.Safe.t -> 'a res;
   pp : unit Fmt.t;
 }
 
@@ -34,43 +48,48 @@ type 'a t =
   | Tuple4 : 'a t * 'b t * 'c t * 'd t -> ('a * 'b * 'c * 'd) t
   | Gen : 'a generic -> 'a t
 
-let rec val_of_json : type a. a t -> Y.Safe.t -> a option =
+let rec val_of_json : type a. a t -> Y.Safe.t -> (a, string) result =
  fun t j ->
   match t with
-  | Unit -> ( match j with `Assoc [ ("Unit", `Null) ] -> Some () | _ -> None)
-  | Bool -> U.to_bool_option j
-  | Float -> U.to_float_option j
-  | Int -> U.to_int_option j
+  | Unit -> (
+      match j with
+      | `Assoc [ ("Unit", `Null) ] -> Ok ()
+      | _ -> Error "invalid unit value")
+  | Bool -> to_bool_res j
+  | Float -> to_float_res j
+  | Int -> to_int_res j
   | List e ->
       let g = val_of_json e in
-      let* l = to_list_option j in
+      let* l = to_list_res j in
       map_bind g l
   | Array e ->
       let g = val_of_json e in
-      let* l = to_list_option j in
+      let* l = to_list_res j in
       let* l = map_bind g l in
-      Some (Array.of_list l)
-  | String -> U.to_string_option j
+      Ok (Array.of_list l)
+  | String -> to_string_res j
   | Option e -> (
       match j with
-      | `Assoc [ ("None", `Null) ] -> Some None
-      | `Assoc [ ("Some", j) ] -> Some (val_of_json e j)
-      | _ -> None)
+      | `Assoc [ ("None", `Null) ] -> Ok None
+      | `Assoc [ ("Some", j) ] ->
+          let* v = val_of_json e j in
+          Ok (Some v)
+      | _ -> Error "invalid option type")
   | Tuple2 (e1, e2) -> (
       match j with
       | `List [ j1; j2 ] ->
           let* v1 = val_of_json e1 j1 in
           let* v2 = val_of_json e2 j2 in
-          Some (v1, v2)
-      | _ -> None)
+          Ok (v1, v2)
+      | _ -> Error "invalid tuple of size 2")
   | Tuple3 (e1, e2, e3) -> (
       match j with
       | `List [ j1; j2; j3 ] ->
           let* v1 = val_of_json e1 j1 in
           let* v2 = val_of_json e2 j2 in
           let* v3 = val_of_json e3 j3 in
-          Some (v1, v2, v3)
-      | _ -> None)
+          Ok (v1, v2, v3)
+      | _ -> Error "invalid tuple of size 3")
   | Tuple4 (e1, e2, e3, e4) -> (
       match j with
       | `List [ j1; j2; j3; j4 ] ->
@@ -78,8 +97,8 @@ let rec val_of_json : type a. a t -> Y.Safe.t -> a option =
           let* v2 = val_of_json e2 j2 in
           let* v3 = val_of_json e3 j3 in
           let* v4 = val_of_json e4 j4 in
-          Some (v1, v2, v3, v4)
-      | _ -> None)
+          Ok (v1, v2, v3, v4)
+      | _ -> Error "invalid tuple of size 4")
   | Gen g -> g.of_json j
 
 let rec val_to_json : type a. a t -> a -> Y.Safe.t =
@@ -149,8 +168,8 @@ let enum ~name l =
     fun j ->
       match j with
       | `String s -> (
-          match List.assoc s rv with exception Not_found -> None | v -> Some v)
-      | _ -> None
+          try Ok (List.assoc s rv) with Not_found -> Error "invalid enum")
+      | _ -> Error "invalid enum"
   in
   let pp ppf () = Fmt.string ppf name in
   Gen { to_json; of_json; pp }

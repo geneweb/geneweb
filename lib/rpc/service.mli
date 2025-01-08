@@ -1,3 +1,5 @@
+type 'a res = ('a, string) Lwt_result.t
+
 module Desc : sig
   (* The type [(!'a, !'r) t] would be more precise, but OCaml 4.08 does
      not support the injectivity annotation. *)
@@ -5,7 +7,7 @@ module Desc : sig
   (** Type of the encoding of an arrow of type 'a. The parametric type [r] is
       the return type of the arrow. *)
 
-  val eval : ('a, _) t -> 'a -> Yojson.Safe.t list -> Yojson.Safe.t option Lwt.t
+  val eval : ('a, _) t -> 'a -> Yojson.Safe.t list -> Yojson.Safe.t res
   val arity : ('a, _) t -> int
 
   val pp_desc : ('a, 'r) t Fmt.t
@@ -15,7 +17,7 @@ module Desc : sig
   module Syntax : sig
     include module type of Encoding.Syntax
 
-    val ret : 'a Encoding.t -> ('a Lwt.t, 'a) t
+    val ret : 'a Encoding.t -> ('a res, 'a) t
     val ( @-> ) : 'a Encoding.t -> ('b, 'r) t -> ('a -> 'b, 'r) t
   end
 end
@@ -45,7 +47,7 @@ val find : string -> t -> binding option
 val fold : (string -> binding -> 'a -> 'a) -> t -> 'a -> 'a
 
 module PingPong : sig
-  val ping : (string Lwt.t, string) meth
-  val echo : (string -> string Lwt.t, string) meth
+  val ping : (string res, string) meth
+  val echo : (string -> string res, string) meth
   val srv : t
 end
