@@ -187,42 +187,44 @@ let output_error =
             | Some fn -> output_file conf fn
             | None -> Output.print_sstring conf ""))
 
-(* is p2 an ancestor of p1? *)
-(* code copied from MergeInd.ml *)
-let is_ancestor conf base p1 p2 =
-  let ip1 = Gwdb.get_iper p1 in
-  let ip2 = Gwdb.get_iper p2 in
-  if ip1 = ip2 then true
+let rec ancestors conf base n set ip =
+  if n = 0 then set
   else
-    let rec loop n set tl =
-      if n = 0 then false
-      else
-        match tl with
-        | [] -> false
-        | ip :: tl -> (
-            if IperSet.mem ip set then loop n set tl
-            else if ip = ip1 then true
-            else
-              let set = IperSet.add ip set in
-              match Gwdb.get_parents (Gwdb.poi base ip) with
-              | Some ifam ->
-                  let cpl = Gwdb.foi base ifam in
-                  loop (n - 1) set
-                    (Gwdb.get_father cpl :: Gwdb.get_mother cpl :: tl)
-              | None -> loop n set tl)
+    let set =
+      if
+        Gwdb.sou base (Gwdb.get_first_name (Gwdb.poi base ip)) <> "?"
+        && Gwdb.sou base (Gwdb.get_surname (Gwdb.poi base ip)) <> "?"
+      then ip :: set
+      else set
     in
-    let max =
-      try List.assoc "is_semi_public_max" conf.Config.base_env
-      with Not_found -> "4" |> String.trim
-      (* limit search to n generations *)
-    in
-    let max = if max = "" then 4 else int_of_string max in
-    loop max IperSet.empty [ ip2 ]
+    match Gwdb.get_parents (Gwdb.poi base ip) with
+    | Some ifam ->
+        let cpl = Gwdb.foi base ifam in
+        let set = ancestors conf base (n - 1) set (Gwdb.get_father cpl) in
+        let set = ancestors conf base (n - 1) set (Gwdb.get_mother cpl) in
+        set
+    | None -> set
+
+let rec descendants conf base set ip =
+  let set = ip :: set in
+  let fams = Gwdb.get_family (Gwdb.poi base ip) in
+  Array.fold_left
+    (fun set ifam ->
+      let children = Gwdb.get_children (Gwdb.foi base ifam) in
+      Array.fold_left
+        (fun set child ->
+          let set = child :: set in
+          descendants conf base set child)
+        set children)
+    set fams
 
 (* is semi public if the user (identified by conf.userkey is semi public
    and p is one of its descendant or ancesstor
 *)
-let is_semi_public conf base p =
+
+let is_semi_public conf base p = Gwdb.get_access p = SemiPublic
+
+let is_related conf base p =
   let split_key key =
     let dot = match String.index_opt key '.' with Some i -> i | _ -> -1 in
     let space = match String.index_opt key ' ' with Some i -> i | _ -> -1 in
@@ -233,17 +235,80 @@ let is_semi_public conf base p =
     else ("?", "", "?")
   in
   (* TODO add ip of userkey in config *)
-  let fn, oc, sn = split_key conf.Config.userkey in
-  match
-    Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
-  with
-  | Some ip1 ->
-      Gwdb.get_access (Gwdb.poi base ip1)
-      = Public (* will be SemiPublic in due time *)
-      && (Gwdb.get_access p = Public
-         || is_ancestor conf base p (Gwdb.poi base ip1)
-         || is_ancestor conf base (Gwdb.poi base ip1) p)
-  | _ -> false
+  let fname =
+    String.concat Filename.dir_sep
+      [
+        Secure.base_dir ();
+        conf.Config.bname ^ ".gwb";
+        "family-" ^ conf.Config.userkey;
+      ]
+  in
+  let _print_family family comment =
+    Printf.eprintf "Family: %s\n" comment;
+    List.iter
+      (fun ip ->
+        Printf.eprintf "   %s\n" (Gutil.designation base (Gwdb.poi base ip)))
+      family
+  in
+  if conf.Config.userkey <> "" then (
+    (if
+     try List.assoc "related" conf.Config.base_env = "reset"
+     with Not_found -> false
+    then
+     try Sys.remove fname
+     with Sys_error _ -> Printf.eprintf "Error when removing %s\n" fname);
+    let family =
+      Mutil.read_or_create_value fname (fun () ->
+          match conf.Config.userip with
+          | Some ip ->
+              let family = [ ip ] in
+              let max =
+                try List.assoc "is_semi_public_max" conf.Config.base_env
+                with Not_found -> "2" |> String.trim
+                (* limit search to n generations *)
+              in
+              let max = if max = "" then 2 else int_of_string max in
+              let family = ancestors conf base (max + 1) family ip in
+              (* siblings
+                 let family =
+                       (match Gwdb.get_parents (Gwdb.poi base ip) with
+                       | Some ifam -> Gwdb.get_children (Gwdb.foi base ifam) |> Array.to_list
+                       | None -> [])
+                       @ family
+                 in *)
+              (* spouses *)
+              let family =
+                (let ifams = Gwdb.get_family (Gwdb.poi base ip) in
+                 Array.fold_left
+                   (fun acc ifam ->
+                     let sp =
+                       let f = Gwdb.foi base ifam in
+                       if ip = Gwdb.get_father f then Gwdb.get_mother f
+                       else Gwdb.get_father f
+                     in
+                     if
+                       Gwdb.sou base (Gwdb.get_first_name (Gwdb.poi base sp))
+                       <> "?"
+                       && Gwdb.sou base (Gwdb.get_surname (Gwdb.poi base sp))
+                          <> "?"
+                     then sp :: acc
+                     else acc)
+                   [] ifams)
+                @ family
+              in
+              (* relations ? *)
+              let family = descendants conf base family ip in
+              List.sort_uniq compare family
+          | _ -> [])
+    in
+    match
+      Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
+    with
+    | Some ip ->
+        Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
+        && List.mem (Gwdb.get_iper p) family
+    | _ -> false)
+  else false
 
 (** Calcul les droits de visualisation d'une personne en
     fonction de son age.
@@ -265,13 +330,14 @@ let is_semi_public conf base p =
 (* check that p is parent or descendant of conf.key *)
 
 let p_auth conf base p =
-  conf.Config.wizard || conf.friend || is_semi_public conf base p
-  || conf.public_if_titles
+  conf.Config.wizard || conf.Config.friend || is_semi_public conf base p
+  || is_related conf base p
+  || conf.Config.public_if_titles
      && Gwdb.get_access p = IfTitles
      && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
   ||
   let death = Gwdb.get_death p in
-  if death = NotDead then conf.private_years < 1
+  if death = NotDead then conf.Config.private_years < 1
   else
     let check_date d lim none =
       match d with
@@ -279,16 +345,18 @@ let p_auth conf base p =
       | Some d ->
           let a = Date.time_elapsed d conf.today in
           if a.Def.year > lim then true
-          else if a.year < conf.private_years then false
+          else if a.year < conf.Config.private_years then false
           else a.month > 0 || a.day > 0
     in
-    check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) conf.private_years
+    check_date
+      (Gwdb.get_birth p |> Date.cdate_to_dmy_opt)
+      conf.Config.private_years
     @@ fun () ->
     check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) conf.private_years
     @@ fun () ->
     check_date (Gwdb.get_death p |> Date.dmy_of_death) conf.private_years_death
     @@ fun () ->
-    (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
+    (Gwdb.get_access p <> Def.Private && conf.Config.public_if_no_date)
     ||
     let families = Gwdb.get_family p in
     let len = Array.length families in
@@ -297,7 +365,7 @@ let p_auth conf base p =
       && check_date
            (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
           |> Date.cdate_to_dmy_opt)
-           conf.private_years_marriage
+           conf.Config.private_years_marriage
            (fun () -> loop (i + 1))
     in
     loop 0
@@ -357,6 +425,7 @@ let bpath = ref (Legacy.bpath : my_fun_2)
 let portraits_d = ref (Legacy.portraits_d : my_fun_2)
 let images_d = ref (Legacy.images_d : my_fun_2)
 let is_semi_public = ref is_semi_public
+let is_related = ref is_related
 let p_auth = ref p_auth
 let wrap_output = ref wrap_output
 let syslog = ref syslog
