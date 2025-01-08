@@ -51,10 +51,12 @@ type config = {
   debug : bool;
   query_start : float;
   friend : bool;
+  semi_public : bool;
   just_friend_wizard : bool;
   user : string;
   username : string;
   userkey : string;
+  userip : iper option;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;
@@ -132,10 +134,12 @@ let empty =
     debug = false;
     query_start = 0.;
     friend = false;
+    semi_public = false;
     just_friend_wizard = false;
     user = "";
     username = "";
     userkey = "";
+    userip = None;
     auth_scheme = NoAuth;
     command = "";
     indep_command = "";

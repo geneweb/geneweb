@@ -56,10 +56,12 @@ type config = {
   debug : bool;
   query_start : float;
   friend : bool;
+  semi_public : bool;
   just_friend_wizard : bool;
   user : string;
   username : string;
   userkey : string;
+  userip : iper option;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;

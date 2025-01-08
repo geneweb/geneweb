@@ -139,10 +139,6 @@ val is_public : config -> base -> person -> bool
     - IfTitle and has titles or
     - is_old_person) *)
 
-val is_semi_public : config -> base -> person -> bool
-(** tells if person is semi_public
-    - access = SemiPublic *)
-
 val pget : config -> base -> iper -> person
 (** Returns person with giving id from the base.
     Wrapper around `Gwdb.poi` defined such as:
