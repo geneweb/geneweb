@@ -48,32 +48,6 @@ type syslog_level =
 
 (* S: Move it to gwd_lib?  *)
 
-val output_error :
-  (?headers:string list ->
-  ?content:Adef.safe_string ->
-  Config.config ->
-  Def.httpStatus ->
-  unit)
-  ref
-(** [!output_error ?headers ?content conf status] default function that send the http status [status].
-    Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
-*)
-
-val is_semi_public : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
-(** Check if a person is an asc or desc of conf.userkey *)
-
-val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
-(** Check if a person should be displayed or not *)
-
-val syslog : (syslog_level -> string -> unit) ref
-(** [!syslog level log] log message [log] with gravity level [level] on stderr. *)
-
-val wrap_output :
-  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) ref
-(** [wrap_output conf title content]
-    Wrap the display of [title] and [content] in a defined template.
-*)
-
 val init : string -> unit
 (** Function called before gwd starts
     e.g. inititialise assets folders in Secure module. *)
