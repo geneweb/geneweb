@@ -2064,7 +2064,6 @@ let person_exists conf base (fn, sn, oc) =
   | Some _ | None -> auth
 
 let mark_if_not_public conf base (fn, sn, oc) =
-  Printf.eprintf "mark_if_not_public %s %s\n" fn sn;
   match p_getenv conf.env "red_if_not_public" with
   | Some "on" -> (
       match person_of_key base fn sn oc with
