@@ -3583,7 +3583,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
   | "is_public" -> Util.is_public conf base p
-  | "is_semi_public" -> !GWPARAM.is_semi_public conf base p
+  | "is_semi_public" -> !GWPARAM.is_semi_public p
+  | "is_related" -> !GWPARAM.is_related conf base p
   | "is_restricted" -> is_hidden p
   | _ -> raise Not_found
 
@@ -3656,7 +3657,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       in
       if (not p_auth) && is_hide_names conf p then str_val "x x"
       else if force_surname then gen_person_text conf base p |> safe_val
-      else gen_person_text ~sn:false ~chk:false conf base p |> safe_val
+      else gen_person_text ~sn:false conf base p |> safe_val
   | "consanguinity" ->
       if p_auth then
         string_of_decimal_num conf
@@ -4044,6 +4045,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if is_hide_names conf p && not p_auth then null_val
       else Name.strip_c (p_surname base p) '"' |> str_val
   | "title" -> person_title conf base p |> safe_val
+  | "p_auth" ->
+      Format.sprintf "p_auth %s\n" (if p_auth then "true" else "false")
+      |> str_val
   | _ -> raise Not_found
 
 and eval_witness_relation_var conf base env
