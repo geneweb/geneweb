@@ -86,8 +86,8 @@ module Search = struct
               @@ List.to_seq
                    [
                      Index.search words i;
-                     (* Index.search_prefix words i; *)
-                     (* Index.fuzzy_search ~max_dist:1 words i; *)
+                     Index.search_prefix words i;
+                     Index.fuzzy_search ~max_dist:1 words i;
                    ]
             in
             Lwt.return r)

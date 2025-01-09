@@ -65,7 +65,8 @@ module Make (O : OrderedType) = struct
      starting from index [lo]. Returns the index of [e] if found, or the index
      where it could be inserted to maintain ascending order. *)
   let exponential_search e t lo =
-    if O.compare t.(lo) e = 0 then `Found lo
+    binary_search e t lo (cardinal t)
+    (* if O.compare t.(lo) e = 0 then `Found lo
     else
       let len = cardinal t in
       let rec loop i =
@@ -77,7 +78,7 @@ module Make (O : OrderedType) = struct
           else if c = 0 then `Found j
           else binary_search e t (lo + (i / 2)) j
       in
-      loop 1
+      loop 1 *)
 
   let iterator t =
     let idx = ref 0 in
