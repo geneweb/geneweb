@@ -5,6 +5,5 @@
   (libraries
     geneweb_search
     lwt
-    lwt.unix
     yojson
     fmt))

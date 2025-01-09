@@ -95,16 +95,16 @@ module Make (W : Word.S) (E : Entry) = struct
       let len = W.length w in
       fun i t ->
         if i = len then
-          Option.bind (Trie.data t) @@ fun s -> Some (Flatset.iterator s)
+          match Trie.data t with
+          | Some s -> Flatset.iterator s
+          | None -> Flatset.(iterator @@ of_seq @@ List.to_seq [])
         else
           match Trie.step (W.get w i) t with
-          | exception Not_found -> None
+          | exception Not_found ->
+              Flatset.(iterator @@ of_seq @@ List.to_seq [])
           | t -> loop w (i + 1) t
     in
-    List.fold_left
-      (fun acc w -> match loop w 0 t with Some it -> it :: acc | None -> acc)
-      [] ws
-    |> intersection
+    List.fold_left (fun acc w -> loop w 0 t :: acc) [] ws |> intersection
 
   let search_prefix ps t =
     (* Accumulate in [acc] all the iterators of flatsets in [t] whose the

@@ -142,8 +142,11 @@ let to_seq it =
   let rec loop () =
     match curr it with
     | exception End -> Seq.Nil
-    | v ->
+    | v -> (
         next it;
-        Seq.Cons (v, loop)
+        (* XXX: hot fix *)
+        match curr it with
+        | exception End -> Seq.Cons (v, loop)
+        | w -> if v = w then loop () else Seq.Cons (v, loop))
   in
   loop

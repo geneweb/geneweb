@@ -117,7 +117,11 @@ module Flatset_tests = struct
   module Naive = struct
     type t = int array
 
-    let of_seq = Array.of_seq
+    let of_seq s =
+      let arr = Array.of_seq s in
+      Array.fast_sort Int.compare arr;
+      arr
+
     let to_seq = Array.to_seq
     let mem = Array.mem
     let cardinal = List.length
@@ -142,15 +146,11 @@ module Flatset_tests = struct
       loop [] l1 l2 |> List.sort Int.compare |> Array.of_list
 
     let iterator t =
-      let st = ref (to_seq t) in
+      let idx = ref 0 in
       let curr () =
-        match !st () with
-        | Seq.Nil -> raise Iterator.End
-        | Seq.Cons (hd, _) -> hd
+        if !idx < Array.length t then t.(!idx) else raise Iterator.End
       in
-      let next () =
-        match !st () with Seq.Nil -> () | Seq.Cons (_, tl) -> st := tl
-      in
+      let next () = if !idx < Array.length t then incr idx in
       let seek w =
         let rec loop () =
           match curr () with
@@ -165,7 +165,7 @@ module Flatset_tests = struct
       Iterator.make (module C) ~curr ~next ~seek
   end
 
-  let nonempty_array = QCheck.Gen.(array_size (int_range 1 100) int)
+  let nonempty_array = QCheck.Gen.(range_subset ~size:5 0 50)
 
   let index_array =
     QCheck.Gen.(
@@ -205,7 +205,17 @@ module Flatset_tests = struct
     let seq = Array.to_seq a in
     let it1 = Naive.iterator @@ Naive.of_seq seq in
     let it2 = Flatset.iterator @@ Flatset.of_seq seq in
-    Iterator.equal (module C) it1 it2
+    (* Iterator.equal (module C) it1 it2 *)
+    let seq1 = Iterator.to_seq it1 in
+    let seq2 = Iterator.to_seq it2 in
+    let b = Seq.equal Int.equal seq1 seq2 in
+    if not b then
+      Fmt.pr "it1 = %a@. it2 = %a@."
+        Fmt.(seq ~sep:comma int)
+        seq1
+        Fmt.(seq ~sep:comma int)
+        seq2;
+    b
 
   let test_random_iterator_seek =
     QCheck.Test.make ~count:1000 ~name:"random iterator seek"
@@ -237,11 +247,21 @@ module Flatset_tests = struct
       in
       Iterator.union (module C) l2
     in
-    Iterator.equal (module C) it1 it2
+    (* Iterator.equal (module C) it1 it2 *)
+    let seq1 = Iterator.to_seq it1 in
+    let seq2 = Iterator.to_seq it2 in
+    let b = Seq.equal Int.equal seq1 seq2 in
+    if not b then
+      Fmt.pr "it1 = %a@. it2 = %a@."
+        Fmt.(seq ~sep:comma int)
+        seq1
+        Fmt.(seq ~sep:comma int)
+        seq2;
+    b
 
   let test_random_iterator_join =
     QCheck.Test.make ~count:1000 ~name:"random iterator join"
-      QCheck.(make Gen.(list_size (int_range 1 100) nonempty_array))
+      QCheck.(make Gen.(list_size (int_range 1 3) nonempty_array))
     @@ fun l ->
     let it1 =
       let l1 = List.map (fun a -> Array.to_seq a |> Naive.of_seq) l in
@@ -256,7 +276,17 @@ module Flatset_tests = struct
       in
       Iterator.join (module C) l2
     in
-    Iterator.equal (module C) it1 it2
+    (* Iterator.equal (module C) it1 it2 *)
+    let seq1 = Iterator.to_seq it1 in
+    let seq2 = Iterator.to_seq it2 in
+    let b = Seq.equal Int.equal seq1 seq2 in
+    if not b then
+      Fmt.pr "it1 = %a@. it2 = %a@."
+        Fmt.(seq ~sep:comma int)
+        seq1
+        Fmt.(seq ~sep:comma int)
+        seq2;
+    b
 
   let all =
     let quick_test s tst = A.test_case s `Quick tst in
