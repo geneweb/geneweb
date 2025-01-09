@@ -48,9 +48,7 @@ val seek : ('a, 'c) t -> 'a -> unit
 val union : ('a, 'c) comparator -> ('a, 'c) t list -> ('a, 'c) t
 (** [union l] computes the union iterator of the iterators [l].
     The resulting iterator produces elements of the union of [l] in
-    ascending order.
-
-    @raise Invalid_argument if the list [l] is empty. *)
+    ascending order. *)
 
 val join : ('a, 'c) comparator -> ('a, 'c) t list -> ('a, 'c) t
 (** [join l] computes the join iterator of the iterators [l]. The resulting

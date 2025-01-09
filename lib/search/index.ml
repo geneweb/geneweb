@@ -121,9 +121,7 @@ module Make (W : Word.S) (E : Entry) = struct
     in
     List.fold_left
       (fun acc pfx ->
-        match loop [] pfx 0 t with
-        | [] -> acc
-        | l -> Iterator.union (module Flatset.Comparator) l :: acc)
+        Iterator.union (module Flatset.Comparator) (loop [] pfx 0 t) :: acc)
       [] ps
     |> intersection
 
@@ -166,9 +164,7 @@ module Make (W : Word.S) (E : Entry) = struct
     in
     List.fold_left
       (fun acc atm ->
-        match loop [] atm t with
-        | [] -> acc
-        | l -> Iterator.union (module Flatset.Comparator) l :: acc)
+        Iterator.union (module Flatset.Comparator) (loop [] atm t) :: acc)
       [] atms
     |> intersection
 end
