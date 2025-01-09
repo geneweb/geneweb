@@ -586,60 +586,58 @@ let insert_person state gen so =
         (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
       check_error gen);
-  if not gen.g_errored then (
-    let empty_string = unique_string gen "" in
-    (* Convert [(_,_,string) gen_person] to [person]. Save all strings in base *)
-    let access =
-      if state.no_public then handle_public_access so.access else so.access
-    in
-    let x =
-      {
-        first_name = empty_string;
-        surname = empty_string;
-        occ = 0;
-        image = unique_string gen so.image;
-        first_names_aliases =
-          List.map (unique_string gen) so.first_names_aliases;
-        surnames_aliases = List.map (unique_string gen) so.surnames_aliases;
-        public_name = unique_string gen so.public_name;
-        qualifiers = List.map (unique_string gen) so.qualifiers;
-        aliases = List.map (unique_string gen) so.aliases;
-        titles = List.map (title_unique_string gen) so.titles;
-        rparents = [];
-        related = [];
-        occupation = unique_string gen so.occupation;
-        sex = Neuter;
-        access;
-        birth = so.birth;
-        birth_place = unique_string gen so.birth_place;
-        birth_note = unique_string gen so.birth_note;
-        birth_src = unique_string gen so.birth_src;
-        baptism = so.baptism;
-        baptism_place = unique_string gen so.baptism_place;
-        baptism_note = unique_string gen so.baptism_note;
-        baptism_src = unique_string gen so.baptism_src;
-        death = so.death;
-        death_place = unique_string gen so.death_place;
-        death_note = unique_string gen so.death_note;
-        death_src = unique_string gen so.death_src;
-        burial = so.burial;
-        burial_place = unique_string gen so.burial_place;
-        burial_note = unique_string gen so.burial_note;
-        burial_src = unique_string gen so.burial_src;
-        pevents = [];
-        notes = empty_string;
-        psources =
-          unique_string gen
-            (if so.psources = "" then state.default_source else so.psources);
-        key_index = ip;
-      }
-    in
-    (* write/update start position of person in [g_per] *)
-    seek_out gen.g_per_index (sizeof_long * ip);
-    output_binary_int gen.g_per_index (pos_out gen.g_per);
-    (* write person *)
-    output_char gen.g_per 'D';
-    output_item_value gen.g_per (x : person));
+  let empty_string = unique_string gen "" in
+  (* Convert [(_,_,string) gen_person] to [person]. Save all strings in base *)
+  let access =
+    if state.no_public then handle_public_access so.access else so.access
+  in
+  let x' =
+    {
+      first_name = empty_string;
+      surname = empty_string;
+      occ = 0;
+      image = unique_string gen so.image;
+      first_names_aliases = List.map (unique_string gen) so.first_names_aliases;
+      surnames_aliases = List.map (unique_string gen) so.surnames_aliases;
+      public_name = unique_string gen so.public_name;
+      qualifiers = List.map (unique_string gen) so.qualifiers;
+      aliases = List.map (unique_string gen) so.aliases;
+      titles = List.map (title_unique_string gen) so.titles;
+      rparents = [];
+      related = [];
+      occupation = unique_string gen so.occupation;
+      sex = Neuter;
+      access;
+      birth = so.birth;
+      birth_place = unique_string gen so.birth_place;
+      birth_note = unique_string gen so.birth_note;
+      birth_src = unique_string gen so.birth_src;
+      baptism = so.baptism;
+      baptism_place = unique_string gen so.baptism_place;
+      baptism_note = unique_string gen so.baptism_note;
+      baptism_src = unique_string gen so.baptism_src;
+      death = so.death;
+      death_place = unique_string gen so.death_place;
+      death_note = unique_string gen so.death_note;
+      death_src = unique_string gen so.death_src;
+      burial = so.burial;
+      burial_place = unique_string gen so.burial_place;
+      burial_note = unique_string gen so.burial_note;
+      burial_src = unique_string gen so.burial_src;
+      pevents = [];
+      notes = empty_string;
+      psources =
+        unique_string gen
+          (if so.psources = "" then state.default_source else so.psources);
+      key_index = ip;
+    }
+  in
+  (* write/update start position of person in [g_per] *)
+  seek_out gen.g_per_index (sizeof_long * ip);
+  output_binary_int gen.g_per_index (pos_out gen.g_per);
+  (* write person *)
+  output_char gen.g_per 'D';
+  output_item_value gen.g_per (x' : person);
   (x, ip)
 
 (** Insert definition or reference in [gen] and returns its entry and
