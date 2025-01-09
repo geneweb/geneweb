@@ -11,24 +11,22 @@ let set_levels dflags =
     (fun flag -> Logs.Src.set_level (flag_to_src flag) (Some Debug))
     dflags
 
-let file_to_seq ic =
-  let rec loop () =
+let fold_lines f acc ic =
+  let rec loop acc =
     match My_gzip.input_line ic with
-    | exception End_of_file -> Seq.Nil
-    | s -> Seq.Cons (s, loop)
+    | exception End_of_file -> acc
+    | s -> loop (f acc s)
   in
-  loop
+  loop acc
 
 let index_from_gzip path =
   My_gzip.with_open path @@ fun ic ->
-  let seq =
-    Seq.concat_map
-      (fun line ->
-        let words = Analyze.preprocess line in
-        List.to_seq words |> Seq.map (fun w -> (w.Analyze.content, line)))
-      (file_to_seq ic)
-  in
-  Index.of_seq seq
+  fold_lines
+    (fun acc line ->
+      let words = Analyze.preprocess line in
+      List.fold_left (fun acc w -> (w.Analyze.content, line) :: acc) acc words)
+    [] ic
+  |> List.to_seq |> Index.of_seq
 
 let load_dictionaries path =
   File.walk_folder ~recursive:true
@@ -36,7 +34,7 @@ let load_dictionaries path =
       match file with
       | `File f when String.equal (Filename.extension f) ".gz" ->
           let basename = Filename.(basename f |> chop_extension) in
-          Logs.info (fun k -> k"found %s" basename);
+          Logs.info (fun k -> k "found %s" basename);
           (basename, index_from_gzip f) :: acc
       | `Dir _ | `File _ -> acc)
     path []

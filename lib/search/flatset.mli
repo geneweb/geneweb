@@ -82,6 +82,7 @@ module type OrderedType = sig
 
   val dummy : t
   val compare : t -> t -> int
+  val pp : t Fmt.t
 end
 
 module Make (O : OrderedType) : S with type elt = O.t

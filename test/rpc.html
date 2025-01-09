@@ -47,7 +47,6 @@
       document.getElementById("input-ping")
               .addEventListener("input", ping_callback);
 
-
       async function main() {
         const msg = await client1.ping();
         console.log(msg);
@@ -59,11 +58,8 @@
       async function search_callback() {
         const input = document.getElementById("input-search");
         const msg = await client2.lookup(["test.cache", input.value]);
-        console.log(msg);
-        console.log(Array.isArray(msg));
-        console.log(typeof msg);
-        console.log(Object.prototype.toString.call(msg));
         const output = document.getElementById("output-search");
+        console.log(msg);
         output.innerHTML = "";
         msg.forEach(item => {
           const li = document.createElement("li");
