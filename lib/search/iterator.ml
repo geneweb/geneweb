@@ -38,7 +38,6 @@ let equal (type a c) (module C : Comparator with type t = a and type wit = c)
 let union (type a c) (module C : Comparator with type t = a and type wit = c)
     (l : (a, c) t list) =
   let arr = Array.of_list l in
-  if Array.length arr = 0 then invalid_arg "union";
   let module H = Heap.Make (struct
     type t = int * a
 
@@ -65,11 +64,7 @@ let union (type a c) (module C : Comparator with type t = a and type wit = c)
           in
           loop ()
     in
-    let () = loop () in
-    assert (
-      match H.min hp with
-      | exception H.Empty -> true
-      | _, v -> C.compare w v <= 0)
+    loop ()
   in
   let next () =
     match H.delete_min hp with
