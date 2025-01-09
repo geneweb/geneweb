@@ -85,7 +85,7 @@ let join (type a c) (module C : Comparator with type t = a and type wit = c)
   let arr = Array.of_list l in
   if Array.length arr = 0 then
     (* Intersection of 0th elements cannot be represented by a finite
-       set of any type. *)
+       set for any type. *)
     invalid_arg "join";
   let ended = ref false in
   (* Index of an iterator [it] in [arr] such that its current value
