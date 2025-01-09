@@ -29,6 +29,7 @@ module type OrderedType = sig
 
   val dummy : t
   val compare : t -> t -> int
+  val pp : t Fmt.t
 end
 
 module Make (O : OrderedType) = struct
@@ -42,36 +43,6 @@ module Make (O : OrderedType) = struct
 
   let to_seq = Array.to_seq
   let cardinal = Array.length
-
-  (* Perform a binary search of the value [e] in the slice [lo...hi[ of
-     the sorted array [t]. Returns the index of [e] if found, or the
-     index where it could be inserted to maintain ascending order. *)
-  let binary_search e t lo hi =
-    let rec loop l h =
-      if l >= h then `Gap l
-      else
-        let mid = l + ((h - l) / 2) in
-        let c = O.compare t.(mid) e in
-        if c = 0 then `Found mid
-        else if c < 0 then loop (mid + 1) h
-        else loop l mid
-    in
-    loop lo hi
-
-  let mem e t =
-    match binary_search e t 0 (cardinal t) with
-    | `Gap _ -> false
-    | `Found _ -> true
-
-  (* Perform a exponential search of the value [e] in the sorted array [t],
-     starting from index [lo]. Returns the index of [e] if found, or the index
-     where it could be inserted to maintain ascending order. *)
-  let exponential_search e t lo =
-    let c = cardinal t in
-    let rec loop i = if i < c && t.(i) < e then loop (2 * i) else min i c in
-    let hi = loop (max lo 1) in
-    let lo = max lo (hi / 2) in
-    binary_search e t lo hi
 
   type iterator = {
     curr : unit -> elt;
@@ -133,7 +104,11 @@ module Make (O : OrderedType) = struct
               in
               loop ()
         in
-        loop ()
+        let () = loop () in
+        assert (
+          match H.min hp with
+          | exception H.Empty -> true
+          | _, v -> O.compare w v <= 0)
       in
       let next () =
         match H.delete_min hp with
@@ -167,13 +142,17 @@ module Make (O : OrderedType) = struct
         let k = Array.length arr in
         let rec loop x =
           let y = curr arr.(!pos) in
-          if O.compare x y <> 0 then (
+          if O.compare y x < 0 then (
             seek arr.(!pos) x;
             match curr arr.(!pos) with
             | exception End -> ended := true
-            | x ->
+            | x' ->
+                (* As y < x and the iterator [arr.(!pos)] has not
+                   reached its end, the previous seek call must
+                   advance this iterator. *)
+                assert (O.compare y x' < 0);
                 pos := (!pos + 1) mod k;
-                loop x)
+                loop x')
         in
         loop (curr arr.((k + !pos - 1) mod k))
       in
@@ -214,6 +193,41 @@ module Make (O : OrderedType) = struct
       in
       loop
   end
+
+  (* Perform a binary search of the value [e] in the slice [lo...hi[ of
+     the sorted array [t]. Returns the index of [e] if found, or the
+     index where it could be inserted to maintain ascending order. *)
+  let binary_search e t lo hi =
+    let rec loop l h =
+      if l >= h then `Gap l
+      else
+        let mid = l + ((h - l) / 2) in
+        let c = O.compare t.(mid) e in
+        if c = 0 then `Found mid
+        else if c < 0 then loop (mid + 1) h
+        else loop l mid
+    in
+    loop lo hi
+
+  let mem e t =
+    match binary_search e t 0 (cardinal t) with
+    | `Gap _ -> false
+    | `Found _ -> true
+
+  (* Perform a exponential search of the value [e] in the sorted array [t],
+     starting from index [lo]. Returns the index of [e] if found, or the index
+     where it could be inserted to maintain ascending order. *)
+  let exponential_search e t lo =
+    let len = cardinal t in
+    let rec loop i =
+      if i >= len then `Gap len
+      else
+        let c = O.compare t.(i) e in
+        if c < 0 then loop (2 * i)
+        else if c = 0 then `Found i
+        else binary_search e t lo i
+    in
+    loop (max lo 1)
 
   let iterator t =
     let idx = ref 0 in

@@ -41,6 +41,7 @@ module Make (W : Word.S) (E : Entry) = struct
     let compare { tag = t1; _ } { tag = t2; _ } = t1 - t2
     let dummy = { e = E.dummy; tag = -1 }
     let[@inline always] to_entry { e; _ } = e
+    let pp ppf { e; _ } = E.pp ppf e
 
     let add =
       let tbl = W.create 200 in
