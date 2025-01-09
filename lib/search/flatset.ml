@@ -66,11 +66,14 @@ module Make (O : OrderedType) = struct
      where it could be inserted to maintain ascending order. *)
   let exponential_search e t lo =
     if O.compare t.(lo) e = 0 then `Found lo
+    else if t.(lo) > e then `Gap lo
     else
       let len = cardinal t in
       let rec loop i =
         let j = lo + i in
-        if j >= len then `Gap len
+        if j >= len then
+          let u = min (lo + (i / 2)) len in
+          binary_search e t u len
         else
           let c = O.compare t.(j) e in
           if c < 0 then loop (2 * i)
