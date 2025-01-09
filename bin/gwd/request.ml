@@ -228,6 +228,15 @@ let make_henv conf base =
     then { conf with henv = conf.henv @ ["manitou", Adef.encoded "off"] }
     else conf
   in
+  let conf =
+    let fn, oc, sn = GWPARAM.split_key conf.userkey in
+    match
+      Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
+    with
+    | Some ip -> 
+      { conf with semi_public = get_access (poi base ip) = SemiPublic; userip = Some ip }
+    | None -> conf
+  in
   let aux param conf =
     match Util.p_getenv conf.env param with
     | Some s -> { conf with henv = conf.henv @ [param, Mutil.encode s] }

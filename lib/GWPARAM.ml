@@ -222,24 +222,25 @@ let rec descendants conf base set ip =
    and p is one of its descendant or ancesstor
 *)
 
-let is_semi_public conf base p = Gwdb.get_access p = SemiPublic
+let is_semi_public p = Gwdb.get_access p = SemiPublic
+
+let split_key key =
+  let dot = match String.index_opt key '.' with Some i -> i | _ -> -1 in
+  let space = match String.index_opt key ' ' with Some i -> i | _ -> -1 in
+  if dot <> -1 && space <> -1 then
+    ( String.sub key 0 dot,
+      String.sub key (dot + 1) (space - dot - 1),
+      String.sub key (space + 1) (String.length key - space - 1) )
+  else ("?", "", "?")
 
 let is_related conf base p =
-  let split_key key =
-    let dot = match String.index_opt key '.' with Some i -> i | _ -> -1 in
-    let space = match String.index_opt key ' ' with Some i -> i | _ -> -1 in
-    if dot <> -1 && space <> -1 then
-      ( String.sub key 0 dot,
-        String.sub key (dot + 1) (space - dot - 1),
-        String.sub key (space + 1) (String.length key - space - 1) )
-    else ("?", "", "?")
-  in
   (* TODO add ip of userkey in config *)
   let fname =
     String.concat Filename.dir_sep
       [
         Secure.base_dir ();
         conf.Config.bname ^ ".gwb";
+        "caches";
         "family-" ^ conf.Config.userkey;
       ]
   in
@@ -301,9 +302,7 @@ let is_related conf base p =
               List.sort_uniq compare family
           | _ -> [])
     in
-    match
-      Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
-    with
+    match conf.Config.userip with
     | Some ip ->
         Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
         && List.mem (Gwdb.get_iper p) family
@@ -312,56 +311,69 @@ let is_related conf base p =
 
 (** Calcul les droits de visualisation d'une personne en
     fonction de son age.
-    Renvoie (dans l'ordre des tests) :
-    - Vrai si : magicien ou ami ou la personne est public
-    - Vrai si : la personne est en si_titre, si elle a au moins un
-                titre et que public_if_title = yes dans le fichier gwf
-    - Faux si : la personne n'est pas décédée et private_years > 0
+    pour les test impliquant une date, si elle existe, on renvoie vrai ou faux
+    sinon, on passe au test suivant dans l'ordre ci dessous) :
+    - Vrai si : magicien
+                ou ami 
+                ou la personne est public
+                ou la personne est en IfTitles, si elle a au moins un
+                   titre et que public_if_title = yes dans le fichier gwf
+                ou la personne s'est mariée depuis plus de private_years_marriage
     - Vrai si : la personne est plus agée (en fonction de la date de
                 naissance ou de la date de baptème) que privates_years
+    - Vrai si : la personne est décédée depuis plus de privates_years_death
+    - Vrai si : la personne n'est pas Private et public_if_no_date = yes
+    - Faux si : la personne n'est pas décédée et private_years > 0
     - Faux si : la personne est plus jeune (en fonction de la date de
                 naissance ou de la date de baptème) que privates_years
-    - Vrai si : la personne est décédée depuis plus de privates_years
     - Faux si : la personne est décédée depuis moins de privates_years
-    - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
-                privée et public_if_no_date = yes
-    - Vrai si : la personne s'est mariée depuis plus de private_years
     - Faux dans tous les autres cas *)
 (* check that p is parent or descendant of conf.key *)
 
 let p_auth conf base p =
-  conf.Config.wizard || conf.Config.friend || is_semi_public conf base p
-  || is_related conf base p
+  conf.Config.wizard
+  || conf.Config.friend && conf.Config.semi_public
+     && (is_semi_public p || is_related conf base p)
   || conf.Config.public_if_titles
      && Gwdb.get_access p = IfTitles
      && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
   ||
-  let death = Gwdb.get_death p in
-  if death = NotDead then conf.Config.private_years < 1
+  if false then conf.Config.private_years < -1
   else
+    (* return true if (today - d) > lim *)
     let check_date d lim none =
       match d with
       | None -> none ()
       | Some d ->
           let a = Date.time_elapsed d conf.today in
+          Printf.eprintf "  Check_date %d > %d \n" a.Def.year lim;
           if a.Def.year > lim then true
-          else if a.year < conf.Config.private_years then false
-          else a.month > 0 || a.day > 0
+          else if a.Def.year = 0 then a.month > 0 || a.day > 0
+          else false
     in
+    (* born more than private_years ago *)
     check_date
       (Gwdb.get_birth p |> Date.cdate_to_dmy_opt)
       conf.Config.private_years
     @@ fun () ->
-    check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) conf.private_years
+    (* baptised more than private_years ago *)
+    check_date
+      (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt)
+      conf.Config.private_years
     @@ fun () ->
-    check_date (Gwdb.get_death p |> Date.dmy_of_death) conf.private_years_death
+    (* dead more than private_years_death ago *)
+    check_date
+      (Gwdb.get_death p |> Date.dmy_of_death)
+      conf.Config.private_years_death
     @@ fun () ->
+    (* public if no date *)
     (Gwdb.get_access p <> Def.Private && conf.Config.public_if_no_date)
     ||
     let families = Gwdb.get_family p in
     let len = Array.length families in
     let rec loop i =
       i < len
+      (* true if one marriage is more than private_years_marriage ago *)
       && check_date
            (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
           |> Date.cdate_to_dmy_opt)
