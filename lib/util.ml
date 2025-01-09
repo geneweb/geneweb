@@ -2325,10 +2325,11 @@ let select_masc conf base ips =
     ips;
   asc
 
-let select_desc conf base gen_desc ips =
+let select_desc ?(skip_descendants = fun ~ancestors:_ ~generation:_ _ -> false)
+    conf base gen_desc ips =
   let desc = Hashtbl.create 64 in
   let skip = Hashtbl.create 64 in
-  let rec loop_desc gen ip =
+  let rec loop_desc ~ancestors gen ip =
     if not @@ Hashtbl.mem skip ip then (
       let p = pget conf base ip in
       Hashtbl.add skip ip true;
@@ -2339,15 +2340,25 @@ let select_desc conf base gen_desc ips =
           Hashtbl.replace desc sp (pget conf base sp))
         (Gwdb.get_family p);
       if gen > gen_desc then
-        List.iter (loop_desc (gen - 1)) @@ Gwdb.children_of_p base p)
+        let parents person_id =
+          person_id |> Gwdb.poi base
+          |> Gwdb.parents_of_person base
+          |> Option.map Adef.parent_array
+          |> Option.value ~default:[||] |> Array.to_seq |> IperSet.of_seq
+        in
+        List.iter (fun person_id ->
+            let ancestors = IperSet.union ancestors (parents person_id) in
+            if not (skip_descendants ~ancestors ~generation:gen ip) then
+              loop_desc ~ancestors (gen - 1) person_id)
+        @@ Gwdb.children_of_p base p)
   in
-  List.iter (fun (ip, gen) -> loop_desc gen ip) ips;
+  List.iter (fun (ip, gen) -> loop_desc ~ancestors:IperSet.empty gen ip) ips;
   desc
 
-let select_mascdesc conf base ips gen_desc =
+let select_mascdesc ?skip_descendants conf base ips gen_desc =
   let asc = select_masc conf base ips in
   let ips = Hashtbl.fold (fun ip (gen, _) acc -> (ip, gen) :: acc) asc [] in
-  select_desc conf base gen_desc ips
+  select_desc ?skip_descendants conf base gen_desc ips
 
 let auth_warning conf base w =
   let pauth p = authorized_age conf base p in

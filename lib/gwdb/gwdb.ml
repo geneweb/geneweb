@@ -246,3 +246,8 @@ let children_of_p base p =
   Array.fold_right
     (fun ifam -> Array.fold_right List.cons (get_children @@ foi base ifam))
     (get_family p) []
+
+let parents_of_person base person =
+  person |> get_parents
+  |> Option.map (foi base)
+  |> Option.map gen_couple_of_family

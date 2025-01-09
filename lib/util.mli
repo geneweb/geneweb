@@ -522,6 +522,7 @@ val select_masc :
 *)
 
 val select_desc :
+  ?skip_descendants:(ancestors:IperSet.t -> generation:int -> Gwdb.iper -> bool) ->
   Config.config ->
   Gwdb.base ->
   int ->
@@ -533,6 +534,7 @@ val select_desc :
 *)
 
 val select_mascdesc :
+  ?skip_descendants:(ancestors:IperSet.t -> generation:int -> Gwdb.iper -> bool) ->
   Config.config ->
   Gwdb.base ->
   (Gwdb.iper * int) list ->
