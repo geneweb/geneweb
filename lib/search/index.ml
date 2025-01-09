@@ -8,7 +8,7 @@ module type S = sig
   val mem : word -> t -> bool
   val search : word list -> t -> entry Seq.t
   val search_prefix : word list -> t -> entry Seq.t
-  val fuzzy_search: max_dist:int -> word list -> t -> entry Seq.t
+  val fuzzy_search : max_dist:int -> word list -> t -> entry Seq.t
 end
 
 module type Entry = sig
@@ -87,8 +87,8 @@ module Make (W : Word.S) (E : Entry) = struct
     match l with
     | [] -> Seq.empty
     | _ :: _ ->
-        Seq.map HE.to_entry @@ Flatset.Iterator.to_seq
-        @@ Flatset.Iterator.join l
+        Seq.map HE.to_entry @@ Iterator.to_seq
+        @@ Iterator.join (module Flatset.Comparator) l
 
   let search ws t =
     let rec loop w =
@@ -123,7 +123,7 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc pfx ->
         match loop [] pfx 0 t with
         | [] -> acc
-        | l -> Flatset.Iterator.union l :: acc)
+        | l -> Iterator.union (module Flatset.Comparator) l :: acc)
       [] ps
     |> intersection
 
@@ -168,7 +168,7 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc atm ->
         match loop [] atm t with
         | [] -> acc
-        | l -> Flatset.Iterator.union l :: acc)
+        | l -> Iterator.union (module Flatset.Comparator) l :: acc)
       [] atms
     |> intersection
 end
