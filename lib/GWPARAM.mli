@@ -105,11 +105,17 @@ val output_error :
 (** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
       If the current lang is not available, use `en` *)
 
-val is_semi_public : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
-(** determines if the person is a descendant or an ancestor of conf.userkey
-      conf.userkey is the person visiting the base
-      the search for asc or desc is limited to 4 generations
-  *)
+val is_semi_public : (Gwdb.person -> bool) ref
+(** determines if the person has SemiPublic status   *)
+
+val split_key : string -> string * string * string
+
+val is_related : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+(** determines if the person is a descendant a sibling or an ancestor
+    of conf.userkey.
+    conf.userkey is the person visiting the base
+    the search for ancestors is limited to 3 generations
+*)
 
 val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
 (** Calculate the access rights to the person's information in
