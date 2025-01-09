@@ -65,16 +65,19 @@ module Make (O : OrderedType) = struct
      starting from index [lo]. Returns the index of [e] if found, or the index
      where it could be inserted to maintain ascending order. *)
   let exponential_search e t lo =
-    let len = cardinal t in
-    let rec loop i =
-      if i >= len then `Gap len
-      else
-        let c = O.compare t.(i) e in
-        if c < 0 then loop (2 * i)
-        else if c = 0 then `Found i
-        else binary_search e t lo i
-    in
-    loop (max lo 1)
+    if O.compare t.(lo) e = 0 then `Found lo
+    else
+      let len = cardinal t in
+      let rec loop i =
+        let j = lo + i in
+        if j >= len then `Gap len
+        else
+          let c = O.compare t.(j) e in
+          if c < 0 then loop (2 * i)
+          else if c = 0 then `Found j
+          else binary_search e t (lo + (i / 2)) j
+      in
+      loop 1
 
   let iterator t =
     let idx = ref 0 in
