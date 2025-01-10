@@ -92,7 +92,7 @@
         %if;(b.friend_passwd!="" or b.friend_passwd_file!="")
           %if;(not friend)
             %if;(not cgi)
-              <a href="%prefix;w=f" class="btn btn-outline-primary text-nowrap" role="button"
+              <a href="%url_set.w.f;" class="btn btn-outline-primary text-nowrap" role="button"
                 title="[*wizard/wizards/friend/friends/exterior]2"><i class="fas fa-user mr-2"
                 aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
             %end;
@@ -105,7 +105,7 @@
         %if;(b.wizard_passwd!="" or b.wizard_passwd_file!="")
           %if;(not wizard)
             %if;(not cgi)
-              <a href="%prefix;w=w" class="btn btn-outline-success text-nowrap" role="button"
+              <a href="%url_set.w.w;" class="btn btn-outline-success text-nowrap" role="button"
                 title="[*wizard/wizards/friend/friends/exterior]0">
                 <i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>%nn;
                 [*wizard/wizards/friend/friends/exterior]0</a>
