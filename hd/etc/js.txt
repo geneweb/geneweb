@@ -435,7 +435,7 @@ const inputToBook = {
     const encVal = encodeURIComponent(value);
     const encPreVal = encodeURIComponent(preVal);
 
-    const url = `?%if;cgi;b=%base.name;&%end;m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+    const url = `%if;cgi;?b=%base.name;%else;?w=w%end;&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
     window.open(url, '_blank');
   }
 };
