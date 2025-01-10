@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: relmenu.txt v7.1 05/09/2023 21:35:33 $ -->
+  <!-- $Id: relmenu.txt v7.1 22/12/2024 19:06:29 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -19,15 +19,13 @@
 <div class="container">
 %message_to_wizard;
 %include;perso_header
-
-<h1 class="text-center mt-2">[*link between]%sp;
+<h1 class="text-center">[*link between]%sp;
   %if;(public_name != "")%public_name;%else;%first_name;%end;
   %if;(qualifier != "") <em>%qualifier;</em>%end;
   %sp;%surname;
   %if;(alias != "") <em>(%alias;)</em>%end;
-  %sp;[and]0...%nn;
+  %sp;[and]0…%nn;
 </h1>
-
 <form name="relationship" method="submit" action="%action;">
   <div class="row">
     <div id="rel_form_shortcut" class="col-4">
@@ -110,7 +108,7 @@
         </div>
         <div>
           <label class="sr-only" for="n">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
-          <input type="search" id="n" class="form-control mt-1" name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…" autofocus>
+          <input type="search" id="n" class="form-control mt-2" name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…" autofocus>
           <label class="sr-only" for="firstname">[*first name/first names]0</label>
           <input type="search" id="firstname" class="form-control" name="fn" placeholder="[*first name/first names]0">
           <label class="sr-only" for="surname">[*surname/surnames]0</label>
