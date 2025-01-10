@@ -98,7 +98,7 @@
     or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES" or (e.m="MOD_DATA" and e.data="src"))
   %if;(b.use_cdn="yes")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js"
       integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
   %else;
      <script src="%etc_prefix;js/autosize.min.js?version=4.0.2"></script>
@@ -136,7 +136,7 @@
       $('#filterbysurname').removeClass("d-none");
       $('#total').addClass("text-muted");
       $('#input1').focus(); }
-    else { 
+    else {
       $('.filter').prop('disabled', true);
       $('#filterbysurname').addClass("d-none");
       $('#total').removeClass("text-muted"); }
@@ -206,10 +206,10 @@ function insertTags(tagOpen, tagClose, sampleText) {
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const scrollTop = textarea.scrollTop;
-  
+
   let selectedText = textarea.value.substring(start, end);
   if (!selectedText) selectedText = sampleText;
-  
+
   // Remove trailing space if exists
   if (selectedText.endsWith(' ')) {
     selectedText = selectedText.slice(0, -1);
@@ -226,7 +226,7 @@ function insertTags(tagOpen, tagClose, sampleText) {
 
   // Restore scroll position
   textarea.scrollTop = scrollTop;
-  
+
   // Set selection
   if (start === end) {
     // No text was selected
@@ -237,7 +237,7 @@ function insertTags(tagOpen, tagClose, sampleText) {
     const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
     textarea.setSelectionRange(newCursorPos, newCursorPos);
   }
-  
+
   textarea.focus();
   return false;
 }
@@ -246,17 +246,17 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!toolbar) return;
 
   let lastScroll = window.scrollY;
-  
+
   function handleScroll() {
     const currentScroll = window.scrollY;
-    
+
     // Add shadow when scrolled
     if (currentScroll > 0) {
       toolbar.classList.add('is-sticky');
     } else {
       toolbar.classList.remove('is-sticky');
     }
-    
+
     lastScroll = currentScroll;
   }
 
@@ -302,7 +302,6 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 %end;
 %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
-%if;(e.m!="")
 <script>
 // Enhanced clear button management for dynamic input fields
 // Add clear buttons (X) to input fields and handle DataTable updates
@@ -313,7 +312,7 @@ function addClearButtonToInputs() {
         const clearButton = document.createElement('i');
         clearButton.className = 'fas fa-xmark clear-button-icon';
         clearButton.title = '[*clear input]';
-        
+
         clearButton.style.cssText = `
             position: absolute;
             right: 10px;
@@ -380,14 +379,14 @@ function addClearButtonToInputs() {
         clearButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
+
             // Clear the input
             element.value = '';
             element.focus();
             updateVisibility();
 
             // Trigger events
-            const inputEvent = new CustomEvent('clearButton', { 
+            const inputEvent = new CustomEvent('clearButton', {
                 bubbles: true,
                 detail: { element }
             });
@@ -421,8 +420,8 @@ function addClearButtonToInputs() {
     const observer = new MutationObserver((mutations) => {
         let shouldProcess = false;
         mutations.forEach(mutation => {
-            if (mutation.addedNodes.length || 
-                mutation.type === 'attributes' && 
+            if (mutation.addedNodes.length ||
+                mutation.type === 'attributes' &&
                 (mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
                 shouldProcess = true;
             }
@@ -441,11 +440,13 @@ function addClearButtonToInputs() {
 }
 </script>
 <script>
-%if;((e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
-  or ("MOD_" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1
-   or b.datalist_occupations=1 or b.datalist_sources=1
-  or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
-  or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
+%if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
+    or b.datalist_titles=1 or b.datalist_estates=1))
+  or (e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
+  or ("MOD_" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1
+    or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
+    or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
+    or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
 // Manages datalist population and updates
 // Simple datalist manager with special handling for DataTables inputs
 const DatalistManager = {
@@ -495,7 +496,7 @@ const DatalistManager = {
   // Special handling for DataTables inputs
   handleDataTableInput: function(input, listId) {
     if (!input || !listId) return;
-    
+
     const dataList = document.getElementById(listId);
     if (!dataList) return;
 
@@ -505,7 +506,7 @@ const DatalistManager = {
     const currentValue = input.value;
 
     // Let browser handle datalist matching
-    const option = Array.from(dataList.options).find(opt => 
+    const option = Array.from(dataList.options).find(opt =>
       opt.value.toLowerCase() === currentValue.toLowerCase()
     );
 
@@ -515,16 +516,16 @@ const DatalistManager = {
       const $cell = $(input).closest('td');
       const rowIndex = table.row($row).index();
       const cellIndex = $cell.index();
-      
+
       // Preserve case the user typed
       const finalValue = currentValue;
-      
+
       // Use requestAnimationFrame to handle focus after redraw
       requestAnimationFrame(() => {
         const $newRow = $(table.row(rowIndex).node());
         const $newCell = $newRow.find(`td:eq(${cellIndex})`);
         const $newInput = $newCell.find('input');
-        
+
         if ($newInput.length) {
           if ($newInput.val() !== finalValue) {
             $newInput.val(finalValue);
@@ -547,7 +548,7 @@ const DatalistManager = {
   }
 };
 %end;
-%if;("MOD_" in e.m)
+%if;(wizard and (is_welcome or "MOD_" in e.m))
 // Manages enhanced input field behaviors (navigation, interaction)
 const inputToBook = {
   addNavigation: function() {
@@ -562,27 +563,25 @@ const inputToBook = {
 
   openBook: function(value, book) {
     if (!value) return;
-    
+
     let preVal = value;
     if (book === "place") {
       const place = value.split(/\]\s+[-–—]\s+/);
       preVal = place.length > 1 ? place[1] : value;
     }
-    
+
     preVal = preVal.substring(0, Math.min(preVal.length, 12))
                    .split(/[, ]+/)[0];
-                   
+
     const encVal = encodeURIComponent(value);
     const encPreVal = encodeURIComponent(preVal);
-    
+
     const url = `?%if;cgi;b=%base.name;&%end;m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
     window.open(url, '_blank');
   }
 };
 %end;
 </script>
-%end;
-
 %if;(e.m="NOTES" or e.m="WIZNOTES")
 <script>
 // Table of contents toggle

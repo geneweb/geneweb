@@ -828,6 +828,9 @@ let templ_eval_var conf = function
       in
       VVbool (List.mem plugin plugins)
   | [ "supervisor" ] -> VVbool conf.supervisor
+  | [ "roglo" ] ->
+      VVbool
+        (try List.assoc "roglo" conf.base_env = "yes" with Not_found -> false)
   | [ "true" ] -> VVbool true
   | [ "wizard" ] -> VVbool conf.wizard
   | [ "is_printed_by_template" ] -> VVbool conf.is_printed_by_template
