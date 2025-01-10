@@ -8,7 +8,7 @@ type src_mode = Lang | Source
 
 val print : config -> base -> string -> unit
 val print_source : config -> base -> string -> unit
-val print_start : config -> base -> unit
+val print_welcome : config -> base -> unit
 val incr_welcome_counter : config -> (int * int * string) option
 val incr_request_counter : config -> (int * int * string) option
 val source_file_name : config -> string -> string
