@@ -599,3 +599,40 @@ $(document).ready(function() {
 });
 </script>
 %end;
+<script>
+// Floating placeholders for all textual inputs
+function initFloatingPlaceholders() {
+  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="search"][placeholder]');
+  
+  inputs.forEach(input => {
+    const hadFocus = document.activeElement === input;
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'input-wrapper';
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    const placeholder = document.createElement('span');
+    placeholder.className = 'floating-placeholder';
+    placeholder.textContent = input.placeholder;
+    wrapper.appendChild(placeholder);
+
+    input.addEventListener('focus', () => {
+      placeholder.classList.add('active');
+    });
+    
+    input.addEventListener('blur', () => {
+      placeholder.classList.remove('active');
+    });
+
+    if (hadFocus || input.hasAttribute('autofocus')) {
+      requestAnimationFrame(() => {
+        input.focus();
+        placeholder.classList.add('active');
+      });
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initFloatingPlaceholders);
+</script>

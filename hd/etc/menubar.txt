@@ -46,11 +46,11 @@
                     <div class="d-flex align-items-center flex-grow-1">
                       %apply;input_hidden("e.b","b")
                       %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
-                      <div class="input-group mr-2">
-                        <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control w-50"
+                      <div class="input-group p-mod-group mr-2">
+                        <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
                           value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
                           placeholder="%if;(e.p_mod="" and b.p_mod!="")%b.p_mod;
-                          (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="40">
+                          (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="30">
                         <div class="input-group-append">
                           <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
                           <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-xmark fa-lg mx-1"></i></button>
