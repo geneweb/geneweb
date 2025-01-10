@@ -523,6 +523,35 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   margin-bottom: 5rem;
 }
 
+/* Wrapper pour positionner les placeholders flottants */
+.input-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+/* Style du placeholder flottant */
+.floating-placeholder {
+  position: absolute;
+  top: -12px;
+  left: 8px;
+  font-size: 12px;
+  background: white;
+  padding: 0 3px;
+  color: #6c757d;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.form-control-lg + .floating-placeholder {
+  left: 12px;
+}
+
+.floating-placeholder.active {
+  opacity: 0.9;
+}
+
 /* Clear button */
 .clear-button-wrapper {
     position: relative;
@@ -642,6 +671,16 @@ img.image-popover {
 
 div.p_mod_builder {
   width: 3120px;
+}
+
+/* p-mod input group size */
+.p-mod-group {
+  flex: 1;
+}
+
+.p-mod-group .input-wrapper {
+  flex: 1;
+  width: auto;
 }
 
 /* Fixed ancestors image width on modules/arbre_3gen_photo */
