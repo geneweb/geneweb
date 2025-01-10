@@ -50,8 +50,10 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
       Format.sprintf "<h1>%s</h1>" (title_text :> string)
     else ""
   in
-  Output.printf conf {|<div class="d-flex mb-3">%s%s</div>|} title_html
-    (Wiki.make_edit_button conf fnotes ());
+  let modbtn =
+    if conf.wizard then Wiki.make_edit_button conf fnotes () else ""
+  in
+  Output.printf conf {|<div class="d-flex mb-3">%s%s</div>|} title_html modbtn;
   let file_path = file_path conf base in
   let s = Util.string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
