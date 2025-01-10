@@ -58,6 +58,8 @@
   (synopsis "RPC support for GeneWeb")
   (tags (geneweb rpc json))
   (depends
+    (qcheck :with-test)
+    (qcheck-alcotest :with-test)
     lwt
     lwt_ppx
     tls-lwt

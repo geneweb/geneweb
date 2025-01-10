@@ -10,6 +10,8 @@ doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "dune" {>= "2.9"}
+  "qcheck" {with-test}
+  "qcheck-alcotest" {with-test}
   "lwt"
   "lwt_ppx"
   "tls-lwt"
