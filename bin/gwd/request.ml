@@ -604,9 +604,14 @@ let treat_request =
                  w_base @@ fun conf base ->
                  SrcfileDisplay.print conf base "advanced"
              | "AS_OK" -> w_base @@ AdvSearchOkDisplay.print
+             | "BLASON_MOVE_TO_ANC" -> w_base @@ ImageCarrousel.print_main_c
+             | "BLASON_STOP" -> w_base @@ ImageCarrousel.print_main_c
              | "C" -> w_base @@ w_person @@ CousinsDisplay.print
              | "CHK_DATA" -> w_base @@ CheckDataDisplay.print
              | "CAL" -> w_base @@ Hutil.print_calendar
+             | "CHANGE_WIZ_VIS" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ WiznotesDisplay.change_wizard_visibility
              | "CHG_CHN" when conf.wizard ->
                  w_wizard @@ w_base @@ ChangeChildrenDisplay.print
              | "CHG_CHN_OK" ->
@@ -650,6 +655,7 @@ let treat_request =
                  doc_aux conf base (fun conf _base ->
                      ImageDisplay.print_html conf)
              | "F" -> w_base @@ w_person @@ Perso.interp_templ "family"
+             | "FIM" -> w_base @@ ImageDisplay.print_blason
              | "H" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
@@ -668,6 +674,7 @@ let treat_request =
              | "IM_C" -> w_base @@ ImageCarrousel.print_c ~saved:false
              | "IM_C_S" -> w_base @@ ImageCarrousel.print_c ~saved:true
              | "IM" -> w_base @@ ImageDisplay.print
+             | "IMAGE_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
              | "IMH" -> w_base @@ fun conf _ -> ImageDisplay.print_html conf
              | "INV_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_inv
              | "INV_FAM_OK" ->
@@ -831,6 +838,7 @@ let treat_request =
                  w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
              | "POP_PYR" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_population_pyramid
+             | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "PPS" -> w_base @@ Place.print_all_places_surnames
              | "R" -> w_base @@ w_person @@ relation_print
@@ -867,9 +875,6 @@ let treat_request =
                  )
              | "STAT" ->
                  w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
-             | "CHANGE_WIZ_VIS" ->
-                 w_wizard @@ w_lock @@ w_base
-                 @@ WiznotesDisplay.change_wizard_visibility
              | "TP" -> (
                  w_base @@ fun conf base ->
                  match Util.p_getenv conf.env "v" with
