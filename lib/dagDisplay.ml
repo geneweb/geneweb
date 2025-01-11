@@ -9,7 +9,7 @@ open Dag
 let image_normal_txt conf base p fname width height =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
-  let k = Image.default_portrait_filename base p in
+  let k = Image.default_image_filename "portraits" base p in
   let r =
     Format.sprintf
       {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s"
