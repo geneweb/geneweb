@@ -99,7 +99,7 @@ let print_differences conf base branches p1 p2 =
            ^>^ {|" style="max-width:75px;max-height:100px">|} ^ url
             :> Adef.safe_string)
       | Some (`Path path) ->
-          let k = Image.default_portrait_filename base p in
+          let k = Image.default_image_filename "portraits" base p in
           let s = Unix.stat path in
           Printf.sprintf
             {|<img src="%sm=IM&d=%s&%s&k=%s" \
