@@ -3,6 +3,24 @@ open Def
 open Gwdb
 open Util
 
+let file_copy input_name output_name =
+  let fd_in = Unix.openfile input_name [ O_RDONLY ] 0 in
+  let fd_out = Unix.openfile output_name [ O_WRONLY; O_CREAT; O_TRUNC ] 0o666 in
+  let buffer_size = 8192 in
+  let buffer = Bytes.create buffer_size in
+  let rec copy_loop () =
+    match Unix.read fd_in buffer 0 buffer_size with
+    | 0 -> ()
+    | r ->
+        ignore (Unix.write fd_out buffer 0 r);
+        copy_loop ()
+  in
+  copy_loop ();
+  Unix.close fd_in;
+  Unix.close fd_out
+
+let cp = file_copy
+
 let rn fname s =
   try if Sys.file_exists fname then Sys.rename fname s
   with Failure _ ->
@@ -64,9 +82,9 @@ let write_file fname content =
   flush oc;
   close_out oc
 
-let move_file_to_save file dir =
-  (* previous version iterated on file types *)
+let move_file_to_save dir file =
   try
+    (* FIXME attention, le basename détruit les sous dossiers *)
     let save_dir = Filename.concat dir "saved" in
     Filesystem.create_dir ~parent:true save_dir;
     let fname = Filename.basename file in
@@ -82,6 +100,39 @@ let move_file_to_save file dir =
     if Sys.file_exists orig_file_s then rn orig_file_s saved_file_s;
     1
   with _ -> 0
+
+let create_blason_stop conf base p =
+  let blason_dir = !GWPARAM.portraits_d conf.bname in
+  let blason_stop =
+    String.concat Filename.dir_sep
+      [ blason_dir; Image.default_image_filename "blasons" base p ^ ".stop" ]
+  in
+  let oc = open_out blason_stop in
+  close_out oc;
+  blason_stop
+
+let move_blason_file conf base src dst =
+  let blason_dir = !GWPARAM.portraits_d conf.bname in
+  let blason_src =
+    String.concat Filename.dir_sep
+      [ blason_dir; Image.get_blason_name conf base src ]
+  in
+  if
+    Image.has_blason conf base src true
+    && Sys.file_exists blason_src
+    && not (Image.has_blason conf base dst true)
+  then (
+    let blason_dst =
+      String.concat Filename.dir_sep
+        [
+          blason_dir;
+          Image.default_image_filename "blasons" base dst
+          ^ Filename.extension blason_src;
+        ]
+    in
+    rn blason_src blason_dst;
+    blason_dst)
+  else ""
 
 let normal_image_type s =
   if String.length s > 10 && Char.code s.[0] = 0xff && Char.code s.[1] = 0xd8
@@ -136,61 +187,61 @@ let dump_bad_image conf s =
 (* swap files between new and old folder *)
 (* [| ".jpg"; ".jpeg"; ".png"; ".gif" |] *)
 
-let swap_files_aux dir file ext old_ext =
-  let old_file =
-    String.concat Filename.dir_sep [ dir; "saved"; Filename.basename file ]
-  in
+let swap_files_aux dir file old_file =
+  let ext = Filename.extension file in
+  let old_ext = Filename.extension old_file in
   let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
   if ext <> old_ext then (
-    if Sys.file_exists file then rn file (Filename.chop_extension old_file ^ ext);
-    if Sys.file_exists old_file then
-      rn old_file (Filename.chop_extension file ^ old_ext))
+    rn file (Filename.remove_extension old_file ^ ext);
+    rn old_file (Filename.remove_extension file ^ old_ext))
   else (
-    if Sys.file_exists file then rn file tmp_file;
-    if Sys.file_exists old_file then rn old_file file;
-    if Sys.file_exists tmp_file then rn tmp_file old_file)
+    rn file tmp_file;
+    rn old_file file;
+    rn tmp_file old_file)
 
-let swap_files file ext old_ext =
+let swap_files file old_file =
   let dir = Filename.dirname file in
-  let fname = Filename.basename file in
-  swap_files_aux dir file ext old_ext;
-  let txt_file =
-    String.concat Filename.dir_sep
-      [ dir; Filename.chop_extension fname ^ ".txt" ]
-  in
-  swap_files_aux dir txt_file ext old_ext;
-  let src_file =
-    String.concat Filename.dir_sep
-      [ dir; Filename.chop_extension fname ^ ".src" ]
-  in
-  swap_files_aux dir src_file ext old_ext
+  swap_files_aux dir file old_file;
+  let txt_file = Filename.remove_extension file ^ ".txt" in
+  let old_file = Filename.remove_extension old_file ^ ".txt" in
+  swap_files_aux dir txt_file old_file;
+  let src_file = Filename.remove_extension file ^ ".src" in
+  let old_file = Filename.remove_extension old_file ^ ".src" in
+  swap_files_aux dir src_file old_file
 
 let clean_saved_portrait file =
   let file = Filename.remove_extension file in
-  Array.iter
-    (fun ext -> Mutil.rm (file ^ ext))
-    Image.authorized_image_file_extension
+  Array.iter (fun ext -> Mutil.rm (file ^ ext)) Image.ext_list_1
 
-let get_extension conf saved fname =
+(* TODO merge with Image.file_without_extension *)
+let get_extension conf keydir mode saved fname =
+  let t_ext = Filename.extension fname in
+  let fname =
+    if Array.mem t_ext Image.ext_list_2 then Filename.remove_extension fname
+    else fname
+  in
+  let dir =
+    match mode with
+    | "portraits" | "blasons" -> !GWPARAM.portraits_d conf.bname
+    | _ -> Filename.concat (!GWPARAM.images_d conf.bname) keydir
+  in
   let f =
-    if saved then
-      String.concat Filename.dir_sep
-        [ !GWPARAM.portraits_d conf.bname; "saved"; fname ]
-    else
-      String.concat Filename.dir_sep [ !GWPARAM.portraits_d conf.bname; fname ]
+    if saved then String.concat Filename.dir_sep [ dir; "saved"; fname ]
+    else Filename.concat dir fname
   in
   if Sys.file_exists (f ^ ".jpg") then ".jpg"
   else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
   else if Sys.file_exists (f ^ ".png") then ".png"
   else if Sys.file_exists (f ^ ".gif") then ".gif"
   else if Sys.file_exists (f ^ ".url") then ".url"
+  else if Sys.file_exists (f ^ ".stop") then ".stop"
   else "."
 
 let print_confirm_c conf base save_m report =
   match Util.p_getint conf.env "i" with
   | Some ip ->
       let p = poi base (Gwdb.iper_of_string (string_of_int ip)) in
-      let digest = Image.default_portrait_filename base p in
+      let digest = Image.default_image_filename "portraits" base p in
       let new_env =
         List.fold_left
           (fun accu (k, v) ->
@@ -230,7 +281,7 @@ let print_link_delete_image conf base p =
     transl_nth conf "image/images" 0 |> Output.print_sstring conf;
     Output.print_sstring conf "</a></div>")
 
-let print_send_image conf base p =
+let print_send_image conf base mode p =
   let title h =
     if Option.is_some @@ Image.get_portrait conf base p then
       transl_nth conf "image/images" 0
@@ -247,7 +298,7 @@ let print_send_image conf base p =
       Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
-  let digest = Image.default_portrait_filename base p in
+  let digest = Image.default_image_filename "portraits" base p in
   Hutil.header conf title;
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
@@ -258,6 +309,7 @@ let print_send_image conf base p =
   Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
   Util.hidden_input conf "idigest" (Mutil.encode digest);
+  Util.hidden_input conf "mode" (Adef.encoded mode);
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
@@ -324,14 +376,20 @@ let effective_send_ok conf base p file =
             error_too_big_image conf base p (String.length content) len
         | _ -> (typ, content))
   in
-  let fname = Image.default_portrait_filename base p in
-  let dir = !GWPARAM.images_d conf.bname in
+  let fname = Image.default_image_filename mode base p in
+  let dir =
+    if mode = "portraits" || mode = "blasons" then
+      !GWPARAM.portraits_d conf.bname
+    else !GWPARAM.images_d conf.bname
+  in
   Filesystem.create_dir ~parent:true dir;
   let fname =
     Filename.concat dir
-      (if mode = "portraits" then fname ^ extension_of_type typ else fname)
+      (if mode = "portraits" || mode = "blasons" then
+       fname ^ extension_of_type typ
+      else fname)
   in
-  let _moved = move_file_to_save fname dir in
+  let _moved = move_file_to_save dir fname in
   write_file fname content;
   let changed =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
@@ -345,7 +403,7 @@ let print_send_ok conf base =
     with Failure _ -> incorrect conf "print send ok"
   in
   let p = poi base ip in
-  let digest = Image.default_portrait_filename base p in
+  let digest = Image.default_image_filename "portraits" base p in
   if (digest :> string) = Mutil.decode (raw_get conf "idigest") then
     raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
   else Update.error_digest conf
@@ -360,6 +418,17 @@ let effective_send_c_ok conf base p file file_name =
   in
   let image_name =
     try (List.assoc "image_name" conf.env :> string) with Not_found -> ""
+  in
+  let image_name =
+    if image_name = "" then
+      let f =
+        if String.length image_url > 7 then
+          String.sub image_url 7 (String.length image_url - 7)
+        else image_url
+      in
+      (* FIXME basename *)
+      Filename.basename f
+    else image_name
   in
   let note =
     match Util.p_getenv conf.env "note" with
@@ -407,23 +476,34 @@ let effective_send_c_ok conf base p file file_name =
           | _ -> (typ, content))
     else (GIF, content (* we dont care which type, content = "" *))
   in
-  let fname = Image.default_portrait_filename base p in
+  let keydir = Image.default_image_filename mode base p in
   let dir =
-    if mode = "portraits" then !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) fname
+    if mode = "portraits" || mode = "blasons" then
+      !GWPARAM.portraits_d conf.bname
+    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
   in
   Filesystem.create_dir ~parent:true dir;
   let fname =
     Filename.concat dir
-      (if mode = "portraits" then fname ^ extension_of_type typ else file_name)
+      (if mode = "portraits" || mode = "blasons" then
+       keydir ^ extension_of_type typ
+      else file_name)
   in
-  if mode = "portraits" then
-    match Image.get_portrait conf base p with
+  (* move pre-existing file to saved *)
+  if mode = "portraits" || mode = "blasons" then
+    match
+      if mode = "portraits" then Image.get_portrait conf base p
+      else Image.get_blason conf base p true
+    with
     | Some (`Path portrait) ->
-        if move_file_to_save portrait dir = 0 then
-          incorrect conf "effective send (portrait)"
+        if move_file_to_save dir portrait = 0 then
+          incorrect conf "effective send (portrait/blason)"
     | Some (`Url url) -> (
-        let fname = Image.default_portrait_filename base p in
+        let fname =
+          if mode = "portraits" then
+            Image.default_image_filename "portraits" base p
+          else Image.default_image_filename "blasons" base p
+        in
         let dir = Filename.concat dir "saved" in
         Filesystem.create_dir ~parent:true dir;
         let fname = Filename.concat dir fname ^ ".url" in
@@ -436,7 +516,7 @@ let effective_send_c_ok conf base p file file_name =
     | _ -> ()
   else if content <> "" then
     if Sys.file_exists fname then
-      if move_file_to_save fname dir = 0 then
+      if move_file_to_save dir fname = 0 then
         incorrect conf "effective send (image)";
   let fname =
     if image_url <> "" then Filename.concat dir image_name ^ ".url" else fname
@@ -470,13 +550,19 @@ let effective_send_c_ok conf base p file file_name =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
   History.record conf base changed
-    (if mode = "portraits" then "si"
-    else if file_name <> "" && note <> Adef.safe "" && source <> Adef.safe ""
-   then "sb"
-    else if file_name <> "" then "so"
-    else if note <> Adef.safe "" then "sc"
-    else if source <> Adef.safe "" then "ss"
-    else "sn");
+    (match mode with
+    | "portraits" -> "sp"
+    | "blasons" -> "sb"
+    | "carrousel" ->
+        if file_name <> "" && note <> Adef.safe "" && source <> Adef.safe ""
+        then "s3"
+        else if file_name <> "" then "sf"
+        else if note <> Adef.safe "" then "so"
+        else if source <> Adef.safe "" then "ss"
+        else "sx"
+    | "note" -> "so"
+    | "source" -> "ss"
+    | _ -> "s?");
   file_name
 
 (* Delete *)
@@ -521,8 +607,11 @@ let print_deleted conf base p =
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =
-  let fname = Image.default_portrait_filename base p in
-  let ext = get_extension conf false fname in
+  let mode =
+    try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
+  in
+  let fname = Image.default_image_filename "portraits" base p in
+  let ext = get_extension conf fname mode false fname in
   let dir = !GWPARAM.portraits_d conf.bname in
   if move_file_to_save (fname ^ ext) dir = 0 then
     incorrect conf "effective delete";
@@ -552,12 +641,8 @@ let print_del conf base =
 (* removes portrait or other image and saves it into old folder *)
 (* if delete=on permanently deletes the file in old folder *)
 
-let effective_delete_c_ok conf base p =
-  let fname = Image.default_portrait_filename base p in
-  let file_name =
-    try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
-  in
-  let file_name = (Mutil.decode file_name :> string) in
+let effective_delete_c_ok conf base ?(f_name = "") p =
+  let keydir = Image.default_image_filename "portraits" base p in
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
@@ -565,63 +650,177 @@ let effective_delete_c_ok conf base p =
     try List.assoc "delete" conf.env = Adef.encoded "on"
     with Not_found -> false
   in
-  let ext = get_extension conf delete fname in
-  let file = if file_name = "" then fname ^ ext else file_name in
+  let fname =
+    if f_name = "" then
+      try List.assoc "file_name" conf.env |> Mutil.decode with Not_found -> ""
+    else f_name
+  in
   let dir =
-    if mode = "portraits" then !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) fname
+    if mode = "portraits" || mode = "blasons" then
+      !GWPARAM.portraits_d conf.bname
+    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
   in
   Filesystem.create_dir ~parent:true dir;
   (* TODO verify we dont destroy a saved image
       having the same name as portrait! *)
-  if delete then
-    Mutil.rm (String.concat Filename.dir_sep [ dir; "saved"; file ])
-  else if move_file_to_save file dir = 0 then incorrect conf "effective delete";
+  let orig_file =
+    if delete then String.concat Filename.dir_sep [ dir; "saved"; fname ]
+    else Filename.concat dir fname
+  in
+  let orig_file = Image.find_file_without_ext orig_file in
+  (* FIXME basename *)
+  let file = Filename.basename orig_file in
+  if orig_file = "" then incorrect conf "empty file name"
+    (* if delete is on, we are talking about saved files *)
+  else if delete then Mutil.rm orig_file (* is it needed ?, move should do it *)
+  else if move_file_to_save dir file = 0 then incorrect conf "effective delete";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
   in
-  History.record conf base changed (if mode = "portraits" then "di" else "do");
-  file_name
+  History.record conf base changed
+    (match mode with
+    | "portraits" -> "dq"
+    | "blasons" -> "db"
+    | "carrousel" -> "dc"
+    | _ -> "d?");
+  fname
 
-(* carrousel *)
-(* reset portrait or image from old folder to portrait or others *)
-
-let effective_reset_c_ok conf base p =
+let effective_copy_portrait_to_blason conf base p =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
-  let keydir = Image.default_portrait_filename base p in
-  let file_name =
-    try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
+  let keydir = Image.default_image_filename "portraits" base p in
+  let create_url_file keydir url =
+    let fname =
+      Filename.concat (!GWPARAM.images_d conf.bname) (keydir ^ ".url")
+    in
+    let oc = Secure.open_out_bin fname in
+    output_string oc url;
+    flush oc;
+    close_out oc;
+    fname
   in
-  let file_name = (Mutil.decode file_name :> string) in
-  let file_name = if mode = "portraits" then keydir else file_name in
-  let ext = get_extension conf false file_name in
-  let old_ext = get_extension conf true file_name in
+  let dir = !GWPARAM.portraits_d conf.bname in
+  let fname, url =
+    match Image.src_of_string conf (sou base (get_image p)) with
+    | `Url u -> (create_url_file keydir u, true)
+    | _ -> (Image.default_image_filename "portraits" base p, false)
+  in
+  let ext =
+    if url then ".url" else get_extension conf keydir mode false fname
+  in
+  let portrait_filename =
+    String.concat Filename.dir_sep [ dir; keydir ^ ext ]
+  in
+  let blason_filename =
+    String.concat Filename.dir_sep
+      [ dir; Image.default_image_filename "blasons" base p ^ ext ]
+  in
+  let has_blason_self = Image.has_blason conf base p true in
+  (* attention, xxx.url has to be removed too *)
+  let _deleted =
+    (if has_blason_self then
+     effective_delete_c_ok conf base
+       ~f_name:(Filename.basename blason_filename)
+       p
+    else "OK")
+    <> ""
+  in
+  cp portrait_filename blason_filename;
+  History.record conf base
+    (U_Send_image (Util.string_gen_person base (gen_person_of_person p)))
+    "cb";
+  blason_filename
+
+let effective_copy_image_to_blason conf base p =
+  let fname =
+    try List.assoc "file_name" conf.env |> Mutil.decode with Not_found -> ""
+  in
+  let fname = Mutil.decode (Adef.encoded fname) in
+  let keydir = Image.default_image_filename "portraits" base p in
+  let ext = Filename.extension fname in
+  let blason_filename =
+    String.concat Filename.dir_sep
+      [
+        Image.portrait_folder conf;
+        Image.default_image_filename "blasons" base p ^ ext;
+      ]
+  in
+  let has_blason_self = Image.has_blason conf base p true in
+  let _deleted =
+    (if has_blason_self then
+     effective_delete_c_ok conf base
+       ~f_name:(Filename.basename blason_filename)
+       p
+    else "OK")
+    <> ""
+  in
+  (* la fonction image_to_blason part des images sauvegardées *)
+  let fname =
+    String.concat Filename.dir_sep
+      [ Image.carrousel_folder conf; keydir; "saved"; fname ]
+  in
+  cp fname blason_filename;
+  History.record conf base
+    (U_Send_image (Util.string_gen_person base (gen_person_of_person p)))
+    "cd";
+  blason_filename
+
+(* reset portrait or image from old folder to portrait or others *)
+
+let effective_reset_c_ok conf base p =
+  (* WARNING: when saved portrait is an url, we should update the person record
+     when doing a reset  idem for delete *)
+  let mode =
+    try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
+  in
+  let keydir = Image.default_image_filename "portraits" base p in
+  let file_name =
+    match mode with
+    | "portraits" -> Image.default_image_filename "portraits" base p
+    | "blasons" -> Image.default_image_filename "blasons" base p
+    | "carrousel" -> (
+        try List.assoc "file_name" conf.env |> Mutil.decode
+        with Not_found -> "")
+    | _ -> ""
+  in
+  let ext = get_extension conf keydir mode false file_name in
+  let old_ext = get_extension conf keydir mode true file_name in
+  let t_ext = Filename.extension file_name in
+  let file_name_no_ext =
+    if Array.mem t_ext Image.ext_list_2 then Filename.remove_extension file_name
+    else file_name
+  in
   let ext =
     match Image.get_portrait conf base p with
-    | Some src ->
-        if Mutil.start_with "http" 0 (Image.src_to_string src) then ".url"
-        else ext
+    | Some src -> if Image.is_url (Image.src_to_string src) then ".url" else ext
     | _ -> ext
   in
-  let file_in_new =
-    if mode = "portraits" then
-      Filename.concat (!GWPARAM.portraits_d conf.bname) (file_name ^ ext)
-    else
-      String.concat Filename.dir_sep
-        [ !GWPARAM.images_d conf.bname; keydir; file_name ]
+  let dir =
+    if mode = "portraits" || mode = "blasons" then
+      !GWPARAM.portraits_d conf.bname
+    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
   in
-  (if Sys.file_exists file_in_new then ()
-  else
-    match Image.get_portrait conf base p with
-    | Some (`Url url) -> (
-        try write_file file_in_new url
-        with _ ->
-          incorrect conf
-            (Printf.sprintf "reset portrait (swap file %s)" file_in_new))
-    | _ -> ());
-  swap_files file_in_new ext old_ext;
+  let file_in_new =
+    if ext <> "." then Filename.concat dir (file_name_no_ext ^ ext)
+    else Filename.concat dir (file_name_no_ext ^ old_ext)
+  in
+  let file_in_old =
+    if old_ext <> "." then
+      String.concat Filename.dir_sep
+        [ dir; "saved"; file_name_no_ext ^ old_ext ]
+    else String.concat Filename.dir_sep [ dir; "saved"; file_name_no_ext ^ ext ]
+  in
+  swap_files file_in_new file_in_old;
+  let changed =
+    U_Send_image (Util.string_gen_person base (gen_person_of_person p))
+  in
+  History.record conf base changed
+    (match mode with
+    | "portraits" -> "rp"
+    | "blasons" -> "rb"
+    | "carrousel" -> "rc"
+    | _ -> "r?");
   file_name
 
 (* ************************************************************************** *)
@@ -642,21 +841,21 @@ let print_main_c conf base =
           match Util.p_getenv conf.env "i" with
           | Some ip -> (
               let p = poi base (Gwdb.iper_of_string ip) in
-              let digest = Image.default_portrait_filename base p in
+              let digest = Image.default_image_filename "portraits" base p in
               let conf, report =
-                match Util.p_getenv conf.env "m" with
-                | Some "SND_IMAGE_C_OK" ->
+                match m with
+                | "SND_IMAGE_C_OK" ->
                     let mode =
                       try (List.assoc "mode" conf.env :> string)
                       with Not_found -> "portraits"
                     in
                     let file_name =
-                      try (List.assoc "file_name" conf.env :> string)
+                      try List.assoc "file_name" conf.env |> Mutil.decode
                       with Not_found -> ""
                     in
                     let file_name =
                       if file_name = "" then
-                        try (List.assoc "file_name_2" conf.env :> string)
+                        try List.assoc "file_name_2" conf.env |> Mutil.decode
                         with Not_found -> ""
                       else file_name
                     in
@@ -684,23 +883,53 @@ let print_main_c conf base =
                     if digest = idigest then
                       (conf, effective_send_c_ok conf base p file file_name)
                     else (conf, "idigest error")
-                | Some "DEL_IMAGE_C_OK" ->
+                | "DEL_IMAGE_C_OK" ->
                     let idigest =
                       try (List.assoc "idigest" conf.env :> string)
+                      with Not_found -> ""
+                    in
+                    let fdigest =
+                      try (List.assoc "fdigest" conf.env :> string)
                       with Not_found -> ""
                     in
                     if digest = idigest then
                       (conf, effective_delete_c_ok conf base p)
+                    else if fdigest != "" then
+                      (conf, effective_delete_c_ok conf base p)
                     else (conf, "idigest error")
-                | Some "RESET_IMAGE_C_OK" ->
+                | "RESET_IMAGE_C_OK" ->
                     let idigest =
                       try (List.assoc "idigest" conf.env :> string)
                       with Not_found -> ""
                     in
+                    let fdigest =
+                      try (List.assoc "fdigest" conf.env :> string)
+                      with Not_found -> ""
+                    in
                     if digest = idigest then
                       (conf, effective_reset_c_ok conf base p)
+                    else if fdigest != "" then
+                      (conf, effective_reset_c_ok conf base p)
                     else (conf, "idigest error")
-                | Some "IMAGE_C" -> (conf, "image")
+                | "BLASON_MOVE_TO_ANC" ->
+                    if Image.has_blason conf base p true then
+                      match Util.p_getenv conf.env "ia" with
+                      | Some ia ->
+                          let fa = poi base (Gwdb.iper_of_string ia) in
+                          (conf, move_blason_file conf base p fa)
+                      | None -> (conf, "")
+                    else (conf, "")
+                | "PORTRAIT_TO_BLASON" ->
+                    (conf, effective_copy_portrait_to_blason conf base p)
+                | "IMAGE_TO_BLASON" ->
+                    (conf, effective_copy_image_to_blason conf base p)
+                | "BLASON_STOP" ->
+                    let has_blason_self = Image.has_blason conf base p true in
+                    let has_blason = Image.has_blason conf base p false in
+                    if has_blason && not has_blason_self then
+                      (conf, create_blason_stop conf base p)
+                    else (conf, "idigest error")
+                | "IMAGE_C" -> (conf, "image")
                 | _ -> (conf, "incorrect request")
               in
               match report with
@@ -723,20 +952,31 @@ let print conf base =
       let fn = p_first_name base p in
       let sn = p_surname base p in
       if fn = "?" || sn = "?" then Hutil.incorrect_request conf
-      else print_send_image conf base p
+      else print_send_image conf base "portraist" p
+
+let print_family conf base =
+  match p_getenv conf.env "i" with
+  | None -> Hutil.incorrect_request conf
+  | Some ip ->
+      let p = poi base (iper_of_string ip) in
+      let sn = p_surname base p in
+      if sn = "?" then Hutil.incorrect_request conf
+      else print_send_image conf base "blasons" p
 
 (* carrousel *)
-let print_c ?(saved = false) conf base =
+let print_c ?(saved = false) ?(portrait = true) conf base =
+  let mode = if portrait then "portraits" else "blasons" in
   match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
   | Some f, Some p ->
-      let k = Image.default_portrait_filename base p in
+      let k = Image.default_image_filename "portraits" base p in
       let f = Filename.concat k f in
       ImageDisplay.print_source conf (if saved then insert_saved f else f)
   | Some f, _ -> ImageDisplay.print_source conf f
   | _, Some p -> (
       match
-        (if saved then Image.get_old_portrait else Image.get_portrait)
-          conf base p
+        if saved then Image.get_old_portrait_or_blason conf base "portraits" p
+        else if mode = "portraits" then Image.get_portrait conf base p
+        else Image.get_blason conf base p false
       with
       | Some (`Path f) ->
           Result.fold ~ok:ignore

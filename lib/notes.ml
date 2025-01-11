@@ -559,7 +559,7 @@ let person_note conf base p str =
   let env =
     [
       ('i', fun () -> string_of_iper (get_iper p));
-      ('k', fun () -> Image.default_portrait_filename base p);
+      ('k', fun () -> Image.default_image_filename "portraits" base p);
     ]
   in
   note conf base env str
@@ -568,7 +568,7 @@ let source_note conf base p str =
   let env =
     [
       ('i', fun () -> string_of_iper (get_iper p));
-      ('k', fun () -> Image.default_portrait_filename base p);
+      ('k', fun () -> Image.default_image_filename "portraits" base p);
     ]
   in
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str

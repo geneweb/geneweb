@@ -65,7 +65,8 @@ let change_child conf base parent_surname changed ip =
     let key = new_first_name ^ " " ^ new_surname in
     let ipl = Gutil.person_ht_find_all base key in
     check_conflict base p key new_occ ipl;
-    Image.rename_portrait conf base p (new_first_name, new_surname, new_occ);
+    Image.rename_portrait_and_blason conf base p
+      (new_first_name, new_surname, new_occ);
     (* On ajoute les enfants dans le type Change_children_name       *)
     (* pour la future mise à jour de l'historique et du fichier gwf. *)
     let changed =

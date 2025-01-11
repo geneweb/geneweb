@@ -1274,9 +1274,22 @@ let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
     | None -> ""
   else ""
 
+let gen_string_of_fimg_sz max_w max_h conf base (p, p_auth) =
+  if p_auth then
+    match Image.get_blason_with_size conf base p false with
+    | Some (_, Some (w, h)) ->
+        let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
+        Format.sprintf " width=\"%d\" height=\"%d\"" w h
+    | Some (_, None) | None -> Format.sprintf " height=\"%d\"" max_h
+  else ""
+
 let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
 let string_of_image_medium_size = gen_string_of_img_sz 160 120
 let string_of_image_small_size = gen_string_of_img_sz 100 75
+let string_of_blason_size = gen_string_of_fimg_sz max_im_wid max_im_wid
+let string_of_blason_medium_size = gen_string_of_fimg_sz 160 120
+let string_of_blason_small_size = gen_string_of_fimg_sz 100 75
+let string_of_blason_extra_small_size = gen_string_of_fimg_sz 50 37
 
 let get_sosa conf base env r p =
   try List.assoc (get_iper p) !r
@@ -1345,7 +1358,7 @@ let get_note_or_source conf base ?(p = Gwdb.empty_person base Gwdb.dummy_iper)
     let env =
       [
         ('i', fun () -> string_of_iper (get_iper p));
-        ('k', fun () -> Image.default_portrait_filename base p);
+        ('k', fun () -> Image.default_image_filename "portraits" base p);
       ]
     in
     let s = string_with_macros conf env note_or_source in
@@ -1734,7 +1747,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
           null_val
       | _ -> null_val)
   (* carrousel *)
-  | "idigest" -> Image.default_portrait_filename base p |> str_val
+  | "idigest" -> Image.default_image_filename "portraits" base p |> str_val
   | "img_cnt" -> (
       match get_env "img_cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
@@ -2335,6 +2348,12 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           eval_relation_field_var conf base env (0, rt, ip, true) loc sl
       | _ -> raise Not_found)
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
+  | "blason_owner" :: sl -> (
+      match Image.get_blason_owner conf base a with
+      | Some fa_iper ->
+          let ep = make_ep conf base fa_iper in
+          eval_person_field_var conf base env ep loc sl
+      | None -> null_val)
   | "sosa_ref" :: sl -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref (Some p) ->
@@ -3484,21 +3503,29 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_first_names_aliases" ->
       if hide_person conf base p then false else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
+  (* Beware: lots of confusion between image and portrait *)
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
+  | "has_blason" -> Image.has_blason conf base p false
+  | "has_blason_self" -> Image.has_blason conf base p true
+  | "has_blason_stop" -> Image.has_blason_stop conf base p
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
       | _ -> false)
+  | "has_c_image_url" -> (
+      match get_env "carrousel_img" env with
+      | Vstring s -> Image.is_url s
+      | _ -> false)
   | "has_old_image_url" | "has_old_portrait_url" -> (
-      match Image.get_old_portrait conf base p with
+      match Image.get_old_portrait_or_blason conf base "portraits" p with
       | Some (`Url _url) -> true
       | _ -> false)
   (* carrousel *)
-  | "has_carrousel" -> Image.get_carrousel_imgs conf base p <> []
-  | "has_old_carrousel" -> Image.get_carrousel_old_imgs conf base p <> []
   | "has_old_image" | "has_old_portrait" ->
-      Image.get_old_portrait conf base p |> Option.is_some
+      Image.get_old_portrait_or_blason conf base "portraits" p |> Option.is_some
+  | "has_old_blason" ->
+      Image.get_old_portrait_or_blason conf base "blasons" p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -3734,21 +3761,41 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         let sn = sou base (get_surname p) in
         let occ = get_occ p in
         HistoryDiff.history_file fn sn occ |> str_val
-  | "image" -> (
+  | "image" | "portrait" -> (
       match Image.get_portrait conf base p with
       | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "image_html_url" -> string_of_image_url conf base ep true |> safe_val
-  | "image_size" -> string_of_image_size conf base ep |> str_val
-  | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
-  | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
-  | "image_url" -> string_of_image_url conf base ep false |> safe_val
+  | "old_image" | "old_portrait" -> (
+      match Image.get_old_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "image_html_url" | "portrait_html_url" ->
+      string_of_image_url conf base ep true false |> safe_val
+  | "image_size" | "portrait_size" ->
+      string_of_image_size conf base ep |> str_val
+  | "blason_size" -> string_of_blason_size conf base ep |> str_val
+  | "image_medium_size" | "portrait_medium_size" ->
+      string_of_image_medium_size conf base ep |> str_val
+  | "blason_medium_size" -> string_of_blason_medium_size conf base ep |> str_val
+  | "image_small_size" | "portrait_small_size" ->
+      string_of_image_small_size conf base ep |> str_val
+  | "blason_small_size" -> string_of_blason_small_size conf base ep |> str_val
+  | "blason_extra_small_size" ->
+      string_of_blason_extra_small_size conf base ep |> str_val
+  | "image_url" | "portrait_url" ->
+      string_of_image_url conf base ep false false |> safe_val
+  | "old_image_url" | "old_portrait_url" ->
+      string_of_image_url conf base ep false true |> safe_val
+  | "blason_url" -> string_of_blason_url conf base ep false false |> safe_val
+  | "old_blason_url" -> string_of_blason_url conf base ep false true |> safe_val
   | "index" -> (
       match get_env "p_link" env with
       | Vbool _ -> null_val
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
-  (* carrousel functions *)
-  | "carrousel" -> Image.default_portrait_filename base p |> str_val
+  | "carrousel" -> Image.default_image_filename "portraits" base p |> str_val
+  | "blason_carrousel" ->
+      Image.default_image_filename "blasons" base p |> str_val
   | "carrousel_img_nbr" ->
       string_of_int (List.length (Image.get_carrousel_imgs conf base p))
       |> str_val
@@ -3763,32 +3810,40 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "carrousel_img_src" env with
       | Vstring source -> str_val source
       | _ -> raise Not_found)
-  | "portrait" -> (
-      (* TODO what do we want here? can we remove this? *)
-      match Image.get_portrait conf base p with
-      | Some (`Path s) -> str_val s
-      | Some (`Url u) -> str_val u
+  | "blason" -> (
+      match Image.get_blason conf base p false with
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "portrait_name" -> (
-      match Image.get_portrait conf base p with
-      | Some (`Path s) -> str_val (Filename.basename s)
-      | Some (`Url u) -> str_val u (* ?? *)
+  | "old_blason" -> (
+      match Image.get_old_blason conf base p false with
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "portrait_saved" -> (
-      match Image.get_old_portrait conf base p with
-      | Some (`Path s) -> str_val s
-      | Some (`Url u) -> str_val u
+  | "blason_self" -> (
+      match Image.get_blason conf base p true with
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "portrait_saved_name" -> (
-      match Image.get_old_portrait conf base p with
-      | Some (`Path s) -> str_val (Filename.basename s)
-      | Some (`Url u) -> str_val u (* ?? *)
-      | None -> null_val)
+  | "portrait_name" -> str_val (Image.get_portrait_name conf base p)
+  | "blason_name" -> str_val (Image.get_blason_name conf base p)
+  | "old_portrait_name" -> str_val (Image.get_old_portrait_name conf base p)
+  | "old_blason_name" -> str_val (Image.get_old_blason_name conf base p)
+  | "blason_stop_name" ->
+      str_val (Image.default_image_filename "blasons" base p ^ ".stop")
   | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
   | "key" ->
       if hide_person conf base p then null_val
       else
         Format.sprintf "%s.%d %s"
+          (p_first_name base p |> Name.lower)
+          (get_occ p)
+          (p_surname base p |> Name.lower)
+        |> str_val
+  | "keydir" ->
+      if is_hide_names conf p && not p_auth then null_val
+      else
+        Format.sprintf "%s.%d.%s"
           (p_first_name base p |> Name.lower)
           (get_occ p)
           (p_surname base p |> Name.lower)
@@ -4017,7 +4072,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           let env =
             [
               ('i', fun () -> string_of_iper (get_iper p));
-              ('k', fun () -> Image.default_portrait_filename base p);
+              ('k', fun () -> Image.default_image_filename "portraits" base p);
             ]
           in
           let s =
@@ -4186,13 +4241,20 @@ and string_of_died conf p p_auth =
     | NotDead | DontKnowIfDead | OfCourseDead -> ""
   else ""
 
-and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
+and string_of_image_url conf base (p, p_auth) html saved : Adef.escaped_string =
   if p_auth then
-    match Image.get_portrait conf base p with
+    match
+      if saved then Image.get_old_portrait conf base p
+      else Image.get_portrait conf base p
+    with
+    | Some (`Path fname) when Filename.extension fname = ".url" -> (
+        match Some (Secure.open_in fname) with
+        | Some ic -> Adef.escaped (input_line ic)
+        | None -> Adef.escaped "")
     | Some (`Path fname) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
-        let k = Image.default_portrait_filename base p in
+        let k = Image.default_image_filename "portraits" base p in
         Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
           (commd conf :> string)
           (if html then "H" else "")
@@ -4203,6 +4265,34 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
     | Some (`Url url) -> Adef.escaped url (* FIXME *)
     | None -> Adef.escaped ""
   else Adef.escaped ""
+
+and string_of_blason_url conf base (p, p_auth) html saved : Adef.escaped_string
+    =
+  if p_auth then
+    match Image.get_blason_aux conf base p false saved with
+    | Some (`Path fname) when Filename.extension fname = ".url" -> (
+        match Some (Secure.open_in fname) with
+        | Some ic -> Adef.escaped (input_line ic)
+        | None -> Adef.escaped "")
+    | Some (`Path fname) ->
+        (* p is not the blason owner *)
+        let s = Unix.stat fname in
+        let k = Filename.basename fname |> Filename.chop_extension in
+        (* k is first_name.occ.surname.blason *)
+        let parts = String.split_on_char '.' k in
+        let access =
+          Format.sprintf "p=%s&n=%s&oc=%s" (List.nth parts 0) (List.nth parts 2)
+            (List.nth parts 1)
+        in
+        Format.sprintf "%sm=FIM%s&d=%d&%s&k=/%s"
+          (commd conf :> string)
+          (if html then "H" else "")
+          (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+          access k
+        |> Adef.escaped
+    | Some (`Url url) -> Adef.escaped url (* FIXME *)
+    | None -> Adef.escaped ""
+  else Adef.escaped "xz"
 
 and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
   match get_parents p with

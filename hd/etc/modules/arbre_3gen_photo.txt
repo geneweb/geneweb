@@ -14,11 +14,11 @@
 %end;
 %define;ttl(ss,gg)
   %if;(ss=0)
-    %if;(gg=2)[a grandfather/a grandmother/a grandparent]0
-    %else;[father/mother]0%end;
+    %if;(gg=2)([a grandfather/a grandmother/a grandparent]0)
+    %else;([father/mother]0)%end;
   %else;
-    %if;(gg=2)[a grandfather/a grandmother/a grandparent]1
-    %else;[father/mother]1%end;
+    %if;(gg=2)([a grandfather/a grandmother/a grandparent]1)
+    %else;([father/mother]1)%end;
   %end;
 %end;
 %( vtbr will show 2 vertical bars if one grandparents’ couple is divorced or separated
@@ -41,11 +41,18 @@
 %let;marriage_sep_check;%get_var.mar_father;%get_var.mar_mother;%in;
 %let;vtbr;%if;("-" in marriage_sep_check)2%else;1%end;%in;
 %define;ind(xx,gg)
-  %if;xx.has_image;
-    %if;(not cancel_links)<a href="%xx.image_url;" target="_blank">%end;
-    <img class="rounded" %xx.image_small_size; src="%xx.image_url;"
-      alt="[image/images]0" title="%xx; (%apply;ttl(xx.sex,gg))">
-    %if;(not cancel_links)</a>%end;
+  %if;(xx.has_image or xx.has_blason)
+    %if;xx.has_image;
+      %if;(not cancel_links)<a href="%xx.image_url;" target="_blank">%end;
+      <img class="rounded" %xx.image_small_size; src="%xx.image_url;"
+        alt="[image/images]0" title="%xx; %apply;ttl(xx.sex,gg)">
+      %if;(not cancel_links)</a>%end;
+    %elseif;xx.has_blason;
+      %if;(not cancel_links)<a href="%xx.blason_url;" target="_blank">%end;
+      <img class="rounded" %xx.blason_small_size; src="%xx.blason_url;"
+        alt="[image/images]0" title="%xx; %apply;ttl(xx.sex,gg)">
+      %if;(not cancel_links)</a>%end;
+    %end;
   %elseif;(b.default_image="yes")
     <img height="75" src="%images_prefix;img_unknown_%if;(xx.sex=1)wo%end;man.png" alt="[missing image]">
   %(%else;
