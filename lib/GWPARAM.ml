@@ -382,6 +382,9 @@ let p_auth conf base p =
     in
     loop 0
 
+let p_auth_sp conf base p =
+  p_auth conf base p || (conf.friend && is_semi_public p && conf.semi_public)
+
 let syslog (level : syslog_level) msg =
   let tm = Unix.(time () |> localtime) in
   let level =
@@ -439,6 +442,7 @@ let images_d = ref (Legacy.images_d : my_fun_2)
 let is_semi_public = ref is_semi_public
 let is_related = ref is_related
 let p_auth = ref p_auth
+let p_auth_sp = ref p_auth_sp
 let wrap_output = ref wrap_output
 let syslog = ref syslog
 let output_error = ref output_error
