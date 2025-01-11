@@ -137,6 +137,9 @@ val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
       - `false` otherwise
   *)
 
+val p_auth_sp : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+(** returns p_auth or true if both user and p are SemiPublic *)
+
 val syslog : (syslog_level -> string -> unit) ref
 (** Prints on stderr using `"[date]: level message"` format. *)
 
