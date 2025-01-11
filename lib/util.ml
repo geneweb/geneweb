@@ -874,15 +874,13 @@ let acces conf base x = acces_n conf base (Adef.escaped "") x
 (**/**)
 
 let restricted_txt = Adef.safe "....."
-let x_x_txt = Adef.safe "x x"
+let private_txt conf = transl conf "private" |> Utf8.capitalize_fst
 
 let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
   let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
-  else if chk && is_hide_names conf p && not (authorized_age conf base p) then
-    x_x_txt
-  else
+  else if !GWPARAM.p_auth_sp conf base p then
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
       | "", nn :: _ ->
@@ -897,6 +895,7 @@ let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
     if sn then
       match p_surname base p with "" -> beg | sn -> beg ^^^ " " ^<^ esc sn
     else beg
+  else Adef.safe (private_txt conf)
 
 let main_title conf base p =
   let titles = nobtit conf base p in

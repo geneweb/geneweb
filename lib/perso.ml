@@ -2860,42 +2860,46 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               eval_person_field_var conf base env ep loc sl
           | None -> warning_use_has_parents_before_parent loc "father" null_val)
       )
-  | [ "has_linked_page"; s ] -> (
-      match get_env "nldb" env with
-      | Vnldb db ->
-          let key =
-            let fn = Name.lower (sou base (get_first_name p)) in
-            let sn = Name.lower (sou base (get_surname p)) in
-            (fn, sn, get_occ p)
-          in
-          let r =
-            List.exists
-              (fun (pg, (_, il)) ->
-                match pg with
-                | Def.NLDB.PgMisc pg ->
-                    if List.mem_assoc key il then
-                      let nenv, _ = Notes.read_notes base pg in
-                      List.mem_assoc s nenv
-                    else false
-                | _ -> false)
-              db
-          in
-          VVbool r
-      | _ -> raise Not_found)
+  | [ "has_linked_page"; s ] ->
+      if p_auth then
+        match get_env "nldb" env with
+        | Vnldb db ->
+            let key =
+              let fn = Name.lower (sou base (get_first_name p)) in
+              let sn = Name.lower (sou base (get_surname p)) in
+              (fn, sn, get_occ p)
+            in
+            let r =
+              List.exists
+                (fun (pg, (_, il)) ->
+                  match pg with
+                  | Def.NLDB.PgMisc pg ->
+                      if List.mem_assoc key il then
+                        let nenv, _ = Notes.read_notes base pg in
+                        List.mem_assoc s nenv
+                      else false
+                  | _ -> false)
+                db
+            in
+            VVbool r
+        | _ -> raise Not_found
+      else VVbool false
   (* TODO exclude TYPE gallery and album ?? *)
   (* TODO fold link_to_ind and Notes.link_to_ind !! *)
-  | [ "has_linked_pages" ] -> (
-      match get_env "nldb" env with
-      | Vnldb db ->
-          let key =
-            let fn = Name.lower (sou base (get_first_name p)) in
-            let sn = Name.lower (sou base (get_surname p)) in
-            (fn, sn, get_occ p)
-          in
-          VVbool (Notes.links_to_ind conf base db key None <> [])
-      | _ -> raise Not_found)
+  | [ "has_linked_pages" ] ->
+      if p_auth then
+        match get_env "nldb" env with
+        | Vnldb db ->
+            let key =
+              let fn = Name.lower (sou base (get_first_name p)) in
+              let sn = Name.lower (sou base (get_surname p)) in
+              (fn, sn, get_occ p)
+            in
+            VVbool (Notes.links_to_ind conf base db key None <> [])
+        | _ -> raise Not_found
+      else VVbool false
   | [ "has_linked_pages_2" ] ->
-      VVbool (Notes.linked_pages_nbr conf base (get_iper p) > 0)
+      VVbool (p_auth && Notes.linked_pages_nbr conf base (get_iper p) > 0)
   | [ "linked_pages_nbr" ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
@@ -3329,7 +3333,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth
       && (snd (Util.get_approx_death_date_place conf base p) :> string) <> ""
   | "has_aliases" ->
-      if (not p_auth) && is_hide_names conf p then false
+      if (not p_auth) || is_hide_names conf p then false
       else get_aliases p <> []
   | "has_baptism_date" -> p_auth && get_baptism p <> Date.cdate_None
   | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
@@ -3470,7 +3474,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       Array.length (get_family p) > 0
       || !GWPARAM_ITL.has_family_correspondance conf.command (get_iper p)
   | "has_first_names_aliases" ->
-      if (not p_auth) && is_hide_names conf p then false
+      if (not p_auth) || is_hide_names conf p then false
       else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
   | "has_image" | "has_portrait" ->
@@ -3504,13 +3508,13 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       !GWPARAM_ITL.has_parents_link conf.command (get_iper p)
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
-      if is_hide_names conf p && not p_auth then false
+      if (not p_auth) || is_hide_names conf p then false
       else sou base (get_psources p) <> ""
   | "has_public_name" ->
-      if (not p_auth) && is_hide_names conf p then false
+      if (not p_auth) || is_hide_names conf p then false
       else sou base (get_public_name p) <> ""
   | "has_qualifiers" ->
-      if (not p_auth) && is_hide_names conf p then false
+      if (not p_auth) || is_hide_names conf p then false
       else get_qualifiers p <> []
   | "has_relations" ->
       if p_auth && conf.use_restrict then
@@ -3552,7 +3556,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                    || sou base (get_fsources fam) <> ""))
               (get_family p))
   | "has_surnames_aliases" ->
-      if (not p_auth) && is_hide_names conf p then false
+      if (not p_auth) || is_hide_names conf p then false
       else get_surnames_aliases p <> []
   | "is_buried" -> (
       match get_burial p with
@@ -3578,8 +3582,10 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | _ -> raise Not_found)
   | "is_female" -> get_sex p = Female
   | "is_invisible" ->
+      (* to visitors *)
       let conf = { conf with wizard = false; friend = false } in
       not (authorized_age conf base p)
+  | "is_visible" -> authorized_age conf base p
   | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
   | "is_public" -> Util.is_public conf base p
@@ -3599,9 +3605,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | _ -> null_val)
   | "alias" -> (
       match get_aliases p with
-      | nn :: _ ->
-          if (not p_auth) && is_hide_names conf p then null_val
-          else sou base nn |> Util.escape_html |> safe_val
+      | nn :: _ when p_auth -> sou base nn |> Util.escape_html |> safe_val
       | _ -> null_val)
   | "approx_birth_place" ->
       if p_auth then
@@ -3655,7 +3659,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             foi base ifam |> get_father |> pget conf base |> p_surname base
             |> ( <> ) (p_surname base p)
       in
-      if (not p_auth) && is_hide_names conf p then str_val "x x"
+      if (not p_auth) || is_hide_names conf p then
+        str_val (Util.private_txt conf)
       else if force_surname then gen_person_text conf base p |> safe_val
       else gen_person_text ~sn:false conf base p |> safe_val
   | "consanguinity" ->
@@ -3706,16 +3711,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "father_age_at_birth" ->
       string_of_parent_age conf base ep get_father |> safe_val
   | "first_name" ->
-      if (not p_auth) && is_hide_names conf p then str_val "x"
-      else p_first_name base p |> Util.escape_html |> safe_val
+      if !GWPARAM.p_auth_sp conf base p then
+        p_first_name base p |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf)
   | "first_name_key" ->
-      if is_hide_names conf p && not p_auth then null_val
+      if (not p_auth) || is_hide_names conf p then null_val
       else p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
   | "first_name_key_val" ->
-      if is_hide_names conf p && not p_auth then null_val
+      if (not p_auth) || is_hide_names conf p then null_val
       else p_first_name base p |> Name.lower |> str_val
   | "first_name_key_strip" ->
-      if is_hide_names conf p && not p_auth then null_val
+      if (not p_auth) || is_hide_names conf p then null_val
       else Name.strip_c (p_first_name base p) '"' |> str_val
   | "history_file" ->
       if not p_auth then null_val
@@ -3776,7 +3782,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | None -> null_val)
   | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
   | "key" ->
-      if is_hide_names conf p && not p_auth then null_val
+      if (not p_auth) || is_hide_names conf p then null_val
       else
         Format.sprintf "%s.%d %s"
           (p_first_name base p |> Name.lower)
@@ -3890,7 +3896,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "notes" | "pnotes" ->
       get_notes p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "occ" ->
-      if is_hide_names conf p && not p_auth then null_val
+      if (not p_auth) || is_hide_names conf p then null_val
       else get_occ p |> string_of_int |> str_val
   | "occupation" ->
       get_occupation p |> get_note_or_source conf base ~p p_auth false
@@ -3971,12 +3977,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           string_of_iper imoth |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "public_name" ->
-      if (not p_auth) && is_hide_names conf p then null_val
-      else get_public_name p |> sou base |> Util.escape_html |> safe_val
+      if p_auth then
+        get_public_name p |> sou base |> Util.escape_html |> safe_val
+      else null_val
   | "qualifier" -> (
       match get_qualifiers p with
-      | nn :: _ when p_auth || not (is_hide_names conf p) ->
-          sou base nn |> Util.escape_html |> safe_val
+      | nn :: _ when p_auth -> sou base nn |> Util.escape_html |> safe_val
       | _ -> null_val)
   | "sex" ->
       (* Pour éviter les traductions bizarre, on ne teste pas p_auth. *)
@@ -4022,32 +4028,35 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           string_with_macros conf env s |> str_val
       | _ -> null_val)
   | "surname" ->
-      if (not p_auth) && is_hide_names conf p then str_val "x"
-      else p_surname base p |> Util.escape_html |> safe_val
+      if !GWPARAM.p_auth_sp conf base p then
+        p_surname base p |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf)
   | "surname_begin" ->
-      if (not p_auth) && is_hide_names conf p then null_val
-      else
+      if !GWPARAM.p_auth_sp conf base p then
         p_surname base p |> surname_particle base |> Util.escape_html
         |> safe_val
+      else null_val
   | "surname_end" ->
-      if (not p_auth) && is_hide_names conf p then str_val "x"
-      else
+      if !GWPARAM.p_auth_sp conf base p then
         p_surname base p
         |> surname_without_particle base
         |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf)
   | "surname_key" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else p_surname base p |> Name.lower |> Mutil.encode |> safe_val
+      if !GWPARAM.p_auth_sp conf base p then
+        p_surname base p |> Name.lower |> Mutil.encode |> safe_val
+      else null_val
   | "surname_key_val" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else p_surname base p |> Name.lower |> str_val
+      if !GWPARAM.p_auth_sp conf base p then
+        p_surname base p |> Name.lower |> str_val
+      else null_val
   | "surname_key_strip" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else Name.strip_c (p_surname base p) '"' |> str_val
-  | "title" -> person_title conf base p |> safe_val
-  | "p_auth" ->
-      Format.sprintf "p_auth %s\n" (if p_auth then "true" else "false")
-      |> str_val
+      if !GWPARAM.p_auth_sp conf base p then
+        Name.strip_c (p_surname base p) '"' |> str_val
+      else null_val
+  | "title" -> if p_auth then person_title conf base p |> safe_val else null_val
+  | "p_auth" -> !GWPARAM.p_auth conf base p |> bool_val
+  | "p_auth_sp" -> !GWPARAM.p_auth_sp conf base p |> bool_val
   | _ -> raise Not_found
 
 and eval_witness_relation_var conf base env
@@ -4306,14 +4315,14 @@ let print_foreach conf base print_ast eval_expr =
   in
 
   let print_foreach_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first a ->
           let env = ("alias", Vstring (sou base a)) :: env in
           let env = ("first", Vbool first) :: env in
           List.iter (print_ast env ep) al)
         (get_aliases p)
+    else ()
   in
 
   let print_foreach_ascendant env al ep =
@@ -4873,14 +4882,14 @@ let print_foreach conf base print_ast eval_expr =
   in
 
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first s ->
           let env = ("first_name_alias", Vstring (sou base s)) :: env in
           let env = ("first", Vbool first) :: env in
           List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
+    else ()
   in
 
   let print_foreach_cousin_path env el al ((p, _) as ep) in_or_less =
@@ -4953,6 +4962,7 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         titles
   in
+
   let print_foreach_nob_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
@@ -4963,6 +4973,7 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         titles
   in
+
   let print_foreach_parent env al ((a, _) as ep) =
     match get_parents a with
     | Some ifam ->
@@ -4975,16 +4986,18 @@ let print_foreach conf base print_ast eval_expr =
           (get_parent_array cpl)
     | None -> ()
   in
+
   let print_foreach_qualifier env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first nn ->
           let env = ("qualifier", Vstring (sou base nn)) :: env in
           let env = ("first", Vbool first) :: env in
           List.iter (print_ast env ep) al)
         (get_qualifiers p)
+    else ()
   in
+
   let print_foreach_relation env al ((p, p_auth) as ep) =
     if p_auth then
       Mutil.list_iter_first
@@ -4994,6 +5007,7 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         (get_rparents p)
   in
+
   let print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
       let l =
@@ -5039,6 +5053,7 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         l
   in
+
   let print_foreach_sorted_list_item env al ep listname =
     let l =
       match get_env listname env with
@@ -5055,6 +5070,7 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop (Vslistlm []) l
   in
+
   let print_foreach_source env al ((p, p_auth) as ep) =
     let rec insert_loop typ src = function
       | (typ1, src1) :: srcl ->
@@ -5136,16 +5152,18 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop true srcl
   in
+
   let print_foreach_surname_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first s ->
           let env = ("surname_alias", Vstring (sou base s)) :: env in
           let env = ("first", Vbool first) :: env in
           List.iter (print_ast env ep) al)
         (get_surnames_aliases p)
+    else ()
   in
+
   (* carrousel *)
   let print_foreach_img_in_carrousel env al ((p, _p_auth) as ep) old =
     let l =
@@ -5171,6 +5189,7 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop true 1 l
   in
+
   let print_simple_foreach env el al ini_ep ep efam loc = function
     | "alias" -> print_foreach_alias env al ep
     | "ancestor" | "ascendant" -> print_foreach_ascendant env al ep
@@ -5234,6 +5253,7 @@ let print_foreach conf base print_ast eval_expr =
     | "witness_relation" -> print_foreach_witness_relation env al ep
     | _ -> raise Not_found
   in
+
   let print_foreach env ini_ep loc s sl ell al =
     let rec loop env ((a, _) as ep) efam = function
       | [ s ] -> print_simple_foreach env ell al ini_ep ep efam loc s
