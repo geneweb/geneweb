@@ -332,58 +332,62 @@ let is_related conf base p =
 
 let p_auth conf base p =
   conf.Config.wizard
-  || conf.Config.friend && conf.Config.semi_public
-     && (is_semi_public p || is_related conf base p)
-  || conf.Config.public_if_titles
-     && Gwdb.get_access p = IfTitles
-     && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-  ||
-  if false then conf.Config.private_years < -1
-  else
-    (* return true if (today - d) > lim *)
-    let check_date d lim none =
-      match d with
-      | None -> none ()
-      | Some d ->
-          let a = Date.time_elapsed d conf.today in
-          Printf.eprintf "  Check_date %d > %d \n" a.Def.year lim;
-          if a.Def.year > lim then true
-          else if a.Def.year = 0 then a.month > 0 || a.day > 0
-          else false
-    in
-    (* born more than private_years ago *)
-    check_date
-      (Gwdb.get_birth p |> Date.cdate_to_dmy_opt)
-      conf.Config.private_years
-    @@ fun () ->
-    (* baptised more than private_years ago *)
-    check_date
-      (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt)
-      conf.Config.private_years
-    @@ fun () ->
-    (* dead more than private_years_death ago *)
-    check_date
-      (Gwdb.get_death p |> Date.dmy_of_death)
-      conf.Config.private_years_death
-    @@ fun () ->
-    (* public if no date *)
-    (Gwdb.get_access p <> Def.Private && conf.Config.public_if_no_date)
-    ||
-    let families = Gwdb.get_family p in
-    let len = Array.length families in
-    let rec loop i =
-      i < len
-      (* true if one marriage is more than private_years_marriage ago *)
-      && check_date
-           (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
-          |> Date.cdate_to_dmy_opt)
-           conf.Config.private_years_marriage
-           (fun () -> loop (i + 1))
-    in
-    loop 0
+  || conf.userip = Some (Gwdb.get_iper p)
+  || Gwdb.get_access p <> Private
+     && (conf.Config.friend && conf.Config.semi_public
+         && (is_semi_public p || is_related conf base p)
+        || conf.Config.public_if_titles
+           && Gwdb.get_access p = IfTitles
+           && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+        || Gwdb.get_access p = Public
+        ||
+        if false then conf.Config.private_years < -1
+        else
+          (* return true if (today - d) > lim *)
+          let check_date d lim none =
+            match d with
+            | None -> none ()
+            | Some d ->
+                let a = Date.time_elapsed d conf.today in
+                Printf.eprintf "  Check_date %d > %d \n" a.Def.year lim;
+                if a.Def.year > lim then true
+                else if a.Def.year = 0 then a.month > 0 || a.day > 0
+                else false
+          in
+          (* born more than private_years ago *)
+          check_date
+            (Gwdb.get_birth p |> Date.cdate_to_dmy_opt)
+            conf.Config.private_years
+          @@ fun () ->
+          (* baptised more than private_years ago *)
+          check_date
+            (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt)
+            conf.Config.private_years
+          @@ fun () ->
+          (* dead more than private_years_death ago *)
+          check_date
+            (Gwdb.get_death p |> Date.dmy_of_death)
+            conf.Config.private_years_death
+          @@ fun () ->
+          (* public if no date *)
+          (Gwdb.get_access p <> Def.Private && conf.Config.public_if_no_date)
+          ||
+          let families = Gwdb.get_family p in
+          let len = Array.length families in
+          let rec loop i =
+            i < len
+            (* true if one marriage is more than private_years_marriage ago *)
+            && check_date
+                 (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
+                |> Date.cdate_to_dmy_opt)
+                 conf.Config.private_years_marriage
+                 (fun () -> loop (i + 1))
+          in
+          loop 0)
 
 let p_auth_sp conf base p =
-  p_auth conf base p || (conf.friend && is_semi_public p && conf.semi_public)
+  p_auth conf base p
+  || (conf.friend && conf.semi_public && Gwdb.get_access p <> Private)
 
 let syslog (level : syslog_level) msg =
   let tm = Unix.(time () |> localtime) in
