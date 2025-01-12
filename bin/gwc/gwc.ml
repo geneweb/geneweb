@@ -27,7 +27,7 @@ let check_magic fname ic =
 let next_family_fun_templ gwo_list fi =
   let ngwo = List.length gwo_list in
   let run =
-    if ngwo < 10 || not !Mutil.verbose then fun () -> ()
+    if ngwo < 10 || not !Gwcomp.verbose then fun () -> ()
     else if ngwo < 60 then (fun () ->
       Printf.eprintf ".";
       flush stderr)
@@ -85,7 +85,7 @@ let next_family_fun_templ gwo_list fi =
               ic_opt := Some ic;
               loop ()
           | [] ->
-              if ngwo < 10 || not !Mutil.verbose then ()
+              if ngwo < 10 || not !Gwcomp.verbose then ()
               else if ngwo < 60 then (
                 Printf.eprintf "\n";
                 flush stderr)
@@ -95,7 +95,6 @@ let next_family_fun_templ gwo_list fi =
     loop ()
 
 let just_comp = ref false
-let out_file = ref (Filename.concat Filename.current_dir_name "a")
 let in_file = ref ""
 let separate = ref false
 let bnotes = ref "merge"
@@ -131,19 +130,19 @@ let speclist =
       Arg.Set Gwcomp.no_picture,
       " Do not create associative pictures" );
     ( "-o",
-      Arg.Set_string out_file,
+      Arg.Set_string Gwcomp.out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
        available). Alphanumerics and -" );
     ( "-particles",
       Arg.Set_string Db1link.particules_file,
       "<file> Particles file (default = predefined particles)" );
-    ("-q", Arg.Clear Mutil.verbose, " Quiet");
+    ("-q", Arg.Clear Gwcomp.verbose, " Quiet");
     ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
     ("-rgpd", Arg.String (fun s -> Gwcomp.rgpd_files := s), "<file> Rgpd files");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
     ("-stats", Arg.Set Db1link.pr_stats, " Print statistics");
-    ("-v", Arg.Set Mutil.verbose, " Verbose");
+    ("-v", Arg.Set Gwcomp.verbose, " Verbose");
   ]
   |> List.sort compare |> Arg.align
 
@@ -165,7 +164,6 @@ let errmsg =
    and [options] are:"
 
 let main () =
-  Mutil.verbose := false;
   (try
      if Sys.is_directory !Gwcomp.rgpd_files then Gwcomp.rgpd := true
      else Gwcomp.rgpd := false
@@ -180,15 +178,16 @@ let main () =
     Printf.eprintf "The database name must be specified with -o\n";
     flush stdout;
     exit 2);
-  if !in_file <> "" && not (Array.mem "-o" Sys.argv) then out_file := !in_file;
-  if not (Mutil.good_name (Filename.basename !out_file)) then (
+  if !in_file <> "" && not (Array.mem "-o" Sys.argv) then
+    Gwcomp.out_file := !in_file;
+  if not (Mutil.good_name (Filename.basename !Gwcomp.out_file)) then (
     (* Util.transl conf not available !*)
     Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
-      !out_file;
+      !Gwcomp.out_file;
     Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
     flush stderr;
     exit 2);
-  let bname = Filename.remove_extension (Filename.basename !out_file) in
+  let bname = Filename.remove_extension (Filename.basename !Gwcomp.out_file) in
   Geneweb.GWPARAM.init bname;
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
