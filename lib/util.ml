@@ -221,6 +221,10 @@ let search_in_assets = search_in_path Secure.assets
 
 (* Internationalization *)
 
+let start_with s i p =
+  i + String.length p <= String.length s
+  && String.lowercase_ascii (String.sub s i (String.length p)) = p
+
 let start_with_vowel conf s =
   if String.length s > 0 then
     let s, _ = Name.unaccent_utf_8 true s 0 in
@@ -1428,10 +1432,6 @@ let message_to_wizard conf =
 let doctype = Adef.safe "<!DOCTYPE html>"
 
 let http_string s i =
-  let start_with s i p =
-    i + String.length p <= String.length s
-    && String.lowercase_ascii (String.sub s i (String.length p)) = p
-  in
   let http = "http://" in
   let https = "https://" in
   let http, start_with_http =
