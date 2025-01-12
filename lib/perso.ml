@@ -4157,7 +4157,7 @@ and simple_person_text conf base p p_auth : Adef.safe_string =
     match main_title conf base p with
     | Some t -> titled_person_text conf base p t
     | None -> gen_person_text conf base p
-  else if is_hide_names conf p then Adef.safe "x x"
+  else if is_hide_names conf p then Adef.safe (Util.private_txt conf)
   else gen_person_text conf base p
 
 and string_of_died conf p p_auth =
