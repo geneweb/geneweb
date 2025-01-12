@@ -100,6 +100,7 @@ val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
+val start_with : string -> int -> string -> bool
 val start_with_vowel : config -> string -> bool
 
 val acces_n :
