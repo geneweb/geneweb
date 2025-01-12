@@ -583,12 +583,12 @@ let short_dates_text_notag conf base p =
     let s =
       match (birth_date, death_date) with
       | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
-          prec_year_text conf b ^ "-" ^ prec_year_text conf d
+          prec_year_text conf b ^ "–" ^ prec_year_text conf d
       | Some (Dgreg (b, _)), _ -> (
           (* La personne peut être décédée mais ne pas avoir de date. *)
           match get_death p with
           | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-              prec_year_text conf b ^ "-"
+              prec_year_text conf b ^ "–"
           | _ -> prec_year_text conf b)
       | _, Some (Dgreg (d, _)) -> death_symbol conf ^ prec_year_text conf d
       | _, _ -> (
@@ -672,7 +672,7 @@ let short_family_dates_text conf base marr_sep fam =
   if authorized_age conf base fa && authorized_age conf base mo then
     if marr_sep then
       match (marr_dates_aux, sep_dates_aux) with
-      | Some m, Some s -> m ^ "-" ^ s
+      | Some m, Some s -> m ^ "–" ^ s
       | Some m, None -> m
       | None, _ -> ""
     else Option.value ~default:"" sep_dates_aux
