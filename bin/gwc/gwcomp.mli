@@ -97,6 +97,9 @@ val create_all_keys : bool ref
 (** Forces to create all the keys for every persons (even for ? ?).
     Enabled for gwplus format. *)
 
+val verbose : bool ref
+val out_file : string ref
+
 val comp_families : string -> unit
 (** Compile .gw file and save result to corresponding .gwo *)
 

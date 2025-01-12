@@ -24,6 +24,9 @@ let config_reorg bname =
   String.concat Filename.dir_sep
     [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
 
+let config_legacy bname =
+  String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
+
 type syslog_level =
   [ `LOG_ALERT
   | `LOG_CRIT
