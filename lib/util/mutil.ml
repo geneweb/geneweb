@@ -244,6 +244,7 @@ let surnames_pieces surname =
   in
   loop 0 0 0
 
+(** in string s, replace c1 by c2 *)
 let tr c1 c2 s =
   match String.rindex_opt s c1 with
   | Some _ ->
