@@ -83,9 +83,11 @@ let capitalize s =
 
 let initial n =
   let rec loop i =
-    if i = String.length n then 0
+    if i = String.length n then None
     else
-      match n.[i] with 'A' .. 'Z' | '\192' .. '\221' -> i | _ -> loop (succ i)
+      match n.[i] with
+      | 'A' .. 'Z' | '\192' .. '\221' -> Some i
+      | _ -> loop (succ i)
   in
   loop 0
 
