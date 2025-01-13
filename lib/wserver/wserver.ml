@@ -350,13 +350,23 @@ let f syslog addr_opt port tmout max_clients g =
       check_stopping ();
       let addr =
         match addr_opt with
-        | None -> Unix.inet6_addr_any
+        | None ->
+            if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
+              Unix.inet_addr_any
+            else Unix.inet6_addr_any
         | Some addr -> (
             try Unix.inet_addr_of_string addr
             with Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0))
       in
-      let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
-      Unix.setsockopt s Unix.IPV6_ONLY false;
+      let s =
+        Unix.socket
+          (if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
+           Unix.PF_INET
+          else Unix.PF_INET6)
+          Unix.SOCK_STREAM 0
+      in
+      if Unix.string_of_inet_addr Unix.inet6_addr_any <> "::" then
+        Unix.setsockopt s Unix.IPV6_ONLY false;
       Unix.setsockopt s Unix.SO_REUSEADDR true;
       Unix.bind s (Unix.ADDR_INET (addr, port));
       Unix.listen s 4;

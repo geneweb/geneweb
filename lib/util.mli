@@ -4,6 +4,8 @@ open Config
 open Def
 open Gwdb
 
+val is_welcome : bool ref
+
 val print_default_gwf_file : string -> unit
 (** print default config file bname.gwf or bname.gwb/etc/mybase.gwf *)
 

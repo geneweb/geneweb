@@ -46,11 +46,11 @@
                     <div class="d-flex align-items-center flex-grow-1">
                       %apply;input_hidden("e.b","b")
                       %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
-                      <div class="input-group mr-2">
-                        <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control w-50"
+                      <div class="input-group p-mod-group mr-2">
+                        <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
                           value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
                           placeholder="%if;(e.p_mod="" and b.p_mod!="")%b.p_mod;
-                          (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="40">
+                          (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="30">
                         <div class="input-group-append">
                           <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
                           <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-xmark fa-lg mx-1"></i></button>
@@ -405,12 +405,12 @@
               %end;
               <!-- Relationship graph builder -->
               <div class="dropdown-divider"></div>
-              <span class="dropdown-header pt-0" id="RLM"%if;cgi; data-eb="%e.b;"%end;%if;(b.access_by_key="yes") data-accessbykey="1"%end;
-                data-i="%index;" data-p="%first_name_key;" data-n="%surname_key"%if;(occ!=0) data-oc="%occ;"%end;
+              <span class="dropdown-header pt-0" id="RLM"%if;cgi; data-eb="%e.b;"%end;%if;(b.access_by_key="yes") data-accessbykey="1"%end;%sp;
+                data-i="%index;" data-p="%first_name_key;" data-n="%surname_key"%if;(occ!=0) data-oc="%occ;"%end;%sp;
                 data-self="%self; %dates_notag;">[*multi relations graph]</span>
               <div class="form-group px-3 mb-2">
                 <label for="description" class="sr-only">[*description]</label>
-                <input type="text" id="description" class="form-control" placeholder="[*description]" title="&t=…"></input>
+                <input type="text" id="description" class="form-control" placeholder="[*description]" title="&t=…">
               </div>
               <div class="btn-group d-flex pr-3" role="group">
                 <button class="dropdown-item flex-grow-1" title="%apply;addgraph%with;%self; %end;" id="saveButton">
@@ -475,6 +475,14 @@
                 </a>
               </li>
             %end;
+          %end;
+          %if;wizard;
+            <li class="nav-item">
+              <a class="nav-link text-secondary" href="%apply;url_set%with;m%and;MOD_NOTES%end;&f=new_linked_page"
+                title="[*create] [linked pages]%( TODO: TRANSLATION %)">
+                <i class="fa fa-images fa-fw mr-1" aria-hidden="true"></i>
+              </a>
+            </li>
           %end;
         </ul>
       </div>

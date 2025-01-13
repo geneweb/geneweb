@@ -230,6 +230,12 @@
         <span>%apply;a_of_b%with;, %if;spouse.is_male;[son/daughter/child]0%else;[son/daughter/child]1%end;
         %and;%apply;short_display_person("spouse.father") [and] %apply;short_display_person("spouse.mother")</span>%end;
       %end;
+      %if;has_witnesses;
+          %sp;(<span>%apply;a_of_b%with;[witness/witnesses]w%and;[marriage event]0%end;[:]
+          %foreach;witness;
+            %if;not is_first;, %end;%apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+          %end;</span>)%nn;
+      %end;
       %if;(has_children)%nn;
         , %apply;havingchildren(nb_children)[:]
         %foreach;child;
@@ -368,6 +374,7 @@
       </div>
       %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
     %end;
+    
     %if;(are_divorced or are_separated)
       <div class="mb-1 text-muted">
         %if;are_separated;[*separated]%if;(on_separation_date!="") %on_separation_date;%end;.%end;

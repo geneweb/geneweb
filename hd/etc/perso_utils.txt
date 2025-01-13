@@ -55,7 +55,7 @@
 
 %define;marr_wrench_to_bullet(xx)
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%nn;
+    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%nn;>
       <i class="fa fa-wrench fa-sm text-success"%sp;
         title="[*modify::family/families]0 %self; &%sp;
         %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;%sp;
