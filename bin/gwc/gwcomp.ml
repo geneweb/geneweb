@@ -23,6 +23,7 @@ let no_picture = ref false
 
 (** Fonctionnement RGPD *)
 let rgpd_files = ref "None"
+
 let auth_file_name = None
 let consent_list = None
 let rgpd = ref false
