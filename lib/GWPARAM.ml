@@ -37,12 +37,6 @@ type syslog_level =
   | `LOG_NOTICE
   | `LOG_WARNING ]
 
-module IperSet = Set.Make (struct
-  type t = Gwdb.iper
-
-  let compare = Stdlib.compare
-end)
-
 module Default = struct
   (* Attention, ajuster is_reorg_base en conséquence *)
   let config bname =
