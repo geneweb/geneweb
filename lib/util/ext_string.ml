@@ -74,14 +74,6 @@ let strip_all_trailing_spaces s =
   in
   loop 0
 
-let initial n =
-  let rec loop i =
-    if i = String.length n then 0
-    else
-      match n.[i] with 'A' .. 'Z' | '\192' .. '\221' -> i | _ -> loop (succ i)
-  in
-  loop 0
-
 module Set = Set.Make (String)
 
 let tr c1 c2 s =

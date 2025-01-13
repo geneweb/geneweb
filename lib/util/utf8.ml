@@ -81,6 +81,14 @@ let capitalize s =
   in
   cmap_utf_8 cmap s
 
+let initial n =
+  let rec loop i =
+    if i = String.length n then 0
+    else
+      match n.[i] with 'A' .. 'Z' | '\192' .. '\221' -> i | _ -> loop (succ i)
+  in
+  loop 0
+
 module C = struct
   type t = Str of string | Chr of char | Empty
 
