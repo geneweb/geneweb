@@ -3589,6 +3589,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
   | "is_public" -> Util.is_public conf base p
+  | "has_titles" -> get_titles p <> []
   | "is_semi_public" -> !GWPARAM.is_semi_public p
   | "is_related" -> !GWPARAM.is_related conf base p
   | "is_restricted" -> is_hidden p
