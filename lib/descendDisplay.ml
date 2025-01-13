@@ -127,9 +127,8 @@ let display_descendants_level conf base max_level ancestor =
     (fun (p, _) ->
       if Util.is_empty_person p then "?"
       else
-        String.sub (Gwdb.p_surname base p)
-          (Ext_string.initial (Gwdb.p_surname base p))
-          1)
+        let surname = Gwdb.p_surname base p in
+        Utf8.sub surname (Option.value ~default:0 (Utf8.initial surname)) 1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
       Output.print_string conf

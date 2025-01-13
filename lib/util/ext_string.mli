@@ -18,9 +18,6 @@ val cut_words : string -> string list
 val strip_all_trailing_spaces : string -> string
 (** Remove all trailing spaces in string *)
 
-val initial : string -> int
-(** Returns position of first capital letter in the name (0 if no capitals). *)
-
 module Set : Set.S with type elt = string
 (** Set of strings *)
 

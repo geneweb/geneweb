@@ -81,6 +81,20 @@ let capitalize s =
   in
   cmap_utf_8 cmap s
 
+let initial n =
+  let exception Found of int in
+  let find_uppercase uppercase_position position character =
+    let is_uppercase =
+      match character with
+      | `Uchar c -> Uucp.Case.is_upper c
+      | `Malformed _ -> false
+    in
+    if is_uppercase then raise (Found position)
+  in
+  match Uutf.String.fold_utf_8 find_uppercase () n with
+  | exception Found position -> Some position
+  | () -> None
+
 module C = struct
   type t = Str of string | Chr of char | Empty
 
