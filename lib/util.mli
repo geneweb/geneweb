@@ -165,7 +165,6 @@ val gen_person_text :
   ?escape:bool ->
   ?html:bool ->
   ?sn:bool ->
-  ?chk:bool ->
   ?p_first_name:(base -> person -> string) ->
   ?p_surname:(base -> person -> string) ->
   config ->

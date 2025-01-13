@@ -880,7 +880,7 @@ let acces conf base x = acces_n conf base (Adef.escaped "") x
 let restricted_txt = Adef.safe "....."
 let private_txt conf = transl conf "private" |> Utf8.capitalize_fst
 
-let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
+let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
   let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
