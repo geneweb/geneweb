@@ -60,24 +60,30 @@
       <tr>
         <td>%time;</td>
         <td>
-          %if;(first_name!="")
-            <!--%first_name;/%occ;/%surname;-->
-            <a href="%prefix;%person.access;">%person;</a>, %person.title;
-            %person.dates;
-            %if;(b.show_invisible="on" and wizard and person.is_invisible)
-              <img src="%images_prefix;restricted.png"%wid_hei;restricted.png; alt=" (x)">%nn;
-            %end;
-          %elseif;is_note;
-            - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
-            %if;(note.part!="");v=%note.part;%end;">
-            <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
-            </i></a>
-            %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
-              </span>%nn;
-            %end;
-          %else;
-            %key;
+        %if;(person.is_private)
+          <i class="fa fa-person text-danger"> </i>%nn;
+        %elseif;(person.is_semi_public)
+          <i class="fa fa-person text-warning"> </i>%nn;
+        %elseif;(person.is_public or b.public_if_titles and person.has_titles)
+          <i class="fa fa-person text-success"> </i>%nn;
+        %else;
+          <i class="fa fa-person text-muted"> </i>%nn;
+        %end;
+        %if;(first_name!="")
+          <!--%first_name;/%occ;/%surname;-->
+          <a href="%prefix;%person.access;">%person;</a>, %person.title;
+          %person.dates;
+        %elseif;is_note;
+          - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
+          %if;(note.part!="");v=%note.part;%end;">
+          <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
+          </i></a>
+          %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
+            </span>%nn;
           %end;
+        %else;
+          %key;
+        %end;
         </td>
         <td>
           %if;(user!="")
