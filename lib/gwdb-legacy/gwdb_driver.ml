@@ -532,6 +532,33 @@ let families ?(select = fun _ -> true) base =
 
 let ifam_marker c i = Marker.make (fun i -> i) c i
 
+let make_patch_collection patch mk empty =
+  let len = Hashtbl.length patch in
+  let arr = Array.make len empty in
+  let length =
+    Hashtbl.fold
+      (fun _id v i ->
+        arr.(i) <- mk v;
+        i + 1)
+      patch 0
+  in
+  let get i = if i < length then Some arr.(i) else None in
+  { Collection.length; get }
+
+let persons_from_patch base =
+  let empty_person = empty_person base (-1) in
+  let mk dsk_p =
+    { base; iper = dsk_p.key_index; p = Some dsk_p; a = None; u = None }
+  in
+  make_patch_collection base.data.persons_patch mk empty_person
+
+let families_from_patch base =
+  let empty_family = empty_family base (-1) in
+  let mk dsk_f =
+    { base; ifam = dsk_f.fam_index; f = Some dsk_f; c = None; d = None }
+  in
+  make_patch_collection base.data.families_patch mk empty_family
+
 (* Restrict file *)
 
 (* FIXME: these values should not be global *)

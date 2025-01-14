@@ -667,6 +667,12 @@ module type Driver_S = sig
   val families : ?select:(family -> bool) -> base -> family Collection.t
   (** Collection of families *)
 
+  val persons_from_patch : base -> person Collection.t
+  (** Collection of person's ids in patch *)
+
+  val families_from_patch : base -> family Collection.t
+  (** Collection of families' ids in patch *)
+
   val dummy_collection : 'a -> 'a Collection.t
   (** [dummy_collection x] create a dummy collection with no element.
     [x] is only used for typing.
@@ -1501,6 +1507,32 @@ struct
         let coll = Current.families ~select:cselect base in
         let coll = Current.Collection.map (fun f -> Current_family f) coll in
         Current_collection coll)
+
+  let persons_from_patch =
+    Util.wrap_base
+      (fun base ->
+        Collection.Legacy_collection
+          (Legacy.Collection.map
+             (fun p -> Legacy_person p)
+             (Legacy.persons_from_patch base)))
+      (fun base ->
+        Collection.Current_collection
+          (Current.Collection.map
+             (fun p -> Current_person p)
+             (Current.persons_from_patch base)))
+
+  let families_from_patch =
+    Util.wrap_base
+      (fun base ->
+        Collection.Legacy_collection
+          (Legacy.Collection.map
+             (fun f -> Legacy_family f)
+             (Legacy.families_from_patch base)))
+      (fun base ->
+        Collection.Current_collection
+          (Current.Collection.map
+             (fun f -> Current_family f)
+             (Current.families_from_patch base)))
 
   let dummy_collection _x = Collection.Dummy_collection
 

@@ -1202,10 +1202,12 @@ let opendb bname =
   let base_data =
     {
       persons;
+      persons_patch = snd patches.h_person;
       ascends;
       unions;
       visible = make_visible_record_access perm bname persons;
       families;
+      families_patch = snd patches.h_family;
       couples;
       descends;
       strings;
@@ -1277,9 +1279,11 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
   let data : Dbdisk.base_data =
     {
       persons = record_access_of persons;
+      persons_patch = Hashtbl.create 0;
       ascends = record_access_of ascends;
       unions = record_access_of unions;
       families = record_access_of families;
+      families_patch = Hashtbl.create 0;
       visible =
         { v_write = (fun _ -> assert false); v_get = (fun _ -> assert false) };
       couples = record_access_of couples;
