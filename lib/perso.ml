@@ -2737,6 +2737,7 @@ and eval_int conf n = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
+  | [ "access_status" ] -> (VVstring (Util.access_status p))
   | "anc1" :: sl -> (
       match get_env "anc1" env with
       | Vind pa ->
@@ -2951,6 +2952,9 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
         in
         null_val
       with _ -> raise Not_found)
+  | [ "is_visible" ] -> VVbool p_auth
+  | [ "is_public" ] -> VVbool (get_access p = Public)
+  | [ "is_semi_public" ] -> VVbool (get_access p = SemiPublic)
   | [ "lev_cnt" ] -> (
       match get_env "lev_cnt" env with
       | Vint i -> str_val (string_of_int i)

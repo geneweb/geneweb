@@ -832,6 +832,13 @@ let accessible_by_key conf base p fn sn =
 
 (* ********************************************************************** *)
 
+let access_status p =
+  match get_access p with
+  | Private -> "Private"
+  | SemiPublic -> "SemiPublic"
+  | Public -> "Public"
+  | IfTitles -> "IfTitles"
+
 (** [Description] : Renvoie les paramètres URL pour l'accès à la nième
                     personne.
     [Args] :

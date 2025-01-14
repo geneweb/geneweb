@@ -103,6 +103,8 @@ val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 val start_with : string -> int -> string -> bool
 val start_with_vowel : config -> string -> bool
 
+val access_status : person -> string
+
 val acces_n :
   config -> base -> Adef.escaped_string -> person -> Adef.escaped_string
 (** Returns URL query string to access nth person
