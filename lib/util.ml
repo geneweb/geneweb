@@ -885,7 +885,12 @@ let acces conf base x = acces_n conf base (Adef.escaped "") x
 (**/**)
 
 let restricted_txt = Adef.safe "....."
-let private_txt conf = transl conf "private" |> Utf8.capitalize_fst
+
+let private_txt conf k =
+  match k with
+  | "p" -> transl conf "hidden first_name"
+  | "n" -> transl conf "hidden surname"
+  | _ -> transl conf "hidden person"
 
 let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
@@ -906,7 +911,7 @@ let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
     if sn then
       match p_surname base p with "" -> beg | sn -> beg ^^^ " " ^<^ esc sn
     else beg
-  else Adef.safe (private_txt conf)
+  else Adef.safe (private_txt conf "")
 
 let main_title conf base p =
   let titles = nobtit conf base p in
