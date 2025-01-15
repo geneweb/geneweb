@@ -9450,6 +9450,18 @@ pt: não mostrar os retratos
 sv: dölj personbilder
 tr: portreleri gizle
 
+    hiddden person
+en: hidden person
+fr: individu masqué
+
+    hiddden first_name
+en: hidden first name
+fr: prénom masqué
+
+    hiddden surname
+en: hidden surname
+fr: patronyme masqué
+
     hierarchical navigation
 af: kies 'n inskrywing in die hierargiese navigasie
 bg: изберете запис в йерархичната навигация

@@ -213,8 +213,8 @@ let syntax_links conf wi s =
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
           let name =
             if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
-            then Option.value ~default:"?" name
-            else "x x"
+            then Option.value ~default:"??" name
+            else Util.private_txt conf ""
           in
           let color = " style=\"color:red\"" in
           let color1 =
@@ -222,7 +222,7 @@ let syntax_links conf wi s =
             else ""
           in
           let t =
-            if cancel_links || name = "x x" then name
+            if cancel_links || name = Util.private_txt conf "" then name
             else if wi.wi_person_exists (fn, sn, oc) then
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\" %s>%s</a>"
                 pos
@@ -243,7 +243,7 @@ let syntax_links conf wi s =
               Printf.sprintf "<a href=\"%s\" %s>%s</a>"
                 (commd conf :> string)
                 color
-                (if conf.hide_names then "x x" else name)
+                (if conf.hide_names then Util.private_txt conf "" else name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard (j, wiz, name) ->

@@ -102,7 +102,6 @@ val authorized_age : config -> base -> person -> bool
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 val start_with : string -> int -> string -> bool
 val start_with_vowel : config -> string -> bool
-
 val access_status : person -> string
 
 val acces_n :
@@ -142,7 +141,7 @@ val is_public : config -> base -> person -> bool
     - IfTitle and has titles or
     - is_old_person) *)
 
-val private_txt : config -> string
+val private_txt : config -> string -> string
 
 val pget : config -> base -> iper -> person
 (** Returns person with giving id from the base.
