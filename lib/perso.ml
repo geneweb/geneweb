@@ -2737,7 +2737,7 @@ and eval_int conf n = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
-  | [ "access_status" ] -> (VVstring (Util.access_status p))
+  | [ "access_status" ] -> VVstring (Util.access_status p)
   | "anc1" :: sl -> (
       match get_env "anc1" env with
       | Vind pa ->
@@ -3665,7 +3665,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             |> ( <> ) (p_surname base p)
       in
       if (not p_auth) || is_hide_names conf p then
-        str_val (Util.private_txt conf)
+        str_val (Util.private_txt conf "")
       else if force_surname then gen_person_text conf base p |> safe_val
       else gen_person_text ~sn:false conf base p |> safe_val
   | "consanguinity" ->
@@ -3718,7 +3718,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "first_name" ->
       if !GWPARAM.p_auth_sp conf base p then
         p_first_name base p |> Util.escape_html |> safe_val
-      else str_val (Util.private_txt conf)
+      else str_val (Util.private_txt conf "p")
   | "first_name_key" ->
       if (not p_auth) || is_hide_names conf p then null_val
       else p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
@@ -4035,7 +4035,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "surname" ->
       if !GWPARAM.p_auth_sp conf base p then
         p_surname base p |> Util.escape_html |> safe_val
-      else str_val (Util.private_txt conf)
+      else str_val (Util.private_txt conf "n")
   | "surname_begin" ->
       if !GWPARAM.p_auth_sp conf base p then
         p_surname base p |> surname_particle base |> Util.escape_html
@@ -4046,7 +4046,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         p_surname base p
         |> surname_without_particle base
         |> Util.escape_html |> safe_val
-      else str_val (Util.private_txt conf)
+      else str_val (Util.private_txt conf "n")
   | "surname_key" ->
       if !GWPARAM.p_auth_sp conf base p then
         p_surname base p |> Name.lower |> Mutil.encode |> safe_val
@@ -4162,7 +4162,7 @@ and simple_person_text conf base p p_auth : Adef.safe_string =
     match main_title conf base p with
     | Some t -> titled_person_text conf base p t
     | None -> gen_person_text conf base p
-  else if is_hide_names conf p then Adef.safe (Util.private_txt conf)
+  else if is_hide_names conf p then Adef.safe (Util.private_txt conf "")
   else gen_person_text conf base p
 
 and string_of_died conf p p_auth =
