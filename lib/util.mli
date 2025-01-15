@@ -141,7 +141,7 @@ val is_public : config -> base -> person -> bool
     - IfTitle and has titles or
     - is_old_person) *)
 
-val private_txt : config -> string
+val private_txt : config -> string -> string
 
 val pget : config -> base -> iper -> person
 (** Returns person with giving id from the base.
