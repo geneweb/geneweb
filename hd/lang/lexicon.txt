@@ -10063,7 +10063,7 @@ nl: inclusief ontbrekende echtgenoten
 no: inkluder savnede ektefeller
 oc: inclure los conjunts que mancan
 pl: pokaż brakujących małżonków
-pt: incluir os cônjugues que faltam
+pt: incluir os cônjuges que faltam
 ro: include soti necunoscuti
 ru: включая потерянных супругов
 sk: vrátane chýbajúcich manželov/manželiek
@@ -10095,7 +10095,7 @@ nl: inclusief echtgenoten
 no: inkluder ektefeller
 oc: inclure los conjunts
 pl: pokaż małżonków
-pt: incluir os cônjugues
+pt: incluir os cônjuges
 ro: include soti
 ru: включая супругов
 sk: vrátane manželov/manželiek
@@ -12634,7 +12634,7 @@ lt: bet koks/vienas/du/trys/keturi/penki/šeši/septyni/aštuoni/devyni/dešimt/
 nl: geen/één/twee/drie/vier/vijf/zes/zeven/acht/negen/tien/elf/twaalf/dertien/veertien/vijftien/zestien/zeventien/achttien/negentien/twintig/eenentwintig/tweeëntwintig/drieëntwintig/vierentwintig/vijfentwintig/zesentwintig/zevenentwintig/achtentwintig/twintig negen/dertig/eenendertig
 no: ingen/en/to/tre/fire/fem/seks/sju/åtte/ni/ti/elleve/tolv/tretten/fjorten/femten/seksten/sytten/atten/nitten/tjue/tjueen/tjueto/tjuetre/tjuefire/tjuefem/tjueseks/tjuesju/tjueåtte/tjueni/tretti/trettien
 pl: żaden/jeden/dwa/trzy/cztery/pięć/sześć/siedem/osiem/dziewięć/dziesięć/jedenaście/dwanaście/trzynaście/czternaście/piętnaście/szesnaście/siedemnaście/osiemnaście/dziewiętnaście/dwadzieścia jeden/dwadzieścia dwa/dwadzieścia trzy/dwadzieścia cztery/dwadzieścia pięć/dwadzieścia sześć/dwadzieścia siedem/dwadzieścia osiem/dwadzieścia dziewięć/trzydzieści/trzydzieści jeden
-pt: nenhum/um/dois/três/quatro/cinco/seis/sete/oito/nove/dez/onze/doze/treze/catorze/quinze/dezasseis/dezassete/dezoito/dezanove/vinte/winte e um/vinte e dois/vinte e três/vinte quatro/vinte e cinco/vinte e seis/vinte e sete/vinte oito/vinte e e nove/trinta/trinta e um
+pt: nenhum/um/dois/três/quatro/cinco/seis/sete/oito/nove/dez/onze/doze/treze/catorze/quinze/dezasseis/dezassete/dezoito/dezanove/vinte/vinte e um/vinte e dois/vinte e três/vinte e quatro/vinte e cinco/vinte e seis/vinte e sete/vinte e oito/vinte e nove/trinta/trinta e um
 ro: niciunul/unul/doi/trei/patru/cinci/șase/șapte/opt/nouă/zece/unsprezece/doisprezece/treisprezece/paisprezece/cincisprezece/șaisprezece/șaptesprezece/optsprezece/nouăsprezece/douăzeci/douăzeci și unu/douăzeci și doi/douăzeci și trei/douăzeci și patru/douăzeci și cinci/douăzeci şi şase/douăzeci şi şapte/douăzeci şi opt/douăzeci şi nouă/treizeci/treizeci şi unu
 ru: нет/один/два/три/четыре/пять/шесть/семь/восемь/девять/десять/одиннадцать/двенадцать/тринадцать/четырнадцать/пятнадцать/шестнадцать/семнадцать/восемнадцать/девятнадцать/двадцать/двадцать один/двадцать два/двадцать три/двадцать четыре/двадцать пять/двадцать шесть/двадцать семь/двадцать восемь/двадцать девять/тридцать/тридцать один
 sk: nikto/jeden/dva/tri/štyri/päť/šesť/sedem/osem/deväť/desať/jedenásť/dvanásť/trinásť/štrnásť/pätnásť/šestnásť/sedemnásť/osemnásť/devätnásť/dvadsaťjeden/dvadsaťdva/dvadsaťtri/dvadsaťštyri/dvadsaťpäť/dvadsaťšesť/dvadsaťsedem/dvadsaťosem/dvadsaťdeväť/tridsať/tridsaťjeden
@@ -20103,7 +20103,7 @@ nl: zou zijn/haar eigen voorouder zijn
 no: ville være sin egen ane
 oc: seriá son/sa quite(a) aujòl(a)
 pl: byłby/byłaby swoim własnym przodkiem
-pt: seria seu própio antepassado
+pt: seria seu próprio antepassado
 ro: ar fi propriul stramos
 ru: было бы его/ее собственным предком
 sk: bol/bola by svoj vlastný predok
