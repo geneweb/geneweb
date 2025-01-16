@@ -479,7 +479,18 @@ let select opts =
             match opts.ascdesc with
             | Some ascdesc ->
                 let ips = List.map (fun i -> (i, asc)) ips in
-                Geneweb.Util.select_mascdesc conf base ips ascdesc
+                let skip_descendants ~ancestors ~generation _ =
+                  let is_descendant_of_root_person () =
+                    let root_persons =
+                      ips |> List.map fst |> Geneweb.Util.IperSet.of_list
+                    in
+                    not @@ Geneweb.Util.IperSet.is_empty
+                    @@ Geneweb.Util.IperSet.inter ancestors root_persons
+                  in
+                  generation <= desc && is_descendant_of_root_person ()
+                in
+                Geneweb.Util.select_mascdesc ~skip_descendants conf base ips
+                  ascdesc
             | None ->
                 let ht = Hashtbl.create 0 in
                 Geneweb.Util.IperSet.iter
