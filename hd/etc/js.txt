@@ -674,9 +674,20 @@ const DatalistManager = {
 %end;
 };
 
-function populateDatalists() {
+function constructCachePath() {
   const baseName = "%base.name;";
-  const path = baseName + "/cache/" + baseName;
+  %if;cgi;
+    const pathname = window.location.pathname;
+    const segments = pathname.split('/');
+    const prefix = segments[1] || '';
+    return `/${prefix}/bases/etc/${baseName}/cache/${baseName}`;
+  %else;
+    return `${baseName}/cache/${baseName}`;
+  %end;
+}
+
+function populateDatalists() {
+  const path = constructCachePath();
   const datalists = %[
   %if;(is_welcome or e.m="MOD_NOTES" or "IND" in e.m or "FAM" in e.m)
     %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
