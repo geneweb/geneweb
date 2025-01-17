@@ -2,9 +2,6 @@
 
 (* Algorithm relationship and links from Didier Remy *)
 
-open Def
-open Gwdb
-
 type anc_stat = MaybeAnc | IsAnc
 
 (* relationship:
@@ -23,8 +20,8 @@ type relationship = {
   mutable weight1 : float;
   mutable weight2 : float;
   mutable relationship : float;
-  mutable lens1 : (int * int * iper list) list;
-  mutable lens2 : (int * int * iper list) list;
+  mutable lens1 : (int * int * Gwdb.iper list) list;
+  mutable lens2 : (int * int * Gwdb.iper list) list;
   mutable inserted : int;
   mutable elim_ancestors : bool;
   mutable anc_stat1 : anc_stat;
@@ -48,17 +45,17 @@ type visit =
 let rec noloop_aux base error tab i =
   match Gwdb.Marker.get tab i with
   | NotVisited ->
-      (match get_parents (poi base i) with
+      (match Gwdb.get_parents (Gwdb.poi base i) with
       | Some ifam ->
-          let fam = foi base ifam in
-          let fath = get_father fam in
-          let moth = get_mother fam in
+          let fam = Gwdb.foi base ifam in
+          let fath = Gwdb.get_father fam in
+          let moth = Gwdb.get_mother fam in
           Gwdb.Marker.set tab i BeingVisited;
           noloop_aux base error tab fath;
           noloop_aux base error tab moth
       | None -> ());
       Gwdb.Marker.set tab i Visited
-  | BeingVisited -> error (OwnAncestor (poi base i))
+  | BeingVisited -> error (Def.OwnAncestor (Gwdb.poi base i))
   | Visited -> ()
 
 (** It is highly recommended to load ascends and couples array before
@@ -72,7 +69,7 @@ let check_noloop_for_person_list base error list =
   let tab = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
   List.iter (noloop_aux base error tab) list
 
-exception TopologicalSortError of person
+exception TopologicalSortError of Gwdb.person
 
 (* Return tab such as: i is an ancestor of j => tab.(i) > tab.(j) *)
 (* This complicated topological sort has the important following properties:
@@ -89,11 +86,11 @@ let topological_sort base poi =
   Gwdb.Collection.iter
     (fun i ->
       let a = poi base i in
-      match get_parents a with
+      match Gwdb.get_parents a with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let ifath = get_father cpl in
-          let imoth = get_mother cpl in
+          let cpl = Gwdb.foi base ifam in
+          let ifath = Gwdb.get_father cpl in
+          let imoth = Gwdb.get_mother cpl in
           Gwdb.Marker.set tab ifath (Gwdb.Marker.get tab ifath + 1);
           Gwdb.Marker.set tab imoth (Gwdb.Marker.get tab imoth + 1)
       | _ -> ())
@@ -113,11 +110,11 @@ let topological_sort base poi =
             let a = poi base i in
             Gwdb.Marker.set tab i tval;
             incr cnt;
-            match get_parents a with
+            match Gwdb.get_parents a with
             | Some ifam ->
-                let cpl = foi base ifam in
-                let ifath = get_father cpl in
-                let imoth = get_mother cpl in
+                let cpl = Gwdb.foi base ifam in
+                let ifath = Gwdb.get_father cpl in
+                let imoth = Gwdb.get_mother cpl in
                 Gwdb.Marker.set tab ifath (Gwdb.Marker.get tab ifath - 1);
                 Gwdb.Marker.set tab imoth (Gwdb.Marker.get tab imoth - 1);
                 let new_list =
@@ -132,9 +129,9 @@ let topological_sort base poi =
       loop (tval + 1) new_list
   in
   loop 0 todo;
-  if !cnt <> nb_of_persons base then
+  if !cnt <> Gwdb.nb_of_persons base then
     check_noloop base (function
-      | OwnAncestor p -> raise (TopologicalSortError p)
+      | Def.OwnAncestor p -> raise (TopologicalSortError p)
       | _ -> assert false);
   tab
 
@@ -168,8 +165,8 @@ let insert_branch_len ip lens (len, n, _ipl) =
   insert_branch_len_rec (succ len, n, ip) lens
 
 let consang_of p =
-  if get_consang p = Adef.no_consang then 0.0
-  else Adef.float_of_fix (get_consang p)
+  if Gwdb.get_consang p = Adef.no_consang then 0.0
+  else Adef.float_of_fix (Gwdb.get_consang p)
 
 let mark = ref 0
 
@@ -258,7 +255,7 @@ let relationship_and_links base ri b ip1 ip2 =
     in
     let treat_ancestor u =
       let tu = Gwdb.Marker.get reltab u in
-      let a = poi base u in
+      let a = Gwdb.poi base u in
       let contribution =
         (tu.weight1 *. tu.weight2) -. (tu.relationship *. (1.0 +. consang_of a))
       in
@@ -268,11 +265,11 @@ let relationship_and_links base ri b ip1 ip2 =
       if b && contribution <> 0.0 && not tu.elim_ancestors then (
         tops := u :: !tops;
         tu.elim_ancestors <- true);
-      match get_parents a with
+      match Gwdb.get_parents a with
       | Some ifam ->
-          let cpl = foi base ifam in
-          treat_parent u tu (get_father cpl);
-          treat_parent u tu (get_mother cpl)
+          let cpl = Gwdb.foi base ifam in
+          treat_parent u tu (Gwdb.get_father cpl);
+          treat_parent u tu (Gwdb.get_mother cpl)
       | _ -> ()
     in
     insert i1;

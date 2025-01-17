@@ -1,10 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Gwdb
-open TemplAst
-open Util
-
 type counter = {
   mutable welcome_cnt : int;
   mutable request_cnt : int;
@@ -15,10 +10,11 @@ type counter = {
 }
 
 let get_date conf =
-  Printf.sprintf "%02d/%02d/%d" conf.today.day conf.today.month conf.today.year
+  Printf.sprintf "%02d/%02d/%d" conf.Config.today.day conf.Config.today.month
+    conf.Config.today.year
 
 let adm_file f = List.fold_right Filename.concat [ !Util.cnt_dir; "cnt" ] f
-let cnt conf ext = adm_file (conf.bname ^ ext)
+let cnt conf ext = adm_file (conf.Config.bname ^ ext)
 
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
@@ -85,26 +81,34 @@ let write_counter conf r =
   with _ -> ()
 
 let set_wizard_and_friend_traces conf =
-  if conf.wizard && conf.user <> "" then (
+  if conf.Config.wizard && conf.Config.user <> "" then (
     let wpf =
-      try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
+      try List.assoc "wizard_passwd_file" conf.Config.base_env
+      with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = adm_file (conf.bname ^ "_w.txt") in
-      update_wf_trace conf fname)
-  else if conf.friend && (not conf.just_friend_wizard) && conf.user <> "" then
+      let fname = adm_file (conf.Config.bname ^ "_w.txt") in
+      Util.update_wf_trace conf fname)
+  else if
+    conf.Config.friend
+    && (not conf.Config.just_friend_wizard)
+    && conf.Config.user <> ""
+  then
     let fpf =
-      try List.assoc "friend_passwd_file" conf.base_env with Not_found -> ""
+      try List.assoc "friend_passwd_file" conf.Config.base_env
+      with Not_found -> ""
     in
     let fp =
-      try List.assoc "friend_passwd" conf.base_env with Not_found -> ""
+      try List.assoc "friend_passwd" conf.Config.base_env with Not_found -> ""
     in
     if
       fpf <> ""
-      && is_that_user_and_password conf.auth_scheme conf.user fp = false
+      && Util.is_that_user_and_password conf.Config.auth_scheme conf.Config.user
+           fp
+         = false
     then
-      let fname = adm_file (conf.bname ^ "_f.txt") in
-      update_wf_trace conf fname
+      let fname = adm_file (conf.Config.bname ^ "_f.txt") in
+      Util.update_wf_trace conf fname
 
 let incr_counter f conf =
   let lname = cnt conf ".lck" in
@@ -113,8 +117,8 @@ let incr_counter f conf =
     (fun () ->
       let r = count conf in
       f r;
-      if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
-      else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
+      if conf.Config.wizard then r.wizard_cnt <- r.wizard_cnt + 1
+      else if conf.Config.friend then r.friend_cnt <- r.friend_cnt + 1
       else r.normal_cnt <- r.normal_cnt + 1;
       write_counter conf r;
       set_wizard_and_friend_traces conf;
@@ -128,22 +132,25 @@ let incr_request_counter =
 
 let lang_file_name conf fname =
   let fname1 =
-    Util.base_path [ "lang"; conf.lang ] (Filename.basename fname ^ ".txt")
+    Util.base_path
+      [ "lang"; conf.Config.lang ]
+      (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
-    search_in_assets
-      (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
+    Util.search_in_assets
+      (Filename.concat conf.Config.lang (Filename.basename fname ^ ".txt"))
 
 let any_lang_file_name fname =
   let fname1 = Util.base_path [ "lang" ] (Filename.basename fname ^ ".txt") in
   if Sys.file_exists fname1 then fname1
   else
-    search_in_assets (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
+    Util.search_in_assets
+      (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
 
 let source_file_name conf fname =
-  let bname = conf.bname in
-  let lang = conf.lang in
+  let bname = conf.Config.bname in
+  let lang = conf.Config.lang in
   let fname1 =
     List.fold_right Filename.concat
       [ Util.base_path [ "src" ] bname; lang ]
@@ -178,44 +185,46 @@ let macro conf base = function
       | None -> Adef.safe "")
   | 'b' ->
       let s =
-        try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
+        try " dir=\"" ^ Hashtbl.find conf.Config.lexicon "!dir" ^ "\""
         with Not_found -> ""
       in
-      Adef.safe (s ^ body_prop conf)
+      Adef.safe (s ^ Util.body_prop conf)
   | 'c' -> string_of_int_sep_aux conf (count conf).welcome_cnt
   | 'd' -> string_of_start_date conf
   | 'D' -> Adef.safe (count conf).start_date
-  | 'e' -> Adef.safe conf.charset
-  | 'f' -> Adef.safe conf.command
+  | 'e' -> Adef.safe conf.Config.charset
+  | 'f' -> Adef.safe conf.Config.command
   | 'g' -> (Util.prefix_base conf :> Adef.safe_string)
   | 'G' -> (Util.prefix_base_password conf :> Adef.safe_string)
-  | 'i' -> Adef.safe conf.highlight
-  | 'k' -> Adef.safe conf.indep_command
-  | 'l' -> Adef.safe conf.lang
-  | 'L' -> Adef.safe conf.left
+  | 'i' -> Adef.safe conf.Config.highlight
+  | 'k' -> Adef.safe conf.Config.indep_command
+  | 'l' -> Adef.safe conf.Config.lang
+  | 'L' -> Adef.safe conf.Config.left
   | 'm' -> (
       try
-        let s = List.assoc "latest_event" conf.base_env in
+        let s = List.assoc "latest_event" conf.Config.base_env in
         if s = "" then Adef.safe "20"
         else (Util.escape_html s :> Adef.safe_string)
       with Not_found -> Adef.safe "20")
-  | 'n' -> string_of_int_sep_aux conf (nb_of_persons base)
+  | 'n' -> string_of_int_sep_aux conf (Gwdb.nb_of_persons base)
   | 'N' -> (
       try
-        (List.assoc "base_notes_title" conf.base_env |> Util.escape_html
+        (List.assoc "base_notes_title" conf.Config.base_env |> Util.escape_html
           :> Adef.safe_string)
       with Not_found -> Adef.safe "")
   | 'o' -> (Image.prefix conf :> Adef.safe_string)
   | 'q' ->
       let r = count conf in
       string_of_int_sep_aux conf (r.welcome_cnt + r.request_cnt)
-  | 'R' -> Adef.safe conf.right
-  | 's' -> (commd conf :> Adef.safe_string)
-  | 't' -> Adef.safe conf.bname
+  | 'R' -> Adef.safe conf.Config.right
+  | 's' -> (Util.commd conf :> Adef.safe_string)
+  | 't' -> Adef.safe conf.Config.bname
   | 'T' -> Util.doctype
   | 'U' ->
-      if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
-        Adef.safe (": " ^ conf.user)
+      if
+        (conf.Config.wizard || conf.Config.just_friend_wizard)
+        && conf.Config.user <> ""
+      then Adef.safe (": " ^ conf.Config.user)
       else Adef.safe ""
   | 'v' -> Adef.safe Version.txt
   | 'w' ->
@@ -273,7 +282,7 @@ let rec lexicon_translate conf base nomin strm first_c =
   if upp then Utf8.capitalize_fst r else r
 
 let browser_cannot_handle_passwords conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
+  let user_agent = Mutil.extract_param "user-agent: " '/' conf.Config.request in
   String.lowercase_ascii user_agent = "konqueror"
 
 let get_variable strm =
@@ -298,7 +307,7 @@ type src_mode = Lang | Source
 
 let rec copy_from_stream conf base strm mode =
   let echo = ref true in
-  let no_tables = browser_doesnt_have_tables conf in
+  let no_tables = Util.browser_doesnt_have_tables conf in
   let push_echo, pop_echo =
     let stack = ref [] in
     ( (fun x ->
@@ -313,21 +322,22 @@ let rec copy_from_stream conf base strm mode =
   in
   let rec if_expr = function
     | 'N' -> not (if_expr (Stream.next strm))
-    | 'a' -> conf.auth_file <> ""
-    | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
-    | 'f' -> conf.friend
+    | 'a' -> conf.Config.auth_file <> ""
+    | 'c' -> conf.Config.cgi || browser_cannot_handle_passwords conf
+    | 'f' -> conf.Config.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
-    | 'j' -> conf.just_friend_wizard
+    | 'j' -> conf.Config.just_friend_wizard
     | 'l' -> no_tables
     | 'm' -> Gwdb.read_nldb base <> []
-    | 'n' -> not (base_notes_are_empty base "")
+    | 'n' -> not (Gwdb.base_notes_are_empty base "")
     | 'o' -> Sys.file_exists (WiznotesDisplay.dir conf base)
     | 'p' -> (
-        match List.assoc_opt (get_variable strm) conf.base_env with
+        match List.assoc_opt (get_variable strm) conf.Config.base_env with
         | Some "" | None -> false
         | Some _ -> true)
-    | 's' -> List.assoc_opt (get_variable strm) conf.base_env <> Some "no"
-    | 'w' -> conf.wizard
+    | 's' ->
+        List.assoc_opt (get_variable strm) conf.Config.base_env <> Some "no"
+    | 'w' -> conf.Config.wizard
     | 'z' -> Util.find_sosa_ref conf base <> None
     | '|' ->
         let a = if_expr (Stream.next strm) in
@@ -371,7 +381,7 @@ let rec copy_from_stream conf base strm mode =
           | _ when not !echo -> ()
           | '%' -> Output.print_sstring conf "%"
           | '[' | ']' -> Output.printf conf "%c" c
-          | 'h' -> hidden_env conf
+          | 'h' -> Util.hidden_env conf
           | 'j' -> Templ.include_hed_trl conf "hed"
           | 'P' ->
               let _ = Stream.next strm in
@@ -385,11 +395,11 @@ let rec copy_from_stream conf base strm mode =
                 in
                 loop 0
               in
-              let lang_def = transl conf "!languages" in
+              let lang_def = Util.transl conf "!languages" in
               Output.print_sstring conf (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =
-                try List.assoc (get_variable strm) conf.base_env
+                try List.assoc (get_variable strm) conf.Config.base_env
                 with Not_found -> ""
               in
               copy_from_string conf base txt mode
@@ -412,7 +422,7 @@ and src_translate conf base nomin strm echo mode =
       loop 0 0 (Stream.next strm)
     in
     let s, _ =
-      Translate.inline conf.lang '%'
+      Translate.inline conf.Config.lang '%'
         (macro conf base : char -> Adef.safe_string :> char -> string)
         s
     in
@@ -470,31 +480,33 @@ let print_source = gen_print Source
 
 (* welcome page *)
 
-type 'a env = Vsosa_ref of person option Lazy.t | Vother of 'a | Vnone
+type 'a env = Vsosa_ref of Gwdb.person option Lazy.t | Vother of 'a | Vnone
 
 let get_env v env = try List.assoc v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
 let eval_var conf base env () _loc = function
-  | [ "base"; "has_notes" ] -> VVbool (not (base_notes_are_empty base ""))
-  | [ "base"; "name" ] -> VVstring conf.bname
+  | [ "base"; "has_notes" ] ->
+      TemplAst.VVbool (not (Gwdb.base_notes_are_empty base ""))
+  | [ "base"; "name" ] -> TemplAst.VVstring conf.Config.bname
   | [ "base"; "nb_persons" ] ->
-      VVstring
+      TemplAst.VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (nb_of_persons base))
+           (Gwdb.nb_of_persons base))
   | [ "base"; "real_nb_persons" ] ->
-      VVstring
+      TemplAst.VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
            (Gwdb.nb_of_real_persons base))
   | [ "browsing_with_sosa_ref" ] -> (
       match get_env "sosa_ref" env with
-      | Vsosa_ref v -> VVbool (Lazy.force v <> None)
+      | Vsosa_ref v -> TemplAst.VVbool (Lazy.force v <> None)
       | _ -> raise Not_found)
-  | [ "has_history" ] -> VVbool (Sys.file_exists (History.file_name conf))
-  | [ "has_misc_notes" ] -> VVbool (Gwdb.read_nldb base <> [])
+  | [ "has_history" ] ->
+      TemplAst.VVbool (Sys.file_exists (History.file_name conf))
+  | [ "has_misc_notes" ] -> TemplAst.VVbool (Gwdb.read_nldb base <> [])
   | [ "nb_accesses" ] ->
       let r = count conf in
       let s =
@@ -502,7 +514,7 @@ let eval_var conf base env () _loc = function
           (Util.transl conf "(thousand separator)")
           (r.welcome_cnt + r.request_cnt)
       in
-      VVstring s
+      TemplAst.VVstring s
   | [ "nb_accesses_to_welcome" ] ->
       let r = count conf in
       let s =
@@ -510,28 +522,28 @@ let eval_var conf base env () _loc = function
           (Util.transl conf "(thousand separator)")
           r.welcome_cnt
       in
-      VVstring s
+      TemplAst.VVstring s
   | [ "random"; "init" ] ->
       Random.self_init ();
-      VVstring ""
+      TemplAst.VVstring ""
   | [ "random"; s ] -> (
-      try VVstring (string_of_int (Random.int (int_of_string s)))
+      try TemplAst.VVstring (string_of_int (Random.int (int_of_string s)))
       with Failure _ | Invalid_argument _ -> raise Not_found)
   | [ "sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> (
           match Lazy.force v with
           | Some p ->
-              VVstring
+              TemplAst.VVstring
                 (NameDisplay.referenced_person_title_text conf base p
                   : Adef.safe_string
                   :> string)
           | None -> raise Not_found)
       | _ -> raise Not_found)
   | [ "start_date" ] ->
-      VVstring (string_of_start_date conf : Adef.safe_string :> string)
+      TemplAst.VVstring (string_of_start_date conf : Adef.safe_string :> string)
   | [ "wiznotes_dir_exists" ] ->
-      VVbool (Sys.file_exists (WiznotesDisplay.dir conf base))
+      TemplAst.VVbool (Sys.file_exists (WiznotesDisplay.dir conf base))
   | _ -> raise Not_found
 
 let print_foreach _conf _print_ast _eval_expr = raise Not_found

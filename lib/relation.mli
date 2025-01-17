@@ -1,6 +1,3 @@
-open Config
-open Gwdb
-
 (* Relation path computations *)
 
 (* find shortest path :
@@ -22,44 +19,49 @@ and 'a dag_fam = {
 val dag_ind_list_of_path : ('a * famlink) list -> 'a option dag_ind list
 
 val add_missing_parents_of_siblings :
-  config -> base -> iper option dag_ind list -> iper option dag_ind list
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.iper option dag_ind list ->
+  Gwdb.iper option dag_ind list
 
 val dag_fam_list_of_ind_list : 'a dag_ind list -> 'a dag_fam list
 
 val add_phony_children :
   'a option dag_ind list -> 'a option dag_fam list -> 'a option dag_ind list
 
-val ind_set_of_relation_path : base -> (iper * famlink) list -> iper list
-val excl_faml : config -> base -> ifam list
+val ind_set_of_relation_path :
+  Gwdb.base -> (Gwdb.iper * famlink) list -> Gwdb.iper list
+
+val excl_faml : Config.config -> Gwdb.base -> Gwdb.ifam list
 
 val get_shortest_path_relation :
-  config ->
-  base ->
-  iper ->
-  iper ->
-  ifam list ->
-  ((iper * famlink) list * ifam) option
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.iper ->
+  Gwdb.iper ->
+  Gwdb.ifam list ->
+  ((Gwdb.iper * famlink) list * Gwdb.ifam) option
 
 val nb_fields : string -> int
 
 val get_piece_of_branch :
-  config ->
-  base ->
-  (((iper, 'a) Marker.t * (person * 'b) list) * int)
-  * ('a -> (int * 'c * iper list) list) ->
+  Config.config ->
+  Gwdb.base ->
+  (((Gwdb.iper, 'a) Gwdb.Marker.t * (Gwdb.person * 'b) list) * int)
+  * ('a -> (int * 'c * Gwdb.iper list) list) ->
   int * int ->
-  iper list
+  Gwdb.iper list
 
 val compute_relationship :
-  config ->
-  base ->
+  Config.config ->
+  Gwdb.base ->
   bool ->
-  person ->
-  person ->
-  ((person option
-   * person option
-   * (int * int * (person * int) list)
-   * (iper, Consang.relationship) Marker.t)
+  Gwdb.person ->
+  Gwdb.person ->
+  ((Gwdb.person option
+   * Gwdb.person option
+   * (int * int * (Gwdb.person * int) list)
+   * (Gwdb.iper, Consang.relationship) Gwdb.Marker.t)
    list
   * Sosa.t
   * float)
@@ -71,13 +73,17 @@ val simplify_path :
 (* ----------- *)
 (* TODO put them in perso.ml? *)
 
-val get_others_related : config -> base -> person -> (person * relation) list
+val get_others_related :
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  (Gwdb.person * Gwdb.relation) list
 
 val get_event_witnessed :
-  config ->
-  base ->
-  person ->
-  (person * Def.witness_kind * string * istr Event.event_item) list
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  (Gwdb.person * Def.witness_kind * string * Gwdb.istr Event.event_item) list
 (** [get_event_witness_related conf base p] is a list of tuple
       with informations on events the person participated to.
       ( person that has the event * witness_kind * witness_note * event_item )

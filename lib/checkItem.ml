@@ -1,7 +1,4 @@
-open Def
-open Gwdb
-
-type base_error = person error
+type base_error = Gwdb.person Def.error
 
 (* Constants used for computing the warnings. *)
 let max_age_btw_cpl = 50
@@ -44,17 +41,17 @@ let strictly_older age year =
   | Before -> false
   | Sure | About | Maybe | After | OrYear _ | YearInt _ -> age.year > year
 
-let obirth x = get_birth x |> Date.cdate_to_dmy_opt
+let obirth x = Gwdb.get_birth x |> Date.cdate_to_dmy_opt
 
 let title_dates warning p t =
-  let t_date_start = Date.od_of_cdate t.t_date_start in
+  let t_date_start = Date.od_of_cdate t.Def.t_date_start in
   let t_date_end = Date.od_of_cdate t.t_date_end in
   match (t_date_start, t_date_end) with
   | None, None -> ()
   | Some d1, Some d2 when strictly_after d1 d2 ->
       warning (Warning.TitleDatesError (p, t))
   | _ -> (
-      match Date.od_of_cdate (get_birth p) with
+      match Date.od_of_cdate (Gwdb.get_birth p) with
       | None -> ()
       | Some d1 -> (
           match t_date_start with
@@ -80,35 +77,35 @@ let check_person_age warning p =
   (* On pourrait faire un calcul sur la descendance ou l'ascendance si  *)
   (* on ne trouve rien ... mais c'est peut être un peu trop gourmand    *)
   (* juste pour un warning ?                                            *)
-  match Date.dmy_of_death (get_death p) with
+  match Date.dmy_of_death (Gwdb.get_death p) with
   | None -> ()
   | Some d2 -> (
-      match Date.cdate_to_dmy_opt (get_birth p) with
+      match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
       | Some d -> aux d d2
       | None -> (
-          match Date.cdate_to_dmy_opt (get_baptism p) with
+          match Date.cdate_to_dmy_opt (Gwdb.get_baptism p) with
           | Some d -> aux d d2
           | None -> ()))
 
 let try_to_fix_relation_sex base warning p_ref =
-  let p_index = Some (get_iper p_ref) in
+  let p_index = Some (Gwdb.get_iper p_ref) in
   let fixed = ref 0 in
   let not_fixed = ref 0 in
   let changed_related =
     List.fold_right
       (fun ip changed_related ->
-        let p = poi base ip in
+        let p = Gwdb.poi base ip in
         let rparents, changed, not_changed =
           List.fold_right
             (fun rel (rparents, changed, not_changed) ->
               let rel, changed, not_changed =
-                match (p_index = rel.r_fath, p_index = rel.r_moth) with
+                match (p_index = rel.Def.r_fath, p_index = rel.r_moth) with
                 | true, false ->
-                    if get_sex p_ref = Female then
+                    if Gwdb.get_sex p_ref = Female then
                       match rel.r_moth with
                       | Some ip ->
-                          let oth_p = poi base ip in
-                          if get_sex oth_p = Male then
+                          let oth_p = Gwdb.poi base ip in
+                          if Gwdb.get_sex oth_p = Male then
                             let rel =
                               { rel with r_fath = rel.r_moth; r_moth = p_index }
                             in
@@ -121,11 +118,11 @@ let try_to_fix_relation_sex base warning p_ref =
                           (rel, changed + 1, not_changed)
                     else (rel, changed, not_changed)
                 | false, true ->
-                    if get_sex p_ref = Male then
+                    if Gwdb.get_sex p_ref = Male then
                       match rel.r_fath with
                       | Some ip ->
-                          let oth_p = poi base ip in
-                          if get_sex oth_p = Female then
+                          let oth_p = Gwdb.poi base ip in
+                          if Gwdb.get_sex oth_p = Female then
                             let rel =
                               { rel with r_moth = rel.r_fath; r_fath = p_index }
                             in
@@ -141,22 +138,22 @@ let try_to_fix_relation_sex base warning p_ref =
                 | true, true -> (rel, changed, not_changed + 1)
               in
               (rel :: rparents, changed, not_changed))
-            (get_rparents p) ([], 0, 0)
+            (Gwdb.get_rparents p) ([], 0, 0)
         in
         fixed := !fixed + changed;
         not_fixed := !not_fixed + not_changed;
         if changed > 0 then (ip, p, None, Some rparents) :: changed_related
         else changed_related)
-      (get_related p_ref) []
+      (Gwdb.get_related p_ref) []
   in
   warning (Warning.IncoherentSex (p_ref, !fixed, !not_fixed));
   if !fixed > 0 then Some changed_related else None
 
 let related_sex_is_coherent base warning p_ref =
-  let p_index = Some (get_iper p_ref) in
+  let p_index = Some (Gwdb.get_iper p_ref) in
   let merge_sex g1 g2 =
     match (g1, g2) with
-    | Some Male, Some Male -> Some Male
+    | Some Def.Male, Some Def.Male -> Some Def.Male
     | Some Female, Some Female -> Some Female
     | Some Neuter, Some g -> Some g
     | Some g, Some Neuter -> Some g
@@ -165,7 +162,7 @@ let related_sex_is_coherent base warning p_ref =
   let check_sex sex rparents =
     List.fold_left
       (fun g rel ->
-        match (p_index = rel.r_fath, p_index = rel.r_moth) with
+        match (p_index = rel.Def.r_fath, p_index = rel.r_moth) with
         | true, false -> merge_sex g (Some Male)
         | false, true -> merge_sex g (Some Female)
         | false, false -> g
@@ -175,22 +172,23 @@ let related_sex_is_coherent base warning p_ref =
   let new_sex =
     List.fold_left
       (fun g ip ->
-        let p = poi base ip in
-        check_sex g (get_rparents p))
-      (Some (get_sex p_ref))
-      (get_related p_ref)
+        let p = Gwdb.poi base ip in
+        check_sex g (Gwdb.get_rparents p))
+      (Some (Gwdb.get_sex p_ref))
+      (Gwdb.get_related p_ref)
   in
   match new_sex with
   | Some g ->
-      if get_sex p_ref != g then Some [ (get_iper p_ref, p_ref, Some g, None) ]
+      if Gwdb.get_sex p_ref != g then
+        Some [ (Gwdb.get_iper p_ref, p_ref, Some g, None) ]
       else None
   | None -> try_to_fix_relation_sex base warning p_ref
 
 let check_difference_age_between_cpl warning fath moth =
   let find_date p =
-    match Date.cdate_to_dmy_opt (get_birth p) with
+    match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
     | Some d -> Some d
-    | None -> Date.cdate_to_dmy_opt (get_baptism p)
+    | None -> Date.cdate_to_dmy_opt (Gwdb.get_baptism p)
   in
   match find_date fath with
   | None -> ()
@@ -220,22 +218,22 @@ let semi_sort base a before comp di =
   let rec loop i =
     if i < 0 || i >= Array.length a then ()
     else
-      let p1 = poi base a.(i) in
+      let p1 = Gwdb.poi base a.(i) in
       let d1 =
-        match Date.od_of_cdate (get_birth p1) with
+        match Date.od_of_cdate (Gwdb.get_birth p1) with
         | Some d1 -> Some d1
-        | None -> Date.od_of_cdate (get_baptism p1)
+        | None -> Date.od_of_cdate (Gwdb.get_baptism p1)
       in
       match d1 with
       | Some d1 ->
           let rec loop_j sex_interm_sib j =
             if j < 0 || j >= Array.length a then loop (i + di)
             else
-              let p2 = poi base a.(j) in
+              let p2 = Gwdb.poi base a.(j) in
               let d2 =
-                match Date.od_of_cdate (get_birth p2) with
+                match Date.od_of_cdate (Gwdb.get_birth p2) with
                 | Some d2 -> Some d2
-                | None -> Date.od_of_cdate (get_baptism p2)
+                | None -> Date.od_of_cdate (Gwdb.get_baptism p2)
               in
               match d2 with
               | Some d2 ->
@@ -243,8 +241,8 @@ let semi_sort base a before comp di =
                     let j =
                       match sex_interm_sib with
                       | Some s ->
-                          if s = get_sex p1 then None
-                          else if s = get_sex p2 then Some j
+                          if s = Gwdb.get_sex p1 then None
+                          else if s = Gwdb.get_sex p2 then Some j
                           else None
                       | None -> Some j
                     in
@@ -254,11 +252,11 @@ let semi_sort base a before comp di =
                           let rec loop_k k =
                             if k < 0 || k >= Array.length a then k + di
                             else
-                              let p3 = poi base a.(k) in
+                              let p3 = Gwdb.poi base a.(k) in
                               let d3 =
-                                match Date.od_of_cdate (get_birth p3) with
+                                match Date.od_of_cdate (Gwdb.get_birth p3) with
                                 | Some d3 -> Some d3
-                                | None -> Date.od_of_cdate (get_baptism p3)
+                                | None -> Date.od_of_cdate (Gwdb.get_baptism p3)
                               in
                               match d3 with
                               | Some d3 ->
@@ -285,9 +283,9 @@ let semi_sort base a before comp di =
               | None -> (
                   match sex_interm_sib with
                   | Some s ->
-                      if s = get_sex p2 then loop_j sex_interm_sib (j - di)
+                      if s = Gwdb.get_sex p2 then loop_j sex_interm_sib (j - di)
                       else loop (i + di)
-                  | None -> loop_j (Some (get_sex p2)) (j - di))
+                  | None -> loop_j (Some (Gwdb.get_sex p2)) (j - di))
           in
           loop_j None (i - di)
       | None -> loop (i + di)
@@ -302,7 +300,7 @@ let sort_children base children =
   match !before with Some b -> Some (b, children) | None -> None
 
 let changed_marriages_order base warning p =
-  let b = Array.copy (get_family p) in
+  let b = Array.copy (Gwdb.get_family p) in
   (* Astuce : on construire un tableau identique à la famille dans *)
   (* lequel on remplace toutes les dates inconnues par la dernière *)
   (* date maximale que l'on ait vu.                                *)
@@ -311,9 +309,9 @@ let changed_marriages_order base warning p =
   let _, a =
     Array.fold_left
       (fun (max_date, tab) ifam ->
-        let fam = foi base ifam in
+        let fam = Gwdb.foi base ifam in
         let date =
-          match Date.od_of_cdate (get_marriage fam) with
+          match Date.od_of_cdate (Gwdb.get_marriage fam) with
           | Some d -> Some d
           | None -> max_date
         in
@@ -325,7 +323,7 @@ let changed_marriages_order base warning p =
           | _ -> max_date
         in
         (max_date, Array.append tab [| (ifam, date) |]))
-      (None, [||]) (get_family p)
+      (None, [||]) (Gwdb.get_family p)
   in
   Array.stable_sort
     (fun (_f1, d1) (_f2, d2) ->
@@ -340,13 +338,13 @@ let changed_marriages_order base warning p =
         fam.(i) <- a.(i);
         loop (i + 1) fam)
     in
-    loop 0 (get_family p))
+    loop 0 (Gwdb.get_family p))
 
 let close_siblings warning x np ifam =
   match np with
   | None -> ()
   | Some (elder, d1) -> (
-      match Date.cdate_to_dmy_opt (get_birth x) with
+      match Date.cdate_to_dmy_opt (Gwdb.get_birth x) with
       | None -> ()
       | Some d2 ->
           Date.time_elapsed_opt d1 d2
@@ -367,7 +365,7 @@ let born_after_his_elder_sibling warning x b np ifam des =
           if strictly_after_dmy d1 d2 then
             warning (Warning.ChildrenNotInOrder (ifam, des, elder, x))
       | None -> (
-          match Date.dmy_of_death (get_death x) with
+          match Date.dmy_of_death (Gwdb.get_death x) with
           | None -> ()
           | Some d2 ->
               if strictly_after_dmy d1 d2 then
@@ -384,12 +382,12 @@ let siblings_gap gap child = function
               if strictly_after_dmy b max then (b, child) else (max, maxp) ))
 
 let child_born_after_his_parent warning x parent =
-  match Date.cdate_to_dmy_opt (get_birth parent) with
+  match Date.cdate_to_dmy_opt (Gwdb.get_birth parent) with
   | None -> ()
   | Some g1 -> (
-      match Date.cdate_to_dmy_opt (get_birth x) with
+      match Date.cdate_to_dmy_opt (Gwdb.get_birth x) with
       | None -> (
-          match Date.dmy_of_death (get_death x) with
+          match Date.dmy_of_death (Gwdb.get_death x) with
           | None -> ()
           | Some g2 ->
               if strictly_after_dmy g1 g2 then
@@ -408,24 +406,26 @@ let child_born_after_his_parent warning x parent =
                if strictly_younger a min_parent_age then
                  warning (ParentTooYoung (parent, a, x))
                else if
-                 (get_sex parent = Female && strictly_older a max_mother_age)
-                 || (get_sex parent = Male && strictly_older a max_father_age)
+                 Gwdb.get_sex parent = Female
+                 && strictly_older a max_mother_age
+                 || Gwdb.get_sex parent = Male
+                    && strictly_older a max_father_age
                then warning (ParentTooOld (parent, a, x)))
 
 let child_born_before_mother_death warning x mother =
-  match Date.cdate_to_dmy_opt (get_birth x) with
+  match Date.cdate_to_dmy_opt (Gwdb.get_birth x) with
   | None -> ()
   | Some d1 -> (
-      match Date.dmy_of_death @@ get_death mother with
+      match Date.dmy_of_death @@ Gwdb.get_death mother with
       | None -> ()
       | Some d2 ->
           if strictly_after_dmy d1 d2 then
             warning (Warning.MotherDeadBeforeChildBirth (mother, x)))
 
 let possible_father warning x father =
-  match Date.cdate_to_dmy_opt (get_birth x) with
+  match Date.cdate_to_dmy_opt (Gwdb.get_birth x) with
   | Some d1 when d1.prec <> Before -> (
-      match Date.dmy_of_death (get_death father) with
+      match Date.dmy_of_death (Gwdb.get_death father) with
       | Some d2 when d2.prec <> After ->
           let a2 =
             match d2 with
@@ -439,7 +439,7 @@ let possible_father warning x father =
   | Some _ | None -> ()
 
 let child_has_sex warning child =
-  if get_sex child = Neuter then warning (Warning.UndefinedSex child)
+  if Gwdb.get_sex child = Neuter then warning (Warning.UndefinedSex child)
 
 (* used by check_order_pfevents to ignore some date warnings:
    - `sort_events` sorts events like points on a timeline
@@ -466,14 +466,14 @@ let ignore_less_than_one_day_apart_warning get_date e1 e2 =
 
 (* this check if events chronology is sound (e.g. no baptism before birth *)
 let check_order_pevents warning p =
-  let get_name evt = Event.Pevent (get_pevent_name evt) in
-  let get_date evt = get_pevent_date evt in
+  let get_name evt = Event.Pevent (Gwdb.get_pevent_name evt) in
+  let get_date evt = Gwdb.get_pevent_date evt in
   let warning e1 e2 =
     warning
       (Warning.PEventOrder
-         (p, gen_pevent_of_pers_event e1, gen_pevent_of_pers_event e2))
+         (p, Gwdb.gen_pevent_of_pers_event e1, Gwdb.gen_pevent_of_pers_event e2))
   in
-  let events = Event.sort_events get_name get_date (get_pevents p) in
+  let events = Event.sort_events get_name get_date (Gwdb.get_pevents p) in
   let rec loop = function
     | e1 :: e2 :: events -> (
         match get_name e1 with
@@ -499,35 +499,35 @@ let check_witness_pevents_aux (warning : Warning.base_warning -> unit) origin
   | Some d when strictly_before_dmy date d ->
       warning
         (Warning.PWitnessEventBeforeBirth
-           (p, gen_pevent_of_pers_event evt, origin))
+           (p, Gwdb.gen_pevent_of_pers_event evt, origin))
   | Some _ | None -> (
       ();
       match death_opt with
       | Some d when strictly_after_dmy date d -> (
           match witness_kind with
-          | Witness_Mentioned | Witness_Other -> ()
+          | Def.Witness_Mentioned | Witness_Other -> ()
           | Witness | Witness_GodParent | Witness_CivilOfficer
           | Witness_ReligiousOfficer | Witness_Informant | Witness_Attending ->
               warning
                 (PWitnessEventAfterDeath
-                   (p, gen_pevent_of_pers_event evt, origin)))
+                   (p, Gwdb.gen_pevent_of_pers_event evt, origin)))
       | Some _ | None -> ())
 
 let check_witness_pevents base (warning : Warning.base_warning -> unit) origin =
   List.iter
     (fun evt ->
-      match Date.cdate_to_dmy_opt (get_pevent_date evt) with
+      match Date.cdate_to_dmy_opt (Gwdb.get_pevent_date evt) with
       | None -> ()
       | Some d2 ->
           Array.iter
             (fun (iw, witness_kind) ->
-              let p = poi base iw in
+              let p = Gwdb.poi base iw in
               check_witness_pevents_aux warning origin evt d2
-                (Date.cdate_to_dmy_opt @@ get_birth p)
-                (Date.dmy_of_death @@ get_death p)
+                (Date.cdate_to_dmy_opt @@ Gwdb.get_birth p)
+                (Date.dmy_of_death @@ Gwdb.get_death p)
                 p witness_kind)
-            (get_pevent_witnesses evt))
-    (get_pevents origin)
+            (Gwdb.get_pevent_witnesses evt))
+    (Gwdb.get_pevents origin)
 
 let check_witness_fevents_aux (warning : Warning.base_warning -> unit) fam evt
     date birth_opt death_opt p witness_kind =
@@ -535,40 +535,41 @@ let check_witness_fevents_aux (warning : Warning.base_warning -> unit) fam evt
   | Some d when strictly_before_dmy date d ->
       warning
         (Warning.FWitnessEventBeforeBirth
-           (p, gen_fevent_of_fam_event evt, get_ifam fam))
+           (p, Gwdb.gen_fevent_of_fam_event evt, Gwdb.get_ifam fam))
   | Some _ | None -> (
       ();
       match death_opt with
       | Some d when strictly_after_dmy date d -> (
           match witness_kind with
-          | Witness_Mentioned | Witness_Other -> ()
+          | Def.Witness_Mentioned | Witness_Other -> ()
           | Witness | Witness_GodParent | Witness_CivilOfficer
           | Witness_ReligiousOfficer | Witness_Informant | Witness_Attending ->
               warning
                 (FWitnessEventAfterDeath
-                   (p, gen_fevent_of_fam_event evt, get_ifam fam)))
+                   (p, Gwdb.gen_fevent_of_fam_event evt, Gwdb.get_ifam fam)))
       | Some _ | None -> ())
 
 let check_witness_fevents base (warning : Warning.base_warning -> unit) fam =
   List.iter
     (fun evt ->
-      match Date.cdate_to_dmy_opt (get_fevent_date evt) with
+      match Date.cdate_to_dmy_opt (Gwdb.get_fevent_date evt) with
       | None -> ()
       | Some d2 ->
           Array.iter
             (fun (iw, witness_kind) ->
-              let p = poi base iw in
+              let p = Gwdb.poi base iw in
               check_witness_fevents_aux warning fam evt d2
-                (Date.cdate_to_dmy_opt @@ get_birth p)
-                (Date.dmy_of_death @@ get_death p)
+                (Date.cdate_to_dmy_opt @@ Gwdb.get_birth p)
+                (Date.dmy_of_death @@ Gwdb.get_death p)
                 p witness_kind)
-            (get_fevent_witnesses evt))
-    (get_fevents fam)
+            (Gwdb.get_fevent_witnesses evt))
+    (Gwdb.get_fevents fam)
 
 (** Returns wether [iper] can be found in the provided associative array and
     wether it was found associated only with the Mentionned or Other witness kind.
 **)
-let witness_occur : iper -> (iper * witness_kind) array -> bool * bool =
+let witness_occur :
+    Gwdb.iper -> (Gwdb.iper * Def.witness_kind) array -> bool * bool =
   let f iper (is_witness, only_mentioned_or_other) (i, wk) =
     if i = iper then
       ( true,
@@ -593,29 +594,29 @@ let witness_kind_of_witness_array iper witnesses =
 
 let check_person_dates_as_witness base (warning : Warning.base_warning -> unit)
     p =
-  let ip = get_iper p in
+  let ip = Gwdb.get_iper p in
   let aux date w1 w2 evt =
     match Date.od_of_cdate (date evt) with
     | Some (Dgreg (_, _) as d) -> (
-        (match Date.od_of_cdate (get_birth p) with
+        (match Date.od_of_cdate (Gwdb.get_birth p) with
         | Some (Dgreg (_, _) as d') -> if strictly_before d d' then w1 evt
         | _ -> ());
-        match Date.date_of_death (get_death p) with
+        match Date.date_of_death (Gwdb.get_death p) with
         | Some d' -> if strictly_after d d' then w2 evt
         | None -> ())
     | Some (Dtext _) | None -> ()
   in
-  let related_p = get_related p in
+  let related_p = Gwdb.get_related p in
   let related_fam =
     List.fold_left
       (fun acc ir ->
-        let r = poi base ir in
-        if get_sex r = Male then
+        let r = Gwdb.poi base ir in
+        if Gwdb.get_sex r = Male then
           Array.fold_left
             (fun acc ifam ->
-              let fam = foi base ifam in
-              if Array.mem ip (get_witnesses fam) then fam :: acc else acc)
-            acc (get_family r)
+              let fam = Gwdb.foi base ifam in
+              if Array.mem ip (Gwdb.get_witnesses fam) then fam :: acc else acc)
+            acc (Gwdb.get_family r)
         else acc)
       [] related_p
   in
@@ -623,44 +624,46 @@ let check_person_dates_as_witness base (warning : Warning.base_warning -> unit)
     (fun fam ->
       List.iter
         (fun evt ->
-          match witness_kind_of_witness_array ip (get_fevent_witnesses evt) with
+          match
+            witness_kind_of_witness_array ip (Gwdb.get_fevent_witnesses evt)
+          with
           | Some Def.Witness_Mentioned | Some Def.Witness_Other ->
               aux
-                (fun e -> get_fevent_date e)
+                (fun e -> Gwdb.get_fevent_date e)
                 (fun e ->
                   warning
                     (Warning.FWitnessEventBeforeBirth
-                       (p, gen_fevent_of_fam_event e, get_ifam fam)))
+                       (p, Gwdb.gen_fevent_of_fam_event e, Gwdb.get_ifam fam)))
                 (fun _ -> ())
                 evt
           | Some _ ->
               aux
-                (fun e -> get_fevent_date e)
+                (fun e -> Gwdb.get_fevent_date e)
                 (fun e ->
                   warning
                     (FWitnessEventBeforeBirth
-                       (p, gen_fevent_of_fam_event e, get_ifam fam)))
+                       (p, Gwdb.gen_fevent_of_fam_event e, Gwdb.get_ifam fam)))
                 (fun e ->
                   warning
                     (FWitnessEventAfterDeath
-                       (p, gen_fevent_of_fam_event e, get_ifam fam)))
+                       (p, Gwdb.gen_fevent_of_fam_event e, Gwdb.get_ifam fam)))
                 evt
           | None -> ())
-        (get_fevents fam))
+        (Gwdb.get_fevents fam))
     related_fam;
   let related_pers =
     List.fold_left
       (fun acc ir ->
-        let r = poi base ir in
+        let r = Gwdb.poi base ir in
         List.fold_left
           (fun acc e ->
             let witness_kind =
-              witness_kind_of_witness_array ip (get_pevent_witnesses e)
+              witness_kind_of_witness_array ip (Gwdb.get_pevent_witnesses e)
             in
             match witness_kind with
             | Some kind -> (e, r, kind) :: acc
             | _ -> acc)
-          acc (get_pevents r))
+          acc (Gwdb.get_pevents r))
       [] related_p
   in
   List.iter
@@ -668,22 +671,22 @@ let check_person_dates_as_witness base (warning : Warning.base_warning -> unit)
       match kind with
       | Def.Witness_Mentioned | Def.Witness_Other ->
           aux
-            (fun e -> get_pevent_date e)
+            (fun e -> Gwdb.get_pevent_date e)
             (fun e ->
               warning
                 (Warning.PWitnessEventBeforeBirth
-                   (p, gen_pevent_of_pers_event e, r)))
+                   (p, Gwdb.gen_pevent_of_pers_event e, r)))
             (fun _ -> ())
             evt
       | _ ->
           aux
-            (fun e -> get_pevent_date e)
+            (fun e -> Gwdb.get_pevent_date e)
             (fun e ->
               warning
-                (PWitnessEventBeforeBirth (p, gen_pevent_of_pers_event e, r)))
+                (PWitnessEventBeforeBirth (p, Gwdb.gen_pevent_of_pers_event e, r)))
             (fun e ->
               warning
-                (PWitnessEventAfterDeath (p, gen_pevent_of_pers_event e, r)))
+                (PWitnessEventAfterDeath (p, Gwdb.gen_pevent_of_pers_event e, r)))
             evt)
     related_pers
 
@@ -698,18 +701,18 @@ let check_pevents base (warning : Warning.base_warning -> unit) p =
 let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
   let children =
     if onchange then (
-      let b = get_children fam in
+      let b = Gwdb.get_children fam in
       match sort_children base b with
       | None -> b
       | Some (b, a) ->
           warning (Warning.ChangedOrderOfChildren (ifam, fam, b, a));
           a)
-    else get_children fam
+    else Gwdb.get_children fam
   in
   let _, gap =
     Array.fold_left
       (fun (np, gap) child ->
-        let child = poi base child in
+        let child = Gwdb.poi base child in
         let b = obirth child in
         let gap = siblings_gap gap child b in
         born_after_his_elder_sibling warning child b np ifam fam;
@@ -738,16 +741,16 @@ let check_children ?(onchange = true) base warning (ifam, fam) fath moth =
 
 let has_family_sources fam =
   not
-    (is_empty_string (get_fsources fam)
-    && is_empty_string (get_marriage_src fam))
+    (Gwdb.is_empty_string (Gwdb.get_fsources fam)
+    && Gwdb.is_empty_string (Gwdb.get_marriage_src fam))
 
 let has_person_sources p =
   not
-    (is_empty_string (get_psources p)
-    && is_empty_string (get_baptism_src p)
-    && is_empty_string (get_birth_src p)
-    && is_empty_string (get_death_src p)
-    && is_empty_string (get_burial_src p))
+    (Gwdb.is_empty_string (Gwdb.get_psources p)
+    && Gwdb.is_empty_string (Gwdb.get_baptism_src p)
+    && Gwdb.is_empty_string (Gwdb.get_birth_src p)
+    && Gwdb.is_empty_string (Gwdb.get_death_src p)
+    && Gwdb.is_empty_string (Gwdb.get_burial_src p))
 
 (* ************************************************************************* *)
 (* [Fonc] check_sources :
@@ -768,9 +771,9 @@ let has_person_sources p =
 let check_sources base misc ifam fam =
   if has_family_sources fam then ()
   else
-    let cpl = foi base ifam in
-    let fath = poi base (get_father cpl) in
-    let moth = poi base (get_mother cpl) in
+    let cpl = Gwdb.foi base ifam in
+    let fath = Gwdb.poi base (Gwdb.get_father cpl) in
+    let moth = Gwdb.poi base (Gwdb.get_mother cpl) in
     if has_person_sources fath && has_person_sources moth then ()
     else misc Warning.MissingSources
 
@@ -778,16 +781,16 @@ let check_parent_marriage_age warning fam p =
   let rec loop = function
     | [] -> ()
     | evt :: list -> (
-        let evt_name = get_fevent_name evt in
+        let evt_name = Gwdb.get_fevent_name evt in
         match evt_name with
         | Efam_Marriage | Efam_PACS -> (
-            match Date.od_of_cdate (get_fevent_date evt) with
+            match Date.od_of_cdate (Gwdb.get_fevent_date evt) with
             | Some (Dgreg (g2, _) as d2) -> (
-                match Date.date_of_death (get_death p) with
+                match Date.date_of_death (Gwdb.get_death p) with
                 | Some d1 when strictly_after d2 d1 ->
                     warning (Warning.MarriageDateAfterDeath p)
                 | _ -> (
-                    match Date.od_of_cdate (get_birth p) with
+                    match Date.od_of_cdate (Gwdb.get_birth p) with
                     | Some (Dgreg (g1, _) as d1) ->
                         if strictly_before d2 d1 then
                           warning (MarriageDateBeforeBirth p)
@@ -795,43 +798,45 @@ let check_parent_marriage_age warning fam p =
                           Date.time_elapsed_opt g1 g2
                           |> Option.iter @@ fun e ->
                              if strictly_younger e min_age_marriage then
-                               warning (YoungForMarriage (p, e, get_ifam fam))
+                               warning
+                                 (YoungForMarriage (p, e, Gwdb.get_ifam fam))
                              else if strictly_older e max_age_marriage then
-                               warning (OldForMarriage (p, e, get_ifam fam))
+                               warning
+                                 (OldForMarriage (p, e, Gwdb.get_ifam fam))
                              else loop list
                     | Some (Dtext _) | None -> loop list))
             | _ -> loop list)
         | _ -> loop list)
   in
-  loop (get_fevents fam)
+  loop (Gwdb.get_fevents fam)
 
 let check_possible_duplicate_family ?p base warning family father mother =
-  let ifath = get_father family in
-  let imoth = get_mother family in
-  let ifam = get_ifam family in
+  let ifath = Gwdb.get_father family in
+  let imoth = Gwdb.get_mother family in
+  let ifam = Gwdb.get_ifam family in
 
-  let name fn i = Name.strip_lower @@ sou base (fn i) in
-  let first_name = name get_first_name in
-  let surname = name get_surname in
+  let name fn i = Name.strip_lower @@ Gwdb.sou base (fn i) in
+  let first_name = name Gwdb.get_first_name in
+  let surname = name Gwdb.get_surname in
 
   let father_fn, father_sn = (first_name father, surname father) in
   let mother_fn, mother_sn = (first_name mother, surname mother) in
-  let fath_families = get_family father in
-  let moth_families = get_family mother in
+  let fath_families = Gwdb.get_family father in
+  let moth_families = Gwdb.get_family mother in
 
   let f get_parent
       ( _current_parent,
         current_parent_iper,
         current_parent_fn,
         current_parent_sn ) parent_source ifam' =
-    if eq_ifam ifam ifam' then ()
+    if Gwdb.eq_ifam ifam ifam' then ()
     else
-      let fam' = foi base ifam' in
+      let fam' = Gwdb.foi base ifam' in
       let parent' = get_parent fam' in
-      let person = poi base parent' in
+      let person = Gwdb.poi base parent' in
       let fn, sn = (first_name person, surname person) in
       (* Parent is strictly the same *)
-      if eq_iper parent' current_parent_iper then
+      if Gwdb.eq_iper parent' current_parent_iper then
         warning (Warning.PossibleDuplicateFam (ifam, ifam'))
         (*  Homonymous parents *)
       else if fn = current_parent_fn && sn = current_parent_sn then
@@ -840,20 +845,20 @@ let check_possible_duplicate_family ?p base warning family father mother =
   in
 
   match p with
-  | Some p when eq_iper (get_iper p) ifath ->
+  | Some p when Gwdb.eq_iper (Gwdb.get_iper p) ifath ->
       Array.iter
-        (f get_mother (mother, imoth, mother_fn, mother_sn) father)
+        (f Gwdb.get_mother (mother, imoth, mother_fn, mother_sn) father)
         fath_families
-  | Some p when eq_iper (get_iper p) imoth ->
+  | Some p when Gwdb.eq_iper (Gwdb.get_iper p) imoth ->
       Array.iter
-        (f get_father (father, ifath, father_fn, father_sn) mother)
+        (f Gwdb.get_father (father, ifath, father_fn, father_sn) mother)
         moth_families
   | _ ->
       Array.iter
-        (f get_mother (mother, imoth, mother_fn, mother_sn) father)
+        (f Gwdb.get_mother (mother, imoth, mother_fn, mother_sn) father)
         fath_families;
       Array.iter
-        (f get_father (father, ifath, father_fn, father_sn) mother)
+        (f Gwdb.get_father (father, ifath, father_fn, father_sn) mother)
         moth_families
 
 let check_parents base warning fam fath moth =
@@ -866,31 +871,31 @@ let check_parents base warning fam fath moth =
   check_possible_duplicate_family base warning fam fath moth
 
 let changed_pevents_order warning p =
-  let a = get_pevents p in
+  let a = Gwdb.get_pevents p in
   let b =
     Event.sort_events
-      (fun evt -> Event.pevent_name (get_pevent_name evt))
-      (fun evt -> get_pevent_date evt)
+      (fun evt -> Event.pevent_name (Gwdb.get_pevent_name evt))
+      (fun evt -> Gwdb.get_pevent_date evt)
       a
   in
-  let same = Ext_list.cmp eq_pevent a b in
+  let same = Ext_list.cmp Gwdb.eq_pevent a b in
   if not same then
-    let a = List.map gen_pevent_of_pers_event a in
-    let b = List.map gen_pevent_of_pers_event b in
+    let a = List.map Gwdb.gen_pevent_of_pers_event a in
+    let b = List.map Gwdb.gen_pevent_of_pers_event b in
     warning (Warning.ChangedOrderOfPersonEvents (p, a, b))
 
 let changed_fevents_order warning (ifam, fam) =
   let a =
     Event.sort_events
-      (fun evt -> Event.fevent_name (get_fevent_name evt))
-      (fun evt -> get_fevent_date evt)
-      (get_fevents fam)
+      (fun evt -> Event.fevent_name (Gwdb.get_fevent_name evt))
+      (fun evt -> Gwdb.get_fevent_date evt)
+      (Gwdb.get_fevents fam)
   in
-  let b = get_fevents fam in
-  let same = Ext_list.cmp eq_fevent a b in
+  let b = Gwdb.get_fevents fam in
+  let same = Ext_list.cmp Gwdb.eq_fevent a b in
   if not same then
-    let a = List.map gen_fevent_of_fam_event a in
-    let b = List.map gen_fevent_of_fam_event b in
+    let a = List.map Gwdb.gen_fevent_of_fam_event a in
+    let b = List.map Gwdb.gen_fevent_of_fam_event b in
     warning (Warning.ChangedOrderOfFamilyEvents (ifam, b, a))
 
 (* main *)
@@ -901,15 +906,15 @@ let person ?(onchange = true) base (warning : Warning.base_warning -> unit) p =
   (* check person's age *)
   check_person_age warning p;
   (* check titles dates *)
-  List.iter (title_dates warning p) (get_titles p);
+  List.iter (title_dates warning p) (Gwdb.get_titles p);
   (* check order of personal events *)
   if onchange then changed_pevents_order warning p;
   related_sex_is_coherent base warning p
 
 let family ?(onchange = true) base (warning : Warning.base_warning -> unit) ifam
     fam =
-  let fath = poi base @@ get_father fam in
-  let moth = poi base @@ get_mother fam in
+  let fath = Gwdb.poi base @@ Gwdb.get_father fam in
+  let moth = Gwdb.poi base @@ Gwdb.get_mother fam in
   (* check family's witnesses *)
   check_witness_fevents base warning fam;
   (* check parents marraige *)
@@ -918,8 +923,8 @@ let family ?(onchange = true) base (warning : Warning.base_warning -> unit) ifam
   check_children ~onchange base warning (ifam, fam) fath moth;
   if onchange then (
     changed_fevents_order warning (ifam, fam);
-    let father = poi base (get_father fam) in
-    let mother = poi base (get_mother fam) in
+    let father = Gwdb.poi base (Gwdb.get_father fam) in
+    let mother = Gwdb.poi base (Gwdb.get_mother fam) in
     (* change order of father's families *)
     changed_marriages_order base warning father;
     (* change order of mother's families *)
@@ -929,11 +934,11 @@ let check_related_person_pevents warning birth_date death_date p iper related_p
     =
   List.iter
     (fun e ->
-      match Date.cdate_to_dmy_opt (get_pevent_date e) with
+      match Date.cdate_to_dmy_opt (Gwdb.get_pevent_date e) with
       | None -> ()
       | Some date ->
           let is_witness, only_mentioned =
-            witness_occur iper (get_pevent_witnesses e)
+            witness_occur iper (Gwdb.get_pevent_witnesses e)
           in
           if is_witness then
             let witness_kind =
@@ -941,20 +946,20 @@ let check_related_person_pevents warning birth_date death_date p iper related_p
             in
             check_witness_pevents_aux warning related_p e date birth_date
               death_date p witness_kind)
-    (get_pevents related_p)
+    (Gwdb.get_pevents related_p)
 
 let check_related_person_fevents warning base birth_date death_date p iper
     related_p =
   Array.iter
     (fun i ->
-      let f = foi base i in
+      let f = Gwdb.foi base i in
       List.iter
         (fun e ->
-          match Date.cdate_to_dmy_opt (get_fevent_date e) with
+          match Date.cdate_to_dmy_opt (Gwdb.get_fevent_date e) with
           | None -> ()
           | Some date ->
               let is_witness, only_mentioned =
-                witness_occur iper (get_fevent_witnesses e)
+                witness_occur iper (Gwdb.get_fevent_witnesses e)
               in
               if is_witness then
                 let witness_kind =
@@ -962,53 +967,54 @@ let check_related_person_fevents warning base birth_date death_date p iper
                 in
                 check_witness_fevents_aux warning f e date birth_date death_date
                   p witness_kind)
-        (get_fevents f))
-    (get_family related_p)
+        (Gwdb.get_fevents f))
+    (Gwdb.get_family related_p)
 
 let check_related_on_person_update warning base birth_date death_date p iper
     irel =
-  let related_p = poi base irel in
+  let related_p = Gwdb.poi base irel in
   check_related_person_pevents warning birth_date death_date p iper related_p;
   check_related_person_fevents warning base birth_date death_date p iper
     related_p
 
 let on_person_update base warning p =
-  (match get_parents p with
+  (match Gwdb.get_parents p with
   | Some i ->
-      let fam = foi base i in
-      let fath = poi base @@ get_father fam in
-      let moth = poi base @@ get_mother fam in
+      let fam = Gwdb.foi base i in
+      let fath = Gwdb.poi base @@ Gwdb.get_father fam in
+      let moth = Gwdb.poi base @@ Gwdb.get_mother fam in
       child_born_after_his_parent warning p fath;
       child_born_after_his_parent warning p moth;
       check_siblings base warning (i, fam) ignore
   | None -> ());
-  let birth_opt = Date.cdate_to_dmy_opt (get_birth p) in
-  let death_opt = Date.dmy_of_death @@ get_death p in
-  let iper = get_iper p in
+  let birth_opt = Date.cdate_to_dmy_opt (Gwdb.get_birth p) in
+  let death_opt = Date.dmy_of_death @@ Gwdb.get_death p in
+  let iper = Gwdb.get_iper p in
   if Option.is_some birth_opt || Option.is_some death_opt then
     List.iter
       (check_related_on_person_update warning base birth_opt death_opt p iper)
-      (get_related p);
+      (Gwdb.get_related p);
   Array.iter
     (fun ifam ->
-      let fam = foi base ifam in
+      let fam = Gwdb.foi base ifam in
       let fath, moth =
-        if get_iper p = get_father fam then (p, poi base @@ get_mother fam)
-        else (poi base @@ get_father fam, p)
+        if Gwdb.get_iper p = Gwdb.get_father fam then
+          (p, Gwdb.poi base @@ Gwdb.get_mother fam)
+        else (Gwdb.poi base @@ Gwdb.get_father fam, p)
       in
       check_parent_marriage_age warning fam p;
       check_difference_age_between_cpl warning fath moth;
       check_possible_duplicate_family ~p base warning fam fath moth;
       Array.iter
         (fun child ->
-          let child = poi base child in
+          let child = Gwdb.poi base child in
           child_born_after_his_parent warning child p;
-          match get_sex p with
+          match Gwdb.get_sex p with
           | Male -> possible_father warning child p
           | Female -> child_born_before_mother_death warning child p
           | Neuter -> ())
-        (get_children fam))
-    (get_family p)
+        (Gwdb.get_children fam))
+    (Gwdb.get_family p)
 
 (* ************************************************************************* *)
 (* [Fonc] check_other_fields :
@@ -1027,7 +1033,7 @@ let on_person_update base warning p =
     [Rem] : Exporté en clair hors de ce module.                              *)
 let check_other_fields base misc ifam fam = check_sources base misc ifam fam
 
-let eq_person p1 p2 = eq_iper (get_iper p1) (get_iper p2)
+let eq_person p1 p2 = Gwdb.eq_iper (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 let eq_warning w1 w2 = Warning.compare_base_warning w1 w2 = 0
 
 let person_warnings conf base p =
@@ -1040,7 +1046,7 @@ let person_warnings conf base p =
       let iper = Gwdb.get_iper p in
       let ifather = Gwdb.get_father fam in
       let imother = Gwdb.get_mother fam in
-      eq_iper iper ifather || eq_iper iper imother
+      Gwdb.eq_iper iper ifather || Gwdb.eq_iper iper imother
     in
     function
     | Warning.CloseChildren (ifam, p1, p2)
@@ -1057,6 +1063,8 @@ let person_warnings conf base p =
   on_person_update base filter p;
   Array.iter
     (fun ifam ->
-      check_siblings ~onchange:false base filter (ifam, foi base ifam) ignore)
-    (get_family p);
+      check_siblings ~onchange:false base filter
+        (ifam, Gwdb.foi base ifam)
+        ignore)
+    (Gwdb.get_family p);
   Warning.handle_homonymous base (Warning.BaseWarningSet.elements !w)

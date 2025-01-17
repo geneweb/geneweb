@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Gwdb
-
 type auth_scheme_kind =
   | NoAuth
   | TokenAuth of token_auth_scheme
@@ -59,7 +57,7 @@ type config = {
   highlight : string;
   lang : string;
   default_lang : string;
-  default_sosa_ref : iper * Gwdb.person option;
+  default_sosa_ref : Gwdb.iper * Gwdb.person option;
   multi_parents : bool;
   authorized_wizards_notes : bool;
   public_if_titles : bool;

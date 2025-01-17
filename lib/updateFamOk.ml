@@ -1,11 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
-open Update_util
-
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
 let removed_string = ref []
@@ -13,7 +7,7 @@ let removed_string = ref []
 type create_info = Update.create_info = {
   ci_birth_date : Date.date option;
   ci_birth_place : string;
-  ci_death : death;
+  ci_death : Def.death;
   ci_death_date : Date.date option;
   ci_death_place : string;
   ci_occupation : string;
@@ -24,27 +18,31 @@ let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
 let reconstitute_parent_or_child conf var default_surname =
-  let first_name = Ext_string.only_printable (getn conf var "fn") in
+  let first_name = Ext_string.only_printable (Update_util.getn conf var "fn") in
   let surname =
-    let surname = Ext_string.only_printable (getn conf var "sn") in
+    let surname = Ext_string.only_printable (Update_util.getn conf var "sn") in
     if surname = "" && first_name <> "" then default_surname else surname
   in
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
-  let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
+  let occ =
+    try int_of_string (Update_util.getn conf var "occ") with Failure _ -> 0
+  in
   let create_info =
     let b = Update.reconstitute_date conf (var ^ "b") in
-    let bpl = getn conf (var ^ "b") "pl" in
+    let bpl = Update_util.getn conf (var ^ "b") "pl" in
     let death =
-      match p_getenv conf.env (var ^ "d_yyyy") with
-      | Some "+" -> DeadDontKnowWhen
+      match Util.p_getenv conf.Config.env (var ^ "d_yyyy") with
+      | Some "+" -> Def.DeadDontKnowWhen
       | Some ("-" | "=") -> NotDead
       | Some _ | None -> DontKnowIfDead
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
-    let dpl = getn conf (var ^ "d") "pl" in
-    let occupation = Ext_string.only_printable (getn conf var "occupation") in
-    let public = getn conf (var ^ "b") "yyyy" = "p" in
+    let dpl = Update_util.getn conf (var ^ "d") "pl" in
+    let occupation =
+      Ext_string.only_printable (Update_util.getn conf var "occupation")
+    in
+    let public = Update_util.getn conf (var ^ "b") "yyyy" = "p" in
     {
       ci_birth_date = b;
       ci_birth_place = bpl;
@@ -55,19 +53,22 @@ let reconstitute_parent_or_child conf var default_surname =
       ci_public = public;
     }
   in
-  let sex = getenv_sex conf var in
-  let create = getn_p conf var ~create_info sex in
+  let sex = Update_util.getenv_sex conf var in
+  let create = Update_util.getn_p conf var ~create_info sex in
   (first_name, surname, occ, create, var)
 
 let invert_children conf (c, children, ext) i =
   let var = "inv_ch" ^ string_of_int (i + 1) in
-  match (p_getenv conf.env var, children) with
+  match (Util.p_getenv conf.Config.env var, children) with
   | Some "on", c1 :: children -> (c1, c :: children, true)
   | _ -> (c, children, ext)
 
 let insert_child conf (children, ext) i =
   let var = "ins_ch" ^ string_of_int i in
-  match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+  match
+    ( Util.p_getenv conf.Config.env var,
+      Util.p_getint conf.Config.env (var ^ "_n") )
+  with
   | _, Some n when n > 1 ->
       let children =
         let rec loop children n =
@@ -86,7 +87,10 @@ let insert_child conf (children, ext) i =
 
 let insert_parent conf (parents, ext) i =
   let var = "ins_pa" ^ string_of_int i in
-  match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+  match
+    ( Util.p_getenv conf.Config.env var,
+      Util.p_getint conf.Config.env (var ^ "_n") )
+  with
   | _, Some n when n > 1 ->
       let parents =
         let rec loop parents n =
@@ -106,7 +110,10 @@ let insert_parent conf (parents, ext) i =
 let reconstitute_insert_event conf ext cnt el =
   let var = "ins_event" ^ string_of_int cnt in
   let n =
-    match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+    match
+      ( Util.p_getenv conf.Config.env var,
+        Util.p_getint conf.Config.env (var ^ "_n") )
+    with
     | _, Some n when n > 1 -> n
     | Some "on", _ -> 1
     | _ -> 0
@@ -117,7 +124,7 @@ let reconstitute_insert_event conf ext cnt el =
         if n > 0 then
           let e1 =
             {
-              efam_name = Efam_Name "";
+              Def.efam_name = Efam_Name "";
               efam_date = Date.cdate_None;
               efam_place = "";
               efam_reason = "";
@@ -135,12 +142,12 @@ let reconstitute_insert_event conf ext cnt el =
   else (el, ext)
 
 let rec reconstitute_events conf ext cnt =
-  match get_nth conf "e_name" cnt with
+  match Update_util.get_nth conf "e_name" cnt with
   | None -> ([], ext)
   | Some efam_name ->
       let efam_name =
         match efam_name with
-        | "#marr" -> Efam_Marriage
+        | "#marr" -> Def.Efam_Marriage
         | "#nmar" -> Efam_NoMarriage
         | "#nmen" -> Efam_NoMention
         | "#enga" -> Efam_Engage
@@ -158,19 +165,19 @@ let rec reconstitute_events conf ext cnt =
         Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
       in
       let efam_place =
-        match get_nth conf "e_place" cnt with
+        match Update_util.get_nth conf "e_place" cnt with
         | Some place -> Ext_string.only_printable place
         | None -> ""
       in
       let efam_note =
-        match get_nth conf "e_note" cnt with
+        match Update_util.get_nth conf "e_note" cnt with
         | Some note ->
             Ext_string.only_printable_or_nl
               (Ext_string.strip_all_trailing_spaces note)
         | None -> ""
       in
       let efam_src =
-        match get_nth conf "e_src" cnt with
+        match Update_util.get_nth conf "e_src" cnt with
         | Some src -> Ext_string.only_printable src
         | None -> ""
       in
@@ -190,8 +197,8 @@ let rec reconstitute_events conf ext cnt =
                 "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
               in
               let wkind =
-                match p_getenv conf.env var_c with
-                | Some "godp" -> Witness_GodParent
+                match Util.p_getenv conf.Config.env var_c with
+                | Some "godp" -> Def.Witness_GodParent
                 | Some "offi" -> Witness_CivilOfficer
                 | Some "reli" -> Witness_ReligiousOfficer
                 | Some "info" -> Witness_Informant
@@ -204,7 +211,7 @@ let rec reconstitute_events conf ext cnt =
                 let var_note =
                   "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
                 in
-                match p_getenv conf.env var_note with
+                match Util.p_getenv conf.Config.env var_note with
                 | Some wnote ->
                     (* print_endline ("NOTE:" ^ wnote); *)
                     wnote
@@ -212,7 +219,7 @@ let rec reconstitute_events conf ext cnt =
               in
               let c = (c, wkind, wnote) in
               match
-                p_getenv conf.env
+                Util.p_getenv conf.Config.env
                   ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
               with
               | Some "on" -> (
@@ -220,14 +227,14 @@ let rec reconstitute_events conf ext cnt =
                     "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
                     ^ "_n"
                   in
-                  match p_getint conf.env ins_witn_n with
+                  match Util.p_getint conf.Config.env ins_witn_n with
                   | Some n when n > 1 ->
                       let rec loop_witn n witnesses =
                         if n = 0 then (c :: witnesses, true)
                         else
                           let new_witn =
                             ( ("", "", 0, Update.Create (Neuter, None), ""),
-                              Witness,
+                              Def.Witness,
                               "" )
                           in
                           let witnesses = new_witn :: witnesses in
@@ -237,7 +244,7 @@ let rec reconstitute_events conf ext cnt =
                   | Some _ | None ->
                       let new_witn =
                         ( ("", "", 0, Update.Create (Neuter, None), ""),
-                          Witness,
+                          Def.Witness,
                           "" )
                       in
                       (c :: new_witn :: witnesses, true))
@@ -247,17 +254,17 @@ let rec reconstitute_events conf ext cnt =
       in
       let witnesses, ext =
         let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
-        match p_getenv conf.env evt_ins with
+        match Util.p_getenv conf.Config.env evt_ins with
         | Some "on" -> (
             let ins_witn_n = "e" ^ string_of_int cnt ^ "_ins_witn0_n" in
-            match p_getint conf.env ins_witn_n with
+            match Util.p_getint conf.Config.env ins_witn_n with
             | Some n when n > 1 ->
                 let rec loop_witn n witnesses =
                   if n = 0 then (witnesses, true)
                   else
                     let new_witn =
                       ( ("", "", 0, Update.Create (Neuter, None), ""),
-                        Witness,
+                        Def.Witness,
                         "" )
                     in
                     let witnesses = new_witn :: witnesses in
@@ -266,14 +273,16 @@ let rec reconstitute_events conf ext cnt =
                 loop_witn n witnesses
             | Some _ | None ->
                 let new_witn =
-                  (("", "", 0, Update.Create (Neuter, None), ""), Witness, "")
+                  ( ("", "", 0, Update.Create (Neuter, None), ""),
+                    Def.Witness,
+                    "" )
                 in
                 (new_witn :: witnesses, true))
         | Some _ | None -> (witnesses, ext)
       in
       let e =
         {
-          efam_name;
+          Def.efam_name;
           efam_date = Date.cdate_of_od efam_date;
           efam_place;
           efam_reason = "";
@@ -294,7 +303,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   (* On tri les évènements pour être sûr. *)
   let fevents =
     Event.sort_events
-      (fun evt -> Event.Fevent evt.efam_name)
+      (fun evt -> Event.Fevent evt.Def.efam_name)
       (fun evt -> evt.efam_date)
       fevents
   in
@@ -316,7 +325,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
     let e =
       Some
         ( kind,
-          evt.efam_date,
+          evt.Def.efam_date,
           evt.efam_place,
           evt.efam_note,
           evt.efam_src,
@@ -343,7 +352,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   let rec loop = function
     | [] -> ()
     | evt :: l -> (
-        match evt.efam_name with
+        match evt.Def.efam_name with
         | Efam_Engage ->
             mk_marr evt Engaged;
             loop l
@@ -385,7 +394,11 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   let marr, wit =
     match !found_marriage with
     | None ->
-        ( (NoMention, Date.cdate_None, empty_string, empty_string, empty_string),
+        ( ( Def.NoMention,
+            Date.cdate_None,
+            empty_string,
+            empty_string,
+            empty_string ),
           [||] )
     | Some (kind, date, place, note, src, wit) ->
         ((kind, date, place, note, src), wit)
@@ -396,7 +409,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
       let relation, date, place, note, src = marr in
       let relation =
         match relation with
-        | Married -> NoSexesCheckMarried
+        | Married -> Def.NoSexesCheckMarried
         | ( NotMarried | Engaged | NoSexesCheckNotMarried | NoMention
           | NoSexesCheckMarried | MarriageBann | MarriageContract
           | MarriageLicense | Pacs | Residence ) as x ->
@@ -411,7 +424,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
 let reconstitute_family conf base nsck =
   let events, ext = reconstitute_events conf false 1 in
   let events, ext = reconstitute_insert_event conf ext 0 events in
-  let surname = getn conf "pa1" "sn" in
+  let surname = Update_util.getn conf "pa1" "sn" in
   let children, ext =
     let rec loop i ext =
       match
@@ -446,14 +459,14 @@ let reconstitute_family conf base nsck =
   in
   let comment =
     Ext_string.only_printable_or_nl
-      (Ext_string.strip_all_trailing_spaces (get conf "comment"))
+      (Ext_string.strip_all_trailing_spaces (Update_util.get conf "comment"))
   in
-  let fsources = Ext_string.only_printable (get conf "src") in
+  let fsources = Ext_string.only_printable (Update_util.get conf "src") in
   let origin_file =
-    Option.value ~default:"" (p_getenv conf.env "origin_file")
+    Option.value ~default:"" (Util.p_getenv conf.Config.env "origin_file")
   in
   let fam_index =
-    match p_getenv conf.env "i" with
+    match Util.p_getenv conf.Config.env "i" with
     | Some i -> Gwdb.ifam_of_string i
     | None -> Gwdb.dummy_ifam
   in
@@ -465,7 +478,7 @@ let reconstitute_family conf base nsck =
     if events = [] then
       let evt =
         {
-          efam_name = Efam_NoMention;
+          Def.efam_name = Efam_NoMention;
           efam_date = Date.cdate_None;
           efam_place = "";
           efam_reason = "";
@@ -493,22 +506,22 @@ let reconstitute_family conf base nsck =
           match father with
           | _, _, _, Update.Create (sex, _), _ -> sex
           | f, s, o, Update.Link, _ -> (
-              match person_of_key base f s o with
-              | Some ip -> get_sex (poi base ip)
+              match Gwdb.person_of_key base f s o with
+              | Some ip -> Gwdb.get_sex (Gwdb.poi base ip)
               | _ -> Neuter)
         in
         let mother_sex =
           match mother with
           | _, _, _, Update.Create (sex, _), _ -> sex
           | f, s, o, Update.Link, _ -> (
-              match person_of_key base f s o with
-              | Some ip -> get_sex (poi base ip)
+              match Gwdb.person_of_key base f s o with
+              | Some ip -> Gwdb.get_sex (Gwdb.poi base ip)
               | _ -> Neuter)
         in
         match (father_sex, mother_sex) with
         | Male, Male | Female, Female -> (
             match relation with
-            | Married -> NoSexesCheckMarried
+            | Married -> Def.NoSexesCheckMarried
             | _ -> NoSexesCheckNotMarried)
         | _ -> relation)
     | _ -> relation
@@ -516,7 +529,7 @@ let reconstitute_family conf base nsck =
   let divorce = div in
   let fam =
     {
-      marriage;
+      Def.marriage;
       marriage_place;
       marriage_note;
       marriage_src;
@@ -529,8 +542,8 @@ let reconstitute_family conf base nsck =
       fsources;
       fam_index;
     }
-  and cpl = Futil.parent conf.multi_parents (Array.of_list parents)
-  and des = { children = Array.of_list children } in
+  and cpl = Futil.parent conf.Config.multi_parents (Array.of_list parents)
+  and des = { Def.children = Array.of_list children } in
   (fam, cpl, des, ext)
 
 let strip_events fevents =
@@ -544,7 +557,7 @@ let strip_events fevents =
   List.fold_right
     (fun e accu ->
       let has_name =
-        match e.efam_name with Efam_Name s -> s <> "" | _ -> true
+        match e.Def.efam_name with Efam_Name s -> s <> "" | _ -> true
       in
       if has_name then
         let witnesses = strip_array_witness e.efam_witnesses in
@@ -572,12 +585,12 @@ let check_parents conf cpl =
       if sn <> "" then
         Some
           (Update.UERR_missing_first_name
-             (transl_nth conf "father/mother" i |> Adef.safe))
+             (Util.transl_nth conf "father/mother" i |> Adef.safe))
       else None
     else if sn = "" then
       Some
         (Update.UERR_missing_surname
-           (transl_nth conf "father/mother" i |> Adef.safe))
+           (Util.transl_nth conf "father/mother" i |> Adef.safe))
     else None
   in
   match check Gutil.father 0 with
@@ -589,7 +602,7 @@ let check_child conf p =
   if fn = "" && sn <> "" then
     Some
       (Update.UERR_missing_first_name
-         (transl_nth conf "child/children" 0 |> Adef.safe))
+         (Util.transl_nth conf "child/children" 0 |> Adef.safe))
   else None
 
 let check_children conf children =
@@ -610,21 +623,21 @@ let check_family conf fam cpl des :
   let err_parents = check_parents conf cpl in
   let err_fevent_witness =
     Update.check_missing_witnesses_names conf
-      (fun e -> e.efam_witnesses)
-      fam.fevents
+      (fun e -> e.Def.efam_witnesses)
+      fam.Def.fevents
   in
-  let err_children = check_children conf des.children in
+  let err_children = check_children conf des.Def.children in
   (err_fevent_witness, err_parents, err_children)
 
 let strip_family fam des =
   let fam =
     {
       fam with
-      witnesses = strip_array_persons fam.witnesses;
+      Def.witnesses = strip_array_persons fam.Def.witnesses;
       fevents = strip_events fam.fevents;
     }
   in
-  let des = { children = strip_array_persons des.children } in
+  let des = { Def.children = strip_array_persons des.Def.children } in
   (fam, des)
 
 let print_err_parents conf base p =
@@ -634,10 +647,10 @@ let print_err_parents conf base p =
   Output.print_string conf (Update.string_of_error conf err);
   Output.print_sstring conf "<p><ul><li>";
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl conf "first free number"));
+    (Utf8.capitalize_fst (Util.transl conf "first free number"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf @@ string_of_int
-  @@ Gutil.find_free_occ base (p_first_name base p) (p_surname base p);
+  @@ Gutil.find_free_occ base (Gwdb.p_first_name base p) (Gwdb.p_surname base p);
   Output.print_sstring conf "</li></ul>";
   Update.print_return conf
 
@@ -649,14 +662,15 @@ let print_err_sex conf base p =
 
 let print_err conf =
   let err =
-    Update.UERR (transl conf "error" |> Utf8.capitalize_fst |> Adef.safe)
+    Update.UERR (Util.transl conf "error" |> Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () -> Update.print_return conf
 
 let print_error_disconnected conf =
   let err =
     Update.UERR
-      (transl conf "msg error disconnected" |> Utf8.capitalize_fst |> Adef.safe)
+      (Util.transl conf "msg error disconnected"
+      |> Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
@@ -671,14 +685,14 @@ let family_exclude pfams efam =
   Array.of_list pfaml
 
 let infer_origin_file_from_other_marriages base ifam ip =
-  let u = poi base ip in
-  let ufams = get_family u in
+  let u = Gwdb.poi base ip in
+  let ufams = Gwdb.get_family u in
   let rec loop i =
     if i = Array.length ufams then None
     else if ufams.(i) = ifam then loop (i + 1)
     else
-      let r = get_origin_file (foi base ufams.(i)) in
-      if sou base r <> "" then Some r else loop (i + 1)
+      let r = Gwdb.get_origin_file (Gwdb.foi base ufams.(i)) in
+      if Gwdb.sou base r <> "" then Some r else loop (i + 1)
   in
   loop 0
 
@@ -693,50 +707,61 @@ let infer_origin_file conf base ifam ncpl ndes =
     match r with
     | Some r -> r
     | None -> (
-        let afath = poi base (Adef.father ncpl) in
-        let amoth = poi base (Adef.mother ncpl) in
-        match (get_parents afath, get_parents amoth) with
-        | Some if1, _ when sou base (get_origin_file (foi base if1)) <> "" ->
-            get_origin_file (foi base if1)
-        | _, Some if2 when sou base (get_origin_file (foi base if2)) <> "" ->
-            get_origin_file (foi base if2)
+        let afath = Gwdb.poi base (Adef.father ncpl) in
+        let amoth = Gwdb.poi base (Adef.mother ncpl) in
+        match (Gwdb.get_parents afath, Gwdb.get_parents amoth) with
+        | Some if1, _
+          when Gwdb.sou base (Gwdb.get_origin_file (Gwdb.foi base if1)) <> "" ->
+            Gwdb.get_origin_file (Gwdb.foi base if1)
+        | _, Some if2
+          when Gwdb.sou base (Gwdb.get_origin_file (Gwdb.foi base if2)) <> "" ->
+            Gwdb.get_origin_file (Gwdb.foi base if2)
         | _ ->
             let rec loop i =
-              if i = Array.length ndes.children then Gwdb.insert_string base ""
+              if i = Array.length ndes.Def.children then
+                Gwdb.insert_string base ""
               else
-                let cifams = get_family (poi base ndes.children.(i)) in
+                let cifams =
+                  Gwdb.get_family (Gwdb.poi base ndes.children.(i))
+                in
                 if Array.length cifams = 0 then loop (i + 1)
-                else if sou base (get_origin_file (foi base cifams.(0))) <> ""
-                then get_origin_file (foi base cifams.(0))
+                else if
+                  Gwdb.sou base
+                    (Gwdb.get_origin_file (Gwdb.foi base cifams.(0)))
+                  <> ""
+                then Gwdb.get_origin_file (Gwdb.foi base cifams.(0))
                 else loop (i + 1)
             in
             loop 0)
   in
   let no_dec =
-    try List.assoc "propose_add_family" conf.base_env = "no"
+    try List.assoc "propose_add_family" conf.Config.base_env = "no"
     with Not_found -> false
   in
-  if no_dec && sou base r = "" then print_error_disconnected conf else r
+  if no_dec && Gwdb.sou base r = "" then print_error_disconnected conf else r
 
 (* TODO EVENT put this in Event *)
 let fwitnesses_of fevents =
   List.fold_left
     (fun ipl e ->
-      Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.efam_witnesses)
+      Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.Def.efam_witnesses)
     [] fevents
 
 let fwitnesses_of_fam_event fam_events =
   List.fold_left
     (fun l fevent ->
-      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_fevent_witnesses fevent))
+      Array.fold_left
+        (fun l (ip, _) -> ip :: l)
+        l
+        (Gwdb.get_fevent_witnesses fevent))
     [] fam_events
 
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
 let patch_person_with_pevents base ip =
-  let p = poi base ip |> gen_person_of_person in
+  let p = Gwdb.poi base ip |> Gwdb.gen_person_of_person in
   let evt ~name ?(date = Date.cdate_None) ~place ~src ~note () =
     {
-      epers_name = name;
+      Def.epers_name = name;
       epers_date = date;
       epers_place = place;
       epers_reason = Gwdb.empty_string;
@@ -748,31 +773,31 @@ let patch_person_with_pevents base ip =
   in
   let evt_birth =
     let evt ?date () =
-      let name = Epers_Birth in
+      let name = Def.Epers_Birth in
       let place = p.birth_place in
       let note = p.birth_note in
       let src = p.birth_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
     if Option.is_some (Date.od_of_cdate p.birth) then evt ~date:p.birth ()
-    else if sou base p.birth_place = "" then None
+    else if Gwdb.sou base p.birth_place = "" then None
     else evt ()
   in
   let evt_baptism =
     let evt ?date () =
-      let name = Epers_Baptism in
+      let name = Def.Epers_Baptism in
       let place = p.baptism_place in
       let note = p.baptism_note in
       let src = p.baptism_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
     if Option.is_some (Date.od_of_cdate p.baptism) then evt ~date:p.baptism ()
-    else if sou base p.baptism_place = "" then None
+    else if Gwdb.sou base p.baptism_place = "" then None
     else evt ()
   in
   let evt_death =
     let evt ?date () =
-      let name = Epers_Death in
+      let name = Def.Epers_Death in
       let place = p.death_place in
       let note = p.death_note in
       let src = p.death_src in
@@ -782,7 +807,7 @@ let patch_person_with_pevents base ip =
     | Some cd ->
         let date = Date.cdate_of_od (Some cd) in
         evt ~date ()
-    | None -> if sou base p.death_place = "" then None else evt ()
+    | None -> if Gwdb.sou base p.death_place = "" then None else evt ()
   in
   (* Attention, on prend aussi les autres évènements sinon,  *)
   (* on va tout effacer et ne garder que naissance et décès. *)
@@ -798,12 +823,12 @@ let patch_person_with_pevents base ip =
         | None -> event
         | Some new_event ->
             found := true;
-            { new_event with epers_witnesses = event.epers_witnesses }
+            { new_event with Def.epers_witnesses = event.Def.epers_witnesses }
     in
     let l =
       List.map
         (fun evt ->
-          match evt.epers_name with
+          match evt.Def.epers_name with
           | Epers_Birth -> replace_witnesses evt found_birth evt_birth
           | Epers_Baptism -> replace_witnesses evt found_baptism evt_baptism
           | Epers_Death -> replace_witnesses evt found_death evt_death
@@ -820,21 +845,21 @@ let patch_person_with_pevents base ip =
     |> complete !found_death evt_death
   in
   let p = { p with pevents } in
-  patch_person base p.key_index p
+  Gwdb.patch_person base p.key_index p
 
 let patch_parent_with_pevents base cpl =
   Array.iter (patch_person_with_pevents base) (Adef.parent_array cpl)
 
 let patch_children_with_pevents base des =
-  Array.iter (patch_person_with_pevents base) des.children
+  Array.iter (patch_person_with_pevents base) des.Def.children
 
 (* On met à jour les témoins maintenant. *)
 let update_family_with_fevents conf base fam =
   let marr, div, witnesses =
     reconstitute_from_fevents
-      (p_getenv conf.env "nsck" = Some "on")
+      (Util.p_getenv conf.Config.env "nsck" = Some "on")
       (Gwdb.insert_string base "")
-      fam.fevents
+      fam.Def.fevents
   in
   let relation, marriage, marriage_place, marriage_note, marriage_src = marr in
   let divorce = div in
@@ -853,10 +878,12 @@ let update_family_with_fevents conf base fam =
 let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let created_p = ref [] in
   let psrc =
-    match p_getenv conf.env "psrc" with Some s -> String.trim s | None -> ""
+    match Util.p_getenv conf.Config.env "psrc" with
+    | Some s -> String.trim s
+    | None -> ""
   in
   let ncpl =
-    Futil.map_couple_p conf.multi_parents
+    Futil.map_couple_p conf.Config.multi_parents
       (Update.insert_person conf base psrc created_p)
       scpl
   in
@@ -869,19 +896,20 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
-  let nfath_p = poi base (Adef.father ncpl) in
-  let nmoth_p = poi base (Adef.mother ncpl) in
+  let nfath_p = Gwdb.poi base (Adef.father ncpl) in
+  let nmoth_p = Gwdb.poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
-    if conf.api_mode then { nfam with relation = sfam.relation } else nfam
+    if conf.Config.api_mode then { nfam with relation = sfam.relation }
+    else nfam
   in
   if not nsck then (
     let exp sex p =
-      let s = get_sex p in
+      let s = Gwdb.get_sex p in
       if s = Neuter then
-        let p = { (gen_person_of_person p) with sex } in
-        patch_person base p.key_index p
+        let p = { (Gwdb.gen_person_of_person p) with sex } in
+        Gwdb.patch_person base p.key_index p
       else if s <> sex then print_err_sex conf base p
     in
     exp Male nfath_p;
@@ -889,27 +917,27 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   if Adef.father ncpl = Adef.mother ncpl then print_err conf;
   let origin_file = origin_file nfam ncpl ndes in
   let nfam = { nfam with origin_file; fam_index = fi } in
-  patch_family base fi nfam;
-  patch_couple base fi ncpl;
-  patch_descend base fi ndes;
+  Gwdb.patch_family base fi nfam;
+  Gwdb.patch_couple base fi ncpl;
+  Gwdb.patch_descend base fi ndes;
   (nfath_p, nmoth_p, nfam, ncpl, ndes)
 
 let effective_mod conf base nsck sfam scpl sdes =
-  let fi = sfam.fam_index in
+  let fi = sfam.Def.fam_index in
   let oorigin, owitnesses, ofevents =
-    let ofam = foi base fi in
-    (get_origin_file ofam, get_witnesses ofam, get_fevents ofam)
+    let ofam = Gwdb.foi base fi in
+    (Gwdb.get_origin_file ofam, Gwdb.get_witnesses ofam, Gwdb.get_fevents ofam)
   in
   let oarr, ofather, omother =
-    let ocpl = foi base fi in
-    (get_parent_array ocpl, get_father ocpl, get_mother ocpl)
+    let ocpl = Gwdb.foi base fi in
+    (Gwdb.get_parent_array ocpl, Gwdb.get_father ocpl, Gwdb.get_mother ocpl)
   in
-  let ochildren = get_children (foi base fi) in
+  let ochildren = Gwdb.get_children (Gwdb.foi base fi) in
   let origin_file nfam ncpl ndes =
     if sfam.origin_file = "" then
-      if sou base oorigin <> "" then oorigin
+      if Gwdb.sou base oorigin <> "" then oorigin
       else infer_origin_file conf base fi ncpl ndes
-    else nfam.origin_file
+    else nfam.Def.origin_file
   in
   let _, _, nfam, ncpl, ndes =
     aux_effective_mod conf base nsck sfam scpl sdes fi origin_file
@@ -917,22 +945,24 @@ let effective_mod conf base nsck sfam scpl sdes =
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do
     if not (Array.mem oarr.(i) narr) then
-      let ou = poi base oarr.(i) in
-      let ou = { family = family_exclude (get_family ou) fi } in
-      patch_union base oarr.(i) ou
+      let ou = Gwdb.poi base oarr.(i) in
+      let ou = { Def.family = family_exclude (Gwdb.get_family ou) fi } in
+      Gwdb.patch_union base oarr.(i) ou
   done;
   for i = 0 to Array.length narr - 1 do
     if not (Array.mem narr.(i) oarr) then
-      let nu = poi base narr.(i) in
-      let nu = { family = Array.append (get_family nu) [| fi |] } in
-      patch_union base narr.(i) nu
+      let nu = Gwdb.poi base narr.(i) in
+      let nu = { Def.family = Array.append (Gwdb.get_family nu) [| fi |] } in
+      Gwdb.patch_union base narr.(i) nu
   done;
   let cache = Hashtbl.create 101 in
   let find_asc ip =
     try Hashtbl.find cache ip
     with Not_found ->
-      let a = poi base ip in
-      let a = { parents = get_parents a; consang = get_consang a } in
+      let a = Gwdb.poi base ip in
+      let a =
+        { Def.parents = Gwdb.get_parents a; consang = Gwdb.get_consang a }
+      in
       Hashtbl.add cache ip a;
       a
   in
@@ -942,7 +972,7 @@ let effective_mod conf base nsck sfam scpl sdes =
       let a = find_asc ip in
       let a =
         {
-          parents = None;
+          Def.parents = None;
           consang =
             (if not (Array.mem ip ndes.children) then Adef.fix (-1)
             else a.consang);
@@ -954,11 +984,11 @@ let effective_mod conf base nsck sfam scpl sdes =
     (fun ip ->
       let a = find_asc ip in
       match a.parents with
-      | Some _ -> print_err_parents conf base (poi base ip)
+      | Some _ -> print_err_parents conf base (Gwdb.poi base ip)
       | None ->
           let a =
             {
-              parents = Some fi;
+              Def.parents = Some fi;
               consang =
                 (if (not (Array.mem ip ochildren)) || not same_parents then
                  Adef.fix (-1)
@@ -970,12 +1000,12 @@ let effective_mod conf base nsck sfam scpl sdes =
   Array.iter
     (fun ip ->
       if not (Array.mem ip ndes.children) then
-        patch_ascend base ip (find_asc ip))
+        Gwdb.patch_ascend base ip (find_asc ip))
     ochildren;
   Array.iter
     (fun ip ->
       if (not (Array.mem ip ochildren)) || not same_parents then
-        patch_ascend base ip (find_asc ip))
+        Gwdb.patch_ascend base ip (find_asc ip))
     ndes.children;
   let ol =
     Array.fold_right
@@ -994,23 +1024,31 @@ let effective_mod conf base nsck sfam scpl sdes =
   (fi, nfam, ncpl, ndes)
 
 let effective_add conf base nsck sfam scpl sdes =
-  let fi = insert_family base (no_family dummy_ifam) no_couple no_descend in
+  let fi =
+    Gwdb.insert_family base
+      (Gwdb.no_family Gwdb.dummy_ifam)
+      Gwdb.no_couple Gwdb.no_descend
+  in
   let origin_file _nfam ncpl ndes = infer_origin_file conf base fi ncpl ndes in
   let nfath_p, nmoth_p, nfam, ncpl, ndes =
     aux_effective_mod conf base nsck sfam scpl sdes fi origin_file
   in
-  let nfath_u = { family = Array.append (get_family nfath_p) [| fi |] } in
-  let nmoth_u = { family = Array.append (get_family nmoth_p) [| fi |] } in
-  patch_union base (Adef.father ncpl) nfath_u;
-  patch_union base (Adef.mother ncpl) nmoth_u;
+  let nfath_u =
+    { Def.family = Array.append (Gwdb.get_family nfath_p) [| fi |] }
+  in
+  let nmoth_u =
+    { Def.family = Array.append (Gwdb.get_family nmoth_p) [| fi |] }
+  in
+  Gwdb.patch_union base (Adef.father ncpl) nfath_u;
+  Gwdb.patch_union base (Adef.mother ncpl) nmoth_u;
   Array.iter
     (fun ip ->
-      let p = poi base ip in
-      match get_parents p with
+      let p = Gwdb.poi base ip in
+      match Gwdb.get_parents p with
       | Some _ -> print_err_parents conf base p
       | None ->
-          let a = { parents = Some fi; consang = Adef.fix (-1) } in
-          patch_ascend base (get_iper p) a)
+          let a = { Def.parents = Some fi; consang = Adef.fix (-1) } in
+          Gwdb.patch_ascend base (Gwdb.get_iper p) a)
     ndes.children;
   let nl_witnesses = Array.to_list nfam.witnesses in
   let nl_fevents = fwitnesses_of nfam.fevents in
@@ -1029,8 +1067,10 @@ let effective_inv conf base ip u ifam =
         @@ Update.ModErr
              (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe))
   in
-  let u = { family = Array.of_list (loop (Array.to_list (get_family u))) } in
-  patch_union base ip u
+  let u =
+    { Def.family = Array.of_list (loop (Array.to_list (Gwdb.get_family u))) }
+  in
+  Gwdb.patch_union base ip u
 
 (* ************************************************************************ *)
 (*  [Fonc] effective_chg_order : base -> iper -> person -> ifam -> int -> unit        *)
@@ -1049,22 +1089,22 @@ let effective_inv conf base ip u ifam =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 let effective_chg_order base ip u ifam n =
   let fam = UpdateFam.change_order u ifam n in
-  let u = { family = Array.of_list fam } in
-  patch_union base ip u
+  let u = { Def.family = Array.of_list fam } in
+  Gwdb.patch_union base ip u
 
 let effective_del conf base ip fam =
-  let ifam = get_ifam fam in
-  delete_family base ifam;
+  let ifam = Gwdb.get_ifam fam in
+  Gwdb.delete_family base ifam;
   let changed =
     let gen_p =
       let p =
-        if ip = get_mother fam then poi base (get_mother fam)
-        else poi base (get_father fam)
+        if ip = Gwdb.get_mother fam then Gwdb.poi base (Gwdb.get_mother fam)
+        else Gwdb.poi base (Gwdb.get_father fam)
       in
-      Util.string_gen_person base (gen_person_of_person p)
+      Util.string_gen_person base (Gwdb.gen_person_of_person p)
     in
-    let gen_fam = Util.string_gen_family base (gen_family_of_family fam) in
-    U_Delete_family (gen_p, gen_fam)
+    let gen_fam = Util.string_gen_family base (Gwdb.gen_family_of_family fam) in
+    Def.U_Delete_family (gen_p, gen_fam)
   in
   History.record conf base changed "df"
 
@@ -1088,7 +1128,7 @@ let is_created_or_already_there ochil_arr nchil schil =
 let need_check_noloop (scpl, sdes, onfs) =
   if
     Array.exists is_a_link (Gutil.parent_array scpl)
-    || Array.exists is_a_link sdes.children
+    || Array.exists is_a_link sdes.Def.children
   then
     match onfs with
     | Some ((opar, ochil), (npar, nchil)) ->
@@ -1112,56 +1152,59 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
   if need_check_noloop scdo then
     Consang.check_noloop_for_person_list base error
       (Array.to_list (Adef.parent_array cpl));
-  let fam = family_of_gen_family base (gen_fam, cpl, des) in
+  let fam = Gwdb.family_of_gen_family base (gen_fam, cpl, des) in
   CheckItem.family base warning ifam fam;
   CheckItem.check_other_fields base misc ifam fam;
   let wl, ml = (List.sort_uniq compare !wl, List.sort_uniq compare !ml) in
   List.iter
     (function
       | Warning.ChangedOrderOfMarriages (p, _, after) ->
-          patch_union base (get_iper p) { family = after }
+          Gwdb.patch_union base (Gwdb.get_iper p) { family = after }
       | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-          patch_family base ifam { gen_fam with fevents = after }
+          Gwdb.patch_family base ifam { gen_fam with fevents = after }
       | _ -> ())
     wl;
   (wl, ml)
 
 let print_family conf base (wl, ml) cpl des =
   let rdsrc =
-    match p_getenv conf.env "rdsrc" with
-    | Some "on" -> p_getenv conf.env "src"
-    | Some _ | None -> p_getenv conf.env "dsrc"
+    match Util.p_getenv conf.Config.env "rdsrc" with
+    | Some "on" -> Util.p_getenv conf.Config.env "src"
+    | Some _ | None -> Util.p_getenv conf.Config.env "dsrc"
   in
   (match rdsrc with
   | Some x ->
-      conf.henv <- List.remove_assoc "dsrc" conf.henv;
-      if x <> "" then conf.henv <- ("dsrc", Mutil.encode x) :: conf.henv
+      conf.Config.henv <- List.remove_assoc "dsrc" conf.Config.henv;
+      if x <> "" then
+        conf.Config.henv <- ("dsrc", Mutil.encode x) :: conf.Config.henv
   | None -> ());
   Output.print_sstring conf "<ul>\n";
   Output.print_sstring conf "<li>";
   Output.print_string conf
-    (NameDisplay.referenced_person_text conf base (poi base (Adef.father cpl)));
+    (NameDisplay.referenced_person_text conf base
+       (Gwdb.poi base (Adef.father cpl)));
   Output.print_sstring conf "</li>";
   Output.print_sstring conf "\n";
   Output.print_sstring conf "<li>";
   Output.print_string conf
-    (NameDisplay.referenced_person_text conf base (poi base (Adef.mother cpl)));
+    (NameDisplay.referenced_person_text conf base
+       (Gwdb.poi base (Adef.mother cpl)));
   Output.print_sstring conf "</li>";
   Output.print_sstring conf "</ul>\n";
-  if des.children <> [||] then (
+  if des.Def.children <> [||] then (
     Output.print_sstring conf "<ul>\n";
     Array.iter
       (fun ip ->
         Output.print_sstring conf "<li>";
         Output.print_string conf
-          (NameDisplay.referenced_person_text conf base (poi base ip));
+          (NameDisplay.referenced_person_text conf base (Gwdb.poi base ip));
         Output.print_sstring conf "</li>")
       des.children;
     Output.print_sstring conf "</ul>\n");
   Update.print_warnings_and_miscs conf base wl ml
 
 let print_title conf fmt _ =
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
+  Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf fmt))
 
 let print_mod_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
@@ -1170,7 +1213,7 @@ let print_mod_ok conf base (wl, ml) cpl des =
   if List.length !removed_string > 0 then (
     Output.print_sstring conf "<h3 class=\"error\">";
     Output.printf conf
-      (fcapitale (ftransl conf "%s forbidden char"))
+      (Util.fcapitale (Util.ftransl conf "%s forbidden char"))
       (List.fold_left
          (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
          " " Name.forbidden_char);
@@ -1191,7 +1234,7 @@ let print_add_ok conf base (wl, ml) cpl des =
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
     Output.printf conf "<h2 class=\"error\">%s</h2>\n"
-      (Utf8.capitalize_fst (transl conf "forbidden char"));
+      (Utf8.capitalize_fst (Util.transl conf "forbidden char"));
     List.iter (Output.printf conf "<p>%s</p>") !removed_string);
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
@@ -1199,9 +1242,9 @@ let print_add_ok conf base (wl, ml) cpl des =
 let print_del_ok conf base wl =
   Hutil.header conf @@ print_title conf "family deleted";
   Hutil.print_link_to_welcome conf true;
-  (match p_getenv conf.env "ip" with
+  (match Util.p_getenv conf.Config.env "ip" with
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       Output.print_sstring conf "<ul><li>";
       Output.print_string conf
         (NameDisplay.reference conf base p
@@ -1212,14 +1255,15 @@ let print_del_ok conf base wl =
   Hutil.trailer conf
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
+  match Util.p_getenv conf.Config.env "i" with
   | Some i ->
-      let ifam = ifam_of_string i in
-      let fam = foi base ifam in
+      let ifam = Gwdb.ifam_of_string i in
+      let fam = Gwdb.foi base ifam in
       let ip =
-        match p_getenv conf.env "ip" with
-        | Some i when get_mother fam = iper_of_string i -> get_mother fam
-        | Some _ | None -> get_father fam
+        match Util.p_getenv conf.Config.env "ip" with
+        | Some i when Gwdb.get_mother fam = Gwdb.iper_of_string i ->
+            Gwdb.get_mother fam
+        | Some _ | None -> Gwdb.get_father fam
       in
       effective_del conf base ip fam;
       Util.commit_patches conf base;
@@ -1238,7 +1282,7 @@ let get_create (_, _, _, create, _) = create
 
 let forbidden_disconnected conf scpl sdes =
   let no_dec =
-    try List.assoc "propose_add_family" conf.base_env = "no"
+    try List.assoc "propose_add_family" conf.Config.base_env = "no"
     with Not_found -> false
   in
   if no_dec then
@@ -1246,7 +1290,7 @@ let forbidden_disconnected conf scpl sdes =
       get_create (Gutil.father scpl) = Update.Link
       || get_create (Gutil.mother scpl) = Update.Link
     then false
-    else Array.for_all (fun p -> get_create p <> Update.Link) sdes.children
+    else Array.for_all (fun p -> get_create p <> Update.Link) sdes.Def.children
   else false
 
 let print_add o_conf base =
@@ -1254,16 +1298,18 @@ let print_add o_conf base =
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
-  let nsck = p_getenv conf.env "nsck" = Some "on" in
+  let nsck = Util.p_getenv conf.Config.env "nsck" = Some "on" in
   let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
-  let redisp = Option.is_some (p_getenv conf.env "return") in
+  let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
   let digest =
-    match p_getenv conf.env "ip" with
+    match Util.p_getenv conf.Config.env "ip" with
     | Some ip ->
-        string_of_int (Array.length (get_family (poi base (iper_of_string ip))))
+        string_of_int
+          (Array.length
+             (Gwdb.get_family (Gwdb.poi base (Gwdb.iper_of_string ip))))
     | None -> ""
   in
-  let sdigest = get conf "digest" in
+  let sdigest = Update_util.get conf "digest" in
   if digest <> "" && sdigest <> "" && digest <> sdigest then
     Update.error_digest conf
   else if ext || redisp then
@@ -1275,7 +1321,7 @@ let print_add o_conf base =
     | Some err, _, _ | _, Some err, _ | _, _, Some err -> error_family conf err
     | None, None, None ->
         let sfam, sdes = strip_family sfam sdes in
-        let nsck = p_getenv conf.env "nsck" = Some "on" in
+        let nsck = Util.p_getenv conf.Config.env "nsck" = Some "on" in
         let ifam, fam, cpl, des = effective_add conf base nsck sfam scpl sdes in
         let () = patch_parent_with_pevents base cpl in
         let () = patch_children_with_pevents base des in
@@ -1285,13 +1331,13 @@ let print_add o_conf base =
         let changed, act =
           let fam = Util.string_gen_family base fam in
           let ip, act =
-            match p_getenv conf.env "ip" with
+            match Util.p_getenv conf.Config.env "ip" with
             | Some i -> (
-                let i = iper_of_string i in
+                let i = Gwdb.iper_of_string i in
                 if Adef.mother cpl = i then (Adef.mother cpl, "af")
                 else
-                  let a = poi base i in
-                  match get_parents a with
+                  let a = Gwdb.poi base i in
+                  match Gwdb.get_parents a with
                   | Some x when x = ifam -> (i, "aa")
                   | _ -> (Adef.father cpl, "af"))
             | None -> (Adef.father cpl, "af")
@@ -1299,12 +1345,14 @@ let print_add o_conf base =
           match act with
           | "af" ->
               let gen_p =
-                Util.string_gen_person base (gen_person_of_person (poi base ip))
+                Util.string_gen_person base
+                  (Gwdb.gen_person_of_person (Gwdb.poi base ip))
               in
-              (U_Add_family (gen_p, fam), "af")
+              (Def.U_Add_family (gen_p, fam), "af")
           | _ ->
               let gen_p =
-                Util.string_gen_person base (gen_person_of_person (poi base ip))
+                Util.string_gen_person base
+                  (Gwdb.gen_person_of_person (Gwdb.poi base ip))
               in
               (U_Add_parent (gen_p, fam), "aa")
         in
@@ -1320,7 +1368,7 @@ let print_add o_conf base =
    Else, create a new union. *)
 let print_add_parents o_conf base =
   let conf = Update.update_conf o_conf in
-  let nsck = p_getenv conf.env "nsck" = Some "on" in
+  let nsck = Util.p_getenv conf.Config.env "nsck" = Some "on" in
   let sfam, scpl, sdes, _ = reconstitute_family conf base nsck in
   if
     sfam.marriage = Date.cdate_None
@@ -1340,49 +1388,50 @@ let print_add_parents o_conf base =
            };
          ]
     && sfam.comment = "" && sfam.origin_file = ""
-    && sfam.fsources = Option.value ~default:"" (p_getenv conf.env "dsrc")
-    && sfam.fam_index = dummy_ifam
+    && sfam.fsources
+       = Option.value ~default:"" (Util.p_getenv conf.Config.env "dsrc")
+    && sfam.fam_index = Gwdb.dummy_ifam
   then
     match (Adef.father scpl, Adef.mother scpl, sdes.children) with
     | ( (ff, fs, fo, Update.Link, _),
         (mf, ms, mo, Update.Link, _),
         [| (cf, cs, co, Update.Link, _) |] ) -> (
         match
-          ( person_of_key base ff fs fo,
-            person_of_key base mf ms mo,
-            person_of_key base cf cs co )
+          ( Gwdb.person_of_key base ff fs fo,
+            Gwdb.person_of_key base mf ms mo,
+            Gwdb.person_of_key base cf cs co )
         with
         | Some fath, Some moth, Some child ->
-            let ffam = get_family @@ poi base fath in
-            let mfam = get_family @@ poi base moth in
+            let ffam = Gwdb.get_family @@ Gwdb.poi base fath in
+            let mfam = Gwdb.get_family @@ Gwdb.poi base moth in
             let rec loop i =
               if i = -1 then print_add o_conf base
               else
                 let ifam = Array.unsafe_get ffam i in
                 if Array.exists (( = ) ifam) mfam then (
-                  let f = foi base ifam in
-                  let sfam = gen_family_of_family f in
+                  let f = Gwdb.foi base ifam in
+                  let sfam = Gwdb.gen_family_of_family f in
                   let o_f = Util.string_gen_family base sfam in
                   let scpl = Gwdb.gen_couple_of_family f in
                   let sdes =
                     {
-                      children =
-                        Array.append (gen_descend_of_family f).children
+                      Def.children =
+                        Array.append (Gwdb.gen_descend_of_family f).children
                           [| child |];
                     }
                   in
-                  patch_descend base ifam sdes;
-                  patch_ascend base child
+                  Gwdb.patch_descend base ifam sdes;
+                  Gwdb.patch_ascend base child
                     { parents = Some ifam; consang = Adef.fix (-1) };
                   Util.commit_patches conf base;
-                  let f' = family_of_gen_family base (sfam, scpl, sdes) in
+                  let f' = Gwdb.family_of_gen_family base (sfam, scpl, sdes) in
                   let wl = ref [] in
                   let warning w = wl := w :: !wl in
                   CheckItem.family ~onchange:true base warning ifam f';
                   let n_f = Util.string_gen_family base sfam in
                   let hr =
-                    U_Modify_family
-                      ( poi base child |> gen_person_of_person
+                    Def.U_Modify_family
+                      ( Gwdb.poi base child |> Gwdb.gen_person_of_person
                         |> Util.string_gen_person base,
                         o_f,
                         n_f )
@@ -1398,14 +1447,14 @@ let print_add_parents o_conf base =
   else print_add o_conf base
 
 let print_mod_aux conf base callback =
-  let nsck = p_getenv conf.env "nsck" = Some "on" in
+  let nsck = Util.p_getenv conf.Config.env "nsck" = Some "on" in
   let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
-  let redisp = Option.is_some (p_getenv conf.env "return") in
+  let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
   let digest =
     let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
     Update.digest_family ini_sfam
   in
-  if digest = get conf "digest" then
+  if digest = Update_util.get conf "digest" then
     if ext || redisp then
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
     else
@@ -1418,8 +1467,8 @@ let print_mod_aux conf base callback =
   else Update.error_digest conf
 
 let family_structure base ifam =
-  let fam = foi base ifam in
-  (get_parent_array fam, get_children fam)
+  let fam = Gwdb.foi base ifam in
+  (Gwdb.get_parent_array fam, Gwdb.get_children fam)
 
 let print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
@@ -1427,16 +1476,16 @@ let print_mod o_conf base =
   let () = removed_string := [] in
   let o_f =
     let ifam =
-      match p_getenv o_conf.env "i" with
-      | Some i -> ifam_of_string i
-      | None -> dummy_ifam
+      match Util.p_getenv o_conf.Config.env "i" with
+      | Some i -> Gwdb.ifam_of_string i
+      | None -> Gwdb.dummy_ifam
     in
-    Util.string_gen_family base (gen_family_of_family (foi base ifam))
+    Util.string_gen_family base (Gwdb.gen_family_of_family (Gwdb.foi base ifam))
   in
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
-    let ofs = family_structure base sfam.fam_index in
-    let nsck = p_getenv conf.env "nsck" = Some "on" in
+    let ofs = family_structure base sfam.Def.fam_index in
+    let nsck = Util.p_getenv conf.Config.env "nsck" = Some "on" in
     let ifam, fam, cpl, des = effective_mod conf base nsck sfam scpl sdes in
     let () = patch_parent_with_pevents base cpl in
     let () = patch_children_with_pevents base des in
@@ -1448,11 +1497,11 @@ let print_mod o_conf base =
         let rec loop l accu =
           match l with
           | [] -> accu
-          | evt :: l -> loop l (evt.efam_note :: evt.efam_src :: accu)
+          | evt :: l -> loop l (evt.Def.efam_note :: evt.efam_src :: accu)
         in
         loop fam.fevents sl
       in
-      String.concat " " (List.map (sou base) sl)
+      String.concat " " (List.map (Gwdb.sou base) sl)
     in
     Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
     let nfs = (Adef.parent_array cpl, des.children) in
@@ -1463,15 +1512,16 @@ let print_mod o_conf base =
     Util.commit_patches conf base;
     let changed =
       let ip =
-        match p_getenv o_conf.env "ip" with
-        | Some i -> iper_of_string i
-        | None -> dummy_iper
+        match Util.p_getenv o_conf.Config.env "ip" with
+        | Some i -> Gwdb.iper_of_string i
+        | None -> Gwdb.dummy_iper
       in
       let p =
-        Util.string_gen_person base (gen_person_of_person (poi base ip))
+        Util.string_gen_person base
+          (Gwdb.gen_person_of_person (Gwdb.poi base ip))
       in
       let n_f = Util.string_gen_family base fam in
-      U_Modify_family (p, o_f, n_f)
+      Def.U_Modify_family (p, o_f, n_f)
     in
     History.record conf base changed "mf";
     Update.delete_topological_sort conf base;
@@ -1480,16 +1530,18 @@ let print_mod o_conf base =
   print_mod_aux conf base callback
 
 let print_inv conf base =
-  match (p_getenv conf.env "i", p_getenv conf.env "f") with
+  match
+    (Util.p_getenv conf.Config.env "i", Util.p_getenv conf.Config.env "f")
+  with
   | Some ip, Some ifam ->
-      let ip = iper_of_string ip in
-      let ifam = ifam_of_string ifam in
-      let p = poi base ip in
-      effective_inv conf base (get_iper p) p ifam;
+      let ip = Gwdb.iper_of_string ip in
+      let ifam = Gwdb.ifam_of_string ifam in
+      let p = Gwdb.poi base ip in
+      effective_inv conf base (Gwdb.get_iper p) p ifam;
       Util.commit_patches conf base;
       let changed =
-        let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-        U_Invert_family (gen_p, ifam)
+        let gen_p = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+        Def.U_Invert_family (gen_p, ifam)
       in
       History.record conf base changed "if";
       print_inv_ok conf base p
@@ -1497,29 +1549,31 @@ let print_inv conf base =
 
 let print_change_order_ok conf base =
   match
-    (p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n")
+    ( Util.p_getenv conf.Config.env "i",
+      Util.p_getenv conf.Config.env "f",
+      Util.p_getint conf.Config.env "n" )
   with
   | Some ip, Some ifam, Some n ->
-      let ip = iper_of_string ip in
-      let ifam = ifam_of_string ifam in
-      let p = poi base ip in
-      effective_chg_order base (get_iper p) p ifam n;
+      let ip = Gwdb.iper_of_string ip in
+      let ifam = Gwdb.ifam_of_string ifam in
+      let p = Gwdb.poi base ip in
+      effective_chg_order base (Gwdb.get_iper p) p ifam n;
       Util.commit_patches conf base;
       let changed =
-        let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-        U_Invert_family (gen_p, ifam)
+        let gen_p = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+        Def.U_Invert_family (gen_p, ifam)
       in
       History.record conf base changed "if";
       print_inv_ok conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
-  match p_getenv conf.env "i" with
+  match Util.p_getenv conf.Config.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some s ->
       let ifam = Gwdb.ifam_of_string s in
-      let fam = foi base ifam in
-      let o_f = Util.string_gen_family base (gen_family_of_family fam) in
+      let fam = Gwdb.foi base ifam in
+      let o_f = Util.string_gen_family base (Gwdb.gen_family_of_family fam) in
       (* TODO_EVENT use Event.sorted_event *)
       let ht = Hashtbl.create 50 in
       let () =
@@ -1528,36 +1582,38 @@ let print_change_event_order conf base =
              (fun id evt ->
                Hashtbl.add ht id evt;
                succ id)
-             1 (get_fevents fam)
+             1 (Gwdb.get_fevents fam)
       in
       let sorted_fevents =
         List.sort
           (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
-          (reconstitute_sorted_events conf 1)
+          (Update_util.reconstitute_sorted_events conf 1)
       in
       let fevents =
         List.fold_right
           (fun (id, _) accu ->
-            try (Hashtbl.find ht id |> gen_fevent_of_fam_event) :: accu
+            try (Hashtbl.find ht id |> Gwdb.gen_fevent_of_fam_event) :: accu
             with Not_found -> failwith "Sorting event")
           sorted_fevents []
       in
-      let fam = gen_family_of_family fam in
+      let fam = Gwdb.gen_family_of_family fam in
       let fam = { fam with fevents } in
       let fam = update_family_with_fevents conf base fam in
-      patch_family base fam.fam_index fam;
-      let a = foi base fam.fam_index in
-      let cpl = Futil.parent conf.multi_parents (get_parent_array a) in
-      let des = { children = get_children a } in
+      Gwdb.patch_family base fam.fam_index fam;
+      let a = Gwdb.foi base fam.fam_index in
+      let cpl =
+        Futil.parent conf.Config.multi_parents (Gwdb.get_parent_array a)
+      in
+      let des = { Def.children = Gwdb.get_children a } in
       let wl =
         let wl = ref [] in
         let warning w = wl := w :: !wl in
-        let nfam = family_of_gen_family base (fam, cpl, des) in
+        let nfam = Gwdb.family_of_gen_family base (fam, cpl, des) in
         CheckItem.family base warning fam.fam_index nfam;
         List.iter
           (function
             | Warning.ChangedOrderOfFamilyEvents (ifam, _, after) ->
-                patch_family base ifam { fam with fevents = after }
+                Gwdb.patch_family base ifam { fam with fevents = after }
             | _ -> ())
           !wl;
         List.rev !wl
@@ -1565,15 +1621,16 @@ let print_change_event_order conf base =
       Util.commit_patches conf base;
       let changed =
         let ip =
-          match p_getenv conf.env "ip" with
-          | Some i -> iper_of_string i
-          | None -> dummy_iper
+          match Util.p_getenv conf.Config.env "ip" with
+          | Some i -> Gwdb.iper_of_string i
+          | None -> Gwdb.dummy_iper
         in
         let p =
-          Util.string_gen_person base (gen_person_of_person (poi base ip))
+          Util.string_gen_person base
+            (Gwdb.gen_person_of_person (Gwdb.poi base ip))
         in
         let n_f = Util.string_gen_family base fam in
-        U_Modify_family (p, o_f, n_f)
+        Def.U_Modify_family (p, o_f, n_f)
       in
       History.record conf base changed "mf";
       print_change_event_order_ok conf base (wl, []) cpl des

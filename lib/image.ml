@@ -1,7 +1,4 @@
-open Config
-open Gwdb
-
-let prefix conf = Util.escape_html conf.image_prefix
+let prefix conf = Util.escape_html conf.Config.image_prefix
 
 (** [default_portrait_filename_of_key fn sn occ] is the default filename of the corresponding person's portrait. WITHOUT its file extenssion.
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
@@ -13,15 +10,15 @@ let default_portrait_filename_of_key first_name surname occ =
   Format.sprintf "%s.%d.%s" f occ s
 
 let default_portrait_filename base p =
-  default_portrait_filename_of_key (p_first_name base p) (p_surname base p)
-    (get_occ p)
+  default_portrait_filename_of_key (Gwdb.p_first_name base p)
+    (Gwdb.p_surname base p) (Gwdb.get_occ p)
 
 (** [full_portrait_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
   let s = default_portrait_filename base p in
-  let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
+  let f = Filename.concat (Util.base_path [ "images" ] conf.Config.bname) s in
   if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
   else if Sys.file_exists (f ^ ".png") then Some (`Path (f ^ ".png"))
   else if Sys.file_exists (f ^ ".gif") then Some (`Path (f ^ ".gif"))
@@ -143,7 +140,9 @@ let rename_portrait conf base p (nfn, nsn, noc) =
   match full_portrait_path conf base p with
   | Some (`Path old_f) -> (
       let s = default_portrait_filename_of_key nfn nsn noc in
-      let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
+      let f =
+        Filename.concat (Util.base_path [ "images" ] conf.Config.bname) s
+      in
       let new_f = f ^ Filename.extension old_f in
       try Sys.rename old_f new_f
       with Sys_error e ->
@@ -174,12 +173,12 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 
 (** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
 let has_access_to_portrait conf base p =
-  let img = get_image p in
-  (not conf.no_image)
+  let img = Gwdb.get_image p in
+  (not conf.Config.no_image)
   && Util.authorized_age conf base p
-  && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
-  && (conf.wizard || conf.friend
-     || not (Ext_string.contains (sou base img) "/private/"))
+  && ((not (Gwdb.is_empty_string img)) || full_portrait_path conf base p <> None)
+  && (conf.Config.wizard || conf.Config.friend
+     || not (Ext_string.contains (Gwdb.sou base img) "/private/"))
 (* TODO: privacy settings should be in db not in url *)
 
 let get_portrait_path conf base p =
@@ -198,11 +197,11 @@ let urlorpath_of_string conf s =
        && String.sub s 0 (String.length https) = https
   then `Url s
   else if Filename.is_implicit s then
-    match List.assoc_opt "images_path" conf.base_env with
+    match List.assoc_opt "images_path" conf.Config.base_env with
     | Some p when p <> "" -> `Path (Filename.concat p s)
     | Some _ | None ->
         let fname =
-          Filename.concat (Util.base_path [ "images" ] conf.bname) s
+          Filename.concat (Util.base_path [ "images" ] conf.Config.bname) s
         in
         `Path fname
   else `Path s
@@ -230,7 +229,7 @@ let parse_src_with_size_info conf s =
 
 let get_portrait_with_size conf base p =
   if has_access_to_portrait conf base p then
-    match src_of_string conf (sou base (get_image p)) with
+    match src_of_string conf (Gwdb.sou base (Gwdb.get_image p)) with
     | `Src_with_size_info _s as s_info -> (
         match parse_src_with_size_info conf s_info with
         | Error _e -> None
@@ -248,7 +247,7 @@ let get_portrait_with_size conf base p =
 
 let get_portrait conf base p =
   if has_access_to_portrait conf base p then
-    match src_of_string conf (sou base (get_image p)) with
+    match src_of_string conf (Gwdb.sou base (Gwdb.get_image p)) with
     | `Src_with_size_info _s as s_info -> (
         match parse_src_with_size_info conf s_info with
         | Error _e -> None

@@ -1,9 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-open Gwdb
-open Util
-
 (* find shortest path :
  * parents, siblings, mates and children are at distance 1.
  *)
@@ -80,8 +76,8 @@ let add_missing_parents_of_siblings conf base indl =
                   match ind.di_val with
                   | Some ip ->
                       let ip =
-                        match get_parents (pget conf base ip) with
-                        | Some ifam -> get_father (foi base ifam)
+                        match Gwdb.get_parents (Util.pget conf base ip) with
+                        | Some ifam -> Gwdb.get_father (Gwdb.foi base ifam)
                         | None -> assert false
                       in
                       if List.mem ip ipl then ipl else ip :: ipl
@@ -130,16 +126,16 @@ let add_phony_children indl faml =
     faml indl
 
 let add_common_parent base ip1 ip2 set =
-  let a1 = poi base ip1 in
-  let a2 = poi base ip2 in
-  match (get_parents a1, get_parents a2) with
+  let a1 = Gwdb.poi base ip1 in
+  let a2 = Gwdb.poi base ip2 in
+  match (Gwdb.get_parents a1, Gwdb.get_parents a2) with
   | Some ifam1, Some ifam2 ->
-      let cpl1 = foi base ifam1 in
-      let cpl2 = foi base ifam2 in
-      if get_father cpl1 = get_father cpl2 then
-        Dag.Pset.add (get_father cpl1) set
-      else if get_mother cpl1 = get_mother cpl2 then
-        Dag.Pset.add (get_mother cpl1) set
+      let cpl1 = Gwdb.foi base ifam1 in
+      let cpl2 = Gwdb.foi base ifam2 in
+      if Gwdb.get_father cpl1 = Gwdb.get_father cpl2 then
+        Dag.Pset.add (Gwdb.get_father cpl1) set
+      else if Gwdb.get_mother cpl1 = Gwdb.get_mother cpl2 then
+        Dag.Pset.add (Gwdb.get_mother cpl1) set
       else set
   | _ -> set
 
@@ -160,21 +156,22 @@ let ind_set_of_relation_path base path =
   in
   set
 
-type node = NotVisited | Visited of (bool * iper * famlink)
+type node = NotVisited | Visited of (bool * Gwdb.iper * famlink)
 
 let excl_faml conf base =
   let rec loop list i =
-    match p_getenv conf.Config.env ("ef" ^ string_of_int i) with
-    | Some k -> loop (ifam_of_string k :: list) (i + 1)
+    match Util.p_getenv conf.Config.env ("ef" ^ string_of_int i) with
+    | Some k -> loop (Gwdb.ifam_of_string k :: list) (i + 1)
     | None -> (
-        match find_person_in_env conf base ("ef" ^ string_of_int i) with
+        match Util.find_person_in_env conf base ("ef" ^ string_of_int i) with
         | Some p ->
             let n =
-              p_getint conf.env ("fef" ^ string_of_int i)
+              Util.p_getint conf.env ("fef" ^ string_of_int i)
               |> Option.value ~default:0
             in
             let list =
-              if n < Array.length (get_family p) then (get_family p).(n) :: list
+              if n < Array.length (Gwdb.get_family p) then
+                (Gwdb.get_family p).(n) :: list
               else list
             in
             loop list (i + 1)
@@ -182,14 +179,14 @@ let excl_faml conf base =
   in
   loop [] 0
 
-let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
+let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Gwdb.ifam list) =
   let mark_per = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
   let mark_fam = Gwdb.ifam_marker (Gwdb.ifams base) false in
   List.iter (fun i -> Gwdb.Marker.set mark_fam i true) excl_faml;
   let parse_fam ifam =
     if Gwdb.Marker.get mark_fam ifam then []
     else
-      let fam = foi base ifam in
+      let fam = Gwdb.foi base ifam in
       Gwdb.Marker.set mark_fam ifam true;
       let result =
         Array.fold_right
@@ -199,9 +196,9 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
             else
               Array.fold_right
                 (fun child children -> (child, HalfSibling, fam) :: children)
-                (get_children (foi base fam))
+                (Gwdb.get_children (Gwdb.foi base fam))
                 children)
-          (get_family (pget conf base (get_mother fam)))
+          (Gwdb.get_family (Util.pget conf base (Gwdb.get_mother fam)))
           []
       in
       let result =
@@ -212,33 +209,39 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
             else
               Array.fold_right
                 (fun child children -> (child, HalfSibling, fam) :: children)
-                (get_children (foi base fam))
+                (Gwdb.get_children (Gwdb.foi base fam))
                 children)
-          (get_family (pget conf base (get_father fam)))
+          (Gwdb.get_family (Util.pget conf base (Gwdb.get_father fam)))
           result
       in
       let result =
         Array.fold_right
           (fun child children -> (child, Sibling, ifam) :: children)
-          (get_children (foi base ifam))
+          (Gwdb.get_children (Gwdb.foi base ifam))
           result
       in
-      (get_father fam, Parent, ifam) :: (get_mother fam, Parent, ifam) :: result
+      (Gwdb.get_father fam, Parent, ifam)
+      :: (Gwdb.get_mother fam, Parent, ifam)
+      :: result
   in
   let neighbours iper =
     Array.fold_right
       (fun ifam nb ->
         if Gwdb.Marker.get mark_fam ifam then nb
         else
-          let fam = foi base ifam in
+          let fam = Gwdb.foi base ifam in
           Gwdb.Marker.set mark_fam ifam true;
           Array.fold_right
             (fun child children -> (child, Child, ifam) :: children)
-            (get_children fam)
-            [ (get_father fam, Mate, ifam); (get_mother fam, Mate, ifam) ]
+            (Gwdb.get_children fam)
+            [
+              (Gwdb.get_father fam, Mate, ifam);
+              (Gwdb.get_mother fam, Mate, ifam);
+            ]
           @ nb)
-      (get_family (pget conf base iper))
-      (Option.fold ~none:[] ~some:parse_fam (get_parents (pget conf base iper)))
+      (Gwdb.get_family (Util.pget conf base iper))
+      (Option.fold ~none:[] ~some:parse_fam
+         (Gwdb.get_parents (Util.pget conf base iper)))
   in
   let rec make_path path vertex =
     match List.hd path with
@@ -279,11 +282,11 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
                       let path =
                         if source then merge_path p2 p1 else merge_path p1 p2
                       in
-                      Left (path, ifam))
+                      Def.Left (path, ifam))
             | [] -> loop1 result vertexlist
           in
           loop2 newvertexlist (neighbours vertex)
-      | [] -> Right newvertexlist
+      | [] -> Def.Right newvertexlist
     in
     loop1 [] queue
   in
@@ -292,13 +295,13 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
     else if visited1 > visited2 then
       let visited2 = visited2 + List.length queue2 in
       match one_step_further false queue2 with
-      | Left (path, ifam) -> Some (path, ifam)
-      | Right queue2 -> width_search queue1 visited1 queue2 visited2
+      | Def.Left (path, ifam) -> Some (path, ifam)
+      | Def.Right queue2 -> width_search queue1 visited1 queue2 visited2
     else
       let visited1 = visited1 + List.length queue1 in
       match one_step_further true queue1 with
-      | Left (path, ifam) -> Some (path, ifam)
-      | Right queue1 -> width_search queue1 visited1 queue2 visited2
+      | Def.Left (path, ifam) -> Some (path, ifam)
+      | Def.Right queue1 -> width_search queue1 visited1 queue2 visited2
   in
   Gwdb.Marker.set mark_per ip1 @@ Visited (true, ip1, Self);
   Gwdb.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
@@ -316,10 +319,10 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
  *)
 let simplify_path base path =
   let get get i =
-    let p = poi base i in
-    match get_parents p with
+    let p = Gwdb.poi base i in
+    match Gwdb.get_parents p with
     | None -> assert false
-    | Some parents -> get (foi base parents)
+    | Some parents -> get (Gwdb.foi base parents)
   in
   let aux get_field ht i =
     match Hashtbl.find_opt ht i with
@@ -329,8 +332,8 @@ let simplify_path base path =
         Hashtbl.add ht i r;
         r
   in
-  let mother = aux get_mother (Hashtbl.create 0) in
-  let father = aux get_father (Hashtbl.create 0) in
+  let mother = aux Gwdb.get_mother (Hashtbl.create 0) in
+  let father = aux Gwdb.get_father (Hashtbl.create 0) in
   let rec simplify = function
     | [] -> []
     | ((i1, (HalfSibling | Sibling | Child)) as x)
@@ -391,12 +394,12 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
                   else loop2 ipl
               | [] -> loop1 ifaml
             in
-            loop2 (Array.to_list (get_children (foi base ifam)))
+            loop2 (Array.to_list (Gwdb.get_children (Gwdb.foi base ifam)))
         | [] -> []
       in
-      loop1 (Array.to_list (get_family (pget conf base ip)))
+      loop1 (Array.to_list (Gwdb.get_family (Util.pget conf base ip)))
   in
-  loop (get_iper anc) x
+  loop (Gwdb.get_iper anc) x
 
 let compute_simple_relationship conf base tstab ip1 ip2 =
   let tab = Consang.make_relationship_info base tstab in
@@ -424,7 +427,7 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
       List.fold_left
         (fun rl i ->
           let u = Gwdb.Marker.get tab.Consang.reltab i in
-          let p = pget conf base i in
+          let p = Util.pget conf base i in
           List.fold_left
             (fun rl (len1, n1, _) ->
               List.fold_left
@@ -459,14 +462,17 @@ let known_spouses_list conf base p excl_p =
   let u = p in
   Array.fold_left
     (fun spl ifam ->
-      let sp = pget conf base (Gutil.spouse (get_iper p) (foi base ifam)) in
+      let sp =
+        Util.pget conf base
+          (Gutil.spouse (Gwdb.get_iper p) (Gwdb.foi base ifam))
+      in
       if
-        sou base (get_first_name sp) <> "?"
-        && sou base (get_surname sp) <> "?"
-        && get_iper sp <> get_iper excl_p
+        Gwdb.sou base (Gwdb.get_first_name sp) <> "?"
+        && Gwdb.sou base (Gwdb.get_surname sp) <> "?"
+        && Gwdb.get_iper sp <> Gwdb.get_iper excl_p
       then sp :: spl
       else spl)
-    [] (get_family u)
+    [] (Gwdb.get_family u)
 
 let merge_relations rl1 rl2 =
   List.merge
@@ -488,8 +494,8 @@ let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
       List.fold_right
         (fun p2 sl ->
           let sol =
-            compute_simple_relationship conf base tstab (get_iper p1)
-              (get_iper p2)
+            compute_simple_relationship conf base tstab (Gwdb.get_iper p1)
+              (Gwdb.get_iper p2)
           in
           match sol with
           | Some (rl, total, _, reltab) ->
@@ -503,8 +509,8 @@ let sp p = Some p
 let no_sp _ = None
 
 let compute_relationship conf base by_marr p1 p2 =
-  let ip1 = get_iper p1 in
-  let ip2 = get_iper p2 in
+  let ip1 = Gwdb.get_iper p1 in
+  let ip2 = Gwdb.get_iper p2 in
   if ip1 = ip2 then None
   else
     let tstab = Util.create_topological_sort conf base in
@@ -562,28 +568,28 @@ let compute_relationship conf base by_marr p1 p2 =
 let get_others_related conf base p =
   let l =
     (* persons related to [p] *)
-    let l = List.sort_uniq compare (get_related p) in
+    let l = List.sort_uniq compare (Gwdb.get_related p) in
     (* for each person related to [p] we look for relations they have with [p] *)
     List.fold_left
       (fun acc ic ->
-        let c = pget conf base ic in
+        let c = Util.pget conf base ic in
         let rec loop acc = function
           | [] -> acc
           | r :: rl -> (
-              match r.r_fath with
-              | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
+              match r.Def.r_fath with
+              | Some ip when ip = Gwdb.get_iper p -> loop ((c, r) :: acc) rl
               | Some _ | None -> (
-                  match r.r_moth with
-                  | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
+                  match r.Def.r_moth with
+                  | Some ip when ip = Gwdb.get_iper p -> loop ((c, r) :: acc) rl
                   | Some _ | None -> loop acc rl))
         in
-        loop acc (get_rparents c))
+        loop acc (Gwdb.get_rparents c))
       [] l
   in
   (* TODO don't query db in sort *)
   let get_date x =
-    match Date.od_of_cdate (get_baptism x) with
-    | None -> Date.od_of_cdate (get_birth x)
+    match Date.od_of_cdate (Gwdb.get_baptism x) with
+    | None -> Date.od_of_cdate (Gwdb.get_birth x)
     | x -> x
   in
   List.sort
@@ -619,14 +625,14 @@ let get_event_witnessed conf base p =
             in
             if not is_duplicate_fevent then
               match
-                Util.array_mem_witn base (get_iper p)
+                Util.array_mem_witn base (Gwdb.get_iper p)
                   (Event.get_witnesses event_item)
                   (Event.get_witness_notes event_item)
               with
               | None -> ()
               | Some (wk, wnote) -> (
                   match wk with
-                  | Witness_GodParent ->
+                  | Def.Witness_GodParent ->
                       (* TODO we can be Witness_GodParent but not have a relation Godparent... *)
                       (* if [p] is the GodParent of [c] in relationship we remove it here
                          to not duplicate information *)
@@ -634,13 +640,14 @@ let get_event_witnessed conf base p =
                         not
                         @@ List.exists
                              (fun (related, relation) ->
-                               get_iper related = ic
-                               && relation.r_type = GodParent)
+                               Gwdb.get_iper related = ic
+                               && relation.Def.r_type = Def.GodParent)
                              related_parents
                       then l := (c, wk, wnote, event_item) :: !l
-                  | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
-                  | Witness_Informant | Witness_Attending | Witness_Mentioned
-                  | Witness_Other ->
+                  | Def.Witness | Def.Witness_CivilOfficer
+                  | Def.Witness_ReligiousOfficer | Def.Witness_Informant
+                  | Def.Witness_Attending | Def.Witness_Mentioned
+                  | Def.Witness_Other ->
                       l := (c, wk, wnote, event_item) :: !l))
           (Event.events conf base c))
       related;

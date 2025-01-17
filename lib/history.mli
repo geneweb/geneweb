@@ -1,15 +1,15 @@
 (* $Id: history.mli,v 5.4 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-
-val file_name : config -> string
+val file_name : Config.config -> string
 (** Returns path to the file where history of current base updates is stored *)
 
 val record :
-  config -> base -> (iper, iper, ifam, string) base_changed -> string -> unit
+  Config.config ->
+  Gwdb.base ->
+  (Gwdb.iper, Gwdb.iper, Gwdb.ifam, string) Def.base_changed ->
+  string ->
+  unit
 (** [record conf change action] records new modification in the history files
     (global file and specific for each concerned by modification person).
     Additionally it does:
@@ -18,7 +18,7 @@ val record :
     - Notify foreign {i notify_change} about modification on the base
       (doesn't notify if multiple modifications are done succesively) *)
 
-val notify : config -> base -> string -> unit
+val notify : Config.config -> Gwdb.base -> string -> unit
 (** [notify conf base action]
     Explicit notification of foreign script {i notify_change}
     that modification action [action] was executed on the database.
@@ -27,10 +27,10 @@ val notify : config -> base -> string -> unit
     modifications and avoid creating indefinite amount of processes for each modification
     (for example for each concerned person in the list of modified persons). *)
 
-val print : config -> base -> unit
+val print : Config.config -> Gwdb.base -> unit
 (** Displays an history of updates *)
 
-val print_search : config -> base -> unit
+val print_search : Config.config -> Gwdb.base -> unit
 (** Same as `print`, but simultaneously searches for text inside the history and higlhight all found matches.
     Search pattern is available with {i s} variable in environement [conf.env]. *)
 
@@ -40,7 +40,7 @@ val line_fields : string -> (string * string * string * string option) option
 (** Parses one line of history file that delimits one modification record. *)
 
 val filter_map_history :
-  conf:config ->
+  conf:Config.config ->
   skip:int ->
   n:int ->
   filter:
@@ -53,7 +53,7 @@ val filter_map_history :
 *)
 
 val total_entries :
-  conf:config ->
+  conf:Config.config ->
   filter:
     (time:string -> user:string -> action:string -> keyo:string option -> bool) ->
   int
