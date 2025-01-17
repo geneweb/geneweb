@@ -1,21 +1,15 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open TemplAst
-open Util
-
 let string_person_of base p =
   let fp ip =
-    let p = poi base ip in
-    ( sou base (get_first_name p),
-      sou base (get_surname p),
-      get_occ p,
+    let p = Gwdb.poi base ip in
+    ( Gwdb.sou base (Gwdb.get_first_name p),
+      Gwdb.sou base (Gwdb.get_surname p),
+      Gwdb.get_occ p,
       Update.Link,
       "" )
   in
-  Futil.map_person_ps fp (sou base) (gen_person_of_person p)
+  Futil.map_person_ps fp (Gwdb.sou base) (Gwdb.gen_person_of_person p)
 
 (* Interpretation of template file 'updind.txt' *)
 
@@ -53,7 +47,7 @@ let rec eval_var conf base env p _loc sl =
 
 and eval_simple_var conf env p = function
   | [ "alias" ] -> eval_string_env "alias" env
-  | [ "acc_if_titles" ] -> bool_val (p.access = IfTitles)
+  | [ "acc_if_titles" ] -> bool_val (p.Def.access = IfTitles)
   | [ "acc_private" ] -> bool_val (p.access = Private)
   | [ "acc_public" ] -> bool_val (p.access = Public)
   | [ "bapt_place" ] ->
@@ -102,7 +96,7 @@ and eval_simple_var conf env p = function
   | [ "died_young" ] -> bool_val (p.death = DeadYoung)
   | [ "digest" ] -> eval_string_env "digest" env
   | [ "dont_know_if_dead" ] -> bool_val (p.death = DontKnowIfDead)
-  | [ "dr_disappeared" ] -> eval_is_death_reason Disappeared p.death
+  | [ "dr_disappeared" ] -> eval_is_death_reason Def.Disappeared p.death
   | [ "dr_executed" ] -> eval_is_death_reason Executed p.death
   | [ "dr_killed" ] -> eval_is_death_reason Killed p.death
   | [ "dr_murdered" ] -> eval_is_death_reason Murdered p.death
@@ -157,7 +151,7 @@ and eval_simple_var conf env p = function
         match pevents with
         | [] -> bool_val false
         | evt :: l ->
-            if evt.epers_name = Epers_Birth then bool_val true else loop l
+            if evt.Def.epers_name = Epers_Birth then bool_val true else loop l
       in
       loop p.pevents
   | [ "has_pevent_baptism" ] ->
@@ -165,7 +159,7 @@ and eval_simple_var conf env p = function
         match pevents with
         | [] -> bool_val false
         | evt :: l ->
-            if evt.epers_name = Epers_Baptism then bool_val true else loop l
+            if evt.Def.epers_name = Epers_Baptism then bool_val true else loop l
       in
       loop p.pevents
   | [ "has_pevent_death" ] ->
@@ -173,7 +167,7 @@ and eval_simple_var conf env p = function
         match pevents with
         | [] -> bool_val false
         | evt :: l ->
-            if evt.epers_name = Epers_Death then bool_val true else loop l
+            if evt.Def.epers_name = Epers_Death then bool_val true else loop l
       in
       loop p.pevents
   | [ "has_pevent_burial" ] ->
@@ -181,7 +175,7 @@ and eval_simple_var conf env p = function
         match pevents with
         | [] -> bool_val false
         | evt :: l ->
-            if evt.epers_name = Epers_Burial then bool_val true else loop l
+            if evt.Def.epers_name = Epers_Burial then bool_val true else loop l
       in
       loop p.pevents
   | [ "has_pevent_cremation" ] ->
@@ -189,7 +183,8 @@ and eval_simple_var conf env p = function
         match pevents with
         | [] -> bool_val false
         | evt :: l ->
-            if evt.epers_name = Epers_Cremation then bool_val true else loop l
+            if evt.Def.epers_name = Epers_Cremation then bool_val true
+            else loop l
       in
       loop p.pevents
   | [ "has_pevents" ] -> bool_val (p.pevents <> [])
@@ -198,7 +193,7 @@ and eval_simple_var conf env p = function
         match pevents with
         | [] -> false
         | evt :: l -> (
-            match evt.epers_name with
+            match evt.Def.epers_name with
             | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
             | Epers_Cremation ->
                 true
@@ -210,7 +205,7 @@ and eval_simple_var conf env p = function
         match pevents with
         | [] -> false
         | evt :: l -> (
-            match evt.epers_name with
+            match evt.Def.epers_name with
             | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
             | Epers_Cremation ->
                 loop l
@@ -224,7 +219,7 @@ and eval_simple_var conf env p = function
   | [ "has_surnames_aliases" ] -> bool_val (p.surnames_aliases <> [])
   | [ "has_titles" ] -> bool_val (p.titles <> [])
   | [ "image" ] -> safe_val (Util.escape_html p.image :> Adef.safe_string)
-  | [ "index" ] -> str_val (string_of_iper p.key_index)
+  | [ "index" ] -> str_val (Gwdb.string_of_iper p.key_index)
   | [ "is_female" ] -> bool_val (p.sex = Female)
   | [ "is_male" ] -> bool_val (p.sex = Male)
   | [ "is_first" ] -> (
@@ -491,7 +486,7 @@ and eval_relation_var r = function
         | _ -> ("", "", 0, Update.Create (Neuter, None), "")
       in
       eval_person_var x sl
-  | [ "rt_adoption" ] -> eval_is_relation_type Adoption r
+  | [ "rt_adoption" ] -> eval_is_relation_type Def.Adoption r
   | [ "rt_candidate_parent" ] -> eval_is_relation_type CandidateParent r
   | [ "rt_empty" ] -> (
       match r with
@@ -531,7 +526,7 @@ and eval_is_relation_type rt = function
 and eval_special_var conf base = function
   | [ "include_perso_header" ] -> (
       (* TODO merge with mainstream includes ?? *)
-      match p_getenv conf.env "i" with
+      match Util.p_getenv conf.Config.env "i" with
       | Some i ->
           let has_base_loop =
             try
@@ -539,14 +534,14 @@ and eval_special_var conf base = function
               false
             with Consang.TopologicalSortError _ -> true
           in
-          if has_base_loop then VVstring ""
+          if has_base_loop then TemplAst.VVstring ""
           else
-            let p = poi base (iper_of_string i) in
+            let p = Gwdb.poi base (Gwdb.iper_of_string i) in
             Perso.interp_templ_with_menu
               (fun _ -> ())
               "perso_header" conf base p;
-            VVstring ""
-      | None -> VVstring "")
+            TemplAst.VVstring ""
+      | None -> TemplAst.VVstring "")
   | _ -> raise Not_found
 
 and eval_int_env var env =
@@ -562,9 +557,9 @@ and eval_string_env var env =
 let bind_pevents env p =
   let events =
     Event.sort_events
-      (fun e -> Event.Pevent e.epers_name)
+      (fun e -> Event.Pevent e.Def.epers_name)
       (fun e -> e.epers_date)
-      p.pevents
+      p.Def.pevents
   in
   bind "pevents" (Vevents events) env
 
@@ -573,7 +568,7 @@ let bind_pevents env p =
 let print_foreach print_ast _eval_expr =
   let rec print_foreach env p _loc s sl _ al =
     match s :: sl with
-    | [ "alias" ] -> print_foreach_string env p al p.aliases s
+    | [ "alias" ] -> print_foreach_string env p al p.Def.aliases s
     | [ "first_name_alias" ] ->
         print_foreach_string env p al p.first_names_aliases s
     | [ "qualifier" ] -> print_foreach_string env p al p.qualifiers s
@@ -659,14 +654,14 @@ let print_foreach print_ast _eval_expr =
 
 (* S: check on `m` should be made beforehand; what about plugins?  *)
 let print_update_ind conf base p digest =
-  match p_getenv conf.env "m" with
+  match Util.p_getenv conf.Config.env "m" with
   | Some ("MRG_IND_OK" | "MRG_MOD_IND_OK")
   | Some ("MOD_IND" | "MOD_IND_OK")
   | Some ("ADD_IND" | "ADD_IND_OK") ->
       let env =
         [
           ("digest", Vstring digest);
-          ("next_pevent", Vcnt (ref (List.length p.pevents + 1)));
+          ("next_pevent", Vcnt (ref (List.length p.Def.pevents + 1)));
         ]
       in
       Hutil.interp conf "updind"
@@ -683,25 +678,26 @@ let print_update_ind conf base p digest =
 
 let print_del1 conf base p =
   let title () =
-    let s = transl_nth conf "person/persons" 0 in
+    let s = Util.transl_nth conf "person/persons" 0 in
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_decline conf "delete" s))
+      (Utf8.capitalize_fst (Util.transl_decline conf "delete" s))
   in
   Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
   title ();
   Output.print_sstring conf "</h2>\n";
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<form method=\"post\" action=\"%s\">\n"
+    conf.Config.command;
   Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
   Output.print_sstring conf
     "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_iper (get_iper p));
+    (Gwdb.string_of_iper (Gwdb.get_iper p));
   Output.print_sstring conf
     "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button>\n";
   Output.print_sstring conf "</p>\n";
   Output.print_sstring conf "</form>\n";
@@ -710,7 +706,7 @@ let print_del1 conf base p =
 let print_add conf base =
   let p =
     {
-      first_name = "";
+      Def.first_name = "";
       surname = "";
       occ = 0;
       image = "";
@@ -744,32 +740,32 @@ let print_add conf base =
       pevents = [];
       notes = "";
       psources = "";
-      key_index = dummy_iper;
+      key_index = Gwdb.dummy_iper;
     }
   in
   print_update_ind conf base p ""
 
 let print_mod conf base =
-  match p_getenv conf.env "i" with
+  match Util.p_getenv conf.Config.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       let sp = string_person_of base p in
       let digest = Update.digest_person sp in
       print_update_ind conf base sp digest
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
+  match Util.p_getenv conf.Config.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       print_del1 conf base p
 
 let print_change_event_order conf base =
-  match p_getenv conf.env "i" with
+  match Util.p_getenv conf.Config.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = string_person_of base (poi base (iper_of_string i)) in
+      let p = string_person_of base (Gwdb.poi base (Gwdb.iper_of_string i)) in
       Hutil.interp conf "updindevt"
         {
           Templ.eval_var = eval_var conf base;

@@ -1,23 +1,15 @@
-open Config
-open Dag2html
-open Def
-open Gwdb
-open TemplAst
-open Util
-open Dag
-
 let image_normal_txt conf base p fname width height =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
   let k = Image.default_portrait_filename base p in
   let r =
     Format.sprintf
       {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s"
         style="%s %s">|}
-      (commd conf : Adef.escaped_string :> string)
+      (Util.commd conf : Adef.escaped_string :> string)
       (string_of_int
       @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-      (acces conf base p : Adef.escaped_string :> string)
+      (Util.acces conf base p : Adef.escaped_string :> string)
       k
       (if width = 0 then "" else " width=" ^ string_of_int width)
       (if height = 0 then "" else " height=" ^ string_of_int height)
@@ -26,13 +18,13 @@ let image_normal_txt conf base p fname width height =
       (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   in
   Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
-    (commd conf : Adef.escaped_string :> string)
-    (acces conf base p : Adef.escaped_string :> string)
+    (Util.commd conf : Adef.escaped_string :> string)
+    (Util.acces conf base p : Adef.escaped_string :> string)
     k r
   |> Adef.safe
 
 let image_url_txt conf url_p url height : Adef.safe_string =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
   Format.sprintf
     {|<a href="%s"><img src="%s" alt="%s" title="%s"
       style="%s"></a>|}
@@ -43,7 +35,7 @@ let image_url_txt conf url_p url height : Adef.safe_string =
   |> Adef.safe
 
 let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
   Format.sprintf
     {|<a href="%s"><img src="%s"%s%s alt="%s" title="%s"
       style="%s %s">%s</a>|}
@@ -60,7 +52,7 @@ let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
 let image_txt conf base p =
   Adef.safe
   @@
-  match p_getenv conf.env "image" with
+  match Util.p_getenv conf.Config.env "image" with
   | Some "off" -> ""
   | Some _ | None -> (
       match Image.get_portrait_with_size conf base p with
@@ -76,13 +68,19 @@ let image_txt conf base p =
           ^ (image_normal_txt conf base p s w h |> Adef.as_string)
           ^ "</td></tr></table></center>"
       | Some (`Url url, Some (wid, hei)) ->
-          let url_p = commd conf ^^^ acces conf base p in
+          let url_p =
+            let open Def in
+            Util.commd conf ^^^ Util.acces conf base p
+          in
           {|<br><center><table border="0"><tr align="left"><td>|}
           ^ (image_url_txt_with_size conf url_p (Util.escape_html url) wid hei
             |> Adef.as_string)
           ^ {|</td></tr></table></center>|}
       | Some (`Url url, None) ->
-          let url_p = commd conf ^^^ acces conf base p in
+          let url_p =
+            let open Def in
+            Util.commd conf ^^^ Util.acces conf base p
+          in
           let height = 75 in
           (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
           {|<br><center><table border="0" style="height:|}
@@ -91,10 +89,11 @@ let image_txt conf base p =
             |> Adef.as_string)
           ^ "</td></tr></table></center>\n")
 
-type item = Item of person * Adef.safe_string
+type item = Item of Gwdb.person * Adef.safe_string
 
 let string_of_item conf base = function
   | Item (p, s) ->
+      let open Def in
       NameDisplay.referenced_person_title_text conf base p
       ^^^ DateDisplay.short_dates_text conf base p
       ^^^ if (s :> string) = "" then Adef.safe "" else " " ^<^ s
@@ -105,50 +104,53 @@ let print_table conf
     (hts :
       (int * Dag2html.align * Adef.safe_string Dag2html.table_data) array array)
     =
-  begin_centered conf;
+  Util.begin_centered conf;
   Output.print_sstring conf {|<table border="|};
-  Output.print_sstring conf (string_of_int conf.border);
+  Output.print_sstring conf (string_of_int conf.Config.border);
   Output.print_sstring conf {|" cellspacing="0" cellpadding="0">|};
   for i = 0 to Array.length hts - 1 do
     Output.print_sstring conf "<tr align=\"left\">\n";
     for j = 0 to Array.length hts.(i) - 1 do
       let colspan, align, td = hts.(i).(j) in
       Output.print_sstring conf "<td";
-      if colspan = 1 && (td = TDnothing || td = TDhr CenterA) then ()
+      if
+        colspan = 1
+        && (td = Dag2html.TDnothing || td = Dag2html.TDhr Dag2html.CenterA)
+      then ()
       else (
         Output.print_sstring conf " colspan=\"";
         Output.print_sstring conf (string_of_int colspan);
         Output.print_sstring conf "\"");
       (match (align, td) with
-      | LeftA, TDhr LeftA ->
+      | Dag2html.LeftA, Dag2html.TDhr Dag2html.LeftA ->
           Output.print_sstring conf " align=\"";
-          Output.print_sstring conf conf.left;
+          Output.print_sstring conf conf.Config.left;
           Output.print_sstring conf "\""
-      | LeftA, _ -> ()
-      | CenterA, _ -> Output.print_sstring conf " align=\"center\""
-      | RightA, _ ->
+      | Dag2html.LeftA, _ -> ()
+      | Dag2html.CenterA, _ -> Output.print_sstring conf " align=\"center\""
+      | Dag2html.RightA, _ ->
           Output.print_sstring conf " align=\"";
-          Output.print_sstring conf conf.right;
+          Output.print_sstring conf conf.Config.right;
           Output.print_sstring conf "\"");
       Output.print_sstring conf ">";
       (match td with
-      | TDitem s -> Output.print_string conf s
-      | TDtext s -> Output.print_string conf s
-      | TDnothing -> Output.print_sstring conf "&nbsp;"
-      | TDbar None -> Output.print_sstring conf "|"
-      | TDbar (Some (s : Adef.escaped_string)) ->
+      | Dag2html.TDitem s -> Output.print_string conf s
+      | Dag2html.TDtext s -> Output.print_string conf s
+      | Dag2html.TDnothing -> Output.print_sstring conf "&nbsp;"
+      | Dag2html.TDbar None -> Output.print_sstring conf "|"
+      | Dag2html.TDbar (Some (s : Adef.escaped_string)) ->
           Output.print_sstring conf {|<a style="text-decoration:none" href="|};
           Output.print_string conf s;
           Output.print_sstring conf {|">|</a>|}
-      | TDhr align -> (
+      | Dag2html.TDhr align -> (
           match align with
-          | LeftA ->
+          | Dag2html.LeftA ->
               Output.print_sstring conf "<hr class=\"";
-              Output.print_sstring conf conf.left;
+              Output.print_sstring conf conf.Config.left;
               Output.print_sstring conf "\">"
-          | RightA ->
+          | Dag2html.RightA ->
               Output.print_sstring conf "<hr class=\"";
-              Output.print_sstring conf conf.right;
+              Output.print_sstring conf conf.Config.right;
               Output.print_sstring conf "\">"
           | _ -> Output.print_sstring conf {|<hr class="full">|}));
       Output.print_sstring conf "</td>"
@@ -156,7 +158,7 @@ let print_table conf
     Output.print_sstring conf "</tr>"
   done;
   Output.print_sstring conf "</table>";
-  end_centered conf
+  Util.end_centered conf
 
 (*
  * Print without HTML table tags: using <pre>
@@ -337,12 +339,12 @@ let gen_compute_columns_sizes size_fun
           else
             let colspan, _, td = hts.(i).(j) in
             (match td with
-            | TDitem _ | TDtext _ | TDnothing ->
+            | Dag2html.TDitem _ | Dag2html.TDtext _ | Dag2html.TDnothing ->
                 if colspan = curr_colspan then
                   let len =
                     match td with
-                    | TDitem s -> size_fun s
-                    | TDtext s -> size_fun s
+                    | Dag2html.TDitem s -> size_fun s
+                    | Dag2html.TDtext s -> size_fun s
                     | _ -> 1
                   in
                   let currsz =
@@ -369,8 +371,8 @@ let gen_compute_columns_sizes size_fun
                     loop 1 col colspan
                 else if colspan > curr_colspan then
                   next_colspan := min colspan !next_colspan
-            | TDbar _ -> ()
-            | TDhr _ -> ());
+            | Dag2html.TDbar _ -> ()
+            | Dag2html.TDhr _ -> ());
             loop (col + colspan) (j + 1)
         in
         loop 0 0
@@ -398,7 +400,7 @@ let try_add_vbar stra_row stra_row_max hts i col =
         if pj >= Array.length hts.(i - 1) then ""
         else
           let colspan, _, td = hts.(i - 1).(pj) in
-          if pcol = col then match td with TDbar _ -> "|" | _ -> ""
+          if pcol = col then match td with Dag2html.TDbar _ -> "|" | _ -> ""
           else loop (pcol + colspan) (pj + 1)
       in
       loop 0 0
@@ -409,7 +411,7 @@ let try_add_vbar stra_row stra_row_max hts i col =
         if nj >= Array.length hts.(i + 1) then ""
         else
           let colspan, _, td = hts.(i + 1).(nj) in
-          if ncol = col then match td with TDbar _ -> "|" | _ -> ""
+          if ncol = col then match td with Dag2html.TDbar _ -> "|" | _ -> ""
           else loop (ncol + colspan) (nj + 1)
       in
       loop 0 0
@@ -455,8 +457,9 @@ let table_strip_troublemakers hts =
   for i = 0 to Array.length hts - 1 do
     for j = 0 to Array.length hts.(i) - 1 do
       match hts.(i).(j) with
-      | colspan, align, TDitem s ->
-          hts.(i).(j) <- (colspan, align, TDitem (strip_troublemakers s))
+      | colspan, align, Dag2html.TDitem s ->
+          hts.(i).(j) <-
+            (colspan, align, Dag2html.TDitem (strip_troublemakers s))
       | _ -> ()
     done
   done
@@ -480,16 +483,20 @@ let table_pre_dim (hts : (int * 'a * 'c Dag2html.table_data) array array) =
   (min_wid, max_wid, min_widths_tab, max_widths_tab, ncol)
 
 let print_next_pos conf pos1 pos2 tcol =
-  let doit = p_getenv conf.env "notab" = Some "on" in
+  let doit = Util.p_getenv conf.Config.env "notab" = Some "on" in
   if doit then (
     let dpos =
-      match p_getint conf.env "dpos" with Some dpos -> dpos | None -> 78
+      match Util.p_getint conf.Config.env "dpos" with
+      | Some dpos -> dpos
+      | None -> 78
     in
     let pos1 = match pos1 with Some pos1 -> pos1 | None -> 0 in
     let pos2 = match pos2 with Some pos2 -> pos2 | None -> dpos in
     let overlap =
       let overlap =
-        match p_getint conf.env "overlap" with Some x -> x | None -> 10
+        match Util.p_getint conf.Config.env "overlap" with
+        | Some x -> x
+        | None -> 10
       in
       min overlap dpos
     in
@@ -497,7 +504,7 @@ let print_next_pos conf pos1 pos2 tcol =
       List.fold_right
         (fun (k, v) env ->
           match k with "pos1" | "pos2" -> env | _ -> (k, v) :: env)
-        conf.env []
+        conf.Config.env []
     in
     let aux env =
       List.iter
@@ -512,7 +519,7 @@ let print_next_pos conf pos1 pos2 tcol =
     if pos1 = 0 then Output.print_sstring conf "&nbsp;"
     else (
       Output.print_sstring conf "<a href=\"";
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       Output.print_sstring conf "\"";
       aux env;
       Output.print_sstring conf "pos1=";
@@ -523,7 +530,7 @@ let print_next_pos conf pos1 pos2 tcol =
     if pos2 >= tcol then Output.print_sstring conf "&nbsp;"
     else (
       Output.print_sstring conf "<a href=\"";
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       aux env;
       Output.print_sstring conf "pos1=";
       Output.print_sstring conf (string_of_int @@ (pos2 - overlap));
@@ -541,7 +548,9 @@ let print_table_pre conf hts =
   let tmincol, tcol, colminsz, colsz, ncol = table_pre_dim hts in
   let dcol =
     let dcol =
-      match p_getint conf.env "width" with Some i -> i | None -> 79
+      match Util.p_getint conf.Config.env "width" with
+      | Some i -> i
+      | None -> 79
     in
     max tmincol (min dcol tcol)
   in
@@ -551,10 +560,10 @@ let print_table_pre conf hts =
         colminsz.(i)
         + ((colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol))
     done;
-  let pos1 = p_getint conf.env "pos1" in
+  let pos1 = Util.p_getint conf.Config.env "pos1" in
   let pos2 =
-    match p_getint conf.env "pos2" with
-    | None -> p_getint conf.env "dpos"
+    match Util.p_getint conf.Config.env "pos2" with
+    | None -> Util.p_getint conf.Config.env "dpos"
     | x -> x
   in
   print_next_pos conf pos1 pos2 (Array.fold_left ( + ) 0 colsz);
@@ -573,7 +582,10 @@ let print_table_pre conf hts =
                 in
                 loop 0 colspan |> displayed_strip s |> Array.of_list
               in
-              match td with TDitem s -> aux s | TDtext s -> aux s | _ -> [||]
+              match td with
+              | Dag2html.TDitem s -> aux s
+              | Dag2html.TDtext s -> aux s
+              | _ -> [||]
             in
             loop (stra :: stral)
               (max max_row (Array.length stra))
@@ -596,7 +608,7 @@ let print_table_pre conf hts =
           in
           let outs =
             match td with
-            | TDitem _ | TDtext _ ->
+            | Dag2html.TDitem _ | Dag2html.TDtext _ ->
                 let s =
                   let k =
                     let dk = (max_row - Array.length stra.(j)) / 2 in
@@ -608,15 +620,16 @@ let print_table_pre conf hts =
                   else try_add_vbar k (Array.length stra.(j)) hts i col
                 in
                 let len = displayed_length s in
+                let open Def in
                 String.make ((sz - len) / 2) ' '
                 ^<^ (s : Adef.safe_string)
                 ^>^ String.make (sz - ((sz + len) / 2)) ' '
-            | TDnothing ->
+            | Dag2html.TDnothing ->
                 Adef.safe
                 @@ String.make ((sz - 1) / 2) ' '
                 ^ "&nbsp;"
                 ^ String.make (sz - ((sz + 1) / 2)) ' '
-            | TDbar s ->
+            | Dag2html.TDbar s ->
                 let s =
                   match s with
                   | None -> Adef.safe "|"
@@ -631,17 +644,18 @@ let print_table_pre conf hts =
                              s
                 in
                 let len = displayed_length s in
+                let open Def in
                 String.make ((sz - len) / 2) ' '
                 ^<^ s
                 ^>^ String.make (sz - ((sz + len) / 2)) ' '
-            | TDhr LeftA ->
+            | Dag2html.TDhr Dag2html.LeftA ->
                 let len = (sz + 1) / 2 in
                 Adef.safe (String.make len '-' ^ String.make (sz - len) ' ')
-            | TDhr RightA ->
+            | Dag2html.TDhr Dag2html.RightA ->
                 let len = sz / 2 in
                 Adef.safe
                   (String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-')
-            | TDhr CenterA -> Adef.safe (String.make sz '-')
+            | Dag2html.TDhr Dag2html.CenterA -> Adef.safe (String.make sz '-')
           in
           let clipped_outs =
             if pos1 = None && pos2 = None then outs
@@ -668,74 +682,85 @@ let print_table_pre conf hts =
 (* main *)
 
 let print_html_table conf hts =
-  if Util.p_getenv conf.env "notab" <> Some "on" then (
+  if Util.p_getenv conf.Config.env "notab" <> Some "on" then (
     Output.print_sstring conf {|<p><div style="text-align:|};
-    Output.print_sstring conf conf.right;
+    Output.print_sstring conf conf.Config.right;
     Output.print_sstring conf {|"><a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     List.iter
       (fun (k, v) ->
         Output.print_sstring conf k;
         Output.print_sstring conf "=";
         Output.print_string conf v;
         Output.print_sstring conf ";")
-      conf.env;
+      conf.Config.env;
     Output.print_sstring conf {|notab=on&slices=on"><tt>//</tt></a></div></p>|});
   if
-    Util.p_getenv conf.env "notab" = Some "on"
-    || Util.p_getenv conf.env "pos2" <> None
-    || browser_doesnt_have_tables conf
+    Util.p_getenv conf.Config.env "notab" = Some "on"
+    || Util.p_getenv conf.Config.env "pos2" <> None
+    || Util.browser_doesnt_have_tables conf
   then print_table_pre conf hts
   else print_table conf hts
 
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
+  let no_group = Util.p_getenv conf.Config.env "nogroup" = Some "on" in
   let spouse_on =
-    match Util.p_getenv conf.env "spouse" with Some "on" -> true | _ -> false
+    match Util.p_getenv conf.Config.env "spouse" with
+    | Some "on" -> true
+    | _ -> false
   in
-  let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
+  let bd =
+    match Util.p_getint conf.Config.env "bd" with Some x -> x | None -> 0
+  in
   let indi_txt n =
-    match n.valu with
-    | Left ip ->
-        let p = pget conf base ip in
+    match n.Dag2html.valu with
+    | Def.Left ip ->
+        let p = Util.pget conf base ip in
         let txt =
+          let open Def in
           image_txt conf base p ^^^ string_of_item conf base (elem_txt p)
         in
         let spouses =
-          if ((spouse_on && n.chil <> []) || n.pare = []) && not invert then
+          if
+            ((spouse_on && n.Dag2html.chil <> []) || n.Dag2html.pare = [])
+            && not invert
+          then
             List.fold_left
               (fun list id ->
-                match d.dag.(int_of_idag id).valu with
-                | Left cip -> (
-                    match get_parents (pget conf base cip) with
+                match
+                  d.Dag2html.dag.(Dag2html.int_of_idag id).Dag2html.valu
+                with
+                | Def.Left cip -> (
+                    match Gwdb.get_parents (Util.pget conf base cip) with
                     | Some ifam ->
-                        let cpl = foi base ifam in
-                        if ip = get_father cpl then
-                          if List.mem_assoc (get_mother cpl) list then list
-                          else (get_mother cpl, Some ifam) :: list
-                        else if ip = get_mother cpl then
-                          if List.mem_assoc (get_father cpl) list then list
-                          else (get_father cpl, Some ifam) :: list
+                        let cpl = Gwdb.foi base ifam in
+                        if ip = Gwdb.get_father cpl then
+                          if List.mem_assoc (Gwdb.get_mother cpl) list then list
+                          else (Gwdb.get_mother cpl, Some ifam) :: list
+                        else if ip = Gwdb.get_mother cpl then
+                          if List.mem_assoc (Gwdb.get_father cpl) list then list
+                          else (Gwdb.get_father cpl, Some ifam) :: list
                         else list
                     | None -> list)
                 | Right _ -> list)
-              [] n.chil
-          else if n.chil = [] then
+              [] n.Dag2html.chil
+          else if n.Dag2html.chil = [] then
             try [ List.assq ip spl ] with Not_found -> []
           else []
         in
         List.fold_left
           (fun txt (ips, ifamo) ->
-            if Pset.mem ips set then txt
+            if Dag.Pset.mem ips set then txt
             else
-              let ps = pget conf base ips in
+              let ps = Util.pget conf base ips in
               let d =
                 match ifamo with
                 | Some ifam ->
                     DateDisplay.short_marriage_date_text conf base
-                      (foi base ifam) p ps
+                      (Gwdb.foi base ifam) p ps
                 | None -> Adef.safe ""
               in
+              let open Def in
               txt ^^^ "<br>&amp;" ^<^ d ^^^ " "
               ^<^ string_of_item conf base (elem_txt ps)
               ^^^ image_txt conf base ps)
@@ -743,39 +768,44 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | Right _ -> Adef.safe "&nbsp;"
   in
   let indi_txt n : Adef.safe_string =
-    let bd = match n.valu with Left _ -> bd | _ -> 0 in
+    let bd = match n.Dag2html.valu with Def.Left _ -> bd | _ -> 0 in
     if bd > 0 then
+      let open Def in
       {|<table border="|} ^<^ string_of_int bd
       ^<^ {|"><tr align="left"><td align="center">|} ^<^ indi_txt n
       ^>^ {|</td></tr></table>|}
     else indi_txt n
   in
   let vbar_txt n =
-    match n.valu with Left ip -> vbar_txt ip | _ -> Adef.escaped ""
+    match n.Dag2html.valu with
+    | Def.Left ip -> vbar_txt ip
+    | _ -> Adef.escaped ""
   in
-  let phony n = match n.valu with Left _ -> false | Right _ -> true in
+  let phony n =
+    match n.Dag2html.valu with Def.Left _ -> false | Right _ -> true
+  in
   let t = Dag2html.table_of_dag phony false invert no_group d in
-  if Array.length t.table = 0 then [||]
+  if Array.length t.Dag2html.table = 0 then [||]
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 
 let print_slices_menu conf hts =
   let header n =
-    transl_nth conf "display by slices/slice width/overlap/total width" n
+    Util.transl_nth conf "display by slices/slice width/overlap/total width" n
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let title _ = header 0 in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  Util.include_template conf conf.Config.env "buttons_rel" (fun () -> ());
   Output.print_sstring conf {|<form method="get" action="|};
-  Output.print_sstring conf conf.command;
+  Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|"><p>|};
-  hidden_env conf;
+  Util.hidden_env conf;
   List.iter
     (fun (k, v) -> if k <> "slices" then Util.hidden_input conf k v)
-    conf.env;
+    conf.Config.env;
   Output.print_sstring conf {|</p><table><tr align="left"><td align="right">|};
-  transl conf "don't group the common branches together"
+  Util.transl conf "don't group the common branches together"
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf
     {|<input type="checkbox" name="nogroup" value="on"></td></tr><tr align="left"><td align="right">|};
@@ -795,7 +825,7 @@ let print_slices_menu conf hts =
   Output.print_sstring conf {|</td></tr></table><p>|};
   Output.print_sstring conf
     {|<p><button type="submit" class="btn btn-secondary btn-lg">|};
-  transl_nth conf "validate/delete" 0
+  Util.transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</button></p></form>|};
   Hutil.trailer conf
@@ -803,11 +833,11 @@ let print_slices_menu conf hts =
 let print_dag_page conf page_title hts next_txt =
   let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  Util.include_template conf conf.Config.env "buttons_rel" (fun () -> ());
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then (
     Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_string conf next_txt;
     Output.print_sstring conf {|">&gt;&gt;</a></p>|});
   Hutil.trailer conf
@@ -844,44 +874,50 @@ let rec eval_var conf (page_title : Adef.safe_string)
       | _ -> raise Not_found)
   | [ "dag_cell_pre" ] -> (
       match get_env "dag_cell_pre" env with
-      | Vdcellp s -> VVstring s
+      | Vdcellp s -> TemplAst.VVstring s
       | _ -> raise Not_found)
-  | [ "head_title" ] -> VVstring (page_title :> string)
-  | [ "link_next" ] -> VVstring (next_txt :> string)
+  | [ "head_title" ] -> TemplAst.VVstring (page_title :> string)
+  | [ "link_next" ] -> TemplAst.VVstring (next_txt :> string)
   | _ -> raise Not_found
 
 and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
-  | [ "max_wid" ] -> VVstring (string_of_int tcol)
-  | [ "min_wid" ] -> VVstring (string_of_int tmincol)
-  | [ "ncol" ] -> VVstring (string_of_int (Array.fold_left ( + ) 0 colsz))
+  | [ "max_wid" ] -> TemplAst.VVstring (string_of_int tcol)
+  | [ "min_wid" ] -> TemplAst.VVstring (string_of_int tmincol)
+  | [ "ncol" ] ->
+      TemplAst.VVstring (string_of_int (Array.fold_left ( + ) 0 colsz))
   | _ -> raise Not_found
 
 and eval_dag_cell_var conf (colspan, align, td) = function
   | [ "align" ] -> (
       match align with
-      | LeftA -> VVstring conf.left
-      | CenterA -> VVstring "center"
-      | RightA -> VVstring conf.right)
+      | Dag2html.LeftA -> TemplAst.VVstring conf.Config.left
+      | Dag2html.CenterA -> TemplAst.VVstring "center"
+      | Dag2html.RightA -> TemplAst.VVstring conf.Config.right)
   | [ "bar_link" ] ->
-      VVstring
+      TemplAst.VVstring
         (match td with
-        | TDbar (Some s) -> (s : Adef.escaped_string :> string)
+        | Dag2html.TDbar (Some s) -> (s : Adef.escaped_string :> string)
         | _ -> "")
-  | [ "colspan" ] -> VVstring (string_of_int colspan)
-  | [ "is_bar" ] -> VVbool (match td with TDbar _ -> true | _ -> false)
+  | [ "colspan" ] -> TemplAst.VVstring (string_of_int colspan)
+  | [ "is_bar" ] ->
+      TemplAst.VVbool (match td with Dag2html.TDbar _ -> true | _ -> false)
   | [ "is_hr_left" ] -> (
-      match td with TDhr LeftA -> VVbool true | _ -> VVbool false)
+      match td with
+      | Dag2html.TDhr Dag2html.LeftA -> TemplAst.VVbool true
+      | _ -> TemplAst.VVbool false)
   | [ "is_hr_right" ] -> (
-      match td with TDhr RightA -> VVbool true | _ -> VVbool false)
-  | [ "is_nothing" ] -> VVbool (td = TDnothing)
+      match td with
+      | Dag2html.TDhr Dag2html.RightA -> TemplAst.VVbool true
+      | _ -> TemplAst.VVbool false)
+  | [ "is_nothing" ] -> TemplAst.VVbool (td = Dag2html.TDnothing)
   | [ "item" ] -> (
       match td with
-      | TDitem s -> VVstring (s : Adef.safe_string :> string)
-      | _ -> VVstring "")
+      | Dag2html.TDitem s -> TemplAst.VVstring (s : Adef.safe_string :> string)
+      | _ -> TemplAst.VVstring "")
   | [ "text" ] -> (
       match td with
-      | TDtext s -> VVstring (s : Adef.safe_string :> string)
-      | _ -> VVstring "")
+      | Dag2html.TDtext s -> TemplAst.VVstring (s : Adef.safe_string :> string)
+      | _ -> TemplAst.VVstring "")
   | _ -> raise Not_found
 
 let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
@@ -916,7 +952,7 @@ and print_foreach_dag_cell_pre hts print_ast env al =
       in
       let outs =
         match td with
-        | TDitem _ | TDtext _ ->
+        | Dag2html.TDitem _ | Dag2html.TDtext _ ->
             let s =
               let k =
                 let dk = (max_row - Array.length stra.(j)) / 2 in
@@ -933,8 +969,8 @@ and print_foreach_dag_cell_pre hts print_ast env al =
             String.make ((sz - len) / 2) ' '
             ^ (s :> string)
             ^ String.make (sz - ((sz + len) / 2)) ' '
-        | TDnothing -> String.make sz ' '
-        | TDbar s ->
+        | Dag2html.TDnothing -> String.make sz ' '
+        | Dag2html.TDbar s ->
             let s =
               match (s : Adef.escaped_string option :> string option) with
               | None | Some "" -> "|"
@@ -945,13 +981,13 @@ and print_foreach_dag_cell_pre hts print_ast env al =
             String.make ((sz - len) / 2) ' '
             ^ s
             ^ String.make (sz - ((sz + len) / 2)) ' '
-        | TDhr LeftA ->
+        | Dag2html.TDhr Dag2html.LeftA ->
             let len = (sz + 1) / 2 in
             String.make len '-' ^ String.make (sz - len) ' '
-        | TDhr RightA ->
+        | Dag2html.TDhr Dag2html.RightA ->
             let len = sz / 2 in
             String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
-        | TDhr CenterA -> String.make sz '-'
+        | Dag2html.TDhr Dag2html.CenterA -> String.make sz '-'
       in
       let clipped_outs =
         if pos1 = None && pos2 = None then outs
@@ -1012,8 +1048,8 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
               Array.of_list (displayed_strip s sz)
             in
             match td with
-            | TDitem s -> aux (s :> Adef.safe_string)
-            | TDtext s -> aux s
+            | Dag2html.TDitem s -> aux (s :> Adef.safe_string)
+            | Dag2html.TDtext s -> aux s
             | _ -> [||]
           in
           loop (stra :: stral)
@@ -1024,10 +1060,10 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
     in
     (Array.of_list (List.rev stral), max_row)
   in
-  let pos1 = p_getint conf.env "pos1" in
+  let pos1 = Util.p_getint conf.Config.env "pos1" in
   let pos2 =
-    match p_getint conf.env "pos2" with
-    | None -> p_getint conf.env "dpos"
+    match Util.p_getint conf.Config.env "pos2" with
+    | None -> Util.p_getint conf.Config.env "dpos"
     | x -> x
   in
   for row = 0 to max_row - 1 do
@@ -1037,11 +1073,12 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
   done
 
 let old_print_slices_menu_or_dag_page conf page_title hts next_txt =
-  if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
+  if Util.p_getenv conf.Config.env "slices" = Some "on" then
+    print_slices_menu conf hts
   else print_dag_page conf page_title hts next_txt
 
 let print_slices_menu_or_dag_page conf page_title hts next_txt =
-  if p_getenv conf.env "old" = Some "on" then
+  if Util.p_getenv conf.Config.env "old" = Some "on" then
     old_print_slices_menu_or_dag_page conf page_title hts next_txt
   else
     let env =
@@ -1049,7 +1086,9 @@ let print_slices_menu_or_dag_page conf page_title hts next_txt =
         let tmincol, tcol, colminsz, colsz, ncol = table_pre_dim hts in
         let dcol =
           let dcol =
-            match p_getint conf.env "width" with Some i -> i | None -> 79
+            match Util.p_getint conf.Config.env "width" with
+            | Some i -> i
+            | None -> 79
           in
           max tmincol (min dcol tcol)
         in
@@ -1077,15 +1116,15 @@ let print_slices_menu_or_dag_page conf page_title hts next_txt =
 
 let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
     next_txt =
-  let d = make_dag conf base set in
+  let d = Dag.make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
   print_slices_menu_or_dag_page conf page_title hts next_txt
 
 let print conf base =
-  let set = get_dag_elems conf base in
+  let set = Dag.get_dag_elems conf base in
   let elem_txt p = Item (p, Adef.safe "") in
   let vbar_txt _ = Adef.escaped "" in
-  let invert = Util.p_getenv conf.env "invert" = Some "on" in
+  let invert = Util.p_getenv conf.Config.env "invert" = Some "on" in
   let page_title =
     Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
   in

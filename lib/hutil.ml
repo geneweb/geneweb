@@ -1,12 +1,10 @@
 (* Copyright (c) 2007 INRIA *)
 
-open Config
-open Def
-
 let link_to_referer conf =
   let referer = Util.get_referer conf in
   let back = Utf8.capitalize_fst (Util.transl conf "back") in
   if (referer :> string) <> "" then
+    let open Def in
     ({|<a href="|} ^<^ referer
      ^>^ {|"><span class="fa fa-arrow-left fa-lg" title="|} ^ back
      ^ {|"></span></a>|}
@@ -95,7 +93,7 @@ let rheader conf title =
   Output.print_sstring conf "</h1>\n"
 
 let trailer conf =
-  let conf = { conf with is_printed_by_template = false } in
+  let conf = { conf with Config.is_printed_by_template = false } in
   (match Util.open_etc_file "trl" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
   | None -> ());
@@ -112,6 +110,7 @@ let () =
 let incorrect_request conf = GWPARAM.output_error conf Def.Bad_Request
 
 let error_cannot_access conf fname =
+  let open Def in
   GWPARAM.output_error conf Def.Not_Found
     ~content:
       ("Cannot access file \""
@@ -135,7 +134,9 @@ let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
 (* Calendar request *)
 
 let eval_julian_day conf =
-  let getint v = match Util.p_getint conf.env v with Some x -> x | _ -> 0 in
+  let getint v =
+    match Util.p_getint conf.Config.env v with Some x -> x | _ -> 0
+  in
   List.fold_left
     (fun d (var, cal, max_month) ->
       let conv d = Date.to_sdn ~from:cal d in

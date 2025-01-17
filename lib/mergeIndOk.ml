@@ -1,28 +1,23 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
-
 let rec merge_lists l1 = function
   | x2 :: l2 ->
       if List.mem x2 l1 then merge_lists l1 l2 else merge_lists (l1 @ [ x2 ]) l2
   | [] -> l1
 
 let merge_strings base is1 sep is2 =
-  let n1 = sou base is1 in
-  let n2 = sou base is2 in
+  let n1 = Gwdb.sou base is1 in
+  let n2 = Gwdb.sou base is2 in
   if n1 = n2 then n1
   else if n1 = "" then n2
   else if n2 = "" then n1
   else n1 ^ sep ^ n2
 
 let sorp base ip =
-  let p = poi base ip in
-  ( sou base (get_first_name p),
-    sou base (get_surname p),
-    get_occ p,
+  let p = Gwdb.poi base ip in
+  ( Gwdb.sou base (Gwdb.get_first_name p),
+    Gwdb.sou base (Gwdb.get_surname p),
+    Gwdb.get_occ p,
     Update.Link,
     "" )
 
@@ -40,12 +35,12 @@ let merge_events l1 l2 p =
     let found_baptism = ref false in
     let found_death = ref false in
     let found_burial = ref false in
-    match e.epers_name with
+    match e.Def.epers_name with
     | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
       ->
         List.fold_right
           (fun e1 (mem, l1) ->
-            match e1.epers_name with
+            match e1.Def.epers_name with
             | Epers_Birth ->
                 if !found_birth then (mem, e1 :: l1)
                 else if e.epers_name = e1.epers_name then
@@ -55,7 +50,7 @@ let merge_events l1 l2 p =
                   let e1 =
                     {
                       e1 with
-                      epers_date = p.birth;
+                      epers_date = p.Def.birth;
                       epers_place = p.birth_place;
                       epers_note = p.birth_note;
                       epers_src = p.birth_src;
@@ -184,7 +179,7 @@ let reconstitute conf base p1 p2 =
   let field name proj null =
     let x1 = proj p1 in
     let x2 = proj p2 in
-    match p_getenv conf.env name with
+    match Util.p_getenv conf.Config.env name with
     | Some "1" -> x1
     | Some "2" -> x2
     | _ -> if null x1 then x2 else x1
@@ -201,13 +196,15 @@ let reconstitute conf base p1 p2 =
   in
   let p =
     {
-      first_name =
+      Def.first_name =
         field "first_name"
-          (fun p -> p_first_name base p)
+          (fun p -> Gwdb.p_first_name base p)
           (fun x -> x = "" || x = "?");
       surname =
-        field "surname" (fun p -> p_surname base p) (fun x -> x = "" || x = "?");
-      occ = field "number" get_occ (( = ) 0);
+        field "surname"
+          (fun p -> Gwdb.p_surname base p)
+          (fun x -> x = "" || x = "?");
+      occ = field "number" Gwdb.get_occ (( = ) 0);
       image =
         field "image"
           (fun p ->
@@ -216,56 +213,78 @@ let reconstitute conf base p1 p2 =
             | None -> "")
           (( = ) "");
       public_name =
-        field "public_name" (fun p -> sou base (get_public_name p)) (( = ) "");
-      qualifiers = list (sou base) get_qualifiers;
-      aliases = list (sou base) get_aliases;
-      first_names_aliases = list (sou base) get_first_names_aliases;
-      surnames_aliases = list (sou base) get_surnames_aliases;
-      titles = list (Futil.map_title_strings (sou base)) get_titles;
+        field "public_name"
+          (fun p -> Gwdb.sou base (Gwdb.get_public_name p))
+          (( = ) "");
+      qualifiers = list (Gwdb.sou base) Gwdb.get_qualifiers;
+      aliases = list (Gwdb.sou base) Gwdb.get_aliases;
+      first_names_aliases = list (Gwdb.sou base) Gwdb.get_first_names_aliases;
+      surnames_aliases = list (Gwdb.sou base) Gwdb.get_surnames_aliases;
+      titles = list (Futil.map_title_strings (Gwdb.sou base)) Gwdb.get_titles;
       rparents =
-        list (Futil.map_relation_ps (sorp base) (sou base)) get_rparents;
+        list
+          (Futil.map_relation_ps (sorp base) (Gwdb.sou base))
+          Gwdb.get_rparents;
       related = [];
       occupation =
-        field "occupation" (fun p -> sou base (get_occupation p)) (( = ) "");
-      sex = field "sex" get_sex (( = ) Neuter);
-      access = field "access" get_access (( = ) IfTitles);
-      birth = field "birth" get_birth (( = ) Date.cdate_None);
+        field "occupation"
+          (fun p -> Gwdb.sou base (Gwdb.get_occupation p))
+          (( = ) "");
+      sex = field "sex" Gwdb.get_sex (( = ) Def.Neuter);
+      access = field "access" Gwdb.get_access (( = ) Def.IfTitles);
+      birth = field "birth" Gwdb.get_birth (( = ) Date.cdate_None);
       birth_place =
-        field "birth_place" (fun p -> sou base (get_birth_place p)) (( = ) "");
+        field "birth_place"
+          (fun p -> Gwdb.sou base (Gwdb.get_birth_place p))
+          (( = ) "");
       birth_note =
-        merge_strings base (get_birth_note p1) "<br>\n" (get_birth_note p2);
-      birth_src = merge_strings base (get_birth_src p1) ", " (get_birth_src p2);
-      baptism = field "baptism" get_baptism (( = ) Date.cdate_None);
+        merge_strings base (Gwdb.get_birth_note p1) "<br>\n"
+          (Gwdb.get_birth_note p2);
+      birth_src =
+        merge_strings base (Gwdb.get_birth_src p1) ", " (Gwdb.get_birth_src p2);
+      baptism = field "baptism" Gwdb.get_baptism (( = ) Date.cdate_None);
       baptism_place =
         field "baptism_place"
-          (fun p -> sou base (get_baptism_place p))
+          (fun p -> Gwdb.sou base (Gwdb.get_baptism_place p))
           (( = ) "");
       baptism_note =
-        merge_strings base (get_baptism_note p1) "<br>\n" (get_baptism_note p2);
+        merge_strings base (Gwdb.get_baptism_note p1) "<br>\n"
+          (Gwdb.get_baptism_note p2);
       baptism_src =
-        merge_strings base (get_baptism_src p1) ", " (get_baptism_src p2);
+        merge_strings base (Gwdb.get_baptism_src p1) ", "
+          (Gwdb.get_baptism_src p2);
       death =
-        field "death" get_death (fun x ->
+        field "death" Gwdb.get_death (fun x ->
             match x with DontKnowIfDead | OfCourseDead -> true | _ -> false);
       death_place =
-        field "death_place" (fun p -> sou base (get_death_place p)) (( = ) "");
+        field "death_place"
+          (fun p -> Gwdb.sou base (Gwdb.get_death_place p))
+          (( = ) "");
       death_note =
-        merge_strings base (get_death_note p1) "<br>\n" (get_death_note p2);
-      death_src = merge_strings base (get_death_src p1) ", " (get_death_src p2);
-      burial = field "burial" get_burial (( = ) UnknownBurial);
+        merge_strings base (Gwdb.get_death_note p1) "<br>\n"
+          (Gwdb.get_death_note p2);
+      death_src =
+        merge_strings base (Gwdb.get_death_src p1) ", " (Gwdb.get_death_src p2);
+      burial = field "burial" Gwdb.get_burial (( = ) Def.UnknownBurial);
       burial_place =
-        field "burial_place" (fun p -> sou base (get_burial_place p)) (( = ) "");
+        field "burial_place"
+          (fun p -> Gwdb.sou base (Gwdb.get_burial_place p))
+          (( = ) "");
       burial_note =
-        merge_strings base (get_burial_note p1) "<br>\n" (get_burial_note p2);
+        merge_strings base (Gwdb.get_burial_note p1) "<br>\n"
+          (Gwdb.get_burial_note p2);
       burial_src =
-        merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
+        merge_strings base (Gwdb.get_burial_src p1) ", "
+          (Gwdb.get_burial_src p2);
       pevents =
         list
-          (Futil.map_pers_event (sorp base) (sou base))
-          (fun p -> List.map gen_pevent_of_pers_event (get_pevents p));
-      notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
-      psources = merge_strings base (get_psources p1) ", " (get_psources p2);
-      key_index = get_iper p1;
+          (Futil.map_pers_event (sorp base) (Gwdb.sou base))
+          (fun p -> List.map Gwdb.gen_pevent_of_pers_event (Gwdb.get_pevents p));
+      notes =
+        merge_strings base (Gwdb.get_notes p1) "<br>\n" (Gwdb.get_notes p2);
+      psources =
+        merge_strings base (Gwdb.get_psources p1) ", " (Gwdb.get_psources p2);
+      key_index = Gwdb.get_iper p1;
     }
   in
   (* On fait la fusion des évènements à partir *)
@@ -273,9 +292,9 @@ let reconstitute conf base p1 p2 =
   let pevents =
     merge_primary_events
       (fun pe ->
-        let pe = gen_pevent_of_pers_event pe in
-        Futil.map_pers_event (sorp base) (sou base) pe)
-      get_pevents p
+        let pe = Gwdb.gen_pevent_of_pers_event pe in
+        Futil.map_pers_event (sorp base) (Gwdb.sou base) pe)
+      Gwdb.get_pevents p
   in
   { p with pevents }
 
@@ -283,18 +302,18 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
   let p_related, mod_p =
     List.fold_right
       (fun ipc (p_related, mod_p) ->
-        let pc = poi base ipc in
+        let pc = Gwdb.poi base ipc in
         let pc_rparents, _, p_related, mod_p =
           List.fold_right
             (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
               let r, mod_pc, p_related, mod_p =
-                match r.r_fath with
+                match r.Def.r_fath with
                 | Some ip when ip = ip2 ->
                     let p_related, mod_p =
                       if List.mem ipc p_related then (p_related, mod_p)
                       else (ipc :: p_related, true)
                     in
-                    let r = { r with r_fath = Some p.key_index } in
+                    let r = { r with r_fath = Some p.Def.key_index } in
                     (r, true, p_related, mod_p)
                 | _ -> (r, mod_pc, p_related, mod_p)
               in
@@ -310,7 +329,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                 | _ -> (r, mod_pc, p_related, mod_p)
               in
               (r :: pc_rparents, mod_pc, p_related, mod_p))
-            (get_rparents pc)
+            (Gwdb.get_rparents pc)
             ([], false, p_related, mod_p)
         in
         let pc_pevents, mod_pc, p_related, mod_p =
@@ -327,27 +346,27 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                         in
                         ((p.key_index, k, wnotes) :: witnesses, mod_p, p_related)
                       else ((ip, k, wnotes) :: witnesses, mod_p, p_related))
-                    (Array.to_list e.epers_witnesses)
+                    (Array.to_list e.Def.epers_witnesses)
                     ([], mod_pc, p_related)
                 in
                 let e = { e with epers_witnesses = Array.of_list witnesses } in
                 (e, true, p_related, mod_p)
               in
               (e :: pc_pevents, mod_pc, p_related, mod_p))
-            (List.map gen_pevent_of_pers_event (get_pevents pc))
+            (List.map Gwdb.gen_pevent_of_pers_event (Gwdb.get_pevents pc))
             ([], false, p_related, mod_p)
         in
         (* TODO mod_pc = True tout le temps *)
         (if mod_pc then
-         let pc = gen_person_of_person pc in
+         let pc = Gwdb.gen_person_of_person pc in
          let pc = { pc with rparents = pc_rparents; pevents = pc_pevents } in
-         patch_person base ipc pc);
+         Gwdb.patch_person base ipc pc);
         let p_related, mod_p =
           let rec loop (p_related, mod_p) i =
-            if i = Array.length (get_family pc) then (p_related, mod_p)
+            if i = Array.length (Gwdb.get_family pc) then (p_related, mod_p)
             else
-              let ifam = (get_family pc).(i) in
-              let fam = gen_family_of_family (foi base ifam) in
+              let ifam = (Gwdb.get_family pc).(i) in
+              let fam = Gwdb.gen_family_of_family (Gwdb.foi base ifam) in
               let p_related, mod_p =
                 if Array.mem ip2 fam.witnesses then (
                   let p_related, mod_p =
@@ -365,7 +384,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                     in
                     loop (p_related, mod_p) 0
                   in
-                  patch_family base ifam fam;
+                  Gwdb.patch_family base ifam fam;
                   (p_related, mod_p))
                 else (p_related, mod_p)
               in
@@ -375,7 +394,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                     let e, mod_pc, p_related, mod_p =
                       let p_related, mod_p =
                         let rec loop (p_related, mod_p) j =
-                          if j = Array.length e.efam_witnesses then
+                          if j = Array.length e.Def.efam_witnesses then
                             (p_related, mod_p)
                           else
                             let p_related, mod_p =
@@ -401,7 +420,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                 (* TODO mod_pc = True tout le temps *)
                 if mod_pc then
                   let fam = { fam with fevents = pc_fevents } in
-                  patch_family base ifam fam
+                  Gwdb.patch_family base ifam fam
               in
               loop (p_related, mod_p) (i + 1)
           in
@@ -415,40 +434,40 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
 let redirect_added_families base p ip2 p2_family =
   for i = 0 to Array.length p2_family - 1 do
     let ifam = p2_family.(i) in
-    let fam = foi base ifam in
+    let fam = Gwdb.foi base ifam in
     let cpl =
-      if ip2 = get_father fam then (
+      if ip2 = Gwdb.get_father fam then (
         Array.iter
           (fun ip ->
-            let w = poi base ip in
-            if not (List.mem p.key_index (get_related w)) then
-              let w = gen_person_of_person w in
+            let w = Gwdb.poi base ip in
+            if not (List.mem p.Def.key_index (Gwdb.get_related w)) then
+              let w = Gwdb.gen_person_of_person w in
               let w = { w with related = p.key_index :: w.related } in
-              patch_person base ip w)
-          (get_witnesses fam);
+              Gwdb.patch_person base ip w)
+          (Gwdb.get_witnesses fam);
         List.iter
           (fun evt ->
             Array.iter
               (fun (ip, _, _) ->
-                let w = poi base ip in
-                if not (List.mem p.key_index (get_related w)) then
-                  let w = gen_person_of_person w in
+                let w = Gwdb.poi base ip in
+                if not (List.mem p.key_index (Gwdb.get_related w)) then
+                  let w = Gwdb.gen_person_of_person w in
                   let w = { w with related = p.key_index :: w.related } in
-                  patch_person base ip w)
-              evt.efam_witnesses)
-          (List.map gen_fevent_of_fam_event (get_fevents fam));
-        Gutil.couple false p.key_index (get_mother fam))
-      else if ip2 = get_mother fam then
-        Gutil.couple false (get_father fam) p.key_index
+                  Gwdb.patch_person base ip w)
+              evt.Def.efam_witnesses)
+          (List.map Gwdb.gen_fevent_of_fam_event (Gwdb.get_fevents fam));
+        Gutil.couple false p.key_index (Gwdb.get_mother fam))
+      else if ip2 = Gwdb.get_mother fam then
+        Gutil.couple false (Gwdb.get_father fam) p.key_index
       else assert false
     in
-    patch_couple base ifam cpl
+    Gwdb.patch_couple base ifam cpl
   done
 
 let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let conf = Update.update_conf o_conf in
-  let p_family = get_family (poi base sp.key_index) in
-  let p2_family = get_family (poi base o_p2.key_index) in
+  let p_family = Gwdb.get_family (Gwdb.poi base sp.Def.key_index) in
+  let p2_family = Gwdb.get_family (Gwdb.poi base o_p2.Def.key_index) in
   let warning _ = () in
   MergeInd.reparent_ind base warning sp.key_index o_p2.key_index;
   let p =
@@ -459,17 +478,19 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   in
   redirect_added_families base p o_p2.key_index p2_family;
   UpdateIndOk.effective_del_no_commit base o_p2;
-  patch_person base p.key_index p;
+  Gwdb.patch_person base p.key_index p;
   let family = Array.append p_family p2_family in
   Update_util.sort_families_array_by_date base family;
-  let u = { family } in
-  if p2_family <> [||] then patch_union base p.key_index u;
+  let u = { Def.family } in
+  if p2_family <> [||] then Gwdb.patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
     (Update.def_error conf base)
     [ p.key_index ];
   let wl =
-    let a = poi base p.key_index in
-    let a = { parents = get_parents a; consang = get_consang a } in
+    let a = Gwdb.poi base p.key_index in
+    let a =
+      { Def.parents = Gwdb.get_parents a; consang = Gwdb.get_consang a }
+    in
     UpdateIndOk.all_checks_person base p a u
   in
   Util.commit_patches conf base;

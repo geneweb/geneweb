@@ -1,74 +1,73 @@
-open Def
-open Gwdb
-
 type stats = {
   mutable men : int;
   mutable women : int;
   mutable neutre : int;
   mutable noname : int;
-  mutable oldest_father : int * person;
-  mutable oldest_mother : int * person;
-  mutable youngest_father : int * person;
-  mutable youngest_mother : int * person;
-  mutable oldest_dead : int * person;
-  mutable oldest_still_alive : int * person;
+  mutable oldest_father : int * Gwdb.person;
+  mutable oldest_mother : int * Gwdb.person;
+  mutable youngest_father : int * Gwdb.person;
+  mutable youngest_mother : int * Gwdb.person;
+  mutable oldest_dead : int * Gwdb.person;
+  mutable oldest_still_alive : int * Gwdb.person;
 }
 
 let birth_year p =
-  match Date.cdate_to_dmy_opt (get_birth p) with
+  match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
   | Some { year; prec = Sure } -> Some year
   | Some _ | None -> None
 
 let death_year current_year p =
-  match get_death p with
-  | Death (_, d) -> (
+  match Gwdb.get_death p with
+  | Def.Death (_, d) -> (
       match Date.cdate_to_dmy_opt d with
       | Some { year = y; prec = Sure } -> Some y
       | _ -> None)
-  | NotDead -> Some current_year
+  | Def.NotDead -> Some current_year
   | _ -> None
 
 let update_stats base current_year s p =
-  (match get_sex p with
-  | Male -> s.men <- s.men + 1
-  | Female -> s.women <- s.women + 1
-  | Neuter -> s.neutre <- s.neutre + 1);
-  if is_quest_string (get_first_name p) && is_quest_string (get_surname p) then
-    s.noname <- s.noname + 1;
+  (match Gwdb.get_sex p with
+  | Def.Male -> s.men <- s.men + 1
+  | Def.Female -> s.women <- s.women + 1
+  | Def.Neuter -> s.neutre <- s.neutre + 1);
+  if
+    Gwdb.is_quest_string (Gwdb.get_first_name p)
+    && Gwdb.is_quest_string (Gwdb.get_surname p)
+  then s.noname <- s.noname + 1;
   (match (birth_year p, death_year current_year p) with
   | Some y1, Some y2 ->
       let age = y2 - y1 in
-      if age > fst s.oldest_dead && get_death p <> NotDead then
+      if age > fst s.oldest_dead && Gwdb.get_death p <> Def.NotDead then
         s.oldest_dead <- (age, p);
-      if age > fst s.oldest_still_alive && get_death p = NotDead then
+      if age > fst s.oldest_still_alive && Gwdb.get_death p = Def.NotDead then
         s.oldest_still_alive <- (age, p)
   | _ -> ());
-  match (birth_year p, get_parents p) with
+  match (birth_year p, Gwdb.get_parents p) with
   | Some y2, Some ifam -> (
-      let cpl = foi base ifam in
-      (match birth_year (poi base (get_father cpl)) with
+      let cpl = Gwdb.foi base ifam in
+      (match birth_year (Gwdb.poi base (Gwdb.get_father cpl)) with
       | Some y1 ->
           let age = y2 - y1 in
           if age > fst s.oldest_father then
-            s.oldest_father <- (age, poi base (get_father cpl));
+            s.oldest_father <- (age, Gwdb.poi base (Gwdb.get_father cpl));
           if age < fst s.youngest_father then
-            s.youngest_father <- (age, poi base (get_father cpl))
+            s.youngest_father <- (age, Gwdb.poi base (Gwdb.get_father cpl))
       | _ -> ());
-      match birth_year (poi base (get_mother cpl)) with
+      match birth_year (Gwdb.poi base (Gwdb.get_mother cpl)) with
       | Some y1 ->
           let age = y2 - y1 in
           if age > fst s.oldest_mother then
-            s.oldest_mother <- (age, poi base (get_mother cpl));
+            s.oldest_mother <- (age, Gwdb.poi base (Gwdb.get_mother cpl));
           if age < fst s.youngest_mother then
-            s.youngest_mother <- (age, poi base (get_mother cpl))
+            s.youngest_mother <- (age, Gwdb.poi base (Gwdb.get_mother cpl))
       | _ -> ())
   | _ -> ()
 
-let stat_base : base -> stats =
+let stat_base : Gwdb.base -> stats =
  fun base ->
   let s =
-    let y = (1000, poi base Gwdb.dummy_iper) in
-    let o = (0, poi base Gwdb.dummy_iper) in
+    let y = (1000, Gwdb.poi base Gwdb.dummy_iper) in
+    let o = (0, Gwdb.poi base Gwdb.dummy_iper) in
     {
       men = 0;
       women = 0;
@@ -90,7 +89,7 @@ let stat_base : base -> stats =
     (Gwdb.persons base);
   s
 
-let print_stats : base -> stats -> unit =
+let print_stats : Gwdb.base -> stats -> unit =
  fun base s ->
   Printf.printf "\n";
   Printf.printf "%d men\n" s.men;

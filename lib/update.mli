@@ -1,21 +1,17 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-
 type update_error =
   | UERR of Adef.safe_string
-  | UERR_sex_married of person
-  | UERR_sex_incoherent of base * person
+  | UERR_sex_married of Gwdb.person
+  | UERR_sex_incoherent of Gwdb.base * Gwdb.person
   | UERR_sex_undefined of string * string * int
   | UERR_unknow_person of string * string * int
-  | UERR_already_defined of base * person * string
-  | UERR_own_ancestor of base * person
+  | UERR_already_defined of Gwdb.base * Gwdb.person * string
+  | UERR_own_ancestor of Gwdb.base * Gwdb.person
   | UERR_digest
   | UERR_bad_date of Date.dmy
   | UERR_missing_field of Adef.safe_string
-  | UERR_already_has_parents of base * person
+  | UERR_already_has_parents of Gwdb.base * Gwdb.person
   | UERR_missing_surname of Adef.safe_string
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
@@ -26,43 +22,50 @@ exception ModErr of update_error
 type create_info = {
   ci_birth_date : Date.date option;
   ci_birth_place : string;
-  ci_death : death;
+  ci_death : Def.death;
   ci_death_date : Date.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
 }
 
-type create = Create of sex * create_info option | Link
+type create = Create of Def.sex * create_info option | Link
 type key = string * string * int * create * string
 
-val infer_death : config -> base -> person -> death
-val infer_death_bb : config -> Date.date option -> Date.date option -> death
+val infer_death : Config.config -> Gwdb.base -> Gwdb.person -> Def.death
 
-val infer_death_from_parents : config -> base -> family -> death
+val infer_death_bb :
+  Config.config -> Date.date option -> Date.date option -> Def.death
+
+val infer_death_from_parents :
+  Config.config -> Gwdb.base -> Gwdb.family -> Def.death
 (** [infer_death_from_parents conf base fam] infer death status for a new children in this family *)
 
-val print_same_name : config -> base -> person -> unit
-val print_person_parents_and_spouse : config -> base -> person -> unit
+val print_same_name : Config.config -> Gwdb.base -> Gwdb.person -> unit
+
+val print_person_parents_and_spouse :
+  Config.config -> Gwdb.base -> Gwdb.person -> unit
 
 val insert_person :
-  config ->
-  base ->
+  Config.config ->
+  Gwdb.base ->
   string ->
-  (iper, iper, istr) gen_person list ref ->
+  (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person list ref ->
   key ->
-  iper
+  Gwdb.iper
 
-val delete_topological_sort_v : config -> base -> unit
-val delete_topological_sort : config -> base -> unit
-val update_related_pointers : base -> iper -> iper list -> iper list -> unit
+val delete_topological_sort_v : Config.config -> Gwdb.base -> unit
+val delete_topological_sort : Config.config -> Gwdb.base -> unit
 
-val print_return : config -> unit
+val update_related_pointers :
+  Gwdb.base -> Gwdb.iper -> Gwdb.iper list -> Gwdb.iper list -> unit
+
+val print_return : Config.config -> unit
 (** Helper function printing a hidden form containing current env,
     with a submit button "return", plus a hidden field [return=on].  *)
 
 val print_continue :
-  config ->
+  Config.config ->
   ?continue:Adef.encoded_string ->
   string ->
   Adef.encoded_string ->
@@ -73,52 +76,61 @@ val print_continue :
     Optionnal [continue] parameter is the label used for the submit button.
 *)
 
-val prerr : config -> update_error -> (unit -> unit) -> 'a
+val prerr : Config.config -> update_error -> (unit -> unit) -> 'a
 (** [prerr conf err callback]
     Regular mode: print error page using [callback] (wrapped in header/trailer)
     and and raise [ModErr err]
     API mode: only raise [ModErr err]
 *)
 
-val string_of_error : config -> update_error -> Adef.safe_string
-val print_error : config -> update_error -> unit
-val print_warnings : config -> base -> Warning.base_warning list -> unit
-val print_miscs : config -> base -> Warning.base_misc list -> unit
+val string_of_error : Config.config -> update_error -> Adef.safe_string
+val print_error : Config.config -> update_error -> unit
+
+val print_warnings :
+  Config.config -> Gwdb.base -> Warning.base_warning list -> unit
+
+val print_miscs : Config.config -> Gwdb.base -> Warning.base_misc list -> unit
 
 val print_warnings_and_miscs :
-  config -> base -> Warning.base_warning list -> Warning.base_misc list -> unit
+  Config.config ->
+  Gwdb.base ->
+  Warning.base_warning list ->
+  Warning.base_misc list ->
+  unit
 
-val def_error : config -> base -> person Def.error -> unit
-val error : config -> update_error -> 'exn
-val error_locked : config -> 'exn
-val error_digest : config -> 'exn
-val digest_person : (iper, key, string) gen_person -> Digest.t
+val def_error : Config.config -> Gwdb.base -> Gwdb.person Def.error -> unit
+val error : Config.config -> update_error -> 'exn
+val error_locked : Config.config -> 'exn
+val error_digest : Config.config -> 'exn
+val digest_person : (Gwdb.iper, key, string) Def.gen_person -> Digest.t
 
 val digest_family :
-  (key, _, string) gen_family * key gen_couple * key gen_descend -> Digest.t
+  (key, _, string) Def.gen_family * key Def.gen_couple * key Def.gen_descend ->
+  Digest.t
 
-val reconstitute_date : config -> string -> Date.date option
-val print_someone : config -> base -> person -> unit
-val update_conf : config -> config
-val bad_date : config -> Date.dmy -> 'a
-val check_greg_day : config -> Date.dmy -> unit
+val reconstitute_date : Config.config -> string -> Date.date option
+val print_someone : Config.config -> Gwdb.base -> Gwdb.person -> unit
+val update_conf : Config.config -> Config.config
+val bad_date : Config.config -> Date.dmy -> 'a
+val check_greg_day : Config.config -> Date.dmy -> unit
 
 val check_missing_witnesses_names :
-  config ->
+  Config.config ->
   ('a -> ((string * string * 'b * 'c * 'd) * 'e * string) array) ->
   'a list ->
   update_error option
 
 val check_missing_name :
-  base -> (Gwdb.iper, 'b, string) Def.gen_person -> update_error option
+  Gwdb.base -> (Gwdb.iper, 'b, string) Def.gen_person -> update_error option
 
 val is_illegal_access_update :
   previous_access:Def.access -> new_access:Def.access -> bool
 
 val check_illegal_access_update :
-  base -> (Gwdb.iper, 'a, 'b) Def.gen_person -> update_error option
+  Gwdb.base -> (Gwdb.iper, 'a, 'b) Def.gen_person -> update_error option
 
-val print_create_conflict : config -> base -> person -> string -> 'exn
+val print_create_conflict :
+  Config.config -> Gwdb.base -> Gwdb.person -> string -> 'exn
 (** [print_create_conflict conf base p var]
     Print a message because a personne with same key already exists,
     and display a form with two options:
@@ -129,5 +141,9 @@ val print_create_conflict : config -> base -> person -> string -> 'exn
  *)
 
 val print_order_changed :
-  config -> ('a array -> bool array -> unit) -> 'a array -> 'a array -> unit
+  Config.config ->
+  ('a array -> bool array -> unit) ->
+  'a array ->
+  'a array ->
+  unit
 (** [print_order_changed conf print_list before after] *)
