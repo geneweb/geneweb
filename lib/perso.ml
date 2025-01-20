@@ -3876,12 +3876,13 @@ let print_foreach conf base print_ast eval_expr =
     loop 0
   in
   let print_foreach_event env al ((p, _) as ep) =
+    let events = Event.sorted_events conf base p in
     Ext_list.iter_first
       (fun first evt ->
         let env = ("event", Vevent (p, evt)) :: env in
         let env = ("first", Vbool first) :: env in
         List.iter (print_ast env ep) al)
-      (Event.sorted_events conf base p)
+      events
   in
   let print_foreach_epers_event_witness env al ((p, _) as ep) epers_event =
     let epers_event_witness_string =
@@ -3893,6 +3894,7 @@ let print_foreach conf base print_ast eval_expr =
       | Def.Epers_Birth -> "birth_witness"
       | _ -> "" (* TODO: ? *)
     in
+    let events = Event.sorted_events conf base p in
     List.iter
       (fun event_item ->
         if Event.get_name event_item = Event.Pevent epers_event then
@@ -3907,7 +3909,7 @@ let print_foreach conf base print_ast eval_expr =
               List.iter (print_ast env ep) al)
             (Event.get_witnesses event_item)
         else ())
-      (Event.sorted_events conf base p)
+      events
   in
   let print_foreach_event_witness env al ((_, p_auth) as ep) =
     if p_auth then
