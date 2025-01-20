@@ -1812,6 +1812,7 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       match get_env "surname_alias" env with
       | Vstring s -> s |> Util.safe_html |> safe_val
       | _ -> raise Not_found)
+  | "event_count" as id -> string_of_int_env id env
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then Util.escape_html v |> safe_val else raise Not_found
@@ -3640,6 +3641,8 @@ let eval_transl conf base env upp s c =
       if upp then Utf8.capitalize_fst r else r
   | _ -> Templ.eval_transl conf upp s c
 
+let event_count events = ("event_count", Vint (List.length events))
+
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
     let s = eval_expr env ep e in
@@ -3877,6 +3880,7 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_foreach_event env al ((p, _) as ep) =
     let events = Event.sorted_events conf base p in
+    let env = event_count events :: env in
     Ext_list.iter_first
       (fun first evt ->
         let env = ("event", Vevent (p, evt)) :: env in
@@ -3895,6 +3899,7 @@ let print_foreach conf base print_ast eval_expr =
       | _ -> "" (* TODO: ? *)
     in
     let events = Event.sorted_events conf base p in
+    let env = event_count events :: env in
     List.iter
       (fun event_item ->
         if Event.get_name event_item = Event.Pevent epers_event then
@@ -3939,6 +3944,7 @@ let print_foreach conf base print_ast eval_expr =
     (* This is the category "Presence at event" *)
     if p_auth then
       let events_witnesses = Relation.get_event_witnessed conf base p in
+      let env = event_count events_witnesses :: env in
       List.iter
         (fun (related_person, wk, wnote, evt) ->
           let wk = Util.string_of_witness_kind conf (Gwdb.get_sex p) wk in
