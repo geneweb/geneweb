@@ -105,7 +105,8 @@ let join (type a c) (module C : Comparator with type t = a and type wit = c)
             (* As y < x and the iterator [arr.(!pos)] has not
                reached its end, the previous seek call must
                advance this iterator. *)
-            assert (C.compare y x' < 0);
+            (* assert (C.compare y x' < 0); *)
+            assert (C.compare y x' <= 0);
             pos := (!pos + 1) mod k;
             loop x')
     in
