@@ -36,8 +36,9 @@ val decl : string -> ('a, 'r) Desc.t -> 'a -> ('a, 'r) meth
 type t
 (** Type of a service. A service is just a heterogeneous set of methods. *)
 
-type binding = private Binding : ('a, 'r) Desc.t * 'a -> binding
-(** Internal binding used to store the methods. *)
+type binding = private
+  | Binding : ('a, 'r) Desc.t * 'a -> binding
+      (** Internal binding used to store the methods. *)
 
 val empty : t
 (** An empty service. *)

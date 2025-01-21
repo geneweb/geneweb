@@ -1,5 +1,6 @@
 module type S = sig
   type char_
+
   val compare_char : char_ -> char_ -> int
 
   type t
@@ -16,6 +17,7 @@ end
 
 module Default : S with type char_ = char and type t = string = struct
   type char_ = char
+
   let compare_char = Char.compare
 
   type t = string

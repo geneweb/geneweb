@@ -4,7 +4,6 @@ module MS = Map.Make (String)
 open Lwt.Infix
 
 type error = [ Encoding.error | `Bad_arity ]
-
 type 'a res = ('a, error) Lwt_result.t
 
 let pp_error ppf = function

@@ -53,8 +53,7 @@ let pp_duration ppf f =
     let ms, sec = Float.modf sec in
     if sec > 0. then
       Fmt.pf ppf "%ds%dms" (Int.of_float sec) (Int.of_float (1_000. *. ms))
-    else
-      Fmt.pf ppf "%dms" (Int.of_float (1_000. *. ms))
+    else Fmt.pf ppf "%dms" (Int.of_float (1_000. *. ms))
 
 open Lwt.Infix
 
