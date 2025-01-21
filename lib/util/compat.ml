@@ -50,15 +50,11 @@ module Seq = struct
      immediately, without allocating any memory. *)
 
   let rec take_aux n xs =
-    if n = 0 then
-      empty
-    else
-      fun () ->
-        match xs() with
-        | Nil ->
-            Nil
-        | Cons (x, xs) ->
-            Cons (x, take_aux (n-1) xs)
+    if n = 0 then empty
+    else fun () ->
+      match xs () with
+      | Nil -> Nil
+      | Cons (x, xs) -> Cons (x, take_aux (n - 1) xs)
 
   let take n xs =
     if n < 0 then invalid_arg "Seq.take";
