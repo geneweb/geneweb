@@ -73,4 +73,13 @@ module Seq : sig
       @raise Invalid_argument if [n] is negative.
 
       @since 4.14 *)
+
+  val concat : 'a Seq.t Seq.t -> 'a Seq.t
+  (** If [xss] is a sequence of sequences,
+      then [concat xss] is its concatenation.
+
+      If [xss] is the sequence [xs0; xs1; ...] then
+      [concat xss] is the sequence [xs0 @ xs1 @ ...].
+
+      @since 4.13 *)
 end
