@@ -90,26 +90,42 @@ module Make (W : Word.S) (E : Entry) = struct
         Seq.map HE.to_entry @@ Iterator.to_seq
         @@ Iterator.join (module Flatset.Comparator) l
 
+  let ( let* ) = Option.bind
+
+  let rec try_fold f acc l =
+    match l with
+    | [] -> Some acc
+    | x :: xs ->
+        let* acc = f acc x in
+        try_fold f acc xs
+
   let search ws t =
     let rec loop w =
+      (* Produce the iterator of entries associated with the key [w] in
+         the index [t]. Returns [None] if there is no entries associated
+         with [w]. *)
       let len = W.length w in
       fun i t ->
         if i = len then
-          match Trie.data t with
-          | Some s -> Flatset.iterator s
-          | None -> Flatset.(iterator @@ of_seq @@ List.to_seq [])
+          let* s = Trie.data t in
+          Some (Flatset.iterator s)
         else
           match Trie.step (W.get w i) t with
-          | exception Not_found ->
-              Flatset.(iterator @@ of_seq @@ List.to_seq [])
+          | exception Not_found -> None
           | t -> loop w (i + 1) t
     in
-    List.fold_left (fun acc w -> loop w 0 t :: acc) [] ws |> intersection
+    try_fold
+      (fun acc w ->
+        let* u = loop w 0 t in
+        Some (u :: acc))
+      [] ws
+    |> Option.value ~default:[]
+    |> intersection
 
   let search_prefix ps t =
-    (* Accumulate in [acc] all the iterators of flatsets in [t] whose the
-       key starts by [pfx]. *)
     let rec loop acc pfx =
+      (* Accumulate in [acc] all the iterators of flatsets in [t] whose the
+         key starts by [pfx]. *)
       let len = W.length pfx in
       fun i t ->
         if i = len then
@@ -119,10 +135,13 @@ module Make (W : Word.S) (E : Entry) = struct
           | exception Not_found -> acc
           | t -> loop acc pfx (i + 1) t
     in
-    List.fold_left
+    try_fold
       (fun acc pfx ->
-        Iterator.union (module Flatset.Comparator) (loop [] pfx 0 t) :: acc)
+        match loop [] pfx 0 t with
+        | [] -> None
+        | l -> Some ((Iterator.union (module Flatset.Comparator) l) :: acc))
       [] ps
+    |> Option.value ~default:[]
     |> intersection
 
   type automaton =
@@ -151,9 +170,9 @@ module Make (W : Word.S) (E : Entry) = struct
           A ((module A), A.init))
         ps
     in
-    (* Accumulate in [acc] all the iterators of flatsets in [t] whose the
-       key matches the pattern represented by the automaton A. *)
     let rec loop acc (A ((module A), st)) t =
+      (* Accumulate in [acc] all the iterators of flatsets in [t] whose the
+         key matches the pattern represented by the automaton A. *)
       if A.accept st then
         Trie.fold (fun _ se acc -> Flatset.iterator se :: acc) t acc
       else if A.can_match st then
@@ -162,10 +181,13 @@ module Make (W : Word.S) (E : Entry) = struct
           t acc
       else acc
     in
-    List.fold_left
+    try_fold
       (fun acc atm ->
-        Iterator.union (module Flatset.Comparator) (loop [] atm t) :: acc)
+        match loop [] atm t with
+        | [] -> None
+        | l -> Some ((Iterator.union (module Flatset.Comparator) l) :: acc))
       [] atms
+    |> Option.value ~default:[]
     |> intersection
 end
 

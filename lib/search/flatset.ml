@@ -20,7 +20,24 @@ module type OrderedType = sig
   val pp : t Fmt.t
 end
 
+module DisablePolymorphicComparison = struct
+  [@@@ocaml.warning "-32-33"]
+
+  let ( <> ) (a : int) (b : int) = a <> b
+  let ( = ) (a : int) (b : int) = a = b
+  let ( < ) (a : int) (b : int) = a < b
+  let ( > ) (a : int) (b : int) = a > b
+  let ( <= ) (a : int) (b : int) = a <= b
+  let ( >= ) (a : int) (b : int) = a >= b
+  let compare = Int.compare
+end
+
 module Make (O : OrderedType) = struct
+  (* WARNING: Confusing [O.compare] with polymorphic comparison can lead to
+     subtle and hard-to-debug issues. To prevent this, we completely shadow the
+     polymorphic comparison from the Stdlib in this module. *)
+  open DisablePolymorphicComparison
+
   type elt = O.t
   type t = O.t array
   type cmp
@@ -65,8 +82,9 @@ module Make (O : OrderedType) = struct
      starting from index [lo]. Returns the index of [e] if found, or the index
      where it could be inserted to maintain ascending order. *)
   let exponential_search e t lo =
-    if O.compare t.(lo) e = 0 then `Found lo
-    else if t.(lo) > e then `Gap lo
+    let c = O.compare t.(lo) e in
+    if c = 0 then `Found lo
+    else if c > 0 then `Gap lo
     else
       let len = cardinal t in
       let rec loop i =
@@ -87,9 +105,10 @@ module Make (O : OrderedType) = struct
     let curr () = if !idx < cardinal t then t.(!idx) else raise Iterator.End in
     let next () = if !idx < cardinal t then incr idx in
     let seek e =
-      if !idx < cardinal t then
+      if !idx < cardinal t then (
         let (`Gap i | `Found i) = exponential_search e t !idx in
-        idx := i
+        assert (i >= cardinal t || O.compare t.(i) e >= 0);
+        idx := i)
     in
     Iterator.make (module Comparator) ~curr ~next ~seek
 end
