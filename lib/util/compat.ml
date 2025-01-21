@@ -42,3 +42,27 @@ module Out_channel = struct
   let with_open_gen flags perm s f =
     with_open (Stdlib.open_out_gen flags perm) s f
 end
+
+module Seq = struct
+  open Seq
+
+  (* [take] is defined in such a way that [take 0 xs] returns [empty]
+     immediately, without allocating any memory. *)
+
+  let rec take_aux n xs =
+    if n = 0 then
+      empty
+    else
+      fun () ->
+        match xs() with
+        | Nil ->
+            Nil
+        | Cons (x, xs) ->
+            Cons (x, take_aux (n-1) xs)
+
+  let take n xs =
+    if n < 0 then invalid_arg "Seq.take";
+    take_aux n xs
+
+  include Seq
+end
