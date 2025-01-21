@@ -59,6 +59,24 @@
                 %if;(browsing_with_sosa_ref)
                   <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
+                
+                
+                <div class="ml-5">
+                  <input title="[*all-hlp]"
+                      type="checkbox" name="all" id="all" value="on">
+                  <label title="[*all-hlp]" for="all"
+                      class="col-form-label col-sm-2">[*all]</label>
+                  <input title="[*order-hlp]"
+                      type="checkbox" name="order" id="order" value="on">
+                  <label title="[*order-hlp]" for="order"
+                      class="col-form-label col-sm-2">[*order]</label>
+                  <input title="[*exact-hlp]"
+                      type="checkbox" name="exact" id="exact" value="on">
+                  <label title="[*exact-hlp]" for="exact"
+                      class="col-form-label col-sm-2">[*exact]</label>
+                </div>
+                
+                
                 <label class="sr-only" for="n">Search public name</label>
                 <input type="search" id="n" class="form-control form-control-lg no-clear-button" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
                   autofocus>

@@ -15887,11 +15887,33 @@ pt: selamento ao cônjuge LDS
 sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
 
+    path to me
+en: path to me
+fr: chemin vers moi
+
+    path to me hlp
+en: shortest path between me and this person
+fr: chemin le plus court entre moi et cette personne
+
+    reset related cache
+en: reset "related" cache
+fr: reset le cache "related"
+
+    reset related cache hlp
+en: reset the cache extending SemiPublic visibility to family
+fr: reset le cache étendant la visibilité SemiPublic à la famille
+
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
 de: suche %s auf Geneanet
 en: search %s on Geneanet
 fr: rechercher %s sur Geneanet
+
+    search %s on INSEE
+co: ricercà %s nant’à INSEE
+de: suche %s auf INSEE
+en: search %s on INSEE
+fr: rechercher %s sur INSEE
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
@@ -15922,6 +15944,22 @@ sk: hľadať/citlivý na veľkosť písma
 sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
+
+    exact-hlp
+en: exact match (word level)
+fr: comparaison exacte mot par mot
+
+    order
+en: order
+fr: ordre
+
+    order-hlp
+en: test firstnames in the same order
+fr: tester les prénoms dans le même ordre
+  
+    all-hlp
+en: all firstnames must be present
+fr: tous les prénoms doivent être présents
 
     search_exact_fn
 co: ricerca esatta
