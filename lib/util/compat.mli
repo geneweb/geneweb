@@ -60,3 +60,17 @@ module Out_channel : sig
 
       @since 4.14 *)
 end
+
+module Seq : sig
+  val take : int -> 'a Seq.t -> 'a Seq.t
+  (** [take n xs] is the sequence of the first [n] elements of [xs].
+
+      If [xs] has fewer than [n] elements,
+      then [take n xs] is equivalent to [xs].
+
+      [n] must be nonnegative.
+
+      @raise Invalid_argument if [n] is negative.
+
+      @since 4.14 *)
+end

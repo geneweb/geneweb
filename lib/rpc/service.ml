@@ -94,7 +94,9 @@ module Search = struct
                 3. Entries that match prefixes of all the [words] up to
                    Levenshtein distance of 1. *)
             let r =
-              List.of_seq @@ Seq.take 10 @@ Seq.concat
+              List.of_seq
+              @@ Compat.Seq.take 10
+              @@ Seq.concat
               @@ List.to_seq
                    [
                      Index.search words i;
