@@ -22,7 +22,7 @@ module type S = sig
   (** [search_prefix ps t] returns the sequence of entries in the index [t]
       which are associated with all the prefix [ps]. *)
 
-  val fuzzy_search: max_dist:int -> word list -> t -> entry Seq.t
+  val fuzzy_search : max_dist:int -> word list -> t -> entry Seq.t
   (** [fuzzy_search ~max_dist ps t] returns the sequence of entries in the
       index [t] which are associated with all the words matching each pattern
       of [ps] with a Levenstein distance limited to [max_dist]. *)

@@ -145,7 +145,6 @@ module Make (W : Word.S) = struct
     loop [ ([], t) ] acc
 
   let fold_subtries f { subtries; _ } acc = M.fold f subtries acc
-
   let iter f t = fold (fun w v () -> f w v) t ()
 
   let pp pp_val =

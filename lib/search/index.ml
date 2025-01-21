@@ -119,8 +119,7 @@ module Make (W : Word.S) (E : Entry) = struct
         let* u = loop w 0 t in
         Some (u :: acc))
       [] ws
-    |> Option.value ~default:[]
-    |> intersection
+    |> Option.value ~default:[] |> intersection
 
   let search_prefix ps t =
     let rec loop acc pfx =
@@ -139,10 +138,9 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc pfx ->
         match loop [] pfx 0 t with
         | [] -> None
-        | l -> Some ((Iterator.union (module Flatset.Comparator) l) :: acc))
+        | l -> Some (Iterator.union (module Flatset.Comparator) l :: acc))
       [] ps
-    |> Option.value ~default:[]
-    |> intersection
+    |> Option.value ~default:[] |> intersection
 
   type automaton =
     | A :
@@ -185,10 +183,9 @@ module Make (W : Word.S) (E : Entry) = struct
       (fun acc atm ->
         match loop [] atm t with
         | [] -> None
-        | l -> Some ((Iterator.union (module Flatset.Comparator) l) :: acc))
+        | l -> Some (Iterator.union (module Flatset.Comparator) l :: acc))
       [] atms
-    |> Option.value ~default:[]
-    |> intersection
+    |> Option.value ~default:[] |> intersection
 end
 
 module Default =
