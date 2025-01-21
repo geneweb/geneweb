@@ -344,6 +344,10 @@ let delete_couple base ifam =
 
 let persons_of_first_name _base = assert false
 let persons_of_surname _base = assert false
+let persons_stream_of_surname_prefix _ _ = assert false
+let persons_stream_of_first_name_prefix _ _ = assert false
+let persons_of_lower_surname _ = assert false
+let persons_of_lower_first_name _ = assert false
 let spi_first _spi _str = assert false
 let spi_next _spi _istr = assert false
 let spi_find _spi _istr = assert false
