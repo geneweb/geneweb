@@ -97,6 +97,7 @@ module Search = struct
               List.of_seq
               @@ Compat.Seq.take 10
               @@ Seq.concat
+              (* BUG: We can introduce duplicate in the output here. *)
               @@ List.to_seq
                    [
                      Index.search words i;
