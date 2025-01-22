@@ -877,7 +877,7 @@ type spi_stream = {
 
 let spi_stream_of_spi spi = { spi; st = `First }
 
-let ipers_of_prefix base_data spi prefix =
+let ipers_of_prefix ~split_prefix base_data spi prefix =
   let istr_o =
     try
       match spi.st with
@@ -892,22 +892,29 @@ let ipers_of_prefix base_data spi prefix =
   Option.bind istr_o (fun istr ->
       spi.st <- `Current istr;
       let s = base_data.strings.get istr in
-      if Ext_string.start_with prefix 0 s then Some (spi.spi.find istr)
+      if
+        List.for_all
+          (fun prefix -> Ext_string.start_with prefix 0 s)
+          (split_prefix prefix)
+      then Some (spi.spi.find istr)
       else None)
 
-let prefix_exists base_data spi prefix =
+let prefix_exists ~split_prefix base_data spi prefix =
   try
     let istr = spi.spi.cursor prefix in
     let s = base_data.strings.get istr in
-    Ext_string.start_with prefix 0 s
+    List.for_all
+      (fun prefix -> Ext_string.start_with prefix 0 s)
+      (split_prefix prefix)
   with Not_found -> false
 
-let ipers_list_stream_of_prefix base_data spi prefix =
-  if not (prefix_exists base_data spi prefix) then Stream.from (fun _ -> None)
-  else Stream.from (fun _ -> ipers_of_prefix base_data spi prefix)
+let ipers_list_stream_of_prefix ~split_prefix base_data spi prefix =
+  if not (prefix_exists ~split_prefix base_data spi prefix) then
+    Stream.from (fun _ -> None)
+  else Stream.from (fun _ -> ipers_of_prefix ~split_prefix base_data spi prefix)
 
 let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
-    ~dat_fname ~proj ~base_data ~version ~patches prefix =
+    ~dat_fname ~proj ~base_data ~version ~patches ~split_prefix prefix =
   let prefix, spi =
     (* check if lowered names indexes files exist *)
     if
@@ -931,18 +938,22 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
       in
       (prefix, spi)
   in
-  ipers_list_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
+  ipers_list_stream_of_prefix ~split_prefix base_data (spi_stream_of_spi spi)
+    prefix
 
 let persons_stream_of_first_name_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
     ~dat_lower_fname:"fnames_lower.dat" ~inx_fname:"fnames.inx"
-    ~dat_fname:"fnames.dat" ~proj:(fun p ->
-      p.first_name :: p.first_names_aliases)
+    ~dat_fname:"fnames.dat"
+    ~proj:(fun p -> p.first_name :: p.first_names_aliases)
+    ~split_prefix:Name.split_fname
 
 let persons_stream_of_surname_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"snames_lower.inx"
     ~dat_lower_fname:"snames_lower.dat" ~inx_fname:"snames.inx"
-    ~dat_fname:"snames.dat" ~proj:(fun p -> p.surname :: p.surnames_aliases)
+    ~dat_fname:"snames.dat"
+    ~proj:(fun p -> p.surname :: p.surnames_aliases)
+    ~split_prefix:Name.split_sname
 
 let opendb bname =
   let bname =
