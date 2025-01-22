@@ -906,7 +906,7 @@ let ipers_list_stream_of_prefix base_data spi prefix =
   else Stream.from (fun _ -> ipers_of_prefix base_data spi prefix)
 
 let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
-    ~dat_fname ~proj ~base_data ~version ~patches ~gen_default_spi prefix =
+    ~dat_fname ~proj ~base_data ~version ~patches prefix =
   let prefix, spi =
     (* check if lowered names indexes files exist *)
     if
@@ -935,16 +935,13 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
 let persons_stream_of_first_name_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
     ~dat_lower_fname:"fnames_lower.dat" ~inx_fname:"fnames.inx"
-    ~dat_fname:"fnames.dat"
-    ~proj:(fun p -> p.first_name :: p.first_names_aliases)
-    ~gen_default_spi:persons_of_first_name
+    ~dat_fname:"fnames.dat" ~proj:(fun p ->
+      p.first_name :: p.first_names_aliases)
 
 let persons_stream_of_surname_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"snames_lower.inx"
     ~dat_lower_fname:"snames_lower.dat" ~inx_fname:"snames.inx"
-    ~dat_fname:"snames.dat"
-    ~proj:(fun p -> p.surname :: p.surnames_aliases)
-    ~gen_default_spi:persons_of_surname
+    ~dat_fname:"snames.dat" ~proj:(fun p -> p.surname :: p.surnames_aliases)
 
 let opendb bname =
   let bname =
