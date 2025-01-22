@@ -735,7 +735,7 @@ let advanced_search conf base max_answers =
       then
         let filter p =
           let r =
-            match_person ~skip_fname:false ~skip_sname:true ([], 0) p
+            match_person ~skip_fname:true ~skip_sname:false ([], 0) p
               search_type
           in
           r <> ([], 0)
