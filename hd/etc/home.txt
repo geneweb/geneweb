@@ -31,7 +31,7 @@
     </a>
     %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and e.m!="S" and e.m!="L" and e.m!="" and not ("_FAM" in e.m))1%end;%in;
     %if;(nb_persons.v!=0)
-      <a role="button" class="btn btn-sm btn-link p-0 border-0  fa-icon"
+      <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
         href="%if;(rng=1)%apply;url_set%with;i/p/n/oc%and;%random_index;%end;%else;%prefix;i=%random_index;%end;"
           title="[*random individual]%if;(rng=1) ([stay on the current tool])%end;"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*random individual]</span>%nn;
@@ -44,6 +44,14 @@
       <div class="btn btn-sm p-0 border-0 d-none" id="nb_errors">%nn;
         <i class="fa fa-bug fa-fw fa-xs p-0"></i>%nn;
       </div>
+    %end;
+    %if;(b.alt_serv_adr!="" or b.alt_serv_base!="" and not cgi)
+      <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
+        href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
+          %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
+        title="[*database]%if;(b.roglo="yes") Roglo%end; %if;wizard;[wizard/wizards/friend/friends/exterior]0%elseif;friend;[wizard/wizards/friend/friends/exterior]2%end;">
+       <i class="fa fa-arrow-right%if;wizard; text-success%end; fa-fw fa-xs p-0"></i></a>
+      </a>
     %end;
   </div>
   <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
@@ -59,29 +67,25 @@
                 %if;(browsing_with_sosa_ref)
                   <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
-                
-                
-                <div class="ml-5">
-                  <input title="[*all-hlp]"
-                      type="checkbox" name="all" id="all" value="on">
-                  <label title="[*all-hlp]" for="all"
-                      class="col-form-label col-sm-2">[*all]</label>
-                  <input title="[*order-hlp]"
-                      type="checkbox" name="order" id="order" value="on">
-                  <label title="[*order-hlp]" for="order"
-                      class="col-form-label col-sm-2">[*order]</label>
-                  <input title="[*exact-hlp]"
-                      type="checkbox" name="exact" id="exact" value="on">
-                  <label title="[*exact-hlp]" for="exact"
-                      class="col-form-label col-sm-2">[*exact]</label>
-                </div>
-                
-                
                 <label class="sr-only" for="n">Search public name</label>
                 <input type="search" id="n" class="form-control form-control-lg no-clear-button" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
                   autofocus>
                 <label class="sr-only" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2" name="p" placeholder="[*first name/first names]0">
+                <div class="d-flex align-items-center ml-2 flex-nowrap">
+                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*all-hlp]">
+                    <input class="form-check-input" type="checkbox" name="all" id="all" value="on">
+                    <label class="form-check-label" for="all">[*all]</label>
+                  </div>
+                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*order-hlp]">
+                    <input class="form-check-input" type="checkbox" name="order" id="order" value="on">
+                    <label class="form-check-label" for="order">[*order]</label>
+                  </div>
+                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*exact-hlp]">
+                    <input class="form-check-input" type="checkbox" name="exact" id="exact" value="on">
+                    <label class="form-check-label" for="exact">[*exact]</label>
+                  </div>
+                </div>
               </div>
               <button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> [*search/case sensitive]0</button>
             </div>

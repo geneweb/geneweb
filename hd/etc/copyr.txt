@@ -13,7 +13,7 @@
     %let;l1;%apply;language(i)%in;
     %if;(lang!=l1)
       <a class="dropdown-item%if;(l1=b.default_lang) bg-warning%end;" id="lang_%l1;"%sp;
-        href="%apply;set_lang(l1)" title="%if;(l1=b.default_lang)default %end;lang %l1;">%nn;
+        href="%apply;set_lang(l1)">%nn;
        <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1;%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
     %end;
@@ -26,12 +26,12 @@
   <div class="d-flex flex-column flex-sm-row ml-auto justify-content-center justify-content-lg-end m-2" id="copyr">
     <div class="d-flex align-self-center justify-content-center">
     %if;(e.templ="")
-      <div class="btn-group dropup">
+      <div class="btn-group dropup" data-toggle="tooltip" data-placement="left"
+        title="%apply;language_name(lang) – [*select lang]">
         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-          title="%if;(e.lang!="")%apply;capitalize%with;%apply;language_name(e.lang)%end;%end;">%nn;
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">%nn;
           <span class="sr-only">lang</span>%nn;
-          <span class="text-uppercase" title="[*select lang][:] %apply;language_name(lang)">%lang;</span>%nn;
+          <span class="text-uppercase">%lang;</span>%nn;
           <span class="sr-only">, [select lang]</span>%nn;
         </button>
         %if;(not is_printed_by_template)
@@ -107,20 +107,20 @@
       <div class="ml-auto">
         <a role="button" class="mr-1"
           %( button to switch only between default and templm templates %)
-          href="%if;(e.templ!="templm")%url_set.templ_file.templm;%end;"
+          href="%if;(e.templ!="templm")%url_set.templ_file.templm;%end;" data-toggle="tooltip"
           title="%if;(e.templ!="templm")templm%else;default template%end;">%nn;
           <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
           <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span></a>
-        <a href="https://github.com/%source;/tree/%commit_id;"
-           title="[*branch/branches]0 %branch; [compiled on] %compil_date; [from commit] %commit_id; (%commit_date)">GeneWeb v. %version;</a>
+        <a href="https://github.com/%source;/tree/%commit_id;" data-toggle="tooltip" data-html="true"
+           title="[*branch/branches]0 %branch; [compiled on] %compil_date;<br>[from commit] %commit_id; (%commit_date)">GeneWeb v. %version;</a>
       </div>
       <div class="btn-group">
         <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
         <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;" class="ml-1"
-          target="_blank" rel="noreferrer, noopener" title="Documentation GeneWeb">%nn;
+          target="_blank" rel="noreferrer, noopener" data-toggle="tooltip" title="GeneWeb Wiki">%nn;
           <i class="fab fa-wikipedia-w"></i></a>%nn;
         <a href="https://github.com/geneweb/geneweb" class="ml-1"
-          target="_blank" rel="noreferrer, noopener" title="GeneWeb on Github">%nn;
+          target="_blank" rel="noreferrer, noopener" data-toggle="tooltip" title="GeneWeb Github">%nn;
           <i class="fab fa-github"></i></a>
       </div>
     </div>

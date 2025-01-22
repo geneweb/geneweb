@@ -465,7 +465,6 @@ function initializeWelcomeSearchFunctionality() {
 
   $(searchBtn).tooltip({
     title: getTooltip,
-    placement: 'bottom',
     trigger: 'hover'
   });
 
@@ -714,6 +713,17 @@ function populateDatalists() {
 }
 %end;
 
+const initTooltips = () => {
+  const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
+  if (tooltipElements.length > 0) {
+    $(tooltipElements).tooltip({
+      trigger: 'hover',
+      delay: { show: 200, hide: 50 },
+      html: true
+    });
+  }
+};
+
 function safeInitialize(fn) {
   try {
     fn();
@@ -724,6 +734,7 @@ function safeInitialize(fn) {
 %( Initialize on DOM Content Loaded %)
 document.addEventListener('DOMContentLoaded', () => {
 %if;is_welcome;
+  initTooltips();
   initializeWelcomeSearchFunctionality();
   %if;wizard;
     inputToBook.addNavigation();
