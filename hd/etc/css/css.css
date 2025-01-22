@@ -274,10 +274,7 @@ a.book-arrow:hover {
 .modal-backdrop {
    background-color: #808080;
 }
-.tooltip-inner {
-    min-width: 100px;
-    max-width: 100%; 
-}
+
 #content:focus { outline: none; }
 
 /* Remove overused p anchor top margin*/
@@ -291,14 +288,17 @@ p {
 	line-height:1em;
 	}
 
-.tooltip.show {
-  opacity: 1;
+.tooltip-inner {
+   min-width: 100px;
+   max-width: 450px;
+   white-space: normal;
+   opacity: 1 !important;
+   padding: 6px 10px;
+   line-height: 1.2;u
 }
 
-.tooltip-inner {
-   white-space: nowrap;
-   max-width: 450px;
-   opacity: 1 !important;
+.tooltip.show {
+  opacity: 1;
 }
 
 /*! Small webfont with 50 monospaced glyphs for descending tree view	
@@ -1701,7 +1701,7 @@ span.notesourcecolor {
 }
 
 .d-flex.flex-wrap {
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .imap-gallery {
