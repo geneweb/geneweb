@@ -277,6 +277,14 @@ let partial_date_upper_bound ~from ~day ~month ~year =
 
 let partial_date_lower_bound ~day ~month ~year = (max 1 day, max 1 month, year)
 
+let make_date_error_message ~prefix erroneous_date =
+  Printf.sprintf "%s: invalid %s: '%s'" prefix
+    (match erroneous_date.Calendars.kind with
+    | Calendars.Invalid_day -> "day"
+    | Calendars.Invalid_month -> "month"
+    | Calendars.Invalid_year -> "year")
+    (Calendars.Unsafe.to_string erroneous_date.Calendars.value)
+
 (* [to_sdn] does not work if day|month are unknown
    so we return sdn of partial_date_(lower|upper)_bound instead *)
 let to_sdn ~from ?(lower = true) d =
@@ -287,8 +295,9 @@ let to_sdn ~from ?(lower = true) d =
   let day, month, year = bound ~day ~month ~year in
   let make kind =
     match Calendars.make kind ~day ~month ~year ~delta with
-    | Error e ->
-        Printf.eprintf "Calendars.make error: %s" e;
+    | Error erroneous_date ->
+        prerr_string
+        @@ make_date_error_message ~prefix:"Date error" erroneous_date;
         -1
     | Ok d -> Calendars.to_sdn d
   in

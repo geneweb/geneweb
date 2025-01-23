@@ -541,49 +541,69 @@ let roman_int =
   in
   Grammar.Entry.of_parser date_g "roman int" p
 
-let make_date n1 n2 n3 =
-  let n3 =
-    if !state.no_negative_dates then
-      match n3 with
-        Some n3 -> Some (abs n3)
-      | None -> None
-    else n3
+let make_date ~kind n1 n2 n3 =
+  let n3 = if !state.no_negative_dates then Option.map abs n3 else n3 in
+  let day, month, year =
+    match n1, n2, n3 with
+      Some d, Some m, Some y ->
+        let (d, m) =
+          match m with
+            Def.Right m -> d, m
+          | Left m ->
+              match !state.month_number_dates with
+                DayMonthDates -> check_month m; d, m
+              | MonthDayDates -> check_month d; m, d
+              | _ ->
+                  if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
+                    if d > 13 && m <= 13 then d, m
+                    else if m > 13 && d <= 13 then m, d
+                    else if d > 13 && m > 13 then 0, 0
+                    else
+                      begin
+                        !state.month_number_dates <- MonthNumberHappened !state.date_str;
+                        0, 0
+                      end
+                  else 0, 0
+        in
+        let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
+        (d, m, y)
+    | None, Some m, Some y ->
+        let m =
+          match m with
+            Def.Right m -> m
+          | Left m -> m
+        in
+        (0, m, y)
+    | None, None, Some y -> (0, 0, y)
+    | Some y, None, None -> (0, 0, y)
+    | Some _, None, Some _ | Some _, Some _, None | None, Some _, None |
+      None, None, None ->
+        raise (Stream.Error "bad date")
   in
-  match n1, n2, n3 with
-    Some d, Some m, Some y ->
-      let (d, m) =
-        match m with
-          Def.Right m -> d, m
-        | Left m ->
-            match !state.month_number_dates with
-              DayMonthDates -> check_month m; d, m
-            | MonthDayDates -> check_month d; m, d
-            | _ ->
-                if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
-                  if d > 13 && m <= 13 then d, m
-                  else if m > 13 && d <= 13 then m, d
-                  else if d > 13 && m > 13 then 0, 0
-                  else
-                    begin
-                      !state.month_number_dates <- MonthNumberHappened !state.date_str;
-                      0, 0
-                    end
-                else 0, 0
+  let rec validate_date_components ~day ~month ~year =
+    let delta = 0 in
+    let unknown_day = 0 in
+    let unknown_month = 0 in
+    let date =
+      let day, month, year = Date.partial_date_lower_bound ~day ~month ~year
       in
-      let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
-      Date.{day = d; month = m; year = y; prec = Sure; delta = 0}
-  | None, Some m, Some y ->
-      let m =
-        match m with
-          Def.Right m -> m
-        | Left m -> m
-      in
-      {day = 0; month = m; year = y; prec = Sure; delta = 0}
-  | None, None, Some y ->
-      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | Some y, None, None ->
-      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
-  | _ -> raise (Stream.Error "bad date")
+      Calendars.make ~day ~month ~year ~delta kind
+    in
+    match date with
+    | Ok _ -> Ok Date.{day; month; year; prec = Sure; delta}
+    | Error {Calendars.kind = Calendars.Invalid_year} as error -> error
+    | Error {Calendars.kind = Calendars.Invalid_day} ->
+       validate_date_components ~day:unknown_day ~month ~year
+    | Error {Calendars.kind = Calendars.Invalid_month} ->
+       validate_date_components ~day ~month:unknown_month ~year
+  in
+  match validate_date_components ~day ~month ~year with
+  | Ok date -> date
+  | Error erroneous_date ->
+     let error_message =
+       Date.make_date_error_message ~prefix:"bad date" erroneous_date
+     in
+     raise @@ Stream.Error error_message
 
 let recover_date cal = function
   | Date.Dgreg (d, Dgregorian) ->
@@ -659,13 +679,15 @@ EXTEND
   date_greg:
     [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ]; n2 = OPT gen_month;
         LIST0 [ "." | "/" ]; n3 = OPT int; LIST0 "." ->
-          make_date n1 n2 n3 ] ]
+          make_date ~kind:Calendars.Gregorian n1 n2 n3 ] ]
   ;
   date_fren:
     [ [ LIST0 "."; n1 = int; (n2, n3) = date_fren_kont ->
-          make_date (Some n1) n2 n3
-      | LIST0 "."; n1 = year_fren -> make_date (Some n1) None None
-      | LIST0 "."; (n2, n3) = date_fren_kont -> make_date None n2 n3 ] ]
+          make_date ~kind:Calendars.French (Some n1) n2 n3
+      | LIST0 "."; n1 = year_fren ->
+          make_date ~kind:Calendars.French (Some n1) None None
+      | LIST0 "."; (n2, n3) = date_fren_kont ->
+          make_date ~kind:Calendars.French None n2 n3 ] ]
   ;
   date_fren_kont:
     [ [ LIST0 [ "." | "/" ]; n2 = OPT gen_french; LIST0 [ "." | "/" ];
@@ -675,7 +697,7 @@ EXTEND
   date_hebr:
     [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ]; n2 = OPT gen_hebr;
         LIST0 [ "." | "/" ]; n3 = OPT int; LIST0 "." ->
-          make_date n1 n2 n3 ] ]
+          make_date ~kind:Calendars.Hebrew n1 n2 n3 ] ]
   ;
   gen_month:
     [ [ i = int -> Left (abs i)
