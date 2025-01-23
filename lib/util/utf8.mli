@@ -37,6 +37,9 @@ val capitalize_fst : string -> string
 val capitalize : string -> string
 (** Returns UTF-8 encoded string where the first letter is capitalised and others minimalised *)
 
+val initial : string -> int option
+(** Returns position of first capital letter in the string. *)
+
 module C : sig
   (** Utf8 char type.  *)
   type t = Str of string | Chr of char | Empty

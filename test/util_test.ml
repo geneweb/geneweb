@@ -159,6 +159,43 @@ let utf8_alphabetical_order () =
   test ~__POS__ ~expected:`Before "Saint-Lô" "Saint-Lomer";
   test ~__POS__ ~expected:`Before "VANÉAU" "VANEBU"
 
+let utf8_initial () =
+  let test ~__POS__ ~expected s =
+    Alcotest.check' ~pos:__POS__
+      (Alcotest.option Alcotest.int)
+      ~msg:"" ~expected ~actual:(Utf8.initial s)
+  in
+  test ~__POS__ ~expected:None "";
+  test ~__POS__ ~expected:None " ";
+  test ~__POS__ ~expected:None "a";
+  test ~__POS__ ~expected:(Some 0) "A";
+  test ~__POS__ ~expected:None "à";
+  test ~__POS__ ~expected:(Some 0) "À";
+  test ~__POS__ ~expected:None "û";
+  test ~__POS__ ~expected:(Some 0) "Û";
+  test ~__POS__ ~expected:None "ù";
+  test ~__POS__ ~expected:(Some 0) "Ù";
+  test ~__POS__ ~expected:(Some 0) "Foo";
+  test ~__POS__ ~expected:None "foo";
+  test ~__POS__ ~expected:(Some 0) "FOO";
+  test ~__POS__ ~expected:(Some 8) "van der Poel";
+  test ~__POS__ ~expected:None "élise";
+  test ~__POS__ ~expected:(Some 0) "Élise";
+  test ~__POS__ ~expected:None "à l'envers";
+  test ~__POS__ ~expected:(Some 0) "À l'envers";
+  test ~__POS__ ~expected:None "ève";
+  test ~__POS__ ~expected:(Some 0) "Ève";
+  test ~__POS__ ~expected:None "être";
+  test ~__POS__ ~expected:(Some 0) "Être";
+  test ~__POS__ ~expected:None "ô combien";
+  test ~__POS__ ~expected:(Some 0) "Ô combien";
+  test ~__POS__ ~expected:None "âtre";
+  test ~__POS__ ~expected:(Some 0) "Âtre";
+  test ~__POS__ ~expected:None "d'œuf";
+  test ~__POS__ ~expected:(Some 2) "d'Œuf";
+  test ~__POS__ ~expected:None "álvarez";
+  test ~__POS__ ~expected:(Some 0) "Álvarez"
+
 let util_name_with_roman_number () =
   let test r a =
     (Alcotest.check (Alcotest.option Alcotest.string))
@@ -273,6 +310,7 @@ let v =
       [
         Alcotest.test_case "Utf8.sub" `Quick utf8_sub;
         Alcotest.test_case "alphabetical-order" `Quick utf8_alphabetical_order;
+        Alcotest.test_case "initial-letter" `Quick utf8_initial;
       ] );
     ( "util",
       [
