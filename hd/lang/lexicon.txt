@@ -8955,6 +8955,10 @@ sv: GeneWeb-parametrar
 tr: GeneWeb parametreleri
 zh: GeneWeb 参数
 
+    go to alt base
+en: go to the database/&#10;Be carefull to the index number in the query!
+fr: aller vers la base de données/&#10;Attention au numéro d’index dans la requête !
+
     go to section %s
 af: gaan na die %s seksie
 bg: отиди към раздела %s

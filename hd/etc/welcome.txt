@@ -406,7 +406,7 @@ fr: Mon compte associatif
     </div>
   </div>
 %end;
-%if;(((roglo!=1 and wizard) or (roglo=1 and user.name in b.superwizard)) and nb_persons.v!=0)
+%if;(((roglo!=1 and wizard) or (roglo=1 and user.ident!="" and user.ident in b.superwizard)) and nb_persons.v!=0)
   <div class="d-flex flex-column justify-content-lg-center mt-2 mt-lg-4">
     <div class="h4 align-self-lg-center mr-lg-2 text-success">
       <i class="fas fa-book fa-sm fa-fw text-success mr-1"></i>[*book/books]1%nn;
