@@ -277,7 +277,7 @@
               %define;searchinsee(xx)
                 [*search %s on matchID:::xx]
               %end;
-              %if;(wizard and birth_date.year!="" and birth_date.year>1870)
+              %if;(wizard and ((birth_date.year!="" and birth_date.year>1870) or (death_date.year!="" and death_date.year>1970) or not is_dead))
               <a class="dropdown-item" role="button" title="[*search Insee]"
                 href="https://deces.matchid.io/search?advanced=true%nn;
                 &ln=%surname;&fn=%first_name;&bd=%slash_birth_date;">
