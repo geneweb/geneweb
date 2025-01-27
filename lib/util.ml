@@ -1334,7 +1334,7 @@ let string_with_macros conf env s =
         | Out -> (
             match http_string s i with
             | Some (x, j) ->
-                Printf.bprintf buff "<a href=\"%s\">" x;
+                Printf.bprintf buff "<a href=\"%s\" target=\"_blank\">" x;
                 expand_ampersand buff x;
                 Printf.bprintf buff "</a>";
                 loop Out j
@@ -1345,16 +1345,21 @@ let string_with_macros conf env s =
                     Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                     loop Out end_
                 | None ->
-                    let tt =
-                      if start_with s i "<a href=" || start_with s i "<a\nhref="
-                      then In_a_href
-                      else if s.[i] = '<' then In_norm
-                      else Out
-                    in
-                    if s.[i] = '&' && not (followed_by_ident_semi s (i + 1))
-                    then Buffer.add_string buff "&amp;"
-                    else Buffer.add_char buff s.[i];
-                    loop tt (i + 1)))
+                    if start_with s i "<a href=" || start_with s i "<a\nhref="
+                    then (
+                      Buffer.add_string buff "<a target=\"_blank\" href=";
+                      loop In_a_href (i + 8))
+                    else if s.[i] = '<' then (
+                      Buffer.add_char buff s.[i];
+                      loop In_norm (i + 1))
+                    else if
+                      s.[i] = '&' && not (followed_by_ident_semi s (i + 1))
+                    then (
+                      Buffer.add_string buff "&amp;";
+                      loop Out (i + 1))
+                    else (
+                      Buffer.add_char buff s.[i];
+                      loop Out (i + 1))))
     else Buffer.contents buff
   in
   loop Out 0
