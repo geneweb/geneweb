@@ -1344,7 +1344,8 @@ let string_with_macros ?(with_links_target_attribute = true) ~conf ~env str =
                 match List.assoc_opt i email_addresses_positions with
                 | Some end_ ->
                     let x = String.sub str i (end_ - i) in
-                    Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
+                    Printf.bprintf buff
+                      "<a href=\"mailto:%s\" target=\"_blank\">%s</a>" x x;
                     loop Out end_
                 | None ->
                     if
