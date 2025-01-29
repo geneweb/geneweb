@@ -754,7 +754,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     Jingoo.Jg_types.Tfloat (Gwxjg_ezgw.Person.consanguinity p)
   in
   let events' = Gwxjg_ezgw.Person.events conf base p in
-  let events = lazy_list (mk_event conf base) events' in
+  let events = lazy_list (mk_event conf base) (Ext_list.take events' 25) in
   let birth = find_event conf base (Geneweb.Event.Pevent Epers_Birth) events' in
   let baptism =
     find_event conf base (Geneweb.Event.Pevent Epers_Baptism) events'
@@ -849,7 +849,9 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let qualifiers = mk_str_lst base (Gwdb.get_qualifiers p) in
   let related = mk_rparents conf base p in
   let relations =
-    lazy_list (get_n_mk_person conf base) (Gwxjg_ezgw.Person.relations p)
+    lazy_list
+      (get_n_mk_person conf base)
+      (Ext_list.take (Gwxjg_ezgw.Person.relations p) 25)
   in
   let sex = Jingoo.Jg_types.Tint (Gwxjg_ezgw.Person.sex p) in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
