@@ -441,6 +441,9 @@ let ifams ?(select = fun _ -> true) base =
 let ipers base =
   Collection.{ length = nb_of_persons base; get = (fun i -> Some i) }
 
+let persons_from_patch _base = assert false
+let families_from_patch _base = assert false
+
 exception Found of int
 
 let array_find f arr =

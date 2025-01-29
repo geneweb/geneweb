@@ -308,6 +308,8 @@ type perm = RDONLY | RDRW
 type base_data = {
   (* Array of persons *)
   persons : dsk_person record_access;
+  (* Patch of persons *)
+  persons_patch : (int, dsk_person) Hashtbl.t;
   (* Array of persons' ascendants *)
   ascends : dsk_ascend record_access;
   (* Array of persons' unions *)
@@ -316,6 +318,8 @@ type base_data = {
   visible : visible_record_access;
   (* Array of families *)
   families : dsk_family record_access;
+  (* Patch of families *)
+  families_patch : (int, dsk_family) Hashtbl.t;
   (* Array of families' couples *)
   couples : dsk_couple record_access;
   (* Array of families' descendants *)

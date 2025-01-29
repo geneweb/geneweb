@@ -667,6 +667,12 @@ module type Driver_S = sig
   val families : ?select:(family -> bool) -> base -> family Collection.t
   (** Collection of families *)
 
+  val persons_from_patch : base -> person Collection.t
+  (** Collection of persons' ids in patch *)
+
+  val families_from_patch : base -> family Collection.t
+  (** Collection of families' ids in patch *)
+
   val dummy_collection : 'a -> 'a Collection.t
   (** [dummy_collection x] create a dummy collection with no element.
     [x] is only used for typing.

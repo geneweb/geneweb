@@ -788,6 +788,10 @@ module Legacy_driver = struct
     let coll = persons base in
     Collection.map (fun person -> { person; base; witness_notes = None }) coll
 
+  let persons_from_patch base =
+    let coll = persons_from_patch base in
+    Collection.map (fun person -> { person; base; witness_notes = None }) coll
+
   let empty_family base ifam =
     let f = empty_family base ifam in
     { family = f; base; witness_notes = Some [||] }
@@ -876,6 +880,10 @@ module Legacy_driver = struct
   let families ?(select = fun _ -> true) base =
     let select f = select { family = f; base; witness_notes = None } in
     let coll = families ~select base in
+    Collection.map (fun family -> { family; base; witness_notes = None }) coll
+
+  let families_from_patch base =
+    let coll = families_from_patch base in
     Collection.map (fun family -> { family; base; witness_notes = None }) coll
 
   let wrap_pid clear patch insert delete =
