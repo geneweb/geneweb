@@ -17,6 +17,7 @@ type ifam = int
 type iper = int
 
 let string_of_iper = string_of_int
+let int_of_iper = Fun.id
 let string_of_ifam = string_of_int
 let string_of_istr = string_of_int
 let iper_of_string = int_of_string
