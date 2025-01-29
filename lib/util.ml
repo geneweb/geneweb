@@ -1346,9 +1346,13 @@ let string_with_macros conf env s =
                     loop Out end_
                 | None ->
                     if start_with s i "<a href=" || start_with s i "<a\nhref="
-                    then (
-                      Buffer.add_string buff "<a target=\"_blank\" href=";
-                      loop In_a_href (i + 8))
+                    then
+                      if start_with s (i + 8) "\"#" then (
+                        Buffer.add_char buff s.[i];
+                        loop In_a_href (i + 1))
+                      else (
+                        Buffer.add_string buff "<a target=\"_blank\" href=";
+                        loop In_a_href (i + 8))
                     else if s.[i] = '<' then (
                       Buffer.add_char buff s.[i];
                       loop In_norm (i + 1))
