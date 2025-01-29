@@ -1,6 +1,3 @@
-module Ezgw = Gwxjg_ezgw
-module Lexicon_parser = Gwxjg_lexicon_parser
-
 let person_ht = Hashtbl.create 32
 let mk_opt fn = function None -> Jingoo.Jg_types.Tnull | Some x -> fn x
 let safe (x : Adef.safe_string) = Jingoo.Jg_types.Tsafe (x :> string)
@@ -83,9 +80,8 @@ and field = Jingoo.Jg_runtime.jg_obj_lookup
 
 let rec mk_family (conf : Geneweb.Config.config) base
     ((_, fam, (ifath, imoth, ispouse), _) as fcd) =
-  let module E = Ezgw.Family in
-  let f = E.father fcd in
-  let m = E.mother fcd in
+  let f = Gwxjg_ezgw.Family.father fcd in
+  let m = Gwxjg_ezgw.Family.mother fcd in
   let father = lazy_get_n_mk_person conf base f in
   let mother = lazy_get_n_mk_person conf base m in
   let spouse =
@@ -95,9 +91,11 @@ let rec mk_family (conf : Geneweb.Config.config) base
   in
   let children =
     Jingoo.Jg_types.Tarray
-      (Array.map (lazy_get_n_mk_person conf base) (E.children fcd))
+      (Array.map
+         (lazy_get_n_mk_person conf base)
+         (Gwxjg_ezgw.Family.children fcd))
   in
-  let events' = E.events fcd in
+  let events' = Gwxjg_ezgw.Family.events fcd in
   let events = lazy_list (mk_event conf base) events' in
   let relation =
     match Gwdb.get_relation fam with
@@ -130,10 +128,16 @@ let rec mk_family (conf : Geneweb.Config.config) base
         find_event conf base (Geneweb.Event.Fevent Def.Efam_Separated) events'
     | NotDivorced -> Jingoo.Jg_types.Tnull
   in
-  let ifam = Jingoo.Jg_types.Tstr (E.ifam fcd) in
-  let origin_file = Jingoo.Jg_types.Tstr (E.origin_file conf base fcd) in
-  let note_raw, note = mk_note_rs conf base [] (E.note conf base fcd) in
-  let source_raw, source = mk_source_rs conf base (E.sources base fcd) in
+  let ifam = Jingoo.Jg_types.Tstr (Gwxjg_ezgw.Family.ifam fcd) in
+  let origin_file =
+    Jingoo.Jg_types.Tstr (Gwxjg_ezgw.Family.origin_file conf base fcd)
+  in
+  let note_raw, note =
+    mk_note_rs conf base [] (Gwxjg_ezgw.Family.note conf base fcd)
+  in
+  let source_raw, source =
+    mk_source_rs conf base (Gwxjg_ezgw.Family.sources base fcd)
+  in
   Jingoo.Jg_types.Tpat
     (function
     | "children" -> children
@@ -496,19 +500,20 @@ and mk_pevent' conf base e =
   mk_event conf base (Geneweb.Event.event_item_of_gen_pevent e)
 
 and mk_event conf base (evt : 'a Geneweb.Event.event_item) =
-  let module E = Ezgw.Event in
   let date =
-    match E.date evt with Some d -> mk_date d | None -> Jingoo.Jg_types.Tnull
+    match Gwxjg_ezgw.Event.date evt with
+    | Some d -> mk_date d
+    | None -> Jingoo.Jg_types.Tnull
   in
-  let name = safe (E.name conf base evt) in
+  let name = safe (Gwxjg_ezgw.Event.name conf base evt) in
   let spouse =
-    match E.spouse_opt evt with
+    match Gwxjg_ezgw.Event.spouse_opt evt with
     | None -> Jingoo.Jg_types.Tnull
     | Some i -> lazy_get_n_mk_person conf base i
   in
-  let kind = Jingoo.Jg_types.Tsafe (E.kind evt) in
+  let kind = Jingoo.Jg_types.Tsafe (Gwxjg_ezgw.Event.kind evt) in
   let witnesses =
-    match E.witnesses evt with
+    match Gwxjg_ezgw.Event.witnesses evt with
     | [||] -> Jingoo.Jg_types.Tarray [||]
     | w ->
         let lw =
@@ -531,9 +536,15 @@ and mk_event conf base (evt : 'a Geneweb.Event.event_item) =
                  | s -> Jingoo.Jg_types.unbox_pat (Lazy.force lw).(i) @@ s))
              w)
   in
-  let place_raw, place = mk_place (Gwdb.sou base (E.place evt)) in
-  let source_raw, source = mk_source_rs conf base (E.src base evt) in
-  let note_raw, note = mk_note_rs conf base [] (E.note conf base evt) in
+  let place_raw, place =
+    mk_place (Gwdb.sou base (Gwxjg_ezgw.Event.place evt))
+  in
+  let source_raw, source =
+    mk_source_rs conf base (Gwxjg_ezgw.Event.src base evt)
+  in
+  let note_raw, note =
+    mk_note_rs conf base [] (Gwxjg_ezgw.Event.note conf base evt)
+  in
   Jingoo.Jg_types.Tpat
     (function
     | "date" -> date
@@ -659,21 +670,22 @@ and mk_str_lst base istrs =
 
 and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
-  let module E = Ezgw.Person in
   let access_url = escaped (Geneweb.Util.acces conf base p) in
   let access = Jingoo.Jg_types.Tbool (Geneweb.Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
-  let first_name = Jingoo.Jg_types.Tstr (E.first_name base p) in
+  let first_name = Jingoo.Jg_types.Tstr (Gwxjg_ezgw.Person.first_name base p) in
   let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
-  let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
+  let children =
+    lazy_list (get_n_mk_person conf base) (Gwxjg_ezgw.Person.children base p)
+  in
   let iper = Jingoo.Jg_types.Tstr (Gwdb.string_of_iper iper') in
   let related = mk_rparents conf base p in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
-  let siblings = siblings_aux E.siblings in
-  let half_siblings = siblings_aux E.half_siblings in
-  let sex = Jingoo.Jg_types.Tint (E.sex p) in
-  let surname = Jingoo.Jg_types.Tstr (E.surname base p) in
+  let siblings = siblings_aux Gwxjg_ezgw.Person.siblings in
+  let half_siblings = siblings_aux Gwxjg_ezgw.Person.half_siblings in
+  let sex = Jingoo.Jg_types.Tint (Gwxjg_ezgw.Person.sex p) in
+  let surname = Jingoo.Jg_types.Tstr (Gwxjg_ezgw.Person.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let events = Jingoo.Jg_types.Tlist [] in
   let name_is_hidden =
@@ -729,16 +741,19 @@ and find_events conf base x events =
   | None -> Jingoo.Jg_types.Tnull
 
 and unsafe_mk_person conf base (p : Gwdb.person) =
-  let module E = Ezgw.Person in
   let iper' = Gwdb.get_iper p in
   let access_url = escaped (Geneweb.Util.acces conf base p) in
   let access = Jingoo.Jg_types.Tbool (Geneweb.Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let aliases = mk_str_lst base (Gwdb.get_aliases p) in
-  let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
-  let consanguinity = Jingoo.Jg_types.Tfloat (E.consanguinity p) in
-  let events' = E.events conf base p in
+  let children =
+    lazy_list (get_n_mk_person conf base) (Gwxjg_ezgw.Person.children base p)
+  in
+  let consanguinity =
+    Jingoo.Jg_types.Tfloat (Gwxjg_ezgw.Person.consanguinity p)
+  in
+  let events' = Gwxjg_ezgw.Person.events conf base p in
   let events = lazy_list (mk_event conf base) events' in
   let birth = find_event conf base (Geneweb.Event.Pevent Epers_Birth) events' in
   let baptism =
@@ -778,7 +793,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
       ]
       events'
   in
-  let first_name = Jingoo.Jg_types.Tstr (E.first_name base p) in
+  let first_name = Jingoo.Jg_types.Tstr (Gwxjg_ezgw.Person.first_name base p) in
   let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
   let image =
     Jingoo.Jg_types.Tstr
@@ -821,7 +836,9 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
          else Jingoo.Jg_types.Tnull))
   in
   let titles = lazy_list (mk_title base) (Gwdb.get_titles p) in
-  let _, note = mk_person_note_rs conf base p (E.note conf base p) in
+  let _, note =
+    mk_person_note_rs conf base p (Gwxjg_ezgw.Person.note conf base p)
+  in
   let occ = Jingoo.Jg_types.Tint (Gwdb.get_occ p) in
   let occupation_raw, occupation =
     mk_source_rs conf base (Gwdb.sou base @@ Gwdb.get_occupation p)
@@ -831,15 +848,17 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   in
   let qualifiers = mk_str_lst base (Gwdb.get_qualifiers p) in
   let related = mk_rparents conf base p in
-  let relations = lazy_list (get_n_mk_person conf base) (E.relations p) in
-  let sex = Jingoo.Jg_types.Tint (E.sex p) in
+  let relations =
+    lazy_list (get_n_mk_person conf base) (Gwxjg_ezgw.Person.relations p)
+  in
+  let sex = Jingoo.Jg_types.Tint (Gwxjg_ezgw.Person.sex p) in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
-  let siblings = siblings_aux E.siblings in
-  let half_siblings = siblings_aux E.half_siblings in
+  let siblings = siblings_aux Gwxjg_ezgw.Person.siblings in
+  let half_siblings = siblings_aux Gwxjg_ezgw.Person.half_siblings in
   let source_raw, source =
     mk_source_rs conf base (Gwdb.sou base @@ Gwdb.get_psources p)
   in
-  let surname = Jingoo.Jg_types.Tstr (E.surname base p) in
+  let surname = Jingoo.Jg_types.Tstr (Gwxjg_ezgw.Person.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let sosa = Jingoo.Jg_types.box_lazy @@ lazy (get_sosa_person conf base p) in
   let parent_marriage, father_re_marriages, mother_re_marriages =
@@ -1361,14 +1380,15 @@ let trans ?(autoescape = true) (conf : Geneweb.Config.config) =
     try
       let s = Hashtbl.find conf.lexicon s in
       let t =
-        if Lexicon_parser.need_split s then
+        if Gwxjg_lexicon_parser.need_split s then
           Array.of_list @@ String.split_on_char '/' s
         else [| s |]
       in
       let t =
         Array.map
           (fun t ->
-            Lexicon_parser.p_trad (Buffer.create 128) [] @@ Lexing.from_string t)
+            Gwxjg_lexicon_parser.p_trad (Buffer.create 128) []
+            @@ Lexing.from_string t)
           t
       in
       let i = if i < 0 || i >= Array.length t then 0 else i in
@@ -1376,7 +1396,7 @@ let trans ?(autoescape = true) (conf : Geneweb.Config.config) =
       let t = Array.unsafe_get t i in
       Jingoo.Jg_types.Tsafe
         (let conv acc = function
-           | Lexicon_parser.Str s -> s
+           | Gwxjg_lexicon_parser.Str s -> s
            | Arg n ->
                if autoescape then
                  match arg n with
