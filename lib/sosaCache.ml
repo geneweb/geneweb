@@ -15,6 +15,7 @@ type sosa_t = {
 }
 
 let init_sosa_t conf base sosa_ref =
+  print_endline "===================INIT SOSA CACHE=====================";
   try
     let tstab = Util.create_topological_sort conf base in
     let mark = Gwdb.iper_marker (Gwdb.ipers base) false in

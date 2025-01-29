@@ -1263,8 +1263,7 @@ type 'a env =
   | Vnldb of (Gwdb.iper, Gwdb.ifam) Def.NLDB.t
   | Vstring of string
   | Vsosa_ref of Gwdb.person option
-  | Vsosa of (Gwdb.iper * (Sosa.t * Gwdb.person) option) list ref
-  | Vt_sosa of SosaCache.sosa_t option
+  | Vt_sosa of Sosa_cache.t option
   | Vtitle of Gwdb.person * title_item
   | Vevent of Gwdb.person * Gwdb.istr Event.event_item
   | Vlazyp of string option ref
@@ -1306,19 +1305,36 @@ let null_val = TemplAst.VVstring ""
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
   TemplAst.VVstring ((x :> Adef.safe_string) :> string)
 
-let get_sosa conf base env r p =
-  try List.assoc (Gwdb.get_iper p) !r
-  with Not_found ->
-    let s =
-      match get_env "sosa_ref" env with
-      | Vsosa_ref v -> (
-          match get_env "t_sosa" env with
-          | Vt_sosa (Some t_sosa) -> SosaCache.find_sosa conf base p v t_sosa
-          | _ -> None)
-      | _ -> None
-    in
-    r := (Gwdb.get_iper p, s) :: !r;
-    s
+let get_sosa_ref env =
+  match get_env "sosa_ref" env with
+  | Vsosa_ref (Some sosa_ref) ->
+      (*print_endline "===================YES GET SOSA REF==============";*)
+      Some sosa_ref
+  | _ ->
+      (*print_endline "================NO GET SOSA REF========================";*)
+      None
+
+let get_sosa_cache env =
+  match get_env "t_sosa" env with Vt_sosa t_sosa -> t_sosa | _ -> None
+
+let get_sosa conf base env iper : (Sosa.t option * Gwdb.person) option =
+  Option.bind (get_sosa_ref env) (fun sosa_ref ->
+      let cache = get_sosa_cache env in
+      (* (match cache with
+         | Some cache ->
+           print_endline "=================SOME CACHE======================="
+           | None -> print_endline "=====================NO CACHE================");*)
+      Option.bind cache (fun cache ->
+          let sosa = Sosa_cache.get_sosa ~conf ~base ~cache ~iper ~sosa_ref in
+          Some (sosa, sosa_ref)))
+
+let next_sosa conf base env sosa =
+  Option.bind (get_sosa_cache env) (fun cache ->
+      Sosa_cache.next_sosa cache sosa)
+
+let previous_sosa conf base env sosa =
+  Option.bind (get_sosa_cache env) (fun cache ->
+      Sosa_cache.previous_sosa cache sosa)
 
 (* ************************************************************************** *)
 (*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
@@ -2429,10 +2445,11 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | [ "has_sosa" ] -> (
       match get_env "p_link" env with
       | Vbool _ -> TemplAst.VVbool false
-      | _ -> (
-          match get_env "sosa" env with
-          | Vsosa r -> TemplAst.VVbool (get_sosa conf base env r p <> None)
-          | _ -> TemplAst.VVbool false))
+      | _ ->
+          TemplAst.VVbool
+            (match get_sosa conf base env (Gwdb.get_iper p) with
+            | Some (Some _, _) -> true
+            | _ -> false))
   | [ "init_cache"; nb_asc; from_gen_desc; nb_desc ] -> (
       try
         let nb_asc = int_of_string nb_asc in
@@ -2488,40 +2505,29 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | Some _ | None -> null_val)
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa" :: sl -> (
-      match get_env "sosa" env with
-      | Vsosa x -> (
-          match get_sosa conf base env x p with
-          | Some (n, _) -> TemplAst.VVstring (eval_num conf n sl)
-          | None -> null_val)
-      | _ -> raise Not_found)
+      match get_sosa conf base env (Gwdb.get_iper p) with
+      | Some (Some sosa, _) -> TemplAst.VVstring (eval_num conf sosa sl)
+      | _ -> null_val)
   | "sosa_next" :: sl -> (
-      match get_env "sosa" env with
-      | Vsosa x -> (
-          match get_sosa conf base env x p with
-          | Some (n, _) -> (
-              match SosaCache.next_sosa n with
-              | so, ip ->
-                  if so = Sosa.zero then null_val
-                  else
-                    let p = Gwdb.poi base ip in
-                    let p_auth = Util.authorized_age conf base p in
-                    eval_person_field_var conf base env (p, p_auth) loc sl)
+      match get_sosa conf base env (Gwdb.get_iper p) with
+      | Some (Some sosa, _) -> (
+          match next_sosa conf base env sosa with
+          | Some (_sosa, ip) ->
+              let p = Gwdb.poi base ip in
+              let p_auth = Util.authorized_age conf base p in
+              eval_person_field_var conf base env (p, p_auth) loc sl
           | None -> null_val)
-      | _ -> raise Not_found)
+      | _ -> null_val)
   | "sosa_prev" :: sl -> (
-      match get_env "sosa" env with
-      | Vsosa x -> (
-          match get_sosa conf base env x p with
-          | Some (n, _) -> (
-              match SosaCache.prev_sosa n with
-              | so, ip ->
-                  if Sosa.eq so Sosa.zero then null_val
-                  else
-                    let p = Gwdb.poi base ip in
-                    let p_auth = Util.authorized_age conf base p in
-                    eval_person_field_var conf base env (p, p_auth) loc sl)
+      match get_sosa conf base env (Gwdb.get_iper p) with
+      | Some (Some sosa, _) -> (
+          match previous_sosa conf base env sosa with
+          | Some (_sosa, ip) ->
+              let p = Gwdb.poi base ip in
+              let p_auth = Util.authorized_age conf base p in
+              eval_person_field_var conf base env (p, p_auth) loc sl
           | None -> null_val)
-      | _ -> raise Not_found)
+      | _ -> null_val)
   | "spouse" :: sl -> (
       match get_env "fam" env with
       | Vfam (ifam, _, _, _) ->
@@ -3414,17 +3420,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           | Some _ | None -> null_val)
       | _ -> raise Not_found)
   | "sosa_link" -> (
-      match get_env "sosa" env with
-      | Vsosa x -> (
-          match get_sosa conf base env x p with
-          | Some (n, q) ->
-              Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
-                (Gwdb.string_of_iper (Gwdb.get_iper p))
-                (Gwdb.string_of_iper (Gwdb.get_iper q))
-                (Sosa.to_string n)
-              |> str_val
-          | None -> null_val)
-      | _ -> raise Not_found)
+      match get_sosa conf base env (Gwdb.get_iper p) with
+      | Some (Some sosa, sosa_ref) ->
+          Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
+            (Gwdb.string_of_iper (Gwdb.get_iper p))
+            (Gwdb.string_of_iper (Gwdb.get_iper sosa_ref))
+            (Sosa.to_string sosa)
+          |> str_val
+      | _ -> null_val)
   | "source" -> (
       match get_env "src" env with
       | Vstring s -> safe_val (Notes.source_note conf base p s)
@@ -4487,12 +4490,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   in
   let env =
     let sosa_ref = Util.find_sosa_ref conf base in
-    if sosa_ref <> None then SosaCache.build_sosa_ht conf base;
-    let t_sosa =
-      match sosa_ref with
-      | Some p -> SosaCache.init_sosa_t conf base p
-      | None -> None
-    in
+    let t_sosa = Sosa_cache.get_sosa_cache ~conf ~base in
     let desc_level_table_l =
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
@@ -4547,7 +4545,6 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       ("listc", Vslist (ref SortedList.empty));
       ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
       ("lazy_print", Vlazyp (ref None));
-      ("sosa", Vsosa (ref []));
       ("sosa_ref", Vsosa_ref sosa_ref);
       ("t_sosa", Vt_sosa t_sosa);
       ("max_anc_level", Vlazy (Lazy.from_fun mal));
