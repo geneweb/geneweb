@@ -107,7 +107,8 @@
                          %if;(spouses_dead=1)&#10;&#10;Please let both spouses rest in peace!%end;
                        %end;%nn;
                      %end;
-                     %if;wizard;&#10;&#10;%nn;
+                     %if;(wizard and not cancel_links)
+                       &#10;&#10;%nn;
                        %if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0
                        %else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;
                      %end;">%nn;
