@@ -1,8 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Adef
-open Def
-
 external identity : 'a -> 'a = "%identity"
 
 let map_cdate fd d =
@@ -12,15 +9,15 @@ let map_cdate fd d =
 
 let map_title_strings ?(fd = identity) f t =
   let t_name =
-    match t.t_name with
-    | Tmain -> Tmain
+    match t.Def.t_name with
+    | Tmain -> Def.Tmain
     | Tname s -> Tname (f s)
     | Tnone -> Tnone
   in
   let t_ident = f t.t_ident in
   let t_place = f t.t_place in
   {
-    t_name;
+    Def.t_name;
     t_ident;
     t_place;
     t_date_start = map_cdate fd t.t_date_start;
@@ -30,7 +27,7 @@ let map_title_strings ?(fd = identity) f t =
 
 let map_pers_event ?(fd = identity) fp fs e =
   let epers_name =
-    match e.epers_name with
+    match e.Def.epers_name with
     | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
       | Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
       | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
@@ -59,7 +56,7 @@ let map_pers_event ?(fd = identity) fp fs e =
     Array.map (fun (p, w, wnote) -> (fp p, w, fs wnote)) e.epers_witnesses
   in
   {
-    epers_name;
+    Def.epers_name;
     epers_date;
     epers_place;
     epers_reason;
@@ -70,7 +67,7 @@ let map_pers_event ?(fd = identity) fp fs e =
 
 let map_fam_event ?(fd = identity) fp fs e =
   let efam_name =
-    match e.efam_name with
+    match e.Def.efam_name with
     | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
       | Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann
       | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS
@@ -89,7 +86,7 @@ let map_fam_event ?(fd = identity) fp fs e =
       e.efam_witnesses
   in
   {
-    efam_name;
+    Def.efam_name;
     efam_date;
     efam_place;
     efam_reason;
@@ -100,26 +97,26 @@ let map_fam_event ?(fd = identity) fp fs e =
 
 let map_relation_ps fp fs r =
   {
-    r_type = r.r_type;
+    Def.r_type = r.Def.r_type;
     r_fath = (match r.r_fath with Some x -> Some (fp x) | None -> None);
     r_moth = (match r.r_moth with Some x -> Some (fp x) | None -> None);
     r_sources = fs r.r_sources;
   }
 
 let map_death fd = function
-  | (NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead) as
-    x ->
+  | (Def.NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead)
+    as x ->
       x
   | Death (r, d) -> Death (r, map_cdate fd d)
 
 let map_burial fd = function
-  | UnknownBurial -> UnknownBurial
+  | Def.UnknownBurial -> Def.UnknownBurial
   | Buried d -> Buried (map_cdate fd d)
   | Cremated d -> Cremated (map_cdate fd d)
 
 let map_person_ps ?(fd = identity) fp fs p =
   {
-    first_name = fs p.first_name;
+    Def.first_name = fs p.Def.first_name;
     surname = fs p.surname;
     occ = p.occ;
     image = fs p.image;
@@ -157,19 +154,19 @@ let map_person_ps ?(fd = identity) fp fs p =
   }
 
 let map_ascend_f ff a =
-  match a.parents with
-  | Some f -> { parents = Some (ff f); consang = a.consang }
+  match a.Def.parents with
+  | Some f -> { Def.parents = Some (ff f); consang = a.consang }
   | None -> { parents = None; consang = a.consang }
 
-let map_union_f ff u = { family = Array.map ff u.family }
+let map_union_f ff u = { Def.family = Array.map ff u.Def.family }
 
 let map_divorce fd = function
-  | (NotDivorced | Separated) as x -> x
+  | (Def.NotDivorced | Separated) as x -> x
   | Divorced d -> Divorced (map_cdate fd d)
 
 let map_family_ps ?(fd = identity) fp ff fs fam =
   {
-    marriage = map_cdate fd fam.marriage;
+    Def.marriage = map_cdate fd fam.Def.marriage;
     marriage_place = fs fam.marriage_place;
     marriage_note = fs fam.marriage_note;
     marriage_src = fs fam.marriage_src;
@@ -187,9 +184,9 @@ let parent multi parent =
   if not multi then Adef.parent parent else Adef.multi_parent parent
 
 let map_couple_p multi_parents fp cpl =
-  parent multi_parents (Array.map fp (parent_array cpl))
+  parent multi_parents (Array.map fp (Adef.parent_array cpl))
 
-let map_descend_p fp des = { children = Array.map fp des.children }
+let map_descend_p fp des = { Def.children = Array.map fp des.Def.children }
 
 let gen_person_misc_names sou empty_string quest_string first_name surname
     public_name qualifiers aliases first_names_aliases surnames_aliases titles
@@ -201,7 +198,9 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
     let s_titles_names =
       List.fold_left
         (fun acc t ->
-          match t.t_name with Tmain | Tnone -> acc | Tname x -> sou x :: acc)
+          match t.Def.t_name with
+          | Tmain | Tnone -> acc
+          | Tname x -> sou x :: acc)
         [] titles
     in
     let s_public_names =
@@ -247,7 +246,7 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
       (* let first_names = first_name :: first_names_aliases in *)
       List.fold_left
         (fun list t ->
-          let s = t.t_place in
+          let s = t.Def.t_place in
           if s = empty_string then list
           else
             let s = sou s in
@@ -269,7 +268,7 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
       else
         List.fold_left
           (fun list t ->
-            let s = t.t_place in
+            let s = t.Def.t_place in
             if s = empty_string then list
             else
               let s = sou s in
@@ -283,12 +282,12 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
 
 let eq_title_names eq tn1 tn2 =
   match (tn1, tn2) with
-  | Tname i1, Tname i2 -> eq i1 i2
+  | Def.Tname i1, Def.Tname i2 -> eq i1 i2
   | Tmain, Tmain | Tnone, Tnone -> true
   | _ -> false
 
 let eq_titles eq t1 t2 =
-  eq_title_names eq t1.t_name t2.t_name
+  eq_title_names eq t1.Def.t_name t2.Def.t_name
   && eq t1.t_ident t2.t_ident && eq t1.t_place t2.t_place
   && t1.t_date_start = t2.t_date_start
   && t1.t_date_end = t2.t_date_end

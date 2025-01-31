@@ -1,10 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
-
 (* Printing for browsers without tables *)
 
 let pre_text_size txt =
@@ -63,20 +58,20 @@ let print_pre_right conf sz txt =
 (* Algorithm *)
 
 type info = {
-  ip : iper;
-  sp : sex;
-  ip1 : iper;
-  ip2 : iper;
-  b1 : (iper * sex) list;
-  b2 : (iper * sex) list;
+  ip : Gwdb.iper;
+  sp : Def.sex;
+  ip1 : Gwdb.iper;
+  ip2 : Gwdb.iper;
+  b1 : (Gwdb.iper * Def.sex) list;
+  b2 : (Gwdb.iper * Def.sex) list;
   c1 : int;
   c2 : int;
-  pb1 : (iper * sex) list option;
-  pb2 : (iper * sex) list option;
-  nb1 : (iper * sex) list option;
-  nb2 : (iper * sex) list option;
-  sp1 : person option;
-  sp2 : person option;
+  pb1 : (Gwdb.iper * Def.sex) list option;
+  pb2 : (Gwdb.iper * Def.sex) list option;
+  nb1 : (Gwdb.iper * Def.sex) list option;
+  nb2 : (Gwdb.iper * Def.sex) list option;
+  sp1 : Gwdb.person option;
+  sp2 : Gwdb.person option;
   bd : int;
   td_prop : Adef.safe_string;
 }
@@ -96,7 +91,7 @@ let make_dist_tab conf base ia maxlev =
   else
     let tstab = Util.create_topological_sort conf base in
     let module Pq = Pqueue.Make (struct
-      type t = iper
+      type t = Gwdb.iper
 
       let leq x y = not (tsort_leq tstab x y)
     end) in
@@ -104,11 +99,11 @@ let make_dist_tab conf base ia maxlev =
     let dist = Gwdb.iper_marker (Gwdb.ipers base) default in
     let q = ref Pq.empty in
     let add_children ip =
-      let u = pget conf base ip in
-      for i = 0 to Array.length (get_family u) - 1 do
-        let des = foi base (get_family u).(i) in
-        for j = 0 to Array.length (get_children des) - 1 do
-          let k = (get_children des).(j) in
+      let u = Util.pget conf base ip in
+      for i = 0 to Array.length (Gwdb.get_family u) - 1 do
+        let des = Gwdb.foi base (Gwdb.get_family u).(i) in
+        for j = 0 to Array.length (Gwdb.get_children des) - 1 do
+          let k = (Gwdb.get_children des).(j) in
           let d = Gwdb.Marker.get dist k in
           if not d.mark then (
             Gwdb.Marker.set dist k @@ { dmin = infinity; dmax = 0; mark = true };
@@ -121,11 +116,11 @@ let make_dist_tab conf base ia maxlev =
     while not (Pq.is_empty !q) do
       let k, nq = Pq.take !q in
       q := nq;
-      match get_parents (pget conf base k) with
+      match Gwdb.get_parents (Util.pget conf base k) with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let dfath = Gwdb.Marker.get dist (get_father cpl) in
-          let dmoth = Gwdb.Marker.get dist (get_mother cpl) in
+          let cpl = Gwdb.foi base ifam in
+          let dfath = Gwdb.Marker.get dist (Gwdb.get_father cpl) in
+          let dmoth = Gwdb.Marker.get dist (Gwdb.get_mother cpl) in
           (Gwdb.Marker.get dist k).dmin <- min dfath.dmin dmoth.dmin + 1;
           (Gwdb.Marker.get dist k).dmax <- max dfath.dmax dmoth.dmax + 1;
           if (Gwdb.Marker.get dist k).dmin > maxlev then () else add_children k
@@ -140,12 +135,15 @@ let find_first_branch conf base (dmin, dmax) ia =
     else if len = 0 then None
     else if len < dmin ip || len > dmax ip then None
     else
-      match get_parents (pget conf base ip) with
+      match Gwdb.get_parents (Util.pget conf base ip) with
       | Some ifam -> (
-          let cpl = foi base ifam in
-          match find ((ip, sp) :: br) (len - 1) (get_father cpl) Male with
+          let cpl = Gwdb.foi base ifam in
+          match
+            find ((ip, sp) :: br) (len - 1) (Gwdb.get_father cpl) Def.Male
+          with
           | Some _ as r -> r
-          | None -> find ((ip, sp) :: br) (len - 1) (get_mother cpl) Female)
+          | None -> find ((ip, sp) :: br) (len - 1) (Gwdb.get_mother cpl) Female
+          )
       | None -> None
   in
   find []
@@ -156,25 +154,25 @@ let rec next_branch_same_len conf base dist backward missing ia sa ipl =
     | [] -> None
     | (ip, sp) :: ipl1 -> (
         match sa with
-        | Female ->
+        | Def.Female ->
             next_branch_same_len conf base dist true (missing + 1) ip sp ipl1
         | Male -> (
-            match get_parents (pget conf base ip) with
+            match Gwdb.get_parents (Util.pget conf base ip) with
             | Some ifam ->
-                let cpl = foi base ifam in
+                let cpl = Gwdb.foi base ifam in
                 next_branch_same_len conf base dist false missing
-                  (get_mother cpl) Female ipl
+                  (Gwdb.get_mother cpl) Female ipl
             | _ -> failwith "next_branch_same_len")
         | Neuter -> assert false)
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist true missing ia sa ipl
   else
-    match get_parents (pget conf base ia) with
+    match Gwdb.get_parents (Util.pget conf base ia) with
     | Some ifam ->
-        let cpl = foi base ifam in
-        next_branch_same_len conf base dist false (missing - 1) (get_father cpl)
-          Male ((ia, sa) :: ipl)
+        let cpl = Gwdb.foi base ifam in
+        next_branch_same_len conf base dist false (missing - 1)
+          (Gwdb.get_father cpl) Male ((ia, sa) :: ipl)
     | None -> next_branch_same_len conf base dist true missing ia sa ipl
 
 let find_next_branch conf base dist ia sa ipl =
@@ -191,25 +189,25 @@ let rec prev_branch_same_len conf base dist backward missing ia sa ipl =
     | [] -> None
     | (ip, sp) :: ipl1 -> (
         match sa with
-        | Male ->
+        | Def.Male ->
             prev_branch_same_len conf base dist true (missing + 1) ip sp ipl1
         | Female -> (
-            match get_parents (pget conf base ip) with
+            match Gwdb.get_parents (Util.pget conf base ip) with
             | Some ifam ->
-                let cpl = foi base ifam in
+                let cpl = Gwdb.foi base ifam in
                 prev_branch_same_len conf base dist false missing
-                  (get_father cpl) Male ipl
+                  (Gwdb.get_father cpl) Male ipl
             | _ -> failwith "prev_branch_same_len")
         | Neuter -> assert false)
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist true missing ia sa ipl
   else
-    match get_parents (pget conf base ia) with
+    match Gwdb.get_parents (Util.pget conf base ia) with
     | Some ifam ->
-        let cpl = foi base ifam in
-        prev_branch_same_len conf base dist false (missing - 1) (get_mother cpl)
-          Female ((ia, sa) :: ipl)
+        let cpl = Gwdb.foi base ifam in
+        prev_branch_same_len conf base dist false (missing - 1)
+          (Gwdb.get_mother cpl) Female ((ia, sa) :: ipl)
     | None -> prev_branch_same_len conf base dist true missing ia sa ipl
 
 let find_prev_branch conf base dist ia sa ipl =
@@ -223,31 +221,39 @@ let find_prev_branch conf base dist ia sa ipl =
 (* Printing *)
 
 let someone_text conf base ip =
-  let p = pget conf base ip in
+  let p = Util.pget conf base ip in
+  let open Def in
   NameDisplay.referenced_person_title_text conf base p
   ^^^ DateDisplay.short_dates_text conf base p
 
 let spouse_text conf base end_sp ip ipl =
-  match (ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt")) with
+  match
+    ( ipl,
+      ( Util.p_getenv conf.Config.env "spouse",
+        Util.p_getenv conf.Config.env "opt" ) )
+  with
   | (ips, _) :: _, (Some "on", _ | _, Some "spouse") -> (
-      let a = pget conf base ips in
-      match get_parents a with
+      let a = Util.pget conf base ips in
+      match Gwdb.get_parents a with
       | Some ifam ->
-          let fam = foi base ifam in
+          let fam = Gwdb.foi base ifam in
           let sp =
-            if ip = get_father fam then get_mother fam else get_father fam
+            if ip = Gwdb.get_father fam then Gwdb.get_mother fam
+            else Gwdb.get_father fam
           in
           let d =
             DateDisplay.short_marriage_date_text conf base fam
-              (pget conf base (get_father fam))
-              (pget conf base (get_mother fam))
+              (Util.pget conf base (Gwdb.get_father fam))
+              (Util.pget conf base (Gwdb.get_mother fam))
           in
           (someone_text conf base sp, d, Some sp)
       | _ -> (Adef.safe "", Adef.safe "", None))
   | [], _ -> (
       match end_sp with
       | Some p ->
-          (someone_text conf base (get_iper p), Adef.safe "", Some (get_iper p))
+          ( someone_text conf base (Gwdb.get_iper p),
+            Adef.safe "",
+            Some (Gwdb.get_iper p) )
       | _ -> (Adef.safe "", Adef.safe "", None))
   | _ -> (Adef.safe "", Adef.safe "", None)
 
@@ -260,7 +266,8 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
     Output.print_string conf info.td_prop;
     Output.print_sstring conf {|><tr><td align="center">|});
   Output.print_string conf (someone_text conf base ip);
-  Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip));
+  Output.print_string conf
+    (DagDisplay.image_txt conf base (Util.pget conf base ip));
   if (s :> string) <> "" then (
     Output.print_sstring conf "<br>&amp;";
     Output.print_string conf d;
@@ -269,7 +276,7 @@ let print_someone_and_spouse conf base info in_tab ip n ipl =
     match spo with
     | Some ip ->
         Output.print_string conf
-          (DagDisplay.image_txt conf base (pget conf base ip))
+          (DagDisplay.image_txt conf base (Util.pget conf base ip))
     | _ -> ());
   if in_tab && (info.bd > 0 || (info.td_prop :> string) <> "") then
     Output.print_sstring conf "</td></tr></table>"
@@ -284,14 +291,14 @@ let rec print_both_branches conf base info pl1 pl2 =
       match pl2 with (p2, _) :: pl2 -> (Some p2, pl2) | [] -> (None, [])
     in
     Output.print_sstring conf {|<tr align="|};
-    Output.print_sstring conf conf.left;
+    Output.print_sstring conf conf.Config.left;
     Output.print_sstring conf {|">|};
     Output.print_sstring conf {|<td align="center">|};
     Output.print_sstring conf (if p1 <> None then "|" else "&nbsp;");
     Output.print_sstring conf {|</td><td>&nbsp;</td><td align="center">|};
     Output.print_sstring conf (if p2 <> None then "|" else "&nbsp;");
     Output.print_sstring conf {|</td></tr><tr align="|};
-    Output.print_sstring conf conf.left;
+    Output.print_sstring conf conf.Config.left;
     Output.print_sstring conf {|"><td valign="top" align="center">|};
     (match p1 with
     | Some p1 -> print_someone_and_spouse conf base info true p1 info.sp1 pl1
@@ -321,6 +328,7 @@ let rec print_both_branches_pre conf base info sz pl1 pl2 =
         print_pre_left conf sz (someone_text conf base p1);
         let s, d, _ = spouse_text conf base info.sp1 p1 pl1 in
         if (s : Adef.safe_string :> string) <> "" then
+          let open Def in
           print_pre_left conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
     | None -> Output.print_sstring conf "\n");
     (match p2 with
@@ -328,39 +336,50 @@ let rec print_both_branches_pre conf base info sz pl1 pl2 =
         print_pre_right conf sz (someone_text conf base p2);
         let s, d, _ = spouse_text conf base info.sp2 p2 pl2 in
         if (s : Adef.safe_string :> string) <> "" then
+          let open Def in
           print_pre_right conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
     | None -> Output.print_sstring conf "\n");
     print_both_branches_pre conf base info sz pl1 pl2
 
 let include_marr conf base (n : Adef.escaped_string) =
-  match find_person_in_env conf base (n :> string) with
-  | Some p -> "&" ^<^ acces_n conf base n p
+  match Util.find_person_in_env conf base (n :> string) with
+  | Some p ->
+      let open Def in
+      "&" ^<^ Util.acces_n conf base n p
   | None -> Adef.escaped ""
 
 let sign_text conf base sign info b1 b2 c1 c2 =
   let href =
-    commd conf ^^^ "m=RL&"
-    ^<^ acces_n conf base (Adef.escaped "1") (pget conf base info.ip1)
+    let open Def in
+    Util.commd conf ^^^ "m=RL&"
+    ^<^ Util.acces_n conf base (Adef.escaped "1") (Util.pget conf base info.ip1)
     ^^^ "&"
-    ^<^ acces_n conf base (Adef.escaped "2") (pget conf base info.ip2)
+    ^<^ Util.acces_n conf base (Adef.escaped "2") (Util.pget conf base info.ip2)
     ^^^ "&b1="
-    ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b1))
+    ^<^ Sosa.to_string
+          (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b1))
     ^<^ "&b2="
-    ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
+    ^<^ Sosa.to_string
+          (Util.old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
     ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
     ^<^ Adef.escaped
-          (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "")
+          (if Util.p_getenv conf.Config.env "spouse" = Some "on" then
+           "&spouse=on"
+          else "")
     ^^^ Adef.escaped
-          (if p_getenv conf.env "image" = Some "off" then "&image=off" else "")
-    ^^^ (match p_getenv conf.env "bd" with
+          (if Util.p_getenv conf.Config.env "image" = Some "off" then
+           "&image=off"
+          else "")
+    ^^^ (match Util.p_getenv conf.Config.env "bd" with
         | None | Some ("0" | "") -> Adef.escaped ""
         | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
-    ^^^ (match p_getenv conf.env "color" with
+    ^^^ (match Util.p_getenv conf.Config.env "color" with
         | None | Some "" -> Adef.escaped ""
         | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
     ^^^ include_marr conf base (Adef.escaped "3")
     ^^^ include_marr conf base (Adef.escaped "4")
   in
+  let open Def in
   "<a href=\""
   ^<^ (href : Adef.escaped_string :> Adef.safe_string)
   ^^^ "\">"
@@ -371,6 +390,7 @@ let prev_next_1_text conf base info pb nb =
   let s =
     match pb with
     | Some b1 ->
+        let open Def in
         sign_text conf base (Adef.safe "&lt;&lt;") info b1 info.b2 (info.c1 - 1)
           info.c2
         ^>^ "\n"
@@ -380,11 +400,13 @@ let prev_next_1_text conf base info pb nb =
     match (pb, nb) with
     | None, None -> s
     | _ ->
+        let open Def in
         s ^>^ "<span style=\"font-size:80%\">" ^ string_of_int info.c1
         ^ "</span>"
   in
   match nb with
   | Some b1 ->
+      let open Def in
       s ^^^ "\n"
       ^<^ sign_text conf base (Adef.safe "&gt;&gt;") info b1 info.b2
             (info.c1 + 1) info.c2
@@ -394,6 +416,7 @@ let prev_next_2_text conf base info pb nb =
   let s =
     match pb with
     | Some b2 ->
+        let open Def in
         sign_text conf base (Adef.safe "&lt;&lt;") info info.b1 b2 info.c1
           (info.c2 - 1)
         ^>^ "\n"
@@ -403,11 +426,13 @@ let prev_next_2_text conf base info pb nb =
     match (pb, nb) with
     | None, None -> s
     | _ ->
+        let open Def in
         s ^>^ "<span style=\"font-size:80%\">" ^ string_of_int info.c2
         ^ "</span>"
   in
   match nb with
   | Some b2 ->
+      let open Def in
       s ^^^ "\n"
       ^<^ sign_text conf base (Adef.safe "&gt;&gt;") info info.b1 b2 info.c1
             (info.c2 + 1)
@@ -425,26 +450,30 @@ let other_parent_text_if_same conf base info =
   match (info.b1, info.b2) with
   | (sib1, _) :: _, (sib2, _) :: _ -> (
       match
-        (get_parents (pget conf base sib1), get_parents (pget conf base sib2))
+        ( Gwdb.get_parents (Util.pget conf base sib1),
+          Gwdb.get_parents (Util.pget conf base sib2) )
       with
       | Some ifam1, Some ifam2 -> (
-          let cpl1 = foi base ifam1 in
-          let cpl2 = foi base ifam2 in
+          let cpl1 = Gwdb.foi base ifam1 in
+          let cpl2 = Gwdb.foi base ifam2 in
           let other_parent =
-            if get_father cpl1 = info.ip then
-              if get_mother cpl1 = get_mother cpl2 then Some (get_mother cpl1)
+            if Gwdb.get_father cpl1 = info.ip then
+              if Gwdb.get_mother cpl1 = Gwdb.get_mother cpl2 then
+                Some (Gwdb.get_mother cpl1)
               else None
-            else if get_father cpl1 = get_father cpl2 then
-              Some (get_father cpl1)
+            else if Gwdb.get_father cpl1 = Gwdb.get_father cpl2 then
+              Some (Gwdb.get_father cpl1)
             else None
           in
           match other_parent with
           | Some ip ->
               let d =
-                DateDisplay.short_marriage_date_text conf base (foi base ifam1)
-                  (pget conf base (get_father cpl1))
-                  (pget conf base (get_mother cpl1))
+                DateDisplay.short_marriage_date_text conf base
+                  (Gwdb.foi base ifam1)
+                  (Util.pget conf base (Gwdb.get_father cpl1))
+                  (Util.pget conf base (Gwdb.get_mother cpl1))
               in
+              let open Def in
               Some ("&amp;" ^<^ d ^^^ " " ^<^ someone_text conf base ip, ip)
           | _ -> None)
       | _ -> None)
@@ -460,13 +489,13 @@ let print_someone_and_other_parent_if_same conf base info =
   Output.print_string conf (someone_text conf base info.ip);
   Output.print_sstring conf "\n";
   Output.print_string conf
-    (DagDisplay.image_txt conf base (pget conf base info.ip));
+    (DagDisplay.image_txt conf base (Util.pget conf base info.ip));
   (match other_parent_text_if_same conf base info with
   | Some (s, ip) ->
       Output.print_sstring conf "<br>";
       Output.print_string conf s;
       Output.print_string conf
-        (DagDisplay.image_txt conf base (pget conf base ip))
+        (DagDisplay.image_txt conf base (Util.pget conf base ip))
   | None -> ());
   if info.bd > 0 || (info.td_prop :> string) <> "" then
     Output.print_sstring conf "</td></tr></table>"
@@ -497,7 +526,7 @@ let print_one_branch_with_table conf base info =
   let sp = if info.b1 = [] then info.sp2 else info.sp1 in
   Output.printf conf
     "<table border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
-    conf.border;
+    conf.Config.border;
   Output.print_sstring conf "<tr>\n";
   Output.print_sstring conf "<td align=\"center\">\n";
   print_someone_and_spouse conf base info true info.ip sp b;
@@ -543,7 +572,7 @@ let print_two_branches_with_pre conf base info =
 let print_two_branches_with_table conf base info =
   Output.printf conf
     "<table border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
-    conf.border;
+    conf.Config.border;
   Output.printf conf "<tr align=\"%s\">\n" "left";
   Output.print_sstring conf "<td colspan=\"3\" align=\"center\">";
   print_someone_and_other_parent_if_same conf base info;
@@ -555,14 +584,14 @@ let print_two_branches_with_table conf base info =
   Output.print_sstring conf "</td>";
   Output.print_sstring conf "</tr>\n";
   Output.printf conf "<tr align=\"%s\">\n" "left";
-  Output.printf conf "<td align=\"%s\">" conf.right;
-  Output.printf conf "<hr class=\"%s\">\n" conf.right;
+  Output.printf conf "<td align=\"%s\">" conf.Config.right;
+  Output.printf conf "<hr class=\"%s\">\n" conf.Config.right;
   Output.print_sstring conf "</td>\n";
   Output.print_sstring conf "<td>";
   Output.print_sstring conf "<hr class=\"full\">\n";
   Output.print_sstring conf "</td>\n";
-  Output.printf conf "<td align=\"%s\">" conf.left;
-  Output.printf conf "<hr class=\"%s\">\n" conf.left;
+  Output.printf conf "<td align=\"%s\">" conf.Config.left;
+  Output.printf conf "<hr class=\"%s\">\n" conf.Config.left;
   Output.print_sstring conf "</td>\n";
   Output.print_sstring conf "</tr>\n";
   print_both_branches conf base info info.b1 info.b2;
@@ -584,10 +613,10 @@ let print_two_branches_with_table conf base info =
 
 let print_relation_path conf base info =
   let with_table =
-    match p_getenv conf.env "tab" with
+    match Util.p_getenv conf.Config.env "tab" with
     | Some "on" -> true
     | Some "off" -> false
-    | _ -> not (browser_doesnt_have_tables conf)
+    | _ -> not (Util.browser_doesnt_have_tables conf)
   in
   if info.b1 = [] || info.b2 = [] then (
     if (info.bd > 0 || (info.td_prop :> string) <> "") && with_table then
@@ -608,7 +637,7 @@ let print_relation_path conf base info =
 
 let print_relation_ok conf base info =
   let title _ =
-    transl_nth conf "relationship link/relationship links" 0
+    Util.transl_nth conf "relationship link/relationship links" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     (match (info.pb1, info.nb1) with
     | None, None -> ()
@@ -623,36 +652,47 @@ let print_relation_ok conf base info =
   in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  Util.include_template conf conf.Config.env "buttons_rel" (fun () -> ());
   Output.print_sstring conf {|<p style="clear:both">|};
   print_relation_path conf base info;
   Hutil.trailer conf
 
 let print_relation_no_dag conf base po ip1 ip2 =
   let params =
-    match (po, p_getint conf.env "l1", p_getint conf.env "l2") with
+    match
+      ( po,
+        Util.p_getint conf.Config.env "l1",
+        Util.p_getint conf.Config.env "l2" )
+    with
     | Some p, Some l1, Some l2 ->
-        let ip = get_iper p in
+        let ip = Gwdb.get_iper p in
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
         let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
-        Some (ip, get_sex (pget conf base ip), dist, b1, b2, 1, 1)
+        Some (ip, Gwdb.get_sex (Util.pget conf base ip), dist, b1, b2, 1, 1)
     | _ -> (
-        match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
+        match
+          ( Util.p_getenv conf.Config.env "b1",
+            Util.p_getenv conf.Config.env "b2" )
+        with
         | Some b1str, Some b2str -> (
             let n1 = Sosa.of_string b1str in
             let n2 = Sosa.of_string b2str in
             match
-              ( old_branch_of_sosa conf base ip1 n1,
-                old_branch_of_sosa conf base ip2 n2 )
+              ( Util.old_branch_of_sosa conf base ip1 n1,
+                Util.old_branch_of_sosa conf base ip2 n2 )
             with
             | Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
                 if ia1 = ia2 then
                   let c1 =
-                    match p_getint conf.env "c1" with Some n -> n | None -> 0
+                    match Util.p_getint conf.Config.env "c1" with
+                    | Some n -> n
+                    | None -> 0
                   in
                   let c2 =
-                    match p_getint conf.env "c2" with Some n -> n | None -> 0
+                    match Util.p_getint conf.Config.env "c2" with
+                    | Some n -> n
+                    | None -> 0
                   in
                   let dist =
                     if c1 > 0 || c2 > 0 then
@@ -679,13 +719,16 @@ let print_relation_no_dag conf base po ip1 ip2 =
       let nb2 =
         if c2 = 0 then None else find_next_branch conf base dist ip sp b2
       in
-      let sp1 = find_person_in_env conf base "3" in
-      let sp2 = find_person_in_env conf base "4" in
-      let bd = match p_getint conf.env "bd" with Some x -> x | None -> 0 in
+      let sp1 = Util.find_person_in_env conf base "3" in
+      let sp2 = Util.find_person_in_env conf base "4" in
+      let bd =
+        match Util.p_getint conf.Config.env "bd" with Some x -> x | None -> 0
+      in
       let td_prop =
-        match Util.p_getenv conf.env "color" with
+        match Util.p_getenv conf.Config.env "color" with
         | None | Some "" -> Adef.safe ""
         | Some x ->
+            let open Def in
             (" class=\"" ^<^ Mutil.encode x ^>^ "\"" :> Adef.safe_string)
       in
       let info =
@@ -712,7 +755,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
   | _ -> Hutil.incorrect_request conf
 
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
-  let ia = get_iper a in
+  let ia = Gwdb.get_iper a in
   let add_branches dist set n ip l =
     let b = find_first_branch conf base dist ia l ip Neuter in
     let rec loop set n b =
@@ -723,7 +766,8 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
             let set =
               List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
             in
-            loop set (n + 1) (find_next_branch conf base dist ia (get_sex a) b)
+            loop set (n + 1)
+              (find_next_branch conf base dist ia (Gwdb.get_sex a) b)
         | None -> (set, n)
     in
     loop set n b
@@ -745,8 +789,8 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
     let spl =
       List.fold_right
         (fun (ip, s) spl ->
-          match find_person_in_env conf base s with
-          | Some sp -> (ip, (get_iper sp, None)) :: spl
+          match Util.find_person_in_env conf base s with
+          | Some sp -> (ip, (Gwdb.get_iper sp, None)) :: spl
           | None -> spl)
         [ (ip1, "3"); (ip2, "4") ]
         []
@@ -754,7 +798,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
     let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
     let vbar_txt _ = Adef.escaped "" in
     let invert =
-      match Util.p_getenv conf.env "invert" with
+      match Util.p_getenv conf.Config.env "invert" with
       | Some "on" -> true
       | _ -> false
     in
@@ -776,18 +820,20 @@ let int_list s =
   loop 0 0
 
 let print_relation conf base p1 p2 =
-  let l1 = p_getenv conf.env "l1" in
-  let l2 = p_getenv conf.env "l2" in
-  let po = find_person_in_env conf base "" in
-  match (p_getenv conf.env "dag", po, l1, l2) with
+  let l1 = Util.p_getenv conf.Config.env "l1" in
+  let l2 = Util.p_getenv conf.Config.env "l2" in
+  let po = Util.find_person_in_env conf base "" in
+  match (Util.p_getenv conf.Config.env "dag", po, l1, l2) with
   | Some "on", Some p, Some l1, Some l2 ->
-      print_relation_dag conf base p (get_iper p1) (get_iper p2) (int_list l1)
-        (int_list l2)
-  | _ -> print_relation_no_dag conf base po (get_iper p1) (get_iper p2)
+      print_relation_dag conf base p (Gwdb.get_iper p1) (Gwdb.get_iper p2)
+        (int_list l1) (int_list l2)
+  | _ ->
+      print_relation_no_dag conf base po (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 
 let print conf base =
   match
-    (find_person_in_env conf base "1", find_person_in_env conf base "2")
+    ( Util.find_person_in_env conf base "1",
+      Util.find_person_in_env conf base "2" )
   with
   | Some p1, Some p2 -> print_relation conf base p1 p2
   | _ -> Hutil.incorrect_request conf

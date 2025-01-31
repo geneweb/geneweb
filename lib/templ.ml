@@ -1,9 +1,6 @@
-open Config
-open TemplAst
-
 let commd ?excl ?trim conf = (Util.commd ?excl ?trim conf :> string)
 
-exception Exc_located of loc * exn
+exception Exc_located of TemplAst.loc * exn
 exception BadApplyArity
 exception NamedArgumentNotMatched of string
 
@@ -66,7 +63,7 @@ let subst_text x v s =
     loop 0 0 0
 
 let rec subst sf = function
-  | Atext (loc, s) -> Atext (loc, sf s)
+  | TemplAst.Atext (loc, s) -> TemplAst.Atext (loc, sf s)
   | Avar (loc, s, sl) -> (
       let s1 = sf s in
       if
@@ -151,7 +148,7 @@ let not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 
 let setup_link conf =
-  let s = Mutil.extract_param "host: " '\r' conf.request in
+  let s = Mutil.extract_param "host: " '\r' conf.Config.request in
   try
     let i = String.rindex s ':' in
     let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
@@ -161,7 +158,8 @@ let setup_link conf =
 let esc s = (Util.escape_html s :> string)
 
 let rec eval_variable conf = function
-  | [ "bvar"; v ] -> ( try List.assoc v conf.base_env with Not_found -> "")
+  | [ "bvar"; v ] -> (
+      try List.assoc v conf.Config.base_env with Not_found -> "")
   | [ "evar"; v; "ns" ] -> (
       try
         let vv = List.assoc v (conf.env @ conf.henv) in
@@ -294,7 +292,7 @@ and eval_simple_variable conf = function
   | _ -> raise Not_found
 
 let rec string_of_expr_val = function
-  | VVstring s -> s
+  | TemplAst.VVstring s -> s
   | VVbool true -> "1"
   | VVbool false -> "0"
   | VVother f -> string_of_expr_val (f [])
@@ -302,7 +300,7 @@ let rec string_of_expr_val = function
 let eval_string_var conf eval_var sl =
   try eval_var sl
   with Not_found -> (
-    try VVstring (eval_variable conf sl)
+    try TemplAst.VVstring (eval_variable conf sl)
     with Not_found -> VVstring (" %" ^ String.concat "." sl ^ "?"))
 
 let eval_var_handled conf sl =
@@ -335,7 +333,7 @@ let apply_format conf nth s1 s2 =
               | None -> raise Not_found)))
 
 let rec eval_ast conf = function
-  | Atext (_, s) -> s
+  | TemplAst.Atext (_, s) -> s
   | Avar (_, s, sl) -> eval_var_handled conf (s :: sl)
   | Atransl (_, upp, s, c) -> eval_transl conf upp s c
   | ast -> not_impl "eval_ast" ast
@@ -396,7 +394,7 @@ and eval_transl_lexicon conf upp s c =
 let nb_errors = ref 0
 
 let loc_of_expr = function
-  | Atext (loc, _) -> loc
+  | TemplAst.Atext (loc, _) -> loc
   | Avar (loc, _, _) -> loc
   | Atransl (loc, _, _, _) -> loc
   | Aapply (loc, _, _) -> loc
@@ -407,8 +405,8 @@ let loc_of_expr = function
 
 let templ_eval_var conf = function
   | [ "browsing_with_sosa_ref" ] -> (
-      match Util.p_getenv conf.env "sosa_ref" with
-      | Some _ -> VVbool true
+      match Util.p_getenv conf.Config.env "sosa_ref" with
+      | Some _ -> TemplAst.VVbool true
       | _ -> VVbool false)
   | [ "cancel_links" ] -> VVbool (Util.p_getenv conf.env "cgl" = Some "on")
   | [ "cgi" ] -> VVbool conf.cgi
@@ -426,17 +424,17 @@ let templ_eval_var conf = function
   | _ -> raise Not_found
 
 let bool_of e = function
-  | VVbool b -> b
+  | TemplAst.VVbool b -> b
   | VVstring _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "bool value expected")
 
 let string_of e = function
-  | VVstring s -> s
+  | TemplAst.VVstring s -> s
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "string value expected")
 
 let int_of e = function
-  | VVstring s -> (
+  | TemplAst.VVstring s -> (
       try int_of_string s
       with Failure _ ->
         raise_with_loc (loc_of_expr e)
@@ -445,7 +443,7 @@ let int_of e = function
       raise_with_loc (loc_of_expr e) (Failure "int value expected")
 
 let num_of e = function
-  | VVstring s -> (
+  | TemplAst.VVstring s -> (
       try Sosa.of_string s
       with Failure _ ->
         raise_with_loc (loc_of_expr e)
@@ -454,7 +452,7 @@ let num_of e = function
       raise_with_loc (loc_of_expr e) (Failure "num value expected")
 
 let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
-  | Atext (_, s) -> VVstring s
+  | TemplAst.Atext (_, s) -> TemplAst.VVstring s
   | Avar (loc, s, sl) as e -> (
       try eval_var loc (s :: sl)
       with Not_found -> (
@@ -550,34 +548,36 @@ let eval_string_expr conf (eval_var, eval_apply) e =
 
 let print_body_prop conf =
   let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
+    try " dir=\"" ^ Hashtbl.find conf.Config.lexicon "!dir" ^ "\""
     with Not_found -> ""
   in
   Output.print_sstring conf (s ^ Util.body_prop conf)
 
 type 'a vother =
-  | Vdef of (string * ast option) list * ast list
-  | Vval of 'a expr_val
+  | Vdef of (string * TemplAst.ast option) list * TemplAst.ast list
+  | Vval of 'a TemplAst.expr_val
   | Vbind of string * Adef.encoded_string
 
 type 'a env = (string * 'a) list
 
 type ('a, 'b) interp_fun = {
-  eval_var : 'a env -> 'b -> loc -> string list -> 'b expr_val;
+  eval_var :
+    'a env -> 'b -> TemplAst.loc -> string list -> 'b TemplAst.expr_val;
   eval_transl : 'a env -> bool -> string -> string -> string;
-  eval_predefined_apply : 'a env -> string -> 'b expr_val list -> string;
+  eval_predefined_apply :
+    'a env -> string -> 'b TemplAst.expr_val list -> string;
   get_vother : 'a -> 'b vother option;
   set_vother : 'b vother -> 'a;
   print_foreach :
-    ('a env -> 'b -> ast -> unit) ->
-    ('a env -> 'b -> ast -> string) ->
+    ('a env -> 'b -> TemplAst.ast -> unit) ->
+    ('a env -> 'b -> TemplAst.ast -> string) ->
     'a env ->
     'b ->
-    loc ->
+    TemplAst.loc ->
     string ->
     string list ->
-    ast list list ->
-    ast list ->
+    TemplAst.ast list list ->
+    TemplAst.ast list ->
     unit;
 }
 
@@ -608,7 +608,8 @@ let set_val set_vother k v env =
 let eval_subst loc f set_vother env xl vl a =
   let rec loop env a xl vl =
     match (xl, vl) with
-    | x :: xl, VVstring v :: vl -> loop env (subst (subst_text x v) a) xl vl
+    | x :: xl, TemplAst.VVstring v :: vl ->
+        loop env (subst (subst_text x v) a) xl vl
     | x :: xl, v :: vl ->
         let env = set_val set_vother x v env in
         loop env a xl vl
@@ -632,7 +633,8 @@ let print_apply loc f set_vother print_ast env ep gxl al gvl =
     let env, a =
       let rec loop env a xl vl =
         match (xl, vl) with
-        | x :: xl, VVstring v :: vl -> loop env (subst (subst_text x v) a) xl vl
+        | x :: xl, TemplAst.VVstring v :: vl ->
+            loop env (subst (subst_text x v) a) xl vl
         | x :: xl, v :: vl -> loop (set_val set_vother x v env) a xl vl
         | [], [] -> (env, a)
         | _ ->
@@ -648,7 +650,7 @@ let print_apply loc f set_vother print_ast env ep gxl al gvl =
   in
   let rec loop = function
     | [] -> ()
-    | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+    | TemplAst.Avar (_, "sq", []) :: Atext (loc, s) :: al ->
         let s = squeeze_spaces s in
         loop (Atext (loc, s) :: al)
     | a :: al ->
@@ -673,7 +675,7 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
         print_ast (("binding", set_vother (Vbind (k, v))) :: env) ep
       in
       List.iter print_ast al)
-    conf.env
+    conf.Config.env
 
 let float_rgb_of_hsv h s v =
   let h = if h > 1. then 1. else if h < 0. then 0. else h in
@@ -710,7 +712,7 @@ let eval_var conf ifun env ep loc sl =
     match sl with
     | [ "env"; "key" ] -> (
         match ifun.get_vother (List.assoc "binding" env) with
-        | Some (Vbind (k, _)) -> VVstring k
+        | Some (Vbind (k, _)) -> TemplAst.VVstring k
         | _ -> raise Not_found)
     | [ "env"; "val" ] -> (
         match ifun.get_vother (List.assoc "binding" env) with
@@ -721,7 +723,7 @@ let eval_var conf ifun env ep loc sl =
         | Some (Vbind (_, v)) -> VVstring (Mutil.decode v)
         | _ -> raise Not_found)
     | "today" :: sl ->
-        let sdn = Date.to_sdn ~from:Dgregorian conf.today in
+        let sdn = Date.to_sdn ~from:Dgregorian conf.Config.today in
         TemplDate.eval_date_var conf sdn sl
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
@@ -758,13 +760,18 @@ let include_hed_trl conf name =
   Util.include_template conf [] name (fun () -> ())
 
 let rec interp_ast :
-    config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =
+    Config.config ->
+    ('a, 'b) interp_fun ->
+    'a env ->
+    'b ->
+    TemplAst.ast list ->
+    unit =
  fun conf ifun env ->
   let m_env = ref env in
   let rec eval_ast env ep a = string_of_expr_val (eval_ast_expr env ep a)
   and eval_ast_list env ep = function
     | [] -> []
-    | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+    | TemplAst.Avar (_, "sq", []) :: Atext (loc, s) :: al ->
         let s = squeeze_spaces s in
         eval_ast_list env ep (Atext (loc, s) :: al)
     | a :: al -> eval_ast env ep a :: eval_ast_list env ep al
@@ -784,7 +791,7 @@ let rec interp_ast :
   and eval_ast_expr_list env ep v =
     let rec loop = function
       | [] -> []
-      | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+      | TemplAst.Avar (_, "sq", []) :: Atext (loc, s) :: al ->
           let s = squeeze_spaces s in
           loop (Atext (loc, s) :: al)
       | a :: al -> eval_ast_expr env ep a :: loop al
@@ -803,7 +810,7 @@ let rec interp_ast :
     | Some (xl, al) ->
         let xl, vl =
           sort_apply_parameters loc
-            (fun ast -> VVstring (eval_expr env ep ast))
+            (fun ast -> TemplAst.VVstring (eval_expr env ep ast))
             xl vl
         in
 
@@ -887,7 +894,7 @@ let rec interp_ast :
     loop env min max ""
   in
   let rec print_ast env ep = function
-    | Avar (loc, s, sl) ->
+    | TemplAst.Avar (loc, s, sl) ->
         print_var print_ast_list conf ifun env ep loc (s :: sl)
     | Awid_hei s -> print_wid_hei conf s
     | Aif (e, alt, ale) -> print_if env ep e alt ale
@@ -902,7 +909,7 @@ let rec interp_ast :
     | x -> Output.print_sstring conf (eval_ast env ep x)
   and print_ast_list env ep = function
     | [] -> m_env := env
-    | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+    | TemplAst.Avar (_, "sq", []) :: Atext (loc, s) :: al ->
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
     | Ainclude (fname, astl) :: al ->
@@ -926,7 +933,7 @@ let rec interp_ast :
         try
           let xl, vl =
             sort_apply_parameters loc
-              (fun e -> VVstring (eval_expr env ep e))
+              (fun e -> TemplAst.VVstring (eval_expr env ep e))
               xl vl
           in
           templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
@@ -968,7 +975,7 @@ and print_var print_ast_list conf ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try
       match eval_var sl with
-      | VVstring s -> Output.print_sstring conf s
+      | TemplAst.VVstring s -> Output.print_sstring conf s
       | VVbool true -> Output.print_sstring conf "1"
       | VVbool false -> Output.print_sstring conf "0"
       | VVother f -> print_var1 f []
@@ -1011,7 +1018,8 @@ and print_variable conf sl =
       | _ -> raise Not_found
     with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
 
-let copy_from_templ : config -> Adef.encoded_string env -> in_channel -> unit =
+let copy_from_templ :
+    Config.config -> Adef.encoded_string env -> in_channel -> unit =
  fun conf env ic ->
   let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
   close_in ic;

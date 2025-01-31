@@ -1,16 +1,10 @@
 (* $Id: history.ml,v 5.14 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open TemplAst
-open Util
-
 (* S: Fail if conf.bname is undefined? *)
 let file_name conf =
   let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
+    if Filename.check_suffix conf.Config.bname ".gwb" then conf.bname
     else conf.bname ^ ".gwb"
   in
   Filename.concat (Util.bpath bname) "history"
@@ -55,14 +49,14 @@ let slash_name_of_key fn sn occ =
     [Retour] : string array
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let diff_visibility conf base op np =
-  let k = slash_name_of_key np.first_name np.surname np.occ in
-  let empty_union = { family = [||] } in
-  let empty_ascend = { parents = None; consang = Adef.fix (-1) } in
+  let k = slash_name_of_key np.Def.first_name np.surname np.occ in
+  let empty_union = { Def.family = [||] } in
+  let empty_ascend = { Def.parents = None; consang = Adef.fix (-1) } in
   let op = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op in
   let np = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np in
   let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
   let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
-  let tmp_conf = { conf with wizard = false; friend = false } in
+  let tmp_conf = { conf with Config.wizard = false; friend = false } in
   let old_visibility = Util.authorized_age tmp_conf base o_p in
   let new_visibility = Util.authorized_age tmp_conf base n_p in
   if old_visibility <> new_visibility then
@@ -71,7 +65,8 @@ let diff_visibility conf base op np =
 
 type kind_diff =
   | Diff_person of
-      (iper, iper, string) gen_person * (iper, iper, string) gen_person
+      (Gwdb.iper, Gwdb.iper, string) Def.gen_person
+      * (Gwdb.iper, Gwdb.iper, string) Def.gen_person
   | Diff_string of (string * string * int) * (string * string * int)
 
 (* ********************************************************************** *)
@@ -115,7 +110,7 @@ let diff_key d =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let diff_person conf base changed =
   match changed with
-  | U_Add_person _ | U_Delete_person _ -> [||]
+  | Def.U_Add_person _ | U_Delete_person _ -> [||]
   | U_Modify_person (o, n) ->
       Array.append
         (diff_key (Diff_person (o, n)))
@@ -166,14 +161,14 @@ let diff_person conf base changed =
 let notify_change conf base changed action =
   if Sys.unix then
     let notify_change =
-      if Option.is_some conf.notify_change then conf.notify_change
+      if Option.is_some conf.Config.notify_change then conf.notify_change
       else List.assoc_opt "notify_change" conf.base_env
     in
     match notify_change with
     | Some comm -> (
         let base_args =
           match changed with
-          | U_Add_person p
+          | Def.U_Add_person p
           | U_Modify_person (_, p)
           | U_Delete_person p
           | U_Merge_person (_, _, p)
@@ -189,7 +184,7 @@ let notify_change conf base changed action =
           | U_Change_children_name (p, _)
           | U_Multi (_, p, _) ->
               let key = slash_name_of_key p.first_name p.surname p.occ in
-              [| key; string_of_iper p.key_index |]
+              [| key; Gwdb.string_of_iper p.key_index |]
           | U_Notes (Some num, file) -> [| file; string_of_int num |]
           | U_Notes (None, file) -> [| file |]
         in
@@ -224,11 +219,11 @@ let notify_change conf base changed action =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                         *)
 let gen_record conf base changed action =
-  (match List.assoc_opt "history" conf.base_env with
+  (match List.assoc_opt "history" conf.Config.base_env with
   | Some "yes" when not conf.manitou -> (
       let item =
         match changed with
-        | U_Add_person p
+        | Def.U_Add_person p
         | U_Modify_person (_, p)
         | U_Delete_person p
         | U_Merge_person (_, _, p)
@@ -290,20 +285,20 @@ let gen_record conf base changed action =
 let record conf base changed action =
   (* Mise à jour du fichier gwf si le sosa_ref a changé. *)
   (match changed with
-  | U_Modify_person (_, p) ->
+  | Def.U_Modify_person (_, p) ->
       let fn, sn, occ, ip = (p.first_name, p.surname, p.occ, p.key_index) in
-      update_gwf_sosa conf base (ip, (fn, sn, occ))
+      Util.update_gwf_sosa conf base (ip, (fn, sn, occ))
   | U_Merge_person (p1, _, p) ->
       let fn, sn, occ, ip = (p1.first_name, p1.surname, p1.occ, p1.key_index) in
-      update_gwf_sosa conf base (ip, (fn, sn, occ));
+      Util.update_gwf_sosa conf base (ip, (fn, sn, occ));
       (* On n'a pas besoin de faire un update sur "p2" *)
       (* parce qu'on le fait sur p dans tous les cas.  *)
       let fn, sn, occ, ip = (p.first_name, p.surname, p.occ, p.key_index) in
-      update_gwf_sosa conf base (ip, (fn, sn, occ))
+      Util.update_gwf_sosa conf base (ip, (fn, sn, occ))
   | U_Change_children_name (_, l) ->
       List.iter
         (fun (_, (fn, sn, occ, ip)) ->
-          update_gwf_sosa conf base (ip, (fn, sn, occ)))
+          Util.update_gwf_sosa conf base (ip, (fn, sn, occ)))
         l
   | _ -> ());
   (* Mise à jour du fichier historique et appel de notify_change. *)
@@ -326,7 +321,7 @@ let record conf base changed action =
 let notify conf base action =
   let empty_person = Gwdb.empty_person base Gwdb.dummy_iper in
   let empty_person =
-    Util.string_gen_person base (gen_person_of_person empty_person)
+    Util.string_gen_person base (Gwdb.gen_person_of_person empty_person)
   in
   notify_change conf base (U_Multi (empty_person, empty_person, false)) action
 
@@ -353,7 +348,10 @@ let line_fields line =
     Some (time, user, action, key)
   else None
 
-type hist_item = HI_notes of string * int option | HI_ind of person | HI_none
+type hist_item =
+  | HI_notes of string * int option
+  | HI_ind of Gwdb.person
+  | HI_none
 
 type 'a env =
   | Vcnt of int ref
@@ -370,37 +368,39 @@ let set_vother x = Vother x
 let possibly_highlight env s =
   match get_env "search" env with
   | Vsearch (Some (case_sens, h, _)) ->
-      if in_text case_sens h s then html_highlight case_sens h s else s
+      if Util.in_text case_sens h s then Util.html_highlight case_sens h s
+      else s
   | _ -> s
 
-let safe_val (s : Adef.safe_string) = VVstring (s :> string)
+let safe_val (s : Adef.safe_string) = TemplAst.VVstring (s :> string)
 
 let rec eval_var conf base env _ _ = function
   | [ "count" ] -> (
       match get_env "count" env with
-      | Vcnt c -> VVstring (string_of_int !c)
-      | _ -> VVstring "")
+      | Vcnt c -> TemplAst.VVstring (string_of_int !c)
+      | _ -> TemplAst.VVstring "")
   | [ "first_name" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (p_first_name base p)
-      | _ -> VVstring "")
+      | Vinfo (_, _, _, HI_ind p, _) ->
+          TemplAst.VVstring (Gwdb.p_first_name base p)
+      | _ -> TemplAst.VVstring "")
   | [ "found" ] -> (
       match get_env "search" env with
-      | Vsearch (Some _) -> VVbool true
-      | _ -> VVbool false)
+      | Vsearch (Some _) -> TemplAst.VVbool true
+      | _ -> TemplAst.VVbool false)
   | [ "incr_count" ] -> (
       match get_env "count" env with
       | Vcnt c ->
           incr c;
-          VVstring ""
-      | _ -> VVstring "")
+          TemplAst.VVstring ""
+      | _ -> TemplAst.VVstring "")
   | [ "is_note" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_notes (_, _), _) -> VVbool true
-      | _ -> VVbool false)
+      | Vinfo (_, _, _, HI_notes (_, _), _) -> TemplAst.VVbool true
+      | _ -> TemplAst.VVbool false)
   | [ "key" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, _, s) -> VVstring (possibly_highlight env s)
+      | Vinfo (_, _, _, _, s) -> TemplAst.VVstring (possibly_highlight env s)
       | _ -> raise Not_found)
   | "note" :: "page" :: sl -> (
       match get_env "info" env with
@@ -411,38 +411,41 @@ let rec eval_var conf base env _ _ = function
             | [] -> possibly_highlight env s
             | _ -> raise Not_found
           in
-          VVstring s
+          TemplAst.VVstring s
       | _ -> raise Not_found)
   | [ "note"; "part" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_notes (_, Some x), _) -> VVstring (string_of_int x)
-      | Vinfo (_, _, _, HI_notes (_, None), _) -> VVstring ""
+      | Vinfo (_, _, _, HI_notes (_, Some x), _) ->
+          TemplAst.VVstring (string_of_int x)
+      | Vinfo (_, _, _, HI_notes (_, None), _) -> TemplAst.VVstring ""
       | _ -> raise Not_found)
   | [ "occ" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (string_of_int (get_occ p))
-      | _ -> VVstring "")
+      | Vinfo (_, _, _, HI_ind p, _) ->
+          TemplAst.VVstring (string_of_int (Gwdb.get_occ p))
+      | _ -> TemplAst.VVstring "")
   | "person" :: sl -> (
       match get_env "info" env with
       | Vinfo (_, _, _, HI_ind p, _) -> eval_person_field_var conf base env p sl
       | _ -> raise Not_found)
   | [ "pos" ] -> (
       match get_env "pos" env with
-      | Vpos r -> VVstring (string_of_int !r)
+      | Vpos r -> TemplAst.VVstring (string_of_int !r)
       | _ -> raise Not_found)
   | [ "reset_count" ] -> (
       match get_env "count" env with
       | Vcnt c ->
           c := 0;
-          VVstring ""
-      | _ -> VVstring "")
+          TemplAst.VVstring ""
+      | _ -> TemplAst.VVstring "")
   | [ "surname" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (p_surname base p)
-      | _ -> VVstring "")
+      | Vinfo (_, _, _, HI_ind p, _) ->
+          TemplAst.VVstring (Gwdb.p_surname base p)
+      | _ -> TemplAst.VVstring "")
   | [ "time" ] -> (
       match get_env "info" env with
-      | Vinfo (s, _, _, _, _) -> VVstring (possibly_highlight env s)
+      | Vinfo (s, _, _, _, _) -> TemplAst.VVstring (possibly_highlight env s)
       | _ -> raise Not_found)
   | "update" :: sl -> (
       match get_env "info" env with
@@ -457,41 +460,42 @@ let rec eval_var conf base env _ _ = function
             | [] -> possibly_highlight env s
             | _ -> raise Not_found
           in
-          VVstring s
+          TemplAst.VVstring s
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
 and eval_string s = function
-  | [ "var" ] -> VVother (eval_string s)
-  | [] -> VVstring s
+  | [ "var" ] -> TemplAst.VVother (eval_string s)
+  | [] -> TemplAst.VVstring s
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env p = function
   | [ "access" ] -> safe_val (Util.acces conf base p :> Adef.safe_string)
   | [ "dates" ] -> safe_val (DateDisplay.short_dates_text conf base p)
   | [ "has_history" ] ->
-      let fn = sou base (get_first_name p) in
-      let sn = sou base (get_surname p) in
-      let occ = get_occ p in
+      let fn = Gwdb.sou base (Gwdb.get_first_name p) in
+      let sn = Gwdb.sou base (Gwdb.get_surname p) in
+      let occ = Gwdb.get_occ p in
       let person_file = HistoryDiff.history_file fn sn occ in
-      VVbool (Sys.file_exists (HistoryDiff.history_path conf person_file))
+      TemplAst.VVbool
+        (Sys.file_exists (HistoryDiff.history_path conf person_file))
   | [ "history_file" ] ->
-      let fn = sou base (get_first_name p) in
-      let sn = sou base (get_surname p) in
-      let occ = get_occ p in
-      VVstring (HistoryDiff.history_file fn sn occ)
+      let fn = Gwdb.sou base (Gwdb.get_first_name p) in
+      let sn = Gwdb.sou base (Gwdb.get_surname p) in
+      let occ = Gwdb.get_occ p in
+      TemplAst.VVstring (HistoryDiff.history_file fn sn occ)
   | [ "is_invisible" ] ->
       let conf = { conf with wizard = false; friend = false } in
-      VVbool (not (Util.authorized_age conf base p))
-  | [ "title" ] -> safe_val (person_title conf base p)
+      TemplAst.VVbool (not (Util.authorized_age conf base p))
+  | [ "title" ] -> safe_val (Util.person_title conf base p)
   | [] ->
-      VVstring
+      TemplAst.VVstring
         (possibly_highlight env
            (simple_person_text conf base p : Adef.safe_string :> string))
-  | _ -> VVstring "person..."
+  | _ -> TemplAst.VVstring "person..."
 
 and simple_person_text conf base p =
-  match main_title conf base p with
+  match Util.main_title conf base p with
   | Some t -> NameDisplay.title_html_of_person conf base p t
   | None -> NameDisplay.fullname_html_of_person conf base p
 
@@ -570,15 +574,16 @@ let print_foreach conf base print_ast eval_expr =
                     with Failure _ -> HI_notes (key, None))
                 | _ -> (
                     match Gutil.person_ht_find_all base key with
-                    | [ ip ] -> HI_ind (pget conf base ip)
+                    | [ ip ] -> HI_ind (Util.pget conf base ip)
                     | _ -> HI_none))
             | None -> HI_none
           in
           let not_displayed =
             match hist_item with
             | HI_ind p ->
-                is_empty_person p
-                || (is_hide_names conf p && not (authorized_age conf base p))
+                Util.is_empty_person p
+                || Util.is_hide_names conf p
+                   && not (Util.authorized_age conf base p)
             | _ -> false
           in
           if not_displayed then i
@@ -616,14 +621,14 @@ let print conf base = gen_print conf base None
 
 let search_text conf base s =
   let s = if s = "" then " " else s in
-  let case_sens = p_getenv conf.env "c" = Some "on" in
+  let case_sens = Util.p_getenv conf.Config.env "c" = Some "on" in
   let found =
     match
       try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
     with
     | Some ic ->
         let pos =
-          match p_getint conf.env "pos" with
+          match Util.p_getint conf.env "pos" with
           | Some pos -> pos
           | None -> in_channel_length ic
         in
@@ -637,8 +642,9 @@ let search_text conf base s =
               | Some (time, user, _, keyo) ->
                   let key = match keyo with Some key -> key | None -> "" in
                   if
-                    in_text case_sens s time || in_text case_sens s user
-                    || in_text case_sens s key
+                    Util.in_text case_sens s time
+                    || Util.in_text case_sens s user
+                    || Util.in_text case_sens s key
                   then Some pos
                   else loop pos2
               | None -> None)
@@ -653,7 +659,7 @@ let search_text conf base s =
   gen_print conf base (Some h)
 
 let print_search conf base =
-  if conf.wizard || conf.friend then
+  if conf.Config.wizard || conf.friend then
     match try Some (List.assoc "s" conf.env) with Not_found -> None with
     | Some s -> search_text conf base (Mutil.gen_decode false s)
     | None -> print conf base

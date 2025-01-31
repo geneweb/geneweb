@@ -1,7 +1,5 @@
 {
 
-open TemplAst
-
 let dump_list pp a = String.concat ";" (List.map pp a)
 let rec dump_ast trk depth =
   let dump_ast a = if depth > 0 then dump_ast trk (depth - 1) a else "..." in
@@ -11,7 +9,7 @@ let rec dump_ast trk depth =
     let s = Str.global_replace (Str.regexp "\n") " " s in
     if String.length s > trk then String.sub s 0 trk ^ "..." else s in
   function
-  | Atext (_, a) ->
+  | TemplAst.Atext (_, a) ->
     "(Atext " ^ trk a ^ ")"
   | Avar (_, a, b) ->
     "(Avar " ^ trk (String.concat "." (a :: b)) ^ ")"
@@ -159,7 +157,7 @@ rule parse_ast conf b closing ast = parse
             | `variable ["apply"] -> parse_apply conf b lexbuf
             | `variable ["expr"] -> parse_expr_stmt lexbuf
             | `variable ["for"] -> parse_for conf b lexbuf
-            | `variable ["wid_hei"] -> Awid_hei (value lexbuf)
+            | `variable ["wid_hei"] -> TemplAst.Awid_hei (value lexbuf)
             | `variable (hd :: tl) -> Avar (pos, hd, tl)
           [@@warning "-8"]
           in
@@ -175,7 +173,7 @@ rule parse_ast conf b closing ast = parse
         then
           try
             let (ast, _) = parse_ast conf b [] [] (Lexing.from_string s) in
-            Aconcat (pos, ast)
+            TemplAst.Aconcat (pos, ast)
           with _ -> fail lexbuf ~pos ()
         else
           Atransl (pos, upp, s, n)
@@ -226,7 +224,7 @@ and parse_expr_if_1 e1 = parse
 and parse_expr_if_2 e1 e2 = parse
   | ws* "else" {
       let e3 = parse_expr_or lexbuf in
-      Aif (e1, [e2], [e3])
+      TemplAst.Aif (e1, [e2], [e3])
     }
 
 and parse_expr_or = parse
@@ -313,7 +311,7 @@ and parse_expr_4_1 e1 = parse
   | ws* (("+"|"-") as op) ws* {
       let pos = pos lexbuf in
       let e2 = parse_expr_5 lexbuf in
-      parse_expr_4_1 (Aop2 (pos, String.make 1 op, e1, e2)) lexbuf
+      parse_expr_4_1 (TemplAst.Aop2 (pos, String.make 1 op, e1, e2)) lexbuf
     }
   | ws*  { e1 }
 
@@ -327,7 +325,7 @@ and parse_expr_5_1 e1 = parse
   | ws* (("*"|"^"|"/"|"%"|"/.") as op) {
       let pos = pos lexbuf in
       let e2 = parse_simple_expr lexbuf in
-      parse_expr_5_1 (Aop2 (pos, op, e1, e2)) lexbuf
+      parse_expr_5_1 (TemplAst.Aop2 (pos, op, e1, e2)) lexbuf
     }
   | ws* {
       e1
@@ -548,7 +546,7 @@ and parse_define conf b closing ast = parse
       let args = parse_params lexbuf in
       let (a, _) = parse_ast conf b ["end"] [] lexbuf in
       let (k, t) = parse_ast conf b closing [] lexbuf in
-      (List.rev (Adefine (f, args, a, k) :: ast), t)
+      (List.rev (TemplAst.Adefine (f, args, a, k) :: ast), t)
     }
 and parse_params = parse
   | ws* (r_ident as a) ws* '=' ws* {
@@ -577,14 +575,14 @@ and parse_let conf b closing ast = parse
   |  ws* (r_ident as k) ';' ws* {
       let (v, _) = parse_ast conf b ["in"] [] lexbuf in
       let (a, t) = parse_ast conf b closing [] lexbuf in
-      (List.rev (Alet (k, v, a) :: ast), t)
+      (List.rev (TemplAst.Alet (k, v, a) :: ast), t)
     }
 
 and parse_include conf b closing ast = parse
   | value as file {
       let ast =
         match List.assoc_opt file !included_files with
-        | Some a -> Ainclude (file, a) :: ast
+        | Some a -> TemplAst.Ainclude (file, a) :: ast
         | None ->
           match Util.open_etc_file file with
           | Some (ic, fname) ->
@@ -594,7 +592,7 @@ and parse_include conf b closing ast = parse
                 let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
                 let () = close_in ic in
                 let () = included_files := (file, a) :: !included_files in
-                Ainclude (file, a) :: ast
+                TemplAst.Ainclude (file, a) :: ast
               with _ -> fail lex2 ()
             end
           | None ->
@@ -638,7 +636,7 @@ and parse_if conf b = parse
           | "elseif" ->
             let e2 = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
             let (a2, a3) = loop () in
-            a1, [ Aif (e2, a2, a3) ]
+            a1, [ TemplAst.Aif (e2, a2, a3) ]
           | "else" ->
             let (a2, _) = parse_ast conf b ["end"] [] lexbuf in
             a1, a2

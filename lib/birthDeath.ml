@@ -1,15 +1,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
-
 let get_k conf =
-  match p_getint conf.env "k" with
+  match Util.p_getint conf.Config.env "k" with
   | Some x -> x
   | _ -> (
-      try int_of_string (List.assoc "latest_event" conf.base_env)
+      try int_of_string (List.assoc "latest_event" conf.Config.base_env)
       with Not_found | Failure _ -> 20)
 
 let select (type a)
@@ -17,10 +12,14 @@ let select (type a)
     iterator get get_date conf base =
   let n = min (max 0 (get_k conf)) (nb_of base) in
   let ref_date =
-    match p_getint conf.env "by" with
+    match Util.p_getint conf.Config.env "by" with
     | Some by ->
-        let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
-        let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
+        let bm =
+          Option.value ~default:(-1) (Util.p_getint conf.Config.env "bm")
+        in
+        let bd =
+          Option.value ~default:(-1) (Util.p_getint conf.Config.env "bd")
+        in
         Some Date.{ day = bd; month = bm; year = by; prec = Sure; delta = 0 }
     | None -> None
   in
@@ -67,7 +66,7 @@ let select_person conf base get_date find_oldest =
   Gwdb.load_persons_array base;
   select
     (if find_oldest then (module PQ_oldest) else (module PQ))
-    nb_of_persons Gwdb.ipers (pget conf) get_date conf base
+    Gwdb.nb_of_persons Gwdb.ipers (Util.pget conf) get_date conf base
 
 module FQ = Pqueue.Make (struct
   type t = Gwdb.family * Date.dmy * Date.calendar
@@ -85,9 +84,9 @@ let select_family conf base get_date find_oldest =
   Gwdb.load_families_array base;
   select
     (if find_oldest then (module FQ_oldest) else (module FQ))
-    nb_of_families Gwdb.ifams Gwdb.foi get_date conf base
+    Gwdb.nb_of_families Gwdb.ifams Gwdb.foi get_date conf base
 
-let death_date p = Date.date_of_death (get_death p)
+let death_date p = Date.date_of_death (Gwdb.get_death p)
 
 let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
   let men = Array.make (nb_intervals + 1) 0 in
@@ -96,24 +95,25 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
   Gwdb.load_persons_array base;
   Gwdb.Collection.iter
     (fun i ->
-      let p = pget conf base i in
-      let sex = get_sex p in
-      let dea = get_death p in
-      if sex <> Neuter then
-        match Date.cdate_to_dmy_opt (get_birth p) with
+      let p = Util.pget conf base i in
+      let sex = Gwdb.get_sex p in
+      let dea = Gwdb.get_death p in
+      if sex <> Def.Neuter then
+        match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
         | None -> ()
         | Some dmy ->
             if Date.compare_dmy dmy at_date <= 0 then
               let a = Date.time_elapsed dmy at_date in
               let j = min nb_intervals (a.year / interval) in
               if
-                (dea = NotDead || (dea = DontKnowIfDead && a.year < limit))
+                (dea = Def.NotDead
+                || (dea = Def.DontKnowIfDead && a.year < limit))
                 ||
                 match Date.dmy_of_death dea with
                 | None -> false
                 | Some d -> Date.compare_dmy d at_date > 0
               then
-                if sex = Male then men.(j) <- men.(j) + 1
+                if sex = Def.Male then men.(j) <- men.(j) + 1
                 else wom.(j) <- wom.(j) + 1)
     (Gwdb.ipers base);
   (men, wom)

@@ -1,98 +1,95 @@
 (* $Id: check.ml,v 5.28 2008-11-03 15:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-open Gwdb
-
 (* Printing check errors *)
 
 let designation base p =
   let s = Gutil.designation base p in
   if String.get s 0 = '?' || String.get s (String.length s - 1) = '?' then
-    s ^ " (i=" ^ string_of_iper (get_iper p) ^ ")"
+    s ^ " (i=" ^ Gwdb.string_of_iper (Gwdb.get_iper p) ^ ")"
   else s
 
 let string_of_epers_name base epers_name =
   match epers_name with
-  | Epers_Birth -> "birth"
-  | Epers_Baptism -> "baptism"
-  | Epers_Death -> "death"
-  | Epers_Burial -> "burial"
-  | Epers_Cremation -> "cremation"
-  | Epers_Accomplishment -> "accomplishment"
-  | Epers_Acquisition -> "acquisition"
-  | Epers_Adhesion -> "adhesion"
-  | Epers_BaptismLDS -> "baptism (LDS)"
-  | Epers_BarMitzvah -> "bar mitzvah"
-  | Epers_BatMitzvah -> "bat mitzvah"
-  | Epers_Benediction -> "benediction"
-  | Epers_ChangeName -> "change name"
-  | Epers_Circumcision -> "circumcision"
-  | Epers_Confirmation -> "confirmation"
-  | Epers_ConfirmationLDS -> "confirmation (LDS)"
-  | Epers_Decoration -> "decoration"
-  | Epers_DemobilisationMilitaire -> "military demobilisation"
-  | Epers_Diploma -> "diploma"
-  | Epers_Distinction -> "distinction"
-  | Epers_Dotation -> "dotation"
-  | Epers_DotationLDS -> "dotation (LDS)"
-  | Epers_Education -> "education"
-  | Epers_Election -> "election"
-  | Epers_Emigration -> "emigration"
-  | Epers_Excommunication -> "excommunication"
-  | Epers_FamilyLinkLDS -> "family link (LDS)"
-  | Epers_FirstCommunion -> "first communion"
-  | Epers_Funeral -> "funeral"
-  | Epers_Graduate -> "graduation"
-  | Epers_Hospitalisation -> "hospitalisation"
-  | Epers_Illness -> "illness"
-  | Epers_Immigration -> "immigration"
-  | Epers_ListePassenger -> "passenger liste"
-  | Epers_MilitaryDistinction -> "military distinction"
-  | Epers_MilitaryPromotion -> "military promotion"
-  | Epers_MilitaryService -> "military service"
-  | Epers_MobilisationMilitaire -> "military mobilisation"
-  | Epers_Naturalisation -> "naturalisation"
-  | Epers_Occupation -> "occupation"
-  | Epers_Ordination -> "ordination"
-  | Epers_Property -> "property"
-  | Epers_Recensement -> "recensement"
-  | Epers_Residence -> "residence"
-  | Epers_Retired -> "retirement"
-  | Epers_ScellentChildLDS -> "scellent child (LDS)"
-  | Epers_ScellentParentLDS -> "scellent parent (LDS)"
-  | Epers_ScellentSpouseLDS -> "scellent spouse (LDS)"
-  | Epers_VenteBien -> "sell"
-  | Epers_Will -> "will"
-  | Epers_Name n -> sou base n
+  | Def.Epers_Birth -> "birth"
+  | Def.Epers_Baptism -> "baptism"
+  | Def.Epers_Death -> "death"
+  | Def.Epers_Burial -> "burial"
+  | Def.Epers_Cremation -> "cremation"
+  | Def.Epers_Accomplishment -> "accomplishment"
+  | Def.Epers_Acquisition -> "acquisition"
+  | Def.Epers_Adhesion -> "adhesion"
+  | Def.Epers_BaptismLDS -> "baptism (LDS)"
+  | Def.Epers_BarMitzvah -> "bar mitzvah"
+  | Def.Epers_BatMitzvah -> "bat mitzvah"
+  | Def.Epers_Benediction -> "benediction"
+  | Def.Epers_ChangeName -> "change name"
+  | Def.Epers_Circumcision -> "circumcision"
+  | Def.Epers_Confirmation -> "confirmation"
+  | Def.Epers_ConfirmationLDS -> "confirmation (LDS)"
+  | Def.Epers_Decoration -> "decoration"
+  | Def.Epers_DemobilisationMilitaire -> "military demobilisation"
+  | Def.Epers_Diploma -> "diploma"
+  | Def.Epers_Distinction -> "distinction"
+  | Def.Epers_Dotation -> "dotation"
+  | Def.Epers_DotationLDS -> "dotation (LDS)"
+  | Def.Epers_Education -> "education"
+  | Def.Epers_Election -> "election"
+  | Def.Epers_Emigration -> "emigration"
+  | Def.Epers_Excommunication -> "excommunication"
+  | Def.Epers_FamilyLinkLDS -> "family link (LDS)"
+  | Def.Epers_FirstCommunion -> "first communion"
+  | Def.Epers_Funeral -> "funeral"
+  | Def.Epers_Graduate -> "graduation"
+  | Def.Epers_Hospitalisation -> "hospitalisation"
+  | Def.Epers_Illness -> "illness"
+  | Def.Epers_Immigration -> "immigration"
+  | Def.Epers_ListePassenger -> "passenger liste"
+  | Def.Epers_MilitaryDistinction -> "military distinction"
+  | Def.Epers_MilitaryPromotion -> "military promotion"
+  | Def.Epers_MilitaryService -> "military service"
+  | Def.Epers_MobilisationMilitaire -> "military mobilisation"
+  | Def.Epers_Naturalisation -> "naturalisation"
+  | Def.Epers_Occupation -> "occupation"
+  | Def.Epers_Ordination -> "ordination"
+  | Def.Epers_Property -> "property"
+  | Def.Epers_Recensement -> "recensement"
+  | Def.Epers_Residence -> "residence"
+  | Def.Epers_Retired -> "retirement"
+  | Def.Epers_ScellentChildLDS -> "scellent child (LDS)"
+  | Def.Epers_ScellentParentLDS -> "scellent parent (LDS)"
+  | Def.Epers_ScellentSpouseLDS -> "scellent spouse (LDS)"
+  | Def.Epers_VenteBien -> "sell"
+  | Def.Epers_Will -> "will"
+  | Def.Epers_Name n -> Gwdb.sou base n
 
 let string_of_efam_name base efam_name =
   match efam_name with
-  | Efam_Marriage -> "marriage"
-  | Efam_NoMarriage -> "relation"
-  | Efam_NoMention -> "relation"
-  | Efam_Engage -> "engagement"
-  | Efam_Divorce -> "divorce"
-  | Efam_Separated -> "separation"
-  | Efam_Annulation -> "annulation"
-  | Efam_MarriageBann -> "marriage bann"
-  | Efam_MarriageContract -> "marriage contract"
-  | Efam_MarriageLicense -> "marriage licence"
-  | Efam_PACS -> "PACS"
-  | Efam_Residence -> "residence"
-  | Efam_Name n -> sou base n
+  | Def.Efam_Marriage -> "marriage"
+  | Def.Efam_NoMarriage -> "relation"
+  | Def.Efam_NoMention -> "relation"
+  | Def.Efam_Engage -> "engagement"
+  | Def.Efam_Divorce -> "divorce"
+  | Def.Efam_Separated -> "separation"
+  | Def.Efam_Annulation -> "annulation"
+  | Def.Efam_MarriageBann -> "marriage bann"
+  | Def.Efam_MarriageContract -> "marriage contract"
+  | Def.Efam_MarriageLicense -> "marriage licence"
+  | Def.Efam_PACS -> "PACS"
+  | Def.Efam_Residence -> "residence"
+  | Def.Efam_Name n -> Gwdb.sou base n
 
 let print_base_error oc base = function
-  | AlreadyDefined p ->
+  | Def.AlreadyDefined p ->
       Printf.fprintf oc "%s is defined several times\n" (designation base p)
-  | OwnAncestor p ->
+  | Def.OwnAncestor p ->
       Printf.fprintf oc "%s is his/her own ancestor\n" (designation base p)
-  | BadSexOfMarriedPerson p ->
+  | Def.BadSexOfMarriedPerson p ->
       Printf.fprintf oc "%s bad sex for a married person\n" (designation base p)
 
 let print_base_warning oc base (w : Warning.base_warning) =
-  let get_fevent_name e = e.efam_name in
-  let get_pevent_name e = e.epers_name in
+  let get_fevent_name e = e.Def.efam_name in
+  let get_pevent_name e = e.Def.epers_name in
   match w with
   | Warning.BigAgeBetweenSpouses (p1, p2, a) ->
       Printf.fprintf oc
@@ -101,36 +98,36 @@ let print_base_warning oc base (w : Warning.base_warning) =
   | BirthAfterDeath p ->
       Printf.fprintf oc "%s born after his/her death\n" (designation base p)
   | ChangedOrderOfChildren (ifam, _, _, _) ->
-      let cpl = foi base ifam in
+      let cpl = Gwdb.foi base ifam in
       Printf.fprintf oc "Changed order of children of %s and %s\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)))
+        (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
+        (designation base (Gwdb.poi base (Gwdb.get_mother cpl)))
   | ChildrenNotInOrder (ifam, _, elder, x) ->
-      let cpl = foi base ifam in
+      let cpl = Gwdb.foi base ifam in
       Printf.fprintf oc
         "The following children of\n  %s\nand\n  %s\nare not in order:\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)));
+        (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
+        (designation base (Gwdb.poi base (Gwdb.get_mother cpl)));
       Printf.fprintf oc "- %s\n" (designation base elder);
       Printf.fprintf oc "- %s\n" (designation base x)
   | ChangedOrderOfMarriages (p, _, _) ->
       Printf.fprintf oc "Changed order of marriages of %s\n"
         (designation base p)
   | ChangedOrderOfFamilyEvents (ifam, _, _) ->
-      let cpl = foi base ifam in
+      let cpl = Gwdb.foi base ifam in
       Printf.fprintf oc "Changed order of family's events for %s\n"
-        (designation base (poi base (get_father cpl)));
+        (designation base (Gwdb.poi base (Gwdb.get_father cpl)));
       Printf.fprintf oc "Changed order of family's events for %s\n"
-        (designation base (poi base (get_mother cpl)))
+        (designation base (Gwdb.poi base (Gwdb.get_mother cpl)))
   | ChangedOrderOfPersonEvents (p, _, _) ->
       Printf.fprintf oc "Changed order of person's events for %s\n"
         (designation base p)
   | CloseChildren (ifam, c1, c2) ->
-      let cpl = foi base ifam in
+      let cpl = Gwdb.foi base ifam in
       Printf.fprintf oc
         "The following children of\n  %s\nand\n  %s\nare born very close:\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)));
+        (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
+        (designation base (Gwdb.poi base (Gwdb.get_mother cpl)));
       Printf.fprintf oc "- %s\n" (designation base c1);
       Printf.fprintf oc "- %s\n" (designation base c2)
   | DeadOld (p, a) ->
@@ -142,11 +139,11 @@ let print_base_warning oc base (w : Warning.base_warning) =
         "is born more than 2 years after the death of his/her father";
       Printf.fprintf oc " %s\n" (designation base father)
   | DistantChildren (ifam, p1, p2) ->
-      let cpl = foi base ifam in
+      let cpl = Gwdb.foi base ifam in
       Printf.fprintf oc
         "The following children of\n  %s\nand\n  %s\nare born very close:\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)));
+        (designation base (Gwdb.poi base (Gwdb.get_father cpl)))
+        (designation base (Gwdb.poi base (Gwdb.get_mother cpl)));
       Printf.fprintf oc "- %s\n" (designation base p1);
       Printf.fprintf oc "- %s\n" (designation base p2)
   | FEventOrder (p, e1, e2) ->
@@ -194,20 +191,21 @@ let print_base_warning oc base (w : Warning.base_warning) =
         a.year
   | PossibleDuplicateFam (f1, f2) ->
       Printf.fprintf oc "possible duplicate families: %s and %s\n"
-        (string_of_ifam f1) (string_of_ifam f2)
+        (Gwdb.string_of_ifam f1) (Gwdb.string_of_ifam f2)
   | PossibleDuplicateFamHomonymous (f1, f2, p) ->
-      let f = foi base f1 in
-      let fath = get_father f in
-      let moth = get_mother f in
+      let f = Gwdb.foi base f1 in
+      let fath = Gwdb.get_father f in
+      let moth = Gwdb.get_mother f in
       let curr, hom =
-        if eq_iper fath (get_iper p) then (moth, fath) else (fath, moth)
+        if Gwdb.eq_iper fath (Gwdb.get_iper p) then (moth, fath)
+        else (fath, moth)
       in
       Printf.fprintf oc
         "possible duplicate families: %s and %s, %s has unions with several \
          persons named %s\n"
-        (string_of_ifam f1) (string_of_ifam f2)
-        (designation base (poi base curr))
-        (designation base (poi base hom))
+        (Gwdb.string_of_ifam f1) (Gwdb.string_of_ifam f2)
+        (designation base (Gwdb.poi base curr))
+        (designation base (Gwdb.poi base hom))
   | PEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_epers_name base (get_pevent_name e1))
@@ -223,7 +221,9 @@ let print_base_warning oc base (w : Warning.base_warning) =
   | TitleDatesError (p, t) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "has incorrect title dates as:\n";
-      Printf.fprintf oc " %s %s\n" (sou base t.t_ident) (sou base t.t_place)
+      Printf.fprintf oc " %s %s\n"
+        (Gwdb.sou base t.Def.t_ident)
+        (Gwdb.sou base t.Def.t_place)
   | UndefinedSex p ->
       Printf.fprintf oc "Undefined sex for %s\n" (designation base p)
   | YoungForMarriage (p, a, _) | OldForMarriage (p, a, _) ->
@@ -241,7 +241,7 @@ let min_year_of p =
     | { prec = Before; year } -> CheckBefore year
     | { year } -> CheckOther year
   in
-  Option.map aux (Date.cdate_to_dmy_opt (get_birth p))
+  Option.map aux (Date.cdate_to_dmy_opt (Gwdb.get_birth p))
 
 let dummy_date = CheckInfered (CheckOther max_int)
 
@@ -269,24 +269,24 @@ let rec check_ancestors base warning year year_tab ip ini_p =
     | _ -> ()
   in
   if Gwdb.Marker.get year_tab ip = dummy_date then (
-    let p = poi base ip in
+    let p = Gwdb.poi base ip in
     let new_year, new_ini_p =
       match min_year_of p with Some y -> (y, p) | None -> (infer year, ini_p)
     in
     Gwdb.Marker.set year_tab ip new_year;
     test new_year year (lazy p) ini_p;
-    match get_parents p with
+    match Gwdb.get_parents p with
     | Some ifam ->
-        let fam = foi base ifam in
+        let fam = Gwdb.foi base ifam in
         let f ip =
           let year = Gwdb.Marker.get year_tab ip in
           if year = dummy_date then
             check_ancestors base warning new_year year_tab ip new_ini_p
           else if own year then
-            test year new_year (lazy (poi base ip)) new_ini_p
+            test year new_year (lazy (Gwdb.poi base ip)) new_ini_p
         in
-        f @@ get_father fam;
-        f @@ get_mother fam
+        f @@ Gwdb.get_father fam;
+        f @@ Gwdb.get_mother fam
     | None -> ())
 
 let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
@@ -304,7 +304,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
     Gwdb.Collection.iteri
       (fun i ip ->
         ProgrBar.run i len;
-        let p = poi base ip in
+        let p = Gwdb.poi base ip in
         if Gwdb.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
         match CheckItem.person ~onchange:false base warning p with
@@ -315,7 +315,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
   else
     Gwdb.Collection.iter
       (fun ip ->
-        let p = poi base ip in
+        let p = Gwdb.poi base ip in
         if Gwdb.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
         match CheckItem.person ~onchange:false base warning p with
@@ -334,13 +334,13 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
     Gwdb.Collection.iteri
       (fun i ifam ->
         ProgrBar.run i len;
-        CheckItem.family ~onchange:false base warning ifam @@ foi base ifam)
+        CheckItem.family ~onchange:false base warning ifam @@ Gwdb.foi base ifam)
       families;
     ProgrBar.finish ())
   else
     Gwdb.Collection.iter
       (fun ifam ->
-        CheckItem.family ~onchange:false base warning ifam @@ foi base ifam)
+        CheckItem.family ~onchange:false base warning ifam @@ Gwdb.foi base ifam)
       families;
   if not mem then (
     Gwdb.clear_persons_array base;

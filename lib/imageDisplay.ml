@@ -1,8 +1,6 @@
 (* $Id: image.ml,v 5.8 2009-03-11 09:22:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-
 let print_placeholder_gendered_portrait conf p size =
   let open Gwdb in
   let image, alt =
@@ -123,7 +121,7 @@ let print_portrait conf base p =
 let print_source conf f =
   let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
   if fname = Filename.basename fname then
-    let fname = Image.source_filename conf.bname fname in
+    let fname = Image.source_filename conf.Config.bname fname in
     Result.fold ~ok:ignore
       ~error:(fun _ -> Hutil.incorrect_request conf)
       (print_image_file conf fname)
@@ -133,7 +131,7 @@ let print_source conf f =
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
 let print conf base =
-  match Util.p_getenv conf.env "s" with
+  match Util.p_getenv conf.Config.env "s" with
   | Some f -> print_source conf f
   | None -> (
       match Util.find_person_in_env conf base "" with
@@ -156,5 +154,5 @@ let print_html conf =
       Output.print_sstring conf k;
       Output.print_sstring conf "=";
       Output.print_string conf v)
-    conf.env;
+    conf.Config.env;
   Output.print_sstring conf "\"></body></html>"
