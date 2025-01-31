@@ -1,5 +1,112 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+let persons_of_stream conf base filter iperset stream max =
+  let rec aux n iperset ipers =
+    match ipers with
+    | _iper :: _ipers when n <= 0 -> (n, iperset)
+    | iper :: ipers ->
+        let p = Gwdb.poi base iper in
+        if Util.authorized_age conf base p && filter p then
+          let iperset' = Util.IperSet.add iper iperset in
+          if iperset' == iperset then aux n iperset ipers
+          else aux (n - 1) iperset' ipers
+        else aux n iperset ipers
+    | _ -> (n, iperset)
+  in
+  if max <= 0 then None
+  else
+    try
+      let ipers = Stream.next stream in
+      Some (aux max iperset ipers)
+    with Stream.Failure -> None
+
+let n_persons_of_stream n conf base filter stream =
+  let rec consume n iperset =
+    match persons_of_stream conf base filter iperset stream n with
+    | Some (n, iperset) ->
+        if n = 0 then Util.IperSet.elements iperset else consume n iperset
+    | None -> Util.IperSet.elements iperset
+  in
+  List.rev (consume n Util.IperSet.empty)
+
+let strip_particle base s =
+  let particles = Gwdb.base_particles base in
+  let p = Mutil.get_particle particles s in
+  let len_particle = String.length p in
+  String.sub s len_particle (String.length s - len_particle)
+
+let start_with base pfx s =
+  let s = Name.lower (strip_particle base s) in
+  Ext_string.start_with pfx 0 s
+
+let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
+  let sn_stream = Gwdb.persons_stream_of_surname_prefix base sn_pfx in
+  let fn_map = Hashtbl.create 100 in
+  let match_fn_istr istr =
+    match Hashtbl.find_opt fn_map istr with
+    | Some value -> value
+    | None ->
+        let value =
+          start_with base
+            (Name.lower (strip_particle base fn_pfx))
+            (Gwdb.sou base istr)
+        in
+        Hashtbl.add fn_map istr value;
+        value
+  in
+  let rec consume n results =
+    try
+      let sn_ipers = Stream.next sn_stream in
+      let rec aux n iperset ipers =
+        if n = 0 then iperset
+        else
+          match ipers with
+          | iper :: ipers ->
+              let p = Gwdb.poi base iper in
+              let fn = Gwdb.get_first_name p in
+              if match_fn_istr fn && Util.authorized_age conf base p && filter p
+              then
+                let iperset' = Util.IperSet.add iper iperset in
+                if iperset' == iperset then aux (n - 1) iperset' ipers
+                else aux n iperset ipers
+              else aux n iperset ipers
+          | _ -> consume n iperset
+      in
+      aux n results sn_ipers
+    with Stream.Failure -> results
+  in
+  Util.IperSet.elements (consume max Util.IperSet.empty)
+
+let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
+    ~limit =
+  let l =
+    match (first_name_prefix, surname_prefix) with
+    | "", "" -> []
+    | _, "" ->
+        let stream =
+          Gwdb.persons_stream_of_first_name_prefix base first_name_prefix
+        in
+        n_persons_of_stream limit conf base filter stream
+    | "", _ ->
+        let stream =
+          Gwdb.persons_stream_of_surname_prefix base surname_prefix
+        in
+        n_persons_of_stream limit conf base filter stream
+    | _, _ ->
+        persons_of_prefixes_stream limit conf base filter first_name_prefix
+          surname_prefix
+  in
+  let cmp_s proj p1 p2 =
+    Utf8.compare (Gwdb.sou base (proj p1)) (Gwdb.sou base (proj p2))
+  in
+  List.sort
+    (fun iper1 iper2 ->
+      let p1 = Gwdb.poi base iper1 in
+      let p2 = Gwdb.poi base iper2 in
+      let sn = cmp_s Gwdb.get_surname p1 p2 in
+      if sn <> 0 then sn else cmp_s Gwdb.get_first_name p1 p2)
+    l
+
 let empty_sn_or_fn base p =
   Gwdb.is_empty_string (Gwdb.get_surname p)
   || Gwdb.is_quest_string (Gwdb.get_surname p)
