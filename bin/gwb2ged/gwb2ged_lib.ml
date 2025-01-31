@@ -80,6 +80,82 @@ let ged_month cal m =
       if m >= 1 && m <= Array.length hebrew_txt then hebrew_txt.(m - 1)
       else failwith "ged_month"
 
+(* Reference:
+   https://gedcom.io/specifications/FamilySearchGEDCOMv7.html#date *)
+module Ged_date : sig
+  module Day_month : sig
+    type t
+
+    val make :
+      calendar:Date.calendar ->
+      day:int option ->
+      month:int ->
+      (t, [> `Invalid_day | `Invalid_month ]) result
+  end
+
+  type t
+
+  val make :
+    calendar:Date.calendar -> day_month:Day_month.t option -> year:int -> t
+
+  val to_string : t -> string
+end = struct
+  module Day_month : sig
+    type t
+
+    val make :
+      calendar:Date.calendar ->
+      day:int option ->
+      month:int ->
+      (t, [> `Invalid_day | `Invalid_month ]) result
+
+    val day : t -> int option
+    val month : t -> int
+  end = struct
+    type t = { day : int option; month : int }
+
+    let day day_month = day_month.day
+    let month day_month = day_month.month
+    let check_day day = if day > 0 then Ok () else Error `Invalid_day
+
+    let check_month ~calendar month =
+      match ged_month calendar month with
+      | (_ : string) -> Ok ()
+      | exception Failure _ -> Error `Invalid_month
+
+    let make ~calendar ~day ~month =
+      let ( >>= ) = Result.bind in
+      check_month ~calendar month >>= fun () ->
+      Option.fold ~none:(Ok ()) ~some:check_day day >>= fun () ->
+      Ok { day; month }
+  end
+
+  type t = {
+    calendar : Date.calendar;
+    day_month : Day_month.t option;
+    year : int;
+  }
+
+  let calendar date = date.calendar
+  let day date = Option.bind date.day_month Day_month.day
+  let month date = Option.map Day_month.month date.day_month
+  let year date = date.year
+  let make ~calendar ~day_month ~year = { calendar; day_month; year }
+
+  let to_string date =
+    let month_code date =
+      try Option.map (ged_month @@ calendar date) (month date)
+      with Failure _ -> None
+    in
+    String.concat " "
+      (List.filter_map Fun.id
+         [
+           Option.map (Printf.sprintf "%02d") (day date);
+           month_code date;
+           Some (Int.to_string @@ year date);
+         ])
+end
+
 let encode opts s =
   match opts.Gwexport.charset with
   | Gwexport.Ansel -> Geneweb.Ansel.of_iso_8859_1 @@ Utf8.iso_8859_1_of_utf_8 s
@@ -248,9 +324,17 @@ let ged_header opts base ifile ofile =
      if Filename.check_suffix fname ".gwb" then fname else fname ^ ".gwb");
   (try
      let tm = Unix.localtime (Unix.time ()) in
-     let mon = ged_month Dgregorian (tm.Unix.tm_mon + 1) in
-     Printf.ksprintf (oc opts) "1 DATE %02d %s %d\n" tm.Unix.tm_mday mon
-       (1900 + tm.Unix.tm_year);
+     let today =
+       let calendar = Date.Dgregorian in
+       let day_month =
+         Result.fold ~ok:Option.some
+           ~error:(fun _ -> assert false)
+           (Ged_date.Day_month.make ~calendar ~day:(Some tm.Unix.tm_mday)
+              ~month:(tm.Unix.tm_mon + 1))
+       in
+       Ged_date.make ~calendar ~day_month ~year:(1900 + tm.Unix.tm_year)
+     in
+     Printf.ksprintf (oc opts) "1 DATE %s\n" (Ged_date.to_string today);
      Printf.ksprintf (oc opts) "2 TIME %02d:%02d:%02d\n" tm.Unix.tm_hour
        tm.Unix.tm_min tm.Unix.tm_sec
    with _ -> ());
@@ -335,6 +419,38 @@ let ged_calendar opts = function
   | Dhebrew -> Printf.ksprintf (oc opts) "@#DHEBREW@ "
 
 let ged_date_dmy opts dt cal =
+  let ged_date ~calendar ~day ~month ~year =
+    let optional component = if component = 0 then None else Some component in
+    let rec day_month ~calendar ~day ~month =
+      let log_error message =
+        prerr_endline @@ Printf.sprintf "Date error: %s" message
+      in
+      match Ged_date.Day_month.make ~calendar ~day ~month with
+      | Ok day_month -> Some day_month
+      | Error `Invalid_month ->
+          let error_message =
+            Printf.sprintf "invalid month: no month '%d' in calendar '%s'" month
+              (Def_show.show_calendar calendar)
+          in
+          log_error error_message;
+          None
+      | Error `Invalid_day ->
+          let error_message =
+            Printf.sprintf
+              "invalid day: no day '%s' in month '%d' of calendar '%s'"
+              (Option.fold ~none:"none" ~some:Int.to_string day)
+              month
+              (Def_show.show_calendar calendar)
+          in
+          log_error error_message;
+          day_month ~calendar ~day:None ~month
+    in
+    Ged_date.make ~calendar
+      ~day_month:
+        (Option.bind (optional month) (fun month ->
+             day_month ~calendar ~day:(optional day) ~month))
+      ~year
+  in
   (match dt.Date.prec with
   | Sure -> ()
   | About -> Printf.ksprintf (oc opts) "ABT "
@@ -343,17 +459,17 @@ let ged_date_dmy opts dt cal =
   | After -> Printf.ksprintf (oc opts) "AFT "
   | OrYear _ | YearInt _ -> Printf.ksprintf (oc opts) "BET ");
   ged_calendar opts cal;
-  if dt.day <> 0 then Printf.ksprintf (oc opts) "%02d " dt.day;
-  if dt.month <> 0 then Printf.ksprintf (oc opts) "%s " (ged_month cal dt.month);
-  Printf.ksprintf (oc opts) "%d" dt.year;
+  oc opts
+    (Ged_date.to_string
+    @@ ged_date ~calendar:cal ~day:dt.day ~month:dt.month ~year:dt.year);
   match dt.prec with
   | OrYear dmy2 | YearInt dmy2 ->
       Printf.ksprintf (oc opts) " AND ";
       ged_calendar opts cal;
-      if dmy2.day2 <> 0 then Printf.ksprintf (oc opts) "%02d " dmy2.day2;
-      if dmy2.month2 <> 0 then
-        Printf.ksprintf (oc opts) "%s " (ged_month cal dmy2.month2);
-      Printf.ksprintf (oc opts) "%d" dmy2.year2
+      oc opts
+        (Ged_date.to_string
+        @@ ged_date ~calendar:cal ~day:dmy2.day2 ~month:dmy2.month2
+             ~year:dmy2.year2)
   | Sure | About | Maybe | Before | After -> ()
 
 let ged_date opts = function
