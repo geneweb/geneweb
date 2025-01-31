@@ -71,14 +71,17 @@ let hebrew_txt =
 let ged_month cal m =
   match cal with
   | Date.Dgregorian | Djulian ->
-      if m >= 1 && m <= Array.length month_txt then month_txt.(m - 1)
-      else failwith "ged_month"
+      Ext_option.return_if
+        (m >= 1 && m <= Array.length month_txt)
+        (fun () -> month_txt.(m - 1))
   | Dfrench ->
-      if m >= 1 && m <= Array.length french_txt then french_txt.(m - 1)
-      else failwith "ged_month"
+      Ext_option.return_if
+        (m >= 1 && m <= Array.length french_txt)
+        (fun () -> french_txt.(m - 1))
   | Dhebrew ->
-      if m >= 1 && m <= Array.length hebrew_txt then hebrew_txt.(m - 1)
-      else failwith "ged_month"
+      Ext_option.return_if
+        (m >= 1 && m <= Array.length hebrew_txt)
+        (fun () -> hebrew_txt.(m - 1))
 
 (* Reference:
    https://gedcom.io/specifications/FamilySearchGEDCOMv7.html#date *)
@@ -120,8 +123,8 @@ end = struct
 
     let check_month ~calendar month =
       match ged_month calendar month with
-      | (_ : string) -> Ok ()
-      | exception Failure _ -> Error `Invalid_month
+      | Some _ -> Ok ()
+      | None -> Error `Invalid_month
 
     let make ~calendar ~day ~month =
       let ( >>= ) = Result.bind in
@@ -144,8 +147,7 @@ end = struct
 
   let to_string date =
     let month_code date =
-      try Option.map (ged_month @@ calendar date) (month date)
-      with Failure _ -> None
+      Option.bind (month date) (ged_month @@ calendar date)
     in
     String.concat " "
       (List.filter_map Fun.id
