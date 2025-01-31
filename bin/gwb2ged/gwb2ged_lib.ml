@@ -341,21 +341,13 @@ let ged_date_dmy opts dt cal =
   | Maybe -> Printf.ksprintf (oc opts) "EST "
   | Before -> Printf.ksprintf (oc opts) "BEF "
   | After -> Printf.ksprintf (oc opts) "AFT "
-  | OrYear _ -> Printf.ksprintf (oc opts) "BET "
-  | YearInt _ -> Printf.ksprintf (oc opts) "BET ");
+  | OrYear _ | YearInt _ -> Printf.ksprintf (oc opts) "BET ");
   ged_calendar opts cal;
   if dt.day <> 0 then Printf.ksprintf (oc opts) "%02d " dt.day;
   if dt.month <> 0 then Printf.ksprintf (oc opts) "%s " (ged_month cal dt.month);
   Printf.ksprintf (oc opts) "%d" dt.year;
   match dt.prec with
-  | OrYear dmy2 ->
-      Printf.ksprintf (oc opts) " AND ";
-      ged_calendar opts cal;
-      if dmy2.day2 <> 0 then Printf.ksprintf (oc opts) "%02d " dmy2.day2;
-      if dmy2.month2 <> 0 then
-        Printf.ksprintf (oc opts) "%s " (ged_month cal dmy2.month2);
-      Printf.ksprintf (oc opts) "%d" dmy2.year2
-  | YearInt dmy2 ->
+  | OrYear dmy2 | YearInt dmy2 ->
       Printf.ksprintf (oc opts) " AND ";
       ged_calendar opts cal;
       if dmy2.day2 <> 0 then Printf.ksprintf (oc opts) "%02d " dmy2.day2;
