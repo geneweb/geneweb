@@ -4388,6 +4388,26 @@ ru: порядок личных событий был изменён
 sv: ändrade ordningen för personhändelser
 tr: bireysel etkinliklerin sırasını değiştir
 
+    chk_data invisible characters
+en: Invisible characters
+fr: Caractères invisibles
+
+    chk_data bad capitalization
+en: Bad capitalization
+fr: Capitalisation erronée
+
+    chk_data multiple spaces
+en: Multiple spaces
+fr: Espaces multiples
+
+    chk_data mutiples characters
+en: Multiple characters
+fr: Caractères multiples
+
+    chk_data non-breaking spaces
+en: Non-breaking spaces
+fr: Espaces insécables
+
     child/children
 af: kind/kinders
 ar: طفلة/أطفال
@@ -19186,6 +19206,10 @@ ru: попытайтесь изменить тип связи
 sv: försök ett annat beräkningssätt
 tr: başka bir hesaplama seçeneği deneyin
 
+    data typographic checker
+en: Data typographic checker
+fr: Vérificateur typographique des données
+
     uncheck
 co: diselezziunà
 de: Abwählen
@@ -20317,4 +20341,6 @@ sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på godkännande
 tr: mesajınız doğrulama için bekliyor
 
-
+    zero-width character
+en: this zero-width character has been widened to be visible
+fr: ce caractère sans chasse a été élargi pour être visible
