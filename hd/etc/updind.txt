@@ -799,23 +799,24 @@
             </div>
           </div>
           <div class="col-4 d-flex px-0">
-            <span class="col col-form-label">[*access]0</span>
+            <span class="col col-form-label">[*access]0 (<a href="%prefix;m=H&v=visibility"
+              title="[*visibility-hlp]">?</a>)</span>
             <div class="col mt-2">
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="access" value="IfTitles" id="IfTitles"%if;acc_if_titles; checked%end;>
-                <label class="form-check-label" for="IfTitles">[*iftitles/public/semipublic/private]0</label>
+                <label class="form-check-label" for="IfTitles"><span class="bg-secondary">  </span> [*iftitles/public/semipublic/private]0</label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="access" value="Public" id="Public"%if;acc_public; checked%end;>
-                <label class="form-check-label" for="Public">[*iftitles/public/semipublic/private]1</label>
+                <label class="form-check-label" for="Public"><span class="bg-success">  </span> [*iftitles/public/semipublic/private]1</label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="access" value="SemiPublic" id="SemiPublic"%if;acc_semi_public; checked%end;>
-                <label class="form-check-label" for="SemiPublic">[*iftitles/public/semipublic/private]2</label>
+                <label class="form-check-label" for="SemiPublic"><span class="bg-warning">  </span> [*iftitles/public/semipublic/private]2</label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="access" value="Private" id="Private"%if;acc_private; checked%end;>
-                <label class="form-check-label" for="Private">[*iftitles/public/semipublic/private]3</label>
+                <label class="form-check-label" for="Private"><span class="bg-danger">  </span> [*iftitles/public/semipublic/private]3</label>
               </div>
             </div>
           </div>
