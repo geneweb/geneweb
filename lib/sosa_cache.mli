@@ -1,7 +1,7 @@
 type t
 
-val build_sosa_cache : conf:Config.config -> base:Gwdb.base -> t
-val output_sosa_cache : conf:Config.config -> base:Gwdb.base -> cache:t -> unit
+(*val build_sosa_cache : conf:Config.config -> base:Gwdb.base -> t option*)
+(*val output_sosa_cache : conf:Config.config -> base:Gwdb.base -> cache:t -> unit*)
 val get_sosa_cache : conf:Config.config -> base:Gwdb.base -> t option
 
 val get_sosa :
