@@ -158,7 +158,6 @@ let output_sosa_cache ~conf ~base ~cache =
   StaticCache.output ~base ~cache
 
 let sosa_cache : t option ref = ref None
-let find dyn_cache = assert false
 
 let set_dynamic_cache cache_o =
   Option.iter (fun cache -> sosa_cache := Some (dynamic_cache cache)) cache_o
