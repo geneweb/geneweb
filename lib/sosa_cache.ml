@@ -211,7 +211,6 @@ let get_sosa ~conf ~base ~cache ~iper ~sosa_ref =
     | DynamicCache cache ->
         DynamicCache.get_sosa ~conf ~base ~cache ~iper ~sosa_ref
     | StaticCache cache -> StaticCache.get_sosa ~conf ~base ~cache ~iper
-(*let get_sosa ~conf ~base ~cache ~iper ~sosa_ref = Some Sosa.one*)
 
 let next_sosa cache sosa = None
 let previous_sosa cache sosa = None
