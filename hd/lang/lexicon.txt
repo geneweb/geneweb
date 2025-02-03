@@ -19744,6 +19744,14 @@ sk: pozri zdroj
 sv: se källa
 tr: kaynağı görüntüle
 
+    visibility
+en: visibility
+fr: visibilité
+
+    visibility-hlp
+en: help for visibility of individuals
+fr: aide pour la visibilité des individus
+
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
 ca: visualtza/mostra/sumari

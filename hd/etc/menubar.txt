@@ -178,6 +178,18 @@
               <span class="fa fa-user-gear" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*tools] [person/persons]0</span></a>
             <div class="dropdown-menu dropdown-menu-transl">
+              %( Visibility button %)
+              <a class="dropdown-item" href="%prefix;m=H&v=visibility" title="[*visibility-hlp]">
+                %if;is_private;
+                  <i class="fa fa-person fa-fw text-danger mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]3)%nn;
+                %elseif;is_semi_public;
+                  <i class="fa fa-person fa-fw text-warning mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]2)%nn;
+                %elseif;(is_public or has_titles)
+                  <i class="fa fa-person fa-fw text-success mr-2"></i>.[*visibility] ([iftitles/public/semipublic/private]1)%nn;
+                %else;
+                  <i class="fa fa-person fa-fw text-muted mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]0)%nn;
+                %end;
+              </a>
               %( SOSA_REF / CGL buttons %)
               %if;(not browsing_with_sosa_ref or sosa_ref.key!=key)
                   <a class="dropdown-item"
