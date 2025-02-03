@@ -1,0 +1,28 @@
+  <!-- $Id: visibility.txt %version; 15/02/2025 05:05:34 $ -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>[*visibility-hlp]</title>
+  %if;(bvar.robot_index="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body>
+<div class="container">
+<h2>[*visibility-hlp]</h2>
+<div class="mb-2">You are currently logged-is as %if;wizard;<span class="text-success">wizard</span>%elseif;friend;friend;%else;visitor%end;.</div>
+<div>Wizards have full visibility. When logged-in as Friend, himself is always visible for himself.</div>
+<div>
+  <ul>
+   <li><i class="fa fa-person fa-fw text-muted mr-2"></i>[*iftitles/public/semipublic/private]0: Public if has titles, needs <code>publiciftitle=yes</code> parameter in gwf (default)
+    <li><i class="fa fa-person fa-fw text-success mr-2"></i>[*iftitles/public/semipublic/private]1: Visible for everyone
+    <li><i class="fa fa-person fa-fw text-warning mr-2"></i>[*iftitles/public/semipublic/private]2: Visible for Friends having SemiPublic status, other Friends see only firstname and surname
+    <li><i class="fa fa-person fa-fw text-danger mr-2"></i>[*iftitles/public/semipublic/private]3: Never visible except for himself when logged as Friend
+  </ul>
+</div>
+</div>
+</body>
+</html>
