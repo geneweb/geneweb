@@ -277,7 +277,8 @@ let partial_date_upper_bound ~from ~day ~month ~year =
 
 let partial_date_lower_bound ~day ~month ~year = (max 1 day, max 1 month, year)
 
-let make_date_error_message ~prefix erroneous_date =
+let make_date_error_message ~prefix
+    (erroneous_date : _ Calendars.erroneous_date) =
   Printf.sprintf "%s: invalid %s: '%s'" prefix
     (match erroneous_date.Calendars.kind with
     | Calendars.Invalid_day -> "day"
