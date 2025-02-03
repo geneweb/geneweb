@@ -8,5 +8,4 @@ let () =
   let filter ~name ~index:_ =
     if is_ci && Array.mem name known_failures then `Skip else `Run
   in
-  try Alcotest.run ~and_exit:false "Geneweb" ~filter test_suite
-  with Alcotest.Test_error -> ()
+  Alcotest.run "Geneweb" ~filter test_suite
