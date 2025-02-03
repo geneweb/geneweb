@@ -533,12 +533,7 @@ let families ?(select = fun _ -> true) base =
 let ifam_marker c i = Marker.make (fun i -> i) c i
 
 let make_patch_collection patch mk empty =
-  let arr =
-    patch
-    |> Hashtbl.to_seq_values
-    |> Seq.map mk
-    |> Array.of_seq
-  in
+  let arr = patch |> Hashtbl.to_seq_values |> Seq.map mk |> Array.of_seq in
   let length = Array.length arr in
   let get i = if i < length then Some arr.(i) else None in
   { Collection.length; get }
