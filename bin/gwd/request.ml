@@ -843,13 +843,9 @@ let treat_request =
   else process ()
 
 let treat_request conf =
-  GWPARAM.init conf.bname ;
+  GWPARAM.init_etc conf.bname ;
   (* TODO verify if we need init_etc here *)
   let conf = { conf with
     base_env = Util.read_base_env conf.bname conf.gw_prefix conf.debug }
   in
-  let fname = Filename.concat (!GWPARAM.bpath conf.bname) "caches" in
-  if Sys.file_exists fname then ()
-  else (try Unix.mkdir fname 0o755
-    with Sys_error _ -> Printf.eprintf "Error when creating %s\n" fname);
   try treat_request conf with Update.ModErr _ -> Output.flush conf
