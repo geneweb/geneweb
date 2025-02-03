@@ -2,7 +2,7 @@
   (name gwb2ged_lib)
   (public_name geneweb.gwb2ged_lib)
   (wrapped false)
-  (libraries geneweb geneweb.gwexport_lib)
+  (libraries geneweb geneweb.gwexport_lib geneweb.def_show)
   (modules gwb2ged_lib)
 )
 
