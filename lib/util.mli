@@ -465,9 +465,14 @@ val safe_html : string -> Adef.safe_string
  *)
 
 val string_with_macros :
-  Config.config -> (char * (unit -> string)) list -> string -> string
-(** [string_with_macros conf env s]
+  ?with_links_target_attribute:bool ->
+  conf:Config.config ->
+  env:(char * (unit -> string)) list ->
+  string ->
+  string
+(** [string_with_macros ~with_links_target_attribute ~conf ~env str]
     Return a string with "%xxx" macro replaced by their value.
+    If [with_links_target_attribute] is set to true, html links are rewritten with target="_blank" attribute.
 *)
 
 val is_empty_name : Gwdb.person -> bool

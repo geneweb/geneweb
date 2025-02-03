@@ -187,7 +187,9 @@ and eval_date_var conf date = function
 
 and eval_message_text_var conf base str so = function
   | [ "wiki" ] ->
-      let s = string_with_macros conf [] (Notes.limit_display_length str) in
+      let s =
+        string_with_macros ~conf ~env:[] (Notes.limit_display_length str)
+      in
       let lines = Wiki.html_of_tlsw conf s in
       let s = String.concat "\n" lines in
       let s =
@@ -210,7 +212,7 @@ and eval_message_text_var conf base str so = function
       in
       str_val s
   | [ "nowiki" ] ->
-      let s = string_with_macros conf [] str in
+      let s = string_with_macros ~conf ~env:[] str in
       let s =
         match so with
         | Some h ->

@@ -359,7 +359,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   Output.print_sstring conf "</h1>";
   Util.include_template conf [] "summary" (fun () -> ());
   Output.print_sstring conf {|<table border="0" width="100%"><tr><td>|};
-  let s = Util.string_with_macros conf [] s in
+  let s = Util.string_with_macros ~conf ~env:[] s in
   let s =
     let wi =
       {
@@ -406,7 +406,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
 let print_part_wiznote conf base wz s cnt0 =
   let title = Util.escape_html wz in
   Hutil.header_no_page_title conf (fun _ -> Output.print_string conf title);
-  let s = Util.safe_html @@ Util.string_with_macros conf [] s in
+  let s = Util.safe_html @@ Util.string_with_macros ~conf ~env:[] s in
   let lines = Wiki.extract_sub_part (s : Adef.safe_string :> string) cnt0 in
   let lines =
     if cnt0 = 0 then (title :> string) :: "<br><br>" :: lines else lines
@@ -509,7 +509,7 @@ let print_mod_ok conf base =
       ([], fst (read_wizard_notes ~limit:false (wzfile (dir conf base) wz)))
     in
     let commit = commit_wiznotes conf base in
-    let string_filter s = Util.string_with_macros conf [] s in
+    let string_filter s = Util.string_with_macros ~conf ~env:[] s in
     let file_path = Notes.file_path conf base in
     let wi =
       {

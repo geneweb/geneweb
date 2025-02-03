@@ -1261,27 +1261,27 @@ let expand_env =
         loop 0
     | _ -> s
 
-let string_with_macros conf env s =
+let string_with_macros ?(with_links_target_attribute = true) ~conf ~env str =
   let start_with s i p =
     i + String.length p <= String.length s
     && String.lowercase_ascii (String.sub s i (String.length p)) = p
   in
   let buff = Buffer.create 1000 in
-  let email_addresses_positions = email_addr_positions s in
+  let email_addresses_positions = email_addr_positions str in
   let rec loop tt i =
-    if i < String.length s then
-      if i + 1 < String.length s && s.[i] = '%' then
+    if i < String.length str then
+      if i + 1 < String.length str && str.[i] = '%' then
         let i =
           try
-            Buffer.add_string buff (List.assoc s.[i + 1] env ());
+            Buffer.add_string buff (List.assoc str.[i + 1] env ());
             i + 2
           with Not_found -> (
-            match s.[i + 1] with
+            match str.[i + 1] with
             | 's' ->
                 Buffer.add_string buff (commd conf :> string);
                 i + 2
             | 'v' ->
-                let k, vl, j = get_variable s (i + 2) in
+                let k, vl, j = get_variable str (i + 2) in
                 let v, i =
                   let v =
                     try
@@ -1324,45 +1324,52 @@ let string_with_macros conf env s =
       else
         match tt with
         | In_a_href ->
-            let tt = if start_with s i "</a>" then Out else In_a_href in
-            Buffer.add_char buff s.[i];
+            let tt = if start_with str i "</a>" then Out else In_a_href in
+            Buffer.add_char buff str.[i];
             loop tt (i + 1)
         | In_norm ->
-            let tt = if s.[i] = '>' then Out else In_norm in
-            Buffer.add_char buff s.[i];
+            let tt = if str.[i] = '>' then Out else In_norm in
+            Buffer.add_char buff str.[i];
             loop tt (i + 1)
         | Out -> (
-            match http_string s i with
+            match http_string str i with
             | Some (x, j) ->
-                Printf.bprintf buff "<a href=\"%s\" target=\"_blank\">" x;
+                if with_links_target_attribute then
+                  Printf.bprintf buff "<a href=\"%s\" target=\"_blank\">" x
+                else Printf.bprintf buff "<a href=\"%s\">" x;
                 expand_ampersand buff x;
                 Printf.bprintf buff "</a>";
                 loop Out j
             | None -> (
                 match List.assoc_opt i email_addresses_positions with
                 | Some end_ ->
-                    let x = String.sub s i (end_ - i) in
+                    let x = String.sub str i (end_ - i) in
                     Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                     loop Out end_
                 | None ->
-                    if start_with s i "<a href=" || start_with s i "<a\nhref="
+                    if
+                      start_with str i "<a href="
+                      || start_with str i "<a\nhref="
                     then
-                      if start_with s (i + 8) "\"#" then (
-                        Buffer.add_char buff s.[i];
+                      if
+                        (not with_links_target_attribute)
+                        || start_with str (i + 8) "\"#"
+                      then (
+                        Buffer.add_char buff str.[i];
                         loop In_a_href (i + 1))
                       else (
                         Buffer.add_string buff "<a target=\"_blank\" href=";
                         loop In_a_href (i + 8))
-                    else if s.[i] = '<' then (
-                      Buffer.add_char buff s.[i];
+                    else if str.[i] = '<' then (
+                      Buffer.add_char buff str.[i];
                       loop In_norm (i + 1))
                     else if
-                      s.[i] = '&' && not (followed_by_ident_semi s (i + 1))
+                      str.[i] = '&' && not (followed_by_ident_semi str (i + 1))
                     then (
                       Buffer.add_string buff "&amp;";
                       loop Out (i + 1))
                     else (
-                      Buffer.add_char buff s.[i];
+                      Buffer.add_char buff str.[i];
                       loop Out (i + 1))))
     else Buffer.contents buff
   in
