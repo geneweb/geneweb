@@ -241,14 +241,9 @@ let util_string_with_macros () =
   in
   List.iter
     (fun actual -> test ~expected:actual actual)
-    [
-      {|a@.|};
-      {|a@b|};
-      {|a@b.|};
-      {|a@.b|};
-      {|a@b..|};
-      {|<a href="mailto:a@b.c">a@b.c</a>|};
-    ];
+    [ {|a@.|}; {|a@b|}; {|a@b.|}; {|a@.b|}; {|a@b..|} ];
+  test ~expected:{|<a target="_blank" href="mailto:a@b.c">a@b.c</a>|}
+    {|<a href="mailto:a@b.c">a@b.c</a>|};
   test ~expected:{|abc <a href="mailto:a@b.c">a@b.c</a>|} {|abc a@b.c|};
   test ~expected:{|<a href="mailto:a@b..">a@b..</a>.|} {|a@b...|};
   test ~expected:{|<a href="mailto:a@b.c">a@b.c</a>.|} {|a@b.c.|};
