@@ -170,7 +170,7 @@ let commit_notes conf base fnotes s =
   update_notes_links_db base pg s
 
 let wiki_aux pp conf base env str =
-  let s = Util.string_with_macros conf env (limit_display_length str) in
+  let s = Util.string_with_macros ~conf ~env (limit_display_length str) in
   let lines = pp (Wiki.html_of_tlsw conf s) in
   let wi =
     {
