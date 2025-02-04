@@ -874,7 +874,12 @@ let print_ok conf wi edit_mode fname title_is_1st s =
 
 let print_mod_ok conf wi edit_mode fname read_string commit string_filter
     title_is_1st =
-  let fname = fname (Util.p_getenv conf.env "f") in
+  let new_fname = Util.p_getenv conf.env "new_f" in
+  let fname =
+    match new_fname with
+    | Some f -> fname (Some f)
+    | None -> fname (Util.p_getenv conf.env "f")
+  in
   match edit_mode fname with
   | Some edit_mode ->
       let old_string =

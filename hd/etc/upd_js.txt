@@ -13,28 +13,10 @@
   %apply;dl("estates")
 %end;
 <script>
-var baseName = "%base.name;";
-var path = baseName + "/cache/" + baseName;
-var datalists = %[
-%if;(b.datalist_fnames=1)    { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
-%if;(b.datalist_snames=1)    { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
-%if;(b.datalist_places=1)    { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
-%if;(b.datalist_occupations=1)    { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
-%if;(b.datalist_sources=1)    { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
-%if;("IND" in e.m)
-  %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
-  %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
-  %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
-  %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
-  %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
-%end;
-%];
-
-datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
-
 document.addEventListener('DOMContentLoaded', () => {
     addClearButtonToInputs();
     inputToBook.addNavigation();
+    populateDatalists();
 });
 
 %( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)

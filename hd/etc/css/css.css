@@ -274,10 +274,7 @@ a.book-arrow:hover {
 .modal-backdrop {
    background-color: #808080;
 }
-.tooltip-inner {
-    min-width: 100px;
-    max-width: 100%; 
-}
+
 #content:focus { outline: none; }
 
 /* Remove overused p anchor top margin*/
@@ -291,14 +288,17 @@ p {
 	line-height:1em;
 	}
 
-.tooltip.show {
-  opacity: 1;
+.tooltip-inner {
+   min-width: 100px;
+   max-width: 450px;
+   white-space: normal;
+   opacity: 1 !important;
+   padding: 6px 10px;
+   line-height: 1.2;u
 }
 
-.tooltip-inner {
-   white-space: nowrap;
-   max-width: 450px;
-   opacity: 1 !important;
+.tooltip.show {
+  opacity: 1;
 }
 
 /*! Small webfont with 50 monospaced glyphs for descending tree view	
@@ -523,6 +523,35 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   margin-bottom: 5rem;
 }
 
+/* Wrapper pour positionner les placeholders flottants */
+.input-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+/* Style du placeholder flottant */
+.floating-placeholder {
+  position: absolute;
+  top: -12px;
+  left: 8px;
+  font-size: 12px;
+  background: white;
+  padding: 0 3px;
+  color: #6c757d;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.form-control-lg + .floating-placeholder {
+  left: 12px;
+}
+
+.floating-placeholder.active {
+  opacity: 0.9;
+}
+
 /* Clear button */
 .clear-button-wrapper {
     position: relative;
@@ -534,7 +563,7 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
     opacity: 0;
     pointer-events: none;
 }
-input:focus, select:focus {
+input:not(.custom-file-input):focus, select:focus {
     z-index: 1;
 }
 .clear-button-wrapper:hover .clear-button-icon {
@@ -642,6 +671,16 @@ img.image-popover {
 
 div.p_mod_builder {
   width: 3120px;
+}
+
+/* p-mod input group size */
+.p-mod-group {
+  flex: 1;
+}
+
+.p-mod-group .input-wrapper {
+  flex: 1;
+  width: auto;
 }
 
 /* Fixed ancestors image width on modules/arbre_3gen_photo */
@@ -1662,7 +1701,7 @@ span.notesourcecolor {
 }
 
 .d-flex.flex-wrap {
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .imap-gallery {
@@ -1728,3 +1767,38 @@ span.notesourcecolor {
     display: inline;
 }
 */
+
+.image-arbre-famille {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  object-position: center 35%
+}
+.image-arbre-placeholder {
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+.text-overflow-ellipsis {
+  text-overflow: ellipsis;
+}
+
+.text-truncate-narrow {
+  max-width: min(170px, 100%);
+}
+
+.text-truncate-wide {
+  max-width: min(235px, 100%);
+}
+
+
+.name-container {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1;
+}

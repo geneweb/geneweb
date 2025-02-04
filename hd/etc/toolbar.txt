@@ -1,4 +1,10 @@
 <!-- $Id: toolbar.txt v7.1 08/12/2024 08:33:21 $ -->
+
+%if;(e.f="new_linked_page")
+  [*new linked page name][:]
+  <input type="input" name="new_f" id="new_f"
+      size="20" maxlength="50" style="padding-left:4px">
+%end;
 <style>
 %if;(e.m="MOD_NOTES")
 body {

@@ -440,7 +440,7 @@ let treat_request =
           in
           if base <> None then
             w_base @@
-            if only_special_env conf.env then SrcfileDisplay.print_start
+            if only_special_env conf.env then SrcfileDisplay.print_welcome
             else w_person @@ fun conf base p ->
               match p_getenv conf.env "ptempl" with
               | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
@@ -449,8 +449,8 @@ let treat_request =
           else if conf.bname = ""
           then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
           else
-            w_base begin (* print_start -> welcome.txt *)
-              if only_special_env conf.env then SrcfileDisplay.print_start
+            w_base begin
+              if only_special_env conf.env then SrcfileDisplay.print_welcome
               else w_person @@ fun conf base p ->
                 match p_getenv conf.env "ptempl" with
                 | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->

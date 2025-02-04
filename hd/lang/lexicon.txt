@@ -1104,6 +1104,11 @@ pt: um cunhado/cunhados/uma cunhada/cunhadas
 sv: en svåger/svågrar/en svägerska/svägerskor
 tr: bir kayınbiraderi/kayınbiraderleri/bir kayınbiraderi/kayınbiraderleri
 
+
+    new linked page name
+en: give a name to this linked page
+fr: donnez un nom à cette page liée
+
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
 bg: брат/сестра/брат или сестра
@@ -5059,7 +5064,7 @@ tr: devam eden
 
     copy link %s
 co: cupià u liame %s in u preme’papei
-en: copy the link %s to the clipboard
+en: copy the %s link to the clipboard
 fr: copier le lien %s dans le presse-papier
 pt: copiar o link %s para a área de transferência
 sv: kopiera länken
@@ -5699,6 +5704,7 @@ fr: 9×-arrière-grands-parents
 
     cousins.11.0 tt
 de: Stammgroßeltern
+fr: neuf-fois-arrière-grands-parents<br>décaïeuls
 
     cousins.12.0
 de: Ur<sup>(×10)</sup>-Großeltern
@@ -5821,7 +5827,7 @@ fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et pet
 ->: 2nd cousins
 
     cousins.3.3 tt
-fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)
+fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)<br>cousins sous germain
 
     cousins.3.4
 de: Neffen und Nichten 3. Grades
@@ -6568,7 +6574,7 @@ co: basa geneologica
 cs: rodokmen
 da: family Tree
 de: stammbaum
-en: family Tree
+en: genealogical database
 eo: family Tree
 es: árbol genealógico
 et: sugupuu
@@ -8948,6 +8954,10 @@ sl: GeneWeb parametri
 sv: GeneWeb-parametrar
 tr: GeneWeb parametreleri
 zh: GeneWeb 参数
+
+    go to alt base
+en: go to the database/&#10;Be carefull to the index number in the query!
+fr: aller vers la base de données/&#10;Attention au numéro d’index dans la requête !
 
     go to section %s
 af: gaan na die %s seksie
@@ -13192,9 +13202,9 @@ en: no more
 fr: pas d’autres
 
     no user key
-co: u liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu .auth
-en: the link may lead to a homonym or even fail because the user key is not defined in the .auth file
-fr: le lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier .auth
+co: u liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu `.auth`
+en: this link may lead to a homonym or even fail because the user key is not defined in the `.auth` file
+fr: ce lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier `.auth`
 
     no sexes check
 af: geslag word nie aangedui nie
@@ -15881,11 +15891,41 @@ pt: selamento ao cônjuge LDS
 sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
 
+    path to
+en: path to me/path to the Sosa n<sup>o</sup> 1
+fr: chemin vers moi/chemin vers le Sosa n<sup>o</sup> 1
+
+    path to me
+en: shortest path between this individual and me
+fr: chemin le plus court entre cet individu et moi
+
+    path to Sosa 1
+en: shortest path between this individual and the Sosa nº 1
+fr: chemin le plus court entre cet individu et le Sosa nº 1
+
+    reset related cache
+en: reset the cache of near relationships
+fr: réinitialiser le cache des relations proches
+
+    reset related cache hlp
+en: reset the cache extending semi-public visibility to the family
+fr: réinitialiser le cache étendant la visibilité semi-publique à la famille
+
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
 de: suche %s auf Geneanet
 en: search %s on Geneanet
 fr: rechercher %s sur Geneanet
+
+    search %s on matchID
+co: ricercà %s nant’à matchID
+de: suche %s auf matchID
+en: search %s on matchID
+fr: recherche %s sur matchID
+
+    search Insee
+en: search matches in the Insee death index files
+fr: recherche de correspondances dans les fichiers des décès de l’Insee
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
@@ -15916,6 +15956,22 @@ sk: hľadať/citlivý na veľkosť písma
 sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
+
+    exact-hlp
+en: exact match (word level)
+fr: comparaison exacte mot par mot
+
+    order
+en: order
+fr: ordre
+
+    order-hlp
+en: test firstnames in the same order
+fr: tester les prénoms dans le même ordre
+  
+    all-hlp
+en: all firstnames must be present
+fr: tous les prénoms doivent être présents
 
     search_exact_fn
 co: ricerca esatta
@@ -16269,12 +16325,12 @@ co: affissà in
 cs: zvolte jazyk pro prohlížení databáze
 da: du kan vælge fremstilling på et andet sprog blandt de følgende
 de: Blick auf
-en: view in
+en: select langage
 eo: vi povas elekti alian lingvon inter la sekvantajn
 es: ver en
 et: võid valida ka mõne muu keele järgnevatest
 fi: mäytä
-fr: afficher en
+fr: sélectionner la langue
 is: þú getur valið milli eftirfarandi tungumála
 it: vista in
 lv: jūs variet apskatīt datu bāzi arī citās sekojošās valodās

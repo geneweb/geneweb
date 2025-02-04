@@ -815,6 +815,7 @@ let templ_eval_var conf = function
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
       VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
+  | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
@@ -827,6 +828,9 @@ let templ_eval_var conf = function
       in
       VVbool (List.mem plugin plugins)
   | [ "supervisor" ] -> VVbool conf.supervisor
+  | [ "roglo" ] ->
+      VVbool
+        (try List.assoc "roglo" conf.base_env = "yes" with Not_found -> false)
   | [ "true" ] -> VVbool true
   | [ "wizard" ] -> VVbool conf.wizard
   | [ "is_printed_by_template" ] -> VVbool conf.is_printed_by_template
@@ -1275,6 +1279,9 @@ let rec interp_ast :
             String.concat "" (eval_ast_list env ep astl)
         | "language_name", [ (None, VVstring s) ] ->
             Translate.language_name s (Util.transl conf "!languages")
+        | "url_encode", [ (None, VVstring s) ]
+        | "uri_encode", [ (None, VVstring s) ] ->
+            Util.uri_encode s
         | "url_set", [ (None, VVstring s1) ] ->
             let s1 = String.split_on_char '/' s1 in
             url_set_aux conf s1 []

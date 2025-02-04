@@ -14,22 +14,24 @@
 <div class="container text-center ">
 <h1 class="mt-5">[*choose a genealogy]</h1>
 
-<div class="my-3">
+<div class="mt-4">
 <span>[*input database][:]</span>
 
-<form class="form-inline d-flex justify-content-center my-2" method="get" action="%prefix;">
+<form class="form-inline d-flex justify-content-center mt-2" method="get" action="%prefix;">
   <input type="hidden" name="lang" value="%evar.lang;">
-  <input name="b" placeholder="%bases_list;"  class="form-control col-4">
+  <input name="b" placeholder="%bases_list;" class="form-control col-8">
   <button type="submit" class="btn btn-outline-secondary ml-2" value="">Ok</button>
 </form>
 
 %( TODO find server name and port number %)
+<div class="mt-4">
 [*available genealogies][:]<br>
 %bases_list_links;
 </div>
+</div>
 
-<h3 class="text-center mt-5">[*select lang][:]</h3>
-<div class="d-flex flex-wrap justify-content-center col-11 mt-2 mx-auto">
+<h3 class="text-center mt-4">[*select lang][:]</h3>
+<div class="d-flex flex-wrap justify-content-center col-10 mx-auto">
   <a class="btn btn-outline-secondary" href="?lang=af%if;(evar.templ!="")&templ=%evar.templ;%end;" title="af">Afrikaans</a>
   <a class="btn btn-outline-secondary" href="?lang=ar%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ar">العربية</a>
   <a class="btn btn-outline-secondary" href="?lang=bg%if;(evar.templ!="")&templ=%evar.templ;%end;" title="bg">български</a>
