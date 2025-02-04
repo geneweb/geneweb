@@ -32,12 +32,6 @@ val get_single_sosa : Config.config -> base -> person -> Sosa.t
     calls init_sosa_t if needed
     *)
 
-val print_sosa :
-  Config.config -> base -> person -> bool (* print link if true *) -> unit
-(** Prints the sosa pictogram
-    and a link to display relationship with sosa 1 if requested
-    *)
-
 val find_sosa :
   Config.config ->
   base ->

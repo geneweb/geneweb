@@ -281,3 +281,63 @@ let get_sosa_person ~conf ~base ~person =
       Option.bind (Util.find_sosa_ref conf base) (fun sosa_ref ->
           get_sosa ~conf ~base ~cache ~iper:(Gwdb.get_iper person) ~sosa_ref))
   |> Option.value ~default:Sosa.zero
+
+(* ************************************************************************ *)
+(*  [Fonc] print_sosa : config -> base -> person -> bool -> unit            *)
+
+(* ************************************************************************ *)
+
+(** [Description] : Affiche le picto sosa ainsi que le lien de calcul de
+      relation entre la personne et le sosa 1 (si l'option cancel_link
+      n'est pas activée).
+    [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - p    : la personne que l'on veut afficher
+    - link : ce booléen permet d'afficher ou non le lien sur le picto
+               sosa. Il n'est pas nécessaire de mettre le lien si on a
+               déjà affiché cette personne.
+      [Retour] :
+    - unit
+      [Rem] : Exporté en clair hors de ce module.                             *)
+let print_sosa ~conf ~base ~person ~link =
+  let sosa_num = get_sosa_person ~conf ~base ~person in
+  if Sosa.gt sosa_num Sosa.zero then
+    match Util.find_sosa_ref conf base with
+    | Some r ->
+        (if not link then ()
+        else
+          let sosa_link =
+            let i1 = Gwdb.string_of_iper (Gwdb.get_iper person) in
+            let i2 = Gwdb.string_of_iper (Gwdb.get_iper r) in
+            let b2 = Sosa.to_string sosa_num in
+            "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
+          in
+          Output.print_sstring conf {|<a href="|};
+          Output.print_string conf (Util.commd conf);
+          Output.print_string conf (sosa_link |> Adef.safe);
+          Output.print_sstring conf {|"> |});
+        let title =
+          if Util.is_hide_names conf r && not (Util.authorized_age conf base r)
+          then ""
+          else
+            let direct_ancestor =
+              Name.strip_c (Gwdb.p_first_name base r) '"'
+              ^ " "
+              ^ Name.strip_c (Gwdb.p_surname base r) '"'
+            in
+            Printf.sprintf
+              (Util.fcapitale (Util.ftransl conf "direct ancestor of %s"))
+              direct_ancestor
+            ^ Printf.sprintf ", Sosa: %s"
+                (Sosa.to_string_sep
+                   (Util.transl conf "(thousand separator)")
+                   sosa_num)
+        in
+        Output.print_sstring conf {|<img src="|};
+        Output.print_string conf (Image.prefix conf);
+        Output.print_sstring conf {|/sosa.png" alt="sosa" title="|};
+        Output.print_string conf (title |> Adef.safe);
+        Output.print_sstring conf {|"> |};
+        if not link then () else Output.print_sstring conf "</a> "
+    | None -> ()
