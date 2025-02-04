@@ -2438,3 +2438,41 @@ let has_children base u =
       let des = Gwdb.foi base ifam in
       Array.length (Gwdb.get_children des) > 0)
     (Gwdb.get_family u)
+
+let rec cut_at_equal i s =
+  if i = String.length s then (s, "")
+  else if s.[i] = '=' then
+    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
+  else cut_at_equal (succ i) s
+
+let strip_trailing_spaces s =
+  let len =
+    let rec loop len =
+      if len = 0 then 0
+      else
+        match s.[len - 1] with
+        | ' ' | '\n' | '\r' | '\t' -> loop (len - 1)
+        | _ -> len
+    in
+    loop (String.length s)
+  in
+  String.sub s 0 len
+
+let read_base_env ~bname =
+  let fname = bpath (bname ^ ".gwf") in
+  try
+    let ic = Secure.open_in fname in
+    let env =
+      let rec loop env =
+        match input_line ic with
+        | s ->
+            let s = strip_trailing_spaces s in
+            if s = "" || s.[0] = '#' then loop env
+            else loop (cut_at_equal 0 s :: env)
+        | exception End_of_file -> env
+      in
+      loop []
+    in
+    close_in ic;
+    env
+  with Sys_error _ -> []
