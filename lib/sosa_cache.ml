@@ -271,3 +271,7 @@ let output_static_sosa_cache ~base ~cache =
   | StaticCache cache -> StaticCache.output ~base ~cache
   | DynamicCache cache ->
       failwith "output_static_sosa_cache called with dynamic cache"
+
+let write_static_sosa_cache ~conf ~base =
+  let cache = build_static_sosa_cache ~conf ~base in
+  Option.iter (fun cache -> output_static_sosa_cache ~base ~cache) cache
