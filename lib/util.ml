@@ -2476,3 +2476,6 @@ let read_base_env ~bname =
     close_in ic;
     env
   with Sys_error _ -> []
+
+let minimal_wiz_conf ~bname =
+  { Config.empty with base_env = read_base_env ~bname; wizard = true }
