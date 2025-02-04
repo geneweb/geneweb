@@ -1307,10 +1307,8 @@ let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
 
 let get_sosa_ref env =
   match get_env "sosa_ref" env with
-  | Vsosa_ref (Some sosa_ref) ->
-      Some sosa_ref
-  | _ ->
-      None
+  | Vsosa_ref (Some sosa_ref) -> Some sosa_ref
+  | _ -> None
 
 let get_sosa_cache env =
   match get_env "t_sosa" env with Vt_sosa t_sosa -> t_sosa | _ -> None
@@ -1321,14 +1319,6 @@ let get_sosa conf base env iper : (Sosa.t option * Gwdb.person) option =
       Option.bind cache (fun cache ->
           let sosa = Sosa_cache.get_sosa ~conf ~base ~cache ~iper ~sosa_ref in
           Some (sosa, sosa_ref)))
-
-let next_sosa conf base env sosa =
-  Option.bind (get_sosa_cache env) (fun cache ->
-      Sosa_cache.next_sosa cache sosa)
-
-let previous_sosa conf base env sosa =
-  Option.bind (get_sosa_cache env) (fun cache ->
-      Sosa_cache.previous_sosa cache sosa)
 
 (* ************************************************************************** *)
 (*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
@@ -2507,26 +2497,6 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | "sosa" :: sl -> (
       match get_sosa conf base env (Gwdb.get_iper p) with
       | Some (Some sosa, _) -> TemplAst.VVstring (eval_num conf sosa sl)
-      | _ -> null_val)
-  | "sosa_next" :: sl -> (
-      match get_sosa conf base env (Gwdb.get_iper p) with
-      | Some (Some sosa, _) -> (
-          match next_sosa conf base env sosa with
-          | Some (_sosa, ip) ->
-              let p = Gwdb.poi base ip in
-              let p_auth = Util.authorized_age conf base p in
-              eval_person_field_var conf base env (p, p_auth) loc sl
-          | None -> null_val)
-      | _ -> null_val)
-  | "sosa_prev" :: sl -> (
-      match get_sosa conf base env (Gwdb.get_iper p) with
-      | Some (Some sosa, _) -> (
-          match previous_sosa conf base env sosa with
-          | Some (_sosa, ip) ->
-              let p = Gwdb.poi base ip in
-              let p_auth = Util.authorized_age conf base p in
-              eval_person_field_var conf base env (p, p_auth) loc sl
-          | None -> null_val)
       | _ -> null_val)
   | "spouse" :: sl -> (
       match get_env "fam" env with

@@ -718,15 +718,10 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
     | "name_is_restricted" -> name_is_restricted
     | _ -> raise Not_found)
 
-and get_sosa_person =
-  let loaded = ref false in
-  fun conf base p ->
-    if not !loaded then (
-      Geneweb.SosaCache.build_sosa_ht conf base;
-      loaded := true);
-    let sosa = Geneweb.SosaCache.get_sosa_person p in
-    if sosa = Sosa.zero then Jingoo.Jg_types.Tnull
-    else Jingoo.Jg_types.Tstr (Sosa.to_string sosa)
+and get_sosa_person conf base person =
+  let sosa = Geneweb.Sosa_cache.get_sosa_person ~conf ~base ~person in
+  if sosa = Sosa.zero then Jingoo.Jg_types.Tnull
+  else Jingoo.Jg_types.Tstr (Sosa.to_string sosa)
 
 and find_event conf base x (events : 'a Geneweb.Event.event_item list) =
   match List.find_opt (fun evt -> Geneweb.Event.get_name evt = x) events with
