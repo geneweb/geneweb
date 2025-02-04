@@ -217,7 +217,7 @@ let is_sosa_cache_valid conf base =
   let patch_file = Filename.concat base_dir "patches" in
   let cache_file = Filename.concat base_dir "cache_static_sosa" in
   print_endline patch_file;
-  (not (Files.exists patch_file))
+  (Files.exists cache_file && not (Files.exists patch_file))
   || Files.exists cache_file
      && (Unix.stat patch_file).st_mtime < (Unix.stat cache_file).st_mtime
 
