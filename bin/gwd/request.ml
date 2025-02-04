@@ -105,10 +105,9 @@ let specify conf base n pl =
   Geneweb.Util.print_tips_relationship conf;
   Geneweb.Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
-  let () = Geneweb.SosaCache.build_sosa_ht conf base in
   List.iter begin fun (p, tl) ->
     Geneweb.Output.print_sstring conf "<li>";
-    Geneweb.SosaCache.print_sosa conf base p true;
+    Geneweb.Sosa_cache.print_sosa ~conf ~base ~person:p ~link:true;
     begin match tl with
       | [] ->
         Geneweb.Output.print_sstring conf " " ;
