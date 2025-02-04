@@ -96,6 +96,8 @@ end = struct
         aux ()
 
   let make ~base ~sosa_ref =
+    let () = Gwdb.load_ascends_array base in
+    let () = Gwdb.load_couples_array base in
     let cache = Gwdb.iper_marker (Gwdb.ipers base) None in
     let ancestor_queue = Queue.create () in
     Queue.push (sosa_ref, Sosa.one) ancestor_queue;
@@ -123,6 +125,8 @@ end = struct
 
   let compute_all_sosas ~base ~sosa_ref =
     print_endline "=================BUILD STATIC CACHE=======================";
+    let () = Gwdb.load_ascends_array base in
+    let () = Gwdb.load_couples_array base in
     let arr = Array.make (Gwdb.nb_of_persons base) None in
     let ancestor_queue = Queue.create () in
     Queue.add (sosa_ref, Sosa.one) ancestor_queue;
@@ -163,7 +167,7 @@ end = struct
     let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
     let cache_file = Filename.concat base_dir "cache_static_sosa" in
     let tmp_cache_file = cache_file ^ "~" in
-    let oc = open_out tmp_cache_file in
+    let oc = Secure.open_out tmp_cache_file in
     Marshal.to_channel oc cache [];
     close_out oc;
     Files.mv tmp_cache_file cache_file
@@ -173,7 +177,7 @@ end = struct
     let cache_file = Filename.concat base_dir "cache_static_sosa" in
     if Sys.file_exists cache_file then (
       print_endline "===================INPUT CACHE FOUND=====================";
-      let ic = open_in cache_file in
+      let ic = Secure.open_in cache_file in
       let cache : Sosa.t option array = Marshal.from_channel ic in
       close_in ic;
       Some cache)
@@ -213,8 +217,8 @@ let is_sosa_cache_valid conf base =
   let patch_file = Filename.concat base_dir "patches" in
   let cache_file = Filename.concat base_dir "cache_static_sosa" in
   print_endline patch_file;
-  (not (Sys.file_exists patch_file))
-  || Sys.file_exists cache_file
+  (not (Files.exists patch_file))
+  || Files.exists cache_file
      && (Unix.stat patch_file).st_mtime < (Unix.stat cache_file).st_mtime
 
 let get_sosa_cache ~conf ~base : t option =
@@ -257,3 +261,13 @@ let get_sosa ~conf ~base ~cache ~iper ~sosa_ref =
 
 let next_sosa cache sosa = None
 let previous_sosa cache sosa = None
+
+let build_static_sosa_cache ~conf ~base =
+  let cache = StaticCache.build ~conf ~base in
+  Option.map static_cache cache
+
+let output_static_sosa_cache ~base ~cache =
+  match cache with
+  | StaticCache cache -> StaticCache.output ~base ~cache
+  | DynamicCache cache ->
+      failwith "output_static_sosa_cache called with dynamic cache"
