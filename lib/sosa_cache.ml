@@ -109,8 +109,6 @@ module StaticCache : sig
   type t
 
   val build : conf:Config.config -> base:Gwdb.base -> t option
-  val of_marker : (Gwdb.iper, Sosa.t option) Gwdb.Marker.t -> t
-  val of_array : Sosa.t option array -> t
   val output : base:Gwdb.base -> cache:t -> unit
   val input : conf:Config.config -> base:Gwdb.base -> t option
 
@@ -121,25 +119,19 @@ module StaticCache : sig
     iper:Gwdb.iper ->
     Sosa.t option
 end = struct
-  type t =
-    | Marker of (Gwdb.iper, Sosa.t option) Gwdb.Marker.t
-    | Array of Sosa.t option array
-
-  let of_marker marker = Marker marker
-  let of_array arr = Array arr
+  type t = Sosa.t option array
 
   let compute_all_sosas ~base ~sosa_ref =
     print_endline "=================BUILD STATIC CACHE=======================";
-    let ipers = Gwdb.ipers base in
-    let iper_marker = Gwdb.iper_marker ipers None in
+    let arr = Array.make (Gwdb.nb_of_persons base) None in
     let ancestor_queue = Queue.create () in
     Queue.add (sosa_ref, Sosa.one) ancestor_queue;
-    Gwdb.Marker.set iper_marker sosa_ref (Some Sosa.one);
+    arr.(Obj.magic sosa_ref) <- Some Sosa.one;
     let add_in_queue iper sosa =
-      let v = Gwdb.Marker.get iper_marker iper in
+      let v = arr.(Obj.magic iper) in
       match v with
       | None ->
-          Gwdb.Marker.set iper_marker iper (Some sosa);
+          arr.(Obj.magic iper) <- Some sosa;
           Queue.push (iper, sosa) ancestor_queue
       | Some _sosa -> ()
     in
@@ -160,7 +152,7 @@ end = struct
         | None -> aux ()
     in
     aux ();
-    of_marker iper_marker
+    arr
 
   let build ~conf ~base =
     let sosa_ref = Util.default_sosa_ref conf base in
@@ -171,22 +163,8 @@ end = struct
     let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
     let cache_file = Filename.concat base_dir "cache_static_sosa" in
     let tmp_cache_file = cache_file ^ "~" in
-    let arr =
-      match cache with
-      | Marker cache ->
-          let nb_persons = Gwdb.nb_of_persons base in
-          let arr = Array.make nb_persons None in
-          Gwdb.Collection.iter
-            (fun iper ->
-              let sosa_v = Gwdb.Marker.get cache iper in
-              let i = Gwdb.string_of_iper iper |> int_of_string in
-              arr.(i) <- sosa_v)
-            (Gwdb.ipers base);
-          arr
-      | Array arr -> arr
-    in
     let oc = open_out tmp_cache_file in
-    Marshal.to_channel oc arr [];
+    Marshal.to_channel oc cache [];
     close_out oc;
     Files.mv tmp_cache_file cache_file
 
@@ -198,19 +176,13 @@ end = struct
       let ic = open_in cache_file in
       let cache : Sosa.t option array = Marshal.from_channel ic in
       close_in ic;
-      Some (of_array cache))
+      Some cache)
     else (
-      (* TODO no build *)
       print_endline
         "=================INPUT CACHE NOT FOUND=======================";
-      let cache = build ~conf ~base in
-      Option.iter (fun cache -> output ~base ~cache) cache;
-      cache)
+      None)
 
-  let get_sosa ~conf ~base ~cache ~iper =
-    match cache with
-    | Marker marker -> Gwdb.Marker.get marker iper
-    | Array arr -> arr.(Gwdb.string_of_iper iper |> int_of_string)
+  let get_sosa ~conf ~base ~cache ~iper = cache.(Obj.magic iper)
 end
 
 type t = DynamicCache of DynamicCache.t | StaticCache of StaticCache.t
@@ -252,20 +224,15 @@ let get_sosa_cache ~conf ~base : t option =
   | None -> (
       let sosa_ref = Util.find_sosa_ref conf base in
       match sosa_ref with
-      | Some sosa_ref when is_default_sosa_ref conf base sosa_ref ->
+      | Some sosa_ref
+        when is_default_sosa_ref conf base sosa_ref
+             && is_sosa_cache_valid conf base ->
           print_endline
             "============================================================use \
              static sosa cache";
-
-          if is_sosa_cache_valid conf base then (
-            let cache = StaticCache.input ~conf ~base in
-            set_static_cache cache;
-            Option.map static_cache cache)
-          else
-            let cache = StaticCache.build ~conf ~base in
-            Option.iter (fun cache -> StaticCache.output ~base ~cache) cache;
-            set_static_cache cache;
-            Option.map static_cache cache
+          let cache = StaticCache.input ~conf ~base in
+          set_static_cache cache;
+          Option.map static_cache cache
       | Some sosa_ref ->
           print_endline
             "============================================================use \
