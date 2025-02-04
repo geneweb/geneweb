@@ -15,3 +15,6 @@ val get_sosa :
 
 val next_sosa : t -> Sosa.t -> (Sosa.t * Gwdb.iper) option
 val previous_sosa : t -> Sosa.t -> (Sosa.t * Gwdb.iper) option
+
+val get_sosa_person :
+  conf:Config.config -> base:Gwdb.base -> person:Gwdb.person -> Sosa.t
