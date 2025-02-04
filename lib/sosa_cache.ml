@@ -211,3 +211,9 @@ let output_static_sosa_cache ~base ~cache =
 let write_static_sosa_cache ~conf ~base =
   let cache = build_static_sosa_cache ~conf ~base in
   Option.iter (fun cache -> output_static_sosa_cache ~base ~cache) cache
+
+let get_sosa_person ~conf ~base ~person =
+  Option.bind (get_sosa_cache ~conf ~base) (fun cache ->
+      Option.bind (Util.find_sosa_ref conf base) (fun sosa_ref ->
+          get_sosa ~conf ~base ~cache ~iper:(Gwdb.get_iper person) ~sosa_ref))
+  |> Option.value ~default:Sosa.zero
