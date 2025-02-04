@@ -572,3 +572,4 @@ val is_fully_visible_to_visitors :
 
 val is_public : Config.config -> Gwdb.base -> Gwdb.person -> bool
 val read_base_env : bname:string -> (string * string) list
+val minimal_wiz_conf : bname:string -> Config.config
