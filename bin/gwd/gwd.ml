@@ -250,43 +250,6 @@ let alias_lang lang =
       close_in ic ; lang
     with Sys_error _ -> lang
 
-let rec cut_at_equal i s =
-  if i = String.length s then s, ""
-  else if s.[i] = '=' then
-    String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
-  else cut_at_equal (succ i) s
-
-let strip_trailing_spaces s =
-  let len =
-    let rec loop len =
-      if len = 0 then 0
-      else
-        match s.[len-1] with
-          ' ' | '\n' | '\r' | '\t' -> loop (len - 1)
-        | _ -> len
-    in
-    loop (String.length s)
-  in
-  String.sub s 0 len
-
-let read_base_env bname =
-  let fname = Util.bpath (bname ^ ".gwf") in
-  try
-    let ic = Secure.open_in fname in
-    let env =
-      let rec loop env =
-        match input_line ic with
-        | s ->
-          let s = strip_trailing_spaces s in
-          if s = "" || s.[0] = '#' then loop env
-          else loop (cut_at_equal 0 s :: env)
-        | exception End_of_file -> env
-      in
-      loop []
-    in
-    close_in ic; env
-  with Sys_error _ -> []
-
 let log_redirect from request req =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ()) begin fun () ->
@@ -1036,7 +999,7 @@ let make_conf from_addr request script_name env =
   let (threshold_test, env) = extract_assoc "threshold" env in
   if threshold_test <> ""
   then RelationLink.threshold := int_of_string threshold_test;
-  let base_env = read_base_env base_file in
+  let base_env = Util.read_base_env ~bname:base_file in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
