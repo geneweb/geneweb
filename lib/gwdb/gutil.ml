@@ -102,10 +102,20 @@ let person_not_a_key_find_all base s =
   in
   select ipl
 
-let person_ht_find_all base s =
-  match person_of_string_key base s with
-  | Some p -> [ p ]
-  | None -> person_not_a_key_find_all base s
+let person_ht_find_all =
+  let memo = Hashtbl.create 1 in
+  fun base s ->
+    match Hashtbl.find_opt memo s with
+    | Some p -> p
+    | None -> (
+        match person_of_string_key base s with
+        | Some p ->
+            Hashtbl.add memo s [ p ];
+            [ p ]
+        | None ->
+            let all = person_not_a_key_find_all base s in
+            Hashtbl.add memo s all;
+            all)
 
 let find_same_name base p =
   let f = Gwdb.p_first_name base p in
