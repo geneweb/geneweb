@@ -231,79 +231,76 @@ let split_key key =
   else ("?", "", "?")
 
 let is_related conf base p =
-  (* TODO add ip of userkey in config *)
-  let fname =
-    String.concat Filename.dir_sep
-      [
-        Secure.base_dir ();
-        conf.Config.bname ^ ".gwb";
-        "caches";
-        "family-" ^ conf.Config.userkey;
-      ]
-  in
-  let _print_family family comment =
-    Printf.eprintf "Family: %s\n" comment;
-    List.iter
-      (fun ip ->
-        Printf.eprintf "   %s\n" (Gutil.designation base (Gwdb.poi base ip)))
-      family
-  in
-  if conf.Config.userkey <> "" then (
-    (if
-     try List.assoc "related" conf.Config.base_env = "reset"
-     with Not_found -> false
-    then
-     try Sys.remove fname
-     with Sys_error _ -> Printf.eprintf "Error when removing %s\n" fname);
-    let family =
-      Mutil.read_or_create_value fname (fun () ->
-          match conf.Config.userip with
-          | Some ip ->
-              let family = [ ip ] in
-              let max =
-                try List.assoc "is_semi_public_max" conf.Config.base_env
-                with Not_found -> "2" |> String.trim
-                (* limit search to n generations *)
-              in
-              let max = if max = "" then 2 else int_of_string max in
-              let family = ancestors conf base (max + 1) family ip in
-              (* siblings
-                 let family =
-                       (match Gwdb.get_parents (Gwdb.poi base ip) with
-                       | Some ifam -> Gwdb.get_children (Gwdb.foi base ifam) |> Array.to_list
-                       | None -> [])
-                       @ family
-                 in *)
-              (* spouses *)
-              let family =
-                (let ifams = Gwdb.get_family (Gwdb.poi base ip) in
-                 Array.fold_left
-                   (fun acc ifam ->
-                     let sp =
-                       let f = Gwdb.foi base ifam in
-                       if ip = Gwdb.get_father f then Gwdb.get_mother f
-                       else Gwdb.get_father f
-                     in
-                     if
-                       Gwdb.sou base (Gwdb.get_first_name (Gwdb.poi base sp))
-                       <> "?"
-                       && Gwdb.sou base (Gwdb.get_surname (Gwdb.poi base sp))
-                          <> "?"
-                     then sp :: acc
-                     else acc)
-                   [] ifams)
-                @ family
-              in
-              (* relations ? *)
-              let family = descendants conf base family ip in
-              List.sort_uniq compare family
-          | _ -> [])
+  if conf.Config.userkey <> "" then
+    let fname =
+      String.concat Filename.dir_sep
+        [
+          Secure.base_dir ();
+          conf.Config.bname ^ ".gwb";
+          "caches";
+          "family-" ^ conf.Config.userkey;
+        ]
     in
-    match conf.Config.userip with
-    | Some ip ->
-        Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
-        && List.mem (Gwdb.get_iper p) family
-    | _ -> false)
+    match (List.assoc_opt "fmode" conf.Config.env :> string option) with
+    | Some "on" -> (
+        let family =
+          Mutil.read_or_create_value fname (fun () ->
+              match conf.Config.userip with
+              | Some ip ->
+                  let family = [ ip ] in
+                  let max =
+                    try List.assoc "is_semi_public_max" conf.Config.base_env
+                    with Not_found -> "2" |> String.trim
+                    (* limit search to n generations *)
+                  in
+                  let max = if max = "" then 2 else int_of_string max in
+                  let family = ancestors conf base (max + 1) family ip in
+                  (* siblings
+                     let family =
+                           (match Gwdb.get_parents (Gwdb.poi base ip) with
+                           | Some ifam -> Gwdb.get_children (Gwdb.foi base ifam) |> Array.to_list
+                           | None -> [])
+                           @ family
+                     in *)
+                  (* spouses *)
+                  let family =
+                    (let ifams = Gwdb.get_family (Gwdb.poi base ip) in
+                     Array.fold_left
+                       (fun acc ifam ->
+                         let sp =
+                           let f = Gwdb.foi base ifam in
+                           if ip = Gwdb.get_father f then Gwdb.get_mother f
+                           else Gwdb.get_father f
+                         in
+                         if
+                           Gwdb.sou base
+                             (Gwdb.get_first_name (Gwdb.poi base sp))
+                           <> "?"
+                           && Gwdb.sou base
+                                (Gwdb.get_surname (Gwdb.poi base sp))
+                              <> "?"
+                         then sp :: acc
+                         else acc)
+                       [] ifams)
+                    @ family
+                  in
+                  (* relations ? *)
+                  let family = descendants conf base family ip in
+                  List.sort_uniq compare family
+              | _ -> [])
+        in
+        match conf.Config.userip with
+        | Some ip ->
+            Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
+            && List.mem (Gwdb.get_iper p) family
+        | _ -> false)
+    | _ -> (
+        try
+          Sys.remove fname;
+          false
+        with Sys_error _ ->
+          Printf.eprintf "Error when removing %s\n" fname;
+          false)
   else false
 
 (** Calcul les droits de visualisation d'une personne en
