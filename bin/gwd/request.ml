@@ -230,6 +230,11 @@ let make_henv conf base =
     else conf
   in
   let conf =
+    if Util.p_getenv conf.env "fmode" = Some "on"
+    then { conf with henv = conf.henv @ ["fmode", Adef.encoded "on"] }
+    else conf
+  in
+  let conf =
     let fn, oc, sn = GWPARAM.split_key conf.userkey in
     match
       Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
@@ -251,7 +256,7 @@ let make_henv conf base =
 
 let special_vars =
   [ "alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
-    "iz"; "long"; "manitou"; "nz"; "ocz";
+    "iz"; "long"; "manitou"; "nz"; "ocz"; "fmode";
     "p_mod"; "pure_xhtml"; "pz"; "size"; "templ"; "wide" ]
 
 let only_special_env env = List.for_all (fun (x, _) -> List.mem x special_vars) env

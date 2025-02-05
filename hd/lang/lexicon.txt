@@ -15989,6 +15989,14 @@ sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
 
+    family mode
+en: family mode
+fr: mode famille
+
+    family mode-hlp
+en: extend the SemiPublic status to family members
+fr: étendre le statut SemiPublic aux membres de la famille
+
     exact-hlp
 en: exact match (word level)
 fr: comparaison exacte mot par mot
