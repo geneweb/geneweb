@@ -190,6 +190,14 @@
                   <i class="fa fa-person fa-fw text-muted mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]0)%nn;
                 %end;
               </a>
+              %if;is_semi_public;
+              <a class="dropdown-item" title="[*family mode-hlp]"
+                href="%if;(e.fmode="on")%url_set.fmode;%else;%url;&fmode=on%end;">
+                <span class="fa fa-people-group mr-1"></span>
+                [*family mode]
+              </a>
+              %end;
+              <div class="dropdown-divider"></div>
               %( SOSA_REF / CGL buttons %)
               %if;(not browsing_with_sosa_ref or sosa_ref.key!=key)
                   <a class="dropdown-item"
@@ -301,12 +309,6 @@
                 <i class="fa fa-magnifying-glass fa-fw mr-2"></i>%nn;
                 %apply;searchgnt(self)</a>
               <div class="dropdown-divider"></div>
-              %( TODO: add a condition to show the reset button only if the cache exists %)
-              %if;(user.key!="")
-                <a class="dropdown-item" href="%url;&related=reset" title="[*reset related cache hlp]">%nn;
-                  <i class="fa fa-wrench fa-fw mr-2"></i>%nn;
-                  [*reset related cache]</a>
-              %end;
             </div>
           </li>
           %( FAM WIZARD ONLY TOOLS %)
