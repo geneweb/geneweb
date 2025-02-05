@@ -321,7 +321,6 @@ let print conf base specify unknown =
       let order = [ FirstName ] in
       search conf base fn order specify unknown
   | None, Some sn ->
-      Printf.eprintf "None, Some sn: %s\n" sn;
       let order =
         [ Sosa; Key; FullName; Surname; ApproxKey; PartialKey; DefaultSurname ]
       in
