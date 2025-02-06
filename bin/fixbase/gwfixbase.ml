@@ -94,7 +94,13 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
       Printf.printf "Rebuilding the indexes..\n";
       flush stdout);
     Gwdb.sync ~save_mem:false
-      ~tasks:[ (fun () -> Caches.write_caches base) ]
+      ~tasks:
+        [
+          (fun () -> Caches.write_caches base);
+          (fun () ->
+            let conf = Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base) in
+            Geneweb.Sosa_cache.write_static_sosa_cache ~conf ~base);
+        ]
       base;
     if v1 then (
       Printf.printf "Done";
