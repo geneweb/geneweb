@@ -132,10 +132,11 @@ let misc_notes_link s i =
                 in
                 let oc1 = try int_of_string name with Failure _ -> -1 in
                 let oc = try int_of_string oc with Failure _ -> 0 in
-                if oc1 = -1 then (fn, sn, oc, Some name) else (fn, sn, oc1, None)
+                if oc1 = -1 then (fn, sn, oc, Some name)
+                else (fn, sn, oc1, Some (fn ^ " " ^ sn))
               with Not_found ->
                 let sn = String.sub b k (String.length b - k) in
-                (fn, sn, 0, None)
+                (fn, sn, 0, Some (fn ^ " " ^ sn))
             in
             let fn = Name.lower fn in
             let sn = Name.lower sn in
