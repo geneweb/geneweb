@@ -1263,7 +1263,6 @@ type 'a env =
   | Vnldb of (Gwdb.iper, Gwdb.ifam) Def.NLDB.t
   | Vstring of string
   | Vsosa_ref of Gwdb.person option
-  | Vt_sosa of Sosa_cache.t option
   | Vtitle of Gwdb.person * title_item
   | Vevent of Gwdb.person * Gwdb.istr Event.event_item
   | Vlazyp of string option ref
@@ -1310,15 +1309,9 @@ let get_sosa_ref env =
   | Vsosa_ref (Some sosa_ref) -> Some sosa_ref
   | _ -> None
 
-let get_sosa_cache env =
-  match get_env "t_sosa" env with Vt_sosa t_sosa -> t_sosa | _ -> None
-
-let get_sosa conf base env iper : (Sosa.t option * Gwdb.person) option =
-  Option.bind (get_sosa_ref env) (fun sosa_ref ->
-      let cache = get_sosa_cache env in
-      Option.bind cache (fun cache ->
-          let sosa = Sosa_cache.get_sosa ~conf ~base ~cache ~iper ~sosa_ref in
-          Some (sosa, sosa_ref)))
+let get_sosa conf base iper : Sosa.t option =
+  let cache = Sosa_cache.get_sosa_cache ~conf ~base in
+  Option.bind cache (fun cache -> Sosa_cache.get_sosa ~base ~cache ~iper)
 
 (* ************************************************************************** *)
 (*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
@@ -2437,9 +2430,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | Vbool _ -> TemplAst.VVbool false
       | _ ->
           TemplAst.VVbool
-            (match get_sosa conf base env (Gwdb.get_iper p) with
-            | Some (Some _, _) -> true
-            | _ -> false))
+            (Option.is_some (get_sosa conf base (Gwdb.get_iper p))))
   | [ "init_cache"; nb_asc; from_gen_desc; nb_desc ] -> (
       try
         let nb_asc = int_of_string nb_asc in
@@ -2495,8 +2486,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | Some _ | None -> null_val)
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa" :: sl -> (
-      match get_sosa conf base env (Gwdb.get_iper p) with
-      | Some (Some sosa, _) -> TemplAst.VVstring (eval_num conf sosa sl)
+      match get_sosa conf base (Gwdb.get_iper p) with
+      | Some sosa -> TemplAst.VVstring (eval_num conf sosa sl)
       | _ -> null_val)
   | "spouse" :: sl -> (
       match get_env "fam" env with
@@ -3390,14 +3381,18 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           | Some _ | None -> null_val)
       | _ -> raise Not_found)
   | "sosa_link" -> (
-      match get_sosa conf base env (Gwdb.get_iper p) with
-      | Some (Some sosa, sosa_ref) ->
-          Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
-            (Gwdb.string_of_iper (Gwdb.get_iper p))
-            (Gwdb.string_of_iper (Gwdb.get_iper sosa_ref))
-            (Sosa.to_string sosa)
-          |> str_val
-      | _ -> null_val)
+      match get_sosa conf base (Gwdb.get_iper p) with
+      | Some sosa ->
+          Option.map
+            (fun sosa_ref ->
+              Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
+                (Gwdb.string_of_iper (Gwdb.get_iper p))
+                (Gwdb.string_of_iper (Gwdb.get_iper sosa_ref))
+                (Sosa.to_string sosa)
+              |> str_val)
+            (get_sosa_ref env)
+          |> Option.value ~default:null_val
+      | None -> null_val)
   | "source" -> (
       match get_env "src" env with
       | Vstring s -> safe_val (Notes.source_note conf base p s)
@@ -4460,7 +4455,6 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   in
   let env =
     let sosa_ref = Util.find_sosa_ref conf base in
-    let t_sosa = Sosa_cache.get_sosa_cache ~conf ~base in
     let desc_level_table_l =
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
@@ -4516,7 +4510,6 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
       ("lazy_print", Vlazyp (ref None));
       ("sosa_ref", Vsosa_ref sosa_ref);
-      ("t_sosa", Vt_sosa t_sosa);
       ("max_anc_level", Vlazy (Lazy.from_fun mal));
       ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
       ("sosa_ref_max_anc_level", Vlazy (Lazy.from_fun srmal));

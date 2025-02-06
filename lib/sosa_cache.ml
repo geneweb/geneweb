@@ -2,21 +2,14 @@ module DynamicCache : sig
   type t
 
   val make : base:Gwdb.base -> sosa_ref:Gwdb.iper -> t
-
-  val get_sosa :
-    conf:Config.config ->
-    base:Gwdb.base ->
-    cache:t ->
-    iper:Gwdb.iper ->
-    sosa_ref:Gwdb.iper ->
-    Sosa.t option
+  val get_sosa : base:Gwdb.base -> cache:t -> iper:Gwdb.iper -> Sosa.t option
 end = struct
   type t = {
     cache : (Gwdb.iper, Sosa.t option) Gwdb.Marker.t;
     ancestor_queue : (Gwdb.iper * Sosa.t) Queue.t;
   }
 
-  let compute_sosa ~base ~cache ~iper ~sosa_ref =
+  let compute_sosa ~base ~cache ~iper =
     match Gwdb.Marker.get cache.cache iper with
     | Some sosa -> Some sosa
     | None ->
@@ -58,8 +51,7 @@ end = struct
     Queue.push (sosa_ref, Sosa.one) ancestor_queue;
     { cache; ancestor_queue }
 
-  let get_sosa ~conf ~base ~cache ~iper ~sosa_ref =
-    compute_sosa ~base ~cache ~iper ~sosa_ref
+  let get_sosa = compute_sosa
 end
 
 module StaticCache : sig
@@ -68,13 +60,7 @@ module StaticCache : sig
   val build : conf:Config.config -> base:Gwdb.base -> t option
   val output : base:Gwdb.base -> cache:t -> unit
   val input : conf:Config.config -> base:Gwdb.base -> t option
-
-  val get_sosa :
-    conf:Config.config ->
-    base:Gwdb.base ->
-    cache:t ->
-    iper:Gwdb.iper ->
-    Sosa.t option
+  val get_sosa : cache:t -> iper:Gwdb.iper -> Sosa.t option
 end = struct
   type t = Sosa.t option array
 
@@ -136,7 +122,7 @@ end = struct
       Some cache)
     else None
 
-  let get_sosa ~conf ~base ~cache ~iper = cache.(Gwdb.int_of_iper iper)
+  let get_sosa ~cache ~iper = cache.(Gwdb.int_of_iper iper)
 end
 
 type t = DynamicCache of DynamicCache.t | StaticCache of StaticCache.t
@@ -186,33 +172,18 @@ let get_sosa_cache ~conf ~base : t option =
           Some (dynamic_cache cache)
       | None -> None)
 
-let get_sosa ~conf ~base ~cache ~iper ~sosa_ref =
-  if Gwdb.compare_iper iper (Gwdb.get_iper sosa_ref) = 0 then Some Sosa.one
-  else
-    match cache with
-    | DynamicCache cache ->
-        DynamicCache.get_sosa ~conf ~base ~cache ~iper
-          ~sosa_ref:(Gwdb.get_iper sosa_ref)
-    | StaticCache cache -> StaticCache.get_sosa ~conf ~base ~cache ~iper
-
-let build_static_sosa_cache ~conf ~base =
-  let cache = StaticCache.build ~conf ~base in
-  Option.map static_cache cache
-
-let output_static_sosa_cache ~base ~cache =
+let get_sosa ~base ~cache ~iper =
   match cache with
-  | StaticCache cache -> StaticCache.output ~base ~cache
-  | DynamicCache cache ->
-      failwith "output_static_sosa_cache called with dynamic cache"
+  | DynamicCache cache -> DynamicCache.get_sosa ~base ~cache ~iper
+  | StaticCache cache -> StaticCache.get_sosa ~cache ~iper
 
 let write_static_sosa_cache ~conf ~base =
-  let cache = build_static_sosa_cache ~conf ~base in
-  Option.iter (fun cache -> output_static_sosa_cache ~base ~cache) cache
+  let cache = StaticCache.build ~conf ~base in
+  Option.iter (fun cache -> StaticCache.output ~base ~cache) cache
 
 let get_sosa_person ~conf ~base ~person =
   Option.bind (get_sosa_cache ~conf ~base) (fun cache ->
-      Option.bind (Util.find_sosa_ref conf base) (fun sosa_ref ->
-          get_sosa ~conf ~base ~cache ~iper:(Gwdb.get_iper person) ~sosa_ref))
+      get_sosa ~base ~cache ~iper:(Gwdb.get_iper person))
   |> Option.value ~default:Sosa.zero
 
 (* ************************************************************************ *)
