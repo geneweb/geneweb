@@ -1,24 +1,20 @@
 (* $Id: mergeFamOk.ml,v 5.19 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
-
 let cat_strings base is1 sep is2 =
-  let n1 = sou base is1 in
-  let n2 = sou base is2 in
+  let n1 = Gwdb.sou base is1 in
+  let n2 = Gwdb.sou base is2 in
   if n1 = "" then n2 else if n2 = "" then n1 else n1 ^ sep ^ n2
 
 let merge_strings base is1 sep is2 =
-  if eq_istr is1 is2 then sou base is1 else cat_strings base is1 sep is2
+  if Gwdb.eq_istr is1 is2 then Gwdb.sou base is1
+  else cat_strings base is1 sep is2
 
 let sorp base ip =
-  let p = poi base ip in
-  ( sou base (get_first_name p),
-    sou base (get_surname p),
-    get_occ p,
+  let p = Gwdb.poi base ip in
+  ( Gwdb.sou base (Gwdb.get_first_name p),
+    Gwdb.sou base (Gwdb.get_surname p),
+    Gwdb.get_occ p,
     Update.Link,
     "" )
 
@@ -59,7 +55,7 @@ let merge_events conf l1 l2 =
   let field x1 x2 null = if null x1 then x2 else x1 in
   let need_selection x1 x2 = x1 <> "" && x2 <> "" && x1 <> x2 in
   let string_event_date e =
-    match Date.od_of_cdate e.efam_date with
+    match Date.od_of_cdate e.Def.efam_date with
     | None -> Adef.safe ""
     | Some d -> DateDisplay.string_of_ondate conf d
   in
@@ -75,12 +71,12 @@ let merge_events conf l1 l2 =
   let list_mem e l =
     let found_marriage = ref false in
     let found_divorce = ref false in
-    match e.efam_name with
+    match e.Def.efam_name with
     | Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
     | Efam_Divorce | Efam_Separated ->
         List.fold_right
           (fun e1 (mem, l1) ->
-            if e1.efam_name = e.efam_name then
+            if e1.Def.efam_name = e.efam_name then
               match e1.efam_name with
               | Efam_Marriage | Efam_NoMarriage | Efam_NoMention ->
                   if !found_marriage then (mem, e1 :: l1)
@@ -157,7 +153,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
   let field name proj null =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
-    match p_getenv conf.env name with
+    match Util.p_getenv conf.Config.env name with
     | Some "1" -> x1
     | Some "2" -> x2
     | _ -> if null x1 then x2 else x1
@@ -169,61 +165,73 @@ let reconstitute conf base ifam1 fam1 fam2 =
   in
   let fam =
     {
-      marriage = field "marriage" get_marriage (( = ) Date.cdate_None);
+      Def.marriage = field "marriage" Gwdb.get_marriage (( = ) Date.cdate_None);
       marriage_place =
         field "marriage_place"
-          (fun f -> sou base (get_marriage_place f))
+          (fun f -> Gwdb.sou base (Gwdb.get_marriage_place f))
           (( = ) "");
       marriage_note =
-        merge_strings base (get_marriage_note fam1) "<br>\n"
-          (get_marriage_note fam2);
+        merge_strings base
+          (Gwdb.get_marriage_note fam1)
+          "<br>\n"
+          (Gwdb.get_marriage_note fam2);
       marriage_src =
-        merge_strings base (get_marriage_src fam1) ", " (get_marriage_src fam2);
-      witnesses = merge_witnesses base (get_witnesses fam1) (get_witnesses fam2);
-      relation = field "relation" get_relation (( = ) Married);
-      divorce = field "divorce" get_divorce (( = ) NotDivorced);
+        merge_strings base
+          (Gwdb.get_marriage_src fam1)
+          ", "
+          (Gwdb.get_marriage_src fam2);
+      witnesses =
+        merge_witnesses base (Gwdb.get_witnesses fam1) (Gwdb.get_witnesses fam2);
+      relation = field "relation" Gwdb.get_relation (( = ) Def.Married);
+      divorce = field "divorce" Gwdb.get_divorce (( = ) Def.NotDivorced);
       fevents =
         merge_possible_event
-          (Futil.map_fam_event (sorp base) (sou base))
-          (fun f -> List.map gen_fevent_of_fam_event (get_fevents f));
-      comment = merge_strings base (get_comment fam1) ", " (get_comment fam2);
-      origin_file = sou base (get_origin_file fam1);
-      fsources = merge_strings base (get_fsources fam1) ", " (get_fsources fam2);
+          (Futil.map_fam_event (sorp base) (Gwdb.sou base))
+          (fun f -> List.map Gwdb.gen_fevent_of_fam_event (Gwdb.get_fevents f));
+      comment =
+        merge_strings base (Gwdb.get_comment fam1) ", " (Gwdb.get_comment fam2);
+      origin_file = Gwdb.sou base (Gwdb.get_origin_file fam1);
+      fsources =
+        merge_strings base (Gwdb.get_fsources fam1) ", "
+          (Gwdb.get_fsources fam2);
       fam_index = ifam1;
     }
   in
   let des =
     {
-      children =
+      Def.children =
         Array.map
           (UpdateFam.person_key base)
-          (Array.append (get_children fam1) (get_children fam2));
+          (Array.append (Gwdb.get_children fam1) (Gwdb.get_children fam2));
     }
   in
   (fam, des)
 
 let print_merge conf base =
-  match (p_getenv conf.env "i", p_getenv conf.env "i2") with
+  match
+    (Util.p_getenv conf.Config.env "i", Util.p_getenv conf.Config.env "i2")
+  with
   | Some f1, Some f2 ->
-      let ifam1 = ifam_of_string f1 in
-      let fam1 = foi base ifam1 in
-      let fam2 = foi base (ifam_of_string f2) in
+      let ifam1 = Gwdb.ifam_of_string f1 in
+      let fam1 = Gwdb.foi base ifam1 in
+      let fam2 = Gwdb.foi base (Gwdb.ifam_of_string f2) in
       let sfam, sdes = reconstitute conf base ifam1 fam1 fam2 in
       let digest =
         let ini_sfam = UpdateFam.string_family_of conf base ifam1 in
         Update.digest_family ini_sfam
       in
       let scpl =
-        Futil.map_couple_p conf.multi_parents
+        Futil.map_couple_p conf.Config.multi_parents
           (UpdateFam.person_key base)
-          (gen_couple_of_family (foi base sfam.fam_index))
+          (Gwdb.gen_couple_of_family (Gwdb.foi base sfam.fam_index))
       in
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl cpl des =
   let title _ =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "merge done"))
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (Util.transl conf "merge done"))
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -232,11 +240,11 @@ let print_mod_merge_ok conf base wl cpl des =
   Hutil.trailer conf
 
 let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
-  match p_getenv conf.env "i2" with
+  match Util.p_getenv conf.Config.env "i2" with
   | None -> Hutil.incorrect_request conf
   | Some i2 ->
-      let ifam2 = ifam_of_string i2 in
-      UpdateFamOk.effective_del conf base Gwdb.dummy_iper (foi base ifam2);
+      let ifam2 = Gwdb.ifam_of_string i2 in
+      UpdateFamOk.effective_del conf base Gwdb.dummy_iper (Gwdb.foi base ifam2);
       let ifam, fam, cpl, des =
         UpdateFamOk.effective_mod conf base true sfam scpl sdes
       in
@@ -253,40 +261,40 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
           let rec loop l accu =
             match l with
             | [] -> accu
-            | evt :: l -> loop l (evt.efam_note :: evt.efam_src :: accu)
+            | evt :: l -> loop l (evt.Def.efam_note :: evt.efam_src :: accu)
           in
           loop fam.fevents sl
         in
-        String.concat " " (List.map (sou base) sl)
+        String.concat " " (List.map (Gwdb.sou base) sl)
       in
       Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
       let changed =
         let gen_p =
           let p =
-            match p_getenv conf.env "ip" with
+            match Util.p_getenv conf.Config.env "ip" with
             | Some i ->
-                let ip = iper_of_string i in
-                if Adef.mother cpl = ip then poi base (Adef.mother cpl)
-                else poi base (Adef.father cpl)
-            | None -> poi base (Adef.father cpl)
+                let ip = Gwdb.iper_of_string i in
+                if Adef.mother cpl = ip then Gwdb.poi base (Adef.mother cpl)
+                else Gwdb.poi base (Adef.father cpl)
+            | None -> Gwdb.poi base (Adef.father cpl)
           in
-          Util.string_gen_person base (gen_person_of_person p)
+          Util.string_gen_person base (Gwdb.gen_person_of_person p)
         in
         let n_f = Util.string_gen_family base fam in
-        U_Merge_family (gen_p, o_f1, o_f2, n_f)
+        Def.U_Merge_family (gen_p, o_f1, o_f2, n_f)
       in
       History.record conf base changed "ff";
       print_mod_merge_ok conf base wl cpl des
 
 let print_mod_merge o_conf base =
   let get_gen_family i =
-    match p_getenv o_conf.env i with
+    match Util.p_getenv o_conf.Config.env i with
     | Some i ->
-        let fam = foi base (ifam_of_string i) in
-        Util.string_gen_family base (gen_family_of_family fam)
+        let fam = Gwdb.foi base (Gwdb.ifam_of_string i) in
+        Util.string_gen_family base (Gwdb.gen_family_of_family fam)
     | None ->
-        let fam = foi base dummy_ifam in
-        Util.string_gen_family base (gen_family_of_family fam)
+        let fam = Gwdb.foi base Gwdb.dummy_ifam in
+        Util.string_gen_family base (Gwdb.gen_family_of_family fam)
   in
   let o_f1 = get_gen_family "i" in
   let o_f2 = get_gen_family "i2" in

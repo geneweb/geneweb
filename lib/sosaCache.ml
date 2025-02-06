@@ -1,6 +1,3 @@
-open Def
-open Gwdb
-
 (* Optimisation de find_sosa_aux :                                           *)
 (* - ajout d'un cache pour conserver les descendants du sosa que l'on calcul *)
 (* - on sauvegarde la dernière génération où l'on a arrêté le calcul pour    *)
@@ -18,9 +15,9 @@ let init_sosa_t conf base sosa_ref =
   try
     let tstab = Util.create_topological_sort conf base in
     let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-    let last_zil = [ (get_iper sosa_ref, Sosa.one) ] in
+    let last_zil = [ (Gwdb.get_iper sosa_ref, Sosa.one) ] in
     let sosa_ht = Hashtbl.create 5003 in
-    Hashtbl.add sosa_ht (get_iper sosa_ref) (Some (Sosa.one, sosa_ref));
+    Hashtbl.add sosa_ht (Gwdb.get_iper sosa_ref) (Some (Sosa.one, sosa_ref));
     Some { tstab; mark; last_zil; sosa_ht }
   with Consang.TopologicalSortError _ -> None
 
@@ -36,29 +33,29 @@ let find_sosa_aux conf base a p t_sosa =
     | [] -> Def.Left []
     | (ip, z) :: zil ->
         let _ = cache := (ip, z) :: !cache in
-        if ip = get_iper a then Right z
+        if ip = Gwdb.get_iper a then Def.Right z
         else if Gwdb.Marker.get t_sosa.mark ip then gene_find zil
         else (
           Gwdb.Marker.set t_sosa.mark ip true;
           if
-            Gwdb.Marker.get t_sosa.tstab (get_iper a)
+            Gwdb.Marker.get t_sosa.tstab (Gwdb.get_iper a)
             <= Gwdb.Marker.get t_sosa.tstab ip
           then
             let _ = has_ignore := true in
             gene_find zil
           else
             let asc = Util.pget conf base ip in
-            match get_parents asc with
+            match Gwdb.get_parents asc with
             | Some ifam -> (
-                let cpl = foi base ifam in
+                let cpl = Gwdb.foi base ifam in
                 let z = Sosa.twice z in
                 match gene_find zil with
-                | Left zil ->
-                    Left
-                      ((get_father cpl, z)
-                      :: (get_mother cpl, Sosa.inc z 1)
+                | Def.Left zil ->
+                    Def.Left
+                      ((Gwdb.get_father cpl, z)
+                      :: (Gwdb.get_mother cpl, Sosa.inc z 1)
                       :: zil)
-                | Right z -> Right z)
+                | Def.Right z -> Def.Right z)
             | None -> gene_find zil)
   in
   let rec find zil =
@@ -66,14 +63,14 @@ let find_sosa_aux conf base a p t_sosa =
       try gene_find zil
       with Invalid_argument msg when msg = "index out of bounds" ->
         Update.delete_topological_sort conf base;
-        Left []
+        Def.Left []
     with
-    | Left [] ->
+    | Def.Left [] ->
         let _ =
           List.iter (fun (ip, _) -> Gwdb.Marker.set t_sosa.mark ip false) !cache
         in
         None
-    | Left zil ->
+    | Def.Left zil ->
         let _ =
           if !has_ignore then ()
           else (
@@ -83,7 +80,7 @@ let find_sosa_aux conf base a p t_sosa =
             t_sosa.last_zil <- zil)
         in
         find zil
-    | Right z ->
+    | Def.Right z ->
         let _ =
           List.iter (fun (ip, _) -> Gwdb.Marker.set t_sosa.mark ip false) !cache
         in
@@ -94,11 +91,11 @@ let find_sosa_aux conf base a p t_sosa =
 let find_sosa conf base a sosa_ref t_sosa =
   match sosa_ref with
   | Some p ->
-      if get_iper a = get_iper p then Some (Sosa.one, p)
+      if Gwdb.get_iper a = Gwdb.get_iper p then Some (Sosa.one, p)
       else
-        let u = Util.pget conf base (get_iper a) in
+        let u = Util.pget conf base (Gwdb.get_iper a) in
         if Util.has_children base u then
-          try Hashtbl.find t_sosa.sosa_ht (get_iper a)
+          try Hashtbl.find t_sosa.sosa_ht (Gwdb.get_iper a)
           with Not_found -> find_sosa_aux conf base a p t_sosa
         else None
   | None -> None
@@ -123,15 +120,15 @@ let sosa_ht = Hashtbl.create 5003
       - unit
     [Rem] : Exporté en clair hors de ce module.                             *)
 let build_sosa_tree_ht conf base person =
-  let () = load_ascends_array base in
-  let () = load_couples_array base in
-  let nb_persons = nb_of_persons base in
+  let () = Gwdb.load_ascends_array base in
+  let () = Gwdb.load_couples_array base in
+  let nb_persons = Gwdb.nb_of_persons base in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   (* Tableau qui va stocker au fur et à mesure les ancêtres de person. *)
   (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
   (* commence à l'indice 1 !                                            *)
-  let sosa_accu = Array.make (nb_persons + 1) (Sosa.zero, dummy_iper) in
-  let () = Array.set sosa_accu 1 (Sosa.one, get_iper person) in
+  let sosa_accu = Array.make (nb_persons + 1) (Sosa.zero, Gwdb.dummy_iper) in
+  let () = Array.set sosa_accu 1 (Sosa.one, Gwdb.get_iper person) in
   let rec loop i len =
     if i > nb_persons then ()
     else
@@ -143,21 +140,21 @@ let build_sosa_tree_ht conf base person =
         Hashtbl.add sosa_ht ip sosa_num;
         let asc = Util.pget conf base ip in
         (* Ajoute les nouveaux ascendants au tableau des ancêtres. *)
-        match get_parents asc with
+        match Gwdb.get_parents asc with
         | Some ifam ->
-            let cpl = foi base ifam in
+            let cpl = Gwdb.foi base ifam in
             let z = Sosa.twice sosa_num in
             let len =
-              if not @@ Gwdb.Marker.get mark (get_father cpl) then (
-                Array.set sosa_accu (len + 1) (z, get_father cpl);
-                Gwdb.Marker.set mark (get_father cpl) true;
+              if not @@ Gwdb.Marker.get mark (Gwdb.get_father cpl) then (
+                Array.set sosa_accu (len + 1) (z, Gwdb.get_father cpl);
+                Gwdb.Marker.set mark (Gwdb.get_father cpl) true;
                 len + 1)
               else len
             in
             let len =
-              if not @@ Gwdb.Marker.get mark (get_mother cpl) then (
-                Array.set sosa_accu (len + 1) (Sosa.inc z 1, get_mother cpl);
-                Gwdb.Marker.set mark (get_mother cpl) true;
+              if not @@ Gwdb.Marker.get mark (Gwdb.get_mother cpl) then (
+                Array.set sosa_accu (len + 1) (Sosa.inc z 1, Gwdb.get_mother cpl);
+                Gwdb.Marker.set mark (Gwdb.get_mother cpl) true;
                 len + 1)
               else len
             in
@@ -203,10 +200,10 @@ let next_sosa s =
   in
   let rec find_n x lst =
     match lst with
-    | [] -> (Sosa.zero, dummy_iper)
+    | [] -> (Sosa.zero, Gwdb.dummy_iper)
     | (so, _) :: tl ->
         if Sosa.eq so x then
-          if tl = [] then (Sosa.zero, dummy_iper) else List.hd tl
+          if tl = [] then (Sosa.zero, Gwdb.dummy_iper) else List.hd tl
         else find_n x tl
   in
   let so, ip = find_n s sosa_list in
@@ -220,10 +217,10 @@ let prev_sosa s =
   let sosa_list = List.rev sosa_list in
   let rec find_n x lst =
     match lst with
-    | [] -> (Sosa.zero, dummy_iper)
+    | [] -> (Sosa.zero, Gwdb.dummy_iper)
     | (so, _) :: tl ->
         if Sosa.eq so x then
-          if tl = [] then (Sosa.zero, dummy_iper) else List.hd tl
+          if tl = [] then (Sosa.zero, Gwdb.dummy_iper) else List.hd tl
         else find_n x tl
   in
   let so, ip = find_n s sosa_list in
@@ -243,7 +240,7 @@ let prev_sosa s =
                 sosa, ou retourne son numéro de sosa sinon
     [Rem] : Exporté en clair hors de ce module.                         *)
 let get_sosa_person p =
-  try Hashtbl.find sosa_ht (get_iper p) with Not_found -> Sosa.zero
+  try Hashtbl.find sosa_ht (Gwdb.get_iper p) with Not_found -> Sosa.zero
 
 (* ******************************************************************** *)
 (*  [Fonc] get_single_sosa : config -> base -> person -> Sosa.t          *)
@@ -297,8 +294,8 @@ let print_sosa conf base p link =
         (if not link then ()
         else
           let sosa_link =
-            let i1 = string_of_iper (get_iper p) in
-            let i2 = string_of_iper (get_iper r) in
+            let i1 = Gwdb.string_of_iper (Gwdb.get_iper p) in
+            let i2 = Gwdb.string_of_iper (Gwdb.get_iper r) in
             let b2 = Sosa.to_string sosa_num in
             "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
           in
@@ -311,9 +308,9 @@ let print_sosa conf base p link =
           then ""
           else
             let direct_ancestor =
-              Name.strip_c (p_first_name base r) '"'
+              Name.strip_c (Gwdb.p_first_name base r) '"'
               ^ " "
-              ^ Name.strip_c (p_surname base r) '"'
+              ^ Name.strip_c (Gwdb.p_surname base r) '"'
             in
             Printf.sprintf
               (Util.fcapitale (Util.ftransl conf "direct ancestor of %s"))

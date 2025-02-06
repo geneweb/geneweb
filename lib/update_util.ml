@@ -1,16 +1,13 @@
-open Config
-open Def
-open Util
-
 let get conf key =
-  match p_getenv conf.env key with
+  match Util.p_getenv conf.Config.env key with
   | Some v -> v
   | None -> failwith (key ^ " unbound")
 
-let get_nth conf key cnt = p_getenv conf.env (key ^ string_of_int cnt)
+let get_nth conf key cnt =
+  Util.p_getenv conf.Config.env (key ^ string_of_int cnt)
 
 let getn conf var key =
-  match p_getenv conf.env (var ^ "_" ^ key) with
+  match Util.p_getenv conf.Config.env (var ^ "_" ^ key) with
   | Some v -> v
   | None -> failwith (var ^ "_" ^ key ^ " unbound")
 
@@ -25,10 +22,10 @@ let get_purged_fn_sn removed_string first_name surname =
   else (first_name, surname)
 
 let getenv_sex conf var =
-  match p_getenv conf.env (var ^ "_sex") with
-  | Some "M" -> Male
-  | Some "F" -> Female
-  | Some _ | None -> Neuter
+  match Util.p_getenv conf.Config.env (var ^ "_sex") with
+  | Some "M" -> Def.Male
+  | Some "F" -> Def.Female
+  | Some _ | None -> Def.Neuter
 
 let getn_p conf var ?create_info sex =
   match getn conf var "p" with
@@ -89,14 +86,14 @@ let eval_default_var conf s =
 
   let v = extract_var "evar_" s in
   if v <> "" then
-    match p_getenv (conf.env @ conf.henv) v with
+    match Util.p_getenv (conf.Config.env @ conf.Config.henv) v with
     | Some vv -> safe_val (Util.escape_html vv :> Adef.safe_string)
     | None -> str_val ""
   else
     let v = extract_var "bvar_" s in
     let v = if v = "" then extract_var "cvar_" s else v in
     if v <> "" then
-      str_val (try List.assoc v conf.base_env with Not_found -> "")
+      str_val (try List.assoc v conf.Config.base_env with Not_found -> "")
     else raise Not_found
 
 let eval_date_field = function
@@ -137,7 +134,7 @@ let eval_date_var od s =
           if d.month = 0 then ""
           else
             match od with
-            | Some (Dgreg (_, Dfrench)) -> short_f_month d.month
+            | Some (Dgreg (_, Dfrench)) -> Util.short_f_month d.month
             | _ -> string_of_int d.month)
       | None -> "")
   | "orday" -> (
@@ -156,7 +153,7 @@ let eval_date_var od s =
               if d2.month2 = 0 then ""
               else
                 match od with
-                | Some (Dgreg (_, Dfrench)) -> short_f_month d2.month2
+                | Some (Dgreg (_, Dfrench)) -> Util.short_f_month d2.month2
                 | _ -> string_of_int d2.month2)
           | _ -> "")
       | None -> "")

@@ -1,21 +1,19 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
-open BirthDeath
-
 let month_txt conf d cal =
   let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
   (d : Adef.safe_string :> string) |> Utf8.capitalize_fst |> Adef.safe
 
 let print_birth conf base =
   let list, len =
-    select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
+    BirthDeath.select_person conf base
+      (fun p -> Date.od_of_cdate (Gwdb.get_birth p))
+      false
   in
   let title _ =
-    Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
+    Output.printf conf
+      (Util.fcapitale (Util.ftransl conf "the latest %d births"))
+      len
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -24,7 +22,7 @@ let print_birth conf base =
   @@ List.fold_left
        (fun (last_month_txt, was_future) (p, d, cal) ->
          let month_txt = month_txt conf d cal in
-         let future = Date.compare_dmy d conf.today = 1 in
+         let future = Date.compare_dmy d conf.Config.today = 1 in
          if (not future) && was_future then (
            Output.print_sstring conf "</li></ul></li></ul><p><ul><li>";
            Output.print_string conf month_txt;
@@ -46,7 +44,7 @@ let print_birth conf base =
            Output.print_sstring conf "</em>.")
          else (
            Output.print_sstring conf
-             (transl_nth conf "born" (index_of_sex (get_sex p)));
+             (Util.transl_nth conf "born" (Util.index_of_sex (Gwdb.get_sex p)));
            Output.print_sstring conf " <em>";
            Output.print_string conf
              (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
@@ -59,10 +57,12 @@ let print_birth conf base =
   Hutil.trailer conf
 
 let print_death conf base =
-  let list, len = select_person conf base death_date false in
+  let list, len =
+    BirthDeath.select_person conf base BirthDeath.death_date false
+  in
   let title _ =
     Printf.sprintf
-      (fcapitale (ftransl conf "the latest %t deaths"))
+      (Util.fcapitale (Util.ftransl conf "the latest %t deaths"))
       (fun _ -> string_of_int len)
     |> Output.print_sstring conf
   in
@@ -82,22 +82,22 @@ let print_death conf base =
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
             let sure d = d.Date.prec = Sure in
-            match Date.cdate_to_dmy_opt (get_birth p) with
+            match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
                   let a = Date.time_elapsed d1 d in
                   let ages_sum =
-                    match get_sex p with
-                    | Male -> (fst ages_sum + a.year, snd ages_sum)
-                    | Female -> (fst ages_sum, snd ages_sum + a.year)
-                    | Neuter -> ages_sum
+                    match Gwdb.get_sex p with
+                    | Def.Male -> (fst ages_sum + a.year, snd ages_sum)
+                    | Def.Female -> (fst ages_sum, snd ages_sum + a.year)
+                    | Def.Neuter -> ages_sum
                   in
                   let ages_nb =
-                    match get_sex p with
-                    | Male -> (fst ages_nb + 1, snd ages_nb)
-                    | Female -> (fst ages_nb, snd ages_nb + 1)
-                    | Neuter -> ages_nb
+                    match Gwdb.get_sex p with
+                    | Def.Male -> (fst ages_nb + 1, snd ages_nb)
+                    | Def.Female -> (fst ages_nb, snd ages_nb + 1)
+                    | Def.Neuter -> ages_nb
                   in
                   (Some a, ages_sum, ages_nb)
                 else (None, ages_sum, ages_nb)
@@ -107,7 +107,7 @@ let print_death conf base =
             (NameDisplay.referenced_person_text conf base p);
           Output.print_sstring conf "</b>, ";
           Output.print_sstring conf
-            (transl_nth conf "died" (index_of_sex (get_sex p)));
+            (Util.transl_nth conf "died" (Util.index_of_sex (Gwdb.get_sex p)));
           Output.print_sstring conf " <em>";
           Output.print_string conf
             (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
@@ -126,10 +126,10 @@ let print_death conf base =
     Output.print_sstring conf "</ul></li></ul>";
     let aux sex nb sum =
       if nb >= 3 then (
-        transl conf "average age at death"
+        Util.transl conf "average age at death"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf " (";
-        Output.print_sstring conf (transl_nth conf "M/F" sex);
+        Output.print_sstring conf (Util.transl_nth conf "M/F" sex);
         Output.print_sstring conf ") : ";
         Output.print_string conf
           (DateDisplay.string_of_age conf
@@ -143,26 +143,26 @@ let print_death conf base =
     let aux name def =
       string_of_int
       @@
-      match p_getenv conf.env name with
+      match Util.p_getenv conf.Config.env name with
       | Some s -> int_of_string s
       | None -> def
     in
-    let by = aux "by" conf.today.year in
-    let bm = aux "bm" conf.today.month in
-    let bd = aux "bd" conf.today.day in
+    let by = aux "by" conf.Config.today.year in
+    let bm = aux "bm" conf.Config.today.month in
+    let bd = aux "bd" conf.Config.today.day in
     Output.print_sstring conf {|<form method="get" action="|};
-    Output.print_sstring conf conf.command;
+    Output.print_sstring conf conf.Config.command;
     Output.print_sstring conf {|"><p>|};
     Util.hidden_env conf;
     Util.hidden_input conf "m" (Adef.encoded "LD");
     Output.print_sstring conf
     @@ Printf.sprintf
-         (fcapitale (ftransl conf "the latest %t deaths"))
+         (Util.fcapitale (Util.ftransl conf "the latest %t deaths"))
          (fun _ ->
            {|<input name="k" value="|} ^ string_of_int len
            ^ {|" size="4" maxlength="4">|});
     Output.print_sstring conf "\n... (";
-    Output.print_sstring conf (transl conf "before");
+    Output.print_sstring conf (Util.transl conf "before");
     Output.print_sstring conf "...\n";
     let aux name value size =
       Output.print_sstring conf {|<input name="|};
@@ -181,27 +181,32 @@ let print_death conf base =
     Output.print_sstring conf ")";
     Output.print_sstring conf
       {|<button type="submit" class="btn btn-secondary btn-lg">|};
-    transl_nth conf "validate/delete" 0
+    Util.transl_nth conf "validate/delete" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf "</button></p></form>");
   Hutil.trailer conf
 
 let print_oldest_alive conf base =
-  let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
+  let limit =
+    match Util.p_getint conf.Config.env "lim" with Some x -> x | _ -> 0
+  in
   let get_oldest_alive p =
-    match get_death p with
-    | NotDead -> Date.od_of_cdate (get_birth p)
-    | DontKnowIfDead when limit > 0 -> (
-        match Date.od_of_cdate (get_birth p) with
-        | Some (Dgreg (d, _)) as x when conf.today.year - d.year <= limit -> x
+    match Gwdb.get_death p with
+    | Def.NotDead -> Date.od_of_cdate (Gwdb.get_birth p)
+    | Def.DontKnowIfDead when limit > 0 -> (
+        match Date.od_of_cdate (Gwdb.get_birth p) with
+        | Some (Dgreg (d, _)) as x when conf.Config.today.year - d.year <= limit
+          ->
+            x
         | Some _ | None -> None)
-    | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
+    | Def.Death _ | Def.DontKnowIfDead | Def.DeadYoung | Def.DeadDontKnowWhen
+    | Def.OfCourseDead ->
         None
   in
-  let list, len = select_person conf base get_oldest_alive true in
+  let list, len = BirthDeath.select_person conf base get_oldest_alive true in
   let title _ =
     Printf.sprintf
-      (fcapitale (ftransl conf "the %d oldest perhaps still alive"))
+      (Util.fcapitale (Util.ftransl conf "the %d oldest perhaps still alive"))
       len
     |> Output.print_sstring conf
   in
@@ -214,13 +219,13 @@ let print_oldest_alive conf base =
       Output.print_string conf (NameDisplay.referenced_person_text conf base p);
       Output.print_sstring conf "</b>, ";
       Output.print_sstring conf
-        (transl_nth conf "born" (index_of_sex (get_sex p)));
+        (Util.transl_nth conf "born" (Util.index_of_sex (Gwdb.get_sex p)));
       Output.print_sstring conf " <em>";
       Output.print_string conf
         (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
       Output.print_sstring conf "</em>";
-      if get_death p = NotDead && d.prec = Sure then (
-        let a = Date.time_elapsed d conf.today in
+      if Gwdb.get_death p = Def.NotDead && d.prec = Sure then (
+        let a = Date.time_elapsed d conf.Config.today in
         Output.print_sstring conf " <em>(";
         Output.print_string conf (DateDisplay.string_of_age conf a);
         Output.print_sstring conf ")</em>");
@@ -232,17 +237,19 @@ let print_oldest_alive conf base =
 let print_longest_lived conf base =
   let get_longest p =
     if Util.authorized_age conf base p then
-      match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
-      | Some bd, Death (_, cd) -> (
+      match (Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p) with
+      | Some bd, Def.Death (_, cd) -> (
           match Date.cdate_to_dmy_opt cd with
           | None -> None
           | Some dd -> Some (Date.Dgreg (Date.time_elapsed bd dd, Dgregorian)))
       | _ -> None
     else None
   in
-  let list, len = select_person conf base get_longest false in
+  let list, len = BirthDeath.select_person conf base get_longest false in
   let title _ =
-    Printf.sprintf (fcapitale (ftransl conf "the %d who lived the longest")) len
+    Printf.sprintf
+      (Util.fcapitale (Util.ftransl conf "the %d who lived the longest"))
+      len
     |> Output.print_sstring conf
   in
   Hutil.header conf title;
@@ -257,7 +264,7 @@ let print_longest_lived conf base =
       Output.print_sstring conf " (";
       Output.print_sstring conf (string_of_int d.Date.year);
       Output.print_sstring conf " ";
-      Output.print_sstring conf (transl conf "years old");
+      Output.print_sstring conf (Util.transl conf "years old");
       Output.print_sstring conf ")";
       Output.print_sstring conf ".";
       Output.print_sstring conf "</li>")
@@ -273,7 +280,7 @@ let print_marr_or_eng conf base title list =
   @@ List.fold_left
        (fun (last_month_txt, was_future) (fam, d, cal) ->
          let month_txt = month_txt conf d cal in
-         let future = Date.compare_dmy d conf.today > 0 in
+         let future = Date.compare_dmy d conf.Config.today > 0 in
          if (not future) && was_future then (
            Output.print_sstring conf "</ul></li></ul><ul><li>";
            Output.print_string conf month_txt;
@@ -287,13 +294,13 @@ let print_marr_or_eng conf base title list =
          Output.print_sstring conf "<li><b>";
          Output.print_string conf
            (NameDisplay.referenced_person_text conf base
-              (pget conf base (get_father fam)));
+              (Util.pget conf base (Gwdb.get_father fam)));
          Output.print_sstring conf "</b> ";
-         Output.print_sstring conf (transl_nth conf "and" 0);
+         Output.print_sstring conf (Util.transl_nth conf "and" 0);
          Output.print_sstring conf " <b>";
          Output.print_string conf
            (NameDisplay.referenced_person_text conf base
-              (pget conf base (get_mother fam)));
+              (Util.pget conf base (Gwdb.get_mother fam)));
          Output.print_sstring conf "</b>, ";
          if future then (
            Output.print_sstring conf "<em>";
@@ -301,15 +308,16 @@ let print_marr_or_eng conf base title list =
              (DateDisplay.string_of_date conf (Dgreg (d, cal)));
            Output.print_sstring conf "</em>")
          else (
-           (match get_relation fam with
-           | NotMarried | NoSexesCheckNotMarried ->
+           (match Gwdb.get_relation fam with
+           | Def.NotMarried | Def.NoSexesCheckNotMarried ->
                Output.print_sstring conf
-               @@ transl_nth conf "relation/relations" 0
-           | Married | NoSexesCheckMarried ->
-               Output.print_sstring conf @@ transl conf "married"
-           | Engaged -> Output.print_sstring conf @@ transl conf "engaged"
-           | MarriageBann | MarriageContract | MarriageLicense | Pacs
-           | Residence | NoMention ->
+               @@ Util.transl_nth conf "relation/relations" 0
+           | Def.Married | Def.NoSexesCheckMarried ->
+               Output.print_sstring conf @@ Util.transl conf "married"
+           | Def.Engaged ->
+               Output.print_sstring conf @@ Util.transl conf "engaged"
+           | Def.MarriageBann | Def.MarriageContract | Def.MarriageLicense
+           | Def.Pacs | Def.Residence | Def.NoMention ->
                ());
            Output.print_sstring conf " <em>";
            Output.print_string conf
@@ -324,38 +332,42 @@ let print_marr_or_eng conf base title list =
 
 let print_marriage conf base =
   let list, len =
-    select_family conf base
+    BirthDeath.select_family conf base
       (fun fam ->
-        let rel = get_relation fam in
-        if rel = Married || rel = NoSexesCheckMarried then
-          Date.od_of_cdate (get_marriage fam)
+        let rel = Gwdb.get_relation fam in
+        if rel = Def.Married || rel = Def.NoSexesCheckMarried then
+          Date.od_of_cdate (Gwdb.get_marriage fam)
         else None)
       false
   in
   let title _ =
-    Printf.sprintf (fcapitale (ftransl conf "the latest %d marriages")) len
+    Printf.sprintf
+      (Util.fcapitale (Util.ftransl conf "the latest %d marriages"))
+      len
     |> Output.print_sstring conf
   in
   print_marr_or_eng conf base title list
 
 let print_oldest_engagements conf base =
   let list, len =
-    select_family conf base
+    BirthDeath.select_family conf base
       (fun fam ->
-        if get_relation fam = Engaged then
-          let husb = pget conf base (get_father fam) in
-          let wife = pget conf base (get_mother fam) in
-          match (get_death husb, get_death wife) with
-          | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-              Date.od_of_cdate (get_marriage fam)
+        if Gwdb.get_relation fam = Def.Engaged then
+          let husb = Util.pget conf base (Gwdb.get_father fam) in
+          let wife = Util.pget conf base (Gwdb.get_mother fam) in
+          match (Gwdb.get_death husb, Gwdb.get_death wife) with
+          | ( (Def.NotDead | Def.DontKnowIfDead),
+              (Def.NotDead | Def.DontKnowIfDead) ) ->
+              Date.od_of_cdate (Gwdb.get_marriage fam)
           | _ -> None
         else None)
       true
   in
   let title _ =
     Printf.sprintf
-      (fcapitale
-         (ftransl conf "the %d oldest couples perhaps still alive and engaged"))
+      (Util.fcapitale
+         (Util.ftransl conf
+            "the %d oldest couples perhaps still alive and engaged"))
       len
     |> Output.print_sstring conf
   in
@@ -363,10 +375,11 @@ let print_oldest_engagements conf base =
 
 let old_print_statistics conf =
   let title _ =
-    transl conf "statistics" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    Util.transl conf "statistics"
+    |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let n =
-    try int_of_string (List.assoc "latest_event" conf.base_env)
+    try int_of_string (List.assoc "latest_event" conf.Config.base_env)
     with Not_found | Failure _ -> 20
   in
   Hutil.header conf title;
@@ -374,16 +387,16 @@ let old_print_statistics conf =
   Output.print_sstring conf "<ul>";
   let aux m label =
     Output.print_sstring conf {|<li><a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=|};
     Output.print_sstring conf m;
     Output.print_sstring conf {|&k=|};
     Output.print_sstring conf (string_of_int n);
     Output.print_sstring conf {|">|};
-    Output.print_sstring conf (Printf.sprintf (ftransl conf label) n);
+    Output.print_sstring conf (Printf.sprintf (Util.ftransl conf label) n);
     Output.print_sstring conf {|</a></li>|}
   in
-  if conf.wizard || conf.friend then (
+  if conf.Config.wizard || conf.Config.friend then (
     aux "LB" "the latest %d births";
     aux "LD" "the latest %d deaths";
     (* FIXME *)
@@ -402,7 +415,8 @@ let get_vother = function Vother x -> Some x
 let set_vother x = Vother x
 
 let print_statistics conf =
-  if p_getenv conf.env "old" = Some "on" then old_print_statistics conf
+  if Util.p_getenv conf.Config.env "old" = Some "on" then
+    old_print_statistics conf
   else
     Hutil.interp conf "stats"
       {
@@ -417,24 +431,29 @@ let print_statistics conf =
 
 let print_population_pyramid conf base =
   let interval =
-    match p_getint conf.env "int" with Some i -> max 1 i | None -> 5
+    match Util.p_getint conf.Config.env "int" with
+    | Some i -> max 1 i
+    | None -> 5
   in
-  let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
+  let limit =
+    match Util.p_getint conf.Config.env "lim" with Some x -> x | _ -> 0
+  in
   let at_date =
-    match p_getint conf.env "y" with
-    | None -> conf.today
+    match Util.p_getint conf.Config.env "y" with
+    | None -> conf.Config.today
     | Some i -> { day = 31; month = 12; year = i; prec = Sure; delta = 0 }
   in
   let nb_intervals = 150 / interval in
   let men, wom =
-    make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base
+    BirthDeath.make_population_pyramid ~nb_intervals ~interval ~limit ~at_date
+      conf base
   in
   let at_year = at_date.year in
   let string_of_nb n =
-    Mutil.string_of_int_sep (transl conf "(thousand separator)") n
+    Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
   in
   let title _ =
-    transl conf "population pyramid"
+    Util.transl conf "population pyramid"
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf " (";
     Output.print_sstring conf (string_of_int at_year);
@@ -448,9 +467,9 @@ let print_population_pyramid conf base =
       Output.print_sstring conf "/";
       Output.print_string conf iname;
       Output.print_sstring conf {|" alt="|};
-      Output.print_sstring conf (transl_nth conf "M/F" sex);
+      Output.print_sstring conf (Util.transl_nth conf "M/F" sex);
       Output.print_sstring conf {|" title="|};
-      Output.print_sstring conf (transl_nth conf "M/F" sex);
+      Output.print_sstring conf (Util.transl_nth conf "M/F" sex);
       Output.print_sstring conf {|">|})
     else Output.print_sstring conf "&nbsp;";
     Output.print_sstring conf "</td>"
@@ -474,7 +493,7 @@ let print_population_pyramid conf base =
   in
   Output.print_sstring conf "<div>\n";
   Output.print_sstring conf {|<table id="table_pop_pyr" border="|};
-  Output.print_sstring conf (string_of_int conf.border);
+  Output.print_sstring conf (string_of_int conf.Config.border);
   Output.print_sstring conf
     {|" cellspacing="0" cellpadding="0" style="margin:auto">|};
   for i = first_interv downto 0 do
@@ -518,18 +537,18 @@ let print_population_pyramid conf base =
   let sum_men = Array.fold_left ( + ) 0 men in
   let sum_wom = Array.fold_left ( + ) 0 wom in
   Output.print_sstring conf "<p>";
-  transl conf "number of living persons:"
+  Util.transl conf "number of living persons:"
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf " ";
   Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
   Output.print_sstring conf {|</p><p><form method="get" action="|};
-  Output.print_string conf (commd conf);
+  Output.print_string conf (Util.commd conf);
   Output.print_sstring conf {|">|};
-  hidden_env conf;
+  Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "POP_PYR");
   Util.hidden_input conf "int" (Adef.encoded @@ string_of_int interval);
   Util.hidden_input conf "lim" (Adef.encoded @@ string_of_int limit);
-  Output.print_sstring conf (transl_nth conf "year/month/day" 0);
+  Output.print_sstring conf (Util.transl_nth conf "year/month/day" 0);
   Output.print_sstring conf " ";
   Output.print_sstring conf {|<input name="y" value="|};
   Output.print_sstring conf (string_of_int at_year);

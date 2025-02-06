@@ -1,17 +1,11 @@
 (* $Id: updateFam.ml,v 5.24 2008-01-09 03:34:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open TemplAst
-open Util
-
 (* TODO this is defined 2 times *)
 type create_info = Update.create_info = {
   ci_birth_date : Date.date option;
   ci_birth_place : string;
-  ci_death : death;
+  ci_death : Def.death;
   ci_death_date : Date.date option;
   ci_death_place : string;
   ci_occupation : string;
@@ -19,32 +13,33 @@ type create_info = Update.create_info = {
 }
 
 let default_source conf =
-  match p_getenv conf.env "dsrc" with Some s -> s | None -> ""
+  match Util.p_getenv conf.Config.env "dsrc" with Some s -> s | None -> ""
 
 let person_key base ip =
-  let p = poi base ip in
-  let first_name = sou base (get_first_name p) in
-  let surname = sou base (get_surname p) in
+  let p = Gwdb.poi base ip in
+  let first_name = Gwdb.sou base (Gwdb.get_first_name p) in
+  let surname = Gwdb.sou base (Gwdb.get_surname p) in
   let occ =
     if first_name = "?" || surname = "?" then
       int_of_string @@ Gwdb.string_of_iper ip (* FIXME *)
-    else get_occ p
+    else Gwdb.get_occ p
   in
   (first_name, surname, occ, Update.Link, "")
 
 let string_family_of conf base ifam =
-  let fam = foi base ifam in
+  let fam = Gwdb.foi base ifam in
   let sfam =
     Futil.map_family_ps (person_key base)
       (fun f -> f)
-      (sou base) (gen_family_of_family fam)
+      (Gwdb.sou base)
+      (Gwdb.gen_family_of_family fam)
   in
   let scpl =
-    Futil.map_couple_p conf.multi_parents (person_key base)
-      (gen_couple_of_family fam)
+    Futil.map_couple_p conf.Config.multi_parents (person_key base)
+      (Gwdb.gen_couple_of_family fam)
   in
   let sdes =
-    Futil.map_descend_p (person_key base) (gen_descend_of_family fam)
+    Futil.map_descend_p (person_key base) (Gwdb.gen_descend_of_family fam)
   in
   (sfam, scpl, sdes)
 
@@ -85,7 +80,7 @@ module ExtOption = struct
 end
 
 let eval_witness_kind = function
-  | Witness_GodParent -> str_val "godp"
+  | Def.Witness_GodParent -> str_val "godp"
   | Witness_CivilOfficer -> str_val "offi"
   | Witness_ReligiousOfficer -> str_val "reli"
   | Witness_Informant -> str_val "info"
@@ -101,7 +96,7 @@ let family_events_opt env =
 
 let witness_person_of_event_opt env e =
   match get_env "wcnt" env with
-  | Vint i when i - 1 >= 0 && i - 1 < Array.length e.efam_witnesses ->
+  | Vint i when i - 1 >= 0 && i - 1 < Array.length e.Def.efam_witnesses ->
       Some ((fun (p, _, _) -> p) e.efam_witnesses.(i - 1))
   | Vint i when i - 1 >= 0 && i - 1 < 2 && Array.length e.efam_witnesses < 2 ->
       Some ("", "", 0, Update.Create (Neuter, None), "")
@@ -122,7 +117,7 @@ and eval_child env des sl =
     match get_env "cnt" env with
     | Vint i ->
         let i = i - 1 in
-        if i >= 0 && i < Array.length des.children then des.children.(i)
+        if i >= 0 && i < Array.length des.Def.children then des.children.(i)
         else if i >= 0 && i < 1 && Array.length des.children = 0 then
           ("", "", 0, Update.Create (Neuter, None), "")
         else raise Not_found
@@ -135,19 +130,19 @@ and eval_var conf base env (fam, cpl, des) _loc sl =
   with Not_found -> eval_simple_var conf base env (fam, cpl, des) sl
 
 and eval_bvar conf v =
-  match List.assoc_opt v conf.base_env with
-  | Some v -> VVstring v
-  | None -> VVstring ""
+  match List.assoc_opt v conf.Config.base_env with
+  | Some v -> TemplAst.VVstring v
+  | None -> TemplAst.VVstring ""
 
 and eval_divorce fam =
-  match fam.divorce with
+  match fam.Def.divorce with
   | Divorced _ -> str_val "divorced"
   | NotDivorced -> str_val "not_divorced"
   | Separated -> str_val "separated"
 
 (* TODO : rewrite, second case with None passed as an argument looks odd *)
 and eval_divorce' fam s =
-  match fam.divorce with
+  match fam.Def.divorce with
   | Divorced d -> eval_date_var (Date.od_of_cdate d) s
   | NotDivorced | Separated -> eval_date_var None s
 
@@ -178,7 +173,7 @@ and eval_witness env fam sl =
   | Vint i ->
       let i = i - 1 in
       let k =
-        if i >= 0 && i < Array.length fam.witnesses then fam.witnesses.(i)
+        if i >= 0 && i < Array.length fam.Def.witnesses then fam.witnesses.(i)
         else if i >= 0 && i < 2 && Array.length fam.witnesses < 2 then
           ("", "", 0, Update.Create (Neuter, None), "")
         else raise Not_found
@@ -207,10 +202,11 @@ and eval_event_str conf base env =
         let wit =
           Array.fold_right
             (fun ((_, _, iper, _, _), _, _) accu ->
-              (transl_nth conf "witness/witnesses" 0
-              ^<^ transl conf ":"
+              let open Def in
+              (Util.transl_nth conf "witness/witnesses" 0
+              ^<^ Util.transl conf ":"
               ^<^ NameDisplay.fullname_html_of_person conf base
-                    (poi base (Gwdb.iper_of_string (string_of_int iper))))
+                    (Gwdb.poi base (Gwdb.iper_of_string (string_of_int iper))))
               :: accu)
             e.efam_witnesses []
         in
@@ -281,7 +277,8 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "bvar"; v ] -> eval_bvar conf v
   | "child" :: sl -> eval_child env des sl
   | [ "cnt" ] -> eval_int_env "cnt" env
-  | [ "comment" ] -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
+  | [ "comment" ] ->
+      safe_val (Util.escape_html fam.Def.comment :> Adef.safe_string)
   | [ "digest" ] -> eval_string_env "digest" env
   | [ "divorce" ] -> eval_divorce fam
   | [ "divorce"; s ] -> eval_divorce' fam s
@@ -359,9 +356,9 @@ and eval_parent' conf env k = function
   | [ "himher" ] ->
       let s =
         match get_env "cnt" env with
-        | Vint 1 -> Utf8.capitalize_fst (transl_nth conf "him/her" 0)
-        | Vint 2 -> Utf8.capitalize_fst (transl_nth conf "him/her" 1)
-        | Vint _ -> transl conf "him/her"
+        | Vint 1 -> Utf8.capitalize_fst (Util.transl_nth conf "him/her" 0)
+        | Vint 2 -> Utf8.capitalize_fst (Util.transl_nth conf "him/her" 1)
+        | Vint _ -> Util.transl conf "him/her"
         | _ -> "???"
       in
       str_val s
@@ -399,7 +396,7 @@ and eval_create c = function
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
         ->
           let dmy = Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
-          if dmy.month <> 0 then short_f_month dmy.month else ""
+          if dmy.month <> 0 then Util.short_f_month dmy.month else ""
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg ({ month = m }, _)) })
         when m <> 0 ->
@@ -439,7 +436,7 @@ and eval_create c = function
         -> (
           let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
           match calendar with
-          | Dfrench -> short_f_month dmy.month
+          | Dfrench -> Util.short_f_month dmy.month
           | Dgregorian | Djulian | Dhebrew ->
               if dmy.month <> 0 then string_of_int dmy.month else "")
       | _ -> "")
@@ -499,7 +496,7 @@ and eval_relation_kind = function
 and eval_special_var conf base = function
   | [ "include_perso_header" ] -> (
       (* TODO merge with mainstream includes ?? *)
-      match p_getenv conf.env "ip" with
+      match Util.p_getenv conf.Config.env "ip" with
       | Some i ->
           let has_base_loop =
             try
@@ -507,14 +504,14 @@ and eval_special_var conf base = function
               false
             with Consang.TopologicalSortError _ -> true
           in
-          if has_base_loop then VVstring ""
+          if has_base_loop then TemplAst.VVstring ""
           else
-            let p = poi base (iper_of_string i) in
+            let p = Gwdb.poi base (Gwdb.iper_of_string i) in
             Perso.interp_templ_with_menu
               (fun _ -> ())
               "perso_header" conf base p;
-            VVstring ""
-      | None -> VVstring "")
+            TemplAst.VVstring ""
+      | None -> TemplAst.VVstring "")
   | _ -> raise Not_found
 
 and eval_int_env var env =
@@ -530,9 +527,9 @@ and eval_string_env var env =
 let bind_fevents env fam =
   let events =
     Event.sort_events
-      (fun e -> Event.Fevent e.efam_name)
+      (fun e -> Event.Fevent e.Def.efam_name)
       (fun e -> e.efam_date)
-      fam.fevents
+      fam.Def.fevents
   in
   bind "fevents" (Vevents events) env
 
@@ -541,7 +538,7 @@ let bind_fevents env fam =
 let print_foreach print_ast _eval_expr =
   let rec print_foreach env ((fam, cpl, des) as fcd) _ s sl _ al =
     match s :: sl with
-    | [ "child" ] -> print_foreach_child env fcd al des.children
+    | [ "child" ] -> print_foreach_child env fcd al des.Def.children
     | [ "fevent" ] ->
         let env = bind_fevents env fam in
         let fevents = get_fevent (get_env "fevents" env) in
@@ -604,7 +601,7 @@ let print_foreach print_ast _eval_expr =
   print_foreach
 
 let print_update_fam conf base fcd digest =
-  match p_getenv conf.env "m" with
+  match Util.p_getenv conf.Config.env "m" with
   | Some
       ( "ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM"
       | "MOD_FAM_OK" | "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK"
@@ -624,95 +621,98 @@ let print_update_fam conf base fcd digest =
 
 let print_del1 conf base ifam =
   let title () =
-    transl_nth conf "family/families" 0
-    |> transl_decline conf "delete"
+    Util.transl_nth conf "family/families" 0
+    |> Util.transl_decline conf "delete"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let p =
-    match p_getenv conf.env "ip" with
-    | Some ip -> poi base (iper_of_string ip)
-    | None -> Gwdb.empty_person base dummy_iper
+    match Util.p_getenv conf.Config.env "ip" with
+    | Some ip -> Gwdb.poi base (Gwdb.iper_of_string ip)
+    | None -> Gwdb.empty_person base Gwdb.dummy_iper
   in
   (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
   Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
   title ();
   Output.print_sstring conf {|</h2><form method="post" action="|};
-  Output.print_sstring conf conf.command;
+  Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|"><p>|};
   Util.hidden_env conf;
-  Util.hidden_input conf "i" (Adef.encoded @@ string_of_ifam ifam);
-  (match p_getenv conf.env "ip" with
+  Util.hidden_input conf "i" (Adef.encoded @@ Gwdb.string_of_ifam ifam);
+  (match Util.p_getenv conf.Config.env "ip" with
   | Some ip -> Util.hidden_input conf "ip" (Adef.encoded ip)
   | None -> ());
   Util.hidden_input conf "m" (Adef.encoded "DEL_FAM_OK");
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
   let title () =
-    transl_decline conf "invert" ""
+    Util.transl_decline conf "invert" ""
     |> Utf8.capitalize_fst |> Adef.safe |> Output.print_string conf
   in
-  let cpl1 = foi base ifam1 in
-  let cpl2 = foi base ifam2 in
+  let cpl1 = Gwdb.foi base ifam1 in
+  let cpl2 = Gwdb.foi base ifam2 in
   (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
   Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf
     (Utf8.capitalize_fst
-       (transl conf "invert the order of the following families"));
+       (Util.transl conf "invert the order of the following families"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf "<ul><li>";
-  Update.print_someone conf base (poi base (get_father cpl1));
+  Update.print_someone conf base (Gwdb.poi base (Gwdb.get_father cpl1));
   Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
+  Output.print_sstring conf (Util.transl_nth conf "and" 0);
   Output.print_sstring conf " ";
-  Update.print_someone conf base (poi base (get_mother cpl1));
+  Update.print_someone conf base (Gwdb.poi base (Gwdb.get_mother cpl1));
   Output.print_sstring conf "</li><li>";
-  Update.print_someone conf base (poi base (get_father cpl2));
+  Update.print_someone conf base (Gwdb.poi base (Gwdb.get_father cpl2));
   Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
+  Output.print_sstring conf (Util.transl_nth conf "and" 0);
   Output.print_sstring conf " ";
-  Update.print_someone conf base (poi base (get_mother cpl2));
+  Update.print_someone conf base (Gwdb.poi base (Gwdb.get_mother cpl2));
   Output.print_sstring conf "</li></ul>";
   Output.print_sstring conf {|<form method="post" action="|};
-  Output.print_sstring conf conf.command;
+  Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|"><p>|};
   Util.hidden_env conf;
-  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Adef.encoded);
-  Util.hidden_input conf "f" (string_of_ifam ifam2 |> Adef.encoded);
+  Util.hidden_input conf "i"
+    (Gwdb.get_iper p |> Gwdb.string_of_iper |> Adef.encoded);
+  Util.hidden_input conf "f" (Gwdb.string_of_ifam ifam2 |> Adef.encoded);
   Util.hidden_input conf "m" (Adef.encoded "INV_FAM_OK");
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
 let print_add conf base =
   let fath, moth, digest =
-    match p_getenv conf.env "ip" with
+    match Util.p_getenv conf.Config.env "ip" with
     | Some i ->
-        let p = poi base (iper_of_string i) in
+        let p = Gwdb.poi base (Gwdb.iper_of_string i) in
         let fath =
           if
-            get_sex p = Male
-            || (get_sex p = Neuter && p_getenv conf.env "sex" = Some "M")
-          then person_key base (get_iper p)
+            Gwdb.get_sex p = Male
+            || Gwdb.get_sex p = Neuter
+               && Util.p_getenv conf.Config.env "sex" = Some "M"
+          then person_key base (Gwdb.get_iper p)
           else ("", "", 0, Update.Create (Male, None), "")
         in
         let moth =
           if
-            get_sex p = Female
-            || (get_sex p = Neuter && p_getenv conf.env "sex" = Some "F")
-          then person_key base (get_iper p)
+            Gwdb.get_sex p = Female
+            || Gwdb.get_sex p = Neuter
+               && Util.p_getenv conf.Config.env "sex" = Some "F"
+          then person_key base (Gwdb.get_iper p)
           else ("", "", 0, Update.Create (Female, None), "")
         in
-        let digest = string_of_int (Array.length (get_family p)) in
+        let digest = string_of_int (Array.length (Gwdb.get_family p)) in
         (fath, moth, digest)
     | None ->
         ( ("", "", 0, Update.Create (Male, None), ""),
@@ -721,7 +721,7 @@ let print_add conf base =
   in
   let fam =
     {
-      marriage = Date.cdate_None;
+      Def.marriage = Date.cdate_None;
       marriage_place = "";
       marriage_note = "";
       marriage_src = "";
@@ -732,20 +732,20 @@ let print_add conf base =
       comment = "";
       origin_file = "";
       fsources = default_source conf;
-      fam_index = dummy_ifam;
+      fam_index = Gwdb.dummy_ifam;
     }
-  and cpl = Gutil.couple conf.multi_parents fath moth
-  and des = { children = [||] } in
+  and cpl = Gutil.couple conf.Config.multi_parents fath moth
+  and des = { Def.children = [||] } in
   print_update_fam conf base (fam, cpl, des) digest
 
 let print_add_parents conf base =
-  match p_getenv conf.env "ip" with
+  match Util.p_getenv conf.Config.env "ip" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       let fam =
         {
-          marriage = Date.cdate_None;
+          Def.marriage = Date.cdate_None;
           marriage_place = "";
           marriage_note = "";
           marriage_src = "";
@@ -756,19 +756,23 @@ let print_add_parents conf base =
           comment = "";
           origin_file = "";
           fsources = default_source conf;
-          fam_index = dummy_ifam;
+          fam_index = Gwdb.dummy_ifam;
         }
       and cpl =
-        Gutil.couple conf.multi_parents
-          ("", sou base (get_surname p), 0, Update.Create (Neuter, None), "")
+        Gutil.couple conf.Config.multi_parents
+          ( "",
+            Gwdb.sou base (Gwdb.get_surname p),
+            0,
+            Update.Create (Neuter, None),
+            "" )
           ("", "", 0, Update.Create (Neuter, None), "")
       and des =
         {
-          children =
+          Def.children =
             [|
-              ( sou base (get_first_name p),
-                sou base (get_surname p),
-                get_occ p,
+              ( Gwdb.sou base (Gwdb.get_first_name p),
+                Gwdb.sou base (Gwdb.get_surname p),
+                Gwdb.get_occ p,
                 Update.Link,
                 "" );
             |];
@@ -777,16 +781,16 @@ let print_add_parents conf base =
       print_update_fam conf base (fam, cpl, des) ""
 
 let print_mod conf base =
-  match p_getenv conf.env "i" with
+  match Util.p_getenv conf.Config.env "i" with
   | Some i ->
-      let sfam = string_family_of conf base (ifam_of_string i) in
+      let sfam = string_family_of conf base (Gwdb.ifam_of_string i) in
       let digest = Update.digest_family sfam in
       print_update_fam conf base sfam digest
   | _ -> Hutil.incorrect_request conf
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
-  | Some i -> print_del1 conf base (ifam_of_string i)
+  match Util.p_getenv conf.Config.env "i" with
+  | Some i -> print_del1 conf base (Gwdb.ifam_of_string i)
   | _ -> Hutil.incorrect_request conf
 
 let rec find_families ifam = function
@@ -796,14 +800,17 @@ let rec find_families ifam = function
   | _ -> None
 
 let print_inv conf base =
-  match (p_getenv conf.env "i", p_getenv conf.env "f") with
+  match
+    (Util.p_getenv conf.Config.env "i", Util.p_getenv conf.Config.env "f")
+  with
   | Some ip, Some ifam -> (
-      let u = poi base (iper_of_string ip) in
+      let u = Gwdb.poi base (Gwdb.iper_of_string ip) in
       match
-        find_families (ifam_of_string ifam) (Array.to_list (get_family u))
+        find_families (Gwdb.ifam_of_string ifam)
+          (Array.to_list (Gwdb.get_family u))
       with
       | Some (ifam1, ifam2) ->
-          let p = poi base (iper_of_string ip) in
+          let p = Gwdb.poi base (Gwdb.iper_of_string ip) in
           print_inv1 conf base p ifam1 ifam2
       | _ -> Hutil.incorrect_request conf)
   | _ -> Hutil.incorrect_request conf
@@ -821,31 +828,33 @@ let change_order u ifam n =
         else if i = n then ifam :: loop (i + 1) (fam :: faml)
         else fam :: loop (i + 1) faml
   in
-  loop 1 (Array.to_list (get_family u))
+  loop 1 (Array.to_list (Gwdb.get_family u))
 
 let print_change_order conf base =
   match
-    (p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n")
+    ( Util.p_getenv conf.Config.env "i",
+      Util.p_getenv conf.Config.env "f",
+      Util.p_getint conf.Config.env "n" )
   with
   | Some ip, Some ifam, Some n ->
-      let ip = iper_of_string ip in
-      let ifam = ifam_of_string ifam in
-      let p = poi base ip in
+      let ip = Gwdb.iper_of_string ip in
+      let ifam = Gwdb.ifam_of_string ifam in
+      let p = Gwdb.poi base ip in
       let print_person p sn =
-        Output.print_string conf (escape_html @@ p_first_name base p);
-        if get_occ p <> 0 then (
+        Output.print_string conf (Util.escape_html @@ Gwdb.p_first_name base p);
+        if Gwdb.get_occ p <> 0 then (
           Output.print_sstring conf ".";
-          get_occ p |> string_of_int |> Output.print_sstring conf);
+          Gwdb.get_occ p |> string_of_int |> Output.print_sstring conf);
         if sn then (
           Output.print_sstring conf " ";
-          Output.print_string conf (escape_html @@ p_surname base p))
+          Output.print_string conf (Util.escape_html @@ Gwdb.p_surname base p))
       in
       let print_list arr diff_arr =
         Array.iteri
           (fun i ifam ->
-            let fam = foi base ifam in
-            let sp = Gutil.spouse (get_iper p) fam in
-            let sp = poi base sp in
+            let fam = Gwdb.foi base ifam in
+            let sp = Gutil.spouse (Gwdb.get_iper p) fam in
+            let sp = Gwdb.poi base sp in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
@@ -860,9 +869,9 @@ let print_change_order conf base =
           arr
       in
       let after = change_order p ifam n in
-      let before, after = (get_family p, Array.of_list after) in
+      let before, after = (Gwdb.get_family p, Array.of_list after) in
       let title () =
-        transl_decline conf "invert" ""
+        Util.transl_decline conf "invert" ""
         |> Utf8.capitalize_fst |> Output.print_sstring conf
       in
       (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
@@ -874,29 +883,29 @@ let print_change_order conf base =
       Output.print_sstring conf "</h2>";
       Output.print_sstring conf
         (Utf8.capitalize_fst
-           (transl conf "invert the order of the following families"));
+           (Util.transl conf "invert the order of the following families"));
       Update.print_order_changed conf print_list before after;
       Output.print_sstring conf {|<form method="post" action="|};
-      Output.print_sstring conf conf.command;
+      Output.print_sstring conf conf.Config.command;
       Output.print_sstring conf {|"><p>|};
       Util.hidden_env conf;
-      Util.hidden_input conf "i" (Adef.encoded @@ string_of_iper ip);
-      Util.hidden_input conf "f" (Adef.encoded @@ string_of_ifam ifam);
+      Util.hidden_input conf "i" (Adef.encoded @@ Gwdb.string_of_iper ip);
+      Util.hidden_input conf "f" (Adef.encoded @@ Gwdb.string_of_ifam ifam);
       Util.hidden_input conf "n" (Adef.encoded @@ string_of_int n);
       Util.hidden_input conf "m" (Adef.encoded "CHG_FAM_ORD_OK");
       Output.print_sstring conf
         {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+        (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>";
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
-  match p_getenv conf.env "i" with
+  match Util.p_getenv conf.Config.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let i = ifam_of_string i in
+      let i = Gwdb.ifam_of_string i in
       let sfam = string_family_of conf base i in
       Hutil.interp conf "updfamevt"
         {

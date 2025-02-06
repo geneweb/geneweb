@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Gwdb
-
 (* let rec clear_descend_consang base consang mark ifam =
  *   let des = foi base ifam in
  *   Array.iter
@@ -26,22 +24,22 @@ let trace verbosity cnt max_cnt =
 
 let consang_array base =
   let patched = ref false in
-  let fget i = get_parents @@ poi base i in
-  let cget i = get_consang @@ poi base i in
+  let fget i = Gwdb.get_parents @@ Gwdb.poi base i in
+  let cget i = Gwdb.get_consang @@ Gwdb.poi base i in
   let cset i v =
     patched := true;
-    patch_ascend base i
-      Def.{ (gen_ascend_of_person @@ poi base i) with consang = v }
+    Gwdb.patch_ascend base i
+      Def.{ (Gwdb.gen_ascend_of_person @@ Gwdb.poi base i) with consang = v }
   in
   (fget, cget, cset, patched)
 
 let compute ?(verbosity = 2) base from_scratch =
-  let () = load_ascends_array base in
-  let () = load_couples_array base in
+  let () = Gwdb.load_ascends_array base in
+  let () = Gwdb.load_couples_array base in
   let fget, cget, cset, patched = consang_array base in
   (try
      let tab =
-       let ts = Consang.topological_sort base poi in
+       let ts = Consang.topological_sort base Gwdb.poi in
        Consang.make_relationship_info base ts
      in
      let persons = Gwdb.ipers base in
@@ -92,9 +90,9 @@ let compute ?(verbosity = 2) base from_scratch =
                  let pconsang = Gwdb.Marker.get consang_tab ifam in
                  (* if parent's family's consanguinity wasn't calculated *)
                  if pconsang = Adef.no_consang then
-                   let cpl = foi base ifam in
-                   let ifath = get_father cpl in
-                   let imoth = get_mother cpl in
+                   let cpl = Gwdb.foi base ifam in
+                   let ifath = Gwdb.get_father cpl in
+                   let imoth = Gwdb.get_mother cpl in
                    (* if parent's consanguinity was calculated *)
                    if
                      cget ifath != Adef.no_consang
@@ -112,7 +110,7 @@ let compute ?(verbosity = 2) base from_scratch =
                        then (
                          Printf.eprintf "\nMax consanguinity %g for %s... "
                            consang
-                           (Gutil.designation base (poi base i));
+                           (Gutil.designation base (Gwdb.poi base i));
                          flush stderr;
                          most := Some i)
                      (* if it wasn't makes further another run over persons *))

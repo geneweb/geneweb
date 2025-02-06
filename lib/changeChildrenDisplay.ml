@@ -1,35 +1,29 @@
 (* Copyright (c) 1998-2018 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
-open ChangeChildren
-
 let print_child_person conf base p =
-  let var = Adef.encoded ("c" ^ string_of_iper (get_iper p)) in
+  let var = Adef.encoded ("c" ^ Gwdb.string_of_iper (Gwdb.get_iper p)) in
   let first_name =
-    match p_getenv conf.env ((var :> string) ^ "_first_name") with
+    match Util.p_getenv conf.Config.env ((var :> string) ^ "_first_name") with
     | Some v -> v
-    | None -> p_first_name base p
+    | None -> Gwdb.p_first_name base p
   in
   let surname =
-    match p_getenv conf.env ((var :> string) ^ "_surname") with
+    match Util.p_getenv conf.Config.env ((var :> string) ^ "_surname") with
     | Some v -> v
-    | None -> p_surname base p
+    | None -> Gwdb.p_surname base p
   in
   let occ =
-    match p_getint conf.env ((var :> string) ^ "_occ") with
+    match Util.p_getint conf.Config.env ((var :> string) ^ "_occ") with
     | Some i -> i
-    | None -> get_occ p
+    | None -> Gwdb.get_occ p
   in
   Output.print_sstring conf {|<table class="m1-2"><tbody><tr align="|};
-  Output.print_sstring conf conf.left;
+  Output.print_sstring conf conf.Config.left;
   Output.print_sstring conf {|"><td>|};
   Output.print_sstring conf {|<label for="|};
   Output.print_string conf var;
   Output.print_sstring conf {|_fn" class="mx-2 mb-0">|};
-  transl_nth conf "first name/first names" 0
+  Util.transl_nth conf "first name/first names" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td colspan="3">|};
   Output.print_sstring conf {|<input name=\"|};
@@ -41,11 +35,11 @@ let print_child_person conf base p =
   Output.print_string conf (Util.escape_html first_name);
   Output.print_sstring conf {|">|};
   Output.print_sstring conf {|</td><td align="|};
-  Output.print_sstring conf conf.right;
+  Output.print_sstring conf conf.Config.right;
   Output.print_sstring conf {|"><label for="|};
   Output.print_string conf var;
   Output.print_sstring conf {|_occ" class="mx-2 mb-0">|};
-  transl conf "number" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Util.transl conf "number" |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td>|};
   Output.print_sstring conf {|<input class="form-control" id="|};
   Output.print_string conf var;
@@ -55,12 +49,12 @@ let print_child_person conf base p =
   Output.print_sstring conf
     (if occ = 0 then "" else {| value="|} ^ string_of_int occ ^ {|"|});
   Output.print_sstring conf {|</td></tr><tr align="|};
-  Output.print_sstring conf conf.left;
+  Output.print_sstring conf conf.Config.left;
   Output.print_sstring conf {|"><td>|};
   Output.print_sstring conf {|<label for="|};
   Output.print_string conf var;
   Output.print_sstring conf {|_sn" class="mx-2 mb-0">|};
-  transl_nth conf "surname/surnames" 0
+  Util.transl_nth conf "surname/surnames" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td colspan="5">|};
   Output.print_sstring conf {|<input name="|};
@@ -77,7 +71,7 @@ let print_children conf base ipl =
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun ip ->
-      let p = poi base ip in
+      let p = Gwdb.poi base ip in
       Output.print_sstring conf {|<li class="mt-3"><span class="ml-2">|};
       Output.print_string conf
         (NameDisplay.reference conf base p
@@ -91,11 +85,11 @@ let print_children conf base ipl =
 
 let print_change conf base p =
   let title _ =
-    transl conf "change children's names"
+    Util.transl conf "change children's names"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  let children = children_of_p base p in
-  let digest = digest_children base children in
+  let children = Gwdb.children_of_p base p in
+  let digest = ChangeChildren.digest_children base children in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>";
   title false;
@@ -106,50 +100,50 @@ let print_change conf base p =
   Output.print_sstring conf " ";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   Output.print_sstring conf {|</h2><form method="post" action="|};
-  Output.print_sstring conf conf.command;
+  Output.print_sstring conf conf.Config.command;
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
-  Util.hidden_input_s conf "ip" (string_of_iper (get_iper p));
+  Util.hidden_input_s conf "ip" (Gwdb.string_of_iper (Gwdb.get_iper p));
   Util.hidden_input_s conf "digest" digest;
   Util.hidden_input_s conf "m" "CHG_CHN_OK";
   print_children conf base children;
   Output.print_sstring conf
     {|<button type="submit" class="btn btn-primary btn-lg ml-5 mb-2">|};
-  transl_nth conf "validate/delete" 0
+  Util.transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></form>";
   Hutil.trailer conf
 
 let print conf base =
-  match p_getenv conf.env "ip" with
+  match Util.p_getenv conf.Config.env "ip" with
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       print_change conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
   Output.print_sstring conf "<h4>";
-  transl_nth conf "child/children" 1
+  Util.transl_nth conf "child/children" 1
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</h4><p><ul>";
   Array.iter
     (fun ifam ->
-      let des = foi base ifam in
+      let des = Gwdb.foi base ifam in
       Array.iter
         (fun ip ->
-          let p = poi base ip in
+          let p = Gwdb.poi base ip in
           Output.print_sstring conf "<li>";
           NameDisplay.fullname_html_of_person conf base p
           |> NameDisplay.reference conf base p
           |> Output.print_string conf;
           Output.print_string conf (DateDisplay.short_dates_text conf base p))
-        (get_children des))
-    (get_family u);
+        (Gwdb.get_children des))
+    (Gwdb.get_family u);
   Output.print_sstring conf "</ul>"
 
 let print_change_done conf base p =
   let title _ =
-    transl conf "children's names changed"
+    Util.transl conf "children's names changed"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
@@ -161,12 +155,12 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let var = "c" ^ string_of_iper ip_var in
+  let var = "c" ^ Gwdb.string_of_iper ip_var in
   Update.print_create_conflict conf base p var
 
 let error_person conf err =
   let title _ =
-    transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
+    Util.transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
   Output.printf conf "%s\n" (Utf8.capitalize_fst err);
@@ -176,36 +170,36 @@ let error_person conf err =
        (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe))
 
 let print_update_child conf base =
-  match p_getenv conf.env "m" with
+  match Util.p_getenv conf.Config.env "m" with
   | Some "CHG_CHN_OK" -> print conf base
   | _ -> Hutil.incorrect_request conf
 
 let print_change_ok conf base p =
-  let ipl = children_of_p base p in
-  let parent_surname = p_surname base p in
-  let redisp = Option.is_some (p_getenv conf.env "return") in
+  let ipl = Gwdb.children_of_p base p in
+  let parent_surname = Gwdb.p_surname base p in
+  let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
   if redisp then print_update_child conf base
   else (
-    check_digest conf (digest_children base ipl);
+    ChangeChildren.check_digest conf (ChangeChildren.digest_children base ipl);
     let changed =
-      try change_children conf base parent_surname ipl with
-      | ChangeChildrenConflict (p, p') ->
-          print_conflict conf base (get_iper p) p'
-      | FirstNameMissing _ ->
-          error_person conf (transl conf "first name missing")
+      try ChangeChildren.change_children conf base parent_surname ipl with
+      | ChangeChildren.ChangeChildrenConflict (p, p') ->
+          print_conflict conf base (Gwdb.get_iper p) p'
+      | ChangeChildren.FirstNameMissing _ ->
+          error_person conf (Util.transl conf "first name missing")
     in
     Util.commit_patches conf base;
     let changed =
-      U_Change_children_name
-        (Util.string_gen_person base (gen_person_of_person p), changed)
+      Def.U_Change_children_name
+        (Util.string_gen_person base (Gwdb.gen_person_of_person p), changed)
     in
     History.record conf base changed "cn";
     print_change_done conf base p)
 
 let print_ok o_conf base =
   let conf = Update.update_conf o_conf in
-  match p_getenv conf.env "ip" with
+  match Util.p_getenv conf.Config.env "ip" with
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Gwdb.poi base (Gwdb.iper_of_string i) in
       print_change_ok conf base p
   | _ -> Hutil.incorrect_request conf

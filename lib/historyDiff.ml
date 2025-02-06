@@ -1,15 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-
 type gen_record = {
   date : Adef.safe_string;
   wizard : Adef.safe_string;
-  gen_p : (iper, iper, string) gen_person;
-  gen_f : (iper, ifam, string) gen_family list;
-  gen_c : iper array list;
+  gen_p : (Gwdb.iper, Gwdb.iper, string) Def.gen_person;
+  gen_f : (Gwdb.iper, Gwdb.ifam, string) Def.gen_family list;
+  gen_c : Gwdb.iper array list;
 }
 
 (* Le nom du fichier historique (à partir de la clé personne). *)
@@ -22,7 +18,7 @@ let history_file fn sn occ =
 (* history directory path *)
 let history_d conf =
   let path =
-    match List.assoc_opt "history_path" conf.base_env with
+    match List.assoc_opt "history_path" conf.Config.base_env with
     | Some path when path <> "" -> path
     | _ -> "history_d"
   in
@@ -100,22 +96,22 @@ let make_gen_record conf base first gen_p =
       (* On évite les calculs savant pour la date (ss - 1 avec une date *)
       (* autour de minuit ...). C'est simplement une indication.        *)
       if first then
-        let hh, mm, ss = conf.time in
+        let hh, mm, ss = conf.Config.time in
         { conf with time = (hh, mm, min 0 ss) }
       else conf
     in
     Util.sprintf_today conf
   in
-  let p = poi base gen_p.key_index in
-  let fam = get_family p in
+  let p = Gwdb.poi base gen_p.Def.key_index in
+  let fam = Gwdb.get_family p in
   (* On fait en sorte qu'il y a une 'bijection' *)
   (* entre les familles et les enfants.         *)
   let gen_f, gen_c =
     Array.fold_right
       (fun ifam (accu_fam, accu_child) ->
-        let fam = foi base ifam in
-        let children = get_children fam in
-        let gen_f = gen_family_of_family fam in
+        let fam = Gwdb.foi base ifam in
+        let children = Gwdb.get_children fam in
+        let gen_f = Gwdb.gen_family_of_family fam in
         (Util.string_gen_family base gen_f :: accu_fam, children :: accu_child))
       fam ([], [])
   in
@@ -140,17 +136,23 @@ let make_gen_record conf base first gen_p =
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                             *)
 let record_diff conf base changed =
-  match List.assoc_opt "history_diff" conf.base_env with
+  match List.assoc_opt "history_diff" conf.Config.base_env with
   | Some "yes" when not conf.manitou -> (
       let print_ind_add p =
-        let person_file = history_file p.first_name p.surname p.occ in
+        let person_file =
+          history_file p.Def.first_name p.Def.surname p.Def.occ
+        in
         let fname = history_path conf person_file in
         let gr = make_gen_record conf base false p in
         write_history_file conf person_file fname gr
       in
       let print_ind_mod o p =
-        let o_person_file = history_file o.first_name o.surname o.occ in
-        let person_file = history_file p.first_name p.surname p.occ in
+        let o_person_file =
+          history_file o.Def.first_name o.Def.surname o.Def.occ
+        in
+        let person_file =
+          history_file p.Def.first_name p.Def.surname p.Def.occ
+        in
         let ofname = history_path conf o_person_file in
         let fname = history_path conf person_file in
         (* La clé a changé, on reprend l'ancien historique. *)
@@ -168,12 +170,16 @@ let record_diff conf base changed =
           write_history_file conf person_file fname gr
       in
       match changed with
-      | U_Add_person p -> print_ind_add p
-      | U_Modify_person (o, p) -> print_ind_mod o p
-      | U_Delete_person _ -> ()
-      | U_Merge_person (_, o, p) ->
-          let o_person_file = history_file o.first_name o.surname o.occ in
-          let person_file = history_file p.first_name p.surname p.occ in
+      | Def.U_Add_person p -> print_ind_add p
+      | Def.U_Modify_person (o, p) -> print_ind_mod o p
+      | Def.U_Delete_person _ -> ()
+      | Def.U_Merge_person (_, o, p) ->
+          let o_person_file =
+            history_file o.Def.first_name o.Def.surname o.Def.occ
+          in
+          let person_file =
+            history_file p.Def.first_name p.Def.surname p.Def.occ
+          in
           let fname = history_path conf person_file in
           let gr = make_gen_record conf base false p in
           (* La clé a changé avec la fusion, on reprend l'ancien historique. *)
@@ -185,24 +191,24 @@ let record_diff conf base changed =
              with Sys_error _ -> ());
             write_history_file conf person_file fname gr)
           else write_history_file conf person_file fname gr
-      | U_Delete_family (_p, _f) -> ()
-      | U_Add_family (p, f)
-      | U_Modify_family (p, _, f)
-      | U_Merge_family (p, _, _, f)
-      | U_Add_parent (p, f) ->
-          let p_file = history_file p.first_name p.surname p.occ in
+      | Def.U_Delete_family (_p, _f) -> ()
+      | Def.U_Add_family (p, f)
+      | Def.U_Modify_family (p, _, f)
+      | Def.U_Merge_family (p, _, _, f)
+      | Def.U_Add_parent (p, f) ->
+          let p_file = history_file p.Def.first_name p.Def.surname p.Def.occ in
           let p_fname = history_path conf p_file in
-          let cpl = foi base f.fam_index in
-          let isp = Gutil.spouse p.key_index cpl in
-          let sp = poi base isp in
+          let cpl = Gwdb.foi base f.Def.fam_index in
+          let isp = Gutil.spouse p.Def.key_index cpl in
+          let sp = Gwdb.poi base isp in
           let sp_file =
             history_file
-              (sou base (get_first_name sp))
-              (sou base (get_surname sp))
-              (get_occ sp)
+              (Gwdb.sou base (Gwdb.get_first_name sp))
+              (Gwdb.sou base (Gwdb.get_surname sp))
+              (Gwdb.get_occ sp)
           in
           let sp_fname = history_path conf sp_file in
-          let gen_sp = gen_person_of_person sp in
+          let gen_sp = Gwdb.gen_person_of_person sp in
           let gen_sp = Util.string_gen_person base gen_sp in
           let gr = make_gen_record conf base false p in
           write_history_file conf p_file p_fname gr;
@@ -211,22 +217,22 @@ let record_diff conf base changed =
           (* Création des fichiers pour les enfants ajoutés. *)
           Array.iter
             (fun ip ->
-              let p = poi base ip in
+              let p = Gwdb.poi base ip in
               let person_file =
                 history_file
-                  (sou base (get_first_name p))
-                  (sou base (get_surname p))
-                  (get_occ p)
+                  (Gwdb.sou base (Gwdb.get_first_name p))
+                  (Gwdb.sou base (Gwdb.get_surname p))
+                  (Gwdb.get_occ p)
               in
               let fname = history_path conf person_file in
               if Sys.file_exists fname then ()
               else
-                let gen_p = gen_person_of_person p in
+                let gen_p = Gwdb.gen_person_of_person p in
                 let gen_p = Util.string_gen_person base gen_p in
                 let gr = make_gen_record conf base false gen_p in
                 write_history_file conf person_file fname gr)
-            (get_children cpl)
-      | U_Change_children_name (_, list) ->
+            (Gwdb.get_children cpl)
+      | Def.U_Change_children_name (_, list) ->
           List.iter
             (fun ((ofn, osn, oocc, _oip), (fn, sn, occ, ip)) ->
               let o_person_file = history_file ofn osn oocc in
@@ -235,16 +241,17 @@ let record_diff conf base changed =
                 let ofname = history_path conf o_person_file in
                 let fname = history_path conf person_file in
                 (try Sys.rename ofname fname with Sys_error _ -> ());
-                let p = poi base ip in
+                let p = Gwdb.poi base ip in
                 let p =
                   Futil.map_person_ps
                     (fun p -> p)
-                    (sou base) (gen_person_of_person p)
+                    (Gwdb.sou base)
+                    (Gwdb.gen_person_of_person p)
                 in
                 let gr = make_gen_record conf base false p in
                 write_history_file conf person_file fname gr))
             list
-      | U_Multi (o, p, modified_key) ->
+      | Def.U_Multi (o, p, modified_key) ->
           if modified_key then print_ind_mod o p else print_ind_add p
       | _ -> ())
   | _ -> ()
