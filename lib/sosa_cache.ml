@@ -131,6 +131,15 @@ let dynamic_cache cache = DynamicCache cache
 let static_cache cache = StaticCache cache
 let output_sosa_cache ~conf ~base ~cache = StaticCache.output ~base ~cache
 let sosa_cache : t option ref = ref None
+let sosa_ref : Gwdb.person option option ref = ref None
+
+let find_sosa_ref conf base =
+  match !sosa_ref with
+  | Some sosa_ref -> sosa_ref
+  | None ->
+      let sosa_r = Util.find_sosa_ref conf base in
+      sosa_ref := Some sosa_r;
+      sosa_r
 
 let set_dynamic_cache cache_o =
   Option.iter (fun cache -> sosa_cache := Some (dynamic_cache cache)) cache_o
@@ -156,7 +165,7 @@ let get_sosa_cache ~conf ~base : t option =
   match !sosa_cache with
   | Some _cache as cache -> cache
   | None -> (
-      let sosa_ref = Util.find_sosa_ref conf base in
+      let sosa_ref = find_sosa_ref conf base in
       match sosa_ref with
       | Some sosa_ref
         when is_default_sosa_ref conf base sosa_ref
@@ -207,7 +216,7 @@ let get_sosa_person ~conf ~base ~person =
 let print_sosa ~conf ~base ~person ~link =
   let sosa_num = get_sosa_person ~conf ~base ~person in
   if Sosa.gt sosa_num Sosa.zero then
-    match Util.find_sosa_ref conf base with
+    match find_sosa_ref conf base with
     | Some r ->
         (if not link then ()
         else
