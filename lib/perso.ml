@@ -1110,15 +1110,14 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                     with Not_found ->
                       (Adef.safe "", Util.safe_html v, Adef.safe "")
                   in
-                  (a : Adef.safe_string)
-                  ^^^ {|<a href="|}
-                  ^<^ (commd conf ^^^ {|m=NOTES&f=|}
-                       ^<^ (Mutil.encode pg :> Adef.escaped_string)
-                       ^>^ {|#p_|}
-                       ^ string_of_int text.Def.NLDB.lnPos
-                        : Adef.escaped_string
-                        :> Adef.safe_string)
-                  ^^^ {|">|} ^<^ b ^^^ {|</a>|} ^<^ c
+                  Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s"
+                    (a :> string)
+                    (commd conf :> string)
+                    (Mutil.encode pg :> string)
+                    text.Def.NLDB.lnPos
+                    (b :> string)
+                    (c :> string)
+                  |> Adef.safe
                 in
                 if (str :> string) = "" then str1 else str ^^^ ", " ^<^ str1
           with Not_found -> str)
