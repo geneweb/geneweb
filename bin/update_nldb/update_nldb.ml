@@ -22,15 +22,8 @@ let notes_links s =
             if List.mem lfname list_nt then list_nt else lfname :: list_nt
           in
           loop list_nt list_ind pos j
-      | NotesLinks.WLperson (j, key, name, text) ->
+      | NotesLinks.WLperson (j, key, _name, text) ->
           let list_ind =
-            let text =
-              match (name, text) with
-              | Some name, None -> Some name
-              | Some name, Some text when name = "" -> Some text
-              | Some name, Some text -> Some (name ^ ";" ^ text)
-              | _, _ -> None
-            in
             let link = { NLDB.lnTxt = text; lnPos = pos } in
             (key, link) :: list_ind
           in
