@@ -532,25 +532,23 @@ let families ?(select = fun _ -> true) base =
 
 let ifam_marker c i = Marker.make (fun i -> i) c i
 
-let make_patch_collection patch mk empty =
+let make_patch_collection patch mk =
   let arr = patch |> Hashtbl.to_seq_values |> Seq.map mk |> Array.of_seq in
   let length = Array.length arr in
   let get i = if i < length then Some arr.(i) else None in
   { Collection.length; get }
 
 let persons_from_patch base =
-  let empty_person = empty_person base (-1) in
   let mk dsk_p =
     { base; iper = dsk_p.key_index; p = Some dsk_p; a = None; u = None }
   in
-  make_patch_collection base.data.persons_patch mk empty_person
+  make_patch_collection base.data.persons_patch mk
 
 let families_from_patch base =
-  let empty_family = empty_family base (-1) in
   let mk dsk_f =
     { base; ifam = dsk_f.fam_index; f = Some dsk_f; c = None; d = None }
   in
-  make_patch_collection base.data.families_patch mk empty_family
+  make_patch_collection base.data.families_patch mk
 
 (* Restrict file *)
 
