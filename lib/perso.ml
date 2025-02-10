@@ -2488,7 +2488,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | "sosa" :: sl -> (
       match get_sosa conf base (Gwdb.get_iper p) with
       | Some sosa -> TemplAst.VVstring (eval_num conf sosa sl)
-      | _ -> null_val)
+      | None -> null_val)
   | "spouse" :: sl -> (
       match get_env "fam" env with
       | Vfam (ifam, _, _, _) ->
