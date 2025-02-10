@@ -39,7 +39,7 @@ end = struct
           else
             let ancestor, sosa = Queue.pop cache.ancestor_queue in
             add_parents ancestor sosa;
-            if Gwdb.compare_iper ancestor iper = 0 then Some sosa else aux ()
+            if Gwdb.eq_iper ancestor iper then Some sosa else aux ()
         in
         aux ()
 
