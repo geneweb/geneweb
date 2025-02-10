@@ -100,8 +100,10 @@ end = struct
 
   let build ~conf ~base =
     let sosa_ref = Util.default_sosa_ref conf base in
-    Option.bind sosa_ref (fun sosa_ref ->
-        Some (compute_all_sosas ~base ~sosa_ref:(Gwdb.get_iper sosa_ref)))
+    Option.map
+      (fun sosa_ref ->
+        compute_all_sosas ~base ~sosa_ref:(Gwdb.get_iper sosa_ref))
+      sosa_ref
 
   let output ~base ~cache =
     let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
