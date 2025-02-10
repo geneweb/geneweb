@@ -149,8 +149,9 @@ let set_static_cache cache_o =
 
 let is_default_sosa_ref conf base sosa_ref =
   let dft_sosa_ref = Util.default_sosa_ref conf base in
-  Option.bind dft_sosa_ref (fun dft_sosa_ref ->
-      Some (Gwdb.get_iper sosa_ref = Gwdb.get_iper dft_sosa_ref))
+  Option.map
+    (Gwdb.eq_iper (Gwdb.get_iper sosa_ref))
+    (Option.map Gwdb.get_iper dft_sosa_ref)
   |> Option.value ~default:false
 
 let is_sosa_cache_valid conf base =
