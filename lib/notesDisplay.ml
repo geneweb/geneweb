@@ -63,7 +63,9 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     Output.print_sstring conf {|</h1>|});
   Util.include_template conf [] "summary" (fun () -> ());
   let file_path = Notes.file_path conf base in
-  let s = Util.string_with_macros conf [] s in
+  let s =
+    Util.string_with_macros ~with_links_target_attribute:false ~conf ~env:[] s
+  in
   let edit_opt = Some (conf.Config.wizard, "NOTES", fnotes) in
   let s =
     let wi =
@@ -99,7 +101,9 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
     Output.print_sstring conf "<br><br><h1>";
     Output.print_string conf title;
     Output.print_sstring conf "</h1>");
-  let s = Util.string_with_macros conf [] s in
+  let s =
+    Util.string_with_macros ~with_links_target_attribute:false ~conf ~env:[] s
+  in
   let lines = Wiki.extract_sub_part s cnt0 in
   let mode = "NOTES" in
   let wi =
@@ -282,7 +286,7 @@ let print_mod_ok conf base =
   let mode = "NOTES" in
   let read_string = Notes.read_notes ~limit:false base in
   let commit = Notes.commit_notes conf base in
-  let string_filter = Util.string_with_macros conf [] in
+  let string_filter = Util.string_with_macros ~conf ~env:[] in
   let file_path = Notes.file_path conf base in
   let wi =
     {
