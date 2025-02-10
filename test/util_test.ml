@@ -237,7 +237,7 @@ let util_string_with_macros () =
   let test ~expected actual =
     (Alcotest.check Alcotest.string)
       "" expected
-      (Geneweb.Util.string_with_macros conf [] actual)
+      (Geneweb.Util.string_with_macros ~conf ~env:[] actual)
   in
   List.iter
     (fun actual -> test ~expected:actual actual)
