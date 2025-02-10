@@ -105,7 +105,6 @@ let specify conf base n pl =
   (* l'aide sur la sélection d'un individu.          *)
   Geneweb.Util.print_tips_relationship conf;
   Geneweb.Output.print_sstring conf "<ul>\n";
-  (* Construction de la table des sosa de la base *)
   List.iter begin fun (p, tl) ->
     Geneweb.Output.print_sstring conf "<li>";
     Geneweb.Sosa_cache.print_sosa ~conf ~base ~person:p ~link:true;
