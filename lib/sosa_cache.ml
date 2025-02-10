@@ -1,56 +1,87 @@
+module type CacheData_S = sig
+  type t
+
+  val set : t -> Gwdb.iper -> Sosa.t option -> unit
+  val get : t -> Gwdb.iper -> Sosa.t option
+  val make : Gwdb.base -> t
+end
+
+module Make (D : CacheData_S) : sig
+  type t
+
+  val pop : t -> Gwdb.iper * Sosa.t
+  val is_empty : t -> bool
+  val create : Gwdb.base -> Gwdb.iper -> t
+  val get : t -> Gwdb.iper -> Sosa.t option
+  val get_data : t -> D.t
+
+  val add_parents :
+    base:Gwdb.base -> iper:Gwdb.iper -> sosa:Sosa.t -> cache:t -> unit
+end = struct
+  type t = { queue : (Gwdb.iper * Sosa.t) Queue.t; data : D.t }
+
+  let pop cache = Queue.pop cache.queue
+  let is_empty cache = Queue.is_empty cache.queue
+
+  let create base sosa_ref =
+    let () = Gwdb.load_ascends_array base in
+    let () = Gwdb.load_couples_array base in
+    let data = D.make base in
+    let queue = Queue.create () in
+    Queue.push (sosa_ref, Sosa.one) queue;
+    D.set data sosa_ref (Some Sosa.one);
+    { queue; data }
+
+  let add_in_queue cache iper sosa =
+    match D.get cache.data iper with
+    | None ->
+        D.set cache.data iper (Some sosa);
+        Queue.push (iper, sosa) cache.queue
+    | Some _sosa -> ()
+
+  let add_parents ~base ~iper ~sosa ~cache =
+    Option.iter
+      (fun ifam ->
+        let fam = Gwdb.foi base ifam in
+        let ifath = Gwdb.get_father fam in
+        let imoth = Gwdb.get_mother fam in
+        let sosa_fath = Sosa.twice sosa in
+        let sosa_moth = Sosa.inc sosa_fath 1 in
+        add_in_queue cache ifath sosa_fath;
+        add_in_queue cache imoth sosa_moth)
+      (Gwdb.get_parents (Gwdb.poi base iper))
+
+  let get cache = D.get cache.data
+  let get_data cache = cache.data
+end
+
 module DynamicCache : sig
   type t
 
   val make : base:Gwdb.base -> sosa_ref:Gwdb.iper -> t
   val get_sosa : base:Gwdb.base -> cache:t -> iper:Gwdb.iper -> Sosa.t option
 end = struct
-  type t = {
-    cache : (Gwdb.iper, Sosa.t option) Gwdb.Marker.t;
-    ancestor_queue : (Gwdb.iper * Sosa.t) Queue.t;
-  }
+  module Cache = Make (struct
+    type t = (Gwdb.iper, Sosa.t option) Gwdb.Marker.t
+
+    let set = Gwdb.Marker.set
+    let get = Gwdb.Marker.get
+    let make base = Gwdb.iper_marker (Gwdb.ipers base) None
+  end)
+
+  type t = Cache.t
 
   let compute_sosa ~base ~cache ~iper =
-    match Gwdb.Marker.get cache.cache iper with
-    | Some sosa -> Some sosa
-    | None ->
-        let add_in_queue iper sosa =
-          let v = Gwdb.Marker.get cache.cache iper in
-          match v with
-          | None ->
-              Gwdb.Marker.set cache.cache iper (Some sosa);
-              Queue.push (iper, sosa) cache.ancestor_queue
-          | Some _sosa -> ()
-        in
+    let rec aux () =
+      if Cache.is_empty cache then None
+      else
+        let ancestor, sosa = Cache.pop cache in
+        Cache.add_parents ~base ~iper:ancestor ~sosa ~cache;
+        if Gwdb.eq_iper ancestor iper then Some sosa else aux ()
+    in
+    match Cache.get cache iper with Some sosa -> Some sosa | None -> aux ()
 
-        let add_parents iper sosa =
-          match Gwdb.get_parents (Gwdb.poi base iper) with
-          | Some ifam ->
-              let fam = Gwdb.foi base ifam in
-              let ifath = Gwdb.get_father fam in
-              let imoth = Gwdb.get_mother fam in
-              let sosa_fath = Sosa.twice sosa in
-              let sosa_moth = Sosa.inc sosa_fath 1 in
-              add_in_queue ifath sosa_fath;
-              add_in_queue imoth sosa_moth
-          | None -> ()
-        in
-        let rec aux () =
-          if Queue.is_empty cache.ancestor_queue then None
-          else
-            let ancestor, sosa = Queue.pop cache.ancestor_queue in
-            add_parents ancestor sosa;
-            if Gwdb.eq_iper ancestor iper then Some sosa else aux ()
-        in
-        aux ()
-
-  let make ~base ~sosa_ref =
-    let () = Gwdb.load_ascends_array base in
-    let () = Gwdb.load_couples_array base in
-    let cache = Gwdb.iper_marker (Gwdb.ipers base) None in
-    let ancestor_queue = Queue.create () in
-    Queue.push (sosa_ref, Sosa.one) ancestor_queue;
-    { cache; ancestor_queue }
-
+  let make ~base ~sosa_ref = Cache.create base sosa_ref
   let get_sosa = compute_sosa
 end
 
@@ -62,47 +93,36 @@ module StaticCache : sig
   val input : conf:Config.config -> base:Gwdb.base -> t option
   val get_sosa : cache:t -> iper:Gwdb.iper -> Sosa.t option
 end = struct
-  type t = Sosa.t option array
+  module CacheData = struct
+    type t = Sosa.t option array
+
+    let set a iper = Array.set a (Gwdb.int_of_iper iper)
+    let get a iper = Array.get a (Gwdb.int_of_iper iper)
+    let make base = Array.make (Gwdb.nb_of_persons base) None
+  end
+
+  module Cache = Make (CacheData)
+
+  type t = CacheData.t
 
   let compute_all_sosas ~base ~sosa_ref =
-    let () = Gwdb.load_ascends_array base in
-    let () = Gwdb.load_couples_array base in
-    let arr = Array.make (Gwdb.nb_of_persons base) None in
-    let ancestor_queue = Queue.create () in
-    Queue.add (sosa_ref, Sosa.one) ancestor_queue;
-    arr.(Gwdb.int_of_iper sosa_ref) <- Some Sosa.one;
-    let add_in_queue iper sosa =
-      let v = arr.(Gwdb.int_of_iper iper) in
-      match v with
-      | None ->
-          arr.(Gwdb.int_of_iper iper) <- Some sosa;
-          Queue.push (iper, sosa) ancestor_queue
-      | Some _sosa -> ()
-    in
+    let cache = Cache.create base sosa_ref in
     let rec aux () =
-      if Queue.is_empty ancestor_queue then ()
+      if Cache.is_empty cache then ()
       else
-        let ancestor, sosa = Queue.pop ancestor_queue in
-        match Gwdb.get_parents (Gwdb.poi base ancestor) with
-        | Some ifam ->
-            let fam = Gwdb.foi base ifam in
-            let ifath = Gwdb.get_father fam in
-            let imoth = Gwdb.get_mother fam in
-            let sosa_fath = Sosa.twice sosa in
-            let sosa_moth = Sosa.inc sosa_fath 1 in
-            add_in_queue ifath sosa_fath;
-            add_in_queue imoth sosa_moth;
-            aux ()
-        | None -> aux ()
+        let ancestor, sosa = Cache.pop cache in
+        Cache.add_parents ~base ~iper:ancestor ~sosa ~cache;
+        aux ()
     in
     aux ();
-    arr
+    cache
 
   let build ~conf ~base =
     let sosa_ref = Util.default_sosa_ref conf base in
     Option.map
       (fun sosa_ref ->
-        compute_all_sosas ~base ~sosa_ref:(Gwdb.get_iper sosa_ref))
+        Cache.get_data
+          (compute_all_sosas ~base ~sosa_ref:(Gwdb.get_iper sosa_ref)))
       sosa_ref
 
   let output ~base ~cache =
@@ -124,7 +144,7 @@ end = struct
       Some cache)
     else None
 
-  let get_sosa ~cache ~iper = cache.(Gwdb.int_of_iper iper)
+  let get_sosa ~cache ~iper = CacheData.get cache iper
 end
 
 type t = DynamicCache of DynamicCache.t | StaticCache of StaticCache.t
