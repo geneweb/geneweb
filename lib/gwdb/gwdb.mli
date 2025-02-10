@@ -1,5 +1,13 @@
 include module type of Gwdb_driver
 
+module IperSet : sig
+  include Set.S with type elt = iper
+end
+
+module IfamSet : sig
+  include Set.S with type elt = ifam
+end
+
 val insert_person :
   base ->
   (_, iper, istr) Def.gen_person ->

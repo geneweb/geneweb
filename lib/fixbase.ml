@@ -279,7 +279,7 @@ let fix_person_unions ~report ~base ~person =
   let change, ifams, _ifam_set =
     Array.fold_right
       (fun ifam (change, ifams, ifam_set) ->
-        if Util.IfamSet.mem ifam ifam_set then (
+        if Gwdb.IfamSet.mem ifam ifam_set then (
           Option.iter
             (fun fn -> fn (Fix_RemovedDuplicateUnion (iper, ifam)))
             report;
@@ -287,9 +287,9 @@ let fix_person_unions ~report ~base ~person =
         else if not (is_a_parent iper (Gwdb.foi base ifam)) then (
           Option.iter (fun fn -> fn (Fix_RemovedUnion (iper, ifam))) report;
           (true, ifams, ifam_set))
-        else (change, ifam :: ifams, Util.IfamSet.add ifam ifam_set))
+        else (change, ifam :: ifams, Gwdb.IfamSet.add ifam ifam_set))
       ifams
-      (false, [], Util.IfamSet.empty)
+      (false, [], Gwdb.IfamSet.empty)
   in
   if change then Gwdb.patch_union base iper { family = Array.of_list ifams };
   change

@@ -2322,8 +2322,8 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           | None -> null_val)
       | [ "nb_events" ] -> TemplAst.VVstring (string_of_int (List.length persl))
       | [ "nb_ind" ] ->
-          Util.IperSet.elements
-            (List.fold_right Util.IperSet.add persl Util.IperSet.empty)
+          Gwdb.IperSet.elements
+            (List.fold_right Gwdb.IperSet.add persl Gwdb.IperSet.empty)
           |> List.length |> string_of_int |> str_val
       | [ "place" ] -> safe_val place
       | sl ->

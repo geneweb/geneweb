@@ -480,14 +480,6 @@ val is_empty_name : Gwdb.person -> bool
     [false] if we knwon the first name or the last name of [p].
 *)
 
-module IperSet : sig
-  include Set.S with type elt = Gwdb.iper
-end
-
-module IfamSet : sig
-  include Set.S with type elt = Gwdb.ifam
-end
-
 (**/**)
 
 val copy_from_templ_ref :
@@ -527,7 +519,8 @@ val select_masc :
 *)
 
 val select_desc :
-  ?skip_descendants:(ancestors:IperSet.t -> generation:int -> Gwdb.iper -> bool) ->
+  ?skip_descendants:
+    (ancestors:Gwdb.IperSet.t -> generation:int -> Gwdb.iper -> bool) ->
   Config.config ->
   Gwdb.base ->
   int ->
@@ -539,7 +532,8 @@ val select_desc :
 *)
 
 val select_mascdesc :
-  ?skip_descendants:(ancestors:IperSet.t -> generation:int -> Gwdb.iper -> bool) ->
+  ?skip_descendants:
+    (ancestors:Gwdb.IperSet.t -> generation:int -> Gwdb.iper -> bool) ->
   Config.config ->
   Gwdb.base ->
   (Gwdb.iper * int) list ->
