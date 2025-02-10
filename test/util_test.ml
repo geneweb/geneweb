@@ -241,15 +241,31 @@ let util_string_with_macros () =
   in
   List.iter
     (fun actual -> test ~expected:actual actual)
-    [ {|a@.|}; {|a@b|}; {|a@b.|}; {|a@.b|}; {|a@b..|} ];
-  test ~expected:{|<a target="_blank" href="mailto:a@b.c">a@b.c</a>|}
-    {|<a href="mailto:a@b.c">a@b.c</a>|};
-  test ~expected:{|abc <a href="mailto:a@b.c">a@b.c</a>|} {|abc a@b.c|};
-  test ~expected:{|<a href="mailto:a@b..">a@b..</a>.|} {|a@b...|};
-  test ~expected:{|<a href="mailto:a@b.c">a@b.c</a>.|} {|a@b.c.|};
+    [
+      {|a@.|};
+      {|a@b|};
+      {|a@b.|};
+      {|a@.b|};
+      {|a@b..|};
+      {|<a href="#foo">foo</a>|};
+    ];
   test
     ~expected:
-      {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
+      {|<a href="https://foo.com#foo" target="_blank">https://foo.com#foo</a>|}
+    {|https://foo.com#foo|};
+  test ~expected:{|<a target="_blank" href="https://foo.com#foo">foo</a>|}
+    {|<a href="https://foo.com#foo">foo</a>|};
+  test ~expected:{|<a target="_blank" href="mailto:a@b.c">a@b.c</a>|}
+    {|<a href="mailto:a@b.c">a@b.c</a>|};
+  test ~expected:{|abc <a href="mailto:a@b.c" target="_blank">a@b.c</a>|}
+    {|abc a@b.c|};
+  test ~expected:{|<a href="mailto:a@b.." target="_blank">a@b..</a>.|}
+    {|a@b...|};
+  test ~expected:{|<a href="mailto:a@b.c" target="_blank">a@b.c</a>.|}
+    {|a@b.c.|};
+  test
+    ~expected:
+      {|<a href="mailto:jean@dupond.net" target="_blank">jean@dupond.net</a> - le 1 &amp; 2|}
     {|jean@dupond.net - le 1 &amp; 2|}
 
 let util_escape_html () =
