@@ -117,7 +117,7 @@ end = struct
     let cache_file = Filename.concat base_dir "cache_static_sosa" in
     if Sys.file_exists cache_file then (
       let ic = Secure.open_in cache_file in
-      let cache : Sosa.t option array = Marshal.from_channel ic in
+      let cache : t = Marshal.from_channel ic in
       close_in ic;
       Some cache)
     else None
