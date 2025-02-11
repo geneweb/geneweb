@@ -284,6 +284,20 @@ let print_main conf base auth_file =
     let list = wizard_list_from_dir conf base in
     List.filter (fun n -> not (List.mem_assoc n wizdata)) list
   in
+  let extract_surname str =
+    let i = try String.index str '.' with Not_found -> -1 in
+    if i = -1 then Name.lower str
+    else
+      let name = String.sub str (i + 1) (String.length str - i - 1) in
+      Util.surname_without_particle base name |> Name.lower
+  in
+  let mycompare s1 s2 =
+    let s1 = extract_surname s1 in
+    let s2 = extract_surname s2 in
+    if s1 = s2 then 0 else if s1 < s2 then -1 else 1
+  in
+  let old_list = List.sort mycompare old_list in
+
   if by_alphab_order then (
     Output.print_sstring conf "<p>";
     Output.print_sstring conf (string_of_int @@ List.length wizdata);
