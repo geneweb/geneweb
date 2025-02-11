@@ -18,9 +18,10 @@ val search_partial_key :
   Config.config -> Gwdb.base -> string -> Gwdb.person list
 (** Calls [search_key_aux] with [aux] fonction that makes calls to [search_by_name] if result is empty. *)
 
-val search_by_sosa : Config.config -> Gwdb.base -> string -> Gwdb.person list
+val search_by_sosa :
+  conf:Config.config -> base:Gwdb.base -> sosa:Sosa.t -> Gwdb.person option
 
-val search_by_key : Config.config -> Gwdb.base -> string -> Gwdb.person list
+val search_by_key : Config.config -> Gwdb.base -> string -> Gwdb.person option
 (** Same as [search_by_name] but search by key that has format {i "firstname.occ surname"}. *)
 
 val search_approx_key : Config.config -> Gwdb.base -> string -> Gwdb.person list
