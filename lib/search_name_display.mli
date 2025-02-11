@@ -20,26 +20,33 @@ val persons_of_fsname :
 
 val first_name_print : Config.config -> Gwdb.base -> string -> unit
 
+type surname_search_result
+type first_name_search_result
+
 val surname_print :
   Config.config ->
   Gwdb.base ->
   (Config.config -> string -> unit) ->
+  surname_search_result ->
   string ->
   unit
 
-val search_surname : Config.config -> Gwdb.base -> string -> Gwdb.iper list
+val search_surname :
+  Config.config -> Gwdb.base -> string -> surname_search_result
 
 val search_surname_print :
   Config.config ->
   Gwdb.base ->
   (Config.config -> string -> unit) ->
+  surname_search_result ->
   string ->
   unit
 
 val search_first_name :
-  Config.config ->
-  Gwdb.base ->
-  string ->
-  (string * (Ext_string.Set.t * Gwdb.iper list)) list
+  Config.config -> Gwdb.base -> string -> first_name_search_result
 
-val search_first_name_print : Config.config -> Gwdb.base -> string -> unit
+val search_first_name_print :
+  Config.config -> Gwdb.base -> first_name_search_result -> string -> unit
+
+val sn_search_result_is_empty : surname_search_result -> bool
+val fn_search_result_is_empty : first_name_search_result -> bool

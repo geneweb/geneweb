@@ -801,38 +801,25 @@ let select_ancestors conf base name_inj ipl =
           bh :: bhl)
     [] ipl
 
-let surname_print conf base not_found_fun x =
-  let list, name_inj =
-    if Util.p_getenv conf.Config.env "t" = Some "A" then
-      (persons_of_absolute_surname conf base x, fun x -> x)
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 825, 29)))
-    else
-      persons_of_fsname conf base Gwdb.base_strings_of_surname
-        (Gwdb.spi_find (Gwdb.persons_of_surname base))
-        Gwdb.get_surname x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  let iperl, _ =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-        let len = List.length iperl1 in
-        let strl =
-          try
-            let len1 = List.assoc str strl in
-            (str, len + len1) :: List.remove_assoc str strl
-          with Not_found -> (str, len) :: strl
-        in
-        (List.fold_right Gwdb.IperSet.add iperl1 iperl, strl))
-      list (Gwdb.IperSet.empty, [])
-  in
-  let iperl = Gwdb.IperSet.elements iperl in
+let branch_list_of_ipers conf base name_inj iperl =
+  let bhl = select_ancestors conf base name_inj iperl in
+  List.map
+    (fun bh ->
+      {
+        bh_ancestor = Util.pget conf base bh.bh_ancestor;
+        bh_well_named_ancestors =
+          List.map (Util.pget conf base) bh.bh_well_named_ancestors;
+      })
+    bhl
+
+type surname_search_result = {
+  iperl : Gwdb.iper list;
+  list : (string * (Ext_string.Set.t * Gwdb.iper list)) list;
+  name_inj : string -> string;
+  bhl : Gwdb.person branch_head list;
+}
+
+let surname_print conf base not_found_fun { iperl; list; name_inj; bhl } x =
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match Util.p_getenv conf.Config.env "o" with
@@ -841,28 +828,13 @@ let surname_print conf base not_found_fun x =
         List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
       in
       let pl =
-        List.fold_right
-          (fun p pl ->
-            if
-              (not (Util.is_hide_names conf p))
-              || Util.authorized_age conf base p
-            then p :: pl
-            else pl)
-          pl []
+        List.filter
+          (fun p ->
+            (not (Util.is_hide_names conf p)) || Util.authorized_age conf base p)
+          pl
       in
       print_family_alphabetic x conf base pl
   | _ -> (
-      let bhl = select_ancestors conf base name_inj iperl in
-      let bhl =
-        List.map
-          (fun bh ->
-            {
-              bh_ancestor = Util.pget conf base bh.bh_ancestor;
-              bh_well_named_ancestors =
-                List.map (Util.pget conf base) bh.bh_well_named_ancestors;
-            })
-          bhl
-      in
       match (bhl, list) with
       | [], _ -> not_found_fun conf x
       | _, [ (s, (strl, _)) ] ->
@@ -874,7 +846,7 @@ let surname_print conf base not_found_fun x =
 (**/**)
 (* TODO: refactoring avec les fonctions ci-dessus !!! *)
 
-let search_surname conf base x =
+let search_surname conf base x : surname_search_result =
   let list, name_inj =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
@@ -906,93 +878,21 @@ let search_surname conf base x =
       list (Gwdb.IperSet.empty, [])
   in
   let iperl = Gwdb.IperSet.elements iperl in
-  let bhl = select_ancestors conf base name_inj iperl in
-  let bhl =
-    List.map
-      (fun bh ->
-        {
-          bh_ancestor = Util.pget conf base bh.bh_ancestor;
-          bh_well_named_ancestors =
-            List.map (Util.pget conf base) bh.bh_well_named_ancestors;
-        })
-      bhl
-  in
+  let bhl = branch_list_of_ipers conf base name_inj iperl in
+  { iperl; list; name_inj; bhl }
+
+let sn_search_result_is_empty { list; iperl; name_inj; bhl } =
   match (bhl, list) with
-  | [], _ -> []
-  | _, [ (_, (_, iperl)) ] -> iperl
-  | _ -> []
+  | [], _ | _, [ (_, (_, [])) ] -> true
+  | _, [ (_, (_, iperl)) ] -> false
+  | _ -> true
 
-let search_surname_print conf base not_found_fun x =
-  let list, name_inj =
-    if Util.p_getenv conf.Config.env "t" = Some "A" then
-      (persons_of_absolute_surname conf base x, fun x -> x)
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 942, 29)))
-    else
-      persons_of_fsname conf base Gwdb.base_strings_of_surname
-        (Gwdb.spi_find (Gwdb.persons_of_surname base))
-        Gwdb.get_surname x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  let iperl, _ =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-        let len = List.length iperl1 in
-        let strl =
-          try
-            let len1 = List.assoc str strl in
-            (str, len + len1) :: List.remove_assoc str strl
-          with Not_found -> (str, len) :: strl
-        in
-        (List.fold_right Gwdb.IperSet.add iperl1 iperl, strl))
-      list (Gwdb.IperSet.empty, [])
-  in
-  let iperl = Gwdb.IperSet.elements iperl in
-  (* Construction de la table des sosa de la base *)
-  let () = SosaCache.build_sosa_ht conf base in
-  match Util.p_getenv conf.Config.env "o" with
-  | Some "i" ->
-      let pl =
-        List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
-      in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-            if
-              (not (Util.is_hide_names conf p))
-              || Util.authorized_age conf base p
-            then p :: pl
-            else pl)
-          pl []
-      in
-      print_family_alphabetic x conf base pl
-  | _ -> (
-      let bhl = select_ancestors conf base name_inj iperl in
-      let bhl =
-        List.map
-          (fun bh ->
-            {
-              bh_ancestor = Util.pget conf base bh.bh_ancestor;
-              bh_well_named_ancestors =
-                List.map (Util.pget conf base) bh.bh_well_named_ancestors;
-            })
-          bhl
-      in
-      match (bhl, list) with
-      | [], _ -> not_found_fun conf x
-      | _, [ (s, (strl, _)) ] ->
-          print_one_surname_by_branch conf base x strl (bhl, s)
-      | _ ->
-          let strl = List.map (fun (s, _) -> s) list in
-          print_several_possible_surnames x conf base (bhl, strl))
+let search_surname_print = surname_print
 
-let search_first_name conf base x =
+type first_name_search_result =
+  (string * (Ext_string.Set.t * Gwdb.iper list)) list
+
+let search_first_name conf base x : first_name_search_result =
   let list, _ =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
       ( persons_of_absolute_first_name conf base x,
@@ -1012,25 +912,7 @@ let search_first_name conf base x =
   in
   List.fold_right merge_insert list []
 
-let search_first_name_print conf base x =
-  let list, _ =
-    if Util.p_getenv conf.Config.env "t" = Some "A" then
-      ( persons_of_absolute_first_name conf base x,
-        fun _ -> raise (Match_failure ("src/some.ml", 1025, 51)) )
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 1026, 29)))
-    else
-      persons_of_fsname conf base Gwdb.base_strings_of_first_name
-        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
-        Gwdb.get_first_name x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (Ext_string.Set.add str Ext_string.Set.empty, iperl)))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
+let search_first_name_print conf base list x =
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match list with
@@ -1050,3 +932,5 @@ let search_first_name_print conf base x =
       in
       first_name_print_list conf base x strl pl
   | _ -> select_first_name conf x list
+
+let fn_search_result_is_empty l = l = []

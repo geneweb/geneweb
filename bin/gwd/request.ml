@@ -22,22 +22,23 @@ let find_all conf base an =
   match sosa_ref, sosa_nb with
   | Some p, Some n ->
     if n <> Sosa.zero then
-      match Geneweb.Util.branch_of_sosa conf base n p with
-        Some (p :: _) -> [p], true
+      match Geneweb.Util.p_of_sosa conf base n p with
+      | Some p -> [ p ], true
       | _ -> [], false
     else [], false
   | _ ->
     let acc = Geneweb.SearchName.search_by_key conf base an in
-    if acc <> [] then acc, false
-    else
-      ( Geneweb.SearchName.search_key_aux begin fun conf base acc an ->
-            let spl = select_std_eq conf base acc an in
-            if spl = [] then
-              if acc = [] then Geneweb.SearchName.search_by_name conf base an
-              else acc
-            else spl
-          end conf base an
-      , false )
+    match acc with
+    | Some acc -> [ acc ], false
+    | None ->
+      Geneweb.SearchName.search_key_aux begin fun conf base acc an ->
+        let spl = select_std_eq conf base acc an in
+        if spl = [] then
+          if acc = [] then Geneweb.SearchName.search_by_name conf base an
+          else acc
+        else spl
+      end conf base an
+    , false
 
 let relation_print conf base p =
   let p1 =
@@ -622,7 +623,9 @@ let treat_request =
            w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeIndOkDisplay.print_mod_merge
         | "N" ->
           w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
-            | Some v -> Geneweb.Search_name_display.surname_print conf base Geneweb.Search_name_display.surname_not_found v
+            | Some v ->
+              let sres = Geneweb.Search_name_display.search_surname conf base v in
+              Geneweb.Search_name_display.surname_print conf base Geneweb.Search_name_display.surname_not_found sres v
             | _ -> Geneweb.AllnDisplay.print_surnames conf base
           end
         | "NG" -> w_base @@ begin fun conf base ->
@@ -652,7 +655,8 @@ let treat_request =
                 let (pl, sosa_acc) = find_all conf base n in
                 match pl with
                 | [] ->
-                  Geneweb.Search_name_display.surname_print conf base unknown n
+                  let sres = Geneweb.Search_name_display.search_surname conf base n in
+                  Geneweb.Search_name_display.surname_print conf base unknown sres n
                 | [p] ->
                   if sosa_acc
                   || Gutil.person_of_string_key base n <> None
@@ -669,7 +673,8 @@ let treat_request =
                   | Some fn, None ->
                     Geneweb.Search_name_display.first_name_print conf base fn
                   | None, Some sn ->
-                    Geneweb.Search_name_display.surname_print conf base unknown sn
+                    let sres = Geneweb.Search_name_display.search_surname conf base sn in
+                    Geneweb.Search_name_display.surname_print conf base unknown sres sn
                   | None, None -> incorrect_request conf base
               end
             | Some i ->
