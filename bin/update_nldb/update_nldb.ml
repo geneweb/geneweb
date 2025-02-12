@@ -2,9 +2,18 @@ open Geneweb
 open Def
 open Gwdb
 
+let debug = ref false
 let fname = ref ""
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
-let speclist = []
+
+let speclist =
+  [
+    ( "-bd",
+      Arg.String Secure.set_base_dir,
+      "<DIR> Specify where the “bases” directory with databases is installed \
+       (default if empty is “.”)." );
+    ("-debug", Arg.Set debug, " Debug mode.");
+  ]
 
 let anonfun s =
   if !fname = "" then fname := s
@@ -185,6 +194,8 @@ let compute base bdir =
   ProgrBar.start ();
   Gwdb.Collection.iteri
     (fun i p ->
+      if !debug then
+        Printf.eprintf "Person: (%d) %s\n" i (Gutil.designation base p);
       ProgrBar.run i nb_ind;
       Buffer.reset buffer;
       add_string @@ get_notes p;
@@ -223,6 +234,9 @@ let compute base bdir =
   ProgrBar.start ();
   Gwdb.Collection.iteri
     (fun i fam ->
+      (if !debug then
+       let fath = Gwdb.poi base (Gwdb.get_father fam) in
+       Printf.eprintf "Family: (%d) %s\n" i (Gutil.designation base fath));
       ProgrBar.run i nb_fam;
       Buffer.reset buffer;
       add_string @@ get_comment fam;
@@ -254,18 +268,18 @@ let compute base bdir =
   save_cache_linked_pages bdir cache_linked_pages
 
 let main () =
+  Secure.set_base_dir ".";
   Arg.parse speclist anonfun errmsg;
   if !fname = "" then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
-  Secure.set_base_dir (Filename.dirname !fname);
-  let base = Gwdb.open_base !fname in
+  let base = Gwdb.open_base (Filename.concat (Secure.base_dir ()) !fname) in
   Sys.catch_break true;
   let () = load_strings_array base in
   let () = load_unions_array base in
-  try compute base !fname
+  try compute base (Filename.concat (Secure.base_dir ()) !fname)
   with Sys.Break ->
     Printf.eprintf "\n";
     flush stderr;
