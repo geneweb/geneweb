@@ -999,7 +999,12 @@ let reconstitute_date_dmy conf var =
   let d =
     let day = get_number var "dd" conf.env in
     match int_of_field y with
-    | None -> None
+    | None ->
+        let is_specified component =
+          Option.fold ~none:false ~some:(Fun.negate @@ Int.equal 0) component
+        in
+        if is_specified day || is_specified m then bad_date conf `Missing_year
+        else None
     | Some y -> (
         let prec =
           match prec with
