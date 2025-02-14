@@ -49,10 +49,11 @@ let section_level s len =
   loop 1 (len - 2) 4
 
 (* Creates an edit button with consistent styling *)
-let make_edit_button conf fnotes ?(cnt = None) () =
+let make_edit_button conf mode fnotes ?(cnt = None) () =
   let href =
-    Printf.sprintf "%sm=MOD_NOTES&f=%s%s"
+    Printf.sprintf "%sm=MOD_%s&f=%s%s"
       (commd conf :> string)
+      mode
       (Mutil.encode fnotes :> string)
       (match cnt with None -> "" | Some n -> "&v=" ^ string_of_int n)
   in
@@ -400,8 +401,8 @@ let summary_of_tlsw_lines conf short lines =
     (lines, sections_nums)
 
 let modify_link conf cnt _empty = function
-  | Some (_, _, sfn) when conf.wizard ->
-      make_edit_button conf sfn ~cnt:(Some cnt) ()
+  | Some (_, mode, sfn) when conf.wizard ->
+      make_edit_button conf mode sfn ~cnt:(Some cnt) ()
   | _ -> ""
 
 let rec tlsw_list tag1 tag2 lev list sl =
