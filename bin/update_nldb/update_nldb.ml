@@ -41,7 +41,7 @@ let notes_links s =
   loop [] [] 1 0
 
 let read_file_contents fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
+  match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic -> (
       let len = ref 0 in
       try
@@ -50,7 +50,9 @@ let read_file_contents fname =
           loop ()
         in
         loop ()
-      with End_of_file -> Buff.get !len)
+      with End_of_file ->
+        close_in ic;
+        Buff.get !len)
   | None -> ""
 
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
