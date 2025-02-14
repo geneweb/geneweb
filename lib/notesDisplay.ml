@@ -51,7 +51,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     else ""
   in
   let modbtn =
-    if conf.wizard then Wiki.make_edit_button conf fnotes () else ""
+    if conf.wizard then Wiki.make_edit_button conf "NOTES" fnotes () else ""
   in
   Output.printf conf {|<div class="d-flex mb-3">%s%s</div>|} title_html modbtn;
   let file_path = file_path conf base in

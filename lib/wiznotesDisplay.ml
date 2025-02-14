@@ -19,6 +19,12 @@ let read_auth_file fname bname =
           String.sub au.au_info 0 k
         with Not_found -> au.au_user
       in
+      let wizname =
+        try
+          let k = String.index wizname '|' in
+          String.sub au.au_info 0 k
+        with Not_found -> wizname
+      in
       let wizname, wizorder, islash =
         try
           let i = String.index wizname '/' in
