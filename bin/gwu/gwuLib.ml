@@ -1352,7 +1352,7 @@ let connected_families base fam_sel ifam cpl =
   loop [ ifam ] [] [ get_father cpl ]
 
 let read_file_contents fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
+  match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic -> (
       let len = ref 0 in
       try
@@ -1361,7 +1361,9 @@ let read_file_contents fname =
           loop ()
         in
         loop ()
-      with End_of_file -> Buff.get !len)
+      with End_of_file ->
+        close_in ic;
+        Buff.get !len)
   | None -> ""
 
 type separate = ToSeparate | NotScanned | BeingScanned | Scanned
