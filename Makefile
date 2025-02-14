@@ -54,7 +54,7 @@ VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
-lib/version.ml:
+lib/version.ml: lib/version.txt .git/HEAD .git/index
 	@cp lib/version.txt $@
 	@printf 'let branch = "$(BRANCH)"\n' >> $@
 	@printf 'let src = "$(SOURCE)"\n' >> $@
@@ -62,6 +62,7 @@ lib/version.ml:
 	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
 	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
 	@printf 'Generating $@… Done.\n'
+.PHONY: build fmt gwd install
 
 # Patch/unpatch files for campl5 >= 8.03
 CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
@@ -98,30 +99,10 @@ endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 .PHONY: patch_files unpatch_files info
 
-GENERATED_FILES_DEP = \
-	lib/version.ml \
-	lib/dune \
-	lib/gwdb/dune \
-	lib/core/dune \
-	lib/util/dune \
-	lib/ancient/dune \
-	benchmark/dune \
-	bin/connex/dune \
-	bin/cache_files/dune \
-	bin/consang/dune \
-	bin/fixbase/dune \
-	bin/ged2gwb/dune \
-	bin/gwb2ged/dune \
-	bin/gwc/dune \
-	bin/gwd/dune \
-	bin/gwdiff/dune \
-	bin/gwgc/dune \
-	bin/gwu/dune \
-	bin/setup/dune \
-	bin/update_nldb/dune \
-	test/dune \
+DUNE_IN_FILES := $(shell find lib bin test -name "dune.in")
+DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
 
-generated: $(GENERATED_FILES_DEP)
+generated: $(DUNE_FILES) lib/version.ml
 	@printf "Done.\n"
 
 fmt build gwd install uninstall: info patch_files generated
