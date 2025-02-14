@@ -9,7 +9,7 @@ type update_error =
   | UERR_already_defined of Gwdb.base * Gwdb.person * string
   | UERR_own_ancestor of Gwdb.base * Gwdb.person
   | UERR_digest
-  | UERR_bad_date of Date.dmy
+  | UERR_bad_date of [ `Missing_year | `Date of Date.dmy ]
   | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of Gwdb.base * Gwdb.person
   | UERR_missing_surname of Adef.safe_string
@@ -111,7 +111,7 @@ val digest_family :
 val reconstitute_date : Config.config -> string -> Date.date option
 val print_someone : Config.config -> Gwdb.base -> Gwdb.person -> unit
 val update_conf : Config.config -> Config.config
-val bad_date : Config.config -> Date.dmy -> 'a
+val bad_date : Config.config -> [ `Missing_year | `Date of Date.dmy ] -> 'a
 val check_greg_day : Config.config -> Date.dmy -> unit
 
 val check_missing_witnesses_names :
