@@ -221,6 +221,10 @@ let search_in_assets = search_in_path Secure.assets
 
 (* Internationalization *)
 
+let start_with s i p =
+  i + String.length p <= String.length s
+  && String.lowercase_ascii (String.sub s i (String.length p)) = p
+
 let start_with_vowel conf s =
   if String.length s > 0 then
     let s, _ = Name.unaccent_utf_8 true s 0 in
@@ -779,8 +783,11 @@ let is_restricted (conf : config) base (ip : iper) =
   in
   if conf.use_restrict then base_visible_get base fct ip else false
 
-let pget (conf : config) base ip =
-  if is_restricted conf base ip then Gwdb.empty_person base ip else poi base ip
+let pget_opt conf base ip =
+  if is_restricted conf base ip then None else Some (poi base ip)
+
+let pget conf base ip =
+  Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
 let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 
@@ -799,8 +806,6 @@ let is_public conf base p =
      && get_access p = IfTitles
      && nobtit conf base p <> []
   || is_old_person conf (gen_person_of_person p)
-
-let is_semi_public _conf _base p = get_access p = SemiPublic
 
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
@@ -829,6 +834,13 @@ let accessible_by_key conf base p fn sn =
 (*  [Fonc] acces_n : config -> base -> string -> person -> string         *)
 
 (* ********************************************************************** *)
+
+let access_status p =
+  match get_access p with
+  | Private -> "Private"
+  | SemiPublic -> "SemiPublic"
+  | Public -> "Public"
+  | IfTitles -> "IfTitles"
 
 (** [Description] : Renvoie les paramètres URL pour l'accès à la nième
                     personne.
@@ -876,15 +888,18 @@ let acces conf base x = acces_n conf base (Adef.escaped "") x
 (**/**)
 
 let restricted_txt = Adef.safe "....."
-let x_x_txt = Adef.safe "x x"
 
-let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
+let private_txt conf k =
+  match k with
+  | "p" -> transl conf "hidden first_name"
+  | "n" -> transl conf "hidden surname"
+  | _ -> transl conf "hidden person"
+
+let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
   let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
-  else if chk && is_hide_names conf p && not (authorized_age conf base p) then
-    x_x_txt
-  else
+  else if !GWPARAM.p_auth_sp conf base p then
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
       | "", nn :: _ ->
@@ -899,6 +914,7 @@ let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
     if sn then
       match p_surname base p with "" -> beg | sn -> beg ^^^ " " ^<^ esc sn
     else beg
+  else Adef.safe (private_txt conf "")
 
 let main_title conf base p =
   let titles = nobtit conf base p in
@@ -1431,10 +1447,6 @@ let message_to_wizard conf =
 let doctype = Adef.safe "<!DOCTYPE html>"
 
 let http_string s i =
-  let start_with s i p =
-    i + String.length p <= String.length s
-    && String.lowercase_ascii (String.sub s i (String.length p)) = p
-  in
   let http = "http://" in
   let https = "https://" in
   let http, start_with_http =
@@ -1577,6 +1589,8 @@ let expand_env =
         loop 0
     | _ -> s
 
+(* in srcfileDisplay, there is a macro function with many more macros! *)
+(* not necessarily easy to transpose in this context (base absent) *)
 let string_with_macros conf env s =
   let start_with s i p =
     i + String.length p <= String.length s
@@ -2052,18 +2066,22 @@ let find_person_in_env_pref conf base pref =
     (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
-  let auth, fn, sn =
+  let auth =
     match person_of_key base fn sn oc with
-    | Some ip ->
-        if authorized_age conf base (pget conf base ip) then
-          let p = poi base ip in
-          (true, sou base (get_first_name p), sou base (get_surname p))
-        else (false, "x", "x")
-    | None -> (false, fn, sn)
+    | Some ip -> authorized_age conf base (pget conf base ip)
+    | None -> false
   in
   match List.assoc_opt "red_if_not_exist" conf.base_env with
-  | Some "off" -> (true, fn, sn)
-  | Some _ | None -> (auth, fn, sn)
+  | Some "off" -> true
+  | Some _ | None -> auth
+
+let mark_if_not_public conf base (fn, sn, oc) =
+  match p_getenv conf.env "red_if_not_public" with
+  | Some "on" -> (
+      match person_of_key base fn sn oc with
+      | Some ip -> get_access (poi base ip) <> Public
+      | None -> false)
+  | _ -> false
 
 let default_sosa_ref conf base =
   match List.assoc_opt "default_sosa_ref" conf.base_env with

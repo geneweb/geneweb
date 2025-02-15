@@ -9450,6 +9450,18 @@ pt: não mostrar os retratos
 sv: dölj personbilder
 tr: portreleri gizle
 
+    hiddden person
+en: hidden person
+fr: individu masqué
+
+    hiddden first_name
+en: hidden first name
+fr: prénom masqué
+
+    hiddden surname
+en: hidden surname
+fr: patronyme masqué
+
     hierarchical navigation
 af: kies 'n inskrywing in die hierargiese navigasie
 bg: изберете запис в йерархичната навигация
@@ -9798,7 +9810,7 @@ sv: om titlar
 tr: eğer başlıklar
 
     iftitles/public/semipublic/private
-co: s’è tituli/publicu/semipublicu/privatu
+co: s’è tituli/publicu/semi-public/privatu
 de: Adelstitel/öffentlich/half-public/privat
 en: if titles/public/half-public/private
 es: si hay títulos/público/half-public/privado
@@ -15957,6 +15969,14 @@ sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
 
+    family mode
+en: family mode
+fr: mode famille
+
+    family mode-hlp
+en: extend the SemiPublic status to family members
+fr: étendre le statut SemiPublic aux membres de la famille
+
     exact-hlp
 en: exact match (word level)
 fr: comparaison exacte mot par mot
@@ -19731,6 +19751,14 @@ ru: просмотр первоисточника
 sk: pozri zdroj
 sv: se källa
 tr: kaynağı görüntüle
+
+    visibility
+en: visibility
+fr: visibilité
+
+    visibility-hlp
+en: help for visibility of individuals
+fr: aide pour la visibilité des individus
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
