@@ -465,7 +465,6 @@ let date_lexer =
   ; Token.tok_match = tparse
   ; Token.tok_text = (fun _ -> "<tok>")
   ; Token.tok_comm = None
-  ; Token.kwds = Hashtbl.create 10
   }
 
 type 'a range =
