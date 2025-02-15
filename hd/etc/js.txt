@@ -441,6 +441,8 @@ const inputToBook = {
 };
 %end;
 %if;is_welcome;
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
 function initializeWelcomeSearchFunctionality() {
   const searchForms = {
     main: document.getElementById('main-search'),
@@ -449,15 +451,15 @@ function initializeWelcomeSearchFunctionality() {
   const searchBtn = document.getElementById('global-search');
 
   function hasInput(form) {
-    return Array.from(form.querySelectorAll('input[type="search"]'))
-                .some(input => input.value.trim() !== '');
+    return form && Array.from(form.querySelectorAll('input[type="search"]'))
+                      .some(input => input.value.trim() !== '');
   }
 
   function getTooltip() {
     if (hasInput(searchForms.main)) {
       return '[*search/case sensitive]0 [person/persons]0';
     }
-    if (hasInput(searchForms.title)) {
+    if (searchForms.title && hasInput(searchForms.title)) {
       return '[*search/case sensitive]0 [title/titles]0/[estate]0';
     }
     return '';
@@ -469,6 +471,8 @@ function initializeWelcomeSearchFunctionality() {
   });
 
   Object.values(searchForms).forEach(form => {
+    if (!form) return;
+    
     form.querySelectorAll('input[type="search"]').forEach(input => {
       input.addEventListener('input', () => {
         $(searchBtn).tooltip('hide')
@@ -486,8 +490,12 @@ function initializeWelcomeSearchFunctionality() {
   });
 
   searchBtn.addEventListener('click', () => {
-    if (hasInput(searchForms.main)) searchForms.main.submit();
-    else if (hasInput(searchForms.title)) searchForms.title.submit();
+    if (hasInput(searchForms.main)) {
+      searchForms.main.submit();
+    }
+    else if (searchForms.title && hasInput(searchForms.title)) {
+      searchForms.title.submit();
+    }
   });
 }
 %end;
