@@ -45,11 +45,11 @@
         <i class="fa fa-bug fa-fw fa-xs p-0"></i>%nn;
       </div>
     %end;
-    %if;(b.alt_serv_base!="" and (roglo!=1 or (roglo=1 and wizard)) and not cgi)
+    %if;(b.alt_serv_base!="" and (not roglo or (roglo and wizard)) and not cgi)
       <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
         href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
           %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
-        title="[*go to alt base]0%if;(b.roglo=1) Roglo%end;%sp;
+        title="[*go to alt base]0%if;roglo; Roglo%end;%sp;
           %if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?…
           %if;(e.i!="")[go to alt base]1%end;">
        <i class="fa fa-arrow-right%if;wizard; text-success%end; fa-fw fa-xs p-0"></i></a>
