@@ -42,10 +42,16 @@
       <input type="hidden" name="m" value="NG">
       <span>[*relationship shortcut][:]</span>
       <div class="mt-1 ml-2">
+        %if;((user.index!="" and not browsing_with_sosa_ref) or (browsing_with_sosa_ref and user.index!=sosa_ref.index))
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_user" name="select" value="%user.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_user">%user.ident; ([user/password/cancel]0)</label>
+          </div>
+        %end;
         %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index)
           <div class="custom-control custom-radio">
             <input type="radio" class="custom-control-input" id="sel_sosa" name="select" value="%sosa_ref.index;" onclick="main()">
-            <label class="custom-control-label" for="sel_sosa"><i class="far fa-circle-dot text-success mr-1"></i><b>%sosa_ref;</b> ([Sosa] 1)</label>
+            <label class="custom-control-label" for="sel_sosa"><b>%sosa_ref;</b> (<i class="far fa-circle-dot fa-xs text-success mr-1"></i>[Sosa] 1)</label>
           </div>
         %end;
         %foreach;family;
