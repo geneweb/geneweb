@@ -143,28 +143,7 @@
               <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span></a>
           </li>
           %( WIZARD | MOD_IND button %)
-          %( pour Roglo, aller sur base Wizard! pb authentification %)
           %if;(iswiz=1)
-            %if;(roglo=1)
-              <li class="nav-item">
-                %if;(b.name = "wizard")
-                    <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active%end;"
-                     href="%if;(b.http_mode="https" and cgi)%b.commd;?b=wizard;w=%user.passwd;&%else;%prefix;%end;%nn;
-                     &m=MOD_IND;i=%index;"
-                     title="Modify person">
-                     <span class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></span>%nn;
-                     <span class="sr-only">[*modify::person/persons]0 (P)</span></a>
-                %else;
-                  <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active%end;"
-                     href="%if;(b.http_mode="https" and cgi)%b.commd;?b=wizard;w=%user.passwd;&%else;%b.Base_Wiz;_w?%end;%nn;
-                     &lang=%e.lang;&%if;(evar.templ!="")templ=%evar.templ;%end;
-                     &m=MOD_IND&i=%index;&o=%occ;"
-                     title="Modify person on wizard base">
-                     <span class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></span>%nn;
-                     <span class="sr-only">[*modify::person/persons]0 on wizard base(P)</span></a>
-                %end;
-              </li>
-            %end;
             <li class="nav-item">
               <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active%end;" id="mod_ind" href="%prefix;m=MOD_IND&i=%index;" %laP;>%nn;
                 <span class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></span>%nn;
@@ -230,7 +209,9 @@
                 <a class="dropdown-item" href="%prefix;m=MRG&i=%index;" title="[*merge] %first_name;.%occ; %surname; [with]…"><span class="fa fa-compress fa-fw text-danger mr-2"></span>[*merge::person/persons]1</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=DEL_IND&i=%index;" title="[*delete] %self;"><span class="fa fa-trash-can fa-fw text-danger mr-2"></span>[*delete::person/persons]0</a>
                 %if;has_possible_duplications;
-                  <a class="dropdown-item" href="%prefix;m=MRG_DUP&ip=%index;">[*merge::possible duplications]</a>
+                  <a class="dropdown-item" href="%prefix;m=MRG_DUP&ip=%index;">
+                    <i class="fa fa-wrench fa-fw mr-2"></i>%nn;
+                    [*merge::possible duplications]</a>
                 %end;
                 %if;(b.history_diff="yes" and has_history)
                   <div class="dropdown-divider"></div>
@@ -300,7 +281,7 @@
               %if;(wizard and ((birth_date.year!="" and birth_date.year>1870) or (death_date.year!="" and death_date.year>1970) or not is_dead))
               <a class="dropdown-item" role="button" title="[*search Insee]"
                 href="https://deces.matchid.io/search?advanced=true%nn;
-                &ln=%surname;&fn=%first_name;&bd=%slash_birth_date;">
+                &ln=%surname;&fn=%first_name;%if;(slash_birth_date!="")&bd=%slash_birth_date;%end;%if;(birth_place!="")&bc=%birth_place;%end;">
                 <i class="fa fa-magnifying-glass fa-fw mr-2"></i>%nn;
                 %apply;searchinsee(self)</a>
               %end;
