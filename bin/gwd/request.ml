@@ -552,7 +552,7 @@ let treat_request =
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
-          w_wizard @@ w_base @@ fun conf base ->
+          w_base @@ fun conf base ->
             ( match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f
             | None -> incorrect_request conf base ~comment:"Missing v= for m=H")
