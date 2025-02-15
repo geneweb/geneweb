@@ -433,20 +433,17 @@
               <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;>
                 <span class="fa fa-gear fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
-              %if;(user.key!="")
-                <a class="dropdown-item"
-                 title="[*path to me]"
-                 %( TODO: create i=%user.index; in templ.ml when conf.userip is merged to avoid %20 for spaces in key in URL %)
-                 href="%prefix;&em=R&t=PN&et=S&ei=%index;&n=%user.key;&spouse=on&long=on">
+              %if;(user.index!="")
+                <a class="dropdown-item" title="[*path to me]"
+                 href="%prefix;&em=R&t=PN&et=S&ei=%index;&i=%user.index;&spouse=on&long=on">
                  <i class="fa fa-arrows fa-fw mr-2"></i>[*path to]0</a>
               %end;
-              %( TODO: don't print if sosa_ref.index=user.index that is the same as previous shortest path in that case %)
-              %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index)
-                <a class="dropdown-item"
-                 title="[*path to Sosa 1]"
+              %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index and user.index!=sosa_ref.index)
+                <a class="dropdown-item" title="[*path to Sosa 1]"
                  href="%prefix;&em=R&t=PN&et=S&ei=%index;&i=%sosa_ref.index;&spouse=on&long=on">
                  <i class="fa fa-arrows fa-fw mr-2"></i>[*path to]1</a>
               %end;
+              <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="%prefix;m=C&%access;&v=5"
                 title="[*relationship link/relationship links]0 [with] [close family]"><span class="fa fa-elevator fa-fw mr-2"></span>[*relationship]</a>
               <div class="dropdown-divider"></div>
