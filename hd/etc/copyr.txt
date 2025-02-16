@@ -23,8 +23,8 @@
   [*branch %s compiled on %s from commit:::x:y]0%nn;
 %end;
 %if;(not cancel_links)
-  <div class="d-flex flex-column flex-sm-row ml-auto justify-content-center justify-content-lg-end m-2" id="copyr">
-    <div class="d-flex align-self-center justify-content-center">
+  <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
+    <div class="d-flex align-items-center mx-0 border-0">
     %if;(e.templ="")
       <div class="btn-group dropup" data-toggle="tooltip" data-placement="left"
         title="%apply;language_name(lang) – [*select lang]">
@@ -78,10 +78,10 @@
       </div>
     %end;
     %if;(connections.total!="")
-      <div class="d-flex flex-column align-items-center text-center ml-2 small">
-        %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends; %nn;
-          %if;(connections.friends=1)[wizard/wizards/friend/friends/exterior]2
-          %else;[wizard/wizards/friend/friends/exterior]3
+      <div class="d-flex flex-column justify-items-center align-items-center small ml-1 ml-md-3">
+        %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends;
+          %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2
+          %else; [wizard/wizards/friend/friends/exterior]3
           %end;</span>
         %end;
         %if;(connections.wizards!="" and connections.wizards>0)
@@ -92,7 +92,6 @@
           %if;(connections.wizards=1)[wizard/wizards/friend/friends/exterior]0
           %else;[wizard/wizards/friend/friends/exterior]1
           %end;
-            <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
           %if;(wizard)</a>%end;
         %end;
         %if;(connections.total>0)<span>%connections.total; %nn;
@@ -103,7 +102,7 @@
       </div>
     %end;
     </div>
-    <div class="d-inline-flex flex-column justify-content-md-end align-self-center mt-1 mt-md-0 ml-sm-3">
+    <div class="d-inline-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
       <div class="ml-auto">
         <a role="button" class="mr-1"
           %( button to switch only between default and templm templates %)
