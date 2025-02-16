@@ -1704,6 +1704,10 @@ span.notesourcecolor {
   gap: 0.5rem;
 }
 
+#welcome .flex-wrap {
+  gap: 0.25rem;
+}
+
 .imap-gallery {
   width: 250px;
   margin-bottom: 1rem;
