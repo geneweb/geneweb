@@ -407,7 +407,7 @@ function addClearButtonToInputs() {
 </script>
 %end;
 <script>
-%if;(wizard and (is_welcome or "MOD_" in e.m))
+%if;(wizard and (is_welcome or "ADD_FAM" in e.m or "MOD_" in e.m))
 // Manages enhanced input field behaviors (navigation, interaction)
 const inputToBook = {
   addNavigation: function() {
