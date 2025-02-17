@@ -24,9 +24,9 @@
 %end;
 %define;addgraph(xxx)[*add/clear/show/edit the graph:::xxx]0%end;
 %if;(not cancel_links)
-  <nav class="navbar sticky-top navbar-light bg-white justify-content-center navbar-expand-md pt-0 px-0%sp;
+  <nav class="navbar sticky-top navbar-light justify-content-center navbar-expand-md pt-0 px-0%sp;
     %if;("MOD" in e.m or (e.ip!="" and "ADD" in e.m))mt-5%else;mt-1 mt-md-0%end;">
-    <div class="btn-toolbar bg-white" role="toolbar">
+    <div class="btn-toolbar" role="toolbar">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -127,7 +127,7 @@
           %( WIZARD | ADD_PAR button %)
           %if;(iswiz=1 and not has_parents and first_name!="?" and surname!="?")
             <li class="nav-item">
-              <a class="nav-link %if;(e.m="ADD_PAR" or e.m="ADD_PAR_OK")active%end;" id="add_par"   
+              <a class="nav-link %if;(e.m="ADD_PAR" or e.m="ADD_PAR_OK")active%end;" id="add_par"
                 href="%prefix;m=ADD_PAR&ip=%index;" %laL;>
                 <sup><span class="fa fa-user male" aria-hidden="true"></span></sup>%nn;
                 <sub><span class="fa fa-plus %sexcolor;" aria-hidden="true"></span></sub>%nn;
