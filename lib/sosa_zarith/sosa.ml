@@ -13,9 +13,9 @@ let half =
   fun x -> Z.div x two
 
 let add = Z.add
-let sub = Z.sub
-let mul x y = Z.mul x (Z.of_int y)
-let div x y = Z.div x (Z.of_int y)
+let sub z1 z2 = if Z.lt z1 z2 then invalid_arg "Sosa.sub" else Z.sub z1 z2
+let mul x y = Z.mul x (of_int y)
+let div x y = Z.div x (of_int y)
 let modl x y = Z.rem x (Z.of_int y)
 let exp = Z.pow
 let compare = Z.compare
@@ -55,7 +55,11 @@ let to_string_sep =
     Bytes.unsafe_to_string s
 
 let to_string = Z.to_string
-let of_string = Z.of_string
+
+let of_string i =
+  let z = Z.of_string i in
+  if Z.lt z Z.zero then failwith "Sosa.of_string" else z
+
 let gen x = Z.log2 x + 1
 
 let branches x =
