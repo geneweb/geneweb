@@ -57,8 +57,10 @@ let to_string_sep =
 let to_string = Z.to_string
 
 let of_string i =
-  let z = Z.of_string i in
-  if Z.lt z Z.zero then None else Some z
+  try
+    let z = Z.of_string i in
+    if Z.lt z Z.zero then None else Some z
+  with Invalid_argument _ -> None
 
 let gen x = Z.log2 x + 1
 
