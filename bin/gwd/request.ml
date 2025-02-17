@@ -182,14 +182,23 @@ let person_selected conf base p =
       Geneweb.Util.record_visited conf (Gwdb.get_iper p);
       Geneweb.Perso.print conf base p
 
-let person_selected_with_redirect conf base p =
+let person_selected_with_redirect ~conf ~base ?(parameters = []) ~person () =
   match Geneweb.Util.p_getenv conf.Geneweb.Config.senv "em" with
-  | Some "R" -> relation_print conf base p
+  | Some "R" -> relation_print conf base person
   | Some _ -> incorrect_request conf
   | None ->
       let open Def in
-      Wserver.http_redirect_temporarily
-        (Geneweb.Util.commd conf ^^^ Geneweb.Util.acces conf base p :> string)
+      let url =
+        (Geneweb.Util.commd conf ^^^ Geneweb.Util.acces conf base person
+          :> string)
+      in
+      let url =
+        List.fold_left
+          (fun url (param_name, param_value) ->
+            Printf.sprintf "%s&%s=%s" url param_name param_value)
+          url parameters
+      in
+      Wserver.http_redirect_temporarily url
 
 let updmenu_print = Geneweb.Perso.interp_templ "updmenu"
 
@@ -703,7 +712,9 @@ let treat_request =
                            sosa_acc
                            || Gutil.person_of_string_key base n <> None
                            || person_is_std_key conf base p n
-                         then person_selected_with_redirect conf base p
+                         then
+                           person_selected_with_redirect ~conf ~base ~person:p
+                             ()
                          else specify conf base n pl
                      | pl -> specify conf base n pl
                    in
