@@ -231,11 +231,11 @@
       </thead>
     %end;
     <tbody><tr align="%left;" class="clickable-row text-align %col" data-href="%prefix;m=FORUM&p=%message.pos;"
-      %if;(message.prev_date="") accesskey="1"%end;>
-      <td><samp>%if;(message.access="priv")*%end;</samp></td>
-      <td><samp>%message.hour;</samp></td>
-      <td class="%col;"><b>%message.ident.cut.26;</b></td>
-      <td>%nn;
+      %if;(message.prev_date="") accesskey="1"%end; style="line-height: 1">
+      <td class="py-1"><samp>%if;(message.access="priv")*%end;</samp></td>
+      <td class="py-1"><samp>%message.hour;</samp></td>
+      <td class="%col; py-1"><b>%message.ident.cut.26;</b></td>
+      <td class="py-1">%nn;
         %if;(message.subject="" or message.subject="-")
           <i>…&nbsp;%message.text.cut.80;</i>%nn;
         %else;
