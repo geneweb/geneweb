@@ -124,7 +124,7 @@
       %end;
     </div>
   </div>
-  <div class="bg-white my-0 order-3 order-md-2 flex-fill text-lg-center align-self-md-center">
+  <div class="my-0 order-3 order-md-2 flex-fill text-lg-center align-self-md-center">
     <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
     %if;(b.visitor_access!="no" or wizard or friend)
       <div class="d-flex justify-content-center">
