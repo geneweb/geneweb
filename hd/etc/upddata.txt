@@ -60,7 +60,7 @@
   <a tabindex="4" class="sr-only sr-only-focusable" href="#main-content">[*skip to main content]</a>
   %let;len_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
-  <nav class="navbar sticky-top bg-white justify-content-start py-1 mt-1 mb-0 px-1 mx-0" aria-labelledby="sub-caracter-selection-heading" id="fixed-nav">
+  <nav class="navbar sticky-top justify-content-start py-1 mt-1 mb-0 px-1 mx-0" aria-labelledby="sub-caracter-selection-heading" id="fixed-nav">
     <h2 id="sub-caracter-selection-heading" class="sr-only">
       %if;(e.s="")[*select a letter]%else;[*hierarchical navigation]%end;
     </h2>
@@ -194,7 +194,7 @@
                       %end;
                     </div>
                   %else;
-                    <div class="px-3 mx-0 bg-white"> </div>
+                    <div class="px-3 mx-0"> </div>
                   %end;
                   %if;is_modified;
                     <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-0%if;(e.data!="place") ml-sm-1%end;">

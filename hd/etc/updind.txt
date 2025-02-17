@@ -36,7 +36,7 @@
 %let;datalist_sources; list="datalist_sources" data-book="src"%in;
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <nav class="navbar navbar-light bg-white justify-content-center" id="banner">
+    <nav class="navbar navbar-light justify-content-center" id="banner">
       <nav class="nav nav-pills nav-fill">
         <a class="nav-item nav-link px-1 py-1" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
         <a class="nav-item nav-link px-1 py-1" href="#birth" title="[*birth]"><i class="fa fa-cake-candles fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
