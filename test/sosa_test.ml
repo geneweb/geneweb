@@ -20,6 +20,16 @@ let sosa_string () =
   (Alcotest.check Alcotest.string)
     "to_string zero" "0" (Sosa.to_string Sosa.zero);
   (Alcotest.check Alcotest.string) "to_string one" "1" (Sosa.to_string Sosa.one);
+  (Alcotest.check_raises "of_string (-1)") (Failure "Sosa.of_string") (fun () ->
+      ignore (Sosa.of_string "-1"));
+  (Alcotest.check_raises "inc Sosa.zero (-1)") (Invalid_argument "Sosa.of_int")
+    (fun () -> ignore (Sosa.inc Sosa.zero (-1)));
+  (Alcotest.check_raises "sub Sosa.zero Sosa.one") (Invalid_argument "Sosa.sub")
+    (fun () -> ignore (Sosa.sub Sosa.zero Sosa.one));
+  (Alcotest.check_raises "mul Sosa.one (-1)") (Invalid_argument "Sosa.of_int")
+    (fun () -> ignore (Sosa.mul Sosa.one (-1)));
+  (Alcotest.check_raises "div Sosa.one (-1)") (Invalid_argument "Sosa.of_int")
+    (fun () -> ignore (Sosa.div Sosa.one (-1)));
   ()
 
 let sosa_pp () =
