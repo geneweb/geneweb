@@ -378,7 +378,7 @@ let print_add_ok conf base =
       m_email = email;
       m_access = "";
       m_subject = subject;
-      m_wiki = "";
+      m_wiki = "on";
       m_text = text;
     }
   in
