@@ -571,4 +571,3 @@ val is_fully_visible_to_visitors :
 (** [is_fully_visible_to_visitors conf base p] is true iff [p] is fully visible for a visitor *)
 
 val is_public : Config.config -> Gwdb.base -> Gwdb.person -> bool
-val sosa_of_string : string -> Sosa.t option

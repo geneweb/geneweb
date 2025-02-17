@@ -62,7 +62,7 @@ val branches : t -> int list
 val of_int : int -> t
 (** Converts sosa from integer *)
 
-val of_string : string -> t
+val of_string : string -> t option
 (** Converts sosa from string *)
 
 val to_string : t -> string

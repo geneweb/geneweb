@@ -58,7 +58,7 @@ let to_string = Z.to_string
 
 let of_string i =
   let z = Z.of_string i in
-  if Z.lt z Z.zero then failwith "Sosa.of_string" else z
+  if Z.lt z Z.zero then None else Some z
 
 let gen x = Z.log2 x + 1
 

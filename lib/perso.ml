@@ -2042,7 +2042,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vsosa_ref (Some p) -> (
           let ip = Gwdb.get_iper p in
           let s0 = Sosa.of_string s in
-          match Util.branch_of_sosa conf base s0 (Util.pget conf base ip) with
+          match
+            Option.bind s0 (fun sosa ->
+                Util.branch_of_sosa conf base sosa (Util.pget conf base ip))
+          with
           | Some (p :: _) ->
               let p_auth = Util.authorized_age conf base p in
               eval_person_field_var conf base env (p, p_auth) loc sl
@@ -2052,7 +2055,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       (* %sosa_anc_p.sosa.first_name;
          direct access to a person whose sosa relative to current person
       *)
-      match Util.p_of_sosa conf base (Sosa.of_string s) a with
+      match
+        Option.bind (Sosa.of_string s) (fun sosa ->
+            Util.p_of_sosa conf base sosa a)
+      with
       | Some np ->
           let np_auth = Util.authorized_age conf base np in
           eval_person_field_var conf base env (np, np_auth) loc sl

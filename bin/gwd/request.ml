@@ -18,7 +18,7 @@ let select_std_eq conf base pl k =
 
 let find_all conf base an =
   let sosa_ref = Geneweb.Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
+  let sosa_nb = Sosa.of_string an in
   match sosa_ref, sosa_nb with
   | Some p, Some n ->
     if n <> Sosa.zero then

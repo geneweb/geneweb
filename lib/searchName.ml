@@ -109,7 +109,7 @@ let print_fiche conf base p =
   Perso.print conf base p
 
 let search_sosa conf base s =
-  match Util.sosa_of_string s with
+  match Sosa.of_string s with
   | Some sosa -> Option.to_list (search_by_sosa ~conf ~base ~sosa)
   | None -> []
 

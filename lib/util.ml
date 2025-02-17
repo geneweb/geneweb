@@ -2438,5 +2438,3 @@ let has_children base u =
       let des = Gwdb.foi base ifam in
       Array.length (Gwdb.get_children des) > 0)
     (Gwdb.get_family u)
-
-let sosa_of_string s = try Some (Sosa.of_string s) with _ -> None

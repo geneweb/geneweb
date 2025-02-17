@@ -1,6 +1,13 @@
 (* TODO Fmt *)
 let testable_sosa = Alcotest.testable Fmt.nop Sosa.eq
 
+let testable_sosa_opt =
+  Alcotest.testable Fmt.nop (fun s s2 ->
+      match (s, s2) with
+      | Some s, Some s2 -> Sosa.eq s s2
+      | None, None -> true
+      | _ -> false)
+
 let sosa_eq () =
   (Alcotest.check testable_sosa) "0 = 0" Sosa.zero Sosa.zero;
   (Alcotest.check testable_sosa) "1 = 1" Sosa.one Sosa.one;
@@ -14,14 +21,14 @@ let sosa_int () =
   ()
 
 let sosa_string () =
-  (Alcotest.check testable_sosa)
-    {|of_string "0"|} Sosa.zero (Sosa.of_string "0");
-  (Alcotest.check testable_sosa) {|of_string "1"|} Sosa.one (Sosa.of_string "1");
+  (Alcotest.check testable_sosa_opt)
+    {|of_string "0"|} (Some Sosa.zero) (Sosa.of_string "0");
+  (Alcotest.check testable_sosa_opt)
+    {|of_string "1"|} (Some Sosa.one) (Sosa.of_string "1");
   (Alcotest.check Alcotest.string)
     "to_string zero" "0" (Sosa.to_string Sosa.zero);
   (Alcotest.check Alcotest.string) "to_string one" "1" (Sosa.to_string Sosa.one);
-  (Alcotest.check_raises "of_string (-1)") (Failure "Sosa.of_string") (fun () ->
-      ignore (Sosa.of_string "-1"));
+  (Alcotest.check testable_sosa_opt) "of_string (-1)" None (Sosa.of_string "-1");
   (Alcotest.check_raises "inc Sosa.zero (-1)") (Invalid_argument "Sosa.of_int")
     (fun () -> ignore (Sosa.inc Sosa.zero (-1)));
   (Alcotest.check_raises "sub Sosa.zero Sosa.one") (Invalid_argument "Sosa.sub")
