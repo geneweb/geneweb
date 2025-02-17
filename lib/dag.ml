@@ -19,7 +19,10 @@ let get_dag_elems conf base =
     match (po, so) with
     | Some p, Some s ->
         let set =
-          match Util.branch_of_sosa conf base (Sosa.of_string s) p with
+          match
+            Option.bind (Sosa.of_string s) (fun sosa ->
+                Util.branch_of_sosa conf base sosa p)
+          with
           | Some ipsl ->
               List.fold_left
                 (fun set p -> Pset.add (Gwdb.get_iper p) set)

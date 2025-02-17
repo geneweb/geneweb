@@ -444,10 +444,11 @@ let int_of e = function
 
 let num_of e = function
   | TemplAst.VVstring s -> (
-      try Sosa.of_string s
-      with Failure _ ->
-        raise_with_loc (loc_of_expr e)
-          (Failure ("num value expected\nFound = " ^ s)))
+      match Sosa.of_string s with
+      | Some sosa -> sosa
+      | None ->
+          raise_with_loc (loc_of_expr e)
+            (Failure ("num value expected\nFound = " ^ s)))
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "num value expected")
 

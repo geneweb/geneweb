@@ -33,20 +33,11 @@ let select_approx_key conf base pl k =
 
 (* search functions *)
 
-let search_by_sosa conf base an =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
-  match (sosa_ref, sosa_nb) with
-  | Some p, Some n ->
-      if n <> Sosa.zero then
-        match
-          Util.branch_of_sosa conf base n
-            (Util.pget conf base @@ Gwdb.get_iper p)
-        with
-        | Some (p :: _) -> [ p ]
-        | _ -> []
-      else []
-  | _ -> []
+let search_by_sosa ~conf ~base ~sosa =
+  if Sosa.eq sosa Sosa.zero then None
+  else
+    Option.bind (Util.find_sosa_ref conf base) (fun sosa_ref ->
+        Util.p_of_sosa conf base sosa sosa_ref)
 
 let search_reject_p conf base p =
   empty_sn_or_fn base p
@@ -109,72 +100,20 @@ let search_approx_key = search_key_aux select_approx_key
 
 (* recherche par clé, i.e. prenom.occ nom *)
 let search_by_key conf base an =
-  match Gutil.person_of_string_key base an with
-  | Some ip ->
+  Option.bind (Gutil.person_of_string_key base an) (fun ip ->
       let p = Util.pget conf base ip in
-      if search_reject_p conf base p then [] else [ p ]
+      if search_reject_p conf base p then None else Some p)
+
+let print_fiche conf base p =
+  Util.record_visited conf (Gwdb.get_iper p);
+  Perso.print conf base p
+
+let search_sosa conf base s =
+  match Sosa.of_string s with
+  | Some sosa -> Option.to_list (search_by_sosa ~conf ~base ~sosa)
   | None -> []
 
-(* main *)
-
-type search_type =
-  | Sosa
-  | Key
-  | Surname
-  | FirstName
-  | ApproxKey
-  | PartialKey
-  | DefaultSurname
-
-let search conf base an search_order specify unknown =
-  let rec loop l =
-    match l with
-    | [] -> unknown conf an
-    | Sosa :: l -> (
-        let pl = search_by_sosa conf base an in
-        match pl with
-        | [ p ] ->
-            Util.record_visited conf (Gwdb.get_iper p);
-            Perso.print conf base p
-        | _ -> loop l)
-    | Key :: l -> (
-        let pl = search_by_key conf base an in
-        match pl with
-        | [] -> loop l
-        | [ p ] ->
-            Util.record_visited conf (Gwdb.get_iper p);
-            Perso.print conf base p
-        | pl -> specify conf base an pl)
-    | Surname :: l -> (
-        let pl = Search_name_display.search_surname conf base an in
-        match pl with
-        | [] -> loop l
-        | _ -> Search_name_display.search_surname_print conf base unknown an)
-    | FirstName :: l -> (
-        let pl = Search_name_display.search_first_name conf base an in
-        match pl with
-        | [] -> loop l
-        | _ -> Search_name_display.search_first_name_print conf base an)
-    | ApproxKey :: l -> (
-        let pl = search_approx_key conf base an in
-        match pl with
-        | [] -> loop l
-        | [ p ] ->
-            Util.record_visited conf (Gwdb.get_iper p);
-            Perso.print conf base p
-        | pl -> specify conf base an pl)
-    | PartialKey :: l -> (
-        let pl = search_partial_key conf base an in
-        match pl with
-        | [] -> loop l
-        | [ p ] ->
-            Util.record_visited conf (Gwdb.get_iper p);
-            Perso.print conf base p
-        | pl -> specify conf base an pl)
-    | DefaultSurname :: _ ->
-        Search_name_display.search_surname_print conf base unknown an
-  in
-  loop search_order
+let search_key conf base s = Option.to_list (search_by_key conf base s)
 
 (** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
       trouver la meilleure combinaison de résultat pour afficher la réponse
@@ -190,16 +129,32 @@ let print conf base specify unknown =
     | Some s -> if s = "" then None else Some s
     | None -> None
   in
+  let bind s xs f =
+    match xs with
+    | [ p ] -> print_fiche conf base p
+    | [] -> f ()
+    | pl -> specify conf base s pl
+  in
   match (real_input "p", real_input "n") with
   | Some fn, Some sn ->
-      let order = [ Key; ApproxKey; PartialKey ] in
-      search conf base (fn ^ " " ^ sn) order specify unknown
+      let s = fn ^ " " ^ sn in
+      let ( >>= ) = bind s in
+      search_key conf base s >>= fun () ->
+      search_approx_key conf base s >>= fun () ->
+      search_partial_key conf base s >>= fun () -> unknown conf s
   | Some fn, None ->
-      let order = [ FirstName ] in
-      search conf base fn order specify unknown
+      let fres = Search_name_display.search_first_name conf base fn in
+      if Search_name_display.fn_search_result_is_empty fres then unknown conf fn
+      else Search_name_display.search_first_name_print conf base fres fn
   | None, Some sn ->
-      let order =
-        [ Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname ]
-      in
-      search conf base sn order specify unknown
+      let ( >>= ) = bind sn in
+      search_sosa conf base sn >>= fun () ->
+      search_key conf base sn >>= fun () ->
+      let sres = Search_name_display.search_surname conf base sn in
+      if not (Search_name_display.sn_search_result_is_empty sres) then
+        Search_name_display.search_surname_print conf base unknown sres sn
+      else
+        let ( >>= ) = bind sn in
+        search_approx_key conf base sn >>= fun () ->
+        search_partial_key conf base sn >>= fun () -> unknown conf sn
   | None, None -> Hutil.incorrect_request conf

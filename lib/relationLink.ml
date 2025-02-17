@@ -679,8 +679,8 @@ let print_relation_no_dag conf base po ip1 ip2 =
             let n1 = Sosa.of_string b1str in
             let n2 = Sosa.of_string b2str in
             match
-              ( Util.old_branch_of_sosa conf base ip1 n1,
-                Util.old_branch_of_sosa conf base ip2 n2 )
+              ( Option.bind n1 (Util.old_branch_of_sosa conf base ip1),
+                Option.bind n2 (Util.old_branch_of_sosa conf base ip2) )
             with
             | Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
                 if ia1 = ia2 then
