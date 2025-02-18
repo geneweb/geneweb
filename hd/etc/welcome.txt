@@ -52,6 +52,27 @@
     <span class="text-nowrap">[*yyy]1</span>
   </a>
 %end;
+%define;language(x)
+  %apply;nth%with;
+    af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
+    it/lt/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
+    %and;x%end;
+%end;
+%define;set_lang(l1) %( see same condition in Util.commd and Templ.reorder %)
+  %if;(default_lang!="l1")%url_set.lang_file.l1;%else;%url_set.lang_file;%end;
+%end;
+%define;language_link()
+  %for;i;0;33;
+    %let;l1;%apply;language(i)%in;
+    %if;(lang!=l1)
+      <a class="dropdown-item%if;(l1=b.default_lang) bg-warning%end;" id="lang_%l1;"%sp;
+        href="%apply;set_lang(l1)">%nn;
+       <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1;%end;%sp;</code>%nn;
+       %apply;capitalize%with;%apply;language_name(l1)%end;</a>
+    %end;
+  %end;
+%end;
+
 <div class="d-flex flex-column flex-md-row align-items-center justify-content-lg-around mt-1 mt-lg-%if;roglo;1%else;3%end;">
   <div class="col-md-3 order-2 order-md-1 align-self-center mt-3 mt-md-0">
     <div class="d-flex justify-content-center">
@@ -121,6 +142,20 @@
           %if;(user.key="")title="[*no user key]" data-toggle="tooltip"%end;>%nn;
           %if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %username;</a>
         <a class="btn btn-sm btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>[*disconnect]</a>
+        %if;roglo;
+          <div class="btn-group" data-toggle="tooltip" data-placement="left"
+            title="%apply;language_name(lang) – [*select lang]">
+            <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">%nn;
+              <span class="sr-only">lang</span>%nn;
+              <span class="text-uppercase">%lang;</span>%nn;
+              <span class="sr-only">, [select lang]</span>%nn;
+            </button>
+            <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
+              %apply;language_link()
+            </div>
+          </div>
+        %end;
       %end;
     </div>
   </div>
