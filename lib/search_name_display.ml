@@ -813,11 +813,10 @@ let branch_list_of_ipers conf base name_inj iperl =
 type surname_search_result = {
   iperl : Gwdb.iper list;
   list : (string * (Ext_string.Set.t * Gwdb.iper list)) list;
-  name_inj : string -> string;
   bhl : Gwdb.person branch_head list;
 }
 
-let surname_print conf base not_found_fun { iperl; list; name_inj; bhl } x =
+let surname_print conf base not_found_fun { iperl; list; bhl } x =
   match Util.p_getenv conf.Config.env "o" with
   | Some "i" ->
       let pl =
@@ -875,12 +874,12 @@ let search_surname conf base x : surname_search_result =
   in
   let iperl = Gwdb.IperSet.elements iperl in
   let bhl = branch_list_of_ipers conf base name_inj iperl in
-  { iperl; list; name_inj; bhl }
+  { iperl; list; bhl }
 
-let sn_search_result_is_empty { list; iperl; name_inj; bhl } =
+let sn_search_result_is_empty { list; iperl = _; bhl } =
   match (bhl, list) with
   | [], _ | _, [ (_, (_, [])) ] -> true
-  | _, [ (_, (_, iperl)) ] -> false
+  | _, [ (_, (_, _)) ] -> false
   | _ -> true
 
 let search_surname_print = surname_print
