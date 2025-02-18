@@ -997,6 +997,7 @@ let reconstitute_date_dmy conf var =
     | _ -> (false, int_of_field m)
   in
   let d =
+    let day = get_number var "dd" conf.env in
     match int_of_field y with
     | None -> None
     | Some y -> (
@@ -1023,7 +1024,7 @@ let reconstitute_date_dmy conf var =
         match m with
         | None -> Some Date.{ day = 0; month = 0; year = y; prec; delta = 0 }
         | Some m -> (
-            match get_number var "dd" conf.env with
+            match day with
             | Some day ->
                 let d = Date.{ day; month = m; year = y; prec; delta = 0 } in
                 if d.day >= 1 && d.day <= 31 && d.month >= 1 && d.month <= 13
