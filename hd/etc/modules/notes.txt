@@ -24,7 +24,7 @@
   %if;(count>0 or has_linked_page.BNOTE and linked_page.BNOTE!="")
     <h2 class="mt-2">[*individual notes]</h2>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-      <div class="ml-3">%apply;capitalize(linked_page.BNOTE).</div>
+      <div class="ml-3">%apply;capitalize(linked_page.BNOTE)</div>
     %end;
     <div class="ml-3">
       %notes;
@@ -55,12 +55,12 @@
     %end;
   %end;
   %if;(has_linked_page.NOTE and linked_page.NOTE!="")
-    <div class="ml-3">%apply;capitalize(linked_page.NOTE).</div>
+    <div class="ml-3">%apply;capitalize(linked_page.NOTE)</div>
   %end;
 %elseif;((count>0 or count2>0) and op_m=2)
   <h3 id="notes" class="mt-2">[*note/notes]1</h3>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-      <blockquote>%apply;capitalize(linked_page.BNOTE).</blockquote>
+      <blockquote>%apply;capitalize(linked_page.BNOTE)</blockquote>
     %end;
     %if;has_notes;
       <h2>[*individual notes]</h2>
@@ -110,7 +110,7 @@
       %end;
     %end;
     %if;(has_linked_page.NOTE and linked_page.NOTE!="")
-      <blockquote>%apply;capitalize(linked_page.NOTE).</blockquote>
+      <blockquote>%apply;capitalize(linked_page.NOTE)</blockquote>
     %end;
   %nl;
 %end;
