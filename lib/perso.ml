@@ -1104,22 +1104,23 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                       let a = String.sub v 0 i in
                       let b = String.sub v (i + 1) (j - i - 1) in
                       let c = String.sub v (j + 1) (String.length v - j - 1) in
-                      ( a |> Util.safe_html,
-                        b |> Util.safe_html,
-                        c |> Util.safe_html )
-                    with Not_found ->
-                      (Adef.safe "", Util.safe_html v, Adef.safe "")
+                      (* FIXME Util.safe_html was introducing unwanted </li>  *)
+                      (a, b, c)
+                    with Not_found -> ("", v, "")
                   in
-                  Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s"
-                    (a :> string)
+                  Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
                     (commd conf :> string)
                     (Mutil.encode pg :> string)
-                    text.Def.NLDB.lnPos
-                    (b :> string)
-                    (c :> string)
-                  |> Adef.safe
+                    text.Def.NLDB.lnPos b c
+                  |> Util.safe_html
                 in
-                if (str :> string) = "" then str1 else str ^^^ ", " ^<^ str1
+                (* see FIXME above: if str1 starts with <li> then no ", " *)
+                (* is <li> is within str1, we are toast *)
+                (* template: no punctuation at the end of linked_page.XXX *)
+                if (str :> string) = "" then str1
+                else if Util.start_with (str1 :> string) 0 "<li>" then
+                  str ^>^ (str1 :> string)
+                else str ^^^ ", " ^<^ str1
           with Not_found -> str)
         l str
   | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes | Def.NLDB.PgWizard _
