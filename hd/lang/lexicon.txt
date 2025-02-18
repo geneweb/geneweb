@@ -15923,6 +15923,10 @@ pt: selamento ao cônjuge LDS
 sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
 
+    mentions legales
+en: legal
+fr: mentions légales
+
     path to
 en: path to me/path to the Sosa n<sup>o</sup> 1
 fr: chemin vers moi/chemin vers le Sosa n<sup>o</sup> 1
