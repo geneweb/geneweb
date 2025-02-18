@@ -69,7 +69,7 @@
       
       <!-- Language selector and connections info -->
       <div class="d-flex flex-row align-items-lg-end mt-0 ml-3 border-0">
-        %if;(e.templ="")
+        %if;(e.templ="" and not (roglo and is_welcome))
           <div class="btn-group dropup" data-toggle="tooltip" data-placement="left"
             title="%apply;language_name(lang) – [*select lang]">
             <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
