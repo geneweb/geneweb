@@ -152,6 +152,15 @@ let util_string_with_macros _ =
     {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
     (Util.string_with_macros conf [] {|jean@dupond.net - le 1 &amp; 2|})
 
+let utf8_capitalize_fst _ =
+  let test a r = (check string) a r (Utf8.capitalize_fst a) in
+  test "abcdef" "Abcdef";
+  test " ghiljl" " Ghiljl";
+  test "<i>mnopqr1" "<i>Mnopqr1";
+  test "<i><b>mnopqr2" "<i><b>Mnopqr2";
+  test "<i> <b>mnopqr3" "<i> <b>Mnopqr3";
+  test "<i>, <b>mnopqr4" "<i>, <b>mnopqr4"
+
 let util_escape_html _ =
   (check string) ""
     {|&#60;a href=&#34;mailto:jean@dupond.net&#34;&#62;jean@dupond.net&#60;/a&#62; - le 1 &#38;amp; 2|}
@@ -222,6 +231,7 @@ let v =
         test_case "Utf8.sub" `Quick utf8_sub;
         test_case "Utf8.name_with_roman_number" `Quick
           util_name_with_roman_number;
+        test_case "Utf8.capitalize_fst" `Quick utf8_capitalize_fst;
       ] );
     ( "util",
       [
