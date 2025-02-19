@@ -59,21 +59,11 @@ val concat : string -> string -> string
 val contains_forbidden_char : string -> bool
 (** [contains_forbidden_char s] is [true] iif s contains forbidden characters *)
 
-val split_sname_callback : (int -> int -> unit) -> string -> unit
-(** [split_sname_callback fn s]
-    Same as [split_sname], but call [fn] with substring indexes instead of building
+val split_callback : (int -> int -> unit) -> string -> unit
+(** [split_callback fn s]
+    Same as [split], but call [fn] with substring indexes instead of building
     a list *)
 
-val split_fname_callback : (int -> int -> unit) -> string -> unit
-(** [split_fname_callback fn s]
-    Same as [split_fname], but call [fn] with substring indexes instead of building
-    a list *)
-
-val split_sname : string -> string list
-(** [split_sname s] split the surname [s] in parts composing it.
-    e.g. [split_sname base "Foo-Bar"] is [[ "Foo" ; "Bar"]] *)
-
-val split_fname : string -> string list
-(** [split_fname s] split the string [s] representing multiple first names
-    into this list of firstname.
-    e.g. [split_fname base "Foo-Bar Baz"] is [[ "Foo-Bar" ; "Baz"]] *)
+val split : string -> string list
+(** [split s] split the name [s] in parts composing it.
+    e.g. [split base "Foo-Bar"] is [[ "Foo" ; "Bar"]] *)

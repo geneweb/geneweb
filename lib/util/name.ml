@@ -222,7 +222,7 @@ let concat fn sn = concat_aux fn (String.length fn) sn (String.length sn)
 let contains_forbidden_char s = List.exists (String.contains s) forbidden_char
 
 (* Copy/paste from String.split_on_char adapted to our needs *)
-let split_sname_callback fn s =
+let split_callback fn s =
   let open String in
   let j = ref (length s) in
   for i = length s - 1 downto 0 do
@@ -232,10 +232,7 @@ let split_sname_callback fn s =
   done;
   fn 0 !j
 
-let split_sname s =
+let split s =
   let r = ref [] in
-  split_sname_callback (fun i j -> r := String.sub s i j :: !r) s;
+  split_callback (fun i j -> r := String.sub s i j :: !r) s;
   !r
-
-let split_fname_callback = split_sname_callback
-let split_fname = split_sname
