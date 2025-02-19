@@ -9,5 +9,5 @@
   (name gwc_lib)
   (public_name geneweb.gwc_lib)
   (modules gwc_lib state gwcomp db1link)
-  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries unix %%%GWDB_PKG%%% geneweb)
 )

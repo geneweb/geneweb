@@ -2,5 +2,5 @@
   (names gwdiff)
   (public_names geneweb.gwdiff)
   (modules gwdiff)
-  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries unix str %%%GWDB_PKG%%% geneweb)
 )

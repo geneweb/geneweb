@@ -11,7 +11,6 @@
     geneweb_system_util
     geneweb_gwdb
     %%%GWDB_PKG%%%
-    %%%SOSA_PKG%%%
   )
   (modules)
 )

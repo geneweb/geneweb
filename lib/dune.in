@@ -15,7 +15,6 @@
             geneweb_def
             geneweb_def_ord
             geneweb_gwdb
-            geneweb_sosa_mli
             geneweb_util
 	    geneweb_system_util
             markup)

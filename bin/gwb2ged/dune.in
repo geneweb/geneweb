@@ -17,6 +17,5 @@
     str
     unix
     %%%GWDB_PKG%%%
-    %%%SOSA_PKG%%%
   )
 )
