@@ -15993,6 +15993,22 @@ sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
 
+    other base
+en: other base
+fr: autre base
+
+    hidden first_name
+en: hidden first name
+fr: prénom masqué
+
+    hidden surname
+en: hidden surname
+fr: patronyme masqué
+
+    hidden person
+en: hidden person
+fr: personne masquée
+
     family mode
 en: family mode
 fr: mode famille
