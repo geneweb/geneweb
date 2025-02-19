@@ -387,6 +387,14 @@ fr: Autour de l'arbre
       Association Roglo
     </div>
     <div class="d-flex flex-wrap justify-content-md-center">
+      %if;(b.alt_serv_base!="" and wizard and not cgi)
+        <a role="button" class="btn btn-outline-primary"
+          href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
+            %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
+          title="[*go to alt base]0 %b.alt_serv_base;">
+          %if;(b.alt_serv_title!="")%b.alt_serv_title;%else;[*other base]%end;
+        </a>
+      %end;
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/350795-l-association">Site de l’association</a>
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/358570-donnees-personnelles">Politique de confidentialité</a>
       <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/page/350796-decouvrir">Fonctionnement et usage</a>
