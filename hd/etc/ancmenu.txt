@@ -332,7 +332,7 @@ function missing_events_options () {
           <hr>
           <div class="custom-control custom-radio text-nowrap">
             <input type="radio" class="custom-control-input" id="tY" name="t" value="Y" onclick="no_options()">
-            <label class="custom-control-label" for="tY"><i class="fa fa-table fa-fw mr-1"></i>[*table] [by couple] <span class="text-primary">✱</span><span class="text-info">✘</span></label>
+            <label class="custom-control-label" for="tY"><i class="fa fa-table fa-fw mr-1"></i>[*table] [by couple]0 <span class="text-primary">✱</span><span class="text-info">✘</span></label>
           </div>
           <div class="custom-control custom-radio text-nowrap">
             <input type="radio" class="custom-control-input" id="tZ" name="t" value="Z" onclick="table_options()">

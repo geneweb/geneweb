@@ -36,11 +36,6 @@
     (bvar.p_mod="" and evar.p_mod=""))
   %(Statique%)
   %apply;init_cache(3, 2, 2)
-  %if;(has_parents and (father.has_parents or mother.has_parents))
-     <div class="collapse" id="collapseExample1">
-        %let;op_m;1%in;%include;modules/gr_parents
-     </div>
-  %end;
  <div class="row">
     %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> in individu.txt %)
       %let;op_m;3%in;%include;modules/individu

@@ -20,7 +20,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container-fluid pb-6">
+<div class="container%if;(e.v>3 and e.t!="A" and e.t!="C"))-fluid%end; pb-6">
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar
@@ -39,10 +39,13 @@
   %include;modules/arbre_hi_indexes
   %include;modules/arbre_hi
 %elseif;(e.t="A" or e.t="C" or e.t="T")
-  <h3 class="ml-3 text-no-wrap">%nn;
-    %apply;ttl()<small class="text-muted font-weight-lighter">%apply;togena(e.v)</small>
-  </h3>
-  %include;modules/arbre_vertical
+  <div class="d-flex flex-column ml-3">
+    <h3 class="display-5 ml-3">%nn;
+      %apply;ttl()
+      <%if;(e.t="T" and e.v>2)span%else;div%end; class="text-small text-muted font-weight-lighter">%apply;togena(e.v)</%if;(e.t="T")span%else;div%end;>
+    </h3>
+    %include;modules/arbre_vertical
+  </div>
 %else;
   This should not happen (probably a bad variable in URL: check t=/t1=)
 %end;

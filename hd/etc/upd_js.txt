@@ -31,6 +31,15 @@ $(document).ready(function() {
   }).change();
 });
 
+document.addEventListener("scroll", function () {
+  const banner = document.getElementById("banner");
+  if (window.scrollY > 35) {
+    banner.classList.add("scrolled");
+  } else {
+    banner.classList.remove("scrolled");
+  }
+});
+
 <!--
 function changeCalendar(e,v,m,c) {
   var mv = m;
