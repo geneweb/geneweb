@@ -61,7 +61,23 @@ let cmap_utf_8 cmap s =
 let lowercase s = cmap_utf_8 Uucp.Case.Map.to_lower s
 let uppercase s = cmap_utf_8 Uucp.Case.Map.to_upper s
 
+let skip_html_tags s =
+  let rec loop i s =
+    if s.[i] = ' ' then loop (i + 1) s
+    else if s.[i] = '<' then
+      let j = try String.index_from s i '>' with Not_found -> -1 in
+      if j = -1 then (
+        Printf.eprintf "WARNING: badly formed string %s\n" s;
+        0)
+      else loop (j + 1) s
+    else i
+  in
+  loop 0 s
+
 let capitalize_fst s =
+  let i = skip_html_tags s in
+  let head = String.sub s 0 i in
+  let tail = String.sub s i (String.length s - i) in
   let first = ref true in
   let cmap u =
     if !first then (
@@ -69,7 +85,8 @@ let capitalize_fst s =
       Uucp.Case.Map.to_upper u)
     else `Self
   in
-  cmap_utf_8 cmap s
+  let tail = cmap_utf_8 cmap tail in
+  head ^ tail
 
 let capitalize s =
   let first = ref true in
