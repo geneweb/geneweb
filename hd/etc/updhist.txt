@@ -18,19 +18,15 @@
 <h1>[*history of updates]</h1>
 %define;search_form()
   %if;(wizard or friend)
-    <form class="form-inline mb-2" method="get" action="%action;">
+    <form class="d-flex form-inline mb-2" method="get" action="%action;">
       %hidden;
       <input type="hidden" name="m" value="HIST_SEARCH">
       %if;(e.m="HIST_SEARCH" and found)
         <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
       %end;
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
-          name="s" size="30" maxlength="40" value="%e.s.ns;">
-        <div class="input-group-append">
-          <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
-        </div>
-      </div>
+      <input type="text" class="form-control col-4" placeholder="[*search/case sensitive]0"
+        name="s" maxlength="40" value="%e.s.ns;">
+      <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
       <label class="my-1 ml-3 mr-2" for="rows">[*number of rows]</label>
       <input type="number" class="form-control" id="rows" title="[*number of rows]"
          name="k" value="%kk;" min="0" max="150" step="10">

@@ -49,12 +49,12 @@
   %end;
   %if;(e.m="A" or e.m="D")
     %apply;of%with;%person_index.x.first_name; %person_index.x.surname;%end;
-    %( !! %a_of_b or %self unavailable on dag !! %)
-    %( but the new management of [d'|e ] is ok! %)
-    <small class="text-muted ml-1 user-select-none">(%e.v; 
-    %if;(e.v=1)[generation/generations]0%else;[generation/generations]1%end;
-    %if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;)
-    %(%apply;togend(e.v) also unavailable %)</small>
+    %( note that a_of_b/self/to_gend are unavailable on dag %)
+    %if;(e.v=1)[to the children]%nn;
+    %elseif;(e.v=2)[to the grandchildren]%nn;
+    %elseif;(e.v=3)[to the great-grandchildren]%nn;
+    %else;[up to] %e.v; [generation/generations]1%end;
+    %if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;
   %end;
 </h3>
 %if;(not cancel_links)
@@ -161,7 +161,7 @@
     %end;
     </pre>
   %else;
-    <table id="dag" class="mx-3 mb-6">
+    <table id="dag" class="mt-2 mb-6 ml-4">
     %foreach;dag_line;
       <tr align="left">
       %foreach;dag_cell;

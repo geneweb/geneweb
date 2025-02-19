@@ -39,18 +39,17 @@
         %if;(count=1 or count2=1 and (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
           <h2 class="w-100">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h2>
         %end;
-        <dl>
-          <dt>
+        <ul class="pl-4">
+          <li>
             %if;(not cancel_links)
-              <a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0">^
+              <a href="#wed-callnote-%count;" id="note-wed-%count;" title="[see] [marriage/marriages]0">^
               </a>
             %else;^
             %end;
             %if;(nb_families>1)%apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end; %spouse.first_name; %spouse.surname;
-            [:]
-          </dt>
-          <dd>%comment;</dd>
-        </dl>
+            [:] %comment;
+          </li>
+        </ul>
       %end;
     %end;
   %end;

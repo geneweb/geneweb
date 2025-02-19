@@ -36,7 +36,7 @@
 %let;datalist_sources; list="datalist_sources" data-book="src"%in;
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <nav class="navbar navbar-light justify-content-center" id="banner">
+    <nav class="navbar navbar-light justify-content-center mx-1" id="banner">
       <nav class="nav nav-pills nav-fill">
         <a class="nav-item nav-link px-1 py-1" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
         <a class="nav-item nav-link px-1 py-1" href="#birth" title="[*birth]"><i class="fa fa-cake-candles fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
@@ -57,17 +57,17 @@
 %end;
 
 %define;date(xlab,xvar,xdt,xcond)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" xcond%in;
-  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" xcond%in;
-  %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8" xcond%in;
-  <div class="row justify-content-sm-between justify-content-md-start">
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" xcond placeholder=" "%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" xcond placeholder=" "%in;
+  %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8" xcond placeholder=" "%in;
+  <div class="row justify-content-sm-between justify-content-md-start mt-2">
     <div class="col-sm-1 col-md-2 col-form-label">
       xlab
     </div>
     <div class="col col-sm-auto form-inline">
       %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
         <label>
-          <input type="text" class="form-control" name="xvar_dd" value="%xdt.day;" %day_input;>
+          <input type="text" class="form-control" name="xvar_dd" value="%xdt.day;" %day_input;">
           <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
@@ -320,32 +320,36 @@
 %define;insert_pevent(xcnt)
   <div class="row my-1">
     <label for="ins_eventxcnt_n" class="col-2 col-form-label">[*insert]</label>
-    <div class="input-group col-10">
-      <select class="custom-select col-1 border border-dark" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
-        %for;i;1;11;<option>%i;</option>%nl;%end;
-      </select>
-      <div class="input-group-append">
-        <label class="btn btn-outline-primary mb-0">[event/events]0/[event/events]1
-          <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
-        </label>
-        <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
+    <div class="form-inline col-10 border-primary">
+      <div class="input-group">
+        <select class="form-control bg-light border-primary border-right-0" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
+          %for;i;1;11;<option>%i;</option>%nl;%end;
+        </select>
+        <div class="input-group-append">
+          <label class="btn btn-outline-primary border-left-0 mb-0">[event/events]2
+            <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
+          </label>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]2">OK</button>
+        </div>
       </div>
     </div>
   </div>
 %end;
 
 %define;insert_witness(xcnt, wcnt, evt_name)
-  <div class="row mt-2">
-    <label for="excnt_ins_witnwcnt_n" class="col-2 col-form-label">[*insert]</label>
-    <div class="input-group col-10">
-      <select class="custom-select border border-dark col-1" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n">
-        %for;i;1;11;<option>%i;</option>%nl;%end;
-      </select>
-      <div class="input-group-append">
-        <label class="btn btn-outline-primary mb-0">[witness/witness/witnesses]0/[witness/witness/witnesses]2
-          <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
-        </label>
-        <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0(s)">OK</button>
+  <div class="row mt-3 mb-1">
+    <label for="excnt_ins_witnwcnt_n" class="col-form-label col-2">[*insert]</label>
+    <div class="form-inline col-10">
+      <div class="input-group">
+        <select class="form-control bg-light border-primary border-right-0" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n">
+          %for;i;1;11;<option>%i;</option>%nl;%end;
+        </select>
+        <div class="input-group-append">
+          <label class="btn btn-outline-primary border-left-0">[witness/witness/witnesses]3
+            <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
+          </label>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0(s)">OK</button>
+        </div>
       </div>
     </div>
   </div>
@@ -481,13 +485,13 @@
       </div>
     </div>
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
-    <div class="row">
+    <div class="row mt-2">
       <label for="e_notexcnt" class="col-2 col-form-label">[*note/notes]1</label>
       <div class="col-10">
          <textarea class="form-control" name="e_notexcnt" id="e_notexcnt" rows="1" placeholder="[*note/notes]1" %l_on1s;>%event.e_note;</textarea>
       </div>
     </div>
-    <div class="row">
+    <div class="row mt-0">
       <label for="e_srcxcnt" class="col-2 col-form-label">[*source/sources]0</label>
       <div class="col-10">
         %if;(event.e_src!="")
@@ -577,13 +581,13 @@
       </div>
     </div>
     %apply;date%with;[*date/dates]0%and;e_datexcnt%and;event_date%and;%if;("evt_name" = "#deat")onfocus='set_death_focus(xcnt)'%end;%end;
-    <div class="row">
+    <div class="row mt-2">
       <label for="e_notexcnt" class="col-sm-2 col-form-label">[*note/notes]1</label>
       <div class="col-sm-10">
          <textarea class="form-control" name="e_notexcnt" id="e_notexcnt" rows="1" placeholder="[*note/notes]1" %l_on1s;>%event.e_note;</textarea>
       </div>
     </div>
-    <div class="row">
+    <div class="row mt-0">
       <label for="e_srcxcnt" class="col-sm-2 col-form-label">[*source/sources]0</label>
       <div class="col-sm-10">
         %if;(event.e_src!="")
@@ -681,13 +685,13 @@
   %else;
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
   %end;
-  <div class="row">
+  <div class="row mt-2">
     <label for="e_notexcnt" class="col-sm-2 col-form-label">[*note/notes]1</label>
     <div class="col-sm-10">
        <textarea class="form-control" name="e_notexcnt" id="e_notexcnt" rows="1" placeholder="[*note/notes]1" %l_on1s;%if;("evt_name" = "buri_or_crem") onfocus='set_buri(xcnt)'%end;></textarea>
     </div>
   </div>
-  <div class="row">
+  <div class="row mt-0">
     <label for="e_srcxcnt" class="col-sm-2 col-form-label">[*source/sources]0</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" name="e_srcxcnt" value="" id="e_srcxcnt" placeholder="[*source/sources]0"%if;("evt_name" = "buri_or_crem") onfocus='set_buri(xcnt)'%end;>
@@ -760,8 +764,8 @@
             <input type="text" class="form-control" name="first_name" maxlength="200" value="%first_name;" id="first_name" placeholder="[*first name/first names]0"%datalist_fnames;>
           </div>
           <label for="occ" class="col col-form-label">[*number]0</label>
-          <div class="col">
-            <input type="number" class="form-control" name="occ" min="0" value="%occ;" id="occ">
+          <div class="col-2">
+            <input type="number" class="form-control" name="occ" min="0" value="%occ;" id="occ" placeholder="[*number]">
           </div>
         </div>
         <div class="row">
@@ -932,7 +936,7 @@
           %if;(occupation!="")
             <textarea class="form-control" name="occu" rows="1" id="occu" placeholder="[*occupation/occupations]1" %l_on1s;>%occupation;</textarea>
           %else;
-            <input class="form-control" name="occu" id="occu" placeholder="[*occupation/occupations]1" value="%occupation;"%datalist_occupations;>
+            <input type="text" class="form-control" name="occu" id="occu" placeholder="[*occupation/occupations]1" value="%occupation;"%datalist_occupations;>
           %end;
         </div>
       </div>
@@ -942,11 +946,11 @@
           %if;(sources!="")
             <textarea class="form-control" name="src" rows="1" id="src" placeholder="[*source/sources]0" %l_on1s;>%sources;</textarea>
           %else;
-            <input class="form-control" name="src" id="src" placeholder="[*source/sources]0" value="%sources;"%datalist_sources;>
+            <input type="text" class="form-control" name="src" id="src" placeholder="[*source/sources]0" value="%sources;"%datalist_sources;>
           %end;
         </div>
-        <button type="submit" class="btn btn-primary btn-sm col-2" title="[*validate/delete]0">
-          <i class="fa fa-share fa-rotate-180 mx-1" aria-hidden="true"></i>
+        <button type="submit" class="btn btn-primary btn-sm col-1 mx-auto">
+          [*validate/delete]0<i class="fa fa-share fa-rotate-180 ml-2" aria-hidden="true"></i>
           <span class="sr-only font-weight-bold">[*validate/delete]0</span>
         </button>
       </div>
@@ -1114,8 +1118,8 @@
 %define;insert_relation(xx)
   <div class="row">
     <span class="col-form-label col-2">[*insert]</span>
-    <div class="btn-group col-auto">
-      <label class="btn btn-outline-primary mb-0">1 [relation/relations]0
+    <div class="btn-group col-auto border-primary">
+      <label class="btn btn-outline-primary  mb-0">1 [relation/relations]0
         <input class="ml-1" type="checkbox" name="add_relationxx" value="on">
       </label>
       <button type="submit" class="btn btn-outline-primary" title="[*insert::relation/relations]0">OK</button>
@@ -1223,15 +1227,17 @@
 %define;insert_title(xcnt)
   <div class="row">
     <label for="ins_titlexcnt_n" class="col-form-label col-2">[*insert]</label>
-    <div class="input-group col-10">
-      <select class="custom-select border border-dark col-1" id="ins_titlexcnt_n" name="ins_titlexcnt_n">
-        %for;i;1;11;<option>%i;</option> %end;
-      </select>
-      <div class="input-group-append">
-        <label class="btn btn-outline-primary mb-0">[title/titles]0/[title/titles]1
-          <input class="ml-1" type="checkbox" name="ins_titlexcnt" value="on">
-        </label>
-        <button type="submit" class="btn btn-outline-primary" title="[*insert::title/titles]0/[title/titles]1">OK</button>
+    <div class="form-inline col-10">
+      <div class="input-group">
+        <select class="form-control bg-light border-primary border-right-0" id="ins_titlexcnt_n" name="ins_titlexcnt_n">
+          %for;i;1;11;<option>%i;</option> %end;
+        </select>
+        <div class="input-group-append">
+          <label class="btn btn-outline-primary border-left-0 mb-0">[title/titles]2
+            <input class="ml-1" type="checkbox" name="ins_titlexcnt" value="on">
+          </label>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::title/titles]2">OK</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1295,7 +1301,7 @@
       </div>
       <div class="row">
         <div class="d-flex flex-column col-9">
-          <textarea class="form-control insert-character-target no-clear-button" id="notes_comments" name="notes" rows="16">%notes;</textarea>%sq;
+          <textarea class="form-control insert-character-target no-clear-button ml-2" id="notes_comments" name="notes" rows="16">%notes;</textarea>%sq;
           <button type="submit" class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
             <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
           </button>
