@@ -66,4 +66,4 @@ val split_callback : (int -> int -> unit) -> string -> unit
 
 val split : string -> string list
 (** [split s] split the name [s] in parts composing it.
-    e.g. [split base "Foo-Bar"] is [[ "Foo" ; "Bar"]] *)
+    e.g. [split "Foo-Bar"] is [[ "Foo" ; "Bar"]] *)
