@@ -12,7 +12,7 @@
   %apply;nth%with;one/two/three/four/five/six%and;%random.6;%end;
 %end;
 %let;random_index;%if;(nb_persons.v!=0)%apply;get_random(nb_persons.v)%end;%in;
-%if;(not cancel_links)
+%if;(not cancel_links and e.templ="")
   <div class="d-flex flex-column fix_top fix_left home-xs">
     <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">
       <i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i>%nn;
@@ -32,7 +32,7 @@
     %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and e.m!="S" and e.m!="L" and e.m!="" and not ("_FAM" in e.m))1%end;%in;
     %if;(nb_persons.v!=0)
       <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
-        href="%if;(rng=1)%apply;url_set%with;i/p/n/oc%and;%random_index;%end;%else;%prefix;i=%random_index;%end;"
+        href="%if;(rng=1)%apply;url_set%with;i/p/n/oc/file%and;%random_index;%end;%else;%prefix;i=%random_index;%end;"
           title="[*random individual]%if;(rng=1) ([stay on the current tool])%end;"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*random individual]</span>%nn;
       </a>
@@ -48,11 +48,11 @@
     %if;(b.alt_serv_base!="" and (not roglo or (roglo and wizard)) and not cgi)
       <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
         href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
-          %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
+          %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;((env.key!="" and env.key!="w") or env.key!="file")&%env.key;=%env.val;%end;%end;"
         title="[*go to alt base]0%sp;
           %if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?…
           %if;(e.i!="")[go to alt base]1%end;">
-       <i class="fa fa-arrow-right%if;wizard; text-success%end; fa-fw fa-xs p-0"></i></a>
+       <i class="fa fa-arrow-right%if;wizard; text-success%end; fa-fw fa-xs p-0"></i>
       </a>
     %end;
   </div>

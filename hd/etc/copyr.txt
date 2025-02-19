@@ -163,7 +163,7 @@
           <a href="https://github.com/%source;/tree/%commit_id;" 
              data-toggle="tooltip" 
              data-html="true"
-             title="[*branch/branches]0 %branch; [compiled on] %compil_date;<br>[from commit] %commit_id; (%commit_date)">
+             title="[*branch/branches]0 %branch; [compiled on] %compil_date;%if;not is_printed_by_template;&#010;%else;<br>%end;[from commit] %commit_id; (%commit_date)">
             GeneWeb v. %version;
           </a>
         </div>

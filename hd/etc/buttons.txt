@@ -1,4 +1,4 @@
-<!-- $Id: buttons.txt v7.1 11/10/2024 01:48:16 $ -->
+<!-- $Id: buttons.txt v7.1 19/02/2025 06:36:28 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 %( Boutons de configurations et d'options %)
 %let;l_v0;%if;(e.v!="")
@@ -23,8 +23,8 @@
 %define;urlset(xx,yy)
   %url_set.xx.yy;
 %end;
-%let;istable;%if;((evar.m="D" and (evar.t="H" or evar.t="I")) or (evar.m="A" and (evar.t="Z" or evar.t="Y")))1%end;%in;
-%if;(istable=1 and not cancel_links)
+%let;istable;%if;((e.m="D" and (e.t="H" or e.t="I")) or (e.m="A" and (e.t="Z" or e.t="Y")))1%end;%in;
+%if;(not cancel_links)
   <div class="button-groug ml-2" role="group" aria-label="nav buttons">
     <a role="button" class="btn btn-link ml-1 mt-0 px-0"%sp;
       href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=%evar.m;"><i class="fa fa-gear fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
@@ -142,7 +142,9 @@
           href="%prefix_base_password;%access;&m=A%nn;
                    %foreach;env_binding;
                      %if;(env.key="t")&t=%if;(e.t!="Y")Y%else;Z%end;%nn;
-                     %elseif;(env.key="v" or env.key="v0" or env.key="only" or env.key="im" or env.key="gen")&%env.key=%env.val;%end;%nn;
+                     %elseif;(env.key="v" or env.key="only" or env.key="im" or env.key="gen")&%env.key=%env.val;%end;%nn;
+                     %( TODO: quick fix dans un seul sens, préférer ajouter v0 sur le tableau par couples, changement de v0 intempestif ingérable sinon %)
+                     %if;(env.key="v0")&v0=%if;(env.val=0)1%else;%env.val;%end;%end;%nn;
                    %end;%nn;
                    %( ajout des variables par défaut du tableau asc. pour sortir du tableau par couple qui n'en a quasi pas %)
                    %if;(e.t="Y")&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on%end;"
@@ -167,14 +169,17 @@
             <i class="fa fa-file-csv fa-lg fa-fw %if;(e.csv=1)text-danger%end;" aria-hidden="true"></i>%nn;
         </a>
       %end;
-      %(<a role="button" class="btn btn-link px-0" title="[*cancel GeneWeb links]" href="%url_set.cgl.on;">%nn;
-       <i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i>%nn;
-      </a> already in menubar %)
+      <a role="button" class="btn btn-link px-0" title="[*cancel GeneWeb links]" href="%url_set.cgl.on;">%nn;
+        <i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i>%nn;
+      </a>
       %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
-        <button id="btnshowfilter"
-          type="button" class="btn btn-link ml-1 px-0">
+        <button id="btnshowfilter" type="button" class="btn btn-link ml-1 px-0">
           <i class="fas fa-filter ml-1" aria-hidden="true"></i>
           [*filter by::surname/surnames]0</button>
+      %end;
+      %if;(e.m="D" and e.t="D" and has_parents and e.templ="" and not cancel_links)
+        <button type="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#switch_modal">
+        <i class="fa fa-people-arrows"></i> [*extend]</a>
       %end;
     </div>
   </div>
@@ -188,15 +193,17 @@
             %end;
           %end;
           <span class="col-auto px-0">[*generation/generations]0</span>
-          <div class="input-group ml-2">
-            <div class="input-group-prepend">
-              <label for="input_v0" class="input-group-text" title="v0= (min<=max)">min</label>
+          %if;not ((e.m="D" and e.t="D") or (e.m="A" and e.t="H"))
+            <div class="input-group ml-2">
+              <div class="input-group-prepend">
+                <label for="input_v0" class="input-group-text" title="v0= (min<=max)">min</label>
+              </div>
+              <input type="number" id="input_v0" name="v0" class="form-control"
+                value="%if;(e.t="Y" and e.v0="")1%elseif;(only=1 or v0>l_v)%l_v;%elseif;(v0!="")%v0;%else;0%end;"
+                placeholder="%if;(e.t="Y")1%else; %end;" min="%if;(e.t="Y")1%else;0%end;"
+                max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" autofocus>
             </div>
-            <input type="number" id="input_v0" name="v0" class="form-control"
-              value="%if;(e.t="Y" and e.v0="")1%elseif;(only=1 or v0>l_v)%l_v;%elseif;(v0!="")%v0;%else;0%end;"
-              placeholder="%if;(e.t="Y")1%else;0%end;" min="%if;(e.t="Y")1%else;0%end;"
-              max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" autofocus>
-          </div>
+          %end;
           <div class="input-group ml-2">
             <div class="input-group-prepend">
               <label for="input_v" class="input-group-text" title="v=…">max</label>

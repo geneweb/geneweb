@@ -38,7 +38,7 @@
       <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
-      <script src="%etc_prefix;js/regex.js?version=4.4.0"></script>
+      <script src="%etc_prefix;js/regex.min.js?version=4.4.0"></script>
     %end;
   %end;
   %if;(e.m="A" and e.t="T" and e.t1="CT")
@@ -117,7 +117,7 @@
  <!--
    $("#btnshowfilter").on("click", function() {
     var nbinput = $('input.filter:text:disabled').length;
-    if (nbinput == 5) {
+    if (nbinput == 4) {
       $('#input1').prop('disabled', false);
       $('#filterbysurname').removeClass("d-none");
       $('#total').addClass("text-muted");
@@ -517,9 +517,12 @@ function setupModalAutofocus() {
 %if;(e.m!="MOD_DATA")
 // Floating placeholders for all textual inputs
 function setupFloatingPlaceholders() {
-  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="search"][placeholder]');
+  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
   
   inputs.forEach(input => {
+    // Ignore placeholders that are only non-breaking spaces
+    if (input.placeholder.trim() === '') return;
+    
     const hadFocus = document.activeElement === input;
     
     const wrapper = document.createElement('div');
@@ -544,6 +547,7 @@ function setupFloatingPlaceholders() {
   });
 }
 %end;
+%if;(e.templ="")
 %if;(e.m="NOTES" or e.m="WIZNOTES")
 // TOC toggle for NOTES and WIZNOTES
 function setupTocToggle() {
@@ -739,6 +743,7 @@ function safeInitialize(fn) {
     console.error('Initialization error:', error);
   }
 }
+
 %( Initialize on DOM Content Loaded %)
 document.addEventListener('DOMContentLoaded', () => {
 %if;is_welcome;
@@ -757,7 +762,7 @@ document.addEventListener('DOMContentLoaded', () => {
 %if;(e.templ="" and not is_welcome)
   setupModalAutofocus();
 %end;
-%if;(e.m!="MOD_DATA")
+%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D") or (e.m="A" and e.t="H") or "HIST" in e.m))
   setupFloatingPlaceholders();
 %end;
 %if;("ADD" in e.m or "MOD" in e.m)
@@ -772,3 +777,4 @@ document.addEventListener('DOMContentLoaded', () => {
 %end;
 });
 </script>
+%end;
