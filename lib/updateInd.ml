@@ -528,20 +528,10 @@ and eval_special_var conf base = function
       (* TODO merge with mainstream includes ?? *)
       match Util.p_getenv conf.Config.env "i" with
       | Some i ->
-          let has_base_loop =
-            try
-              let _ = Util.create_topological_sort conf base in
-              false
-            with Consang.TopologicalSortError _ -> true
-          in
-          if has_base_loop then TemplAst.VVstring ""
-          else
-            let p = Gwdb.poi base (Gwdb.iper_of_string i) in
-            Perso.interp_templ_with_menu
-              (fun _ -> ())
-              "perso_header" conf base p;
-            TemplAst.VVstring ""
-      | None -> TemplAst.VVstring "")
+          let p = Gwdb.poi base (Gwdb.iper_of_string i) in
+          Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf base p;
+          VVstring ""
+      | None -> VVstring "")
   | _ -> raise Not_found
 
 and eval_int_env var env =

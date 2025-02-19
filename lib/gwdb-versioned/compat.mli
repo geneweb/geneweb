@@ -76,6 +76,9 @@ module type Driver_S = sig
   val string_of_iper : iper -> string
   (** Convert [iper] to string *)
 
+  val int_of_iper : iper -> int
+  (** Convert [iper] to int *)
+
   val string_of_ifam : ifam -> string
   (** Convert [ifam] to string *)
 
