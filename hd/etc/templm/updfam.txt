@@ -113,7 +113,7 @@
           %apply;date_place("parent","birth","pa1b","pa","1","b_yy")
           %apply;date_place("parent","death","pa1d","pa","1","d_yy")</span>
       </td>
-      <td class="jq4"><div id="pa1_jq4"></div><input id="pa1_occupation" name="pa1_occupation" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;" %l_on4;%/></td>
+      <td class="jq4"><div id="pa1_jq4"></div><input id="pa1_occupation" name="pa1_occu" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;" %l_on4;%/></td>
     </tr>
   %else;
     <tr>
@@ -126,7 +126,7 @@
         <span id="dppa2" class="%l1;">%nn;
           %apply;date_place("parent","birth","pa2b","pa","2","b_yy")
           %apply;date_place("parent","death","pa2d","pa","2","d_yy")</span></td>
-      <td class="jq4"><div id="pa2_jq4"></div><input id="pa2_occupation" name="pa2_occupation" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;" %l_on4;%/></td>
+      <td class="jq4"><div id="pa2_jq4"></div><input id="pa2_occupation" name="pa2_occu" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;" %l_on4;%/></td>
     </tr>
   %end;
 %end;
@@ -143,7 +143,7 @@
       <span id="dpchz1" class="%l2;">%nn;
         %apply;date_place("child","birth","chz1b","ch","z1","b_yy")
         %apply;date_place("child","death","chz1d","ch","z1","d_yy")</span></td>
-    <td class="jq4"><div id="chz1_jq4"> </div><input id="chz1_occupation" name="chz1_occupation" class="occu %l2;" size="40" maxlength="200" value="%child.create.occupation" %l_on4;%/></td>
+    <td class="jq4"><div id="chz1_jq4"> </div><input id="chz1_occupation" name="chz1_occu" class="occu %l2;" size="40" maxlength="200" value="%child.create.occupation" %l_on4;%/></td>
   </tr>
 %end;
 %( <!-- End define --> %)
@@ -200,10 +200,14 @@
     &nbsp;&nbsp;<input type="submit" value="Ok"%/>
   </legend>
   <table>
-    %foreach;parent;%apply;one_parent(cnt)%end;
+    %foreach;parent;
+    %apply;one_parent(cnt)%end;
+ %if;(cnt=2)
  <tr><td colspan=4 style="border:0;text-align:left;padding:5px"><label><input type="checkbox" id="nsck" name="nsck" value="on"
-    %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/> [no sexes check]</label></td></tr>
+    %if;(parent.sexes=3) checked="checked"%end;%/> [no sexes check]</label></td></tr>
+   %end;
   </table>
+
 </fieldset>
 <fieldset>
   <legend>[*child/children]1</legend>
