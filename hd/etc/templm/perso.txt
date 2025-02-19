@@ -952,7 +952,7 @@
   <span>
     %if;(bvar.event_age!="yes" and evar.age!="on")<span title="%parents_age;">%apply;capitalize(event.name)</span>%else;%apply;capitalize(event.name)%end;
     %if;event.has_date;%apply;on_edate("event")%end;
-    %if;event.has_place; • %apply;advanced("birth_place",event.place)%end;
+    %if;event.has_place; [in (place)] %apply;advanced("birth_place",event.place)%end;
   %if;((bvar.event_age = "yes" or evar.age="on") and has_parents)
     <br> └ %parents_age;.
   %end;
@@ -962,14 +962,14 @@
   <span>
     %apply;capitalize(event.name)
     %if;event.has_date;%apply;on_edate("event")%end;
-    %if;event.has_place; • %apply;advanced("bapt_place",event.place)%end;
+    %if;event.has_place; [in (place)] %apply;advanced("bapt_place",event.place)%end;
   </span>
 %end;
 %define;death_event()
   <span>
     %apply;capitalize(event.name)
     %if;event.has_date;%apply;on_edate("event")%end;
-    %if;event.has_place; • %apply;advanced("death_place",event.place)%end;
+    %if;event.has_place; [in (place)] %apply;advanced("death_place",event.place)%end;
   </span>
   %if;has_linked_page.DEATH;<dd>%linked_page.DEATH;</dd>%end;
 %end;
@@ -977,7 +977,7 @@
   <span>
     %apply;capitalize(event.name)
     %if;event.has_date;%apply;on_edate("event")%end;
-    %if;event.has_place; • %apply;advanced("burial_place",event.place)%end;
+    %if;event.has_place; [in (place)] %apply;advanced("burial_place",event.place)%end;
   </span>
 %end;
 %define;marriage_event()
@@ -986,7 +986,7 @@
     %else;%apply;capitalize(event.name)%end;
     %if;(event.has_spouse and evar.spouse!="off") [with] %event.spouse;%end;
     %if;event.has_date;%apply;on_edate("event")%end;
-    %if;event.has_place; • %apply;advanced("marriage_place",event.place)%end;
+    %if;event.has_place; [in (place)] %apply;advanced("marriage_place",event.place)%end;
   </span>
 %end;
 %define;other_event()
@@ -995,7 +995,7 @@
     %else;%if;(event.name=[no mention])[*relation/relations]0%else;%apply;capitalize(event.name)%end;%end;
     %if;(event.has_spouse and evar.spouse!="off" and event.name!=[divorce event] and event.name!=[separate event] and event.name!=[annulation]) [with] %event.spouse;%end;
     %if;event.has_date;%apply;on_edate("event")%end;
-    %if;event.has_place; • %event.place;%end;
+    %if;event.has_place; [in (place)] %event.place;%end;
   </span>
 %end;
 %define;one_event(z1)
@@ -1204,7 +1204,7 @@
           <div class="tree" style="clear:both">
             %if;(has_relation_him and has_relation_her)
               %apply;relation_computing("relation_him", "relation_her", "") %apply;capitalize(relation_type)[:]
-              <span style="white-space: nowrap">%apply;somebody("relation_him")
+              <span style="white-space: wrap">%apply;somebody("relation_him")
               %sp;[and]%sp;%apply;somebody("relation_her")</span>.
             %end;
             %if;(has_relation_him and not has_relation_her)

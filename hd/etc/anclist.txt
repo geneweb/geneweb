@@ -33,7 +33,7 @@
   %if;(b.max_anc_level = "")%apply;min(e.v, max_anc_level, 7)
   %else;%apply;min(e.v, max_anc_level, b.max_anc_level)%end;
 %in;
-<h3>%nn;
+<h3 class="mt-2 ml-3">%nn;
   %if;(e.t = "F")
     %apply;a_of_b%with;[*surnames branch]%and;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -107,7 +107,7 @@
 %end;
 %define;input(xx)
   <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
-  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control-sm mr-1%if;(xx!=1) d-none%end;" disabled>
+  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control ml-1%if;(xx!=1) d-none%end;" disabled>
 %end;
 %define;definecujus(pp,nn)
   %if;(nn=0)[*define Cujus:::pp]0%elseif;(nn=1)[*define Cujus:::pp]1%end;
@@ -121,13 +121,11 @@
     %apply;ancestors_by_list("self", lvl)
   %elseif;(e.t="H")
     %( horizontal ascendency %)
-    <form class="form-inline mt-2">
-      <div id="filterbysurname" class="form-row d-none">
-        <span class="form-control-sm">[*filter by][:]</span>%nn;
-        %apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)%apply;input(5)   
-        <button id="btnplus" type="button" class="btn btn-primary btn-sm" title="[*add filter] (max 5)"><i class="fa fa-plus fa-fw"></i></button>
-        <button id="btnclear" type="button" class="btn btn-danger btn-sm ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
-      </div>
+    <form id="filterbysurname" class="form-inline mt-2 d-none">
+      <div class="form-control px-0 border-0">[*filter by]</div>
+      <div>%apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)</div>
+      <button id="btnplus" type="button" class="btn btn-primary ml-2" title="[*add filter] (max 4)"><i class="fa fa-plus fa-fw"></i></button>
+      <button id="btnclear" type="button" class="btn btn-danger ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
     </form>
     <div class="text-monospace anclist_hr mt-2">
       %let;sosa_v;%if;(sosa.v!="")%sosa.v;%else;1%end;%in;

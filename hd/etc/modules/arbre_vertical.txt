@@ -238,27 +238,22 @@
 %end;
 %let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
 %if;has_parents;
-  <table class="tree-vert mx-auto my-2">
-    %if;(e.t="T" and e.t1="m")
+  %if;(e.t="T" and e.t1="m")
+    <div class="row mx-auto mt-2">
       %include;modules/arbre_8gen
-    %elseif;(e.t="A" or e.t="C")
-      <tr><td class="text-center">%apply;line("self",e_v+1)</td></tr>
-    %else;
-      %foreach;ancestor_tree_line(e_v+1)
-        %apply;a_tree_line()
-      %end;
-    %end;
-  </table>
+    </div>
+  %elseif;(e.t="A" or e.t="C")
+    <div class="text-center col-6 mt-2">
+      %apply;line("self",e_v+1)
+    </div>
+  %else;
+    <div class="d-flex mt-2 mx-3%if;(e.v<3) justify-content-center col-6%end;">
+      <table class="tree-vert">
+        %foreach;ancestor_tree_line(e_v+1)
+          %apply;a_tree_line()
+        %end;
+      </table>
+    </div>
+  %end;
 %end;
 %include;buttons_dag
-%(<script>
-window.addEventListener('load', function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const e_v = urlParams.get('v');
-  const width = window.innerWidth;
-  var size = 2*width/(2^(e_v+1));
-  console.log(size);
-  alert(size);
-  $('.fix_size').css("max-width", size);
-})
-</script>%)

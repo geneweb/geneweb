@@ -18638,12 +18638,12 @@ co: titulu/tituli
 cs: titul/tituly
 da: titel/titler (nob.)
 de: Titel/Titel
-en: title/titles
+en: title/titles/title(s)
 eo: nobeltitolo:a:+n/nobeltitoloj:a:+n
 es: título/títulos
 et: tiitel/tiitlid
 fi: arvonimi/arvonimet
-fr: titre/titres
+fr: titre/titres/titre(s)
 he:  תואר/ תארים
 is: titill/titlar
 it: titolo/titoli
