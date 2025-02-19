@@ -86,7 +86,7 @@
 /* Toolbar and characters panel */
 /* Light grey background color highlight for the toolbar characters.txt */
 .ch .hl {
-    background-color: #ffe2e2;
+  background-color: #ffe2e2;
 }
 
 .ch a.hl:hover {
@@ -130,10 +130,12 @@ html {
   font-size: 1rem;
 }
 
-
+#updform .row{
+  margin-top:0.2rem;
+}
 /* grey empty inputs with placeholder to better see empty fields in forms */
-input:placeholder-shown {
-  background-color: #f9f9f9;
+#updform textarea:placeholder-shown, input:placeholder-shown, select.custom-select {
+  background-color: #f2f2f2;
 }
 
 /* Upd_ind/fam forms scroll fix */
@@ -547,10 +549,16 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   width: 100%;
 }
 
+/* slowly hide placeholder on input focus */
+[placeholder]:focus::-webkit-input-placeholder {
+  transition: opacity 0.25s ease;
+  opacity: 0;
+}
+
 /* Style du placeholder flottant */
 .floating-placeholder {
   position: absolute;
-  top: -12px;
+  top: -8px;
   left: 8px;
   font-size: 12px;
   background: white;
@@ -559,14 +567,19 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   opacity: 0;
   z-index: 3;
   pointer-events: none;
+  border-radius: 5px;
+  border-top: 1px solid #dee2e6;
+  box-shadow: 1px 0 2px -1px rgba(0, 123, 255, 0.7),
 }
 
 .form-control-lg + .floating-placeholder {
   left: 12px;
 }
 
-.floating-placeholder.active {
+.floating-placeholder.active, .floating-placeholder:focus::-webkit-input-placeholder{
   opacity: 0.9;
+  transform: translateY(-4px);
+  transition: transform 0.06s ease-out;
 }
 
 /* Clear button */
@@ -658,11 +671,6 @@ div.anchor_upd {
   #searchmodal .modal-dialog {
     max-width: 85%;
   }
-}
-/* slowly hide placeholder on input focus */
-[placeholder]:focus::-webkit-input-placeholder {
-  transition: opacity 0.5s 0.5s ease;
-  opacity: 0;
 }
 
 /* Force select2 results padding to 0 */
@@ -776,6 +784,24 @@ a {
   max-height: 160px;
 }
 
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.15) !important; /* Légère transparence */
+  color: inherit !important; /* Garde les couleurs d'origine */
+  backdrop-filter: brightness(1.02); /* Légère luminosité */
+}
+
+#banner {
+  background-color: transparent; /* Fond transparent par défaut */
+  transition: background-color 0.15s ease; /* Transition fluide */
+}
+
+#banner.scrolled {
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); /* Légère ombre pour démarquer */
+}
+
+#banner.scrolled, .card-body {
+  background-color: #f8f9fa;
+}
 
 /* Cancel empty margin-left of Bootstrap <dl> */
 dl {
