@@ -486,6 +486,15 @@ end
 let get_search_type gets =
   match gets "search_type" with "OR" -> Fields.Or | _ -> Fields.And
 
+let get_name_search_mode gets key =
+  let key_pfx = key ^ "_prefix" in
+  let value_pfx = gets key_pfx in
+  let value = gets key in
+  if value_pfx = "on" then `Not_Exact_Prefix
+  else if value = "on" then `Exact
+  else if value = "pfx" then `Not_Exact_Prefix
+  else `Not_Exact
+
 (*
   Search for other persons in the base matching with the provided infos.
 
@@ -582,15 +591,7 @@ let advanced_search conf base max_answers =
   let marriage_place_searched = place_searched Fields.marriage_place in
   let other_events_place_searched = place_searched Fields.other_events_place in
 
-  let get_name_search_mode key =
-    let key_pfx = key ^ "_prefix" in
-    let value_pfx = gets key_pfx in
-    let value = gets key in
-    if value_pfx = "on" then `Not_Exact_Prefix
-    else if value = "on" then `Exact
-    else if value = "pfx" then `Not_Exact_Prefix
-    else `Not_Exact
-  in
+  let get_name_search_mode = get_name_search_mode gets in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
@@ -816,8 +817,8 @@ let searching_fields conf base =
   in
   let sex = match gets "sex" with "M" -> 0 | "F" -> 1 | _ -> 2 in
   (* Fonction pour tester un simple champ texte (e.g: first_name). *)
-  let string_field x search =
-    if test_string x then search ^ " " ^ gets x else search
+  let string_field ?(map_field = Fun.id) x search =
+    if test_string x then search ^ " " ^ map_field (gets x) else search
   in
   (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
   let get_place_date_request place_prefix_field_name date_prefix_field_name
@@ -884,8 +885,11 @@ let searching_fields conf base =
   in
   let search_type = get_search_type gets in
   let search = "" in
-  let search = string_field "first_name" search in
-  let search = string_field "surname" search in
+  let map_field key s =
+    if get_name_search_mode gets key = `Not_Exact_Prefix then s ^ "(...)" else s
+  in
+  let search = string_field ~map_field:(map_field "exact_first_name") "first_name" search in
+  let search = string_field ~map_field:(map_field "exact_surname") "surname" search in
   let search = sosa_field search in
   let build_event_search event_search (s1, s2) =
     let date_field_name =
