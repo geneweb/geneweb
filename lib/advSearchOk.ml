@@ -58,6 +58,11 @@ let string_incl =
 let abbrev_lower x = Name.abbrev (Name.lower x)
 let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
 
+let is_subset_pfx s1 s2 =
+  List.for_all
+    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
+    s1
+
 module Fields : sig
   type search = And | Or
   type name = string
@@ -341,11 +346,6 @@ end = struct
              Date.cdate_to_dmy_opt @@ Event.get_date e)
       |> List.exists (fun event_date_f ->
              match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
-
-  let is_subset_pfx s1 s2 =
-    List.for_all
-      (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
-      s1
 
   let match_name ~search_list ~mode : string list -> bool =
     let matching : string list -> string list -> bool =
@@ -958,8 +958,14 @@ let matching_first_name_aliases ~first_name =
 let exact_matching_first_name_aliases ~first_name =
   filter_alias ~name:first_name ~matching:Ext_list.elements_cmp
 
+let prefix_matching_first_name_aliases ~first_name =
+  filter_alias ~name:first_name ~matching:is_subset_pfx
+
 let matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.is_subset
 
 let exact_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.elements_cmp
+
+let prefix_matching_surname_aliases ~surname =
+  filter_alias ~name:surname ~matching:is_subset_pfx

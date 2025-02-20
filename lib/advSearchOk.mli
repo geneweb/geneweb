@@ -14,8 +14,14 @@ val matching_first_name_aliases :
 val exact_matching_first_name_aliases :
   first_name:string -> aliases:string list -> string list
 
+val prefix_matching_first_name_aliases :
+  first_name:string -> aliases:string list -> string list
+
 val matching_surname_aliases :
   surname:string -> aliases:string list -> string list
 
 val exact_matching_surname_aliases :
+  surname:string -> aliases:string list -> string list
+
+val prefix_matching_surname_aliases :
   surname:string -> aliases:string list -> string list
