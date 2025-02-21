@@ -226,7 +226,9 @@
     [access]0
     <label><input type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked="checked"%end;%/>[iftitles/public/semipublic/private]0</label>
     <label><input type="radio" name="access" value="Public"%if;acc_public; checked="checked"%end;%/>[iftitles/public/semipublic/private]1</label>
+    %if;(b.semi_public="yes")
     <label><input type="radio" name="access" value="SemiPublic"%if;acc_semi_public; checked="checked"%end;%/>[iftitles/public/semipublic/private]2</label>
+    %end;
     <label><input type="radio" name="access" value="Private"%if;acc_private; checked="checked"%end;%/>[iftitles/public/semipublic/private]3</label>
   </div>
 </fieldset>

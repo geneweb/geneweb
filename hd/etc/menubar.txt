@@ -24,7 +24,7 @@
 %end;
 %define;addgraph(xxx)[*add/clear/show/edit the graph:::xxx]0%end;
 %if;(not cancel_links)
-  <nav class="navbar sticky-top navbar-light justify-content-center navbar-expand-md pt-0 px-0%sp;
+  <nav class="navbar sticky-top navbar-light bg-white justify-content-center navbar-expand-md pt-0 px-0%sp;
     %if;("MOD" in e.m or (e.ip!="" and "ADD" in e.m))mt-5%else;mt-1 mt-md-0%end;">
     <div class="btn-toolbar" role="toolbar">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -161,7 +161,7 @@
               <a class="dropdown-item" href="%prefix;m=H&v=visibility" title="[*visibility-hlp]">
                 %if;is_private;
                   <i class="fa fa-person fa-fw text-danger mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]3)%nn;
-                %elseif;is_semi_public;
+                %elseif;(b.semi_public="yes" and is_semi_public)
                   <i class="fa fa-person fa-fw text-warning mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]2)%nn;
                 %elseif;(is_public or has_titles)
                   <i class="fa fa-person fa-fw text-success mr-2"></i>.[*visibility] ([iftitles/public/semipublic/private]1)%nn;

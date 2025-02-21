@@ -294,13 +294,15 @@ let is_related conf base p =
             Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
             && List.mem (Gwdb.get_iper p) family
         | _ -> false)
-    | _ -> (
-        try
-          Sys.remove fname;
-          false
-        with Sys_error _ ->
-          Printf.eprintf "Error when removing %s\n" fname;
-          false)
+    | _ ->
+        if Sys.file_exists fname then (
+          try
+            Sys.remove fname;
+            false
+          with Sys_error _ ->
+            Printf.eprintf "Error when removing %s\n" fname;
+            false)
+        else false
   else false
 
 (** Calcul les droits de visualisation d'une personne en
@@ -324,19 +326,90 @@ let is_related conf base p =
     - Faux dans tous les autres cas *)
 (* check that p is parent or descendant of conf.key *)
 
+(* kept for later debugging
+   let check_p_auth conf base p =
+     let mode_semi_public =
+       begin try List.assoc "semi_public" conf.Config.base_env = "yes" with
+         Not_found -> false
+       end;
+     in
+     let access = Gwdb.get_access p in
+     let not_private = access <> Private in
+     Printf.eprintf "P_auth for %s\n" (Gutil.designation base p);
+     if conf.Config.wizard
+         then Printf.eprintf "Wizard\n";
+     if (not mode_semi_public) && conf.Config.friend
+         then Printf.eprintf "Friend and not mode_semi_public\n";
+     if conf.userip = Some (Gwdb.get_iper p)
+         then Printf.eprintf "Self\n";
+     if access = Public
+         then Printf.eprintf "Public\n";
+     if conf.Config.public_if_titles
+        && access = IfTitles
+        && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+         then Printf.eprintf "Has titles\n";
+     if conf.Config.friend && conf.Config.semi_public
+        && (is_semi_public p || is_related conf base p)
+        && not_private
+         then Printf.eprintf "visiting a semi_public or family person\n";
+     if (conf.Config.public_if_no_date && access <> Private)
+         then Printf.eprintf "not private and no dates\n";
+     let birth_d = (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) in
+     if conf.Config.private_years < -1
+         then Printf.eprintf "private_years < -1\n";
+     let baptism_d = (Gwdb.get_baptism  p |> Date.cdate_to_dmy_opt) in
+     let death_d = (Gwdb.get_death p |> Date.dmy_of_death) in
+     Printf.eprintf "other conditions date driven\n";
+     begin match birth_d with
+     | None -> Printf.eprintf "no birth date\n"
+     | Some d -> (
+         let a = Date.time_elapsed d conf.today in
+         if (a.Def.year > conf.Config.private_years)
+           || a.Def.year = 0 && (a.month > 0 || a.day > 0)
+         then Printf.eprintf "old enough (bir) (%d)\n" conf.Config.private_years
+         else Printf.eprintf "too young (bir) (%d)\n" conf.Config.private_years)
+     end;
+     begin match baptism_d with
+     | None -> Printf.eprintf "no baptism date\n"
+     | Some d -> (
+         let a = Date.time_elapsed d conf.today in
+         if (a.Def.year > conf.Config.private_years)
+           || a.Def.year = 0 && (a.month > 0 || a.day > 0)
+         then Printf.eprintf "old enough (bap) (%d)\n" conf.Config.private_years
+         else Printf.eprintf "too young (bap) (%d)\n" conf.Config.private_years)
+     end;
+     Printf.eprintf "check death date\n";
+     begin match death_d with
+     | None -> Printf.eprintf "no death date\n"
+     | Some d -> (
+         let a = Date.time_elapsed d conf.today in
+         if (a.Def.year > conf.Config.private_years_death)
+           || a.Def.year = 0 && (a.month > 0 || a.day > 0)
+         then Printf.eprintf "old enough (dea) (%d)\n" conf.Config.private_years_death
+         else Printf.eprintf "too young  (%d)\n" conf.Config.private_years_death)
+     end;
+     Printf.eprintf "no check on marriage date(s)\n"
+*)
+
 let p_auth conf base p =
+  let mode_semi_public =
+    try List.assoc "semi_public" conf.Config.base_env = "yes"
+    with Not_found -> false
+  in
+  let access = Gwdb.get_access p in
+  let not_private = access <> Private in
   conf.Config.wizard
+  || ((not mode_semi_public) && conf.Config.friend)
   || conf.userip = Some (Gwdb.get_iper p)
-  || Gwdb.get_access p = Public
-  || conf.Config.public_if_titles
-     && Gwdb.get_access p = IfTitles
+  || access = Public
+  || conf.Config.public_if_titles && access = IfTitles
      && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-  || (conf.Config.friend && conf.Config.semi_public
-     && (is_semi_public p || is_related conf base p))
-     && Gwdb.get_access p <> Private
-  || (conf.Config.public_if_no_date && Gwdb.get_access p <> Private)
+  || conf.Config.friend && conf.Config.semi_public
+     && (is_semi_public p || is_related conf base p)
+     && not_private
+  || (conf.Config.public_if_no_date && access <> Private)
   ||
-  if conf.Config.private_years < -1 then true
+  if conf.Config.private_years <= -1 then true
   else
     (* return true if (today - d) > lim *)
     let check_date d lim none =
