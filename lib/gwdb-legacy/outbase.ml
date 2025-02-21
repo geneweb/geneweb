@@ -193,8 +193,7 @@ end = struct
     base.data.strings.set_array arr
 end
 
-let output_name_index_lower_aux strings_store cmp get split base names_inx
-    names_dat =
+let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
   (* Hashtable associating a string id with the list of correspong persons' ids *)
   let ht = Dutil.IntHT.create 0 in
   (* Hashtable associating the id of a strings and the id of its lowered form *)
@@ -205,7 +204,7 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
     | None ->
         (* strip the string particle, lower it and add it to the strings data, return the id of the new string*)
         let name = base.data.strings.get istr in
-        let split_strings = split name in
+        let split_strings = Name.split name in
         let _, strings =
           List.fold_right
             (fun s (str, strings) ->
@@ -287,7 +286,7 @@ let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
   output_name_index_lower_aux strings_ht
     (Dutil.compare_snames_i_lower base.data)
     (fun p -> p.surname :: p.surnames_aliases)
-    Name.split_sname base tmp_snames_inx tmp_snames_dat
+    base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_lower_index strings_ht base tmp_fnames_inx tmp_fnames_dat
@@ -295,7 +294,7 @@ let output_first_name_lower_index strings_ht base tmp_fnames_inx tmp_fnames_dat
   output_name_index_lower_aux strings_ht
     (Dutil.compare_snames_i_lower base.data)
     (fun p -> p.first_name :: p.first_names_aliases)
-    Name.split_fname base tmp_fnames_inx tmp_fnames_dat
+    base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =
   let oc = open_out fname in
