@@ -44,7 +44,7 @@ let make_name_index base =
 let create_name_index oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
-let make_strings_of_fsname_aux split get base =
+let make_strings_of_fsname_aux get base =
   let t = Array.make Dutil.table_size Ext_int.Set.empty in
   let add_name (key : string) (value : int) =
     let key = Dutil.name_index key in
@@ -58,7 +58,7 @@ let make_strings_of_fsname_aux split get base =
       if istr <> 1 then (
         let s = base.data.strings.get istr in
         add_name s istr;
-        split (fun i j -> add_name (String.sub s i j) istr) s)
+        Name.split_callback (fun i j -> add_name (String.sub s i j) istr) s)
     in
     List.iter aux (get p)
   done;
@@ -75,12 +75,10 @@ let make_strings_of_fsname_aux split get base =
     t
 
 let make_strings_of_fname =
-  make_strings_of_fsname_aux Name.split_fname_callback (fun p ->
-      p.first_name :: p.first_names_aliases)
+  make_strings_of_fsname_aux (fun p -> p.first_name :: p.first_names_aliases)
 
 let make_strings_of_sname =
-  make_strings_of_fsname_aux Name.split_sname_callback (fun p ->
-      p.surname :: p.surnames_aliases)
+  make_strings_of_fsname_aux (fun p -> p.surname :: p.surnames_aliases)
 
 let create_strings_of_sname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_sname base)

@@ -496,31 +496,30 @@ let old_strings_of_fsname bname strings (_, person_patches) =
     in
     Hashtbl.fold
       (fun _ p acc ->
-        let aux split acc istr =
+        let aux acc istr =
           let str = strings.get istr in
           if
             (not (List.mem istr acc))
             &&
-            match split str with
+            match Name.split str with
             | [ s ] -> i = Dutil.name_index s
             | list -> List.exists (fun s -> i = Dutil.name_index s) (str :: list)
           then istr :: acc
           else acc
         in
         let acc =
-          List.fold_left (aux Name.split_fname) acc
+          List.fold_left aux acc
             (p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
         in
         let acc =
-          List.fold_left (aux Name.split_sname) acc
-            (p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
+          List.fold_left aux acc (p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
         in
         acc)
       person_patches (Array.to_list r)
 (**)
 
 (** offset: 1 pour sname 2 pour fname *)
-let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
+let new_strings_of_fsname_aux offset_acc offset_inx get bname strings
     (_, person_patches) =
   let t = ref None in
   fun s ->
@@ -565,7 +564,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
               (not (List.mem istr acc))
               &&
               let str = strings.get istr in
-              match split str with
+              match Name.split str with
               | [ s ] -> i = Dutil.name_index s
               | list ->
                   List.exists (fun s -> i = Dutil.name_index s) (str :: list)
@@ -575,11 +574,11 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
       person_patches (Array.to_list r)
 
 let new_strings_of_sname =
-  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p ->
+  new_strings_of_fsname_aux 1 0 (fun p ->
       p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
 
 let new_strings_of_fname =
-  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p ->
+  new_strings_of_fsname_aux 2 1 (fun p ->
       p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
 
 let strings_of_sname = function

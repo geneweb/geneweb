@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* La liste des caractères interdits *)
 let forbidden_char = [ ':'; '@'; '#'; '='; '$' ]
 
 (* Name.lower *)
@@ -101,7 +100,6 @@ let abbrev s =
 
 (* Name.strip *)
 
-(* Name.strip_c = name without the charater c given as parameter *)
 let strip_c s c =
   let rec copy i len =
     if i = String.length s then Buff.get len
@@ -111,21 +109,6 @@ let strip_c s c =
   copy 0 0
 
 let strip s = strip_c s ' '
-
-(* String without any forbidden caracters defined in forbidden_char *)
-(* ******************************************************************** *)
-(*  [Fonc] purge : string -> string                                     *)
-
-(* ******************************************************************** *)
-
-(** [Description] : Supprime tous les caractères interdits (défini par
-                    forbidden_char) présents dans la chaine passée en
-                    argument.
-    [Args] :
-      - s : string que l'on veut purger
-    [Retour] :
-      - string : retourne la chaîne délestée des caractères interdits
-    [Rem] : Exporté en clair hors de ce module.                         *)
 let purge s = List.fold_left strip_c s forbidden_char
 
 (* Name.crush *)
@@ -140,18 +123,6 @@ let roman_number s i =
   in
   if i = 0 || s.[i - 1] = ' ' then loop i else None
 
-(* Name.crush, a custom sonnex/soundex-like phonetic algorithm:
-     - no spaces
-     - roman numbers are keeped
-     - vowels are suppressed, except in words starting with a vowel,
-       where this vowel is converted into "e"
-     - "k" and "q" replaced by "c"
-     - "y" replaced by "i"
-     - "z" replaced by "s"
-     - "ph" replaced by "f"
-     - others "h" deleted
-     - s at end of words are deleted
-     - no double lowercase consons *)
 let crush s =
   let rec copy i len first_vowel =
     if i = String.length s then Buff.get len
@@ -200,14 +171,10 @@ let crush s =
 
 (* strip_lower *)
 
-(* strip_lower = strip o lower, as first comparison of names.
-   First names and Surnames comparison is strip_lower equality. *)
 let strip_lower s = strip (lower s)
 
 (* crush_lower *)
 
-(* crush_lower = crush o abbrev o lower, as second comparison of names.
-   In index by names, the "names" are crush_lowers *)
 let crush_lower s = crush (abbrev (lower s))
 
 (* concat two strings using Bytes module *)
@@ -222,7 +189,7 @@ let concat fn sn = concat_aux fn (String.length fn) sn (String.length sn)
 let contains_forbidden_char s = List.exists (String.contains s) forbidden_char
 
 (* Copy/paste from String.split_on_char adapted to our needs *)
-let split_sname_callback fn s =
+let split_callback fn s =
   let open String in
   let j = ref (length s) in
   for i = length s - 1 downto 0 do
@@ -232,10 +199,7 @@ let split_sname_callback fn s =
   done;
   fn 0 !j
 
-let split_sname s =
+let split s =
   let r = ref [] in
-  split_sname_callback (fun i j -> r := String.sub s i j :: !r) s;
+  split_callback (fun i j -> r := String.sub s i j :: !r) s;
   !r
-
-let split_fname_callback = split_sname_callback
-let split_fname = split_sname
