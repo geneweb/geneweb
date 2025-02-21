@@ -240,7 +240,11 @@ let make_henv conf base =
       Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
     with
     | Some ip -> 
-      { conf with semi_public = get_access (poi base ip) = SemiPublic; userip = Some ip }
+      { conf with
+          semi_public =
+            if conf.semi_public then get_access (poi base ip) = SemiPublic
+            else true;
+          userip = Some ip }
     | None -> conf
   in
   let aux param conf =

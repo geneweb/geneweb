@@ -1175,7 +1175,10 @@ let make_conf from_addr request script_name env =
      debug = !debug;
      query_start = Unix.gettimeofday ();
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
-     semi_public = false;
+     semi_public =
+       begin try List.assoc "semi_public" base_env = "yes" with
+         Not_found -> false
+       end;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user;
      username = username;
