@@ -97,22 +97,39 @@ let patch_misc_names base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
     (fun s -> base.func.Dbdisk.patch_name s ip)
     (gen_gen_person_misc_names base p (fun p -> p.Dbdisk.titles))
 
+let have_names_changed base ip p =
+  let p_opt = try Some (base.data.persons.get ip)
+    with Failure _ -> None
+  in
+  match p_opt with
+  | Some p' ->
+    p.first_name <> p'.first_name ||
+    p.surname <> p'.surname ||
+    p.public_name <> p'.public_name ||
+    p.qualifiers <> p'.qualifiers ||
+    p.aliases <> p'.aliases ||
+    p.first_names_aliases <> p'.first_names_aliases ||
+    p.titles <> p'.titles
+  | None -> true
+
 let patch_person base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
+  let change = have_names_changed base ip p in
   base.func.Dbdisk.patch_person ip p;
-  let s = sou base p.first_name ^ " " ^ sou base p.surname in
-  base.func.Dbdisk.patch_name s ip;
-  patch_misc_names base ip p;
-  Array.iter
-    (fun i ->
-      let cpl = base.data.couples.get i in
-      let m = Adef.mother cpl in
-      let f = Adef.father cpl in
-      patch_misc_names base m (base.data.persons.get m);
-      patch_misc_names base f (base.data.persons.get f);
-      Array.iter
-        (fun i -> patch_misc_names base i (base.data.persons.get i))
-        (base.data.descends.get i).children)
-    (base.data.unions.get ip).family
+  if change then
+    let s = sou base p.first_name ^ " " ^ sou base p.surname in
+    base.func.Dbdisk.patch_name s ip; (* can be avoided *)
+    patch_misc_names base ip p;
+    Array.iter
+      (fun i ->
+         let cpl = base.data.couples.get i in
+         let m = Adef.mother cpl in
+         let f = Adef.father cpl in
+         patch_misc_names base m (base.data.persons.get m);
+         patch_misc_names base f (base.data.persons.get f);
+         Array.iter
+           (fun i -> patch_misc_names base i (base.data.persons.get i))
+           (base.data.descends.get i).children)
+      (base.data.unions.get ip).family
 
 let patch_ascend base ip a = base.func.Dbdisk.patch_ascend ip a
 let patch_union base ip u = base.func.Dbdisk.patch_union ip u
