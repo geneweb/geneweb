@@ -25,7 +25,7 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
-CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
+CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D)
 
 ifeq ($(DUNE_PROFILE),dev)
     CPPO_D+= -D DEBUG
@@ -37,7 +37,6 @@ endif
 	| cppo -n $(CPPO_D) \
 	| sed \
 	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
-	-e "s/%%%SOSA_PKG%%%/$(SOSA_PKG)/g" \
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
 	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \

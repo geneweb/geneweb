@@ -7,6 +7,5 @@
  (libraries unix
             geneweb_def
             geneweb_gwdb
-            geneweb_sosa_mli
             geneweb_util)
 )

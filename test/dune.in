@@ -9,7 +9,6 @@
 (test
   (name test)
   (libraries
-    %%%SOSA_PKG%%%
     %%%GWDB_PKG%%%
     geneweb.ged2gwb_lib
     geneweb.gwb2ged_lib
