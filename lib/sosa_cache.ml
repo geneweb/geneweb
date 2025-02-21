@@ -90,7 +90,7 @@ module StaticCache : sig
 
   val build : conf:Config.config -> base:Gwdb.base -> t option
   val output : base:Gwdb.base -> cache:t -> unit
-  val input : conf:Config.config -> base:Gwdb.base -> t option
+  val input : base:Gwdb.base -> t option
   val get_sosa : cache:t -> iper:Gwdb.iper -> Sosa.t option
   val get_sosa_ref : cache:t -> Gwdb.iper
 end = struct
@@ -139,7 +139,7 @@ end = struct
     close_out oc;
     Files.mv tmp_cache_file cache_file
 
-  let input ~conf ~base : t option =
+  let input ~base : t option =
     let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
     let cache_file = Filename.concat base_dir "cache_static_sosa" in
     if Sys.file_exists cache_file then (
@@ -157,7 +157,6 @@ type t = DynamicCache of DynamicCache.t | StaticCache of StaticCache.t
 
 let dynamic_cache cache = DynamicCache cache
 let static_cache cache = StaticCache cache
-let output_sosa_cache ~conf ~base ~cache = StaticCache.output ~base ~cache
 let sosa_cache : t option ref = ref None
 let sosa_ref : Gwdb.person option option ref = ref None
 
@@ -182,7 +181,7 @@ let is_default_sosa_ref conf base sosa_ref =
     (Option.map Gwdb.get_iper dft_sosa_ref)
   |> Option.value ~default:false
 
-let is_sosa_cache_valid conf base =
+let is_sosa_cache_valid base =
   let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
   let patch_file = Filename.concat base_dir "patches" in
   let cache_file = Filename.concat base_dir "cache_static_sosa" in
@@ -190,7 +189,7 @@ let is_sosa_cache_valid conf base =
   && ((not (Files.exists patch_file))
      || (Unix.stat patch_file).st_mtime < (Unix.stat cache_file).st_mtime)
 
-let get_dynamic_cache conf base sosa_ref =
+let get_dynamic_cache base sosa_ref =
   let cache = DynamicCache.make ~base ~sosa_ref:(Gwdb.get_iper sosa_ref) in
   set_dynamic_cache (Some cache);
   Some (dynamic_cache cache)
@@ -202,9 +201,9 @@ let get_sosa_cache ~conf ~base : t option =
       let sosa_ref = find_sosa_ref conf base in
       match sosa_ref with
       | Some sosa_ref
-        when is_default_sosa_ref conf base sosa_ref
-             && is_sosa_cache_valid conf base -> (
-          let cache = StaticCache.input ~conf ~base in
+        when is_default_sosa_ref conf base sosa_ref && is_sosa_cache_valid base
+        -> (
+          let cache = StaticCache.input ~base in
           (* default sosa ref may have changed since cache generation *)
           match cache with
           | Some cache
@@ -213,8 +212,8 @@ let get_sosa_cache ~conf ~base : t option =
                    (Gwdb.get_iper sosa_ref) ->
               set_static_cache (Some cache);
               Some (static_cache cache)
-          | Some _ | None -> get_dynamic_cache conf base sosa_ref)
-      | Some sosa_ref -> get_dynamic_cache conf base sosa_ref
+          | Some _ | None -> get_dynamic_cache base sosa_ref)
+      | Some sosa_ref -> get_dynamic_cache base sosa_ref
       | None -> None)
 
 let get_sosa ~base ~cache ~iper =
