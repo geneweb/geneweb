@@ -123,6 +123,19 @@ let specify conf base n pl =
   Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf
 
+let this_request_updates_database conf =
+  match p_getenv conf.env "m" with
+  | Some x -> (
+      match x with
+        "ADD_FAM" | "ADD_IND" | "CHANGE_WIZ_VIS" | "CHG_CHN" |
+        "CHG_FAM_ORD" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND" |
+        "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND" |
+        "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" |
+        "MRG_DUP_FAM_Y_N" | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" |
+        "MOD_DATA" | "SND_IMAGE" -> true
+      | _ -> false)
+  | _ -> false
+
 let incorrect_request ?(comment = "") conf =
   Hutil.incorrect_request ~comment:comment conf
 
@@ -399,7 +412,13 @@ let treat_request =
   if conf.wizard
   || conf.friend
   || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
-  then begin
+  then
+  if List.assoc_opt "wizards_cant_write" conf.base_env = Some "yes"
+    && this_request_updates_database conf then
+      Hutil.incorrect_request conf
+          ~comment:"Wizard actions not allowed on this base"
+  else
+  begin
 #ifdef UNIX
     begin match bfile with
       | None -> ()
