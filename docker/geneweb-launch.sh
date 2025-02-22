@@ -1,7 +1,8 @@
 #!/bin/bash
 GENEWEB_HOME="/usr/local/share/geneweb"
+GENEWEB_BASE_PATH=${GENEWEB_HOME}/share/data
 GENEWEB_DB=${GENEWEB_DB:=database}
-GENEWEB_DB_PATH=${GENEWEB_HOME}/share/data/${GENEWEB_DB}
+GENEWEB_DB_PATH=${GENEWEB_BASE_PATH}/${GENEWEB_DB}
 GENEWEB_ADMIN=${GENEWEB_ADMIN:=admin}
 GENEWEB_ADMIN_PASS=${GENEWEB_ADMIN_PASS:=$(openssl rand -hex 32)}
 GENEWEB_LANG=${GENEWEB_LANG:=en}
@@ -73,9 +74,9 @@ start() {
 	-daemon \
 	-plugins -unsafe ${GENEWEB_HOME}/share/dist/gw/plugins \
 	-trace_failed_passwd \
-	-bd ${GENEWEB_DATA_PATH} \
+	-bd ${GENEWEB_BASE_PATH} \
 	-hd ${GENEWEB_HOME}/share/dist/gw \
-	-cache-in-memory
+	-cache-in-memory ${GENEWEB_DB} \
 	-log ${GENEWEB_HOME}/log/gwd.log \
 	$AUTH_ARG 2>&1
 	gwlaunch_log "-- Started gwd!"
