@@ -60,14 +60,18 @@
       <tr>
         <td>%time;</td>
         <td>
-        %if;(person.is_private)
-          <i class="fa fa-person text-danger"> </i>%nn;
-        %elseif;(person.is_semi_public)
-          <i class="fa fa-person text-warning"> </i>%nn;
-        %elseif;(person.is_public or b.public_if_titles and person.has_titles)
-          <i class="fa fa-person text-success"> </i>%nn;
+        %if;is_person;
+          %if;(person.is_private)
+            <i class="fa fa-person text-danger"> </i>%nn;
+          %elseif;(person.is_semi_public)
+            <i class="fa fa-person text-warning"> </i>%nn;
+          %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
+            <i class="fa fa-person text-success"> </i>%nn;
+          %else;
+            <i class="fa fa-person text-muted"> </i>%nn;
+          %end;
         %else;
-          <i class="fa fa-person text-muted"> </i>%nn;
+          &nbsp;&nbsp;
         %end;
         %if;(first_name!="")
           <!--%first_name;/%occ;/%surname;-->

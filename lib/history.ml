@@ -390,6 +390,10 @@ let rec eval_var conf base env _ _ = function
       match get_env "info" env with
       | Vinfo (_, _, _, HI_notes (_, _), _) -> VVbool true
       | _ -> VVbool false)
+  | [ "is_person" ] -> (
+      match get_env "info" env with
+      | Vinfo (_, _, _, HI_ind _p, _) -> VVbool true
+      | _ -> VVbool false)
   | [ "key" ] -> (
       match get_env "info" env with
       | Vinfo (_, _, _, _, s) -> VVstring (possibly_highlight env s)
