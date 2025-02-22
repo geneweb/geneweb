@@ -1079,22 +1079,28 @@ type 'a read_family =
   | F_none  (** Read end of the file *)
   | F_fail of string  (** Exception while reading *)
 
-(** Read succesive family note lines and concat it. *)
-let loop_note line ic =
-  let rec loop_note acc str =
+(** Read succesive lines starting with `tag` and concat them. *)
+let aux_loop_note tag line ic =
+  let tag_len = String.length tag in
+  let rec loop acc str =
     match fields str with
-    | "note" :: tl ->
+    | s :: tl when s = tag ->
         let note =
           if tl = [] then ""
-          else
-            String.sub str
-              (String.length "note" + 1)
-              (String.length str - String.length "note" - 1)
+          else String.sub str (tag_len + 1) (String.length str - tag_len - 1)
         in
-        loop_note (note :: acc) (input_a_line ic)
-    | _ -> (String.concat "\n" (List.rev @@ ("" :: acc)), str)
+        loop (note :: acc) (input_a_line ic)
+    | _l -> (acc, str)
   in
-  loop_note [] line
+  let acc, line = loop [] line in
+  let note =
+    String.concat "\n" (List.rev @@ ("" :: acc))
+    |> Mutil.strip_all_trailing_spaces
+  in
+  (note, line)
+
+(** Parse note (succesive lines starting with "note") *)
+let loop_note = aux_loop_note "note"
 
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk)]
     where wit is a witness definition/reference, [wsex] is a sex of witness
