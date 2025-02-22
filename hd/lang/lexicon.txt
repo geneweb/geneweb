@@ -1719,11 +1719,13 @@ fr: supprimer ce chemin
 
     group/groups
 co: gruppu/gruppi
+de: Gruppe/Gruppen
 en: group/groups
 fr: groupe/groupes
 
     group label
 co: nome di u gruppu
+de: Name der Gruppe
 en: group label
 fr: nom du groupe
 
@@ -1874,6 +1876,7 @@ tr: resim ekle
 
     must use MOD_IND
 co: u ritrattu hè un indirizzu web. Impiegà MOD_IND per mudificallu o squassallu.
+de: Das Bild ist eine URL. Nutze MOD_IND zum korrigieren oder löschen.
 en: portrait is a url. Use MOD_IND to delete or update.
 fr: le portrait est une Url. Utiliser MOD_IND pour le corriger ou le supprimer.
 
@@ -3288,6 +3291,7 @@ tr: bat mitzvah
 
     bce
 co:  nz. à C.
+de:  v. u. Z.
 en:  bce
 fr:  av. J.‑C.
 
@@ -4633,6 +4637,7 @@ tr: "%s" i tıklayın
 
     click to book
 co: per rinuminà tutti i dati uguali&#10;mantene Ctrl è fà un cliccu nant’à un elementu per aprelu in u dizziunariu
+de: zum Umbenennen aller identischen Daten,&#10;halte die Ctrl-Taste und klicke zum Öffnen des Eintrags im Verzeichnis
 en: to rename all the identical data,&#10;hold Ctrl and click to open the entry in the book
 fr: pour renommer toutes les données identiques,&#10;maintenir Ctrl puis cliquer sur une entrée pour l’ouvrir dans le dictionnaire
 
@@ -5078,6 +5083,7 @@ tr: devam eden
 
     copy link %s
 co: cupià u liame %s in u preme’papei
+de: kopiere den %s Link in die Zwischenablage
 en: copy the %s link to the clipboard
 fr: copier le lien %s dans le presse-papier
 pt: copiar o link %s para a área de transferência
@@ -6587,7 +6593,7 @@ ca: base de dades
 co: basa geneologica
 cs: rodokmen
 da: family Tree
-de: stammbaum
+de: Stammbaum
 en: genealogical database
 eo: family Tree
 es: árbol genealógico
@@ -8978,6 +8984,7 @@ tr: GeneWeb parametreleri
 zh: GeneWeb 参数
 
     go to alt base
+de: gehe zur Datenbank/&#10;Sei vorsichtig mit der Indexnummer in der Anfrage!
 en: go to the database/&#10;Be carefull to the index number in the query!
 fr: aller vers la base de données/&#10;Attention au numéro d’index dans la requête !
 
@@ -9833,7 +9840,7 @@ tr: eğer başlıklar
 
     iftitles/public/semipublic/private
 co: s’è tituli/publicu/semi-public/privatu
-de: Adelstitel/öffentlich/half-public/privat
+de: Adelstitel/öffentlich/halb-öffentlich/privat
 en: if titles/public/half-public/private
 es: si hay títulos/público/half-public/privado
 fr: si titres/public/semi-public/privé
@@ -12387,6 +12394,7 @@ sv: ändra ordningen för %s familjehändelser
 tr: %s ailesinin etkinliklerini değiştir
 
     modify all note
+de: die ganze Notiz bearbeiten/vorheriger Abschnitt/nächster Abschnitt
 en: modify all the note/previous section/next section
 fr: éditer toute la note/section précédente/section suivante
 
@@ -12397,11 +12405,13 @@ en: modify the note
 fr: modifier la note
 
     modify note section %d
+de: den Abschnitt %d bearbeiten
 en: modify the section %d
 fr: modifier la section %d
 
     modify gallery
 co: mudificà a fiura (galleria)
+de: das Bild ändern (die Gallerie)
 en: modify the image (gallery)
 fr: modifier l'image (gallerie)
 
@@ -13250,6 +13260,7 @@ fr: pas d’autres
 
     no user key
 co: u liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu `.auth`
+de: dieser Link kann zu einem Homonym führen oder sogar fehlschlagen, weil der Nutzerschlüssel nicht in der `.auth` Datei definiert ist
 en: this link may lead to a homonym or even fail because the user key is not defined in the `.auth` file
 fr: ce lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier `.auth`
 
@@ -14180,6 +14191,7 @@ tr: sadece seçilen nesil
 
     on this image
 co: nant’à sta fiura
+de: auf diesem Bild
 en: on this image
 fr: sur cette image
 
@@ -14922,7 +14934,7 @@ fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegar
 
     previous portrait
 co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu. Impiegà MOD_IND ùn arregistreghja micca u ritrattu.
-de: wenn schon ein gespeichertes Porträt mit dem gleichen Namen existiert, wird es gelöscht.
+de: wenn schon ein gespeichertes Porträt mit dem gleichen Namen existiert, wird es gelöscht. MOD_IND speichert das Porträt nicht.
 en: a possible previous version of the saved portrait will be deleted. Using MOD_IND does not save the portrait.
 fr: une sauvegarde pré-existante du portrait sera supprimée.<br> Utiliser MOD_IND ne sauvegarde pas le portrait.
 
@@ -15047,6 +15059,7 @@ tr: kamu
 
     public name/public names
 co: casata publica/casate publiche
+de: öffentlicher Name/öffentliche Namen
 en: public name/public names
 fr: nom public/noms publics
 
@@ -15959,14 +15972,17 @@ en: legal
 fr: mentions légales
 
     path to
+de: Weg zu mir/Weg zur Sosa N<sup>o</sup> 1
 en: path to me/path to the Sosa n<sup>o</sup> 1
 fr: chemin vers moi/chemin vers le Sosa n<sup>o</sup> 1
 
     path to me
+de: kürzester Weg zwischen dieser Person und mir
 en: shortest path between this individual and me
 fr: chemin le plus court entre cet individu et moi
 
     path to Sosa 1
+de: kürzester Weg zwischen dieser Person und Sosa Nº 1
 en: shortest path between this individual and the Sosa nº 1
 fr: chemin le plus court entre cet individu et le Sosa nº 1
 
@@ -15987,6 +16003,7 @@ en: search %s on matchID
 fr: recherche %s sur matchID
 
     search Insee
+de: suche Treffer in den Insee Sterbeindex Daten
 en: search matches in the Insee death index files
 fr: recherche de correspondances dans les fichiers des décès de l’Insee
 
@@ -16373,6 +16390,7 @@ tr: tüm yıldönümlerini görmek için bir ay seçin.
 
     select/delete an event
 co: selezziunà un evenimentu/squassà l’evenimentu
+de: ein Ereignis auswählen/ein Ereignis löschen
 en: select an event/delete the event
 fr: choisir un événement/supprimer l’événement
 
@@ -16407,8 +16425,8 @@ ca: podeu seleccionar una altre llengua, hi ha disponibles les següents
 co: affissà in
 cs: zvolte jazyk pro prohlížení databáze
 da: du kan vælge fremstilling på et andet sprog blandt de følgende
-de: Blick auf
-en: select langage
+de: Sprache auswählen
+en: select language
 eo: vi povas elekti alian lingvon inter la sekvantajn
 es: ver en
 et: võid valida ka mõne muu keele järgnevatest
@@ -18628,6 +18646,7 @@ tr: zaman çizelgesi
 
     domain/domains
 co: duminiu/duminii
+de: Domäne/Domänen
 en: domain/domains
 fr: domaine/domaines
 
@@ -19516,6 +19535,7 @@ tr: kadar
 
     up to the (individuals)
 co: fin’à i
+de: bis zu
 en: up to the
 fr: jusqu’aux
 
@@ -19595,6 +19615,7 @@ fr: url
 
     restore default_sosa_ref
 co: risturà Sosa 1 predefinitu
+de: Standard Sosa 1 wiederherstellen
 en: restore default Sosa 1
 fr: restorer Sosa 1 par défault
 
@@ -20136,7 +20157,7 @@ ca: testimoni/testimoni/testimonis
 co: testimone/testimone/testimoni
 cs: svědek/svědek/svědkové
 da: vidne/vidne/vidner
-de: Trauzeuge/Trauzeuge/Trauzeugen
+de: Trauzeuge/Trauzeuge/Trauzeugen/Trauzeuge(n)
 en: witness/witness/witnesses/witness(es)
 eo: atestanto:a:+n/atestanto:a:+n/atestantoj
 es: testigo/testigo/testigos
