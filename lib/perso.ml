@@ -3901,8 +3901,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "notes" | "pnotes" ->
       get_notes p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "occ" ->
-      if (not p_auth) || is_hide_names conf p then null_val
-      else get_occ p |> string_of_int |> str_val
+      if !GWPARAM.p_auth_sp conf base p then
+        get_occ p |> string_of_int |> str_val
+      else null_val
   | "occupation" ->
       get_occupation p |> get_note_or_source conf base ~p p_auth false
   | "on_baptism_date" -> date_aux conf p_auth (get_baptism p)
