@@ -10,9 +10,8 @@ type gwexport_opts = {
   img_base_path : string; (* Unused by this module (and not set by options) *)
   keys : string list; (* Key reference of additional persons to select *)
   mem : bool; (* Unused by this module *)
-  no_notes : [ `nn | `nnn | `none ];
-      (* Unused by this module
-         S: Consider simple ADTs *)
+  notes : bool; (* true if we export notes *)
+  base_notes : bool; (* true if we export base_notes *)
   no_picture : bool; (* Unused by this module *)
   oc : string * (string -> unit) * (unit -> unit); (* Unused by this module *)
   parentship : bool;
