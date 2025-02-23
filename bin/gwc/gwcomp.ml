@@ -1102,6 +1102,9 @@ let aux_loop_note tag line ic =
 (** Parse note (succesive lines starting with "note") *)
 let loop_note = aux_loop_note "note"
 
+(** Parse comment (succesive lines starting with "comm") *)
+let loop_comment = aux_loop_note "comm"
+
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk)]
     where wit is a witness definition/reference, [wsex] is a sex of witness
     and [wk] is a kind of witness relationship to the family. *)
@@ -1188,8 +1191,16 @@ let read_family ic fname = function
       let comm, line =
         match line with
         | Some (str, "comm" :: _) ->
-            let comm = String.sub str 5 (String.length str - 5) in
-            (comm, read_line ic)
+            let comm, next_line = loop_comment str ic in
+
+            (* duplicate of input_real_line but starting with line [s] *)
+            let rec get_next_real_line s =
+              if s = "" || s.[0] = '#' then get_next_real_line (input_a_line ic)
+              else s
+            in
+
+            let next_line = get_next_real_line next_line in
+            (comm, Some (next_line, fields next_line))
         | _ -> ("", line)
       in
       (* read family events *)

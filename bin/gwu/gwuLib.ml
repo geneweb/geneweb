@@ -205,17 +205,6 @@ let print_date opts = gen_print_date opts false
 let print_date_option opts = gen_print_date_option opts false
 let print_title_date_option opts = gen_print_date_option opts true
 
-let lines_list_of_string s =
-  let rec loop lines len i =
-    if i = String.length s then
-      List.rev (if len = 0 then lines else Buff.get len :: lines)
-    else if s.[i] = '\n' then
-      let line = Buff.get len in
-      loop (line :: lines) 0 (i + 1)
-    else loop lines (Buff.store len s.[i]) (i + 1)
-  in
-  loop [] 0 0
-
 let has_infos_not_dates opts base p =
   let has_picture_to_export =
     sou base (get_image p) <> "" && not opts.no_picture
@@ -524,6 +513,12 @@ let string_of_witness_kind :
   | Witness_Mentioned -> Some "#ment"
   | Witness_Other -> Some "#othe"
 
+let print_multiline opts tag s =
+  let lines = String.split_on_char '\n' s in
+  List.iter
+    (fun s -> if s <> "" then Printf.ksprintf (oc opts) "%s %s\n" tag s)
+    lines
+
 let print_witness opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s"
     (correct_string base (get_surname p))
@@ -622,10 +617,7 @@ let print_pevent opts base gen e =
         Printf.ksprintf (oc opts) "\n"))
     e.epers_witnesses;
   let note = if opts.notes then sou base e.epers_note else "" in
-  if note <> "" then
-    List.iter
-      (fun line -> Printf.ksprintf (oc opts) "note %s\n" line)
-      (lines_list_of_string note)
+  print_multiline opts "note" note
 
 let get_persons_with_pevents m list =
   let fath = m.m_fath in
@@ -718,12 +710,13 @@ let print_fevent opts base gen in_comment e =
         print_sep ()))
     e.efam_witnesses;
   let note = if opts.notes then sou base e.efam_note else "" in
+  let note_lines = String.split_on_char '\n' note in
   if note <> "" then
     List.iter
       (fun line ->
         Printf.ksprintf (oc opts) "note %s" line;
         print_sep ())
-      (lines_list_of_string note)
+      note_lines
 
 let print_comment_for_family opts base gen fam =
   let comm = if opts.notes then sou base (get_comment fam) else "" in
@@ -742,18 +735,16 @@ let print_comment_for_family opts base gen fam =
   let has_evt =
     !old_gw && (fevents <> [] || sou base (get_marriage_note fam) <> "")
   in
-  if comm <> "" || has_evt then (
-    Printf.ksprintf (oc opts) "comm";
-    if comm <> "" then Printf.ksprintf (oc opts) " %s" (no_newlines comm);
-    if !old_gw then (
-      if sou base (get_marriage_note fam) <> "" then
-        Printf.ksprintf (oc opts) " marriage: %s"
-          (no_newlines (sou base (get_marriage_note fam)));
-      List.iter
-        (fun e ->
-          Printf.ksprintf (oc opts) " ";
-          print_fevent opts base gen true e)
-        fevents);
+  if comm <> "" || has_evt then print_multiline opts "comm" comm;
+  if !old_gw then (
+    if sou base (get_marriage_note fam) <> "" then
+      Printf.ksprintf (oc opts) " marriage: %s"
+        (no_newlines (sou base (get_marriage_note fam)));
+    List.iter
+      (fun e ->
+        Printf.ksprintf (oc opts) " ";
+        print_fevent opts base gen true e)
+      fevents;
     Printf.ksprintf (oc opts) "\n")
 
 let print_empty_family opts base p =
