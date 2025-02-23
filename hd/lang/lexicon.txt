@@ -15919,14 +15919,6 @@ fr: chemin le plus court entre cet individu et moi
 en: shortest path between this individual and the Sosa nº 1
 fr: chemin le plus court entre cet individu et le Sosa nº 1
 
-    reset related cache
-en: reset the cache of near relationships
-fr: réinitialiser le cache des relations proches
-
-    reset related cache hlp
-en: reset the cache extending semi-public visibility to the family
-fr: réinitialiser le cache étendant la visibilité semi-publique à la famille
-
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
 de: suche %s auf Geneanet
@@ -15994,8 +15986,8 @@ en: family mode
 fr: mode famille
 
     family mode-hlp
-en: extend the SemiPublic status to family members
-fr: étendre le statut SemiPublic aux membres de la famille
+en: extend the SemiPublic status to family members (on/off toggle)
+fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
 
     exact-hlp
 en: exact match (word level)
