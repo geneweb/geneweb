@@ -271,9 +271,9 @@
       <li %apply;getvar%with;ns[birth]%end;>
         <span class="fa-li"><i class="fas fa-baby"></i></span>
         %if;has_birth_date;[*born]s %on_birth_date;
-          %if;has_birth_place; [in (place)] %birth_place;%end;
+          %if;has_birth_place; %in_place; %birth_place;%end;
         %else;
-          %if;has_birth_place;[*born]s [in (place)] %birth_place;
+          %if;has_birth_place;[*born]s %in_place; %birth_place;
           %end;
         %end;
       </li>
@@ -288,9 +288,9 @@
       <li %apply;getvar%with;ns[baptism]%end;>
         <span class="fa-li"><i class="fas fa-dove"></i></span>
         %if;has_baptism_date;[*baptized]s %on_baptism_date;
-            %if;has_baptism_place; [in (place)] %baptism_place;%end;
+            %if;has_baptism_place; %in_place; %baptism_place;%end;
         %else;
-          %if;has_baptism_place;[*baptized]s [in (place)] %baptism_place;
+          %if;has_baptism_place;[*baptized]s %in_place; %baptism_place;
           %end;
         %end;
       </li>%nl;
@@ -300,7 +300,7 @@
         <span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>
         %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
-        %if;has_death_place; [in (place)] %death_place;%end;
+        %if;has_death_place; %in_place; %death_place;%end;
         %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
     %end;
     %if;(is_buried or is_cremated)
@@ -308,11 +308,11 @@
         <span class="fa-li"><i class="fas fa-cross"></i></span>
         %if;is_buried;[*buried]s
           %if;has_burial_date; %on_burial_date;%end;
-          %if;has_burial_place; [in (place)] %burial_place;%end;
+          %if;has_burial_place; %in_place; %burial_place;%end;
         %end;
         %if;is_cremated;[*cremated]s
           %if;has_cremation_date; %on_cremation_date;%end;
-          %if;has_cremation_place; [in (place)] %cremation_place;%end;
+          %if;has_cremation_place; %in_place; %cremation_place;%end;
         %end;
       </li>%nl;
     %end;
