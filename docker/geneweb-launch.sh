@@ -7,6 +7,8 @@ GENEWEB_ADMIN=${GENEWEB_ADMIN:=admin}
 GENEWEB_ADMIN_PASS=${GENEWEB_ADMIN_PASS:=$(openssl rand -hex 32)}
 GENEWEB_LANG=${GENEWEB_LANG:=en}
 
+[ -z "${GENEWEB_CUSTOM_ARGS}" ] && GENEWEB_CUSTOM_ARGS=" -cache-in-memory ${GENEWEB_DB}" 
+
 gwlaunch_log() {
 	echo "$(date +%Y-%m-%d_%H:%M:%S) geneweb-launch: $1"
 }
@@ -76,7 +78,7 @@ start() {
 	-trace_failed_passwd \
 	-bd ${GENEWEB_BASE_PATH} \
 	-hd ${GENEWEB_HOME}/share/dist/gw \
-	-cache-in-memory ${GENEWEB_DB} \
+	${GENEWEB_CUSTOM_ARGS} \
 	-log ${GENEWEB_HOME}/log/gwd.log \
 	$AUTH_ARG 2>&1
 	gwlaunch_log "-- Started gwd!"
