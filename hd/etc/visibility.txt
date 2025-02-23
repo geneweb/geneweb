@@ -1,4 +1,4 @@
-  <!-- $Id: visibility.txt %version; 15/02/2025 05:05:34 $ -->
+  <!-- $Id: visibility.txt %version; 23/02/2025 05:05:34 $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -13,14 +13,80 @@
 <body>
 <div class="container">
 <h2>[*visibility-hlp]</h2>
-<div class="mb-2">You are currently logged-is as %if;wizard;<span class="text-success">wizard</span>%elseif;friend;friend;%else;visitor%end;.</div>
-<div>Wizards have full visibility. When logged-in as Friend, himself is always visible for himself.</div>
+<div class="mb-2">
+[
+en: You are currently logged-is as
+fr: Vous êtes connecté en mode
+] %if;wizard;<span class="text-success">wizard</span>%elseif;friend;friend;%else;visitor%end;.
+</div>
+<div>
+[
+en: Wizards have full visibility
+fr: Les magiciens ont la visibilité de toutes les informations
+].<br>
+
+[
+en: For friends and visitor, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter)
+fr: Pour les amis et visiteurs, une personne peut être visible si elle est marquée "Public", ou si elle est décédée ou suffisamment agée (selon des paramètres de la base)
+].<br>
+
+[
+en: Friends who have given their consent see all informations for other consenting friends
+fr: Les amis qui ont donné leur consentement voient toutes les informations des autres amis consentants
+].<br>
+
+[
+en: When logged-in as friend, himself is always visible for himself
+fr: Si connecté comme ami, sa fiche personnelle est toujours visible pour lui même
+].<br>
+
+[
+en: Data for persons who have not (yet) given their consent is limited to first name, surname and marriages
+fr: Pour les personne n'ayant pas (encore) donné leur consentement, seuls les nom, prénom et alliances sont affichés
+].<br>
+[
+en: Anyone cas ask to be tagged as "Private", preventing display of their detailed data to anyone (but widards)
+fr: Toute personne peut demander à être marquée "Private" ce qui réduira l'information affichée aux seuls prénoms, patronyme et alliances
+].<br>
+<p>
+[
+en: If a consenting friend activates the "family mode" he will see all data for the members of his family, even if they have not (yet) given their consent
+fr: S'il active le mode "famille", un ami verra les données des membres de sa famille, même si ceux-ci n'ont pas (ecore) donné leur consentement
+].<br>
+[
+en: this mode is expensive and should be deactivated (second click on the family mode button) for further navigation
+fr: Ce mode, qui est coûteux, doit être désactivé (deuxième click que le bouton famille) pour la poursuite de la navigation
+]
+
+</div>
+<p class="mt-3">
+
+[
+en: Color code
+fr: Codes couleur
+][:]
 <div>
   <ul>
-   <li><i class="fa fa-person fa-fw text-muted mr-2"></i>[*iftitles/public/semipublic/private]0: Public if has titles, needs <code>publiciftitle=yes</code> parameter in gwf (default)
-    <li><i class="fa fa-person fa-fw text-success mr-2"></i>[*iftitles/public/semipublic/private]1: Visible for everyone
-    <li><i class="fa fa-person fa-fw text-warning mr-2"></i>[*iftitles/public/semipublic/private]2: Visible for Friends having SemiPublic status, other Friends see only firstname and surname
-    <li><i class="fa fa-person fa-fw text-danger mr-2"></i>[*iftitles/public/semipublic/private]3: Never visible except for himself when logged as Friend
+    <li><i class="fa fa-person fa-fw text-muted mr-2"></i>[*iftitles/public/semipublic/private]0[:]
+[
+en: Public if has titles, needs <code>public_if_title=yes</code> parameter in gwf (default)
+fr: Publique si titré, si la variable <code>public_if_title=yes</code> est activée pour la base
+]
+    <li><i class="fa fa-person fa-fw text-success mr-2"></i>[*iftitles/public/semipublic/private]1[:] 
+[
+en: Visible for everyone
+fr: Visible pour tout le monde
+]
+    <li><i class="fa fa-person fa-fw text-warning mr-2"></i>[*iftitles/public/semipublic/private]2[:]
+[
+en: Visible for Friends having SemiPublic status (consenting), other Friends see only firstname and surname
+fr: Visible pour les amis consentants (marqués SemiPublic), les autre amis ne voient que nom et prénom
+]
+    <li><i class="fa fa-person fa-fw text-danger mr-2"></i>[*iftitles/public/semipublic/private]3[:]
+[
+en: Never visible except for himself when logged as Friend
+fr: Invisible pour tous sauf lui même (si connecté comme ami)
+]
   </ul>
 </div>
 </div>
