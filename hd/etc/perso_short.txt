@@ -2,6 +2,8 @@
    Display livre d'ascendance
 %)
 
+%let;in_place;%if;roglo;-%else;[in (place)]%end;%in;
+
 %( Copie sans majuscules %)
 %define;tothegen(xx)
   [to the %s generation:::xx]%nn;
@@ -54,15 +56,15 @@
 %define;relation_txt()
   %if;(on_marriage_date != "" or marriage_place != "")
     %if;are_married;
-      [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+      [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
     %elseif;are_not_married;
-      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
     %elseif;are_engaged;
-      [*engaged]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+      [*engaged]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
     %elseif;is_no_sexes_check;
-      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
     %elseif;is_no_mention;
-      %apply;capitalize(on_marriage_date)%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+      %apply;capitalize(on_marriage_date)%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
     %end;
   %end;
 %end;
@@ -732,14 +734,14 @@
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([born],xx.sex))</span>
             %xx.on_birth_date;
-            %if;xx.has_birth_place;%sp;[in (place)]%sp;%xx.birth_place;%end;
+            %if;xx.has_birth_place;%sp;%in_place;%sp;%xx.birth_place;%end;
           </li>
         %end;
         %if;(xx.has_baptism_date or xx.has_baptism_place)
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([baptized],xx.sex))</span>
             %xx.on_baptism_date;
-            %if;xx.has_baptism_place;%sp;[in (place)]%sp;%xx.baptism_place;%end;
+            %if;xx.has_baptism_place;%sp;%in_place;%sp;%xx.baptism_place;%end;
           </li>
         %end;
         %if;(xx.has_death_date or xx.has_death_place)
@@ -747,21 +749,21 @@
             <span class="fp_grey_italic">%apply;capitalize(nth([died],xx.sex))</span>
             %xx.on_death_date;
             %if;xx.computable_death_age;%sp;[aged] %xx.death_age;,%end;
-            %if;xx.has_death_place;%sp;[in (place)]%sp;%xx.death_place;%end;
+            %if;xx.has_death_place;%sp;%in_place;%sp;%xx.death_place;%end;
           </li>
         %end;
         %if;xx.is_buried;
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([buried],xx.sex))</span>
             %xx.on_burial_date;
-            %if;xx.has_burial_place;%sp;[in (place)]%sp;%xx.burial_place;%end;
+            %if;xx.has_burial_place;%sp;%in_place;%sp;%xx.burial_place;%end;
           </li>
         %end;
         %if;xx.is_cremated;
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([cremated],xx.sex))</span>
             %xx.on_cremation_date;
-            %if;xx.has_cremation_place;%sp;[in (place)]%sp;%xx.cremation_place;%end;
+            %if;xx.has_cremation_place;%sp;%in_place;%sp;%xx.cremation_place;%end;
           </li>
         %end;
       </ul>
