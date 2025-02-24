@@ -4,8 +4,14 @@ gwplus
 fam Galichet Jean_Pierre #occu Marchand_de_bois #src déjà_décédés_au_mariage_de_sa_fille_Thérèse_Eugénie 0 <1849 + Loche Marie_Elisabeth #src déjà_décédés_au_mariage_de_sa_fille_Thérèse_Eugénie 0 <1849
 src déjà_décédés_au_mariage_de_sa_fille_Thérèse_Eugénie
 csrc rajout_de_2_enfants_pour_test
+comm few words comment for family, with successive wiki bullets started in first column
+comm * bullet one
+comm ** sub 1.1
+comm ** sub 1.2
+comm ** sub 1.3
+comm * bullet two
 fevt
-#marr 
+#marr
 note Rajout de notes avec retour à la ligne avec des tag html
 note <br>1880 - Habitent Yzernay naissance d'une fille
 note <br>1886 - Habitent la Verdelière (6 enfants) - Recensement Moulins: - Vue 23
@@ -14,7 +20,7 @@ end fevt
 beg
 - h Jean_Charles #occu Négociant #src témoin_au_mariage_de_sa_soeur_Thérèse_Eugénie 1813 #bs 1849-36ans od
 - h Pierre 1814 1/1/1835
-- h Paul 1816 1/1/1886
+- h Paul 1816 1/1/1886 #buri
 - h lolo #src inventé 1818 od
 - f Thérèse_Eugénie #src inscription_des_hypothèques_du_23_février_1874_au_profit_de_dame_thérèse_eugènie_Galichet;_voir_ses_ascendants_dans_la_base_<a_href="https://gw.geneanet.org/mout?lang=fr&p=therese+eugenie&n=galichet">mout</a> 7/9/1830 #bp _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #bs acte_de_mariage od
 end
@@ -23,6 +29,18 @@ notes Galichet Jean_Charles
 beg
 What about [[[Chantal]]]  notes,
 and [[[Andre]]] as second creation ?
+end notes
+
+notes Galichet Paul
+beg
+je rajoute une note sur chacun des événements par défaut, pour contrôler comment elles apparaissent sur la page de cet individu, cela soulève plusieurs problèmes:
+* test fait avec l'affichage par défaut (p_mod=)
+* notes ajoutées sur: naissance, baptême, décès, inhumation
+* ces notes n'apparaissent que sous forme d'info-bulle quand la souris passe sur l'évènement correspondant.
+* sauf pour le baptême qui n'est pas affiché car ni date, ni lieu
+* par contre pour l'inhumation qui est ajouté bien que sans date ni lieu
+(le traitement des deux cas n'est pas cohérent).
+* ces notes devraient apparaitre aussi explicitement dans la fiche par défaut, ce qui correspond à hd/etc/modules/notes.txt  avec op_m=1
 end notes
 
 notes Galichet lolo
@@ -60,7 +78,7 @@ end notes
 
 pevt Galichet Jean_Charles
 #birt 1813 #s 1849-36ans
-#deat 
+#deat
 end pevt
 
 pevt Galichet Pierre
@@ -70,17 +88,23 @@ end pevt
 
 pevt Galichet Paul
 #birt 1816
+note ma note de naissance avec que l'info de l'année
+#bapt
+note ma note de baptême sans aucun détail
 #deat 1/1/1886
+note ma note de mariage sans le lieu
+#buri
+note ma note d'inhumation sans aucun détail non plus
 end pevt
 
 pevt Galichet lolo
 #birt 1818
-#deat 
+#deat
 end pevt
 
 pevt Galichet Thérèse_Eugénie
 #birt 7/9/1830 #p _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #s acte_de_mariage
-#deat 
+#deat
 end pevt
 
 pevt Loche Marie_Elisabeth
@@ -94,8 +118,10 @@ end pevt
 fam Galichet Paul +3/3/1835 Marty Florence #src archives 1/1/1815 1875
 src archives
 csrc archives
+comm * un commentaire de famille sur une seule ligne
 fevt
 #marr 3/3/1835
+note * une note de mariage sur une seule ligne (avec tag wiki)
 end fevt
 beg
 - h Jean-Paul 2/2/1836 od
@@ -116,13 +142,22 @@ pevt Marty Florence
 end pevt
 
 fam Galichet lolo +1840 #mp Brisbane,Queensland,Australie #ms inventé femme1 prenom1 #src inventé 1818 od
+comm un commentaire de famille sur une seule ligne
 fevt
 #marr 1840 #p Brisbane,Queensland,Australie #s inventé
+note note de mariage sur plusieurs lignes avec tag wiki
+note * un bullet
+note * un 2eme bullet
 #div 1844 #s inventé
 end fevt
 fam Galichet lolo +1845 #mp Sydney,Nouvelle-Galles\_du\_Sud,Australie #ms inventé femme2 prenom2 #src inventé 1825 od
+comm une commentaire sur la 2eme famille,
+comm * sur plusieurs lignes
+comm * avec marqueurs wiki
+comm * devant démarrer en 1ere colonne.
 fevt
 #marr 1845 #p Sydney,Nouvelle-Galles\_du\_Sud,Australie #s inventé
+note un commentaire pour le 2eme mariage, sur une seule ligne, et sans tag.
 end fevt
 
 pevt femme1 prenom1
@@ -134,6 +169,7 @@ pevt femme2 prenom2
 end pevt
 
 fam Sutaine Louis.1 0 +1570 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Galichet Nicole 0
+comm le champ commentaire de famille sur une seule ligne, et pas de note de mariage.
 fevt
 #marr 1570 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
 end fevt
@@ -148,12 +184,13 @@ end notes
 
 pevt Sutaine Louis
 #birt 1575
-#deat 
+#deat
 end pevt
 
 fam Sutaine Louis + #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Petizon Claude 0
 fevt
-#marr  #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+#marr #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+note une note de mariage, sur une seule ligne; et pas de commentaire de famille.
 end fevt
 beg
 - f Perrette 1600 11/4/1684 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -165,8 +202,11 @@ pevt Sutaine Perrette
 end pevt
 
 fam Jayot Jean 1604 8/11/1674 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Sutaine Perrette
+comm * un commentaire de famille
+comm * sur plusieurs lignes
+comm * mais pas de note de mariage
 fevt
-#marr 
+#marr
 end fevt
 beg
 - f Claude 27/6/1633 11/4/1697 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -184,7 +224,10 @@ end pevt
 
 fam Boizot Jean.1234 #occu Menuisier 1618 22/3/1702 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Jayot Claude
 fevt
-#marr 
+#marr
+note note de mariage (avec des marqueurs wiki)
+note * sur plusieurs lignes
+note * mais pas de commentaire de famille
 end fevt
 beg
 - f Jeanne.1 27/2/1671 #bp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France 22/4/1748 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -202,7 +245,7 @@ end pevt
 
 fam Geruzet Anthoine.1 #occu Menuisier_à_Paris_(Paroisse_St_Roch) 1640 17/1/1709 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France + Bouquet Louise 0
 fevt
-#marr 
+#marr
 end fevt
 beg
 - h Anthoine #occu Maître_Menuisier_reçu_le_25.01.1695_à_Reims 1667 #bp _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France 16/2/1755 #dp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -221,6 +264,10 @@ end pevt
 fam Geruzet Anthoine +17/1/1695 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Boizot Jeanne.1
 fevt
 #marr 17/1/1695 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+note une note de mariage
+note * sur plusieurs ligne
+note * avec marqueurs wiki en première colonne
+note * mais pas de commentaire de famille.
 end fevt
 beg
 - h Jacques #occu Marchand 4/2/1705 #bp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France 10/3/1774 #dp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -254,7 +301,7 @@ end pevt
 
 pevt Geruzet Marie-Jeanne
 #birt 31/12/1751
-#bapt  #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+#bapt #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
 #deat 8/1/1830 #p Soissons,02,Aisne,Picardie,France
 end pevt
 
@@ -316,6 +363,34 @@ notes-db
   * test la présence d'une apostrophe dans le texte alternate d'une image,
   (https://github.com/geneweb/geneweb/issues/1558)
   <br>voir les notes du couple [[Jean Pierre/Galichet]] et [[Marie Elisabeth/Loche]]
+
+  * test les différentes combinaisons possibles
+  des notes et commentaires associés à un marriage,
+  pendant la correction du pb #1162
+  (https://github.com/geneweb/geneweb/issues/1162)
+
+  ** les deux champs non présents
+  <br>pour le couple [[Jacques/Geruzet]] et [[Jeanne/Pierquin]]
+  ** que le champ note, avec plusieurs lignes
+  <br>pour le couple [[Anthoine/Geruzet]] et [[Jeanne/Boizot/1]]
+  ** que le champ comm, avec plusieurs lignes (sujet du pb #1162)
+  <br>pour le couple [[Jean/Jayot]] et [[Perrette/Sutaine]]
+  ** que le champ note, avec une seule ligne
+  <br>pour le couple [[Louis/Sutaine]] et [[Claude/Petizon]]
+  ** que le champ comm, avec une seule ligne
+  <br>pour le couple [[Louis/Sutaine/1]] et [[Nicole/Galichet]]
+  ** les deux champs rempli, note une ligne, comm plusieurs lignes
+  <br>pour le couple [[lolo/Galichet]] et [[prenom2/femme2]]
+  ** les deux champs rempli, comm une ligne, note plusieurs lignes
+  <br>pour le couple [[lolo/Galichet]] et [[prenom1/femme1]]
+  ** les deux champs rempli, comm et note une seule ligne
+  <br>pour le couple [[Paul/Galichet]] et [[Florence/Marty]]
+  ** les deux champs rempli, comm et note plusieurs lignes
+  <br>pour le couple [[Jean Pierre/Galichet]] et [[Marie Elisabeth/Loche]]
+
+  * problèmes concernant les notes des évènements par défault:
+  çàd naissance, baptême, décès, inhumation
+  Test fait avec la fiche de [[Paul/Galichet]] avec l'affichage par défaut (p_mod=)
 end notes-db
 
 # extended page "Andre" used by:
