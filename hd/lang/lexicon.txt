@@ -19468,7 +19468,7 @@ ca: actualització
 co: mudificazione
 cs: upravit
 da: opdater
-de: Aktualisieren
+de: Aktualisieren +before
 en: update
 eo: ĝisdatigo
 es: revisión
