@@ -1086,9 +1086,9 @@ let rev_input_line ic pos (rbuff, rpos) =
     Bytes.unsafe_to_string s
   in
   let rev_input_line pos =
-    seek_in ic pos;
     if pos <= 0 then raise End_of_file
     else
+      let _ = seek_in ic pos in
       let rec loop pos =
         if pos <= 0 then get_n_reset (), pos
         else
