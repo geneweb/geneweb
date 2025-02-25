@@ -20,7 +20,7 @@
   <h1 id="h1" class="ml-3 mb-0">Chargement en cours…</h1>
   %if(wizard)
     <div class="small float-right mr-2">
-      (<a href="%prefix;m=MOD_NOTES&f=%e.f;">[modify]</a>)
+      (<a href="%prefix;m=MOD_NOTES&f=%e.f;">[modify::]</a>)
     </div>
   %end;
   <div id="album-nav" class="d-none justify-content-center">
