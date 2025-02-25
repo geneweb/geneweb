@@ -136,7 +136,7 @@
           <a href="%prefix;%access;%l_url;i=%index;&%if;(evar.del!="on")del=on&%end;"
             style="%if;(evar.del!="on")color:red;%end;display:inline-block;float:right;width:125px"
             title="%if;(evar.del="on")[*user/password/cancel]2 [delete::person/persons]0%else;[*delete::person/persons]0%end;/[family/families]0%nl;[click on dates]">%nn;
-            <small>%if;(evar.del="on")[*user/password/cancel]2 [delete]%else;[*delete]%end;</small></a>%nn;
+            <small>%if;(evar.del="on")[*user/password/cancel]2 [delete::]%else;[*delete::]%end;</small></a>%nn;
         </span>
       </span>
       %if;(bvar.setup_link != "no")

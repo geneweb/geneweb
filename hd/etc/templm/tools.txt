@@ -82,7 +82,7 @@
   %apply;checkbox("├","witn",[witness/witnesses]1,"")
   %apply;checkbox("├","notes",[note/notes]1,"")
   %apply;checkbox("├","src",[source/sources]1,"")
-  %apply;checkbox("├","upd",[update]1,"")
+  %apply;checkbox("├","upd",[update::]1,"")
   %apply;checkbox("└","hide",[visualize/show/hide/summary]2,"")
 %end;
 

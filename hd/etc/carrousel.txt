@@ -29,7 +29,7 @@
     %elseif;(evar.em="RESET_IMAGE_C_OK")[*image/images]0 [restored]1%nn;
     %end;
   %else;
-    %if;(evar.em="SND_IMAGE_C_OK")%if;(evar.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
+    %if;(evar.em="SND_IMAGE_C_OK")%if;(evar.mode="note")[*note] [update::]%else;[*portrait] [uploaded]0%end;%nn;
     %elseif;(evar.em="DEL_IMAGE_C_OK")[*portrait] [deleted]0%if;(evar.delete!="on") [and] [saved]0%end;%nn;
     %elseif;(evar.em="RESET_IMAGE_C_OK")[*portrait] [restored]0%nn;
     %end;%nn;
@@ -98,7 +98,7 @@
             for="portrait_file">[*select] [image/images]0</label>
         </div>
         <button class="btn btn-primary ml-2 col-2 snd-btn-portrait"
-          type="submit" disabled>[*send]</button>
+          type="submit" disabled>[*send::]</button>
       </form>
       <div class="small mt-2">%nn;
         %if;has_portrait_url;[*must use MOD_IND]%else;
@@ -125,7 +125,7 @@
             [*select] [image/images]0%nn;
           </label>
         </div>
-        <button class="btn btn-primary ml-2 col-2 snd-btn-others" type="submit" >[*send]</button>
+        <button class="btn btn-primary ml-2 col-2 snd-btn-others" type="submit" >[*send::]</button>
         %(TODO: print only if old img already exists%)
         <div class="small col-12 mt-1">
           [*previous image]
