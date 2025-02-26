@@ -73,9 +73,8 @@ let check fname =
 
 let check_open fname =
   if not (check fname) then (
-    if Sys.unix then (
-      Printf.eprintf "*** secure rejects open %s\n" (String.escaped fname);
-      flush stderr);
+    Printf.eprintf "*** secure rejects open %s\n" (String.escaped fname);
+    flush stderr;
     raise (Sys_error "invalid access"))
 
 (* The following functions perform a [check] before opening the file,

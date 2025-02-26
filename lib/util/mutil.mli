@@ -119,8 +119,6 @@ val input_file_ic : in_channel -> string
     Starts from the position where it is when calling [input_file_ic],
     and read until the end of the file.
 
-    This function avoid crashes with text files on Windows platform.
-
     If the channel is opened on a file that is not a regular file,
     the result is meaningless.
 *)

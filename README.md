@@ -28,8 +28,7 @@ Download the file corresponding to your environment from
 the [releases page](https://github.com/geneweb/geneweb/releases).
 
 Extract the distribution folder and place it at the location of your choice. You may alse rename it.
-Its content is as follows (this example is for a Mac distribution.
-Other distributions are very similar):
+Its content is as follows:
 ```
 drwxr-xr-x  13 Henri  staff     416 10 jul 08:34 .
 drwxr-xr-x  44 Henri  staff    1408 10 jul 16:14 ..
@@ -39,10 +38,9 @@ drwxr-xr-x  44 Henri  staff    1408 10 jul 16:14 ..
 -rw-r--r--   1 Henri  staff     950 10 jul 08:34 README.txt
 -rw-r--r--   1 Henri  staff   10780 10 jul 08:34 START.htm
 drwxr-xr-x   2 Henri  staff      64 10 jul 08:34 bases
--rwxr-xr-x   1 Henri  staff    1632 10 jul 08:34 geneweb.command
 drwxr-xr-x  21 Henri  staff     672 10 jul 08:34 gw
--rwxr-xr-x   1 Henri  staff      67 10 jul 08:34 gwd.command
--rwxr-xr-x   1 Henri  staff      71 10 jul 08:34 gwsetup.command
+-rwxr-xr-x   1 Henri  staff      67 10 jul 08:34 gwd.sh
+-rwxr-xr-x   1 Henri  staff      71 10 jul 08:34 gwsetup.sh
 ```
 
 ### Starting the GeneWeb servers

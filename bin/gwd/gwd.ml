@@ -1597,9 +1597,8 @@ let connection (addr, request) script_name contents0 =
     end
 
 let null_reopen flags fd =
-  if Sys.unix then
-    let fd2 = Unix.openfile "/dev/null" flags 0 in
-    Unix.dup2 fd2 fd; Unix.close fd2
+  let fd2 = Unix.openfile "/dev/null" flags 0 in
+  Unix.dup2 fd2 fd; Unix.close fd2
 
 let geneweb_server () =
   let auto_call =
@@ -1634,7 +1633,7 @@ let geneweb_server () =
         else exit 0;
        Files.mkdir_p ~perm:0o777 (Filename.concat !Util.cnt_dir "cnt")
   end;
-  let max_clients = (if Sys.unix then !max_clients else None) in
+  let max_clients = !max_clients in
   Wserver.f ~syslog:Log.syslog ~addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
      ~max_clients ~handler:connection
 
@@ -1653,7 +1652,7 @@ let manage_cgi_timeout tmout =
     let _ = Unix.alarm tmout in ()
 
 let geneweb_cgi addr script_name contents =
-  if Sys.unix then manage_cgi_timeout !conn_timeout;
+  manage_cgi_timeout !conn_timeout;
   begin try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o755 with
     Unix.Unix_error (_, _, _) -> ()
   end;
@@ -1721,12 +1720,6 @@ let slashify s =
 
 let make_cnt_dir x =
   Files.mkdir_p x;
-  if Sys.unix then ()
-  else
-    begin
-      Wserver.sock_in := Filename.concat x "gwd.sin";
-      Wserver.sock_out := Filename.concat x "gwd.sou"
-    end;
   Util.cnt_dir := x
 
 let arg_plugin_doc opt doc =
@@ -1791,10 +1784,6 @@ let arg_plugins opt doc =
   )
 
 let main () =
-#ifdef WINDOWS
-  Wserver.sock_in := "gwd.sin";
-  Wserver.sock_out := "gwd.sou";
-#endif
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"
@@ -1804,7 +1793,7 @@ let main () =
     [
       ("-hd", Arg.String Secure.add_assets, "<DIR> Directory where the directory lang is installed.")
     ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Directory where the databases are installed.")
-    ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
+    ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Ext_list.ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
     ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")
@@ -1835,17 +1824,14 @@ let main () =
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
     ; ("-notify_change", Arg.String (fun x -> notify_change := Some x), "<FILE> Use given path to file as the command to be executed upon changes made in a base")
-#ifdef UNIX
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
-#endif
     ]
   in
   let speclist = List.sort compare speclist in
   let speclist = Arg.align speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-#ifdef UNIX
   default_lang := begin
     let s = try Sys.getenv "LANG" with Not_found -> "" in
     if List.mem s Version.available_languages then s
@@ -1856,7 +1842,6 @@ let main () =
         if List.mem s Version.available_languages then s else "en"
       else "en"
   end ;
-#endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   Geneweb.GWPARAM.set_syslog Log.syslog;
@@ -1917,7 +1902,6 @@ let () =
                     or by another program. Solution: kill the other program \
                     or launch GeneWeb with another port number (option -p)";
     flush stderr
-#ifdef UNIX
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \
@@ -1925,7 +1909,6 @@ let () =
        or choose another port number greater than 1024."
       !selected_port;
     flush stderr;
-#endif
   | Register_plugin_failure (p, `dynlink_error e) ->
     Log.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->

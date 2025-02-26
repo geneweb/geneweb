@@ -130,12 +130,12 @@ fr:  et écraser la base "%o" du répertoire d’arrivée
 it: e cancellare la base "%o" dalla directory di destinazione
 sv:  och skriva över den tidigare databasen "%o" i mål katalogen
 
-    ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
+    ../ allows you to reach the parent directory.
 aa: ged2gwb.htm
-co: ../ vi permette di navigà fine à u cartulare di a radica.<br> In u mondu Windows, st’azzione ùn vi permitterà micca di cambià a lettera di u lettore (C: -> D:), ma puderete fà què direttamente in l’indirizzu di u vostru navigatore.
-de: ../ erlaubt Ihnen im Elternverzeichnis zu suchen.<br>In der Windows Welt, ist dies unzulässig für die änderung von Laufwerksbuchstaben (C: -> D:), aber Sie können dies direkt in der URL in Ihrem Browser durchführen.
-en: ../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.
-fr: ../ vous permet de naviguer vers le dossier parent.<br> Dans le monde Windows, ceci ne vous permettra pas de changer la lettre du disque (C: -> D:), mais vous pouvez faire ce changement directement dans l'url dans le navigateur.
+co: ../ vi permette di navigà fine à u cartulare di a radica.
+de: ../ erlaubt Ihnen im Elternverzeichnis zu suchen.
+en: ../ allows you to reach the parent directory.
+fr: ../ vous permet de naviguer vers le dossier parent.
 
     :
 co:  :
@@ -3465,83 +3465,53 @@ lv: Pçdçjâs komandas izpildes pçdas
 lv: Pçdçjâs komandas izpildes pçdas
 sv: Utskriften från det senaste kommandot
 
-    Under Linux, if you installed %G as an rpm package, become root and type
+    If you installed %G as an rpm package, become root and type
 aa: gwd_info.htm
-co: Sottu <b>Linux</b>, s’è vò avete installatu %G da un pacchettu rpm, diventate « root » è scrivite
-de: Unter <b>Linux</b> gib, sofern %G als RPM-Paket installiert ist, als root folgendes Kommando ein
-en: Under Linux, if you installed %G as an rpm package, become root and type
-es: A partir de Linux con rpm, escriba en el teclado:
-fr: Sous <b>Linux</b>, si vous avez installé %G par un paquetage rpm, devenez root et tapez
-it: Sotto <b>Linux</b>, se avete installato %G a partire da un pacchetto rpm, digitate, come root
-lv: Linux vidç  - ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatkatalogâ un ievadiet
-lv: Linux vidç  - ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatkatalogâ un ievadiet
-sv: Under Linux, om du installerade %G som ett rpm paket, logga in som root och skriv
+co: S’è vò avete installatu %G da un pacchettu rpm, diventate « root » è scrivite
+de: Gib, sofern %G als RPM-Paket installiert ist, als root folgendes Kommando ein
+en: If you installed %G as an rpm package, become root and type
+es: Con rpm, escriba en el teclado:
+fr: Si vous avez installé %G par un paquetage rpm, devenez root et tapez
+it: Se avete installato %G a partire da un pacchetto rpm, digitate, come root
+lv: Ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatkatalogâ un ievadiet
+lv: Ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatkatalogâ un ievadiet
+sv: Om du installerade %G som ett rpm paket, logga in som root och skriv
 
-    Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
+    If you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
 aa: gwd_info.htm
-co: Sottu <b>Linux</b>, s’è vò avete installatu %G da un pacchettu rpm, u serviziu hè statu lanciatu autumaticamente. S’è vò l’avete piantatu è vulete rilanciallu, diventate « root » è scrivite
-de: Unter <b>Linux</b> wird der Service automatisch gestartet, sofern du %G als RPM-Paket installiert hast. Wenn du den Dienst gestoppt hast und ihn neu starten möchtest, dann gib als root folgendes Kommando ein
-en: Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
-es: A partir de Linux con rpm, escriba en el taclado
-fr: Sous <b>Linux</b>, si vous avez installé %G à partir un paquetage rpm, le service a été automatiquement lancé.  Si vous l’avez arrêté et voulez le relancer, devenez root et tapez
-it: Sotto <b>Linux</b>, se avete installato %G partendo da un pacchetto rpm, il service sarà automaticamente lanciato;.  Se lo avete fermato e volete rilanciarlo, digitate, come root
-lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
-lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
-sv: Under Linux, om du installerade %G som ett rpm paket, har servicen startat automatiskt. Om du har stoppat den och vill återstarta den, logga in som root och skriv
+co: S’è vò avete installatu %G da un pacchettu rpm, u serviziu hè statu lanciatu autumaticamente. S’è vò l’avete piantatu è vulete rilanciallu, diventate « root » è scrivite
+de: Wird der Service automatisch gestartet, sofern du %G als RPM-Paket installiert hast. Wenn du den Dienst gestoppt hast und ihn neu starten möchtest, dann gib als root folgendes Kommando ein
+en: If you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
+es: Con rpm, escriba en el taclado
+fr: Si vous avez installé %G à partir un paquetage rpm, le service a été automatiquement lancé.  Si vous l’avez arrêté et voulez le relancer, devenez root et tapez
+it: Se avete installato %G partendo da un pacchetto rpm, il service sarà automaticamente lanciato;.  Se lo avete fermato e volete rilanciarlo, digitate, come root
+lv: Ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
+lv: Ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
+sv: Om du installerade %G som ett rpm paket, har servicen startat automatiskt. Om du har stoppat den och vill återstarta den, logga in som root och skriv
 
-    Under MSdos
-aa: cleanup1.htm
-co: Sottu MSdos
-de: Unter MSdos
-en: Under MSdos
-fi: MS-DOS:ssa
-fr: Sous MSdos
-it: Sotto MSdos
-
-    Under Unix
-aa: cleanup1.htm
-co: Sottu Unix
-de: Unter Unix
-en: Under Unix
-fi: Unixissa
-fr: Sous Unix
-it: Sotto Unix
-
-    Under Unix, launch an xterm and type the following commands
+    launch an xterm and type the following commands
 aa: gwd_info.htm
-co: Sottu <b>Linux</b>, lanciate un « xterm » è scrivite sta seguita di cumande
-de: Unter <b>Unix</b> starte ein xterm und gib die folgenden Kommandos ein
-en: Under Unix, launch an xterm and type the following commands
-es: A partir de Unix, lanzar un xterm y ecribir con el teclado los comandos siguientes
-fr: Sous <b>Unix</b>, lancez un xterm et tapez les commandes suivantes
-it: Sotto <b>Unix</b>, lanciate un xterm e digitate i seguenti comandi
-lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
-lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
-sv: Under Unix, starta ett xterm och skriv följande kommandon
+co: Lanciate un « xterm » è scrivite sta seguita di cumande
+de: Starte ein xterm und gib die folgenden Kommandos ein
+en: Launch an xterm and type the following commands
+es: Lanzar un xterm y ecribir con el teclado los comandos siguientes
+fr: Lancez un xterm et tapez les commandes suivantes
+it: Lanciate un xterm e digitate i seguenti comandi
+lv: Palaidiet xterm un uzrakstiet sekojoðas komandas
+lv: Palaidiet xterm un uzrakstiet sekojoðas komandas
+sv: Starta ett xterm och skriv följande kommandon
 
-    Under Windows or Unix, type "control C" in the window where it is running.
+    Type "control C" in the window where it is running.
 aa: gwd_info.htm
-co: Sottu <b>Windows</b> o <b>Linux</b>, scrivite « control C » in a finestra induve ellu funziuneghja.
-de: Unter <b>Windows</b> oder <b>Unix</b> drücke Control-C (bzw. Strg-C)  in dem Fenster, wo gwd läuft.
-en: Under Windows or Unix, type "control C" in the window where it is running.
-es: A partir de Windows o Unix, escriba en el teclado "control C", (manteniendo apoyadas las dos teclas), en la "ventana" en la cual el programa ha sido lanzado.
-fr: Sous <b>Windows</b> ou <b>Unix</b>, tapez "control C" dans la fenêtre où il tourne.
-it: Sotto <b>Windows</b> o <b>Unix</b>, digitate "control C" nella finestra dove il service è stato lanciato.
-lv: Windows vai Unix vidç - nospiediet "ctrl C" pie aktîva loga, kurâ tas darbojas.
-lv: Windows vai Unix vidç - nospiediet "ctrl C" pie aktîva loga, kurâ tas darbojas.
-sv: Under Windows eller Unix, tryck "control C" i fönstret där den körs.
-
-    Under Windows, launch the program "gwd".
-aa: gwd_info.htm
-co: Sottu <b>Windows</b>, lanciate u prugramma « gwd ».
-de: Unter <b>Windows</b> verwende einen Doppelklick auf das  "gwd"-Icon, dann kehre hierher zurück.
-en: Under Windows, launch the program "gwd".
-es: A partir de Windows, cliquear dos veces en el icono de "gwd", y luego regrese Ud. aquí.
-fr: Sous <b>Windows</b>, lancez le programme "gwd".
-it: Sotto <b>Windows</b>, lanciate il programma "gwd".
-lv: Windows vidç - dubultklikðíis uz "gwd" ikoniòas un tad atgriezieties ðeit.
-lv: Windows vidç - dubultklikðíis uz "gwd" ikoniòas un tad atgriezieties ðeit.
-sv: Under Windows, dubbelklicka på "gwd" ikonen, gå sedan tillbaka hit.
+co: Scrivite « control C » in a finestra induve ellu funziuneghja.
+de: Drücke Control-C (bzw. Strg-C)  in dem Fenster, wo gwd läuft.
+en: Type "control C" in the window where it is running.
+es: Escriba en el teclado "control C", (manteniendo apoyadas las dos teclas), en la "ventana" en la cual el programa ha sido lanzado.
+fr: Tapez "control C" dans la fenêtre où il tourne.
+it: Digitate "control C" nella finestra dove il service è stato lanciato.
+lv: Nospiediet "ctrl C" pie aktîva loga, kurâ tas darbojas.
+lv: Nospiediet "ctrl C" pie aktîva loga, kurâ tas darbojas.
+sv: Tryck "control C" i fönstret där den körs.
 
     Unknown file
 aa: err_unkn.htm
