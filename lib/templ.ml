@@ -306,15 +306,20 @@ let url_set_aux conf evar_l str_l =
 
 let substr_start_aux n s =
   let len = String.length s in
-  let rec loop i n str =
-    if n = 0 || i >= len then str
+  let buffer = Buffer.create (min len (n * 4)) in
+  let rec loop i count =
+    if count = 0 || i >= len then Buffer.contents buffer
     else
-      (* Attention aux caractères utf-8 !! *)
-      let nbc = Utf8.nbc s.[i] in
-      let car = String.sub s i nbc in
-      loop (i + nbc) (n - 1) (str ^ car)
+      try
+        let nbc = Utf8.nbc s.[i] in
+        if i + nbc <= len then (
+          let car = String.sub s i nbc in
+          Buffer.add_string buffer car;
+          loop (i + nbc) (count - 1))
+        else Buffer.contents buffer
+      with _ -> Buffer.contents buffer
   in
-  loop 0 n ""
+  loop 0 n
 
 let rec eval_variable conf = function
   | [ "base"; "name" ] -> conf.bname
