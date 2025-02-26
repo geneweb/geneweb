@@ -10,7 +10,7 @@
 # - gwd.cgi and test.cgi in the cgi-bin folder
 # - a test base in the bases folder
 
-OS_ENV=`uname` 
+OS_ENV=`uname`
 
 # Find the document root under Apache
 

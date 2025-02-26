@@ -9,7 +9,7 @@ en double cliquant sur l'icone gwsetup.bat (Windows), gwsetup.command (macOS) or
 
 Sur macOS, geneweb.command tue les versions précédentes, ouvre les deux programmes et
 minimise la fenêtre correspondante.
-   
+
      -----------------
 
 Voir le fichier CHANGES (en anglais) dans ce repertoire-ci pour les
@@ -27,4 +27,3 @@ Remarques, suggestions, questions, rapports d'erreur sur:
 
 Veuillez preciser le numero de version ci-dessus et le systeme sur lequel
 vous tournez (Unix, Windows, Mac).
-

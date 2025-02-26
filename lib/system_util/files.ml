@@ -1,4 +1,3 @@
-
 let rm fname =
   if Sys.file_exists fname then Sys.remove fname
 
@@ -16,7 +15,7 @@ let ls_r dirs =
     | [] -> result
   in
   loop [] dirs
-  
+
 let rm_rf f =
   if Sys.file_exists f then
     let (directories, files) = ls_r [f] |> List.partition Sys.is_directory in

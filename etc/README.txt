@@ -2,14 +2,14 @@ GeneWeb 7.00
 
 Open the START.htm page
 
-If you intend to open a base, you must have started the gwd program 
+If you intend to open a base, you must have started the gwd program
 by double clicking on the gwd.bat (Windows), gwd.command (macOS) or gwd (Linux) icon.
-If you intend to manage or create a base,  you must have started the gwsetup program 
+If you intend to manage or create a base,  you must have started the gwsetup program
 by double clicking on the gwsetup.bat (Windows), gwsetup.command (macOS) or gwsetup (Linux) icon.
 
-On macOS geneweb.command will kill previous versions, start both programs and minimises 
+On macOS geneweb.command will kill previous versions, start both programs and minimises
 the corresponding window.
-   
+
      -----------------
 
 See the file CHANGES in the present directory for the changes since
