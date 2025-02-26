@@ -15,10 +15,6 @@ let syslog = ref false
 let set_api () = api := true
 let set_syslog () = syslog := true
 
-let set_gwdb_legacy () =
-  assert (!gwdb = `None);
-  gwdb := `Legacy
-
 let set_gwdb_versioned () =
   assert (!gwdb = `None);
   gwdb := `Versioned
@@ -32,7 +28,6 @@ let release = ref false
 let speclist =
   [
     ("--gwdb-versioned", Arg.Unit set_gwdb_versioned, "Use versioned backend");
-    ("--gwdb-legacy", Arg.Unit set_gwdb_legacy, " Use legacy backend");
     ("--gwdb-test", Arg.Unit set_test_back_end, " Use test backend");
     ( "--release",
       Arg.Set release,
@@ -57,7 +52,6 @@ let () =
     match !gwdb with
     | `None | `Versioned ->
         (" -D GENEWEB_GWDB_VERSIONED", "geneweb.gwdb-versioned")
-    | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
     | `Dummy -> (" -D GENEWEB_DUMMY_GWDB", "geneweb.dummy_gwdb")
   in
   let dune_profile = if !release then "release" else "dev" in
