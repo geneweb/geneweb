@@ -27,7 +27,7 @@ let release = ref false
 
 let speclist =
   [
-    ("--gwdb-versioned", Arg.Unit set_gwdb_versioned, "Use versioned backend");
+    ("--gwdb-versioned", Arg.Unit set_gwdb_versioned, " Use versioned backend");
     ("--gwdb-test", Arg.Unit set_test_back_end, " Use test backend");
     ( "--release",
       Arg.Set release,
