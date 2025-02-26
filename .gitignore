@@ -26,7 +26,6 @@ lib/core/dune
 lib/dune
 lib/gwdb/dune
 lib/util/dune
-plugins/welcome/dune
 lib/gwdb-legacy/dune
 lib/gwdb-versioned/dune
 lib/system_util/dune
