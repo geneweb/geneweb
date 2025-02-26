@@ -18,9 +18,8 @@ let control ~onerror lname wait f =
       let fd = Unix.openfile lname [ Unix.O_RDWR; Unix.O_CREAT ] 0o666 in
       (try Unix.chmod lname 0o666 with _ -> ());
       try
-        if Sys.unix then
-          if wait then Unix.lockf fd Unix.F_LOCK 0
-          else Unix.lockf fd Unix.F_TLOCK 0;
+        if wait then Unix.lockf fd Unix.F_LOCK 0
+        else Unix.lockf fd Unix.F_TLOCK 0;
         let r = f () in
         Unix.close fd;
         r

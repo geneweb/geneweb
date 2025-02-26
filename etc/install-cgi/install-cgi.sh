@@ -20,8 +20,6 @@ if [ $OS_ENV = "Linux" ]; then
   elif [ -f /etc/apache2/sites-enabled/000-default.conf ]; then
     TMP=`grep DocumentRoot /etc/apache2/sites-enabled/000-default.conf | sed '/#/d'`
   fi
-elif [ $OS_ENV = "Darwin" ]; then
-  TMP=`grep -i "DocumentRoot" /etc/apache2/httpd.conf | sed '/#/d'`
 else
   echo "Please find value of DocumentRoot of your server and set it manually"
 fi
