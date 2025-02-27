@@ -2009,13 +2009,13 @@ let main () =
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
     ; ("-no-fork", Arg.Set Wserver.no_fork, " Prevent forking processes")
-#endif
     ; ("-cache-in-memory", Arg.String (fun s ->
         if Gw_ancient.is_available then
           cache_databases := s::!cache_databases
         else
           failwith "-cache-in-memory option unavailable for this build."
       ), "<DATABASE> Preload this database in memory")
+#endif
     ]
   in
   let speclist = List.sort compare speclist in
