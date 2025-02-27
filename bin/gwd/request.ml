@@ -366,7 +366,7 @@ let treat_request =
     in
     w_base ~none
   in
-  let w_person = w_person ~none:very_unknown in
+  let w_person = w_person ~none:SrcfileDisplay.print_welcome in
   fun conf ->
   let bfile =
     if conf.bname = "" then None
