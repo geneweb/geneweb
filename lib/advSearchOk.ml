@@ -888,8 +888,12 @@ let searching_fields conf base =
   let map_field key s =
     if get_name_search_mode gets key = `Not_Exact_Prefix then s ^ "(...)" else s
   in
-  let search = string_field ~map_field:(map_field "exact_first_name") "first_name" search in
-  let search = string_field ~map_field:(map_field "exact_surname") "surname" search in
+  let search =
+    string_field ~map_field:(map_field "exact_first_name") "first_name" search
+  in
+  let search =
+    string_field ~map_field:(map_field "exact_surname") "surname" search
+  in
   let search = sosa_field search in
   let build_event_search event_search (s1, s2) =
     let date_field_name =
