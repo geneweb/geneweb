@@ -10742,6 +10742,11 @@ sl: julijanski dan
 sv: juliansk dag
 tr: jülyen günü
 
+    key
+de: Schlüssel
+en: key/individual key
+fr: clé/clé personne
+
     killed (in action)
 af: gesneuwel
 bg: загинал/загинала/загинал(а)
@@ -13780,6 +13785,10 @@ sl: številka"Sosa", v odnosu z
 sv: annummer med som proband (Kekules system)
 tr: Sosa'ya göre
 
+    occ
+en: occurence number/occurence
+fr: numéro d’occurrence/occurence
+
     occupation/occupations
 af: beroep
 bg: занятие
@@ -14305,6 +14314,14 @@ nl: overige/overige/overige
 no: annen/annen/annen
 pt: outro/outra/outro
 sv: annat/annat/annat
+
+    other possibilities
+en: other possibilities
+fr: autres possibilités
+
+    with spouse name
+en: with spouse name
+fr: avec son nom d'épouse
 
     ou
 co: o
@@ -16009,21 +16026,37 @@ fr: mode famille
 en: extend the SemiPublic status to family members (on/off toggle)
 fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
 
-    exact-hlp
-en: exact match (word level)
-fr: comparaison exacte mot par mot
+    not exact hlp
+en: entry can be a substring of the first name otherwise exact match
+fr: recherche d'une sous-chaine dans le prénom sinon comparaison exacte
+
+    not exact
+en: substring
+fr: partiel
 
     order
 en: order
 fr: ordre
 
-    order-hlp
+    order hlp
 en: test firstnames in the same order
 fr: tester les prénoms dans le même ordre
   
-    all-hlp
-en: all firstnames must be present
-fr: tous les prénoms doivent être présents
+    not all
+en: at least one
+fr: au moins un
+
+    not all hlp
+en: at least one first name must be present otherwise all
+fr: au moins un prénom doit être présent sinon tous
+
+    mandatory
+en: mandatory
+fr: obligatoire
+
+    optionnal
+en: optionnal
+fr: optionnel
 
     search_exact_fn
 co: ricerca esatta
@@ -20190,6 +20223,10 @@ sk: wizard/wizards/friend/friends/exterior
 sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
 sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
+
+    word/words
+en: only one name (particle excluded)/full surname (many words)
+fr: un seul nom (particule exclue)/patronyme complet (plusieurs mots)
 
     word match
 co: parolla sana
