@@ -501,9 +501,9 @@ function initializeWelcomeSearchFunctionality() {
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")
 function initializeLazyModules() {
-  $('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
-  $('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
-  $('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+  $('#load_once_p_mod').one('click', () => $.getScript('%etc_prefix;js/p_mod.js'));
+  $('#load_once_copylink').one('click', () => $.getScript('%etc_prefix;js/copylink.js'));
+  $('#load_once_rlm_builder').one('click', () => $.getScript('%etc_prefix;js/rlm_builder.js'));
 }
 %end;
 %if;(e.templ="" and not is_welcome)
