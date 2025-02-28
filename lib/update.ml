@@ -166,19 +166,21 @@ let print_person_parents_and_spouses conf base p =
   Output.print_string conf (commd conf);
   Output.print_string conf (acces conf base p);
   Output.print_sstring conf {|">|};
-  Output.print_string conf (escape_html @@ p_first_name base p);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (string_of_int @@ get_occ p);
+
+  let pub_name = sou base (get_public_name p) in
+  if pub_name <> "" then
+    Output.print_sstring conf (Printf.sprintf "%s" pub_name)
+  else Output.print_string conf (escape_html @@ p_first_name base p);
   Output.print_sstring conf " ";
   Output.print_string conf (escape_html @@ p_surname base p);
   Output.print_sstring conf "</a>";
-  let pub_name = sou base (get_public_name p) in
-  if pub_name <> "" then
-    Output.print_sstring conf (Printf.sprintf " (%s)" pub_name);
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
   if String.length (cop :> string) > 0 then (
     Output.print_sstring conf ", ";
+    if pub_name <> "" then (
+      Output.print_string conf (escape_html @@ p_first_name base p);
+      Output.print_sstring conf ", ");
     Output.print_string conf cop);
   let hbw = Util.husband_wife conf base p true in
   if String.length (hbw :> string) > 0 then (

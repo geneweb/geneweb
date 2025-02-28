@@ -125,41 +125,46 @@ type search_type =
   | PartialKey
   | DefaultSurname
 
-let search_for_multiple_fn conf base fn pl =
-  let test label = p_getenv conf.env label = Some "on" in
-  let exact = test "exact" in
-  let case = test "case" in
-  let order = test "order" in
-  let all = test "all" in
-  let is_same_or_substr x xx = if exact then x = xx else Mutil.contains xx x in
-  let is_sublist l1 l2 =
-    let rec check_from_pos l1 l2_remaining =
-      match (l1, l2_remaining) with
-      | [], _ -> true (* Empty list is a sublist *)
-      | _, [] -> false (* Ran out of l2 before finding match *)
-      | h1 :: t1, h2 :: t2 ->
-          if is_same_or_substr h1 h2 then
-            (* First element matches *)
-            check_from_pos t1 t2
-          else false
-    in
-    let rec try_all_positions l1 = function
-      | [] -> false
-      | _ :: t2 as l2 -> check_from_pos l1 l2 || try_all_positions l1 t2
-    in
-    match l1 with [] -> true | _ -> try_all_positions l1 l2
+let is_equal_or_substr exact string sub =
+  if exact then string = sub else Mutil.contains string sub
+
+let is_sublist l1 l2 =
+  let rec is_prefix l1 l2 =
+    match (l1, l2) with
+    | [], _ -> true (* Empty list is a prefix of any list *)
+    | _, [] -> false (* Non-empty list can't be a prefix of empty list *)
+    | h1 :: t1, h2 :: t2 -> h1 = h2 && is_prefix t1 t2
   in
-  let ok fn_l fn1_l =
-    if all && order then is_sublist fn_l fn1_l
-    else if all then
-      List.for_all
-        (fun fn -> List.exists (fun fn1 -> is_same_or_substr fn fn1) fn1_l)
-        fn_l
-    else
-      List.exists
-        (fun fn -> List.exists (fun fn1 -> is_same_or_substr fn fn1) fn1_l)
-        fn_l
+  let rec find l1 l2 =
+    match l2 with [] -> false | _ :: t -> is_prefix l1 l2 || find l1 t
   in
+  find l1 l2
+
+let ok fn_l fn1_l exact case order all all_only =
+  if all_only then
+    if case then fn_l = fn1_l
+    else List.map Name.lower fn_l = List.map Name.lower fn1_l
+  else
+    match (fn_l, all, order) with
+    | [], _, _ ->
+        true (* Empty list is always a sublist and all elements exist *)
+    | _, false, false when fn1_l <> [] ->
+        is_equal_or_substr exact (List.hd fn_l) (List.hd fn1_l)
+        (* Quick check for common case *)
+    | _, true, true -> is_sublist fn_l fn1_l (* ab does not match xaybz *)
+    | _, true, false ->
+        List.for_all
+          (fun fn ->
+            List.exists (fun fn1 -> is_equal_or_substr exact fn1 fn) fn1_l)
+          fn_l
+    | _, false, _ ->
+        List.exists
+          (fun fn ->
+            List.exists (fun fn1 -> is_equal_or_substr exact fn1 fn) fn1_l)
+          fn_l
+
+let search_for_multiple_fn conf base fn pl exact case order all all_only =
+  (* Check if l1 is a contiguous sublist of l2 *)
   let fn_l = cut_words fn in
   let fn_l = List.map (fun fn -> if case then fn else Name.lower fn) fn_l in
   List.fold_left
@@ -168,10 +173,20 @@ let search_for_multiple_fn conf base fn pl =
       else
         let fn1_l = get_first_name p |> sou base |> split_normalize case in
         let fn2_l = get_public_name p |> sou base |> split_normalize case in
-        if ok fn_l fn1_l || ok fn_l fn2_l then p :: pl else pl)
+        if
+          ok fn_l fn1_l exact case order all all_only
+          || ok fn_l fn2_l exact case order all all_only
+        then p :: pl
+        else pl)
     [] pl
 
 let search conf base an search_order specify unknown =
+  let test label = p_getenv conf.env label = Some "on" in
+  let test_not label = p_getenv conf.env label = Some "off" in
+  let exact = not (test_not "p_exact") in
+  let case = test "p_case" in
+  let order = test "p_order" in
+  let all = not (test_not "p_all") in
   let rec loop l =
     match l with
     | [] -> unknown conf an
@@ -193,10 +208,54 @@ let search conf base an search_order specify unknown =
         | [] -> loop l
         | _ -> Some.search_surname_print conf base unknown an)
     | FirstName :: l -> (
-        let pl = Some.search_first_name conf base an in
-        match pl with
-        | [] -> loop l
-        | _ -> Some.search_first_name_print conf base an)
+        let save_env = conf.env in
+        let _pl = Some.search_first_name conf base an in
+        let conf =
+          {
+            conf with
+            env =
+              ("first_name", Adef.encoded an)
+              :: ("exact_first_name", Adef.encoded "on")
+              :: save_env;
+          }
+        in
+        (* find all bearers of sn using advanced_search *)
+        let pl1, _len = AdvSearchOk.advanced_search conf base max_int in
+        let conf =
+          {
+            conf with
+            env =
+              ("first_name", Adef.encoded an)
+              :: ("exact_first_name", Adef.encoded "off")
+              :: save_env;
+          }
+        in
+        (* find all bearers of sn using advanced_search *)
+        let pl2, _len = AdvSearchOk.advanced_search conf base max_int in
+        let pl2 =
+          List.fold_left
+            (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+            [] pl2
+        in
+        Printf.eprintf "Order: %s\n" (if order then "yes" else "false");
+        let pl1, pl3 =
+          List.fold_left
+            (fun (acc1, acc3) p ->
+              let fn_l = cut_words an in
+              let fn1 = sou base (get_public_name p) in
+              let fn1_l = cut_words fn1 in
+              if fn1 = "" then (p :: acc1, acc3)
+              else if ok fn_l fn1_l exact case order true false then
+                (acc1, p :: acc3)
+              else (p :: acc1, acc3))
+            ([], []) pl1
+        in
+        match (pl1, pl2, pl3) with
+        | [], [], [] -> loop l
+        | [ p ], [], [] | [], [ p ], [] | [], [], [ p ] ->
+            record_visited conf (get_iper p);
+            Perso.print conf base p
+        | _ -> specify conf base an pl1 (pl2 @ pl3) [])
     | FullName :: l -> (
         let fn =
           match p_getenv conf.env "p" with
@@ -214,15 +273,24 @@ let search conf base an search_order specify unknown =
             (* TODO check for particles and cut before particle *)
             (* see if    Name.abbrev (Name.lower sn)    is Ok *)
             (* or use split_normalize here? *)
-            match String.rindex_opt sn ' ' with
-            | Some i ->
-                ( String.sub sn 0 i,
-                  String.sub sn (i + 1) (String.length sn - i - 1) )
-            | _ -> ("", sn)
+            let an = Name.lower an in
+            if sn = "" then
+              match String.rindex_opt an ' ' with
+              | Some i ->
+                  ( String.sub an 0 i,
+                    String.sub an (i + 1) (String.length an - i - 1) )
+              | _ -> ("", an)
+            else (fn, sn)
           else (fn, sn)
         in
         let conf =
-          { conf with env = ("surname", Adef.encoded sn) :: conf.env }
+          {
+            conf with
+            env =
+              ("surname", Adef.encoded sn)
+              :: ("exact_surname", Adef.encoded "on")
+              :: conf.env;
+          }
         in
         (* find all bearers of sn using advanced_search *)
         let list, _len = AdvSearchOk.advanced_search conf base max_int in
@@ -233,13 +301,47 @@ let search conf base an search_order specify unknown =
             Perso.print conf base p
         | pl -> (
             (* check first_names or public_names in list of persons *)
-            let pl = search_for_multiple_fn conf base fn pl in
-            match pl with
-            | [] -> loop l
-            | [ p ] ->
+            let pl1 =
+              search_for_multiple_fn conf base fn pl exact case order true true
+            in
+            let pl2 =
+              search_for_multiple_fn conf base fn pl exact case order all false
+            in
+            let pl2 =
+              List.fold_left
+                (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+                [] pl2
+            in
+            let get_spouse iper ifam =
+              let f = foi base ifam in
+              if iper = get_father f then poi base (get_mother f)
+              else poi base (get_father f)
+            in
+            (* find bearers of surname *)
+            let find_pl3 =
+              not (List.assoc_opt "public_name_as_fn" conf.base_env = Some "no")
+            in
+            let pl3 =
+              if find_pl3 then Some.search_surname conf base sn else []
+            in
+            let pl3 =
+              List.fold_left
+                (fun acc ip ->
+                  Array.fold_left
+                    (fun acc ifam -> get_spouse ip ifam :: acc)
+                    acc
+                    (get_family (poi base ip)))
+                [] pl3
+            in
+            let pl3 =
+              search_for_multiple_fn conf base fn pl3 exact case order all false
+            in
+            match (pl1, pl2, pl3) with
+            | [], [], [] -> loop l
+            | [ p ], [], [] | [], [ p ], [] | [], [], [ p ] ->
                 record_visited conf (get_iper p);
                 Perso.print conf base p
-            | pl -> specify conf base an pl))
+            | _ -> specify conf base an pl1 pl2 pl3))
     | ApproxKey :: l -> (
         let pl = search_approx_key conf base an in
         match pl with
@@ -247,7 +349,7 @@ let search conf base an search_order specify unknown =
         | [ p ] ->
             record_visited conf (get_iper p);
             Perso.print conf base p
-        | pl -> specify conf base an pl)
+        | pl -> specify conf base an pl [] [])
     | PartialKey :: l -> (
         let pl = search_by_name conf base an in
         match pl with
@@ -274,17 +376,29 @@ let search conf base an search_order specify unknown =
                 record_visited conf (get_iper p);
                 Perso.print conf base p
             | pl -> (
-                let pl = search_for_multiple_fn conf base fn pl in
-                match pl with
+                let pl1 =
+                  search_for_multiple_fn conf base fn pl exact case order true
+                    true
+                in
+                let pl2 =
+                  search_for_multiple_fn conf base fn pl exact case order all
+                    false
+                in
+                let pl2 =
+                  List.fold_left
+                    (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+                    [] pl2
+                in
+                match pl1 with
                 | [] -> loop l
                 | [ p ] ->
                     record_visited conf (get_iper p);
                     Perso.print conf base p
-                | pl -> specify conf base an pl))
+                | pl1 -> specify conf base an pl1 pl2 []))
         | [ p ] ->
             record_visited conf (get_iper p);
             Perso.print conf base p
-        | pl -> specify conf base an pl)
+        | pl -> specify conf base an pl [] [])
     | DefaultSurname :: _ -> Some.search_surname_print conf base unknown an
   in
   loop search_order
@@ -308,11 +422,11 @@ let print conf base specify unknown =
     | Some s -> if s = "" then None else Some s
     | None -> None
   in
-  match (real_input "p", real_input "n") with
-  | Some fn, Some sn ->
-      let order = [ Key; FullName ] in
+  match (real_input "pn", real_input "p", real_input "n") with
+  | None, Some fn, Some sn ->
+      let order = [ Key; FullName; ApproxKey; PartialKey; DefaultSurname ] in
       search conf base (fn ^ " " ^ sn) order specify unknown
-  | Some fn, None ->
+  | None, Some fn, None ->
       let fn =
         match String.rindex_opt fn '.' with
         | Some i -> String.sub fn 0 i
@@ -320,10 +434,52 @@ let print conf base specify unknown =
       in
       let order = [ FirstName ] in
       search conf base fn order specify unknown
-  | None, Some sn ->
+  | Some pn, None, None -> (
       let order =
-        [ Sosa; Key; FullName; Surname; ApproxKey; PartialKey; DefaultSurname ]
+        [ Sosa; Key; FullName; ApproxKey; PartialKey; DefaultSurname ]
       in
+      let i = try String.index pn '/' with Not_found -> -1 in
+      if i = -1 then search conf base pn order specify unknown
+      else
+        let j = try String.index_from pn (i + 1) '/' with Not_found -> -1 in
+        let oc =
+          if j = -1 then "" else String.sub pn (j + 1) (String.length pn - j - 1)
+        in
+        let j = if j = -1 then 0 else String.length pn - j in
+        let fn = String.sub pn 0 i in
+        let sn = String.sub pn (i + 1) (String.length pn - i - 1 - j) in
+        match (fn, sn, oc) with
+        | fn, "", "" when fn <> "" ->
+            let order = [ FirstName ] in
+            search conf base fn order specify unknown
+        | "", sn, "" when sn <> "" ->
+            let order = [ Surname; ApproxKey; DefaultSurname ] in
+            search conf base sn order specify unknown
+        | _ ->
+            let order =
+              [ Sosa; Key; FullName; ApproxKey; PartialKey; DefaultSurname ]
+            in
+            let env =
+              List.map
+                (fun (k, v) ->
+                  match k with
+                  | "p" -> (k, Adef.encoded fn)
+                  | "n" -> (k, Adef.encoded sn)
+                  | "oc" -> (k, Adef.encoded oc)
+                  | _ -> (k, v))
+                conf.env
+            in
+            let env =
+              if List.mem_assoc "oc" env && oc <> "" then env
+              else ("oc", Adef.encoded oc) :: env
+            in
+            let conf = { conf with env } in
+            search conf base
+              (String.sub pn 0 i
+              ^ (if oc = "" then " " else "." ^ oc ^ " ")
+              ^ String.sub pn (i + 1) (String.length pn - i - 1 - j))
+              order specify unknown)
+  | None, None, Some sn ->
+      let order = [ Surname; ApproxKey; DefaultSurname ] in
       search conf base sn order specify unknown
-  | None, None ->
-      Hutil.incorrect_request conf ~comment:"Missing first_name and surname"
+  | _ -> Hutil.incorrect_request conf ~comment:"Missing first_name and surname"

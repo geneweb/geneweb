@@ -29,6 +29,12 @@ val search_approx_key : config -> base -> string -> person list
 val print :
   config ->
   base ->
-  (config -> base -> string -> person list -> unit) ->
+  (config ->
+  base ->
+  string ->
+  person list ->
+  person list ->
+  person list ->
+  unit) ->
   (config -> string -> unit) ->
   unit
