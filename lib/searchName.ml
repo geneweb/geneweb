@@ -33,56 +33,83 @@ let start_with base pfx s =
   let s = Name.lower (strip_particle base s) in
   Ext_string.start_with pfx 0 s
 
-let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
-  let sn_stream = Gwdb.persons_stream_of_surname_prefix base sn_pfx in
-  let fn_map = Hashtbl.create 100 in
-  let match_fn_istr p fn_pfx =
-    let istr = Gwdb.get_first_name p in
-    match Hashtbl.find_opt fn_map istr with
+type prefix = { kind : [ `First_name | `Surname ]; value : string }
+
+let persons_of_prefixes_stream max conf base filter other_pfx main_pfx =
+  let main_stream =
+    (match main_pfx.kind with
+    | `First_name -> Gwdb.persons_stream_of_first_name_prefix
+    | `Surname -> Gwdb.persons_stream_of_surname_prefix)
+      base main_pfx.value
+  in
+  let other_map = Hashtbl.create 100 in
+  let match_other_istr p other_pfx =
+    let istr =
+      (match other_pfx.kind with
+      | `First_name -> Gwdb.get_first_name
+      | `Surname -> Gwdb.get_surname)
+        p
+    in
+    match Hashtbl.find_opt other_map istr with
     | Some value -> value
     | None ->
         let value =
           start_with base
-            (Name.lower (strip_particle base fn_pfx))
+            (Name.lower (strip_particle base other_pfx.value))
             (Gwdb.sou base istr)
         in
-        Hashtbl.add fn_map istr value;
+        Hashtbl.add other_map istr value;
         value
   in
-  let rec consume n results sn_stream =
-    match Ext_seq.next sn_stream with
-    | Some (iper, sn_stream) ->
+  let rec consume n results main_stream =
+    match Ext_seq.next main_stream with
+    | Some (iper, main_stream) ->
         if n = 0 then results
         else
           let p = Gwdb.poi base iper in
-          if match_fn_istr p fn_pfx && Person.is_visible conf base p && filter p
+          if
+            match_other_istr p other_pfx
+            && Person.is_visible conf base p
+            && filter p
           then
             let iperset' = Gwdb.IperSet.add iper results in
-            if iperset' != results then consume (n - 1) iperset' sn_stream
-            else consume n results sn_stream
-          else consume n results sn_stream
+            if iperset' != results then consume (n - 1) iperset' main_stream
+            else consume n results main_stream
+          else consume n results main_stream
     | None -> results
   in
-  Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty sn_stream)
+  Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty main_stream)
+
+let persons_starting_with ~conf ~base ~filter ~limit ~other_prefix main_prefix =
+  match other_prefix with
+  | Some other_prefix ->
+      persons_of_prefixes_stream limit conf base filter other_prefix main_prefix
+  | None ->
+      let stream =
+        (match main_prefix.kind with
+        | `First_name -> Gwdb.persons_stream_of_first_name_prefix
+        | `Surname -> Gwdb.persons_stream_of_surname_prefix)
+          base main_prefix.value
+      in
+      n_persons_of_stream limit conf base filter stream
 
 let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
     ~limit =
   let l =
-    match (first_name_prefix, surname_prefix) with
-    | "", "" -> []
-    | _, "" ->
-        let stream =
-          Gwdb.persons_stream_of_first_name_prefix base first_name_prefix
-        in
-        n_persons_of_stream limit conf base filter stream
-    | "", _ ->
-        let stream =
-          Gwdb.persons_stream_of_surname_prefix base surname_prefix
-        in
-        n_persons_of_stream limit conf base filter stream
-    | _, _ ->
-        persons_of_prefixes_stream limit conf base filter first_name_prefix
-          surname_prefix
+    let main_prefix, other_prefix =
+      match (first_name_prefix, surname_prefix) with
+      | "", "" -> (None, None)
+      | _, "" -> (Some { kind = `First_name; value = first_name_prefix }, None)
+      | "", _ -> (Some { kind = `Surname; value = surname_prefix }, None)
+      | _, _ ->
+          ( Some { kind = `Surname; value = surname_prefix },
+            Some { kind = `First_name; value = first_name_prefix } )
+    in
+    match main_prefix with
+    | None -> []
+    | Some main_prefix ->
+        persons_starting_with ~conf ~base ~filter ~limit ~other_prefix
+          main_prefix
   in
   let cmp_s proj p1 p2 =
     Utf8.compare (Gwdb.sou base (proj p1)) (Gwdb.sou base (proj p2))
