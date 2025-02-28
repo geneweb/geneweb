@@ -438,6 +438,7 @@ if test "$test_diff"; then
       diff $test_dir/ref/$xx /tmp/run/$xx > /dev/null 2>&1
       ret=$?
       if test $ret -ne 0; then
+          RC=$(($RC+1))
           echo "*** diff $test_dir/ref/$xx /tmp/run/$xx"
           diff $test_dir/ref/$xx /tmp/run/$xx
           mv /tmp/run/$xx /tmp/new/$xx
@@ -456,8 +457,8 @@ grep -vw "Predictable mode must not be" $GWDLOG | grep -E "$WARNING_CONDITIONS"
 grep -B1 -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
 fi
 if test "$RC" != 0; then
-    echo "at least $RC detected error(s)."
+    echo "$0 failed, at least $RC detected error(s)."
     exit 1
 else
-    echo "No detected error."
+    echo "$0 completed, No detected error."
 fi
