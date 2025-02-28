@@ -79,6 +79,7 @@ PLACE="Australie" # one specific place
 
 #===  main ====================
 cmd=$(basename $0)
+echo "starting $0 $@"
 while getopts "cdf:h" Option
 do
 case $Option in
@@ -239,7 +240,11 @@ crl "m=A&i=$ID&t=C&v=5"
 crl "m=A&i=$ID&t=T&t1=7&v=5"
 crl "m=A&i=$ID&t=T&t1=h6&v=5"
 crl "m=A&i=$ID&t=T&t1=m&v=5"
-#rl "m=A&i=$ID&t=T&t1=CT&v=5" # failed if sosa not set
+if check_gwf 'display_sosa=yes'; then
+crl "m=A&i=$ID&t=T&t1=CT&v=5"
+else
+    echo "dispplay_sosa related command is not tested."
+fi
 crl "m=A&i=$ID&t=T&t1=CT&v=5&sosa=on"
 #--- ---
 crl "m=A&i=$ID&t=H&v=5"
@@ -263,7 +268,7 @@ crl "m=CHG_EVT_IND_ORD&i=$ID"
 crl "m=CHG_FAM_ORD&f=$FID&i=$ID&n=2"
 crl "m=D&i=$ID"
 crl "m=D&i=$ID&t=V&v=3"
-crl "m=D&i=$ID&t=TV&v=3"
+echo 'issue #2072, so comment out crl "m=D&i=$ID&t=TV&v=3"'
 crl "m=D&i=$ID&t=V&v=3"
 crl "m=D&i=$ID&t=I&v=3&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1"
 crl "m=D&i=$ID&t=L&v=3&maxv=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"
@@ -299,7 +304,7 @@ crl "m=IM_C_S&i=$ID&s=$IMG_C_S"
 crl "m=IM_C&i=$ID&s=$IMG_C" # TODO voir comportement si pas d'image sauvée
 crl "m=INV_FAM&i=$ID&f=$FID" # f=family_id is base specific!
 crl "m=L"
-crl "m=L&data=place;&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE"
+echo 'issue #1964, so comment out crl "m=L&data=place;&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE"'
 crl "m=LB&k=30"
 crl "m=LD&k=30"
 crl "m=LL&k=30"
