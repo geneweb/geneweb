@@ -337,7 +337,7 @@
                       %apply;short_display_person_noname("child")<br>
                       %if;(child.public_name!="" and child.public_name!=child.first_name)%child.first_name;<br>%end;
                       %if;(child.birth_date!="")%if;(child.sex=0) [*born]0%else;[*born]1%end; %child.on_birth_date;%end;
-                      %if;(child.birth_place!="") [in (place)] %child.birth_place;%end;
+                      %if;(child.birth_place!="") %in_place; %child.birth_place;%end;
                     %if;(count2=0)</li></ul>%end;
                   </div>
                 </div>

@@ -21,7 +21,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container-fluid">
+<div class="container%if;(e.v>15)-fluid%end;">
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar
@@ -29,7 +29,7 @@
 %end;
 %define;input(xx)
   <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
-  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control-sm mr-1%if;(xx!=1) d-none%end;" disabled>
+  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control ml-1%if;(xx!=1) d-none%end;" disabled>
 %end;
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
@@ -295,24 +295,19 @@
     </div>
   </div>
 %end;
-<h3 class="ml-2">%nn;
+<h3 class="mt-2 ml-2">%nn;
   %let;slf;%if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %dates%in;
   %if;(l_v=0)%slf;%else;
     %apply;a_of_b_gr_eq_lev%with;[*descendants]%and;%slf;<small class="font-weight-lighter text-muted"> %apply;togend(l_v)</small>%end;
   %end;
 </h3>
-<form id="filterbysurname" class="form-inline ml-2 d-none">
-  <div class="form-row">
-    <span class="form-control-sm">[*filter by][:]</span>%nn;
-    %apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)%apply;input(5)
-    <button id="btnplus" type="button" class="btn btn-primary btn-sm" title="[*add filter] (max 5)"><i class="fa fa-plus fa-fw"></i></button>
-    <button id="btnclear" type="button" class="btn btn-danger btn-sm ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
-  </div>
+<form id="filterbysurname" class="form-inline mt-2 d-none">
+    <div class="form-control ml-3 px-0 border-0">[*filter by]</div>
+    <div class="ml-2">%apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)</div>
+    <button id="btnplus" type="button" class="btn btn-primary ml-2" title="[*add filter] (max 4)"><i class="fa fa-plus fa-fw"></i></button>
+    <button id="btnclear" type="button" class="btn btn-danger ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
 </form>
-<div class="deslist">
-  %if;(has_parents and evar.templ="" and not cancel_links)
-    <div><a role="button" class="text-primary" data-toggle="modal" data-target="#switch_modal" title="[*extend]">  ^</a></div>
-  %end;
+<div class="deslist mt-2">
   %apply;desc1(" 0",sex,"0","0","0",l_v+1,0)
 </div>
 %reset_count;

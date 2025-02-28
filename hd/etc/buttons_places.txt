@@ -79,8 +79,8 @@
         <input type="checkbox" class="custom-control-input" name="lower"
           id="lower" value="on"
           %if;(evar.lower!="" and evar.lower="on") checked%end;>
-        <label class="custom-control-label" title="[*case sensitive title]"
-          for="lower">[*case sensitive]</label>
+        <label class="custom-control-label" title="[*case-hlp]"
+          for="lower">[*case]</label>
       </div>
       <div class="custom-control custom-checkbox ml-4">
         <input type="checkbox" class="custom-control-input" name="any"

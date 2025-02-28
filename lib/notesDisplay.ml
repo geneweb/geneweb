@@ -51,7 +51,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     else ""
   in
   let modbtn =
-    if conf.wizard then Wiki.make_edit_button conf fnotes () else ""
+    if conf.wizard then Wiki.make_edit_button conf "NOTES" fnotes () else ""
   in
   Output.printf conf {|<div class="d-flex mb-3">%s%s</div>|} title_html modbtn;
   let file_path = file_path conf base in
@@ -63,6 +63,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
         Wiki.wi_mode = "NOTES";
         Wiki.wi_file_path = file_path;
         Wiki.wi_person_exists = person_exists conf base;
+        Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
         Wiki.wi_always_show_link = conf.wizard || conf.friend;
       }
     in
@@ -102,6 +103,7 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
       Wiki.wi_mode = mode;
       Wiki.wi_file_path = file_path conf base;
       Wiki.wi_person_exists = person_exists conf base;
+      Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
@@ -396,6 +398,7 @@ let print_mod_ok conf base =
       Wiki.wi_mode = mode;
       Wiki.wi_file_path = file_path;
       Wiki.wi_person_exists = person_exists conf base;
+      Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in

@@ -24,7 +24,7 @@
   %if;(count>0 or has_linked_page.BNOTE and linked_page.BNOTE!="")
     <h2 class="mt-2">[*individual notes]</h2>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-      <div class="ml-3">%apply;capitalize(linked_page.BNOTE).</div>
+      <div class="ml-3">%apply;capitalize(linked_page.BNOTE)</div>
     %end;
     <div class="ml-3">
       %notes;
@@ -39,28 +39,27 @@
         %if;(count=1 or count2=1 and (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
           <h2 class="w-100">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h2>
         %end;
-        <dl>
-          <dt>
+        <ul class="pl-4">
+          <li>
             %if;(not cancel_links)
-              <a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0">^
+              <a href="#wed-callnote-%count;" id="note-wed-%count;" title="[see] [marriage/marriages]0">^
               </a>
             %else;^
             %end;
             %if;(nb_families>1)%apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end; %spouse.first_name; %spouse.surname;
-            [:]
-          </dt>
-          <dd>%comment;</dd>
-        </dl>
+            [:] %comment;
+          </li>
+        </ul>
       %end;
     %end;
   %end;
   %if;(has_linked_page.NOTE and linked_page.NOTE!="")
-    <div class="ml-3">%apply;capitalize(linked_page.NOTE).</div>
+    <div class="ml-3">%apply;capitalize(linked_page.NOTE)</div>
   %end;
 %elseif;((count>0 or count2>0) and op_m=2)
   <h3 id="notes" class="mt-2">[*note/notes]1</h3>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-      <blockquote>%apply;capitalize(linked_page.BNOTE).</blockquote>
+      <blockquote>%apply;capitalize(linked_page.BNOTE)</blockquote>
     %end;
     %if;has_notes;
       <h2>[*individual notes]</h2>
@@ -110,7 +109,7 @@
       %end;
     %end;
     %if;(has_linked_page.NOTE and linked_page.NOTE!="")
-      <blockquote>%apply;capitalize(linked_page.NOTE).</blockquote>
+      <blockquote>%apply;capitalize(linked_page.NOTE)</blockquote>
     %end;
   %nl;
 %end;

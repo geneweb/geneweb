@@ -147,7 +147,7 @@
       <div class="mb-2">
         %if;wizard;
           <a href="%prefix;m=MOD_DATA&data=%e.data;&s=%sub;#%item.1;"
-            title="%apply;book_of(e.data)[:] [modify] “%item.1;”">
+            title="%apply;book_of(e.data)[:] [modify::] “%item.1;”">
             <i class="fa fa-wand-magic-sparkles fa-fw ml-2"></i>
           </a>
         %end;

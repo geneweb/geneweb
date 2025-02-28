@@ -2,6 +2,7 @@
 
 open Def
 open Gwdb
+open Geneweb
 
 (** .gwo file header *)
 let magic_gwo = "GnWo000o"
@@ -9,6 +10,27 @@ let magic_gwo = "GnWo000o"
 (* Option qui force a créé les clés des individus. De fait, *)
 (* si la clé est incomplète, on l'enregistre tout de même.  *)
 let create_all_keys = ref false
+
+(** Line counter while reading .gw file *)
+let line_cnt = ref 0
+
+(** Do not raise exception if syntax error occured.
+    Instead print error information on stdout *)
+let no_fail = ref false
+
+(** Save path to the images *)
+let no_picture = ref false
+
+(** Fonctionnement RGPD *)
+let rgpd_files = ref "None"
+
+let auth_file_name = None
+let consent_list = None
+let rgpd = ref false
+let verbose = ref false
+let verbose_friends = ref false
+let semi_pub_cnt = ref 0
+let out_file = ref (Filename.concat Filename.current_dir_name "a")
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Key to refer a person's definition *)
@@ -271,16 +293,6 @@ let date_of_string s i =
   | Some (dt, i) -> if i = String.length s then Some dt else error 5
   | None -> None
 
-(** Line counter while reading .gw file *)
-let line_cnt = ref 0
-
-(** Do not raise exception if syntax error occured.
-    Instead print error information on stdout *)
-let no_fail = ref false
-
-(** Save path to the images *)
-let no_picture = ref false
-
 (** Read line from input channel. *)
 let input_line0 ic =
   let line = input_line ic in
@@ -522,6 +534,128 @@ let get_access l =
   | "#afriend" :: l' -> (SemiPublic, l') (* for retro compatibility *)
   | "#semipub" :: l' -> (SemiPublic, l')
   | _ -> (IfTitles, l)
+
+(* copied from Some *)
+let name_unaccent_lower s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let t, j = Name.unaccent_utf_8 true s i in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0
+
+(* alternative: "%%%consent%%%" in text part of .auth file *)
+(* read .auth file and build a consent_list of keys *)
+let auth_access fn sn oc l =
+  let access, l = get_access l in
+  let fns = name_unaccent_lower fn |> Mutil.tr ' ' '_' in
+  let sns = name_unaccent_lower sn |> Mutil.tr ' ' '_' in
+  let frs = if access = SemiPublic then "SemiPublic" else "Other" in
+  let bname = Filename.basename !out_file |> Filename.remove_extension in
+  let gwf_file =
+    if Geneweb.GWPARAM.is_reorg_base bname then
+      Geneweb.GWPARAM.config_reorg bname
+    else Geneweb.GWPARAM.config_legacy bname
+  in
+  let auth_file_name =
+    match auth_file_name with
+    | Some file -> Some file
+    | None -> (
+        match try Some (Secure.open_in gwf_file) with Sys_error _ -> None with
+        | Some ic -> (
+            try
+              let rec loop () =
+                let line = input_line ic in
+                if Util.start_with line 0 "friend_passwd_file" then (
+                  let parts = String.split_on_char '=' line in
+                  close_in ic;
+                  if List.length parts = 2 then Some (List.nth parts 1)
+                  else Some "")
+                else loop ()
+              in
+              loop ()
+            with End_of_file ->
+              close_in ic;
+              Some "")
+        | None -> Some "")
+  in
+  let consent_list =
+    match consent_list with
+    | Some list -> list
+    | None -> (
+        match auth_file_name with
+        | Some file when file <> "" -> (
+            let friend_passwd_file =
+              Filename.concat (Secure.base_dir ()) file
+            in
+            match
+              try Some (Secure.open_in friend_passwd_file)
+              with Sys_error _ -> None
+            with
+            | Some ic -> (
+                let acc = ref [] in
+                try
+                  let rec loop () =
+                    let line = input_line ic |> name_unaccent_lower in
+                    let parts = String.split_on_char ':' line in
+                    let username =
+                      try List.nth parts 2 with Failure _ -> ""
+                    in
+                    let parts = String.split_on_char '|' username in
+                    let key = try List.nth parts 1 with Failure _ -> "" in
+                    if key <> "" && Mutil.contains line "%%%consent%%%" then (
+                      acc := key :: !acc;
+                      loop ())
+                    else loop ()
+                  in
+                  loop ()
+                with End_of_file ->
+                  close_in ic;
+                  !acc)
+            | None -> [])
+        | _ -> [])
+  in
+  let is_consent =
+    List.mem (Format.sprintf "%s.%d+%s" fns oc sns) consent_list
+  in
+  if access = Public then (Public, l)
+  else if is_consent then (
+    incr semi_pub_cnt;
+    if !verbose then Printf.eprintf "Set to %s %s.%d %s\n" frs fns oc sns;
+    if !verbose_friends then
+      Printf.eprintf "Set to %s %s.%d %s\n" frs fns oc sns;
+    (SemiPublic, l))
+  else (access, l)
+
+(** test presence of a file fn.occ.sn.pdf in rgpd_files *)
+let rgpd_access fn sn occ l =
+  let access, l = get_access l in
+  let fns = name_unaccent_lower fn in
+  let sns = name_unaccent_lower sn in
+  let ocs = string_of_int occ in
+  let frs = if access = SemiPublic then "SemiPublic" else "Other" in
+  let access, l =
+    let rgpd_file = Filename.concat !rgpd_files (fns ^ "." ^ ocs ^ "." ^ sns) in
+    let _ =
+      if String.contains sn '%' then
+        Printf.eprintf "Bad encoding for RGPD filename: %s\n" rgpd_file
+      else ()
+    in
+    (* if Public, stay Public *)
+    if access = Public then (Public, l)
+      (* if the files exist, set the Friend or Friend_m value *)
+    else if Sys.file_exists (rgpd_file ^ ".pdf") then (SemiPublic, l)
+      (* if not and person was SemiPublic, then it becomes Private *)
+    else if access = SemiPublic then (Private, l)
+      (* otherwise keep the current value *)
+    else (access, l)
+  in
+  if access = SemiPublic then (
+    incr semi_pub_cnt;
+    if !verbose_friends then
+      Printf.printf "Set to %s %s.%s %s\n" frs fns ocs sns);
+  (access, l)
 
 (** Create [gen_title] from string *)
 let scan_title t =
@@ -785,7 +919,9 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let qualifiers, l = get_qualifiers str l in
   let aliases, l = get_aliases str l in
   let titles, l = get_titles str l in
-  let access, l = get_access l in
+  let access, l =
+    if !rgpd then rgpd_access fn sn occ l else auth_access fn sn occ l
+  in
   let occupation, l = get_occu l in
   let psources, l = get_sources l in
   let naissance, l = get_optional_birthdate l in

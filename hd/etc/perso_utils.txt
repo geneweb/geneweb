@@ -53,6 +53,8 @@
     %if;xx.has_families;%if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
 %end;
 
+%let;in_place;%if;roglo;-%else;[in (place)]%end;%in;
+
 %define;marr_wrench_to_bullet(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%nn;>
@@ -568,7 +570,7 @@
   %let;marr_text;
     %apply;rel_date_place%with;%xx.sex;%and;
       %if;(on_marriage_date!="") %on_marriage_date;%end;
-      %if;(marriage_place!="") [in (place)] %marriage_place;%end;%end;%in;
+      %if;(marriage_place!="") %in_place; %marriage_place;%end;%end;%in;
   %if;(yy=1)%apply;capitalize(marr_text)%else;%marr_text;%end;
   %if;wedding_birthday; ([happy birthday to them!])%end;
 %end;

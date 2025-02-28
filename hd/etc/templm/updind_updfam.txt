@@ -6,7 +6,7 @@
          [or]
            [number] index (i=)
 
-         [*create]/[add] [person/persons]0
+         [*create]/[add::person/persons]0
 %in;
 %let;ak2;  [*sex], [select a letter][:]
            (M) [male/female/neuter]0
@@ -20,7 +20,7 @@
            (H) [move up/down]2
            (B) [move up/down]3
            (A) [add::]
-           (I) [insert]
+           (I) [insert::]
 %in;
 %let;ak4;  (P) [visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [surname/surnames]0
 %in;

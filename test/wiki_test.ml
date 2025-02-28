@@ -31,33 +31,26 @@ let f s =
 
 let l =
   [
-    ( [
-        WLpage (13, ([], "aaa"), "aaa", "", "bbb");
-        WLnone (15, ", ");
-        WLperson (26, ("ccc", "ddd", 0), None, None);
-        WLnone (51, ", http://site.com/eee#fff");
-      ],
-      "[[[aaa/bbb]]], [[ccc/ddd]], http://site.com/eee#fff" );
+    ([ WLpage (13, ([], "aaa"), "aaa", "", "bbb") ], "[[[aaa/bbb]]]");
+    ([ WLperson (11, ("ccc", "ddd", 0), Some "ccc ddd", None) ], "[[ccc/ddd]]");
+    ( [ WLperson (17, ("ccc", "ddd", 0), Some "Texte", None) ],
+      "[[ccc/ddd/Texte]]" );
+    ( [ WLperson (21, ("ccc", "ddd", 1), Some "Ccc Ddd", None) ],
+      "[[ccc/ddd/1/Ccc Ddd]]" );
+    ( [ WLperson (25, ("ccc", "ddd", 0), Some "Texte", Some "Texte 2") ],
+      "[[ccc/ddd/Texte;Texte 2]]" );
     ([ WLnone (6, "[[[]]]") ], "[[[]]]");
     ([ WLnone (4, "[[]]") ], "[[]]");
     ([ WLnone (3, "[[w") ], "[[w");
     ( [ WLpage (34, ([], "d_azincourt"), "d_azincourt", "", "d&#039;Azincourt") ],
       "[[[d_azincourt/d&#039;Azincourt]]]" );
-    (*
+  ]
+(*
     TODO tests suppressed pending fix in wiki.ml fir wiki_syntax
     following Keryan's modification for automatic pnoc update
-    ( [
-        WLnone (1, "[");
-        WLperson (12, ("aaa", "bbb", 0), None, None);
-        WLnone (14, ", ");
-        WLperson (25, ("ccc", "ddd", 0), Some "Ccc Ddd", None);
-        WLnone (50, ", http://site.com/eee#fff");
-      ],
-      "[[[aaa/bbb]], [[ccc/ddd/Ccc Ddd]], http://site.com/eee#fff" );
     ([ WLnone (7, "[[[aaa/") ], "[[[aaa/");
     ([ WLnone (4, "[[[w") ], "[[[w");
     *)
-  ]
 
 (* todo fix Fmt *)
 let testable_wiki = testable Fmt.nop ( = )

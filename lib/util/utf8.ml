@@ -75,18 +75,20 @@ let skip_html_tags s =
   loop 0 s
 
 let capitalize_fst s =
-  let i = skip_html_tags s in
-  let head = String.sub s 0 i in
-  let tail = String.sub s i (String.length s - i) in
-  let first = ref true in
-  let cmap u =
-    if !first then (
-      first := false;
-      Uucp.Case.Map.to_upper u)
-    else `Self
-  in
-  let tail = cmap_utf_8 cmap tail in
-  head ^ tail
+  if s = "" then s
+  else
+    let i = skip_html_tags s in
+    let head = String.sub s 0 i in
+    let tail = String.sub s i (String.length s - i) in
+    let first = ref true in
+    let cmap u =
+      if !first then (
+        first := false;
+        Uucp.Case.Map.to_upper u)
+      else `Self
+    in
+    let tail = cmap_utf_8 cmap tail in
+    head ^ tail
 
 let capitalize s =
   let first = ref true in
