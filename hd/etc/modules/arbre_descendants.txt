@@ -1,10 +1,10 @@
-<!-- $Id: modules/arbre_descendants.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/arbre_descendants.txt v7.1 28/02/2025 09:51:04 $ -->
 %define;display_person(xxx)
-  <div class="px-0 mx-0 border-0">
+  <div class="list-group-item bg-transparent px-0 mx-0 border-0">
   %if;(not cancel_links)
     <a href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;/D/V%end;%nn;
              %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;"
-      class="big_anchor" title="[*navigation]">
+       class="big_anchor list-group-item-action bg-transparent" title="[*navigation]"></a>
     </a>
   %end;
   %if;(xxx.has_sosa)%apply;display_sosa("xxx")<br>%end;
