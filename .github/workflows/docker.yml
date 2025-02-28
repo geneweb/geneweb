@@ -9,12 +9,11 @@ on:
       - 'etc/**'
       - 'hd/**'
       - 'man/**'
-      - 'CONTRIBUTING.md'
+      - '**/*.md'
       - 'geneweb_colab.ipynb'
       - 'ICHANGES'
       - 'INSTALL'
       - 'LICENSE'
-      - 'README.md'
       - 'CHANGES'
       - '.gitattributes'
       - '.gitignore'
@@ -28,12 +27,11 @@ on:
       - 'etc/**'
       - 'hd/**'
       - 'man/**'
-      - 'CONTRIBUTING.md'
+      - '**/*.md'
       - 'geneweb_colab.ipynb'
       - 'ICHANGES'
       - 'INSTALL'
       - 'LICENSE'
-      - 'README.md'
       - 'CHANGES'
       - '.gitattributes'
       - '.gitignore'
@@ -145,7 +143,6 @@ jobs:
         with:
           platforms: linux/arm64/v8
           driver-opts: |
-            network=host
             image=moby/buildkit:latest
 
       - name: Login to GitHub Container Registry

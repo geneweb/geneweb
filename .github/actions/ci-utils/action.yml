@@ -67,8 +67,13 @@ runs:
             fi
           fi
 
+          CACHE_HIT_VALUE="false"
+          if [ "$CACHE_HIT" = "true" ]; then
+            CACHE_HIT_VALUE="true"
+          fi
+
           printf -v metric "{\"os\":\"%s\",\"ocaml\":\"%s\",\"duration\":%d,\"status\":\"%s\",\"cache_hit\":%s,\"size_bytes\":%d}" \
-            "$OS_NAME" "$OCAML_VERSION" "$BUILD_TIME" "$JOB_STATUS" "$CACHE_HIT" "$SIZE_BYTES"
+            "$OS_NAME" "$OCAML_VERSION" "$BUILD_TIME" "$JOB_STATUS" "$CACHE_HIT_VALUE" "$SIZE_BYTES"
 
           echo "$metric" > "metric-$OS_NAME-$OCAML_VERSION.json"
           echo "metric=$metric" >> $GITHUB_OUTPUT
@@ -135,7 +140,7 @@ runs:
           size=$(jq -r '.size_bytes' "$f")
 
           status_icon=$([ "$status" = "success" ] && echo "✅" || echo "❌")
-          cache_icon=$([ "$cache_hit" = "true" ] && echo "📦" || echo "🔄")
+          cache_icon=$([ "$cache_hit" = "true" ] && echo "✅" || echo "❌")
 
           mins=$((duration / 60))
           secs=$((duration % 60))
