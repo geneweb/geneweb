@@ -2,14 +2,15 @@
 #                                                      STAGE 1: Build Geneweb
 ###############################################################################
 
-FROM ocaml/opam:debian-ocaml-4.14-nnp AS builder
+FROM ocaml/opam:debian-12-ocaml-4.14 AS builder
 
 ENV OPAMYES=yes
+ENV OPAMJOBS=2
+
 USER root
-# Ignore the apt warning here as apt-get does not allow wildcarding versions
-# hadolint ignore=DL3027
+# Install required system dependencies
 RUN export DEBIAN_FRONTEND=noninteractive \
-&& apt install -yq --no-install-recommends \
+    && apt install -yq --no-install-recommends \
     m4=1.4.19-3 \
     libgmp-dev=2:6.2.1+dfsg1-1.1 \
     libpcre3-dev=2:8.39-15 \
@@ -17,19 +18,16 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     xdot=1.2-3 \
     zlib1g-dev=1:1.2.13.dfsg-1 \
     pkg-config=1.8.1-1 \
-&& ln -sf /usr/bin/opam-2.3 /usr/bin/opam
+    && ln -sf /usr/bin/opam-2.3 /usr/bin/opam
 
+# Initialize OPAM
 USER opam
-# Install problematic packages on ARM64 first to isolate any issues
-RUN eval "$(opam env)" && opam install \
-    uri.4.4.0 yojson.2.2.2 zarith.1.14
+WORKDIR /home/opam
+RUN opam init --disable-sandboxing --auto-setup --bare
 
-# Install deps before cloning Geneweb to store them in a stable reusable cache
-RUN eval "$(opam env)" && opam install \
-    ancient.0.9.1 calendars.1.0.0 camlp-streams.5.0.1 camlzip.1.13 \
-    cppo.1.8.0 jingoo.1.5.0 markup.1.0.3 ppx_import.1.11.0 ppx_blob.0.7.2 \
-    stdlib-shims.0.3.0 unidecode.0.2.0 uucp.16.0.0 uunf.16.0.0 uutf.1.0.3 \
-    camlp5.8.03.01 oUnit.2.2.7 syslog.2.0.2
+# Copy opam file for dependency resolution then install dependencies
+COPY --chown=opam:opam *.opam ./
+RUN eval "$(opam env)" && opam install . --deps-only && opam install ancient
 
 # Clone repository and build Geneweb
 WORKDIR /home/opam/geneweb
