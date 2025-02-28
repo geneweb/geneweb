@@ -23,46 +23,54 @@
   [*branch %s compiled on %s from commit:::x:y]0%nn;
 %end;
 
+%define;test_notice(notice,lang)
+  %if;(b.notice_title_lang!="")1%elseif;(b.notice_title!="")1%else;0%end;
+%end;
+
 %define;notice(notice, lang)
   %if;(b.notice_title_lang!="")
-    <div class="btn-group mx-1">
-      <a class="ml-3 mr-3" href="%b.notice_url">%b.notice_title_lang;</a>
+    <div class="btn-group mx-3 mt-3">
+      <a href="%b.notice_url">%b.notice_title_lang;</a>
     </div>
   %elseif;(b.notice_title!="")
-    <div class="btn-group mx-1">
-      <a class="ml-3 mr-3" href="%b.notice_url">%b.notice_title;</a>
+    <div class="btn-group mx-3 mt-3">
+      <a href="%b.notice_url">%b.notice_title;</a>
     </div>
   %end;
 %end;
+
+%let;notice1;%apply;test_notice("notice1", lang)%in;
+%let;notice2;%apply;test_notice("notice2", lang)%in;
+%let;notice3;%apply;test_notice("notice3", lang)%in;
 
 %if;(not cancel_links)
   <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
     <div class="d-flex flex-wrap justify-content-md-end">
       <!-- legal notices -->
       %if;is_printed_by_template;
-        <div class="d-flex flex-row align-items-center mr-4 border-0">
-          %apply;notice("notice1", lang)
-        </div>
-        <div class="d-flex flex-row align-items-center mr-4 border-0">
-          %apply;notice("notice2", lang)
-        </div>
-        <div class="d-flex flex-row align-items-center mr-4 border-0">
-          %apply;notice("notice3", lang)
-        </div>
+        %if;(notice1=1)
+            %apply;notice("notice1", lang)
+        %end;
+        %if;(notice2=1)
+            %apply;notice("notice2", lang)
+        %end;
+        %if;(notice3=1)
+            %apply;notice("notice3", lang)
+        %end;
       %else;
         %if;(b.notice1_title!="")
-          <div class="btn-group mr-4">
-            <a class="ml-3 mr-3" href="%b.notice1_url">%b.notice1_title;</a>
+          <div class="btn-group mx-3 mt-3">
+            <a href="%b.notice1_url">%b.notice1_title;</a>
           </div>
         %end;
         %if;(b.notice2_title!="")
-          <div class="btn-group mr-4">
-            <a class="ml-3 mr-3" href="%b.notice2_url">%b.notice2_title;</a>
+          <div class="btn-group mx-3 mt-3">
+            <a href="%b.notice2_url">%b.notice2_title;</a>
           </div>
         %end;
         %if;(b.notice3_title!="")
-          <div class="btn-group mr-4">
-            <a class="ml-3 mr-3" href="%b.notice3_url">%b.notice3_title;</a>
+          <div class="btn-group mx-3 mt-3">
+            <a href="%b.notice3_url">%b.notice3_title;</a>
           </div>
         %end;
       %end;
