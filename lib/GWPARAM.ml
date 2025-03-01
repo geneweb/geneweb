@@ -553,66 +553,67 @@ let init_etc bname =
   if !init_done.status && bname = !init_done.bname then ()
   else init_done := { status = true; bname };
   let fname = Filename.concat (!bpath bname) "caches" in
-  if not (Sys.file_exists fname) then (
-    try Unix.mkdir fname 0o755
-    with Unix.Unix_error (_, _, _) ->
-      !syslog `LOG_WARNING (Printf.sprintf "Error when creating %s" fname);
-      if !reorg then (
-        (if not (Sys.file_exists (!bpath bname)) then
-         try
-           Unix.mkdir (!bpath bname) 0o755;
-           force := true
-         with Unix.Unix_error (_, _, _) ->
-           !syslog `LOG_WARNING
-             (Printf.sprintf "Failure when creating base_dir: %s" (!bpath bname)));
+  let bdir = !bpath bname in
+  (if Sys.file_exists bdir && not (Sys.file_exists fname) then
+   try Unix.mkdir fname 0o755
+   with Unix.Unix_error (_, _, _) ->
+     !syslog `LOG_WARNING (Printf.sprintf "Error when creating %s" fname));
+  if !reorg then (
+    (if not (Sys.file_exists (!bpath bname)) then
+     try
+       Unix.mkdir (!bpath bname) 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating base_dir: %s" (!bpath bname)));
 
-        (if not (Sys.file_exists (!etc_d bname)) then
-         try Unix.mkdir (!etc_d bname) 0o755
-         with Unix.Unix_error (_, _, _) ->
-           !syslog `LOG_WARNING
-             (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)));
+    (if not (Sys.file_exists (!etc_d bname)) then
+     try Unix.mkdir (!etc_d bname) 0o755
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)));
 
-        (if not (Sys.file_exists (!config_d bname)) then
-         try Unix.mkdir (!config_d bname) 0o755
-         with Unix.Unix_error (_, _, _) ->
-           !syslog `LOG_WARNING
-             (Printf.sprintf "Failure when creating config_dir: %s"
-                (!config_d bname)));
+    (if not (Sys.file_exists (!config_d bname)) then
+     try Unix.mkdir (!config_d bname) 0o755
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating config_dir: %s"
+            (!config_d bname)));
 
-        if not (Sys.file_exists (!cnt_d bname)) then
-          try Unix.mkdir (!cnt_d bname) 0o755
-          with Unix.Unix_error (_, _, _) ->
-            !syslog `LOG_WARNING
-              (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)))
-      else (
-        (if not (Sys.file_exists "etc") then
-         try
-           Unix.mkdir "etc" 0o755;
-           force := true
-         with Unix.Unix_error (_, _, _) ->
-           !syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
+    if not (Sys.file_exists (!cnt_d bname)) then
+      try Unix.mkdir (!cnt_d bname) 0o755
+      with Unix.Unix_error (_, _, _) ->
+        !syslog `LOG_WARNING
+          (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)))
+  else (
+    (if not (Sys.file_exists "etc") then
+     try
+       Unix.mkdir "etc" 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
 
-        (if not (Sys.file_exists "lang") then
-         try
-           Unix.mkdir "lang" 0o755;
-           force := true
-         with Unix.Unix_error (_, _, _) ->
-           !syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
+    (if not (Sys.file_exists "lang") then
+     try
+       Unix.mkdir "lang" 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
 
-        (if not (Sys.file_exists "cnt") then
-         try
-           Unix.mkdir "cnt" 0o755;
-           force := true
-         with Unix.Unix_error (_, _, _) ->
-           !syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
+    (if not (Sys.file_exists "cnt") then
+     try
+       Unix.mkdir "cnt" 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
 
-        if not (Sys.file_exists (!etc_d bname)) then
-          try
-            Unix.mkdir (!etc_d bname) 0o755;
-            force := true
-          with Unix.Unix_error (_, _, _) ->
-            !syslog `LOG_WARNING
-              (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname))))
+    if not (Sys.file_exists (!etc_d bname)) then
+      try
+        Unix.mkdir (!etc_d bname) 0o755;
+        force := true
+      with Unix.Unix_error (_, _, _) ->
+        !syslog `LOG_WARNING
+          (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)))
 
 let test_reorg bname =
   if !reorg || is_reorg_base bname then (
