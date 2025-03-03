@@ -805,7 +805,7 @@ let searching_fields conf base =
       | Some p ->
           let s =
             Printf.sprintf
-              (Util.ftransl conf "direct ancestor of %s")
+              (Util.ftransl conf "direct ancestor(s) of %s")
               (NameDisplay.fullname_html_of_person conf base p :> string)
           in
           if search = "" then s
