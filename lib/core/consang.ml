@@ -248,8 +248,7 @@ let relationship_and_links base ri b ip1 ip2 =
       ty.weight1 <- ty.weight1 +. p1;
       ty.weight2 <- ty.weight2 +. p2;
       ty.relationship <- ty.relationship +. (p1 *. p2);
-      if u.elim_ancestors then ty.elim_ancestors <- true;
-      if b && not ty.elim_ancestors then (
+      if b && not u.elim_ancestors then (
         ty.lens1 <- List.fold_left (insert_branch_len ip_from) ty.lens1 u.lens1;
         ty.lens2 <- List.fold_left (insert_branch_len ip_from) ty.lens2 u.lens2)
     in
