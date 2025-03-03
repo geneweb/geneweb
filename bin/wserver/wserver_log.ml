@@ -1,5 +1,6 @@
 let string_of_status = function
   | Def.OK -> "200 OK"
+  | Def.Moved_Permanently -> "301 Moved Permanently"
   | Def.Moved_Temporarily -> "302 Moved Temporarily"
   | Def.Bad_Request -> "400 Bad Request"
   | Def.Unauthorized -> "401 Unauthorized"
