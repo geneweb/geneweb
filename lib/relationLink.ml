@@ -754,60 +754,77 @@ let print_relation_no_dag conf base po ip1 ip2 =
       print_relation_ok conf base info
   | _ -> Hutil.incorrect_request conf
 
+let all_ipers_between ~conf ~base ~store ~start_iper ~end_iper ~max_depth =
+  let ancestors = Queue.create () in
+  Queue.push (start_iper, 0) ancestors;
+  let push_parent a depth pa =
+    let s = Gwdb.Marker.get store pa in
+    if Gwdb.IperSet.is_empty s then (
+      Gwdb.Marker.set store pa (Gwdb.IperSet.singleton a);
+      Queue.push (pa, depth + 1) ancestors)
+    else Gwdb.Marker.set store pa (Gwdb.IperSet.add a s)
+  in
+  let rec loop () =
+    if not (Queue.is_empty ancestors) then
+      let ip, depth = Queue.pop ancestors in
+      if depth < max_depth then (
+        let p = Gwdb.poi base ip in
+        let fam = Option.map (Gwdb.foi base) @@ Gwdb.get_parents p in
+        let fath = Option.map Gwdb.get_father fam in
+        let moth = Option.map Gwdb.get_mother fam in
+        Option.iter (push_parent ip depth) fath;
+        Option.iter (push_parent ip depth) moth;
+        loop ())
+  in
+  loop ();
+  let rec follow_descendants acc s =
+    if Gwdb.IperSet.is_empty s then acc
+    else
+      let acc' =
+        Gwdb.IperSet.fold
+          (fun iper acc -> Gwdb.IperSet.union (Gwdb.Marker.get store iper) acc)
+          s Gwdb.IperSet.empty
+      in
+      follow_descendants (Gwdb.IperSet.union acc acc') acc'
+  in
+  let set =
+    follow_descendants Gwdb.IperSet.empty (Gwdb.IperSet.singleton end_iper)
+  in
+  if not (Gwdb.IperSet.is_empty set) then Gwdb.IperSet.add end_iper set else set
+
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
   let ia = Gwdb.get_iper a in
-  let add_branches dist set n ip l =
-    let b = find_first_branch conf base dist ia l ip Neuter in
-    let rec loop set n b =
-      if n > 100 then raise Exit
-      else
-        match b with
-        | Some b ->
-            let set =
-              List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
-            in
-            loop set (n + 1)
-              (find_next_branch conf base dist ia (Gwdb.get_sex a) b)
-        | None -> (set, n)
-    in
-    loop set n b
+  let store = Gwdb.iper_marker (Gwdb.ipers base) Gwdb.IperSet.empty in
+  let s1 =
+    all_ipers_between ~conf ~base ~store ~start_iper:ip1 ~end_iper:ia
+      ~max_depth:l1
   in
-  try
-    let set =
-      List.fold_left
-        (fun set l1 ->
-          List.fold_left
-            (fun set l2 ->
-              let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
-              let set, n = add_branches dist set 0 ip1 l1 in
-              let set, _ = add_branches dist set n ip2 l2 in
-              set)
-            set l2)
-        (Dag.Pset.add ia Dag.Pset.empty)
-        l1
-    in
-    let spl =
-      List.fold_right
-        (fun (ip, s) spl ->
-          match Util.find_person_in_env conf base s with
-          | Some sp -> (ip, (Gwdb.get_iper sp, None)) :: spl
-          | None -> spl)
-        [ (ip1, "3"); (ip2, "4") ]
-        []
-    in
-    let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
-    let vbar_txt _ = Adef.escaped "" in
-    let invert =
-      match Util.p_getenv conf.Config.env "invert" with
-      | Some "on" -> true
-      | _ -> false
-    in
-    let page_title =
-      Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
-    in
-    DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
-      page_title (Adef.escaped "")
-  with Exit -> Hutil.incorrect_request conf
+  let s2 =
+    all_ipers_between ~conf ~base ~store ~start_iper:ip2 ~end_iper:ia
+      ~max_depth:l2
+  in
+  let set = Gwdb.IperSet.union s1 s2 |> Gwdb.IperSet.elements in
+  let spl =
+    List.fold_right
+      (fun (ip, s) spl ->
+        match Util.find_person_in_env conf base s with
+        | Some sp -> (ip, (Gwdb.get_iper sp, None)) :: spl
+        | None -> spl)
+      [ (ip1, "3"); (ip2, "4") ]
+      []
+  in
+  let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
+  let vbar_txt _ = Adef.escaped "" in
+  let invert =
+    match Util.p_getenv conf.Config.env "invert" with
+    | Some "on" -> true
+    | _ -> false
+  in
+  let page_title =
+    Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+  in
+  DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
+    page_title (Adef.escaped "")
 
 let int_list s =
   let rec loop i n =
@@ -819,6 +836,13 @@ let int_list s =
   in
   loop 0 0
 
+let rec max_int_of_list =
+  let rec aux i = function
+    | x :: xs -> if x > i then aux x xs else aux i xs
+    | [] -> i
+  in
+  aux 0
+
 let print_relation conf base p1 p2 =
   let l1 = Util.p_getenv conf.Config.env "l1" in
   let l2 = Util.p_getenv conf.Config.env "l2" in
@@ -826,7 +850,8 @@ let print_relation conf base p1 p2 =
   match (Util.p_getenv conf.Config.env "dag", po, l1, l2) with
   | Some "on", Some p, Some l1, Some l2 ->
       print_relation_dag conf base p (Gwdb.get_iper p1) (Gwdb.get_iper p2)
-        (int_list l1) (int_list l2)
+        (max_int_of_list (int_list l1))
+        (max_int_of_list (int_list l2))
   | _ ->
       print_relation_no_dag conf base po (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 
