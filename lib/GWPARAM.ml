@@ -54,7 +54,7 @@ module Default = struct
             | Internal_Server_Error -> "500"
             | Service_Unavailable -> "503"
             | Gateway_Timeout -> "504"
-            | OK | Moved_Temporarily -> assert false
+            | OK | Moved_Temporarily | Moved_Permanently -> assert false
           in
           let fname lang =
             code ^ "-" ^ lang ^ ".html"
