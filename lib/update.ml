@@ -9,7 +9,7 @@ type update_error =
   | UERR_already_defined of Gwdb.base * Gwdb.person * string
   | UERR_own_ancestor of Gwdb.base * Gwdb.person
   | UERR_digest
-  | UERR_bad_date of Date.dmy
+  | UERR_bad_date of [ `Missing_year | `Date of Date.dmy ]
   | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of Gwdb.base * Gwdb.person
   | UERR_missing_surname of Adef.safe_string
@@ -324,9 +324,11 @@ let string_of_error conf =
       ^ Util.transl conf ":" ^ " "
       ^
       match d with
-      | { day = 0; month = 0; year = a } -> Printf.sprintf "%d" a
-      | { day = 0; month = m; year = a } -> Printf.sprintf "%d/%d" m a
-      | { day = j; month = m; year = a } -> Printf.sprintf "%d/%d/%d" j m a)
+      | `Missing_year -> Util.transl conf "missing year"
+      | `Date { day = 0; month = 0; year = a } -> Printf.sprintf "%d" a
+      | `Date { day = 0; month = m; year = a } -> Printf.sprintf "%d/%d" m a
+      | `Date { day = j; month = m; year = a } ->
+          Printf.sprintf "%d/%d/%d" j m a)
       |> Adef.safe
   | UERR_missing_field s ->
       let open Def in
@@ -951,13 +953,13 @@ let reconstitute_date_dmy2 conf var =
               then dmy2
               else
                 let d = Date.dmy_of_dmy2 dmy2 in
-                bad_date conf d
+                bad_date conf (`Date d)
           | None ->
               let dmy2 = Date.{ day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
               if dmy2.month2 >= 1 && dmy2.month2 <= 13 then dmy2
               else
                 let d = Date.dmy_of_dmy2 dmy2 in
-                bad_date conf d))
+                bad_date conf (`Date d)))
   | None -> raise @@ ModErr (UERR_missing_field (Adef.safe "oryear"))
 
 let reconstitute_date_dmy conf var =
@@ -995,8 +997,14 @@ let reconstitute_date_dmy conf var =
     | _ -> (false, int_of_field m)
   in
   let d =
+    let day = get_number var "dd" conf.env in
     match int_of_field y with
-    | None -> None
+    | None ->
+        let is_specified component =
+          Option.fold ~none:false ~some:(Fun.negate @@ Int.equal 0) component
+        in
+        if is_specified day || is_specified m then bad_date conf `Missing_year
+        else None
     | Some y -> (
         let prec =
           match prec with
@@ -1021,18 +1029,18 @@ let reconstitute_date_dmy conf var =
         match m with
         | None -> Some Date.{ day = 0; month = 0; year = y; prec; delta = 0 }
         | Some m -> (
-            match get_number var "dd" conf.env with
+            match day with
             | Some day ->
                 let d = Date.{ day; month = m; year = y; prec; delta = 0 } in
                 if d.day >= 1 && d.day <= 31 && d.month >= 1 && d.month <= 13
                 then Some d
-                else bad_date conf d
+                else bad_date conf (`Date d)
             | None ->
                 let d =
                   Date.{ day = 0; month = m; year = y; prec; delta = 0 }
                 in
                 if d.month >= 1 && d.month <= 13 then Some d
-                else bad_date conf d))
+                else bad_date conf (`Date d)))
   in
   (d, force_f_cal)
 
@@ -1107,7 +1115,8 @@ let check_missing_witnesses_names conf get list =
   loop list
 
 let check_greg_day conf d =
-  if d.Date.day > Date.nb_days_in_month d.month d.year then bad_date conf d
+  if d.Date.day > Date.nb_days_in_month d.month d.year then
+    bad_date conf (`Date d)
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
