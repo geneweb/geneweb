@@ -167,20 +167,18 @@ let () =
    aux "cmis" cmis;
    aux "cmas" cmas);
   Printf.fprintf out {|let shared=[||};
-  if Sys.unix then (
-    (* FIXME: what is the windows version? *)
-    let aux s =
-      Printf.fprintf out
-        {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob}
-        s
-        (opam_swich_prefix_lib // s)
-    in
-    List.iter aux
-      [
-        "ocaml" // "stublibs" // "dllcamlstr.so";
-        "ocaml" // "stublibs" // "dllunix.so";
-      ];
-    aux ("stublibs" // "dllzarith.so"));
+  let aux s =
+    Printf.fprintf out
+      {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob}
+      s
+      (opam_swich_prefix_lib // s)
+  in
+  List.iter aux
+    [
+      "ocaml" // "stublibs" // "dllcamlstr.so";
+      "ocaml" // "stublibs" // "dllunix.so";
+    ];
+  aux ("stublibs" // "dllzarith.so");
   Printf.fprintf out {||];;|};
   let b = Buffer.create 1024 in
   let aux =

@@ -1762,10 +1762,10 @@ let link ~save_mem state next_family_fun bdir =
   let istr_quest = unique_string gen "?" in
   assert (istr_empty = 0);
   assert (istr_quest = 1);
-  if Sys.unix then Sys.remove tmp_per_index;
-  if Sys.unix then Sys.remove tmp_per;
-  if Sys.unix then Sys.remove tmp_fam_index;
-  if Sys.unix then Sys.remove tmp_fam;
+  Sys.remove tmp_per_index;
+  Sys.remove tmp_per;
+  Sys.remove tmp_fam_index;
+  Sys.remove tmp_fam;
   let next_family = next_family_fun fi in
   (let rec loop () =
      match next_family () with

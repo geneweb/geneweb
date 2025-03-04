@@ -1,4 +1,4 @@
-INSTALLATIONS INSTRUCTIONS IN UNIX or MACOSX MACHINES
+INSTALLATIONS INSTRUCTIONS
 
 For the compilation, you need the Objective Caml compiler installed
 in your computer. The compilation works for several versions of ocaml.
@@ -28,32 +28,13 @@ They freely distributed at address:
 
 4- To use GeneWeb, move the directory "distribution" to another place, or
    rename it.
-   On macOSX, do:
+   Do:
    	   make install
-   This will install the distribution folder on your Desktop and rename it "GeneWeb-7.00-Mac" 
+   This will install the distribution folder on your Desktop and rename it "GeneWeb-7.00"
    (or another name of your choice).
 
    Go to this directory and launch the commands "./gwd" and possibly "./gwsetup".
-   On macOSX, geneweb.command will kill previous instances, launch both gwd and gwsetup 
-   and minimize the window.
 
    The reason why it is much better to move this directory is that "make clean"
    deletes it, and another "make distrib" overwrites it. If you created
    genealogic databases inside, they would be deleted.
-
-
-INSTALLATIONS INSTRUCTIONS IN WINDOWS NT/95/98
-
-You need:
-
-- The Cygnus GNU-Win32 development tool, free (search in the Web)
-
-- The Microsoft Visual C++ compiler.
-
-- The Microsoft Assembler masm.
-
-- The Objective Caml compiler.
-
-- The Camlp5 preprocessor.
-
-Follow the same instructions above than for the Unix installation.

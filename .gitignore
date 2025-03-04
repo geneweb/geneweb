@@ -16,7 +16,6 @@ bin/gwb2ged/dune
 bin/gwc/dune
 bin/gwd/dune
 bin/gwdiff/dune
-bin/gwgc/dune
 bin/gwrepl/.depend
 bin/gwrepl/dune
 bin/gwu/dune
@@ -26,7 +25,6 @@ lib/core/dune
 lib/dune
 lib/gwdb/dune
 lib/util/dune
-plugins/welcome/dune
 lib/gwdb-legacy/dune
 lib/gwdb-versioned/dune
 lib/system_util/dune
