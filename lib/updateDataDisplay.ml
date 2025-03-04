@@ -176,18 +176,6 @@ type 'a env =
   | Vother of 'a
   | Vstring of string
 
-let string_to_list str =
-  let rec loop acc = function
-    | s ->
-        if Utf8.length s > 0 then
-          let nbc = Utf8.nbc s.[0] in
-          let c = Utf8.sub s 0 nbc in
-          let s1 = Utf8.sub s nbc (Utf8.length s - nbc) in
-          loop (c :: acc) s1
-        else acc
-  in
-  loop [] str
-
 let unfold_place_long inverted s =
   let pl, sub = Place.fold_place_long inverted s in
   if inverted then String.concat ", " (List.rev (sub :: List.rev pl))
@@ -241,13 +229,14 @@ and eval_simple_var conf base env xx = function
         in
         loop 0 "" p_list
       in
-      let tail =
+      let title =
         Printf.sprintf
-          "\" title=\"%s\">%d<i class=\"fa fa-user fa-xs ml-1\"></i></a>"
+          "\" title=\"%s\" data-toggle=\"tooltip\" data-placement=\"top\">%d"
           (Utf8.capitalize (transl conf "list of linked persons"))
           (List.length p_list)
       in
-      head ^ body ^ tail |> str_val
+      let tail = Printf.sprintf "<i class=\"fa fa-user fa-xs ml-1\"></i></a>" in
+      head ^ body ^ title ^ tail |> str_val
   | [ s ] -> (
       try bool_val (eval_simple_bool_var conf base env xx s)
       with Not_found -> str_val (eval_simple_str_var conf base env xx s))
@@ -336,9 +325,12 @@ and eval_simple_str_var conf _base env _xx = function
       | Some ini ->
           if ini = "" then Printf.sprintf "%s %s" len2 book_name
           else
-            Printf.sprintf
-              (ftransl conf "%s %s starting with %s")
-              len2 book_name ini
+            let fmt_str = ftransl conf "%s %s starting with %s" in
+            let escaped_ini =
+              Printf.sprintf "<span class=\"hl-book\">%s</span>"
+                (Util.escape_html ini :> string)
+            in
+            Printf.sprintf fmt_str len2 book_name escaped_ini
       | None -> Printf.sprintf "%s %s" len2 book_name)
   | _ -> raise Not_found
 
@@ -357,11 +349,10 @@ and eval_compound_var conf base env xx sl =
         | None -> "")
     | [ "evar"; s ] | [ "e"; s ] ->
         Option.value ~default:"" (p_getenv conf.env s)
-    | "encode" :: sl -> (Mutil.encode (loop sl) :> string) (* FIXME? *)
-    | ("escape" | "html_encode") :: sl ->
-        (Util.escape_html (loop sl) :> string) (* FIXME? *)
-    | [ "uri_encode"; s ] -> Util.uri_encode s
-    | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
+    | "encode" :: sl -> Util.uri_encode (loop sl)
+    | "escape" :: sl ->
+        let escaped = Util.escape_html (loop sl) in
+        (escaped :> string)
     | [ "subs"; n; s ] -> (
         match int_of_string_opt n with
         | Some n ->
@@ -386,7 +377,7 @@ let print_foreach conf print_ast _eval_expr =
     match s :: sl with
     | [ "initial" ] -> print_foreach_initial env xx al
     | [ "entry" ] -> print_foreach_entry env xx el al
-    | [ "substr"; e ] -> print_foreach_substr env xx el al e
+    | [ "substring"; e; n ] -> print_foreach_substring env xx el al e n
     | [ "value" ] -> print_foreach_value env xx al
     | _ -> raise Not_found
   and print_foreach_entry env xx _el al =
@@ -404,35 +395,43 @@ let print_foreach conf print_ast _eval_expr =
         in
         List.iter (print_ast env xx) al)
       list
-  and print_foreach_substr env xx _el al evar =
+  and print_foreach_substring env xx _el al evar n =
     let evar = match p_getenv conf.env evar with Some s -> s | None -> "" in
-    let list_of_char = string_to_list evar in
-    let list_of_sub =
-      let rec loop acc = function
-        | c :: l ->
-            let s1 = List.fold_left (fun acc cc -> cc ^ acc) c l in
-            loop (s1 :: acc) l
-        | [] -> acc
-      in
-      loop [] list_of_char
+    (* Parse the limiting integer from n *)
+    let limit =
+      match int_of_string_opt n with
+      | Some i -> i
+      | None -> 12 (* Default limit if n is not a valid integer *)
     in
-    let max = List.length list_of_sub in
-    let rec loop first cnt = function
+
+    (* Generate the list of progressive substrings *)
+    let rec build_substrings i acc =
+      if i >= Utf8.length evar then List.rev acc
+      else if i > limit then List.rev acc
+      else
+        let rec get_substr j pos =
+          if j >= i then pos else get_substr (j + 1) (Utf8.next evar pos)
+        in
+        let substr = String.sub evar 0 (get_substr 0 0) in
+        build_substrings (i + 1) (substr :: acc)
+    in
+
+    let substrings = build_substrings 1 [] in
+    let max = List.length substrings in
+
+    (* Process each substring *)
+    let rec process_items idx = function
       | [] -> ()
-      | [ _s ] -> () (* dont do last element *)
-      | s :: l ->
-          let tail =
-            if Utf8.length s > 0 then Utf8.sub s (Utf8.length s - 1) 1 else ""
-          in
+      | s :: tail ->
           let env =
-            ("substr", Vstring s) :: ("tail", Vstring tail)
-            :: ("first", Vbool first) :: ("max", Vint max) :: ("cnt", Vint cnt)
+            ("substr", Vstring s) :: ("max", Vint max) :: ("cnt", Vint idx)
             :: env
           in
           List.iter (print_ast env xx) al;
-          loop false (cnt + 1) l
+          process_items (idx + 1) tail
     in
-    loop true 0 list_of_sub
+
+    process_items 0 substrings
   and print_foreach_value env xx al =
     let l =
       match get_env "list_value" env with
