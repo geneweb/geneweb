@@ -17283,6 +17283,10 @@ de: das ausgewählte Bild wird kopiert nach
 en: the selected image will be copied to
 fr: l’image sélectionnée sera enregistrée dans
 
+    subplace help
+en: be carefull, the syntax of subplaces is “[subplace] – place” with a dash that can be emdash or endash.
+fr: attention, la syntaxe des sous-lieux est « [sous-lieu] – lieu » avec un tiret qui peut être cadratin ou demi-cadratin.
+
     subdivision
 co: paisolu
 de: Ort

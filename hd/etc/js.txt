@@ -731,7 +731,7 @@ const initTooltips = () => {
     $(tooltipElements).tooltip({
       trigger: 'hover',
       delay: { show: 200, hide: 50 },
-      html: true
+      container: 'body',
     });
   }
 };
@@ -747,7 +747,6 @@ function safeInitialize(fn) {
 %( Initialize on DOM Content Loaded %)
 document.addEventListener('DOMContentLoaded', () => {
 %if;is_welcome;
-  initTooltips();
   initializeWelcomeSearchFunctionality();
   %if;wizard;
     inputToBook.addNavigation();
@@ -755,6 +754,9 @@ document.addEventListener('DOMContentLoaded', () => {
   %if;(b.datalist_fnames=1 or b.datalist_snames=1)
     populateDatalists();
   %end;
+%end;
+%if;(is_welcome or "MOD_DATA" in e.m)
+  initTooltips();
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")
   initializeLazyModules();
