@@ -45,35 +45,10 @@ drwxr-xr-x  21 Henri  staff     672 10 jul 08:34 gw
 -rwxr-xr-x   1 Henri  staff      71 10 jul 08:34 gwsetup.command
 ```
 
-Starting the GeneWeb servers may depend on your specific environment.
+### Starting the GeneWeb servers
 
-### Windows
-
-TBD
-
-### MacOS
-
-Apple provides a security mechanism preventing users from executing application
-which are not provided by authenticated developpers. Such applications cannot be started
-by double-clicking on their icons.
-Apple provides a two step mechanism circumventing this security:
-* right-click on the application icon (```gwd``` and ```gwsetup```). This will pop-up a window
-mentioning the security issue, and providing an "open" button. Click on this button to open
-the application. Ignore the resulting messages as no parameters were provided.
-* once ```gwd``` and ```gwsetup``` have been started in this fashion, they will be white-listed
-on your machine and subsequent opens will succeed.
-
-After white-listing ```gwd``` and ```gwsetup```, double click on the ```geneweb.command```
-file which will launch both servers with appropriate parameters.
-With the configuration provided in this launch command the bases are located in
-the ```bases``` folder.
-You may reorganize your folder structure (and launch command) as described in the
-documentation at ```http://geneweb.tuxfamily.org/```
-
-### Linux
-
-Quite similar to the MacOS solution, without the security check.
-```xxx.command``` files have an equivalent ```xxx.sh``` variant.
+See the file `README.txt` of the distribution directory
+([etc/README.txt](etc/README.txt)).
 
 ## Resources
 
