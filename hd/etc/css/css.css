@@ -93,6 +93,10 @@
   background: #ffe69c;
 }
 
+.hl-book {
+  background: #6cb2fd59;
+}
+
 .ch a:hover {
   background: #e9ecef;
   transform: scale(1.1);
@@ -169,7 +173,7 @@ html {
   z-index: 9999;
 }
 
- /* Light green background for odd-numbered items */
+/* Light green background for odd-numbered items */
 .src-list-bg li:nth-child(even) {
   background-color: #e4f5df;
 }
@@ -260,6 +264,12 @@ a.book-arrow:hover {
 #book-navigation .d-inline-flex, #subinit div > *:not(:first-child) {
   border-left: 0px;
 }
+
+.book-input-text, #nx_input {
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
 
 /* scrollbar appear as an overlay, thus not affecting the width of the page when appering */
 .book-anchor {
