@@ -94,7 +94,7 @@ type auth_report =
     ar_can_stale : bool }
 
 let log_passwd_failed ar tm from request base_file =
-  GwdLog.log @@ fun oc ->
+  Log.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
@@ -121,7 +121,7 @@ let http conf status =
   Output.header conf "Content-type: text/html; charset=iso-8859-1"
 
 let robots_txt conf =
-  GwdLog.syslog `LOG_NOTICE "Robot request";
+  Log.syslog `LOG_NOTICE "Robot request";
   Output.status conf Def.OK;
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
@@ -129,21 +129,21 @@ let robots_txt conf =
     begin Output.print_sstring conf "User-Agent: *\n"; Output.print_sstring conf "Disallow: /\n" end
 
 let refuse_log conf from =
-  GwdLog.syslog `LOG_NOTICE @@ "Excluded: " ^ from ;
+  Log.syslog `LOG_NOTICE @@ "Excluded: " ^ from ;
   http conf Def.Forbidden;
   Output.header conf "Content-type: text/html";
   Output.print_sstring conf "Your access has been disconnected by administrator.\n";
   let _ = (copy_file conf "refuse" : bool) in ()
 
 let only_log conf from =
-  GwdLog.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
+  Log.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
   http conf Def.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
   Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
-  GwdLog.syslog `LOG_NOTICE @@
+  Log.syslog `LOG_NOTICE @@
   Printf.sprintf
     "Access failed --- From: %s --- Basic realm: %s --- Response: %s"
     from auth_type auth;
@@ -254,7 +254,7 @@ let log_redirect from request req =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ()) begin fun () ->
     let referer = Mutil.extract_param "referer: " '\n' request in
-    GwdLog.syslog `LOG_NOTICE @@
+    Log.syslog `LOG_NOTICE @@
     Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer
   end
 
@@ -1175,7 +1175,7 @@ let make_conf from_addr request script_name env =
   conf, ar
 
 let log tm conf from gauth request script_name contents =
-  GwdLog.log @@ fun oc ->
+  Log.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
@@ -1312,7 +1312,7 @@ let conf_and_connection =
             unauth_server conf ar
       | _ ->
         let printexc e =
-          GwdLog.syslog `LOG_CRIT
+          Log.syslog `LOG_CRIT
             ((context conf contents :> string) ^ " " ^ Printexc.to_string e)
         in
         try
@@ -1321,7 +1321,7 @@ let conf_and_connection =
           let t2 = Unix.gettimeofday () in
           if t2 -. t1 > slow_query_threshold
           then
-            GwdLog.syslog
+            Log.syslog
               `LOG_WARNING
               (Printf.sprintf "%s slow query (%.3f)"
                  (context conf contents : Adef.encoded_string :> string) (t2 -. t1))
@@ -1635,7 +1635,7 @@ let geneweb_server () =
        Files.mkdir_p ~perm:0o777 (Filename.concat !Util.cnt_dir "cnt")
   end;
   let max_clients = (if Sys.unix then !max_clients else None) in
-  Wserver.f ~syslog:GwdLog.syslog ~addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+  Wserver.f ~syslog:Log.syslog ~addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
      ~max_clients ~handler:connection
 
 let cgi_timeout conf tmout _ =
@@ -1823,14 +1823,14 @@ let main () =
     ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
     ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
     ; ("-add_lexicon", Arg.String (Ext_list.ref_append lexicon_list), "<FILE> Add file as lexicon.")
-    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
-    ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
+    ; ("-log", Arg.String (fun x -> Log.oc := Some (match x with "-" | "<stdout>" -> stdout | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
+    ; ("-log_level", Arg.Set_int Log.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !Log.verbosity ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
     ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")
     ; ("-login_tmout", Arg.Int (fun x -> login_timeout := x), "<SEC> Login timeout for entries with passwords in CGI mode (default " ^ string_of_int !login_timeout ^ "s).")
     ; ("-redirect", Arg.String (fun x -> redirected_addr := Some x), "<ADDR> Send a message to say that this service has been redirected to <ADDR>.")
     ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
-    ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
+    ; ("-debug", Arg.Unit (fun () -> debug := true ; Log.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
@@ -1859,7 +1859,7 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
-  Geneweb.GWPARAM.set_syslog GwdLog.syslog;
+  Geneweb.GWPARAM.set_syslog Log.syslog;
   List.iter register_plugin !plugins ;
   GWPARAM.init () ;
   cache_lexicon () ;
@@ -1927,7 +1927,7 @@ let () =
     flush stderr;
 #endif
   | Register_plugin_failure (p, `dynlink_error e) ->
-    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
+    Log.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->
-    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ s)
-  | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)
+    Log.syslog `LOG_CRIT (p ^ ": " ^ s)
+  | e -> Log.syslog `LOG_CRIT (Printexc.to_string e)

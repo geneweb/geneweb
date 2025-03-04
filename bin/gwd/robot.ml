@@ -94,7 +94,7 @@ let check tm from max_call sec conf suicide =
     | Some att ->
         incr att;
         if !att mod max_call = 0 then
-          Gwd_lib.GwdLog.syslog `LOG_NOTICE
+          Log.syslog `LOG_NOTICE
           @@ Printf.sprintf
                {|From: %s --- %d refused attempts --- to restore access, delete file "%s"|}
                from !att fname;
@@ -128,7 +128,7 @@ let check tm from max_call sec conf suicide =
             xcl.who;
         let refused =
           if suicide || cnt > max_call then (
-            Gwd_lib.GwdLog.log (fun oc ->
+            Log.log (fun oc ->
                 Printf.fprintf oc "--- %s is a robot" from;
                 if suicide then
                   Printf.fprintf oc " (called the \"suicide\" request)\n"
@@ -144,7 +144,7 @@ let check tm from max_call sec conf suicide =
         in
         (match xcl.excl with
         | [ _; _ ] ->
-            Gwd_lib.GwdLog.log (fun oc ->
+            Log.log (fun oc ->
                 List.iter
                   (fun (s, att) ->
                     Printf.fprintf oc "--- excluded:";
@@ -169,7 +169,7 @@ let check tm from max_call sec conf suicide =
               match compare nb2 nb1 with 0 -> compare tm2 tm1 | x -> x)
             list
         in
-        Gwd_lib.GwdLog.log (fun oc ->
+        Log.log (fun oc ->
             List.iter
               (fun (k, tm0, nb) ->
                 Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
