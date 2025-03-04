@@ -545,17 +545,28 @@ let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
   let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   let list = get_all_data conf base in
+  let data_type = p_getenv conf.env "data" in
+  let has_particle = data_type = Some "sn" || data_type = Some "domain" in
+  let is_name_type = data_type = Some "fn" || data_type = Some "sn" in
   if ini <> "" then
     Mutil.filter_map
       (fun istr ->
-        let str = sou base istr |> move_particle base in
-        if Mutil.start_with_wildcard ini 0 @@ Place.without_suburb str then
-          Some (istr, str)
-        else None)
+        let str = sou base istr in
+        if is_name_type && str = "?" then None
+        else
+          let str = if has_particle then move_particle base str else str in
+          if Mutil.start_with_wildcard ini 0 @@ Place.without_suburb str then
+            Some (istr, str)
+          else None)
       list
   else
     List.filter_map
-      (fun istr -> Some (istr, sou base istr |> move_particle base))
+      (fun istr ->
+        let str = sou base istr in
+        if is_name_type && str = "?" then None
+        else
+          let str = if has_particle then move_particle base str else str in
+          Some (istr, str))
       (List.rev list)
 
 let build_list_short conf list =
