@@ -476,8 +476,8 @@ module type Driver_S = sig
   (** Returns data structure that allows to make optimised search throughout
       index by surname *)
 
-  val persons_stream_of_first_name_prefix : base -> string -> iper list Stream.t
-  val persons_stream_of_surname_prefix : base -> string -> iper list Stream.t
+  val persons_stream_of_first_name_prefix : base -> string -> iper Stream.t
+  val persons_stream_of_surname_prefix : base -> string -> iper Stream.t
 
   val spi_first : string_person_index -> string -> istr
   (** Returns first [first/sur]name id starting with that string *)
