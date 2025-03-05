@@ -871,29 +871,31 @@ let person_of_key (persons : person record_access) strings persons_of_name
 
 type spi_stream = {
   spi : Dbdisk.string_person_index;
-  mutable st : [ `First | `Current of int ];
+  mutable st : [ `First | `Current of int * int list ];
 }
 
 let spi_stream_of_spi spi = { spi; st = `First }
 
-let ipers_of_prefix base_data spi prefix =
-  let next_person_ids istr =
-    spi.st <- `Current istr;
+let rec iper_of_prefix base_data spi prefix =
+  let next_person_id istr =
     let s = base_data.strings.get istr in
-    if Ext_string.start_with prefix 0 s then Some (spi.spi.find istr) else None
+    if Ext_string.start_with prefix 0 s then (
+      spi.st <- `Current (istr, spi.spi.find istr);
+      iper_of_prefix base_data spi prefix)
+    else None
   in
-  let istr_o =
-    try
-      match spi.st with
-      | `First ->
-          let istr = spi.spi.cursor prefix in
-          Some istr
-      | `Current istr ->
-          let istr' = spi.spi.next istr in
-          if Int.compare istr istr' <> 0 then Some istr' else None
-    with Not_found -> None
-  in
-  Option.bind istr_o next_person_ids
+  try
+    match spi.st with
+    | `First ->
+        let istr = spi.spi.cursor prefix in
+        next_person_id istr
+    | `Current (istr, []) ->
+        let istr' = spi.spi.next istr in
+        if Int.compare istr istr' <> 0 then next_person_id istr' else None
+    | `Current (string_id, person_id :: person_ids) ->
+        spi.st <- `Current (string_id, person_ids);
+        Some person_id
+  with Not_found -> None
 
 let prefix_exists base_data spi prefix =
   try
@@ -902,9 +904,9 @@ let prefix_exists base_data spi prefix =
     Ext_string.start_with prefix 0 s
   with Not_found -> false
 
-let ipers_list_stream_of_prefix base_data spi prefix =
+let iper_stream_of_prefix base_data spi prefix =
   if not (prefix_exists base_data spi prefix) then Stream.from (fun _ -> None)
-  else Stream.from (fun _ -> ipers_of_prefix base_data spi prefix)
+  else Stream.from (fun _ -> iper_of_prefix base_data spi prefix)
 
 let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
     ~dat_fname ~proj ~base_data ~version ~patches prefix =
@@ -931,7 +933,7 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
       in
       (prefix, spi)
   in
-  ipers_list_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
+  iper_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
 
 let persons_stream_of_first_name_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
