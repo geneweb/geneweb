@@ -871,7 +871,7 @@ let person_of_key (persons : person record_access) strings persons_of_name
 
 type spi_stream = {
   spi : Dbdisk.string_person_index;
-  mutable st : [ `First | `Current of int * int list ];
+  st : [ `First | `Current of int * int list ];
 }
 
 let spi_stream_of_spi spi = { spi; st = `First }
@@ -879,10 +879,11 @@ let spi_stream_of_spi spi = { spi; st = `First }
 let rec iper_of_prefix base_data spi prefix =
   let next_person_id istr =
     let s = base_data.strings.get istr in
-    if Ext_string.start_with prefix 0 s then (
-      spi.st <- `Current (istr, spi.spi.find istr);
-      iper_of_prefix base_data spi prefix)
-    else None
+    if Ext_string.start_with prefix 0 s then
+      iper_of_prefix base_data
+        { spi with st = `Current (istr, spi.spi.find istr) }
+        prefix
+    else Seq.Nil
   in
   try
     match spi.st with
@@ -891,11 +892,15 @@ let rec iper_of_prefix base_data spi prefix =
         next_person_id istr
     | `Current (istr, []) ->
         let istr' = spi.spi.next istr in
-        if Int.compare istr istr' <> 0 then next_person_id istr' else None
+        if Int.compare istr istr' <> 0 then next_person_id istr' else Seq.Nil
     | `Current (string_id, person_id :: person_ids) ->
-        spi.st <- `Current (string_id, person_ids);
-        Some person_id
-  with Not_found -> None
+        Seq.Cons
+          ( person_id,
+            fun () ->
+              iper_of_prefix base_data
+                { spi with st = `Current (string_id, person_ids) }
+                prefix )
+  with Not_found -> Seq.Nil
 
 let prefix_exists base_data spi prefix =
   try
@@ -905,8 +910,8 @@ let prefix_exists base_data spi prefix =
   with Not_found -> false
 
 let iper_stream_of_prefix base_data spi prefix =
-  if not (prefix_exists base_data spi prefix) then Stream.from (fun _ -> None)
-  else Stream.from (fun _ -> iper_of_prefix base_data spi prefix)
+  if not (prefix_exists base_data spi prefix) then Seq.empty
+  else fun () -> iper_of_prefix base_data spi prefix
 
 let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
     ~dat_fname ~proj ~base_data ~version ~patches prefix =
