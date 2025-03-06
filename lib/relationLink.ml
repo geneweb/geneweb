@@ -754,15 +754,52 @@ let print_relation_no_dag conf base po ip1 ip2 =
       print_relation_ok conf base info
   | _ -> Hutil.incorrect_request conf
 
-let all_ipers_between ~conf ~base ~store ~start_iper ~end_iper ~max_depth =
+module RelData = struct
+  type t = {
+    descendants : Gwdb.IperSet.t;
+    depths_1 : Ext_int.Set.t;
+    depths_2 : Ext_int.Set.t;
+  }
+
+  let empty =
+    {
+      descendants = Gwdb.IperSet.empty;
+      depths_1 = Ext_int.Set.empty;
+      depths_2 = Ext_int.Set.empty;
+    }
+
+  let get_depths_1 { depths_1 } = depths_1
+  let get_depths_2 { depths_2 } = depths_2
+
+  let add_depth_1 d ({ depths_1 } as data) =
+    { data with depths_1 = Ext_int.Set.add d depths_1 }
+
+  let add_depth_2 d ({ depths_2 } as data) =
+    { data with depths_2 = Ext_int.Set.add d depths_2 }
+end
+
+let rec max_int_of_list =
+  let rec aux i = function
+    | x :: xs -> if x > i then aux x xs else aux i xs
+    | [] -> i
+  in
+  aux 0
+
+let all_ipers_between ~conf ~base ~store ~start_iper ~end_iper ~max_depths
+    ~get_depths ~add_depth =
+  let max_depth = max_int_of_list max_depths in
+  let max_depths = Ext_int.Set.of_list max_depths in
   let ancestors = Queue.create () in
   Queue.push (start_iper, 0) ancestors;
+  let data = Gwdb.Marker.get store start_iper in
+  Gwdb.Marker.set store start_iper (add_depth 0 data);
   let push_parent a depth pa =
-    let s = Gwdb.Marker.get store pa in
-    if Gwdb.IperSet.is_empty s then (
-      Gwdb.Marker.set store pa (Gwdb.IperSet.singleton a);
-      Queue.push (pa, depth + 1) ancestors)
-    else Gwdb.Marker.set store pa (Gwdb.IperSet.add a s)
+    let ({ RelData.descendants; _ } as data) = Gwdb.Marker.get store pa in
+    let descendants = Gwdb.IperSet.add a descendants in
+    if not (Ext_int.Set.mem (depth + 1) (get_depths data)) then
+      Queue.push (pa, depth + 1) ancestors;
+    let data = add_depth (depth + 1) { data with descendants } in
+    Gwdb.Marker.set store pa data
   in
   let rec loop () =
     if not (Queue.is_empty ancestors) then
@@ -777,31 +814,44 @@ let all_ipers_between ~conf ~base ~store ~start_iper ~end_iper ~max_depth =
         loop ())
   in
   loop ();
-  let rec follow_descendants acc s =
-    if Gwdb.IperSet.is_empty s then acc
+  let rec follow_descendants result remaining_descendants depths =
+    if Gwdb.IperSet.is_empty remaining_descendants then result
     else
-      let acc' =
+      let result, remaining_descendants =
         Gwdb.IperSet.fold
-          (fun iper acc -> Gwdb.IperSet.union (Gwdb.Marker.get store iper) acc)
-          s Gwdb.IperSet.empty
+          (fun iper (res, des) ->
+            let ({ RelData.descendants; _ } as data) =
+              Gwdb.Marker.get store iper
+            in
+            let dep = Ext_int.Set.inter depths (get_depths data) in
+            if not (Ext_int.Set.is_empty dep) then
+              (Gwdb.IperSet.add iper res, Gwdb.IperSet.union descendants des)
+            else (res, des))
+          remaining_descendants
+          (result, Gwdb.IperSet.empty)
       in
-      follow_descendants (Gwdb.IperSet.union acc acc') acc'
+      let depths = Ext_int.Set.map (fun depth -> depth - 1) depths in
+      follow_descendants result remaining_descendants depths
   in
   let set =
-    follow_descendants Gwdb.IperSet.empty (Gwdb.IperSet.singleton end_iper)
+    follow_descendants Gwdb.IperSet.empty
+      (Gwdb.IperSet.singleton end_iper)
+      max_depths
   in
   if not (Gwdb.IperSet.is_empty set) then Gwdb.IperSet.add end_iper set else set
 
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
   let ia = Gwdb.get_iper a in
-  let store = Gwdb.iper_marker (Gwdb.ipers base) Gwdb.IperSet.empty in
+  let store = Gwdb.iper_marker (Gwdb.ipers base) RelData.empty in
   let s1 =
     all_ipers_between ~conf ~base ~store ~start_iper:ip1 ~end_iper:ia
-      ~max_depth:l1
+      ~max_depths:l1 ~get_depths:RelData.get_depths_1
+      ~add_depth:RelData.add_depth_1
   in
   let s2 =
     all_ipers_between ~conf ~base ~store ~start_iper:ip2 ~end_iper:ia
-      ~max_depth:l2
+      ~max_depths:l2 ~get_depths:RelData.get_depths_2
+      ~add_depth:RelData.add_depth_2
   in
   let set = Gwdb.IperSet.union s1 s2 |> Gwdb.IperSet.elements in
   let spl =
@@ -836,13 +886,6 @@ let int_list s =
   in
   loop 0 0
 
-let rec max_int_of_list =
-  let rec aux i = function
-    | x :: xs -> if x > i then aux x xs else aux i xs
-    | [] -> i
-  in
-  aux 0
-
 let print_relation conf base p1 p2 =
   let l1 = Util.p_getenv conf.Config.env "l1" in
   let l2 = Util.p_getenv conf.Config.env "l2" in
@@ -850,8 +893,7 @@ let print_relation conf base p1 p2 =
   match (Util.p_getenv conf.Config.env "dag", po, l1, l2) with
   | Some "on", Some p, Some l1, Some l2 ->
       print_relation_dag conf base p (Gwdb.get_iper p1) (Gwdb.get_iper p2)
-        (max_int_of_list (int_list l1))
-        (max_int_of_list (int_list l2))
+        (int_list l1) (int_list l2)
   | _ ->
       print_relation_no_dag conf base po (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 
