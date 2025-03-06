@@ -67,7 +67,7 @@ let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
               if match_fn_istr fn && Person.is_visible conf base p && filter p
               then
                 let iperset' = Gwdb.IperSet.add iper iperset in
-                if iperset' == iperset then aux (n - 1) iperset' ipers
+                if iperset' != iperset then aux (n - 1) iperset' ipers
                 else aux n iperset ipers
               else aux n iperset ipers
           | _ -> consume n iperset
