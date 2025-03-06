@@ -2,16 +2,16 @@
 
 let persons_of_stream conf base filter iperset stream max =
   let rec aux n iperset ipers =
-    match Stream.next ipers with
-    | _iper when n <= 0 -> iperset
-    | iper ->
+    match Ext_seq.next ipers with
+    | Some (_iper, _) when n <= 0 -> iperset
+    | Some (iper, ipers) ->
         let p = Gwdb.poi base iper in
         if Person.is_visible conf base p && filter p then
           let iperset' = Gwdb.IperSet.add iper iperset in
           if iperset' == iperset then aux n iperset ipers
           else aux (n - 1) iperset' ipers
         else aux n iperset ipers
-    | exception Stream.Failure -> iperset
+    | None -> iperset
   in
   if max <= 0 then None else Some (aux max iperset stream)
 
@@ -48,21 +48,21 @@ let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
         Hashtbl.add fn_map istr value;
         value
   in
-  let rec consume n results =
-    try
-      let iper = Stream.next sn_stream in
-      if n = 0 then results
-      else
-        let p = Gwdb.poi base iper in
-        let fn = Gwdb.get_first_name p in
-        if match_fn_istr fn && Person.is_visible conf base p && filter p then
-          let iperset' = Gwdb.IperSet.add iper results in
-          if iperset' != results then consume (n - 1) iperset'
-          else consume n results
-        else consume n results
-    with Stream.Failure -> results
+  let rec consume n results sn_stream =
+    match Ext_seq.next sn_stream with
+    | Some (iper, sn_stream) ->
+        if n = 0 then results
+        else
+          let p = Gwdb.poi base iper in
+          let fn = Gwdb.get_first_name p in
+          if match_fn_istr fn && Person.is_visible conf base p && filter p then
+            let iperset' = Gwdb.IperSet.add iper results in
+            if iperset' != results then consume (n - 1) iperset' sn_stream
+            else consume n results sn_stream
+          else consume n results sn_stream
+    | None -> results
   in
-  Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty)
+  Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty sn_stream)
 
 let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
     ~limit =
