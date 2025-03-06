@@ -43,24 +43,33 @@ let l =
     ([ WLnone (3, "[[w") ], "[[w");
     ( [ WLpage (34, ([], "d_azincourt"), "d_azincourt", "", "d&#039;Azincourt") ],
       "[[[d_azincourt/d&#039;Azincourt]]]" );
-    (*
-    TODO tests suppressed pending fix in wiki.ml fir wiki_syntax
-    following Keryan's modification for automatic pnoc update
     ( [
         WLnone (1, "[");
         WLperson (12, ("aaa", "bbb", 0), None, None);
         WLnone (14, ", ");
-        WLperson (25, ("ccc", "ddd", 0), Some "Ccc Ddd", None);
-        WLnone (50, ", http://site.com/eee#fff");
+        WLperson (33, ("ccc", "ddd", 0), Some "Ccc Ddd", None);
+        WLnone (58, ", http://site.com/eee#fff");
       ],
       "[[[aaa/bbb]], [[ccc/ddd/Ccc Ddd]], http://site.com/eee#fff" );
-    ([ WLnone (7, "[[[aaa/") ], "[[[aaa/");
-    ([ WLnone (4, "[[[w") ], "[[[w");
-    *)
+    ([ WLnone (1, "["); WLnone (7, "[[aaa/") ], "[[[aaa/");
+    ([ WLnone (1, "["); WLnone (4, "[[w") ], "[[[w");
   ]
 
 (* todo fix Fmt *)
-let testable_wiki = testable Fmt.nop ( = )
+let testable_wiki =
+  testable
+    (fun fmt x ->
+      match x with
+      | WLpage (pos, _b, fname, anchor, text) ->
+          Fmt.pf fmt "WLpage   (%d,_,%S,%S,%S)" pos fname anchor text
+      | WLperson (pos, key, name, text) ->
+          let fn, sn, oc = key in
+          Fmt.pf fmt "WLperson (%d, (%S,%S,%d),%a,%a)" pos fn sn oc
+            (Fmt.option Fmt.string) name (Fmt.option Fmt.string) text
+      | WLwizard (pos, wiz, name) ->
+          Fmt.pf fmt "WLwizard (%d,%S,%S)" pos wiz name
+      | WLnone (pos, s) -> Fmt.pf fmt "WLnone   (%d,%S)" pos s)
+    ( = )
 
 let test expected s () =
   (check (list testable_wiki)) "" expected (f s);

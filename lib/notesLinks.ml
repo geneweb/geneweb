@@ -39,7 +39,7 @@ let misc_notes_link s i =
       match s.[j] with
       | '%' -> wlnone (j + 2)
       | '[' ->
-          if j + 1 < slen && s.[j + 1] = '[' then WLnone (j, cut j)
+          if j > i && j + 1 < slen && s.[j + 1] = '[' then WLnone (j, cut j)
           else wlnone (j + 1)
       | _ -> wlnone (j + 1)
     else WLnone (slen, cut slen)
