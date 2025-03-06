@@ -398,8 +398,8 @@ type base_func = {
      Pending patches are also considered. *)
   ifam_exists : int -> bool;
   (* Stream of iper list matching a given surname/first name prefix, each list corresponds to a different matched surname/first name. *)
-  persons_stream_of_surname_prefix : string -> int Stream.t;
-  persons_stream_of_first_name_prefix : string -> int Stream.t;
+  persons_stream_of_surname_prefix : string -> int Seq.t;
+  persons_stream_of_first_name_prefix : string -> int Seq.t;
 }
 (** Functionality part of database. Every modification of the base is stored in {i patches} file.
     Note that, every modification firstly is pendent and should be commited
