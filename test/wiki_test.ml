@@ -31,13 +31,14 @@ let f s =
 
 let l =
   [
-    ( [
-        WLpage (13, ([], "aaa"), "aaa", "", "bbb");
-        WLnone (15, ", ");
-        WLperson (26, ("ccc", "ddd", 0), None, None);
-        WLnone (51, ", http://site.com/eee#fff");
-      ],
-      "[[[aaa/bbb]]], [[ccc/ddd]], http://site.com/eee#fff" );
+    ([ WLpage (13, ([], "aaa"), "aaa", "", "bbb") ], "[[[aaa/bbb]]]");
+    ([ WLperson (11, ("ccc", "ddd", 0), Some "ccc ddd", None) ], "[[ccc/ddd]]");
+    ( [ WLperson (17, ("ccc", "ddd", 0), Some "Texte", None) ],
+      "[[ccc/ddd/Texte]]" );
+    ( [ WLperson (21, ("ccc", "ddd", 1), Some "Ccc Ddd", None) ],
+      "[[ccc/ddd/1/Ccc Ddd]]" );
+    ( [ WLperson (25, ("ccc", "ddd", 0), Some "Texte", Some "Texte 2") ],
+      "[[ccc/ddd/Texte;Texte 2]]" );
     ([ WLnone (6, "[[[]]]") ], "[[[]]]");
     ([ WLnone (4, "[[]]") ], "[[]]");
     ([ WLnone (3, "[[w") ], "[[w");
@@ -45,7 +46,7 @@ let l =
       "[[[d_azincourt/d&#039;Azincourt]]]" );
     ( [
         WLnone (1, "[");
-        WLperson (12, ("aaa", "bbb", 0), None, None);
+        WLperson (12, ("aaa", "bbb", 0), Some "aaa bbb", None);
         WLnone (14, ", ");
         WLperson (33, ("ccc", "ddd", 0), Some "Ccc Ddd", None);
         WLnone (58, ", http://site.com/eee#fff");
@@ -53,6 +54,10 @@ let l =
       "[[[aaa/bbb]], [[ccc/ddd/Ccc Ddd]], http://site.com/eee#fff" );
     ([ WLnone (1, "["); WLnone (7, "[[aaa/") ], "[[[aaa/");
     ([ WLnone (1, "["); WLnone (4, "[[w") ], "[[[w");
+    ([ WLwizard (8, "hg", "") ], "[[w:hg]]");
+    ([ WLwizard (14, "hg", "henri") ], "[[w:hg/henri]]");
+    ( [ WLnone (1, "["); WLnone (2, "["); WLwizard (16, "hg", "henri") ],
+      "[[[[w:hg/henri]]" );
   ]
 
 (* todo fix Fmt *)

@@ -135,7 +135,7 @@ let misc_notes_link s i =
                 if oc1 = -1 then (fn, sn, oc, Some name) else (fn, sn, oc1, None)
               with Not_found ->
                 let sn = String.sub b k (String.length b - k) in
-                (fn, sn, 0, None)
+                (fn, sn, 0, Some (fn ^ " " ^ sn))
             in
             let fn = Name.lower fn in
             let sn = Name.lower sn in
