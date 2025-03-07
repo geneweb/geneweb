@@ -877,6 +877,11 @@ type spi_stream = {
 let spi_stream_of_spi spi = { spi; st = `First }
 
 let ipers_of_prefix base_data spi prefix =
+  let next_person_ids istr =
+    spi.st <- `Current istr;
+    let s = base_data.strings.get istr in
+    if Ext_string.start_with prefix 0 s then Some (spi.spi.find istr) else None
+  in
   let istr_o =
     try
       match spi.st with
@@ -888,11 +893,7 @@ let ipers_of_prefix base_data spi prefix =
           if Int.compare istr istr' <> 0 then Some istr' else None
     with Not_found -> None
   in
-  Option.bind istr_o (fun istr ->
-      spi.st <- `Current istr;
-      let s = base_data.strings.get istr in
-      if Ext_string.start_with prefix 0 s then Some (spi.spi.find istr)
-      else None)
+  Option.bind istr_o next_person_ids
 
 let prefix_exists base_data spi prefix =
   try
