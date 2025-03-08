@@ -205,17 +205,6 @@ let print_date opts = gen_print_date opts false
 let print_date_option opts = gen_print_date_option opts false
 let print_title_date_option opts = gen_print_date_option opts true
 
-let lines_list_of_string s =
-  let rec loop lines len i =
-    if i = String.length s then
-      List.rev (if len = 0 then lines else Buff.get len :: lines)
-    else if s.[i] = '\n' then
-      let line = Buff.get len in
-      loop (line :: lines) 0 (i + 1)
-    else loop lines (Buff.store len s.[i]) (i + 1)
-  in
-  loop [] 0 0
-
 let has_infos_not_dates opts base p =
   let has_picture_to_export =
     sou base (get_image p) <> "" && not opts.no_picture
@@ -524,6 +513,12 @@ let string_of_witness_kind :
   | Witness_Mentioned -> Some "#ment"
   | Witness_Other -> Some "#othe"
 
+let print_multiline opts tag s =
+  let lines = String.split_on_char '\n' s in
+  List.iter
+    (fun s -> if s <> "" then Printf.ksprintf (oc opts) "%s %s\n" tag s)
+    lines
+
 let print_witness opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s"
     (correct_string base (get_surname p))
@@ -596,9 +591,12 @@ let print_pevent opts base gen e =
   | Epers_VenteBien -> Printf.ksprintf (oc opts) "#vteb"
   | Epers_Will -> Printf.ksprintf (oc opts) "#will"
   | Epers_Name s -> Printf.ksprintf (oc opts) "#%s" (correct_string base s));
-  Printf.ksprintf (oc opts) " ";
   let epers_date = Date.od_of_cdate e.epers_date in
-  print_date_option opts epers_date;
+  (match epers_date with
+  | None -> ()
+  | Some d ->
+      Printf.ksprintf (oc opts) " ";
+      print_date_option opts epers_date);
   print_if_no_empty opts base "#p" e.epers_place;
   (* TODO *)
   (*print_if_no_empty opts base "#c" e.epers_cause;*)
@@ -621,11 +619,8 @@ let print_pevent opts base gen e =
         print_witness opts base gen p;
         Printf.ksprintf (oc opts) "\n"))
     e.epers_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.epers_note else "" in
-  if note <> "" then
-    List.iter
-      (fun line -> Printf.ksprintf (oc opts) "note %s\n" line)
-      (lines_list_of_string note)
+  let note = if opts.notes then sou base e.epers_note else "" in
+  print_multiline opts "note" note
 
 let get_persons_with_pevents m list =
   let fath = m.m_fath in
@@ -693,9 +688,12 @@ let print_fevent opts base gen in_comment e =
   | Efam_PACS -> Printf.ksprintf (oc opts) "#pacs"
   | Efam_Residence -> Printf.ksprintf (oc opts) "#resi"
   | Efam_Name n -> Printf.ksprintf (oc opts) "#%s" (correct_string base n));
-  Printf.ksprintf (oc opts) " ";
   let efam_date = Date.od_of_cdate e.efam_date in
-  print_date_option opts efam_date;
+  (match efam_date with
+  | None -> ()
+  | Some d ->
+      Printf.ksprintf (oc opts) " ";
+      print_date_option opts efam_date);
   print_if_no_empty opts base "#p" e.efam_place;
   (*print_if_no_empty opts base "#c" e.efam_cause;*)
   if opts.source = None then print_if_no_empty opts base "#s" e.efam_src;
@@ -717,16 +715,17 @@ let print_fevent opts base gen in_comment e =
         print_witness opts base gen p;
         print_sep ()))
     e.efam_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.efam_note else "" in
+  let note = if opts.notes then sou base e.efam_note else "" in
+  let note_lines = String.split_on_char '\n' note in
   if note <> "" then
     List.iter
       (fun line ->
         Printf.ksprintf (oc opts) "note %s" line;
         print_sep ())
-      (lines_list_of_string note)
+      note_lines
 
 let print_comment_for_family opts base gen fam =
-  let comm = if opts.no_notes <> `nnn then sou base (get_comment fam) else "" in
+  let comm = if opts.notes then sou base (get_comment fam) else "" in
   (* Si on est en mode old_gw, on mets tous les évènements dans les notes. *)
   (* On supprime les 2 évènements principaux. *)
   let fevents =
@@ -742,18 +741,16 @@ let print_comment_for_family opts base gen fam =
   let has_evt =
     !old_gw && (fevents <> [] || sou base (get_marriage_note fam) <> "")
   in
-  if comm <> "" || has_evt then (
-    Printf.ksprintf (oc opts) "comm";
-    if comm <> "" then Printf.ksprintf (oc opts) " %s" (no_newlines comm);
-    if !old_gw then (
-      if sou base (get_marriage_note fam) <> "" then
-        Printf.ksprintf (oc opts) " marriage: %s"
-          (no_newlines (sou base (get_marriage_note fam)));
-      List.iter
-        (fun e ->
-          Printf.ksprintf (oc opts) " ";
-          print_fevent opts base gen true e)
-        fevents);
+  if comm <> "" || has_evt then print_multiline opts "comm" comm;
+  if !old_gw then (
+    if sou base (get_marriage_note fam) <> "" then
+      Printf.ksprintf (oc opts) " marriage: %s"
+        (no_newlines (sou base (get_marriage_note fam)));
+    List.iter
+      (fun e ->
+        Printf.ksprintf (oc opts) " ";
+        print_fevent opts base gen true e)
+      fevents;
     Printf.ksprintf (oc opts) "\n")
 
 let print_empty_family opts base p =
@@ -955,7 +952,7 @@ let print_notes_for_person opts base gen p =
     | Epers_Cremation -> "cremation"
     | _ -> ""
   in
-  let notes = if opts.no_notes <> `nnn then sou base (get_notes p) else "" in
+  let notes = if opts.notes then sou base (get_notes p) else "" in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
   (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
@@ -975,9 +972,7 @@ let print_notes_for_person opts base gen p =
            | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
            | Epers_Cremation ->
                let name = epers_name_to_string evt in
-               let notes =
-                 if opts.no_notes <> `nnn then sou base evt.epers_note else ""
-               in
+               let notes = if opts.notes then sou base evt.epers_note else "" in
                if notes <> "" then
                  Printf.ksprintf (oc opts) "%s: %s\n" name notes;
                print_witness_in_notes evt.epers_witnesses;
@@ -995,7 +990,7 @@ let print_notes_for_person opts base gen p =
   let s =
     let aux g = sou base (g p) in
     let sl =
-      if opts.no_notes <> `nnn then
+      if opts.notes then
         [
           aux get_notes;
           aux get_birth_note;
@@ -1016,9 +1011,7 @@ let print_notes_for_person opts base gen p =
     if (not !old_gw) && opts.source = None then
       List.fold_left
         (fun acc e ->
-          let acc =
-            if opts.no_notes <> `nnn then sou base e.epers_note :: acc else acc
-          in
+          let acc = if opts.notes then sou base e.epers_note :: acc else acc in
           let acc =
             if opts.source = None then sou base e.epers_src :: acc else acc
           in
@@ -1675,7 +1668,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
                 print_isolated_relations opts base gen p)
       (Gwdb.ipers base);
   if !Mutil.verbose then ProgrBar.finish ();
-  if opts.no_notes = `none then (
+  if opts.base_notes then (
     let s = base_notes_read base "" in
     let oc, first, _ = origin_file (base_notes_origin_file base) in
     let f, _ooc, c = opts.oc in
