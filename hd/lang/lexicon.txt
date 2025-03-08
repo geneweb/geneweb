@@ -1104,11 +1104,6 @@ pt: um cunhado/cunhados/uma cunhada/cunhadas
 sv: en svåger/svågrar/en svägerska/svägerskor
 tr: bir kayınbiraderi/kayınbiraderleri/bir kayınbiraderi/kayınbiraderleri
 
-
-    new linked page name
-en: give a name to this linked page
-fr: donnez un nom à cette page liée
-
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
 bg: брат/сестра/брат или сестра
@@ -2282,7 +2277,6 @@ sk: alias
 sl: alias
 sv: alias
 tr: takma ad
-
 
     search type
 co: tipu di ricerca
@@ -8176,6 +8170,14 @@ ru: семейная история
 sv: utöver släktträdet
 tr: aile öyküsü
 
+    family mode
+en: family mode
+fr: mode famille
+
+    family mode-hlp
+en: extend the SemiPublic status to family members (on/off toggle)
+fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
+
     family modified
 af: familie verander
 bg: данните за cемейството са променени
@@ -12961,6 +12963,10 @@ pt: nome novo
 sv: nytt namn
 tr: yeni ad
 
+    new note
+en: name of the note
+fr: nom de la note
+
     new tree with this individual
 co: arburu novu da st’individuu
 de: Neuer Baum mit dieser Person
@@ -14259,6 +14265,14 @@ sl: ali
 sv: eller
 tr: veya
 
+    order
+en: same order
+fr: même ordre
+
+    order hlp
+en: keep the same order
+fr: conserver le même ordre
+
     ordination
 co: ordinazione
 de: Ordination
@@ -14318,10 +14332,6 @@ sv: annat/annat/annat
     other possibilities
 en: other possibilities
 fr: autres possibilités
-
-    with spouse name
-en: with spouse name
-fr: avec son nom d'épouse
 
     ou
 co: o
@@ -15956,6 +15966,10 @@ fr: chemin le plus court entre cet individu et moi
 en: shortest path between this individual and the Sosa nº 1
 fr: chemin le plus court entre cet individu et le Sosa nº 1
 
+    search format
+en: search formats
+fr: formats de recherche
+
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
 de: suche %s auf Geneanet
@@ -16018,45 +16032,25 @@ fr: patronyme masqué
 en: hidden person
 fr: personne masquée
 
-    family mode
-en: family mode
-fr: mode famille
-
-    family mode-hlp
-en: extend the SemiPublic status to family members (on/off toggle)
-fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
-
-    not exact hlp
-en: entry can be a substring of the first name otherwise exact match
-fr: recherche d'une sous-chaine dans le prénom sinon comparaison exacte
-
-    not exact
-en: substring
-fr: partiel
-
-    order
-en: order
-fr: ordre
-
-    order hlp
-en: test firstnames in the same order
-fr: tester les prénoms dans le même ordre
-  
     not all
-en: at least one
-fr: au moins un
+en: one first name
+fr: un prénom
 
     not all hlp
-en: at least one first name must be present otherwise all
-fr: au moins un prénom doit être présent sinon tous
+en: contains only one first name (contains all first names by default)
+fr: contient un seul prénom (contient tous les prénoms par défaut)
 
-    mandatory
-en: mandatory
-fr: obligatoire
+    not exact
+en: partial
+fr: partiel
 
-    optionnal
-en: optionnal
-fr: optionnel
+    not exact hlp
+en: partial matching (exact matching by default)
+fr: correspondance partielle (correspondance exacte par défaut)
+
+    optional/mandatory
+en: optional/mandatory
+fr: facultatif/obligatoire
 
     search_exact_fn
 co: ricerca esatta
@@ -20070,6 +20064,10 @@ pt: com o antepassado raiz, cônjuges e desconhecidos
 sv: med rot, partners och okända
 tr: kök atası, eşler ve bilinmeyenler ile
 
+    with spouse name
+en: with spouse's name
+fr: avec le nom de son conjoint
+
     without implex display
 co: senza affissà l’implessi
 de: ohne Implex-Anzeige
@@ -20225,8 +20223,8 @@ sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
 
     word/words
-en: only one name (particle excluded)/full surname (many words)
-fr: un seul nom (particule exclue)/patronyme complet (plusieurs mots)
+en: only one word/full surname
+fr: un seul mot/patronyme complet
 
     word match
 co: parolla sana
