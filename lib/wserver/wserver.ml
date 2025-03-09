@@ -260,8 +260,6 @@ let check_stopping () =
 
 let client_connection tmout callback addr t =
   let oc = Unix.out_channel_of_descr t in
-  connection_closed := false;
-  wserver_sock := t;
   wserver_oc := oc;
   Fun.protect ~finally:close_connection @@ fun () ->
   treat_connection tmout callback addr t
@@ -269,10 +267,15 @@ let client_connection tmout callback addr t =
 let accept_connection tmout max_clients callback s =
   let () = wait_available max_clients s in
   let t, addr = Unix.accept s in
+  connection_closed := false;
+  wserver_sock := t;
   check_stopping ();
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
   Fun.protect
-    ~finally:(fun () -> Unix.close t)
+    ~finally:(fun () ->
+      if not !connection_closed then (
+        connection_closed := true;
+        Unix.close t))
     (fun () ->
       if Sys.unix then
         if !no_fork then client_connection tmout callback addr t
