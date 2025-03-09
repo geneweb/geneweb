@@ -9904,6 +9904,10 @@ de: Bildnotiz hinzufügen
 en: add a note for the image.
 fr: ajouter une note pour l’image.
 
+    image map
+en: an image map
+fr: une image réactive
+
     image received
 af: prent ontvang
 bg: изображението е получено
@@ -12963,9 +12967,9 @@ pt: nome novo
 sv: nytt namn
 tr: yeni ad
 
-    new note
-en: name of the note
-fr: nom de la note
+    new note name
+en: name of the new note
+fr: nom de la nouvelle note
 
     new tree with this individual
 co: arburu novu da st’individuu

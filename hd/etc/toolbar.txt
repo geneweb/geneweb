@@ -1,9 +1,12 @@
-<!-- $Id: toolbar.txt v7.1 08/12/2024 08:33:21 $ -->
+<!-- $Id: toolbar.txt v7.1 09/03/2025 03:17:13 $ -->
 
-%if;(e.f="new_linked_page")
-  [*new linked page name][:]
-  <input type="input" name="new_f" id="new_f"
-      size="20" maxlength="50" style="padding-left:4px">
+%if;(e.f="new_note")
+  <div class="form-group row ml-1">
+    <label class="col-form-label" for="new_f">[*new note name][:]</label>
+    <div class="col-6">
+      <input type="input" class="form-control" name="new_f" id="new_f">
+    </div>
+  </div>
 %end;
 <style>
 %if;(e.m="MOD_NOTES")
@@ -223,7 +226,7 @@ body {
   <div class="modal-dialog role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="init_gallery_label">[*initialize image map]</h5>
+        <h5 class="modal-title" id="init_gallery_label">[*create::image map]</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
