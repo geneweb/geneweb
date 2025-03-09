@@ -63,14 +63,17 @@ let uppercase s = cmap_utf_8 Uucp.Case.Map.to_upper s
 
 let skip_html_tags s =
   let rec loop i s =
-    if s.[i] = ' ' then loop (i + 1) s
-    else if s.[i] = '<' then
-      let j = try String.index_from s i '>' with Not_found -> -1 in
-      if j = -1 then (
-        Printf.eprintf "WARNING: badly formed string %s\n" s;
-        0)
-      else loop (j + 1) s
-    else i
+    if i = String.length s then i
+    else
+      match s.[i] with
+      | ' ' -> loop (i + 1) s
+      | '<' -> (
+          match String.index_from s i '>' with
+          | exception Not_found ->
+              Printf.eprintf "WARNING: badly formed string %s\n" s;
+              0
+          | j -> loop (j + 1) s)
+      | _ -> i
   in
   loop 0 s
 
