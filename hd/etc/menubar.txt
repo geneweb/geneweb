@@ -511,13 +511,6 @@
               </li>
             %end;
           %end;
-          %if;wizard;
-            <li class="nav-item">
-              <a class="nav-link text-secondary" href="%apply;url_set%with;m%and;MOD_NOTES%end;&f=new_note"
-                title="[*create] [note]">
-                <i class="fa fa-images fa-fw mr-1" aria-hidden="true"></i></a>
-            </li>
-          %end;
         </ul>
       </div>
     </div>

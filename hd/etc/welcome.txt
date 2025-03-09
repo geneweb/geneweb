@@ -424,9 +424,13 @@ fr: Autour de l'arbre
       <a role="button" class="btn btn-outline-success" href="%prefix;m=H&v=conf">
         <i class="fas fa-gear fa-fw mr-1" aria-hidden="true"></i>[*configuration]1</a>
     %end;
-    %if;(wizard and b.propose_add_family!="no")
+    %if;wizard;
+      <a role="button" class="btn btn-outline-success" href="%prefix;m=MOD_NOTES&f=new_note">
+        <i class="fa fa-file-lines fa-fw mr-1" aria-hidden="true"></i>[*add::note/notes]0</a>
+      %if;(b.propose_add_family!="no")
       <a role="button" class="btn btn-outline-success" href="%prefix;m=ADD_FAM">
-        <i class="fas fa-user-plus mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
+        <i class="fas fa-user-plus fa-fw mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
+      %end;
     %end;
   </div>
 </div>
