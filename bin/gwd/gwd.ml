@@ -1441,9 +1441,12 @@ let conf_and_connection =
               (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
       | _ ->
-        let printexc e =
+        let printexc bt exn =
           GwdLog.syslog `LOG_CRIT
-            ((context conf contents :> string) ^ " " ^ Printexc.to_string e)
+            ((context conf contents :> string) ^ " " ^ Printexc.to_string exn);
+          if Printexc.backtrace_status () then
+            let s = Format.sprintf "Backtrace:@ %s" bt in
+            GwdLog.syslog `LOG_CRIT s
         in
         try
           let t1 = Unix.gettimeofday () in
@@ -1457,10 +1460,13 @@ let conf_and_connection =
                  (context conf contents : Adef.encoded_string :> string) (t2 -. t1))
         with
         | Exit -> ()
-        | (Def.HttpExn (code, _)) as e ->
+        | (Def.HttpExn (code, _)) as exn ->
+          let bt = Printexc.get_backtrace () in
           !GWPARAM.output_error conf code ;
-          printexc e
-        | e -> printexc e
+          printexc bt exn
+        | exn ->
+          let bt = Printexc.get_backtrace () in
+          printexc bt exn
 
 let chop_extension name =
   let rec loop i =
@@ -2128,9 +2134,9 @@ let () =
     GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->
     GwdLog.syslog `LOG_CRIT (p ^ ": " ^ s)
-  | exn -> (
-      let s = Printexc.get_backtrace () in
-      GwdLog.syslog `LOG_CRIT (Printexc.to_string exn);
-      if Printexc.backtrace_status () then
-        let s = Format.sprintf "Backtrace:@ %s" s in
-        GwdLog.syslog `LOG_CRIT s)
+  | exn ->
+    let bt = Printexc.get_backtrace () in
+    GwdLog.syslog `LOG_CRIT (Printexc.to_string exn);
+    if Printexc.backtrace_status () then
+      let s = Format.sprintf "Backtrace:@ %s" bt in
+      GwdLog.syslog `LOG_CRIT s
