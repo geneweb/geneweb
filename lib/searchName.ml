@@ -36,7 +36,8 @@ let start_with base pfx s =
 let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
   let sn_stream = Gwdb.persons_stream_of_surname_prefix base sn_pfx in
   let fn_map = Hashtbl.create 100 in
-  let match_fn_istr istr =
+  let match_fn_istr p fn_pfx =
+    let istr = Gwdb.get_first_name p in
     match Hashtbl.find_opt fn_map istr with
     | Some value -> value
     | None ->
@@ -54,8 +55,8 @@ let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
         if n = 0 then results
         else
           let p = Gwdb.poi base iper in
-          let fn = Gwdb.get_first_name p in
-          if match_fn_istr fn && Person.is_visible conf base p && filter p then
+          if match_fn_istr p fn_pfx && Person.is_visible conf base p && filter p
+          then
             let iperset' = Gwdb.IperSet.add iper results in
             if iperset' != results then consume (n - 1) iperset' sn_stream
             else consume n results sn_stream
