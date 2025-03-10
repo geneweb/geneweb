@@ -6,6 +6,7 @@ echo "Usage: $cmd [Options]
 Compare gwc input and gwu output expecting no changes.
 Need to properly set 'hardcoded vars' in script header.
 Options:
+-d  print out some debug traces
 -f  file to be sourced in to overwrite hardcoded vars
 -h  To display this help.
 "
@@ -27,9 +28,11 @@ SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
 
 #===  main ====================
 cmd=$(basename $0)
-while getopts "f:h" Option
+echo "$0 $@ started"
+while getopts "df:h" Option
 do
 case $Option in
+    d ) debug=1;;
     f ) setenv_file=$OPTARG
         test -f "$setenv_file" || \
             { echo "invalid -f $setenv_file  option file"; exit 1; }
@@ -65,6 +68,7 @@ fqbindir=$(realpath $BIN_DIR)
 cd $BASES_DIR
 $SUDOPRFX rm -rf $TESTGW.lck $TESTGW.gwo $TESTGW.log $TESTGW.gwb $TESTGW_nouveau.gw $TESTGW.gwu_stderr outdir.$TESTGW
 $SUDOPRFX mkdir outdir.$TESTGW $TESTGW.gwb $TESTGW.gwb/wiznotes || exit 1
+test -n "$debug" && set -x
 $SUDOPRFX $fqbindir/gwc -v -f -cg -o $TESTGW $TESTGW.gw >$TESTGW.log 2>&1 || \
   { echo "gwc failure, details in $TESTGW.log"; exit 1; }
 $SUDOPRFX $fqbindir/gwu $TESTGW -v -o ${TESTGW}.gwu.o.gw 2>$TESTGW.gwu.o.stderr || \
@@ -86,8 +90,8 @@ for xx in "${TESTGW}.gwu.o.gw" "outdir.$TESTGW/$TESTGW.gw" ; do
 done
 
 if test "$RC" != 0; then
-    echo "at least $RC detected error(s)."
+    echo "$0 failed, at least $RC detected error(s)."
     exit 1
 else
-    echo "No detected error."
+    echo "$0 completed, No detected error."
 fi
