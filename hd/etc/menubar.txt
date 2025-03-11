@@ -154,7 +154,12 @@
           <li class="nav-item dropdown">
             <a id="load_once_copylink" class="nav-link dropdown-toggle text-secondary %if;(e.m="CHG_EVT_IND_ORD" or e.m="SND_IMAGE" or e.m="MRG" or e.m="DEL_IND")active%end;"
                data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true" title="[*tools] [person/persons]0">%nn;
-              <span class="fa fa-user-gear" aria-hidden="true"></span>%nn;
+              <span class="fa fa-user-gear
+                %if;is_private;text-danger%nn;
+                %elseif;(b.semi_public="yes" and is_semi_public)text-warning%nn;
+                %elseif;(is_public or (b.public_if_titles="yes" and has_titles))text-success%nn;
+                %else;text-muted%nn;
+                %end;" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*tools] [person/persons]0</span></a>
             <div class="dropdown-menu dropdown-menu-transl">
               %( Visibility button %)
@@ -163,7 +168,7 @@
                   <i class="fa fa-person fa-fw text-danger mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]3)%nn;
                 %elseif;(b.semi_public="yes" and is_semi_public)
                   <i class="fa fa-person fa-fw text-warning mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]2)%nn;
-                %elseif;(is_public or has_titles)
+                %elseif;(is_public or (b.public_if_titles="yes" and has_titles))
                   <i class="fa fa-person fa-fw text-success mr-2"></i>.[*visibility] ([iftitles/public/semipublic/private]1)%nn;
                 %else;
                   <i class="fa fa-person fa-fw text-muted mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]0)%nn;
