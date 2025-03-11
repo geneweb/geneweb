@@ -1010,7 +1010,7 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   in
   let iper = get_iper p in
   (* let is_hidden = is_empty_string (get_surname p) !! *)
-  if is_hidden p || cgl then s
+  if (not (!GWPARAM.p_auth conf base p)) || cgl then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)

@@ -162,31 +162,33 @@ let rec infer_death conf base p =
     [Retour] : unit
     [Rem] : Not visible.                                                      *)
 let print_person_parents_and_spouses conf base p =
-  Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (commd conf);
-  Output.print_string conf (acces conf base p);
-  Output.print_sstring conf {|">|};
+  if !GWPARAM.p_auth conf base p then (
+    Output.print_sstring conf {|<a href="|};
+    Output.print_string conf (commd conf);
+    Output.print_string conf (acces conf base p);
+    Output.print_sstring conf {|">|};
 
-  let pub_name = sou base (get_public_name p) in
-  if pub_name <> "" then
-    Output.print_sstring conf (Printf.sprintf "%s" pub_name)
-  else Output.print_string conf (escape_html @@ p_first_name base p);
-  Output.print_sstring conf " ";
-  Output.print_string conf (escape_html @@ p_surname base p);
-  Output.print_sstring conf "</a>";
-  Output.print_string conf (DateDisplay.short_dates_text conf base p);
-  let cop = Util.child_of_parent conf base p in
-  if String.length (cop :> string) > 0 then (
-    Output.print_sstring conf ", ";
-    if pub_name <> "" then (
-      Output.print_string conf (escape_html @@ p_first_name base p);
-      Output.print_sstring conf ", ");
-    Output.print_string conf cop);
-  let hbw = Util.husband_wife conf base p true in
-  if String.length (hbw :> string) > 0 then (
-    Output.print_sstring conf ", ";
-    Output.print_string conf hbw);
-  Output.print_sstring conf ". "
+    let pub_name = sou base (get_public_name p) in
+    if pub_name <> "" then
+      Output.print_sstring conf (Printf.sprintf "%s" pub_name)
+    else Output.print_string conf (escape_html @@ p_first_name base p);
+    Output.print_sstring conf " ";
+    Output.print_string conf (escape_html @@ p_surname base p);
+    Output.print_sstring conf "</a>";
+    Output.print_string conf (DateDisplay.short_dates_text conf base p);
+    let cop = Util.child_of_parent conf base p in
+    if String.length (cop :> string) > 0 then (
+      Output.print_sstring conf ", ";
+      if pub_name <> "" then (
+        Output.print_string conf (escape_html @@ p_first_name base p);
+        Output.print_sstring conf ", ");
+      Output.print_string conf cop);
+    let hbw = Util.husband_wife conf base p true in
+    if String.length (hbw :> string) > 0 then (
+      Output.print_sstring conf ", ";
+      Output.print_string conf hbw);
+    Output.print_sstring conf ". ")
+  else ()
 
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
