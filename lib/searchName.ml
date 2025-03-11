@@ -2,29 +2,23 @@
 
 let persons_of_stream conf base filter iperset stream max =
   let rec aux n iperset ipers =
-    match ipers with
-    | _iper :: _ipers when n <= 0 -> (n, iperset)
-    | iper :: ipers ->
+    match Ext_seq.next ipers with
+    | Some (_iper, _) when n <= 0 -> iperset
+    | Some (iper, ipers) ->
         let p = Gwdb.poi base iper in
         if Util.authorized_age conf base p && filter p then
           let iperset' = Gwdb.IperSet.add iper iperset in
           if iperset' == iperset then aux n iperset ipers
           else aux (n - 1) iperset' ipers
         else aux n iperset ipers
-    | _ -> (n, iperset)
+    | None -> iperset
   in
-  if max <= 0 then None
-  else
-    try
-      let ipers = Stream.next stream in
-      Some (aux max iperset ipers)
-    with Stream.Failure -> None
+  if max <= 0 then None else Some (aux max iperset stream)
 
 let n_persons_of_stream n conf base filter stream =
-  let rec consume n iperset =
+  let consume n iperset =
     match persons_of_stream conf base filter iperset stream n with
-    | Some (n, iperset) ->
-        if n = 0 then Gwdb.IperSet.elements iperset else consume n iperset
+    | Some iperset -> Gwdb.IperSet.elements iperset
     | None -> Gwdb.IperSet.elements iperset
   in
   List.rev (consume n Gwdb.IperSet.empty)
@@ -54,28 +48,22 @@ let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
         Hashtbl.add fn_map istr value;
         value
   in
-  let rec consume n results =
-    try
-      let sn_ipers = Stream.next sn_stream in
-      let rec aux n iperset ipers =
-        if n = 0 then iperset
+  let rec consume n results sn_stream =
+    match Ext_seq.next sn_stream with
+    | Some (iper, sn_stream) ->
+        if n = 0 then results
         else
-          match ipers with
-          | iper :: ipers ->
-              let p = Gwdb.poi base iper in
-              let fn = Gwdb.get_first_name p in
-              if match_fn_istr fn && Util.authorized_age conf base p && filter p
-              then
-                let iperset' = Gwdb.IperSet.add iper iperset in
-                if iperset' == iperset then aux (n - 1) iperset' ipers
-                else aux n iperset ipers
-              else aux n iperset ipers
-          | _ -> consume n iperset
-      in
-      aux n results sn_ipers
-    with Stream.Failure -> results
+          let p = Gwdb.poi base iper in
+          let fn = Gwdb.get_first_name p in
+          if match_fn_istr fn && Util.authorized_age conf base p && filter p
+          then
+            let iperset' = Gwdb.IperSet.add iper results in
+            if iperset' != results then consume (n - 1) iperset' sn_stream
+            else consume n results sn_stream
+          else consume n results sn_stream
+    | None -> results
   in
-  Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty)
+  Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty sn_stream)
 
 let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
     ~limit =
