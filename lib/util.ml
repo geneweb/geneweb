@@ -2995,7 +2995,7 @@ let cut_words str =
     else if beg = i then []
     else [ String.sub str beg (i - beg) ]
   in
-  loop 0 0
+  loop 0 0 |> List.map String.trim
 
 let designation base p = Gutil.designation base p |> escape_html
 

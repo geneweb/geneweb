@@ -180,8 +180,9 @@ let print_person_parents_and_spouses conf base p =
     if String.length (cop :> string) > 0 then (
       Output.print_sstring conf ", ";
       if pub_name <> "" then (
+        Output.print_sstring conf "(";
         Output.print_string conf (escape_html @@ p_first_name base p);
-        Output.print_sstring conf ", ");
+        Output.print_sstring conf "), ");
       Output.print_string conf cop);
     let hbw = Util.husband_wife conf base p true in
     if String.length (hbw :> string) > 0 then (
