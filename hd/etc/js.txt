@@ -38,7 +38,7 @@
       <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
-      <script src="%etc_prefix;js/regex.js?version=4.4.0"></script>
+      <script src="%etc_prefix;js/regex.min.js?version=4.4.0"></script>
     %end;
   %end;
   %if;(e.m="A" and e.t="T" and e.t1="CT")
