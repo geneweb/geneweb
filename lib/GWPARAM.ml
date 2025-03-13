@@ -181,6 +181,15 @@ let syslog = ref Default.syslog
 let wrap_output = ref Default.wrap_output
 
 let has_ignored_duplicates = ref (fun _ _ -> false)
+
+external process_config_identity : Config.config -> Config.config = "%identity"
+let process_config = ref process_config_identity
+let compose_process_config f =
+  let g = !process_config in
+  process_config := fun conf -> f (g conf)
+
+let process_config conf = !process_config conf
+
 let set_init f = init := f
 let set_base_path f = base_path := f
 let set_bpath f = bpath := f

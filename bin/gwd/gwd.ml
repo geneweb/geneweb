@@ -1273,6 +1273,7 @@ let conf_and_connection =
   in
   fun from request script_name (contents: Adef.encoded_string) env ->
   let (conf, passwd_err) = make_conf from request script_name env in
+  let conf = GWPARAM.process_config conf in  
   match !redirected_addr with
     Some addr -> print_redirected conf from request addr
   | None ->
