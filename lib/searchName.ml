@@ -276,7 +276,16 @@ let search conf base an search_order specify unknown =
         | [ p ], [], [] | [], [ p ], [] | [], [], [ p ] ->
             record_visited conf (get_iper p);
             Perso.print conf base p
-        | _ -> specify conf base an pl1 (pl2 @ pl3) [])
+        | _ ->
+            let str = Mutil.StrSet.empty in
+            let str = Mutil.StrSet.add an str in
+            let tit2 =
+              transl conf "other possibilities" |> Utf8.capitalize_fst
+            in
+            let tit3 = transl conf "with spouse name" |> Utf8.capitalize_fst in
+            Some.first_name_print_list conf base an str
+              [ ("", pl1); (tit2, pl2); (tit3, pl3) ]
+        (*specify conf base an pl1 (pl2 @ pl3) []*))
     | FullName :: l -> (
         let fn =
           match p_getenv conf.env "p" with
