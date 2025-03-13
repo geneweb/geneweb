@@ -34,3 +34,11 @@ val search_first_name :
   (string * (Mutil.StrSet.t * Gwdb.iper list)) list
 
 val search_first_name_print : Config.config -> Gwdb.base -> string -> unit
+
+val first_name_print_list :
+  Config.config ->
+  Gwdb.base ->
+  string ->
+  Mutil.StrSet.t ->
+  (string * Gwdb.person list) list ->
+  unit
