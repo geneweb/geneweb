@@ -43,7 +43,7 @@ let speclist =
       " Use dev profile: no optimization, debug informations (default: "
       ^ string_of_bool (not !release)
       ^ ")" );
-    ("--syslog", Arg.Unit set_syslog, " Log gwd errors using syslog");
+    ("--syslog", Arg.Unit set_syslog, " Log errors using syslog");
   ]
   |> List.sort compare |> Arg.align
 
