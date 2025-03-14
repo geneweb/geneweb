@@ -79,8 +79,6 @@ val read_or_create_channel :
     that in [read]/[write].
     It also takes care of writing [magic] at the beginning of the file before calling
     [write]
-
-    On Windows, file is not locked.
 *)
 
 val read_or_create_value :
@@ -91,6 +89,4 @@ val read_or_create_value :
     return the unmarshalled value.
     If it does not, or does not start with [magic], or if unmarshalling raise an exception,
     [create] function is used to produce the value to be marshalled.
-
-    On Windows, file is not locked.
 *)

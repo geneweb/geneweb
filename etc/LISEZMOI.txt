@@ -3,13 +3,10 @@ GeneWeb 7.00
 Ouvrez la page START.htm
 
 Si vous avez l'intention d'ouvrir une base, vous devez avoir démarré le programme gwd
-en double cliquant sur l'icone gwd.bat (Windows), gwd.command (macOS) or gwd (Linux).
+en double cliquant sur l'icone gwd.
 Si vous avez l'intention de gérer ou créer une base, vous devez avoir démarré le programme gwsetup
-en double cliquant sur l'icone gwsetup.bat (Windows), gwsetup.command (macOS) or gwsetup (Linux).
+en double cliquant sur l'icone gwsetup.
 
-Sur macOS, geneweb.command tue les versions précédentes, ouvre les deux programmes et
-minimise la fenêtre correspondante.
-   
      -----------------
 
 Voir le fichier CHANGES (en anglais) dans ce repertoire-ci pour les
@@ -25,6 +22,4 @@ Remarques, suggestions, questions, rapports d'erreur sur:
 	or
 	https://groups.yahoo.com/neo/groups/GeneWeb/info
 
-Veuillez preciser le numero de version ci-dessus et le systeme sur lequel
-vous tournez (Unix, Windows, Mac).
-
+Veuillez preciser le numero de version ci-dessus.

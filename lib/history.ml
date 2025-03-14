@@ -159,48 +159,45 @@ let diff_person conf base changed =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                         *)
 let notify_change conf base changed action =
-  if Sys.unix then
-    let notify_change =
-      if Option.is_some conf.Config.notify_change then conf.notify_change
-      else List.assoc_opt "notify_change" conf.base_env
-    in
-    match notify_change with
-    | Some comm -> (
-        let base_args =
-          match changed with
-          | Def.U_Add_person p
-          | U_Modify_person (_, p)
-          | U_Delete_person p
-          | U_Merge_person (_, _, p)
-          | U_Send_image p
-          | U_Delete_image p
-          | U_Add_family (p, _)
-          | U_Modify_family (p, _, _)
-          | U_Delete_family (p, _)
-          | U_Invert_family (p, _)
-          | U_Merge_family (p, _, _, _)
-          | U_Add_parent (p, _)
-          | U_Kill_ancestors p
-          | U_Change_children_name (p, _)
-          | U_Multi (_, p, _) ->
-              let key = slash_name_of_key p.first_name p.surname p.occ in
-              [| key; Gwdb.string_of_iper p.key_index |]
-          | U_Notes (Some num, file) -> [| file; string_of_int num |]
-          | U_Notes (None, file) -> [| file |]
-        in
-        let optional_args = diff_person conf base changed in
-        let args = Array.append base_args optional_args in
-        let args =
-          Array.append [| comm; conf.bname; conf.user; action |] args
-        in
-        match Unix.fork () with
-        | 0 ->
-            if Unix.fork () <> 0 then exit 0
-            else (
-              (try Unix.execvp comm args with _ -> ());
-              exit 0)
-        | id -> ignore (Unix.waitpid [] id))
-    | None -> ()
+  let notify_change =
+    if Option.is_some conf.Config.notify_change then conf.notify_change
+    else List.assoc_opt "notify_change" conf.base_env
+  in
+  match notify_change with
+  | Some comm -> (
+      let base_args =
+        match changed with
+        | Def.U_Add_person p
+        | U_Modify_person (_, p)
+        | U_Delete_person p
+        | U_Merge_person (_, _, p)
+        | U_Send_image p
+        | U_Delete_image p
+        | U_Add_family (p, _)
+        | U_Modify_family (p, _, _)
+        | U_Delete_family (p, _)
+        | U_Invert_family (p, _)
+        | U_Merge_family (p, _, _, _)
+        | U_Add_parent (p, _)
+        | U_Kill_ancestors p
+        | U_Change_children_name (p, _)
+        | U_Multi (_, p, _) ->
+            let key = slash_name_of_key p.first_name p.surname p.occ in
+            [| key; Gwdb.string_of_iper p.key_index |]
+        | U_Notes (Some num, file) -> [| file; string_of_int num |]
+        | U_Notes (None, file) -> [| file |]
+      in
+      let optional_args = diff_person conf base changed in
+      let args = Array.append base_args optional_args in
+      let args = Array.append [| comm; conf.bname; conf.user; action |] args in
+      match Unix.fork () with
+      | 0 ->
+          if Unix.fork () <> 0 then exit 0
+          else (
+            (try Unix.execvp comm args with _ -> ());
+            exit 0)
+      | id -> ignore (Unix.waitpid [] id))
+  | None -> ()
 
 (* ************************************************************************ *)
 (*  [Fonc] gen_record : config -> base -> base_changed -> string -> unit    *)
