@@ -63,6 +63,18 @@ let person_of_key base = base.func.Dbdisk.person_of_key
 let persons_of_name base = base.func.Dbdisk.persons_of_name
 let persons_of_first_name base = base.func.Dbdisk.persons_of_first_name
 let persons_of_surname base = base.func.Dbdisk.persons_of_surname
+
+let persons_of_lower_first_name base =
+  base.func.Dbdisk.persons_of_lower_first_name
+
+let persons_of_lower_surname base = base.func.Dbdisk.persons_of_lower_surname
+
+let persons_stream_of_first_name_prefix base =
+  base.func.Dbdisk.persons_stream_of_first_name_prefix
+
+let persons_stream_of_surname_prefix base =
+  base.func.Dbdisk.persons_stream_of_surname_prefix
+
 let base_particles base = Lazy.force base.data.particles
 let base_strings_of_first_name base s = base.func.strings_of_fname s
 let base_strings_of_surname base s = base.func.strings_of_sname s
