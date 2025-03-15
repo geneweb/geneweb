@@ -177,7 +177,10 @@ let print_elem conf base is_surname (p, xl) =
       Output.print_sstring conf {|">|};
       if is_surname then (
         Output.print_string conf (escape_html @@ surname_without_particle base p);
-        Output.print_string conf (escape_html @@ surname_particle base p))
+        Output.print_string conf (escape_html @@ surname_particle base p);
+        Output.print_sstring conf " (<small>";
+        Output.print_string conf (escape_html @@ sou base (get_first_name x));
+        Output.print_sstring conf "</small>)")
       else
         Output.print_string conf
           (if p = "" then Adef.escaped "?" else escape_html p);
@@ -204,8 +207,8 @@ let name_unaccent s =
   in
   copy 0 0
 
-let first_name_print_list conf base x1 xl liste =
-  let liste =
+let first_name_print_list conf base x1 xl listes =
+  let surnames_liste l =
     let l =
       List.sort
         (fun x1 x2 ->
@@ -219,7 +222,7 @@ let first_name_print_list conf base x1 xl liste =
               | Some _, _ -> 1
               | _ -> -1)
           | n -> -n)
-        liste
+        l
     in
     List.fold_left
       (fun l x ->
@@ -229,6 +232,7 @@ let first_name_print_list conf base x1 xl liste =
         | _ -> (px, [ x ]) :: l)
       [] l
   in
+
   let title h =
     if h || p_getenv conf.env "t" = Some "A" then
       Output.print_string conf (escape_html x1)
@@ -249,21 +253,31 @@ let first_name_print_list conf base x1 xl liste =
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
-  let list =
-    List.map
-      (fun (sn, ipl) ->
-        let txt =
-          Util.surname_without_particle base sn ^ Util.surname_particle base sn
+
+  List.iter
+    (fun (str, liste) ->
+      if liste <> [] then (
+        let list = surnames_liste liste in
+        let list =
+          List.map
+            (fun (sn, ipl) ->
+              let txt =
+                Util.surname_without_particle base sn
+                ^ Util.surname_particle base sn
+              in
+              let ord = name_unaccent txt in
+              (ord, txt, ipl))
+            list
         in
-        let ord = name_unaccent txt in
-        (ord, txt, ipl))
-      liste
-  in
-  let list = List.sort compare list in
-  print_alphab_list conf
-    (fun (ord, _, _) -> first_char ord)
-    (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl))
-    list;
+        let list = List.sort compare list in
+        if str <> "" then (
+          Output.print_sstring conf str;
+          Output.print_sstring conf "<p>\n");
+        print_alphab_list conf
+          (fun (ord, _, _) -> first_char ord)
+          (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl))
+          list))
+    listes;
   Hutil.trailer conf
 
 let mk_specify_title conf kw n _ =
@@ -862,5 +876,5 @@ let search_first_name_print conf base x =
             else pl)
           pl []
       in
-      first_name_print_list conf base x strl pl
+      first_name_print_list conf base x strl [ ("", pl) ]
   | _ -> select_first_name conf x list

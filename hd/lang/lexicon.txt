@@ -1104,11 +1104,6 @@ pt: um cunhado/cunhados/uma cunhada/cunhadas
 sv: en svåger/svågrar/en svägerska/svägerskor
 tr: bir kayınbiraderi/kayınbiraderleri/bir kayınbiraderi/kayınbiraderleri
 
-
-    new linked page name
-en: give a name to this linked page
-fr: donnez un nom à cette page liée
-
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
 bg: брат/сестра/брат или сестра
@@ -2282,7 +2277,6 @@ sk: alias
 sl: alias
 sv: alias
 tr: takma ad
-
 
     search type
 co: tipu di ricerca
@@ -8176,6 +8170,14 @@ ru: семейная история
 sv: utöver släktträdet
 tr: aile öyküsü
 
+    family mode
+en: family mode
+fr: mode famille
+
+    family mode-hlp
+en: extend the SemiPublic status to family members (on/off toggle)
+fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
+
     family modified
 af: familie verander
 bg: данните за cемейството са променени
@@ -9470,6 +9472,18 @@ pt: não mostrar os retratos
 sv: dölj personbilder
 tr: portreleri gizle
 
+    hiddden person
+en: hidden person
+fr: individu masqué
+
+    hiddden first_name
+en: hidden first name
+fr: prénom masqué
+
+    hiddden surname
+en: hidden surname
+fr: patronyme masqué
+
     hierarchical navigation
 af: kies 'n inskrywing in die hierargiese navigasie
 bg: изберете запис в йерархичната навигация
@@ -9818,7 +9832,7 @@ sv: om titlar
 tr: eğer başlıklar
 
     iftitles/public/semipublic/private
-co: s’è tituli/publicu/semipublicu/privatu
+co: s’è tituli/publicu/semi-public/privatu
 de: Adelstitel/öffentlich/half-public/privat
 en: if titles/public/half-public/private
 es: si hay títulos/público/half-public/privado
@@ -9889,6 +9903,10 @@ co: aghjunghje una nota per a fiura.
 de: Bildnotiz hinzufügen
 en: add a note for the image.
 fr: ajouter une note pour l’image.
+
+    image map
+en: an image map
+fr: une image réactive
 
     image received
 af: prent ontvang
@@ -10729,6 +10747,11 @@ sk: juliánsky deň
 sl: julijanski dan
 sv: juliansk dag
 tr: jülyen günü
+
+    key
+de: Schlüssel
+en: key/individual key
+fr: clé/clé personne
 
     killed (in action)
 af: gesneuwel
@@ -12944,6 +12967,10 @@ pt: nome novo
 sv: nytt namn
 tr: yeni ad
 
+    new note name
+en: name of the new note
+fr: nom de la nouvelle note
+
     new tree with this individual
 co: arburu novu da st’individuu
 de: Neuer Baum mit dieser Person
@@ -13768,6 +13795,10 @@ sl: številka"Sosa", v odnosu z
 sv: annummer med som proband (Kekules system)
 tr: Sosa'ya göre
 
+    occ
+en: occurence number/occurence
+fr: numéro d’occurrence/occurence
+
     occupation/occupations
 af: beroep
 bg: занятие
@@ -14238,6 +14269,14 @@ sl: ali
 sv: eller
 tr: veya
 
+    order
+en: same order
+fr: même ordre
+
+    order hlp
+en: keep the same order
+fr: conserver le même ordre
+
     ordination
 co: ordinazione
 de: Ordination
@@ -14293,6 +14332,10 @@ nl: overige/overige/overige
 no: annen/annen/annen
 pt: outro/outra/outro
 sv: annat/annat/annat
+
+    other possibilities
+en: other possibilities
+fr: autres possibilités
 
     ou
 co: o
@@ -15911,6 +15954,10 @@ pt: selamento ao cônjuge LDS
 sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
 
+    mentions legales
+en: legal
+fr: mentions légales
+
     path to
 en: path to me/path to the Sosa n<sup>o</sup> 1
 fr: chemin vers moi/chemin vers le Sosa n<sup>o</sup> 1
@@ -15923,13 +15970,9 @@ fr: chemin le plus court entre cet individu et moi
 en: shortest path between this individual and the Sosa nº 1
 fr: chemin le plus court entre cet individu et le Sosa nº 1
 
-    reset related cache
-en: reset the cache of near relationships
-fr: réinitialiser le cache des relations proches
-
-    reset related cache hlp
-en: reset the cache extending semi-public visibility to the family
-fr: réinitialiser le cache étendant la visibilité semi-publique à la famille
+    search format
+en: search formats
+fr: formats de recherche
 
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
@@ -15977,21 +16020,41 @@ sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
 
-    exact-hlp
-en: exact match (word level)
-fr: comparaison exacte mot par mot
+    other base
+en: other base
+fr: autre base
 
-    order
-en: order
-fr: ordre
+    hidden first_name
+en: hidden first name
+fr: prénom masqué
 
-    order-hlp
-en: test firstnames in the same order
-fr: tester les prénoms dans le même ordre
-  
-    all-hlp
-en: all firstnames must be present
-fr: tous les prénoms doivent être présents
+    hidden surname
+en: hidden surname
+fr: patronyme masqué
+
+    hidden person
+en: hidden person
+fr: personne masquée
+
+    not all
+en: one first name
+fr: un prénom
+
+    not all hlp
+en: contains only one first name (contains all first names by default)
+fr: contient un seul prénom (contient tous les prénoms par défaut)
+
+    not exact
+en: partial
+fr: partiel
+
+    not exact hlp
+en: partial matching (exact matching by default)
+fr: correspondance partielle (correspondance exacte par défaut)
+
+    optional/mandatory
+en: optional/mandatory
+fr: facultatif/obligatoire
 
     search_exact_fn
 co: ricerca esatta
@@ -17250,6 +17313,10 @@ co: a fiura selezziunata serà piazzata in
 de: das ausgewählte Bild wird kopiert nach
 en: the selected image will be copied to
 fr: l’image sélectionnée sera enregistrée dans
+
+    subplace help
+en: be carefull, the syntax of subplaces is “[subplace] – place” with a dash that can be emdash or endash.
+fr: attention, la syntaxe des sous-lieux est « [sous-lieu] – lieu » avec un tiret qui peut être cadratin ou demi-cadratin.
 
     subdivision
 co: paisolu
@@ -18618,12 +18685,12 @@ co: titulu/tituli
 cs: titul/tituly
 da: titel/titler (nob.)
 de: Titel/Titel
-en: title/titles
+en: title/titles/title(s)
 eo: nobeltitolo:a:+n/nobeltitoloj:a:+n
 es: título/títulos
 et: tiitel/tiitlid
 fi: arvonimi/arvonimet
-fr: titre/titres
+fr: titre/titres/titre(s)
 he:  תואר/ תארים
 is: titill/titlar
 it: titolo/titoli
@@ -19460,7 +19527,7 @@ ca: actualització
 co: mudificazione
 cs: upravit
 da: opdater
-de: Aktualisieren
+de: Aktualisieren +before
 en: update
 eo: ĝisdatigo
 es: revisión
@@ -19756,6 +19823,14 @@ sk: pozri zdroj
 sv: se källa
 tr: kaynağı görüntüle
 
+    visibility
+en: visibility
+fr: visibilité
+
+    visibility-hlp
+en: help for visibility of individuals
+fr: aide pour la visibilité des individus
+
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
 ca: visualtza/mostra/sumari
@@ -19993,6 +20068,10 @@ pt: com o antepassado raiz, cônjuges e desconhecidos
 sv: med rot, partners och okända
 tr: kök atası, eşler ve bilinmeyenler ile
 
+    with spouse name
+en: with spouse's name
+fr: avec le nom de son conjoint
+
     without implex display
 co: senza affissà l’implessi
 de: ohne Implex-Anzeige
@@ -20146,6 +20225,10 @@ sk: wizard/wizards/friend/friends/exterior
 sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
 sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
+
+    word/words
+en: only one word/full surname
+fr: un seul mot/patronyme complet
 
     word match
 co: parolla sana

@@ -3,6 +3,13 @@
 open Def
 open Gwdb
 
+val rgpd_files : string ref
+(** Fonctionnement RGPD *)
+
+val rgpd : bool ref
+val verbose_friends : bool ref
+val semi_pub_cnt : int ref
+
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Key to refer a person's definition *)
 
@@ -89,6 +96,9 @@ val no_picture : bool ref
 val create_all_keys : bool ref
 (** Forces to create all the keys for every persons (even for ? ?).
     Enabled for gwplus format. *)
+
+val verbose : bool ref
+val out_file : string ref
 
 val comp_families : string -> unit
 (** Compile .gw file and save result to corresponding .gwo *)

@@ -49,10 +49,11 @@ let section_level s len =
   loop 1 (len - 2) 4
 
 (* Creates an edit button with consistent styling *)
-let make_edit_button conf fnotes ?(cnt = None) () =
+let make_edit_button conf mode fnotes ?(cnt = None) () =
   let href =
-    Printf.sprintf "%sm=MOD_NOTES&f=%s%s"
+    Printf.sprintf "%sm=MOD_%s&f=%s%s"
       (commd conf :> string)
+      mode
       (Mutil.encode fnotes :> string)
       (match cnt with None -> "" | Some n -> "&v=" ^ string_of_int n)
   in
@@ -108,19 +109,30 @@ let str_start_with str i x =
   in
   loop i 0
 
-type wiki_info = {
-  wi_mode : string;
-  wi_file_path : string -> string;
-  wi_person_exists : string * string * int -> bool * string * string;
-  wi_always_show_link : bool;
-}
-
 let escape (s : string) = (Util.escape_html s : Adef.escaped_string :> string)
 let encode (s : string) = (Mutil.encode s : Adef.encoded_string :> string)
 
-let syntax_links conf wi s =
+type wiki_info = {
+  wi_mode : string;
+  wi_file_path : string -> string;
+  wi_person_exists : string * string * int -> bool;
+  wi_mark_if_not_public : string * string * int -> bool;
+  wi_always_show_link : bool;
+}
+
+let bold_italic_syntax s =
+  let chars = [ '{'; '%'; '\'' ] in
+  let find_first_char_from_list str i chars =
+    let len = String.length str in
+    let rec find_index j =
+      if j >= len then None
+      else if List.mem str.[j] chars then Some j
+      else find_index (j + 1)
+    in
+    find_index i
+  in
   let slen = String.length s in
-  let rec loop quot_lev pos i len =
+  let rec loop quot_lev i len =
     let len, quot_lev =
       if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
         let len =
@@ -138,9 +150,8 @@ let syntax_links conf wi s =
       s.[i] = '%'
       && i < slen - 1
       && List.mem s.[i + 1] [ '['; ']'; '{'; '}'; '\'' ]
-    then loop quot_lev pos (i + 2) (Buff.store len s.[i + 1])
-    else if s.[i] = '%' && i < slen - 1 && s.[i + 1] = '/' then
-      loop quot_lev pos (i + 2) (Buff.mstore len "")
+    then loop quot_lev (i + 2) (Buff.store len s.[i + 1])
+    else if s.[i] = '%' then loop quot_lev (i + 1) (Buff.mstore len "%")
     else if s.[i] = '{' then
       let b, j =
         let rec loop len j =
@@ -157,7 +168,7 @@ let syntax_links conf wi s =
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
-      loop quot_lev pos j (Buff.mstore len s)
+      loop quot_lev j (Buff.mstore len s)
     else if
       i <= slen - 5
       && s.[i] = '\''
@@ -168,7 +179,7 @@ let syntax_links conf wi s =
       && (quot_lev = 0 || quot_lev = 3)
     then
       let s = if quot_lev = 0 then "<i><b>" else "</b></i>" in
-      loop (3 - quot_lev) pos (i + 5) (Buff.mstore len s)
+      loop (3 - quot_lev) (i + 5) (Buff.mstore len s)
     else if
       i <= slen - 3
       && s.[i] = '\''
@@ -177,7 +188,7 @@ let syntax_links conf wi s =
       && (quot_lev = 0 || quot_lev = 2)
     then
       let s = if quot_lev = 0 then "<b>" else "</b>" in
-      loop (2 - quot_lev) pos (i + 3) (Buff.mstore len s)
+      loop (2 - quot_lev) (i + 3) (Buff.mstore len s)
     else if
       i <= slen - 2
       && s.[i] = '\''
@@ -185,7 +196,22 @@ let syntax_links conf wi s =
       && (quot_lev = 0 || quot_lev = 1)
     then
       let s = if quot_lev = 0 then "<i>" else "</i>" in
-      loop (1 - quot_lev) pos (i + 2) (Buff.mstore len s)
+      loop (1 - quot_lev) (i + 2) (Buff.mstore len s)
+    else if s.[i] = '\'' then loop quot_lev (i + 1) (Buff.mstore len "'")
+    else
+      let k = find_first_char_from_list s i chars in
+      match k with
+      | None -> Buff.get len
+      | Some k -> loop quot_lev k (Buff.mstore len (String.sub s i (k - i)))
+  in
+  loop 0 0 0
+
+let syntax_links conf wi s =
+  let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
+
+  let slen = String.length s in
+  let rec loop quot_lev pos i len =
+    if i = slen then Buff.get len
     else
       match NotesLinks.misc_notes_link s i with
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->
@@ -207,30 +233,40 @@ let syntax_links conf wi s =
               (encode wi.wi_mode) (encode fname) anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
-      | NotesLinks.WLperson (j, (fn, sn, oc), name, _text) ->
-          let exists, fn0, sn0 = wi.wi_person_exists (fn, sn, oc) in
+      | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
           let name =
-            match name with None -> fn0 ^ " " ^ sn0 | Some name -> name
+            if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
+            then Option.value ~default:"??" name
+            else Util.private_txt conf ""
+          in
+          let color = " style=\"color:red\"" in
+          let color1 =
+            if wi.wi_mark_if_not_public (fn, sn, oc) then "style=\"color:red\""
+            else ""
           in
           let t =
-            if exists then
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
-                (commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                name
-            else if wi.wi_always_show_link then
-              let s = " style=\"color:red\"" in
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\"%s>%s</a>"
+            if cancel_links || name = Util.private_txt conf "" then name
+            else if wi.wi_person_exists (fn, sn, oc) then
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\" %s>%s</a>"
                 pos
                 (commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                s name
-            else
-              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
+                (Mutil.encode fn :> string)
+                (Mutil.encode sn :> string)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc)
+                color1 name
+            else if wi.wi_always_show_link then
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
+                pos
                 (commd conf :> string)
-                (if conf.hide_names then "x x" else escape name)
+                (Mutil.encode fn :> string)
+                (Mutil.encode sn :> string)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc)
+                color name
+            else
+              Printf.sprintf "<a href=\"%s\" %s>%s</a>"
+                (commd conf :> string)
+                color
+                (if conf.hide_names then Util.private_txt conf "" else name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard (j, wiz, name) ->
@@ -241,8 +277,8 @@ let syntax_links conf wi s =
               (encode wiz) s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
-      | NotesLinks.WLnone (_j, _none_s) ->
-          loop quot_lev pos (i + 1) (Buff.store len s.[i])
+      | NotesLinks.WLnone (j, none_s) ->
+          loop quot_lev pos j (Buff.mstore len (bold_italic_syntax none_s))
   in
   loop 0 1 0 0
 
@@ -387,8 +423,8 @@ let summary_of_tlsw_lines conf short lines =
     (lines, sections_nums)
 
 let modify_link conf cnt _empty = function
-  | Some (_, _, sfn) when conf.wizard ->
-      make_edit_button conf sfn ~cnt:(Some cnt) ()
+  | Some (_, mode, sfn) when conf.wizard ->
+      make_edit_button conf mode sfn ~cnt:(Some cnt) ()
   | _ -> ""
 
 let rec tlsw_list tag1 tag2 lev list sl =
