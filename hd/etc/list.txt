@@ -68,16 +68,17 @@
   %end;
 </div>
 
-%if;(e.data="place")
 %let;opt;%nn;
+  %if;(e.data="place")
   %if;(e.bi="on")&bi=on%end;%nn;
   %if;(e.ba="on")&bp=on%end;%nn;
   %if;(e.ma="on")&ma=on%end;%nn;
   %if;(e.de="on")&de=on%end;%nn;
   %if;(e.bu="on")&bu=on%end;%nn;
   %if;(e.long="on")&long=on%end;%nn;
-  %if;(e.f_sort="on")&f_sort=on%end;%in;
-%end;
+  %if;(e.f_sort="on")&f_sort=on%end;
+  %end;
+  %in;
 %let;k;%if;(e.k!="")%e.k;%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
 %define;evt(vv,tt,ii)
