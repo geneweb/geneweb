@@ -118,9 +118,19 @@ type wiki_info = {
 let escape (s : string) = (Util.escape_html s : Adef.escaped_string :> string)
 let encode (s : string) = (Mutil.encode s : Adef.encoded_string :> string)
 
-let syntax_links conf wi s =
+let bold_italic_syntax s =
+  let chars = [ '{'; '%'; '\'' ] in
+  let find_first_char_from_list str i chars =
+    let len = String.length str in
+    let rec find_index j =
+      if j >= len then None
+      else if List.mem str.[j] chars then Some j
+      else find_index (j + 1)
+    in
+    find_index i
+  in
   let slen = String.length s in
-  let rec loop quot_lev pos i len =
+  let rec loop quot_lev i len =
     let len, quot_lev =
       if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
         let len =
@@ -138,9 +148,8 @@ let syntax_links conf wi s =
       s.[i] = '%'
       && i < slen - 1
       && List.mem s.[i + 1] [ '['; ']'; '{'; '}'; '\'' ]
-    then loop quot_lev pos (i + 2) (Buff.store len s.[i + 1])
-    else if s.[i] = '%' && i < slen - 1 && s.[i + 1] = '/' then
-      loop quot_lev pos (i + 2) (Buff.mstore len "")
+    then loop quot_lev (i + 2) (Buff.store len s.[i + 1])
+    else if s.[i] = '%' then loop quot_lev (i + 1) (Buff.mstore len "%")
     else if s.[i] = '{' then
       let b, j =
         let rec loop len j =
@@ -157,7 +166,7 @@ let syntax_links conf wi s =
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
-      loop quot_lev pos j (Buff.mstore len s)
+      loop quot_lev j (Buff.mstore len s)
     else if
       i <= slen - 5
       && s.[i] = '\''
@@ -168,7 +177,7 @@ let syntax_links conf wi s =
       && (quot_lev = 0 || quot_lev = 3)
     then
       let s = if quot_lev = 0 then "<i><b>" else "</b></i>" in
-      loop (3 - quot_lev) pos (i + 5) (Buff.mstore len s)
+      loop (3 - quot_lev) (i + 5) (Buff.mstore len s)
     else if
       i <= slen - 3
       && s.[i] = '\''
@@ -177,7 +186,7 @@ let syntax_links conf wi s =
       && (quot_lev = 0 || quot_lev = 2)
     then
       let s = if quot_lev = 0 then "<b>" else "</b>" in
-      loop (2 - quot_lev) pos (i + 3) (Buff.mstore len s)
+      loop (2 - quot_lev) (i + 3) (Buff.mstore len s)
     else if
       i <= slen - 2
       && s.[i] = '\''
@@ -185,7 +194,20 @@ let syntax_links conf wi s =
       && (quot_lev = 0 || quot_lev = 1)
     then
       let s = if quot_lev = 0 then "<i>" else "</i>" in
-      loop (1 - quot_lev) pos (i + 2) (Buff.mstore len s)
+      loop (1 - quot_lev) (i + 2) (Buff.mstore len s)
+    else if s.[i] = '\'' then loop quot_lev (i + 1) (Buff.mstore len "'")
+    else
+      let k = find_first_char_from_list s i chars in
+      match k with
+      | None -> Buff.get len
+      | Some k -> loop quot_lev k (Buff.mstore len (String.sub s i (k - i)))
+  in
+  loop 0 0 0
+
+let syntax_links conf wi s =
+  let slen = String.length s in
+  let rec loop quot_lev pos i len =
+    if i = slen then Buff.get len
     else
       match NotesLinks.misc_notes_link s i with
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->
@@ -241,8 +263,8 @@ let syntax_links conf wi s =
               (encode wiz) s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
-      | NotesLinks.WLnone (_j, _none_s) ->
-          loop quot_lev pos (i + 1) (Buff.store len s.[i])
+      | NotesLinks.WLnone (j, none_s) ->
+          loop quot_lev pos j (Buff.mstore len (bold_italic_syntax none_s))
   in
   loop 0 1 0 0
 
