@@ -8,11 +8,15 @@ They freely distributed at address:
      http://caml.inria.fr/ocaml/
      http://pauillac.inria.fr/~ddr/camlp5/
 
+0. prerequisites:
+
+$ opam install zarith jingoo ppx_import uri uunf camlzip markup unidecode calendars alcotest
+
 1- In the top directory, do:
-      ./configure
+      ocaml ./configure.ml --debug
 
 2- Do:
-      make
+      make build
 
    If your platform does not have the command ocamlopt, the
    executables will be slower.
