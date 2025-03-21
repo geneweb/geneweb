@@ -816,9 +816,12 @@ let treat_request =
         Geneweb.Output.print_sstring conf ".</li></ul>";
         Geneweb.Hutil.trailer conf
     in
-    if conf.debug then
-      Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
-    else process ()
+    try
+      if conf.debug then
+        Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
+      else process ()
+    with Gwdb.Not_plain_text s ->
+      Geneweb.Update.error conf (Geneweb.Update.not_plain_text_error s)
 
 let treat_request conf =
   try treat_request conf

@@ -16,6 +16,9 @@ type update_error =
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
   | UERR_illegal_access_update of Def.access * Def.access
+  | UERR_not_plain_text of Adef.escaped_string
+
+let not_plain_text_error s = UERR_not_plain_text (Util.escape_html s)
 
 exception ModErr of update_error
 
@@ -363,6 +366,11 @@ let string_of_error conf =
       ^<^ (Util.string_of_access conf old_access :> string)
       ^<^ " "
       ^<^ (Util.string_of_access conf new_access :> Adef.safe_string)
+  | UERR_not_plain_text s ->
+      let open Def in
+      ("not_plain_text_error" |> Util.transl conf |> Utf8.capitalize_fst)
+      ^<^ Util.transl conf ":" ^<^ " "
+      ^<^ (s :> Adef.safe_string)
 
 let print_err_unknown conf (f, s, o) =
   let err = UERR_unknow_person (f, s, o) in
@@ -1292,7 +1300,9 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             burial_src = empty_string;
             pevents = [];
             notes = empty_string;
-            psources = Gwdb.insert_string base (Ext_string.only_printable src);
+            psources =
+              Gwdb.insert_string ~format:`Html base
+                (Ext_string.only_printable src);
             key_index = Gwdb.dummy_iper;
           }
         in

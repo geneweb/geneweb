@@ -1,5 +1,14 @@
 include Gwdb_driver
 
+exception Not_plain_text of string
+
+let insert_string base ?format s =
+  match format with
+  | None | Some `Plain_text ->
+      if not @@ Html.is_plain_text s then raise @@ Not_plain_text s
+      else insert_string base s
+  | Some `Html -> insert_string base s
+
 module IperSet = Set.Make (struct
   type t = iper
 

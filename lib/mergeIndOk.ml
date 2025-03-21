@@ -223,7 +223,7 @@ let reconstitute conf base p1 p2 =
       titles = list (Futil.map_title_strings (Gwdb.sou base)) Gwdb.get_titles;
       rparents =
         list
-          (Futil.map_relation_ps (sorp base) (Gwdb.sou base))
+          (Futil.map_relation_ps (sorp base) (fun ?format:_ -> Gwdb.sou base))
           Gwdb.get_rparents;
       related = [];
       occupation =
@@ -278,7 +278,7 @@ let reconstitute conf base p1 p2 =
           (Gwdb.get_burial_src p2);
       pevents =
         list
-          (Futil.map_pers_event (sorp base) (Gwdb.sou base))
+          (Futil.map_pers_event (sorp base) (fun ?format:_ -> Gwdb.sou base))
           (fun p -> List.map Gwdb.gen_pevent_of_pers_event (Gwdb.get_pevents p));
       notes =
         merge_strings base (Gwdb.get_notes p1) "<br>\n" (Gwdb.get_notes p2);
@@ -293,7 +293,7 @@ let reconstitute conf base p1 p2 =
     merge_primary_events
       (fun pe ->
         let pe = Gwdb.gen_pevent_of_pers_event pe in
-        Futil.map_pers_event (sorp base) (Gwdb.sou base) pe)
+        Futil.map_pers_event (sorp base) (fun ?format:_ -> Gwdb.sou base) pe)
       Gwdb.get_pevents p
   in
   { p with pevents }

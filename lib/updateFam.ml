@@ -31,7 +31,7 @@ let string_family_of conf base ifam =
   let sfam =
     Futil.map_family_ps (person_key base)
       (fun f -> f)
-      (Gwdb.sou base)
+      (fun ?format:_ -> Gwdb.sou base)
       (Gwdb.gen_family_of_family fam)
   in
   let scpl =

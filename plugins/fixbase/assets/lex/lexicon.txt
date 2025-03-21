@@ -28,9 +28,9 @@ co: Aghjunghje e relazioni assente truvate in l’evenimenti famigliali.
 en: Add missing related from family events.
 fr: Ajoute les relations manquantes trouvées dans les événements familiaux.
 
-    plugin_fixbase_invalid_utf8
+    plugin_fixbase_invalid_strings
 co: Currege i testi malcudificati.
-en: Fix wrong UTF8 encoding.
+en: Fix wrong strings.
 fr: Corrige les textes mal encodés.
 
     plugin_fixbase_marriage_divorce

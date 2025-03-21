@@ -1,4 +1,8 @@
+exception Not_plain_text of string
+
 include module type of Gwdb_driver
+
+val insert_string : base -> ?format:[< `Plain_text | `Html ] -> string -> istr
 
 module IperSet : sig
   include Set.S with type elt = iper

@@ -16,6 +16,9 @@ type update_error =
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
   | UERR_illegal_access_update of Def.access * Def.access
+  | UERR_not_plain_text of Adef.escaped_string
+
+val not_plain_text_error : string -> update_error
 
 exception ModErr of update_error
 
