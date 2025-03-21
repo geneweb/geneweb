@@ -29,7 +29,8 @@ let person_key base ip =
 let string_family_of base ifam =
   let fam = Gwdb.foi base ifam in
   let sfam =
-    Futil.map_family_ps (person_key base) Fun.id (Gwdb.sou base)
+    Futil.map_family_ps (person_key base) Fun.id
+      (fun ?format:_ -> Gwdb.sou base)
       (Gwdb.gen_family_of_family fam)
   in
   let scpl =

@@ -814,7 +814,12 @@ let assume_tab tab none =
     Array.blit tab.arr 0 new_arr 0 (Array.length tab.arr) ;
     tab.arr <- new_arr
 
-let add_string gen s =
+let add_string gen ?format s =
+  let s =
+    match format with
+    | Some `Html -> s
+    | None | Some `Plain_text -> Html.text_content s
+  in
   try Hashtbl.find gen.g_hstr s
   with Not_found ->
     let i = gen.g_str.tlen in
@@ -1362,7 +1367,7 @@ let find_event_witness_aux gen i r forward =
           | None -> Witness
         in
          let wnote =
-           find_and_treat_notes gen r.rsons |> add_string gen
+           find_and_treat_notes gen r.rsons |> add_string gen ~format:`Html
          in
         (witness, witness_kind, wnote) :: find_witnesses asso_l
   in
@@ -1486,8 +1491,8 @@ let treat_indi_pevent gen ip r =
                 {Def.epers_name = name; epers_date = Date.cdate_of_od date;
                  epers_place = add_string gen place;
                  epers_reason = add_string gen reason;
-                 epers_note = add_string gen note;
-                 epers_src = add_string gen src; epers_witnesses = witnesses}
+                 epers_note = add_string gen ~format:`Html note;
+                 epers_src = add_string gen ~format:`Html src; epers_witnesses = witnesses}
               in
               (* On ajoute que les évènements non vides, sauf *)
               (* s'il est spécifié qu'il faut l'ajouter.      *)
@@ -1554,8 +1559,8 @@ let treat_indi_pevent gen ip r =
                  {Def.epers_name = name; epers_date = Date.cdate_of_od date;
                   epers_place = add_string gen place;
                   epers_reason = add_string gen reason;
-                  epers_note = add_string gen note;
-                  epers_src = add_string gen src; epers_witnesses = witnesses}
+                  epers_note = add_string gen ~format:`Html note;
+                  epers_src = add_string gen ~format:`Html src; epers_witnesses = witnesses}
                in
                (* On ajoute que les évènements non vides, *)
                (* sauf si évènement personnalisé !        *)
@@ -2017,20 +2022,20 @@ let add_indi gen r =
   in
   (* Mise à jour des évènements principaux. *)
   let (birth_place, birth_note, birth_src) =
-    add_string gen birth_place, add_string gen birth_note,
-    add_string gen birth_src
+    add_string gen birth_place, add_string gen ~format:`Html birth_note,
+    add_string gen ~format:`Html birth_src
   in
   let (bapt_place, bapt_note, bapt_src) =
-    add_string gen bapt_place, add_string gen bapt_note,
-    add_string gen bapt_src
+    add_string gen bapt_place, add_string gen ~format:`Html bapt_note,
+    add_string gen ~format:`Html bapt_src
   in
   let (death_place, death_note, death_src) =
-    add_string gen death_place, add_string gen death_note,
-    add_string gen death_src
+    add_string gen death_place, add_string gen ~format:`Html death_note,
+    add_string gen ~format:`Html death_src
   in
   let (burial_place, burial_note, burial_src) =
-    add_string gen burial_place, add_string gen burial_note,
-    add_string gen burial_src
+    add_string gen burial_place, add_string gen ~format:`Html burial_note,
+    add_string gen ~format:`Html burial_src
   in
   (* On tri les évènements pour être sûr. *)
   let pevents =
@@ -2066,8 +2071,8 @@ let add_indi gen r =
      death_place = death_place; death_note = death_note;
      death_src = death_src; burial = burial; burial_place = burial_place;
      burial_note = burial_note; burial_src = burial_src; pevents = pevents;
-     notes = add_string gen (notes ^ ext_notes);
-     psources = add_string gen psources; key_index = ip}
+     notes = add_string gen ~format:`Html (notes ^ ext_notes);
+     psources = add_string gen ~format:`Html psources; key_index = ip}
   in
   let ascend = {Def.parents = parents; consang = Adef.fix (-1)} in
   let union = {Def.family = Array.of_list family} in
@@ -2182,8 +2187,8 @@ let treat_fam_fevent gen ifath r =
                 {Def.efam_name = name; efam_date = Date.cdate_of_od date;
                  efam_place = add_string gen place;
                  efam_reason = add_string gen reason;
-                 efam_note = add_string gen note;
-                 efam_src = add_string gen src; efam_witnesses = witnesses}
+                 efam_note = add_string gen ~format:`Html note;
+                 efam_src = add_string gen ~format:`Html src; efam_witnesses = witnesses}
               in
               (* On ajoute toujours les évènements principaux liés à la   *)
               (* famille, sinon, on peut avoir un problème si on supprime *)
@@ -2246,8 +2251,8 @@ let treat_fam_fevent gen ifath r =
                  {Def.efam_name = name; efam_date = Date.cdate_of_od date;
                   efam_place = add_string gen place;
                   efam_reason = add_string gen reason;
-                  efam_note = add_string gen note;
-                  efam_src = add_string gen src; efam_witnesses = witnesses}
+                  efam_note = add_string gen ~format:`Html note;
+                  efam_src = add_string gen ~format:`Html src; efam_witnesses = witnesses}
                in
                (* On n'ajoute que les évènements non vides,        *)
                (* sauf si évènement personnalisé et les évènements *)
@@ -2529,7 +2534,7 @@ let add_fam_norm gen r adop_list =
         else if ext_sources = "" then notes ^ "\n" ^ ext_notes
         else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
       in
-      let new_notes = add_string gen notes in
+      let new_notes = add_string gen ~format:`Html notes in
       let p = { p with notes = new_notes } in
       gen.g_per.arr.(iper) <- Def.Right (p, a, u)
   in
@@ -2540,7 +2545,7 @@ let add_fam_norm gen r adop_list =
   (* Mise à jour des évènements principaux. *)
   let (marr, marr_place, marr_note, marr_src) =
     Date.cdate_of_od marr, add_string gen marr_place,
-    add_string gen marr_note, add_string gen marr_src
+    add_string gen ~format:`Html marr_note, add_string gen ~format:`Html marr_src
   in
   (* On tri les évènements pour être sûr. *)
   let fevents =
@@ -2558,8 +2563,8 @@ let add_fam_norm gen r adop_list =
     {Def.marriage = marr; marriage_place = marr_place;
      marriage_note = marr_note; marriage_src = marr_src;
      witnesses = witnesses; relation = relation; divorce = div;
-     fevents = fevents; comment = add_string gen comment;
-     origin_file = string_empty; fsources = add_string gen fsources;
+     fevents = fevents; comment = add_string gen ~format:`Html comment;
+     origin_file = string_empty; fsources = add_string gen ~format:`Html fsources;
      fam_index = i}
   and cpl = Adef.couple fath moth
   and des = {Def.children = Array.of_list children} in

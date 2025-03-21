@@ -243,7 +243,8 @@ let record_diff conf base changed =
                 (try Sys.rename ofname fname with Sys_error _ -> ());
                 let p = Gwdb.poi base ip in
                 let p =
-                  Futil.map_person_ps Fun.id (Gwdb.sou base)
+                  Futil.map_person_ps Fun.id
+                    (fun ?format:_ -> Gwdb.sou base)
                     (Gwdb.gen_person_of_person p)
                 in
                 let gr = make_gen_record conf base false p in

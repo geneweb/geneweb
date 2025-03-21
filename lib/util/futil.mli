@@ -11,7 +11,7 @@ val map_title_strings :
 val map_pers_event :
   ?fd:(Date.date -> Date.date) ->
   ('a -> 'c) ->
-  ('b -> 'd) ->
+  (?format:[ `Plain_text | `Html ] -> 'b -> 'd) ->
   ('a, 'b) Def.gen_pers_event ->
   ('c, 'd) Def.gen_pers_event
 (** Convert:
@@ -24,7 +24,7 @@ val map_pers_event :
 val map_fam_event :
   ?fd:(Date.date -> Date.date) ->
   ('a -> 'c) ->
-  ('b -> 'd) ->
+  (?format:[ `Plain_text | `Html ] -> 'b -> 'd) ->
   ('a, 'b) Def.gen_fam_event ->
   ('c, 'd) Def.gen_fam_event
 (** Convert:
@@ -36,7 +36,7 @@ val map_fam_event :
 
 val map_relation_ps :
   ('a -> 'c) ->
-  ('b -> 'd) ->
+  (?format:[ `Plain_text | `Html ] -> 'b -> 'd) ->
   ('a, 'b) Def.gen_relation ->
   ('c, 'd) Def.gen_relation
 (** Convert:
@@ -47,7 +47,7 @@ val map_relation_ps :
 val map_person_ps :
   ?fd:(Date.date -> Date.date) ->
   ('b -> 'd) ->
-  ('c -> 'e) ->
+  (?format:[ `Plain_text | `Html ] -> 'c -> 'e) ->
   ('a, 'b, 'c) Def.gen_person ->
   ('a, 'd, 'e) Def.gen_person
 (** Convert:
@@ -74,7 +74,7 @@ val map_family_ps :
   ?fd:(Date.date -> Date.date) ->
   ('a -> 'b) ->
   ('c -> 'd) ->
-  ('e -> 'f) ->
+  (?format:[ `Plain_text | `Html ] -> 'e -> 'f) ->
   ('a, 'c, 'e) Def.gen_family ->
   ('b, 'd, 'f) Def.gen_family
 (** Convert:

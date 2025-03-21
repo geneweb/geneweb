@@ -65,3 +65,13 @@ let pretty_print elements =
   |> Markup.to_string
 
 let map f s = s |> parse_as_body_content |> Markup.map f |> pretty_print
+
+let is_plain_text s =
+  s |> parse_as_body_content
+  |> Markup.fold
+       (fun is_plain_text_so_far element ->
+         is_plain_text_so_far && Ext_markup.is_text element)
+       true
+
+let text_content s =
+  s |> parse_as_body_content |> Markup.filter Ext_markup.is_text |> pretty_print

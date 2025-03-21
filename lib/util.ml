@@ -550,10 +550,11 @@ let pget_opt conf base ip =
 let pget conf base ip =
   Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
-let string_gen_person base p = Futil.map_person_ps Fun.id (Gwdb.sou base) p
+let string_gen_person base p =
+  Futil.map_person_ps Fun.id (fun ?format:_ -> Gwdb.sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps Fun.id Fun.id (Gwdb.sou base) fam
+  Futil.map_family_ps Fun.id Fun.id (fun ?format:_ -> Gwdb.sou base) fam
 
 let is_empty_name p =
   Gwdb.is_quest_string (Gwdb.get_surname p)

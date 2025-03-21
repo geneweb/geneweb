@@ -185,7 +185,8 @@ let map_person_ps ?(fd = Fun.id) fp fs p =
     public_name = fs p.public_name;
     qualifiers = List.map fs p.qualifiers;
     titles = List.map (Futil.map_title_strings ~fd fs) p.titles;
-    rparents = List.map (Futil.map_relation_ps fp fs) p.rparents;
+    rparents =
+      List.map (Futil.map_relation_ps fp (fun ?format:_ -> fs)) p.rparents;
     related = List.map fp p.related;
     aliases = List.map fs p.aliases;
     occupation = fs p.occupation;
