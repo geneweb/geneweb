@@ -559,7 +559,7 @@ let init_etc bname =
   (if Sys.file_exists bdir && not (Sys.file_exists fname) then
    try Unix.mkdir fname 0o755
    with Unix.Unix_error (_, _, _) ->
-     !syslog `LOG_WARNING (Printf.sprintf "Error when creating %s" fname));
+     !syslog `LOG_WARNING (Printf.sprintf "Error when creating (init) %s" fname));
   if !reorg then (
     (if not (Sys.file_exists (!bpath bname)) then
      try
