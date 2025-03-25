@@ -1,10 +1,19 @@
 module type S = sig
   type ctx
+  (** Context of a hashing function. *)
+
   type 'a feeder = 'a -> ctx -> ctx
+  (** Type of a feeder function for ['a]. *)
+
   type 'a hasher = 'a -> string
+  (** Type of a hash function for ['a]. *)
 
   val feeder_to_hasher : 'a feeder -> 'a hasher
+  (** [feeder_to_hasher f] converts the feeder [f] into a hash function. *)
+
   val ( <+> ) : (ctx -> ctx) -> (ctx -> ctx) -> ctx -> ctx
+  (** [f <+> g] composes the two feeder functions. *)
+
   val string : string feeder
   val int : int feeder
   val bool : bool feeder
