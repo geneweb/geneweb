@@ -51,7 +51,7 @@ type cdate =
   | Cdate of date
   | Cnone
 
-type 'person gen_couple
+type 'person gen_couple = private { father : 'person; mother : 'person }
 (** Polymorphic type to represent a family's couple.
     Couple consists of the father and of the mother. *)
 
