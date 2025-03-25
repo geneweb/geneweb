@@ -54,9 +54,14 @@ let escape_attribute =
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
 
-let map f s =
+let parse_as_body_content s =
   Markup.string s
   |> Markup.parse_html ~context:(`Fragment "body")
-  |> Markup.signals |> Markup.map f
+  |> Markup.signals
+
+let pretty_print elements =
+  elements
   |> Markup.write_html ~escape_text:escape ~escape_attribute
   |> Markup.to_string
+
+let map f s = s |> parse_as_body_content |> Markup.map f |> pretty_print
