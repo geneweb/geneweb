@@ -865,8 +865,9 @@ let feed_create_info
     } =
   Hasher.SHA256.(
     (option date) ci_birth_date
-    <+> string ci_birth_place
+    <+> death ci_death
     <+> (option date) ci_death_date
+    <+> string ci_birth_place
     <+> string ci_death_place
     <+> string ci_occupation
     <+> bool ci_public)
