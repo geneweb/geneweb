@@ -1754,6 +1754,20 @@ let hexa_string s =
   Bytes.unsafe_to_string s'
 
 let print_alphab_list conf crit print_elem liste =
+  let print_sub_list len sub_l print_e index =
+    if sub_l <> [] then (
+      if len > menu_threshold then (
+        Output.print_sstring conf "<li>\n";
+        Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string index) index;
+        Output.print_sstring conf "<ul>\n");
+      List.iter
+        (fun e ->
+          Output.print_sstring conf "<li>\n  ";
+          print_e e;
+          Output.print_sstring conf "</li>\n")
+        sub_l;
+      if len > menu_threshold then Output.print_sstring conf "</ul>\n")
+  in
   let len = List.length liste in
   if len > menu_threshold then (
     Output.print_sstring conf "<p>\n";
@@ -1770,32 +1784,26 @@ let print_alphab_list conf crit print_elem liste =
          None liste
      in
      ());
-    Output.print_sstring conf "</p>\n");
-  Output.print_sstring conf "<ul>\n";
-  (let _ =
-     List.fold_left
-       (fun last e ->
-         let t = crit e in
-         let same_than_last =
-           match last with Some t1 -> t = t1 | _ -> false
-         in
-         if len > menu_threshold || is_number t then (
-           (match last with
-           | Some _ ->
-               if not same_than_last then
-                 Output.print_sstring conf "</ul>\n</li>\n"
-           | _ -> ());
-           if not same_than_last then (
-             Output.print_sstring conf "<li>\n";
-             Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
-             Output.print_sstring conf "<ul>\n"));
-         Output.print_sstring conf "<li>\n  ";
-         print_elem e;
-         Output.print_sstring conf "</li>\n";
-         Some t)
-       None liste
-   in
-   ());
+    Output.print_sstring conf "</p>\n";
+    Output.print_sstring conf "<ul>\n");
+  let rec loop acc last liste =
+    let index = match last with Some t -> t | None -> "" in
+    match liste with
+    | [] -> print_sub_list len acc print_elem index
+    | e :: liste ->
+        let t = crit e in
+        let same_than_last = match last with Some t1 -> t = t1 | _ -> false in
+        if len > menu_threshold || is_number t then
+          match last with
+          | Some _ ->
+              if not same_than_last then (
+                print_sub_list len acc print_elem index;
+                loop [] (Some t) liste)
+              else loop (e :: acc) (Some t) liste
+          | _ -> loop (e :: acc) (Some t) liste
+        else print_sub_list len liste print_elem ""
+  in
+  loop [] None liste;
   if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
   Output.print_sstring conf "</ul>\n"
 

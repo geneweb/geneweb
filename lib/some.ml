@@ -209,21 +209,6 @@ let name_unaccent s =
 
 let first_name_print_list conf base x1 xl listes =
   let surnames_liste l =
-    let l =
-      List.sort
-        (fun x1 x2 ->
-          match Gutil.alphabetic (p_surname base x1) (p_surname base x2) with
-          | 0 -> (
-              match
-                ( Date.od_of_cdate (get_birth x1),
-                  Date.od_of_cdate (get_birth x2) )
-              with
-              | Some d1, Some d2 -> Date.compare_date d1 d2
-              | Some _, _ -> 1
-              | _ -> -1)
-          | n -> -n)
-        l
-    in
     List.fold_left
       (fun l x ->
         let px = p_surname base x in
@@ -259,7 +244,7 @@ let first_name_print_list conf base x1 xl listes =
       if liste <> [] then (
         let list = surnames_liste liste in
         let list =
-          List.map
+          List.rev_map
             (fun (sn, ipl) ->
               let txt =
                 Util.surname_without_particle base sn
@@ -271,8 +256,9 @@ let first_name_print_list conf base x1 xl listes =
         in
         let list = List.sort compare list in
         if str <> "" then (
+          Output.print_sstring conf {|<div class="my-3">|};
           Output.print_sstring conf str;
-          Output.print_sstring conf "<p>\n");
+          Output.print_sstring conf "</div>\n");
         print_alphab_list conf
           (fun (ord, _, _) -> first_char ord)
           (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl))
