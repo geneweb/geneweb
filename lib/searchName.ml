@@ -271,6 +271,21 @@ let search conf base an search_order specify unknown =
               else (p :: acc1, acc3))
             ([], []) pl1
         in
+        let pl2 =
+          List.fold_left
+            (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+            [] pl2
+        in
+        let pl3 =
+          List.fold_left
+            (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+            [] pl3
+        in
+        let pl3 =
+          List.fold_left
+            (fun acc p -> if List.mem p pl2 then acc else p :: acc)
+            [] pl3
+        in
         match (pl1, pl2, pl3) with
         | [], [], [] -> loop l
         | [ p ], [], [] | [], [ p ], [] | [], [], [ p ] ->
