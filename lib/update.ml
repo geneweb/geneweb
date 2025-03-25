@@ -853,8 +853,47 @@ let error_digest conf =
   Output.print_string conf (string_of_error conf err);
   Output.print_sstring conf "</p>"
 
-let digest_person p = Marshal.to_string p [] |> Mutil.digest
-let digest_family f = Marshal.to_string f [] |> Mutil.digest
+let feed_create_info
+    {
+      ci_birth_date;
+      ci_birth_place;
+      ci_death;
+      ci_death_date;
+      ci_death_place;
+      ci_occupation;
+      ci_public;
+    } =
+  Hasher.SHA256.(
+    (option date) ci_birth_date
+    <+> string ci_birth_place
+    <+> (option date) ci_death_date
+    <+> string ci_death_place
+    <+> string ci_occupation
+    <+> bool ci_public)
+    [@ocamlformat "disable"]
+
+let feed_create c =
+  match c with
+  | Create (s, i) ->
+      Hasher.SHA256.(string "Create" <+> sex s <+> (option feed_create_info) i)
+  | Link -> Hasher.SHA256.string "Link"
+
+let feed_key (s1, s2, i, c, s3) =
+  Hasher.SHA256.(
+    string s1 <+> string s2 <+> int i <+> feed_create c <+> string s3)
+
+let digest_person =
+  let feeder p = Hasher.SHA256.((gen_person iper feed_key string) p) in
+  Hasher.SHA256.feeder_to_hasher feeder
+
+let digest_family =
+  let feeder (f, c, d) =
+    Hasher.SHA256.(
+      (gen_family feed_key ifam string) f
+      <+> (gen_couple feed_key) c
+      <+> (gen_descend feed_key) d)
+  in
+  Hasher.SHA256.feeder_to_hasher feeder
 
 let get var key env =
   match p_getenv env (var ^ "_" ^ key) with

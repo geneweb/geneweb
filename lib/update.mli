@@ -95,10 +95,10 @@ val def_error : config -> base -> person Def.error -> unit
 val error : config -> update_error -> 'exn
 val error_locked : config -> 'exn
 val error_digest : config -> 'exn
-val digest_person : (iper, key, string) gen_person -> Digest.t
+val digest_person : (iper, key, string) gen_person -> string
 
 val digest_family :
-  (key, _, string) gen_family * key gen_couple * key gen_descend -> Digest.t
+  (key, ifam, string) gen_family * key gen_couple * key gen_descend -> string
 
 val reconstitute_date : config -> string -> date option
 val print_someone : config -> base -> person -> unit
