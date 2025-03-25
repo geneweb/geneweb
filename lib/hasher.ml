@@ -79,18 +79,23 @@ module Make (H : Digestif.S) = struct
   type 'a feeder = 'a -> ctx -> ctx
   type 'a hasher = 'a -> string
 
+  let ( <+> ) f g ctx = f (g ctx)
+
+  (* This function is used to add a seed in the hashing context before
+     returning a digest to ensure that the value is not reproducible.
+     The seed is generated during the startup process. *)
+  let seeder =
+    Random.self_init ();
+    let s = string_of_int @@ Random.bits () in
+    fun ctx -> H.feed_string ctx s
+
   let feeder_to_hasher f u =
     let ctx = H.init () in
-    H.to_hex @@ H.get @@ f u ctx
+    H.to_hex @@ H.get @@ seeder @@ f u ctx
 
   let string s ctx = H.feed_string ctx s
-  let int i ctx = H.feed_string ctx @@ string_of_int i
-
-  let bool b ctx =
-    let s = if b then "true" else "false" in
-    H.feed_string ctx s
-
-  let ( <+> ) f g ctx = f (g ctx)
+  let int i = string @@ string_of_int i
+  let bool b = string (if b then "true" else "false")
   let list f l ctx = List.fold_left (fun ctx a -> f a ctx) ctx l
   let array f l ctx = Array.fold_left (fun ctx a -> f a ctx) ctx l
   let pair f g (x, y) = f x <+> g y
