@@ -37,6 +37,7 @@ depends: [
   "uutf"
   "yojson"
   "zarith"
+  "digestif"
   "utop" {dev}
   "odoc" {with-doc}
 ]

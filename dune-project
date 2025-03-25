@@ -45,6 +45,7 @@
     uutf
     yojson
     zarith
+    digestif
     (utop :dev)
   )
   (depopts ancient)
