@@ -19,6 +19,7 @@
             yojson
             markup
             uri
-            wserver)
+            wserver
+            digestif)
  (modules_without_implementation templAst)
 )
