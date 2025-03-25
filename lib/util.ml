@@ -1,65 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let escape_aux count blit str =
-  let strlen = String.length str in
-  let rec loop acc i =
-    if i < strlen then loop (acc + count (String.unsafe_get str i)) (i + 1)
-    else if acc = strlen then str
-    else
-      let buf = Bytes.create acc in
-      let rec loop istr ibuf =
-        if istr = strlen then Bytes.unsafe_to_string buf
-        else blit buf ibuf istr loop (String.unsafe_get str istr)
-      in
-      loop 0 0
-  in
-  loop 0 0
-
-(** [escape_html str] replaces '&', '"', '<' and '>'
-    with their corresponding character entities (using entity number) *)
-let escape_html s : Adef.escaped_string =
-  escape_aux
-    (function '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *) | _ -> 1)
-    (fun buf ibuf istr loop -> function
-      | '&' ->
-          Bytes.blit_string "&#38;" 0 buf ibuf 5;
-          loop (istr + 1) (ibuf + 5)
-      | '"' ->
-          Bytes.blit_string "&#34;" 0 buf ibuf 5;
-          loop (istr + 1) (ibuf + 5)
-      | '\'' ->
-          Bytes.blit_string "&#39;" 0 buf ibuf 5;
-          loop (istr + 1) (ibuf + 5)
-      | '<' ->
-          Bytes.blit_string "&#60;" 0 buf ibuf 5;
-          loop (istr + 1) (ibuf + 5)
-      | '>' ->
-          Bytes.blit_string "&#62;" 0 buf ibuf 5;
-          loop (istr + 1) (ibuf + 5)
-      | c ->
-          Bytes.unsafe_set buf ibuf c;
-          loop (istr + 1) (ibuf + 1))
-    s
-  |> Adef.escaped
-
+let escape_html s : Adef.escaped_string = Html.escape s |> Adef.escaped
 let esc x = (escape_html x :> Adef.safe_string)
-
-(** [escape_attribute str] only escapes double quote and ampersand.
-    Since we will return normalized HTML, ['"'] should be the only
-    dangerous character here. *)
-let escape_attribute =
-  escape_aux
-    (function '&' | '"' -> 5 (* "&#xx;" *) | _ -> 1)
-    (fun buf ibuf istr loop -> function
-      | '&' ->
-          Bytes.blit_string "&#38;" 0 buf ibuf 5;
-          loop (istr + 1) (ibuf + 5)
-      | '"' ->
-          Bytes.blit_string "&#34;" 0 buf ibuf 5;
-          loop (istr + 1) (ibuf + 5)
-      | c ->
-          Bytes.unsafe_set buf ibuf c;
-          loop (istr + 1) (ibuf + 1))
 
 (* aswer the question "should we show p's names and other private stuffs?";
    takes into account if you are a wizard or not *)
@@ -475,7 +417,7 @@ let safe_html_allowed_tags =
 
    Markup.ml automatically return tags names in lowercase.
 *)
-let safe_html_aux escape_text s =
+let safe_html_aux s =
   let stack = ref [] in
   let make_safe = function
     | `Start_element (name, attrs) ->
@@ -508,14 +450,9 @@ let safe_html_aux escape_text s =
         | _ -> failwith (__FILE__ ^ " " ^ string_of_int __LINE__))
     | e -> e
   in
-  Markup.string s
-  |> Markup.parse_html ~context:(`Fragment "body")
-  |> Markup.signals |> Markup.map make_safe
-  |> Markup.write_html ~escape_text ~escape_attribute
-  |> Markup.to_string
+  Html.map make_safe s
 
-let safe_html s =
-  Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
+let safe_html s = Adef.safe (safe_html_aux s)
 
 (* Version 1 => moche *)
 let clean_html_tags s l =
