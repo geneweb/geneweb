@@ -524,7 +524,6 @@ let is_reorg_base bname =
 
 let init bname =
   Secure.add_assets Filename.current_dir_name;
-
   reorg := !reorg || is_reorg_base bname;
   if !reorg then (
     config := Default.config;
@@ -550,7 +549,10 @@ let init bname =
     images_d := Legacy.images_d)
 
 let init_etc bname =
-  if !init_done.status && bname = !init_done.bname then ()
+  if
+    (!init_done.status && bname = !init_done.bname)
+    || not (Sys.file_exists (!bpath bname))
+  then ()
   else init_done := { status = true; bname };
   let fname = Filename.concat (!bpath bname) "caches" in
   let bdir = !bpath bname in
