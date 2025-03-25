@@ -311,18 +311,27 @@ module Make (H : Digestif.S) = struct
           first_names_aliases;
           surnames_aliases;
           titles;
+          rparents;
+          related;
           occupation;
           sex = s;
           access = a;
           birth;
           birth_place;
           birth_note;
+          birth_src;
           baptism;
           baptism_place;
+          baptism_note;
           baptism_src;
           death = d;
+          death_place;
           death_note;
           death_src;
+          burial = b;
+          burial_place;
+          burial_note;
+          burial_src;
           pevents;
           notes;
           psources;
@@ -339,17 +348,26 @@ module Make (H : Digestif.S) = struct
     <+> (list feed_string) surnames_aliases
     <+> (list @@ gen_title feed_string) titles
     <+> feed_string occupation
+    <+> (list @@ gen_relation feed_pers feed_string) rparents
+    <+> (list feed_pers) related
     <+> sex s
     <+> access a
     <+> cdate birth
     <+> feed_string birth_place
     <+> feed_string birth_note
+    <+> feed_string birth_src
     <+> cdate baptism
     <+> feed_string baptism_place
+    <+> feed_string baptism_note
     <+> feed_string baptism_src
     <+> death d
+    <+> feed_string death_place
     <+> feed_string death_note
     <+> feed_string death_src
+    <+> burial b
+    <+> feed_string burial_place
+    <+> feed_string burial_note
+    <+> feed_string burial_src
     <+> (list @@ gen_pers_event feed_pers feed_string) pevents
     <+> feed_string notes
     <+> feed_string psources
