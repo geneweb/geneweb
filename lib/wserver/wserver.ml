@@ -147,26 +147,49 @@ let string_of_sockaddr = function
 
 let sockaddr_of_string s = Unix.ADDR_UNIX s
 
-let treat_connection tmout callback addr fd =
+let timeout_handler ~timeout _ =
+  try
+    if !printing_state = Nothing then http Def.OK;
+    if !printing_state <> Contents then (
+      output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
+      printnl ();
+      printnl ();
+      printf "<head><title>Time out</title></head>\n";
+      printf "<body>");
+    printf "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>"
+      timeout;
+    wflush ();
+    exit 0
+  with Sys_error _ ->
+    (* The client may close the connection before reaching the time limit.
+       In this case, we cannot print the timeout message to the socket but
+       this is not an error and we must exit normally, even in no-fork mode. *)
+    exit 0
+
+(* Set a Unix signal with a timeout around the execution of the function [f].
+   The signal is properly cleared even if the function [f] raises an exception.
+
+   Since a process can have only one active alarm signal at a time, this
+   function should be used only once per fork of the web server.
+
+   This function is supported only on Unix. *)
+let with_timeout ~timeout handler f =
+  assert Sys.unix;
+  let (_ : Sys.signal_behavior) =
+    Sys.signal Sys.sigalrm (Sys.Signal_handle handler)
+  in
+  let finally () =
+    let (_ : int) = Unix.alarm 0 in
+    ()
+  in
+  let g () =
+    let (_ : int) = Unix.alarm timeout in
+    f ()
+  in
+  Fun.protect ~finally g
+
+let treat_connection callback addr fd =
   printing_state := Nothing;
-  if Sys.unix && tmout > 0 then (
-    ignore @@ Sys.signal Sys.sigalrm
-    @@ Sys.Signal_handle
-         (fun _ ->
-           if !printing_state = Nothing then http Def.OK;
-           if !printing_state <> Contents then (
-             output_string !wserver_oc
-               "Content-type: text/html; charset=iso-8859-1";
-             printnl ();
-             printnl ();
-             printf "<head><title>Time out</title></head>\n";
-             printf "<body>");
-           printf
-             "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>"
-             tmout;
-           wflush ();
-           exit 0);
-    ignore @@ Unix.alarm tmout);
   let request, path, query =
     let request, query =
       let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
@@ -186,6 +209,12 @@ let treat_connection tmout callback addr fd =
     (request, path, query)
   in
   callback (addr, request) path query
+
+let treat_connection_with_timeout ~timeout callback addr fd =
+  if Sys.unix && timeout > 0 then
+    with_timeout ~timeout (timeout_handler ~timeout) @@ fun () ->
+    treat_connection callback addr fd
+  else treat_connection callback addr fd
 
 let buff = Bytes.create 1024
 
@@ -262,7 +291,7 @@ let client_connection tmout callback addr t =
   let oc = Unix.out_channel_of_descr t in
   wserver_oc := oc;
   Fun.protect ~finally:close_connection @@ fun () ->
-  treat_connection tmout callback addr t
+  treat_connection_with_timeout ~timeout:tmout callback addr t
 
 let accept_connection tmout max_clients callback s =
   let () = wait_available max_clients s in
@@ -347,7 +376,7 @@ let f syslog addr_opt port tmout max_clients g =
       let fd = Unix.openfile !sock_in [ Unix.O_RDONLY ] 0 in
       let oc = open_out_bin !sock_out in
       wserver_oc := oc;
-      ignore (treat_connection tmout g addr fd);
+      ignore (treat_connection_with_timeout ~timeout:tmout g addr fd);
       exit 0
   | None ->
       check_stopping ();
