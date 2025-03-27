@@ -3,6 +3,7 @@
 (** Http response status *)
 type httpStatus =
   | OK (* 200 *)
+  | Moved_Permanently (* 301 *)
   | Moved_Temporarily (* 302 *)
   | Bad_Request (* 400 *)
   | Unauthorized (* 401 *)
