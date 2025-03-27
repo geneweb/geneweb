@@ -304,3 +304,8 @@ let print conf base specify unknown =
         search_approx_key conf base sn >>= fun () ->
         search_partial_key conf base sn >>= fun () -> unknown conf sn
   | None, None -> Hutil.incorrect_request conf
+
+let search_by_sosa_in_env conf base =
+  let ( >>= ) = Option.bind in
+  Util.p_getenv conf.Config.env "surname" >>= fun str ->
+  Sosa.of_string str >>= fun sosa -> search_by_sosa ~conf ~base ~sosa

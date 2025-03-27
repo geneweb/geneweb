@@ -46,3 +46,5 @@ val persons_starting_with :
   surname_prefix:string ->
   limit:int ->
   Gwdb.iper list
+
+val search_by_sosa_in_env : Config.config -> Gwdb.base -> Gwdb.person option
