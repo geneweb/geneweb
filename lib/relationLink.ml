@@ -754,60 +754,122 @@ let print_relation_no_dag conf base po ip1 ip2 =
       print_relation_ok conf base info
   | _ -> Hutil.incorrect_request conf
 
+module RelData = struct
+  type t = {
+    descendants : Gwdb.IperSet.t;
+    depths_1 : Ext_int.Set.t;
+    depths_2 : Ext_int.Set.t;
+  }
+
+  let empty =
+    {
+      descendants = Gwdb.IperSet.empty;
+      depths_1 = Ext_int.Set.empty;
+      depths_2 = Ext_int.Set.empty;
+    }
+
+  let get_depths_1 { depths_1 } = depths_1
+  let get_depths_2 { depths_2 } = depths_2
+
+  let add_depth_1 d ({ depths_1 } as data) =
+    { data with depths_1 = Ext_int.Set.add d depths_1 }
+
+  let add_depth_2 d ({ depths_2 } as data) =
+    { data with depths_2 = Ext_int.Set.add d depths_2 }
+end
+
+let all_ipers_between ~base ~store ~start_iper ~end_iper ~max_depths ~get_depths
+    ~add_depth =
+  let max_depths = Ext_int.Set.of_list max_depths in
+  let max_depth =
+    Option.value ~default:0 (Ext_int.Set.max_elt_opt max_depths)
+  in
+  let ancestors = Queue.create () in
+  Queue.push (start_iper, 0) ancestors;
+  let data = Gwdb.Marker.get store start_iper in
+  Gwdb.Marker.set store start_iper (add_depth 0 data);
+  let push_parent ancestor depth ancestor_parent =
+    let ({ RelData.descendants; _ } as data) =
+      Gwdb.Marker.get store ancestor_parent
+    in
+    let descendants = Gwdb.IperSet.add ancestor descendants in
+    if not (Ext_int.Set.mem (depth + 1) (get_depths data)) then
+      Queue.push (ancestor_parent, depth + 1) ancestors;
+    let data = add_depth (depth + 1) { data with descendants } in
+    Gwdb.Marker.set store ancestor_parent data
+  in
+  let rec loop () =
+    if not (Queue.is_empty ancestors) then
+      let ip, depth = Queue.pop ancestors in
+      if depth < max_depth then (
+        let p = Gwdb.poi base ip in
+        let fam = Option.map (Gwdb.foi base) @@ Gwdb.get_parents p in
+        let fath = Option.map Gwdb.get_father fam in
+        let moth = Option.map Gwdb.get_mother fam in
+        Option.iter (push_parent ip depth) fath;
+        Option.iter (push_parent ip depth) moth;
+        loop ())
+  in
+  loop ();
+  let rec follow_descendants result remaining_descendants depths =
+    if Gwdb.IperSet.is_empty remaining_descendants then result
+    else
+      let result, remaining_descendants =
+        Gwdb.IperSet.fold
+          (fun iper (res, des) ->
+            let ({ RelData.descendants; _ } as data) =
+              Gwdb.Marker.get store iper
+            in
+            let dep = Ext_int.Set.inter depths (get_depths data) in
+            if not (Ext_int.Set.is_empty dep) then
+              (Gwdb.IperSet.add iper res, Gwdb.IperSet.union descendants des)
+            else (res, des))
+          remaining_descendants
+          (result, Gwdb.IperSet.empty)
+      in
+      let depths = Ext_int.Set.map (fun depth -> depth - 1) depths in
+      follow_descendants result remaining_descendants depths
+  in
+  let set =
+    follow_descendants Gwdb.IperSet.empty
+      (Gwdb.IperSet.singleton end_iper)
+      max_depths
+  in
+  if not (Gwdb.IperSet.is_empty set) then Gwdb.IperSet.add end_iper set else set
+
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
   let ia = Gwdb.get_iper a in
-  let add_branches dist set n ip l =
-    let b = find_first_branch conf base dist ia l ip Neuter in
-    let rec loop set n b =
-      if n > 100 then raise Exit
-      else
-        match b with
-        | Some b ->
-            let set =
-              List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
-            in
-            loop set (n + 1)
-              (find_next_branch conf base dist ia (Gwdb.get_sex a) b)
-        | None -> (set, n)
-    in
-    loop set n b
+  let store = Gwdb.iper_marker (Gwdb.ipers base) RelData.empty in
+  let s1 =
+    all_ipers_between ~base ~store ~start_iper:ip1 ~end_iper:ia ~max_depths:l1
+      ~get_depths:RelData.get_depths_1 ~add_depth:RelData.add_depth_1
   in
-  try
-    let set =
-      List.fold_left
-        (fun set l1 ->
-          List.fold_left
-            (fun set l2 ->
-              let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
-              let set, n = add_branches dist set 0 ip1 l1 in
-              let set, _ = add_branches dist set n ip2 l2 in
-              set)
-            set l2)
-        (Dag.Pset.add ia Dag.Pset.empty)
-        l1
-    in
-    let spl =
-      List.fold_right
-        (fun (ip, s) spl ->
-          match Util.find_person_in_env conf base s with
-          | Some sp -> (ip, (Gwdb.get_iper sp, None)) :: spl
-          | None -> spl)
-        [ (ip1, "3"); (ip2, "4") ]
-        []
-    in
-    let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
-    let vbar_txt _ = Adef.escaped "" in
-    let invert =
-      match Util.p_getenv conf.Config.env "invert" with
-      | Some "on" -> true
-      | _ -> false
-    in
-    let page_title =
-      Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
-    in
-    DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
-      page_title (Adef.escaped "")
-  with Exit -> Hutil.incorrect_request conf
+  let s2 =
+    all_ipers_between ~base ~store ~start_iper:ip2 ~end_iper:ia ~max_depths:l2
+      ~get_depths:RelData.get_depths_2 ~add_depth:RelData.add_depth_2
+  in
+  let set = Gwdb.IperSet.union s1 s2 |> Gwdb.IperSet.elements in
+  let spl =
+    List.fold_right
+      (fun (ip, s) spl ->
+        match Util.find_person_in_env conf base s with
+        | Some sp -> (ip, (Gwdb.get_iper sp, None)) :: spl
+        | None -> spl)
+      [ (ip1, "3"); (ip2, "4") ]
+      []
+  in
+  let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
+  let vbar_txt _ = Adef.escaped "" in
+  let invert =
+    match Util.p_getenv conf.Config.env "invert" with
+    | Some "on" -> true
+    | _ -> false
+  in
+  let page_title =
+    Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+  in
+  DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
+    page_title (Adef.escaped "")
 
 let int_list s =
   let rec loop i n =
