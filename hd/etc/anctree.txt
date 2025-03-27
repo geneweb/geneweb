@@ -20,7 +20,8 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container%if;(e.v>3 and e.t!="A" and e.t!="C"))-fluid%end; pb-6">
+%let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
+<div class="container%if;(e_v>3 and e.t!="A" and e.t!="C"))-fluid%end; pb-6">
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar

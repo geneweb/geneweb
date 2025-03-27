@@ -4528,12 +4528,15 @@ let print_foreach conf base print_ast eval_expr =
             let children =
               !GWPARAM_ITL.get_children base baseprefix ifam ifath imoth
             in
-            List.iter
-              (fun (((p, _) as ep), baseprefix) ->
-                let env = ("#loop", Vint 0) :: env in
-                let env = ("child_link", Vind p) :: env in
-                let env = ("baseprefix", Vstring baseprefix) :: env in
-                let env = ("p_link", Vbool true) :: env in
+            List.iteri
+              (fun i (((p, _) as ep), baseprefix) ->
+                let env =
+                  ("#loop", Vint 0) :: ("child_link", Vind p)
+                  :: ("baseprefix", Vstring baseprefix)
+                  :: ("p_link", Vbool true)
+                  :: ("last", Vbool (i = List.length children - 1))
+                  :: env
+                in
                 List.iter (print_ast env ep) al)
               children
         | _ ->
@@ -4983,13 +4986,17 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_parent env al ((a, _) as ep) =
     match get_parents a with
     | Some ifam ->
-        let cpl = foi base ifam in
-        Array.iter
-          (fun iper ->
+        let parents = get_parent_array (foi base ifam) in
+        Array.iteri
+          (fun i iper ->
             let p = pget conf base iper in
-            let env = ("parent", Vind p) :: env in
+            let env =
+              ("parent", Vind p)
+              :: ("last", Vbool (i = Array.length parents - 1))
+              :: env
+            in
             List.iter (print_ast env ep) al)
-          (get_parent_array cpl)
+          parents
     | None -> ()
   in
 
