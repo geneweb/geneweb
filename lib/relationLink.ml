@@ -788,13 +788,17 @@ let rec max_int_of_list =
 let all_ipers_between ~conf ~base ~store ~start_iper ~end_iper ~max_depths
     ~get_depths ~add_depth =
   let max_depths = Ext_int.Set.of_list max_depths in
-  let max_depth = Option.value ~default:0 (Ext_int.Set.max_elt_opt (max_depths)) in
+  let max_depth =
+    Option.value ~default:0 (Ext_int.Set.max_elt_opt max_depths)
+  in
   let ancestors = Queue.create () in
   Queue.push (start_iper, 0) ancestors;
   let data = Gwdb.Marker.get store start_iper in
   Gwdb.Marker.set store start_iper (add_depth 0 data);
   let push_parent ancestor depth ancestor_parent =
-    let ({ RelData.descendants; _ } as data) = Gwdb.Marker.get store ancestor_parent in
+    let ({ RelData.descendants; _ } as data) =
+      Gwdb.Marker.get store ancestor_parent
+    in
     let descendants = Gwdb.IperSet.add ancestor descendants in
     if not (Ext_int.Set.mem (depth + 1) (get_depths data)) then
       Queue.push (ancestor_parent, depth + 1) ancestors;
