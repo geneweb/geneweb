@@ -130,7 +130,7 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
       home_errors.title = nb_errors +" error(s)!";
       home_errors.classList.remove("d-none");
     }
-    if (errors_list != "") {
+    if (errors_list != "\u{000A}") {
       home_errors.title = home_errors.title + errors_list + ".";
     }
   }
