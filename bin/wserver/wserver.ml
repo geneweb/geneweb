@@ -2,8 +2,6 @@
 
 let connection_closed = ref false
 let eprintf = Printf.eprintf
-let sock_in = ref "wserver.sin"
-let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
 let cgi = ref false
 let wserver_sock = ref Unix.stdout
@@ -149,12 +147,6 @@ let get_request_and_content strm =
   in
   (request, Adef.encoded content)
 
-let string_of_sockaddr = function
-  | Unix.ADDR_UNIX s -> s
-  | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
-
-let sockaddr_of_string s = Unix.ADDR_UNIX s
-
 let request_timeout () =
   if !printing_state = Nothing then http Def.Gateway_Timeout
 
@@ -173,15 +165,14 @@ let set_on_timeout timeout_f = on_timeout := timeout_f
 let timeout_wrapper = ref (fun tmout -> !on_timeout tmout)
 
 let set_timeout tmout =
-  if Sys.unix then (
-    if tmout > 0 then
-      ignore @@ Sys.signal Sys.sigalrm
-      @@ Sys.Signal_handle
-           (fun _ ->
-             !timeout_wrapper tmout;
-             wflush ();
-             exit 0);
-    ignore @@ Unix.alarm tmout)
+  if tmout > 0 then
+    ignore @@ Sys.signal Sys.sigalrm
+    @@ Sys.Signal_handle
+         (fun _ ->
+           !timeout_wrapper tmout;
+           wflush ();
+           exit 0);
+  ignore @@ Unix.alarm tmout
 
 let treat_connection tmout callback addr fd =
   printing_state := Nothing;
@@ -212,25 +203,6 @@ let treat_connection tmout callback addr fd =
   callback (addr, request) path query;
   Wserver_log.log_request_infos ~request ~path ~resp_status:!resp_status
     ~length:(PrintingLen.get_value ())
-
-let buff = Bytes.create 1024
-
-let copy_what_necessary t oc =
-  let strm =
-    let len = ref 0 in
-    let i = ref 0 in
-    Stream.from (fun _ ->
-        if !i >= !len then (
-          len := Unix.read t buff 0 (Bytes.length buff);
-          i := 0;
-          if !len > 0 then output oc buff 0 !len);
-        if !len = 0 then None
-        else (
-          incr i;
-          Some (Bytes.get buff (!i - 1))))
-  in
-  let _ = get_request_and_content strm in
-  ()
 
 let rec list_remove x = function
   | [] -> failwith "list_remove"
@@ -273,9 +245,6 @@ let wait_available max_clients s =
       done
   | None -> ()
 
-let skip_possible_remaining_chars fd =
-  if not !connection_closed then skip_possible_remaining_chars fd
-
 let check_stopping () =
   if Sys.file_exists !stop_server then (
     flush stdout;
@@ -289,125 +258,56 @@ let accept_connection tmout max_clients callback s =
   let t, addr = Unix.accept s in
   check_stopping ();
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
-  if Sys.unix then (
-    match try Some (Unix.fork ()) with _ -> None with
-    | Some 0 -> (
-        try
-          if max_clients = None && Unix.fork () <> 0 then exit 0;
-          Unix.close s;
-          wserver_sock := t;
-          wserver_oc := Unix.out_channel_of_descr t;
-          treat_connection tmout callback addr t;
-          close_connection ();
-          exit 0
-        with
-        | Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0
-        | e -> raise e)
-    | Some id ->
-        Unix.close t;
-        if max_clients = None then
-          let _ = Unix.waitpid [] id in
-          ()
-        else pids := id :: !pids
-    | None ->
-        Unix.close t;
-        eprintf "Fork failed\n";
-        flush stderr)
-  else
-    let oc = open_out_bin !sock_in in
-    let cleanup () = try close_out oc with _ -> () in
-    (try copy_what_necessary t oc with
-    | Unix.Unix_error (_, _, _) -> ()
-    | exc ->
-        cleanup ();
-        raise exc);
-    cleanup ();
-    (let pid =
-       let env =
-         Array.append (Unix.environment ())
-           [| "WSERVER=" ^ string_of_sockaddr addr |]
-       in
-       let args = Sys.argv in
-       Unix.create_process_env Sys.argv.(0) args env Unix.stdin Unix.stdout
-         Unix.stderr
-     in
-     let _ = Unix.waitpid [] pid in
-     let ic = open_in_bin !sock_in in
-     close_in ic);
-    let cleanup () =
-      (try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ());
-      skip_possible_remaining_chars t;
-      (try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ());
-      try Unix.close t with _ -> ()
-    in
-    (try
-       let ic = open_in_bin !sock_out in
-       let cleanup () = try close_in ic with _ -> () in
-       (try
-          let rec loop () =
-            let len = input ic buff 0 (Bytes.length buff) in
-            if len = 0 then ()
-            else (
-              (let rec loop_write i =
-                 let olen = Unix.write t buff i (len - i) in
-                 if i + olen < len then loop_write (i + olen)
-               in
-               loop_write 0);
-              loop ())
-          in
-          loop ()
-        with
-       | Unix.Unix_error (_, _, _) -> ()
-       | exc ->
-           cleanup ();
-           raise exc);
-       cleanup ()
-     with
-    | Unix.Unix_error (_, _, _) -> ()
-    | exc ->
-        cleanup ();
-        raise exc);
-    cleanup ()
+  match try Some (Unix.fork ()) with _ -> None with
+  | Some 0 -> (
+      try
+        if max_clients = None && Unix.fork () <> 0 then exit 0;
+        Unix.close s;
+        wserver_sock := t;
+        wserver_oc := Unix.out_channel_of_descr t;
+        treat_connection tmout callback addr t;
+        close_connection ();
+        exit 0
+      with
+      | Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0
+      | e -> raise e)
+  | Some id ->
+      Unix.close t;
+      if max_clients = None then
+        let _ = Unix.waitpid [] id in
+        ()
+      else pids := id :: !pids
+  | None ->
+      Unix.close t;
+      eprintf "Fork failed\n";
+      flush stderr
 
 let f ~syslog ~addr ~port ~timeout ~max_clients ~handler =
   let g = handler in
   let tmout = timeout in
   let addr_opt = addr in
-  match
-    if Sys.unix then None
-    else try Some (Sys.getenv "WSERVER") with Not_found -> None
-  with
-  | Some s ->
-      let addr = sockaddr_of_string s in
-      let fd = Unix.openfile !sock_in [ Unix.O_RDONLY ] 0 in
-      let oc = open_out_bin !sock_out in
-      wserver_oc := oc;
-      ignore (treat_connection tmout g addr fd);
-      exit 0
-  | None ->
-      check_stopping ();
-      let addr =
-        match addr_opt with
-        | None -> Unix.inet6_addr_any
-        | Some addr -> (
-            try Unix.inet_addr_of_string addr
-            with Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0))
-      in
-      let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
-      Unix.setsockopt s Unix.IPV6_ONLY false;
-      Unix.setsockopt s Unix.SO_REUSEADDR true;
-      Unix.bind s (Unix.ADDR_INET (addr, port));
-      Unix.listen s 4;
-      let tm = Unix.localtime (Unix.time ()) in
-      eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
-        (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
-        tm.Unix.tm_hour tm.Unix.tm_min port;
-      flush stderr;
-      while true do
-        try accept_connection tmout max_clients g s with
-        | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-            syslog `LOG_INFO (Printexc.to_string e)
-        | Sys_error msg as e when msg = "Broken pipe" ->
-            syslog `LOG_INFO (Printexc.to_string e)
-        | e -> raise e
-      done
+  check_stopping ();
+  let addr =
+    match addr_opt with
+    | None -> Unix.inet6_addr_any
+    | Some addr -> (
+        try Unix.inet_addr_of_string addr
+        with Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0))
+  in
+  let s = Unix.socket Unix.PF_INET6 Unix.SOCK_STREAM 0 in
+  Unix.setsockopt s Unix.IPV6_ONLY false;
+  Unix.setsockopt s Unix.SO_REUSEADDR true;
+  Unix.bind s (Unix.ADDR_INET (addr, port));
+  Unix.listen s 4;
+  let tm = Unix.localtime (Unix.time ()) in
+  eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n" (1900 + tm.Unix.tm_year)
+    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min port;
+  flush stderr;
+  while true do
+    try accept_connection tmout max_clients g s with
+    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
+        syslog `LOG_INFO (Printexc.to_string e)
+    | Sys_error msg as e when msg = "Broken pipe" ->
+        syslog `LOG_INFO (Printexc.to_string e)
+    | e -> raise e
+  done

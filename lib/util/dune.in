@@ -12,7 +12,7 @@
    re
    unix
    uucp
-   uunf
+   uunf.string
    uutf
    zarith
    %%%SYSLOG_PKG%%%

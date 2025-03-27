@@ -1,8 +1,4 @@
-plugins/forum/plugin_forum.cppo.ml
 bin/ged2gwb/ged2gwb_lib.ml
 bin/gwd/gwd.ml
 lib/util/log.ml
-bin/gwd/request.ml
-bin/setup/setup.ml
-lib/system_util/files.ml
 lib/gwlib.ml

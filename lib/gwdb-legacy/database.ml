@@ -602,7 +602,7 @@ let make_visible_record_access perm bname persons =
     let visible =
       try
         let ic = Secure.open_in fname in
-        if Sys.unix && !verbose then (
+        if !verbose then (
           Printf.eprintf "*** read restrict file\n";
           flush stderr);
         let visible = input_value ic in
@@ -619,7 +619,7 @@ let make_visible_record_access perm bname persons =
         if perm = RDONLY then raise (HttpExn (Forbidden, __LOC__))
         else
           let oc = Secure.open_out fname in
-          if Sys.unix && !verbose then (
+          if !verbose then (
             Printf.eprintf "*** write restrict file\n";
             flush stderr);
           output_value oc visible;
