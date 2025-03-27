@@ -778,15 +778,8 @@ module RelData = struct
     { data with depths_2 = Ext_int.Set.add d depths_2 }
 end
 
-let rec max_int_of_list =
-  let rec aux i = function
-    | x :: xs -> if x > i then aux x xs else aux i xs
-    | [] -> i
-  in
-  aux 0
-
-let all_ipers_between ~conf ~base ~store ~start_iper ~end_iper ~max_depths
-    ~get_depths ~add_depth =
+let all_ipers_between ~base ~store ~start_iper ~end_iper ~max_depths ~get_depths
+    ~add_depth =
   let max_depths = Ext_int.Set.of_list max_depths in
   let max_depth =
     Option.value ~default:0 (Ext_int.Set.max_elt_opt max_depths)
@@ -848,14 +841,12 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
   let ia = Gwdb.get_iper a in
   let store = Gwdb.iper_marker (Gwdb.ipers base) RelData.empty in
   let s1 =
-    all_ipers_between ~conf ~base ~store ~start_iper:ip1 ~end_iper:ia
-      ~max_depths:l1 ~get_depths:RelData.get_depths_1
-      ~add_depth:RelData.add_depth_1
+    all_ipers_between ~base ~store ~start_iper:ip1 ~end_iper:ia ~max_depths:l1
+      ~get_depths:RelData.get_depths_1 ~add_depth:RelData.add_depth_1
   in
   let s2 =
-    all_ipers_between ~conf ~base ~store ~start_iper:ip2 ~end_iper:ia
-      ~max_depths:l2 ~get_depths:RelData.get_depths_2
-      ~add_depth:RelData.add_depth_2
+    all_ipers_between ~base ~store ~start_iper:ip2 ~end_iper:ia ~max_depths:l2
+      ~get_depths:RelData.get_depths_2 ~add_depth:RelData.add_depth_2
   in
   let set = Gwdb.IperSet.union s1 s2 |> Gwdb.IperSet.elements in
   let spl =
