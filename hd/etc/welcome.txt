@@ -465,7 +465,7 @@ fr: Autour de l'arbre
 en: Obtain a <code class="mb-1">Friend</code> access
 fr: Obtenir un accès <code class="mb-1">Ami</code>
 ]</a>
-      <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/collect/description/383016-j-campagne-de-dons-2024-cb-uniquement?header=%2Fpage%2F350802-cotiser-adherer-a-lassociation">%nn;
+      <a role="button" class="btn btn-outline-primary" href="https://asso.roglo.eu/collect/description/383016-j-campagne-de-dons-2024-cb-uniquement">%nn;
 [
 en: Contribute/join
 fr: Cotiser/adhérer
