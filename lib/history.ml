@@ -390,6 +390,10 @@ let rec eval_var conf base env _ _ = function
       match get_env "info" env with
       | Vinfo (_, _, _, HI_notes (_, _), _) -> VVbool true
       | _ -> VVbool false)
+  | [ "is_person" ] -> (
+      match get_env "info" env with
+      | Vinfo (_, _, _, HI_ind _p, _) -> VVbool true
+      | _ -> VVbool false)
   | [ "key" ] -> (
       match get_env "info" env with
       | Vinfo (_, _, _, _, s) -> VVstring (possibly_highlight env s)
@@ -475,6 +479,11 @@ and eval_person_field_var conf base env p = function
   | [ "is_invisible" ] ->
       let conf = { conf with wizard = false; friend = false } in
       VVbool (not (Util.authorized_age conf base p))
+  | [ "is_public" ] -> VVbool (get_access p = Public)
+  | [ "is_semi_public" ] -> VVbool (get_access p = SemiPublic)
+  | [ "is_private" ] -> VVbool (get_access p = Private)
+  | [ "has_titles" ] -> VVbool (get_titles p <> [])
+  | [ "access_status" ] -> VVstring (Util.access_status p)
   | [ "title" ] -> safe_val (person_title conf base p)
   | [] ->
       VVstring

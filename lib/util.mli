@@ -1,5 +1,4 @@
 (* Copyright (c) 1998-2007 INRIA *)
-
 open Config
 open Def
 open Gwdb
@@ -100,7 +99,9 @@ val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
+val start_with : string -> int -> string -> bool
 val start_with_vowel : config -> string -> bool
+val access_status : person -> string
 
 val acces_n :
   config -> base -> Adef.escaped_string -> person -> Adef.escaped_string
@@ -139,20 +140,20 @@ val is_public : config -> base -> person -> bool
     - IfTitle and has titles or
     - is_old_person) *)
 
-val is_semi_public : config -> base -> person -> bool
-(** tells if person is semi_public
-    - access = SemiPublic *)
+val private_txt : config -> string -> string
 
-val pget : config -> base -> iper -> person
-(** Returns person with giving id from the base.
+val pget_opt : config -> base -> iper -> person option
+(** Returns person option with giving id from the base.
     Wrapper around `Gwdb.poi` defined such as:
-    - if `conf.use_restrict` (option defined in .gwf file):
+    - Some ip: if user have permissions or `use_restrict` disabled.
+    - None: if `conf.use_restrict` (option defined in .gwf file):
       checks that the user has enought rights to see
       corresponding person (see `authorized_age`).
       If the user does not have enought permissions, returns
-      an empty person.
-    - just an alias to `Gwdb.poi` if `use_restrict` disabled.
-*)
+      None. *)
+
+val pget : config -> base -> iper -> person
+(** Value of [pget_opt], map None to empty_person *)
 
 val string_gen_person :
   base -> (iper, iper, istr) gen_person -> (iper, iper, string) gen_person
@@ -166,7 +167,6 @@ val gen_person_text :
   ?escape:bool ->
   ?html:bool ->
   ?sn:bool ->
-  ?chk:bool ->
   ?p_first_name:(base -> person -> string) ->
   ?p_surname:(base -> person -> string) ->
   config ->
@@ -180,8 +180,6 @@ val gen_person_text :
   or access to them is denied returns "x x"
   - if [html=false], doesn't encapsulates description in HTML tag <em>.
   - if [sn=false], doesn't display surname
-  - if [chk=false], returns HTML description even if person's names are hiden
-    or access to them is denied (don't print "x x")
 *)
 
 val gen_person_title_text :
@@ -369,10 +367,8 @@ val string_of_witness_kind_raw : witness_kind -> Adef.safe_string
 
 val relation_txt : config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format
 val string_of_decimal_num : config -> float -> string
-
-val person_exists :
-  config -> base -> string * string * int -> bool * string * string
-
+val person_exists : config -> base -> string * string * int -> bool
+val mark_if_not_public : config -> base -> string * string * int -> bool
 val husband_wife : config -> base -> person -> bool -> Adef.safe_string
 
 val find_person_in_env : config -> base -> string -> person option

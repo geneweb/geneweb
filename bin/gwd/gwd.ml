@@ -1169,15 +1169,21 @@ let make_conf from_addr request script_name env =
     {from = from_addr;
      api_mode = false;
      manitou = manitou;
-     supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
+     supervisor = supervisor;
+     wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
      debug = !debug;
      query_start = Unix.gettimeofday ();
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
+     semi_public =
+       begin try List.assoc "semi_public" base_env = "yes" with
+         Not_found -> false
+       end;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user;
      username = username;
      userkey = (Name.lower userkey);
+     userip = None;
      auth_scheme = ar.ar_scheme;
      command = ar.ar_command;
      indep_command =
@@ -1802,7 +1808,10 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-        File.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
+        try File.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
+        with Sys_error e ->
+          GwdLog.syslog `LOG_CRIT (Format.sprintf "failure creating %s (%s)\n"
+            !GWPARAM.cnt_dir e);
     end;
   Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection

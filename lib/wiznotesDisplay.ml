@@ -19,6 +19,12 @@ let read_auth_file fname bname =
           String.sub au.au_info 0 k
         with Not_found -> au.au_user
       in
+      let wizname =
+        try
+          let k = String.index wizname '|' in
+          String.sub au.au_info 0 k
+        with Not_found -> wizname
+      in
       let wizname, wizorder, islash =
         try
           let i = String.index wizname '/' in
@@ -284,6 +290,20 @@ let print_main conf base auth_file =
     let list = wizard_list_from_dir conf base in
     List.filter (fun n -> not (List.mem_assoc n wizdata)) list
   in
+  let extract_surname str =
+    let i = try String.index str '.' with Not_found -> -1 in
+    if i = -1 then Name.lower str
+    else
+      let name = String.sub str (i + 1) (String.length str - i - 1) in
+      Util.surname_without_particle base name |> Name.lower
+  in
+  let mycompare s1 s2 =
+    let s1 = extract_surname s1 in
+    let s2 = extract_surname s2 in
+    if s1 = s2 then 0 else if s1 < s2 then -1 else 1
+  in
+  let old_list = List.sort mycompare old_list in
+
   if by_alphab_order then (
     Output.print_sstring conf "<p>";
     Output.print_sstring conf (string_of_int @@ List.length wizdata);
@@ -347,6 +367,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
         Wiki.wi_mode = "NOTES";
         Wiki.wi_file_path = Notes.file_path conf base;
         Wiki.wi_person_exists = person_exists conf base;
+        Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
         Wiki.wi_always_show_link = conf.wizard || conf.friend;
       }
     in
@@ -398,6 +419,7 @@ let print_part_wiznote conf base wz s cnt0 =
       Wiki.wi_mode = "NOTES";
       Wiki.wi_file_path = file_path;
       Wiki.wi_person_exists = person_exists conf base;
+      Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
@@ -489,6 +511,7 @@ let print_mod_ok conf base =
         Wiki.wi_mode = mode;
         Wiki.wi_file_path = file_path;
         Wiki.wi_person_exists = person_exists conf base;
+        Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
         Wiki.wi_always_show_link = conf.wizard || conf.friend;
       }
     in

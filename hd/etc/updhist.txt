@@ -18,19 +18,15 @@
 <h1>[*history of updates]</h1>
 %define;search_form()
   %if;(wizard or friend)
-    <form class="form-inline mb-2" method="get" action="%action;">
+    <form class="d-flex form-inline mb-2" method="get" action="%action;">
       %hidden;
       <input type="hidden" name="m" value="HIST_SEARCH">
       %if;(e.m="HIST_SEARCH" and found)
         <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
       %end;
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
-          name="s" size="30" maxlength="40" value="%e.s.ns;">
-        <div class="input-group-append">
-          <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
-        </div>
-      </div>
+      <input type="text" class="form-control col-4" placeholder="[*search/case sensitive]0"
+        name="s" maxlength="40" value="%e.s.ns;">
+      <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
       <label class="my-1 ml-3 mr-2" for="rows">[*number of rows]</label>
       <input type="number" class="form-control" id="rows" title="[*number of rows]"
          name="k" value="%kk;" min="0" max="150" step="10">
@@ -60,24 +56,34 @@
       <tr>
         <td>%time;</td>
         <td>
-          %if;(first_name!="")
-            <!--%first_name;/%occ;/%surname;-->
-            <a href="%prefix;%person.access;">%person;</a>, %person.title;
-            %person.dates;
-            %if;(b.show_invisible="on" and wizard and person.is_invisible)
-              <img src="%images_prefix;restricted.png"%wid_hei;restricted.png; alt=" (x)">%nn;
-            %end;
-          %elseif;is_note;
-            - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
-            %if;(note.part!="");v=%note.part;%end;">
-            <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
-            </i></a>
-            %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
-              </span>%nn;
-            %end;
+        %if;is_person;
+          %if;(person.is_private)
+            <i class="fa fa-person text-danger"> </i>%nn;
+          %elseif;(person.is_semi_public)
+            <i class="fa fa-person text-warning"> </i>%nn;
+          %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
+            <i class="fa fa-person text-success"> </i>%nn;
           %else;
-            %key;
+            <i class="fa fa-person text-muted"> </i>%nn;
           %end;
+        %else;
+          &nbsp;&nbsp;
+        %end;
+        %if;(first_name!="")
+          <!--%first_name;/%occ;/%surname;-->
+          <a href="%prefix;%person.access;">%person;</a>, %person.title;
+          %person.dates;
+        %elseif;is_note;
+          - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
+          %if;(note.part!="");v=%note.part;%end;">
+          <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
+          </i></a>
+          %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
+            </span>%nn;
+          %end;
+        %else;
+          %key;
+        %end;
         </td>
         <td>
           %if;(user!="")

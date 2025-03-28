@@ -141,7 +141,7 @@
   %reset_count;%reset_count1;%reset_count2;
   <ul>
   %foreach;ancestor_level;
-    %if;(level=evar.v1+1)
+    %if;(level=evar.v1)
       %foreach;ancestor;
         %incr_count;
         %if;(count%2=1)<li>%if;(ancestor="? ?")%incr_count1;%end;%end;

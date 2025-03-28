@@ -443,6 +443,8 @@ let rec eval_variable conf = function
       let evar_l = String.split_on_char '_' evar_l in
       url_set_aux conf evar_l []
   | [ "user"; "ident" ] -> conf.user
+  | [ "user"; "index" ] -> (
+      match conf.userip with Some ip -> Gwdb.string_of_iper ip | None -> "")
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
   | [ s ] -> eval_simple_variable conf s
