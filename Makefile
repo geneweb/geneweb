@@ -25,16 +25,20 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
+lib/dev_config.ml:
+	@echo -n "Generating $@..."
+	@echo -n "let debug = " > $@
 ifeq ($(DUNE_PROFILE),dev)
-    CPPO_D=-D DEBUG
+	@echo "true" >> $@
+else
+	@echo "false" >> $@
 endif
+	@echo " Done!"
 
 %/dune: %/dune.in Makefile.config
 	@echo -n "Generating $@..." \
 	&& cat $< \
-	| cppo -n $(CPPO_D) \
 	| sed \
-	-e "s/%%%CPPO_D%%%/$(CPPO_D)/g" \
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
 	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
@@ -65,11 +69,9 @@ GENERATED_FILES_DEP = \
 	hd/etc/version.txt \
 	lib/dune \
 	test/dune \
-	lib/gwdb/dune \
-	lib/core/dune \
 	lib/gwlib.ml \
+	lib/dev_config.ml \
 	lib/util/dune \
-	lib/system_util/dune \
 	benchmark/dune \
 	bin/caches/dune \
 	bin/connex/dune \

@@ -2,3 +2,4 @@ bin/ged2gwb/ged2gwb_lib.ml
 bin/gwd/gwd.ml
 lib/util/log.ml
 lib/gwlib.ml
+lib/dev_config.ml

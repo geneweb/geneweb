@@ -1,8 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-#ifdef DEBUG
-let () = Sys.enable_runtime_warnings true
-#endif
+let () = Sys.enable_runtime_warnings Geneweb.Dev_config.debug
 
 open Geneweb
 open Config
