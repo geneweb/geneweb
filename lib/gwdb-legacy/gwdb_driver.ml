@@ -65,28 +65,42 @@ let clear_strings_array base = base.data.strings.clear_array ()
 let clear_persons_array base = base.data.persons.clear_array ()
 let clear_families_array base = base.data.families.clear_array ()
 
-let open_base ?(keep_in_memory = false) bname : base =
-  let base = Database.opendb ~read_only:keep_in_memory bname in
-  if keep_in_memory then (
-    load_persons_array base;
-    load_ascends_array base;
-    load_unions_array base;
-    load_couples_array base;
-    load_descends_array base;
-    load_families_array base;
-    load_strings_array base);
-  base
-
-let close_base base =
-  base.func.cleanup ();
+let clear_base base =
   clear_ascends_array base;
   clear_unions_array base;
   clear_couples_array base;
   clear_descends_array base;
   clear_strings_array base;
   clear_persons_array base;
-  clear_families_array base;
-  ()
+  clear_families_array base
+
+(* Map of loaded read-only databases in memory. *)
+let loaded_databases : (string, dsk_base) Hashtbl.t = Hashtbl.create 17
+
+let load_database bname =
+  match Hashtbl.find loaded_databases bname with
+  | exception Not_found ->
+      Database.with_database ~read_only:true bname (fun base ->
+          Hashtbl.add loaded_databases bname base;
+          load_persons_array base;
+          load_ascends_array base;
+          load_unions_array base;
+          load_couples_array base;
+          load_descends_array base;
+          load_families_array base;
+          load_strings_array base;
+          at_exit @@ fun () -> clear_base base)
+  | _base -> Fmt.failwith "'%s' is already loaded in memory" bname
+
+let with_database bname k =
+  match Hashtbl.find loaded_databases bname with
+  | exception Not_found ->
+      Database.with_database ~read_only:false bname (fun base ->
+          Fun.protect ~finally:(fun () -> clear_base base) @@ fun () -> k base)
+  | base ->
+      (* If the base has already been loaded in memory, we do not
+         process it again. *)
+      k base
 
 let date_of_last_change base =
   let s =
@@ -208,9 +222,9 @@ let sync ?(scratch = false) base =
     raise Def.(HttpExn (Forbidden, __LOC__))
   else Outbase.output base
 
-let make bname particles arrays : Dbdisk.dsk_base =
-  sync ~scratch:true (Database.make bname particles arrays);
-  open_base bname
+let make bname particles arrays k =
+  Database.make bname particles arrays (sync ~scratch:true);
+  with_database bname k
 
 let bfname base fname = Filename.concat base.data.bdir fname
 

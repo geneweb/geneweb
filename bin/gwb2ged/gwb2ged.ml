@@ -5,11 +5,20 @@ let speclist opts =
   :: Gwexport.speclist opts
   |> List.sort compare |> Arg.align
 
-let main () =
-  let opts = ref Gwexport.default_opts in
-  Arg.parse (speclist opts) (Gwexport.anonfun opts) Gwexport.errmsg;
-  let opts = !opts in
-  let select = Gwexport.select opts [] in
-  Gwb2gedLib.gwb2ged !with_indexes opts select
+let bname = ref None
 
-let _ = main ()
+let anonfun s =
+  if !bname = None then (
+    Secure.set_base_dir (Filename.dirname s);
+    bname := Some s)
+  else raise (Arg.Bad "Cannot treat several databases")
+
+let () =
+  let opts = ref Gwexport.default_opts in
+  Arg.parse (speclist opts) anonfun Gwexport.errmsg;
+  match !bname with
+  | None -> raise @@ Arg.Bad "Expect a database"
+  | Some bname ->
+      Gwdb.with_database bname @@ fun base ->
+      let select = Gwexport.select base !opts [] in
+      Gwb2gedLib.gwb2ged base !with_indexes !opts select

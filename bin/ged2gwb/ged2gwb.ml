@@ -3325,7 +3325,7 @@ let main () =
   Gc.compact ();
   let arrays = make_subarrays arrays in
   finish_base arrays ;
-  let base = Gwdb.make !out_file !particles arrays in
+  Gwdb.make !out_file !particles arrays @@ fun base ->
   warning_month_number_dates ();
   if !do_check then begin
     let base_error x =

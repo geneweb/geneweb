@@ -412,9 +412,6 @@ type base_func = {
   (* Update content (second arg) of the notes' file (first arg) if exists. *)
   commit_wiznotes : string -> string -> unit;
   (* Close every opened channel. *)
-  cleanup : unit -> unit;
-  (* Returns real number of persons inside the base (without empty persons).
-     Pending patches aren't considered. *)
   nb_of_real_persons : unit -> int;
   (* Tells if person with giving id exists in the base.
      Pending patches are also considered. *)

@@ -1551,7 +1551,7 @@ let empty_base : cbase =
   }
 
 (** Extract information from the [gen.g_base] and create database *)
-let make_base bname gen per_index_ic per_ic =
+let make_base bname gen per_index_ic per_ic k =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
@@ -1609,6 +1609,7 @@ let make_base bname gen per_index_ic per_ic =
       (families, couples, descends),
       strings,
       gen.g_base.c_bnotes )
+    k
 
 (** Write content in the file *)
 let write_file_contents fname text =
@@ -1699,7 +1700,7 @@ let link next_family_fun bdir =
   Hashtbl.clear gen.g_strings;
   Hashtbl.clear gen.g_names;
   Hashtbl.clear fi.f_local_names;
-  let base = make_base bdir gen per_index_ic per_ic in
+  make_base bdir gen per_index_ic per_ic @@ fun base ->
   Hashtbl.clear gen.g_patch_p;
   Gc.full_major ();
   close_in per_index_ic;

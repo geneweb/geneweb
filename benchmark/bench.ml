@@ -107,10 +107,9 @@ let bench () =
       let conf = Config.empty in
       let bench_w_base ?t ?(load = []) name fn args =
         Secure.set_base_dir (Filename.dirname bname);
-        let base = Gwdb.open_base bname in
+        Gwdb.with_database bname @@ fun base ->
         List.iter (fun load -> load base) load;
         let r = bench ?t name (fn base) args in
-        Gwdb.close_base base;
         r
       in
       bench_w_base "UpdateData.get_all_data"

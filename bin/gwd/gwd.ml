@@ -2055,7 +2055,7 @@ let main () =
     (fun dbn ->
        Printf.eprintf "Caching database %s in memory… %!" dbn;
        let dbn = !GWPARAM.bpath dbn in
-       ignore (Gwdb.open_base ~keep_in_memory:true dbn);
+       Gwdb.load_database dbn;
        Printf.eprintf "Done.\n%!"
     )
     !cache_databases;

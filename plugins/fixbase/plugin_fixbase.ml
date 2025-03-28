@@ -119,7 +119,7 @@ let fixbase_ok conf base =
   let process () =
     ignore @@ Unix.alarm 0;
     (* cancel timeout *)
-    let base' = Gwdb.open_base @@ !GWPARAM.bpath conf.bname in
+    Gwdb.with_database (!GWPARAM.bpath conf.bname) @@ fun base' ->
     let ipers = ref [] in
     let ifams = ref [] in
     let istrs = ref [] in

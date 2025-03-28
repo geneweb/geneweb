@@ -167,7 +167,7 @@ let () =
   Arg.parse speclist anonfun usage;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   let bname = Filename.remove_extension (Filename.basename !bname) in
-  let base = Gwdb.open_base (Secure.base_dir () // bname) in
+  Gwdb.with_database (Secure.base_dir () // bname) @@ fun base ->
   cache_dir := set_cache_dir bname;
 
   Printf.printf "Generating cache(s) compressed with gzip\n";

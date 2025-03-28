@@ -130,7 +130,6 @@ let export conf base =
           no_notes;
           no_picture = getenv_opt "pictures" conf.env = Some "off";
           source;
-          base = Some (Gwdb.bname base, base);
         }
       in
       let select = ((fun i -> IPS.mem i ipers), fun i -> IFS.mem i ifams) in
@@ -139,7 +138,7 @@ let export conf base =
       Wserver.header
         (Printf.sprintf "Content-disposition: attachment; filename=\"%s\"" fname);
       (match output with
-      | `ged -> Gwb2gedLib.gwb2ged false opts select
+      | `ged -> Gwb2gedLib.gwb2ged base false opts select
       | `gw ->
           GwuLib.prepare_free_occ ~select:(fst select) base;
           Output.print_sstring conf "encoding: utf-8\n";

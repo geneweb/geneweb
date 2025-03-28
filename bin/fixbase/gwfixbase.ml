@@ -115,7 +115,7 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
-  let base = Gwdb.open_base bname in
+  Gwdb.with_database bname @@ fun base ->
   let fix = ref 0 in
   let nb_fam = nb_of_families base in
   let nb_ind = nb_of_persons base in

@@ -34,23 +34,24 @@ let main () =
   Secure.set_base_dir (Filename.dirname !fname);
   Lock.control_retry (Mutil.lock_file !fname) ~onerror:Lock.print_error_and_exit
     (fun () ->
-      let base = Gwdb.open_base !fname in
-      if !fast then (
-        Gwdb.load_persons_array base;
-        Gwdb.load_families_array base;
-        Gwdb.load_ascends_array base;
-        Gwdb.load_unions_array base;
-        Gwdb.load_couples_array base;
-        Gwdb.load_descends_array base;
-        Gwdb.load_strings_array base);
-      try
-        Sys.catch_break true;
-        if ConsangAll.compute ~verbosity:!verbosity base !scratch then
-          Gwdb.sync base
-      with Consang.TopologicalSortError p ->
-        Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
-          (Gutil.designation base p);
-        flush stdout;
-        exit 2)
+      Gwdb.with_database !fname (fun base ->
+          if !fast then (
+            Gwdb.load_persons_array base;
+            Gwdb.load_families_array base;
+            Gwdb.load_ascends_array base;
+            Gwdb.load_unions_array base;
+            Gwdb.load_couples_array base;
+            Gwdb.load_descends_array base;
+            Gwdb.load_strings_array base);
+          try
+            Sys.catch_break true;
+            if ConsangAll.compute ~verbosity:!verbosity base !scratch then
+              Gwdb.sync base
+          with Consang.TopologicalSortError p ->
+            Printf.printf
+              "\nError: loop in database, %s is his/her own ancestor.\n"
+              (Gutil.designation base p);
+            flush stdout;
+            exit 2))
 
 let _ = Printexc.print main ()

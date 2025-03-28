@@ -617,26 +617,22 @@ let check_args () =
     flush stdout;
     exit 2)
 
+let load_base f k =
+  Gwdb.with_database f (fun base ->
+      load_ascends_array base;
+      load_strings_array base;
+      if not !mem then (
+        load_unions_array base;
+        load_couples_array base;
+        load_descends_array base);
+      k base)
+
 let main () =
   let _ = check_args () in
   let _ = if not !html then cr := "\n" else cr := "<BR>\n" in
-  let load_base file =
-    let base = open_base file in
-    let () = load_ascends_array base in
-    let () = load_strings_array base in
-    let () =
-      if not !mem then
-        let () = load_unions_array base in
-        let () = load_couples_array base in
-        let () = load_descends_array base in
-        ()
-    in
-    base
-  in
-  (* Reference base *)
-  let base1 = load_base !in_file1 in
-  (* Destination base *)
-  let base2 = if !in_file1 != !in_file2 then load_base !in_file2 else base1 in
+  (* [base1] is the reference base and [base2] is the destination base. *)
+  load_base !in_file1 @@ fun base1 ->
+  load_base !in_file2 @@ fun base2 ->
   let iper1 = person_of_key base1 !p1_fn !p1_sn !p1_occ in
   let iper2 = person_of_key base2 !p2_fn !p2_sn !p2_occ in
   if !html then Printf.printf "<BODY>\n";

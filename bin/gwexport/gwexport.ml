@@ -6,7 +6,6 @@ type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 type gwexport_opts = {
   asc : int option;
   ascdesc : int option;
-  base : (string * base) option;
   censor : int;
   charset : gwexport_charset;
   desc : int option;
@@ -27,7 +26,6 @@ let default_opts =
   {
     asc = None;
     ascdesc = None;
-    base = None;
     censor = 0;
     charset = Utf8;
     desc = None;
@@ -45,12 +43,6 @@ let default_opts =
   }
 
 let errmsg = "Usage: " ^ Sys.argv.(0) ^ " <BASE> [OPT]"
-
-let anonfun c s =
-  if !c.base = None then (
-    Secure.set_base_dir (Filename.dirname s);
-    c := { !c with base = Some (s, Gwdb.open_base s) })
-  else raise (Arg.Bad "Cannot treat several databases")
 
 let speclist c =
   [
@@ -357,100 +349,95 @@ let select_from_set (ipers : IPS.t) (ifams : IFS.t) =
     Return filters for [iper] and [ifam] to be used when exporting
     a (portion of a) base.
 *)
-let select opts ips =
-  match opts.base with
-  | None -> raise (Arg.Bad "Missing base name. Use option -help for usage")
-  | Some (_, base) ->
-      let ips =
-        List.rev_append ips
-        @@ Mutil.filter_map (Gutil.person_of_string_key base) opts.keys
+let select base opts ips =
+  let ips =
+    List.rev_append ips
+    @@ Mutil.filter_map (Gutil.person_of_string_key base) opts.keys
+  in
+  let not_censor_p, not_censor_f =
+    if opts.censor <> 0 then (
+      let pmark = iper_marker (ipers base) 0 in
+      let fmark = ifam_marker (ifams base) 0 in
+      (if opts.censor = -1 then restrict_base base pmark fmark 1
+      else
+        let tm = Unix.localtime (Unix.time ()) in
+        let threshold = 1900 + tm.Unix.tm_year - opts.censor in
+        censor_base base pmark fmark 1 threshold);
+      ((fun i -> Marker.get pmark i = 0), fun i -> Marker.get fmark i = 0))
+    else ((fun _ -> true), fun _ -> true)
+  in
+  let conf = Config.{ empty with wizard = true } in
+  let sel_per, sel_fam =
+    (* S: a lot of redundant tests are done here, would be simpler with
+       pattern matchings and factorization. *)
+    if opts.ascdesc <> None || opts.desc <> None then (
+      assert (opts.censor = 0);
+      let asc =
+        if opts.ascdesc <> None then Option.value ~default:max_int opts.asc
+        else Option.value ~default:0 opts.asc
       in
-      let not_censor_p, not_censor_f =
-        if opts.censor <> 0 then (
-          let pmark = iper_marker (ipers base) 0 in
-          let fmark = ifam_marker (ifams base) 0 in
-          (if opts.censor = -1 then restrict_base base pmark fmark 1
-          else
-            let tm = Unix.localtime (Unix.time ()) in
-            let threshold = 1900 + tm.Unix.tm_year - opts.censor in
-            censor_base base pmark fmark 1 threshold);
-          ((fun i -> Marker.get pmark i = 0), fun i -> Marker.get fmark i = 0))
-        else ((fun _ -> true), fun _ -> true)
+      let desc = -Option.value ~default:0 opts.desc in
+      let ht =
+        match opts.ascdesc with
+        | Some ascdesc ->
+            let ips = List.map (fun i -> (i, asc)) ips in
+            Util.select_mascdesc conf base ips ascdesc
+        | None ->
+            let ht = Hashtbl.create 0 in
+            IPS.iter
+              (fun i -> Hashtbl.add ht i (poi base i))
+              (select_asc conf base asc ips);
+            ht
       in
-      let conf = Config.{ empty with wizard = true } in
-      let sel_per, sel_fam =
-        (* S: a lot of redundant tests are done here, would be simpler with
-           pattern matchings and factorization. *)
-        if opts.ascdesc <> None || opts.desc <> None then (
-          assert (opts.censor = 0);
-          let asc =
-            if opts.ascdesc <> None then Option.value ~default:max_int opts.asc
-            else Option.value ~default:0 opts.asc
-          in
-          let desc = -Option.value ~default:0 opts.desc in
-          let ht =
-            match opts.ascdesc with
-            | Some ascdesc ->
-                let ips = List.map (fun i -> (i, asc)) ips in
-                Util.select_mascdesc conf base ips ascdesc
-            | None ->
-                let ht = Hashtbl.create 0 in
-                IPS.iter
-                  (fun i -> Hashtbl.add ht i (poi base i))
-                  (select_asc conf base asc ips);
-                ht
-          in
-          let ht' =
-            let ips = List.map (fun i -> (i, 0)) ips in
-            Util.select_desc conf base desc ips
-          in
-          Hashtbl.iter (fun i p -> Hashtbl.replace ht i p) ht';
-          let ipers =
-            Hashtbl.fold (fun i _ ipers -> IPS.add i ipers) ht IPS.empty
-          in
-          let ifams =
-            IPS.fold
-              (fun iper acc ->
-                Array.fold_left
-                  (fun acc ifam ->
-                    if
-                      IFS.mem ifam acc
-                      || not
-                           (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
-                    then acc
-                    else IFS.add ifam acc)
-                  acc
-                  (get_family (poi base iper)))
-              ipers IFS.empty
-          in
-          let sel_per i = IPS.mem i ipers in
-          let sel_fam i = IFS.mem i ifams in
-          (sel_per, sel_fam))
-        else
-          match opts.asc with
-          (* opts.ascdesc = None && opts.desc = None *)
-          | Some asc ->
-              let ipers = select_asc conf base asc ips in
-              let per_sel i = IPS.mem i ipers in
-              let fam_sel i =
-                let f = foi base i in
-                per_sel (get_father f) && per_sel (get_mother f)
-              in
-              (per_sel, fam_sel)
-          | None ->
-              if opts.surnames <> [] then select_surnames base opts.surnames
-              else if opts.parentship then
-                let rec loop ipers ifams = function
-                  | [] -> select_from_set ipers ifams
-                  | k2 :: k1 :: tl ->
-                      let ipers', ifams' = select_parentship base k1 k2 in
-                      let ipers = IPS.fold IPS.add ipers ipers' in
-                      let ifams = IFS.fold IFS.add ifams ifams' in
-                      loop ipers ifams tl
-                  | _ -> assert false
-                in
-                loop IPS.empty IFS.empty ips
-              else ((fun _ -> true), fun _ -> true)
+      let ht' =
+        let ips = List.map (fun i -> (i, 0)) ips in
+        Util.select_desc conf base desc ips
       in
-      ( (fun i -> not_censor_p i && sel_per i),
-        fun i -> not_censor_f i && sel_fam i )
+      Hashtbl.iter (fun i p -> Hashtbl.replace ht i p) ht';
+      let ipers =
+        Hashtbl.fold (fun i _ ipers -> IPS.add i ipers) ht IPS.empty
+      in
+      let ifams =
+        IPS.fold
+          (fun iper acc ->
+            Array.fold_left
+              (fun acc ifam ->
+                if
+                  IFS.mem ifam acc
+                  || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+                then acc
+                else IFS.add ifam acc)
+              acc
+              (get_family (poi base iper)))
+          ipers IFS.empty
+      in
+      let sel_per i = IPS.mem i ipers in
+      let sel_fam i = IFS.mem i ifams in
+      (sel_per, sel_fam))
+    else
+      match opts.asc with
+      (* opts.ascdesc = None && opts.desc = None *)
+      | Some asc ->
+          let ipers = select_asc conf base asc ips in
+          let per_sel i = IPS.mem i ipers in
+          let fam_sel i =
+            let f = foi base i in
+            per_sel (get_father f) && per_sel (get_mother f)
+          in
+          (per_sel, fam_sel)
+      | None ->
+          if opts.surnames <> [] then select_surnames base opts.surnames
+          else if opts.parentship then
+            let rec loop ipers ifams = function
+              | [] -> select_from_set ipers ifams
+              | k2 :: k1 :: tl ->
+                  let ipers', ifams' = select_parentship base k1 k2 in
+                  let ipers = IPS.fold IPS.add ipers ipers' in
+                  let ifams = IFS.fold IFS.add ifams ifams' in
+                  loop ipers ifams tl
+              | _ -> assert false
+            in
+            loop IPS.empty IFS.empty ips
+          else ((fun _ -> true), fun _ -> true)
+  in
+  ((fun i -> not_censor_p i && sel_per i), fun i -> not_censor_f i && sel_fam i)
