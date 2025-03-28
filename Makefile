@@ -54,7 +54,7 @@ VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
-lib/version.ml: lib/version.txt .git/HEAD .git/index
+lib/version.ml: lib/version.txt
 	@cp lib/version.txt $@
 	@printf 'let branch = "$(BRANCH)"\n' >> $@
 	@printf 'let src = "$(SOURCE)"\n' >> $@
