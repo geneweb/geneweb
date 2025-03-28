@@ -552,8 +552,6 @@ let rec extract_param name stop_char =
       else extract_param name stop_char l
   | [] -> ""
 
-let sprintf_date tm = Adef.safe @@ Ext_unix.sprintf_date tm
-
 let rev_input_line ic pos (rbuff, rpos) =
   let rev = Buffer.create 256 in
   let rev_input_char pos =

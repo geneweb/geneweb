@@ -1813,7 +1813,7 @@ let sprintf_today conf =
         tm_isdst = false;
       }
   in
-  Mutil.sprintf_date tm
+  Ext_unix.sprintf_date tm
 
 let read_wf_trace fname =
   try
@@ -1834,7 +1834,7 @@ let write_wf_trace fname wt =
   close_out oc
 
 let update_wf_trace conf fname =
-  let dt = (sprintf_today conf :> string) in
+  let dt = sprintf_today conf in
   let wt =
     let r = read_wf_trace fname in
     let dtlen = String.length dt in
@@ -2236,7 +2236,7 @@ let write_visited conf ht =
 let record_visited conf ip =
   if conf.Config.friend || conf.Config.wizard then
     let ht = read_visited conf in
-    let time = (sprintf_today conf :> string) in
+    let time = sprintf_today conf in
     let () =
       try
         let vl = Hashtbl.find ht conf.Config.user in

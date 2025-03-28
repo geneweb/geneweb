@@ -247,8 +247,7 @@ let gen_record conf base changed action =
         with Sys_error _ -> None
       with
       | Some oc ->
-          Printf.fprintf oc "%s [%s] %s %s\n"
-            (Util.sprintf_today conf :> string)
+          Printf.fprintf oc "%s [%s] %s %s\n" (Util.sprintf_today conf)
             conf.user action item;
           close_out oc
       | None -> ())

@@ -100,7 +100,7 @@ let log_passwd_failed ar tm from request base_file =
   let tm = Unix.localtime tm in
   Printf.fprintf oc
     "%s (%d) %s_%s => failed (%s)"
-    (Mutil.sprintf_date tm :> string) (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user;
+    (Ext_unix.sprintf_date tm) (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user;
   if !trace_failed_passwd then Printf.fprintf oc " (%s)" (String.escaped ar.ar_uauth);
   Printf.fprintf oc "\n  From: %s\n  Agent: %s\n" from user_agent;
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
@@ -327,7 +327,7 @@ let unauth_server conf ar =
         (fun oc ->
            Printf.fprintf oc
              "\n401 unauthorized\n- date: %s\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n"
-             (Mutil.sprintf_date tm :> string)
+             (Ext_unix.sprintf_date tm)
              (fun oc ->
                 List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) conf.request)
              ar.ar_passwd nonce ar.ar_can_stale)
@@ -886,7 +886,7 @@ let digest_authorization request base_env passwd utm base_file command =
           (fun oc ->
              Printf.fprintf oc
                "\nanswer\n- date: %s\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n"
-               (Mutil.sprintf_date @@ Unix.localtime utm :> string)
+               (Ext_unix.sprintf_date @@ Unix.localtime utm)
                (fun oc ->
                   List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) request)
                passwd nonce ds.ds_meth ds.ds_uri)
@@ -1180,7 +1180,7 @@ let log tm conf from gauth request script_name contents =
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Printf.fprintf oc
-    "%s (%d) %s?" (Mutil.sprintf_date tm :> string) (Unix.getpid ()) script_name ;
+    "%s (%d) %s?" (Ext_unix.sprintf_date tm) (Unix.getpid ()) script_name ;
   print_and_cut_if_too_big oc contents;
   output_char oc '\n';
   Printf.fprintf oc "  From: %s\n" from;

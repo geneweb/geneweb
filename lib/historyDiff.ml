@@ -100,7 +100,7 @@ let make_gen_record conf base first gen_p =
         { conf with time = (hh, mm, min 0 ss) }
       else conf
     in
-    Util.sprintf_today conf
+    Adef.safe @@ Util.sprintf_today conf
   in
   let p = Gwdb.poi base gen_p.Def.key_index in
   let fam = Gwdb.get_family p in

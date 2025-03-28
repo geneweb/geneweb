@@ -162,10 +162,6 @@ val extract_param : string -> char -> string list -> string
     string request has been obtained by: [extract_param "GET /" ' '].
     Answers the empty string if the parameter is not found. *)
 
-val sprintf_date : Unix.tm -> Adef.safe_string
-(** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format
-    Example : 2021-12-13 22:35:08. *)
-
 val rev_input_line : in_channel -> int -> bytes ref * int ref -> string * int
 (** [rev_input_line ic pos (rbytes, rpos)]
     Read characters in reverse order from the given input channel,

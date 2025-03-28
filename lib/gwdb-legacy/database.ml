@@ -1025,7 +1025,7 @@ let opendb bname =
   let commit_patches =
     if perm = RDONLY then fun () -> raise (HttpExn (Forbidden, __LOC__))
     else fun () ->
-      let tm = Unix.time () |> Unix.gmtime |> Mutil.sprintf_date in
+      let tm = Unix.time () |> Unix.gmtime |> Ext_unix.sprintf_date in
       (* read real person number (considering pending patches) *)
       let nbp =
         Hashtbl.fold
@@ -1062,7 +1062,7 @@ let opendb bname =
       let tmp_fname = Filename.concat bname "1patches" in
       let fname = Filename.concat bname "patches" in
       let tm_oc = Secure.open_out_bin tm_fname in
-      output_string tm_oc (tm : Adef.safe_string :> string);
+      output_string tm_oc tm;
       close_out tm_oc;
       let oc_tmp = Secure.open_out_bin tmp_fname in
       output_string oc_tmp magic_patch;
