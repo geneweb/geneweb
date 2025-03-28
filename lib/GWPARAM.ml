@@ -571,12 +571,13 @@ let init_etc bname =
      with Unix.Unix_error (_, _, _) ->
        Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
 
-    (if not (Sys.file_exists "cnt") then
+    (if not (Sys.file_exists (!cnt_d bname)) then
      try
-       Unix.mkdir "cnt" 0o755;
+       Unix.mkdir (!cnt_d bname) 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
+       Logs.syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)));
 
     if not (Sys.file_exists (!etc_d bname)) then
       try
