@@ -293,10 +293,9 @@ crl "m=IMH&s=$IMG_SRC"
 # ATTENTION, Test only a subset of carrousel (m=IM_C*)
 # ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
 crl "m=IM_C&i=$ID"
-crl "m=IM_C_S&i=$ID"
+crl "m=IM_C_S&i=$ID" # TODO voir comportement si pas d'image sauvée
 crl "m=IM_C&i=$ID&s=$IMG_C"
 crl "m=IM_C_S&i=$ID&s=$IMG_C_S"
-crl "m=IM_C&i=$ID&s=$IMG_C" # TODO voir comportement si pas d'image sauvée
 crl "m=INV_FAM&i=$ID&f=$FID" # f=family_id is base specific!
 crl "m=L"
 crl "m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE"
