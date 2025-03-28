@@ -162,13 +162,12 @@ let gc ?(dry_run = true) base =
     base.data.couples.clear_array ();
     base.data.descends.clear_array ();
     base.data.strings.clear_array ();
-    let base' =
-      Database.make bname particles
-        ( (persons, ascends, unions),
-          (families, couples, descends),
-          strings,
-          bnotes )
-    in
+    Database.make bname particles
+      ( (persons, ascends, unions),
+        (families, couples, descends),
+        strings,
+        bnotes )
+    @@ fun base' ->
     base'.data.persons.load_array ();
     base'.data.ascends.load_array ();
     base'.data.unions.load_array ();

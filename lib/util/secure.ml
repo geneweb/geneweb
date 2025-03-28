@@ -80,24 +80,43 @@ let check_open fname =
     raise (Sys_error "invalid access"))
 
 (* The following functions perform a [check] before opening the file,
-   preventing potential attacks on the system.
-*)
+   preventing potential attacks on the system. *)
+let with_ic openfun s f =
+  check_open s;
+  let ic = openfun s in
+  Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () -> f ic
+
+let with_oc openfun s f =
+  check_open s;
+  let oc = openfun s in
+  Fun.protect ~finally:(fun () -> close_out_noerr oc) @@ fun () -> f oc
+
 let open_in fname =
   check_open fname;
   Stdlib.open_in fname
+
+let with_open_in_text s f = with_ic open_in s f
 
 let open_in_bin fname =
   check_open fname;
   Stdlib.open_in_bin fname
 
+let with_open_in_bin s f = with_ic open_in_bin s f
+
 let open_out fname =
   check_open fname;
   Stdlib.open_out fname
+
+let with_open_out_text s f = with_oc open_out s f
 
 let open_out_bin fname =
   check_open fname;
   Stdlib.open_out_bin fname
 
+let with_open_out_bin s f = with_oc open_out_bin s f
+
 let open_out_gen mode perm fname =
   check_open fname;
   Stdlib.open_out_gen mode perm fname
+
+let with_open_out_gen mode perm = with_oc @@ open_out_gen mode perm

@@ -20,7 +20,7 @@ let () =
   Secure.set_base_dir (Filename.dirname bname);
   Lock.control (Mutil.lock_file bname) true ~onerror:Lock.print_try_again
   @@ fun () ->
-  let base = Database.opendb bname in
+  Database.with_database bname @@ fun base ->
   let p, f, s = Gwdb_gc.gc ~dry_run base in
   Printf.printf
     "%s:\n\tnb of persons: %d\n\tnb of families: %d\n\tnb of strings: %d\n"

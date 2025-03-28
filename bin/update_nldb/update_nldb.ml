@@ -268,7 +268,7 @@ let main () =
     flush stderr;
     exit 2);
   Secure.set_base_dir (Filename.dirname !fname);
-  let base = Gwdb.open_base !fname in
+  Gwdb.with_database !fname @@ fun base ->
   Sys.catch_break true;
   let () = load_strings_array base in
   let () = load_unions_array base in

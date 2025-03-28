@@ -4,7 +4,6 @@ type gwexport_opts = {
   asc : int option; (* Maximum generation of the root's ascendants *)
   ascdesc : int option;
       (* Maximum generation of the root's ascendants descendants *)
-  base : (string * Gwdb.base) option; (* The base analyzed *)
   censor : int; (* Censors the base for 'n' years *)
   charset : gwexport_charset; (* The charset of the export *)
   desc : int option; (* Maximum generation of the root's descendants *)
@@ -36,20 +35,14 @@ val speclist : gwexport_opts ref -> (Arg.key * Arg.spec * Arg.doc) list
 *)
 (* Used for gwd2ged and gwu. *)
 
-val anonfun : gwexport_opts ref -> Arg.anon_fun
-(** [anonfun opts = fun base_name -> ...]
-    Given a set of options `opts` where `!opts.base` is uninitialized,
-    opens the dir `base_name` and initializes !opts.base with the base name.
-    The output of this function is the second argument of Arg.parse.
-*)
-(* Arg.anon_fun = string -> unit *)
-
 val errmsg : Arg.usage_msg
 (** Default error message.
     This is the third argument of Arg.parse. *)
 
 val select :
-  gwexport_opts -> Gwdb.iper list -> (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
-(** [select opts ips]
-    Return filters for [iper] and [ifam] to be used when exporting a (portion of a) base.
-*)
+  Gwdb.base ->
+  gwexport_opts ->
+  Gwdb.iper list ->
+  (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
+(** [select base opts ips] returns filters for [iper] and [ifam] to be used
+    when exporting a portion of the [base]. *)

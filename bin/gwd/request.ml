@@ -324,10 +324,8 @@ let w_base ~none fn conf (bfile : string option) =
   match bfile with
   | None -> none conf
   | Some bfile ->
-     let base = try Some (Gwdb.open_base bfile) with _ -> None in
-     match base with
-     | None -> none conf
-     | Some base ->
+     try
+       Gwdb.with_database bfile (fun base ->
         let conf = make_henv conf base in
         let conf = make_senv conf base in
         let conf = match Util.default_sosa_ref conf base with
@@ -338,7 +336,12 @@ let w_base ~none fn conf (bfile : string option) =
               nb_of_persons = Gwdb.nb_of_persons base;
               nb_of_families = Gwdb.nb_of_families base}
         in
-        fn conf base
+        fn conf base)
+     with _ ->
+       (* FIXME: If the exception is raised after printing the HTTP header,
+          the function [none] fails and raises an exception with a cryptic
+          backtrace. *)
+       none conf
 
 let w_person ~none fn conf base =
   match find_person_in_env conf base "" with
@@ -367,6 +370,21 @@ let treat_request =
     w_base ~none
   in
   let w_person = w_person ~none:SrcfileDisplay.print_welcome in
+  let print_page conf l =
+      w_base (
+        if only_special_env conf.env then SrcfileDisplay.print_welcome
+        else w_person @@ fun conf base p ->
+          match p_getenv conf.env "ptempl" with
+          | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
+            Perso.interp_templ t conf base p
+          | _ -> person_selected conf base p) conf l
+  in
+  let handle_no_bfile conf l =
+    if conf.bname = "" then
+      include_template conf [] "index" (fun () -> propose_base conf)
+    else
+      print_page conf l
+  in
   fun conf ->
   let bfile =
     if conf.bname = "" then None
@@ -432,31 +450,16 @@ let treat_request =
           | _ -> incorrect_request conf ~comment:"Missing s= for m=DOC" base
         in
         match m with
-        | "" ->
-          let base =
-            match bfile with
-            | None -> None
-            | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
-          in
-          if base <> None then
-            w_base @@
-            if only_special_env conf.env then SrcfileDisplay.print_welcome
-            else w_person @@ fun conf base p ->
-              match p_getenv conf.env "ptempl" with
-              | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
-                Perso.interp_templ t conf base p
-              | _ -> person_selected conf base p
-          else if conf.bname = ""
-          then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
-          else
-            w_base begin
-              if only_special_env conf.env then SrcfileDisplay.print_welcome
-              else w_person @@ fun conf base p ->
-                match p_getenv conf.env "ptempl" with
-                | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
-                  Perso.interp_templ t conf base p
-                | _ -> person_selected conf base p
-            end
+        | "" -> (
+          match bfile with
+          | Some bfile -> (
+            (* We attempt to load the database in order to detect issues. *)
+            try
+              Gwdb.with_database bfile ignore;
+              print_page
+            with _ -> handle_no_bfile)
+          | None -> handle_no_bfile)
+
         | "A" ->
           AscendDisplay.print |> w_person |> w_base
         | "ADD_FAM" ->
@@ -571,8 +574,8 @@ let treat_request =
           w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
         | "KILL_ANC" ->
           w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
-        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base 
-              (Gwdb.empty_person base Gwdb.dummy_iper) 
+        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base
+              (Gwdb.empty_person base Gwdb.dummy_iper)
         | "LB" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
@@ -813,7 +816,7 @@ let treat_request =
             (conf.command :> string) base_name
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
     in
-    Output.print_sstring conf 
+    Output.print_sstring conf
       (Printf.sprintf {|
         <form class="form-inline" method="post" action="%s">
           <div class="input-group mt-1">

@@ -268,9 +268,8 @@ let speclist =
 let main () =
   Arg.parse speclist (fun s -> bname := s) usage;
   if !ask_for_delete > 0 then
-    Lock.control (Mutil.lock_file !bname) false
-      (fun () -> move (Gwdb.open_base !bname) !bname)
-      ~onerror:Lock.print_try_again
-  else move (Gwdb.open_base !bname) !bname
+    Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
+    @@ fun () -> Gwdb.with_database !bname (fun base -> move base !bname)
+  else Gwdb.with_database !bname (fun base -> move base !bname)
 
 let _ = main ()

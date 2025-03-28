@@ -697,30 +697,28 @@ let ged_fam_record opts base (per_sel, _fam_sel) ifam =
   ged_fsource opts base fam;
   ged_comment opts base fam
 
-let gwb2ged with_indexes opts ((per_sel, fam_sel) as sel) =
-  match opts.Gwexport.base with
-  | Some (ifile, base) ->
-      let ofile, oc, close = opts.Gwexport.oc in
-      if not opts.Gwexport.mem then (
-        load_ascends_array base;
-        load_unions_array base;
-        load_couples_array base;
-        load_descends_array base);
-      ged_header opts base ifile ofile;
-      Gwdb.Collection.iter
-        (fun i -> if per_sel i then ged_ind_record with_indexes opts base sel i)
-        (Gwdb.ipers base);
-      Gwdb.Collection.iter
-        (fun i -> if fam_sel i then ged_fam_record opts base sel i)
-        (Gwdb.ifams base);
-      let _ =
-        List.fold_right
-          (fun adop i ->
-            ged_fam_adop opts i adop;
-            i + 1)
-          !adop_fam_list
-          (nb_of_families base + 1)
-      in
-      Printf.ksprintf oc "0 TRLR\n";
-      close ()
-  | None -> assert false
+let gwb2ged base with_indexes opts ((per_sel, fam_sel) as sel) =
+  let bname = Gwdb.bname base in
+  let ofile, oc, close = opts.Gwexport.oc in
+  if not opts.Gwexport.mem then (
+    load_ascends_array base;
+    load_unions_array base;
+    load_couples_array base;
+    load_descends_array base);
+  ged_header opts base bname ofile;
+  Gwdb.Collection.iter
+    (fun i -> if per_sel i then ged_ind_record with_indexes opts base sel i)
+    (Gwdb.ipers base);
+  Gwdb.Collection.iter
+    (fun i -> if fam_sel i then ged_fam_record opts base sel i)
+    (Gwdb.ifams base);
+  let _ =
+    List.fold_right
+      (fun adop i ->
+        ged_fam_adop opts i adop;
+        i + 1)
+      !adop_fam_list
+      (nb_of_families base + 1)
+  in
+  Printf.ksprintf oc "0 TRLR\n";
+  close ()

@@ -852,11 +852,25 @@ type ro_data_records =
 
 let cached_records = ref []
 
-let opendb ?(read_only = false) bname =
+let try_with_open openfun s f =
+  let ic =
+    try Some (openfun s)
+    with Sys_error e ->
+      Format.eprintf "@[While loading '%s', got: %s@ trying to continue...@]@."
+        s e;
+      None
+  in
+  let finally () = match ic with Some ic -> close_in_noerr ic | None -> () in
+  Fun.protect ~finally (fun () -> f ic)
+
+let try_with_open_bin s f = try_with_open Secure.open_in_bin s f
+let ( // ) = Filename.concat
+
+let with_database ?(read_only = false) bname k =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  let tm_fname = Filename.concat bname "commit_timestamp" in
+  let tm_fname = bname // "commit_timestamp" in
   let patches = input_patches bname in
   let pending : patches_ht = empty_patch_ht () in
   let patches, perm =
@@ -875,10 +889,8 @@ let opendb ?(read_only = false) bname =
         (empty_patch_ht (), RDONLY)
   in
   let synchro = input_synchro bname in
-  let particles =
-    Mutil.input_particles (Filename.concat bname "particles.txt")
-  in
-  let ic = Secure.open_in_bin (Filename.concat bname "base") in
+  let particles = Mutil.input_particles (bname // "particles.txt") in
+  Secure.with_open_in_bin (bname // "base") @@ fun ic ->
   let version =
     if Mutil.check_magic Dutil.magic_GnWb0024 ic then GnWb0024
     else if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
@@ -900,20 +912,8 @@ let opendb ?(read_only = false) bname =
   let descends_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
-  let ic_acc =
-    try Some (Secure.open_in_bin (Filename.concat bname "base.acc"))
-    with Sys_error _ ->
-      Printf.eprintf "File base.acc not found; trying to continue...\n";
-      flush stderr;
-      None
-  in
-  let ic2 =
-    try Some (Secure.open_in_bin (Filename.concat bname "strings.inx"))
-    with Sys_error _ ->
-      Printf.eprintf "File strings.inx not found; trying to continue...\n";
-      flush stderr;
-      None
-  in
+  try_with_open_bin (bname // "base.acc") @@ fun ic_acc ->
+  try_with_open_bin (bname // "strings.inx") @@ fun ic2 ->
   (* skipping array length *)
   let ic2_string_start_pos =
     match version with
@@ -923,14 +923,13 @@ let opendb ?(read_only = false) bname =
   let ic2_string_hash_len =
     match ic2 with Some ic2 -> Some (input_binary_int ic2) | None -> None
   in
-  (if true then
-   match ic2 with
-   | Some ic2 ->
-       ignore @@ input_binary_int ic2;
-       (* ic2_surname_start_pos *)
-       ignore @@ input_binary_int ic2
-       (* ic2_first_name_start_pos *)
-   | None -> ());
+  (match ic2 with
+  | Some ic2 ->
+      ignore @@ input_binary_int ic2;
+      (* ic2_surname_start_pos *)
+      ignore @@ input_binary_int ic2
+      (* ic2_first_name_start_pos *)
+  | None -> ());
   let shift = 0 in
   let iper_exists =
     make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len
@@ -1031,14 +1030,9 @@ let opendb ?(read_only = false) bname =
   let strings =
     make_record_access im_strings patches.h_string pending.h_string strings_len
   in
-  let cleanup () =
-    close_in ic;
-    (match ic_acc with Some ic_acc -> close_in ic_acc | None -> ());
-    match ic2 with Some ic2 -> close_in ic2 | None -> ()
-  in
   let commit_synchro () =
-    let tmp_fname = Filename.concat bname "1synchro_patches" in
-    let fname = Filename.concat bname "synchro_patches" in
+    let tmp_fname = bname // "1synchro_patches" in
+    let fname = bname // "synchro_patches" in
     let oc9 =
       try Secure.open_out_bin tmp_fname
       with Sys_error _ -> raise (Failure "the database is not writable")
@@ -1053,7 +1047,7 @@ let opendb ?(read_only = false) bname =
     close_out oc9;
     move_with_backup tmp_fname fname
   in
-  let nbp_fname = Filename.concat bname "nb_persons" in
+  let nbp_fname = bname // "nb_persons" in
   let is_empty_name p =
     (0 = p.surname || 1 = p.surname) && (0 = p.first_name || 1 = p.first_name)
   in
@@ -1062,17 +1056,12 @@ let opendb ?(read_only = false) bname =
     for i = 0 to persons.len - 1 do
       if not @@ is_empty_name @@ persons.get i then incr cnt
     done;
-    let oc = Secure.open_out_bin nbp_fname in
-    output_value oc !cnt;
-    close_out oc;
+    Secure.with_open_out_bin nbp_fname (fun oc -> output_value oc !cnt);
     !cnt
   in
   let nbp_read () =
-    if Sys.file_exists nbp_fname then (
-      let ic = Secure.open_in_bin nbp_fname in
-      let x : int = input_value ic in
-      close_in ic;
-      x)
+    if Sys.file_exists nbp_fname then
+      Secure.with_open_in_bin nbp_fname input_value
     else npb_init ()
   in
   let commit_patches =
@@ -1312,13 +1301,12 @@ let opendb ?(read_only = false) bname =
       commit_patches;
       commit_notes;
       commit_wiznotes;
-      cleanup;
       nb_of_real_persons = nbp_read;
       iper_exists;
       ifam_exists;
     }
   in
-  { data = base_data; func = base_func; version }
+  k { data = base_data; func = base_func; version }
 
 let record_access_of tab =
   {
@@ -1330,8 +1318,7 @@ let record_access_of tab =
     clear_array = (fun () -> ());
   }
 
-let make bname particles ((persons, families, strings, bnotes) as _arrays) :
-    Dbdisk.dsk_base =
+let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
@@ -1386,10 +1373,9 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
       commit_patches = (fun _ -> assert false);
       commit_notes = (fun _ -> assert false);
       commit_wiznotes = (fun _ -> assert false);
-      cleanup = (fun _ -> ());
       nb_of_real_persons = (fun _ -> assert false);
       iper_exists = (fun _ -> assert false);
       ifam_exists = (fun _ -> assert false);
     }
   in
-  { data; func; version = GnWb0024 }
+  k { data; func; version = GnWb0024 }

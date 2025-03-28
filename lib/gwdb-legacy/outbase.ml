@@ -7,7 +7,6 @@ let load_unions_array base = base.data.unions.load_array ()
 let load_couples_array base = base.data.couples.load_array ()
 let load_descends_array base = base.data.descends.load_array ()
 let load_strings_array base = base.data.strings.load_array ()
-let close_base base = base.func.cleanup ()
 let save_mem = ref false
 let verbose = Mutil.verbose
 
@@ -351,7 +350,6 @@ let output base =
      Mutil.rm tmp_strings_inx;
      Mutil.rm_rf tmp_notes_d;
      raise e);
-  close_base base;
   Mutil.rm (Filename.concat bname "base");
   Sys.rename tmp_base (Filename.concat bname "base");
   Mutil.rm (Filename.concat bname "base.acc");

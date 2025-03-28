@@ -52,11 +52,25 @@ type string_person_index
 type base
 (** The database representation. *)
 
-val open_base : ?keep_in_memory:bool -> string -> base
-(** Open database associated with (likely situated in) the specified directory. *)
+val load_database : string -> unit
+(** [load_database bname] loads the database [bname] into memory.
+    The database is automatically unloaded upon exit.
 
-val close_base : base -> unit
-(** Close database. May perform some clean up tasks. *)
+    The base is read-only and any attempt to modify its values will
+    result in failure.
+
+    @raise Failwith if the base has already been loaded. *)
+
+val with_database : string -> (base -> 'a) -> 'a
+(** [with_database bname k] loads the database [bname] and invokes the
+    continuation [k] with it.
+
+    If the database [bname] has already been loaded into memory with
+    [load_database], the function uses this in-memory base instead of
+    reloading it.
+
+    If the database [bname] was not loaded in memory, it is unloaded
+    after [k] is executed. *)
 
 val dummy_iper : iper
 (** Dummy person id *)
@@ -662,8 +676,10 @@ val make :
     * int Def.gen_descend array)
   * string array
   * Def.base_notes ->
-  base
-(** [make bname particles arrays] create a base with [bname] name and [arrays] as content. *)
+  (base -> 'a) ->
+  'a
+(** [make bname particles arrays k] create a base with [bname] name and
+    [arrays] as content and invokes the continuation [k] with it. *)
 
 val read_nldb : base -> (iper, ifam) Def.NLDB.t
 (** TODOOCP : doc *)

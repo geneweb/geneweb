@@ -38,16 +38,25 @@ let speclist opts =
   :: Gwexport.speclist opts
   |> List.sort compare |> Arg.align
 
+let bname = ref None
+
+let anonfun s =
+  if !bname = None then (
+    Secure.set_base_dir (Filename.dirname s);
+    bname := Some s)
+  else raise (Arg.Bad "Cannot treat several databases")
+
 let main () =
   let opts = ref Gwexport.default_opts in
-  Arg.parse (speclist opts) (Gwexport.anonfun opts) Gwexport.errmsg;
+  Arg.parse (speclist opts) anonfun Gwexport.errmsg;
   let opts = !opts in
-  match opts.Gwexport.base with
-  | None -> assert false
-  | Some (ifile, base) ->
-      let select = Gwexport.select opts [] in
+  match !bname with
+  | None -> raise @@ Arg.Bad "Expect a database"
+  | Some bname ->
+      Gwdb.with_database bname @@ fun base ->
+      let select = Gwexport.select base opts [] in
       let in_dir =
-        if Filename.check_suffix ifile ".gwb" then ifile else ifile ^ ".gwb"
+        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
       in
       let src_oc_ht = Hashtbl.create 1009 in
       Gwdb.load_ascends_array base;
