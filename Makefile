@@ -25,10 +25,8 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
-CPPO_D=$(SYSLOG_D)
-
 ifeq ($(DUNE_PROFILE),dev)
-    CPPO_D+= -D DEBUG
+    CPPO_D=-D DEBUG
 endif
 
 %/dune: %/dune.in Makefile.config

@@ -1,0 +1,3 @@
+(library
+ (name geneweb_log_common)
+ (public_name geneweb.log-common))

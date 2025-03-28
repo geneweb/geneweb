@@ -1,0 +1,5 @@
+(library
+ (name geneweb_log_default)
+ (public_name geneweb.log-default)
+ (libraries geneweb.log-common geneweb.system_util)
+ (implements geneweb.log))

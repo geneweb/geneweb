@@ -17,6 +17,7 @@
             geneweb_gwdb
             geneweb_util
 	    geneweb_system_util
+            geneweb_log
             markup)
  (modules_without_implementation templAst)
 )
