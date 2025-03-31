@@ -5,7 +5,6 @@
       geneweb.def
       geneweb.util
       geneweb.system_util
-;;      geneweb.dsk_format
       re
       unix
   )
