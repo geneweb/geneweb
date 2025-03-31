@@ -1246,21 +1246,14 @@ let opendb ?(read_only = false) bname =
         close_out oc)
   in
   let ext_files () =
-    let top = Filename.concat bname "notes_d" in
-    let rec loop list subdir =
-      let dir = Filename.concat top subdir in
-      try
-        let files = Sys.readdir dir in
-        Array.fold_left
-          (fun files file ->
-            let f = Filename.concat subdir file in
-            if Filename.check_suffix f ".txt" then
-              Filename.chop_suffix f ".txt" :: files
-            else loop files f)
-          list files
-      with Sys_error _ -> list
-    in
-    loop [] Filename.current_dir_name
+    File.walk_folder ~recursive:true
+      (fun fl files ->
+        match fl with
+        | `File f when Filename.check_suffix f ".txt" ->
+            Filename.chop_suffix f ".txt" :: files
+        | `File _ | `Dir _ -> files)
+      (Filename.concat bname "nodes_d")
+      []
   in
   let bnotes = { nread = read_notes; norigin_file; efiles = ext_files } in
   let base_data =
