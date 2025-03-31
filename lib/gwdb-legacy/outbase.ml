@@ -194,7 +194,7 @@ end = struct
 end
 
 let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
-  (* Hashtable associating a string id with the list of correspong persons' ids *)
+  (* Hashtable associating a string id with the list of corresponding persons' ids *)
   let ht = Dutil.IntHT.create 0 in
   (* Hashtable associating the id of a strings and the id of its lowered form *)
   let ht_mem = Dutil.IntHT.create 0 in
