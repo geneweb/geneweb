@@ -148,26 +148,12 @@ lv: :
 nl: :
 sv: :
 
-    <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
-aa: bsi_connex.htm
-co: <span style="color:#FF0000;">AVERTIMENTU</span> : a cumanda -del squasseghja certe famiglie di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.
-de: <span style="color:#FF0000;">ACHTUNG</span>: der -del Befehl unterdrückt unwiderruflich einige Familien. Ein Backup Archiv wird empfohlen.
-en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
-fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
-
     <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
 aa: bsi.htm
 co: <span style="color:#FF0000;">AVERTIMENTU</span> : U cuntenutu di u schedariu %o serà rimpiazzatu.
 de: <span style="color:#FF0000;">ACHTUNG</span>: Der Inhalt der Datei %o wird überschrieben.
 en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
 fr: <span style="color:#FF0000;">ATTENTION</span> : Le contenu du fichier %o sera écrasé.
-
-    <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
-aa: connex.htm
-co: <span style="color:#FF0000;">AVERTIMENTU</span> : E trè cumande chì seguitanu ponu squassà parechje famiglie di manera irriversibile. Avè un archiviu di salvaguardia hè ricumandatu.
-de: <span style="color:#FF0000;">ACHTUNG</span>: Die folgenden drei Optionen führen zu unwiderruflichen Löschungen. Ein Backup Archiv wird empfohlen.
-en: <span style="color:#FF0000;">WARNING</span>: The following three options result in irreversible deletions. Having a backup archive is recommended.
-fr: <span style="color:#FF0000;">ATTENTION</span> : Les trois commandes qui suivent résultent en la destruction irréversible de familles. Disposer d'une archive serait prudent.
 
     <span style="color:#FF0000;">WARNING</span>: this command modifies the base irreversibly. It may be prudent to have a backup archive.
 aa: bsi_fix.htm
@@ -222,13 +208,6 @@ fr: Options avancées
 it: Opzioni avanzate
 lv: Papildus opcijas
 sv: Avancerade alternativ
-
-    All connex components.
-aa: connex.htm
-co: Tutti i cumpunenti cunnessi.
-de: alle verknüpften Komponenten
-en: All connex components.
-fr: Toutes les composantes connexes.
 
     All your databases to be merged must be first under %G.
 aa: merge.htm
@@ -303,13 +282,6 @@ fr: Êtes-vous sûr de vouloir supprimer ces bases?
 it: Siete sicuri di voler cancellare queste basi ?
 lv: Vai Jûs patieðâm vçlaties dzçst sekojoðas datu bâzes?
 sv: Är du säker att du vill radera dessa databaser?
-
-    Ask for deleting branches whose size <= that value.
-aa: connex.htm
-co: Dumandà di squassà i cumpunenti di dimensione <= à stu valore.
-de: Frage nach dem löschen von Zweigen dessen Größe <= diesem Wert sind.
-en: Ask for deleting branches whose size <= that value.
-fr: Demander à détruire les composantes de taille <= à cette valeur.
 
     Ask to indicate the updates in the welcome pages as a link "history of updates". <p> Remark (technical): the updates traces are saved in a file named "history" in the directory of the database (%a.gwb). This file grows indefinitively. You can edit it to remove the old information. Or you can also delete this file to restart empty.
 aa: gwf_1.htm
@@ -398,20 +370,6 @@ it: Come settaggio standard, al momento della creazione di una persona, se la pa
 lv: Noklusçtajâ variantâ GEDCOM standartâ pirmais vârds ir kâ oficiâlais vârds, t.i.tas var saturçt: <ul> <li>Romieði skaitli, kas apzîmç aristokrâta titlu (piemçram, George V) <li>Vienu no sekojoðiem vârdiem: "der", "den", "die", "el", "le", "la", "the", kâ kvalifikators (e.g. William the Conqueror) </ul> tâdâ gadîjumâ GEDCOMa pirmais vârds kïûst par personas "oficiâlo vârdu" un tâ pirmais vârds par personas vârdu.
 sv: Denna option är förvald: när man skapar en person, om GEDCOM-filens förnamnsdel ser ut som ett officiellt namn, dvs innehåller: <ul> <li>Ett nummer eller ett romersktnummer, förmodas det vara ett nummer för en kunglig- eller adelstitel (tex Gustaf V) <li>Ett av dessa ord: "der", "den", "die", "el", "le", "la", "the", förmodas vara en bestämmning till (tex William the Conqueror) </ul> då blir GEDCOM-filens förnamnsdel personens "officiellanamn" och första ordet dess "förnamn".
 
-    By looking at the terminal window if you have not asked for result redirection.
-aa: connex_ok.htm
-co: Fighjendu in a finestra chì s’hè aperta s’è ùn avete micca dumandatu di ridirezzione di i risultati.
-de: durch das einsehen des Terminal Fensters wenn Sie nicht nach Ergebnis umleitung gefragt haben.
-en: By looking at the terminal window if you have not asked for result redirection.
-fr: En regardant dans la fenêtre qui s'est ouverte si vous n'avez pas demandé de redirection des résultats.
-
-    By origin file.
-aa: connex.htm
-co: Secondu à u schedariu d’origine.
-de: durch Originaldatei
-en: By origin file.
-fr: D'après le fichier origine.
-
     Can be useful in local, in order to be able to put an image for somebody, because the procedure installs automatically the image at the right place with the appropriate file name.
 aa: gwf_1.htm
 de: Dies kann auch bei lokalem Zugiff sinnvoll sein, um Bilder für jemanden zu installieren, da die Funktion das Bild automatisch mit dem richtigen Namen an die richtige Stelle kopiert.
@@ -463,20 +421,6 @@ fr: Vérifier
 it: Verificare
 lv: Pârbaudît
 sv: Radera
-
-    Checks descendants (default).
-aa: gwdiff.htm
-co: Cuntrollà i discendenti (predefinitu)
-de: Prüft Nachkommen (Standard).
-en: Checks descendants (default).
-fr: Vérifier les descendants (par défaut).
-
-    Checks descendants of all ascendants.
-aa: gwdiff.htm
-co: Cuntrollà i discendenti di tutti l’ascendenti.
-de: Prüft Nachkommen aller Verwandten.
-en: Checks descendants of all ascendants.
-fr: Vérifier tous les descendants des ascendants.
 
     cleaning up
 aa: welcome.htm
@@ -537,27 +481,6 @@ it: colore dei links visitati
 lv: izmantoto norâþu krâsa
 sv: färg för de redan besökta länkarna
 
-    Compare
-aa: gwdiff.htm
-co: Paragunà
-de: Vergleichen
-en: Compare
-fr: Comparer
-
-    Compute connected componants
-aa: welcome.htm
-co: Calculeghja i cumpunenti cunnessi
-de: Berechne verbundene Bestandteile
-en: Compute connected componants
-fr: Calcule les composantes connexes
-
-    Compute the difference between two bases
-aa: welcome.htm
-co: Calculeghja a sfarenza trà duie base
-de: Berechne die unterschiede zwischen zwei bases
-en: Compute the difference between two bases
-fr: Calcule la différence entre deux bases
-
     Configure
 aa: welcome.htm
 co: Cunfigurà
@@ -570,13 +493,6 @@ it: Configura
 lv: Konfiguret
 sv: Konfigurera
 
-    Connected components identified
-aa: connex_ok.htm
-co: Cumpunenti cunnessi identificati
-de: Verbundene Komponenten identifiziert
-en: Connected components identified
-fr: Calcul des composantes connexes exécuté
-
     Connection log file.
 aa: gwd.htm
 co: Schedariu di e traccie di cunnessione.
@@ -587,13 +503,6 @@ fr: Fichier de traces de connexion.
 it: File delle tracce di collegamento.
 lv: Pieprasîjumu reìistrâcijas datne.
 sv: Åtkomst loggfil.
-
-    Connex
-aa: connex.htm
-co: Connex
-de: Connex
-en: Connex
-fr: Connex
 
     Consang
 aa: consang.htm
@@ -826,20 +735,6 @@ fr: Répertoire et base d’arrivée
 it: Directory e base finale
 lv: Jaunais datu bâzes katalogs un datu bâze
 sv: Målkatalog och databas
-
-    Details for this length.
-aa: connex.htm
-co: Pruvede detaglii per sta longhezza.
-de: Details für diese länge.
-en: Details for this length.
-fr: Fournir détails pour cette taille.
-
-    Differences computed
-aa: gwdiff_ok.htm
-co: Sfarenza calculata
-de: Unterschiede berechnet
-en: Differences computed
-fr: Différence calculée
 
     Directory
 aa: recover1.htm
@@ -1768,13 +1663,6 @@ it: Se non mettete niente il nome verrà dedotto da quello del file sorgente %G.
 lv: Ja nekas netiks ierakstîts, datu bâzes nosaukums tiks izveidots no %G resursdatnes nosaukuma.
 sv: Om du inte skriver någonting, kommer namnet att bli härlätt från %G källfilens namn.
 
-    Ignore this file.
-aa: connex.htm
-co: Ignurà stu schedariu.
-de: Ignoriere diese Datei.
-en: Ignore this file.
-fr: Ignorer ce fichier.
-
     Images path
 aa: gwf_1.htm
 co: Chjassu d’accessu à e fiure
@@ -1930,13 +1818,6 @@ it: colore dei links
 lv: norâþu krâsa
 sv: länkfärg
 
-    Listing connected components
-aa: connex.htm
-co: Lista di i cumpunenti cunnessi
-de: verbundene Komponenten auflisten
-en: Listing connected components
-fr: Liste des composantes connexes
-
     Look at the traces, may be you can find an explanation.
 co: Fighjate e traccie, forse ci truverete una spiegazione.
 de: Sehen Sie in die Aufzeichnungen, vielleicht finden Sie eine Erklärung.
@@ -2084,13 +1965,6 @@ it: Non accettare le date negative: non interpretare un anno preceduto dal segno
 lv: Neveidot negatîvus datumus no esoðajiem negatîvajiem datumiem.
 sv: Inga negativa datum: tolka inte ett år med minus tecken framför som ett negativt år.
 
-    No redirection of results.
-aa: connex.htm
-co: Alcuna ridirezzione di i risultati.
-de: keine Umleitung von Ergebnissen
-en: No redirection of results.
-fr: Pas de redirection des résultats.
-
     no selection
 aa: delete_1.htm
 co: nisuna selezzione
@@ -2231,20 +2105,6 @@ it: Esistono altri parametri per il comando "gwd", ma non possono essere settati
 lv: Citi "gwd" komandas parametri ðeit nav izmainâmi, jo tie var ietekmçt paðas "gwsetup" programmas darbîbu.
 sv: Det finns andra parametrar för kommandot "gwd", men de kan inte konfigureras här ifrån, därför att de kan hindra operationen av "gwsetup".
 
-    Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
-aa: connex.htm
-co: Inversureghja i risultati ver di basename/notes_d/connex.txt (-o deve stà viotu è notes_d deve esiste).
-de: Ausgabe erfolgt in basename/notes_d/connex.txt (-o muss leer bleiben und notes_d muss existieren).
-en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
-fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
-
-    Output results to this file.
-aa: connex.htm
-co: Inversureghja i risultati ver di stu schedariu.
-de: Ausgabe erfolgt in diese Datei.
-en: Output results to this file.
-fr: Rediriger les résultats vers ce fichier.
-
     Page outdated
 aa: err_outd.htm
 co: Pagina antica à rinnovà
@@ -2361,13 +2221,6 @@ co: testimoni di « pevents ».
 de: pevents' Trauzeuge
 en: pevents' witnesses.
 fr: pevents' witnesses.
-
-    Produce connected components statistics.
-aa: connex.htm
-co: Affissà e statistiche nant’à i cumpunenti cunnessi.
-de: Erzeuge Statistiken über verbundene Komponenten
-en: Produce connected components statistics.
-fr: Afficher les statistiques sur les composantes connexes.
 
     Push the below button to launch the operation
 aa: recover2.htm
@@ -2565,13 +2418,6 @@ it: Ricominciare il calcolo su tutta la base.
 lv: Restart the computing from scratch.
 sv: Starta beräkning från början.
 
-    Restrict deleting branches whose size = -del.
-aa: connex.htm
-co: Limiteghja a squassatura à e ghjembe di dimensione = -del.
-de: Begrenze das löschen von zweigen deren  Größe = -del.
-en: Restrict deleting branches whose size = -del.
-fr: Limite la suppression aux branches de taille = -del.
-
     Return to the main menu.
 aa: delete_1.htm
 co: Rivinite à u listinu principale.
@@ -2757,13 +2603,6 @@ it: Selezionate la vostra base di dati cliccando sul bottone associato
 lv: Ieklikðíinot atbilstoðjâ podziòâ, izvçlieties savu datu bâzi
 sv: Välj din databas genom att klicka på motsvarande knapp
 
-    Select your first database
-aa: gwdiff.htm
-co: Selezziunate a prima basa di dati
-de: Wählen Sie Ihre erste Datenbank
-en: Select your first database
-fr: Sélectionnez la première base de données 
-
     Select your GEDCOM file by clicking on the file or navigating in your folders.
 aa: ged2gwb.htm
 co: Selezziunate u vostru schedariu GEDCOM clicchendu nant’à u so nome, o navigate in i vostri cartulari.
@@ -2774,13 +2613,6 @@ fr: Sélectionnez votre fichier GEDCOM en cliquant sur son nom ou en navigant da
 it: Selezionate il vostro file GEDCOM.
 lv: Ievadiet pilnu GEDCOM datnes nosaukumu.
 sv: Skriv det kompletta namnet på din GEDCOM-fil.
-
-    Select your second database
-aa: gwdiff.htm
-co: Selezziunate a seconda basa di dati
-de: Wählen Sie Ihre zweite Datenbank
-en: Select your second database
-fr: Sélectionnez la seconde base de données
 
     Service gwd
 aa: gwd_info.htm
@@ -2862,13 +2694,6 @@ it: Spiacente, questo file è sconosciuto:
 lv: Atvanojiet ðî datne nav pazîstama:
 sv: Denna fil är okänd:
 
-    Specifiy the number of branches to be deleted.
-aa: connex.htm
-co: Definisce u contu di ghjembe à squassà.
-de: Spezifizieren Sie die Anzahl der zu löschenden Zweige.
-en: Specifiy the number of branches to be deleted.
-fr: Définit le nombre de branches à supprimer.
-
     Starting directory and database
 aa: recover2.htm
 co: Cartulare è basa di dati d’origine
@@ -2879,20 +2704,6 @@ fr: Répertoire et base de départ
 it: Directory e base iniziale
 lv: Vecâs datu bâzes katalogs un datu bâze
 sv: Startkatalog och databas
-
-    Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
-aa: gwdiff.htm
-co: Persona di principu in a prima basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
-de: Startperson in der ersten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
-en: Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
-fr: Personne racine dans la première base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
-
-    Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
-aa: gwdiff.htm
-co: Persona di principu in a seconda basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
-de: Startperson in der zweiten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
-en: Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
-fr: Personne racine dans la seconde base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
 
     Surname
 aa: gwb2ged.htm
@@ -3549,20 +3360,6 @@ it: update_nldb
 lv: update_nldb
 sv: update_nldb
 
-    Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
-aa: connex_ok.htm
-co: Impieghendu <b>gwd</b> per fighjà u schedariu in u cartulare NOTES induve i risultati sò stati ridiretti (%a.gwb/notes_d/connex.txt).<br> Ci viderete l’ultimi dati arregistrati in stu locu (chì ùn sò micca necessariamente quelli chì vò vinite di calculà - fighjate a stampiglia di data è ora in capu di schedariu).<br> Sta suluzione vi permette di seguità i liami ver di e persone indettate.
-de: Verwende <b>gwd</b> um die Datei im NOTES Ordner Ihrer base, in der Sie die Ausgabe umgeleitet haben (%a.gwb/notes_d/connex.txt), zu visualisieren.<br> Diese Datei enthält den zuletzt gespeicherten Datensatz an dieser Position (welcher nicht notwendigerweise der ist, den Sie zuletzt berechnet haben - Siehe Zeitstempel am Anfang der Datei).<br> Diese Lösung erlaubt Ihnen Links zu markierten Personen zu folgen.
-en: Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.
-fr: En utilisant <b>gwd</b> pour visualiser le fichier dans le dossier NOTES où vous avez redirigé les résultats (%a.gwb/notes_d/connex.txt).<br> Vous y verrez la dernière version du fichier connex.txt que vous avez créé à cet endroit (qui n'est pas nécessairement celle que vous venez de calculer - voir l'horodateur en tête de fichier).<br> Cette solution vous permet de suivre les liens vers les personnes désignées.
-
-    Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
-aa: connex_ok.htm
-co: Impieghendu <b>gwsetup</b> per fighjà u schedariu induve i risultati sò stati ridiretti ("%K").
-de: Verwende <b>gwsetup</b>  um die Datei in der Ergebnisse umgeleitet wurden zu visualisieren ("%K").
-en: Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").
-fr: En utilisant <b>gwsetup</b> pour visualiser le fichier vers lequel ont été envoyés les résultats ("%K").
-
     very quiet mode.
 aa: gwfix.htm
 co: manc’appena traccie.
@@ -3872,13 +3669,6 @@ fr: Il se peut que vous soyez parti d’une trop ancienne version de %G. Dans ce
 it: Forse siete partiti da una troppo vecchia versione di %G. In questo caso  riprovate  a fare il trasferimento aggiungendo l'opzione "passare per un file GEDCOM".
 lv: Iespçjams Jûsu dati nâk no pârâk vecas %G versijas. Tâdâ gadîjumâ mçìiniet vçlreiz veikt pârveidoðanu, lietojot iespçju "izmantojot GEDCOM datni" (to Jûs arî variet izdarît aizejot atpakï uz ieprieksçjo lapu).
 sv: Du kanske har gått från en alltför gammal version av %G. I det fallet, försök igen för att göra överföringen med optionen "genom en GEDCOM-fil".
-
-    You may observe results through two means
-aa: connex_ok.htm
-co: Pudete cunsultà i risultati da duie manere sfarente
-de: Sie können ergebnisse durch zwei Mittel feststellen
-en: You may observe results through two means
-fr: Vous pouvez consulter les résultats de deux façons différentes
 
     You selected the directory
 aa: err_ngw.htm
