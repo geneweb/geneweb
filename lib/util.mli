@@ -129,17 +129,6 @@ val is_restricted : Config.config -> Gwdb.base -> Gwdb.iper -> bool
 val is_empty_person : Gwdb.person -> bool
 (** Tells if person is an empty person (a placeholder: his surname is empty) *)
 
-val pget_opt : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person option
-(** Returns person option with giving id from the base.
-    Wrapper around `Gwdb.poi` defined such as:
-    - Some ip: if user have permissions or `use_restrict` disabled.
-    - None: if `conf.use_restrict` (option defined in .gwf file):
-      checks that the user has enought rights to see
-      corresponding person (see `authorized_age`).
-      If the user does not have enought permissions, returns
-      None.
-*)
-
 val pget : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person
 (** Value of [pget_opt], map None to empty_person *)
 
@@ -500,22 +489,6 @@ val include_template :
     Search [fname] in templates path and interpret it with global environnement [env] provided.
     Interpretation of template write directly its results in the socket.
     If the file can not be found, [failure] is called.
-*)
-
-val select_masc :
-  Config.config ->
-  Gwdb.base ->
-  (Gwdb.iper * int) list ->
-  (Gwdb.iper, int * Gwdb.person) Hashtbl.t
-(** [select_masc conf base ips]
-    From [ips], a list matching ipers to a number of maximum generations,
-    get maximum ascendants of ipers up to these corresponding generations.
-
-    A person is maximum ascendant if their generation matches the maximum, or
-    if they do not have ancestors.
-
-    The result is a Hashtbl matching an iper to the corresponding person and
-    their generation.
 *)
 
 val select_desc :

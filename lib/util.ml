@@ -601,6 +601,15 @@ let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
   in
   if conf.Config.use_restrict then Gwdb.base_visible_get base fct ip else false
 
+(** Returns person option with giving id from the base.
+    Wrapper around `Gwdb.poi` defined such as:
+    - Some ip: if user have permissions or `use_restrict` disabled.
+    - None: if `conf.use_restrict` (option defined in .gwf file):
+      checks that the user has enought rights to see
+      corresponding person (see `authorized_age`).
+      If the user does not have enought permissions, returns
+      None.
+*)
 let pget_opt conf base ip =
   if is_restricted conf base ip then None else Some (Gwdb.poi base ip)
 
@@ -2274,6 +2283,16 @@ let array_mem_witn base ip witnesses wnotes =
   in
   loop 0
 
+(** [select_masc conf base ips]
+    From [ips], a list matching ipers to a number of maximum generations,
+    get maximum ascendants of ipers up to these corresponding generations.
+
+    A person is maximum ascendant if their generation matches the maximum, or
+    if they do not have ancestors.
+
+    The result is a Hashtbl matching an iper to the corresponding person and
+    their generation.
+*)
 let select_masc conf base ips =
   let poi =
     if conf.Config.wizard || conf.Config.friend then Gwdb.poi else pget conf
