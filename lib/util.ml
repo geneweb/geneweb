@@ -258,7 +258,6 @@ let ftransl conf s = valid_format s (transl conf (string_of_format s))
 let ftransl_nth conf s p =
   valid_format s (transl_nth conf (string_of_format s) p)
 
-let fdecline w s = valid_format w (gen_decline_basic (string_of_format w) s)
 let translate_eval s = Translate.eval (Mutil.nominative s)
 
 (* *)
@@ -1077,16 +1076,6 @@ let body_prop conf =
     | s -> " " ^ s
   with Not_found -> ""
 
-let get_server_string conf =
-  if not conf.Config.cgi then
-    Mutil.extract_param "host: " '\r' conf.Config.request
-  else
-    let server_name = try Sys.getenv "SERVER_NAME" with Not_found -> "" in
-    let server_port =
-      try Sys.getenv "SERVER_PORT" with Not_found | Failure _ -> "80"
-    in
-    if server_port = "80" then server_name else server_name ^ ":" ^ server_port
-
 let get_request_string conf =
   if not conf.Config.cgi then Mutil.extract_param "GET " ' ' conf.Config.request
   else
@@ -1792,13 +1781,6 @@ let browser_doesnt_have_tables conf =
   let user_agent = Mutil.extract_param "user-agent: " '/' conf.Config.request in
   String.lowercase_ascii user_agent = "lynx"
 
-let of_course_died conf p =
-  match Date.cdate_to_dmy_opt (Gwdb.get_birth p) with
-  | Some d ->
-      (* TODO this value should be defined elsewhere *)
-      conf.Config.today.year - d.year > 120
-  | None -> false
-
 let escache_value base =
   let t = Gwdb.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in
@@ -2087,22 +2069,6 @@ let wprint_in_columns conf order wprint_elem list =
 (*  [Fonc] print_reference : config -> string -> int -> string -> unit    *)
 
 (* ********************************************************************** *)
-
-(** [Description] : Affiche la référence d'une personne
-    [Args] :
-      - conf : configuration de la base
-      - fn   : first name
-      - occ  : occ
-      - sn   : surname
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                           *)
-let print_reference conf fn occ sn =
-  Output.print_sstring conf "<span class=\"reference\">";
-  Output.printf conf " (%s %s.%d %s)"
-    (transl conf "reference key")
-    (Name.lower fn) occ (Name.lower sn);
-  Output.print_sstring conf "</span>"
 
 (* ********************************************************************** *)
 (*  [Fonc] gen_print_tips : conf -> string -> unit                        *)
@@ -2450,13 +2416,6 @@ let name_with_roman_number str =
   loop false 0 0
 
 let designation base p = Gutil.designation base p |> escape_html
-
-let has_children base u =
-  Array.exists
-    (fun ifam ->
-      let des = Gwdb.foi base ifam in
-      Array.length (Gwdb.get_children des) > 0)
-    (Gwdb.get_family u)
 
 let rec cut_at_equal i s =
   if i = String.length s then (s, "")

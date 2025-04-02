@@ -38,8 +38,6 @@ val html : ?content_type:string -> Config.config -> unit
 val unauthorized : Config.config -> string -> unit
 (** Prints HTTP response with code 401 (Unauthorized) and error page with giving message *)
 
-val string_of_ctime : Config.config -> string
-
 val commd :
   ?excl:string list ->
   ?trim:bool ->
@@ -194,8 +192,6 @@ val message_to_wizard : Config.config -> unit
     {i <basename>/etc/mess_wizzard.txt} (messages destinated to all wizards) and in
     {i <basename>/etc/mess_wizzard_<user>.txt} (messages destinated to considered wizard). *)
 
-val of_course_died : Config.config -> Gwdb.person -> bool
-
 val surname_particle : Gwdb.base -> string -> string
 (** [surname_particle base sn]
     Extract the particle of [sn] if there is one.
@@ -215,7 +211,6 @@ val get_approx_death_date_place :
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
 val check_format : ('a, 'b) format2 -> string -> ('a, 'b) format2 option
-val valid_format : ('a, 'b) format2 -> string -> ('a, 'b) format2
 
 val transl : Config.config -> string -> string
 (** Find translation of given keyword in [conf.lexicon].
@@ -227,7 +222,6 @@ val transl_nth : Config.config -> string -> int -> string
 val transl_decline : Config.config -> string -> string -> string
 val ftransl : Config.config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : Config.config -> ('a, 'b) format2 -> int -> ('a, 'b) format2
-val fdecline : ('a, 'b) format2 -> string -> ('a, 'b) format2
 val fcapitale : ('a, 'b) format2 -> ('a, 'b) format2
 
 val nth_field : string -> int -> string
@@ -319,9 +313,6 @@ val find_sosa_ref : Config.config -> Gwdb.base -> Gwdb.person option
 val update_gwf_sosa :
   Config.config -> Gwdb.base -> Gwdb.iper * (string * string * int) -> unit
 
-val get_server_string : Config.config -> string
-(** Returns server host name with its port number (if different from 80). *)
-
 val get_request_string : Config.config -> string
 (** Returns request string. Request string has format {i scriptname?querystring} where
     scriptname is a path to the script in URI. *)
@@ -407,8 +398,6 @@ val wprint_in_columns :
 val is_hide_names : Config.config -> Gwdb.person -> bool
 (** Tells if person's names are hiden (if person's access is [Private] or if mode [conf.hide_names] is enabled). *)
 
-val print_reference : Config.config -> string -> int -> string -> unit
-
 val gen_print_tips : Config.config -> Adef.safe_string -> unit
 (** Print a tip with the specified text *)
 
@@ -419,7 +408,6 @@ val display_options : Config.config -> Adef.escaped_string
 
 type cache_visited_t = (string, (Gwdb.iper * string) list) Hashtbl.t
 
-val cache_visited : Config.config -> string
 val read_visited : Config.config -> cache_visited_t
 val record_visited : Config.config -> Gwdb.iper -> unit
 
@@ -536,8 +524,6 @@ val name_with_roman_number : string -> string option
 
 val designation : Gwdb.base -> Gwdb.person -> Adef.escaped_string
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
-
-val has_children : Gwdb.base -> Gwdb.person -> bool
 
 val is_fully_visible_to_visitors :
   Config.config -> Gwdb.base -> Gwdb.person -> bool
