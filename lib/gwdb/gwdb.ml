@@ -263,3 +263,16 @@ let parents_of_person base person =
   person |> get_parents
   |> Option.map (foi base)
   |> Option.map gen_couple_of_family
+
+type person_reference = {
+  surname : string;
+  first_name : string;
+  occurrence_number : int;
+}
+
+let person_reference base person =
+  {
+    surname = Name.lower @@ p_surname base person;
+    first_name = Name.lower @@ p_first_name base person;
+    occurrence_number = get_occ person;
+  }

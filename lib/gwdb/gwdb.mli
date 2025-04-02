@@ -31,3 +31,11 @@ val nobtitles :
 
 val children_of_p : base -> person -> iper list
 val parents_of_person : base -> person -> iper Adef.gen_couple option
+
+type person_reference = private {
+  surname : string;
+  first_name : string;
+  occurrence_number : int;
+}
+
+val person_reference : base -> person -> person_reference
