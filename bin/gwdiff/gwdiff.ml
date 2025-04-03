@@ -304,8 +304,8 @@ let compatible_occupations p1 p2 =
     If first names are not compatible, the returned list will have MsgFirstName.
     If surnames are not compatible, the returned list will have MsgSurname. *)
 let compatible_persons_ligth base1 base2 p1 p2 =
-  let fn1 = sou base1 p1.first_name in
-  let fn2 = sou base2 p2.first_name in
+  let fn1 = sou base1 p1.Def.first_name in
+  let fn2 = sou base2 p2.Def.first_name in
   let afn2 = fn2 :: List.map (sou base2) p2.first_names_aliases in
   let sn1 = sou base1 p1.surname in
   let sn2 = sou base2 p2.surname in
