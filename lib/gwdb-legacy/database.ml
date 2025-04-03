@@ -914,31 +914,54 @@ let iper_stream_of_prefix base_data spi prefix =
   else fun () -> iper_of_prefix base_data spi prefix
 
 let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
-    ~dat_fname ~proj ~base_data ~version ~patches prefix =
-  let prefix, spi =
-    (* check if lowered names indexes files exist *)
-    if
-      Sys.file_exists (Filename.concat base_data.bdir inx_lower_fname)
-      && Sys.file_exists (Filename.concat base_data.bdir dat_lower_fname)
-    then
-      let spi =
-        persons_of_lower_fs_name version base_data
-          ( proj,
-            snd patches.h_person,
-            inx_lower_fname,
-            dat_lower_fname,
-            base_data.bdir )
-      in
-      let prefix = Name.lower prefix in
-      (prefix, spi)
-    else
-      let spi =
-        persons_of_surname version base_data
-          (proj, snd patches.h_person, inx_fname, dat_fname, base_data.bdir)
-      in
-      (prefix, spi)
-  in
-  iper_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
+    ~dat_fname ~proj ~insert_string ~base_data ~version ~patches =
+  let mem_proj = Dutil.IntHT.create 0 in
+  let mem_strings = Dutil.IntHT.create 0 in
+  fun prefix ->
+    let prefix, spi =
+      (* check if lowered names indexes files exist *)
+      if
+        Sys.file_exists (Filename.concat base_data.bdir inx_lower_fname)
+        && Sys.file_exists (Filename.concat base_data.bdir dat_lower_fname)
+      then
+        let proj p =
+          let iper = p.Dbdisk.key_index in
+          match Dutil.IntHT.find_opt mem_proj iper with
+          | Some projection -> projection
+          | None ->
+              let aux istr =
+                match Dutil.IntHT.find_opt mem_strings istr with
+                | Some istrs -> istrs
+                | None ->
+                    let lowered_strings_istrs =
+                      Dutil.insert_lowered_name_suffix_istrs ~insert_string
+                        ~base_data ~istr
+                    in
+                    Dutil.IntHT.add mem_strings istr lowered_strings_istrs;
+                    lowered_strings_istrs
+              in
+              let istrs = List.flatten (List.map aux (proj p)) in
+              Dutil.IntHT.add mem_proj iper istrs;
+              istrs
+        in
+        let spi =
+          persons_of_lower_fs_name version base_data
+            ( proj,
+              snd patches.h_person,
+              inx_lower_fname,
+              dat_lower_fname,
+              base_data.bdir )
+        in
+        let prefix = Name.lower prefix in
+        (prefix, spi)
+      else
+        let spi =
+          persons_of_surname version base_data
+            (proj, snd patches.h_person, inx_fname, dat_fname, base_data.bdir)
+        in
+        (prefix, spi)
+    in
+    iper_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
 
 let persons_stream_of_first_name_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
@@ -1383,9 +1406,11 @@ let opendb bname =
               "fnames.dat",
               bname ));
       persons_stream_of_first_name_prefix =
-        persons_stream_of_first_name_prefix ~base_data ~version ~patches;
+        persons_stream_of_first_name_prefix ~insert_string ~base_data ~version
+          ~patches;
       persons_stream_of_surname_prefix =
-        persons_stream_of_surname_prefix ~base_data ~version ~patches;
+        persons_stream_of_surname_prefix ~insert_string ~base_data ~version
+          ~patches;
       patch_person;
       patch_ascend;
       patch_union;
