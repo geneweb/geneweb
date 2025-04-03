@@ -100,13 +100,17 @@ let split_name ~kind name =
     (fun value -> Ext_option.return_if (name <> "") (fun () -> { kind; value }))
     (Name.split name)
 
+let sort_by_len l =
+  let cmp pfx1 pfx2 = String.length pfx2.value - String.length pfx1.value in
+  List.sort cmp l
+
 let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
     ~limit =
   let l =
     let main_prefix, other_prefixes, partial_results =
       match
-        ( split_name ~kind:`First_name first_name_prefix,
-          split_name ~kind:`Surname surname_prefix )
+        ( sort_by_len (split_name ~kind:`First_name first_name_prefix),
+          sort_by_len (split_name ~kind:`Surname surname_prefix) )
       with
       | [], [] -> (None, [], [])
       | main_prefix :: other_prefixes, [] ->
