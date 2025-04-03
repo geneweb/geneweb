@@ -129,6 +129,7 @@ let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
     in
     match main_prefix with
     | None -> []
+    | Some _ when other_prefixes = [] -> partial_results
     | Some main_prefix ->
         let extra_results =
           let limit = limit - List.length partial_results in
