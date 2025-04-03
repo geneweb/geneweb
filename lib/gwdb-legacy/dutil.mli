@@ -126,3 +126,9 @@ val map_family_ps :
     - Generic type used to represent another large part of information of [Def.gen_family]
     into another one.
     If [fd] is present, apply it on it on every date (marriage, divorce, famillial events, etc.).*)
+
+val insert_lowered_name_suffix_istrs :
+  insert_string:(string -> int) ->
+  base_data:Dbdisk.base_data ->
+  istr:int ->
+  int list
