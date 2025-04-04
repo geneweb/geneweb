@@ -19,11 +19,11 @@ let input_templ conf fname =
   match Util.open_etc_file conf fname with
   | None -> None
   | Some (ic, fname) ->
-      Templ_parser.wrap fname (fun () ->
-          let lex = Lexing.from_channel ic in
-          let r = Templ_parser.parse_templ conf lex in
-          close_in ic;
-          Some r)
+      Templ_parser.wrap fname @@ fun () ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+      let lex = Lexing.from_channel ic in
+      let r = Templ_parser.parse_templ conf lex in
+      Some r
 
 let sort_apply_parameters loc f_expr xl vl =
   let named_vl, unnamed_vl =
