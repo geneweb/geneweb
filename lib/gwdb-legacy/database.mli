@@ -30,3 +30,8 @@ type synchro_patch = {
 }
 (** List of commited modifications inside the database. First element is a timestamp of a commit,
     second - changed/added by considered commit person ids, third - changed/added by considered commit families ids. *)
+
+val lowercase_first_name_index_file : string
+val lowercase_first_name_data_file : string
+val lowercase_surname_index_file : string
+val lowercase_surname_data_file : string
