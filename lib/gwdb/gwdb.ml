@@ -276,3 +276,6 @@ let person_reference base person =
     first_name = Name.lower @@ p_first_name base person;
     occurrence_number = get_occ person;
   }
+
+let search_indexes_can_be_initialized_on_the_fly base =
+  nb_of_persons base < 100_000
