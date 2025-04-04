@@ -55,12 +55,12 @@ val link_to_referer : config -> Adef.safe_string
 val incorrect_request : ?comment:string -> config -> unit
 (** Sends [Bad Request] HTTP response (same as [GWPARAM.output_error conf Bad_Request]) *)
 
-(* TODOO CP *)
+(* TODO OCP *)
 val interp :
-  config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit
+  config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.Env.t -> 'b -> unit
 
 val interp_no_header :
-  config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit
+  config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.Env.t -> 'b -> unit
 
 val interp_no_env : config -> string -> unit
 

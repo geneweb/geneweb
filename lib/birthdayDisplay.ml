@@ -599,4 +599,4 @@ let print_anniversaries conf =
         Templ.set_vother;
         Templ.print_foreach = (fun _ -> raise Not_found);
       }
-      [] ()
+      Templ.Env.empty ()

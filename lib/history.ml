@@ -355,7 +355,7 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -586,7 +586,9 @@ let print_foreach conf base print_ast eval_expr =
           else
             let key = match keyo with Some s -> s | None -> "" in
             let env =
-              ("info", Vinfo (time, action, user, hist_item, key)) :: env
+              Templ.Env.add "info"
+                (Vinfo (time, action, user, hist_item, key))
+                env
             in
             List.iter (print_ast env xx) al;
             i + 1)
@@ -597,17 +599,21 @@ let print_foreach conf base print_ast eval_expr =
 
 let gen_print conf base hoo =
   let env =
-    let env = [ ("pos", Vpos (ref 0)); ("count", Vcnt (ref 0)) ] in
-    match hoo with Some ho -> ("search", Vsearch ho) :: env | None -> env
+    Templ.Env.(empty |> add "pos" (Vpos (ref 0)) |> add "count" (Vcnt (ref 0)))
+  in
+  let env =
+    match hoo with
+    | Some ho -> Templ.Env.add "search" (Vsearch ho) env
+    | None -> env
   in
   Hutil.interp conf "updhist"
     {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf base;
+      eval_var = eval_var conf base;
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = print_foreach conf base;
     }
     env ()
 

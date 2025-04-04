@@ -13,7 +13,7 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -45,7 +45,7 @@ let print_foreach conf _base print_ast eval_expr =
                 if accessible && is_visible conf mess then (
                   let next_pos = MF.rpos_in ic in
                   let vmess = Vmess (mess, prev_mess, pos, next_pos, None) in
-                  let env = ("mess", vmess) :: env in
+                  let env = Templ.Env.add "mess" vmess env in
                   List.iter (print_ast env ()) al;
                   loop (Some mess) (i + 1))
                 else loop prev_mess i
@@ -244,15 +244,15 @@ and eval_message_string_var conf str so = function
 
 let visualize conf base mess =
   let vmess = Vmess (mess, None, MF.not_a_pos, MF.not_a_pos, None) in
-  let env = [ ("mess", vmess) ] in
+  let env = Templ.Env.(add "mess" vmess empty) in
   Hutil.interp conf "forum"
     {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf base;
+      eval_var = eval_var conf base;
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = print_foreach conf base;
     }
     env ()
 
@@ -297,28 +297,26 @@ let print_valid_ok conf pos del =
 let print_forum_message conf base r so =
   let env =
     match r with
-    | Some (acc, mess, pos, next_pos) ->
-        if acc && is_visible conf mess then
-          [
-            ("mess", Vmess (mess, None, pos, next_pos, so));
-            ("pos", Vpos (ref pos));
-          ]
-        else [ ("pos", Vpos (ref MF.not_a_pos)) ]
-    | None -> [ ("pos", Vpos (ref MF.not_a_pos)) ]
+    | Some (acc, mess, pos, next_pos) when acc && is_visible conf mess ->
+        Templ.Env.(
+          empty
+          |> add "mess" (Vmess (mess, None, pos, next_pos, so))
+          |> add "pos" (Vpos (ref pos)))
+    | Some _ | None -> Templ.Env.(add "pos" (Vpos (ref MF.not_a_pos)) empty)
   in
   Hutil.interp conf "forum"
     {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf base;
+      eval_var = eval_var conf base;
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = print_foreach conf base;
     }
     env ()
 
 let print_forum_headers conf base =
-  let env = [ ("pos", Vpos (ref MF.not_a_pos)) ] in
+  let env = Templ.Env.(add "pos" (Vpos (ref MF.not_a_pos)) empty) in
   Hutil.interp conf "forum"
     {
       Templ.eval_var = eval_var conf base;

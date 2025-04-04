@@ -478,7 +478,7 @@ let print_source = gen_print Source
 
 type 'a env = Vsosa_ref of person option Lazy.t | Vother of 'a | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -559,16 +559,16 @@ let print_welcome conf base =
       let sosa_ref () = Util.find_sosa_ref conf base in
       Lazy.from_fun sosa_ref
     in
-    [ ("sosa_ref", Vsosa_ref sosa_ref_l) ]
+    Templ.Env.(add "sosa_ref" (Vsosa_ref sosa_ref_l) empty)
   in
   Hutil.interp conf "welcome"
     {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = eval_predefined_apply conf;
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf;
+      eval_var = eval_var conf base;
+      eval_transl = (fun _env -> Templ.eval_transl conf);
+      eval_predefined_apply = eval_predefined_apply conf;
+      get_vother;
+      set_vother;
+      print_foreach = print_foreach conf;
     }
     env ()
 
@@ -577,12 +577,12 @@ let print conf base fname =
   if Sys.file_exists (Util.etc_file_name conf fname) then
     Hutil.interp conf fname
       {
-        Templ.eval_var = eval_var conf base;
-        Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = eval_predefined_apply conf;
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = print_foreach conf;
+        eval_var = eval_var conf base;
+        eval_transl = (fun _env -> Templ.eval_transl conf);
+        eval_predefined_apply = eval_predefined_apply conf;
+        get_vother;
+        set_vother;
+        print_foreach = print_foreach conf;
       }
-      [] ()
+      Templ.Env.empty ()
   else gen_print Lang conf base fname
