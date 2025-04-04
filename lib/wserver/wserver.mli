@@ -2,41 +2,34 @@
 
 (* module [Wserver]: elementary web service *)
 
-val f :
-  ([ `LOG_EMERG
-   | `LOG_ALERT
-   | `LOG_CRIT
-   | `LOG_ERR
-   | `LOG_WARNING
-   | `LOG_NOTICE
-   | `LOG_INFO
-   | `LOG_DEBUG ] ->
-  string ->
-  unit) ->
-  string option ->
-  int ->
-  int ->
-  int option ->
+module GwdLog : module type of GwdLog
+
+val start :
+  ?addr:string ->
+  port:int ->
+  ?timeout:int ->
+  max_pending_requests:int ->
+  n_workers:int ->
   (Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit) ->
   unit
-(** [ Wserver.f syslog addr port tmout maxc g ]
-    Starts an elementary httpd server at port [port] in the current
-    machine. The variable [addr] is [Some the-address-to-use] or
-    [None] for any of the available addresses of the present machine.
-    The port number is any number greater than 1024 (to create a
-    client < 1024, you must be root). At each connection, the function
-    [g] is called: [g (addr, request) path query] where [addr] is the
-    client identification socket, [request] the browser request, [path]
-    the part of the [request] before the query part and [query] the query content.
-    The function [g] has [tmout] seconds to answer some
-    text on standard output. If [maxc] is [Some n], maximum [n]
-    clients can be treated at the same time; [None] means no limit.
-    [syslog] is the function used to log errors or debug info. It is
-    called syslog because it is used with the same gravity levels, but
-    it can be anything.
+(** [Wserver.start ?addr ~port ?timeout ~n_workers callback]
+    starts a HTTP 1.1 server that listens on the address [addr] and port [port].
 
-    See the example below.
-*)
+    On Unix, worker jobs managed by [n_workers] workers have a time limit of
+    [timeout]. If [timeout] is [Some 0] or [None], there is no limit.
+
+    The [max_pending_requests] argument specified the maximum number of
+    pending requests that the server can store. If the queue is full, new
+    requests are ignored until space becomes available.
+
+    When a client connects, [callback] is invoked with the arguments
+    [(addr, request) path query] where:
+      - [addr] is the client address,
+      - [request] is the client request,
+      - [path] is the path of the request,
+      - [query] is the query content.
+
+    Listening on ports < 1024 may require root privileges. *)
 
 val close_connection : unit -> unit
 (** Closes the current socket *)

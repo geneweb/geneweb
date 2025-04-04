@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module GwdLog = Wserver.GwdLog
+
 #ifdef DEBUG
 let () = Sys.enable_runtime_warnings true
 #endif
@@ -37,7 +39,10 @@ let images_prefix = ref ""
 let etc_prefix = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref 1800
-let max_clients = ref None
+let default_n_workers = 20
+let n_workers = ref default_n_workers
+let default_max_pending_requests = 150
+let max_pending_requests = ref default_max_pending_requests
 let no_host_address = ref false
 let only_addresses = ref []
 let plugins = ref []
@@ -82,6 +87,11 @@ let print_and_cut_if_too_big oc str =
       end
   in
   loop 0
+
+let deprecated_warning_max_clients () =
+  Format.eprintf "The `-max_clients` option is deprecated and may be removed \
+    in a future release.@ It has no effect.@ Use `-n_workers` and
+    `-max_pending_requests` instead.@."
 
 type auth_report =
   { ar_ok : bool;
@@ -1813,8 +1823,8 @@ let geneweb_server () =
           GWPARAM.syslog `LOG_CRIT (Format.sprintf "failure creating %s (%s)\n"
             !GWPARAM.cnt_dir e);
     end;
-  Wserver.f Geneweb.GWPARAM.syslog !selected_addr !selected_port !conn_timeout
-    (if Sys.unix then !max_clients else None) connection
+  Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+    ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers connection
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2020,7 +2030,10 @@ let main () =
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
     ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
 #ifdef UNIX
-    ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
+    ; ("-max_clients", Arg.Int
+    (fun x -> deprecated_warning_max_clients ()), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi) (DEPRECATED).")
+    ; ("-n_workers", Arg.Int (fun x -> n_workers := x), "<NUM> Number of workers used by the server (default: " ^ string_of_int default_n_workers ^ ")")
+    ; ("-max_pending_requests", Arg.Int (fun x -> max_pending_requests := x), "<NUM> Maximum number of pending requests (default: " ^ string_of_int default_max_pending_requests ^ ")")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (only on Unix) (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
     ; ("-no-fork", Arg.Set Wserver.no_fork, " Prevent forking processes")
