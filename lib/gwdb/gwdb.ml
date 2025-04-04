@@ -318,3 +318,6 @@ let person_reference base person =
 
 let person_reference_key { surname; first_name; occurrence_number } =
   Printf.sprintf "%s.%d %s" first_name occurrence_number surname
+
+let search_indexes_can_be_initialized_on_the_fly base =
+  nb_of_persons base < 100_000

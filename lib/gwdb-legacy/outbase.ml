@@ -413,6 +413,43 @@ let generate_lowercase_surname_index ~strings_data base =
     Files.rm lowercase_surname_index_file;
     Sys.rename tmp_snames_lower_inx lowercase_surname_index_file
 
+let initialize_lowercase_name_index ~kind base =
+  let lock_file =
+    match kind with
+    | `First_name -> "initialize_lowercase_first_name_index"
+    | `Surname -> "initialize_lowercase_surname_index"
+  in
+  Lock.control ~onerror:Lock.print_try_again
+    (Files.lock_file @@ Filename.concat base.data.bdir lock_file)
+    true
+    (fun () ->
+      let index_files, generate_index =
+        match kind with
+        | `First_name ->
+            ( [
+                Database.lowercase_first_name_data_file;
+                Database.lowercase_first_name_index_file;
+              ],
+              generate_lowercase_first_name_index )
+        | `Surname ->
+            ( [
+                Database.lowercase_surname_data_file;
+                Database.lowercase_surname_index_file;
+              ],
+              generate_lowercase_surname_index )
+      in
+      let already_initialized =
+        List.for_all Sys.file_exists
+          (List.map (Filename.concat base.data.bdir) index_files)
+      in
+      if not already_initialized then (
+        let commit_index =
+          generate_index ~strings_data:(StringData.of_base base) base
+        in
+        let commit_base = generate_base base in
+        commit_base ();
+        commit_index ()))
+
 let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
   let bname = base.data.bdir in
