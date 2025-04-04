@@ -295,6 +295,8 @@ let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
   let bname = base.data.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
+  let base_file = Filename.concat bname "base" in
+  let base_acc_file = Filename.concat bname "base.acc" in
   (* temporary files *)
   let tmp_particles = Filename.concat bname "1particles.txt" in
   let tmp_base = Filename.concat bname "1base" in
@@ -318,6 +320,18 @@ let output ?(save_mem = false) ?(tasks = []) base =
   load_descends_array base;
   load_strings_array base;
   let strings_data = StringData.of_base base in
+  let lowercase_surname_data_file =
+    Filename.concat base.data.bdir Database.lowercase_surname_data_file
+  in
+  let lowercase_surname_index_file =
+    Filename.concat base.data.bdir Database.lowercase_surname_index_file
+  in
+  let lowercase_first_name_data_file =
+    Filename.concat base.data.bdir Database.lowercase_first_name_data_file
+  in
+  let lowercase_first_name_index_file =
+    Filename.concat base.data.bdir Database.lowercase_first_name_index_file
+  in
   trace "create first name lower index";
   output_first_name_lower_index strings_data base tmp_fnames_lower_inx
     tmp_fnames_lower_dat;
@@ -475,10 +489,10 @@ let output ?(save_mem = false) ?(tasks = []) base =
      Files.rm tmp_strings_inx;
      Files.remove_dir tmp_notes_d;
      raise e);
-  Files.rm (Filename.concat bname "base");
-  Sys.rename tmp_base (Filename.concat bname "base");
-  Files.rm (Filename.concat bname "base.acc");
-  Sys.rename tmp_base_acc (Filename.concat bname "base.acc");
+  Files.rm base_file;
+  Sys.rename tmp_base base_file;
+  Files.rm base_acc_file;
+  Sys.rename tmp_base_acc base_acc_file;
   Files.rm (Filename.concat bname "names.inx");
   Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
   Files.rm (Filename.concat bname "names.acc");
@@ -492,18 +506,14 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
 
-  Files.rm (Filename.concat bname Database.lowercase_surname_data_file);
-  Sys.rename tmp_snames_lower_dat
-    (Filename.concat bname Database.lowercase_surname_data_file);
-  Files.rm (Filename.concat bname Database.lowercase_surname_index_file);
-  Sys.rename tmp_snames_lower_inx
-    (Filename.concat bname Database.lowercase_surname_index_file);
-  Files.rm (Filename.concat bname Database.lowercase_first_name_data_file);
-  Sys.rename tmp_fnames_lower_dat
-    (Filename.concat bname Database.lowercase_first_name_data_file);
-  Files.rm (Filename.concat bname Database.lowercase_first_name_index_file);
-  Sys.rename tmp_fnames_lower_inx
-    (Filename.concat bname Database.lowercase_first_name_index_file);
+  Files.rm lowercase_surname_data_file;
+  Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
+  Files.rm lowercase_surname_index_file;
+  Sys.rename tmp_snames_lower_inx lowercase_surname_index_file;
+  Files.rm lowercase_first_name_data_file;
+  Sys.rename tmp_fnames_lower_dat lowercase_first_name_data_file;
+  Files.rm lowercase_first_name_index_file;
+  Sys.rename tmp_fnames_lower_inx lowercase_first_name_index_file;
 
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
