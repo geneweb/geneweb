@@ -606,3 +606,6 @@ let base_visible_get base fct i =
       visible_ref := Some visible;
       status
   | Some b -> b
+
+let initialize_lowercase_name_index ~kind base =
+  Outbase.initialize_lowercase_name_index ~kind base
