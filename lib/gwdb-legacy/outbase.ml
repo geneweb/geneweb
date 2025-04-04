@@ -492,14 +492,18 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
 
-  Files.rm (Filename.concat bname "snames_lower.dat");
-  Sys.rename tmp_snames_lower_dat (Filename.concat bname "snames_lower.dat");
-  Files.rm (Filename.concat bname "snames_lower.inx");
-  Sys.rename tmp_snames_lower_inx (Filename.concat bname "snames_lower.inx");
-  Files.rm (Filename.concat bname "fnames_lower.dat");
-  Sys.rename tmp_fnames_lower_dat (Filename.concat bname "fnames_lower.dat");
-  Files.rm (Filename.concat bname "fnames_lower.inx");
-  Sys.rename tmp_fnames_lower_inx (Filename.concat bname "fnames_lower.inx");
+  Files.rm (Filename.concat bname Database.lowercase_surname_data_file);
+  Sys.rename tmp_snames_lower_dat
+    (Filename.concat bname Database.lowercase_surname_data_file);
+  Files.rm (Filename.concat bname Database.lowercase_surname_index_file);
+  Sys.rename tmp_snames_lower_inx
+    (Filename.concat bname Database.lowercase_surname_index_file);
+  Files.rm (Filename.concat bname Database.lowercase_first_name_data_file);
+  Sys.rename tmp_fnames_lower_dat
+    (Filename.concat bname Database.lowercase_first_name_data_file);
+  Files.rm (Filename.concat bname Database.lowercase_first_name_index_file);
+  Sys.rename tmp_fnames_lower_inx
+    (Filename.concat bname Database.lowercase_first_name_index_file);
 
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");

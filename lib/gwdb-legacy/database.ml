@@ -1015,16 +1015,21 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
     in
     iper_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
 
+let lowercase_first_name_index_file = "fnames_lower.inx"
+let lowercase_first_name_data_file = "fnames_lower.dat"
+let lowercase_surname_index_file = "snames_lower.inx"
+let lowercase_surname_data_file = "snames_lower.dat"
+
 let persons_stream_of_first_name_prefix =
-  persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
-    ~dat_lower_fname:"fnames_lower.dat" ~inx_fname:"fnames.inx"
+  persons_stream_of_prefix ~inx_lower_fname:lowercase_first_name_index_file
+    ~dat_lower_fname:lowercase_first_name_data_file ~inx_fname:"fnames.inx"
     ~dat_fname:"fnames.dat"
     ~proj:(fun p -> p.first_name :: p.first_names_aliases)
     ~has_changed:first_name_changed
 
 let persons_stream_of_surname_prefix =
-  persons_stream_of_prefix ~inx_lower_fname:"snames_lower.inx"
-    ~dat_lower_fname:"snames_lower.dat" ~inx_fname:"snames.inx"
+  persons_stream_of_prefix ~inx_lower_fname:lowercase_surname_index_file
+    ~dat_lower_fname:lowercase_surname_data_file ~inx_fname:"snames.inx"
     ~dat_fname:"snames.dat"
     ~proj:(fun p -> p.surname :: p.surnames_aliases)
     ~has_changed:surname_changed
@@ -1428,15 +1433,15 @@ let opendb bname =
             bname );
       persons_of_lower_surname =
         (if
-         Sys.file_exists (Filename.concat bname "snames_lower.inx")
-         && Sys.file_exists (Filename.concat bname "snames_lower.dat")
+         Sys.file_exists (Filename.concat bname lowercase_surname_index_file)
+         && Sys.file_exists (Filename.concat bname lowercase_surname_data_file)
         then
          persons_of_lower_fs_name version base_data
            ( (fun p -> p.surname :: p.surnames_aliases),
              first_name_changed,
              snd patches.h_person,
-             "snames_lower.inx",
-             "snames_lower.dat",
+             lowercase_surname_index_file,
+             lowercase_surname_data_file,
              bname )
         else
           persons_of_surname version base_data
@@ -1448,15 +1453,16 @@ let opendb bname =
               bname ));
       persons_of_lower_first_name =
         (if
-         Sys.file_exists (Filename.concat bname "fnames_lower.inx")
-         && Sys.file_exists (Filename.concat bname "fnames_lower.dat")
+         Sys.file_exists (Filename.concat bname lowercase_first_name_index_file)
+         && Sys.file_exists
+              (Filename.concat bname lowercase_first_name_data_file)
         then
          persons_of_lower_fs_name version base_data
            ( (fun p -> p.first_name :: p.first_names_aliases),
              first_name_changed,
              snd patches.h_person,
-             "fnames_lower.inx",
-             "fnames_lower.dat",
+             lowercase_first_name_index_file,
+             lowercase_first_name_data_file,
              bname )
         else
           persons_of_first_name version base_data
