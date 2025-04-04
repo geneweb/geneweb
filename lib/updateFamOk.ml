@@ -542,7 +542,7 @@ let reconstitute_family conf base nsck =
       fsources;
       fam_index;
     }
-  and cpl = Futil.parent conf.Config.multi_parents (Array.of_list parents)
+  and cpl = Adef.parent (Array.of_list parents)
   and des = { Def.children = Array.of_list children } in
   (fam, cpl, des, ext)
 
@@ -883,9 +883,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
     | None -> ""
   in
   let ncpl =
-    Futil.map_couple_p conf.Config.multi_parents
-      (Update.insert_person conf base psrc created_p)
-      scpl
+    Futil.map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
     Futil.map_family_ps
@@ -1451,7 +1449,7 @@ let print_mod_aux conf base callback =
   let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
   let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
   let digest =
-    let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
+    let ini_sfam = UpdateFam.string_family_of base sfam.fam_index in
     Update.digest_family ini_sfam
   in
   if digest = Update_util.get conf "digest" then
@@ -1601,9 +1599,7 @@ let print_change_event_order conf base =
       let fam = update_family_with_fevents conf base fam in
       Gwdb.patch_family base fam.fam_index fam;
       let a = Gwdb.foi base fam.fam_index in
-      let cpl =
-        Futil.parent conf.Config.multi_parents (Gwdb.get_parent_array a)
-      in
+      let cpl = Adef.parent (Gwdb.get_parent_array a) in
       let des = { Def.children = Gwdb.get_children a } in
       let wl =
         let wl = ref [] in

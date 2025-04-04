@@ -456,9 +456,9 @@ let redirect_added_families base p ip2 p2_family =
                   Gwdb.patch_person base ip w)
               evt.Def.efam_witnesses)
           (List.map Gwdb.gen_fevent_of_fam_event (Gwdb.get_fevents fam));
-        Gutil.couple false p.key_index (Gwdb.get_mother fam))
+        Adef.couple p.key_index (Gwdb.get_mother fam))
       else if ip2 = Gwdb.get_mother fam then
-        Gutil.couple false (Gwdb.get_father fam) p.key_index
+        Adef.couple (Gwdb.get_father fam) p.key_index
       else assert false
     in
     Gwdb.patch_couple base ifam cpl

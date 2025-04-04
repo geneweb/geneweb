@@ -62,7 +62,6 @@ type config = {
   lang : string;
   default_lang : string;
   default_sosa_ref : Gwdb.iper * Gwdb.person option;
-  multi_parents : bool;
   authorized_wizards_notes : bool;
   public_if_titles : bool;
   public_if_no_date : bool;

@@ -8,10 +8,6 @@ let designation base p =
 
 let father = Adef.father
 let mother = Adef.mother
-
-let couple multi fath moth =
-  if not multi then Adef.couple fath moth else Adef.multi_couple fath moth
-
 let parent_array = Adef.parent_array
 
 let spouse ip cpl =

@@ -1193,9 +1193,6 @@ let make_conf from_addr request script_name env =
       lang = (if lang = "" then default_lang else lang);
       default_lang;
       default_sosa_ref;
-      multi_parents =
-        (try List.assoc "multi_parents" base_env = "yes"
-         with Not_found -> false);
       authorized_wizards_notes =
         (try List.assoc "authorized_wizards_notes" base_env = "yes"
          with Not_found -> false);

@@ -41,7 +41,6 @@ val print_change_event_order : Config.config -> Gwdb.base -> unit
 (** Displays the form for changing the order of events for a family *)
 
 val string_family_of :
-  Config.config ->
   Gwdb.base ->
   Gwdb.ifam ->
   (Update.key, Gwdb.ifam, string) Def.gen_family
