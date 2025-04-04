@@ -3,9 +3,9 @@
 open Config
 open Def
 
-type 'a env = Vint of int | Vother of 'a | Vnone
+type 'a value = Vint of int | Vother of 'a | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -43,7 +43,7 @@ let interp_no_env conf fname =
       Templ.set_vother;
       Templ.print_foreach = (fun _ -> raise Not_found);
     }
-    [] ()
+    Templ.Env.empty ()
 
 let include_home_template conf =
   Templ_parser.wrap "home" (fun () ->
@@ -59,7 +59,7 @@ let include_home_template conf =
               Templ.set_vother;
               Templ.print_foreach = (fun _ -> raise Not_found);
             }
-            [] ()
+            Templ.Env.empty ()
             [ Ainclude (full_name, astl) ]
       | None -> error_cannot_access conf "home")
 
@@ -266,7 +266,7 @@ let print_foreach print_ast eval_expr =
       | _ -> raise Not_found
     in
     for i = i1 to i2 do
-      let env = ("integer", Vint i) :: env in
+      let env = Templ.Env.add "integer" (Vint i) env in
       List.iter (print_ast env jd) al
     done
   in
@@ -275,11 +275,11 @@ let print_foreach print_ast eval_expr =
 let print_calendar conf _base =
   interp conf "calendar"
     {
-      Templ.eval_var = eval_var conf;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach;
+      eval_var = eval_var conf;
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach;
     }
-    [] (eval_julian_day conf)
+    Templ.Env.empty (eval_julian_day conf)

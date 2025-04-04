@@ -27,7 +27,7 @@ type 'a env =
   | Vbool of bool
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 let bool_val = Update_util.bool_val
@@ -559,8 +559,10 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt nn ->
-             let env = (lab, Vstring nn) :: env in
-             let env = ("cnt", Vint cnt) :: env in
+             (* TODO: replace by Templ.Env.update *)
+             let env =
+               Templ.Env.(env |> add lab (Vstring nn) |> add "cnt" (Vint cnt))
+             in
              List.iter (print_ast env p) al;
              cnt + 1)
            0 list
@@ -571,7 +573,8 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt _ ->
-             let env = ("cnt", Vint cnt) :: env in
+             (* TODO: replace by Templ.Env.update *)
+             let env = Templ.Env.add "cnt" (Vint cnt) env in
              List.iter (print_ast env p) al;
              cnt + 1)
            1 list
@@ -582,7 +585,8 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt _ ->
-             let env = ("cnt", Vint cnt) :: env in
+             (* TODO: replace by Templ.Env.update *)
+             let env = Templ.Env.add "cnt" (Vint cnt) env in
              List.iter (print_ast env p) al;
              cnt + 1)
            1 list
@@ -592,9 +596,9 @@ let print_foreach print_ast _eval_expr =
     let rec loop first cnt = function
       | _ :: l ->
           let env =
-            ("cnt", Vint cnt) :: ("first", Vbool first)
-            :: ("last", Vbool (l = []))
-            :: env
+            Templ.Env.(
+              env |> add "cnt" (Vint cnt) |> add "first" (Vbool first)
+              |> add "last" (Vbool (l = [])))
           in
           List.iter (print_ast env p) al;
           loop false (cnt + 1) l
@@ -604,20 +608,21 @@ let print_foreach print_ast _eval_expr =
   and print_foreach_witness env p al list =
     match get_env "cnt" env with
     | Vint i -> (
-        match try Some (List.nth list (i - 1)) with Failure _ -> None with
-        | Some e ->
+        match List.nth list (i - 1) with
+        | exception Failure _ -> ()
+        | e ->
             let last = Array.length e.epers_witnesses - 1 in
             Array.iteri
               (fun i _ ->
                 let env =
-                  ("wcnt", Vint (i + 1))
-                  :: ("first", Vbool (i = 0))
-                  :: ("last", Vbool (i = last))
-                  :: env
+                  Templ.Env.(
+                    env
+                    |> add "wcnt" (Vint (i + 1))
+                    |> add "first" (Vbool (i = 0))
+                    |> add "last" (Vbool (i = last)))
                 in
                 List.iter (print_ast env p) al)
-              e.epers_witnesses
-        | None -> ())
+              e.epers_witnesses)
     | _ -> ()
   in
   print_foreach
@@ -629,19 +634,19 @@ let print_update_ind conf base p digest =
   | Some ("MOD_IND" | "MOD_IND_OK")
   | Some ("ADD_IND" | "ADD_IND_OK") ->
       let env =
-        [
-          ("digest", Vstring digest);
-          ("next_pevent", Vcnt (ref (List.length p.pevents + 1)));
-        ]
+        Templ.Env.(
+          empty
+          |> add "digest" (Vstring digest)
+          |> add "next_pevent" (Vcnt (ref (List.length p.pevents + 1))))
       in
       Hutil.interp conf "updind"
         {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach;
+          eval_var = eval_var conf base;
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother;
+          set_vother;
+          print_foreach;
         }
         env p
   | Some _ | None -> Hutil.incorrect_request conf
@@ -745,4 +750,4 @@ let print_change_event_order conf base =
           Templ.set_vother;
           Templ.print_foreach;
         }
-        [] p
+        Templ.Env.empty p
