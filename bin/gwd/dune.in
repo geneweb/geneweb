@@ -16,10 +16,9 @@
     wserver
     %%%GWDB_PKG%%%
     %%%SOSA_PKG%%%
-    %%%SYSLOG_PKG%%%
   )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (modules gwdLog gwdPlugin request)
+  (modules gwdPlugin request)
 )
 
 (executable

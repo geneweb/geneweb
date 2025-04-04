@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module GwdLog = GwdLog
+
 let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
@@ -38,11 +40,13 @@ let skip_possible_remaining_chars fd =
 
 let close_connection () =
   if not !connection_closed then (
-    wflush ();
-    (try Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND with _ -> ());
-    skip_possible_remaining_chars !wserver_sock;
+    (try
+       wflush ();
+       Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND;
+       skip_possible_remaining_chars !wserver_sock;
+       close_out !wserver_oc
+     with _ -> ());
     (* Closing the channel flushes the data and closes the underlying file descriptor *)
-    close_out !wserver_oc;
     connection_closed := true)
 
 let printnl () = output_string !wserver_oc "\013\010"
@@ -166,33 +170,11 @@ let timeout_handler ~timeout _ =
        this is not an error and we must exit normally, even in no-fork mode. *)
     exit 0
 
-(* Set a Unix signal with a timeout around the execution of the function [f].
-   The signal is properly cleared even if the function [f] raises an exception.
-
-   Since a process can have only one active alarm signal at a time, this
-   function should be used only once per fork of the web server.
-
-   This function is supported only on Unix. *)
-let with_timeout ~timeout handler f =
-  assert Sys.unix;
-  let (_ : Sys.signal_behavior) =
-    Sys.signal Sys.sigalrm (Sys.Signal_handle handler)
-  in
-  let finally () =
-    let (_ : int) = Unix.alarm 0 in
-    ()
-  in
-  let g () =
-    let (_ : int) = Unix.alarm timeout in
-    f ()
-  in
-  Fun.protect ~finally g
-
-let treat_connection callback addr fd =
+let treat_connection callback client_addr client_socket =
   printing_state := Nothing;
   let request, path, query =
     let request, query =
-      let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
+      let strm = Stream.of_channel (Unix.in_channel_of_descr client_socket) in
       get_request_and_content strm
     in
     let path, query =
@@ -208,13 +190,7 @@ let treat_connection callback addr fd =
     in
     (request, path, query)
   in
-  callback (addr, request) path query
-
-let treat_connection_with_timeout ~timeout callback addr fd =
-  if Sys.unix && timeout > 0 then
-    with_timeout ~timeout (timeout_handler ~timeout) @@ fun () ->
-    treat_connection callback addr fd
-  else treat_connection callback addr fd
+  callback (client_addr, request) path query
 
 let buff = Bytes.create 1024
 
@@ -235,47 +211,6 @@ let copy_what_necessary t oc =
   let _ = get_request_and_content strm in
   ()
 
-let rec list_remove x = function
-  | [] -> failwith "list_remove"
-  | y :: l -> if x = y then l else y :: list_remove x l
-
-let pids = ref []
-
-let cleanup_sons () =
-  List.iter
-    (fun p ->
-      match fst (Unix.waitpid [ Unix.WNOHANG ] p) with
-      | 0 -> ()
-      | (exception Unix.Unix_error (Unix.ECHILD, "waitpid", _))
-      (* should not be needed anymore since [Unix.getpid () <> ppid] loop security *)
-      | _ ->
-          pids := list_remove p !pids)
-    !pids
-
-let wait_available max_clients s =
-  match max_clients with
-  | Some m ->
-      (if List.length !pids >= m then
-       let pid, _ = Unix.wait () in
-       pids := list_remove pid !pids);
-      if !pids <> [] then cleanup_sons ();
-      let stop_verbose = ref false in
-      while !pids <> [] && Unix.select [ s ] [] [] 15.0 = ([], [], []) do
-        cleanup_sons ();
-        if !pids <> [] && not !stop_verbose then (
-          stop_verbose := true;
-          let tm = Unix.localtime (Unix.time ()) in
-          eprintf
-            "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after \
-             cleanup (%d)\n"
-            tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year)
-            tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length !pids)
-            (List.hd !pids);
-          flush stderr;
-          ())
-      done
-  | None -> ()
-
 let skip_possible_remaining_chars fd =
   if not !connection_closed then skip_possible_remaining_chars fd
 
@@ -287,101 +222,105 @@ let check_stopping () =
     flush stderr;
     exit 0)
 
-let client_connection tmout callback addr t =
-  let oc = Unix.out_channel_of_descr t in
-  wserver_oc := oc;
-  Fun.protect ~finally:close_connection @@ fun () ->
-  treat_connection_with_timeout ~timeout:tmout callback addr t
-
-let accept_connection tmout max_clients callback s =
-  let () = wait_available max_clients s in
-  let t, addr = Unix.accept s in
+let accept_connection_windows socket =
+  let client_socket, addr = Unix.accept socket in
+  Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
-  wserver_sock := t;
+  wserver_sock := client_socket;
   check_stopping ();
-  Unix.setsockopt t Unix.SO_KEEPALIVE true;
-  Fun.protect
-    ~finally:(fun () ->
-      if not !connection_closed then (
-        connection_closed := true;
-        Unix.close t))
-    (fun () ->
-      if Sys.unix then
-        if !no_fork then client_connection tmout callback addr t
-        else
-          match Unix.fork () with
-          | exception _ ->
-              eprintf "Fork failed\n";
-              flush stderr
-          | 0 -> (
-              try
-                if max_clients = None && Unix.fork () <> 0 then exit 0;
-                Unix.close s;
-                client_connection tmout callback addr t;
-                exit 0
-              with Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0)
-          | id ->
-              if max_clients = None then
-                let _ = Unix.waitpid [] id in
-                ()
-              else pids := id :: !pids
-      else (
-        Compat.Out_channel.with_open_bin !sock_in (fun oc ->
-            try copy_what_necessary t oc with Unix.Unix_error _ -> ());
-        let pid =
-          let env =
-            Array.append (Unix.environment ())
-              [| "WSERVER=" ^ string_of_sockaddr addr |]
-          in
-          let args = Sys.argv in
-          Unix.create_process_env Sys.argv.(0) args env Unix.stdin Unix.stdout
-            Unix.stderr
-        in
-        let _ = Unix.waitpid [] pid in
-        Compat.In_channel.with_open_bin !sock_in close_in;
-        let shutdown () =
-          (try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ());
-          skip_possible_remaining_chars t;
-          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ()
-        in
-        Fun.protect ~finally:shutdown (fun () ->
+  Compat.Out_channel.with_open_bin !sock_in (fun oc ->
+      try copy_what_necessary client_socket oc with Unix.Unix_error _ -> ());
+  let pid =
+    let env =
+      Array.append (Unix.environment ())
+        [| "WSERVER=" ^ string_of_sockaddr addr |]
+    in
+    let args = Sys.argv in
+    Unix.create_process_env Sys.argv.(0) args env Unix.stdin Unix.stdout
+      Unix.stderr
+  in
+  let _ = Unix.waitpid [] pid in
+  Compat.In_channel.with_open_bin !sock_in close_in;
+  let shutdown () =
+    (try Unix.shutdown client_socket Unix.SHUTDOWN_SEND with _ -> ());
+    skip_possible_remaining_chars client_socket;
+    try Unix.shutdown client_socket Unix.SHUTDOWN_RECEIVE with _ -> ()
+  in
+  Fun.protect ~finally:shutdown (fun () ->
+      try
+        Compat.In_channel.with_open_bin !sock_out (fun ic ->
             try
-              Compat.In_channel.with_open_bin !sock_out (fun ic ->
-                  try
-                    let rec loop () =
-                      let len = input ic buff 0 (Bytes.length buff) in
-                      if len = 0 then ()
-                      else (
-                        (let rec loop_write i =
-                           let olen = Unix.write t buff i (len - i) in
-                           if i + olen < len then loop_write (i + olen)
-                         in
-                         loop_write 0);
-                        loop ())
-                    in
-                    loop ()
-                  with Unix.Unix_error _ -> ())
-            with Unix.Unix_error _ ->
-              (* A Unix exception could be raised by [In_channel.open_bin]
-                 inside [In_channel.with_open_bin]. *)
-              ())))
+              let rec loop () =
+                let len = input ic buff 0 (Bytes.length buff) in
+                if len = 0 then ()
+                else (
+                  (let rec loop_write i =
+                     let olen = Unix.write client_socket buff i (len - i) in
+                     if i + olen < len then loop_write (i + olen)
+                   in
+                   loop_write 0);
+                  loop ())
+              in
+              loop ()
+            with Unix.Unix_error _ -> ())
+      with Unix.Unix_error _ ->
+        (* A Unix exception could be raised by [In_channel.open_bin]
+           inside [In_channel.with_open_bin]. *)
+        ())
 
-let f syslog addr_opt port tmout max_clients g =
-  match
-    if Sys.unix then None
-    else try Some (Sys.getenv "WSERVER") with Not_found -> None
-  with
-  | Some s ->
-      let addr = sockaddr_of_string s in
-      let fd = Unix.openfile !sock_in [ Unix.O_RDONLY ] 0 in
-      let oc = open_out_bin !sock_out in
-      wserver_oc := oc;
-      ignore (treat_connection_with_timeout ~timeout:tmout g addr fd);
-      exit 0
-  | None ->
+let accept_connections_windows socket =
+  while true do
+    try accept_connection_windows socket with
+    | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
+        GwdLog.syslog `LOG_INFO (Printexc.to_string e)
+    | Sys_error msg as e when msg = "Broken pipe" ->
+        GwdLog.syslog `LOG_INFO (Printexc.to_string e)
+  done
+
+(* Set a Unix signal with a timeout around the execution of the function [f].
+   The signal is properly cleared even if the function [f] raises an exception.
+
+   Since a process can have only one active alarm signal at a time, this
+   function should be used only once per fork of the web server.
+
+   This function is supported only on Unix. *)
+let with_timeout ~timeout handler f =
+  assert Sys.unix;
+  if timeout > 0 then
+    let (_ : Sys.signal_behavior) =
+      Sys.signal Sys.sigalrm (Sys.Signal_handle handler)
+    in
+    let finally () = ignore (Unix.alarm 0 : int) in
+    let g () =
+      ignore (Unix.alarm timeout : int);
+      f ()
+    in
+    Fun.protect ~finally g
+  else f ()
+
+let accept_connections_unix ~timeout ~n_workers callback socket =
+  Pool.start n_workers @@ fun pid ->
+  let client_socket, client_addr = Unix.accept socket in
+  GwdLog.debug (fun k -> k "Worker %d got a job" pid);
+  Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
+  connection_closed := false;
+  wserver_sock := client_socket;
+  wserver_oc := Unix.out_channel_of_descr client_socket;
+  Fun.protect ~finally:close_connection @@ fun () ->
+  with_timeout ~timeout (timeout_handler ~timeout) @@ fun () ->
+  treat_connection callback client_addr client_socket
+
+let accept_connections ~timeout ~n_workers callback socket =
+  if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
+  else accept_connections_windows socket
+
+let start ?addr ~port ?timeout ~max_pending_requests ~n_workers callback =
+  let timeout = match timeout with None -> 0 | Some t -> t in
+  match Sys.getenv "WSERVER" with
+  | exception Not_found ->
       check_stopping ();
       let addr =
-        match addr_opt with
+        match addr with
         | None ->
             if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
               Unix.inet_addr_any
@@ -390,7 +329,7 @@ let f syslog addr_opt port tmout max_clients g =
             try Unix.inet_addr_of_string addr
             with Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0))
       in
-      let s =
+      let socket =
         Unix.socket
           (if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
            Unix.PF_INET
@@ -398,20 +337,21 @@ let f syslog addr_opt port tmout max_clients g =
           Unix.SOCK_STREAM 0
       in
       if Unix.string_of_inet_addr Unix.inet6_addr_any <> "::" then
-        Unix.setsockopt s Unix.IPV6_ONLY false;
-      Unix.setsockopt s Unix.SO_REUSEADDR true;
-      Unix.bind s (Unix.ADDR_INET (addr, port));
-      Unix.listen s 4;
+        Unix.setsockopt socket Unix.IPV6_ONLY false;
+      Unix.setsockopt socket Unix.SO_REUSEADDR true;
+      Unix.bind socket (Unix.ADDR_INET (addr, port));
+      Unix.listen socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
       eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
         (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min port;
       flush stderr;
       if !no_fork then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
-      while true do
-        try accept_connection tmout max_clients g s with
-        | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-            syslog `LOG_INFO (Printexc.to_string e)
-        | Sys_error msg as e when msg = "Broken pipe" ->
-            syslog `LOG_INFO (Printexc.to_string e)
-      done
+      accept_connections ~timeout ~n_workers callback socket
+  | s ->
+      let addr = sockaddr_of_string s in
+      let client_socket = Unix.openfile !sock_in [ Unix.O_RDONLY ] 0 in
+      let oc = open_out_bin !sock_out in
+      wserver_oc := oc;
+      ignore (treat_connection callback addr client_socket);
+      exit 0

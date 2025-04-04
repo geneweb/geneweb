@@ -2,7 +2,7 @@ val verbosity : int ref
 (** Verbosity level: defines the verbosity level that will
     allow the [syslog] function to print anything. *)
 
-val debug : bool ref
+val debug_flag : bool ref
 (** If set to [true], prints backtrace when printing log. *)
 
 val oc : out_channel option ref
@@ -25,3 +25,14 @@ type level =
 val syslog : level -> string -> unit
 (** [syslog level msg]
     Prints [msg] on [!oc] depending on the verbosity. *)
+
+(* TODO: The gwd serveur uses Syslog library for log management. This library
+      is no longer maintained and is not the standard logging approach in
+      OCaml. Logs is the recommend library for this purpose. In order
+      to limit changes within a single PR, the following code wraps the Syslog
+      API to provide an interface similar to Logs.
+*)
+type 'a msgf = (('a, Format.formatter, unit, unit) format4 -> 'a) -> unit
+
+val info : 'a msgf -> unit
+val debug : 'a msgf -> unit

@@ -6,6 +6,8 @@ open Def
 open Gwdb
 open Util
 
+module GwdLog = Wserver.GwdLog
+
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
   if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p) then

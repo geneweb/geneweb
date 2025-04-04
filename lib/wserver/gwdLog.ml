@@ -1,5 +1,5 @@
 let verbosity = ref 7
-let debug = ref false
+let debug_flag = ref false
 
 let oc : out_channel option ref = ref None
 
@@ -32,13 +32,13 @@ let syslog (level : level) msg =
      | `LOG_DEBUG -> 7
   in
 #ifdef SYSLOG
-  let flags = if !debug then [`LOG_PERROR] else [] in
+  let flags = if !debug_flag then [`LOG_PERROR] else [] in
   if !verbosity >= verbosity_level
   then begin
     let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
     Syslog.syslog log level msg ;
     Syslog.closelog log ;
-    if !debug then Printexc.print_backtrace stderr ;
+    if !debug_flag then Printexc.print_backtrace stderr ;
   end
 #else
   let () = () in
@@ -65,6 +65,12 @@ let syslog (level : level) msg =
         close_out oc
       | None -> print stderr
     end ;
-    if !debug then Printexc.print_backtrace stderr ;
+    if !debug_flag then Printexc.print_backtrace stderr ;
   end
 #endif
+
+type 'a msgf = (('a, Format.formatter, unit, unit) format4 -> 'a) -> unit
+
+let report level fmt = Fmt.kstr (syslog level) ("@[" ^^ fmt ^^ "@]@?")
+let info (msgf : 'a msgf) = msgf @@ report `LOG_INFO
+let debug (msgf : 'a msgf) = msgf @@ report `LOG_DEBUG
