@@ -482,7 +482,7 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 let str_val x = VVstring x
@@ -793,9 +793,11 @@ let print_foreach conf base print_ast _eval_expr =
             | _ -> (* pas normal*) (Vchild (None, None), [])
           in
           let env =
-            ("fam", vfam) :: ("spouse_bef", Vstring "")
-            :: ("spouse_aft", Vstring (sp :> string))
-            :: ("child", vchild) :: env
+            Templ.Env.(
+              env |> add "fam" vfam
+              |> add "spouse_bef" (Vstring "")
+              |> add "spouse_aft" (Vstring (sp :> string))
+              |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
           loop [] bef_c l c
@@ -811,9 +813,11 @@ let print_foreach conf base print_ast _eval_expr =
             | _ -> (* pas normal*) (Vchild (None, None), [])
           in
           let env =
-            ("fam", vfam)
-            :: ("spouse_bef", Vstring (sp :> string))
-            :: ("spouse_aft", Vstring "") :: ("child", vchild) :: env
+            Templ.Env.(
+              env |> add "fam" vfam
+              |> add "spouse_bef" (Vstring (sp :> string))
+              |> add "spouse_aft" (Vstring "")
+              |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
           loop l c [] aft_c
@@ -832,10 +836,11 @@ let print_foreach conf base print_ast _eval_expr =
             | _ -> (* pas normal*) (Vchild (None, None), [], [])
           in
           let env =
-            ("fam", vfam)
-            :: ("spouse_bef", Vstring (sp1 :> string))
-            :: ("spouse_aft", Vstring (sp2 :> string))
-            :: ("child", vchild) :: env
+            Templ.Env.(
+              env |> add "fam" vfam
+              |> add "spouse_bef" (Vstring (sp1 :> string))
+              |> add "spouse_aft" (Vstring (sp2 :> string))
+              |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
           loop l1 c1 l2 c2
@@ -846,16 +851,22 @@ let print_foreach conf base print_ast _eval_expr =
       match (bef_fevents, aft_fevents) with
       | [], [] -> ()
       | [], aft_evt :: l ->
-          let env = ("fevent", Vfevent (None, Some aft_evt, m_auth)) :: env in
+          let env =
+            Templ.Env.add "fevent" (Vfevent (None, Some aft_evt, m_auth)) env
+          in
           List.iter (print_ast env xx) al;
           loop m_auth [] l
       | bef_evt :: l, [] ->
-          let env = ("fevent", Vfevent (Some bef_evt, None, m_auth)) :: env in
+          let env =
+            Templ.Env.add "fevent" (Vfevent (Some bef_evt, None, m_auth)) env
+          in
           List.iter (print_ast env xx) al;
           loop m_auth l []
       | bef_evt :: l1, aft_evt :: l2 ->
           let env =
-            ("fevent", Vfevent (Some bef_evt, Some aft_evt, m_auth)) :: env
+            Templ.Env.add "fevent"
+              (Vfevent (Some bef_evt, Some aft_evt, m_auth))
+              env
           in
           List.iter (print_ast env xx) al;
           loop m_auth l1 l2
@@ -874,15 +885,17 @@ let print_foreach conf base print_ast _eval_expr =
       match (bef_pevents, aft_pevents) with
       | [], [] -> ()
       | [], aft_evt :: l ->
-          let env = ("pevent", Vpevent (None, Some aft_evt)) :: env in
+          let env = Templ.Env.add "pevent" (Vpevent (None, Some aft_evt)) env in
           List.iter (print_ast env xx) al;
           loop [] l
       | bef_evt :: l, [] ->
-          let env = ("pevent", Vpevent (Some bef_evt, None)) :: env in
+          let env = Templ.Env.add "pevent" (Vpevent (Some bef_evt, None)) env in
           List.iter (print_ast env xx) al;
           loop l []
       | bef_evt :: l1, aft_evt :: l2 ->
-          let env = ("pevent", Vpevent (Some bef_evt, Some aft_evt)) :: env in
+          let env =
+            Templ.Env.add "pevent" (Vpevent (Some bef_evt, Some aft_evt)) env
+          in
           List.iter (print_ast env xx) al;
           loop l1 l2
     in
@@ -896,12 +909,12 @@ let print_foreach conf base print_ast _eval_expr =
           | [] -> ()
           | gr :: l ->
               let env =
-                ("line", Vint i)
-                :: ("date", Vstring (gr.date : Adef.safe_string :> string))
-                :: ( "wizard",
-                     Vstring
-                       (gr.HistoryDiff.wizard : Adef.safe_string :> string) )
-                :: env
+                Templ.Env.(
+                  empty |> add "line" (Vint i)
+                  |> add "date" (Vstring (gr.date : Adef.safe_string :> string))
+                  |> add "wizard"
+                       (Vstring
+                          (gr.HistoryDiff.wizard : Adef.safe_string :> string)))
               in
               List.iter (print_ast env xx) al;
               loop (i + 1) l
@@ -952,19 +965,22 @@ let print conf base =
           let p = person_of_gen_p_key base after.gen_p in
           let p_auth = authorized_age conf base p in
           let env =
-            [ ("history_file", Vstring file); ("history_len", Vint len) ]
+            Templ.Env.(
+              empty
+              |> add "history_file" (Vstring file)
+              |> add "history_len" (Vint len))
           in
           let eval_predefined_apply _env f vl =
             (eval_predefined_apply conf _env f vl :> string)
           in
           Hutil.interp conf "updhist_diff"
             {
-              Templ.eval_var = eval_var conf base;
-              Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-              Templ.eval_predefined_apply;
-              Templ.get_vother;
-              Templ.set_vother;
-              Templ.print_foreach = print_foreach conf base;
+              eval_var = eval_var conf base;
+              eval_transl = (fun _ -> Templ.eval_transl conf);
+              eval_predefined_apply;
+              get_vother;
+              set_vother;
+              print_foreach = print_foreach conf base;
             }
             env (before, after, p_auth)
       | _ -> Hutil.incorrect_request conf ~comment:"bad f parameter")

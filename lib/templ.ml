@@ -139,13 +139,6 @@ let split_at_coloncolon s =
   in
   loop 0
 
-let rec skip_spaces_and_newlines s i =
-  if i = String.length s then i
-  else
-    match s.[i] with
-    | ' ' | '\n' | '\r' -> skip_spaces_and_newlines s (i + 1)
-    | _ -> i
-
 let not_impl func x =
   let desc =
     if Obj.is_block (Obj.repr x) then
@@ -995,18 +988,24 @@ type 'a vother =
   | Vval of 'a expr_val
   | Vbind of string * Adef.encoded_string
 
-type 'a env = (string * 'a) list
+module Env = struct
+  type 'a t = (string * 'a) list
+
+  let empty = []
+  let find v env = List.assoc v env
+  let add s v env = (s, v) :: env
+end
 
 type ('a, 'b) interp_fun = {
-  eval_var : 'a env -> 'b -> loc -> string list -> 'b expr_val;
-  eval_transl : 'a env -> bool -> string -> string -> string;
-  eval_predefined_apply : 'a env -> string -> 'b expr_val list -> string;
+  eval_var : 'a Env.t -> 'b -> loc -> string list -> 'b expr_val;
+  eval_transl : 'a Env.t -> bool -> string -> string -> string;
+  eval_predefined_apply : 'a Env.t -> string -> 'b expr_val list -> string;
   get_vother : 'a -> 'b vother option;
   set_vother : 'b vother -> 'a;
   print_foreach :
-    ('a env -> 'b -> ast -> unit) ->
-    ('a env -> 'b -> ast -> string) ->
-    'a env ->
+    ('a Env.t -> 'b -> ast -> unit) ->
+    ('a Env.t -> 'b -> ast -> string) ->
+    'a Env.t ->
     'b ->
     loc ->
     string ->
@@ -1219,7 +1218,7 @@ let include_hed_trl conf name =
   | _ -> ()
 
 let rec interp_ast :
-    config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =
+    config -> ('a, 'b) interp_fun -> 'a Env.t -> 'b -> ast list -> unit =
  fun conf ifun env ->
   let m_env = ref env in
   let rec eval_ast env ep a = string_of_expr_val (eval_ast_expr env ep a)
@@ -1538,7 +1537,8 @@ and print_variable conf sl =
         Format.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
       Output.printf conf " %%%s?" (String.concat "." sl))
 
-let copy_from_templ : config -> Adef.encoded_string env -> in_channel -> unit =
+let copy_from_templ : config -> Adef.encoded_string Env.t -> in_channel -> unit
+    =
  fun conf env ic ->
   let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
   close_in ic;
