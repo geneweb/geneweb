@@ -291,26 +291,140 @@ let output_particles_file particles fname =
     particles;
   close_out oc
 
+let generate_base base =
+  let tmp_base = Filename.concat base.data.bdir "1base" in
+  let tmp_base_acc = Filename.concat base.data.bdir "1base.acc" in
+  let () =
+    let oc = Secure.open_out_bin tmp_base in
+    let oc_acc = Secure.open_out_bin tmp_base_acc in
+    let output_array arrname arr =
+      let bpos = pos_out oc in
+      if !verbose then Printf.eprintf "*** saving %s array\n" arrname;
+      flush stderr;
+      arr.output_array oc;
+      let epos = Iovalue.output_array_access oc_acc arr.get arr.len bpos in
+      if epos <> pos_out oc then count_error epos (pos_out oc)
+    in
+    try
+      (* output header of "base" *)
+      (* FIXME: switch to GnWb0024 *)
+      output_string oc Dutil.magic_GnWb0023;
+      output_binary_int oc base.data.persons.len;
+      output_binary_int oc base.data.families.len;
+      output_binary_int oc base.data.strings.len;
+      let array_start_indexes = pos_out oc in
+      output_binary_int oc 0;
+      output_binary_int oc 0;
+      output_binary_int oc 0;
+      output_binary_int oc 0;
+      output_binary_int oc 0;
+      output_binary_int oc 0;
+      output_binary_int oc 0;
+      Dutil.output_value_no_sharing oc
+        (base.data.bnotes.Def.norigin_file : string);
+      (* output arrays in the "base" and position for each element in the "base.acc" *)
+      let persons_array_pos = pos_out oc in
+      output_array "persons" base.data.persons;
+      let ascends_array_pos = pos_out oc in
+      output_array "ascends" base.data.ascends;
+      let unions_array_pos = pos_out oc in
+      output_array "unions" base.data.unions;
+      let families_array_pos = pos_out oc in
+      output_array "families" base.data.families;
+      let couples_array_pos = pos_out oc in
+      output_array "couples" base.data.couples;
+      let descends_array_pos = pos_out oc in
+      output_array "descends" base.data.descends;
+      let strings_array_pos = pos_out oc in
+      output_array "strings" base.data.strings;
+      (* output arrays position in the header *)
+      seek_out oc array_start_indexes;
+      output_binary_int oc persons_array_pos;
+      output_binary_int oc ascends_array_pos;
+      output_binary_int oc unions_array_pos;
+      output_binary_int oc families_array_pos;
+      output_binary_int oc couples_array_pos;
+      output_binary_int oc descends_array_pos;
+      output_binary_int oc strings_array_pos;
+      base.data.families.clear_array ();
+      base.data.descends.clear_array ();
+      close_out oc;
+      close_out oc_acc
+    with e ->
+      (try close_out oc with _ -> ());
+      (try close_out oc_acc with _ -> ());
+      Files.rm tmp_base;
+      Files.rm tmp_base_acc;
+      raise e
+  in
+  fun () ->
+    let base_file = Filename.concat base.data.bdir "base" in
+    let base_acc_file = Filename.concat base.data.bdir "base.acc" in
+    Files.rm base_file;
+    Sys.rename tmp_base base_file;
+    Files.rm base_acc_file;
+    Sys.rename tmp_base_acc base_acc_file
+
+let generate_lowercase_first_name_index ~strings_data base =
+  let tmp_fnames_lower_inx =
+    Filename.concat base.data.bdir "1fnames_lower.inx"
+  in
+  let tmp_fnames_lower_dat =
+    Filename.concat base.data.bdir "1fnames_lower.dat"
+  in
+  let () =
+    trace "create first name lower index";
+    output_first_name_lower_index strings_data base tmp_fnames_lower_inx
+      tmp_fnames_lower_dat
+  in
+  fun () ->
+    let lowercase_first_name_data_file =
+      Filename.concat base.data.bdir Database.lowercase_first_name_data_file
+    in
+    let lowercase_first_name_index_file =
+      Filename.concat base.data.bdir Database.lowercase_first_name_index_file
+    in
+    Files.rm lowercase_first_name_data_file;
+    Sys.rename tmp_fnames_lower_dat lowercase_first_name_data_file;
+    Files.rm lowercase_first_name_index_file;
+    Sys.rename tmp_fnames_lower_inx lowercase_first_name_index_file
+
+let generate_lowercase_surname_index ~strings_data base =
+  let tmp_snames_lower_inx =
+    Filename.concat base.data.bdir "1snames_lower.inx"
+  in
+  let tmp_snames_lower_dat =
+    Filename.concat base.data.bdir "1snames_lower.dat"
+  in
+  let () =
+    trace "create surname lower index";
+    output_surname_lower_index strings_data base tmp_snames_lower_inx
+      tmp_snames_lower_dat
+  in
+  fun () ->
+    let lowercase_surname_data_file =
+      Filename.concat base.data.bdir Database.lowercase_surname_data_file
+    in
+    let lowercase_surname_index_file =
+      Filename.concat base.data.bdir Database.lowercase_surname_index_file
+    in
+    Files.rm lowercase_surname_data_file;
+    Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
+    Files.rm lowercase_surname_index_file;
+    Sys.rename tmp_snames_lower_inx lowercase_surname_index_file
+
 let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
   let bname = base.data.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
-  let base_file = Filename.concat bname "base" in
-  let base_acc_file = Filename.concat bname "base.acc" in
   (* temporary files *)
   let tmp_particles = Filename.concat bname "1particles.txt" in
-  let tmp_base = Filename.concat bname "1base" in
-  let tmp_base_acc = Filename.concat bname "1base.acc" in
   let tmp_names_inx = Filename.concat bname "1names.inx" in
   let tmp_names_acc = Filename.concat bname "1names.acc" in
   let tmp_snames_inx = Filename.concat bname "1snames.inx" in
   let tmp_snames_dat = Filename.concat bname "1snames.dat" in
   let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
   let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
-  let tmp_snames_lower_inx = Filename.concat bname "1snames_lower.inx" in
-  let tmp_snames_lower_dat = Filename.concat bname "1snames_lower.dat" in
-  let tmp_fnames_lower_inx = Filename.concat bname "1fnames_lower.inx" in
-  let tmp_fnames_lower_dat = Filename.concat bname "1fnames_lower.dat" in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
   let tmp_notes = Filename.concat bname "1notes" in
   let tmp_notes_d = Filename.concat bname "1notes_d" in
@@ -320,79 +434,14 @@ let output ?(save_mem = false) ?(tasks = []) base =
   load_descends_array base;
   load_strings_array base;
   let strings_data = StringData.of_base base in
-  let lowercase_surname_data_file =
-    Filename.concat base.data.bdir Database.lowercase_surname_data_file
+  let commit_lowercase_first_name_index =
+    generate_lowercase_first_name_index ~strings_data base
   in
-  let lowercase_surname_index_file =
-    Filename.concat base.data.bdir Database.lowercase_surname_index_file
+  let commit_lowercase_surname_index =
+    generate_lowercase_surname_index ~strings_data base
   in
-  let lowercase_first_name_data_file =
-    Filename.concat base.data.bdir Database.lowercase_first_name_data_file
-  in
-  let lowercase_first_name_index_file =
-    Filename.concat base.data.bdir Database.lowercase_first_name_index_file
-  in
-  trace "create first name lower index";
-  output_first_name_lower_index strings_data base tmp_fnames_lower_inx
-    tmp_fnames_lower_dat;
-  trace "create surname lower index";
-  output_surname_lower_index strings_data base tmp_snames_lower_inx
-    tmp_snames_lower_dat;
-  let oc = Secure.open_out_bin tmp_base in
-  let oc_acc = Secure.open_out_bin tmp_base_acc in
-  let output_array arrname arr =
-    let bpos = pos_out oc in
-    if !verbose then Printf.eprintf "*** saving %s array\n" arrname;
-    flush stderr;
-    arr.output_array oc;
-    let epos = Iovalue.output_array_access oc_acc arr.get arr.len bpos in
-    if epos <> pos_out oc then count_error epos (pos_out oc)
-  in
+  let commit_base = generate_base base in
   (try
-     (* output header of "base" *)
-     (* FIXME: switch to GnWb0024 *)
-     output_string oc Dutil.magic_GnWb0023;
-     output_binary_int oc base.data.persons.len;
-     output_binary_int oc base.data.families.len;
-     output_binary_int oc base.data.strings.len;
-     let array_start_indexes = pos_out oc in
-     output_binary_int oc 0;
-     output_binary_int oc 0;
-     output_binary_int oc 0;
-     output_binary_int oc 0;
-     output_binary_int oc 0;
-     output_binary_int oc 0;
-     output_binary_int oc 0;
-     Dutil.output_value_no_sharing oc
-       (base.data.bnotes.Def.norigin_file : string);
-     (* output arrays in the "base" and position for each element in the "base.acc" *)
-     let persons_array_pos = pos_out oc in
-     output_array "persons" base.data.persons;
-     let ascends_array_pos = pos_out oc in
-     output_array "ascends" base.data.ascends;
-     let unions_array_pos = pos_out oc in
-     output_array "unions" base.data.unions;
-     let families_array_pos = pos_out oc in
-     output_array "families" base.data.families;
-     let couples_array_pos = pos_out oc in
-     output_array "couples" base.data.couples;
-     let descends_array_pos = pos_out oc in
-     output_array "descends" base.data.descends;
-     let strings_array_pos = pos_out oc in
-     output_array "strings" base.data.strings;
-     (* output arrays position in the header *)
-     seek_out oc array_start_indexes;
-     output_binary_int oc persons_array_pos;
-     output_binary_int oc ascends_array_pos;
-     output_binary_int oc unions_array_pos;
-     output_binary_int oc families_array_pos;
-     output_binary_int oc couples_array_pos;
-     output_binary_int oc descends_array_pos;
-     output_binary_int oc strings_array_pos;
-     base.data.families.clear_array ();
-     base.data.descends.clear_array ();
-     close_out oc;
-     close_out oc_acc;
      (let oc_inx = Secure.open_out_bin tmp_names_inx in
       let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
       try
@@ -480,19 +529,12 @@ let output ?(save_mem = false) ?(tasks = []) base =
      output_value oc nbp;
      close_out oc
    with e ->
-     (try close_out oc with _ -> ());
-     (try close_out oc_acc with _ -> ());
-     Files.rm tmp_base;
-     Files.rm tmp_base_acc;
      Files.rm tmp_names_inx;
      Files.rm tmp_names_acc;
      Files.rm tmp_strings_inx;
      Files.remove_dir tmp_notes_d;
      raise e);
-  Files.rm base_file;
-  Sys.rename tmp_base base_file;
-  Files.rm base_acc_file;
-  Sys.rename tmp_base_acc base_acc_file;
+  commit_base ();
   Files.rm (Filename.concat bname "names.inx");
   Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
   Files.rm (Filename.concat bname "names.acc");
@@ -506,14 +548,8 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
 
-  Files.rm lowercase_surname_data_file;
-  Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
-  Files.rm lowercase_surname_index_file;
-  Sys.rename tmp_snames_lower_inx lowercase_surname_index_file;
-  Files.rm lowercase_first_name_data_file;
-  Sys.rename tmp_fnames_lower_dat lowercase_first_name_data_file;
-  Files.rm lowercase_first_name_index_file;
-  Sys.rename tmp_fnames_lower_inx lowercase_first_name_index_file;
+  commit_lowercase_surname_index ();
+  commit_lowercase_first_name_index ();
 
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
