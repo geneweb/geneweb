@@ -206,7 +206,7 @@ let order =
 
 let reorder conf url_env =
   let new_lang =
-    match List.assoc_opt "lang" url_env with Some l1 -> l1 | None -> ""
+    match List.assoc "lang" url_env with exception Not_found -> "" | l -> l
   in
   let keep_lang =
     (* same condition in Util.commd and copyr.txt *)
@@ -219,7 +219,7 @@ let reorder conf url_env =
       | [] -> (acc1, acc2)
       | k :: order ->
           let v =
-            match List.assoc_opt k url_env with Some v -> v | None -> ""
+            match List.assoc k url_env with exception Not_found -> "" | v -> v
           in
           if
             List.mem_assoc k url_env
