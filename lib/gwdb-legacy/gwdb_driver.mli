@@ -701,3 +701,6 @@ val sync :
     the whole database. Otherwise, only changes that occured
     since the last [sync] call are treated.
  *)
+
+val initialize_lowercase_name_index :
+  kind:[< `First_name | `Surname ] -> base -> unit
