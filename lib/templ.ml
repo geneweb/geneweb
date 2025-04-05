@@ -1007,13 +1007,7 @@ type 'a vother =
   | Vval of 'a expr_val
   | Vbind of string * Adef.encoded_string
 
-module Env = struct
-  type 'a t = (string * 'a) list
-
-  let empty = []
-  let find v env = List.assoc v env
-  let add s v env = (s, v) :: env
-end
+module Env = Map.Make (String)
 
 type ('a, 'b) interp_fun = {
   eval_var : 'a Env.t -> 'b -> loc -> string list -> 'b expr_val;
