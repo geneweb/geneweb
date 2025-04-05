@@ -5023,8 +5023,10 @@ let print_foreach conf base print_ast eval_expr =
         Array.iteri
           (fun i iper ->
             let p = pget conf base iper in
-            let env = Templ.Env.(env |>
-            add "parent" (Vind p) |> add "last" (Vbool (i = len - 1)) ) in
+            let env =
+              Templ.Env.(
+                env |> add "parent" (Vind p) |> add "last" (Vbool (i = len - 1)))
+            in
             List.iter (print_ast env ep) al)
           parents
     | None -> ()
