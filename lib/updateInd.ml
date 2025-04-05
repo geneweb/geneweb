@@ -559,7 +559,6 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt nn ->
-             (* TODO: replace by Templ.Env.update *)
              let env =
                Templ.Env.(env |> add lab (Vstring nn) |> add "cnt" (Vint cnt))
              in
@@ -573,7 +572,6 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt _ ->
-             (* TODO: replace by Templ.Env.update *)
              let env = Templ.Env.add "cnt" (Vint cnt) env in
              List.iter (print_ast env p) al;
              cnt + 1)
@@ -585,7 +583,6 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt _ ->
-             (* TODO: replace by Templ.Env.update *)
              let env = Templ.Env.add "cnt" (Vint cnt) env in
              List.iter (print_ast env p) al;
              cnt + 1)
