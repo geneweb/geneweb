@@ -300,13 +300,13 @@ let print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf ^ new_req
   in
   let env =
-    [
-      ("old", Mutil.encode conf.bname);
-      ("new", Mutil.encode new_n);
-      ("link", Mutil.encode link);
-    ]
+    Templ.Env.(
+      empty
+      |> add "old" (Mutil.encode conf.bname)
+      |> add "new" (Mutil.encode new_n)
+      |> add "link" (Mutil.encode link))
   in
-  include_template conf env "renamed" (fun () ->
+  Templ.include_template conf env "renamed" (fun () ->
       let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
       Hutil.header conf title;
       Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link;
@@ -325,9 +325,9 @@ let log_redirect from request req =
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
   let link = "http://" ^ new_addr ^ req in
-  let env = [ ("link", Mutil.encode link) ] in
+  let env = Templ.Env.(add "link" (Mutil.encode link) empty) in
   log_redirect from request req;
-  include_template conf env "redirect" (fun () ->
+  Templ.include_template conf env "redirect" (fun () ->
       let title _ = Output.print_sstring conf "Address changed" in
       Hutil.header conf title;
       Output.print_sstring conf "Use the following address:\n<p>\n";

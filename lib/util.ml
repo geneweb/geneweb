@@ -1265,28 +1265,6 @@ let string_of_witness_kind_raw witness_kind =
   Adef.safe s
 
 let bpath bname = !GWPARAM.bpath bname
-let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
-let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
-
-let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string)
-    =
-  if conf.debug then
-    match Filename.extension (fname :> string) with
-    | ".css" | ".js" ->
-        Output.print_sstring conf "\n/* ";
-        Output.print_string conf k;
-        Output.print_sstring conf " ";
-        Output.print_string conf fname;
-        Output.print_sstring conf " */\n"
-    | _ ->
-        Output.print_sstring conf "\n<!-- ";
-        Output.print_string conf k;
-        Output.print_sstring conf " ";
-        Output.print_string conf fname;
-        Output.print_sstring conf " -->\n"
-
-let include_begin = include_begin_end_aux (Adef.safe "begin")
-let include_end = include_begin_end_aux (Adef.safe "end")
 
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
@@ -1314,6 +1292,7 @@ let include_end = include_begin_end_aux (Adef.safe "end")
     [Rem] : Exporté en clair hors de ce module.                             *)
 
 let etc_file_name conf fname =
+  let open Config in
   (* On recherche si dans le nom du fichier, on a specifié son *)
   (* répertoire, i.e. si fname est écrit comme ceci : dir/file *)
   (* on le reconstitue avec le bon dir_separateur *)
@@ -1400,14 +1379,6 @@ let open_etc_file conf fname =
     Logs.syslog `LOG_ERR
       (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
-
-let include_template conf env fname failure =
-  match open_etc_file conf fname with
-  | Some (ic, fname) ->
-      include_begin conf (esc fname);
-      copy_from_templ conf env ic;
-      include_end conf (esc fname)
-  | None -> failure ()
 
 let body_prop conf =
   try match List.assoc "body_prop" conf.base_env with "" -> "" | s -> " " ^ s
