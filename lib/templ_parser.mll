@@ -62,9 +62,8 @@ let wrap fname fn =
     raise e
 
 let line_of_loc (fname, bp, ep) =
-  match try Some (Secure.open_in fname) with _ -> None with
-  | None -> None
-  | Some ic ->
+  try
+    Secure.with_open_in_text fname (fun ic ->
     try
       let rec line i j =
         let rec column j j0 =
@@ -76,7 +75,8 @@ let line_of_loc (fname, bp, ep) =
             (i+1, bp - j0, ep - j0)
         in column j j
       in Some (line 0 0)
-    with _ -> None
+    with _ -> None)
+  with _ -> None
 
 let dummy_pos = (-1, -1)
 
@@ -90,7 +90,15 @@ let fail lex ?(pos = pos lex) () =
 
 let dump_ast ?(truncate=max_int) ?(depth=max_int) a = dump_ast truncate depth a
 
-let included_files = ref []
+module HS = Hashtbl.Make (struct
+  type t = string
+  let equal = String.equal
+  let hash = Hashtbl.hash
+end)
+
+(* Cache used for already parsed files. This cache is only hit while
+   parsing included files. *)
+let included_files : ast list HS.t = HS.create 17
 
 (* Leading ([' ' '\t' '\r']* '\n') will be removed, except if
    the previous node is a Atransl. *)
@@ -584,30 +592,33 @@ and parse_let conf b closing ast = parse
 
 and parse_include conf b closing ast = parse
   | value as file {
-      let ast =
-        let fname = Util.etc_file_name conf file in
-        match List.assoc_opt fname !included_files with
-        | Some a -> Ainclude (fname, a) :: ast
-        | None ->
-          try
-            let ic = Secure.open_in fname in
-            wrap fname begin fun () ->
-              let lex2 = Lexing.from_channel ic in
+    let ast =
+      let fname = Util.etc_file_name conf file in
+      match HS.find included_files fname with
+      | a -> Ainclude (fname, a) :: ast
+      | exception Not_found ->
+        try
+          Secure.with_open_in_text fname @@ fun ic ->
+            wrap fname @@ fun () ->
+              let lex = Lexing.from_channel ic in
               try
-                let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
-                let () = close_in ic in
-                let () = included_files := (fname, a) :: !included_files in
+                let (a, _) =
+                  parse_ast conf (Buffer.create 1024) [] [] lex
+                in
+                HS.add included_files fname a;
                 Ainclude (fname, a) :: ast
-              with _ -> fail lex2 ()
-            end
-          with Sys_error _ ->
-            GWPARAM.errors_other := (Format.sprintf "Missing template: %s" file) ::
-              !GWPARAM.errors_other;
-            Logs.syslog `LOG_WARNING ("Missing template: " ^ file) ;
-          ast
-      in
-      parse_ast conf b closing ast lexbuf
-    }
+              with _ ->
+                (* FIXME: The backtrace is lost. *)
+                fail lex ()
+        with Sys_error _ ->
+          GWPARAM.errors_other :=
+            (Format.sprintf "Missing template: %s" file) ::
+            !GWPARAM.errors_other;
+          Logs.syslog `LOG_WARNING ("Missing template: " ^ file) ;
+        ast
+     in
+     parse_ast conf b closing ast lexbuf
+  }
 
 and parse_apply conf b = parse
   | (r_ident as f) '%' {

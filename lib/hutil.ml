@@ -36,12 +36,12 @@ let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
 let interp_no_env conf fname =
   interp_no_header conf fname
     {
-      Templ.eval_var = (fun _ -> raise Not_found);
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = (fun _ -> raise Not_found);
+      eval_var = (fun _ -> raise Not_found);
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = (fun _ -> raise Not_found);
     }
     Templ.Env.empty ()
 
@@ -52,12 +52,12 @@ let include_home_template conf =
           let full_name = Util.etc_file_name conf "home" in
           Templ.interp_ast conf
             {
-              Templ.eval_var = (fun _ -> raise Not_found);
-              Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-              Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-              Templ.get_vother;
-              Templ.set_vother;
-              Templ.print_foreach = (fun _ -> raise Not_found);
+              eval_var = (fun _ -> raise Not_found);
+              eval_transl = (fun _ -> Templ.eval_transl conf);
+              eval_predefined_apply = (fun _ -> raise Not_found);
+              get_vother;
+              set_vother;
+              print_foreach = (fun _ -> raise Not_found);
             }
             Templ.Env.empty ()
             [ Ainclude (full_name, astl) ]
@@ -101,7 +101,7 @@ let header_without_http_nor_home conf title =
   Output.print_sstring conf str1;
   title true;
   Output.print_sstring conf str2;
-  Util.include_template conf [] "css" (fun () -> ());
+  Templ.include_template conf Templ.Env.empty "css" (fun () -> ());
   Output.print_sstring conf "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
@@ -172,7 +172,7 @@ let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
   Templ.include_hed_trl conf "trl";
   Templ.print_copyright conf;
-  Util.include_template conf [] "js" (fun () -> ());
+  Templ.include_template conf Templ.Env.empty "js" (fun () -> ());
   Output.print_sstring conf "</body>\n</html>\n"
 
 (* Calendar request *)
