@@ -600,13 +600,13 @@ let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
   in
   if conf.Config.use_restrict then Gwdb.base_visible_get base fct ip else false
 
-(** Returns person option with giving id from the base.
+(** Returns person option with given id from the base.
     Wrapper around `Gwdb.poi` defined such as:
-    - Some ip: if user have permissions or `use_restrict` disabled.
+    - Some ip: if user has permissions or `use_restrict` disabled.
     - None: if `conf.use_restrict` (option defined in .gwf file):
-      checks that the user has enought rights to see
+      checks that the user has enough rights to see
       corresponding person (see `authorized_age`).
-      If the user does not have enought permissions, returns
+      If the user does not have enough permissions, returns
       None.
 *)
 let pget_opt conf base ip =
