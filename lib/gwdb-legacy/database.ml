@@ -314,6 +314,12 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
        Array.sort (fun (k, _) (k', _) -> cmp_istr base_data k k') a;
        a)
   in
+  let patched_set =
+    lazy
+      (Hashtbl.fold
+         (fun i _ acc -> Ext_int.Set.add i acc)
+         person_patches Ext_int.Set.empty)
+  in
   let find istr =
     let ipera =
       try
@@ -330,21 +336,21 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
           if len = 0 then ipera
           else
             let iper = input_binary_int ic_dat in
-            read_loop (iper :: ipera) (len - 1)
+            read_loop (Ext_int.Set.add iper ipera) (len - 1)
         in
-        let ipera = read_loop [] len in
+        let ipera = read_loop Ext_int.Set.empty len in
         close_in ic_dat;
         ipera
-      with Not_found -> []
+      with Not_found -> Ext_int.Set.empty
     in
-    let patched = Hashtbl.fold (fun i _ acc -> i :: acc) person_patches [] in
-    let ipera = List.filter (fun i -> not @@ List.mem i patched) ipera in
+    let patched = Lazy.force patched_set in
+    let ipera = Ext_int.Set.diff ipera patched in
     Hashtbl.fold
       (fun i p acc ->
         let istrs = proj p in
-        if List.mem istr istrs then if List.mem i acc then acc else i :: acc
-        else acc)
+        if List.mem istr istrs then Ext_int.Set.add i acc else acc)
       person_patches ipera
+    |> Ext_int.Set.elements
   in
   let cursor str =
     let bt = Lazy.force bt in
