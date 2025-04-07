@@ -81,9 +81,6 @@ val stop_server : string ref
 val cgi : bool ref
 (** CGI (Common Gateway Interface) mode (default false). *)
 
-val no_fork : bool ref
-(** Do not fork processes at every request (default: false) *)
-
 (* Example:
 
     - Source program "foo.ml":

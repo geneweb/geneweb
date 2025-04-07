@@ -93,6 +93,10 @@ let deprecated_warning_max_clients () =
     in a future release.@ It has no effect.@ Use `-n_workers` and
     `-max_pending_requests` instead.@."
 
+let deprecated_warning_no_fork () =
+  Format.eprintf "The `-no-fork` option is deprecated and may be removed \
+    in a future release.@ To achieve the same behavior, use `-n_workers 0` instead.@."
+
 type auth_report =
   { ar_ok : bool;
     ar_command : string;
@@ -2051,13 +2055,12 @@ let main () =
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
     ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
 #ifdef UNIX
-    ; ("-max_clients", Arg.Int
-    (fun x -> deprecated_warning_max_clients ()), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi) (DEPRECATED).")
+    ; ("-max_clients", Arg.Unit deprecated_warning_max_clients, "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi) (DEPRECATED).")
     ; ("-n_workers", Arg.Int (fun x -> n_workers := x), "<NUM> Number of workers used by the server (default: " ^ string_of_int default_n_workers ^ ")")
     ; ("-max_pending_requests", Arg.Int (fun x -> max_pending_requests := x), "<NUM> Maximum number of pending requests (default: " ^ string_of_int default_max_pending_requests ^ ")")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (only on Unix) (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
-    ; ("-no-fork", Arg.Set Wserver.no_fork, " Prevent forking processes")
+    ; ("-no-fork", Arg.Unit (fun () -> deprecated_warning_no_fork (); n_workers := 0), " Prevent forking processes (DEPRECATED)")
     ; ("-cache-in-memory", Arg.String (fun s ->
         if Gw_ancient.is_available then
           cache_databases := s::!cache_databases
