@@ -48,5 +48,8 @@
     digestif
     (utop :dev)
   )
-  (depopts ancient)
+  (depopts
+    ocaml-option-nnp
+    ancient
+  )
 )
