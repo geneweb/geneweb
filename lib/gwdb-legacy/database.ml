@@ -152,7 +152,9 @@ let index_of_string strings ic start_pos hash_len string_patches string_pending
    running `gwfixbase -index /path/to/base.gwb`
 *)
 let old_persons_of_first_name_or_surname base_data params =
-  let proj, person_patches, names_inx, names_dat, bname = params in
+  let proj, _has_changed, person_patches, names_inx, names_dat, bname =
+    params
+  in
   let module IstrTree = Btree.Make (struct
     type t = int
 
@@ -279,7 +281,7 @@ let binary_search_next arr cmp =
   aux None 0 (Array.length arr - 1)
 
 let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
-  let proj, person_patches, names_inx, names_dat, bname = params in
+  let proj, has_changed, person_patches, names_inx, names_dat, bname = params in
   let fname_dat = Filename.concat bname names_dat in
   (* content of "snames.inx" *)
   let bt =
@@ -289,6 +291,21 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
        let bt : (int * int) array = input_value ic_inx in
        close_in ic_inx;
        bt)
+  in
+  let filtered_person_patches =
+    lazy
+      (let ht = Hashtbl.create (Hashtbl.length person_patches) in
+       Hashtbl.iter
+         (fun i p -> if has_changed base_data i p then Hashtbl.add ht i p)
+         person_patches;
+       ht)
+  in
+  let patched_set =
+    lazy
+      (Hashtbl.fold
+         (fun i _ acc -> Ext_int.Set.add i acc)
+         (Lazy.force filtered_person_patches)
+         Ext_int.Set.empty)
   in
   (* ordered by string name's ids attached to the patched persons *)
   let patched =
@@ -303,7 +320,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
              (fun k ->
                if not @@ Dutil.IntHT.mem ht k then Dutil.IntHT.add ht k [])
              ks)
-         person_patches;
+         (Lazy.force filtered_person_patches);
        let a = Array.make (Dutil.IntHT.length ht) (0, []) in
        ignore
        @@ Dutil.IntHT.fold
@@ -313,12 +330,6 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
             ht 0;
        Array.sort (fun (k, _) (k', _) -> cmp_istr base_data k k') a;
        a)
-  in
-  let patched_set =
-    lazy
-      (Hashtbl.fold
-         (fun i _ acc -> Ext_int.Set.add i acc)
-         person_patches Ext_int.Set.empty)
   in
   let find istr =
     let ipera =
@@ -343,13 +354,13 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
         ipera
       with Not_found -> Ext_int.Set.empty
     in
-    let patched = Lazy.force patched_set in
-    let ipera = Ext_int.Set.diff ipera patched in
+    let ipera = Ext_int.Set.diff ipera (Lazy.force patched_set) in
     Hashtbl.fold
       (fun i p acc ->
         let istrs = proj p in
         if List.mem istr istrs then Ext_int.Set.add i acc else acc)
-      person_patches ipera
+      (Lazy.force filtered_person_patches)
+      ipera
     |> Ext_int.Set.elements
   in
   let cursor str =
@@ -402,6 +413,7 @@ let persons_of_first_name :
     base_version ->
     base_data ->
     ('a -> Dutil.IntHT.key list)
+    * (base_data -> int -> person -> bool)
     * (int, person) Hashtbl.t
     * string
     * string
@@ -420,6 +432,7 @@ let persons_of_surname :
     base_version ->
     base_data ->
     ('a -> Dutil.IntHT.key list)
+    * (base_data -> int -> person -> bool)
     * (int, person) Hashtbl.t
     * string
     * string
@@ -434,6 +447,7 @@ let persons_of_lower_fs_name :
     base_version ->
     base_data ->
     ('a -> Dutil.IntHT.key list)
+    * (base_data -> int -> person -> bool)
     * (int, person) Hashtbl.t
     * string
     * string
@@ -920,8 +934,24 @@ let iper_stream_of_prefix base_data spi prefix =
   if not (prefix_exists base_data spi prefix) then Seq.empty
   else fun () -> iper_of_prefix base_data spi prefix
 
+let has_name_changed proj base_data i p =
+  let names = proj p in
+  let base_person =
+    try base_data.persons.get_nopatch i
+    with Failure _ -> { (Dutil.empty_person 0 0) with key_index = -1 }
+  in
+
+  let base_names = proj base_person in
+  names <> base_names
+
+let first_name_changed =
+  has_name_changed (fun p -> p.Dbdisk.first_name :: p.first_names_aliases)
+
+let surname_changed =
+  has_name_changed (fun p -> p.Dbdisk.surname :: p.surnames_aliases)
+
 let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
-    ~dat_fname ~proj ~insert_string ~base_data ~version ~patches =
+    ~dat_fname ~proj ~has_changed ~insert_string ~base_data ~version ~patches =
   let mem_proj = Dutil.IntHT.create 0 in
   let mem_strings = Dutil.IntHT.create 0 in
   fun prefix ->
@@ -954,6 +984,7 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
         let spi =
           persons_of_lower_fs_name version base_data
             ( proj,
+              has_changed,
               snd patches.h_person,
               inx_lower_fname,
               dat_lower_fname,
@@ -964,7 +995,12 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
       else
         let spi =
           persons_of_surname version base_data
-            (proj, snd patches.h_person, inx_fname, dat_fname, base_data.bdir)
+            ( proj,
+              has_changed,
+              snd patches.h_person,
+              inx_fname,
+              dat_fname,
+              base_data.bdir )
         in
         (prefix, spi)
     in
@@ -973,13 +1009,16 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
 let persons_stream_of_first_name_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
     ~dat_lower_fname:"fnames_lower.dat" ~inx_fname:"fnames.inx"
-    ~dat_fname:"fnames.dat" ~proj:(fun p ->
-      p.first_name :: p.first_names_aliases)
+    ~dat_fname:"fnames.dat"
+    ~proj:(fun p -> p.first_name :: p.first_names_aliases)
+    ~has_changed:first_name_changed
 
 let persons_stream_of_surname_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"snames_lower.inx"
     ~dat_lower_fname:"snames_lower.dat" ~inx_fname:"snames.inx"
-    ~dat_fname:"snames.dat" ~proj:(fun p -> p.surname :: p.surnames_aliases)
+    ~dat_fname:"snames.dat"
+    ~proj:(fun p -> p.surname :: p.surnames_aliases)
+    ~has_changed:surname_changed
 
 let opendb bname =
   let bname =
@@ -1365,6 +1404,7 @@ let opendb bname =
       persons_of_surname =
         persons_of_surname version base_data
           ( (fun p -> p.surname :: p.surnames_aliases),
+            surname_changed,
             snd patches.h_person,
             "snames.inx",
             "snames.dat",
@@ -1372,6 +1412,7 @@ let opendb bname =
       persons_of_first_name =
         persons_of_first_name version base_data
           ( (fun p -> p.first_name :: p.first_names_aliases),
+            first_name_changed,
             snd patches.h_person,
             "fnames.inx",
             "fnames.dat",
@@ -1383,6 +1424,7 @@ let opendb bname =
         then
          persons_of_lower_fs_name version base_data
            ( (fun p -> p.surname :: p.surnames_aliases),
+             first_name_changed,
              snd patches.h_person,
              "snames_lower.inx",
              "snames_lower.dat",
@@ -1390,6 +1432,7 @@ let opendb bname =
         else
           persons_of_surname version base_data
             ( (fun p -> p.surname :: p.surnames_aliases),
+              surname_changed,
               snd patches.h_person,
               "snames.inx",
               "snames.dat",
@@ -1401,6 +1444,7 @@ let opendb bname =
         then
          persons_of_lower_fs_name version base_data
            ( (fun p -> p.first_name :: p.first_names_aliases),
+             first_name_changed,
              snd patches.h_person,
              "fnames_lower.inx",
              "fnames_lower.dat",
@@ -1408,6 +1452,7 @@ let opendb bname =
         else
           persons_of_first_name version base_data
             ( (fun p -> p.first_name :: p.first_names_aliases),
+              first_name_changed,
               snd patches.h_person,
               "fnames.inx",
               "fnames.dat",
