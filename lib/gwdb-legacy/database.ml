@@ -731,11 +731,11 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
     len name input_array input_item =
   let tab = ref None in
   let cleared = ref false in
-  let gen_get nopending i =
+  let gen_get ~nopatch ~nopending i =
     match if nopending then None else Hashtbl.find_opt pending i with
     | Some v -> v
     | None -> (
-        match Hashtbl.find_opt patches i with
+        match if nopatch then None else Hashtbl.find_opt patches i with
         | Some v -> v
         | None -> (
             match !tab with
@@ -768,8 +768,9 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
   let rec r =
     {
       load_array = (fun () -> ignore @@ array ());
-      get = gen_get false;
-      get_nopending = gen_get true;
+      get = gen_get ~nopatch:false ~nopending:false;
+      get_nopending = gen_get ~nopatch:false ~nopending:true;
+      get_nopatch = gen_get ~nopatch:true ~nopending:true;
       set = (fun i v -> (array ()).(i) <- v);
       len = max len !plenr;
       output_array =
@@ -1437,6 +1438,7 @@ let record_access_of tab =
       Dbdisk.load_array = (fun () -> ());
       get = (fun i -> !tab.(i));
       get_nopending = (fun i -> !tab.(i));
+      get_nopatch = (fun i -> !tab.(i));
       set = (fun i v -> !tab.(i) <- v);
       output_array =
         (fun oc -> Dutil.output_value_no_sharing oc (!tab : _ array));
