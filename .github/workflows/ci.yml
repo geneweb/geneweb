@@ -71,7 +71,7 @@ jobs:
 
           # v3 builds (newer environments)
           - os: ubuntu-24.04
-            ocaml-compiler: 4.14.2
+            ocaml-compiler: 4.14.2-nnp
             setup-version: v3
 
           - os: ubuntu-24.04
@@ -79,7 +79,7 @@ jobs:
             setup-version: v3
 
           - os: macos-15
-            ocaml-compiler: 4.14.2
+            ocaml-compiler: 4.14.2-nnp
             setup-version: v3
 
           - os: macos-15
@@ -92,6 +92,7 @@ jobs:
 
     env:
       FMT_CI: ${{ matrix.os == 'ubuntu-24.04' && matrix.ocaml-compiler == '4.14.2' && matrix.setup-version == 'v3' }}
+      USE_NNP: ${{ !startsWith(matrix.os, 'windows') && (contains(matrix.ocaml-compiler, 'nnp') || startsWith(matrix.ocaml-compiler, '5')) }}
 
     steps:
       - name: Checkout code
@@ -119,8 +120,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: D:\.opam
-          key: windows-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
-          restore-keys: windows-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}
+          key: windows-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
+          restore-keys: windows-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}
 
       - name: Setup Ocaml with v2
         if: matrix.setup-version == 'v2'
@@ -130,25 +131,25 @@ jobs:
 
       - name: Setup Ocaml with v3
         if: matrix.setup-version == 'v3'
-        uses: ocaml/setup-ocaml@v3
+        uses: ocaml/setup-ocaml@master
         with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          ocaml-compiler: ${{ matrix.ocaml-compiler == '4.14.2-nnp' && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
 
       - name: Install Geneweb dependencies
         run: opam install . --deps-only ${{ env.FMT_CI == 'true' && '--with-test' || '' }}
 
-      - name: Install ancient dependency for Unix
-        if: ${{ runner.os != 'Windows' }}
+      - name: Install ancient dependency
+        if: env.USE_NNP == 'true'
         run: opam pin ancient -y https://github.com/OCamlPro/ocaml-ancient.git
 
       - name: Configure
-        run: opam exec -- ocaml ./configure.ml --sosa-zarith
+        run: opam exec -- ocaml ./configure.ml --sosa-zarith ${{ env.USE_NNP == 'true' && '--gwd-caching' || '' }}
 
       - name: Build Geneweb
         run: opam exec -- make ${{ env.FMT_CI == 'true' && 'fmt ci' || 'build' }} distrib
 
       - name: "Test Geneweb daemon with --cache-in-memory"
-        if: ${{ runner.os != 'Windows' }}
+        if: env.USE_NNP == 'true'
         run: |
           output=$(distribution/gw/gwd -cache-in-memory testing 2>&1)
           if echo "$output" | grep -q "Caching database testing in memory"; then
