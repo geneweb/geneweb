@@ -8,6 +8,11 @@ let rm = ref ""
 let ext = ref ""
 let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
+
+let nnp_compiler =
+  if not Sys.win32 then 1 = Sys.command "$(ocamlc -config-var naked_pointers)"
+  else false
+
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let sosa = ref `None
@@ -94,13 +99,19 @@ let () =
   in
   let ancient_lib, ancient_file =
     let no_cache = ("", "gw_ancient.dum.ml") in
-    if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
+    if nnp_compiler then
+      if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
+      else (
+        if !caching then
+          Printf.eprintf
+            "Warning: ocaml-ancient not installed. Cannot enable database \
+             caching.\n";
+        no_cache)
     else (
       if !caching then
         Printf.eprintf
-          "Warning: the ancient package is not installed. Cannot enable \
-           database caching. Install ancient in the current switch with `opam \
-           install ancient`.\n";
+          "Warning: Compiler not set to no-naked-pointers. Cannot enable \
+           database caching.\n";
       no_cache)
   in
   let ch = open_out "Makefile.config" in
