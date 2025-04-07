@@ -272,6 +272,8 @@ type 'a record_access = {
   get : int -> 'a;
   (* Same as [get] but doesn't consider pending patches *)
   get_nopending : int -> 'a;
+  (* Same as [get] but doesn't consider patches data *)
+  get_nopatch : int -> 'a;
   (* Set the nth element of array *)
   set : int -> 'a -> unit;
   (* Return length of an array that by default takes into account
