@@ -103,15 +103,18 @@ let () =
       if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
       else (
         if !caching then
-          Printf.eprintf
+          Format.eprintf
             "Warning: ocaml-ancient not installed. Cannot enable database \
-             caching.\n";
+             caching.@.";
         no_cache)
     else (
       if !caching then
-        Printf.eprintf
-          "Warning: Compiler not set to no-naked-pointers. Cannot enable \
-           database caching.\n";
+        Format.eprintf
+          "Warning: the OCaml compiler was not installed with the \
+          no-naked-pointers@ option. The gwd caching feature requires this \
+          option because GeneWeb@ uses the Marshal module on values from the \
+          database, which is not compatible@ with Ancient when naked pointers \
+          could be present.@.";
       no_cache)
   in
   let ch = open_out "Makefile.config" in
