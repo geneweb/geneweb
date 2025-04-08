@@ -601,7 +601,7 @@ and parse_include conf b closing ast = parse
           with Sys_error _ ->
             GWPARAM.errors_other := (Format.sprintf "Missing template: %s" file) ::
               !GWPARAM.errors_other;
-            !GWPARAM.syslog `LOG_WARNING ("Missing template: " ^ file) ;
+            GWPARAM.syslog `LOG_WARNING ("Missing template: " ^ file) ;
           ast
       in
       parse_ast conf b closing ast lexbuf

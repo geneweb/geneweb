@@ -222,7 +222,7 @@ let parse_src_with_size_info conf s =
     let s = String.sub s 0 pos1 in
     Ok (urlorpath_of_string conf s, (w, h))
   with Not_found | Failure _ ->
-    !GWPARAM.syslog `LOG_ERR
+    GWPARAM.syslog `LOG_ERR
       (Format.sprintf "Error parsing portrait source with size info %s" s);
     Error "Failed to parse url with size info"
 
@@ -261,7 +261,7 @@ let rename_portrait conf base p (nfn, nsn, noc) =
       let new_f = f ^ old_ext in
       (try Sys.rename old_f new_f
        with Sys_error e ->
-         !GWPARAM.syslog `LOG_ERR
+         GWPARAM.syslog `LOG_ERR
            (Format.sprintf
               "Error renaming portrait: old_path=%s new_path=%s : %s" old_f
               new_f e));
@@ -271,10 +271,11 @@ let rename_portrait conf base p (nfn, nsn, noc) =
       let old_s_f =
         String.concat Filename.dir_sep [ portrait_folder conf; "saved"; old_s ]
       in
-      if Sys.file_exists (old_s_f ^ old_ext) then
-        try Sys.rename (old_s_f ^ old_ext) (new_s_f ^ old_ext)
+      let fl = old_s_f ^ old_ext in
+      if Sys.file_exists fl then
+        try Sys.rename fl (new_s_f ^ old_ext)
         with Sys_error e ->
-          !GWPARAM.syslog `LOG_ERR
+          GWPARAM.syslog `LOG_ERR
             (Format.sprintf
                "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
                new_f e))
@@ -282,16 +283,12 @@ let rename_portrait conf base p (nfn, nsn, noc) =
   | None -> (
       ();
       (* in all cases, rename carrousel *)
-      let new_c_f =
-        String.concat Filename.dir_sep [ carrousel_folder conf; new_s ]
-      in
-      let old_c_f =
-        String.concat Filename.dir_sep [ carrousel_folder conf; old_s ]
-      in
+      let new_c_f = Filename.concat (carrousel_folder conf) new_s in
+      let old_c_f = Filename.concat (carrousel_folder conf) old_s in
       if Sys.file_exists old_c_f then
         try Sys.rename old_c_f new_c_f
         with Sys_error e ->
-          !GWPARAM.syslog `LOG_ERR
+          GWPARAM.syslog `LOG_ERR
             (Format.sprintf
                "Error renaming carrousel store: old_path=%s new_path=%s : %s"
                old_c_f new_c_f e))
@@ -379,7 +376,7 @@ let get_carrousel_img_aux conf base p old =
           [] (Sys.readdir f)
       else []
     with Sys_error e ->
-      !GWPARAM.syslog `LOG_ERR (Format.sprintf "carrousel error: %s, %s" f e);
+      GWPARAM.syslog `LOG_ERR (Format.sprintf "carrousel error: %s, %s" f e);
       []
 
 let get_carrousel_imgs conf base p = get_carrousel_img_aux conf base p false

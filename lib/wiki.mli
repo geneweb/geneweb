@@ -39,11 +39,16 @@ type wiki_info = {
   wi_mark_if_not_public : string * string * int -> bool;
   wi_always_show_link : bool;
 }
+(** wi_mark_if_not_public: if the person designated by fn * sn * oc is not
+    public display it in red.
+    This function is used by Roglo to identify persons that should be
+    public and are not *)
 
 val syntax_links : config -> wiki_info -> string -> string
+val bold_italic_syntax : string -> string
 
 val make_edit_button :
-  Config.config -> string -> string -> ?cnt:int option -> unit -> string
+  Config.config -> ?mode:string -> string -> ?cnt:int option -> unit -> string
 
 val html_of_tlsw : config -> string -> string list
 (** Parses a whole TLSW text to a list of strings *)

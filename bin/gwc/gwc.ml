@@ -1,12 +1,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Gwcomp
-
 (** Checks a .gwo header and prints fails if header is absent or not compatible. *)
 let check_magic fname ic =
-  let b = really_input_string ic (String.length magic_gwo) in
-  if b <> magic_gwo then
-    if String.sub magic_gwo 0 4 = String.sub b 0 4 then
+  let b = really_input_string ic (String.length Gwcomp.magic_gwo) in
+  if b <> Gwcomp.magic_gwo then
+    if String.sub Gwcomp.magic_gwo 0 4 = String.sub b 0 4 then
       failwith ("\"" ^ fname ^ "\" is a GeneWeb object file, but not compatible")
     else
       failwith
@@ -50,7 +48,8 @@ let next_family_fun_templ gwo_list fi =
         match !ic_opt with
         | Some ic -> (
             match
-              try Some (input_value ic : gw_syntax) with End_of_file -> None
+              try Some (input_value ic : Gwcomp.gw_syntax)
+              with End_of_file -> None
             with
             | Some fam -> Some fam
             | None ->
@@ -138,7 +137,7 @@ let speclist =
       "<file> Particles file (default = predefined particles)" );
     ("-q", Arg.Clear Gwcomp.verbose, " Quiet");
     ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
-    ("-rgpd", Arg.String (fun s -> Gwcomp.rgpd_files := s), "<file> Rgpd files");
+    ("-rgpd", Arg.String (fun s -> Gwcomp.rgpd_dir := s), "<dir> Rgpd directory");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
     ("-stats", Arg.Set Db1link.pr_stats, " Print statistics");
@@ -165,9 +164,11 @@ let errmsg =
 
 let main () =
   (try
-     if Sys.is_directory !Gwcomp.rgpd_files then Gwcomp.rgpd := true
+     if Sys.is_directory !Gwcomp.rgpd_dir then Gwcomp.rgpd := true
      else Gwcomp.rgpd := false
-   with Sys_error _ -> Gwcomp.rgpd := false);
+   with Sys_error _ ->
+     Printf.eprintf "Warning: failed testing for %s\n" !Gwcomp.rgpd_dir;
+     Gwcomp.rgpd := false);
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   in_file :=
@@ -194,7 +195,7 @@ let main () =
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
 
   if !Gwcomp.rgpd then
-    Printf.eprintf "Rgpd status: True, files in: %s\n" !Gwcomp.rgpd_files
+    Printf.eprintf "Rgpd status: True, files in: %s\n" !Gwcomp.rgpd_dir
   else Printf.eprintf "Rgpd status: False\n";
   let gwo = ref [] in
   List.iter
@@ -202,7 +203,7 @@ let main () =
       if Filename.check_suffix x ".gw" then (
         (try Gwcomp.comp_families x
          with e ->
-           Printf.eprintf "File \"%s\", line %d:\n" x !line_cnt;
+           Printf.eprintf "File \"%s\", line %d:\n" x !Gwcomp.line_cnt;
            raise e);
         gwo := (x ^ "o", separate, bnotes, shift) :: !gwo)
       else if Filename.check_suffix x ".gwo" then
@@ -211,6 +212,7 @@ let main () =
     (List.rev !files);
   if not !just_comp then (
     let bdir = !Geneweb.GWPARAM.bpath bname in
+    (* test_base will fail if base exists and force has not been set (-f) *)
     Geneweb.GWPARAM.test_base bname;
     Geneweb.GWPARAM.init_etc bname;
     Lock.control (Mutil.lock_file bdir) false ~onerror:Lock.print_error_and_exit

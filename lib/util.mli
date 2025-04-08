@@ -367,9 +367,17 @@ val string_of_witness_kind_raw : witness_kind -> Adef.safe_string
 
 val relation_txt : config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format
 val string_of_decimal_num : config -> float -> string
+
 val person_exists : config -> base -> string * string * int -> bool
+(** test if person exists using fn, sn, oc as arguments *)
+
 val mark_if_not_public : config -> base -> string * string * int -> bool
+(** used by Roglo to flag persons that should be public and are not.
+    Active only if url contains red_if_not_public=on *)
+
 val husband_wife : config -> base -> person -> bool -> Adef.safe_string
+(** returns a string listing the spouses of a person
+    [bool] if true return all spouses otherwise the first one only *)
 
 val find_person_in_env : config -> base -> string -> person option
 (** [find_person_in_env conf base suff]
@@ -623,3 +631,10 @@ val get_bases_list : ?format_fun:(string -> string) -> unit -> string list
 
 val test_cnt_d : config -> string
 (** tests if cnt_d exists and creaets it if needed *)
+
+val extract_value : char -> string -> string
+(** [extract_value delimiter s]
+   Assuming that the string [s] is of the form [key=value], 
+   where = stands for a one char [delimiter],
+   this function extracts the value.
+   @raise Not_found if [s] does not contain exactly one delimiter. *)
