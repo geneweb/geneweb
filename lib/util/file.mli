@@ -30,20 +30,25 @@ val create_dir : ?parent:bool -> ?required_perm:int -> string -> unit
 
     @raise Invalid_argument on empty path. *)
 
-val walk_folder :
-  ?recursive:bool ->
-  ([ `File of string | `Dir of string ] -> 'a -> 'a) ->
-  string ->
-  'a ->
-  'a
-(** [walk_folder ~recursive f dir] accumulates [f] on all the regular files or
-    directories of [dir].
+type entry =
+  | File of string
+  | Dir of string
+  | Exn of { path : string; exn : exn; bt : Printexc.raw_backtrace }
 
-    The argument of [f] is the relative path of the file or subdirectory in
-    [dir].
+val walk_folder : ?recursive:bool -> (entry -> 'a -> 'a) -> string -> 'a -> 'a
+(** [walk_folder ~recursive f dir] applies [f] to each regular file or
+    directory within [dir].
 
-    If [recursive] is [true], the iterator also explores subdirectories. [false]
-    is the default.
+    The iterator yields:
+    - [File path] for each regular file,
+    - [Dir path] for each subdirectory,
+    where [path] is the relative path to the item within [dir].
 
-    @raise Unix.Unix_error if the function cannot open a file or a
-                           subdirectory in [dir]. *)
+    If an exception is raised while accessing an entry, the iterator yields
+    [Exn { path; exn; bt }] where:
+    - [path] is the relative path of the entry,
+    - [exn] is the raised exception,
+    - [bt] is the raw backtrace associated with this exception,
+
+    If [recursive] is [true], subdirectories are explored recursively.
+    The default is [false]. *)
