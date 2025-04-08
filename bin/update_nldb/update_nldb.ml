@@ -275,7 +275,8 @@ let main () =
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
-  Gwdb.with_database (Filename.concat (Secure.base_dir ()) !fname) @@ fun base ->
+  Gwdb.with_database (Filename.concat (Secure.base_dir ()) !fname)
+  @@ fun base ->
   Sys.catch_break true;
   let () = load_strings_array base in
   let () = load_unions_array base in
