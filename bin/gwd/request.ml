@@ -64,6 +64,7 @@ let relation_print conf base p =
   RelationDisplay.print conf base p p1
 
 let specify conf base n pl1 pl2 pl3 =
+  Printf.eprintf "specify\n";
   let title _ = Output.printf conf "%s : %s" n (transl conf "specify") in
   let n = Name.crush_lower n in
   let ptll pl =
@@ -104,21 +105,20 @@ let specify conf base n pl1 pl2 pl3 =
          p, !tl)
       pl
   in
+
   let sort_ptll ptll =
-    List.sort (fun (p1, _) (p2, _) ->
-      let bi1 = get_birth p1 in
-      let bi2 = get_birth p2 in
-      let ba1 = get_baptism p1 in
-      let ba2 = get_baptism p2 in
-      let bi1 = if bi1 = Date.cdate_None then ba1 else bi1 in
-      let bi2 = if bi2 = Date.cdate_None then ba2 else bi2 in
-      let dmy1 = Date.cdate_to_dmy_opt bi1 in
-      let dmy2 = Date.cdate_to_dmy_opt bi2 in
-      match dmy1, dmy2 with
-      | Some dmy1, Some dmy2 -> Date.compare_dmy dmy1 dmy2
-      | _ -> 0
-    ) ptll
+    let l = List.rev_map (fun (p, v) ->
+      let bi = get_birth p in
+      let bi =
+         if bi = Date.cdate_None then get_baptism p
+         else bi
+      in
+      (p, v, Date.cdate_to_dmy_opt bi)) ptll
+    in
+    List.sort (fun (_, _, dmy1) (_, _, dmy2) -> Option.compare Date.compare_dmy dmy2 dmy1) l
+    |> List.rev_map (fun (p, v, _) -> (p, v))
   in
+  Printf.eprintf "sort ptll\n";
   let ptll1 = ptll pl1 |> sort_ptll in
   let ptll2 = ptll pl2 |> sort_ptll in
   let ptll3 = ptll pl3 |> sort_ptll in
@@ -165,15 +165,12 @@ let specify conf base n pl1 pl2 pl3 =
 
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
-  | Some x -> (
-      match x with
-        "ADD_FAM" | "ADD_IND" | "CHANGE_WIZ_VIS" | "CHG_CHN" |
+  | Some ("ADD_FAM" | "ADD_IND" | "CHANGE_WIZ_VIS" | "CHG_CHN" |
         "CHG_FAM_ORD" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND" |
         "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND" |
         "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" |
         "MRG_DUP_FAM_Y_N" | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" |
-        "MOD_DATA" | "SND_IMAGE" -> true
-      | _ -> false)
+        "MOD_DATA" | "SND_IMAGE") -> true
   | _ -> false
 
 let incorrect_request ?(comment = "") conf =
@@ -297,7 +294,7 @@ let make_henv conf base =
           semi_public =
             if conf.semi_public then get_access (poi base ip) = SemiPublic
             else true;
-          userip = Some ip }
+          user_iper = Some ip }
     | None -> conf
   in
   let aux param conf =
@@ -420,24 +417,21 @@ let w_person ~none fn conf base =
   | Some p -> fn conf base p
   | _ -> none conf base
 
-let output_error ?headers ?content conf code =
-  !GWPARAM.output_error ?headers ?content conf code
-
 let w_wizard fn conf base =
   if conf.wizard then
     fn conf base
   else if conf.just_friend_wizard then
-    output_error conf Def.Forbidden
+    GWPARAM.output_error conf Def.Forbidden
   else
     (* FIXME: send authentification headers *)
-    output_error conf Def.Unauthorized
+    GWPARAM.output_error conf Def.Unauthorized
 
 let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base =
     let none conf =
-      if conf.bname = "" then output_error conf Def.Bad_Request
-      else output_error conf Def.Not_Found
+      if conf.bname = "" then GWPARAM.output_error conf Def.Bad_Request
+      else GWPARAM.output_error conf Def.Not_Found
     in
     w_base ~none
   in
@@ -865,9 +859,12 @@ let treat_request =
     in
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
-    let referer = String.split_on_char '?' (get_referer conf :> string) in
-    let referer = if List.length referer > 1 then (List.nth referer 1) else "" in
-    let referer = if referer = "" then referer else "&" ^ referer in
+    let referer =
+      match Util.extract_value '?' (get_referer conf :> string) with
+      | exception Not_found -> ""
+      | referer when referer <> "" -> "&" ^ referer
+      | _ -> ""
+    in
     let body =
       if conf.cgi then
         Printf.sprintf {|

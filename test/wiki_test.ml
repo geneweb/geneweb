@@ -60,6 +60,22 @@ let l =
       "[[[[w:hg/henri]]" );
   ]
 
+let l2 =
+  [
+    ( [ WLperson (32, ("ccc", "ddd", 0), Some "Texte <b>bold</b> end", None) ],
+      "[[ccc/ddd/Texte '''bold''' end]]" );
+    ( [ WLperson (32, ("ccc", "ddd", 0), Some "Texte <i>italic</i> end", None) ],
+      "[[ccc/ddd/Texte ''italic'' end]]" );
+    ( [
+        WLperson
+          ( 42,
+            ("ccc", "ddd", 0),
+            Some "Texte <b><i>bolditalic</i></b> end",
+            None );
+      ],
+      "[[ccc/ddd/Texte '''''bolditalic''''' end]]" );
+  ]
+
 (* todo fix Fmt *)
 let testable_wiki =
   testable
@@ -68,9 +84,14 @@ let testable_wiki =
       | WLpage (pos, _b, fname, anchor, text) ->
           Fmt.pf fmt "WLpage   (%d,_,%S,%S,%S)" pos fname anchor text
       | WLperson (pos, key, name, text) ->
+          let name =
+            match name with
+            | Some name -> Wiki.bold_italic_syntax name
+            | None -> ""
+          in
           let fn, sn, oc = key in
-          Fmt.pf fmt "WLperson (%d, (%S,%S,%d),%a,%a)" pos fn sn oc
-            (Fmt.option Fmt.string) name (Fmt.option Fmt.string) text
+          Fmt.pf fmt "WLperson (%d, (%S,%S,%d),%a,%a)" pos fn sn oc Fmt.string
+            name (Fmt.option Fmt.string) text
       | WLwizard (pos, wiz, name) ->
           Fmt.pf fmt "WLwizard (%d,%S,%S)" pos wiz name
       | WLnone (pos, s) -> Fmt.pf fmt "WLnone   (%d,%S)" pos s)
@@ -87,4 +108,9 @@ let v =
       List.map
         (fun (expected, s) -> test_case "Wiki links" `Quick (test expected s))
         l );
+    ( "wiki-syntax",
+      (* todo List.map here or in test? *)
+      List.map
+        (fun (expected, s) -> test_case "Wiki syntax" `Quick (test expected s))
+        l2 );
   ]

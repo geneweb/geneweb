@@ -4,14 +4,14 @@ open Gwdb
 
 let debug = ref false
 let fname = ref ""
-let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>"
+let errmsg = Format.sprintf "usage: %s [options] <file_name>" Sys.argv.(0)
 
 let speclist =
   [
     ( "-bd",
       Arg.String Secure.set_base_dir,
-      "<DIR> Specify where the “bases” directory with databases is installed \
-       (default if empty is “.”)." );
+      "<DIR> Specify where the bases directory with databases is installed \
+       (default if empty is .)." );
     ("-debug", Arg.Set debug, " Debug mode.");
   ]
 
@@ -269,17 +269,18 @@ let compute base bdir =
 
 let main () =
   Secure.set_base_dir ".";
+  let bname = Filename.concat (Secure.base_dir ()) !fname in
   Arg.parse speclist anonfun errmsg;
   if !fname = "" then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
-  Gwdb.with_database (Filename.concat (Secure.base_dir ()) !fname) @@ fun base ->
+  Gwdb.with_database bname @@ fun base ->
   Sys.catch_break true;
   let () = load_strings_array base in
   let () = load_unions_array base in
-  try compute base (Filename.concat (Secure.base_dir ()) !fname)
+  try compute base bname
   with Sys.Break ->
     Printf.eprintf "\n";
     flush stderr;

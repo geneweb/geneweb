@@ -911,7 +911,7 @@ let eval_predefined_apply f vl =
     let m = List.fold_left (fun acc s -> f acc s) first_element l in
     string_of_int m
   with Failure _ ->
-    !GWPARAM.syslog `LOG_WARNING "Incorrect parameter for eval_predefined_apply";
+    GWPARAM.syslog `LOG_WARNING "Incorrect parameter for eval_predefined_apply";
     raise Not_found
 
 let parents_access_aux conf base td get_parent =

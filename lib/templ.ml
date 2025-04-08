@@ -269,7 +269,7 @@ let url_set_aux conf evar_l str_l =
   let href =
     match String.split_on_char '?' (Util.commd conf :> string) with
     | [] ->
-        !GWPARAM.syslog `LOG_WARNING "Empty Url\n";
+        GWPARAM.syslog `LOG_WARNING "Empty Url\n";
         ""
     | s :: _l -> s
   in
@@ -444,7 +444,7 @@ let rec eval_variable conf = function
       url_set_aux conf evar_l []
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "index" ] -> (
-      match conf.userip with Some ip -> Gwdb.string_of_iper ip | None -> "")
+      match conf.user_iper with Some ip -> Gwdb.string_of_iper ip | None -> "")
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
   | [ s ] -> eval_simple_variable conf s
@@ -692,7 +692,7 @@ let apply_format conf nth s1 s2 =
                                                   | None -> "[" ^ s1 ^ "?]")))))
                               ))))))
     with _ ->
-      Printf.sprintf "Format error in %s\n" s1 |> !GWPARAM.syslog `LOG_WARNING;
+      Printf.sprintf "Format error in %s\n" s1 |> GWPARAM.syslog `LOG_WARNING;
       s1
 
 let rec eval_ast conf = function

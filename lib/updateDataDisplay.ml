@@ -236,7 +236,7 @@ and eval_simple_var conf base env xx = function
           (List.length p_list)
       in
       let tail = Printf.sprintf "<i class=\"fa fa-user fa-xs ml-1\"></i></a>" in
-      head ^ body ^ title ^ tail |> str_val
+      Printf.sprintf "%s%s%s%s" head body title tail |> str_val
   | [ s ] -> (
       try bool_val (eval_simple_bool_var conf base env xx s)
       with Not_found -> str_val (eval_simple_str_var conf base env xx s))
@@ -358,7 +358,7 @@ and eval_compound_var conf base env xx sl =
         | Some n ->
             if String.length s > n then String.sub s 0 (String.length s - n)
             else (
-              !GWPARAM.syslog `LOG_WARNING "String shorter that requested\n";
+              GWPARAM.syslog `LOG_WARNING "String shorter that requested\n";
               s)
         | None -> raise Not_found)
     | "printable" :: sl -> only_printable (loop sl)
@@ -406,8 +406,7 @@ let print_foreach conf print_ast _eval_expr =
 
     (* Generate the list of progressive substrings *)
     let rec build_substrings i acc =
-      if i >= Utf8.length evar then List.rev acc
-      else if i > limit then List.rev acc
+      if i >= Utf8.length evar || i > limit then List.rev acc
       else
         let rec get_substr j pos =
           if j >= i then pos else get_substr (j + 1) (Utf8.next evar pos)

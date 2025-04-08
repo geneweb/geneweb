@@ -3,12 +3,14 @@
 open Def
 open Gwdb
 
-val rgpd_files : string ref
+val rgpd_dir : string ref
 (** Fonctionnement RGPD *)
 
 val rgpd : bool ref
-val verbose_friends : bool ref
+(** activate RGPD features (SemiPublic otehrwise ignore them *)
+
 val semi_pub_cnt : int ref
+(** count the number of person registered as SemiPublic *)
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Key to refer a person's definition *)

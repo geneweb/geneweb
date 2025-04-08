@@ -6,8 +6,22 @@ val gwd_cmd : string ref
 val cnt_dir : string ref
 val sock_dir : string ref
 val bases : string ref
+
 val reorg : bool ref
+(** set to true when base is in reorg format *)
+
 val force : bool ref
+(** force creation of database if already existing *)
+
+val verbosity : int ref
+(** Verbosity level: defines the verbosity level that will
+    allow the [syslog] function to print anything. *)
+
+val debug : bool ref
+(** If set to [true], prints backtrace when printing log. *)
+
+val oc : out_channel option ref
+(** The output channel in which log is written. *)
 
 type init_s = { status : bool; bname : string }
 
@@ -93,32 +107,33 @@ module Legacy : sig
   val images_d : string -> string
 
   val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ())] *)
+  (** [Filename.concat (Secure.base_dir ()) (string ^ ".gwb") ] *)
 end
 
 val output_error :
-  (?headers:string list ->
+  ?headers:string list ->
   ?content:Adef.safe_string ->
   Config.config ->
   Def.httpStatus ->
-  unit)
-  ref
+  unit
 (** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
       If the current lang is not available, use `en` *)
 
-val is_semi_public : (Gwdb.person -> bool) ref
+val is_semi_public : Gwdb.person -> bool
 (** determines if the person has SemiPublic status   *)
 
 val split_key : string -> string * string * string
+(** split a key of the form first_name.occ surname into its three components
+  the .occ part may be absent. No spaces in first_name and surnames *)
 
-val is_related : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+val is_related : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** determines if the person is a descendant a sibling or an ancestor
     of conf.userkey.
     conf.userkey is the person visiting the base
     the search for ancestors is limited to 3 generations
 *)
 
-val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** Calculate the access rights to the person's information in
       according to his age.
       Returns (in the order of the tests) :
@@ -138,12 +153,14 @@ val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
       - `false` otherwise
   *)
 
-val p_auth_sp : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+val p_auth_sp : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** returns p_auth or true if both user and p are SemiPublic *)
 
-val syslog : (syslog_level -> string -> unit) ref
+val log : (out_channel -> unit) -> unit
+(** logs directly some text *)
+
+val syslog : syslog_level -> string -> unit
 (** Prints on stderr using `"[date]: level message"` format. *)
 
-val wrap_output :
-  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) ref
+val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
 (** Display in a very basic HTML doc, with no CSS or JavaScript. *)

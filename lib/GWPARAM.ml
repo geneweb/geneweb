@@ -14,6 +14,9 @@ let force = ref false
 let cnt_dir = ref ""
 let sock_dir = ref ""
 let bases = ref (Secure.base_dir ())
+let verbosity = ref 7
+let debug = ref false
+let oc : out_channel option ref = ref None
 
 type init_s = { status : bool; bname : string }
 
@@ -26,16 +29,6 @@ let config_reorg bname =
 
 let config_legacy bname =
   String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
-
-type syslog_level =
-  [ `LOG_ALERT
-  | `LOG_CRIT
-  | `LOG_DEBUG
-  | `LOG_EMERG
-  | `LOG_ERR
-  | `LOG_INFO
-  | `LOG_NOTICE
-  | `LOG_WARNING ]
 
 module Default = struct
   (* Attention, ajuster is_reorg_base en conséquence *)
@@ -245,7 +238,7 @@ let is_related conf base p =
     | Some "on" -> (
         let family =
           Mutil.read_or_create_value fname (fun () ->
-              match conf.Config.userip with
+              match conf.Config.user_iper with
               | Some ip ->
                   let family = [ ip ] in
                   let max =
@@ -289,7 +282,7 @@ let is_related conf base p =
                   List.sort_uniq compare family
               | _ -> [])
         in
-        match conf.Config.userip with
+        match conf.Config.user_iper with
         | Some ip ->
             Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
             && List.mem (Gwdb.get_iper p) family
@@ -340,7 +333,7 @@ let is_related conf base p =
          then Printf.eprintf "Wizard\n";
      if (not mode_semi_public) && conf.Config.friend
          then Printf.eprintf "Friend and not mode_semi_public\n";
-     if conf.userip = Some (Gwdb.get_iper p)
+     if conf.user_iper = Some (Gwdb.get_iper p)
          then Printf.eprintf "Self\n";
      if access = Public
          then Printf.eprintf "Public\n";
@@ -400,7 +393,7 @@ let p_auth conf base p =
   let not_private = access <> Private in
   conf.Config.wizard
   || ((not mode_semi_public) && conf.Config.friend)
-  || conf.userip = Some (Gwdb.get_iper p)
+  || conf.user_iper = Some (Gwdb.get_iper p)
   || access = Public
   || conf.Config.public_if_titles && access = IfTitles
      && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
@@ -453,22 +446,71 @@ let p_auth conf base p =
 let p_auth_sp conf base p =
   p_auth conf base p || (conf.Config.friend && Gwdb.get_access p <> Private)
 
+let log fn =
+  match !oc with
+  | Some oc -> fn oc
+  | None -> ()
+
+type syslog_level =
+  [ `LOG_ALERT
+  | `LOG_CRIT
+  | `LOG_DEBUG
+  | `LOG_EMERG
+  | `LOG_ERR
+  | `LOG_INFO
+  | `LOG_NOTICE
+  | `LOG_WARNING
+  ]
+
 let syslog (level : syslog_level) msg =
-  let tm = Unix.(time () |> localtime) in
-  let level =
+  let verbosity_level =
     match level with
-    | `LOG_EMERG -> "EMERGENCY"
-    | `LOG_ALERT -> "ALERT"
-    | `LOG_CRIT -> "CRITICAL"
-    | `LOG_ERR -> "ERROR"
-    | `LOG_WARNING -> "WARNING"
-    | `LOG_NOTICE -> "NOTICE"
-    | `LOG_INFO -> "INFO"
-    | `LOG_DEBUG -> "DEBUG"
+     | `LOG_EMERG -> 0
+     | `LOG_ALERT -> 1
+     | `LOG_CRIT -> 2
+     | `LOG_ERR -> 3
+     | `LOG_WARNING -> 4
+     | `LOG_NOTICE -> 5
+     | `LOG_INFO -> 6
+     | `LOG_DEBUG -> 7
   in
-  Printf.eprintf "[%s]: %s %s\n"
-    (Mutil.sprintf_date tm : Adef.safe_string :> string)
-    level msg
+#ifdef SYSLOG
+  let flags = if !debug then [`LOG_PERROR] else [] in
+  if !verbosity >= verbosity_level
+  then begin
+    let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
+    Syslog.syslog log level msg ;
+    Syslog.closelog log ;
+    if !debug then Printexc.print_backtrace stderr ;
+  end
+#else
+  let () = () in
+  if !verbosity >= verbosity_level
+  then begin
+    let tm = Unix.(time () |> localtime) in
+    let level =
+      match level with
+      | `LOG_EMERG -> "EMERGENCY"
+      | `LOG_ALERT -> "ALERT"
+      | `LOG_CRIT -> "CRITICAL"
+      | `LOG_ERR -> "ERROR"
+      | `LOG_WARNING -> "WARNING"
+      | `LOG_NOTICE -> "NOTICE"
+      | `LOG_INFO -> "INFO"
+      | `LOG_DEBUG -> "DEBUG"
+    in
+    let print oc = Printf.fprintf oc "[%s]: %s %s\n%!"
+        (Mutil.sprintf_date tm :> string) level msg in
+    begin match Sys.getenv_opt "GW_SYSLOG_FILE" with
+      | Some fn ->
+        let oc = open_out_gen [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn in
+        print oc ;
+        close_out oc
+      | None -> print stderr
+    end ;
+    if !debug then Printexc.print_backtrace stderr ;
+  end
+#endif
 
 (** [wrap_output conf title content]
   Plugins defining a page content but not a complete UI
@@ -507,13 +549,6 @@ let lang_d = ref (Legacy.lang_d : my_fun_3)
 let bpath = ref (Legacy.bpath : my_fun_2)
 let portraits_d = ref (Legacy.portraits_d : my_fun_2)
 let images_d = ref (Legacy.images_d : my_fun_2)
-let is_semi_public = ref is_semi_public
-let is_related = ref is_related
-let p_auth = ref p_auth
-let p_auth_sp = ref p_auth_sp
-let wrap_output = ref wrap_output
-let syslog = ref syslog
-let output_error = ref output_error
 
 (* attention; ne pas utiliser !config! *)
 let is_reorg_base bname =
@@ -559,33 +594,33 @@ let init_etc bname =
   (if Sys.file_exists bdir && not (Sys.file_exists fname) then
    try Unix.mkdir fname 0o755
    with Unix.Unix_error (_, _, _) ->
-     !syslog `LOG_WARNING (Printf.sprintf "Error when creating (init) %s" fname));
+     syslog `LOG_WARNING (Printf.sprintf "Error when creating (init) %s" fname));
   if !reorg then (
     (if not (Sys.file_exists (!bpath bname)) then
      try
        Unix.mkdir (!bpath bname) 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING
+       syslog `LOG_WARNING
          (Printf.sprintf "Failure when creating base_dir: %s" (!bpath bname)));
 
     (if not (Sys.file_exists (!etc_d bname)) then
      try Unix.mkdir (!etc_d bname) 0o755
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING
+       syslog `LOG_WARNING
          (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)));
 
     (if not (Sys.file_exists (!config_d bname)) then
      try Unix.mkdir (!config_d bname) 0o755
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING
+       syslog `LOG_WARNING
          (Printf.sprintf "Failure when creating config_dir: %s"
             (!config_d bname)));
 
     if not (Sys.file_exists (!cnt_d bname)) then
       try Unix.mkdir (!cnt_d bname) 0o755
       with Unix.Unix_error (_, _, _) ->
-        !syslog `LOG_WARNING
+        syslog `LOG_WARNING
           (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)))
   else (
     (if not (Sys.file_exists "etc") then
@@ -593,28 +628,28 @@ let init_etc bname =
        Unix.mkdir "etc" 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
+       syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
 
     (if not (Sys.file_exists "lang") then
      try
        Unix.mkdir "lang" 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
+       syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
 
     (if not (Sys.file_exists "cnt") then
      try
        Unix.mkdir "cnt" 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
+       syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
 
     if not (Sys.file_exists (!etc_d bname)) then
       try
         Unix.mkdir (!etc_d bname) 0o755;
         force := true
       with Unix.Unix_error (_, _, _) ->
-        !syslog `LOG_WARNING
+        syslog `LOG_WARNING
           (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)))
 
 let test_reorg bname =

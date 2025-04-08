@@ -10,10 +10,10 @@ let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
 let incorrect_request ?(comment = "") conf =
-  !GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
+  GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
 
 let error_cannot_access conf fname =
-  !GWPARAM.output_error conf Def.Not_Found
+  GWPARAM.output_error conf Def.Not_Found
     ~content:
       ("Cannot access file \""
       ^<^ (Util.escape_html fname : Adef.escaped_string :> Adef.safe_string)
@@ -112,12 +112,12 @@ let header_without_http_nor_home conf title =
   Templ.include_hed_trl conf "hed";
   Util.message_to_wizard conf
 
+let is_fluid conf =
+  (try List.assoc "wide" conf.env = Adef.encoded "on" with Not_found -> false)
+  || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
+
 let header_without_title conf =
-  let fluid =
-    (try List.assoc "wide" conf.env = Adef.encoded "on"
-     with Not_found -> false)
-    || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
-  in
+  let fluid = is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf (fun _ -> ());
   include_home_template conf;
@@ -126,12 +126,7 @@ let header_without_title conf =
     else "<div class=\"container\">")
 
 let header_with_title ?(error = false) ?(fluid = false) conf title =
-  let fluid =
-    fluid
-    || (try List.assoc "wide" conf.env = Adef.encoded "on"
-        with Not_found -> false)
-    || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
-  in
+  let fluid = fluid || is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf title;
   include_home_template conf;
@@ -147,11 +142,7 @@ let header_fluid conf title = header_with_title ~fluid:true conf title
 
 (* when the use of home.txt is not available *)
 let header_without_home conf title =
-  let fluid =
-    (try List.assoc "wide" conf.env = Adef.encoded "on"
-     with Not_found -> false)
-    || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
-  in
+  let fluid = is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf title;
   (* balancing </div> in gen_trailer *)
@@ -183,13 +174,6 @@ let trailer conf =
   Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
   Output.print_sstring conf "</body>\n</html>\n"
-
-let () =
-  GWPARAM.wrap_output :=
-    fun conf title content ->
-      header conf (fun _ -> Output.print_string conf title);
-      content ();
-      trailer conf
 
 (* Calendar request *)
 
