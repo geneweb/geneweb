@@ -724,4 +724,7 @@ val gc :
   ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
 
 val initialize_lowercase_name_index :
-  kind:[< `First_name | `Surname ] -> base -> unit
+  ?on_lock_error:(unit -> unit) ->
+  kind:[< `First_name | `Surname ] ->
+  base ->
+  unit
