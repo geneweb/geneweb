@@ -607,5 +607,5 @@ let base_visible_get base fct i =
       status
   | Some b -> b
 
-let initialize_lowercase_name_index ~kind base =
-  Outbase.initialize_lowercase_name_index ~kind base
+let initialize_lowercase_name_index ?on_lock_error ~kind base =
+  Outbase.initialize_lowercase_name_index ?on_lock_error ~kind base

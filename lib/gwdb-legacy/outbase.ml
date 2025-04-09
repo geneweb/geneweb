@@ -471,9 +471,10 @@ let generate_lowercase_surname_index ~strings_data base =
   in
   { commit; rollback = remove_temporary_files }
 
-let initialize_lowercase_name_index ~kind base =
-  Lock.control ~onerror:Lock.print_try_again (Files.lock_file base.data.bdir)
-    true (fun () ->
+let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
+    ~kind base =
+  Lock.control ~onerror:on_lock_error (Files.lock_file base.data.bdir) true
+    (fun () ->
       let index_files, generate_index =
         match kind with
         | `First_name ->
