@@ -91,7 +91,7 @@ jobs:
       metric: ${{ steps.collect-metrics.outputs.metric }}
 
     env:
-      FMT_CI: ${{ matrix.os == 'ubuntu-24.04' && matrix.ocaml-compiler == '4.14.2' && matrix.setup-version == 'v3' }}
+      FMT_CI: ${{ matrix.os == 'ubuntu-24.04' && matrix.ocaml-compiler == '4.14.2-nnp' && matrix.setup-version == 'v3' }}
       USE_NNP: ${{ !startsWith(matrix.os, 'windows') && (contains(matrix.ocaml-compiler, 'nnp') || startsWith(matrix.ocaml-compiler, '5')) }}
 
     steps:
