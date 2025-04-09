@@ -18,8 +18,12 @@ let () =
   in
   let dry_run = !dry_run in
   Secure.set_base_dir (Filename.dirname bname);
-  Lock.control (Mutil.lock_file bname) true ~onerror:Lock.print_try_again
-  @@ fun () ->
+  let lock_file = Mutil.lock_file bname in
+  let on_exn exn bt =
+    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+    exit 2
+  in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   Database.with_database bname @@ fun base ->
   let p, f, s = Gwdb_gc.gc ~dry_run base in
   Printf.printf

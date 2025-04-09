@@ -201,8 +201,12 @@ let main () =
   if !bname = "" then (
     Arg.usage speclist usage;
     exit 2);
-  Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
-  @@ fun () ->
+  let lock_file = Mutil.lock_file !bname in
+  let on_exn exn bt =
+    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+    exit 2
+  in
+  Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
   if
     !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
     || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8

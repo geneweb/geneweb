@@ -384,10 +384,12 @@ let try_plugin list conf base_name m =
 
 let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
+  (* FIXME: we lost the backtrace because onerror does not handle it. *)
   Lock.control
-    (Mutil.lock_file bfile) true
-    ~onerror:(fun () -> onerror conf base_name)
-    (fun () -> fn conf base_name)
+    ~on_exn:(fun _exn _bt -> onerror conf base_name)
+    ~wait:true
+    ~lock_file:(Mutil.lock_file bfile) @@ fun () ->
+    fn conf base_name
 
 let w_base ~none fn conf (bfile : string option) =
   match bfile with

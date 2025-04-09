@@ -292,12 +292,14 @@ let print_renamed conf new_n =
       Hutil.trailer conf)
 
 let log_redirect from request req =
-  Lock.control (!GWPARAM.adm_file "gwd.lck") true
-    ~onerror:(fun () -> ()) begin fun () ->
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let on_exn exn bt =
+    GwdLog.syslog `LOG_NOTICE @@ Format.asprintf "%a\n" Lock.pp_exception (exn, bt)
+  in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
     let referer = Mutil.extract_param "referer: " '\n' request in
     Geneweb.GWPARAM.syslog `LOG_NOTICE @@
     Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer
-  end
 
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
@@ -546,13 +548,14 @@ let set_actlog list =
     ())
 
 let get_token check_from utm from_addr base_password =
-  Lock.control (!GWPARAM.adm_file "gwd.lck") true
-    ~onerror:(fun () -> ATnormal)
-    (fun () ->
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  (* FIXME: we silently ignore errors if we cannot lock the database. *)
+  let on_exn _exn _bt = ATnormal in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
        let (list, r, changed) =
          get_actlog check_from utm from_addr base_password
        in
-       if changed then set_actlog list; r)
+       if changed then set_actlog list; r
 
 let mkpasswd () =
   let rec loop len =
@@ -568,9 +571,10 @@ let random_self_init () =
   Random.init seed
 
 let set_token utm from_addr base_file acc user username =
-  Lock.control (!GWPARAM.adm_file "gwd.lck") true
-    ~onerror:(fun () -> "")
-    (fun () ->
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  (* FIXME: we silently ignore errors if we cannot lock the database. *)
+  let on_exn _exn _bt = "" in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
        random_self_init ();
        let (list, _, _) = get_actlog false utm "" "" in
        let (x, xx) =
@@ -591,7 +595,7 @@ let set_token utm from_addr base_file acc user username =
          loop 50
        in
        let list = ((from_addr, xx), (utm, acc, user, username)) :: list in
-       set_actlog list; x)
+       set_actlog list; x
 
 let index_not_name s =
   let rec loop i =
@@ -1336,11 +1340,12 @@ let log tm conf from gauth request script_name contents =
     end
 
 let is_robot from =
-  Lock.control (!GWPARAM.adm_file "gwd.lck") true
-    ~onerror:(fun () -> false)
-    (fun () ->
+  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  (* FIXME: we silently ignore errors if we cannot lock the database. *)
+  let on_exn _exn _bt = false in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
        let (robxcl, _) = Robot.robot_excl () in
-       List.mem_assoc from robxcl.Robot.excl)
+       List.mem_assoc from robxcl.Robot.excl
 
 let auth_err request auth_file =
   if auth_file = "" then false, ""
@@ -1383,8 +1388,10 @@ let log_and_robot_check conf auth from request script_name contents =
   if !robot_xcl = None
   then log (Unix.time ()) conf from auth request script_name contents
   else
-    Lock.control (!GWPARAM.adm_file "gwd.lck") true ~onerror:ignore
-      begin fun () ->
+    let lock_file = !GWPARAM.adm_file "gwd.lck" in
+    (* FIXME: we silently ignore errors if we cannot lock the database. *)
+    let on_exn _exn _bt = () in
+    Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
         let tm = Unix.time () in
         begin match !robot_xcl with
           | Some (cnt, sec) ->
@@ -1394,7 +1401,6 @@ let log_and_robot_check conf auth from request script_name contents =
           | _ -> ()
         end;
         log tm conf from auth request script_name contents
-      end
 
 let conf_and_connection =
   let slow_query_threshold =
@@ -1442,9 +1448,11 @@ let conf_and_connection =
           if is_robot from then Robot.robot_error conf 0 0
           else
             let tm = Unix.time () in
-            Lock.control (!GWPARAM.adm_file "gwd.lck") true
-              ~onerror:(fun () -> ())
-              (fun () -> log_passwd_failed ar tm from request conf.bname) ;
+            let lock_file = !GWPARAM.adm_file "gwd.lck" in
+            (* FIXME: we silently ignore errors if we cannot lock the database. *)
+            let on_exn _exn _bt = () in
+            Lock.control ~on_exn ~wait:true ~lock_file
+              (fun () -> log_passwd_failed ar tm from request conf.bname);
             unauth_server conf ar
       | _ ->
         let printexc bt exn =

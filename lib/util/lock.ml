@@ -2,42 +2,35 @@
 
 let no_lock_flag = ref false
 
-let print_error_and_exit () =
-  Printf.printf "\nSorry. Impossible to lock base.\n";
-  flush stdout;
-  exit 2
+(* TODO: move this generic function in a more appropriate location. *)
+let pp_exception ppf (exn, bt) =
+  let sexn = Printexc.to_string exn in
+  if Printexc.backtrace_status () then
+    Format.fprintf ppf "@[Raised exception %s:@ %s@]" sexn
+      (Printexc.raw_backtrace_to_string bt)
+  else Format.fprintf ppf "@[Raised exception %s@]" sexn
 
-let print_try_again () =
-  Printf.eprintf "Base locked. Try again.\n";
-  flush stdout
+let close_noerr fd = try Unix.close fd with _ -> ()
+let chmod_noerr fl perm = try Unix.chmod fl perm with _ -> ()
 
-let control ~onerror lname wait f =
-  if !no_lock_flag || Filename.basename lname = ".lck" then f ()
+let acquire_lock ~wait lock_file =
+  let fd = Unix.openfile lock_file Unix.[ O_RDWR; O_CREAT ] 0o666 in
+  chmod_noerr lock_file 0o666;
+  if wait then Unix.lockf fd Unix.F_LOCK 0 else Unix.lockf fd Unix.F_TLOCK 0;
+  fd
+
+let release_lock_noerr fd = try Unix.lockf fd Unix.F_ULOCK 0 with _ -> ()
+
+let control ~on_exn ~wait ~lock_file k =
+  if !no_lock_flag || Filename.basename lock_file = ".lck" then k ()
   else
-    try
-      let fd = Unix.openfile lname [ Unix.O_RDWR; Unix.O_CREAT ] 0o666 in
-      (try Unix.chmod lname 0o666 with _ -> ());
-      try
-        if Sys.unix then
-          if wait then Unix.lockf fd Unix.F_LOCK 0
-          else Unix.lockf fd Unix.F_TLOCK 0;
-        let r = f () in
-        Unix.close fd;
-        r
-      with e ->
-        Unix.close fd;
-        raise e
-    with
-    | Unix.Unix_error _ -> onerror ()
-    | e -> raise e
-
-let control_retry ~onerror lname f =
-  control lname false
-    ~onerror:(fun () ->
-      Printf.eprintf "Base is locked. Waiting... ";
-      flush stderr;
-      control lname true ~onerror (fun () ->
-          Printf.eprintf "Ok\n";
-          flush stderr;
-          f ()))
-    f
+    match acquire_lock ~wait lock_file with
+    | exception exn ->
+        let bt = Printexc.get_raw_backtrace () in
+        on_exn exn bt
+    | fd ->
+        let finally () =
+          release_lock_noerr fd;
+          close_noerr fd
+        in
+        Fun.protect ~finally k
