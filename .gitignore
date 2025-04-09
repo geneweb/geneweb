@@ -18,6 +18,7 @@ bin/gwrepl/dune
 bin/gwu/dune
 bin/setup/dune
 bin/update_nldb/dune
+bin/init-search-indexes/dune
 lib/util/dune
 test/dune
 
