@@ -332,7 +332,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
        a)
   in
   let find istr =
-    let ipera =
+    let ipera, iperset =
       try
         let bt = Lazy.force bt in
         let s = base_data.strings.get istr in
@@ -343,25 +343,34 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
         let ic_dat = Secure.open_in_bin fname_dat in
         seek_in ic_dat pos;
         let len = input_binary_int ic_dat in
-        let rec read_loop ipera len =
-          if len = 0 then ipera
+        let rec read_loop (ipera, iperset) len =
+          if len = 0 then (ipera, iperset)
           else
             let iper = input_binary_int ic_dat in
-            read_loop (Ext_int.Set.add iper ipera) (len - 1)
+            let iperset' = Ext_int.Set.add iper iperset in
+            let ipera = if iperset' != iperset then iper :: ipera else ipera in
+            read_loop (ipera, iperset') (len - 1)
         in
-        let ipera = read_loop Ext_int.Set.empty len in
+        let ipera, iperset = read_loop ([], Ext_int.Set.empty) len in
         close_in ic_dat;
-        ipera
-      with Not_found -> Ext_int.Set.empty
+        (ipera, iperset)
+      with Not_found -> ([], Ext_int.Set.empty)
     in
-    let ipera = Ext_int.Set.diff ipera (Lazy.force patched_set) in
+    let iperset = Ext_int.Set.diff iperset (Lazy.force patched_set) in
+    let ipera = List.filter (fun iper -> Ext_int.Set.mem iper iperset) ipera in
     Hashtbl.fold
-      (fun i p acc ->
-        let istrs = proj p in
-        if List.mem istr istrs then Ext_int.Set.add i acc else acc)
+      (fun i p (ipera, iperset) ->
+        if Ext_int.Set.mem i iperset then (ipera, iperset)
+        else
+          let istrs = proj p in
+          if List.mem istr istrs then
+            let iperset = Ext_int.Set.add i iperset in
+            let ipera = i :: ipera in
+            (ipera, iperset)
+          else (ipera, iperset))
       (Lazy.force filtered_person_patches)
-      ipera
-    |> Ext_int.Set.elements
+      (ipera, iperset)
+    |> fst
   in
   let cursor str =
     let bt = Lazy.force bt in
