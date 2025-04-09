@@ -274,7 +274,7 @@ let commit_notes conf base fnotes s =
     String.concat Filename.dir_sep
       [ Util.bpath conf.bname; base_notes_dir base; fname ]
   in
-  File.create_dir ~parent:true (Filename.dirname fpath);
+  Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   (try Gwdb.commit_notes base fname s
    with Sys_error m ->
      Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
@@ -289,7 +289,7 @@ let commit_wiznotes conf base fnotes s =
       (Util.bpath (conf.bname ^ ".gwb"))
       [ base_wiznotes_dir base; fname ]
   in
-  File.create_dir ~parent:true (Filename.dirname fpath);
+  Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   Gwdb.commit_wiznotes base fname s;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s

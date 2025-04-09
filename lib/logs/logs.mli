@@ -57,3 +57,4 @@ type 'a msgf = (('a, Format.formatter, unit, unit) format4 -> 'a) -> unit
 
 val info : 'a msgf -> unit
 val debug : 'a msgf -> unit
+val err : 'a msgf -> unit

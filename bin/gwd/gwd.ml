@@ -1795,8 +1795,8 @@ let geneweb_server () =
   let auto_call =
     try let _ = Sys.getenv "WSERVER" in true with Not_found -> false
   in
-  if not auto_call then
-    begin let hostn =
+  if not auto_call then begin
+    let hostn =
       match !selected_addr with
         Some addr -> addr
       | None -> try Unix.gethostname () with _ -> "computer"
@@ -1835,13 +1835,17 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-        try File.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
+        try
+          Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
         with Sys_error e ->
-          Logs.syslog `LOG_CRIT (Format.sprintf "failure creating %s (%s)\n"
-            !GWPARAM.cnt_dir e);
+          Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
     end;
-  Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
-    ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers connection
+  Wserver.start
+    ?addr:!selected_addr
+    ~port:!selected_port
+    ~timeout:!conn_timeout
+    ~max_pending_requests:!max_pending_requests
+    ~n_workers:!n_workers connection
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -1925,7 +1929,7 @@ let slashify s =
   String.init (String.length s) conv_char
 
 let make_sock_dir x =
-  File.create_dir ~parent:true x;
+  Filesystem.create_dir ~parent:true x;
   if Sys.unix then ()
   else
     begin
