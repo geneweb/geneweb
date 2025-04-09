@@ -417,11 +417,11 @@ let fixbase_ok conf base =
   in
   if dry_run then process ()
   else
+    let lock_file = Mutil.lock_file @@ !GWPARAM.bpath conf.bname in
     Lock.control
-      (Mutil.lock_file @@ !GWPARAM.bpath conf.bname)
-      false
-      ~onerror:(fun () -> GWPARAM.output_error conf Def.Service_Unavailable)
-      process
+      ~on_exn:(fun _exn _bt ->
+        GWPARAM.output_error conf Def.Service_Unavailable)
+      ~wait:false ~lock_file process
 
 let ns = "fixbase"
 

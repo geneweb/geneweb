@@ -265,11 +265,14 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
-let main () =
+let () =
   Arg.parse speclist (fun s -> bname := s) usage;
   if !ask_for_delete > 0 then
-    Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
-    @@ fun () -> Gwdb.with_database !bname (fun base -> move base !bname)
+    let lock_file = Mutil.lock_file !bname in
+    let on_exn exn bt =
+      Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+      exit 2
+    in
+    Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+    Gwdb.with_database !bname (fun base -> move base !bname)
   else Gwdb.with_database !bname (fun base -> move base !bname)
-
-let _ = main ()

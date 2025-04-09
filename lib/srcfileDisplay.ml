@@ -109,12 +109,13 @@ let set_wizard_and_friend_traces conf =
 
 let incr_counter f conf =
   if conf.bname = "" then None
-  else
-    let _ = Util.test_cnt_d conf in
-    let lname = !GWPARAM.adm_file (conf.bname ^ ".lck") in
-    Lock.control lname true
-      ~onerror:(fun () -> None)
-      (fun () ->
+  else (
+    ignore (Util.test_cnt_d conf : string);
+    let lock_file = !GWPARAM.adm_file (conf.bname ^ ".lck") in
+    (* FIXME: we silently ignore errors if we cannot acquire the lock on the
+       database. *)
+    let on_exn _exn _bt = None in
+    Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
         let r = count conf in
         f r;
         if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
@@ -122,7 +123,7 @@ let incr_counter f conf =
         else r.normal_cnt <- r.normal_cnt + 1;
         write_counter conf r;
         set_wizard_and_friend_traces conf;
-        Some (r.welcome_cnt, r.request_cnt, r.start_date))
+        Some (r.welcome_cnt, r.request_cnt, r.start_date)))
 
 let incr_welcome_counter =
   incr_counter (fun r -> r.welcome_cnt <- r.welcome_cnt + 1)

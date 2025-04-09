@@ -2174,18 +2174,15 @@ let create_topological_sort conf base =
       in
       Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
-          Lock.control (Mutil.lock_file bfile) false
-            ~onerror:(fun () ->
-              let () = load_ascends_array base in
-              let () = load_couples_array base in
-              Consang.topological_sort base (pget conf))
-            (fun () ->
-              let () = load_ascends_array base in
-              let () = load_couples_array base in
-              let tstab = Consang.topological_sort base (pget conf) in
-              if conf.use_restrict && (not conf.wizard) && not conf.friend then
-                base_visible_write base;
-              tstab))
+          load_ascends_array base;
+          load_couples_array base;
+          let tstab = Consang.topological_sort base (pget conf) in
+          (* FIXME: we silently ignores error if we cannot lock the database. *)
+          let on_exn _exn _bt = () in
+          if conf.use_restrict && (not conf.wizard) && not conf.friend then
+            Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bfile)
+              (fun () -> base_visible_write base);
+          tstab)
 
 let p_of_sosa conf base sosa p0 =
   let path = Sosa.branches sosa in

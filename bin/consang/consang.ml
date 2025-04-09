@@ -23,35 +23,35 @@ let anonfun s =
   if !fname = "" then fname := s
   else raise (Arg.Bad "Cannot treat several databases")
 
-let main () =
+let () =
   Arg.parse speclist anonfun errmsg;
   if !fname = "" then (
     Printf.eprintf "Missing file name\n";
-    Printf.eprintf "Use option -help for usage\n";
-    flush stderr;
+    Printf.eprintf "Use option -help for usage@.";
     exit 2);
   if !verbosity = 0 then Mutil.verbose := false;
   Secure.set_base_dir (Filename.dirname !fname);
-  Lock.control_retry (Mutil.lock_file !fname) ~onerror:Lock.print_error_and_exit
-    (fun () ->
-      Gwdb.with_database !fname (fun base ->
-          if !fast then (
-            Gwdb.load_persons_array base;
-            Gwdb.load_families_array base;
-            Gwdb.load_ascends_array base;
-            Gwdb.load_unions_array base;
-            Gwdb.load_couples_array base;
-            Gwdb.load_descends_array base;
-            Gwdb.load_strings_array base);
-          try
-            Sys.catch_break true;
-            if ConsangAll.compute ~verbosity:!verbosity base !scratch then
-              Gwdb.sync base
-          with Consang.TopologicalSortError p ->
-            Printf.printf
-              "\nError: loop in database, %s is his/her own ancestor.\n"
-              (Gutil.designation base p);
-            flush stdout;
-            exit 2))
-
-let _ = Printexc.print main ()
+  let lock_file = Mutil.lock_file !fname in
+  let on_exn exn bt =
+    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+    exit 2
+  in
+  Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
+  Gwdb.with_database !fname (fun base ->
+      if !fast then (
+        Gwdb.load_persons_array base;
+        Gwdb.load_families_array base;
+        Gwdb.load_ascends_array base;
+        Gwdb.load_unions_array base;
+        Gwdb.load_couples_array base;
+        Gwdb.load_descends_array base;
+        Gwdb.load_strings_array base);
+      try
+        Sys.catch_break true;
+        if ConsangAll.compute ~verbosity:!verbosity base !scratch then
+          Gwdb.sync base
+      with Consang.TopologicalSortError p ->
+        Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
+          (Gutil.designation base p);
+        flush stdout;
+        exit 2)
