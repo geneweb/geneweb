@@ -623,3 +623,10 @@ val get_bases_list : ?format_fun:(string -> string) -> unit -> string list
 
 val test_cnt_d : config -> string
 (** tests if cnt_d exists and creaets it if needed *)
+
+val extract_value : char -> string -> string
+(** [extract_value delimiter s]
+   Assuming that the string [s] is of the form [key=value], 
+   where = stands for a one char [delimiter],
+   this function extracts the value.
+   @raise Not_found if [s] does not contain exactly one delimiter. *)

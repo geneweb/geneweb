@@ -3027,3 +3027,22 @@ let get_bases_list ?(format_fun = fun x -> x) () =
   Unix.closedir dh;
   list := List.sort compare !list;
   !list
+
+let extract_value delimiter s =
+  let len = String.length s in
+  let rec loop equal_pos i =
+    if i = len then equal_pos
+    else
+      let c = s.[i] in
+      match equal_pos with
+      | Some _ when c = delimiter ->
+          (* The line contains several delimiters. *)
+          None
+      | None when c = delimiter ->
+          (* We found the first delimiter. *)
+          loop (Some i) (i + 1)
+      | _ -> loop equal_pos (i + 1)
+  in
+  match loop None 0 with
+  | Some i -> String.sub s (i + 1) (len - i - 1)
+  | None -> raise Not_found
