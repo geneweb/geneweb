@@ -54,7 +54,7 @@ VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
-lib/version.ml: lib/version.txt
+lib/version.ml:
 	@cp lib/version.txt $@
 	@printf 'let branch = "$(BRANCH)"\n' >> $@
 	@printf 'let src = "$(SOURCE)"\n' >> $@
@@ -62,7 +62,7 @@ lib/version.ml: lib/version.txt
 	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
 	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
 	@printf 'Generating $@… Done.\n'
-.PHONY: build fmt gwd install
+.PHONY: build fmt gwd install lib/version.ml
 
 # Patch/unpatch files for campl5 >= 8.03
 CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
