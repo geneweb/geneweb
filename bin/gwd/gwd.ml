@@ -1168,8 +1168,8 @@ let make_conf from_addr request script_name env =
   let conf =
     {from = from_addr;
      api_mode = false;
-     manitou = manitou;
-     supervisor = supervisor;
+     manitou;
+     supervisor;
      wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
      debug = !debug;
@@ -1181,7 +1181,7 @@ let make_conf from_addr request script_name env =
        end;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user;
-     username = username;
+     username;
      userkey = (Name.lower userkey);
      userip = None;
      auth_scheme = ar.ar_scheme;
@@ -1194,9 +1194,9 @@ let make_conf from_addr request script_name env =
        end;
      lang = if lang = "" then default_lang else lang;
      vowels=vowels;
-     default_lang = default_lang;
-     browser_lang = browser_lang;
-     default_sosa_ref = default_sosa_ref;
+     default_lang;
+     browser_lang;
+     default_sosa_ref;
      multi_parents =
        begin try List.assoc "multi_parents" base_env = "yes" with
          Not_found -> false
@@ -1262,11 +1262,11 @@ let make_conf from_addr request script_name env =
         else ["b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd]) @
        (if lang = "" then [] else ["lang", Mutil.encode lang]) @
        (if from = "" then [] else ["opt", Mutil.encode from]);
-     base_env = base_env;
+     base_env;
      allowed_titles = Lazy.from_fun (allowed_titles env base_env);
      denied_titles = Lazy.from_fun (denied_titles env base_env);
-     request = request; lexicon = lexicon;
-     charset = "UTF-8"; is_rtl = is_rtl;
+     request; lexicon;
+     charset = "UTF-8"; is_rtl;
      left = if is_rtl then "right" else "left";
      right = if is_rtl then "left" else "right";
      auth_file =
