@@ -1236,7 +1236,7 @@ let with_database ?(read_only = false) bname k =
         close_out oc)
   in
   let ext_files () =
-    File.walk_folder ~recursive:true
+    Filesystem.walk_folder ~recursive:true
       (fun fl files ->
         match fl with
         | File f when Filename.check_suffix f ".txt" ->
@@ -1318,6 +1318,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
+  Filesystem.create_dir ~parent:true (bdir // "notes_d");
+  Filesystem.create_file (bdir // "notes");
   let persons, ascends, unions = persons in
   let families, couples, descends = families in
   let data : Dbdisk.base_data =

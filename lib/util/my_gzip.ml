@@ -41,11 +41,12 @@ let find_nextline b s =
 (* Read from the input channel [ic] until a new line is found in the
    buffer. Return the number of read characters. *)
 let read_until_newline ic =
-  let b = Bytes.create 500 in
+  let sz = 8192 in
+  let buf = Bytes.create sz in
   let rec loop acc =
-    let r = Gzip.input ic.gic b 0 500 in
-    Buffer.add_subbytes ic.tail b 0 r;
-    if contains_newline b r || r = 0 then acc + r else loop (acc + r)
+    let r = Gzip.input ic.gic buf 0 sz in
+    Buffer.add_subbytes ic.tail buf 0 r;
+    if contains_newline buf r || r = 0 then acc + r else loop (acc + r)
   in
   loop 0
 
