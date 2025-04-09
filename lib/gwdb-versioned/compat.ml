@@ -727,7 +727,10 @@ module type Driver_S = sig
   val set_fpoi_cache : base -> bool -> unit
 
   val initialize_lowercase_name_index :
-    kind:[< `First_name | `Surname ] -> base -> unit
+    ?on_lock_error:(unit -> unit) ->
+    kind:[< `First_name | `Surname ] ->
+    base ->
+    unit
 end
 
 module type DriverImpl = sig
@@ -1584,8 +1587,8 @@ struct
   let set_fpoi_cache =
     Util.wrap_base Legacy.set_fpoi_cache Current.set_fpoi_cache
 
-  let initialize_lowercase_name_index ~kind =
+  let initialize_lowercase_name_index ?on_lock_error ~kind =
     Util.wrap_base
-      (Legacy.initialize_lowercase_name_index ~kind)
-      (Current.initialize_lowercase_name_index ~kind)
+      (Legacy.initialize_lowercase_name_index ?on_lock_error ~kind)
+      (Current.initialize_lowercase_name_index ?on_lock_error ~kind)
 end
