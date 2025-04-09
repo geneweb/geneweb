@@ -73,7 +73,11 @@ patch_files:
 	@if [ '$(CAMLP5_VERSION)' != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
 	  printf "\nPatching bin/ged2gwb/dune.in and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
 	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune.in; \
-	  perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\n  \})/$$1\n  ; Token.kwds = Hashtbl.create 10$$2/' bin/ged2gwb/ged2gwb.ml; \
+	  if [ "$(OS_TYPE)" = "Win" ]; then \
+	    perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\s*\})/\1\r\n  ; Token.kwds = Hashtbl.create 301\2/' bin/ged2gwb/ged2gwb.ml; \
+	  else \
+	    perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\n  \})/$$1\n  ; Token.kwds = Hashtbl.create 301$$2/' bin/ged2gwb/ged2gwb.ml; \
+	  fi \
 	fi
 
 unpatch_files:
