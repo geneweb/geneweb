@@ -26,4 +26,7 @@ val output :
     *)
 
 val initialize_lowercase_name_index :
-  kind:[< `First_name | `Surname ] -> Dbdisk.dsk_base -> unit
+  ?on_lock_error:(unit -> unit) ->
+  kind:[< `First_name | `Surname ] ->
+  Dbdisk.dsk_base ->
+  unit
