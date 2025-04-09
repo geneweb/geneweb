@@ -51,8 +51,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04, macos-15, windows-latest]
+        ocaml-compiler: [4.14.2, 5.3.0]
+        setup-version: [v3]
         include:
-          # v2 builds (legacy environments)
           - os: ubuntu-22.04
             ocaml-compiler: 4.08.1
             setup-version: v2
@@ -65,34 +67,13 @@ jobs:
             ocaml-compiler: 4.08.1
             setup-version: v2
 
-          - os: windows-latest
-            ocaml-compiler: 4.14.2
-            setup-version: v2
-
-          # v3 builds (newer environments)
-          - os: ubuntu-24.04
-            ocaml-compiler: 4.14.2-nnp
-            setup-version: v3
-
-          - os: ubuntu-24.04
-            ocaml-compiler: 5.3.0
-            setup-version: v3
-
-          - os: macos-15
-            ocaml-compiler: 4.14.2-nnp
-            setup-version: v3
-
-          - os: macos-15
-            ocaml-compiler: 5.3.0
-            setup-version: v3
-
     outputs:
       total_matrix_jobs: ${{ strategy.job-total || 0 }}
       metric: ${{ steps.collect-metrics.outputs.metric }}
 
     env:
       FMT_CI: ${{ matrix.os == 'ubuntu-24.04' && matrix.ocaml-compiler == '4.14.2-nnp' && matrix.setup-version == 'v3' }}
-      USE_NNP: ${{ !startsWith(matrix.os, 'windows') && (contains(matrix.ocaml-compiler, 'nnp') || startsWith(matrix.ocaml-compiler, '5')) }}
+      USE_NNP: ${{ !startsWith(matrix.os, 'windows') && (matrix.ocaml-compiler == '4.14.2' || startsWith(matrix.ocaml-compiler, '5')) }}
 
     steps:
       - name: Checkout code
@@ -129,11 +110,16 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - name: Setup Ocaml with v3
+      - name: Setup Ocaml with v3 (master)
         if: matrix.setup-version == 'v3'
         uses: ocaml/setup-ocaml@master
         with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler == '4.14.2-nnp' && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
+          ocaml-compiler: ${{ (!startsWith(matrix.os, 'windows') && matrix.ocaml-compiler == '4.14.2') && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
+
+      - name: Install Perl dependencies (Windows @v3)
+        if: runner.os == 'Windows' && matrix.setup-version == 'v3'
+        run: cpan -j .github/ci-config/cpan-config.pm -T -f -i String::ShellQuote IPC::System::Simple;
+        shell: bash
 
       - name: Install Geneweb dependencies
         run: opam install . --deps-only ${{ env.FMT_CI == 'true' && '--with-test' || '' }}
