@@ -112,12 +112,15 @@ let header_without_http_nor_home conf title =
   Templ.include_hed_trl conf "hed";
   Util.message_to_wizard conf
 
-let header_without_title conf =
-  let fluid =
-    (try List.assoc "wide" conf.env = Adef.encoded "on"
-     with Not_found -> false)
-    || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
+let is_fluid conf =
+  let is_wide env =
+    try List.assoc "wide" env = Adef.encoded "on"
+    with Not_found -> false
   in
+  is_wide conf.env || is_wide conf.base_env
+
+let header_without_title conf =
+  let fluid = is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf (fun _ -> ());
   include_home_template conf;
@@ -126,12 +129,7 @@ let header_without_title conf =
     else "<div class=\"container\">")
 
 let header_with_title ?(error = false) ?(fluid = false) conf title =
-  let fluid =
-    fluid
-    || (try List.assoc "wide" conf.env = Adef.encoded "on"
-        with Not_found -> false)
-    || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
-  in
+  let fluid = fluid || is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf title;
   include_home_template conf;
@@ -147,11 +145,7 @@ let header_fluid conf title = header_with_title ~fluid:true conf title
 
 (* when the use of home.txt is not available *)
 let header_without_home conf title =
-  let fluid =
-    (try List.assoc "wide" conf.env = Adef.encoded "on"
-     with Not_found -> false)
-    || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
-  in
+  let fluid = is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf title;
   (* balancing </div> in gen_trailer *)
