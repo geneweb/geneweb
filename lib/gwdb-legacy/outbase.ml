@@ -349,7 +349,29 @@ let generate_base base =
       base.data.families.clear_array ();
       base.data.descends.clear_array ();
       close_out oc;
-      close_out oc_acc
+      close_out oc_acc;
+      let nbp =
+        let rec loop i acc =
+          if i = base.data.persons.len then acc
+          else
+            let p = base.data.persons.get i in
+            let acc =
+              if
+                p.key_index = -1
+                || (0 = p.surname || 1 = p.surname)
+                   && (0 = p.first_name || 1 = p.first_name)
+              then acc
+              else acc + 1
+            in
+            loop (i + 1) acc
+        in
+        loop 0 0
+      in
+      let oc =
+        Secure.open_out_bin @@ Filename.concat base.data.bdir "nb_persons"
+      in
+      output_value oc nbp;
+      close_out oc
     with e ->
       (try close_out oc with _ -> ());
       (try close_out oc_acc with _ -> ());
@@ -363,7 +385,16 @@ let generate_base base =
     Files.rm base_file;
     Sys.rename tmp_base base_file;
     Files.rm base_acc_file;
-    Sys.rename tmp_base_acc base_acc_file
+    Sys.rename tmp_base_acc base_acc_file;
+    Files.rm (Filename.concat base.data.bdir "patches");
+    Files.rm (Filename.concat base.data.bdir "patches~");
+    Files.rm (Filename.concat base.data.bdir "synchro_patches");
+    Files.rm (Filename.concat base.data.bdir "notes_link");
+    Files.rm (Filename.concat base.data.bdir "restrict");
+    Files.rm (Filename.concat base.data.bdir "nb_persons");
+    (* FIXME: should not be present in this part of the code? *)
+    Files.rm (Filename.concat base.data.bdir "tstab");
+    Files.rm (Filename.concat base.data.bdir "tstab_visitor")
 
 let generate_lowercase_first_name_index ~strings_data base =
   let tmp_fnames_lower_inx =
@@ -544,27 +575,7 @@ let output ?(save_mem = false) ?(tasks = []) base =
         (try close_out oc_inx with _ -> ());
         (try close_out oc_inx_acc with _ -> ());
         raise e);
-     trace "ok";
-     let nbp =
-       let rec loop i acc =
-         if i = base.data.persons.len then acc
-         else
-           let p = base.data.persons.get i in
-           let acc =
-             if
-               p.key_index = -1
-               || (0 = p.surname || 1 = p.surname)
-                  && (0 = p.first_name || 1 = p.first_name)
-             then acc
-             else acc + 1
-           in
-           loop (i + 1) acc
-       in
-       loop 0 0
-     in
-     let oc = Secure.open_out_bin @@ Filename.concat bname "nb_persons" in
-     output_value oc nbp;
-     close_out oc
+     trace "ok"
    with e ->
      Files.rm tmp_names_inx;
      Files.rm tmp_names_acc;
@@ -598,15 +609,6 @@ let output ?(save_mem = false) ?(tasks = []) base =
     let notes_d = Filename.concat bname "notes_d" in
     Files.remove_dir notes_d;
     Sys.rename tmp_notes_d notes_d);
-  Files.rm (Filename.concat bname "patches");
-  Files.rm (Filename.concat bname "patches~");
-  Files.rm (Filename.concat bname "synchro_patches");
-  Files.rm (Filename.concat bname "notes_link");
-  Files.rm (Filename.concat bname "restrict");
-  Files.rm (Filename.concat bname "nb_persons");
-  (* FIXME: should not be present in this part of the code? *)
-  Files.rm (Filename.concat bname "tstab");
-  Files.rm (Filename.concat bname "tstab_visitor");
   trace "perform additional tasks";
   List.iter (fun task -> task ()) tasks;
   close_base base
