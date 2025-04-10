@@ -314,10 +314,17 @@ let accept_connections ~timeout ~n_workers callback socket =
   if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
   else accept_connections_windows socket
 
+let generate_secret_salt () =
+  Random.self_init ();
+  string_of_int @@ Random.bits ()
+
 let start ?addr ~port ?timeout ~max_pending_requests ~n_workers callback =
   let timeout = match timeout with None -> 0 | Some t -> t in
   match Sys.getenv "WSERVER" with
   | exception Not_found ->
+      (* A secret salt is added to the environment to ensure that workers
+         use the same salt for digests on both Unix and Windows platforms. *)
+      Unix.putenv "SECRET_SALT" @@ generate_secret_salt ();
       check_stopping ();
       let addr =
         match addr with
@@ -342,10 +349,9 @@ let start ?addr ~port ?timeout ~max_pending_requests ~n_workers callback =
       Unix.bind socket (Unix.ADDR_INET (addr, port));
       Unix.listen socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
-      eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
+      Format.eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...@."
         (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min port;
-      flush stderr;
       if !no_fork then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
       accept_connections ~timeout ~n_workers callback socket
   | s ->

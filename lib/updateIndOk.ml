@@ -1123,7 +1123,8 @@ let print_mod_aux conf base callback =
   let p, ext = reconstitute_person conf in
   let redisp = Option.is_some (p_getenv conf.env "return") in
   let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
-  let digest = Update.digest_person ini_ps in
+  let salt = Option.get conf.secret_salt in
+  let digest = Update.digest_person ~salt ini_ps in
   if digest = get conf "digest" then
     if ext || redisp then UpdateInd.print_update_ind conf base p digest
     else
