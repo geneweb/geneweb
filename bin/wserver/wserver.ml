@@ -61,6 +61,7 @@ let http status =
     let answer =
       match status with
       | Def.OK -> "200 OK"
+      | Def.Moved_Permanently -> "301 Moved Permanently"
       | Def.Moved_Temporarily -> "302 Moved Temporarily"
       | Def.Bad_Request -> "400 Bad Request"
       | Def.Unauthorized -> "401 Unauthorized"
@@ -102,12 +103,14 @@ let print_string s =
     printing_state := Contents);
   output_string !wserver_oc s
 
-let http_redirect_temporarily url =
-  http Def.Moved_Temporarily;
+let http_redirect code url =
+  http code;
   output_string !wserver_oc "Location: ";
   output_string !wserver_oc url;
   printnl ()
 
+let http_redirect_temporarily url = http_redirect Def.Moved_Temporarily url
+let http_redirect_permanently url = http_redirect Def.Moved_Permanently url
 let buff = ref (Bytes.create 80)
 
 let store len x =
