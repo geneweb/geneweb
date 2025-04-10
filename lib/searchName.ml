@@ -4,14 +4,6 @@ open Config
 open Gwdb
 open Util
 
-type opts = {
-  order : bool;
-  all : bool;
-  case : bool;
-  exact : bool;
-  all_in : bool;
-}
-
 (* TODO use function from Util instead? *)
 let empty_sn_or_fn base p =
   is_empty_string (get_surname p)
@@ -45,7 +37,9 @@ let select_approx_key conf base pl k =
     pl []
 
 let split_normalize case s =
-  cut_words (Name.abbrev (if case then s else Name.lower s))
+  let s = Name.abbrev s in
+  let s = if case then s else Name.lower s in
+  cut_words s
 
 (* search functions *)
 
@@ -54,26 +48,21 @@ let search_by_sosa conf base an =
   let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
   match (sosa_ref, sosa_nb) with
   | None, _ | _, None -> None
-  | Some p, Some n ->
-      if n <> Sosa.zero then
-        match
-          Util.branch_of_sosa conf base n (pget conf base @@ get_iper p)
-        with
-        | Some (p :: _) -> Some p
-        | _ -> None
-      else None
+  | Some p, Some n when n <> Sosa.zero -> (
+      match Util.branch_of_sosa conf base n (pget conf base @@ get_iper p) with
+      | Some (p :: _) -> Some p
+      | _ -> None)
+  | _ -> None
 
-(* TODO use function from Util instead? *)
 let search_reject_p conf base p =
   empty_sn_or_fn base p
   || (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
 
 let search_by_name conf base n =
-  (* TODO use f here? why only split on the first ' '? *)
   let n1 = Name.abbrev (Name.lower n) in
-  match String.index_opt n1 ' ' with
-  | None -> []
-  | Some i ->
+  match String.index n1 ' ' with
+  | exception Not_found -> []
+  | i ->
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let p_of_sn_l, _ =
@@ -133,12 +122,22 @@ type search_type =
   | PartialKey
   | DefaultSurname
 
-let match_fn_l fn_l fn1_l opts =
+(* FIXME this set of options needs deeper review
+   for semantic and implementation *)
+type opts = {
+  order : bool; (* first_names should be in same order as typed *)
+  all : bool; (* all first_names typed should be present *)
+  case : bool; (* maintain case and accents when comparing *)
+  exact : bool; (* fuzzy match (for the time being starts_with *)
+  all_in : bool; (* all first_names should match one of the typed first_names *)
+}
+
+let match_fn_lists fn_l fn1_l opts =
   let lower fn_l =
     List.map (fun fn -> if opts.case then fn else Name.lower fn) fn_l
   in
   let equal fn1 fn2 =
-    if opts.exact then fn1 = fn2 else Mutil.contains fn2 fn1
+    if opts.exact then String.compare fn1 fn2 = 0 else Mutil.contains fn2 fn1
   in
   let _list_equal equal fn1_l fn2_l =
     try List.length fn1_l = List.length fn2_l && List.for_all2 equal fn1_l fn2_l
@@ -155,7 +154,8 @@ let match_fn_l fn_l fn1_l opts =
   let fn1_l = lower fn1_l in
   match (fn_l, opts.all, opts.order) with
   | [], _, _ -> true
-  | [ fn ], _, _ when List.length fn1_l = 1 -> equal fn (List.hd fn1_l)
+  | [ fn ], _, _ when List.compare_length_with fn1_l 1 = 0 ->
+      equal fn (List.hd fn1_l)
   | _, true, true -> is_subsequence fn_l fn1_l
   | _, true, false -> List.for_all (fun fn -> List.mem fn fn1_l) fn_l
   | _, false, _ ->
@@ -172,7 +172,8 @@ let search_for_multiple_fn conf base fn pl opts =
         let fn2_l =
           get_public_name p |> sou base |> split_normalize opts.case
         in
-        if match_fn_l fn_l fn1_l opts || match_fn_l fn_l fn2_l opts then p :: pl
+        if match_fn_lists fn_l fn1_l opts || match_fn_lists fn_l fn2_l opts then
+          p :: pl
         else pl)
     [] pl
 
@@ -210,6 +211,7 @@ let search conf base an search_order specify unknown =
         | [] -> loop l
         | _ -> Some.search_surname_print conf base unknown an)
     | FirstName :: l -> (
+        let fn_l = cut_words an in
         let save_env = conf.env in
         (* was let _pl = Some.search_first_name conf base an in *)
         let conf =
@@ -221,16 +223,16 @@ let search conf base an search_order specify unknown =
               :: save_env;
           }
         in
-        (* find all bearers of sn with all fn using advanced_search *)
+        (* find all bearers of sn with all exact = "on" fn using advanced_search *)
         let pl1, _len = AdvSearchOk.advanced_search conf base max_int in
+        (* filter out with match_fn_list *)
         let pl1 =
           List.fold_left
             (fun acc p ->
-              let fn_l = cut_words an in
               let fn1 = sou base (get_first_name p) in
               let fn1_l = cut_words fn1 in
               if fn1 = "" then acc
-              else if match_fn_l fn_l fn1_l opts then p :: acc
+              else if match_fn_lists fn_l fn1_l opts then p :: acc
               else acc)
             [] pl1
         in
@@ -243,48 +245,62 @@ let search conf base an search_order specify unknown =
               :: save_env;
           }
         in
-        (* find additional bearers of sn with some fn using advanced_search *)
+        (* find additional bearers of sn with with exact = "off" fn using advanced_search *)
+        let pl1_ht = Hashtbl.create 40 in
+        List.iter (fun p -> Hashtbl.add pl1_ht (get_iper p) "") pl1;
         let pl2, _len = AdvSearchOk.advanced_search conf base max_int in
-        let pl2 =
-          List.fold_left
-            (fun acc p -> if List.mem p pl1 then acc else p :: acc)
-            [] pl2
-        in
+        (* filter out with match_fn_lists *)
         let pl2 =
           List.fold_left
             (fun acc p ->
-              let fn_l = cut_words an in
               let fn1 = sou base (get_first_name p) in
               let fn1_l = cut_words fn1 in
               if fn1 = "" then acc
-              else if match_fn_l fn_l fn1_l opts then p :: acc
+              else if match_fn_lists fn_l fn1_l opts then p :: acc
               else acc)
             [] pl2
         in
+        (* remove from pl2 persons already in pl1 *)
+        let pl2 =
+          List.fold_left
+            (fun acc p ->
+              if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
+            [] pl2
+        in
+        (* split pl1 into exact matches (pl1) and partial match (pl3) *)
         let pl1, pl3 =
           List.fold_left
             (fun (acc1, acc3) p ->
-              let fn_l = cut_words an in
               let fn1 = sou base (get_public_name p) in
               let fn1_l = cut_words fn1 in
               if fn1 = "" then (p :: acc1, acc3)
-              else if match_fn_l fn_l fn1_l opts then (acc1, p :: acc3)
+              else if match_fn_lists fn_l fn1_l opts then (acc1, p :: acc3)
               else (p :: acc1, acc3))
             ([], []) pl1
         in
+        let pl1_ht = Hashtbl.create 40 in
+        List.iter (fun p -> Hashtbl.add pl1_ht (get_iper p) "") pl1;
+        (* remove from pl2 persons already in pl1 *)
         let pl2 =
           List.fold_left
-            (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+            (fun acc p ->
+              if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
             [] pl2
         in
+        (* remove from pl3 persons already in pl1 *)
         let pl3 =
           List.fold_left
-            (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+            (fun acc p ->
+              if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
             [] pl3
         in
+        let pl2_ht = Hashtbl.create 40 in
+        List.iter (fun p -> Hashtbl.add pl2_ht (get_iper p) "") pl2;
+        (* remove from pl3 persons already in pl2 *)
         let pl3 =
           List.fold_left
-            (fun acc p -> if List.mem p pl2 then acc else p :: acc)
+            (fun acc p ->
+              if Hashtbl.mem pl2_ht (get_iper p) then acc else p :: acc)
             [] pl3
         in
         match (pl1, pl2, pl3) with
@@ -350,11 +366,14 @@ let search conf base an search_order specify unknown =
             (* check first_names or public_names in list of persons *)
             let opts1 = { opts with all_in = true } in
             let pl1 = search_for_multiple_fn conf base fn pl opts1 in
-            let opts1 = { opts with all_in = true } in
-            let pl2 = search_for_multiple_fn conf base fn pl opts1 in
+            let opts2 = { opts with all_in = false } in
+            let pl2 = search_for_multiple_fn conf base fn pl opts2 in
+            let pl1_ht = Hashtbl.create 40 in
+            List.iter (fun p -> Hashtbl.add pl1_ht (get_iper p) "") pl1;
             let pl2 =
               List.fold_left
-                (fun acc p -> if List.mem p pl1 then acc else p :: acc)
+                (fun acc p ->
+                  if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
                 [] pl2
             in
             let get_spouse iper ifam =
@@ -423,8 +442,8 @@ let search conf base an search_order specify unknown =
             | pl -> (
                 let opts1 = { opts with all_in = true } in
                 let pl1 = search_for_multiple_fn conf base fn pl opts1 in
-                let opts1 = { opts with all_in = false } in
-                let pl2 = search_for_multiple_fn conf base fn pl opts1 in
+                let opts2 = { opts with all_in = false } in
+                let pl2 = search_for_multiple_fn conf base fn pl opts2 in
                 let pl2 =
                   List.fold_left
                     (fun acc p -> if List.mem p pl1 then acc else p :: acc)
@@ -518,9 +537,9 @@ let print conf base specify unknown =
             in
             let conf = { conf with env } in
             search conf base
-              (String.sub pn 0 i
-              ^ (if oc = "" then " " else "." ^ oc ^ " ")
-              ^ String.sub pn (i + 1) (String.length pn - i - 1 - j))
+              (Printf.sprintf "%s%s %s" (String.sub pn 0 i)
+                 (if oc = "" then "" else "." ^ oc)
+                 (String.sub pn (i + 1) (String.length pn - i - 1 - j)))
               order specify unknown)
   | None, None, Some sn ->
       let order = [ Surname; ApproxKey; DefaultSurname ] in
