@@ -294,7 +294,7 @@ let make_henv conf base =
           semi_public =
             if conf.semi_public then get_access (poi base ip) = SemiPublic
             else true;
-          userip = Some ip }
+          user_iper = Some ip }
     | None -> conf
   in
   let aux param conf =

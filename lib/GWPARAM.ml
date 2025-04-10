@@ -238,7 +238,7 @@ let is_related conf base p =
     | Some "on" -> (
         let family =
           Mutil.read_or_create_value fname (fun () ->
-              match conf.Config.userip with
+              match conf.Config.user_iper with
               | Some ip ->
                   let family = [ ip ] in
                   let max =
@@ -282,7 +282,7 @@ let is_related conf base p =
                   List.sort_uniq compare family
               | _ -> [])
         in
-        match conf.Config.userip with
+        match conf.Config.user_iper with
         | Some ip ->
             Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
             && List.mem (Gwdb.get_iper p) family
@@ -333,7 +333,7 @@ let is_related conf base p =
          then Printf.eprintf "Wizard\n";
      if (not mode_semi_public) && conf.Config.friend
          then Printf.eprintf "Friend and not mode_semi_public\n";
-     if conf.userip = Some (Gwdb.get_iper p)
+     if conf.user_iper = Some (Gwdb.get_iper p)
          then Printf.eprintf "Self\n";
      if access = Public
          then Printf.eprintf "Public\n";
@@ -393,7 +393,7 @@ let p_auth conf base p =
   let not_private = access <> Private in
   conf.Config.wizard
   || ((not mode_semi_public) && conf.Config.friend)
-  || conf.userip = Some (Gwdb.get_iper p)
+  || conf.user_iper = Some (Gwdb.get_iper p)
   || access = Public
   || conf.Config.public_if_titles && access = IfTitles
      && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []

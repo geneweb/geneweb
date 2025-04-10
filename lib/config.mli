@@ -61,7 +61,7 @@ type config = {
   user : string;
   username : string;
   userkey : string;
-  userip : iper option;
+  user_iper : iper option;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;

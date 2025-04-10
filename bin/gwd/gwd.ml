@@ -1183,7 +1183,7 @@ let make_conf from_addr request script_name env =
      user = ar.ar_user;
      username;
      userkey = (Name.lower userkey);
-     userip = None;
+     user_iper = None;
      auth_scheme = ar.ar_scheme;
      command = ar.ar_command;
      indep_command =
