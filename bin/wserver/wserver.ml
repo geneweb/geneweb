@@ -107,6 +107,7 @@ let http_redirect code url =
   http code;
   output_string !wserver_oc "Location: ";
   output_string !wserver_oc url;
+  printnl ();
   printnl ()
 
 let http_redirect_temporarily url = http_redirect Def.Moved_Temporarily url
