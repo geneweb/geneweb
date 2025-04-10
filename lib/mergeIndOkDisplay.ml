@@ -13,7 +13,8 @@ let print_merge conf base =
       let p2 = poi base (iper_of_string i2) in
       let p = reconstitute conf base p1 p2 in
       let sp = UpdateInd.string_person_of base p1 in
-      let digest = Update.digest_person sp in
+      let salt = Option.get conf.secret_salt in
+      let digest = Update.digest_person ~salt sp in
       UpdateInd.print_update_ind conf base p digest;
       MergeIndOk.merge_carrousel conf base p1 p2 p
   | _ -> Hutil.incorrect_request conf

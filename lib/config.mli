@@ -122,6 +122,9 @@ type config = {
   cgi : bool;
   forced_plugins : string list;
   plugins : string list;
+  secret_salt : string option;
+      (** Secret salt generated at the server startup. The salt is used in form's
+      digests to enhance security. *)
 }
 (** Geneweb configuration data type *)
 

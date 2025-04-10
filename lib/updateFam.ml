@@ -692,7 +692,8 @@ let print_mod conf base =
   match p_getenv conf.env "i" with
   | Some i ->
       let sfam = string_family_of conf base (ifam_of_string i) in
-      let digest = Update.digest_family sfam in
+      let salt = Option.get conf.secret_salt in
+      let digest = Update.digest_family ~salt sfam in
       print_update_fam conf base sfam digest
   | _ -> Hutil.incorrect_request conf
 
