@@ -1248,7 +1248,7 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
   Printf.sprintf
     "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
     fname bp ep var
-  |> !GWPARAM.syslog `LOG_WARNING;
+  |> GWPARAM.syslog `LOG_WARNING;
   r
 
 let bool_val x = VVbool x
@@ -3594,8 +3594,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_private" -> get_access p = Private
   | "is_public" -> Util.is_public conf base p
   | "has_titles" -> get_titles p <> []
-  | "is_semi_public" -> !GWPARAM.is_semi_public p
-  | "is_related" -> !GWPARAM.is_related conf base p
+  | "is_semi_public" -> GWPARAM.is_semi_public p
+  | "is_related" -> GWPARAM.is_related conf base p
   | "is_restricted" -> is_hidden p
   | _ -> raise Not_found
 
@@ -3716,7 +3716,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "father_age_at_birth" ->
       string_of_parent_age conf base ep get_father |> safe_val
   | "first_name" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         p_first_name base p |> Util.escape_html |> safe_val
       else str_val (Util.private_txt conf "p")
   | "first_name_key" ->
@@ -3901,7 +3901,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "notes" | "pnotes" ->
       get_notes p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "occ" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         get_occ p |> string_of_int |> str_val
       else null_val
   | "occupation" ->
@@ -4034,35 +4034,35 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           string_with_macros conf env s |> str_val
       | _ -> null_val)
   | "surname" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         p_surname base p |> Util.escape_html |> safe_val
       else str_val (Util.private_txt conf "n")
   | "surname_begin" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         p_surname base p |> surname_particle base |> Util.escape_html
         |> safe_val
       else null_val
   | "surname_end" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         p_surname base p
         |> surname_without_particle base
         |> Util.escape_html |> safe_val
       else str_val (Util.private_txt conf "n")
   | "surname_key" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         p_surname base p |> Name.lower |> Mutil.encode |> safe_val
       else null_val
   | "surname_key_val" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         p_surname base p |> Name.lower |> str_val
       else null_val
   | "surname_key_strip" ->
-      if !GWPARAM.p_auth_sp conf base p then
+      if GWPARAM.p_auth_sp conf base p then
         Name.strip_c (p_surname base p) '"' |> str_val
       else null_val
   | "title" -> if p_auth then person_title conf base p |> safe_val else null_val
-  | "p_auth" -> !GWPARAM.p_auth conf base p |> bool_val
-  | "p_auth_sp" -> !GWPARAM.p_auth_sp conf base p |> bool_val
+  | "p_auth" -> GWPARAM.p_auth conf base p |> bool_val
+  | "p_auth_sp" -> GWPARAM.p_auth_sp conf base p |> bool_val
   | _ -> raise Not_found
 
 and eval_witness_relation_var conf base env
@@ -4241,7 +4241,7 @@ let eval_transl conf base env upp s c =
                 | Vind p -> index_of_sex (get_sex p)
                 | _ ->
                     Printf.sprintf "Sex of unknown person"
-                    |> !GWPARAM.syslog `LOG_WARNING;
+                    |> GWPARAM.syslog `LOG_WARNING;
                     assert false))
         | "w" -> (
             (* witness/witnesses *)
@@ -4255,7 +4255,7 @@ let eval_transl conf base env upp s c =
             | Vind p -> if Array.length (get_family p) <= 1 then 0 else 1
             | _ ->
                 Printf.sprintf "families of unknown person"
-                |> !GWPARAM.syslog `LOG_WARNING;
+                |> GWPARAM.syslog `LOG_WARNING;
                 assert false)
         | "c" -> (
             (* child/children *)
@@ -4274,7 +4274,7 @@ let eval_transl conf base env upp s c =
                     if n <= 1 then 0 else 1
                 | _ ->
                     Printf.sprintf "Children of unknown person"
-                    |> !GWPARAM.syslog `LOG_WARNING;
+                    |> GWPARAM.syslog `LOG_WARNING;
                     assert false))
         | "e" -> (
             (* singular/plural for events *)
@@ -4286,7 +4286,7 @@ let eval_transl conf base env upp s c =
                 | _ -> 1)
             | _ ->
                 Printf.sprintf "Events of unknown person"
-                |> !GWPARAM.syslog `LOG_WARNING;
+                |> GWPARAM.syslog `LOG_WARNING;
                 assert false)
         | "t" -> (
             (* singular/plural  titles *)
@@ -4298,7 +4298,7 @@ let eval_transl conf base env upp s c =
                 | _ -> 1)
             | _ ->
                 Printf.sprintf "Titles of unknown person"
-                |> !GWPARAM.syslog `LOG_WARNING;
+                |> GWPARAM.syslog `LOG_WARNING;
                 assert false)
         | _ -> assert false
       in
@@ -4599,14 +4599,14 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "level" env with
       | Vint lev -> lev
       | _ ->
-          !GWPARAM.syslog `LOG_WARNING "Missing level info";
+          GWPARAM.syslog `LOG_WARNING "Missing level info";
           0
     in
     let ip_l =
       match get_env "cousins" env with
       | Vcousl cl -> !cl
       | _ ->
-          !GWPARAM.syslog `LOG_WARNING "Empty cousins list";
+          GWPARAM.syslog `LOG_WARNING "Empty cousins list";
           []
     in
     let ip_l =
@@ -4944,7 +4944,7 @@ let print_foreach conf base print_ast eval_expr =
     | Some l ->
         print_foreach_path_aux conf base in_or_less level env al ep
           (Cousins.cousins_fold l)
-    | None -> !GWPARAM.syslog `LOG_WARNING "Empty cousins list"
+    | None -> GWPARAM.syslog `LOG_WARNING "Empty cousins list"
   in
 
   let print_foreach_cousin_level env al ((_, _) as ep) =

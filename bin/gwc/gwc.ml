@@ -212,6 +212,7 @@ let main () =
     (List.rev !files);
   if not !just_comp then (
     let bdir = !Geneweb.GWPARAM.bpath bname in
+    (* test_base will fail if base exists and force has not been set (-f) *)
     Geneweb.GWPARAM.test_base bname;
     Geneweb.GWPARAM.init_etc bname;
     Lock.control (Mutil.lock_file bdir) false ~onerror:Lock.print_error_and_exit

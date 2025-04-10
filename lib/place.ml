@@ -115,7 +115,7 @@ let max_rlm_nbr conf =
 let fold_place_long inverted s =
   match String.length s with
   | 0 ->
-      !GWPARAM.syslog `LOG_WARNING "Zero length string in fold_place_long!";
+      GWPARAM.syslog `LOG_WARNING "Zero length string in fold_place_long!";
       ([], "")
   | _ ->
       let sub = only_suburb s in

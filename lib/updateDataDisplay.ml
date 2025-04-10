@@ -358,7 +358,7 @@ and eval_compound_var conf base env xx sl =
         | Some n ->
             if String.length s > n then String.sub s 0 (String.length s - n)
             else (
-              !GWPARAM.syslog `LOG_WARNING "String shorter that requested\n";
+              GWPARAM.syslog `LOG_WARNING "String shorter that requested\n";
               s)
         | None -> raise Not_found)
     | "printable" :: sl -> only_printable (loop sl)

@@ -417,24 +417,21 @@ let w_person ~none fn conf base =
   | Some p -> fn conf base p
   | _ -> none conf base
 
-let output_error ?headers ?content conf code =
-  !GWPARAM.output_error ?headers ?content conf code
-
 let w_wizard fn conf base =
   if conf.wizard then
     fn conf base
   else if conf.just_friend_wizard then
-    output_error conf Def.Forbidden
+    GWPARAM.output_error conf Def.Forbidden
   else
     (* FIXME: send authentification headers *)
-    output_error conf Def.Unauthorized
+    GWPARAM.output_error conf Def.Unauthorized
 
 let treat_request =
   let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
   let w_base =
     let none conf =
-      if conf.bname = "" then output_error conf Def.Bad_Request
-      else output_error conf Def.Not_Found
+      if conf.bname = "" then GWPARAM.output_error conf Def.Bad_Request
+      else GWPARAM.output_error conf Def.Not_Found
     in
     w_base ~none
   in

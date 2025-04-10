@@ -10,10 +10,10 @@ let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
 let incorrect_request ?(comment = "") conf =
-  !GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
+  GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
 
 let error_cannot_access conf fname =
-  !GWPARAM.output_error conf Def.Not_Found
+  GWPARAM.output_error conf Def.Not_Found
     ~content:
       ("Cannot access file \""
       ^<^ (Util.escape_html fname : Adef.escaped_string :> Adef.safe_string)
@@ -183,13 +183,6 @@ let trailer conf =
   Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
   Output.print_sstring conf "</body>\n</html>\n"
-
-let () =
-  GWPARAM.wrap_output :=
-    fun conf title content ->
-      header conf (fun _ -> Output.print_string conf title);
-      content ();
-      trailer conf
 
 (* Calendar request *)
 

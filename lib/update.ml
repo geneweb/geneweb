@@ -162,7 +162,7 @@ let rec infer_death conf base p =
     [Retour] : unit
     [Rem] : Not visible.                                                      *)
 let print_person_parents_and_spouses conf base p =
-  if !GWPARAM.p_auth conf base p then (
+  if GWPARAM.p_auth conf base p then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_string conf (acces conf base p);

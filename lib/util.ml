@@ -42,7 +42,7 @@ let print_default_gwf_file bname =
         List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
         close_out oc
     with Unix.Unix_error (_, _, _) ->
-      !GWPARAM.syslog `LOG_WARNING
+      GWPARAM.syslog `LOG_WARNING
         (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
 
 let rec cut_at_equal i s =
@@ -69,7 +69,7 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      !GWPARAM.syslog `LOG_WARNING
+      GWPARAM.syslog `LOG_WARNING
         (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
            error fname);
       []
@@ -80,12 +80,12 @@ let read_base_env bname gw_prefix debug =
     let fname2 = Filename.concat gw_prefix "a.gwf" in
     if Sys.file_exists fname2 then (
       if debug then
-        !GWPARAM.syslog `LOG_WARNING
+        GWPARAM.syslog `LOG_WARNING
           (Printf.sprintf "Using configuration from %s\n%!" fname2);
       load_file fname2)
     else (
       if debug then
-        !GWPARAM.syslog `LOG_WARNING
+        GWPARAM.syslog `LOG_WARNING
           (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
              fname2);
       [])
@@ -511,7 +511,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
       match String.split_on_char '_' commd with
       | b :: _p -> b
       | [] ->
-          !GWPARAM.syslog `LOG_ERR
+          GWPARAM.syslog `LOG_ERR
             (Format.sprintf "Poorly formatted command: %s" commd);
           commd
   in
@@ -630,7 +630,7 @@ let safe_html_allowed_tags =
         Printf.sprintf "Requested allowed_tags file (%s) absent"
           !allowed_tags_file
       in
-      !GWPARAM.syslog `LOG_WARNING str;
+      GWPARAM.syslog `LOG_WARNING str;
       default_safe_html_allowed_tags)
 
 (* Few notes:
@@ -773,7 +773,7 @@ let is_old_person conf p =
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = !GWPARAM.p_auth conf base p
+let authorized_age conf base p = GWPARAM.p_auth conf base p
 
 let is_restricted (conf : config) base (ip : iper) =
   let fct p =
@@ -899,7 +899,7 @@ let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
   let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
-  else if !GWPARAM.p_auth_sp conf base p then
+  else if GWPARAM.p_auth_sp conf base p then
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
       | "", nn :: _ ->
@@ -1010,7 +1010,7 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   in
   let iper = get_iper p in
   (* let is_hidden = is_empty_string (get_surname p) !! *)
-  if (not (!GWPARAM.p_auth conf base p)) || cgl then s
+  if (not (GWPARAM.p_auth conf base p)) || cgl then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
@@ -1394,7 +1394,7 @@ let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
-    !GWPARAM.syslog `LOG_ERR
+    GWPARAM.syslog `LOG_ERR
       (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
 
@@ -2391,12 +2391,12 @@ let test_cnt_d conf =
   (if not (Sys.file_exists config_d) then
    try Unix.mkdir config_d 0o755
    with Unix.Unix_error (_, _, _) ->
-     !GWPARAM.syslog `LOG_WARNING
+     GWPARAM.syslog `LOG_WARNING
        (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
   if not (Sys.file_exists cnt_d) then
     try Unix.mkdir cnt_d 0o755
     with Unix.Unix_error (_, _, _) ->
-      !GWPARAM.syslog `LOG_WARNING
+      GWPARAM.syslog `LOG_WARNING
         (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
   else ();
   cnt_d
