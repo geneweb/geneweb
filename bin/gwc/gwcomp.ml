@@ -9,12 +9,9 @@ let magic_gwo = "GnWo000o"
 (* si la clé est incomplète, on l'enregistre tout de même.  *)
 let create_all_keys = ref false
 let line_cnt = ref 0
-let force = ref false
 let no_fail = ref false
 let no_picture = ref false
 let rgpd_dir = ref "None"
-let auth_file_name = None
-let consent_list = None
 let rgpd = ref false
 let verbose = ref false
 let semi_pub_cnt = ref 0
@@ -551,7 +548,7 @@ let auth_access fn sn oc l =
                 match Geneweb.Util.extract_value '=' line with
                 | exception Not_found -> None
                 | passwd_file -> Some passwd_file)
-            | line -> loop ()
+            | _ -> loop ()
           in
           loop ())
     with Sys_error _ -> None
