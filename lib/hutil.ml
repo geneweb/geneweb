@@ -113,8 +113,7 @@ let header_without_http_nor_home conf title =
   Util.message_to_wizard conf
 
 let is_fluid conf =
-  (try List.assoc "wide" conf.env = Adef.encoded "on"
-  with Not_found -> false)
+  (try List.assoc "wide" conf.env = Adef.encoded "on" with Not_found -> false)
   || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
 
 let header_without_title conf =
