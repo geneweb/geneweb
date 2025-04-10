@@ -510,7 +510,7 @@ let summary_of_tlsw_lines conf short lines =
 
 let modify_link conf cnt _empty = function
   | Some (_, mode, sfn) when conf.wizard ->
-      make_edit_button conf ~mode:mode sfn ~cnt:(Some cnt) ()
+      make_edit_button conf ~mode sfn ~cnt:(Some cnt) ()
   | _ -> ""
 
 let rec tlsw_list tag1 tag2 lev list sl =
