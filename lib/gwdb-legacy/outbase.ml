@@ -445,15 +445,8 @@ let generate_lowercase_surname_index ~strings_data base =
     Sys.rename tmp_snames_lower_inx lowercase_surname_index_file
 
 let initialize_lowercase_name_index ~kind base =
-  let lock_file =
-    match kind with
-    | `First_name -> "initialize_lowercase_first_name_index"
-    | `Surname -> "initialize_lowercase_surname_index"
-  in
-  Lock.control ~onerror:Lock.print_try_again
-    (Files.lock_file @@ Filename.concat base.data.bdir lock_file)
-    true
-    (fun () ->
+  Lock.control ~onerror:Lock.print_try_again (Files.lock_file base.data.bdir)
+    true (fun () ->
       let index_files, generate_index =
         match kind with
         | `First_name ->
