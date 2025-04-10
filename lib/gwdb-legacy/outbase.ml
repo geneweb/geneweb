@@ -603,7 +603,6 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Files.rm (Filename.concat bname "synchro_patches");
   Files.rm (Filename.concat bname "notes_link");
   Files.rm (Filename.concat bname "restrict");
-  Files.rm (Filename.concat bname "tstab_visitor");
   Files.rm (Filename.concat bname "nb_persons");
   (* FIXME: should not be present in this part of the code? *)
   Files.rm (Filename.concat bname "tstab");
