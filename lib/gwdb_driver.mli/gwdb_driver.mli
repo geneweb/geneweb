@@ -54,10 +54,17 @@ type base
 
 val load_database : string -> unit
 (** [load_database bname] loads the database [bname] into memory.
-    The database is automatically unloaded upon exit.
 
     The base is read-only and any attempt to modify its values will
     result in failure.
+
+    A caveat of this function is that the allocated memory cannot be freed
+    before the current process terminates. Under the hood, it uses
+    the Ancient library to map the database into memory, outside the
+    OCaml heap. As a result, the OCaml garbage collector cannot reclaim it and
+    the delete function of Ancient is flawed. For this reason, this function
+    should only be used with databases that are intended to remain in
+    memory during the entire execution of the current process.
 
     @raise Failwith if the base has already been loaded. *)
 
