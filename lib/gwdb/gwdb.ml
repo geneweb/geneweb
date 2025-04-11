@@ -64,7 +64,7 @@ let rec delete_person excl base ip =
         Gwdb_driver.delete_ascend base ip;
         (* remove person id from family descendants *)
         let children =
-          (get_gen_descend base ifam).Def.children |> Mutil.array_except ip
+          (get_gen_descend base ifam).Def.children |> Ext_array.except ip
         in
         Gwdb_driver.patch_descend base ifam { children };
         if children = [| ip |] then
@@ -158,7 +158,7 @@ and delete_family excl base ifam =
     excl children
 
 and rm_union base ifam iper =
-  { Def.family = (get_gen_union base iper).family |> Mutil.array_except ifam }
+  { Def.family = (get_gen_union base iper).family |> Ext_array.except ifam }
   |> patch_union base iper
 
 (** [delete_person base iper] and [delete_family base ifam]

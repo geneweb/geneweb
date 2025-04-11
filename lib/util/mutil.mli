@@ -47,14 +47,6 @@ val input_lexicon :
     If traduction line has a form [->: kw] it associates to the current section name the value
     associated to [kw] section name inside [ht] (keyword alias). *)
 
-val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
-(** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
-    but is more efficient.
-
-    The list is constructed backward,
-    so if [fn] have side effects it may not behave as excepted.
- *)
-
 val compile_particles : string list -> Re.re
 (** [compile_particles list]
     Compile [list] so it can be used with [get_particle]
@@ -86,21 +78,8 @@ val random_magic : string
     It should be different each time you launch the program.
 *)
 
-val array_except : 'a -> 'a array -> 'a array
-(** [array_except value array]
-    Return a new array containing all the elements
-    from [array] except the first occurence of [value]
- *)
-
 val default_particles : string list
 (** List of default particles used in GeneWeb *)
-
-val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
-(** [array_forall2 p a b]
-    Checks if all elements of the arrays satisfy the predicate [p].
-    That is, it returns [(p a1 b1) && (p a2 b2) && ... && (p an bn)].
-    Raise Invalid_argument if the two lists are determined to have different lengths.
-*)
 
 val input_file_ic : in_channel -> string
 (** Read the content of a file.
