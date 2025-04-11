@@ -287,9 +287,7 @@ let fixbase_ok conf base =
         Futil.map_family_ps string_of_iper string_of_ifam (sou base)
           (gen_family_of_family f)
       in
-      let mkc f =
-        Futil.map_couple_p false string_of_iper (gen_couple_of_family f)
-      in
+      let mkc f = Futil.map_couple_p string_of_iper (gen_couple_of_family f) in
       let mkd f =
         Futil.map_descend_p string_of_iper (gen_descend_of_family f)
       in

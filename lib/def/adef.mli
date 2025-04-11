@@ -70,12 +70,6 @@ val parent : 'a array -> 'a gen_couple
 val parent_array : 'a gen_couple -> 'a array
 (** Returns array from [gen_couple]. First element of array is father, second - mother  *)
 
-val multi_couple : 'a -> 'a -> 'a gen_couple
-(** @deprecated Use [couple] instead *)
-
-val multi_parent : 'a array -> 'a gen_couple
-(** @deprecated Use [parent] instead *)
-
 type +'a astring = private string
 type safe_string = [ `encoded | `escaped | `safe ] astring
 type escaped_string = [ `encoded | `escaped ] astring

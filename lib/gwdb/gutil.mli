@@ -51,10 +51,6 @@ val father : 'a Def.gen_couple -> 'a
 val mother : 'a Def.gen_couple -> 'a
 (** Same as [Adef.mother] *)
 
-val couple : bool -> 'a -> 'a -> 'a Def.gen_couple
-(** [couple multi f m] creates a couple from father [f] and mother [m]. If
-    [multi] true uses multiparent functionality *)
-
 val parent_array : 'a Def.gen_couple -> 'a array
 (** Same as [Adef.parent_array] *)
 

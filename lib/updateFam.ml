@@ -26,7 +26,7 @@ let person_key base ip =
   in
   (first_name, surname, occ, Update.Link, "")
 
-let string_family_of conf base ifam =
+let string_family_of base ifam =
   let fam = Gwdb.foi base ifam in
   let sfam =
     Futil.map_family_ps (person_key base)
@@ -35,8 +35,7 @@ let string_family_of conf base ifam =
       (Gwdb.gen_family_of_family fam)
   in
   let scpl =
-    Futil.map_couple_p conf.Config.multi_parents (person_key base)
-      (Gwdb.gen_couple_of_family fam)
+    Futil.map_couple_p (person_key base) (Gwdb.gen_couple_of_family fam)
   in
   let sdes =
     Futil.map_descend_p (person_key base) (Gwdb.gen_descend_of_family fam)
@@ -724,7 +723,7 @@ let print_add conf base =
       fsources = default_source conf;
       fam_index = Gwdb.dummy_ifam;
     }
-  and cpl = Gutil.couple conf.Config.multi_parents fath moth
+  and cpl = Adef.couple fath moth
   and des = { Def.children = [||] } in
   print_update_fam conf base (fam, cpl, des) digest
 
@@ -749,7 +748,7 @@ let print_add_parents conf base =
           fam_index = Gwdb.dummy_ifam;
         }
       and cpl =
-        Gutil.couple conf.Config.multi_parents
+        Adef.couple
           ( "",
             Gwdb.sou base (Gwdb.get_surname p),
             0,
@@ -773,7 +772,7 @@ let print_add_parents conf base =
 let print_mod conf base =
   match Util.p_getenv conf.Config.env "i" with
   | Some i ->
-      let sfam = string_family_of conf base (Gwdb.ifam_of_string i) in
+      let sfam = string_family_of base (Gwdb.ifam_of_string i) in
       let digest = Update.digest_family sfam in
       print_update_fam conf base sfam digest
   | _ -> Hutil.incorrect_request conf
@@ -896,7 +895,7 @@ let print_change_event_order conf base =
   | None -> Hutil.incorrect_request conf
   | Some i ->
       let i = Gwdb.ifam_of_string i in
-      let sfam = string_family_of conf base i in
+      let sfam = string_family_of base i in
       Hutil.interp conf "updfamevt"
         {
           Templ.eval_var = eval_var conf base;

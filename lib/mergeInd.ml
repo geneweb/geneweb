@@ -118,9 +118,9 @@ let effective_merge_ind conf base (warning : Warning.base_warning -> unit) p1 p2
       let cpl = Gwdb.foi base ifam in
       let cpl =
         if Gwdb.get_iper p2 = Gwdb.get_father cpl then
-          Gutil.couple false (Gwdb.get_iper p1) (Gwdb.get_mother cpl)
+          Adef.couple (Gwdb.get_iper p1) (Gwdb.get_mother cpl)
         else if Gwdb.get_iper p2 = Gwdb.get_mother cpl then
-          Gutil.couple false (Gwdb.get_father cpl) (Gwdb.get_iper p1)
+          Adef.couple (Gwdb.get_father cpl) (Gwdb.get_iper p1)
         else assert false
       in
       Gwdb.patch_couple base ifam cpl
