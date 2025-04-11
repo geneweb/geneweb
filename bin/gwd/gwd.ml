@@ -2,8 +2,6 @@
 
 let () = Sys.enable_runtime_warnings Geneweb.Dev_config.debug
 
-module StrSet = Ext_string.Set
-
 let output_conf =
   {
     Geneweb.Config.status = Wserver.http;
@@ -610,14 +608,14 @@ let allowed_denied_titles key extra_line env base_env () =
                     ^ if pla = "*" then pla else Name.lower pla
                 | None -> Name.lower line
               in
-              StrSet.add line set
+              Ext_string.Set.add line set
           in
           if eof then (
             close_in ic;
-            StrSet.elements set)
+            Ext_string.Set.elements set)
           else loop set
         in
-        loop StrSet.empty
+        loop Ext_string.Set.empty
     with Not_found | Sys_error _ -> []
 
 let allowed_titles env =
