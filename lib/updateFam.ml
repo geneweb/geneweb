@@ -68,14 +68,6 @@ let get_env v env = try List.assoc v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
-module ExtOption = struct
-  let bind o f = match o with Some v -> f v | None -> None
-
-  let get : 'a option -> 'a = function
-    | Some v -> v
-    | None -> raise (Invalid_argument "option is None")
-end
-
 let eval_witness_kind = function
   | Def.Witness_GodParent -> str_val "godp"
   | Witness_CivilOfficer -> str_val "offi"
@@ -99,7 +91,7 @@ let witness_person_of_event_opt env e =
       Some ("", "", 0, Update.Create (Neuter, None), "")
   | _ -> None
 
-let ( >>= ) x f = ExtOption.bind x f
+let ( >>= ) x f = Option.bind x f
 
 let rec eval_fwitness env sl =
   let fwitness_opt =
@@ -222,8 +214,7 @@ and eval_has_fwitness env =
     family_events_opt env >>= fun e ->
     Some (bool_val (e.efam_witnesses <> [||]))
   in
-  try ExtOption.get has_fwitness_opt
-  with Invalid_argument _ -> raise Not_found
+  try Option.get has_fwitness_opt with Invalid_argument _ -> raise Not_found
 
 (* TODO : rewrite, looks bad *)
 and eval_fwitness_kind env =
