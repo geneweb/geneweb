@@ -1,5 +1,3 @@
-open Dbdisk
-
 type ('iper, 'person, 'string) legacy_dsk_person =
   ('iper, 'person, 'string) Dbdisk.gen_person
 
@@ -38,52 +36,54 @@ let is_quest_string istr = istr = 1
 
 type string_person_index = Dbdisk.string_person_index
 
-let spi_find spi = spi.find
-let spi_first spi = spi.cursor
+let spi_find spi = spi.Dbdisk.find
+let spi_first spi = spi.Dbdisk.cursor
 let spi_next (spi : string_person_index) istr = spi.next istr
 
-type base = dsk_base
+type base = Dbdisk.dsk_base
 
 let open_base bname : base = Database.opendb bname
-let close_base base = base.func.cleanup ()
-let sou base i = base.data.strings.get i
-let bname base = Filename.(remove_extension @@ basename base.data.bdir)
-let bdir base = base.data.bdir
-let nb_of_persons base = base.data.persons.len
-let nb_of_real_persons base = base.func.nb_of_real_persons ()
-let nb_of_families base = base.data.families.len
-let insert_string base s = base.func.Dbdisk.insert_string @@ Utf8.normalize s
+let close_base base = base.Dbdisk.func.cleanup ()
+let sou base i = base.Dbdisk.data.strings.get i
+let bname base = Filename.(remove_extension @@ basename base.Dbdisk.data.bdir)
+let bdir base = base.Dbdisk.data.bdir
+let nb_of_persons base = base.Dbdisk.data.persons.len
+let nb_of_real_persons base = base.Dbdisk.func.nb_of_real_persons ()
+let nb_of_families base = base.Dbdisk.data.families.len
+
+let insert_string base s =
+  base.Dbdisk.func.Dbdisk.insert_string @@ Utf8.normalize s
 
 let find_opt_string_istr base s =
-  base.func.Dbdisk.find_opt_string_istr @@ Utf8.normalize s
+  base.Dbdisk.func.Dbdisk.find_opt_string_istr @@ Utf8.normalize s
 
-let commit_patches base = base.func.Dbdisk.commit_patches ()
-let commit_notes base s = base.func.Dbdisk.commit_notes s
-let person_of_key base = base.func.Dbdisk.person_of_key
-let persons_of_name base = base.func.Dbdisk.persons_of_name
-let persons_of_first_name base = base.func.Dbdisk.persons_of_first_name
-let persons_of_surname base = base.func.Dbdisk.persons_of_surname
-let base_particles base = Lazy.force base.data.particles
-let base_strings_of_first_name base s = base.func.strings_of_fname s
-let base_strings_of_surname base s = base.func.strings_of_sname s
-let load_ascends_array base = base.data.ascends.load_array ()
-let load_unions_array base = base.data.unions.load_array ()
-let load_couples_array base = base.data.couples.load_array ()
-let load_descends_array base = base.data.descends.load_array ()
-let load_strings_array base = base.data.strings.load_array ()
-let load_persons_array base = base.data.persons.load_array ()
-let load_families_array base = base.data.families.load_array ()
-let clear_ascends_array base = base.data.ascends.clear_array ()
-let clear_unions_array base = base.data.unions.clear_array ()
-let clear_couples_array base = base.data.couples.clear_array ()
-let clear_descends_array base = base.data.descends.clear_array ()
-let clear_strings_array base = base.data.strings.clear_array ()
-let clear_persons_array base = base.data.persons.clear_array ()
-let clear_families_array base = base.data.families.clear_array ()
+let commit_patches base = base.Dbdisk.func.Dbdisk.commit_patches ()
+let commit_notes base s = base.Dbdisk.func.Dbdisk.commit_notes s
+let person_of_key base = base.Dbdisk.func.Dbdisk.person_of_key
+let persons_of_name base = base.Dbdisk.func.Dbdisk.persons_of_name
+let persons_of_first_name base = base.Dbdisk.func.Dbdisk.persons_of_first_name
+let persons_of_surname base = base.Dbdisk.func.Dbdisk.persons_of_surname
+let base_particles base = Lazy.force base.Dbdisk.data.particles
+let base_strings_of_first_name base s = base.Dbdisk.func.strings_of_fname s
+let base_strings_of_surname base s = base.Dbdisk.func.strings_of_sname s
+let load_ascends_array base = base.Dbdisk.data.ascends.load_array ()
+let load_unions_array base = base.Dbdisk.data.unions.load_array ()
+let load_couples_array base = base.Dbdisk.data.couples.load_array ()
+let load_descends_array base = base.Dbdisk.data.descends.load_array ()
+let load_strings_array base = base.Dbdisk.data.strings.load_array ()
+let load_persons_array base = base.Dbdisk.data.persons.load_array ()
+let load_families_array base = base.Dbdisk.data.families.load_array ()
+let clear_ascends_array base = base.Dbdisk.data.ascends.clear_array ()
+let clear_unions_array base = base.Dbdisk.data.unions.clear_array ()
+let clear_couples_array base = base.Dbdisk.data.couples.clear_array ()
+let clear_descends_array base = base.Dbdisk.data.descends.clear_array ()
+let clear_strings_array base = base.Dbdisk.data.strings.clear_array ()
+let clear_persons_array base = base.Dbdisk.data.persons.clear_array ()
+let clear_families_array base = base.Dbdisk.data.families.clear_array ()
 
 let date_of_last_change base =
   let s =
-    let bdir = base.data.bdir in
+    let bdir = base.Dbdisk.data.bdir in
     try Unix.stat (Filename.concat bdir "patches")
     with Unix.Unix_error (_, _, _) -> Unix.stat (Filename.concat bdir "base")
   in
@@ -94,11 +94,11 @@ let gen_gen_person_misc_names = Dutil.dsk_person_misc_names
 let patch_misc_names base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
   let p = { p with Dbdisk.key_index = ip } in
   List.iter
-    (fun s -> base.func.Dbdisk.patch_name s ip)
+    (fun s -> base.Dbdisk.func.Dbdisk.patch_name s ip)
     (gen_gen_person_misc_names base p (fun p -> p.Dbdisk.titles))
 
 let patch_person base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
-  base.func.Dbdisk.patch_person ip p;
+  base.Dbdisk.func.Dbdisk.patch_person ip p;
   let s = sou base p.first_name ^ " " ^ sou base p.surname in
   base.func.Dbdisk.patch_name s ip;
   patch_misc_names base ip p;
@@ -114,11 +114,11 @@ let patch_person base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
         (base.data.descends.get i).children)
     (base.data.unions.get ip).family
 
-let patch_ascend base ip a = base.func.Dbdisk.patch_ascend ip a
-let patch_union base ip u = base.func.Dbdisk.patch_union ip u
-let patch_family base ifam f = base.func.Dbdisk.patch_family ifam f
-let patch_couple base ifam c = base.func.Dbdisk.patch_couple ifam c
-let patch_descend base ifam d = base.func.Dbdisk.patch_descend ifam d
+let patch_ascend base ip a = base.Dbdisk.func.Dbdisk.patch_ascend ip a
+let patch_union base ip u = base.Dbdisk.func.Dbdisk.patch_union ip u
+let patch_family base ifam f = base.Dbdisk.func.Dbdisk.patch_family ifam f
+let patch_couple base ifam c = base.Dbdisk.func.Dbdisk.patch_couple ifam c
+let patch_descend base ifam d = base.Dbdisk.func.Dbdisk.patch_descend ifam d
 let insert_person = patch_person
 let insert_ascend = patch_ascend
 let insert_union = patch_union
@@ -195,12 +195,12 @@ let delete_couple base ifam =
   patch_couple base ifam (Adef.couple dummy_iper dummy_iper)
 
 let delete_descend base ifam = patch_descend base ifam { children = [||] }
-let new_iper base = base.data.persons.len
-let new_ifam base = base.data.families.len
+let new_iper base = base.Dbdisk.data.persons.len
+let new_ifam base = base.Dbdisk.data.families.len
 
 (* FIXME: lock *)
 let sync ?(scratch = false) ?(tasks = []) ~save_mem base =
-  if base.data.perm = RDONLY && not scratch then
+  if base.Dbdisk.data.perm = RDONLY && not scratch then
     raise Def.(HttpExn (Forbidden, __LOC__))
   else Outbase.output ~save_mem ~tasks base
 
@@ -208,7 +208,7 @@ let make bname particles arrays : Dbdisk.dsk_base =
   sync ~scratch:true ~save_mem:false (Database.make bname particles arrays);
   open_base bname
 
-let bfname base fname = Filename.concat base.data.bdir fname
+let bfname base fname = Filename.concat base.Dbdisk.data.bdir fname
 
 module NLDB = struct
   let magic = "GWNL0010"
@@ -227,7 +227,8 @@ module NLDB = struct
     | None -> []
 
   let write base db =
-    if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
+    if base.Dbdisk.data.perm = RDONLY then
+      raise Def.(HttpExn (Forbidden, __LOC__))
     else
       let fname_tmp = bfname base "1notes_links" in
       let fname_def = bfname base "notes_links" in
@@ -243,7 +244,7 @@ end
 
 let read_nldb = NLDB.read
 let write_nldb = NLDB.write
-let base_notes_origin_file base = base.data.bnotes.Def.norigin_file
+let base_notes_origin_file base = base.Dbdisk.data.bnotes.Def.norigin_file
 let base_notes_dir _base = "notes_d"
 let base_wiznotes_dir _base = "wiznotes"
 
@@ -252,7 +253,7 @@ let base_notes_read_aux base fnotes mode =
     if fnotes = "" then "notes" else Filename.concat "notes_d" (fnotes ^ ".txt")
   in
   try
-    let ic = Secure.open_in @@ Filename.concat base.data.bdir fname in
+    let ic = Secure.open_in @@ Filename.concat base.Dbdisk.data.bdir fname in
     let str =
       match mode with
       | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
@@ -289,9 +290,9 @@ let cache f a get set x =
 type person = {
   base : base;
   iper : iper;
-  mutable p : (iper, iper, istr) gen_person option;
-  mutable a : ifam gen_ascend option;
-  mutable u : ifam gen_union option;
+  mutable p : (iper, iper, istr) Dbdisk.gen_person option;
+  mutable a : ifam Dbdisk.gen_ascend option;
+  mutable u : ifam Dbdisk.gen_union option;
 }
 
 let cache_per f ({ base; iper; _ } as p) =
@@ -350,9 +351,9 @@ let get_titles = cache_per (fun p -> p.Dbdisk.titles)
 type family = {
   base : base;
   ifam : ifam;
-  mutable f : (iper, ifam, istr) gen_family option;
-  mutable c : iper gen_couple option;
-  mutable d : iper gen_descend option;
+  mutable f : (iper, ifam, istr) Dbdisk.gen_family option;
+  mutable c : iper Dbdisk.gen_couple option;
+  mutable d : iper Dbdisk.gen_descend option;
 }
 
 let cache_fam f ({ base; ifam; _ } as fam) =
@@ -384,11 +385,11 @@ let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Dbdisk.relation)
 let get_witnesses = cache_fam (fun f -> f.Dbdisk.witnesses)
 
-let no_person ip : dsk_person =
+let no_person ip : Dbdisk.dsk_person =
   { (Dutil.empty_person empty_string empty_string) with key_index = ip }
 
-let no_ascend = { parents = None; consang = Adef.no_consang }
-let no_union = { family = [||] }
+let no_ascend = { Dbdisk.parents = None; consang = Adef.no_consang }
+let no_union = { Dbdisk.family = [||] }
 
 let empty_person base iper =
   {
@@ -401,15 +402,15 @@ let empty_person base iper =
   [@ocaml.warning "-42"]
 
 let person_of_gen_person base (p, a, u) =
-  { base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
+  { base; iper = p.Dbdisk.key_index; p = Some p; a = Some a; u = Some u }
   [@ocaml.warning "-42"]
 
 let family_of_gen_family base (f, c, d) =
-  { base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
+  { base; ifam = f.Dbdisk.fam_index; f = Some f; c = Some c; d = Some d }
   [@ocaml.warning "-42"]
 
-let iper_exists base = base.func.iper_exists
-let ifam_exists base = base.func.ifam_exists
+let iper_exists base = base.Dbdisk.func.iper_exists
+let ifam_exists base = base.Dbdisk.func.ifam_exists
 
 let poi base iper =
   if iper = dummy_iper then empty_person base iper
@@ -541,13 +542,13 @@ let make_patch_collection patch mk =
 
 let persons_from_patch base =
   let mk dsk_p =
-    { base; iper = dsk_p.key_index; p = Some dsk_p; a = None; u = None }
+    { base; iper = dsk_p.Dbdisk.key_index; p = Some dsk_p; a = None; u = None }
   in
   make_patch_collection base.data.persons_patch mk
 
 let families_from_patch base =
   let mk dsk_f =
-    { base; ifam = dsk_f.fam_index; f = Some dsk_f; c = None; d = None }
+    { base; ifam = dsk_f.Dbdisk.fam_index; f = Some dsk_f; c = None; d = None }
   in
   make_patch_collection base.data.families_patch mk
 
@@ -557,7 +558,7 @@ let families_from_patch base =
 let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
 
 let read_or_create_visible base =
-  let fname = Filename.concat base.data.bdir "restrict" in
+  let fname = Filename.concat base.Dbdisk.data.bdir "restrict" in
   let visible =
     if Sys.file_exists fname then (
       let ic = Secure.open_in fname in
@@ -573,7 +574,8 @@ let read_or_create_visible base =
   visible
 
 let base_visible_write base =
-  if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
+  if base.Dbdisk.data.perm = RDONLY then
+    raise Def.(HttpExn (Forbidden, __LOC__))
   else
     let fname = Filename.concat base.data.bdir "restrict" in
     match !visible_ref with

@@ -1,10 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
-open Gwcomp
-open Def
-open State
-
 (* From OCaml manual, integer in binary format is 4 bytes long. *)
 let sizeof_long = 4
 
@@ -30,10 +25,10 @@ type ('person, 'string) gen_min_person = {
   mutable m_first_name : 'string;
   mutable m_surname : 'string;
   mutable m_occ : int;
-  mutable m_rparents : ('person, 'string) gen_relation list;
+  mutable m_rparents : ('person, 'string) Def.gen_relation list;
   mutable m_related : int list;
-  mutable m_pevents : ('person, 'string) gen_pers_event list;
-  mutable m_sex : sex assumption;
+  mutable m_pevents : ('person, 'string) Def.gen_pers_event list;
+  mutable m_sex : Def.sex Gwc_lib__.Gwcomp.assumption;
   mutable m_notes : 'string;
 }
 (** Restricted to the minimum [Def.gen_person] data type. *)
@@ -126,13 +121,13 @@ let check_error gen = gen.g_errored <- true
 (** Function that will be called if base's checker will find an error *)
 let set_error base gen x =
   Printf.printf "\nError: ";
-  Check.print_base_error stdout base x;
+  Geneweb.Check.print_base_error stdout base x;
   check_error gen
 
 (** Function that will be called if base's checker will find a warning *)
 let set_warning base x =
   Printf.printf "Warning: ";
-  Check.print_base_warning stdout base x
+  Geneweb.Check.print_base_warning stdout base x
 
 (** Returns person's entry from [base] at position [i] *)
 let poi base i = base.c_persons.(i)
@@ -197,7 +192,7 @@ let no_family gen =
   let empty_string = unique_string gen "" in
   let fam =
     {
-      marriage = Date.cdate_None;
+      Def.marriage = Date.cdate_None;
       marriage_place = empty_string;
       marriage_note = empty_string;
       marriage_src = empty_string;
@@ -212,7 +207,7 @@ let no_family gen =
     }
   in
   let cpl = Adef.couple 0 0 in
-  let des = { children = [||] } in
+  let des = { Def.children = [||] } in
   (fam, cpl, des)
 
 (** Initialises [min_person] with occurence number and index of [p] for first name and
@@ -228,11 +223,11 @@ let make_person gen p n occ : min_person * ascend * union =
       m_rparents = [];
       m_related = [];
       m_pevents = [];
-      m_sex = Gwcomp.make_weak_assumption Neuter;
+      m_sex = Gwc_lib__.Gwcomp.make_weak_assumption Def.Neuter;
       m_notes = empty_string;
     }
-  and a = { parents = None; consang = Adef.fix (-1) }
-  and u = { family = [||] } in
+  and a = { Def.parents = None; consang = Adef.fix (-1) }
+  and u = { Def.family = [||] } in
   (p, a, u)
 
 (** Dummy [min_person] with its empty [ascend] and [union]. *)
@@ -282,7 +277,7 @@ let new_ifam gen =
 (** Convert [string Def.gen_title_name] to [int Def.gen_title_name].
     If title is [Tname] stores title name as a string in the base. *)
 let title_name_unique_string gen = function
-  | Tmain -> Tmain
+  | Def.Tmain -> Def.Tmain
   | Tname n -> Tname (unique_string gen n)
   | Tnone -> Tnone
 
@@ -290,7 +285,7 @@ let title_name_unique_string gen = function
     all related to title information in the base. *)
 let title_unique_string gen t =
   {
-    t_name = title_name_unique_string gen t.t_name;
+    Def.t_name = title_name_unique_string gen t.Def.t_name;
     t_ident = unique_string gen t.t_ident;
     t_place = unique_string gen t.t_place;
     t_date_start = t.t_date_start;
@@ -414,31 +409,48 @@ let find_first_available_occ gen fn sn occ =
      *)
 let insert_undefined state gen key =
   (* shift person's occurence *)
-  let occ = key.pk_occ + gen.g_file_info.f_shift in
+  let occ = key.Gwc_lib__.Gwcomp.pk_occ + gen.g_file_info.f_shift in
   (* person with its position in the base *)
   let x, ip =
     try
-      if key.pk_first_name = "?" || key.pk_surname = "?" then raise Not_found
+      if
+        key.Gwc_lib__.Gwcomp.pk_first_name = "?"
+        || key.Gwc_lib__.Gwcomp.pk_surname = "?"
+      then raise Not_found
       else
-        let ip = find_person_by_name gen key.pk_first_name key.pk_surname occ in
+        let ip =
+          find_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
+            key.Gwc_lib__.Gwcomp.pk_surname occ
+        in
         (poi gen.g_base ip, ip) (* if person not found *)
     with Not_found ->
       (* available occurence number *)
       let new_occ =
         if
-          gen.g_file_info.f_separate && key.pk_first_name <> "?"
-          && key.pk_surname <> "?"
-        then find_first_available_occ gen key.pk_first_name key.pk_surname occ
+          gen.g_file_info.f_separate
+          && key.Gwc_lib__.Gwcomp.pk_first_name <> "?"
+          && key.Gwc_lib__.Gwcomp.pk_surname <> "?"
+        then
+          find_first_available_occ gen key.Gwc_lib__.Gwcomp.pk_first_name
+            key.Gwc_lib__.Gwcomp.pk_surname occ
         else occ
       in
       (* person's entry index *)
       let i = gen.g_pcnt in
-      let x, a, u = make_person gen key.pk_first_name key.pk_surname new_occ in
+      let x, a, u =
+        make_person gen key.Gwc_lib__.Gwcomp.pk_first_name
+          key.Gwc_lib__.Gwcomp.pk_surname new_occ
+      in
       (* strore names globally *)
-      if key.pk_first_name <> "?" && key.pk_surname <> "?" then
-        add_person_by_name gen key.pk_first_name key.pk_surname i
-      else if state.create_all_keys then
-        add_person_by_name gen key.pk_first_name key.pk_surname i;
+      if
+        key.Gwc_lib__.Gwcomp.pk_first_name <> "?"
+        && key.Gwc_lib__.Gwcomp.pk_surname <> "?"
+      then
+        add_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
+          key.Gwc_lib__.Gwcomp.pk_surname i
+      else if state.Gwc_lib__.State.create_all_keys then
+        add_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
+          key.Gwc_lib__.Gwcomp.pk_surname i;
       (* extend arrays if needed *)
       new_iper gen;
       (* add person to array *)
@@ -449,8 +461,14 @@ let insert_undefined state gen key =
       gen.g_base.c_unions.(i) <- u;
       gen.g_pcnt <- gen.g_pcnt + 1;
       (* strore names locally *)
-      (if key.pk_first_name <> "?" && key.pk_surname <> "?" then
-       let h = person_hash key.pk_first_name key.pk_surname in
+      (if
+       key.Gwc_lib__.Gwcomp.pk_first_name <> "?"
+       && key.Gwc_lib__.Gwcomp.pk_surname <> "?"
+      then
+       let h =
+         person_hash key.Gwc_lib__.Gwcomp.pk_first_name
+           key.Gwc_lib__.Gwcomp.pk_surname
+       in
        Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
       (* write start position of person in [g_per] *)
       seek_out gen.g_per_index (sizeof_long * i);
@@ -461,13 +479,13 @@ let insert_undefined state gen key =
   in
   if not gen.g_errored then
     if
-      sou gen.g_base x.m_first_name <> key.pk_first_name
-      || sou gen.g_base x.m_surname <> key.pk_surname
+      sou gen.g_base x.m_first_name <> key.Gwc_lib__.Gwcomp.pk_first_name
+      || sou gen.g_base x.m_surname <> key.Gwc_lib__.Gwcomp.pk_surname
     then (
       Printf.printf "\nPerson defined with two spellings:\n";
-      Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
+      Printf.printf "  \"%s%s %s\"\n" key.Gwc_lib__.Gwcomp.pk_first_name
         (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
-        key.pk_surname;
+        key.Gwc_lib__.Gwcomp.pk_surname;
       Printf.printf "  \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
@@ -512,7 +530,7 @@ let handle_public_access = function
 *)
 let insert_person state gen so =
   (* shift person's occurence *)
-  let occ = so.occ + gen.g_file_info.f_shift in
+  let occ = so.Def.occ + gen.g_file_info.f_shift in
   (* person with its position in the base *)
   let x, ip =
     try
@@ -535,7 +553,7 @@ let insert_person state gen so =
       (* strore names globally *)
       if so.first_name <> "?" && so.surname <> "?" then
         add_person_by_name gen so.first_name so.surname i
-      else if state.create_all_keys then
+      else if state.Gwc_lib__.State.create_all_keys then
         add_person_by_name gen so.first_name so.surname i;
       (* extend arrays if needed *)
       new_iper gen;
@@ -589,11 +607,12 @@ let insert_person state gen so =
   let empty_string = unique_string gen "" in
   (* Convert [(_,_,string) gen_person] to [person]. Save all strings in base *)
   let access =
-    if state.no_public then handle_public_access so.access else so.access
+    if state.Gwc_lib__.State.no_public then handle_public_access so.access
+    else so.access
   in
   let x' =
     {
-      first_name = empty_string;
+      Def.first_name = empty_string;
       surname = empty_string;
       occ = 0;
       image = unique_string gen so.image;
@@ -628,7 +647,8 @@ let insert_person state gen so =
       notes = empty_string;
       psources =
         unique_string gen
-          (if so.psources = "" then state.default_source else so.psources);
+          (if so.psources = "" then state.Gwc_lib__.State.default_source
+          else so.psources);
       key_index = ip;
     }
   in
@@ -644,8 +664,8 @@ let insert_person state gen so =
     entry's index in the [gen.g_base]. Calls [insert_person] for definition
     and [insert_undefined] for reference. *)
 let insert_somebody state gen = function
-  | Undefined key -> insert_undefined state gen key
-  | Defined so -> insert_person state gen so
+  | Gwc_lib__.Gwcomp.Undefined key -> insert_undefined state gen key
+  | Gwc_lib__.Gwcomp.Defined so -> insert_person state gen so
 
 (** Checks if children [ix] doesn't have another parents *)
 let check_parents_not_already_defined gen ix fath moth =
@@ -683,11 +703,11 @@ let display_sex_inconsistency gen p =
     Print message if sexes are different. *)
 let notice_sex gen p s =
   match (p.m_sex, s) with
-  | Strong _, Weak _ -> ()
-  | Weak _, Strong _ -> p.m_sex <- s
-  | Strong sex1, Strong sex2 ->
+  | Gwc_lib__.Gwcomp.Strong _, Gwc_lib__.Gwcomp.Weak _ -> ()
+  | Gwc_lib__.Gwcomp.Weak _, Gwc_lib__.Gwcomp.Strong _ -> p.m_sex <- s
+  | Gwc_lib__.Gwcomp.Strong sex1, Gwc_lib__.Gwcomp.Strong sex2 ->
       if sex1 <> sex2 then display_sex_inconsistency gen p
-  | Weak sex1, Weak sex2 -> (
+  | Gwc_lib__.Gwcomp.Weak sex1, Gwc_lib__.Gwcomp.Weak sex2 -> (
       match (sex1, sex2) with
       | Neuter, _ -> p.m_sex <- s
       | _, Neuter -> ()
@@ -696,7 +716,7 @@ let notice_sex gen p s =
 (** Convert [string Def.gen_fam_event_name] to [int Def.gen_fam_event_name].
     If event is [Efam_Name] stores event name as a string in the base. *)
 let fevent_name_unique_string gen = function
-  | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
+  | ( Def.Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
     | Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann
     | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS | Efam_Residence
       ) as evt ->
@@ -708,7 +728,7 @@ let update_family_with_fevents gen fam =
   let found_marriage = ref false in
   let found_divorce = ref false in
   let nsck_std_fields =
-    match fam.relation with
+    match fam.Def.relation with
     | NoSexesCheckNotMarried | NoSexesCheckMarried -> true
     | _ -> false
   in
@@ -718,7 +738,7 @@ let update_family_with_fevents gen fam =
     match fevents with
     | [] -> fam
     | evt :: l -> (
-        match evt.efam_name with
+        match evt.Def.efam_name with
         | Efam_Engage ->
             if !found_marriage then loop l fam
             else
@@ -728,7 +748,7 @@ let update_family_with_fevents gen fam =
               let fam =
                 {
                   fam with
-                  relation =
+                  Def.relation =
                     (if nsck_std_fields then NoSexesCheckNotMarried
                     else Engaged);
                   marriage = evt.efam_date;
@@ -855,8 +875,8 @@ let update_fevents_with_family gen fam =
   let evt_marr =
     (* make a marriage fevent from gen_family's basic marriage info *)
     let name =
-      match fam.relation with
-      | Married -> Efam_Marriage
+      match fam.Def.relation with
+      | Married -> Def.Efam_Marriage
       | NotMarried -> Efam_NoMarriage
       | Engaged -> Efam_Engage
       | NoSexesCheckNotMarried -> Efam_NoMarriage
@@ -869,11 +889,11 @@ let update_fevents_with_family gen fam =
       | Residence -> Efam_Residence
     in
     let witnesses =
-      Array.map (fun ip -> (ip, Witness, empty_string)) fam.witnesses
+      Array.map (fun ip -> (ip, Def.Witness, empty_string)) fam.witnesses
     in
     let evt =
       {
-        efam_name = name;
+        Def.efam_name = name;
         efam_date = fam.marriage;
         efam_place = fam.marriage_place;
         efam_reason = empty_string;
@@ -890,7 +910,7 @@ let update_fevents_with_family gen fam =
     | Divorced cd ->
         let evt =
           {
-            efam_name = Efam_Divorce;
+            Def.efam_name = Efam_Divorce;
             efam_date = cd;
             efam_place = unique_string gen "";
             efam_reason = unique_string gen "";
@@ -903,7 +923,7 @@ let update_fevents_with_family gen fam =
     | Separated ->
         let evt =
           {
-            efam_name = Efam_Separated;
+            Def.efam_name = Efam_Separated;
             efam_date = Date.cdate_None;
             efam_place = unique_string gen "";
             efam_reason = unique_string gen "";
@@ -949,8 +969,8 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
     with
     (* Look for inverted WIFE/HUSB *)
     | (fath, ifath), (moth, imoth)
-      when Gwcomp.value_of_assumption fath.m_sex = Female
-           && Gwcomp.value_of_assumption moth.m_sex = Male ->
+      when Gwc_lib__.Gwcomp.value_of_assumption fath.m_sex = Female
+           && Gwc_lib__.Gwcomp.value_of_assumption moth.m_sex = Male ->
         (moth, imoth, fath, ifath)
     | (fath, ifath), (moth, imoth) -> (fath, ifath, moth, imoth)
   in
@@ -967,8 +987,8 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
   in
   (* Events are sorted by chronological order (if equal then by alphabetical order) *)
   let fevents =
-    Event.sort_events
-      (fun (name, _, _, _, _, _, _) -> Event.Fevent name)
+    Geneweb.Event.sort_events
+      (fun (name, _, _, _, _, _, _) -> Geneweb.Event.Fevent name)
       (fun (_, date, _, _, _, _, _) -> date)
       fevtl
   in
@@ -988,7 +1008,7 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
             witl
         in
         {
-          efam_name = fevent_name_unique_string gen name;
+          Def.efam_name = fevent_name_unique_string gen name;
           efam_date = date;
           efam_place = unique_string gen place;
           efam_reason = unique_string gen reason;
@@ -1004,17 +1024,19 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
       (fun key ->
         let e, ie = insert_person state gen key in
         notice_sex gen e
-          (if key.sex = Neuter then Gwcomp.make_weak_assumption key.sex
-          else Gwcomp.make_strong_assumption key.sex);
+          (if key.sex = Neuter then
+           Gwc_lib__.Gwcomp.make_weak_assumption key.sex
+          else Gwc_lib__.Gwcomp.make_strong_assumption key.sex);
         ie)
-      deo.children
+      deo.Def.children
   in
   (* insert family comment *)
-  let comment = unique_string gen fo.comment in
+  let comment = unique_string gen fo.Def.comment in
   (* insert sources comment *)
   let fsources =
     unique_string gen
-      (if fo.fsources = "" then state.default_source else fo.fsources)
+      (if fo.fsources = "" then state.Gwc_lib__.State.default_source
+      else fo.fsources)
   in
   (* extend arrays if needed *)
   new_ifam gen;
@@ -1023,7 +1045,7 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
   (* Convert [(_,_,string) gen_family] to [family]. Save all strings in base *)
   let fam =
     {
-      marriage = fo.marriage;
+      Def.marriage = fo.marriage;
       marriage_place = unique_string gen fo.marriage_place;
       marriage_note = unique_string gen fo.marriage_note;
       marriage_src = unique_string gen fo.marriage_src;
@@ -1039,7 +1061,7 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
   (* create couple *)
   and cpl = Adef.couple ifath imoth
   (* created descandants *)
-  and des = { children } in
+  and des = { Def.children } in
   (* On mets à jour les fevents et events normaux *)
   let fam =
     if fevents <> [] then update_family_with_fevents gen fam
@@ -1062,9 +1084,9 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
   gen.g_base.c_descends.(gen.g_fcnt) <- des;
   gen.g_fcnt <- gen.g_fcnt + 1;
   (* append this family to father's and mother's union  *)
-  let fath_uni = { family = Array.append fath_uni.family [| i |] } in
+  let fath_uni = { Def.family = Array.append fath_uni.family [| i |] } in
   gen.g_base.c_unions.(ifath) <- fath_uni;
-  let moth_uni = { family = Array.append moth_uni.family [| i |] } in
+  let moth_uni = { Def.family = Array.append moth_uni.family [| i |] } in
   gen.g_base.c_unions.(imoth) <- moth_uni;
   notice_sex gen fath fath_sex;
   notice_sex gen moth moth_sex;
@@ -1081,21 +1103,22 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
 (** Convert [string Def.gen_pers_event_name] to [int Def.gen_pers_event_name].
     If event is [Epers_Name] stores event name as a string in the base. *)
 let pevent_name_unique_string gen = function
-  | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
-    | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
-    | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
-    | Epers_ChangeName | Epers_Circumcision | Epers_Confirmation
-    | Epers_ConfirmationLDS | Epers_Decoration | Epers_DemobilisationMilitaire
-    | Epers_Diploma | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
-    | Epers_Education | Epers_Election | Epers_Emigration
-    | Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion
-    | Epers_Funeral | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
-    | Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction
-    | Epers_MilitaryPromotion | Epers_MilitaryService
-    | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
-    | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
-    | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
-    | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will ) as evt ->
+  | ( Def.Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+    | Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
+    | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
+    | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
+    | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
+    | Epers_DemobilisationMilitaire | Epers_Diploma | Epers_Distinction
+    | Epers_Dotation | Epers_DotationLDS | Epers_Education | Epers_Election
+    | Epers_Emigration | Epers_Excommunication | Epers_FamilyLinkLDS
+    | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
+    | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
+    | Epers_ListePassenger | Epers_MilitaryDistinction | Epers_MilitaryPromotion
+    | Epers_MilitaryService | Epers_MobilisationMilitaire | Epers_Naturalisation
+    | Epers_Occupation | Epers_Ordination | Epers_Property | Epers_Recensement
+    | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
+    | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien
+    | Epers_Will ) as evt ->
       evt
   | Epers_Name n -> Epers_Name (unique_string gen n)
 
@@ -1114,8 +1137,8 @@ let insert_pevents state fname gen sb pevtl =
   else
     (* sort evenets *)
     let pevents =
-      Event.sort_events
-        (fun (name, _, _, _, _, _, _) -> Event.Pevent name)
+      Geneweb.Event.sort_events
+        (fun (name, _, _, _, _, _, _) -> Geneweb.Event.Pevent name)
         (fun (_, date, _, _, _, _, _) -> date)
         pevtl
     in
@@ -1136,7 +1159,7 @@ let insert_pevents state fname gen sb pevtl =
               witl
           in
           {
-            epers_name = pevent_name_unique_string gen name;
+            Def.epers_name = pevent_name_unique_string gen name;
             epers_date = date;
             epers_place = unique_string gen place;
             epers_reason = unique_string gen reason;
@@ -1152,9 +1175,12 @@ let insert_pevents state fname gen sb pevtl =
 (** Insert person's notes in the base and associate it to the referenced
     with [key] person *)
 let insert_notes fname gen key str =
-  let occ = key.pk_occ + gen.g_file_info.f_shift in
+  let occ = key.Gwc_lib__.Gwcomp.pk_occ + gen.g_file_info.f_shift in
   match
-    try Some (find_person_by_name gen key.pk_first_name key.pk_surname occ)
+    try
+      Some
+        (find_person_by_name gen key.Gwc_lib__.Gwcomp.pk_first_name
+           key.Gwc_lib__.Gwcomp.pk_surname occ)
     with Not_found -> None
   with
   | Some ip ->
@@ -1162,17 +1188,17 @@ let insert_notes fname gen key str =
       if sou gen.g_base p.m_notes <> "" then (
         Printf.printf "\nFile \"%s\"\n" fname;
         Printf.printf "Notes already defined for \"%s%s %s\"\n"
-          key.pk_first_name
+          key.Gwc_lib__.Gwcomp.pk_first_name
           (if occ = 0 then "" else "." ^ string_of_int occ)
-          key.pk_surname;
+          key.Gwc_lib__.Gwcomp.pk_surname;
         check_error gen)
       else p.m_notes <- unique_string gen str
   | None ->
       Printf.printf "File \"%s\"\n" fname;
       Printf.printf "*** warning: undefined person: \"%s%s %s\"\n"
-        key.pk_first_name
+        key.Gwc_lib__.Gwcomp.pk_first_name
         (if occ = 0 then "" else "." ^ string_of_int occ)
-        key.pk_surname;
+        key.Gwc_lib__.Gwcomp.pk_surname;
       flush stdout
 
 (** Changes [gen.g_base.c_bnotes] to take into account [nfname] page
@@ -1186,7 +1212,7 @@ let insert_bnotes fname gen nfname str =
     let nfname =
       if nfname = "" then ""
       else
-        match NotesLinks.check_file_name nfname with
+        match Geneweb.NotesLinks.check_file_name nfname with
         | Some (dl, f) -> List.fold_right Filename.concat dl f
         | None -> "bad"
     in
@@ -1200,7 +1226,7 @@ let insert_bnotes fname gen nfname str =
             match old_nread nfname RnAll with "" -> str | str -> str)
       in
       {
-        nread = (fun f n -> if f = nfname then str else old_nread f n);
+        Def.nread = (fun f n -> if f = nfname then str else old_nread f n);
         norigin_file = fname;
         efiles =
           (if nfname <> "" then
@@ -1222,7 +1248,7 @@ let map_option f = function Some x -> Some (f x) | None -> None
 let insert_relation_parent state gen ip s k =
   let par, ipar = insert_somebody state gen k in
   par.m_related <- ip :: par.m_related;
-  if Gwcomp.value_of_assumption par.m_sex = Neuter then par.m_sex <- s;
+  if Gwc_lib__.Gwcomp.value_of_assumption par.m_sex = Neuter then par.m_sex <- s;
   ipar
 
 (** Convert [(Dune__exe.Gwcomp.somebody, string) Def.gen_relation] to
@@ -1230,15 +1256,16 @@ let insert_relation_parent state gen ip s k =
     information in the base. *)
 let insert_relation state gen ip r =
   {
-    r_type = r.r_type;
+    Def.r_type = r.Def.r_type;
     r_fath =
       map_option
-        (insert_relation_parent state gen ip (Gwcomp.make_weak_assumption Male))
+        (insert_relation_parent state gen ip
+           (Gwc_lib__.Gwcomp.make_weak_assumption Def.Male))
         r.r_fath;
     r_moth =
       map_option
         (insert_relation_parent state gen ip
-           (Gwcomp.make_weak_assumption Female))
+           (Gwc_lib__.Gwcomp.make_weak_assumption Def.Female))
         r.r_moth;
     r_sources = unique_string gen r.r_sources;
   }
@@ -1262,13 +1289,15 @@ let insert_relations state fname gen sb sex rl =
 
 (** Insert syntax element read from .gwo file. *)
 let insert_syntax state fname gen = function
-  | Family (cpl, fs, ms, witl, fevents, fam, des) ->
+  | Gwc_lib__.Gwcomp.Family (cpl, fs, ms, witl, fevents, fam, des) ->
       insert_family state gen cpl fs ms witl fevents fam des
-  | Notes (key, str) -> insert_notes fname gen key str
-  | Relations (sb, sex, rl) -> insert_relations state fname gen sb sex rl
-  | Pevent (sb, _, pevents) -> insert_pevents state fname gen sb pevents
-  | Bnotes (nfname, str) -> insert_bnotes fname gen nfname str
-  | Wnotes (wizid, str) -> insert_wiznote gen wizid str
+  | Gwc_lib__.Gwcomp.Notes (key, str) -> insert_notes fname gen key str
+  | Gwc_lib__.Gwcomp.Relations (sb, sex, rl) ->
+      insert_relations state fname gen sb sex rl
+  | Gwc_lib__.Gwcomp.Pevent (sb, _, pevents) ->
+      insert_pevents state fname gen sb pevents
+  | Gwc_lib__.Gwcomp.Bnotes (nfname, str) -> insert_bnotes fname gen nfname str
+  | Gwc_lib__.Gwcomp.Wnotes (wizid, str) -> insert_wiznote gen wizid str
 
 (** Update person by looking up information inferred from person events *)
 let update_person_with_pevents p =
@@ -1276,7 +1305,7 @@ let update_person_with_pevents p =
   let found_baptism = ref false in
   let found_death = ref false in
   let found_burial = ref false in
-  let death_std_fields = p.death in
+  let death_std_fields = p.Def.death in
   let death_reason_std_fields =
     match death_std_fields with Death (dr, _) -> dr | _ -> Unspecified
   in
@@ -1284,14 +1313,14 @@ let update_person_with_pevents p =
     match pevents with
     | [] -> p
     | evt :: l -> (
-        match evt.epers_name with
+        match evt.Def.epers_name with
         | Epers_Birth ->
             if !found_birth then loop l p
             else
               let p =
                 {
                   p with
-                  birth = evt.epers_date;
+                  Def.birth = evt.epers_date;
                   birth_place = evt.epers_place;
                   birth_note = evt.epers_note;
                   birth_src = evt.epers_src;
@@ -1318,7 +1347,8 @@ let update_person_with_pevents p =
             else
               let death =
                 match Date.od_of_cdate evt.epers_date with
-                | Some d -> Death (death_reason_std_fields, Date.cdate_of_date d)
+                | Some d ->
+                    Def.Death (death_reason_std_fields, Date.cdate_of_date d)
                 | None -> (
                     match death_std_fields with
                     | OfCourseDead -> OfCourseDead
@@ -1372,11 +1402,11 @@ let update_person_with_pevents p =
 let update_pevents_with_person p =
   let empty_string = 0 in
   let evt_birth =
-    match Date.od_of_cdate p.birth with
+    match Date.od_of_cdate p.Def.birth with
     | Some _ ->
         let evt =
           {
-            epers_name = Epers_Birth;
+            Def.epers_name = Epers_Birth;
             epers_date = p.birth;
             epers_place = p.birth_place;
             epers_reason = empty_string;
@@ -1391,7 +1421,7 @@ let update_pevents_with_person p =
         else
           let evt =
             {
-              epers_name = Epers_Birth;
+              Def.epers_name = Epers_Birth;
               epers_date = p.birth;
               epers_place = p.birth_place;
               epers_reason = empty_string;
@@ -1407,7 +1437,7 @@ let update_pevents_with_person p =
     | Some _ ->
         let evt =
           {
-            epers_name = Epers_Baptism;
+            Def.epers_name = Epers_Baptism;
             epers_date = p.baptism;
             epers_place = p.baptism_place;
             epers_reason = empty_string;
@@ -1422,7 +1452,7 @@ let update_pevents_with_person p =
         else
           let evt =
             {
-              epers_name = Epers_Baptism;
+              Def.epers_name = Epers_Baptism;
               epers_date = p.baptism;
               epers_place = p.baptism_place;
               epers_reason = empty_string;
@@ -1440,7 +1470,7 @@ let update_pevents_with_person p =
         else
           let evt =
             {
-              epers_name = Epers_Death;
+              Def.epers_name = Epers_Death;
               epers_date = Date.cdate_None;
               epers_place = p.death_place;
               epers_reason = empty_string;
@@ -1454,7 +1484,7 @@ let update_pevents_with_person p =
         let date = Date.cdate_of_od (Some (Date.date_of_cdate cd)) in
         let evt =
           {
-            epers_name = Epers_Death;
+            Def.epers_name = Epers_Death;
             epers_date = date;
             epers_place = p.death_place;
             epers_reason = empty_string;
@@ -1467,7 +1497,7 @@ let update_pevents_with_person p =
     | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         let evt =
           {
-            epers_name = Epers_Death;
+            Def.epers_name = Epers_Death;
             epers_date = Date.cdate_None;
             epers_place = p.death_place;
             epers_reason = empty_string;
@@ -1485,7 +1515,7 @@ let update_pevents_with_person p =
         else
           let evt =
             {
-              epers_name = Epers_Burial;
+              Def.epers_name = Epers_Burial;
               epers_date = Date.cdate_None;
               epers_place = p.burial_place;
               epers_reason = empty_string;
@@ -1498,7 +1528,7 @@ let update_pevents_with_person p =
     | Buried cd ->
         let evt =
           {
-            epers_name = Epers_Burial;
+            Def.epers_name = Epers_Burial;
             epers_date = cd;
             epers_place = p.burial_place;
             epers_reason = empty_string;
@@ -1511,7 +1541,7 @@ let update_pevents_with_person p =
     | Cremated cd ->
         let evt =
           {
-            epers_name = Epers_Cremation;
+            Def.epers_name = Epers_Cremation;
             epers_date = cd;
             epers_place = p.burial_place;
             epers_reason = empty_string;
@@ -1600,7 +1630,7 @@ let convert_persons per_index_ic per_ic persons =
           rparents = mp.m_rparents;
           related = mp.m_related;
           pevents = mp.m_pevents;
-          sex = Gwcomp.value_of_assumption mp.m_sex;
+          sex = Gwc_lib__.Gwcomp.value_of_assumption mp.m_sex;
           notes = mp.m_notes;
           key_index = i;
         }
@@ -1684,7 +1714,7 @@ let make_base state bname gen per_index_ic per_ic =
     a
   in
   Gwdb.make bname
-    (input_particles state.particules_file)
+    (input_particles state.Gwc_lib__.State.particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),
       strings,
@@ -1785,11 +1815,13 @@ let link ~save_mem state next_family_fun bdir =
   Gc.compact ();
   let base = make_base state bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
-  if state.do_check && gen.g_pcnt > 0 then (
-    Check.check_base base (set_error base gen) (set_warning base) ignore;
-    if state.pr_stats then Stats.(print_stats base @@ stat_base base));
+  if state.Gwc_lib__.State.do_check && gen.g_pcnt > 0 then (
+    Geneweb.Check.check_base base (set_error base gen) (set_warning base) ignore;
+    if state.Gwc_lib__.State.pr_stats then
+      Geneweb.Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
-    if state.do_consang then ignore @@ ConsangAll.compute base true;
+    if state.Gwc_lib__.State.do_consang then
+      ignore @@ ConsangAll.compute base true;
     Gwdb.sync ~save_mem base;
     output_wizard_notes bdir gen.g_wiznotes;
     Files.remove_dir tmp_dir;
