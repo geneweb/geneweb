@@ -202,11 +202,7 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
       if public_name = empty_string then s_titles_names
       else sou public_name :: s_titles_names
     in
-    let s_first_names =
-      s_first_name
-      :: (* List.rev_append *)
-         List.rev_map sou first_names_aliases (* public_names *)
-    in
+    let s_first_names = s_first_name :: List.rev_map sou first_names_aliases in
     let s_surnames =
       s_surname
       :: Ext_list.rev_map_append sou surnames_aliases
@@ -238,7 +234,6 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
     in
     (* + (first names + (title | (public name)) ) x (titles places) *)
     let s_list =
-      (* let first_names = first_name :: first_names_aliases in *)
       List.fold_left
         (fun list t ->
           let s = t.Def.t_place in
