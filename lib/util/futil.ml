@@ -1,13 +1,11 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-external identity : 'a -> 'a = "%identity"
-
 let map_cdate fd d =
   match Date.od_of_cdate d with
   | Some d -> Date.cdate_of_date (fd d)
   | None -> d
 
-let map_title_strings ?(fd = identity) f t =
+let map_title_strings ?(fd = Fun.id) f t =
   let t_name =
     match t.Def.t_name with
     | Tmain -> Def.Tmain
@@ -25,7 +23,7 @@ let map_title_strings ?(fd = identity) f t =
     t_nth = t.t_nth;
   }
 
-let map_pers_event ?(fd = identity) fp fs e =
+let map_pers_event ?(fd = Fun.id) fp fs e =
   let epers_name =
     match e.Def.epers_name with
     | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
@@ -65,7 +63,7 @@ let map_pers_event ?(fd = identity) fp fs e =
     epers_witnesses;
   }
 
-let map_fam_event ?(fd = identity) fp fs e =
+let map_fam_event ?(fd = Fun.id) fp fs e =
   let efam_name =
     match e.Def.efam_name with
     | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
@@ -114,7 +112,7 @@ let map_burial fd = function
   | Buried d -> Buried (map_cdate fd d)
   | Cremated d -> Cremated (map_cdate fd d)
 
-let map_person_ps ?(fd = identity) fp fs p =
+let map_person_ps ?(fd = Fun.id) fp fs p =
   {
     Def.first_name = fs p.Def.first_name;
     surname = fs p.surname;
@@ -164,7 +162,7 @@ let map_divorce fd = function
   | (Def.NotDivorced | Separated) as x -> x
   | Divorced d -> Divorced (map_cdate fd d)
 
-let map_family_ps ?(fd = identity) fp ff fs fam =
+let map_family_ps ?(fd = Fun.id) fp ff fs fam =
   {
     Def.marriage = map_cdate fd fam.Def.marriage;
     marriage_place = fs fam.marriage_place;

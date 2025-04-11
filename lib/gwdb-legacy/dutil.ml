@@ -1,7 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-external identity : 'a -> 'a = "%identity"
-
 type name_index_data = int array array
 type strings_of_fsname = int array array
 
@@ -138,7 +136,7 @@ let empty_family empty =
     fam_index = ();
   }
 
-let map_pers_event ?(fd = identity) fp fs e =
+let map_pers_event ?(fd = Fun.id) fp fs e =
   let epers_name =
     match e.Dbdisk.epers_name with
     | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
@@ -176,7 +174,7 @@ let map_pers_event ?(fd = identity) fp fs e =
     epers_witnesses;
   }
 
-let map_person_ps ?(fd = identity) fp fs p =
+let map_person_ps ?(fd = Fun.id) fp fs p =
   {
     Dbdisk.first_name = fs p.Dbdisk.first_name;
     surname = fs p.surname;
@@ -215,7 +213,7 @@ let map_person_ps ?(fd = identity) fp fs p =
     key_index = p.key_index;
   }
 
-let map_fam_event ?(fd = identity) fp fs e =
+let map_fam_event ?(fd = Fun.id) fp fs e =
   let efam_name =
     match e.Dbdisk.efam_name with
     | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
@@ -243,7 +241,7 @@ let map_fam_event ?(fd = identity) fp fs e =
     efam_witnesses;
   }
 
-let map_family_ps ?(fd = identity) fp ff fs fam =
+let map_family_ps ?(fd = Fun.id) fp ff fs fam =
   {
     Dbdisk.marriage = Futil.map_cdate fd fam.Dbdisk.marriage;
     marriage_place = fs fam.marriage_place;
