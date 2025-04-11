@@ -81,9 +81,6 @@ let bench name fn =
   pprint_gc (diff gc1 gc2);
   res
 
-let print_callstack ?(max = 5) () =
-  Printexc.(print_raw_backtrace stderr @@ get_callstack max)
-
 let verbose = ref true
 
 (* [decline] has been deprecated since version 5.00
@@ -324,17 +321,6 @@ let input_lexicon lang ht open_fname =
   key ()
 
 let array_to_list_map fn a = Array.fold_right (fun x acc -> fn x :: acc) a []
-let array_to_list_rev_map fn a = Array.fold_left (fun acc x -> fn x :: acc) [] a
-
-let array_assoc k a =
-  let len = Array.length a in
-  let rec loop i =
-    if i = len then raise Not_found
-    else
-      let k', v = Array.unsafe_get a i in
-      if k' = k then v else loop (i + 1)
-  in
-  loop 0
 
 let string_of_int_sep sep x =
   let digits, len =
