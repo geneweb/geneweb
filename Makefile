@@ -74,14 +74,12 @@ GENERATED_FILES_DEP = \
 	lib/util/dune \
 	benchmark/dune \
 	bin/caches/dune \
-	bin/connex/dune \
 	bin/consang/dune \
 	bin/fixbase/dune \
 	bin/ged2gwb/dune \
 	bin/gwb2ged/dune \
 	bin/gwc/dune \
 	bin/gwd/dune \
-	bin/gwdiff/dune \
 	bin/gwrepl/dune \
 	bin/gwrepl/.depend \
 	bin/gwu/dune \
@@ -131,14 +129,12 @@ distrib:
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
-	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex;
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang;
 	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase;
 	cp $(BUILD_DISTRIB_DIR)ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb;
 	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged;
 	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc;
 	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd;
-	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff;
 	if test -f $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc ; then cp $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc $(DISTRIB_DIR)/gw/gwrepl; fi
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu;
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup;

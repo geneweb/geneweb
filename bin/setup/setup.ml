@@ -215,9 +215,6 @@ let parameters_1 =
           if s = "choice" then loop comm bname env
           else
             let out = stringify s in
-            let out =
-              if out = "/notes_d/connex.txt" then bname ^ ".gwb" ^ out else out
-            in
             comm ^ " -o " ^ out ^ " > " ^ out
         else loop comm bname env
     | [] -> comm
@@ -1000,22 +997,6 @@ let gwc conf =
     print_default_gwf_file conf;
     print_file conf "bso_ok.htm")
 
-let gwdiff_check conf = print_file conf "bsi_diff.htm"
-
-let gwdiff ok_file conf =
-  let rc =
-    let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ parameters_2 conf.env)
-  in
-  Printf.eprintf "\n";
-  flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm"
-  else
-    let conf =
-      conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
-    in
-    print_file conf ok_file
-
 let gwfixbase_check conf = print_file conf "bsi_fix.htm"
 
 let gwfixbase ok_file conf =
@@ -1024,29 +1005,6 @@ let gwfixbase ok_file conf =
     exec_f (comm ^ parameters conf.env)
   in
   Printf.eprintf "\n";
-  flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
-
-let connex_check conf = print_file conf "bsi_connex.htm"
-
-let connex ok_file conf =
-  let ic = Unix.open_process_in "uname" in
-  let uname = input_line ic in
-  let () = close_in ic in
-  let rc =
-    let commnd =
-      "cd " ^ Sys.getcwd () ^ "; tput bel;"
-      ^ stringify (Filename.concat !bin_dir "connex")
-      ^ " " ^ parameters_1 conf.env
-    in
-    if uname = "Linux" then
-      (* non testé ! *)
-      Sys.command ("xterm -e \" " ^ commnd ^ " \" ")
-    else (
-      Printf.eprintf "%s (%s) %s (%s)\n" "Unknown Os_type" Sys.os_type
-        "or wrong uname response" uname;
-      2)
-  in
   flush stderr;
   if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
 
@@ -1615,14 +1573,6 @@ let setup_comm_ok conf = function
   | "gwf_1" -> gwf_1 conf
   | "gwd" -> gwd conf
   | "gwd_1" -> gwd_1 conf
-  | "connex" -> (
-      match p_getenv conf.env "opt" with
-      | Some "check" -> connex_check conf
-      | _ -> connex "connex_ok.htm" conf)
-  | "gwdiff" -> (
-      match p_getenv conf.env "opt" with
-      | Some "check" -> gwdiff_check conf
-      | _ -> gwdiff "gwdiff_ok.htm" conf)
   | "gwfixbase" -> (
       match p_getenv conf.env "opt" with
       | Some "check" -> gwfixbase_check conf
