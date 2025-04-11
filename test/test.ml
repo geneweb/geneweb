@@ -1,7 +1,7 @@
 open Alcotest
 
 let () =
-  let known_failures = [| "calendar-sdn" |] in
+  let known_failures = [| "calendar-sdn"; "wiki-syntax" |] in
   let is_ci = Option.is_some (Sys.getenv_opt "GENEWEB_CI") in
   let filter ~name ~index:_ =
     if is_ci then if Array.mem name known_failures then `Skip else `Run

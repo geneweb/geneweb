@@ -33,6 +33,7 @@ open Util
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
+module Buff3 = Buff.Make ()
 module Buff2 = Buff.Make ()
 module Buff1 = Buff.Make ()
 module Buff = Buff.Make ()
@@ -123,13 +124,45 @@ type wiki_info = {
 
 let find_first_char_from_list str i chars =
   let len = String.length str in
+  let tbl : (char, unit) Hashtbl.t = Hashtbl.create 17 in
+  List.iter (fun c -> Hashtbl.replace tbl c ()) chars;
   let rec find_index j =
     if j >= len then None
-    else if List.mem str.[j] chars then Some j
+    else if Hashtbl.mem tbl str.[j] then Some j
     else find_index (j + 1)
   in
   find_index i
 
+type quot_lev = Italic | Bold | BoldItalic | Zero
+
+let italic_delimiter_at s i quot_lev =
+  let len = String.length s in
+  i <= len - 2
+  && s.[i] = '\''
+  && s.[i + 1] = '\''
+  && (quot_lev = Zero || quot_lev = Italic)
+
+let bold_delimiter_at s i quot_lev =
+  let len = String.length s in
+  i <= len - 3
+  && s.[i] = '\''
+  && s.[i + 1] = '\''
+  && s.[i + 2] = '\''
+  && (quot_lev = Zero || quot_lev = Bold)
+
+let bold_italic_delimiter_at s i quot_lev =
+  let len = String.length s in
+  i <= len - 5
+  && s.[i] = '\''
+  && s.[i + 1] = '\''
+  && s.[i + 2] = '\''
+  && s.[i + 3] = '\''
+  && s.[i + 4] = '\''
+  && (quot_lev = Zero || quot_lev = BoldItalic)
+
+(* bold italic detects ''bold'', '''italic''' and '''''bold_italic'''''
+    and {highlight} sequences in a string, and replaces it with the
+    appropriate html code (<i>, <b>, ...) *)
 let bold_italic_syntax s =
   let chars = [ '{'; '%'; '\'' ] in
   let slen = String.length s in
@@ -138,66 +171,54 @@ let bold_italic_syntax s =
       if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
         let len =
           match quot_lev with
-          | 1 -> Buff1.mstore len "</i>"
-          | 2 -> Buff1.mstore len "</b>"
-          | 3 -> Buff1.mstore len "</b></i>"
+          | Italic -> Buff1.mstore len "</i>"
+          | Bold -> Buff1.mstore len "</b>"
+          | BoldItalic -> Buff1.mstore len "</b></i>"
           | _ -> len
         in
-        (len, 0)
+        (len, Zero)
       else (len, quot_lev)
     in
-    if i = slen then Buff1.get len
+    if i = slen then Buff1.get len (* % allows escaping [, {, ' *)
     else if
       s.[i] = '%'
       && i < slen - 1
-      && List.mem s.[i + 1] [ '['; ']'; '{'; '}'; '\'' ]
+      && (s.[i + 1] = '['
+         || s.[i + 1] = '{'
+         || s.[i + 1] = '}' (* is this needed?, then why not ']' ?*)
+         || s.[i + 1] = '\'')
     then loop quot_lev (i + 2) (Buff1.store len s.[i + 1])
+      (* single % are kept *)
     else if s.[i] = '%' then loop quot_lev (i + 1) (Buff1.mstore len "%")
+      (* highlight *)
     else if s.[i] = '{' then
       let b, j =
         let rec loop len j =
           if j = slen then ("", i + 1)
           else if j < slen - 1 && s.[j] = '%' then
-            loop (Buff2.store len s.[j + 1]) (j + 2)
-          else if s.[j] = '}' then (Buff2.get len, j + 1)
-          else loop (Buff2.store len s.[j]) (j + 1)
+            loop (Buff3.store len s.[j + 1]) (j + 2)
+          else if s.[j] = '}' then (Buff3.get len, j + 1)
+          else loop (Buff3.store len s.[j]) (j + 1)
         in
         loop 0 (i + 1)
       in
       let s =
-        if String.length b <> 0 then
+        if b <> "" then
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
       loop quot_lev j (Buff1.mstore len s)
-    else if
-      i <= slen - 5
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && s.[i + 2] = '\''
-      && s.[i + 3] = '\''
-      && s.[i + 4] = '\''
-      && (quot_lev = 0 || quot_lev = 3)
-    then
-      let s = if quot_lev = 0 then "<i><b>" else "</b></i>" in
-      loop (3 - quot_lev) (i + 5) (Buff1.mstore len s)
-    else if
-      i <= slen - 3
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && s.[i + 2] = '\''
-      && (quot_lev = 0 || quot_lev = 2)
-    then
-      let s = if quot_lev = 0 then "<b>" else "</b>" in
-      loop (2 - quot_lev) (i + 3) (Buff1.mstore len s)
-    else if
-      i <= slen - 2
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && (quot_lev = 0 || quot_lev = 1)
-    then
-      let s = if quot_lev = 0 then "<i>" else "</i>" in
-      loop (1 - quot_lev) (i + 2) (Buff1.mstore len s)
+    else if bold_italic_delimiter_at s i quot_lev then
+      let s, ql =
+        if quot_lev = Zero then ("<b><i>", BoldItalic) else ("</i></b>", Zero)
+      in
+      loop ql (i + 5) (Buff1.mstore len s)
+    else if bold_delimiter_at s i quot_lev then
+      let s, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
+      loop ql (i + 3) (Buff1.mstore len s)
+    else if italic_delimiter_at s i quot_lev then
+      let s, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
+      loop ql (i + 2) (Buff1.mstore len s)
     else if s.[i] = '\'' then loop quot_lev (i + 1) (Buff1.mstore len "'")
     else
       let k = find_first_char_from_list s i chars in
@@ -207,7 +228,7 @@ let bold_italic_syntax s =
           Buff1.get len
       | Some k -> loop quot_lev k (Buff1.mstore len (String.sub s i (k - i)))
   in
-  loop 0 0 0
+  loop Zero 0 0
 
 let syntax_links conf wi s =
   let chars = [ '{'; '%'; '\''; '[' ] in
@@ -218,18 +239,23 @@ let syntax_links conf wi s =
       if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
         let len =
           match quot_lev with
-          | 1 -> Buff.mstore len "</i>"
-          | 2 -> Buff.mstore len "</b>"
-          | 3 -> Buff.mstore len "</b></i>"
+          | Italic -> Buff.mstore len "</i>"
+          | Bold -> Buff.mstore len "</b>"
+          | BoldItalic -> Buff.mstore len "</b></i>"
           | _ -> len
         in
-        (len, 0)
+        (len, Zero)
       else (len, quot_lev)
     in
     if i = slen then Buff.get len
     else if
       s.[i] = '%'
       && i < slen - 1
+      && (s.[i + 1] = '['
+         || s.[i + 1] = ']'
+         || s.[i + 1] = '{'
+         || s.[i + 1] = '}'
+         || s.[i + 1] = '\'')
       && List.mem s.[i + 1] [ '['; ']'; '{'; '}'; '\'' ]
     then loop quot_lev pos (i + 2) (Buff.store len s.[i + 1])
     else if s.[i] = '%' && i < slen - 1 && s.[i + 1] = '/' then
@@ -252,34 +278,17 @@ let syntax_links conf wi s =
         else ""
       in
       loop quot_lev pos j (Buff.mstore len s)
-    else if
-      i <= slen - 5
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && s.[i + 2] = '\''
-      && s.[i + 3] = '\''
-      && s.[i + 4] = '\''
-      && (quot_lev = 0 || quot_lev = 3)
-    then
-      let s = if quot_lev = 0 then "<i><b>" else "</b></i>" in
-      loop (3 - quot_lev) pos (i + 5) (Buff.mstore len s)
-    else if
-      i <= slen - 3
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && s.[i + 2] = '\''
-      && (quot_lev = 0 || quot_lev = 2)
-    then
-      let s = if quot_lev = 0 then "<b>" else "</b>" in
-      loop (2 - quot_lev) pos (i + 3) (Buff.mstore len s)
-    else if
-      i <= slen - 2
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && (quot_lev = 0 || quot_lev = 1)
-    then
-      let s = if quot_lev = 0 then "<i>" else "</i>" in
-      loop (1 - quot_lev) pos (i + 2) (Buff.mstore len s)
+    else if bold_italic_delimiter_at s i quot_lev then
+      let s, ql =
+        if quot_lev = Zero then ("<i><b>", BoldItalic) else ("</b></i>", Zero)
+      in
+      loop ql pos (i + 5) (Buff.mstore len s)
+    else if bold_delimiter_at s i quot_lev then
+      let s, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
+      loop ql pos (i + 3) (Buff.mstore len s)
+    else if italic_delimiter_at s i quot_lev then
+      let s, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
+      loop ql pos (i + 2) (Buff.mstore len s)
     else if s.[i] = '\'' then loop quot_lev pos (i + 1) (Buff.mstore len "'")
     else
       match NotesLinks.misc_notes_link s i with
@@ -366,7 +375,7 @@ let syntax_links conf wi s =
                 (j - String.length none_s + k + 1)
                 (Buff.mstore len "["))
   in
-  loop 0 1 0 0
+  loop Zero 1 0 0
 
 let toc_list = [ "__NOTOC__"; "__TOC__"; "__SHORT_TOC__" ]
 

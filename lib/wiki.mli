@@ -41,6 +41,7 @@ type wiki_info = {
 }
 
 val syntax_links : config -> wiki_info -> string -> string
+val bold_italic_syntax : string -> string
 
 val make_edit_button :
   Config.config -> ?mode:string -> string -> ?cnt:int option -> unit -> string
