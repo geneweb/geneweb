@@ -544,9 +544,9 @@ val select_mascdesc :
     {!val:select_desc}
  *)
 
-val sprintf_today : Config.config -> Adef.safe_string
+val sprintf_today : Config.config -> string
 (** [sprintf_today confo]
-    Uses {!val:Mutil.sprintf_date} in order to print datetime defined in [conf]. *)
+    Uses {!val:Ext_unix.sprintf_date} in order to print datetime defined in [conf]. *)
 
 val auth_warning :
   Config.config ->

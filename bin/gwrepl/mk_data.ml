@@ -1,4 +1,4 @@
-(* This file is used to generate the file 'data.cppo.ml', containing all
+(* This file is used to generate the file 'data.ml', containing all
    the files (cmis, cmas, .so) that could be used at runtime by
    a geneweb interpreter.
 
@@ -149,7 +149,7 @@ let () =
       cmis
       (Sys.readdir (opam_swich_prefix_lib // "ocaml"))
   in
-  let data = "data.cppo.ml" in
+  let data = "data.ml" in
   let out = open_out_bin data in
   (let print_dir d = Printf.fprintf out {|"%s";|} d in
    Printf.fprintf out {|let directories=[||};

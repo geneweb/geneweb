@@ -1,0 +1,4 @@
+(library
+ (name geneweb_log)
+ (public_name geneweb.log)
+ (virtual_modules driver))

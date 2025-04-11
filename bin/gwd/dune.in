@@ -16,7 +16,6 @@
     wserver
     %%%GWDB_PKG%%%
   )
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwdPlugin request)
 )
 
@@ -34,7 +33,6 @@
     caches
     %%%GWDB_PKG%%%
   )
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules
     gwd
     gwdPluginDep

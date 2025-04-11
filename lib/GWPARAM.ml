@@ -145,9 +145,7 @@ module Default = struct
       | `LOG_INFO -> "INFO"
       | `LOG_DEBUG -> "DEBUG"
     in
-    Printf.eprintf "[%s]: %s %s\n"
-      (Mutil.sprintf_date tm : Adef.safe_string :> string)
-      level msg
+    Printf.eprintf "[%s]: %s %s\n" (Ext_unix.sprintf_date tm) level msg
 
   let wrap_output (conf : Config.config) (title : Adef.safe_string)
       (content : unit -> unit) =

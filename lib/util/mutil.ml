@@ -552,12 +552,6 @@ let rec extract_param name stop_char =
       else extract_param name stop_char l
   | [] -> ""
 
-let sprintf_date tm =
-  Adef.safe
-  @@ Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
-       (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-       tm.Unix.tm_sec
-
 let rev_input_line ic pos (rbuff, rpos) =
   let rev = Buffer.create 256 in
   let rev_input_char pos =
