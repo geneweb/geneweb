@@ -888,8 +888,7 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let nfam =
     Futil.map_family_ps
       (Update.insert_person conf base psrc created_p)
-      (fun f -> f)
-      (Gwdb.insert_string base) sfam
+      Fun.id (Gwdb.insert_string base) sfam
   in
   let ndes =
     Futil.map_descend_p (Update.insert_person conf base psrc created_p) sdes

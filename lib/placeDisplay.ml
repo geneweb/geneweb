@@ -84,8 +84,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
       (Place.fold_place_short inverted)
       (fun _ -> true)
       (fun prev _ -> match prev with Some n -> n + 1 | None -> 1)
-      (fun x -> x)
-      max_int
+      Fun.id max_int
   in
   Array.sort (fun (s1, _) (s2, _) -> Utf8.alphabetic_order s1 s2) array;
   let title _ =

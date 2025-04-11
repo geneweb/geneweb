@@ -185,7 +185,7 @@ let wiki_aux pp conf base env str =
 let source conf base str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base [] str
 
-let note conf base env str = wiki_aux (fun x -> x) conf base env str
+let note conf base env str = wiki_aux Fun.id conf base env str
 
 let person_note conf base p str =
   let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in

@@ -52,8 +52,8 @@ let diff_visibility conf base op np =
   let k = slash_name_of_key np.Def.first_name np.surname np.occ in
   let empty_union = { Def.family = [||] } in
   let empty_ascend = { Def.parents = None; consang = Adef.fix (-1) } in
-  let op = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op in
-  let np = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np in
+  let op = Futil.map_person_ps Fun.id (Gwdb.insert_string base) op in
+  let np = Futil.map_person_ps Fun.id (Gwdb.insert_string base) np in
   let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
   let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
   let tmp_conf = { conf with Config.wizard = false; friend = false } in

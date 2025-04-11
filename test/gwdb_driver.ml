@@ -408,8 +408,8 @@ end
 let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
   { Marker.get = (fun _ -> v); set = (fun _ _ -> ()) }
 
-let ifam_marker c i = Marker.make (fun i -> i) c i
-let iper_marker c i = Marker.make (fun i -> i) c i
+let ifam_marker c i = Marker.make Fun.id c i
+let iper_marker c i = Marker.make Fun.id c i
 
 let families ?(select = fun _ -> true) base =
   Collection.

@@ -298,9 +298,9 @@ let cache_asc f ({ base; iper; _ } as p) =
 let cache_uni f ({ base; iper; _ } as p) =
   f (cache base.data.unions.get iper (fun p -> p.u) (fun p v -> p.u <- v) p)
 
-let gen_person_of_person = cache_per (fun p -> p)
-let gen_ascend_of_person = cache_asc (fun p -> p)
-let gen_union_of_person = cache_uni (fun p -> p)
+let gen_person_of_person = cache_per Fun.id
+let gen_ascend_of_person = cache_asc Fun.id
+let gen_union_of_person = cache_uni Fun.id
 let get_access = cache_per (fun p -> p.Dbdisk.access)
 let get_aliases = cache_per (fun p -> p.Dbdisk.aliases)
 let get_baptism = cache_per (fun p -> p.Dbdisk.baptism)
@@ -359,9 +359,9 @@ let cache_cpl f ({ base; ifam; _ } as fam) =
 let cache_des f ({ base; ifam; _ } as fam) =
   f (cache base.data.descends.get ifam (fun f -> f.d) (fun f v -> f.d <- v) fam)
 
-let gen_couple_of_family = cache_cpl (fun c -> c)
-let gen_descend_of_family = cache_des (fun d -> d)
-let gen_family_of_family = cache_fam (fun f -> f)
+let gen_couple_of_family = cache_cpl Fun.id
+let gen_descend_of_family = cache_des Fun.id
+let gen_family_of_family = cache_fam Fun.id
 let get_children = cache_des (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Dbdisk.comment)
 let get_ifam = cache_fam (fun f -> f.Dbdisk.fam_index)
@@ -505,7 +505,7 @@ let persons base =
 let ipers base =
   { Collection.length = nb_of_persons base; get = (fun i -> Some i) }
 
-let iper_marker c i = Marker.make (fun i -> i) c i
+let iper_marker c i = Marker.make Fun.id c i
 
 let ifams ?(select = fun _ -> true) base =
   {
@@ -526,7 +526,7 @@ let families ?(select = fun _ -> true) base =
         if get_ifam f <> dummy_ifam && select f then Some f else None);
   }
 
-let ifam_marker c i = Marker.make (fun i -> i) c i
+let ifam_marker c i = Marker.make Fun.id c i
 
 let make_patch_collection patch mk =
   let arr = patch |> Hashtbl.to_seq_values |> Seq.map mk |> Array.of_seq in

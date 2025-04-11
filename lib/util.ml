@@ -615,11 +615,10 @@ let pget_opt conf base ip =
 let pget conf base ip =
   Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
-let string_gen_person base p =
-  Futil.map_person_ps (fun p -> p) (Gwdb.sou base) p
+let string_gen_person base p = Futil.map_person_ps Fun.id (Gwdb.sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (fun f -> f) (Gwdb.sou base) fam
+  Futil.map_family_ps Fun.id Fun.id (Gwdb.sou base) fam
 
 (* TODO
    should it be is_empty_name instead? (deleted person have surname and first_name = "?")
