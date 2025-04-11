@@ -132,7 +132,7 @@ let incr_request_counter =
 
 let lang_file_name conf fname =
   let fname1 =
-    Util.base_path
+    GWPARAM.base_path
       [ "lang"; conf.Config.lang ]
       (Filename.basename fname ^ ".txt")
   in
@@ -142,7 +142,9 @@ let lang_file_name conf fname =
       (Filename.concat conf.Config.lang (Filename.basename fname ^ ".txt"))
 
 let any_lang_file_name fname =
-  let fname1 = Util.base_path [ "lang" ] (Filename.basename fname ^ ".txt") in
+  let fname1 =
+    GWPARAM.base_path [ "lang" ] (Filename.basename fname ^ ".txt")
+  in
   if Sys.file_exists fname1 then fname1
   else
     Util.search_in_assets
@@ -153,13 +155,13 @@ let source_file_name conf fname =
   let lang = conf.Config.lang in
   let fname1 =
     List.fold_right Filename.concat
-      [ Util.base_path [ "src" ] bname; lang ]
+      [ GWPARAM.base_path [ "src" ] bname; lang ]
       (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
     Filename.concat
-      (Util.base_path [ "src" ] bname)
+      (GWPARAM.base_path [ "src" ] bname)
       (Filename.basename fname ^ ".txt")
 
 let extract_date s =

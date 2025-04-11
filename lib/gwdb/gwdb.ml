@@ -20,9 +20,9 @@ end)
 let insert_person base p a u =
   let iper = Gwdb_driver.new_iper base in
   let p = { p with Def.key_index = iper } in
-  Gwdb_driver.insert_ascend base iper a;
-  Gwdb_driver.insert_union base iper u;
-  Gwdb_driver.insert_person base iper p;
+  Gwdb_driver.patch_ascend base iper a;
+  Gwdb_driver.patch_union base iper u;
+  Gwdb_driver.patch_person base iper p;
   iper
 
 (** [insert_family base f c d]
@@ -32,9 +32,9 @@ let insert_person base p a u =
 *)
 let insert_family base f c d =
   let ifam = Gwdb_driver.new_ifam base in
-  Gwdb_driver.insert_family base ifam f;
-  Gwdb_driver.insert_couple base ifam c;
-  Gwdb_driver.insert_descend base ifam d;
+  Gwdb_driver.patch_family base ifam f;
+  Gwdb_driver.patch_couple base ifam c;
+  Gwdb_driver.patch_descend base ifam d;
   ifam
 
 (** DELETE *)

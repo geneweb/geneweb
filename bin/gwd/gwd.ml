@@ -1264,7 +1264,7 @@ let make_conf from_addr request script_name env =
       auth_file =
         (try
            let x = List.assoc "auth_file" base_env in
-           if x = "" then !auth_file else Geneweb.Util.bpath x
+           if x = "" then !auth_file else Geneweb.GWPARAM.bpath x
          with Not_found -> !auth_file);
       border =
         (match Geneweb.Util.p_getint env "border" with

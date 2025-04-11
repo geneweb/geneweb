@@ -259,14 +259,6 @@ let insert array index data =
     array.(index) <- data;
     array)
 
-(* WRONG INSERTIONS *)
-let patch_person base ip p = base.persons.(ip) <- p
-let patch_ascend base ip a = base.ascends.(ip) <- a
-let patch_union base ip u = base.unions.(ip) <- u
-let patch_family base ifam f = base.families.(ifam) <- f
-let patch_descend base ifam d = base.descends.(ifam) <- d
-let patch_couple base ifam c = base.couples.(ifam) <- c
-
 let insert_string base s =
   let s = Utf8.normalize s in
   let len = Array.length base.strings in
@@ -290,27 +282,27 @@ let commit_notes _base _fname _s = () (* TODO *)
 let new_iper base = Array.length base.persons
 let new_ifam base = Array.length base.families
 
-let insert_person base ip p =
+let patch_person base ip p =
   let a = insert base.persons ip p in
   base.persons <- a
 
-let insert_family base ifam f =
+let patch_family base ifam f =
   let a = insert base.families ifam f in
   base.families <- a
 
-let insert_ascend base ip ascend =
+let patch_ascend base ip ascend =
   let a = insert base.ascends ip ascend in
   base.ascends <- a
 
-let insert_union base ip u =
+let patch_union base ip u =
   let a = insert base.unions ip u in
   base.unions <- a
 
-let insert_descend base ifam d =
+let patch_descend base ifam d =
   let a = insert base.descends ifam d in
   base.descends <- a
 
-let insert_couple base ifam c =
+let patch_couple base ifam c =
   let a = insert base.couples ifam c in
   base.couples <- a
 

@@ -45,15 +45,6 @@ val sort_person_list : Gwdb.base -> Gwdb.person list -> Gwdb.person list
 val sort_uniq_person_list : Gwdb.base -> Gwdb.person list -> Gwdb.person list
 (** Same as [sort_person_list] but also remove duplicates *)
 
-val father : 'a Def.gen_couple -> 'a
-(** Same as [Adef.father] *)
-
-val mother : 'a Def.gen_couple -> 'a
-(** Same as [Adef.mother] *)
-
-val parent_array : 'a Def.gen_couple -> 'a array
-(** Same as [Adef.parent_array] *)
-
 val homonyms :
   base:Gwdb.base -> first_name:string -> surname:string -> Gwdb.iper list
 

@@ -155,7 +155,7 @@ and eval_is_last env =
 and eval_parent conf env cpl sl =
   match get_env "cnt" env with
   | Vint i ->
-      let arr = Gutil.parent_array cpl in
+      let arr = Adef.parent_array cpl in
       let i = i - 1 in
       let k =
         if i >= 0 && i < Array.length arr then arr.(i)
@@ -281,7 +281,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "digest" ] -> eval_string_env "digest" env
   | [ "divorce" ] -> eval_divorce fam
   | [ "divorce"; s ] -> eval_divorce' fam s
-  | "father" :: sl -> eval_key (Gutil.father cpl) sl
+  | "father" :: sl -> eval_key (Adef.father cpl) sl
   | [ "fsources" ] ->
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | [ "is_first" ] -> eval_is_first env
@@ -537,7 +537,7 @@ let print_foreach print_ast _eval_expr =
         let fevents = get_fevent (get_env "fevents" env) in
         print_foreach_fwitness env fcd al fevents
     | [ "witness" ] -> print_foreach_witness env fcd al fam.witnesses
-    | [ "parent" ] -> print_foreach_parent env fcd al (Gutil.parent_array cpl)
+    | [ "parent" ] -> print_foreach_parent env fcd al (Adef.parent_array cpl)
     | _ -> raise Not_found
   and print_foreach_child env fcd al arr =
     for i = 0 to max 1 (Array.length arr) - 1 do

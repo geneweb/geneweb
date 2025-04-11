@@ -119,12 +119,6 @@ let patch_union base ip u = base.Dbdisk.func.Dbdisk.patch_union ip u
 let patch_family base ifam f = base.Dbdisk.func.Dbdisk.patch_family ifam f
 let patch_couple base ifam c = base.Dbdisk.func.Dbdisk.patch_couple ifam c
 let patch_descend base ifam d = base.Dbdisk.func.Dbdisk.patch_descend ifam d
-let insert_person = patch_person
-let insert_ascend = patch_ascend
-let insert_union = patch_union
-let insert_family = patch_family
-let insert_couple = patch_couple
-let insert_descend = patch_descend
 
 let delete_person base ip =
   patch_person base ip

@@ -5,7 +5,7 @@ let limit_display_length =
   fun s -> String.sub s 0 (min (String.length s) max_display_length)
 
 let file_path conf base fname =
-  Util.bpath
+  GWPARAM.bpath
     (List.fold_left Filename.concat
        (conf.Config.bname ^ ".gwb")
        [ Gwdb.base_notes_dir base; fname ^ ".txt" ])
@@ -159,7 +159,7 @@ let commit_notes conf base fnotes s =
   let fname = path_of_fnotes fnotes in
   let fpath =
     List.fold_left Filename.concat
-      (Util.bpath (conf.Config.bname ^ ".gwb"))
+      (GWPARAM.bpath (conf.Config.bname ^ ".gwb"))
       [ Gwdb.base_notes_dir base; fname ]
   in
   Files.mkdir_p (Filename.dirname fpath);
