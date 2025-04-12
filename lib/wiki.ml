@@ -33,10 +33,6 @@ open Util
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
-let buff3 = Buffer.create 16
-let buff2 = Buffer.create 16
-let buff1 = Buffer.create 16
-let buff = Buffer.create 16
 let first_cnt = 1
 let tab lev s = String.make (2 * lev) ' ' ^ s
 
@@ -163,15 +159,15 @@ let bold_italic_delimiter_at s i quot_lev =
     and {highlight} sequences in a string, and replaces it with the
     appropriate html code (<i>, <b>, ...) *)
 let bold_italic_syntax s =
-  Buffer.clear buff1;
+  let buff = Buffer.create 80 in
   let chars = [ '{'; '%'; '\'' ] in
   let slen = String.length s in
   let rec loop quot_lev i =
     (if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
      match quot_lev with
-     | Italic -> Buffer.add_string buff1 "</i>"
-     | Bold -> Buffer.add_string buff1 "</b>"
-     | BoldItalic -> Buffer.add_string buff1 "</b></i>"
+     | Italic -> Buffer.add_string buff "</i>"
+     | Bold -> Buffer.add_string buff "</b>"
+     | BoldItalic -> Buffer.add_string buff "</b></i>"
      | Zero -> ());
     if i = slen then () (* % allows escaping [, {, ' *)
     else if
@@ -182,63 +178,63 @@ let bold_italic_syntax s =
          || s.[i + 1] = '}' (* is this needed?, then why not ']' ?*)
          || s.[i + 1] = '\'')
     then (
-      Buffer.add_char buff1 s.[i + 1];
+      Buffer.add_char buff s.[i + 1];
       loop quot_lev (i + 2) (* single % are kept *))
     else if s.[i] = '%' then (
-      Buffer.add_char buff1 '%';
+      Buffer.add_char buff '%';
       loop quot_lev (i + 1) (* highlight *))
     else if s.[i] = '{' then (
-      Buffer.clear buff3;
+      let buff2 = Buffer.create 80 in
       let b, j =
         let rec loop j =
           if j = slen then ("", i + 1)
           else if j < slen - 1 && s.[j] = '%' then (
-            Buffer.add_char buff3 s.[j + 1];
+            Buffer.add_char buff2 s.[j + 1];
             loop (j + 2))
-          else if s.[j] = '}' then (Buffer.contents buff3, j + 1)
+          else if s.[j] = '}' then (Buffer.contents buff2, j + 1)
           else (
-            Buffer.add_char buff3 s.[j];
+            Buffer.add_char buff2 s.[j];
             loop (j + 1))
         in
         loop (i + 1)
       in
-      let s =
+      let t =
         if b <> "" then
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
-      Buffer.add_string buff1 s;
+      Buffer.add_string buff t;
       loop quot_lev j)
     else if bold_italic_delimiter_at s i quot_lev then (
-      let s, ql =
+      let t, ql =
         if quot_lev = Zero then ("<b><i>", BoldItalic) else ("</i></b>", Zero)
       in
-      Buffer.add_string buff1 s;
+      Buffer.add_string buff t;
       loop ql (i + 5))
     else if bold_delimiter_at s i quot_lev then (
-      let s, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
-      Buffer.add_string buff1 s;
+      let t, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
+      Buffer.add_string buff t;
       loop ql (i + 3))
     else if italic_delimiter_at s i quot_lev then (
-      let s, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
-      Buffer.add_string buff1 s;
+      let t, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
+      Buffer.add_string buff t;
       loop ql (i + 2))
     else if s.[i] = '\'' then (
-      Buffer.add_char buff1 '\'';
+      Buffer.add_char buff '\'';
       loop quot_lev (i + 1))
     else
       let k = find_first_char_from_list s i chars in
       match k with
-      | None -> Buffer.add_string buff1 (String.sub s i (String.length s - i))
+      | None -> Buffer.add_string buff (String.sub s i (String.length s - i))
       | Some k ->
-          Buffer.add_string buff1 (String.sub s i (k - i));
+          Buffer.add_string buff (String.sub s i (k - i));
           loop quot_lev k
   in
   loop Zero 0;
-  Printf.sprintf "trace: (%s)" (Buffer.contents buff1)
+  Buffer.contents buff
 
 let syntax_links conf wi s =
-  Buffer.clear buff;
+  let buff = Buffer.create 80 in
   let chars = [ '{'; '%'; '\''; '[' ] in
   let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
   let slen = String.length s in
@@ -268,7 +264,7 @@ let syntax_links conf wi s =
       Buffer.add_char buff '%';
       loop quot_lev pos (i + 1))
     else if s.[i] = '{' then (
-      Buffer.clear buff2;
+      let buff2 = Buffer.create 80 in
       let b, j =
         let rec loop j =
           if j = slen then ("", i + 1)
@@ -282,26 +278,26 @@ let syntax_links conf wi s =
         in
         loop (i + 1)
       in
-      let s =
+      let t =
         if String.length b <> 0 then
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
-      Buffer.add_string buff s;
+      Buffer.add_string buff t;
       loop quot_lev pos j)
     else if bold_italic_delimiter_at s i quot_lev then (
-      let s, ql =
+      let t, ql =
         if quot_lev = Zero then ("<i><b>", BoldItalic) else ("</b></i>", Zero)
       in
-      Buffer.add_string buff s;
+      Buffer.add_string buff t;
       loop ql pos (i + 5))
     else if bold_delimiter_at s i quot_lev then (
-      let s, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
-      Buffer.add_string buff s;
+      let t, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
+      Buffer.add_string buff t;
       loop ql pos (i + 3))
     else if italic_delimiter_at s i quot_lev then (
-      let s, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
-      Buffer.add_string buff s;
+      let t, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
+      Buffer.add_string buff t;
       loop ql pos (i + 2))
     else if s.[i] = '\'' then (
       Buffer.add_char buff '\'';
@@ -395,7 +391,7 @@ let syntax_links conf wi s =
               loop quot_lev pos (j - String.length none_s + k + 1))
   in
   loop Zero 1 0;
-  Printf.sprintf "Trace wiki syntax: (%s)" (Buffer.contents buff)
+  Buffer.contents buff
 
 let toc_list = [ "__NOTOC__"; "__TOC__"; "__SHORT_TOC__" ]
 
