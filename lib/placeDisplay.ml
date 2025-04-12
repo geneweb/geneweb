@@ -1,11 +1,12 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let print_html_places_surnames conf base
-    (array : (string list * (string * iper list) list) array) =
+    (array : (string list * (string * Driver.iper list) list) array) =
   let link_to_ind =
     List.assoc_opt "place_surname_link_to_ind" conf.base_env = Some "yes"
   in
@@ -25,7 +26,7 @@ let print_html_places_surnames conf base
         Output.print_sstring conf (string_of_int len);
         Output.print_sstring conf ")"
   in
-  let print_sn_list (snl : (string * iper list) list) =
+  let print_sn_list (snl : (string * Driver.iper list) list) =
     let snl =
       List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl
     in
@@ -141,7 +142,7 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
       (Place.fold_place_long_v6 inverted)
       filter
       (fun prev p ->
-        let value = (get_surname p, get_iper p) in
+        let value = (Driver.get_surname p, Driver.get_iper p) in
         match prev with Some list -> value :: list | None -> [ value ])
       (fun v ->
         let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
@@ -149,10 +150,10 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
           match (list, acc) with
           | [], _ -> acc
           | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc
-            when sou base sn = sn' ->
+            when Driver.sou base sn = sn' ->
               loop ((sn', iper :: iper_list) :: tl_acc) tl_list
           | (sn, iper) :: tl_list, _ ->
-              loop ((sou base sn, [ iper ]) :: acc) tl_list
+              loop ((Driver.sou base sn, [ iper ]) :: acc) tl_list
         in
         loop [] v)
       max_length

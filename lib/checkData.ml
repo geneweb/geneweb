@@ -1,5 +1,6 @@
-open Gwdb
 open Def
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 (* Basic types *)
 type dict_type =
@@ -435,18 +436,18 @@ let get_efam_place evt = evt.efam_place
 let get_efam_src evt = evt.efam_src
 
 (* Basic getters returning lists *)
-let get_birth_place_x p = [ get_birth_place p ]
-let get_baptism_place_x p = [ get_baptism_place p ]
-let get_death_place_x p = [ get_death_place p ]
-let get_burial_place_x p = [ get_burial_place p ]
-let get_birth_src_x p = [ get_birth_src p ]
-let get_baptism_src_x p = [ get_baptism_src p ]
-let get_death_src_x p = [ get_death_src p ]
-let get_burial_src_x p = [ get_burial_src p ]
-let get_psources_x p = [ get_psources p ]
-let get_marriage_place_x fam = [ get_marriage_place fam ]
-let get_marriage_src_x fam = [ get_marriage_src fam ]
-let get_fsources_x fam = [ get_fsources fam ]
+let get_birth_place_x p = [ Driver.get_birth_place p ]
+let get_baptism_place_x p = [ Driver.get_baptism_place p ]
+let get_death_place_x p = [ Driver.get_death_place p ]
+let get_burial_place_x p = [ Driver.get_burial_place p ]
+let get_birth_src_x p = [ Driver.get_birth_src p ]
+let get_baptism_src_x p = [ Driver.get_baptism_src p ]
+let get_death_src_x p = [ Driver.get_death_src p ]
+let get_burial_src_x p = [ Driver.get_burial_src p ]
+let get_psources_x p = [ Driver.get_psources p ]
+let get_marriage_place_x fam = [ Driver.get_marriage_place fam ]
+let get_marriage_src_x fam = [ Driver.get_marriage_src fam ]
+let get_fsources_x fam = [ Driver.get_fsources fam ]
 
 (* Generic collector for attributes - places or sources *)
 let collect_attributes base p
@@ -458,17 +459,19 @@ let collect_attributes base p
   List.iter
     (fun getter -> List.iter (fun x -> attrs := x :: !attrs) (getter p))
     std_attrs;
-  List.iter (fun evt -> attrs := epers_attr_get evt :: !attrs) (get_pevents p);
+  List.iter
+    (fun evt -> attrs := epers_attr_get evt :: !attrs)
+    (Driver.get_pevents p);
   Array.iter
     (fun ifam ->
-      let fam = foi base ifam in
+      let fam = Driver.foi base ifam in
       List.iter (fun x -> attrs := x :: !attrs) (marriage_attr fam);
       List.iter
         (fun evt -> attrs := efam_attr_get evt :: !attrs)
-        (get_fevents fam))
-    (get_family p);
+        (Driver.get_fevents fam))
+    (Driver.get_family p);
   !attrs
-  |> List.filter (fun i -> not (is_empty_string i))
+  |> List.filter (fun i -> not (Driver.is_empty_string i))
   |> List.sort_uniq compare
 
 let collect_places base p =
@@ -500,21 +503,21 @@ let collect_sources base p =
   let sources = ref sources in
   Array.iter
     (fun ifam ->
-      let fam = foi base ifam in
+      let fam = Driver.foi base ifam in
       List.iter (fun x -> sources := x :: !sources) (get_fsources_x fam))
-    (get_family p);
+    (Driver.get_family p);
   List.sort_uniq compare !sources
 
 let collect_dict_strings base = function
-  | Fnames -> fun p -> [ get_first_name p ]
-  | Snames -> fun p -> [ get_surname p ]
+  | Fnames -> fun p -> [ Driver.get_first_name p ]
+  | Snames -> fun p -> [ Driver.get_surname p ]
   | Places -> collect_places base
-  | PubNames -> fun p -> [ get_public_name p ]
-  | Qualifiers -> get_qualifiers
-  | Aliases -> get_aliases
-  | Occupation -> fun p -> [ get_occupation p ]
-  | Titles -> fun p -> List.map (fun t -> t.t_ident) (get_titles p)
-  | Estates -> fun p -> List.map (fun t -> t.t_place) (get_titles p)
+  | PubNames -> fun p -> [ Driver.get_public_name p ]
+  | Qualifiers -> Driver.get_qualifiers
+  | Aliases -> Driver.get_aliases
+  | Occupation -> fun p -> [ Driver.get_occupation p ]
+  | Titles -> fun p -> List.map (fun t -> t.t_ident) (Driver.get_titles p)
+  | Estates -> fun p -> List.map (fun t -> t.t_place) (Driver.get_titles p)
   | Sources -> collect_sources base
 
 let collect_all_errors base dict =
@@ -536,13 +539,13 @@ let collect_all_errors base dict =
 
   Collection.iter
     (fun i ->
-      let p = poi base i in
+      let p = Driver.poi base i in
       List.iter
         (fun istr ->
-          let s = sou base istr in
+          let s = Driver.sou base istr in
           if s <> "" then check_string s)
         (collect_strings p))
-    (ipers base);
+    (Driver.ipers base);
 
   let result = ref [] in
   Hashtbl.iter

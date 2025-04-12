@@ -3,19 +3,23 @@
 open Geneweb
 open Config
 open Def
-open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
-  if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p) then
-    true
+  if
+    k
+    = Name.strip_lower
+        (Driver.p_first_name base p ^ " " ^ Driver.p_surname base p)
+  then true
   else if
     List.exists
       (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
+      (Driver.person_misc_names base p (nobtit conf base))
   then true
   else false
 
@@ -52,8 +56,9 @@ let relation_print conf base p =
     match p_getenv conf.senv "ei" with
     | Some i ->
         conf.senv <- [];
-        let i = iper_of_string i in
-        if Gwdb.iper_exists base i then Some (pget conf base i) else None
+        let i = Driver.iper_of_string i in
+        if Geneweb_db.Driver.iper_exists base i then Some (pget conf base i)
+        else None
     | None -> (
         match find_person_in_env conf base "1" with
         | Some p1 ->
@@ -75,7 +80,8 @@ let specify conf base n pl1 pl2 pl3 =
             let rec add_rec = function
               | t1 :: tl1 ->
                   if
-                    eq_istr t1.t_ident t.t_ident && eq_istr t1.t_place t.t_place
+                    Driver.eq_istr t1.t_ident t.t_ident
+                    && Driver.eq_istr t1.t_place t.t_place
                   then t1 :: tl1
                   else t1 :: add_rec tl1
               | [] -> [ t ]
@@ -83,20 +89,20 @@ let specify conf base n pl1 pl2 pl3 =
             add_rec !tl
         in
         let compare_and_add t pn =
-          let pn = sou base pn in
+          let pn = Driver.sou base pn in
           if Name.crush_lower pn = n then add_tl t
           else
-            match get_qualifiers p with
+            match Driver.get_qualifiers p with
             | nn :: _ ->
-                let nn = sou base nn in
+                let nn = Driver.sou base nn in
                 if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t
             | _ -> ()
         in
         List.iter
           (fun t ->
-            match (t.t_name, get_public_name p) with
+            match (t.t_name, Driver.get_public_name p) with
             | Tname s, _ -> compare_and_add t s
-            | _, pn when sou base pn <> "" -> compare_and_add t pn
+            | _, pn when Driver.sou base pn <> "" -> compare_and_add t pn
             | _ -> ())
           (nobtit conf base p);
         (p, !tl))
@@ -107,8 +113,8 @@ let specify conf base n pl1 pl2 pl3 =
     let l =
       List.rev_map
         (fun (p, v) ->
-          let bi = get_birth p in
-          let bi = if bi = Date.cdate_None then get_baptism p else bi in
+          let bi = Driver.get_birth p in
+          let bi = if bi = Date.cdate_None then Driver.get_baptism p else bi in
           (p, v, Date.cdate_to_dmy_opt bi))
         ptll
     in
@@ -183,7 +189,7 @@ let person_selected conf base p =
   | Some "R" -> relation_print conf base p
   | Some _ -> incorrect_request conf ~comment:"incorrect em= value"
   | None ->
-      record_visited conf (get_iper p);
+      record_visited conf (Driver.get_iper p);
       Perso.print conf base p
 
 let person_selected_with_redirect conf base p =
@@ -247,15 +253,18 @@ let make_henv conf base =
     match Util.find_sosa_ref conf base with
     | Some p ->
         let x =
-          let first_name = p_first_name base p in
-          let surname = p_surname base p in
+          let first_name = Driver.p_first_name base p in
+          let surname = Driver.p_surname base p in
           if Util.accessible_by_key conf base p first_name surname then
             [
               ("pz", Name.lower first_name |> Mutil.encode);
               ("nz", Name.lower surname |> Mutil.encode);
-              ("ocz", get_occ p |> string_of_int |> Mutil.encode);
+              ("ocz", Driver.get_occ p |> string_of_int |> Mutil.encode);
             ]
-          else [ ("iz", get_iper p |> string_of_iper |> Mutil.encode) ]
+          else
+            [
+              ("iz", Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+            ]
         in
         { conf with henv = conf.henv @ x }
     | None -> conf
@@ -289,13 +298,15 @@ let make_henv conf base =
   let conf =
     let fn, oc, sn = GWPARAM.split_key conf.userkey in
     match
-      Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
+      Geneweb_db.Driver.person_of_key base fn sn
+        (if oc = "" then 0 else int_of_string oc)
     with
     | Some ip ->
         {
           conf with
           semi_public =
-            (if conf.semi_public then get_access (poi base ip) = SemiPublic
+            (if conf.semi_public then
+             Driver.get_access (Driver.poi base ip) = SemiPublic
             else true);
           user_iper = Some ip;
         }
@@ -374,14 +385,14 @@ let make_senv conf base =
         | None -> 0
       in
       let ip =
-        match person_of_key base vp vn voc with
+        match Driver.person_of_key base vp vn voc with
         | Some ip -> ip
         | None ->
             Hutil.incorrect_request conf
               ~comment:"Incorrect em=, ei=, ep=, en=, eoc= configuration";
             raise Exit
       in
-      let vi = string_of_iper ip in
+      let vi = Driver.string_of_iper ip in
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
@@ -419,7 +430,7 @@ let w_base ~none fn conf (bfile : string option) =
   match bfile with
   | None -> none conf
   | Some bfile ->
-      Gwdb.with_database bfile (fun base ->
+      Driver.with_database bfile (fun base ->
           let conf = make_henv conf base in
           let conf = make_senv conf base in
           let conf =
@@ -427,15 +438,15 @@ let w_base ~none fn conf (bfile : string option) =
             | Some p ->
                 {
                   conf with
-                  default_sosa_ref = (get_iper p, Some p);
-                  nb_of_persons = Gwdb.nb_of_persons base;
-                  nb_of_families = Gwdb.nb_of_families base;
+                  default_sosa_ref = (Driver.get_iper p, Some p);
+                  nb_of_persons = Driver.nb_of_persons base;
+                  nb_of_families = Driver.nb_of_families base;
                 }
             | None ->
                 {
                   conf with
-                  nb_of_persons = Gwdb.nb_of_persons base;
-                  nb_of_families = Gwdb.nb_of_families base;
+                  nb_of_persons = Driver.nb_of_persons base;
+                  nb_of_families = Driver.nb_of_families base;
                 }
           in
           fn conf base)
@@ -565,7 +576,7 @@ let treat_request =
                  | Some bfile -> (
                      (* We attempt to load the database in order to detect issues. *)
                      try
-                       Gwdb.with_database bfile ignore;
+                       Driver.with_database bfile ignore;
                        print_page
                      with _ -> handle_no_bfile)
                  | None -> handle_no_bfile)
@@ -685,7 +696,7 @@ let treat_request =
              | "L" ->
                  w_base @@ fun conf base ->
                  Perso.interp_templ "list" conf base
-                   (Gwdb.empty_person base Gwdb.dummy_iper)
+                   (Driver.empty_person base Driver.dummy_iper)
              | "LB" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_birth
              | "LD" when conf.wizard || conf.friend ->
@@ -802,7 +813,7 @@ let treat_request =
                                ~comment:"Missing fn= and sn= for m=NG"))
                  | Some i ->
                      relation_print conf base
-                       (pget conf base (iper_of_string i)))
+                       (pget conf base (Driver.iper_of_string i)))
              | "NOTES" ->
                  w_base (fun conf base ->
                      match
@@ -882,7 +893,7 @@ let treat_request =
                      | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
                      | _ ->
                          Perso.interp_templ ("tp0_" ^ f) conf base
-                           (Gwdb.empty_person base Gwdb.dummy_iper))
+                           (Driver.empty_person base Driver.dummy_iper))
                  | None ->
                      incorrect_request conf base ~comment:"Missing v= for m=TP")
              | "TT" -> w_base @@ TitleDisplay.print

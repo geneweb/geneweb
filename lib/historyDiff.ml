@@ -2,14 +2,15 @@
 
 open Config
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 type gen_record = {
   date : Adef.safe_string;
   wizard : Adef.safe_string;
-  gen_p : (iper, iper, string) gen_person;
-  gen_f : (iper, ifam, string) gen_family list;
-  gen_c : iper array list;
+  gen_p : (Driver.iper, Driver.iper, string) gen_person;
+  gen_f : (Driver.iper, Driver.ifam, string) gen_family list;
+  gen_c : Driver.iper array list;
 }
 
 (* Le nom du fichier historique (à partir de la clé personne). *)
@@ -106,16 +107,16 @@ let make_gen_record conf base first gen_p =
     in
     Util.sprintf_today conf
   in
-  let p = poi base gen_p.key_index in
-  let fam = get_family p in
+  let p = Driver.poi base gen_p.key_index in
+  let fam = Driver.get_family p in
   (* On fait en sorte qu'il y a une 'bijection' *)
   (* entre les familles et les enfants.         *)
   let gen_f, gen_c =
     Array.fold_right
       (fun ifam (accu_fam, accu_child) ->
-        let fam = foi base ifam in
-        let children = get_children fam in
-        let gen_f = gen_family_of_family fam in
+        let fam = Driver.foi base ifam in
+        let children = Driver.get_children fam in
+        let gen_f = Driver.gen_family_of_family fam in
         (Util.string_gen_family base gen_f :: accu_fam, children :: accu_child))
       fam ([], [])
   in
@@ -192,17 +193,17 @@ let record_diff conf base changed =
       | U_Add_parent (p, f) ->
           let p_file = history_file p.first_name p.surname p.occ in
           let p_fname = history_path conf p_file in
-          let cpl = foi base f.fam_index in
+          let cpl = Driver.foi base f.fam_index in
           let isp = Gutil.spouse p.key_index cpl in
-          let sp = poi base isp in
+          let sp = Driver.poi base isp in
           let sp_file =
             history_file
-              (sou base (get_first_name sp))
-              (sou base (get_surname sp))
-              (get_occ sp)
+              (Driver.sou base (Driver.get_first_name sp))
+              (Driver.sou base (Driver.get_surname sp))
+              (Driver.get_occ sp)
           in
           let sp_fname = history_path conf sp_file in
-          let gen_sp = gen_person_of_person sp in
+          let gen_sp = Driver.gen_person_of_person sp in
           let gen_sp = Util.string_gen_person base gen_sp in
           let gr = make_gen_record conf base false p in
           write_history_file conf p_file p_fname gr;
@@ -211,21 +212,21 @@ let record_diff conf base changed =
           (* Création des fichiers pour les enfants ajoutés. *)
           Array.iter
             (fun ip ->
-              let p = poi base ip in
+              let p = Driver.poi base ip in
               let person_file =
                 history_file
-                  (sou base (get_first_name p))
-                  (sou base (get_surname p))
-                  (get_occ p)
+                  (Driver.sou base (Driver.get_first_name p))
+                  (Driver.sou base (Driver.get_surname p))
+                  (Driver.get_occ p)
               in
               let fname = history_path conf person_file in
               if Sys.file_exists fname then ()
               else
-                let gen_p = gen_person_of_person p in
+                let gen_p = Driver.gen_person_of_person p in
                 let gen_p = Util.string_gen_person base gen_p in
                 let gr = make_gen_record conf base false gen_p in
                 write_history_file conf person_file fname gr)
-            (get_children cpl)
+            (Driver.get_children cpl)
       | U_Change_children_name (_, list) ->
           List.iter
             (fun ((ofn, osn, oocc, _oip), (fn, sn, occ, ip)) ->
@@ -235,11 +236,12 @@ let record_diff conf base changed =
                 let ofname = history_path conf o_person_file in
                 let fname = history_path conf person_file in
                 (try Sys.rename ofname fname with Sys_error _ -> ());
-                let p = poi base ip in
+                let p = Driver.poi base ip in
                 let p =
                   Futil.map_person_ps
                     (fun p -> p)
-                    (sou base) (gen_person_of_person p)
+                    (Driver.sou base)
+                    (Driver.gen_person_of_person p)
                 in
                 let gr = make_gen_record conf base false p in
                 write_history_file conf person_file fname gr))

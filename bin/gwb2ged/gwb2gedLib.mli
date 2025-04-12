@@ -1,8 +1,8 @@
 val gwb2ged :
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   bool ->
   Gwexport.gwexport_opts ->
-  (Gwdb.iper -> bool) * (Gwdb.ifam -> bool) ->
+  (Geneweb_db.Driver.iper -> bool) * (Geneweb_db.Driver.ifam -> bool) ->
   unit
 (** [gwb2ged base with_indexes opts sel]
     Converts a Geneweb database [base] to a GEDCOM file.

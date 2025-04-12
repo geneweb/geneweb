@@ -2,11 +2,11 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open Dag2html
 open Relation
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
 
 let dag_of_ind_dag_list indl =
   let indl, _ =
@@ -86,12 +86,12 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   let sl, _ =
     List.fold_left
       (fun (sl, i) ifam ->
-        ("&ef" ^ string_of_int i ^ "=" ^ string_of_ifam ifam ^ sl, i - 1))
+        ("&ef" ^ string_of_int i ^ "=" ^ Driver.string_of_ifam ifam ^ sl, i - 1))
       ("", List.length excl_faml - 1)
       excl_faml
   in
-  commd conf ^^^ "em=R&ei=" ^<^ string_of_iper ip1 ^<^ "&i="
-  ^<^ string_of_iper ip2
+  commd conf ^^^ "em=R&ei=" ^<^ Driver.string_of_iper ip1 ^<^ "&i="
+  ^<^ Driver.string_of_iper ip2
   ^<^ (if sps then "" else "&sp=0")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
 
@@ -108,14 +108,14 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
     let vbar_txt ip =
       let u = pget conf base ip in
-      let excl_faml = Array.to_list (get_family u) @ excl_faml in
+      let excl_faml = Array.to_list (Driver.get_family u) @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
     print_relationship_dag conf base elem_txt vbar_txt path next_txt
 
 let print_shortest_path conf base p1 p2 =
-  let ip1 = get_iper p1 in
-  let ip2 = get_iper p2 in
+  let ip1 = Driver.get_iper p1 in
+  let ip2 = Driver.get_iper p2 in
   if ip1 = ip2 then (
     let title _ =
       transl conf "relationship" |> Utf8.capitalize_fst
@@ -174,7 +174,8 @@ let parents_label conf base info = function
       let is =
         if nb_fields txt = 2 then
           match get_piece_of_branch conf base info (1, 1) with
-          | [ ip1 ] -> if get_sex (pget conf base ip1) = Male then 0 else 1
+          | [ ip1 ] ->
+              if Driver.get_sex (pget conf base ip1) = Male then 0 else 1
           | _ -> (* must be a bug *) 0
         else 0
       in
@@ -184,7 +185,8 @@ let parents_label conf base info = function
       let is =
         if nb_fields txt = 2 then
           match get_piece_of_branch conf base info (1, 1) with
-          | [ ip1 ] -> if get_sex (pget conf base ip1) = Male then 0 else 1
+          | [ ip1 ] ->
+              if Driver.get_sex (pget conf base ip1) = Male then 0 else 1
           | _ -> (* must be a bug *) 0
         else 0
       in
@@ -213,7 +215,7 @@ let ancestor_label conf base info x sex =
         if nb_fields txt = 6 then
           match get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if get_sex (pget conf base ip1) = Male then is else is + 3
+              if Driver.get_sex (pget conf base ip1) = Male then is else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
@@ -227,7 +229,7 @@ let ancestor_label conf base info x sex =
         if nb_fields txt = 6 then
           match get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if get_sex (pget conf base ip1) = Male then is else is + 3
+              if Driver.get_sex (pget conf base ip1) = Male then is else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
@@ -247,7 +249,7 @@ let child_in_law_label conf sex_child sex_parent =
   else nth_field txt ((2 * index_of_sex sex_parent) + is) |> Adef.safe
 
 let descendant_label conf base info x p =
-  let is = index_of_sex (get_sex p) in
+  let is = index_of_sex (Driver.get_sex p) in
   match x with
   | 1 -> transl_nth conf "a son/a daughter/a child" is |> Adef.safe
   | 2 ->
@@ -257,7 +259,7 @@ let descendant_label conf base info x p =
           let info = (info, fun r -> r.Consang.lens2) in
           match get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if get_sex (pget conf base ip1) = Male then is else is + 3
+              if Driver.get_sex (pget conf base ip1) = Male then is else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
@@ -272,9 +274,10 @@ let descendant_label conf base info x p =
           match get_piece_of_branch conf base info (1, 2) with
           | [ ip1; ip2 ] ->
               let is =
-                if get_sex (pget conf base ip1) = Male then is else is + 6
+                if Driver.get_sex (pget conf base ip1) = Male then is
+                else is + 6
               in
-              if get_sex (pget conf base ip2) = Male then is else is + 3
+              if Driver.get_sex (pget conf base ip2) = Male then is else is + 3
           | _ -> (* must be a bug *) is
         else is
       in
@@ -317,7 +320,7 @@ let brother_in_law_label conf brother_sex self_sex =
   else nth_field txt ((2 * index_of_sex self_sex) + is) |> Adef.safe
 
 let uncle_label conf base info x p =
-  let is = index_of_sex (get_sex p) in
+  let is = index_of_sex (Driver.get_sex p) in
   match x with
   | 1 ->
       let txt = "an uncle/an aunt" in
@@ -326,7 +329,7 @@ let uncle_label conf base info x p =
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if get_sex (pget conf base ip1) = Male then is else is + 2
+              if Driver.get_sex (pget conf base ip1) = Male then is else is + 2
           | _ -> (* must be a bug *) is
         else is
       in
@@ -338,7 +341,7 @@ let uncle_label conf base info x p =
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
           | [ ip1 ] ->
-              if get_sex (pget conf base ip1) = Male then is else is + 2
+              if Driver.get_sex (pget conf base ip1) = Male then is else is + 2
           | _ -> (* must be a bug *) is
         else is
       in
@@ -352,7 +355,7 @@ let uncle_label conf base info x p =
       |> Adef.safe
 
 let nephew_label conf x p =
-  let is = index_of_sex (get_sex p) in
+  let is = index_of_sex (Driver.get_sex p) in
   match x with
   | 1 -> Templ.apply_format conf (Some is) "a nephew/a niece" "" |> Adef.safe
   | 2 ->
@@ -367,8 +370,8 @@ let nephew_label conf x p =
       |> Adef.safe
 
 let same_parents conf base p1 p2 =
-  get_parents (pget conf base (get_iper p1))
-  = get_parents (pget conf base (get_iper p2))
+  Driver.get_parents (pget conf base (Driver.get_iper p1))
+  = Driver.get_parents (pget conf base (Driver.get_iper p2))
 
 let print_link_name conf base n p1 p2 sol =
   let pp1, pp2, (x1, x2, list), reltab = sol in
@@ -391,22 +394,28 @@ let print_link_name conf base n p1 p2 sol =
     let sp2 = pp2 <> None in
     if x2 = 0 then
       if sp1 && x1 = 1 then
-        (parent_in_law_label conf (get_sex ini_p1) (get_sex ini_p2), false, sp2)
+        ( parent_in_law_label conf (Driver.get_sex ini_p1)
+            (Driver.get_sex ini_p2),
+          false,
+          sp2 )
       else
         let info = ((info, x1), fun r -> r.Consang.lens1) in
-        (ancestor_label conf base info x1 (get_sex p2), sp1, sp2)
+        (ancestor_label conf base info x1 (Driver.get_sex p2), sp1, sp2)
     else if x1 = 0 then
       if sp2 && x2 = 1 then
-        (child_in_law_label conf (get_sex ini_p2) (get_sex ini_p1), sp1, false)
+        ( child_in_law_label conf (Driver.get_sex ini_p2) (Driver.get_sex ini_p1),
+          sp1,
+          false )
       else (descendant_label conf base (info, x2) x2 p2, sp1, sp2)
     else if x2 = x1 then
       if x2 = 1 && not (same_parents conf base p2 p1) then
-        (half_brother_label conf (get_sex p2), sp1, sp2)
-      else if x2 = 1 && (sp2 || sp1) && get_sex p2 <> Neuter then
-        ( brother_in_law_label conf (get_sex ini_p2) (get_sex ini_p1),
+        (half_brother_label conf (Driver.get_sex p2), sp1, sp2)
+      else if x2 = 1 && (sp2 || sp1) && Driver.get_sex p2 <> Neuter then
+        ( brother_in_law_label conf (Driver.get_sex ini_p2)
+            (Driver.get_sex ini_p1),
           false,
           false )
-      else (brother_label conf x1 (get_sex p2), sp1, sp2)
+      else (brother_label conf x1 (Driver.get_sex p2), sp1, sp2)
     else if x2 = 1 then (uncle_label conf base (info, x1) (x1 - x2) p2, sp1, sp2)
     else if x1 = 1 then (nephew_label conf (x2 - x1) p2, sp1, sp2)
     else if x2 < x1 then
@@ -414,7 +423,9 @@ let print_link_name conf base n p1 p2 sol =
         let info = ((info, x1), fun r -> r.Consang.lens1) in
         let s = ancestor_label conf base info (x1 - x2) Neuter in
         transl_a_of_gr_eq_gen_lev conf
-          (brother_label conf x2 (get_sex p2) : Adef.safe_string :> string)
+          (brother_label conf x2 (Driver.get_sex p2)
+            : Adef.safe_string
+            :> string)
           (s : Adef.safe_string :> string)
           (s : Adef.safe_string :> string)
         |> Adef.safe
@@ -430,7 +441,8 @@ let print_link_name conf base n p1 p2 sol =
           else
             let info = ((info, x2), fun r -> r.Consang.lens2) in
             match get_piece_of_branch conf base info (x2 - x1, x2 - x1) with
-            | [ ip2 ] -> if get_sex (pget conf base ip2) = Male then sm else sf
+            | [ ip2 ] ->
+                if Driver.get_sex (pget conf base ip2) = Male then sm else sf
             | _ -> sm
         in
         transl_a_of_gr_eq_gen_lev conf
@@ -444,7 +456,7 @@ let print_link_name conf base n p1 p2 sol =
   let s =
     if sp2 then
       transl_a_of_gr_eq_gen_lev conf
-        (transl_nth conf "the spouse" (index_of_sex (get_sex p2)))
+        (transl_nth conf "the spouse" (index_of_sex (Driver.get_sex p2)))
         (s : Adef.safe_string :> string)
         (s : Adef.safe_string :> string)
       |> Adef.safe
@@ -455,7 +467,7 @@ let print_link_name conf base n p1 p2 sol =
       match pp1 with
       | Some pp1 ->
           let s' =
-            get_sex pp1 |> index_of_sex
+            Driver.get_sex pp1 |> index_of_sex
             |> transl_nth conf "the spouse"
             |> Adef.safe
           in
@@ -600,7 +612,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   let lab proj x =
     let info = (((reltab, list), x), proj) in
     match list with
-    | [ (a, _) ] -> ancestor_label conf base info x (get_sex a)
+    | [ (a, _) ] -> ancestor_label conf base info x (Driver.get_sex a)
     | _ -> parents_label conf base info x
   in
   let print pp p (alab : Adef.safe_string) =
@@ -610,7 +622,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
       | None -> transl_a_of_b conf (alab :> string) (s :> string) (s :> string)
       | Some pp ->
           transl_a_of_gr_eq_gen_lev conf
-            (let s = transl_nth conf "the spouse" (index_of_sex (get_sex pp)) in
+            (let s =
+               transl_nth conf "the spouse" (index_of_sex (Driver.get_sex pp))
+             in
              transl_a_of_b conf (alab :> string) s s)
             (s :> string)
             (s :> string)
@@ -637,7 +651,7 @@ let max_br = 33
 
 let print_dag_links conf base p1 p2 rl =
   let module O = struct
-    type t = iper
+    type t = Driver.iper
 
     let compare = compare
   end in
@@ -650,13 +664,13 @@ let print_dag_links conf base p1 p2 rl =
         List.fold_left
           (fun anc_map (p, n) ->
             let pp1, pp2, nn, nt, maxlev =
-              try M.find (get_iper p) anc_map
+              try M.find (Driver.get_iper p) anc_map
               with Not_found -> (pp1, pp2, 0, 0, 0)
             in
             if nn >= max_br then anc_map
             else
               let v = (pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2)) in
-              M.add (get_iper p) v anc_map)
+              M.add (Driver.get_iper p) v anc_map)
           anc_map list)
       M.empty rl
   in
@@ -706,7 +720,7 @@ let print_dag_links conf base p1 p2 rl =
               (fun (l1, l2) (_, _, (x1, x2, list), _) ->
                 List.fold_left
                   (fun (l1, l2) (a, _) ->
-                    if get_iper a = ip then
+                    if Driver.get_iper a = ip then
                       let l1 = if List.mem x1 l1 then l1 else x1 :: l1 in
                       let l2 = if List.mem x2 l2 then l2 else x2 :: l2 in
                       (l1, l2)
@@ -776,13 +790,13 @@ let print_propose_upto conf base p1 p2 rl =
   | _ -> ()
 
 let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
-  let ip = get_iper a in
+  let ip = Driver.get_iper a in
   let sp1 = match pp1 with Some _ -> Some p1 | _ -> None in
   let sp2 = match pp2 with Some _ -> Some p2 | _ -> None in
   let p1 = match pp1 with Some p1 -> p1 | _ -> p1 in
   let p2 = match pp2 with Some p2 -> p2 | _ -> p2 in
-  let ip1 = get_iper p1 in
-  let ip2 = get_iper p2 in
+  let ip1 = Driver.get_iper p1 in
+  let ip2 = Driver.get_iper p2 in
   let dist = RelationLink.make_dist_tab conf base ip (max l1 l2 + 1) in
   let b1 = RelationLink.find_first_branch conf base dist ip l1 ip1 Neuter in
   let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
@@ -799,7 +813,7 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
         RelationLink.
           {
             ip;
-            sp = get_sex a;
+            sp = Driver.get_sex a;
             ip1;
             ip2;
             b1;
@@ -876,7 +890,7 @@ let print_main_relationship conf base long p1 p2 rel =
   | Some x -> conf.senv <- conf.senv @ [ ("color", Mutil.encode x) ]);
   (match rel with
   | None ->
-      if get_iper p1 = get_iper p2 then (
+      if Driver.get_iper p1 = Driver.get_iper p2 then (
         transl conf "it is the same person!"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf " ")
@@ -922,8 +936,8 @@ let print_main_relationship conf base long p1 p2 rel =
         (not all_by_marr)
         && authorized_age conf base p1
         && authorized_age conf base p2
-        && get_consang a1 != Adef.fix (-1)
-        && get_consang a2 != Adef.fix (-1)
+        && Driver.get_consang a1 != Adef.fix (-1)
+        && Driver.get_consang a2 != Adef.fix (-1)
       then (
         Output.print_sstring conf "<p>\n";
         Output.printf conf "<em>%s%s %s%%</em>"
@@ -937,7 +951,7 @@ let print_main_relationship conf base long p1 p2 rel =
   Hutil.trailer conf
 
 let multi_relation_next_txt conf pl2 lim assoc_txt =
-  let assoc_txt : (Gwdb.iper, string) Hashtbl.t = assoc_txt in
+  let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t = assoc_txt in
   match pl2 with
   | [] -> Adef.escaped ""
   | _ ->
@@ -950,14 +964,14 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
             let acc =
               try
                 "&t" ^<^ string_of_int n ^<^ "="
-                ^<^ (get_iper p |> Hashtbl.find assoc_txt |> Mutil.encode
+                ^<^ (Driver.get_iper p |> Hashtbl.find assoc_txt |> Mutil.encode
                       :> Adef.escaped_string)
                 ^^^ acc
               with Not_found -> acc
             in
             let acc =
               "&i" ^<^ string_of_int n ^<^ "="
-              ^<^ (get_iper p |> string_of_iper |> Mutil.encode
+              ^<^ (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode
                     :> Adef.escaped_string)
               ^^^ acc
             in
@@ -984,7 +998,7 @@ let print_no_relationship conf base pl =
   Hutil.trailer conf
 
 let print_multi_relation conf base pl lim assoc_txt =
-  let assoc_txt : (Gwdb.iper, string) Hashtbl.t = assoc_txt in
+  let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t = assoc_txt in
   let pl1, pl2 =
     if lim <= 0 then (pl, [])
     else
@@ -1002,8 +1016,8 @@ let print_multi_relation conf base pl lim assoc_txt =
   let path =
     let rec loop path = function
       | p1 :: (p2 :: _ as pl) -> (
-          let ip1 = get_iper p1 in
-          let ip2 = get_iper p2 in
+          let ip1 = Driver.get_iper p1 in
+          let ip2 = Driver.get_iper p2 in
           match get_shortest_path_relation conf base ip1 ip2 [] with
           | Some (path1, _) ->
               let path =
@@ -1025,7 +1039,7 @@ let print_multi_relation conf base pl lim assoc_txt =
     let elem_txt p =
       let content =
         try
-          let txt = Hashtbl.find assoc_txt (get_iper p) in
+          let txt = Hashtbl.find assoc_txt (Driver.get_iper p) in
           if txt <> "" then
             "<b>(" ^<^ (Util.escape_html txt :> Adef.safe_string) ^>^ ")</b>"
           else Adef.safe ""
@@ -1070,14 +1084,16 @@ let print conf base p = function
   | None -> relmenu_print conf base p
 
 let print_multi conf base =
-  let assoc_txt : (Gwdb.iper, string) Hashtbl.t = Hashtbl.create 53 in
+  let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t =
+    Hashtbl.create 53
+  in
   let pl =
     let rec loop pl i =
       let k = string_of_int i in
       match find_person_in_env conf base k with
       | Some p ->
           (match p_getenv conf.env ("t" ^ k) with
-          | Some x -> Hashtbl.add assoc_txt (get_iper p) x
+          | Some x -> Hashtbl.add assoc_txt (Driver.get_iper p) x
           | None -> ());
           loop (p :: pl) (i + 1)
       | None -> List.rev pl

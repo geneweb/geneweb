@@ -1,8 +1,8 @@
 open Config
 open Def
-open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
+module Driver = Geneweb_db.Driver
 
 let cp = Filesystem.copy_file ~perm:0o666
 
@@ -257,7 +257,8 @@ let print_link_delete_image conf base p =
     Output.print_sstring conf {|<div><a class="btn btn-danger mt-3" href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=DEL_IMAGE&i=";
-    Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
+    Output.print_string conf
+      (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
     Output.print_sstring conf {|">|};
     transl conf "delete" |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf {| |};
@@ -277,9 +278,9 @@ let print_send_image conf base mode p =
     if not h then (
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf " ";
-      Output.print_string conf (Util.escape_html (p_first_name base p));
-      Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
-      Output.print_string conf (Util.escape_html (p_surname base p)))
+      Output.print_string conf (Util.escape_html (Driver.p_first_name base p));
+      Output.print_sstring conf (Format.sprintf ".%d " (Driver.get_occ p));
+      Output.print_string conf (Util.escape_html (Driver.p_surname base p)))
   in
   Hutil.header conf title;
   Output.printf conf
@@ -289,7 +290,8 @@ let print_send_image conf base mode p =
     "<div class=\"d-inline-flex align-items-center mt-2\">\n";
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
-  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
+  Util.hidden_input conf "i"
+    (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
   Util.hidden_input conf "mode" (Adef.encoded mode);
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
   Output.print_sstring conf (Util.transl conf ":");
@@ -373,17 +375,17 @@ let effective_send_ok conf base p file =
   let _moved = move_file_to_save dir fname in
   write_file fname content;
   let changed =
-    U_Send_image (Util.string_gen_person base (gen_person_of_person p))
+    U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
   History.record conf base changed "si";
   print_sent conf base p
 
 let print_send_ok conf base =
   let ip =
-    try raw_get conf "i" |> Mutil.decode |> iper_of_string
+    try raw_get conf "i" |> Mutil.decode |> Driver.iper_of_string
     with Failure _ -> incorrect conf "print send ok"
   in
-  let p = poi base ip in
+  let p = Driver.poi base ip in
   raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
 
 (* carrousel *)
@@ -520,7 +522,7 @@ let effective_send_c_ok conf base p file file_name =
         (Printf.sprintf "effective send (writing .txt file %s)" fname)
   else ();
   let changed =
-    U_Send_image (Util.string_gen_person base (gen_person_of_person p))
+    U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
   History.record conf base changed
     (match mode with
@@ -545,9 +547,9 @@ let print_delete_image conf base p =
     |> transl_decline conf "delete"
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     if not h then (
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
-      let occ = get_occ p in
+      let fn = Driver.p_first_name base p in
+      let sn = Driver.p_surname base p in
+      let occ = Driver.get_occ p in
       Output.print_sstring conf (Util.transl conf ":");
       Output.print_sstring conf " ";
       Output.print_string conf (Util.escape_html fn);
@@ -560,7 +562,8 @@ let print_delete_image conf base p =
   Output.printf conf "<form method=\"post\" action=\"%s\">" conf.command;
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK");
-  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
+  Util.hidden_input conf "i"
+    (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
   Output.print_sstring conf
     {|<div class="mt-3"><button type="submit" class="btn btn-danger">|};
   transl_nth conf "validate/delete" 1
@@ -589,7 +592,7 @@ let effective_delete_ok conf base p =
   if move_file_to_save (fname ^ ext) dir = 0 then
     incorrect conf "effective delete (ok)";
   let changed =
-    U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
+    U_Delete_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
   History.record conf base changed "di";
   print_deleted conf base p
@@ -597,7 +600,7 @@ let effective_delete_ok conf base p =
 let print_del_ok conf base =
   match p_getenv conf.env "i" with
   | Some ip ->
-      let p = poi base (iper_of_string ip) in
+      let p = Driver.poi base (Driver.iper_of_string ip) in
       effective_delete_ok conf base p
   | None -> incorrect conf "print del ok"
 
@@ -605,7 +608,7 @@ let print_del conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some ip -> (
-      let p = poi base (iper_of_string ip) in
+      let p = Driver.poi base (Driver.iper_of_string ip) in
       match Image.get_portrait conf base p with
       | Some _ -> print_delete_image conf base p
       | None -> Hutil.incorrect_request conf)
@@ -653,7 +656,7 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
   else if move_file_to_save dir file = 0 then
     incorrect conf "effective delete (c_ok)";
   let changed =
-    U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
+    U_Delete_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
   History.record conf base changed
     (match mode with
@@ -680,7 +683,7 @@ let effective_copy_portrait_to_blason conf base p =
   in
   let dir = !GWPARAM.portraits_d conf.bname in
   let fname, url =
-    match Image.src_of_string conf (sou base (get_image p)) with
+    match Image.src_of_string conf (Driver.sou base (Driver.get_image p)) with
     | `Url u -> (create_url_file keydir u, true)
     | _ -> (Image.default_image_filename "portraits" base p, false)
   in
@@ -706,7 +709,7 @@ let effective_copy_portrait_to_blason conf base p =
   in
   cp portrait_filename blason_filename;
   History.record conf base
-    (U_Send_image (Util.string_gen_person base (gen_person_of_person p)))
+    (U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p)))
     "cb";
   blason_filename
 
@@ -739,7 +742,7 @@ let effective_copy_image_to_blason conf base p =
   in
   cp fname blason_filename;
   History.record conf base
-    (U_Send_image (Util.string_gen_person base (gen_person_of_person p)))
+    (U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p)))
     "cd";
   blason_filename
 
@@ -790,7 +793,7 @@ let effective_reset_c_ok conf base p =
   in
   swap_files file_in_new file_in_old;
   let changed =
-    U_Send_image (Util.string_gen_person base (gen_person_of_person p))
+    U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
   History.record conf base changed
     (match mode with
@@ -801,7 +804,7 @@ let effective_reset_c_ok conf base p =
   file_name
 
 (* ************************************************************************** *)
-(*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
+(*  [Fonc] print : Config.config -> Geneweb_db.Driver.base -> unit                         *)
 (* ************************************************************************** *)
 
 (* Carrousel image management with direct HTTP redirects:
@@ -817,7 +820,7 @@ let print_main_c conf base =
       | Some m -> (
           match Util.p_getenv conf.env "i" with
           | Some ip -> (
-              let p = poi base (Gwdb.iper_of_string ip) in
+              let p = Driver.poi base (Driver.iper_of_string ip) in
               let processed_filename =
                 match m with
                 | "SND_IMAGE_C_OK" ->
@@ -853,7 +856,7 @@ let print_main_c conf base =
                     if Image.has_blason conf base p true then
                       match Util.p_getenv conf.env "ia" with
                       | Some ia ->
-                          let fa = poi base (Gwdb.iper_of_string ia) in
+                          let fa = Driver.poi base (Driver.iper_of_string ia) in
                           Filename.basename (move_blason_file conf base p fa)
                       | None -> ""
                     else ""
@@ -936,7 +939,7 @@ let print_main_c conf base =
   | Some _ ->
       let p =
         match Util.p_getint conf.env "i" with
-        | Some ip -> poi base (Gwdb.iper_of_string (string_of_int ip))
+        | Some ip -> Driver.poi base (Driver.iper_of_string (string_of_int ip))
         | None -> failwith "No person index in success display"
       in
       Perso.interp_templ "carrousel" conf base p
@@ -945,9 +948,9 @@ let print conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some ip ->
-      let p = poi base (iper_of_string ip) in
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
+      let p = Driver.poi base (Driver.iper_of_string ip) in
+      let fn = Driver.p_first_name base p in
+      let sn = Driver.p_surname base p in
       if fn = "?" || sn = "?" then Hutil.incorrect_request conf
       else print_send_image conf base "portraist" p
 
@@ -955,8 +958,8 @@ let print_family conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some ip ->
-      let p = poi base (iper_of_string ip) in
-      let sn = p_surname base p in
+      let p = Driver.poi base (Driver.iper_of_string ip) in
+      let sn = Driver.p_surname base p in
       if sn = "?" then Hutil.incorrect_request conf
       else print_send_image conf base "blasons" p
 

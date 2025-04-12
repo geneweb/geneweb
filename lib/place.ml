@@ -1,9 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Gutil = Geneweb_db.Gutil
 
 (* max number of persons for which a m=RLM graph will be computed *)
 let max_rlm_nbr_default = 80
@@ -254,14 +256,14 @@ let get_opt conf =
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
     (fold_place : string -> 'a) (filter : 'a -> bool)
-    (mk_value : 'b option -> person -> 'b) (fn : 'b -> 'c) (max_length : int) :
-    ('a * 'c) array =
+    (mk_value : 'b option -> Driver.person -> 'b) (fn : 'b -> 'c)
+    (max_length : int) : ('a * 'c) array =
   let ht_size = 2048 in
   (* FIXME: find the good heuristic *)
   let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
   let long = p_getenv conf.env "display" = Some "long" in
   let ht_add istr p =
-    let key : 'a = sou base istr |> fold_place in
+    let key : 'a = Driver.sou base istr |> fold_place in
     if filter key then
       match Hashtbl.find_opt ht key with
       | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
@@ -273,29 +275,29 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
    let aux b fn p =
      if b then
        let x = fn p in
-       if not (is_empty_string x) then ht_add x p
+       if not (Driver.is_empty_string x) then ht_add x p
    in
-   Gwdb.Collection.iter
+   Collection.iter
      (fun i ->
        let p = pget conf base i in
        if authorized_age conf base p then (
-         aux add_birth get_birth_place p;
-         aux add_baptism get_baptism_place p;
-         aux add_death get_death_place p;
-         aux add_burial get_burial_place p))
-     (Gwdb.ipers base));
+         aux add_birth Driver.get_birth_place p;
+         aux add_baptism Driver.get_baptism_place p;
+         aux add_death Driver.get_death_place p;
+         aux add_burial Driver.get_burial_place p))
+     (Geneweb_db.Driver.ipers base));
   if add_marriage then
-    Gwdb.Collection.iter
+    Collection.iter
       (fun i ->
-        let fam = foi base i in
-        let pl_ma = get_marriage_place fam in
-        if not (is_empty_string pl_ma) then
-          let fath = pget conf base (get_father fam) in
-          let moth = pget conf base (get_mother fam) in
+        let fam = Driver.foi base i in
+        let pl_ma = Driver.get_marriage_place fam in
+        if not (Driver.is_empty_string pl_ma) then
+          let fath = pget conf base (Driver.get_father fam) in
+          let moth = pget conf base (Driver.get_mother fam) in
           if authorized_age conf base fath && authorized_age conf base moth then (
             ht_add pl_ma fath;
             ht_add pl_ma moth))
-      (Gwdb.ifams base);
+      (Geneweb_db.Driver.ifams base);
   let len = Hashtbl.length ht in
   let array = Array.make len (dummy_key, dummy_value) in
   let i = ref 0 in
@@ -359,7 +361,7 @@ let find_in conf x ini =
         | x :: _ -> Mutil.contains (low x) ini)
     true inil
 
-let get_ip_list (snl : (string * iper list) list) =
+let get_ip_list (snl : (string * Driver.iper list) list) =
   List.map snd snl |> List.flatten |> List.sort_uniq compare
 
 (* TODO clean-up pi (place) and qi (suburb??) *)
@@ -380,7 +382,7 @@ let print_ip_list conf places opt link_to_ind ipl =
         | [] -> acc
         | ip :: ipl ->
             loop (i + 1)
-              (Printf.sprintf "&i%d=%s" i (Gwdb.string_of_iper ip) ^ acc)
+              (Printf.sprintf "&i%d=%s" i (Driver.string_of_iper ip) ^ acc)
               ipl
       in
       loop 0 "" ipl
@@ -430,7 +432,7 @@ let strip_pl keep pll =
     loop [] 1 pll
 
 let print_html_places_surnames_short conf _base _link_to_ind
-    (arry : ((string list * string) * (string * iper list) list) array) =
+    (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
@@ -522,7 +524,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
                     | [] -> loop1 i l
                     | ip :: ipl ->
                         Output.printf conf "&i%d=%s%s" i
-                          (Gwdb.string_of_iper ip)
+                          (Driver.string_of_iper ip)
                           (Printf.sprintf "&p%d=%s" i
                              (places_to_string false pl));
                         loop2 (i + 1) ipl
@@ -549,7 +551,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
   Output.print_sstring conf "<p>"
 
 let print_html_places_surnames_long conf base link_to_ind
-    (arry : ((string list * string) * (string * iper list) list) array) =
+    (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k =
     (Mutil.encode (match p_getenv conf.env "k" with Some s -> s | _ -> "")
@@ -584,7 +586,7 @@ let print_html_places_surnames_long conf base link_to_ind
           Output.printf conf "<a href=\"%s" (commd conf :> string);
           Output.print_string conf (acces conf base @@ pget conf base @@ ip);
           Output.printf conf "\" title=\"%s\">%s</a>"
-            (sou base (get_first_name (poi base ip)))
+            (Driver.sou base (Driver.get_first_name (Driver.poi base ip)))
             sn
       | _ ->
           Output.printf conf "<a href=\"%s" (commd conf :> string);
@@ -593,7 +595,7 @@ let print_html_places_surnames_long conf base link_to_ind
     else Output.printf conf "%s" (sn :> string);
     print_ip_list conf places opt link_to_ind ips
   in
-  let print_sn_list (pl, sub) (snl : (string * iper list) list) =
+  let print_sn_list (pl, sub) (snl : (string * Driver.iper list) list) =
     Output.printf conf "<li>%s\n" (if sub <> "" then sub else "");
     let snl =
       (* sort surname list according to a_sort, f_sort *)
@@ -659,7 +661,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
       ~add_marriage ([], "") [] (fold_place_long inverted) filter
       (fun prev p ->
         (* add one ip to a list flagged by surname *)
-        let value = (get_surname p, get_iper p) in
+        let value = (Driver.get_surname p, Driver.get_iper p) in
         match prev with Some l -> value :: l | None -> [ value ])
       (fun v ->
         let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
@@ -667,10 +669,10 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
           match (l, acc) with
           | [], _ -> acc
           | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc
-            when sou base sn = sn' ->
+            when Driver.sou base sn = sn' ->
               loop ((sn', iper :: iper_list) :: tl_acc) tl_list
           | (sn, iper) :: tl_list, _ ->
-              loop ((sou base sn, [ iper ]) :: acc) tl_list
+              loop ((Driver.sou base sn, [ iper ]) :: acc) tl_list
         in
         loop [] v)
       max_length
@@ -697,7 +699,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
       }
   in
   Templ.output conf ifun Templ.Env.empty
-    (Gwdb.empty_person base Gwdb.dummy_iper)
+    (Driver.empty_person base Driver.dummy_iper)
     "buttons_places";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   let link_to_ind =

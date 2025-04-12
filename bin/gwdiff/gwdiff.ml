@@ -1,7 +1,8 @@
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 (*= TODO =====================================================================
   - Improve the way not to check several time the same persons.
@@ -16,11 +17,11 @@ let cr = ref ""
 (** Messages are printed when there is a difference between a person
     present in the two bases explored. *)
 type messages =
-  | MsgBadChild of iper
+  | MsgBadChild of Driver.iper
   | MsgBirthDate
   | MsgBirthPlace
-  | MsgChildMissing of iper
-  | MsgChildren of iper
+  | MsgChildMissing of Driver.iper
+  | MsgChildren of Driver.iper
   | MsgDeathDate
   | MsgDeathPlace
   | MsgDivorce
@@ -30,26 +31,28 @@ type messages =
   | MsgMarriageDate
   | MsgMarriagePlace
   | MsgSex
-  | MsgSpouseMissing of iper
-  | MsgSpouses of iper
+  | MsgSpouseMissing of Driver.iper
+  | MsgSpouses of Driver.iper
   | MsgSurname
 
 (** [person_string base iper]
     Returns the string associated to the person with id `iper` in the base
     `base`. *)
 let person_string base iper =
-  let p = poi base iper in
-  let fn = sou base (get_first_name p) in
-  let sn = sou base (get_surname p) in
-  if sn = "?" || fn = "?" then fn ^ " " ^ sn ^ " (#" ^ string_of_iper iper ^ ")"
-  else fn ^ "." ^ string_of_int (get_occ p) ^ " " ^ sn
+  let p = Driver.poi base iper in
+  let fn = Driver.sou base (Driver.get_first_name p) in
+  let sn = Driver.sou base (Driver.get_surname p) in
+  if sn = "?" || fn = "?" then
+    fn ^ " " ^ sn ^ " (#" ^ Driver.string_of_iper iper ^ ")"
+  else fn ^ "." ^ string_of_int (Driver.get_occ p) ^ " " ^ sn
 
 (** Returns the string associated to a person in HTML if the html option is set,
     otherwise it has the same effect tja, `person_string`. *)
 let person_link bname base iper target =
   if !html then
     Printf.sprintf "<A HREF=\"%s%s_w?i=%s\" TARGET=\"%s\">%s</A>" !root bname
-      (string_of_iper iper) target (person_string base iper)
+      (Driver.string_of_iper iper)
+      target (person_string base iper)
   else person_string base iper
 
 (** Prints a message *)
@@ -87,14 +90,14 @@ let print_message base1 msg =
 
 (** Prints messages associates to the two families identifiers in argument *)
 let print_f_messages base1 base2 ifam1 ifam2 res =
-  let f1 = foi base1 ifam1 in
-  let f2 = foi base2 ifam2 in
+  let f1 = Driver.foi base1 ifam1 in
+  let f2 = Driver.foi base2 ifam2 in
   Printf.printf "%s x %s%s/ %s x %s%s"
-    (person_link !in_file1 base1 (get_father f1) "base1")
-    (person_link !in_file1 base1 (get_mother f1) "base1")
+    (person_link !in_file1 base1 (Driver.get_father f1) "base1")
+    (person_link !in_file1 base1 (Driver.get_mother f1) "base1")
     !cr
-    (person_link !in_file2 base2 (get_father f2) "base2")
-    (person_link !in_file2 base2 (get_father f2) "base2")
+    (person_link !in_file2 base2 (Driver.get_father f2) "base2")
+    (person_link !in_file2 base2 (Driver.get_father f2) "base2")
     !cr;
   List.iter (print_message base1) res
 
@@ -118,7 +121,7 @@ let compatible_names src_name dest_name_list =
     if istr1 is not the empty string identifier, then istr2
     must not be. *)
 let compatible_str_field istr1 istr2 =
-  is_empty_string istr1 || not (is_empty_string istr2)
+  Driver.is_empty_string istr1 || not (Driver.is_empty_string istr2)
 
 (** Returns a list of intervals of SDN (SDN 1 is November 25, 4714 BC Gregorian
     calendar) of the date in argument. An interval has the format (b, b'),
@@ -303,12 +306,12 @@ let compatible_occupations p1 p2 =
     If first names are not compatible, the returned list will have MsgFirstName.
     If surnames are not compatible, the returned list will have MsgSurname. *)
 let compatible_persons_ligth base1 base2 p1 p2 =
-  let fn1 = sou base1 p1.first_name in
-  let fn2 = sou base2 p2.first_name in
-  let afn2 = fn2 :: List.map (sou base2) p2.first_names_aliases in
-  let sn1 = sou base1 p1.surname in
-  let sn2 = sou base2 p2.surname in
-  let asn2 = sn2 :: List.map (sou base2) p2.surnames_aliases in
+  let fn1 = Driver.sou base1 p1.first_name in
+  let fn2 = Driver.sou base2 p2.first_name in
+  let afn2 = fn2 :: List.map (Driver.sou base2) p2.first_names_aliases in
+  let sn1 = Driver.sou base1 p1.surname in
+  let sn2 = Driver.sou base2 p2.surname in
+  let asn2 = sn2 :: List.map (Driver.sou base2) p2.surnames_aliases in
   let res1 = if compatible_names fn1 afn2 then [] else [ MsgFirstName ] in
   let res2 = if compatible_names sn1 asn2 then [] else [ MsgSurname ] in
   res1 @ res2
@@ -328,8 +331,8 @@ let rec find_compatible_persons_ligth base1 base2 iper1 iper2_list =
   match iper2_list with
   | [] -> []
   | head :: rest ->
-      let p1 = gen_person_of_person (poi base1 iper1) in
-      let p2 = gen_person_of_person (poi base2 head) in
+      let p1 = Driver.gen_person_of_person (Driver.poi base1 iper1) in
+      let p2 = Driver.gen_person_of_person (Driver.poi base2 head) in
       let c_rest = find_compatible_persons_ligth base1 base2 iper1 rest in
       if compatible_persons_ligth base1 base2 p1 p2 = [] then head :: c_rest
       else c_rest
@@ -340,8 +343,8 @@ let rec find_compatible_persons base1 base2 iper1 iper2_list =
   match iper2_list with
   | [] -> []
   | head :: rest ->
-      let p1 = gen_person_of_person (poi base1 iper1) in
-      let p2 = gen_person_of_person (poi base2 head) in
+      let p1 = Driver.gen_person_of_person (Driver.poi base1 iper1) in
+      let p2 = Driver.gen_person_of_person (Driver.poi base2 head) in
       let c_rest = find_compatible_persons base1 base2 iper1 rest in
       if compatible_persons base1 base2 p1 p2 = [] then head :: c_rest
       else c_rest
@@ -350,12 +353,12 @@ let rec find_compatible_persons base1 base2 iper1 iper2_list =
     compatible (only checking names) and returns the associated messages list. *)
 let compatible_unions base1 base2 iper1 iper2 ifam1 ifam2 =
   let get_spouse base iper ifam =
-    let f = foi base ifam in
-    if iper = get_father f then poi base (get_mother f)
-    else poi base (get_father f)
+    let f = Driver.foi base ifam in
+    if iper = Driver.get_father f then Driver.poi base (Driver.get_mother f)
+    else Driver.poi base (Driver.get_father f)
   in
-  let spouse1 = gen_person_of_person (get_spouse base1 iper1 ifam1) in
-  let spouse2 = gen_person_of_person (get_spouse base2 iper2 ifam2) in
+  let spouse1 = Driver.gen_person_of_person (get_spouse base1 iper1 ifam1) in
+  let spouse2 = Driver.gen_person_of_person (get_spouse base2 iper2 ifam2) in
   compatible_persons_ligth base1 base2 spouse1 spouse2
 
 (** [find_compatible_unions base1 base2 iper1 iper2_list ifam1 ifam2_list]
@@ -383,8 +386,8 @@ let compatible_divorces d1 d2 =
 (** Checks the compatibility of marriages (mariage date, divorce
     and mariage place), then print the list of messages calculated. *)
 let compatible_marriages base1 base2 ifam1 ifam2 =
-  let f1 = gen_family_of_family (foi base1 ifam1) in
-  let f2 = gen_family_of_family (foi base2 ifam2) in
+  let f1 = Driver.gen_family_of_family (Driver.foi base1 ifam1) in
+  let f2 = Driver.gen_family_of_family (Driver.foi base2 ifam2) in
   let res1 =
     if compatible_cdates f1.marriage f2.marriage then []
     else [ MsgMarriageDate ]
@@ -402,22 +405,22 @@ let compatible_marriages base1 base2 ifam1 ifam2 =
 (** Calculates the compatibility of two persons and prints the associated
     messages *)
 let pdiff base1 base2 iper1 iper2 =
-  let p1 = gen_person_of_person (poi base1 iper1) in
-  let p2 = gen_person_of_person (poi base2 iper2) in
+  let p1 = Driver.gen_person_of_person (Driver.poi base1 iper1) in
+  let p2 = Driver.gen_person_of_person (Driver.poi base2 iper2) in
   let res = compatible_persons base1 base2 p1 p2 in
   if res = [] then () else print_p_messages base1 base2 iper1 iper2 res
 
 (** Calculates the compatibility of two persons' families and prints the
     associated messages. *)
 let compatible_parents base1 base2 iper1 iper2 =
-  let a1 = get_parents (poi base1 iper1) in
-  let a2 = get_parents (poi base2 iper2) in
+  let a1 = Driver.get_parents (Driver.poi base1 iper1) in
+  let a2 = Driver.get_parents (Driver.poi base2 iper2) in
   match (a1, a2) with
   | Some ifam1, Some ifam2 ->
-      let f1 = foi base1 ifam1 in
-      let f2 = foi base2 ifam2 in
-      let _ = pdiff base1 base2 (get_father f1) (get_father f2) in
-      let _ = pdiff base1 base2 (get_mother f1) (get_mother f2) in
+      let f1 = Driver.foi base1 ifam1 in
+      let f2 = Driver.foi base2 ifam2 in
+      let _ = pdiff base1 base2 (Driver.get_father f1) (Driver.get_father f2) in
+      let _ = pdiff base1 base2 (Driver.get_mother f1) (Driver.get_mother f2) in
       compatible_marriages base1 base2 ifam1 ifam2
   | None, _ -> ()
   | Some _, None ->
@@ -428,66 +431,70 @@ let compatible_parents base1 base2 iper1 iper2 =
 let rec ddiff base1 base2 iper1 iper2 d_tab =
   (* S: Simplify with statement:
      let ddiff iper1 iper2 = ddiff base1 base2 iper1 iper2 d_tab *)
-  let d_check = Gwdb.Marker.get d_tab iper1 in
+  let d_check = Collection.Marker.get d_tab iper1 in
   if List.mem iper2 d_check then ()
-  else
-    let _ = Gwdb.Marker.set d_tab iper1 (iper2 :: d_check) in
-    let spouse f iper =
-      if iper = get_father f then get_mother f else get_father f
+  else Collection.Marker.set d_tab iper1 (iper2 :: d_check);
+  let spouse f iper =
+    if iper = Driver.get_father f then Driver.get_mother f
+    else Driver.get_father f
+  in
+  let udiff base1 base2 iper1 iper2 ifam1 ifam2 =
+    let fd b1 b2 ip2_list ip1 =
+      match find_compatible_persons_ligth b1 b2 ip1 ip2_list with
+      | [ ip2 ] -> ddiff base1 base2 ip1 ip2 d_tab
+      | [] -> print_p_messages base1 base2 iper1 iper2 [ MsgChildMissing ip1 ]
+      | rest_list -> (
+          match find_compatible_persons b1 b2 ip1 rest_list with
+          | [ best_ip2 ] -> ddiff base1 base2 ip1 best_ip2 d_tab
+          | [] -> print_p_messages base1 base2 iper1 iper2 [ MsgBadChild ip1 ]
+          | _ -> print_p_messages base1 base2 iper1 iper2 [ MsgChildren ip1 ])
     in
-    let udiff base1 base2 iper1 iper2 ifam1 ifam2 =
-      let fd b1 b2 ip2_list ip1 =
-        match find_compatible_persons_ligth b1 b2 ip1 ip2_list with
-        | [ ip2 ] -> ddiff base1 base2 ip1 ip2 d_tab
-        | [] -> print_p_messages base1 base2 iper1 iper2 [ MsgChildMissing ip1 ]
-        | rest_list -> (
-            match find_compatible_persons b1 b2 ip1 rest_list with
-            | [ best_ip2 ] -> ddiff base1 base2 ip1 best_ip2 d_tab
-            | [] -> print_p_messages base1 base2 iper1 iper2 [ MsgBadChild ip1 ]
-            | _ -> print_p_messages base1 base2 iper1 iper2 [ MsgChildren ip1 ])
-      in
-      let f1 = foi base1 ifam1 in
-      let f2 = foi base2 ifam2 in
-      let p1 = spouse f1 iper1 in
-      let p2 = spouse f2 iper2 in
-      let d1 = Array.to_list (get_children (foi base1 ifam1)) in
-      let d2 = Array.to_list (get_children (foi base2 ifam2)) in
-      pdiff base1 base2 p1 p2;
-      List.iter (fd base1 base2 d2) d1
-    in
-    let fu b1 b2 ifam2_list ifam1 =
-      match find_compatible_unions b1 b2 iper1 iper2 ifam1 ifam2_list with
-      | [ ifam2 ] ->
-          compatible_marriages b1 b2 ifam1 ifam2;
-          compatible_parents b1 b2
-            (spouse (foi base1 ifam1) iper1)
-            (spouse (foi base2 ifam2) iper2);
-          udiff b1 b2 iper1 iper2 ifam1 ifam2
-      | [] ->
-          print_p_messages base1 base2 iper1 iper2
-            [ MsgSpouseMissing (spouse (foi base1 ifam1) iper1) ]
-      | _ ->
-          print_p_messages base1 base2 iper1 iper2
-            [ MsgSpouses (spouse (foi base1 ifam1) iper1) ]
-    in
-    let u1 = Array.to_list (get_family (poi base1 iper1)) in
-    let u2 = Array.to_list (get_family (poi base2 iper2)) in
-    pdiff base1 base2 iper1 iper2;
-    List.iter (fu base1 base2 u2) u1
+    let f1 = Driver.foi base1 ifam1 in
+    let f2 = Driver.foi base2 ifam2 in
+    let p1 = spouse f1 iper1 in
+    let p2 = spouse f2 iper2 in
+    let d1 = Array.to_list (Driver.get_children (Driver.foi base1 ifam1)) in
+    let d2 = Array.to_list (Driver.get_children (Driver.foi base2 ifam2)) in
+    pdiff base1 base2 p1 p2;
+    List.iter (fd base1 base2 d2) d1
+  in
+  let fu b1 b2 ifam2_list ifam1 =
+    match find_compatible_unions b1 b2 iper1 iper2 ifam1 ifam2_list with
+    | [ ifam2 ] ->
+        compatible_marriages b1 b2 ifam1 ifam2;
+        compatible_parents b1 b2
+          (spouse (Driver.foi base1 ifam1) iper1)
+          (spouse (Driver.foi base2 ifam2) iper2);
+        udiff b1 b2 iper1 iper2 ifam1 ifam2
+    | [] ->
+        print_p_messages base1 base2 iper1 iper2
+          [ MsgSpouseMissing (spouse (Driver.foi base1 ifam1) iper1) ]
+    | _ ->
+        print_p_messages base1 base2 iper1 iper2
+          [ MsgSpouses (spouse (Driver.foi base1 ifam1) iper1) ]
+  in
+  let u1 = Array.to_list (Driver.get_family (Driver.poi base1 iper1)) in
+  let u2 = Array.to_list (Driver.get_family (Driver.poi base2 iper2)) in
+  pdiff base1 base2 iper1 iper2;
+  List.iter (fu base1 base2 u2) u1
 
 (** Returns the eldest persons on the base starting from the persons in argument. *)
 let rec find_top base1 base2 iper1 iper2 =
-  let p1 = gen_person_of_person (poi base1 iper1) in
-  let p2 = gen_person_of_person (poi base2 iper2) in
+  let p1 = Driver.gen_person_of_person (Driver.poi base1 iper1) in
+  let p2 = Driver.gen_person_of_person (Driver.poi base2 iper2) in
   if compatible_persons_ligth base1 base2 p1 p2 = [] then
-    let a1 = get_parents (poi base1 iper1) in
-    let a2 = get_parents (poi base2 iper2) in
+    let a1 = Driver.get_parents (Driver.poi base1 iper1) in
+    let a2 = Driver.get_parents (Driver.poi base2 iper2) in
     match (a1, a2) with
     | Some ifam1, Some ifam2 ->
-        let f1 = foi base1 ifam1 in
-        let f2 = foi base2 ifam2 in
-        let f_top_list = find_top base1 base2 (get_father f1) (get_father f2) in
-        let m_top_list = find_top base1 base2 (get_mother f1) (get_mother f2) in
+        let f1 = Driver.foi base1 ifam1 in
+        let f2 = Driver.foi base2 ifam2 in
+        let f_top_list =
+          find_top base1 base2 (Driver.get_father f1) (Driver.get_father f2)
+        in
+        let m_top_list =
+          find_top base1 base2 (Driver.get_mother f1) (Driver.get_mother f2)
+        in
         f_top_list @ m_top_list
     | _ -> [ (iper1, iper2) ]
   else (
@@ -514,7 +521,9 @@ let addiff base1 base2 iper1 iper2 d_tab =
 (* Main *)
 
 let gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
-  let desc_tab = Gwdb.iper_marker (Gwdb.ipers base1) [] in
+  let desc_tab =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base1) []
+  in
   match (d_mode, ad_mode) with
   | true, _ | false, false -> ddiff base1 base2 iper1 iper2 desc_tab
   | false, true -> addiff base1 base2 iper1 iper2 desc_tab
@@ -618,13 +627,13 @@ let check_args () =
     exit 2)
 
 let load_base f k =
-  Gwdb.with_database f (fun base ->
-      load_ascends_array base;
-      load_strings_array base;
+  Driver.with_database f (fun base ->
+      Driver.load_ascends_array base;
+      Driver.load_strings_array base;
       if not !mem then (
-        load_unions_array base;
-        load_couples_array base;
-        load_descends_array base);
+        Driver.load_unions_array base;
+        Driver.load_couples_array base;
+        Driver.load_descends_array base);
       k base)
 
 let main () =
@@ -633,8 +642,8 @@ let main () =
   (* [base1] is the reference base and [base2] is the destination base. *)
   load_base !in_file1 @@ fun base1 ->
   load_base !in_file2 @@ fun base2 ->
-  let iper1 = person_of_key base1 !p1_fn !p1_sn !p1_occ in
-  let iper2 = person_of_key base2 !p2_fn !p2_sn !p2_occ in
+  let iper1 = Driver.person_of_key base1 !p1_fn !p1_sn !p1_occ in
+  let iper2 = Driver.person_of_key base2 !p2_fn !p2_sn !p2_occ in
   if !html then Printf.printf "<BODY>\n";
   (match (iper1, iper2) with
   | None, _ ->

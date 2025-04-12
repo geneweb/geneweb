@@ -1,6 +1,6 @@
 open Config
-open Gwdb
 module Logs = Geneweb_logs.Logs
+module Driver = Geneweb_db.Driver
 
 let path_str path =
   match path with Some (`Path pa) -> pa | Some (`Url u) -> u | None -> ""
@@ -21,8 +21,9 @@ let default_image_filename_of_key mode first_name surname occ =
 
 let default_image_filename_aux mode base p saved =
   let name =
-    default_image_filename_of_key mode (p_first_name base p) (p_surname base p)
-      (get_occ p)
+    default_image_filename_of_key mode
+      (Driver.p_first_name base p)
+      (Driver.p_surname base p) (Driver.get_occ p)
   in
   if saved then Filename.concat "saved" name else name
 
@@ -193,15 +194,16 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 let is_not_private_img _conf fname =
   not (Mutil.contains fname ("private" ^ Filename.dir_sep))
 
-(** [has_access_to_image mode conf base p] is true iif we can see [p]'s portrait or blason. *)
+(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
 let has_access_to_image mode conf base p =
-  let img = get_image p in
+  let img = Driver.get_image p in
   (conf.wizard || conf.friend)
   || (not conf.no_image)
      && Util.authorized_age conf base p
-     && ((not (is_empty_string img))
+     && ((not (Driver.is_empty_string img))
         || full_image_path mode conf base p false <> None)
-     && is_not_private_img conf (sou base img)
+     && is_not_private_img conf (Driver.sou base img)
+
 (* TODO: privacy settings should be in db not in url *)
 
 (** [has_access_to_carrousel conf base p] is true iif ???. *)
@@ -278,7 +280,7 @@ let get_portrait_aux conf base p saved =
   in
   if has_access_to_image "portraits" conf base p then
     if not saved then
-      match src_of_string conf (sou base (get_image p)) with
+      match src_of_string conf (Driver.sou base (Driver.get_image p)) with
       | `Src_with_size_info _s as s_info -> (
           match parse_src_with_size_info conf s_info with
           | Error _e -> None
@@ -325,10 +327,10 @@ let get_blason_aux conf base p self saved =
       | `Path p -> Some (`Path p)
       | `Url u -> Some (`Url u)
       | `Empty -> (
-          match get_parents p with
+          match Driver.get_parents p with
           | Some ifam when not self ->
-              let cpl = foi base ifam in
-              let fa = poi base (get_father cpl) in
+              let cpl = Driver.foi base ifam in
+              let fa = Driver.poi base (Driver.get_father cpl) in
               loop fa
           | _ -> None)
     in
@@ -366,11 +368,11 @@ let has_blason_stop conf base p =
 let get_blason_owner conf base p =
   if has_access_to_image "blasons" conf base p then
     let rec loop p =
-      match get_parents p with
+      match Driver.get_parents p with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let fa_iper = get_father cpl in
-          let fa = poi base fa_iper in
+          let cpl = Driver.foi base ifam in
+          let fa_iper = Driver.get_father cpl in
+          let fa = Driver.poi base fa_iper in
           if get_blason conf base fa true <> None then Some fa_iper else loop fa
       | _ -> None
     in
@@ -381,9 +383,9 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
   let sp2_ = Mutil.tr ' ' '_' in
   let old_key =
     Format.sprintf "%s.%d.%s"
-      (get_first_name p |> sou base |> Name.lower |> sp2_)
-      (get_occ p)
-      (get_surname p |> sou base |> Name.lower |> sp2_)
+      (Driver.get_first_name p |> Driver.sou base |> Name.lower |> sp2_)
+      (Driver.get_occ p)
+      (Driver.get_surname p |> Driver.sou base |> Name.lower |> sp2_)
   in
   let new_key =
     Format.sprintf "%s.%d.%s"
@@ -428,7 +430,7 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
 
 let get_portrait_with_size conf base p =
   if has_access_to_image "portraits" conf base p then
-    match src_of_string conf (sou base (get_image p)) with
+    match src_of_string conf (Driver.sou base (Driver.get_image p)) with
     | `Src_with_size_info _s as s_info -> (
         match parse_src_with_size_info conf s_info with
         | Error _e -> None
@@ -462,10 +464,10 @@ let get_blason_with_size conf base p self =
             Some (path, size_from_path p |> Result.to_option)
           else None
       | `Empty -> (
-          match get_parents p with
+          match Driver.get_parents p with
           | Some ifam when not self ->
-              let cpl = foi base ifam in
-              let fa = poi base (get_father cpl) in
+              let cpl = Driver.foi base ifam in
+              let fa = Driver.poi base (Driver.get_father cpl) in
               loop fa
           | _ -> (
               match full_image_path "blasons" conf base p false with

@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 open Config
 open Def
-open Gwdb
 
 val is_welcome : bool ref
 
@@ -29,10 +28,10 @@ val open_etc_file : Config.config -> string -> (in_channel * string) option
     inside the base directory or inside one of assets directories.
     Returns input channel and the path to given template. *)
 
-val escache_value : base -> Adef.encoded_string
+val escache_value : Geneweb_db.Driver.base -> Adef.encoded_string
 (** Returns the date of the base directory last update *)
 
-val commit_patches : config -> base -> unit
+val commit_patches : config -> Geneweb_db.Driver.base -> unit
 (** Commits the patches and logs the modification *)
 
 val update_wf_trace : config -> string -> unit
@@ -89,31 +88,57 @@ val hidden_input_s : config -> string -> string -> unit
 val submit_input : config -> string -> Adef.encoded_string -> unit
 (** [submit_input conf k v] *)
 
-val nobtit : config -> base -> person -> title list
+val nobtit :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.title list
 (** [nobtit conf base p] returns list of titles of [p] from the [base]
     that respects constraints imposed by [conf.allowed_titles] and
     [conf.denied_titles] *)
 
 val strictly_after_private_years : dmy -> int -> bool
 
-val authorized_age : config -> base -> person -> bool
+val authorized_age :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
-val is_old_person : config -> (iper, iper, istr) gen_person -> bool
+val is_old_person :
+  config ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.istr )
+  gen_person ->
+  bool
+
 val start_with : string -> int -> string -> bool
 val start_with_vowel : config -> string -> bool
-val access_status : person -> string
+val access_status : Geneweb_db.Driver.person -> string
 
 val acces_n :
-  config -> base -> Adef.escaped_string -> person -> Adef.escaped_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Adef.escaped_string ->
+  Geneweb_db.Driver.person ->
+  Adef.escaped_string
 (** Returns URL query string to access nth person
     (e.g. for person 2 in url: p2=foo&n2=bar&oc2=1 *)
 
-val acces : config -> base -> person -> Adef.escaped_string
+val acces :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.escaped_string
 
-val accessible_by_key : config -> base -> person -> string -> string -> bool
+val accessible_by_key :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  string ->
+  string ->
+  bool
 (** [accessible_by_key conf base p fn sn]
-    Tells if person could be accessed by his first name and surname
+    Tells if Geneweb_db.Driver.person could be accessed by his first name and surname
 
     i.e. current base configuration and user rights allow this and
     person's name is suitable for searching by key (e.g. `? ?` is not)
@@ -128,14 +153,16 @@ val wprint_geneweb_link :
   config -> Adef.escaped_string -> Adef.safe_string -> unit
 (** Prints on the socket link created by [geneweb_link]. *)
 
-val is_restricted : config -> base -> iper -> bool
+val is_restricted :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> bool
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
     disabled returns always [false]. *)
 
-val is_hidden : person -> bool
+val is_hidden : Geneweb_db.Driver.person -> bool
 (** Tells if person is hiden (if his surname is empty) *)
 
-val is_public : config -> base -> person -> bool
+val is_public :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** Tells if person is public
     - access = Public or
     - IfTitle and has titles or
@@ -143,9 +170,13 @@ val is_public : config -> base -> person -> bool
 
 val private_txt : config -> string -> string
 
-val pget_opt : config -> base -> iper -> person option
+val pget_opt :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper ->
+  Geneweb_db.Driver.person option
 (** Returns person option with giving id from the base.
-    Wrapper around `Gwdb.poi` defined such as:
+    Wrapper around `Geneweb_db.poi` defined such as:
     - Some ip: if user have permissions or `use_restrict` disabled.
     - None: if `conf.use_restrict` (option defined in .gwf file):
       checks that the user has enought rights to see
@@ -153,26 +184,40 @@ val pget_opt : config -> base -> iper -> person option
       If the user does not have enought permissions, returns
       None. *)
 
-val pget : config -> base -> iper -> person
+val pget :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper ->
+  Geneweb_db.Driver.person
 (** Value of [pget_opt], map None to empty_person *)
 
 val string_gen_person :
-  base -> (iper, iper, istr) gen_person -> (iper, iper, string) gen_person
+  Geneweb_db.Driver.base ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.istr )
+  gen_person ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) gen_person
 (** Remplaces string ids inside person's entry by their actual string value. *)
 
 val string_gen_family :
-  base -> (iper, ifam, istr) gen_family -> (iper, ifam, string) gen_family
+  Geneweb_db.Driver.base ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.ifam,
+    Geneweb_db.Driver.istr )
+  gen_family ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam, string) gen_family
 (** Remplaces string ids inside family's entry by their actual string value. *)
 
 val gen_person_text :
   ?escape:bool ->
   ?html:bool ->
   ?sn:bool ->
-  ?p_first_name:(base -> person -> string) ->
-  ?p_surname:(base -> person -> string) ->
+  ?p_first_name:(Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> string) ->
+  ?p_surname:(Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> string) ->
   config ->
-  base ->
-  person ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
   Adef.safe_string
 (** Returns person's first name and surname HTML description depending on :
     - his public name
@@ -184,73 +229,132 @@ val gen_person_text :
 *)
 
 val gen_person_title_text :
-  (config -> base -> person -> Adef.safe_string -> Adef.safe_string) ->
+  (config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string ->
+  Adef.safe_string) ->
   config ->
-  base ->
-  person ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
   Adef.safe_string
 (** [gen_person_title_text reference paccess conf base p] returns HTML structure
     of person that describes person's first name surname and main title. [reference]
     is used to either encapsulate structure in the link (or other type
     of maniplations). *)
 
-val person_text_without_title : config -> base -> person -> Adef.safe_string
+val person_text_without_title :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Makes call to [gen_person_text_without_title] with [std_access] *)
 
-val main_title : config -> base -> person -> title option
+val main_title :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.title option
 (** Returns main person's title. If person doesn't have it, then returns first title
     from the list. *)
 
-val titled_person_text : config -> base -> person -> title -> Adef.safe_string
+val titled_person_text :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.title ->
+  Adef.safe_string
 (** Returns person's first name and surname text description depending on
     person's title *)
 
-val one_title_text : base -> title -> Adef.safe_string
+val one_title_text :
+  Geneweb_db.Driver.base -> Geneweb_db.Driver.title -> Adef.safe_string
 (** Returns HTML representation of title's identifier with its place (if exists) *)
 
-val person_title_text : config -> base -> person -> Adef.safe_string
+val person_title_text :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Returns HTML structure of person that describes person's first name surname
     and main title. Calls [gen_person_title_text] with [no_reference]. *)
 
-val person_title : config -> base -> person -> Adef.safe_string
+val person_title :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Returns HTML representation of person's main title (or first title if
     main doesn't exists). If person doesn't have a title or if access to
     person isn't granted returns empty string *)
 
-val child_of_parent : config -> base -> person -> Adef.safe_string
+val child_of_parent :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 
-val mod_ind_link : config -> person -> Adef.safe_string -> Adef.safe_string
+val mod_ind_link :
+  config -> Geneweb_db.Driver.person -> Adef.safe_string -> Adef.safe_string
 (** [mod_ind_link conf base p s] creates a hyperlink with the URL "?m=MOD_IND&i=\{iper\}"
     where '\{iper\}' is the index of the person [p], and the text [s]. If [s] is empty,
     it defaults to print a wrench icon. *)
 
-val reference : config -> base -> person -> Adef.safe_string -> Adef.safe_string
+val reference :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string ->
+  Adef.safe_string
 (** [reference conf base p desc] returns HTML link to the person
     where [desc] is content of the link (generaly his first name and
     surname description). If person is hidden returns [desc] (do not
     create link). *)
 
 val reference_noid :
-  config -> base -> person -> Adef.safe_string -> Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string ->
+  Adef.safe_string
 (** Same as [reference] but link doesn't has "id" field *)
 
 val no_reference :
-  config -> base -> person -> Adef.safe_string -> Adef.safe_string
-(** [reference conf base p desc] returns [desc] without creating a link *)
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string ->
+  Adef.safe_string
+(** [reference conf Geneweb_db.Driver.base p desc] returns [desc] without creating a link *)
 
-val referenced_person_title_text : config -> base -> person -> Adef.safe_string
+val referenced_person_title_text :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Retruns HTML link to the person that contains its first name, surname and person's
     nobility title. Calls [gen_person_title_text] with [reference]. *)
 
-val referenced_person_text : config -> base -> person -> Adef.safe_string
+val referenced_person_text :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Returns HTML link to the person that contains its first name and surname. *)
 
 val referenced_person_text_without_surname :
-  config -> base -> person -> Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Returns HTML link to the person that contains its first name. *)
 
 val update_family_loop :
-  config -> base -> person -> Adef.safe_string -> Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string ->
+  Adef.safe_string
 
 val p_getenv : Config.env -> string -> string option
 (** Returns value associated to the label in environnement *)
@@ -276,26 +380,33 @@ val message_to_wizard : config -> unit
     {i <basename>/etc/mess_wizzard.txt} (messages destinated to all wizards) and in
     {i <basename>/etc/mess_wizzard_<user>.txt} (messages destinated to considered wizard). *)
 
-val of_course_died : config -> person -> bool
+val of_course_died : config -> Geneweb_db.Driver.person -> bool
 val hexa_string : string -> string
 
-val surname_particle : base -> string -> string
+val surname_particle : Geneweb_db.Driver.base -> string -> string
 (** [surname_particle base sn]
     Extract the particle of [sn] if there is one.
     The list of particles to use is defined in [base]. *)
 
-val surname_without_particle : base -> string -> string
+val surname_without_particle : Geneweb_db.Driver.base -> string -> string
 (** [surname_without_particle base sn]
     Remove the particle of [sn] if there is one.
-    The list of particles to use is defined in [base]. *)
+    The list of particles to use is defined in [Geneweb_db.Driver.base]. *)
 
-val specify_homonymous : config -> base -> person -> bool -> unit
+val specify_homonymous :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool -> unit
 
 val get_approx_birth_date_place :
-  config -> base -> person -> date option * Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  date option * Adef.safe_string
 
 val get_approx_death_date_place :
-  config -> base -> person -> date option * Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  date option * Adef.safe_string
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
@@ -344,10 +455,16 @@ val index_of_sex : sex -> int
 (** Sex index used in translations (0 for male, 1 for female, 2 for neuter) *)
 
 val string_of_pevent_name :
-  config -> base -> istr gen_pers_event_name -> Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.istr gen_pers_event_name ->
+  Adef.safe_string
 
 val string_of_fevent_name :
-  config -> base -> istr gen_fam_event_name -> Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.istr gen_fam_event_name ->
+  Adef.safe_string
 (** [string_of_fevent_name conf base fevent_name]
 *)
 
@@ -361,36 +478,55 @@ val string_of_witness_kind_raw : witness_kind -> Adef.safe_string
     Return the string corresponding to generic coding of wk .
 *)
 
-val relation_txt : config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format
+val relation_txt :
+  config -> sex -> Geneweb_db.Driver.family -> (('a -> 'b) -> 'b, 'a, 'b) format
+
 val string_of_decimal_num : config -> float -> string
 
-val person_exists : config -> base -> string * string * int -> bool
+val person_exists :
+  config -> Geneweb_db.Driver.base -> string * string * int -> bool
 (** test if person exists using fn, sn, oc as arguments *)
 
-val mark_if_not_public : config -> base -> string * string * int -> bool
+val mark_if_not_public :
+  config -> Geneweb_db.Driver.base -> string * string * int -> bool
 (** used by Roglo to flag persons that should be public and are not.
     Active only if url contains red_if_not_public=on *)
 
-val husband_wife : config -> base -> person -> bool -> Adef.safe_string
+val husband_wife :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  bool ->
+  Adef.safe_string
 (** returns a string listing the spouses of a person
     [bool] if true return all spouses otherwise the first one only *)
 
-val find_person_in_env : config -> base -> string -> person option
+val find_person_in_env :
+  config -> Geneweb_db.Driver.base -> string -> Geneweb_db.Driver.person option
 (** [find_person_in_env conf base suff]
     Reconstitutes the key of a person from [conf.env],
     using ["i" ^ suff] or ["n" ^ suff] + ["p" ^ suff] + ["oc" ^ suff]
 *)
 
-val find_person_in_env_pref : config -> base -> string -> person option
+val find_person_in_env_pref :
+  config -> Geneweb_db.Driver.base -> string -> Geneweb_db.Driver.person option
 (** [find_person_in_env_pref conf base prefix]
     Same as [find_person_in_env] except that it uses a prefix
     instead of a suffix.
 *)
 
 (* Recherche le sosa uniquement dans le fichier gwf *)
-val default_sosa_ref : config -> base -> person option
-val find_sosa_ref : config -> base -> person option
-val update_gwf_sosa : config -> base -> iper * (string * string * int) -> unit
+val default_sosa_ref :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person option
+
+val find_sosa_ref :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person option
+
+val update_gwf_sosa :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper * (string * string * int) ->
+  unit
 
 val get_server_string : config -> string
 (** Returns server host name with its port number (if different from 80). *)
@@ -399,20 +535,32 @@ val get_request_string : config -> string
 (** Returns request string. Request string has format {i scriptname?querystring} where
     scriptname is a path to the script in URI. *)
 
-val create_topological_sort : config -> base -> (iper, int) Gwdb.Marker.t
+val create_topological_sort :
+  config ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper, int) Geneweb_db.Collection.Marker.t
 
-val p_of_sosa : config -> base -> Geneweb_sosa.t -> person -> person option
+val p_of_sosa :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_sosa.t ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person option
 (** [p_of_sosa conf base sosa p0]
     Get the sosa [sosa] of [p0] if it exists
 *)
 
 val branch_of_sosa :
-  config -> base -> Geneweb_sosa.t -> person -> person list option
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_sosa.t ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person list option
 (** [branch_of_sosa conf base sosa p0]
     Get all the lineage to go from [p0]'s ancestor with sosa number [sosa] to [p0]
 *)
 
-val sosa_of_branch : person list -> Geneweb_sosa.t
+val sosa_of_branch : Geneweb_db.Driver.person list -> Geneweb_sosa.t
 (** [sosa_of_branch branch]
     Given a path of person to follow [branch], return the sosa number
     of the last person of this list. No check is done to ensure that
@@ -420,10 +568,18 @@ val sosa_of_branch : person list -> Geneweb_sosa.t
 *)
 
 val old_branch_of_sosa :
-  config -> base -> iper -> Geneweb_sosa.t -> (iper * sex) list option
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper ->
+  Geneweb_sosa.t ->
+  (Geneweb_db.Driver.iper * sex) list option
 (** @deprecated Use [branch_of_sosa] instead *)
 
-val old_sosa_of_branch : config -> base -> (iper * sex) list -> Geneweb_sosa.t
+val old_sosa_of_branch :
+  config ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper * sex) list ->
+  Geneweb_sosa.t
 (** @deprecated Use [sosa_of_branch] instead *)
 
 val only_printable : string -> string
@@ -434,7 +590,10 @@ val only_printable_or_nl : string -> string
 
 val relation_type_text : config -> relation_type -> int -> Adef.safe_string
 val rchild_type_text : config -> relation_type -> int -> Adef.safe_string
-val has_nephews_or_nieces : config -> base -> person -> bool
+
+val has_nephews_or_nieces :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+
 val browser_doesnt_have_tables : config -> bool
 val doctype : Adef.safe_string
 
@@ -470,7 +629,7 @@ val html_highlight : bool -> string -> string -> string
 val wprint_in_columns :
   config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
 
-val is_hide_names : config -> person -> bool
+val is_hide_names : config -> Geneweb_db.Driver.person -> bool
 (** Tells if person's names are hiden (if person's access is [Private] or if mode [conf.hide_names] is enabled). *)
 
 val reduce_list : int -> 'a list -> 'a list
@@ -490,27 +649,33 @@ val get_opt : config -> string -> bool -> bool
 
 val display_options : config -> Adef.escaped_string
 
-type cache_visited_t = (string, (iper * string) list) Hashtbl.t
+type cache_visited_t =
+  (string, (Geneweb_db.Driver.iper * string) list) Hashtbl.t
 
 val cache_visited : config -> string
 val read_visited : config -> cache_visited_t
-val record_visited : config -> iper -> unit
+val record_visited : config -> Geneweb_db.Driver.iper -> unit
 
 val array_mem_witn :
   Config.config ->
-  Gwdb.base ->
-  iper ->
-  (iper * Def.witness_kind) array ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper ->
+  (Geneweb_db.Driver.iper * Def.witness_kind) array ->
   Adef.safe_string option
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
     and returns corresponding [string_of_witness_kind] if so.
 *)
 
 val make_key :
-  Gwdb.base -> (iper, iper, istr) Def.gen_person -> string * string * int
+  Geneweb_db.Driver.base ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.istr )
+  Def.gen_person ->
+  string * string * int
 (** make a tuple (first_name, surname, occ) apply Name.lower *)
 
-val name_key : Gwdb.base -> string -> string
+val name_key : Geneweb_db.Driver.base -> string -> string
 (** [name_key base name] is [name],
     with particles put at the end of the string instead of the beginning.
 *)
@@ -539,21 +704,19 @@ val string_with_macros :
     Return a string with "%xxx" macro replaced by their value.
 *)
 
-val is_empty_name : person -> bool
+val is_empty_name : Geneweb_db.Driver.person -> bool
 (** [is_empty_name p]
     [false] if we knwon the first name or the last name of [p].
 *)
 
-module IperSet : sig
-  include Set.S with type elt = iper
-end
-
-module IfamSet : sig
-  include Set.S with type elt = ifam
-end
+module IperSet : Set.S with type elt = Geneweb_db.Driver.iper
+module IfamSet : Set.S with type elt = Geneweb_db.Driver.ifam
 
 val select_masc :
-  config -> base -> (iper * int) list -> (iper, int * person) Hashtbl.t
+  config ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper * int) list ->
+  (Geneweb_db.Driver.iper, int * Geneweb_db.Driver.person) Hashtbl.t
 (** [select_masc conf base ips]
     From [ips], a list matching ipers to a number of maximum generations,
     get maximum ascendants of ipers up to these corresponding generations.
@@ -566,14 +729,22 @@ val select_masc :
 *)
 
 val select_desc :
-  config -> base -> int -> (iper * int) list -> (iper, person) Hashtbl.t
+  config ->
+  Geneweb_db.Driver.base ->
+  int ->
+  (Geneweb_db.Driver.iper * int) list ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.person) Hashtbl.t
 (** [select_desc conf base gen_desc ips]
     From [ips], a list matching ipers to a number of maximum generations,
     get spouses and descendants of ipers up to these corresponding generations.
 *)
 
 val select_mascdesc :
-  config -> base -> (iper * int) list -> int -> (iper, person) Hashtbl.t
+  config ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper * int) list ->
+  int ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.person) Hashtbl.t
 (** [select_ascdesc conf base ips gen_desc]
     Get maximum ascendants with {!val:select_masc}, and get their desc with
     {!val:select_desc}
@@ -584,7 +755,10 @@ val sprintf_today : Config.config -> Adef.safe_string
     Uses {!val:Mutil.sprintf_date} in order to print datetime defined in [conf]. *)
 
 val auth_warning :
-  config -> base -> ('a, person, ifam, 'b, 'c, 'd, 'e) warning -> bool
+  config ->
+  Geneweb_db.Driver.base ->
+  ('a, Geneweb_db.Driver.person, Geneweb_db.Driver.ifam, 'b, 'c, 'd, 'e) warning ->
+  bool
 (** [auth_warning conf base w]
     Check if current user has enough right in order to see [w] *)
 
@@ -599,10 +773,11 @@ val cut_words : string -> string list
     [String.split_on_char ' ' s |> List.map String.trim |> List.filter ((<>) "")]
 *)
 
-val designation : base -> person -> Adef.escaped_string
+val designation :
+  Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> Adef.escaped_string
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
 
-val has_children : base -> person -> bool
+val has_children : Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 val get_bases_list : ?format_fun:(string -> string) -> unit -> string list
 
 val test_cnt_d : config -> string

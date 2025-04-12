@@ -3,9 +3,11 @@
 open Config
 open Def
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let dir conf base =
-  Filename.concat (Util.bpath conf.bname) (Gwdb.base_wiznotes_dir base)
+  Filename.concat (Util.bpath conf.bname) (Driver.base_wiznotes_dir base)
 
 let wzfile wddir wz = Filename.concat wddir (wz ^ ".txt")
 

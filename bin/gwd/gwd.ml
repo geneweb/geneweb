@@ -1,12 +1,14 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Logs = Geneweb_logs.Logs
 open Geneweb
 open Config
 open Def
 open Util
 open Gwd_lib
+module Logs = Geneweb_logs.Logs
 module StrSet = Mutil.StrSet
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let output_conf =
   {
@@ -1284,7 +1286,7 @@ let make_conf ~secret_salt from_addr request script_name env =
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
-  let default_sosa_ref = (Gwdb.dummy_iper, None) in
+  let default_sosa_ref = (Driver.dummy_iper, None) in
   let ar =
     authorization from_addr request base_env passwd access_type utm base_file
       command
@@ -2431,7 +2433,7 @@ let main () =
     (fun dbn ->
       Printf.eprintf "Caching database %s in memory… %!" dbn;
       let dbn = !GWPARAM.bpath dbn in
-      Gwdb.load_database dbn;
+      Driver.load_database dbn;
       Printf.eprintf "Done.\n%!")
     !cache_databases;
   if !auth_file <> "" && !force_cgi then

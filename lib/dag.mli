@@ -1,7 +1,7 @@
 (* TODOCP *)
 module Pset : sig
-  type t = Gwdb.iper list
-  type elt = Gwdb.iper
+  type t = Geneweb_db.Driver.iper list
+  type elt = Geneweb_db.Driver.iper
 
   val add : 'a -> 'a list -> 'a list
   val empty : 'a list
@@ -9,12 +9,13 @@ module Pset : sig
   val mem : 'a -> 'a list -> bool
 end
 
-val get_dag_elems : Config.config -> Gwdb.base -> Gwdb.iper list
+val get_dag_elems :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper list
 
 type ('a, 'b) sum = ('a, 'b) Def.choice
 
 val make_dag :
   Config.config ->
-  Gwdb.base ->
-  Gwdb.iper list ->
-  (Gwdb.iper, int) Def.choice Dag2html.dag
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper list ->
+  (Geneweb_db.Driver.iper, int) Def.choice Dag2html.dag

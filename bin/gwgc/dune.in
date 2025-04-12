@@ -1,10 +1,8 @@
-#ifdef GENEWEB_GWDB_LEGACY
 (executable
   (package geneweb)
   (name gwgc)
   (public_name geneweb.gwgc)
   (modules gwgc)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries unix str %%%GWDB_PKG%%% geneweb)
+  (libraries unix str geneweb)
 )
-#endif

@@ -1,14 +1,15 @@
 open Config
 open Dag2html
 open Def
-open Gwdb
 open Util
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 (* TODO use a set.. *)
 module Pset = struct
-  type t = iper list
-  type elt = iper
+  type t = Driver.iper list
+  type elt = Driver.iper
 
   let add e s = if List.mem e s then s else e :: s
   let empty = []
@@ -29,7 +30,9 @@ let get_dag_elems conf base =
         let set =
           match Util.branch_of_sosa conf base (Sosa.of_string s) p with
           | Some ipsl ->
-              List.fold_left (fun set p -> Pset.add (get_iper p) set) set ipsl
+              List.fold_left
+                (fun set p -> Pset.add (Driver.get_iper p) set)
+                set ipsl
           | None -> set
         in
         loop po set (i + 1)
@@ -42,7 +45,7 @@ type ('a, 'b) sum = ('a, 'b) Def.choice
 let make_dag conf base set =
   let list = Pset.elements set in
   let module O = struct
-    type t = iper
+    type t = Driver.iper
 
     let compare = compare
   end in
@@ -59,25 +62,25 @@ let make_dag conf base set =
     Array.map
       (fun ip ->
         let pare =
-          match get_parents (pget conf base ip) with
+          match Driver.get_parents (pget conf base ip) with
           | Some ifam -> (
-              let c = foi base ifam in
+              let c = Driver.foi base ifam in
               let l =
-                try [ M.find (get_mother c) map ] with Not_found -> []
+                try [ M.find (Driver.get_mother c) map ] with Not_found -> []
               in
-              try M.find (get_father c) map :: l with Not_found -> l)
+              try M.find (Driver.get_father c) map :: l with Not_found -> l)
           | None -> []
         in
         let chil =
           let u = pget conf base ip in
           Array.fold_left
             (fun chil ifam ->
-              let des = foi base ifam in
+              let des = Driver.foi base ifam in
               Array.fold_left
                 (fun chil ip ->
                   try M.find ip map :: chil with Not_found -> chil)
-                chil (get_children des))
-            [] (get_family u)
+                chil (Driver.get_children des))
+            [] (Driver.get_family u)
         in
         let chil = List.rev chil in
         { pare; valu = Left ip; chil })
@@ -89,11 +92,11 @@ let make_dag conf base set =
       else
         match nodes.(i) with
         | { valu = Left ip; chil; _ } ->
-            let ifaml = Array.to_list (get_family (pget conf base ip)) in
+            let ifaml = Array.to_list (Driver.get_family (pget conf base ip)) in
             let nodes, n =
               let rec loop nodes = function
                 | ifam :: ifaml -> (
-                    let cpl = foi base ifam in
+                    let cpl = Driver.foi base ifam in
                     let isp = Gutil.spouse ip cpl in
                     let jdo =
                       try Some (M.find isp map) with Not_found -> None

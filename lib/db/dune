@@ -1,0 +1,10 @@
+(library
+ (name geneweb_db)
+ (public_name geneweb.db)
+ (libraries
+   unix
+   re
+   fmt
+   geneweb.def
+   geneweb.ancient
+   geneweb.util))

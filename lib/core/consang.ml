@@ -3,7 +3,8 @@
 (* Algorithm relationship and links from Didier Remy *)
 
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 type anc_stat = MaybeAnc | IsAnc
 
@@ -23,8 +24,8 @@ type relationship = {
   mutable weight1 : float;
   mutable weight2 : float;
   mutable relationship : float;
-  mutable lens1 : (int * int * iper list) list;
-  mutable lens2 : (int * int * iper list) list;
+  mutable lens1 : (int * int * Geneweb_db.Driver.iper list) list;
+  mutable lens2 : (int * int * Geneweb_db.Driver.iper list) list;
   mutable inserted : int;
   mutable elim_ancestors : bool;
   mutable anc_stat1 : anc_stat;
@@ -32,9 +33,10 @@ type relationship = {
 }
 
 type relationship_info = {
-  tstab : (Gwdb.iper, int) Gwdb.Marker.t;
-  reltab : (Gwdb.iper, relationship) Gwdb.Marker.t;
-  mutable queue : Gwdb.iper list array;
+  tstab : (Geneweb_db.Driver.iper, int) Geneweb_db.Collection.Marker.t;
+  reltab :
+    (Geneweb_db.Driver.iper, relationship) Geneweb_db.Collection.Marker.t;
+  mutable queue : Geneweb_db.Driver.iper list array;
 }
 
 let half x = x *. 0.5
@@ -46,33 +48,33 @@ type visit =
   | Visited (* visited person and his ascendants *)
 
 let rec noloop_aux base error tab i =
-  match Gwdb.Marker.get tab i with
+  match Collection.Marker.get tab i with
   | NotVisited ->
-      (match get_parents (poi base i) with
+      (match Driver.get_parents (Driver.poi base i) with
       | Some ifam ->
-          let fam = foi base ifam in
-          let fath = get_father fam in
-          let moth = get_mother fam in
-          Gwdb.Marker.set tab i BeingVisited;
+          let fam = Driver.foi base ifam in
+          let fath = Driver.get_father fam in
+          let moth = Driver.get_mother fam in
+          Collection.Marker.set tab i BeingVisited;
           noloop_aux base error tab fath;
           noloop_aux base error tab moth
       | None -> ());
-      Gwdb.Marker.set tab i Visited
-  | BeingVisited -> error (OwnAncestor (poi base i))
+      Collection.Marker.set tab i Visited
+  | BeingVisited -> error (OwnAncestor (Driver.poi base i))
   | Visited -> ()
 
 (** It is highly recommended to load ascends and couples array before
     running [check_noloop]
 *)
 let check_noloop base error =
-  let tab = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
-  Gwdb.Collection.iter (noloop_aux base error tab) (Gwdb.ipers base)
+  let tab = Driver.iper_marker (Driver.ipers base) NotVisited in
+  Collection.iter (noloop_aux base error tab) (Driver.ipers base)
 
 let check_noloop_for_person_list base error list =
-  let tab = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
+  let tab = Driver.iper_marker (Driver.ipers base) NotVisited in
   List.iter (noloop_aux base error tab) list
 
-exception TopologicalSortError of person
+exception TopologicalSortError of Geneweb_db.Driver.person
 
 (* Return tab such as: i is an ancestor of j => tab.(i) > tab.(j) *)
 (* This complicated topological sort has the important following properties:
@@ -83,25 +85,25 @@ exception TopologicalSortError of person
      list of one of the person is exhausted).
 *)
 let topological_sort base poi =
-  let persons = Gwdb.ipers base in
-  let tab = Gwdb.iper_marker (Gwdb.ipers base) 0 in
+  let persons = Driver.ipers base in
+  let tab = Driver.iper_marker (Driver.ipers base) 0 in
   let cnt = ref 0 in
-  Gwdb.Collection.iter
+  Collection.iter
     (fun i ->
       let a = poi base i in
-      match get_parents a with
+      match Driver.get_parents a with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let ifath = get_father cpl in
-          let imoth = get_mother cpl in
-          Gwdb.Marker.set tab ifath (Gwdb.Marker.get tab ifath + 1);
-          Gwdb.Marker.set tab imoth (Gwdb.Marker.get tab imoth + 1)
+          let cpl = Driver.foi base ifam in
+          let ifath = Driver.get_father cpl in
+          let imoth = Driver.get_mother cpl in
+          Collection.Marker.set tab ifath (Collection.Marker.get tab ifath + 1);
+          Collection.Marker.set tab imoth (Collection.Marker.get tab imoth + 1)
       | _ -> ())
     persons;
   (* starting from the leaf vertex of graph (persons without childs) *)
   let todo =
-    Gwdb.Collection.fold
-      (fun acc i -> if Gwdb.Marker.get tab i = 0 then i :: acc else acc)
+    Collection.fold
+      (fun acc i -> if Collection.Marker.get tab i = 0 then i :: acc else acc)
       [] persons
   in
   let rec loop tval list =
@@ -111,20 +113,22 @@ let topological_sort base poi =
         List.fold_left
           (fun new_list i ->
             let a = poi base i in
-            Gwdb.Marker.set tab i tval;
+            Collection.Marker.set tab i tval;
             incr cnt;
-            match get_parents a with
+            match Driver.get_parents a with
             | Some ifam ->
-                let cpl = foi base ifam in
-                let ifath = get_father cpl in
-                let imoth = get_mother cpl in
-                Gwdb.Marker.set tab ifath (Gwdb.Marker.get tab ifath - 1);
-                Gwdb.Marker.set tab imoth (Gwdb.Marker.get tab imoth - 1);
+                let cpl = Driver.foi base ifam in
+                let ifath = Driver.get_father cpl in
+                let imoth = Driver.get_mother cpl in
+                Collection.Marker.set tab ifath
+                  (Collection.Marker.get tab ifath - 1);
+                Collection.Marker.set tab imoth
+                  (Collection.Marker.get tab imoth - 1);
                 let new_list =
-                  if Gwdb.Marker.get tab ifath = 0 then ifath :: new_list
+                  if Collection.Marker.get tab ifath = 0 then ifath :: new_list
                   else new_list
                 in
-                if Gwdb.Marker.get tab imoth = 0 then imoth :: new_list
+                if Collection.Marker.get tab imoth = 0 then imoth :: new_list
                 else new_list
             | _ -> new_list)
           [] list
@@ -132,7 +136,7 @@ let topological_sort base poi =
       loop (tval + 1) new_list
   in
   loop 0 todo;
-  if !cnt <> nb_of_persons base then
+  if !cnt <> Driver.nb_of_persons base then
     check_noloop base (function
       | OwnAncestor p -> raise (TopologicalSortError p)
       | _ -> assert false);
@@ -152,7 +156,9 @@ let phony_rel =
   }
 
 let make_relationship_info base tstab =
-  let tab = Gwdb.iper_marker (Gwdb.ipers base) phony_rel in
+  let tab =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) phony_rel
+  in
   { tstab; reltab = tab; queue = [||] }
 
 let rec insert_branch_len_rec ((len, n, ip) as x) = function
@@ -168,8 +174,8 @@ let insert_branch_len ip lens (len, n, _ipl) =
   insert_branch_len_rec (succ len, n, ip) lens
 
 let consang_of p =
-  if get_consang p = Adef.no_consang then 0.0
-  else Adef.float_of_fix (get_consang p)
+  if Driver.get_consang p = Adef.no_consang then 0.0
+  else Adef.float_of_fix (Driver.get_consang p)
 
 let mark = ref 0
 
@@ -186,9 +192,9 @@ let relationship_and_links base ri b ip1 ip2 =
     let tstab = ri.tstab in
     let yes_inserted = new_mark () in
     let reset u =
-      let tu = Gwdb.Marker.get reltab u in
+      let tu = Collection.Marker.get reltab u in
       if tu == phony_rel then
-        Gwdb.Marker.set reltab u
+        Collection.Marker.set reltab u
           {
             weight1 = 0.0;
             weight2 = 0.0;
@@ -211,10 +217,13 @@ let relationship_and_links base ri b ip1 ip2 =
         tu.anc_stat1 <- MaybeAnc;
         tu.anc_stat2 <- MaybeAnc)
     in
-    let qi = ref (min (Gwdb.Marker.get tstab i1) (Gwdb.Marker.get tstab i2)) in
+    let qi =
+      ref
+        (min (Collection.Marker.get tstab i1) (Collection.Marker.get tstab i2))
+    in
     let qmax = ref (-1) in
     let insert u =
-      let v = Gwdb.Marker.get tstab u in
+      let v = Collection.Marker.get tstab u in
       reset u;
       (if v >= Array.length ri.queue then
        let len = Array.length ri.queue in
@@ -238,8 +247,8 @@ let relationship_and_links base ri b ip1 ip2 =
     let nb_anc2 = ref 1 in
     let tops = ref [] in
     let treat_parent ip_from u y =
-      if (Gwdb.Marker.get reltab y).inserted <> yes_inserted then insert y;
-      let ty = Gwdb.Marker.get reltab y in
+      if (Collection.Marker.get reltab y).inserted <> yes_inserted then insert y;
+      let ty = Collection.Marker.get reltab y in
       let p1 = half u.weight1 in
       let p2 = half u.weight2 in
       if u.anc_stat1 = IsAnc && ty.anc_stat1 <> IsAnc then (
@@ -257,8 +266,8 @@ let relationship_and_links base ri b ip1 ip2 =
         ty.lens2 <- List.fold_left (insert_branch_len ip_from) ty.lens2 u.lens2)
     in
     let treat_ancestor u =
-      let tu = Gwdb.Marker.get reltab u in
-      let a = poi base u in
+      let tu = Collection.Marker.get reltab u in
+      let a = Driver.poi base u in
       let contribution =
         (tu.weight1 *. tu.weight2) -. (tu.relationship *. (1.0 +. consang_of a))
       in
@@ -268,21 +277,21 @@ let relationship_and_links base ri b ip1 ip2 =
       if b && contribution <> 0.0 && not tu.elim_ancestors then (
         tops := u :: !tops;
         tu.elim_ancestors <- true);
-      match get_parents a with
+      match Driver.get_parents a with
       | Some ifam ->
-          let cpl = foi base ifam in
-          treat_parent u tu (get_father cpl);
-          treat_parent u tu (get_mother cpl)
+          let cpl = Driver.foi base ifam in
+          treat_parent u tu (Driver.get_father cpl);
+          treat_parent u tu (Driver.get_mother cpl)
       | _ -> ()
     in
     insert i1;
     insert i2;
-    (Gwdb.Marker.get reltab i1).weight1 <- 1.0;
-    (Gwdb.Marker.get reltab i2).weight2 <- 1.0;
-    (Gwdb.Marker.get reltab i1).lens1 <- [ (0, 1, []) ];
-    (Gwdb.Marker.get reltab i2).lens2 <- [ (0, 1, []) ];
-    (Gwdb.Marker.get reltab i1).anc_stat1 <- IsAnc;
-    (Gwdb.Marker.get reltab i2).anc_stat2 <- IsAnc;
+    (Collection.Marker.get reltab i1).weight1 <- 1.0;
+    (Collection.Marker.get reltab i2).weight2 <- 1.0;
+    (Collection.Marker.get reltab i1).lens1 <- [ (0, 1, []) ];
+    (Collection.Marker.get reltab i2).lens2 <- [ (0, 1, []) ];
+    (Collection.Marker.get reltab i1).anc_stat1 <- IsAnc;
+    (Collection.Marker.get reltab i2).anc_stat2 <- IsAnc;
     while !qi <= !qmax && !nb_anc1 > 0 && !nb_anc2 > 0 do
       List.iter treat_ancestor ri.queue.(!qi);
       incr qi

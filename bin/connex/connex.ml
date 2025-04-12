@@ -1,7 +1,8 @@
 (* Copyright (c) 1999 INRIA *)
 
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 let all = ref false
 let statistics = ref false
@@ -37,122 +38,127 @@ let connected_families base ifam cpl =
     | ip :: ipl ->
         if List.memq ip ipl_scanned then loop ifaml ipl_scanned ipl
         else
-          let u = poi base ip in
-          let ifaml1 = Array.to_list (get_family u) in
+          let u = Driver.poi base ip in
+          let ifaml1 = Array.to_list (Driver.get_family u) in
           let ifaml = merge_families ifaml ifaml1 in
           let ipl =
             List.fold_right
               (fun ifam ipl ->
-                let cpl = foi base ifam in
-                get_father cpl :: get_mother cpl :: ipl)
+                let cpl = Driver.foi base ifam in
+                Driver.get_father cpl :: Driver.get_mother cpl :: ipl)
               ifaml1 ipl
           in
           loop ifaml (ip :: ipl_scanned) ipl
     | [] -> ifaml
   in
-  loop [ ifam ] [] [ get_father cpl ]
+  loop [ ifam ] [] [ Driver.get_father cpl ]
 
 let neighbourgs base ifam =
-  let fam = foi base ifam in
+  let fam = Driver.foi base ifam in
   let ifaml = connected_families base ifam fam in
   let ifaml =
-    match get_parents (poi base (get_father fam)) with
+    match Driver.get_parents (Driver.poi base (Driver.get_father fam)) with
     | Some ifam -> ifam :: ifaml
     | None -> ifaml
   in
   let ifaml =
-    match get_parents (poi base (get_mother fam)) with
+    match Driver.get_parents (Driver.poi base (Driver.get_mother fam)) with
     | Some ifam -> ifam :: ifaml
     | None -> ifaml
   in
   List.fold_left
     (fun ifaml ip ->
-      let u = poi base ip in
+      let u = Driver.poi base ip in
       List.fold_left
         (fun ifaml ifam -> ifam :: ifaml)
         ifaml
-        (Array.to_list (get_family u)))
+        (Array.to_list (Driver.get_family u)))
     ifaml
-    (Array.to_list (get_children fam))
+    (Array.to_list (Driver.get_children fam))
 
 let utf8_designation base p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  let s = first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname in
+  let first_name = Driver.p_first_name base p in
+  let surname = Driver.p_surname base p in
+  let s = first_name ^ "." ^ string_of_int (Driver.get_occ p) ^ " " ^ surname in
   if first_name = "?" || surname = "?" then
-    s ^ " (i=" ^ string_of_iper (get_iper p) ^ ")"
+    s ^ " (i=" ^ Driver.string_of_iper (Driver.get_iper p) ^ ")"
   else s
 
 let wiki_designation base basename p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
+  let first_name = Driver.p_first_name base p in
+  let surname = Driver.p_surname base p in
   let s =
     "[[" ^ first_name ^ "/" ^ surname ^ "/"
-    ^ string_of_int (get_occ p)
+    ^ string_of_int (Driver.get_occ p)
     ^ "/" ^ first_name ^ "."
-    ^ string_of_int (get_occ p)
+    ^ string_of_int (Driver.get_occ p)
     ^ " " ^ surname ^ "]]"
   in
   if first_name = "?" || surname = "?" then
-    let indx = string_of_iper (get_iper p) in
+    let indx = Driver.string_of_iper (Driver.get_iper p) in
     s ^ " <a href=\"http://" ^ !server ^ ":" ^ string_of_int !gwd_port ^ "/"
     ^ basename ^ "?i=" ^ indx ^ "\">(i=" ^ indx ^ ")</a><br>"
   else s ^ "<br>"
 
 let print_family base basename ifam =
-  let fam = foi base ifam in
-  let p = poi base (get_father fam) in
+  let fam = Driver.foi base ifam in
+  let p = Driver.poi base (Driver.get_father fam) in
   if !output <> "" then (
-    if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?" then
-      Printf.eprintf "i=%s" (string_of_iper (get_iper p))
+    if
+      Driver.sou base (Driver.get_first_name p) = "?"
+      || Driver.sou base (Driver.get_surname p) = "?"
+    then Printf.eprintf "i=%s" (Driver.string_of_iper (Driver.get_iper p))
     else Printf.eprintf "  - %s" (utf8_designation base p);
     Printf.eprintf "\n";
     Printf.eprintf "  - %s\n"
-      (utf8_designation base (poi base (get_mother fam)));
+      (utf8_designation base (Driver.poi base (Driver.get_mother fam)));
     flush stderr);
-  if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?" then
-    let indx = string_of_iper (get_iper p) in
+  if
+    Driver.sou base (Driver.get_first_name p) = "?"
+    || Driver.sou base (Driver.get_surname p) = "?"
+  then
+    let indx = Driver.string_of_iper (Driver.get_iper p) in
     Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>" !server
       !gwd_port basename indx indx
   else Printf.printf "  - %s" (wiki_designation base basename p);
   Printf.printf "\n";
   Printf.printf "  - %s\n"
-    (wiki_designation base basename (poi base (get_mother fam)))
+    (wiki_designation base basename (Driver.poi base (Driver.get_mother fam)))
 
 let kill_family base ip =
   let u = { family = Array.of_list [] } in
-  patch_union base ip u
+  Driver.patch_union base ip u
 
 let kill_parents base ip =
   let a = { parents = None; consang = Adef.fix (-1) } in
-  patch_ascend base ip a
+  Driver.patch_ascend base ip a
 
 let effective_del base (ifam, fam) =
-  kill_family base (get_father fam);
-  kill_family base (get_mother fam);
-  Array.iter (kill_parents base) (get_children fam);
-  Gwdb.delete_family base ifam
+  kill_family base (Driver.get_father fam);
+  kill_family base (Driver.get_mother fam);
+  Array.iter (kill_parents base) (Driver.get_children fam);
+  Driver.delete_family base ifam
 
 let move base basename =
-  load_ascends_array base;
-  load_unions_array base;
-  load_couples_array base;
-  load_descends_array base;
+  Driver.load_ascends_array base;
+  Driver.load_unions_array base;
+  Driver.load_couples_array base;
+  Driver.load_descends_array base;
   Printf.printf "<h3>Connected components of base %s</h3><br>\n" basename;
   let ic = Unix.open_process_in "date" in
   let date = input_line ic in
   let () = close_in ic in
   Printf.printf "Computed on %s<br><br>\n" date;
   flush stderr;
-  let mark = Gwdb.ifam_marker (Gwdb.ifams base) false in
+  let mark = Driver.ifam_marker (Driver.ifams base) false in
   let min = ref max_int in
   let max = ref 0 in
   let hts = Hashtbl.create 100 in
-  Gwdb.Collection.iter
+  Collection.iter
     (fun ifam ->
-      let fam = foi base ifam in
-      let origin_file = get_origin_file fam in
-      if List.mem (sou base origin_file) !ignore then ()
+      let fam = Driver.foi base ifam in
+      let origin_file = Driver.get_origin_file fam in
+      if List.mem (Driver.sou base origin_file) !ignore then ()
       else
         let nb, ifaml =
           let rec loop nb rfaml = function
@@ -160,10 +166,12 @@ let move base basename =
             | ifam :: ifaml ->
                 let j = ifam in
                 if
-                  (not (Gwdb.Marker.get mark j))
-                  && (!ignore_files || eq_istr (get_origin_file fam) origin_file)
+                  (not (Collection.Marker.get mark j))
+                  && (!ignore_files
+                     || Driver.eq_istr (Driver.get_origin_file fam) origin_file
+                     )
                 then (
-                  Gwdb.Marker.set mark j true;
+                  Collection.Marker.set mark j true;
                   let nl = neighbourgs base ifam in
                   let rfaml =
                     if nb > !detail then
@@ -182,10 +190,12 @@ let move base basename =
           if nb >= !max then max := nb;
           if !output <> "" then (
             Printf.eprintf "Connex component \"%s\" length %d\n"
-              (sou base origin_file) nb;
+              (Driver.sou base origin_file)
+              nb;
             flush stderr);
           Printf.printf "Connex component \"%s\" length %d<br>\n"
-            (sou base origin_file) nb;
+            (Driver.sou base origin_file)
+            nb;
           if !detail == nb then List.iter (print_family base basename) ifaml
           else print_family base basename ifam;
           if !statistics then
@@ -215,7 +225,7 @@ let move base basename =
                     decr cnt_for_delete;
                     List.iter
                       (fun ifam ->
-                        let fam = foi base ifam in
+                        let fam = Driver.foi base ifam in
                         effective_del base (ifam, fam))
                       ifaml;
                     Printf.eprintf "%d families deleted\n" (List.length ifaml);
@@ -223,8 +233,8 @@ let move base basename =
                   else (
                     Printf.printf "Nothing done.\n";
                     flush stdout))))
-    (Gwdb.ifams base);
-  if !ask_for_delete > 0 then Gwdb.commit_patches base;
+    (Driver.ifams base);
+  if !ask_for_delete > 0 then Driver.commit_patches base;
   if !statistics then (
     Printf.printf "<br>\nStatistics:<br>\n";
     let ls = Hashtbl.fold (fun nb n ls -> (nb, n) :: ls) hts [] in
@@ -274,5 +284,5 @@ let () =
       exit 2
     in
     Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-    Gwdb.with_database !bname (fun base -> move base !bname)
-  else Gwdb.with_database !bname (fun base -> move base !bname)
+    Driver.with_database !bname (fun base -> move base !bname)
+  else Driver.with_database !bname (fun base -> move base !bname)

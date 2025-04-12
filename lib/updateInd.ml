@@ -2,20 +2,20 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 module Ast = Geneweb_templ.Ast
+module Driver = Geneweb_db.Driver
 
 let string_person_of base p =
   let fp ip =
-    let p = poi base ip in
-    ( sou base (get_first_name p),
-      sou base (get_surname p),
-      get_occ p,
+    let p = Driver.poi base ip in
+    ( Driver.sou base (Driver.get_first_name p),
+      Driver.sou base (Driver.get_surname p),
+      Driver.get_occ p,
       Update.Link,
       "" )
   in
-  Futil.map_person_ps fp (sou base) (gen_person_of_person p)
+  Futil.map_person_ps fp (Driver.sou base) (Driver.gen_person_of_person p)
 
 (* Interpretation of template file 'updind.txt' *)
 
@@ -118,8 +118,8 @@ and eval_simple_var conf base env p = function
       match get_env "cnt" env with
       | Vint i -> (
           try
-            let p = poi base p.key_index in
-            let e = List.nth (get_pevents p) (i - 1) in
+            let p = Driver.poi base p.key_index in
+            let e = List.nth (Driver.get_pevents p) (i - 1) in
             let name =
               Util.string_of_pevent_name conf base e.epers_name
               |> Adef.safe_fn Utf8.capitalize_fst
@@ -129,7 +129,9 @@ and eval_simple_var conf base env p = function
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
-            let place = Util.string_of_place conf (sou base e.epers_place) in
+            let place =
+              Util.string_of_place conf (Driver.sou base e.epers_place)
+            in
             ([ name; date; (place :> Adef.safe_string) ]
               : Adef.safe_string list
               :> string list)
@@ -212,7 +214,7 @@ and eval_simple_var conf base env p = function
   | [ "has_surnames_aliases" ] -> bool_val (p.surnames_aliases <> [])
   | [ "has_titles" ] -> bool_val (p.titles <> [])
   | [ "image" ] -> safe_val (Util.escape_html p.image :> Adef.safe_string)
-  | [ "index" ] -> str_val (string_of_iper p.key_index)
+  | [ "index" ] -> str_val (Driver.string_of_iper p.key_index)
   | [ "is_female" ] -> bool_val (p.sex = Female)
   | [ "is_male" ] -> bool_val (p.sex = Male)
   | [ "is_first" ] -> (
@@ -487,13 +489,14 @@ and eval_person_var base (fn, sn, oc, create, _) = function
   | [ "occ" ] -> str_val (string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | [ "index" ] -> (
-      match person_of_key base fn sn oc with
-      | Some ip -> str_val (string_of_iper ip)
-      | _ -> str_val (string_of_iper Gwdb.dummy_iper))
+      match Driver.person_of_key base fn sn oc with
+      | Some ip -> str_val (Driver.string_of_iper ip)
+      | _ -> str_val (Driver.string_of_iper Driver.dummy_iper))
   | [ "sex" ] ->
       let sex =
-        match person_of_key base fn sn oc with
-        | Some ip -> get_sex (poi base ip) |> index_of_sex |> string_of_int
+        match Driver.person_of_key base fn sn oc with
+        | Some ip ->
+            Driver.get_sex (Driver.poi base ip) |> index_of_sex |> string_of_int
         | _ -> Neuter |> index_of_sex |> string_of_int
       in
       str_val sex
@@ -521,7 +524,7 @@ and eval_special_var conf base = function
           in
           if has_base_loop then VVstring ""
           else
-            let p = poi base (iper_of_string i) in
+            let p = Driver.poi base (Driver.iper_of_string i) in
             Perso.interp_templ_with_menu
               (fun _ -> ())
               "perso_header" conf base p;
@@ -656,9 +659,9 @@ let print_del1 conf base p =
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_decline conf "delete" s));
     Output.print_sstring conf " ";
-    Output.print_string conf (Util.escape_html (p_first_name base p));
-    Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
-    Output.print_string conf (Util.escape_html (p_surname base p))
+    Output.print_string conf (Util.escape_html (Driver.p_first_name base p));
+    Output.print_sstring conf (Format.sprintf ".%d " (Driver.get_occ p));
+    Output.print_string conf (Util.escape_html (Driver.p_surname base p))
   in
   Hutil.header conf title;
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
@@ -667,7 +670,7 @@ let print_del1 conf base p =
   Output.print_sstring conf
     "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_iper (get_iper p));
+    (Driver.string_of_iper (Driver.get_iper p));
   Output.print_sstring conf
     "<button type=\"submit\" class=\"btn btn-danger btn-lg m-3\">\n";
   Output.print_sstring conf
@@ -714,7 +717,7 @@ let print_add conf base =
       pevents = [];
       notes = "";
       psources = "";
-      key_index = dummy_iper;
+      key_index = Driver.dummy_iper;
     }
   in
   print_update_ind conf base p ""
@@ -723,7 +726,7 @@ let print_mod conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Driver.poi base (Driver.iper_of_string i) in
       let sp = string_person_of base p in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_person ~salt sp in
@@ -733,15 +736,17 @@ let print_del conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Driver.poi base (Driver.iper_of_string i) in
       print_del1 conf base p
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = string_person_of base (poi base (iper_of_string i)) in
-      let ifun =
+      let p =
+        string_person_of base (Driver.poi base (Driver.iper_of_string i))
+      in
+      Templ.output conf
         Templ.
           {
             eval_var = eval_var conf base;
@@ -751,5 +756,4 @@ let print_change_event_order conf base =
             set_vother;
             print_foreach;
           }
-      in
-      Templ.output conf ifun Templ.Env.empty p "updindevt"
+        Templ.Env.empty p "updindevt"

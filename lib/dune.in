@@ -11,7 +11,7 @@
             camlp-streams
             geneweb_core
             geneweb_def
-            geneweb_gwdb
+            geneweb_db
             geneweb_sosa
             geneweb_util
             geneweb_templ

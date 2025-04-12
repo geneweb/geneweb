@@ -11,12 +11,12 @@ type t =
       (** Not exhaustive result that specifies all existing names
                                  prefixes (their length depends on initial searched prefix) *)
 
-val first_letters : Gwdb.base -> bool -> string list
+val first_letters : Geneweb_db.Driver.base -> bool -> string list
 (** Returns list of all first name's first letter present in the base (UTF8 encoded).
     Used for fast access for base's names *)
 
 val select_names :
-  Config.config -> Gwdb.base -> bool -> string -> int -> t * int
+  Config.config -> Geneweb_db.Driver.base -> bool -> string -> int -> t * int
 (** [select_names conf base is_surnames ini limit]
     Select up to [limit] first names/surnames starting with [ini].
     If more values are available, return [Specify] with different

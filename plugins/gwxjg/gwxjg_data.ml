@@ -1,9 +1,12 @@
 module Ezgw = Gwxjg_ezgw
 module Lexicon_parser = Gwxjg_lexicon_parser
 module Sosa = Geneweb_sosa
+module Db = Geneweb_db
 open Geneweb
 open Jingoo
 open Jg_types
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let person_ht = Hashtbl.create 32
 let mk_opt fn = function None -> Tnull | Some x -> fn x
@@ -91,7 +94,7 @@ let rec mk_family (conf : Config.config) base
   let events' = E.events fcd in
   let events = lazy_list (mk_event conf base) events' in
   let relation =
-    match Gwdb.get_relation fam with
+    match Driver.get_relation fam with
     | Def.Married | NoSexesCheckMarried ->
         find_event conf base (Event.Fevent Def.Efam_Marriage) events'
     | NotMarried | NoSexesCheckNotMarried ->
@@ -110,7 +113,7 @@ let rec mk_family (conf : Config.config) base
         find_event conf base (Event.Fevent Def.Efam_Residence) events'
   in
   let separation =
-    match Gwdb.get_divorce fam with
+    match Driver.get_divorce fam with
     | Def.Divorced _ ->
         find_event conf base (Event.Fevent Def.Efam_Divorce) events'
     | Def.Separated _ ->
@@ -141,9 +144,9 @@ let rec mk_family (conf : Config.config) base
     | "source_raw" -> source_raw
     | _ -> raise Not_found)
 
-and get_n_mk_family conf base ?(origin = Gwdb.dummy_iper) ifam cpl =
-  let ifath = Gwdb.get_father cpl in
-  let imoth = Gwdb.get_mother cpl in
+and get_n_mk_family conf base ?(origin = Driver.dummy_iper) ifam cpl =
+  let ifath = Driver.get_father cpl in
+  let imoth = Driver.get_mother cpl in
   let cpl =
     ( ifath,
       imoth,
@@ -151,10 +154,10 @@ and get_n_mk_family conf base ?(origin = Gwdb.dummy_iper) ifam cpl =
     )
   in
   let m_auth =
-    Util.authorized_age conf base (Gwdb.poi base ifath)
-    && Util.authorized_age conf base (Gwdb.poi base imoth)
+    Util.authorized_age conf base (Driver.poi base ifath)
+    && Util.authorized_age conf base (Driver.poi base imoth)
   in
-  mk_family conf base (ifam, Gwdb.foi base ifam, cpl, m_auth)
+  mk_family conf base (ifam, Driver.foi base ifam, cpl, m_auth)
 
 and date_compare = func_arg2_no_kw date_compare_aux
 
@@ -348,17 +351,17 @@ and lazy_list : 'a. ('a -> tvalue) -> 'a list -> tvalue =
 
 and lazy_get_n_mk_person conf base i =
   let lp = lazy (get_n_mk_person conf base i) in
-  let iper = Tstr (Gwdb.string_of_iper i) in
+  let iper = Tstr (Driver.string_of_iper i) in
   Tpat (function "iper" -> iper | s -> unbox_pat (Lazy.force lp) s)
 
 and ppget conf base p =
   let open Config in
   let open Def in
-  let open Gwdb in
   if not (Util.authorized_age conf base p) then
     if conf.use_restrict then
-      get_iper p |> Gwdb.empty_person base |> unsafe_mk_person conf base
-    else if conf.hide_names || get_access p = Private then
+      Driver.get_iper p |> Driver.empty_person base
+      |> unsafe_mk_person conf base
+    else if conf.hide_names || Driver.get_access p = Private then
       let lazy_p =
         lazy (unbox_pat @@ unsafe_mk_semi_public_person conf base p)
       in
@@ -371,11 +374,11 @@ and ppget conf base p =
   else unsafe_mk_person conf base p
 
 and pget conf base ip =
-  let open Gwdb in
-  if ip = dummy_iper then unsafe_mk_person conf base (Gwdb.empty_person base ip)
-  else ppget conf base (poi base ip)
+  if ip = Driver.dummy_iper then
+    unsafe_mk_person conf base (Driver.empty_person base ip)
+  else ppget conf base (Driver.poi base ip)
 
-and get_n_mk_person conf base (i : Gwdb.iper) =
+and get_n_mk_person conf base (i : Driver.iper) =
   try Hashtbl.find person_ht i
   with Not_found ->
     let p = pget conf base i in
@@ -384,9 +387,9 @@ and get_n_mk_person conf base (i : Gwdb.iper) =
 
 and mk_rparent_aux kind conf base acc =
   let mk_rel i t s =
-    let iper = Tstr (Gwdb.string_of_iper i) in
+    let iper = Tstr (Driver.string_of_iper i) in
     let kind = kind t in
-    let sources = Tstr (Gwdb.sou base s) in
+    let sources = Tstr (Driver.sou base s) in
     let lp = lazy (get_n_mk_person conf base i) in
     Tpat
       (function
@@ -455,7 +458,7 @@ and mk_event conf base d =
           (Array.mapi
              (fun i (ip, k) ->
                let kind = mk_witness_kind k in
-               let iper = Tstr (Gwdb.string_of_iper ip) in
+               let iper = Tstr (Driver.string_of_iper ip) in
                Tpat
                  (function
                  | "kind" -> kind
@@ -482,14 +485,14 @@ and mk_event conf base d =
     | _ -> raise Not_found)
 
 and mk_title conf base t =
-  let ident = Tstr (Gwdb.sou base t.Def.t_ident) in
+  let ident = Tstr (Driver.sou base t.Def.t_ident) in
   let name =
     match t.t_name with
     | Tmain -> Tstr ""
-    | Tname s -> Tstr (Gwdb.sou base s)
+    | Tname s -> Tstr (Driver.sou base s)
     | Tnone -> Tnull
   in
-  let place_raw, place = mk_place conf (Gwdb.sou base t.t_place) in
+  let place_raw, place = mk_place conf (Driver.sou base t.t_place) in
   let date_start = mk_opt mk_date (Date.od_of_cdate t.t_date_start) in
   let date_end = mk_opt mk_date (Date.od_of_cdate t.t_date_end) in
   let nth = Tint t.t_nth in
@@ -504,10 +507,10 @@ and mk_title conf base t =
     | "nth" -> nth
     | _ -> raise Not_found)
 
-and mk_ancestors conf base (p : Gwdb.person) =
+and mk_ancestors conf base (p : Driver.person) =
   let parents =
-    match Gwdb.get_parents p with
-    | Some ifam -> Some (lazy (Gwdb.foi base ifam))
+    match Driver.get_parents p with
+    | Some ifam -> Some (lazy (Driver.foi base ifam))
     | None -> None
   in
   let mk_parent fn =
@@ -522,27 +525,27 @@ and mk_ancestors conf base (p : Gwdb.person) =
         Tlazy
           (lazy
             (let cpl = Lazy.force f in
-             let ifam = Gwdb.get_ifam cpl in
-             let ifath = Gwdb.get_father cpl in
-             let imoth = Gwdb.get_mother cpl in
-             let cpl = (ifath, imoth, Gwdb.dummy_iper) in
+             let ifam = Driver.get_ifam cpl in
+             let ifath = Driver.get_father cpl in
+             let imoth = Driver.get_mother cpl in
+             let cpl = (ifath, imoth, Driver.dummy_iper) in
              let m_auth =
-               Util.authorized_age conf base (Gwdb.poi base ifath)
-               && Util.authorized_age conf base (Gwdb.poi base imoth)
+               Util.authorized_age conf base (Driver.poi base ifath)
+               && Util.authorized_age conf base (Driver.poi base imoth)
              in
-             mk_family conf base (ifam, Gwdb.foi base ifam, cpl, m_auth)))
+             mk_family conf base (ifam, Driver.foi base ifam, cpl, m_auth)))
   in
-  let father = mk_parent Gwdb.get_father in
-  let mother = mk_parent Gwdb.get_mother in
+  let father = mk_parent Driver.get_father in
+  let mother = mk_parent Driver.get_mother in
   (parents, father, mother)
 
-and mk_rparents conf base (p : Gwdb.person) =
+and mk_rparents conf base (p : Driver.person) =
   let mkr p r =
-    if Gwdb.get_sex p = Def.Female then
-      { r with Def.r_fath = None; r_moth = Some (Gwdb.get_iper p) }
-    else { r with Def.r_fath = Some (Gwdb.get_iper p); r_moth = None }
+    if Driver.get_sex p = Def.Female then
+      { r with Def.r_fath = None; r_moth = Some (Driver.get_iper p) }
+    else { r with Def.r_fath = Some (Driver.get_iper p); r_moth = None }
   in
-  match Gwdb.get_rparents p with
+  match Driver.get_rparents p with
   | [] -> Tlist []
   | r ->
       box_list
@@ -552,14 +555,14 @@ and mk_rparents conf base (p : Gwdb.person) =
                 let p = Util.pget conf base i in
                 List.fold_left
                   (fun acc r -> mk_rchild conf base acc @@ mkr p r)
-                  acc (Gwdb.get_rparents p))
+                  acc (Driver.get_rparents p))
               []
-           @@ Gwdb.get_related p)
+           @@ Driver.get_related p)
            r
 
-and mk_families_spouses iper conf base (p : Gwdb.person) =
+and mk_families_spouses iper conf base (p : Driver.person) =
   let lazy_families =
-    lazy (Array.map (fun i -> (i, Gwdb.foi base i)) @@ Gwdb.get_family p)
+    lazy (Array.map (fun i -> (i, Driver.foi base i)) @@ Driver.get_family p)
   in
   let families =
     Tlazy
@@ -576,33 +579,33 @@ and mk_families_spouses iper conf base (p : Gwdb.person) =
         (Tarray
            (Array.map
               (fun (_, c) ->
-                let f = Gwdb.get_father c in
+                let f = Driver.get_father c in
                 get_n_mk_person conf base
-                  (if f = iper then Gwdb.get_mother c else f))
+                  (if f = iper then Driver.get_mother c else f))
               (Lazy.force lazy_families))))
   in
   (families, spouses)
 
 and mk_str_lst base istrs =
-  Tlist (List.map (fun i -> Tstr (Gwdb.sou base i)) istrs)
+  Tlist (List.map (fun i -> Tstr (Driver.sou base i)) istrs)
 
-and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
-  let iper' = Gwdb.get_iper p in
+and unsafe_mk_semi_public_person conf base (p : Driver.person) =
+  let iper' = Driver.get_iper p in
   let module E = Ezgw.Person in
   let access = escaped (Util.acces conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let first_name = Tstr (E.first_name base p) in
-  let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
+  let first_name_aliases = mk_str_lst base (Driver.get_first_names_aliases p) in
   let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
-  let iper = Tstr (Gwdb.string_of_iper iper') in
+  let iper = Tstr (Driver.string_of_iper iper') in
   let related = mk_rparents conf base p in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
   let siblings = siblings_aux E.siblings in
   let half_siblings = siblings_aux E.half_siblings in
   let sex = Tint (E.sex p) in
   let surname = Tstr (E.surname base p) in
-  let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
+  let surname_aliases = mk_str_lst base (Driver.get_surnames_aliases p) in
   let events = Tlist [] in
   Tpat
     (function
@@ -644,13 +647,13 @@ and find_events conf base x events =
   | Some e -> mk_event conf base e
   | None -> Tnull
 
-and unsafe_mk_person conf base (p : Gwdb.person) =
+and unsafe_mk_person conf base (p : Driver.person) =
   let module E = Ezgw.Person in
-  let iper' = Gwdb.get_iper p in
+  let iper' = Driver.get_iper p in
   let access = escaped (Util.acces conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
-  let aliases = mk_str_lst base (Gwdb.get_aliases p) in
+  let aliases = mk_str_lst base (Driver.get_aliases p) in
   let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
   let consanguinity = Tfloat (E.consanguinity p) in
   let events' = E.events conf base p in
@@ -659,7 +662,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let baptism = find_event conf base (Event.Pevent Epers_Baptism) events' in
   let death =
     let wrap s = Tpat (function "reason" -> Tsafe s | _ -> raise Not_found) in
-    match Gwdb.get_death p with
+    match Driver.get_death p with
     | Def.NotDead -> Tnull
     | Death (r, _cd) ->
         let reason =
@@ -683,22 +686,22 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
       events'
   in
   let first_name = Tstr (E.first_name base p) in
-  let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
+  let first_name_aliases = mk_str_lst base (Driver.get_first_names_aliases p) in
   let image =
     Tstr
       (Image.get_portrait conf base p
       |> Option.fold ~none:"" ~some:Image.src_to_string)
   in
-  let iper = Tstr (Gwdb.string_of_iper iper') in
+  let iper = Tstr (Driver.string_of_iper iper') in
   let linked_page =
     Tlazy
       (lazy
-        (let db = Gwdb.read_nldb base in
+        (let db = Driver.read_nldb base in
          let db = Notes.merge_possible_aliases conf db in
          let key =
-           let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-           let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
-           (fn, sn, Gwdb.get_occ p)
+           let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+           let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+           (fn, sn, Driver.get_occ p)
          in
          if
            List.exists
@@ -707,7 +710,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
                | Def.NLDB.PgInd ip ->
                    Util.pget conf base ip |> Util.authorized_age conf base
                | Def.NLDB.PgFam ifam ->
-                   Gwdb.foi base ifam |> Gwdb.get_father |> Util.pget conf base
+                   Driver.foi base ifam |> Driver.get_father
+                   |> Util.pget conf base
                    |> Util.authorized_age conf base
                | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ ->
                    true)
@@ -722,14 +726,14 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
                     (Adef.safe "") db))
          else Tnull))
   in
-  let titles = lazy_list (mk_title conf base) (Gwdb.get_titles p) in
+  let titles = lazy_list (mk_title conf base) (Driver.get_titles p) in
   let _, note = mk_person_note_rs conf base p (E.note conf base p) in
-  let occ = Tint (Gwdb.get_occ p) in
+  let occ = Tint (Driver.get_occ p) in
   let occupation_raw, occupation =
-    mk_source_rs conf base (Gwdb.sou base @@ Gwdb.get_occupation p)
+    mk_source_rs conf base (Driver.sou base @@ Driver.get_occupation p)
   in
-  let public_name = Tstr (Gwdb.sou base @@ Gwdb.get_public_name p) in
-  let qualifiers = mk_str_lst base (Gwdb.get_qualifiers p) in
+  let public_name = Tstr (Driver.sou base @@ Driver.get_public_name p) in
+  let qualifiers = mk_str_lst base (Driver.get_qualifiers p) in
   let related = mk_rparents conf base p in
   let relations = lazy_list (get_n_mk_person conf base) (E.relations p) in
   let sex = Tint (E.sex p) in
@@ -737,10 +741,10 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let siblings = siblings_aux E.siblings in
   let half_siblings = siblings_aux E.half_siblings in
   let source_raw, source =
-    mk_source_rs conf base (Gwdb.sou base @@ Gwdb.get_psources p)
+    mk_source_rs conf base (Driver.sou base @@ Driver.get_psources p)
   in
   let surname = Tstr (E.surname base p) in
-  let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
+  let surname_aliases = mk_str_lst base (Driver.get_surnames_aliases p) in
   let sosa = box_lazy @@ lazy (get_sosa_person conf base p) in
   Tpat
     (function
@@ -805,9 +809,9 @@ and mk_pevent conf base e =
 (* take optionnal p parameter for spouse things? *)
 and mk_warning conf base =
   let get_fam ifam =
-    let cpl = Gwdb.foi base ifam in
-    let ifath = Gwdb.get_father cpl in
-    let imoth = Gwdb.get_mother cpl in
+    let cpl = Driver.foi base ifam in
+    let ifath = Driver.get_father cpl in
+    let imoth = Driver.get_mother cpl in
     (* spouse if not used so it should be okay *)
     mk_family conf base (ifam, cpl, (ifath, imoth, imoth), true)
   in
@@ -971,7 +975,7 @@ and mk_warning conf base =
           Tsafe "OldForMarriage";
           unsafe_mk_person conf base p;
           mk_date (Dgreg (a, Dgregorian));
-          get_n_mk_family conf base i (Gwdb.foi base i);
+          get_n_mk_family conf base i (Driver.foi base i);
         ]
   | ParentBornAfterChild (p1, p2) ->
       Tset
@@ -1061,7 +1065,9 @@ let module_NAME base =
     | Tsafe _ -> Tsafe s
     | _ -> assert false
   in
-  let get_particle s = Mutil.get_particle (Gwdb.base_particles base) s in
+  let get_particle s =
+    Mutil.get_particle (Geneweb_db.Driver.base_particles base) s
+  in
   let particle =
     func_arg1_no_kw (function
       | (Tstr s | Tsafe s) as x -> (
@@ -1139,7 +1145,7 @@ let mk_env conf base =
     box_lazy
     @@ lazy
          (match Util.p_getenv conf.Config.env "iz" with
-         | Some i -> get_n_mk_person conf base (Gwdb.iper_of_string i)
+         | Some i -> get_n_mk_person conf base (Driver.iper_of_string i)
          | None -> (
              match Util.p_getenv conf.env "pz" with
              | None -> (
@@ -1156,7 +1162,7 @@ let mk_env conf base =
                      let occ =
                        Option.value ~default:0 (Util.p_getint conf.env "ocz")
                      in
-                     match Gwdb.person_of_key base p n occ with
+                     match Geneweb_db.Driver.person_of_key base p n occ with
                      | Some ip -> get_n_mk_person conf base ip
                      | None -> Tnull))))
   in
@@ -1181,9 +1187,9 @@ let encode_varenv =
 let mk_base base =
   Tpat
     (function
-    | "nb_persons" -> Tint (Gwdb.nb_of_persons base)
-    | "nb_families" -> Tint (Gwdb.nb_of_families base)
-    | "name" -> Tstr (Gwdb.bname base)
+    | "nb_persons" -> Tint (Driver.nb_of_persons base)
+    | "nb_families" -> Tint (Driver.nb_of_families base)
+    | "name" -> Tstr (Driver.bname base)
     | _ -> raise Not_found)
 
 let stringify s =
@@ -1296,14 +1302,14 @@ let module_CAST =
 let module_GWDB conf base =
   let poi =
     func_arg1_no_kw @@ function
-    | Tstr i | Tsafe i -> get_n_mk_person conf base (Gwdb.iper_of_string i)
+    | Tstr i | Tsafe i -> get_n_mk_person conf base (Driver.iper_of_string i)
     | x -> failwith_type_error_1 "GWDB.poi" x
   in
   let foi =
     func_arg1_no_kw @@ function
     | Tstr i | Tsafe i ->
-        let i = Gwdb.ifam_of_string i in
-        get_n_mk_family conf base i (Gwdb.foi base i)
+        let i = Driver.ifam_of_string i in
+        get_n_mk_family conf base i (Driver.foi base i)
     | x -> failwith_type_error_1 "GWDB.foi" x
   in
   Tpat (function "poi" -> poi | "foi" -> foi | _ -> raise Not_found)

@@ -1,8 +1,8 @@
 open Config
 open Def
-open Gwdb
 open Util
 open Title
+module Driver = Geneweb_db.Driver
 
 let my_alphabetic n1 n2 = compare (Name.lower n1) (Name.lower n2)
 
@@ -42,27 +42,27 @@ let give_access_someone conf base (x, t) list =
   else
     Output.print_string conf
       ({|<a href="|} ^<^ commd conf ^^^ acces conf base x ^>^ {|">|});
-  (match (t.t_name, get_public_name x, get_qualifiers x) with
-  | Tmain, pn, nn :: _ when sou base pn <> "" ->
-      Output.print_string conf (escape_html @@ sou base pn);
+  (match (t.t_name, Driver.get_public_name x, Driver.get_qualifiers x) with
+  | Tmain, pn, nn :: _ when Driver.sou base pn <> "" ->
+      Output.print_string conf (escape_html @@ Driver.sou base pn);
       Output.print_sstring conf " <em>";
-      Output.print_string conf (escape_html @@ sou base nn);
+      Output.print_string conf (escape_html @@ Driver.sou base nn);
       Output.print_sstring conf "</em> ";
-      Output.print_string conf (escape_html @@ p_surname base x)
-  | Tmain, pn, [] when sou base pn <> "" ->
-      Output.print_string conf (escape_html @@ sou base pn);
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
+  | Tmain, pn, [] when Driver.sou base pn <> "" ->
+      Output.print_string conf (escape_html @@ Driver.sou base pn);
       Output.print_sstring conf " ";
-      Output.print_string conf (escape_html @@ p_surname base x)
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
   | Tname n, _, nn :: _ ->
-      Output.print_string conf (escape_html @@ sou base n);
+      Output.print_string conf (escape_html @@ Driver.sou base n);
       Output.print_sstring conf " <em>";
-      Output.print_string conf (escape_html @@ sou base nn);
+      Output.print_string conf (escape_html @@ Driver.sou base nn);
       Output.print_sstring conf "</em> ";
-      Output.print_string conf (escape_html @@ p_surname base x)
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
   | Tname n, _, [] ->
-      Output.print_string conf (escape_html @@ sou base n);
+      Output.print_string conf (escape_html @@ Driver.sou base n);
       Output.print_sstring conf " ";
-      Output.print_string conf (escape_html @@ p_surname base x)
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
   | _ -> Output.print_string conf (gen_person_text conf base x));
   Output.print_sstring conf "\n";
   Output.print_string conf (DateDisplay.short_dates_text conf base x);
@@ -118,7 +118,8 @@ let propose_tree_for_list list conf =
              Output.print_sstring conf "&i";
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";
-             Output.print_sstring conf (Gwdb.string_of_iper @@ get_iper p);
+             Output.print_sstring conf
+               (Driver.string_of_iper @@ Driver.get_iper p);
              Output.print_sstring conf "&t";
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";
@@ -178,7 +179,7 @@ let print_all_with_place_list conf base p list =
       Output.print_sstring conf "<li>";
       give_access_someone conf base x [];
       Output.print_sstring conf ", ";
-      Output.print_string conf (sou base t.t_ident |> escape_html);
+      Output.print_string conf (Driver.sou base t.t_ident |> escape_html);
       Output.printf conf "<li>")
     list;
   Output.print_sstring conf "</ul>\n";

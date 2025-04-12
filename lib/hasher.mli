@@ -22,9 +22,9 @@ module type S = sig
   val array : 'a feeder -> 'a array feeder
   val pair : 'a feeder -> 'b feeder -> ('a * 'b) feeder
   val option : 'a feeder -> 'a option feeder
-  val iper : Gwdb_legacy.Gwdb_driver.iper feeder
-  val ifam : Gwdb_legacy.Gwdb_driver.ifam feeder
-  val istr : Gwdb_legacy.Gwdb_driver.istr feeder
+  val iper : Geneweb_db.Driver.iper feeder
+  val ifam : Geneweb_db.Driver.ifam feeder
+  val istr : Geneweb_db.Driver.istr feeder
   val calendar : Adef.calendar feeder
   val dmy2 : Adef.dmy2 feeder
   val precision : Adef.precision feeder

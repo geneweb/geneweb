@@ -2,8 +2,10 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Gutil = Geneweb_db.Gutil
 
 let get_number var key env = p_getint env (var ^ "_" ^ key)
 
@@ -142,7 +144,7 @@ let advanced_search conf base max_answers =
     let y = gets x in
     if y = "" then empty_default_value
     else if authorized_age conf base p then
-      cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
+      cmp (abbrev_lower y) (abbrev_lower @@ Driver.sou base @@ get p)
     else false
   in
   let do_compare p y get cmp =
@@ -156,7 +158,7 @@ let advanced_search conf base max_answers =
     else false
   in
   let apply_to_field_values p x get cmp empty_default_value =
-    let get p = sou base @@ get p in
+    let get p = Driver.sou base @@ get p in
     apply_to_field_values_raw p x get cmp empty_default_value
   in
   (* Check if the date matches with the person event. *)
@@ -184,21 +186,23 @@ let advanced_search conf base max_answers =
   let match_sex p empty_default_value =
     apply_to_field_value_raw p "sex"
       (function
-        | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
+        | "M" -> Driver.get_sex p = Male
+        | "F" -> Driver.get_sex p = Female
+        | _ -> true)
       empty_default_value
   in
 
   let match_death p empty_default_value =
     let is_dead p =
-      match Gwdb.get_death p with
+      match Driver.get_death p with
       | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> true
       | _ -> false
     in
     apply_to_field_value_raw p "death"
       (function
         | "Dead" -> is_dead p
-        | "NotDead" -> Gwdb.get_death p = NotDead
-        | "DontKnowIfDead" -> Gwdb.get_death p = DontKnowIfDead
+        | "NotDead" -> Driver.get_death p = NotDead
+        | "DontKnowIfDead" -> Driver.get_death p = DontKnowIfDead
         | _ -> true)
       empty_default_value
   in
@@ -235,47 +239,48 @@ let advanced_search conf base max_answers =
   in
   let match_baptism_date p empty_default_value =
     match_date p bapt_date_field_name
-      (fun () -> Date.od_of_cdate (get_baptism p))
+      (fun () -> Date.od_of_cdate (Driver.get_baptism p))
       empty_default_value
   in
   let match_birth_date p empty_default_value =
     match_date p birth_date_field_name
-      (fun () -> Date.od_of_cdate (get_birth p))
+      (fun () -> Date.od_of_cdate (Driver.get_birth p))
       empty_default_value
   in
   let match_death_date p empty_default_value =
     match_date p death_date_field_name
-      (fun () -> Date.date_of_death (get_death p))
+      (fun () -> Date.date_of_death (Driver.get_death p))
       empty_default_value
   in
   let match_burial_date p empty_default_value =
     match_date p burial_date_field_name
       (fun () ->
         (* TODO Date.cdate_of_burial *)
-        match get_burial p with
+        match Driver.get_burial p with
         | Buried cod | Cremated cod -> Date.od_of_cdate cod
         | UnknownBurial -> None)
       empty_default_value
   in
   let cmp_place = if "on" = gets "exact_place" then ( = ) else string_incl in
   let match_baptism_place p empty_default_value =
-    apply_to_field_values p bapt_place_field_name get_baptism_place cmp_place
-      empty_default_value
+    apply_to_field_values p bapt_place_field_name Driver.get_baptism_place
+      cmp_place empty_default_value
   in
   let match_birth_place p empty_default_value =
-    apply_to_field_values p birth_place_field_name get_birth_place cmp_place
-      empty_default_value
+    apply_to_field_values p birth_place_field_name Driver.get_birth_place
+      cmp_place empty_default_value
   in
   let match_death_place p empty_default_value =
-    apply_to_field_values p death_place_field_name get_death_place cmp_place
-      empty_default_value
+    apply_to_field_values p death_place_field_name Driver.get_death_place
+      cmp_place empty_default_value
   in
   let match_burial_place p empty_default_value =
-    apply_to_field_values p burial_place_field_name get_burial_place cmp_place
-      empty_default_value
+    apply_to_field_values p burial_place_field_name Driver.get_burial_place
+      cmp_place empty_default_value
   in
   let match_occupation p empty_default_value =
-    apply_to_field_value p "occu" get_occupation string_incl empty_default_value
+    apply_to_field_value p "occu" Driver.get_occupation string_incl
+      empty_default_value
   in
   let match_name search_list exact : string list -> bool =
     let eq : string list -> string list -> bool =
@@ -291,20 +296,24 @@ let advanced_search conf base max_answers =
       let eq = match_name fn_list (gets "exact_first_name" = "on") in
       fun p ->
         eq
-          (List.map Name.lower @@ Name.split_fname @@ sou base
-         @@ get_first_name p)
+          (List.map Name.lower @@ Name.split_fname @@ Driver.sou base
+         @@ Driver.get_first_name p)
   in
   let match_surname =
     if sn_list = [] then fun _ -> true
     else
       let eq = match_name sn_list (gets "exact_surname" = "on") in
       fun p ->
-        eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
+        eq
+          (List.map Name.lower @@ Name.split_sname @@ Driver.sou base
+         @@ Driver.get_surname p)
   in
   let match_married p empty_default_value =
     apply_to_field_value_raw p "married"
       (function
-        | "Y" -> get_family p <> [||] | "N" -> get_family p = [||] | _ -> true)
+        | "Y" -> Driver.get_family p <> [||]
+        | "N" -> Driver.get_family p = [||]
+        | _ -> true)
       empty_default_value
   in
   let match_marriage p x y empty_default_value =
@@ -313,21 +322,21 @@ let advanced_search conf base max_answers =
     let test_date_place df =
       Array.exists
         (fun ifam ->
-          let fam = foi base ifam in
-          let sp = poi base @@ Gutil.spouse (get_iper p) fam in
+          let fam = Driver.foi base ifam in
+          let sp = Driver.poi base @@ Gutil.spouse (Driver.get_iper p) fam in
           if authorized_age conf base sp then
             df fam
             && (y = []
                || do_compare fam y
-                    (fun f -> sou base @@ get_marriage_place f)
+                    (fun f -> Driver.sou base @@ Driver.get_marriage_place f)
                     cmp_place)
           else false)
-        (get_family p)
+        (Driver.get_family p)
     in
     match (d1, d2) with
     | Some d1, Some d2 ->
         test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
+            match Date.od_of_cdate (Driver.get_marriage fam) with
             | Some (Dgreg (_, _) as d) ->
                 if Date.compare_date d d1 < 0 then false
                 else if Date.compare_date d2 d < 0 then false
@@ -335,13 +344,13 @@ let advanced_search conf base max_answers =
             | _ -> false)
     | Some d1, _ ->
         test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
+            match Date.od_of_cdate (Driver.get_marriage fam) with
             | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
                 if Date.compare_date d d1 < 0 then false else true
             | _ -> false)
     | _, Some d2 ->
         test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
+            match Date.od_of_cdate (Driver.get_marriage fam) with
             | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
                 if Date.compare_date d d2 > 0 then false else true
             | _ -> false)
@@ -393,20 +402,22 @@ let advanced_search conf base max_answers =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
           let rec loop p (set, acc) =
-            if not (IperSet.mem (get_iper p) set) then
-              let set = IperSet.add (get_iper p) set in
+            if not (IperSet.mem (Driver.get_iper p) set) then
+              let set = IperSet.add (Driver.get_iper p) set in
               let acc = match_person acc p search_type in
-              match get_parents p with
+              match Driver.get_parents p with
               | Some ifam ->
-                  let fam = foi base ifam in
+                  let fam = Driver.foi base ifam in
                   let set, acc =
-                    loop (pget conf base @@ get_mother fam) (set, acc)
+                    loop (pget conf base @@ Driver.get_mother fam) (set, acc)
                   in
-                  loop (pget conf base @@ get_father fam) (set, acc)
+                  loop (pget conf base @@ Driver.get_father fam) (set, acc)
               | None -> (set, acc)
             else (set, acc)
           in
-          loop (pget conf base @@ get_iper sosa_ref) (IperSet.empty, ([], 0))
+          loop
+            (pget conf base @@ Driver.get_iper sosa_ref)
+            (IperSet.empty, ([], 0))
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
@@ -417,27 +428,27 @@ let advanced_search conf base max_answers =
                let istrs = strings_of base x in
                List.fold_left
                  (fun acc istr ->
-                   let str = Mutil.nominative (sou base istr) in
+                   let str = Mutil.nominative (Driver.sou base istr) in
                    if eq (List.map Name.lower @@ split str) then istr :: acc
                    else acc)
                  [] istrs))
           n_list
         |> List.flatten |> List.flatten |> List.sort_uniq compare
-        |> List.map (spi_find @@ persons_of base)
+        |> List.map (Driver.spi_find @@ persons_of base)
         |> List.flatten |> List.sort_uniq compare
       in
       let skip_fname, skip_sname, list =
         if sn_list <> [] then
           ( false,
             true,
-            list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-              Name.split_sname sn_list
+            list_aux Geneweb_db.Driver.base_strings_of_surname
+              Geneweb_db.Driver.persons_of_surname Name.split_sname sn_list
               (gets "exact_surname" = "on") )
         else
           ( true,
             false,
-            list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
-              Name.split_fname fn_list
+            list_aux Geneweb_db.Driver.base_strings_of_first_name
+              Geneweb_db.Driver.persons_of_first_name Name.split_fname fn_list
               (gets "exact_first_name" = "on") )
       in
       let rec loop ((_, len) as acc) = function
@@ -451,10 +462,11 @@ let advanced_search conf base max_answers =
       in
       loop ([], 0) list
     else
-      Gwdb.Collection.fold_until
+      Collection.fold_until
         (fun (_, len) -> len <= max_answers)
         (fun acc i -> match_person acc (pget conf base i) search_type)
-        ([], 0) (Gwdb.ipers base)
+        ([], 0)
+        (Geneweb_db.Driver.ipers base)
   in
   (List.rev list, len)
 

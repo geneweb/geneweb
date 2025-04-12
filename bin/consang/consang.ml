@@ -1,6 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Outbase = Gwdb_legacy.Outbase
+module Outbase = Geneweb_db.Outbase
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let fname = ref ""
 let scratch = ref false
@@ -15,7 +17,7 @@ let speclist =
     ("-fast", Arg.Set fast, " faster, but use more memory");
     ("-scratch", Arg.Set scratch, " from scratch");
     ( "-mem",
-      Arg.Set Outbase.save_mem,
+      Arg.Set Geneweb_db.Outbase.save_mem,
       " Save memory, but slower when rewritting database" );
     ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
   ]
@@ -39,19 +41,19 @@ let () =
     exit 2
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
-  Gwdb.with_database !fname (fun base ->
+  Driver.with_database !fname (fun base ->
       if !fast then (
-        Gwdb.load_persons_array base;
-        Gwdb.load_families_array base;
-        Gwdb.load_ascends_array base;
-        Gwdb.load_unions_array base;
-        Gwdb.load_couples_array base;
-        Gwdb.load_descends_array base;
-        Gwdb.load_strings_array base);
+        Driver.load_persons_array base;
+        Driver.load_families_array base;
+        Driver.load_ascends_array base;
+        Driver.load_unions_array base;
+        Driver.load_couples_array base;
+        Driver.load_descends_array base;
+        Driver.load_strings_array base);
       try
         Sys.catch_break true;
         if ConsangAll.compute ~verbosity:!verbosity base !scratch then
-          Gwdb.sync base
+          Driver.sync base
       with Consang.TopologicalSortError p ->
         Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
           (Gutil.designation base p);

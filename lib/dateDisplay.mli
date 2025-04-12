@@ -2,7 +2,6 @@
 
 open Config
 open Def
-open Gwdb
 
 val get_wday : config -> date -> string
 (** [get_wday conf date]
@@ -58,7 +57,11 @@ val month_text : dmy -> string
 val year_text : config -> dmy -> string
 (** Returns textual representation of date's year. *)
 
-val short_dates_text : config -> base -> person -> Adef.safe_string
+val short_dates_text :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Returns concatenation of person's birth and death dates (if exists). Precision is mentionned for each date.
     For example :
 
@@ -68,14 +71,24 @@ val short_dates_text : config -> base -> person -> Adef.safe_string
         * †1780     (unknown birth date - death)
         * †         (unknown birth date - death but don't know when) *)
 
-val short_dates_text_notag : config -> base -> person -> string
+val short_dates_text_notag :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> string
 
 val short_marriage_date_text :
-  config -> base -> family -> person -> person -> Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.family ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string
 (** Retruns year of marriage for given spouses with its precision. *)
 
 val short_family_dates_text :
-  config -> base -> bool -> family -> Adef.safe_string
+  config ->
+  Geneweb_db.Driver.base ->
+  bool ->
+  Geneweb_db.Driver.family ->
+  Adef.safe_string
 (** Retruns years of marriage (yyy1-yyy2) for given family taking
 into account possible separation or divorce. *)
 

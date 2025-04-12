@@ -13,9 +13,7 @@
   (wrapped true)
   (libraries
     geneweb
-    wserver
-    %%%GWDB_PKG%%%
-  )
+    wserver)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwdPlugin request)
 )
@@ -33,9 +31,7 @@
     str
     unix
     uri
-    wserver
-    %%%GWDB_PKG%%%
-  )
+    wserver)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules
     base64
