@@ -1,13 +1,14 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
 module StrSet = Mutil.StrSet
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let file_path conf base fname =
   String.concat Filename.dir_sep
-    [ Util.bpath conf.bname; base_notes_dir base; fname ^ ".txt" ]
+    [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -16,7 +17,7 @@ let path_of_fnotes fnotes =
 
 let read_notes base fnotes =
   let fnotes = path_of_fnotes fnotes in
-  let s = base_notes_read base fnotes in
+  let s = Driver.base_notes_read base fnotes in
   Wiki.split_title_and_text s
 
 let merge_possible_aliases conf db =
@@ -61,7 +62,7 @@ let merge_possible_aliases conf db =
     [] db
 
 let notes_links_db conf base eliminate_unlinked =
-  let db = Gwdb.read_nldb base in
+  let db = Driver.read_nldb base in
   let db = merge_possible_aliases conf db in
   let db2 =
     List.fold_left
@@ -71,8 +72,9 @@ let notes_links_db conf base eliminate_unlinked =
           match pg with
           | PgInd ip -> pget conf base ip |> authorized_age conf base
           | PgFam ifam ->
-              foi base ifam |> get_father |> pget conf base
-              |> authorized_age conf base
+              Driver.(
+                foi base ifam |> get_father |> pget conf base
+                |> authorized_age conf base)
           | PgNotes | PgMisc _ | PgWizard _ -> true
         in
         if record_it then
@@ -263,7 +265,7 @@ let update_notes_links_person base (p : _ Def.gen_person) =
       in
       loop p.pevents sl
     in
-    String.concat " " (List.map (sou base) sl)
+    String.concat " " (List.map (Driver.sou base) sl)
   in
   update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
 
@@ -278,7 +280,7 @@ let update_notes_links_family base (f : _ Def.gen_family) =
       in
       loop f.fevents sl
     in
-    String.concat " " (List.map (sou base) sl)
+    String.concat " " (List.map (Driver.sou base) sl)
   in
   update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
 
@@ -287,10 +289,10 @@ let commit_notes conf base fnotes s =
   let fname = path_of_fnotes fnotes in
   let fpath =
     String.concat Filename.dir_sep
-      [ Util.bpath conf.bname; base_notes_dir base; fname ]
+      [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ]
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
-  (try Gwdb.commit_notes base fname s
+  (try Driver.commit_notes base fname s
    with Sys_error m ->
      Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
@@ -302,10 +304,10 @@ let commit_wiznotes conf base fnotes s =
   let fpath =
     List.fold_left Filename.concat
       (Util.bpath (conf.bname ^ ".gwb"))
-      [ base_wiznotes_dir base; fname ]
+      [ Driver.base_wiznotes_dir base; fname ]
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
-  Gwdb.commit_wiznotes base fname s;
+  Driver.commit_wiznotes base fname s;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
 
@@ -450,14 +452,16 @@ let rewrite_key s oldk newk _file =
   rebuild "" 0
 
 let replace_ind_key_in_str base is oldk newk p =
-  let s = sou base is in
+  let s = Driver.sou base is in
   let design = Gutil.designation base p in
   let s' = rewrite_key s oldk newk design in
-  Gwdb.insert_string base s'
+  Driver.insert_string base s'
 
 let update_ind_key_pgind base p oldk newk =
-  let oldp = Gwdb.gen_person_of_person @@ poi base p in
-  let replace is = replace_ind_key_in_str base is oldk newk (poi base p) in
+  let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
+  let replace is =
+    replace_ind_key_in_str base is oldk newk (Driver.poi base p)
+  in
   let notes = replace oldp.notes in
   let occupation = replace oldp.occupation in
   let birth_note = replace oldp.birth_note in
@@ -496,14 +500,14 @@ let update_ind_key_pgind base p oldk newk =
       pevents;
     }
   in
-  Gwdb.patch_person base p newp;
+  Driver.patch_person base p newp;
   update_notes_links_person base newp
 
 let update_ind_key_pgfam base f oldk newk =
-  let oldf = Gwdb.gen_family_of_family @@ foi base f in
-  let cpl = foi base f in
-  let fath = poi base (get_father cpl) in
-  let moth = poi base (get_mother cpl) in
+  let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
+  let cpl = Driver.foi base f in
+  let fath = Driver.poi base (Driver.get_father cpl) in
+  let moth = Driver.poi base (Driver.get_mother cpl) in
   let _family =
     Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
   in
@@ -525,18 +529,18 @@ let update_ind_key_pgfam base f oldk newk =
   let newf =
     { oldf with marriage_note; marriage_src; comment; fsources; fevents }
   in
-  Gwdb.patch_family base f newf;
+  Driver.patch_family base f newf;
   update_notes_links_family base newf
 
 let update_ind_key_pgmisc conf base f oldk newk =
   let fname = path_of_fnotes f in
-  let oldn = base_notes_read base fname in
+  let oldn = Driver.base_notes_read base fname in
   let newn = rewrite_key oldn oldk newk f in
   commit_notes conf base f newn
 
 let update_ind_key_pgwiz conf base f oldk newk =
   let fname = path_of_fnotes f in
-  let oldn = base_wiznotes_read base fname in
+  let oldn = Driver.base_wiznotes_read base fname in
   let newn = rewrite_key oldn oldk newk f in
   commit_wiznotes conf base f newn
 
@@ -573,7 +577,7 @@ let note conf base env str = wiki_aux (fun x -> x) conf base env str
 let person_note conf base p str =
   let env =
     [
-      ('i', fun () -> string_of_iper (get_iper p));
+      ('i', fun () -> Driver.string_of_iper (Driver.get_iper p));
       ('k', fun () -> Image.default_image_filename "portraits" base p);
     ]
   in
@@ -582,7 +586,7 @@ let person_note conf base p str =
 let source_note conf base p str =
   let env =
     [
-      ('i', fun () -> string_of_iper (get_iper p));
+      ('i', fun () -> Driver.string_of_iper (Driver.get_iper p));
       ('k', fun () -> Image.default_image_filename "portraits" base p);
     ]
   in
@@ -610,7 +614,7 @@ let fold_linked_pages conf base db key type_filter transform =
             | _ -> true)
         | Def.NLDB.PgFam ifam, None -> (
             authorized_age conf base
-              (pget conf base (get_father @@ foi base ifam))
+              (pget conf base (Driver.get_father @@ Driver.foi base ifam))
             &&
             match type_filter with
             | Some "gallery" | Some "album" -> false
@@ -687,7 +691,9 @@ let update_cache_linked_pages conf mode old_key new_key nbr =
       write_cache_linked_pages conf ht
 
 let linked_pages_nbr conf base ip =
-  let key = Util.make_key base (Gwdb.gen_person_of_person (poi base ip)) in
+  let key =
+    Util.make_key base (Driver.gen_person_of_person (Driver.poi base ip))
+  in
   let ht = read_cache_linked_pages conf in
   let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
   match entry with Some nbr -> nbr | None -> 0

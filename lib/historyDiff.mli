@@ -1,9 +1,11 @@
 type gen_record = {
   date : Adef.safe_string;
   wizard : Adef.safe_string;
-  gen_p : (Gwdb.iper, Gwdb.iper, string) Def.gen_person;
-  gen_f : (Gwdb.iper, Gwdb.ifam, string) Def.gen_family list;
-  gen_c : Gwdb.iper array list;
+  gen_p :
+    (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) Def.gen_person;
+  gen_f :
+    (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam, string) Def.gen_family list;
+  gen_c : Geneweb_db.Driver.iper array list;
 }
 (** Type that represents one update record stored in the history file for concerned person. *)
 
@@ -16,8 +18,12 @@ val history_path : Config.config -> string -> string
 
 val record_diff :
   Config.config ->
-  Gwdb.base ->
-  (Gwdb.iper, Gwdb.iper, Gwdb.ifam, string) Def.base_changed ->
+  Geneweb_db.Driver.base ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.ifam,
+    string )
+  Def.base_changed ->
   unit
 (** [record_diff conf base change] records new updated information [change]
     inside the history files of concerned by [change] persons. *)

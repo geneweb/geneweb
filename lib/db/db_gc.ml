@@ -5,7 +5,7 @@ let dummy_ifam = -1
 let empty_string = 0
 let quest_string = 1
 
-let empty_person p =
+let empty_person (p : _ Def.gen_person) =
   (p.first_name = empty_string || p.first_name = quest_string)
   && (p.surname = empty_string || p.surname = quest_string)
   (* && p.occ = 0 *)

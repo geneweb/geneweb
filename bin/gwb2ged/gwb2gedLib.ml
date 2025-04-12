@@ -2,7 +2,8 @@
 
 open Geneweb
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 let int_of_iper =
   let ht = Hashtbl.create 0 in
@@ -226,7 +227,9 @@ let ged_header opts base ifile ofile =
   | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
   | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n");
   if opts.Gwexport.no_notes = `none then
-    match base_notes_read base "" with "" -> () | s -> display_note opts 1 s
+    match Driver.base_notes_read base "" with
+    | "" -> ()
+    | s -> display_note opts 1 s
 
 let sub_string_index s t =
   let rec loop i j =
@@ -238,10 +241,10 @@ let sub_string_index s t =
   loop 0 0
 
 let ged_1st_name base p =
-  let fn = sou base (get_first_name p) in
-  match get_first_names_aliases p with
+  let fn = Driver.sou base (Driver.get_first_name p) in
+  match Driver.get_first_names_aliases p with
   | n :: _ -> (
-      let fna = sou base n in
+      let fna = Driver.sou base n in
       match sub_string_index fna fn with
       | Some i ->
           let j = i + String.length fn in
@@ -258,30 +261,31 @@ let string_of_list =
   loop ""
 
 let ged_index opts per =
-  Printf.ksprintf (oc opts) "1 _GWID %s\n" (Gwdb.string_of_iper (get_iper per))
+  Printf.ksprintf (oc opts) "1 _GWID %s\n"
+    (Driver.string_of_iper (Driver.get_iper per))
 
 let ged_name opts base per =
   Printf.ksprintf (oc opts) "1 NAME %s /%s/\n"
     (encode opts (Mutil.nominative (ged_1st_name base per)))
-    (encode opts (Mutil.nominative (sou base (get_surname per))));
-  let n = sou base (get_public_name per) in
+    (encode opts (Mutil.nominative (Driver.sou base (Driver.get_surname per))));
+  let n = Driver.sou base (Driver.get_public_name per) in
   if n <> "" then Printf.ksprintf (oc opts) "2 GIVN %s\n" (encode opts n);
-  (match get_qualifiers per with
+  (match Driver.get_qualifiers per with
   | nn :: _ ->
-      Printf.ksprintf (oc opts) "2 NICK %s\n" (encode opts (sou base nn))
+      Printf.ksprintf (oc opts) "2 NICK %s\n" (encode opts (Driver.sou base nn))
   | [] -> ());
-  (match get_surnames_aliases per with
+  (match Driver.get_surnames_aliases per with
   | [] -> ()
   | list ->
-      let list = List.map (fun n -> encode opts (sou base n)) list in
+      let list = List.map (fun n -> encode opts (Driver.sou base n)) list in
       Printf.ksprintf (oc opts) "2 SURN %s\n" (string_of_list list));
   List.iter
     (fun s ->
-      Printf.ksprintf (oc opts) "1 NAME %s\n" (encode opts (sou base s)))
-    (get_aliases per)
+      Printf.ksprintf (oc opts) "1 NAME %s\n" (encode opts (Driver.sou base s)))
+    (Driver.get_aliases per)
 
 let ged_sex opts per =
-  match get_sex per with
+  match Driver.get_sex per with
   | Male -> Printf.ksprintf (oc opts) "1 SEX M\n"
   | Female -> Printf.ksprintf (oc opts) "1 SEX F\n"
   | Neuter -> ()
@@ -404,7 +408,7 @@ let ged_tag_pevent base evt =
   | Epers_ScellentSpouseLDS -> "SLGS"
   | Epers_VenteBien -> "Property sale"
   | Epers_Will -> "WILL"
-  | Epers_Name n -> sou base n
+  | Epers_Name n -> Driver.sou base n
 
 let is_primary_pevents = function
   | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
@@ -443,9 +447,9 @@ let ged_pevent opts base per_sel evt =
       ged_tag_pevent base evt)
   in
   let date = Date.od_of_cdate evt.epers_date in
-  let place = sou base evt.epers_place in
-  let note = sou base evt.epers_note in
-  let src = sou base evt.epers_src in
+  let place = Driver.sou base evt.epers_place in
+  let note = Driver.sou base evt.epers_note in
+  let src = Driver.sou base evt.epers_src in
   ged_ev_detail opts 2 typ date place note src;
   Array.iter
     (fun (ip, wk) ->
@@ -467,12 +471,12 @@ let ged_fam_adop opts i (fath, moth, _) =
   | _ -> ()
 
 let ged_ind_ev_str opts base per per_sel =
-  List.iter (ged_pevent opts base per_sel) (get_pevents per)
+  List.iter (ged_pevent opts base per_sel) (Driver.get_pevents per)
 
 let ged_title opts base per tit =
   Printf.ksprintf (oc opts) "1 TITL ";
-  Printf.ksprintf (oc opts) "%s" (encode opts (sou base tit.t_ident));
-  (match sou base tit.t_place with
+  Printf.ksprintf (oc opts) "%s" (encode opts (Driver.sou base tit.t_ident));
+  (match Driver.sou base tit.t_place with
   | "" -> ()
   | pl -> Printf.ksprintf (oc opts) ", %s" (encode opts pl));
   if tit.t_nth <> 0 then Printf.ksprintf (oc opts) ", %d" tit.t_nth;
@@ -498,19 +502,19 @@ let ged_title opts base per tit =
   match tit.t_name with
   | Tmain ->
       Printf.ksprintf (oc opts) "2 NOTE %s\n"
-        (encode opts (sou base (get_public_name per)))
+        (encode opts (Driver.sou base (Driver.get_public_name per)))
   | Tname n ->
-      Printf.ksprintf (oc opts) "2 NOTE %s\n" (encode opts (sou base n))
+      Printf.ksprintf (oc opts) "2 NOTE %s\n" (encode opts (Driver.sou base n))
   | Tnone -> ()
 
 let ged_ind_attr_str opts base per =
-  (match sou base (get_occupation per) with
+  (match Driver.sou base (Driver.get_occupation per) with
   | "" -> ()
   | occu -> Printf.ksprintf (oc opts) "1 OCCU %s\n" (encode opts occu));
-  List.iter (ged_title opts base per) (get_titles per)
+  List.iter (ged_title opts base per) (Driver.get_titles per)
 
 let ged_famc opts fam_sel asc =
-  match get_parents asc with
+  match Driver.get_parents asc with
   | Some ifam ->
       if fam_sel ifam then
         Printf.ksprintf (oc opts) "1 FAMC @F%d@\n" (int_of_ifam ifam + 1)
@@ -540,25 +544,25 @@ let ged_asso opts base (per_sel, fam_sel) per =
       if r.r_type = GodParent then (
         ged_godparent opts per_sel "GODF" r.r_fath;
         ged_godparent opts per_sel "GODM" r.r_moth))
-    (get_rparents per);
+    (Driver.get_rparents per);
   List.iter
     (fun ic ->
-      let c = poi base ic in
-      if get_sex c = Male then
+      let c = Driver.poi base ic in
+      if Driver.get_sex c = Male then
         List.iter
           (fun ifam ->
-            let fam = foi base ifam in
-            if Array.mem (get_iper per) (get_witnesses fam) then
+            let fam = Driver.foi base ifam in
+            if Array.mem (Driver.get_iper per) (Driver.get_witnesses fam) then
               ged_witness opts fam_sel ifam)
-          (Array.to_list (get_family c)))
-    (get_related per)
+          (Array.to_list (Driver.get_family c)))
+    (Driver.get_related per)
 
 let ged_psource opts base per =
   match opts.Gwexport.source with
   | Some "" -> ()
   | Some s -> print_sour opts 1 (encode opts s)
   | None -> (
-      match sou base (get_psources per) with
+      match Driver.sou base (Driver.get_psources per) with
       | "" -> ()
       | s -> print_sour opts 1 (encode opts s))
 
@@ -571,7 +575,7 @@ let has_image_file opts base p =
   else None
 
 let ged_multimedia_link opts base per =
-  match sou base (get_image per) with
+  match Driver.sou base (Driver.get_image per) with
   | "" -> (
       if (not opts.Gwexport.no_picture) && opts.Gwexport.picture_path then
         match has_image_file opts base per with
@@ -586,7 +590,9 @@ let ged_multimedia_link opts base per =
 
 let ged_note opts base per =
   if opts.Gwexport.no_notes <> `nnn then
-    match sou base (get_notes per) with "" -> () | s -> display_note opts 1 s
+    match Driver.sou base (Driver.get_notes per) with
+    | "" -> ()
+    | s -> display_note opts 1 s
 
 let ged_tag_fevent base evt =
   match evt.efam_name with
@@ -602,7 +608,7 @@ let ged_tag_fevent base evt =
   | Efam_MarriageLicense -> "MARL"
   | Efam_PACS -> "pacs"
   | Efam_Residence -> "residence"
-  | Efam_Name n -> sou base n
+  | Efam_Name n -> Driver.sou base n
 
 let is_primary_fevents = function
   | Efam_Marriage | Efam_Engage | Efam_Divorce | Efam_Separated
@@ -622,9 +628,9 @@ let ged_fevent opts base per_sel evt =
       ged_tag_fevent base evt)
   in
   let date = Date.od_of_cdate evt.efam_date in
-  let place = sou base evt.efam_place in
-  let note = sou base evt.efam_note in
-  let src = sou base evt.efam_src in
+  let place = Driver.sou base evt.efam_place in
+  let note = Driver.sou base evt.efam_note in
+  let src = Driver.sou base evt.efam_src in
   ged_ev_detail opts 2 typ date place note src;
   Array.iter
     (fun (ip, wk) ->
@@ -643,28 +649,28 @@ let ged_fsource opts base fam =
   | Some "" -> ()
   | Some s -> print_sour opts 1 (encode opts s)
   | None -> (
-      match sou base (get_fsources fam) with
+      match Driver.sou base (Driver.get_fsources fam) with
       | "" -> ()
       | s -> print_sour opts 1 (encode opts s))
 
 let ged_comment opts base fam =
   if opts.Gwexport.no_notes <> `nnn then
-    match sou base (get_comment fam) with
+    match Driver.sou base (Driver.get_comment fam) with
     | "" -> ()
     | s -> display_note opts 1 s
 
 let has_personal_infos base per =
-  get_parents per <> None
-  || sou base (get_first_name per) <> "?"
-  || sou base (get_surname per) <> "?"
-  || get_birth per <> Date.cdate_None
-  || sou base (get_birth_place per) <> ""
-  || (get_death per <> NotDead && get_death per <> DontKnowIfDead)
-  || sou base (get_occupation per) <> ""
-  || get_titles per <> []
+  Driver.get_parents per <> None
+  || Driver.sou base (Driver.get_first_name per) <> "?"
+  || Driver.sou base (Driver.get_surname per) <> "?"
+  || Driver.get_birth per <> Date.cdate_None
+  || Driver.sou base (Driver.get_birth_place per) <> ""
+  || (Driver.get_death per <> NotDead && Driver.get_death per <> DontKnowIfDead)
+  || Driver.sou base (Driver.get_occupation per) <> ""
+  || Driver.get_titles per <> []
 
 let ged_ind_record with_indexes opts base ((per_sel, fam_sel) as sel) i =
-  let per = poi base i in
+  let per = Driver.poi base i in
   if has_personal_infos base per then (
     Printf.ksprintf (oc opts) "0 @I%d@ INDI\n" (int_of_iper i + 1);
     ged_name opts base per;
@@ -673,52 +679,54 @@ let ged_ind_record with_indexes opts base ((per_sel, fam_sel) as sel) i =
     ged_ind_ev_str opts base per per_sel;
     ged_ind_attr_str opts base per;
     ged_famc opts fam_sel per;
-    Array.iter (ged_fams opts fam_sel) (get_family per);
+    Array.iter (ged_fams opts fam_sel) (Driver.get_family per);
     ged_asso opts base sel per;
     ged_psource opts base per;
     ged_multimedia_link opts base per;
     ged_note opts base per)
 
 let ged_fam_record opts base (per_sel, _fam_sel) ifam =
-  let fam = foi base ifam in
+  let fam = Driver.foi base ifam in
   Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" (int_of_ifam ifam + 1);
-  List.iter (ged_fevent opts base per_sel) (get_fevents fam);
+  List.iter (ged_fevent opts base per_sel) (Driver.get_fevents fam);
   if
-    per_sel (get_father fam)
-    && has_personal_infos base (poi base (get_father fam))
+    per_sel (Driver.get_father fam)
+    && has_personal_infos base (Driver.poi base (Driver.get_father fam))
   then
-    Printf.ksprintf (oc opts) "1 HUSB @I%d@\n" (int_of_iper (get_father fam) + 1);
+    Printf.ksprintf (oc opts) "1 HUSB @I%d@\n"
+      (int_of_iper (Driver.get_father fam) + 1);
   if
-    per_sel (get_mother fam)
-    && has_personal_infos base (poi base (get_mother fam))
+    per_sel (Driver.get_mother fam)
+    && has_personal_infos base (Driver.poi base (Driver.get_mother fam))
   then
-    Printf.ksprintf (oc opts) "1 WIFE @I%d@\n" (int_of_iper (get_mother fam) + 1);
-  Array.iter (ged_child opts per_sel) (get_children fam);
+    Printf.ksprintf (oc opts) "1 WIFE @I%d@\n"
+      (int_of_iper (Driver.get_mother fam) + 1);
+  Array.iter (ged_child opts per_sel) (Driver.get_children fam);
   ged_fsource opts base fam;
   ged_comment opts base fam
 
 let gwb2ged base with_indexes opts ((per_sel, fam_sel) as sel) =
-  let bname = Gwdb.bname base in
+  let bname = Driver.bname base in
   let ofile, oc, close = opts.Gwexport.oc in
   if not opts.Gwexport.mem then (
-    load_ascends_array base;
-    load_unions_array base;
-    load_couples_array base;
-    load_descends_array base);
+    Driver.load_ascends_array base;
+    Driver.load_unions_array base;
+    Driver.load_couples_array base;
+    Driver.load_descends_array base);
   ged_header opts base bname ofile;
-  Gwdb.Collection.iter
+  Collection.iter
     (fun i -> if per_sel i then ged_ind_record with_indexes opts base sel i)
-    (Gwdb.ipers base);
-  Gwdb.Collection.iter
+    (Driver.ipers base);
+  Collection.iter
     (fun i -> if fam_sel i then ged_fam_record opts base sel i)
-    (Gwdb.ifams base);
+    (Driver.ifams base);
   let _ =
     List.fold_right
       (fun adop i ->
         ged_fam_adop opts i adop;
         i + 1)
       !adop_fam_list
-      (nb_of_families base + 1)
+      (Driver.nb_of_families base + 1)
   in
   Printf.ksprintf oc "0 TRLR\n";
   close ()

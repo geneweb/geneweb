@@ -40,9 +40,9 @@ val errmsg : Arg.usage_msg
     This is the third argument of Arg.parse. *)
 
 val select :
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   gwexport_opts ->
-  Gwdb.iper list ->
-  (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
+  Geneweb_db.Driver.iper list ->
+  (Geneweb_db.Driver.iper -> bool) * (Geneweb_db.Driver.ifam -> bool)
 (** [select base opts ips] returns filters for [iper] and [ifam] to be used
     when exporting a portion of the [base]. *)

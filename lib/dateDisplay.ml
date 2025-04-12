@@ -3,7 +3,8 @@
 open Config
 open Def
 open Util
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let get_wday conf = function
   | Dgreg (({ prec = Sure; delta = 0; _ } as d), _)
@@ -586,14 +587,14 @@ let short_dates_text_notag conf base p =
           prec_year_text conf b ^ "–" ^ prec_year_text conf d
       | Some (Dgreg (b, _)), _ -> (
           (* La personne peut être décédée mais ne pas avoir de date. *)
-          match get_death p with
+          match Driver.get_death p with
           | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
               prec_year_text conf b ^ "–"
           | _ -> prec_year_text conf b)
       | _, Some (Dgreg (d, _)) -> death_symbol conf ^ prec_year_text conf d
       | _, _ -> (
           (* La personne peut être décédée mais ne pas avoir de date. *)
-          match get_death p with
+          match Driver.get_death p with
           | Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
           | _ -> "")
     in
@@ -623,7 +624,7 @@ let short_marriage_date_text conf base fam p1 p2 =
   Adef.safe
   @@
   if authorized_age conf base p1 && authorized_age conf base p2 then
-    match Date.cdate_to_dmy_opt (get_marriage fam) with
+    match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
     | Some d ->
         "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
     | None -> ""
@@ -646,7 +647,7 @@ let short_marriage_date_text conf base fam p1 p2 =
     [Rem] : Exporté en clair hors de ce module.                           *)
 let short_family_dates_text conf base marr_sep fam =
   let marr_dates_aux =
-    match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+    match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
     | Some dmy -> Some (prec_year_text conf dmy)
     | None -> Some ""
   in
@@ -657,7 +658,7 @@ let short_family_dates_text conf base marr_sep fam =
           e.efam_name = Efam_Divorce
           || e.efam_name = Efam_Annulation
           || e.efam_name = Efam_Separated)
-        (Gwdb.get_fevents fam)
+        (Driver.get_fevents fam)
     with
     | None -> None
     | Some e -> (
@@ -665,8 +666,8 @@ let short_family_dates_text conf base marr_sep fam =
         | None -> Some ""
         | Some dmy -> Some (prec_year_text conf dmy))
   in
-  let fa = poi base (get_father fam) in
-  let mo = poi base (get_mother fam) in
+  let fa = Driver.poi base (Driver.get_father fam) in
+  let mo = Driver.poi base (Driver.get_mother fam) in
   Adef.safe
   @@
   if authorized_age conf base fa && authorized_age conf base mo then

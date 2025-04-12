@@ -1,4 +1,4 @@
-val print_surnames : Config.config -> Gwdb.base -> unit
+val print_surnames : Config.config -> Geneweb_db.Driver.base -> unit
 (** Displays all persons surnames present in the base. Display could be different depending
     on environement [conf.env]. These variables affect the display:
 
@@ -9,5 +9,5 @@ val print_surnames : Config.config -> Gwdb.base -> unit
     - o : "A" to print all surnames (if less then [Alln.default_max_cnt])
           otherwise prints links to access different type of displaying *)
 
-val print_first_names : Config.config -> Gwdb.base -> unit
+val print_first_names : Config.config -> Geneweb_db.Driver.base -> unit
 (** Same as [print_surnames] but dealing with first names. *)

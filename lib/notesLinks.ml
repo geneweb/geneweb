@@ -1,4 +1,5 @@
 open Def.NLDB
+module Driver = Geneweb_db.Driver
 
 let char_dir_sep = ':'
 
@@ -152,4 +153,4 @@ let add_in_db db who (list_nt, list_ind) =
   if list_nt = [] && list_ind = [] then db else (who, (list_nt, list_ind)) :: db
 
 let update_db base who list =
-  Gwdb.write_nldb base @@ add_in_db (Gwdb.read_nldb base) who list
+  Driver.write_nldb base @@ add_in_db (Driver.read_nldb base) who list

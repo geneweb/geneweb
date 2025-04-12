@@ -3,6 +3,8 @@
 open Config
 open Util
 open Notes
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 (* FIXME code copied/adapted from MergeInd. To be factorized *)
 let test_ancestor conf base p1 p2 =
@@ -12,8 +14,8 @@ let test_ancestor conf base p1 p2 =
     | None -> 32
   in
   let module IperSet = Util.IperSet in
-  let ip1 = Gwdb.get_iper p1 in
-  let ip2 = Gwdb.get_iper p2 in
+  let ip1 = Driver.get_iper p1 in
+  let ip2 = Driver.get_iper p2 in
   if ip1 = ip2 then true
   else
     let rec loop n set = function
@@ -23,11 +25,11 @@ let test_ancestor conf base p1 p2 =
           else if ip = ip1 then true
           else
             let set = IperSet.add ip set in
-            match Gwdb.get_parents (Gwdb.poi base ip) with
+            match Driver.get_parents (Driver.poi base ip) with
             | Some ifam ->
-                let cpl = Gwdb.foi base ifam in
+                let cpl = Driver.foi base ifam in
                 loop (n - 1) set
-                  (Gwdb.get_father cpl :: Gwdb.get_mother cpl :: tl)
+                  (Driver.get_father cpl :: Driver.get_mother cpl :: tl)
             | None -> loop n set tl)
       | _ -> false
     in
@@ -63,27 +65,28 @@ let is_ancestor conf base anc =
           bad_format 3;
           0
       in
-      match (Gwdb.person_of_key base fn sn oc, conf.user_iper) with
+      match (Driver.person_of_key base fn sn oc, conf.user_iper) with
       | Some anc_ip, Some user_ip ->
-          test_ancestor conf base (Gwdb.poi base anc_ip) (Gwdb.poi base user_ip)
+          test_ancestor conf base (Driver.poi base anc_ip)
+            (Driver.poi base user_ip)
           || restrict_for_spouses
              &&
-             let families = Gwdb.get_family (Gwdb.poi base user_ip) in
+             let families = Driver.get_family (Driver.poi base user_ip) in
              (* FIXME
                  use of
-                 !GWPARAM_ITL.get_families conf base (Gwdb.poi base user_ip)
+                 !GWPARAM_ITL.get_families conf base (Driver.poi base user_ip)
                  fails (returns list of length 0)
              *)
              Array.exists
                (fun fam ->
-                 let fam = Gwdb.foi base fam in
-                 let fath_ip = Gwdb.get_father fam in
-                 let moth_ip = Gwdb.get_mother fam in
+                 let fam = Driver.foi base fam in
+                 let fath_ip = Driver.get_father fam in
+                 let moth_ip = Driver.get_mother fam in
                  let spouse_ip =
                    if user_ip = fath_ip then moth_ip else fath_ip
                  in
-                 test_ancestor conf base (Gwdb.poi base anc_ip)
-                   (Gwdb.poi base spouse_ip))
+                 test_ancestor conf base (Driver.poi base anc_ip)
+                   (Driver.poi base spouse_ip))
                families
       | _ -> false
 
@@ -227,7 +230,7 @@ let linked_page_rows conf base pg pgl =
   <a href="%sm=MOD_IND&i=%s#notes" title="%s">
     <i class="fa fa-user"></i></a></td>|}
              (commd conf :> string)
-             (Gwdb.string_of_iper ip)
+             (Driver.string_of_iper ip)
              (Utf8.capitalize_fst (transl conf "modify note")));
       Output.print_sstring conf
         (Format.sprintf {|
@@ -237,9 +240,9 @@ let linked_page_rows conf base pg pgl =
            (DateDisplay.short_dates_text conf base p :> string)
            (Utf8.capitalize_fst (transl conf "individual notes")))
   | Def.NLDB.PgFam ifam, _ ->
-      let fam = Gwdb.foi base ifam in
-      let fath = pget conf base (Gwdb.get_father fam) in
-      let moth = pget conf base (Gwdb.get_mother fam) in
+      let fam = Driver.foi base ifam in
+      let fath = pget conf base (Driver.get_father fam) in
+      let moth = pget conf base (Driver.get_mother fam) in
       if conf.wizard then
         Output.print_sstring conf
           (Format.sprintf
@@ -248,8 +251,8 @@ let linked_page_rows conf base pg pgl =
   <a href="%sm=MOD_FAM&i=%s&ip=%s#events" title="%s %s %s">
     <i class="fa fa-user fa-sm"></i><i class="fa fa-user fa-sm"></i></a></td>|}
              (commd conf :> string)
-             (Gwdb.string_of_ifam ifam)
-             (Gwdb.get_iper fath |> Gwdb.string_of_iper)
+             (Driver.string_of_ifam ifam)
+             (Driver.get_iper fath |> Driver.string_of_iper)
              (Utf8.capitalize_fst (transl conf "modify"))
              (transl_nth conf "event/events" 0)
              (transl_nth conf "family/families" 0));
@@ -423,11 +426,11 @@ let simple_person_text conf base p p_auth : Adef.safe_string =
 let print_what_links_p conf base p =
   if authorized_age conf base p then (
     let key =
-      let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
-      let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
-      (fn, sn, Gwdb.get_occ p)
+      let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+      let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+      (fn, sn, Driver.get_occ p)
     in
-    let db = Gwdb.read_nldb base in
+    let db = Driver.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     let pgl = Notes.links_to_ind conf base db key None in
     let title h =

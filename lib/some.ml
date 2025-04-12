@@ -2,9 +2,10 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 module StrSet = Mutil.StrSet
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let not_found conf txt x =
   let title _ =
@@ -121,7 +122,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
     let x = Name.crush_lower x in
     List.fold_right
       (fun istr l ->
-        let str = Mutil.nominative (sou base istr) in
+        let str = Mutil.nominative (Driver.sou base istr) in
         if
           Name.crush_lower str = x
           || List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
@@ -132,7 +133,8 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
           let iperl =
             List.fold_left
               (fun iperl iper ->
-                if eq_istr (proj (pget conf base iper)) istr then iper :: iperl
+                if Driver.eq_istr (proj (pget conf base iper)) istr then
+                  iper :: iperl
                 else iperl)
               [] iperl
           in
@@ -166,20 +168,21 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
 let print_elem conf base is_surname (p, xl) =
   Mutil.list_iter_first
     (fun first x ->
-      let iper = get_iper x in
+      let iper = Driver.get_iper x in
       if not first then Output.print_sstring conf "</li><li> ";
       SosaCache.print_sosa conf base x true;
       Output.print_sstring conf {|<a href="|};
       Output.print_string conf (commd conf);
       Output.print_string conf (acces conf base x);
       Output.print_sstring conf {|" id="i|};
-      Output.print_sstring conf (string_of_iper iper);
+      Output.print_sstring conf (Driver.string_of_iper iper);
       Output.print_sstring conf {|">|};
       if is_surname then (
         Output.print_string conf (escape_html @@ surname_without_particle base p);
         Output.print_string conf (escape_html @@ surname_particle base p);
         Output.print_sstring conf " (<small>";
-        Output.print_string conf (escape_html @@ sou base (get_first_name x));
+        Output.print_string conf
+          (escape_html @@ Driver.sou base (Driver.get_first_name x));
         Output.print_sstring conf "</small>)")
       else
         Output.print_string conf
@@ -211,7 +214,7 @@ let first_name_print_list conf base x1 xl listes =
   let surnames_liste l =
     List.fold_left
       (fun l x ->
-        let px = p_surname base x in
+        let px = Driver.p_surname base x in
         match l with
         | (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
@@ -307,15 +310,15 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
   let istrl = base_strings_of base x in
   List.fold_right
     (fun istr l ->
-      let str = sou base istr in
+      let str = Driver.sou base istr in
       if str = x then
-        let iperl = spi_find (persons_of base) istr in
+        let iperl = Driver.spi_find (persons_of base) istr in
         let iperl =
           List.fold_left
             (fun iperl iper ->
               let p = pget conf base iper in
               if
-                eq_istr (get_field p) istr
+                Driver.eq_istr (get_field p) istr
                 && ((not (is_hide_names conf p))
                    || Util.authorized_age conf base p)
               then iper :: iperl
@@ -327,11 +330,12 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
     istrl []
 
 let persons_of_absolute_first_name =
-  persons_of_absolute base_strings_of_first_name persons_of_first_name
-    get_first_name
+  persons_of_absolute Driver.base_strings_of_first_name
+    Driver.persons_of_first_name Driver.get_first_name
 
 let persons_of_absolute_surname =
-  persons_of_absolute base_strings_of_surname persons_of_surname get_surname
+  persons_of_absolute Driver.base_strings_of_surname Driver.persons_of_surname
+    Driver.get_surname
 
 let has_children_with_that_name conf base des name =
   let compare_name n1 n2 =
@@ -339,8 +343,8 @@ let has_children_with_that_name conf base des name =
     else Name.lower n1 = Name.lower n2
   in
   List.exists
-    (fun ip -> compare_name (p_surname base (pget conf base ip)) name)
-    (Array.to_list (get_children des))
+    (fun ip -> compare_name (Driver.p_surname base (pget conf base ip)) name)
+    (Array.to_list (Driver.get_children des))
 
 (* List selection bullets *)
 
@@ -378,7 +382,7 @@ let print_selection_bullet conf = function
 let unselected_bullets conf =
   List.fold_left
     (fun sl (k, v) ->
-      try if k = "u" then ifam_of_string (Mutil.decode v) :: sl else sl
+      try if k = "u" then Driver.ifam_of_string (Mutil.decode v) :: sl else sl
       with Failure _ -> sl)
     [] conf.env
 
@@ -389,25 +393,26 @@ type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 let print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
   let rec loop p =
-    let u = pget conf base (get_iper p) in
+    let u = pget conf base (Driver.get_iper p) in
     let family_list =
       Array.map
         (fun ifam ->
-          let fam = foi base ifam in
-          let c = Gutil.spouse (get_iper p) fam in
+          let fam = Driver.foi base ifam in
+          let c = Gutil.spouse (Driver.get_iper p) fam in
           let c = pget conf base c in
           let down = has_children_with_that_name conf base fam name in
           let down =
-            if get_sex p = Female && p_surname base c = name then false
+            if Driver.get_sex p = Female && Driver.p_surname base c = name then
+              false
             else down
           in
           let i = ifam in
           let sel = not (List.mem i unsel_list) in
           ( fam,
             c,
-            if down then Some (Mutil.encode @@ string_of_ifam i, sel) else None
-          ))
-        (get_family u)
+            if down then Some (Mutil.encode @@ Driver.string_of_ifam i, sel)
+            else None ))
+        (Driver.get_family u)
     in
     let first_select =
       if family_list = [||] then None
@@ -426,8 +431,8 @@ let print_branch conf base psn name =
         (render p
            (if is_hide_names conf p && not (authorized_age conf base p) then
             Adef.safe "x"
-           else if (not psn) && (not with_sn) && p_surname base p = name then
-             gen_person_text ~sn:false conf base p
+           else if (not psn) && (not with_sn) && Driver.p_surname base p = name
+          then gen_person_text ~sn:false conf base p
            else gen_person_text conf base p));
       Output.print_sstring conf @@ if with_link then "</strong>" else "</em>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
@@ -436,7 +441,7 @@ let print_branch conf base psn name =
     Output.print_sstring conf "<li>";
     print_selection_bullet conf first_select;
     print_elem p true true false;
-    if Array.length (get_family u) <> 0 then
+    if Array.length (Driver.get_family u) <> 0 then
       ignore
       @@ Array.fold_left
            (fun first (fam, sp, select) ->
@@ -449,7 +454,7 @@ let print_branch conf base psn name =
                (DateDisplay.short_marriage_date_text conf base fam p sp);
              Output.print_sstring conf "\n";
              print_elem sp true false true;
-             let children = get_children fam in
+             let children = Driver.get_children fam in
              (match select with
              | Some (_, true) ->
                  Output.print_sstring conf "<ul>";
@@ -475,7 +480,7 @@ let print_one_branch conf base bh psn =
   Output.print_sstring conf "<ul>";
   let p = bh.bh_ancestor in
   if bh.bh_well_named_ancestors = [] then
-    let x = sou base (get_surname p) in
+    let x = Driver.sou base (Driver.get_surname p) in
     print_branch conf base psn x p
   else (
     Output.print_sstring conf "<li>";
@@ -485,7 +490,7 @@ let print_one_branch conf base bh psn =
     Output.print_sstring conf "<ul>";
     List.iter
       (fun p ->
-        let x = sou base (get_surname p) in
+        let x = Driver.sou base (Driver.get_surname p) in
         print_branch conf base psn x p)
       bh.bh_well_named_ancestors;
     Output.print_sstring conf "</ul></li>");
@@ -497,7 +502,8 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     | Some "d" ->
         let born_before p1 p2 =
           match
-            (Date.od_of_cdate (get_birth p1), Date.od_of_cdate (get_birth p2))
+            ( Date.od_of_cdate (Driver.get_birth p1),
+              Date.od_of_cdate (Driver.get_birth p2) )
           with
           | Some d1, Some d2 -> Date.compare_date d1 d2
           | _, None -> -1
@@ -508,8 +514,8 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
         List.sort
           (fun p1 p2 ->
             alphabetic1
-              (p_first_name base p1.bh_ancestor)
-              (p_first_name base p2.bh_ancestor))
+              (Driver.p_first_name base p1.bh_ancestor)
+              (Driver.p_first_name base p2.bh_ancestor))
           bhl
   in
   let len = List.length ancestors in
@@ -621,13 +627,13 @@ let print_family_alphabetic x conf base liste =
     let list =
       List.fold_left
         (fun list p ->
-          if List.exists (eq_istr (get_surname p)) list then list
-          else get_surname p :: list)
+          if List.exists (Driver.eq_istr (Driver.get_surname p)) list then list
+          else Driver.get_surname p :: list)
         [] liste
     in
     let set =
       List.fold_left
-        (fun set istr -> StrSet.add (sou base istr) set)
+        (fun set istr -> StrSet.add (Driver.sou base istr) set)
         StrSet.empty list
     in
     List.sort compare (StrSet.elements set)
@@ -636,14 +642,18 @@ let print_family_alphabetic x conf base liste =
     let l =
       List.sort
         (fun x1 x2 ->
-          match alphabetic1 (p_first_name base x2) (p_first_name base x1) with
-          | 0 -> compare (get_occ x1) (get_occ x2)
+          match
+            alphabetic1
+              (Driver.p_first_name base x2)
+              (Driver.p_first_name base x1)
+          with
+          | 0 -> compare (Driver.get_occ x1) (Driver.get_occ x2)
           | n -> n)
         liste
     in
     List.fold_left
       (fun l x ->
-        let px = p_first_name base x in
+        let px = Driver.p_first_name base x in
         match l with
         | (p, l1) :: l when alphabetic1 px p = 0 -> (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
@@ -693,19 +703,21 @@ let insert_at_position_in_family children ip ipl =
   loop (Array.to_list children) ipl
 
 let select_ancestors conf base name_inj ipl =
-  let str_inj s = name_inj (sou base s) in
+  let str_inj s = name_inj (Driver.sou base s) in
   List.fold_left
     (fun bhl ip ->
       let p = pget conf base ip in
-      match get_parents p with
+      match Driver.get_parents p with
       | Some ifam ->
-          let fam = foi base ifam in
-          let ifath = get_father fam in
-          let imoth = get_mother fam in
+          let fam = Driver.foi base ifam in
+          let ifath = Driver.get_father fam in
+          let imoth = Driver.get_mother fam in
           let fath = pget conf base ifath in
           let moth = pget conf base imoth in
-          let s = str_inj (get_surname p) in
-          if str_inj (get_surname fath) <> s && str_inj (get_surname moth) <> s
+          let s = str_inj (Driver.get_surname p) in
+          if
+            str_inj (Driver.get_surname fath) <> s
+            && str_inj (Driver.get_surname moth) <> s
           then
             let rec loop = function
               | bh :: bhl ->
@@ -714,8 +726,8 @@ let select_ancestors conf base name_inj ipl =
                       {
                         bh with
                         bh_well_named_ancestors =
-                          insert_at_position_in_family (get_children fam) ip
-                            bh.bh_well_named_ancestors;
+                          insert_at_position_in_family (Driver.get_children fam)
+                            ip bh.bh_well_named_ancestors;
                       }
                     in
                     bh :: bhl
@@ -731,7 +743,7 @@ let select_ancestors conf base name_inj ipl =
     [] ipl
 
 module PerSet = Set.Make (struct
-  type t = iper
+  type t = Driver.iper
 
   let compare = compare
 end)
@@ -743,9 +755,9 @@ let search_surname_list conf base x =
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 942, 29)))
     else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base))
-        get_surname x
+      persons_of_fsname conf base Driver.base_strings_of_surname
+        (Driver.spi_find (Driver.persons_of_surname base))
+        Driver.get_surname x
   in
   let list =
     List.map
@@ -833,9 +845,9 @@ let search_first_name conf base x =
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 1008, 29)))
     else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base))
-        get_first_name x
+      persons_of_fsname conf base Driver.base_strings_of_first_name
+        (Driver.spi_find (Driver.persons_of_first_name base))
+        Driver.get_first_name x
   in
   let list =
     List.map

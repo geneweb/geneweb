@@ -12,9 +12,9 @@ module type S = sig
   val array : 'a feeder -> 'a array feeder
   val pair : 'a feeder -> 'b feeder -> ('a * 'b) feeder
   val option : 'a feeder -> 'a option feeder
-  val iper : Gwdb_legacy.Gwdb_driver.iper feeder
-  val ifam : Gwdb_legacy.Gwdb_driver.ifam feeder
-  val istr : Gwdb_legacy.Gwdb_driver.istr feeder
+  val iper : Geneweb_db.Driver.iper feeder
+  val ifam : Geneweb_db.Driver.ifam feeder
+  val istr : Geneweb_db.Driver.istr feeder
   val calendar : Adef.calendar feeder
   val dmy2 : Adef.dmy2 feeder
   val precision : Adef.precision feeder
@@ -74,8 +74,6 @@ module type S = sig
     ('person, 'ifam, 'string) Def.gen_family feeder
 end
 
-module Gwdb_driver = Gwdb_legacy.Gwdb_driver
-
 module Make (H : Digestif.S) = struct
   type ctx = H.ctx
   type 'a feeder = 'a -> ctx -> ctx
@@ -116,9 +114,14 @@ module Make (H : Digestif.S) = struct
   let dmy Adef.{ day; month; year; prec; delta } =
     int day <+> int month <+> int year <+> precision prec <+> int delta
 
-  let iper (i : Gwdb_driver.iper) = string @@ Gwdb_driver.string_of_iper i
-  let ifam (i : Gwdb_driver.ifam) = string @@ Gwdb_driver.string_of_ifam i
-  let istr (i : Gwdb_driver.istr) = string @@ Gwdb_driver.string_of_istr i
+  let iper (i : Geneweb_db.Driver.iper) =
+    string @@ Geneweb_db.Driver.string_of_iper i
+
+  let ifam (i : Geneweb_db.Driver.ifam) =
+    string @@ Geneweb_db.Driver.string_of_ifam i
+
+  let istr (i : Geneweb_db.Driver.istr) =
+    string @@ Geneweb_db.Driver.string_of_istr i
 
   let calendar (c : Adef.calendar) =
     match c with

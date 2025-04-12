@@ -1,9 +1,9 @@
 val select_person :
   Config.config ->
-  Gwdb.base ->
-  (Gwdb.person -> Def.date option) ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.person -> Def.date option) ->
   bool ->
-  (Gwdb.person * Def.dmy * Def.calendar) list * int
+  (Geneweb_db.Driver.person * Def.dmy * Def.calendar) list * int
 (** [select_person conf base get_date find_oldest] select 20 persons
     from the base according to the one of their date (birth, death,
     marriage, specific event, etc.) that could be get with [get_date].
@@ -17,13 +17,13 @@ val select_person :
 
 val select_family :
   Config.config ->
-  Gwdb.base ->
-  (Gwdb.family -> Def.date option) ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.family -> Def.date option) ->
   bool ->
-  (Gwdb.family * Def.dmy * Def.calendar) list * int
+  (Geneweb_db.Driver.family * Def.dmy * Def.calendar) list * int
 (** Same as [select_person] but dealing with families *)
 
-val death_date : Gwdb.person -> Adef.date option
+val death_date : Geneweb_db.Driver.person -> Adef.date option
 (** Returns person's death date (if exists) *)
 
 val make_population_pyramid :
@@ -32,7 +32,7 @@ val make_population_pyramid :
   limit:int ->
   at_date:Def.dmy ->
   Config.config ->
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   int array * int array
 (** [make_population_pyramid nb_intervals interval interval at_date conf base]
     Calculates population pyramid of all perons in the base. Population pyramid

@@ -3,36 +3,38 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let default_source conf =
   match p_getenv conf.env "dsrc" with Some s -> s | None -> ""
 
 let person_key base ip =
-  let p = poi base ip in
-  let first_name = sou base (get_first_name p) in
-  let surname = sou base (get_surname p) in
+  let p = Driver.poi base ip in
+  let first_name = Driver.sou base (Driver.get_first_name p) in
+  let surname = Driver.sou base (Driver.get_surname p) in
   let occ =
     if first_name = "?" || surname = "?" then
-      int_of_string @@ Gwdb.string_of_iper ip (* FIXME *)
-    else get_occ p
+      int_of_string @@ Driver.string_of_iper ip (* FIXME *)
+    else Driver.get_occ p
   in
   (first_name, surname, occ, Update.Link, "")
 
 let string_family_of conf base ifam =
-  let fam = foi base ifam in
+  let fam = Driver.foi base ifam in
   let sfam =
     Futil.map_family_ps (person_key base)
       (fun f -> f)
-      (sou base) (gen_family_of_family fam)
+      (Driver.sou base)
+      (Driver.gen_family_of_family fam)
   in
   let scpl =
     Futil.map_couple_p conf.multi_parents (person_key base)
-      (gen_couple_of_family fam)
+      (Driver.gen_couple_of_family fam)
   in
   let sdes =
-    Futil.map_descend_p (person_key base) (gen_descend_of_family fam)
+    Futil.map_descend_p (person_key base) (Driver.gen_descend_of_family fam)
   in
   (sfam, scpl, sdes)
 
@@ -201,8 +203,8 @@ and eval_event_str conf base env fam =
   match get_env "cnt" env with
   | Vint i -> (
       try
-        let fam = foi base fam.fam_index in
-        let e = List.nth (get_fevents fam) (i - 1) in
+        let fam = Driver.foi base fam.fam_index in
+        let e = List.nth (Driver.get_fevents fam) (i - 1) in
         let name =
           Util.string_of_fevent_name conf base e.efam_name
           |> Adef.safe_fn Utf8.capitalize_fst
@@ -212,15 +214,15 @@ and eval_event_str conf base env fam =
           | Some d -> DateDisplay.string_of_date conf d
           | None -> Adef.safe ""
         in
-        let place = Util.string_of_place conf (sou base e.efam_place) in
-        let note = Util.safe_html (sou base e.efam_note) in
-        let src = Util.safe_html (sou base e.efam_src) in
+        let place = Util.string_of_place conf (Driver.sou base e.efam_place) in
+        let note = Util.safe_html (Driver.sou base e.efam_note) in
+        let src = Util.safe_html (Driver.sou base e.efam_src) in
         let wit =
           Array.fold_right
             (fun (w, _) accu ->
               (transl_nth conf "witness/witnesses" 0
               ^<^ transl conf ":"
-              ^<^ Util.gen_person_text conf base (poi base w))
+              ^<^ Util.gen_person_text conf base (Driver.poi base w))
               :: accu)
             e.efam_witnesses []
         in
@@ -367,10 +369,11 @@ and eval_parent' conf base env k = function
   | sl -> eval_key conf base k sl
 
 and get_parent_sex conf base fn sn oc =
-  match Gwdb.person_of_key base fn sn oc with
+  match Geneweb_db.Driver.person_of_key base fn sn oc with
   | Some ip -> (
       match pget conf base ip with
-      | p -> ( match get_sex p with Male -> 0 | Female -> 1 | Neuter -> 2))
+      | p -> (
+          match Driver.get_sex p with Male -> 0 | Female -> 1 | Neuter -> 2))
   | _ -> -1
 
 and eval_key conf base (fn, sn, oc, create, _) = function
@@ -385,9 +388,9 @@ and eval_key conf base (fn, sn, oc, create, _) = function
         str_val (string_of_int sex)
       else Update_util.eval_create create "sex"
   | [ "index" ] -> (
-      match person_of_key base fn sn oc with
-      | Some ip -> str_val (string_of_iper ip)
-      | _ -> str_val (string_of_iper Gwdb.dummy_iper))
+      match Driver.person_of_key base fn sn oc with
+      | Some ip -> str_val (Driver.string_of_iper ip)
+      | _ -> str_val (Driver.string_of_iper Driver.dummy_iper))
   | [ "sexes" ] ->
       (* this is somewhat of a hack to determine same sex situations *)
       (* updateFam.ml does not provide adequate mechanisms to test   *)
@@ -430,7 +433,7 @@ and eval_special_var conf base = function
           in
           if has_base_loop then VVstring ""
           else
-            let p = poi base (iper_of_string i) in
+            let p = Driver.poi base (Driver.iper_of_string i) in
             Perso.interp_templ_with_menu
               (fun _ -> ())
               "perso_header" conf base p;
@@ -531,9 +534,9 @@ let print_update_fam conf base fcd digest =
   | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base ifam =
-  let cpl = foi base ifam in
-  let ifath = get_father cpl in
-  let imoth = get_mother cpl in
+  let cpl = Driver.foi base ifam in
+  let ifath = Driver.get_father cpl in
+  let imoth = Driver.get_mother cpl in
   let title _ =
     transl_nth conf "family/families" 0
     |> transl_decline conf "delete"
@@ -542,21 +545,25 @@ let print_del1 conf base ifam =
   Hutil.header conf title;
   Output.print_sstring conf "<h2>\n";
   Output.print_string conf
-    (Util.escape_html (p_first_name base (poi base ifath)));
-  Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
-  Output.print_string conf (Util.escape_html (p_surname base (poi base ifath)));
+    (Util.escape_html (Driver.p_first_name base (Driver.poi base ifath)));
+  Output.print_sstring conf
+    (Format.sprintf ".%d " (Driver.get_occ (Driver.poi base ifath)));
+  Output.print_string conf
+    (Util.escape_html (Driver.p_surname base (Driver.poi base ifath)));
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "and");
   Output.print_sstring conf " ";
   Output.print_string conf
-    (Util.escape_html (p_first_name base (poi base imoth)));
-  Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
-  Output.print_string conf (Util.escape_html (p_surname base (poi base imoth)));
+    (Util.escape_html (Driver.p_first_name base (Driver.poi base imoth)));
+  Output.print_sstring conf
+    (Format.sprintf ".%d " (Driver.get_occ (Driver.poi base imoth)));
+  Output.print_string conf
+    (Util.escape_html (Driver.p_surname base (Driver.poi base imoth)));
   Output.print_sstring conf {|</h2><form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
   Util.hidden_env conf;
-  Util.hidden_input conf "i" (Adef.encoded @@ string_of_ifam ifam);
+  Util.hidden_input conf "i" (Adef.encoded @@ Driver.string_of_ifam ifam);
   (match p_getenv conf.env "ip" with
   | Some ip -> Util.hidden_input conf "ip" (Adef.encoded ip)
   | None -> ());
@@ -573,32 +580,33 @@ let print_inv1 conf base p ifam1 ifam2 =
     transl_decline conf "invert" ""
     |> Utf8.capitalize_fst |> Adef.safe |> Output.print_string conf
   in
-  let cpl1 = foi base ifam1 in
-  let cpl2 = foi base ifam2 in
+  let cpl1 = Driver.foi base ifam1 in
+  let cpl2 = Driver.foi base ifam2 in
   Hutil.header conf title;
   Output.print_sstring conf
     (Utf8.capitalize_fst
        (transl conf "invert the order of the following families"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf "<ul><li>";
-  Update.print_someone conf base (poi base (get_father cpl1));
+  Update.print_someone conf base (Driver.poi base (Driver.get_father cpl1));
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl_nth conf "and" 0);
   Output.print_sstring conf " ";
-  Update.print_someone conf base (poi base (get_mother cpl1));
+  Update.print_someone conf base (Driver.poi base (Driver.get_mother cpl1));
   Output.print_sstring conf "</li><li>";
-  Update.print_someone conf base (poi base (get_father cpl2));
+  Update.print_someone conf base (Driver.poi base (Driver.get_father cpl2));
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl_nth conf "and" 0);
   Output.print_sstring conf " ";
-  Update.print_someone conf base (poi base (get_mother cpl2));
+  Update.print_someone conf base (Driver.poi base (Driver.get_mother cpl2));
   Output.print_sstring conf "</li></ul>";
   Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
   Util.hidden_env conf;
-  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Adef.encoded);
-  Util.hidden_input conf "f" (string_of_ifam ifam2 |> Adef.encoded);
+  Util.hidden_input conf "i"
+    (Driver.get_iper p |> Driver.string_of_iper |> Adef.encoded);
+  Util.hidden_input conf "f" (Driver.string_of_ifam ifam2 |> Adef.encoded);
   Util.hidden_input conf "m" (Adef.encoded "INV_FAM_OK");
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
@@ -611,22 +619,22 @@ let print_add conf base =
   let fath, moth, digest =
     match p_getenv conf.env "ip" with
     | Some i ->
-        let p = poi base (iper_of_string i) in
+        let p = Driver.poi base (Driver.iper_of_string i) in
         let fath =
           if
-            get_sex p = Male
-            || (get_sex p = Neuter && p_getenv conf.env "sex" = Some "M")
-          then person_key base (get_iper p)
+            Driver.get_sex p = Male
+            || (Driver.get_sex p = Neuter && p_getenv conf.env "sex" = Some "M")
+          then person_key base (Driver.get_iper p)
           else ("", "", 0, Update.Create (Male, None), "")
         in
         let moth =
           if
-            get_sex p = Female
-            || (get_sex p = Neuter && p_getenv conf.env "sex" = Some "F")
-          then person_key base (get_iper p)
+            Driver.get_sex p = Female
+            || (Driver.get_sex p = Neuter && p_getenv conf.env "sex" = Some "F")
+          then person_key base (Driver.get_iper p)
           else ("", "", 0, Update.Create (Female, None), "")
         in
-        let digest = string_of_int (Array.length (get_family p)) in
+        let digest = string_of_int (Array.length (Driver.get_family p)) in
         (fath, moth, digest)
     | None ->
         ( ("", "", 0, Update.Create (Male, None), ""),
@@ -646,7 +654,7 @@ let print_add conf base =
       comment = "";
       origin_file = "";
       fsources = default_source conf;
-      fam_index = dummy_ifam;
+      fam_index = Driver.dummy_ifam;
     }
   and cpl = Gutil.couple conf.multi_parents fath moth
   and des = { children = [||] } in
@@ -669,19 +677,23 @@ let print_add_parents conf base =
           comment = "";
           origin_file = "";
           fsources = default_source conf;
-          fam_index = dummy_ifam;
+          fam_index = Driver.dummy_ifam;
         }
       and cpl =
         Gutil.couple conf.multi_parents
-          ("", sou base (get_surname p), 0, Update.Create (Neuter, None), "")
+          ( "",
+            Driver.sou base (Driver.get_surname p),
+            0,
+            Update.Create (Neuter, None),
+            "" )
           ("", "", 0, Update.Create (Neuter, None), "")
       and des =
         {
           children =
             [|
-              ( sou base (get_first_name p),
-                sou base (get_surname p),
-                get_occ p,
+              ( Driver.sou base (Driver.get_first_name p),
+                Driver.sou base (Driver.get_surname p),
+                Driver.get_occ p,
                 Update.Link,
                 "" );
             |];
@@ -692,7 +704,7 @@ let print_add_parents conf base =
 let print_mod conf base =
   match p_getenv conf.env "i" with
   | Some i ->
-      let sfam = string_family_of conf base (ifam_of_string i) in
+      let sfam = string_family_of conf base (Driver.ifam_of_string i) in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_family ~salt sfam in
       print_update_fam conf base sfam digest
@@ -700,7 +712,7 @@ let print_mod conf base =
 
 let print_del conf base =
   match p_getenv conf.env "i" with
-  | Some i -> print_del1 conf base (ifam_of_string i)
+  | Some i -> print_del1 conf base (Driver.ifam_of_string i)
   | _ -> Hutil.incorrect_request conf
 
 let rec find_families ifam = function
@@ -712,12 +724,14 @@ let rec find_families ifam = function
 let print_inv conf base =
   match (p_getenv conf.env "i", p_getenv conf.env "f") with
   | Some ip, Some ifam -> (
-      let u = poi base (iper_of_string ip) in
+      let u = Driver.poi base (Driver.iper_of_string ip) in
       match
-        find_families (ifam_of_string ifam) (Array.to_list (get_family u))
+        find_families
+          (Driver.ifam_of_string ifam)
+          (Array.to_list (Driver.get_family u))
       with
       | Some (ifam1, ifam2) ->
-          let p = poi base (iper_of_string ip) in
+          let p = Driver.poi base (Driver.iper_of_string ip) in
           print_inv1 conf base p ifam1 ifam2
       | _ -> Hutil.incorrect_request conf)
   | _ -> Hutil.incorrect_request conf
@@ -735,31 +749,31 @@ let change_order u ifam n =
         else if i = n then ifam :: loop (i + 1) (fam :: faml)
         else fam :: loop (i + 1) faml
   in
-  loop 1 (Array.to_list (get_family u))
+  loop 1 (Array.to_list (Driver.get_family u))
 
 let print_change_order conf base =
   match
     (p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n")
   with
   | Some ip, Some ifam, Some n ->
-      let ip = iper_of_string ip in
-      let ifam = ifam_of_string ifam in
-      let p = poi base ip in
+      let ip = Driver.iper_of_string ip in
+      let ifam = Driver.ifam_of_string ifam in
+      let p = Driver.poi base ip in
       let print_person p sn =
-        Output.print_string conf (escape_html @@ p_first_name base p);
-        if get_occ p <> 0 then (
+        Output.print_string conf (escape_html @@ Driver.p_first_name base p);
+        if Driver.get_occ p <> 0 then (
           Output.print_sstring conf ".";
-          get_occ p |> string_of_int |> Output.print_sstring conf);
+          Driver.get_occ p |> string_of_int |> Output.print_sstring conf);
         if sn then (
           Output.print_sstring conf " ";
-          Output.print_string conf (escape_html @@ p_surname base p))
+          Output.print_string conf (escape_html @@ Driver.p_surname base p))
       in
       let print_list arr diff_arr =
         Array.iteri
           (fun i ifam ->
-            let fam = foi base ifam in
-            let sp = Gutil.spouse (get_iper p) fam in
-            let sp = poi base sp in
+            let fam = Driver.foi base ifam in
+            let sp = Gutil.spouse (Driver.get_iper p) fam in
+            let sp = Driver.poi base sp in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
@@ -774,7 +788,7 @@ let print_change_order conf base =
           arr
       in
       let after = change_order p ifam n in
-      let before, after = (get_family p, Array.of_list after) in
+      let before, after = (Driver.get_family p, Array.of_list after) in
       let title () =
         transl_decline conf "invert" ""
         |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -794,8 +808,8 @@ let print_change_order conf base =
       Output.print_sstring conf conf.command;
       Output.print_sstring conf {|"><p>|};
       Util.hidden_env conf;
-      Util.hidden_input conf "i" (Adef.encoded @@ string_of_iper ip);
-      Util.hidden_input conf "f" (Adef.encoded @@ string_of_ifam ifam);
+      Util.hidden_input conf "i" (Adef.encoded @@ Driver.string_of_iper ip);
+      Util.hidden_input conf "f" (Adef.encoded @@ Driver.string_of_ifam ifam);
       Util.hidden_input conf "n" (Adef.encoded @@ string_of_int n);
       Util.hidden_input conf "m" (Adef.encoded "CHG_FAM_ORD_OK");
       Output.print_sstring conf
@@ -810,7 +824,7 @@ let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let i = ifam_of_string i in
+      let i = Driver.ifam_of_string i in
       let sfam = string_family_of conf base i in
       let ifun =
         Templ.

@@ -1,8 +1,9 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let default_max_cnt = 2000
 
@@ -12,11 +13,12 @@ type t = Result of (string * string * int) list | Specify of string list
 
 let first_letters base is_surnames =
   let iii =
-    if is_surnames then persons_of_surname base else persons_of_first_name base
+    if is_surnames then Driver.persons_of_surname base
+    else Driver.persons_of_first_name base
   in
   try
     let rec loop istr list =
-      let s = Translate.eval (Mutil.nominative (sou base istr)) in
+      let s = Translate.eval (Mutil.nominative (Driver.sou base istr)) in
       let k = Util.name_key base s in
       let c = Utf8.sub k 0 1 in
       let list =
@@ -24,30 +26,31 @@ let first_letters base is_surnames =
         | hd :: _ -> if hd = c then list else c :: list
         | [] -> [ c ]
       in
-      match spi_next iii istr with
+      match Driver.spi_next iii istr with
       | istr -> loop istr list
       | exception Not_found -> list
     in
-    loop (spi_first iii "") []
+    loop (Driver.spi_first iii "") []
   with Not_found -> []
 
 let select_names conf base is_surnames ini limit =
   let inilen = Utf8.length ini + 1 in
   let cut k = Utf8.sub k 0 (min (Utf8.length k) inilen) in
   let iii =
-    if is_surnames then persons_of_surname base else persons_of_first_name base
+    if is_surnames then Driver.persons_of_surname base
+    else Driver.persons_of_first_name base
   in
   let list, len =
     let start_k = Mutil.tr '_' ' ' ini in
     try
-      let istr = spi_first iii start_k in
+      let istr = Driver.spi_first iii start_k in
       let rec loop istr len list =
-        let s = Translate.eval (Mutil.nominative (sou base istr)) in
+        let s = Translate.eval (Mutil.nominative (Driver.sou base istr)) in
         let k = Util.name_key base s in
         if Mutil.start_with_wildcard ini 0 k then
           let list, len =
             if s <> "?" then
-              let ips = spi_find iii istr in
+              let ips = Driver.spi_find iii istr in
               let cnt =
                 (* Optimization:
                  * In the case of [Specify _]:
@@ -66,7 +69,8 @@ let select_names conf base is_surnames ini limit =
                     else if conf.hide_names then
                       if
                         List.exists
-                          (fun i -> Util.authorized_age conf base (poi base i))
+                          (fun i ->
+                            Util.authorized_age conf base (Driver.poi base i))
                           ips
                       then 1
                       else 0
@@ -80,8 +84,8 @@ let select_names conf base is_surnames ini limit =
                     else if conf.hide_names then
                       List.fold_left
                         (fun acc i ->
-                          if Util.authorized_age conf base (poi base i) then
-                            acc + 1
+                          if Util.authorized_age conf base (Driver.poi base i)
+                          then acc + 1
                           else acc)
                         0 ips
                     else List.length ips
@@ -108,7 +112,7 @@ let select_names conf base is_surnames ini limit =
                 | Specify [] -> (Specify [ cut k ], 1)
             else (list, len)
           in
-          match spi_next iii istr with
+          match Driver.spi_next iii istr with
           | istr -> loop istr len list
           | exception Not_found -> (list, len)
         else (list, len)

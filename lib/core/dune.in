@@ -6,7 +6,7 @@
  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
  (libraries unix
             geneweb_def
-            geneweb_gwdb
+            geneweb_db
             geneweb_sosa
             geneweb_util)
 )

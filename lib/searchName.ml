@@ -1,32 +1,33 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 (* TODO use function from Util instead? *)
 let empty_sn_or_fn base p =
-  is_empty_string (get_surname p)
-  || is_quest_string (get_surname p)
-  || is_empty_string (get_first_name p)
-  || is_quest_string (get_first_name p)
-  || Name.lower (sou base (get_surname p)) = ""
-  || Name.lower (sou base (get_first_name p)) = ""
+  Driver.is_empty_string (Driver.get_surname p)
+  || Driver.is_quest_string (Driver.get_surname p)
+  || Driver.is_empty_string (Driver.get_first_name p)
+  || Driver.is_quest_string (Driver.get_first_name p)
+  || Name.lower (Driver.sou base (Driver.get_surname p)) = ""
+  || Name.lower (Driver.sou base (Driver.get_first_name p)) = ""
 
 let person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
   if
     List.exists
       (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
+      (Driver.person_misc_names base p (nobtit conf base))
   then true
   else false
 
 let person_is_approx_key base p k =
   let k = Name.strip_lower k in
-  let fn = Name.strip_lower (p_first_name base p) in
-  let sn = Name.strip_lower (p_surname base p) in
+  let fn = Name.strip_lower (Driver.p_first_name base p) in
+  let sn = Name.strip_lower (Driver.p_surname base p) in
   if k = fn ^ sn && fn <> "" && sn <> "" then true else false
 
 let select_approx_key conf base pl k =
@@ -50,7 +51,9 @@ let search_by_sosa conf base an =
   match (sosa_ref, sosa_nb) with
   | None, _ | _, None -> None
   | Some p, Some n when n <> Sosa.zero -> (
-      match Util.branch_of_sosa conf base n (pget conf base @@ get_iper p) with
+      match
+        Util.branch_of_sosa conf base n (pget conf base @@ Driver.get_iper p)
+      with
       | Some (p :: _) -> Some p
       | _ -> None)
   | _ -> None
@@ -67,9 +70,9 @@ let search_by_name conf base n =
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let p_of_sn_l, _ =
-        Some.persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base))
-          get_surname sn
+        Some.persons_of_fsname conf base Driver.base_strings_of_surname
+          (Driver.spi_find (Driver.persons_of_surname base))
+          Driver.get_surname sn
       in
       List.fold_left
         (fun pl (_, _, ipl) ->
@@ -79,10 +82,12 @@ let search_by_name conf base n =
               | None -> pl
               | Some p ->
                   let fn1_l =
-                    split_normalize true (sou base (get_first_name p))
+                    split_normalize true
+                      (Driver.sou base (Driver.get_first_name p))
                   in
                   let fn2_l =
-                    split_normalize true (sou base (get_public_name p))
+                    split_normalize true
+                      (Driver.sou base (Driver.get_public_name p))
                   in
                   if List.mem fn fn1_l || List.mem fn fn2_l then p :: pl else pl)
             pl ipl)
@@ -169,9 +174,13 @@ let search_for_multiple_fn conf base fn pl opts =
     (fun pl p ->
       if search_reject_p conf base p then pl
       else
-        let fn1_l = get_first_name p |> sou base |> split_normalize opts.case in
+        let fn1_l =
+          Driver.get_first_name p |> Driver.sou base
+          |> split_normalize opts.case
+        in
         let fn2_l =
-          get_public_name p |> sou base |> split_normalize opts.case
+          Driver.get_public_name p |> Driver.sou base
+          |> split_normalize opts.case
         in
         if match_fn_lists fn_l fn1_l opts || match_fn_lists fn_l fn2_l opts then
           p :: pl
@@ -197,13 +206,13 @@ let search conf base an search_order specify unknown =
         match search_by_sosa conf base an with
         | None -> loop l
         | Some p ->
-            record_visited conf (get_iper p);
+            record_visited conf (Driver.get_iper p);
             Perso.print conf base p)
     | Key :: l -> (
         match search_by_key conf base an with
         | None -> loop l
         | Some p ->
-            record_visited conf (get_iper p);
+            record_visited conf (Driver.get_iper p);
             Perso.print conf base p)
     | Surname :: l -> (
         let pl = Some.search_surname conf base an in
@@ -229,7 +238,7 @@ let search conf base an search_order specify unknown =
         let pl1 =
           List.fold_left
             (fun acc p ->
-              let fn1 = sou base (get_first_name p) in
+              let fn1 = Driver.sou base (Driver.get_first_name p) in
               let fn1_l = cut_words fn1 in
               if fn1 = "" then acc
               else if match_fn_lists fn_l fn1_l opts then p :: acc
@@ -247,13 +256,13 @@ let search conf base an search_order specify unknown =
         in
         (* find additional bearers of sn with with exact = "off" fn using advanced_search *)
         let pl1_ht = Hashtbl.create 40 in
-        List.iter (fun p -> Hashtbl.add pl1_ht (get_iper p) "") pl1;
+        List.iter (fun p -> Hashtbl.add pl1_ht (Driver.get_iper p) "") pl1;
         let pl2, _len = AdvSearchOk.advanced_search conf base max_int in
         (* filter out with match_fn_lists *)
         let pl2 =
           List.fold_left
             (fun acc p ->
-              let fn1 = sou base (get_first_name p) in
+              let fn1 = Driver.sou base (Driver.get_first_name p) in
               let fn1_l = cut_words fn1 in
               if fn1 = "" then acc
               else if match_fn_lists fn_l fn1_l opts then p :: acc
@@ -264,14 +273,14 @@ let search conf base an search_order specify unknown =
         let pl2 =
           List.fold_left
             (fun acc p ->
-              if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
+              if Hashtbl.mem pl1_ht (Driver.get_iper p) then acc else p :: acc)
             [] pl2
         in
         (* split pl1 into exact matches (pl1) and partial match (pl3) *)
         let pl1, pl3 =
           List.fold_left
             (fun (acc1, acc3) p ->
-              let fn1 = sou base (get_public_name p) in
+              let fn1 = Driver.sou base (Driver.get_public_name p) in
               let fn1_l = cut_words fn1 in
               if fn1 = "" then (p :: acc1, acc3)
               else if match_fn_lists fn_l fn1_l opts then (acc1, p :: acc3)
@@ -279,34 +288,34 @@ let search conf base an search_order specify unknown =
             ([], []) pl1
         in
         let pl1_ht = Hashtbl.create 40 in
-        List.iter (fun p -> Hashtbl.add pl1_ht (get_iper p) "") pl1;
+        List.iter (fun p -> Hashtbl.add pl1_ht (Driver.get_iper p) "") pl1;
         (* remove from pl2 persons already in pl1 *)
         let pl2 =
           List.fold_left
             (fun acc p ->
-              if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
+              if Hashtbl.mem pl1_ht (Driver.get_iper p) then acc else p :: acc)
             [] pl2
         in
         (* remove from pl3 persons already in pl1 *)
         let pl3 =
           List.fold_left
             (fun acc p ->
-              if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
+              if Hashtbl.mem pl1_ht (Driver.get_iper p) then acc else p :: acc)
             [] pl3
         in
         let pl2_ht = Hashtbl.create 40 in
-        List.iter (fun p -> Hashtbl.add pl2_ht (get_iper p) "") pl2;
+        List.iter (fun p -> Hashtbl.add pl2_ht (Driver.get_iper p) "") pl2;
         (* remove from pl3 persons already in pl2 *)
         let pl3 =
           List.fold_left
             (fun acc p ->
-              if Hashtbl.mem pl2_ht (get_iper p) then acc else p :: acc)
+              if Hashtbl.mem pl2_ht (Driver.get_iper p) then acc else p :: acc)
             [] pl3
         in
         match (pl1, pl2, pl3) with
         | [], [], [] -> loop l
         | [ p ], [], [] | [], [ p ], [] | [], [], [ p ] ->
-            record_visited conf (get_iper p);
+            record_visited conf (Driver.get_iper p);
             Perso.print conf base p
         | _ ->
             let str = Mutil.StrSet.empty in
@@ -359,7 +368,7 @@ let search conf base an search_order specify unknown =
         match list with
         | [] -> loop l
         | [ p ] ->
-            record_visited conf (get_iper p);
+            record_visited conf (Driver.get_iper p);
             Perso.print conf base p
         | pl -> (
             (* check first_names or public_names in list of persons *)
@@ -368,17 +377,19 @@ let search conf base an search_order specify unknown =
             let opts2 = { opts with all_in = false } in
             let pl2 = search_for_multiple_fn conf base fn pl opts2 in
             let pl1_ht = Hashtbl.create 40 in
-            List.iter (fun p -> Hashtbl.add pl1_ht (get_iper p) "") pl1;
+            List.iter (fun p -> Hashtbl.add pl1_ht (Driver.get_iper p) "") pl1;
             let pl2 =
               List.fold_left
                 (fun acc p ->
-                  if Hashtbl.mem pl1_ht (get_iper p) then acc else p :: acc)
+                  if Hashtbl.mem pl1_ht (Driver.get_iper p) then acc
+                  else p :: acc)
                 [] pl2
             in
             let get_spouse iper ifam =
-              let f = foi base ifam in
-              if iper = get_father f then poi base (get_mother f)
-              else poi base (get_father f)
+              let f = Driver.foi base ifam in
+              if iper = Driver.get_father f then
+                Driver.poi base (Driver.get_mother f)
+              else Driver.poi base (Driver.get_father f)
             in
             (* find bearers of surname *)
             let find_pl3 =
@@ -393,14 +404,14 @@ let search conf base an search_order specify unknown =
                   Array.fold_left
                     (fun acc ifam -> get_spouse ip ifam :: acc)
                     acc
-                    (get_family (poi base ip)))
+                    (Driver.get_family (Driver.poi base ip)))
                 [] pl3
             in
             let pl3 = search_for_multiple_fn conf base fn pl3 opts in
             match (pl1, pl2, pl3) with
             | [], [], [] -> loop l
             | [ p ], [], [] | [], [ p ], [] | [], [], [ p ] ->
-                record_visited conf (get_iper p);
+                record_visited conf (Driver.get_iper p);
                 Perso.print conf base p
             | _ -> specify conf base an pl1 pl2 pl3))
     | ApproxKey :: l -> (
@@ -408,7 +419,7 @@ let search conf base an search_order specify unknown =
         match pl with
         | [] -> loop l
         | [ p ] ->
-            record_visited conf (get_iper p);
+            record_visited conf (Driver.get_iper p);
             Perso.print conf base p
         | pl -> specify conf base an pl [] [])
     | PartialKey :: l -> (
@@ -434,7 +445,7 @@ let search conf base an search_order specify unknown =
             match p_of_sn_l with
             | [] -> loop l
             | [ p ] ->
-                record_visited conf (get_iper p);
+                record_visited conf (Driver.get_iper p);
                 Perso.print conf base p
             | pl -> (
                 let opts1 = { opts with all_in = true } in
@@ -449,11 +460,11 @@ let search conf base an search_order specify unknown =
                 match pl1 with
                 | [] -> loop l
                 | [ p ] ->
-                    record_visited conf (get_iper p);
+                    record_visited conf (Driver.get_iper p);
                     Perso.print conf base p
                 | pl1 -> specify conf base an pl1 pl2 []))
         | [ p ] ->
-            record_visited conf (get_iper p);
+            record_visited conf (Driver.get_iper p);
             Perso.print conf base p
         | pl -> specify conf base an pl [] [])
     | DefaultSurname :: _ -> Some.search_surname_print conf base unknown an

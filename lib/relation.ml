@@ -1,9 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
 open Util
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Collection = Geneweb_db.Collection
 
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
@@ -83,8 +85,8 @@ let add_missing_parents_of_siblings conf base indl =
                   match ind.di_val with
                   | Some ip ->
                       let ip =
-                        match get_parents (pget conf base ip) with
-                        | Some ifam -> get_father (foi base ifam)
+                        match Driver.get_parents (pget conf base ip) with
+                        | Some ifam -> Driver.get_father (Driver.foi base ifam)
                         | None -> assert false
                       in
                       if List.mem ip ipl then ipl else ip :: ipl
@@ -133,16 +135,16 @@ let add_phony_children indl faml =
     faml indl
 
 let add_common_parent base ip1 ip2 set =
-  let a1 = poi base ip1 in
-  let a2 = poi base ip2 in
-  match (get_parents a1, get_parents a2) with
+  let a1 = Driver.poi base ip1 in
+  let a2 = Driver.poi base ip2 in
+  match (Driver.get_parents a1, Driver.get_parents a2) with
   | Some ifam1, Some ifam2 ->
-      let cpl1 = foi base ifam1 in
-      let cpl2 = foi base ifam2 in
-      if get_father cpl1 = get_father cpl2 then
-        Dag.Pset.add (get_father cpl1) set
-      else if get_mother cpl1 = get_mother cpl2 then
-        Dag.Pset.add (get_mother cpl1) set
+      let cpl1 = Driver.foi base ifam1 in
+      let cpl2 = Driver.foi base ifam2 in
+      if Driver.get_father cpl1 = Driver.get_father cpl2 then
+        Dag.Pset.add (Driver.get_father cpl1) set
+      else if Driver.get_mother cpl1 = Driver.get_mother cpl2 then
+        Dag.Pset.add (Driver.get_mother cpl1) set
       else set
   | _ -> set
 
@@ -163,12 +165,12 @@ let ind_set_of_relation_path base path =
   in
   set
 
-type node = NotVisited | Visited of (bool * iper * famlink)
+type node = NotVisited | Visited of (bool * Driver.iper * famlink)
 
 let excl_faml conf base =
   let rec loop list i =
     match p_getenv conf.Config.env ("ef" ^ string_of_int i) with
-    | Some k -> loop (ifam_of_string k :: list) (i + 1)
+    | Some k -> loop (Driver.ifam_of_string k :: list) (i + 1)
     | None -> (
         match find_person_in_env conf base ("ef" ^ string_of_int i) with
         | Some p ->
@@ -177,7 +179,8 @@ let excl_faml conf base =
               |> Option.value ~default:0
             in
             let list =
-              if n < Array.length (get_family p) then (get_family p).(n) :: list
+              if n < Array.length (Driver.get_family p) then
+                (Driver.get_family p).(n) :: list
               else list
             in
             loop list (i + 1)
@@ -185,69 +188,76 @@ let excl_faml conf base =
   in
   loop [] 0
 
-let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
-  let mark_per = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
-  let mark_fam = Gwdb.ifam_marker (Gwdb.ifams base) false in
-  List.iter (fun i -> Gwdb.Marker.set mark_fam i true) excl_faml;
+let get_shortest_path_relation conf base ip1 ip2 (excl_faml : Driver.ifam list)
+    =
+  let mark_per = Driver.iper_marker (Driver.ipers base) NotVisited in
+  let mark_fam = Driver.ifam_marker (Driver.ifams base) false in
+  List.iter (fun i -> Collection.Marker.set mark_fam i true) excl_faml;
   let parse_fam ifam =
-    if Gwdb.Marker.get mark_fam ifam then []
+    if Collection.Marker.get mark_fam ifam then []
     else
-      let fam = foi base ifam in
-      Gwdb.Marker.set mark_fam ifam true;
+      let fam = Driver.foi base ifam in
+      Collection.Marker.set mark_fam ifam true;
       let result =
         Array.fold_right
           (fun fam children ->
             if ifam = fam then children
-            else if Gwdb.Marker.get mark_fam fam then children
+            else if Collection.Marker.get mark_fam fam then children
             else
               Array.fold_right
                 (fun child children -> (child, HalfSibling, fam) :: children)
-                (get_children (foi base fam))
+                (Driver.get_children (Driver.foi base fam))
                 children)
-          (get_family (pget conf base (get_mother fam)))
+          (Driver.get_family (pget conf base (Driver.get_mother fam)))
           []
       in
       let result =
         Array.fold_right
           (fun fam children ->
             if ifam = fam then children
-            else if Gwdb.Marker.get mark_fam fam then children
+            else if Collection.Marker.get mark_fam fam then children
             else
               Array.fold_right
                 (fun child children -> (child, HalfSibling, fam) :: children)
-                (get_children (foi base fam))
+                (Driver.get_children (Driver.foi base fam))
                 children)
-          (get_family (pget conf base (get_father fam)))
+          (Driver.get_family (pget conf base (Driver.get_father fam)))
           result
       in
       let result =
         Array.fold_right
           (fun child children -> (child, Sibling, ifam) :: children)
-          (get_children (foi base ifam))
+          (Driver.get_children (Driver.foi base ifam))
           result
       in
-      (get_father fam, Parent, ifam) :: (get_mother fam, Parent, ifam) :: result
+      (Driver.get_father fam, Parent, ifam)
+      :: (Driver.get_mother fam, Parent, ifam)
+      :: result
   in
   let neighbours iper =
     Array.fold_right
       (fun ifam nb ->
-        if Gwdb.Marker.get mark_fam ifam then nb
+        if Collection.Marker.get mark_fam ifam then nb
         else
-          let fam = foi base ifam in
-          Gwdb.Marker.set mark_fam ifam true;
+          let fam = Driver.foi base ifam in
+          Collection.Marker.set mark_fam ifam true;
           Array.fold_right
             (fun child children -> (child, Child, ifam) :: children)
-            (get_children fam)
-            [ (get_father fam, Mate, ifam); (get_mother fam, Mate, ifam) ]
+            (Driver.get_children fam)
+            [
+              (Driver.get_father fam, Mate, ifam);
+              (Driver.get_mother fam, Mate, ifam);
+            ]
           @ nb)
-      (get_family (pget conf base iper))
-      (Option.fold ~none:[] ~some:parse_fam (get_parents (pget conf base iper)))
+      (Driver.get_family (pget conf base iper))
+      (Option.fold ~none:[] ~some:parse_fam
+         (Driver.get_parents (pget conf base iper)))
   in
   let rec make_path path vertex =
     match path with
     | (_, Self) :: _ -> path
     | _ -> (
-        match Gwdb.Marker.get mark_per vertex with
+        match Collection.Marker.get mark_per vertex with
         | NotVisited -> assert false
         | Visited (_, v, f) -> make_path ((vertex, f) :: path) v)
   in
@@ -270,9 +280,10 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
       | vertex :: vertexlist ->
           let rec loop2 result = function
             | (iper, fl, ifam) :: neighbourslist -> (
-                match Gwdb.Marker.get mark_per iper with
+                match Collection.Marker.get mark_per iper with
                 | NotVisited ->
-                    Gwdb.Marker.set mark_per iper (Visited (source, vertex, fl));
+                    Collection.Marker.set mark_per iper
+                      (Visited (source, vertex, fl));
                     loop2 (iper :: result) neighbourslist
                 | Visited (s, v, f) ->
                     if s = source then loop2 result neighbourslist
@@ -303,8 +314,8 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
       | Left (path, ifam) -> Some (path, ifam)
       | Right queue1 -> width_search queue1 visited1 queue2 visited2
   in
-  Gwdb.Marker.set mark_per ip1 @@ Visited (true, ip1, Self);
-  Gwdb.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
+  Collection.Marker.set mark_per ip1 @@ Visited (true, ip1, Self);
+  Collection.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
   width_search [ ip1 ] 0 [ ip2 ] 0
 
 (** [simplify_path conf base path]
@@ -319,10 +330,10 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
  *)
 let simplify_path base path =
   let get get i =
-    let p = poi base i in
-    match get_parents p with
+    let p = Driver.poi base i in
+    match Driver.get_parents p with
     | None -> assert false
-    | Some parents -> get (foi base parents)
+    | Some parents -> get (Driver.foi base parents)
   in
   let aux get_field ht i =
     match Hashtbl.find_opt ht i with
@@ -332,8 +343,8 @@ let simplify_path base path =
         Hashtbl.add ht i r;
         r
   in
-  let mother = aux get_mother (Hashtbl.create 0) in
-  let father = aux get_father (Hashtbl.create 0) in
+  let mother = aux Driver.get_mother (Hashtbl.create 0) in
+  let father = aux Driver.get_father (Hashtbl.create 0) in
   let rec simplify = function
     | [] -> []
     | ((i1, (HalfSibling | Sibling | Child)) as x)
@@ -383,7 +394,7 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
   let rec loop ip dist =
     if dist <= len1 then []
     else
-      let lens = proj @@ Gwdb.Marker.get reltab ip in
+      let lens = proj @@ Collection.Marker.get reltab ip in
       let rec loop1 = function
         | ifam :: ifaml ->
             let rec loop2 = function
@@ -394,12 +405,12 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
                   else loop2 ipl
               | [] -> loop1 ifaml
             in
-            loop2 (Array.to_list (get_children (foi base ifam)))
+            loop2 (Array.to_list (Driver.get_children (Driver.foi base ifam)))
         | [] -> []
       in
-      loop1 (Array.to_list (get_family (pget conf base ip)))
+      loop1 (Array.to_list (Driver.get_family (pget conf base ip)))
   in
-  loop (get_iper anc) x
+  loop (Driver.get_iper anc) x
 
 let compute_simple_relationship conf base tstab ip1 ip2 =
   let tab = Consang.make_relationship_info base tstab in
@@ -412,7 +423,7 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
       try
         List.fold_left
           (fun n i ->
-            let u = Gwdb.Marker.get tab.Consang.reltab i in
+            let u = Collection.Marker.get tab.Consang.reltab i in
             List.fold_left
               (fun n (_, n1, _) ->
                 let n1 = if n1 < 0 then raise Exit else Sosa.of_int n1 in
@@ -426,7 +437,7 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
     let rl =
       List.fold_left
         (fun rl i ->
-          let u = Gwdb.Marker.get tab.Consang.reltab i in
+          let u = Collection.Marker.get tab.Consang.reltab i in
           let p = pget conf base i in
           List.fold_left
             (fun rl (len1, n1, _) ->
@@ -462,14 +473,16 @@ let known_spouses_list conf base p excl_p =
   let u = p in
   Array.fold_left
     (fun spl ifam ->
-      let sp = pget conf base (Gutil.spouse (get_iper p) (foi base ifam)) in
+      let sp =
+        pget conf base (Gutil.spouse (Driver.get_iper p) (Driver.foi base ifam))
+      in
       if
-        sou base (get_first_name sp) <> "?"
-        && sou base (get_surname sp) <> "?"
-        && get_iper sp <> get_iper excl_p
+        Driver.sou base (Driver.get_first_name sp) <> "?"
+        && Driver.sou base (Driver.get_surname sp) <> "?"
+        && Driver.get_iper sp <> Driver.get_iper excl_p
       then sp :: spl
       else spl)
-    [] (get_family u)
+    [] (Driver.get_family u)
 
 let merge_relations rl1 rl2 =
   List.merge
@@ -491,8 +504,8 @@ let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
       List.fold_right
         (fun p2 sl ->
           let sol =
-            compute_simple_relationship conf base tstab (get_iper p1)
-              (get_iper p2)
+            compute_simple_relationship conf base tstab (Driver.get_iper p1)
+              (Driver.get_iper p2)
           in
           match sol with
           | Some (rl, total, _, reltab) ->
@@ -506,8 +519,8 @@ let sp p = Some p
 let no_sp _ = None
 
 let compute_relationship conf base by_marr p1 p2 =
-  let ip1 = get_iper p1 in
-  let ip2 = get_iper p2 in
+  let ip1 = Driver.get_iper p1 in
+  let ip2 = Driver.get_iper p2 in
   if ip1 = ip2 then None
   else
     let tstab = Util.create_topological_sort conf base in

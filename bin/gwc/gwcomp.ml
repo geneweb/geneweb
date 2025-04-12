@@ -1,7 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
 
 let magic_gwo = "GnWo000o"
 
@@ -21,7 +21,8 @@ type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 
 type somebody =
   | Undefined of key (* Reference to person *)
-  | Defined of (iper, iper, string) gen_person (* Person's definition *)
+  | Defined of
+      (Driver.iper, Driver.iper, string) gen_person (* Person's definition *)
 
 type gw_syntax =
   | Family of
@@ -37,8 +38,11 @@ type gw_syntax =
         * string
         * (somebody * sex * witness_kind) list)
         list
-      * ((iper, iper, string) gen_person, ifam, string) gen_family
-      * (iper, iper, string) gen_person gen_descend
+      * ( (Driver.iper, Driver.iper, string) gen_person,
+          Driver.ifam,
+          string )
+        gen_family
+      * (Driver.iper, Driver.iper, string) gen_person gen_descend
       (** Family definition block. Contains:
       - Family couple (father's and mother's definition/reference)
       - Father's sex
@@ -856,7 +860,7 @@ let read_line ic =
 
 (** Create a dummy [gen_person]. *)
 let create_person () =
-  { (Mutil.empty_person "" "") with key_index = Gwdb.dummy_iper }
+  { (Mutil.empty_person "" "") with key_index = Driver.dummy_iper }
 
 (** Person is unknown (bogus definition) *)
 let bogus_def p n = p = "?" || n = "?"
@@ -1250,7 +1254,7 @@ let read_family ic fname = function
               comment = comm;
               origin_file = Filename.basename fname;
               fsources = fsrc;
-              fam_index = Gwdb.dummy_ifam;
+              fam_index = Driver.dummy_ifam;
             }
           in
           let deo = { children = Array.of_list cles_enfants } in
@@ -1272,7 +1276,7 @@ let read_family ic fname = function
               comment = comm;
               origin_file = Filename.basename fname;
               fsources = fsrc;
-              fam_index = Gwdb.dummy_ifam;
+              fam_index = Driver.dummy_ifam;
             }
           in
           let deo = { children = [||] } in

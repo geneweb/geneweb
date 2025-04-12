@@ -314,9 +314,9 @@ let cache f a get set x =
 type person = {
   base : base;
   iper : iper;
-  mutable p : (iper, iper, istr) gen_person option;
-  mutable a : ifam gen_ascend option;
-  mutable u : ifam gen_union option;
+  mutable p : (iper, iper, istr) Def.gen_person option;
+  mutable a : ifam Def.gen_ascend option;
+  mutable u : ifam Def.gen_union option;
 }
 
 let cache_per f ({ base; iper; _ } as p) =
@@ -375,9 +375,9 @@ let get_titles = cache_per (fun p -> p.Def.titles)
 type family = {
   base : base;
   ifam : ifam;
-  mutable f : (iper, ifam, istr) gen_family option;
-  mutable c : iper gen_couple option;
-  mutable d : iper gen_descend option;
+  mutable f : (iper, ifam, istr) Def.gen_family option;
+  mutable c : iper Def.gen_couple option;
+  mutable d : iper Def.gen_descend option;
 }
 
 let cache_fam f ({ base; ifam; _ } as fam) =
@@ -413,8 +413,8 @@ let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
 let no_person ip =
   { (Mutil.empty_person empty_string empty_string) with key_index = ip }
 
-let no_ascend = { parents = None; consang = Adef.no_consang }
-let no_union = { family = [||] }
+let no_ascend = Def.{ parents = None; consang = Adef.no_consang }
+let no_union = Def.{ family = [||] }
 
 let empty_person base iper =
   {
@@ -427,12 +427,12 @@ let empty_person base iper =
   [@ocaml.warning "-42"]
 
 let person_of_gen_person base (p, a, u) =
-  { base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
-  [@ocaml.warning "-42"]
+  (Def.{ base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
+  [@ocaml.warning "-42"])
 
 let family_of_gen_family base (f, c, d) =
-  { base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
-  [@ocaml.warning "-42"]
+  (Def.{ base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
+  [@ocaml.warning "-42"])
 
 let iper_exists base = base.func.iper_exists
 let ifam_exists base = base.func.ifam_exists
@@ -458,105 +458,24 @@ let foi base ifam =
   if ifam = dummy_ifam then empty_family base ifam
   else { base; ifam; f = None; c = None; d = None }
 
-module Collection = struct
-  type 'a t = { length : int; get : int -> 'a option }
-
-  let map (fn : 'a -> 'b) c =
-    {
-      length = c.length;
-      get = (fun i -> match c.get i with Some x -> Some (fn x) | None -> None);
-    }
-
-  let length { length; _ } = length
-
-  let iter fn { get; length } =
-    for i = 0 to length - 1 do
-      match get i with Some x -> fn x | None -> ()
-    done
-
-  let iteri fn { get; length } =
-    for i = 0 to length - 1 do
-      match get i with Some x -> fn i x | None -> ()
-    done
-
-  let fold ?from ?until fn acc { get; length } =
-    let from = match from with Some x -> x | None -> 0 in
-    let until = match until with Some x -> x + 1 | None -> length in
-    let rec loop acc i =
-      if i = until then acc
-      else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
-    in
-    loop acc from
-
-  let fold_until continue fn acc { get; length } =
-    let rec loop acc i =
-      if (not (continue acc)) || i = length then acc
-      else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
-    in
-    loop acc 0
-
-  let iterator { get; length } =
-    let cursor = ref 0 in
-    let rec next () =
-      if !cursor < length then (
-        match get !cursor with
-        | None ->
-            incr cursor;
-            next ()
-        | v ->
-            incr cursor;
-            v)
-      else None
-    in
-    next
-end
-
-module Marker = struct
-  type ('k, 'v) t = { get : 'k -> 'v; set : 'k -> 'v -> unit }
-
-  let make (k : 'a -> int) (c : 'a Collection.t) (i : 'v) : ('a, 'v) t =
-    let a = Array.make c.Collection.length i in
-    {
-      get = (fun x -> Array.get a (k x));
-      set = (fun x v -> Array.set a (k x) v);
-    }
-
-  let get ({ get; _ } : _ t) k = get k
-  let set ({ set; _ } : _ t) k = set k
-end
-
 let persons base =
-  { Collection.length = nb_of_persons base; get = (fun i -> Some (poi base i)) }
+  Collection.make ~len:(nb_of_persons base) (fun i -> Some (poi base i))
 
-let ipers base =
-  { Collection.length = nb_of_persons base; get = (fun i -> Some i) }
-
-let iper_marker c i = Marker.make (fun i -> i) c i
+let ipers base = Collection.make ~len:(nb_of_persons base) (fun i -> Some i)
+let iper_marker c i = Collection.Marker.make (fun i -> i) c i
 
 let ifams ?(select = fun _ -> true) base =
-  {
-    Collection.length = nb_of_families base;
-    get =
-      (fun i ->
-        if select i then
-          if get_ifam (foi base i) = dummy_ifam then None else Some i
-        else None);
-  }
+  Collection.make ~len:(nb_of_families base) (fun i ->
+      if select i then
+        if get_ifam (foi base i) = dummy_ifam then None else Some i
+      else None)
 
 let families ?(select = fun _ -> true) base =
-  {
-    Collection.length = nb_of_families base;
-    get =
-      (fun i ->
-        let f = foi base i in
-        if get_ifam f <> dummy_ifam && select f then Some f else None);
-  }
+  Collection.make ~len:(nb_of_families base) (fun i ->
+      let f = foi base i in
+      if get_ifam f <> dummy_ifam && select f then Some f else None)
 
-let dummy_collection _ = { Collection.length = -1; get = (fun _ -> None) }
-let ifam_marker c i = Marker.make (fun i -> i) c i
-
-let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
-  { Marker.get = (fun _ -> v); set = (fun _ _ -> ()) }
+let ifam_marker c i = Collection.Marker.make (fun i -> i) c i
 
 (* Restrict file *)
 
@@ -643,7 +562,7 @@ let get_divorce fam =
   let divorce, separated =
     List.fold_right
       (fun evt (divorce, separated) ->
-        let name = evt.efam_name in
+        let name = evt.Def.efam_name in
         let date = evt.efam_date in
         let place = evt.efam_place in
         let note = evt.efam_note in
@@ -656,7 +575,7 @@ let get_divorce fam =
       (get_fevents fam) ([], [])
   in
   match (divorce, separated) with
-  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
+  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Def.Divorced date
   | _, _ -> NotDivorced
 
 (*let get_divorce = cache_fam (fun f -> get_divorce_aux)
@@ -666,7 +585,7 @@ let get_separation fam =
   let divorce, separated =
     List.fold_right
       (fun evt (divorce, separated) ->
-        let name = evt.efam_name in
+        let name = evt.Def.efam_name in
         let date = evt.efam_date in
         let place = evt.efam_place in
         let note = evt.efam_note in
@@ -679,8 +598,226 @@ let get_separation fam =
       (get_fevents fam) ([], [])
   in
   match (divorce, separated) with
-  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
+  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Def.Separated date
   | _, _ -> NotSeparated
 
 (*let get_separation = cache_fam (fun f -> get_separation_aux)
 *)
+
+(** Returns array of surnames of person's husbands.
+    First element of a couple in the array is husband's surname,
+    second - is a husband's surname aliases *)
+let husbands base (gp : _ Def.gen_person) =
+  let p = poi base gp.key_index in
+  Array.map
+    (fun ifam ->
+      let fam = foi base ifam in
+      let husband = poi base (get_father fam) in
+      let husband_surname = get_surname husband in
+      let husband_surnames_aliases = get_surnames_aliases husband in
+      (husband_surname, husband_surnames_aliases))
+    (get_family p)
+
+(** Return person's father titles *)
+let father_titles_places base p (nobtit : person -> title list) =
+  match get_parents (poi base p.Def.key_index) with
+  | Some ifam ->
+      let fam = foi base ifam in
+      let fath = poi base (get_father fam) in
+      nobtit fath
+  | None -> []
+
+let gen_gen_person_misc_names base (p : _ Def.gen_person) nobtit nobtit_fun =
+  Futil.gen_person_misc_names (sou base) empty_string quest_string p.first_name
+    p.surname p.public_name p.qualifiers p.aliases p.first_names_aliases
+    p.surnames_aliases nobtit
+    (if p.sex = Female then husbands base p else [||])
+    (father_titles_places base p nobtit_fun)
+  |> List.map Name.lower
+
+(** DELETE *)
+
+let getp fn b i = fn @@ poi b i
+let get_gen_person = getp gen_person_of_person
+let get_gen_ascend = getp gen_ascend_of_person
+let get_gen_union = getp gen_union_of_person
+let getf fn b i = fn @@ foi b i
+
+(* let get_gen_family = getf gen_family_of_family *)
+let get_gen_couple = getf gen_couple_of_family
+let get_gen_descend = getf gen_descend_of_family
+
+let rec delete_person_aux excl base ip =
+  let iexcl, fexcl = excl in
+  if ip = dummy_iper || List.mem ip iexcl then
+    failwith
+      ("gwdb.delete_person(" ^ string_of_iper ip ^ ",["
+      ^ (List.map string_of_iper iexcl |> String.concat ",")
+      ^ "])");
+  let a = get_gen_ascend base ip in
+  (* if person is the single child and their parents are empty persons
+     then [ipers] contains father and mother and [ifams] contains family *)
+  let ipers, ifams =
+    match a.parents with
+    | Some ifam ->
+        (* delete ascendants *)
+        delete_ascend base ip;
+        (* remove person id from family descendants *)
+        let children =
+          (get_gen_descend base ifam).children |> Mutil.array_except ip
+        in
+        patch_descend base ifam { children };
+        if children = [| ip |] then
+          let c = get_gen_couple base ifam in
+          let fath = Adef.father c in
+          let moth = Adef.mother c in
+          if is_empty_p base fath ~ifam && is_empty_p base moth ~ifam then
+            ([ fath; moth ], [ ifam ])
+          else ([], [])
+        else ([], [])
+    | None -> ([], [])
+  in
+  let del, ipers, ifams =
+    let u = get_gen_union base ip in
+    if u.family = [||] then (true, [], [])
+    else
+      Array.fold_left
+        (fun (del, ipers, ifams) ifam ->
+          let cpl = get_gen_couple base ifam in
+          (* Test if ip is really in union in order to prevent "false positive" *)
+          let fath = Adef.father cpl in
+          let moth = Adef.mother cpl in
+          if fath = ip || moth = ip then
+            let d = get_gen_descend base ifam in
+            if Array.length d.children > 1 then (false, ipers, ifams)
+            else
+              let sp = if ip = fath then moth else fath in
+              if List.mem sp iexcl then (del, ipers, ifams)
+              else if is_empty_p base sp ~ifam then
+                (del, sp :: ipers, ifam :: ifams)
+              else (false, ipers, ifams)
+          else (
+            (* Data are probably partially deleted.
+               It is likely to happen when merging persons. *)
+            rm_union base ifam ip;
+            (del, ipers, ifams)))
+        (true, ipers, ifams) u.family
+  in
+  if del then delete_person base ip
+  else
+    patch_person base ip
+      { (no_person ip) with first_name = quest_string; surname = quest_string };
+  let iexcl = if del then ip :: iexcl else iexcl in
+  let excl = (iexcl, fexcl) in
+  let excl =
+    List.fold_left (fun excl ip -> delete_person_aux excl base ip) excl ipers
+  in
+  List.fold_left (fun excl ifam -> delete_family_aux excl base ifam) excl ifams
+
+and is_empty_p ?ifam base sp =
+  (get_gen_ascend base sp).parents = None
+  && ((get_gen_union base sp).family
+     = match ifam with Some i -> [| i |] | None -> [||])
+  && get_gen_person base sp
+     = { (no_person sp) with first_name = quest_string; surname = quest_string }
+
+and delete_family_aux excl base ifam =
+  let iexcl, fexcl = excl in
+  if ifam = dummy_ifam || List.mem ifam fexcl then
+    failwith
+      ("gwdb.delete_family(" ^ string_of_ifam ifam ^ ",["
+      ^ (List.map string_of_ifam fexcl |> String.concat ",")
+      ^ "])");
+  let fam = foi base ifam in
+  let fath = get_father fam in
+  let moth = get_mother fam in
+  let children = get_children fam in
+  rm_union base ifam fath;
+  rm_union base ifam moth;
+  Array.iter (fun i -> patch_ascend base i no_ascend) children;
+  delete_family base ifam;
+  delete_couple base ifam;
+  delete_descend base ifam;
+  let fexcl = ifam :: fexcl in
+  let excl = (iexcl, fexcl) in
+  let excl =
+    if (not (List.mem fath iexcl)) && is_empty_p base fath then
+      delete_person_aux excl base fath
+    else excl
+  in
+  let excl =
+    if (not (List.mem moth iexcl)) && is_empty_p base moth then
+      delete_person_aux excl base moth
+    else excl
+  in
+  Array.fold_left
+    (fun excl i ->
+      if (not (List.mem i iexcl)) && is_empty_p base i then
+        delete_person_aux excl base i
+      else excl)
+    excl children
+
+and rm_union base ifam iper =
+  Def.
+    { family = (get_gen_union base iper).Def.family |> Mutil.array_except ifam }
+  |> patch_union base iper
+
+let insert_person_with_union_and_ascendants base p a u =
+  let iper = new_iper base in
+  let p = Def.{ p with key_index = iper } in
+  insert_ascend base iper a;
+  insert_union base iper u;
+  insert_person base iper p;
+  iper
+
+let insert_family_with_couple_and_descendants base f c d =
+  let ifam = new_ifam base in
+  insert_family base ifam f;
+  insert_couple base ifam c;
+  insert_descend base ifam d;
+  ifam
+
+let delete_person_rec base iper = ignore @@ delete_person_aux ([], []) base iper
+let delete_family_rec base ifam = ignore @@ delete_family_aux ([], []) base ifam
+let p_first_name base p = Mutil.nominative (sou base (get_first_name p))
+let p_surname base p = Mutil.nominative (sou base (get_surname p))
+
+let children_of_p base p =
+  Array.fold_right
+    (fun ifam -> Array.fold_right List.cons (get_children @@ foi base ifam))
+    (get_family p) []
+
+let nobtitles base allowed_titles denied_titles p =
+  let list = get_titles p in
+  match Lazy.force allowed_titles with
+  | [] -> list
+  | allowed_titles -> (
+      let list =
+        List.fold_right
+          (fun (t : _ Def.gen_title) l ->
+            let id = Name.lower (sou base t.t_ident) in
+            let pl = Name.lower (sou base t.t_place) in
+            if pl = "" then if List.mem id allowed_titles then t :: l else l
+            else if
+              List.mem (id ^ "/" ^ pl) allowed_titles
+              || List.mem (id ^ "/*") allowed_titles
+            then t :: l
+            else l)
+          list []
+      in
+      match Lazy.force denied_titles with
+      | [] -> list
+      | denied_titles ->
+          List.filter
+            (fun (t : _ Def.gen_title) ->
+              let id = Name.lower (sou base t.t_ident) in
+              let pl = Name.lower (sou base t.t_place) in
+              if
+                List.mem (id ^ "/" ^ pl) denied_titles
+                || List.mem ("*/" ^ pl) denied_titles
+              then false
+              else true)
+            list)
+
+let person_misc_names base p nobtit =
+  gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit

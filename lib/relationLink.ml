@@ -2,10 +2,12 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Gutil = Geneweb_db.Gutil
 
 (* Printing for browsers without tables *)
 
@@ -65,20 +67,20 @@ let print_pre_right conf sz txt =
 (* Algorithm *)
 
 type info = {
-  ip : iper;
+  ip : Driver.iper;
   sp : sex;
-  ip1 : iper;
-  ip2 : iper;
-  b1 : (iper * sex) list;
-  b2 : (iper * sex) list;
+  ip1 : Driver.iper;
+  ip2 : Driver.iper;
+  b1 : (Driver.iper * sex) list;
+  b2 : (Driver.iper * sex) list;
   c1 : int;
   c2 : int;
-  pb1 : (iper * sex) list option;
-  pb2 : (iper * sex) list option;
-  nb1 : (iper * sex) list option;
-  nb2 : (iper * sex) list option;
-  sp1 : person option;
-  sp2 : person option;
+  pb1 : (Driver.iper * sex) list option;
+  pb2 : (Driver.iper * sex) list option;
+  nb1 : (Driver.iper * sex) list option;
+  nb2 : (Driver.iper * sex) list option;
+  sp1 : Driver.person option;
+  sp2 : Driver.person option;
   bd : int;
   td_prop : Adef.safe_string;
 }
@@ -90,51 +92,53 @@ let threshold = ref 10
 let phony_dist_tab = ((fun _ -> 0), fun _ -> infinity)
 
 let tsort_leq tstab x y =
-  if Gwdb.Marker.get tstab x = Gwdb.Marker.get tstab y then x >= y
-  else Gwdb.Marker.get tstab x < Gwdb.Marker.get tstab y
+  if Collection.Marker.get tstab x = Collection.Marker.get tstab y then x >= y
+  else Collection.Marker.get tstab x < Collection.Marker.get tstab y
 
 let make_dist_tab conf base ia maxlev =
   if maxlev <= !threshold then phony_dist_tab
   else
     let tstab = Util.create_topological_sort conf base in
     let module Pq = Pqueue.Make (struct
-      type t = iper
+      type t = Driver.iper
 
       let leq x y = not (tsort_leq tstab x y)
     end) in
     let default = { dmin = infinity; dmax = 0; mark = false } in
-    let dist = Gwdb.iper_marker (Gwdb.ipers base) default in
+    let dist = Driver.iper_marker (Driver.ipers base) default in
     let q = ref Pq.empty in
     let add_children ip =
       let u = pget conf base ip in
-      for i = 0 to Array.length (get_family u) - 1 do
-        let des = foi base (get_family u).(i) in
-        for j = 0 to Array.length (get_children des) - 1 do
-          let k = (get_children des).(j) in
-          let d = Gwdb.Marker.get dist k in
+      for i = 0 to Array.length (Driver.get_family u) - 1 do
+        let des = Driver.foi base (Driver.get_family u).(i) in
+        for j = 0 to Array.length (Driver.get_children des) - 1 do
+          let k = (Driver.get_children des).(j) in
+          let d = Collection.Marker.get dist k in
           if not d.mark then (
-            Gwdb.Marker.set dist k @@ { dmin = infinity; dmax = 0; mark = true };
+            Collection.Marker.set dist k
+            @@ { dmin = infinity; dmax = 0; mark = true };
             q := Pq.add k !q)
         done
       done
     in
-    Gwdb.Marker.set dist ia @@ { dmin = 0; dmax = 0; mark = true };
+    Collection.Marker.set dist ia @@ { dmin = 0; dmax = 0; mark = true };
     add_children ia;
     while not (Pq.is_empty !q) do
       let k, nq = Pq.take !q in
       q := nq;
-      match get_parents (pget conf base k) with
+      match Driver.get_parents (pget conf base k) with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let dfath = Gwdb.Marker.get dist (get_father cpl) in
-          let dmoth = Gwdb.Marker.get dist (get_mother cpl) in
-          (Gwdb.Marker.get dist k).dmin <- min dfath.dmin dmoth.dmin + 1;
-          (Gwdb.Marker.get dist k).dmax <- max dfath.dmax dmoth.dmax + 1;
-          if (Gwdb.Marker.get dist k).dmin > maxlev then () else add_children k
+          let cpl = Driver.foi base ifam in
+          let dfath = Collection.Marker.get dist (Driver.get_father cpl) in
+          let dmoth = Collection.Marker.get dist (Driver.get_mother cpl) in
+          (Collection.Marker.get dist k).dmin <- min dfath.dmin dmoth.dmin + 1;
+          (Collection.Marker.get dist k).dmax <- max dfath.dmax dmoth.dmax + 1;
+          if (Collection.Marker.get dist k).dmin > maxlev then ()
+          else add_children k
       | None -> ()
     done;
-    ( (fun ip -> (Gwdb.Marker.get dist ip).dmin),
-      fun ip -> (Gwdb.Marker.get dist ip).dmax )
+    ( (fun ip -> (Collection.Marker.get dist ip).dmin),
+      fun ip -> (Collection.Marker.get dist ip).dmax )
 
 let find_first_branch conf base (dmin, dmax) ia =
   let rec find br len ip sp =
@@ -142,12 +146,15 @@ let find_first_branch conf base (dmin, dmax) ia =
     else if len = 0 then None
     else if len < dmin ip || len > dmax ip then None
     else
-      match get_parents (pget conf base ip) with
+      match Driver.get_parents (pget conf base ip) with
       | Some ifam -> (
-          let cpl = foi base ifam in
-          match find ((ip, sp) :: br) (len - 1) (get_father cpl) Male with
+          let cpl = Driver.foi base ifam in
+          match
+            find ((ip, sp) :: br) (len - 1) (Driver.get_father cpl) Male
+          with
           | Some _ as r -> r
-          | None -> find ((ip, sp) :: br) (len - 1) (get_mother cpl) Female)
+          | None ->
+              find ((ip, sp) :: br) (len - 1) (Driver.get_mother cpl) Female)
       | None -> None
   in
   find []
@@ -161,26 +168,26 @@ let rec next_branch_same_len conf base dist backward missing ia sa ipl =
         | Female ->
             next_branch_same_len conf base dist true (missing + 1) ip sp ipl1
         | Male -> (
-            match get_parents (pget conf base ip) with
+            match Driver.get_parents (pget conf base ip) with
             | Some ifam ->
-                let cpl = foi base ifam in
+                let cpl = Driver.foi base ifam in
                 next_branch_same_len conf base dist false missing
-                  (get_mother cpl) Female ipl
+                  (Driver.get_mother cpl) Female ipl
             | _ -> failwith "next_branch_same_len")
         | Neuter ->
             Logs.syslog `LOG_CRIT
               (Format.sprintf "sex of %s is Neuter!\n"
-                 (Gutil.designation base (poi base ia)));
+                 (Gutil.designation base (Driver.poi base ia)));
             assert false)
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist true missing ia sa ipl
   else
-    match get_parents (pget conf base ia) with
+    match Driver.get_parents (pget conf base ia) with
     | Some ifam ->
-        let cpl = foi base ifam in
-        next_branch_same_len conf base dist false (missing - 1) (get_father cpl)
-          Male ((ia, sa) :: ipl)
+        let cpl = Driver.foi base ifam in
+        next_branch_same_len conf base dist false (missing - 1)
+          (Driver.get_father cpl) Male ((ia, sa) :: ipl)
     | None -> next_branch_same_len conf base dist true missing ia sa ipl
 
 let find_next_branch conf base dist ia sa ipl =
@@ -200,22 +207,22 @@ let rec prev_branch_same_len conf base dist backward missing ia sa ipl =
         | Male ->
             prev_branch_same_len conf base dist true (missing + 1) ip sp ipl1
         | Female -> (
-            match get_parents (pget conf base ip) with
+            match Driver.get_parents (pget conf base ip) with
             | Some ifam ->
-                let cpl = foi base ifam in
+                let cpl = Driver.foi base ifam in
                 prev_branch_same_len conf base dist false missing
-                  (get_father cpl) Male ipl
+                  (Driver.get_father cpl) Male ipl
             | _ -> failwith "prev_branch_same_len")
         | Neuter -> assert false)
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist true missing ia sa ipl
   else
-    match get_parents (pget conf base ia) with
+    match Driver.get_parents (pget conf base ia) with
     | Some ifam ->
-        let cpl = foi base ifam in
-        prev_branch_same_len conf base dist false (missing - 1) (get_mother cpl)
-          Female ((ia, sa) :: ipl)
+        let cpl = Driver.foi base ifam in
+        prev_branch_same_len conf base dist false (missing - 1)
+          (Driver.get_mother cpl) Female ((ia, sa) :: ipl)
     | None -> prev_branch_same_len conf base dist true missing ia sa ipl
 
 let find_prev_branch conf base dist ia sa ipl =
@@ -237,23 +244,26 @@ let spouse_text conf base end_sp ip ipl =
   match (ipl, (p_getenv conf.env "sp", p_getenv conf.env "opt")) with
   | (ips, _) :: _, (None, _ | _, Some "spouse") -> (
       let a = pget conf base ips in
-      match get_parents a with
+      match Driver.get_parents a with
       | Some ifam ->
-          let fam = foi base ifam in
+          let fam = Driver.foi base ifam in
           let sp =
-            if ip = get_father fam then get_mother fam else get_father fam
+            if ip = Driver.get_father fam then Driver.get_mother fam
+            else Driver.get_father fam
           in
           let d =
             DateDisplay.short_marriage_date_text conf base fam
-              (pget conf base (get_father fam))
-              (pget conf base (get_mother fam))
+              (pget conf base (Driver.get_father fam))
+              (pget conf base (Driver.get_mother fam))
           in
           (someone_text conf base sp, d, Some sp)
       | _ -> (Adef.safe "", Adef.safe "", None))
   | [], _ -> (
       match end_sp with
       | Some p ->
-          (someone_text conf base (get_iper p), Adef.safe "", Some (get_iper p))
+          ( someone_text conf base (Driver.get_iper p),
+            Adef.safe "",
+            Some (Driver.get_iper p) )
       | _ -> (Adef.safe "", Adef.safe "", None))
   | _ -> (Adef.safe "", Adef.safe "", None)
 
@@ -431,25 +441,28 @@ let other_parent_text_if_same conf base info =
   match (info.b1, info.b2) with
   | (sib1, _) :: _, (sib2, _) :: _ -> (
       match
-        (get_parents (pget conf base sib1), get_parents (pget conf base sib2))
+        ( Driver.get_parents (pget conf base sib1),
+          Driver.get_parents (pget conf base sib2) )
       with
       | Some ifam1, Some ifam2 -> (
-          let cpl1 = foi base ifam1 in
-          let cpl2 = foi base ifam2 in
+          let cpl1 = Driver.foi base ifam1 in
+          let cpl2 = Driver.foi base ifam2 in
           let other_parent =
-            if get_father cpl1 = info.ip then
-              if get_mother cpl1 = get_mother cpl2 then Some (get_mother cpl1)
+            if Driver.get_father cpl1 = info.ip then
+              if Driver.get_mother cpl1 = Driver.get_mother cpl2 then
+                Some (Driver.get_mother cpl1)
               else None
-            else if get_father cpl1 = get_father cpl2 then
-              Some (get_father cpl1)
+            else if Driver.get_father cpl1 = Driver.get_father cpl2 then
+              Some (Driver.get_father cpl1)
             else None
           in
           match other_parent with
           | Some ip ->
               let d =
-                DateDisplay.short_marriage_date_text conf base (foi base ifam1)
-                  (pget conf base (get_father cpl1))
-                  (pget conf base (get_mother cpl1))
+                DateDisplay.short_marriage_date_text conf base
+                  (Driver.foi base ifam1)
+                  (pget conf base (Driver.get_father cpl1))
+                  (pget conf base (Driver.get_mother cpl1))
               in
               Some ("&amp;" ^<^ d ^^^ " " ^<^ someone_text conf base ip, ip)
           | _ -> None)
@@ -641,11 +654,11 @@ let print_relation_no_dag conf base po ip1 ip2 =
   let params =
     match (po, p_getint conf.env "l1", p_getint conf.env "l2") with
     | Some p, Some l1, Some l2 ->
-        let ip = get_iper p in
+        let ip = Driver.get_iper p in
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
         let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
-        Some (ip, get_sex (pget conf base ip), dist, b1, b2, 1, 1)
+        Some (ip, Driver.get_sex (pget conf base ip), dist, b1, b2, 1, 1)
     | _ -> (
         match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
         | Some b1str, Some b2str -> (
@@ -723,7 +736,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
         ~comment:"relationLink: print_relation_no_dag failed"
 
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
-  let ia = get_iper a in
+  let ia = Driver.get_iper a in
   let add_branches dist set n ip l =
     let b = find_first_branch conf base dist ia l ip Neuter in
     let rec loop set n b =
@@ -734,7 +747,8 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
             let set =
               List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
             in
-            loop set (n + 1) (find_next_branch conf base dist ia (get_sex a) b)
+            loop set (n + 1)
+              (find_next_branch conf base dist ia (Driver.get_sex a) b)
         | None -> (set, n)
     in
     loop set n b
@@ -757,7 +771,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
       List.fold_right
         (fun (ip, s) spl ->
           match find_person_in_env conf base s with
-          | Some sp -> (ip, (get_iper sp, None)) :: spl
+          | Some sp -> (ip, (Driver.get_iper sp, None)) :: spl
           | None -> spl)
         [ (ip1, "3"); (ip2, "4") ]
         []
@@ -794,9 +808,11 @@ let print_relation conf base p1 p2 =
   let po = find_person_in_env conf base "" in
   match (p_getenv conf.env "dag", po, l1, l2) with
   | Some "on", Some p, Some l1, Some l2 ->
-      print_relation_dag conf base p (get_iper p1) (get_iper p2) (int_list l1)
-        (int_list l2)
-  | _ -> print_relation_no_dag conf base po (get_iper p1) (get_iper p2)
+      print_relation_dag conf base p (Driver.get_iper p1) (Driver.get_iper p2)
+        (int_list l1) (int_list l2)
+  | _ ->
+      print_relation_no_dag conf base po (Driver.get_iper p1)
+        (Driver.get_iper p2)
 
 let print conf base =
   match

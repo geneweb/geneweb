@@ -153,7 +153,7 @@ let index_of_string strings ic start_pos hash_len string_patches string_pending
 *)
 let old_persons_of_first_name_or_surname base_data params =
   let proj, person_patches, names_inx, names_dat, bname = params in
-  let module IstrTree = Btree.Make (struct
+  let module IstrTree = Avl.Make (struct
     type t = int
 
     let compare = Dutil.compare_snames_i base_data

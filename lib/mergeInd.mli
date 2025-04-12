@@ -1,46 +1,50 @@
-exception Error_loop of Gwdb.person
+exception Error_loop of Geneweb_db.Driver.person
 exception Same_person
-exception Different_sexes of Gwdb.person * Gwdb.person
+exception Different_sexes of Geneweb_db.Driver.person * Geneweb_db.Driver.person
 
 (* TODOOCP *)
 val reparent_ind :
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   (CheckItem.base_warning -> unit) ->
-  Gwdb.iper ->
-  Gwdb.iper ->
+  Geneweb_db.Driver.iper ->
+  Geneweb_db.Driver.iper ->
   unit
 
 val merge :
   Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Gwdb.person ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person ->
   (Config.config ->
-  Gwdb.base ->
-  (Gwdb.iper * Gwdb.iper) list ->
-  Gwdb.person ->
-  Gwdb.person ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper * Geneweb_db.Driver.iper) list ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person ->
   unit) ->
   (Config.config ->
-  Gwdb.base ->
-  (Gwdb.iper * Gwdb.iper) list ->
-  Gwdb.ifam * Gwdb.family ->
-  Gwdb.ifam * Gwdb.family ->
-  Gwdb.person ->
-  Gwdb.person ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper * Geneweb_db.Driver.iper) list ->
+  Geneweb_db.Driver.ifam * Geneweb_db.Driver.family ->
+  Geneweb_db.Driver.ifam * Geneweb_db.Driver.family ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person ->
   unit) ->
   bool * CheckItem.base_warning list
 
 val kill_ancestors :
   Config.config ->
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   bool ->
-  Gwdb.person ->
+  Geneweb_db.Driver.person ->
   int ref ->
   int ref ->
   unit
 
-val is_ancestor : Gwdb.base -> Gwdb.person -> Gwdb.person -> bool
+val is_ancestor :
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person ->
+  bool
 (** [is_ancestor base p1 p2]
     Checks if [p1] is an ancestor of [p2].
     Raises [Same_person] if [p1] and [p2] have the same iper.

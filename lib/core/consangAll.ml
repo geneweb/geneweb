@@ -1,15 +1,17 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Gutil = Geneweb_db.Gutil
 
 (* let rec clear_descend_consang base consang mark ifam =
  *   let des = foi base ifam in
  *   Array.iter
  *     (fun ip ->
- *        if not (Gwdb.Marker.get mark ip) then
+ *        if not (Collection.Marker.get mark ip) then
  *          begin
  *            consang ip Adef.no_consang;
- *            Gwdb.Marker.set mark ip true ;
+ *            Collection.Marker.set mark ip true ;
  *            let u = poi base ip in
  *            Array.iter (clear_descend_consang base consang mark) (get_family u)
  *          end)
@@ -26,39 +28,40 @@ let trace verbosity cnt max_cnt =
 
 let consang_array base =
   let patched = ref false in
-  let fget i = get_parents @@ poi base i in
-  let cget i = get_consang @@ poi base i in
+  let fget i = Driver.get_parents @@ Driver.poi base i in
+  let cget i = Driver.get_consang @@ Driver.poi base i in
   let cset i v =
     patched := true;
-    patch_ascend base i
-      Def.{ (gen_ascend_of_person @@ poi base i) with consang = v }
+    Driver.patch_ascend base i
+      Def.
+        { (Driver.gen_ascend_of_person @@ Driver.poi base i) with consang = v }
   in
   (fget, cget, cset, patched)
 
 let compute ?(verbosity = 2) base from_scratch =
-  let () = load_ascends_array base in
-  let () = load_couples_array base in
+  Driver.load_ascends_array base;
+  Driver.load_couples_array base;
   let fget, cget, cset, patched = consang_array base in
   (try
      let tab =
-       let ts = Consang.topological_sort base poi in
+       let ts = Consang.topological_sort base Driver.poi in
        Consang.make_relationship_info base ts
      in
-     let persons = Gwdb.ipers base in
-     let families = Gwdb.ifams base in
-     let consang_tab = Gwdb.ifam_marker families Adef.no_consang in
+     let persons = Driver.ipers base in
+     let families = Driver.ifams base in
+     let consang_tab = Driver.ifam_marker families Adef.no_consang in
      let cnt = ref 0 in
      (* FIXME *)
      (* if not from_scratch then
       *   begin
-      *     let mark = Gwdb.Marker.make (Gwdb.Collection.length persons) false in
+      *     let mark = Collection.Marker.make (Geneweb_db.Collection.length persons) false in
       *     List.iter
       *       (fun ip ->
       *          let u = poi base ip in
       *          Array.iter (clear_descend_consang base cset mark) (get_family u))
       *       (patched_ascends base)
       *   end; *)
-     Gwdb.Collection.iter
+     Collection.iter
        (fun i ->
          if from_scratch then (
            cset i Adef.no_consang;
@@ -66,7 +69,7 @@ let compute ?(verbosity = 2) base from_scratch =
          else
            let cg = cget i in
            Option.iter
-             (fun ifam -> Gwdb.Marker.set consang_tab ifam cg)
+             (fun ifam -> Collection.Marker.set consang_tab ifam cg)
              (fget i);
            if cg = Adef.no_consang then incr cnt)
        persons;
@@ -82,19 +85,19 @@ let compute ?(verbosity = 2) base from_scratch =
      let running = ref true in
      while !running do
        running := false;
-       Gwdb.Collection.iter
+       Collection.iter
          (fun i ->
            (* if person's consanguinity wasn't calculated *)
            if cget i = Adef.no_consang then
              match fget i with
              (* if person has parents *)
              | Some ifam ->
-                 let pconsang = Gwdb.Marker.get consang_tab ifam in
+                 let pconsang = Collection.Marker.get consang_tab ifam in
                  (* if parent's family's consanguinity wasn't calculated *)
                  if pconsang = Adef.no_consang then
-                   let cpl = foi base ifam in
-                   let ifath = get_father cpl in
-                   let imoth = get_mother cpl in
+                   let cpl = Driver.foi base ifam in
+                   let ifath = Driver.get_father cpl in
+                   let imoth = Driver.get_mother cpl in
                    (* if parent's consanguinity was calculated *)
                    if
                      cget ifath != Adef.no_consang
@@ -105,14 +108,14 @@ let compute ?(verbosity = 2) base from_scratch =
                      decr cnt;
                      let cg = Adef.fix_of_float consang in
                      cset i cg;
-                     Gwdb.Marker.set consang_tab ifam cg;
+                     Collection.Marker.set consang_tab ifam cg;
                      if verbosity >= 2 then
                        if
                          match !most with Some m -> cg > cget m | None -> true
                        then (
                          Printf.eprintf "\nMax consanguinity %g for %s... "
                            consang
-                           (Gutil.designation base (poi base i));
+                           (Gutil.designation base (Driver.poi base i));
                          flush stderr;
                          most := Some i)
                      (* if it wasn't makes further another run over persons *))
@@ -138,5 +141,5 @@ let compute ?(verbosity = 2) base from_scratch =
      Printf.eprintf "\n";
      flush stderr;
      ());
-  if !patched then Gwdb.commit_patches base;
+  if !patched then Driver.commit_patches base;
   !patched

@@ -1,14 +1,19 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Gutil = Geneweb_db.Gutil
 
 (* le cousin, liste des familles entre lui et l'ancêtre, l'ancêtre, level *)
 (* TODO see if level is the same as List.length ifam list *)
 type one_cousin =
-  Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int
+  Geneweb_db.Driver.iper
+  * Geneweb_db.Driver.ifam list
+  * Geneweb_db.Driver.iper
+  * int
 
 type cousins_i_j = one_cousin list
 
@@ -22,11 +27,12 @@ let max_cousin_level conf =
 let children_of base u =
   Array.fold_right
     (fun ifam list ->
-      let des = foi base ifam in
-      Array.fold_right List.cons (get_children des) list)
-    (get_family u) []
+      let des = Driver.foi base ifam in
+      Array.fold_right List.cons (Driver.get_children des) list)
+    (Driver.get_family u) []
 
-let children_of_fam base ifam = Array.to_list (get_children @@ foi base ifam)
+let children_of_fam base ifam =
+  Array.to_list (Driver.get_children @@ Driver.foi base ifam)
 
 let siblings_by conf base iparent ip =
   let list = children_of base (pget conf base iparent) in
@@ -44,19 +50,19 @@ let merge_siblings l1 l2 =
   List.rev l
 
 let siblings conf base ip =
-  match get_parents (pget conf base ip) with
+  match Driver.get_parents (pget conf base ip) with
   | None -> []
   | Some ifam ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       let fath_sib =
         List.map
-          (fun ip -> (ip, (get_father cpl, Male)))
-          (siblings_by conf base (get_father cpl) ip)
+          (fun ip -> (ip, (Driver.get_father cpl, Male)))
+          (siblings_by conf base (Driver.get_father cpl) ip)
       in
       let moth_sib =
         List.map
-          (fun ip -> (ip, (get_mother cpl, Female)))
-          (siblings_by conf base (get_mother cpl) ip)
+          (fun ip -> (ip, (Driver.get_mother cpl, Female)))
+          (siblings_by conf base (Driver.get_mother cpl) ip)
       in
       merge_siblings fath_sib moth_sib
 
@@ -65,11 +71,11 @@ let rec has_desc_lev conf base lev u =
   else
     Array.exists
       (fun ifam ->
-        let des = foi base ifam in
+        let des = Driver.foi base ifam in
         Array.exists
           (fun ip -> has_desc_lev conf base (lev - 1) (pget conf base ip))
-          (get_children des))
-      (get_family u)
+          (Driver.get_children des))
+      (Driver.get_family u)
 
 let br_inter_is_empty b1 b2 =
   List.for_all (fun (ip, _) -> not (List.mem_assoc ip b2)) b1
@@ -101,22 +107,24 @@ let max_ancestor_level conf base ip max_lvl =
     | _ -> max_lvl
   in
   let x = ref 0 in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+  let mark =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+  in
   (* Loading ITL cache, up to 10 generations. *)
   let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
   let rec loop level ip =
     (* Ne traite pas l'index s'il a déjà été traité. *)
     (* Pose surement probleme pour des implexes. *)
-    if not @@ Gwdb.Marker.get mark ip then (
+    if not @@ Collection.Marker.get mark ip then (
       (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
-      Gwdb.Marker.set mark ip true;
+      Collection.Marker.set mark ip true;
       x := max !x level;
       if !x <> max_lvl then
-        match get_parents (pget conf base ip) with
+        match Driver.get_parents (pget conf base ip) with
         | Some ifam ->
-            let cpl = foi base ifam in
-            loop (succ level) (get_father cpl);
-            loop (succ level) (get_mother cpl)
+            let cpl = Driver.foi base ifam in
+            loop (succ level) (Driver.get_father cpl);
+            loop (succ level) (Driver.get_mother cpl)
         | _ ->
             x :=
               max !x
@@ -135,13 +143,15 @@ let max_descendant_level conf base ip max_lvl =
     | _ -> max_lvl
   in
   let childs_of_ip ip =
-    let faml = Array.to_list (get_family (poi base ip)) in
+    let faml = Array.to_list (Driver.get_family (Driver.poi base ip)) in
     (* accumuler tous les enfants de ip *)
     let rec loop2 acc faml =
       match faml with
       | [] -> acc
       | ifam :: faml ->
-          let children = Array.to_list (get_children (foi base ifam)) in
+          let children =
+            Array.to_list (Driver.get_children (Driver.foi base ifam))
+          in
           loop2 (children @ acc) faml
     in
     loop2 [] faml
@@ -158,9 +168,9 @@ let get_min_max_dates base l =
     | [] -> (min, max)
     | one_cousin :: l -> (
         let ip, _, _, _ = one_cousin in
-        let not_dead = get_death (poi base ip) = NotDead in
+        let not_dead = Driver.get_death (Driver.poi base ip) = NotDead in
         let birth_date, death_date, _ =
-          Gutil.get_birth_death_date (poi base ip)
+          Gutil.get_birth_death_date (Driver.poi base ip)
         in
         match (birth_date, death_date) with
         | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
@@ -206,12 +216,12 @@ let rec ascendants base acc l =
   | [] -> acc
   (* TODO type for this tuple?; why list of level? *)
   | (ip, _, _, lev) :: l -> (
-      match get_parents (poi base ip) with
+      match Driver.get_parents (Driver.poi base ip) with
       | None -> ascendants base acc l
       | Some ifam ->
-          let cpl = foi base ifam in
-          let ifath = get_father cpl in
-          let imoth = get_mother cpl in
+          let cpl = Driver.foi base ifam in
+          let ifath = Driver.get_father cpl in
+          let imoth = Driver.get_mother cpl in
           let acc = (ifath, [], ifath, lev + 1) :: acc in
           let acc = (imoth, [], imoth, lev + 1) :: acc in
           ascendants base acc l)
@@ -229,7 +239,7 @@ let descendants_aux base liste1 liste2 =
     | [] -> acc
     | one_cousin :: l ->
         let ip, ifaml, ipar0, lev = one_cousin in
-        let fams = Array.to_list (get_family (poi base ip)) in
+        let fams = Array.to_list (Driver.get_family (Driver.poi base ip)) in
         let chlds =
           (* accumuler tous les enfants de ip *)
           let rec loop1 acc fams =
@@ -246,7 +256,8 @@ let descendants_aux base liste1 liste2 =
                           ((ipch, ifam :: ifaml, ipar0, lev - 1) :: acc2)
                           children
                   in
-                  loop2 [] (Array.to_list (get_children (foi base ifam)))
+                  loop2 []
+                    (Array.to_list (Driver.get_children (Driver.foi base ifam)))
                 in
                 (* @ is ok, children is a small list *)
                 loop1 (children @ acc) fams
@@ -270,13 +281,13 @@ let descendants base cousins_cnt i j =
   descendants_aux base liste1 liste2
 
 let init_cousins_cnt conf base p =
-  let max_a_l = max_ancestor_level conf base (get_iper p) mal in
+  let max_a_l = max_ancestor_level conf base (Driver.get_iper p) mal in
   let max_a_l =
     match p_getenv conf.Config.env "v" with
     | Some v -> int_of_string v
     | None -> max_a_l
   in
-  let max_d_l = max_descendant_level conf base (get_iper p) mdl in
+  let max_d_l = max_descendant_level conf base (Driver.get_iper p) mdl in
   let rec loop0 j cousins_cnt cousins_dates =
     (* initiate lists of direct descendants *)
     cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
@@ -305,8 +316,8 @@ let init_cousins_cnt conf base p =
   in
 
   let build_tables key =
-    let () = load_ascends_array base in
-    let () = load_couples_array base in
+    let () = Driver.load_ascends_array base in
+    let () = Driver.load_couples_array base in
     (* +3: there may be more descendants for cousins than my own *)
     let cousins_cnt =
       try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
@@ -317,7 +328,7 @@ let init_cousins_cnt conf base p =
       with Failure _ -> failwith "Cousins table too large for system (2)"
     in
     cousins_cnt.(0).(0) <-
-      [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
+      [ (Driver.get_iper p, [ Driver.dummy_ifam ], Driver.dummy_iper, 0) ];
     cousins_dates.(0).(0) <- get_min_max_dates base cousins_cnt.(0).(0);
     loop0 1 cousins_cnt cousins_dates;
     loop1 1 cousins_cnt cousins_dates;
@@ -347,9 +358,9 @@ let init_cousins_cnt conf base p =
         build_tables key
   in
 
-  let fn = Name.strip_lower @@ sou base @@ get_surname p in
-  let sn = Name.strip_lower @@ sou base @@ get_first_name p in
-  let occ = get_occ p in
+  let fn = Name.strip_lower @@ Driver.sou base @@ Driver.get_surname p in
+  let sn = Name.strip_lower @@ Driver.sou base @@ Driver.get_first_name p in
+  let occ = Driver.get_occ p in
   let key = Format.sprintf "%s.%d.%s" fn occ sn in
   match (!cousins_t, !cousins_dates_t) with
   | Some t, Some d_t -> (t, d_t)
@@ -474,7 +485,7 @@ let cousins_fold l =
         if first || cnt0 = 0 then acc
         else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc
   in
-  loop false [] (Gwdb.dummy_iper, ([], [], 0), [ 0 ]) l
+  loop false [] (Driver.dummy_iper, ([], [], 0), [ 0 ]) l
 
 let cousins_implex_cnt conf base l1 l2 p =
   (* warning, this is expensive: two nested loops *)
@@ -516,13 +527,14 @@ let desc_cnt_t = ref None
 
 (* tableau des ascendants de p *)
 let init_asc_cnt conf base p =
-  let max_a_l = max_ancestor_level conf base (get_iper p) mal in
+  let max_a_l = max_ancestor_level conf base (Driver.get_iper p) mal in
   match !asc_cnt_t with
   | Some t -> t
   | None ->
       let t' =
         let asc_cnt = Array.make (max_a_l + 2) [] in
-        asc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
+        asc_cnt.(0) <-
+          [ (Driver.get_iper p, [ Driver.dummy_ifam ], Driver.dummy_iper, 0) ];
         for i = 1 to max_a_l do
           asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1)
         done;
@@ -533,14 +545,14 @@ let init_asc_cnt conf base p =
 
 (* tableau des ascendants de p *)
 let init_desc_cnt conf base p =
-  let max_d_l = max_descendant_level conf base (get_iper p) mdl in
+  let max_d_l = max_descendant_level conf base (Driver.get_iper p) mdl in
   match !desc_cnt_t with
   | Some t -> t
   | None ->
       let t' =
         let desc_cnt = Array.make (max_d_l + 2) [] in
         desc_cnt.(0) <-
-          [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
+          [ (Driver.get_iper p, [ Driver.dummy_ifam ], Driver.dummy_iper, 0) ];
         for i = 1 to min max_d_l (Array.length desc_cnt - 1) do
           desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) []
         done;

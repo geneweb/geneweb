@@ -1,6 +1,6 @@
 open Geneweb
 open Config
-open Gwdb
+module Driver = Geneweb_db.Driver
 
 let arg_f_parents = "f_parents"
 let arg_f_children = "f_children"
@@ -119,7 +119,7 @@ let fixbase_ok conf base =
   let process () =
     ignore @@ Unix.alarm 0;
     (* cancel timeout *)
-    Gwdb.with_database (!GWPARAM.bpath conf.bname) @@ fun base' ->
+    Driver.with_database (!GWPARAM.bpath conf.bname) @@ fun base' ->
     let ipers = ref [] in
     let ifams = ref [] in
     let istrs = ref [] in
@@ -154,13 +154,13 @@ let fixbase_ok conf base =
           "missing_spouses";
           "invalid_utf8";
         ]
-    then Gwdb.load_families_array base;
-    if enabled [ "invalid_utf8"; "p_key" ] then Gwdb.load_strings_array base;
-    if enabled [ "f_parents"; "p_families" ] then Gwdb.load_unions_array base;
+    then Driver.load_families_array base;
+    if enabled [ "invalid_utf8"; "p_key" ] then Driver.load_strings_array base;
+    if enabled [ "f_parents"; "p_families" ] then Driver.load_unions_array base;
     if enabled [ "f_children"; "p_parents" ] then (
-      Gwdb.load_descends_array base;
-      Gwdb.load_ascends_array base);
-    load_persons_array base;
+      Driver.load_descends_array base;
+      Driver.load_ascends_array base);
+    Driver.load_persons_array base;
     let opt s (fn : ?report:_ -> _ -> _ -> _) =
       if UI.enabled conf s then fn ~report progress base
     in
@@ -178,12 +178,12 @@ let fixbase_ok conf base =
     opt "invalid_utf8" Fixbase.fix_utf8_sequence;
     opt "p_key" Fixbase.fix_key;
     opt "p_key" Fixbase.fix_key;
-    clear_persons_array base;
-    clear_strings_array base;
-    clear_families_array base;
-    clear_unions_array base;
-    clear_descends_array base;
-    clear_ascends_array base;
+    Driver.clear_persons_array base;
+    Driver.clear_strings_array base;
+    Driver.clear_families_array base;
+    Driver.clear_unions_array base;
+    Driver.clear_descends_array base;
+    Driver.clear_ascends_array base;
     let ifneq x1 x2 label s =
       if x1 <> x2 then (
         Output.print_sstring conf {|<tr><td><b>|};
@@ -196,16 +196,20 @@ let fixbase_ok conf base =
     in
     let dump_p p p' =
       let mka p =
-        let a = gen_ascend_of_person p in
-        { a with parents = Option.map string_of_ifam a.parents }
+        let a = Driver.gen_ascend_of_person p in
+        { a with parents = Option.map Driver.string_of_ifam a.parents }
       in
       let mku p =
-        { Def.family = Array.map string_of_ifam (gen_union_of_person p).family }
+        {
+          Def.family =
+            Array.map Driver.string_of_ifam
+              (Driver.gen_union_of_person p).family;
+        }
       in
       let mkp p =
-        let p = gen_person_of_person p in
-        let p = Futil.map_person_ps string_of_iper (sou base) p in
-        { p with key_index = string_of_iper p.key_index }
+        let p = Driver.gen_person_of_person p in
+        let p = Futil.map_person_ps Driver.string_of_iper (Driver.sou base) p in
+        { p with key_index = Driver.string_of_iper p.key_index }
       in
       let a1 = mka p in
       let u1 = mku p in
@@ -259,14 +263,17 @@ let fixbase_ok conf base =
     in
     let dump_f f f' =
       let mkf f =
-        Futil.map_family_ps string_of_iper string_of_ifam (sou base)
-          (gen_family_of_family f)
+        Futil.map_family_ps Driver.string_of_iper Driver.string_of_ifam
+          (Driver.sou base)
+          (Driver.gen_family_of_family f)
       in
       let mkc f =
-        Futil.map_couple_p false string_of_iper (gen_couple_of_family f)
+        Futil.map_couple_p false Driver.string_of_iper
+          (Driver.gen_couple_of_family f)
       in
       let mkd f =
-        Futil.map_descend_p string_of_iper (gen_descend_of_family f)
+        Futil.map_descend_p Driver.string_of_iper
+          (Driver.gen_descend_of_family f)
       in
       let f1 = mkf f in
       let c1 = mkc f in
@@ -295,15 +302,17 @@ let fixbase_ok conf base =
     let string_of_p i =
       Printf.sprintf {|<a href="%s&i=%s">%s</a>|}
         (Util.commd conf :> string)
-        (string_of_iper i |> Mutil.encode :> string)
-        (Util.designation base (poi base i) : Adef.escaped_string :> string)
+        (Driver.string_of_iper i |> Mutil.encode :> string)
+        (Util.designation base (Driver.poi base i)
+          : Adef.escaped_string
+          :> string)
       |> Adef.safe
     in
     let string_of_f i =
-      let fam = foi base i in
+      let fam = Driver.foi base i in
       Printf.sprintf "[%s & %s]"
-        (string_of_p @@ get_father fam : Adef.safe_string :> string)
-        (string_of_p @@ get_mother fam : Adef.safe_string :> string)
+        (string_of_p @@ Driver.get_father fam : Adef.safe_string :> string)
+        (string_of_p @@ Driver.get_mother fam : Adef.safe_string :> string)
       |> Adef.safe
     in
     let dump string_of dump get data =
@@ -317,14 +326,15 @@ let fixbase_ok conf base =
           Output.print_sstring conf "</table>")
         data
     in
-    dump string_of_p dump_p poi !ipers;
-    dump string_of_f dump_f foi !ifams;
+    dump string_of_p dump_p Driver.poi !ipers;
+    dump string_of_f dump_f Driver.foi !ifams;
     List.iter
       (fun (ifam_opt, iper_opt, opt) ->
         let aux, sou =
           match opt with
-          | Some (i, i') -> (ifneq i i', sou base)
-          | None -> (ifneq empty_string quest_string, fun _ -> "Dtext")
+          | Some (i, i') -> (ifneq i i', Driver.sou base)
+          | None ->
+              (ifneq Driver.empty_string Driver.quest_string, fun _ -> "Dtext")
         in
         Output.print_sstring conf "<table>";
         aux
@@ -349,7 +359,7 @@ let fixbase_ok conf base =
       Output.print_sstring conf
         {|<input type="hidden" name="date_of_last_change" value="|};
       Output.print_sstring conf
-        (Gwdb.date_of_last_change base |> string_of_float);
+        (Driver.date_of_last_change base |> string_of_float);
       Output.print_sstring conf {|">|};
       let opt s =
         if UI.enabled conf s then (
@@ -388,9 +398,9 @@ let fixbase_ok conf base =
     if not dry_run then
       if
         Util.p_getenv conf.env "date_of_last_change"
-        = Some (Gwdb.date_of_last_change base |> string_of_float)
+        = Some (Driver.date_of_last_change base |> string_of_float)
       then (
-        Gwdb.commit_patches base;
+        Driver.commit_patches base;
         Output.print_sstring conf {|<p>|};
         Output.print_sstring conf
           (Util.transl conf "plugin_fixbase_ok_commit_patches");

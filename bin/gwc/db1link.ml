@@ -3,6 +3,7 @@
 open Geneweb
 open Gwcomp
 open Def
+module Driver = Geneweb_db.Driver
 
 (* From OCaml manual, integer in binary format is 4 bytes long. *)
 let sizeof_long = 4
@@ -1603,7 +1604,7 @@ let make_base bname gen per_index_ic per_ic k =
     gen.g_base.c_strings <- [||];
     a
   in
-  Gwdb.make bname
+  Driver.make bname
     (input_particles !particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),
@@ -1710,7 +1711,7 @@ let link next_family_fun bdir =
     if !pr_stats then Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
     if !do_consang then ignore @@ ConsangAll.compute base true;
-    Gwdb.sync base;
+    Driver.sync base;
     output_wizard_notes bdir gen.g_wiznotes;
     output_command_line bdir;
     Mutil.rm_rf tmp_dir;
