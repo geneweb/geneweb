@@ -33,11 +33,10 @@ open Util
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
-module Buff3 = Buff.Make ()
-module Buff2 = Buff.Make ()
-module Buff1 = Buff.Make ()
-module Buff = Buff.Make ()
-
+let buff3 = Buffer.create 16
+let buff2 = Buffer.create 16
+let buff1 = Buffer.create 16
+let buff = Buffer.create 16
 let first_cnt = 1
 let tab lev s = String.make (2 * lev) ' ' ^ s
 
@@ -164,22 +163,17 @@ let bold_italic_delimiter_at s i quot_lev =
     and {highlight} sequences in a string, and replaces it with the
     appropriate html code (<i>, <b>, ...) *)
 let bold_italic_syntax s =
+  Buffer.clear buff1;
   let chars = [ '{'; '%'; '\'' ] in
   let slen = String.length s in
-  let rec loop quot_lev i len =
-    let len, quot_lev =
-      if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
-        let len =
-          match quot_lev with
-          | Italic -> Buff1.mstore len "</i>"
-          | Bold -> Buff1.mstore len "</b>"
-          | BoldItalic -> Buff1.mstore len "</b></i>"
-          | _ -> len
-        in
-        (len, Zero)
-      else (len, quot_lev)
-    in
-    if i = slen then Buff1.get len (* % allows escaping [, {, ' *)
+  let rec loop quot_lev i =
+    (if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
+     match quot_lev with
+     | Italic -> Buffer.add_string buff1 "</i>"
+     | Bold -> Buffer.add_string buff1 "</b>"
+     | BoldItalic -> Buffer.add_string buff1 "</b></i>"
+     | Zero -> ());
+    if i = slen then () (* % allows escaping [, {, ' *)
     else if
       s.[i] = '%'
       && i < slen - 1
@@ -187,67 +181,75 @@ let bold_italic_syntax s =
          || s.[i + 1] = '{'
          || s.[i + 1] = '}' (* is this needed?, then why not ']' ?*)
          || s.[i + 1] = '\'')
-    then loop quot_lev (i + 2) (Buff1.store len s.[i + 1])
-      (* single % are kept *)
-    else if s.[i] = '%' then loop quot_lev (i + 1) (Buff1.mstore len "%")
-      (* highlight *)
-    else if s.[i] = '{' then
+    then (
+      Buffer.add_char buff1 s.[i + 1];
+      loop quot_lev (i + 2) (* single % are kept *))
+    else if s.[i] = '%' then (
+      Buffer.add_char buff1 '%';
+      loop quot_lev (i + 1) (* highlight *))
+    else if s.[i] = '{' then (
+      Buffer.clear buff3;
       let b, j =
-        let rec loop len j =
+        let rec loop j =
           if j = slen then ("", i + 1)
-          else if j < slen - 1 && s.[j] = '%' then
-            loop (Buff3.store len s.[j + 1]) (j + 2)
-          else if s.[j] = '}' then (Buff3.get len, j + 1)
-          else loop (Buff3.store len s.[j]) (j + 1)
+          else if j < slen - 1 && s.[j] = '%' then (
+            Buffer.add_char buff3 s.[j + 1];
+            loop (j + 2))
+          else if s.[j] = '}' then (Buffer.contents buff3, j + 1)
+          else (
+            Buffer.add_char buff3 s.[j];
+            loop (j + 1))
         in
-        loop 0 (i + 1)
+        loop (i + 1)
       in
       let s =
         if b <> "" then
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
-      loop quot_lev j (Buff1.mstore len s)
-    else if bold_italic_delimiter_at s i quot_lev then
+      Buffer.add_string buff1 s;
+      loop quot_lev j)
+    else if bold_italic_delimiter_at s i quot_lev then (
       let s, ql =
         if quot_lev = Zero then ("<b><i>", BoldItalic) else ("</i></b>", Zero)
       in
-      loop ql (i + 5) (Buff1.mstore len s)
-    else if bold_delimiter_at s i quot_lev then
+      Buffer.add_string buff1 s;
+      loop ql (i + 5))
+    else if bold_delimiter_at s i quot_lev then (
       let s, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
-      loop ql (i + 3) (Buff1.mstore len s)
-    else if italic_delimiter_at s i quot_lev then
+      Buffer.add_string buff1 s;
+      loop ql (i + 3))
+    else if italic_delimiter_at s i quot_lev then (
       let s, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
-      loop ql (i + 2) (Buff1.mstore len s)
-    else if s.[i] = '\'' then loop quot_lev (i + 1) (Buff1.mstore len "'")
+      Buffer.add_string buff1 s;
+      loop ql (i + 2))
+    else if s.[i] = '\'' then (
+      Buffer.add_char buff1 '\'';
+      loop quot_lev (i + 1))
     else
       let k = find_first_char_from_list s i chars in
       match k with
-      | None ->
-          let len = Buff1.mstore len (String.sub s i (String.length s - i)) in
-          Buff1.get len
-      | Some k -> loop quot_lev k (Buff1.mstore len (String.sub s i (k - i)))
+      | None -> Buffer.add_string buff1 (String.sub s i (String.length s - i))
+      | Some k ->
+          Buffer.add_string buff1 (String.sub s i (k - i));
+          loop quot_lev k
   in
-  loop Zero 0 0
+  loop Zero 0;
+  Printf.sprintf "trace: (%s)" (Buffer.contents buff1)
 
 let syntax_links conf wi s =
+  Buffer.clear buff;
   let chars = [ '{'; '%'; '\''; '[' ] in
   let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
   let slen = String.length s in
-  let rec loop quot_lev pos i len =
-    let len, quot_lev =
-      if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
-        let len =
-          match quot_lev with
-          | Italic -> Buff.mstore len "</i>"
-          | Bold -> Buff.mstore len "</b>"
-          | BoldItalic -> Buff.mstore len "</b></i>"
-          | _ -> len
-        in
-        (len, Zero)
-      else (len, quot_lev)
-    in
-    if i = slen then Buff.get len
+  let rec loop quot_lev pos i =
+    (if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
+     match quot_lev with
+     | Italic -> Buffer.add_string buff "</i>"
+     | Bold -> Buffer.add_string buff "</b>"
+     | BoldItalic -> Buffer.add_string buff "</b></i>"
+     | Zero -> ());
+    if i = slen then ()
     else if
       s.[i] = '%'
       && i < slen - 1
@@ -257,39 +259,53 @@ let syntax_links conf wi s =
          || s.[i + 1] = '}'
          || s.[i + 1] = '\'')
       && List.mem s.[i + 1] [ '['; ']'; '{'; '}'; '\'' ]
-    then loop quot_lev pos (i + 2) (Buff.store len s.[i + 1])
+    then (
+      Buffer.add_char buff s.[i + 1];
+      loop quot_lev pos (i + 2))
     else if s.[i] = '%' && i < slen - 1 && s.[i + 1] = '/' then
-      loop quot_lev pos (i + 2) (Buff.mstore len "")
-    else if s.[i] = '%' then loop quot_lev pos (i + 1) (Buff.mstore len "%")
-    else if s.[i] = '{' then
+      loop quot_lev pos (i + 2) (* ignore !!?? *)
+    else if s.[i] = '%' then (
+      Buffer.add_char buff '%';
+      loop quot_lev pos (i + 1))
+    else if s.[i] = '{' then (
+      Buffer.clear buff2;
       let b, j =
-        let rec loop len j =
+        let rec loop j =
           if j = slen then ("", i + 1)
-          else if j < slen - 1 && s.[j] = '%' then
-            loop (Buff2.store len s.[j + 1]) (j + 2)
-          else if s.[j] = '}' then (Buff2.get len, j + 1)
-          else loop (Buff2.store len s.[j]) (j + 1)
+          else if j < slen - 1 && s.[j] = '%' then (
+            Buffer.add_char buff2 s.[j + 1];
+            loop (j + 2))
+          else if s.[j] = '}' then (Buffer.contents buff2, j + 1)
+          else (
+            Buffer.add_char buff2 s.[j];
+            loop (j + 1))
         in
-        loop 0 (i + 1)
+        loop (i + 1)
       in
       let s =
         if String.length b <> 0 then
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
-      loop quot_lev pos j (Buff.mstore len s)
-    else if bold_italic_delimiter_at s i quot_lev then
+      Buffer.add_string buff s;
+      loop quot_lev pos j)
+    else if bold_italic_delimiter_at s i quot_lev then (
       let s, ql =
         if quot_lev = Zero then ("<i><b>", BoldItalic) else ("</b></i>", Zero)
       in
-      loop ql pos (i + 5) (Buff.mstore len s)
-    else if bold_delimiter_at s i quot_lev then
+      Buffer.add_string buff s;
+      loop ql pos (i + 5))
+    else if bold_delimiter_at s i quot_lev then (
       let s, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
-      loop ql pos (i + 3) (Buff.mstore len s)
-    else if italic_delimiter_at s i quot_lev then
+      Buffer.add_string buff s;
+      loop ql pos (i + 3))
+    else if italic_delimiter_at s i quot_lev then (
       let s, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
-      loop ql pos (i + 2) (Buff.mstore len s)
-    else if s.[i] = '\'' then loop quot_lev pos (i + 1) (Buff.mstore len "'")
+      Buffer.add_string buff s;
+      loop ql pos (i + 2))
+    else if s.[i] = '\'' then (
+      Buffer.add_char buff '\'';
+      loop quot_lev pos (i + 1))
     else
       match NotesLinks.misc_notes_link s i with
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->
@@ -313,7 +329,8 @@ let syntax_links conf wi s =
                 (commd conf : Adef.escaped_string :> string)
                 (encode wi.wi_mode) (encode fname) anchor c text
           in
-          loop quot_lev pos j (Buff.mstore len t)
+          Buffer.add_string buff t;
+          loop quot_lev pos j
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
           let name =
             if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
@@ -350,7 +367,8 @@ let syntax_links conf wi s =
                 color
                 (if conf.hide_names then Util.private_txt conf "" else name)
           in
-          loop quot_lev (pos + 1) j (Buff.mstore len t)
+          Buffer.add_string buff t;
+          loop quot_lev (pos + 1) j
       | NotesLinks.WLwizard (j, wiz, name) ->
           let name = bold_italic_syntax name in
           let t =
@@ -361,23 +379,28 @@ let syntax_links conf wi s =
                 (commd conf :> string)
                 (encode wiz) s
           in
-          loop quot_lev (pos + 1) j (Buff.mstore len t)
+          Buffer.add_string buff t;
+          loop quot_lev (pos + 1) j
       | NotesLinks.WLnone (j, none_s) -> (
           let k = find_first_char_from_list none_s 0 chars in
           match k with
-          | None -> loop quot_lev pos j (Buff.mstore len none_s)
+          | None ->
+              Buffer.add_string buff none_s;
+              loop quot_lev pos j
           | Some k when none_s.[k] <> '[' ->
-              loop quot_lev pos
-                (j - String.length none_s + k)
-                (Buff.mstore len (String.sub none_s 0 k))
+              Buffer.add_string buff (String.sub none_s 0 k);
+              loop quot_lev pos (j - String.length none_s + k)
           | Some k ->
-              loop quot_lev pos
-                (j - String.length none_s + k + 1)
-                (Buff.mstore len "["))
+              Buffer.add_char buff '[';
+              loop quot_lev pos (j - String.length none_s + k + 1))
   in
-  loop Zero 1 0 0
+  loop Zero 1 0;
+  Printf.sprintf "Trace wiki syntax: (%s)" (Buffer.contents buff)
 
 let toc_list = [ "__NOTOC__"; "__TOC__"; "__SHORT_TOC__" ]
+
+module Buff = Buff.Make ()
+(* TODO replace Buff by Buffer. Needs more understanding of the functions *)
 
 let lines_list_of_string s =
   let rec loop no_toc lines len i =
@@ -484,7 +507,7 @@ let summary_of_tlsw_lines conf short lines =
           let summary =
             let s =
               Printf.sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
-                (if short then "" else section_num ^ " â€“ ")
+                (if short then "" else section_num ^ " Ð ")
                 (String.trim (String.sub s slev (len - (2 * slev))))
             in
             if short then if summary = [] then [ s ] else s :: "&" :: summary
@@ -507,7 +530,7 @@ let summary_of_tlsw_lines conf short lines =
       Format.sprintf
         {|<div id="summary">
   <div class="d-flex align-items-center">
-    <h2>0 â€“ %s</h2>
+    <h2>0 Ð %s</h2>
     <a href="#" class="toc-toggle ml-2">(%s)</a>
   </div>
 <div id="toc-content">|}
@@ -657,7 +680,7 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
             let slev = section_level s len in
             let section_num, sections_nums =
               match sections_nums with
-              | (_, a) :: l -> (a ^ " â€“ ", l)
+              | (_, a) :: l -> (a ^ " Ð ", l)
               | [] -> ("", [])
             in
             let s =
