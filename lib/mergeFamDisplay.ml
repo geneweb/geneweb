@@ -3,8 +3,8 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
 
 let compatible_fevents fevt1 fevt2 = fevt1 = [] && fevt2 = []
 
@@ -15,7 +15,7 @@ let need_differences_selection conf base fam1 fam2 =
     x1 <> "" && x2 <> "" && x1 <> x2
   in
   need_selection (fun fam ->
-      match get_relation fam with
+      match Driver.get_relation fam with
       | Married -> "married"
       | NotMarried -> "not married"
       | Engaged -> "engaged"
@@ -28,19 +28,19 @@ let need_differences_selection conf base fam1 fam2 =
       | Pacs -> "pacs"
       | Residence -> "residence")
   || need_selection (fun fam ->
-         match Date.od_of_cdate (get_marriage fam) with
+         match Date.od_of_cdate (Driver.get_marriage fam) with
          | None -> ""
          | Some d -> (DateDisplay.string_of_ondate conf d :> string))
-  || need_selection (fun fam -> sou base (get_marriage_place fam))
+  || need_selection (fun fam -> Driver.sou base (Driver.get_marriage_place fam))
   || need_selection (fun fam ->
-         match get_divorce fam with
+         match Driver.get_divorce fam with
          | Divorced cod -> (
              match Date.od_of_cdate cod with
              | Some d -> (DateDisplay.string_of_ondate conf d :> string)
              | None -> "divorced")
          | _ -> "not divorced")
   || need_selection (fun fam ->
-         match get_separation fam with
+         match Driver.get_separation fam with
          | Separated cod -> (
              match Date.od_of_cdate cod with
              | Some d -> (DateDisplay.string_of_ondate conf d :> string)
@@ -73,15 +73,15 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   Output.print_sstring conf "\">";
   Util.hidden_env conf;
   Util.hidden_input_s conf "m" "MRG_FAM_OK";
-  Util.hidden_input_s conf "i" (string_of_ifam ifam1);
-  Util.hidden_input_s conf "i2" (string_of_ifam ifam2);
+  Util.hidden_input_s conf "i" (Driver.string_of_ifam ifam1);
+  Util.hidden_input_s conf "i2" (Driver.string_of_ifam ifam2);
   (match p_getenv conf.env "ip" with
   | Some ip -> Util.hidden_input conf "ip" (Mutil.encode ip)
   | None -> ());
   (let rec loop = function
      | [ (ip1, ip2) ] ->
-         Util.hidden_input_s conf "ini1" (string_of_iper ip1);
-         Util.hidden_input_s conf "ini2" (string_of_iper ip2)
+         Util.hidden_input_s conf "ini1" (Driver.string_of_iper ip1);
+         Util.hidden_input_s conf "ini2" (Driver.string_of_iper ip2)
      | _ :: branches -> loop branches
      | _ -> ()
    in
@@ -93,7 +93,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     (fun fam ->
       Adef.safe @@ transl conf
       @@
-      match get_relation fam with
+      match Driver.get_relation fam with
       | Married -> "married"
       | NotMarried -> "not married"
       | Engaged -> "engaged"
@@ -109,7 +109,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     (Util.translate_eval (transl_nth conf "marriage/marriages" 0) |> Adef.safe)
     (Adef.encoded "marriage")
     (fun fam ->
-      match Date.od_of_cdate (get_marriage fam) with
+      match Date.od_of_cdate (Driver.get_marriage fam) with
       | None -> Adef.safe ""
       | Some d -> DateDisplay.string_of_ondate conf d);
   string_field
@@ -119,12 +119,13 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     |> Adef.safe)
     (Adef.encoded "marriage_place")
     (fun fam ->
-      (get_marriage_place fam |> sou base |> escape_html :> Adef.safe_string));
+      (Driver.get_marriage_place fam |> Driver.sou base |> escape_html
+        :> Adef.safe_string));
   string_field
     (transl conf "divorce" |> Adef.safe)
     (Adef.encoded "divorce")
     (fun fam ->
-      match get_divorce fam with
+      match Driver.get_divorce fam with
       | Divorced cod -> (
           match Date.od_of_cdate cod with
           | Some d ->
@@ -136,7 +137,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     (transl conf "separation" |> Adef.safe)
     (Adef.encoded "separation")
     (fun fam ->
-      match get_separation fam with
+      match Driver.get_separation fam with
       | Separated cod -> (
           match Date.od_of_cdate cod with
           | Some d ->
@@ -162,16 +163,20 @@ let merge_fam1 conf base fam1 fam2 =
   Hutil.trailer conf
 
 let merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
-  let cpl1 = foi base ifam1 in
-  let cpl2 = foi base ifam2 in
-  (* Vérifie que les deux couples sont identiques. Il est possible dans certains cas (couple de même sexe) que les personnes soient inversées dans l'union. *)
+  let cpl1 = Driver.foi base ifam1 in
+  let cpl2 = Driver.foi base ifam2 in
+  (* Vérifie que les deux couples sont identiques. Il est possible dans
+     certains cas (couple de même sexe) que les personnes soient inversées
+     dans l'union. *)
   if
-    (get_father cpl1 = get_father cpl2 && get_mother cpl1 = get_mother cpl2)
-    || (get_father cpl1 = get_mother cpl2 && get_mother cpl1 = get_father cpl2)
+    Driver.get_father cpl1 = Driver.get_father cpl2
+    && Driver.get_mother cpl1 = Driver.get_mother cpl2
+    || Driver.get_father cpl1 = Driver.get_mother cpl2
+       && Driver.get_mother cpl1 = Driver.get_father cpl2
   then
     if
       need_differences_selection conf base fam1 fam2
-      && compatible_fevents (get_fevents fam1) (get_fevents fam2)
+      && compatible_fevents (Driver.get_fevents fam1) (Driver.get_fevents fam2)
     then merge_fam1 conf base (ifam1, fam1) (ifam2, fam2)
     else MergeFamOk.print_merge conf base
   else Hutil.incorrect_request conf
@@ -179,9 +184,9 @@ let merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
 let print conf base =
   match (p_getenv conf.env "i", p_getenv conf.env "i2") with
   | Some f1, Some f2 ->
-      let ifam1 = ifam_of_string f1 in
-      let ifam2 = ifam_of_string f2 in
-      let fam1 = foi base ifam1 in
-      let fam2 = foi base ifam2 in
+      let ifam1 = Driver.ifam_of_string f1 in
+      let ifam2 = Driver.ifam_of_string f2 in
+      let fam1 = Driver.foi base ifam1 in
+      let fam2 = Driver.foi base ifam2 in
       merge_fam conf base (ifam1, fam1) (ifam2, fam2)
   | _ -> Hutil.incorrect_request conf

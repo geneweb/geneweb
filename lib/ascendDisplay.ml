@@ -1,8 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
 
 let limit_by_tree conf =
   match List.assoc_opt "max_anc_tree" conf.base_env with
@@ -17,19 +17,19 @@ let print_ancestors_dag conf base v p =
       let set = Dag.Pset.add ip set in
       if lev <= 0 then set
       else
-        match get_parents (pget conf base ip) with
+        match Driver.get_parents (pget conf base ip) with
         | Some ifam ->
-            let cpl = foi base ifam in
+            let cpl = Driver.foi base ifam in
             let get_left, get_right =
               match p_getenv conf.env "mf" with
-              | Some "1" -> (get_father, get_mother)
-              | _ -> (get_mother, get_father)
+              | Some "1" -> (Driver.get_father, Driver.get_mother)
+              | _ -> (Driver.get_mother, Driver.get_father)
             in
             let set = loop set (lev - 1) (get_left cpl) in
             loop set (lev - 1) (get_right cpl)
         | None -> set
     in
-    loop Dag.Pset.empty v (get_iper p)
+    loop Dag.Pset.empty v (Driver.get_iper p)
   in
   let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
   (* Récupère les options d'affichage. *)

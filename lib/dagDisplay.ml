@@ -1,10 +1,10 @@
 open Config
 open Dag2html
 open Def
-open Gwdb
 open Util
 open Dag
 module Logs = Geneweb_logs.Logs
+module Driver = Geneweb_db.Driver
 
 let image_normal_txt conf base p fname width height =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
@@ -112,7 +112,7 @@ let image_txt conf base p =
           |> Adef.as_string)
   else ""
 
-type item = Item of person * Adef.safe_string
+type item = Item of Driver.person * Adef.safe_string
 
 let string_of_item conf base = function
   | Item (p, s) ->
@@ -732,7 +732,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   in
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let indi_ip n =
-    match n.valu with Left ip -> ip | Right _ -> Gwdb.dummy_iper
+    match n.valu with Left ip -> ip | Right _ -> Driver.dummy_iper
   in
   let indi_txt n =
     match n.valu with
@@ -747,15 +747,17 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
               (fun list id ->
                 match d.dag.(int_of_idag id).valu with
                 | Left cip -> (
-                    match get_parents (pget conf base cip) with
+                    match Driver.get_parents (pget conf base cip) with
                     | Some ifam ->
-                        let cpl = foi base ifam in
-                        if ip = get_father cpl then
-                          if List.mem_assoc (get_mother cpl) list then list
-                          else (get_mother cpl, Some ifam) :: list
-                        else if ip = get_mother cpl then
-                          if List.mem_assoc (get_father cpl) list then list
-                          else (get_father cpl, Some ifam) :: list
+                        let cpl = Driver.foi base ifam in
+                        if ip = Driver.get_father cpl then
+                          if List.mem_assoc (Driver.get_mother cpl) list then
+                            list
+                          else (Driver.get_mother cpl, Some ifam) :: list
+                        else if ip = Driver.get_mother cpl then
+                          if List.mem_assoc (Driver.get_father cpl) list then
+                            list
+                          else (Driver.get_father cpl, Some ifam) :: list
                         else list
                     | None -> list)
                 | Right _ -> list)
@@ -776,7 +778,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                 match ifamo with
                 | Some ifam when auth ->
                     DateDisplay.short_marriage_date_text conf base
-                      (foi base ifam) p ps
+                      (Driver.foi base ifam) p ps
                 | _ -> Adef.safe ""
               in
               txt ^^^ "<br>&amp;" ^<^ d ^^^ " "
@@ -874,7 +876,7 @@ type 'a env =
   | Vint of int
   | Vsstring of Adef.safe_string
   | Vestring of Adef.escaped_string
-  | Vind of person
+  | Vind of Driver.person
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
@@ -917,20 +919,20 @@ let eval_predefined_apply f vl =
 let parents_access_aux conf base td get_parent =
   match td with
   | TDitem (ip, _, _) | TDtext (ip, _) -> (
-      match get_parents (poi base ip) with
+      match Driver.get_parents (Driver.poi base ip) with
       | Some ifam ->
-          let cpl = foi base ifam in
+          let cpl = Driver.foi base ifam in
           Templ.VVstring
-            (Util.acces conf base (poi base (get_parent cpl)) :> string)
+            (Util.acces conf base (Driver.poi base (get_parent cpl)) :> string)
       | None -> VVstring "")
   | _ -> VVstring ""
 
 let has_sibling_aux base td next_or_prev =
   match td with
   | TDitem (ip, _, _) | TDtext (ip, _) -> (
-      match get_parents (poi base ip) with
+      match Driver.get_parents (Driver.poi base ip) with
       | Some ifam ->
-          let sib = get_children (foi base ifam) in
+          let sib = Driver.get_children (Driver.foi base ifam) in
           (* array *)
           let i = ref (-1) in
           let _ = Array.iteri (fun n s -> if ip = s then i := n else ()) sib in
@@ -944,7 +946,8 @@ let has_sibling_aux base td next_or_prev =
 
 let sibling_access_aux conf base td next_or_prev =
   match has_sibling_aux base td next_or_prev with
-  | Some s_ip -> Templ.VVstring (Util.acces conf base (poi base s_ip) :> string)
+  | Some s_ip ->
+      Templ.VVstring (Util.acces conf base (Driver.poi base s_ip) :> string)
   | None -> raise Not_found
 
 let rec eval_var conf base env _xx _loc = function
@@ -986,7 +989,7 @@ let rec eval_var conf base env _xx _loc = function
       | _ -> VVstring "")
   | [ "person_index" ] -> (
       match find_person_in_env conf base "" with
-      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
+      | Some p -> VVstring (Driver.string_of_iper (Driver.get_iper p))
       | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
@@ -1006,7 +1009,7 @@ let rec eval_var conf base env _xx _loc = function
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
-      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
+      | Some p -> VVstring (Driver.string_of_iper (Driver.get_iper p))
       | None -> VVstring "")
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
@@ -1041,8 +1044,8 @@ let rec eval_var conf base env _xx _loc = function
   | _ -> raise Not_found
 
 and eval_person_var _conf base p = function
-  | "surname" -> VVstring (sou base (get_surname p))
-  | "first_name" -> VVstring (sou base (get_first_name p))
+  | "surname" -> VVstring (Driver.sou base (Driver.get_surname p))
+  | "first_name" -> VVstring (Driver.sou base (Driver.get_first_name p))
   | _ -> raise Not_found
 
 and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
@@ -1055,7 +1058,7 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
   | [ "access" ] -> (
       match td with
       | TDtext (ip, _s) ->
-          VVstring (Util.acces conf base (poi base ip) :> string)
+          VVstring (Util.acces conf base (Driver.poi base ip) :> string)
       | _ -> VVstring "")
   | [ "align" ] -> (
       match align with
@@ -1068,7 +1071,7 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
         | TDbar (Some s) -> (s : Adef.escaped_string :> string)
         | _ -> "")
   | [ "colspan" ] -> VVstring (string_of_int colspan)
-  | [ "father"; "access" ] -> parents_access_aux conf base td get_father
+  | [ "father"; "access" ] -> parents_access_aux conf base td Driver.get_father
   | [ "has_next_sibling" ] -> (
       match has_sibling_aux base td true with
       | Some _ -> VVbool true
@@ -1079,7 +1082,8 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
       | None -> VVbool false)
   | [ "index" ] -> (
       match td with
-      | TDitem (ip, _, _) | TDtext (ip, _) -> VVstring (string_of_iper ip)
+      | TDitem (ip, _, _) | TDtext (ip, _) ->
+          VVstring (Driver.string_of_iper ip)
       | _ -> VVstring "")
   | [ "is_bar" ] -> VVbool (match td with TDbar _ -> true | _ -> false)
   | [ "is_hr" ] -> (
@@ -1097,7 +1101,7 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
       match td with
       | TDitem (_ip, s, _t) -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring "")
-  | [ "mother"; "access" ] -> parents_access_aux conf base td get_mother
+  | [ "mother"; "access" ] -> parents_access_aux conf base td Driver.get_mother
   | [ "next_sibling"; "access" ] -> sibling_access_aux conf base td true
   | [ "prev_sibling"; "access" ] -> sibling_access_aux conf base td false
   | [ "text" ] -> (
@@ -1311,7 +1315,7 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
     let p =
       match find_person_in_env conf base "" with
       | Some p -> p
-      | None -> poi base Gwdb.dummy_iper
+      | None -> Driver.poi base Driver.dummy_iper
     in
     let env =
       let table_pre_dim () =

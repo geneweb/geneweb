@@ -1,5 +1,4 @@
 (* $Id: dag2html.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
-open Gwdb
 
 type 'a dag = { mutable dag : 'a node array }
 and 'a node = { mutable pare : idag list; valu : 'a; mutable chil : idag list }
@@ -34,8 +33,8 @@ let new_ghost_id =
 type align = LeftA | CenterA | RightA
 
 type 'a table_data =
-  | TDitem of iper * 'a * Adef.safe_string
-  | TDtext of iper * Adef.safe_string
+  | TDitem of Geneweb_db.Driver.iper * 'a * Adef.safe_string
+  | TDtext of Geneweb_db.Driver.iper * Adef.safe_string
   | TDhr of align
   | TDbar of Adef.escaped_string option
   | TDnothing

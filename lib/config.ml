@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
 
 type auth_scheme_kind =
   | NoAuth
@@ -56,7 +55,7 @@ type config = {
   user : string;
   username : string;
   userkey : string;
-  user_iper : iper option;
+  user_iper : Geneweb_db.Driver.iper option;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;
@@ -65,7 +64,7 @@ type config = {
   vowels : string list;
   default_lang : string;
   browser_lang : string;
-  default_sosa_ref : iper * Gwdb.person option;
+  default_sosa_ref : Geneweb_db.Driver.iper * Geneweb_db.Driver.person option;
   multi_parents : bool;
   authorized_wizards_notes : bool;
   public_if_titles : bool;
@@ -150,7 +149,7 @@ let empty =
     vowels = [];
     default_lang = "";
     browser_lang = "";
-    default_sosa_ref = (Gwdb.dummy_iper, None);
+    default_sosa_ref = (Geneweb_db.Driver.dummy_iper, None);
     multi_parents = false;
     authorized_wizards_notes = false;
     public_if_titles = false;

@@ -2,15 +2,15 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open MergeIndOk
+module Driver = Geneweb_db.Driver
 
 let print_merge conf base =
   match (p_getenv conf.env "i1", p_getenv conf.env "i2") with
   | Some i1, Some i2 ->
-      let p1 = poi base (iper_of_string i1) in
-      let p2 = poi base (iper_of_string i2) in
+      let p1 = Driver.poi base (Driver.iper_of_string i1) in
+      let p2 = Driver.poi base (Driver.iper_of_string i2) in
       let p = reconstitute conf base p1 p2 in
       let sp = UpdateInd.string_person_of base p1 in
       let salt = Option.get conf.secret_salt in
@@ -26,14 +26,14 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
       |> Output.print_sstring conf);
   Output.print_sstring conf " ";
   Output.print_string conf
-    (referenced_person_text conf base (poi base p.key_index));
+    (referenced_person_text conf base (Driver.poi base p.key_index));
   Output.print_sstring conf " ";
   Update.print_warnings conf base wl;
   let pi = p.key_index in
-  let np = poi base pi in
-  let nfn = p_first_name base np in
-  let nsn = p_surname base np in
-  let nocc = get_occ np in
+  let np = Driver.poi base pi in
+  let nfn = Driver.p_first_name base np in
+  let nsn = Driver.p_surname base np in
+  let nocc = Driver.get_occ np in
   if
     ((ofn1 <> nfn || osn1 <> nsn || oocc1 <> nocc) && pgl1 <> [])
     || ((ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc) && pgl2 <> [])
@@ -77,7 +77,8 @@ let print_mod_merge o_conf base =
     match p_getenv o_conf.env i with
     | Some i ->
         Util.string_gen_person base
-          (gen_person_of_person (poi base (iper_of_string i)))
+          (Driver.gen_person_of_person
+             (Driver.poi base (Driver.iper_of_string i)))
     | None -> assert false
   in
   let o_p1 = get_gen_person "i" in

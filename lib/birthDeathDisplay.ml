@@ -2,9 +2,9 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open BirthDeath
+module Driver = Geneweb_db.Driver
 
 let month_txt conf d cal =
   let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
@@ -27,7 +27,9 @@ let list_aux_1 conf d cal last_month_txt was_future =
 
 let print_birth conf base =
   let list, len =
-    select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
+    select_person conf base
+      (fun p -> Date.od_of_cdate (Driver.get_birth p))
+      false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -50,7 +52,7 @@ let print_birth conf base =
            Output.print_sstring conf "</em>.")
          else (
            Output.print_sstring conf
-             (transl_nth conf "born" (index_of_sex (get_sex p)));
+             (transl_nth conf "born" (index_of_sex (Driver.get_sex p)));
            Output.print_sstring conf " <em>";
            Output.print_string conf
              (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
@@ -85,19 +87,19 @@ let print_death conf base =
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
             let sure d = d.prec = Sure in
-            match Date.cdate_to_dmy_opt (get_birth p) with
+            match Date.cdate_to_dmy_opt (Driver.get_birth p) with
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
                   let a = Date.time_elapsed d1 d in
                   let ages_sum =
-                    match get_sex p with
+                    match Driver.get_sex p with
                     | Male -> (fst ages_sum + a.year, snd ages_sum)
                     | Female -> (fst ages_sum, snd ages_sum + a.year)
                     | Neuter -> ages_sum
                   in
                   let ages_nb =
-                    match get_sex p with
+                    match Driver.get_sex p with
                     | Male -> (fst ages_nb + 1, snd ages_nb)
                     | Female -> (fst ages_nb, snd ages_nb + 1)
                     | Neuter -> ages_nb
@@ -109,7 +111,7 @@ let print_death conf base =
           Output.print_string conf (referenced_person_text conf base p);
           Output.print_sstring conf "</b>, ";
           Output.print_sstring conf
-            (transl_nth conf "died" (index_of_sex (get_sex p)));
+            (transl_nth conf "died" (index_of_sex (Driver.get_sex p)));
           Output.print_sstring conf " <em>";
           Output.print_string conf
             (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
@@ -193,10 +195,10 @@ let print_death conf base =
 let print_oldest_alive conf base =
   let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
   let get_oldest_alive p =
-    match get_death p with
-    | NotDead -> Date.od_of_cdate (get_birth p)
+    match Driver.get_death p with
+    | NotDead -> Date.od_of_cdate (Driver.get_birth p)
     | DontKnowIfDead when limit > 0 -> (
-        match Date.od_of_cdate (get_birth p) with
+        match Date.od_of_cdate (Driver.get_birth p) with
         | Some (Dgreg (d, _)) as x when conf.today.year - d.year <= limit -> x
         | Some _ | None -> None)
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
@@ -217,12 +219,12 @@ let print_oldest_alive conf base =
       Output.print_string conf (referenced_person_text conf base p);
       Output.print_sstring conf "</b>, ";
       Output.print_sstring conf
-        (transl_nth conf "born" (index_of_sex (get_sex p)));
+        (transl_nth conf "born" (index_of_sex (Driver.get_sex p)));
       Output.print_sstring conf " <em>";
       Output.print_string conf
         (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
       Output.print_sstring conf "</em>";
-      if get_death p = NotDead && d.prec = Sure then (
+      if Driver.get_death p = NotDead && d.prec = Sure then (
         let a = Date.time_elapsed d conf.today in
         Output.print_sstring conf " <em>(";
         Output.print_string conf (DateDisplay.string_of_age conf a);
@@ -235,7 +237,9 @@ let print_oldest_alive conf base =
 let print_longest_lived conf base =
   let get_longest p =
     if Util.authorized_age conf base p then
-      match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+      match
+        (Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+      with
       | Some bd, Death (_, cd) -> (
           match Date.cdate_to_dmy_opt cd with
           | None -> None
@@ -278,12 +282,14 @@ let print_marr_or_eng conf base title list =
          in
          Output.print_sstring conf "<li><b>";
          Output.print_string conf
-           (referenced_person_text conf base (pget conf base (get_father fam)));
+           (referenced_person_text conf base
+              (pget conf base (Driver.get_father fam)));
          Output.print_sstring conf "</b> ";
          Output.print_sstring conf (transl_nth conf "and" 0);
          Output.print_sstring conf " <b>";
          Output.print_string conf
-           (referenced_person_text conf base (pget conf base (get_mother fam)));
+           (referenced_person_text conf base
+              (pget conf base (Driver.get_mother fam)));
          Output.print_sstring conf "</b>, ";
          if future then (
            Output.print_sstring conf "<em>";
@@ -291,7 +297,7 @@ let print_marr_or_eng conf base title list =
              (DateDisplay.string_of_date conf (Dgreg (d, cal)));
            Output.print_sstring conf "</em>")
          else (
-           (match get_relation fam with
+           (match Driver.get_relation fam with
            | NotMarried | NoSexesCheckNotMarried ->
                Output.print_sstring conf
                @@ transl_nth conf "relation/relations" 0
@@ -316,9 +322,9 @@ let print_marriage conf base =
   let list, len =
     select_family conf base
       (fun fam ->
-        let rel = get_relation fam in
+        let rel = Driver.get_relation fam in
         if rel = Married || rel = NoSexesCheckMarried then
-          Date.od_of_cdate (get_marriage fam)
+          Date.od_of_cdate (Driver.get_marriage fam)
         else None)
       false
   in
@@ -332,12 +338,12 @@ let print_oldest_engagements conf base =
   let list, len =
     select_family conf base
       (fun fam ->
-        if get_relation fam = Engaged then
-          let husb = pget conf base (get_father fam) in
-          let wife = pget conf base (get_mother fam) in
-          match (get_death husb, get_death wife) with
+        if Driver.get_relation fam = Engaged then
+          let husb = pget conf base (Driver.get_father fam) in
+          let wife = pget conf base (Driver.get_mother fam) in
+          match (Driver.get_death husb, Driver.get_death wife) with
           | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-              Date.od_of_cdate (get_marriage fam)
+              Date.od_of_cdate (Driver.get_marriage fam)
           | _ -> None
         else None)
       true

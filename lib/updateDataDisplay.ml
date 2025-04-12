@@ -1,9 +1,9 @@
 open Config
-open Gwdb
 open Util
 open UpdateData
 module Logs = Geneweb_logs.Logs
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
 
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in
@@ -59,10 +59,12 @@ let print_mod_ok conf base =
   let new_input =
     Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
   in
-  let new_istr_s = Gwdb.string_of_istr (Gwdb.insert_string base new_input) in
+  let new_istr_s =
+    Driver.string_of_istr (Driver.insert_string base new_input)
+  in
   let new_ini = ini_of_update_data ini new_input in
   let list = get_person_from_data conf base in
-  let list = List.map (fun (istr, perl) -> (sou base istr, perl)) list in
+  let list = List.map (fun (istr, perl) -> (Driver.sou base istr, perl)) list in
   let nb_pers =
     List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
   in
@@ -171,8 +173,8 @@ type 'a env =
   | Vbool of bool
   | Vcnt of int ref
   | Vint of int
-  | Vlist_data of (istr * string) list
-  | Vlist_value of (istr * string) list
+  | Vlist_data of (Driver.istr * string) list
+  | Vlist_value of (Driver.istr * string) list
   | Vnone
   | Vother of 'a
   | Vstring of string
@@ -216,16 +218,16 @@ and eval_simple_var conf base env xx = function
           (commd conf :> string)
           (Format.sprintf "&data=%s" data)
           "&bi=on&ba=on&ma=on&de=on&bu=on&parents=0"
-          (Mutil.encode (sou base istr) :> string)
+          (Mutil.encode (Driver.sou base istr) :> string)
           (List.length p_list)
       in
       let body =
         let rec loop i acc = function
           | [] -> acc
           | p :: pl ->
-              let ip = get_iper p in
+              let ip = Driver.get_iper p in
               loop (i + 1)
-                (acc ^ Printf.sprintf "&i%d=%s" i (Gwdb.string_of_iper ip))
+                (acc ^ Printf.sprintf "&i%d=%s" i (Driver.string_of_iper ip))
                 pl
         in
         loop 0 "" p_list
@@ -387,7 +389,7 @@ let print_foreach conf print_ast _eval_expr =
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
     List.iteri
-      (fun i (ini_k, (list_v : (istr * string) list)) ->
+      (fun i (ini_k, (list_v : (Driver.istr * string) list)) ->
         let env =
           Templ.Env.(
             env |> add "cnt" (Vint i) |> add "max" (Vint max)
@@ -457,7 +459,7 @@ let print_foreach conf print_ast _eval_expr =
               env |> add "cnt" (Vint i) |> add "max" (Vint max)
               |> add "entry_value" (Vstring s)
               |> add "entry_value_rev" (Vstring (unfold_place_long false s))
-              |> add "entry_key" (Vstring (string_of_istr k))
+              |> add "entry_key" (Vstring (Driver.string_of_istr k))
               |> add "first" (Vbool (Place.without_suburb s <> prev)))
           in
           List.iter (print_ast env xx) al;

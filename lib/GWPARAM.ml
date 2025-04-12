@@ -5,6 +5,7 @@
 *)
 
 module Logs = Geneweb_logs.Logs
+module Driver = Geneweb_db.Driver
 
 let nb_errors = ref 0
 let errors_undef = ref []
@@ -181,25 +182,25 @@ let rec ancestors conf base n set ip =
   else
     let set =
       if
-        Gwdb.sou base (Gwdb.get_first_name (Gwdb.poi base ip)) <> "?"
-        && Gwdb.sou base (Gwdb.get_surname (Gwdb.poi base ip)) <> "?"
+        Driver.sou base (Driver.get_first_name (Driver.poi base ip)) <> "?"
+        && Driver.sou base (Driver.get_surname (Driver.poi base ip)) <> "?"
       then ip :: set
       else set
     in
-    match Gwdb.get_parents (Gwdb.poi base ip) with
+    match Driver.get_parents (Driver.poi base ip) with
     | Some ifam ->
-        let cpl = Gwdb.foi base ifam in
-        let set = ancestors conf base (n - 1) set (Gwdb.get_father cpl) in
-        let set = ancestors conf base (n - 1) set (Gwdb.get_mother cpl) in
+        let cpl = Driver.foi base ifam in
+        let set = ancestors conf base (n - 1) set (Driver.get_father cpl) in
+        let set = ancestors conf base (n - 1) set (Driver.get_mother cpl) in
         set
     | None -> set
 
 let rec descendants conf base set ip =
   let set = ip :: set in
-  let fams = Gwdb.get_family (Gwdb.poi base ip) in
+  let fams = Driver.get_family (Driver.poi base ip) in
   Array.fold_left
     (fun set ifam ->
-      let children = Gwdb.get_children (Gwdb.foi base ifam) in
+      let children = Driver.get_children (Driver.foi base ifam) in
       Array.fold_left
         (fun set child ->
           let set = child :: set in
@@ -211,7 +212,7 @@ let rec descendants conf base set ip =
    and p is one of its descendant or ancesstor
 *)
 
-let is_semi_public p = Gwdb.get_access p = SemiPublic
+let is_semi_public p = Driver.get_access p = SemiPublic
 
 let split_key key =
   let dot = match String.index_opt key '.' with Some i -> i | _ -> -1 in
@@ -249,27 +250,27 @@ let is_related conf base p =
                   let family = ancestors conf base (max + 1) family ip in
                   (* siblings
                      let family =
-                           (match Gwdb.get_parents (Gwdb.poi base ip) with
-                           | Some ifam -> Gwdb.get_children (Gwdb.foi base ifam) |> Array.to_list
+                           (match Geneweb_db.get_parents (Geneweb_db.poi base ip) with
+                           | Some ifam -> Geneweb_db.get_children (Geneweb_db.foi base ifam) |> Array.to_list
                            | None -> [])
                            @ family
                      in *)
                   (* spouses *)
                   let family =
-                    (let ifams = Gwdb.get_family (Gwdb.poi base ip) in
+                    (let ifams = Driver.get_family (Driver.poi base ip) in
                      Array.fold_left
                        (fun acc ifam ->
                          let sp =
-                           let f = Gwdb.foi base ifam in
-                           if ip = Gwdb.get_father f then Gwdb.get_mother f
-                           else Gwdb.get_father f
+                           let f = Driver.foi base ifam in
+                           if ip = Driver.get_father f then Driver.get_mother f
+                           else Driver.get_father f
                          in
                          if
-                           Gwdb.sou base
-                             (Gwdb.get_first_name (Gwdb.poi base sp))
+                           Driver.sou base
+                             (Driver.get_first_name (Driver.poi base sp))
                            <> "?"
-                           && Gwdb.sou base
-                                (Gwdb.get_surname (Gwdb.poi base sp))
+                           && Driver.sou base
+                                (Driver.get_surname (Driver.poi base sp))
                               <> "?"
                          then sp :: acc
                          else acc)
@@ -283,8 +284,8 @@ let is_related conf base p =
         in
         match conf.Config.user_iper with
         | Some ip ->
-            Gwdb.get_access (Gwdb.poi base ip) = SemiPublic
-            && List.mem (Gwdb.get_iper p) family
+            Driver.get_access (Driver.poi base ip) = SemiPublic
+            && List.mem (Driver.get_iper p) family
         | _ -> false)
     | _ ->
         if Sys.file_exists fname then (
@@ -325,20 +326,20 @@ let is_related conf base p =
          Not_found -> false
        end;
      in
-     let access = Gwdb.get_access p in
+     let access = Geneweb_db.get_access p in
      let not_private = access <> Private in
      Printf.eprintf "P_auth for %s\n" (Gutil.designation base p);
      if conf.Config.wizard
          then Printf.eprintf "Wizard\n";
      if (not mode_semi_public) && conf.Config.friend
          then Printf.eprintf "Friend and not mode_semi_public\n";
-     if conf.user_iper = Some (Gwdb.get_iper p)
+     if conf.user_iper = Some (Geneweb_db.get_iper p)
          then Printf.eprintf "Self\n";
      if access = Public
          then Printf.eprintf "Public\n";
      if conf.Config.public_if_titles
         && access = IfTitles
-        && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+        && Geneweb_db.nobtitles base conf.allowed_titles conf.denied_titles p <> []
          then Printf.eprintf "Has titles\n";
      if conf.Config.friend && conf.Config.semi_public
         && (is_semi_public p || is_related conf base p)
@@ -346,11 +347,11 @@ let is_related conf base p =
          then Printf.eprintf "visiting a semi_public or family person\n";
      if (conf.Config.public_if_no_date && access <> Private)
          then Printf.eprintf "not private and no dates\n";
-     let birth_d = (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) in
+     let birth_d = (Geneweb_db.get_birth p |> Date.cdate_to_dmy_opt) in
      if conf.Config.private_years < -1
          then Printf.eprintf "private_years < -1\n";
-     let baptism_d = (Gwdb.get_baptism  p |> Date.cdate_to_dmy_opt) in
-     let death_d = (Gwdb.get_death p |> Date.dmy_of_death) in
+     let baptism_d = (Geneweb_db.get_baptism  p |> Date.cdate_to_dmy_opt) in
+     let death_d = (Geneweb_db.get_death p |> Date.dmy_of_death) in
      Printf.eprintf "other conditions date driven\n";
      begin match birth_d with
      | None -> Printf.eprintf "no birth date\n"
@@ -388,14 +389,14 @@ let p_auth conf base p =
     try List.assoc "semi_public" conf.Config.base_env = "yes"
     with Not_found -> false
   in
-  let access = Gwdb.get_access p in
+  let access = Driver.get_access p in
   let not_private = access <> Private in
   conf.Config.wizard
   || ((not mode_semi_public) && conf.Config.friend)
-  || conf.user_iper = Some (Gwdb.get_iper p)
+  || conf.user_iper = Some (Driver.get_iper p)
   || access = Public
   || conf.Config.public_if_titles && access = IfTitles
-     && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+     && Driver.nobtitles base conf.allowed_titles conf.denied_titles p <> []
   || conf.Config.friend && conf.Config.semi_public
      && (is_semi_public p || is_related conf base p)
      && not_private
@@ -415,27 +416,27 @@ let p_auth conf base p =
     in
     (* born more than private_years ago *)
     check_date
-      (Gwdb.get_birth p |> Date.cdate_to_dmy_opt)
+      (Driver.get_birth p |> Date.cdate_to_dmy_opt)
       conf.Config.private_years
     @@ fun () ->
     (* baptised more than private_years ago *)
     check_date
-      (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt)
+      (Driver.get_baptism p |> Date.cdate_to_dmy_opt)
       conf.Config.private_years
     @@ fun () ->
     (* dead more than private_years_death ago *)
     check_date
-      (Gwdb.get_death p |> Date.dmy_of_death)
+      (Driver.get_death p |> Date.dmy_of_death)
       conf.Config.private_years_death
     @@ fun () ->
     (* married more than private_years_marriage ago *)
-    let families = Gwdb.get_family p in
+    let families = Driver.get_family p in
     let len = Array.length families in
     let rec loop i =
       i < len
       (* true if one marriage is more than private_years_marriage ago *)
       && check_date
-           (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
+           (Array.get families i |> Driver.foi base |> Driver.get_marriage
           |> Date.cdate_to_dmy_opt)
            conf.Config.private_years_marriage
            (fun () -> loop (i + 1))
@@ -443,7 +444,7 @@ let p_auth conf base p =
     loop 0
 
 let p_auth_sp conf base p =
-  p_auth conf base p || (conf.Config.friend && Gwdb.get_access p <> Private)
+  p_auth conf base p || (conf.Config.friend && Driver.get_access p <> Private)
 
 (** [wrap_output conf title content]
   Plugins defining a page content but not a complete UI

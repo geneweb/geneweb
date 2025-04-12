@@ -2,14 +2,16 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Collection = Geneweb_db.Collection
 
 (* Printing check errors *)
 
 let designation base p =
   let s = Gutil.designation base p in
   if String.get s 0 = '?' || String.get s (String.length s - 1) = '?' then
-    s ^ " (i=" ^ string_of_iper (get_iper p) ^ ")"
+    s ^ " (i=" ^ Driver.string_of_iper (Driver.get_iper p) ^ ")"
   else s
 
 let string_of_epers_name base epers_name =
@@ -64,7 +66,7 @@ let string_of_epers_name base epers_name =
   | Epers_ScellentSpouseLDS -> "scellent spouse (LDS)"
   | Epers_VenteBien -> "sell"
   | Epers_Will -> "will"
-  | Epers_Name n -> sou base n
+  | Epers_Name n -> Driver.sou base n
 
 let string_of_efam_name base efam_name =
   match efam_name with
@@ -80,7 +82,7 @@ let string_of_efam_name base efam_name =
   | Efam_MarriageLicense -> "marriage licence"
   | Efam_PACS -> "PACS"
   | Efam_Residence -> "residence"
-  | Efam_Name n -> sou base n
+  | Efam_Name n -> Driver.sou base n
 
 let print_base_error oc base = function
   | AlreadyDefined p ->
@@ -98,36 +100,36 @@ let print_base_warning oc base = function
   | BirthAfterDeath p ->
       Printf.fprintf oc "%s born after his/her death\n" (designation base p)
   | ChangedOrderOfChildren (ifam, _, _, _) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Printf.fprintf oc "Changed order of children of %s and %s\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)))
+        (designation base (Driver.poi base (Driver.get_father cpl)))
+        (designation base (Driver.poi base (Driver.get_mother cpl)))
   | ChildrenNotInOrder (ifam, _, elder, x) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Printf.fprintf oc
         "The following children of\n  %s\nand\n  %s\nare not in order:\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)));
+        (designation base (Driver.poi base (Driver.get_father cpl)))
+        (designation base (Driver.poi base (Driver.get_mother cpl)));
       Printf.fprintf oc "- %s\n" (designation base elder);
       Printf.fprintf oc "- %s\n" (designation base x)
   | ChangedOrderOfMarriages (p, _, _) ->
       Printf.fprintf oc "Changed order of marriages of %s\n"
         (designation base p)
   | ChangedOrderOfFamilyEvents (ifam, _, _) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Printf.fprintf oc "Changed order of family's events for %s\n"
-        (designation base (poi base (get_father cpl)));
+        (designation base (Driver.poi base (Driver.get_father cpl)));
       Printf.fprintf oc "Changed order of family's events for %s\n"
-        (designation base (poi base (get_mother cpl)))
+        (designation base (Driver.poi base (Driver.get_mother cpl)))
   | ChangedOrderOfPersonEvents (p, _, _) ->
       Printf.fprintf oc "Changed order of person's events for %s\n"
         (designation base p)
   | CloseChildren (ifam, c1, c2) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Printf.fprintf oc
         "The following children of\n  %s\nand\n  %s\nare born very close:\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)));
+        (designation base (Driver.poi base (Driver.get_father cpl)))
+        (designation base (Driver.poi base (Driver.get_mother cpl)));
       Printf.fprintf oc "- %s\n" (designation base c1);
       Printf.fprintf oc "- %s\n" (designation base c2)
   | DeadOld (p, a) ->
@@ -139,11 +141,11 @@ let print_base_warning oc base = function
         "is born more than 2 years after the death of his/her father";
       Printf.fprintf oc " %s\n" (designation base father)
   | DistantChildren (ifam, p1, p2) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Printf.fprintf oc
         "The following children of\n  %s\nand\n  %s\nare born very close:\n"
-        (designation base (poi base (get_father cpl)))
-        (designation base (poi base (get_mother cpl)));
+        (designation base (Driver.poi base (Driver.get_father cpl)))
+        (designation base (Driver.poi base (Driver.get_mother cpl)));
       Printf.fprintf oc "- %s\n" (designation base p1);
       Printf.fprintf oc "- %s\n" (designation base p2)
   | FEventOrder (p, e1, e2) ->
@@ -191,20 +193,21 @@ let print_base_warning oc base = function
         a.year
   | PossibleDuplicateFam (f1, f2) ->
       Printf.fprintf oc "possible duplicate families: %s and %s\n"
-        (string_of_ifam f1) (string_of_ifam f2)
+        (Driver.string_of_ifam f1) (Driver.string_of_ifam f2)
   | PossibleDuplicateFamHomonymous (f1, f2, p) ->
-      let f = foi base f1 in
-      let fath = get_father f in
-      let moth = get_mother f in
+      let f = Driver.foi base f1 in
+      let fath = Driver.get_father f in
+      let moth = Driver.get_mother f in
       let curr, hom =
-        if eq_iper fath (get_iper p) then (moth, fath) else (fath, moth)
+        if Driver.eq_iper fath (Driver.get_iper p) then (moth, fath)
+        else (fath, moth)
       in
       Printf.fprintf oc
         "possible duplicate families: %s and %s, %s has unions with several \
          persons named %s\n"
-        (string_of_ifam f1) (string_of_ifam f2)
-        (designation base (poi base curr))
-        (designation base (poi base hom))
+        (Driver.string_of_ifam f1) (Driver.string_of_ifam f2)
+        (designation base (Driver.poi base curr))
+        (designation base (Driver.poi base hom))
   | PEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_epers_name base e1.epers_name)
@@ -220,7 +223,9 @@ let print_base_warning oc base = function
   | TitleDatesError (p, t) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "has incorrect title dates as:\n";
-      Printf.fprintf oc " %s %s\n" (sou base t.t_ident) (sou base t.t_place)
+      Printf.fprintf oc " %s %s\n"
+        (Driver.sou base t.t_ident)
+        (Driver.sou base t.t_place)
   | UndefinedSex p ->
       Printf.fprintf oc "Undefined sex for %s\n" (designation base p)
   | YoungForMarriage (p, a, _) | OldForMarriage (p, a, _) ->
@@ -238,7 +243,7 @@ let min_year_of p =
     | { prec = Before; year; _ } -> CheckBefore year
     | { year; _ } -> CheckOther year
   in
-  Option.map aux (Date.cdate_to_dmy_opt (get_birth p))
+  Option.map aux (Date.cdate_to_dmy_opt (Driver.get_birth p))
 
 let dummy_date = CheckInfered (CheckOther max_int)
 
@@ -265,44 +270,44 @@ let rec check_ancestors base warning year year_tab ip ini_p =
         warning (IncoherentAncestorDate (Lazy.force p, p'))
     | _ -> ()
   in
-  if Gwdb.Marker.get year_tab ip = dummy_date then (
-    let p = poi base ip in
+  if Collection.Marker.get year_tab ip = dummy_date then (
+    let p = Driver.poi base ip in
     let new_year, new_ini_p =
       match min_year_of p with Some y -> (y, p) | None -> (infer year, ini_p)
     in
-    Gwdb.Marker.set year_tab ip new_year;
+    Collection.Marker.set year_tab ip new_year;
     test new_year year (lazy p) ini_p;
-    match get_parents p with
+    match Driver.get_parents p with
     | Some ifam ->
-        let fam = foi base ifam in
+        let fam = Driver.foi base ifam in
         let f ip =
-          let year = Gwdb.Marker.get year_tab ip in
+          let year = Collection.Marker.get year_tab ip in
           if year = dummy_date then
             check_ancestors base warning new_year year_tab ip new_ini_p
           else if own year then
-            test year new_year (lazy (poi base ip)) new_ini_p
+            test year new_year (lazy (Driver.poi base ip)) new_ini_p
         in
-        f @@ get_father fam;
-        f @@ get_mother fam
+        f @@ Driver.get_father fam;
+        f @@ Driver.get_mother fam
     | None -> ())
 
 let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
   if not mem then (
-    Gwdb.load_persons_array base;
-    Gwdb.load_ascends_array base;
-    Gwdb.load_unions_array base;
-    Gwdb.load_couples_array base);
-  let persons = Gwdb.ipers base in
-  let len = Gwdb.Collection.length persons in
-  let year_tab = Gwdb.iper_marker (Gwdb.ipers base) dummy_date in
+    Driver.load_persons_array base;
+    Driver.load_ascends_array base;
+    Driver.load_unions_array base;
+    Driver.load_couples_array base);
+  let persons = Driver.ipers base in
+  let len = Collection.length persons in
+  let year_tab = Driver.iper_marker (Driver.ipers base) dummy_date in
   if verbose then (
     Printf.eprintf "check persons\n";
     ProgrBar.start ();
-    Gwdb.Collection.iteri
+    Collection.iteri
       (fun i ip ->
         ProgrBar.run i len;
-        let p = poi base ip in
-        if Gwdb.Marker.get year_tab ip = dummy_date then
+        let p = Driver.poi base ip in
+        if Collection.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
         match CheckItem.person ~onchange:false base warning p with
         | Some ippl -> List.iter changed_p ippl
@@ -310,40 +315,42 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
       persons;
     ProgrBar.finish ())
   else
-    Gwdb.Collection.iter
+    Collection.iter
       (fun ip ->
-        let p = poi base ip in
-        if Gwdb.Marker.get year_tab ip = dummy_date then
+        let p = Driver.poi base ip in
+        if Collection.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
         match CheckItem.person ~onchange:false base warning p with
         | Some ippl -> List.iter changed_p ippl
         | None -> ())
       persons;
   if not mem then (
-    Gwdb.clear_unions_array base;
-    Gwdb.load_families_array base;
-    Gwdb.load_descends_array base);
-  let families = Gwdb.ifams base in
-  let len = Gwdb.Collection.length families in
+    Driver.clear_unions_array base;
+    Driver.load_families_array base;
+    Driver.load_descends_array base);
+  let families = Geneweb_db.Driver.ifams base in
+  let len = Collection.length families in
   if verbose then (
     Printf.eprintf "check families\n";
     ProgrBar.start ();
-    Gwdb.Collection.iteri
+    Collection.iteri
       (fun i ifam ->
         ProgrBar.run i len;
-        CheckItem.family ~onchange:false base warning ifam @@ foi base ifam)
+        CheckItem.family ~onchange:false base warning ifam
+        @@ Driver.foi base ifam)
       families;
     ProgrBar.finish ())
   else
-    Gwdb.Collection.iter
+    Collection.iter
       (fun ifam ->
-        CheckItem.family ~onchange:false base warning ifam @@ foi base ifam)
+        CheckItem.family ~onchange:false base warning ifam
+        @@ Driver.foi base ifam)
       families;
   if not mem then (
-    Gwdb.clear_persons_array base;
-    Gwdb.clear_families_array base;
-    Gwdb.clear_descends_array base);
+    Driver.clear_persons_array base;
+    Driver.clear_families_array base;
+    Driver.clear_descends_array base);
   Consang.check_noloop base error;
   if not mem then (
-    Gwdb.clear_ascends_array base;
-    Gwdb.clear_couples_array base)
+    Driver.clear_ascends_array base;
+    Driver.clear_couples_array base)

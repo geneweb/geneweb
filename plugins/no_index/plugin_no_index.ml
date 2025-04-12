@@ -1,43 +1,45 @@
 open Geneweb
 open Config
 open Adef
+module Driver = Geneweb_db.Driver
 
 let ns = "no_index"
 
 let url_no_index conf base pwd =
-  let scratch s = Mutil.encode (Name.lower (Gwdb.sou base s)) in
+  let scratch s = Mutil.encode (Name.lower (Driver.sou base s)) in
   let get_a_person v =
     try
-      let i = Gwdb.iper_of_string (Mutil.decode v) in
+      let i = Driver.iper_of_string (Mutil.decode v) in
       let p = Util.pget conf base i in
       if
         (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
         || Util.is_hidden p
       then None
       else
-        let f = scratch (Gwdb.get_first_name p) in
-        let s = scratch (Gwdb.get_surname p) in
-        let oc = string_of_int (Gwdb.get_occ p) |> Adef.encoded in
+        let f = scratch (Driver.get_first_name p) in
+        let s = scratch (Driver.get_surname p) in
+        let oc = string_of_int (Driver.get_occ p) |> Adef.encoded in
         Some (f, s, oc)
     with Failure _ -> None
   in
   let get_a_family v =
     try
-      let i = Gwdb.ifam_of_string (Mutil.decode v) in
-      let fam = Gwdb.foi base i in
-      let p = Util.pget conf base (Gwdb.get_father fam) in
-      let f = scratch (Gwdb.get_first_name p) in
-      let s = scratch (Gwdb.get_surname p) in
+      let i = Driver.ifam_of_string (Mutil.decode v) in
+      let fam = Driver.foi base i in
+      let p = Util.pget conf base (Driver.get_father fam) in
+      let f = scratch (Driver.get_first_name p) in
+      let s = scratch (Driver.get_surname p) in
       if
         (f : Adef.encoded_string :> string) = ""
         || (s : Adef.encoded_string :> string) = ""
       then None
       else
-        let oc = string_of_int (Gwdb.get_occ p) |> Adef.encoded in
-        let u = Util.pget conf base (Gwdb.get_father fam) in
+        let oc = string_of_int (Driver.get_occ p) |> Adef.encoded in
+        let u = Util.pget conf base (Driver.get_father fam) in
         let n =
           let rec loop k =
-            if (Gwdb.get_family u).(k) = i then string_of_int k |> Adef.encoded
+            if (Driver.get_family u).(k) = i then
+              string_of_int k |> Adef.encoded
             else loop (k + 1)
           in
           loop 0

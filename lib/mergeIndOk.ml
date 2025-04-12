@@ -2,8 +2,9 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let rec merge_lists l1 = function
   | x2 :: l2 ->
@@ -11,18 +12,18 @@ let rec merge_lists l1 = function
   | [] -> l1
 
 let merge_strings base is1 sep is2 =
-  let n1 = sou base is1 in
-  let n2 = sou base is2 in
+  let n1 = Driver.sou base is1 in
+  let n2 = Driver.sou base is2 in
   if n1 = n2 then n1
   else if n1 = "" then n2
   else if n2 = "" then n1
   else n1 ^ sep ^ n2
 
 let sorp base ip =
-  let p = poi base ip in
-  ( sou base (get_first_name p),
-    sou base (get_surname p),
-    get_occ p,
+  let p = Driver.poi base ip in
+  ( Driver.sou base (Driver.get_first_name p),
+    Driver.sou base (Driver.get_surname p),
+    Driver.get_occ p,
     Update.Link,
     "" )
 
@@ -203,11 +204,13 @@ let reconstitute conf base p1 p2 =
     {
       first_name =
         field "first_name"
-          (fun p -> p_first_name base p)
+          (fun p -> Driver.p_first_name base p)
           (fun x -> x = "" || x = "?");
       surname =
-        field "surname" (fun p -> p_surname base p) (fun x -> x = "" || x = "?");
-      occ = field "number" get_occ (( = ) 0);
+        field "surname"
+          (fun p -> Driver.p_surname base p)
+          (fun x -> x = "" || x = "?");
+      occ = field "number" Driver.get_occ (( = ) 0);
       image =
         field "image"
           (fun p ->
@@ -216,61 +219,97 @@ let reconstitute conf base p1 p2 =
             | None -> "")
           (( = ) "");
       public_name =
-        field "public_name" (fun p -> sou base (get_public_name p)) (( = ) "");
-      qualifiers = list (sou base) get_qualifiers;
-      aliases = list (sou base) get_aliases;
-      first_names_aliases = list (sou base) get_first_names_aliases;
-      surnames_aliases = list (sou base) get_surnames_aliases;
-      titles = list (Futil.map_title_strings (sou base)) get_titles;
+        field "public_name"
+          (fun p -> Driver.sou base (Driver.get_public_name p))
+          (( = ) "");
+      qualifiers = list (Driver.sou base) Driver.get_qualifiers;
+      aliases = list (Driver.sou base) Driver.get_aliases;
+      first_names_aliases =
+        list (Driver.sou base) Driver.get_first_names_aliases;
+      surnames_aliases = list (Driver.sou base) Driver.get_surnames_aliases;
+      titles =
+        list (Futil.map_title_strings (Driver.sou base)) Driver.get_titles;
       rparents =
-        list (Futil.map_relation_ps (sorp base) (sou base)) get_rparents;
+        list
+          (Futil.map_relation_ps (sorp base) (Driver.sou base))
+          Driver.get_rparents;
       related = [];
       occupation =
-        field "occupation" (fun p -> sou base (get_occupation p)) (( = ) "");
-      sex = field "sex" get_sex (( = ) Neuter);
-      access = field "access" get_access (( = ) IfTitles);
-      birth = field "birth" get_birth (( = ) Date.cdate_None);
+        field "occupation"
+          (fun p -> Driver.sou base (Driver.get_occupation p))
+          (( = ) "");
+      sex = field "sex" Driver.get_sex (( = ) Neuter);
+      access = field "access" Driver.get_access (( = ) IfTitles);
+      birth = field "birth" Driver.get_birth (( = ) Date.cdate_None);
       birth_place =
-        field "birth_place" (fun p -> sou base (get_birth_place p)) (( = ) "");
+        field "birth_place"
+          (fun p -> Driver.sou base (Driver.get_birth_place p))
+          (( = ) "");
       birth_note =
-        merge_strings base (get_birth_note p1) "<br>\n" (get_birth_note p2);
-      birth_src = merge_strings base (get_birth_src p1) ", " (get_birth_src p2);
-      baptism = field "baptism" get_baptism (( = ) Date.cdate_None);
+        merge_strings base (Driver.get_birth_note p1) "<br>\n"
+          (Driver.get_birth_note p2);
+      birth_src =
+        merge_strings base (Driver.get_birth_src p1) ", "
+          (Driver.get_birth_src p2);
+      baptism = field "baptism" Driver.get_baptism (( = ) Date.cdate_None);
       baptism_place =
         field "baptism_place"
-          (fun p -> sou base (get_baptism_place p))
+          (fun p -> Driver.sou base (Driver.get_baptism_place p))
           (( = ) "");
       baptism_note =
-        merge_strings base (get_baptism_note p1) "<br>\n" (get_baptism_note p2);
+        merge_strings base
+          (Driver.get_baptism_note p1)
+          "<br>\n"
+          (Driver.get_baptism_note p2);
       baptism_src =
-        merge_strings base (get_baptism_src p1) ", " (get_baptism_src p2);
+        merge_strings base
+          (Driver.get_baptism_src p1)
+          ", "
+          (Driver.get_baptism_src p2);
       death =
-        field "death" get_death (fun x ->
+        field "death" Driver.get_death (fun x ->
             match x with DontKnowIfDead | OfCourseDead -> true | _ -> false);
       death_place =
-        field "death_place" (fun p -> sou base (get_death_place p)) (( = ) "");
+        field "death_place"
+          (fun p -> Driver.sou base (Driver.get_death_place p))
+          (( = ) "");
       death_note =
-        merge_strings base (get_death_note p1) "<br>\n" (get_death_note p2);
-      death_src = merge_strings base (get_death_src p1) ", " (get_death_src p2);
-      burial = field "burial" get_burial (( = ) UnknownBurial);
+        merge_strings base (Driver.get_death_note p1) "<br>\n"
+          (Driver.get_death_note p2);
+      death_src =
+        merge_strings base (Driver.get_death_src p1) ", "
+          (Driver.get_death_src p2);
+      burial = field "burial" Driver.get_burial (( = ) UnknownBurial);
       burial_place =
-        field "burial_place" (fun p -> sou base (get_burial_place p)) (( = ) "");
+        field "burial_place"
+          (fun p -> Driver.sou base (Driver.get_burial_place p))
+          (( = ) "");
       burial_note =
-        merge_strings base (get_burial_note p1) "<br>\n" (get_burial_note p2);
+        merge_strings base
+          (Driver.get_burial_note p1)
+          "<br>\n"
+          (Driver.get_burial_note p2);
       burial_src =
-        merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
-      pevents = list (Futil.map_pers_event (sorp base) (sou base)) get_pevents;
-      notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
-      psources = merge_strings base (get_psources p1) ", " (get_psources p2);
-      key_index = get_iper p1;
+        merge_strings base (Driver.get_burial_src p1) ", "
+          (Driver.get_burial_src p2);
+      pevents =
+        list
+          (Futil.map_pers_event (sorp base) (Driver.sou base))
+          Driver.get_pevents;
+      notes =
+        merge_strings base (Driver.get_notes p1) "<br>\n" (Driver.get_notes p2);
+      psources =
+        merge_strings base (Driver.get_psources p1) ", "
+          (Driver.get_psources p2);
+      key_index = Driver.get_iper p1;
     }
   in
   (* On fait la fusion des évènements à partir *)
   (* de la fusion des évènements principaux.   *)
   let pevents =
     merge_primary_events
-      (Futil.map_pers_event (sorp base) (sou base))
-      get_pevents p
+      (Futil.map_pers_event (sorp base) (Driver.sou base))
+      Driver.get_pevents p
   in
   { p with pevents }
 
@@ -278,7 +317,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
   let p_related, mod_p =
     List.fold_right
       (fun ipc (p_related, mod_p) ->
-        let pc = poi base ipc in
+        let pc = Driver.poi base ipc in
         let pc_rparents, _, p_related, mod_p =
           List.fold_right
             (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
@@ -305,7 +344,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                 | _ -> (r, mod_pc, p_related, mod_p)
               in
               (r :: pc_rparents, mod_pc, p_related, mod_p))
-            (get_rparents pc)
+            (Driver.get_rparents pc)
             ([], false, p_related, mod_p)
         in
         let pc_pevents, mod_pc, p_related, mod_p =
@@ -329,20 +368,20 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                 (e, true, p_related, mod_p)
               in
               (e :: pc_pevents, mod_pc, p_related, mod_p))
-            (get_pevents pc)
+            (Driver.get_pevents pc)
             ([], false, p_related, mod_p)
         in
         (* TODO mod_pc = True tout le temps *)
         (if mod_pc then
-         let pc = gen_person_of_person pc in
+         let pc = Driver.gen_person_of_person pc in
          let pc = { pc with rparents = pc_rparents; pevents = pc_pevents } in
-         patch_person base ipc pc);
+         Driver.patch_person base ipc pc);
         let p_related, mod_p =
           let rec loop (p_related, mod_p) i =
-            if i = Array.length (get_family pc) then (p_related, mod_p)
+            if i = Array.length (Driver.get_family pc) then (p_related, mod_p)
             else
-              let ifam = (get_family pc).(i) in
-              let fam = gen_family_of_family (foi base ifam) in
+              let ifam = (Driver.get_family pc).(i) in
+              let fam = Driver.gen_family_of_family (Driver.foi base ifam) in
               let p_related, mod_p =
                 if Array.mem ip2 fam.witnesses then (
                   let p_related, mod_p =
@@ -360,7 +399,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                     in
                     loop (p_related, mod_p) 0
                   in
-                  patch_family base ifam fam;
+                  Driver.patch_family base ifam fam;
                   (p_related, mod_p))
                 else (p_related, mod_p)
               in
@@ -395,7 +434,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                 (* TODO mod_pc = True tout le temps *)
                 if mod_pc then
                   let fam = { fam with fevents = pc_fevents } in
-                  patch_family base ifam fam
+                  Driver.patch_family base ifam fam
               in
               loop (p_related, mod_p) (i + 1)
           in
@@ -409,34 +448,34 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
 let redirect_added_families base p ip2 p2_family =
   for i = 0 to Array.length p2_family - 1 do
     let ifam = p2_family.(i) in
-    let fam = foi base ifam in
+    let fam = Driver.foi base ifam in
     let cpl =
-      if ip2 = get_father fam then (
+      if ip2 = Driver.get_father fam then (
         Array.iter
           (fun ip ->
-            let w = poi base ip in
-            if not (List.mem p.key_index (get_related w)) then
-              let w = gen_person_of_person w in
+            let w = Driver.poi base ip in
+            if not (List.mem p.key_index (Driver.get_related w)) then
+              let w = Driver.gen_person_of_person w in
               let w = { w with related = p.key_index :: w.related } in
-              patch_person base ip w)
-          (get_witnesses fam);
+              Driver.patch_person base ip w)
+          (Driver.get_witnesses fam);
         List.iter
           (fun evt ->
             Array.iter
               (fun (ip, _) ->
-                let w = poi base ip in
-                if not (List.mem p.key_index (get_related w)) then
-                  let w = gen_person_of_person w in
+                let w = Driver.poi base ip in
+                if not (List.mem p.key_index (Driver.get_related w)) then
+                  let w = Driver.gen_person_of_person w in
                   let w = { w with related = p.key_index :: w.related } in
-                  patch_person base ip w)
+                  Driver.patch_person base ip w)
               evt.efam_witnesses)
-          (get_fevents fam);
-        Gutil.couple false p.key_index (get_mother fam))
-      else if ip2 = get_mother fam then
-        Gutil.couple false (get_father fam) p.key_index
+          (Driver.get_fevents fam);
+        Gutil.couple false p.key_index (Driver.get_mother fam))
+      else if ip2 = Driver.get_mother fam then
+        Gutil.couple false (Driver.get_father fam) p.key_index
       else assert false
     in
-    patch_couple base ifam cpl
+    Driver.patch_couple base ifam cpl
   done
 
 let merge_carrousel conf base o_p1 o_p2 p =
@@ -470,12 +509,12 @@ let merge_carrousel conf base o_p1 o_p2 p =
   let ofn = p.first_name in
   let osn = p.surname in
   let oocc = p.occ in
-  let ofn1 = sou base (get_first_name o_p1) in
-  let osn1 = sou base (get_surname o_p1) in
-  let oocc1 = get_occ o_p1 in
-  let ofn2 = sou base (get_first_name o_p2) in
-  let osn2 = sou base (get_surname o_p2) in
-  let oocc2 = get_occ o_p2 in
+  let ofn1 = Driver.sou base (Driver.get_first_name o_p1) in
+  let osn1 = Driver.sou base (Driver.get_surname o_p1) in
+  let oocc1 = Driver.get_occ o_p1 in
+  let ofn2 = Driver.sou base (Driver.get_first_name o_p2) in
+  let osn2 = Driver.sou base (Driver.get_surname o_p2) in
+  let oocc2 = Driver.get_occ o_p2 in
   let dir0 = Printf.sprintf "%s.%d.%s" ofn oocc osn in
   let dir1 = Printf.sprintf "%s.%d.%s" ofn1 oocc1 osn1 in
   let dir2 = Printf.sprintf "%s.%d.%s" ofn2 oocc2 osn2 in
@@ -510,9 +549,9 @@ let merge_carrousel conf base o_p1 o_p2 p =
 
 let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let conf = Update.update_conf o_conf in
-  let p_family = get_family (poi base sp.key_index) in
-  let p2_family = get_family (poi base o_p2.key_index) in
-  let db = Gwdb.read_nldb base in
+  let p_family = Driver.get_family (Driver.poi base sp.key_index) in
+  let p2_family = Driver.get_family (Driver.poi base o_p2.key_index) in
+  let db = Driver.read_nldb base in
   let ofn1 = o_p1.first_name in
   let osn1 = o_p1.surname in
   let oocc1 = o_p1.occ in
@@ -533,21 +572,25 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   in
   redirect_added_families base p o_p2.key_index p2_family;
   UpdateIndOk.effective_del_no_commit base o_p2;
-  patch_person base p.key_index p;
-  let new_key = (sou base p.first_name, sou base p.surname, p.occ) in
+  Driver.patch_person base p.key_index p;
+  let new_key =
+    (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
+  in
   if
     (not (String.equal ofn1 sp.first_name && String.equal osn1 sp.surname))
     || oocc1 <> sp.occ
   then Notes.update_ind_key conf base pgl1 key1 new_key;
   Notes.update_ind_key conf base pgl2 key2 new_key;
   let u = { family = Array.append p_family p2_family } in
-  if p2_family <> [||] then patch_union base p.key_index u;
+  if p2_family <> [||] then Driver.patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
     (Update.def_error conf base)
     [ p.key_index ];
   let wl =
-    let a = poi base p.key_index in
-    let a = { parents = get_parents a; consang = get_consang a } in
+    let a = Driver.poi base p.key_index in
+    let a =
+      { parents = Driver.get_parents a; consang = Driver.get_consang a }
+    in
     UpdateIndOk.all_checks_person base p a u
   in
   Util.commit_patches conf base;

@@ -1,12 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def
-open Gwdb
 
 let designation base p =
-  let first_name = p_first_name base p in
-  let nom = p_surname base p in
-  first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom
+  let first_name = Driver.p_first_name base p in
+  let nom = Driver.p_surname base p in
+  first_name ^ "." ^ string_of_int (Driver.get_occ p) ^ " " ^ nom
 
 let father = Adef.father
 let mother = Adef.mother
@@ -17,16 +16,20 @@ let couple multi fath moth =
 let parent_array = Adef.parent_array
 
 let spouse ip cpl =
-  if ip = get_father cpl then get_mother cpl else get_father cpl
+  if ip = Driver.get_father cpl then Driver.get_mother cpl
+  else Driver.get_father cpl
 
 let person_is_key base p k =
   let k = Name.crush_lower k in
-  if k = Name.crush_lower (p_first_name base p ^ " " ^ p_surname base p) then
-    true
+  if
+    k
+    = Name.crush_lower
+        (Driver.p_first_name base p ^ " " ^ Driver.p_surname base p)
+  then true
   else if
     List.exists
       (fun x -> k = Name.crush_lower x)
-      (person_misc_names base p get_titles)
+      (Driver.person_misc_names base p Driver.get_titles)
   then true
   else false
 
@@ -61,7 +64,7 @@ let person_of_string_key base s =
   let rec loop i =
     match split_key s i with
     | Some (i, first_name, occ, surname) -> (
-        match person_of_key base first_name surname occ with
+        match Driver.person_of_key base first_name surname occ with
         | Some ip -> Some ip
         | None -> loop (i + 1))
     | None -> None
@@ -84,14 +87,15 @@ let rsplit_key s =
 
 let person_of_string_dot_key base s =
   match rsplit_key s with
-  | Some (first_name, occ, surname) -> person_of_key base first_name surname occ
+  | Some (first_name, occ, surname) ->
+      Driver.person_of_key base first_name surname occ
   | None -> None
 
 let person_not_a_key_find_all base s =
-  let ipl = persons_of_name base s in
+  let ipl = Driver.persons_of_name base s in
   let rec select = function
     | ip :: ipl ->
-        if person_is_key base (poi base ip) s then
+        if person_is_key base (Driver.poi base ip) s then
           let ipl = select ipl in
           if List.mem ip ipl then ipl else ip :: ipl
         else select ipl
@@ -105,23 +109,23 @@ let person_ht_find_all base s =
   | None -> person_not_a_key_find_all base s
 
 let find_same_name base p =
-  let f = p_first_name base p in
-  let s = p_surname base p in
+  let f = Driver.p_first_name base p in
+  let s = Driver.p_surname base p in
   let ipl = person_ht_find_all base (f ^ " " ^ s) in
   let f = Name.strip_lower f in
   let s = Name.strip_lower s in
   let pl =
     List.fold_left
       (fun pl ip ->
-        let p = poi base ip in
+        let p = Driver.poi base ip in
         if
-          Name.strip_lower (p_first_name base p) = f
-          && Name.strip_lower (p_surname base p) = s
+          Name.strip_lower (Driver.p_first_name base p) = f
+          && Name.strip_lower (Driver.p_surname base p) = s
         then p :: pl
         else pl)
       [] ipl
   in
-  List.sort (fun p1 p2 -> compare (get_occ p1) (get_occ p2)) pl
+  List.sort (fun p1 p2 -> compare (Driver.get_occ p1) (Driver.get_occ p2)) pl
 
 let trim_trailing_spaces s =
   let len = String.length s in
@@ -217,25 +221,27 @@ let arg_list_of_string line =
 
 let sort_person_list_aux sort base =
   let default p1 p2 =
-    match alphabetic (p_surname base p1) (p_surname base p2) with
+    match alphabetic (Driver.p_surname base p1) (Driver.p_surname base p2) with
     | 0 -> (
-        match alphabetic (p_first_name base p1) (p_first_name base p2) with
+        match
+          alphabetic (Driver.p_first_name base p1) (Driver.p_first_name base p2)
+        with
         | 0 -> (
-            match compare (get_occ p1) (get_occ p2) with
-            | 0 -> compare (get_iper p1) (get_iper p2)
+            match compare (Driver.get_occ p1) (Driver.get_occ p2) with
+            | 0 -> compare (Driver.get_iper p1) (Driver.get_iper p2)
             | c -> c)
         | c -> c)
     | c -> c
   in
   sort (fun p1 p2 ->
-      if get_iper p1 = get_iper p2 then 0
+      if Driver.get_iper p1 = Driver.get_iper p2 then 0
       else
         match
           match
-            ( Date.od_of_cdate (get_birth p1),
-              get_death p1,
-              Date.od_of_cdate (get_birth p2),
-              get_death p2 )
+            ( Date.od_of_cdate (Driver.get_birth p1),
+              Driver.get_death p1,
+              Date.od_of_cdate (Driver.get_birth p2),
+              Driver.get_death p2 )
           with
           | Some d1, _, Some d2, _ -> Date.compare_date d1 d2
           | Some d1, _, _, Death (_, d2) ->
@@ -257,18 +263,18 @@ let sort_person_list = sort_person_list_aux List.sort
 let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
 
 let find_free_occ base f s =
-  let ipl = persons_of_name base (f ^ " " ^ s) in
+  let ipl = Driver.persons_of_name base (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in
   let list_occ =
     let rec loop list = function
       | ip :: ipl ->
-          let p = poi base ip in
+          let p = Driver.poi base ip in
           if
-            (not (List.mem (get_occ p) list))
-            && first_name = Name.lower (p_first_name base p)
-            && surname = Name.lower (p_surname base p)
-          then loop (get_occ p :: list) ipl
+            (not (List.mem (Driver.get_occ p) list))
+            && first_name = Name.lower (Driver.p_first_name base p)
+            && surname = Name.lower (Driver.p_surname base p)
+          then loop (Driver.get_occ p :: list) ipl
           else loop list ipl
       | [] -> list
     in
@@ -283,15 +289,15 @@ let find_free_occ base f s =
 
 let get_birth_death_date p =
   let birth_date, approx =
-    match Date.od_of_cdate (get_birth p) with
-    | None -> (Date.od_of_cdate (get_baptism p), true)
+    match Date.od_of_cdate (Driver.get_birth p) with
+    | None -> (Date.od_of_cdate (Driver.get_baptism p), true)
     | x -> (x, false)
   in
   let death_date, approx =
-    match Date.date_of_death (get_death p) with
+    match Date.date_of_death (Driver.get_death p) with
     | Some d -> (Some d, approx)
     | None -> (
-        match get_burial p with
+        match Driver.get_burial p with
         | Buried cd | Cremated cd -> (Date.od_of_cdate cd, true)
         | UnknownBurial -> (None, approx))
   in

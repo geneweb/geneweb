@@ -2,18 +2,19 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let digest_children base ipl =
   List.fold_left
     (fun _s ip ->
-      let p = poi base ip in
-      sou base (get_first_name p)
+      let p = Driver.poi base ip in
+      Driver.sou base (Driver.get_first_name p)
       ^ "\n"
-      ^ sou base (get_surname p)
+      ^ Driver.sou base (Driver.get_surname p)
       ^ "\n"
-      ^ string_of_int (get_occ p)
+      ^ string_of_int (Driver.get_occ p)
       ^ "\n")
     "" ipl
   |> Mutil.digest
@@ -23,44 +24,46 @@ let check_digest conf digest =
   | Some ini_digest -> if digest <> ini_digest then Update.error_digest conf
   | None -> ()
 
-exception ChangeChildrenConflict of person * person
-exception FirstNameMissing of iper
+exception ChangeChildrenConflict of Driver.person * Driver.person
+exception FirstNameMissing of Driver.iper
 
 let check_conflict base p key new_occ ipl =
   let name = Name.lower key in
   List.iter
     (fun ip ->
-      let p1 = poi base ip in
+      let p1 = Driver.poi base ip in
       if
-        get_iper p1 <> get_iper p
-        && Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) = name
-        && get_occ p1 = new_occ
+        Driver.get_iper p1 <> Driver.get_iper p
+        && Name.lower
+             (Driver.p_first_name base p1 ^ " " ^ Driver.p_surname base p1)
+           = name
+        && Driver.get_occ p1 = new_occ
       then raise @@ ChangeChildrenConflict (p, p1))
     ipl
 
 let change_child conf base parent_surname changed ip =
-  let p = poi base ip in
-  let var = "c" ^ string_of_iper (get_iper p) in
+  let p = Driver.poi base ip in
+  let var = "c" ^ Driver.string_of_iper (Driver.get_iper p) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
     | Some x -> only_printable x
-    | _ -> p_first_name base p
+    | _ -> Driver.p_first_name base p
   in
   let new_surname =
     match p_getenv conf.env (var ^ "_surname") with
     | Some x ->
         let x = only_printable x in
         if x = "" then parent_surname else x
-    | _ -> p_surname base p
+    | _ -> Driver.p_surname base p
   in
   let new_occ =
     match p_getint conf.env (var ^ "_occ") with Some x -> x | _ -> 0
   in
   if new_first_name = "" then raise (FirstNameMissing ip)
   else if
-    new_first_name <> p_first_name base p
-    || new_surname <> p_surname base p
-    || new_occ <> get_occ p
+    new_first_name <> Driver.p_first_name base p
+    || new_surname <> Driver.p_surname base p
+    || new_occ <> Driver.get_occ p
   then (
     let key = new_first_name ^ " " ^ new_surname in
     let ipl = Gutil.person_ht_find_all base key in
@@ -70,19 +73,22 @@ let change_child conf base parent_surname changed ip =
     (* On ajoute les enfants dans le type Change_children_name       *)
     (* pour la future mise à jour de l'historique et du fichier gwf. *)
     let changed =
-      ( (p_first_name base p, p_surname base p, get_occ p, ip),
+      ( ( Driver.p_first_name base p,
+          Driver.p_surname base p,
+          Driver.get_occ p,
+          ip ),
         (new_first_name, new_surname, new_occ, ip) )
       :: changed
     in
     let p =
       {
-        (gen_person_of_person p) with
-        first_name = Gwdb.insert_string base new_first_name;
-        surname = Gwdb.insert_string base new_surname;
+        (Driver.gen_person_of_person p) with
+        first_name = Driver.insert_string base new_first_name;
+        surname = Driver.insert_string base new_surname;
         occ = new_occ;
       }
     in
-    patch_person base ip p;
+    Driver.patch_person base ip p;
     changed)
   else changed
 

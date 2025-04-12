@@ -1,17 +1,18 @@
 open Geneweb
 open Config
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let ns = "export"
 
 module IPS = Set.Make (struct
-  type t = Gwdb.iper
+  type t = Driver.iper
 
   let compare = compare
 end)
 
 module IFS = Set.Make (struct
-  type t = Gwdb.ifam
+  type t = Driver.ifam
 
   let compare = compare
 end)
@@ -39,7 +40,7 @@ let export conf base =
   | Some output ->
       Mutil.verbose := false;
       let find_iper i =
-        getenv ("i" ^ string_of_int i) conf.env |> Gwdb.iper_of_string
+        getenv ("i" ^ string_of_int i) conf.env |> Driver.iper_of_string
       in
       let find_npoc i =
         let n = getenv ("n" ^ string_of_int i) conf.env in
@@ -49,7 +50,7 @@ let export conf base =
           | None -> 0
           | Some i -> int_of_string i
         in
-        match Gwdb.person_of_key base p n oc with
+        match Geneweb_db.Driver.person_of_key base p n oc with
         | None -> raise Not_found
         | Some i -> i
       in
@@ -59,7 +60,7 @@ let export conf base =
       in
       let ini = loop IPS.empty 1 in
       let fname =
-        Gwdb.bname base ^ match output with `ged -> ".ged" | `gw -> ".gw"
+        Driver.bname base ^ match output with `ged -> ".ged" | `gw -> ".gw"
       in
       let ipers =
         if getenv_opt "spouses" conf.env = Some "on" then
@@ -67,9 +68,9 @@ let export conf base =
             (fun iper acc ->
               Array.fold_left
                 (fun acc ifam ->
-                  IPS.add (Gutil.spouse iper @@ foi base ifam) acc)
+                  IPS.add (Gutil.spouse iper @@ Driver.foi base ifam) acc)
                 acc
-                (get_family (poi base iper)))
+                (Driver.get_family (Driver.poi base iper)))
             ini ini
         else ini
       in
@@ -77,11 +78,12 @@ let export conf base =
         if getenv_opt "parents" conf.env = Some "on" then
           IPS.fold
             (fun iper acc ->
-              match get_parents (poi base iper) with
+              match Driver.get_parents (Driver.poi base iper) with
               | None -> acc
               | Some ifam ->
-                  let fam = foi base ifam in
-                  IPS.add (get_father fam) (IPS.add (get_mother fam) acc))
+                  let fam = Driver.foi base ifam in
+                  IPS.add (Driver.get_father fam)
+                    (IPS.add (Driver.get_mother fam) acc))
             ini ipers
         else ipers
       in
@@ -94,9 +96,9 @@ let export conf base =
                   Array.fold_left
                     (fun acc iper -> IPS.add iper acc)
                     acc
-                    (get_children @@ foi base ifam))
+                    (Driver.get_children @@ Driver.foi base ifam))
                 acc
-                (get_family (poi base iper)))
+                (Driver.get_family (Driver.poi base iper)))
             ini ipers
         else ipers
       in
@@ -107,11 +109,14 @@ let export conf base =
               (fun acc ifam ->
                 if
                   IFS.mem ifam acc
-                  || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+                  || not
+                       (IPS.mem
+                          (Gutil.spouse iper @@ Driver.foi base ifam)
+                          ipers)
                 then acc
                 else IFS.add ifam acc)
               acc
-              (get_family (poi base iper)))
+              (Driver.get_family (Driver.poi base iper)))
           ipers IFS.empty
       in
       let no_notes =

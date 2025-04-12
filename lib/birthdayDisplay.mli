@@ -1,9 +1,13 @@
 val gen_print :
   Config.config ->
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   int ->
   (unit ->
-  Gwdb.person * (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string)) ->
+  Geneweb_db.Driver.person
+  * (Config.config ->
+    Geneweb_db.Driver.base ->
+    Geneweb_db.Driver.person ->
+    Adef.safe_string)) ->
   bool ->
   unit
 (** [gen_print conf base month (next,txt_of) dead_people] displays anniversaries
@@ -13,20 +17,24 @@ val gen_print :
     [next] is function that returns next person from iterator
     and [txt_of] text/link that describes person's information *)
 
-val print_birth : Config.config -> Gwdb.base -> int -> unit
+val print_birth : Config.config -> Geneweb_db.Driver.base -> int -> unit
 (** Displays birthdays for alive people for a given month *)
 
-val print_dead : Config.config -> Gwdb.base -> int -> unit
+val print_dead : Config.config -> Geneweb_db.Driver.base -> int -> unit
 (** Displays anniversaries for dead people for a given month *)
 
-val print_marriage : Config.config -> Gwdb.base -> int -> unit
+val print_marriage : Config.config -> Geneweb_db.Driver.base -> int -> unit
 (** Displays marriage anniversaries for a given month *)
 
 val gen_print_menu_birth :
   Config.config ->
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   (unit ->
-  Gwdb.person * (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string)) ->
+  Geneweb_db.Driver.person
+  * (Config.config ->
+    Geneweb_db.Driver.base ->
+    Geneweb_db.Driver.person ->
+    Adef.safe_string)) ->
   (unit -> unit) ->
   unit
 (** [gen_print_menu_birth conf base (next,txt_of) mode] displays the main birthdays menu for alive people
@@ -38,14 +46,18 @@ val gen_print_menu_birth :
     [next] is function that returns next person from iterator, [txt_of] text/link that
     describes person's information and [mode] that add some additional hidden inputs in the month form *)
 
-val print_menu_birth : Config.config -> Gwdb.base -> unit
+val print_menu_birth : Config.config -> Geneweb_db.Driver.base -> unit
 (** Displays the main birthdays menu considering all alive people *)
 
 val gen_print_menu_dead :
   Config.config ->
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   (unit ->
-  Gwdb.person * (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string)) ->
+  Geneweb_db.Driver.person
+  * (Config.config ->
+    Geneweb_db.Driver.base ->
+    Geneweb_db.Driver.person ->
+    Adef.safe_string)) ->
   (unit -> unit) ->
   unit
 (** [gen_print_menu_dead conf base (next,txt_of) mode] displays the main anniversaries menu for dead people
@@ -57,10 +69,10 @@ val gen_print_menu_dead :
     [next] is function that returns next person from iterator, [txt_of] text/link that
     describes person's information and [mode] that add some additional hidden inputs in the month form *)
 
-val print_menu_dead : Config.config -> Gwdb.base -> unit
+val print_menu_dead : Config.config -> Geneweb_db.Driver.base -> unit
 (** Displays the main anniversaries menu considering all dead people *)
 
-val print_menu_marriage : Config.config -> Gwdb.base -> unit
+val print_menu_marriage : Config.config -> Geneweb_db.Driver.base -> unit
 (** Displays the main wedding anniversaries menu *)
 
 val print_anniversaries : Config.config -> unit

@@ -1,7 +1,6 @@
 (* Copyright (c) 2007-2008 INRIA *)
 
 open Def
-open Gwdb
 
 val rgpd_dir : string ref
 (** Fonctionnement RGPD *)
@@ -19,7 +18,9 @@ type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
     (only key elements provided) or definition (all information provided). *)
 type somebody =
   | Undefined of key  (** Reference to person *)
-  | Defined of (iper, iper, string) gen_person  (** Person's definition *)
+  | Defined of
+      (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) gen_person
+      (** Person's definition *)
 
 (** Blocks that could appear in .gw file. *)
 type gw_syntax =
@@ -36,8 +37,12 @@ type gw_syntax =
         * string
         * (somebody * sex * witness_kind) list)
         list
-      * ((iper, iper, string) gen_person, ifam, string) gen_family
-      * (iper, iper, string) gen_person gen_descend
+      * ( (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) gen_person,
+          Geneweb_db.Driver.ifam,
+          string )
+        gen_family
+      * (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) gen_person
+        gen_descend
       (** Family definition block. Contains:
       - Family couple (father's and mother's definition/reference)
       - Father's sex

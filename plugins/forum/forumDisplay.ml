@@ -5,6 +5,7 @@ open Config
 open Def
 open Util
 open Forum
+module Gutil = Geneweb_db.Gutil
 
 type 'a env =
   | Vmess of message * message option * MF.pos * MF.pos * string option

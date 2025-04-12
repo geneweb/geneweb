@@ -3,9 +3,10 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 module Ast = Geneweb_templ.Ast
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 (* S: Fail if conf.bname is undefined? *)
 let file_name conf = Filename.concat (Util.bpath conf.bname) "history"
@@ -53,10 +54,14 @@ let diff_visibility conf base op np =
   let k = slash_name_of_key np.first_name np.surname np.occ in
   let empty_union = { family = [||] } in
   let empty_ascend = { parents = None; consang = Adef.fix (-1) } in
-  let op = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op in
-  let np = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np in
-  let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
-  let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
+  let op = Futil.map_person_ps (fun p -> p) (Driver.insert_string base) op in
+  let np = Futil.map_person_ps (fun p -> p) (Driver.insert_string base) np in
+  let o_p =
+    Geneweb_db.Driver.person_of_gen_person base (op, empty_ascend, empty_union)
+  in
+  let n_p =
+    Geneweb_db.Driver.person_of_gen_person base (np, empty_ascend, empty_union)
+  in
   let tmp_conf = { conf with wizard = false; friend = false } in
   let old_visibility = Util.authorized_age tmp_conf base o_p in
   let new_visibility = Util.authorized_age tmp_conf base n_p in
@@ -66,7 +71,8 @@ let diff_visibility conf base op np =
 
 type kind_diff =
   | Diff_person of
-      (iper, iper, string) gen_person * (iper, iper, string) gen_person
+      (Driver.iper, Driver.iper, string) gen_person
+      * (Driver.iper, Driver.iper, string) gen_person
   | Diff_string of (string * string * int) * (string * string * int)
 
 (* ********************************************************************** *)
@@ -180,7 +186,7 @@ let notify_change conf base changed action =
           | U_Change_children_name (p, _)
           | U_Multi (_, p, _) ->
               let key = slash_name_of_key p.first_name p.surname p.occ in
-              [| key; string_of_iper p.key_index |]
+              [| key; Driver.string_of_iper p.key_index |]
           | U_Notes (Some num, file) -> [| file; string_of_int num |]
           | U_Notes (None, file) -> [| file |]
         in
@@ -316,9 +322,9 @@ let record conf base changed action =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                         *)
 let notify conf base action =
-  let empty_person = Gwdb.empty_person base Gwdb.dummy_iper in
+  let empty_person = Driver.empty_person base Driver.dummy_iper in
   let empty_person =
-    Util.string_gen_person base (gen_person_of_person empty_person)
+    Util.string_gen_person base (Driver.gen_person_of_person empty_person)
   in
   notify_change conf base (U_Multi (empty_person, empty_person, false)) action
 
@@ -345,7 +351,10 @@ let line_fields line =
     Some (time, user, action, key)
   else None
 
-type hist_item = HI_notes of string * int option | HI_ind of person | HI_none
+type hist_item =
+  | HI_notes of string * int option
+  | HI_ind of Driver.person
+  | HI_none
 
 type 'a env =
   | Vcnt of int ref
@@ -374,7 +383,7 @@ let rec eval_var conf base env _ _ = function
       | _ -> VVstring "")
   | [ "first_name" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (p_first_name base p)
+      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (Driver.p_first_name base p)
       | _ -> VVstring "")
   | [ "found" ] -> (
       match get_env "search" env with
@@ -416,7 +425,8 @@ let rec eval_var conf base env _ _ = function
       | _ -> raise Not_found)
   | [ "occ" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (string_of_int (get_occ p))
+      | Vinfo (_, _, _, HI_ind p, _) ->
+          VVstring (string_of_int (Driver.get_occ p))
       | _ -> VVstring "")
   | "person" :: sl -> (
       match get_env "info" env with
@@ -434,7 +444,7 @@ let rec eval_var conf base env _ _ = function
       | _ -> VVstring "")
   | [ "surname" ] -> (
       match get_env "info" env with
-      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (p_surname base p)
+      | Vinfo (_, _, _, HI_ind p, _) -> VVstring (Driver.p_surname base p)
       | _ -> VVstring "")
   | [ "time" ] -> (
       match get_env "info" env with
@@ -466,23 +476,23 @@ and eval_person_field_var conf base env p = function
   | [ "access" ] -> safe_val (Util.acces conf base p :> Adef.safe_string)
   | [ "dates" ] -> safe_val (DateDisplay.short_dates_text conf base p)
   | [ "has_history" ] ->
-      let fn = sou base (get_first_name p) in
-      let sn = sou base (get_surname p) in
-      let occ = get_occ p in
+      let fn = Driver.sou base (Driver.get_first_name p) in
+      let sn = Driver.sou base (Driver.get_surname p) in
+      let occ = Driver.get_occ p in
       let person_file = HistoryDiff.history_file fn sn occ in
       VVbool (Sys.file_exists (HistoryDiff.history_path conf person_file))
   | [ "history_file" ] ->
-      let fn = sou base (get_first_name p) in
-      let sn = sou base (get_surname p) in
-      let occ = get_occ p in
+      let fn = Driver.sou base (Driver.get_first_name p) in
+      let sn = Driver.sou base (Driver.get_surname p) in
+      let occ = Driver.get_occ p in
       VVstring (HistoryDiff.history_file fn sn occ)
   | [ "is_invisible" ] ->
       let conf = { conf with wizard = false; friend = false } in
       VVbool (not (Util.authorized_age conf base p))
-  | [ "is_public" ] -> VVbool (get_access p = Public)
-  | [ "is_semi_public" ] -> VVbool (get_access p = SemiPublic)
-  | [ "is_private" ] -> VVbool (get_access p = Private)
-  | [ "has_titles" ] -> VVbool (get_titles p <> [])
+  | [ "is_public" ] -> VVbool (Driver.get_access p = Public)
+  | [ "is_semi_public" ] -> VVbool (Driver.get_access p = SemiPublic)
+  | [ "is_private" ] -> VVbool (Driver.get_access p = Private)
+  | [ "has_titles" ] -> VVbool (Driver.get_titles p <> [])
   | [ "access_status" ] -> VVstring (Util.access_status p)
   | [ "title" ] -> safe_val (person_title conf base p)
   | [] ->

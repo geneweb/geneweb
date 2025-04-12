@@ -1,8 +1,9 @@
 open Def
 open Config
-open Gwdb
 open Util
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let default_max_cnt = Alln.default_max_cnt
 
@@ -46,7 +47,7 @@ let print_title conf base is_surnames ini len =
     Output.print_string conf (Util.escape_html ini))
   else (
     Output.print_sstring conf " (";
-    let num_persons = Gwdb.nb_of_real_persons base in
+    let num_persons = Driver.nb_of_real_persons base in
     Output.print_sstring conf (format_with_thousand_sep conf num_persons);
     Output.print_sstring conf " ";
     Output.print_sstring conf
@@ -226,7 +227,7 @@ let print_frequency_any conf base is_surnames list len =
   Hutil.trailer conf
 
 let print_frequency conf base is_surnames =
-  let () = load_strings_array base in
+  let () = Driver.load_strings_array base in
   let list, len = Alln.select_names conf base is_surnames "" max_int in
   let list = Alln.groupby_count list in
   print_frequency_any conf base is_surnames list len
@@ -235,7 +236,7 @@ let print_alphabetic conf base is_surnames =
   let ini = match p_getenv conf.env "k" with Some k -> k | _ -> "" in
   if List.assoc_opt "fast_alphabetic" conf.base_env = Some "yes" && ini = ""
   then (
-    load_strings_array base;
+    Driver.load_strings_array base;
     let list = Alln.first_letters base is_surnames in
     let list = List.sort Gutil.alphabetic_order list in
     print_alphabetic_big conf base is_surnames ini list 1 true)
@@ -243,7 +244,7 @@ let print_alphabetic conf base is_surnames =
     let all =
       match p_getenv conf.env "o" with Some "A" -> true | _ -> false
     in
-    if String.length ini < 2 then load_strings_array base;
+    if String.length ini < 2 then Driver.load_strings_array base;
     let list, len =
       Alln.select_names conf base is_surnames ini (if all then max_int else 50)
     in
@@ -308,7 +309,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
 
 let print_short conf base is_surnames =
   let ini = match p_getenv conf.env "k" with Some k -> k | _ -> "" in
-  let _ = if String.length ini < 2 then load_strings_array base in
+  let _ = if String.length ini < 2 then Driver.load_strings_array base in
   match Alln.select_names conf base is_surnames ini max_int with
   | Alln.Specify _, _ -> Hutil.incorrect_request conf
   | Alln.Result list, len ->

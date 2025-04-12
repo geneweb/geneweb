@@ -1,26 +1,28 @@
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Gutil = Geneweb_db.Gutil
 
 type stats = {
   mutable men : int;
   mutable women : int;
   mutable neutre : int;
   mutable noname : int;
-  mutable oldest_father : int * person;
-  mutable oldest_mother : int * person;
-  mutable youngest_father : int * person;
-  mutable youngest_mother : int * person;
-  mutable oldest_dead : int * person;
-  mutable oldest_still_alive : int * person;
+  mutable oldest_father : int * Driver.person;
+  mutable oldest_mother : int * Driver.person;
+  mutable youngest_father : int * Driver.person;
+  mutable youngest_mother : int * Driver.person;
+  mutable oldest_dead : int * Driver.person;
+  mutable oldest_still_alive : int * Driver.person;
 }
 
 let birth_year p =
-  match Date.cdate_to_dmy_opt (get_birth p) with
+  match Date.cdate_to_dmy_opt (Driver.get_birth p) with
   | Some { year; prec = Sure; _ } -> Some year
   | Some _ | None -> None
 
 let death_year current_year p =
-  match get_death p with
+  match Driver.get_death p with
   | Death (_, d) -> (
       match Date.cdate_to_dmy_opt d with
       | Some { year = y; prec = Sure; _ } -> Some y
@@ -29,46 +31,48 @@ let death_year current_year p =
   | _ -> None
 
 let update_stats base current_year s p =
-  (match get_sex p with
+  (match Driver.get_sex p with
   | Male -> s.men <- s.men + 1
   | Female -> s.women <- s.women + 1
   | Neuter -> s.neutre <- s.neutre + 1);
-  if is_quest_string (get_first_name p) && is_quest_string (get_surname p) then
-    s.noname <- s.noname + 1;
+  if
+    Driver.is_quest_string (Driver.get_first_name p)
+    && Driver.is_quest_string (Driver.get_surname p)
+  then s.noname <- s.noname + 1;
   (match (birth_year p, death_year current_year p) with
   | Some y1, Some y2 ->
       let age = y2 - y1 in
-      if age > fst s.oldest_dead && get_death p <> NotDead then
+      if age > fst s.oldest_dead && Driver.get_death p <> NotDead then
         s.oldest_dead <- (age, p);
-      if age > fst s.oldest_still_alive && get_death p = NotDead then
+      if age > fst s.oldest_still_alive && Driver.get_death p = NotDead then
         s.oldest_still_alive <- (age, p)
   | _ -> ());
-  match (birth_year p, get_parents p) with
+  match (birth_year p, Driver.get_parents p) with
   | Some y2, Some ifam -> (
-      let cpl = foi base ifam in
-      (match birth_year (poi base (get_father cpl)) with
+      let cpl = Driver.foi base ifam in
+      (match birth_year (Driver.poi base (Driver.get_father cpl)) with
       | Some y1 ->
           let age = y2 - y1 in
           if age > fst s.oldest_father then
-            s.oldest_father <- (age, poi base (get_father cpl));
+            s.oldest_father <- (age, Driver.poi base (Driver.get_father cpl));
           if age < fst s.youngest_father then
-            s.youngest_father <- (age, poi base (get_father cpl))
+            s.youngest_father <- (age, Driver.poi base (Driver.get_father cpl))
       | _ -> ());
-      match birth_year (poi base (get_mother cpl)) with
+      match birth_year (Driver.poi base (Driver.get_mother cpl)) with
       | Some y1 ->
           let age = y2 - y1 in
           if age > fst s.oldest_mother then
-            s.oldest_mother <- (age, poi base (get_mother cpl));
+            s.oldest_mother <- (age, Driver.poi base (Driver.get_mother cpl));
           if age < fst s.youngest_mother then
-            s.youngest_mother <- (age, poi base (get_mother cpl))
+            s.youngest_mother <- (age, Driver.poi base (Driver.get_mother cpl))
       | _ -> ())
   | _ -> ()
 
-let stat_base : base -> stats =
+let stat_base : Geneweb_db.Driver.base -> stats =
  fun base ->
   let s =
-    let y = (1000, poi base Gwdb.dummy_iper) in
-    let o = (0, poi base Gwdb.dummy_iper) in
+    let y = (1000, Driver.poi base Driver.dummy_iper) in
+    let o = (0, Driver.poi base Driver.dummy_iper) in
     {
       men = 0;
       women = 0;
@@ -83,14 +87,14 @@ let stat_base : base -> stats =
     }
   in
   let current_year = (Unix.localtime (Unix.time ())).Unix.tm_year + 1900 in
-  Gwdb.Collection.iter
+  Collection.iter
     (fun p ->
       update_stats base current_year s p;
       flush stdout)
-    (Gwdb.persons base);
+    (Geneweb_db.Driver.persons base);
   s
 
-let print_stats : base -> stats -> unit =
+let print_stats : Geneweb_db.Driver.base -> stats -> unit =
  fun base s ->
   Printf.printf "\n";
   Printf.printf "%d men\n" s.men;

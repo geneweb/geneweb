@@ -1,6 +1,8 @@
 open Geneweb
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Collection = Geneweb_db.Collection
 
 let debug = ref false
 let fname = ref ""
@@ -74,8 +76,8 @@ let compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
   in
-  let nb_ind = nb_of_persons base in
-  let nb_fam = nb_of_families base in
+  let nb_ind = Driver.nb_of_persons base in
+  let nb_fam = Driver.nb_of_families base in
   let db = ref [] in
   let cache_linked_pages : cache_linked_pages_t = Hashtbl.create 1024 in
 
@@ -88,7 +90,7 @@ let compute base bdir =
 
   Printf.eprintf "--- database notes\n";
   flush stderr;
-  let list = notes_links (base_notes_read base "") in
+  let list = notes_links (Driver.base_notes_read base "") in
   (if list = ([], []) then ()
   else
     let pg = NLDB.PgNotes in
@@ -97,7 +99,9 @@ let compute base bdir =
   Printf.eprintf "--- wizard notes\n";
   flush stderr;
   (try
-     let files = Sys.readdir (Filename.concat bdir (base_wiznotes_dir base)) in
+     let files =
+       Sys.readdir (Filename.concat bdir (Driver.base_wiznotes_dir base))
+     in
      for i = 0 to Array.length files - 1 do
        try
          let file = files.(i) in
@@ -108,7 +112,7 @@ let compute base bdir =
          then
            if Filename.check_suffix file ".txt" then
              let wizid = Filename.chop_suffix file ".txt" in
-             match notes_links (base_wiznotes_read base wizid) with
+             match notes_links (Driver.base_wiznotes_read base wizid) with
              | [], [] -> ()
              | (_list_nt, list_ind) as list ->
                  Printf.eprintf "%s... " wizid;
@@ -135,7 +139,7 @@ let compute base bdir =
 
   Printf.eprintf "--- misc notes\n";
   flush stderr;
-  let ndir = Filename.concat bdir (base_notes_dir base) in
+  let ndir = Filename.concat bdir (Driver.base_notes_dir base) in
   let rec loop dir name =
     try
       let cdir = Filename.concat ndir dir in
@@ -150,7 +154,7 @@ let compute base bdir =
           if Filename.check_suffix file ".txt" then (
             let fnotes = Filename.chop_suffix file ".txt" in
             let file = Filename.concat dir fnotes in
-            match notes_links (base_notes_read base file) with
+            match notes_links (Driver.base_notes_read base file) with
             | [], [] -> ()
             | (_list_nt, list_ind) as list ->
                 let fnotes =
@@ -184,7 +188,7 @@ let compute base bdir =
 
   let buffer = Buffer.create 1024 in
   let add_string istr =
-    Buffer.add_string buffer @@ sou base istr;
+    Buffer.add_string buffer @@ Driver.sou base istr;
     Buffer.add_char buffer ' '
   in
   ProgrBar.full := '*';
@@ -192,33 +196,33 @@ let compute base bdir =
   Printf.eprintf "--- individual notes\n";
   flush stderr;
   ProgrBar.start ();
-  Gwdb.Collection.iteri
+  Collection.iteri
     (fun i p ->
       if !debug then
         Printf.eprintf "Person: (%d) %s\n" i (Gutil.designation base p);
       ProgrBar.run i nb_ind;
       Buffer.reset buffer;
-      add_string @@ get_notes p;
-      add_string @@ get_occupation p;
-      add_string @@ get_birth_note p;
-      add_string @@ get_birth_src p;
-      add_string @@ get_baptism_note p;
-      add_string @@ get_baptism_src p;
-      add_string @@ get_death_note p;
-      add_string @@ get_death_src p;
-      add_string @@ get_burial_note p;
-      add_string @@ get_burial_src p;
-      add_string @@ get_psources p;
+      add_string @@ Driver.get_notes p;
+      add_string @@ Driver.get_occupation p;
+      add_string @@ Driver.get_birth_note p;
+      add_string @@ Driver.get_birth_src p;
+      add_string @@ Driver.get_baptism_note p;
+      add_string @@ Driver.get_baptism_src p;
+      add_string @@ Driver.get_death_note p;
+      add_string @@ Driver.get_death_src p;
+      add_string @@ Driver.get_burial_note p;
+      add_string @@ Driver.get_burial_src p;
+      add_string @@ Driver.get_psources p;
       List.iter
         (fun { epers_note; epers_src; _ } ->
           add_string epers_note;
           add_string epers_src)
-        (get_pevents p);
+        (Driver.get_pevents p);
       (* list is: lfname :: list_nt, (key, link) :: list_ind *)
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
       | (_, list_ind) as list ->
-          (db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
+          (db := NotesLinks.add_in_db !db (NLDB.PgInd (Driver.get_iper p)) list;
            let list_ind =
              List.fold_left
                (fun acc (key, l) ->
@@ -227,31 +231,32 @@ let compute base bdir =
            in
            List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
           ProgrBar.run i nb_ind)
-    (Gwdb.persons base);
+    (Geneweb_db.Driver.persons base);
   ProgrBar.finish ();
   Printf.eprintf "--- families notes\n";
   flush stderr;
   ProgrBar.start ();
-  Gwdb.Collection.iteri
+  Collection.iteri
     (fun i fam ->
       (if !debug then
-       let fath = Gwdb.poi base (Gwdb.get_father fam) in
+       let fath = Driver.poi base (Driver.get_father fam) in
        Printf.eprintf "Family: (%d) %s\n" i (Gutil.designation base fath));
       ProgrBar.run i nb_fam;
       Buffer.reset buffer;
-      add_string @@ get_comment fam;
-      add_string @@ get_fsources fam;
-      add_string @@ get_marriage_note fam;
-      add_string @@ get_marriage_src fam;
+      add_string @@ Driver.get_comment fam;
+      add_string @@ Driver.get_fsources fam;
+      add_string @@ Driver.get_marriage_note fam;
+      add_string @@ Driver.get_marriage_src fam;
       List.iter
         (fun { efam_note; efam_src; _ } ->
           add_string @@ efam_note;
           add_string @@ efam_src)
-        (get_fevents fam);
+        (Driver.get_fevents fam);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
       | (_list_nt, list_ind) as list ->
-          (db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
+          (db :=
+             NotesLinks.add_in_db !db (NLDB.PgFam (Driver.get_ifam fam)) list;
            let list_ind =
              List.fold_left
                (fun acc (key, l) ->
@@ -260,9 +265,9 @@ let compute base bdir =
            in
            List.iter (fun (key, _) -> update_cache_linked_pages key) list_ind);
           ProgrBar.run i nb_fam)
-    (Gwdb.families base);
+    (Driver.families base);
   ProgrBar.finish ();
-  write_nldb base !db;
+  Driver.write_nldb base !db;
 
   (* Save the cache_linked_pages to a file *)
   save_cache_linked_pages bdir cache_linked_pages
@@ -276,14 +281,13 @@ let main () =
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
-  Gwdb.with_database bname @@ fun base ->
+  Driver.with_database bname @@ fun base ->
   Sys.catch_break true;
-  let () = load_strings_array base in
-  let () = load_unions_array base in
+  Driver.load_strings_array base;
+  Driver.load_unions_array base;
   try compute base bname
   with Sys.Break ->
     Printf.eprintf "\n";
-    flush stderr;
-    ()
+    flush stderr
 
 let _ = Printexc.print main ()

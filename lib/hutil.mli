@@ -55,6 +55,6 @@ val link_to_referer : config -> Adef.safe_string
 val incorrect_request : ?comment:string -> config -> unit
 (** Sends [Bad Request] HTTP response (same as [GWPARAM.output_error conf Bad_Request]) *)
 
-val print_calendar : config -> Gwdb.base -> unit
+val print_calendar : config -> Geneweb_db.Driver.base -> unit
 (** Displays the calendar; if no key is set, it will use today's date.
     Based on template file calendar.txt *)

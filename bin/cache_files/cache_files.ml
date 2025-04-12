@@ -1,4 +1,5 @@
-module Gwdb_driver = Gwdb_legacy.Gwdb_driver
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 let bname = ref ""
 let trace = ref false
@@ -47,42 +48,42 @@ let with_timer f =
 
 module HT = struct
   include Hashtbl.Make (struct
-    type t = Gwdb_driver.istr
+    type t = Driver.istr
 
-    let equal = Gwdb_driver.eq_istr
-    let hash = Gwdb_driver.hash_istr
+    let equal = Driver.eq_istr
+    let hash = Driver.hash_istr
   end)
 
-  let replace s i v = if not @@ Gwdb_driver.is_empty_string i then replace s i v
+  let replace s i v = if not @@ Driver.is_empty_string i then replace s i v
 end
 
 let fullname bname fname = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz")
 
 let iteri_places f base =
-  let ipers = Gwdb.ipers base in
-  let n_pers = Gwdb.nb_of_persons base in
-  let ifams = Gwdb.ifams base in
-  Gwdb.Collection.iteri
+  let ipers = Driver.ipers base in
+  let n_pers = Driver.nb_of_persons base in
+  let ifams = Driver.ifams base in
+  Collection.iteri
     (fun i iper ->
-      let per = Gwdb.poi base iper in
-      f i (Gwdb.get_birth_place per);
-      f i (Gwdb.get_baptism_place per);
-      f i (Gwdb.get_death_place per);
-      f i (Gwdb.get_burial_place per))
+      let per = Driver.poi base iper in
+      f i (Driver.get_birth_place per);
+      f i (Driver.get_baptism_place per);
+      f i (Driver.get_death_place per);
+      f i (Driver.get_burial_place per))
     ipers;
-  Gwdb.Collection.iteri
+  Collection.iteri
     (fun i ifam ->
-      let fam = Gwdb.foi base ifam in
-      f (n_pers + i) (Gwdb.get_marriage_place fam))
+      let fam = Driver.foi base ifam in
+      f (n_pers + i) (Driver.get_marriage_place fam))
     ifams
 
 let iteri_pers f base =
-  Gwdb.Collection.iteri
-    (fun i iper -> f i (Gwdb.poi base iper))
-    (Gwdb.ipers base)
+  Collection.iteri
+    (fun i iper -> f i (Driver.poi base iper))
+    (Driver.ipers base)
 
 let collect_places base bar =
-  let len = Gwdb.nb_of_persons base + Gwdb.nb_of_families base in
+  let len = Driver.nb_of_persons base + Driver.nb_of_families base in
   let set : unit HT.t = HT.create 2048 in
   iteri_places
     (fun i istr ->
@@ -93,26 +94,26 @@ let collect_places base bar =
 
 let iter_field base p f = function
   | `Fnames with_aliases ->
-      f (Gwdb.get_first_name p);
-      if with_aliases then List.iter f (Gwdb.get_first_names_aliases p)
+      f (Driver.get_first_name p);
+      if with_aliases then List.iter f (Driver.get_first_names_aliases p)
   | `Snames with_aliases ->
-      f (Gwdb.get_surname p);
-      if with_aliases then List.iter f (Gwdb.get_surnames_aliases p)
-  | `Aliases -> List.iter f (Gwdb.get_aliases p)
-  | `Occupations -> f (Gwdb.get_occupation p)
-  | `Qualifiers -> List.iter f (Gwdb.get_qualifiers p)
-  | `Pub_names -> f (Gwdb.get_public_name p)
-  | `Estates -> List.iter (fun t -> f t.Def.t_place) (Gwdb.get_titles p)
-  | `Titles -> List.iter (fun t -> f t.Def.t_ident) (Gwdb.get_titles p)
+      f (Driver.get_surname p);
+      if with_aliases then List.iter f (Driver.get_surnames_aliases p)
+  | `Aliases -> List.iter f (Driver.get_aliases p)
+  | `Occupations -> f (Driver.get_occupation p)
+  | `Qualifiers -> List.iter f (Driver.get_qualifiers p)
+  | `Pub_names -> f (Driver.get_public_name p)
+  | `Estates -> List.iter (fun t -> f t.Def.t_place) (Driver.get_titles p)
+  | `Titles -> List.iter (fun t -> f t.Def.t_ident) (Driver.get_titles p)
   | `Sources ->
-      f (Gwdb.get_psources p);
-      List.iter (fun t -> f t.Def.epers_src) (Gwdb.get_pevents p);
+      f (Driver.get_psources p);
+      List.iter (fun t -> f t.Def.epers_src) (Driver.get_pevents p);
       Array.iter
         (fun ifam ->
           List.iter
             (fun evt -> f evt.Def.efam_src)
-            (Gwdb.get_fevents (Gwdb.foi base ifam)))
-        (Gwdb.get_family p)
+            (Driver.get_fevents (Driver.foi base ifam)))
+        (Driver.get_family p)
 
 let field_to_string = function
   | `Fnames _ -> "fnames"
@@ -126,7 +127,7 @@ let field_to_string = function
   | `Sources -> "sources"
 
 let collect_names base field bar =
-  let len = Gwdb.nb_of_persons base in
+  let len = Driver.nb_of_persons base in
   let set : unit HT.t = HT.create 17 in
   iteri_pers
     (fun i p ->
@@ -136,7 +137,7 @@ let collect_names base field bar =
   set
 
 let process_data base set =
-  HT.fold (fun k () acc -> Gwdb.sou base k :: acc) set []
+  HT.fold (fun k () acc -> Driver.sou base k :: acc) set []
   |> List.sort String.compare
 
 let speclist =
@@ -169,7 +170,7 @@ let () =
   Arg.parse speclist anonfun usage;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   let bname = Filename.remove_extension (Filename.basename !bname) in
-  Gwdb.with_database (Secure.base_dir () // bname) @@ fun base ->
+  Driver.with_database (Secure.base_dir () // bname) @@ fun base ->
   cache_dir := set_cache_dir bname;
 
   Printf.printf "Generating cache(s) compressed with gzip\n";

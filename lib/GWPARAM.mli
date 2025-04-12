@@ -91,21 +91,23 @@ val output_error :
 (** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
       If the current lang is not available, use `en` *)
 
-val is_semi_public : Gwdb.person -> bool
+val is_semi_public : Geneweb_db.Driver.person -> bool
 (** determines if the person has SemiPublic status   *)
 
 val split_key : string -> string * string * string
 (** split a key of the form first_name.occ surname into its three components
   the .occ part may be absent. No spaces in first_name and surnames *)
 
-val is_related : Config.config -> Gwdb.base -> Gwdb.person -> bool
+val is_related :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** determines if the person is a descendant a sibling or an ancestor
     of conf.userkey.
     conf.userkey is the person visiting the base
     the search for ancestors is limited to 3 generations
 *)
 
-val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
+val p_auth :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** Calculate the access rights to the person's information in
       according to his age.
       Returns (in the order of the tests) :
@@ -125,7 +127,8 @@ val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
       - `false` otherwise
   *)
 
-val p_auth_sp : Config.config -> Gwdb.base -> Gwdb.person -> bool
+val p_auth_sp :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
 (** returns p_auth or true if both user and p are SemiPublic *)
 
 val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit

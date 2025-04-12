@@ -1,6 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Outbase = Gwdb_legacy.Outbase
+module Outbase = Geneweb_db.Outbase
+
 (** Checks a .gwo header and prints fails if header is absent or not compatible. *)
 
 let check_magic fname ic =

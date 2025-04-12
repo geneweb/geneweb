@@ -1,5 +1,5 @@
-module Database = Gwdb_legacy.Database
-module Gwdb_gc = Gwdb_legacy.Gwdb_gc
+module Database = Geneweb_db.Database
+module Gwdb_gc = Geneweb_db.Db_gc
 
 let dry_run = ref false
 let bname = ref ""
