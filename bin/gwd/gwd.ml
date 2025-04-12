@@ -2,9 +2,9 @@
 
 module Logs = Geneweb_logs.Logs
 
-#ifdef DEBUG
-let () = Sys.enable_runtime_warnings true
-#endif
+let () = 
+  if Sys.getenv_opt "DEBUG" <> None then
+    Sys.enable_runtime_warnings true
 
 open Geneweb
 open Config
@@ -2027,10 +2027,10 @@ let set_predictable_mode () =
   predictable_mode := true
 
 let main () =
-#ifdef WINDOWS
-  Wserver.sock_in := "gwd.sin";
-  Wserver.sock_out := "gwd.sou";
-#endif
+  if not Sys.unix then begin
+    Wserver.sock_in := "gwd.sin";
+    Wserver.sock_out := "gwd.sou";
+  end;
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"
@@ -2072,38 +2072,43 @@ let main () =
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
     ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
-#ifdef UNIX
-    ; ("-max_clients", Arg.Unit deprecated_warning_max_clients, "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi) (DEPRECATED).")
-    ; ("-n_workers", Arg.Int (fun x -> n_workers := x), "<NUM> Number of workers used by the server (default: " ^ string_of_int default_n_workers ^ ")")
-    ; ("-max_pending_requests", Arg.Int (fun x -> max_pending_requests := x), "<NUM> Maximum number of pending requests (default: " ^ string_of_int default_max_pending_requests ^ ")")
-    ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (only on Unix) (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
-    ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
-    ; ("-no-fork", Arg.Unit (fun () -> deprecated_warning_no_fork (); n_workers := 0), " Prevent forking processes (DEPRECATED)")
-    ; ("-cache-in-memory", Arg.String (fun s ->
-        if Gw_ancient.is_available then
-          cache_databases := s::!cache_databases
-        else
-          failwith "-cache-in-memory option unavailable for this build."
-      ), "<DATABASE> Preload this database in memory")
-    ; ("-predictable_mode", Arg.Unit set_predictable_mode, " Turn on the predictable mode. In this mode, the behavior of the server is predictable, which is helpful for debugging or testing. (default: false)")
-#endif
     ]
+  in
+  let speclist =
+    if Sys.unix then
+      speclist @ [
+        ("-max_clients", Arg.Unit deprecated_warning_max_clients, "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi) (DEPRECATED).");
+        ("-n_workers", Arg.Int (fun x -> n_workers := x), "<NUM> Number of workers used by the server (default: " ^ string_of_int default_n_workers ^ ")");
+        ("-max_pending_requests", Arg.Int (fun x -> max_pending_requests := x), "<NUM> Maximum number of pending requests (default: " ^ string_of_int default_max_pending_requests ^ ")");
+        ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (only on Unix) (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit).");
+        ("-daemon", Arg.Set daemon, " Unix daemon mode.");
+        ("-no-fork", Arg.Unit (fun () -> deprecated_warning_no_fork (); n_workers := 0), " Prevent forking processes (DEPRECATED)");
+        ("-cache-in-memory", Arg.String (fun s ->
+            if Gw_ancient.is_available then
+              cache_databases := s::!cache_databases
+            else
+              failwith "-cache-in-memory option unavailable for this build."
+          ), "<DATABASE> Preload this database in memory");
+        ("-predictable_mode", Arg.Unit set_predictable_mode, " Turn on the predictable mode. In this mode, the behavior of the server is predictable, which is helpful for debugging or testing. (default: false)")
+      ]
+    else
+      speclist
   in
   let speclist = List.sort compare speclist in
   let speclist = Arg.align speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-#ifdef UNIX
-  default_lang := begin
-    let s = try Sys.getenv "LANG" with Not_found -> "" in
-    if List.mem s Version.available_languages then s
-    else
-      let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
-      if String.length s >= 2 then
-        let s = String.sub s 0 2 in
-        if List.mem s Version.available_languages then s else "en"
-      else "en"
-  end ;
-#endif
+  if Sys.unix then begin
+    default_lang := begin
+      let s = try Sys.getenv "LANG" with Not_found -> "" in
+      if List.mem s Version.available_languages then s
+      else
+        let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+        if String.length s >= 2 then
+          let s = String.sub s 0 2 in
+          if List.mem s Version.available_languages then s else "en"
+        else "en"
+    end
+  end;
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   let gwd_cmd =
@@ -2183,17 +2188,15 @@ let () =
                     or by another program. Solution: kill the other program \
                     or launch GeneWeb with another port number (option -p)";
     flush stderr
-#ifdef UNIX
-  | Unix.Unix_error (Unix.ENOTCONN, _, _ ) ->
+  | Unix.Unix_error (Unix.ENOTCONN, _, _) when Sys.unix ->
     Logs.syslog `LOG_WARNING ({|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|})
-  | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
+  | Unix.Unix_error (Unix.EACCES, "bind", _) when Sys.unix ->
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \
        than 1024 are reserved to the system. Solution: do it as root \
        or choose another port number greater than 1024."
       !selected_port;
-    flush stderr;
-#endif
+    flush stderr
   | Register_plugin_failure (p, `dynlink_error e) ->
     Logs.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->

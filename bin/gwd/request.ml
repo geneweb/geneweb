@@ -476,8 +476,8 @@ let treat_request =
           ~comment:"Wizard actions not allowed on this base"
   else
   begin
-#ifdef UNIX
-    begin match bfile with
+    if Sys.unix then begin
+      match bfile with
       | None -> ()
       | Some bfile ->
         let stat = Unix.stat bfile in
@@ -490,7 +490,7 @@ let treat_request =
         if puid <> fuid then Unix.setuid fuid ;
         if pgid <> fgid then Unix.setgid fgid ;
     end ;
-#endif
+    
     let plugins =
       match List.assoc_opt "plugins" conf.Config.base_env with
       | None -> []
