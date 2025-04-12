@@ -474,43 +474,42 @@ let syslog (level : syslog_level) msg =
      | `LOG_INFO -> 6
      | `LOG_DEBUG -> 7
   in
-#ifdef SYSLOG
-  let flags = if !debug then [`LOG_PERROR] else [] in
-  if !verbosity >= verbosity_level
-  then begin
-    let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
-    Syslog.syslog log level msg ;
-    Syslog.closelog log ;
-    if !debug then Printexc.print_backtrace stderr ;
-  end
-#else
-  let () = () in
-  if !verbosity >= verbosity_level
-  then begin
-    let tm = Unix.(time () |> localtime) in
-    let level =
-      match level with
-      | `LOG_EMERG -> "EMERGENCY"
-      | `LOG_ALERT -> "ALERT"
-      | `LOG_CRIT -> "CRITICAL"
-      | `LOG_ERR -> "ERROR"
-      | `LOG_WARNING -> "WARNING"
-      | `LOG_NOTICE -> "NOTICE"
-      | `LOG_INFO -> "INFO"
-      | `LOG_DEBUG -> "DEBUG"
+  if !verbosity >= verbosity_level then begin
+    let use_syslog = 
+      try let _ = Sys.getenv "SYSLOG" in true
+      with Not_found -> false
     in
-    let print oc = Printf.fprintf oc "[%s]: %s %s\n%!"
-        (Mutil.sprintf_date tm :> string) level msg in
-    begin match Sys.getenv_opt "GW_SYSLOG_FILE" with
-      | Some fn ->
-        let oc = open_out_gen [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn in
-        print oc ;
-        close_out oc
-      | None -> print stderr
-    end ;
-    if !debug then Printexc.print_backtrace stderr ;
+    if use_syslog then begin
+      let flags = if !debug then [`LOG_PERROR] else [] in
+      let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
+      Syslog.syslog log level msg;
+      Syslog.closelog log;
+      if !debug then Printexc.print_backtrace stderr;
+    end else begin
+      let tm = Unix.(time () |> localtime) in
+      let level_str =
+        match level with
+        | `LOG_EMERG -> "EMERGENCY"
+        | `LOG_ALERT -> "ALERT"
+        | `LOG_CRIT -> "CRITICAL"
+        | `LOG_ERR -> "ERROR"
+        | `LOG_WARNING -> "WARNING"
+        | `LOG_NOTICE -> "NOTICE"
+        | `LOG_INFO -> "INFO"
+        | `LOG_DEBUG -> "DEBUG"
+      in
+      let print oc = Printf.fprintf oc "[%s]: %s %s\n%!"
+          (Mutil.sprintf_date tm :> string) level_str msg in
+      begin match Sys.getenv_opt "GW_SYSLOG_FILE" with
+        | Some fn ->
+          let oc = open_out_gen [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn in
+          print oc;
+          close_out oc
+        | None -> print stderr
+      end;
+      if !debug then Printexc.print_backtrace stderr;
+    end
   end
-#endif
 
 (** [wrap_output conf title content]
   Plugins defining a page content but not a complete UI

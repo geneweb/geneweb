@@ -4,5 +4,4 @@ bin/gwd/gwd.ml
 bin/gwd/gwdLog.ml
 bin/gwd/request.ml
 bin/setup/setup.ml
-lib/GWPARAM.ml
 
