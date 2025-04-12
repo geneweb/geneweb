@@ -297,12 +297,11 @@ let print_main conf base auth_file =
       let name = String.sub str (i + 1) (String.length str - i - 1) in
       Util.surname_without_particle base name |> Name.lower
   in
-  let mycompare s1 s2 =
-    let s1 = extract_surname s1 in
-    let s2 = extract_surname s2 in
-    if s1 = s2 then 0 else if s1 < s2 then -1 else 1
+  let old_list =
+    List.rev_map (fun s -> (s, extract_surname s)) old_list
+    |> List.sort (fun (_, sn1) (_, sn2) -> String.compare sn2 sn1)
+    |> List.rev_map fst
   in
-  let old_list = List.sort mycompare old_list in
 
   if by_alphab_order then (
     Output.print_sstring conf "<p>";
