@@ -35,14 +35,16 @@ open Config
 type wiki_info = {
   wi_mode : string;
   wi_file_path : string -> string;
-  wi_person_exists : string * string * int -> bool * string * string;
+  wi_person_exists : string * string * int -> bool;
+  wi_mark_if_not_public : string * string * int -> bool;
   wi_always_show_link : bool;
 }
 
 val syntax_links : config -> wiki_info -> string -> string
+val bold_italic_syntax : string -> string
 
 val make_edit_button :
-  Config.config -> string -> ?cnt:int option -> unit -> string
+  Config.config -> ?mode:string -> string -> ?cnt:int option -> unit -> string
 
 val html_of_tlsw : config -> string -> string list
 (** Parses a whole TLSW text to a list of strings *)

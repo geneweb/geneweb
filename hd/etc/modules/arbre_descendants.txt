@@ -1,10 +1,9 @@
-<!-- $Id: modules/arbre_descendants.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/arbre_descendants.txt v7.1 01/03/2025 19:03:50 $ -->
 %define;display_person(xxx)
-  <div class="list-group-item px-0 mx-0 border-0">
+  <div class="px-0 mx-0 border-0">
   %if;(not cancel_links)
     <a href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;/D/V%end;%nn;
-             %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;"
-      class="big_anchor list-group-item-action" title="[*navigation]">
+             %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;" title="[*navigation]"></a>
     </a>
   %end;
   %if;(xxx.has_sosa)%apply;display_sosa("xxx")<br>%end;
@@ -253,7 +252,7 @@ Person:            Child1     Child2          Child3
 %let;e_im;%if;(e.im!="")0%else;1%end;%in;
 %let;evarborder;%if;(e.border="" or e.border="0")0%else;1%end;%in;
 %let;baseindex;%index;%in;
-<h1 id="a">[*descendants tree]</h1>
+<h3 id="a">[*descendants tree]</h3>
 %include;buttons_dag
 %reset_count;
 %let;evarv;%expr(e_v+1)%in;

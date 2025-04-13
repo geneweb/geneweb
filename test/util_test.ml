@@ -154,6 +154,7 @@ let util_string_with_macros _ =
 
 let utf8_capitalize_fst _ =
   let test a r = (check string) a r (Utf8.capitalize_fst a) in
+  test "" "";
   test "abcdef" "Abcdef";
   test " ghiljl" " Ghiljl";
   test "<i>mnopqr1" "<i>Mnopqr1";

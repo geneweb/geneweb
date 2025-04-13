@@ -3,23 +3,26 @@
 open Def
 open Gwdb
 
-(** .gwo file header *)
 let magic_gwo = "GnWo000o"
 
-(* Option qui force a créé les clés des individus. De fait, *)
+(* Option qui force a créer les clés des individus. De fait, *)
 (* si la clé est incomplète, on l'enregistre tout de même.  *)
 let create_all_keys = ref false
+let line_cnt = ref 0
+let no_fail = ref false
+let no_picture = ref false
+let rgpd_dir = ref "None"
+let rgpd = ref false
+let verbose = ref false
+let semi_pub_cnt = ref 0
+let out_file = ref (Filename.concat Filename.current_dir_name "a")
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
-(** Key to refer a person's definition *)
 
-(** Represents a person in .gw file. It could be either reference to a person
-    (only key elements provided) or definition (all information provided). *)
 type somebody =
-  | Undefined of key  (** Reference to person *)
-  | Defined of (iper, iper, string) gen_person  (** Person's definition *)
+  | Undefined of key (* Reference to person *)
+  | Defined of (iper, iper, string) gen_person (* Person's definition *)
 
-(** Blocks that could appear in .gw file. *)
 type gw_syntax =
   | Family of
       somebody gen_couple
@@ -46,14 +49,14 @@ type gw_syntax =
       - Family definition
       - Children (descendants) *)
   | Notes of key * string
-      (** Block that defines personal notes. First element represents
-      reference to person. Second is note's content. *)
+    (* Block that defines personal notes. First element represents
+       reference to person. Second is note's content. *)
   | Relations of somebody * sex * (somebody, string) gen_relation list
-      (** Block that defines relations of a person with someone outisde of
-      family block (like foster parents) (field {i rparents}). Contains:
-      - Concerned person definition/reference
-      - Sex of person
-      - List of his relations. *)
+    (* Block that defines relations of a person with someone outisde of
+       family block (like foster parents) (field {i rparents}). Contains:
+       - Concerned person definition/reference
+       - Sex of person
+       - List of his relations. *)
   | Pevent of
       somebody
       * sex
@@ -71,15 +74,15 @@ type gw_syntax =
       - List of information about every personal event (name, date,
       place, reason, source, notes and witnesses)*)
   | Bnotes of string * string
-      (** Block that defines database notes and extended pages.
-      First string represents name of extended page ("" for
-      database notes, only one for file). Second is note's
-      or page's content. *)
+    (* Block that defines database notes and extended pages.
+       First string represents name of extended page ("" for
+       database notes, only one for file). Second is note's
+       or page's content. *)
   | Wnotes of string * string
-      (** Block that defines wizard notes. First string represents
-      First string represents wizard's id. Second is note's content. *)
+(* Block that defines wizard notes. First string represents
+   First string represents wizard's id. Second is note's content. *)
 
-(** {i .gw} file encoding *)
+(* {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
 
 (** [copy_decode s i1 i2] decode the word delimited by [i1] and [i2] inside [s]
@@ -270,16 +273,6 @@ let date_of_string s i =
   match date with
   | Some (dt, i) -> if i = String.length s then Some dt else error 5
   | None -> None
-
-(** Line counter while reading .gw file *)
-let line_cnt = ref 0
-
-(** Do not raise exception if syntax error occured.
-    Instead print error information on stdout *)
-let no_fail = ref false
-
-(** Save path to the images *)
-let no_picture = ref false
 
 (** Read line from input channel. *)
 let input_line0 ic =
@@ -522,6 +515,105 @@ let get_access l =
   | "#afriend" :: l' -> (SemiPublic, l') (* for retro compatibility *)
   | "#semipub" :: l' -> (SemiPublic, l')
   | _ -> (IfTitles, l)
+
+(* copied from Some *)
+let name_unaccent_lower s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let t, j = Name.unaccent_utf_8 true s i in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0
+
+(* read .auth file and build a consent_list of keys *)
+let auth_access fn sn oc l =
+  let access, l = get_access l in
+  let fns = name_unaccent_lower fn |> Mutil.tr ' ' '_' in
+  let sns = name_unaccent_lower sn |> Mutil.tr ' ' '_' in
+  let frs = if access = SemiPublic then "SemiPublic" else "Other" in
+  let bname = Filename.basename !out_file |> Filename.remove_extension in
+  let gwf_file =
+    if Geneweb.GWPARAM.is_reorg_base bname then
+      Geneweb.GWPARAM.config_reorg bname
+    else Geneweb.GWPARAM.config_legacy bname
+  in
+  let auth_file_name =
+    try
+      Secure.with_open_in_text gwf_file (fun ic ->
+          let rec loop () =
+            match input_line ic with
+            | exception End_of_file -> None
+            | line when Geneweb.Util.start_with line 0 "friend_passwd_file" -> (
+                match Geneweb.Util.extract_value '=' line with
+                | exception Not_found -> None
+                | passwd_file -> Some passwd_file)
+            | _ -> loop ()
+          in
+          loop ())
+    with Sys_error _ -> None
+  in
+
+  let consent_htbl =
+    let ht = Hashtbl.create 10 in
+    match auth_file_name with
+    | Some file_name -> (
+        let friend_passwd_file =
+          Filename.concat (Secure.base_dir ()) file_name
+        in
+        try
+          Secure.with_open_in_text friend_passwd_file (fun ic ->
+              let rec loop ht =
+                match input_line ic |> name_unaccent_lower with
+                | exception End_of_file -> ht
+                | line -> (
+                    (* ident:passwd:name[|key]:comment *)
+                    let parts = String.split_on_char ':' line in
+                    let username =
+                      try List.nth parts 2 with Failure _ -> ""
+                    in
+                    match Geneweb.Util.extract_value '|' username with
+                    | exception Not_found -> loop ht
+                    | key ->
+                        Hashtbl.add ht key key;
+                        loop ht)
+              in
+              loop ht)
+        with Sys_error _ ->
+          Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
+          ht)
+    | None -> ht
+  in
+
+  let is_consent =
+    Hashtbl.mem consent_htbl (Format.sprintf "%s.%d+%s" fns oc sns)
+  in
+  if access = Public then (Public, l)
+  else if is_consent then (
+    incr semi_pub_cnt;
+    if !verbose then Printf.eprintf "Set to %s %s.%d %s\n" frs fns oc sns;
+    (SemiPublic, l))
+  else (access, l)
+
+(** test presence of a file fn.occ.sn.pdf in rgpd_dirs *)
+let rgpd_access fn sn occ l =
+  let access, l = get_access l in
+  let fns = name_unaccent_lower fn in
+  let sns = name_unaccent_lower sn in
+  let ocs = string_of_int occ in
+  let access, l =
+    let rgpd_file = Filename.concat !rgpd_dir (fns ^ "." ^ ocs ^ "." ^ sns) in
+    (* if Public, stay Public *)
+    if access = Public then (Public, l)
+      (* if the files exist, set to SemiPublic *)
+    else if Sys.file_exists (rgpd_file ^ ".pdf") then (SemiPublic, l)
+      (* if not and person was SemiPublic, then it becomes Private *)
+    else if access = SemiPublic then (Private, l)
+      (* otherwise keep the current value *)
+    else (access, l)
+  in
+  if access = SemiPublic then incr semi_pub_cnt;
+  (access, l)
 
 (** Create [gen_title] from string *)
 let scan_title t =
@@ -785,7 +877,9 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let qualifiers, l = get_qualifiers str l in
   let aliases, l = get_aliases str l in
   let titles, l = get_titles str l in
-  let access, l = get_access l in
+  let access, l =
+    if !rgpd then rgpd_access fn sn occ l else auth_access fn sn occ l
+  in
   let occupation, l = get_occu l in
   let psources, l = get_sources l in
   let naissance, l = get_optional_birthdate l in

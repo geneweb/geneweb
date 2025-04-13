@@ -35,7 +35,7 @@
           Alt+%lpc1k; [first name/first names]0<br>
           Alt+%lpc2k; [birth]<br>
           Alt+%lpc3k; [death]<br>
-          Alt+%lpc4k; [add] [event/events]0<br>
+          Alt+%lpc4k; [add::event/events]0<br>
           Alt+%lpc5k; [note/notes]1<br>
           Alt+%lpc6k; [relation/relations]1<br>
           Alt+%lpc7k; [title/titles]1<br>
@@ -43,9 +43,9 @@
           Alt+%lpcOk; [invert::event/events]1<br><br>
           %elseif;(e.m ="MOD_FAM" or e.m ="ADD_FAM")
           Alt+%lfc1k; [first name/first names]0 [father/mother]0<br>
-          Alt+%lfc2k; [add] [child/children]0<br>
+          Alt+%lfc2k; [add::child/children]0<br>
           Alt+%lfc3k; [date of marriage]/[relation/relations]0<br>
-          Alt+%lfc4k; [add] [event/events]0<br>
+          Alt+%lfc4k; [add::event/events]0<br>
           Alt+%lfc5k; [marriage notes]<br>
           Alt+%lfc6k; [source/sources]1<br>
           Alt+%lpcOk; [invert::event/events]1 [family/families]0<br><br>

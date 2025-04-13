@@ -6,13 +6,28 @@ val gwd_cmd : string ref
 val cnt_dir : string ref
 val sock_dir : string ref
 val bases : string ref
+
 val reorg : bool ref
+(** set to true when base is in reorg format *)
+
 val force : bool ref
+(** force creation of database if already existing *)
+
+val verbosity : int ref
+(** Verbosity level: defines the verbosity level that will
+    allow the [syslog] function to print anything. *)
+
+val debug : bool ref
+(** If set to [true], prints backtrace when printing log. *)
+
+val oc : out_channel option ref
+(** The output channel in which log is written. *)
 
 type init_s = { status : bool; bname : string }
 
 val init_done : init_s ref
 val config_reorg : string -> string
+val config_legacy : string -> string
 
 type my_fun_2 = string -> string
 type my_fun_3 = string -> string -> string
@@ -47,29 +62,6 @@ type syslog_level =
 (** The level of log gravity. See SYSLOG(3) *)
 
 (* S: Move it to gwd_lib?  *)
-
-val output_error :
-  (?headers:string list ->
-  ?content:Adef.safe_string ->
-  Config.config ->
-  Def.httpStatus ->
-  unit)
-  ref
-(** [!output_error ?headers ?content conf status] default function that send the http status [status].
-    Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
-*)
-
-val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
-(** Check if a person should be displayed or not *)
-
-val syslog : (syslog_level -> string -> unit) ref
-(** [!syslog level log] log message [log] with gravity level [level] on stderr. *)
-
-val wrap_output :
-  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) ref
-(** [wrap_output conf title content]
-    Wrap the display of [title] and [content] in a defined template.
-*)
 
 val init : string -> unit
 (** Function called before gwd starts
@@ -116,18 +108,33 @@ module Legacy : sig
 
   val bpath : string -> string
   (** [Filename.concat (Secure.base_dir ())] *)
+end
 
-  val output_error :
-    ?headers:string list ->
-    ?content:Adef.safe_string ->
-    Config.config ->
-    Def.httpStatus ->
-    unit
-  (** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
+val output_error :
+  ?headers:string list ->
+  ?content:Adef.safe_string ->
+  Config.config ->
+  Def.httpStatus ->
+  unit
+(** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
       If the current lang is not available, use `en` *)
 
-  val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
-  (** Calculate the access rights to the person's information in
+val is_semi_public : Gwdb.person -> bool
+(** determines if the person has SemiPublic status   *)
+
+val split_key : string -> string * string * string
+(** split a key of the form first_name.occ surname into its three components
+  the .occ part may be absent. No spaces in first_name and surnames *)
+
+val is_related : Config.config -> Gwdb.base -> Gwdb.person -> bool
+(** determines if the person is a descendant a sibling or an ancestor
+    of conf.userkey.
+    conf.userkey is the person visiting the base
+    the search for ancestors is limited to 3 generations
+*)
+
+val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
+(** Calculate the access rights to the person's information in
       according to his age.
       Returns (in the order of the tests) :
       - `true` if requester is wizard or friend or person is public
@@ -146,9 +153,14 @@ module Legacy : sig
       - `false` otherwise
   *)
 
-  val syslog : syslog_level -> string -> unit
-  (** Prints on stderr using `"[date]: level message"` format. *)
+val p_auth_sp : Config.config -> Gwdb.base -> Gwdb.person -> bool
+(** returns p_auth or true if both user and p are SemiPublic *)
 
-  val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
-  (** Display in a very basic HTML doc, with no CSS or JavaScript. *)
-end
+val log : (out_channel -> unit) -> unit
+(** logs directly some text *)
+
+val syslog : syslog_level -> string -> unit
+(** Prints on stderr using `"[date]: level message"` format. *)
+
+val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
+(** Display in a very basic HTML doc, with no CSS or JavaScript. *)

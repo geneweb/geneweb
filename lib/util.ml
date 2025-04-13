@@ -42,7 +42,7 @@ let print_default_gwf_file bname =
         List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
         close_out oc
     with Unix.Unix_error (_, _, _) ->
-      !GWPARAM.syslog `LOG_WARNING
+      GWPARAM.syslog `LOG_WARNING
         (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
 
 let rec cut_at_equal i s =
@@ -69,7 +69,7 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      !GWPARAM.syslog `LOG_WARNING
+      GWPARAM.syslog `LOG_WARNING
         (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
            error fname);
       []
@@ -80,12 +80,12 @@ let read_base_env bname gw_prefix debug =
     let fname2 = Filename.concat gw_prefix "a.gwf" in
     if Sys.file_exists fname2 then (
       if debug then
-        !GWPARAM.syslog `LOG_WARNING
+        GWPARAM.syslog `LOG_WARNING
           (Printf.sprintf "Using configuration from %s\n%!" fname2);
       load_file fname2)
     else (
       if debug then
-        !GWPARAM.syslog `LOG_WARNING
+        GWPARAM.syslog `LOG_WARNING
           (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
              fname2);
       [])
@@ -130,7 +130,7 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
       home_errors.title = nb_errors +" error(s)!";
       home_errors.classList.remove("d-none");
     }
-    if (errors_list != "") {
+    if (errors_list != "\u{000A}") {
       home_errors.title = home_errors.title + errors_list + ".";
     }
   }
@@ -220,6 +220,10 @@ let search_in_path p s =
 let search_in_assets = search_in_path Secure.assets
 
 (* Internationalization *)
+
+let start_with s i p =
+  i + String.length p <= String.length s
+  && String.lowercase_ascii (String.sub s i (String.length p)) = p
 
 let start_with_vowel conf s =
   if String.length s > 0 then
@@ -507,7 +511,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
       match String.split_on_char '_' commd with
       | b :: _p -> b
       | [] ->
-          !GWPARAM.syslog `LOG_ERR
+          GWPARAM.syslog `LOG_ERR
             (Format.sprintf "Poorly formatted command: %s" commd);
           commd
   in
@@ -626,7 +630,7 @@ let safe_html_allowed_tags =
         Printf.sprintf "Requested allowed_tags file (%s) absent"
           !allowed_tags_file
       in
-      !GWPARAM.syslog `LOG_WARNING str;
+      GWPARAM.syslog `LOG_WARNING str;
       default_safe_html_allowed_tags)
 
 (* Few notes:
@@ -769,7 +773,7 @@ let is_old_person conf p =
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = !GWPARAM.p_auth conf base p
+let authorized_age conf base p = GWPARAM.p_auth conf base p
 
 let is_restricted (conf : config) base (ip : iper) =
   let fct p =
@@ -779,8 +783,11 @@ let is_restricted (conf : config) base (ip : iper) =
   in
   if conf.use_restrict then base_visible_get base fct ip else false
 
-let pget (conf : config) base ip =
-  if is_restricted conf base ip then Gwdb.empty_person base ip else poi base ip
+let pget_opt conf base ip =
+  if is_restricted conf base ip then None else Some (poi base ip)
+
+let pget conf base ip =
+  Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
 let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 
@@ -799,8 +806,6 @@ let is_public conf base p =
      && get_access p = IfTitles
      && nobtit conf base p <> []
   || is_old_person conf (gen_person_of_person p)
-
-let is_semi_public _conf _base p = get_access p = SemiPublic
 
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
@@ -829,6 +834,13 @@ let accessible_by_key conf base p fn sn =
 (*  [Fonc] acces_n : config -> base -> string -> person -> string         *)
 
 (* ********************************************************************** *)
+
+let access_status p =
+  match get_access p with
+  | Private -> "Private"
+  | SemiPublic -> "SemiPublic"
+  | Public -> "Public"
+  | IfTitles -> "IfTitles"
 
 (** [Description] : Renvoie les paramètres URL pour l'accès à la nième
                     personne.
@@ -876,15 +888,18 @@ let acces conf base x = acces_n conf base (Adef.escaped "") x
 (**/**)
 
 let restricted_txt = Adef.safe "....."
-let x_x_txt = Adef.safe "x x"
 
-let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
+let private_txt conf k =
+  match k with
+  | "p" -> transl conf "hidden first_name"
+  | "n" -> transl conf "hidden surname"
+  | _ -> transl conf "hidden person"
+
+let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
   let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
-  else if chk && is_hide_names conf p && not (authorized_age conf base p) then
-    x_x_txt
-  else
+  else if GWPARAM.p_auth_sp conf base p then
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
       | "", nn :: _ ->
@@ -899,6 +914,7 @@ let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
     if sn then
       match p_surname base p with "" -> beg | sn -> beg ^^^ " " ^<^ esc sn
     else beg
+  else Adef.safe (private_txt conf "")
 
 let main_title conf base p =
   let titles = nobtit conf base p in
@@ -994,7 +1010,7 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   in
   let iper = get_iper p in
   (* let is_hidden = is_empty_string (get_surname p) !! *)
-  if is_hidden p || cgl then s
+  if (not (GWPARAM.p_auth conf base p)) || cgl then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
@@ -1378,7 +1394,7 @@ let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
-    !GWPARAM.syslog `LOG_ERR
+    GWPARAM.syslog `LOG_ERR
       (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
 
@@ -1431,10 +1447,6 @@ let message_to_wizard conf =
 let doctype = Adef.safe "<!DOCTYPE html>"
 
 let http_string s i =
-  let start_with s i p =
-    i + String.length p <= String.length s
-    && String.lowercase_ascii (String.sub s i (String.length p)) = p
-  in
   let http = "http://" in
   let https = "https://" in
   let http, start_with_http =
@@ -1577,6 +1589,8 @@ let expand_env =
         loop 0
     | _ -> s
 
+(* in srcfileDisplay, there is a macro function with many more macros! *)
+(* not necessarily easy to transpose in this context (base absent) *)
 let string_with_macros conf env s =
   let start_with s i p =
     i + String.length p <= String.length s
@@ -1740,6 +1754,20 @@ let hexa_string s =
   Bytes.unsafe_to_string s'
 
 let print_alphab_list conf crit print_elem liste =
+  let print_sub_list len sub_l print_e index =
+    if sub_l <> [] then (
+      if len > menu_threshold then (
+        Output.print_sstring conf "<li>\n";
+        Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string index) index;
+        Output.print_sstring conf "<ul>\n");
+      List.iter
+        (fun e ->
+          Output.print_sstring conf "<li>\n  ";
+          print_e e;
+          Output.print_sstring conf "</li>\n")
+        sub_l;
+      if len > menu_threshold then Output.print_sstring conf "</ul>\n")
+  in
   let len = List.length liste in
   if len > menu_threshold then (
     Output.print_sstring conf "<p>\n";
@@ -1756,32 +1784,26 @@ let print_alphab_list conf crit print_elem liste =
          None liste
      in
      ());
-    Output.print_sstring conf "</p>\n");
-  Output.print_sstring conf "<ul>\n";
-  (let _ =
-     List.fold_left
-       (fun last e ->
-         let t = crit e in
-         let same_than_last =
-           match last with Some t1 -> t = t1 | _ -> false
-         in
-         if len > menu_threshold || is_number t then (
-           (match last with
-           | Some _ ->
-               if not same_than_last then
-                 Output.print_sstring conf "</ul>\n</li>\n"
-           | _ -> ());
-           if not same_than_last then (
-             Output.print_sstring conf "<li>\n";
-             Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
-             Output.print_sstring conf "<ul>\n"));
-         Output.print_sstring conf "<li>\n  ";
-         print_elem e;
-         Output.print_sstring conf "</li>\n";
-         Some t)
-       None liste
-   in
-   ());
+    Output.print_sstring conf "</p>\n";
+    Output.print_sstring conf "<ul>\n");
+  let rec loop acc last liste =
+    let index = match last with Some t -> t | None -> "" in
+    match liste with
+    | [] -> print_sub_list len acc print_elem index
+    | e :: liste ->
+        let t = crit e in
+        let same_than_last = match last with Some t1 -> t = t1 | _ -> false in
+        if len > menu_threshold || is_number t then
+          match last with
+          | Some _ ->
+              if not same_than_last then (
+                print_sub_list len acc print_elem index;
+                loop [] (Some t) liste)
+              else loop (e :: acc) (Some t) liste
+          | _ -> loop (e :: acc) (Some t) liste
+        else print_sub_list len liste print_elem ""
+  in
+  loop [] None liste;
   if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
   Output.print_sstring conf "</ul>\n"
 
@@ -2052,18 +2074,22 @@ let find_person_in_env_pref conf base pref =
     (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
-  let auth, fn, sn =
+  let auth =
     match person_of_key base fn sn oc with
-    | Some ip ->
-        if authorized_age conf base (pget conf base ip) then
-          let p = poi base ip in
-          (true, sou base (get_first_name p), sou base (get_surname p))
-        else (false, "x", "x")
-    | None -> (false, fn, sn)
+    | Some ip -> authorized_age conf base (pget conf base ip)
+    | None -> false
   in
   match List.assoc_opt "red_if_not_exist" conf.base_env with
-  | Some "off" -> (true, fn, sn)
-  | Some _ | None -> (auth, fn, sn)
+  | Some "off" -> true
+  | Some _ | None -> auth
+
+let mark_if_not_public conf base (fn, sn, oc) =
+  match p_getenv conf.env "red_if_not_public" with
+  | Some "on" -> (
+      match person_of_key base fn sn oc with
+      | Some ip -> get_access (poi base ip) <> Public
+      | None -> false)
+  | _ -> false
 
 let default_sosa_ref conf base =
   match List.assoc_opt "default_sosa_ref" conf.base_env with
@@ -2365,12 +2391,12 @@ let test_cnt_d conf =
   (if not (Sys.file_exists config_d) then
    try Unix.mkdir config_d 0o755
    with Unix.Unix_error (_, _, _) ->
-     !GWPARAM.syslog `LOG_WARNING
+     GWPARAM.syslog `LOG_WARNING
        (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
   if not (Sys.file_exists cnt_d) then
     try Unix.mkdir cnt_d 0o755
     with Unix.Unix_error (_, _, _) ->
-      !GWPARAM.syslog `LOG_WARNING
+      GWPARAM.syslog `LOG_WARNING
         (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
   else ();
   cnt_d
@@ -3001,3 +3027,22 @@ let get_bases_list ?(format_fun = fun x -> x) () =
   Unix.closedir dh;
   list := List.sort compare !list;
   !list
+
+let extract_value delimiter s =
+  let len = String.length s in
+  let rec loop equal_pos i =
+    if i = len then equal_pos
+    else
+      let c = s.[i] in
+      match equal_pos with
+      | Some _ when c = delimiter ->
+          (* The line contains several delimiters. *)
+          None
+      | None when c = delimiter ->
+          (* We found the first delimiter. *)
+          loop (Some i) (i + 1)
+      | _ -> loop equal_pos (i + 1)
+  in
+  match loop None 0 with
+  | Some i -> String.sub s (i + 1) (len - i - 1)
+  | None -> raise Not_found

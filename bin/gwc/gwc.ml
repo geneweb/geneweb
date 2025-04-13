@@ -1,12 +1,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Gwcomp
-
 (** Checks a .gwo header and prints fails if header is absent or not compatible. *)
 let check_magic fname ic =
-  let b = really_input_string ic (String.length magic_gwo) in
-  if b <> magic_gwo then
-    if String.sub magic_gwo 0 4 = String.sub b 0 4 then
+  let b = really_input_string ic (String.length Gwcomp.magic_gwo) in
+  if b <> Gwcomp.magic_gwo then
+    if String.sub Gwcomp.magic_gwo 0 4 = String.sub b 0 4 then
       failwith ("\"" ^ fname ^ "\" is a GeneWeb object file, but not compatible")
     else
       failwith
@@ -27,7 +25,7 @@ let check_magic fname ic =
 let next_family_fun_templ gwo_list fi =
   let ngwo = List.length gwo_list in
   let run =
-    if ngwo < 10 || not !Mutil.verbose then fun () -> ()
+    if ngwo < 10 || not !Gwcomp.verbose then fun () -> ()
     else if ngwo < 60 then (fun () ->
       Printf.eprintf ".";
       flush stderr)
@@ -50,7 +48,8 @@ let next_family_fun_templ gwo_list fi =
         match !ic_opt with
         | Some ic -> (
             match
-              try Some (input_value ic : gw_syntax) with End_of_file -> None
+              try Some (input_value ic : Gwcomp.gw_syntax)
+              with End_of_file -> None
             with
             | Some fam -> Some fam
             | None ->
@@ -85,7 +84,7 @@ let next_family_fun_templ gwo_list fi =
               ic_opt := Some ic;
               loop ()
           | [] ->
-              if ngwo < 10 || not !Mutil.verbose then ()
+              if ngwo < 10 || not !Gwcomp.verbose then ()
               else if ngwo < 60 then (
                 Printf.eprintf "\n";
                 flush stderr)
@@ -95,7 +94,6 @@ let next_family_fun_templ gwo_list fi =
     loop ()
 
 let just_comp = ref false
-let out_file = ref (Filename.concat Filename.current_dir_name "a")
 let in_file = ref ""
 let separate = ref false
 let bnotes = ref "merge"
@@ -131,18 +129,19 @@ let speclist =
       Arg.Set Gwcomp.no_picture,
       " Do not create associative pictures" );
     ( "-o",
-      Arg.Set_string out_file,
+      Arg.Set_string Gwcomp.out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
        available). Alphanumerics and -" );
     ( "-particles",
       Arg.Set_string Db1link.particules_file,
       "<file> Particles file (default = predefined particles)" );
-    ("-q", Arg.Clear Mutil.verbose, " Quiet");
+    ("-q", Arg.Clear Gwcomp.verbose, " Quiet");
     ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
+    ("-rgpd", Arg.String (fun s -> Gwcomp.rgpd_dir := s), "<dir> Rgpd directory");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
     ("-stats", Arg.Set Db1link.pr_stats, " Print statistics");
-    ("-v", Arg.Set Mutil.verbose, " Verbose");
+    ("-v", Arg.Set Gwcomp.verbose, " Verbose");
   ]
   |> List.sort compare |> Arg.align
 
@@ -164,7 +163,12 @@ let errmsg =
    and [options] are:"
 
 let main () =
-  Mutil.verbose := false;
+  (try
+     if Sys.is_directory !Gwcomp.rgpd_dir then Gwcomp.rgpd := true
+     else Gwcomp.rgpd := false
+   with Sys_error _ ->
+     Printf.eprintf "Warning: failed testing for %s\n" !Gwcomp.rgpd_dir;
+     Gwcomp.rgpd := false);
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   in_file :=
@@ -175,26 +179,31 @@ let main () =
     Printf.eprintf "The database name must be specified with -o\n";
     flush stdout;
     exit 2);
-  if !in_file <> "" && not (Array.mem "-o" Sys.argv) then out_file := !in_file;
-  if not (Mutil.good_name (Filename.basename !out_file)) then (
+  if !in_file <> "" && not (Array.mem "-o" Sys.argv) then
+    Gwcomp.out_file := !in_file;
+  if not (Mutil.good_name (Filename.basename !Gwcomp.out_file)) then (
     (* Util.transl conf not available !*)
     Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
-      !out_file;
+      !Gwcomp.out_file;
     Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
     flush stderr;
     exit 2);
-  let bname = Filename.remove_extension (Filename.basename !out_file) in
+  let bname = Filename.remove_extension (Filename.basename !Gwcomp.out_file) in
   Geneweb.GWPARAM.init bname;
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
+
+  if !Gwcomp.rgpd then
+    Printf.eprintf "Rgpd status: True, files in: %s\n" !Gwcomp.rgpd_dir
+  else Printf.eprintf "Rgpd status: False\n";
   let gwo = ref [] in
   List.iter
     (fun (x, separate, bnotes, shift) ->
       if Filename.check_suffix x ".gw" then (
         (try Gwcomp.comp_families x
          with e ->
-           Printf.eprintf "File \"%s\", line %d:\n" x !line_cnt;
+           Printf.eprintf "File \"%s\", line %d:\n" x !Gwcomp.line_cnt;
            raise e);
         gwo := (x ^ "o", separate, bnotes, shift) :: !gwo)
       else if Filename.check_suffix x ".gwo" then
@@ -203,6 +212,7 @@ let main () =
     (List.rev !files);
   if not !just_comp then (
     let bdir = !Geneweb.GWPARAM.bpath bname in
+    (* test_base will fail if base exists and force has not been set (-f) *)
     Geneweb.GWPARAM.test_base bname;
     Geneweb.GWPARAM.init_etc bname;
     Lock.control (Mutil.lock_file bdir) false ~onerror:Lock.print_error_and_exit

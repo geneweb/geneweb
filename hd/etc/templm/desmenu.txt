@@ -141,7 +141,7 @@
     <label><input type="checkbox" name="src" value="on" checked="checked" %l_on1; %l_on;
            %/>[source/sources]1</label><br>
     <label><input type="checkbox" name="upd" value="on" %l_on1; %l_on;
-           %/>[update]</label><br>
+           %/>[update::]</label><br>
     <label><input type="checkbox" name="hide" value="on" %l_on1; %l_on;
            %/>[visualize/show/hide/summary]2… </label>
   </fieldset>
