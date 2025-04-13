@@ -4,7 +4,14 @@ usage()
 {
 echo "Usage: $cmd [Options]
 Compare gwc input and gwu output expecting no changes.
-Need to properly set 'hardcoded vars' in script header.
+By default:
+* assume we are running as test/$cmd
+  in the repo folder where geneweb was built
+  to access gwc/gwu tools in $BIN_DIR
+* gwc is using test/$REFTESTGW.gw input file and creating
+  $BASES_DIR/$REFTESTGW.gwb database.
+If needed use -f option to change from default.
+
 Options:
 -f  file to be sourced in to overwrite hardcoded vars
 -h  To display this help.
@@ -27,6 +34,7 @@ SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
 
 #===  main ====================
 cmd=$(basename $0)
+echo "starting $0 $@"
 while getopts "f:h" Option
 do
 case $Option in
@@ -44,8 +52,11 @@ shift $(($OPTIND - 1))
 test -f "$setenv_file" && . $setenv_file
 
 if test ! -d $BASES_DIR/ ; then
-    echo "$BASES_DIR/ not accessible, change your default parms."
-    exit 1
+    mkdir -p $BASES_DIR
+    if test ! -d $BASES_DIR/ ; then
+        echo "$BASES_DIR/ not accessible, change your default parms."
+        exit 1
+    fi
 fi
 if test ! -f $BASES_DIR/$TESTGW.gw ; then
     if test -f test/$TESTGW.gw ; then
@@ -66,11 +77,11 @@ cd $BASES_DIR
 $SUDOPRFX rm -rf $TESTGW.lck $TESTGW.gwo $TESTGW.log $TESTGW.gwb $TESTGW_nouveau.gw $TESTGW.gwu_stderr outdir.$TESTGW
 $SUDOPRFX mkdir outdir.$TESTGW $TESTGW.gwb $TESTGW.gwb/wiznotes || exit 1
 $SUDOPRFX $fqbindir/gwc -v -f -cg -o $TESTGW $TESTGW.gw >$TESTGW.log 2>&1 || \
-  { echo "gwc failure, details in $TESTGW.log"; exit 1; }
+  { echo "gwc failure, details in $BASES_DIR/$TESTGW.log"; exit 1; }
 $SUDOPRFX $fqbindir/gwu $TESTGW -v -o ${TESTGW}.gwu.o.gw 2>$TESTGW.gwu.o.stderr || \
-  { echo "gwu failure, details in $TESTGW.gwu.o.stderr"; exit 1; }
+  { echo "gwu failure, details in $BASES_DIR/$TESTGW.gwu.o.stderr"; exit 1; }
 $SUDOPRFX $fqbindir/gwu $TESTGW -v -o ${TESTGW}_nouveau.gw -odir outdir.$TESTGW 2>$TESTGW.gwu_stderr || \
-  { echo "gwu failure, details in $TESTGW.gwu_stderr"; exit 1; }
+  { echo "gwu failure, details in $BASES_DIR/$TESTGW.gwu_stderr"; exit 1; }
 
 RC=0
 for xx in "${TESTGW}.gwu.o.gw" "outdir.$TESTGW/$TESTGW.gw" ; do
