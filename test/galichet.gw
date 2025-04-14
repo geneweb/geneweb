@@ -19,6 +19,12 @@ beg
 - f Thérèse_Eugénie #src inscription_des_hypothèques_du_23_février_1874_au_profit_de_dame_thérèse_eugènie_Galichet;_voir_ses_ascendants_dans_la_base_<a_href="https://gw.geneanet.org/mout?lang=fr&p=therese+eugenie&n=galichet">mout</a> 7/9/1830 #bp _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #bs acte_de_mariage od
 end
 
+notes Galichet Jean_Charles
+beg
+What about [[[Chantal]]]  notes,
+and [[[Andre]]] as second creation ?
+end notes
+
 notes Galichet lolo
 beg
 * je le crée de façon arbitraire, avec deux mariages, le 1er avec divorce.
@@ -109,14 +115,14 @@ pevt Marty Florence
 #deat 1875
 end pevt
 
-fam Galichet lolo +1840 #ms inventé femme1 prenom1 #src inventé 1818 od
+fam Galichet lolo +1840 #mp Brisbane,Queensland,Australie #ms inventé femme1 prenom1 #src inventé 1818 od
 fevt
-#marr 1840 #s inventé
+#marr 1840 #p Brisbane,Queensland,Australie #s inventé
 #div 1844 #s inventé
 end fevt
-fam Galichet lolo +1845 #ms inventé femme2 prenom2 #src inventé 1825 od
+fam Galichet lolo +1845 #mp Sydney,Nouvelle-Galles\_du\_Sud,Australie #ms inventé femme2 prenom2 #src inventé 1825 od
 fevt
-#marr 1845 #s inventé
+#marr 1845 #p Sydney,Nouvelle-Galles\_du\_Sud,Australie #s inventé
 end fevt
 
 pevt femme1 prenom1
@@ -127,10 +133,205 @@ pevt femme2 prenom2
 #birt 1825
 end pevt
 
-notes-db
-  Ceci est une base de test.
+fam Sutaine Louis.1 0 +1570 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Galichet Nicole 0
+fevt
+#marr 1570 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+end fevt
+beg
+- h Louis 1575 0
+end
 
-  * initialement créée pour investiguer le pb #1334 (https://github.com/geneweb/geneweb/issues/1334)
-    et valider la correction
-    avec mon script ~/work/geneweb/local/checkgwuodir
+notes Galichet Nicole
+beg
+* Elle n'est pas liée aux autres Galichet
+end notes
+
+pevt Sutaine Louis
+#birt 1575
+#deat 
+end pevt
+
+fam Sutaine Louis + #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Petizon Claude 0
+fevt
+#marr  #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+end fevt
+beg
+- f Perrette 1600 11/4/1684 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+end
+
+pevt Sutaine Perrette
+#birt 1600
+#deat 11/4/1684 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+fam Jayot Jean 1604 8/11/1674 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Sutaine Perrette
+fevt
+#marr 
+end fevt
+beg
+- f Claude 27/6/1633 11/4/1697 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+end
+
+pevt Jayot Claude
+#birt 27/6/1633
+#deat 11/4/1697 #p _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+pevt Jayot Jean
+#birt 1604
+#deat 8/11/1674 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+fam Boizot Jean.1234 #occu Menuisier 1618 22/3/1702 #dp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France + Jayot Claude
+fevt
+#marr 
+end fevt
+beg
+- f Jeanne.1 27/2/1671 #bp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France 22/4/1748 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+end
+
+pevt Boizot Jeanne.1
+#birt 27/2/1671 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+#deat 22/4/1748 #p _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+pevt Boizot Jean.1234
+#birt 1618
+#deat 22/3/1702 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+fam Geruzet Anthoine.1 #occu Menuisier_à_Paris_(Paroisse_St_Roch) 1640 17/1/1709 #dp _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France + Bouquet Louise 0
+fevt
+#marr 
+end fevt
+beg
+- h Anthoine #occu Maître_Menuisier_reçu_le_25.01.1695_à_Reims 1667 #bp _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France 16/2/1755 #dp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
+end
+
+pevt Geruzet Anthoine
+#birt 1667 #p _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France
+#deat 16/2/1755 #p _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+pevt Geruzet Anthoine.1
+#birt 1640
+#deat 17/1/1709 #p _[Saint-Hilaire]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+fam Geruzet Anthoine +17/1/1695 #mp _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France Boizot Jeanne.1
+fevt
+#marr 17/1/1695 #p _[Saint-Jacques]_-_Reims,51,Marne,Champagne-Ardenne,France
+end fevt
+beg
+- h Jacques #occu Marchand 4/2/1705 #bp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France 10/3/1774 #dp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+end
+
+pevt Geruzet Jacques
+#birt 4/2/1705 #p _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
+#deat 10/3/1774 #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+end pevt
+
+fam Geruzet Jacques +2/8/1728 #mp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France Pierquin Jeanne 0
+fevt
+#marr 2/8/1728 #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+end fevt
+beg
+- h Laurent #occu Marchand_Drapier,_Changeur_du_Roy 25/9/1738 #bp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France 1812 #dp Laon,02,Aisne,Picardie,France
+- f Marie-Jeanne 31/12/1751 #pp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France 8/1/1830 #dp Soissons,02,Aisne,Picardie,France
+end
+
+notes Geruzet Laurent
+beg
+* is is mandatory to have at least a three brackets delimited link
+  to be able to access a miscellaneous note ?
+* so a pointer to [[[Chantal]]] note.
+end notes
+
+pevt Geruzet Laurent
+#birt 25/9/1738 #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+#deat 1812 #p Laon,02,Aisne,Picardie,France
+end pevt
+
+pevt Geruzet Marie-Jeanne
+#birt 31/12/1751
+#bapt  #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
+#deat 8/1/1830 #p Soissons,02,Aisne,Picardie,France
+end pevt
+
+fam Geruzet Laurent +28/12/1763 #mp _[Eglise_St_Rémi]_-_Laon,02,Aisne,Picardie,France Dupond Marie 1736 #bp Laon,02,Aisne,Picardie,France #bs base_michelbonnet 25/11/1784 #dp Laon,02,Aisne,Picardie,France #ds base_michelbonnet
+fevt
+#marr 28/12/1763 #p _[Eglise_St_Rémi]_-_Laon,02,Aisne,Picardie,France
+end fevt
+beg
+- h Jean-Baptiste {Jean-Baptiste_Laurent} #occu Officier_d'infanterie,_marchand_teinturier 23/9/1768 #bp Laon,02,Aisne,Picardie,France 20/5/1846 #dp Laon,02,Aisne,Picardie,France
+end
+fam Geruzet Laurent +25/3/1786 #mp Reims,51,Marne,Champagne-Ardenne,France #ms base_michelbonnet Laramee Charlotte #src base_michelbonnet 1766 14/6/1789
+fevt
+#marr 25/3/1786 #p Reims,51,Marne,Champagne-Ardenne,France #s base_michelbonnet
+end fevt
+fam Geruzet Laurent +30/10/1794 #mp Paris,75000,Ville-de-Paris,Ile-de-France,France #ms base_michelbonnet Fache Jeanne #src base_michelbonnetg ~1750 od
+fevt
+#marr 30/10/1794 #p Paris,75000,Ville-de-Paris,Ile-de-France,France #s base_michelbonnet
+end fevt
+
+pevt Geruzet Jean-Baptiste
+#birt 23/9/1768 #p Laon,02,Aisne,Picardie,France
+#deat 20/5/1846 #p Laon,02,Aisne,Picardie,France
+end pevt
+
+pevt Dupond Marie
+#birt 1736 #p Laon,02,Aisne,Picardie,France #s base_michelbonnet
+#deat 25/11/1784 #p Laon,02,Aisne,Picardie,France #s base_michelbonnet
+end pevt
+
+pevt Laramee Charlotte
+#birt 1766
+#deat 14/6/1789
+end pevt
+
+pevt Fache Jeanne
+#birt ~1750
+end pevt
+
+fam Geruzet Jean-Baptiste +21/12/2F #mp _[Mairie]_-_Reims,51,Marne,Champagne-Ardenne,France Biemont Marie 0
+fevt
+#marr 21/12/2F #p _[Mairie]_-_Reims,51,Marne,Champagne-Ardenne,France
+end fevt
+beg
+- f Laurence 23/1/1802 #bp Nonancourt,27,Eure,Normandie,France 18/4/1866 #dp Amiens,80,Somme,Picardie,France
+end
+
+pevt Geruzet Laurence
+#birt 23/1/1802 #p Nonancourt,27,Eure,Normandie,France
+#deat 18/4/1866 #p Amiens,80,Somme,Picardie,France
+end pevt
+
+notes-db
+  TITLE=Ceci est une base de test.
+
+  * initialement créée pour investiguer le pb #1334
+  (https://github.com/geneweb/geneweb/issues/1334)
+  et valider la correction avec le script gwu_test.sh
+
+  * test la présence d'une apostrophe dans le texte alternate d'une image,
+  (https://github.com/geneweb/geneweb/issues/1558)
+  <br>voir les notes du couple [[Jean Pierre/Galichet]] et [[Marie Elisabeth/Loche]]
 end notes-db
+
+# extended page "Andre" used by:
+#  - person "Jean Charles.0 Galichet"
+page-ext Andre
+  TITLE=title line, is first line
+  and next is text
+  * with wiki syntax
+  * this note created from note of [[Jean Charles/Galichet]]
+end page-ext
+
+# extended page "Chantal" used by:
+#  - person "Jean Charles.0 Galichet"
+#  - person "Laurent.0 Geruzet"
+page-ext Chantal
+  TITLE=la 1ere ligne correspond au titre
+  * et j'utilise une syntax wiki pour le reste
+  * avec un lien vers [[Laurent/Geruzet]]
+end page-ext
