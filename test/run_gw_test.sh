@@ -35,18 +35,20 @@ setenv_file="./test-gw-vars.txt"
 #=== hardcoded vars (start) ===
 # assumes we are running in the repo folder
 # ./test/run-GW-test.sh
-DBNAME='mydbname'   # database name associated to specified hardcoded vars
+DBNAME='galichet'   # database name associated to specified hardcoded vars
 PWD=                # default is without wizard_id:passwd
 
 GWD2START=1
 BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
+LEXICON=
+TAGS=
 GWDLOG=./distribution/gw/gwd.log
 GWCGI=gwd.cgi # the cgi script name that call gwd with cgi parameter
 GWDLOGCGI=/tmp/gwd.log # associated error log
 CLEANLOG=1
-SUDOPRFX=   # if required for GWDLOG cleanup
+SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
 CRLMAXTIME=5
 FAILING_CONDITIONS='CRITICAL|ERROR|Failed'
 WARNING_CONDITIONS='WARNING'
@@ -55,24 +57,24 @@ GREPOPT='-q'
 # this is the data for specific persons
 # for synonym test there should be several occurrences of FN+SN
 WIZ=hg
-FN=henri
-SN=gouraud
+FN=anthoine
+SN=geruzet
 OC=0
-ID=1711 # individual Id, ideally should have multiple events
-FID=597 # family id for this individual, ideally, should have multiple families
-IMG_C="alain.0.de_fouchier.jpg" # une image du carrousel de $ID!
-IMG_C_S="alain.0.boucher.jpg" # une image sauvegardée du carrousel de $ID!
-IMG_SRC="famille-h-gouraud.jpg" # une image dans bases/src/mabase/images
-TXT_SRC="famille-h-gouraud.txt" # une source dans bases/src/mabase
-IMG_IM="henri.0.gouraud.jpg" # un portrait dans bases/images/mabase
+ID=26 # individual Id, ideally should have multiple events
+FID=13 # family id for this individual, ideally, should have multiple families
+IMG_C="peugeot_206.png" # une image du carrousel de $ID!
+IMG_C_S="850r.jpg" # une image sauvegardée du carrousel de $ID!
+IMG_SRC="carte.de.priere.png" # une image dans bases/src/mabase/images
+TXT_SRC="macros.txt" # une source dans bases/src/mabase
+IMG_IM="jean_pierre.0.galichet.jpg" # un portrait dans bases/images/mabase
 # someone without grand parents
-FN1=paul
-OC1=1
-SN1=cosse
+FN1=anthoine
+SN1=geruzet
+OC1=0
 # someone without parents
-FN2=antoine
+FN2=marie
+SN2=dupond
 OC2=0
-SN2=cosse
 NOTE="chantal" # one specific note
 PLACE="Australie" # one specific place
 #=== hardcoded vars (end)   ===
@@ -112,22 +114,31 @@ else
 fi
 
 if test "$GWD2START" && test -z "$cgitest"; then
+if test -n "$LEXICON"; then
+    test -f "$LEXICON" || { echo "invalid LEXICON $LEXICON file"; exit 1; }
+    gwdopt="$gwdopt --add_lexicon $LEXICON"
+fi
+
+if test -n "$TAGS"; then
+    test -f "$TAGS" || { echo "invalid TAGS $TAGS file"; exit 1; }
+    gwdopt="$gwdopt --allowed_tags $TAGS"
+fi
+
 pgrep gwd >/dev/null && \
     { killall gwd || { echo "unable to kill previous gwd process"; exit 1; }; }
 
-OCAMLRUNPARAM=b "$BIN_DIR"/gwd \
+OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -setup_link \
-  -bd "$BASES_DIR" \
-  -hd "$BIN_DIR" \
-  -add_lexicon "$BASES_DIR"/lang/lexicon-hg.txt \
-  -allowed_tags "$BASES_DIR"/tags.txt \
+  -bd $BASES_DIR \
+  -hd $BIN_DIR \
+  $gwdopt \
   -trace_failed_passwd \
   -robot_xcl 10000,1 \
   -conn_tmout 3600 \
   -blang \
   -log "<stderr>" \
-  -plugins -unsafe "$BIN_DIR"/plugins \
-  2>> "$GWDLOG" &
+  -plugins -unsafe $BIN_DIR/plugins \
+  2>> $GWDLOG &
 
 # give some time for gwd to start
 sleep 1
@@ -237,6 +248,7 @@ crl "m=A&i=$ID"
 crl "m=A&i=$ID&t=T&v=5"
 crl "m=A&i=$ID&t=A&v=5"
 crl "m=A&i=$ID&t=C&v=5"
+crl "m=A&i=$ID&t=FC&v=5"
 crl "m=A&i=$ID&t=T&t1=7&v=5"
 crl "m=A&i=$ID&t=T&t1=h6&v=5"
 crl "m=A&i=$ID&t=T&t1=m&v=5"
@@ -332,6 +344,7 @@ crl "m=P&tri=F"
 crl "m=PERSO&i=$ID"
 crl "m=PS"
 crl "m=PPS&bi=on&ba=on&ma=on&de=on&bu=on"
+crl "m=PPS&k=$PLACE&bi=on&ba=on&ma=on&de=on&bu=on&all=on&any=on&max_rlm_nbr="
 crl "m=R&i=$ID"
 crl "m=REFRESH&i=$ID"
 #crl "m=RL&i=$ID&i1" # m=RL&i=5316&l1=3&i1=1711&l2=2&i2=6223&dag=on
