@@ -39,3 +39,4 @@ type person_reference = private {
 }
 
 val person_reference : base -> person -> person_reference
+val search_indexes_can_be_initialized_on_the_fly : base -> bool

@@ -746,6 +746,12 @@ module type Driver_S = sig
     ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
 
   val set_fpoi_cache : base -> bool -> unit
+
+  val initialize_lowercase_name_index :
+    ?on_lock_error:(unit -> unit) ->
+    kind:[< `First_name | `Surname ] ->
+    base ->
+    unit
 end
 
 module type DriverImpl = sig
