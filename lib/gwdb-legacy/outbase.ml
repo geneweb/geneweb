@@ -294,6 +294,10 @@ let output_particles_file particles fname =
 let generate_base base =
   let tmp_base = Filename.concat base.data.bdir "1base" in
   let tmp_base_acc = Filename.concat base.data.bdir "1base.acc" in
+  let remove_temporary_files () =
+    Files.rm tmp_base;
+    Files.rm tmp_base_acc
+  in
   let () =
     let oc = Secure.open_out_bin tmp_base in
     let oc_acc = Secure.open_out_bin tmp_base_acc in
@@ -375,8 +379,7 @@ let generate_base base =
     with e ->
       (try close_out oc with _ -> ());
       (try close_out oc_acc with _ -> ());
-      Files.rm tmp_base;
-      Files.rm tmp_base_acc;
+      remove_temporary_files ();
       raise e
   in
   fun () ->
