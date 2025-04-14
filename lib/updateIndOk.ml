@@ -88,31 +88,47 @@ let rec reconstitute_titles conf ext cnt =
       (t :: tl, ext)
   | _ -> ([], ext)
 
-let reconstitute_insert_pevent conf ext cnt el =
-  let var = "ins_event" ^ string_of_int cnt in
+type 'a form_pevent =
+  | FormBirth of ('a, string) Def.gen_pers_event
+  | FormBapt of ('a, string) Def.gen_pers_event
+  | FormPevent of ('a, string) Def.gen_pers_event
+  | FormDeath of
+      [ `Auto
+      | `DeadYoung
+      | `DontKnowIfDead
+      | `NotDead
+      | `OfCourseDead
+      | `Death ]
+      * ('a, string) Def.gen_pers_event
+  | FormBurial of
+      [ `UnknownBurial | `Burial | `Cremation ]
+      * ('a, string) Def.gen_pers_event
+
+let reconstitute_insert_pevent conf ext el =
+  let var = "ins_event" in
   let n =
     match
       ( Util.p_getenv conf.Config.env var,
         Util.p_getint conf.Config.env (var ^ "_n") )
     with
-    | _, Some n when n > 1 -> n
-    | Some "on", _ -> 1
-    | _ -> 0
+    | Some "on", Some n when n > 0 -> n
+    | _, _ -> 0
   in
   if n > 0 then
     let el =
       let rec loop el n =
         if n > 0 then
           let e1 =
-            {
-              Def.epers_name = Epers_Name "";
-              epers_date = Date.cdate_None;
-              epers_place = "";
-              epers_reason = "";
-              epers_note = "";
-              epers_src = "";
-              epers_witnesses = [||];
-            }
+            FormPevent
+              {
+                Def.epers_name = Epers_Name "";
+                epers_date = Date.cdate_None;
+                epers_place = "";
+                epers_reason = "";
+                epers_note = "";
+                epers_src = "";
+                epers_witnesses = [||];
+              }
           in
           loop (e1 :: el) (n - 1)
         else el
@@ -121,6 +137,42 @@ let reconstitute_insert_pevent conf ext cnt el =
     in
     (el, true)
   else (el, ext)
+
+let is_empty_burial conf cnt =
+  let buri = Update_util.get_nth conf "buri_select" cnt in
+  match buri with Some "#buri" | Some "#crem" -> false | _ -> true
+
+let is_empty_death conf cnt =
+  let death = Update_util.get_nth conf "death_select" cnt in
+  match death with Some "Auto" | Some "DontKnowIfDead" -> true | _ -> false
+
+let pevent_of_form_pevent = function
+  | FormBirth pe -> pe
+  | FormBapt pe -> pe
+  | FormPevent pe -> pe
+  | FormDeath (_death_status, pe) -> pe
+  | FormBurial (_burial_status, pe) -> pe
+
+let burial_event conf cnt pe =
+  let tag =
+    match Update_util.get_nth conf "buri_select" cnt with
+    | Some "#buri" -> `Burial
+    | Some "#crem" -> `Cremation
+    | Some "buri_or_crem" | Some _ | None -> `UnknownBurial
+  in
+  FormBurial (tag, pe)
+
+let death_event conf cnt pe =
+  let tag =
+    match Update_util.get_nth conf "death_select" cnt with
+    | Some "Auto" -> `Auto
+    | Some "DeadYoung" -> `DeadYoung
+    | Some "DontKnowIfDead" -> `DontKnowIfDead
+    | Some "NotDead" -> `NotDead
+    | Some "OfCourseDead" -> `OfCourseDead
+    | Some "Death" | Some _ | None -> `Death
+  in
+  FormDeath (tag, pe)
 
 let rec reconstitute_pevents ~base conf ext cnt =
   match Update_util.get_nth conf "e_name" cnt with
@@ -179,6 +231,7 @@ let rec reconstitute_pevents ~base conf ext cnt =
         | "#slgs" -> Epers_ScellentSpouseLDS
         | "#vteb" -> Epers_VenteBien
         | "#will" -> Epers_Will
+        | "buri_or_crem" -> Epers_Burial
         | n -> Epers_Name (Ext_string.only_printable n)
       in
       let epers_date =
@@ -312,9 +365,24 @@ let rec reconstitute_pevents ~base conf ext cnt =
           epers_witnesses = Array.of_list witnesses;
         }
       in
+      let e =
+        match epers_name with
+        | Epers_Birth -> FormBirth e
+        | Epers_Baptism -> FormBapt e
+        | Epers_Burial -> burial_event conf cnt e
+        | Epers_Cremation -> burial_event conf cnt e
+        | Epers_Death -> death_event conf cnt e
+        | _ -> FormPevent e
+      in
       let el, ext = reconstitute_pevents ~base conf ext (cnt + 1) in
-      let el, ext = reconstitute_insert_pevent conf ext (cnt + 1) el in
-      (e :: el, ext)
+      let skip =
+        match epers_name with
+        | Epers_Burial when is_empty_burial conf cnt -> true
+        | Epers_Death when is_empty_death conf cnt -> true
+        | _ -> false
+      in
+      let el = if (not skip) || ext then e :: el else el in
+      (el, ext)
 
 let reconstitute_add_relation conf ext cnt rl =
   match Update_util.get_nth conf "add_relation" cnt with
@@ -380,193 +448,119 @@ let rec reconstitute_relations conf ext cnt =
       (r :: rl, ext)
   | None -> ([], ext)
 
-let reconstitute_death conf birth baptism death_place burial burial_place =
-  let d = Update.reconstitute_date conf "death" in
-  let dr =
-    match Util.p_getenv conf.Config.env "death_reason" with
-    | Some "Killed" -> Def.Killed
-    | Some "Murdered" -> Murdered
-    | Some "Executed" -> Executed
-    | Some "Disappeared" -> Disappeared
-    | Some "Unspecified" | None -> Unspecified
-    | Some x -> failwith ("bad death reason type " ^ x)
-  in
-  match Update_util.get conf "death" with
-  | "Auto" when d = None ->
-      if
-        death_place <> ""
-        || burial <> Def.UnknownBurial
-        || burial_place <> "" || dr <> Unspecified
-      then Def.DeadDontKnowWhen
-      else Update.infer_death_bb conf birth baptism
-  | "DeadYoung" when d = None -> DeadYoung
-  | "DontKnowIfDead" when d = None -> DontKnowIfDead
-  | "NotDead" -> NotDead
-  | "OfCourseDead" when d = None -> OfCourseDead
-  | _s -> (
-      match d with
-      | Some d -> Death (dr, Date.cdate_of_date d)
-      | None -> DeadDontKnowWhen)
-
-let reconstitute_burial conf burial_place =
-  let d = Update.reconstitute_date conf "burial" in
-  match Util.p_getenv conf.Config.env "burial" with
-  | Some "UnknownBurial" | None -> (
-      match (d, burial_place) with
-      | None, "" -> Def.UnknownBurial
-      | _ -> Buried (Date.cdate_of_od d))
-  | Some "Buried" -> Buried (Date.cdate_of_od d)
-  | Some "Cremated" -> Cremated (Date.cdate_of_od d)
-  | Some x -> failwith ("bad burial type " ^ x)
+let infer_death death_status burial_status burial_place death_pers_event =
+  if death_pers_event.Def.epers_date <> Date.cdate_None then
+    Def.Death (Unspecified, death_pers_event.Def.epers_date)
+  else
+    match death_status with
+    | `DeadYoung -> Def.DeadYoung
+    | (`DontKnowIfDead | `Auto | `NotDead)
+      when death_pers_event.Def.epers_place <> ""
+           || burial_status <> `UnknownBurial
+           || burial_place <> "" ->
+        DeadDontKnowWhen
+    | `DontKnowIfDead | `Auto -> DontKnowIfDead
+    | `NotDead -> NotDead
+    | `OfCourseDead -> OfCourseDead
+    | `Death when death_pers_event.epers_date = Date.cdate_None ->
+        DeadDontKnowWhen
+    | `Death -> Death (Unspecified, death_pers_event.Def.epers_date)
 
 (* TODO EVENT put this in Event *)
-let sort_pevents pevents =
+let sort_form_pevents form_pevents =
   Event.sort_events
-    (fun evt -> Event.Pevent evt.Def.epers_name)
-    (fun evt -> evt.epers_date)
-    pevents
+    (fun evt -> Event.Pevent (pevent_of_form_pevent evt).Def.epers_name)
+    (fun evt -> (pevent_of_form_pevent evt).epers_date)
+    form_pevents
 
-let reconstitute_from_pevents pevents ext bi bp de bu =
-  (* On tri les évènements pour être sûr. *)
-  let pevents = sort_pevents pevents in
-  let found_birth = ref false in
-  let found_baptism = ref false in
-  let found_death = ref false in
-  let found_burial = ref false in
-  let death_reason_std_fields =
-    let death_std_fields, _, _, _ = de in
-    match death_std_fields with
-    | Def.Death (dr, _) -> dr
-    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
-        Unspecified
+let pevent_of_form_pevent = function
+  | FormBirth pe -> pe
+  | FormBapt pe -> pe
+  | FormPevent pe -> pe
+  | FormDeath (_death_status, pe) -> pe
+  | FormBurial (_burial_status, pe) -> pe
+
+let remove_unnamed_events form_pevents =
+  List.filter
+    (fun pe -> (pevent_of_form_pevent pe).Def.epers_name <> Epers_Name "")
+    form_pevents
+
+let get_main_form_pevents form_pevents =
+  let form_pevents : 'a form_pevent list = sort_form_pevents form_pevents in
+  let rec find found_birth found_baptism found_death found_burial = function
+    | [] -> (found_birth, found_baptism, found_death, found_burial)
+    | (FormBirth _evt as evt) :: pevents when found_birth = None ->
+        find (Some evt) found_baptism found_death found_burial pevents
+    | (FormBapt _evt as evt) :: pevents when found_baptism = None ->
+        find found_birth (Some evt) found_death found_burial pevents
+    | (FormDeath (_, _evt) as evt) :: pevents when found_death = None ->
+        find found_birth found_baptism (Some evt) found_burial pevents
+    | (FormBurial (_, _evt) as evt) :: pevents when found_burial = None ->
+        find found_birth found_baptism found_death (Some evt) pevents
+    | _evt :: pevents ->
+        find found_birth found_baptism found_death found_burial pevents
   in
-  let rec loop pevents bi bp de bu =
-    match pevents with
-    | [] -> (bi, bp, de, bu)
-    | evt :: l -> (
-        match evt.Def.epers_name with
-        | Epers_Birth ->
-            if !found_birth then loop l bi bp de bu
-            else
-              let bi =
-                (evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src)
-              in
-              let () = found_birth := true in
-              loop l bi bp de bu
-        | Epers_Baptism ->
-            if !found_baptism then loop l bi bp de bu
-            else
-              let bp =
-                (evt.epers_date, evt.epers_place, evt.epers_note, evt.epers_src)
-              in
-              let () = found_baptism := true in
-              loop l bi bp de bu
-        | Epers_Death ->
-            if !found_death then loop l bi bp de bu
-            else
-              let death =
-                match Date.od_of_cdate evt.epers_date with
-                | Some _d -> Def.Death (death_reason_std_fields, evt.epers_date)
-                | None -> (
-                    let death, _, _, _ = de in
-                    (* On ajoute DontKnowIfDead dans le cas où tous les *)
-                    (* champs sont vides.                               *)
-                    match death with
-                    | ( Def.DeadYoung | DeadDontKnowWhen | OfCourseDead
-                      | DontKnowIfDead ) as death ->
-                        death
-                    | Death _ | NotDead -> DeadDontKnowWhen)
-              in
-              let de =
-                (death, evt.epers_place, evt.epers_note, evt.epers_src)
-              in
-              let () = found_death := true in
-              loop l bi bp de bu
-        | Epers_Burial ->
-            if !found_burial then loop l bi bp de bu
-            else
-              let bu =
-                ( Def.Buried evt.epers_date,
-                  evt.epers_place,
-                  evt.epers_note,
-                  evt.epers_src )
-              in
-              let () = found_burial := true in
-              loop l bi bp de bu
-        | Epers_Cremation ->
-            if !found_burial then loop l bi bp de bu
-            else
-              let bu =
-                ( Def.Cremated evt.epers_date,
-                  evt.epers_place,
-                  evt.epers_note,
-                  evt.epers_src )
-              in
-              let () = found_burial := true in
-              loop l bi bp de bu
-        | _ -> loop l bi bp de bu)
+  let birth, bapt, death, burial = find None None None None form_pevents in
+  let empty_evt =
+    FormPevent
+      {
+        Def.epers_name = Epers_Name "";
+        epers_date = Date.cdate_None;
+        epers_place = "";
+        epers_note = "";
+        epers_src = "";
+        epers_reason = "";
+        epers_witnesses = [||];
+      }
   in
-  let bi, bp, de, bu = loop pevents bi bp de bu in
-  (* Hack *)
-  let pevents =
-    if not !found_death then
-      let remove_evt = ref false in
-      List.fold_left
-        (fun accu evt ->
-          if not !remove_evt then
-            if evt.Def.epers_name = Epers_Name "" then (
-              remove_evt := true;
-              accu)
-            else evt :: accu
-          else evt :: accu)
-        [] (List.rev pevents)
-    else pevents
+  let birth = Option.value ~default:empty_evt birth in
+  let bapt = Option.value ~default:empty_evt bapt in
+  let burial = Option.value ~default:empty_evt burial in
+  let death = Option.value ~default:empty_evt death in
+  (birth, bapt, death, burial)
+
+let form_pevent_of_pevent death_status pe =
+  match pe.Def.epers_name with
+  | Epers_Birth -> FormBirth pe
+  | Epers_Baptism -> FormBapt pe
+  | Epers_Death -> FormDeath (death_status, pe)
+  | Epers_Burial -> FormBurial (`Burial, pe)
+  | Epers_Cremation -> FormBurial (`Cremation, pe)
+  | _ -> FormPevent pe
+
+let get_burial_status_opt = function
+  | FormBurial (burial_status, _) -> Some burial_status
+  | _ -> None
+
+let get_death_status_opt = function
+  | FormDeath (death_status, _) -> Some death_status
+  | _ -> None
+
+let get_main_pevents ?(death_status = `DontKnowIfDead) pevents =
+  let form_pevents = List.map (form_pevent_of_pevent death_status) pevents in
+  let bi, ba, de, bu = get_main_form_pevents form_pevents in
+  let burial_status =
+    Option.value ~default:`UnknownBurial (get_burial_status_opt bu)
+  in
+  let bi = pevent_of_form_pevent bi in
+  let ba = pevent_of_form_pevent ba in
+  let de = pevent_of_form_pevent de in
+  let bu = pevent_of_form_pevent bu in
+  let death = infer_death death_status burial_status bu.epers_place de in
+  let burial_status =
+    match burial_status with
+    | `Burial -> Def.Buried bu.Def.epers_date
+    | `Cremation -> Cremated bu.epers_date
+    | `UnknownBurial -> UnknownBurial
   in
   let pevents =
-    if not !found_burial then
-      let remove_evt = ref false in
-      List.fold_left
-        (fun accu evt ->
-          if not !remove_evt then
-            if evt.Def.epers_name = Epers_Name "" then (
-              remove_evt := true;
-              accu)
-            else evt :: accu
-          else evt :: accu)
-        [] (List.rev pevents)
-    else pevents
+    List.map pevent_of_form_pevent (remove_unnamed_events form_pevents)
   in
-  let pevents =
-    if not ext then
-      let remove_evt = ref false in
-      List.fold_left
-        (fun accu evt ->
-          if not !remove_evt then
-            if evt.Def.epers_name = Epers_Name "" then (
-              remove_evt := true;
-              accu)
-            else evt :: accu
-          else evt :: accu)
-        [] (List.rev pevents)
-    else pevents
-  in
-  (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
-  let bi = if not !found_birth then (Date.cdate_None, "", "", "") else bi in
-  let bp = if not !found_baptism then (Date.cdate_None, "", "", "") else bp in
-  let de =
-    if not !found_death then
-      if !found_burial then (Def.DeadDontKnowWhen, "", "", "")
-      else
-        let death, _, _, _ = de in
-        match death with
-        | NotDead -> (NotDead, "", "", "")
-        | DeadYoung | DeadDontKnowWhen | OfCourseDead | DontKnowIfDead | Death _
-          ->
-            (DontKnowIfDead, "", "", "")
-    else de
-  in
-  let bu = if not !found_burial then (Def.UnknownBurial, "", "", "") else bu in
-  (bi, bp, de, bu, pevents)
+  ( (bi.Def.epers_date, bi.epers_place, bi.epers_note, bi.epers_src),
+    (ba.Def.epers_date, ba.epers_place, ba.epers_note, ba.epers_src),
+    (death, de.epers_place, de.epers_note, de.epers_src),
+    (burial_status, bu.epers_place, bu.epers_note, bu.epers_src),
+    pevents )
 
 let reconstitute_person ~base conf =
   let ext = false in
@@ -616,66 +610,9 @@ let reconstitute_person ~base conf =
     | Some "F" -> Female
     | Some _ | None -> Neuter
   in
-  let birth = Update.reconstitute_date conf "birth" in
-  let birth_place =
-    Ext_string.only_printable (Update_util.get conf "birth_place")
-  in
-  let birth_note =
-    Ext_string.only_printable_or_nl
-      (Ext_string.strip_all_trailing_spaces (Update_util.get conf "birth_note"))
-  in
-  let birth_src =
-    Ext_string.only_printable (Update_util.get conf "birth_src")
-  in
-  let bapt = Update.reconstitute_date conf "bapt" in
-  let bapt_place =
-    Ext_string.only_printable (Update_util.get conf "bapt_place")
-  in
-  let bapt_note =
-    Ext_string.only_printable_or_nl
-      (Ext_string.strip_all_trailing_spaces (Update_util.get conf "bapt_note"))
-  in
-  let bapt_src = Ext_string.only_printable (Update_util.get conf "bapt_src") in
-  let burial_place =
-    Ext_string.only_printable (Update_util.get conf "burial_place")
-  in
-  let burial_note =
-    Ext_string.only_printable_or_nl
-      (Ext_string.strip_all_trailing_spaces
-         (Update_util.get conf "burial_note"))
-  in
-  let burial_src =
-    Ext_string.only_printable (Update_util.get conf "burial_src")
-  in
-  let burial = reconstitute_burial conf burial_place in
-  let death_place =
-    Ext_string.only_printable (Update_util.get conf "death_place")
-  in
-  let death_note =
-    Ext_string.only_printable_or_nl
-      (Ext_string.strip_all_trailing_spaces (Update_util.get conf "death_note"))
-  in
-  let death_src =
-    Ext_string.only_printable (Update_util.get conf "death_src")
-  in
-  let death =
-    reconstitute_death conf birth bapt death_place burial burial_place
-  in
-  let death_place =
-    match death with
-    | Death _ | DeadYoung | DeadDontKnowWhen -> death_place
-    | NotDead | DontKnowIfDead | OfCourseDead -> ""
-  in
-  let death =
-    match death with
-    | NotDead | DontKnowIfDead -> (
-        match burial with
-        | Buried _ | Cremated _ -> Def.DeadDontKnowWhen
-        | UnknownBurial -> death)
-    | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> death
-  in
   let pevents, ext = reconstitute_pevents ~base conf ext 1 in
-  let pevents, ext = reconstitute_insert_pevent conf ext 0 pevents in
+  let pevents, ext = reconstitute_insert_pevent conf ext pevents in
+  let pevents = if ext then pevents else remove_unnamed_events pevents in
   let notes =
     if first_name = "?" || surname = "?" then ""
     else
@@ -683,28 +620,30 @@ let reconstitute_person ~base conf =
         (Ext_string.strip_all_trailing_spaces (Update_util.get conf "notes"))
   in
   let psources = Ext_string.only_printable (Update_util.get conf "src") in
+  let birth_form, bapt_form, death_form, burial_form =
+    get_main_form_pevents pevents
+  in
+  let burial_status =
+    Option.value ~default:`UnknownBurial (get_burial_status_opt burial_form)
+  in
+  let death_status =
+    Option.value ~default:`Auto (get_death_status_opt death_form)
+  in
+  let death = pevent_of_form_pevent death_form in
+  let burial = pevent_of_form_pevent burial_form in
+  let birth = pevent_of_form_pevent birth_form in
+  let bapt = pevent_of_form_pevent bapt_form in
+  let death_status =
+    infer_death death_status burial_status burial.epers_place death
+  in
+  let burial_status =
+    match burial_status with
+    | `Burial -> Def.Buried burial.Def.epers_date
+    | `Cremation -> Cremated burial.epers_date
+    | `UnknownBurial -> UnknownBurial
+  in
   (* Mise à jour des évènements principaux. *)
-  let bi, bp, de, bu, pevents =
-    reconstitute_from_pevents pevents ext
-      (Date.cdate_of_od birth, birth_place, birth_note, birth_src)
-      (Date.cdate_of_od bapt, bapt_place, bapt_note, bapt_src)
-      (death, death_place, death_note, death_src)
-      (burial, burial_place, burial_note, burial_src)
-  in
-  let birth, birth_place, birth_note, birth_src = bi in
-  let bapt, bapt_place, bapt_note, bapt_src = bp in
-  let death, death_place, death_note, death_src = de in
-  let burial, burial_place, burial_note, burial_src = bu in
-  (* Maintenant qu'on a propagé les evèenements, on a *)
-  (* peut-être besoin de refaire un infer_death.      *)
-  let death =
-    match death with
-    | DontKnowIfDead ->
-        (* FIXME: do not use _bb version *)
-        Update.infer_death_bb conf (Date.od_of_cdate birth)
-          (Date.od_of_cdate bapt)
-    | NotDead | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> death
-  in
+  let pevents = List.map pevent_of_form_pevent pevents in
   let p =
     {
       Def.first_name;
@@ -722,22 +661,22 @@ let reconstitute_person ~base conf =
       related = [];
       sex;
       access;
-      birth;
-      birth_place;
-      birth_note;
-      birth_src;
-      baptism = bapt;
-      baptism_place = bapt_place;
-      baptism_note = bapt_note;
-      baptism_src = bapt_src;
-      death;
-      death_place;
-      death_note;
-      death_src;
-      burial;
-      burial_place;
-      burial_note;
-      burial_src;
+      birth = birth.Def.epers_date;
+      birth_place = birth.epers_place;
+      birth_note = birth.epers_note;
+      birth_src = birth.epers_src;
+      baptism = bapt.epers_date;
+      baptism_place = bapt.epers_place;
+      baptism_note = bapt.epers_note;
+      baptism_src = bapt.epers_src;
+      death = death_status;
+      death_place = death.epers_place;
+      death_note = death.epers_note;
+      death_src = death.epers_src;
+      burial = burial_status;
+      burial_place = burial.epers_place;
+      burial_note = burial.epers_note;
+      burial_src = burial.epers_src;
       pevents;
       notes;
       psources;
@@ -745,6 +684,20 @@ let reconstitute_person ~base conf =
     }
   in
   (p, ext)
+
+let reconstitute_from_pevents pevents (death_status, _, _, _)
+    (_burial_status, _, _, _) =
+  let death_status =
+    match death_status with
+    | Def.DontKnowIfDead -> `DontKnowIfDead
+    | NotDead -> `NotDead
+    | Death _ -> `Death
+    | DeadYoung -> `DeadYoung
+    | DeadDontKnowWhen -> `Death
+    | OfCourseDead -> `OfCourseDead
+  in
+  let bi, ba, de, bu, pevents = get_main_pevents ~death_status pevents in
+  (bi, ba, de, bu, pevents)
 
 let check_person conf base p =
   let bind_none x f = match x with Some _ -> x | None -> f () in
