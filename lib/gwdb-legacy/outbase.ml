@@ -291,6 +291,8 @@ let output_particles_file particles fname =
     particles;
   close_out oc
 
+type pending_operation = { commit : unit -> unit; rollback : unit -> unit }
+
 let generate_base base =
   let tmp_base = Filename.concat base.data.bdir "1base" in
   let tmp_base_acc = Filename.concat base.data.bdir "1base.acc" in
@@ -382,7 +384,7 @@ let generate_base base =
       remove_temporary_files ();
       raise e
   in
-  fun () ->
+  let commit () =
     let base_file = Filename.concat base.data.bdir "base" in
     let base_acc_file = Filename.concat base.data.bdir "base.acc" in
     Files.rm base_file;
@@ -398,6 +400,8 @@ let generate_base base =
     (* FIXME: should not be present in this part of the code? *)
     Files.rm (Filename.concat base.data.bdir "tstab");
     Files.rm (Filename.concat base.data.bdir "tstab_visitor")
+  in
+  { commit; rollback = remove_temporary_files }
 
 let generate_lowercase_first_name_index ~strings_data base =
   let tmp_fnames_lower_inx =
@@ -406,12 +410,20 @@ let generate_lowercase_first_name_index ~strings_data base =
   let tmp_fnames_lower_dat =
     Filename.concat base.data.bdir "1fnames_lower.dat"
   in
-  let () =
-    trace "create first name lower index";
-    output_first_name_lower_index strings_data base tmp_fnames_lower_inx
-      tmp_fnames_lower_dat
+  let remove_temporary_files () =
+    Files.rm tmp_fnames_lower_inx;
+    Files.rm tmp_fnames_lower_dat
   in
-  fun () ->
+  let () =
+    try
+      trace "create first name lower index";
+      output_first_name_lower_index strings_data base tmp_fnames_lower_inx
+        tmp_fnames_lower_dat
+    with e ->
+      remove_temporary_files ();
+      raise e
+  in
+  let commit () =
     let lowercase_first_name_data_file =
       Filename.concat base.data.bdir Database.lowercase_first_name_data_file
     in
@@ -422,6 +434,8 @@ let generate_lowercase_first_name_index ~strings_data base =
     Sys.rename tmp_fnames_lower_dat lowercase_first_name_data_file;
     Files.rm lowercase_first_name_index_file;
     Sys.rename tmp_fnames_lower_inx lowercase_first_name_index_file
+  in
+  { commit; rollback = remove_temporary_files }
 
 let generate_lowercase_surname_index ~strings_data base =
   let tmp_snames_lower_inx =
@@ -430,12 +444,20 @@ let generate_lowercase_surname_index ~strings_data base =
   let tmp_snames_lower_dat =
     Filename.concat base.data.bdir "1snames_lower.dat"
   in
-  let () =
-    trace "create surname lower index";
-    output_surname_lower_index strings_data base tmp_snames_lower_inx
-      tmp_snames_lower_dat
+  let remove_temporary_files () =
+    Files.rm tmp_snames_lower_inx;
+    Files.rm tmp_snames_lower_dat
   in
-  fun () ->
+  let () =
+    try
+      trace "create surname lower index";
+      output_surname_lower_index strings_data base tmp_snames_lower_inx
+        tmp_snames_lower_dat
+    with e ->
+      remove_temporary_files ();
+      raise e
+  in
+  let commit () =
     let lowercase_surname_data_file =
       Filename.concat base.data.bdir Database.lowercase_surname_data_file
     in
@@ -446,6 +468,8 @@ let generate_lowercase_surname_index ~strings_data base =
     Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
     Files.rm lowercase_surname_index_file;
     Sys.rename tmp_snames_lower_inx lowercase_surname_index_file
+  in
+  { commit; rollback = remove_temporary_files }
 
 let initialize_lowercase_name_index ~kind base =
   Lock.control ~onerror:Lock.print_try_again (Files.lock_file base.data.bdir)
@@ -470,12 +494,17 @@ let initialize_lowercase_name_index ~kind base =
           (List.map (Filename.concat base.data.bdir) index_files)
       in
       if not already_initialized then (
-        let commit_index =
+        let pending_index_generation =
           generate_index ~strings_data:(StringData.of_base base) base
         in
-        let commit_base = generate_base base in
-        commit_base ();
-        commit_index ()))
+        let pending_base_generation =
+          try generate_base base
+          with e ->
+            pending_index_generation.rollback ();
+            raise e
+        in
+        pending_base_generation.commit ();
+        pending_index_generation.commit ()))
 
 let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
@@ -498,13 +527,13 @@ let output ?(save_mem = false) ?(tasks = []) base =
   load_descends_array base;
   load_strings_array base;
   let strings_data = StringData.of_base base in
-  let commit_lowercase_first_name_index =
+  let pending_lowercase_first_name_index_generation =
     generate_lowercase_first_name_index ~strings_data base
   in
-  let commit_lowercase_surname_index =
+  let pending_lowercase_surname_index_generation =
     generate_lowercase_surname_index ~strings_data base
   in
-  let commit_base = generate_base base in
+  let pending_base_generation = generate_base base in
   (try
      (let oc_inx = Secure.open_out_bin tmp_names_inx in
       let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
@@ -573,12 +602,15 @@ let output ?(save_mem = false) ?(tasks = []) base =
         raise e);
      trace "ok"
    with e ->
+     pending_base_generation.rollback ();
+     pending_lowercase_surname_index_generation.rollback ();
+     pending_lowercase_first_name_index_generation.rollback ();
      Files.rm tmp_names_inx;
      Files.rm tmp_names_acc;
      Files.rm tmp_strings_inx;
      Files.remove_dir tmp_notes_d;
      raise e);
-  commit_base ();
+  pending_base_generation.commit ();
   Files.rm (Filename.concat bname "names.inx");
   Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
   Files.rm (Filename.concat bname "names.acc");
@@ -592,8 +624,8 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
 
-  commit_lowercase_surname_index ();
-  commit_lowercase_first_name_index ();
+  pending_lowercase_surname_index_generation.commit ();
+  pending_lowercase_first_name_index_generation.commit ();
 
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
