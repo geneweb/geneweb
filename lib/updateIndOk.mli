@@ -82,15 +82,6 @@ val error_person : Config.config -> Update.update_error -> unit
 val update_relations_of_related :
   Gwdb.base -> Gwdb.iper -> Gwdb.iper list -> unit
 
-val reconstitute_death :
-  Config.config ->
-  Date.date option ->
-  Date.date option ->
-  string ->
-  Def.burial ->
-  string ->
-  Def.death
-
 val reconstitute_from_pevents :
   ('a, string) Def.gen_pers_event list ->
   bool ->
