@@ -330,7 +330,7 @@ let v =
         Alcotest.test_case "Util.string_with_macros" `Quick
           util_string_with_macros;
         Alcotest.test_case "Util.escape_html" `Quick util_escape_html;
-        Alcotest.test_case "Utf8.name_with_roman_number" `Quick
+        Alcotest.test_case "Util.name_with_roman_number" `Quick
           util_name_with_roman_number;
       ] );
     ( "date-display",
