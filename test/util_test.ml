@@ -276,6 +276,36 @@ let util_escape_html () =
        {|<a href="mailto:jean@dupond.net">jean@dupond.net</a> - le 1 &amp; 2|}
       :> string)
 
+let privacy_of_dummy_person () =
+  let test ~__POS__ ~public_if_no_date predicate =
+    let empty_base =
+      Gwdb.make "" []
+        ( ([||], [||], [||]),
+          ([||], [||], [||]),
+          [||],
+          {
+            Def.nread = (fun _ _ -> "");
+            norigin_file = "";
+            efiles = (fun () -> []);
+          } )
+    in
+    let predicate, expected =
+      match predicate with
+      | `Is_contemporary -> (Geneweb.Person.is_contemporary, true)
+      | `Is_visible -> (Geneweb.Person.is_visible, false)
+    in
+    Alcotest.check' ~pos:__POS__ Alcotest.bool ~msg:"" ~expected
+      ~actual:
+        (predicate
+           { Geneweb.Config.empty with public_if_no_date }
+           empty_base
+           (Gwdb.empty_person empty_base Gwdb.dummy_iper))
+  in
+  test ~__POS__ ~public_if_no_date:false `Is_contemporary;
+  test ~__POS__ ~public_if_no_date:false `Is_visible;
+  test ~__POS__ ~public_if_no_date:true `Is_contemporary;
+  test ~__POS__ ~public_if_no_date:true `Is_visible
+
 let datedisplay_string_of_date () =
   let conf = Geneweb.Config.empty in
   let conf = { conf with env = ("lang", Adef.encoded "co") :: conf.env } in
@@ -332,6 +362,8 @@ let v =
         Alcotest.test_case "Util.escape_html" `Quick util_escape_html;
         Alcotest.test_case "Util.name_with_roman_number" `Quick
           util_name_with_roman_number;
+        Alcotest.test_case "privacy-of-dummy-person" `Quick
+          privacy_of_dummy_person;
       ] );
     ( "date-display",
       [
