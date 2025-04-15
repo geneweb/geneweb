@@ -18,7 +18,9 @@ let default_portrait_filename base p =
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
   let s = default_portrait_filename base p in
-  let f = Filename.concat (Util.base_path [ "images" ] conf.Config.bname) s in
+  let f =
+    Filename.concat (GWPARAM.base_path [ "images" ] conf.Config.bname) s
+  in
   if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
   else if Sys.file_exists (f ^ ".png") then Some (`Path (f ^ ".png"))
   else if Sys.file_exists (f ^ ".gif") then Some (`Path (f ^ ".gif"))
@@ -27,7 +29,7 @@ let full_portrait_path conf base p =
 let source_filename bname src =
   let fname1 =
     List.fold_right Filename.concat
-      [ Util.base_path [ "src" ] bname; "images" ]
+      [ GWPARAM.base_path [ "src" ] bname; "images" ]
       src
   in
   let fname2 =
@@ -141,7 +143,7 @@ let rename_portrait conf base p (nfn, nsn, noc) =
   | Some (`Path old_f) -> (
       let s = default_portrait_filename_of_key nfn nsn noc in
       let f =
-        Filename.concat (Util.base_path [ "images" ] conf.Config.bname) s
+        Filename.concat (GWPARAM.base_path [ "images" ] conf.Config.bname) s
       in
       let new_f = f ^ Filename.extension old_f in
       try Sys.rename old_f new_f
@@ -201,7 +203,7 @@ let urlorpath_of_string conf s =
     | Some p when p <> "" -> `Path (Filename.concat p s)
     | Some _ | None ->
         let fname =
-          Filename.concat (Util.base_path [ "images" ] conf.Config.bname) s
+          Filename.concat (GWPARAM.base_path [ "images" ] conf.Config.bname) s
         in
         `Path fname
   else `Path s

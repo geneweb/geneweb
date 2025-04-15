@@ -131,7 +131,7 @@ end = struct
       sosa_ref
 
   let output ~base ~cache =
-    let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
+    let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
     let cache_file = Filename.concat base_dir "cache_static_sosa" in
     let tmp_cache_file = cache_file ^ "~" in
     let oc = Secure.open_out tmp_cache_file in
@@ -140,7 +140,7 @@ end = struct
     Files.mv tmp_cache_file cache_file
 
   let input ~base : t option =
-    let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
+    let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
     let cache_file = Filename.concat base_dir "cache_static_sosa" in
     if Sys.file_exists cache_file then (
       let ic = Secure.open_in cache_file in
@@ -182,7 +182,7 @@ let is_default_sosa_ref conf base sosa_ref =
   |> Option.value ~default:false
 
 let is_sosa_cache_valid base =
-  let base_dir = Util.bpath (Gwdb.bname base ^ ".gwb") in
+  let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
   let patch_file = Filename.concat base_dir "patches" in
   let cache_file = Filename.concat base_dir "cache_static_sosa" in
   Files.exists cache_file

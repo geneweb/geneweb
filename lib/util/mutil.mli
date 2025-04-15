@@ -47,26 +47,6 @@ val input_lexicon :
     If traduction line has a form [->: kw] it associates to the current section name the value
     associated to [kw] section name inside [ht] (keyword alias). *)
 
-val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
-(** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
-    but is more efficient.
-
-    The list is constructed backward,
-    so if [fn] have side effects it may not behave as excepted.
- *)
-
-val array_to_list_rev_map : ('a -> 'b) -> 'a array -> 'b list
-(** [array_to_list_revmap fn a] is almost like [Array.to_list a |> List.rev_map fn]
-    but is more efficient.
- *)
-
-val array_assoc : 'k -> ('k * 'v) array -> 'v
-(** [array_assoc k arr]
-    returns the value associated with key [k] in the array of pairs [arr].
-    That is, [array_assoc k [| ... ; (k,v) ; ... |] = v]
-    if [(k,v)] is the leftmost binding of a in array [arr].
-    Raise [Not_found] if there is no value associated with [k] in [arr]. *)
-
 val compile_particles : string list -> Re.re
 (** [compile_particles list]
     Compile [list] so it can be used with [get_particle]
@@ -98,21 +78,8 @@ val random_magic : string
     It should be different each time you launch the program.
 *)
 
-val array_except : 'a -> 'a array -> 'a array
-(** [array_except value array]
-    Return a new array containing all the elements
-    from [array] except the first occurence of [value]
- *)
-
 val default_particles : string list
 (** List of default particles used in GeneWeb *)
-
-val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
-(** [array_forall2 p a b]
-    Checks if all elements of the arrays satisfy the predicate [p].
-    That is, it returns [(p a1 b1) && (p a2 b2) && ... && (p an bn)].
-    Raise Invalid_argument if the two lists are determined to have different lengths.
-*)
 
 val input_file_ic : in_channel -> string
 (** Read the content of a file.
@@ -130,9 +97,6 @@ val bench : string -> (unit -> 'a) -> 'a
 (** [bench name fn]
     Execute [fn], print stats about time and memory allocation, return [fn] result.
  *)
-
-val print_callstack : ?max:int -> unit -> unit
-(** Prints call stack on stderr with at most [max] entries. *)
 
 val encode : string -> Adef.encoded_string
 (** [encode s]

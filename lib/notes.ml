@@ -5,7 +5,7 @@ let limit_display_length =
   fun s -> String.sub s 0 (min (String.length s) max_display_length)
 
 let file_path conf base fname =
-  Util.bpath
+  GWPARAM.bpath
     (List.fold_left Filename.concat
        (conf.Config.bname ^ ".gwb")
        [ Gwdb.base_notes_dir base; fname ^ ".txt" ])
@@ -159,7 +159,7 @@ let commit_notes conf base fnotes s =
   let fname = path_of_fnotes fnotes in
   let fpath =
     List.fold_left Filename.concat
-      (Util.bpath (conf.Config.bname ^ ".gwb"))
+      (GWPARAM.bpath (conf.Config.bname ^ ".gwb"))
       [ Gwdb.base_notes_dir base; fname ]
   in
   Files.mkdir_p (Filename.dirname fpath);
@@ -185,7 +185,7 @@ let wiki_aux pp conf base env str =
 let source conf base str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base [] str
 
-let note conf base env str = wiki_aux (fun x -> x) conf base env str
+let note conf base env str = wiki_aux Fun.id conf base env str
 
 let person_note conf base p str =
   let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in

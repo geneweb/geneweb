@@ -1,12 +1,10 @@
-open Dbdisk
-
 (* copied from Gwdb_driver *)
 let dummy_ifam = -1
 let empty_string = 0
 let quest_string = 1
 
 let empty_person p =
-  (p.first_name = empty_string || p.first_name = quest_string)
+  (p.Dbdisk.first_name = empty_string || p.first_name = quest_string)
   && (p.surname = empty_string || p.surname = quest_string)
   (* && p.occ = 0 *)
   && p.image = empty_string
@@ -35,7 +33,7 @@ let empty_person p =
   && p.pevents = [] && p.notes = empty_string && p.psources = empty_string
 
 let gc ?(dry_run = true) ~save_mem base =
-  base.data.persons.load_array ();
+  base.Dbdisk.data.persons.load_array ();
   base.data.ascends.load_array ();
   base.data.unions.load_array ();
   base.data.families.load_array ();
@@ -72,7 +70,7 @@ let gc ?(dry_run = true) ~save_mem base =
   (* [p1;p2:p3;p4] [true;false;true;false] -> [0;0;1;1] *)
   let dst_i src m =
     let off = ref 0 in
-    Array.init src.len (fun i ->
+    Array.init src.Dbdisk.len (fun i ->
         if Array.get m i then i - !off
         else (
           incr off;

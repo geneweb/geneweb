@@ -27,7 +27,7 @@ let history_d conf =
       if Filename.check_suffix conf.bname ".gwb" then conf.bname
       else conf.bname ^ ".gwb"
     in
-    Filename.concat (Util.bpath bname) path
+    Filename.concat (GWPARAM.bpath bname) path
   else path
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
@@ -243,9 +243,7 @@ let record_diff conf base changed =
                 (try Sys.rename ofname fname with Sys_error _ -> ());
                 let p = Gwdb.poi base ip in
                 let p =
-                  Futil.map_person_ps
-                    (fun p -> p)
-                    (Gwdb.sou base)
+                  Futil.map_person_ps Fun.id (Gwdb.sou base)
                     (Gwdb.gen_person_of_person p)
                 in
                 let gr = make_gen_record conf base false p in

@@ -1,7 +1,3 @@
-open Def
-open Gwdb
-open State
-
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Key to refer a person's definition *)
 
@@ -9,27 +5,31 @@ type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
     (only key elements provided) or definition (all information provided). *)
 type somebody =
   | Undefined of key  (** Reference to person *)
-  | Defined of (iper, iper, string) gen_person  (** Person's definition *)
+  | Defined of (Gwdb.iper, Gwdb.iper, string) Def.gen_person
+      (** Person's definition *)
 
 type 'a assumption = Weak of 'a | Strong of 'a
 
 (** Blocks that could appear in .gw file. *)
 type gw_syntax =
   | Family of
-      somebody gen_couple
-      * sex assumption
-      * sex assumption
-      * (somebody * sex assumption) list
-      * (string gen_fam_event_name
-        * cdate
+      somebody Def.gen_couple
+      * Def.sex assumption
+      * Def.sex assumption
+      * (somebody * Def.sex assumption) list
+      * (string Def.gen_fam_event_name
+        * Def.cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex assumption * witness_kind * string) list)
+        * (somebody * Def.sex assumption * Def.witness_kind * string) list)
         list
-      * ((iper, iper, string) gen_person, ifam, string) gen_family
-      * (iper, iper, string) gen_person gen_descend
+      * ( (Gwdb.iper, Gwdb.iper, string) Def.gen_person,
+          Gwdb.ifam,
+          string )
+        Def.gen_family
+      * (Gwdb.iper, Gwdb.iper, string) Def.gen_person Def.gen_descend
       (** Family definition block. Contains:
       - Family couple (father's and mother's definition/reference)
       - Father's sex
@@ -43,7 +43,7 @@ type gw_syntax =
       (** Block that defines personal notes. First element represents
       reference to person. Second is note's content. *)
   | Relations of
-      somebody * sex assumption * (somebody, string) gen_relation list
+      somebody * Def.sex assumption * (somebody, string) Def.gen_relation list
       (** Block that defines relations of a person with someone outisde of
       family block (like foster parents) (field {i rparents}). Contains:
       - Concerned person definition/reference
@@ -51,14 +51,14 @@ type gw_syntax =
       - List of his relations. *)
   | Pevent of
       somebody
-      * sex assumption
-      * (string gen_pers_event_name
-        * cdate
+      * Def.sex assumption
+      * (string Def.gen_pers_event_name
+        * Def.cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex assumption * witness_kind * string) list)
+        * (somebody * Def.sex assumption * Def.witness_kind * string) list)
         list
       (** Block that defines events of a person. Specific to gwplus format. Contains:
       - Concerned person's definition/reference
@@ -289,7 +289,7 @@ let date_of_string s i =
 (** Read line from input channel. *)
 let input_line0 state ic =
   let line = input_line ic in
-  state.line_cnt <- succ state.line_cnt;
+  state.Gwc_lib__.State.line_cnt <- succ state.Gwc_lib__.State.line_cnt;
   if String.length line > 0 && line.[String.length line - 1] = '\r' then
     String.sub line 0 (String.length line - 1)
   else line
@@ -338,14 +338,14 @@ let get_optional_baptdate l =
 (** Parse death information if present. *)
 let get_optional_deathdate l =
   match l with
-  | "?" :: l' -> (Some DontKnowIfDead, l')
+  | "?" :: l' -> (Some Def.DontKnowIfDead, l')
   | "mj" :: l' -> (Some DeadYoung, l')
   | "od" :: l' -> (Some OfCourseDead, l')
   | x :: l' ->
       let i = 0 in
       let dr, i =
         match x.[i] with
-        | 'k' -> (Killed, i + 1)
+        | 'k' -> (Def.Killed, i + 1)
         | 'm' -> (Murdered, i + 1)
         | 'e' -> (Executed, i + 1)
         | 's' -> (Disappeared, i + 1)
@@ -356,7 +356,7 @@ let get_optional_deathdate l =
         | '~' | '?' | '>' | '<' | '-' | '0' .. '9' ->
             let d =
               match date_of_string x i with
-              | None -> DeadDontKnowWhen
+              | None -> Def.DeadDontKnowWhen
               | Some d -> Death (dr, Date.cdate_of_date d)
             in
             (Some d, l')
@@ -377,7 +377,7 @@ let get_burial l =
                 (date_of_string x i, l')
             | _ -> (None, l)
           in
-          (Buried (Date.cdate_of_od od), l)
+          (Def.Buried (Date.cdate_of_od od), l)
       | [] -> (Buried Date.cdate_None, l))
   | "#crem" :: l -> (
       match l with
@@ -395,7 +395,7 @@ let get_burial l =
 
 (** Parse sex of person *)
 let get_optional_sexe = function
-  | "h" :: l -> (Male, l)
+  | "h" :: l -> (Def.Male, l)
   | "f" :: l -> (Female, l)
   | l -> (Neuter, l)
 
@@ -508,7 +508,7 @@ let get_pub_name l =
 let get_image state l =
   match l with
   | ("#image" | "#photo") :: x :: l' ->
-      if state.no_picture then ("", l') else (cut_space x, l')
+      if state.Gwc_lib__.State.no_picture then ("", l') else (cut_space x, l')
   | _ -> ("", l)
 
 (** Parses person's occupation if present *)
@@ -522,7 +522,7 @@ let get_sources l =
 (** Parses person's acces rights *)
 let get_access l =
   match l with
-  | "#apubl" :: l' -> (Public, l')
+  | "#apubl" :: l' -> (Def.Public, l')
   | "#apriv" :: l' -> (Private, l')
   | _ -> (IfTitles, l)
 
@@ -544,7 +544,9 @@ let scan_title t =
     let s, i = next_field i in
     if i = String.length t then failwith t else (s, i)
   in
-  let name = match name with "" -> Tnone | "*" -> Tmain | _ -> Tname name in
+  let name =
+    match name with "" -> Def.Tnone | "*" -> Tmain | _ -> Tname name
+  in
   let title, i =
     let s, i = next_field i in
     if t.[i - 1] <> ':' then failwith t else (s, i)
@@ -565,7 +567,7 @@ let scan_title t =
   if i <> String.length t then failwith t
   else
     {
-      t_name = name;
+      Def.t_name = name;
       t_ident = title;
       t_place = place;
       t_date_start = Date.cdate_of_od date_start;
@@ -588,7 +590,7 @@ let rec get_titles str l =
 (** Parses person's event name *)
 let get_pevent_name str l =
   match l with
-  | "#birt" :: l' -> (Epers_Birth, l')
+  | "#birt" :: l' -> (Def.Epers_Birth, l')
   | "#bapt" :: l' -> (Epers_Baptism, l')
   | "#deat" :: l' -> (Epers_Death, l')
   | "#buri" :: l' -> (Epers_Burial, l')
@@ -646,7 +648,7 @@ let get_pevent_name str l =
 (** Parses family event name *)
 let get_fevent_name str l =
   match l with
-  | "#marr" :: l' -> (Efam_Marriage, l')
+  | "#marr" :: l' -> (Def.Efam_Marriage, l')
   | "#nmar" :: l' -> (Efam_NoMarriage, l')
   | "#nmen" :: l' -> (Efam_NoMention, l')
   | "#enga" :: l' -> (Efam_Engage, l')
@@ -680,7 +682,7 @@ let get_optional_event_date l =
 (** Parse witness kind *)
 let get_event_witness_kind l =
   match l with
-  | "#godp" :: l' -> (Witness_GodParent, l')
+  | "#godp" :: l' -> (Def.Witness_GodParent, l')
   | "#offi" :: l' -> (Witness_CivilOfficer, l')
   | "#reli" :: l' -> (Witness_ReligiousOfficer, l')
   | "#info" :: l' -> (Witness_Informant, l')
@@ -711,44 +713,51 @@ let get_mar_date str = function
         let decode_sex v c l =
           let decode_sex i =
             match c.[i] with
-            | 'm' -> make_strong_assumption Male
-            | 'f' -> make_strong_assumption Female
-            | '?' -> make_strong_assumption Neuter
+            | 'm' -> make_strong_assumption Def.Male
+            | 'f' -> make_strong_assumption Def.Female
+            | '?' -> make_strong_assumption Def.Neuter
             | _ -> failwith __LOC__
           in
           try ((v, decode_sex 0, decode_sex 1), l)
           with _ ->
-            ((v, make_weak_assumption Male, make_weak_assumption Female), c :: l)
+            ( (v, make_weak_assumption Def.Male, make_weak_assumption Def.Female),
+              c :: l )
         in
         match l with
         | "#nm" :: l ->
-            ( ( NotMarried,
-                make_weak_assumption Male,
-                make_weak_assumption Female ),
+            ( ( Def.NotMarried,
+                make_weak_assumption Def.Male,
+                make_weak_assumption Def.Female ),
               l )
         | "#eng" :: l ->
-            ( (Engaged, make_weak_assumption Male, make_weak_assumption Female),
+            ( ( Engaged,
+                make_weak_assumption Def.Male,
+                make_weak_assumption Def.Female ),
               l )
         | "#noment" :: c :: l when String.length c = 2 ->
-            decode_sex NoMention c l
+            decode_sex Def.NoMention c l
         | "#noment" :: l ->
-            ( (NoMention, make_weak_assumption Male, make_weak_assumption Female),
+            ( ( NoMention,
+                make_weak_assumption Def.Male,
+                make_weak_assumption Def.Female ),
               l )
         | "#nsck" :: c :: l when String.length c = 2 ->
-            decode_sex NoSexesCheckNotMarried c l
+            decode_sex Def.NoSexesCheckNotMarried c l
         | "#nsckm" :: c :: l when String.length c = 2 ->
-            decode_sex NoSexesCheckMarried c l
+            decode_sex Def.NoSexesCheckMarried c l
         | "#banns" :: c :: l when String.length c = 2 ->
-            decode_sex MarriageBann c l
+            decode_sex Def.MarriageBann c l
         | "#contract" :: c :: l when String.length c = 2 ->
-            decode_sex MarriageContract c l
+            decode_sex Def.MarriageContract c l
         | "#license" :: c :: l when String.length c = 2 ->
-            decode_sex MarriageLicense c l
-        | "#pacs" :: c :: l when String.length c = 2 -> decode_sex Pacs c l
+            decode_sex Def.MarriageLicense c l
+        | "#pacs" :: c :: l when String.length c = 2 -> decode_sex Def.Pacs c l
         | "#residence" :: c :: l when String.length c = 2 ->
-            decode_sex Residence c l
+            decode_sex Def.Residence c l
         | _ ->
-            ( (Married, make_weak_assumption Male, make_weak_assumption Female),
+            ( ( Married,
+                make_weak_assumption Def.Male,
+                make_weak_assumption Def.Female ),
               l )
       in
       let place, l = get_field "#mp" l in
@@ -758,7 +767,7 @@ let get_mar_date str = function
         match l with
         | x :: l when x.[0] = '-' ->
             if String.length x > 1 then
-              (Divorced (Date.cdate_of_od (date_of_string x 1)), l)
+              (Def.Divorced (Date.cdate_of_od (date_of_string x 1)), l)
             else (Divorced Date.cdate_None, l)
         | "#sep" :: l -> (Separated, l)
         | _ -> (NotDivorced, l)
@@ -837,10 +846,10 @@ let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
   let burial_src, l = get_field "#rs" l in
   let u =
     {
-      first_name = fn;
+      Def.first_name = fn;
       surname = sn;
       occ;
-      rparents = u.rparents;
+      rparents = u.Def.rparents;
       related = u.related;
       sex;
       notes = u.notes;
@@ -926,7 +935,7 @@ let get_relation state str = function
   | "-" :: x :: l -> (
       let rtyp =
         match x with
-        | "adop" | "adop:" -> Adoption
+        | "adop" | "adop:" -> Def.Adoption
         | "reco" | "reco:" -> Recognition
         | "cand" | "cand:" -> CandidateParent
         | "godp" | "godp:" -> GodParent
@@ -938,7 +947,12 @@ let get_relation state str = function
         let l = match l with "+" :: l -> l | _ -> failwith str in
         let mk, _, l = parse_parent state str l in
         if l <> [] then failwith str;
-        { r_type = rtyp; r_fath = Some fk; r_moth = Some mk; r_sources = "" })
+        {
+          Def.r_type = rtyp;
+          r_fath = Some fk;
+          r_moth = Some mk;
+          r_sources = "";
+        })
       else
         match l with
         | "fath:" :: l ->
@@ -1036,9 +1050,9 @@ let loop_witn state line ic =
         let sex, l =
           (* TODO factorize sex parsing? *)
           match l with
-          | "m:" :: l -> (make_strong_assumption Male, l)
-          | "f:" :: l -> (make_strong_assumption Female, l)
-          | l -> (make_weak_assumption Neuter, l)
+          | "m:" :: l -> (make_strong_assumption Def.Male, l)
+          | "f:" :: l -> (make_strong_assumption Def.Female, l)
+          | l -> (make_weak_assumption Def.Neuter, l)
         in
         let wkind, l = get_event_witness_kind l in
         let wit, _, l = parse_parent state str l in
@@ -1077,9 +1091,9 @@ let read_family state ic fname = function
           | Some (str, ("wit" | "wit:") :: l) ->
               let sex, l =
                 match l with
-                | "m:" :: l -> (make_strong_assumption Male, l)
-                | "f:" :: l -> (make_strong_assumption Female, l)
-                | l -> (make_weak_assumption Neuter, l)
+                | "m:" :: l -> (make_strong_assumption Def.Male, l)
+                | "f:" :: l -> (make_strong_assumption Def.Female, l)
+                | l -> (make_weak_assumption Def.Neuter, l)
               in
               let wk, _, l = parse_parent state str l in
               if l <> [] then failwith str;
@@ -1183,7 +1197,7 @@ let read_family state ic fname = function
           (* create a family definition (without witnesses, events and family index) *)
           let fo =
             {
-              marriage;
+              Def.marriage;
               marriage_place = marr_place;
               marriage_note = marr_note;
               marriage_src = marr_src;
@@ -1197,7 +1211,7 @@ let read_family state ic fname = function
               fam_index = Gwdb.dummy_ifam;
             }
           in
-          let deo = { children = Array.of_list cles_enfants } in
+          let deo = { Def.children = Array.of_list cles_enfants } in
           F_some
             ( Family (co, fath_sex, moth_sex, witn, fevents, fo, deo),
               read_line state ic )
@@ -1205,7 +1219,7 @@ let read_family state ic fname = function
       | line ->
           let fo =
             {
-              marriage;
+              Def.marriage;
               marriage_place = marr_place;
               marriage_note = marr_note;
               marriage_src = marr_src;
@@ -1219,7 +1233,7 @@ let read_family state ic fname = function
               fam_index = Gwdb.dummy_ifam;
             }
           in
-          let deo = { children = [||] } in
+          let deo = { Def.children = [||] } in
           F_some (Family (co, fath_sex, moth_sex, witn, fevents, fo, deo), line)
       )
   (* Database notes block *)
@@ -1268,9 +1282,9 @@ let read_family state ic fname = function
 
       let sex, l =
         match l with
-        | "#h" :: l -> (make_strong_assumption Male, l)
-        | "#f" :: l -> (make_strong_assumption Female, l)
-        | l -> (make_weak_assumption Neuter, l)
+        | "#h" :: l -> (make_strong_assumption Def.Male, l)
+        | "#f" :: l -> (make_strong_assumption Def.Female, l)
+        | l -> (make_weak_assumption Def.Neuter, l)
       in
       if l <> [] then failwith "str"
       else
@@ -1325,7 +1339,8 @@ let read_family state ic fname = function
         in
         let pevents = List.rev pevents in
         F_some
-          (Pevent (sb, make_weak_assumption Neuter, pevents), read_line state ic)
+          ( Pevent (sb, make_weak_assumption Def.Neuter, pevents),
+            read_line state ic )
   | Some (str, _) -> failwith str
   (* End of the file *)
   | None -> F_none
@@ -1333,14 +1348,14 @@ let read_family state ic fname = function
 (** Read and return a block of .gw file. If [!no_fail] is disabled raises
     [Failure] exception. *)
 let read_family_1 state ic fname line =
-  if state.no_fail then
+  if state.Gwc_lib__.State.no_fail then
     try read_family state ic fname line with Failure str -> F_fail str
   else read_family state ic fname line
 
 (** Compile .gw file and save result to corresponding .gwo *)
 let comp_families state x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
-  state.line_cnt <- 0;
+  state.Gwc_lib__.State.line_cnt <- 0;
   let oc = open_out_bin out_file in
   (try
      let ic = open_in x in
@@ -1355,11 +1370,12 @@ let comp_families state x =
            loop line encoding
        | F_enc_utf_8 -> loop (read_line state (ic, E_utf_8)) E_utf_8
        | F_gw_plus ->
-           state.create_all_keys <- true;
+           state.Gwc_lib__.State.create_all_keys <- true;
            loop (read_line state (ic, encoding)) encoding
        | F_none -> ()
        | F_fail str ->
-           Printf.printf "File \"%s\", line %d:\n" x state.line_cnt;
+           Printf.printf "File \"%s\", line %d:\n" x
+             state.Gwc_lib__.State.line_cnt;
            Printf.printf "Error: %s\n" str;
            flush stdout;
            loop (read_line state (ic, encoding)) encoding

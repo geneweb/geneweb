@@ -36,7 +36,7 @@ let only_suburb =
 (** [without_suburb "[foo-bar] - boobar (baz)"] is ["boobar (baz)"]
     [without_suburb "boobar (baz)"] is ["boobar (baz)"] *)
 let without_suburb =
-  suburb_aux (fun s len _i j -> String.sub s j (len - j)) (fun s -> s)
+  suburb_aux (fun s len _i j -> String.sub s j (len - j)) Fun.id
 
 (** Transform ["[foo-bar] - boobar (baz)"] into ["foo-bar, boobar (baz)"] *)
 let normalize =
@@ -48,7 +48,7 @@ let normalize =
       Bytes.unsafe_set b i ' ';
       Bytes.blit_string s j b (i + 1) (len - j);
       Bytes.unsafe_to_string b)
-    (fun s -> s)
+    Fun.id
 
 let compare_places s1 s2 =
   let ss1, s1 = split_suburb s1 in

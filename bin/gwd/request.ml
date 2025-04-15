@@ -401,7 +401,7 @@ let try_plugin list conf base_name m =
   List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
 
 let w_lock ~onerror fn conf (base_name : string option) =
-  let bfile = Geneweb.Util.bpath (conf.Geneweb.Config.bname ^ ".gwb") in
+  let bfile = Geneweb.GWPARAM.bpath (conf.Geneweb.Config.bname ^ ".gwb") in
   Lock.control (Files.lock_file bfile) true
     ~onerror:(fun () -> onerror conf base_name)
     (fun () -> fn conf base_name)
@@ -455,7 +455,7 @@ let treat_request =
     let bfile =
       if conf.Geneweb.Config.bname = "" then None
       else
-        let bfile = Geneweb.Util.bpath (conf.bname ^ ".gwb") in
+        let bfile = Geneweb.GWPARAM.bpath (conf.bname ^ ".gwb") in
         if Sys.file_exists bfile then Some bfile else None
     in
     let process () =

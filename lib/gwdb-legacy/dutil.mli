@@ -1,7 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Dbdisk
-
 type name_index_data = int array array
 (** Index for all kind of mix between person's names (first index inside {i names.inx}) *)
 
@@ -39,20 +37,23 @@ val compare_snames : Dbdisk.base_data -> string -> string -> int
 (** [compare_snames_i base s1 s2] compare two surnames according to the principe specified by [Mutil.compare_after_particle]. *)
 
 val dsk_person_misc_names :
-  dsk_base -> dsk_person -> (dsk_person -> dsk_title list) -> string list
+  Dbdisk.dsk_base ->
+  Dbdisk.dsk_person ->
+  (Dbdisk.dsk_person -> Dbdisk.dsk_title list) ->
+  string list
 (** [dsk_person_misc_names base p nobtit] computes various mix between all kind of names of a person's entry [p]
     from the database [base]. [nobtit] is used to return a title entries for passed in argument person. *)
 
-val poi : dsk_base -> int -> dsk_person
+val poi : Dbdisk.dsk_base -> int -> Dbdisk.dsk_person
 (** [poi base i] returns person's entry with index [i] from [base]. *)
 
-val sou : dsk_base -> int -> string
+val sou : Dbdisk.dsk_base -> int -> string
 (** [poi base i] returns string with index [i] from [base]. *)
 
-val p_first_name : dsk_base -> dsk_person -> string
+val p_first_name : Dbdisk.dsk_base -> Dbdisk.dsk_person -> string
 (** Returns person's first name from the given person's entry. *)
 
-val p_surname : dsk_base -> dsk_person -> string
+val p_surname : Dbdisk.dsk_base -> Dbdisk.dsk_person -> string
 (** Returns person's surname from the given person's entry. *)
 
 val output_value_no_sharing : out_channel -> _ -> unit

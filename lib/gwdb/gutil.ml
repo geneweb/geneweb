@@ -6,10 +6,6 @@ let designation base p =
   Utf8.iso_8859_1_of_utf_8
     (first_name ^ "." ^ string_of_int (Gwdb.get_occ p) ^ " " ^ nom)
 
-let father = Adef.father
-let mother = Adef.mother
-let parent_array = Adef.parent_array
-
 let spouse ip cpl =
   if ip = Gwdb.get_father cpl then Gwdb.get_mother cpl else Gwdb.get_father cpl
 

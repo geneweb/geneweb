@@ -433,24 +433,6 @@ module type Driver_S = sig
   val new_ifam : base -> ifam
   (** Retruns new unused family's id *)
 
-  val insert_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
-  (** Same as [patch_person] *)
-
-  val insert_ascend : base -> iper -> ifam Def.gen_ascend -> unit
-  (** Same as [patch_ascend] *)
-
-  val insert_union : base -> iper -> ifam Def.gen_union -> unit
-  (** Same as [patch_union] *)
-
-  val insert_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
-  (** Same as [patch_family] *)
-
-  val insert_descend : base -> ifam -> iper Def.gen_descend -> unit
-  (** Same as [patch_couple] *)
-
-  val insert_couple : base -> ifam -> iper Def.gen_couple -> unit
-  (** Same as [patch_descend] *)
-
   val delete_person : base -> iper -> unit
   (** Remplace person with the giving id by bogus definition and clear
     person's data structure. *)
@@ -1223,15 +1205,6 @@ struct
   let commit_notes = Util.wrap_base Legacy.commit_notes Current.commit_notes
   let new_iper = Util.wrap_base Legacy.new_iper Current.new_iper
   let new_ifam = Util.wrap_base Legacy.new_ifam Current.new_ifam
-  let insert_person = Util.wrap_base Legacy.insert_person Current.insert_person
-  let insert_ascend = Util.wrap_base Legacy.insert_ascend Current.insert_ascend
-  let insert_union = Util.wrap_base Legacy.insert_union Current.insert_union
-  let insert_family = Util.wrap_base Legacy.insert_family Current.insert_family
-
-  let insert_descend =
-    Util.wrap_base Legacy.insert_descend Current.insert_descend
-
-  let insert_couple = Util.wrap_base Legacy.insert_couple Current.insert_couple
   let delete_person = Util.wrap_base Legacy.delete_person Current.delete_person
   let delete_ascend = Util.wrap_base Legacy.delete_ascend Current.delete_ascend
   let delete_union = Util.wrap_base Legacy.delete_union Current.delete_union

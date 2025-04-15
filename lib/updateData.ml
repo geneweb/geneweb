@@ -135,8 +135,7 @@ let combine_by_ini ~ignore_case ini list =
     ~key:(fun (_, s) ->
       let normalize = if ignore_case then Utf8.capitalize else Fun.id in
       normalize @@ Alln.ini len @@ Place.without_suburb s)
-    ~value:(fun x -> x)
-    list
+    ~value:Fun.id list
 
 (* ************************************************************************** *)
 (*  [Fonc] reduce_cpl_list : int -> ('a, 'b list) list -> ('a, 'b list) list  *)

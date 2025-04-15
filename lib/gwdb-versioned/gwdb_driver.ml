@@ -502,14 +502,6 @@ module Legacy_driver = struct
     PatchPer.set base iper witnotes;
     clear_poi iper
 
-  let insert_person base iper genpers =
-    let pevents = genpers.Def.pevents in
-    let genpers = Translate.as_legacy_person genpers in
-    insert_person base iper genpers;
-    let witnotes = witness_notes_of_events pevents in
-    PatchPer.set base iper witnotes;
-    clear_poi iper
-
   let delete_person base iper =
     Gwdb_legacy.Gwdb_driver.delete_person base iper;
     clear_poi iper
@@ -839,14 +831,6 @@ module Legacy_driver = struct
     PatchFam.set base ifam witnotes;
     clear_foi ifam
 
-  let insert_family base ifam genfam =
-    let fevents = genfam.Def.fevents in
-    let genfam = Translate.as_legacy_family genfam in
-    insert_family base ifam genfam;
-    let witnotes = fwitness_notes_of_events fevents in
-    PatchFam.set base ifam witnotes;
-    clear_foi ifam
-
   let delete_family base ifam =
     Gwdb_legacy.Gwdb_driver.delete_family base ifam;
     clear_foi ifam
@@ -886,35 +870,23 @@ module Legacy_driver = struct
     let coll = families_from_patch base in
     Collection.map (fun family -> { family; base; witness_notes = None }) coll
 
-  let wrap_pid clear patch insert delete =
+  let wrap_pd clear patch delete =
     let patch b i d =
       patch b i d;
-      clear i
-    in
-    let insert b i d =
-      insert b i d;
       clear i
     in
     let delete b i =
       delete b i;
       clear i
     in
-    (patch, insert, delete)
+    (patch, delete)
 
-  let wrap_iper_pid p i d = wrap_pid clear_poi p i d
-  let wrap_ifam_pid p i d = wrap_pid clear_foi p i d
-
-  let patch_ascend, insert_ascend, delete_ascend =
-    wrap_iper_pid patch_ascend insert_ascend delete_ascend
-
-  let patch_union, insert_union, delete_union =
-    wrap_iper_pid patch_union insert_union delete_union
-
-  let patch_descend, insert_descend, delete_descend =
-    wrap_ifam_pid patch_descend insert_descend delete_descend
-
-  let patch_couple, insert_couple, delete_couple =
-    wrap_ifam_pid patch_couple insert_couple delete_couple
+  let wrap_iper_pd p d = wrap_pd clear_poi p d
+  let wrap_ifam_pd p d = wrap_pd clear_foi p d
+  let patch_ascend, delete_ascend = wrap_iper_pd patch_ascend delete_ascend
+  let patch_union, delete_union = wrap_iper_pd patch_union delete_union
+  let patch_descend, delete_descend = wrap_ifam_pd patch_descend delete_descend
+  let patch_couple, delete_couple = wrap_ifam_pd patch_couple delete_couple
 
   let load_clear_array load clear =
     let load_array base =

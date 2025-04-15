@@ -1,8 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
-open Config
-
 let magic_robot = "GWRB0007"
 
 module W = Map.Make (struct
@@ -28,21 +25,21 @@ type excl = {
 }
 
 let robot_error conf cnt sec =
-  Output.status conf Def.Forbidden;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Geneweb.Output.status conf Def.Forbidden;
+  Geneweb.Output.header conf "Content-type: text/html; charset=iso-8859-1";
   let env =
     [
       ("cnt", Adef.encoded (string_of_int cnt));
       ("sec", Adef.encoded (string_of_int sec));
     ]
   in
-  Util.include_template conf env "robot" (fun () ->
-      let title _ = Output.print_sstring conf "Access refused" in
-      Output.print_sstring conf "<head><title>";
+  Geneweb.Util.include_template conf env "robot" (fun () ->
+      let title _ = Geneweb.Output.print_sstring conf "Access refused" in
+      Geneweb.Output.print_sstring conf "<head><title>";
       title true;
-      Output.print_sstring conf "</title>\n<body>\n<h1>";
+      Geneweb.Output.print_sstring conf "</title>\n<body>\n<h1>";
       title false;
-      Output.print_sstring conf "</body>\n");
+      Geneweb.Output.print_sstring conf "</body>\n");
   raise Exit
 
 let purge_who tm xcl sec =
@@ -66,7 +63,7 @@ let output_excl oc xcl =
   output_value oc (xcl : excl)
 
 let robot_excl () =
-  let fname = SrcfileDisplay.adm_file "robot" in
+  let fname = Geneweb.SrcfileDisplay.adm_file "robot" in
   let xcl =
     match try Some (Secure.open_in_bin fname) with _ -> None with
     | Some ic ->
@@ -84,7 +81,7 @@ let min_disp_req = ref 6
 
 let check tm from max_call sec conf suicide =
   let nfw =
-    if conf.wizard then Wizard conf.user
+    if conf.Geneweb.Config.wizard then Wizard conf.user
     else if conf.friend then Friend conf.user
     else Normal
   in

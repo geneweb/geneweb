@@ -1,8 +1,5 @@
 (* Copyright (c) 2007-2008 INRIA *)
 
-open Def
-open Gwdb
-
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Key to refer a person's definition *)
 
@@ -10,27 +7,31 @@ type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
     (only key elements provided) or definition (all information provided). *)
 type somebody =
   | Undefined of key  (** Reference to person *)
-  | Defined of (iper, iper, string) gen_person  (** Person's definition *)
+  | Defined of (Gwdb.iper, Gwdb.iper, string) Def.gen_person
+      (** Person's definition *)
 
 type 'a assumption = Weak of 'a | Strong of 'a
 
 (** Blocks that could appear in .gw file. *)
 type gw_syntax =
   | Family of
-      somebody gen_couple
-      * sex assumption
-      * sex assumption
-      * (somebody * sex assumption) list
-      * (string gen_fam_event_name
-        * cdate
+      somebody Def.gen_couple
+      * Def.sex assumption
+      * Def.sex assumption
+      * (somebody * Def.sex assumption) list
+      * (string Def.gen_fam_event_name
+        * Def.cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex assumption * witness_kind * string) list)
+        * (somebody * Def.sex assumption * Def.witness_kind * string) list)
         list
-      * ((iper, iper, string) gen_person, ifam, string) gen_family
-      * (iper, iper, string) gen_person gen_descend
+      * ( (Gwdb.iper, Gwdb.iper, string) Def.gen_person,
+          Gwdb.ifam,
+          string )
+        Def.gen_family
+      * (Gwdb.iper, Gwdb.iper, string) Def.gen_person Def.gen_descend
       (** Family definition block. Contains:
       - Family couple (father's and mother's definition/reference)
       - Father's sex
@@ -44,7 +45,7 @@ type gw_syntax =
       (** Block that defines personal notes. First element represents
       reference to person. Second is note's content. *)
   | Relations of
-      somebody * sex assumption * (somebody, string) gen_relation list
+      somebody * Def.sex assumption * (somebody, string) Def.gen_relation list
       (** Block that defines relations of a person with someone outisde of
       family block. Contains:
       - Concerned person definition/reference
@@ -52,14 +53,14 @@ type gw_syntax =
       - List of his relations. *)
   | Pevent of
       somebody
-      * sex assumption
-      * (string gen_pers_event_name
-        * cdate
+      * Def.sex assumption
+      * (string Def.gen_pers_event_name
+        * Def.cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex assumption * witness_kind * string) list)
+        * (somebody * Def.sex assumption * Def.witness_kind * string) list)
         list
       (** Block that defines events of a person. Specific to gwplus format. Contains:
       - Concerned person definition/reference

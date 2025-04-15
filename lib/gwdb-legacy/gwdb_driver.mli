@@ -411,24 +411,6 @@ val new_iper : base -> iper
 val new_ifam : base -> ifam
 (** Retruns new unused family's id *)
 
-val insert_person : base -> iper -> (iper, iper, istr) Dbdisk.gen_person -> unit
-(** Same as [patch_person] *)
-
-val insert_ascend : base -> iper -> ifam Def.gen_ascend -> unit
-(** Same as [patch_ascend] *)
-
-val insert_union : base -> iper -> ifam Def.gen_union -> unit
-(** Same as [patch_union] *)
-
-val insert_family : base -> ifam -> (iper, ifam, istr) Dbdisk.gen_family -> unit
-(** Same as [patch_family] *)
-
-val insert_descend : base -> ifam -> iper Def.gen_descend -> unit
-(** Same as [patch_couple] *)
-
-val insert_couple : base -> ifam -> iper Def.gen_couple -> unit
-(** Same as [patch_descend] *)
-
 val delete_person : base -> iper -> unit
 (** Remplace person with the giving id by bogus definition and clear
     person's data structure. *)

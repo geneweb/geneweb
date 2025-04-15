@@ -1,9 +1,4 @@
 (* TODO modify according to changes to def *)
-(*
-external legacy_to_def_person :
-  ('iper, 'person, 'string) Gwdb_legacy.Gwdb_driver.legacy_dsk_person ->
-  ('iper, 'person, 'string) Def.gen_person = "%identity"
- *)
 let rec legacy_to_def_person value p =
   {
     Def.first_name = p.Gwdb_legacy.Dbdisk.first_name;
