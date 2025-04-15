@@ -52,6 +52,9 @@ module Utils = struct
   let is_in_range arr i = 0 <= i && i < Array.length arr
 end
 
+let no_ascend = { Def.parents = None; consang = Adef.no_consang }
+let no_union = { Def.family = [||] }
+
 module Person = struct
   let create_empty_person empty what iper =
     {
@@ -239,8 +242,6 @@ let close_base _ = ()
 let sou base istr = base.strings.(istr)
 let iper_exists base iper = Utils.is_in_range base.persons iper
 let ifam_exists base ifam = Utils.is_in_range base.families ifam
-let no_ascend = { Def.parents = None; consang = Adef.no_consang }
-let no_union = { Def.family = [||] }
 let no_descend = { Def.children = [||] }
 let no_couple = Adef.couple dummy_iper dummy_iper
 let nb_of_persons base = Array.length base.persons
