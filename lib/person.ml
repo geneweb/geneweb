@@ -38,7 +38,7 @@ let is_contemporary conf base p =
       conf.default_contemporary_private_years
     else conf.private_years
   in
-  is_contemporary' conf base private_years p
+  is_empty p || is_contemporary' conf base private_years p
 
 (** Calcul les droits de visualisation d'une personne en
       fonction de son age.
@@ -58,9 +58,10 @@ let is_contemporary conf base p =
       - Vrai si : la personne s'est mariée depuis plus de private_years
       - Faux dans tous les autres cas *)
 let is_visible conf base p =
-  conf.Config.wizard || conf.friend
-  || Gwdb.get_access p = Public
-  || conf.public_if_titles
-     && Gwdb.get_access p = IfTitles
-     && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-  || not (is_contemporary' conf base conf.Config.private_years p)
+  (not (is_empty p))
+  && (conf.Config.wizard || conf.friend
+     || Gwdb.get_access p = Public
+     || conf.public_if_titles
+        && Gwdb.get_access p = IfTitles
+        && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+     || not (is_contemporary' conf base conf.Config.private_years p))
