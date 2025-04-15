@@ -70,10 +70,6 @@ val set_output_error :
   unit) ->
   unit
 
-val set_is_contemporary :
-  (Config.config -> Gwdb.base -> Gwdb.person -> bool) -> unit
-
-val set_p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) -> unit
 val set_syslog : (syslog_level -> string -> unit) -> unit
 
 val set_wrap_output :

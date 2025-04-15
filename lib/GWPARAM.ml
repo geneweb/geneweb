@@ -183,8 +183,6 @@ let set_init f = init := f
 let set_base_path f = base_path := f
 let set_bpath f = bpath := f
 let set_output_error f = output_error := f
-let set_is_contemporary f = is_contemporary := f
-let set_p_auth f = p_auth := f
 let set_syslog f = syslog := f
 let set_wrap_output f = wrap_output := f
 let set_has_ignored_duplicates f = has_ignored_duplicates := f
