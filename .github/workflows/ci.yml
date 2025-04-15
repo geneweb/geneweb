@@ -51,19 +51,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-latest]
+        os: [ubuntu-24.04, macos-15, windows-2025]
         ocaml-compiler: [4.14.2, 5.3.0]
         setup-version: [v3]
         include:
           - os: ubuntu-22.04
-            ocaml-compiler: 4.08.1
-            setup-version: v2
-
-          - os: macos-13
-            ocaml-compiler: 4.08.1
-            setup-version: v2
-
-          - os: windows-latest
             ocaml-compiler: 4.08.1
             setup-version: v2
 
@@ -92,8 +84,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.opam
-          key: unix-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
-          restore-keys: unix-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}
+          key: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
+          restore-keys: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ env.FMT_CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}
 
       - name: Cache Opam dependencies (Windows)
         id: cache-opam-windows
@@ -110,9 +102,9 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - name: Setup Ocaml with v3 (master)
+      - name: Setup Ocaml with v3
         if: matrix.setup-version == 'v3'
-        uses: ocaml/setup-ocaml@master
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ (!startsWith(matrix.os, 'windows') && matrix.ocaml-compiler == '4.14.2') && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
 
