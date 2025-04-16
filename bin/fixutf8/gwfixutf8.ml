@@ -95,6 +95,7 @@ let fix_utf8_sequence ?report progress base =
 *)
 
 let fix_key ?report progress base =
+  Printf.eprintf "fix key\n";
   let nb_ind = nb_of_persons base in
   let ipers = Gwdb.ipers base in
   let skip = Gwdb.iper_marker ipers false in
@@ -107,6 +108,10 @@ let fix_key ?report progress base =
       if f <> "?" && s <> "?" then
         let p_key = Name.concat f s in
         let ipers = Gwdb.persons_of_name base p_key in
+        Printf.eprintf "P_key: %s, %d; " p_key (List.length ipers);
+        List.iter (fun ip -> Printf.eprintf "%s, "
+          (Gutil.designation base (poi base ip))) ipers;
+        Printf.eprintf "\n";
         let f = Name.lower f in
         let s = Name.lower s in
         let list =
@@ -138,7 +143,7 @@ let fix_key ?report progress base =
           match acc with
           | [] -> (
               match list with
-              | [] -> failwith p_key
+              | [] -> (Printf.eprintf "fail\n"; flush stderr; failwith p_key)
               | (ip, occ) :: tl ->
                   Gwdb.Marker.set skip ip true;
                   loop [ (ip, occ) ] tl)
@@ -278,15 +283,15 @@ let rename_portraits p_list dry_run =
           if List.length parts = 4 then
             match parts with
             | [ fn; occ; sn; ext ] -> (
-                let new_fname = Printf.sprintf "%s.%d.%s.%s" fn occ' sn ext in
+                let new_fname = Printf.sprintf "%s.%d.%s.%s" fn noc sn ext in
                 if dry_run then
                   Printf.printf "Will rename %s.%s.%s.%s (%s -> %d)\n" fn occ sn
-                    ext occ occ'
+                    ext occ noc
                 else
                   try
                     Sys.rename portrait (Filename.concat dir new_fname);
                     Printf.printf "Renamed %s.%s.%s.%s (%s -> %d)\n" fn occ sn
-                      ext occ occ'
+                      ext occ noc
                   with Failure _ ->
                     Printf.printf "Failed to rename %s\n" portrait)
             | _ -> Printf.printf "Failed to rename %s\n" portrait
@@ -311,17 +316,17 @@ let aux conf txt
           (match opt with
           | Some (i, i') -> string_of_istr i ^ " -> " ^ string_of_istr i'
           | None -> "Dtext")
-    | Fix_UpdatedOcc (iper, oocc, nocc) ->
+    | Fix_UpdatedOcc (iper, ooc, noc) ->
         let ofn = sou base (get_first_name (poi base iper)) in
         let osn = sou base (get_surname (poi base iper)) in
-        let okey = (Name.lower ofn, Name.lower osn, oocc) in
+        let okey = (Name.lower ofn, Name.lower osn, ooc) in
         let pgl =
           let db = Gwdb.read_nldb base in
           let db = Geneweb.Notes.merge_possible_aliases conf db in
-          Geneweb.Perso.links_to_ind conf base db okey
+          Geneweb.Notes.links_to_ind conf base db okey None
         in
         if pgl <> [] then
-          let dir = !Geneweb.GWPARAM.portraits_d bname in
+          let dir = !Geneweb.GWPARAM.portraits_d !bname in
           let portrait =
             Filename.concat dir (Format.sprintf "%s.%d.%s" ofn ooc osn)
           in
@@ -337,7 +342,7 @@ let aux conf txt
             match full_portrait with
             | Some f ->
                 let portrait = Filename.basename f in
-                rename_portraits conf bname [ (Some portrait, noc) ] !dry_run;
+                rename_portraits [ (Some portrait, noc) ] !dry_run;
                 Printf.sprintf "Uptated portrait %s<br>\n" portrait
             | None -> ""
           in
@@ -381,7 +386,7 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
-  let base = Gwdb.open_base bname in
+  Gwdb.with_database bname @@ fun base ->
   let conf = { Geneweb.Config.empty with bname } in
   let fix = ref 0 in
   let nb_fam = nb_of_families base in
@@ -390,12 +395,12 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
     load_strings_array base;
     load_persons_array base);
   if !invalid_utf8 then
-    aux conf bname "Fix invalid UTF-8 sequence" fix_utf8_sequence ~v1 ~v2 base
+    aux conf "Fix invalid UTF-8 sequence" fix_utf8_sequence ~v1 ~v2 base
       nb_fam fix;
   if !p_key then
-    aux conf bname "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
+    aux conf "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
   if !utf8_key then
-    aux conf bname "Scan for possible UTF-8 conflicts" scan_utf8_conflicts ~v1
+    aux conf "Scan for possible UTF-8 conflicts" scan_utf8_conflicts ~v1
       ~v2 base nb_ind fix;
   if fast then (
     clear_strings_array base;
@@ -411,7 +416,7 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
         Printf.printf "%n changes commited\n" !fix;
         flush stdout);
       if !portraits_list <> [] then
-        rename_portraits conf bname !portraits_list false;
+        rename_portraits !portraits_list false;
       if v1 then (
         Printf.printf "Portraits renamed\n";
         flush stdout))
@@ -437,6 +442,8 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
 
 let speclist =
   [
+    ("-bd", Arg.String Secure.set_base_dir, "<DIR> Specify where the “bases”
+      directory with databases is installed (default if empty is “bases”).");
     ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
@@ -455,11 +462,12 @@ let anonfun i = bname := i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
+  Secure.set_base_dir (".");
   Arg.parse speclist anonfun usage;
-  Secure.set_base_dir (Filename.dirname !bname);
   if !bname = "" then (
     Printf.eprintf "Missing base name\n";
     exit 2);
+  bname := Filename.concat (!Geneweb.GWPARAM.bpath "") !bname;
   Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
   @@ fun () ->
   if !invalid_utf8 || !p_key || !utf8_key || !index then ()
