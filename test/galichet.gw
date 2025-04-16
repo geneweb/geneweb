@@ -19,6 +19,12 @@ beg
 - f Thérèse_Eugénie #src inscription_des_hypothèques_du_23_février_1874_au_profit_de_dame_thérèse_eugènie_Galichet;_voir_ses_ascendants_dans_la_base_<a_href="https://gw.geneanet.org/mout?lang=fr&p=therese+eugenie&n=galichet">mout</a> 7/9/1830 #bp _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #bs acte_de_mariage od
 end
 
+notes Galichet Jean_Charles
+beg
+What about [[[Chantal]]]  notes,
+and [[[Andre]]] as second creation ?
+end notes
+
 notes Galichet lolo
 beg
 * je le crée de façon arbitraire, avec deux mariages, le 1er avec divorce.
@@ -234,6 +240,13 @@ beg
 - f Marie-Jeanne 31/12/1751 #pp _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France 8/1/1830 #dp Soissons,02,Aisne,Picardie,France
 end
 
+notes Geruzet Laurent
+beg
+* is is mandatory to have at least a three brackets delimited link
+  to be able to access a miscellaneous note ?
+* so a pointer to [[[Chantal]]] note.
+end notes
+
 pevt Geruzet Laurent
 #birt 25/9/1738 #p _[Saint_Pierre]_-_Reims,51,Marne,Champagne-Ardenne,France
 #deat 1812 #p Laon,02,Aisne,Picardie,France
@@ -272,8 +285,8 @@ pevt Dupond Marie
 end pevt
 
 pevt Laramee Charlotte
-#deat 14/6/1789
 #birt 1766
+#deat 14/6/1789
 end pevt
 
 pevt Fache Jeanne
@@ -304,3 +317,21 @@ notes-db
   (https://github.com/geneweb/geneweb/issues/1558)
   <br>voir les notes du couple [[Jean Pierre/Galichet]] et [[Marie Elisabeth/Loche]]
 end notes-db
+
+# extended page "Andre" used by:
+#  - person "Jean Charles.0 Galichet"
+page-ext Andre
+  TITLE=title line, is first line
+  and next is text
+  * with wiki syntax
+  * this note created from note of [[Jean Charles/Galichet]]
+end page-ext
+
+# extended page "Chantal" used by:
+#  - person "Jean Charles.0 Galichet"
+#  - person "Laurent.0 Geruzet"
+page-ext Chantal
+  TITLE=la 1ere ligne correspond au titre
+  * et j'utilise une syntax wiki pour le reste
+  * avec un lien vers [[Laurent/Geruzet]]
+end page-ext
