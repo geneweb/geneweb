@@ -1,4 +1,4 @@
-val is_empty_person : Gwdb.person -> bool
+val is_empty : Gwdb.person -> bool
 (** Tells if person is an empty person (a placeholder: his surname is empty) *)
 
 val is_contemporary : Config.config -> Gwdb.base -> Gwdb.person -> bool

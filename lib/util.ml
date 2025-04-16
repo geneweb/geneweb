@@ -620,11 +620,6 @@ let string_gen_person base p = Futil.map_person_ps Fun.id (Gwdb.sou base) p
 let string_gen_family base fam =
   Futil.map_family_ps Fun.id Fun.id (Gwdb.sou base) fam
 
-(* TODO
-   should it be is_empty_name instead? (deleted person have surname and first_name = "?")
-   I don't think it is possible to have surname = empty_string *)
-let is_empty_person p = Gwdb.is_empty_string (Gwdb.get_surname p)
-
 let is_empty_name p =
   Gwdb.is_quest_string (Gwdb.get_surname p)
   && Gwdb.is_quest_string (Gwdb.get_first_name p)
@@ -828,7 +823,7 @@ let wprint_geneweb_link conf href s =
                  contenant la boucle, soit vers le menu de mise à jour.
     [Rem] : Exporté en clair hors de ce module.                              *)
 let update_family_loop conf base p s =
-  if is_empty_person p then s
+  if Person.is_empty p then s
   else
     let iper = Gwdb.get_iper p in
     let list = Gwdb.get_family p in
@@ -1540,7 +1535,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
       let i = Gwdb.iper_of_string i in
       if Gwdb.iper_exists base i then
         let p = pget conf base i in
-        if is_empty_person p then None else Some p
+        if Person.is_empty p then None else Some p
       else None
   | _ -> (
       match
@@ -1553,7 +1548,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           match Gwdb.person_of_key base p n occ with
           | Some ip ->
               let p = pget conf base ip in
-              if is_empty_person p then None
+              if Person.is_empty p then None
               else if (not (is_hide_names conf p)) || authorized_age conf base p
               then Some p
               else None
@@ -1584,7 +1579,7 @@ let default_sosa_ref conf base =
         match Gutil.person_ht_find_all base n with
         | [ ip ] ->
             let p = pget conf base ip in
-            if is_empty_person p then None else Some p
+            if Person.is_empty p then None else Some p
         | _ -> None)
   | None -> None
 

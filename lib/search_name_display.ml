@@ -535,7 +535,7 @@ let print_one_branch conf base bh psn =
     print_branch conf base psn x p
   else (
     Output.print_sstring conf "<li>";
-    if Util.is_empty_person p then Output.print_sstring conf "&lt;&lt;"
+    if Person.is_empty p then Output.print_sstring conf "&lt;&lt;"
     else
       Util.wprint_geneweb_link conf (Util.acces conf base p)
         (Adef.safe "&lt;&lt;");

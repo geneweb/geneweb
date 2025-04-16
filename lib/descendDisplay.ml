@@ -125,7 +125,7 @@ let display_descendants_level conf base max_level ancestor =
   Output.print_sstring conf ".<p>";
   Util.print_alphabetically_indexed_list conf
     (fun (p, _) ->
-      if Util.is_empty_person p then "?"
+      if Person.is_empty p then "?"
       else
         let surname = Gwdb.p_surname base p in
         Utf8.sub surname (Option.value ~default:0 (Utf8.initial surname)) 1)
@@ -134,7 +134,7 @@ let display_descendants_level conf base max_level ancestor =
       Output.print_string conf
         (NameDisplay.referenced_person_title_text conf base p);
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
-      if (not (Util.is_empty_person p)) && c > 1 then
+      if (not (Person.is_empty p)) && c > 1 then
         Output.printf conf " <em>(%d)</em>" c;
       Output.print_sstring conf "\n")
     list;
