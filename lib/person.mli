@@ -4,5 +4,5 @@ val is_empty : Gwdb.person -> bool
 val is_contemporary : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** Check if a person is contemporary *)
 
-val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
+val is_visible : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** Check if a person should be displayed or not *)

@@ -57,7 +57,7 @@ let is_contemporary conf base p =
                   privée et public_if_no_date = yes
       - Vrai si : la personne s'est mariée depuis plus de private_years
       - Faux dans tous les autres cas *)
-let p_auth conf base p =
+let is_visible conf base p =
   conf.Config.wizard || conf.friend
   || Gwdb.get_access p = Public
   || conf.public_if_titles
