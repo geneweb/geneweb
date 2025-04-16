@@ -590,13 +590,11 @@ let is_old_person conf p =
       p.Def.access <> Def.Private && conf.Config.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = Person.is_visible conf base p
-
 let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
   let fct p =
     (not (Gwdb.is_quest_string (Gwdb.get_surname p)))
     && (not (Gwdb.is_quest_string (Gwdb.get_first_name p)))
-    && not (authorized_age conf base p)
+    && not (Person.is_visible conf base p)
   in
   if conf.Config.use_restrict then Gwdb.base_visible_get base fct ip else false
 
@@ -626,7 +624,7 @@ let is_empty_name p =
 
 let is_fully_visible_to_visitors conf base p =
   let conf = { conf with Config.wizard = false; friend = false } in
-  authorized_age conf base p
+  Person.is_visible conf base p
 
 (* TODO should probably not exists *)
 let is_public conf base p =
@@ -856,7 +854,7 @@ let update_family_loop conf base p s =
     else s
 
 let person_title conf base p =
-  if authorized_age conf base p then
+  if Person.is_visible conf base p then
     match main_title conf base p with
     | Some t -> one_title_text base t
     | None -> Adef.safe ""
@@ -1549,7 +1547,8 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           | Some ip ->
               let p = pget conf base ip in
               if Person.is_empty p then None
-              else if (not (is_hide_names conf p)) || authorized_age conf base p
+              else if
+                (not (is_hide_names conf p)) || Person.is_visible conf base p
               then Some p
               else None
           | None -> None)
@@ -1568,7 +1567,7 @@ let person_exists conf base (fn, sn, oc) =
   | Some "off" -> true
   | Some _ | None -> (
       match Gwdb.person_of_key base fn sn oc with
-      | Some ip -> authorized_age conf base (pget conf base ip)
+      | Some ip -> Person.is_visible conf base (pget conf base ip)
       | None -> false)
 
 let default_sosa_ref conf base =
@@ -2347,7 +2346,7 @@ let select_mascdesc ?skip_descendants conf base ips gen_desc =
   select_desc ?skip_descendants conf base gen_desc ips
 
 let auth_warning conf base w =
-  let pauth p = authorized_age conf base p in
+  let pauth p = Person.is_visible conf base p in
   let fauth ifam =
     let fam = Gwdb.foi base ifam in
     pauth (Gwdb.get_father fam |> Gwdb.poi base)

@@ -266,7 +266,7 @@ let print_sosa ~conf ~base ~person ~link =
           Output.print_string conf (sosa_link |> Adef.safe);
           Output.print_sstring conf {|"> |});
         let title =
-          if Util.is_hide_names conf r && not (Util.authorized_age conf base r)
+          if Util.is_hide_names conf r && not (Person.is_visible conf base r)
           then ""
           else
             let direct_ancestor =

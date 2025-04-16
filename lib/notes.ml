@@ -73,10 +73,10 @@ let notes_links_db conf base eliminate_unlinked =
         let record_it =
           match pg with
           | Def.NLDB.PgInd ip ->
-              Util.pget conf base ip |> Util.authorized_age conf base
+              Util.pget conf base ip |> Person.is_visible conf base
           | Def.NLDB.PgFam ifam ->
               Gwdb.foi base ifam |> Gwdb.get_father |> Util.pget conf base
-              |> Util.authorized_age conf base
+              |> Person.is_visible conf base
           | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
         in
         if record_it then

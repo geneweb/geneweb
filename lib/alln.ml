@@ -79,7 +79,7 @@ let select_names conf base is_surnames ini limit =
                       if
                         List.exists
                           (fun i ->
-                            Util.authorized_age conf base (Gwdb.poi base i))
+                            Person.is_visible conf base (Gwdb.poi base i))
                           ips
                       then 1
                       else 0
@@ -98,8 +98,8 @@ let select_names conf base is_surnames ini limit =
                     then
                       List.fold_left
                         (fun acc i ->
-                          if Util.authorized_age conf base (Gwdb.poi base i)
-                          then acc + 1
+                          if Person.is_visible conf base (Gwdb.poi base i) then
+                            acc + 1
                           else acc)
                         0 ips
                     else List.length ips

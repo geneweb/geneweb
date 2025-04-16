@@ -76,9 +76,6 @@ val nobtit : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title list
 
 val strictly_after_private_years : Config.config -> Date.dmy -> bool
 
-val authorized_age : Config.config -> Gwdb.base -> Gwdb.person -> bool
-(** Alias to Person.is_visible *)
-
 (* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
 val is_old_person :
   Config.config -> (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person -> bool
