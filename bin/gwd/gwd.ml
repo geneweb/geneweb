@@ -1802,7 +1802,7 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-        File.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
+        Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
     end;
   Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection
@@ -1889,7 +1889,7 @@ let slashify s =
   String.init (String.length s) conv_char
 
 let make_sock_dir x =
-  File.create_dir ~parent:true x;
+  Filesystem.create_dir ~parent:true x;
   if Sys.unix then ()
   else
     begin

@@ -47,3 +47,9 @@ val walk_folder :
 
     @raise Unix.Unix_error if the function cannot open a file or a
                            subdirectory in [dir]. *)
+
+val copy_file : string -> string -> unit
+(** [copy_file src dst] copies the file [src] into the destination [dst].
+    The file [dst] is created, if it does not exist.
+
+    This function can be used to copy binary files. *)

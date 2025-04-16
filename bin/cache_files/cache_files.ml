@@ -21,7 +21,7 @@ let ( // ) = Filename.concat
 (* Attention: cache files are reorg independant *)
 let set_cache_dir bname =
   let cache_dir = Secure.base_dir () // "etc" // bname // "cache" in
-  File.create_dir ~parent:true cache_dir;
+  Filesystem.create_dir ~parent:true cache_dir;
   cache_dir
 
 let write_cache_file bname fname l =

@@ -88,3 +88,17 @@ let walk_folder ?(recursive = false) f path acc =
         traverse stack acc
   in
   traverse [ path ] acc
+
+let copy_file src dst =
+  Compat.In_channel.with_open_bin src @@ fun ic ->
+  Compat.Out_channel.with_open_bin dst @@ fun oc ->
+  let sz = 8192 in
+  let buf = Bytes.create sz in
+  let rec loop () =
+    let r = Compat.In_channel.input ic buf 0 sz in
+    if r > 0 then (
+      Compat.Out_channel.output oc buf 0 r;
+      loop ())
+    else Compat.Out_channel.flush oc
+  in
+  loop ()

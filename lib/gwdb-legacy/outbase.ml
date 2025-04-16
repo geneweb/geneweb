@@ -178,6 +178,30 @@ let output_particles_file particles fname =
   List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
   close_out oc
 
+let ( // ) = Filename.concat
+
+(* TODO: these functions should be defined into [Gwdb_driver] but
+   such a definition introduces a cyclic dependency between [Gwdb_driver]
+   and the present module. The [output] function is invoked in
+   [Gwdb_driver.sync] to synchronize the database on the disk after
+   initializing it in memory. *)
+
+let notes_dir base = base.data.bdir // "notes_d"
+let notes_file base = base.data.bdir // "notes"
+let output_notes base dst = Filesystem.copy_file (notes_file base) dst
+
+(* Copy all the notes from "notes_d" of the database [base] into the
+   destination directory [dst_dir]. *)
+let output_notes_d base dst_dir =
+  let l = base.data.bnotes.Def.efiles () in
+  List.iter
+    (fun f ->
+      let src = notes_dir base // (f ^ ".txt") in
+      let dst = dst_dir // (f ^ ".txt") in
+      Filesystem.create_dir ~parent:true @@ Filename.dirname dst;
+      Filesystem.copy_file src dst)
+    l
+
 let output base =
   (* create database directory *)
   let bname = base.data.bdir in
@@ -299,21 +323,8 @@ let output base =
           Gc.compact ());
         trace "create first name index";
         output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
-        let s = base.data.bnotes.Def.nread "" Def.RnAll in
-        (if s = "" then ()
-        else
-          let oc_not = Secure.open_out tmp_notes in
-          output_string oc_not s;
-          close_out oc_not);
-        List.iter
-          (fun f ->
-            let s = base.data.bnotes.Def.nread f Def.RnAll in
-            let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
-            File.create_dir ~parent:true (Filename.dirname fname);
-            let oc = open_out fname in
-            output_string oc s;
-            close_out oc)
-          (List.rev (base.data.bnotes.Def.efiles ()));
+        output_notes base tmp_notes;
+        output_notes_d base tmp_notes_d;
         output_particles_file base.data.particles_txt tmp_particles
       with e ->
         (try close_out oc_inx with _ -> ());
