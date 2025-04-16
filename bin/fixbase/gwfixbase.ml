@@ -2,7 +2,7 @@ let add b f l = if b then f :: l else l
 
 let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key bname =
+    ~invalid_strings ~key bname =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -41,10 +41,10 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     add !marriage_divorce Geneweb.Fixbase.fix_family_divorce family_fixes
   in
   let person_fixes =
-    add !invalid_utf8 Geneweb.Fixbase.fix_person_utf8_sequence person_fixes
+    add !invalid_strings Geneweb.Fixbase.fix_person_strings person_fixes
   in
   let family_fixes =
-    add !invalid_utf8 Geneweb.Fixbase.fix_family_utf8_sequence family_fixes
+    add !invalid_strings Geneweb.Fixbase.fix_family_strings family_fixes
   in
   let person_fixes =
     add !key (Geneweb.Fixbase.fix_person_key base) person_fixes
@@ -119,7 +119,7 @@ let p_NBDS = ref false
 let pevents_witnesses = ref false
 let fevents_witnesses = ref false
 let marriage_divorce = ref false
-let invalid_utf8 = ref false
+let invalid_strings = ref false
 let key = ref false
 let index = ref false
 let dry_run = ref false
@@ -142,7 +142,7 @@ let speclist =
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enable by any other option." );
-    ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
+    ("-invalid-strings", Arg.Set invalid_strings, " missing doc");
   ]
 
 let anonfun i = bname := i
@@ -158,7 +158,7 @@ let main () =
   @@ fun () ->
   if
     !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
-    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8
+    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_strings
     || !key || !index
   then ()
   else (
@@ -170,10 +170,10 @@ let main () =
     fevents_witnesses := true;
     marriage_divorce := true;
     p_NBDS := true;
-    invalid_utf8 := true;
+    invalid_strings := true;
     key := true);
   check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
     ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key !bname
+    ~invalid_strings ~key !bname
 
 let () = main ()

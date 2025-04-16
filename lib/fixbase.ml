@@ -10,7 +10,7 @@ type patch =
   | Fix_AddedRelatedFromFevent of Gwdb.iper * Gwdb.iper
   | Fix_MarriageDivorce of Gwdb.ifam
   | Fix_MissingSpouse of Gwdb.ifam * Gwdb.iper
-  | Fix_WrongUTF8Encoding of
+  | Fix_WrongString of
       Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
   | Fix_UpdatedOcc of Gwdb.iper * int * int
 
@@ -46,8 +46,8 @@ let string_of_patch base =
   | Fix_MissingSpouse (ifam, iper) ->
       Printf.sprintf "Fixed missing spouse (%s) in family %s" (string_of_p iper)
         (string_of_f ifam)
-  | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
-      Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
+  | Fix_WrongString (ifam_opt, iper_opt, opt) ->
+      Printf.sprintf "Fixed invalid string (%s): %s"
         (match ifam_opt with
         | Some i -> "ifam " ^ Gwdb.string_of_ifam i
         | None -> (
@@ -397,31 +397,35 @@ let fix_map_utf8_date ~report = function
       Date.Dtext t'
   | d -> d
 
-let fix_map_utf8_str ~report ~base istr =
+let fix_map_str ~report ~base ?format istr =
   let s = Gwdb.sou base istr in
-  let s' = Utf8.normalize s in
-  let istr' = Gwdb.insert_string base s' in
+  let s' =
+    let clean =
+      match format with
+      | Some `Html -> Fun.id
+      | None | Some `Plain_text -> Html.text_content
+    in
+    Utf8.normalize @@ clean s
+  in
+  let istr' = Gwdb.insert_string base ?format s' in
   if istr <> istr' then report istr istr';
   istr'
 
-let fix_person_utf8_sequence ~report ~base ~person =
+let fix_person_strings ~report ~base ~person =
   let iper = Gwdb.get_iper person in
   let change = ref false in
   let report_date () =
-    Option.iter
-      (fun fn -> fn (Fix_WrongUTF8Encoding (None, Some iper, None)))
-      report;
+    Option.iter (fun fn -> fn (Fix_WrongString (None, Some iper, None))) report;
     change := true
   in
   let report_str istr istr' =
     Option.iter
-      (fun fn ->
-        fn (Fix_WrongUTF8Encoding (None, Some iper, Some (istr, istr'))))
+      (fun fn -> fn (Fix_WrongString (None, Some iper, Some (istr, istr'))))
       report;
     change := true
   in
   let fix_map_date = fix_map_utf8_date ~report:report_date in
-  let fix_map_str = fix_map_utf8_str ~report:report_str ~base in
+  let fix_map_str ?format = fix_map_str ~report:report_str ~base ?format in
   let gen_pers = Gwdb.gen_person_of_person person in
   let gen_pers' =
     Futil.map_person_ps ~fd:fix_map_date Fun.id fix_map_str gen_pers
@@ -431,24 +435,21 @@ let fix_person_utf8_sequence ~report ~base ~person =
     true)
   else !change
 
-let fix_family_utf8_sequence ~report ~base ~family =
+let fix_family_strings ~report ~base ~family =
   let ifam = Gwdb.get_ifam family in
   let change = ref false in
   let report_date () =
-    Option.iter
-      (fun fn -> fn (Fix_WrongUTF8Encoding (Some ifam, None, None)))
-      report;
+    Option.iter (fun fn -> fn (Fix_WrongString (Some ifam, None, None))) report;
     change := true
   in
   let report_str istr istr' =
     Option.iter
-      (fun fn ->
-        fn (Fix_WrongUTF8Encoding (Some ifam, None, Some (istr, istr'))))
+      (fun fn -> fn (Fix_WrongString (Some ifam, None, Some (istr, istr'))))
       report;
     change := true
   in
   let fix_map_date = fix_map_utf8_date ~report:report_date in
-  let fix_map_str = fix_map_utf8_str ~report:report_str ~base in
+  let fix_map_str ?format = fix_map_str ~report:report_str ~base ?format in
   let gen_fam = Gwdb.gen_family_of_family family in
   let gen_fam' =
     Futil.map_family_ps ~fd:fix_map_date Fun.id Fun.id fix_map_str gen_fam

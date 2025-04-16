@@ -245,7 +245,7 @@ let record_diff conf base changed =
                 let p =
                   Futil.map_person_ps
                     (fun p -> p)
-                    (Gwdb.sou base)
+                    (fun ?format:_ -> Gwdb.sou base)
                     (Gwdb.gen_person_of_person p)
                 in
                 let gr = make_gen_record conf base false p in

@@ -40,7 +40,10 @@ let print_mod_ok conf base =
     Option.fold ~none:"" ~some:Ext_string.only_printable
       (Util.p_getenv conf.env "nx_input")
   in
-  let new_istr_s = Gwdb.string_of_istr (Gwdb.insert_string base new_input) in
+  let new_istr_s =
+    let format = match data with "src" -> `Html | _ -> `Plain_text in
+    Gwdb.string_of_istr (Gwdb.insert_string ~format base new_input)
+  in
   let new_ini = ini_of_update_data ini new_input in
   let list = UpdateData.get_person_from_data conf base in
   let list = List.map (fun (istr, perl) -> (Gwdb.sou base istr, perl)) list in

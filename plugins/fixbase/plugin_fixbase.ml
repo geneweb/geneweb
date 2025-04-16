@@ -11,7 +11,7 @@ let arg_pevents_witnesses = "pevents_witnesses"
 let arg_fevents_witnesses = "fevents_witnesses"
 let arg_marriage_divorce = "marriage_divorce"
 let arg_missing_spouses = "missing_spouses"
-let arg_invalid_utf8 = "invalid_utf8"
+let arg_invalid_strings = "invalid_strings"
 let arg_p_key = "p_key"
 let arg_tstab = "tstab"
 let arg_password = "password"
@@ -104,7 +104,7 @@ let fixbase conf _base =
       input arg_fevents_witnesses "plugin_fixbase_fevents_witnesses";
       input arg_marriage_divorce "plugin_fixbase_marriage_divorce";
       input arg_missing_spouses "plugin_fixbase_missing_spouses";
-      input arg_invalid_utf8 "plugin_fixbase_invalid_utf8";
+      input arg_invalid_strings "plugin_fixbase_invalid_strings";
       input arg_p_key "plugin_fixbase_p_key";
       input arg_tstab "plugin_fixbase_tstab";
     ]
@@ -139,7 +139,7 @@ let fixbase_ok conf base =
           ipers := iper :: !ipers
       | Fix_MarriageDivorce ifam | Fix_AddedChild ifam ->
           ifams := ifam :: !ifams
-      | Fix_WrongUTF8Encoding (ifam, iper, istr) ->
+      | Fix_WrongString (ifam, iper, istr) ->
           istrs := (ifam, iper, istr) :: !istrs
     in
     let progress (_ : int) (_ : int) = () in
@@ -152,10 +152,10 @@ let fixbase_ok conf base =
           "f_children";
           "fevents_witnesses";
           "missing_spouses";
-          "invalid_utf8";
+          "invalid_strings";
         ]
     then Gwdb.load_families_array base;
-    if enabled [ "invalid_utf8"; "p_key" ] then Gwdb.load_strings_array base;
+    if enabled [ "invalid_strings"; "p_key" ] then Gwdb.load_strings_array base;
     if enabled [ "f_parents"; "p_families" ] then Gwdb.load_unions_array base;
     if enabled [ "f_children"; "p_parents" ] then (
       Gwdb.load_descends_array base;
@@ -192,10 +192,10 @@ let fixbase_ok conf base =
       opt "missing_spouses" Fixbase.fix_family_spouses family_fixes
     in
     let person_fixes =
-      opt "invalid_utf8" Fixbase.fix_person_utf8_sequence person_fixes
+      opt "invalid_strings" Fixbase.fix_person_strings person_fixes
     in
     let family_fixes =
-      opt "invalid_utf8" Fixbase.fix_family_utf8_sequence family_fixes
+      opt "invalid_strings" Fixbase.fix_family_strings family_fixes
     in
     let person_fixes = opt "p_key" (Fixbase.fix_person_key base) person_fixes in
     let person_fixes = List.rev person_fixes in
@@ -229,7 +229,9 @@ let fixbase_ok conf base =
       in
       let mkp p =
         let p = gen_person_of_person p in
-        let p = Futil.map_person_ps string_of_iper (sou base) p in
+        let p =
+          Futil.map_person_ps string_of_iper (fun ?format:_ -> sou base) p
+        in
         { p with key_index = string_of_iper p.key_index }
       in
       let a1 = mka p in
@@ -284,7 +286,8 @@ let fixbase_ok conf base =
     in
     let dump_f f f' =
       let mkf f =
-        Futil.map_family_ps string_of_iper string_of_ifam (sou base)
+        Futil.map_family_ps string_of_iper string_of_ifam
+          (fun ?format:_ -> sou base)
           (gen_family_of_family f)
       in
       let mkc f = Futil.map_couple_p string_of_iper (gen_couple_of_family f) in
@@ -389,7 +392,7 @@ let fixbase_ok conf base =
       opt "fevents_witnesses";
       opt "marriage_divorce";
       opt "missing_spouses";
-      opt "invalid_utf8";
+      opt "invalid_strings";
       opt "p_key";
       opt "tstab";
       Output.print_sstring conf {|<p>|};
