@@ -358,7 +358,29 @@ let linked_list _conf base pgl =
   %s
   </span>|} str
 
-let print_linked_list conf base pgl =
+let create_gallery_item conf fnotes nenv s =
+  let img_url, img_name = Notes.json_extract_img conf s
+  and title = try List.assoc "TITLE" nenv with Not_found -> "" in
+  Printf.sprintf
+    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s"><img src="%s" \
+       title="%s | %s" alt="%s"></a>%s</div>|}
+    (commd conf :> string)
+    fnotes img_url fnotes img_name img_name title
+
+let print_linked_list_gallery conf base pgl =
+  Wserver.printf "<div class=\"d-flex flex-wrap mt-3\">\n";
+  List.iter
+    (function
+      | Def.NLDB.PgMisc fnotes ->
+          let nenv, s = read_notes base fnotes in
+          let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
+          if typ = "gallery" || typ = "album" then
+            Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
+      | _ -> ())
+    pgl;
+  Wserver.printf "</div>\n"
+
+let print_linked_list_standard conf base pgl =
   Output.print_sstring conf
     "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
   List.iter
