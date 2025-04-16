@@ -577,7 +577,7 @@ let print_foreach conf base print_ast eval_expr =
           let not_displayed =
             match hist_item with
             | HI_ind p ->
-                Util.is_empty_person p
+                Person.is_empty p
                 || Util.is_hide_names conf p
                    && not (Util.authorized_age conf base p)
             | _ -> false

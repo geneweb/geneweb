@@ -29,7 +29,7 @@ end = struct
     Util.is_hide_names conf person && not (Util.authorized_age conf base person)
 
   let name_visibility_of_person ~conf ~base ~person =
-    if Util.is_empty_person person then RestrictedName
+    if Person.is_empty person then RestrictedName
     else if is_hidden conf base person then HiddenName
     else VisibleName person
 end
@@ -193,7 +193,7 @@ let gen_person_title_text reference conf base p =
 
 let reference_flags with_id conf base p (s : Adef.safe_string) =
   let iper = Gwdb.get_iper p in
-  if Util.is_empty_person p then s
+  if Person.is_empty p then s
   else
     let open Def in
     "<a href=\""

@@ -930,11 +930,11 @@ let build_surnames_list conf base v p =
             && not (Gwdb.eq_istr surn (Gwdb.get_surname moth))
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
-          (if not (Util.is_empty_person fath) then
+          (if not (Person.is_empty fath) then
            let dp1 = merge_date_place conf base surn dp fath in
            loop (lev + 1) sosa fath (Gwdb.get_surname fath) dp1);
           let sosa = Sosa.inc sosa 1 in
-          if not (Util.is_empty_person moth) then
+          if not (Person.is_empty moth) then
             let dp2 = merge_date_place conf base surn dp moth in
             loop (lev + 1) sosa moth (Gwdb.get_surname moth) dp2
       | None -> add_surname sosa p surn dp)
@@ -1056,9 +1056,9 @@ let build_list_eclair conf base v p =
           let cpl = Gwdb.foi base ifam in
           let fath = Util.pget conf base (Gwdb.get_father cpl) in
           let moth = Util.pget conf base (Gwdb.get_mother cpl) in
-          if not (Util.is_empty_person fath) then
+          if not (Person.is_empty fath) then
             loop (lev + 1) fath (Gwdb.get_surname fath);
-          if not (Util.is_empty_person moth) then
+          if not (Person.is_empty moth) then
             loop (lev + 1) moth (Gwdb.get_surname moth)
       | None -> ())
   in
@@ -1999,7 +1999,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       let v0 = Gwdb.iper_of_string v in
       (* if v0 >= 0 && v0 < nb_of_persons base then *)
       let ep = make_ep conf base v0 in
-      if Util.is_empty_person (fst ep) then raise Not_found
+      if Person.is_empty (fst ep) then raise Not_found
       else eval_person_field_var conf base env ep loc sl
   (* else raise Not_found *)
   | "svar" :: i :: sl -> (
@@ -3014,7 +3014,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "hide_private_names" -> conf.Config.hide_private_names
   | "is_restricted" ->
       (* TODO why is it not Util.is_restricted *)
-      Util.is_empty_person p
+      Person.is_empty p
   | "is_contemporary" -> Person.is_contemporary conf base p
   | "name_is_hidden" -> NameDisplay.is_hidden conf base p
   | "name_is_restricted" -> NameDisplay.is_restricted conf base p
@@ -3806,10 +3806,10 @@ let print_foreach conf base print_ast eval_expr =
                 let env = ("child", Vind p) :: env in
                 let env = ("child_cnt", Vint (i + 1)) :: env in
                 let env =
-                  if i = n - 1 && not (Util.is_empty_person p) then
+                  if i = n - 1 && not (Person.is_empty p) then
                     ("pos", Vstring "prev") :: env
                   else if i = n then ("pos", Vstring "self") :: env
-                  else if i = n + 1 && not (Util.is_empty_person p) then
+                  else if i = n + 1 && not (Person.is_empty p) then
                     ("pos", Vstring "next") :: env
                   else env
                 in

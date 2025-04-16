@@ -1,7 +1,7 @@
 (* TODO
    should it be is_empty_name instead? (deleted person have surname and first_name = "?")
    I don't think it is possible to have surname = empty_string *)
-let is_empty_person p = Gwdb.is_empty_string (Gwdb.get_surname p)
+let is_empty p = Gwdb.is_empty_string (Gwdb.get_surname p)
 
 let is_contemporary' conf base private_years p =
   let death = Gwdb.get_death p in
