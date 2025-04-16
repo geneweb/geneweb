@@ -125,7 +125,7 @@ let display_descendants_level conf base max_level ancestor =
   Output.print_sstring conf ".<p>";
   Util.print_alphabetically_indexed_list conf
     (fun (p, _) ->
-      if Util.is_empty_person p then "?"
+      if Person.is_empty p then "?"
       else
         let surname = Gwdb.p_surname base p in
         Utf8.sub surname (Option.value ~default:0 (Utf8.initial surname)) 1)
@@ -134,7 +134,7 @@ let display_descendants_level conf base max_level ancestor =
       Output.print_string conf
         (NameDisplay.referenced_person_title_text conf base p);
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
-      if (not (Util.is_empty_person p)) && c > 1 then
+      if (not (Person.is_empty p)) && c > 1 then
         Output.printf conf " <em>(%d)</em>" c;
       Output.print_sstring conf "\n")
     list;
@@ -431,7 +431,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   total := 0;
   Output.print_string conf (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
-  (if Util.authorized_age conf base p then
+  (if Person.is_visible conf base p then
    match (Date.od_of_cdate (Gwdb.get_birth p), Gwdb.get_death p) with
    | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
    | _ -> ());
@@ -591,8 +591,7 @@ let display_descendant_index conf base max_level ancestor =
           Gwdb.p_first_name base p <> "?"
           && Gwdb.p_surname base p <> "?"
           && Gwdb.p_first_name base p <> "x"
-          && ((not (Util.is_hide_names conf p))
-             || Util.authorized_age conf base p)
+          && ((not (Util.is_hide_names conf p)) || Person.is_visible conf base p)
         then Gwdb.get_iper p :: acc
         else acc)
       [] (Gwdb.ipers base)
@@ -631,7 +630,7 @@ let display_spouse_index conf base max_level ancestor =
                     && Gwdb.p_surname base c <> "?"
                     && Gwdb.p_first_name base p <> "x"
                     && ((not (Util.is_hide_names conf c))
-                       || Util.authorized_age conf base c)
+                       || Person.is_visible conf base c)
                     && not (List.mem (Gwdb.get_iper c) acc)
                   then Gwdb.get_iper c :: acc
                   else acc
@@ -702,7 +701,7 @@ let print_desc_table_header conf =
       [Retour] : Néant
       [Rem] : Non exporté en clair hors de ce module.                        *)
 let print_person_table conf base p lab =
-  let p_auth = Util.authorized_age conf base p in
+  let p_auth = Person.is_visible conf base p in
   let nb_families = Array.length (Gwdb.get_family p) in
   let birth, birth_place =
     if
@@ -803,9 +802,7 @@ let print_person_table conf base p lab =
       Output.print_sstring conf " &nbsp;");
   aux [ "marr_date" ] (fun fam spouse ->
       let mdate =
-        if
-          Util.authorized_age conf base p
-          && Util.authorized_age conf base spouse
+        if Person.is_visible conf base p && Person.is_visible conf base spouse
         then
           match Date.od_of_cdate (Gwdb.get_marriage fam) with
           | Some d -> DateDisplay.string_slash_of_date conf d
@@ -814,7 +811,7 @@ let print_person_table conf base p lab =
       in
       Output.print_string conf mdate);
   aux [ "marr_place" ] (fun fam spouse ->
-      if Util.authorized_age conf base p && Util.authorized_age conf base spouse
+      if Person.is_visible conf base p && Person.is_visible conf base spouse
       then
         Gwdb.get_marriage_place fam
         |> Gwdb.sou base |> Util.trimmed_string_of_place
@@ -899,8 +896,8 @@ let print_person_table conf base p lab =
             Output.print_sstring conf "&nbsp;");
         aux i "marr_date" (fun () ->
             if
-              Util.authorized_age conf base p
-              && Util.authorized_age conf base spouse
+              Person.is_visible conf base p
+              && Person.is_visible conf base spouse
             then
               let fam = Gwdb.foi base (Gwdb.get_family u).(i) in
               match Date.od_of_cdate (Gwdb.get_marriage fam) with
@@ -911,8 +908,8 @@ let print_person_table conf base p lab =
             else Output.print_sstring conf "&nbsp;");
         aux i "marr_place" (fun () ->
             if
-              Util.authorized_age conf base p
-              && Util.authorized_age conf base spouse
+              Person.is_visible conf base p
+              && Person.is_visible conf base spouse
             then
               Gwdb.get_marriage_place cpl
               |> Gwdb.sou base |> Util.trimmed_string_of_place
@@ -1277,7 +1274,7 @@ let make_tree_hts conf base gv p =
                     let age_auth =
                       Array.for_all
                         (fun ip ->
-                          Util.authorized_age conf base (Util.pget conf base ip))
+                          Person.is_visible conf base (Util.pget conf base ip))
                         (get_children des)
                     in
                     Array.fold_right
@@ -1353,9 +1350,7 @@ let print_aboville conf base max_level p =
         let cpl = Gwdb.foi base (Gwdb.get_family u).(i) in
         let spouse = Util.pget conf base (Gutil.spouse (Gwdb.get_iper p) cpl) in
         Output.print_sstring conf "&amp;";
-        if
-          Util.authorized_age conf base p
-          && Util.authorized_age conf base spouse
+        if Person.is_visible conf base p && Person.is_visible conf base spouse
         then
           let fam = Gwdb.foi base (Gwdb.get_family u).(i) in
           match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with

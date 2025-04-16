@@ -851,7 +851,7 @@ let print_foreach conf base print_ast _eval_expr =
           let isp = Gutil.spouse aft.HistoryDiff.gen_p.key_index fam in
           let sp = person_of_iper conf base isp in
           let m_auth =
-            Util.authorized_age conf base (Gwdb.poi base isp) && p_auth
+            Person.is_visible conf base (Gwdb.poi base isp) && p_auth
           in
           let vfam = Vfam (None, Some gen_f, m_auth) in
           let vchild, c =
@@ -871,7 +871,7 @@ let print_foreach conf base print_ast _eval_expr =
           let isp = Gutil.spouse aft.HistoryDiff.gen_p.key_index fam in
           let sp = person_of_iper conf base isp in
           let m_auth =
-            Util.authorized_age conf base (Gwdb.poi base isp) && p_auth
+            Person.is_visible conf base (Gwdb.poi base isp) && p_auth
           in
           let vfam = Vfam (Some gen_f, None, m_auth) in
           let vchild, c =
@@ -893,7 +893,7 @@ let print_foreach conf base print_ast _eval_expr =
           let sp1 = person_of_iper conf base isp1 in
           let sp2 = person_of_iper conf base isp2 in
           let m_auth =
-            Util.authorized_age conf base (Gwdb.poi base isp2) && p_auth
+            Person.is_visible conf base (Gwdb.poi base isp2) && p_auth
           in
           let vfam = Vfam (Some gen_f1, Some gen_f2, m_auth) in
           let vchild, c1, c2 =
@@ -1030,7 +1030,7 @@ let print conf base =
           let before = List.nth history before in
           let after = List.nth history after in
           let p = person_of_gen_p_key base after.HistoryDiff.gen_p in
-          let p_auth = Util.authorized_age conf base p in
+          let p_auth = Person.is_visible conf base p in
           let env =
             [ ("history_file", Vstring file); ("history_len", Vint len) ]
           in

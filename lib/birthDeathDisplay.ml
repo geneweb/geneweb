@@ -236,7 +236,7 @@ let print_oldest_alive conf base =
 
 let print_longest_lived conf base =
   let get_longest p =
-    if Util.authorized_age conf base p then
+    if Person.is_visible conf base p then
       match (Date.cdate_to_dmy_opt (Gwdb.get_birth p), Gwdb.get_death p) with
       | Some bd, Def.Death (_, cd) -> (
           match Date.cdate_to_dmy_opt cd with

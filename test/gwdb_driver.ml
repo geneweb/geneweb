@@ -52,6 +52,9 @@ module Utils = struct
   let is_in_range arr i = 0 <= i && i < Array.length arr
 end
 
+let no_ascend = { Def.parents = None; consang = Adef.no_consang }
+let no_union = { Def.family = [||] }
+
 module Person = struct
   let create_empty_person empty what iper =
     {
@@ -122,11 +125,22 @@ module Person = struct
   let get_death_place (_, p) = p.Def.death_place
   let get_death_src (_, p) = p.Def.death_src
   let get_iper (_, p) = p.Def.key_index
+  let is_dummy p = eq_iper (get_iper p) dummy_iper
   let get_notes (_, p) = p.Def.notes
   let get_occupation (_, p) = p.Def.occupation
-  let get_consang (base, p) = base.ascends.(p.Def.key_index).consang
-  let get_family (base, p) = base.unions.(p.Def.key_index).family
-  let get_parents (base, p) = base.ascends.(p.Def.key_index).parents
+
+  let get_consang ((base, p) as person) =
+    if is_dummy person then no_ascend.consang
+    else base.ascends.(p.Def.key_index).consang
+
+  let get_family ((base, p) as person) =
+    if is_dummy person then no_union.family
+    else base.unions.(p.Def.key_index).family
+
+  let get_parents ((base, p) as person) =
+    if is_dummy person then no_ascend.parents
+    else base.ascends.(p.Def.key_index).parents
+
   let get_pevents (_, p) = p.Def.pevents
   let get_psources (_, p) = p.Def.psources
   let get_related (_, p) = p.Def.related
@@ -134,8 +148,13 @@ module Person = struct
   let get_sex (_, p) = p.Def.sex
   let get_titles (_, p) = p.Def.titles
   let gen_person_of_person (_, p) = p
-  let gen_ascend_of_person (base, p) = base.ascends.(p.Def.key_index)
-  let gen_union_of_person (base, p) = base.unions.(p.Def.key_index)
+
+  let gen_ascend_of_person ((base, p) as person) =
+    if is_dummy person then no_ascend else base.ascends.(p.Def.key_index)
+
+  let gen_union_of_person ((base, p) as person) =
+    if is_dummy person then no_union else base.unions.(p.Def.key_index)
+
   let person_of_gen_person base (p, _a, _u) = (base, p)
   let poi base iper = (base, base.persons.(iper))
   let no_person ip = create_empty_person empty_string empty_string ip
@@ -239,8 +258,6 @@ let close_base _ = ()
 let sou base istr = base.strings.(istr)
 let iper_exists base iper = Utils.is_in_range base.persons iper
 let ifam_exists base ifam = Utils.is_in_range base.families ifam
-let no_ascend = { Def.parents = None; consang = Adef.no_consang }
-let no_union = { Def.family = [||] }
 let no_descend = { Def.children = [||] }
 let no_couple = Adef.couple dummy_iper dummy_iper
 let nb_of_persons base = Array.length base.persons

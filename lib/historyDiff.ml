@@ -27,7 +27,7 @@ let history_d conf =
       if Filename.check_suffix conf.bname ".gwb" then conf.bname
       else conf.bname ^ ".gwb"
     in
-    Filename.concat (Util.bpath bname) path
+    Filename.concat (GWPARAM.bpath bname) path
   else path
 
 (* Le chemin du fichier historique dans le dossier history_d. *)

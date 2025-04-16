@@ -54,7 +54,7 @@ let gen_print conf base mois f_scan dead_people =
                d.prec = Sure && d.day <> 0 && d.month <> 0 && d.month = mois
                && d.delta = 0
              then
-               if Util.authorized_age conf base p then
+               if Person.is_visible conf base p then
                  let j = d.day in
                  tab.(pred j) <- (p, d.year, DeBirth, txt_of) :: tab.(pred j)
          | _ -> ()
@@ -69,7 +69,7 @@ let gen_print conf base mois f_scan dead_people =
                    dt.prec = Sure && dt.day <> 0 && dt.month <> 0
                    && dt.month = mois && dt.delta = 0
                  then
-                   if Util.authorized_age conf base p then
+                   if Person.is_visible conf base p then
                      let j = dt.day in
                      tab.(pred j) <-
                        (p, dt.year, DeBirth, txt_of) :: tab.(pred j));
@@ -85,7 +85,7 @@ let gen_print conf base mois f_scan dead_people =
                        dt.prec = Sure && dt.day <> 0 && dt.month <> 0
                        && dt.month = mois && dt.delta = 0
                      then
-                       if Util.authorized_age conf base p then
+                       if Person.is_visible conf base p then
                          let j = dt.day in
                          let a = dt.year in
                          tab.(pred j) <-
@@ -312,10 +312,10 @@ let print_marriage conf base month =
           let mother = Util.pget conf base (Gwdb.get_mother fam) in
           if
             m = month
-            && Util.authorized_age conf base father
-            && (not (Util.is_empty_person father))
-            && Util.authorized_age conf base mother
-            && not (Util.is_empty_person mother)
+            && Person.is_visible conf base father
+            && (not (Person.is_empty father))
+            && Person.is_visible conf base mother
+            && not (Person.is_empty mother)
           then tab.(pred d) <- (fam, y) :: tab.(pred d)
       | _ -> ())
     (Gwdb.ifams base);
@@ -372,11 +372,11 @@ let print_marriage_day conf base day_name fphrase wd dt = function
 
 let match_dates conf base p d1 d2 =
   if d1.Date.day = d2.Date.day && d1.month = d2.month then
-    Util.authorized_age conf base p
+    Person.is_visible conf base p
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
     && not (Date.leap_year d2.year)
-  then Util.authorized_age conf base p
+  then Person.is_visible conf base p
   else false
 
 let gen_print_menu_birth conf base f_scan mode =
@@ -532,14 +532,14 @@ let print_menu_dead conf base =
 
 let match_mar_dates conf base cpl d1 d2 =
   if d1.Date.day = d2.Date.day && d1.month = d2.month then
-    Util.authorized_age conf base (Util.pget conf base (Gwdb.get_father cpl))
-    && Util.authorized_age conf base (Util.pget conf base (Gwdb.get_mother cpl))
+    Person.is_visible conf base (Util.pget conf base (Gwdb.get_father cpl))
+    && Person.is_visible conf base (Util.pget conf base (Gwdb.get_mother cpl))
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
     && not (Date.leap_year d2.year)
   then
-    Util.authorized_age conf base (Util.pget conf base (Gwdb.get_father cpl))
-    && Util.authorized_age conf base (Util.pget conf base (Gwdb.get_mother cpl))
+    Person.is_visible conf base (Util.pget conf base (Gwdb.get_father cpl))
+    && Person.is_visible conf base (Util.pget conf base (Gwdb.get_mother cpl))
   else false
 
 let print_menu_marriage conf base =
@@ -572,9 +572,7 @@ let print_menu_marriage conf base =
           if conf.Config.use_restrict then (
             let father = Util.pget conf base (Gwdb.get_father fam) in
             let mother = Util.pget conf base (Gwdb.get_mother fam) in
-            if
-              (not (Util.is_empty_person father))
-              && not (Util.is_empty_person mother)
+            if (not (Person.is_empty father)) && not (Person.is_empty mother)
             then update_list fam)
           else update_list fam
       | _ -> ())

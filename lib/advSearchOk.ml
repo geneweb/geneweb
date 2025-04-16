@@ -265,7 +265,7 @@ end = struct
         (fun ifam ->
           let fam = Gwdb.foi base ifam in
           let sp = Gwdb.poi base @@ Gutil.spouse (Gwdb.get_iper p) fam in
-          if Util.authorized_age conf base sp then
+          if Person.is_visible conf base sp then
             df fam
             && match_marriage_place ~exact_place ~default:true ~base ~p:fam
                  ~places
@@ -560,7 +560,7 @@ let advanced_search conf base max_answers =
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
-    let auth = Util.authorized_age conf base p in
+    let auth = Person.is_visible conf base p in
     let civil_match =
       lazy
         (AdvancedSearchMatch.match_civil_status ~base ~p
