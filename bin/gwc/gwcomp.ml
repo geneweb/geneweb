@@ -9,7 +9,6 @@ let magic_gwo = "GnWo000o"
 (* si la clé est incomplète, on l'enregistre tout de même.  *)
 let create_all_keys = ref false
 let line_cnt = ref 0
-let force = ref false
 let no_fail = ref false
 let no_picture = ref false
 let rgpd_dir = ref "None"
