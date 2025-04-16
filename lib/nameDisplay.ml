@@ -26,7 +26,7 @@ end = struct
   type name_visibility = HiddenName | RestrictedName | VisibleName of t
 
   let is_hidden conf base person =
-    Util.is_hide_names conf person && not (Util.authorized_age conf base person)
+    Util.is_hide_names conf person && not (Person.is_visible conf base person)
 
   let name_visibility_of_person ~conf ~base ~person =
     if Person.is_empty person then RestrictedName
@@ -182,7 +182,7 @@ let title_html_of_person conf base p t : Adef.safe_string =
 let fullname_html_of_person = fullname_html_of_person ~p_surname:Gwdb.p_surname
 
 let gen_person_title_text reference conf base p =
-  if Util.authorized_age conf base p then
+  if Person.is_visible conf base p then
     match Util.main_title conf base p with
     | Some t ->
         let open Def in
@@ -280,7 +280,7 @@ let child_of_parent conf base p =
 let relation_date conf base fam : Adef.safe_string =
   let is_visible family =
     let is_visible person =
-      Util.authorized_age conf base (Util.pget conf base person)
+      Person.is_visible conf base (Util.pget conf base person)
     in
     is_visible (Gwdb.get_father family) && is_visible (Gwdb.get_mother family)
   in
@@ -351,7 +351,7 @@ let first_child conf base p =
         let child =
           if
             Util.is_hide_names conf enfant
-            && not (Util.authorized_age conf base enfant)
+            && not (Person.is_visible conf base enfant)
           then Adef.safe "xx"
           else if
             not (Gwdb.eq_istr (Gwdb.get_surname p) (Gwdb.get_surname enfant))

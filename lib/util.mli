@@ -3,12 +3,6 @@
 val cnt_dir : string ref
 (** The directory where counters (e.g. number page displayed) are stored. *)
 
-val base_path : string list -> string -> string
-(** Alias for GWPARAM.base_path *)
-
-val bpath : string -> string
-(** Alias for GWPARAM.bpath *)
-
 val search_in_assets : string -> string
 (** Checks that the file in argument belong to one of the asserts dir
     (defined in the Secure module) *)
@@ -81,9 +75,6 @@ val nobtit : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title list
     [conf.denied_titles] *)
 
 val strictly_after_private_years : Config.config -> Date.dmy -> bool
-
-val authorized_age : Config.config -> Gwdb.base -> Gwdb.person -> bool
-(** Alias to Person.is_visible *)
 
 (* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
 val is_old_person :

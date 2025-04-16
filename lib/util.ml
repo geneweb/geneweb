@@ -590,13 +590,11 @@ let is_old_person conf p =
       p.Def.access <> Def.Private && conf.Config.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = Person.is_visible conf base p
-
 let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
   let fct p =
     (not (Gwdb.is_quest_string (Gwdb.get_surname p)))
     && (not (Gwdb.is_quest_string (Gwdb.get_first_name p)))
-    && not (authorized_age conf base p)
+    && not (Person.is_visible conf base p)
   in
   if conf.Config.use_restrict then Gwdb.base_visible_get base fct ip else false
 
@@ -627,7 +625,7 @@ let is_empty_name p =
 
 let is_fully_visible_to_visitors conf base p =
   let conf = { conf with Config.wizard = false; friend = false } in
-  authorized_age conf base p
+  Person.is_visible conf base p
 
 (* TODO should probably not exists *)
 let is_public conf base p =
@@ -857,7 +855,7 @@ let update_family_loop conf base p s =
     else s
 
 let person_title conf base p =
-  if authorized_age conf base p then
+  if Person.is_visible conf base p then
     match main_title conf base p with
     | Some t -> one_title_text base t
     | None -> Adef.safe ""
@@ -1024,8 +1022,6 @@ let string_of_access conf access =
   in
   Adef.safe @@ transl_nth conf "iftitles/public/private" n
 
-let base_path pref bname = GWPARAM.base_path pref bname
-let bpath bname = GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 
@@ -1081,7 +1077,9 @@ let get_request_string conf =
 let message_to_wizard conf =
   if conf.Config.wizard || conf.Config.just_friend_wizard then (
     let print_file fname =
-      let fname = base_path [ "etc"; conf.Config.bname ] (fname ^ ".txt") in
+      let fname =
+        GWPARAM.base_path [ "etc"; conf.Config.bname ] (fname ^ ".txt")
+      in
       try
         let ic = Secure.open_in fname in
         try
@@ -1550,7 +1548,8 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           | Some ip ->
               let p = pget conf base ip in
               if Person.is_empty p then None
-              else if (not (is_hide_names conf p)) || authorized_age conf base p
+              else if
+                (not (is_hide_names conf p)) || Person.is_visible conf base p
               then Some p
               else None
           | None -> None)
@@ -1569,7 +1568,7 @@ let person_exists conf base (fn, sn, oc) =
   | Some "off" -> true
   | Some _ | None -> (
       match Gwdb.person_of_key base fn sn oc with
-      | Some ip -> authorized_age conf base (pget conf base ip)
+      | Some ip -> Person.is_visible conf base (pget conf base ip)
       | None -> false)
 
 let default_sosa_ref conf base =
@@ -1592,7 +1591,7 @@ let find_sosa_ref conf base =
 let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.Config.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
-  let fname = bpath (conf.Config.bname ^ ".gwf") in
+  let fname = GWPARAM.bpath (conf.Config.bname ^ ".gwf") in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Stdlib.open_out tmp_fname
@@ -1625,7 +1624,7 @@ let create_topological_sort conf base =
       Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Gwdb.iper_marker (Gwdb.ipers base) 0
   | _ ->
-      let bfile = bpath (conf.Config.bname ^ ".gwb") in
+      let bfile = GWPARAM.bpath (conf.Config.bname ^ ".gwb") in
       let tstab_file =
         if
           conf.Config.use_restrict && (not conf.Config.wizard)
@@ -1874,7 +1873,7 @@ let short_f_month m =
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
 let read_gen_auth_file fname =
-  let fname = bpath fname in
+  let fname = GWPARAM.bpath fname in
   try
     let ic = Secure.open_in fname in
     let rec loop data =
@@ -2151,7 +2150,7 @@ let cache_visited conf =
     if Filename.check_suffix conf.Config.bname ".gwb" then conf.Config.bname
     else conf.Config.bname ^ ".gwb"
   in
-  Filename.concat (bpath bname) "cache_visited"
+  Filename.concat (GWPARAM.bpath bname) "cache_visited"
 
 (* ************************************************************************ *)
 (*  [Fonc] read_visited : string -> cache_visited_t                         *)
@@ -2348,7 +2347,7 @@ let select_mascdesc ?skip_descendants conf base ips gen_desc =
   select_desc ?skip_descendants conf base gen_desc ips
 
 let auth_warning conf base w =
-  let pauth p = authorized_age conf base p in
+  let pauth p = Person.is_visible conf base p in
   let fauth ifam =
     let fam = Gwdb.foi base ifam in
     pauth (Gwdb.get_father fam |> Gwdb.poi base)
@@ -2432,7 +2431,7 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env ~bname =
-  let fname = bpath (bname ^ ".gwf") in
+  let fname = GWPARAM.bpath (bname ^ ".gwf") in
   try
     let ic = Secure.open_in fname in
     let env =

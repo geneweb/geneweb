@@ -1250,7 +1250,7 @@ let make_conf from_addr request script_name env =
       auth_file =
         (try
            let x = List.assoc "auth_file" base_env in
-           if x = "" then !auth_file else Util.bpath x
+           if x = "" then !auth_file else GWPARAM.bpath x
          with Not_found -> !auth_file);
       border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
       n_connect = None;

@@ -607,7 +607,7 @@ let prec_year_text conf d =
 let short_dates_text conf base p =
   Adef.safe
   @@
-  if Util.authorized_age conf base p then
+  if Person.is_visible conf base p then
     let birth_date, death_date, _ = Gutil.get_birth_death_date p in
     let s =
       match (birth_date, death_date) with
@@ -647,7 +647,7 @@ let short_dates_text conf base p =
 let short_marriage_date_text conf base fam p1 p2 =
   Adef.safe
   @@
-  if Util.authorized_age conf base p1 && Util.authorized_age conf base p2 then
+  if Person.is_visible conf base p1 && Person.is_visible conf base p2 then
     match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
     | Some d ->
         "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"

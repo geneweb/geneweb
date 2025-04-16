@@ -216,7 +216,7 @@ let sort_events get_name get_date events =
   List.merge cmp l1 l2
 
 let events conf base p =
-  if not (Util.authorized_age conf base p) then []
+  if not (Person.is_visible conf base p) then []
   else
     let pevents = List.map event_item_of_pevent (Gwdb.get_pevents p) in
     let events =
@@ -226,9 +226,7 @@ let events conf base p =
           let fam = Gwdb.foi base ifam in
           let isp = Gutil.spouse (Gwdb.get_iper p) fam in
           (* filter family event with contemporary spouse *)
-          let m_auth =
-            Util.authorized_age conf base (Util.pget conf base isp)
-          in
+          let m_auth = Person.is_visible conf base (Util.pget conf base isp) in
           if not m_auth then events
           else
             List.fold_right
