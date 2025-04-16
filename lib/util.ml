@@ -590,7 +590,7 @@ let is_old_person conf p =
       p.Def.access <> Def.Private && conf.Config.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = GWPARAM.p_auth conf base p
+let authorized_age conf base p = Person.p_auth conf base p
 
 let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
   let fct p =

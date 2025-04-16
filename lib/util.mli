@@ -77,7 +77,7 @@ val nobtit : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title list
 val strictly_after_private_years : Config.config -> Date.dmy -> bool
 
 val authorized_age : Config.config -> Gwdb.base -> Gwdb.person -> bool
-(** Alias to GWPARAM.p_auth *)
+(** Alias to Person.p_auth *)
 
 (* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
 val is_old_person :
