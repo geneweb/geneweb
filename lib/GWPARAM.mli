@@ -13,16 +13,6 @@ val reorg : bool ref
 val force : bool ref
 (** force creation of database if already existing *)
 
-val verbosity : int ref
-(** Verbosity level: defines the verbosity level that will
-    allow the [syslog] function to print anything. *)
-
-val debug : bool ref
-(** If set to [true], prints backtrace when printing log. *)
-
-val oc : out_channel option ref
-(** The output channel in which log is written. *)
-
 type init_s = { status : bool; bname : string }
 
 val init_done : init_s ref
@@ -42,24 +32,6 @@ val lang_d : my_fun_3 ref
 val bpath : my_fun_2 ref
 val portraits_d : my_fun_2 ref
 val images_d : my_fun_2 ref
-
-type syslog_level =
-  [ `LOG_EMERG  (** A panic condition. *)
-  | `LOG_ALERT
-    (** A condition that should be corrected immediately,
-                                    such as a corrupted system database. *)
-  | `LOG_CRIT  (** Critical conditions, such as hard device errors. *)
-  | `LOG_ERR  (** Errors. *)
-  | `LOG_WARNING  (** Warning messages.  *)
-  | `LOG_DEBUG
-    (** Conditions that are not error conditions,
-                                    but that may require special handling. *)
-  | `LOG_INFO  (** Informational messages. *)
-  | `LOG_NOTICE
-    (** Messages that contain information
-                                    normally of use only when debugging a program.  *)
-  ]
-(** The level of log gravity. See SYSLOG(3) *)
 
 (* S: Move it to gwd_lib?  *)
 
@@ -155,12 +127,6 @@ val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
 
 val p_auth_sp : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** returns p_auth or true if both user and p are SemiPublic *)
-
-val log : (out_channel -> unit) -> unit
-(** logs directly some text *)
-
-val syslog : syslog_level -> string -> unit
-(** Prints on stderr using `"[date]: level message"` format. *)
 
 val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
 (** Display in a very basic HTML doc, with no CSS or JavaScript. *)

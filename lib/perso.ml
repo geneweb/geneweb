@@ -5,6 +5,7 @@ open Def
 open Gwdb
 open TemplAst
 open Util
+module Logs = Geneweb_logs.Logs
 
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
@@ -1252,7 +1253,7 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
   Printf.sprintf
     "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
     fname bp ep var
-  |> GWPARAM.syslog `LOG_WARNING;
+  |> Logs.syslog `LOG_WARNING;
   r
 
 let bool_val x = VVbool x
@@ -4232,7 +4233,7 @@ let eval_transl conf base env upp s c =
                 | Vind p -> index_of_sex (get_sex p)
                 | _ ->
                     Printf.sprintf "Sex of unknown person"
-                    |> GWPARAM.syslog `LOG_WARNING;
+                    |> Logs.syslog `LOG_WARNING;
                     assert false))
         | "w" -> (
             (* witness/witnesses *)
@@ -4246,7 +4247,7 @@ let eval_transl conf base env upp s c =
             | Vind p -> if Array.length (get_family p) <= 1 then 0 else 1
             | _ ->
                 Printf.sprintf "families of unknown person"
-                |> GWPARAM.syslog `LOG_WARNING;
+                |> Logs.syslog `LOG_WARNING;
                 assert false)
         | "c" -> (
             (* child/children *)
@@ -4265,7 +4266,7 @@ let eval_transl conf base env upp s c =
                     if n <= 1 then 0 else 1
                 | _ ->
                     Printf.sprintf "Children of unknown person"
-                    |> GWPARAM.syslog `LOG_WARNING;
+                    |> Logs.syslog `LOG_WARNING;
                     assert false))
         | "e" -> (
             (* singular/plural for events *)
@@ -4277,7 +4278,7 @@ let eval_transl conf base env upp s c =
                 | _ -> 1)
             | _ ->
                 Printf.sprintf "Events of unknown person"
-                |> GWPARAM.syslog `LOG_WARNING;
+                |> Logs.syslog `LOG_WARNING;
                 assert false)
         | "t" -> (
             (* singular/plural  titles *)
@@ -4289,7 +4290,7 @@ let eval_transl conf base env upp s c =
                 | _ -> 1)
             | _ ->
                 Printf.sprintf "Titles of unknown person"
-                |> GWPARAM.syslog `LOG_WARNING;
+                |> Logs.syslog `LOG_WARNING;
                 assert false)
         | _ -> assert false
       in
@@ -4588,14 +4589,14 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "level" env with
       | Vint lev -> lev
       | _ ->
-          GWPARAM.syslog `LOG_WARNING "Missing level info";
+          Logs.syslog `LOG_WARNING "Missing level info";
           0
     in
     let ip_l =
       match get_env "cousins" env with
       | Vcousl cl -> !cl
       | _ ->
-          GWPARAM.syslog `LOG_WARNING "Empty cousins list";
+          Logs.syslog `LOG_WARNING "Empty cousins list";
           []
     in
     let ip_l =
@@ -4930,7 +4931,7 @@ let print_foreach conf base print_ast eval_expr =
     | Some l ->
         print_foreach_path_aux conf base in_or_less level env al ep
           (Cousins.cousins_fold l)
-    | None -> GWPARAM.syslog `LOG_WARNING "Empty cousins list"
+    | None -> Logs.syslog `LOG_WARNING "Empty cousins list"
   in
 
   let print_foreach_cousin_level env al ((_, _) as ep) =

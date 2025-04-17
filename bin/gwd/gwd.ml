@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module GwdLog = Wserver.GwdLog
+module Logs = Geneweb_logs.Logs
 
 #ifdef DEBUG
 let () = Sys.enable_runtime_warnings true
@@ -111,11 +111,11 @@ let split_username username =
     | 1 -> username, ""
     | 2 -> (List.nth l1 0), (List.nth l1 1)
     | _ -> (
-            Geneweb.GWPARAM.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
+            Logs.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
             username, "")
 
 let log_passwd_failed ar tm from request base_file =
-  Geneweb.GWPARAM.log @@ fun oc ->
+  Logs.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
@@ -142,7 +142,7 @@ let http conf status =
   Output.header conf "Content-type: text/html; charset=iso-8859-1"
 
 let robots_txt conf =
-  Geneweb.GWPARAM.syslog `LOG_NOTICE "Robot request";
+  Logs.syslog `LOG_NOTICE "Robot request";
   Output.status conf Def.OK;
   Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
@@ -150,21 +150,21 @@ let robots_txt conf =
     begin Output.print_sstring conf "User-Agent: *\n"; Output.print_sstring conf "Disallow: /\n" end
 
 let refuse_log conf from =
-  Geneweb.GWPARAM.syslog `LOG_NOTICE @@ "Excluded: " ^ from ;
+  Logs.syslog `LOG_NOTICE @@ "Excluded: " ^ from ;
   http conf Def.Forbidden;
   Output.header conf "Content-type: text/html";
   Output.print_sstring conf "Your access has been disconnected by administrator.\n";
   let _ = (copy_file conf "refuse" : bool) in ()
 
 let only_log conf from =
-  Geneweb.GWPARAM.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
+  Logs.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
   http conf Def.OK;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
   Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
-  Geneweb.GWPARAM.syslog `LOG_NOTICE @@
+  Logs.syslog `LOG_NOTICE @@
   Printf.sprintf
     "Access failed --- From: %s --- Basic realm: %s --- Response: %s"
     from auth_type auth;
@@ -214,7 +214,7 @@ let load_lexicon =
                   Secure.open_in fname
                 end
               else
-                Geneweb.GWPARAM.syslog `LOG_WARNING
+                Logs.syslog `LOG_WARNING
                   (Format.sprintf "File %s unavailable\n" fname)
             end !lexicon_list ;
             ht
@@ -305,7 +305,7 @@ let log_redirect from request req =
   Lock.control (!GWPARAM.adm_file "gwd.lck") true
     ~onerror:(fun () -> ()) begin fun () ->
     let referer = Mutil.extract_param "referer: " '\n' request in
-    Geneweb.GWPARAM.syslog `LOG_NOTICE @@
+    Logs.syslog `LOG_NOTICE @@
     Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer
   end
 
@@ -537,7 +537,7 @@ let get_actlog check_from utm from_addr base_password =
       in
       loop false ATnormal []
   with Sys_error e -> (
-      Geneweb.GWPARAM.syslog `LOG_WARNING ("Error opening (get) actlog: " ^ e);
+      Logs.syslog `LOG_WARNING ("Error opening (get) actlog: " ^ e);
     [], ATnormal, false)
 
 let set_actlog list =
@@ -552,7 +552,7 @@ let set_actlog list =
       list;
     close_out oc
   with Sys_error e -> (
-    Geneweb.GWPARAM.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
+    Logs.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
     ())
 
 let get_token check_from utm from_addr base_password =
@@ -1061,7 +1061,7 @@ let make_conf from_addr request script_name env =
        "Requested allowed_tags file (%s) absent" !allowed_tags_file
     in
     GWPARAM.errors_other := str :: !GWPARAM.errors_other;
-    GWPARAM.syslog `LOG_WARNING str);
+    Logs.syslog `LOG_WARNING str);
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
   let cgi = !Wserver.cgi in
@@ -1075,7 +1075,7 @@ let make_conf from_addr request script_name env =
       | [ bname ] -> bname, ""
       | [ bname ; access ] -> bname, access
       | _ -> (
-        GWPARAM.syslog
+        Logs.syslog
           `LOG_CRIT (Format.sprintf "bad bname: (%s)\n" base_access);
         assert false)
     in
@@ -1321,7 +1321,7 @@ let make_conf from_addr request script_name env =
   conf, ar
 
 let log tm conf from gauth request script_name contents =
-  Geneweb.GWPARAM.log @@ fun oc ->
+  Logs.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
@@ -1458,11 +1458,11 @@ let conf_and_connection =
             unauth_server conf ar
       | _ ->
         let printexc bt exn =
-          Geneweb.GWPARAM.syslog `LOG_CRIT
+          Logs.syslog `LOG_CRIT
             ((context conf contents :> string) ^ " " ^ Printexc.to_string exn);
           if Printexc.backtrace_status () then
             let s = Format.sprintf "Backtrace:@ %s" bt in
-            Geneweb.GWPARAM.syslog `LOG_CRIT s
+            Logs.syslog `LOG_CRIT s
         in
         try
           let t1 = Unix.gettimeofday () in
@@ -1470,7 +1470,7 @@ let conf_and_connection =
           let t2 = Unix.gettimeofday () in
           if t2 -. t1 > slow_query_threshold
           then
-            Geneweb.GWPARAM.syslog
+            Logs.syslog
               `LOG_WARNING
               (Printf.sprintf "%s slow query (%.3f)"
                  (context conf contents : Adef.encoded_string :> string) (t2 -. t1))
@@ -1820,7 +1820,7 @@ let geneweb_server () =
         else exit 0;
         try File.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
         with Sys_error e ->
-          GWPARAM.syslog `LOG_CRIT (Format.sprintf "failure creating %s (%s)\n"
+          Logs.syslog `LOG_CRIT (Format.sprintf "failure creating %s (%s)\n"
             !GWPARAM.cnt_dir e);
     end;
   Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
@@ -1983,6 +1983,14 @@ let print_version_commit () =
   Printf.printf "Branch %s\nLast commit %s\n" Version.branch Version.commit_id;
   exit 0
 
+let set_debug_flag () =
+  debug := true;
+  Logs.debug_flag := true;
+  Printexc.record_backtrace true
+
+let set_verbosity_level lvl =
+  Logs.verbosity_level := lvl
+
 let main () =
 #ifdef WINDOWS
   Wserver.sock_in := "gwd.sin";
@@ -2017,14 +2025,14 @@ let main () =
     ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
     ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
     ; ("-add_lexicon", Arg.String (Mutil.list_ref_append lexicon_list), "<FILE> Add file as lexicon.")
-    ; ("-log", Arg.String (fun x -> Geneweb.GWPARAM.oc := Some (match x with "-" | "<stdout>" -> stdout | "2" | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
-    ; ("-log_level", Arg.Set_int Geneweb.GWPARAM.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !Geneweb.GWPARAM.verbosity ^ {|).|})
+    ; ("-log", Arg.String (fun x -> Logs.oc := Some (match x with "-" | "<stdout>" -> stdout | "2" | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
+    ; ("-log_level", Arg.Int set_verbosity_level, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !Logs.verbosity_level ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
     ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")
     ; ("-login_tmout", Arg.Int (fun x -> login_timeout := x), "<SEC> Login timeout for entries with passwords in CGI mode (default " ^ string_of_int !login_timeout ^ "s).")
     ; ("-redirect", Arg.String (fun x -> redirected_addr := Some x), "<ADDR> Send a message to say that this service has been redirected to <ADDR>.")
     ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
-    ; ("-debug", Arg.Unit (fun () -> debug := true ; Geneweb.GWPARAM.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
+    ; ("-debug", Arg.Unit set_debug_flag, " Enable debug mode")
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
@@ -2081,10 +2089,10 @@ let main () =
     )
     !cache_databases;
   if !auth_file <> "" && !force_cgi then
-    Geneweb.GWPARAM.syslog `LOG_WARNING "-auth option is not compatible with CGI mode.\n \
+    Logs.syslog `LOG_WARNING "-auth option is not compatible with CGI mode.\n \
       Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";
   if !use_auth_digest_scheme && !force_cgi then
-    Geneweb.GWPARAM.syslog `LOG_WARNING "-digest option is not compatible with CGI mode.\n";
+    Logs.syslog `LOG_WARNING "-digest option is not compatible with CGI mode.\n";
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
@@ -2142,7 +2150,7 @@ let () =
     flush stderr
 #ifdef UNIX
   | Unix.Unix_error (Unix.ENOTCONN, _, _ ) ->
-    Geneweb.GWPARAM.syslog `LOG_WARNING ({|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|})
+    Logs.syslog `LOG_WARNING ({|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|})
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \
@@ -2152,12 +2160,12 @@ let () =
     flush stderr;
 #endif
   | Register_plugin_failure (p, `dynlink_error e) ->
-    Geneweb.GWPARAM.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
+    Logs.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->
-    Geneweb.GWPARAM.syslog `LOG_CRIT (p ^ ": " ^ s)
+    Logs.syslog `LOG_CRIT (p ^ ": " ^ s)
   | exn ->
     let bt = Printexc.get_backtrace () in
-    Geneweb.GWPARAM.syslog `LOG_CRIT (Printexc.to_string exn);
+    Logs.syslog `LOG_CRIT (Printexc.to_string exn);
     if Printexc.backtrace_status () then
       let s = Format.sprintf "Backtrace:@ %s" bt in
-      Geneweb.GWPARAM.syslog `LOG_CRIT s
+      Logs.syslog `LOG_CRIT s

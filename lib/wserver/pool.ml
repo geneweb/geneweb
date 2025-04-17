@@ -4,6 +4,8 @@
    let src = Logs.Src.create ~doc:"Pool" __MODULE__
    module Log = (val Logs.src_log src : Logs.LOG) *)
 
+module Logs = Geneweb_logs.Logs
+
 type worker = { pid : int } [@@unboxed]
 type t = { workers : (worker, unit) Hashtbl.t } [@@unboxed]
 
@@ -26,10 +28,10 @@ let add_worker t k =
          done
        with e ->
          let bt = Printexc.get_raw_backtrace () in
-         GwdLog.info (fun k -> k "%a" pp_exception (e, bt)));
+         Logs.info (fun k -> k "%a" pp_exception (e, bt)));
       exit 1
   | pid ->
-      GwdLog.debug (fun k -> k "Creating worker %d" pid);
+      Logs.debug (fun k -> k "Creating worker %d" pid);
       Hashtbl.replace t.workers { pid } ()
 
 let cleanup { workers } =
@@ -49,7 +51,7 @@ let start n k =
     assert (pid > 0);
     match Hashtbl.find t.workers { pid } with
     | () ->
-        GwdLog.debug (fun k -> k "Worker %d is dead, replace it" pid);
+        Logs.debug (fun k -> k "Worker %d is dead, replace it" pid);
         add_worker t k
     | exception Not_found -> assert false
   done

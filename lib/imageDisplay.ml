@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+module Logs = Geneweb_logs.Logs
 
 let print_placeholder_gendered_portrait conf p size =
   let open Gwdb in
@@ -81,7 +82,7 @@ let print_image_file conf fname =
         close_in ic;
         Ok ()
       with Sys_error e ->
-        GWPARAM.syslog `LOG_ERR
+        Logs.syslog `LOG_ERR
           (Format.sprintf "Error printing image file content for %s : %s" fname
              e);
         Error e)
