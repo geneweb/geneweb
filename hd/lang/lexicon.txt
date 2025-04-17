@@ -19640,8 +19640,8 @@ tr: aileyi Düzenle
     update image note
 co: mudificà a nota di a fiura
 de: Bildnotiz aktualisieren
-en: update image note
-fr: mettre à jour la note de l’image
+en: update image
+fr: mettre à jour l’image
 
     update image source
 co: mudificà a fonte di a fiura
