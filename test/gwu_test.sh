@@ -1,5 +1,5 @@
 #!/bin/sh
-#set -ex
+set -e
 usage()
 {
 echo "Usage: $cmd [Options]
@@ -10,11 +10,15 @@ By default:
   to access gwc/gwu tools in $BIN_DIR
 * gwc is using test/$REFDBNAME.gw input file and creating
   $BASES_DIR/$REFDBNAME.gwb database.
+* if using $REFDBNAME then unzip related images to prepare DB
+  for usage by test/run_gw_test.sh other tool.
 If needed use -f option to change from default.
 
 Options:
 -f  file to be sourced in to overwrite hardcoded vars
 -h  To display this help.
+-r  To pass -reorg option to gwc
+    (if not set then gwc will create a legacy DB)
 "
 exit 1
 }
@@ -26,6 +30,7 @@ REFDBNAME='galichet' # reference gw file
 # assumes we are running in the repo folder
 # ./test/testgwu.sh
 DBNAME='galichet' # name of gw file input to gwc (w/o extension)
+ZIP_IMG='galichet_src_images.zip' # zip of images and src files for legacy DB
 BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
@@ -37,7 +42,7 @@ GWCOPT='-v -f -cg'
 cmd=$(basename $0)
 cmddir=$(dirname $0)
 echo "starting $0 $@"
-while getopts "f:h" Option
+while getopts "f:hr" Option
 do
 case $Option in
     f ) setenv_file=$OPTARG
@@ -45,6 +50,7 @@ case $Option in
             { echo "invalid -f $setenv_file  option file"; exit 1; }
         ;;
     h ) usage;;
+    r ) optreorg='-reorg';;
     * ) usage;;
 esac
 done
@@ -54,22 +60,28 @@ shift $(($OPTIND - 1))
 test -f "$setenv_file" && . $setenv_file
 
 if test ! -d $BASES_DIR/ ; then
-    mkdir -p $BASES_DIR
+    $SUDOPRFX mkdir -pm 775 $BASES_DIR
     if test ! -d $BASES_DIR/ ; then
         echo "$BASES_DIR/ not accessible, change your default parms."
         exit 1
     fi
+    # for Legacy, bypass to avoid gwd Warning messages  (as per issue #2143)
+    if test ! -n "$optreorg"; then
+        for xx in cnt etc lang; do
+            $SUDOPRFX mkdir -m 755 $BASES_DIR/$xx
+        done
+    fi
 fi
 if test ! -f $BASES_DIR/$DBNAME.gw ; then
-    if test -f test/$DBNAME.gw ; then
-        cp -f  test/$DBNAME.gw $BASES_DIR/
+    if test -f $cmddir/$DBNAME.gw ; then
+        $SUDOPRFX cp -f  $cmddir/$DBNAME.gw $BASES_DIR/
     else
-        echo "$DBNAME.gw not found in $BASES_DIR or test/"
+        echo "$DBNAME.gw not found in $BASES_DIR or $cmddir/"
         exit 1
     fi
 else
     if test "$DBNAME" = "$REFDBNAME"; then
-        rsync -a test/$DBNAME.gw $BASES_DIR/
+        $SUDOPRFX rsync -a $cmddir/$DBNAME.gw $BASES_DIR/
     fi
 fi
 
@@ -80,9 +92,29 @@ for xx in .gwb _outdir; do
     $SUDOPRFX mkdir $BASES_DIR/${DBNAME}${xx} || exit 1
 done
 
-gwcopt="$GWCOPT -bd $BASES_DIR"
+gwcopt="$GWCOPT -bd $BASES_DIR $optreorg"
 $SUDOPRFX $BIN_DIR/gwc $gwcopt -o $DBNAME $BASES_DIR/$DBNAME.gw >$BASES_DIR/$DBNAME.log 2>&1 || \
   { echo "gwc failure, details in $BASES_DIR/$DBNAME.log"; exit 1; }
+
+
+if test "$DBNAME" = "$REFDBNAME"; then
+    tmpdir="$BASES_DIR/unzip_tmp"
+    mkdir -p $tmpdir && rm -rf $tmpdir/*
+    unzip -q $cmddir/$ZIP_IMG -d $tmpdir
+    if test -n "$optreorg"; then
+        tmpname=$BASES_DIR/${DBNAME}.gwb/documents
+        $SUDOPRFX mkdir -p $tmpname/portraits
+        $SUDOPRFX cp -Rp $tmpdir/src/$DBNAME/* $tmpname/
+        $SUDOPRFX cp -Rp $tmpdir/images/$DBNAME/* $tmpname/portraits/
+    else
+        for xx in src images; do
+            tmpname=$xx/$DBNAME
+            test -e $BASES_DIR/$tmpname || $SUDOPRFX mkdir -p $BASES_DIR/$tmpname
+            $SUDOPRFX cp -Rp $tmpdir/$tmpname/* $BASES_DIR/$tmpname/
+        done
+    fi
+    rm -rf $tmpdir
+fi
 
 $SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}.gwu.o.gw 2>$BASES_DIR/$DBNAME.gwu.o.stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu.o.stderr"; exit 1; }
