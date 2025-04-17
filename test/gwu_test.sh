@@ -10,11 +10,15 @@ By default:
   to access gwc/gwu tools in $BIN_DIR
 * gwc is using test/$REFDBNAME.gw input file and creating
   $BASES_DIR/$REFDBNAME.gwb database.
+* if using $REFDBNAME then unzip $ZIP_IMG to prepare DB
+  for usage by test/run_gw_test.sh other tool.
 If needed use -f option to change from default.
 
 Options:
 -f  file to be sourced in to overwrite hardcoded vars
 -h  To display this help.
+-r  To pass -reorg option to gwc
+    (if not set then gwc will create a legacy DB)
 "
 exit 1
 }
@@ -26,16 +30,19 @@ REFDBNAME='galichet' # reference gw file
 # assumes we are running in the repo folder
 # ./test/testgwu.sh
 DBNAME='galichet' # name of gw file input to gwc (w/o extension)
+ZIP_IMG='galichet_src_images.zip' # zip of associated images and src files.
 BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
 SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
+GWCOPT='-v -f -cg'
 #=== hardcoded vars (end)   ===
 
 #===  main ====================
 cmd=$(basename $0)
+cmddir=$(realpath $0); cmddir=$(dirname $cmddir)
 echo "starting $0 $@"
-while getopts "f:h" Option
+while getopts "f:hr" Option
 do
 case $Option in
     f ) setenv_file=$OPTARG
@@ -43,6 +50,7 @@ case $Option in
             { echo "invalid -f $setenv_file  option file"; exit 1; }
         ;;
     h ) usage;;
+    r ) optreorg='-reorg';;
     * ) usage;;
 esac
 done
@@ -59,15 +67,15 @@ if test ! -d $BASES_DIR/ ; then
     fi
 fi
 if test ! -f $BASES_DIR/$DBNAME.gw ; then
-    if test -f test/$DBNAME.gw ; then
-        cp -f  test/$DBNAME.gw $BASES_DIR/
+    if test -f $cmddir/$DBNAME.gw ; then
+        cp -f  $cmddir/$DBNAME.gw $BASES_DIR/
     else
-        echo "$DBNAME.gw not found in $BASES_DIR or test/"
+        echo "$DBNAME.gw not found in $BASES_DIR or $cmddir/"
         exit 1
     fi
 else
     if test "$DBNAME" = "$REFDBNAME"; then
-        rsync -a test/$DBNAME.gw $BASES_DIR/
+        rsync -a $cmddir/$DBNAME.gw $BASES_DIR/
     fi
 fi
 
@@ -76,8 +84,18 @@ fqbindir=$(realpath $BIN_DIR)
 cd $BASES_DIR
 $SUDOPRFX rm -rf $DBNAME.lck $DBNAME.gwo $DBNAME.log $DBNAME.gwb $DBNAME_nouveau.gw $DBNAME.gwu_stderr outdir.$DBNAME
 $SUDOPRFX mkdir outdir.$DBNAME $DBNAME.gwb $DBNAME.gwb/wiznotes || exit 1
-$SUDOPRFX $fqbindir/gwc -v -f -cg -o $DBNAME $DBNAME.gw >$DBNAME.log 2>&1 || \
+gwcopt="$GWCOPT $optreorg"
+$SUDOPRFX $fqbindir/gwc $gwcopt -o $DBNAME $DBNAME.gw >$DBNAME.log 2>&1 || \
   { echo "gwc failure, details in $BASES_DIR/$DBNAME.log"; exit 1; }
+
+if test "$DBNAME" = "$REFDBNAME"; then
+    if test -n "$optreorg"; then
+        echo "TODO for reorg mode DB need to identify different subdirectories \nto unpack files from $cmddir/$ZIP_IMG"
+    else
+        unzip -u "$cmddir/$ZIP_IMG"
+    fi
+fi
+
 $SUDOPRFX $fqbindir/gwu $DBNAME -v -o ${DBNAME}.gwu.o.gw 2>$DBNAME.gwu.o.stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu.o.stderr"; exit 1; }
 $SUDOPRFX $fqbindir/gwu $DBNAME -v -o ${DBNAME}_nouveau.gw -odir outdir.$DBNAME 2>$DBNAME.gwu_stderr || \
