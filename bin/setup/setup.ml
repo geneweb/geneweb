@@ -1483,11 +1483,6 @@ let separate_slashed_filename s =
   in
   loop 0
 
-let end_with s x =
-  let slen = String.length s in
-  let xlen = String.length x in
-  slen >= xlen && String.sub s (slen - xlen) xlen = x
-
 let print_typed_file conf typ fname =
   let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
   match ic_opt with
@@ -1518,10 +1513,10 @@ let raw_file conf s =
     List.fold_left Filename.concat !setup_dir (separate_slashed_filename s)
   in
   let typ =
-    if end_with s ".png" then "image/png"
-    else if end_with s ".jpg" then "image/jpeg"
-    else if end_with s ".gif" then "image/gif"
-    else if end_with s ".css" then "text/css"
+    if Ext_string.end_with s ".png" then "image/png"
+    else if Ext_string.end_with s ".jpg" then "image/jpeg"
+    else if Ext_string.end_with s ".gif" then "image/gif"
+    else if Ext_string.end_with s ".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
