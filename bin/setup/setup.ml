@@ -421,27 +421,9 @@ let file_contents fname =
     loop 0
   with Sys_error _ -> ""
 
-let cut_at_equal s =
-  match String.index_opt s '=' with
-  | Some i ->
-      (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
-  | None -> (s, "")
-
 let read_base_env bname =
-  let fname = bname ^ ".gwf" in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let rec loop env =
-        match try Some (input_line ic) with End_of_file -> None with
-        | None ->
-            close_in ic;
-            env
-        | Some s ->
-            if s = "" || s.[0] = '#' then loop env
-            else loop (cut_at_equal s :: env)
-      in
-      loop []
-  | None -> []
+  let bname = bname |> Filename.basename |> Filename.remove_extension in
+  Geneweb.Util.read_base_env ~bname
 
 let rec split_string acc s =
   if String.length s < 80 then acc ^ s
