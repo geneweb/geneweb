@@ -1238,9 +1238,11 @@ let with_database ?(read_only = false) bname k =
     File.walk_folder ~recursive:true
       (fun fl files ->
         match fl with
-        | `File f when Filename.check_suffix f ".txt" ->
+        | File f when Filename.check_suffix f ".txt" ->
             Filename.chop_suffix f ".txt" :: files
-        | `File _ | `Dir _ -> files)
+        | File _ | Dir _ | Exn _ ->
+            (* TODO: we may print a warning for errors. *)
+            files)
       (Filename.concat bname "nodes_d")
       []
   in
