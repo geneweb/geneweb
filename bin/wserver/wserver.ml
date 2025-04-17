@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 let connection_closed = ref false
-let eprintf = Printf.eprintf
 let stop_server = ref "STOP_SERVER"
 let cgi = ref false
 let wserver_sock = ref Unix.stdout
@@ -238,7 +237,7 @@ let wait_available max_clients s =
         if !pids <> [] && not !stop_verbose then (
           stop_verbose := true;
           let tm = Unix.localtime (Unix.time ()) in
-          eprintf
+          Printf.eprintf
             "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after \
              cleanup (%d)\n"
             tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year)
@@ -252,8 +251,8 @@ let wait_available max_clients s =
 let check_stopping () =
   if Sys.file_exists !stop_server then (
     flush stdout;
-    eprintf "\nServer stopped by presence of file %s.\n" !stop_server;
-    eprintf "Remove that file to allow servers to run again.\n";
+    Printf.eprintf "\nServer stopped by presence of file %s.\n" !stop_server;
+    Printf.eprintf "Remove that file to allow servers to run again.\n";
     flush stderr;
     exit 0)
 
@@ -283,7 +282,7 @@ let accept_connection tmout max_clients callback s =
       else pids := id :: !pids
   | None ->
       Unix.close t;
-      eprintf "Fork failed\n";
+      Printf.eprintf "Fork failed\n";
       flush stderr
 
 let f ~syslog ~addr ~port ~timeout ~max_clients ~handler =
@@ -304,8 +303,9 @@ let f ~syslog ~addr ~port ~timeout ~max_clients ~handler =
   Unix.bind s (Unix.ADDR_INET (addr, port));
   Unix.listen s 4;
   let tm = Unix.localtime (Unix.time ()) in
-  eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n" (1900 + tm.Unix.tm_year)
-    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min port;
+  Printf.eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
+    (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
+    tm.Unix.tm_hour tm.Unix.tm_min port;
   flush stderr;
   while true do
     try accept_connection tmout max_clients g s with
