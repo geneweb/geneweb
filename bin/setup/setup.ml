@@ -6,8 +6,6 @@ let bin_dir = ref ""
 let base_dir = ref ""
 let lang_param = ref ""
 let only_file = ref ""
-let bname = ref ""
-let commnd = ref ""
 
 let printer_conf =
   {
