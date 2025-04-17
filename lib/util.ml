@@ -1754,58 +1754,74 @@ let hexa_string s =
   Bytes.unsafe_to_string s'
 
 let print_alphab_list conf crit print_elem liste =
-  let print_sub_list len sub_l print_e index =
-    if sub_l <> [] then (
-      if len > menu_threshold then (
+  let len = List.length liste in
+  (* No work to do if list is empty *)
+  if liste = [] then Output.print_sstring conf "<ul></ul>\n"
+  else (
+    (* Print alphabetical index links at the top if we have many items *)
+    if len > menu_threshold then (
+      Output.print_sstring conf "<p>\n";
+
+      (* Create index links without duplicates *)
+      let rec print_index seen = function
+        | [] -> ()
+        | e :: rest ->
+            let t = crit e in
+            if not (List.mem t seen) then
+              Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
+            print_index (t :: seen) rest
+      in
+      print_index [] liste;
+      Output.print_sstring conf "</p>\n";
+      Output.print_sstring conf "<ul>\n")
+    else Output.print_sstring conf "<ul>\n";
+    (* Group items by their criteria and print each group *)
+    let rec process_groups current_group current_index = function
+      | [] when current_group != [] ->
+          (* Print the last group *)
+          print_group (List.rev current_group) current_index
+      | [] ->
+          (* Empty list, nothing to do *)
+          ()
+      | e :: rest ->
+          let t = crit e in
+          (* If we're using numerical indexes or have many items, group by criteria *)
+          if len > menu_threshold || is_number t then
+            if current_index = None || Some t <> current_index then
+              (* New group - print previous group if any, then start new group *)
+              let () =
+                if current_group <> [] then
+                  print_group (List.rev current_group) current_index
+              in
+              process_groups [ e ] (Some t) rest
+            else
+              (* Continue same group *)
+              process_groups (e :: current_group) current_index rest
+          else
+            (* Not grouping - print all items together *)
+            print_group (e :: rest) (Some "")
+    (* Print a group of items with the same criteria *)
+    and print_group items index_opt =
+      let index = match index_opt with Some t -> t | None -> "" in
+      (* If we're grouping items, create a container with an anchor *)
+      if len > menu_threshold && index <> "" then (
         Output.print_sstring conf "<li>\n";
         Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string index) index;
         Output.print_sstring conf "<ul>\n");
+      (* Print each item in the group *)
       List.iter
         (fun e ->
           Output.print_sstring conf "<li>\n  ";
-          print_e e;
+          print_elem e;
           Output.print_sstring conf "</li>\n")
-        sub_l;
-      if len > menu_threshold then Output.print_sstring conf "</ul>\n")
-  in
-  let len = List.length liste in
-  if len > menu_threshold then (
-    Output.print_sstring conf "<p>\n";
-    (let _ =
-       List.fold_left
-         (fun last e ->
-           let t = crit e in
-           let same_than_last =
-             match last with Some t1 -> t = t1 | _ -> false
-           in
-           if not same_than_last then
-             Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
-           Some t)
-         None liste
-     in
-     ());
-    Output.print_sstring conf "</p>\n";
-    Output.print_sstring conf "<ul>\n");
-  let rec loop acc last liste =
-    let index = match last with Some t -> t | None -> "" in
-    match liste with
-    | [] -> print_sub_list len acc print_elem index
-    | e :: liste ->
-        let t = crit e in
-        let same_than_last = match last with Some t1 -> t = t1 | _ -> false in
-        if len > menu_threshold || is_number t then
-          match last with
-          | Some _ ->
-              if not same_than_last then (
-                print_sub_list len acc print_elem index;
-                loop [] (Some t) liste)
-              else loop (e :: acc) (Some t) liste
-          | _ -> loop (e :: acc) (Some t) liste
-        else print_sub_list len liste print_elem ""
-  in
-  loop [] None liste;
-  if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
-  Output.print_sstring conf "</ul>\n"
+        items;
+      (* Close the container if we opened one *)
+      if len > menu_threshold && index <> "" then (
+        Output.print_sstring conf "</ul>\n";
+        Output.print_sstring conf "</li>\n")
+    in
+    process_groups [] None liste;
+    Output.print_sstring conf "</ul>\n")
 
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
