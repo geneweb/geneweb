@@ -446,86 +446,60 @@
 %include;js
 %define;input_snd(xxx,yyy)
 $('.xxx').change(function() {
-   %(replace input label with file name, then enable send button if input is non empty%)
-   let fileName = $(this).val().split('\\').pop();
-   $(this).next('.custom-file-label').addClass("selected").html(fileName);
-   $('.yyy').attr('disabled', false);
-   %if;("yyy"="snd-btn-others")
-     $('textarea').attr('disabled', false);
-     $('textarea').focus();
-   %end;
+  let fileName = $(this).val().split('\\').pop();
+  $(this).next('.custom-file-label').addClass("selected").html(fileName);
+  $('.yyy').prop('disabled', false);
+  %if;("yyy"="snd-btn-others")
+    $('textarea').prop('disabled', false).focus();
+  %end;
 });
 %end;
 <script>
-%apply;input_snd("custom-portrait","snd-btn-portrait")
-%apply;input_snd("custom-others","snd-btn-others")
-$('#image_note').bind('input propertychange', function() {
-  if(this.value.length){
-  $('.btn-update-note-source').attr('disabled', false);
-  }
-});
-$('#image_source').bind('input propertychange', function() {
-  if(this.value.length){
-  $('.btn-update-note-source').attr('disabled', false);
-  }
-});
-$('.fa-file-lines').click(function() {
-  $('.custom-others').attr('disabled', true);
-  $('#image_note').attr('disabled', false);
-  $('#image_note').focus();4
-});
-$('.fa-file-zipper').click(function() {
-  $('.custom-others').attr('disabled', true);
-  $('#image_source').attr('disabled', false);
-  $('#image_source').focus();1
-});
-%( Initialize Bootstrap toast, tooltip and popover component, dismiss on next click function,
-  TODO: choose one and delete the other %)
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-%($(function () {
-  $('[data-toggle="popover"]').popover()
-})
-$('.popover-dismiss').popover({
-  trigger: 'focus'
-})
-$( document).ready(function () {
- $('.toast').toast('show');
-})
-$(function () {
-  $('.toast').toast()
-})%)
-function get_note (cnt, name) {
-var item = document.getElementById("note_"+cnt);
-document.getElementById("image_note").value=item.dataset.note;
-document.getElementById("which_img_show").textContent="[*update image note] "+name;
-document.getElementById("file_name_2").value=name;
-document.getElementById("mode_2").value="note";
-%(var ta = document.getElementById("image_note");
-autosize.update(ta);%)
-}
-function get_source (cnt, name) {
-var item = document.getElementById("source_"+cnt);
-document.getElementById("image_source").value=item.dataset.source;
-document.getElementById("which_img_show").textContent="[*update image source] "+name;
-document.getElementById("file_name_2").value=name;
-document.getElementById("mode_2").value="source";
-%(var ta = document.getElementById("image_source");
-autosize.update(ta);%)
-}
-function toggle_url_on () {
-console.log("trace");
-var state = document.getElementById("image_name").disable;
-console.log(state);
-document.getElementById("image_name").disable = !state;
-document.getElementById("image_name").focus();
-}
-</script>
-%( Possible heavier futur script to manage multiple files inputs
-   https://github.com/Johann-S/bs-custom-file-input/blob/master/dist/bs-custom-file-input.min.js
-<script src=%etc_prefix;js/bs-custom-file-input.min.js></script>
-<script>$(document).ready(function(){bsCustomFileInput.init()})</script> %)
+// Clic pour les icônes de note et source
+const setupFieldEditor = (iconSelector, fieldSelector) => {
+  $(iconSelector).click(function() {
+    $('.custom-others').prop('disabled', true);
+    $(fieldSelector).prop('disabled', false).focus();
+  });
+};
+$(function() {
+  %apply;input_snd("custom-portrait","snd-btn-portrait")
+  %apply;input_snd("custom-others","snd-btn-others")
 
+  setupFieldEditor('.fa-file-lines', '#image_note');
+  setupFieldEditor('.fa-file-zipper', '#image_source');
+
+  $('#image_note, #image_source').on('input', function() {
+    if(this.value.length) {
+      $('.btn-update-note-source').prop('disabled', false);
+    }
+  });
+
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+// Fonction d'édition de métadonnées
+const updateImageMetadata = (type, cnt, name) => {
+  const $typeField = $(`#${type}_${cnt}`);
+  const $textField = $(`#image_${type}`);
+  
+  $textField.val($typeField.data(type));
+  $('#file_name_2').val(name);
+  $('#mode_2').val(type);
+  $('#which_img_show').text(`[*update image ${type}] ${name}`);
+};
+
+// Fonctions pour les notes et sources
+const get_note = (cnt, name) => updateImageMetadata('note', cnt, name);
+const get_source = (cnt, name) => updateImageMetadata('source', cnt, name);
+
+// Basculer l'état du champ URL
+const toggle_url_on = () => {
+  const $imageNameField = $('#image_name');
+  $imageNameField
+    .prop('disabled', !$imageNameField.prop('disabled'))
+    .focus();
+};
+</script>
 </body>
 </html>
