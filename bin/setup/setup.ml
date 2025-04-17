@@ -23,10 +23,6 @@ let slashify s = String.map (function '\\' -> '/' | c -> c) s
 let decode s = Mutil.decode (Adef.encoded s)
 let encode s = (Mutil.encode s :> string)
 
-let rec list_remove_assoc x = function
-  | (x1, y1) :: l -> if x = x1 then l else (x1, y1) :: list_remove_assoc x l
-  | [] -> []
-
 type config = {
   lang : string;
   comm : string;
@@ -1679,7 +1675,7 @@ let setup (addr, req) comm (env_str : Adef.encoded_string) =
     else
       let lang, env =
         match p_getenv env "lang" with
-        | Some x -> (x, list_remove_assoc "lang" env)
+        | Some x -> (x, List.remove_assoc "lang" env)
         | _ -> (!default_lang, env)
       in
       let lexicon = input_lexicon lang in
