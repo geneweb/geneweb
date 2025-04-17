@@ -2,8 +2,6 @@
 
 (* module [Wserver]: elementary web service *)
 
-module GwdLog : module type of GwdLog
-
 val start :
   ?addr:string ->
   port:int ->

@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module GwdLog = GwdLog
+module Logs = Geneweb_logs.Logs
 
 let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
@@ -272,9 +272,9 @@ let accept_connections_windows socket =
   while true do
     try accept_connection_windows socket with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-        GwdLog.syslog `LOG_INFO (Printexc.to_string e)
+        Logs.info (fun k -> k "%s" (Printexc.to_string e))
     | Sys_error msg as e when msg = "Broken pipe" ->
-        GwdLog.syslog `LOG_INFO (Printexc.to_string e)
+        Logs.info (fun k -> k "%s" (Printexc.to_string e))
   done
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
@@ -301,7 +301,7 @@ let with_timeout ~timeout handler f =
 let accept_connections_unix ~timeout ~n_workers callback socket =
   Pool.start n_workers @@ fun pid ->
   let client_socket, client_addr = Unix.accept socket in
-  GwdLog.debug (fun k -> k "Worker %d got a job" pid);
+  Logs.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
   wserver_sock := client_socket;

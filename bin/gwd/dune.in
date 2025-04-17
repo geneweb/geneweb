@@ -28,6 +28,7 @@
   (libraries
     dynlink
     geneweb
+    geneweb.logs
     gwd_lib
     str
     unix

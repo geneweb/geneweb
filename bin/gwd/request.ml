@@ -6,7 +6,7 @@ open Def
 open Gwdb
 open Util
 
-module GwdLog = Wserver.GwdLog
+module Logs = Geneweb_logs.Logs
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
@@ -291,7 +291,7 @@ let make_henv conf base =
     match
       Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
     with
-    | Some ip -> 
+    | Some ip ->
       { conf with
           semi_public =
             if conf.semi_public then get_access (poi base ip) = SemiPublic
@@ -503,7 +503,7 @@ let treat_request =
             else SrcfileDisplay.incr_request_counter conf
           with
           | Some (welcome_cnt, request_cnt, start_date) ->
-            GwdLog.log begin fun oc ->
+            Logs.log begin fun oc ->
               let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
               Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
                 thousand (welcome_cnt + request_cnt) thousand welcome_cnt
