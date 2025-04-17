@@ -188,7 +188,13 @@ crl () {
   unset first_request tstmsg
 }
 
-gwf_file=$BASES_DIR/$DBNAME.gwf
+gwf_file=$BASES_DIR/$DBNAME.gwb/config/$DBNAME.gwf
+if test -h "$gwf_file" || test -f "$gwf_file"; then
+    modereorg=1
+else
+    gwf_file=$BASES_DIR/$DBNAME.gwf
+fi
+
 if test -h "$gwf_file" || test -f "$gwf_file"; then
     if test -h "$gwf_file"; then
         origgwf=$(realpath $gwf_file)
