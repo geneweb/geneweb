@@ -1521,10 +1521,6 @@ let image_request conf script_name env =
       if Ext_string.start_with "images/" 0 s then
         let i = String.length "images/" in
         let fname = String.sub s i (String.length s - i) in
-        (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)
-        (* empeche d'avoir des images qui se trouvent dans le dossier   *)
-        (* image. Si on ne fait pas de basename, alors ça marche.       *)
-        (* let fname = Filename.basename fname in *)
         let (`Path fname) = Geneweb.Image.path_of_filename fname in
         let _ = Geneweb.ImageDisplay.print_image_file conf fname in
         true
