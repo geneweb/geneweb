@@ -457,6 +457,85 @@ let rec split_string acc s =
           (String.sub s (i + 1) (String.length s - i - 1))
     | _ -> acc ^ s
 
+let print_selector conf print =
+  let sel =
+    try getenv conf.env "sel"
+    with Not_found -> (
+      try Sys.getenv "HOME" with Not_found -> Sys.getcwd ())
+  in
+  let list =
+    try
+      let dh = Unix.opendir sel in
+      let rec loop list =
+        match try Some (Unix.readdir dh) with End_of_file -> None with
+        | Some x ->
+            let list =
+              if x = ".." then x :: list
+              else if String.length x > 0 && x.[0] = '.' then list
+              else x :: list
+            in
+            loop list
+        | None -> List.sort compare list
+      in
+      loop []
+    with Unix.Unix_error (_, _, _) -> [ ".." ]
+  in
+  print "<pre>\n";
+  print "     ";
+  print "<input type=hidden name=anon value=\"";
+  print sel;
+  print "\">";
+  print sel;
+  let list =
+    List.map
+      (fun x ->
+        let d =
+          if x = ".." then Filename.dirname sel else Filename.concat sel x
+        in
+        let x = if is_directory d then Filename.concat x "" else x in
+        (d, x))
+      list
+  in
+  let max_len =
+    List.fold_left (fun max_len (_, x) -> max max_len (String.length x)) 0 list
+  in
+  let min_interv = 2 in
+  let line_len = 72 in
+  let n_by_line = max 1 ((line_len + min_interv) / (max_len + min_interv)) in
+  let newline () = print "\n" in
+  newline ();
+  (let rec loop i = function
+     | (d, x) :: list ->
+         print "<a class=\"j\" href=\"";
+         print conf.comm;
+         print "?lang=";
+         print conf.lang;
+         print ";";
+         List.iter
+           (fun (k, v) ->
+             if k <> "sel" && k <> "body_prop" then (
+               print k;
+               print "=";
+               print v;
+               print ";"))
+           conf.env;
+         print "sel=";
+         print (encode d);
+         print "\">";
+         print x;
+         print "</a>";
+         if i = n_by_line then (
+           newline ();
+           loop 1 list)
+         else if list = [] then newline ()
+         else (
+           print (String.make (max_len + 2 - String.length x) ' ');
+           loop (i + 1) list)
+     | [] -> print "\n"
+   in
+   loop 1 list);
+  print "</pre>\n"
+
 let rec copy_from_stream conf print strm =
   try
     while true do
@@ -675,85 +754,6 @@ and print_specific_file_tail conf print fname strm =
         close_in ic)
       else copy_from_stream conf print (Stream.of_string s)
   | _ -> ()
-
-and print_selector conf print =
-  let sel =
-    try getenv conf.env "sel"
-    with Not_found -> (
-      try Sys.getenv "HOME" with Not_found -> Sys.getcwd ())
-  in
-  let list =
-    try
-      let dh = Unix.opendir sel in
-      let rec loop list =
-        match try Some (Unix.readdir dh) with End_of_file -> None with
-        | Some x ->
-            let list =
-              if x = ".." then x :: list
-              else if String.length x > 0 && x.[0] = '.' then list
-              else x :: list
-            in
-            loop list
-        | None -> List.sort compare list
-      in
-      loop []
-    with Unix.Unix_error (_, _, _) -> [ ".." ]
-  in
-  print "<pre>\n";
-  print "     ";
-  print "<input type=hidden name=anon value=\"";
-  print sel;
-  print "\">";
-  print sel;
-  let list =
-    List.map
-      (fun x ->
-        let d =
-          if x = ".." then Filename.dirname sel else Filename.concat sel x
-        in
-        let x = if is_directory d then Filename.concat x "" else x in
-        (d, x))
-      list
-  in
-  let max_len =
-    List.fold_left (fun max_len (_, x) -> max max_len (String.length x)) 0 list
-  in
-  let min_interv = 2 in
-  let line_len = 72 in
-  let n_by_line = max 1 ((line_len + min_interv) / (max_len + min_interv)) in
-  let newline () = print "\n" in
-  newline ();
-  (let rec loop i = function
-     | (d, x) :: list ->
-         print "<a class=\"j\" href=\"";
-         print conf.comm;
-         print "?lang=";
-         print conf.lang;
-         print ";";
-         List.iter
-           (fun (k, v) ->
-             if k <> "sel" && k <> "body_prop" then (
-               print k;
-               print "=";
-               print v;
-               print ";"))
-           conf.env;
-         print "sel=";
-         print (encode d);
-         print "\">";
-         print x;
-         print "</a>";
-         if i = n_by_line then (
-           newline ();
-           loop 1 list)
-         else if list = [] then newline ()
-         else (
-           print (String.make (max_len + 2 - String.length x) ' ');
-           loop (i + 1) list)
-     | [] -> print "\n"
-   in
-   loop 1 list);
-  print "</pre>\n"
 
 and print_if conf print cond strm =
   match Stream.next strm with
