@@ -2,6 +2,7 @@ open Config
 open Def
 open Gwdb
 open Util
+module Logs = Geneweb_logs.Logs
 
 let file_copy input_name output_name =
   let fd_in = Unix.openfile input_name [ O_RDONLY ] 0 in
@@ -84,22 +85,28 @@ let write_file fname content =
 
 let move_file_to_save dir file =
   try
-    (* FIXME attention, le basename détruit les sous dossiers *)
     let save_dir = Filename.concat dir "saved" in
     Filesystem.create_dir ~parent:true save_dir;
     let fname = Filename.basename file in
     let orig_file = Filename.concat dir fname in
+    if not (Sys.file_exists orig_file) then
+      raise (Sys_error (Printf.sprintf "File not found: %s" orig_file));
     let saved_file = Filename.concat save_dir fname in
-    (* TODO handle rn errors *)
+    if Sys.file_exists saved_file then Mutil.rm saved_file;
     rn orig_file saved_file;
-    let orig_file_t = Filename.remove_extension orig_file ^ ".txt" in
-    let saved_file_t = Filename.remove_extension saved_file ^ ".txt" in
-    if Sys.file_exists orig_file_t then rn orig_file_t saved_file_t;
-    let orig_file_s = Filename.remove_extension orig_file ^ ".src" in
-    let saved_file_s = Filename.remove_extension saved_file ^ ".src" in
-    if Sys.file_exists orig_file_s then rn orig_file_s saved_file_s;
+    let extensions = [ ".txt"; ".src" ] in
+    List.iter
+      (fun ext ->
+        let orig_ext = Filename.remove_extension orig_file ^ ext in
+        let saved_ext = Filename.remove_extension saved_file ^ ext in
+        if Sys.file_exists orig_ext then rn orig_ext saved_ext)
+      extensions;
     1
-  with _ -> 0
+  with
+  | Sys_error e ->
+      Logs.syslog `LOG_ERR (Printf.sprintf "Error moving file to saved: %s" e);
+      0
+  | _ -> 0
 
 let create_blason_stop conf base p =
   let blason_dir = !GWPARAM.portraits_d conf.bname in
