@@ -19,6 +19,14 @@
   mode="note" then only the note file is updated
   carrousel is “on” if we are dealing with “others” images %)
 %random.init;
+%define;refresh()
+  %if;(e.m!="REFRESH")
+    <div class="d-flex align-items-center small mt-2">
+      <a href="%prefix;&m=REFRESH&i=%index;" class="btn btn-sm btn-danger mr-2">
+        <i class="fas fa-retweet fa-rotate-90 fa-fw"></i></a> [*warning refresh]
+    </div>
+  %end;
+%end;
 %define;alert_header()
   %if;("http" in portrait or "http" in old_portrait)
     WARNING
@@ -28,9 +36,9 @@
     %elseif;(e.em="RESET_IMAGE_C_OK")[*image/images]0 [restored]1%nn;
     %end;%nn;
   %elseif;(e.mode="blasons")
-    %if;(e.em="SND_IMAGE_C_OK")[*coat of arms] [uploaded]0%nn;
-    %elseif;(e.em="DEL_IMAGE_C_OK" and e.fdigest=e.idigest)[*coat of arms] [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
-    %elseif;(e.em="RESET_IMAGE_C_OK" and e.fdigest=e.idigest)[*coat of arms] [restored]0%nn;
+    %if;(e.em="SND_IMAGE_C_OK")[*blason/blasons] [uploaded]0%nn;
+    %elseif;(e.em="DEL_IMAGE_C_OK" and e.fdigest=e.idigest)[*blason/blasons]0 [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
+    %elseif;(e.em="RESET_IMAGE_C_OK" and e.fdigest=e.idigest)[*blason/blasons] [restored]0%nn;
     %end;%nn;
   %elseif;(e.mode="portraits")
     %if;(e.em="SND_IMAGE_C_OK")%if;(e.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
@@ -179,7 +187,7 @@
         <button class="btn btn-primary ml-2 col-2 snd-btn-others" type="submit" >[*send::]</button>
         %(TODO: print only if saved img already exists%)
           <span class="col-1 align-self-center ml-3">[or]</span>
-          <span class="col">
+          <span class="col px-0">
           <input type="text" class="form-control mt-1" id="image_url" name="image_url"
             placeholder="%apply;a_of_b%with;[URL]%and;[image/images]0%end;">
           </span>
@@ -205,7 +213,7 @@
         <h1 class="display-4">[*portrait]0</h1>
         %if;has_portrait;
           <div class="d-flex mt-1">
-            <a role="button" 
+            <a role="button"
               href="%portrait_url;" target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see portrait]</strong><br><span class="small">%portrait;</span><br>
@@ -216,7 +224,7 @@
                  <i class="fa-solid fa-user-shield"></i></a>
             %if;has_portrait_url;%portrait_name;%else;
               <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%portrait_name;%end;</samp>
-            <a role="button" class="ml-auto mt-1"
+            <a role="button" class="ml-auto"
               href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&idigest=%idigest;&file_name=%portrait_name;"
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete portrait]</strong><br><span class="small">%portrait;</span><br>
@@ -225,8 +233,8 @@
           </div>
         %end;
         %if;has_old_portrait;
-          <div class="d-flex mt-1">
-            <a role="button" 
+          <div class="d-flex">
+            <a role="button"
               href="%old_portrait_url;" target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see portrait]</strong><br><span class="small">%old_portrait;</span><br>
@@ -236,8 +244,8 @@
               title="[*restore portrait saved]">
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;</a>
             %if;has_old_portrait_url;<strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong>%old_portrait_name;%else;
-            <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%portrait_url;%end;</samp>
-            <a role="button" class="ml-auto col-1"
+            <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%old_portrait_name;%end;</samp>
+            <a role="button" class="ml-auto"
               href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&idigest=%idigest;&delete=on&file_name=%old_portrait_name;"
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<i class="far fa-trash-can text-danger mr-1"></i><strong>[*delete saved portrait]0</strong><br><span class="small">%old_portrait;</span><br>
@@ -245,12 +253,7 @@
               <i class="far fa-trash-can text-danger"></i></a>
           </div>
         %end;
-        %( TODO: table removed, restore formating %)
-        <i class="fas fa-retweet fa-rotate-90 fa-fw mr-1"></i>
-        <a href="%prefix;&m=REFRESH&i=%index;">
-          <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
-        </a>
-        <small>[*warning refresh]</small>
+        %apply;refresh()
       %end;
       %if;(has_blason or has_blason_stop or has_old_blason)
       <h1 class="display-4 mt-2">[*blason/blasons]0</h1>
@@ -328,13 +331,7 @@
             <i class="far fa-trash-can text-danger"></i></a>
         </div>
       %end;
-      <div>
-      %( TODO: table removed, restore formating %)
-        <i class="fas fa-retweet fa-rotate-90 fa-fw mr-1"></i>
-        <a href="%prefix;&m=REFRESH&i=%index;">
-          <i class="fa fa-image fa-fw" aria-hidden="true"></i></a>
-        <small>[*warning refresh]</small>
-      </div>
+      %apply;refresh()
     %end;
       %if;(carrousel_img_nbr>0)
         <h1 class="display-4">[*image/images]1</h1>
@@ -420,12 +417,7 @@
                 <i class="far fa-trash-can text-danger fa-fw text-primary"></i></a>
           </div>
         %end;
-        %( TODO: table removed, restore formating + fix/remove this %)
-        <i class="fas fa-retweet fa-rotate-90 fa-fw mr-1"></i>
-        <a href="%prefix;&m=REFRESH&i=%index;">
-          <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
-        </a>
-        <small>[*warning refresh]</small>
+        %apply;refresh()
       %end;
     </div>
   </div>
