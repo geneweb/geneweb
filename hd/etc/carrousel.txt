@@ -20,6 +20,14 @@
   carrousel is “on” if we are dealing with “others” images %)
 %random.init;
 %let;random_bits;%if;predictable_mode;123456%else;%random.bits;%end;%in;
+%define;refresh()
+  %if;(e.m!="REFRESH")
+    <div class="d-flex align-items-center small mt-2">
+      <a href="%prefix;&m=REFRESH&i=%index;" class="btn btn-sm btn-danger mr-2">
+        <i class="fas fa-retweet fa-rotate-90 fa-fw"></i></a> [*warning refresh]
+    </div>
+  %end;
+%end;
 %define;alert_header()
   %if;("http" in portrait or "http" in old_portrait)
     WARNING
@@ -29,9 +37,9 @@
     %elseif;(e.em="RESET_IMAGE_C_OK")[*image/images]0 [restored]1%nn;
     %end;%nn;
   %elseif;(e.mode="blasons")
-    %if;(e.em="SND_IMAGE_C_OK")[*coat of arms] [uploaded]0%nn;
-    %elseif;(e.em="DEL_IMAGE_C_OK" and e.fdigest=e.idigest)[*coat of arms] [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
-    %elseif;(e.em="RESET_IMAGE_C_OK" and e.fdigest=e.idigest)[*coat of arms] [restored]0%nn;
+    %if;(e.em="SND_IMAGE_C_OK")[*blason/blasons]0 [uploaded]0%nn;
+    %elseif;(e.em="DEL_IMAGE_C_OK" and e.fdigest=e.idigest)[*blason/blasons]0 [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
+    %elseif;(e.em="RESET_IMAGE_C_OK" and e.fdigest=e.idigest)[*blason/blasons]0 [restored]0%nn;
     %end;%nn;
   %elseif;(e.mode="portraits")
     %if;(e.em="SND_IMAGE_C_OK")%if;(e.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
@@ -112,8 +120,14 @@
   <div class="row mb-1">
     %( *** Col 1 *** %)
     <div class="col-6 border border-bottom-0 border-top-0 border-left-0">
+      <div class="d-inline-flex">
       <h1 class="display-5">%nn;
         %if;(has_portrait)[*modify portrait]%else;[*add portrait]%end;</h1>
+        <a class="ml-2 mt-2 text-primary small" data-toggle="tooltip" data-html="true" data-placement="top"
+          title="%if;has_portrait_url;[*must use MOD_IND]%else;
+          %if;(has_portrait and has_old_portrait)[*previous portrait]%end;%end;">
+          (<i class="fa fa-info fa-xs"></i>)</a>
+      </div>
       <form class="form-row" method="post" action="%action;" enctype="multipart/form-data">
         %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
         <input type="hidden" name="m" value="SND_IMAGE_C_OK">
@@ -131,11 +145,6 @@
         <button class="btn btn-primary ml-2 col-2 snd-btn-portrait"
           type="submit" disabled>[*send::]</button>
       </form>
-      <div class="small mt-2">%nn;
-        %if;has_portrait_url;[*must use MOD_IND]%else;
-          %if;(has_portrait and has_old_portrait)[*previous portrait]%end;
-        %end;
-      </div>
       <h1 class="display-5">%nn;
         %if;(has_blason)[*modify coat of arms]%else;[*add coat of arms]%end;</h1>
       <form class="form-row" method="post" action="%action;" enctype="multipart/form-data">
@@ -147,66 +156,68 @@
         <input type="hidden" name="idigest" value=%idigest;>
         <input type="hidden" name="fdigest" value=%idigest;>
         <div class="custom-file col">
-          <input type="file" name="file"
-            class="custom-file-input custom-portrait"
+          <input type="file" name="file" class="custom-file-input custom-blason"
               id="portrait_file" accept="image/*"%if;(not has_blason) autofocus%end;>
           <label class="custom-file-label text-truncate" data-browse="[*browse]"
             for="portrait_file">[*select] [blason/blasons]0</label>
         </div>
-        <button class="btn btn-primary ml-2 col-2 snd-btn-portrait"
+        <button class="btn btn-primary ml-2 col-2 snd-btn-blason"
           type="submit" disabled>[*send::]</button>
       </form>
       <div class="small mt-2">%nn;
-        %if;(has_blason and has_old_blason)[*previous::blason/blasons]%end;
+        %if;(has_blason and has_old_blason)[*previous::blason/blasons]0%end;
       </div>
-      <h1 class="display-5">[*add image]</h1>
+      <div class="d-inline-flex">
+        <h1 class="display-5">[*add image]</h1>
+        <a class="ml-2 mt-2 text-primary small" data-toggle="tooltip" data-html="true" data-placement="top"
+          title="[*previous image]">(<i class="fa fa-info fa-xs"></i>)</a>
+      </div>
       <form class="form-row" method="post" action="%action;" enctype="multipart/form-data">
         %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
         <input type="hidden" name="m" value="SND_IMAGE_C_OK">
         <input type="hidden" name="i" value="%index;">
         <input type="hidden" name="mode" id="mode_2" value="carrousel">
         <input type="hidden" name="idigest" value=%idigest;>
-        %( file_name is automatically provided by the type="file" item %)
-        %( file_name_2 is used when updating the note file after selection %)
-        %( with the radiobutton of the saved folder content (right column) %)
         <input type="hidden" name="file_name_2" id="file_name_2" value="">
-        <div class="custom-file col-9">
+        <div class="custom-file col">
           <input type="file" name="file" class="custom-file-input custom-others"
-            id="others_file" accept="image/*"%if;has_portrait; autofocus%end;%( multiple%)>
-          <label class="custom-file-label text-truncate" for="others_file"  data-browse="[*browse]">%nn;
-            [*select] [image/images]0%nn;
-          </label>
+            id="others_file" accept="image/*"%if;has_portrait; autofocus%end;>
+          <label class="custom-file-label text-truncate" data-browse="[*browse]"
+            for="others_file">[*select] [image/images]0</label>
         </div>
-        <button class="btn btn-primary ml-2 col-2 snd-btn-others" type="submit" >[*send::]</button>
-        %(TODO: print only if saved img already exists%)
-          <span class="col-1 align-self-center ml-3">[or]</span>
-          <span class="col">
-          <input type="text" class="form-control mt-1" id="image_url" name="image_url"
+        <button type="button" class="btn btn-primary ml-2 col-2 btn-quick-upload" disabled>[*send::]</button>
+        <div class="col-12 d-flex align-items-center mt-2">
+          <span class="mr-2">[or]</span>
+          <input type="text" class="form-control" id="image_url" name="image_url"
             placeholder="%apply;a_of_b%with;[URL]%and;[image/images]0%end;">
-          </span>
-        %( long message about image with same name being deleted %)
-        <div class="small col-12 mt-1">[*previous image]</div>
-        %( TODO expliciter que le nom peut rester vide, gardera celui fourni %)
+        </div>
         <input type="text" class="form-control col-12 mt-3" id="image_name"
-          name="image_name" placeholder="[*name] ([optionnal])">
-        %( TODO re-activate disable for send, source and note %)
-        <textarea class="form-control col-12 mt-1" id="image_source"
-          name="source" rows="1" placeholder="[*source/sources]0 ([optionnal])">
+          name="image_name" placeholder="[*name] ([optional]) TODO: FIXME!">
+        <textarea class="form-control col-12 mt-2" id="image_note" disabled
+          name="note" rows="2" placeholder="[*note/notes]0 ([optional])">
         </textarea>
-        <textarea class="form-control col-12 mt-1" id="image_note"
-          name="note" rows="4" placeholder="[*note/notes]0 ([optionnal])">
+        <textarea class="form-control col-12 mt-2" id="image_source" disabled
+          name="source" rows="1" placeholder="[*source/sources]0 ([optional])">
         </textarea>
-        <button class="btn btn-primary mt-2 col-12 btn-update-note-source" type="submit" disabled>
-          <span id="which_img_show">[*send image with note and source]</span></button>
+        <div class="col-12 mt-2">
+          <div class="d-flex">
+            <button type="submit" class="flex-grow-1 btn btn-primary text-wrap text-left py-2 submit-button" disabled>
+              <span id="which_img_show" class="d-inline-block">[*send image with note and source]</span>
+            </button>
+            <button type="button" class="btn btn-secondary ml-2 d-none" id="btn-cancel-edit">
+                [*user/password/cancel]2
+            </button>
+          </div>
+        </div>
       </form>
     </div>
     %( *** Col 2 *** image cache disabled with a kch=%random_bits; %)
     <div class="col-6">
       %if;(has_portrait or has_old_portrait)
-        <h1 class="display-4">[*portrait]0</h1>
+        <h1 class="display-5">[*portrait]0</h1>
         %if;has_portrait;
           <div class="d-flex mt-1">
-            <a role="button" 
+            <a role="button"
               href="%portrait_url;" target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see portrait]</strong><br><span class="small">%portrait;</span><br>
@@ -217,7 +228,7 @@
                  <i class="fa-solid fa-user-shield"></i></a>
             %if;has_portrait_url;%portrait_name;%else;
               <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%portrait_name;%end;</samp>
-            <a role="button" class="ml-auto mt-1"
+            <a role="button" class="ml-auto"
               href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&idigest=%idigest;&file_name=%portrait_name;"
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete portrait]</strong><br><span class="small">%portrait;</span><br>
@@ -226,8 +237,8 @@
           </div>
         %end;
         %if;has_old_portrait;
-          <div class="d-flex mt-1">
-            <a role="button" 
+          <div class="d-flex">
+            <a role="button"
               href="%old_portrait_url;" target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see portrait]</strong><br><span class="small">%old_portrait;</span><br>
@@ -237,8 +248,8 @@
               title="[*restore portrait saved]">
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;</a>
             %if;has_old_portrait_url;<strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong>%old_portrait_name;%else;
-            <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%portrait_url;%end;</samp>
-            <a role="button" class="ml-auto col-1"
+            <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%old_portrait_name;%end;</samp>
+            <a role="button" class="ml-auto"
               href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&idigest=%idigest;&delete=on&file_name=%old_portrait_name;"
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<i class="far fa-trash-can text-danger mr-1"></i><strong>[*delete saved portrait]0</strong><br><span class="small">%old_portrait;</span><br>
@@ -246,30 +257,12 @@
               <i class="far fa-trash-can text-danger"></i></a>
           </div>
         %end;
-        %( TODO: table removed, restore formating %)
-        <i class="fas fa-retweet fa-rotate-90 fa-fw mr-1"></i>
-        <a href="%prefix;&m=REFRESH&i=%index;">
-          <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
-        </a>
-        <small>[*warning refresh]</small>
+        %apply;refresh()
       %end;
       %if;(has_blason or has_blason_stop or has_old_blason)
-      <h1 class="display-4 mt-2">[*blason/blasons]0</h1>
-      %if;has_blason_self;
-        <div class="d-flex align-self-center mt-1">
-          <a role="button" href="%blason_url;" target="_blank" rel="noopener"
-            data-toggle="tooltip" data-html="true" data-placement="left"
-            title='<strong>[*see coat of arms]</strong><br><span class="small">%blason_url;</span><br>
-              <img class="rounded my-1" src="%blason_url;" width="185px">'>
-            <i class="far fa-file-image fa-fw text-primary"></i></a>
-          <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%blason_name;</samp>
-          <a role="button" class="ml-auto col-1"
-            href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=blasons&fdigest=%idigest;&file_name=%blason_name;"
-            data-toggle="tooltip" data-html="true" data-placement="left"
-            title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete coat of arms]</strong><br><span class="small">%blason;</span><br>
-              <img class="rounded my-1" src="%blason_url;" width="185px">'>
-            <i class="far fa-trash-can text-warning"></i></a>
-          <div class="dropdown">
+        <div class="d-flex justify-content-between">
+          <h1 class="display-5">[*blason/blasons]0</h1>
+          <div class="dropdown align-self-center">
             <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
               title="[*move coat of arms to]1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-person-arrow-up-from-line pb-0"></i>
@@ -289,56 +282,65 @@
             </div>
           </div>
         </div>
-      %elseif;has_blason_stop;
-        <div class="d-flex mt-1">
-          <span>%self; [stop using the coat of arms of]1 <a href="%prefix;%blason_owner.access;">%blason_owner;</a></span>%nn;
-          <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=blasons&fdigest=%idigest;&file_name=%blason_stop_name;"
-            data-toggle="tooltip" data-html="true" data-placement="left">
-            <i class="far fa-trash-can text-warning"></i>%nn;</a>
-        </div>
-      %elseif;has_blason;
-        <div class="d-flex mt-1">
-          <a role="button" href="%blason_url;"
-            target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
-            title='<strong>[*see coat of arms]</strong><br><span class="small">
-              %blason_name;</span><br><img class="rounded my-1"%sp;
-              src="%blason_url;" width="185px">'>
-            <i class="far fa-file-image fa-fw text-primary"></i></a>
-          <span>[*use coat of arms of]0%sp;<a href="%prefix;%blason_owner.access;">%blason_owner;</a></span>
-          <a role="button" class="ml-auto" href="%prefix;m=BLASON_STOP&i=%index;&mode=blasons" title="[stop using the coat of arms of]0 %blason_owner;"
-            data-toggle="tooltip" data-html="true" data-placement="left">
-            <i class="fa-solid fa-xmark fa-fw fa-xl text-danger"></i></a>
-        </div>
+        %if;has_blason_self;
+          <div class="d-flex align-self-center mt-1">
+            <a role="button" href="%blason_url;" target="_blank" rel="noopener"
+              data-toggle="tooltip" data-html="true" data-placement="left"
+              title='<strong>[*see coat of arms]</strong><br><span class="small">%blason_url;</span><br>
+                <img class="rounded my-1" src="%blason_url;" width="185px">'>
+              <i class="far fa-file-image fa-fw text-primary"></i></a>
+            <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%blason_name;</samp>
+            <a role="button" class="ml-auto col-1"
+              href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=blasons&fdigest=%idigest;&file_name=%blason_name;"
+              data-toggle="tooltip" data-html="true" data-placement="left"
+              title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete coat of arms]</strong><br><span class="small">%blason;</span><br>
+                <img class="rounded my-1" src="%blason_url;" width="185px">'>
+              <i class="far fa-trash-can text-warning"></i></a>
+          </div>
+        %elseif;has_blason_stop;
+          <div class="d-flex mt-1">
+            <span>%self; [stop using the coat of arms of]1 <a href="%prefix;%blason_owner.access;">%blason_owner;</a></span>%nn;
+            <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=blasons&fdigest=%idigest;&file_name=%blason_stop_name;"
+              data-toggle="tooltip" data-html="true" data-placement="left">
+              <i class="far fa-trash-can text-warning"></i>%nn;</a>
+          </div>
+        %elseif;has_blason;
+          <div class="d-flex mt-1">
+            <a role="button" href="%blason_url;"
+              target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
+              title='<strong>[*see coat of arms]</strong><br><span class="small">
+                %blason_name;</span><br><img class="rounded my-1"%sp;
+                src="%blason_url;" width="185px">'>
+              <i class="far fa-file-image fa-fw text-primary"></i></a>
+            <span>[*use coat of arms of]0%sp;<a href="%prefix;%blason_owner.access;">%blason_owner;</a></span>
+            <a role="button" class="ml-auto" href="%prefix;m=BLASON_STOP&i=%index;&mode=blasons" title="[stop using the coat of arms of]0 %blason_owner;"
+              data-toggle="tooltip" data-html="true" data-placement="left">
+              <i class="fa-solid fa-xmark fa-fw fa-xl text-danger"></i></a>
+          </div>
+        %end;
+        %if;has_old_blason;
+          <div class="d-flex mt-1">
+            <a role="button" href="%old_blason_url;"
+              target="_blank" rel="noopener"
+              data-toggle="tooltip" data-html="true" data-placement="left"
+              title='<strong>[*see coat of arms]</strong><br><span class="small">%blason;</span><br>
+                <img class="rounded my-1" width="185px" src="%old_blason_url;">'>
+              <i class="far fa-file-image fa-fw text-primary"></i></a>
+            <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=blasons&file_name=%portrait;&fdigest=%idigest;"
+              title="[*restore coat of arms saved]">
+              <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;</a>
+            <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%old_blason_name;</samp>
+            <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=blasons&delete=on&fdigest=%idigest;&file_name=%old_blason_name;"
+              data-toggle="tooltip" data-html="true" data-placement="left"%sp;
+              title='<strong>[*delete saved coat of arms]0</strong><br><span class="small">%old_blason;</span><br>
+                <img class="rounded my-1" src="%old_blason_url;" width="185px">'>
+              <i class="far fa-trash-can text-danger"></i></a>
+          </div>
+        %end;
+        %apply;refresh()
       %end;
-      %if;has_old_blason;
-        <div class="d-flex mt-1">
-          <a role="button" href="%old_blason_url;"
-            target="_blank" rel="noopener"
-            data-toggle="tooltip" data-html="true" data-placement="left"
-            title='<strong>[*see coat of arms]</strong><br><span class="small">%blason;</span><br>
-              <img class="rounded my-1" width="185px" src="%old_blason_url;">'>
-            <i class="far fa-file-image fa-fw text-primary"></i></a>
-          <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=blasons&file_name=%portrait;&fdigest=%idigest;"
-            title="[*restore coat of arms saved]">
-            <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;</a>
-          <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%old_blason_name;</samp>
-          <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=blasons&delete=on&fdigest=%idigest;&file_name=%old_blason_name;"
-            data-toggle="tooltip" data-html="true" data-placement="left"%sp;
-            title='<strong>[*delete saved coat of arms]0</strong><br><span class="small">%old_blason;</span><br>
-              <img class="rounded my-1" src="%old_blason_url;" width="185px">'>
-            <i class="far fa-trash-can text-danger"></i></a>
-        </div>
-      %end;
-      <div>
-      %( TODO: table removed, restore formating %)
-        <i class="fas fa-retweet fa-rotate-90 fa-fw mr-1"></i>
-        <a href="%prefix;&m=REFRESH&i=%index;">
-          <i class="fa fa-image fa-fw" aria-hidden="true"></i></a>
-        <small>[*warning refresh]</small>
-      </div>
-    %end;
       %if;(carrousel_img_nbr>0)
-        <h1 class="display-4">[*image/images]1</h1>
+        <h1 class="display-5">[*image/images]1</h1>
         <div class="d-flex align-items-center">
           <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
           <strong><samp class="text-truncate" title="%images_store;%X;%carrousel;">%images_store;%X;%carrousel;%X;</samp></strong>
@@ -346,29 +348,18 @@
         </div>
         %foreach;img_in_carrousel;
           <div class="d-flex mt-1">
-            <a role="button"
-              href="%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;"
-              target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
+            <a role="button" href="#" id="source_%img_cnt;" 
+              onclick='editImageNote(%img_cnt;, "%carrousel_img_raw;"); return false;' 
+              data-source="%carrousel_img_src;" data-note="%carrousel_img_note;"
+              data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong><br>
                 <span class="small">%carrousel_img_raw;</span><br>
                 <img class="rounded my-1"
                   src="%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;"
-                  width="185px">'>
+                  width="185px">
+                %if;(carrousel_img_note!="")<br><strong>[*note/notes]0[:]</strong> %carrousel_img_note;%end;
+                %if;(carrousel_img_src!="")<br><strong>[*source/sources]0[:]</strong> %carrousel_img_src;%end;'>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
-            <a role="button" href="#" id="source_%img_cnt;" class="text-%if;(carrousel_img_src="")danger%else;primary%end;"
-              onclick='get_source(%img_cnt;, "%carrousel_img_raw;"); return false;' data-source="%carrousel_img_src;"
-              data-toggle="tooltip" data-html="true" data-placement="bottom"
-              title='<strong><i class="far fa-file fa-fw mr-1"></i>
-                 %if;(carrousel_img_src="")[*add source]%else;[*modify source]%end;</strong>
-                 <br><span class="small"><br>%carrousel_img_src;</span>'>
-              <i class="far fa-file-zipper fa-fw"></i></a>
-            <a role="button" href="#" id="note_%img_cnt;" class="text-%if;(carrousel_img_note="")danger%else;primary%end;"
-              onclick='get_note(%img_cnt;, "%carrousel_img_raw;"); return false;' data-note="%carrousel_img_note;"
-              data-toggle="tooltip" data-html="true" data-placement="bottom"
-              title='<strong><i class="far fa-file fa-fw mr-1"></i>
-                 %if;(carrousel_img_note="")[*add note]%else;[*modify note]%end;</strong>
-                 <br><span class="small"><br>%carrousel_img_note;</span>'>
-              <i class="far fa-file-lines fa-fw"></i></a>
             <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img_raw;">%carrousel_img_raw;</samp>
             <div class="ml-auto">
               <a role="button"
@@ -385,7 +376,7 @@
         %end;
       %end;
       %if;(carrousel_old_img_nbr>0)
-        <h1 class="display-4">[*saved images]1</h1>
+        <h1 class="display-5">[*saved images]1</h1>
         <div class="d-flex align-items-center">
           <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
           <strong><samp class="text-truncate" title="%images_store;%X;%carrousel;%X;saved%X;">%images_store%X;%carrousel;%X;saved%X;</samp></strong>
@@ -421,12 +412,7 @@
                 <i class="far fa-trash-can text-danger fa-fw text-primary"></i></a>
           </div>
         %end;
-        %( TODO: table removed, restore formating + fix/remove this %)
-        <i class="fas fa-retweet fa-rotate-90 fa-fw mr-1"></i>
-        <a href="%prefix;&m=REFRESH&i=%index;">
-          <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
-        </a>
-        <small>[*warning refresh]</small>
+        %apply;refresh()
       %end;
     </div>
   </div>
@@ -449,57 +435,155 @@ $('.xxx').change(function() {
   let fileName = $(this).val().split('\\').pop();
   $(this).next('.custom-file-label').addClass("selected").html(fileName);
   $('.yyy').prop('disabled', false);
-  %if;("yyy"="snd-btn-others")
-    $('textarea').prop('disabled', false).focus();
+  %if;("yyy"="btn-quick-upload")
+    $('#image_note, #image_source').prop('disabled', false);
+    $('.submit-button').prop('disabled', false);
+    $('#image_url').prop('disabled', true).val('');
+    $('#btn-cancel-edit').removeClass('d-none').addClass('d-flex align-items-center');
+    $('#image_note').focus();
   %end;
 });
 %end;
 <script>
-// Clic pour les icônes de note et source
-const setupFieldEditor = (iconSelector, fieldSelector) => {
-  $(iconSelector).click(function() {
-    $('.custom-others').prop('disabled', true);
-    $(fieldSelector).prop('disabled', false).focus();
-  });
-};
 $(function() {
   %apply;input_snd("custom-portrait","snd-btn-portrait")
-  %apply;input_snd("custom-others","snd-btn-others")
+  %apply;input_snd("custom-blason","snd-btn-blason")
+  %apply;input_snd("custom-others","btn-quick-upload")
 
-  setupFieldEditor('.fa-file-lines', '#image_note');
-  setupFieldEditor('.fa-file-zipper', '#image_source');
-
-  $('#image_note, #image_source').on('input', function() {
-    if(this.value.length) {
-      $('.btn-update-note-source').prop('disabled', false);
+  $('[data-toggle="tooltip"]').tooltip({
+    html: true,
+    boundary: 'window'
+  });
+  
+  // Gestion du bouton d'envoi rapide (le premier bouton)
+  $('.btn-quick-upload').click(function() {
+    if($('#others_file').val()) {
+      $('form').submit();
     }
   });
-
-  $('[data-toggle="tooltip"]').tooltip();
+  
+  // Gestion de l'URL d'image 
+  $('#image_url').on('input', function() {
+    if(this.value.length) {
+      // Si une URL est saisie
+      $('.btn-quick-upload').prop('disabled', false);
+      $('#image_note, #image_source').prop('disabled', false);
+      $('.submit-button').prop('disabled', false);
+      
+      // Désactiver l'input de fichier puisqu'une URL est saisie
+      $('#others_file').prop('disabled', true);
+      $('.custom-file-label').html('[*select] [image/images]0');
+      
+      // Afficher le bouton d'annulation
+      $('#btn-cancel-edit').removeClass('d-none').addClass('d-flex align-items-center');
+    } else {
+      // Si l'URL est vidée et qu'il n'y a pas de fichier
+      if (!$('#others_file').prop('disabled')) {
+        $('.btn-quick-upload').prop('disabled', true);
+        $('#image_note, #image_source').prop('disabled', true);
+        $('.submit-button').prop('disabled', true);
+        
+        // Cacher le bouton d'annulation si on est revenu à l'état initial
+        $('#btn-cancel-edit').addClass('d-none');
+      }
+    }
+  });
+  
+  // Activer le bouton du bas si des métadonnées sont saisies
+  $('#image_name, #image_note, #image_source').on('input', function() {
+    if($('#others_file').val() || $('#image_url').val().trim() !== '' || $(this).val().trim() !== '') {
+      $('.submit-button').prop('disabled', false);
+    }
+  });
+  
+  // Désactiver les champs après l'envoi
+  $('form').on('submit', function() {
+    // Ne pas réinitialiser tout de suite si on est en mode édition
+    if($('#mode_2').val() !== 'note') {
+      setTimeout(function() {
+        $('#image_note, #image_source').prop('disabled', true);
+      }, 100);
+    }
+  });
+  
+ // Annuler l'édition
+  $('#btn-cancel-edit').click(function() {
+    // Réinitialiser les champs
+    $('#image_note, #image_source').val('').prop('disabled', true);
+    $('#file_name_2').val('');
+    $('#mode_2').val('carrousel');
+    $('#which_img_show').text('[*send image with note and source]');
+    $('.submit-button').prop('disabled', true);
+    
+    // Réinitialiser les champs spécifiques
+    $('#others_file').val('').prop('disabled', false);
+    $('.custom-file-label').html('[*select] [image/images]0');
+    $('#image_url').val('').prop('disabled', false);
+    $('.btn-quick-upload').prop('disabled', true);
+    
+    // Cacher le bouton d'annulation
+    $(this).addClass('d-none').removeClass('d-flex');
+  });
 });
 
-// Fonction d'édition de métadonnées
-const updateImageMetadata = (type, cnt, name) => {
-  const $typeField = $(`#${type}_${cnt}`);
-  const $textField = $(`#image_${type}`);
+const updateTextareaSize = () => {
+  setTimeout(() => {
+    autosize.update($('textarea'));
+  }, 0);
+};
+
+function formatButtonText(noteText, imageName, maxLen = 37) {
+  const ext = imageName.lastIndexOf('.');
+  const name = ext !== -1 ? imageName.slice(0, ext) : imageName;
+  const truncName = name.length > maxLen 
+    ? name.slice(0, maxLen - 3) + '[…]'
+    : name;
+  const fullText = `${noteText}\n${truncName}${ext !== -1 ? imageName.slice(ext) : ''}`;
+  if (name.length > maxLen) {
+    $('#which_img_show').css('white-space', 'pre-line');
+  } else {
+    $('#which_img_show').css('white-space', 'normal');
+  }
+
+  return fullText;
+}
+
+const editImageNote = (cnt, name) => {
+  const noteData = $(`#source_${cnt}`).data('note');
+  const sourceData = $(`#source_${cnt}`).data('source');
   
-  $textField.val($typeField.data(type));
+  // Désactiver l'input de fichier et l'URL pendant l'édition
+  $('#others_file').prop('disabled', true);
+  $('#image_url').prop('disabled', true);
+  
+  // Désactiver le bouton d'envoi rapide pendant l'édition
+  $('.btn-quick-upload').prop('disabled', true);
+  
+  // Afficher le bouton d'annulation
+  $('#btn-cancel-edit').removeClass('d-none').addClass('d-flex align-items-center');
+  
+  $('#image_note').val(noteData || '').prop('disabled', false).focus();
+  $('#image_source').val(sourceData || '').prop('disabled', false);
+  
+  updateTextareaSize();
+  $('#image_note').focus();
+
   $('#file_name_2').val(name);
-  $('#mode_2').val(type);
-  $('#which_img_show').text(`[*update image ${type}] ${name}`);
+  $('#mode_2').val('note');
+  const buttonText = noteData 
+    ? formatButtonText(`[*update image note]`, name)
+    : formatButtonText(`[*add note]/[source/sources]0`, name);
+  $('#which_img_show').text(buttonText);
+  $('.submit-button').prop('disabled', false);
+  
+  $('#image_note, #image_source').off('input').on('input', function() {
+    $('.submit-button').prop('disabled', !this.value.length);
+    updateTextareaSize();
+  });
+  
+  return false;
 };
 
-// Fonctions pour les notes et sources
-const get_note = (cnt, name) => updateImageMetadata('note', cnt, name);
-const get_source = (cnt, name) => updateImageMetadata('source', cnt, name);
-
-// Basculer l'état du champ URL
-const toggle_url_on = () => {
-  const $imageNameField = $('#image_name');
-  $imageNameField
-    .prop('disabled', !$imageNameField.prop('disabled'))
-    .focus();
-};
 </script>
 </body>
 </html>
