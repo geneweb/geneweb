@@ -152,6 +152,11 @@ html {
   scroll-padding-top: 48px;
 }
 
+/* Carrousel */
+.text-pre-line {
+  white-space: pre-line;
+}
+
 /* Books */
 /* fix small down-arrow position on books navigation entries */
 .bottom-book-arrow {
