@@ -116,11 +116,15 @@ fmt: ## Format Ocaml code
 	$(call unpatch_after, dune build @fmt --auto-promote)
 
 # [BEGIN] Installation / Distribution section
+build: build-geneweb build-rpc-support # Build all the project
 
-build: ## Build the geneweb package (libraries and binaries)
+build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
 	@$(call unpatch_after, $(BUILD))
 	@printf "Done."
+
+build-rpc-support: ## Build the geneweb-rpc package
+	dune build -p geneweb-rpc
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
@@ -207,7 +211,8 @@ endif
 	done
 	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
 	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
-.PHONY: fmt install uninstall distrib
+
+.PHONY: build build-geneweb build-geneweb-rpc fmt install uninstall distrib
 
 # [END] Installation / Distribution section
 
