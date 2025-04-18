@@ -95,10 +95,27 @@ val def_error : config -> base -> person Def.error -> unit
 val error : config -> update_error -> 'exn
 val error_locked : config -> 'exn
 val error_digest : config -> 'exn
-val digest_person : (iper, key, string) gen_person -> string
+
+val digest_person : ?salt:string -> (iper, key, string) gen_person -> string
+(** [digest_person ?salt per] generates a digest of the person [pers]. The
+    function is intended for use in form to help prevent:
+      - Concurrent edits of the same person.
+      - Cross-site Request Forgery (CSRF) attacks.
+
+    The optional [salt] parameter should be set to a secret value generated
+    at server startup to strengthen security. *)
 
 val digest_family :
-  (key, ifam, string) gen_family * key gen_couple * key gen_descend -> string
+  ?salt:string ->
+  (key, ifam, string) gen_family * key gen_couple * key gen_descend ->
+  string
+(** [digest_family ?salt fam] generates a digest of the family [fam]. The
+    function is intended for use in form to help prevent:
+      - Concurrent edits of the same family.
+      - Cross-site Request Forgery (CSRF) attacks.
+
+    The optional [salt] parameter should be set to a secret value generated
+    at server startup to strengthen security. *)
 
 val reconstitute_date : config -> string -> date option
 val print_someone : config -> base -> person -> unit

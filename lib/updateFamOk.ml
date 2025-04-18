@@ -1330,7 +1330,8 @@ let print_mod_aux conf base callback =
   let redisp = Option.is_some (p_getenv conf.env "return") in
   let digest =
     let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
-    Update.digest_family ini_sfam
+    let salt = Option.get conf.secret_salt in
+    Update.digest_family ~salt ini_sfam
   in
   if digest = get conf "digest" then
     if ext || redisp then

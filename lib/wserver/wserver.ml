@@ -366,10 +366,26 @@ let accept_connection tmout max_clients callback s =
                  inside [In_channel.with_open_bin]. *)
               ())))
 
+let generate_secret_salt () =
+  Random.self_init ();
+  string_of_int @@ Random.bits ()
+
+let add_secret_salt () =
+  match Unix.getenv "SECRET_SALT" with
+  | exception Not_found ->
+      (* A secret salt is added to the environment to ensure that workers
+         use the same salt for digests on both Unix and Windows platforms. *)
+      Unix.putenv "SECRET_SALT" @@ generate_secret_salt ()
+  | _ ->
+      (* This case occurs only on Windows as workers are new processes.
+         We must not generate again the salt. *)
+      assert (not Sys.unix)
+
 let f syslog addr_opt port tmout max_clients g =
+  add_secret_salt ();
   match
     if Sys.unix then None
-    else try Some (Sys.getenv "WSERVER") with Not_found -> None
+    else try Some (Unix.getenv "WSERVER") with Not_found -> None
   with
   | Some s ->
       let addr = sockaddr_of_string s in
