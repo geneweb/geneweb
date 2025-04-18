@@ -304,7 +304,7 @@ let print_renamed conf new_n =
 let log_redirect from request req =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
   let on_exn exn bt =
-    GwdLog.syslog `LOG_NOTICE @@ Format.asprintf "%a\n" Lock.pp_exception (exn, bt)
+    Logs.syslog `LOG_NOTICE @@ Format.asprintf "%a\n" Lock.pp_exception (exn, bt)
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
     let referer = Mutil.extract_param "referer: " '\n' request in
