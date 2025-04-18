@@ -29,17 +29,8 @@ let nb_char_occ c s =
   !cnt
 
 let cut_words str =
-  let rec loop beg i =
-    if i < String.length str then
-      match str.[i] with
-      | ' ' ->
-          if beg = i then loop (succ beg) (succ i)
-          else String.sub str beg (i - beg) :: loop (succ i) (succ i)
-      | _ -> loop beg (succ i)
-    else if beg = i then []
-    else [ String.sub str beg (i - beg) ]
-  in
-  loop 0 0
+  str |> String.split_on_char ' ' |> List.map String.trim
+  |> List.filter (( <> ) "")
 
 let strip_all_trailing_spaces s =
   let b = Buffer.create (String.length s) in
