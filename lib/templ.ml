@@ -1,5 +1,6 @@
 open Config
 open TemplAst
+module Logs = Geneweb_logs.Logs
 
 exception Exc_located of loc * exn
 exception BadApplyArity
@@ -269,7 +270,7 @@ let url_set_aux conf evar_l str_l =
   let href =
     match String.split_on_char '?' (Util.commd conf :> string) with
     | [] ->
-        GWPARAM.syslog `LOG_WARNING "Empty Url\n";
+        Logs.syslog `LOG_WARNING "Empty Url\n";
         ""
     | s :: _l -> s
   in
@@ -692,7 +693,7 @@ let apply_format conf nth s1 s2 =
                                                   | None -> "[" ^ s1 ^ "?]")))))
                               ))))))
     with _ ->
-      Printf.sprintf "Format error in %s\n" s1 |> GWPARAM.syslog `LOG_WARNING;
+      Printf.sprintf "Format error in %s\n" s1 |> Logs.syslog `LOG_WARNING;
       s1
 
 let rec eval_ast conf = function

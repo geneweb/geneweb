@@ -2,6 +2,8 @@
 
 open TemplAst
 
+module Logs = Geneweb_logs.Logs
+
 let dump_list pp a = String.concat ";" (List.map pp a)
 let rec dump_ast trk depth =
   let dump_ast a = if depth > 0 then dump_ast trk (depth - 1) a else "..." in
@@ -601,7 +603,7 @@ and parse_include conf b closing ast = parse
           with Sys_error _ ->
             GWPARAM.errors_other := (Format.sprintf "Missing template: %s" file) ::
               !GWPARAM.errors_other;
-            GWPARAM.syslog `LOG_WARNING ("Missing template: " ^ file) ;
+            Logs.syslog `LOG_WARNING ("Missing template: " ^ file) ;
           ast
       in
       parse_ast conf b closing ast lexbuf

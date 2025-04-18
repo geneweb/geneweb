@@ -1043,7 +1043,7 @@ let gwfixbase ok_file conf =
   else
     print_file conf ok_file
 
-let cache_files_check conf = 
+let cache_files_check conf =
   let in_base =
     match p_getenv conf.env "anon" with
       Some f -> strip_spaces f
@@ -1552,8 +1552,8 @@ let gwf_1 conf =
     benv;
   close_out oc;
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
-  
-  
+
+
   let trl_dir = !GWPARAM.etc_d in_base in
   let trl_file = Filename.concat trl_dir ("trl.txt") in
   try Unix.mkdir trl_dir  0o755 with Unix.Unix_error (_, _, _) -> ();
@@ -2029,4 +2029,4 @@ let () =
 #else
   if Sys.getenv_opt "WSERVER" = None then intro () ;
 #endif
-  Wserver.f (fun _ -> prerr_endline) None !port 0 None wrap_setup
+  Wserver.start ~port:!port ~max_pending_requests:150 ~n_workers:1 wrap_setup

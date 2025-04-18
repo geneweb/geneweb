@@ -3,6 +3,7 @@
 open Def
 open Gwdb
 open Util
+module Logs = Geneweb_logs.Logs
 
 type one_cousin =
   Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int
@@ -280,7 +281,7 @@ let init_cousins_cnt conf base p =
 
   let expand_tables key v1 max_a_l cousins_cnt cousins_dates =
     Printf.sprintf "******** Expand tables from %d to %d ********\n" v1 max_a_l
-    |> GWPARAM.syslog `LOG_WARNING;
+    |> Logs.syslog `LOG_WARNING;
     if
       max_a_l + 3 > Sys.max_array_length
       || max_d_l + max_a_l + 3 > Sys.max_array_length
@@ -303,7 +304,7 @@ let init_cousins_cnt conf base p =
   let build_tables key =
     Printf.sprintf "******** Compute %d × %d table ********\n" (max_a_l + 3)
       (max_d_l + max_a_l + 3)
-    |> GWPARAM.syslog `LOG_WARNING;
+    |> Logs.syslog `LOG_WARNING;
     if
       max_a_l + 3 > Sys.max_array_length
       || max_d_l + max_a_l + 3 > Sys.max_array_length
