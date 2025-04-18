@@ -28,6 +28,7 @@ let server = ref "localhost"
 let gwd_port = ref 2317
 let utf8_key = ref false
 let portraits_list = ref []
+let persons_list = ref []
 let of_pevent e = (e.epers_date, e.epers_place, e.epers_note, e.epers_src)
 
 let find_pevent names pevents =
@@ -108,10 +109,6 @@ let fix_key ?report progress base =
       if f <> "?" && s <> "?" then
         let p_key = Name.concat f s in
         let ipers = Gwdb.persons_of_name base p_key in
-        Printf.eprintf "P_key: %s, %d; " p_key (List.length ipers);
-        List.iter (fun ip -> Printf.eprintf "%s, "
-          (Gutil.designation base (poi base ip))) ipers;
-        Printf.eprintf "\n";
         let f = Name.lower f in
         let s = Name.lower s in
         let list =
@@ -143,7 +140,7 @@ let fix_key ?report progress base =
           match acc with
           | [] -> (
               match list with
-              | [] -> (Printf.eprintf "fail\n"; flush stderr; failwith p_key)
+              | [] -> acc
               | (ip, occ) :: tl ->
                   Gwdb.Marker.set skip ip true;
                   loop [ (ip, occ) ] tl)
@@ -238,24 +235,16 @@ let scan_utf8_conflicts ?report progress base =
       let fn = Gwdb.sou base (Gwdb.get_first_name p) in
       let sn = Gwdb.sou base (Gwdb.get_surname p) in
       let occ = string_of_int (Gwdb.get_occ p) in
-      let ip0 =
-        match
-          Gwdb.person_of_key base
-            (string_unaccent ~special:true true fn)
-            (string_unaccent ~special:true true sn)
-            (int_of_string occ)
-        with
-        | Some ip -> ip
-        | _ -> Gwdb.dummy_iper
-      in
       let v = fn ^ "." ^ occ ^ " " ^ sn in
       let v1 = string_unaccent ~special:true true (fn ^ "." ^ occ ^ " " ^ sn) in
-      if fn <> "?" && sn <> "?" then
-        if not (Hashtbl.mem ht v1) then Hashtbl.add ht v1 v1
-        else (
-          Printf.printf "conflit %s (index: %d) avec %s (%s)...\n" v i
-            (Hashtbl.find ht v1) (string_of_iper ip0);
+      if fn <> "?" && sn <> "?" then (
+        if not (Hashtbl.mem ht v1) then Hashtbl.add ht v1 (v, ip)
+        else
+          let v0, ip0 = Hashtbl.find ht v1 in
           let occ' = new_occ fn sn (int_of_string occ) htoc in
+          Printf.printf
+            "conflit %s (index: %s; occ: %s -> %d) avec %s (index: %s)\n" v
+            (string_of_iper ip) occ occ' v0 (string_of_iper ip0);
           Hashtbl.add htoc v1 occ';
           (* record portrait filename *)
           let portrait =
@@ -264,6 +253,7 @@ let scan_utf8_conflicts ?report progress base =
             | _ -> None
           in
           portraits_list := (portrait, occ') :: !portraits_list;
+          persons_list := (i, occ, occ') :: !persons_list;
           Gwdb.patch_person base ip
             { (Gwdb.gen_person_of_person p) with occ = occ' };
           match report with
@@ -298,6 +288,8 @@ let rename_portraits p_list dry_run =
           else Printf.printf "Failed to rename %s\n" portrait
       | None -> ())
     p_list
+
+let update_nldb base persons_list = ()
 
 let aux conf txt
     (fn : ?report:(patch -> unit) -> (int -> int -> unit) -> base -> unit) ~v1
@@ -395,13 +387,12 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
     load_strings_array base;
     load_persons_array base);
   if !invalid_utf8 then
-    aux conf "Fix invalid UTF-8 sequence" fix_utf8_sequence ~v1 ~v2 base
-      nb_fam fix;
-  if !p_key then
-    aux conf "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
+    aux conf "Fix invalid UTF-8 sequence" fix_utf8_sequence ~v1 ~v2 base nb_fam
+      fix;
+  if !p_key then aux conf "Fix duplicate keys" fix_key ~v1 ~v2 base nb_ind fix;
   if !utf8_key then
-    aux conf "Scan for possible UTF-8 conflicts" scan_utf8_conflicts ~v1
-      ~v2 base nb_ind fix;
+    aux conf "Scan for possible UTF-8 conflicts" scan_utf8_conflicts ~v1 ~v2
+      base nb_ind fix;
   if fast then (
     clear_strings_array base;
     clear_persons_array base);
@@ -415,8 +406,8 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
       if v1 then (
         Printf.printf "%n changes commited\n" !fix;
         flush stdout);
-      if !portraits_list <> [] then
-        rename_portraits !portraits_list false;
+      if !portraits_list <> [] then rename_portraits !portraits_list false;
+      if !persons_list <> [] then update_nldb base !persons_list;
       if v1 then (
         Printf.printf "Portraits renamed\n";
         flush stdout))
@@ -432,18 +423,17 @@ let check ~dry_run ~verbosity ~fast ~invalid_utf8 ~p_key ~utf8_key bname =
     rename_portraits !portraits_list true);
   if v1 then (
     Printf.printf "Done\n";
-    flush stdout);
-  if !fix <> 0 then (
-    Printf.printf {|<span style="color:#FF0000;">WARNING WIP</span><br>|};
-    Printf.printf
-      "- Wizard access to the pages to be modified is not provided<br>")
+    flush stdout)
 
 (**/**)
 
 let speclist =
   [
-    ("-bd", Arg.String Secure.set_base_dir, "<DIR> Specify where the “bases”
-      directory with databases is installed (default if empty is “bases”).");
+    ( "-bd",
+      Arg.String Secure.set_base_dir,
+      "<DIR> Specify where the “bases”\n\
+      \      directory with databases is installed (default if empty is \
+       “bases”)." );
     ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
@@ -462,7 +452,7 @@ let anonfun i = bname := i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
-  Secure.set_base_dir (".");
+  Secure.set_base_dir ".";
   Arg.parse speclist anonfun usage;
   if !bname = "" then (
     Printf.eprintf "Missing base name\n";
