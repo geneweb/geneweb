@@ -1,5 +1,6 @@
 <!-- $Id: modules/arbre_vertical.txt v7.1 04/03/2023 10:39:16 $ -->
 %( Arbre ascendant vertical %)
+
 %define;a_tree_line()
   %if;(not is_first)
     <tr>
@@ -21,10 +22,22 @@
       <td colspan="%expr(cell.colspan)" class="text-center align-bottom p-0 fix_size">%nn;
         %if;(cell.is_empty)%nn;
         %else;
-          %if;(e.im="" and cell.person.has_image)
-            %if;not cancel_links;<a href="%cell.person.image_html_url;">%end;
-            <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
-             alt="[image/images]0" title="[image/images]0">%nn;
+          %if;(e.im="" and (cell.person.has_image or cell.person.has_blason))
+            %if;(cell.person.has_image and cell.person.has_blason)
+              %if;not cancel_links;<a
+                href="%cell.person.blason_url;">%end;
+              <img class="rounded mb-1"
+                src="%cell.person.blason_url;"%nn;
+                %cell.person.blason_extra_small_size;%sp;%nn;
+                alt="[blason]0 " title="[blason]0">%nn;
+              %if;not cancel_links;</a>%end;
+            %end;
+            %if;not cancel_links;<a
+              href="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;">%end;
+            <img class="rounded mb-1"
+              src="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;"%nn;
+              %if;cell.person.has_image;%cell.person.image_small_size;%else;%cell.person.blason_small_size;%end;%sp;%nn;
+              alt="[image/images]0 " title="[image/images]0">%nn;
             %if;not cancel_links;</a>%end;<br>
           %end;
           %( Checking if the ancestors are falsly alive by verifying three first generations (self/parents/grand-parents births)
