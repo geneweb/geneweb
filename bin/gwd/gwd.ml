@@ -91,8 +91,9 @@ let log_passwd_failed ar tm from request base_file =
     (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user;
   if !trace_failed_passwd then
     Printf.fprintf oc " (%s)" (String.escaped ar.ar_uauth);
-  Printf.fprintf oc "\n  From: %s\n  Agent: %s\n" from user_agent;
-  if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
+  Printf.fprintf oc "\n  From: %s\n  Agent: %s\n" from
+    (Option.value ~default:"" user_agent);
+  Option.iter (Printf.fprintf oc "  Referer: %s\n") referer
 
 let copy_file conf fname =
   match Geneweb.Util.open_etc_file fname with
@@ -255,7 +256,8 @@ let log_redirect from request req =
     (fun () ->
       let referer = Mutil.extract_param "referer: " '\n' request in
       Log.syslog `LOG_NOTICE
-      @@ Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer)
+      @@ Printf.sprintf "%s --- From: %s --- Referer: %s" req from
+           (Option.value ~default:"" referer))
 
 let print_redirected conf from request new_addr =
   let req = Geneweb.Util.get_request_string conf in
@@ -557,29 +559,30 @@ let set_token utm from_addr base_file acc user =
 
 let http_preferred_language request =
   let v = Mutil.extract_param "accept-language: " '\n' request in
-  if v = "" then ""
-  else
-    let s = String.lowercase_ascii v in
-    let list =
-      let rec loop list i len =
-        if i = String.length s then List.rev (Buff.get len :: list)
-        else if s.[i] = ',' then loop (Buff.get len :: list) (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
+  match v with
+  | None -> ""
+  | Some v ->
+      let s = String.lowercase_ascii v in
+      let list =
+        let rec loop list i len =
+          if i = String.length s then List.rev (Buff.get len :: list)
+          else if s.[i] = ',' then loop (Buff.get len :: list) (i + 1) 0
+          else loop list (i + 1) (Buff.store len s.[i])
+        in
+        loop [] 0 0
       in
-      loop [] 0 0
-    in
-    let list = List.map String.trim list in
-    let rec loop = function
-      | lang :: list ->
-          if List.mem lang Geneweb.Version.available_languages then lang
-          else if String.length lang = 5 then
-            let blang = String.sub lang 0 2 in
-            if List.mem blang Geneweb.Version.available_languages then blang
+      let list = List.map String.trim list in
+      let rec loop = function
+        | lang :: list ->
+            if List.mem lang Geneweb.Version.available_languages then lang
+            else if String.length lang = 5 then
+              let blang = String.sub lang 0 2 in
+              if List.mem blang Geneweb.Version.available_languages then blang
+              else loop list
             else loop list
-          else loop list
-      | [] -> ""
-    in
-    loop list
+        | [] -> ""
+      in
+      loop list
 
 let allowed_denied_titles key extra_line env base_env () =
   if Geneweb.Util.p_getenv env "all_titles" = Some "on" then []
@@ -747,17 +750,19 @@ let basic_authorization from_addr request base_env passwd access_type utm
   in
   let passwd1 =
     let auth = Mutil.extract_param "authorization: " '\r' request in
-    if auth = "" then ""
-    else
-      let s = "Basic " in
-      if Ext_string.start_with s 0 auth then
-        let i = String.length s in
-        Geneweb.Base64.decode (String.sub auth i (String.length auth - i))
-      else ""
+    match auth with
+    | None -> ""
+    | Some auth ->
+        let s = "Basic " in
+        if Ext_string.start_with s 0 auth then
+          let i = String.length s in
+          Geneweb.Base64.decode (String.sub auth i (String.length auth - i))
+        else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let auto = Mutil.extract_param "gw-connection-type: " '\r' request in
-  let uauth = if auto = "auto" then passwd1 else uauth in
+  let uauth = if auto = Some "auto" then passwd1 else uauth in
+
   let ok, wizard, friend, username =
     if (not !Wserver.cgi) && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
@@ -809,7 +814,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
       else (base_file, "")
     else if !Wserver.cgi then (command, passwd)
     else if passwd = "" then
-      if auto = "auto" then
+      if auto = Some "auto" then
         let suffix = if wizard then "_w" else if friend then "_f" else "" in
         (base_file ^ suffix, passwd)
       else (base_file, "")
@@ -939,12 +944,15 @@ let digest_authorization request base_env passwd utm base_file command =
       ar_can_stale = false;
     }
   else if passwd = "w" || passwd = "f" then
-    let auth = Mutil.extract_param "authorization: " '\r' request in
+    let auth =
+      Option.value ~default:""
+        (Mutil.extract_param "authorization: " '\r' request)
+    in
     if Ext_string.start_with "Digest " 0 auth then
       let meth =
         match Mutil.extract_param "GET " ' ' request with
-        | "" -> "POST"
-        | _ -> "GET"
+        | None -> "POST"
+        | Some _ -> "GET"
       in
       let _ =
         trace_auth base_env (fun oc ->
@@ -1324,11 +1332,13 @@ let log tm conf from gauth request script_name contents =
   else if conf.friend && not conf.wizard then
     Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
       (if conf.user = "" then "" else " ");
-  if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent;
-  if referer <> "" then (
-    Printf.fprintf oc "  Referer: ";
-    print_and_cut_if_too_big oc referer;
-    Printf.fprintf oc "\n")
+  Option.iter (Printf.fprintf oc "  Agent: %s\n") user_agent;
+  Option.iter
+    (fun referer ->
+      Printf.fprintf oc "  Referer: ";
+      print_and_cut_if_too_big oc referer;
+      Printf.fprintf oc "\n")
+    referer
 
 let is_robot from =
   Lock.control
@@ -1343,32 +1353,35 @@ let auth_err request auth_file =
   if auth_file = "" then (false, "")
   else
     let auth = Mutil.extract_param "authorization: " '\r' request in
-    if auth <> "" then
-      match try Some (Secure.open_in auth_file) with Sys_error _ -> None with
-      | Some ic -> (
-          let auth =
-            let i = String.length "Basic " in
-            Geneweb.Base64.decode (String.sub auth i (String.length auth - i))
-          in
-          try
-            let rec loop () =
-              if auth = input_line ic then (
-                close_in ic;
-                let s =
-                  try
-                    let i = String.rindex auth ':' in
-                    String.sub auth 0 i
-                  with Not_found -> "..."
-                in
-                (false, s))
-              else loop ()
+    match auth with
+    | Some auth -> (
+        match
+          try Some (Secure.open_in auth_file) with Sys_error _ -> None
+        with
+        | Some ic -> (
+            let auth =
+              let i = String.length "Basic " in
+              Geneweb.Base64.decode (String.sub auth i (String.length auth - i))
             in
-            loop ()
-          with End_of_file ->
-            close_in ic;
-            (true, auth))
-      | _ -> (true, "(auth file '" ^ auth_file ^ "' not found)")
-    else (true, "(authorization not provided)")
+            try
+              let rec loop () =
+                if auth = input_line ic then (
+                  close_in ic;
+                  let s =
+                    try
+                      let i = String.rindex auth ':' in
+                      String.sub auth 0 i
+                    with Not_found -> "..."
+                  in
+                  (false, s))
+                else loop ()
+              in
+              loop ()
+            with End_of_file ->
+              close_in ic;
+              (true, auth))
+        | _ -> (true, "(auth file '" ^ auth_file ^ "' not found)"))
+    | None -> (true, "(authorization not provided)")
 
 let no_access conf =
   let title _ = Geneweb.Output.print_sstring conf "Error" in
@@ -1709,14 +1722,17 @@ let extract_multipart boundary str =
 let build_env request (contents : Adef.encoded_string) :
     Adef.encoded_string * (string * Adef.encoded_string) list =
   let content_type = Mutil.extract_param "content-type: " '\n' request in
-  if is_multipart_form content_type then
-    let boundary =
-      (extract_boundary (Adef.encoded content_type)
-        : Adef.encoded_string
-        :> string)
-    in
-    extract_multipart boundary contents
-  else (contents, Geneweb.Util.create_env contents)
+  Option.fold content_type
+    ~none:(contents, Geneweb.Util.create_env contents)
+    ~some:(fun content_type ->
+      if is_multipart_form content_type then
+        let boundary =
+          (extract_boundary (Adef.encoded content_type)
+            : Adef.encoded_string
+            :> string)
+        in
+        extract_multipart boundary contents
+      else (contents, Geneweb.Util.create_env contents))
 
 let connection (addr, request) script_name contents0 =
   let from =

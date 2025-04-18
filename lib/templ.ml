@@ -149,11 +149,12 @@ let not_impl func x =
 
 let setup_link conf =
   let s = Mutil.extract_param "host: " '\r' conf.Config.request in
-  try
-    let i = String.rindex s ':' in
-    let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
-    "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
-  with Not_found -> ""
+  Option.fold s ~none:"" ~some:(fun s ->
+      try
+        let i = String.rindex s ':' in
+        let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
+        "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
+      with Not_found -> "")
 
 let esc s = (Util.escape_html s :> string)
 
@@ -413,7 +414,7 @@ let templ_eval_var conf = function
   | [ "false" ] -> VVbool false
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
-      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
+      VVbool (Mutil.extract_param "referer: " '\n' conf.request <> None)
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou

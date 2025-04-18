@@ -284,10 +284,11 @@ let is_directory x =
 
 let server_string conf =
   let s = Mutil.extract_param "host: " '\r' conf.request in
-  try
-    let i = String.rindex s ':' in
-    String.sub s 0 i
-  with Not_found -> "127.0.0.1"
+  Option.fold s ~none:"127.0.0.1" ~some:(fun s ->
+      try
+        let i = String.rindex s ':' in
+        String.sub s 0 i
+      with Not_found -> "127.0.0.1")
 
 let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 
@@ -306,7 +307,7 @@ let macro conf = function
   | 'i' -> strip_spaces (s_getenv conf.env "i")
   | 'l' -> conf.lang
   | 'm' -> server_string conf
-  | 'n' -> referer conf
+  | 'n' -> Option.value ~default:"" (referer conf)
   | 'o' -> strip_spaces (s_getenv conf.env "o")
   | 'O' ->
       Filename.remove_extension

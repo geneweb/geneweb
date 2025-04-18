@@ -145,8 +145,8 @@ let get_request_and_content strm =
   let request = get_request strm in
   let content =
     match Mutil.extract_param "content-length: " ' ' request with
-    | "" -> ""
-    | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
+    | None -> ""
+    | Some x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
   (request, Adef.encoded content)
 
@@ -187,16 +187,16 @@ let treat_connection tmout callback addr fd =
     in
     let path, query =
       match Mutil.extract_param "GET /" ' ' request with
-      | "" -> (Mutil.extract_param "POST /" ' ' request, query)
-      | str -> (
+      | None -> (Mutil.extract_param "POST /" ' ' request, query)
+      | Some str -> (
           match String.index_opt str '?' with
           | Some i ->
-              ( String.sub str 0 i,
+              ( Some (String.sub str 0 i),
                 String.sub str (i + 1) (String.length str - i - 1)
                 |> Adef.encoded )
-          | None -> (str, "" |> Adef.encoded))
+          | None -> (Some str, "" |> Adef.encoded))
     in
-    (request, path, query)
+    (request, Option.value ~default:"" path, query)
   in
   (timeout_wrapper :=
      fun tmout ->

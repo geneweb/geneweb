@@ -264,7 +264,7 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 
 let get_referer conf =
   let referer = Mutil.extract_param "referer: " '\n' conf.Config.request in
-  escape_html referer
+  escape_html @@ Option.value ~default:"" referer
 
 let begin_centered conf =
   Output.printf conf
@@ -1063,7 +1063,9 @@ let body_prop conf =
   with Not_found -> ""
 
 let get_request_string conf =
-  if not conf.Config.cgi then Mutil.extract_param "GET " ' ' conf.Config.request
+  if not conf.Config.cgi then
+    Option.value ~default:""
+      (Mutil.extract_param "GET " ' ' conf.Config.request)
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
@@ -1768,7 +1770,7 @@ let is_that_user_and_password auth_scheme user passwd =
 
 let browser_doesnt_have_tables conf =
   let user_agent = Mutil.extract_param "user-agent: " '/' conf.Config.request in
-  String.lowercase_ascii user_agent = "lynx"
+  Option.map String.lowercase_ascii user_agent = Some "lynx"
 
 let escache_value base =
   let t = Gwdb.date_of_last_change base in
