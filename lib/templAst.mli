@@ -24,3 +24,7 @@ type 'a expr_val =
   | VVbool of bool
   | VVstring of string
   | VVother of (string list -> 'a expr_val)
+
+(* TODO: move this function in a more appropriate location. *)
+val etc_file_name : Config.config -> string -> string
+(** Returns the path to the template file in parameter *)

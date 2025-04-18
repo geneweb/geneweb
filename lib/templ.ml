@@ -13,15 +13,91 @@ let raise_with_loc loc = function
       incr GWPARAM.nb_errors;
       raise (Exc_located (loc, e))
 
+let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string)
+    =
+  if conf.debug then
+    match Filename.extension (fname :> string) with
+    | ".css" | ".js" ->
+        Output.print_sstring conf "\n/* ";
+        Output.print_string conf k;
+        Output.print_sstring conf " ";
+        Output.print_string conf fname;
+        Output.print_sstring conf " */\n"
+    | _ ->
+        Output.print_sstring conf "\n<!-- ";
+        Output.print_string conf k;
+        Output.print_sstring conf " ";
+        Output.print_string conf fname;
+        Output.print_sstring conf " -->\n"
+
+let include_begin = include_begin_end_aux (Adef.safe "begin")
+let include_end = include_begin_end_aux (Adef.safe "end")
+
+let open_etc_file conf fname =
+  let fname = etc_file_name conf fname in
+  try Some (Secure.open_in fname, fname)
+  with Sys_error e ->
+    GWPARAM.syslog `LOG_ERR
+      (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
+    None
+
 let input_templ conf fname =
-  match Util.open_etc_file conf fname with
+  match open_etc_file conf fname with
   | None -> None
-  | Some (ic, fname) ->
-      Templ_parser.wrap fname (fun () ->
-          let lex = Lexing.from_channel ic in
-          let r = Templ_parser.parse_templ conf lex in
-          close_in ic;
-          Some r)
+  | Some (ic, _fname) ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+      Templ_parser.wrap fname @@ fun () ->
+      let lex = Lexing.from_channel ic in
+      Some (Templ_parser.parse_templ conf lex)
+
+(* TODO: remove these duplications *)
+(* DUPLICATION OF UTIL *)
+
+let escape_aux count blit str =
+  let strlen = String.length str in
+  let rec loop acc i =
+    if i < strlen then loop (acc + count (String.unsafe_get str i)) (i + 1)
+    else if acc = strlen then str
+    else
+      let buf = Bytes.create acc in
+      let rec loop istr ibuf =
+        if istr = strlen then Bytes.unsafe_to_string buf
+        else blit buf ibuf istr loop (String.unsafe_get str istr)
+      in
+      loop 0 0
+  in
+  loop 0 0
+
+(** [escape_html str] replaces '&', '"', '<' and '>'
+    with their corresponding character entities (using entity number) *)
+let escape_html s : Adef.escaped_string =
+  escape_aux
+    (function '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *) | _ -> 1)
+    (fun buf ibuf istr loop -> function
+      | '&' ->
+          Bytes.blit_string "&#38;" 0 buf ibuf 5;
+          loop (istr + 1) (ibuf + 5)
+      | '"' ->
+          Bytes.blit_string "&#34;" 0 buf ibuf 5;
+          loop (istr + 1) (ibuf + 5)
+      | '\'' ->
+          Bytes.blit_string "&#39;" 0 buf ibuf 5;
+          loop (istr + 1) (ibuf + 5)
+      | '<' ->
+          Bytes.blit_string "&#60;" 0 buf ibuf 5;
+          loop (istr + 1) (ibuf + 5)
+      | '>' ->
+          Bytes.blit_string "&#62;" 0 buf ibuf 5;
+          loop (istr + 1) (ibuf + 5)
+      | c ->
+          Bytes.unsafe_set buf ibuf c;
+          loop (istr + 1) (ibuf + 1))
+    s
+  |> Adef.escaped
+
+let esc x = (escape_html x :> Adef.safe_string)
+
+(* END: DUPLICATION OF UTIL *)
 
 let sort_apply_parameters loc f_expr xl vl =
   let named_vl, unnamed_vl =
@@ -137,13 +213,6 @@ let split_at_coloncolon s =
   in
   loop 0
 
-let rec skip_spaces_and_newlines s i =
-  if i = String.length s then i
-  else
-    match s.[i] with
-    | ' ' | '\n' | '\r' -> skip_spaces_and_newlines s (i + 1)
-    | _ -> i
-
 let not_impl func x =
   let desc =
     if Obj.is_block (Obj.repr x) then
@@ -204,7 +273,7 @@ let order =
 
 let reorder conf url_env =
   let new_lang =
-    match List.assoc_opt "lang" url_env with Some l1 -> l1 | None -> ""
+    match List.assoc "lang" url_env with exception Not_found -> "" | l -> l
   in
   let keep_lang =
     (* same condition in Util.commd and copyr.txt *)
@@ -217,7 +286,7 @@ let reorder conf url_env =
       | [] -> (acc1, acc2)
       | k :: order ->
           let v =
-            match List.assoc_opt k url_env with Some v -> v | None -> ""
+            match List.assoc k url_env with exception Not_found -> "" | v -> v
           in
           if
             List.mem_assoc k url_env
@@ -993,18 +1062,18 @@ type 'a vother =
   | Vval of 'a expr_val
   | Vbind of string * Adef.encoded_string
 
-type 'a env = (string * 'a) list
+module Env = Map.Make (String)
 
 type ('a, 'b) interp_fun = {
-  eval_var : 'a env -> 'b -> loc -> string list -> 'b expr_val;
-  eval_transl : 'a env -> bool -> string -> string -> string;
-  eval_predefined_apply : 'a env -> string -> 'b expr_val list -> string;
+  eval_var : 'a Env.t -> 'b -> loc -> string list -> 'b expr_val;
+  eval_transl : 'a Env.t -> bool -> string -> string -> string;
+  eval_predefined_apply : 'a Env.t -> string -> 'b expr_val list -> string;
   get_vother : 'a -> 'b vother option;
   set_vother : 'b vother -> 'a;
   print_foreach :
-    ('a env -> 'b -> ast -> unit) ->
-    ('a env -> 'b -> ast -> string) ->
-    'a env ->
+    ('a Env.t -> 'b -> ast -> unit) ->
+    ('a Env.t -> 'b -> ast -> string) ->
+    'a Env.t ->
     'b ->
     loc ->
     string ->
@@ -1017,7 +1086,7 @@ type ('a, 'b) interp_fun = {
 let get_def get_vother k env =
   let k = "#" ^ k in
   try
-    match get_vother (List.assoc k env) with
+    match get_vother (Env.find k env) with
     | Some (Vdef (al, el)) -> Some (al, el)
     | _ -> None
   with Not_found -> None
@@ -1025,18 +1094,16 @@ let get_def get_vother k env =
 let get_val get_vother k env =
   let k = "#" ^ k in
   try
-    match get_vother (List.assoc k env) with
-    | Some (Vval x) -> Some x
-    | _ -> None
+    match get_vother (Env.find k env) with Some (Vval x) -> Some x | _ -> None
   with Not_found -> None
 
 let set_def set_vother k al el env =
   let k = "#" ^ k in
-  (k, set_vother (Vdef (al, el))) :: env
+  Env.add k (set_vother (Vdef (al, el))) env
 
 let set_val set_vother k v env =
   let k = "#" ^ k in
-  (k, set_vother (Vval v)) :: env
+  Env.add k (set_vother (Vval v)) env
 
 let eval_subst loc f set_vother env xl vl a =
   let rec loop env a xl vl =
@@ -1113,7 +1180,8 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
   List.iter
     (fun (k, v) ->
       let print_ast =
-        print_ast (("binding", set_vother (Vbind (k, v))) :: env) ep
+        let env = Env.add "binding" (set_vother (Vbind (k, v))) env in
+        print_ast env ep
       in
       List.iter print_ast al)
     env_vars
@@ -1153,15 +1221,15 @@ let eval_var conf ifun env ep loc sl =
     match sl with
     | [ "reorg" ] -> VVbool !GWPARAM.reorg
     | [ "env"; "key" ] -> (
-        match ifun.get_vother (List.assoc "binding" env) with
+        match ifun.get_vother (Env.find "binding" env) with
         | Some (Vbind (k, _)) -> VVstring k
         | _ -> raise Not_found)
     | [ "env"; "val" ] -> (
-        match ifun.get_vother (List.assoc "binding" env) with
+        match ifun.get_vother (Env.find "binding" env) with
         | Some (Vbind (_, v)) -> VVstring (v :> string)
         | _ -> raise Not_found)
     | [ "env"; "val"; "decoded" ] -> (
-        match ifun.get_vother (List.assoc "binding" env) with
+        match ifun.get_vother (Env.find "binding" env) with
         | Some (Vbind (_, v)) -> VVstring (Mutil.decode v)
         | _ -> raise Not_found)
     | "today" :: sl ->
@@ -1190,31 +1258,10 @@ let print_wid_hei conf fname =
   | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
   | Error () -> ()
 
-(** Evaluates and prints content of {i cpr} template.
-    If template wasn't found prints basic copyrigth HTML structure. *)
-let print_copyright conf =
-  Util.include_template conf [] "copyr" (fun () ->
-      Output.print_sstring conf "<hr style=\"margin:0\">\n";
-      Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
-      Output.print_sstring conf "<em>";
-      Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
-      Output.print_sstring conf Version.ver;
-      Output.print_sstring conf "</em>";
-      Output.print_sstring conf "</div>\n";
-      Output.print_sstring conf "<br>\n")
-
-let include_hed_trl conf name =
-  match name with
-  | "hed" -> Util.include_template conf [] name (fun () -> ())
-  | "trl" ->
-      Util.include_template conf [] name (fun () -> ());
-      let query_time = Unix.gettimeofday () -. conf.query_start in
-      Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
-        !GWPARAM.errors_other !GWPARAM.set_vars
-  | _ -> ()
-
+(* TODO: simplify this mutually recursive functions. *)
 let rec interp_ast :
-    config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =
+          'a 'b.
+          config -> ('a, 'b) interp_fun -> 'a Env.t -> 'b -> ast list -> unit =
  fun conf ifun env ->
   let m_env = ref env in
   let rec eval_ast env ep a = string_of_expr_val (eval_ast_expr env ep a)
@@ -1385,9 +1432,9 @@ let rec interp_ast :
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
     | Ainclude (fname, astl) :: al ->
-        Util.include_begin conf (Adef.safe fname);
+        include_begin conf (Adef.safe fname);
         print_ast_list env ep astl;
-        Util.include_end conf (Adef.safe fname);
+        include_end conf (Adef.safe fname);
         print_ast_list !m_env ep al
     | [ a ] -> print_ast env ep a
     | a :: al ->
@@ -1455,7 +1502,7 @@ and print_var print_ast_list conf ifun env ep loc sl =
       match sl with
       (* covers case of %include.file; *)
       | [ "include"; templ ] -> (
-          match Util.open_etc_file conf templ with
+          match open_etc_file conf templ with
           | Some (_, fname) -> (
               match input_templ conf templ with
               | Some astl ->
@@ -1463,9 +1510,9 @@ and print_var print_ast_list conf ifun env ep loc sl =
                     Templ_parser.(
                       included_files := (templ, astl) :: !included_files)
                   in
-                  Util.include_begin conf (Adef.safe fname);
+                  include_begin conf (Adef.safe fname);
                   print_ast_list env ep astl;
-                  Util.include_end conf (Adef.safe fname)
+                  include_end conf (Adef.safe fname)
               | None ->
                   GWPARAM.errors_other :=
                     Format.sprintf "%%%s?" (String.concat "." sl)
@@ -1533,15 +1580,24 @@ and print_variable conf sl =
         Format.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
       Output.printf conf " %%%s?" (String.concat "." sl))
 
-let copy_from_templ : config -> Adef.encoded_string env -> in_channel -> unit =
- fun conf env ic ->
+and include_hed_trl conf name =
+  match name with
+  | "hed" -> include_template conf Env.empty name (fun () -> ())
+  | "trl" ->
+      include_template conf Env.empty name (fun () -> ());
+      let query_time = Unix.gettimeofday () -. conf.query_start in
+      Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+        !GWPARAM.errors_other !GWPARAM.set_vars
+  | _ -> ()
+
+and copy_from_templ conf env ic =
   let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
   close_in ic;
   let ifun =
     {
       eval_var =
         (fun env _ _ -> function
-          | [ s ] -> VVstring (List.assoc s env : Adef.encoded_string :> string)
+          | [ s ] -> VVstring (Env.find s env : Adef.encoded_string :> string)
           | _ -> raise Not_found);
       eval_transl = (fun _ -> eval_transl conf);
       eval_predefined_apply = (fun _ -> raise Not_found);
@@ -1552,4 +1608,23 @@ let copy_from_templ : config -> Adef.encoded_string env -> in_channel -> unit =
   in
   Templ_parser.wrap "" (fun () -> interp_ast conf ifun env () astl)
 
-let _ = Util.copy_from_templ_ref := copy_from_templ
+and include_template conf env fname failure =
+  match open_etc_file conf fname with
+  | Some (ic, fname) ->
+      include_begin conf @@ Adef.safe fname;
+      copy_from_templ conf env ic;
+      include_end conf @@ Adef.safe fname
+  | None -> failure ()
+
+(** Evaluates and prints content of {i cpr} template.
+    If template wasn't found prints basic copyrigth HTML structure. *)
+and print_copyright conf =
+  include_template conf Env.empty "copyr" (fun () ->
+      Output.print_sstring conf "<hr style=\"margin:0\">\n";
+      Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
+      Output.print_sstring conf "<em>";
+      Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
+      Output.print_sstring conf Version.ver;
+      Output.print_sstring conf "</em>";
+      Output.print_sstring conf "</div>\n";
+      Output.print_sstring conf "<br>\n")

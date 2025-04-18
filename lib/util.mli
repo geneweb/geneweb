@@ -22,12 +22,6 @@ val search_in_assets : string -> string
 (** Checks that the file in argument belong to one of the asserts dir
     (defined in the Secure module) *)
 
-val include_begin : config -> Adef.safe_string -> unit
-val include_end : config -> Adef.safe_string -> unit
-
-val etc_file_name : config -> string -> string
-(** Returns the path to the template file in parameter *)
-
 val escache_value : base -> Adef.encoded_string
 (** Returns the date of the base directory last update *)
 
@@ -261,11 +255,6 @@ val create_env : Adef.encoded_string -> Config.env
 (** Create association list from the query part of a URL.
     (i.e. a list of key-value separated by `&` or `;`)
 *)
-
-val open_etc_file : config -> string -> (in_channel * string) option
-(** [open_etc_file conf fname] search for template {i etc/fname.txt}
-    inside the base directory or inside one of assets directories.
-    Returns input channel and the path to given template. *)
 
 val string_of_place : config -> string -> Adef.escaped_string
 val raw_string_of_place : config -> string -> string
@@ -554,27 +543,6 @@ end
 module IfamSet : sig
   include Set.S with type elt = ifam
 end
-
-(**/**)
-
-val copy_from_templ_ref :
-  (config -> (string * Adef.encoded_string) list -> in_channel -> unit) ref
-(** Reference by default [Templ.copy_from_templ] *)
-(* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
-
-(**/**)
-
-val include_template :
-  config ->
-  (string * Adef.encoded_string) list ->
-  string ->
-  (unit -> unit) ->
-  unit
-(** [include_template conf env fname failure]
-    Search [fname] in templates path and interpret it with global environnement [env] provided.
-    Interpretation of template write directly its results in the socket.
-    If the file can not be found, [failure] is called.
-*)
 
 val select_masc :
   config -> base -> (iper * int) list -> (iper, int * person) Hashtbl.t

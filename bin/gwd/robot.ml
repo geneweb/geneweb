@@ -31,12 +31,12 @@ let robot_error conf cnt sec =
   Output.status conf Def.Forbidden;
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
   let env =
-    [
-      ("cnt", Adef.encoded (string_of_int cnt));
-      ("sec", Adef.encoded (string_of_int sec));
-    ]
+    Templ.Env.(
+      empty
+      |> add "cnt" (Adef.encoded @@ string_of_int cnt)
+      |> add "sec" (Adef.encoded @@ string_of_int sec))
   in
-  Util.include_template conf env "robot" (fun () ->
+  Templ.include_template conf env "robot" (fun () ->
       let title _ = Output.print_sstring conf "Access refused" in
       Output.print_sstring conf "<head><title>";
       title true;

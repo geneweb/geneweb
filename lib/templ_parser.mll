@@ -583,7 +583,7 @@ and parse_let conf b closing ast = parse
 and parse_include conf b closing ast = parse
   | value as file {
       let ast =
-        let fname = Util.etc_file_name conf file in
+        let fname = TemplAst.etc_file_name conf file in
         match List.assoc_opt fname !included_files with
         | Some a -> Ainclude (fname, a) :: ast
         | None ->

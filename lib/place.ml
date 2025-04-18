@@ -686,14 +686,14 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
   Hutil.header conf title;
   Hutil.interp_no_header conf "buttons_places"
     {
-      Templ.eval_var = (fun _ -> raise Not_found);
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = (fun _ -> raise Not_found);
+      eval_var = (fun _ -> raise Not_found);
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = (fun _ -> raise Not_found);
     }
-    []
+    Templ.Env.empty
     (Gwdb.empty_person base Gwdb.dummy_iper);
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   let link_to_ind =
@@ -764,11 +764,11 @@ let print_all_places_surnames conf base =
 let print_list conf _base =
   Hutil.interp conf "list"
     {
-      Templ.eval_var = (fun _ -> raise Not_found);
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = (fun _ -> raise Not_found);
+      eval_var = (fun _ -> raise Not_found);
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = (fun _ -> raise Not_found);
     }
-    [] ()
+    Templ.Env.empty ()

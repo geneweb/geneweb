@@ -49,7 +49,7 @@ type 'a env =
 let bool_val = Update_util.bool_val
 let str_val = Update_util.str_val
 let safe_val = Update_util.safe_val
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 let sexes = ref (-1)
@@ -462,16 +462,16 @@ let print_foreach print_ast _eval_expr =
     | _ -> raise Not_found
   and print_foreach_child env fcd al arr =
     for i = 0 to max 1 (Array.length arr) - 1 do
-      let env = ("cnt", Vint (i + 1)) :: env in
+      let env = Templ.Env.add "cnt" (Vint (i + 1)) env in
       List.iter (print_ast env fcd) al
     done
   and print_foreach_fevent env fcd al list =
     let rec loop first cnt = function
       | _ :: l ->
           let env =
-            ("cnt", Vint cnt) :: ("first", Vbool first)
-            :: ("last", Vbool (l = []))
-            :: env
+            Templ.Env.(
+              env |> add "cnt" (Vint cnt) |> add "first" (Vbool first)
+              |> add "last" (Vbool (l = [])))
           in
           List.iter (print_ast env fcd) al;
           loop false (cnt + 1) l
@@ -481,30 +481,30 @@ let print_foreach print_ast _eval_expr =
   and print_foreach_fwitness env fcd al list =
     match get_env "cnt" env with
     | Vint i -> (
-        match try Some (List.nth list (i - 1)) with Failure _ -> None with
-        | Some e ->
+        match List.nth list (i - 1) with
+        | exception Failure _ -> ()
+        | e ->
             let rec loop first wcnt = function
               | _ :: l ->
                   let env =
-                    ("wcnt", Vint wcnt) :: ("first", Vbool first)
-                    :: ("last", Vbool (l = []))
-                    :: env
+                    Templ.Env.(
+                      env |> add "wcnt" (Vint wcnt) |> add "first" (Vbool first)
+                      |> add "last" (Vbool (l = [])))
                   in
                   List.iter (print_ast env fcd) al;
                   loop false (wcnt + 1) l
               | [] -> ()
             in
-            loop true 1 (Array.to_list e.efam_witnesses)
-        | None -> ())
+            loop true 1 (Array.to_list e.efam_witnesses))
     | _ -> ()
   and print_foreach_witness env fcd al arr =
     for i = 0 to max 2 (Array.length arr) - 1 do
-      let env = ("cnt", Vint (i + 1)) :: env in
+      let env = Templ.Env.add "cnt" (Vint (i + 1)) env in
       List.iter (print_ast env fcd) al
     done
   and print_foreach_parent env fcd al arr =
     for i = 0 to Array.length arr - 1 do
-      let env = ("cnt", Vint (i + 1)) :: env in
+      let env = Templ.Env.add "cnt" (Vint (i + 1)) env in
       List.iter (print_ast env fcd) al
     done
   in
@@ -516,15 +516,15 @@ let print_update_fam conf base fcd digest =
       ( "ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM"
       | "MOD_FAM_OK" | "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK"
       | "MRG_MOD_FAM_OK" ) ->
-      let env = [ ("digest", Vstring digest) ] in
+      let env = Templ.Env.(add "digest" (Vstring digest) empty) in
       Hutil.interp conf "updfam"
         {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach;
+          eval_var = eval_var conf base;
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother;
+          set_vother;
+          print_foreach;
         }
         env fcd
   | Some _ | None -> Hutil.incorrect_request conf
@@ -812,11 +812,11 @@ let print_change_event_order conf base =
       let sfam = string_family_of conf base i in
       Hutil.interp conf "updfamevt"
         {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach;
+          eval_var = eval_var conf base;
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother;
+          set_vother;
+          print_foreach;
         }
-        [] sfam
+        Templ.Env.empty sfam

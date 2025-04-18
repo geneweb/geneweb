@@ -181,7 +181,7 @@ let unfold_place_long inverted s =
   if inverted then String.concat ", " (List.rev (sub :: List.rev pl))
   else String.concat ", " (sub :: pl)
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 let bool_val x = VVbool x
@@ -388,10 +388,11 @@ let print_foreach conf print_ast _eval_expr =
     List.iteri
       (fun i (ini_k, (list_v : (istr * string) list)) ->
         let env =
-          ("cnt", Vint i) :: ("max", Vint max) :: ("key", Vstring k)
-          :: ("entry_ini", Vstring ini_k)
-          :: ("list_value", Vlist_value list_v)
-          :: env
+          Templ.Env.(
+            env |> add "cnt" (Vint i) |> add "max" (Vint max)
+            |> add "key" (Vstring k)
+            |> add "entry_ini" (Vstring ini_k)
+            |> add "list_value" (Vlist_value list_v))
         in
         List.iter (print_ast env xx) al)
       list
@@ -423,8 +424,9 @@ let print_foreach conf print_ast _eval_expr =
       | [] -> ()
       | s :: tail ->
           let env =
-            ("substr", Vstring s) :: ("max", Vint max) :: ("cnt", Vint idx)
-            :: env
+            Templ.Env.(
+              env |> add "substr" (Vstring s) |> add "max" (Vint max)
+              |> add "cnt" (Vint idx))
           in
           List.iter (print_ast env xx) al;
           process_items (idx + 1) tail
@@ -450,11 +452,12 @@ let print_foreach conf print_ast _eval_expr =
       | [] -> ()
       | (k, s) :: l ->
           let env =
-            ("cnt", Vint i) :: ("max", Vint max) :: ("entry_value", Vstring s)
-            :: ("entry_value_rev", Vstring (unfold_place_long false s))
-            :: ("entry_key", Vstring (string_of_istr k))
-            :: ("first", Vbool (Place.without_suburb s <> prev))
-            :: env
+            Templ.Env.(
+              env |> add "cnt" (Vint i) |> add "max" (Vint max)
+              |> add "entry_value" (Vstring s)
+              |> add "entry_value_rev" (Vstring (unfold_place_long false s))
+              |> add "entry_key" (Vstring (string_of_istr k))
+              |> add "first" (Vbool (Place.without_suburb s <> prev)))
           in
           List.iter (print_ast env xx) al;
           loop (i + 1) l (Place.without_suburb s)
@@ -465,7 +468,7 @@ let print_foreach conf print_ast _eval_expr =
     let ini_l = build_list_short conf l in
     List.iter
       (fun ini ->
-        let env = ("ini", Vstring ini) :: env in
+        let env = Templ.Env.add "ini" (Vstring ini) env in
         List.iter (print_ast env xx) al)
       ini_l
   in
@@ -473,14 +476,17 @@ let print_foreach conf print_ast _eval_expr =
 
 let print_mod conf base =
   let list = build_list conf base in
-  let env = [ ("list", Vlist_data list); ("count", Vcnt (ref 0)) ] in
+  let env =
+    Templ.Env.(
+      empty |> add "list" (Vlist_data list) |> add "count" (Vcnt (ref 0)))
+  in
   Hutil.interp conf "upddata"
     {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf;
+      eval_var = eval_var conf base;
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = print_foreach conf;
     }
     env ()

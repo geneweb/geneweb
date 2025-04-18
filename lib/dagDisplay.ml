@@ -881,7 +881,7 @@ type 'a env =
   | Vvars of (string * string) list ref
 
 let get_env v env =
-  try match List.assoc v env with Vlazy l -> Lazy.force l | x -> x
+  try match Templ.Env.find v env with Vlazy l -> Lazy.force l | x -> x
   with Not_found -> Vnone
 
 let get_vother = function Vother x -> Some x | _ -> None
@@ -1217,40 +1217,38 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
       in
       (if clipped_outs <> "" then
        let v = Vdcellp clipped_outs in
-       let print_ast = print_ast (("dag_cell_pre", v) :: env) () in
+       let env = Templ.Env.add "dag_cell_pre" v env in
+       let print_ast = print_ast env () in
        List.iter print_ast al);
       loop (pos + sz) (col + colspan) (j + 1)
   in
   loop 0 0 0
 
 and print_foreach_dag_cell hts print_ast env al =
-  let i =
-    match get_env "dag_line" env with Vdline i -> i | _ -> raise Not_found
-  in
-  for j = 0 to Array.length hts.(i) - 1 do
-    let print_ast =
-      print_ast
-        (("dag_cell", Vdcell hts.(i).(j))
-        :: ("cell_nbr", Vint j)
-        :: ("first", Vbool (j = 0))
-        :: ("last", Vbool (j = Array.length hts.(i) - 1))
-        :: env)
-        ()
-    in
-    List.iter print_ast al
-  done
+  match get_env "dag_line" env with
+  | Vdline i ->
+      for j = 0 to Array.length hts.(i) - 1 do
+        let env =
+          Templ.Env.(
+            env
+            |> add "dag_cell" (Vdcell hts.(i).(j))
+            |> add "cell_nbr" (Vint j)
+            |> add "first" (Vbool (j = 0))
+            |> add "last" (Vbool (j = Array.length hts.(i) - 1)))
+        in
+        List.iter (print_ast env ()) al
+      done
+  | _ -> raise Not_found
 
 and print_foreach_dag_line print_ast env hts al =
   for i = 0 to Array.length hts - 1 do
-    let print_ast =
-      print_ast
-        (("dag_line", Vdline i) :: ("line_nbr", Vint i)
-        :: ("first", Vbool (i = 0))
-        :: ("last", Vbool (i = Array.length hts - 1))
-        :: env)
-        ()
+    let env =
+      Templ.Env.(
+        env |> add "dag_line" (Vdline i) |> add "line_nbr" (Vint i)
+        |> add "first" (Vbool (i = 0))
+        |> add "last" (Vbool (i = Array.length hts - 1)))
     in
-    List.iter print_ast al
+    List.iter (print_ast env ()) al
   done
 
 and print_foreach_dag_line_pre conf hts print_ast env al =
@@ -1297,8 +1295,8 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
   in
   for row = 0 to max_row - 1 do
     let v = Vdlinep (max_row, stra, row, pos1, pos2) in
-    let print_ast = print_ast (("dag_line_pre", v) :: env) () in
-    List.iter print_ast al
+    let env = Templ.Env.add "dag_line_pre" v env in
+    List.iter (print_ast env ()) al
   done
 
 let old_print_slices_menu_or_dag_page conf page_title hts next_txt =
@@ -1332,28 +1330,26 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
           done;
         Vdag (tmincol, tcol, colminsz, colsz, ncol)
       in
-      [
-        ("p", Vind p);
-        ("p_auth", Vbool (authorized_age conf base p));
-        ("count", Vcnt (ref 0));
-        ("count1", Vcnt (ref 0));
-        ("count2", Vcnt (ref 0));
-        ("count3", Vcnt (ref 0));
-        ("vars", Vvars (ref []));
-        ("dag", Vlazy (Lazy.from_fun table_pre_dim));
-        ("p_title", Vsstring page_title);
-        ("next_txt", Vestring next_txt);
-      ]
+      Templ.Env.(
+        empty |> add "p" (Vind p)
+        |> add "p_auth" (Vbool (authorized_age conf base p))
+        |> add "count" (Vcnt (ref 0))
+        |> add "count1" (Vcnt (ref 0))
+        |> add "count2" (Vcnt (ref 0))
+        |> add "count3" (Vcnt (ref 0))
+        |> add "vars" (Vvars (ref []))
+        |> add "dag" (Vlazy (Lazy.from_fun table_pre_dim))
+        |> add "p_title" (Vsstring page_title)
+        |> add "next_txt" (Vestring next_txt))
     in
-
     Hutil.interp conf "dag"
       {
-        Templ.eval_var = eval_var conf base;
-        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = (fun _ -> eval_predefined_apply);
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = print_foreach conf hts;
+        eval_var = eval_var conf base;
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> eval_predefined_apply);
+        get_vother;
+        set_vother;
+        print_foreach = print_foreach conf hts;
       }
       env ()
 

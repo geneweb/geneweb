@@ -117,7 +117,7 @@ let log_passwd_failed ar tm from request base_file =
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
 let copy_file conf fname =
-  match Util.open_etc_file conf fname with
+  match Templ.open_etc_file conf fname with
     Some (ic, _fname) ->
       begin try
         while true do let c = input_char ic in Output.printf conf "%c" c done
@@ -281,10 +281,13 @@ let print_renamed conf new_n =
     in
     "http://" ^ Util.get_server_string conf ^ new_req
   in
-  let env = [ "old", Mutil.encode conf.bname
-            ; "new", Mutil.encode new_n
-            ; "link", Mutil.encode link ] in
-  include_template conf env "renamed"
+  let env =
+    Templ.Env.(empty
+    |> add "old" (Mutil.encode conf.bname)
+    |> add "new" (Mutil.encode new_n)
+    |> add "link" (Mutil.encode link))
+  in
+  Templ.include_template conf env "renamed"
     (fun () ->
       let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
       Hutil.header conf title;
@@ -302,9 +305,9 @@ let log_redirect from request req =
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
   let link = "http://" ^ new_addr ^ req in
-  let env = ["link", Mutil.encode link] in
+  let env = Templ.Env.(add "link" (Mutil.encode link) empty) in
   log_redirect from request req;
-  include_template conf env "redirect"
+  Templ.include_template conf env "redirect"
     (fun () ->
       let title _ = Output.print_sstring conf "Address changed" in
       Hutil.header conf title;

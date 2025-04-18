@@ -447,7 +447,7 @@ let treat_request =
   in
   let handle_no_bfile conf l =
     if conf.bname = "" then
-      include_template conf [] "index" (fun () -> propose_base conf)
+      Templ.include_template conf Templ.Env.empty "index" (fun () -> propose_base conf)
     else
       print_page conf l
   in

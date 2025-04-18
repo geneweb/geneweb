@@ -393,14 +393,14 @@ let print_statistics conf =
   else
     Hutil.interp conf "stats"
       {
-        Templ.eval_var = (fun _ -> raise Not_found);
-        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = (fun _ -> raise Not_found);
+        eval_var = (fun _ -> raise Not_found);
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = (fun _ -> raise Not_found);
       }
-      [] ()
+      Templ.Env.empty ()
 
 let print_population_pyramid conf base =
   let interval =

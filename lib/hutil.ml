@@ -3,9 +3,9 @@
 open Config
 open Def
 
-type 'a env = Vint of int | Vother of 'a | Vnone
+type 'a value = Vint of int | Vother of 'a | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -24,7 +24,7 @@ let gen_interp header conf fname ifun env ep =
       match Templ.input_templ conf fname with
       | Some astl ->
           if header then Util.html conf;
-          let full_name = Util.etc_file_name conf fname in
+          let full_name = TemplAst.etc_file_name conf fname in
           Templ.interp_ast conf ifun env ep [ Ainclude (full_name, astl) ]
       | None -> error_cannot_access conf fname)
 
@@ -36,30 +36,30 @@ let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
 let interp_no_env conf fname =
   interp_no_header conf fname
     {
-      Templ.eval_var = (fun _ -> raise Not_found);
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = (fun _ -> raise Not_found);
+      eval_var = (fun _ -> raise Not_found);
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach = (fun _ -> raise Not_found);
     }
-    [] ()
+    Templ.Env.empty ()
 
 let include_home_template conf =
   Templ_parser.wrap "home" (fun () ->
       match Templ.input_templ conf "home" with
       | Some astl ->
-          let full_name = Util.etc_file_name conf "home" in
+          let full_name = TemplAst.etc_file_name conf "home" in
           Templ.interp_ast conf
             {
-              Templ.eval_var = (fun _ -> raise Not_found);
-              Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-              Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-              Templ.get_vother;
-              Templ.set_vother;
-              Templ.print_foreach = (fun _ -> raise Not_found);
+              eval_var = (fun _ -> raise Not_found);
+              eval_transl = (fun _ -> Templ.eval_transl conf);
+              eval_predefined_apply = (fun _ -> raise Not_found);
+              get_vother;
+              set_vother;
+              print_foreach = (fun _ -> raise Not_found);
             }
-            [] ()
+            Templ.Env.empty ()
             [ Ainclude (full_name, astl) ]
       | None -> error_cannot_access conf "home")
 
@@ -101,7 +101,7 @@ let header_without_http_nor_home conf title =
   Output.print_sstring conf str1;
   title true;
   Output.print_sstring conf str2;
-  Util.include_template conf [] "css" (fun () -> ());
+  Templ.include_template conf Templ.Env.empty "css" (fun () -> ());
   Output.print_sstring conf "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
@@ -172,7 +172,7 @@ let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
   Templ.include_hed_trl conf "trl";
   Templ.print_copyright conf;
-  Util.include_template conf [] "js" (fun () -> ());
+  Templ.include_template conf Templ.Env.empty "js" (fun () -> ());
   Output.print_sstring conf "</body>\n</html>\n"
 
 (* Calendar request *)
@@ -266,7 +266,7 @@ let print_foreach print_ast eval_expr =
       | _ -> raise Not_found
     in
     for i = i1 to i2 do
-      let env = ("integer", Vint i) :: env in
+      let env = Templ.Env.add "integer" (Vint i) env in
       List.iter (print_ast env jd) al
     done
   in
@@ -275,11 +275,11 @@ let print_foreach print_ast eval_expr =
 let print_calendar conf _base =
   interp conf "calendar"
     {
-      Templ.eval_var = eval_var conf;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach;
+      eval_var = eval_var conf;
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply = (fun _ -> raise Not_found);
+      get_vother;
+      set_vother;
+      print_foreach;
     }
-    [] (eval_julian_day conf)
+    Templ.Env.empty (eval_julian_day conf)
