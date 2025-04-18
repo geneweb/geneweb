@@ -346,12 +346,13 @@ let linked_page_rows conf base pg pgl =
 
 let linked_list _conf base pgl =
   let str =
-  List.fold_left
-    (fun acc pg ->
+    List.fold_left
+      (fun acc pg ->
         match pg with
-        | Def.NLDB.PgInd ip -> acc ^ (Gutil.designation base (Gwdb.poi base ip)) ^ "<br>"
+        | Def.NLDB.PgInd ip ->
+            acc ^ Gutil.designation base (Gwdb.poi base ip) ^ "<br>"
         | _ -> acc)
-      "" pgl;
+      "" pgl
   in
   Printf.sprintf {|
   <span>
