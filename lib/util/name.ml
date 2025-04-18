@@ -6,6 +6,7 @@ let forbidden_char = [ ':'; '@'; '#'; '='; '$' ]
 (* Name.lower *)
 
 let unaccent_utf_8 lower s i =
+  Printf.eprintf "Unaccent utf 8 in : %s\n" s; flush stderr;
   let fns =
     if lower then fun n s -> (String.lowercase_ascii s, n) else fun n s -> (s, n)
   in
@@ -18,6 +19,20 @@ let unaccent_utf_8 lower s i =
       (fun n -> (String.sub s i (n - i), n))
       s i (String.length s)
   in
+  Printf.eprintf "Unaccent utf 8 out: %s\n" s; flush stderr;
+  let s =
+    let rec loop s =
+      match String.index_opt s '\xE2' with
+      | Some i when Char.code s.[i+1] = 0x80
+                && (Char.code s.[i + 2] = 0x98
+                  || Char.code s.[i + 2] = 0x99) ->
+              loop ((String.sub s 0 i) 
+                    ^ "'"
+                    ^ (String.sub s (i+3) (String.length s - i - 3)))
+      | _ -> s
+    in loop s
+  in
+  
   if lower then (String.lowercase_ascii s, n) else (s, n)
 
 let next_chars_if_equiv s i t j =
