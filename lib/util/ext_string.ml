@@ -28,8 +28,10 @@ let nb_char_occ c s =
   String.iter (fun x -> if x = c then incr cnt) s;
   !cnt
 
-let cut_words str =
-  str |> String.split_on_char ' ' |> List.map String.trim
+let split_on_char separator str =
+  str
+  |> String.split_on_char separator
+  |> List.map String.trim
   |> List.filter (( <> ) "")
 
 let strip_all_trailing_spaces s =
