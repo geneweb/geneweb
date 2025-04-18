@@ -1096,6 +1096,23 @@ let dates_format_of_string = function
   | "month_day_year" -> Geneweb.Config.MDY
   | _ -> Geneweb.Config.DMY
 
+let get_client_preferences request =
+  let parse_client_preferences preferences =
+    let parse_client_preference preference =
+      match Ext_string.split_on_char '=' preference with
+      | [] | [ _ ] | _ :: _ :: _ :: _ -> None
+      | [ key; value ] ->
+          Ext_option.return_if
+            (List.mem key Geneweb.Util.authorized_client_preference_keys)
+            (fun () -> (key, value))
+    in
+    preferences
+    |> Ext_string.split_on_char ','
+    |> List.filter_map parse_client_preference
+  in
+  Option.fold ~none:[] ~some:parse_client_preferences
+    (Http.Header.get ~request "Prefer")
+
 let make_conf from_addr request script_name env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
@@ -1143,7 +1160,9 @@ let make_conf from_addr request script_name env =
   let threshold_test, env = extract_assoc "threshold" env in
   if threshold_test <> "" then
     Geneweb.RelationLink.threshold := int_of_string threshold_test;
-  let base_env = Geneweb.Util.read_base_env ~bname:base_file in
+  let base_env =
+    get_client_preferences request @ Geneweb.Util.read_base_env ~bname:base_file
+  in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -1320,6 +1339,11 @@ let log tm conf from gauth request script_name contents =
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
+  let print_header_if_any header =
+    Option.iter
+      (Printf.fprintf oc "  %s: %s\n" header)
+      (Http.Header.get ~request header)
+  in
   Printf.fprintf oc "%s (%d) %s?" (Ext_unix.sprintf_date tm) (Unix.getpid ())
     script_name;
   print_and_cut_if_too_big oc contents;
@@ -1333,6 +1357,7 @@ let log tm conf from gauth request script_name contents =
     Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
       (if conf.user = "" then "" else " ");
   Option.iter (Printf.fprintf oc "  Agent: %s\n") user_agent;
+  print_header_if_any "Prefer";
   Option.iter
     (fun referer ->
       Printf.fprintf oc "  Referer: ";
