@@ -21,7 +21,7 @@ val commit_patches : Config.config -> Gwdb.base -> unit
 
 val update_wf_trace : Config.config -> string -> unit
 
-val get_referer : Config.config -> Adef.escaped_string
+val get_referer : Config.config -> Adef.escaped_string option
 (** Get referer (the page you came from to the current page) page from HTTP request *)
 
 val clean_html_tags : string -> string list -> string

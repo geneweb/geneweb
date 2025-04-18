@@ -250,7 +250,8 @@ and eval_simple_variable conf = function
   | "prefix_no_wide" -> commd ~excl:[ "wide" ] conf
   | "prefix_no_lang" -> commd ~excl:[ "lang" ] conf
   | "prefix_no_all" -> commd ~excl:[ "templ"; "p_mod"; "wide" ] conf
-  | "referer" -> (Util.get_referer conf :> string)
+  | "referer" ->
+      Option.value ~default:"" (Util.get_referer conf :> string option)
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "

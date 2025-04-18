@@ -264,7 +264,7 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 
 let get_referer conf =
   let referer = Mutil.extract_param "referer: " '\n' conf.Config.request in
-  escape_html @@ Option.value ~default:"" referer
+  Option.map escape_html referer
 
 let begin_centered conf =
   Output.printf conf

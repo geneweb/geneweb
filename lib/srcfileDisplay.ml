@@ -232,7 +232,9 @@ let macro conf base = function
   | 'w' ->
       let s = Hutil.link_to_referer conf in
       if (s :> string) = "" then Adef.safe "&nbsp;" else s
-  | 'W' -> (Util.get_referer conf :> Adef.safe_string)
+  | 'W' ->
+      Option.value ~default:(Adef.safe "")
+        (Util.get_referer conf :> Adef.safe_string option)
   | '/' -> Adef.safe ""
   | c -> Adef.safe ("%" ^ String.make 1 c)
 
