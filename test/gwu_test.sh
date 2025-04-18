@@ -10,7 +10,7 @@ By default:
   to access gwc/gwu tools in $BIN_DIR
 * gwc is using test/$REFDBNAME.gw input file and creating
   $BASES_DIR/$REFDBNAME.gwb database.
-* if using $REFDBNAME then unzip $ZIP_IMG to prepare DB
+* if using $REFDBNAME then unzip related images to prepare DB
   for usage by test/run_gw_test.sh other tool.
 If needed use -f option to change from default.
 
@@ -30,7 +30,8 @@ REFDBNAME='galichet' # reference gw file
 # assumes we are running in the repo folder
 # ./test/testgwu.sh
 DBNAME='galichet' # name of gw file input to gwc (w/o extension)
-ZIP_IMG='galichet_src_images.zip' # zip of associated images and src files.
+ZIP_IMG='galichet_src_images.zip' # zip of images and src files for legacy DB
+ZIPREORG_IMG='galichet_reorg_documents.zip' # zip of documents for reorg DB
 BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
@@ -90,10 +91,11 @@ $SUDOPRFX $fqbindir/gwc $gwcopt -o $DBNAME $DBNAME.gw >$DBNAME.log 2>&1 || \
 
 if test "$DBNAME" = "$REFDBNAME"; then
     if test -n "$optreorg"; then
-        echo "TODO for reorg mode DB need to identify different subdirectories \nto unpack files from $cmddir/$ZIP_IMG"
+        zipsrc="$cmddir/$ZIPREORG_IMG"
     else
-        unzip -u "$cmddir/$ZIP_IMG"
+        zipsrc="$cmddir/$ZIP_IMG"
     fi
+    unzip -qu $zipsrc || { echo "stop on unzip failure"; exit 1; }
 fi
 
 $SUDOPRFX $fqbindir/gwu $DBNAME -v -o ${DBNAME}.gwu.o.gw 2>$DBNAME.gwu.o.stderr || \
