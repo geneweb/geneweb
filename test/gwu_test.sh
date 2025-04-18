@@ -95,7 +95,7 @@ if test "$DBNAME" = "$REFDBNAME"; then
     else
         zipsrc="$cmddir/$ZIP_IMG"
     fi
-    unzip -qu $zipsrc || { echo "stop on unzip failure"; exit 1; }
+    $SUDOPRFX unzip -qu $zipsrc || { echo "stop on unzip failure"; exit 1; }
 fi
 
 $SUDOPRFX $fqbindir/gwu $DBNAME -v -o ${DBNAME}.gwu.o.gw 2>$DBNAME.gwu.o.stderr || \

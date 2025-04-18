@@ -202,7 +202,7 @@ if test -h "$gwf_file" || test -f "$gwf_file"; then
         origgwf="$gwf_file"
     fi
     gwf_backup="$origgwf.$$"
-    cp -pf $origgwf $gwf_backup
+    $SUDOPRFX cp -pf $origgwf $gwf_backup
 else
     signature_str="#to.be.removed.after.test.$$"
     origgwf="$gwf_file"
@@ -211,7 +211,7 @@ fi
 
 cleanup () {
     if test -f "$gwf_backup" ; then
-        mv -f $gwf_backup $origgwf
+        $SUDOPRFX mv -f $gwf_backup $origgwf
     elif test -f "$gwf_file" && grep -q "$signature_str" $gwf_file ; then
         rm -f $gwf_file
     fi
