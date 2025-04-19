@@ -16,7 +16,6 @@ let force = ref false
 let cnt_dir = ref ""
 let sock_dir = ref ""
 let bases = ref (Secure.base_dir ())
-let oc : out_channel option ref = ref None
 
 type init_s = { status : bool; bname : string }
 
@@ -446,8 +445,6 @@ let p_auth conf base p =
 let p_auth_sp conf base p =
   p_auth conf base p || (conf.Config.friend && Gwdb.get_access p <> Private)
 
-let log fn = match !oc with Some oc -> fn oc | None -> ()
-
 (** [wrap_output conf title content]
   Plugins defining a page content but not a complete UI
   may want to wrap their page using [wrap_output].
@@ -574,12 +571,13 @@ let init_etc bname =
      with Unix.Unix_error (_, _, _) ->
        Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
 
-    (if not (Sys.file_exists "cnt") then
+    (if not (Sys.file_exists (!cnt_d bname)) then
      try
-       Unix.mkdir "cnt" 0o755;
+       Unix.mkdir (!cnt_d bname) 0o755;
        force := true
      with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
+       Logs.syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)));
 
     if not (Sys.file_exists (!etc_d bname)) then
       try
