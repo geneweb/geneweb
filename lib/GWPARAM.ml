@@ -446,8 +446,6 @@ let p_auth conf base p =
 let p_auth_sp conf base p =
   p_auth conf base p || (conf.Config.friend && Gwdb.get_access p <> Private)
 
-let log fn = match !oc with Some oc -> fn oc | None -> ()
-
 (** [wrap_output conf title content]
   Plugins defining a page content but not a complete UI
   may want to wrap their page using [wrap_output].
