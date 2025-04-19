@@ -16,7 +16,6 @@ let force = ref false
 let cnt_dir = ref ""
 let sock_dir = ref ""
 let bases = ref (Secure.base_dir ())
-let oc : out_channel option ref = ref None
 
 type init_s = { status : bool; bname : string }
 
