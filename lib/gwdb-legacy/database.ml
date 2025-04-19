@@ -729,7 +729,7 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
           cleared := true;
           match !tab with
           | None -> ()
-          | Some a ->
+          | Some _a ->
               (* We could call [Gw_ancient.delete] here to
                  free the memory allocated with Ancient. Unfortunately,
                  [Ancient.delete] is buggy and cannot be used without causing
