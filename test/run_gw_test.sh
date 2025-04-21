@@ -79,6 +79,7 @@ PLACE="Australie" # one specific place
 
 #===  main ====================
 cmd=$(basename $0)
+echo "starting $0 $@"
 while getopts "cdf:h" Option
 do
 case $Option in
@@ -133,13 +134,7 @@ sleep 1
 fi
 
 if test -z "$cgitest"; then
-if pgrep -a gwd
-then
-  echo "Running GW-test on $DBNAME with $setenv_file"
-else
-  echo "gwd not running"
-  exit 1
-fi
+  pgrep -a gwd >/dev/null || { echo "gwd not running, potential traces in $GWDLOG"; exit 1; }
 fi
 
 RC=0
@@ -182,7 +177,13 @@ crl () {
   unset first_request tstmsg
 }
 
-gwf_file=$BASES_DIR/$DBNAME.gwf
+gwf_file=$BASES_DIR/$DBNAME.gwb/config/$DBNAME.gwf
+if test -h "$gwf_file" || test -f "$gwf_file"; then
+    modereorg=1
+else
+    gwf_file=$BASES_DIR/$DBNAME.gwf
+fi
+
 if test -h "$gwf_file" || test -f "$gwf_file"; then
     if test -h "$gwf_file"; then
         origgwf=$(realpath $gwf_file)
@@ -190,7 +191,7 @@ if test -h "$gwf_file" || test -f "$gwf_file"; then
         origgwf="$gwf_file"
     fi
     gwf_backup="$origgwf.$$"
-    cp -pf $origgwf $gwf_backup
+    $SUDOPRFX cp -pf $origgwf $gwf_backup
 else
     signature_str="#to.be.removed.after.test.$$"
     origgwf="$gwf_file"
@@ -199,7 +200,7 @@ fi
 
 cleanup () {
     if test -f "$gwf_backup" ; then
-        mv -f $gwf_backup $origgwf
+        $SUDOPRFX mv -f $gwf_backup $origgwf
     elif test -f "$gwf_file" && grep -q "$signature_str" $gwf_file ; then
         rm -f $gwf_file
     fi
@@ -273,10 +274,13 @@ crl "m=DEL_IND&i=$ID"
 crl "m=DOC&s=$IMG_SRC"
 crl "m=DOCH&s=$IMG_SRC"
 crl "m=F&i=$ID"
-# Warning: Assume forum enabled, because no simple way to check it.
+if check_gwf 'disable_forum=yes'; then
+    echo "two forum related commands are not tested."
+else
 crl "m=FORUM"
 #crl "m=FORUM&p=939" # too base specific
 crl "m=FORUM_ADD"
+fi
 crl "m=H&v=conf"
 crl "m=H&v=$TXT_SRC"
 crl "m=HIST&k=20"
