@@ -30,10 +30,12 @@ BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
 SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
+GWCOPT='-v -f -cg'
 #=== hardcoded vars (end)   ===
 
 #===  main ====================
 cmd=$(basename $0)
+cmddir=$(dirname $0)
 echo "starting $0 $@"
 while getopts "f:h" Option
 do
@@ -71,27 +73,31 @@ else
     fi
 fi
 
-fqbindir=$(realpath $BIN_DIR)
+for xx in .lck .gwo .log .gwb _nouveau.gw .gwu_stderr _outdir; do
+    $SUDOPRFX rm -rf $BASES_DIR/${DBNAME}${xx}
+done
+for xx in .gwb _outdir; do
+    $SUDOPRFX mkdir $BASES_DIR/${DBNAME}${xx} || exit 1
+done
 
-cd $BASES_DIR
-$SUDOPRFX rm -rf $DBNAME.lck $DBNAME.gwo $DBNAME.log $DBNAME.gwb $DBNAME_nouveau.gw $DBNAME.gwu_stderr outdir.$DBNAME
-$SUDOPRFX mkdir outdir.$DBNAME $DBNAME.gwb $DBNAME.gwb/wiznotes || exit 1
-$SUDOPRFX $fqbindir/gwc -v -f -cg -o $DBNAME $DBNAME.gw >$DBNAME.log 2>&1 || \
+gwcopt="$GWCOPT -bd $BASES_DIR"
+$SUDOPRFX $BIN_DIR/gwc $gwcopt -o $DBNAME $BASES_DIR/$DBNAME.gw >$BASES_DIR/$DBNAME.log 2>&1 || \
   { echo "gwc failure, details in $BASES_DIR/$DBNAME.log"; exit 1; }
-$SUDOPRFX $fqbindir/gwu $DBNAME -v -o ${DBNAME}.gwu.o.gw 2>$DBNAME.gwu.o.stderr || \
+
+$SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}.gwu.o.gw 2>$BASES_DIR/$DBNAME.gwu.o.stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu.o.stderr"; exit 1; }
-$SUDOPRFX $fqbindir/gwu $DBNAME -v -o ${DBNAME}_nouveau.gw -odir outdir.$DBNAME 2>$DBNAME.gwu_stderr || \
+$SUDOPRFX $BIN_DIR/gwu $BASES_DIR/$DBNAME -v -o $BASES_DIR/${DBNAME}_nouveau.gw -odir $BASES_DIR/outdir.$DBNAME 2>$BASES_DIR/$DBNAME.gwu_stderr || \
   { echo "gwu failure, details in $BASES_DIR/$DBNAME.gwu_stderr"; exit 1; }
 
 RC=0
 for xx in "${DBNAME}.gwu.o.gw" "outdir.$DBNAME/$DBNAME.gw" ; do
-    if diff -q $DBNAME.gw $xx >/dev/null ; then
+    if diff -q $BASES_DIR/$DBNAME.gw $BASES_DIR/$xx >/dev/null ; then
         : # nop
     else
-        if diff -qZ $DBNAME.gw $xx >/dev/null ; then
+        if diff -qZ $BASES_DIR/$DBNAME.gw $BASES_DIR/$xx >/dev/null ; then
             echo "Warning: trailing whitespace ignored"
         else
-            diff -u $DBNAME.gw $xx || RC=$(($RC+1))
+            diff -u $BASES_DIR/$DBNAME.gw $BASES_DIR/$xx || RC=$(($RC+1))
         fi
     fi
 done
