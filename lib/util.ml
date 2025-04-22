@@ -596,7 +596,7 @@ let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
     && (not (Gwdb.is_quest_string (Gwdb.get_first_name p)))
     && not (Person.is_visible conf base p)
   in
-  if conf.Config.use_restrict then Gwdb.base_visible_get base fct ip else false
+  conf.Config.use_restrict && Gwdb.base_visible_get base fct ip
 
 (** Returns person option with given id from the base.
     Wrapper around `Gwdb.poi` defined such as:
