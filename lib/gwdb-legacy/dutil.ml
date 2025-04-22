@@ -266,3 +266,18 @@ let map_family_ps ?(fd = Fun.id) fp ff fs fam =
     fsources = fs fam.fsources;
     fam_index = ff fam.fam_index;
   }
+
+let insert_lowered_name_suffix_istrs ~insert_string ~base_data ~istr =
+  let name = base_data.Dbdisk.strings.get istr in
+  let split_strings = Name.split name in
+  let _, strings =
+    List.fold_right
+      (fun s (str, strings) ->
+        let s = s ^ " " ^ str in
+        (s, s :: strings))
+      split_strings ("", [])
+  in
+  let lowered_strings = List.map Name.lower strings in
+  List.filter_map
+    (fun s -> if s <> "" then Some (insert_string s) else None)
+    lowered_strings
