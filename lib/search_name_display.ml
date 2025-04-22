@@ -31,9 +31,7 @@ let print_img conf img =
     [Args] :
       - conf      : configuration de la base
       - x         : 'nom/prénom/sosa...' recherché
-      - nb_branch : nombre de branches dans le résultat de la recherche
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                     *)
+      - nb_branch : nombre de branches dans le résultat de la recherche *)
 let print_branch_to_alphabetic (conf : Config.config) (x : string)
     (nb_branch : int) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
@@ -76,9 +74,7 @@ let print_branch_to_alphabetic (conf : Config.config) (x : string)
                     d'afficher les liens pour un affichage par branches.
     [Args] :
       - conf      : configuration de la base
-      - x         : 'nom/prénom/sosa...' recherché
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                     *)
+      - x         : 'nom/prénom/sosa...' recherché                      *)
 let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf

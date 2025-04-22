@@ -117,12 +117,7 @@ let search_key conf base s = Option.to_list (search_by_key conf base s)
 
 (** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
       trouver la meilleure combinaison de résultat pour afficher la réponse
-      la plus probable.
-    [Args] :
-      - conf : configuration de la base
-      - base : base
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
+      la plus probable.                                                     *)
 let print conf base specify unknown =
   let real_input label =
     match Util.p_getenv conf.Config.env label with
