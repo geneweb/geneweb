@@ -3,12 +3,6 @@
 val cnt_dir : string ref
 (** The directory where counters (e.g. number page displayed) are stored. *)
 
-val base_path : string list -> string -> string
-(** Alias for GWPARAM.base_path *)
-
-val bpath : string -> string
-(** Alias for GWPARAM.bpath *)
-
 val search_in_assets : string -> string
 (** Checks that the file in argument belong to one of the asserts dir
     (defined in the Secure module) *)

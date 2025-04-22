@@ -101,7 +101,7 @@ let tmp_file fname = fname ^ ".tmp"
 let write_caches base =
   if Gwdb.nb_of_persons base > node_threshold then (
     let cache = create_cache_data base in
-    let base_dir = Geneweb.Util.bpath (Gwdb.bname base ^ ".gwb") in
+    let base_dir = Geneweb.GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
     let lastname =
       sorted_list_of_istr_set base Utf8.alphabetic_order cache.lastname
     in

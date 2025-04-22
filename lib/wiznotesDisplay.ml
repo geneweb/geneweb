@@ -2,7 +2,7 @@
 
 let dir conf base =
   Filename.concat
-    (Util.bpath (conf.Config.bname ^ ".gwb"))
+    (GWPARAM.bpath (conf.Config.bname ^ ".gwb"))
     (Gwdb.base_wiznotes_dir base)
 
 let wzfile wddir wz = Filename.concat wddir (wz ^ ".txt")

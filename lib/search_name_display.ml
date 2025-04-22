@@ -470,7 +470,7 @@ let print_branch conf base psn name =
         if with_link then
           if with_id then NameDisplay.reference conf base p
           else NameDisplay.reference_noid conf base p
-        else fun s -> s
+        else Fun.id
       in
       Sosa_cache.print_sosa ~conf ~base ~person:p ~link:with_link;
       Output.print_sstring conf @@ if with_link then "<strong>" else "<em>";
@@ -844,7 +844,7 @@ let surname_print conf base not_found_fun { iperl; list; bhl } x =
 let search_surname conf base x : surname_search_result =
   let list, name_inj =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
-      (persons_of_absolute_surname conf base x, fun x -> x)
+      (persons_of_absolute_surname conf base x, Fun.id)
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
     else

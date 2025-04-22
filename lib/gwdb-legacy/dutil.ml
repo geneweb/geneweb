@@ -1,9 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Dbdisk
-
-external identity : 'a -> 'a = "%identity"
-
 type name_index_data = int array array
 type strings_of_fsname = int array array
 
@@ -13,11 +9,11 @@ let magic_GnWb0022 = "GnWb0022"
 let magic_GnWb0023 = "GnWb0023"
 let magic_GnWb0024 = "GnWb0024"
 let table_size = 0x3fff
-let poi base i = base.data.persons.get i
-let aoi base i = base.data.ascends.get i
-let uoi base i = base.data.unions.get i
-let coi base i = base.data.couples.get i
-let sou base i = base.data.strings.get i
+let poi base i = base.Dbdisk.data.persons.get i
+let aoi base i = base.Dbdisk.data.ascends.get i
+let uoi base i = base.Dbdisk.data.unions.get i
+let coi base i = base.Dbdisk.data.couples.get i
+let sou base i = base.Dbdisk.data.strings.get i
 let p_first_name base p = Mutil.nominative (sou base p.Dbdisk.first_name)
 let p_surname base p = Mutil.nominative (sou base p.Dbdisk.surname)
 
@@ -31,7 +27,8 @@ let husbands base p =
       (husband_surname, husband_surnames_aliases))
     (uoi base p.Dbdisk.key_index).family
 
-let father_titles_places base p (nobtit : dsk_person -> dsk_title list) =
+let father_titles_places base p
+    (nobtit : Dbdisk.dsk_person -> Dbdisk.dsk_title list) =
   match (aoi base p.Dbdisk.key_index).parents with
   | Some ifam ->
       let cpl = coi base ifam in
@@ -40,7 +37,10 @@ let father_titles_places base p (nobtit : dsk_person -> dsk_title list) =
   | None -> []
 
 let dsk_person_misc_names :
-    dsk_base -> dsk_person -> (dsk_person -> dsk_title list) -> string list =
+    Dbdisk.dsk_base ->
+    Dbdisk.dsk_person ->
+    (Dbdisk.dsk_person -> Dbdisk.dsk_title list) ->
+    string list =
  fun base p nobtit ->
   Futil.gen_person_misc_names (sou base) 0 1 p.first_name p.surname
     p.public_name p.qualifiers p.aliases p.first_names_aliases
@@ -49,7 +49,7 @@ let dsk_person_misc_names :
     (father_titles_places base p nobtit)
 
 let compare_snames base_data s1 s2 =
-  Mutil.compare_after_particle (Lazy.force base_data.particles) s1 s2
+  Mutil.compare_after_particle (Lazy.force base_data.Dbdisk.particles) s1 s2
 
 let compare_snames_i base_data is1 is2 =
   if is1 = is2 then 0
@@ -62,7 +62,10 @@ let compare_fnames = String.compare
 
 let compare_fnames_i base_data is1 is2 =
   if is1 = is2 then 0
-  else compare_fnames (base_data.strings.get is1) (base_data.strings.get is2)
+  else
+    compare_fnames
+      (base_data.Dbdisk.strings.get is1)
+      (base_data.strings.get is2)
 
 let int_size = 4
 
@@ -133,7 +136,7 @@ let empty_family empty =
     fam_index = ();
   }
 
-let map_pers_event ?(fd = identity) fp fs e =
+let map_pers_event ?(fd = Fun.id) fp fs e =
   let epers_name =
     match e.Dbdisk.epers_name with
     | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
@@ -171,7 +174,7 @@ let map_pers_event ?(fd = identity) fp fs e =
     epers_witnesses;
   }
 
-let map_person_ps ?(fd = identity) fp fs p =
+let map_person_ps ?(fd = Fun.id) fp fs p =
   {
     Dbdisk.first_name = fs p.Dbdisk.first_name;
     surname = fs p.surname;
@@ -210,7 +213,7 @@ let map_person_ps ?(fd = identity) fp fs p =
     key_index = p.key_index;
   }
 
-let map_fam_event ?(fd = identity) fp fs e =
+let map_fam_event ?(fd = Fun.id) fp fs e =
   let efam_name =
     match e.Dbdisk.efam_name with
     | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
@@ -238,7 +241,7 @@ let map_fam_event ?(fd = identity) fp fs e =
     efam_witnesses;
   }
 
-let map_family_ps ?(fd = identity) fp ff fs fam =
+let map_family_ps ?(fd = Fun.id) fp ff fs fam =
   {
     Dbdisk.marriage = Futil.map_cdate fd fam.Dbdisk.marriage;
     marriage_place = fs fam.marriage_place;

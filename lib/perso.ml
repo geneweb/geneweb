@@ -1070,7 +1070,7 @@ let build_list_eclair conf base v p =
     (fun (istr, place) ht_val ->
       let surn = Gwdb.sou base istr in
       if surn <> "?" then
-        let p, db, de, pl = (fun x -> x) !ht_val in
+        let p, db, de, pl = !ht_val in
         list := (surn, place, db, de, p, pl) :: !list)
     ht;
   (* On trie la liste par nom, puis lieu. *)

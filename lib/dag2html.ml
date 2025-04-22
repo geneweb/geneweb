@@ -1378,9 +1378,9 @@ let invert_dag d =
     let n = d.dag.(i) in
     d.dag.(i) <-
       {
-        pare = List.map (fun x -> x) n.chil;
+        pare = List.map Fun.id n.chil;
         valu = n.valu;
-        chil = List.map (fun x -> x) n.pare;
+        chil = List.map Fun.id n.pare;
       }
   done;
   d

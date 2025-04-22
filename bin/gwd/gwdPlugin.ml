@@ -1,9 +1,10 @@
-open Geneweb
-
 let assets = ref ""
 let registered = ref []
 
-let ht : (string, string * (Config.config -> string option -> bool)) Hashtbl.t =
+let ht :
+    ( string,
+      string * (Geneweb.Config.config -> string option -> bool) )
+    Hashtbl.t =
   Hashtbl.create 0
 
 let register ~ns list =
@@ -15,5 +16,7 @@ let register ~ns list =
       Hashtbl.add ht m (ns, fn))
     list
 
-let se : (string * (Config.config -> string option -> unit)) list ref = ref []
+let se : (string * (Geneweb.Config.config -> string option -> unit)) list ref =
+  ref []
+
 let register_se ~ns fn = Ext_list.ref_append se (ns, fn !assets)

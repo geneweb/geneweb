@@ -81,9 +81,6 @@ let bench name fn =
   pprint_gc (diff gc1 gc2);
   res
 
-let print_callstack ?(max = 5) () =
-  Printexc.(print_raw_backtrace stderr @@ get_callstack max)
-
 let verbose = ref true
 
 (* [decline] has been deprecated since version 5.00
@@ -323,19 +320,6 @@ let input_lexicon lang ht open_fname =
   in
   key ()
 
-let array_to_list_map fn a = Array.fold_right (fun x acc -> fn x :: acc) a []
-let array_to_list_rev_map fn a = Array.fold_left (fun acc x -> fn x :: acc) [] a
-
-let array_assoc k a =
-  let len = Array.length a in
-  let rec loop i =
-    if i = len then raise Not_found
-    else
-      let k', v = Array.unsafe_get a i in
-      if k' = k then v else loop (i + 1)
-  in
-  loop 0
-
 let string_of_int_sep sep x =
   let digits, len =
     let rec loop (d, l) x =
@@ -368,16 +352,6 @@ let random_magic =
   Random.self_init ();
   Random.bits () |> string_of_int
 
-let array_except v a =
-  let rec loop i =
-    if i = Array.length a then Array.copy a
-    else if a.(i) = v then
-      Array.append (Array.sub a 0 i)
-        (Array.sub a (i + 1) (Array.length a - i - 1))
-    else loop (i + 1)
-  in
-  loop 0
-
 let default_particles =
   let upper =
     [
@@ -399,16 +373,6 @@ let default_particles =
     ]
   in
   List.rev_append (List.rev_map String.lowercase_ascii upper) upper
-
-let array_forall2 f a1 a2 =
-  if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
-  else
-    let rec loop i =
-      if i = Array.length a1 then true
-      else if f a1.(i) a2.(i) then loop (i + 1)
-      else false
-    in
-    loop 0
 
 let input_file_ic ic =
   let len = in_channel_length ic in

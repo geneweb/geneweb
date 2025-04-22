@@ -20,9 +20,9 @@ end)
 let insert_person base p a u =
   let iper = Gwdb_driver.new_iper base in
   let p = { p with Def.key_index = iper } in
-  Gwdb_driver.insert_ascend base iper a;
-  Gwdb_driver.insert_union base iper u;
-  Gwdb_driver.insert_person base iper p;
+  Gwdb_driver.patch_ascend base iper a;
+  Gwdb_driver.patch_union base iper u;
+  Gwdb_driver.patch_person base iper p;
   iper
 
 (** [insert_family base f c d]
@@ -32,9 +32,9 @@ let insert_person base p a u =
 *)
 let insert_family base f c d =
   let ifam = Gwdb_driver.new_ifam base in
-  Gwdb_driver.insert_family base ifam f;
-  Gwdb_driver.insert_couple base ifam c;
-  Gwdb_driver.insert_descend base ifam d;
+  Gwdb_driver.patch_family base ifam f;
+  Gwdb_driver.patch_couple base ifam c;
+  Gwdb_driver.patch_descend base ifam d;
   ifam
 
 (** DELETE *)
@@ -64,7 +64,7 @@ let rec delete_person excl base ip =
         Gwdb_driver.delete_ascend base ip;
         (* remove person id from family descendants *)
         let children =
-          (get_gen_descend base ifam).Def.children |> Mutil.array_except ip
+          (get_gen_descend base ifam).Def.children |> Ext_array.except ip
         in
         Gwdb_driver.patch_descend base ifam { children };
         if children = [| ip |] then
@@ -158,7 +158,7 @@ and delete_family excl base ifam =
     excl children
 
 and rm_union base ifam iper =
-  { Def.family = (get_gen_union base iper).family |> Mutil.array_except ifam }
+  { Def.family = (get_gen_union base iper).family |> Ext_array.except ifam }
   |> patch_union base iper
 
 (** [delete_person base iper] and [delete_family base ifam]

@@ -2,22 +2,15 @@
 
 let () = Sys.enable_runtime_warnings Geneweb.Dev_config.debug
 
-open Geneweb
-open Config
-open Def
-open Util
-open Gwd_lib
-module StrSet = Ext_string.Set
-
 let output_conf =
   {
-    status = Wserver.http;
+    Geneweb.Config.status = Wserver.http;
     header = Wserver.header;
     body = Wserver.print_string;
     flush = Wserver.wflush;
   }
 
-let printer_conf = { Config.empty with output_conf }
+let printer_conf = { Geneweb.Config.empty with output_conf }
 let auth_file = ref ""
 let cache_langs = ref []
 let choose_browser_lang = ref false
@@ -60,7 +53,7 @@ let is_multipart_form =
     loop 0
 
 let extract_boundary content_type =
-  List.assoc "boundary" (Util.create_env content_type)
+  List.assoc "boundary" (Geneweb.Util.create_env content_type)
 
 let print_and_cut_if_too_big oc str =
   let rec loop i =
@@ -80,7 +73,7 @@ type auth_report = {
   ar_ok : bool;
   ar_command : string;
   ar_passwd : string;
-  ar_scheme : auth_scheme_kind;
+  ar_scheme : Geneweb.Config.auth_scheme_kind;
   ar_user : string;
   ar_name : string;
   ar_wizard : bool;
@@ -102,12 +95,12 @@ let log_passwd_failed ar tm from request base_file =
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
 let copy_file conf fname =
-  match Util.open_etc_file fname with
+  match Geneweb.Util.open_etc_file fname with
   | Some (ic, _fname) ->
       (try
          while true do
            let c = input_char ic in
-           Output.printf conf "%c" c
+           Geneweb.Output.printf conf "%c" c
          done
        with _ -> ());
       close_in ic;
@@ -115,23 +108,23 @@ let copy_file conf fname =
   | None -> false
 
 let http conf status =
-  Output.status conf status;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1"
+  Geneweb.Output.status conf status;
+  Geneweb.Output.header conf "Content-type: text/html; charset=iso-8859-1"
 
 let robots_txt conf =
   Log.syslog `LOG_NOTICE "Robot request";
-  Output.status conf Def.OK;
-  Output.header conf "Content-type: text/plain";
+  Geneweb.Output.status conf Def.OK;
+  Geneweb.Output.header conf "Content-type: text/plain";
   if copy_file conf "robots" then ()
   else (
-    Output.print_sstring conf "User-Agent: *\n";
-    Output.print_sstring conf "Disallow: /\n")
+    Geneweb.Output.print_sstring conf "User-Agent: *\n";
+    Geneweb.Output.print_sstring conf "Disallow: /\n")
 
 let refuse_log conf from =
   Log.syslog `LOG_NOTICE @@ "Excluded: " ^ from;
   http conf Def.Forbidden;
-  Output.header conf "Content-type: text/html";
-  Output.print_sstring conf
+  Geneweb.Output.header conf "Content-type: text/html";
+  Geneweb.Output.print_sstring conf
     "Your access has been disconnected by administrator.\n";
   let _ = (copy_file conf "refuse" : bool) in
   ()
@@ -139,16 +132,17 @@ let refuse_log conf from =
 let only_log conf from =
   Log.syslog `LOG_NOTICE @@ "Connection refused from " ^ from;
   http conf Def.OK;
-  Output.header conf "Content-type: text/html; charset=iso-8859-1";
-  Output.print_sstring conf "<head><title>Invalid access</title></head>\n";
-  Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
+  Geneweb.Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Geneweb.Output.print_sstring conf
+    "<head><title>Invalid access</title></head>\n";
+  Geneweb.Output.print_sstring conf "<body><h1>Invalid access</h1></body>\n"
 
 let refuse_auth conf from auth auth_type =
   Log.syslog `LOG_NOTICE
   @@ Printf.sprintf
        "Access failed --- From: %s --- Basic realm: %s --- Response: %s" from
        auth_type auth;
-  Util.unauthorized conf auth_type
+  Geneweb.Util.unauthorized conf auth_type
 
 let index_from s o c =
   match String.index_from_opt s o c with Some i -> i | None -> String.length s
@@ -188,7 +182,7 @@ let load_lexicon =
               rev_iter
                 (fun fname ->
                   Mutil.input_lexicon lang ht (fun () ->
-                      Secure.open_in (Util.search_in_assets fname)))
+                      Secure.open_in (Geneweb.Util.search_in_assets fname)))
                 !lexicon_list;
               ht)
         in
@@ -219,18 +213,20 @@ let register_plugin dir =
         if not (Sys.is_directory f) then lexicon_list := f :: !lexicon_list)
       lex);
   let assets = Filename.concat dir "assets" in
-  GwdPlugin.assets := assets;
+  Gwd_lib.GwdPlugin.assets := assets;
   (try
      if Sys.file_exists dir then Secure.add_assets assets;
      Dynlink.loadfile plugin
    with Dynlink.Error e ->
      raise (Register_plugin_failure (plugin, `dynlink_error e)));
-  GwdPlugin.assets := ""
+  Gwd_lib.GwdPlugin.assets := ""
 
 let alias_lang lang =
   if String.length lang < 2 then lang
   else
-    let fname = Util.search_in_assets (Filename.concat "lang" "alias_lg.txt") in
+    let fname =
+      Geneweb.Util.search_in_assets (Filename.concat "lang" "alias_lg.txt")
+    in
     try
       let ic = Secure.open_in fname in
       let lang =
@@ -253,7 +249,7 @@ let alias_lang lang =
 
 let log_redirect from request req =
   Lock.control
-    (SrcfileDisplay.adm_file "gwd.lck")
+    (Geneweb.SrcfileDisplay.adm_file "gwd.lck")
     true
     ~onerror:(fun () -> ())
     (fun () ->
@@ -262,20 +258,21 @@ let log_redirect from request req =
       @@ Printf.sprintf "%s --- From: %s --- Referer: %s" req from referer)
 
 let print_redirected conf from request new_addr =
-  let req = Util.get_request_string conf in
+  let req = Geneweb.Util.get_request_string conf in
   let link = "http://" ^ new_addr ^ req in
   let env = [ ("link", Mutil.encode link) ] in
   log_redirect from request req;
-  include_template conf env "redirect" (fun () ->
-      let title _ = Output.print_sstring conf "Address changed" in
-      Hutil.header conf title;
-      Output.print_sstring conf "Use the following address:\n<p>\n";
-      Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link;
-      Hutil.trailer conf)
+  Geneweb.Util.include_template conf env "redirect" (fun () ->
+      let title _ = Geneweb.Output.print_sstring conf "Address changed" in
+      Geneweb.Hutil.header conf title;
+      Geneweb.Output.print_sstring conf "Use the following address:\n<p>\n";
+      Geneweb.Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link
+        link;
+      Geneweb.Hutil.trailer conf)
 
 let nonce_private_key =
   Lazy.from_fun (fun () ->
-      let cnt_dir = Filename.concat !Util.cnt_dir "cnt" in
+      let cnt_dir = Filename.concat !Geneweb.Util.cnt_dir "cnt" in
       let fname = Filename.concat cnt_dir "gwd_private.txt" in
       let k =
         try
@@ -320,7 +317,7 @@ let trace_auth base_env f =
 
 let unauth_server conf ar =
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Output.status conf Def.Unauthorized;
+  Geneweb.Output.status conf Def.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
     let _ =
@@ -339,13 +336,15 @@ let unauth_server conf ar =
               List.iter (fun s -> Printf.fprintf oc "  * %s\n" s) conf.request)
             ar.ar_passwd nonce ar.ar_can_stale)
     in
-    Output.header conf
+    Geneweb.Output.header conf
       "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\"" typ conf.bname
       (if nonce = "" then "" else Printf.sprintf ",nonce=\"%s\"" nonce)
       (if ar.ar_can_stale then ",stale=true" else "")
   else
-    Output.header conf "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
+    Geneweb.Output.header conf "WWW-Authenticate: Basic realm=\"%s %s\"" typ
+      conf.bname;
   let url =
+    let open Def in
     conf.bname ^<^ "?"
     ^<^ List.fold_left
           (fun s (k, v) ->
@@ -354,49 +353,54 @@ let unauth_server conf ar =
           (Adef.encoded "")
           (conf.henv @ conf.senv @ conf.env)
   in
-  let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
+  let txt i =
+    Geneweb.Util.transl_nth conf "wizard/wizards/friend/friends/exterior" i
+  in
   let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
   let title h =
-    Output.printf conf
-      (fcapitale (ftransl conf "%s access cancelled for that page"))
+    Geneweb.Output.printf conf
+      (Geneweb.Util.fcapitale
+         (Geneweb.Util.ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
-  Hutil.header_without_http conf title;
-  Output.print_sstring conf "<h1>\n";
+  Geneweb.Hutil.header_without_http conf title;
+  Geneweb.Output.print_sstring conf "<h1>\n";
   title false;
-  Output.print_sstring conf "</h1>\n";
-  Output.print_sstring conf "<dl>\n";
+  Geneweb.Output.print_sstring conf "</h1>\n";
+  Geneweb.Output.print_sstring conf "<dl>\n";
   (let alt_bind, alt_access =
      if ar.ar_passwd = "w" then ("&w=f", txt 2) else ("&w=w", txt 0)
    in
-   Output.print_sstring conf "<dd>\n";
-   Output.print_sstring conf "<ul>\n";
-   Output.print_sstring conf "<li>\n";
-   Output.printf conf "%s : <a href=\"%s%s\">%s</a>" (transl conf "access")
+   Geneweb.Output.print_sstring conf "<dd>\n";
+   Geneweb.Output.print_sstring conf "<ul>\n";
+   Geneweb.Output.print_sstring conf "<li>\n";
+   Geneweb.Output.printf conf "%s : <a href=\"%s%s\">%s</a>"
+     (Geneweb.Util.transl conf "access")
      (url : Adef.encoded_string :> string)
      alt_bind alt_access;
-   Output.print_sstring conf "</li>\n";
-   Output.print_sstring conf "<li>\n";
-   Output.printf conf "%s : <a href=\"%s\">%s</a>" (transl conf "access")
+   Geneweb.Output.print_sstring conf "</li>\n";
+   Geneweb.Output.print_sstring conf "<li>\n";
+   Geneweb.Output.printf conf "%s : <a href=\"%s\">%s</a>"
+     (Geneweb.Util.transl conf "access")
      (url : Adef.encoded_string :> string)
      (txt 4);
-   Output.print_sstring conf "</li>\n";
-   Output.print_sstring conf "</ul>\n";
-   Output.print_sstring conf "</dd>\n");
-  Output.print_sstring conf "</dl>\n";
-  Hutil.trailer conf
+   Geneweb.Output.print_sstring conf "</li>\n";
+   Geneweb.Output.print_sstring conf "</ul>\n";
+   Geneweb.Output.print_sstring conf "</dd>\n");
+  Geneweb.Output.print_sstring conf "</dl>\n";
+  Geneweb.Hutil.trailer conf
 
 let gen_match_auth_file test_user_and_password auth_file =
   if auth_file = "" then None
   else
-    let aul = read_gen_auth_file auth_file in
+    let aul = Geneweb.Util.read_gen_auth_file auth_file in
     let rec loop = function
       | au :: aul ->
           if test_user_and_password au then
             let s =
               try
-                let i = String.index au.au_info ':' in
-                String.sub au.au_info 0 i
+                let i = String.index au.Geneweb.Util.au_info ':' in
+                String.sub au.Geneweb.Util.au_info 0 i
               with Not_found -> ""
             in
             let username =
@@ -413,11 +417,13 @@ let gen_match_auth_file test_user_and_password auth_file =
     loop aul
 
 let basic_match_auth_file uauth =
-  gen_match_auth_file (fun au -> au.au_user ^ ":" ^ au.au_passwd = uauth)
+  gen_match_auth_file (fun au ->
+      au.Geneweb.Util.au_user ^ ":" ^ au.Geneweb.Util.au_passwd = uauth)
 
 let digest_match_auth_file asch =
   gen_match_auth_file (fun au ->
-      is_that_user_and_password asch au.au_user au.au_passwd)
+      Geneweb.Util.is_that_user_and_password asch au.Geneweb.Util.au_user
+        au.Geneweb.Util.au_passwd)
 
 let match_simple_passwd sauth uauth =
   match String.index_opt sauth ':' with
@@ -442,7 +448,7 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
   ((not check_from) || addr1 = addr2) && base1_pw1 = base2_pw2
 
 let get_actlog check_from utm from_addr base_password =
-  let fname = SrcfileDisplay.adm_file "actlog" in
+  let fname = Geneweb.SrcfileDisplay.adm_file "actlog" in
   try
     let ic = Secure.open_in fname in
     let tmout = float_of_int !login_timeout in
@@ -485,7 +491,7 @@ let get_actlog check_from utm from_addr base_password =
   with Sys_error _ -> ([], ATnormal, false)
 
 let set_actlog list =
-  let fname = SrcfileDisplay.adm_file "actlog" in
+  let fname = Geneweb.SrcfileDisplay.adm_file "actlog" in
   try
     let oc = Secure.open_out fname in
     List.iter
@@ -498,7 +504,7 @@ let set_actlog list =
 
 let get_token check_from utm from_addr base_password =
   Lock.control
-    (SrcfileDisplay.adm_file "gwd.lck")
+    (Geneweb.SrcfileDisplay.adm_file "gwd.lck")
     true
     ~onerror:(fun () -> ATnormal)
     (fun () ->
@@ -523,7 +529,7 @@ let random_self_init () =
 
 let set_token utm from_addr base_file acc user =
   Lock.control
-    (SrcfileDisplay.adm_file "gwd.lck")
+    (Geneweb.SrcfileDisplay.adm_file "gwd.lck")
     true
     ~onerror:(fun () -> "")
     (fun () ->
@@ -565,10 +571,10 @@ let http_preferred_language request =
     let list = List.map String.trim list in
     let rec loop = function
       | lang :: list ->
-          if List.mem lang Version.available_languages then lang
+          if List.mem lang Geneweb.Version.available_languages then lang
           else if String.length lang = 5 then
             let blang = String.sub lang 0 2 in
-            if List.mem blang Version.available_languages then blang
+            if List.mem blang Geneweb.Version.available_languages then blang
             else loop list
           else loop list
       | [] -> ""
@@ -576,7 +582,7 @@ let http_preferred_language request =
     loop list
 
 let allowed_denied_titles key extra_line env base_env () =
-  if p_getenv env "all_titles" = Some "on" then []
+  if Geneweb.Util.p_getenv env "all_titles" = Some "on" then []
   else
     try
       let fname = List.assoc key base_env in
@@ -602,14 +608,14 @@ let allowed_denied_titles key extra_line env base_env () =
                     ^ if pla = "*" then pla else Name.lower pla
                 | None -> Name.lower line
               in
-              StrSet.add line set
+              Ext_string.Set.add line set
           in
           if eof then (
             close_in ic;
-            StrSet.elements set)
+            Ext_string.Set.elements set)
           else loop set
         in
-        loop StrSet.empty
+        loop Ext_string.Set.empty
     with Not_found | Sys_error _ -> []
 
 let allowed_titles env =
@@ -746,7 +752,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
       let s = "Basic " in
       if Ext_string.start_with s 0 auth then
         let i = String.length s in
-        Base64.decode (String.sub auth i (String.length auth - i))
+        Geneweb.Base64.decode (String.sub auth i (String.length auth - i))
       else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
@@ -810,7 +816,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     else (base_file ^ "_" ^ passwd, passwd)
   in
   let auth_scheme =
-    if (not wizard) && not friend then NoAuth
+    if (not wizard) && not friend then Geneweb.Config.NoAuth
     else
       let realm =
         if wizard then "Wizard " ^ base_file else "Friend " ^ base_file
@@ -855,8 +861,10 @@ let bad_nonce_report command passwd_char =
   }
 
 let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz =
-  let asch = HttpAuth (Digest ds) in
-  if wf_passwd <> "" && is_that_user_and_password asch ds.ds_username wf_passwd
+  let asch = Geneweb.Config.HttpAuth (Digest ds) in
+  if
+    wf_passwd <> ""
+    && Geneweb.Util.is_that_user_and_password asch ds.ds_username wf_passwd
   then
     if ds.ds_nonce <> nonce then bad_nonce_report command passwd_char
     else
@@ -946,7 +954,7 @@ let digest_authorization request base_env passwd utm base_file command =
       let get_digenv s = try List.assoc s digenv with Not_found -> "" in
       let ds =
         {
-          ds_username = get_digenv "username";
+          Geneweb.Config.ds_username = get_digenv "username";
           ds_realm = get_digenv "realm";
           ds_nonce = get_digenv "nonce";
           ds_meth = meth;
@@ -1016,7 +1024,9 @@ let authorization from_addr request base_env passwd access_type utm base_file
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
-      let auth_scheme = TokenAuth { ts_user = user; ts_pass = passwd } in
+      let auth_scheme =
+        Geneweb.Config.TokenAuth { ts_user = user; ts_pass = passwd }
+      in
       {
         ar_ok = true;
         ar_command = command;
@@ -1035,7 +1045,9 @@ let authorization from_addr request base_env passwd access_type utm base_file
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
-      let auth_scheme = TokenAuth { ts_user = user; ts_pass = passwd } in
+      let auth_scheme =
+        Geneweb.Config.TokenAuth { ts_user = user; ts_pass = passwd }
+      in
       {
         ar_ok = true;
         ar_command = command;
@@ -1072,9 +1084,9 @@ let authorization from_addr request base_env passwd access_type utm base_file
           base_file command
 
 let dates_format_of_string = function
-  | "day_month_year" -> Config.DMY
-  | "month_day_year" -> Config.MDY
-  | _ -> Config.DMY
+  | "day_month_year" -> Geneweb.Config.DMY
+  | "month_day_year" -> Geneweb.Config.MDY
+  | _ -> Geneweb.Config.DMY
 
 let make_conf from_addr request script_name env =
   let utm = Unix.time () in
@@ -1122,8 +1134,8 @@ let make_conf from_addr request script_name env =
   in
   let threshold_test, env = extract_assoc "threshold" env in
   if threshold_test <> "" then
-    RelationLink.threshold := int_of_string threshold_test;
-  let base_env = Util.read_base_env ~bname:base_file in
+    Geneweb.RelationLink.threshold := int_of_string threshold_test;
+  let base_env = Geneweb.Util.read_base_env ~bname:base_file in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -1151,7 +1163,7 @@ let make_conf from_addr request script_name env =
   let manitou =
     try
       ar.ar_wizard && ar.ar_user <> ""
-      && p_getenv env "manitou" <> Some "off"
+      && Geneweb.Util.p_getenv env "manitou" <> Some "off"
       && List.assoc "manitou" base_env = ar.ar_user
     with Not_found -> false
   in
@@ -1165,7 +1177,7 @@ let make_conf from_addr request script_name env =
   let dates_format =
     let df_opt = List.assoc_opt "dates_format" base_env in
     let df_opt = Option.map dates_format_of_string df_opt in
-    Option.value ~default:Config.DMY df_opt
+    Option.value ~default:Geneweb.Config.DMY df_opt
   in
   let default_contemporary_private_years =
     try int_of_string (List.assoc "default_contemporary_private_years" base_env)
@@ -1173,7 +1185,7 @@ let make_conf from_addr request script_name env =
   in
   let conf =
     {
-      from = from_addr;
+      Geneweb.Config.from = from_addr;
       api_mode = false;
       manitou;
       supervisor;
@@ -1250,9 +1262,12 @@ let make_conf from_addr request script_name env =
       auth_file =
         (try
            let x = List.assoc "auth_file" base_env in
-           if x = "" then !auth_file else Util.bpath x
+           if x = "" then !auth_file else Geneweb.GWPARAM.bpath x
          with Not_found -> !auth_file);
-      border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
+      border =
+        (match Geneweb.Util.p_getint env "border" with
+        | Some i -> i
+        | None -> 0);
       n_connect = None;
       today =
         {
@@ -1303,7 +1318,7 @@ let log tm conf from gauth request script_name contents =
   output_char oc '\n';
   Printf.fprintf oc "  From: %s\n" from;
   if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth;
-  if conf.wizard && not conf.friend then
+  if conf.Geneweb.Config.wizard && not conf.friend then
     Printf.fprintf oc "  User: %s%s(wizard)\n" conf.user
       (if conf.user = "" then "" else " ")
   else if conf.friend && not conf.wizard then
@@ -1317,7 +1332,7 @@ let log tm conf from gauth request script_name contents =
 
 let is_robot from =
   Lock.control
-    (SrcfileDisplay.adm_file "gwd.lck")
+    (Geneweb.SrcfileDisplay.adm_file "gwd.lck")
     true
     ~onerror:(fun () -> false)
     (fun () ->
@@ -1333,7 +1348,7 @@ let auth_err request auth_file =
       | Some ic -> (
           let auth =
             let i = String.length "Basic " in
-            Base64.decode (String.sub auth i (String.length auth - i))
+            Geneweb.Base64.decode (String.sub auth i (String.length auth - i))
           in
           try
             let rec loop () =
@@ -1356,22 +1371,22 @@ let auth_err request auth_file =
     else (true, "(authorization not provided)")
 
 let no_access conf =
-  let title _ = Output.print_sstring conf "Error" in
-  Hutil.rheader conf title;
-  Output.print_sstring conf "No access to this database in CGI mode\n";
-  Hutil.trailer conf
+  let title _ = Geneweb.Output.print_sstring conf "Error" in
+  Geneweb.Hutil.rheader conf title;
+  Geneweb.Output.print_sstring conf "No access to this database in CGI mode\n";
+  Geneweb.Hutil.trailer conf
 
 let log_and_robot_check conf auth from request script_name contents =
   if !robot_xcl = None then
     log (Unix.time ()) conf from auth request script_name contents
   else
-    Lock.control (SrcfileDisplay.adm_file "gwd.lck") true ~onerror:ignore
-      (fun () ->
+    Lock.control (Geneweb.SrcfileDisplay.adm_file "gwd.lck")
+      true ~onerror:ignore (fun () ->
         let tm = Unix.time () in
         (match !robot_xcl with
         | Some (cnt, sec) ->
             let s = "suicide" in
-            let suicide = Util.p_getenv conf.env s <> None in
+            let suicide = Geneweb.Util.p_getenv conf.env s <> None in
             conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide)
         | _ -> ());
         log tm conf from auth request script_name contents)
@@ -1383,7 +1398,8 @@ let conf_and_connection =
     | None -> infinity
   in
   let context conf contents =
-    conf.bname
+    let open Def in
+    conf.Geneweb.Config.bname
     ^<^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
     ^<^ contents
   in
@@ -1397,7 +1413,7 @@ let conf_and_connection =
           else if !Wserver.cgi then (true, "")
           else auth_err request conf.auth_file
         in
-        let mode = Util.p_getenv conf.env "m" in
+        let mode = Geneweb.Util.p_getenv conf.env "m" in
         (if mode <> Some "IM" then
          let contents =
            if List.mem_assoc "log_pwd" env then Adef.encoded "..." else contents
@@ -1423,7 +1439,7 @@ let conf_and_connection =
             else
               let tm = Unix.time () in
               Lock.control
-                (SrcfileDisplay.adm_file "gwd.lck")
+                (Geneweb.SrcfileDisplay.adm_file "gwd.lck")
                 true
                 ~onerror:(fun () -> ())
                 (fun () -> log_passwd_failed ar tm from request conf.bname);
@@ -1435,7 +1451,7 @@ let conf_and_connection =
             in
             try
               let t1 = Unix.gettimeofday () in
-              Request.treat_request conf;
+              Gwd_lib.Request.treat_request conf;
               let t2 = Unix.gettimeofday () in
               if t2 -. t1 > slow_query_threshold then
                 Log.syslog `LOG_WARNING
@@ -1445,7 +1461,7 @@ let conf_and_connection =
             with
             | Exit -> ()
             | Def.HttpExn (code, _) as e ->
-                GWPARAM.output_error conf code;
+                Geneweb.GWPARAM.output_error conf code;
                 printexc e
             | e -> printexc e))
 
@@ -1491,14 +1507,14 @@ let excluded from =
   with Sys_error _ -> false
 
 let image_request conf script_name env =
-  match (Util.p_getenv env "m", Util.p_getenv env "v") with
+  match (Geneweb.Util.p_getenv env "m", Geneweb.Util.p_getenv env "v") with
   | Some "IM", Some fname ->
       let fname =
         if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
         else fname
       in
-      let (`Path fname) = Image.path_of_filename fname in
-      let _ = ImageDisplay.print_image_file conf fname in
+      let (`Path fname) = Geneweb.Image.path_of_filename fname in
+      let _ = Geneweb.ImageDisplay.print_image_file conf fname in
       true
   | _ ->
       let s = script_name in
@@ -1509,8 +1525,8 @@ let image_request conf script_name env =
         (* empeche d'avoir des images qui se trouvent dans le dossier   *)
         (* image. Si on ne fait pas de basename, alors ça marche.       *)
         (* let fname = Filename.basename fname in *)
-        let (`Path fname) = Image.path_of_filename fname in
-        let _ = ImageDisplay.print_image_file conf fname in
+        let (`Path fname) = Geneweb.Image.path_of_filename fname in
+        let _ = Geneweb.ImageDisplay.print_image_file conf fname in
         true
       else false
 
@@ -1530,7 +1546,7 @@ type misc_fname =
   | Woff2 of string
 
 let content_misc conf len misc_fname =
-  Output.status conf Def.OK;
+  Geneweb.Output.status conf Def.OK;
   let fname, t =
     match misc_fname with
     | Css fname -> (fname, "text/css")
@@ -1545,12 +1561,13 @@ let content_misc conf len misc_fname =
     | Woff2 fname -> (fname, "application/font-woff2")
   in
 
-  Output.header conf "Content-type: %s" t;
-  Output.header conf "Content-length: %d" len;
-  Output.header conf "Content-disposition: inline; filename=%s"
+  Geneweb.Output.header conf "Content-type: %s" t;
+  Geneweb.Output.header conf "Content-length: %d" len;
+  Geneweb.Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
-  Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
-  Output.flush conf
+  Geneweb.Output.header conf "Cache-control: private, max-age=%d"
+    (60 * 60 * 24 * 365);
+  Geneweb.Output.flush conf
 
 let find_misc_file name =
   if
@@ -1560,7 +1577,7 @@ let find_misc_file name =
          !plugins
   then name
   else
-    let name' = search_in_assets @@ Filename.concat "etc" name in
+    let name' = Geneweb.Util.search_in_assets @@ Filename.concat "etc" name in
     if Sys.file_exists name' then name' else ""
 
 let print_misc_file conf misc_fname =
@@ -1584,7 +1601,7 @@ let print_misc_file conf misc_fname =
         else
           let olen = min (Bytes.length buf) len in
           really_input ic buf 0 olen;
-          Output.print_sstring conf (Bytes.sub_string buf 0 olen);
+          Geneweb.Output.print_sstring conf (Bytes.sub_string buf 0 olen);
           loop (len - olen)
       in
       loop len;
@@ -1641,8 +1658,11 @@ let extract_multipart boundary str =
       if s = boundary then
         let s, i = next_line i in
         let s = String.lowercase_ascii s |> Adef.encoded in
-        let env = Util.create_env s in
-        match (Util.p_getenv env "name", Util.p_getenv env "filename") with
+        let env = Geneweb.Util.create_env s in
+        match
+          ( Geneweb.Util.p_getenv env "name",
+            Geneweb.Util.p_getenv env "filename" )
+        with
         | Some var, Some filename ->
             let var = strip_quotes var in
             let filename = strip_quotes filename in
@@ -1681,7 +1701,10 @@ let extract_multipart boundary str =
   let str, _ =
     List.fold_left
       (fun (str, sep) (v, x) ->
-        if v = "file" then (str, sep) else (str ^^^ sep ^<^ v ^<^ "=" ^<^ x, "&"))
+        if v = "file" then (str, sep)
+        else
+          let open Def in
+          (str ^^^ sep ^<^ v ^<^ "=" ^<^ x, "&"))
       (Adef.encoded "", "")
       env
   in
@@ -1697,7 +1720,7 @@ let build_env request (contents : Adef.encoded_string) :
         :> string)
     in
     extract_multipart boundary contents
-  else (contents, Util.create_env contents)
+  else (contents, Geneweb.Util.create_env contents)
 
 let connection (addr, request) script_name contents0 =
   let from =
@@ -1743,7 +1766,7 @@ let geneweb_server () =
       | Some addr -> addr
       | None -> ( try Unix.gethostname () with _ -> "computer")
     in
-    Printf.eprintf "GeneWeb %s - " Version.txt;
+    Printf.eprintf "GeneWeb %s - " Geneweb.Version.txt;
     if not !daemon then (
       Printf.eprintf
         "Possible addresses:\n\
@@ -1762,18 +1785,18 @@ let geneweb_server () =
         null_reopen [ Unix.O_WRONLY ] Unix.stdout;
         null_reopen [ Unix.O_WRONLY ] Unix.stderr)
       else exit 0;
-    Files.mkdir_p ~perm:0o777 (Filename.concat !Util.cnt_dir "cnt"));
+    Files.mkdir_p ~perm:0o777 (Filename.concat !Geneweb.Util.cnt_dir "cnt"));
   let max_clients = !max_clients in
   Wserver.f ~syslog:Log.syslog ~addr:!selected_addr ~port:!selected_port
     ~timeout:!conn_timeout ~max_clients ~handler:connection
 
 let cgi_timeout conf tmout _ =
-  Output.header conf "Content-type: text/html; charset=iso-8859-1";
-  Output.print_sstring conf "<head><title>Time out</title></head>\n";
-  Output.print_sstring conf "<body><h1>Time out</h1>\n";
-  Output.printf conf "Computation time > %d second(s)\n" tmout;
-  Output.print_sstring conf "</body>\n";
-  Output.flush conf;
+  Geneweb.Output.header conf "Content-type: text/html; charset=iso-8859-1";
+  Geneweb.Output.print_sstring conf "<head><title>Time out</title></head>\n";
+  Geneweb.Output.print_sstring conf "<body><h1>Time out</h1>\n";
+  Geneweb.Output.printf conf "Computation time > %d second(s)\n" tmout;
+  Geneweb.Output.print_sstring conf "</body>\n";
+  Geneweb.Output.flush conf;
   exit 0
 
 let manage_cgi_timeout tmout =
@@ -1787,7 +1810,7 @@ let manage_cgi_timeout tmout =
 
 let geneweb_cgi addr script_name contents =
   manage_cgi_timeout !conn_timeout;
-  (try Unix.mkdir (Filename.concat !Util.cnt_dir "cnt") 0o755
+  (try Unix.mkdir (Filename.concat !Geneweb.Util.cnt_dir "cnt") 0o755
    with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
     try
@@ -1850,7 +1873,7 @@ let slashify s =
 
 let make_cnt_dir x =
   Files.mkdir_p x;
-  Util.cnt_dir := x
+  Geneweb.Util.cnt_dir := x
 
 let arg_plugin_doc opt doc =
   doc
@@ -1957,7 +1980,7 @@ let main () =
         Arg.Set setup_link,
         " Display a link to local gwsetup in bottom of pages." );
       ( "-allowed_tags",
-        Arg.String (fun x -> Util.allowed_tags_file := x),
+        Arg.String (fun x -> Geneweb.Util.allowed_tags_file := x),
         "<FILE> HTML tags which are allowed to be displayed. One tag per line \
          in file." );
       ( "-wizard",
@@ -2060,12 +2083,12 @@ let main () =
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   (default_lang :=
      let s = try Sys.getenv "LANG" with Not_found -> "" in
-     if List.mem s Version.available_languages then s
+     if List.mem s Geneweb.Version.available_languages then s
      else
        let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
        if String.length s >= 2 then
          let s = String.sub s 0 2 in
-         if List.mem s Version.available_languages then s else "en"
+         if List.mem s Geneweb.Version.available_languages then s else "en"
        else "en");
   arg_parse_in_file
     (chop_extension Sys.argv.(0) ^ ".arg")
@@ -2073,19 +2096,22 @@ let main () =
   Arg.parse speclist anonfun usage;
   Geneweb.GWPARAM.set_syslog Log.syslog;
   List.iter register_plugin !plugins;
-  GWPARAM.init ();
+  Geneweb.GWPARAM.init ();
   cache_lexicon ();
   (if !images_dir <> "" then
    let abs_dir =
-     let f = Util.search_in_assets (Filename.concat !images_dir "gwback.jpg") in
+     let f =
+       Geneweb.Util.search_in_assets (Filename.concat !images_dir "gwback.jpg")
+     in
      let d = Filename.dirname f in
      if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
    in
    images_url := "file://" ^ slashify abs_dir);
-  if !Util.cnt_dir = Filename.current_dir_name then
-    Util.cnt_dir := Secure.base_dir ();
+  if !Geneweb.Util.cnt_dir = Filename.current_dir_name then
+    Geneweb.Util.cnt_dir := Secure.base_dir ();
   Wserver.stop_server :=
-    List.fold_left Filename.concat !Util.cnt_dir [ "cnt"; "STOP_SERVER" ];
+    List.fold_left Filename.concat !Geneweb.Util.cnt_dir
+      [ "cnt"; "STOP_SERVER" ];
   let query, cgi =
     try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
     with Not_found -> ("" |> Adef.encoded, !force_cgi)

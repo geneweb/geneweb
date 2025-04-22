@@ -1371,7 +1371,7 @@ let stringify s =
 
 let trans ?(autoescape = true) (conf : Geneweb.Config.config) =
   let trad ~kwargs s i =
-    let esc = if autoescape then Jingoo.Jg_utils.escape_html else fun s -> s in
+    let esc = if autoescape then Jingoo.Jg_utils.escape_html else Fun.id in
     try
       let s = Hashtbl.find conf.lexicon s in
       let t =

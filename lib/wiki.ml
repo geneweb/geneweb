@@ -18,9 +18,11 @@ let section_level s len =
 let notes_aliases conf =
   let fname =
     match List.assoc_opt "notes_alias_file" conf.Config.base_env with
-    | Some f -> Util.bpath f
+    | Some f -> GWPARAM.bpath f
     | None ->
-        Filename.concat (Util.bpath (conf.Config.bname ^ ".gwb")) "notes.alias"
+        Filename.concat
+          (GWPARAM.bpath (conf.Config.bname ^ ".gwb"))
+          "notes.alias"
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic ->

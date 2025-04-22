@@ -615,11 +615,10 @@ let pget_opt conf base ip =
 let pget conf base ip =
   Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
-let string_gen_person base p =
-  Futil.map_person_ps (fun p -> p) (Gwdb.sou base) p
+let string_gen_person base p = Futil.map_person_ps Fun.id (Gwdb.sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (fun f -> f) (Gwdb.sou base) fam
+  Futil.map_family_ps Fun.id Fun.id (Gwdb.sou base) fam
 
 (* TODO
    should it be is_empty_name instead? (deleted person have surname and first_name = "?")
@@ -1029,8 +1028,6 @@ let string_of_access conf access =
   in
   Adef.safe @@ transl_nth conf "iftitles/public/private" n
 
-let base_path pref bname = GWPARAM.base_path pref bname
-let bpath bname = GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 
@@ -1086,7 +1083,9 @@ let get_request_string conf =
 let message_to_wizard conf =
   if conf.Config.wizard || conf.Config.just_friend_wizard then (
     let print_file fname =
-      let fname = base_path [ "etc"; conf.Config.bname ] (fname ^ ".txt") in
+      let fname =
+        GWPARAM.base_path [ "etc"; conf.Config.bname ] (fname ^ ".txt")
+      in
       try
         let ic = Secure.open_in fname in
         try
@@ -1597,7 +1596,7 @@ let find_sosa_ref conf base =
 let write_default_sosa conf key =
   let gwf = List.remove_assoc "default_sosa_ref" conf.Config.base_env in
   let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
-  let fname = bpath (conf.Config.bname ^ ".gwf") in
+  let fname = GWPARAM.bpath (conf.Config.bname ^ ".gwf") in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Stdlib.open_out tmp_fname
@@ -1630,7 +1629,7 @@ let create_topological_sort conf base =
       Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Gwdb.iper_marker (Gwdb.ipers base) 0
   | _ ->
-      let bfile = bpath (conf.Config.bname ^ ".gwb") in
+      let bfile = GWPARAM.bpath (conf.Config.bname ^ ".gwb") in
       let tstab_file =
         if
           conf.Config.use_restrict && (not conf.Config.wizard)
@@ -1879,7 +1878,7 @@ let short_f_month m =
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
 let read_gen_auth_file fname =
-  let fname = bpath fname in
+  let fname = GWPARAM.bpath fname in
   try
     let ic = Secure.open_in fname in
     let rec loop data =
@@ -2156,7 +2155,7 @@ let cache_visited conf =
     if Filename.check_suffix conf.Config.bname ".gwb" then conf.Config.bname
     else conf.Config.bname ^ ".gwb"
   in
-  Filename.concat (bpath bname) "cache_visited"
+  Filename.concat (GWPARAM.bpath bname) "cache_visited"
 
 (* ************************************************************************ *)
 (*  [Fonc] read_visited : string -> cache_visited_t                         *)
@@ -2437,7 +2436,7 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env ~bname =
-  let fname = bpath (bname ^ ".gwf") in
+  let fname = GWPARAM.bpath (bname ^ ".gwf") in
   try
     let ic = Secure.open_in fname in
     let env =
