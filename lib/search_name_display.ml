@@ -338,14 +338,15 @@ let persons_of_absolute_surname =
     Gwdb.get_surname
 
 let first_name_print conf base x =
-  let list, _ =
+  let list =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
-      (persons_of_absolute_first_name conf base x, fun _ -> assert false)
-    else if x = "" then ([], fun _ -> assert false)
+      persons_of_absolute_first_name conf base x
+    else if x = "" then []
     else
-      persons_of_fsname conf base Gwdb.base_strings_of_first_name
-        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
-        Gwdb.get_first_name x
+      fst
+      @@ persons_of_fsname conf base Gwdb.base_strings_of_first_name
+           (Gwdb.spi_find (Gwdb.persons_of_first_name base))
+           Gwdb.get_first_name x
   in
   let list =
     List.map
@@ -883,16 +884,15 @@ type first_name_search_result =
   (string * (Ext_string.Set.t * Gwdb.iper list)) list
 
 let search_first_name conf base x : first_name_search_result =
-  let list, _ =
+  let list =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
-      ( persons_of_absolute_first_name conf base x,
-        fun _ -> raise (Match_failure ("src/some.ml", 1007, 51)) )
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 1008, 29)))
+      persons_of_absolute_first_name conf base x
+    else if x = "" then []
     else
-      persons_of_fsname conf base Gwdb.base_strings_of_first_name
-        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
-        Gwdb.get_first_name x
+      fst
+      @@ persons_of_fsname conf base Gwdb.base_strings_of_first_name
+           (Gwdb.spi_find (Gwdb.persons_of_first_name base))
+           Gwdb.get_first_name x
   in
   let list =
     List.map
