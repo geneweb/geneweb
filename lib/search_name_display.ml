@@ -128,9 +128,8 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
           let iperl =
             List.fold_left
               (fun iperl iper ->
-                if Gwdb.eq_istr (proj (Util.pget conf base iper)) istr then
-                  iper :: iperl
-                else iperl)
+                let person = Util.pget conf base iper in
+                if Gwdb.eq_istr (proj person) istr then iper :: iperl else iperl)
               [] iperl
           in
           if iperl = [] then l else (str, istr, iperl) :: l
