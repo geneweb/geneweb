@@ -203,22 +203,10 @@ let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
     | Some istrs -> istrs
     | None ->
         (* strip the string particle, lower it and add it to the strings data, return the id of the new string*)
-        let name = base.data.strings.get istr in
-        let split_strings = Name.split name in
-        let _, strings =
-          List.fold_right
-            (fun s (str, strings) ->
-              let s = s ^ " " ^ str in
-              (s, s :: strings))
-            split_strings ("", [])
-        in
-        let lowered_strings = List.map Name.lower strings in
         let lowered_strings_istrs =
-          List.filter_map
-            (fun s ->
-              if s <> "" then Some (StringData.insert_string strings_store s)
-              else None)
-            lowered_strings
+          Dutil.insert_lowered_name_suffix_istrs
+            ~insert_string:(StringData.insert_string strings_store)
+            ~base_data:base.data ~istr
         in
         Dutil.IntHT.add ht_mem istr lowered_strings_istrs;
         lowered_strings_istrs
