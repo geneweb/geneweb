@@ -841,8 +841,7 @@ let search_surname conf base x : surname_search_result =
   let list, name_inj =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, Fun.id)
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
+    else if x = "" then ([], Fun.id)
     else
       persons_of_fsname conf base Gwdb.base_strings_of_surname
         (Gwdb.spi_find (Gwdb.persons_of_surname base))
