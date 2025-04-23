@@ -1059,7 +1059,10 @@ let string_to_char_list s =
   exp (String.length s - 1) []
 
 let make_conf from_addr request script_name env =
-  let secret_salt = Some (Unix.getenv "SECRET_SALT") in
+  let secret_salt =
+    try Some (Unix.getenv "SECRET_SALT")
+    with Not_found -> Some "100"
+  in
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
     let str =
      Printf.sprintf
