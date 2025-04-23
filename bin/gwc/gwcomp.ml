@@ -580,7 +580,8 @@ let auth_access fn sn oc l =
               in
               loop ht)
         with Sys_error _ ->
-          Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
+          if Sys.file_exists friend_passwd_file then
+            Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
           ht)
     | None -> ht
   in
