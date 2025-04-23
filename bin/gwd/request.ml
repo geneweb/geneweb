@@ -132,7 +132,7 @@ let specify conf base n pl =
             tl);
       Geneweb.Output.print_string conf
         (Geneweb.DateDisplay.short_dates_text conf base p);
-      (if Geneweb.Util.authorized_age conf base p then
+      (if Geneweb.Person.is_visible conf base p then
        match Gwdb.get_first_names_aliases p with
        | [] -> ()
        | fnal ->

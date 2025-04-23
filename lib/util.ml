@@ -590,13 +590,11 @@ let is_old_person conf p =
       p.Def.access <> Def.Private && conf.Config.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = GWPARAM.p_auth conf base p
-
 let is_restricted (conf : Config.config) base (ip : Gwdb.iper) =
   let fct p =
     (not (Gwdb.is_quest_string (Gwdb.get_surname p)))
     && (not (Gwdb.is_quest_string (Gwdb.get_first_name p)))
-    && not (authorized_age conf base p)
+    && not (Person.is_visible conf base p)
   in
   if conf.Config.use_restrict then Gwdb.base_visible_get base fct ip else false
 
@@ -620,18 +618,13 @@ let string_gen_person base p = Futil.map_person_ps Fun.id (Gwdb.sou base) p
 let string_gen_family base fam =
   Futil.map_family_ps Fun.id Fun.id (Gwdb.sou base) fam
 
-(* TODO
-   should it be is_empty_name instead? (deleted person have surname and first_name = "?")
-   I don't think it is possible to have surname = empty_string *)
-let is_empty_person p = Gwdb.is_empty_string (Gwdb.get_surname p)
-
 let is_empty_name p =
   Gwdb.is_quest_string (Gwdb.get_surname p)
   && Gwdb.is_quest_string (Gwdb.get_first_name p)
 
 let is_fully_visible_to_visitors conf base p =
   let conf = { conf with Config.wizard = false; friend = false } in
-  authorized_age conf base p
+  Person.is_visible conf base p
 
 (* TODO should probably not exists *)
 let is_public conf base p =
@@ -828,7 +821,7 @@ let wprint_geneweb_link conf href s =
                  contenant la boucle, soit vers le menu de mise à jour.
     [Rem] : Exporté en clair hors de ce module.                              *)
 let update_family_loop conf base p s =
-  if is_empty_person p then s
+  if Person.is_empty p then s
   else
     let iper = Gwdb.get_iper p in
     let list = Gwdb.get_family p in
@@ -861,7 +854,7 @@ let update_family_loop conf base p s =
     else s
 
 let person_title conf base p =
-  if authorized_age conf base p then
+  if Person.is_visible conf base p then
     match main_title conf base p with
     | Some t -> one_title_text base t
     | None -> Adef.safe ""
@@ -1540,7 +1533,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
       let i = Gwdb.iper_of_string i in
       if Gwdb.iper_exists base i then
         let p = pget conf base i in
-        if is_empty_person p then None else Some p
+        if Person.is_empty p then None else Some p
       else None
   | _ -> (
       match
@@ -1553,8 +1546,9 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           match Gwdb.person_of_key base p n occ with
           | Some ip ->
               let p = pget conf base ip in
-              if is_empty_person p then None
-              else if (not (is_hide_names conf p)) || authorized_age conf base p
+              if Person.is_empty p then None
+              else if
+                (not (is_hide_names conf p)) || Person.is_visible conf base p
               then Some p
               else None
           | None -> None)
@@ -1573,7 +1567,7 @@ let person_exists conf base (fn, sn, oc) =
   | Some "off" -> true
   | Some _ | None -> (
       match Gwdb.person_of_key base fn sn oc with
-      | Some ip -> authorized_age conf base (pget conf base ip)
+      | Some ip -> Person.is_visible conf base (pget conf base ip)
       | None -> false)
 
 let default_sosa_ref conf base =
@@ -1584,7 +1578,7 @@ let default_sosa_ref conf base =
         match Gutil.person_ht_find_all base n with
         | [ ip ] ->
             let p = pget conf base ip in
-            if is_empty_person p then None else Some p
+            if Person.is_empty p then None else Some p
         | _ -> None)
   | None -> None
 
@@ -2352,7 +2346,7 @@ let select_mascdesc ?skip_descendants conf base ips gen_desc =
   select_desc ?skip_descendants conf base gen_desc ips
 
 let auth_warning conf base w =
-  let pauth p = authorized_age conf base p in
+  let pauth p = Person.is_visible conf base p in
   let fauth ifam =
     let fam = Gwdb.foi base ifam in
     pauth (Gwdb.get_father fam |> Gwdb.poi base)

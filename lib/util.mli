@@ -76,9 +76,6 @@ val nobtit : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title list
 
 val strictly_after_private_years : Config.config -> Date.dmy -> bool
 
-val authorized_age : Config.config -> Gwdb.base -> Gwdb.person -> bool
-(** Alias to GWPARAM.p_auth *)
-
 (* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
 val is_old_person :
   Config.config -> (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person -> bool
@@ -117,9 +114,6 @@ val wprint_geneweb_link :
 val is_restricted : Config.config -> Gwdb.base -> Gwdb.iper -> bool
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
     disabled returns always [false]. *)
-
-val is_empty_person : Gwdb.person -> bool
-(** Tells if person is an empty person (a placeholder: his surname is empty) *)
 
 val pget : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person
 (** Value of [pget_opt], map None to empty_person *)

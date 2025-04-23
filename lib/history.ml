@@ -57,8 +57,8 @@ let diff_visibility conf base op np =
   let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
   let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
   let tmp_conf = { conf with Config.wizard = false; friend = false } in
-  let old_visibility = Util.authorized_age tmp_conf base o_p in
-  let new_visibility = Util.authorized_age tmp_conf base n_p in
+  let old_visibility = Person.is_visible tmp_conf base o_p in
+  let new_visibility = Person.is_visible tmp_conf base n_p in
   if old_visibility <> new_visibility then
     [| "VISIBLE"; k; string_of_bool new_visibility |]
   else [||]
@@ -482,7 +482,7 @@ and eval_person_field_var conf base env p = function
       TemplAst.VVstring (HistoryDiff.history_file fn sn occ)
   | [ "is_invisible" ] ->
       let conf = { conf with wizard = false; friend = false } in
-      TemplAst.VVbool (not (Util.authorized_age conf base p))
+      TemplAst.VVbool (not (Person.is_visible conf base p))
   | [ "title" ] -> safe_val (Util.person_title conf base p)
   | [] ->
       TemplAst.VVstring
@@ -577,9 +577,9 @@ let print_foreach conf base print_ast eval_expr =
           let not_displayed =
             match hist_item with
             | HI_ind p ->
-                Util.is_empty_person p
+                Person.is_empty p
                 || Util.is_hide_names conf p
-                   && not (Util.authorized_age conf base p)
+                   && not (Person.is_visible conf base p)
             | _ -> false
           in
           if not_displayed then i

@@ -49,7 +49,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     match (nth, dates, name) with
     | n, _, _ when n > 0 -> true
     | _, _, Def.Tname _ -> true
-    | _, (Some _, _) :: _, _ -> Util.authorized_age conf base p
+    | _, (Some _, _) :: _, _ -> Person.is_visible conf base p
     | _ -> false
   in
   let acc =
@@ -81,7 +81,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     | _ -> (acc, first)
   in
   let acc =
-    if Util.authorized_age conf base p && dates <> [ (None, None) ] then
+    if Person.is_visible conf base p && dates <> [ (None, None) ] then
       fst
       @@ List.fold_left
            (fun (acc, first) (date_start, date_end) ->
@@ -657,7 +657,7 @@ let tree_generation_list conf base gv p =
 (* Ancestors surnames list *)
 
 let get_date_place conf base auth_for_all_anc p =
-  if auth_for_all_anc || Util.authorized_age conf base p then
+  if auth_for_all_anc || Person.is_visible conf base p then
     let d1 =
       match Date.od_of_cdate (Gwdb.get_birth p) with
       | None -> Date.od_of_cdate (Gwdb.get_baptism p)
@@ -914,7 +914,7 @@ let build_surnames_list conf base v p =
   let rec loop lev sosa p surn dp =
     if Gwdb.Marker.get mark (Gwdb.get_iper p) = 0 then ()
     else if lev = v then
-      if Util.is_hide_names conf p && not (Util.authorized_age conf base p) then
+      if Util.is_hide_names conf p && not (Person.is_visible conf base p) then
         ()
       else add_surname sosa p surn dp
     else (
@@ -930,11 +930,11 @@ let build_surnames_list conf base v p =
             && not (Gwdb.eq_istr surn (Gwdb.get_surname moth))
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
-          (if not (Util.is_empty_person fath) then
+          (if not (Person.is_empty fath) then
            let dp1 = merge_date_place conf base surn dp fath in
            loop (lev + 1) sosa fath (Gwdb.get_surname fath) dp1);
           let sosa = Sosa.inc sosa 1 in
-          if not (Util.is_empty_person moth) then
+          if not (Person.is_empty moth) then
             let dp2 = merge_date_place conf base surn dp moth in
             loop (lev + 1) sosa moth (Gwdb.get_surname moth) dp2
       | None -> add_surname sosa p surn dp)
@@ -1046,7 +1046,7 @@ let build_list_eclair conf base v p =
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
   let rec loop lev p surn =
     if lev = v then
-      if Util.is_hide_names conf p && not (Util.authorized_age conf base p) then
+      if Util.is_hide_names conf p && not (Person.is_visible conf base p) then
         ()
       else add_person p surn
     else (
@@ -1056,9 +1056,9 @@ let build_list_eclair conf base v p =
           let cpl = Gwdb.foi base ifam in
           let fath = Util.pget conf base (Gwdb.get_father cpl) in
           let moth = Util.pget conf base (Gwdb.get_mother cpl) in
-          if not (Util.is_empty_person fath) then
+          if not (Person.is_empty fath) then
             loop (lev + 1) fath (Gwdb.get_surname fath);
-          if not (Util.is_empty_person moth) then
+          if not (Person.is_empty moth) then
             loop (lev + 1) moth (Gwdb.get_surname moth)
       | None -> ())
   in
@@ -1168,9 +1168,9 @@ let links_to_ind conf base db key =
         let record_it =
           match pg with
           | Def.NLDB.PgInd ip ->
-              Util.authorized_age conf base (Util.pget conf base ip)
+              Person.is_visible conf base (Util.pget conf base ip)
           | Def.NLDB.PgFam ifam ->
-              Util.authorized_age conf base
+              Person.is_visible conf base
                 (Util.pget conf base (Gwdb.get_father @@ Gwdb.foi base ifam))
           | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
         in
@@ -1338,7 +1338,7 @@ let get_linked_page conf base p s =
 
 let make_ep conf base ip =
   let p = Util.pget conf base ip in
-  let p_auth = Util.authorized_age conf base p in
+  let p_auth = Person.is_visible conf base p in
   (p, p_auth)
 
 (* TODO this should be a (fam * cpl) option; None if m_auth is false *)
@@ -1349,8 +1349,8 @@ let make_efam conf base ip ifam =
   let ispouse = if ip = ifath then imoth else ifath in
   let cpl = (ifath, imoth, ispouse) in
   let m_auth =
-    Util.authorized_age conf base (Util.pget conf base ifath)
-    && Util.authorized_age conf base (Util.pget conf base imoth)
+    Person.is_visible conf base (Util.pget conf base ifath)
+    && Person.is_visible conf base (Util.pget conf base imoth)
   in
   (fam, cpl, m_auth)
 
@@ -1824,7 +1824,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | ("event_witness" as s) :: sl -> (
       match get_env s env with
       | Vind p ->
-          let ep = (p, Util.authorized_age conf base p) in
+          let ep = (p, Person.is_visible conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | "event_witnessed" :: sl -> (
@@ -1857,7 +1857,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | "child" :: sl -> (
       match get_env "child" env with
       | Vind p when mode_local env ->
-          let auth = Util.authorized_age conf base p in
+          let auth = Person.is_visible conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> (
@@ -1974,7 +1974,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | "parent" :: sl -> (
       match get_env "parent" env with
       | Vind p ->
-          let ep = (p, Util.authorized_age conf base p) in
+          let ep = (p, Person.is_visible conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | "prev_item" :: sl -> (
@@ -1999,7 +1999,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       let v0 = Gwdb.iper_of_string v in
       (* if v0 >= 0 && v0 < nb_of_persons base then *)
       let ep = make_ep conf base v0 in
-      if Util.is_empty_person (fst ep) then raise Not_found
+      if Person.is_empty (fst ep) then raise Not_found
       else eval_person_field_var conf base env ep loc sl
   (* else raise Not_found *)
   | "svar" :: i :: sl -> (
@@ -2023,7 +2023,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ip0 = Gwdb.get_iper p0 in
           match Util.branch_of_sosa conf base s0 (Util.pget conf base ip0) with
           | Some (p :: _) ->
-              let p_auth = Util.authorized_age conf base p in
+              let p_auth = Person.is_visible conf base p in
               eval_person_field_var conf base env (p, p_auth) loc sl
           | _ -> raise Not_found)
       | None -> raise Not_found)
@@ -2040,7 +2040,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
                 Util.branch_of_sosa conf base sosa (Util.pget conf base ip))
           with
           | Some (p :: _) ->
-              let p_auth = Util.authorized_age conf base p in
+              let p_auth = Person.is_visible conf base p in
               eval_person_field_var conf base env (p, p_auth) loc sl
           | _ -> raise Not_found)
       | _ -> raise Not_found)
@@ -2053,7 +2053,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
             Util.p_of_sosa conf base sosa a)
       with
       | Some np ->
-          let np_auth = Util.authorized_age conf base np in
+          let np_auth = Person.is_visible conf base np in
           eval_person_field_var conf base env (np, np_auth) loc sl
       | None -> raise Not_found)
   (* in "related" and "relation(_him/her)"
@@ -2106,7 +2106,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | "witness" :: sl -> (
       match get_env "witness" env with
       | Vind p ->
-          let ep = (p, Util.authorized_age conf base p) in
+          let ep = (p, Person.is_visible conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | sl -> eval_person_field_var conf base env ep loc sl
@@ -2194,8 +2194,8 @@ and eval_ancestor_field_var conf base env gp loc = function
           let ispouse = if ip = ifath then imoth else ifath in
           let c = (ifath, imoth, ispouse) in
           let m_auth =
-            Util.authorized_age conf base (Util.pget conf base ifath)
-            && Util.authorized_age conf base (Util.pget conf base imoth)
+            Person.is_visible conf base (Util.pget conf base ifath)
+            && Person.is_visible conf base (Util.pget conf base imoth)
           in
           eval_family_field_var conf base env (ifam, f, c, m_auth) loc sl
       | _ -> raise Not_found)
@@ -2644,7 +2644,7 @@ and eval_event_field_var conf base env (p, p_auth) event_item loc = function
       match Event.get_spouse_iper event_item with
       | Some isp ->
           let sp = Gwdb.poi base isp in
-          let ep = (sp, Util.authorized_age conf base sp) in
+          let ep = (sp, Person.is_visible conf base sp) in
           eval_person_field_var conf base env ep loc sl
       | None -> null_val)
   | [ s ] -> (
@@ -2655,10 +2655,10 @@ and eval_event_field_var conf base env (p, p_auth) event_item loc = function
 
 and eval_event_witnessed_var conf base env (p, e) loc = function
   | "event" :: sl ->
-      let ep = (p, Util.authorized_age conf base p) in
+      let ep = (p, Person.is_visible conf base p) in
       eval_event_field_var conf base env ep e loc sl
   | "person" :: sl ->
-      let ep = (p, Util.authorized_age conf base p) in
+      let ep = (p, Person.is_visible conf base p) in
       eval_person_field_var conf base env ep loc sl
   | _ -> raise Not_found
 
@@ -2689,9 +2689,9 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                   let mother = Util.pget conf base (Gwdb.get_mother fam) in
                   if
                     d.prec = Sure
-                    && Util.authorized_age conf base father
+                    && Person.is_visible conf base father
                     && Gwdb.get_death father = Def.NotDead
-                    && Util.authorized_age conf base mother
+                    && Person.is_visible conf base mother
                     && Gwdb.get_death mother = Def.NotDead
                   then
                     d.day = conf.Config.today.day
@@ -2973,7 +2973,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                 let isp = Gutil.spouse (Gwdb.get_iper p) fam in
                 let sp = Gwdb.poi base isp in
                 (* On sait que p_auth vaut vrai. *)
-                let m_auth = Util.authorized_age conf base sp in
+                let m_auth = Person.is_visible conf base sp in
                 m_auth
                 && (Gwdb.sou base (Gwdb.get_marriage_src fam) <> ""
                    || Gwdb.sou base (Gwdb.get_fsources fam) <> ""))
@@ -3014,8 +3014,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "hide_private_names" -> conf.Config.hide_private_names
   | "is_restricted" ->
       (* TODO why is it not Util.is_restricted *)
-      Util.is_empty_person p
-  | "is_contemporary" -> GWPARAM.is_contemporary conf base p
+      Person.is_empty p
+  | "is_contemporary" -> Person.is_contemporary conf base p
   | "name_is_hidden" -> NameDisplay.is_hidden conf base p
   | "name_is_restricted" -> NameDisplay.is_restricted conf base p
   | _ -> raise Not_found
@@ -3544,7 +3544,7 @@ and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
   | Some ifam ->
       let cpl = Gwdb.foi base ifam in
       let pp = Util.pget conf base (parent cpl) in
-      if p_auth && Util.authorized_age conf base pp then
+      if p_auth && Person.is_visible conf base pp then
         match
           ( Date.cdate_to_dmy_opt (Gwdb.get_birth pp),
             Date.cdate_to_dmy_opt (Gwdb.get_birth p) )
@@ -3783,8 +3783,7 @@ let print_foreach conf base print_ast eval_expr =
         | _ ->
             let auth =
               Array.for_all
-                (fun ip ->
-                  Util.authorized_age conf base (Util.pget conf base ip))
+                (fun ip -> Person.is_visible conf base (Util.pget conf base ip))
                 (Gwdb.get_children fam)
             in
             let env = ("auth", Vbool auth) :: env in
@@ -3806,14 +3805,14 @@ let print_foreach conf base print_ast eval_expr =
                 let env = ("child", Vind p) :: env in
                 let env = ("child_cnt", Vint (i + 1)) :: env in
                 let env =
-                  if i = n - 1 && not (Util.is_empty_person p) then
+                  if i = n - 1 && not (Person.is_empty p) then
                     ("pos", Vstring "prev") :: env
                   else if i = n then ("pos", Vstring "self") :: env
-                  else if i = n + 1 && not (Util.is_empty_person p) then
+                  else if i = n + 1 && not (Person.is_empty p) then
                     ("pos", Vstring "next") :: env
                   else env
                 in
-                let ep = (p, Util.authorized_age conf base p) in
+                let ep = (p, Person.is_visible conf base p) in
                 List.iter (print_ast env ep) al)
               (Gwdb.get_children fam);
 
@@ -3987,8 +3986,8 @@ let print_foreach conf base print_ast eval_expr =
              let ispouse = Gutil.spouse (Gwdb.get_iper p) fam in
              let cpl = (ifath, imoth, ispouse) in
              let m_auth =
-               Util.authorized_age conf base (Util.pget conf base ifath)
-               && Util.authorized_age conf base (Util.pget conf base imoth)
+               Person.is_visible conf base (Util.pget conf base ifath)
+               && Person.is_visible conf base (Util.pget conf base imoth)
              in
              let vfam = Vfam (ifam, fam, cpl, m_auth) in
              let env = ("#loop", Vint 0) :: env in
@@ -4158,7 +4157,7 @@ let print_foreach conf base print_ast eval_expr =
               let isp = Gutil.spouse (Gwdb.get_iper p) fam in
               let sp = Gwdb.poi base isp in
               (* On sait que p_auth vaut vrai. *)
-              let m_auth = Util.authorized_age conf base sp in
+              let m_auth = Person.is_visible conf base sp in
               if m_auth then
                 let lab =
                   if Array.length (Gwdb.get_family p) = 1 then ""
@@ -4299,7 +4298,7 @@ let print_foreach conf base print_ast eval_expr =
       | "child" :: sl -> (
           match get_env "child" env with
           | Vind p ->
-              let auth = Util.authorized_age conf base p in
+              let auth = Person.is_visible conf base p in
               let ep = (p, auth) in
               loop env ep efam sl
           | _ -> (
@@ -4307,7 +4306,7 @@ let print_foreach conf base print_ast eval_expr =
               | Vind p ->
                   let env = ("p_link", Vbool true) :: env in
                   let env = ("f_link", Vbool true) :: env in
-                  let auth = Util.authorized_age conf base p in
+                  let auth = Person.is_visible conf base p in
                   let ep = (p, auth) in
                   loop env ep efam sl
               | _ -> raise Not_found))
@@ -4322,7 +4321,7 @@ let print_foreach conf base print_ast eval_expr =
               let cpl = (ifath, Gwdb.get_mother cpl, ifath) in
               let m_auth =
                 p_auth
-                && Util.authorized_age conf base (Util.pget conf base ifath)
+                && Person.is_visible conf base (Util.pget conf base ifath)
               in
               let efam = Vfam (ifam, Gwdb.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
@@ -4351,7 +4350,7 @@ let print_foreach conf base print_ast eval_expr =
               let cpl = (ifath, Gwdb.get_mother cpl, ifath) in
               let m_auth =
                 p_auth
-                && Util.authorized_age conf base (Util.pget conf base ifath)
+                && Person.is_visible conf base (Util.pget conf base ifath)
               in
               let efam = Vfam (ifam, Gwdb.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
@@ -4448,7 +4447,7 @@ let eval_predefined_apply conf env f vl =
   | _ -> raise Not_found
 
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
-  let ep = (p, Util.authorized_age conf base p) in
+  let ep = (p, Person.is_visible conf base p) in
   (* TODO what is this? what are those "120" *)
   let emal =
     match Util.p_getint conf.Config.env "v" with Some i -> i | None -> 120
@@ -4500,7 +4499,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [
       ("p", Vind p);
-      ("p_auth", Vbool (Util.authorized_age conf base p));
+      ("p_auth", Vbool (Person.is_visible conf base p));
       ("count", Vcnt (ref 0));
       ("count1", Vcnt (ref 0));
       ("count2", Vcnt (ref 0));
@@ -4653,7 +4652,7 @@ let print_ascend conf base p =
       interp_templ templ conf base p
 
 let print_what_links conf base p =
-  if Util.authorized_age conf base p then (
+  if Person.is_visible conf base p then (
     let key =
       let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
       let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in

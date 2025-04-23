@@ -1063,7 +1063,7 @@ let check_illegal_access_update base person =
     let iper = person.Def.key_index in
     if Gwdb.iper_exists base iper then
       let old_person = Gwdb.poi base iper in
-      if Util.is_empty_person old_person then None
+      if Person.is_empty old_person then None
       else Some (Gwdb.get_access old_person)
     else None
   in

@@ -151,7 +151,7 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
    Gwdb.Collection.iter
      (fun i ->
        let p = Util.pget conf base i in
-       if Util.authorized_age conf base p then (
+       if Person.is_visible conf base p then (
          aux add_birth Gwdb.get_birth_place p;
          aux add_baptism Gwdb.get_baptism_place p;
          aux add_death Gwdb.get_death_place p;
@@ -166,8 +166,7 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
           let fath = Util.pget conf base (Gwdb.get_father fam) in
           let moth = Util.pget conf base (Gwdb.get_mother fam) in
           if
-            Util.authorized_age conf base fath
-            && Util.authorized_age conf base moth
+            Person.is_visible conf base fath && Person.is_visible conf base moth
           then (
             ht_add pl_ma fath;
             ht_add pl_ma moth))

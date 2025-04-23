@@ -324,7 +324,7 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
               if
                 Gwdb.eq_istr (get_field p) istr
                 && ((not (Util.is_hide_names conf p))
-                   || Util.authorized_age conf base p)
+                   || Person.is_visible conf base p)
               then iper :: iperl
               else iperl)
             [] iperl
@@ -367,8 +367,7 @@ let first_name_print conf base x =
         List.fold_right
           (fun p pl ->
             if
-              (not (Util.is_hide_names conf p))
-              || Util.authorized_age conf base p
+              (not (Util.is_hide_names conf p)) || Person.is_visible conf base p
             then p :: pl
             else pl)
           pl []
@@ -535,7 +534,7 @@ let print_one_branch conf base bh psn =
     print_branch conf base psn x p
   else (
     Output.print_sstring conf "<li>";
-    if Util.is_empty_person p then Output.print_sstring conf "&lt;&lt;"
+    if Person.is_empty p then Output.print_sstring conf "&lt;&lt;"
     else
       Util.wprint_geneweb_link conf (Util.acces conf base p)
         (Adef.safe "&lt;&lt;");
@@ -825,7 +824,7 @@ let surname_print conf base not_found_fun { iperl; list; bhl } x =
       let pl =
         List.filter
           (fun p ->
-            (not (Util.is_hide_names conf p)) || Util.authorized_age conf base p)
+            (not (Util.is_hide_names conf p)) || Person.is_visible conf base p)
           pl
       in
       print_family_alphabetic x conf base pl
@@ -917,8 +916,7 @@ let search_first_name_print conf base list x =
         List.fold_right
           (fun p pl ->
             if
-              (not (Util.is_hide_names conf p))
-              || Util.authorized_age conf base p
+              (not (Util.is_hide_names conf p)) || Person.is_visible conf base p
             then p :: pl
             else pl)
           pl []

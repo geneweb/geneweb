@@ -177,7 +177,7 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 let has_access_to_portrait conf base p =
   let img = Gwdb.get_image p in
   (not conf.Config.no_image)
-  && Util.authorized_age conf base p
+  && Person.is_visible conf base p
   && ((not (Gwdb.is_empty_string img)) || full_portrait_path conf base p <> None)
   && (conf.Config.wizard || conf.Config.friend
      || not (Ext_string.contains (Gwdb.sou base img) "/private/"))

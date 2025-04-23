@@ -165,8 +165,8 @@ and get_n_mk_family conf base ?(origin = Gwdb.dummy_iper) ifam cpl =
     )
   in
   let m_auth =
-    Geneweb.Util.authorized_age conf base (Gwdb.poi base ifath)
-    && Geneweb.Util.authorized_age conf base (Gwdb.poi base imoth)
+    Geneweb.Person.is_visible conf base (Gwdb.poi base ifath)
+    && Geneweb.Person.is_visible conf base (Gwdb.poi base imoth)
   in
   mk_family conf base (ifam, Gwdb.foi base ifam, cpl, m_auth)
 
@@ -395,7 +395,7 @@ and lazy_get_n_mk_person conf base i =
     | "iper" -> iper | s -> Jingoo.Jg_types.unbox_pat (Lazy.force lp) s)
 
 and ppget conf base p =
-  if not (Geneweb.Util.authorized_age conf base p) then
+  if not (Geneweb.Person.is_visible conf base p) then
     if conf.use_restrict then
       Gwdb.get_iper p |> Gwdb.empty_person base |> unsafe_mk_person conf base
     else if
@@ -608,8 +608,8 @@ and mk_ancestors conf base (p : Gwdb.person) =
              let imoth = Gwdb.get_mother cpl in
              let cpl = (ifath, imoth, Gwdb.dummy_iper) in
              let m_auth =
-               Geneweb.Util.authorized_age conf base (Gwdb.poi base ifath)
-               && Geneweb.Util.authorized_age conf base (Gwdb.poi base imoth)
+               Geneweb.Person.is_visible conf base (Gwdb.poi base ifath)
+               && Geneweb.Person.is_visible conf base (Gwdb.poi base imoth)
              in
              mk_family conf base (ifam, Gwdb.foi base ifam, cpl, m_auth)))
   in
@@ -812,11 +812,11 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
                (match pg with
                | Def.NLDB.PgInd ip ->
                    Geneweb.Util.pget conf base ip
-                   |> Geneweb.Util.authorized_age conf base
+                   |> Geneweb.Person.is_visible conf base
                | Def.NLDB.PgFam ifam ->
                    Gwdb.foi base ifam |> Gwdb.get_father
                    |> Geneweb.Util.pget conf base
-                   |> Geneweb.Util.authorized_age conf base
+                   |> Geneweb.Person.is_visible conf base
                | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ ->
                    true)
                && List.exists (fun (k, _) -> k = key) il)
