@@ -2,6 +2,7 @@ open Config
 open Def
 open Gwdb
 open Util
+module Logs = Geneweb_logs.Logs
 
 let file_copy input_name output_name =
   let fd_in = Unix.openfile input_name [ O_RDONLY ] 0 in
@@ -108,7 +109,7 @@ let move_file_to_save dir file =
     1
   with
   | Sys_error e ->
-      GWPARAM.syslog `LOG_ERR
+      Logs.syslog `LOG_ERR
         (Printf.sprintf "Error moving file to saved: %s" e);
       0
   | _ -> 0
