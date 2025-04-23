@@ -312,15 +312,13 @@ let init_cousins_cnt conf base p =
   let expand_tables key v1 max_a_l cousins_cnt cousins_dates =
     Printf.sprintf "******** Expand tables from %d to %d ********\n" v1 max_a_l
     |> Logs.syslog `LOG_WARNING;
-    if
-      max_a_l + 3 > Sys.max_array_length
-      || max_d_l + max_a_l + 3 > Sys.max_array_length
-    then failwith "Cousins table too large for system";
     let new_cousins_cnt =
-      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
+      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
+      with Failure _ -> failwith "Cousins table too large for system"
     in
     let new_cousins_dates =
-      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
+      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
+      with Failure _ -> failwith "Cousins table too large for system"
     in
     for i = 0 to v1 do
       new_cousins_cnt.(i) <- cousins_cnt.(i);
@@ -335,18 +333,16 @@ let init_cousins_cnt conf base p =
     Printf.sprintf "******** Compute %d × %d table ********\n" (max_a_l + 3)
       (max_d_l + max_a_l + 3)
     |> Logs.syslog `LOG_WARNING;
-    if
-      max_a_l + 3 > Sys.max_array_length
-      || max_d_l + max_a_l + 3 > Sys.max_array_length
-    then failwith "Cousins table too large for system";
     let () = load_ascends_array base in
     let () = load_couples_array base in
     (* +3: there may be more descendants for cousins than my own *)
     let cousins_cnt =
-      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
+      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
+      with Failure _ -> failwith "Cousins table too large for system"
     in
     let cousins_dates =
-      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
+      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
+      with Failure _ -> failwith "Cousins table too large for system"
     in
     cousins_cnt.(0).(0) <-
       [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
