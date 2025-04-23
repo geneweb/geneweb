@@ -1642,7 +1642,7 @@ let output_command_line bdir =
 
 (** Link .gwo files and create a database. *)
 let link next_family_fun bdir =
-  let tmp_dir = Filename.concat "gw_tmp" bdir in
+  let tmp_dir = Filename.concat bdir "gw_tmp" in
   Mutil.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
