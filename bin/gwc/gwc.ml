@@ -232,8 +232,6 @@ let main () =
         else (
           Printf.eprintf "*** database not created\n";
           flush stderr;
-          exit 2));
-    let tmp_file = Filename.concat Filename.current_dir_name "gw_tmp" in
-    Mutil.rm_rf tmp_file)
+          exit 2)))
 
 let _ = main ()
