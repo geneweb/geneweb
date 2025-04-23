@@ -24,7 +24,7 @@ lib/core/dune
 lib/dune
 lib/ancient/dune
 lib/gwdb/dune
-lib/gwdlog/dune
+lib/logs/dune
 lib/util/dune
 plugins/welcome/dune
 test/dune
