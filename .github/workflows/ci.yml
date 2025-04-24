@@ -114,7 +114,7 @@ jobs:
         shell: bash
 
       - name: Install Geneweb dependencies
-        run: opam install . --deps-only ${{ env.FMT_CI == 'true' && '--with-test' || '' }}
+        run: opam install . --deps-only --with-test
 
       - name: Install ancient dependency
         if: env.USE_NNP == 'true'
