@@ -269,8 +269,8 @@ let compute base bdir =
 
 let main () =
   Secure.set_base_dir ".";
-  let bname = Filename.concat (Secure.base_dir ()) !fname in
   Arg.parse speclist anonfun errmsg;
+  let bname = Filename.concat (Secure.base_dir ()) !fname in
   if !fname = "" then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
