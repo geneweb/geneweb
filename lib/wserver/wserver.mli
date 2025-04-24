@@ -3,6 +3,7 @@
 (* module [Wserver]: elementary web service *)
 
 val start :
+  ?with_salt:bool ->
   ?addr:string ->
   port:int ->
   ?timeout:int ->
@@ -27,7 +28,9 @@ val start :
       - [path] is the path of the request,
       - [query] is the query content.
 
-    Listening on ports < 1024 may require root privileges. *)
+    Listening on ports < 1024 may require root privileges.
+
+    The flag [with_salt] can be used to disable salt generation. *)
 
 val close_connection : unit -> unit
 (** Closes the current socket *)

@@ -118,6 +118,7 @@ type config = {
   forced_plugins : string list;
   plugins : string list;
   secret_salt : string option;
+  predictable_mode : bool;
 }
 
 (**/**)
@@ -195,6 +196,7 @@ let empty =
     forced_plugins = [];
     plugins = [];
     secret_salt = None;
+    predictable_mode = false;
   }
 
 (**/**)
