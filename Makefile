@@ -62,7 +62,7 @@ lib/version.ml:
 	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
 	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
 	@printf 'Generating $@… Done.\n'
-.PHONY: build fmt gwd install lib/version.ml
+.PHONY: install lib/version.ml
 
 # Patch/unpatch files for campl5 >= 8.03
 CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
@@ -109,22 +109,22 @@ DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
 generated: $(DUNE_FILES) lib/version.ml
 	@printf "Done.\n"
 
-fmt build gwd install uninstall: info patch_files generated
+fmt build-geneweb gwd install uninstall: info patch_files generated
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
 	$(call unpatch_after, dune build @fmt --auto-promote)
 
 # [BEGIN] Installation / Distribution section
-build: build-geneweb build-rpc-support # Build all the project
+build: build-geneweb build-geneweb-rpc # Build all the project
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	@$(call unpatch_after, $(BUILD))
+	@$(call unpatch_after, dune build @bin/all @lib/all)
 	@printf "Done."
 
-build-rpc-support: ## Build the geneweb-rpc package
-	dune build -p geneweb-rpc
+build-geneweb-rpc: ## Build the geneweb-rpc package
+	dune build @rpc/all
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
@@ -215,7 +215,7 @@ endif
 	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
 	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
 
-.PHONY: build build-geneweb build-geneweb-rpc fmt install uninstall distrib
+.PHONY: build build-geneweb build-geneweb-rpc gwd fmt install uninstall distrib
 
 # [END] Installation / Distribution section
 
