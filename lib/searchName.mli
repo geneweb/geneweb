@@ -34,3 +34,6 @@ val print :
   (Config.config -> Gwdb.base -> string -> Gwdb.person list -> unit) ->
   (Config.config -> string -> unit) ->
   unit
+(** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
+      trouver la meilleure combinaison de résultat pour afficher la réponse
+      la plus probable.                                                     *)

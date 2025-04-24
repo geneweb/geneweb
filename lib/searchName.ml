@@ -10,18 +10,15 @@ let empty_sn_or_fn base p =
 
 let person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
-  if
-    List.exists
-      (fun n -> Name.strip n = k)
-      (Gwdb.person_misc_names base p (Util.nobtit conf base))
-  then true
-  else false
+  List.exists
+    (fun n -> Name.strip n = k)
+    (Gwdb.person_misc_names base p (Util.nobtit conf base))
 
 let person_is_approx_key base p k =
   let k = Name.strip_lower k in
   let fn = Name.strip_lower (Gwdb.p_first_name base p) in
   let sn = Name.strip_lower (Gwdb.p_surname base p) in
-  if k = fn ^ sn && fn <> "" && sn <> "" then true else false
+  k = fn ^ sn && fn <> "" && sn <> ""
 
 let select_approx_key conf base pl k =
   List.fold_right
@@ -115,14 +112,6 @@ let search_sosa conf base s =
 
 let search_key conf base s = Option.to_list (search_by_key conf base s)
 
-(** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
-      trouver la meilleure combinaison de résultat pour afficher la réponse
-      la plus probable.
-    [Args] :
-      - conf : configuration de la base
-      - base : base
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
 let print conf base specify unknown =
   let real_input label =
     match Util.p_getenv conf.Config.env label with

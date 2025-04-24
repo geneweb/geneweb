@@ -31,9 +31,7 @@ let print_img conf img =
     [Args] :
       - conf      : configuration de la base
       - x         : 'nom/prénom/sosa...' recherché
-      - nb_branch : nombre de branches dans le résultat de la recherche
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                     *)
+      - nb_branch : nombre de branches dans le résultat de la recherche *)
 let print_branch_to_alphabetic (conf : Config.config) (x : string)
     (nb_branch : int) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
@@ -76,9 +74,7 @@ let print_branch_to_alphabetic (conf : Config.config) (x : string)
                     d'afficher les liens pour un affichage par branches.
     [Args] :
       - conf      : configuration de la base
-      - x         : 'nom/prénom/sosa...' recherché
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                     *)
+      - x         : 'nom/prénom/sosa...' recherché                      *)
 let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
@@ -132,8 +128,11 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
           let iperl =
             List.fold_left
               (fun iperl iper ->
-                if Gwdb.eq_istr (proj (Util.pget conf base iper)) istr then
-                  iper :: iperl
+                let person = Util.pget conf base iper in
+                if
+                  (not (NameDisplay.is_hidden conf base person))
+                  && Gwdb.eq_istr (proj person) istr
+                then iper :: iperl
                 else iperl)
               [] iperl
           in
@@ -342,14 +341,15 @@ let persons_of_absolute_surname =
     Gwdb.get_surname
 
 let first_name_print conf base x =
-  let list, _ =
+  let list =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
-      (persons_of_absolute_first_name conf base x, fun _ -> assert false)
-    else if x = "" then ([], fun _ -> assert false)
+      persons_of_absolute_first_name conf base x
+    else if x = "" then []
     else
-      persons_of_fsname conf base Gwdb.base_strings_of_first_name
-        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
-        Gwdb.get_first_name x
+      fst
+      @@ persons_of_fsname conf base Gwdb.base_strings_of_first_name
+           (Gwdb.spi_find (Gwdb.persons_of_first_name base))
+           Gwdb.get_first_name x
   in
   let list =
     List.map
@@ -844,8 +844,7 @@ let search_surname conf base x : surname_search_result =
   let list, name_inj =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, Fun.id)
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
+    else if x = "" then ([], Fun.id)
     else
       persons_of_fsname conf base Gwdb.base_strings_of_surname
         (Gwdb.spi_find (Gwdb.persons_of_surname base))
@@ -887,16 +886,15 @@ type first_name_search_result =
   (string * (Ext_string.Set.t * Gwdb.iper list)) list
 
 let search_first_name conf base x : first_name_search_result =
-  let list, _ =
+  let list =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
-      ( persons_of_absolute_first_name conf base x,
-        fun _ -> raise (Match_failure ("src/some.ml", 1007, 51)) )
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 1008, 29)))
+      persons_of_absolute_first_name conf base x
+    else if x = "" then []
     else
-      persons_of_fsname conf base Gwdb.base_strings_of_first_name
-        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
-        Gwdb.get_first_name x
+      fst
+      @@ persons_of_fsname conf base Gwdb.base_strings_of_first_name
+           (Gwdb.spi_find (Gwdb.persons_of_first_name base))
+           Gwdb.get_first_name x
   in
   let list =
     List.map
