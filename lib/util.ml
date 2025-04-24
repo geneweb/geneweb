@@ -8,6 +8,8 @@ module Sosa = Geneweb_sosa
 
 let is_welcome = ref false
 
+let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
+
 let print_default_gwf_file bname =
   let gwf =
     [
@@ -106,9 +108,10 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   in
   let err_list1 = String.concat "," errors_undef in
   let err_list2 = String.concat "," errors_other in
-  match List.assoc_opt "hide_querytime_bugs" conf.base_env with
-  | Some "yes" -> ()
-  | _ ->
+  match List.assoc_opt "hide_querytime_bugs" conf.base_env,
+    p_getenv conf.env "norandom" with
+  | _, Some "yes" | Some "yes", _ -> ()
+  | _, _ ->
       Output.print_sstring conf
         (Printf.sprintf
            {|<script>
@@ -739,8 +742,6 @@ let hidden_env conf =
 
 let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
-
-let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
   try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
