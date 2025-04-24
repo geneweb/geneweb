@@ -125,6 +125,9 @@ type config = {
   secret_salt : string option;
       (** Secret salt generated at the server startup. The salt is used in form's
       digests to enhance security. *)
+  predictable_mode : bool;
+  (** Determine if we are in predictable mode. In this mode, output must not
+      depend on random state. *)
 }
 (** Geneweb configuration data type *)
 
