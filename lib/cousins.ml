@@ -134,29 +134,24 @@ let max_descendant_level conf base ip max_lvl =
     | Some v when v <> "" -> int_of_string v
     | _ -> max_lvl
   in
-  let x = ref 0 in
-  let rec loop0 l lev =
-    match l with
-    | [] -> x := if lev > !x then lev else !x
-    | ip :: l ->
-        let childs_of_ip =
-          let faml = Array.to_list (get_family (poi base ip)) in
-          (* accumuler tous les enfants de ip *)
-          let rec loop2 acc faml =
-            match faml with
-            | [] -> acc
-            | ifam :: faml ->
-                let children = Array.to_list (get_children (foi base ifam)) in
-                loop2 (children @ acc) faml
-          in
-          loop2 [] faml
-        in
-        (* TODO verify < of <= *)
-        if lev < max_lvl then loop0 childs_of_ip (lev + 1);
-        loop0 l lev
+  let childs_of_ip ip =
+    let faml = Array.to_list (get_family (poi base ip)) in
+    (* accumuler tous les enfants de ip *)
+    let rec loop2 acc faml =
+      match faml with
+      | [] -> acc
+      | ifam :: faml ->
+          let children = Array.to_list (get_children (foi base ifam)) in
+          loop2 (children @ acc) faml
+    in
+    loop2 [] faml
   in
-  loop0 [ ip ] 0;
-  !x
+  let rec loop0 acc l lev =
+    match l with
+    | [] -> if lev < max_lvl then loop0 [] acc (lev + 1) else lev
+    | ip :: l -> loop0 (childs_of_ip ip @ acc) l lev
+  in
+  loop0 [] [ ip ] 0
 
 let get_min_max_dates base l =
   let rec loop (min, max) = function
@@ -320,18 +315,15 @@ let init_cousins_cnt conf base p =
       try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
       with Failure _ -> failwith "Cousins table too large for system (1)"
     in
-    Printf.eprintf "cousins_cnt\n";
     let cousins_dates =
       try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
       with Failure _ -> failwith "Cousins table too large for system (2)"
     in
-    Printf.eprintf "cousins_dates\n";
     cousins_cnt.(0).(0) <-
       [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
     cousins_dates.(0).(0) <- get_min_max_dates base cousins_cnt.(0).(0);
     loop0 1 cousins_cnt cousins_dates;
     loop1 1 cousins_cnt cousins_dates;
-    Printf.eprintf "cousins_tables ok\n";
     (key, max_a_l, cousins_cnt, cousins_dates)
   in
 
@@ -356,8 +348,7 @@ let init_cousins_cnt conf base p =
         loop1 v1 cousins_cnt cousins_dates;
         (key, max_a_l, cousins_cnt, cousins_dates)
     | _, _ ->
-        Printf.sprintf "Can't expand cousins tables"
-        |> Logs.syslog `LOG_WARNING;
+        Printf.sprintf "Can't expand cousins tables" |> Logs.syslog `LOG_WARNING;
         build_tables key
   in
 
