@@ -2,7 +2,7 @@ module WS = Js_of_ocaml.WebSockets
 module Dom_html = Js_of_ocaml.Dom_html
 module Dom = Js_of_ocaml.Dom
 module Js = Js_of_ocaml.Js
-module Firebug = Js_of_ocaml.Firebug
+module Console = Js_of_ocaml.Console
 module Y = Yojson.Safe
 module U = Yojson.Safe.Util
 module Json_rpc = Geneweb_rpc.Json_rpc
@@ -27,13 +27,13 @@ let onmessage tbl (ev : WS.webSocket WS.messageEvent Js.t) =
         | None ->
             let err = Result.get_error r.result in
             let msg = Fmt.str "%a" Json_rpc.Response.Error.pp err in
-            Firebug.console##log (Js.string msg);
+            Console.console##log (Js.string msg);
             Js._false)
     | Error err ->
-        Firebug.console##error (Js.string err);
+        Console.console##error (Js.string err);
         Js._false
   with U.Type_error _ ->
-    Firebug.console##error (Js.string "not a valid JSON message");
+    Console.console##error (Js.string "not a valid JSON message");
     Js._false
 
 let websocket_promise ~uri ~onmessage =
