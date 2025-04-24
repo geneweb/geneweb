@@ -4,6 +4,5 @@
   (modes byte native)
   (libraries
     lwt
-    lwt.unix
     yojson
     fmt))
