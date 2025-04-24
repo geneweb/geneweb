@@ -28,6 +28,21 @@ let ext_string_start_with () =
     (Ext_string.start_with "" 0 "foo");
   ()
 
+let ext_string_cut_words () =
+  let test ~__POS__ ~expected s =
+    Alcotest.check' ~pos:__POS__
+      (Alcotest.list Alcotest.string)
+      ~msg:"" ~expected ~actual:(Ext_string.cut_words s)
+  in
+  test ~__POS__ ~expected:[] "";
+  test ~__POS__ ~expected:[ "foo" ] "foo";
+  test ~__POS__ ~expected:[ "foo," ] "foo,";
+  test ~__POS__ ~expected:[ "foo" ] " foo ";
+  test ~__POS__ ~expected:[ "foo," ] "foo, ";
+  test ~__POS__ ~expected:[ "foo"; "bar" ] "foo bar";
+  test ~__POS__ ~expected:[ "foo,bar" ] "foo,bar";
+  test ~__POS__ ~expected:[ "foo,"; "bar,baz" ] "foo,  bar,baz"
+
 let mutil_arabian_romian () =
   let test a r =
     (Alcotest.check Alcotest.int)
@@ -504,6 +519,7 @@ let v =
       [
         Alcotest.test_case "Ext_string.contains" `Quick ext_string_contains;
         Alcotest.test_case "Ext_string.start_with" `Quick ext_string_start_with;
+        Alcotest.test_case "Ext_string.cut_words" `Quick ext_string_cut_words;
       ] );
     ( "mutil",
       [
