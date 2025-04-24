@@ -19,6 +19,7 @@
   mode="note" then only the note file is updated
   carrousel is “on” if we are dealing with “others” images %)
 %random.init;
+%let;random_bits;%if;(e.norandom="yes")123456%else;%random.bits;%end;%in;
 %define;alert_header()
   %if;("http" in portrait or "http" in portrait_saved)
     WARNING
@@ -160,19 +161,19 @@
           <span id="which_img_show">[*send image with note and source]</span></button>
       </form>
     </div>
-    %( *** Col 2 *** image cache disabled with a kch=%random.bits; %)
+    %( *** Col 2 *** image cache disabled with a kch=%random_bits; %)
     <div class="col-6">
       %if;(has_portrait or has_old_portrait)
         <h1 class="display-4">[*portrait]0</h1>
         %if;has_portrait;
           <div class="d-flex mt-1">
             <a role="button" 
-              href="%if;has_portrait_url;%portrait;%else;%prefix;kch=%random.bits;&m=IM_C&i=%index;%end;"%sp;
+              href="%if;has_portrait_url;%portrait;%else;%prefix;kch=%random_bits;&m=IM_C&i=%index;%end;"%sp;
               target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see portrait]</strong><br><span class="small">%portrait;</span>
                    <br><img class="rounded my-1"
-              src="%if;has_portrait_url;%portrait;%else;%prefix;kch=%random.bits;&m=IM_C&i=%index;%end;"%sp;
+              src="%if;has_portrait_url;%portrait;%else;%prefix;kch=%random_bits;&m=IM_C&i=%index;%end;"%sp;
                    width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
           <span class="invisible"><i class="fas fa-retweet fa-rotate-90 fa-fw text-primary"></i></span>
@@ -191,12 +192,12 @@
         %if;has_old_portrait;
           <div class="d-flex mt-1">
             <a role="button" 
-              href="%if;has_old_portrait_url;%portrait;%else;%prefix;kch=%random.bits;&m=IM_C_S&i=%index;%end;"
+              href="%if;has_old_portrait_url;%portrait;%else;%prefix;kch=%random_bits;&m=IM_C_S&i=%index;%end;"
               target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see portrait]</strong><br><span class="small">%portrait_saved</span>
                    <br><img class="rounded my-1"
-              src="%if;has_old_portrait_url;%portrait_saved;%else;%prefix;kch=%random.bits;&m=IM_C_S&i=%index;%end;"
+              src="%if;has_old_portrait_url;%portrait_saved;%else;%prefix;kch=%random_bits;&m=IM_C_S&i=%index;%end;"
                    width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=portraits&file_name=%portrait_name;&idigest=%idigest;"
