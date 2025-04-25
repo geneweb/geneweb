@@ -20,6 +20,7 @@
   (description "GeneWeb is an open source genealogy software written in OCaml. It comes with a Web interface and can be used off-line or as a Web service.")
   (tags (genealogy))
   (depends
+    (ocaml (>= 4.08))
     (alcotest :with-test)
     benchmark
     (calendars (= "1.0.0"))
@@ -30,8 +31,6 @@
     fmt
     jingoo
     markup
-    (ocaml (>= 4.08))
-    (ocamlformat (and :with-test (= "0.24.1")))
     ounit
     ppx_blob
     ppx_deriving
@@ -47,6 +46,7 @@
     zarith
     digestif
     (utop :dev)
+    (ocamlformat (and :dev (= "0.24.1")))
   )
   (depopts
     ocaml-option-nnp

@@ -12,6 +12,7 @@ doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "dune" {>= "2.9"}
+  "ocaml" {>= "4.08"}
   "alcotest" {with-test}
   "benchmark"
   "calendars" {= "1.0.0"}
@@ -22,8 +23,6 @@ depends: [
   "fmt"
   "jingoo"
   "markup"
-  "ocaml" {>= "4.08"}
-  "ocamlformat" {with-test & = "0.24.1"}
   "ounit"
   "ppx_blob"
   "ppx_deriving"
@@ -39,6 +38,7 @@ depends: [
   "zarith"
   "digestif"
   "utop" {dev}
+  "ocamlformat" {dev & = "0.24.1"}
   "odoc" {with-doc}
 ]
 depopts: ["ocaml-option-nnp" "ancient"]
