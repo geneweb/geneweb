@@ -39,9 +39,9 @@ DBNAME='galichet'   # database name associated to specified hardcoded vars
 PWD=                # default is without wizard_id:passwd
 
 GWD2START=1
-BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
+BASES_DIR="$DIST_DIR/bases"
 LEXICON=
 TAGS=
 GWDLOG=./distribution/gw/gwd.log
@@ -141,7 +141,7 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   2>> $GWDLOG &
 
 # give some time for gwd to start
-sleep 1
+sleep 3
 fi
 
 if test -z "$cgitest"; then
@@ -159,7 +159,7 @@ crl () {
   fi
   curl $curlopt $curlstr
   if [ $? -ne 0 ]; then
-    echo "Failed to execute $cmd."
+    echo "Failed to execute: $cmd"
     test -n "$first_request" && exit 1
   # TODO: Is there a need for test in different languages ?
   elif grep $GREPOPT "<h1>Incorrect request</h1>" /tmp/tmp.txt; then

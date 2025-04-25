@@ -31,9 +31,9 @@ REFDBNAME='galichet' # reference gw file
 # ./test/testgwu.sh
 DBNAME='galichet' # name of gw file input to gwc (w/o extension)
 ZIP_IMG='galichet_src_images.zip' # zip of images and src files for legacy DB
-BASES_DIR="$HOME/Genea/GeneWeb-Bases"
 DIST_DIR="./distribution"
 BIN_DIR="$DIST_DIR/gw"
+BASES_DIR="$DIST_DIR/bases"
 SUDOPRFX=   # something like 'sudo -u aSpecificId' if access fs required.
 GWCOPT='-v -f -cg'
 #=== hardcoded vars (end)   ===
