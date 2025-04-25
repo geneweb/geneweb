@@ -1,0 +1,26 @@
+name: Linter
+
+on: [push, pull_request]
+
+env:
+  OPAMYES: true
+
+jobs:
+  check_formatting:
+    name: Check formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14.2
+          dune-cache: true
+
+      - name: Install ocamlformat
+        run: opam install dune ocamlformat.0.24.1
+
+      - name: Check formatting with dune
+        run: opam exec -- dune build @fmt
