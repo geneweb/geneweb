@@ -19,7 +19,7 @@
   mode="note" then only the note file is updated
   carrousel is “on” if we are dealing with “others” images %)
 %random.init;
-%let;random_bits;%if;(e.norandom="yes")123456%else;%random.bits;%end;%in;
+%let;random_bits;%if;predictable_mode;123456%else;%random.bits;%end;%in;
 %define;alert_header()
   %if;("http" in portrait or "http" in portrait_saved)
     WARNING

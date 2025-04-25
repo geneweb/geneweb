@@ -166,7 +166,7 @@ curlopt="-sS -m $CRLMAXTIME -o /tmp/tmp.txt"
 crl () {
   local cmd=$1
   local flag_nodiff=$2
-  curlstr="${urlprfix}w=$PWD&norandom=yes&$cmd"
+  curlstr="${urlprfix}w=$PWD&$cmd"
   if test -n "$debug"; then
     test -n "$tstmsg" && echo "$tstmsg"
     echo "curl $curlstr"

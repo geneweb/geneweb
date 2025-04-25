@@ -175,7 +175,7 @@ fr: individus<br> tous reliés par des liens familiaux
 ]
 %else;h4 font-weight-lighter">%base.real_nb_persons; %nn;
   %if;(base.real_nb_persons="0" or base.real_nb_persons="1")[person/persons]0%else;[person/persons]1%end;%end;</span>
-        %if;(base.real_nb_persons!="0" and e.norandom!="yes")
+        %if;(base.real_nb_persons!="0" and not predictable_mode)
           <a class="align-self-center ml-2 mb-2" href="%prefix;i=%apply;get_random(nb_persons.v)"
             data-toggle="tooltip" data-placement="bottom"
             title="[*random individual]"><i class="fa-solid fa-dice"></i></a>

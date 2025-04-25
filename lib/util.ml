@@ -109,8 +109,8 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   let err_list1 = String.concat "," errors_undef in
   let err_list2 = String.concat "," errors_other in
   match List.assoc_opt "hide_querytime_bugs" conf.base_env,
-    p_getenv conf.env "norandom" with
-  | _, Some "yes" | Some "yes", _ -> ()
+    conf.predictable_mode with
+  | _, false | Some "yes", _ -> ()
   | _, _ ->
       Output.print_sstring conf
         (Printf.sprintf
