@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module Outbase = Gwdb_legacy.Outbase
+
 let fname = ref ""
 let scratch = ref false
 let verbosity = ref 2

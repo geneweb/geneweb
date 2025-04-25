@@ -42,7 +42,8 @@ module Make : functor (D : ConverterDriver) -> sig
   val conv_event_witness_kind : Def.witness_kind -> D.t
   (** Convert [witness_kind] to JSON *)
 
-  val conv_pevent : (Gwdb_driver.iper, string) Def.gen_pers_event -> D.t
+  val conv_pevent :
+    (Gwdb_legacy.Gwdb_driver.iper, string) Def.gen_pers_event -> D.t
   (** Convert [gen_pers_event] to JSON *)
 
   val conv_title_name : string Def.gen_title_name -> D.t
@@ -57,7 +58,8 @@ module Make : functor (D : ConverterDriver) -> sig
   val conv_fevent_name : string Def.gen_fam_event_name -> D.t
   (** Convert [gen_fam_event_name] to JSON *)
 
-  val conv_fevent : (Gwdb_driver.iper, string) Def.gen_fam_event -> D.t
+  val conv_fevent :
+    (Gwdb_legacy.Gwdb_driver.iper, string) Def.gen_fam_event -> D.t
   (** Convert [gen_fam_event] to JSON *)
 
   val conv_divorce : Def.divorce -> D.t
@@ -66,7 +68,8 @@ module Make : functor (D : ConverterDriver) -> sig
   val conv_relation_type : Def.relation_type -> D.t
   (** Convert [relation_type] to JSON *)
 
-  val conv_rparent : (Gwdb_driver.iper, string) Def.gen_relation -> D.t
+  val conv_rparent :
+    (Gwdb_legacy.Gwdb_driver.iper, string) Def.gen_relation -> D.t
   (** Convert [gen_relation] to JSON *)
 
   val conv_death : Def.death -> D.t

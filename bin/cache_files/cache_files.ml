@@ -1,3 +1,5 @@
+module Gwdb_driver = Gwdb_legacy.Gwdb_driver
+
 let bname = ref ""
 let trace = ref false
 let fnames = ref false

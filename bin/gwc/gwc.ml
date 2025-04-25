@@ -1,6 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module Outbase = Gwdb_legacy.Outbase
 (** Checks a .gwo header and prints fails if header is absent or not compatible. *)
+
 let check_magic fname ic =
   let b = really_input_string ic (String.length Gwcomp.magic_gwo) in
   if b <> Gwcomp.magic_gwo then
