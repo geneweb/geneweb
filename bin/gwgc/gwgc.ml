@@ -1,3 +1,6 @@
+module Database = Gwdb_legacy.Database
+module Gwdb_gc = Gwdb_legacy.Gwdb_gc
+
 let dry_run = ref false
 let bname = ref ""
 

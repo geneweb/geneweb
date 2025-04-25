@@ -1,4 +1,5 @@
 open Def
+module Gwdb_driver = Gwdb_legacy.Gwdb_driver
 include Gwdb_driver
 
 (** [insert_person base p a u]

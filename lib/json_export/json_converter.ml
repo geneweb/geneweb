@@ -1,4 +1,5 @@
 open Def
+module Gwdb_driver = Gwdb_legacy.Gwdb_driver
 
 module type ConverterDriver = sig
   type t
