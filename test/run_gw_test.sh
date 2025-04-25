@@ -138,6 +138,8 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -blang \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
+  -predictable_mode \
+  -n_workers 0 \
   2>> $GWDLOG &
 
 # give some time for gwd to start
