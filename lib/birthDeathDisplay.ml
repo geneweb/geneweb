@@ -149,9 +149,18 @@ let print_death conf base =
       | Some s -> int_of_string s
       | None -> def
     in
-    let by = aux "by" conf.today.year in
-    let bm = aux "bm" conf.today.month in
-    let bd = aux "bd" conf.today.day in
+    let by =
+      if conf.predictable_mode then "1971"
+      else aux "by" conf.today.year
+    in
+    let bm =
+      if conf.predictable_mode then "1"
+      else aux "bm" conf.today.month
+    in
+    let bd =
+      if conf.predictable_mode then "1"
+      else aux "bd" conf.today.day
+    in
     Output.print_sstring conf {|<form method="get" action="|};
     Output.print_sstring conf conf.command;
     Output.print_sstring conf {|"><p>|};

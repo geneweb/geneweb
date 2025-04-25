@@ -835,6 +835,7 @@ let templ_eval_var conf = function
         with Not_found -> []
       in
       VVbool (List.mem plugin plugins)
+  | [ "predictable_mode" ] -> VVbool conf.predictable_mode
   | [ "supervisor" ] -> VVbool conf.supervisor
   | [ "roglo" ] ->
       VVbool
