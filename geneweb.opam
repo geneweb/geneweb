@@ -37,8 +37,8 @@ depends: [
   "yojson"
   "zarith"
   "digestif"
-  "utop" {dev}
-  "ocamlformat" {dev & = "0.24.1"}
+  "utop" {with-dev-setup}
+  "ocamlformat" {with-dev-setup & = "0.24.1"}
   "odoc" {with-doc}
 ]
 depopts: ["ocaml-option-nnp" "ancient"]
