@@ -262,16 +262,30 @@
       %if;(has_blason or has_blason_stop or has_old_blason)
         <div class="d-flex justify-content-between">
           <h1 class="display-5">[*blason/blasons]0</h1>
+          %reset_count;
+          %reset_count1;
+          %foreach;ancestor_level;
+            %foreach;ancestor;
+              %for;i;1;12;
+                %if;(ancestor.anc_sosa.v=2^i and ancestor.has_blason_stop)%incr_count;%end;
+                %if;(ancestor.anc_sosa.v=2^i and count=0)%incr_count1;
+                %end;
+              %end;
+            %end;
+          %end;
           <div class="dropdown align-self-center">
+            %if;(has_blason_self and count1>0)
             <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
               title="[*move coat of arms to]1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-person-arrow-up-from-line pb-0"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+              %reset_count;
               %foreach;ancestor_level;
                 %foreach;ancestor;
                   %for;i;1;12;
-                    %if;(ancestor.anc_sosa.v=2^i)
+                    %if;(ancestor.anc_sosa.v=2^i and ancestor.has_blason_stop)%incr_count;%end;
+                    %if;(ancestor.anc_sosa.v=2^i and count=0)
                       <a class="dropdown-item small" href="%prefix;m=BLASON_MOVE_TO_ANC&i=%index;&ia=%ancestor.index;"
                         title="[*move coat of arms to]0 %ancestor; %ancestor.dates_notag; (Sosa %ancestor.anc_sosa.v;),
                                %apply;a_of_b%with;%apply;anc_name(i)%and;%self;%end;">%ancestor; %ancestor.dates;</a>
@@ -280,6 +294,7 @@
                 %end;
               %end;
             </div>
+            %end;
           </div>
         </div>
         %if;has_blason_self;
