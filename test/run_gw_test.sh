@@ -172,8 +172,12 @@ crl () {
     echo "curl $curlstr"
   fi
   curl $curlopt $curlstr
-  if [ $? -ne 0 -a $cmd != "" ]; then
-    echo "Failed to execute $cmd."
+  if [ $? -ne 0 ]; then
+    if [ "$cmd" != "" ];then
+      echo "Failed to execute $cmd."
+    else
+      return 1
+    fi
   # TODO: Is there a need for test in different languages ?
   elif grep $GREPOPT "<h1>Incorrect request</h1>" /tmp/tmp.txt; then
     if grep $GREPOPT "<h1>404 Not Found</h1>" /tmp/tmp.txt; then
@@ -273,6 +277,8 @@ done
 if [ $attempt -eq $MAX_ATTEMPTS ]; then
   echo "gwd does not seem to be running after $attempt trys"
   exit 1
+else
+  echo "start after $attempt trys"
 fi
 
 crl "m=S&n=$FN+$SN&p="
@@ -280,7 +286,6 @@ crl "p=$FN&n=$SN&oc=$OC"
 crl "p=$FN1&n=$SN1&oc=$OC1"
 crl "p=$FN2&n=$SN2&oc=$OC2"
 crl "p=xxx&n=yyy"
-
 #--- based on hd/etc/menubar.txt
 #--- based on hd/etc/anctree.txt
 crl "m=A&i=$ID"
