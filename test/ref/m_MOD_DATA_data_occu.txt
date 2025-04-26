@@ -1,0 +1,840 @@
+<!-- $Id: upddata.txt 7.1-beta 07/03/2025 04:45:21 $ -->
+<!-- Copyright (c) 2006-2007 INRIA -->
+<!DOCTYPE html>
+<html lang="en" id="book">
+<head>
+<title>Book of occupations – 8 occupations</title>
+<meta name="robots" content="none">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="images/favicon_gwd.png">
+<!-- $Id: css.txt v7.1 04/11/2023 04:28:54 $ -->
+<link rel="stylesheet" href="css/bootstrap.min.css?version=4.6.2">
+<link rel="stylesheet" href="css/all.min.css?version=6.5.1">
+<link rel="stylesheet" href="css/css.css">
+</head>
+<body>
+<div id="loading-overlay"></div>
+<meta name="format-detection" content="telephone=no" />
+<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
+<div class="d-flex flex-column fix_top fix_left home-xs">
+<a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="galichet?" title="Home">
+<i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i><i class="sr-only">Home</i></a>
+<a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
+accesskey="S" title="Search"><i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i><span class="sr-only">Search</span></a>
+</div>
+<div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+<div class="modal-body" id="ModalSearch">
+<form id="collapse_search" method="get" action="galichet?">
+<input type="hidden" name="m" value="S">
+<div class="d-flex flex-column flex-md-row justify-content-center">
+<h3 class="rounded modal-title my-2 ml-3 ml-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">Search individual</h3>
+<div class="col-12 col-md-8 mt-2 mt-md-0">
+<label class="sr-only" for="pn">Search person name</label>
+<input type="search" id="fullname" class="form-control form-control-lg no-clear-button mb-2"
+name="pn" placeholder="Search individual, surname, public name, alias or key"
+autofocus tabindex="4">
+<label class="sr-only" for="n">Search public name</label>
+<input type="search" id="n" class="form-control form-control-lg no-clear-button"
+name="n" placeholder="Surname" tabindex="5">
+<label class="sr-only" for="p">Search firstname</label>
+<input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2"
+name="p" placeholder="First name" tabindex="6">
+<div class="d-flex align-items-center ml-2 flex-nowrap">
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[all-hlp]">
+<input class="form-check-input" type="checkbox" name="p_all" id="p_all" value="on">
+<label class="form-check-label" for="p_all">All</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[order-hlp]">
+<input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
+<label class="form-check-label" for="p_order">Same order</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[exact-hlp]">
+<input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="on">
+<label class="form-check-label" for="p_exact">Exact</label>
+</div>
+</div>
+</div>
+<button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="Search"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> Search</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+<div class="container">
+<a tabindex="4" class="sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
+<nav class="navbar bg-light sticky-top justify-content-start py-1 mt-1 mb-0 px-1 mx-0" aria-labelledby="sub-caracter-selection-heading" id="fixed-nav">
+<h2 id="sub-caracter-selection-heading" class="sr-only">
+Select an entry in the alphabetical index</h2>
+<div class="btn-group" role="toolbar" aria-label="sub-caracter-selection-heading" id="book-navigation">
+<div class="d-flex flex-column flex-sm-row list-group list-group-horizontal user-select-none font-weight-bold user-select-none ml-2">
+<div class="d-inline-flex flex-wrap align-self-center mt-1 mt-sm-0 order-3 text-monospace">
+<div class="list-group-item list-group-item-action list-group-item-info w-auto px-3 sup-char-div" tabindex="5"
+title="Search “M”" data-toggle="tooltip">
+<a class="stretched-link sup-char" href="galichet?m=MOD_DATA&data=occu&s=M"
+>M</a>
+<span class="bottom-book-arrow">
+<a href="#_M" title="Go to section “M”"
+aria-label="Go to section “M”" tabindex="6">
+<i class="fa-solid fa-sort-down fa-2xs p-0 book-arrow"></i>
+</a>
+</span>
+</div>
+<div class="list-group-item list-group-item-action list-group-item-info w-auto px-3 sup-char-div" tabindex="7"
+title="Search “N”" data-toggle="tooltip">
+<a class="stretched-link sup-char" href="galichet?m=MOD_DATA&data=occu&s=N"
+>N</a>
+<span class="bottom-book-arrow">
+<a href="#_N" title="Go to section “N”"
+aria-label="Go to section “N”" tabindex="8">
+<i class="fa-solid fa-sort-down fa-2xs p-0 book-arrow"></i>
+</a>
+</span>
+</div>
+<div class="list-group-item list-group-item-action list-group-item-info w-auto px-3 sup-char-div" tabindex="9"
+title="Search “O”" data-toggle="tooltip">
+<a class="stretched-link sup-char" href="galichet?m=MOD_DATA&data=occu&s=O"
+>O</a>
+<span class="bottom-book-arrow">
+<a href="#_O" title="Go to section “O”"
+aria-label="Go to section “O”" tabindex="10">
+<i class="fa-solid fa-sort-down fa-2xs p-0 book-arrow"></i>
+</a>
+</span>
+</div>
+</div>
+<div class="d-flex col-xs-12 order-1">
+<div class="d-flex flex-row align-self-center">
+<div class="d-flex flex-column mr-2">
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=fn" class="sub-char d-flex align-items-center" title="Book of first names"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-child fa-2x fa-fw "></i>
+</a></div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=sn" class="sub-char d-flex align-items-center" title="Book of surnames"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-signature fa-2x fa-fw "></i>
+</a></div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=pubn" class="sub-char d-flex align-items-center" title="Book of public names"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-pen fa-2x fa-fw "></i>
+</a></div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=qual" class="sub-char d-flex align-items-center" title="Book of qualifiers"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-comment fa-2x fa-fw "></i>
+</a></div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=alias" class="sub-char d-flex align-items-center" title="Book of aliases"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-mask fa-2x fa-fw "></i>
+</a></div>
+</div><div class="d-flex flex-column mr-2"><div class="my-1">
+<i class="fa fa-user-doctor fa-2x fa-fw text-success"></i>
+</div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=place" class="sub-char d-flex align-items-center" title="Book of places"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-map-location-dot fa-2x fa-fw "></i>
+</a></div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=src" class="sub-char d-flex align-items-center" title="Book of sources"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-box-archive fa-2x fa-fw "></i>
+</a></div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=title" class="sub-char d-flex align-items-center" title="Book of titles"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-crown fa-2x fa-fw "></i>
+</a></div>
+<div class="my-1">
+<a href="galichet?m=MOD_DATA&data=domain" class="sub-char d-flex align-items-center" title="Book of domains"
+data-toggle="tooltip" data-placement="right">
+<i class="fa fa-chess-rook fa-2x fa-fw "></i>
+</a></div>
+</div>
+<div class="align-self-center text-center mx-3">
+<h1 class="h3 mt-0">Book</h1>
+<h2 class="h4 mt-0 text-nowrap">8 occupations</h2>
+</div>
+</div>
+<div class="d-flex flex-fill align-self-center order-2 d-xs-none">
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="d-flex flex-column justify-content-center mx-2">
+</div>
+<ul class="list-group mt-1 mt-sm-2" id="main-content">
+<li class="list-group-item-info list-group-action d-flex p-0 mt-1 align-items-center border-0" id="_M">
+<div class="d-flex align-items-center justify-content-center position-relative top-book-arrow w-10 h-100 border border-bottom-0 border-top-0 border-left-0 border-light">
+<a role="button" class="stretched-link w-100 mx-3" href="#top" title="Return to top" data-toggle="tooltip" data-placement="top" tabindex="-1"><i class="fa-solid fa-sort-up ml-sm-1 mt-1"></i></a>
+</div>
+<div class="list-group-item-info position-relative w-100 border font-weight-bold text-monospace">
+<a class="stretched-link ml-1" href="galichet?m=MOD_DATA&data=occu&s=M" title="Search “M”"><span class="ml-3">M</span>
+</a></div>
+</li>
+<li class="list-unstyled mt-1 pl-0">
+<ul class="list-group src-list-bg my-1">
+<li class="list-unstyled ml-sm-1 pl-0" id="k60">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=Ma%C3%AEtre%20Menuisier%20re%C3%A7u%20le%2025.01.1695%20%C3%A0%20Reims"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Maître Menuisier reçu le 25.01.1695 à Reims on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=60&s=" data-entry="Maître Menuisier reçu le 25.01.1695 à Reims">
+Maître Menuisier reçu le 25.01.1695 à Reims</a></div>
+</div>
+</div>
+</li>
+<li class="list-unstyled ml-sm-1 pl-0" id="k63">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=Marchand"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Marchand on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=63&s=" data-entry="Marchand">
+Marchand</a></div>
+</div>
+</div>
+</li>
+<li class="list-unstyled ml-sm-1 pl-0" id="k67">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=Marchand%20Drapier,%20Changeur%20du%20Roy"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Marchand Drapier, Changeur du Roy on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=67&s=" data-entry="Marchand Drapier, Changeur du Roy">
+Marchand Drapier, Changeur du Roy</a></div>
+</div>
+</div>
+</li>
+<li class="list-unstyled ml-sm-1 pl-0" id="k5">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=Marchand%20de%20bois"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Marchand de bois on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=5&s=" data-entry="Marchand de bois">
+Marchand de bois</a></div>
+</div>
+</div>
+</li>
+<li class="list-unstyled ml-sm-1 pl-0" id="k51">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=Menuisier"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Menuisier on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=51&s=" data-entry="Menuisier">
+Menuisier</a></div>
+</div>
+</div>
+</li>
+<li class="list-unstyled ml-sm-1 pl-0" id="k55">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=Menuisier%20%C3%A0%20Paris%20(Paroisse%20St%20Roch)"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Menuisier à Paris (Paroisse St Roch) on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=55&s=" data-entry="Menuisier à Paris (Paroisse St Roch)">
+Menuisier à Paris (Paroisse St Roch)</a></div>
+</div>
+</div>
+</li>
+</ul>
+</li>
+<li class="list-group-item-info list-group-action d-flex p-0 mt-1 align-items-center border-0" id="_N">
+<div class="d-flex align-items-center justify-content-center position-relative top-book-arrow w-10 h-100 border border-bottom-0 border-top-0 border-left-0 border-light">
+<a role="button" class="stretched-link w-100 mx-3" href="#top" title="Return to top" data-toggle="tooltip" data-placement="top" tabindex="-1"><i class="fa-solid fa-sort-up ml-sm-1 mt-1"></i></a>
+</div>
+<div class="list-group-item-info position-relative w-100 border font-weight-bold text-monospace">
+<a class="stretched-link ml-1" href="galichet?m=MOD_DATA&data=occu&s=N" title="Search “N”"><span class="ml-3">N</span>
+</a></div>
+</li>
+<li class="list-unstyled mt-1 pl-0">
+<ul class="list-group src-list-bg my-1">
+<li class="list-unstyled ml-sm-1 pl-0" id="k12">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=N%C3%A9gociant"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Négociant on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=12&s=" data-entry="Négociant">
+Négociant</a></div>
+</div>
+</div>
+</li>
+</ul>
+</li>
+<li class="list-group-item-info list-group-action d-flex p-0 mt-1 align-items-center border-0" id="_O">
+<div class="d-flex align-items-center justify-content-center position-relative top-book-arrow w-10 h-100 border border-bottom-0 border-top-0 border-left-0 border-light">
+<a role="button" class="stretched-link w-100 mx-3" href="#top" title="Return to top" data-toggle="tooltip" data-placement="top" tabindex="-1"><i class="fa-solid fa-sort-up ml-sm-1 mt-1"></i></a>
+</div>
+<div class="list-group-item-info position-relative w-100 border font-weight-bold text-monospace">
+<a class="stretched-link ml-1" href="galichet?m=MOD_DATA&data=occu&s=O" title="Search “O”"><span class="ml-3">O</span>
+</a></div>
+</li>
+<li class="list-unstyled mt-1 pl-0">
+<ul class="list-group src-list-bg my-1">
+<li class="list-unstyled ml-sm-1 pl-0" id="k76">
+<div class="d-flex mx-2">
+<div class="d-flex flex-column justify-content-center">
+<a href="https://www.wikidata.org/w/index.php?search=Officier%20d'infanterie,%20marchand%20teinturier"
+role="button" class="btn btn-link p-0 ml-1"
+title="Search Officier d&#39;infanterie, marchand teinturier on the free and open knowledge base Wikidata"
+target="_blank" rel="noreferrer, noopener" tabindex="-1">
+<i class="fab fa-wikipedia-w fa-sm"></i>
+</a>
+</div>
+<div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1 ml-3">
+<div class="flex-column flex-sm-row ml-sm-2">
+<a role="button" class=" btn-link ml-1 mr-3"
+title="Update" data-toggle="tooltip" data-placement="bottom"
+href="galichet?m=MOD_DATA&data=occu&key=76&s=" data-entry="Officier d&#39;infanterie, marchand teinturier">
+Officier d&#39;infanterie, marchand teinturier</a></div>
+</div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
+<div class="d-flex flex-wrap justify-content-md-end">
+<!-- legal notices -->
+<!-- Language selector and connections info -->
+<div class="d-flex flex-row align-items-lg-end mt-0 ml-3 border-0">
+<div class="btn-group dropup" data-toggle="tooltip" data-placement="left"
+title="English – Select language">
+<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
+data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<span class="sr-only">lang</span>
+<span class="text-uppercase">en</span>
+<span class="sr-only">, select language</span>
+</button>
+<div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
+<a class="dropdown-item" id="lang_af" href="galichet?lang=af&m=MOD_DATA&norandom=yes&data=occu"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
+<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&m=MOD_DATA&norandom=yes&data=occu"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
+<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&m=MOD_DATA&norandom=yes&data=occu"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
+<a class="dropdown-item" id="lang_br" href="galichet?lang=br&m=MOD_DATA&norandom=yes&data=occu"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
+<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&m=MOD_DATA&norandom=yes&data=occu"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
+<a class="dropdown-item" id="lang_co" href="galichet?lang=co&m=MOD_DATA&norandom=yes&data=occu"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
+<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&m=MOD_DATA&norandom=yes&data=occu"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
+<a class="dropdown-item" id="lang_da" href="galichet?lang=da&m=MOD_DATA&norandom=yes&data=occu"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
+<a class="dropdown-item" id="lang_de" href="galichet?lang=de&m=MOD_DATA&norandom=yes&data=occu"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
+<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&m=MOD_DATA&norandom=yes&data=occu"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
+<a class="dropdown-item" id="lang_es" href="galichet?lang=es&m=MOD_DATA&norandom=yes&data=occu"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
+<a class="dropdown-item" id="lang_et" href="galichet?lang=et&m=MOD_DATA&norandom=yes&data=occu"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
+<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&m=MOD_DATA&norandom=yes&data=occu"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
+<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&m=MOD_DATA&norandom=yes&data=occu"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
+<a class="dropdown-item" id="lang_he" href="galichet?lang=he&m=MOD_DATA&norandom=yes&data=occu"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
+<a class="dropdown-item" id="lang_is" href="galichet?lang=is&m=MOD_DATA&norandom=yes&data=occu"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
+<a class="dropdown-item" id="lang_it" href="galichet?lang=it&m=MOD_DATA&norandom=yes&data=occu"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
+<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&m=MOD_DATA&norandom=yes&data=occu"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
+<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&m=MOD_DATA&norandom=yes&data=occu"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
+<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&m=MOD_DATA&norandom=yes&data=occu"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
+<a class="dropdown-item" id="lang_no" href="galichet?lang=no&m=MOD_DATA&norandom=yes&data=occu"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
+<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&m=MOD_DATA&norandom=yes&data=occu"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
+<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&m=MOD_DATA&norandom=yes&data=occu"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
+<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&m=MOD_DATA&norandom=yes&data=occu"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
+<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&m=MOD_DATA&norandom=yes&data=occu"><code>pt-br </code>Brazilian-Portuguese</a>
+<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&m=MOD_DATA&norandom=yes&data=occu"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
+<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&m=MOD_DATA&norandom=yes&data=occu"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
+<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&m=MOD_DATA&norandom=yes&data=occu"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
+<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&m=MOD_DATA&norandom=yes&data=occu"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
+<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&m=MOD_DATA&norandom=yes&data=occu"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
+<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&m=MOD_DATA&norandom=yes&data=occu"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
+<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&m=MOD_DATA&norandom=yes&data=occu"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
+</div>
+</div>
+<!-- Connections info -->
+<div class="d-flex flex-column justify-items-center align-items-center small ml-1 ml-md-3">
+<a href="galichet?m=CONN_WIZ">1 wizard
+</a><span>1 connection
+</span>
+</div>
+</div>
+<!-- Footer links and copyright -->
+<div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
+<div class="ml-auto mb-0">
+<a role="button" class="mr-1"
+href="galichet?templ=templm&m=MOD_DATA&norandom=yes&data=occu" 
+data-toggle="tooltip"
+title="templm">
+<i class="fab fa-markdown" aria-hidden="true"></i>
+<span class="sr-only">switch to templm</span>
+</a>
+GeneWeb v. 7.1-beta</div>
+<div class="btn-group mt-0">
+<span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
+<a href="https://geneweb.tuxfamily.org/wiki/GeneWeb" 
+class="ml-1"
+target="_blank" 
+rel="noreferrer, noopener" 
+data-toggle="tooltip" 
+title="GeneWeb Wiki">
+<i class="fab fa-wikipedia-w"></i>
+</a>
+<a href="https://github.com/geneweb/geneweb" 
+class="ml-1"
+target="_blank" 
+rel="noreferrer, noopener" 
+data-toggle="tooltip" 
+title="GeneWeb Github">
+<i class="fab fa-github"></i>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
+<script src="js/jquery.min.js?version=3.7.1"></script>
+<script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
+<script src="js/regex.min.js?version=4.4.0"></script>
+<script src="js/autosize.min.js?version=4.0.2"></script>
+<script>autosize(document.querySelectorAll('textarea'));</script>
+<script>
+// Attach a click event listener to each anchor element within the character's list container
+function setupCharacterInsertion() {
+document.querySelectorAll('.ch a').forEach(function (element) {
+element.addEventListener('click', function (event) {
+event.preventDefault();
+var textarea = document.querySelector('.insert-character-target');
+insertCharacter(textarea, this.innerText);
+});
+});
+}
+// Function to insert a character at the current cursor position in a textarea
+function insertCharacter(t, v) {
+var startPos = t.selectionStart;
+var endPos = t.selectionEnd;
+t.value = t.value.substring(0, startPos) + v + t.value.substring(endPos, t.value.length);
+t.selectionStart = startPos + v.length;
+t.selectionEnd = t.selectionStart;
+t.focus();
+}
+function insertTags(tagOpen, tagClose, sampleText) {
+const textarea = document.querySelector('textarea#notes_comments');
+if (!textarea) return false;
+const start = textarea.selectionStart;
+const end = textarea.selectionEnd;
+const scrollTop = textarea.scrollTop;
+let selectedText = textarea.value.substring(start, end);
+if (!selectedText) selectedText = sampleText;
+// Remove trailing space if exists
+if (selectedText.endsWith(' ')) {
+selectedText = selectedText.slice(0, -1);
+const text = textarea.value;
+const before = text.substring(0, start);
+const after = text.substring(end);
+textarea.value = before + tagOpen + selectedText + tagClose + ' ' + after;
+} else {
+const text = textarea.value;
+const before = text.substring(0, start);
+const after = text.substring(end);
+textarea.value = before + tagOpen + selectedText + tagClose + after;
+}
+// Restore scroll position
+textarea.scrollTop = scrollTop;
+// Set selection
+if (start === end) {
+// No text was selected
+const cursorPos = start + tagOpen.length;
+textarea.setSelectionRange(cursorPos, cursorPos + sampleText.length);
+} else {
+// Text was selected
+const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
+textarea.setSelectionRange(newCursorPos, newCursorPos);
+}
+textarea.focus();
+return false;
+}
+// Toolbar sticky behavior
+function setupToolbarSticky() {
+const toolbar = document.querySelector('.toolbar-wrapper');
+if (!toolbar) return;
+let lastScroll = window.scrollY;
+function handleScroll() {
+const currentScroll = window.scrollY;
+if (currentScroll > 0) {
+toolbar.classList.add('is-sticky');
+} else {
+toolbar.classList.remove('is-sticky');
+}
+lastScroll = currentScroll;
+}
+window.addEventListener('scroll', handleScroll, { passive: true });
+}
+</script>
+<script>
+// Enhanced clear button management for dynamic input fields
+// Add clear buttons (X) to input fields and handle DataTable updates
+// Generic clear button functionality for form inputs
+function addClearButtonToInputs() {
+// Utility function to create and setup clear button
+function createClearButton(element) {
+const clearButton = document.createElement('i');
+clearButton.className = 'fas fa-xmark clear-button-icon';
+clearButton.title = 'Clear the input';
+clearButton.style.cssText = `
+position: absolute;
+right: 10px;
+top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
+transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
+cursor: pointer;
+color: #667fc9;
+font-size: 1em;
+opacity: 0;
+transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+pointer-events: auto;
+`;
+return clearButton;
+}
+// Initialize or update a single input
+function initializeInput(element) {
+// Skip if already initialized
+if (element.dataset.clearInitialized) {
+const existingButton = element.parentNode.querySelector('.clear-button-icon');
+if (existingButton) {
+existingButton.style.opacity = element.value ? '1' : '0';
+}
+return;
+}
+// Mark as initialized
+element.dataset.clearInitialized = 'true';
+// Create wrapper if needed
+let wrapper = element.parentNode;
+if (!wrapper.classList.contains('clear-button-wrapper')) {
+wrapper = document.createElement('div');
+wrapper.className = 'clear-button-wrapper';
+wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
+element.parentNode.insertBefore(wrapper, element);
+wrapper.appendChild(element);
+}
+// Add padding for the clear button
+element.style.paddingRight = '24px';
+// Create and append clear button
+const clearButton = createClearButton(element);
+wrapper.appendChild(clearButton);
+// Update clear button visibility
+const updateVisibility = () => {
+requestAnimationFrame(() => {
+clearButton.style.opacity = element.value ? '1' : '0';
+});
+};
+// Event listeners
+element.addEventListener('input', updateVisibility);
+element.addEventListener('change', updateVisibility);
+element.addEventListener('focus', updateVisibility);
+// Hover effects
+clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
+clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
+// Handle clear button click
+clearButton.addEventListener('click', (e) => {
+e.preventDefault();
+e.stopPropagation();
+// Clear the input
+element.value = '';
+element.focus();
+updateVisibility();
+// Trigger events
+const inputEvent = new CustomEvent('clearButton', {
+bubbles: true,
+detail: { element }
+});
+element.dispatchEvent(inputEvent);
+element.dispatchEvent(new Event('input', { bubbles: true }));
+element.dispatchEvent(new Event('change', { bubbles: true }));
+});
+// Initial visibility state
+updateVisibility();
+}
+// Process all matching inputs
+function processInputs() {
+const selector = `
+input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
+input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
+textarea:not(.no-clear-button):not([readonly]):not([disabled]),
+.clear-button:not([readonly]):not([disabled])
+`;
+requestAnimationFrame(() => {
+document.querySelectorAll(selector).forEach(initializeInput);
+});
+}
+// Initial processing
+processInputs();
+// Monitor DOM changes
+const observer = new MutationObserver((mutations) => {
+let shouldProcess = false;
+mutations.forEach(mutation => {
+if (mutation.addedNodes.length ||
+mutation.type === 'attributes' &&
+(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
+shouldProcess = true;
+}
+});
+if (shouldProcess) {
+processInputs();
+}
+});
+observer.observe(document.body, {
+childList: true,
+subtree: true,
+attributes: true,
+attributeFilter: ['type', 'class']
+});
+}
+</script>
+<script>
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+addNavigation: function() {
+// Use event delegation for dynamically added inputs
+$(document).on('mousedown', 'input[data-book]', function(event) {
+if (event.ctrlKey && event.button === 0) {
+event.preventDefault();
+inputToBook.openBook(this.value, $(this).data('book'));
+}
+});
+},
+openBook: function(value, book) {
+if (!value) return;
+let preVal = value;
+if (book === "place") {
+const place = value.split(/\]\s+[-��]\s+/);
+preVal = place.length > 1 ? place[1] : value;
+}
+preVal = preVal.substring(0, Math.min(preVal.length, 12))
+.split(/[, ]+/)[0];
+const encVal = encodeURIComponent(value);
+const encPreVal = encodeURIComponent(preVal);
+const url = `?w=w&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+window.open(url, '_blank');
+}
+};
+// Focus on found autofocus input in opening BS modal
+function setupModalAutofocus() {
+$('.modal').on('shown.bs.modal', function() {
+$(this).find('[autofocus]').focus();
+});
+}
+function setupAutofocusInput() {
+const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
+if (focusableElement) {
+focusableElement.focus();
+if (focusableElement.setSelectionRange) {
+focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
+} else if (focusableElement.value) {
+focusableElement.value = focusableElement.value;
+}
+}
+}
+const initTooltips = () => {
+const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
+if (tooltipElements.length > 0) {
+$(tooltipElements).tooltip({
+trigger: 'hover',
+delay: { show: 200, hide: 50 },
+container: 'body',
+});
+}
+};
+function safeInitialize(fn) {
+try {
+fn();
+} catch (error) {
+console.error('Initialization error:', error);
+}
+}
+document.addEventListener('DOMContentLoaded', () => {
+initTooltips();
+setupModalAutofocus();
+setupToolbarSticky();
+setupCharacterInsertion();
+setupAutofocusInput();
+});
+</script>
+<script>
+// Function for navigation and keyboard shortcuts
+function setupNavigation() {
+var navbarHeight = document.getElementById('fixed-nav').offsetHeight;
+var scrollPaddingTop = navbarHeight + 4;
+document.getElementById('book').style.scrollPaddingTop = scrollPaddingTop + 'px';
+const linkTrm = document.querySelectorAll('.sub-char');
+const linkAdd = document.querySelectorAll('.sup-char');
+let iTrm = -1;
+let iAdd = -1;
+document.addEventListener('keydown', (event) => {
+if (event.altKey && event.key === 't' || event.key === 't' && !['input', 'textarea'].includes(event.target.tagName.toLowerCase())) {
+event.preventDefault();
+let len = linkTrm.length;
+if (iTrm === -1) {
+iTrm = len - 1;
+linkTrm[iTrm].focus();
+} else {
+linkTrm[iTrm].blur();
+iTrm = (iTrm + len - 1) % len;
+linkTrm[iTrm].focus();
+}
+}
+if (event.altKey && event.key === 'd' || event.key === 'd' && !['INPUT', 'TEXTAREA'].includes(event.target.tagName)) {
+event.preventDefault();
+if (iAdd === -1) {
+iAdd = 0;
+linkAdd[iAdd].parentNode.focus();
+} else {
+linkAdd[iAdd].parentNode.blur();
+iAdd = (iAdd + 1) % linkAdd.length;
+linkAdd[iAdd].parentNode.focus();
+}
+}
+});
+document.querySelectorAll('.sup-char-div').forEach((div) => {
+div.addEventListener('keydown', (event) => {
+if (event.key === 'Enter') {
+const hyperlink = div.querySelector('a:first-child');
+if (hyperlink) {
+hyperlink.click();
+}
+}
+});
+});
+}
+// Function to remove loading overlay
+function removeLoadingOverlay() {
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('key') || (!urlParams.has('s1'))) {
+const overlay = document.getElementById('loading-overlay');
+if (overlay) { overlay.style.display = 'none'; }
+}
+}
+// Function to auto-select link based on URL parameters
+function autoSelectLink() {
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('key') || (!urlParams.has('s1') && !urlParams.has('s2'))) return;
+const sParam = urlParams.get('s');
+const s1Param = urlParams.get('s1');
+const s2Param = urlParams.get('s2');
+const value = s1Param !== null && s1Param !== '' ? s1Param : sParam;
+if (s2Param) { localStorage.setItem('s2Tmp', decodeURIComponent(s2Param)); }
+if (value) {
+const link = Array.from(document.getElementsByTagName('a')).find(
+a => a.getAttribute('data-entry') === decodeURIComponent(value) && a.href.includes('key')
+);
+if (link) { link.click(); }
+}
+}
+// Function to update input field
+function updateInputField() {
+const s2 = localStorage.getItem('s2Tmp');
+if (s2 && window.location.href.includes('key=')) {
+const input = document.getElementById('nx_input');
+if (input) {
+input.value = s2;
+localStorage.removeItem('s2Tmp');
+}
+}
+}
+// Function to highlight non-Latin characters
+const {regex} = Regex;
+const scripts = ['Arabic', 'Armenian', 'Cyrillic', 'Ethiopic', 'Georgian', 'Greek', 'Hebrew', 'Khmer'];
+function highlightNonLatinChars() {
+const divs = document.querySelectorAll('.sup-char-div');
+divs.forEach(div => {
+const link = div.querySelector('.sup-char');
+if (!link) return;
+const char = link.textContent.trim();
+scripts.forEach(script => {
+if (regex`\p{Script=${script}}`.test(char)) {
+scriptName = script.toLowerCase();
+div.classList.add(`${scriptName}-char`);
+link.title += ` (${scriptName})`;
+}
+});
+});
+}
+function setupStableTooltips() {
+// Configure tooltips with more stability options
+$('[data-toggle="tooltip"]').tooltip({
+trigger: 'hover focus',
+delay: { "show": 100, "hide": 100 },
+container: 'body', // This is important - moves tooltips to body
+animation: false,  // Disable animations
+boundary: 'window' // Uses window as positioning boundary
+});
+}
+document.addEventListener('DOMContentLoaded', function() {
+setupNavigation();
+setupStableTooltips()
+highlightNonLatinChars();
+removeLoadingOverlay();
+autoSelectLink();
+updateInputField();
+});
+</script>
+</body>
+</html>

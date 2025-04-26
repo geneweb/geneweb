@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- $Id: anctree.txt v7.1 07/09/2023 04:06:52 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
+<title>Ascending tree of Laurent Geruzet </title>
+<meta name="robots" content="none">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="images/favicon_gwd.png">
+<!-- $Id: css.txt v7.1 04/11/2023 04:28:54 $ -->
+<link rel="stylesheet" href="css/bootstrap.min.css?version=4.6.2">
+<link rel="stylesheet" href="css/all.min.css?version=6.5.1">
+<link rel="stylesheet" href="css/css.css">
+</head>
+<body>
+<meta name="format-detection" content="telephone=no" />
+<div class="container)-fluid pb-6">
+<!-- $Id: perso_utils v7.1 13/08/2023 16:55:48 $ -->
+<!-- $Id: menubar.txt v7.1 02/05/2024 19:03:42 $ -->
+<nav class="navbar navbar-light justify-content-center navbar-expand-md pt-0 px-0 mt-1 mt-md-0">
+<div class="btn-toolbar" role="toolbar">
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+<ul class="nav nav-tabs">
+<li class="nav-item dropdown">
+<a id="load_once_p_mod" class="nav-link dropdown-toggle text-secondary dropdown-toggle-split" data-toggle="dropdown"
+href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Modules"><span class="fas fa-address-card fa-fw mr-1" aria-hidden="true"></span><span class="sr-only">Modules</span></a>
+<div class="dropdown-menu dropdown-menu-transl-pmod">
+<div class="d-flex justify-content-around mx-1">
+<form class="form-group mx-1" name="upd_url" method="get" action="galichet">
+<div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="images/modules">
+<div class="d-flex align-items-center flex-grow-1">
+<div class="input-group p-mod-group mr-2">
+<input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
+value=""
+placeholder="Select personalized modules" maxlength="30">
+<div class="input-group-append">
+<button type="submit" class="btn btn-outline-success" title="Submit"><i class="fa fa-check fa-lg"></i></button>
+<button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="Delete"><i class="fa fa-xmark fa-lg mx-1"></i></button>
+</div>
+</div>
+<input type="hidden" name="i" value="26">
+<input type="hidden" name="v" value="5">
+</div>
+<div class="ml-auto">
+<button type="button" class="btn btn-outline-danger ml-2" id="p_mod_rm" title="Remove the last added module" value=""><i class="fa fa-backward"></i></button>
+<button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
+title="Default template" data-toggle="popover" data-trigger="hover"
+data-html="true" data-content="<img class='w-100' src='images/modules/zz_1.jpg'>"><i class="fa fa-arrow-rotate-left"></i></button>
+<a role="button" class="btn btn-outline-primary ml-2"
+href="galichet?m=A&t=T&i=26&wide=on&v=5&norandom=yes&t1=CT&sosa=on"
+title="Full width display"><i class="fa fa-desktop fa-fw" aria-hidden="true"></i><span class="sr-only">Full width display</span></a>
+</div>
+</div>
+<div class="mx-2 mt-2">Select each module by clicking on the corresponding button (max 15).</div>
+<div class="alert alert-warning alert-dismissible fade show mt-1 mb-2 d-none" role="alert">
+<div class="d-none alert-opt">Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.</div>
+<div class="d-none alert-mod">Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.</div>
+</div>
+<div id="p_mod_table"></div>
+</form>
+<div class="form-group d-none d-md-block mx-1">
+<img src="images/modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
+<div id="p_mod_builder"></div>
+</div>
+</div>
+</div>
+</li>
+<li class="nav-item">
+<a class="nav-link " id="self"
+href="galichet?p=laurent&n=geruzet" title="Laurent Geruzet">
+<span class="fa fa-user-large fa-fw male" aria-hidden="true"></span>
+<span class="sr-only">Laurent Geruzet</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link " id="mod_ind" href="galichet?m=MOD_IND&i=26" title="Update individual Laurent Geruzet (P)" accesskey="P"><span class="fa fa-user-pen fa-fw male" aria-hidden="true"></span><span class="sr-only">Update individual (P)</span></a>
+</li>
+<li class="nav-item dropdown">
+<a id="load_once_copylink" class="nav-link dropdown-toggle text-secondary "
+data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true" title="Tools individual"><span class="fa fa-user-gear
+text-muted" aria-hidden="true"></span><span class="sr-only">Tools individual</span></a>
+<div class="dropdown-menu dropdown-menu-transl">
+<a class="dropdown-item" href="galichet?m=H&v=visibility" title="Help for visibility of individuals" target="_blank">
+<i class="fa fa-person fa-fw text-muted mr-2"></i>Visibility (if titles)</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item"
+href="galichet?pz=laurent&nz=geruzet&m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on"
+title="Browse using Laurent Geruzet as Sosa reference" accesskey="S"><i class="far fa-circle-dot fa-fw male mr-1"></i> Update Sosa 1: Laurent Geruzet</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="Without GeneWeb links"></i>Without GeneWeb links</a><div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=CHG_EVT_IND_ORD&i=26" title="Change order of individual events"><span class="fa fa-sort fa-fw mr-2"></span>Reverse events</a>
+<a class="dropdown-item" href="galichet?m=SND_IMAGE&i=26">
+<i class="far fa-file-image fa-fw mr-2"></i>Update picture</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=MRG&i=26" title="Merge Laurent.0 Geruzet with…"><span class="fa fa-compress fa-fw text-danger mr-2"></span>Merge individuals</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=DEL_IND&i=26" title="Delete Laurent Geruzet"><span class="fa fa-trash-can fa-fw text-danger mr-2"></span>Delete individual</a>
+<a href="galichet?p=marie+jeanne&n=geruzet" id="next_sibling" class="d-none"></a>
+<div class="dropdown-divider"></div>
+<div class="btn-group pr-4" role="group"><button class="dropdown-item permalink-copy mr-1 pr-0" type="button"
+title="Copy the exterior link to the clipboard
+" 
+data-bname="galichet"
+data-query="p=laurent&n=geruzet&sosa=on&v=5&t1=CT&t=T&m=A&norandom=yes"><i class="fas fa-link fa-fw mr-2"></i>Copy the permalink exterior</button>
+<button class="disabled dropdown-item mx-0 px-0">/</button>
+<button class="mx-1 px-0 dropdown-item permalink-friend-copy" type="button"
+title="Copy the friend link to the clipboard
+">friend</button>
+<button class="disabled dropdown-item mx-0 px-0">/</button>
+<button class="ml-1 px-0 dropdown-item permalink-wizard-copy" type="button"
+title="Copy the wizard link to the clipboard
+">wizard</button>
+</div><div class="dropdown-divider"></div>
+<button class="dropdown-item simple-copy" type="button" title="Copy the wiki link to the clipboard"
+data-wikilink="[[Laurent/Geruzet]]"><i class="far fa-clipboard fa-fw mr-2"></i>[[Laurent/Geruzet]]</button>
+<button class="dropdown-item full-copy" type="button" title="Copy the wikitext link to the clipboard"
+data-wikilink="[[Laurent/Geruzet/0/Laurent Geruzet]]"><i class="far fa-clipboard fa-fw mr-2"></i>[[Laurent/Geruzet/0/Laurent Geruzet]]</button>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" role="button"
+href="https://www.geneanet.org/fonds/individus/?sourcename=&size=50&sexe=&nom=Geruzet&ignore_each_patronyme=&with_variantes_nom=1&prenom=Laurent&prenom_operateur=or&ignore_each_prenom=&profession=&ignore_each_profession=&nom_conjoint=&ignore_each_patronyme_conjoint=&prenom_conjoint=&prenom_conjoint_operateur=or&ignore_each_prenom_conjoint=&place__0__=Saint%20Pierre%20-%20Reims,51,Marne,Champagne-Ardenne,France&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=1723&to=1827&exact_day=&exact_month=&exact_year=&nom_pere=&ignore_each_patronyme_pere=&prenom_pere=&prenom_pere_operateur=or&ignore_each_prenom_pere=&nom_mere=Pierquin&ignore_each_patronyme_mere=&with_variantes_nom_mere=1&prenom_mere=&prenom_mere_operateur=or&ignore_each_prenom_mere=&with_parents=0&go=1" target="_blank" rel="noreferrer, noopener">
+<i class="fa fa-magnifying-glass fa-fw mr-2"></i>Search Laurent Geruzet on Geneanet
+</a>
+</div>
+</li>
+<li class="nav-item">
+<a class="nav-link " id="mod_fam_1" href="galichet?m=MOD_FAM&i=11&ip=26"
+title="Update family with Marie Dupond (F)"
+accesskey="F"><span class="fa fa-user-pen male" aria-hidden="true"></span><span class="fa fa-user female" aria-hidden="true"></span><span class="small align-top"><sup>1</sup></span><span class="sr-only"> Update family with Marie Dupond (F)</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link " id="mod_fam_2" href="galichet?m=MOD_FAM&i=12&ip=26"
+title="Update family with Charlotte Laramee (G)"
+accesskey="G"><span class="fa fa-user-pen male" aria-hidden="true"></span><span class="fa fa-user female" aria-hidden="true"></span><span class="small align-top"><sup>2</sup></span><span class="sr-only"> Update family with Charlotte Laramee (G)</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link " id="mod_fam_3" href="galichet?m=MOD_FAM&i=13&ip=26"
+title="Update family with Jeanne Fache (H)"
+accesskey="H"><span class="fa fa-user-pen male" aria-hidden="true"></span><span class="fa fa-user female" aria-hidden="true"></span><span class="small align-top"><sup>3</sup></span><span class="sr-only"> Update family with Jeanne Fache (H)</span></a>
+</li>
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle text-secondary
+"
+data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"
+title="Tools families"><span class="fa fa-user-plus" aria-hidden="true"></span><span class="fa fa-user-gear" aria-hidden="true"></span><span class="sr-only">Tools families</span></a>
+<div class="dropdown-menu dropdown-menu-transl">
+<a class="dropdown-item" id="add_fam" href="galichet?m=ADD_FAM&ip=26" title="Add family (A)" accesskey="A"><span class="fa fa-plus fa-fw mr-2"></span>Add family</a>
+<div class="dropdown-divider"></div>
+<span class="dropdown-header">Marriage with Marie Dupond</span>
+<a class="dropdown-item" href="galichet?m=CHG_EVT_FAM_ORD&i=11&ip=26" title="Change order of family events"><span class="fa fa-sort fa-fw mr-2"></span>Reverse events</a>
+<a class="dropdown-item" href="galichet?m=DEL_FAM&i=11&ip=26"><span class="fa fa-trash fa-fw text-danger mr-2"></span>Delete family</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=INV_FAM&i=26&f=12"
+title="Reverse families 1 and 2"><span class="fa fa-right-left fa-rotate-90 fa-fw mr-1"></span> Reverse families<span class="sr-only"> 1 and 2</span></a>
+<div class="dropdown-divider"></div>
+<span class="dropdown-header">Marriage with Charlotte Laramee</span>
+<a class="dropdown-item" href="galichet?m=CHG_EVT_FAM_ORD&i=12&ip=26" title="Change order of family events"><span class="fa fa-sort fa-fw mr-2"></span>Reverse events</a>
+<a class="dropdown-item" href="galichet?m=DEL_FAM&i=12&ip=26"><span class="fa fa-trash fa-fw text-danger mr-2"></span>Delete family</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=INV_FAM&i=26&f=13"
+title="Reverse families 2 and 3"><span class="fa fa-right-left fa-rotate-90 fa-fw mr-1"></span> Reverse families<span class="sr-only"> 2 and 3</span></a>
+<div class="dropdown-divider"></div>
+<span class="dropdown-header">Marriage with Jeanne Fache</span>
+<a class="dropdown-item" href="galichet?m=CHG_EVT_FAM_ORD&i=13&ip=26" title="Change order of family events"><span class="fa fa-sort fa-fw mr-2"></span>Reverse events</a>
+<a class="dropdown-item" href="galichet?m=DEL_FAM&i=13&ip=26"><span class="fa fa-trash fa-fw text-danger mr-2"></span>Delete family</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=CHG_CHN&ip=26"><span class="fa fa-child fa-fw mr-1"></span> Update surname of children</a>
+</div>
+</li>
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle text-secondary active" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-code-fork fa-fw" title="Ancestors"></span></a>
+<div class="dropdown-menu dropdown-menu-transl">
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A"><span class="fa fa-gear fa-fw mr-2"></span>Ancestors</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" id="anc_tree" href="galichet?p=laurent&n=geruzet&m=A&t=T&v=5" title="Tree (Y)" accesskey="Y"><span class="fa fa-code-fork fa-fw mr-2"></span>Ascending tree</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A&t=H&v=5" title="Horizontal tree"><span class="fa fa-code-fork fa-rotate-90 fa-fw mr-2"></span>Horizontal tree</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A&t=Z&v=6&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&fn=1&ns=1&hl=1"><span class="fa fa-table fa-fw mr-2"></span>Table ancestors</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A&t=G&v=3&maxv=6&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>Full display</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?i=26&m=A&t=F&tf1=sb&v=6&maxv=6"><span class="fa fa-align-justify fa-fw mr-2"></span>Lines by name</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>Fanchart</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A&t=T&t1=CT&hi=H&v=5&scale=100&fs=17&sosa=on" title="Compact tree with Laurent Geruzet"><span class="fa fa-table-cells fa-fw mr-2"></span>Compact tree</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A&t=T&t1=h6&sosa=1" title="H-tree 6 generation with CSS (127 ind.)"><span class="fa fa-border-none fa-fw mr-2"></span>6 generations</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=A&t=T&t1=m" title="8 generations H tree"><span class="fa fa-chess-board fa-fw mr-2"></span>8 generations</a>
+</div>
+</li>
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle text-secondary" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="Descendants"></span></a>
+<div class="dropdown-menu dropdown-menu-transl">
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=D"><span class="fa fa-gear fa-fw mr-2"></span>Descendants</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=D&t=V&v=5"><span class="fa fa-sitemap fa-fw mr-2"></span>Descendants tree</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=D&t=TV&v=5"><span class="fa fa-sitemap fa-fw mr-2"></span>Compact descendants tree</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=D&t=D&v=5"><span class="fa fa-code-branch fa-rotate-90 fa-flip-vertical fa-fw mr-2"></span>Descendant tree view</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=D&t=I&v=2&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1"><span class="fa fa-table fa-fw mr-2"></span>Table descendants</a>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=D&t=L&v=3&maxv=2&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>Full display</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=D&t=A&num=on&v=2"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
+</div>
+</li>
+<li class="nav-item dropdown">
+<a id="load_once_rlm_builder" class="nav-link dropdown-toggle text-secondary" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="Relationship">
+<span class="fa fa-user-group"></span></a>
+<div class="dropdown-menu dropdown-menu-transl">
+<a class="dropdown-item" href="galichet?p=laurent&n=geruzet&m=R" title="Relationship computing (R)" accesskey="R">
+<span class="fa fa-gear fa-fw mr-2"></span>Relationship computing</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=C&p=laurent&n=geruzet&v=5"
+title="Relationship with a parent"><span class="fa fa-elevator fa-fw mr-2"></span>Relationship</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=F&p=laurent&n=geruzet" title="Family">
+<span class="fa fa-users fa-fw mr-2"></span>Family</a>
+<!-- Relationship graph builder -->
+<div class="dropdown-divider"></div>
+<span class="dropdown-header pt-0" id="RLM" data-accessbykey="1" data-i="26" data-p="laurent" data-n="geruzet" data-self="Laurent Geruzet 1738–1812">Multi relations graph</span>
+<div class="form-group px-3 mb-2">
+<label for="description" class="sr-only">Description</label>
+<input type="text" id="description" class="form-control" placeholder="Description" title="&t=…">
+</div>
+<div class="btn-group d-flex pr-3" role="group">
+<button class="dropdown-item flex-grow-1" title="Add Laurent Geruzet to the graph" id="saveButton">
+<i class="fa fa-plus fa-fw mr-2" aria-hidden="true"></i>
+<span>Add to the graph</span>
+</button>
+<button class="dropdown-item col-1 pl-1 d-none" title="Clear the graph" id="clearGraphButton">
+<i class="fa fa-trash-can fa-fw text-danger" aria-hidden="true"></i>
+<span class="sr-only">Clear the graph</span>
+</button>
+</div>
+<div class="d-none" id="graphButtons">
+<div class="btn-group d-flex pr-3" role="group" aria-label="Relationship graph actions">
+<a class="dropdown-item flex-grow-1 align-items-center" id="generateGraphButton">
+<i class="fa fa-code-fork fa-rotate-180 fa-fw mr-2" aria-hidden="true"></i>
+<span>Show the graph</span></a>
+<a class="dropdown-item col-1 pl-1" title="Edit the graph" id="editGraphButton">
+<i class="far fa-pen-to-square fa-fw" aria-hidden="true"></i>
+<span class="sr-only">Edit the graph</span></a>
+</div>
+</div>
+</div>
+</li>
+<li class="nav-item">
+<a class="nav-link text-secondary" data-toggle="modal" data-target="#carousel_modal"
+title="Display the carrousel of images">
+<span class="far fa-image fa-fw mr-1" aria-hidden="true"></span><sup class="small">6</sup><span class="sr-only">Pictures</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link text-secondary" href="galichet?m=LINKED&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on"
+title="Linked pages">
+<i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><sup class="small">1</sup><span class="sr-only">file-lines icon</span></a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
+<div class="d-flex flex-column fix_top fix_left home-xs">
+<a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="galichet?" title="Home">
+<i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i><i class="sr-only">Home</i></a>
+<a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
+accesskey="S" title="Search"><i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i><span class="sr-only">Search</span></a>
+</div>
+<div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+<div class="modal-body" id="ModalSearch">
+<form id="collapse_search" method="get" action="galichet?">
+<input type="hidden" name="m" value="S">
+<div class="d-flex flex-column flex-md-row justify-content-center">
+<h3 class="rounded modal-title my-2 ml-3 ml-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">Search individual</h3>
+<div class="col-12 col-md-8 mt-2 mt-md-0">
+<label class="sr-only" for="pn">Search person name</label>
+<input type="search" id="fullname" class="form-control form-control-lg no-clear-button mb-2"
+name="pn" placeholder="Search individual, surname, public name, alias or key"
+autofocus tabindex="4">
+<label class="sr-only" for="n">Search public name</label>
+<input type="search" id="n" class="form-control form-control-lg no-clear-button"
+name="n" placeholder="Surname" tabindex="5">
+<label class="sr-only" for="p">Search firstname</label>
+<input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2"
+name="p" placeholder="First name" tabindex="6">
+<div class="d-flex align-items-center ml-2 flex-nowrap">
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[all-hlp]">
+<input class="form-check-input" type="checkbox" name="p_all" id="p_all" value="on">
+<label class="form-check-label" for="p_all">All</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[order-hlp]">
+<input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
+<label class="form-check-label" for="p_order">Same order</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[exact-hlp]">
+<input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="on">
+<label class="form-check-label" for="p_exact">Exact</label>
+</div>
+</div>
+</div>
+<button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="Search"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> Search</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+<!-- begin carrousel_display.txt -->
+<div class="modal fade" id="carousel_modal" tabindex="-1" role="dialog" aria-labelledby="carouselmodal" aria-hidden="true">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<h5 class="modal-header d-inline-flex justify-content-between">
+<a href="galichet?m=SND_IMAGE_C&i=26"
+title="Add/delete pictures (1 portrait/6 pictures)">
+1<i class="fas fa-image-portrait ml-1 mr-2" aria-hidden="true"></i>6<i class="far fa-image fa-fw ml-1" aria-hidden="true"></i></a>
+Laurent Geruzet</span>
+<div class="btn-group">
+<a role="button" class="btn btn-link p-0 " href="#carousel" data-slide="prev">
+<i class="fa fa-chevron-left fa-fw " aria-hidden="true" title="Previous"></i>
+<span class="sr-only">Previous</span>
+</a><a role="button" class="btn btn-link p-0" href="#carousel" data-slide="next">
+<i class="fa fa-chevron-right fa-fw" aria-hidden="true" title="Next"></i>
+<span class="sr-only">Next</span>
+</a>
+</div>
+</h5>
+<div class="modal-body d-flex justify-content-center">
+<div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
+<div class="carousel-inner">
+<div class="carousel-item active">
+<a href="galichet?m=IM&i=26" target="_blank" rel="noopener">
+<img class="img-fluid" src="galichet?m=IM&i=26" alt="Portrait">
+</a>
+<div class="position-relative d-none d-md-block">
+<span>portrait</span>
+</div>
+</div>
+<div class="carousel-item">
+<a href="galichet?m=IM_C&i=26&s=cerveau_droite_gauche.gif" target="_blank" rel="noopener">
+<img class="img-fluid" src="galichet?m=IM_C&i=26&s=cerveau_droite_gauche.gif" alt="1 slide">
+</a>
+<div class="position-relative d-inline-flex w-100 d-none d-md-block">
+<span>picture 1/6: </span>
+<small class="ml-auto">cerveau_droite_gauche.gif </small>
+<br>
+<span><strong>Source: </strong>mon stock d images</span><br>
+<span><strong>Note: </strong>envoie d une image gif non sauvegardé</span></div>
+</div>
+<div class="carousel-item">
+<a href="galichet?m=IM_C&i=26&s=coup-de-vice.jpg" target="_blank" rel="noopener">
+<img class="img-fluid" src="galichet?m=IM_C&i=26&s=coup-de-vice.jpg" alt="2 slide">
+</a>
+<div class="position-relative d-inline-flex w-100 d-none d-md-block">
+<span>picture 2/6: </span>
+<small class="ml-auto">coup-de-vice.jpg </small>
+<br>
+<span><strong>Source: </strong>mon stock d&#39;images</span><br>
+<span><strong>Note: </strong>un peu d&#39;humour</span></div>
+</div>
+<div class="carousel-item">
+<a href="galichet?m=IM_C&i=26&s=ouest_eclair_19351020.jpg" target="_blank" rel="noopener">
+<img class="img-fluid" src="galichet?m=IM_C&i=26&s=ouest_eclair_19351020.jpg" alt="3 slide">
+</a>
+<div class="position-relative d-inline-flex w-100 d-none d-md-block">
+<span>picture 3/6: </span>
+<small class="ml-auto">ouest_eclair_19351020.jpg </small>
+<br>
+<span><strong>Source: </strong>https://gallica.bnf.fr/ark:/12148/bpt6k5005029</span><br>
+<span><strong>Note: </strong>extrait du journal l&#39;Ouest-Eclair du 20 octobre 1935 (voir le source sur Galica) Le Juge d&#39;Instruction dont il est question est [[Henri/Normand]]</span></div>
+</div>
+<div class="carousel-item">
+<a href="galichet?m=IM_C&i=26&s=peugeot_206.png" target="_blank" rel="noopener">
+<img class="img-fluid" src="galichet?m=IM_C&i=26&s=peugeot_206.png" alt="4 slide">
+</a>
+<div class="position-relative d-inline-flex w-100 d-none d-md-block">
+<span>picture 4/6: </span>
+<small class="ml-auto">peugeot_206.png </small>
+<br>
+<span><strong>Source: </strong>mon stock d&#39;images</span><br>
+<span><strong>Note: </strong>image ajouté dans ce carrousel pour test.</span></div>
+</div>
+<div class="carousel-item">
+<a href="galichet?m=IM_C&i=26&s=r1250rt_2022.jpg" target="_blank" rel="noopener">
+<img class="img-fluid" src="galichet?m=IM_C&i=26&s=r1250rt_2022.jpg" alt="5 slide">
+</a>
+<div class="position-relative d-inline-flex w-100 d-none d-md-block">
+<span>picture 5/6: </span>
+<small class="ml-auto">r1250rt_2022.jpg </small>
+<br>
+<span><strong>Source: </strong>à partir de mon disque <b>local</b> avec une phrase un peu plus longue. et quid de l&#39;ajout <h3>d&#39;un header</h3></span><br>
+<span><strong>Note: </strong>Une seule phrase<br>suivie d&#39;une autre<br>et que se passe t&#39;il si la ligne wrap à l&#39;écriture ? avec dif en tant que wizard et ajout d&#39;un <h2>header</h2>test again update</span></div>
+</div>
+<div class="carousel-item">
+<a href="galichet?m=IM_C&i=26&s=sexy_carotte.jpg" target="_blank" rel="noopener">
+<img class="img-fluid" src="galichet?m=IM_C&i=26&s=sexy_carotte.jpg" alt="6 slide">
+</a>
+<div class="position-relative d-inline-flex w-100 d-none d-md-block">
+<span>picture 6/6: </span>
+<small class="ml-auto">sexy_carotte.jpg </small>
+<br>
+<span><strong>Source: </strong>mes images</span><br>
+<span><strong>Note: </strong>test pour vérifier l&#39;ajout d&#39;une 2ème image</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- end carrousel_display.txt -->
+ <!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
+<script src="js/jquery.min.js?version=3.7.1"></script>
+<script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
+<script src="js/jquery.line.js"></script>
+<script>
+// Enhanced clear button management for dynamic input fields
+// Add clear buttons (X) to input fields and handle DataTable updates
+// Generic clear button functionality for form inputs
+function addClearButtonToInputs() {
+// Utility function to create and setup clear button
+function createClearButton(element) {
+const clearButton = document.createElement('i');
+clearButton.className = 'fas fa-xmark clear-button-icon';
+clearButton.title = 'Clear the input';
+clearButton.style.cssText = `
+position: absolute;
+right: 10px;
+top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
+transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
+cursor: pointer;
+color: #667fc9;
+font-size: 1em;
+opacity: 0;
+transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+pointer-events: auto;
+`;
+return clearButton;
+}
+// Initialize or update a single input
+function initializeInput(element) {
+// Skip if already initialized
+if (element.dataset.clearInitialized) {
+const existingButton = element.parentNode.querySelector('.clear-button-icon');
+if (existingButton) {
+existingButton.style.opacity = element.value ? '1' : '0';
+}
+return;
+}
+// Mark as initialized
+element.dataset.clearInitialized = 'true';
+// Create wrapper if needed
+let wrapper = element.parentNode;
+if (!wrapper.classList.contains('clear-button-wrapper')) {
+wrapper = document.createElement('div');
+wrapper.className = 'clear-button-wrapper';
+wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
+element.parentNode.insertBefore(wrapper, element);
+wrapper.appendChild(element);
+}
+// Add padding for the clear button
+element.style.paddingRight = '24px';
+// Create and append clear button
+const clearButton = createClearButton(element);
+wrapper.appendChild(clearButton);
+// Update clear button visibility
+const updateVisibility = () => {
+requestAnimationFrame(() => {
+clearButton.style.opacity = element.value ? '1' : '0';
+});
+};
+// Event listeners
+element.addEventListener('input', updateVisibility);
+element.addEventListener('change', updateVisibility);
+element.addEventListener('focus', updateVisibility);
+// Hover effects
+clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
+clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
+// Handle clear button click
+clearButton.addEventListener('click', (e) => {
+e.preventDefault();
+e.stopPropagation();
+// Clear the input
+element.value = '';
+element.focus();
+updateVisibility();
+// Trigger events
+const inputEvent = new CustomEvent('clearButton', {
+bubbles: true,
+detail: { element }
+});
+element.dispatchEvent(inputEvent);
+element.dispatchEvent(new Event('input', { bubbles: true }));
+element.dispatchEvent(new Event('change', { bubbles: true }));
+});
+// Initial visibility state
+updateVisibility();
+}
+// Process all matching inputs
+function processInputs() {
+const selector = `
+input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
+input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
+textarea:not(.no-clear-button):not([readonly]):not([disabled]),
+.clear-button:not([readonly]):not([disabled])
+`;
+requestAnimationFrame(() => {
+document.querySelectorAll(selector).forEach(initializeInput);
+});
+}
+// Initial processing
+processInputs();
+// Monitor DOM changes
+const observer = new MutationObserver((mutations) => {
+let shouldProcess = false;
+mutations.forEach(mutation => {
+if (mutation.addedNodes.length ||
+mutation.type === 'attributes' &&
+(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
+shouldProcess = true;
+}
+});
+if (shouldProcess) {
+processInputs();
+}
+});
+observer.observe(document.body, {
+childList: true,
+subtree: true,
+attributes: true,
+attributeFilter: ['type', 'class']
+});
+}
+</script>
+<script>
+function initializeLazyModules() {
+$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
+$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
+$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+}
+// Focus on found autofocus input in opening BS modal
+function setupModalAutofocus() {
+$('.modal').on('shown.bs.modal', function() {
+$(this).find('[autofocus]').focus();
+});
+}
+// Floating placeholders for all textual inputs
+function setupFloatingPlaceholders() {
+const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
+inputs.forEach(input => {
+// Ignore placeholders that are only non-breaking spaces
+if (input.placeholder.trim() === '') return;
+const hadFocus = document.activeElement === input;
+const wrapper = document.createElement('div');
+wrapper.className = 'input-wrapper';
+input.parentNode.insertBefore(wrapper, input);
+wrapper.appendChild(input);
+const placeholder = document.createElement('span');
+placeholder.className = 'floating-placeholder';
+placeholder.textContent = input.placeholder;
+wrapper.appendChild(placeholder);
+input.addEventListener('focus', () => placeholder.classList.add('active'));
+input.addEventListener('blur', () => placeholder.classList.remove('active'));
+if (hadFocus || input.hasAttribute('autofocus')) {
+requestAnimationFrame(() => {
+input.focus();
+placeholder.classList.add('active');
+});
+}
+});
+}
+const initTooltips = () => {
+const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
+if (tooltipElements.length > 0) {
+$(tooltipElements).tooltip({
+trigger: 'hover',
+delay: { show: 200, hide: 50 },
+container: 'body',
+});
+}
+};
+function safeInitialize(fn) {
+try {
+fn();
+} catch (error) {
+console.error('Initialization error:', error);
+}
+}
+document.addEventListener('DOMContentLoaded', () => {
+initializeLazyModules();
+setupModalAutofocus();
+setupFloatingPlaceholders();
+});
+</script>
+<!-- $Id: modules/arbre_hi_tools.txt v7.0 26/09/2023 04:30:23 $ -->
+<div class="d-flex ml-2 mb-2">
+<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+<div class="btn-group mx-2">
+<a href="galichet?m=A&t=T&i=26&v=4&norandom=yes&t1=CT&sosa=on" class="btn btn-outline-primary"
+title="(−1) display 4 generations">−</a>
+<span class="btn btn-outline-primary disabled border-top border-bottom"
+title="generations">5 gen.</span>
+<a href="galichet?m=A&t=T&i=26&v=6&norandom=yes&t1=CT&sosa=on" class="btn btn-outline-primary"
+title="(+1) display 6 generations (max 12)">+</a>
+</div>
+<div class="mx-2">
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&hi=I"
+class="btn btn-outline-primary">I-tree</a>
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT" class="btn btn-outline-primary ml-1"
+title="Display ASCII">
+ASCII box drawing</a>
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&sms=on" class="btn btn-outline-primary ml-1"
+title="Display missing Sosa">·</a>
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&cpl=on" class="btn btn-outline-primary ml-1"
+title="Display couples">
+<i class="fa fa-user-plus" aria-hidden="true"></i><i class="fa fa-user" aria-hidden="true"></i></a>
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&implx=on" class="btn btn-outline-primary ml-1"
+title="Link implexes">
+<i class="fa fa-shuffle fa-fw"></i></a>
+</div>
+<div class="btn-group mx-2">
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=16&scale=80"
+class="btn btn-outline-primary" title="Reduce scale (-20 %)">−</a>
+<span class="btn btn-outline-primary disabled border-top border-bottom">100 %</span>
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=18&scale=120"
+class="btn btn-outline-primary" title="Increase scale (+20 %)">+</a>
+</div>
+<div class="btn-group mx-2">
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=16" class="btn btn-outline-primary"
+title="reduce font size">−</a>
+<span class="btn btn-outline-primary disabled border-top border-bottom">Font 17 px</span>
+<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=18" class="btn btn-outline-primary"
+title="increase font size">+</a>
+</div>
+</div>
+</div>
+<!-- $Id: templm/tools.txt v7.0 2016/02/04 21:27:03 $ -->
+<style id="s" type="text/css">
+#htree{font-size:15px;width:980px;height:600px}
+</style>
+<style type="text/css">
+#tools p input{text-align:right;width:40px;}
+</style>
+<script type="text/javascript">
+<!--
+function over1(xx)
+{ 
+document.getElementById(xx).style.outline="#00F solid 4px";
+return false;
+}
+function out1(xx)
+{
+document.getElementById(xx).style.outline="none";
+return false;
+}
+function ob()
+{
+var a = new Array(3)
+for (var i=0; i < a.length; ++i)
+{
+a[i] = document.getElementById("e" + i).value;
+}
+document.getElementById("s").outerHTML = '\
+<style id="s" type="text\/css">\n\
+@page{size:'+a[1]+'px '+a[2]+'px;}\n\
+#htree{position:relative;font-size:'+a[0]+'px;width:'+a[1]+'px;height:'+a[2]+'px;margin:3em}\n\
+<\/style>';
+}
+-->
+</script>
+  <!-- $Id: modules/arbre_hi.txt v7.1 04/03/2023 09:51:04 $-->
+  <style type="text/css">
+#hi-tree1 {position:relative;left:10px;}
+#hi-tree1 tt{position:absolute;line-height:10pt;font-family:monospace;}
+#hi-tree1 span{position:absolute;line-height:10pt;margin:8px 12px}
+#hi-tree1 a{position:absolute;line-height:10pt;}
+</style>
+<script>
+<!--
+function over1(xx)
+{
+document.getElementById(xx).style.outline="#C0FEFF solid 6px";
+return false;
+}
+function out1(xx)
+{
+document.getElementById(xx).style.outline="none";
+return false;
+}
+-->
+</script>
+<h2 class="display-5 ml-3">H-tree of the ancestors of Laurent
+ Geruzet  <bdo dir=ltr>1738–1812</bdo> (5 generations)</h2>
+<div id="hi-tree1" style="width:560px;height:336px">
+   <div id="s1"style="position:absolute;border:solid 1px;top:336px;left:240px;width:76px;height:44px;background-color:#FFFFFF;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=laurent&n=geruzet'
+title="Laurent Geruzet (0)">
+<img style="width:15px" src="galichet?m=IM&d=1744609222&p=laurent&n=geruzet&k=/laurent.0.geruzet" alt="picture">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=26"
+title="Modifier Laurent Geruzet (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=laurent&n=geruzet&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 0 – Sosa 1 &#010; ♂ Laurent Geruzet (0)&#010;° 1738 – 1812&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+1</span>
+</a>
+</div>
+</div>
+  <div id="s2"style="position:absolute;border:solid 1px;top:144px;left:240px;width:76px;height:44px;background-color:#FFFFFF;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=jacques&n=geruzet'
+title="Jacques Geruzet (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=24"
+title="Modifier Jacques Geruzet (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=jacques&n=geruzet&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 1 – Sosa 2 &#010; ♂ Jacques Geruzet (0)&#010;° 1705 – 1774&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+2</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(278, 166, 278, 358, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s3"style="position:absolute;border:solid 1px;top:528px;left:240px;border-top:3px solid;width:76px;height:44px;background-color:#FFFFFF;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=jeanne&n=pierquin'
+title="Jeanne Pierquin (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=25"
+title="Modifier Jeanne Pierquin (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=jeanne&n=pierquin&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 1 – Sosa 3 &#010; ♀ Jeanne Pierquin (0)&#010;&#010; Parents unknown.&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+3</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(278, 550, 278, 358, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s4"style="position:absolute;border:solid 1px;top:144px;left:80px;width:76px;height:44px;background-color:#FFC8E3;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=anthoine&n=geruzet'
+title="Anthoine Geruzet (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=23"
+title="Modifier Anthoine Geruzet (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=anthoine&n=geruzet&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 2 – Sosa 4 &#010; ♂ Anthoine Geruzet (0)&#010;° 1667 – 1755&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+4</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(118, 166, 438, 166, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s5"style="position:absolute;border:solid 1px;top:144px;left:400px;width:76px;height:44px;background-color:#FFC8E3;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=jeanne&n=boizot&oc=1'
+title="Jeanne Boizot (1)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=20"
+title="Modifier Jeanne Boizot (1)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=jeanne&n=boizot&oc=1&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 2 – Sosa 5 &#010; ♀ Jeanne Boizot (1)&#010;° 1671 – 1748&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+5</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(438, 166, 118, 166, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s8"style="position:absolute;border:solid 1px;top:48px;left:80px;border-top:3px solid;width:76px;height:44px;background-color:#F0CBFE;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=anthoine&n=geruzet&oc=1'
+title="Anthoine Geruzet (1)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=21"
+title="Modifier Anthoine Geruzet (1)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=anthoine&n=geruzet&oc=1&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 3 – Sosa 8 &#010; ♂ Anthoine Geruzet (1)&#010;° 1640 – 1709&#010; Parents unknown.&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+8</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(118, 70, 118, 166, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s9"style="position:absolute;border:solid 1px;top:240px;left:80px;border-top:3px solid;width:76px;height:44px;background-color:#F0CBFE;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=louise&n=bouquet'
+title="Louise Bouquet (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=22"
+title="Modifier Louise Bouquet (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=louise&n=bouquet&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 3 – Sosa 9 &#010; ♀ Louise Bouquet (0)&#010;&#010; Parents unknown.&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+9</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(118, 262, 118, 166, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s10"style="position:absolute;border:solid 1px;top:48px;left:400px;border-top:3px solid;width:76px;height:44px;background-color:#F0CBFE;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=jean&n=boizot&oc=1234'
+title="Jean Boizot (1234)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=19"
+title="Modifier Jean Boizot (1234)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=jean&n=boizot&oc=1234&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 3 – Sosa 10 &#010; ♂ Jean Boizot (1234)&#010;° 1618 – 1702&#010; Parents unknown.&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+10</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(438, 70, 438, 166, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s11"style="position:absolute;border:solid 1px;top:240px;left:400px;width:76px;height:44px;background-color:#F0CBFE;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=claude&n=jayot'
+title="Claude Jayot (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=18"
+title="Modifier Claude Jayot (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=claude&n=jayot&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 3 – Sosa 11 &#010; ♀ Claude Jayot (0)&#010;° 1633 – 1697&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+11</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(438, 262, 438, 166, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s22"style="position:absolute;border:solid 1px;top:240px;left:320px;border-top:3px solid;width:76px;height:44px;background-color:#DDCEFF;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=jean&n=jayot'
+title="Jean Jayot (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=17"
+title="Modifier Jean Jayot (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=jean&n=jayot&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 4 – Sosa 22 &#010; ♂ Jean Jayot (0)&#010;° 1604 – 1674&#010; Parents unknown.&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+22</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(358, 262, 518, 262, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s23"style="position:absolute;border:solid 1px;top:240px;left:480px;width:76px;height:44px;background-color:#DDCEFF;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=perrette&n=sutaine'
+title="Perrette Sutaine (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=16"
+title="Modifier Perrette Sutaine (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=perrette&n=sutaine&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 4 – Sosa 23 &#010; ♀ Perrette Sutaine (0)&#010;° 1600 – 1684&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+23</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(518, 262, 358, 262, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s46"style="position:absolute;border:solid 1px;top:192px;left:480px;width:76px;height:44px;background-color:#FFA8D3;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=louis&n=sutaine'
+title="Louis Sutaine (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=14"
+title="Modifier Louis Sutaine (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=louis&n=sutaine&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 5 – Sosa 46 &#010; ♂ Louis Sutaine (0)&#010;° 1575 – &#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+46</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(518, 214, 518, 262, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+  <div id="s47"style="position:absolute;border:solid 1px;top:288px;left:480px;border-top:3px solid;width:76px;height:44px;background-color:#FFA8D3;;zindex:2">
+<a class="big_anchor_1 list-group-item-action"
+href='galichet?p=claude&n=petizon'
+title="Claude Petizon (0)">
+</a>
+<a class="big_anchor_1m list-group-item-action"
+href="galichet?m=MOD_IND&i=15"
+title="Modifier Claude Petizon (0)">
+</a>
+<div>
+<a style="width:100%;zindex:2;"
+href="galichet?p=claude&n=petizon&t=T&t1=CT&
+sosa=on&v=5&i=26&m=A&norandom=yes&"
+title='Generation 5 – Sosa 47 &#010; ♀ Claude Petizon (0)&#010;&#010; Parents unknown.&#010;'>
+<span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
+47</span>
+</a>
+</div>
+</div>
+<script>
+$(window).on("load", function() {
+$('#hi-tree1').line(518, 310, 518, 262, {stroke:2, opacity:0.3, zindex:-1});
+});
+</script>
+</div>
+</div>
+</body>
+</html>
