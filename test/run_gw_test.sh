@@ -84,6 +84,7 @@ PLACE="Australie" # one specific place
 #===  main ====================
 cmd=$(basename $0)
 test_dir=$(dirname $0)
+nodiff=1 # to avoid diff crl output for specific crl call.
 
 echo "starting $0 $@"
 while getopts "cdtrf:h" Option
@@ -165,7 +166,7 @@ RC=0
 curlopt="-sS -m $CRLMAXTIME -o /tmp/tmp.txt"
 crl () {
   local cmd=$1
-  local number=$2
+  local flag_nodiff=$2
   curlstr="${urlprfix}w=$PWD&norandom=yes&$cmd"
   if test -n "$debug"; then
     test -n "$tstmsg" && echo "$tstmsg"
@@ -200,7 +201,7 @@ crl () {
     fi
   fi
   unset first_request tstmsg
-  if test "$test_diff" || test "$set_ref"; then
+  if test -z "$flag_nodiff" && (test "$test_diff" || test "$set_ref"); then
     fn=$(echo "$cmd" | sed -e 's/=/_/g; s/&/_/g')
     mv /tmp/tmp.txt /tmp/run/$fn.txt
   fi
@@ -254,128 +255,128 @@ update_gwf () {
 
 first_request=1
 crl "" # first call to verify DBNAME access, that will exit here.
-crl "m=S&n=$FN+$SN&p=" "m=S"
-crl "p=$FN&n=$SN&oc=$OC" "pnoc0"
-crl "p=$FN1&n=$SN1&oc=$OC1" "pnoc1"
-crl "p=$FN2&n=$SN2&oc=$OC2" "pnoc2"
-crl "p=xxx&n=yyy" "xxyy"
+crl "m=S&n=$FN+$SN&p="
+crl "p=$FN&n=$SN&oc=$OC"
+crl "p=$FN1&n=$SN1&oc=$OC1"
+crl "p=$FN2&n=$SN2&oc=$OC2"
+crl "p=xxx&n=yyy"
 
 #--- based on hd/etc/menubar.txt
 #--- based on hd/etc/anctree.txt
-crl "m=A&i=$ID" "m=A"
-crl "m=A&i=$ID&t=T&v=5" "m=A-t=T"
-crl "m=A&i=$ID&t=A&v=5" "m=A-t=A"
-crl "m=A&i=$ID&t=C&v=5" "m=A-t=C"
-crl "m=A&i=$ID&t=FC&v=5" "m=A-t=FC"
-crl "m=A&i=$ID&t=T&t1=7&v=5" "m=A-t=T-t1=7-v=5"
-crl "m=A&i=$ID&t=T&t1=h6&v=5" "m=A-t=T-t1=h6-v=5"
-crl "m=A&i=$ID&t=T&t1=m&v=5" "m=A-t=T-t1=m-v=5"
+crl "m=A&i=$ID"
+crl "m=A&i=$ID&t=T&v=5"
+crl "m=A&i=$ID&t=A&v=5"
+crl "m=A&i=$ID&t=C&v=5"
+crl "m=A&i=$ID&t=FC&v=5"
+crl "m=A&i=$ID&t=T&t1=7&v=5"
+crl "m=A&i=$ID&t=T&t1=h6&v=5"
+crl "m=A&i=$ID&t=T&t1=m&v=5"
 #rl "m=A&i=$ID&t=T&t1=CT&v=5" # failed if sosa not set
-crl "m=A&i=$ID&t=T&t1=CT&v=5&sosa=on" "m=A-t=T-t1=CT-v=5-sosa=on"
+crl "m=A&i=$ID&t=T&t1=CT&v=5&sosa=on"
 #--- ---
-crl "m=A&i=$ID&t=H&v=5"  "m=A-t=H"
-crl "m=A&i=$ID&t=Z&v=6&maxv=19&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1" "m=A-t=Z"
-crl "m=A&i=$ID&t=G&v=3&maxv=19&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"  "m=A-t=G"
-crl "m=AD" "m=AD"
-crl "m=ADD_FAM" "m=ADD_FAM"
-crl "m=ADD_IND" "m=ADD_IND"
-crl "m=ADD_PAR&pp=$FN2&np=$SN2&ocp=$OC2" "m=ADD_PAR"
-crl "m=AM" "m=AM"
-crl "m=AN" "m=AN"
-crl "m=ANM" "m=ANM"
-crl "m=AS" "m=AS"
-crl "m=C&i=$ID&v=3" "m=C-v=3"
-crl "m=C&i=$ID&t=AN" "m=C-t=AN"
-crl "m=C&i=$ID" "m=C"
-crl "m=CAL" # "m=CAL"
-crl "m=CHG_CHN&ip=$FID" "m=CHG_CHN"
-crl "m=CHG_EVT_FAM_ORD&i=$FID&ip=$ID" "m=CHG_EVT_FAM_ORD"
-crl "m=CHG_EVT_IND_ORD&i=$ID" "m=CHG_EVT_IND_ORD"
-crl "m=CHG_FAM_ORD&f=$FID&i=$ID&n=2" "m=CHG_FAM_ORD"
-crl "m=D&i=$ID" "m=D"
-crl "m=D&i=$ID&t=V&v=3" "m=D-t=V"
-crl "m=D&i=$ID&t=TV&v=3" "m=D-t=TV"
-crl "m=D&i=$ID&t=I&v=3&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1" "m=D-t=I"
-crl "m=D&i=$ID&t=L&v=3&maxv=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"  "m=D-t=L"
-crl "m=D&i=$ID&t=A&num=on&v=3" "m=D-t=A"
-crl "m=DEL_FAM&i=$FID&ip=$ID" "m=DEL_FAM"
-crl "m=DEL_IND&i=$ID" "m=DEL_IND"
-crl "m=DOC&s=$IMG_SRC" "m=DOC"
-crl "m=DOCH&s=$IMG_SRC" ="m=DOCH"
-crl "m=F&i=$ID" "m=F"
+crl "m=A&i=$ID&t=H&v=5"
+crl "m=A&i=$ID&t=Z&v=6&maxv=19&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1"
+crl "m=A&i=$ID&t=G&v=3&maxv=19&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"
+crl "m=AD"
+crl "m=ADD_FAM"
+crl "m=ADD_IND"
+crl "m=ADD_PAR&pp=$FN2&np=$SN2&ocp=$OC2"
+crl "m=AM"
+crl "m=AN"
+crl "m=ANM"
+crl "m=AS"
+crl "m=C&i=$ID&v=3"
+crl "m=C&i=$ID&t=AN"
+crl "m=C&i=$ID"
+crl "m=CAL" $nodiff
+crl "m=CHG_CHN&ip=$FID"
+crl "m=CHG_EVT_FAM_ORD&i=$FID&ip=$ID"
+crl "m=CHG_EVT_IND_ORD&i=$ID"
+crl "m=CHG_FAM_ORD&f=$FID&i=$ID&n=2"
+crl "m=D&i=$ID"
+crl "m=D&i=$ID&t=V&v=3"
+crl "m=D&i=$ID&t=TV&v=3"
+crl "m=D&i=$ID&t=I&v=3&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1"
+crl "m=D&i=$ID&t=L&v=3&maxv=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"
+crl "m=D&i=$ID&t=A&num=on&v=3"
+crl "m=DEL_FAM&i=$FID&ip=$ID"
+crl "m=DEL_IND&i=$ID"
+crl "m=DOC&s=$IMG_SRC"
+crl "m=DOCH&s=$IMG_SRC"
+crl "m=F&i=$ID"
 if check_gwf 'disable_forum=yes'; then
     echo "two forum related commands are not tested."
 else
-crl "m=FORUM" "m=FORUM"
+crl "m=FORUM"
 #crl "m=FORUM&p=939" # too base specific
-crl "m=FORUM_ADD" "m=FORUM_ADD"
+crl "m=FORUM_ADD"
 fi
-crl "m=H&v=conf" "m=H-v=conf"
-crl "m=H&v=$TXT_SRC" "m=H"
-crl "m=HIST&k=20" "m=HIST"
-crl "m=HIST_CLEAN&i=$ID&f=$FN.$OC.$SN" "m=HIST_CLEAN"
+crl "m=H&v=conf"
+crl "m=H&v=$TXT_SRC"
+crl "m=HIST&k=20"
+crl "m=HIST_CLEAN&i=$ID&f=$FN.$OC.$SN"
 if check_gwf 'history_diff=yes'; then
-crl "m=HIST_DIFF&t=SUM&f=$FN.$OC.$SN" "m=HIST_DIFF"
-crl "m=HIST_DIFF&t=SUM&f=$FN.$OC.$SN&new=0&old=1" "m=HIST_DIFF_1"
+crl "m=HIST_DIFF&t=SUM&f=$FN.$OC.$SN"
+crl "m=HIST_DIFF&t=SUM&f=$FN.$OC.$SN&new=0&old=1"
 else
     echo "three history_diff related commands are not tested."
 fi
-crl "m=HIST_SEARCH&i=$ID" "m=HIST_SEARCH"
-crl "m=IM&s=$IMG_SRC" "m=IM"
-crl "m=IMH&s=$IMG_SRC" "m=IMH"
+crl "m=HIST_SEARCH&i=$ID"
+crl "m=IM&s=$IMG_SRC"
+crl "m=IMH&s=$IMG_SRC"
 # ATTENTION, Test only a subset of carrousel (m=IM_C*)
 # ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
-crl "m=IM_C&i=$ID" "m=IM_C"
-crl "m=IM_C_S&i=$ID" "m=IM_C_S" # TODO voir comportement si pas d'image sauvée
-crl "m=IM_C&i=$ID&s=$IMG_C" "m=IM_C-s=xxx"
-crl "m=IM_C_S&i=$ID&s=$IMG_C_S" "m=IM_C_S-s=xxx"
-crl "m=INV_FAM&i=$ID&f=$FID" "m=INV_FAM" # f=family_id is base specific!
-crl "m=L" "m=L"
-crl "m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE" "m=L-data=place"
-crl "m=LB&k=30" "m=LB"
-crl "m=LD&k=30" "m=LD"
-crl "m=LL&k=30" "m=LL"
-crl "m=LM&k=30" "m=LM"
-crl "m=MISC_NOTES" "m=MISC_NOTES"
-crl "m=MOD_DATA&data=fn" "m=MOD_DATA-data=fn"
-crl "m=MOD_DATA&data=sn" "m=MOD_DATA-data=sn"
-crl "m=MOD_DATA&data=place" "m=MOD_DATA-data=place"
-crl "m=MOD_DATA&data=occu" "m=MOD_DATA-data=occu"
-crl "m=MOD_DATA&data=src" "m=MOD_DATA-data=src"
-crl "m=MOD_NOTES&f" "m=MOD_NOTES-f=note"
-crl "m=MOD_IND&i=$ID" "m=MOD_IND"
-crl "m=MRG&i=$ID" "m=MRG"
+crl "m=IM_C&i=$ID"
+crl "m=IM_C_S&i=$ID"
+crl "m=IM_C&i=$ID&s=$IMG_C"
+crl "m=IM_C_S&i=$ID&s=$IMG_C_S"
+crl "m=INV_FAM&i=$ID&f=$FID"
+crl "m=L"
+crl "m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE"
+crl "m=LB&k=30"
+crl "m=LD&k=30"
+crl "m=LL&k=30"
+crl "m=LM&k=30"
+crl "m=MISC_NOTES"
+crl "m=MOD_DATA&data=fn"
+crl "m=MOD_DATA&data=sn"
+crl "m=MOD_DATA&data=place"
+crl "m=MOD_DATA&data=occu"
+crl "m=MOD_DATA&data=src"
+crl "m=MOD_NOTES&f"
+crl "m=MOD_IND&i=$ID"
+crl "m=MRG&i=$ID"
 #crl "m=MRG_DUP"
 #crl "m=MRG_DUP_IND_Y_N"
 #crl "m=MRG_FAM"
 #crl "m=MRG_DUP_FAM_Y_N"
-crl "m=MRG_IND" "m=MRG_IND"
-crl "m=N&tri=A" "m=N-tri=A"
-crl "m=N&tri=F" "m=N-tri=F"
-crl "m=NOTES" "m=NOTES"
-crl "m=NOTES&f=$NOTE" "m=NOTES-f=note"
-crl "m=OA&k=30" "m=OA"
-crl "m=OE&k=30" "m=OE"
-crl "m=P&tri=A" "m=P-tri=A"
-crl "m=P&tri=F" "m=P-tri=F"
-crl "m=PERSO&i=$ID" "m=PERSO"
-crl "m=PS" "m=PS"
-crl "m=PPS&bi=on&ba=on&ma=on&de=on&bu=on" "m=PPS"
-crl "m=PPS&k=$PLACE&bi=on&ba=on&ma=on&de=on&bu=on&all=on&any=on&max_rlm_nbr=" "m=PPS-k=place"
-crl "m=R&i=$ID" "m=R"
-crl "m=REFRESH&i=$ID" "m=REFRESH"
+crl "m=MRG_IND"
+crl "m=N&tri=A"
+crl "m=N&tri=F"
+crl "m=NOTES"
+crl "m=NOTES&f=$NOTE"
+crl "m=OA&k=30"
+crl "m=OE&k=30"
+crl "m=P&tri=A"
+crl "m=P&tri=F"
+crl "m=PERSO&i=$ID"
+crl "m=PS"
+crl "m=PPS&bi=on&ba=on&ma=on&de=on&bu=on"
+crl "m=PPS&k=$PLACE&bi=on&ba=on&ma=on&de=on&bu=on&all=on&any=on&max_rlm_nbr="
+crl "m=R&i=$ID"
+crl "m=REFRESH&i=$ID"
 #crl "m=RL&i=$ID&i1" # m=RL&i=5316&l1=3&i1=1711&l2=2&i2=6223&dag=on
-crl "m=RLM&i1=$ID&p2=$FN2&n2=$SN2&oc2=$OC2" "m=RLM"
-crl "m=SND_IMAGE&i=$ID" "m=SND_IMAGE"
-crl "m=SND_IMAGE_C&i=$ID" "m=SND_IMAGE_C"
-crl "m=SRC&v=$TXT_SRC" "m=SRC"
-crl "m=STAT" "m=STAT"
-crl "m=TT" "m=TT"
-crl "m=TT&p=*" "m=TT-p=xx"
+crl "m=RLM&i1=$ID&p2=$FN2&n2=$SN2&oc2=$OC2"
+crl "m=SND_IMAGE&i=$ID"
+crl "m=SND_IMAGE_C&i=$ID"
+crl "m=SRC&v=$TXT_SRC"
+crl "m=STAT"
+crl "m=TT"
+crl "m=TT&p=*"
 if check_gwf 'authorized_wizards_notes=yes'; then
-crl "m=CONN_WIZ" "m=CONN_WIZ"
-crl "m=MOD_WIZNOTES&f=$WIZ" "m=MOD_WIZNOTES-f=note"
-crl "m=WIZNOTES" "m=WIZNOTES"
+crl "m=CONN_WIZ"
+crl "m=MOD_WIZNOTES&f=$WIZ"
+crl "m=WIZNOTES"
 else
     echo "three wizards notes related commands are not tested."
 fi
@@ -402,7 +403,7 @@ for xx in $modules; do
     esac
     for ii in $list; do
       tstmsg="test $xx with p_mod=$cc$ii"
-      crl "p=$FN&n=$SN&oc=$OC&p_mod=$cc$ii" "mod-$cc$ii"
+      crl "p=$FN&n=$SN&oc=$OC&p_mod=$cc$ii"
     done
 done
 
