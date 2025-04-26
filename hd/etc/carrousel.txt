@@ -263,6 +263,7 @@
         <div class="d-flex justify-content-between">
           <h1 class="display-5">[*blason/blasons]0</h1>
           <div class="dropdown align-self-center">
+            %if;has_blason_self;
             <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
               title="[*move coat of arms to]1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-person-arrow-up-from-line pb-0"></i>
@@ -280,6 +281,7 @@
                 %end;
               %end;
             </div>
+            %end;
           </div>
         </div>
         %if;has_blason_self;
