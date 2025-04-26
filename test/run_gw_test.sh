@@ -301,7 +301,7 @@ crl "m=D&i=$ID&t=L&v=3&maxv=3&siblings=on&alias=on&parents=on&rel=on&witn=on&not
 crl "m=D&i=$ID&t=A&num=on&v=3"
 crl "m=DEL_FAM&i=$FID&ip=$ID"
 crl "m=DEL_IND&i=$ID"
-crl "m=DOC&s=$IMG_SRC"
+crl "m=DOC&s=$IMG_SRC" $nodiff
 crl "m=DOCH&s=$IMG_SRC"
 crl "m=F&i=$ID"
 if check_gwf 'disable_forum=yes'; then
@@ -311,7 +311,7 @@ crl "m=FORUM"
 #crl "m=FORUM&p=939" # too base specific
 crl "m=FORUM_ADD"
 fi
-crl "m=H&v=conf"
+crl "m=H&v=conf" $nodiff
 crl "m=H&v=$TXT_SRC"
 crl "m=HIST&k=20"
 crl "m=HIST_CLEAN&i=$ID&f=$FN.$OC.$SN"
@@ -322,14 +322,14 @@ else
     echo "three history_diff related commands are not tested."
 fi
 crl "m=HIST_SEARCH&i=$ID"
-crl "m=IM&s=$IMG_SRC"
+crl "m=IM&s=$IMG_SRC" $nodiff
 crl "m=IMH&s=$IMG_SRC"
 # ATTENTION, Test only a subset of carrousel (m=IM_C*)
 # ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
-crl "m=IM_C&i=$ID"
-crl "m=IM_C_S&i=$ID"
-crl "m=IM_C&i=$ID&s=$IMG_C"
-crl "m=IM_C_S&i=$ID&s=$IMG_C_S"
+crl "m=IM_C&i=$ID" $nodiff
+crl "m=IM_C_S&i=$ID" $nodiff
+crl "m=IM_C&i=$ID&s=$IMG_C" $nodiff
+crl "m=IM_C_S&i=$ID&s=$IMG_C_S" $nodiff
 crl "m=INV_FAM&i=$ID&f=$FID"
 crl "m=L"
 crl "m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE"
@@ -344,7 +344,7 @@ crl "m=MOD_DATA&data=place"
 crl "m=MOD_DATA&data=occu"
 crl "m=MOD_DATA&data=src"
 crl "m=MOD_NOTES&f"
-crl "m=MOD_IND&i=$ID"
+crl "m=MOD_IND&i=$ID" $nodiff
 crl "m=MRG&i=$ID"
 #crl "m=MRG_DUP"
 #crl "m=MRG_DUP_IND_Y_N"
@@ -354,7 +354,7 @@ crl "m=MRG_IND"
 crl "m=N&tri=A"
 crl "m=N&tri=F"
 crl "m=NOTES"
-crl "m=NOTES&f=$NOTE"
+crl "m=NOTES&f=$NOTE" $nodiff
 crl "m=OA&k=30"
 crl "m=OE&k=30"
 crl "m=P&tri=A"
@@ -364,11 +364,11 @@ crl "m=PS"
 crl "m=PPS&bi=on&ba=on&ma=on&de=on&bu=on"
 crl "m=PPS&k=$PLACE&bi=on&ba=on&ma=on&de=on&bu=on&all=on&any=on&max_rlm_nbr="
 crl "m=R&i=$ID"
-crl "m=REFRESH&i=$ID"
+crl "m=REFRESH&i=$ID" $nodiff
 #crl "m=RL&i=$ID&i1" # m=RL&i=5316&l1=3&i1=1711&l2=2&i2=6223&dag=on
 crl "m=RLM&i1=$ID&p2=$FN2&n2=$SN2&oc2=$OC2"
 crl "m=SND_IMAGE&i=$ID"
-crl "m=SND_IMAGE_C&i=$ID"
+crl "m=SND_IMAGE_C&i=$ID" $nodiff
 crl "m=SRC&v=$TXT_SRC"
 crl "m=STAT"
 crl "m=TT"
