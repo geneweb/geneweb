@@ -7,6 +7,7 @@ open Gwdb
 open Util
 
 module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in

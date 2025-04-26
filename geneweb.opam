@@ -35,13 +35,12 @@ depends: [
   "uunf"
   "uutf"
   "yojson"
-  "zarith"
   "digestif"
   "utop" {with-dev-setup}
   "ocamlformat" {with-dev-setup & = "0.24.1"}
   "odoc" {with-doc}
 ]
-depopts: ["ocaml-option-nnp" "ancient"]
+depopts: ["ocaml-option-nnp" "ancient" "zarith"]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
   [ "ocaml" "./configure.ml" "--release" ]

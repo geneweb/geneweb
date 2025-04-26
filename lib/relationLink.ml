@@ -5,6 +5,7 @@ open Def
 open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 (* Printing for browsers without tables *)
 

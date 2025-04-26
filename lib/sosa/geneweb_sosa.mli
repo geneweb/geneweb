@@ -50,7 +50,7 @@ val modl : t -> int -> t
 (** Calculate modulo of sosa number comparing to integer *)
 
 val gen : t -> int
-(** Retruns generation of sosa number. *)
+(** Returns generation of sosa number. *)
 
 val branches : t -> int list
 (** [branches sosa]

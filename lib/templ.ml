@@ -1,6 +1,7 @@
 open Config
 open TemplAst
 module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 exception Exc_located of loc * exn
 exception BadApplyArity

@@ -4,6 +4,7 @@ open TemplAst
 open Util
 open UpdateData
 module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in

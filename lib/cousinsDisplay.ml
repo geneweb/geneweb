@@ -5,6 +5,7 @@ open Def
 open Gwdb
 open Util
 open Cousins
+module Sosa = Geneweb_sosa
 
 let default_max_cnt = Cousins.default_max_cnt
 
