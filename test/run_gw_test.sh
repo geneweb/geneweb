@@ -148,9 +148,6 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -predictable_mode \
   -n_workers 0 \
   2>> $GWDLOG &
-
-# give some time for gwd to start
-sleep 3
 fi
 
 if test -z "$cgitest"; then
@@ -173,9 +170,8 @@ crl () {
     echo "curl $curlstr"
   fi
   curl $curlopt $curlstr
-  if [ $? -ne 0 ]; then
-    echo "Failed to execute: $cmd"
-    test -n "$first_request" && exit 1
+  if [ $? -ne 0 -a $cmd != "" ]; then
+    echo "Failed to execute $cmd."
   # TODO: Is there a need for test in different languages ?
   elif grep $GREPOPT "<h1>Incorrect request</h1>" /tmp/tmp.txt; then
     if grep $GREPOPT "<h1>404 Not Found</h1>" /tmp/tmp.txt; then
@@ -253,8 +249,30 @@ update_gwf () {
     fi
 }
 
-first_request=1
-crl "" # first call to verify DBNAME access, that will exit here.
+#!/bin/bash
+
+# Script to monitor a process using the 'crl ""' command
+# The script will exit once the process is detected as alive
+# Maximum 10 attempts before giving up
+
+MAX_ATTEMPTS=10
+attempt=0
+
+# first call to verify DBNAME access, that will exit here.
+while [ $attempt -lt $MAX_ATTEMPTS ]; do
+  crl "" >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    break
+  else
+    sleep 1
+  fi
+  attempt=$((attempt + 1))
+done
+if [ $attempt -eq $MAX_ATTEMPTS ]; then
+  echo "gwd does not seem to be running after $attempt trys"
+  exit 1
+fi
+
 crl "m=S&n=$FN+$SN&p="
 crl "p=$FN&n=$SN&oc=$OC"
 crl "p=$FN1&n=$SN1&oc=$OC1"
