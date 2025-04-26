@@ -109,14 +109,15 @@ DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
 generated: $(DUNE_FILES) lib/version.ml
 	@printf "Done.\n"
 
-fmt build-geneweb gwd install uninstall: info patch_files generated
+fmt build build-geneweb gwd install uninstall: info patch_files generated
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
 	$(call unpatch_after, dune build @fmt --auto-promote)
 
 # [BEGIN] Installation / Distribution section
-build: build-geneweb build-geneweb-rpc # Build all the project
+build:
+	@$(call unpatch_after, dune build)
 
 build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
