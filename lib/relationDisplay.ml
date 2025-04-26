@@ -6,6 +6,7 @@ open Gwdb
 open Util
 open Dag2html
 open Relation
+module Sosa = Geneweb_sosa
 
 let dag_of_ind_dag_list indl =
   let indl, _ =

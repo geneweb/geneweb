@@ -15,7 +15,6 @@
     geneweb
     wserver
     %%%GWDB_PKG%%%
-    %%%SOSA_PKG%%%
   )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules gwdPlugin request)
@@ -36,7 +35,6 @@
     uri
     wserver
     %%%GWDB_PKG%%%
-    %%%SOSA_PKG%%%
   )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules

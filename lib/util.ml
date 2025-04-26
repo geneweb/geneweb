@@ -4,6 +4,7 @@ open Config
 open Def
 open Gwdb
 module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 let is_welcome = ref false
 

@@ -6,6 +6,7 @@ open Gwdb
 open TemplAst
 open Util
 module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0

@@ -43,7 +43,6 @@
     uunf
     uutf
     yojson
-    zarith
     digestif
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.24.1")))
@@ -51,6 +50,7 @@
   (depopts
     ocaml-option-nnp
     ancient
+    zarith
   )
 )
 

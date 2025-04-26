@@ -3,6 +3,7 @@ open Dag2html
 open Def
 open Gwdb
 open Util
+module Sosa = Geneweb_sosa
 
 (* TODO use a set.. *)
 module Pset = struct

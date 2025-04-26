@@ -3,6 +3,7 @@
 open Config
 open Gwdb
 open Util
+module Sosa = Geneweb_sosa
 
 (* TODO use function from Util instead? *)
 let empty_sn_or_fn base p =

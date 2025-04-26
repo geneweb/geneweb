@@ -5,6 +5,7 @@ open Config
 open Def
 open Gwdb
 open Util
+module Sosa = Geneweb_sosa
 
 type fam = ifam * family * (iper * iper * iper) * bool
 type rel = relation * person option
