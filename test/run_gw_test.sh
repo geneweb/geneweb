@@ -157,6 +157,8 @@ fi
 if test "$test_diff" || test "$set_ref"; then
   rm -R /tmp/run
   mkdir /tmp/run
+  rm -R /tmp/new
+  mkdir /tmp/new
 fi
 
 RC=0
@@ -433,15 +435,14 @@ if test "$test_diff"; then
       if test $ret -ne 0; then
           echo "*** diff $test_dir/ref/$xx /tmp/run/$xx"
           diff $test_dir/ref/$xx /tmp/run/$xx
+          mv /tmp/run/$xx /tmp/new/$xx
       fi
     done
 fi
 
 if test "$set_ref"; then
-    echo "Saving /tmp/run files into $test_dir/ref for further tests"
-    rm -R $test_dir/ref
-    mkdir $test_dir/ref
-    cp /tmp/run/*.txt $test_dir/ref
+    echo "Saving /tmp/new files into $test_dir/ref for further tests"
+    cp /tmp/new/*.txt $test_dir/ref
 fi
 
 if test -f "$GWDLOG"; then
