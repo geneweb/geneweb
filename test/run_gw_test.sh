@@ -156,8 +156,10 @@ if test -z "$cgitest"; then
   pgrep -a gwd >/dev/null || { echo "gwd not running, potential traces in $GWDLOG"; exit 1; }
 fi
 
-rm -R /tmp/run
-mkdir /tmp/run
+if test "$test_diff" || test "$set_ref"; then
+  rm -R /tmp/run
+  mkdir /tmp/run
+fi
 
 RC=0
 curlopt="-sS -m $CRLMAXTIME -o /tmp/tmp.txt"
@@ -198,8 +200,9 @@ crl () {
     fi
   fi
   unset first_request tstmsg
-  if test "$number" != ""; then
-      mv /tmp/tmp.txt /tmp/run/$number.txt
+  if test "$test_diff" || test "$set_ref"; then
+    fn=$(echo "$cmd" | sed -e 's/=/_/g; s/&/_/g')
+    mv /tmp/tmp.txt /tmp/run/$fn.txt
   fi
 }
 
@@ -408,7 +411,7 @@ if test "$test_diff"; then
     for xx in $(ls /tmp/run); do
       diff $test_dir/ref/$xx /tmp/run/$xx > /dev/null 2>&1
       ret=$?
-      if [[ $ret -ne 0 ]]; then
+      if test $ret -ne 0; then
           echo "*** diff $test_dir/ref/$xx /tmp/run/$xx"
           diff $test_dir/ref/$xx /tmp/run/$xx
       fi

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- $Id: calendar.txt v7.1 10/01/2023 20:01:49 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
+<title>Calendars</title>
+<meta name="robots" content="none">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="images/favicon_gwd.png">
+<!-- $Id: css.txt v7.1 04/11/2023 04:28:54 $ -->
+<link rel="stylesheet" href="css/bootstrap.min.css?version=4.6.2">
+<link rel="stylesheet" href="css/all.min.css?version=6.5.1">
+<link rel="stylesheet" href="css/css.css">
+</head>
+<body>
+<meta name="format-detection" content="telephone=no" />
+<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
+<div class="d-flex flex-column fix_top fix_left home-xs">
+<a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="galichet?" title="Home">
+<i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i><i class="sr-only">Home</i></a>
+<a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
+accesskey="S" title="Search"><i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i><span class="sr-only">Search</span></a>
+</div>
+<div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+<div class="modal-body" id="ModalSearch">
+<form id="collapse_search" method="get" action="galichet?">
+<input type="hidden" name="m" value="S">
+<div class="d-flex flex-column flex-md-row justify-content-center">
+<h3 class="rounded modal-title my-2 ml-3 ml-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">Search individual</h3>
+<div class="col-12 col-md-8 mt-2 mt-md-0">
+<label class="sr-only" for="pn">Search person name</label>
+<input type="search" id="fullname" class="form-control form-control-lg no-clear-button mb-2"
+name="pn" placeholder="Search individual, surname, public name, alias or key"
+autofocus tabindex="4">
+<label class="sr-only" for="n">Search public name</label>
+<input type="search" id="n" class="form-control form-control-lg no-clear-button"
+name="n" placeholder="Surname" tabindex="5">
+<label class="sr-only" for="p">Search firstname</label>
+<input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2"
+name="p" placeholder="First name" tabindex="6">
+<div class="d-flex align-items-center ml-2 flex-nowrap">
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[all-hlp]">
+<input class="form-check-input" type="checkbox" name="p_all" id="p_all" value="on">
+<label class="form-check-label" for="p_all">All</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[order-hlp]">
+<input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
+<label class="form-check-label" for="p_order">Same order</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[exact-hlp]">
+<input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="on">
+<label class="form-check-label" for="p_exact">Exact</label>
+</div>
+</div>
+</div>
+<button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="Search"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> Search</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+<div class="container">
+<div class="row mt-4">
+<div class="mx-auto text-center">
+<h1>Calendars</h1>
+<h3 class="mt-4">Saturday - 05:56:30</h3>
+</div>
+</div>
+<div class="row mt-3">
+<div class="mx-auto text-center">
+<form method="get" action="galichet">
+<div class="form-inline">
+<input type="hidden" name="m" value="CAL"/>
+<table class="table-sm table-bordered mx-auto">
+<thead>
+<tr>
+<th class="py-2">&nbsp;</th>
+<th class="text-center" colspan="3">Month</th>
+<th class="text-center" colspan="3">Day</th>
+<th class="text-center" colspan="3">Year</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th class="px-2" class="mx-1" scope="row">Gregorian</th>
+<td><button class="btn btn-outline-secondary" type="submit" name="mg1">&lt;</button></td>
+<td><select class="form-control h-100 w-100" style="text-align-last:center;" name="mg">
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4" selected="selected">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+</select></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="mg2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="dg1">&lt;</button></td>
+<td><input type="number" class="form-control text-center" name="dg" min="1" max="31" value="26"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="dg2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yg1">&lt;</button></td>
+<td><input class="form-control text-center" name="yg" size="6" maxlength="6" value="2025"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yg2">&gt;</button></td>
+<td><button class="btn btn-outline-success" type="submit" name="tg">=</button></td>
+</tr>
+<tr>
+<th class="px-2" scope="row">Julian</th>
+<td><button class="btn btn-outline-secondary" type="submit" name="mj1">&lt;</button></td>
+<td><select class="form-control h-100 w-100" style="text-align-last:center;" name="mj">
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4" selected="selected">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+</select></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="mj2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="dj1">&lt;</button></td>
+<td><input type="number" class="form-control text-center" name="dj" min="1" max="31" value="13"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="dj2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yj1">&lt;</button></td>
+<td><input class="form-control text-center" name="yj" size="6" maxlength="6" value="2025"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yj2">&gt;</button></td>
+<td><button class="btn btn-outline-success" type="submit" name="tj">=</button></td>
+</tr>
+<tr>
+<th class="px-2" scope="row">French republican</th>
+<td><button class="btn btn-outline-secondary" type="submit" name="mf1">&lt;</button></td>
+<td><select class="form-control h-100 w-100" style="text-align-last:center;" name="mf">
+<option value="1">Vendémiaire</option>
+<option value="2">Brumaire</option>
+<option value="3">Frimaire</option>
+<option value="4">Nivôse</option>
+<option value="5">Pluviose</option>
+<option value="6">Ventôse</option>
+<option value="7">Germinal</option>
+<option value="8" selected="selected">Floréal</option>
+<option value="9">Prairial</option>
+<option value="10">Messidor</option>
+<option value="11">Thermidor</option>
+<option value="12">Fructidor</option>
+<option value="13">Extra</option>
+</select></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="mf2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="df1">&lt;</button></td>
+<td><input type="number" class="form-control text-center" name="df" min="1" max="31" value="7"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="df2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yf1">&lt;</button></td>
+<td><input class="form-control text-center" name="yf" size="6" maxlength="6" value="233"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yf2">&gt;</button></td>
+<td><button class="btn btn-outline-success" type="submit" name="tf">=</button></td>
+</tr>
+<tr>
+<th class="px-2" scope="row">Hebrew</th>
+<td><button class="btn btn-outline-secondary" type="submit" name="mh1">&lt;</button></td>
+<td><select class="form-control h-100 w-100" style="text-align-last:center;" name="mh">
+<option value="1">Tishri</option>
+<option value="2">Heshvan</option>
+<option value="3">Kislev</option>
+<option value="4">Tevet</option>
+<option value="5">Shevat</option>
+<option value="6">Adar I</option>
+<option value="7">Adar II</option>
+<option value="8" selected="selected">Nisan</option>
+<option value="9">Iyyar</option>
+<option value="10">Sivan</option>
+<option value="11">Tammuz</option>
+<option value="12">Av</option>
+<option value="13">Elul</option>
+</select></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="mh2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="dh1">&lt;</button></td>
+<td><input type="number" class="form-control text-center" name="dh" min="1" max="31" value="28"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="dh2">&gt;</button></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yh1">&lt;</button></td>
+<td><input class="form-control text-center" name="yh" size="6" maxlength="6" value="5785"/></td>
+<td><button class="btn btn-outline-secondary" type="submit" name="yh2">&gt;</button></td>
+<td><button class="btn btn-outline-success" type="submit" name="th">=</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</form>
+<br>
+<span>Number of days after new moon: 29</span>
+<br><br>
+Julian day: 2,460,792</div>
+</div>
+<!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
+<div class="d-flex flex-wrap justify-content-md-end">
+<!-- legal notices -->
+<!-- Language selector and connections info -->
+<div class="d-flex flex-row align-items-lg-end mt-0 ml-3 border-0">
+<div class="btn-group dropup" data-toggle="tooltip" data-placement="left"
+title="English – Select language">
+<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
+data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<span class="sr-only">lang</span>
+<span class="text-uppercase">en</span>
+<span class="sr-only">, select language</span>
+</button>
+<div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
+<a class="dropdown-item" id="lang_af" href="galichet?lang=af&m=CAL&norandom=yes"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
+<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&m=CAL&norandom=yes"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
+<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&m=CAL&norandom=yes"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
+<a class="dropdown-item" id="lang_br" href="galichet?lang=br&m=CAL&norandom=yes"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
+<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&m=CAL&norandom=yes"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
+<a class="dropdown-item" id="lang_co" href="galichet?lang=co&m=CAL&norandom=yes"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
+<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&m=CAL&norandom=yes"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
+<a class="dropdown-item" id="lang_da" href="galichet?lang=da&m=CAL&norandom=yes"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
+<a class="dropdown-item" id="lang_de" href="galichet?lang=de&m=CAL&norandom=yes"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
+<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&m=CAL&norandom=yes"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
+<a class="dropdown-item" id="lang_es" href="galichet?lang=es&m=CAL&norandom=yes"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
+<a class="dropdown-item" id="lang_et" href="galichet?lang=et&m=CAL&norandom=yes"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
+<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&m=CAL&norandom=yes"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
+<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&m=CAL&norandom=yes"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
+<a class="dropdown-item" id="lang_he" href="galichet?lang=he&m=CAL&norandom=yes"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
+<a class="dropdown-item" id="lang_is" href="galichet?lang=is&m=CAL&norandom=yes"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
+<a class="dropdown-item" id="lang_it" href="galichet?lang=it&m=CAL&norandom=yes"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
+<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&m=CAL&norandom=yes"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
+<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&m=CAL&norandom=yes"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
+<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&m=CAL&norandom=yes"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
+<a class="dropdown-item" id="lang_no" href="galichet?lang=no&m=CAL&norandom=yes"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
+<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&m=CAL&norandom=yes"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
+<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&m=CAL&norandom=yes"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
+<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&m=CAL&norandom=yes"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
+<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&m=CAL&norandom=yes"><code>pt-br </code>Brazilian-Portuguese</a>
+<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&m=CAL&norandom=yes"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
+<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&m=CAL&norandom=yes"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
+<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&m=CAL&norandom=yes"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
+<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&m=CAL&norandom=yes"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
+<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&m=CAL&norandom=yes"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
+<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&m=CAL&norandom=yes"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
+<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&m=CAL&norandom=yes"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
+</div>
+</div>
+<!-- Connections info -->
+<div class="d-flex flex-column justify-items-center align-items-center small ml-1 ml-md-3">
+<a href="galichet?m=CONN_WIZ">1 wizard
+</a><span>1 connection
+</span>
+</div>
+</div>
+<!-- Footer links and copyright -->
+<div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
+<div class="ml-auto mb-0">
+<a role="button" class="mr-1"
+href="galichet?templ=templm&m=CAL&norandom=yes" 
+data-toggle="tooltip"
+title="templm">
+<i class="fab fa-markdown" aria-hidden="true"></i>
+<span class="sr-only">switch to templm</span>
+</a>
+GeneWeb v. 7.1-beta</div>
+<div class="btn-group mt-0">
+<span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
+<a href="https://geneweb.tuxfamily.org/wiki/GeneWeb" 
+class="ml-1"
+target="_blank" 
+rel="noreferrer, noopener" 
+data-toggle="tooltip" 
+title="GeneWeb Wiki">
+<i class="fab fa-wikipedia-w"></i>
+</a>
+<a href="https://github.com/geneweb/geneweb" 
+class="ml-1"
+target="_blank" 
+rel="noreferrer, noopener" 
+data-toggle="tooltip" 
+title="GeneWeb Github">
+<i class="fab fa-github"></i>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
+<script src="js/jquery.min.js?version=3.7.1"></script>
+<script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
+<script>
+// Enhanced clear button management for dynamic input fields
+// Add clear buttons (X) to input fields and handle DataTable updates
+// Generic clear button functionality for form inputs
+function addClearButtonToInputs() {
+// Utility function to create and setup clear button
+function createClearButton(element) {
+const clearButton = document.createElement('i');
+clearButton.className = 'fas fa-xmark clear-button-icon';
+clearButton.title = 'Clear the input';
+clearButton.style.cssText = `
+position: absolute;
+right: 10px;
+top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
+transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
+cursor: pointer;
+color: #667fc9;
+font-size: 1em;
+opacity: 0;
+transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+pointer-events: auto;
+`;
+return clearButton;
+}
+// Initialize or update a single input
+function initializeInput(element) {
+// Skip if already initialized
+if (element.dataset.clearInitialized) {
+const existingButton = element.parentNode.querySelector('.clear-button-icon');
+if (existingButton) {
+existingButton.style.opacity = element.value ? '1' : '0';
+}
+return;
+}
+// Mark as initialized
+element.dataset.clearInitialized = 'true';
+// Create wrapper if needed
+let wrapper = element.parentNode;
+if (!wrapper.classList.contains('clear-button-wrapper')) {
+wrapper = document.createElement('div');
+wrapper.className = 'clear-button-wrapper';
+wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
+element.parentNode.insertBefore(wrapper, element);
+wrapper.appendChild(element);
+}
+// Add padding for the clear button
+element.style.paddingRight = '24px';
+// Create and append clear button
+const clearButton = createClearButton(element);
+wrapper.appendChild(clearButton);
+// Update clear button visibility
+const updateVisibility = () => {
+requestAnimationFrame(() => {
+clearButton.style.opacity = element.value ? '1' : '0';
+});
+};
+// Event listeners
+element.addEventListener('input', updateVisibility);
+element.addEventListener('change', updateVisibility);
+element.addEventListener('focus', updateVisibility);
+// Hover effects
+clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
+clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
+// Handle clear button click
+clearButton.addEventListener('click', (e) => {
+e.preventDefault();
+e.stopPropagation();
+// Clear the input
+element.value = '';
+element.focus();
+updateVisibility();
+// Trigger events
+const inputEvent = new CustomEvent('clearButton', {
+bubbles: true,
+detail: { element }
+});
+element.dispatchEvent(inputEvent);
+element.dispatchEvent(new Event('input', { bubbles: true }));
+element.dispatchEvent(new Event('change', { bubbles: true }));
+});
+// Initial visibility state
+updateVisibility();
+}
+// Process all matching inputs
+function processInputs() {
+const selector = `
+input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
+input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
+textarea:not(.no-clear-button):not([readonly]):not([disabled]),
+.clear-button:not([readonly]):not([disabled])
+`;
+requestAnimationFrame(() => {
+document.querySelectorAll(selector).forEach(initializeInput);
+});
+}
+// Initial processing
+processInputs();
+// Monitor DOM changes
+const observer = new MutationObserver((mutations) => {
+let shouldProcess = false;
+mutations.forEach(mutation => {
+if (mutation.addedNodes.length ||
+mutation.type === 'attributes' &&
+(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
+shouldProcess = true;
+}
+});
+if (shouldProcess) {
+processInputs();
+}
+});
+observer.observe(document.body, {
+childList: true,
+subtree: true,
+attributes: true,
+attributeFilter: ['type', 'class']
+});
+}
+</script>
+<script>
+function initializeLazyModules() {
+$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
+$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
+$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+}
+// Focus on found autofocus input in opening BS modal
+function setupModalAutofocus() {
+$('.modal').on('shown.bs.modal', function() {
+$(this).find('[autofocus]').focus();
+});
+}
+// Floating placeholders for all textual inputs
+function setupFloatingPlaceholders() {
+const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
+inputs.forEach(input => {
+// Ignore placeholders that are only non-breaking spaces
+if (input.placeholder.trim() === '') return;
+const hadFocus = document.activeElement === input;
+const wrapper = document.createElement('div');
+wrapper.className = 'input-wrapper';
+input.parentNode.insertBefore(wrapper, input);
+wrapper.appendChild(input);
+const placeholder = document.createElement('span');
+placeholder.className = 'floating-placeholder';
+placeholder.textContent = input.placeholder;
+wrapper.appendChild(placeholder);
+input.addEventListener('focus', () => placeholder.classList.add('active'));
+input.addEventListener('blur', () => placeholder.classList.remove('active'));
+if (hadFocus || input.hasAttribute('autofocus')) {
+requestAnimationFrame(() => {
+input.focus();
+placeholder.classList.add('active');
+});
+}
+});
+}
+const initTooltips = () => {
+const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
+if (tooltipElements.length > 0) {
+$(tooltipElements).tooltip({
+trigger: 'hover',
+delay: { show: 200, hide: 50 },
+container: 'body',
+});
+}
+};
+function safeInitialize(fn) {
+try {
+fn();
+} catch (error) {
+console.error('Initialization error:', error);
+}
+}
+document.addEventListener('DOMContentLoaded', () => {
+initializeLazyModules();
+setupModalAutofocus();
+setupFloatingPlaceholders();
+});
+</script>
+</body>
+</html>

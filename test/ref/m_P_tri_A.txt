@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>27 first names (34 individuals)</title>
+<meta name="robots" content="none">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="images/favicon_gwd.png">
+<link rel="apple-touch-icon" href="images/favicon_gwd.png">
+<!-- $Id: css.txt v7.1 04/11/2023 04:28:54 $ -->
+<link rel="stylesheet" href="css/bootstrap.min.css?version=4.6.2">
+<link rel="stylesheet" href="css/all.min.css?version=6.5.1">
+<link rel="stylesheet" href="css/css.css">
+</head>
+<body>
+<meta name="format-detection" content="telephone=no" />
+<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
+<div class="d-flex flex-column fix_top fix_left home-xs">
+<a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="galichet?" title="Home">
+<i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i><i class="sr-only">Home</i></a>
+<a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
+accesskey="S" title="Search"><i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i><span class="sr-only">Search</span></a>
+</div>
+<div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+<div class="modal-body" id="ModalSearch">
+<form id="collapse_search" method="get" action="galichet?">
+<input type="hidden" name="m" value="S">
+<div class="d-flex flex-column flex-md-row justify-content-center">
+<h3 class="rounded modal-title my-2 ml-3 ml-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">Search individual</h3>
+<div class="col-12 col-md-8 mt-2 mt-md-0">
+<label class="sr-only" for="pn">Search person name</label>
+<input type="search" id="fullname" class="form-control form-control-lg no-clear-button mb-2"
+name="pn" placeholder="Search individual, surname, public name, alias or key"
+autofocus tabindex="4">
+<label class="sr-only" for="n">Search public name</label>
+<input type="search" id="n" class="form-control form-control-lg no-clear-button"
+name="n" placeholder="Surname" tabindex="5">
+<label class="sr-only" for="p">Search firstname</label>
+<input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2"
+name="p" placeholder="First name" tabindex="6">
+<div class="d-flex align-items-center ml-2 flex-nowrap">
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[all-hlp]">
+<input class="form-check-input" type="checkbox" name="p_all" id="p_all" value="on">
+<label class="form-check-label" for="p_all">All</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[order-hlp]">
+<input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
+<label class="form-check-label" for="p_order">Same order</label>
+</div>
+<div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[exact-hlp]">
+<input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="on">
+<label class="form-check-label" for="p_exact">Exact</label>
+</div>
+</div>
+</div>
+<button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="Search"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> Search</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+<div class="container"><h1>27 first names (34 individuals)</h1>
+<p class="search_name"><a href="#aA">A</a>
+<a href="#aC">C</a>
+<a href="#aF">F</a>
+<a href="#aJ">J</a>
+<a href="#aL">L</a>
+<a href="#aM">M</a>
+<a href="#aN">N</a>
+<a href="#aP">P</a>
+<a href="#aT">T</a>
+<a href="#al">l</a>
+<a href="#ap">p</a>
+</p><ul><li><a id="aA">A</a><ul><li><a href="galichet?m=P&v=Anthoine&t=A">Anthoine</a> (2)</li></ul></li><li><a id="aC">C</a><ul><li><a href="galichet?m=P&v=Charlotte&t=A">Charlotte</a> (1)</li><li><a href="galichet?m=P&v=Claude&t=A">Claude</a> (2)</li></ul></li><li><a id="aF">F</a><ul><li><a href="galichet?m=P&v=Florence&t=A">Florence</a> (1)</li></ul></li><li><a id="aJ">J</a><ul><li><a href="galichet?m=P&v=Jacques&t=A">Jacques</a> (1)</li><li><a href="galichet?m=P&v=Jean&t=A">Jean</a> (2)</li><li><a href="galichet?m=P&v=Jean+Charles&t=A">Jean Charles</a> (1)</li><li><a href="galichet?m=P&v=Jean+Pierre&t=A">Jean Pierre</a> (1)</li><li><a href="galichet?m=P&v=Jean-Baptiste&t=A">Jean-Baptiste</a> (1)</li><li><a href="galichet?m=P&v=Jean-Paul&t=A">Jean-Paul</a> (1)</li><li><a href="galichet?m=P&v=Jeanne&t=A">Jeanne</a> (3)</li></ul></li><li><a id="aL">L</a><ul><li><a href="galichet?m=P&v=Laure&t=A">Laure</a> (1)</li><li><a href="galichet?m=P&v=Laurence&t=A">Laurence</a> (1)</li><li><a href="galichet?m=P&v=Laurent&t=A">Laurent</a> (1)</li><li><a href="galichet?m=P&v=Louis&t=A">Louis</a> (2)</li><li><a href="galichet?m=P&v=Louise&t=A">Louise</a> (1)</li></ul></li><li><a id="aM">M</a><ul><li><a href="galichet?m=P&v=Marie&t=A">Marie</a> (2)</li><li><a href="galichet?m=P&v=Marie+Elisabeth&t=A">Marie Elisabeth</a> (1)</li><li><a href="galichet?m=P&v=Marie-Jeanne&t=A">Marie-Jeanne</a> (1)</li></ul></li><li><a id="aN">N</a><ul><li><a href="galichet?m=P&v=Nicole&t=A">Nicole</a> (1)</li></ul></li><li><a id="aP">P</a><ul><li><a href="galichet?m=P&v=Paul&t=A">Paul</a> (1)</li><li><a href="galichet?m=P&v=Perrette&t=A">Perrette</a> (1)</li><li><a href="galichet?m=P&v=Pierre&t=A">Pierre</a> (1)</li></ul></li><li><a id="aT">T</a><ul><li><a href="galichet?m=P&v=Th%C3%A9r%C3%A8se+Eug%C3%A9nie&t=A">Thérèse Eugénie</a> (1)</li></ul></li><li><a id="al">l</a><ul><li><a href="galichet?m=P&v=lolo&t=A">lolo</a> (1)</li></ul></li><li><a id="ap">p</a><ul><li><a href="galichet?m=P&v=prenom1&t=A">prenom1</a> (1)</li><li><a href="galichet?m=P&v=prenom2&t=A">prenom2</a> (1)</li></ul></li></ul><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
+<div class="d-flex flex-wrap justify-content-md-end">
+<!-- legal notices -->
+<!-- Language selector and connections info -->
+<div class="d-flex flex-row align-items-lg-end mt-0 ml-3 border-0">
+<div class="btn-group dropup" data-toggle="tooltip" data-placement="left"
+title="English – Select language">
+<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
+data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<span class="sr-only">lang</span>
+<span class="text-uppercase">en</span>
+<span class="sr-only">, select language</span>
+</button>
+<div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
+<!-- Language options remain the same -->
+<a class="dropdown-item" href="galichet?lang=af&m=P&norandom=yes&tri=A">af</a>
+<a class="dropdown-item" href="galichet?lang=ar&m=P&norandom=yes&tri=A">ar</a>
+<a class="dropdown-item" href="galichet?lang=bg&m=P&norandom=yes&tri=A">bg</a>
+<a class="dropdown-item" href="galichet?lang=br&m=P&norandom=yes&tri=A">br</a>
+<a class="dropdown-item" href="galichet?lang=ca&m=P&norandom=yes&tri=A">ca</a>
+<a class="dropdown-item" href="galichet?lang=co&m=P&norandom=yes&tri=A">co</a>
+<a class="dropdown-item" href="galichet?lang=cs&m=P&norandom=yes&tri=A">cs</a>
+<a class="dropdown-item" href="galichet?lang=da&m=P&norandom=yes&tri=A">da</a>
+<a class="dropdown-item" href="galichet?lang=de&m=P&norandom=yes&tri=A">de</a>
+<a class="dropdown-item" href="galichet?m=P&norandom=yes&tri=A">en</a>
+<a class="dropdown-item" href="galichet?lang=eo&m=P&norandom=yes&tri=A">eo</a>
+<a class="dropdown-item" href="galichet?lang=es&m=P&norandom=yes&tri=A">es</a>
+<a class="dropdown-item" href="galichet?lang=et&m=P&norandom=yes&tri=A">et</a>
+<a class="dropdown-item" href="galichet?lang=fi&m=P&norandom=yes&tri=A">fi</a>
+<a class="dropdown-item" href="galichet?lang=fr&m=P&norandom=yes&tri=A">fr</a>
+<a class="dropdown-item" href="galichet?lang=he&m=P&norandom=yes&tri=A">he</a>
+<a class="dropdown-item" href="galichet?lang=is&m=P&norandom=yes&tri=A">is</a>
+<a class="dropdown-item" href="galichet?lang=it&m=P&norandom=yes&tri=A">it</a>
+<a class="dropdown-item" href="galichet?lang=lt&m=P&norandom=yes&tri=A">lt</a>
+<a class="dropdown-item" href="galichet?lang=lv&m=P&norandom=yes&tri=A">lv</a>
+<a class="dropdown-item" href="galichet?lang=nl&m=P&norandom=yes&tri=A">nl</a>
+<a class="dropdown-item" href="galichet?lang=no&m=P&norandom=yes&tri=A">no</a>
+<a class="dropdown-item" href="galichet?lang=oc&m=P&norandom=yes&tri=A">oc</a>
+<a class="dropdown-item" href="galichet?lang=pl&m=P&norandom=yes&tri=A">pl</a>
+<a class="dropdown-item" href="galichet?lang=pt&m=P&norandom=yes&tri=A">pt</a>
+<a class="dropdown-item" href="galichet?lang=pt-br&m=P&norandom=yes&tri=A">pt-br</a>
+<a class="dropdown-item" href="galichet?lang=ro&m=P&norandom=yes&tri=A">ro</a>
+<a class="dropdown-item" href="galichet?lang=ru&m=P&norandom=yes&tri=A">ru</a>
+<a class="dropdown-item" href="galichet?lang=sk&m=P&norandom=yes&tri=A">sk</a>
+<a class="dropdown-item" href="galichet?lang=sl&m=P&norandom=yes&tri=A">sl</a>
+<a class="dropdown-item" href="galichet?lang=sv&m=P&norandom=yes&tri=A">sv</a>
+<a class="dropdown-item" href="galichet?lang=tr&m=P&norandom=yes&tri=A">tr</a>
+<a class="dropdown-item" href="galichet?lang=zh&m=P&norandom=yes&tri=A">zh</a>
+</div>
+</div>
+<!-- Connections info -->
+<div class="d-flex flex-column justify-items-center align-items-center small ml-1 ml-md-3">
+<a href="galichet?m=CONN_WIZ">1 wizard
+</a><span>1 connection
+</span>
+</div>
+</div>
+<!-- Footer links and copyright -->
+<div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
+<div class="ml-auto mb-0">
+<a role="button" class="mr-1"
+href="galichet?templ=templm&m=P&norandom=yes&tri=A" 
+data-toggle="tooltip"
+title="templm">
+<i class="fab fa-markdown" aria-hidden="true"></i>
+<span class="sr-only">switch to templm</span>
+</a>
+GeneWeb v. 7.1-beta</div>
+<div class="btn-group mt-0">
+<span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
+<a href="https://geneweb.tuxfamily.org/wiki/GeneWeb" 
+class="ml-1"
+target="_blank" 
+rel="noreferrer, noopener" 
+data-toggle="tooltip" 
+title="GeneWeb Wiki">
+<i class="fab fa-wikipedia-w"></i>
+</a>
+<a href="https://github.com/geneweb/geneweb" 
+class="ml-1"
+target="_blank" 
+rel="noreferrer, noopener" 
+data-toggle="tooltip" 
+title="GeneWeb Github">
+<i class="fab fa-github"></i>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
+<script src="js/jquery.min.js?version=3.7.1"></script>
+<script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
+<script>
+// Enhanced clear button management for dynamic input fields
+// Add clear buttons (X) to input fields and handle DataTable updates
+// Generic clear button functionality for form inputs
+function addClearButtonToInputs() {
+// Utility function to create and setup clear button
+function createClearButton(element) {
+const clearButton = document.createElement('i');
+clearButton.className = 'fas fa-xmark clear-button-icon';
+clearButton.title = 'Clear the input';
+clearButton.style.cssText = `
+position: absolute;
+right: 10px;
+top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
+transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
+cursor: pointer;
+color: #667fc9;
+font-size: 1em;
+opacity: 0;
+transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+pointer-events: auto;
+`;
+return clearButton;
+}
+// Initialize or update a single input
+function initializeInput(element) {
+// Skip if already initialized
+if (element.dataset.clearInitialized) {
+const existingButton = element.parentNode.querySelector('.clear-button-icon');
+if (existingButton) {
+existingButton.style.opacity = element.value ? '1' : '0';
+}
+return;
+}
+// Mark as initialized
+element.dataset.clearInitialized = 'true';
+// Create wrapper if needed
+let wrapper = element.parentNode;
+if (!wrapper.classList.contains('clear-button-wrapper')) {
+wrapper = document.createElement('div');
+wrapper.className = 'clear-button-wrapper';
+wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
+element.parentNode.insertBefore(wrapper, element);
+wrapper.appendChild(element);
+}
+// Add padding for the clear button
+element.style.paddingRight = '24px';
+// Create and append clear button
+const clearButton = createClearButton(element);
+wrapper.appendChild(clearButton);
+// Update clear button visibility
+const updateVisibility = () => {
+requestAnimationFrame(() => {
+clearButton.style.opacity = element.value ? '1' : '0';
+});
+};
+// Event listeners
+element.addEventListener('input', updateVisibility);
+element.addEventListener('change', updateVisibility);
+element.addEventListener('focus', updateVisibility);
+// Hover effects
+clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
+clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
+// Handle clear button click
+clearButton.addEventListener('click', (e) => {
+e.preventDefault();
+e.stopPropagation();
+// Clear the input
+element.value = '';
+element.focus();
+updateVisibility();
+// Trigger events
+const inputEvent = new CustomEvent('clearButton', {
+bubbles: true,
+detail: { element }
+});
+element.dispatchEvent(inputEvent);
+element.dispatchEvent(new Event('input', { bubbles: true }));
+element.dispatchEvent(new Event('change', { bubbles: true }));
+});
+// Initial visibility state
+updateVisibility();
+}
+// Process all matching inputs
+function processInputs() {
+const selector = `
+input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
+input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
+textarea:not(.no-clear-button):not([readonly]):not([disabled]),
+.clear-button:not([readonly]):not([disabled])
+`;
+requestAnimationFrame(() => {
+document.querySelectorAll(selector).forEach(initializeInput);
+});
+}
+// Initial processing
+processInputs();
+// Monitor DOM changes
+const observer = new MutationObserver((mutations) => {
+let shouldProcess = false;
+mutations.forEach(mutation => {
+if (mutation.addedNodes.length ||
+mutation.type === 'attributes' &&
+(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
+shouldProcess = true;
+}
+});
+if (shouldProcess) {
+processInputs();
+}
+});
+observer.observe(document.body, {
+childList: true,
+subtree: true,
+attributes: true,
+attributeFilter: ['type', 'class']
+});
+}
+</script>
+<script>
+function initializeLazyModules() {
+$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
+$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
+$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+}
+// Focus on found autofocus input in opening BS modal
+function setupModalAutofocus() {
+$('.modal').on('shown.bs.modal', function() {
+$(this).find('[autofocus]').focus();
+});
+}
+// Floating placeholders for all textual inputs
+function setupFloatingPlaceholders() {
+const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
+inputs.forEach(input => {
+// Ignore placeholders that are only non-breaking spaces
+if (input.placeholder.trim() === '') return;
+const hadFocus = document.activeElement === input;
+const wrapper = document.createElement('div');
+wrapper.className = 'input-wrapper';
+input.parentNode.insertBefore(wrapper, input);
+wrapper.appendChild(input);
+const placeholder = document.createElement('span');
+placeholder.className = 'floating-placeholder';
+placeholder.textContent = input.placeholder;
+wrapper.appendChild(placeholder);
+input.addEventListener('focus', () => placeholder.classList.add('active'));
+input.addEventListener('blur', () => placeholder.classList.remove('active'));
+if (hadFocus || input.hasAttribute('autofocus')) {
+requestAnimationFrame(() => {
+input.focus();
+placeholder.classList.add('active');
+});
+}
+});
+}
+const initTooltips = () => {
+const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
+if (tooltipElements.length > 0) {
+$(tooltipElements).tooltip({
+trigger: 'hover',
+delay: { show: 200, hide: 50 },
+container: 'body',
+});
+}
+};
+function safeInitialize(fn) {
+try {
+fn();
+} catch (error) {
+console.error('Initialization error:', error);
+}
+}
+document.addEventListener('DOMContentLoaded', () => {
+initializeLazyModules();
+setupModalAutofocus();
+setupFloatingPlaceholders();
+});
+</script>
+</body>
+</html>
