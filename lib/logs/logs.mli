@@ -7,6 +7,8 @@ val verbosity_level : int ref
 val debug_flag : bool ref
 (** If set to [true], prints backtrace when printing log. *)
 
+val syslog_flag : bool ref
+
 val oc : out_channel option ref
 (** The output channel in which log is written. *)
 

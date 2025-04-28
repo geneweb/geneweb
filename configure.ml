@@ -17,11 +17,9 @@ let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let sosa = ref `None
 let gwdb = ref `None
-let syslog = ref false
 let caching = ref false
 let set_caching () = caching := true
 let set_api () = api := true
-let set_syslog () = syslog := true
 
 let set_sosa_legacy () =
   assert (!sosa = `None);
@@ -55,7 +53,7 @@ let speclist =
     ( "--sosa-zarith",
       Arg.Unit set_sosa_zarith,
       " Use Sosa module implementation based on `zarith` library" );
-    ("--syslog", Arg.Unit set_syslog, " Log gwd errors using syslog");
+    ("--syslog", Arg.Unit ignore, " Log gwd errors using syslog");
     ( "--gwd-caching",
       Arg.Unit set_caching,
       " Enable database preloading (Unix-only)" );
@@ -66,9 +64,6 @@ let () =
   Arg.parse speclist failwith errmsg;
   let dune_dirs_exclude = ref "" in
   let exclude_dir s = dune_dirs_exclude := !dune_dirs_exclude ^ " " ^ s in
-  let syslog_d, syslog_pkg =
-    match !syslog with true -> (" -D SYSLOG", "syslog") | false -> ("", "")
-  in
   if !sosa = `None then
     if installed "zarith" then set_sosa_zarith () else set_sosa_legacy ();
   let sosa_d, sosa_pkg =
@@ -128,10 +123,8 @@ let () =
   var "GWDB_D" gwdb_d;
   var "OS_D" os_d;
   var "SOSA_D" sosa_d;
-  var "SYSLOG_D" syslog_d;
   var "GWDB_PKG" gwdb_pkg;
   var "SOSA_PKG" sosa_pkg;
-  var "SYSLOG_PKG" syslog_pkg;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude;
   var "DUNE_PROFILE" dune_profile;
   var "ANCIENT_LIB" ancient_lib;

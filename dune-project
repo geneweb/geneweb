@@ -36,7 +36,6 @@
     ppx_deriving
     ppx_import
     stdlib-shims
-    syslog
     (unidecode (= "0.2.0"))
     uri
     uucp
@@ -51,8 +50,16 @@
   (depopts
     ocaml-option-nnp
     ancient
+    geneweb-option-syslog
   )
 )
+
+(package
+  (name geneweb-option-syslog)
+  (synopsis "Syslog support for GeneWeb")
+  (tags (geneweb syslog))
+  (depends
+    syslog))
 
 (package
   (name geneweb-rpc)

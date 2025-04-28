@@ -1,0 +1,3 @@
+(library
+  (package geneweb-option-syslog)
+  (name geneweb_option_syslog))

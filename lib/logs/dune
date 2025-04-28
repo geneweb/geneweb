@@ -1,0 +1,9 @@
+(library
+  (name geneweb_logs)
+  (public_name geneweb.logs)
+  (libraries
+    fmt
+    geneweb_util
+    (select geneweb_syslog.ml from
+      (geneweb_option_syslog syslog -> geneweb_syslog.wrapped.ml)
+      ( -> geneweb_syslog.dummy.ml))))
