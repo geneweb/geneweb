@@ -78,7 +78,7 @@ browser_lang: <br>
 </section>
 <section id="gwd-arguments" class="mt-3 mx-3">
 <h2>Launch arguments of Gwd server</h2>
-<div>./distribution/gw/gwd<br><b>-setup_link</b> <br><b>-bd</b> /home/michel/Genea/GeneWeb-Bases<br><b>-hd</b> ./distribution/gw<br><b>-trace_failed_passwd</b> <br><b>-robot_xcl</b> 10000,1<br><b>-conn_tmout</b> 3600<br><b>-blang</b> <br><b>-log</b> <stderr><br><b>-plugins</b> <br><b>-unsafe</b> ./distribution/gw/plugins</div>
+<div>./distribution/gw/gwd<br><b>-setup_link</b> <br><b>-bd</b> ./distribution/bases<br><b>-hd</b> ./distribution/gw<br><b>-trace_failed_passwd</b> <br><b>-robot_xcl</b> 10000,1<br><b>-conn_tmout</b> 3600<br><b>-lang</b> en<br><b>-log</b> <stderr><br><b>-plugins</b> <br><b>-unsafe</b> ./distribution/gw/plugins</div>
 <p>
 Mode: Server<br>
 prefix: galichet?<br>
