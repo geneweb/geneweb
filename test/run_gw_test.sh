@@ -142,7 +142,7 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -trace_failed_passwd \
   -robot_xcl 10000,1 \
   -conn_tmout 3600 \
-  -blang \
+  -lang en \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
   -predictable_mode \
@@ -359,7 +359,7 @@ crl "m=INV_FAM&i=$ID&f=$FID"
 crl "m=L"
 crl "m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE"
 crl "m=LB&k=30"
-crl "m=LD&k=30"
+crl "m=LD&k=30" $nodiff #uses today's date!
 crl "m=LL&k=30"
 crl "m=LM&k=30"
 crl "m=MISC_NOTES"
