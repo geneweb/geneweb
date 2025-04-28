@@ -1881,8 +1881,8 @@ tr: resim ekle
     must use MOD_IND
 co: u ritrattu hè un indirizzu web. Impiegà MOD_IND per mudificallu o squassallu.
 de: Das Bild ist eine URL. Nutze MOD_IND zum korrigieren oder löschen.
-en: portrait is a url. Use MOD_IND to delete or update.
-fr: le portrait est une Url. Utiliser MOD_IND pour le corriger ou le supprimer.
+en: portrait is a URL. Use MOD_IND to delete or update.
+fr: le portrait est une URL. Utiliser MOD_IND pour le corriger ou le supprimer.
 
     add portrait
 co: aghjunghje un ritrattu
@@ -8660,6 +8660,10 @@ sk: pre zoznam podľa dátumu poslednej zmeny
 sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
 tr: son değişiklik tarihine göre sıralanmış liste için
+
+    for url only
+en: for URL defined images
+fr: pour les images définies par une URL
 
     for/since
 co: durante/dapoi
