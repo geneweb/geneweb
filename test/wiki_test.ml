@@ -15,6 +15,13 @@ let f s =
   in
   loop [] 0
 
+let expect_failure name speed f =
+  Alcotest.test_case name speed (fun () ->
+      try
+        f ();
+        Alcotest.fail "Expected this test to fail, but it passed"
+      with _ -> ())
+
 let l =
   [
     ([ WLpage (13, ([], "aaa"), "aaa", "", "bbb") ], "[[[aaa/bbb]]]");
@@ -68,6 +75,13 @@ let test expected s () =
   (check (list testable_wiki)) "" expected (f s);
   ()
 
+let bold_italic_syntax _ =
+  let test a r = (check string) a r (Wiki.bold_italic_syntax a) in
+  test "" "";
+  test "abc ''def'' ghi" "abc <i>def</i> ghi";
+  test "abc '''def''' ghi" "abc <b>def</b> ghi";
+  test "abc '''''def''''' ghi" "abc <b><i>def</i></b> ghi"
+
 let v =
   [
     ( "misc-notes-link",
@@ -75,4 +89,6 @@ let v =
       List.map
         (fun (expected, s) -> test_case "Wiki links" `Quick (test expected s))
         l );
+    ( "bold-italic-syntax",
+      [ test_case "Wiki.bold_italic_syntax" `Quick bold_italic_syntax ] );
   ]
