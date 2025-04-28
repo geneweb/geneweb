@@ -15,9 +15,9 @@ let escape_aux count blit str =
   in
   loop 0 0
 
-(** [escape_html str] replaces '&', '"', '<' and '>'
+(** [escape str] replaces '&', '"', '<' and '>'
     with their corresponding character entities (using entity number) *)
-let escape_html s : Adef.escaped_string =
+let escape s =
   escape_aux
     (function '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *) | _ -> 1)
     (fun buf ibuf istr loop -> function
@@ -40,9 +40,6 @@ let escape_html s : Adef.escaped_string =
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
     s
-  |> Adef.escaped
-
-let esc x = (escape_html x :> Adef.safe_string)
 
 (** [escape_attribute str] only escapes double quote and ampersand.
     Since we will return normalized HTML, ['"'] should be the only
@@ -60,6 +57,9 @@ let escape_attribute =
       | c ->
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
+
+let escape_html s : Adef.escaped_string = escape s |> Adef.escaped
+let esc x = (escape_html x :> Adef.safe_string)
 
 (* aswer the question "should we show p's names and other private stuffs?";
    takes into account if you are a wizard or not *)
@@ -475,7 +475,7 @@ let safe_html_allowed_tags =
 
    Markup.ml automatically return tags names in lowercase.
 *)
-let safe_html_aux escape_text s =
+let safe_html_aux s =
   let stack = ref [] in
   let make_safe = function
     | `Start_element (name, attrs) ->
@@ -508,14 +508,9 @@ let safe_html_aux escape_text s =
         | _ -> failwith (__FILE__ ^ " " ^ string_of_int __LINE__))
     | e -> e
   in
-  Markup.string s
-  |> Markup.parse_html ~context:(`Fragment "body")
-  |> Markup.signals |> Markup.map make_safe
-  |> Markup.write_html ~escape_text ~escape_attribute
-  |> Markup.to_string
+  Html.map ~escape_text:escape ~escape_attribute make_safe s
 
-let safe_html s =
-  Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
+let safe_html s = Adef.safe (safe_html_aux s)
 
 (* Version 1 => moche *)
 let clean_html_tags s l =
@@ -613,10 +608,11 @@ let pget_opt conf base ip =
 let pget conf base ip =
   Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
-let string_gen_person base p = Futil.map_person_ps Fun.id (Gwdb.sou base) p
+let string_gen_person base p =
+  Futil.map_person_ps Fun.id (fun ?format:_ -> Gwdb.sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps Fun.id Fun.id (Gwdb.sou base) fam
+  Futil.map_family_ps Fun.id Fun.id (fun ?format:_ -> Gwdb.sou base) fam
 
 let is_empty_name p =
   Gwdb.is_quest_string (Gwdb.get_surname p)

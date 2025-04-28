@@ -9,7 +9,9 @@ let string_person_of base p =
       Update.Link,
       "" )
   in
-  Futil.map_person_ps fp (Gwdb.sou base) (Gwdb.gen_person_of_person p)
+  Futil.map_person_ps fp
+    (fun ?format:_ -> Gwdb.sou base)
+    (Gwdb.gen_person_of_person p)
 
 (* Interpretation of template file 'updind.txt' *)
 

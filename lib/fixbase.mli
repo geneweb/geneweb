@@ -25,7 +25,7 @@ type patch =
   | Fix_AddedRelatedFromFevent of Gwdb.iper * Gwdb.iper
   | Fix_MarriageDivorce of Gwdb.ifam
   | Fix_MissingSpouse of Gwdb.ifam * Gwdb.iper
-  | Fix_WrongUTF8Encoding of
+  | Fix_WrongString of
       Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
   | Fix_UpdatedOcc of Gwdb.iper * int * int
 
@@ -69,10 +69,10 @@ val fix_family_spouses : family_fix
     instead of just erasing their personal details.
 *)
 
-val fix_person_utf8_sequence : person_fix
+val fix_person_strings : person_fix
 
-val fix_family_utf8_sequence : family_fix
-(** For every person's and family's field, remplace it with normalized UTF8 version. *)
+val fix_family_strings : family_fix
+(** For every person's and family's field, remplace it with normalized strings. *)
 
 val fix_person_key : Gwdb.base -> person_fix
 (** For every person in the base, update their occurence number

@@ -225,7 +225,8 @@ let update_person conf base old new_input p =
       }
   | Some "src" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_input)
+        Gwdb.insert_string ~format:`Html base
+          (Ext_string.only_printable new_input)
       in
       let src_bi = Gwdb.get_birth_src p in
       let s_bi = Gwdb.sou base src_bi in
@@ -368,7 +369,8 @@ let update_family conf base old new_istr fam =
       { (Gwdb.gen_family_of_family fam) with marriage_place; fevents }
   | Some "src" ->
       let new_istr =
-        Gwdb.insert_string base (Ext_string.only_printable new_istr)
+        Gwdb.insert_string ~format:`Html base
+          (Ext_string.only_printable new_istr)
       in
       let src_ma = Gwdb.get_marriage_src fam in
       let s_ma = Gwdb.sou base src_ma in
@@ -436,7 +438,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
            let sp =
              Futil.map_person_ps
                (fun ip -> ip)
-               (fun istr -> Gwdb.sou base istr)
+               (fun ?format:_ istr -> Gwdb.sou base istr)
                np
            in
            Image.rename_portrait conf base op (sp.first_name, sp.surname, sp.occ));

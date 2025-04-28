@@ -15,5 +15,6 @@
    uutf
    zarith
    %%%SYSLOG_PKG%%%
+   markup
  )
 )

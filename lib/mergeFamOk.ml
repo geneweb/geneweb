@@ -186,7 +186,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
       divorce = field "divorce" Gwdb.get_divorce (( = ) Def.NotDivorced);
       fevents =
         merge_possible_event
-          (Futil.map_fam_event (sorp base) (Gwdb.sou base))
+          (Futil.map_fam_event (sorp base) (fun ?format:_ -> Gwdb.sou base))
           (fun f -> List.map Gwdb.gen_fevent_of_fam_event (Gwdb.get_fevents f));
       comment =
         merge_strings base (Gwdb.get_comment fam1) ", " (Gwdb.get_comment fam2);
