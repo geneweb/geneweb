@@ -36,7 +36,6 @@
     ppx_deriving
     ppx_import
     stdlib-shims
-    syslog
     (unidecode (= "0.2.0"))
     uri
     uucp
@@ -51,6 +50,7 @@
     ocaml-option-nnp
     ancient
     zarith
+    syslog
   )
 )
 

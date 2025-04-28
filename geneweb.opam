@@ -28,7 +28,6 @@ depends: [
   "ppx_deriving"
   "ppx_import"
   "stdlib-shims"
-  "syslog"
   "unidecode" {= "0.2.0"}
   "uri"
   "uucp"
@@ -40,7 +39,7 @@ depends: [
   "ocamlformat" {with-dev-setup & = "0.24.1"}
   "odoc" {with-doc}
 ]
-depopts: ["ocaml-option-nnp" "ancient" "zarith"]
+depopts: ["ocaml-option-nnp" "ancient" "zarith" "syslog"]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
   [ "ocaml" "./configure.ml" "--release" ]

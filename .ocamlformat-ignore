@@ -1,7 +1,6 @@
 plugins/forum/plugin_forum.cppo.ml
 bin/ged2gwb/ged2gwb.ml
 bin/gwd/gwd.ml
-lib/logs/logs.ml
 bin/gwd/request.ml
 bin/setup/setup.ml
 lib/util/mutil.ml

@@ -23,7 +23,7 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
 
-CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D)
+CPPO_D=$(GWDB_D) $(OS_D)
 
 ifeq ($(DUNE_PROFILE),dev)
     CPPO_D+= -D DEBUG
@@ -36,7 +36,6 @@ endif
 	| sed \
 	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
 	-e 's/%%%GWDB_PKG%%%/$(GWDB_PKG)/g' \
-	-e 's/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g' \
 	-e 's/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g' \
 	-e 's/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g' \
 	-e 's/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g' \
