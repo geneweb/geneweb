@@ -305,9 +305,6 @@ let init_cousins_cnt conf base p =
   in
 
   let build_tables key =
-    Printf.sprintf "******** Compute %d × %d table ********\n" (max_a_l + 3)
-      (max_d_l + max_a_l + 3)
-    |> Logs.syslog `LOG_WARNING;
     let () = load_ascends_array base in
     let () = load_couples_array base in
     (* +3: there may be more descendants for cousins than my own *)
@@ -328,8 +325,6 @@ let init_cousins_cnt conf base p =
   in
 
   let expand_tables key v1 max_a_l cousins_cnt cousins_dates =
-    Printf.sprintf "******** Expand tables from %d to %d ********\n" v1 max_a_l
-    |> Logs.syslog `LOG_WARNING;
     let new_cousins_cnt =
       try Some (Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) [])
       with Failure _ -> None

@@ -134,6 +134,7 @@ fi
 pgrep gwd >/dev/null && \
     { killall gwd || { echo "unable to kill previous gwd process"; exit 1; }; }
 
+# force lang to en. The galichet ref run is in english
 OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -setup_link \
   -bd $BASES_DIR \
@@ -148,6 +149,9 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -predictable_mode \
   -n_workers 0 \
   2>> $GWDLOG &
+# when predictable mode will be active
+# -predictable_mode \
+# -n_worker 0 \
 fi
 
 if test -z "$cgitest"; then
@@ -451,12 +455,11 @@ if test "$set_ref"; then
 fi
 
 if test -f "$GWDLOG"; then
-echo "$GWDLOG reported traces (empty if no failure):"
 grep -E "$WARNING_CONDITIONS" $GWDLOG
 grep -B1 -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
 fi
 if test "$RC" != 0; then
-    echo "at least $RC detected error(s)."
+    echo "at least $RC detected error(s) reported in $GWDLOG."
     exit 1
 else
     echo "No detected error."
