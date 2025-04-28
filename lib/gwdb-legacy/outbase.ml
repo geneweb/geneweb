@@ -188,7 +188,11 @@ let ( // ) = Filename.concat
 
 let notes_dir base = base.data.bdir // "notes_d"
 let notes_file base = base.data.bdir // "notes"
-let output_notes base dst = Filesystem.copy_file (notes_file base) dst
+
+let output_notes base dst =
+  let content = base.Dbdisk.data.bnotes.nread "" Def.RnAll in
+  Compat.Out_channel.with_open_text dst (fun oc ->
+    output_string oc content)
 
 (* Copy all the notes from "notes_d" of the database [base] into the
    destination directory [dst_dir]. *)
