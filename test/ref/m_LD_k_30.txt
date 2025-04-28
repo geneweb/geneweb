@@ -100,7 +100,7 @@ name="p" placeholder="First name" tabindex="6">
 <li>November 1674<ul><li><b><a href="galichet?p=jean&n=jayot" id="i17">Jean Jayot</a></b>, died <em><a href="galichet?m=CAL&yg=1674&mg=11&dg=8&tg=1" class="date">on&nbsp;8&nbsp;November&nbsp;1674</a></em> <em>(70 years)</em></li></ul></li></ul>Average age at death (M) : 69 years<br>Average age at death (F) : 62 years<br><br><div align="center"><hr width="50%"></div><br><form method="get" action="galichet"><p><input type="hidden" name="m" value="LD">
 Latest <input name="k" value="19" size="4" maxlength="4"> deaths
 ... (before...
-<input name="by" value="2025" size="4" maxlength="4"><input name="bm" value="4" size="2" maxlength="2"><input name="bd" value="26" size="2" maxlength="2">)<button type="submit" class="btn btn-primary btn-lg">Submit</button></p></form><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<input name="by" value="1971" size="4" maxlength="4"><input name="bm" value="1" size="2" maxlength="2"><input name="bd" value="1" size="2" maxlength="2">)<button type="submit" class="btn btn-primary btn-lg">Submit</button></p></form><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->
