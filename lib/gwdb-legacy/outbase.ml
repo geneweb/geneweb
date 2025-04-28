@@ -186,13 +186,9 @@ let ( // ) = Filename.concat
    [Gwdb_driver.sync] to synchronize the database on the disk after
    initializing it in memory. *)
 
-let notes_dir base = base.data.bdir // "notes_d"
-let notes_file base = base.data.bdir // "notes"
-
 let output_notes base dst =
   let content = base.Dbdisk.data.bnotes.nread "" Def.RnAll in
-  Compat.Out_channel.with_open_text dst (fun oc ->
-    output_string oc content)
+  Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content)
 
 (* Copy all the notes from "notes_d" of the database [base] into the
    destination directory [dst_dir]. *)
@@ -207,8 +203,7 @@ let output_notes_d base dst_dir =
          a file in memory too. We should use an enum type to distinguish
          these cases in [Def.base_notes]. *)
       let content = base.Dbdisk.data.bnotes.nread f Def.RnAll in
-      Compat.Out_channel.with_open_text dst (fun oc ->
-        output_string oc content))
+      Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content))
     l
 
 let output base =
