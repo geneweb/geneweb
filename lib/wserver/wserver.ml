@@ -329,7 +329,7 @@ let generate_secret_salt with_salt =
   if with_salt then (
     Random.self_init ();
     string_of_int @@ Random.bits ())
-  else "101"
+  else ""
 
 let start ?(with_salt = true) ?addr ~port ?timeout ~max_pending_requests
     ~n_workers callback =
