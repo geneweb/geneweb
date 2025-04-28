@@ -190,9 +190,11 @@ let is_default_sosa_ref conf base sosa_ref =
 let is_sosa_cache_valid base =
   let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
   let patch_file = Filename.concat base_dir "patches" in
+  let base_file = Filename.concat base_dir "base" in
   let cache_file = Filename.concat base_dir "cache_static_sosa" in
   Files.exists cache_file
   && ((not (Files.exists patch_file))
+      && (Unix.stat base_file).st_mtime <= (Unix.stat cache_file).st_mtime
      || (Unix.stat patch_file).st_mtime < (Unix.stat cache_file).st_mtime)
 
 let get_dynamic_cache base sosa_ref =
