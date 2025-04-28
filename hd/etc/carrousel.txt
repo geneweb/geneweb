@@ -188,11 +188,13 @@
         <button type="button" class="btn btn-primary ml-2 col-2 btn-quick-upload" disabled>[*send::]</button>
         <div class="col-12 d-flex align-items-center mt-2">
           <span class="mr-2">[or]</span>
+          <div class="col">
           <input type="text" class="form-control" id="image_url" name="image_url"
             placeholder="%apply;a_of_b%with;[URL]%and;[image/images]0%end;">
+          <input type="text" class="form-control col-12 mt-3" id="image_name"
+            name="image_name" placeholder="[*name] ([for url only])">
+          </div>
         </div>
-        <input type="text" class="form-control col-12 mt-3" id="image_name"
-          name="image_name" placeholder="[*name] ([optional]) TODO: FIXME!">
         <textarea class="form-control col-12 mt-2" id="image_note" disabled
           name="note" rows="2" placeholder="[*note/notes]0 ([optional])">
         </textarea>

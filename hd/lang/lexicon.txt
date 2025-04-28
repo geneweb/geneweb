@@ -8661,6 +8661,10 @@ sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
 tr: son değişiklik tarihine göre sıralanmış liste için
 
+    for url only
+en: for url defined images
+fr: pour les images définies par une Url
+
     for/since
 co: durante/dapoi
 de: während/seit
