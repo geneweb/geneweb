@@ -34,12 +34,13 @@
   %elseif;(e.mode="carrousel")
     %if;(e.em="SND_IMAGE_C_OK")[*image received]%if;(e.notes!="") [with note]%end;
     %elseif;(e.em="DEL_IMAGE_C_OK")[*image deleted]%if;(e.delete!="on") [and] [saved]1%end;
-    %elseif;(e.em="RESET_IMAGE_C_OK")[*image/images]0 [restored]1%nn;
+    %elseif;(e.em="RESET_IMAGE_C_OK")[*image/images]0 [copied/copied]1%nn;
     %end;%nn;
   %elseif;(e.mode="blasons")
     %if;(e.em="SND_IMAGE_C_OK")[*blason/blasons]0 [uploaded]0%nn;
     %elseif;(e.em="DEL_IMAGE_C_OK" and e.fdigest=e.idigest)[*blason/blasons]0 [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
     %elseif;(e.em="RESET_IMAGE_C_OK" and e.fdigest=e.idigest)[*blason/blasons]0 [restored]0%nn;
+    %elseif;(e.em="IMAGE_TO_BLASON")[*image/images]0 [copied/copied]1 [to] [blason/blasons]0%nn;
     %end;%nn;
   %elseif;(e.mode="portraits")
     %if;(e.em="SND_IMAGE_C_OK")%if;(e.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
@@ -86,6 +87,7 @@
         %portraits_store;%X;%e.file_name; <strong>></strong> %old_portraits_store;%X;%e.file_name;%nn;
       %end;%nn;
     %elseif;(e.em="RESET_IMAGE_C_OK")%old_portraits_store;%X;%e.file_name; <strong><></strong> %portraits_store;%X;%e.file_name;%nn;
+    %elseif;(e.em="IMAGE_TO_BLASON")%images_store;%X%e.file_name; <strong><></strong> %portraits_store;%X;%keydir;.blason%ext;%nn;
     %else;bad command %e.em; %e.mode;%end;
     </samp>
   %else;
@@ -377,6 +379,8 @@
                 %if;(carrousel_img_note!="")<br><strong>[*note/notes]0[:]</strong> %carrousel_img_note;%end;
                 %if;(carrousel_img_src!="")<br><strong>[*source/sources]0[:]</strong> %carrousel_img_src;%end;'>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
+            <a href="%prefix;m=IMAGE_TO_BLASON&i=%index;&mode=blasons&file_name=%carrousel_img;"
+            title="[*copy image to blason]"><i class="fa-solid fa-user-shield text-success"></i></a>
             <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img_raw;">%carrousel_img_raw;</samp>
             <div class="ml-auto">
               <a role="button"
@@ -414,8 +418,6 @@
                %if;(url_in_env!="")%else;data-toggle="tooltip" data-html="true" data-placement="top"%end;
                title="[*restore image saved]">
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i></a>
-            <a href="%prefix;m=IMAGE_TO_BLASON&i=%index;&file_name=%carrousel_img;"
-            title="[*copy image to blason]"><i class="fa-solid fa-user-shield text-success"></i></a>
             <samp class="text-truncate ml-1" title="%images_store;%X;saved%X;%carrousel_img_raw;">%carrousel_img_raw;</samp>
             <a role="button" class="ml-auto"
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index%nn;

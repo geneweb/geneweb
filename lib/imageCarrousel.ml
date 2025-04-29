@@ -91,13 +91,9 @@ let move_file_to_save dir file =
     let orig_file = Filename.concat dir fname in
     if not (Sys.file_exists orig_file) then
       raise (Sys_error (Printf.sprintf "File not found: %s" orig_file));
-
     let saved_file = Filename.concat save_dir fname in
-
     if Sys.file_exists saved_file then Mutil.rm saved_file;
-
     rn orig_file saved_file;
-
     let extensions = [ ".txt"; ".src" ] in
     List.iter
       (fun ext ->
@@ -105,7 +101,6 @@ let move_file_to_save dir file =
         let saved_ext = Filename.remove_extension saved_file ^ ext in
         if Sys.file_exists orig_ext then rn orig_ext saved_ext)
       extensions;
-
     1
   with
   | Sys_error e ->
@@ -626,7 +621,7 @@ let effective_delete_ok conf base p =
   let ext = get_extension conf fname mode false fname in
   let dir = !GWPARAM.portraits_d conf.bname in
   if move_file_to_save (fname ^ ext) dir = 0 then
-    incorrect conf "effective delete";
+    incorrect conf "effective delete (ok)";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -679,13 +674,16 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
     if delete then String.concat Filename.dir_sep [ dir; "saved"; fname ]
     else Filename.concat dir fname
   in
-  let orig_file = Image.find_file_without_ext orig_file in
+  let orig_file =
+    Filename.remove_extension orig_file |> Image.find_file_without_ext
+  in
   (* FIXME basename *)
   let file = Filename.basename orig_file in
   if orig_file = "" then incorrect conf "empty file name"
     (* if delete is on, we are talking about saved files *)
   else if delete then Mutil.rm orig_file (* is it needed ?, move should do it *)
-  else if move_file_to_save dir file = 0 then incorrect conf "effective delete";
+  else if move_file_to_save dir file = 0 then
+    incorrect conf "effective delete (c_ok)";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -767,10 +765,9 @@ let effective_copy_image_to_blason conf base p =
     else "OK")
     <> ""
   in
-  (* la fonction image_to_blason part des images sauvegardées *)
   let fname =
     String.concat Filename.dir_sep
-      [ Image.carrousel_folder conf; keydir; "saved"; fname ]
+      [ Image.carrousel_folder conf; keydir; fname ]
   in
   cp fname blason_filename;
   History.record conf base
@@ -949,10 +946,10 @@ let print_main_c conf base =
                   failwith
                     (__FILE__ ^ " idigest error, line " ^ string_of_int __LINE__
                       :> string)
-              | "incorrect request" -> Hutil.incorrect_request conf
+              | "incorrect request" -> Hutil.incorrect_request conf ~comment:"incorrect request, report"
               | _ -> print_confirm_c conf base save_m report)
-          | None -> Hutil.incorrect_request conf)
-      | None -> Hutil.incorrect_request conf)
+          | None -> Hutil.incorrect_request conf ~comment:"incorrect, None ip")
+      | None -> Hutil.incorrect_request conf ~comment:"incorrect request, None m")
   (* em!="" second pass, ignore *)
   | Some _ -> print_confirm_c conf base "REFRESH" ""
 
