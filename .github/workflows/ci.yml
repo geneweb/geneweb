@@ -134,8 +134,13 @@ jobs:
       - name: Build Geneweb
         id: build
         shell: bash
+        run: opam exec -- make distrib
+
+      - name: Run tests
+        id: tests
+        shell: bash
         run: |
-          opam exec -- make ci distrib 2>&1 | tee build-output.log
+          opam exec -- make ci 2>&1 | tee build-output.log
 
           set +e
           PASSED=$(grep -c "\[OK\]" build-output.log)
@@ -168,10 +173,10 @@ jobs:
           os: ${{ matrix.os }}
           ocaml-version: ${{ matrix.ocaml-compiler }}
           cache-hit: ${{ runner.os != 'Windows' && steps.cache-opam-unix.outputs.cache-hit || steps.cache-opam-windows.outputs.cache-hit }}
-          tests-total: ${{ steps.build.outputs.tests_total }}
-          tests-passed: ${{ steps.build.outputs.tests_passed }}
-          tests-failed: ${{ steps.build.outputs.tests_failed }}
-          tests-skipped: ${{ steps.build.outputs.tests_skipped }}
+          tests-total: ${{ steps.tests.outputs.tests_total }}
+          tests-passed: ${{ steps.tests.outputs.tests_passed }}
+          tests-failed: ${{ steps.tests.outputs.tests_failed }}
+          tests-skipped: ${{ steps.tests.outputs.tests_skipped }}
 
   build-results:
     needs: [build]

@@ -26,20 +26,9 @@ let set_gwdb_legacy () =
   assert (!gwdb = `None);
   gwdb := `Legacy
 
-let release = ref false
-
 let speclist =
   [
     ("--gwdb-legacy", Arg.Unit set_gwdb_legacy, " Use legacy backend");
-    ( "--release",
-      Arg.Set release,
-      " Use release profile: no debug information (default: "
-      ^ string_of_bool !release ^ ")" );
-    ( "--debug",
-      Arg.Clear release,
-      " Use dev profile: no optimization, debug information (default: "
-      ^ string_of_bool (not !release)
-      ^ ")" );
     ("--sosa-legacy", Arg.Unit ignore, " Use legacy Sosa module implementation");
     ( "--sosa-zarith",
       Arg.Unit ignore,
@@ -61,7 +50,6 @@ let () =
     match !gwdb with
     | `None | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
   in
-  let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
@@ -75,23 +63,23 @@ let () =
   in
   let ancient_lib, ancient_file =
     let no_cache = ("", "gw_ancient.dum.ml") in
-    if nnp_compiler then
-      if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
-      else (
-        if !caching then
+    if !caching then
+      if nnp_compiler then
+        if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
+        else (
           Format.eprintf
             "Warning: ocaml-ancient not installed. Cannot enable database \
              caching.@.";
-        no_cache)
-    else (
-      if !caching then
+          no_cache)
+      else (
         Format.eprintf
           "Warning: the OCaml compiler was not installed with the \
            no-naked-pointers@ option. The gwd caching feature requires this \
            option because GeneWeb@ uses the Marshal module on values from the \
            database, which is not compatible@ with Ancient when naked pointers \
            could be present.@.";
-      no_cache)
+        no_cache)
+    else no_cache
   in
   let ch = open_out "Makefile.config" in
   let writeln s = output_string ch @@ s ^ "\n" in
@@ -107,7 +95,6 @@ let () =
   var "GWDB_PKG" gwdb_pkg;
   var "SYSLOG_PKG" syslog_pkg;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude;
-  var "DUNE_PROFILE" dune_profile;
   var "ANCIENT_LIB" ancient_lib;
   var "ANCIENT_FILE" ancient_file;
   close_out ch

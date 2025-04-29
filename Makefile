@@ -7,10 +7,6 @@ Makefile.config: configure.ml
 	fi
 include Makefile.config
 
-# Ensure that all the dune commands run with the profile choosen with the script
-# ./configure
-export DUNE_PROFILE := $(DUNE_PROFILE)
-
 endif
 
 -include Makefile.local
@@ -24,10 +20,6 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 # [BEGIN] Generated files section
 
 CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D)
-
-ifeq ($(DUNE_PROFILE),dev)
-    CPPO_D+= -D DEBUG
-endif
 
 %/dune: %/dune.in Makefile.config
 	@printf "Generating $@…" \
@@ -230,7 +222,7 @@ opendoc: doc
 
 test: ## Run tests
 test: | $(GENERATED_FILES_DEP)
-	dune build @runtest
+	@$(call unpatch_after, dune build @runtest)
 .PHONY: test
 
 bench: ## Run benchmarks
@@ -264,12 +256,8 @@ clean:
 .PHONY: clean
 
 ci: ## Run tests, skip known failures
-ci:
-ifdef SKIP_BUILD
-	@GENEWEB_CI=on dune runtest
-else
-	@ocaml ./configure.ml && $(MAKE) -s build && GENEWEB_CI=on dune runtest
-endif
+ci: | $(GENERATED_FILES_DEP)
+	@$(call unpatch_after, GENEWEB_CI=on dune build @runtest)
 
 ocp-indent: ## Run ocp-indent (inplace edition)
 ocp-indent:
