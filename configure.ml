@@ -13,20 +13,15 @@ let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let set_api () = api := true
 
-let release = ref false
-
 let speclist =
   [
     ("--gwdb-legacy", Arg.Unit ignore, " Use legacy backend");
     ( "--release",
-      Arg.Set release,
-      " Use release profile: no debug information (default: "
-      ^ string_of_bool !release ^ ")" );
+      Arg.Unit ignore,
+      " Use release profile: no debug information" );
     ( "--debug",
-      Arg.Clear release,
-      " Use dev profile: no optimization, debug information (default: "
-      ^ string_of_bool (not !release)
-      ^ ")" );
+      Arg.Unit ignore,
+      " Use dev profile: no optimization, debug information" );
     ("--sosa-legacy", Arg.Unit ignore, " Use legacy Sosa module implementation");
     ( "--sosa-zarith",
       Arg.Unit ignore,
@@ -37,7 +32,6 @@ let speclist =
 
 let () =
   Arg.parse speclist failwith errmsg;
-  let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
@@ -58,5 +52,4 @@ let () =
   var "RM" rm;
   var "EXT" ext;
   var "OS_D" os_d;
-  var "DUNE_PROFILE" dune_profile;
   close_out ch
