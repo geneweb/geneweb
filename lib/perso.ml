@@ -3831,7 +3831,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "old_blason_name" -> str_val (Image.get_old_blason_name conf base p)
   | "blason_stop_name" ->
       str_val (Image.default_image_filename "blasons" base p ^ ".stop")
-  | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
+  | "X" -> str_val Filename.dir_sep
+  | "ext" -> (
+      match p_getenv conf.env "file_name" with
+      | Some f -> str_val (Filename.extension f)
+      | None -> str_val "no_ext")
+  (* end carrousel functions *)
   | "key" ->
       if hide_person conf base p then null_val
       else
