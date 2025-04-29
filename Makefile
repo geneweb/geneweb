@@ -98,7 +98,7 @@ fmt build build-geneweb gwd install uninstall: info patch_files generated
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
-	$(call unpatch_after, dune build @fmt --auto-promote)
+	$(call unpatch_after, dune fmt)
 
 # [BEGIN] Installation / Distribution section
 build:
