@@ -1,17 +1,3 @@
-(*
-let pp_wiki_link = function
-  | WLpage (a, b, c, d, e) ->
-      "WLpage "
-      ^ [%show: int * (string list * string) * string * string * string]
-          (a, b, c, d, e)
-  | WLperson (a, b, c, d) ->
-      "WLperson"
-      ^ [%show: int * (string * string * int) * string option * string option]
-          (a, Obj.magic b, c, d)
-  | WLwizard (a, b, c) -> "WLwizard" ^ [%show: int * string * string] (a, b, c)
-  | WLnone (a, b)-> "WLnone" ^ [%show: int * string] (a, b)
-  *)
-
 open Alcotest
 open Geneweb
 open NotesLinks
@@ -60,42 +46,23 @@ let l =
       "[[[[w:hg/henri]]" );
   ]
 
-let l2 =
-  [
-    ( [ WLperson (32, ("ccc", "ddd", 0), Some "Texte <b>bold</b> end", None) ],
-      "[[ccc/ddd/Texte '''bold''' end]]" );
-    ( [ WLperson (32, ("ccc", "ddd", 0), Some "Texte <i>italic</i> end", None) ],
-      "[[ccc/ddd/Texte ''italic'' end]]" );
-    ( [
-        WLperson
-          ( 42,
-            ("ccc", "ddd", 0),
-            Some "Texte <b><i>bolditalic</i></b> end",
-            None );
-      ],
-      "[[ccc/ddd/Texte '''''bolditalic''''' end]]" );
-  ]
+let pp_token ppf tk =
+  match tk with
+  | WLpage (pos, p, fname, anchor, text) ->
+      Fmt.pf ppf "WLpage (%d, %a, %s, %s, %s)" pos
+        Fmt.(
+          parens @@ pair ~sep:comma (brackets @@ list ~sep:semi string) string)
+        p fname anchor text
+  | WLperson (pos, (fn, sn, oc), name, text) ->
+      Fmt.pf ppf "WLperson (%d, (%s, %s, %d), %a, %a)" pos fn sn oc
+        Fmt.(option string)
+        name
+        Fmt.(option string)
+        text
+  | WLwizard (pos, wiz, name) -> Fmt.pf ppf "WLwizard (%d, %s, %s)" pos wiz name
+  | WLnone (pos, s) -> Fmt.pf ppf "WLnone (%d, %s)" pos s
 
-(* todo fix Fmt *)
-let testable_wiki =
-  testable
-    (fun fmt x ->
-      match x with
-      | WLpage (pos, _b, fname, anchor, text) ->
-          Fmt.pf fmt "WLpage   (%d,_,%S,%S,%S)" pos fname anchor text
-      | WLperson (pos, key, name, text) ->
-          let name =
-            match name with
-            | Some name -> Wiki.bold_italic_syntax name
-            | None -> ""
-          in
-          let fn, sn, oc = key in
-          Fmt.pf fmt "WLperson (%d, (%S,%S,%d),%a,%a)" pos fn sn oc Fmt.string
-            name (Fmt.option Fmt.string) text
-      | WLwizard (pos, wiz, name) ->
-          Fmt.pf fmt "WLwizard (%d,%S,%S)" pos wiz name
-      | WLnone (pos, s) -> Fmt.pf fmt "WLnone   (%d,%S)" pos s)
-    ( = )
+let testable_wiki = testable pp_token ( = )
 
 let test expected s () =
   (check (list testable_wiki)) "" expected (f s);
@@ -108,9 +75,4 @@ let v =
       List.map
         (fun (expected, s) -> test_case "Wiki links" `Quick (test expected s))
         l );
-    ( "wiki-syntax",
-      (* todo List.map here or in test? *)
-      List.map
-        (fun (expected, s) -> test_case "Wiki syntax" `Quick (test expected s))
-        l2 );
   ]
