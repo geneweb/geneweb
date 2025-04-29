@@ -5,6 +5,9 @@ on:
     tags:
       - v**
 
+env:
+  DUNE_PROFILE: "release"
+
 jobs:
 
   release:
@@ -49,7 +52,7 @@ jobs:
       # Build the distribution
       - name: Build the distribution
         run: |
-          opam exec -- ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release
+          opam exec -- ocaml ./configure.ml --sosa-legacy --gwdb-legacy
           opam exec -- make distrib
 
       # Archive distribution for release

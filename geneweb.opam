@@ -42,6 +42,8 @@ depends: [
 ]
 depopts: ["ocaml-option-nnp" "ancient" "zarith"]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
+build-env: DUNE_PROFILE = "release"
+
 build: [
   [ "ocaml" "./configure.ml" "--release" ]
   [ make "build" ]
