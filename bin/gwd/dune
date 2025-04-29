@@ -13,7 +13,7 @@
     geneweb
     geneweb.gwdb-legacy
     wserver)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (preprocess (action (run %{bin:cppo} -D UNIX %{input-file})))
   (modules gwdPlugin request))
 
 (executable
@@ -31,7 +31,7 @@
     unix
     uri
     wserver)
-  (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
+  (preprocess (action (run %{bin:cppo} -D UNIX %{input-file})))
   (modules
     base64
     gwd

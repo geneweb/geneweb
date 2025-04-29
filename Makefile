@@ -21,7 +21,7 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 CPPO_D=$(OS_D)
 
-%/dune: %/dune.in Makefile.config
+%/dune: Makefile.config
 	@printf "Generating $@…" \
 	&& cat $< \
 	| cppo -n $(CPPO_D) \
@@ -59,8 +59,8 @@ CAMLP5_MINOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 2)
 
 patch_files:
 	@if [ '$(CAMLP5_VERSION)' != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
-	  printf "\nPatching bin/ged2gwb/dune.in and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
-	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune.in; \
+	  printf "\nPatching bin/ged2gwb/dune and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
+	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune; \
 	  if [ "$(OS_TYPE)" = "Win" ]; then \
 	    perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\s*\})/\1\r\n  ; Token.kwds = Hashtbl.create 301\2/' bin/ged2gwb/ged2gwb.ml; \
 	  else \
@@ -69,9 +69,9 @@ patch_files:
 	fi
 
 unpatch_files:
-	@if [ -f bin/ged2gwb/dune.in.bak ] && [ -f bin/ged2gwb/ged2gwb.ml.bak ]; then \
+	@if [ -f bin/ged2gwb/dune.bak ] && [ -f bin/ged2gwb/ged2gwb.ml.bak ]; then \
 	  printf "Restoring original patched files… Done.\n"; \
-	  mv bin/ged2gwb/dune.in.bak bin/ged2gwb/dune.in; \
+	  mv bin/ged2gwb/dune.bak bin/ged2gwb/dune; \
 	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
 	fi
 
@@ -91,10 +91,7 @@ endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
 .PHONY: patch_files unpatch_files info
 
-DUNE_IN_FILES := $(shell find lib bin test -name "dune.in")
-DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
-
-generated: $(DUNE_FILES) lib/version.ml
+generated: lib/version.ml
 	@printf "Done.\n"
 
 fmt build build-geneweb gwd install uninstall: info patch_files generated
