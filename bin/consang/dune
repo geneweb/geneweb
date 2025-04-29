@@ -1,7 +1,9 @@
 (executable
-  (package geneweb)
-  (name consang)
-  (public_name geneweb.consang)
-  (modules consang)
-  (preprocess (action (run %{bin:cppo} -D UNIX %{input-file})))
-  (libraries unix geneweb geneweb.gwdb-legacy))
+ (package geneweb)
+ (name consang)
+ (public_name geneweb.consang)
+ (modules consang)
+ (preprocess
+  (action
+   (run %{bin:cppo} -D UNIX %{input-file})))
+ (libraries unix geneweb geneweb.gwdb-legacy))

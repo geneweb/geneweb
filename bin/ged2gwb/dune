@@ -1,7 +1,16 @@
 (executable
-  (package geneweb)
-  (name ged2gwb)
-  (public_name geneweb.ged2gwb)
-  (modules ged2gwb)
-  (preprocess (action (run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %{input-file})))
-  (libraries camlp5 unix str geneweb geneweb.gwdb-legacy))
+ (package geneweb)
+ (name ged2gwb)
+ (public_name geneweb.ged2gwb)
+ (modules ged2gwb)
+ (preprocess
+  (action
+   (run
+    not-ocamlfind
+    preprocess
+    -package
+    camlp5.extend,camlp5.quotations,camlp5.pr_o
+    -syntax
+    camlp5o
+    %{input-file})))
+ (libraries camlp5 unix str geneweb geneweb.gwdb-legacy))

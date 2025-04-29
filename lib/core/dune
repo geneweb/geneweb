@@ -3,10 +3,7 @@
  (public_name geneweb.core)
  (wrapped false)
  (synopsis "GeneWeb Core library")
- (preprocess (action (run %{bin:cppo} -D UNIX -V OCAML:%{ocaml_version} %{input-file})))
- (libraries unix
-            geneweb_def
-            geneweb_gwdb
-            geneweb_sosa
-            geneweb_util)
-)
+ (preprocess
+  (action
+   (run %{bin:cppo} -D UNIX -V OCAML:%{ocaml_version} %{input-file})))
+ (libraries unix geneweb_def geneweb_gwdb geneweb_sosa geneweb_util))

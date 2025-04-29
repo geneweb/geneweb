@@ -1,9 +1,11 @@
 (library
-  (name geneweb_logs)
-  (public_name geneweb.logs)
-  (libraries
-    fmt
-    geneweb_util
-    (select geneweb_syslog.ml from
-      (syslog -> geneweb_syslog.wrapped.ml)
-      ( -> geneweb_syslog.dummy.ml))))
+ (name geneweb_logs)
+ (public_name geneweb.logs)
+ (libraries
+  fmt
+  geneweb_util
+  (select
+   geneweb_syslog.ml
+   from
+   (syslog -> geneweb_syslog.wrapped.ml)
+   (-> geneweb_syslog.dummy.ml))))

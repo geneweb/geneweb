@@ -1,7 +1,9 @@
 (executable
-  (package geneweb)
-  (name gwc)
-  (public_name geneweb.gwc)
-  (modules gwc gwcomp db1link)
-  (preprocess (action (run %{bin:cppo} -D UNIX %{input-file})))
-  (libraries unix geneweb geneweb.gwdb-legacy))
+ (package geneweb)
+ (name gwc)
+ (public_name geneweb.gwc)
+ (modules gwc gwcomp db1link)
+ (preprocess
+  (action
+   (run %{bin:cppo} -D UNIX %{input-file})))
+ (libraries unix geneweb geneweb.gwdb-legacy))

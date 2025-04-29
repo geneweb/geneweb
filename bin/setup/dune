@@ -1,7 +1,9 @@
 (executable
-  (package geneweb)
-  (name setup)
-  (public_name geneweb.setup)
-  (preprocess (action (run %{bin:cppo} -D UNIX %{input-file})))
-  (libraries unix str wserver geneweb)
-  (modules setup))
+ (package geneweb)
+ (name setup)
+ (public_name geneweb.setup)
+ (preprocess
+  (action
+   (run %{bin:cppo} -D UNIX %{input-file})))
+ (libraries unix str wserver geneweb)
+ (modules setup))

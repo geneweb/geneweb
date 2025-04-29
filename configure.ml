@@ -8,7 +8,6 @@ let rm = ref ""
 let ext = ref ""
 let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
-
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let set_api () = api := true
@@ -16,9 +15,7 @@ let set_api () = api := true
 let speclist =
   [
     ("--gwdb-legacy", Arg.Unit ignore, " Use legacy backend");
-    ( "--release",
-      Arg.Unit ignore,
-      " Use release profile: no debug information" );
+    ("--release", Arg.Unit ignore, " Use release profile: no debug information");
     ( "--debug",
       Arg.Unit ignore,
       " Use dev profile: no optimization, debug information" );

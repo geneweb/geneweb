@@ -1,12 +1,5 @@
 (library
  (name wserver)
  (public_name geneweb.wserver)
- (libraries
-   camlp-streams
-   geneweb_util
-   geneweb_logs
-   unix
-   fmt)
- (modules
-   wserver
-   pool))
+ (libraries camlp-streams geneweb_util geneweb_logs unix fmt)
+ (modules wserver pool))

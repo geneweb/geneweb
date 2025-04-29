@@ -1,4 +1,11 @@
 (test
  (name test)
- (modules test sosa_test place_test calendar_test wiki_test merge_test util_test)
+ (modules
+  test
+  sosa_test
+  place_test
+  calendar_test
+  wiki_test
+  merge_test
+  util_test)
  (libraries alcotest geneweb geneweb.gwdb-legacy fmt))
