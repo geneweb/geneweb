@@ -47,7 +47,6 @@
     (ocamlformat (and :with-dev-setup (= "0.24.1")))
   )
   (depopts
-    ocaml-option-nnp
     ancient
     zarith
     syslog

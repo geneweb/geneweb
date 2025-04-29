@@ -1,0 +1,7 @@
+(library
+ (public_name geneweb.ancient)
+ (name geneweb_ancient)
+ (libraries
+  (select geneweb_ancient.ml from
+    (ancient -> geneweb_ancient.wrapped.ml)
+    ( -> geneweb_ancient.dummy.ml))))

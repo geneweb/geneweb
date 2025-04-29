@@ -9,14 +9,8 @@ let ext = ref ""
 let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
 
-let nnp_compiler =
-  if not Sys.win32 then 1 = Sys.command "$(ocamlc -config-var naked_pointers)"
-  else false
-
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
-let caching = ref false
-let set_caching () = caching := true
 let set_api () = api := true
 
 let release = ref false
@@ -38,9 +32,6 @@ let speclist =
       Arg.Unit ignore,
       " Use Sosa module implementation based on `zarith` library" );
     ("--syslog", Arg.Unit ignore, " Log gwd errors using syslog");
-    ( "--gwd-caching",
-      Arg.Unit set_caching,
-      " Enable database preloading (Unix-only)" );
   ]
   |> List.sort compare |> Arg.align
 
@@ -58,26 +49,6 @@ let () =
         (os_type, " -D UNIX", "", "/bin/rm -f", "strip")
     | _ -> ("Win", " -D WINDOWS", ".exe", "rm -f", "true")
   in
-  let ancient_lib, ancient_file =
-    let no_cache = ("", "gw_ancient.dum.ml") in
-    if nnp_compiler then
-      if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
-      else (
-        if !caching then
-          Format.eprintf
-            "Warning: ocaml-ancient not installed. Cannot enable database \
-             caching.@.";
-        no_cache)
-    else (
-      if !caching then
-        Format.eprintf
-          "Warning: the OCaml compiler was not installed with the \
-           no-naked-pointers@ option. The gwd caching feature requires this \
-           option because GeneWeb@ uses the Marshal module on values from the \
-           database, which is not compatible@ with Ancient when naked pointers \
-           could be present.@.";
-      no_cache)
-  in
   let ch = open_out "Makefile.config" in
   let writeln s = output_string ch @@ s ^ "\n" in
   let var name value = writeln @@ name ^ "=" ^ value in
@@ -88,6 +59,4 @@ let () =
   var "EXT" ext;
   var "OS_D" os_d;
   var "DUNE_PROFILE" dune_profile;
-  var "ANCIENT_LIB" ancient_lib;
-  var "ANCIENT_FILE" ancient_file;
   close_out ch

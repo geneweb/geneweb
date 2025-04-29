@@ -39,7 +39,7 @@ depends: [
   "ocamlformat" {with-dev-setup & = "0.24.1"}
   "odoc" {with-doc}
 ]
-depopts: ["ocaml-option-nnp" "ancient" "zarith" "syslog"]
+depopts: ["ancient" "zarith" "syslog"]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
   [ "ocaml" "./configure.ml" "--release" ]

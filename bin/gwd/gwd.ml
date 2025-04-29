@@ -2067,7 +2067,7 @@ let main () =
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
     ; ("-no-fork", Arg.Unit (fun () -> deprecated_warning_no_fork (); n_workers := 0), " Prevent forking processes (DEPRECATED)")
     ; ("-cache-in-memory", Arg.String (fun s ->
-        if Gw_ancient.is_available then
+        if Geneweb_ancient.is_available then
           cache_databases := s::!cache_databases
         else
           failwith "-cache-in-memory option unavailable for this build."
