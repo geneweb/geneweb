@@ -35,7 +35,6 @@ endif
 	| cppo -n $(CPPO_D) \
 	| sed \
 	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
-	-e 's/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g' \
 	-e 's/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g' \
 	-e 's/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g' \
 	> $@ \

@@ -46,7 +46,6 @@ let speclist =
 
 let () =
   Arg.parse speclist failwith errmsg;
-  let dune_dirs_exclude = ref "" in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =
     match
@@ -88,7 +87,6 @@ let () =
   var "RM" rm;
   var "EXT" ext;
   var "OS_D" os_d;
-  var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude;
   var "DUNE_PROFILE" dune_profile;
   var "ANCIENT_LIB" ancient_lib;
   var "ANCIENT_FILE" ancient_file;
