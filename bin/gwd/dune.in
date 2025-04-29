@@ -2,23 +2,19 @@
   (target gwdPluginMD5.ml)
   (deps
     (alias_rec %{project_root}/plugins/plugin)
-    (:maker mk_gwdPluginMD5.ml)
-  )
+    (:maker mk_gwdPluginMD5.ml))
   (action (with-stdout-to %{target} (run ocaml %{maker} %{project_root}/plugins)))
 )
-
 (library
   (name gwd_lib)
   (public_name geneweb.gwd_lib)
   (wrapped true)
   (libraries
     geneweb
-    wserver
-    %%%GWDB_PKG%%%
-  )
+    geneweb.gwdb-legacy
+    wserver)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (modules gwdPlugin request)
-)
+  (modules gwdPlugin request))
 
 (executable
   (package geneweb)
@@ -26,16 +22,15 @@
   (public_name geneweb.gwd)
   (flags -linkall)
   (libraries
-    dynlink
     geneweb
     geneweb.logs
+    geneweb.gwdb-legacy
+    dynlink
     gwd_lib
     str
     unix
     uri
-    wserver
-    %%%GWDB_PKG%%%
-  )
+    wserver)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules
     base64
@@ -43,6 +38,4 @@
     gwdPluginDep
     gwdPluginMD5
     gwdPluginMETA
-    robot
-  )
-)
+    robot))

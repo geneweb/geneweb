@@ -15,20 +15,15 @@ let nnp_compiler =
 
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
-let gwdb = ref `None
 let caching = ref false
 let set_caching () = caching := true
 let set_api () = api := true
-
-let set_gwdb_legacy () =
-  assert (!gwdb = `None);
-  gwdb := `Legacy
 
 let release = ref false
 
 let speclist =
   [
-    ("--gwdb-legacy", Arg.Unit set_gwdb_legacy, " Use legacy backend");
+    ("--gwdb-legacy", Arg.Unit ignore, " Use legacy backend");
     ( "--release",
       Arg.Set release,
       " Use release profile: no debug information (default: "
@@ -52,10 +47,6 @@ let speclist =
 let () =
   Arg.parse speclist failwith errmsg;
   let dune_dirs_exclude = ref "" in
-  let gwdb_d, gwdb_pkg =
-    match !gwdb with
-    | `None | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
-  in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =
     match
@@ -96,9 +87,7 @@ let () =
   var "STRIP" strip;
   var "RM" rm;
   var "EXT" ext;
-  var "GWDB_D" gwdb_d;
   var "OS_D" os_d;
-  var "GWDB_PKG" gwdb_pkg;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude;
   var "DUNE_PROFILE" dune_profile;
   var "ANCIENT_LIB" ancient_lib;

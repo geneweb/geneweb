@@ -3,5 +3,4 @@
   (names cache_files)
   (public_names geneweb.cache_files)
   (modules cache_files)
-  (libraries camlzip unix str %%%GWDB_PKG%%% geneweb)
-)
+  (libraries camlzip unix str geneweb geneweb.gwdb-legacy))
