@@ -5089,6 +5089,10 @@ sl: nadaljevano
 sv: forts
 tr: devam eden
 
+    copied/copied
+en: copied/copied
+fr: copié/copiée
+
     copy link %s
 co: cupià u liame %s in u preme’papei
 de: kopiere den %s Link in die Zwischenablage
@@ -18794,6 +18798,10 @@ sk: titul/tituly
 sl: naziv/nazivi
 sv: titel/titlar
 tr: konu başlığı/başlıkları
+
+    to
+en: to
+fr: vers
 
     to add a child to a family, use "%s"
 af: om 'n kind by te voeg by 'n familie, gebruik "%s"
