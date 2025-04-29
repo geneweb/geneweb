@@ -109,8 +109,7 @@ let move_file_to_save dir file =
     1
   with
   | Sys_error e ->
-      Logs.syslog `LOG_ERR
-        (Printf.sprintf "Error moving file to saved: %s" e);
+      Logs.syslog `LOG_ERR (Printf.sprintf "Error moving file to saved: %s" e);
       0
   | _ -> 0
 
