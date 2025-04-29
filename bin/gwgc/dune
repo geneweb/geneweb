@@ -3,7 +3,4 @@
  (name gwgc)
  (public_name geneweb.gwgc)
  (modules gwgc)
- (preprocess
-  (action
-   (run %{bin:cppo} -D UNIX %{input-file})))
  (libraries unix str geneweb geneweb.gwdb-legacy))

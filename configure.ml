@@ -29,7 +29,7 @@ let speclist =
 
 let () =
   Arg.parse speclist failwith errmsg;
-  let os_type, os_d, ext, rm, strip =
+  let os_type, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
       let line = input_line p in
@@ -37,8 +37,8 @@ let () =
       line
     with
     | ("Linux" | "Darwin" | "FreeBSD") as os_type ->
-        (os_type, " -D UNIX", "", "/bin/rm -f", "strip")
-    | _ -> ("Win", " -D WINDOWS", ".exe", "rm -f", "true")
+        (os_type, "", "/bin/rm -f", "strip")
+    | _ -> ("Win", ".exe", "rm -f", "true")
   in
   let ch = open_out "Makefile.config" in
   let writeln s = output_string ch @@ s ^ "\n" in
@@ -48,5 +48,4 @@ let () =
   var "STRIP" strip;
   var "RM" rm;
   var "EXT" ext;
-  var "OS_D" os_d;
   close_out ch

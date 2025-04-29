@@ -864,17 +864,12 @@ let rec list_rev_iter f = function
    that holds the locks closes ANY file descriptor that was open on that file.
 *)
 let read_or_create_channel ?magic ?(wait = false) fname read write =
-#ifdef WINDOWS
-  let _ = wait in
-#endif
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
-#ifndef WINDOWS
-  begin try
-    Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0
-    with e -> Unix.close fd; raise e
-  end;
-#endif
+  if not Sys.win32 then (
+    try
+      Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0
+      with e -> Unix.close fd; raise e);
   let ic = Unix.in_channel_of_descr fd in
   let read () =
     seek_in ic 0;
@@ -891,9 +886,7 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
   in
   match read () with
   | Some v ->
-#ifndef WINDOWS
-     Unix.lockf fd Unix.F_ULOCK 0;
-#endif
+     if not Sys.win32 then Unix.lockf fd Unix.F_ULOCK 0;
      close_in ic;
      v
   | None ->
@@ -907,9 +900,8 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
      begin match magic with Some m -> output_string oc m | None -> () end;
      begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
      flush oc;
-#ifndef WINDOWS
-     Unix.lockf fd Unix.F_ULOCK 0;
-#endif
+     if not Sys.win32 then
+       Unix.lockf fd Unix.F_ULOCK 0;
      close_out oc;
      v
 

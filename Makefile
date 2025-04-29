@@ -19,19 +19,6 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
 
-CPPO_D=$(OS_D)
-
-%/dune: Makefile.config
-	@printf "Generating $@…" \
-	&& cat $< \
-	| cppo -n $(CPPO_D) \
-	| sed \
-	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
-	-e 's/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g' \
-	-e 's/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g' \
-	> $@ \
-	&& printf " Done.\n"
-
 COMPIL_DATE := $(shell date +'%Y-%m-%d')
 COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)

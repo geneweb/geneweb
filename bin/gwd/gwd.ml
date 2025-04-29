@@ -2,10 +2,6 @@
 
 module Logs = Geneweb_logs.Logs
 
-#ifdef DEBUG
-let () = Sys.enable_runtime_warnings true
-#endif
-
 open Geneweb
 open Config
 open Def
@@ -2007,16 +2003,16 @@ let print_version_commit () =
 let set_debug_flag () =
   debug := true;
   Logs.debug_flag := true;
-  Printexc.record_backtrace true
+  Printexc.record_backtrace true;
+  Sys.enable_runtime_warnings true
 
 let set_verbosity_level lvl =
   Logs.verbosity_level := lvl
 
 let main () =
-#ifdef WINDOWS
+  if Sys.win32 then (
   Wserver.sock_in := "gwd.sin";
-  Wserver.sock_out := "gwd.sou";
-#endif
+  Wserver.sock_out := "gwd.sou");
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"
@@ -2059,7 +2055,8 @@ let main () =
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
     ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
-#ifdef UNIX
+(* TODO: Add a warning messages for the below options as there are not
+   available on Windows. *)
     ; ("-max_clients", Arg.Unit deprecated_warning_max_clients, "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi) (DEPRECATED).")
     ; ("-n_workers", Arg.Int (fun x -> n_workers := x), "<NUM> Number of workers used by the server (default: " ^ string_of_int default_n_workers ^ ")")
     ; ("-max_pending_requests", Arg.Int (fun x -> max_pending_requests := x), "<NUM> Maximum number of pending requests (default: " ^ string_of_int default_max_pending_requests ^ ")")
@@ -2072,24 +2069,22 @@ let main () =
         else
           failwith "-cache-in-memory option unavailable for this build."
       ), "<DATABASE> Preload this database in memory")
-#endif
     ]
   in
   let speclist = List.sort compare speclist in
   let speclist = Arg.align speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-#ifdef UNIX
-  default_lang := begin
-    let s = try Sys.getenv "LANG" with Not_found -> "" in
-    if List.mem s Version.available_languages then s
-    else
-      let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
-      if String.length s >= 2 then
-        let s = String.sub s 0 2 in
-        if List.mem s Version.available_languages then s else "en"
-      else "en"
-  end ;
-#endif
+  if Sys.unix then (
+    default_lang := begin
+      let s = try Sys.getenv "LANG" with Not_found -> "" in
+      if List.mem s Version.available_languages then s
+      else
+        let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+        if String.length s >= 2 then
+          let s = String.sub s 0 2 in
+          if List.mem s Version.available_languages then s else "en"
+        else "en"
+    end);
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   let gwd_cmd =
@@ -2169,7 +2164,6 @@ let () =
                     or by another program. Solution: kill the other program \
                     or launch GeneWeb with another port number (option -p)";
     flush stderr
-#ifdef UNIX
   | Unix.Unix_error (Unix.ENOTCONN, _, _ ) ->
     Logs.syslog `LOG_WARNING ({|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|})
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
@@ -2179,7 +2173,6 @@ let () =
        or choose another port number greater than 1024."
       !selected_port;
     flush stderr;
-#endif
   | Register_plugin_failure (p, `dynlink_error e) ->
     Logs.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->
