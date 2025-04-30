@@ -64,7 +64,6 @@ jobs:
       metric: ${{ steps.collect-metrics.outputs.metric }}
 
     env:
-      CI: ${{ matrix.os == 'ubuntu-24.04' && matrix.ocaml-compiler == '4.14.2-nnp' && matrix.setup-version == 'v3' }}
       USE_NNP: ${{ !startsWith(matrix.os, 'windows') && (matrix.ocaml-compiler == '4.14.2' || startsWith(matrix.ocaml-compiler, '5')) }}
 
     steps:
@@ -84,8 +83,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.opam
-          key: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ env.CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
-          restore-keys: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ env.CI == 'true' && 'with-test' || 'no-test' }}-${{ matrix.setup-version }}
+          key: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}-${{ hashFiles('*.opam') }}-cache
+          restore-keys: ${{ runner.os }}-unix-${{ matrix.ocaml-compiler }}-${{ matrix.setup-version }}
 
       - name: Cache Opam dependencies (Windows)
         id: cache-opam-windows
@@ -124,7 +123,7 @@ jobs:
         run: opam exec -- ocaml ./configure.ml --sosa-zarith ${{ env.USE_NNP == 'true' && '--gwd-caching' || '' }}
 
       - name: Build Geneweb
-        run: opam exec -- make ${{ env.CI == 'true' && 'ci' || 'build' }} distrib
+        run: opam exec -- make ci distrib
 
       - name: "Test Geneweb daemon with --cache-in-memory"
         if: env.USE_NNP == 'true'
