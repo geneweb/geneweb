@@ -8,61 +8,28 @@ let rm = ref ""
 let ext = ref ""
 let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
-
-let nnp_compiler =
-  if not Sys.win32 then 1 = Sys.command "$(ocamlc -config-var naked_pointers)"
-  else false
-
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
-let gwdb = ref `None
-let syslog = ref false
-let caching = ref false
-let set_caching () = caching := true
 let set_api () = api := true
-let set_syslog () = syslog := true
-
-let set_gwdb_legacy () =
-  assert (!gwdb = `None);
-  gwdb := `Legacy
-
-let release = ref false
 
 let speclist =
   [
-    ("--gwdb-legacy", Arg.Unit set_gwdb_legacy, " Use legacy backend");
-    ( "--release",
-      Arg.Set release,
-      " Use release profile: no debug information (default: "
-      ^ string_of_bool !release ^ ")" );
+    ("--gwdb-legacy", Arg.Unit ignore, " Use legacy backend");
+    ("--release", Arg.Unit ignore, " Use release profile: no debug information");
     ( "--debug",
-      Arg.Clear release,
-      " Use dev profile: no optimization, debug information (default: "
-      ^ string_of_bool (not !release)
-      ^ ")" );
+      Arg.Unit ignore,
+      " Use dev profile: no optimization, debug information" );
     ("--sosa-legacy", Arg.Unit ignore, " Use legacy Sosa module implementation");
     ( "--sosa-zarith",
       Arg.Unit ignore,
       " Use Sosa module implementation based on `zarith` library" );
-    ("--syslog", Arg.Unit set_syslog, " Log gwd errors using syslog");
-    ( "--gwd-caching",
-      Arg.Unit set_caching,
-      " Enable database preloading (Unix-only)" );
+    ("--syslog", Arg.Unit ignore, " Log gwd errors using syslog");
   ]
   |> List.sort compare |> Arg.align
 
 let () =
   Arg.parse speclist failwith errmsg;
-  let dune_dirs_exclude = ref "" in
-  let syslog_d, syslog_pkg =
-    match !syslog with true -> (" -D SYSLOG", "syslog") | false -> ("", "")
-  in
-  let gwdb_d, gwdb_pkg =
-    match !gwdb with
-    | `None | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
-  in
-  let dune_profile = if !release then "release" else "dev" in
-  let os_type, os_d, ext, rm, strip =
+  let os_type, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
       let line = input_line p in
@@ -70,28 +37,8 @@ let () =
       line
     with
     | ("Linux" | "Darwin" | "FreeBSD") as os_type ->
-        (os_type, " -D UNIX", "", "/bin/rm -f", "strip")
-    | _ -> ("Win", " -D WINDOWS", ".exe", "rm -f", "true")
-  in
-  let ancient_lib, ancient_file =
-    let no_cache = ("", "gw_ancient.dum.ml") in
-    if nnp_compiler then
-      if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
-      else (
-        if !caching then
-          Format.eprintf
-            "Warning: ocaml-ancient not installed. Cannot enable database \
-             caching.@.";
-        no_cache)
-    else (
-      if !caching then
-        Format.eprintf
-          "Warning: the OCaml compiler was not installed with the \
-           no-naked-pointers@ option. The gwd caching feature requires this \
-           option because GeneWeb@ uses the Marshal module on values from the \
-           database, which is not compatible@ with Ancient when naked pointers \
-           could be present.@.";
-      no_cache)
+        (os_type, "", "/bin/rm -f", "strip")
+    | _ -> ("Win", ".exe", "rm -f", "true")
   in
   let ch = open_out "Makefile.config" in
   let writeln s = output_string ch @@ s ^ "\n" in
@@ -101,13 +48,4 @@ let () =
   var "STRIP" strip;
   var "RM" rm;
   var "EXT" ext;
-  var "GWDB_D" gwdb_d;
-  var "OS_D" os_d;
-  var "SYSLOG_D" syslog_d;
-  var "GWDB_PKG" gwdb_pkg;
-  var "SYSLOG_PKG" syslog_pkg;
-  var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude;
-  var "DUNE_PROFILE" dune_profile;
-  var "ANCIENT_LIB" ancient_lib;
-  var "ANCIENT_FILE" ancient_file;
   close_out ch

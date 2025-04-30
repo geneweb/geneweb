@@ -1,0 +1,16 @@
+(library
+ (name geneweb_util)
+ (public_name geneweb.util)
+ (wrapped false)
+ (libraries
+  calendars
+  camlzip
+  stdlib-shims
+  unidecode
+  geneweb.def
+  re
+  unix
+  uucp
+  uunf
+  uutf
+  digestif))

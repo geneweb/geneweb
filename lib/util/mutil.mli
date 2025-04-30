@@ -298,16 +298,16 @@ val read_or_create_channel :
 
     If [fname] exists (and starts with [magic] if this one is provided),
     [read] function is used on the file.
-    If it does not, or does not start with [magic], or if [read] raise an exception,
-    [write] function is used on the file.
+    If it does not, or does not start with [magic], or if [read] raise an
+    exception, [write] function is used on the file.
 
-    This function takes care of locking and closing files so you must not take care of
-    that in [read]/[write].
-    It also takes care of writing [magic] at the beginning of the file before calling
-    [write]
+    This function takes care of locking and closing files so you must not
+    take care of that in [read]/[write].
 
-    On Windows, file is not locked.
-*)
+    It also takes care of writing [magic] at the beginning of the file
+    before calling [write]
+
+    On Windows, file is not locked. *)
 
 val read_or_create_value :
   ?magic:string -> ?wait:bool -> string -> (unit -> 'a) -> 'a

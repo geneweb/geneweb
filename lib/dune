@@ -1,0 +1,24 @@
+(ocamllex
+ (modules templ_parser))
+
+(library
+ (name geneweb)
+ (public_name geneweb)
+ (synopsis "GeneWeb library")
+ (libraries
+  unix
+  str
+  stdlib-shims
+  camlp-streams
+  geneweb_core
+  geneweb_def
+  geneweb_gwdb
+  geneweb_sosa
+  geneweb_util
+  geneweb_logs
+  yojson
+  markup
+  uri
+  wserver
+  digestif)
+ (modules_without_implementation templAst))

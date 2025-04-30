@@ -1,0 +1,9 @@
+(library
+ (public_name geneweb.ancient)
+ (name geneweb_ancient)
+ (libraries
+  (select
+   geneweb_ancient.ml
+   from
+   (geneweb_option_in_memory ancient -> geneweb_ancient.wrapped.ml)
+   (-> geneweb_ancient.dummy.ml))))
