@@ -1,0 +1,11 @@
+(library
+  (package geneweb-option-syslog)
+  (name geneweb_option_syslog)
+  (modules geneweb_option_syslog)
+  (libraries syslog))
+
+(library
+  (package geneweb-option-in-memory)
+  (name geneweb_option_in_memory)
+  (modules geneweb_option_in_memory)
+  (libraries ancient))

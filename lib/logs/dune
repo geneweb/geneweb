@@ -7,5 +7,5 @@
   (select
    geneweb_syslog.ml
    from
-   (syslog -> geneweb_syslog.wrapped.ml)
+   (geneweb_option_syslog syslog -> geneweb_syslog.wrapped.ml)
    (-> geneweb_syslog.dummy.ml))))

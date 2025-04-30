@@ -43,9 +43,9 @@
     (ocamlformat (and :with-dev-setup (= "0.24.1")))
   )
   (depopts
-    ancient
     zarith
-    syslog
+    geneweb-option-syslog
+    geneweb-option-in-memory
   )
 )
 
@@ -70,3 +70,11 @@
     promise_jsoo
     yojson
     fmt))
+
+(package
+  (name geneweb-option-syslog)
+  (depends syslog))
+
+(package
+  (name geneweb-option-in-memory)
+  (depends syslog))
