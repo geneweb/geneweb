@@ -1,5 +1,3 @@
-(dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
-
 (ocamllex (modules templ_parser))
 
 (library
