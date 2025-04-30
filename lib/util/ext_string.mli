@@ -50,3 +50,6 @@ val digest : string -> string
 
 val trim_trailing_spaces : string -> string
 (** Trim at the end of string *)
+
+val end_with : string -> string -> bool
+(** [end_with s x] returns [true] iff [s] is ending with [x].  *)
