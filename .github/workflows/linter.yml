@@ -1,6 +1,22 @@
-name: Linter
+name: OCaml Code Linter
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
+  pull_request:
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
 
 env:
   OPAMYES: true
@@ -13,6 +29,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache OPAM dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.opam
+          key: ${{ runner.os }}-linter-ocaml-${{ hashFiles('*.opam') }}
+          restore-keys: |
+            ${{ runner.os }}-linter-ocaml-
+
       - name: Use OCaml
         uses: ocaml/setup-ocaml@v3
         with:
@@ -23,4 +47,15 @@ jobs:
         run: opam install dune ocamlformat.0.24.1
 
       - name: Check formatting with dune
+        id: format-check
         run: opam exec -- dune build @fmt
+        
+      - name: Report formatting status
+        if: always()
+        run: |
+          if [ "${{ steps.format-check.outcome }}" == "success" ]; then
+            echo "✅ Code formatting check passed"
+          else
+            echo "❌ Formatting check failed. Please run 'dune build @fmt' locally and commit the changes."
+            exit 1
+          fi
