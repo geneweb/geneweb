@@ -139,13 +139,7 @@ let rec skip_spaces_and_newlines s i =
     | ' ' | '\n' | '\r' -> skip_spaces_and_newlines s (i + 1)
     | _ -> i
 
-let not_impl func x =
-  let desc =
-    if Obj.is_block (Obj.repr x) then
-      "tag = " ^ string_of_int (Obj.tag (Obj.repr x))
-    else "int_val = " ^ string_of_int (Obj.magic x)
-  in
-  "Templ." ^ func ^ ": not impl " ^ desc
+let not_impl func x = "Templ." ^ func ^ ": not impl " ^ TemplAst.show_ast x
 
 let setup_link conf =
   let s = Mutil.extract_param "host: " '\r' conf.Config.request in
