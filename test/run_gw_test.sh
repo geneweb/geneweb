@@ -134,7 +134,6 @@ fi
 pgrep gwd >/dev/null && \
     { killall gwd || { echo "unable to kill previous gwd process"; exit 1; }; }
 
-# force lang to en. The galichet ref run is in english
 OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -setup_link \
   -bd $BASES_DIR \
@@ -143,15 +142,12 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -trace_failed_passwd \
   -robot_xcl 10000,1 \
   -conn_tmout 3600 \
-  -lang en \
+  -blang \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
   -predictable_mode \
   -n_workers 0 \
   2>> $GWDLOG &
-# when predictable mode will be active
-# -predictable_mode \
-# -n_worker 0 \
 fi
 
 if test -z "$cgitest"; then
@@ -363,7 +359,7 @@ crl "m=INV_FAM&i=$ID&f=$FID"
 crl "m=L"
 crl "m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=$PLACE&nb=1&i0=$ID&p0=$PLACE"
 crl "m=LB&k=30"
-crl "m=LD&k=30" #uses today's date!
+crl "m=LD&k=30"
 crl "m=LL&k=30"
 crl "m=LM&k=30"
 crl "m=MISC_NOTES"
@@ -401,7 +397,7 @@ crl "m=SND_IMAGE_C&i=$ID" $nodiff
 crl "m=SRC&v=$TXT_SRC"
 crl "m=STAT"
 crl "m=TT"
-crl "m=TT&p=*"
+crl "m=TT&p=*" $nodiff
 if check_gwf 'authorized_wizards_notes=yes'; then
 crl "m=CONN_WIZ"
 crl "m=MOD_WIZNOTES&f=$WIZ"
@@ -455,11 +451,12 @@ if test "$set_ref"; then
 fi
 
 if test -f "$GWDLOG"; then
+echo "$GWDLOG reported traces (empty if no failure):"
 grep -E "$WARNING_CONDITIONS" $GWDLOG
 grep -B1 -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
 fi
 if test "$RC" != 0; then
-    echo "at least $RC detected error(s) reported in $GWDLOG."
+    echo "at least $RC detected error(s)."
     exit 1
 else
     echo "No detected error."

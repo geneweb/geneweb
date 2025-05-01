@@ -1810,7 +1810,32 @@ Individual
 </div>
 </div>
 </form>
-<!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->
@@ -1825,38 +1850,38 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <span class="sr-only">, select language</span>
 </button>
 <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
-<a class="dropdown-item" id="lang_af" href="galichet?lang=af&m=ADD_IND&norandom=yes"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
-<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&m=ADD_IND&norandom=yes"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
-<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&m=ADD_IND&norandom=yes"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
-<a class="dropdown-item" id="lang_br" href="galichet?lang=br&m=ADD_IND&norandom=yes"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
-<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&m=ADD_IND&norandom=yes"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
-<a class="dropdown-item" id="lang_co" href="galichet?lang=co&m=ADD_IND&norandom=yes"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
-<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&m=ADD_IND&norandom=yes"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
-<a class="dropdown-item" id="lang_da" href="galichet?lang=da&m=ADD_IND&norandom=yes"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
-<a class="dropdown-item" id="lang_de" href="galichet?lang=de&m=ADD_IND&norandom=yes"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
-<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&m=ADD_IND&norandom=yes"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
-<a class="dropdown-item" id="lang_es" href="galichet?lang=es&m=ADD_IND&norandom=yes"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
-<a class="dropdown-item" id="lang_et" href="galichet?lang=et&m=ADD_IND&norandom=yes"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
-<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&m=ADD_IND&norandom=yes"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
-<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&m=ADD_IND&norandom=yes"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
-<a class="dropdown-item" id="lang_he" href="galichet?lang=he&m=ADD_IND&norandom=yes"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
-<a class="dropdown-item" id="lang_is" href="galichet?lang=is&m=ADD_IND&norandom=yes"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
-<a class="dropdown-item" id="lang_it" href="galichet?lang=it&m=ADD_IND&norandom=yes"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
-<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&m=ADD_IND&norandom=yes"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
-<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&m=ADD_IND&norandom=yes"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
-<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&m=ADD_IND&norandom=yes"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
-<a class="dropdown-item" id="lang_no" href="galichet?lang=no&m=ADD_IND&norandom=yes"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
-<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&m=ADD_IND&norandom=yes"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
-<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&m=ADD_IND&norandom=yes"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
-<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&m=ADD_IND&norandom=yes"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
-<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&m=ADD_IND&norandom=yes"><code>pt-br </code>Brazilian-Portuguese</a>
-<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&m=ADD_IND&norandom=yes"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
-<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&m=ADD_IND&norandom=yes"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
-<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&m=ADD_IND&norandom=yes"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
-<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&m=ADD_IND&norandom=yes"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
-<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&m=ADD_IND&norandom=yes"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
-<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&m=ADD_IND&norandom=yes"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
-<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&m=ADD_IND&norandom=yes"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
+<a class="dropdown-item" id="lang_af" href="galichet?lang=af&m=ADD_IND"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
+<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&m=ADD_IND"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
+<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&m=ADD_IND"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
+<a class="dropdown-item" id="lang_br" href="galichet?lang=br&m=ADD_IND"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
+<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&m=ADD_IND"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
+<a class="dropdown-item" id="lang_co" href="galichet?lang=co&m=ADD_IND"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
+<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&m=ADD_IND"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
+<a class="dropdown-item" id="lang_da" href="galichet?lang=da&m=ADD_IND"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
+<a class="dropdown-item" id="lang_de" href="galichet?lang=de&m=ADD_IND"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
+<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&m=ADD_IND"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
+<a class="dropdown-item" id="lang_es" href="galichet?lang=es&m=ADD_IND"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
+<a class="dropdown-item" id="lang_et" href="galichet?lang=et&m=ADD_IND"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
+<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&m=ADD_IND"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
+<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&m=ADD_IND"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
+<a class="dropdown-item" id="lang_he" href="galichet?lang=he&m=ADD_IND"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
+<a class="dropdown-item" id="lang_is" href="galichet?lang=is&m=ADD_IND"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
+<a class="dropdown-item" id="lang_it" href="galichet?lang=it&m=ADD_IND"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
+<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&m=ADD_IND"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
+<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&m=ADD_IND"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
+<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&m=ADD_IND"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
+<a class="dropdown-item" id="lang_no" href="galichet?lang=no&m=ADD_IND"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
+<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&m=ADD_IND"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
+<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&m=ADD_IND"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
+<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&m=ADD_IND"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
+<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&m=ADD_IND"><code>pt-br </code>Brazilian-Portuguese</a>
+<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&m=ADD_IND"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
+<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&m=ADD_IND"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
+<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&m=ADD_IND"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
+<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&m=ADD_IND"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
+<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&m=ADD_IND"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
+<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&m=ADD_IND"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
+<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&m=ADD_IND"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
 </div>
 </div>
 <!-- Connections info -->
@@ -1870,7 +1895,7 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
 <div class="ml-auto mb-0">
 <a role="button" class="mr-1"
-href="galichet?templ=templm&m=ADD_IND&norandom=yes" 
+href="galichet?templ=templm&m=ADD_IND" 
 data-toggle="tooltip"
 title="templm">
 <i class="fab fa-markdown" aria-hidden="true"></i>

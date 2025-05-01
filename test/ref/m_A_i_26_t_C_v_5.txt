@@ -51,7 +51,7 @@ placeholder="Select personalized modules" maxlength="30">
 title="Default template" data-toggle="popover" data-trigger="hover"
 data-html="true" data-content="<img class='w-100' src='images/modules/zz_1.jpg'>"><i class="fa fa-arrow-rotate-left"></i></button>
 <a role="button" class="btn btn-outline-primary ml-2"
-href="galichet?m=A&t=C&i=26&wide=on&v=5&norandom=yes"
+href="galichet?m=A&t=C&i=26&wide=on&v=5"
 title="Full width display"><i class="fa fa-desktop fa-fw" aria-hidden="true"></i><span class="sr-only">Full width display</span></a>
 </div>
 </div>
@@ -87,10 +87,10 @@ text-muted" aria-hidden="true"></span><span class="sr-only">Tools individual</sp
 <i class="fa fa-person fa-fw text-muted mr-2"></i>Visibility (if titles)</a>
 <div class="dropdown-divider"></div>
 <a class="dropdown-item"
-href="galichet?pz=laurent&nz=geruzet&m=A&t=C&i=26&v=5&norandom=yes"
+href="galichet?pz=laurent&nz=geruzet&m=A&t=C&i=26&v=5"
 title="Browse using Laurent Geruzet as Sosa reference" accesskey="S"><i class="far fa-circle-dot fa-fw male mr-1"></i> Update Sosa 1: Laurent Geruzet</a>
 <div class="dropdown-divider"></div>
-<a class="dropdown-item" href="galichet?m=A&t=C&i=26&v=5&norandom=yes&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="Without GeneWeb links"></i>Without GeneWeb links</a><div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=A&t=C&i=26&v=5&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="Without GeneWeb links"></i>Without GeneWeb links</a><div class="dropdown-divider"></div>
 <a class="dropdown-item" href="galichet?m=CHG_EVT_IND_ORD&i=26" title="Change order of individual events"><span class="fa fa-sort fa-fw mr-2"></span>Reverse events</a>
 <a class="dropdown-item" href="galichet?m=SND_IMAGE&i=26">
 <i class="far fa-file-image fa-fw mr-2"></i>Update picture</a>
@@ -103,7 +103,7 @@ title="Browse using Laurent Geruzet as Sosa reference" accesskey="S"><i class="f
 title="Copy the exterior link to the clipboard
 " 
 data-bname="galichet"
-data-query="p=laurent&n=geruzet&v=5&t=C&m=A&norandom=yes"><i class="fas fa-link fa-fw mr-2"></i>Copy the permalink exterior</button>
+data-query="p=laurent&n=geruzet&v=5&t=C&m=A"><i class="fas fa-link fa-fw mr-2"></i>Copy the permalink exterior</button>
 <button class="disabled dropdown-item mx-0 px-0">/</button>
 <button class="mx-1 px-0 dropdown-item permalink-friend-copy" type="button"
 title="Copy the friend link to the clipboard
@@ -248,7 +248,7 @@ title="Display the carrousel of images">
 <span class="far fa-image fa-fw mr-1" aria-hidden="true"></span><sup class="small">6</sup><span class="sr-only">Pictures</span></a>
 </li>
 <li class="nav-item">
-<a class="nav-link text-secondary" href="galichet?m=LINKED&t=C&i=26&v=5&norandom=yes"
+<a class="nav-link text-secondary" href="galichet?m=LINKED&t=C&i=26&v=5"
 title="Linked pages">
 <i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><sup class="small">1</sup><span class="sr-only">file-lines icon</span></a>
 </li>
@@ -424,92 +424,92 @@ Laurent Geruzet</span>
 <nav class="navbar fixed-bottom navbar-light bg-light justify-content-center py-0">
 <div class="btn-toolbar align-items-center" role="toolbar" arial-label="asc/dsc button group">
 <div class="btn-group border rounded mr-1" role="group" aria-label="ascendant tree button group">
-<a role="button" href="galichet?m=A&t=A&v=5&i=26&norandom=yes"
+<a role="button" href="galichet?m=A&t=A&v=5&i=26"
 class="btn btn-outline-primary border-0 px-2 pt-1 h-100"
 title="Male line"><i class="fas fa-mars fa-lg"></i><br>Agna.</a>
-<a role="button" href="galichet?m=A&t=T&v=5&i=26&norandom=yes"
+<a role="button" href="galichet?m=A&t=T&v=5&i=26"
 class="btn btn-outline-primary border-0 px-3 pt-1 h-100"
 title="Ascending tree"><i class="fas fa-code-fork fa-lg"></i><br>Asc.</a>
-<a role="button" href="galichet?m=A&t=C&v=5&i=26&norandom=yes"
+<a role="button" href="galichet?m=A&t=C&v=5&i=26"
 class="btn btn-outline-primary border-2 disabled font-weight-bold px-2 pt-1 h-100"
 title="Female line"><i class="fas fa-venus fa-lg"></i><br>Cogn.</a>
 </div>
 <div class="btn-group border rounded mr-1">
-<a role="button" href="galichet?m=D&t=T&v=5&i=26&norandom=yes"
+<a role="button" href="galichet?m=D&t=T&v=5&i=26"
 class="btn btn-outline-primary border-0 pt-1"
 title="Descendants tree"><i class="fas fa-sitemap fa-lg"></i><br>Desc.</a>
-<a role="button" href="galichet?m=D&t=V&v=5&i=26&norandom=yes"
+<a role="button" href="galichet?m=D&t=V&v=5&i=26"
 class="btn btn-outline-primary border-0 pt-1"
 title="Descendants tree"><i class="fas fa-sitemap fa-sm"></i><br>V</a>
 <a role="button" class="btn btn-outline-primary border-0 pt-1"
-href="galichet?m=D&t=TV&v=5&i=26&norandom=yes"
+href="galichet?m=D&t=TV&v=5&i=26"
 title="Display [compact form]"><i class="fas fa-code-fork fa-rotate-180 fa-lg"></i><br>Short</a>
 </div>
 <div class="d-flex flex-column justify-content-center mr-1">
 <div class="d-flex flex-nowrap justify-content-center mx-1">
 <div class="border rounded order-3">
-<a role="button" class="d-flex btn btn-sm btn-outline-dark disabled border-0" href="galichet?m=A&t=C&p=jeanne&n=pierquin&norandom=yes&v=5"
+<a role="button" class="d-flex btn btn-sm btn-outline-dark disabled border-0" href="galichet?m=A&t=C&p=jeanne&n=pierquin&v=5"
 title="Navigate on the tree with the mother Jeanne Pierquin"><span>Mother</span><i class="fas fa-arrow-turn-up fa-sm ml-2 align-self-center"></i></a>
 </div>
 <div class="border rounded mx-1 order-2">
 <a role="button" class="btn btn-sm btn-outline-dark disabled border-0"
-href="galichet?m=A&t=C&i=26&v=5&norandom=yes&mf=1"
+href="galichet?m=A&t=C&i=26&v=5&mf=1"
 title="Reverse father/mother"><i class="fas fa-arrow-right-arrow-left fa-sm"></i></a>
 </div>
 <div class="border rounded order-1">
-<a role="button" class="d-flex btn btn-sm btn-outline-primary border-0" href="galichet?m=A&t=C&p=jacques&n=geruzet&norandom=yes&v=5"
+<a role="button" class="d-flex btn btn-sm btn-outline-primary border-0" href="galichet?m=A&t=C&p=jacques&n=geruzet&v=5"
 title="Navigate on the tree with the father Jacques Geruzet"><i class="fas fa-arrow-turn-up fa-sm fa-flip-horizontal mr-2 align-self-center"></i><span>Father</span></a>
 </div>
 </div>
 <div class="d-inline-flex flex-nowrap justify-content-around align-items-center my-1">
-<a role="button" class="btn btn-sm btn-outline-dark disabled border rounded" href="galichet? %get_var.prevsiblingaccess?&v=5&t=C&m=A&norandom=yes&"
+<a role="button" class="btn btn-sm btn-outline-dark disabled border rounded" href="galichet? %get_var.prevsiblingaccess?&v=5&t=C&m=A&"
 title="Navigate on the tree with previous sibling  %get_var.prevsiblingname?"><i class="fas fa-angle-left"></i></a>
 <span class="user-select-none small">Siblings</span>
-<a role="button" class="btn btn-sm btn-outline-primary border rounded" href="galichet?p=marie+jeanne&n=geruzet&v=5&t=C&m=A&norandom=yes&"
+<a role="button" class="btn btn-sm btn-outline-primary border rounded" href="galichet?p=marie+jeanne&n=geruzet&v=5&t=C&m=A&"
 title="Navigate on the tree with next sibling Marie-Jeanne Geruzet"><i class="fas fa-angle-right"></i></a>
 </div>
 </div>
 <div>
 <div class="btn-group border rounded" role="group" aria-label="generation pickup buttons group">
 <span class="btn btn-sm btn-primary disabled border border-info rounded-left mt-0 w-100 h-100">Generation</span>
-<a role="button" id="v1" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=1&norandom=yes" title="Display 1 generation ">1</a>
-<a role="button" id="v2" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=2&norandom=yes" title="Display 2 generations ">2</a>
-<a role="button" id="v3" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=3&norandom=yes" title="Display 3 generations ">3</a>
-<a role="button" id="v4" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=4&norandom=yes" title="Display 4 generations ">4</a>
+<a role="button" id="v1" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=1" title="Display 1 generation ">1</a>
+<a role="button" id="v2" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=2" title="Display 2 generations ">2</a>
+<a role="button" id="v3" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=3" title="Display 3 generations ">3</a>
+<a role="button" id="v4" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=4" title="Display 4 generations ">4</a>
 <a role="button" id="v5" class="btn btn-sm px-2 btn-outline-primary border-2 rounded disabled font-weight-bold"  title=" ">5</a>
-<a role="button" id="v6" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=6&norandom=yes" title="Display 6 generations (max)">6</a>
+<a role="button" id="v6" class="btn btn-sm px-2 btn-outline-primary border-0" href="galichet?m=A&t=C&i=26&v=6" title="Display 6 generations (max)">6</a>
 </div>
 <div class="d-flex align-self-center my-1">
 <div class="border rounded mr-1">
 <a role="button" class="btn btn-sm btn-outline-dark disabled border-0"
-href="galichet?m=A&t=C&i=26&v=5&norandom=yes&dag=on"
+href="galichet?m=A&t=C&i=26&v=5&dag=on"
 title="Show dag (fusion implexes)">
 <i class="fa fa-shuffle fa-fw fa-lg"></i>Dag</a>
 </div>
 <div class="border rounded mr-1">
 <a role="button" class="btn btn-sm btn-outline-primary border-2 h-100"
-href="galichet?m=A&t=C&i=26&im=0&v=5&norandom=yes"
+href="galichet?m=A&t=C&i=26&im=0&v=5"
 title="Hide pictures">
 <i class="fa fa-image fa-sm mr-1"></i>Pictures
 </a>
 </div>
 <div class="border rounded mr-1">
 <a role="button" class="btn btn-sm btn-outline-dark disabled border-0 border-2 w-100 h-100"
-href="galichet?m=A&t=C&i=26&ma=0&v=5&norandom=yes"
+href="galichet?m=A&t=C&i=26&ma=0&v=5"
 title="Hide date of marriage">
 <i class="fa fa-venus-mars fa-sm mr-1"></i>Marriages
 </a>
 </div>
 <div class="border rounded mr-1">
 <a role="button" class="btn btn-sm btn-outline-dark disabled border-0 border-2 w-100 h-100"
-href="galichet?m=A&t=C&i=26&sp=0&v=5&norandom=yes"
+href="galichet?m=A&t=C&i=26&sp=0&v=5"
 title="Hide spouses">
 <i class="fa fa-user-plus fa-sm mr-1"></i>Spouses
 </a>
 </div>
 <div class="border rounded mr-1">
 <a role="button" class="btn btn-sm btn-outline-primary mr-2 border-0 w-100 h-100"
-href="galichet?m=A&t=C&i=26&v=5&norandom=yes&cgl=on" target="_blank">
+href="galichet?m=A&t=C&i=26&v=5&cgl=on" target="_blank">
 <i class="fa fa-link-slash fa-sm mr-1" title="Without GeneWeb links"></i>Cgl</a>
 </div>
 </div>
@@ -518,139 +518,110 @@ href="galichet?m=A&t=C&i=26&v=5&norandom=yes&cgl=on" target="_blank">
 </div>
 </nav>
 </div>
-</div>
+<script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script></div>
 <!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
 <script src="js/jquery.min.js?version=3.7.1"></script>
 <script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
 <script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-function addClearButtonToInputs() {
-// Utility function to create and setup clear button
-function createClearButton(element) {
-const clearButton = document.createElement('i');
-clearButton.className = 'fas fa-xmark clear-button-icon';
-clearButton.title = 'Clear the input';
-clearButton.style.cssText = `
-position: absolute;
-right: 10px;
-top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-cursor: pointer;
-color: #667fc9;
-font-size: 1em;
-opacity: 0;
-transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-pointer-events: auto;
-`;
-return clearButton;
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+addNavigation: function() {
+// Use event delegation for dynamically added inputs
+$(document).on('mousedown', 'input[data-book]', function(event) {
+if (event.ctrlKey && event.button === 0) {
+event.preventDefault();
+inputToBook.openBook(this.value, $(this).data('book'));
 }
-// Initialize or update a single input
-function initializeInput(element) {
-// Skip if already initialized
-if (element.dataset.clearInitialized) {
-const existingButton = element.parentNode.querySelector('.clear-button-icon');
-if (existingButton) {
-existingButton.style.opacity = element.value ? '1' : '0';
-}
-return;
-}
-// Mark as initialized
-element.dataset.clearInitialized = 'true';
-// Create wrapper if needed
-let wrapper = element.parentNode;
-if (!wrapper.classList.contains('clear-button-wrapper')) {
-wrapper = document.createElement('div');
-wrapper.className = 'clear-button-wrapper';
-wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-element.parentNode.insertBefore(wrapper, element);
-wrapper.appendChild(element);
-}
-// Add padding for the clear button
-element.style.paddingRight = '24px';
-// Create and append clear button
-const clearButton = createClearButton(element);
-wrapper.appendChild(clearButton);
-// Update clear button visibility
-const updateVisibility = () => {
-requestAnimationFrame(() => {
-clearButton.style.opacity = element.value ? '1' : '0';
 });
+},
+openBook: function(value, book) {
+if (!value) return;
+let preVal = value;
+if (book === "place") {
+const place = value.split(/\]\s+[-��]\s+/);
+preVal = place.length > 1 ? place[1] : value;
+}
+preVal = preVal.substring(0, Math.min(preVal.length, 12))
+.split(/[, ]+/)[0];
+const encVal = encodeURIComponent(value);
+const encPreVal = encodeURIComponent(preVal);
+const url = `?w=w&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+window.open(url, '_blank');
+}
 };
-// Event listeners
-element.addEventListener('input', updateVisibility);
-element.addEventListener('change', updateVisibility);
-element.addEventListener('focus', updateVisibility);
-// Hover effects
-clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-// Handle clear button click
-clearButton.addEventListener('click', (e) => {
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
+function initializeWelcomeSearchFunctionality() {
+const searchForms = {
+main: document.getElementById('main-search'),
+title: document.getElementById('title-search')
+};
+const searchBtn = document.getElementById('global-search');
+function hasInput(form) {
+return form && Array.from(form.querySelectorAll('input[type="search"]'))
+.some(input => input.value.trim() !== '');
+}
+function getTooltip() {
+if (hasInput(searchForms.main)) {
+return 'Search individual';
+}
+if (searchForms.title && hasInput(searchForms.title)) {
+return 'Search title/fief';
+}
+return '';
+}
+$(searchBtn).tooltip({
+title: getTooltip,
+trigger: 'hover'
+});
+Object.values(searchForms).forEach(form => {
+if (!form) return;
+form.querySelectorAll('input[type="search"]').forEach(input => {
+input.addEventListener('input', () => {
+$(searchBtn).tooltip('hide')
+.attr('data-original-title', getTooltip())
+.tooltip('show');
+});
+});
+form.addEventListener('keypress', e => {
+if (e.key === 'Enter') {
 e.preventDefault();
-e.stopPropagation();
-// Clear the input
-element.value = '';
-element.focus();
-updateVisibility();
-// Trigger events
-const inputEvent = new CustomEvent('clearButton', {
-bubbles: true,
-detail: { element }
-});
-element.dispatchEvent(inputEvent);
-element.dispatchEvent(new Event('input', { bubbles: true }));
-element.dispatchEvent(new Event('change', { bubbles: true }));
-});
-// Initial visibility state
-updateVisibility();
-}
-// Process all matching inputs
-function processInputs() {
-const selector = `
-input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-.clear-button:not([readonly]):not([disabled])
-`;
-requestAnimationFrame(() => {
-document.querySelectorAll(selector).forEach(initializeInput);
-});
-}
-// Initial processing
-processInputs();
-// Monitor DOM changes
-const observer = new MutationObserver((mutations) => {
-let shouldProcess = false;
-mutations.forEach(mutation => {
-if (mutation.addedNodes.length ||
-mutation.type === 'attributes' &&
-(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-shouldProcess = true;
+if (hasInput(form)) form.submit();
 }
 });
-if (shouldProcess) {
-processInputs();
-}
 });
-observer.observe(document.body, {
-childList: true,
-subtree: true,
-attributes: true,
-attributeFilter: ['type', 'class']
-});
+searchBtn.addEventListener('click', () => {
+if (hasInput(searchForms.main)) {
+searchForms.main.submit();
 }
-</script>
-<script>
-function initializeLazyModules() {
-$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
-$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
-$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+else if (searchForms.title && hasInput(searchForms.title)) {
+searchForms.title.submit();
 }
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-$('.modal').on('shown.bs.modal', function() {
-$(this).find('[autofocus]').focus();
 });
 }
 // Floating placeholders for all textual inputs
@@ -696,8 +667,9 @@ console.error('Initialization error:', error);
 }
 }
 document.addEventListener('DOMContentLoaded', () => {
-initializeLazyModules();
-setupModalAutofocus();
+initializeWelcomeSearchFunctionality();
+inputToBook.addNavigation();
+initTooltips();
 setupFloatingPlaceholders();
 });
 </script>

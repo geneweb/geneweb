@@ -51,7 +51,7 @@ placeholder="Select personalized modules" maxlength="30">
 title="Default template" data-toggle="popover" data-trigger="hover"
 data-html="true" data-content="<img class='w-100' src='images/modules/zz_1.jpg'>"><i class="fa fa-arrow-rotate-left"></i></button>
 <a role="button" class="btn btn-outline-primary ml-2"
-href="galichet?m=A&t=T&i=26&wide=on&v=5&norandom=yes&t1=CT&sosa=on"
+href="galichet?m=A&t=T&i=26&wide=on&v=5&t1=CT&sosa=on"
 title="Full width display"><i class="fa fa-desktop fa-fw" aria-hidden="true"></i><span class="sr-only">Full width display</span></a>
 </div>
 </div>
@@ -87,10 +87,10 @@ text-muted" aria-hidden="true"></span><span class="sr-only">Tools individual</sp
 <i class="fa fa-person fa-fw text-muted mr-2"></i>Visibility (if titles)</a>
 <div class="dropdown-divider"></div>
 <a class="dropdown-item"
-href="galichet?pz=laurent&nz=geruzet&m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on"
+href="galichet?pz=laurent&nz=geruzet&m=A&t=T&i=26&v=5&t1=CT&sosa=on"
 title="Browse using Laurent Geruzet as Sosa reference" accesskey="S"><i class="far fa-circle-dot fa-fw male mr-1"></i> Update Sosa 1: Laurent Geruzet</a>
 <div class="dropdown-divider"></div>
-<a class="dropdown-item" href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="Without GeneWeb links"></i>Without GeneWeb links</a><div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="Without GeneWeb links"></i>Without GeneWeb links</a><div class="dropdown-divider"></div>
 <a class="dropdown-item" href="galichet?m=CHG_EVT_IND_ORD&i=26" title="Change order of individual events"><span class="fa fa-sort fa-fw mr-2"></span>Reverse events</a>
 <a class="dropdown-item" href="galichet?m=SND_IMAGE&i=26">
 <i class="far fa-file-image fa-fw mr-2"></i>Update picture</a>
@@ -103,7 +103,7 @@ title="Browse using Laurent Geruzet as Sosa reference" accesskey="S"><i class="f
 title="Copy the exterior link to the clipboard
 " 
 data-bname="galichet"
-data-query="p=laurent&n=geruzet&sosa=on&v=5&t1=CT&t=T&m=A&norandom=yes"><i class="fas fa-link fa-fw mr-2"></i>Copy the permalink exterior</button>
+data-query="p=laurent&n=geruzet&sosa=on&v=5&t1=CT&t=T&m=A"><i class="fas fa-link fa-fw mr-2"></i>Copy the permalink exterior</button>
 <button class="disabled dropdown-item mx-0 px-0">/</button>
 <button class="mx-1 px-0 dropdown-item permalink-friend-copy" type="button"
 title="Copy the friend link to the clipboard
@@ -248,7 +248,7 @@ title="Display the carrousel of images">
 <span class="far fa-image fa-fw mr-1" aria-hidden="true"></span><sup class="small">6</sup><span class="sr-only">Pictures</span></a>
 </li>
 <li class="nav-item">
-<a class="nav-link text-secondary" href="galichet?m=LINKED&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on"
+<a class="nav-link text-secondary" href="galichet?m=LINKED&t=T&i=26&v=5&t1=CT&sosa=on"
 title="Linked pages">
 <i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><sup class="small">1</sup><span class="sr-only">file-lines icon</span></a>
 </li>
@@ -412,134 +412,80 @@ Laurent Geruzet</span>
 <script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
 <script src="js/jquery.line.js"></script>
 <script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-function addClearButtonToInputs() {
-// Utility function to create and setup clear button
-function createClearButton(element) {
-const clearButton = document.createElement('i');
-clearButton.className = 'fas fa-xmark clear-button-icon';
-clearButton.title = 'Clear the input';
-clearButton.style.cssText = `
-position: absolute;
-right: 10px;
-top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-cursor: pointer;
-color: #667fc9;
-font-size: 1em;
-opacity: 0;
-transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-pointer-events: auto;
-`;
-return clearButton;
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+addNavigation: function() {
+// Use event delegation for dynamically added inputs
+$(document).on('mousedown', 'input[data-book]', function(event) {
+if (event.ctrlKey && event.button === 0) {
+event.preventDefault();
+inputToBook.openBook(this.value, $(this).data('book'));
 }
-// Initialize or update a single input
-function initializeInput(element) {
-// Skip if already initialized
-if (element.dataset.clearInitialized) {
-const existingButton = element.parentNode.querySelector('.clear-button-icon');
-if (existingButton) {
-existingButton.style.opacity = element.value ? '1' : '0';
-}
-return;
-}
-// Mark as initialized
-element.dataset.clearInitialized = 'true';
-// Create wrapper if needed
-let wrapper = element.parentNode;
-if (!wrapper.classList.contains('clear-button-wrapper')) {
-wrapper = document.createElement('div');
-wrapper.className = 'clear-button-wrapper';
-wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-element.parentNode.insertBefore(wrapper, element);
-wrapper.appendChild(element);
-}
-// Add padding for the clear button
-element.style.paddingRight = '24px';
-// Create and append clear button
-const clearButton = createClearButton(element);
-wrapper.appendChild(clearButton);
-// Update clear button visibility
-const updateVisibility = () => {
-requestAnimationFrame(() => {
-clearButton.style.opacity = element.value ? '1' : '0';
 });
+},
+openBook: function(value, book) {
+if (!value) return;
+let preVal = value;
+if (book === "place") {
+const place = value.split(/\]\s+[-��]\s+/);
+preVal = place.length > 1 ? place[1] : value;
+}
+preVal = preVal.substring(0, Math.min(preVal.length, 12))
+.split(/[, ]+/)[0];
+const encVal = encodeURIComponent(value);
+const encPreVal = encodeURIComponent(preVal);
+const url = `?w=w&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+window.open(url, '_blank');
+}
 };
-// Event listeners
-element.addEventListener('input', updateVisibility);
-element.addEventListener('change', updateVisibility);
-element.addEventListener('focus', updateVisibility);
-// Hover effects
-clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-// Handle clear button click
-clearButton.addEventListener('click', (e) => {
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
+function initializeWelcomeSearchFunctionality() {
+const searchForms = {
+main: document.getElementById('main-search'),
+title: document.getElementById('title-search')
+};
+const searchBtn = document.getElementById('global-search');
+function hasInput(form) {
+return form && Array.from(form.querySelectorAll('input[type="search"]'))
+.some(input => input.value.trim() !== '');
+}
+function getTooltip() {
+if (hasInput(searchForms.main)) {
+return 'Search individual';
+}
+if (searchForms.title && hasInput(searchForms.title)) {
+return 'Search title/fief';
+}
+return '';
+}
+$(searchBtn).tooltip({
+title: getTooltip,
+trigger: 'hover'
+});
+Object.values(searchForms).forEach(form => {
+if (!form) return;
+form.querySelectorAll('input[type="search"]').forEach(input => {
+input.addEventListener('input', () => {
+$(searchBtn).tooltip('hide')
+.attr('data-original-title', getTooltip())
+.tooltip('show');
+});
+});
+form.addEventListener('keypress', e => {
+if (e.key === 'Enter') {
 e.preventDefault();
-e.stopPropagation();
-// Clear the input
-element.value = '';
-element.focus();
-updateVisibility();
-// Trigger events
-const inputEvent = new CustomEvent('clearButton', {
-bubbles: true,
-detail: { element }
-});
-element.dispatchEvent(inputEvent);
-element.dispatchEvent(new Event('input', { bubbles: true }));
-element.dispatchEvent(new Event('change', { bubbles: true }));
-});
-// Initial visibility state
-updateVisibility();
-}
-// Process all matching inputs
-function processInputs() {
-const selector = `
-input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-.clear-button:not([readonly]):not([disabled])
-`;
-requestAnimationFrame(() => {
-document.querySelectorAll(selector).forEach(initializeInput);
-});
-}
-// Initial processing
-processInputs();
-// Monitor DOM changes
-const observer = new MutationObserver((mutations) => {
-let shouldProcess = false;
-mutations.forEach(mutation => {
-if (mutation.addedNodes.length ||
-mutation.type === 'attributes' &&
-(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-shouldProcess = true;
+if (hasInput(form)) form.submit();
 }
 });
-if (shouldProcess) {
-processInputs();
-}
 });
-observer.observe(document.body, {
-childList: true,
-subtree: true,
-attributes: true,
-attributeFilter: ['type', 'class']
-});
+searchBtn.addEventListener('click', () => {
+if (hasInput(searchForms.main)) {
+searchForms.main.submit();
 }
-</script>
-<script>
-function initializeLazyModules() {
-$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
-$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
-$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+else if (searchForms.title && hasInput(searchForms.title)) {
+searchForms.title.submit();
 }
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-$('.modal').on('shown.bs.modal', function() {
-$(this).find('[autofocus]').focus();
 });
 }
 // Floating placeholders for all textual inputs
@@ -585,8 +531,9 @@ console.error('Initialization error:', error);
 }
 }
 document.addEventListener('DOMContentLoaded', () => {
-initializeLazyModules();
-setupModalAutofocus();
+initializeWelcomeSearchFunctionality();
+inputToBook.addNavigation();
+initTooltips();
 setupFloatingPlaceholders();
 });
 </script>
@@ -594,40 +541,40 @@ setupFloatingPlaceholders();
 <div class="d-flex ml-2 mb-2">
 <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 <div class="btn-group mx-2">
-<a href="galichet?m=A&t=T&i=26&v=4&norandom=yes&t1=CT&sosa=on" class="btn btn-outline-primary"
+<a href="galichet?m=A&t=T&i=26&v=4&t1=CT&sosa=on" class="btn btn-outline-primary"
 title="(−1) display 4 generations">−</a>
 <span class="btn btn-outline-primary disabled border-top border-bottom"
 title="generations">5 gen.</span>
-<a href="galichet?m=A&t=T&i=26&v=6&norandom=yes&t1=CT&sosa=on" class="btn btn-outline-primary"
+<a href="galichet?m=A&t=T&i=26&v=6&t1=CT&sosa=on" class="btn btn-outline-primary"
 title="(+1) display 6 generations (max 12)">+</a>
 </div>
 <div class="mx-2">
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&hi=I"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&hi=I"
 class="btn btn-outline-primary">I-tree</a>
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT" class="btn btn-outline-primary ml-1"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT" class="btn btn-outline-primary ml-1"
 title="Display ASCII">
 ASCII box drawing</a>
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&sms=on" class="btn btn-outline-primary ml-1"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&sms=on" class="btn btn-outline-primary ml-1"
 title="Display missing Sosa">·</a>
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&cpl=on" class="btn btn-outline-primary ml-1"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&cpl=on" class="btn btn-outline-primary ml-1"
 title="Display couples">
 <i class="fa fa-user-plus" aria-hidden="true"></i><i class="fa fa-user" aria-hidden="true"></i></a>
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&implx=on" class="btn btn-outline-primary ml-1"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&implx=on" class="btn btn-outline-primary ml-1"
 title="Link implexes">
 <i class="fa fa-shuffle fa-fw"></i></a>
 </div>
 <div class="btn-group mx-2">
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=16&scale=80"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&fs=16&scale=80"
 class="btn btn-outline-primary" title="Reduce scale (-20 %)">−</a>
 <span class="btn btn-outline-primary disabled border-top border-bottom">100 %</span>
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=18&scale=120"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&fs=18&scale=120"
 class="btn btn-outline-primary" title="Increase scale (+20 %)">+</a>
 </div>
 <div class="btn-group mx-2">
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=16" class="btn btn-outline-primary"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&fs=16" class="btn btn-outline-primary"
 title="reduce font size">−</a>
 <span class="btn btn-outline-primary disabled border-top border-bottom">Font 17 px</span>
-<a href="galichet?m=A&t=T&i=26&v=5&norandom=yes&t1=CT&sosa=on&fs=18" class="btn btn-outline-primary"
+<a href="galichet?m=A&t=T&i=26&v=5&t1=CT&sosa=on&fs=18" class="btn btn-outline-primary"
 title="increase font size">+</a>
 </div>
 </div>
@@ -703,7 +650,7 @@ title="Modifier Laurent Geruzet (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=laurent&n=geruzet&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 0 – Sosa 1 &#010; ♂ Laurent Geruzet (0)&#010;° 1738 – 1812&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 1</span>
@@ -722,7 +669,7 @@ title="Modifier Jacques Geruzet (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=jacques&n=geruzet&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 1 – Sosa 2 &#010; ♂ Jacques Geruzet (0)&#010;° 1705 – 1774&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 2</span>
@@ -746,7 +693,7 @@ title="Modifier Jeanne Pierquin (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=jeanne&n=pierquin&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 1 – Sosa 3 &#010; ♀ Jeanne Pierquin (0)&#010;&#010; Parents unknown.&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 3</span>
@@ -770,7 +717,7 @@ title="Modifier Anthoine Geruzet (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=anthoine&n=geruzet&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 2 – Sosa 4 &#010; ♂ Anthoine Geruzet (0)&#010;° 1667 – 1755&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 4</span>
@@ -794,7 +741,7 @@ title="Modifier Jeanne Boizot (1)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=jeanne&n=boizot&oc=1&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 2 – Sosa 5 &#010; ♀ Jeanne Boizot (1)&#010;° 1671 – 1748&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 5</span>
@@ -818,7 +765,7 @@ title="Modifier Anthoine Geruzet (1)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=anthoine&n=geruzet&oc=1&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 3 – Sosa 8 &#010; ♂ Anthoine Geruzet (1)&#010;° 1640 – 1709&#010; Parents unknown.&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 8</span>
@@ -842,7 +789,7 @@ title="Modifier Louise Bouquet (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=louise&n=bouquet&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 3 – Sosa 9 &#010; ♀ Louise Bouquet (0)&#010;&#010; Parents unknown.&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 9</span>
@@ -866,7 +813,7 @@ title="Modifier Jean Boizot (1234)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=jean&n=boizot&oc=1234&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 3 – Sosa 10 &#010; ♂ Jean Boizot (1234)&#010;° 1618 – 1702&#010; Parents unknown.&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 10</span>
@@ -890,7 +837,7 @@ title="Modifier Claude Jayot (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=claude&n=jayot&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 3 – Sosa 11 &#010; ♀ Claude Jayot (0)&#010;° 1633 – 1697&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 11</span>
@@ -914,7 +861,7 @@ title="Modifier Jean Jayot (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=jean&n=jayot&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 4 – Sosa 22 &#010; ♂ Jean Jayot (0)&#010;° 1604 – 1674&#010; Parents unknown.&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 22</span>
@@ -938,7 +885,7 @@ title="Modifier Perrette Sutaine (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=perrette&n=sutaine&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 4 – Sosa 23 &#010; ♀ Perrette Sutaine (0)&#010;° 1600 – 1684&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 23</span>
@@ -962,7 +909,7 @@ title="Modifier Louis Sutaine (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=louis&n=sutaine&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 5 – Sosa 46 &#010; ♂ Louis Sutaine (0)&#010;° 1575 – &#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 46</span>
@@ -986,7 +933,7 @@ title="Modifier Claude Petizon (0)">
 <div>
 <a style="width:100%;zindex:2;"
 href="galichet?p=claude&n=petizon&t=T&t1=CT&
-sosa=on&v=5&i=26&m=A&norandom=yes&"
+sosa=on&v=5&i=26&m=A&"
 title='Generation 5 – Sosa 47 &#010; ♀ Claude Petizon (0)&#010;&#010; Parents unknown.&#010;'>
 <span style="margin:8px 0 2px 0;text-align:center;width:100%;font-size:17px;">
 47</span>
@@ -999,6 +946,31 @@ $('#hi-tree1').line(518, 310, 518, 262, {stroke:2, opacity:0.3, zindex:-1});
 });
 </script>
 </div>
-</div>
+<script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script></div>
 </body>
 </html>

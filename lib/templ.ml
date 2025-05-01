@@ -1210,7 +1210,10 @@ let include_hed_trl conf name =
   | "hed" -> Util.include_template conf [] name (fun () -> ())
   | "trl" ->
       Util.include_template conf [] name (fun () -> ());
-      let query_time = Unix.gettimeofday () -. conf.query_start in
+      let query_time =
+        if conf.predictable_mode then 0.
+        else Unix.gettimeofday () -. conf.query_start
+      in
       Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
         !GWPARAM.errors_other !GWPARAM.set_vars
   | _ -> ()

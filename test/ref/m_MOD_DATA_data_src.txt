@@ -411,7 +411,32 @@ href="galichet?m=MOD_DATA&data=src&key=10&s=" data-entry="témoin au mariage de 
 </ul>
 </li>
 </ul>
-<!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->
@@ -426,38 +451,38 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <span class="sr-only">, select language</span>
 </button>
 <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
-<a class="dropdown-item" id="lang_af" href="galichet?lang=af&m=MOD_DATA&norandom=yes&data=src"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
-<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&m=MOD_DATA&norandom=yes&data=src"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
-<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&m=MOD_DATA&norandom=yes&data=src"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
-<a class="dropdown-item" id="lang_br" href="galichet?lang=br&m=MOD_DATA&norandom=yes&data=src"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
-<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&m=MOD_DATA&norandom=yes&data=src"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
-<a class="dropdown-item" id="lang_co" href="galichet?lang=co&m=MOD_DATA&norandom=yes&data=src"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
-<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&m=MOD_DATA&norandom=yes&data=src"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
-<a class="dropdown-item" id="lang_da" href="galichet?lang=da&m=MOD_DATA&norandom=yes&data=src"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
-<a class="dropdown-item" id="lang_de" href="galichet?lang=de&m=MOD_DATA&norandom=yes&data=src"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
-<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&m=MOD_DATA&norandom=yes&data=src"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
-<a class="dropdown-item" id="lang_es" href="galichet?lang=es&m=MOD_DATA&norandom=yes&data=src"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
-<a class="dropdown-item" id="lang_et" href="galichet?lang=et&m=MOD_DATA&norandom=yes&data=src"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
-<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&m=MOD_DATA&norandom=yes&data=src"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
-<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&m=MOD_DATA&norandom=yes&data=src"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
-<a class="dropdown-item" id="lang_he" href="galichet?lang=he&m=MOD_DATA&norandom=yes&data=src"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
-<a class="dropdown-item" id="lang_is" href="galichet?lang=is&m=MOD_DATA&norandom=yes&data=src"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
-<a class="dropdown-item" id="lang_it" href="galichet?lang=it&m=MOD_DATA&norandom=yes&data=src"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
-<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&m=MOD_DATA&norandom=yes&data=src"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
-<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&m=MOD_DATA&norandom=yes&data=src"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
-<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&m=MOD_DATA&norandom=yes&data=src"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
-<a class="dropdown-item" id="lang_no" href="galichet?lang=no&m=MOD_DATA&norandom=yes&data=src"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
-<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&m=MOD_DATA&norandom=yes&data=src"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
-<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&m=MOD_DATA&norandom=yes&data=src"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
-<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&m=MOD_DATA&norandom=yes&data=src"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
-<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&m=MOD_DATA&norandom=yes&data=src"><code>pt-br </code>Brazilian-Portuguese</a>
-<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&m=MOD_DATA&norandom=yes&data=src"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
-<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&m=MOD_DATA&norandom=yes&data=src"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
-<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&m=MOD_DATA&norandom=yes&data=src"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
-<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&m=MOD_DATA&norandom=yes&data=src"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
-<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&m=MOD_DATA&norandom=yes&data=src"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
-<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&m=MOD_DATA&norandom=yes&data=src"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
-<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&m=MOD_DATA&norandom=yes&data=src"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
+<a class="dropdown-item" id="lang_af" href="galichet?lang=af&m=MOD_DATA&data=src"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
+<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&m=MOD_DATA&data=src"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
+<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&m=MOD_DATA&data=src"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
+<a class="dropdown-item" id="lang_br" href="galichet?lang=br&m=MOD_DATA&data=src"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
+<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&m=MOD_DATA&data=src"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
+<a class="dropdown-item" id="lang_co" href="galichet?lang=co&m=MOD_DATA&data=src"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
+<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&m=MOD_DATA&data=src"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
+<a class="dropdown-item" id="lang_da" href="galichet?lang=da&m=MOD_DATA&data=src"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
+<a class="dropdown-item" id="lang_de" href="galichet?lang=de&m=MOD_DATA&data=src"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
+<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&m=MOD_DATA&data=src"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
+<a class="dropdown-item" id="lang_es" href="galichet?lang=es&m=MOD_DATA&data=src"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
+<a class="dropdown-item" id="lang_et" href="galichet?lang=et&m=MOD_DATA&data=src"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
+<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&m=MOD_DATA&data=src"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
+<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&m=MOD_DATA&data=src"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
+<a class="dropdown-item" id="lang_he" href="galichet?lang=he&m=MOD_DATA&data=src"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
+<a class="dropdown-item" id="lang_is" href="galichet?lang=is&m=MOD_DATA&data=src"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
+<a class="dropdown-item" id="lang_it" href="galichet?lang=it&m=MOD_DATA&data=src"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
+<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&m=MOD_DATA&data=src"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
+<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&m=MOD_DATA&data=src"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
+<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&m=MOD_DATA&data=src"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
+<a class="dropdown-item" id="lang_no" href="galichet?lang=no&m=MOD_DATA&data=src"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
+<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&m=MOD_DATA&data=src"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
+<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&m=MOD_DATA&data=src"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
+<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&m=MOD_DATA&data=src"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
+<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&m=MOD_DATA&data=src"><code>pt-br </code>Brazilian-Portuguese</a>
+<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&m=MOD_DATA&data=src"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
+<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&m=MOD_DATA&data=src"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
+<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&m=MOD_DATA&data=src"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
+<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&m=MOD_DATA&data=src"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
+<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&m=MOD_DATA&data=src"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
+<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&m=MOD_DATA&data=src"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
+<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&m=MOD_DATA&data=src"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
 </div>
 </div>
 <!-- Connections info -->
@@ -471,7 +496,7 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
 <div class="ml-auto mb-0">
 <a role="button" class="mr-1"
-href="galichet?templ=templm&m=MOD_DATA&norandom=yes&data=src" 
+href="galichet?templ=templm&m=MOD_DATA&data=src" 
 data-toggle="tooltip"
 title="templm">
 <i class="fab fa-markdown" aria-hidden="true"></i>
@@ -581,125 +606,6 @@ window.addEventListener('scroll', handleScroll, { passive: true });
 }
 </script>
 <script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-function addClearButtonToInputs() {
-// Utility function to create and setup clear button
-function createClearButton(element) {
-const clearButton = document.createElement('i');
-clearButton.className = 'fas fa-xmark clear-button-icon';
-clearButton.title = 'Clear the input';
-clearButton.style.cssText = `
-position: absolute;
-right: 10px;
-top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-cursor: pointer;
-color: #667fc9;
-font-size: 1em;
-opacity: 0;
-transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-pointer-events: auto;
-`;
-return clearButton;
-}
-// Initialize or update a single input
-function initializeInput(element) {
-// Skip if already initialized
-if (element.dataset.clearInitialized) {
-const existingButton = element.parentNode.querySelector('.clear-button-icon');
-if (existingButton) {
-existingButton.style.opacity = element.value ? '1' : '0';
-}
-return;
-}
-// Mark as initialized
-element.dataset.clearInitialized = 'true';
-// Create wrapper if needed
-let wrapper = element.parentNode;
-if (!wrapper.classList.contains('clear-button-wrapper')) {
-wrapper = document.createElement('div');
-wrapper.className = 'clear-button-wrapper';
-wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-element.parentNode.insertBefore(wrapper, element);
-wrapper.appendChild(element);
-}
-// Add padding for the clear button
-element.style.paddingRight = '24px';
-// Create and append clear button
-const clearButton = createClearButton(element);
-wrapper.appendChild(clearButton);
-// Update clear button visibility
-const updateVisibility = () => {
-requestAnimationFrame(() => {
-clearButton.style.opacity = element.value ? '1' : '0';
-});
-};
-// Event listeners
-element.addEventListener('input', updateVisibility);
-element.addEventListener('change', updateVisibility);
-element.addEventListener('focus', updateVisibility);
-// Hover effects
-clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-// Handle clear button click
-clearButton.addEventListener('click', (e) => {
-e.preventDefault();
-e.stopPropagation();
-// Clear the input
-element.value = '';
-element.focus();
-updateVisibility();
-// Trigger events
-const inputEvent = new CustomEvent('clearButton', {
-bubbles: true,
-detail: { element }
-});
-element.dispatchEvent(inputEvent);
-element.dispatchEvent(new Event('input', { bubbles: true }));
-element.dispatchEvent(new Event('change', { bubbles: true }));
-});
-// Initial visibility state
-updateVisibility();
-}
-// Process all matching inputs
-function processInputs() {
-const selector = `
-input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-.clear-button:not([readonly]):not([disabled])
-`;
-requestAnimationFrame(() => {
-document.querySelectorAll(selector).forEach(initializeInput);
-});
-}
-// Initial processing
-processInputs();
-// Monitor DOM changes
-const observer = new MutationObserver((mutations) => {
-let shouldProcess = false;
-mutations.forEach(mutation => {
-if (mutation.addedNodes.length ||
-mutation.type === 'attributes' &&
-(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-shouldProcess = true;
-}
-});
-if (shouldProcess) {
-processInputs();
-}
-});
-observer.observe(document.body, {
-childList: true,
-subtree: true,
-attributes: true,
-attributeFilter: ['type', 'class']
-});
-}
-</script>
-<script>
 // Manages enhanced input field behaviors (navigation, interaction)
 const inputToBook = {
 addNavigation: function() {
@@ -726,10 +632,54 @@ const url = `?w=w&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreV
 window.open(url, '_blank');
 }
 };
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-$('.modal').on('shown.bs.modal', function() {
-$(this).find('[autofocus]').focus();
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
+function initializeWelcomeSearchFunctionality() {
+const searchForms = {
+main: document.getElementById('main-search'),
+title: document.getElementById('title-search')
+};
+const searchBtn = document.getElementById('global-search');
+function hasInput(form) {
+return form && Array.from(form.querySelectorAll('input[type="search"]'))
+.some(input => input.value.trim() !== '');
+}
+function getTooltip() {
+if (hasInput(searchForms.main)) {
+return 'Search individual';
+}
+if (searchForms.title && hasInput(searchForms.title)) {
+return 'Search title/fief';
+}
+return '';
+}
+$(searchBtn).tooltip({
+title: getTooltip,
+trigger: 'hover'
+});
+Object.values(searchForms).forEach(form => {
+if (!form) return;
+form.querySelectorAll('input[type="search"]').forEach(input => {
+input.addEventListener('input', () => {
+$(searchBtn).tooltip('hide')
+.attr('data-original-title', getTooltip())
+.tooltip('show');
+});
+});
+form.addEventListener('keypress', e => {
+if (e.key === 'Enter') {
+e.preventDefault();
+if (hasInput(form)) form.submit();
+}
+});
+});
+searchBtn.addEventListener('click', () => {
+if (hasInput(searchForms.main)) {
+searchForms.main.submit();
+}
+else if (searchForms.title && hasInput(searchForms.title)) {
+searchForms.title.submit();
+}
 });
 }
 function setupAutofocusInput() {
@@ -761,8 +711,9 @@ console.error('Initialization error:', error);
 }
 }
 document.addEventListener('DOMContentLoaded', () => {
+initializeWelcomeSearchFunctionality();
+inputToBook.addNavigation();
 initTooltips();
-setupModalAutofocus();
 setupToolbarSticky();
 setupCharacterInsertion();
 setupAutofocusInput();
