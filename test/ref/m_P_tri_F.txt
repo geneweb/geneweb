@@ -63,7 +63,32 @@ name="p" placeholder="First name" tabindex="6">
 </div>
 </div>
 <div class="container"><h1>27 first names (34 individuals)</h1>
-<ul><li>3<ul><li><a href="galichet?m=P&v=jeanne">Jeanne</a></li></ul></li><li>2<ul><li><a href="galichet?m=P&v=anthoine">Anthoine</a></li><li><a href="galichet?m=P&v=claude">Claude</a></li><li><a href="galichet?m=P&v=jean">Jean</a></li><li><a href="galichet?m=P&v=louis">Louis</a></li><li><a href="galichet?m=P&v=marie">Marie</a></li></ul></li><li>1<ul><li><a href="galichet?m=P&v=charlotte">Charlotte</a></li><li><a href="galichet?m=P&v=florence">Florence</a></li><li><a href="galichet?m=P&v=jacques">Jacques</a></li><li><a href="galichet?m=P&v=jean+charles">Jean Charles</a></li><li><a href="galichet?m=P&v=jean+pierre">Jean Pierre</a></li><li><a href="galichet?m=P&v=jean+baptiste">Jean-Baptiste</a></li><li><a href="galichet?m=P&v=jean+paul">Jean-Paul</a></li><li><a href="galichet?m=P&v=laure">Laure</a></li><li><a href="galichet?m=P&v=laurence">Laurence</a></li><li><a href="galichet?m=P&v=laurent">Laurent</a></li><li><a href="galichet?m=P&v=louise">Louise</a></li><li><a href="galichet?m=P&v=marie+elisabeth">Marie Elisabeth</a></li><li><a href="galichet?m=P&v=marie+jeanne">Marie-Jeanne</a></li><li><a href="galichet?m=P&v=nicole">Nicole</a></li><li><a href="galichet?m=P&v=paul">Paul</a></li><li><a href="galichet?m=P&v=perrette">Perrette</a></li><li><a href="galichet?m=P&v=pierre">Pierre</a></li><li><a href="galichet?m=P&v=therese+eugenie">Thérèse Eugénie</a></li><li><a href="galichet?m=P&v=lolo">lolo</a></li><li><a href="galichet?m=P&v=prenom1">prenom1</a></li><li><a href="galichet?m=P&v=prenom2">prenom2</a></li></ul></li></ul><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<ul><li>3<ul><li><a href="galichet?m=P&v=jeanne">Jeanne</a></li></ul></li><li>2<ul><li><a href="galichet?m=P&v=anthoine">Anthoine</a></li><li><a href="galichet?m=P&v=claude">Claude</a></li><li><a href="galichet?m=P&v=jean">Jean</a></li><li><a href="galichet?m=P&v=louis">Louis</a></li><li><a href="galichet?m=P&v=marie">Marie</a></li></ul></li><li>1<ul><li><a href="galichet?m=P&v=charlotte">Charlotte</a></li><li><a href="galichet?m=P&v=florence">Florence</a></li><li><a href="galichet?m=P&v=jacques">Jacques</a></li><li><a href="galichet?m=P&v=jean+charles">Jean Charles</a></li><li><a href="galichet?m=P&v=jean+pierre">Jean Pierre</a></li><li><a href="galichet?m=P&v=jean+baptiste">Jean-Baptiste</a></li><li><a href="galichet?m=P&v=jean+paul">Jean-Paul</a></li><li><a href="galichet?m=P&v=laure">Laure</a></li><li><a href="galichet?m=P&v=laurence">Laurence</a></li><li><a href="galichet?m=P&v=laurent">Laurent</a></li><li><a href="galichet?m=P&v=louise">Louise</a></li><li><a href="galichet?m=P&v=marie+elisabeth">Marie Elisabeth</a></li><li><a href="galichet?m=P&v=marie+jeanne">Marie-Jeanne</a></li><li><a href="galichet?m=P&v=nicole">Nicole</a></li><li><a href="galichet?m=P&v=paul">Paul</a></li><li><a href="galichet?m=P&v=perrette">Perrette</a></li><li><a href="galichet?m=P&v=pierre">Pierre</a></li><li><a href="galichet?m=P&v=therese+eugenie">Thérèse Eugénie</a></li><li><a href="galichet?m=P&v=lolo">lolo</a></li><li><a href="galichet?m=P&v=prenom1">prenom1</a></li><li><a href="galichet?m=P&v=prenom2">prenom2</a></li></ul></li></ul><script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->
@@ -79,39 +104,39 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 </button>
 <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
 <!-- Language options remain the same -->
-<a class="dropdown-item" href="galichet?lang=af&m=P&norandom=yes&tri=F">af</a>
-<a class="dropdown-item" href="galichet?lang=ar&m=P&norandom=yes&tri=F">ar</a>
-<a class="dropdown-item" href="galichet?lang=bg&m=P&norandom=yes&tri=F">bg</a>
-<a class="dropdown-item" href="galichet?lang=br&m=P&norandom=yes&tri=F">br</a>
-<a class="dropdown-item" href="galichet?lang=ca&m=P&norandom=yes&tri=F">ca</a>
-<a class="dropdown-item" href="galichet?lang=co&m=P&norandom=yes&tri=F">co</a>
-<a class="dropdown-item" href="galichet?lang=cs&m=P&norandom=yes&tri=F">cs</a>
-<a class="dropdown-item" href="galichet?lang=da&m=P&norandom=yes&tri=F">da</a>
-<a class="dropdown-item" href="galichet?lang=de&m=P&norandom=yes&tri=F">de</a>
-<a class="dropdown-item" href="galichet?m=P&norandom=yes&tri=F">en</a>
-<a class="dropdown-item" href="galichet?lang=eo&m=P&norandom=yes&tri=F">eo</a>
-<a class="dropdown-item" href="galichet?lang=es&m=P&norandom=yes&tri=F">es</a>
-<a class="dropdown-item" href="galichet?lang=et&m=P&norandom=yes&tri=F">et</a>
-<a class="dropdown-item" href="galichet?lang=fi&m=P&norandom=yes&tri=F">fi</a>
-<a class="dropdown-item" href="galichet?lang=fr&m=P&norandom=yes&tri=F">fr</a>
-<a class="dropdown-item" href="galichet?lang=he&m=P&norandom=yes&tri=F">he</a>
-<a class="dropdown-item" href="galichet?lang=is&m=P&norandom=yes&tri=F">is</a>
-<a class="dropdown-item" href="galichet?lang=it&m=P&norandom=yes&tri=F">it</a>
-<a class="dropdown-item" href="galichet?lang=lt&m=P&norandom=yes&tri=F">lt</a>
-<a class="dropdown-item" href="galichet?lang=lv&m=P&norandom=yes&tri=F">lv</a>
-<a class="dropdown-item" href="galichet?lang=nl&m=P&norandom=yes&tri=F">nl</a>
-<a class="dropdown-item" href="galichet?lang=no&m=P&norandom=yes&tri=F">no</a>
-<a class="dropdown-item" href="galichet?lang=oc&m=P&norandom=yes&tri=F">oc</a>
-<a class="dropdown-item" href="galichet?lang=pl&m=P&norandom=yes&tri=F">pl</a>
-<a class="dropdown-item" href="galichet?lang=pt&m=P&norandom=yes&tri=F">pt</a>
-<a class="dropdown-item" href="galichet?lang=pt-br&m=P&norandom=yes&tri=F">pt-br</a>
-<a class="dropdown-item" href="galichet?lang=ro&m=P&norandom=yes&tri=F">ro</a>
-<a class="dropdown-item" href="galichet?lang=ru&m=P&norandom=yes&tri=F">ru</a>
-<a class="dropdown-item" href="galichet?lang=sk&m=P&norandom=yes&tri=F">sk</a>
-<a class="dropdown-item" href="galichet?lang=sl&m=P&norandom=yes&tri=F">sl</a>
-<a class="dropdown-item" href="galichet?lang=sv&m=P&norandom=yes&tri=F">sv</a>
-<a class="dropdown-item" href="galichet?lang=tr&m=P&norandom=yes&tri=F">tr</a>
-<a class="dropdown-item" href="galichet?lang=zh&m=P&norandom=yes&tri=F">zh</a>
+<a class="dropdown-item" href="galichet?lang=af&m=P&tri=F">af</a>
+<a class="dropdown-item" href="galichet?lang=ar&m=P&tri=F">ar</a>
+<a class="dropdown-item" href="galichet?lang=bg&m=P&tri=F">bg</a>
+<a class="dropdown-item" href="galichet?lang=br&m=P&tri=F">br</a>
+<a class="dropdown-item" href="galichet?lang=ca&m=P&tri=F">ca</a>
+<a class="dropdown-item" href="galichet?lang=co&m=P&tri=F">co</a>
+<a class="dropdown-item" href="galichet?lang=cs&m=P&tri=F">cs</a>
+<a class="dropdown-item" href="galichet?lang=da&m=P&tri=F">da</a>
+<a class="dropdown-item" href="galichet?lang=de&m=P&tri=F">de</a>
+<a class="dropdown-item" href="galichet?m=P&tri=F">en</a>
+<a class="dropdown-item" href="galichet?lang=eo&m=P&tri=F">eo</a>
+<a class="dropdown-item" href="galichet?lang=es&m=P&tri=F">es</a>
+<a class="dropdown-item" href="galichet?lang=et&m=P&tri=F">et</a>
+<a class="dropdown-item" href="galichet?lang=fi&m=P&tri=F">fi</a>
+<a class="dropdown-item" href="galichet?lang=fr&m=P&tri=F">fr</a>
+<a class="dropdown-item" href="galichet?lang=he&m=P&tri=F">he</a>
+<a class="dropdown-item" href="galichet?lang=is&m=P&tri=F">is</a>
+<a class="dropdown-item" href="galichet?lang=it&m=P&tri=F">it</a>
+<a class="dropdown-item" href="galichet?lang=lt&m=P&tri=F">lt</a>
+<a class="dropdown-item" href="galichet?lang=lv&m=P&tri=F">lv</a>
+<a class="dropdown-item" href="galichet?lang=nl&m=P&tri=F">nl</a>
+<a class="dropdown-item" href="galichet?lang=no&m=P&tri=F">no</a>
+<a class="dropdown-item" href="galichet?lang=oc&m=P&tri=F">oc</a>
+<a class="dropdown-item" href="galichet?lang=pl&m=P&tri=F">pl</a>
+<a class="dropdown-item" href="galichet?lang=pt&m=P&tri=F">pt</a>
+<a class="dropdown-item" href="galichet?lang=pt-br&m=P&tri=F">pt-br</a>
+<a class="dropdown-item" href="galichet?lang=ro&m=P&tri=F">ro</a>
+<a class="dropdown-item" href="galichet?lang=ru&m=P&tri=F">ru</a>
+<a class="dropdown-item" href="galichet?lang=sk&m=P&tri=F">sk</a>
+<a class="dropdown-item" href="galichet?lang=sl&m=P&tri=F">sl</a>
+<a class="dropdown-item" href="galichet?lang=sv&m=P&tri=F">sv</a>
+<a class="dropdown-item" href="galichet?lang=tr&m=P&tri=F">tr</a>
+<a class="dropdown-item" href="galichet?lang=zh&m=P&tri=F">zh</a>
 </div>
 </div>
 <!-- Connections info -->
@@ -125,7 +150,7 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
 <div class="ml-auto mb-0">
 <a role="button" class="mr-1"
-href="galichet?templ=templm&m=P&norandom=yes&tri=F" 
+href="galichet?templ=templm&m=P&tri=F" 
 data-toggle="tooltip"
 title="templm">
 <i class="fab fa-markdown" aria-hidden="true"></i>

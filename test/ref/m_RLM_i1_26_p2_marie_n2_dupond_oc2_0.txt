@@ -83,15 +83,15 @@ title="Relatives by marriage" accesskey="-"><i class="fa fa-ring fa-fw"></i></a>
 <span class="invisible"><i class="fa fa-chevron-up fa-fw"></i></span>
 </div>
 <div class="d-flex col-5 ml-5">
-<a href="galichet?m=RLM&im=0&norandom=yes&i1=26&p2=marie&n2=dupond&oc2=0"
+<a href="galichet?m=RLM&im=0&i1=26&p2=marie&n2=dupond&oc2=0"
 title="Hide picture">
 <i class="far fa-image fa-lg"></i></a>
-<a class="ml-2" href="galichet?m=RLM&sp=0&norandom=yes&i1=26&p2=marie&n2=dupond&oc2=0"
+<a class="ml-2" href="galichet?m=RLM&sp=0&i1=26&p2=marie&n2=dupond&oc2=0"
 title="Hide spouses">
 <i class="fa fa-user male p-0"></i></a>
-<a class="ml-2" href="galichet?m=RLM&norandom=yes&i1=26&p2=marie&n2=dupond&oc2=0&dag=on" target="_blank"><i class="fa fa-shuffle fa-fw" title="Fusion implexes"></i></a>
-<a class="ml-2" href="galichet?m=RLM&norandom=yes&i1=26&p2=marie&n2=dupond&oc2=0&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw" title="Without GeneWeb links"></i></a>
-<a class="ml-4" title="Edit the graph" href="galichet?m=TP&v=updRLM&norandom=yes&i1=26&p2=marie&n2=dupond&oc2=0">
+<a class="ml-2" href="galichet?m=RLM&i1=26&p2=marie&n2=dupond&oc2=0&dag=on" target="_blank"><i class="fa fa-shuffle fa-fw" title="Fusion implexes"></i></a>
+<a class="ml-2" href="galichet?m=RLM&i1=26&p2=marie&n2=dupond&oc2=0&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw" title="Without GeneWeb links"></i></a>
+<a class="ml-4" title="Edit the graph" href="galichet?m=TP&v=updRLM&i1=26&p2=marie&n2=dupond&oc2=0">
 <i class="far fa-pen-to-square fa-lg fa-fw"></i></a>
 </div>
 </div>
@@ -178,139 +178,110 @@ style="line-height:0;" valign="bottom"align="left">
 &nbsp;</td>
 </tr>
 </table>
-</div>
+<script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + "Â s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +"Â error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script></div>
 <!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
 <script src="js/jquery.min.js?version=3.7.1"></script>
 <script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
 <script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-function addClearButtonToInputs() {
-// Utility function to create and setup clear button
-function createClearButton(element) {
-const clearButton = document.createElement('i');
-clearButton.className = 'fas fa-xmark clear-button-icon';
-clearButton.title = 'Clear the input';
-clearButton.style.cssText = `
-position: absolute;
-right: 10px;
-top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-cursor: pointer;
-color: #667fc9;
-font-size: 1em;
-opacity: 0;
-transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-pointer-events: auto;
-`;
-return clearButton;
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+addNavigation: function() {
+// Use event delegation for dynamically added inputs
+$(document).on('mousedown', 'input[data-book]', function(event) {
+if (event.ctrlKey && event.button === 0) {
+event.preventDefault();
+inputToBook.openBook(this.value, $(this).data('book'));
 }
-// Initialize or update a single input
-function initializeInput(element) {
-// Skip if already initialized
-if (element.dataset.clearInitialized) {
-const existingButton = element.parentNode.querySelector('.clear-button-icon');
-if (existingButton) {
-existingButton.style.opacity = element.value ? '1' : '0';
-}
-return;
-}
-// Mark as initialized
-element.dataset.clearInitialized = 'true';
-// Create wrapper if needed
-let wrapper = element.parentNode;
-if (!wrapper.classList.contains('clear-button-wrapper')) {
-wrapper = document.createElement('div');
-wrapper.className = 'clear-button-wrapper';
-wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-element.parentNode.insertBefore(wrapper, element);
-wrapper.appendChild(element);
-}
-// Add padding for the clear button
-element.style.paddingRight = '24px';
-// Create and append clear button
-const clearButton = createClearButton(element);
-wrapper.appendChild(clearButton);
-// Update clear button visibility
-const updateVisibility = () => {
-requestAnimationFrame(() => {
-clearButton.style.opacity = element.value ? '1' : '0';
 });
+},
+openBook: function(value, book) {
+if (!value) return;
+let preVal = value;
+if (book === "place") {
+const place = value.split(/\]\s+[-–—]\s+/);
+preVal = place.length > 1 ? place[1] : value;
+}
+preVal = preVal.substring(0, Math.min(preVal.length, 12))
+.split(/[, ]+/)[0];
+const encVal = encodeURIComponent(value);
+const encPreVal = encodeURIComponent(preVal);
+const url = `?w=w&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+window.open(url, '_blank');
+}
 };
-// Event listeners
-element.addEventListener('input', updateVisibility);
-element.addEventListener('change', updateVisibility);
-element.addEventListener('focus', updateVisibility);
-// Hover effects
-clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-// Handle clear button click
-clearButton.addEventListener('click', (e) => {
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
+function initializeWelcomeSearchFunctionality() {
+const searchForms = {
+main: document.getElementById('main-search'),
+title: document.getElementById('title-search')
+};
+const searchBtn = document.getElementById('global-search');
+function hasInput(form) {
+return form && Array.from(form.querySelectorAll('input[type="search"]'))
+.some(input => input.value.trim() !== '');
+}
+function getTooltip() {
+if (hasInput(searchForms.main)) {
+return 'Search individual';
+}
+if (searchForms.title && hasInput(searchForms.title)) {
+return 'Search title/fief';
+}
+return '';
+}
+$(searchBtn).tooltip({
+title: getTooltip,
+trigger: 'hover'
+});
+Object.values(searchForms).forEach(form => {
+if (!form) return;
+form.querySelectorAll('input[type="search"]').forEach(input => {
+input.addEventListener('input', () => {
+$(searchBtn).tooltip('hide')
+.attr('data-original-title', getTooltip())
+.tooltip('show');
+});
+});
+form.addEventListener('keypress', e => {
+if (e.key === 'Enter') {
 e.preventDefault();
-e.stopPropagation();
-// Clear the input
-element.value = '';
-element.focus();
-updateVisibility();
-// Trigger events
-const inputEvent = new CustomEvent('clearButton', {
-bubbles: true,
-detail: { element }
-});
-element.dispatchEvent(inputEvent);
-element.dispatchEvent(new Event('input', { bubbles: true }));
-element.dispatchEvent(new Event('change', { bubbles: true }));
-});
-// Initial visibility state
-updateVisibility();
-}
-// Process all matching inputs
-function processInputs() {
-const selector = `
-input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-.clear-button:not([readonly]):not([disabled])
-`;
-requestAnimationFrame(() => {
-document.querySelectorAll(selector).forEach(initializeInput);
-});
-}
-// Initial processing
-processInputs();
-// Monitor DOM changes
-const observer = new MutationObserver((mutations) => {
-let shouldProcess = false;
-mutations.forEach(mutation => {
-if (mutation.addedNodes.length ||
-mutation.type === 'attributes' &&
-(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-shouldProcess = true;
+if (hasInput(form)) form.submit();
 }
 });
-if (shouldProcess) {
-processInputs();
-}
 });
-observer.observe(document.body, {
-childList: true,
-subtree: true,
-attributes: true,
-attributeFilter: ['type', 'class']
-});
+searchBtn.addEventListener('click', () => {
+if (hasInput(searchForms.main)) {
+searchForms.main.submit();
 }
-</script>
-<script>
-function initializeLazyModules() {
-$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
-$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
-$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+else if (searchForms.title && hasInput(searchForms.title)) {
+searchForms.title.submit();
 }
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-$('.modal').on('shown.bs.modal', function() {
-$(this).find('[autofocus]').focus();
 });
 }
 // Floating placeholders for all textual inputs
@@ -356,8 +327,9 @@ console.error('Initialization error:', error);
 }
 }
 document.addEventListener('DOMContentLoaded', () => {
-initializeLazyModules();
-setupModalAutofocus();
+initializeWelcomeSearchFunctionality();
+inputToBook.addNavigation();
+initTooltips();
 setupFloatingPlaceholders();
 });
 </script>

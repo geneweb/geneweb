@@ -52,7 +52,7 @@ placeholder="Select personalized modules" maxlength="30">
 title="Default template" data-toggle="popover" data-trigger="hover"
 data-html="true" data-content="<img class='w-100' src='images/modules/zz_1.jpg'>"><i class="fa fa-arrow-rotate-left"></i></button>
 <a role="button" class="btn btn-outline-primary ml-2"
-href="galichet?p=anthoine&n=geruzet&wide=on&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=anthoine&n=geruzet&wide=on&p_mod=a4&p_mod=a4"
 title="Full width display"><i class="fa fa-desktop fa-fw" aria-hidden="true"></i><span class="sr-only">Full width display</span></a>
 </div>
 </div>
@@ -88,10 +88,10 @@ text-muted" aria-hidden="true"></span><span class="sr-only">Tools individual</sp
 <i class="fa fa-person fa-fw text-muted mr-2"></i>Visibility (if titles)</a>
 <div class="dropdown-divider"></div>
 <a class="dropdown-item"
-href="galichet?pz=anthoine&nz=geruzet&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?pz=anthoine&nz=geruzet&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"
 title="Browse using Anthoine Geruzet as Sosa reference" accesskey="S"><i class="far fa-circle-dot fa-fw male mr-1"></i> Update Sosa 1: Anthoine Geruzet</a>
 <div class="dropdown-divider"></div>
-<a class="dropdown-item" href="galichet?p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="Without GeneWeb links"></i>Without GeneWeb links</a><div class="dropdown-divider"></div>
+<a class="dropdown-item" href="galichet?p=anthoine&n=geruzet&p_mod=a4&p_mod=a4&cgl=on" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="Without GeneWeb links"></i>Without GeneWeb links</a><div class="dropdown-divider"></div>
 <a class="dropdown-item" href="galichet?p_mod=a4&m=CHG_EVT_IND_ORD&i=23" title="Change order of individual events"><span class="fa fa-sort fa-fw mr-2"></span>Reverse events</a>
 <a class="dropdown-item" href="galichet?p_mod=a4&m=SND_IMAGE&i=23">
 <i class="far fa-file-image fa-fw mr-2"></i>Add picture</a>
@@ -103,7 +103,7 @@ title="Browse using Anthoine Geruzet as Sosa reference" accesskey="S"><i class="
 title="Copy the exterior link to the clipboard
 " 
 data-bname="galichet"
-data-query="p=anthoine&n=geruzet&p_mod=a4&norandom=yes"><i class="fas fa-link fa-fw mr-2"></i>Copy the permalink exterior</button>
+data-query="p=anthoine&n=geruzet&p_mod=a4"><i class="fas fa-link fa-fw mr-2"></i>Copy the permalink exterior</button>
 <button class="disabled dropdown-item mx-0 px-0">/</button>
 <button class="mx-1 px-0 dropdown-item permalink-friend-copy" type="button"
 title="Copy the friend link to the clipboard
@@ -286,10 +286,10 @@ name="p" placeholder="First name" tabindex="6">
 <tr>
 <td colspan="7" class="text-center align-top">
 <div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Anthoine&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Anthoine&n=Geruzet&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Anthoine&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Anthoine&n=Geruzet&p_mod=a4&p_mod=a4"
 title=" Anthoine Geruzet">
 Anthoine <span class="text-nowrap">Geruzet</span>
 </a>
@@ -316,10 +316,10 @@ and Jeanne Boizot (1)"
 <tr>
 <td colspan="7" class="text-center align-top">
 <div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Jeanne&n=Boizot&oc=1&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Jeanne&n=Boizot&oc=1&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Jeanne&n=Boizot&oc=1&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Jeanne&n=Boizot&oc=1&p_mod=a4&p_mod=a4"
 title=" Jeanne.1 Boizot">
 Jeanne <span class="text-nowrap">Boizot</span>
 </a>
@@ -340,10 +340,10 @@ title="Update Jeanne.1 Boizot">
 <tr>
 <td colspan="7" class="text-center align-top">
 │<div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Jacques&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Jacques&n=Geruzet&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Jacques&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Jacques&n=Geruzet&p_mod=a4&p_mod=a4"
 title=" Jacques Geruzet">
 Jacques <span class="text-nowrap">Geruzet</span>
 </a>
@@ -370,10 +370,10 @@ and Jeanne Pierquin (0)"
 <tr>
 <td colspan="7" class="text-center align-top">
 <div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Jeanne&n=Pierquin&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Jeanne&n=Pierquin&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Jeanne&n=Pierquin&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Jeanne&n=Pierquin&p_mod=a4&p_mod=a4"
 title=" Jeanne Pierquin">
 Jeanne <span class="text-nowrap">Pierquin</span>
 </a>
@@ -397,10 +397,10 @@ title="Update Jeanne Pierquin">
 <tr>
 <td colspan="5" class="text-center align-top">
 │<div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Laurent&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Laurent&n=Geruzet&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Laurent&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Laurent&n=Geruzet&p_mod=a4&p_mod=a4"
 title=" Laurent Geruzet">
 Laurent <span class="text-nowrap">Geruzet</span>
 </a>
@@ -413,10 +413,10 @@ title="Update Laurent Geruzet">
    </td><td>&nbsp;</td>
 <td colspan="1" class="text-center align-top">
 │<div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Marie-Jeanne&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Marie-Jeanne&n=Geruzet&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Marie-Jeanne&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Marie-Jeanne&n=Geruzet&p_mod=a4&p_mod=a4"
 title=" Marie-Jeanne Geruzet">
 Marie-Jeanne <span class="text-nowrap">Geruzet</span>
 </a>
@@ -465,10 +465,10 @@ and Jeanne Fache (0)"
 <tr>
 <td colspan="1" class="text-center align-top">
 <div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Marie&n=Dupond&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Marie&n=Dupond&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Marie&n=Dupond&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Marie&n=Dupond&p_mod=a4&p_mod=a4"
 title=" Marie Dupond">
 Marie <span class="text-nowrap">Dupond</span>
 </a>
@@ -482,10 +482,10 @@ title="Update Marie Dupond">
 </td><td>&nbsp;</td>
 <td colspan="1" class="text-center align-top">
 <div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Charlotte&n=Laramee&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Charlotte&n=Laramee&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Charlotte&n=Laramee&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Charlotte&n=Laramee&p_mod=a4&p_mod=a4"
 title=" Charlotte Laramee">
 Charlotte <span class="text-nowrap">Laramee</span>
 </a>
@@ -499,10 +499,10 @@ title="Update Charlotte Laramee">
 </td><td>&nbsp;</td>
 <td colspan="1" class="text-center align-top">
 <div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Jeanne&n=Fache&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Jeanne&n=Fache&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Jeanne&n=Fache&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Jeanne&n=Fache&p_mod=a4&p_mod=a4"
 title=" Jeanne Fache">
 Jeanne <span class="text-nowrap">Fache</span>
 </a>
@@ -528,10 +528,10 @@ title="Update Jeanne Fache">
 <tr>
 <td colspan="1" class="text-center align-top">
 │<div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Jean-Baptiste&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Jean-Baptiste&n=Geruzet&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Jean-Baptiste&n=Geruzet&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Jean-Baptiste&n=Geruzet&p_mod=a4&p_mod=a4"
 title=" Jean-Baptiste Geruzet">
 Jean-Baptiste <span class="text-nowrap">Geruzet</span>
 </a>
@@ -564,10 +564,10 @@ and Marie Biemont (0)"
 <tr>
 <td colspan="1" class="text-center align-top">
 <div class="px-0 mx-0 border-0">
-<a href="galichet?m=D&t=V&p=Marie&n=Biemont&p_mod=a4&norandom=yes&p_mod=a4" title="Navigation"></a>
+<a href="galichet?m=D&t=V&p=Marie&n=Biemont&p_mod=a4&p_mod=a4" title="Navigation"></a>
 </a>
 <a class="normal_anchor"
-href="galichet?p=Marie&n=Biemont&p_mod=a4&norandom=yes&p_mod=a4"
+href="galichet?p=Marie&n=Biemont&p_mod=a4&p_mod=a4"
 title=" Marie Biemont">
 Marie <span class="text-nowrap">Biemont</span>
 </a>
@@ -590,7 +590,32 @@ title="Update Marie Biemont">
 </tr>
 </table>
 </div>
-<!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->
@@ -605,38 +630,38 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <span class="sr-only">, select language</span>
 </button>
 <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
-<a class="dropdown-item" id="lang_af" href="galichet?lang=af&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
-<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
-<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
-<a class="dropdown-item" id="lang_br" href="galichet?lang=br&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
-<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
-<a class="dropdown-item" id="lang_co" href="galichet?lang=co&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
-<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
-<a class="dropdown-item" id="lang_da" href="galichet?lang=da&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
-<a class="dropdown-item" id="lang_de" href="galichet?lang=de&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
-<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
-<a class="dropdown-item" id="lang_es" href="galichet?lang=es&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
-<a class="dropdown-item" id="lang_et" href="galichet?lang=et&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
-<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
-<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
-<a class="dropdown-item" id="lang_he" href="galichet?lang=he&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
-<a class="dropdown-item" id="lang_is" href="galichet?lang=is&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
-<a class="dropdown-item" id="lang_it" href="galichet?lang=it&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
-<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
-<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
-<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
-<a class="dropdown-item" id="lang_no" href="galichet?lang=no&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
-<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
-<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
-<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
-<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>pt-br </code>Brazilian-Portuguese</a>
-<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
-<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
-<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
-<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
-<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
-<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
-<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
+<a class="dropdown-item" id="lang_af" href="galichet?lang=af&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>af&nbsp;&nbsp;&nbsp; </code>Afrikaans</a>
+<a class="dropdown-item" id="lang_ar" href="galichet?lang=ar&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>ar&nbsp;&nbsp;&nbsp; </code>Arabic</a>
+<a class="dropdown-item" id="lang_bg" href="galichet?lang=bg&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>bg&nbsp;&nbsp;&nbsp; </code>Bulgarian</a>
+<a class="dropdown-item" id="lang_br" href="galichet?lang=br&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>br&nbsp;&nbsp;&nbsp; </code>Breton</a>
+<a class="dropdown-item" id="lang_ca" href="galichet?lang=ca&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>ca&nbsp;&nbsp;&nbsp; </code>Catalan</a>
+<a class="dropdown-item" id="lang_co" href="galichet?lang=co&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>co&nbsp;&nbsp;&nbsp; </code>Corsican</a>
+<a class="dropdown-item" id="lang_cs" href="galichet?lang=cs&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>cs&nbsp;&nbsp;&nbsp; </code>Czech</a>
+<a class="dropdown-item" id="lang_da" href="galichet?lang=da&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>da&nbsp;&nbsp;&nbsp; </code>Danish</a>
+<a class="dropdown-item" id="lang_de" href="galichet?lang=de&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>de&nbsp;&nbsp;&nbsp; </code>German</a>
+<a class="dropdown-item" id="lang_eo" href="galichet?lang=eo&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>eo&nbsp;&nbsp;&nbsp; </code>Esperanto</a>
+<a class="dropdown-item" id="lang_es" href="galichet?lang=es&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>es&nbsp;&nbsp;&nbsp; </code>Spanish</a>
+<a class="dropdown-item" id="lang_et" href="galichet?lang=et&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>et&nbsp;&nbsp;&nbsp; </code>Estonian</a>
+<a class="dropdown-item" id="lang_fi" href="galichet?lang=fi&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>fi&nbsp;&nbsp;&nbsp; </code>Finnish</a>
+<a class="dropdown-item" id="lang_fr" href="galichet?lang=fr&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>fr&nbsp;&nbsp;&nbsp; </code>French</a>
+<a class="dropdown-item" id="lang_he" href="galichet?lang=he&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>he&nbsp;&nbsp;&nbsp; </code>Hebrew</a>
+<a class="dropdown-item" id="lang_is" href="galichet?lang=is&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>is&nbsp;&nbsp;&nbsp; </code>Icelandic</a>
+<a class="dropdown-item" id="lang_it" href="galichet?lang=it&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>it&nbsp;&nbsp;&nbsp; </code>Italian</a>
+<a class="dropdown-item" id="lang_lt" href="galichet?lang=lt&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>lt&nbsp;&nbsp;&nbsp; </code>Lithuanian</a>
+<a class="dropdown-item" id="lang_lv" href="galichet?lang=lv&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>lv&nbsp;&nbsp;&nbsp; </code>Latvian</a>
+<a class="dropdown-item" id="lang_nl" href="galichet?lang=nl&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>nl&nbsp;&nbsp;&nbsp; </code>Dutch</a>
+<a class="dropdown-item" id="lang_no" href="galichet?lang=no&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>no&nbsp;&nbsp;&nbsp; </code>Norwegian</a>
+<a class="dropdown-item" id="lang_oc" href="galichet?lang=oc&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>oc&nbsp;&nbsp;&nbsp; </code>Occitan</a>
+<a class="dropdown-item" id="lang_pl" href="galichet?lang=pl&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>pl&nbsp;&nbsp;&nbsp; </code>Polish</a>
+<a class="dropdown-item" id="lang_pt" href="galichet?lang=pt&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>pt&nbsp;&nbsp;&nbsp; </code>Portuguese</a>
+<a class="dropdown-item" id="lang_pt-br" href="galichet?lang=pt-br&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>pt-br </code>Brazilian-Portuguese</a>
+<a class="dropdown-item" id="lang_ro" href="galichet?lang=ro&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>ro&nbsp;&nbsp;&nbsp; </code>Romanian</a>
+<a class="dropdown-item" id="lang_ru" href="galichet?lang=ru&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>ru&nbsp;&nbsp;&nbsp; </code>Russian</a>
+<a class="dropdown-item" id="lang_sk" href="galichet?lang=sk&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>sk&nbsp;&nbsp;&nbsp; </code>Slovak</a>
+<a class="dropdown-item" id="lang_sl" href="galichet?lang=sl&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>sl&nbsp;&nbsp;&nbsp; </code>Slovenian</a>
+<a class="dropdown-item" id="lang_sv" href="galichet?lang=sv&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>sv&nbsp;&nbsp;&nbsp; </code>Swedish</a>
+<a class="dropdown-item" id="lang_tr" href="galichet?lang=tr&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>tr&nbsp;&nbsp;&nbsp; </code>Turkish</a>
+<a class="dropdown-item" id="lang_zh" href="galichet?lang=zh&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4"><code>zh&nbsp;&nbsp;&nbsp; </code>Chinese</a>
 </div>
 </div>
 <!-- Connections info -->
@@ -650,7 +675,7 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
 <div class="ml-auto mb-0">
 <a role="button" class="mr-1"
-href="galichet?templ=templm&p=anthoine&n=geruzet&p_mod=a4&norandom=yes&p_mod=a4" 
+href="galichet?templ=templm&p=anthoine&n=geruzet&p_mod=a4&p_mod=a4" 
 data-toggle="tooltip"
 title="templm">
 <i class="fab fa-markdown" aria-hidden="true"></i>
@@ -685,134 +710,80 @@ title="GeneWeb Github">
 <script src="js/jquery.min.js?version=3.7.1"></script>
 <script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
 <script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-function addClearButtonToInputs() {
-// Utility function to create and setup clear button
-function createClearButton(element) {
-const clearButton = document.createElement('i');
-clearButton.className = 'fas fa-xmark clear-button-icon';
-clearButton.title = 'Clear the input';
-clearButton.style.cssText = `
-position: absolute;
-right: 10px;
-top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-cursor: pointer;
-color: #667fc9;
-font-size: 1em;
-opacity: 0;
-transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-pointer-events: auto;
-`;
-return clearButton;
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+addNavigation: function() {
+// Use event delegation for dynamically added inputs
+$(document).on('mousedown', 'input[data-book]', function(event) {
+if (event.ctrlKey && event.button === 0) {
+event.preventDefault();
+inputToBook.openBook(this.value, $(this).data('book'));
 }
-// Initialize or update a single input
-function initializeInput(element) {
-// Skip if already initialized
-if (element.dataset.clearInitialized) {
-const existingButton = element.parentNode.querySelector('.clear-button-icon');
-if (existingButton) {
-existingButton.style.opacity = element.value ? '1' : '0';
-}
-return;
-}
-// Mark as initialized
-element.dataset.clearInitialized = 'true';
-// Create wrapper if needed
-let wrapper = element.parentNode;
-if (!wrapper.classList.contains('clear-button-wrapper')) {
-wrapper = document.createElement('div');
-wrapper.className = 'clear-button-wrapper';
-wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-element.parentNode.insertBefore(wrapper, element);
-wrapper.appendChild(element);
-}
-// Add padding for the clear button
-element.style.paddingRight = '24px';
-// Create and append clear button
-const clearButton = createClearButton(element);
-wrapper.appendChild(clearButton);
-// Update clear button visibility
-const updateVisibility = () => {
-requestAnimationFrame(() => {
-clearButton.style.opacity = element.value ? '1' : '0';
 });
+},
+openBook: function(value, book) {
+if (!value) return;
+let preVal = value;
+if (book === "place") {
+const place = value.split(/\]\s+[-��]\s+/);
+preVal = place.length > 1 ? place[1] : value;
+}
+preVal = preVal.substring(0, Math.min(preVal.length, 12))
+.split(/[, ]+/)[0];
+const encVal = encodeURIComponent(value);
+const encPreVal = encodeURIComponent(preVal);
+const url = `?w=w&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+window.open(url, '_blank');
+}
 };
-// Event listeners
-element.addEventListener('input', updateVisibility);
-element.addEventListener('change', updateVisibility);
-element.addEventListener('focus', updateVisibility);
-// Hover effects
-clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-// Handle clear button click
-clearButton.addEventListener('click', (e) => {
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
+function initializeWelcomeSearchFunctionality() {
+const searchForms = {
+main: document.getElementById('main-search'),
+title: document.getElementById('title-search')
+};
+const searchBtn = document.getElementById('global-search');
+function hasInput(form) {
+return form && Array.from(form.querySelectorAll('input[type="search"]'))
+.some(input => input.value.trim() !== '');
+}
+function getTooltip() {
+if (hasInput(searchForms.main)) {
+return 'Search individual';
+}
+if (searchForms.title && hasInput(searchForms.title)) {
+return 'Search title/fief';
+}
+return '';
+}
+$(searchBtn).tooltip({
+title: getTooltip,
+trigger: 'hover'
+});
+Object.values(searchForms).forEach(form => {
+if (!form) return;
+form.querySelectorAll('input[type="search"]').forEach(input => {
+input.addEventListener('input', () => {
+$(searchBtn).tooltip('hide')
+.attr('data-original-title', getTooltip())
+.tooltip('show');
+});
+});
+form.addEventListener('keypress', e => {
+if (e.key === 'Enter') {
 e.preventDefault();
-e.stopPropagation();
-// Clear the input
-element.value = '';
-element.focus();
-updateVisibility();
-// Trigger events
-const inputEvent = new CustomEvent('clearButton', {
-bubbles: true,
-detail: { element }
-});
-element.dispatchEvent(inputEvent);
-element.dispatchEvent(new Event('input', { bubbles: true }));
-element.dispatchEvent(new Event('change', { bubbles: true }));
-});
-// Initial visibility state
-updateVisibility();
-}
-// Process all matching inputs
-function processInputs() {
-const selector = `
-input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-.clear-button:not([readonly]):not([disabled])
-`;
-requestAnimationFrame(() => {
-document.querySelectorAll(selector).forEach(initializeInput);
-});
-}
-// Initial processing
-processInputs();
-// Monitor DOM changes
-const observer = new MutationObserver((mutations) => {
-let shouldProcess = false;
-mutations.forEach(mutation => {
-if (mutation.addedNodes.length ||
-mutation.type === 'attributes' &&
-(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-shouldProcess = true;
+if (hasInput(form)) form.submit();
 }
 });
-if (shouldProcess) {
-processInputs();
-}
 });
-observer.observe(document.body, {
-childList: true,
-subtree: true,
-attributes: true,
-attributeFilter: ['type', 'class']
-});
+searchBtn.addEventListener('click', () => {
+if (hasInput(searchForms.main)) {
+searchForms.main.submit();
 }
-</script>
-<script>
-function initializeLazyModules() {
-$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
-$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
-$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+else if (searchForms.title && hasInput(searchForms.title)) {
+searchForms.title.submit();
 }
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-$('.modal').on('shown.bs.modal', function() {
-$(this).find('[autofocus]').focus();
 });
 }
 // Floating placeholders for all textual inputs
@@ -858,8 +829,9 @@ console.error('Initialization error:', error);
 }
 }
 document.addEventListener('DOMContentLoaded', () => {
-initializeLazyModules();
-setupModalAutofocus();
+initializeWelcomeSearchFunctionality();
+inputToBook.addNavigation();
+initTooltips();
 setupFloatingPlaceholders();
 });
 </script>

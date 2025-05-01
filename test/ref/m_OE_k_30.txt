@@ -64,7 +64,32 @@ name="p" placeholder="First name" tabindex="6">
 </div>
 <div class="container"><h1>The 0 oldest couples perhaps still alive and engaged</h1>
 <ul>
-</ul></li><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+</ul></li><script>
+  var q_time = 0.000;
+  var nb_errors = 0;
+  var errors_list = "\u{000A}";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + "Â s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +"Â error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "\u{000A}") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->
@@ -80,39 +105,39 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 </button>
 <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
 <!-- Language options remain the same -->
-<a class="dropdown-item" href="galichet?lang=af&m=OE&norandom=yes&k=30">af</a>
-<a class="dropdown-item" href="galichet?lang=ar&m=OE&norandom=yes&k=30">ar</a>
-<a class="dropdown-item" href="galichet?lang=bg&m=OE&norandom=yes&k=30">bg</a>
-<a class="dropdown-item" href="galichet?lang=br&m=OE&norandom=yes&k=30">br</a>
-<a class="dropdown-item" href="galichet?lang=ca&m=OE&norandom=yes&k=30">ca</a>
-<a class="dropdown-item" href="galichet?lang=co&m=OE&norandom=yes&k=30">co</a>
-<a class="dropdown-item" href="galichet?lang=cs&m=OE&norandom=yes&k=30">cs</a>
-<a class="dropdown-item" href="galichet?lang=da&m=OE&norandom=yes&k=30">da</a>
-<a class="dropdown-item" href="galichet?lang=de&m=OE&norandom=yes&k=30">de</a>
-<a class="dropdown-item" href="galichet?m=OE&norandom=yes&k=30">en</a>
-<a class="dropdown-item" href="galichet?lang=eo&m=OE&norandom=yes&k=30">eo</a>
-<a class="dropdown-item" href="galichet?lang=es&m=OE&norandom=yes&k=30">es</a>
-<a class="dropdown-item" href="galichet?lang=et&m=OE&norandom=yes&k=30">et</a>
-<a class="dropdown-item" href="galichet?lang=fi&m=OE&norandom=yes&k=30">fi</a>
-<a class="dropdown-item" href="galichet?lang=fr&m=OE&norandom=yes&k=30">fr</a>
-<a class="dropdown-item" href="galichet?lang=he&m=OE&norandom=yes&k=30">he</a>
-<a class="dropdown-item" href="galichet?lang=is&m=OE&norandom=yes&k=30">is</a>
-<a class="dropdown-item" href="galichet?lang=it&m=OE&norandom=yes&k=30">it</a>
-<a class="dropdown-item" href="galichet?lang=lt&m=OE&norandom=yes&k=30">lt</a>
-<a class="dropdown-item" href="galichet?lang=lv&m=OE&norandom=yes&k=30">lv</a>
-<a class="dropdown-item" href="galichet?lang=nl&m=OE&norandom=yes&k=30">nl</a>
-<a class="dropdown-item" href="galichet?lang=no&m=OE&norandom=yes&k=30">no</a>
-<a class="dropdown-item" href="galichet?lang=oc&m=OE&norandom=yes&k=30">oc</a>
-<a class="dropdown-item" href="galichet?lang=pl&m=OE&norandom=yes&k=30">pl</a>
-<a class="dropdown-item" href="galichet?lang=pt&m=OE&norandom=yes&k=30">pt</a>
-<a class="dropdown-item" href="galichet?lang=pt-br&m=OE&norandom=yes&k=30">pt-br</a>
-<a class="dropdown-item" href="galichet?lang=ro&m=OE&norandom=yes&k=30">ro</a>
-<a class="dropdown-item" href="galichet?lang=ru&m=OE&norandom=yes&k=30">ru</a>
-<a class="dropdown-item" href="galichet?lang=sk&m=OE&norandom=yes&k=30">sk</a>
-<a class="dropdown-item" href="galichet?lang=sl&m=OE&norandom=yes&k=30">sl</a>
-<a class="dropdown-item" href="galichet?lang=sv&m=OE&norandom=yes&k=30">sv</a>
-<a class="dropdown-item" href="galichet?lang=tr&m=OE&norandom=yes&k=30">tr</a>
-<a class="dropdown-item" href="galichet?lang=zh&m=OE&norandom=yes&k=30">zh</a>
+<a class="dropdown-item" href="galichet?lang=af&m=OE&k=30">af</a>
+<a class="dropdown-item" href="galichet?lang=ar&m=OE&k=30">ar</a>
+<a class="dropdown-item" href="galichet?lang=bg&m=OE&k=30">bg</a>
+<a class="dropdown-item" href="galichet?lang=br&m=OE&k=30">br</a>
+<a class="dropdown-item" href="galichet?lang=ca&m=OE&k=30">ca</a>
+<a class="dropdown-item" href="galichet?lang=co&m=OE&k=30">co</a>
+<a class="dropdown-item" href="galichet?lang=cs&m=OE&k=30">cs</a>
+<a class="dropdown-item" href="galichet?lang=da&m=OE&k=30">da</a>
+<a class="dropdown-item" href="galichet?lang=de&m=OE&k=30">de</a>
+<a class="dropdown-item" href="galichet?m=OE&k=30">en</a>
+<a class="dropdown-item" href="galichet?lang=eo&m=OE&k=30">eo</a>
+<a class="dropdown-item" href="galichet?lang=es&m=OE&k=30">es</a>
+<a class="dropdown-item" href="galichet?lang=et&m=OE&k=30">et</a>
+<a class="dropdown-item" href="galichet?lang=fi&m=OE&k=30">fi</a>
+<a class="dropdown-item" href="galichet?lang=fr&m=OE&k=30">fr</a>
+<a class="dropdown-item" href="galichet?lang=he&m=OE&k=30">he</a>
+<a class="dropdown-item" href="galichet?lang=is&m=OE&k=30">is</a>
+<a class="dropdown-item" href="galichet?lang=it&m=OE&k=30">it</a>
+<a class="dropdown-item" href="galichet?lang=lt&m=OE&k=30">lt</a>
+<a class="dropdown-item" href="galichet?lang=lv&m=OE&k=30">lv</a>
+<a class="dropdown-item" href="galichet?lang=nl&m=OE&k=30">nl</a>
+<a class="dropdown-item" href="galichet?lang=no&m=OE&k=30">no</a>
+<a class="dropdown-item" href="galichet?lang=oc&m=OE&k=30">oc</a>
+<a class="dropdown-item" href="galichet?lang=pl&m=OE&k=30">pl</a>
+<a class="dropdown-item" href="galichet?lang=pt&m=OE&k=30">pt</a>
+<a class="dropdown-item" href="galichet?lang=pt-br&m=OE&k=30">pt-br</a>
+<a class="dropdown-item" href="galichet?lang=ro&m=OE&k=30">ro</a>
+<a class="dropdown-item" href="galichet?lang=ru&m=OE&k=30">ru</a>
+<a class="dropdown-item" href="galichet?lang=sk&m=OE&k=30">sk</a>
+<a class="dropdown-item" href="galichet?lang=sl&m=OE&k=30">sl</a>
+<a class="dropdown-item" href="galichet?lang=sv&m=OE&k=30">sv</a>
+<a class="dropdown-item" href="galichet?lang=tr&m=OE&k=30">tr</a>
+<a class="dropdown-item" href="galichet?lang=zh&m=OE&k=30">zh</a>
 </div>
 </div>
 <!-- Connections info -->
@@ -126,7 +151,7 @@ data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <div class="d-flex flex-column justify-content-md-end align-self-center ml-1 ml-md-3 ml-lg-4">
 <div class="ml-auto mb-0">
 <a role="button" class="mr-1"
-href="galichet?templ=templm&m=OE&norandom=yes&k=30" 
+href="galichet?templ=templm&m=OE&k=30" 
 data-toggle="tooltip"
 title="templm">
 <i class="fab fa-markdown" aria-hidden="true"></i>
@@ -159,134 +184,80 @@ title="GeneWeb Github">
 <script src="js/jquery.min.js?version=3.7.1"></script>
 <script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
 <script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-function addClearButtonToInputs() {
-// Utility function to create and setup clear button
-function createClearButton(element) {
-const clearButton = document.createElement('i');
-clearButton.className = 'fas fa-xmark clear-button-icon';
-clearButton.title = 'Clear the input';
-clearButton.style.cssText = `
-position: absolute;
-right: 10px;
-top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-cursor: pointer;
-color: #667fc9;
-font-size: 1em;
-opacity: 0;
-transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-pointer-events: auto;
-`;
-return clearButton;
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+addNavigation: function() {
+// Use event delegation for dynamically added inputs
+$(document).on('mousedown', 'input[data-book]', function(event) {
+if (event.ctrlKey && event.button === 0) {
+event.preventDefault();
+inputToBook.openBook(this.value, $(this).data('book'));
 }
-// Initialize or update a single input
-function initializeInput(element) {
-// Skip if already initialized
-if (element.dataset.clearInitialized) {
-const existingButton = element.parentNode.querySelector('.clear-button-icon');
-if (existingButton) {
-existingButton.style.opacity = element.value ? '1' : '0';
-}
-return;
-}
-// Mark as initialized
-element.dataset.clearInitialized = 'true';
-// Create wrapper if needed
-let wrapper = element.parentNode;
-if (!wrapper.classList.contains('clear-button-wrapper')) {
-wrapper = document.createElement('div');
-wrapper.className = 'clear-button-wrapper';
-wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-element.parentNode.insertBefore(wrapper, element);
-wrapper.appendChild(element);
-}
-// Add padding for the clear button
-element.style.paddingRight = '24px';
-// Create and append clear button
-const clearButton = createClearButton(element);
-wrapper.appendChild(clearButton);
-// Update clear button visibility
-const updateVisibility = () => {
-requestAnimationFrame(() => {
-clearButton.style.opacity = element.value ? '1' : '0';
 });
+},
+openBook: function(value, book) {
+if (!value) return;
+let preVal = value;
+if (book === "place") {
+const place = value.split(/\]\s+[-–—]\s+/);
+preVal = place.length > 1 ? place[1] : value;
+}
+preVal = preVal.substring(0, Math.min(preVal.length, 12))
+.split(/[, ]+/)[0];
+const encVal = encodeURIComponent(value);
+const encPreVal = encodeURIComponent(preVal);
+const url = `?w=w&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+window.open(url, '_blank');
+}
 };
-// Event listeners
-element.addEventListener('input', updateVisibility);
-element.addEventListener('change', updateVisibility);
-element.addEventListener('focus', updateVisibility);
-// Hover effects
-clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-// Handle clear button click
-clearButton.addEventListener('click', (e) => {
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
+function initializeWelcomeSearchFunctionality() {
+const searchForms = {
+main: document.getElementById('main-search'),
+title: document.getElementById('title-search')
+};
+const searchBtn = document.getElementById('global-search');
+function hasInput(form) {
+return form && Array.from(form.querySelectorAll('input[type="search"]'))
+.some(input => input.value.trim() !== '');
+}
+function getTooltip() {
+if (hasInput(searchForms.main)) {
+return 'Search individual';
+}
+if (searchForms.title && hasInput(searchForms.title)) {
+return 'Search title/fief';
+}
+return '';
+}
+$(searchBtn).tooltip({
+title: getTooltip,
+trigger: 'hover'
+});
+Object.values(searchForms).forEach(form => {
+if (!form) return;
+form.querySelectorAll('input[type="search"]').forEach(input => {
+input.addEventListener('input', () => {
+$(searchBtn).tooltip('hide')
+.attr('data-original-title', getTooltip())
+.tooltip('show');
+});
+});
+form.addEventListener('keypress', e => {
+if (e.key === 'Enter') {
 e.preventDefault();
-e.stopPropagation();
-// Clear the input
-element.value = '';
-element.focus();
-updateVisibility();
-// Trigger events
-const inputEvent = new CustomEvent('clearButton', {
-bubbles: true,
-detail: { element }
-});
-element.dispatchEvent(inputEvent);
-element.dispatchEvent(new Event('input', { bubbles: true }));
-element.dispatchEvent(new Event('change', { bubbles: true }));
-});
-// Initial visibility state
-updateVisibility();
-}
-// Process all matching inputs
-function processInputs() {
-const selector = `
-input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-.clear-button:not([readonly]):not([disabled])
-`;
-requestAnimationFrame(() => {
-document.querySelectorAll(selector).forEach(initializeInput);
-});
-}
-// Initial processing
-processInputs();
-// Monitor DOM changes
-const observer = new MutationObserver((mutations) => {
-let shouldProcess = false;
-mutations.forEach(mutation => {
-if (mutation.addedNodes.length ||
-mutation.type === 'attributes' &&
-(mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-shouldProcess = true;
+if (hasInput(form)) form.submit();
 }
 });
-if (shouldProcess) {
-processInputs();
-}
 });
-observer.observe(document.body, {
-childList: true,
-subtree: true,
-attributes: true,
-attributeFilter: ['type', 'class']
-});
+searchBtn.addEventListener('click', () => {
+if (hasInput(searchForms.main)) {
+searchForms.main.submit();
 }
-</script>
-<script>
-function initializeLazyModules() {
-$('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
-$('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
-$('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+else if (searchForms.title && hasInput(searchForms.title)) {
+searchForms.title.submit();
 }
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-$('.modal').on('shown.bs.modal', function() {
-$(this).find('[autofocus]').focus();
 });
 }
 // Floating placeholders for all textual inputs
@@ -332,8 +303,9 @@ console.error('Initialization error:', error);
 }
 }
 document.addEventListener('DOMContentLoaded', () => {
-initializeLazyModules();
-setupModalAutofocus();
+initializeWelcomeSearchFunctionality();
+inputToBook.addNavigation();
+initTooltips();
 setupFloatingPlaceholders();
 });
 </script>

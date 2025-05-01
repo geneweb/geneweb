@@ -481,8 +481,14 @@ let treat_request =
       | None -> ()
       | Some bfile ->
         let stat = Unix.stat bfile in
-        Unix.setgid stat.Unix.st_gid ;
-        Unix.setuid stat.Unix.st_uid ;
+        let fuid = stat.Unix.st_uid in
+        let fgid = stat.Unix.st_gid in
+        let pgid = Unix.getgid () in
+        let puid = Unix.getuid () in
+        (* FIXME possible issue with effective uid/gid! *)
+        (* see setuid, setgid man pages *)
+        if puid <> fuid then Unix.setuid fuid ;
+        if pgid <> fgid then Unix.setgid fgid ;
     end ;
 #endif
     let plugins =
