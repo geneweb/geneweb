@@ -452,7 +452,7 @@ fi
 
 if test -f "$GWDLOG"; then
 echo "$GWDLOG reported traces (empty if no failure):"
-grep -E "$WARNING_CONDITIONS" $GWDLOG
+grep -vw "Predictable mode must not be" $GWDLOG | grep -E "$WARNING_CONDITIONS"
 grep -B1 -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
 fi
 if test "$RC" != 0; then
