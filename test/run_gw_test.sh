@@ -130,6 +130,9 @@ if test -n "$TAGS"; then
     test -f "$TAGS" || { echo "invalid TAGS $TAGS file"; exit 1; }
     gwdopt="$gwdopt --allowed_tags $TAGS"
 fi
+if test "$test_diff" || test "$set_ref"; then
+    gwdopt="$gwdopt -predictable_mode"
+fi
 
 pgrep gwd >/dev/null && \
     { killall gwd || { echo "unable to kill previous gwd process"; exit 1; }; }
@@ -145,16 +148,15 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -blang \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
-  -predictable_mode \
   -n_workers 0 \
   2>> $GWDLOG &
 fi
 
 if test "$test_diff" || test "$set_ref"; then
-  rm -R /tmp/run
-  mkdir /tmp/run
-  rm -R /tmp/new
-  mkdir /tmp/new
+  for xx in run new; do
+    test -d /tmp/$xx && rm -R /tmp/$xx
+    mkdir /tmp/$xx
+  done
 fi
 
 RC=0
