@@ -198,7 +198,7 @@ crl () {
       RC=$(($RC+1))
     fi
   fi
-  unset first_request tstmsg
+  unset tstmsg
   if test -z "$flag_nodiff" && (test "$test_diff" || test "$set_ref"); then
     fn=$(echo "$cmd" | sed -e 's/=/_/g; s/&/_/g')
     mv /tmp/tmp.txt /tmp/run/$fn.txt
