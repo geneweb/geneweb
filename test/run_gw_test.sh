@@ -150,10 +150,6 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   2>> $GWDLOG &
 fi
 
-if test -z "$cgitest"; then
-  pgrep -a gwd >/dev/null || { echo "gwd not running, potential traces in $GWDLOG"; exit 1; }
-fi
-
 if test "$test_diff" || test "$set_ref"; then
   rm -R /tmp/run
   mkdir /tmp/run
@@ -255,6 +251,7 @@ update_gwf () {
     fi
 }
 
+if test -z "$cgitest"; then
 #!/bin/bash
 
 # Script to monitor a process using the 'crl ""' command
@@ -279,6 +276,7 @@ if [ $attempt -eq $MAX_ATTEMPTS ]; then
   exit 1
 else
   echo "start after $attempt trys"
+fi
 fi
 
 crl "m=S&n=$FN+$SN&p="
