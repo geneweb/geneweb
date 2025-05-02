@@ -816,7 +816,9 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
    match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
    | Some p' when p' <> pi && Some p' <> skip_conflict ->
        Update.print_create_conflict conf base (poi base p') ""
-   | _ -> Image.rename_portrait conf base op (sp.first_name, sp.surname, sp.occ));
+   | _ ->
+       Image.rename_portrait_and_blason conf base op
+         (sp.first_name, sp.surname, sp.occ));
   if (List.assoc_opt "nsck" conf.env :> string option) <> Some "on" then
     check_sex_married ?prerr conf base sp op;
   let created_p = ref [] in
