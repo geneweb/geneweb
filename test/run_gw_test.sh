@@ -170,7 +170,9 @@ crl () {
     echo "curl $curlstr"
   fi
   curl $curlopt $curlstr
-  if [ $? -ne 0 ]; then
+  curlrc=$?
+  if [ $curlrc -ne 0 ]; then
+    test $curlrc -eq 28 && exit 1 # stop if curl timeout
     if [ "$cmd" != "" ];then
       echo "Failed to execute $cmd."
     else
@@ -253,6 +255,7 @@ update_gwf () {
     fi
 }
 
+test -n "$debug" && set -x
 if test -z "$cgitest"; then
 #!/bin/bash
 
@@ -277,7 +280,7 @@ if [ $attempt -eq $MAX_ATTEMPTS ]; then
   echo "gwd does not seem to be running after $attempt trys"
   exit 1
 else
-  echo "start after $attempt trys"
+  echo "gwd start after $attempt trys"
 fi
 fi
 
