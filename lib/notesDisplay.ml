@@ -241,6 +241,21 @@ let linked_page_rows conf base pg =
            (wizname :> string)
            (Utf8.capitalize_fst (transl conf "base wizard notes")))
 
+let linked_list _conf base pgl =
+  let str =
+    List.fold_left
+      (fun acc pg ->
+        match pg with
+        | Def.NLDB.PgInd ip ->
+            acc ^ Gutil.designation base (Gwdb.poi base ip) ^ "<br>"
+        | _ -> acc)
+      "" pgl
+  in
+  Printf.sprintf {|
+  <span>
+  %s
+  </span>|} str
+
 let create_gallery_item conf fnotes nenv s =
   let img_url, img_name = Notes.json_extract_img conf s
   and title = try List.assoc "TITLE" nenv with Not_found -> "" in

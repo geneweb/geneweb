@@ -1446,6 +1446,22 @@ de: Löse Probleme in einer base
 en: Fixes problems in a base
 fr: Corrige les problèmes d'une base
 
+    Fixes utf8 problems in a base
+en: Fixes utf8 problems in a base (apostrophs, accented characters)
+fr: Corrige les problèmes Utf8 d'une base (apostrophes, caractères accentués)
+
+    checks for possible utf8 related conflicts
+en: Corrects  possible utf8 related conflicts (apostrophs)
+fr: Corrige les conlits Utf8 (apostrophes)
+
+    checks for duplicate keys
+en: Checks for duplicate keys
+fr: Teste les clé dupliquées
+
+    checks for invalid utf8 characters
+en: Checks for invalid utf8 characters
+fr: Recherche les caractères Utf8 invalides
+
     Follow the indications of the GEDCOM header.
 aa: ged2gwb.htm
 co: Seguità l’addittamenti di l’intestatura GEDCOM.
@@ -1618,6 +1634,13 @@ co: Messaghji gwfixbase
 de: Gwfixbase Nachrichten
 en: Gwfixbase messages
 fr: Messages gwfixbase
+
+    Gwfixutf8 messages
+aa: gwfixutf8_ok.htm
+co: Messaghji gwfixbase
+de: Gwfixutf8 Nachrichten
+en: Gwfixutf8 messages
+fr: Messages gwfixutf8
 
     help.
 aa: gwfix.htm
