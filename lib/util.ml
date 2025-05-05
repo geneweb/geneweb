@@ -2437,7 +2437,9 @@ let read_base_env ~bname =
         | s ->
             let s = strip_trailing_spaces s in
             if s = "" || s.[0] = '#' then loop env
-            else loop (cut_at_equal 0 s :: env)
+            else
+              let setting = cut_at_equal 0 s in
+              loop (setting :: env)
         | exception End_of_file -> env
       in
       loop []
