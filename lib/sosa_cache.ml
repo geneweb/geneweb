@@ -93,6 +93,7 @@ module StaticCache : sig
   val input : base:Gwdb.base -> t option
   val get_sosa : cache:t -> iper:Gwdb.iper -> Sosa.t option
   val get_sosa_ref : cache:t -> Gwdb.iper
+  val erase_cache_file : Gwdb.base -> unit
 end = struct
   module CacheData = struct
     type t = Sosa.t option array
@@ -130,9 +131,14 @@ end = struct
         })
       sosa_ref
 
-  let output ~base ~cache =
+  let cache_filename base =
     let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
-    let cache_file = Filename.concat base_dir "cache_static_sosa" in
+    Filename.concat base_dir "cache_static_sosa"
+
+  let erase_cache_file base = Files.rm (cache_filename base)
+
+  let output ~base ~cache =
+    let cache_file = cache_filename base in
     let tmp_cache_file = cache_file ^ "~" in
     let oc = Secure.open_out tmp_cache_file in
     Marshal.to_channel oc cache [];
@@ -184,10 +190,14 @@ let is_default_sosa_ref conf base sosa_ref =
 let is_sosa_cache_valid base =
   let base_dir = GWPARAM.bpath (Gwdb.bname base ^ ".gwb") in
   let patch_file = Filename.concat base_dir "patches" in
+  let base_file = Filename.concat base_dir "base" in
   let cache_file = Filename.concat base_dir "cache_static_sosa" in
-  Files.exists cache_file
-  && ((not (Files.exists patch_file))
-     || (Unix.stat patch_file).st_mtime < (Unix.stat cache_file).st_mtime)
+  let has_cache_file = Files.exists cache_file in
+  let has_patch_file = Files.exists patch_file in
+  has_cache_file && (not has_patch_file)
+  && (Unix.stat base_file).st_mtime <= (Unix.stat cache_file).st_mtime
+  || has_cache_file && has_patch_file
+     && (Unix.stat patch_file).st_mtime < (Unix.stat cache_file).st_mtime
 
 let get_dynamic_cache base sosa_ref =
   let cache = DynamicCache.make ~base ~sosa_ref:(Gwdb.get_iper sosa_ref) in
@@ -223,7 +233,9 @@ let get_sosa ~base ~cache ~iper =
 
 let write_static_sosa_cache ~conf ~base =
   let cache = StaticCache.build ~conf ~base in
-  Option.iter (fun cache -> StaticCache.output ~base ~cache) cache
+  match cache with
+  | Some cache -> StaticCache.output ~base ~cache
+  | None -> StaticCache.erase_cache_file base
 
 let get_sosa_person ~conf ~base ~person =
   Option.bind (get_sosa_cache ~conf ~base) (fun cache ->
