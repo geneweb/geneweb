@@ -37,35 +37,21 @@ echo Web-root: $WEB_ROOT
 DISTRIB_NAME="distribution"
 # Provide the location of your bases.
 # If no value is given, the default is $DISTRIB_NAME/bases 
-MY_BASES="/Users/Henri/Genea/GeneWeb-Bases"
-DIR="$(dirname "$0")"
-cd "$DIR"
+MY_BASES=""
+DIR=$(dirname $0)
+INSTALL_CGI="$DIR/install-cgi"
 PWD=`pwd`
+echo `pwd`
 
-if ! [ $MY_BASES == "" ]; then
-  echo "Set link to my bases"
-  rm -f -R $WEB_ROOT/$DISTRIB_NAME/bases
-  ln -s $MY_BASES $WEB_ROOT/$DISTRIB_NAME/bases
-fi
-BASES=$WEB_ROOT/$DISTRIB_NAME/bases
+BASES=$DIR/../$DISTRIB_NAME/bases
 echo "Bases: $BASES"
-
-# Apache follows SymLinks
-#if ! [ -d $WEB_ROOT/$DISTRIB_NAME ]; then
-#  ln -s ../$DISTRIB_NAME $WEB_ROOT
-#fi
-# Apache does not follow SymLinks
-#rm -f -R $WEB_ROOT/$DISTRIB_NAME
-#cp -f -R ../$DISTRIB_NAME $WEB_ROOT
-
-cd ./install-cgi
 
 BIN_DIR=$WEB_ROOT/$DISTRIB_NAME/gw
 if [ -d $WEB_ROOT/cgi-bin ]; then
   echo "Copy some files to Web-root"
-  cp gwd.cgi $WEB_ROOT/cgi-bin
-  cp test.cgi $WEB_ROOT/cgi-bin
-  cp Lenna.jpg $WEB_ROOT
+  cp $INSTALL_CGI/gwd.cgi $WEB_ROOT/cgi-bin
+  cp $INSTALL_CGI/test.cgi $WEB_ROOT/cgi-bin
+  cp $INSTALL_CGI/Lenna.jpg $WEB_ROOT
   chmod +x $WEB_ROOT/cgi-bin/gwd.cgi
   if [ $OS_ENV = "Darwin" ]; then
     # Apple extended attributes
@@ -102,15 +88,23 @@ fi
 # <image of Lenna.jpg>
 # End of test 
 
-echo "Make tmp dir"
 LOG_DIR="tmp"
 if ! [ -d $WEB_ROOT/$LOG_DIR ]; then
+  echo "Make tmp dir"
   mkdir -f $WEB_ROOT/$LOG_DIR
 fi
 
+if ! [ -d $DIR/../$DISTRIB_NAME ]; then
+  echo "$DIR/../$DISTRIB_NAME does not exist!"
+  exit 1
+fi
+
 echo "Copy test base elements"
+if ! [ -d $BASES ]; then
+  mkdir $BASES
+fi
 rm -f -R $BASES/test.*
-cp test.gwf $BASES
+cp $INSTALL_CGI/test.gwf $BASES
 if ! [ -d $BASES/src ]; then
   mkdir $BASES/src
 fi
@@ -128,11 +122,22 @@ if ! [ -d $BASES/images/test ]; then
   mkdir $BASES/images/test
 fi
 
-cp Lenna.jpg $BASES/src/test/images/aatest.jpg
-cp Lenna.jpg $BASES/images/test/tiny.0.mouse.jpg
+cp $INSTALL_CGI/Lenna.jpg $BASES/src/test/images/aatest.jpg
+cp $INSTALL_CGI/Lenna.jpg $BASES/images/test/tiny.0.mouse.jpg
 
-echo "Create test base"
-$BIN_DIR/gwc -f -o $BASES/test test.gw
+echo "Create test base in $BASES"
+$BIN_DIR/gwc -f -bd $BASES -o test $INSTALL_CGI/test.gw
+
+echo "Create galichet base in $BASES"
+$DIR/gwu_test.sh
+
+rm -f -R $WEB_ROOT/$DISTRIB_NAME
+# Apache follows SymLinks
+#echo "Create sym link to distribution"
+#ln -s $DIR/../$DISTRIB_NAME $WEB_ROOT
+# Apache does not follow SymLinks
+echo "Copy distribution to WEB_ROOT"
+cp -R $DIR/../$DISTRIB_NAME $WEB_ROOT
 
 echo "Open test base"
 
