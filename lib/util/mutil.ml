@@ -512,9 +512,9 @@ let rec extract_param name stop_char =
           | Some i -> i
           | None -> String.length x
         in
-        String.sub x (String.length name) (i - String.length name)
+        Some (String.sub x (String.length name) (i - String.length name))
       else extract_param name stop_char l
-  | [] -> ""
+  | [] -> None
 
 let rev_input_line ic pos (rbuff, rpos) =
   let rev = Buffer.create 256 in

@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 let connection_closed = ref false
-let eprintf = Printf.eprintf
 let stop_server = ref "STOP_SERVER"
 let cgi = ref false
 let wserver_sock = ref Unix.stdout
@@ -146,8 +145,8 @@ let get_request_and_content strm =
   let request = get_request strm in
   let content =
     match Mutil.extract_param "content-length: " ' ' request with
-    | "" -> ""
-    | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
+    | None -> ""
+    | Some x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
   (request, Adef.encoded content)
 
@@ -188,16 +187,16 @@ let treat_connection tmout callback addr fd =
     in
     let path, query =
       match Mutil.extract_param "GET /" ' ' request with
-      | "" -> (Mutil.extract_param "POST /" ' ' request, query)
-      | str -> (
+      | None -> (Mutil.extract_param "POST /" ' ' request, query)
+      | Some str -> (
           match String.index_opt str '?' with
           | Some i ->
-              ( String.sub str 0 i,
+              ( Some (String.sub str 0 i),
                 String.sub str (i + 1) (String.length str - i - 1)
                 |> Adef.encoded )
-          | None -> (str, "" |> Adef.encoded))
+          | None -> (Some str, "" |> Adef.encoded))
     in
-    (request, path, query)
+    (request, Option.value ~default:"" path, query)
   in
   (timeout_wrapper :=
      fun tmout ->
@@ -238,7 +237,7 @@ let wait_available max_clients s =
         if !pids <> [] && not !stop_verbose then (
           stop_verbose := true;
           let tm = Unix.localtime (Unix.time ()) in
-          eprintf
+          Printf.eprintf
             "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after \
              cleanup (%d)\n"
             tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year)
@@ -252,8 +251,8 @@ let wait_available max_clients s =
 let check_stopping () =
   if Sys.file_exists !stop_server then (
     flush stdout;
-    eprintf "\nServer stopped by presence of file %s.\n" !stop_server;
-    eprintf "Remove that file to allow servers to run again.\n";
+    Printf.eprintf "\nServer stopped by presence of file %s.\n" !stop_server;
+    Printf.eprintf "Remove that file to allow servers to run again.\n";
     flush stderr;
     exit 0)
 
@@ -283,7 +282,7 @@ let accept_connection tmout max_clients callback s =
       else pids := id :: !pids
   | None ->
       Unix.close t;
-      eprintf "Fork failed\n";
+      Printf.eprintf "Fork failed\n";
       flush stderr
 
 let f ~syslog ~addr ~port ~timeout ~max_clients ~handler =
@@ -304,8 +303,9 @@ let f ~syslog ~addr ~port ~timeout ~max_clients ~handler =
   Unix.bind s (Unix.ADDR_INET (addr, port));
   Unix.listen s 4;
   let tm = Unix.localtime (Unix.time ()) in
-  eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n" (1900 + tm.Unix.tm_year)
-    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min port;
+  Printf.eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...\n"
+    (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
+    tm.Unix.tm_hour tm.Unix.tm_min port;
   flush stderr;
   while true do
     try accept_connection tmout max_clients g s with

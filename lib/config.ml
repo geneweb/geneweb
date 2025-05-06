@@ -1,23 +1,14 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-type auth_scheme_kind =
-  | NoAuth
-  | TokenAuth of token_auth_scheme
-  | HttpAuth of http_auth_scheme
+type token_auth_scheme = { ts_user : string; ts_pass : string }
 
-and token_auth_scheme = { ts_user : string; ts_pass : string }
-
-and http_auth_scheme =
-  | Basic of basic_auth_scheme
-  | Digest of digest_auth_scheme
-
-and basic_auth_scheme = {
+type basic_auth_scheme = {
   bs_realm : string;
   bs_user : string;
   bs_pass : string;
 }
 
-and digest_auth_scheme = {
+type digest_auth_scheme = {
   ds_username : string;
   ds_realm : string;
   ds_nonce : string;
@@ -28,6 +19,15 @@ and digest_auth_scheme = {
   ds_cnonce : string;
   ds_response : string;
 }
+
+type http_auth_scheme =
+  | Basic of basic_auth_scheme
+  | Digest of digest_auth_scheme
+
+type auth_scheme_kind =
+  | NoAuth
+  | TokenAuth of token_auth_scheme
+  | HttpAuth of http_auth_scheme
 
 type output_conf = {
   status : Def.httpStatus -> unit;

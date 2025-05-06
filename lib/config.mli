@@ -1,25 +1,14 @@
-(** Authentication scheme data type *)
-type auth_scheme_kind =
-  | NoAuth
-  | TokenAuth of token_auth_scheme
-  | HttpAuth of http_auth_scheme
-
-and token_auth_scheme = { ts_user : string; ts_pass : string }
+type token_auth_scheme = { ts_user : string; ts_pass : string }
 (** Authentication via security token *)
 
-(** Authentication via HTTP *)
-and http_auth_scheme =
-  | Basic of basic_auth_scheme
-  | Digest of digest_auth_scheme
-
-and basic_auth_scheme = {
+type basic_auth_scheme = {
   bs_realm : string;
   bs_user : string;
   bs_pass : string;
 }
 (** Basic authentication scheme inside {i Autorization} HTTP header *)
 
-and digest_auth_scheme = {
+type digest_auth_scheme = {
   ds_username : string;
   ds_realm : string;
   ds_nonce : string;
@@ -31,6 +20,17 @@ and digest_auth_scheme = {
   ds_response : string;
 }
 (** Digest authentication scheme inside {i Autorization} HTTP header *)
+
+(** Authentication via HTTP *)
+type http_auth_scheme =
+  | Basic of basic_auth_scheme
+  | Digest of digest_auth_scheme
+
+(** Authentication scheme data type *)
+type auth_scheme_kind =
+  | NoAuth
+  | TokenAuth of token_auth_scheme
+  | HttpAuth of http_auth_scheme
 
 type output_conf = {
   status : Def.httpStatus -> unit;
