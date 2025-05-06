@@ -610,4 +610,7 @@ let base_visible_get base fct i =
       status
   | Some b -> b
 
+let initialize_lowercase_name_index ~kind base =
+  Outbase.initialize_lowercase_name_index ~kind base
+
 include Gwdb_gc
