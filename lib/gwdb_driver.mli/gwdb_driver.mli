@@ -729,4 +729,7 @@ val gc :
 val set_fpoi_cache : base -> bool -> unit
 
 val initialize_lowercase_name_index :
-  kind:[< `First_name | `Surname ] -> base -> unit
+  ?on_lock_error:(unit -> unit) ->
+  kind:[< `First_name | `Surname ] ->
+  base ->
+  unit
