@@ -132,7 +132,21 @@ jobs:
         run: opam exec -- ocaml ./configure.ml --sosa-zarith ${{ env.USE_NNP == 'true' && '--gwd-caching' || '' }}
 
       - name: Build Geneweb
-        run: opam exec -- make ci distrib
+        id: build
+        shell: bash
+        run: |
+          opam exec -- make ci distrib 2>&1 | tee build-output.log
+
+          set +e
+          PASSED=$(grep -c "\[OK\]" build-output.log)
+          FAILED=$(grep -c "\[FAIL\]" build-output.log)
+          SKIPPED=$(grep -c "\[SKIP\]" build-output.log)
+          set -e
+          TOTAL=$((PASSED + FAILED + SKIPPED))
+          echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "tests_skipped=$SKIPPED" >> $GITHUB_OUTPUT
+          echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: "Test Geneweb daemon with --cache-in-memory"
         if: env.USE_NNP == 'true'
@@ -154,6 +168,10 @@ jobs:
           os: ${{ matrix.os }}
           ocaml-version: ${{ matrix.ocaml-compiler }}
           cache-hit: ${{ runner.os != 'Windows' && steps.cache-opam-unix.outputs.cache-hit || steps.cache-opam-windows.outputs.cache-hit }}
+          tests-total: ${{ steps.build.outputs.tests_total }}
+          tests-passed: ${{ steps.build.outputs.tests_passed }}
+          tests-failed: ${{ steps.build.outputs.tests_failed }}
+          tests-skipped: ${{ steps.build.outputs.tests_skipped }}
 
   build-results:
     needs: [build]
