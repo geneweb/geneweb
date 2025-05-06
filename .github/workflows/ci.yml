@@ -123,7 +123,25 @@ jobs:
         run: opam exec -- ocaml ./configure.ml --sosa-zarith ${{ env.USE_NNP == 'true' && '--gwd-caching' || '' }}
 
       - name: Build Geneweb
-        run: opam exec -- make ci distrib
+        shell: bash
+        run: |
+          opam exec -- make ci distrib 2>&1 | tee build-output.log
+          if grep -q "{Geneweb}" build-output.log; then
+            TOTAL=$(grep -o "[0-9]\+ tests run" build-output.log | awk '{print $1}' || echo "0")
+            PASSED=$(grep -o "\[OK\]" build-output.log | wc -l || echo "0")
+            SKIPPED=$(grep -o "\[SKIP\]" build-output.log | wc -l || echo "0")
+            FAILED=$((TOTAL - PASSED - SKIPPED))
+            
+            echo "TESTS_TOTAL=$TOTAL" >> $GITHUB_ENV
+            echo "TESTS_PASSED=$PASSED" >> $GITHUB_ENV
+            echo "TESTS_FAILED=$FAILED" >> $GITHUB_ENV
+            echo "TESTS_SKIPPED=$SKIPPED" >> $GITHUB_ENV
+          else
+            echo "TESTS_TOTAL=0" >> $GITHUB_ENV
+            echo "TESTS_PASSED=0" >> $GITHUB_ENV
+            echo "TESTS_FAILED=0" >> $GITHUB_ENV
+            echo "TESTS_SKIPPED=0" >> $GITHUB_ENV
+          fi
 
       - name: "Test Geneweb daemon with --cache-in-memory"
         if: env.USE_NNP == 'true'

@@ -39,51 +39,40 @@ runs:
     # Metrics Collection
     - if: inputs.command == 'collect-metrics'
       id: collect
-      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+      shell: bash
       run: |
-        ${{ runner.os == 'Windows' && '
-          $startTime = [int]$env:start_time
-          $endTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-          $buildTime = $endTime - $startTime
+        # Implémentation unifiée
+        end_time=$(date +%s)
+        BUILD_TIME=$((end_time - start_time))
 
-          $size = (Get-ChildItem -Recurse "distribution" -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum ?? 0
-
-          $cacheHit = if ($env:CACHE_HIT -eq "true") { "true" } else { "false" }
-
-          $metric = "{""os"":""$($env:OS_NAME)"",""ocaml"":""$($env:OCAML_VERSION)"",""duration"":$buildTime,""status"":""$($env:JOB_STATUS)"",""cache_hit"":$cacheHit,""size_bytes"":$size}"
-
-          $metric | Set-Content "metric-$env:OS_NAME-$env:OCAML_VERSION.json" -NoNewline
-          "metric=$metric" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8 -NoNewline
-        ' || '
-          end_time=$(date +%s)
-          BUILD_TIME=$((end_time - start_time))
-
-          SIZE_BYTES=0
-          if [ -d "distribution" ]; then
-            if [ "$(uname)" = "Darwin" ]; then
-              SIZE_BYTES=$(find distribution -type f -exec stat -f %z {} + 2>/dev/null | awk "{sum += \$1} END {print sum}" || echo "0")
-            else
-              SIZE_BYTES=$(du -sb distribution 2>/dev/null | cut -f1 || echo "0")
-            fi
+        # Taille des artifacts
+        SIZE_BYTES=0
+        if [ -d "distribution" ]; then
+          if [ "$(uname)" = "Darwin" ]; then
+            SIZE_BYTES=$(find distribution -type f -exec stat -f %z {} \; 2>/dev/null | awk "{sum += \$1} END {print sum}" || echo "0")
+          else
+            SIZE_BYTES=$(du -sb distribution 2>/dev/null | cut -f1 || echo "0")
           fi
+        fi
+        
+        # Récupération des infos de test depuis les variables d'environnement
+        TESTS_TOTAL=${TESTS_TOTAL:-0}
+        TESTS_PASSED=${TESTS_PASSED:-0}
+        TESTS_FAILED=${TESTS_FAILED:-0}
+        TESTS_SKIPPED=${TESTS_SKIPPED:-0}
+        
+        # Création des métriques
+        printf -v metric "{\"os\":\"%s\",\"ocaml\":\"%s\",\"duration\":%d,\"status\":\"%s\",\"cache_hit\":%s,\"size_bytes\":%d,\"tests_total\":%d,\"tests_passed\":%d,\"tests_failed\":%d,\"tests_skipped\":%d}" \
+          "$OS_NAME" "$OCAML_VERSION" "$BUILD_TIME" "$JOB_STATUS" "$CACHE_HIT" "$SIZE_BYTES" "$TESTS_TOTAL" "$TESTS_PASSED" "$TESTS_FAILED" "$TESTS_SKIPPED"
 
-          CACHE_HIT_VALUE="false"
-          if [ "$CACHE_HIT" = "true" ]; then
-            CACHE_HIT_VALUE="true"
-          fi
-
-          printf -v metric "{\"os\":\"%s\",\"ocaml\":\"%s\",\"duration\":%d,\"status\":\"%s\",\"cache_hit\":%s,\"size_bytes\":%d}" \
-            "$OS_NAME" "$OCAML_VERSION" "$BUILD_TIME" "$JOB_STATUS" "$CACHE_HIT_VALUE" "$SIZE_BYTES"
-
-          echo "$metric" > "metric-$OS_NAME-$OCAML_VERSION.json"
-          echo "metric=$metric" >> $GITHUB_OUTPUT
-        ' }}
+        echo "$metric" > "metric-$OS_NAME-$OCAML_VERSION.json"
+        echo "metric=$metric" >> $GITHUB_OUTPUT
       env:
         OS_NAME: ${{ inputs.os }}
         OCAML_VERSION: ${{ inputs.ocaml-version }}
         JOB_STATUS: ${{ job.status }}
         CACHE_HIT: ${{ inputs.cache-hit }}
-
+        
     # Upload Metrics
     - if: inputs.command == 'collect-metrics'
       uses: actions/upload-artifact@v4
@@ -120,8 +109,8 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "## 📈 Build Results Statistics" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "| OS | OCaml | Status | Duration | Cache | Size |" >> $GITHUB_STEP_SUMMARY
-        echo "|------------|----------------|:---------:|-----------:|:--------:|---------|" >> $GITHUB_STEP_SUMMARY
+        echo "| OS | OCaml | Status | Tests | Duration | Cache | Size |" >> $GITHUB_STEP_SUMMARY
+        echo "|------------|----------------|:---------:|:---------:|-----------:|:--------:|---------|" >> $GITHUB_STEP_SUMMARY
 
         find metrics -name "metric-*.json" -type f | while read -r f; do
           if [ ! -f "$f" ]; then continue; fi
@@ -154,8 +143,25 @@ runs:
             size_str=$(printf "%.1f Ko" "$(echo "scale=1; $size/1024" | bc)")
           fi
 
-          printf "| %s | %s | %s | %s | %s | %s |\n" \
-            "$os" "$ocaml" "$status_icon" "$duration_str" "$cache_icon" "$size_str"
+          tests_total=$(jq -r '.tests_total // 0' "$f")
+          tests_passed=$(jq -r '.tests_passed // 0' "$f")
+          tests_failed=$(jq -r '.tests_failed // 0' "$f")
+          tests_skipped=$(jq -r '.tests_skipped // 0' "$f")
+
+          if [ "$tests_total" -eq 0 ]; then
+            test_display="N/A"
+          elif [ "$tests_failed" -eq 0 ]; then
+            if [ "$tests_skipped" -eq 0 ]; then
+              test_display="$tests_passed/$tests_total"
+            else
+              test_display="$tests_passed+$tests_skipped/$tests_total"
+            fi
+          else
+            test_display="$tests_passed+$tests_skipped-$tests_failed/$tests_total"
+          fi
+
+          printf "| %s | %s | %s | %s | %s | %s | %s |\n" \
+            "$os" "$ocaml" "$status_icon" "$test_display" "$duration_str" "$cache_icon" "$size_str"
         done | sort -t'|' -k2,2 -k3,3 >> $GITHUB_STEP_SUMMARY
 
         # Count builds
