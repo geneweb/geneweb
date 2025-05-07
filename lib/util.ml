@@ -110,7 +110,7 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   match
     (List.assoc_opt "hide_querytime_bugs" conf.base_env, conf.predictable_mode)
   with
-  | _, false | Some "yes", _ -> ()
+  | _, true | Some "yes", _ -> ()
   | _, _ ->
       Output.print_sstring conf
         (Printf.sprintf
