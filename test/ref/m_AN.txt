@@ -66,32 +66,7 @@ name="p" placeholder="First name" tabindex="6">
 <p>No birthday today.</p><p>No birthday tomorrow.</p><p>No birthday the day after tomorrow.</p> <table border="0" width="100%"><tr><td align="center">
 <span>Select a month to see all the anniversaries.</span><table border="0"><tr><td><form class="form-inline" method="get" action="galichet"><p><input type="hidden" name="m" value="AN">
 <select class="form-control form-control-lg" name="v"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5" selected="selected">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select><button type="submit" class="btn btn-primary btn-lg ml-2">Submit</button></p></form></td></tr></table></td></tr></table>
- <script>
-  var q_time = 0.000;
-  var nb_errors = 0;
-  var errors_list = "\u{000A}";
-  var home_time = document.getElementById('q_time');
-  var home_errors = document.getElementById('nb_errors');
-  if (home_time != null) {
-    home_time.title = "Query treated in " + q_time + " s";
-    if (q_time < 3) {
-      home_time.classList.add("text-success");
-    } else if (q_time < 8) {
-      home_time.classList.add("text-warning");
-     } else {
-       home_time.classList.add("text-danger");
-    }
-  }
-  if (home_errors != null) {
-    if (nb_errors > 0) {
-      home_errors.title = nb_errors +" error(s)!";
-      home_errors.classList.remove("d-none");
-    }
-    if (errors_list != "\u{000A}") {
-      home_errors.title = home_errors.title + errors_list + ".";
-    }
-  }
-</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+ <!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->

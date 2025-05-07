@@ -63,32 +63,7 @@ name="p" placeholder="First name" tabindex="6">
 </div>
 </div>
 <div class="container"><h1>27 first names (34 individuals)</h1>
-<ul><li>3<ul><li><a href="galichet?m=P&v=jeanne">Jeanne</a></li></ul></li><li>2<ul><li><a href="galichet?m=P&v=anthoine">Anthoine</a></li><li><a href="galichet?m=P&v=claude">Claude</a></li><li><a href="galichet?m=P&v=jean">Jean</a></li><li><a href="galichet?m=P&v=louis">Louis</a></li><li><a href="galichet?m=P&v=marie">Marie</a></li></ul></li><li>1<ul><li><a href="galichet?m=P&v=charlotte">Charlotte</a></li><li><a href="galichet?m=P&v=florence">Florence</a></li><li><a href="galichet?m=P&v=jacques">Jacques</a></li><li><a href="galichet?m=P&v=jean+charles">Jean Charles</a></li><li><a href="galichet?m=P&v=jean+pierre">Jean Pierre</a></li><li><a href="galichet?m=P&v=jean+baptiste">Jean-Baptiste</a></li><li><a href="galichet?m=P&v=jean+paul">Jean-Paul</a></li><li><a href="galichet?m=P&v=laure">Laure</a></li><li><a href="galichet?m=P&v=laurence">Laurence</a></li><li><a href="galichet?m=P&v=laurent">Laurent</a></li><li><a href="galichet?m=P&v=louise">Louise</a></li><li><a href="galichet?m=P&v=marie+elisabeth">Marie Elisabeth</a></li><li><a href="galichet?m=P&v=marie+jeanne">Marie-Jeanne</a></li><li><a href="galichet?m=P&v=nicole">Nicole</a></li><li><a href="galichet?m=P&v=paul">Paul</a></li><li><a href="galichet?m=P&v=perrette">Perrette</a></li><li><a href="galichet?m=P&v=pierre">Pierre</a></li><li><a href="galichet?m=P&v=therese+eugenie">Thérèse Eugénie</a></li><li><a href="galichet?m=P&v=lolo">lolo</a></li><li><a href="galichet?m=P&v=prenom1">prenom1</a></li><li><a href="galichet?m=P&v=prenom2">prenom2</a></li></ul></li></ul><script>
-  var q_time = 0.000;
-  var nb_errors = 0;
-  var errors_list = "\u{000A}";
-  var home_time = document.getElementById('q_time');
-  var home_errors = document.getElementById('nb_errors');
-  if (home_time != null) {
-    home_time.title = "Query treated in " + q_time + " s";
-    if (q_time < 3) {
-      home_time.classList.add("text-success");
-    } else if (q_time < 8) {
-      home_time.classList.add("text-warning");
-     } else {
-       home_time.classList.add("text-danger");
-    }
-  }
-  if (home_errors != null) {
-    if (nb_errors > 0) {
-      home_errors.title = nb_errors +" error(s)!";
-      home_errors.classList.remove("d-none");
-    }
-    if (errors_list != "\u{000A}") {
-      home_errors.title = home_errors.title + errors_list + ".";
-    }
-  }
-</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<ul><li>3<ul><li><a href="galichet?m=P&v=jeanne">Jeanne</a></li></ul></li><li>2<ul><li><a href="galichet?m=P&v=anthoine">Anthoine</a></li><li><a href="galichet?m=P&v=claude">Claude</a></li><li><a href="galichet?m=P&v=jean">Jean</a></li><li><a href="galichet?m=P&v=louis">Louis</a></li><li><a href="galichet?m=P&v=marie">Marie</a></li></ul></li><li>1<ul><li><a href="galichet?m=P&v=charlotte">Charlotte</a></li><li><a href="galichet?m=P&v=florence">Florence</a></li><li><a href="galichet?m=P&v=jacques">Jacques</a></li><li><a href="galichet?m=P&v=jean+charles">Jean Charles</a></li><li><a href="galichet?m=P&v=jean+pierre">Jean Pierre</a></li><li><a href="galichet?m=P&v=jean+baptiste">Jean-Baptiste</a></li><li><a href="galichet?m=P&v=jean+paul">Jean-Paul</a></li><li><a href="galichet?m=P&v=laure">Laure</a></li><li><a href="galichet?m=P&v=laurence">Laurence</a></li><li><a href="galichet?m=P&v=laurent">Laurent</a></li><li><a href="galichet?m=P&v=louise">Louise</a></li><li><a href="galichet?m=P&v=marie+elisabeth">Marie Elisabeth</a></li><li><a href="galichet?m=P&v=marie+jeanne">Marie-Jeanne</a></li><li><a href="galichet?m=P&v=nicole">Nicole</a></li><li><a href="galichet?m=P&v=paul">Paul</a></li><li><a href="galichet?m=P&v=perrette">Perrette</a></li><li><a href="galichet?m=P&v=pierre">Pierre</a></li><li><a href="galichet?m=P&v=therese+eugenie">Thérèse Eugénie</a></li><li><a href="galichet?m=P&v=lolo">lolo</a></li><li><a href="galichet?m=P&v=prenom1">prenom1</a></li><li><a href="galichet?m=P&v=prenom2">prenom2</a></li></ul></li></ul><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->

@@ -214,32 +214,7 @@ toggle ("bu", state) ;
 <p>
 <a href="galichet?m=PPS&bi=on&ba=on&de=on&bu=on&ma=on&display=long&keep=1" title="">Full display</a><p>
 <a href="galichet?m=PPS&bi=on&ba=on&de=on&bu=on&ma=on&display=short&keep=2&k=Australie">Australie</a>&nbsp;(<a href="galichet?m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=Australie&nb=3&i0=5&p0=Australie&i1=10&p1=Australie&i2=11&p2=Australie" title="List of individuals">3</a>), <a href="galichet?m=PPS&bi=on&ba=on&de=on&bu=on&ma=on&display=short&keep=2&k=France">France</a>&nbsp;(<a href="galichet?m=L&data=place&bi=on&ba=on&de=on&bu=on&ma=on&k=France&nb=22&i0=6&p0=France&i1=12&p1=France&i2=13&p2=France&i3=14&p3=France&i4=15&p4=France&i5=16&p5=France&i6=17&p6=France&i7=18&p7=France&i8=19&p8=France&i9=20&p9=France&i10=21&p10=France&i11=23&p11=France&i12=24&p12=France&i13=25&p13=France&i14=26&p14=France&i15=27&p15=France&i16=28&p16=France&i17=29&p17=France&i18=30&p18=France&i19=31&p19=France&i20=32&p20=France&i21=33&p21=France" title="List of individuals">22</a>)<p></form>
-<script>
-  var q_time = 0.000;
-  var nb_errors = 0;
-  var errors_list = "\u{000A}";
-  var home_time = document.getElementById('q_time');
-  var home_errors = document.getElementById('nb_errors');
-  if (home_time != null) {
-    home_time.title = "Query treated in " + q_time + " s";
-    if (q_time < 3) {
-      home_time.classList.add("text-success");
-    } else if (q_time < 8) {
-      home_time.classList.add("text-warning");
-     } else {
-       home_time.classList.add("text-danger");
-    }
-  }
-  if (home_errors != null) {
-    if (nb_errors > 0) {
-      home_errors.title = nb_errors +" error(s)!";
-      home_errors.classList.remove("d-none");
-    }
-    if (errors_list != "\u{000A}") {
-      home_errors.title = home_errors.title + errors_list + ".";
-    }
-  }
-</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->

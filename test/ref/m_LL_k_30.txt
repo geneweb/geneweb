@@ -63,32 +63,7 @@ name="p" placeholder="First name" tabindex="6">
 </div>
 </div>
 <div class="container"><h1>The 17 who lived the longest</h1>
-<ul><li><strong><a href="galichet?p=anthoine&n=geruzet" id="i23">Anthoine Geruzet</a></strong> <bdo dir=ltr>1667–1755</bdo> (88 years).</li><li><strong><a href="galichet?p=perrette&n=sutaine" id="i16">Perrette Sutaine</a></strong> <bdo dir=ltr>1600–1684</bdo> (84 years).</li><li><strong><a href="galichet?p=jean&n=boizot&oc=1234" id="i19">Jean Boizot</a></strong> <bdo dir=ltr>1618–1702</bdo> (84 years).</li><li><strong><a href="galichet?p=marie+jeanne&n=geruzet" id="i27">Marie-Jeanne Geruzet</a></strong> <bdo dir=ltr>1751–1830</bdo> (78 years).</li><li><strong><a href="galichet?p=jean+baptiste&n=geruzet" id="i29">Jean-Baptiste Geruzet</a></strong> <bdo dir=ltr>1768–1846</bdo> (77 years).</li><li><strong><a href="galichet?p=jeanne&n=boizot&oc=1" id="i20">Jeanne Boizot</a></strong> <bdo dir=ltr>1671–1748</bdo> (77 years).</li><li><strong><a href="galichet?p=laurent&n=geruzet" id="i26">Laurent Geruzet</a></strong> <bdo dir=ltr>1738–1812</bdo> (74 years).</li><li><strong><a href="galichet?p=jean&n=jayot" id="i17">Jean Jayot</a></strong> <bdo dir=ltr>1604–1674</bdo> (70 years).</li><li><strong><a href="galichet?p=paul&n=galichet" id="i4">Paul Galichet</a></strong> <bdo dir=ltr>1816–1886</bdo> (70 years).</li><li><strong><a href="galichet?p=anthoine&n=geruzet&oc=1" id="i21">Anthoine Geruzet</a></strong> <bdo dir=ltr>1640–1709</bdo> (69 years).</li><li><strong><a href="galichet?p=jacques&n=geruzet" id="i24">Jacques Geruzet</a></strong> <bdo dir=ltr>1705–1774</bdo> (69 years).</li><li><strong><a href="galichet?p=laurence&n=geruzet" id="i33">Laurence Geruzet</a></strong> <bdo dir=ltr>1802–1866</bdo> (64 years).</li><li><strong><a href="galichet?p=claude&n=jayot" id="i18">Claude Jayot</a></strong> <bdo dir=ltr>1633–1697</bdo> (63 years).</li><li><strong><a href="galichet?p=florence&n=marty" id="i7">Florence Marty</a></strong> <bdo dir=ltr>1815–1875</bdo> (60 years).</li><li><strong><a href="galichet?p=marie&n=dupond" id="i28">Marie Dupond</a></strong> <bdo dir=ltr>1736–1784</bdo> (48 years).</li><li><strong><a href="galichet?p=charlotte&n=laramee" id="i30">Charlotte Laramee</a></strong> <bdo dir=ltr>1766–1789</bdo> (23 years).</li><li><strong><a href="galichet?p=pierre&n=galichet" id="i3">Pierre Galichet</a></strong> <bdo dir=ltr>1814–1835</bdo> (21 years).</li></ul><script>
-  var q_time = 0.000;
-  var nb_errors = 0;
-  var errors_list = "\u{000A}";
-  var home_time = document.getElementById('q_time');
-  var home_errors = document.getElementById('nb_errors');
-  if (home_time != null) {
-    home_time.title = "Query treated in " + q_time + " s";
-    if (q_time < 3) {
-      home_time.classList.add("text-success");
-    } else if (q_time < 8) {
-      home_time.classList.add("text-warning");
-     } else {
-       home_time.classList.add("text-danger");
-    }
-  }
-  if (home_errors != null) {
-    if (nb_errors > 0) {
-      home_errors.title = nb_errors +" error(s)!";
-      home_errors.classList.remove("d-none");
-    }
-    if (errors_list != "\u{000A}") {
-      home_errors.title = home_errors.title + errors_list + ".";
-    }
-  }
-</script><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
+<ul><li><strong><a href="galichet?p=anthoine&n=geruzet" id="i23">Anthoine Geruzet</a></strong> <bdo dir=ltr>1667–1755</bdo> (88 years).</li><li><strong><a href="galichet?p=perrette&n=sutaine" id="i16">Perrette Sutaine</a></strong> <bdo dir=ltr>1600–1684</bdo> (84 years).</li><li><strong><a href="galichet?p=jean&n=boizot&oc=1234" id="i19">Jean Boizot</a></strong> <bdo dir=ltr>1618–1702</bdo> (84 years).</li><li><strong><a href="galichet?p=marie+jeanne&n=geruzet" id="i27">Marie-Jeanne Geruzet</a></strong> <bdo dir=ltr>1751–1830</bdo> (78 years).</li><li><strong><a href="galichet?p=jean+baptiste&n=geruzet" id="i29">Jean-Baptiste Geruzet</a></strong> <bdo dir=ltr>1768–1846</bdo> (77 years).</li><li><strong><a href="galichet?p=jeanne&n=boizot&oc=1" id="i20">Jeanne Boizot</a></strong> <bdo dir=ltr>1671–1748</bdo> (77 years).</li><li><strong><a href="galichet?p=laurent&n=geruzet" id="i26">Laurent Geruzet</a></strong> <bdo dir=ltr>1738–1812</bdo> (74 years).</li><li><strong><a href="galichet?p=jean&n=jayot" id="i17">Jean Jayot</a></strong> <bdo dir=ltr>1604–1674</bdo> (70 years).</li><li><strong><a href="galichet?p=paul&n=galichet" id="i4">Paul Galichet</a></strong> <bdo dir=ltr>1816–1886</bdo> (70 years).</li><li><strong><a href="galichet?p=anthoine&n=geruzet&oc=1" id="i21">Anthoine Geruzet</a></strong> <bdo dir=ltr>1640–1709</bdo> (69 years).</li><li><strong><a href="galichet?p=jacques&n=geruzet" id="i24">Jacques Geruzet</a></strong> <bdo dir=ltr>1705–1774</bdo> (69 years).</li><li><strong><a href="galichet?p=laurence&n=geruzet" id="i33">Laurence Geruzet</a></strong> <bdo dir=ltr>1802–1866</bdo> (64 years).</li><li><strong><a href="galichet?p=claude&n=jayot" id="i18">Claude Jayot</a></strong> <bdo dir=ltr>1633–1697</bdo> (63 years).</li><li><strong><a href="galichet?p=florence&n=marty" id="i7">Florence Marty</a></strong> <bdo dir=ltr>1815–1875</bdo> (60 years).</li><li><strong><a href="galichet?p=marie&n=dupond" id="i28">Marie Dupond</a></strong> <bdo dir=ltr>1736–1784</bdo> (48 years).</li><li><strong><a href="galichet?p=charlotte&n=laramee" id="i30">Charlotte Laramee</a></strong> <bdo dir=ltr>1766–1789</bdo> (23 years).</li><li><strong><a href="galichet?p=pierre&n=galichet" id="i3">Pierre Galichet</a></strong> <bdo dir=ltr>1814–1835</bdo> (21 years).</li></ul><!-- $Id: copyr.txt 7.1-beta 18/12/2023 22:03:44 $ -->
 <div class="d-flex flex-row justify-content-center justify-content-lg-end my-2" id="copyr">
 <div class="d-flex flex-wrap justify-content-md-end">
 <!-- legal notices -->

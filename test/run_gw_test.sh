@@ -145,10 +145,11 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -trace_failed_passwd \
   -robot_xcl 10000,1 \
   -conn_tmout 3600 \
-  -blang \
+  -lang en \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
   -n_workers 0 \
+  -predictable_mode \
   2>> $GWDLOG &
 fi
 

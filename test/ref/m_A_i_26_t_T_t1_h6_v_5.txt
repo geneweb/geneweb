@@ -550,32 +550,7 @@ Nicole Galichet<br>
 </a>
 </div>
 </div>
-<script>
-  var q_time = 0.000;
-  var nb_errors = 0;
-  var errors_list = "\u{000A}";
-  var home_time = document.getElementById('q_time');
-  var home_errors = document.getElementById('nb_errors');
-  if (home_time != null) {
-    home_time.title = "Query treated in " + q_time + " s";
-    if (q_time < 3) {
-      home_time.classList.add("text-success");
-    } else if (q_time < 8) {
-      home_time.classList.add("text-warning");
-     } else {
-       home_time.classList.add("text-danger");
-    }
-  }
-  if (home_errors != null) {
-    if (nb_errors > 0) {
-      home_errors.title = nb_errors +" error(s)!";
-      home_errors.classList.remove("d-none");
-    }
-    if (errors_list != "\u{000A}") {
-      home_errors.title = home_errors.title + errors_list + ".";
-    }
-  }
-</script></div>
+</div>
 <!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
 <script src="js/jquery.min.js?version=3.7.1"></script>
 <script src="js/bootstrap.bundle.min.js?version=4.6.1"></script>
