@@ -332,6 +332,172 @@ let datedisplay_string_of_date () =
   test "d[i |'marzu 1975" Dgregorian (0, 3, 1975);
   test "4 d[i sittembre 1974" Dgregorian (4, 9, 1974)
 
+let html_text_content () =
+  let module Expected : sig
+    type t
+
+    val plain_text : string -> t
+    val make : text_content:string -> is_plain_text:bool -> t
+
+    val test :
+      __POS__:Alcotest.Source_code_position.pos -> expected:t -> string -> unit
+  end = struct
+    type t = { text_content : string; is_plain_text : bool }
+
+    let make ~text_content ~is_plain_text = { text_content; is_plain_text }
+    let plain_text s = make ~text_content:s ~is_plain_text:true
+
+    let test ~__POS__ ~expected s =
+      Alcotest.check' ~pos:__POS__
+        (Alcotest.pair Alcotest.string Alcotest.bool)
+        ~msg:""
+        ~expected:(expected.text_content, expected.is_plain_text)
+        ~actual:(Html.text_content s, Html.is_plain_text s)
+  end in
+  let test_cases =
+    let test_case ~__POS__ ~expected s = (__POS__, expected, s) in
+    let plain_text_test_case ~__POS__ s =
+      test_case ~__POS__ ~expected:(Expected.plain_text s) s
+    in
+    [
+      plain_text_test_case ~__POS__ "";
+      plain_text_test_case ~__POS__ " ";
+      plain_text_test_case ~__POS__ "foo";
+      plain_text_test_case ~__POS__ "foo\nbar";
+      plain_text_test_case ~__POS__ "Paris > France";
+      plain_text_test_case ~__POS__ {|"Ferdinand" Henri|};
+      plain_text_test_case ~__POS__ "< foo >";
+      plain_text_test_case ~__POS__ ">foo";
+      plain_text_test_case ~__POS__ ">foo>";
+      plain_text_test_case ~__POS__ "/>foo>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo<bar";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "</foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo</bar";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<!-- Comment -->";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<!-- <span>foo</span> -->";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foobar" ~is_plain_text:false)
+        "foo<br />bar";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<span></span>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<html></html>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<foo></foo>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<foo></bar>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:" " ~is_plain_text:false)
+        "<span> </span>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<html> </html>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:" " ~is_plain_text:false)
+        "<foo> </foo>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:" " ~is_plain_text:false)
+        "<foo> </bar>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<span<foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo</span<";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<html<foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo</html<";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"" ~is_plain_text:false)
+        "<foo<bar";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo</bar<";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "<span>foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "</span>foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo<span>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo</span>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "<span>foo</span>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "<html>foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "</html>foo";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo<html>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo</html>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "<html>foo</html>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"bar" ~is_plain_text:false)
+        "<foo>bar";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"bar" ~is_plain_text:false)
+        "</foo>bar";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo<bar>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        "foo</bar>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"bar" ~is_plain_text:false)
+        "<foo>bar</foo>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foobar" ~is_plain_text:false)
+        "<span>foo</span><span>bar</span>";
+      test_case ~__POS__
+        ~expected:(Expected.make ~text_content:"foo" ~is_plain_text:false)
+        {|<div class="main-content"><span>foo</span></div>|};
+      test_case ~__POS__
+        ~expected:
+          (Expected.make ~text_content:{|>alert("XsS")|} ~is_plain_text:false)
+        {|><sCrIpt>alert("XsS")</scRiPt>|};
+      test_case ~__POS__
+        ~expected:
+          (Expected.make ~text_content:"My test page" ~is_plain_text:false)
+        {|<!doctype html><html lang="en-US"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /><title>My test page</title></head><body><img src="" alt="My test image" /></body></html>|};
+    ]
+  in
+  List.iter
+    (fun (__POS__, expected, s) -> Expected.test ~__POS__ ~expected s)
+    test_cases
+
 let v =
   [
     ( "ext-string",
@@ -370,4 +536,5 @@ let v =
         Alcotest.test_case "DateDisplay.string_of_date" `Quick
           datedisplay_string_of_date;
       ] );
+    ("html", [ Alcotest.test_case "text-content" `Quick html_text_content ]);
   ]

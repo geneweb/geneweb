@@ -508,7 +508,8 @@ let safe_html_aux s =
         | _ -> failwith (__FILE__ ^ " " ^ string_of_int __LINE__))
     | e -> e
   in
-  Html.map ~escape_text:escape ~escape_attribute make_safe s
+  Html.map ~context:(`Fragment "body") ~escape_text:escape ~escape_attribute
+    make_safe s
 
 let safe_html s = Adef.safe (safe_html_aux s)
 
