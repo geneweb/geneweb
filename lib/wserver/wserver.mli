@@ -32,6 +32,9 @@ val start :
 
     The flag [with_salt] can be used to disable salt generation. *)
 
+val generate_secret_salt : bool -> string
+(** generate secret salt if [with_salt] is requested *)
+
 val close_connection : unit -> unit
 (** Closes the current socket *)
 

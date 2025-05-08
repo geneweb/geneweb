@@ -2412,6 +2412,8 @@ let main () =
   Util.is_welcome := false;
   if cgi then (
     Wserver.cgi := true;
+    Unix.putenv "SECRET_SALT"
+      (Wserver.generate_secret_salt (not !predictable_mode));
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
         let len =
