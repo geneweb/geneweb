@@ -154,10 +154,13 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
 fi
 
 if test "$test_diff" || test "$set_ref"; then
-  for xx in run new; do
+  for xx in run new; do # /tmp/new not used at this time
     test -d /tmp/$xx && rm -R /tmp/$xx
     mkdir /tmp/$xx
   done
+  if ! [ -d $test_dir/ref ]; then
+    mkdir $test_dir/ref
+  fi
 fi
 
 RC=0
@@ -436,23 +439,34 @@ for xx in $modules; do
     done
 done
 
-if test "$test_diff"; then
-    echo "Running diff on run versus ref"
-    for xx in $(ls /tmp/run); do
-      diff $test_dir/ref/$xx /tmp/run/$xx > /dev/null 2>&1
-      ret=$?
-      if test $ret -ne 0; then
-          RC=$(($RC+1))
-          echo "*** diff $test_dir/ref/$xx /tmp/run/$xx"
-          diff $test_dir/ref/$xx /tmp/run/$xx
-          mv /tmp/run/$xx /tmp/new/$xx
-      fi
-    done
-fi
-
 if test "$set_ref"; then
-    echo "Saving /tmp/new files into $test_dir/ref for further tests"
-    cp /tmp/new/*.txt $test_dir/ref
+    echo "Saving /tmp/run files into $test_dir/ref for further tests"
+    for xx in $(ls /tmp/run); do
+      mv /tmp/run/$xx $test_dir/ref/$xx
+    done
+elif test "$test_diff"; then
+    echo "Running diff on run versus ref"
+    found_txt=0
+    for file in `ls "$test_dir"/ref/*.txt`; do
+        if [ -f "$file" ]; then
+            found_txt=1
+            break
+        fi
+    done
+    if [ "$found_txt" -eq 1 ]; then
+      for xx in $(ls /tmp/run); do
+        diff $test_dir/ref/$xx /tmp/run/$xx > /dev/null 2>&1
+        ret=$?
+        if test $ret -ne 0; then
+            RC=$(($RC+1))
+            echo "*** diff $test_dir/ref/$xx /tmp/run/$xx"
+            diff $test_dir/ref/$xx /tmp/run/$xx
+            mv /tmp/run/$xx /tmp/new/$xx # not used at this time
+        fi
+      done
+    else
+      echo "$test_dir/ref is empty"
+    fi
 fi
 
 if test -f "$GWDLOG"; then
