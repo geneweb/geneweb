@@ -2,20 +2,22 @@
 
 (* module [Wserver]: elementary web service *)
 
+type handler =
+  Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit
+
 val start :
-  ?with_salt:bool ->
   ?addr:string ->
   port:int ->
   ?timeout:int ->
   max_pending_requests:int ->
   n_workers:int ->
-  (Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit) ->
+  handler ->
   unit
-(** [Wserver.start ?addr ~port ?timeout ~n_workers callback]
+(** [Wserver.start ~secret_salt ?addr ~port ?timeout ~n_workers callback]
     starts a HTTP 1.1 server that listens on the address [addr] and port [port].
 
     On Unix, worker jobs managed by [n_workers] workers have a time limit of
-    [timeout]. If [timeout] is [Some 0] or [None], there is no limit.
+    [timeout]. If [timeout] is [0], there is no limit. This is the default.
 
     The [max_pending_requests] argument specified the maximum number of
     pending requests that the server can store. If the queue is full, new
@@ -28,12 +30,7 @@ val start :
       - [path] is the path of the request,
       - [query] is the query content.
 
-    Listening on ports < 1024 may require root privileges.
-
-    The flag [with_salt] can be used to disable salt generation. *)
-
-val generate_secret_salt : bool -> string
-(** generate secret salt if [with_salt] is requested *)
+    Listening on ports < 1024 may require root privileges. *)
 
 val close_connection : unit -> unit
 (** Closes the current socket *)

@@ -1199,17 +1199,7 @@ let string_to_char_list s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
   exp (String.length s - 1) []
 
-let retrieve_secret_salt () =
-  match Unix.getenv "SECRET_SALT" with
-  | exception Not_found ->
-      Logs.err (fun k ->
-          k "Secret salt missing, the worker %d cannot continue its job."
-            (Unix.getpid ()));
-      exit 1
-  | s -> Some s
-
-let make_conf from_addr request script_name env =
-  let secret_salt = retrieve_secret_salt () in
+let make_conf ~secret_salt from_addr request script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
     let str =
       Printf.sprintf "Requested allowed_tags file (%s) absent"
@@ -1459,7 +1449,7 @@ let make_conf from_addr request script_name env =
       output_conf;
       forced_plugins = !forced_plugins;
       plugins = !plugins;
-      secret_salt;
+      secret_salt = Some secret_salt;
       predictable_mode = !predictable_mode;
     }
   in
@@ -1563,8 +1553,10 @@ let conf_and_connection =
     ^<^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
     ^<^ contents
   in
-  fun from request script_name (contents : Adef.encoded_string) env ->
-    let conf, passwd_err = make_conf from request script_name env in
+  fun ~secret_salt from request script_name (contents : Adef.encoded_string) env ->
+    let conf, passwd_err =
+      make_conf ~secret_salt from request script_name env
+    in
     match !redirected_addr with
     | Some addr -> print_redirected conf from request addr
     | None -> (
@@ -1908,7 +1900,7 @@ let build_env request (contents : Adef.encoded_string) :
     extract_multipart boundary contents
   else (contents, Util.create_env contents)
 
-let connection (addr, request) script_name contents0 =
+let connection ~secret_salt (addr, request) script_name contents0 =
   let from =
     match addr with
     | Unix.ADDR_UNIX x -> x
@@ -1931,7 +1923,8 @@ let connection (addr, request) script_name contents0 =
         if
           (not (image_request printer_conf script_name env))
           && not (misc_request printer_conf script_name)
-        then conf_and_connection from request script_name contents env
+        then
+          conf_and_connection ~secret_salt from request script_name contents env
       with Exit -> ()
 
 let null_reopen flags fd =
@@ -1940,60 +1933,89 @@ let null_reopen flags fd =
     Unix.dup2 fd2 fd;
     Unix.close fd2)
 
-let geneweb_server () =
-  let auto_call =
-    try
-      let _ = Sys.getenv "WSERVER" in
-      true
-    with Not_found -> false
+(* [generate_secret_salt ?random ()] generates a secret salt.
+   If the [random] argument is [false], the salt is always the same.
+   The default is [true]. *)
+let generate_secret_salt ?(random = true) () =
+  if random then (
+    Random.self_init ();
+    string_of_int @@ Random.bits ())
+  else ""
+
+let retrieve_secret_salt () =
+  match Unix.getenv "SECRET_SALT" with
+  | exception Not_found ->
+      Logs.err (fun k ->
+          k "Secret salt missing, the worker %d cannot continue its job."
+            (Unix.getpid ()));
+      exit 1
+  | s -> s
+
+let geneweb_server ~predictable_mode () =
+  let secret_salt =
+    match Unix.getenv "WSERVER" with
+    | exception Not_found ->
+        let hostn =
+          match !selected_addr with
+          | Some addr -> addr
+          | None -> ( try Unix.gethostname () with _ -> "computer")
+        in
+        let () =
+          if !daemon then
+            match Unix.fork () with
+            | 0 ->
+                Unix.close Unix.stdin;
+                null_reopen [ Unix.O_WRONLY ] Unix.stdout;
+                null_reopen [ Unix.O_WRONLY ] Unix.stderr
+            | _ -> exit 0
+          else (
+            Printf.eprintf
+              "Possible addresses:\n\
+               http://localhost:%d/base\n\
+               http://127.0.0.1:%d/base\n\
+               http://%s:%d/base\n"
+              !selected_port !selected_port hostn !selected_port;
+            Printf.eprintf
+              "where \"base\" is the name of the database\n\
+               Type “Ctrl+C” to stop the service\n";
+            if !debug then (
+              (* taken from Michel Normand commit 1874dcbf7 *)
+              Printf.eprintf
+                "gwd parameters (after GWPARAM.init & cache_lexicon):\n";
+              Printf.eprintf "  source: %s\n" Version.src;
+              Printf.eprintf "  branch: %s\n" Version.branch;
+              Printf.eprintf "  commit: %s\n" Version.commit_id;
+              Printf.eprintf "  gwd: %s\n" Sys.argv.(0);
+              Printf.eprintf "  current_dir_name: %s\n" (Sys.getcwd ());
+              Printf.eprintf "  gw_prefix: %s\n" !gw_prefix;
+              Printf.eprintf "  etc_prefix: %s\n" !etc_prefix;
+              Printf.eprintf "  images_prefix: %s\n" !images_prefix;
+              Printf.eprintf "  images_dir: %s\n" !images_dir;
+              List.iter
+                (fun a -> Printf.eprintf "  secure asset: %s\n" a)
+                (Secure.assets ());
+              Printf.eprintf "TODO: how to print content of conf ?\n"));
+          flush stderr
+        in
+        let () =
+          try
+            Filesystem.create_dir ~parent:true ~required_perm:0o755
+              !GWPARAM.cnt_dir
+          with Sys_error e ->
+            Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
+        in
+        (* A secret salt is added to the environment to ensure that workers
+           use the same salt for digests on both Unix and Windows platforms. *)
+        let secret_salt =
+          generate_secret_salt ~random:(not predictable_mode) ()
+        in
+        Unix.putenv "SECRET_SALT" secret_salt;
+        secret_salt
+    | _ -> retrieve_secret_salt ()
   in
-  if not auto_call then (
-    let hostn =
-      match !selected_addr with
-      | Some addr -> addr
-      | None -> ( try Unix.gethostname () with _ -> "computer")
-    in
-    Printf.eprintf "GeneWeb %s - " Version.ver;
-    if not !daemon then (
-      Printf.eprintf
-        "Possible addresses:\n\
-         http://localhost:%d/base\n\
-         http://127.0.0.1:%d/base\n\
-         http://%s:%d/base\n"
-        !selected_port !selected_port hostn !selected_port;
-      Printf.eprintf
-        "where \"base\" is the name of the database\n\
-         Type “Ctrl+C” to stop the service\n";
-      if !debug then (
-        (* taken from Michel Normand commit 1874dcbf7 *)
-        Printf.eprintf "gwd parameters (after GWPARAM.init & cache_lexicon):\n";
-        Printf.eprintf "  source: %s\n" Version.src;
-        Printf.eprintf "  branch: %s\n" Version.branch;
-        Printf.eprintf "  commit: %s\n" Version.commit_id;
-        Printf.eprintf "  gwd: %s\n" Sys.argv.(0);
-        Printf.eprintf "  current_dir_name: %s\n" (Sys.getcwd ());
-        Printf.eprintf "  gw_prefix: %s\n" !gw_prefix;
-        Printf.eprintf "  etc_prefix: %s\n" !etc_prefix;
-        Printf.eprintf "  images_prefix: %s\n" !images_prefix;
-        Printf.eprintf "  images_dir: %s\n" !images_dir;
-        List.iter
-          (fun a -> Printf.eprintf "  secure asset: %s\n" a)
-          (Secure.assets ());
-        Printf.eprintf "TODO: how to print content of conf ?\n"));
-    flush stderr;
-    if !daemon then
-      if Unix.fork () = 0 then (
-        Unix.close Unix.stdin;
-        null_reopen [ Unix.O_WRONLY ] Unix.stdout;
-        null_reopen [ Unix.O_WRONLY ] Unix.stderr)
-      else exit 0;
-    try Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
-    with Sys_error e ->
-      Logs.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e));
-  let with_salt = not !predictable_mode in
-  Wserver.start ~with_salt ?addr:!selected_addr ~port:!selected_port
-    ~timeout:!conn_timeout ~max_pending_requests:!max_pending_requests
-    ~n_workers:!n_workers connection
+  Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+    ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
+    (connection ~secret_salt)
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2013,7 +2035,7 @@ let manage_cgi_timeout tmout =
     let _ = Unix.alarm tmout in
     ()
 
-let geneweb_cgi addr script_name contents =
+let geneweb_cgi ~secret_salt addr script_name contents =
   if Sys.unix then manage_cgi_timeout !conn_timeout;
   (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
@@ -2028,7 +2050,7 @@ let geneweb_cgi addr script_name contents =
   let request = add "accept-language" "HTTP_ACCEPT_LANGUAGE" request in
   let request = add "referer" "HTTP_REFERER" request in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
-  connection (Unix.ADDR_UNIX addr, request) script_name contents
+  connection ~secret_salt (Unix.ADDR_UNIX addr, request) script_name contents
 
 let read_input len =
   if len >= 0 then really_input_string stdin len
@@ -2175,6 +2197,7 @@ let main () =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
   in
   let force_cgi = ref false in
+  let cgi_secret_salt : string option ref = ref None in
   let speclist =
     [
       ( "-hd",
@@ -2199,6 +2222,9 @@ let main () =
             @@ String.split_on_char ',' s),
         " Lexicon languages to be cached." );
       ("-cgi", Arg.Set force_cgi, " Force CGI mode.");
+      ( "-cgi_secret_salt",
+        Arg.String (fun s -> cgi_secret_salt := Some s),
+        "<STRING> Add a secret salt to form digests." );
       ( "-etc_prefix",
         Arg.String
           (fun x ->
@@ -2412,7 +2438,6 @@ let main () =
   Util.is_welcome := false;
   if cgi then (
     Wserver.cgi := true;
-    Unix.putenv "SECRET_SALT" (Wserver.generate_secret_salt false);
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
         let len =
@@ -2429,8 +2454,9 @@ let main () =
     let script =
       try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
     in
-    geneweb_cgi addr (Filename.basename script) query)
-  else geneweb_server ()
+    let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
+    geneweb_cgi ~secret_salt addr (Filename.basename script) query)
+  else geneweb_server ~predictable_mode:!predictable_mode ()
 
 let () =
   try main () with
