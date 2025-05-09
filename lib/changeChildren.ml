@@ -71,7 +71,7 @@ let change_child conf base parent_surname changed ip =
         (new_first_name, new_surname, new_occ, ip) )
       :: changed
     in
-    let p =
+    let new_p =
       {
         (Gwdb.gen_person_of_person p) with
         first_name = Gwdb.insert_string base new_first_name;
@@ -79,7 +79,7 @@ let change_child conf base parent_surname changed ip =
         occ = new_occ;
       }
     in
-    Gwdb.patch_person base ip p;
+    Gwdb.patch_person base ip new_p;
     changed)
   else changed
 
