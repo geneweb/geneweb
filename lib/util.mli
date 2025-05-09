@@ -299,7 +299,7 @@ val default_sosa_ref : Config.config -> Gwdb.base -> Gwdb.person option
 val find_sosa_ref : Config.config -> Gwdb.base -> Gwdb.person option
 
 val update_gwf_sosa :
-  Config.config -> Gwdb.base -> Gwdb.iper * (string * string * int) -> unit
+  Config.config -> Gwdb.base -> (Gwdb.iper, _, Gwdb.istr) Def.gen_person -> unit
 
 val get_request_string : Config.config -> string
 (** Returns request string. Request string has format {i scriptname?querystring} where

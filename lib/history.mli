@@ -7,7 +7,7 @@ val file_name : Config.config -> string
 val record :
   Config.config ->
   Gwdb.base ->
-  (Gwdb.iper, Gwdb.iper, Gwdb.ifam, string) Def.base_changed ->
+  (Gwdb.iper, Gwdb.iper, Gwdb.ifam, Gwdb.istr) Def.base_changed ->
   string ->
   unit
 (** [record conf change action] records new modification in the history files

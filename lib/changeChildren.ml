@@ -64,14 +64,7 @@ let change_child conf base parent_surname changed ip =
     let ipl = Gutil.person_ht_find_all base key in
     check_conflict base p key new_occ ipl;
     Image.rename_portrait conf base p (new_first_name, new_surname, new_occ);
-    (* On ajoute les enfants dans le type Change_children_name       *)
-    (* pour la future mise à jour de l'historique et du fichier gwf. *)
-    let changed =
-      ( (Gwdb.p_first_name base p, Gwdb.p_surname base p, Gwdb.get_occ p, ip),
-        (new_first_name, new_surname, new_occ, ip) )
-      :: changed
-    in
-    let p =
+    let new_p =
       {
         (Gwdb.gen_person_of_person p) with
         first_name = Gwdb.insert_string base new_first_name;
@@ -79,7 +72,10 @@ let change_child conf base parent_surname changed ip =
         occ = new_occ;
       }
     in
-    Gwdb.patch_person base ip p;
+    (* On ajoute les enfants dans le type Change_children_name       *)
+    (* pour la future mise à jour de l'historique et du fichier gwf. *)
+    let changed = (Gwdb.gen_person_of_person p, new_p) :: changed in
+    Gwdb.patch_person base ip new_p;
     changed)
   else changed
 

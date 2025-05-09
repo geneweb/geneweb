@@ -447,10 +447,7 @@ let print_kill_ancestors conf base =
           let nb_fam = ref 0 in
           MergeInd.kill_ancestors conf base false p nb_ind nb_fam;
           Util.commit_patches conf base;
-          let changed =
-            Def.U_Kill_ancestors
-              (Util.string_gen_person base (Gwdb.gen_person_of_person p))
-          in
+          let changed = Def.U_Kill_ancestors (Gwdb.gen_person_of_person p) in
           History.record conf base changed "ka";
           print_killed conf base p !nb_ind !nb_fam
       | None -> Hutil.incorrect_request conf)

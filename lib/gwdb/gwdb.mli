@@ -43,3 +43,5 @@ type person_reference = private {
 }
 
 val person_reference : base -> person -> person_reference
+val person_reference' : base -> (_, _, istr) Def.gen_person -> person_reference
+val person_reference_key : person_reference -> string

@@ -190,8 +190,7 @@ let print_change_ok conf base p =
     in
     Util.commit_patches conf base;
     let changed =
-      Def.U_Change_children_name
-        (Util.string_gen_person base (Gwdb.gen_person_of_person p), changed)
+      Def.U_Change_children_name (Gwdb.gen_person_of_person p, changed)
     in
     History.record conf base changed "cn";
     print_change_done conf base p)
