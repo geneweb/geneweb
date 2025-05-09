@@ -1599,7 +1599,7 @@ let write_default_sosa conf key =
   Sys.rename fname (fname ^ "~");
   try Sys.rename tmp_fname fname with Sys_error _ -> ()
 
-let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
+let update_gwf_sosa conf base person =
   let sosa_ref_key =
     match snd conf.Config.default_sosa_ref with
     | Some p ->
@@ -1608,9 +1608,17 @@ let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
         ^ " " ^ Gwdb.p_surname base p
     | None -> ""
   in
-  let new_key = fn ^ "." ^ string_of_int occ ^ " " ^ sn in
-  if ip = fst conf.Config.default_sosa_ref && new_key != sosa_ref_key then
-    write_default_sosa conf new_key
+  let new_key =
+    Gwdb.sou base person.Def.first_name
+    ^ "."
+    ^ string_of_int person.Def.occ
+    ^ " "
+    ^ Gwdb.sou base person.Def.surname
+  in
+  if
+    person.Def.key_index = fst conf.Config.default_sosa_ref
+    && new_key != sosa_ref_key
+  then write_default_sosa conf new_key
 
 let create_topological_sort conf base =
   match p_getenv conf.Config.env "opt" with

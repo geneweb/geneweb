@@ -49,15 +49,13 @@ let slash_name_of_key fn sn occ =
     [Retour] : string array
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let diff_visibility conf base op np =
-  let k = slash_name_of_key np.Def.first_name np.surname np.occ in
+  let k =
+    slash_name_of_key
+      (Gwdb.sou base np.Def.first_name)
+      (Gwdb.sou base np.surname) np.occ
+  in
   let empty_union = { Def.family = [||] } in
   let empty_ascend = { Def.parents = None; consang = Adef.fix (-1) } in
-  let op =
-    Futil.map_person_ps Fun.id
-      (fun ?format:_ -> Gwdb.insert_string base ~format:`Html)
-      op
-  in
-  let np = Futil.map_person_ps Fun.id (Gwdb.insert_string base) np in
   let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
   let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
   let tmp_conf = { conf with Config.wizard = false; friend = false } in
@@ -69,8 +67,9 @@ let diff_visibility conf base op np =
 
 type kind_diff =
   | Diff_person of
-      (Gwdb.iper, Gwdb.iper, string) Def.gen_person
-      * (Gwdb.iper, Gwdb.iper, string) Def.gen_person
+      Gwdb.base
+      * (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person
+      * (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person
   | Diff_string of (string * string * int) * (string * string * int)
 
 (* ********************************************************************** *)
@@ -87,9 +86,17 @@ type kind_diff =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let diff_key d =
   match d with
-  | Diff_person (op, np) ->
-      let o_key = slash_name_of_key op.first_name op.surname op.occ in
-      let n_key = slash_name_of_key np.first_name np.surname np.occ in
+  | Diff_person (base, op, np) ->
+      let o_key =
+        slash_name_of_key
+          (Gwdb.sou base op.first_name)
+          (Gwdb.sou base op.surname) op.occ
+      in
+      let n_key =
+        slash_name_of_key
+          (Gwdb.sou base np.first_name)
+          (Gwdb.sou base np.surname) np.occ
+      in
       if o_key <> n_key then [| "KEY"; o_key; n_key |] else [||]
   | Diff_string ((ofn, osn, oocc), (fn, sn, occ)) ->
       let o_key = slash_name_of_key ofn osn oocc in
@@ -117,17 +124,17 @@ let diff_person conf base changed =
   | Def.U_Add_person _ | U_Delete_person _ -> [||]
   | U_Modify_person (o, n) ->
       Array.append
-        (diff_key (Diff_person (o, n)))
+        (diff_key (Diff_person (base, o, n)))
         (diff_visibility conf base o n)
   | U_Merge_person (p1, p2, p) ->
       let args_p1 =
         Array.append
-          (diff_key (Diff_person (p1, p)))
+          (diff_key (Diff_person (base, p1, p)))
           (diff_visibility conf base p1 p)
       in
       let args_p2 =
         Array.append
-          (diff_key (Diff_person (p2, p)))
+          (diff_key (Diff_person (base, p2, p)))
           (diff_visibility conf base p2 p)
       in
       Array.append args_p1 args_p2
@@ -141,11 +148,18 @@ let diff_person conf base changed =
       [||]
   | U_Change_children_name (_, l) ->
       List.fold_left
-        (fun accu ((ofn, osn, oocc, _), (fn, sn, occ, _)) ->
+        (fun accu (old_person, new_person) ->
           Array.append accu
-            (diff_key (Diff_string ((ofn, osn, oocc), (fn, sn, occ)))))
+            (diff_key
+               (Diff_string
+                  ( ( Gwdb.sou base old_person.Def.first_name,
+                      Gwdb.sou base old_person.Def.surname,
+                      old_person.Def.occ ),
+                    ( Gwdb.sou base new_person.Def.first_name,
+                      Gwdb.sou base new_person.Def.surname,
+                      new_person.Def.occ ) ))))
         [||] l
-  | U_Multi (o, n, _) -> diff_key (Diff_person (o, n))
+  | U_Multi (o, n, _) -> diff_key (Diff_person (base, o, n))
   | U_Notes (_, _) | U_Kill_ancestors _ -> [||]
 
 (* ************************************************************************ *)
@@ -186,7 +200,11 @@ let notify_change conf base changed action =
         | U_Kill_ancestors p
         | U_Change_children_name (p, _)
         | U_Multi (_, p, _) ->
-            let key = slash_name_of_key p.first_name p.surname p.occ in
+            let key =
+              slash_name_of_key
+                (Gwdb.sou base p.first_name)
+                (Gwdb.sou base p.surname) p.occ
+            in
             [| key; Gwdb.string_of_iper p.key_index |]
         | U_Notes (Some num, file) -> [| file; string_of_int num |]
         | U_Notes (None, file) -> [| file |]
@@ -239,7 +257,8 @@ let gen_record conf base changed action =
         | U_Kill_ancestors p
         | U_Change_children_name (p, _)
         | U_Multi (_, p, _) ->
-            p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
+            Gwdb.sou base p.first_name ^ "." ^ string_of_int p.occ ^ " "
+            ^ Gwdb.sou base p.surname
         | U_Notes (Some num, file) ->
             let s = string_of_int num in
             if file = "" then s else file ^ "/" ^ s
@@ -285,21 +304,14 @@ let gen_record conf base changed action =
 let record conf base changed action =
   (* Mise à jour du fichier gwf si le sosa_ref a changé. *)
   (match changed with
-  | Def.U_Modify_person (_, p) ->
-      let fn, sn, occ, ip = (p.first_name, p.surname, p.occ, p.key_index) in
-      Util.update_gwf_sosa conf base (ip, (fn, sn, occ))
+  | Def.U_Modify_person (_, p) -> Util.update_gwf_sosa conf base p
   | U_Merge_person (p1, _, p) ->
-      let fn, sn, occ, ip = (p1.first_name, p1.surname, p1.occ, p1.key_index) in
-      Util.update_gwf_sosa conf base (ip, (fn, sn, occ));
+      Util.update_gwf_sosa conf base p1;
       (* On n'a pas besoin de faire un update sur "p2" *)
       (* parce qu'on le fait sur p dans tous les cas.  *)
-      let fn, sn, occ, ip = (p.first_name, p.surname, p.occ, p.key_index) in
-      Util.update_gwf_sosa conf base (ip, (fn, sn, occ))
+      Util.update_gwf_sosa conf base p
   | U_Change_children_name (_, l) ->
-      List.iter
-        (fun (_, (fn, sn, occ, ip)) ->
-          Util.update_gwf_sosa conf base (ip, (fn, sn, occ)))
-        l
+      List.iter (fun (_, person) -> Util.update_gwf_sosa conf base person) l
   | _ -> ());
   (* Mise à jour du fichier historique et appel de notify_change. *)
   gen_record conf base changed action
@@ -320,9 +332,7 @@ let record conf base changed action =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 let notify conf base action =
   let empty_person = Gwdb.empty_person base Gwdb.dummy_iper in
-  let empty_person =
-    Util.string_gen_person base (Gwdb.gen_person_of_person empty_person)
-  in
+  let empty_person = Gwdb.gen_person_of_person empty_person in
   notify_change conf base (U_Multi (empty_person, empty_person, false)) action
 
 (* Request for history printing *)

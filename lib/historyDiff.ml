@@ -140,18 +140,29 @@ let record_diff conf base changed =
   | Some "yes" when not conf.manitou -> (
       let print_ind_add p =
         let person_file =
-          history_file p.Def.first_name p.Def.surname p.Def.occ
+          history_file
+            (Gwdb.sou base p.Def.first_name)
+            (Gwdb.sou base p.Def.surname)
+            p.Def.occ
         in
         let fname = history_path conf person_file in
-        let gr = make_gen_record conf base false p in
+        let gr =
+          make_gen_record conf base false (Util.string_gen_person base p)
+        in
         write_history_file conf person_file fname gr
       in
       let print_ind_mod o p =
         let o_person_file =
-          history_file o.Def.first_name o.Def.surname o.Def.occ
+          history_file
+            (Gwdb.sou base o.Def.first_name)
+            (Gwdb.sou base o.Def.surname)
+            o.Def.occ
         in
         let person_file =
-          history_file p.Def.first_name p.Def.surname p.Def.occ
+          history_file
+            (Gwdb.sou base p.Def.first_name)
+            (Gwdb.sou base p.Def.surname)
+            p.Def.occ
         in
         let ofname = history_path conf o_person_file in
         let fname = history_path conf person_file in
@@ -161,11 +172,15 @@ let record_diff conf base changed =
            let () = create_history_dirs conf person_file in
            Sys.rename ofname fname
          with Sys_error _ -> ());
-        let gr = make_gen_record conf base false p in
+        let gr =
+          make_gen_record conf base false (Util.string_gen_person base p)
+        in
         if Sys.file_exists fname then
           write_history_file conf person_file fname gr
         else
-          let o_gr = make_gen_record conf base true o in
+          let o_gr =
+            make_gen_record conf base true (Util.string_gen_person base o)
+          in
           write_history_file conf person_file fname o_gr;
           write_history_file conf person_file fname gr
       in
@@ -175,13 +190,21 @@ let record_diff conf base changed =
       | Def.U_Delete_person _ -> ()
       | Def.U_Merge_person (_, o, p) ->
           let o_person_file =
-            history_file o.Def.first_name o.Def.surname o.Def.occ
+            history_file
+              (Gwdb.sou base o.Def.first_name)
+              (Gwdb.sou base o.Def.surname)
+              o.Def.occ
           in
           let person_file =
-            history_file p.Def.first_name p.Def.surname p.Def.occ
+            history_file
+              (Gwdb.sou base p.Def.first_name)
+              (Gwdb.sou base p.Def.surname)
+              p.Def.occ
           in
           let fname = history_path conf person_file in
-          let gr = make_gen_record conf base false p in
+          let gr =
+            make_gen_record conf base false (Util.string_gen_person base p)
+          in
           (* La clé a changé avec la fusion, on reprend l'ancien historique. *)
           if o_person_file <> person_file then (
             let ofname = history_path conf o_person_file in
@@ -196,7 +219,12 @@ let record_diff conf base changed =
       | Def.U_Modify_family (p, _, f)
       | Def.U_Merge_family (p, _, _, f)
       | Def.U_Add_parent (p, f) ->
-          let p_file = history_file p.Def.first_name p.Def.surname p.Def.occ in
+          let p_file =
+            history_file
+              (Gwdb.sou base p.Def.first_name)
+              (Gwdb.sou base p.Def.surname)
+              p.Def.occ
+          in
           let p_fname = history_path conf p_file in
           let cpl = Gwdb.foi base f.Def.fam_index in
           let isp = Gutil.spouse p.Def.key_index cpl in
@@ -210,7 +238,9 @@ let record_diff conf base changed =
           let sp_fname = history_path conf sp_file in
           let gen_sp = Gwdb.gen_person_of_person sp in
           let gen_sp = Util.string_gen_person base gen_sp in
-          let gr = make_gen_record conf base false p in
+          let gr =
+            make_gen_record conf base false (Util.string_gen_person base p)
+          in
           write_history_file conf p_file p_fname gr;
           let gr = make_gen_record conf base false gen_sp in
           write_history_file conf sp_file sp_fname gr;
@@ -234,14 +264,24 @@ let record_diff conf base changed =
             (Gwdb.get_children cpl)
       | Def.U_Change_children_name (_, list) ->
           List.iter
-            (fun ((ofn, osn, oocc, _oip), (fn, sn, occ, ip)) ->
-              let o_person_file = history_file ofn osn oocc in
-              let person_file = history_file fn sn occ in
+            (fun (old_person, new_person) ->
+              let o_person_file =
+                history_file
+                  (Gwdb.sou base old_person.Def.first_name)
+                  (Gwdb.sou base old_person.Def.surname)
+                  old_person.Def.occ
+              in
+              let person_file =
+                history_file
+                  (Gwdb.sou base new_person.Def.first_name)
+                  (Gwdb.sou base new_person.Def.surname)
+                  new_person.Def.occ
+              in
               if o_person_file <> person_file then (
                 let ofname = history_path conf o_person_file in
                 let fname = history_path conf person_file in
                 (try Sys.rename ofname fname with Sys_error _ -> ());
-                let p = Gwdb.poi base ip in
+                let p = Gwdb.poi base new_person.Def.key_index in
                 let p =
                   Futil.map_person_ps Fun.id
                     (fun ?format:_ -> Gwdb.sou base)

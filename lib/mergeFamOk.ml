@@ -278,10 +278,9 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
                 else Gwdb.poi base (Adef.father cpl)
             | None -> Gwdb.poi base (Adef.father cpl)
           in
-          Util.string_gen_person base (Gwdb.gen_person_of_person p)
+          Gwdb.gen_person_of_person p
         in
-        let n_f = Util.string_gen_family base fam in
-        Def.U_Merge_family (gen_p, o_f1, o_f2, n_f)
+        Def.U_Merge_family (gen_p, o_f1, o_f2, fam)
       in
       History.record conf base changed "ff";
       print_mod_merge_ok conf base wl cpl des
@@ -291,10 +290,10 @@ let print_mod_merge o_conf base =
     match Util.p_getenv o_conf.Config.env i with
     | Some i ->
         let fam = Gwdb.foi base (Gwdb.ifam_of_string i) in
-        Util.string_gen_family base (Gwdb.gen_family_of_family fam)
+        Gwdb.gen_family_of_family fam
     | None ->
         let fam = Gwdb.foi base Gwdb.dummy_ifam in
-        Util.string_gen_family base (Gwdb.gen_family_of_family fam)
+        Gwdb.gen_family_of_family fam
   in
   let o_f1 = get_gen_family "i" in
   let o_f2 = get_gen_family "i2" in

@@ -1005,7 +1005,7 @@ let effective_del_commit conf base op =
   History.record conf base changed "dp"
 
 let effective_del conf base p =
-  let op = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+  let op = Gwdb.gen_person_of_person p in
   effective_del_no_commit base op;
   effective_del_commit conf base op
 
@@ -1174,7 +1174,7 @@ let print_add o_conf base =
         let u = { Def.family = Gwdb.get_family (Gwdb.poi base p.key_index) } in
         let wl = all_checks_person base p a u in
         Util.commit_patches conf base;
-        let changed = Def.U_Add_person (Util.string_gen_person base p) in
+        let changed = Def.U_Add_person p in
         History.record conf base changed "ap";
         print_add_ok conf base wl p
 
@@ -1208,14 +1208,11 @@ let print_mod ?prerr o_conf base =
   let o_p =
     match Util.p_getenv o_conf.Config.env "i" with
     | Some ip ->
-        Util.string_gen_person base
-          (Gwdb.gen_person_of_person (Gwdb.poi base (Gwdb.iper_of_string ip)))
-    | None ->
-        Util.string_gen_person base
-          (Gwdb.gen_person_of_person (Gwdb.poi base Gwdb.dummy_iper))
+        Gwdb.gen_person_of_person (Gwdb.poi base (Gwdb.iper_of_string ip))
+    | None -> Gwdb.gen_person_of_person (Gwdb.poi base Gwdb.dummy_iper)
   in
-  let ofn = o_p.first_name in
-  let osn = o_p.surname in
+  let ofn = Gwdb.sou base o_p.first_name in
+  let osn = Gwdb.sou base o_p.surname in
   let oocc = o_p.occ in
   let key = (Name.lower ofn, Name.lower osn, oocc) in
   let conf = Update.update_conf o_conf in
@@ -1264,7 +1261,7 @@ let print_mod ?prerr o_conf base =
       all_checks_person base p a u
     in
     Util.commit_patches conf base;
-    let changed = Def.U_Modify_person (o_p, Util.string_gen_person base p) in
+    let changed = Def.U_Modify_person (o_p, p) in
     History.record conf base changed "mp";
     Update.delete_topological_sort_v conf base;
     print_mod_ok conf base wl pgl p ofn osn oocc
@@ -1276,7 +1273,7 @@ let print_change_event_order conf base =
   | None -> Hutil.incorrect_request conf
   | Some s ->
       let p = Gwdb.poi base (Gwdb.iper_of_string s) in
-      let o_p = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+      let o_p = Gwdb.gen_person_of_person p in
       (* TODO_EVENT use Event.sorted_event *)
       let ht = Hashtbl.create 50 in
       let _ =
@@ -1311,6 +1308,6 @@ let print_change_event_order conf base =
         all_checks_person base p a u
       in
       Util.commit_patches conf base;
-      let changed = Def.U_Modify_person (o_p, Util.string_gen_person base p) in
+      let changed = Def.U_Modify_person (o_p, p) in
       History.record conf base changed "mp";
       print_change_event_order_ok conf base wl p

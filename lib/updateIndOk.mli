@@ -1,11 +1,11 @@
 val effective_del_no_commit :
-  Gwdb.base -> (Gwdb.iper, Gwdb.iper, string) Def.gen_person -> unit
+  Gwdb.base -> (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person -> unit
 (** Removes a person from the base *)
 
 val effective_del_commit :
   Config.config ->
   Gwdb.base ->
-  (Gwdb.iper, Gwdb.iper, string) Def.gen_person ->
+  (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person ->
   unit
 (** Adds to the diff the deletion of a person *)
 

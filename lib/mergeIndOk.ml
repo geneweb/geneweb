@@ -494,20 +494,18 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
     UpdateIndOk.all_checks_person base p a u
   in
   Util.commit_patches conf base;
-  History.record conf base
-    (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p))
-    "fp";
+  History.record conf base (U_Merge_person (o_p1, o_p2, p)) "fp";
   Notes.update_notes_links_db base (Def.NLDB.PgInd o_p2.key_index) "";
   Update.delete_topological_sort conf base;
   let db = Gwdb.read_nldb base in
-  let ofn1 = o_p1.first_name in
-  let osn1 = o_p1.surname in
+  let ofn1 = Gwdb.sou base o_p1.first_name in
+  let osn1 = Gwdb.sou base o_p1.surname in
   let oocc1 = o_p1.occ in
   let pgl1 =
     Perso.links_to_ind conf base db (Name.lower ofn1, Name.lower osn1, oocc1)
   in
-  let ofn2 = o_p2.first_name in
-  let osn2 = o_p2.surname in
+  let ofn2 = Gwdb.sou base o_p2.first_name in
+  let osn2 = Gwdb.sou base o_p2.surname in
   let oocc2 = o_p2.occ in
   let pgl2 =
     Perso.links_to_ind conf base db (Name.lower ofn2, Name.lower osn2, oocc2)

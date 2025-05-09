@@ -16,7 +16,8 @@ val change_children :
   Gwdb.base ->
   string ->
   Gwdb.iper list ->
-  ((string * string * int * Gwdb.iper) * (string * string * int * Gwdb.iper))
+  ((Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person
+  * (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person)
   list
 (** Change all person's children by looking up information to update inside [conf.env] that was send by the form.
     Changes also children's personal image name. Could raise [ChangeChildrenConflict] if new children's key
