@@ -47,7 +47,10 @@
             %else;^
             %end;
             %if;(nb_families>1)%apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end; %spouse.first_name; %spouse.surname;
-            [:] %comment;
+            [:]
+            %if;has_comment;%comment;%end;
+            %if;(has_comment and has_marriage_note)%nl;%end;
+            %if;has_marriage_note;%marriage_note;%end;
           </li>
         </ul>
       %end;
@@ -75,7 +78,7 @@
     %end;
     %foreach;family;
       %if;(has_comment or has_marriage_note)
-        <h3>[*marriage notes/marriages notes]1%sp;
+        <h3>[*marriage notes/marriages notes]0%sp;
         [with] %spouse.first_name; %spouse.surname;</h3>
       %end;
       <blockquote>%nn;
