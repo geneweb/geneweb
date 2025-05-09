@@ -1602,22 +1602,15 @@ let write_default_sosa conf key =
 let update_gwf_sosa conf base person =
   let sosa_ref_key =
     match snd conf.Config.default_sosa_ref with
-    | Some p ->
-        Gwdb.p_first_name base p ^ "."
-        ^ string_of_int (Gwdb.get_occ p)
-        ^ " " ^ Gwdb.p_surname base p
+    | Some p -> p |> Gwdb.person_reference base |> Gwdb.person_reference_key
     | None -> ""
   in
   let new_key =
-    Gwdb.sou base person.Def.first_name
-    ^ "."
-    ^ string_of_int person.Def.occ
-    ^ " "
-    ^ Gwdb.sou base person.Def.surname
+    person |> Gwdb.person_reference' base |> Gwdb.person_reference_key
   in
   if
     person.Def.key_index = fst conf.Config.default_sosa_ref
-    && new_key != sosa_ref_key
+    && new_key <> sosa_ref_key
   then write_default_sosa conf new_key
 
 let create_topological_sort conf base =
