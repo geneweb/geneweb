@@ -279,9 +279,12 @@ type person_reference = {
   occurrence_number : int;
 }
 
-let person_reference base person =
+let person_reference' base person =
   {
-    surname = Name.lower @@ p_surname base person;
-    first_name = Name.lower @@ p_first_name base person;
-    occurrence_number = get_occ person;
+    surname = Name.lower @@ sou base person.Def.surname;
+    first_name = Name.lower @@ sou base person.Def.first_name;
+    occurrence_number = person.Def.occ;
   }
+
+let person_reference base person =
+  person |> gen_person_of_person |> person_reference' base
