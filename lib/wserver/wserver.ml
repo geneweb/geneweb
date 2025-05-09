@@ -2,6 +2,9 @@
 
 module Logs = Geneweb_logs.Logs
 
+type handler =
+  Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit
+
 let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
@@ -325,21 +328,9 @@ let accept_connections ~timeout ~n_workers callback socket =
   if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
   else accept_connections_windows socket
 
-let generate_secret_salt with_salt =
-  if with_salt then (
-    Random.self_init ();
-    string_of_int @@ Random.bits ())
-  else ""
-
-let start ?(with_salt = true) ?addr ~port ?timeout ~max_pending_requests
-    ~n_workers callback =
-  let timeout = match timeout with None -> 0 | Some t -> t in
+let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
   | exception Not_found ->
-      Printf.eprintf "WSERVER Not_found\n";
-      (* A secret salt is added to the environment to ensure that workers
-         use the same salt for digests on both Unix and Windows platforms. *)
-      Unix.putenv "SECRET_SALT" @@ generate_secret_salt with_salt;
       check_stopping ();
       let addr =
         match addr with
