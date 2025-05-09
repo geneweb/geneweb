@@ -17,7 +17,7 @@ val history_path : Config.config -> string -> string
 val record_diff :
   Config.config ->
   Gwdb.base ->
-  (Gwdb.iper, Gwdb.iper, Gwdb.ifam, string) Def.base_changed ->
+  (Gwdb.iper, Gwdb.iper, Gwdb.ifam, Gwdb.istr) Def.base_changed ->
   unit
 (** [record_diff conf base change] records new updated information [change]
     inside the history files of concerned by [change] persons. *)

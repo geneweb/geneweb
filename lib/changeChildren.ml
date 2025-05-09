@@ -74,11 +74,7 @@ let change_child conf base parent_surname changed ip =
     in
     (* On ajoute les enfants dans le type Change_children_name       *)
     (* pour la future mise à jour de l'historique et du fichier gwf. *)
-    let changed =
-      ( (Gwdb.p_first_name base p, Gwdb.p_surname base p, Gwdb.get_occ p, ip),
-        (new_first_name, new_surname, new_occ, ip) )
-      :: changed
-    in
+    let changed = (Gwdb.gen_person_of_person p, new_p) :: changed in
     Gwdb.patch_person base ip new_p;
     changed)
   else changed

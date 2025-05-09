@@ -1098,9 +1098,9 @@ let effective_del conf base ip fam =
         if ip = Gwdb.get_mother fam then Gwdb.poi base (Gwdb.get_mother fam)
         else Gwdb.poi base (Gwdb.get_father fam)
       in
-      Util.string_gen_person base (Gwdb.gen_person_of_person p)
+      Gwdb.gen_person_of_person p
     in
-    let gen_fam = Util.string_gen_family base (Gwdb.gen_family_of_family fam) in
+    let gen_fam = Gwdb.gen_family_of_family fam in
     Def.U_Delete_family (gen_p, gen_fam)
   in
   History.record conf base changed "df"
@@ -1326,7 +1326,6 @@ let print_add o_conf base =
           all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
         in
         let changed, act =
-          let fam = Util.string_gen_family base fam in
           let ip, act =
             match Util.p_getenv conf.Config.env "ip" with
             | Some i -> (
@@ -1341,16 +1340,10 @@ let print_add o_conf base =
           in
           match act with
           | "af" ->
-              let gen_p =
-                Util.string_gen_person base
-                  (Gwdb.gen_person_of_person (Gwdb.poi base ip))
-              in
+              let gen_p = Gwdb.gen_person_of_person (Gwdb.poi base ip) in
               (Def.U_Add_family (gen_p, fam), "af")
           | _ ->
-              let gen_p =
-                Util.string_gen_person base
-                  (Gwdb.gen_person_of_person (Gwdb.poi base ip))
-              in
+              let gen_p = Gwdb.gen_person_of_person (Gwdb.poi base ip) in
               (U_Add_parent (gen_p, fam), "aa")
         in
         Util.commit_patches conf base;
@@ -1408,7 +1401,6 @@ let print_add_parents o_conf base =
                 if Array.exists (( = ) ifam) mfam then (
                   let f = Gwdb.foi base ifam in
                   let sfam = Gwdb.gen_family_of_family f in
-                  let o_f = Util.string_gen_family base sfam in
                   let scpl = Gwdb.gen_couple_of_family f in
                   let sdes =
                     {
@@ -1425,13 +1417,11 @@ let print_add_parents o_conf base =
                   let wl = ref [] in
                   let warning w = wl := w :: !wl in
                   CheckItem.family ~onchange:true base warning ifam f';
-                  let n_f = Util.string_gen_family base sfam in
                   let hr =
                     Def.U_Modify_family
-                      ( Gwdb.poi base child |> Gwdb.gen_person_of_person
-                        |> Util.string_gen_person base,
-                        o_f,
-                        n_f )
+                      ( Gwdb.poi base child |> Gwdb.gen_person_of_person,
+                        sfam,
+                        sfam )
                   in
                   History.record conf base hr "mf";
                   Update.delete_topological_sort conf base;
@@ -1477,7 +1467,7 @@ let print_mod o_conf base =
       | Some i -> Gwdb.ifam_of_string i
       | None -> Gwdb.dummy_ifam
     in
-    Util.string_gen_family base (Gwdb.gen_family_of_family (Gwdb.foi base ifam))
+    Gwdb.gen_family_of_family (Gwdb.foi base ifam)
   in
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
@@ -1513,12 +1503,8 @@ let print_mod o_conf base =
         | Some i -> Gwdb.iper_of_string i
         | None -> Gwdb.dummy_iper
       in
-      let p =
-        Util.string_gen_person base
-          (Gwdb.gen_person_of_person (Gwdb.poi base ip))
-      in
-      let n_f = Util.string_gen_family base fam in
-      Def.U_Modify_family (p, o_f, n_f)
+      let p = Gwdb.gen_person_of_person (Gwdb.poi base ip) in
+      Def.U_Modify_family (p, o_f, fam)
     in
     History.record conf base changed "mf";
     Update.delete_topological_sort conf base;
@@ -1537,7 +1523,7 @@ let print_inv conf base =
       effective_inv conf base (Gwdb.get_iper p) p ifam;
       Util.commit_patches conf base;
       let changed =
-        let gen_p = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+        let gen_p = Gwdb.gen_person_of_person p in
         Def.U_Invert_family (gen_p, ifam)
       in
       History.record conf base changed "if";
@@ -1557,7 +1543,7 @@ let print_change_order_ok conf base =
       effective_chg_order base (Gwdb.get_iper p) p ifam n;
       Util.commit_patches conf base;
       let changed =
-        let gen_p = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+        let gen_p = Gwdb.gen_person_of_person p in
         Def.U_Invert_family (gen_p, ifam)
       in
       History.record conf base changed "if";
@@ -1570,7 +1556,7 @@ let print_change_event_order conf base =
   | Some s ->
       let ifam = Gwdb.ifam_of_string s in
       let fam = Gwdb.foi base ifam in
-      let o_f = Util.string_gen_family base (Gwdb.gen_family_of_family fam) in
+      let o_f = Gwdb.gen_family_of_family fam in
       (* TODO_EVENT use Event.sorted_event *)
       let ht = Hashtbl.create 50 in
       let () =
@@ -1620,12 +1606,8 @@ let print_change_event_order conf base =
           | Some i -> Gwdb.iper_of_string i
           | None -> Gwdb.dummy_iper
         in
-        let p =
-          Util.string_gen_person base
-            (Gwdb.gen_person_of_person (Gwdb.poi base ip))
-        in
-        let n_f = Util.string_gen_family base fam in
-        Def.U_Modify_family (p, o_f, n_f)
+        let p = Gwdb.gen_person_of_person (Gwdb.poi base ip) in
+        Def.U_Modify_family (p, o_f, fam)
       in
       History.record conf base changed "mf";
       print_change_event_order_ok conf base (wl, []) cpl des

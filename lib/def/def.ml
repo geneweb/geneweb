@@ -317,7 +317,8 @@ type ('iper, 'person, 'family, 'string) base_changed =
       * ('person, 'family, 'string) gen_family
   | U_Change_children_name of
       ('iper, 'person, 'string) gen_person
-      * ((string * string * int * 'person) * (string * string * int * 'person))
+      * (('iper, 'person, 'string) gen_person
+        * ('iper, 'person, 'string) gen_person)
         list
   | U_Add_parent of
       ('iper, 'person, 'string) gen_person
