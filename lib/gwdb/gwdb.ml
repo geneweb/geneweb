@@ -288,3 +288,6 @@ let person_reference' base person =
 
 let person_reference base person =
   person |> gen_person_of_person |> person_reference' base
+
+let person_reference_key { surname; first_name; occurrence_number } =
+  Printf.sprintf "%s.%d %s" first_name occurrence_number surname
