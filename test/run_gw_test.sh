@@ -131,7 +131,7 @@ if test -n "$TAGS"; then
     gwdopt="$gwdopt --allowed_tags $TAGS"
 fi
 if test "$test_diff" || test "$set_ref"; then
-    gwdopt="$gwdopt -predictable_mode"
+    gwdopt="$gwdopt -predictable_mode -n_workers 0"
 fi
 
 pgrep gwd >/dev/null && \
@@ -148,8 +148,6 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -lang en \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
-  -n_workers 0 \
-  -predictable_mode \
   2>> $GWDLOG &
 fi
 
