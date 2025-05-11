@@ -1203,10 +1203,7 @@ let print_wid_hei conf fname =
   | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
   | Error () -> ()
 
-let rec interp_ast :
-          'a 'b.
-          config -> ('a, 'b) interp_fun -> 'a Env.t -> 'b -> ast list -> unit =
- fun conf ifun env ->
+let rec interp_ast conf ifun env =
   let m_env = ref env in
   let rec eval_ast env ep a = string_of_expr_val (eval_ast_expr env ep a)
   and eval_ast_list env ep = function
@@ -1464,16 +1461,16 @@ and print_var print_ast_list conf ifun env ep loc sl =
                 Format.sprintf "%%%s?" (String.concat "." sl)
                 :: !GWPARAM.errors_other;
               Output.printf conf " %%%s?" (String.concat "." sl))
-      | sl -> print_variable conf sl)
+      | sl -> print_variable ep conf sl)
   in
   let eval_var = eval_var conf ifun env ep loc in
   print_var1 eval_var sl
 
-and print_simple_variable conf = function
-  | "base_header" -> include_hed_trl conf "hed"
-  | "base_trailer" -> include_hed_trl conf "trl"
+and print_simple_variable dummy conf = function
+  | "base_header" -> include_hed_trl dummy conf "hed"
+  | "base_trailer" -> include_hed_trl dummy conf "trl"
   | "body_prop" -> print_body_prop conf
-  | "copyright" -> print_copyright conf
+  | "copyright" -> print_copyright dummy conf
   | "number_of_bases" ->
       Output.print_sstring conf
         (string_of_int (List.length (Util.get_bases_list ())))
@@ -1509,36 +1506,67 @@ and print_simple_variable conf = function
       Output.print_sstring conf res
   | _ -> raise Not_found
 
-and print_variable conf sl =
+and print_variable dummy conf sl =
   try Output.print_sstring conf (eval_variable conf sl)
   with Not_found -> (
     try
       match sl with
-      | [ s ] -> print_simple_variable conf s
+      | [ s ] -> print_simple_variable dummy conf s
       | _ -> raise Not_found
     with Not_found ->
       GWPARAM.errors_undef :=
         Format.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
       Output.printf conf " %%%s?" (String.concat "." sl))
 
-and include_hed_trl conf name =
+and include_hed_trl dummy conf name =
   match name with
-  | "hed" -> include_template conf Env.empty name (fun () -> ())
+  | "hed" -> include_template_without_env dummy conf name (fun () -> ())
   | "trl" ->
-      include_template conf Env.empty name (fun () -> ());
+      include_template_without_env dummy conf name (fun () -> ());
       let query_time = Unix.gettimeofday () -. conf.query_start in
       Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
         !GWPARAM.errors_other !GWPARAM.set_vars
   | _ -> ()
 
-and copy_from_templ conf env ic =
+and include_template_without_env dummy conf fname failure =
+  match Util.open_etc_file conf fname with
+  | Some (ic, fname) ->
+      include_begin conf @@ Adef.safe fname;
+      let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
+      close_in ic;
+      let ifun =
+        {
+          eval_var = (fun _ _ _ -> raise Not_found);
+          eval_transl = (fun _ -> eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother = (fun _ -> None);
+          set_vother = (fun _ -> assert false);
+          print_foreach = (fun _ -> raise Not_found);
+        }
+      in
+      Templ_parser.wrap "" (fun () -> interp_ast conf ifun Env.empty dummy astl);
+      include_end conf @@ Adef.safe fname
+  | None -> failure ()
+
+and print_copyright dummy conf =
+  include_template_without_env dummy conf "copyr" (fun () ->
+      Output.print_sstring conf "<hr style=\"margin:0\">\n";
+      Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
+      Output.print_sstring conf "<em>";
+      Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
+      Output.print_sstring conf Version.ver;
+      Output.print_sstring conf "</em>";
+      Output.print_sstring conf "</div>\n";
+      Output.print_sstring conf "<br>\n")
+
+let copy_from_templ conf env ic =
   let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
   close_in ic;
   let ifun =
     {
       eval_var =
         (fun env _ _ -> function
-          | [ s ] -> VVstring (Env.find s env : Adef.encoded_string :> string)
+          | [ s ] -> VVstring ((Env.find s env : Adef.encoded_string) :> string)
           | _ -> raise Not_found);
       eval_transl = (fun _ -> eval_transl conf);
       eval_predefined_apply = (fun _ -> raise Not_found);
@@ -1549,7 +1577,7 @@ and copy_from_templ conf env ic =
   in
   Templ_parser.wrap "" (fun () -> interp_ast conf ifun env () astl)
 
-and include_template conf env fname failure =
+let include_template conf env fname failure =
   match Util.open_etc_file conf fname with
   | Some (ic, fname) ->
       include_begin conf @@ Adef.safe fname;
@@ -1557,15 +1585,5 @@ and include_template conf env fname failure =
       include_end conf @@ Adef.safe fname
   | None -> failure ()
 
-(** Evaluates and prints content of {i cpr} template.
-    If template wasn't found prints basic copyrigth HTML structure. *)
-and print_copyright conf =
-  include_template conf Env.empty "copyr" (fun () ->
-      Output.print_sstring conf "<hr style=\"margin:0\">\n";
-      Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
-      Output.print_sstring conf "<em>";
-      Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
-      Output.print_sstring conf Version.ver;
-      Output.print_sstring conf "</em>";
-      Output.print_sstring conf "</div>\n";
-      Output.print_sstring conf "<br>\n")
+let include_hed_trl = include_hed_trl ()
+let print_copyright = print_copyright ()
