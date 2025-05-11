@@ -553,6 +553,7 @@ let eval_predefined_apply conf _env f vl =
 
 let print_welcome conf base =
   Util.is_welcome := true;
+  Fun.protect ~finally:(fun () -> Util.is_welcome := false) @@ fun () ->
   let env =
     let sosa_ref_l =
       let sosa_ref () = Util.find_sosa_ref conf base in
