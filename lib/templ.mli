@@ -54,4 +54,7 @@ val include_template :
   Config.config -> Adef.encoded_string Env.t -> string -> (unit -> unit) -> unit
 
 val apply_format : Config.config -> int option -> string -> string -> string
+
 val print_copyright : Config.config -> unit
+(** Evaluates and prints content of {i cpr} template.
+    If template wasn't found prints basic copyrigth HTML structure. *)
