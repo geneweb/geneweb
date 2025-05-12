@@ -1,5 +1,8 @@
 include Gwdb_driver
 
+let iper_of_int i = i |> Int.to_string |> iper_of_string
+let ifam_of_int i = i |> Int.to_string |> ifam_of_string
+
 exception Not_plain_text of string
 
 let insert_string base ?format s =

@@ -1,5 +1,3 @@
-(dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
-
 (ocamllex (modules templ_parser))
 
 (library
@@ -18,5 +16,5 @@
 	    geneweb_system_util
             geneweb_log
             markup)
- (modules_without_implementation templAst)
+ (preprocess (pps ppx_deriving.show))
 )

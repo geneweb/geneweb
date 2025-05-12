@@ -17,6 +17,7 @@ type ast =
   | Aop2 of loc * string * ast * ast
   | Aint of loc * string
   | Ainclude of string * ast list
+[@@deriving show]
 
 and loc = string * int * int
 

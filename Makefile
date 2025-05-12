@@ -41,7 +41,6 @@ endif
 	| sed \
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
 	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
-	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
 	> $@ \
 	&& echo " Done!"
 
@@ -67,7 +66,6 @@ hd/etc/version.txt:
 GENERATED_FILES_DEP = \
 	dune-workspace \
 	hd/etc/version.txt \
-	lib/dune \
 	test/dune \
 	lib/gwlib.ml \
 	lib/dev_config.ml \

@@ -19,7 +19,6 @@ bin/gwrepl/dune
 bin/gwu/dune
 bin/setup/dune
 bin/update_nldb/dune
-lib/dune
 lib/util/dune
 test/dune
 
