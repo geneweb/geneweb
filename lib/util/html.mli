@@ -1,4 +1,5 @@
 val map :
+  ?context:[< `Document | `Fragment of string ] ->
   ?escape_attribute:(string -> string) ->
   ?escape_text:(string -> string) ->
   (Markup.signal -> Markup.signal) ->
