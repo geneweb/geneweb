@@ -70,9 +70,6 @@ val http_redirect_permanently : string -> unit
 (** [http_redirect_permanently url] sends the http header where [url]
     represents the Location where the request needs to be redirected. *)
 
-val get_request_and_content : char Stream.t -> string list * Adef.encoded_string
-(** Returns the request from a stream read from a socket. *)
-
 val stop_server : string ref
 (** Name of the file whose presence tells the server to stop (at least
     one request is necessary to unfreeze the server to make it check

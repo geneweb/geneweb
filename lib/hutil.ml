@@ -3,13 +3,14 @@
 let link_to_referer conf =
   let referer = Util.get_referer conf in
   let back = Utf8.capitalize_fst (Util.transl conf "back") in
-  if (referer :> string) <> "" then
-    let open Def in
-    ({|<a href="|} ^<^ referer
-     ^>^ {|"><span class="fa fa-arrow-left fa-lg" title="|} ^ back
-     ^ {|"></span></a>|}
-      :> Adef.safe_string)
-  else Adef.safe ""
+  match referer with
+  | Some referer ->
+      let open Def in
+      ({|<a href="|} ^<^ referer
+       ^>^ {|"><span class="fa fa-arrow-left fa-lg" title="|} ^ back
+       ^ {|"></span></a>|}
+        :> Adef.safe_string)
+  | None -> Adef.safe ""
 
 let gen_print_link_to_welcome f conf right_aligned =
   if right_aligned then
