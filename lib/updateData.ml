@@ -430,7 +430,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
       (* Mise à jour de toutes les personnes concernées. *)
       List.iter
         (fun p ->
-          let o_p = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+          let o_p = Gwdb.gen_person_of_person p in
           let np = update_person conf base old new_input p in
           (if action = "fn" || action = "sn" then
            let pi = np.key_index in
@@ -453,9 +453,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
           (* On met aussi à jour l'historique. *)
           let changed =
             Def.U_Multi
-              ( o_p,
-                Util.string_gen_person base np,
-                if action = "fn" || action = "sn" then true else false )
+              (o_p, np, if action = "fn" || action = "sn" then true else false)
           in
           History.record conf base changed action)
         perl)

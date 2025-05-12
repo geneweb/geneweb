@@ -97,8 +97,7 @@ let print_mod_merge o_conf base =
   let get_gen_person i =
     match Util.p_getenv o_conf.Config.env i with
     | Some i ->
-        Util.string_gen_person base
-          (Gwdb.gen_person_of_person (Gwdb.poi base (Gwdb.iper_of_string i)))
+        Gwdb.gen_person_of_person (Gwdb.poi base (Gwdb.iper_of_string i))
     | None -> assert false
   in
   let o_p1 = get_gen_person "i" in

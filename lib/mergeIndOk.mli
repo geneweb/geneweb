@@ -12,8 +12,8 @@ val reconstitute :
 val effective_mod_merge :
   Config.config ->
   Gwdb.base ->
-  (Gwdb.iper, Gwdb.iper, string) Def.gen_person ->
-  (Gwdb.iper, Gwdb.iper, string) Def.gen_person ->
+  (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person ->
+  (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person ->
   (Gwdb.iper, Update.key, string) Def.gen_person ->
   (Config.config ->
   Gwdb.base ->

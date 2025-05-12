@@ -339,8 +339,8 @@ let merge conf base p1 p2 propose_merge_ind propose_merge_fam =
   if changes_done then Util.commit_patches conf base;
   (if ok then
    let changed =
-     let p1 = Util.string_gen_person base (Gwdb.gen_person_of_person p1) in
-     let p2 = Util.string_gen_person base (Gwdb.gen_person_of_person p2) in
+     let p1 = Gwdb.gen_person_of_person p1 in
+     let p2 = Gwdb.gen_person_of_person p2 in
      Def.U_Merge_person (p2, p1, p1)
    in
    History.record conf base changed "fp");
