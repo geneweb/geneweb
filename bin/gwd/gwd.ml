@@ -55,6 +55,7 @@ let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
 let predictable_mode = ref false
+let skip = ref false
 
 let is_multipart_form =
   let s = "multipart/form-data" in
@@ -2398,9 +2399,15 @@ let main () =
     speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   let gwd_cmd =
+    skip := false;
     Array.fold_left
       (fun acc arg ->
-        if arg.[0] = '-' then acc ^ "<br><b>" ^ arg ^ "</b> " else acc ^ arg)
+        if arg = "-cgi_secret_salt" then skip := true;
+        if arg <> "" && arg.[0] = '-' then acc ^ "<br><b>" ^ arg ^ "</b> "
+        else if !skip then (
+          skip := false;
+          acc ^ "xxx")
+        else acc ^ arg)
       "" Sys.argv
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;

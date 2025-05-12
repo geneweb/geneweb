@@ -139,6 +139,10 @@ rm -f -R $WEB_ROOT/$DISTRIB_NAME
 echo "Copy distribution to WEB_ROOT"
 cp -R $DIR/../$DISTRIB_NAME $WEB_ROOT
 
+#echo "create salt"
+#echo "`date`" > ~/.salt.txt
+#chmod 500 ~/.salt.txt
+
 echo "Open test base"
 
 open "http://localhost/~$USER/cgi-bin/gwd.cgi?b=test"
