@@ -520,9 +520,46 @@ let rec copy_from_stream conf print strm =
           match Stream.peek strm with
           | Some '\n' ->
               let s = parse_upto ']' strm in
-              print
-                "Translations must be on a single line: [string to translate]";
-              print s
+              let lines = String.split_on_char '\n' s in
+              let lines =
+                let rec loop acc1 acc2 lines =
+                  match lines with
+                  | [] -> acc1 :: acc2
+                  | line :: lines ->
+                      if String.length line > 0 && line.[0] = ' ' then
+                        loop (acc1 ^ line) acc2 lines
+                      else loop line (acc1 :: acc2) lines
+                in
+                loop "" [] lines
+              in
+              let lang, s =
+                let rec loop lines =
+                  match lines with
+                  | [] -> ("", "")
+                  | line :: lines ->
+                      let i =
+                        try String.index_from line 0 ':' with Not_found -> -1
+                      in
+                      if
+                        i > 0
+                        && String.length line > i + 2
+                        && line.[i + 1] = ' '
+                      then
+                        let lang = String.sub line 0 i in
+                        if lang = conf.lang then
+                          ( lang,
+                            String.sub line (i + 2) (String.length line - i - 2)
+                          )
+                        else loop lines
+                      else loop lines
+                in
+                loop lines
+              in
+              if lang = "" then
+                print
+                  (transl conf
+                     (String.concat " " (List.rev lines) |> String.trim))
+              else print s
           | _ ->
               let s =
                 let rec loop len =
@@ -550,6 +587,10 @@ let rec copy_from_stream conf print strm =
               let s =
                 let rec loop acc s =
                   if String.length s = 0 then acc
+                  else if s.[0] = '%' then
+                    loop
+                      (acc ^ macro conf s.[1])
+                      (String.sub s 2 (String.length s - 2))
                   else if s.[0] = '%' then
                     loop
                       (acc ^ macro conf s.[1])
@@ -1044,8 +1085,18 @@ let gwdiff ok_file conf =
     print_file conf ok_file
 
 let gwfixbase_check conf = print_file conf "bsi_fix.htm"
+let gwfixutf8_check conf = print_file conf "bsi_fixutf8.htm"
 
 let gwfixbase ok_file conf =
+  let rc =
+    let comm = stringify (Filename.concat !bin_dir conf.comm) in
+    exec_f (comm ^ parameters conf.env)
+  in
+  Printf.eprintf "\n";
+  flush stderr;
+  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+
+let gwfixutf8 ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
     exec_f (comm ^ parameters conf.env)
@@ -1731,6 +1782,10 @@ let setup_comm_ok conf = function
       match p_getenv conf.env "opt" with
       | Some "check" -> gwfixbase_check conf
       | _ -> gwfixbase "gwfix_ok.htm" conf)
+  | "gwfixutf8" -> (
+      match p_getenv conf.env "opt" with
+      | Some "check" -> gwfixbase_check conf
+      | _ -> gwfixbase "gwfixutf8_ok.htm" conf)
   | x ->
       if
         Mutil.start_with "doc/" 0 x
