@@ -520,7 +520,6 @@ let rec copy_from_stream conf print strm =
           match Stream.peek strm with
           | Some '\n' ->
               let s = parse_upto ']' strm in
-<<<<<<< HEAD
               let lines = String.split_on_char '\n' s in
               let lines =
                 let rec loop acc1 acc2 lines =
@@ -530,36 +529,37 @@ let rec copy_from_stream conf print strm =
                       if String.length line > 0 && line.[0] = ' ' then
                         loop (acc1 ^ line) acc2 lines
                       else loop line (acc1 :: acc2) lines
-                in loop "" [] lines
+                in
+                loop "" [] lines
               in
               let lang, s =
                 let rec loop lines =
                   match lines with
-                  | [] -> "", ""
-                  | line :: lines -> 
+                  | [] -> ("", "")
+                  | line :: lines ->
                       let i =
                         try String.index_from line 0 ':' with Not_found -> -1
                       in
-                      if i > 0 && String.length line > i + 2
-                        && line.[i + 1] = ' ' then (
-                          let lang = String.sub line 0 i in
-                          if lang = conf.lang then 
-                            (lang, String.sub line (i + 2)
-                              (String.length line - i - 2))
-                          else
-                            loop lines)
+                      if
+                        i > 0
+                        && String.length line > i + 2
+                        && line.[i + 1] = ' '
+                      then
+                        let lang = String.sub line 0 i in
+                        if lang = conf.lang then
+                          ( lang,
+                            String.sub line (i + 2) (String.length line - i - 2)
+                          )
+                        else loop lines
                       else loop lines
-                in loop lines
+                in
+                loop lines
               in
               if lang = "" then
-                print (transl conf
-                  (String.concat " " (List.rev lines) |> String.trim))
+                print
+                  (transl conf
+                     (String.concat " " (List.rev lines) |> String.trim))
               else print s
-=======
-              print
-                "Translations must be on a single line: [string to translate]";
-              print s
->>>>>>> geneweb/master
           | _ ->
               let s =
                 let rec loop len =
@@ -591,22 +591,16 @@ let rec copy_from_stream conf print strm =
                     loop
                       (acc ^ macro conf s.[1])
                       (String.sub s 2 (String.length s - 2))
+                  else if s.[0] = '%' then
+                    loop
+                      (acc ^ macro conf s.[1])
+                      (String.sub s 2 (String.length s - 2))
                   else
-<<<<<<< HEAD
-                    if s.[0] = '%' then 
-                      loop (acc ^ (macro conf s.[1]))
-                        (String.sub s 2 (String.length s - 2))
-                    else 
-                      loop (acc ^ (String.sub s 0 1))
-                        (String.sub s 1 (String.length s - 1))
-                in loop "" s
-=======
                     loop
                       (acc ^ String.sub s 0 1)
                       (String.sub s 1 (String.length s - 1))
                 in
                 loop "" s
->>>>>>> geneweb/master
               in
               print (split_string "" s))
       | '%' -> (
@@ -1091,9 +1085,7 @@ let gwdiff ok_file conf =
     print_file conf ok_file
 
 let gwfixbase_check conf = print_file conf "bsi_fix.htm"
-
-let gwfixutf8_check conf =
-  print_file conf "bsi_fixutf8.htm"
+let gwfixutf8_check conf = print_file conf "bsi_fixutf8.htm"
 
 let gwfixbase ok_file conf =
   let rc =
@@ -1111,11 +1103,9 @@ let gwfixutf8 ok_file conf =
   in
   Printf.eprintf "\n";
   flush stderr;
-  if rc > 1 then print_file conf "bsi_err.htm"
-  else
-    print_file conf ok_file
+  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
 
-let cache_files_check conf = 
+let cache_files_check conf =
   let in_base =
     match p_getenv conf.env "anon" with Some f -> strip_spaces f | None -> ""
   in
@@ -1793,7 +1783,7 @@ let setup_comm_ok conf = function
       | Some "check" -> gwfixbase_check conf
       | _ -> gwfixbase "gwfix_ok.htm" conf)
   | "gwfixutf8" -> (
-       begin match p_getenv conf.env "opt" with
+      match p_getenv conf.env "opt" with
       | Some "check" -> gwfixbase_check conf
       | _ -> gwfixbase "gwfixutf8_ok.htm" conf)
   | x ->
