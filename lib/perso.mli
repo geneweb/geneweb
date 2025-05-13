@@ -28,9 +28,6 @@ val interp_notempl_with_menu :
 val print : ?no_headers:bool -> config -> base -> person -> unit
 (** Displays the HTML page of a person *)
 
-val print_what_links : config -> base -> person -> unit
-(** Displays links to pages associated to the person *)
-
 val get_linked_page : config -> base -> person -> string -> Adef.safe_string
 val get_birth_text : config -> person -> bool -> Adef.safe_string
 val get_baptism_text : config -> person -> bool -> Adef.safe_string
