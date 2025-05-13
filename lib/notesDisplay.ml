@@ -4,6 +4,95 @@ open Config
 open Util
 open Notes
 
+(* FIXME code copied/adapted from MergeInd. To be factorized *)
+let test_ancestor conf base p1 p2 =
+  let max =
+    match List.assoc_opt "restrict_note_max" conf.base_env with
+    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
+    | None -> 32
+  in
+  let module IperSet = Util.IperSet in
+  let ip1 = Gwdb.get_iper p1 in
+  let ip2 = Gwdb.get_iper p2 in
+  if ip1 = ip2 then true
+  else
+    let rec loop n set = function
+      | [] -> false
+      | ip :: tl when n > 0 -> (
+          if IperSet.mem ip set then loop n set tl
+          else if ip = ip1 then true
+          else
+            let set = IperSet.add ip set in
+            match Gwdb.get_parents (Gwdb.poi base ip) with
+            | Some ifam ->
+                let cpl = Gwdb.foi base ifam in
+                loop (n - 1) set
+                  (Gwdb.get_father cpl :: Gwdb.get_mother cpl :: tl)
+            | None -> loop n set tl)
+      | _ -> false
+    in
+    loop max IperSet.empty [ ip2 ]
+(* n generations > 2^(n+1) *)
+
+let is_ancestor conf base anc =
+  let restrict_for_spouses =
+    try List.assoc "restrict_for_spouses" conf.base_env = "yes"
+    with Not_found -> false
+  in
+
+  (* anc is [[fn/sn/oc]]; Return true if anc is one ancestor of conf.user_iper *)
+  let bad_format n =
+    Geneweb_logs.Logs.syslog `LOG_WARNING
+      (Printf.sprintf "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
+  in
+  if String.length anc <= 4 then (
+    bad_format 1;
+    false)
+  else
+    let anc = String.sub anc 2 (String.length anc - 4) in
+    let parts = String.split_on_char '/' anc in
+    if List.length parts <> 3 then (
+      bad_format 2;
+      false)
+    else
+      let fn = List.nth parts 0 |> Name.lower in
+      let sn = List.nth parts 1 |> Name.lower in
+      let oc =
+        try int_of_string (List.nth parts 2)
+        with Failure _ ->
+          bad_format 3;
+          0
+      in
+      match (Gwdb.person_of_key base fn sn oc, conf.user_iper) with
+      | Some anc_ip, Some user_ip ->
+          test_ancestor conf base (Gwdb.poi base anc_ip) (Gwdb.poi base user_ip)
+          || restrict_for_spouses
+             &&
+             let families = Gwdb.get_family (Gwdb.poi base user_ip) in
+             (* FIXME
+                 use of
+                 !GWPARAM_ITL.get_families conf base (Gwdb.poi base user_ip)
+                 fails (returns list of length 0)
+             *)
+             Array.exists
+               (fun fam ->
+                 let fam = Gwdb.foi base fam in
+                 let fath_ip = Gwdb.get_father fam in
+                 let moth_ip = Gwdb.get_mother fam in
+                 let spouse_ip =
+                   if user_ip = fath_ip then moth_ip else fath_ip
+                 in
+                 test_ancestor conf base (Gwdb.poi base anc_ip)
+                   (Gwdb.poi base spouse_ip))
+               families
+      | _ -> false
+
+let rec is_restricted conf base anc_l =
+  match anc_l with
+  | [] -> true
+  | anc :: l ->
+      if is_ancestor conf base anc then false else is_restricted conf base l
+
 let print_search_form conf from_note =
   Output.print_sstring conf "<div class=\"form-group mt-3\">\n";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
@@ -257,8 +346,16 @@ let print_linked_list_gallery conf base pgl =
       | Def.NLDB.PgMisc fnotes ->
           let nenv, s = read_notes base fnotes in
           let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
-          if typ = "gallery" || typ = "album" then
-            Output.print_sstring conf (create_gallery_item conf fnotes nenv s)
+          let restrict_l =
+            try List.assoc "RESTRICT" nenv with Not_found -> ""
+          in
+          let restrict_l =
+            if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+          in
+          if
+            (restrict_l = [] || not (is_restricted conf base restrict_l))
+            && (typ = "gallery" || typ = "album")
+          then Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
       | _ -> ())
     pgl;
   Output.print_sstring conf "</div>\n"
@@ -268,9 +365,23 @@ let print_linked_list_standard conf base pgl =
     "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
   List.iter
     (fun pg ->
-      Output.print_sstring conf "\n<tr>";
-      linked_page_rows conf base pg;
-      Output.print_sstring conf "</tr>\n")
+      match pg with
+      | Def.NLDB.PgMisc fnotes ->
+          let nenv, _ = read_notes base fnotes in
+          let restrict_l =
+            try List.assoc "RESTRICT" nenv with Not_found -> ""
+          in
+          let restrict_l =
+            if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+          in
+          if restrict_l = [] || not (is_restricted conf base restrict_l) then (
+            Output.print_sstring conf "\n<tr>";
+            linked_page_rows conf base pg;
+            Output.print_sstring conf "</tr>\n")
+      | _ ->
+          Output.print_sstring conf "\n<tr>";
+          linked_page_rows conf base pg;
+          Output.print_sstring conf "</tr>\n")
     pgl;
   Output.print_sstring conf "</table>"
 
@@ -280,14 +391,56 @@ let print_linked_list conf base pgl =
   | Some "album" -> print_linked_list_gallery conf base pgl
   | _ -> print_linked_list_standard conf base pgl
 
-let print_what_links conf base =
-  let fnotes =
-    match p_getenv conf.env "f" with
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
-    | None -> ""
-  in
+(* copied from perso.ml *)
+let simple_person_text conf base p p_auth : Adef.safe_string =
+  if p_auth then
+    match main_title conf base p with
+    | Some t -> titled_person_text conf base p t
+    | None -> gen_person_text conf base p
+  else if is_hide_names conf p then Adef.safe (Util.private_txt conf "")
+  else gen_person_text conf base p
+
+let print_what_links_p conf base p =
+  if authorized_age conf base p then (
+    let key =
+      let fn = Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) in
+      let sn = Name.lower (Gwdb.sou base (Gwdb.get_surname p)) in
+      (fn, sn, Gwdb.get_occ p)
+    in
+    let db = Gwdb.read_nldb base in
+    let db = Notes.merge_possible_aliases conf db in
+    let pgl = Notes.links_to_ind conf base db key None in
+    let title h =
+      let lnkd_typ =
+        match p_getenv conf.env "type" with
+        | Some "gallery" | Some "album" ->
+            "albums galleries where person appears"
+        | _ -> "pages where person appears"
+      in
+      Util.transl conf lnkd_typ |> Utf8.capitalize_fst
+      |> Output.print_sstring conf;
+      Util.transl conf ":" |> Output.print_sstring conf;
+      Output.print_sstring conf " ";
+      if h then Output.print_string conf (simple_person_text conf base p true)
+      else (
+        Output.print_sstring conf {|<a href="|};
+        Output.print_string conf (commd conf);
+        Output.print_string conf (acces conf base p);
+        Output.print_sstring conf {|">|};
+        Output.print_string conf (simple_person_text conf base p true);
+        Output.print_sstring conf {|</a>|})
+    in
+    Hutil.header conf title;
+    print_linked_list conf base pgl;
+    Hutil.trailer conf)
+  else Hutil.incorrect_request conf
+
+let print_what_links conf base fnotes =
   let title h =
-    Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "linked pages"));
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "pages where page appears"));
+    Util.transl conf ":" |> Output.print_sstring conf;
+    Output.print_sstring conf " ";
     if h then (
       Output.print_sstring conf "[";
       Output.print_string conf (Util.escape_html fnotes);
@@ -329,20 +482,48 @@ let print conf base =
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  let nenv, s = read_notes base fnotes in
-  let templ =
-    match List.assoc "TYPE" nenv with
-    | "album" | "gallery" -> Util.open_etc_file conf "notes_gallery"
-    | (exception Not_found) | _ -> None
-  in
-  match templ with
-  | Some (ic, _) -> Templ.copy_from_templ conf Templ.Env.empty ic
-  | None -> (
-      let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-      let title = Util.safe_html title in
-      match p_getint conf.env "v" with
-      | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-      | None -> print_whole_notes conf base fnotes title s None)
+  match p_getenv conf.env "ref" with
+  | Some "on" ->
+      print_what_links conf base fnotes
+      (* print pages where fnotes is referenced *)
+  | _ -> (
+      let nenv, s = read_notes base fnotes in
+      let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
+      let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
+      let restrict_l =
+        if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+      in
+      if restrict_l <> [] && is_restricted conf base restrict_l then
+        Output.print_sstring conf
+          (transl conf "note is restricted" |> Utf8.capitalize_fst)
+      else
+        let templ =
+          match List.assoc "TYPE" nenv with
+          | "album" | "gallery" -> Util.open_etc_file conf "notes_gallery"
+          | (exception Not_found) | _ -> None
+        in
+        match templ with
+        | Some (ic, _fname) -> (
+            match p_getenv conf.env "ajax" with
+            | Some "on" ->
+                let charset =
+                  if conf.charset = "" then "utf-8" else conf.charset
+                in
+                Wserver.header
+                  (Format.sprintf "Content-type: application/json; charset=%s"
+                     charset);
+                Wserver.printf "%s"
+                  (match typ with
+                  | "gallery" -> Notes.safe_gallery conf s
+                  | "album" -> Notes.safe_gallery conf s
+                  | _ -> s)
+            | _ -> Templ.copy_from_templ conf Templ.Env.empty ic)
+        | None -> (
+            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+            let title = Util.safe_html title in
+            match p_getint conf.env "v" with
+            | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+            | None -> print_whole_notes conf base fnotes title s None))
 
 let print_mod_json conf base =
   let nenv, s = read_notes_from_conf conf base in
@@ -359,24 +540,48 @@ let print_mod conf base =
     | None -> ""
   in
   let nenv, s = read_notes base fnotes in
-  let title _ =
-    Output.printf conf "%s - %s%s"
-      (Utf8.capitalize_fst (transl conf "base notes"))
-      conf.bname
-      (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
+  let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
+  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
+  let restrict_l =
+    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
   in
-  match List.assoc "TYPE" nenv with
-  | ("gallery" | "album") as typ -> (
-      match Util.open_etc_file conf ("notes_upd_" ^ typ) with
-      | Some (ic, _fname) -> Templ.copy_from_templ conf Templ.Env.empty ic
-      | None ->
-          (* FIXME: We should emit an error instead of ignoring silently the
-             absence of the template? *)
-          Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
-            nenv s)
-  | (exception Not_found) | _ ->
-      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
-        nenv s
+  if restrict_l <> [] && is_restricted conf base restrict_l then
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
+  else
+    let templ =
+      if typ = "" then None
+      else if typ = "gallery" || typ = "album" then
+        Util.open_etc_file conf ("notes_upd_" ^ typ)
+      else None
+    in
+    let title _ =
+      Output.printf conf "%s - %s%s"
+        (Utf8.capitalize_fst (transl conf "base notes"))
+        conf.bname
+        (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
+    in
+    match (templ, p_getenv conf.env "notmpl") with
+    | Some _, Some "on" ->
+        Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
+          nenv s
+    | Some (ic, _fname), _ -> (
+        match p_getenv conf.env "ajax" with
+        | Some "on" ->
+            let s_digest =
+              List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv
+              ^ s
+            in
+            let digest = Mutil.digest s_digest in
+            let charset = if conf.charset = "" then "utf-8" else conf.charset in
+            Wserver.header
+              (Format.sprintf "Content-type: application/json; charset=%s"
+                 charset);
+            Wserver.printf "{\"digest\":\"%s\",\"r\":%s}" digest s
+        | _ -> Templ.copy_from_templ conf Templ.Env.empty ic)
+    | _ ->
+        Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
+          nenv s
 
 let print_mod_ok conf base =
   let fname = function

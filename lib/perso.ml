@@ -5685,37 +5685,3 @@ let print ?no_headers conf base p =
     when is_that_user_and_password conf.auth_scheme "" passwd = false ->
       Util.unauthorized conf src
   | Some _ | None -> interp_templ ?no_headers "perso" conf base p
-
-let print_what_links conf base p =
-  if authorized_age conf base p then (
-    let key =
-      let fn = Name.lower (sou base (get_first_name p)) in
-      let sn = Name.lower (sou base (get_surname p)) in
-      (fn, sn, get_occ p)
-    in
-    let db = Gwdb.read_nldb base in
-    let db = Notes.merge_possible_aliases conf db in
-    let pgl = Notes.links_to_ind conf base db key None in
-    let title h =
-      let lnkd_typ =
-        match p_getenv conf.env "type" with
-        | Some "gallery" -> "linked images"
-        | Some "album" -> "linked images"
-        | _ -> "linked pages"
-      in
-      transl conf lnkd_typ |> Utf8.capitalize_fst |> Output.print_sstring conf;
-      Util.transl conf ":" |> Output.print_sstring conf;
-      Output.print_sstring conf " ";
-      if h then Output.print_string conf (simple_person_text conf base p true)
-      else (
-        Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (commd conf);
-        Output.print_string conf (acces conf base p);
-        Output.print_sstring conf {|">|};
-        Output.print_string conf (simple_person_text conf base p true);
-        Output.print_sstring conf {|</a>|})
-    in
-    Hutil.header conf title;
-    NotesDisplay.print_linked_list conf base pgl;
-    Hutil.trailer conf)
-  else Hutil.incorrect_request conf
