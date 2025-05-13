@@ -1,0 +1,28 @@
+(executable
+  (package geneweb-rpc)
+  (name rpc_test)
+  (public_name rpc_test)
+  (modules
+    rpc_test)
+  (libraries
+    fmt
+    yojson
+    geneweb_rpc
+    httpun
+    httpun-lwt-unix
+    httpun-ws))
+
+(executable
+  (name client)
+  (modes js)
+  (modules
+    client)
+  (libraries
+    geneweb_rpc
+    js_of_ocaml
+    promise_jsoo
+    ojs
+    yojson)
+  (preprocess
+    (pps
+      js_of_ocaml-ppx)))

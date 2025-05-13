@@ -14,8 +14,9 @@
             geneweb_core
             geneweb_def
             geneweb_gwdb
-            geneweb_sosa_mli
+            geneweb_sosa
             geneweb_util
+            geneweb_logs
             yojson
             markup
             uri

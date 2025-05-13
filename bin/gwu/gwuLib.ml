@@ -1544,7 +1544,7 @@ let rs_printf opts s =
 
 let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   if out_dir <> "" && not (Sys.file_exists out_dir) then
-    File.create_dir ~parent:true out_dir;
+    Filesystem.create_dir ~parent:true out_dir;
   let to_separate = separate base in
   let out_oc_first = ref true in
   let _ofile, oc, close = opts.oc in

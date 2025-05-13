@@ -1,0 +1,9 @@
+(library
+  (name geneweb_logs)
+  (public_name geneweb.logs)
+  (libraries
+    %%%SYSLOG_PKG%%%
+    fmt
+    geneweb_util)
+  (preprocess
+    (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file}))))

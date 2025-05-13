@@ -5,10 +5,14 @@ open Gwdb
 open Config
 
 type generation_person =
-  | GP_person of Sosa.t * iper * ifam option
-  | GP_same of Sosa.t * Sosa.t * iper
-  | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
-  | GP_missing of Sosa.t * iper
+  | GP_person of Geneweb_sosa.t * iper * ifam option
+  | GP_same of Geneweb_sosa.t * Geneweb_sosa.t * iper
+  | GP_interv of
+      (Geneweb_sosa.t
+      * Geneweb_sosa.t
+      * (Geneweb_sosa.t * Geneweb_sosa.t) option)
+      option
+  | GP_missing of Geneweb_sosa.t * iper
 
 val string_of_marriage_text : config -> base -> family -> Adef.safe_string
 

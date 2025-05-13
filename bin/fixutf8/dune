@@ -1,4 +1,5 @@
 (executable
+  (package geneweb)
   (name gwfixutf8)
   (public_name geneweb.gwfixutf8)
   (modules gwfixutf8)

@@ -1,5 +1,6 @@
 open Def
 open Gwdb
+module Sosa = Geneweb_sosa
 
 (* Optimisation de find_sosa_aux :                                           *)
 (* - ajout d'un cache pour conserver les descendants du sosa que l'on calcul *)

@@ -3,6 +3,8 @@ open Gwdb
 open TemplAst
 open Util
 open UpdateData
+module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in
@@ -358,7 +360,7 @@ and eval_compound_var conf base env xx sl =
         | Some n ->
             if String.length s > n then String.sub s 0 (String.length s - n)
             else (
-              GWPARAM.syslog `LOG_WARNING "String shorter that requested\n";
+              Logs.syslog `LOG_WARNING "String shorter that requested\n";
               s)
         | None -> raise Not_found)
     | "printable" :: sl -> only_printable (loop sl)

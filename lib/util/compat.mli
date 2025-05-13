@@ -35,6 +35,17 @@ module In_channel : sig
       permission, in case the file must be created (see {!open_gen}).
 
       @since 4.14 *)
+
+  val input : t -> bytes -> int -> int -> int
+  (** [input ic buf pos len] reads up to [len] characters from the given channel
+      [ic], storing them in byte sequence [buf], starting at character number
+      [pos]. It returns the actual number of characters read, between 0 and [len]
+      (inclusive). A return value of 0 means that the end of file was reached.
+
+      Use {!really_input} to read exactly [len] characters.
+
+      @raise Invalid_argument if [pos] and [len] do not designate a valid range of
+      [buf]. *)
 end
 
 module Out_channel : sig
@@ -59,4 +70,16 @@ module Out_channel : sig
       permission, in case the file must be created (see {!open_gen}).
 
       @since 4.14 *)
+
+  val flush : t -> unit
+  (** Flush the buffer associated with the given output channel, performing all
+      pending writes on that channel.  Interactive programs must be careful about
+      flushing standard output and standard error at the right time. *)
+
+  val output : t -> bytes -> int -> int -> unit
+  (** [output oc buf pos len] writes [len] characters from byte sequence [buf],
+      starting at offset [pos], to the given output channel [oc].
+
+      @raise Invalid_argument if [pos] and [len] do not designate a valid range of
+      [buf]. *)
 end

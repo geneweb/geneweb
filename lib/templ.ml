@@ -1,5 +1,7 @@
 open Config
 open TemplAst
+module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 exception Exc_located of loc * exn
 exception BadApplyArity
@@ -269,16 +271,15 @@ let url_set_aux conf evar_l str_l =
   let href =
     match String.split_on_char '?' (Util.commd conf :> string) with
     | [] ->
-        GWPARAM.syslog `LOG_WARNING "Empty Url\n";
+        Logs.syslog `LOG_WARNING "Empty Url\n";
         ""
     | s :: _l -> s
   in
   let conf_l = conf.henv @ conf.senv @ conf.env in
-  let conf_l =
-    List.fold_left
-      (fun acc (k, v) -> if List.mem_assoc k acc then acc else (k, v) :: acc)
-      [] conf_l
-  in
+  let k_l = List.map (fun (k, _v) -> k) conf_l in
+
+  let conf_l = List.map (fun k -> (k, List.assoc k conf_l)) k_l |> List.rev in
+
   (* process evar_l *)
   let url_env =
     let rec loop i acc evar_l =
@@ -692,7 +693,7 @@ let apply_format conf nth s1 s2 =
                                                   | None -> "[" ^ s1 ^ "?]")))))
                               ))))))
     with _ ->
-      Printf.sprintf "Format error in %s\n" s1 |> GWPARAM.syslog `LOG_WARNING;
+      Printf.sprintf "Format error in %s\n" s1 |> Logs.syslog `LOG_WARNING;
       s1
 
 let rec eval_ast conf = function
@@ -834,6 +835,7 @@ let templ_eval_var conf = function
         with Not_found -> []
       in
       VVbool (List.mem plugin plugins)
+  | [ "predictable_mode" ] -> VVbool conf.predictable_mode
   | [ "supervisor" ] -> VVbool conf.supervisor
   | [ "roglo" ] ->
       VVbool
@@ -1208,7 +1210,10 @@ let include_hed_trl conf name =
   | "hed" -> Util.include_template conf [] name (fun () -> ())
   | "trl" ->
       Util.include_template conf [] name (fun () -> ());
-      let query_time = Unix.gettimeofday () -. conf.query_start in
+      let query_time =
+        if conf.predictable_mode then 0.
+        else Unix.gettimeofday () -. conf.query_start
+      in
       Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
         !GWPARAM.errors_other !GWPARAM.set_vars
   | _ -> ()

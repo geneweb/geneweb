@@ -1,6 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module Outbase = Gwdb_legacy.Outbase
 (** Checks a .gwo header and prints fails if header is absent or not compatible. *)
+
 let check_magic fname ic =
   let b = really_input_string ic (String.length Gwcomp.magic_gwo) in
   if b <> Gwcomp.magic_gwo then
@@ -215,8 +217,12 @@ let main () =
     (* test_base will fail if base exists and force has not been set (-f) *)
     Geneweb.GWPARAM.test_base bname;
     Geneweb.GWPARAM.init_etc bname;
-    Lock.control (Mutil.lock_file bdir) false ~onerror:Lock.print_error_and_exit
-      (fun () ->
+    let lock_file = Mutil.lock_file bdir in
+    let on_exn exn bt =
+      Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+      exit 2
+    in
+    Lock.control ~on_exn ~wait:false ~lock_file (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
         if Db1link.link next_family_fun bdir then (
           Geneweb.Util.print_default_gwf_file bname;
@@ -228,8 +234,6 @@ let main () =
         else (
           Printf.eprintf "*** database not created\n";
           flush stderr;
-          exit 2));
-    let tmp_file = Filename.concat Filename.current_dir_name "gw_tmp" in
-    Mutil.rm_rf tmp_file)
+          exit 2)))
 
 let _ = main ()

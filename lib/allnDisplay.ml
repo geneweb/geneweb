@@ -2,6 +2,7 @@ open Def
 open Config
 open Gwdb
 open Util
+module Sosa = Geneweb_sosa
 
 let default_max_cnt = Alln.default_max_cnt
 

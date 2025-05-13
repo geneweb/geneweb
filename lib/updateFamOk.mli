@@ -109,7 +109,7 @@ val effective_add :
   (Update.key, 'a, string) Def.gen_family ->
   Update.key Def.gen_couple ->
   Update.key Def.gen_descend ->
-  Gwdb_driver.ifam
+  Gwdb_legacy.Gwdb_driver.ifam
   * (Gwdb.iper, Gwdb.ifam, Gwdb.istr) Def.gen_family
   * Gwdb.iper Def.gen_couple
   * Gwdb.iper Def.gen_descend

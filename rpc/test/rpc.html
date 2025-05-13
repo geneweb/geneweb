@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Test RPC client</title>
+  </head>
+  <body>
+    <form id="form">
+      <label for="input">Enter any text:</label>
+      <input type="text" name="input" id="input" required>
+    </form>
+    <div id="output">ICI</div>
+    <script src="../../_build/default/rpc/test/client.bc.js"></script>
+    <script>
+      const client = new Rpc("ws://localhost:8080/pingpong");
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const output = document.getElementById("output");
+
+      // TODO : can we write this function in js_of_ocaml?
+      function add_method(client, meth) {
+        client[meth] = function (...args) {
+          const jargs = args.map((a) => { return JSON.stringify(a); });
+          return client.call(meth, jargs);
+        }
+      }
+
+      add_method(client, "ping");
+      add_method(client, "echo");
+
+      async function main() {
+        const msg = await client.ping();
+        console.log(msg);
+      }
+
+      async function callback() {
+        const msg = await client.echo(input.value);
+        console.log(msg);
+        output.innerText = msg;
+      }
+
+      input.addEventListener("input", callback);
+    </script>
+  </body>
+</html>

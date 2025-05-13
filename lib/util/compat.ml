@@ -27,6 +27,8 @@ module In_channel = struct
 
   let with_open_gen flags perm s f =
     with_open (Stdlib.open_in_gen flags perm) s f
+
+  let input = Stdlib.input
 end
 
 module Out_channel = struct
@@ -41,4 +43,7 @@ module Out_channel = struct
 
   let with_open_gen flags perm s f =
     with_open (Stdlib.open_out_gen flags perm) s f
+
+  let flush = Stdlib.flush
+  let output = Stdlib.output
 end

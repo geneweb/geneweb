@@ -721,7 +721,8 @@ let print_mod conf base =
   | Some i ->
       let p = poi base (iper_of_string i) in
       let sp = string_person_of base p in
-      let digest = Update.digest_person sp in
+      let salt = Option.get conf.secret_salt in
+      let digest = Update.digest_person ~salt sp in
       print_update_ind conf base sp digest
 
 let print_del conf base =

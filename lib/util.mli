@@ -405,17 +405,18 @@ val get_request_string : config -> string
 
 val create_topological_sort : config -> base -> (iper, int) Gwdb.Marker.t
 
-val p_of_sosa : config -> base -> Sosa.t -> person -> person option
+val p_of_sosa : config -> base -> Geneweb_sosa.t -> person -> person option
 (** [p_of_sosa conf base sosa p0]
     Get the sosa [sosa] of [p0] if it exists
 *)
 
-val branch_of_sosa : config -> base -> Sosa.t -> person -> person list option
+val branch_of_sosa :
+  config -> base -> Geneweb_sosa.t -> person -> person list option
 (** [branch_of_sosa conf base sosa p0]
     Get all the lineage to go from [p0]'s ancestor with sosa number [sosa] to [p0]
 *)
 
-val sosa_of_branch : person list -> Sosa.t
+val sosa_of_branch : person list -> Geneweb_sosa.t
 (** [sosa_of_branch branch]
     Given a path of person to follow [branch], return the sosa number
     of the last person of this list. No check is done to ensure that
@@ -423,10 +424,10 @@ val sosa_of_branch : person list -> Sosa.t
 *)
 
 val old_branch_of_sosa :
-  config -> base -> iper -> Sosa.t -> (iper * sex) list option
+  config -> base -> iper -> Geneweb_sosa.t -> (iper * sex) list option
 (** @deprecated Use [branch_of_sosa] instead *)
 
-val old_sosa_of_branch : config -> base -> (iper * sex) list -> Sosa.t
+val old_sosa_of_branch : config -> base -> (iper * sex) list -> Geneweb_sosa.t
 (** @deprecated Use [sosa_of_branch] instead *)
 
 val only_printable : string -> string
@@ -634,7 +635,7 @@ val test_cnt_d : config -> string
 
 val extract_value : char -> string -> string
 (** [extract_value delimiter s]
-   Assuming that the string [s] is of the form [key=value], 
+   Assuming that the string [s] is of the form [key=value],
    where = stands for a one char [delimiter],
    this function extracts the value.
    @raise Not_found if [s] does not contain exactly one delimiter. *)

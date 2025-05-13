@@ -7,8 +7,9 @@
 )
 
 (executable
+  (package geneweb)
   (name gwu)
   (public_name geneweb.gwu)
   (modules gwu)
-  (libraries geneweb gwexport_lib gwu_lib str unix %%%GWDB_PKG%%% %%%SOSA_PKG%%%)
+  (libraries geneweb gwexport_lib gwu_lib str unix %%%GWDB_PKG%%%)
 )

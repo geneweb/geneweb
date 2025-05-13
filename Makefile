@@ -23,7 +23,7 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
 
-CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
+CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D)
 
 ifeq ($(DUNE_PROFILE),dev)
     CPPO_D+= -D DEBUG
@@ -35,7 +35,6 @@ endif
 	| cppo -n $(CPPO_D) \
 	| sed \
 	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
-	-e 's/%%%SOSA_PKG%%%/$(SOSA_PKG)/g' \
 	-e 's/%%%GWDB_PKG%%%/$(GWDB_PKG)/g' \
 	-e 's/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g' \
 	-e 's/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g' \
@@ -47,14 +46,14 @@ endif
 COMPIL_DATE := $(shell date +'%Y-%m-%d')
 COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
-COMMIT_TITLE := $(shell git log -1 --no-merges --pretty="%s" | sed "s/\"/\\\"/g")
-COMMIT_COMMENT:= $(shell git log -1 --no-merges --pretty="%b" | sed "s/\"/\\\"/g")
+COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
+COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
-lib/version.ml: lib/version.txt
+lib/version.ml:
 	@cp lib/version.txt $@
 	@printf 'let branch = "$(BRANCH)"\n' >> $@
 	@printf 'let src = "$(SOURCE)"\n' >> $@
@@ -62,7 +61,7 @@ lib/version.ml: lib/version.txt
 	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
 	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
 	@printf 'Generating $@… Done.\n'
-.PHONY: build fmt gwd install
+.PHONY: install lib/version.ml
 
 # Patch/unpatch files for campl5 >= 8.03
 CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
@@ -87,7 +86,7 @@ unpatch_files:
 	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
 	fi
 
-BUILD = dune build -p geneweb
+BUILD = dune build
 UNPATCH = $(MAKE) --no-print-directory unpatch_files
 
 unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
@@ -109,18 +108,23 @@ DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
 generated: $(DUNE_FILES) lib/version.ml
 	@printf "Done.\n"
 
-fmt build gwd install uninstall: info patch_files generated
+fmt build build-geneweb gwd install uninstall: info patch_files generated
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
 	$(call unpatch_after, dune build @fmt --auto-promote)
 
 # [BEGIN] Installation / Distribution section
+build:
+	@$(call unpatch_after, dune build)
 
-build: ## Build the geneweb package (libraries and binaries)
+build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	@$(call unpatch_after, $(BUILD))
+	@$(call unpatch_after, dune build @bin/all @lib/all)
 	@printf "Done."
+
+build-geneweb-rpc: ## Build the geneweb-rpc package
+	dune build @rpc/all
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
@@ -144,6 +148,9 @@ distrib: info ## Build the project and copy what is necessary for distribution
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
+	mkdir -p $(DISTRIB_DIR)/bases/etc
+	mkdir -p $(DISTRIB_DIR)/bases/lang
+	mkdir -p $(DISTRIB_DIR)/bases/src
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
 	cp LICENSE $(DISTRIB_DIR)/LICENSE.txt
 	cp etc/README.txt $(DISTRIB_DIR)/.
@@ -208,7 +215,8 @@ endif
 	done
 	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
 	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
-.PHONY: fmt install uninstall distrib
+
+.PHONY: build build-geneweb build-geneweb-rpc gwd fmt install uninstall distrib
 
 # [END] Installation / Distribution section
 

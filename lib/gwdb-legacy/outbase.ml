@@ -178,6 +178,34 @@ let output_particles_file particles fname =
   List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
   close_out oc
 
+let ( // ) = Filename.concat
+
+(* TODO: these functions should be defined into [Gwdb_driver] but
+   such a definition introduces a cyclic dependency between [Gwdb_driver]
+   and the present module. The [output] function is invoked in
+   [Gwdb_driver.sync] to synchronize the database on the disk after
+   initializing it in memory. *)
+
+let output_notes base dst =
+  let content = base.Dbdisk.data.bnotes.nread "" Def.RnAll in
+  Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content)
+
+(* Copy all the notes from "notes_d" of the database [base] into the
+   destination directory [dst_dir]. *)
+let output_notes_d base dst_dir =
+  let l = base.data.bnotes.Def.efiles () in
+  List.iter
+    (fun f ->
+      let dst = dst_dir // (f ^ ".txt") in
+      Filesystem.create_dir ~parent:true @@ Filename.dirname dst;
+      (* TODO: The nread function is not an efficient way to copy a file.
+         We would use [Filesystem.copy_file] instead but [f] can be
+         a file in memory too. We should use an enum type to distinguish
+         these cases in [Def.base_notes]. *)
+      let content = base.Dbdisk.data.bnotes.nread f Def.RnAll in
+      Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content))
+    l
+
 let output base =
   (* create database directory *)
   let bname = base.data.bdir in
@@ -254,71 +282,53 @@ let output base =
      base.data.descends.clear_array ();
      close_out oc;
      close_out oc_acc;
-     (let oc_inx = Secure.open_out_bin tmp_names_inx in
-      let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
-      try
-        trace "create name index";
-        output_binary_int oc_inx 0;
-        (* room for sname index *)
-        output_binary_int oc_inx 0;
-        (* room for fname index *)
-        create_name_index oc_inx oc_inx_acc base;
-        base.data.ascends.clear_array ();
-        base.data.unions.clear_array ();
-        base.data.couples.clear_array ();
-        if !save_mem then (
-          trace "compacting";
-          Gc.compact ());
-        let surname_pos = pos_out oc_inx in
-        trace "create strings of sname";
-        create_strings_of_sname oc_inx oc_inx_acc base;
-        let first_name_pos = pos_out oc_inx in
-        trace "create strings of fname";
-        create_strings_of_fname oc_inx oc_inx_acc base;
-        seek_out oc_inx 0;
-        (* sname index *)
-        output_binary_int oc_inx surname_pos;
-        seek_out oc_inx 1;
-        (* fname index *)
-        output_binary_int oc_inx first_name_pos;
-        close_out oc_inx;
-        close_out oc_inx_acc;
-        if !save_mem then (
-          trace "compacting";
-          Gc.compact ());
-        Gc.compact ();
-        trace "create string index";
-        output_strings_hash tmp_strings_inx base;
-        if !save_mem then (
-          trace "compacting";
-          Gc.compact ());
-        trace "create surname index";
-        output_surname_index base tmp_snames_inx tmp_snames_dat;
-        if !save_mem then (
-          trace "compacting";
-          Gc.compact ());
-        trace "create first name index";
-        output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
-        let s = base.data.bnotes.Def.nread "" Def.RnAll in
-        (if s = "" then ()
-        else
-          let oc_not = Secure.open_out tmp_notes in
-          output_string oc_not s;
-          close_out oc_not);
-        List.iter
-          (fun f ->
-            let s = base.data.bnotes.Def.nread f Def.RnAll in
-            let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
-            File.create_dir ~parent:true (Filename.dirname fname);
-            let oc = open_out fname in
-            output_string oc s;
-            close_out oc)
-          (List.rev (base.data.bnotes.Def.efiles ()));
-        output_particles_file base.data.particles_txt tmp_particles
-      with e ->
-        (try close_out oc_inx with _ -> ());
-        (try close_out oc_inx_acc with _ -> ());
-        raise e);
+     Secure.with_open_out_bin tmp_names_inx (fun oc_inx ->
+         Secure.with_open_out_bin tmp_names_acc @@ fun oc_inx_acc ->
+         trace "create name index";
+         output_binary_int oc_inx 0;
+         (* room for sname index *)
+         output_binary_int oc_inx 0;
+         (* room for fname index *)
+         create_name_index oc_inx oc_inx_acc base;
+         base.data.ascends.clear_array ();
+         base.data.unions.clear_array ();
+         base.data.couples.clear_array ();
+         if !save_mem then (
+           trace "compacting";
+           Gc.compact ());
+         let surname_pos = pos_out oc_inx in
+         trace "create strings of sname";
+         create_strings_of_sname oc_inx oc_inx_acc base;
+         let first_name_pos = pos_out oc_inx in
+         trace "create strings of fname";
+         create_strings_of_fname oc_inx oc_inx_acc base;
+         seek_out oc_inx 0;
+         (* sname index *)
+         output_binary_int oc_inx surname_pos;
+         seek_out oc_inx 1;
+         (* fname index *)
+         output_binary_int oc_inx first_name_pos;
+         close_out oc_inx;
+         close_out oc_inx_acc;
+         if !save_mem then (
+           trace "compacting";
+           Gc.compact ());
+         Gc.compact ();
+         trace "create string index";
+         output_strings_hash tmp_strings_inx base;
+         if !save_mem then (
+           trace "compacting";
+           Gc.compact ());
+         trace "create surname index";
+         output_surname_index base tmp_snames_inx tmp_snames_dat;
+         if !save_mem then (
+           trace "compacting";
+           Gc.compact ());
+         trace "create first name index";
+         output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
+         output_notes base tmp_notes;
+         output_notes_d base tmp_notes_d;
+         output_particles_file base.data.particles_txt tmp_particles);
      trace "ok";
      let nbp =
        let rec loop i acc =

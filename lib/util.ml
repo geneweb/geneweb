@@ -3,8 +3,11 @@
 open Config
 open Def
 open Gwdb
+module Logs = Geneweb_logs.Logs
+module Sosa = Geneweb_sosa
 
 let is_welcome = ref false
+let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
 let print_default_gwf_file bname =
   let gwf =
@@ -42,7 +45,7 @@ let print_default_gwf_file bname =
         List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
         close_out oc
     with Unix.Unix_error (_, _, _) ->
-      GWPARAM.syslog `LOG_WARNING
+      Logs.syslog `LOG_WARNING
         (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
 
 let rec cut_at_equal i s =
@@ -69,7 +72,7 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      GWPARAM.syslog `LOG_WARNING
+      Logs.syslog `LOG_WARNING
         (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
            error fname);
       []
@@ -80,12 +83,12 @@ let read_base_env bname gw_prefix debug =
     let fname2 = Filename.concat gw_prefix "a.gwf" in
     if Sys.file_exists fname2 then (
       if debug then
-        GWPARAM.syslog `LOG_WARNING
+        Logs.syslog `LOG_WARNING
           (Printf.sprintf "Using configuration from %s\n%!" fname2);
       load_file fname2)
     else (
       if debug then
-        GWPARAM.syslog `LOG_WARNING
+        Logs.syslog `LOG_WARNING
           (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
              fname2);
       [])
@@ -104,9 +107,11 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   in
   let err_list1 = String.concat "," errors_undef in
   let err_list2 = String.concat "," errors_other in
-  match List.assoc_opt "hide_querytime_bugs" conf.base_env with
-  | Some "yes" -> ()
-  | _ ->
+  match
+    (List.assoc_opt "hide_querytime_bugs" conf.base_env, conf.predictable_mode)
+  with
+  | _, true | Some "yes", _ -> ()
+  | _, _ ->
       Output.print_sstring conf
         (Printf.sprintf
            {|<script>
@@ -511,7 +516,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
       match String.split_on_char '_' commd with
       | b :: _p -> b
       | [] ->
-          GWPARAM.syslog `LOG_ERR
+          Logs.syslog `LOG_ERR
             (Format.sprintf "Poorly formatted command: %s" commd);
           commd
   in
@@ -630,7 +635,7 @@ let safe_html_allowed_tags =
         Printf.sprintf "Requested allowed_tags file (%s) absent"
           !allowed_tags_file
       in
-      GWPARAM.syslog `LOG_WARNING str;
+      Logs.syslog `LOG_WARNING str;
       default_safe_html_allowed_tags)
 
 (* Few notes:
@@ -737,8 +742,6 @@ let hidden_env conf =
 
 let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
-
-let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
   try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
@@ -1394,7 +1397,7 @@ let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
-    GWPARAM.syslog `LOG_ERR
+    Logs.syslog `LOG_ERR
       (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
 
@@ -1754,58 +1757,74 @@ let hexa_string s =
   Bytes.unsafe_to_string s'
 
 let print_alphab_list conf crit print_elem liste =
-  let print_sub_list len sub_l print_e index =
-    if sub_l <> [] then (
-      if len > menu_threshold then (
+  let len = List.length liste in
+  (* No work to do if list is empty *)
+  if liste = [] then Output.print_sstring conf "<ul></ul>\n"
+  else (
+    (* Print alphabetical index links at the top if we have many items *)
+    if len > menu_threshold then (
+      Output.print_sstring conf "<p>\n";
+
+      (* Create index links without duplicates *)
+      let rec print_index seen = function
+        | [] -> ()
+        | e :: rest ->
+            let t = crit e in
+            if not (List.mem t seen) then
+              Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
+            print_index (t :: seen) rest
+      in
+      print_index [] liste;
+      Output.print_sstring conf "</p>\n";
+      Output.print_sstring conf "<ul>\n")
+    else Output.print_sstring conf "<ul>\n";
+    (* Group items by their criteria and print each group *)
+    let rec process_groups current_group current_index = function
+      | [] when current_group != [] ->
+          (* Print the last group *)
+          print_group (List.rev current_group) current_index
+      | [] ->
+          (* Empty list, nothing to do *)
+          ()
+      | e :: rest ->
+          let t = crit e in
+          (* If we're using numerical indexes or have many items, group by criteria *)
+          if len > menu_threshold || is_number t then
+            if current_index = None || Some t <> current_index then
+              (* New group - print previous group if any, then start new group *)
+              let () =
+                if current_group <> [] then
+                  print_group (List.rev current_group) current_index
+              in
+              process_groups [ e ] (Some t) rest
+            else
+              (* Continue same group *)
+              process_groups (e :: current_group) current_index rest
+          else
+            (* Not grouping - print all items together *)
+            print_group (e :: rest) (Some "")
+    (* Print a group of items with the same criteria *)
+    and print_group items index_opt =
+      let index = match index_opt with Some t -> t | None -> "" in
+      (* If we're grouping items, create a container with an anchor *)
+      if len > menu_threshold && index <> "" then (
         Output.print_sstring conf "<li>\n";
         Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string index) index;
         Output.print_sstring conf "<ul>\n");
+      (* Print each item in the group *)
       List.iter
         (fun e ->
           Output.print_sstring conf "<li>\n  ";
-          print_e e;
+          print_elem e;
           Output.print_sstring conf "</li>\n")
-        sub_l;
-      if len > menu_threshold then Output.print_sstring conf "</ul>\n")
-  in
-  let len = List.length liste in
-  if len > menu_threshold then (
-    Output.print_sstring conf "<p>\n";
-    (let _ =
-       List.fold_left
-         (fun last e ->
-           let t = crit e in
-           let same_than_last =
-             match last with Some t1 -> t = t1 | _ -> false
-           in
-           if not same_than_last then
-             Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
-           Some t)
-         None liste
-     in
-     ());
-    Output.print_sstring conf "</p>\n";
-    Output.print_sstring conf "<ul>\n");
-  let rec loop acc last liste =
-    let index = match last with Some t -> t | None -> "" in
-    match liste with
-    | [] -> print_sub_list len acc print_elem index
-    | e :: liste ->
-        let t = crit e in
-        let same_than_last = match last with Some t1 -> t = t1 | _ -> false in
-        if len > menu_threshold || is_number t then
-          match last with
-          | Some _ ->
-              if not same_than_last then (
-                print_sub_list len acc print_elem index;
-                loop [] (Some t) liste)
-              else loop (e :: acc) (Some t) liste
-          | _ -> loop (e :: acc) (Some t) liste
-        else print_sub_list len liste print_elem ""
-  in
-  loop [] None liste;
-  if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
-  Output.print_sstring conf "</ul>\n"
+        items;
+      (* Close the container if we opened one *)
+      if len > menu_threshold && index <> "" then (
+        Output.print_sstring conf "</ul>\n";
+        Output.print_sstring conf "</li>\n")
+    in
+    process_groups [] None liste;
+    Output.print_sstring conf "</ul>\n")
 
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
@@ -2157,18 +2176,15 @@ let create_topological_sort conf base =
       in
       Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
-          Lock.control (Mutil.lock_file bfile) false
-            ~onerror:(fun () ->
-              let () = load_ascends_array base in
-              let () = load_couples_array base in
-              Consang.topological_sort base (pget conf))
-            (fun () ->
-              let () = load_ascends_array base in
-              let () = load_couples_array base in
-              let tstab = Consang.topological_sort base (pget conf) in
-              if conf.use_restrict && (not conf.wizard) && not conf.friend then
-                base_visible_write base;
-              tstab))
+          load_ascends_array base;
+          load_couples_array base;
+          let tstab = Consang.topological_sort base (pget conf) in
+          (* FIXME: we silently ignores error if we cannot lock the database. *)
+          let on_exn _exn _bt = () in
+          if conf.use_restrict && (not conf.wizard) && not conf.friend then
+            Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bfile)
+              (fun () -> base_visible_write base);
+          tstab)
 
 let p_of_sosa conf base sosa p0 =
   let path = Sosa.branches sosa in
@@ -2391,12 +2407,12 @@ let test_cnt_d conf =
   (if not (Sys.file_exists config_d) then
    try Unix.mkdir config_d 0o755
    with Unix.Unix_error (_, _, _) ->
-     GWPARAM.syslog `LOG_WARNING
+     Logs.syslog `LOG_WARNING
        (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
   if not (Sys.file_exists cnt_d) then
     try Unix.mkdir cnt_d 0o755
     with Unix.Unix_error (_, _, _) ->
-      GWPARAM.syslog `LOG_WARNING
+      Logs.syslog `LOG_WARNING
         (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
   else ();
   cnt_d

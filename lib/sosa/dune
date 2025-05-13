@@ -1,0 +1,7 @@
+(library
+  (public_name geneweb.sosa)
+  (name geneweb_sosa)
+  (libraries
+    (select geneweb_sosa.ml from
+      (zarith -> geneweb_sosa.zarith.ml)
+      ( -> geneweb_sosa.array.ml))))

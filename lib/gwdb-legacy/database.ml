@@ -729,10 +729,11 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
           cleared := true;
           match !tab with
           | None -> ()
-          | Some a ->
-              (match a with
-              | ReadOnly a -> Gw_ancient.delete a
-              | ReadWrite _ -> ());
+          | Some _a ->
+              (* We could call [Gw_ancient.delete] here to
+                 free the memory allocated with Ancient. Unfortunately,
+                 [Ancient.delete] is buggy and cannot be used without causing
+                 the process terminate abruptly. *)
               tab := None);
     }
   in
@@ -1235,7 +1236,7 @@ let with_database ?(read_only = false) bname k =
         close_out oc)
   in
   let ext_files () =
-    File.walk_folder ~recursive:true
+    Filesystem.walk_folder ~recursive:true
       (fun fl files ->
         match fl with
         | File f when Filename.check_suffix f ".txt" ->
@@ -1317,6 +1318,9 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
+  Filesystem.create_dir ~parent:true (bdir // "notes_d");
+  Filesystem.create_dir (bdir // "wiznotes");
+  Filesystem.create_file (bdir // "notes");
   let persons, ascends, unions = persons in
   let families, couples, descends = families in
   let data : Dbdisk.base_data =

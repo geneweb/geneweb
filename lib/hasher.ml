@@ -1,7 +1,7 @@
 module type S = sig
   type ctx
   type 'a feeder = 'a -> ctx -> ctx
-  type 'a hasher = 'a -> string
+  type 'a hasher = ?salt:string -> 'a -> string
 
   val feeder_to_hasher : 'a feeder -> 'a hasher
   val ( <+> ) : (ctx -> ctx) -> (ctx -> ctx) -> ctx -> ctx
@@ -12,9 +12,9 @@ module type S = sig
   val array : 'a feeder -> 'a array feeder
   val pair : 'a feeder -> 'b feeder -> ('a * 'b) feeder
   val option : 'a feeder -> 'a option feeder
-  val iper : Gwdb_driver.iper feeder
-  val ifam : Gwdb_driver.ifam feeder
-  val istr : Gwdb_driver.istr feeder
+  val iper : Gwdb_legacy.Gwdb_driver.iper feeder
+  val ifam : Gwdb_legacy.Gwdb_driver.ifam feeder
+  val istr : Gwdb_legacy.Gwdb_driver.istr feeder
   val calendar : Adef.calendar feeder
   val dmy2 : Adef.dmy2 feeder
   val precision : Adef.precision feeder
@@ -74,24 +74,21 @@ module type S = sig
     ('person, 'ifam, 'string) Def.gen_family feeder
 end
 
+module Gwdb_driver = Gwdb_legacy.Gwdb_driver
+
 module Make (H : Digestif.S) = struct
   type ctx = H.ctx
   type 'a feeder = 'a -> ctx -> ctx
-  type 'a hasher = 'a -> string
+  type 'a hasher = ?salt:string -> 'a -> string
 
   let ( <+> ) f g ctx = f (g ctx)
 
-  (* This function is used to add a seed in the hashing context before
-     returning a digest to ensure that the value is not reproducible.
-     The seed is generated during the startup process. *)
-  let seeder =
-    Random.self_init ();
-    let s = string_of_int @@ Random.bits () in
-    fun ctx -> H.feed_string ctx s
-
-  let feeder_to_hasher f u =
+  let feeder_to_hasher f ?salt u =
     let ctx = H.init () in
-    H.to_hex @@ H.get @@ seeder @@ f u ctx
+    let h =
+      match salt with None -> f u ctx | Some s -> H.feed_string (f u ctx) s
+    in
+    H.to_hex @@ H.get h
 
   let string s ctx = H.feed_string ctx s
   let int i = string @@ string_of_int i

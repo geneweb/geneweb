@@ -9,7 +9,6 @@ let magic_gwo = "GnWo000o"
 (* si la clé est incomplète, on l'enregistre tout de même.  *)
 let create_all_keys = ref false
 let line_cnt = ref 0
-let force = ref false
 let no_fail = ref false
 let no_picture = ref false
 let rgpd_dir = ref "None"
@@ -581,7 +580,8 @@ let auth_access fn sn oc l =
               in
               loop ht)
         with Sys_error _ ->
-          Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
+          if Sys.file_exists friend_passwd_file then
+            Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
           ht)
     | None -> ht
   in

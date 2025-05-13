@@ -44,18 +44,26 @@ let round_trip of_ to_ l () =
   (* todo should iter in v? *)
   List.iter (fun d -> (check testable_calendar) "" d (f d)) l
 
+let expect_failure name speed f =
+  Alcotest.test_case name speed (fun () ->
+      try
+        f ();
+        Alcotest.fail "Expected this test to fail, but it passed"
+      with _ -> ())
+
 let v =
   [
     ( (* this fail because Calendars library does not work on incomplete dates (day|month) = 0 *)
+      (* see issue 2172 *)
       "calendar-sdn",
       [
-        test_case "Calendar gregorian <-> sdn" `Quick
+        expect_failure "Calendar gregorian <-> sdn" `Quick
           (round_trip (gregorian_of_sdn Def.Sure) sdn_of_gregorian data_sure);
-        test_case "Calendar julian <-> sdn" `Quick
+        expect_failure "Calendar julian <-> sdn" `Quick
           (round_trip (julian_of_sdn Def.Sure) sdn_of_julian data_sure);
-        test_case "Calendar french <-> sdn" `Quick
+        expect_failure "Calendar french <-> sdn" `Quick
           (round_trip (french_of_sdn Def.Sure) sdn_of_french data_sure);
-        test_case "Calendar hebrew <-> sdn" `Quick
+        expect_failure "Calendar hebrew <-> sdn" `Quick
           (round_trip (hebrew_of_sdn Def.Sure) sdn_of_hebrew data_sure);
       ] );
     ( "calendar-greg",

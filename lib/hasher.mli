@@ -5,8 +5,9 @@ module type S = sig
   type 'a feeder = 'a -> ctx -> ctx
   (** Type of a feeder function for ['a]. *)
 
-  type 'a hasher = 'a -> string
-  (** Type of a hash function for ['a]. *)
+  type 'a hasher = ?salt:string -> 'a -> string
+  (** Type of a hash function for ['a]. The salt [salt] is added to
+      context before producing the final result. *)
 
   val feeder_to_hasher : 'a feeder -> 'a hasher
   (** [feeder_to_hasher f] converts the feeder [f] into a hash function. *)
@@ -21,9 +22,9 @@ module type S = sig
   val array : 'a feeder -> 'a array feeder
   val pair : 'a feeder -> 'b feeder -> ('a * 'b) feeder
   val option : 'a feeder -> 'a option feeder
-  val iper : Gwdb_driver.iper feeder
-  val ifam : Gwdb_driver.ifam feeder
-  val istr : Gwdb_driver.istr feeder
+  val iper : Gwdb_legacy.Gwdb_driver.iper feeder
+  val ifam : Gwdb_legacy.Gwdb_driver.ifam feeder
+  val istr : Gwdb_legacy.Gwdb_driver.istr feeder
   val calendar : Adef.calendar feeder
   val dmy2 : Adef.dmy2 feeder
   val precision : Adef.precision feeder

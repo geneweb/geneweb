@@ -3,6 +3,7 @@
 open Def
 open Gwdb
 open Util
+module Sosa = Geneweb_sosa
 
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 

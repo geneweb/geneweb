@@ -88,8 +88,7 @@ let load_database bname =
           load_couples_array base;
           load_descends_array base;
           load_families_array base;
-          load_strings_array base;
-          at_exit @@ fun () -> clear_base base)
+          load_strings_array base)
   | _base -> Fmt.failwith "'%s' is already loaded in memory" bname
 
 let with_database bname k =
