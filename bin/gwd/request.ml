@@ -685,7 +685,7 @@ let treat_request =
                  w_base @@ BirthDeathDisplay.print_birth
              | "LD" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_death
-             | "LINKED" -> w_base @@ w_person @@ Perso.print_what_links
+             | "LINKED" -> w_base @@ w_person @@ NotesDisplay.print_what_links_p
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
              | "LM" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_marriage
@@ -803,7 +803,15 @@ let treat_request =
                      match
                        (p_getenv conf.env "ref", p_getenv conf.env "ajax")
                      with
-                     | Some "on", _ -> NotesDisplay.print_what_links conf base
+                     | Some "on", _ ->
+                         let fnotes =
+                           match p_getenv conf.env "f" with
+                           | Some f ->
+                               if NotesLinks.check_file_name f <> None then f
+                               else ""
+                           | None -> ""
+                         in
+                         NotesDisplay.print_what_links conf base fnotes
                      | _, Some "on" ->
                          let charset =
                            if conf.charset = "" then "utf-8" else conf.charset
