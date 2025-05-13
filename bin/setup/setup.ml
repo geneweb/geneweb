@@ -6,8 +6,6 @@ let bin_dir = ref ""
 let base_dir = ref ""
 let lang_param = ref ""
 let only_file = ref ""
-let bname = ref ""
-let commnd = ref ""
 
 let printer_conf =
   {
@@ -24,10 +22,6 @@ let printer_conf =
 let slashify s = String.map (function '\\' -> '/' | c -> c) s
 let decode s = Mutil.decode (Adef.encoded s)
 let encode s = (Mutil.encode s :> string)
-
-let rec list_remove_assoc x = function
-  | (x1, y1) :: l -> if x = x1 then l else (x1, y1) :: list_remove_assoc x l
-  | [] -> []
 
 type config = {
   lang : string;
@@ -290,10 +284,11 @@ let is_directory x =
 
 let server_string conf =
   let s = Mutil.extract_param "host: " '\r' conf.request in
-  try
-    let i = String.rindex s ':' in
-    String.sub s 0 i
-  with Not_found -> "127.0.0.1"
+  Option.fold s ~none:"127.0.0.1" ~some:(fun s ->
+      try
+        let i = String.rindex s ':' in
+        String.sub s 0 i
+      with Not_found -> "127.0.0.1")
 
 let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 
@@ -312,7 +307,7 @@ let macro conf = function
   | 'i' -> strip_spaces (s_getenv conf.env "i")
   | 'l' -> conf.lang
   | 'm' -> server_string conf
-  | 'n' -> referer conf
+  | 'n' -> Option.value ~default:"" (referer conf)
   | 'o' -> strip_spaces (s_getenv conf.env "o")
   | 'O' ->
       Filename.remove_extension
@@ -427,27 +422,9 @@ let file_contents fname =
     loop 0
   with Sys_error _ -> ""
 
-let cut_at_equal s =
-  match String.index_opt s '=' with
-  | Some i ->
-      (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
-  | None -> (s, "")
-
 let read_base_env bname =
-  let fname = bname ^ ".gwf" in
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic ->
-      let rec loop env =
-        match try Some (input_line ic) with End_of_file -> None with
-        | None ->
-            close_in ic;
-            env
-        | Some s ->
-            if s = "" || s.[0] = '#' then loop env
-            else loop (cut_at_equal s :: env)
-      in
-      loop []
-  | None -> []
+  let bname = bname |> Filename.basename |> Filename.remove_extension in
+  Geneweb.Util.read_base_env ~bname
 
 let rec split_string acc s =
   if String.length s < 80 then acc ^ s
@@ -458,6 +435,85 @@ let rec split_string acc s =
           (acc ^ String.sub s 0 i ^ "\n")
           (String.sub s (i + 1) (String.length s - i - 1))
     | _ -> acc ^ s
+
+let print_selector conf print =
+  let sel =
+    try getenv conf.env "sel"
+    with Not_found -> (
+      try Sys.getenv "HOME" with Not_found -> Sys.getcwd ())
+  in
+  let list =
+    try
+      let dh = Unix.opendir sel in
+      let rec loop list =
+        match try Some (Unix.readdir dh) with End_of_file -> None with
+        | Some x ->
+            let list =
+              if x = ".." then x :: list
+              else if String.length x > 0 && x.[0] = '.' then list
+              else x :: list
+            in
+            loop list
+        | None -> List.sort compare list
+      in
+      loop []
+    with Unix.Unix_error (_, _, _) -> [ ".." ]
+  in
+  print "<pre>\n";
+  print "     ";
+  print "<input type=hidden name=anon value=\"";
+  print sel;
+  print "\">";
+  print sel;
+  let list =
+    List.map
+      (fun x ->
+        let d =
+          if x = ".." then Filename.dirname sel else Filename.concat sel x
+        in
+        let x = if is_directory d then Filename.concat x "" else x in
+        (d, x))
+      list
+  in
+  let max_len =
+    List.fold_left (fun max_len (_, x) -> max max_len (String.length x)) 0 list
+  in
+  let min_interv = 2 in
+  let line_len = 72 in
+  let n_by_line = max 1 ((line_len + min_interv) / (max_len + min_interv)) in
+  let newline () = print "\n" in
+  newline ();
+  (let rec loop i = function
+     | (d, x) :: list ->
+         print "<a class=\"j\" href=\"";
+         print conf.comm;
+         print "?lang=";
+         print conf.lang;
+         print ";";
+         List.iter
+           (fun (k, v) ->
+             if k <> "sel" && k <> "body_prop" then (
+               print k;
+               print "=";
+               print v;
+               print ";"))
+           conf.env;
+         print "sel=";
+         print (encode d);
+         print "\">";
+         print x;
+         print "</a>";
+         if i = n_by_line then (
+           newline ();
+           loop 1 list)
+         else if list = [] then newline ()
+         else (
+           print (String.make (max_len + 2 - String.length x) ' ');
+           loop (i + 1) list)
+     | [] -> print "\n"
+   in
+   loop 1 list);
+  print "</pre>\n"
 
 let rec copy_from_stream conf print strm =
   try
@@ -677,85 +733,6 @@ and print_specific_file_tail conf print fname strm =
         close_in ic)
       else copy_from_stream conf print (Stream.of_string s)
   | _ -> ()
-
-and print_selector conf print =
-  let sel =
-    try getenv conf.env "sel"
-    with Not_found -> (
-      try Sys.getenv "HOME" with Not_found -> Sys.getcwd ())
-  in
-  let list =
-    try
-      let dh = Unix.opendir sel in
-      let rec loop list =
-        match try Some (Unix.readdir dh) with End_of_file -> None with
-        | Some x ->
-            let list =
-              if x = ".." then x :: list
-              else if String.length x > 0 && x.[0] = '.' then list
-              else x :: list
-            in
-            loop list
-        | None -> List.sort compare list
-      in
-      loop []
-    with Unix.Unix_error (_, _, _) -> [ ".." ]
-  in
-  print "<pre>\n";
-  print "     ";
-  print "<input type=hidden name=anon value=\"";
-  print sel;
-  print "\">";
-  print sel;
-  let list =
-    List.map
-      (fun x ->
-        let d =
-          if x = ".." then Filename.dirname sel else Filename.concat sel x
-        in
-        let x = if is_directory d then Filename.concat x "" else x in
-        (d, x))
-      list
-  in
-  let max_len =
-    List.fold_left (fun max_len (_, x) -> max max_len (String.length x)) 0 list
-  in
-  let min_interv = 2 in
-  let line_len = 72 in
-  let n_by_line = max 1 ((line_len + min_interv) / (max_len + min_interv)) in
-  let newline () = print "\n" in
-  newline ();
-  (let rec loop i = function
-     | (d, x) :: list ->
-         print "<a class=\"j\" href=\"";
-         print conf.comm;
-         print "?lang=";
-         print conf.lang;
-         print ";";
-         List.iter
-           (fun (k, v) ->
-             if k <> "sel" && k <> "body_prop" then (
-               print k;
-               print "=";
-               print v;
-               print ";"))
-           conf.env;
-         print "sel=";
-         print (encode d);
-         print "\">";
-         print x;
-         print "</a>";
-         if i = n_by_line then (
-           newline ();
-           loop 1 list)
-         else if list = [] then newline ()
-         else (
-           print (String.make (max_len + 2 - String.length x) ' ');
-           loop (i + 1) list)
-     | [] -> print "\n"
-   in
-   loop 1 list);
-  print "</pre>\n"
 
 and print_if conf print cond strm =
   match Stream.next strm with
@@ -1489,11 +1466,6 @@ let separate_slashed_filename s =
   in
   loop 0
 
-let end_with s x =
-  let slen = String.length s in
-  let xlen = String.length x in
-  slen >= xlen && String.sub s (slen - xlen) xlen = x
-
 let print_typed_file conf typ fname =
   let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
   match ic_opt with
@@ -1524,10 +1496,10 @@ let raw_file conf s =
     List.fold_left Filename.concat !setup_dir (separate_slashed_filename s)
   in
   let typ =
-    if end_with s ".png" then "image/png"
-    else if end_with s ".jpg" then "image/jpeg"
-    else if end_with s ".gif" then "image/gif"
-    else if end_with s ".css" then "text/css"
+    if Ext_string.end_with s ".png" then "image/png"
+    else if Ext_string.end_with s ".jpg" then "image/jpeg"
+    else if Ext_string.end_with s ".gif" then "image/gif"
+    else if Ext_string.end_with s ".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
@@ -1681,7 +1653,7 @@ let setup (addr, req) comm (env_str : Adef.encoded_string) =
     else
       let lang, env =
         match p_getenv env "lang" with
-        | Some x -> (x, list_remove_assoc "lang" env)
+        | Some x -> (x, List.remove_assoc "lang" env)
         | _ -> (!default_lang, env)
       in
       let lexicon = input_lexicon lang in

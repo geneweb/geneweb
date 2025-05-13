@@ -28,18 +28,11 @@ let nb_char_occ c s =
   String.iter (fun x -> if x = c then incr cnt) s;
   !cnt
 
-let cut_words str =
-  let rec loop beg i =
-    if i < String.length str then
-      match str.[i] with
-      | ' ' ->
-          if beg = i then loop (succ beg) (succ i)
-          else String.sub str beg (i - beg) :: loop (succ i) (succ i)
-      | _ -> loop beg (succ i)
-    else if beg = i then []
-    else [ String.sub str beg (i - beg) ]
-  in
-  loop 0 0
+let split_on_char separator str =
+  str
+  |> String.split_on_char separator
+  |> List.map String.trim
+  |> List.filter (( <> ) "")
 
 let strip_all_trailing_spaces s =
   let b = Buffer.create (String.length s) in
@@ -137,3 +130,8 @@ let trim_trailing_spaces s =
     loop (len - 1)
   in
   if len' = 0 then "" else if len' = len then s else String.sub s 0 len'
+
+let end_with s x =
+  let slen = String.length s in
+  let xlen = String.length x in
+  slen >= xlen && String.sub s (slen - xlen) xlen = x
