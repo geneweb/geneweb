@@ -289,7 +289,8 @@ let rename_portraits p_list dry_run =
       | None -> ())
     p_list
 
-let update_nldb base persons_list = ()
+(* FIXME implement update_nldb *)
+let update_nldb _base _persons_list = ()
 
 let aux conf txt
     (fn : ?report:(patch -> unit) -> (int -> int -> unit) -> base -> unit) ~v1
@@ -458,8 +459,12 @@ let main () =
     Printf.eprintf "Missing base name\n";
     exit 2);
   bname := Filename.concat (!Geneweb.GWPARAM.bpath "") !bname;
-  Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
-  @@ fun () ->
+  let lock_file = Mutil.lock_file !bname in
+  let on_exn exn bt =
+    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+    exit 2
+  in
+  Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
   if !invalid_utf8 || !p_key || !utf8_key || !index then ()
   else (
     invalid_utf8 := true;
