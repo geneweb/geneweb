@@ -15981,6 +15981,14 @@ de: gespeichertes Bild/gespeicherte Bilder
 en: saved image/saved images
 fr: sauvegarde/sauvegardes
 
+    save help
+en: files not referenced as [[[filename]]]; Will nonetheless be saved by gwu
+fr: fichiers non référencés au format [[[fichier]]]; Seront néanmoins sauvegardés par gwu
+
+    files not in db
+en: files not present in nldb
+fr: fichiers absents de nldb
+
     scale
 co: anni à a generazione
 de: Jahre nach Generation

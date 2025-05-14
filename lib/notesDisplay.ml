@@ -650,12 +650,11 @@ let format_folder_entry conf depth r path_to is_current is_path =
       in
       Format.sprintf
         {|<a href="%sm=MISC_NOTES&d=%s"%s>
-             <i class="far fa-folder%s fa-fw mr-2"></i>%s
+             <i class="far fa-folder-open fa-fw mr-2"></i>%s
           </a>|}
         (commd conf :> string)
         (Mutil.encode path_to :> string)
         title_attr
-        (if is_path then "-open" else "")
         (Util.escape_html r :> string))
 
 (* Format file entry with proper indentation level *)
@@ -700,8 +699,22 @@ let format_simple_filename d f =
 
 let print_misc_notes conf base =
   let d = match p_getenv conf.env "d" with Some d -> d | None -> "" in
+  let current_depth =
+    if d = "" then 0
+    else List.length (String.split_on_char NotesLinks.char_dir_sep d) + 1
+  in
+  (* ATTENTION check this if "notes_d" changes (REORG) *)
+  let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
+  let path_hierarchy d =
+    List.iteri
+      (fun i (path_to, dirname) ->
+        let parts = String.split_on_char NotesLinks.char_dir_sep d in
+        let is_current = i = List.length parts - 1 in
+        format_folder_entry conf (i + 1) dirname path_to is_current true
+        |> Output.print_sstring conf)
+      (build_path_hierarchy d)
+  in
   Hutil.header conf (fun _ -> ());
-
   Format.sprintf
     {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
     (if d <> "" then d
@@ -709,9 +722,7 @@ let print_misc_notes conf base =
       transl conf "miscellaneous notes"
       |> Util.translate_eval |> Utf8.capitalize_fst)
   |> Output.print_sstring conf;
-
   if d <> "" then format_back_button conf d |> Output.print_sstring conf;
-
   let db = notes_links_db conf base true in
   let db =
     List.fold_right
@@ -738,55 +749,92 @@ let print_misc_notes conf base =
       db []
   in
   let db = sort_entries db in
+  let one_folder r =
+    let simple_d =
+      if d = "" then r else d ^ String.make 1 NotesLinks.char_dir_sep ^ r
+    in
+    format_folder_entry conf current_depth r simple_d false false
+    |> Output.print_sstring conf
+  in
+  let one_file f =
+    let envn, s = read_notes base f in
+    let txt =
+      let t = try List.assoc "TITLE" envn with Not_found -> "" in
+      if t <> "" then (Util.escape_html t :> string)
+      else if s = "" then ""
+      else
+        "<em>"
+        ^ (begin_text_without_html_tags 50 s |> Util.escape_html :> string)
+        ^ "</em>"
+    in
+    let n_type = try List.assoc "TYPE" envn with Not_found -> "" in
+    let simple_f = format_simple_filename d f in
+    format_file_entry conf current_depth d simple_f n_type txt
+    |> Output.print_sstring conf
+  in
+
+  let dirs_in_db, files_in_db =
+    List.partition
+      (fun f -> match f with _, Some _f -> true | _, None -> false)
+      db
+  in
+  let files_in_db =
+    List.fold_left
+      (fun acc e -> match e with _, Some f -> f :: acc | _ -> acc)
+      [] files_in_db
+  in
+  let dirs_in_db =
+    List.fold_left
+      (fun acc e -> match e with d, None -> d :: acc | _ -> acc)
+      [] dirs_in_db
+  in
 
   if db <> [] then (
     Output.print_sstring conf {|<div class="px-1">|};
-
-    if d <> "" then
+    if d <> "" then (
       format_folder_entry conf 0 ".." "" false true |> Output.print_sstring conf;
-
-    if d <> "" then
-      List.iteri
-        (fun i (path_to, dirname) ->
-          let parts = String.split_on_char NotesLinks.char_dir_sep d in
-          let is_current = i = List.length parts - 1 in
-          format_folder_entry conf (i + 1) dirname path_to is_current true
-          |> Output.print_sstring conf)
-        (build_path_hierarchy d);
-
-    let current_depth =
-      if d = "" then 0
-      else List.length (String.split_on_char NotesLinks.char_dir_sep d) + 1
-    in
-
-    List.iter
-      (function
-        | _, Some f ->
-            let txt =
-              let n, s = read_notes base f in
-              let t = try List.assoc "TITLE" n with Not_found -> "" in
-              if t <> "" then (Util.escape_html t :> string)
-              else if s = "" then ""
-              else
-                "<em>"
-                ^ (begin_text_without_html_tags 50 s |> Util.escape_html
-                    :> string)
-                ^ "</em>"
-            in
-            let n, _ = read_notes base f in
-            let n_type = try List.assoc "TYPE" n with Not_found -> "" in
-            let simple_f = format_simple_filename d f in
-            format_file_entry conf current_depth d simple_f n_type txt
-            |> Output.print_sstring conf
-        | r, None ->
-            format_folder_entry conf current_depth r
-              (if d = "" then r
-              else d ^ String.make 1 NotesLinks.char_dir_sep ^ r)
-              false false
-            |> Output.print_sstring conf)
-      db;
+      path_hierarchy d);
+    Output.print_sstring conf {|<div class="px-1">|};
+    List.iter (fun f -> one_file f) files_in_db;
+    List.iter (fun d -> one_folder d) dirs_in_db;
     Output.print_sstring conf "</div>");
 
+  let d = Util.note_link_to_sys d in
+  let cur_dir = Filename.concat notes_d d in
+  let ls = Sys.readdir cur_dir |> Array.to_list in
+  let files, dirs =
+    List.fold_left
+      (fun (acc_f, acc_d) f ->
+        let stats = Unix.stat (Filename.concat cur_dir f) in
+        match stats.st_kind with
+        | S_DIR when f.[0] <> '.' ->
+            if List.mem f dirs_in_db then (acc_f, acc_d) else (acc_f, f :: acc_d)
+        | S_REG ->
+            if f.[String.length f - 1] <> '~' && f.[0] <> '.' then
+              let f =
+                d
+                ^ String.make 1 NotesLinks.char_dir_sep
+                ^ Filename.remove_extension f
+              in
+              if List.mem (Util.sys_to_note_link f) files_in_db then
+                (acc_f, acc_d)
+              else (f :: acc_f, acc_d)
+            else (acc_f, acc_d)
+        | _ -> (acc_f, acc_d))
+      ([], []) ls
+  in
+  if dirs <> [] || files <> [] then (
+    Output.print_sstring conf
+      (Format.sprintf
+         {|<h4>%s <sup><i class="fa fa-info fa-xs" title="%s"></i></sup></h4>|}
+         (transl conf "files not in db" |> Utf8.capitalize_fst)
+         (transl conf "save help" |> Utf8.capitalize_fst));
+    if d <> "" then path_hierarchy d;
+    List.iter (fun r -> one_folder r) dirs;
+    Output.print_sstring conf "<p>";
+    List.iter
+      (fun f -> one_file (Filename.basename (Util.note_link_to_sys f)))
+      files);
   if d = "" then print_search_form conf None;
   Hutil.trailer conf
 
