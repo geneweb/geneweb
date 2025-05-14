@@ -3056,3 +3056,12 @@ let extract_value delimiter s =
   match loop None 0 with
   | Some i -> String.sub s (i + 1) (len - i - 1)
   | None -> raise Not_found
+
+let sys_to_note_link p =
+  let dir_sep = Filename.dir_sep.[0] in
+  String.split_on_char dir_sep p
+  |> String.concat (String.make 1 NotesLinks.char_dir_sep)
+
+let note_link_to_sys p =
+  String.split_on_char NotesLinks.char_dir_sep p
+  |> String.concat Filename.dir_sep

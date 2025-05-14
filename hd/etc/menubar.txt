@@ -501,7 +501,7 @@
           %if;has_linked_pages;
             <li class="nav-item">
               <a class="nav-link text-secondary" href="%url_set.m.LINKED;"
-                title="[*pages where person appears]">
+                title="[*linked pages help]">
                 <i class="fa fa-file-lines fa-fw" aria-hidden="true"></i>%nn;
                 <sup class="small">%linked_pages_nbr;</sup>%nn;
                 <span class="sr-only">file-lines icon</span></a>
@@ -509,7 +509,7 @@
             %if;(nb_linked_pages_type.gallery>0)
               <li class="nav-item">
                 <a class="nav-link text-secondary" href="%url_set.m_type.LINKED_gallery"
-                  title="[*albums galleries where person appears]">
+                  title="[*linked albums help]">
                   <i class="fa fa-images fa-fw mr-1" aria-hidden="true"></i>%nn;
                   %let;nbalb;%nb_linked_pages_type.album;%in;
                   <sup class="small">%nb_linked_pages_type.gallery;

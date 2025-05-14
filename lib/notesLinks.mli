@@ -5,6 +5,7 @@ type wiki_link =
   | WLnone of int * string
 
 val char_dir_sep : char
+val dir_sep : string
 val check_file_name : string -> (string list * string) option
 val misc_notes_link : string -> int -> wiki_link
 

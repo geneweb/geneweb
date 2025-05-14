@@ -3,7 +3,9 @@ open Geneweb
 
 let mutil_contains () =
   let str = "foo bar" in
+  let str2 = "/notes_d/albums/test-images-alb" in
   let test t b = (check bool) t b (Mutil.contains str t) in
+  let test2 t b = (check bool) t b (Mutil.contains str2 t) in
   test "foo" true;
   test "baz" false;
   test "foo_b" false;
@@ -11,7 +13,9 @@ let mutil_contains () =
   test "foo__b" false;
   test "bar__" false;
   test "r" true;
-  test "" true
+  test "" true;
+  test2 "albums/test-images-alb" true;
+  test2 "albums/test" true
 
 let mutil_start_with () =
   check_raises "" (Invalid_argument "start_with") (fun () ->

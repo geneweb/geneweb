@@ -784,3 +784,9 @@ val extract_value : char -> string -> string
     [key=value], where = stands for a one char [delimiter], this function
     extracts the value.
     @raise Not_found if [s] does not contain exactly one delimiter. *)
+
+val sys_to_note_link : string -> string
+(** convert system path (a/b/c) to note_link format (a:b:c) *)
+
+val note_link_to_sys : string -> string
+(** convert note_link path (a:b:c) to system format (a/b/c) *)
