@@ -1685,7 +1685,8 @@ let image_request conf script_name env =
         (* image. Si on ne fait pas de basename, alors ça marche.       *)
         (* let fname = Filename.basename fname in *)
         let fname = Image.path_of_filename conf fname in
-        let _ = ImageDisplay.print_image_file conf fname in true
+        let _ = ImageDisplay.print_image_file conf fname in
+        true
       else false
 
 (* Une version un peu à cheval entre avant et maintenant afin de   *)
@@ -1842,7 +1843,7 @@ let extract_multipart boundary str =
         let s, i = next_line i in
         let s = String.lowercase_ascii s |> Adef.encoded in
         let env = Util.create_env s in
-        match Util.p_getenv env "name", Util.p_getenv env "filename" with
+        match (Util.p_getenv env "name", Util.p_getenv env "filename") with
         | Some var, Some filename ->
             let var = strip_quotes var in
             let filename = strip_quotes filename in
@@ -1872,12 +1873,13 @@ let extract_multipart boundary str =
             let i1 =
               let rec loop i =
                 if i < String.length str then
-                  if i > String.length boundary &&
-                     String.sub str (i - String.length boundary)
-                       (String.length boundary) =
-                       boundary
-                  then
-                    i - String.length boundary
+                  if
+                    i > String.length boundary
+                    && String.sub str
+                         (i - String.length boundary)
+                         (String.length boundary)
+                       = boundary
+                  then i - String.length boundary
                   else loop (i + 1)
                 else i
               in

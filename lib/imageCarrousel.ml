@@ -946,10 +946,13 @@ let print_main_c conf base =
                   failwith
                     (__FILE__ ^ " idigest error, line " ^ string_of_int __LINE__
                       :> string)
-              | "incorrect request" -> Hutil.incorrect_request conf ~comment:"incorrect request, report"
+              | "incorrect request" ->
+                  Hutil.incorrect_request conf
+                    ~comment:"incorrect request, report"
               | _ -> print_confirm_c conf base save_m report)
           | None -> Hutil.incorrect_request conf ~comment:"incorrect, None ip")
-      | None -> Hutil.incorrect_request conf ~comment:"incorrect request, None m")
+      | None ->
+          Hutil.incorrect_request conf ~comment:"incorrect request, None m")
   (* em!="" second pass, ignore *)
   | Some _ -> print_confirm_c conf base "REFRESH" ""
 
