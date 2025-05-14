@@ -11071,34 +11071,38 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
-    linked pages (all)
-de: Notizen, Seiten, Alben oder Gallerien, wo die Person erwähnt wird
-en: notes, pages albums or galleries where person is mentionned
-fr: notes, pages, albums ou galleries ou la personne est citée
-
-    albums galleries where person appears
+    linked albums help
 de: Alben oder Gallerien, wo die Person verlinkt ist
 en: albums or galleries where person is referenced
 fr: albums ou galleries où la personne est citée
 
-    pages where page appears
+    linked albums
+en: linked albums or galleries
+fr: albums ou galleries liés
+
+    linked pages (pages) help
 de: Seiten oder Notizen, wo die Seite referenziert wird
 en: pages or notes where page is referenced
 fr: pages ou notes où la page est citée
 
-    pages where person appears
+    linked pages help
+de: Notizen, Seiten, Alben oder Gallerien, wo die Person erwähnt wird
+en: notes, pages, albums or galleries where person is referenced
+fr: notes, pages, albums ou galleries où la personne est citée
+
+    linked pages
 bg: свързани страници
 ca: enllaços
 co: pagine ligate
 cs: spojený stránky
 da: lænkede sider
 de: Notizen, Seiten, Alben oder Gallerien, wo die Person verlinkt ist
-en: notes, pages, albums or galleries where person is referenced
+en: linked pages
 eo: linkitaj paĝoj
 es: páginas enlazadas
 et: seotud leheküljed
 fi: linkitettyjä sivuja
-fr: notes, pages, albums ou galleries où la personne est citée
+fr: pages liées
 he: דפים מקושרים
 it: pagine collegate
 lt: susieti puslapiai
@@ -12197,6 +12201,7 @@ ru: прочие сведения
 sv: övriga fält
 tr: diğer alan
 
+
     miscellaneous notes
 bg: разни бележки
 ca: miscel·lània
@@ -12225,6 +12230,10 @@ sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
 tr: çeşitli notlar
+
+    miscellaneous notes help
+en: external pages referenced in the base as [[[filename]]]
+fr: pages externes réfécencées dans la base sous la forme [[[fichier]]]
 
     missing %s
 co: %s assente
@@ -16012,6 +16021,14 @@ co: fiura arregistrata/fiure arregistrate
 de: gespeichertes Bild/gespeicherte Bilder
 en: saved image/saved images
 fr: sauvegarde/sauvegardes
+
+    save help
+en: files not referenced as [[[filename]]] or referenced by persons not visible; Will nonetheless be saved by gwu
+fr: fichiers non référencés au format [[[fichier]]] ou référencés par des personnes non visibles; Seront néanmoins sauvegardés par gwu
+
+    files not in db
+en: files not referenced
+fr: fichiers non référencés 
 
     scale
 co: anni à a generazione
