@@ -819,6 +819,9 @@ let add_string gen ?format s =
     match format with
     | Some `Html -> s
     | None | Some `Plain_text -> Html.text_content s
+    | Some (`First_name | `Surname) ->
+       let s = Html.text_content s in
+       if s = "" then "?" else s
   in
   try Hashtbl.find gen.g_hstr s
   with Not_found ->
@@ -2054,8 +2057,8 @@ let add_indi gen r =
   let (death, death_place, death_note, death_src) = de in
   let (burial, burial_place, burial_note, burial_src) = bu in
   let person =
-    {Def.first_name = add_string gen first_name;
-     surname = add_string gen surname; occ = occ;
+    {Def.first_name = add_string gen ~format:`First_name first_name;
+     surname = add_string gen ~format:`Surname surname; occ = occ;
      public_name = add_string gen public_name; image = add_string gen image;
      qualifiers =
        if qualifier <> "" then [add_string gen qualifier] else [];
