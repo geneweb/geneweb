@@ -327,7 +327,7 @@ let rec copy_from_stream conf base strm mode =
     | 'l' -> no_tables
     | 'm' -> Driver.read_nldb base <> []
     | 'n' -> not (Driver.base_notes_are_empty base "")
-    | 'o' -> Sys.file_exists (WiznotesDisplay.dir conf base)
+    | 'o' -> Sys.file_exists (WiznotesDisplay.wiz_dir conf base)
     | 'p' -> (
         match List.assoc_opt (get_variable strm) conf.base_env with
         | Some "" | None -> false
@@ -537,7 +537,7 @@ let eval_var conf base env () _loc = function
   | [ "start_date" ] ->
       VVstring (string_of_start_date conf : Adef.safe_string :> string)
   | [ "wiznotes_dir_exists" ] ->
-      VVbool (Sys.file_exists (WiznotesDisplay.dir conf base))
+      VVbool (Sys.file_exists (WiznotesDisplay.wiz_dir conf base))
   | _ -> raise Not_found
 
 let print_foreach _conf _print_ast _eval_expr = raise Not_found
