@@ -143,7 +143,24 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     if conf.wizard then Wiki.make_edit_button conf ~mode:"NOTES" fnotes ()
     else ""
   in
-  Output.printf conf {|<div class="d-flex mb-3">%s%s</div>|} title_html modbtn;
+  let db = notes_links_db conf base false in
+  let pgl =
+    match List.assoc_opt fnotes db with Some _ -> true | None -> false
+  in
+  let from_where =
+    if pgl then
+      Format.sprintf
+        {|
+ <a href="%sm=NOTES&f=%s&ref=on"
+     class="align-self-center ml-3 mb-1"
+     title="%s">(<-)</a>|}
+        (commd conf :> string)
+        (fnotes :> string)
+        (Utf8.capitalize_fst (transl conf "pages where page appears"))
+    else ""
+  in
+  Output.printf conf {|<div class="d-flex mb-3">%s%s%s</div>|} title_html modbtn
+    from_where;
   let file_path = file_path conf base in
   let s = Util.string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
@@ -163,18 +180,6 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Output.print_string conf s;
   if ho <> None then print_search_form conf (Some fnotes);
   Hutil.trailer conf
-
-(* TODO: DO†WE†NEED†ME?
-   let what_links_page () =
-     if fnotes <> "" then (
-       Output.print_sstring conf {|<a href="|};
-       Output.print_string conf (commd conf);
-       Output.print_sstring conf {|m=NOTES&f=|};
-       Output.print_string conf (Mutil.encode fnotes);
-       Output.print_sstring conf {|&ref=on" class="mx-2">(|};
-       Output.print_sstring conf (transl conf "linked pages");
-       Output.print_sstring conf ")</a>\n")
-   in*)
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
   Hutil.header_with_title conf (fun _ ->
@@ -308,14 +313,15 @@ let linked_page_rows conf base pg pgl =
              (Util.uri_encode fnotes)
              (fnotes :> string)
              (Util.safe_html fnote_title :> string)
-             (if pgl then ""
-             else
-               Format.sprintf
-                 {|<td><a href="%sm=NOTES&f=%s&ref=on"
+             (if pgl then
+              Format.sprintf
+                {|
+<td><a href="%sm=NOTES&f=%s&ref=on"
        title="%s"><-</a></td>|}
-                 (commd conf :> string)
-                 (fnotes :> string)
-                 (Utf8.capitalize_fst (transl conf "pages where page appears")))))
+                (commd conf :> string)
+                (fnotes :> string)
+                (Utf8.capitalize_fst (transl conf "pages where page appears"))
+             else "")))
   | Def.NLDB.PgWizard wizname, _ ->
       if conf.wizard then
         Output.print_sstring conf
@@ -387,8 +393,8 @@ let print_linked_list_standard conf base pgl =
             let db = notes_links_db conf base false in
             let pgl =
               match List.assoc_opt fnotes db with
-              | Some _ -> false
-              | None -> true
+              | Some _ -> true
+              | None -> false
             in
             linked_page_rows conf base pg pgl;
             Output.print_sstring conf "</tr>\n")

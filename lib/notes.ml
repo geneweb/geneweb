@@ -154,7 +154,7 @@ let json_extract_img conf s =
   | None -> ("", "")
 
 let safe_gallery conf base s =
-  let html s = 
+  let html s =
     let s =
       let wi =
         {
@@ -167,7 +167,8 @@ let safe_gallery conf base s =
       in
       Wiki.syntax_links conf wi s
     in
-  Util.string_with_macros conf [] s in
+    Util.string_with_macros conf [] s
+  in
 
   let safe_map e =
     match e with
