@@ -373,9 +373,9 @@ let syntax_links conf wi s =
           in
           Buffer.add_string buff t;
           loop quot_lev (pos + 1) j
-      | NotesLinks.WLnone (j, none_s) -> (
+      | NotesLinks.WLnone (j, none_s) ->
           Buffer.add_string buff none_s;
-          loop quot_lev pos j)
+          loop quot_lev pos j
   in
   loop Zero 1 0;
   Buffer.contents buff
