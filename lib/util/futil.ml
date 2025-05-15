@@ -114,10 +114,11 @@ let map_burial fd = function
   | Buried d -> Buried (map_cdate fd d)
   | Cremated d -> Cremated (map_cdate fd d)
 
-let map_person_ps ?(fd = Fun.id) fp (fs : ?format:_ -> _) p =
+let map_person_ps ?(fd = Fun.id) fp (fs : ?format:_ -> _)
+    ?(f_first_name = fun s -> fs s) ?(f_surname = fun s -> fs s) p =
   {
-    Def.first_name = fs p.Def.first_name;
-    surname = fs p.surname;
+    Def.first_name = f_first_name p.Def.first_name;
+    surname = f_surname p.surname;
     occ = p.occ;
     image = fs p.image;
     first_names_aliases = List.map (fun s -> fs s) p.first_names_aliases;
