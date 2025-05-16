@@ -48,6 +48,8 @@ val map_person_ps :
   ?fd:(Date.date -> Date.date) ->
   ('b -> 'd) ->
   (?format:[ `Plain_text | `Html ] -> 'c -> 'e) ->
+  ?f_first_name:('c -> 'e) ->
+  ?f_surname:('c -> 'e) ->
   ('a, 'b, 'c) Def.gen_person ->
   ('a, 'd, 'e) Def.gen_person
 (** Convert:
