@@ -1341,7 +1341,13 @@ let get_note_or_source conf base ?(p = Gwdb.empty_person base Gwdb.dummy_iper)
   let note_or_source = sou base note_or_source in
   if auth && not no_note then
     (* TODO investigate the use of i in env *)
-    let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in
+    (* in notes, %i becomes index. Other use ??  *)
+    let env =
+      [
+        ('i', fun () -> string_of_iper (get_iper p));
+        ('k', fun () -> Image.default_portrait_filename base p);
+      ]
+    in
     let s = string_with_macros conf env note_or_source in
     let lines = Wiki.html_of_tlsw conf s in
     let lines =
@@ -4009,7 +4015,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "src" env with
       | Vstring s ->
           let env =
-            [ ('i', fun () -> Image.default_portrait_filename base p) ]
+            [
+              ('i', fun () -> string_of_iper (get_iper p));
+              ('k', fun () -> Image.default_portrait_filename base p);
+            ]
           in
           let s =
             let wi =

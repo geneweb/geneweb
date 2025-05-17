@@ -1391,8 +1391,8 @@ let make_conf ~secret_salt from_addr request script_name env =
           try List.assoc "no_note_for_visitor" base_env = "yes"
           with Not_found -> false);
       bname = Filename.remove_extension base_file;
-      nb_of_persons = -1;
-      nb_of_families = -1;
+      nb_of_persons = 0;
+      nb_of_families = 0;
       env;
       senv = [];
       cgi_passwd = ar.ar_passwd;
