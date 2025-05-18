@@ -35,17 +35,26 @@ let add_worker t k =
       Hashtbl.replace t.workers { pid } ()
 
 let cleanup { workers } =
-  Hashtbl.iter (fun { pid } () -> try Unix.kill 9 pid with _ -> ()) workers
+  Logs.debug (fun k -> k "Cleanup workers...");
+  Hashtbl.iter
+    (fun { pid } () ->
+      Logs.debug (fun k -> k "Kill worker %d" pid);
+      try Unix.kill pid Sys.sigterm with _ -> ())
+    workers
+
+let wait_any_child () = My_unix.waitpid_noeintr [] (-1) |> fst
 
 let start n k =
   if (not Sys.unix) || n < 1 then invalid_arg "start";
   let t = { workers = Hashtbl.create n } in
-  Fun.protect ~finally:(fun () -> cleanup t) @@ fun () ->
+  let parent_pid = Unix.getpid () in
+  let finally () = if Unix.getpid () = parent_pid then cleanup t in
+  Fun.protect ~finally @@ fun () ->
   for _ = 0 to n - 1 do
     add_worker t k
   done;
   while true do
-    let pid = Unix.waitpid [] (-1) |> fst in
+    let pid = wait_any_child () in
     (* We never run out of children because each time a worker terminates,
        it is immediately replaced with a new one. *)
     assert (pid > 0);
