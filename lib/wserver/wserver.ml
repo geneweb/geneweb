@@ -288,20 +288,18 @@ let accept_connections_windows socket =
    This function is supported only on Unix. *)
 let with_timeout ~timeout handler f =
   assert Sys.unix;
-  if timeout > 0 then
-    let (_ : Sys.signal_behavior) =
-      Sys.signal Sys.sigalrm (Sys.Signal_handle handler)
-    in
+  if timeout > 0 then (
+    Sys.set_signal Sys.sigalrm (Sys.Signal_handle handler);
     let finally () = ignore (Unix.alarm 0 : int) in
     let g () =
       ignore (Unix.alarm timeout : int);
       f ()
     in
-    Fun.protect ~finally g
+    Fun.protect ~finally g)
   else f ()
 
 let accept_connection_unix ~timeout callback socket pid =
-  let client_socket, client_addr = Unix.accept socket in
+  let client_socket, client_addr = My_unix.accept_noeintr socket in
   Logs.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
@@ -353,7 +351,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
         Unix.setsockopt socket Unix.IPV6_ONLY false;
       Unix.setsockopt socket Unix.SO_REUSEADDR true;
       Unix.bind socket (Unix.ADDR_INET (addr, port));
-      Unix.listen socket max_pending_requests;
+      My_unix.listen_noeintr socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
       Format.eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...@."
         (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
