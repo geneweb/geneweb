@@ -491,7 +491,11 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
               generate_lowercase_surname_index )
       in
       let already_initialized =
-        List.for_all Sys.file_exists
+        List.for_all
+          (fun index_file ->
+            let base_file = Filename.concat base.data.bdir "base" in
+            Sys.file_exists index_file
+            && (Unix.stat index_file).st_mtime > (Unix.stat base_file).st_mtime)
           (List.map (Filename.concat base.data.bdir) index_files)
       in
       if not already_initialized then (
