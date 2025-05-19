@@ -39,6 +39,14 @@ val treat_request : Geneweb.Config.config -> unit
 
 (**/**)
 
+val person_selected_with_redirect :
+  conf:Geneweb.Config.config ->
+  base:Gwdb.base ->
+  ?parameters:(string * string) list ->
+  person:Gwdb.person ->
+  unit ->
+  unit
+
 (* Used by v7 plugin *)
 val incorrect_request : Geneweb.Config.config -> unit
 
