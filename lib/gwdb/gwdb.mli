@@ -2,6 +2,8 @@ exception Not_plain_text of string
 
 include module type of Gwdb_driver
 
+val iper_of_int : int -> iper
+val ifam_of_int : int -> ifam
 val insert_string : base -> ?format:[< `Plain_text | `Html ] -> string -> istr
 
 module IperSet : sig
