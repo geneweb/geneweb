@@ -13,13 +13,15 @@ let first_letters base is_surnames =
   in
   try
     let rec loop istr list =
-      let s = Translate.eval (Mutil.nominative (Gwdb.sou base istr)) in
-      let k = Util.name_key base s in
-      let c = Utf8.sub k 0 1 in
       let list =
-        match list with
-        | hd :: _ -> if hd = c then list else c :: list
-        | [] -> [ c ]
+        if Gwdb.is_empty_string istr then list
+        else
+          let s = Translate.eval (Mutil.nominative (Gwdb.sou base istr)) in
+          let k = Util.name_key base s in
+          let c = Utf8.sub k 0 1 in
+          match list with
+          | hd :: _ -> if hd = c then list else c :: list
+          | [] -> [ c ]
       in
       match Gwdb.spi_next name_index istr with
       | istr -> loop istr list
