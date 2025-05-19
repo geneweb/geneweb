@@ -232,7 +232,9 @@ let macro conf base = function
   | 'w' ->
       let s = Hutil.link_to_referer conf in
       if (s :> string) = "" then Adef.safe "&nbsp;" else s
-  | 'W' -> (Util.get_referer conf :> Adef.safe_string)
+  | 'W' ->
+      Option.value ~default:(Adef.safe "")
+        (Util.get_referer conf :> Adef.safe_string option)
   | '/' -> Adef.safe ""
   | c -> Adef.safe ("%" ^ String.make 1 c)
 
@@ -285,7 +287,7 @@ let rec lexicon_translate conf base nomin strm first_c =
 
 let browser_cannot_handle_passwords conf =
   let user_agent = Mutil.extract_param "user-agent: " '/' conf.Config.request in
-  String.lowercase_ascii user_agent = "konqueror"
+  Option.map String.lowercase_ascii user_agent = Some "konqueror"
 
 let get_variable strm =
   let rec loop len =

@@ -137,3 +137,8 @@ let trim_trailing_spaces s =
     loop (len - 1)
   in
   if len' = 0 then "" else if len' = len then s else String.sub s 0 len'
+
+let end_with s x =
+  let slen = String.length s in
+  let xlen = String.length x in
+  slen >= xlen && String.sub s (slen - xlen) xlen = x
