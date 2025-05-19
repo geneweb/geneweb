@@ -9,16 +9,6 @@ module Logs = Geneweb_logs.Logs
 type worker = { pid : int } [@@unboxed]
 type t = { workers : (worker, unit) Hashtbl.t } [@@unboxed]
 
-let pp_exception ppf (e, bt) =
-  let pp_header ppf pid = Fmt.pf ppf "Exception raised in %d:" pid in
-  let pp_header = Fmt.(styled (`Fg `Red) pp_header) in
-  let lines =
-    String.split_on_char '\n' @@ Printexc.raw_backtrace_to_string bt
-  in
-  Fmt.pf ppf "@[%a@ %s@ %a@]" pp_header (Unix.getpid ()) (Printexc.to_string e)
-    Fmt.(list ~sep:cut string)
-    lines
-
 let add_worker t k =
   match Unix.fork () with
   | 0 ->
@@ -28,7 +18,7 @@ let add_worker t k =
          done
        with e ->
          let bt = Printexc.get_raw_backtrace () in
-         Logs.info (fun k -> k "%a" pp_exception (e, bt)));
+         Logs.info (fun k -> k "%a" Util.pp_exception (e, bt)));
       exit 1
   | pid ->
       Logs.debug (fun k -> k "Creating worker %d" pid);

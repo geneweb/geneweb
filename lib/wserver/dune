@@ -6,7 +6,4 @@
    geneweb_util
    geneweb_logs
    unix
-   fmt)
- (modules
-   wserver
-   pool))
+   fmt))
