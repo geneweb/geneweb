@@ -599,23 +599,3 @@ let print_menu_marriage conf base =
       Util.hidden_input conf "m" @@ Adef.encoded "AM");
   Output.print_sstring conf "\n";
   Hutil.trailer conf
-
-(* template *)
-type 'a env = Vother of 'a
-
-let get_vother = function Vother x -> Some x
-let set_vother x = Vother x
-
-let print_anniversaries conf =
-  if Util.p_getenv conf.Config.env "old" = Some "on" then ()
-  else
-    Hutil.interp conf "annivmenu"
-      {
-        Templ.eval_var = (fun _ -> raise Not_found);
-        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = (fun _ -> raise Not_found);
-      }
-      [] ()

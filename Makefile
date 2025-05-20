@@ -12,6 +12,7 @@ endif
 
 # Variables for packagers.
 PREFIX=/usr
+RESOURCES_DIR=../geneweb-resources
 DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
 ODOC_DIR=$(BUILD_DIR)/_doc/_html
@@ -53,19 +54,10 @@ bin/gwrepl/.depend:
 dune-workspace: dune-workspace.in Makefile.config
 	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
-hd/etc/version.txt:
-	@echo -n "Generating $@..."
-	@echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
-	@echo "$$(date '+%Y-%m-%d'):" >> $@
-	@echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')]" >> $@
-	@echo " Done!"
-.PHONY:hd/etc/version.txt
-
 # [End] Generated files section
 
 GENERATED_FILES_DEP = \
 	dune-workspace \
-	hd/etc/version.txt \
 	test/dune \
 	lib/gwlib.ml \
 	lib/dev_config.ml \
@@ -145,7 +137,9 @@ distrib:
 	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp -R hd/* $(DISTRIB_DIR)/gw/
+	cp -R $(RESOURCES_DIR)/etc/ $(DISTRIB_DIR)/gw/
+	cp -R $(RESOURCES_DIR)/images/ $(DISTRIB_DIR)/gw/
+	cp -R $(RESOURCES_DIR)/lang/ $(DISTRIB_DIR)/gw/
 	mkdir $(DISTRIB_DIR)/gw/plugins
 	for P in $(shell ls plugins); do \
 		if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
