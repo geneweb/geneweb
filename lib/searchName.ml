@@ -206,7 +206,6 @@ let search conf base an search_order specify unknown =
             record_visited conf (get_iper p);
             Perso.print conf base p)
     | Surname :: l -> (
-        Printf.eprintf "Surname\n";
         let pl = Some.search_surname conf base an in
         match pl with
         | [] -> loop l
@@ -320,7 +319,6 @@ let search conf base an search_order specify unknown =
               [ ("", pl1); (tit2, pl2); (tit3, pl3) ]
         (*specify conf base an pl1 (pl2 @ pl3) []*))
     | FullName :: l -> (
-        Printf.eprintf "FullName\n";
         let fn =
           match p_getenv conf.env "p" with
           | Some fn -> Name.lower fn
@@ -406,7 +404,6 @@ let search conf base an search_order specify unknown =
                 Perso.print conf base p
             | _ -> specify conf base an pl1 pl2 pl3))
     | ApproxKey :: l -> (
-        Printf.eprintf "ApproxKey\n";
         let pl = search_approx_key conf base an in
         match pl with
         | [] -> loop l
@@ -415,7 +412,6 @@ let search conf base an search_order specify unknown =
             Perso.print conf base p
         | pl -> specify conf base an pl [] [])
     | PartialKey :: l -> (
-        Printf.eprintf "PartialKey\n";
         let pl = search_by_name conf base an in
         match pl with
         | [] -> (
