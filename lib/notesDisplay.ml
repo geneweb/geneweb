@@ -251,17 +251,17 @@ let create_gallery_item conf fnotes nenv s =
     fnotes img_url fnotes img_name img_name title
 
 let print_linked_list_gallery conf base pgl =
-  Wserver.printf "<div class=\"d-flex flex-wrap mt-3\">\n";
+  Output.printf conf "<div class=\"d-flex flex-wrap mt-3\">\n";
   List.iter
     (function
       | Def.NLDB.PgMisc fnotes ->
           let nenv, s = read_notes base fnotes in
           let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
           if typ = "gallery" || typ = "album" then
-            Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
+            Output.print_sstring conf (create_gallery_item conf fnotes nenv s)
       | _ -> ())
     pgl;
-  Wserver.printf "</div>\n"
+  Output.print_sstring conf "</div>\n"
 
 let print_linked_list_standard conf base pgl =
   Output.print_sstring conf
@@ -280,10 +280,14 @@ let print_linked_list conf base pgl =
   | Some "album" -> print_linked_list_gallery conf base pgl
   | _ -> print_linked_list_standard conf base pgl
 
-let print_what_links conf base fnotes =
+let print_what_links conf base =
+  let fnotes =
+    match p_getenv conf.env "f" with
+    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+    | None -> ""
+  in
   let title h =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "linked pages"));
-    Output.print_sstring conf " ";
+    Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "linked pages"));
     if h then (
       Output.print_sstring conf "[";
       Output.print_string conf (Util.escape_html fnotes);
@@ -302,46 +306,43 @@ let print_what_links conf base fnotes =
   Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db);
   Hutil.trailer conf
 
+let read_notes_from_conf conf base =
+  let fnotes =
+    match p_getenv conf.env "f" with
+    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+    | None -> ""
+  in
+  read_notes base fnotes
+
+let print_json conf base =
+  let nenv, s = read_notes_from_conf conf base in
+  let s =
+    match List.assoc "TYPE" nenv with
+    | "album" | "gallery" -> Notes.safe_gallery conf s
+    | (exception Not_found) | _ -> s
+  in
+  Output.print_sstring conf s
+
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  match p_getenv conf.env "ref" with
-  | Some "on" -> print_what_links conf base fnotes
-  | _ -> (
-      let nenv, s = read_notes base fnotes in
-      let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
-      let templ, typ =
-        if typ = "" then (None, "")
-        else if typ = "album" || typ = "gallery" then
-          try (Util.open_etc_file conf "notes_gallery", typ)
-          with Not_found -> (None, "")
-        else (None, "")
-      in
-      match templ with
-      | Some (ic, _fname) -> (
-          match p_getenv conf.env "ajax" with
-          | Some "on" ->
-              let charset =
-                if conf.charset = "" then "utf-8" else conf.charset
-              in
-              Wserver.header
-                (Format.sprintf "Content-type: application/json; charset=%s"
-                   charset);
-              Wserver.printf "%s"
-                (match typ with
-                | "gallery" -> Notes.safe_gallery conf s
-                | "album" -> Notes.safe_gallery conf s
-                | _ -> s)
-          | _ -> Templ.copy_from_templ conf Templ.Env.empty ic)
-      | None -> (
-          let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-          let title = Util.safe_html title in
-          match p_getint conf.env "v" with
-          | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-          | None -> print_whole_notes conf base fnotes title s None))
+  let nenv, s = read_notes base fnotes in
+  let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+  let title = Util.safe_html title in
+  match p_getint conf.env "v" with
+  | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+  | None -> print_whole_notes conf base fnotes title s None
+
+let print_mod_json conf base =
+  let nenv, s = read_notes_from_conf conf base in
+  let s_digest =
+    List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv ^ s
+  in
+  let digest = Mutil.digest s_digest in
+  Output.printf conf "{\"digest\":\"%s\",\"r\":%s}" digest s
 
 let print_mod conf base =
   let fnotes =
@@ -350,36 +351,22 @@ let print_mod conf base =
     | None -> ""
   in
   let nenv, s = read_notes base fnotes in
-  let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
-  let templ =
-    if typ = "" then None
-    else if typ = "gallery" || typ = "album" then
-      Util.open_etc_file conf ("notes_upd_" ^ typ)
-    else None
-  in
   let title _ =
     Output.printf conf "%s - %s%s"
       (Utf8.capitalize_fst (transl conf "base notes"))
       conf.bname
       (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  match (templ, p_getenv conf.env "notmpl") with
-  | Some _, Some "on" ->
-      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
-        nenv s
-  | Some (ic, _fname), _ -> (
-      match p_getenv conf.env "ajax" with
-      | Some "on" ->
-          let s_digest =
-            List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv ^ s
-          in
-          let digest = Mutil.digest s_digest in
-          let charset = if conf.charset = "" then "utf-8" else conf.charset in
-          Wserver.header
-            (Format.sprintf "Content-type: application/json; charset=%s" charset);
-          Wserver.printf "{\"digest\":\"%s\",\"r\":%s}" digest s
-      | _ -> Templ.copy_from_templ conf Templ.Env.empty ic)
-  | _ ->
+  match List.assoc "TYPE" nenv with
+  | ("gallery" | "album") as typ -> (
+      match Util.open_etc_file conf ("notes_upd_" ^ typ) with
+      | Some (ic, _fname) -> Templ.copy_from_templ conf Templ.Env.empty ic
+      | None ->
+          (* FIXME: We should emit an error instead of ignoring silently the
+             absence of the template? *)
+          Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
+            nenv s)
+  | (exception Not_found) | _ ->
       Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
         nenv s
 

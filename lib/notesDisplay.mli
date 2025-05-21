@@ -5,11 +5,17 @@ val print_linked_list :
   unit
 (** Displays the page list in argument *)
 
+val print_what_links : Config.config -> Gwdb.base -> unit
+
 val print : Config.config -> Gwdb.base -> unit
 (** Displays the base notes *)
 
+val print_json : Config.config -> Gwdb.base -> unit
+
 val print_mod : Config.config -> Gwdb.base -> unit
 (** Displays a text form for notes creation/edition *)
+
+val print_mod_json : Config.config -> Gwdb.base -> unit
 
 val print_mod_ok : Config.config -> Gwdb.base -> unit
 (** Updates notes *)
