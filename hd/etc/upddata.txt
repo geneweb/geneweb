@@ -279,7 +279,7 @@
       (> %if;(b.book_max_results!="")<abbr title="book_max_results">%b.book_max_results;</abbr>%else;%nb_max%end;).
       %if;(e.s!="")[*specify]%else;[*select a letter]%end;.</div>
   %end;
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js

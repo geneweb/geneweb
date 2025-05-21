@@ -137,7 +137,7 @@
         <textarea class="form-control col-10 mr-2" id="image_name"
           type="input" name="image_name" rows="1" placeholder="[*name]">
         </textarea>
-        
+
         <div class="d-flex col">
           <h1 class="display-4">
             %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*source/sources]0</h1>
@@ -167,7 +167,7 @@
         <h1 class="display-4">[*portrait]0</h1>
         %if;has_portrait;
           <div class="d-flex mt-1">
-            <a role="button" 
+            <a role="button"
               href="%if;has_portrait_url;%portrait;%else;%prefix;kch=%random_bits;&m=IM_C&i=%index;%end;"%sp;
               target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
@@ -191,7 +191,7 @@
         %end;
         %if;has_old_portrait;
           <div class="d-flex mt-1">
-            <a role="button" 
+            <a role="button"
               href="%if;has_old_portrait_url;%portrait;%else;%prefix;kch=%random_bits;&m=IM_C_S&i=%index;%end;"
               target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
@@ -325,7 +325,7 @@
   %end;
 %end;
 
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js

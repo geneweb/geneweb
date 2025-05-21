@@ -125,7 +125,7 @@
   </table>
 </form>
 %if;(not cancel_links)
-  %base_trailer;
+  %include;trl
   %include;copyr
 %end;
 </div>

@@ -36,7 +36,7 @@
 %end;
 %if;(max!=0 and not (max=1 and not has_children))
   <div class="d-flex flex-wrap align-self-center btn-toolbar py-0 mx-3 mt-1" role="toolbar" aria-label="buttons to select maximum ascending level v">
-    
+
     <span>%for;i;min;maxp;%if;(i=13)<span class="high-lev d-none">%end;%apply;picklvl(i)%if;(i=max and max>12)</span>%end;%end;
       %if;(max>12)
         <span class="toggle-lev ml-1" data-caution=". [*high generation caution]">
@@ -210,7 +210,7 @@
                       <button type="button" class="btn btn-sm py-0 mt-1 btn-light%if;(cousdown=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_vvv_%expr(www+1)"><span title="vvv/%expr(www+1)" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-down-long fa-fw"></i>www</span></button>
                     </div>
                   </div>
-                  <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" 
+                  <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www"
                     class="btn btn-lg btn-light p-2 mr-2 align-self-center">
                       <span data-toggle="tooltip" data-html="true" title="%expr(vvv+www) %if;(vvv+www<2)[degree of kinship]0%else;[degree of kinship]1%end; ([show all] [relationship link/relationship links]1)">
                         <i class="fa-solid fa-person-arrow-up-from-line"></i>
@@ -376,7 +376,7 @@
       </div>
     </div>
   </div>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js

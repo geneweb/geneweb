@@ -241,7 +241,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                             2. [*surname/surnames]0 ¹[:] <i class='font-weight-lighter'>Doe</i><br><br>
                             3. [*public name][:] <i class='font-weight-lighter'>James Smith</i><br><br>
                             4. [*alias][:] <i class='font-weight-lighter'>Jimmy</i><br><br>
-                            
+
                             5. [*key]0[:] [first name/first names]2.[occ]1 [surname/surnames]0 ²<br>
                                    <i class='font-weight-lighter'>James William.2 Smith-Johnson<br>       james william.2 smith johnson</i><br>
                             <br><div class='font-weight-lighter small'>¹ [word/words]0<br>² [word/words]1<br>³ [optional/mandatory]0</div></div>">
@@ -575,7 +575,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 %end;
   </div>
 </div>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js

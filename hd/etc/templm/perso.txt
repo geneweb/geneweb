@@ -1354,7 +1354,7 @@
         %apply;content_family("self","spouse")
         %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em>%nl;%end;
         %if;(evar.image="on" and nb_families > 1)<hr style="clear:both;">%end;
-      
+
     %end;
     </div>
   %else;
@@ -1390,7 +1390,7 @@
 %if;(not cancel_links)
   %apply;menu()
   %apply;buttons()
-  %base_trailer;
+  %include;trl
   %include;copyr
 %end;
 </div>

@@ -103,7 +103,7 @@
     %apply;event("burial")
   </fieldset>
 </form>
-%base_trailer;
+%include;trl
 %include;copyr
 </body>
 </html>

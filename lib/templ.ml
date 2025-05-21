@@ -1467,7 +1467,6 @@ and print_var print_ast_list conf ifun env ep loc sl =
   print_var1 eval_var sl
 
 and print_simple_variable dummy conf = function
-  | "base_trailer" -> include_hed_trl dummy conf "trl"
   | "body_prop" -> print_body_prop conf
   | "number_of_bases" ->
       Output.print_sstring conf

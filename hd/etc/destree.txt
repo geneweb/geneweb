@@ -19,7 +19,7 @@
 %include;perso_utils
 %include;menubar
 %include;modules/arbre_descendants
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
