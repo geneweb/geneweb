@@ -171,7 +171,7 @@ let rheader conf title = header_with_title ~error:true conf title
 let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
   Templ.include_hed_trl conf "trl";
-  Templ.print_copyright conf;
+  Templ.include_template conf Templ.Env.empty "copyr" (fun () -> ());
   Templ.include_template conf Templ.Env.empty "js" (fun () -> ());
   Output.print_sstring conf "</body>\n</html>\n"
 
