@@ -330,11 +330,19 @@ let print conf base =
     | None -> ""
   in
   let nenv, s = read_notes base fnotes in
-  let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-  let title = Util.safe_html title in
-  match p_getint conf.env "v" with
-  | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-  | None -> print_whole_notes conf base fnotes title s None
+  let templ =
+    match List.assoc "TYPE" nenv with
+    | "album" | "gallery" -> Util.open_etc_file conf "notes_gallery"
+    | exception Not_found | _ -> None
+  in
+  match templ with
+  | Some (ic, _) -> Templ.copy_from_templ conf Templ.Env.empty ic
+  | None ->
+    let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+    let title = Util.safe_html title in
+    match p_getint conf.env "v" with
+    | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+    | None -> print_whole_notes conf base fnotes title s None
 
 let print_mod_json conf base =
   let nenv, s = read_notes_from_conf conf base in
