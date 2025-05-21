@@ -153,8 +153,22 @@ let json_extract_img conf s =
   | Some img -> ((Util.commd conf :> string) ^ "m=DOC&s=" ^ img, img)
   | None -> ("", "")
 
-let safe_gallery conf s =
-  let html s = Util.string_with_macros conf [] s in
+let safe_gallery conf base s =
+  let html s = 
+    let s =
+      let wi =
+        {
+          Wiki.wi_mode = "NOTES";
+          Wiki.wi_file_path = file_path conf base;
+          Wiki.wi_person_exists = person_exists conf base;
+          Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
+          Wiki.wi_always_show_link = conf.wizard || conf.friend;
+        }
+      in
+      Wiki.syntax_links conf wi s
+    in
+  Util.string_with_macros conf [] s in
+
   let safe_map e =
     match e with
     | `Assoc l ->
