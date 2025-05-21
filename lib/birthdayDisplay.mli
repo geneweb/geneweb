@@ -62,6 +62,3 @@ val print_menu_dead : Config.config -> Gwdb.base -> unit
 
 val print_menu_marriage : Config.config -> Gwdb.base -> unit
 (** Displays the main wedding anniversaries menu *)
-
-val print_anniversaries : Config.config -> unit
-(** Displays the menu of anniversaries selection *)

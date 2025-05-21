@@ -1,2 +1,0 @@
-%include;perso_utils
-%include;menubar

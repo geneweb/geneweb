@@ -540,9 +540,6 @@ let treat_request =
            | "ADD_PAR_OK" ->
                w_wizard @@ w_lock @@ w_base
                @@ Geneweb.UpdateFamOk.print_add_parents
-           | "ANM" ->
-               w_base @@ fun conf _ ->
-               Geneweb.BirthdayDisplay.print_anniversaries conf
            | "AN" -> (
                w_base @@ fun conf base ->
                match Geneweb.Util.p_getenv conf.env "v" with
