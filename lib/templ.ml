@@ -1469,7 +1469,6 @@ and print_var print_ast_list conf ifun env ep loc sl =
 and print_simple_variable dummy conf = function
   | "base_trailer" -> include_hed_trl dummy conf "trl"
   | "body_prop" -> print_body_prop conf
-  | "copyright" -> print_copyright dummy conf
   | "number_of_bases" ->
       Output.print_sstring conf
         (string_of_int (List.length (Util.get_bases_list ())))
