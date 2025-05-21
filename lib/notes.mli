@@ -103,4 +103,4 @@ val update_cache_linked_pages :
   Config.config -> mode -> Def.NLDB.key -> Def.NLDB.key -> int -> unit
 
 val json_extract_img : Config.config -> string -> string * string
-val safe_gallery : Config.config -> string -> string
+val safe_gallery : Config.config -> Gwdb.base -> string -> string

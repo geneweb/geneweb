@@ -485,7 +485,7 @@ let print_json conf base =
   let nenv, s = read_notes_from_conf conf base in
   let s =
     match List.assoc "TYPE" nenv with
-    | "album" | "gallery" -> Notes.safe_gallery conf s
+    | "album" | "gallery" -> Notes.safe_gallery conf base s
     | (exception Not_found) | _ -> s
   in
   Output.print_sstring conf s
