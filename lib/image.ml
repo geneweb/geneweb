@@ -13,9 +13,9 @@ let carrousel_folder conf = !GWPARAM.images_d conf.bname
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
  *)
 let default_image_filename_of_key mode first_name surname occ =
-  let space_to_unders = Mutil.tr ' ' '_' in
-  let f = space_to_unders (Name.lower first_name) in
-  let s = space_to_unders (Name.lower surname) in
+  let sp2_ = Mutil.tr ' ' '_' in
+  let f = sp2_ (Name.lower first_name) in
+  let s = sp2_ (Name.lower surname) in
   if mode = "blasons" then Format.sprintf "%s.%d.%s.blason" f occ s
   else Format.sprintf "%s.%d.%s" f occ s
 
@@ -377,48 +377,53 @@ let get_blason_owner conf base p =
     loop p
   else None
 
-(* rename any folder or file based on fn, sn, oc *)
 let rename_portrait_or_blason conf base _mode p (nfn, nsn, noc) =
-  let key =
+  let sp2_ = Mutil.tr ' ' '_' in
+  let old_key =
     Format.sprintf "%s.%d.%s"
-      (get_first_name p |> sou base)
+      (get_first_name p |> sou base |> Name.lower |> sp2_)
       (get_occ p)
-      (get_surname p |> sou base)
-    |> Name.lower
+      (get_surname p |> sou base |> Name.lower |> sp2_)
   in
-  let key_l = String.length key in
-  let n_key = Format.sprintf "%s.%d.%s" nfn noc nsn |> Name.lower in
-  let rec loop f =
-    if not (f = "") then
-      let dir = Filename.dirname f in
-      let fname = Filename.basename f in
-      let n_fname =
-        n_key ^ String.sub fname key_l (String.length fname - key_l)
-      in
-      if Sys.file_exists f then (
-        Sys.rename f (Filename.concat dir n_fname);
-        loop f)
-      else ()
+  let new_key =
+    Format.sprintf "%s.%d.%s"
+      (nfn |> Name.lower |> sp2_)
+      noc
+      (nsn |> Name.lower |> sp2_)
   in
-  let p_dir = !GWPARAM.portraits_d conf.bname in
-  let i_dir = !GWPARAM.images_d conf.bname in
-  (* carrousel folder *)
-  if Sys.file_exists (Filename.concat i_dir key) then
-    Sys.rename (Filename.concat i_dir key) (Filename.concat i_dir n_key);
-  let p_dir_s = Filename.concat p_dir "saved" in
-  (* saved portraits *)
-  let f = find_file_without_ext (Filename.concat p_dir_s key) in
-  loop f;
-  (* xxx.png/jpg/jpeg/gif/, xxx.txt, xxx.src, xxx.url, xxx.stop *)
-  let f = find_file_without_ext (Filename.concat p_dir key) in
-  loop f;
-  (* idem for blason files *)
-  let f = find_file_without_ext (Filename.concat p_dir key ^ ".blason") in
-  loop f
+  if old_key = new_key then ()
+  else
+    let p_dir = !GWPARAM.portraits_d conf.bname in
+    let i_dir = !GWPARAM.images_d conf.bname in
+    let old_carrousel = Filename.concat i_dir old_key in
+    let new_carrousel = Filename.concat i_dir new_key in
+    if Sys.file_exists old_carrousel && Sys.is_directory old_carrousel then (
+      try Sys.rename old_carrousel new_carrousel
+      with Sys_error e ->
+        Logs.syslog `LOG_ERR
+          (Format.sprintf "Error renaming carrousel directory %s to %s: %s"
+             old_carrousel new_carrousel e);
+        let rename_files_with_extensions dir base_name =
+          Array.iter
+            (fun ext ->
+              let old_file = Filename.concat dir (base_name ^ ext) in
+              if Sys.file_exists old_file then
+                let new_file = Filename.concat dir (new_key ^ ext) in
+                try Sys.rename old_file new_file
+                with Sys_error e ->
+                  Logs.syslog `LOG_ERR
+                    (Format.sprintf "Error renaming %s to %s: %s" old_file
+                       new_file e))
+            [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
+        in
+        rename_files_with_extensions p_dir old_key;
+        let saved_dir = Filename.concat p_dir "saved" in
+        if Sys.file_exists saved_dir then
+          rename_files_with_extensions saved_dir old_key;
+        rename_files_with_extensions p_dir (old_key ^ ".blason"))
 
 let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
-  rename_portrait_or_blason conf base "portraits" p (nfn, nsn, noc);
-  rename_portrait_or_blason conf base "blasons" p (nfn, nsn, noc)
+  rename_portrait_or_blason conf base "all" p (nfn, nsn, noc)
 
 let get_portrait_with_size conf base p =
   if has_access_to_image "portraits" conf base p then
