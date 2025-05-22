@@ -170,9 +170,12 @@ let rheader conf title = header_with_title ~error:true conf title
 
 let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
-  Templ.include_hed_trl conf "trl";
-  Templ.print_copyright conf;
+  Templ.include_template conf Templ.Env.empty "trl" (fun () -> ());
+  Templ.include_template conf Templ.Env.empty "copyr" (fun () -> ());
   Templ.include_template conf Templ.Env.empty "js" (fun () -> ());
+  let query_time = Unix.gettimeofday () -. conf.query_start in
+  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+    !GWPARAM.errors_other !GWPARAM.set_vars;
   Output.print_sstring conf "</body>\n</html>\n"
 
 (* Calendar request *)

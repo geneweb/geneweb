@@ -1485,6 +1485,10 @@ and print_simple_variable conf = function
         (String.concat ", " (Util.get_bases_list ~format_fun:format_link ()))
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
+  | "query_time" ->
+      let query_time = Unix.gettimeofday () -. conf.query_start in
+      Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+        !GWPARAM.errors_other !GWPARAM.set_vars
   | "src_images_list" ->
       let dir = !GWPARAM.images_d conf.bname in
       let f_list = Sys.readdir dir |> Array.to_list |> List.sort compare in
