@@ -157,6 +157,24 @@ let string_search s v =
   in
   loop 0 0
 
+let extract_filename_from_url url =
+  try
+    let without_protocol =
+      match string_search url "://" with
+      | Some pos -> String.sub url (pos + 3) (String.length url - pos - 3)
+      | None -> url
+    in
+    let without_params =
+      match String.index_opt without_protocol '?' with
+      | Some pos -> String.sub without_protocol 0 pos
+      | None -> without_protocol
+    in
+    let filename = Filename.basename without_params in
+    if filename = "" || filename = "/" || not (String.contains filename '.')
+    then "image_" ^ string_of_int (int_of_float (Unix.time ()))
+    else filename
+  with _ -> "image_" ^ string_of_int (int_of_float (Unix.time ()))
+
 (* get the image type, possibly removing spurious header *)
 
 let image_type s =
@@ -244,32 +262,6 @@ let get_extension conf keydir mode saved fname =
   else if Sys.file_exists (f ^ ".stop") then ".stop"
   else "."
 
-let print_confirm_c conf base save_m report =
-  match Util.p_getint conf.env "i" with
-  | Some ip ->
-      let p = poi base (Gwdb.iper_of_string (string_of_int ip)) in
-      let digest = Image.default_image_filename "portraits" base p in
-      let new_env =
-        List.fold_left
-          (fun accu (k, v) ->
-            if k = "m" then ("m", Adef.encoded "REFRESH") :: accu
-            else if k = "idigest" || k = "" || k = "file" then accu
-            else (k, v) :: accu)
-          [] conf.env
-      in
-      let new_env =
-        if save_m = "REFRESH" then new_env
-        else ("em", Adef.encoded save_m) :: new_env
-      in
-      let new_env =
-        ("idigest", Adef.encoded digest)
-        :: ("report", Adef.encoded report)
-        :: new_env
-      in
-      let conf = { conf with env = new_env } in
-      Perso.interp_templ "carrousel" conf base p
-  | None -> Hutil.incorrect_request conf
-
 (* ************************************************************************ *)
 (*  send, delete, reset and print functions                                 *)
 (*                                                                          *)
@@ -305,7 +297,6 @@ let print_send_image conf base mode p =
       Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
-  let digest = Image.default_image_filename "portraits" base p in
   Hutil.header conf title;
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
@@ -315,7 +306,6 @@ let print_send_image conf base mode p =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
-  Util.hidden_input conf "idigest" (Mutil.encode digest);
   Util.hidden_input conf "mode" (Adef.encoded mode);
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
   Output.print_sstring conf (Util.transl conf ":");
@@ -410,10 +400,7 @@ let print_send_ok conf base =
     with Failure _ -> incorrect conf "print send ok"
   in
   let p = poi base ip in
-  let digest = Image.default_image_filename "portraits" base p in
-  if (digest :> string) = Mutil.decode (raw_get conf "idigest") then
-    raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
-  else Update.error_digest conf
+  raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
 
 (* carrousel *)
 let effective_send_c_ok conf base p file file_name =
@@ -424,18 +411,13 @@ let effective_send_c_ok conf base p file file_name =
     try (List.assoc "image_url" conf.env :> string) with Not_found -> ""
   in
   let image_name =
-    try (List.assoc "image_name" conf.env :> string) with Not_found -> ""
-  in
-  let image_name =
-    if image_name = "" then
-      let f =
-        if String.length image_url > 7 then
-          String.sub image_url 7 (String.length image_url - 7)
-        else image_url
-      in
-      (* FIXME basename *)
-      Filename.basename f
-    else image_name
+    let user_provided_name =
+      try (List.assoc "image_name" conf.env :> string) with Not_found -> ""
+    in
+    if user_provided_name = "" && image_url <> "" then
+      extract_filename_from_url image_url
+    else if user_provided_name = "" then ""
+    else user_provided_name
   in
   let note =
     match Util.p_getenv conf.env "note" with
@@ -675,7 +657,9 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
     else Filename.concat dir fname
   in
   let orig_file =
-    Filename.remove_extension orig_file |> Image.find_file_without_ext
+    if Filename.extension orig_file = ".url" && Sys.file_exists orig_file then
+      orig_file
+    else Filename.remove_extension orig_file |> Image.find_file_without_ext
   in
   (* FIXME basename *)
   let file = Filename.basename orig_file in
@@ -836,22 +820,21 @@ let effective_reset_c_ok conf base p =
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
 (* ************************************************************************** *)
 
-(* most functions in GeneWeb end with a COMMAND_OK confirmation step *)
-(* for carrousel, we have chosen to ignore this step and refresh *)
-(* the updated page directly *)
-(* if em="" this is the first pass, do it *)
+(* Carrousel image management with direct HTTP redirects:
+   - Process POST action immediately
+   - Redirect to main page with success message in URL parameters
+   - Single, clean request cycle *)
 
 let print_main_c conf base =
   match Util.p_getenv conf.env "em" with
   | None -> (
+      (* Process action and redirect with success message *)
       match Util.p_getenv conf.env "m" with
       | Some m -> (
-          let save_m = m in
           match Util.p_getenv conf.env "i" with
           | Some ip -> (
               let p = poi base (Gwdb.iper_of_string ip) in
-              let digest = Image.default_image_filename "portraits" base p in
-              let conf, report =
+              let processed_filename =
                 match m with
                 | "SND_IMAGE_C_OK" ->
                     let mode =
@@ -871,90 +854,108 @@ let print_main_c conf base =
                     let file_name =
                       (Mutil.decode (Adef.encoded file_name) :> string)
                     in
-                    let file_name_2 = Filename.remove_extension file_name in
-                    let new_env =
-                      List.fold_left
-                        (fun accu (k, v) ->
-                          if k = "file_name_2" then
-                            (k, Adef.encoded file_name_2) :: accu
-                          else (k, v) :: accu)
-                        [] conf.env
-                    in
-                    let conf = { conf with env = new_env } in
                     let file =
                       if mode = "note" || mode = "source" then "file_name"
-                      else (raw_get conf "file" :> string)
+                      else
+                        match Util.p_getenv conf.env "image_url" with
+                        | Some url when url <> "" -> ""
+                        | _ -> (
+                            try (raw_get conf "file" :> string) with _ -> "")
                     in
-                    let idigest =
-                      try (List.assoc "idigest" conf.env :> string)
-                      with Not_found -> ""
-                    in
-                    if digest = idigest then
-                      (conf, effective_send_c_ok conf base p file file_name)
-                    else (conf, "idigest error")
-                | "DEL_IMAGE_C_OK" ->
-                    let idigest =
-                      try (List.assoc "idigest" conf.env :> string)
-                      with Not_found -> ""
-                    in
-                    let fdigest =
-                      try (List.assoc "fdigest" conf.env :> string)
-                      with Not_found -> ""
-                    in
-                    if digest = idigest then
-                      (conf, effective_delete_c_ok conf base p)
-                    else if fdigest != "" then
-                      (conf, effective_delete_c_ok conf base p)
-                    else (conf, "idigest error")
-                | "RESET_IMAGE_C_OK" ->
-                    let idigest =
-                      try (List.assoc "idigest" conf.env :> string)
-                      with Not_found -> ""
-                    in
-                    let fdigest =
-                      try (List.assoc "fdigest" conf.env :> string)
-                      with Not_found -> ""
-                    in
-                    if digest = idigest then
-                      (conf, effective_reset_c_ok conf base p)
-                    else if fdigest != "" then
-                      (conf, effective_reset_c_ok conf base p)
-                    else (conf, "idigest error")
+                    effective_send_c_ok conf base p file file_name
+                | "DEL_IMAGE_C_OK" -> effective_delete_c_ok conf base p
+                | "RESET_IMAGE_C_OK" -> effective_reset_c_ok conf base p
                 | "BLASON_MOVE_TO_ANC" ->
                     if Image.has_blason conf base p true then
                       match Util.p_getenv conf.env "ia" with
                       | Some ia ->
                           let fa = poi base (Gwdb.iper_of_string ia) in
-                          (conf, move_blason_file conf base p fa)
-                      | None -> (conf, "")
-                    else (conf, "")
+                          Filename.basename (move_blason_file conf base p fa)
+                      | None -> ""
+                    else ""
                 | "PORTRAIT_TO_BLASON" ->
-                    (conf, effective_copy_portrait_to_blason conf base p)
+                    Filename.basename
+                      (effective_copy_portrait_to_blason conf base p)
                 | "IMAGE_TO_BLASON" ->
-                    (conf, effective_copy_image_to_blason conf base p)
+                    Filename.basename
+                      (effective_copy_image_to_blason conf base p)
                 | "BLASON_STOP" ->
                     let has_blason_self = Image.has_blason conf base p true in
                     let has_blason = Image.has_blason conf base p false in
                     if has_blason && not has_blason_self then
-                      (conf, create_blason_stop conf base p)
-                    else (conf, "idigest error")
-                | "IMAGE_C" -> (conf, "image")
-                | _ -> (conf, "incorrect request")
+                      Filename.basename (create_blason_stop conf base p)
+                    else "error"
+                | _ -> "incorrect request"
               in
-              match report with
-              | "idigest error" ->
-                  failwith
-                    (__FILE__ ^ " idigest error, line " ^ string_of_int __LINE__
-                      :> string)
+
+              (* HTTP redirect to main page with success message *)
+              match processed_filename with
+              | "error" -> Hutil.incorrect_request conf
               | "incorrect request" ->
-                  Hutil.incorrect_request conf
-                    ~comment:"incorrect request, report"
-              | _ -> print_confirm_c conf base save_m report)
-          | None -> Hutil.incorrect_request conf ~comment:"incorrect, None ip")
-      | None ->
-          Hutil.incorrect_request conf ~comment:"incorrect request, None m")
-  (* em!="" second pass, ignore *)
-  | Some _ -> print_confirm_c conf base "REFRESH" ""
+                  Hutil.incorrect_request conf ~comment:"incorrect request"
+              | _ ->
+                  let mode =
+                    try (List.assoc "mode" conf.env :> string)
+                    with Not_found -> "portraits"
+                  in
+                  let display_filename =
+                    if Filename.extension processed_filename = "" then
+                      (* Pas d'extension, essayer de la récupérer *)
+                      let keydir =
+                        Image.default_image_filename "portraits" base p
+                      in
+                      let ext =
+                        get_extension conf keydir mode false processed_filename
+                      in
+                      if ext <> "." then processed_filename ^ ext
+                      else processed_filename
+                    else processed_filename
+                  in
+                  let base_url =
+                    Printf.sprintf
+                      "%sm=SND_IMAGE_C&i=%s&em=%s&file_name=%s&mode=%s"
+                      (commd conf :> string)
+                      ip
+                      (Mutil.encode m :> string)
+                      (Mutil.encode display_filename :> string)
+                      (Mutil.encode mode :> string)
+                  in
+                  let url_params = ref [] in
+                  (try
+                     if List.assoc "delete" conf.env = Adef.encoded "on" then
+                       url_params := ("delete", "on") :: !url_params
+                   with Not_found -> ());
+                  (try
+                     let fn2 =
+                       List.assoc "file_name_2" conf.env |> Mutil.decode
+                     in
+                     if fn2 <> "" then
+                       url_params := ("file_name_2", fn2) :: !url_params
+                   with Not_found -> ());
+                  (if m = "IMAGE_TO_BLASON" then
+                   let ext = Filename.extension processed_filename in
+                   if ext <> "" then url_params := ("ext", ext) :: !url_params);
+                  let params_string =
+                    List.fold_left
+                      (fun acc (key, value) ->
+                        acc ^ "&" ^ key ^ "=" ^ (Mutil.encode value :> string))
+                      "" !url_params
+                  in
+                  let redirect_url = base_url ^ params_string in
+                  Output.status conf Def.Moved_Temporarily;
+                  Output.header conf "Location: %s" redirect_url;
+                  Output.flush conf)
+          | None -> Hutil.incorrect_request conf ~comment:"missing person index"
+          )
+      | None -> Hutil.incorrect_request conf ~comment:"missing action")
+  (* Display main page with success message from URL params *)
+  | Some _ ->
+      let p =
+        match Util.p_getint conf.env "i" with
+        | Some ip -> poi base (Gwdb.iper_of_string (string_of_int ip))
+        | None -> failwith "No person index in success display"
+      in
+      Perso.interp_templ "carrousel" conf base p
 
 let print conf base =
   match p_getenv conf.env "i" with

@@ -842,7 +842,6 @@ let treat_request =
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "PPS" -> w_base @@ Place.print_all_places_surnames
              | "R" -> w_base @@ w_person @@ relation_print
-             | "REFRESH" -> w_base @@ w_person @@ Perso.interp_templ "carrousel"
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
                  Output.status conf Def.OK;
