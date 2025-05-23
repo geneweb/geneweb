@@ -2396,10 +2396,17 @@ let main () =
     speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   let gwd_cmd =
-    Array.fold_left
-      (fun acc arg ->
-        if arg.[0] = '-' then acc ^ "<br><b>" ^ arg ^ "</b> " else acc ^ arg)
-      "" Sys.argv
+    let rec process acc skip_next = function
+      | [] -> acc
+      | arg :: rest ->
+          if skip_next then process (acc ^ "xxx") false rest
+          else if arg = "-cgi_secret_salt" then
+            process (acc ^ "<br><b>" ^ arg ^ "</b> ") true rest
+          else if arg.[0] = '-' then
+            process (acc ^ "<br><b>" ^ arg ^ "</b> ") false rest
+          else process (acc ^ arg) false rest
+    in
+    process "" false (Array.to_list Sys.argv)
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter register_plugin !plugins;
