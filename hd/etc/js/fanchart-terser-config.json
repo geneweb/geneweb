@@ -1,0 +1,31 @@
+{
+  "compress": {
+    "arrows": true,
+    "booleans": true,
+    "collapse_vars": true,
+    "comparisons": true,
+    "dead_code": true,
+    "drop_console": false,
+    "hoist_funs": true,
+    "if_return": true,
+    "join_vars": true,
+    "keep_infinity": true,
+    "reduce_funcs": true,
+    "reduce_vars": true,
+    "sequences": true,
+    "typeofs": true,
+    "passes": 2,
+    "ecma": 2020,
+    "module": true,
+    "toplevel": true
+  },
+  "mangle": {
+    "toplevel": true,
+    "properties": {
+      "regex": "^(?!S\\d|fn$|sn$|fnk$|snk$|oc$|dates$|sosa$|sosasame$|has_parents$|birth_place$|baptism_date$|baptism_place$|death_date$|death_place$|burial_date$|burial_place$|marriage_date$|marriage_date_$|marriage_place$|age$|marriage_age$|marriage_length$|index$|place$|placeClass$|total$|eventType$|eventCount$|originalFill$|wizard$|location$|eventOrder$|eventToClass$|eventToLabel$|birth$|baptism$|marriage$|death$|burial$)"
+    }
+  },
+  "output": {
+    "comments": false
+  }
+}

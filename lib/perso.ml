@@ -15,6 +15,13 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module IperSet = Driver.Iper.Set
 
+let person_living_age conf p p_auth =
+  match
+    (p_auth, Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+  with
+  | true, Some d, NotDead -> Some (Date.time_elapsed d conf.today)
+  | _ -> None
+
 let get_cousins_sparse =
   let cache = ref None in
   fun conf base p ->
@@ -3715,20 +3722,13 @@ and eval_bool_person_field conf base env (p, p_auth) = function
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "access" -> acces conf base p |> safe_val
   | "age" -> (
-      match
-        (p_auth, Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
-      with
-      | true, Some d, NotDead ->
-          Date.time_elapsed d conf.today
-          |> DateDisplay.string_of_age conf
-          |> safe_val
-      | _ -> null_val)
+      match person_living_age conf p p_auth with
+      | Some elapsed -> DateDisplay.string_of_age conf elapsed |> safe_val
+      | None -> null_val)
   | "age_years" -> (
-      match
-        (p_auth, Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
-      with
-      | true, Some d, NotDead -> d.year |> string_of_int |> str_val
-      | _ -> null_val)
+      match person_living_age conf p p_auth with
+      | Some elapsed -> elapsed.year |> string_of_int |> str_val
+      | None -> null_val)
   | "alias" -> (
       match Driver.get_aliases p with
       | nn :: _ when p_auth ->
@@ -4275,6 +4275,13 @@ and eval_family_field_var conf base env
   | "father" :: sl ->
       let ep = make_ep conf base ifath in
       eval_person_field_var conf base env ep loc sl
+  | "divorce_date" :: sl -> (
+      match Driver.get_divorce fam with
+      | Divorced cd when m_auth -> (
+          match Date.od_of_cdate cd with
+          | Some d -> eval_date_field_var conf d sl
+          | None -> null_val)
+      | _ -> null_val)
   | "marriage_date" :: sl -> (
       match Date.od_of_cdate (Driver.get_marriage fam) with
       | Some d when m_auth -> eval_date_field_var conf d sl

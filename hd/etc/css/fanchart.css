@@ -1,186 +1,1533 @@
+/* ============================================
+   FANCHART CSS - Architecture modulaire
+   Geneweb - Visualisation généalogique en éventail
+   ============================================ */
+
+/* ===========================================
+   1. VARIABLES CSS ET CONFIGURATION GLOBALE
+   =========================================== */
 :root {
+  /* Dimensions système */
+  --fc-control-size: 28px; /* Restauré à la taille originale */
+  --fc-control-size-mobile: 44px;
+  --fc-panel-width: 335px;
+  --fc-panel-offset: 64px;
+  --fc-place-height-compact: 26px; /* Hauteur compacte pour la densité */
+  --fc-svg-margin: 5px;
+
+  /* Palette de couleurs système */
+  --fc-primary: #007bff;
+  --fc-primary-hover: #0056b3;
+  --fc-success: #28a745;
+  --fc-danger: #dc3545;
+  --fc-text-primary: #212529;
+  --fc-text-secondary: #6c757d;
+  --fc-text-muted: #adb5bd;
+  --fc-bg-light: #f8f9fa;
+  --fc-border-color: #dee2e6;
+  --fc-border-subtle: rgba(0, 0, 0, 0.08);
+  --fc-panel-border: 1px solid rgba(0,0,0,0.08);
+
+  /* Couleurs des événements (source unique) */
+  --fc-event-birth: #9FD1A4;
+  --fc-event-baptism: #C7E0C9;
+  --fc-event-marriage: #E67E22;
+  --fc-event-death: #A5CCC9;
+  --fc-event-burial: #6FA8A2;
+
+  /* Transitions et animations */
+  --fc-transition-fast: 0.15s ease;
+  --fc-transition-normal: 0.2s ease;
+  --fc-transition-slow: 0.3s ease;
+
+  /* Ombres */
+  --fc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --fc-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --fc-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  /* SVG spécifique */
   --fc-stroke-width: 0.1%;
   --fc-stroke-dasharray: 5px;
+
+  /* Surlignage mariages */
+  --fc-marriage-highlight: rgb(250, 185, 120);
+  --fc-marriage-hover: rgb(250, 220, 190);
 }
 
-@media print {
-  .noprint {
-    display: none;
-  }
-  #place_list {
-    position: static;
-  }
-}
-
-svg .highlight {
- fill: lightgrey !important;
-}
-svg .text_highlight {
- fill: black !important;
-}
-
-svg .same_hl .bg {
- fill: lightgrey !important;
-}
-svg .same_hl .text {
- fill: black !important;
-}
-
-/* places list */
-body:not(.places-list) #places-list {
-  display: none;
-}
-
-#places-list {
- overflow: scroll;
- height: 100%;
- width: var(--fc-tool-size, 18%);
- white-space: nowrap;
-}
-/*
-#places-list>ul>li {
- font-size: 70%;
-}
-*/
-
-ul {
- list-style: none;
- margin: 0;
- margin-left: 5px;
- margin-top: 5px;
- padding: 0;
-}
-.hidden {
-  visibility: hidden;
-}
-
-/* Place hilight */
-body.place_hl .square, .square {
-  display: none;
-}
-
-/* Colorise places */
-body.place_color .square { display: inline; color: transparent; }
-
-/* death age */
-#death-age {
-  margin: 5px;
-}
-
-body.death-age svg .DA0  { fill: hsl(30, 100%, 90%)}
-body.death-age svg .DA1  { fill: hsl(30, 100%, 80%)}
-body.death-age svg .DA2  { fill: hsl(30, 100%, 70%)}
-body.death-age svg .DA3  { fill: hsl(30, 100%, 60%)}
-body.death-age svg .DA4  { fill: hsl(30, 100%, 50%)}
-body.death-age svg .DA5  { fill: hsl(30, 100%, 45%)}
-body.death-age svg .DA6  { fill: hsl(30, 100%, 40%)}
-body.death-age svg .DA7  { fill: hsl(30, 100%, 35%)}
-
-body:not(.death-age) #death-age {
-  display: none;
-}
-
-body.death-age span.DA0  { color: hsl(30, 100%, 90%)}
-body.death-age span.DA1  { color: hsl(30, 100%, 80%)}
-body.death-age span.DA2  { color: hsl(30, 100%, 70%)}
-body.death-age span.DA3  { color: hsl(30, 100%, 60%)}
-body.death-age span.DA4  { color: hsl(30, 100%, 50%)}
-body.death-age span.DA5  { color: hsl(30, 100%, 45%)}
-body.death-age span.DA6  { color: hsl(30, 100%, 40%)}
-body.death-age span.DA7  { color: hsl(30, 100%, 35%)}
-
-.arrow {
-  color: transparent;
-}
-body.death-age .hl .arrow {
-  color: black;
-}
-
+/* ===========================================
+   2. RESET ET STYLES DE BASE
+   =========================================== */
 body {
   margin: 0;
   padding: 0;
 }
 
-svg .link {
+svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===========================================
+   3. PANNEAU DE CONTRÔLES PRINCIPAL
+   =========================================== */
+.fanchart-controls {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  max-width: 200px;
+  font-size: 0.95rem;
+}
+
+.control-section {
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 0.4rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+/* Boutons de contrôle */
+.btn-fanchart {
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  transition: all 0.2s ease;
+  font-size: 1em;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   cursor: pointer;
 }
 
+.btn-fanchart:hover {
+  background: #e7f3ff;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.btn-fanchart.active {
+  background-color: #007bff !important;
+  border-color: #007bff !important;
+  color: white !important;
+}
+
+.btn-fanchart.disabled {
+  background: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-close {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 6px;
+  transition: color 0.1s ease;
+}
+
+.btn-close:hover {
+  color: #dc3545;
+}
+
+.btn-group-fanchart {
+  display: flex;
+  gap: 3px;
+}
+
+/* Sélecteur de police */
+.custom-select {
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  background: white;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+/* ===========================================
+   4. RENDU SVG ET ÉLÉMENTS GRAPHIQUES
+   =========================================== */
 path {
- stroke: transparent;
- stroke-width: var(--fc-stroke-width);
- fill: transparent;
+  stroke: transparent;
+  stroke-width: var(--fc-stroke-width);
+  fill: transparent;
 }
-circle, path.contour {
- stroke: #A0A0A0;
- stroke-width: var(--fc-stroke-width);
- fill: transparent;
+
+circle,
+path.contour {
+  stroke: #A0A0A0;
+  stroke-width: var(--fc-stroke-width);
+  fill: transparent;
 }
-path.middle {
- stroke: #A0A0A0;
- stroke-dasharray: var(--fc-stroke-dasharray);
- stroke-width: var(--fc-stroke-width);
- fill: transparent;
+
+path.middle, line.middle {
+  stroke: #A0A0A0;
+  stroke-dasharray: var(--fc-stroke-dasharray);
+  stroke-width: var(--fc-stroke-width);
+  fill: transparent;
 }
+
 text {
- fill: black;
- text-anchor: middle;
+  fill: black;
+  text-anchor: middle;
 }
+
 textPath {
- dominant-baseline: central;
+  dominant-baseline: central;
 }
-.dates { font-size: 80%; }
+
 .none {
- display: none;
+  display: none;
 }
 
-.icon {
- fill: transparent;
-}
-.icon:hover {
- fill: green;
+.link {
+  cursor: pointer;
 }
 
-.no-link {
- fill: transparent;
-}
-.no-link:hover {
- fill: brown;
+/* Patronyme du couple en mode circulaire graissé */
+.bold-sn {
+  font-weight: 600;
 }
 
+/* Indicateurs de navigation (triangles et croix) */
+svg .icon {
+  fill: transparent !important;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+svg g[id^="S"]:hover .icon,  /* Triangle noir au survol de l'individu */
+svg g[id^="N-S"]:hover .icon,
+svg g[id^="S-S"]:hover .icon {
+  opacity: 1 !important;
+  fill: black !important;
+}
+
+svg .icon:hover { /* Triangle blanc avec bordure au survol de l'icône elle-même */
+  fill: white !important;
+  stroke: black;
+  stroke-width: 1px;
+  stroke-opacity: 0.8;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+}
+
+svg .no-link {
+  fill: transparent;
+}
+
+svg .no-link:hover {
+  fill: brown;
+  opacity: 0.8;
+}
+
+/* Masque l’élément nécessaire aux calculs de métrique */
 #standard {
- font-size: 100%;
- fill: transparent;
+  fill: transparent;
 }
 
-#places-list, #death-age {
- position: absolute;
- right: 0;
- top: 0;
-}
-svg {
- position: absolute;
- left: 0;
- top: 0;
+/* ===========================================
+   5. SURLIGNAGE ET INTERACTIONS SVG
+   =========================================== */
+
+/* Survol d’une personne */
+svg g[id^="S"]:hover > text, /* texte en gras et noir */
+svg g[id^="S"]:hover > .text,
+svg g[id^="N-S"]:hover > text,
+svg g[id^="N-S"]:hover > .text,
+svg g[id^="S-S"]:hover > text,
+svg g[id^="S-S"]:hover > .text {
+  font-weight: 600 !important;
+  fill: black !important;
+  font-size: 95% !important;
 }
 
-#buttons {
- position: absolute;
- left: 0;
- top: 0;
- z-index: 1;
- margin: 2px;
+/* Survol d'un mariage */
+svg g[id^="M"]:hover > path.bg,
+svg g[id^="N-M"]:hover > path.bg,
+svg g[id^="S-M"]:hover > path.bg,
+svg g[id^="M"] .event-highlight-marriage,
+svg g[id^="N-M"] .event-highlight-marriage,
+svg g[id^="S-M"] .event-highlight-marriage {
+  fill: var(--fc-marriage-hover) !important;
 }
-.button {
- font-size: 140%;
- text-align: center;
+
+svg g[id^="M"]:hover > text, /* texte gras avec ombre blanche */
+svg g[id^="M"]:hover > .text,
+svg g[id^="N-M"]:hover > text,
+svg g[id^="N-M"]:hover > .text,
+svg g[id^="S-M"]:hover > text,
+svg g[id^="S-M"]:hover > .text {
+  font-weight: 600 !important;
+  text-shadow: 0 0 1px white !important;
 }
-.button:hover {
- cursor: pointer;
+
+/* Surlignage des personnes et mariages */
+svg g[id^="S"] .highlight text,
+svg g[id^="S"] .highlight .text,
+svg g[id^="N-S"] .highlight text,
+svg g[id^="N-S"] .highlight .text,
+svg g[id^="S-S"] .highlight text,
+svg g[id^="S-S"] .highlight .text {
+  font-weight: 600 !important;
+  fill: black !important;
+  font-size: 95% !important;
 }
-.disabled {
-  color: lightgrey;
+
+svg g[id^="M"] > path.bg.highlight,
+svg g[id^="N-M"] > path.bg.highlight,
+svg g[id^="S-M"] > path.bg.highlight {
+  fill: var(--fc-marriage-highlight) !important;
+}
+
+svg g[id^="M"] .highlight text,
+svg g[id^="M"] .highlight .text,
+svg g[id^="N-M"] .highlight text,
+svg g[id^="N-M"] .highlight .text,
+svg g[id^="S-M"] .highlight text,
+svg g[id^="S-M"] .highlight .text {
+  font-weight: 600 !important;
+  fill: black !important;
+  text-shadow: 0 0 1px white !important;
+}
+
+/* Surlignage SVG - cibler uniquement les arrière-plans, pas le texte */
+/* Mariage du couple central (mode 360°) : fond blanc par défaut */
+svg #M1-NS > path.bg {
+  fill: white;
+  fill-opacity: 1;
+}
+
+/* Texte : même règle de hover que le fond, et même poids */
+svg #M1-NS:hover text,
+svg #M1-NS:hover .text,
+svg #M1-NS.event-highlight text,
+svg #M1-NS.event-highlight .text {
+  font-weight: 600 !important;
+  fill: black !important;
+  text-shadow: 0 0 1px white !important;
+}
+
+/* Surlignage multiple des secteurs des implexes */
+svg .same_hl .bg:not([class*="ma-"]) { /* arrière-plan grisé léger */
+  fill: rgba(128, 128, 128, 0.2) !important;
+}
+
+svg .same_hl .text:not([class*="ma-"]) { /* texte en gras et ombre blanche multiple */
+  fill: black !important;
+  font-weight: bold !important;
+  text-shadow: 0 0 2px white, 0 0 4px white, 0 0 6px white !important;
+}
+
+/* Amélioration générale du contraste au survol */
+svg g:hover > text,
+svg g:hover > .text {
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Secteurs de personnes : léger agrandissement de la police au survol */
+svg g[id^="S"]:hover > text,
+svg g[id^="S"]:hover > .text,
+svg g[id^="N-S"]:hover > text,
+svg g[id^="N-S"]:hover > .text,
+svg g[id^="S-S"]:hover > text,
+svg g[id^="S-S"]:hover > .text {
+  font-size: 95% !important;
+}
+
+svg .implex-compact text, /* réduction de la taille de police en mode "reduced" ou "numbered" */
+svg .implex-compact .text {
+  font-size: 80% !important;
+}
+
+/* Tailles et variantes de police */
+.dates {
+  font-size: 80%;
+}
+
+svg.serif text {
+  font-size: 85%;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+svg.large text {
+  font-size: 105%;
 }
 
 svg.mono text {
- font-family: monospace;
+  font-family: monospace, "Courier New", Courier;
+  font-size: 80%;
+}
+
+svg.readable text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 90%;
+  letter-spacing: 0.4px;
+}
+
+/* Colorisation des événements */
+svg .event-highlight-birth {
+  fill: rgba(159, 209, 164, 0.4) !important;
+}
+
+svg .event-highlight-baptism {
+  fill: rgba(199, 224, 201, 0.4) !important;
+}
+
+svg .event-highlight-death {
+  fill: rgba(165, 204, 201, 0.4) !important;
+}
+
+svg .event-highlight-burial {
+  fill: rgba(111, 168, 162, 0.4) !important;
+}
+
+/* Accélération GPU pour les transformations fréquentes */
+svg g[id^="G"],
+svg g[id^="N-G"],
+svg g[id^="S-G"] {
+  will-change: transform;
+  transform-origin: center;
+}
+
+/* Optimisation du rendu texte (améliore l’antialiasing) */
+svg text,
+svg .text {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===========================================
+   6. MODES DE VISUALISATION
+   =========================================== */
+
+/* Mode Âges */
+body:not(.age) #age-legend { display: none; }
+
+.age-legend-container {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 160px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+}
+
+.legend-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.legend-title { margin: 0; font-size: 14px; font-weight: 600; }
+.legend-close { background: none; border: none; color: white; cursor: pointer; font-size: 16px; }
+.legend-close:hover { opacity: 0.8; }
+
+.legend-section { padding: 8px 12px; }
+.legend-section:not(:last-child) { border-bottom: 1px solid #eee; }
+
+.section-label {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-list { list-style: none; margin: 0; padding: 0; }
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
+}
+
+.legend-item:hover { background: rgba(0, 0, 0, 0.05); }
+
+.legend-item[style*="opacity: 0.3"] {
+  cursor: not-allowed !important;
+  filter: grayscale(1);
+}
+
+.legend-item[style*="opacity: 0.3"] .legend-text {
+  color: #999 !important;
+  font-style: italic;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  margin-right: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.legend-text { flex: 1; font-size: 12px; color: #333; }
+
+/* Couleurs palettes */
+/* Palette âges - Bleus avec contraste garanti > 4.5:1 */
+.legend-swatch.age-0, body.age svg .DA0 {
+  background-color: #E3F2FD; /* Très clair - Contraste: 14.2:1 */
+  fill: #E3F2FD;
+}
+
+.legend-swatch.age-1, body.age svg .DA1 {
+  background-color: #90CAF9; /* Clair - Contraste: 8.1:1 */
+  fill: #90CAF9;
+}
+
+.legend-swatch.age-2, body.age svg .DA2 {
+  background-color: #64B5F6; /* Moyen - Contraste: 6.3:1 */
+  fill: #64B5F6;
+}
+
+.legend-swatch.age-3, body.age svg .DA3 {
+  background-color: #42A5F5; /* Moyen-foncé - Contraste: 5.1:1 */
+  fill: #42A5F5;
+}
+
+.legend-swatch.age-4, body.age svg .DA4 {
+  background-color: #2196F3; /* Foncé mais lisible - Contraste: 4.6:1 */
+  fill: #2196F3;
+}
+
+/* Palette mariages - Violets avec contraste garanti > 4.5:1 */
+.legend-swatch.marr-0, body.age svg .DAM0 {
+  background-color: #F3E5F5; /* Très clair - Contraste: 13.8:1 */
+  fill: #F3E5F5;
+}
+
+.legend-swatch.marr-1, body.age svg .DAM1 {
+  background-color: #CE93D8; /* Clair - Contraste: 7.9:1 */
+  fill: #CE93D8;
+}
+
+.legend-swatch.marr-2, body.age svg .DAM2 {
+  background-color: #BA68C8; /* Moyen - Contraste: 6.1:1 */
+  fill: #BA68C8;
+}
+
+.legend-swatch.marr-3, body.age svg .DAM3 {
+  background-color: #AB47BC; /* Moyen-foncé - Contraste: 5.2:1 */
+  fill: #AB47BC;
+}
+
+.legend-swatch.marr-4, body.age svg .DAM4 {
+  background-color: #9C27B0; /* Foncé mais lisible - Contraste: 4.7:1 */
+  fill: #9C27B0;
+}
+
+body.age svg g[id^="S"] > circle.bg.highlight,
+body.age svg g[id^="S"] > path.bg.highlight,
+body.age svg g[id^="M"] > path.bg.highlight,
+body.age svg g[id^="N"] > path.bg.highlight {
+  fill: #FAF183 !important;
+}
+
+body.age svg .highlight text {
+  fill: black !important;
+  font-weight: 600 !important;
+}
+
+/* Surlignage légende - simplifié sans bordure ni triangle */
+.legend-item.hl { background: #f0f0f0 !important; }
+.legend-item.hl .legend-text { font-weight: 600; color: #222; }
+
+/* Colorisation par lieux */
+body.place .square {
+  display: inline;
+  color: transparent;
+}
+
+/* ===========================================
+   7. PANNEAU DES LIEUX - STRUCTURE PRINCIPALE
+   =========================================== */
+body:not(.place) .places-panel {
+  display: none;
+}
+
+.places-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  width: 340px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease;
+}
+
+/* ===========================================
+   7.1 PANNEAU MASQUÉ (COLLAPSED)
+   État où le panneau est réduit mais le mode place reste actif
+   =========================================== */
+body.place .places-panel.panel-collapsed {
+  width: var(--fc-panel-offset);
+  min-width: var(--fc-panel-offset);
+  overflow: hidden;
+}
+
+body.place .places-panel.panel-collapsed .places-header,
+body.place .places-panel.panel-collapsed .controls-search-section,
+body.place .places-panel.panel-collapsed .summary-section,
+body.place .places-panel.panel-collapsed .places-container {
+  display: none;
+}
+
+body.place {
+  overflow-x: hidden;
+}
+
+body.place .places-panel.panel-hidden {
+  display: none;
+}
+/* Bouton toggle pour restaurer le panneau masqué */
+/* Bouton toggle pour restaurer le panneau masqué */
+.panel-toggle {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  z-index: 1002;
+}
+
+body.place .places-panel.panel-collapsed .panel-toggle {
+  display: flex;
+}
+
+.panel-toggle:hover {
+  opacity: 0.9;
+}
+
+/* Header du panneau */
+.places-header {
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: var(--fc-panel-offset);
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.places-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.generation-count {
+  font-size: 12px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* Bouton pour masquer le panneau */
+.panel-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.panel-close:hover {
+  opacity: 0.8;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+
+/* ===========================================
+   7.1 SECTION RECHERCHE ET CONTRÔLES
+   =========================================== */
+.controls-search-section {
+  padding: 5px;
+  background: rgba(248, 249, 250, 0.95);
+  border-bottom: var(--fc-panel-border);
+  border-left: var(--fc-panel-border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: var(--fc-panel-offset);
+}
+
+.places-panel.show-events .controls-search-section {
+  border-bottom: none;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 3px 24px 3px 6px; /* Espace pour le bouton clear */
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+}
+
+.search-clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.controls-buttons {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.sort-toggle,
+.events-toggle {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.sort-toggle:hover,
+.events-toggle:hover {
+  background: #e7f3ff;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+/* ===========================================
+   7.2 SECTION RÉSUMÉ - LAYOUT HORIZONTAL
+   =========================================== */
+.summary-section {
+  padding: 0px 4px 4px 8px;
+  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  display: none;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  flex-shrink: 0;
+  margin-left: var(--fc-panel-offset);
+  border-left: var(--fc-panel-border);
+  border-bottom: var(--fc-panel-border);
+  transition: all 0.2s ease;
+}
+
+.places-panel.show-events .summary-section {
+  display: flex;
+  padding-bottom: 4px;
+}
+
+.summary-helper-icon {
+  color: #17a2b8;
+  font-size: 10px;
+  flex-shrink: 0;
+  cursor: help;
+  opacity: 0.8;
+}
+
+.summary-helper-icon:hover {
+  opacity: 1;
+}
+
+.summary-places-info {
+  font-weight: 600;
+  color: #495057;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Tableau horizontal des événements */
+.summary-events-table {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  margin-left: auto;
+  margin-right: 8px;
+  align-items: center;
+  font-size: 9px;
+}
+
+.summary-event-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 18px;
+}
+
+/* Indicateurs de légende avec même style que les indicateurs de ligne */
+.summary-event-label {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 1px;
+  padding: 0px 3px;
+}
+
+.summary-event-count {
+  font-weight: 700;
+  color: #495057;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.summary-persons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 4px;
+  margin-right: 8px;
+  gap: 1px;
+  }
+
+.summary-persons-icon {
+  color: #495057;
+  font-size: 11px;
+  cursor: help;
+}
+
+.summary-persons-count {
+  font-weight: 700;
+  color: #495057;
+  font-size: 11px;
+}
+
+/* Badge du total d'événements */
+.summary-total-events {
+  background: #ffffff;
+  color: #495057;
+  padding: 2px 2px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 24px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: help;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+/* ===========================================
+   7.3 CONTENEUR ET LISTE DES LIEUX
+   =========================================== */
+.places-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.places-list {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: overlay;
+  padding: 0;
+  padding-bottom: 0;
+}
+
+/* Barre de scroll personnalisée */
+.places-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.places-list::-webkit-scrollbar-thumb {
+  background: rgba(40, 167, 69, 0.4);
+  border-radius: 3px;
+}
+
+.places-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(40, 167, 69, 0.6);
+}
+
+/* ===========================================
+   7.4 LIGNE DE LIEU - STRUCTURE 3 COLONNES
+   =========================================== */
+.place-row {
+  display: flex;
+  align-items: stretch;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.place-row.tall-row {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+}
+
+/* Indicateurs d'événements (colonne gauche) */
+.place-indicators {
+  width: 60px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  gap: 2px;
+  min-height: var(--fc-place-height-compact);
+  overflow: hidden;
+  transition: opacity 0.1s ease-in;
+}
+
+.place-row.tall-row .place-indicators {
+  padding: 1px 4px 1px 0px;
+  gap: 1px;
+}
+
+/* Ligne de séparation pour organiser 2/3 */
+.line-break {
+  flex-basis: 100%;
+  height: 0;
+  width: 0;
+}
+
+/* Indicateur individuel */
+.indicator {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Couleurs des indicateurs */
+.indicator.n,
+.summary-event-label.birth-label {
+  background: #9FD1A4;
+  color: white;
+}
+
+.indicator.b,
+.summary-event-label.baptism-label {
+  background: #C7E0C9;
+  color: white;
+}
+
+.indicator.m,
+.summary-event-label.marriage-label {
+  background: #E67E22;
+  color: white;
+}
+
+.indicator.d,
+.summary-event-label.death-label {
+  background: #A5CCC9;
+  color: white;
+}
+
+.indicator.s,
+.summary-event-label.burial-label {
+  background: #6FA8A2;
+  color: white;
+}
+
+/* ===========================================
+   7.5 CONTENU DU LIEU - COLONNES CENTRALE ET DROITE
+   =========================================== */
+.place-content {
+  flex: 1;
+  padding: 0px 2px 0px 6px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  cursor: pointer;
+  min-height: var(--fc-place-height-compact);
+  border-left: 1px solid #dee2e6;
+  position: relative;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Zone de hover étendue */
+.place-content::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  z-index: -1;
+  pointer-events: auto;
+}
+
+/* États de survol sans changement de dimensions */
+.place-content:hover {
+  background: rgba(40, 167, 69, 0.08);
+}
+
+.places-panel .place-content.person-match {
+  background: rgba(40, 167, 69, 0.08);
+  font-weight: 600;
+  min-height: inherit;
+}
+
+.place-content.grayed-out {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.places-panel .place-content.person-match {
+  background: linear-gradient(to right,
+    rgba(40, 167, 69, 0.15) 0%,
+    rgba(40, 167, 69, 0.25) 100%) !important;
+}
+
+/* Lieu verrouillé au repos - violet */
+.places-panel .place-content.locked:not(.person-match) {
+  background: linear-gradient(to right,
+    rgba(102, 126, 234, 0.12) 0%,
+    rgba(102, 126, 234, 0.25) 100%) !important;
+  box-shadow: inset 2px 0 0 #667eea;
+  min-height: inherit;
+}
+
+/* Lieu verrouillé + matché par survol individu - vert avec shadow violet */
+.places-panel .place-content.locked.person-match {
+  box-shadow: inset 2px 0 0 #667eea;
+}
+
+.place-content.locked .place-name {
+  font-weight: 700;
+}
+
+/* Colonnes internes */
+.place-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.place-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Carré coloré */
+.place-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+/* Nom du lieu */
+.place-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: black;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: font-weight 0.1s ease;
+}
+
+/* Expansion du nom en mode détaillé ou au survol */
+.place-content:hover .place-name,
+.place-content.person-match .place-name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+}
+
+.places-panel.show-events .place-name {
+  white-space: normal;
+  font-weight: 500;
+}
+
+/* Totaux détaillés par événement (mode détaillé) */
+.place-events {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  color: #95989b;
+}
+
+.places-panel.show-events .place-events {
+  display: flex !important;
+}
+
+.event-item {
+  display: none;
+  align-items: baseline;
+  gap: 3px;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  font-family: monospace;
+}
+
+.event-item.active {
+  display: flex;
+}
+
+.event-count {
+  font-weight: 700;
+  font-size: 11px;
+  text-align: right;
+  min-width: 10px;
+}
+
+.event-label {
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  width: 8px;
+  text-align: right;
+}
+
+/* Badge total du lieu */
+.place-count {
+  font-size: 11px;
+  color: #495057;
+  background: #f1f3f4;
+  padding: 0px 3px;
+  border-radius: 4px;
+  font-weight: 600;
+  min-width: 20px;
+  width: 26px;
+  text-align: center;
+  border: 1px solid #e8eaed;
+  box-sizing: border-box;
+  margin-left: 2px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* Mode détaillé - alternance de couleurs */
+.places-panel.show-events .place-content {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding: 3px 2px 3px 4px;
+}
+
+/* Mode détaillé - alternance renforcée */
+.places-panel.show-events .place-row:nth-child(even) .place-content {
+  background: linear-gradient(to right,
+    rgba(97, 166, 120, 0.05) 0%,
+    rgba(97, 166, 120, 0.12) 100%);
+}
+
+.places-panel.show-events .place-row:nth-child(odd) .place-content {
+  background: linear-gradient(to right,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(248, 249, 250, 0.9) 100%);
+}
+
+/* Hover states - priorité sur l'alternance */
+.place-content:hover {
+  background: rgba(40, 167, 69, 0.08) !important;
+}
+
+.place-content.person-match {
+  background: rgba(40, 167, 69, 0.12) !important;
+  font-weight: 600;
+}
+
+.place-content:hover .place-name {
+  font-weight: 600;
+}
+
+/* 
+/* Badge total - alternance cohérente */
+.places-panel.show-events .place-row:nth-child(even) .place-count {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.places-panel.show-events .place-row:nth-child(odd) .place-count {
+  background: #f8f9fa;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Sous-lieux */
+.sublocation-indicator {
+  color: #999;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+/* Palette de couleurs pour lieux */
+.color-1 { background: hsl(0, 60%, 65%); }
+.color-2 { background: hsl(20, 60%, 65%); }
+.color-3 { background: hsl(40, 60%, 65%); }
+.color-4 { background: hsl(60, 60%, 65%); }
+.color-5 { background: hsl(80, 60%, 65%); }
+.color-6 { background: hsl(100, 60%, 65%); }
+.color-7 { background: hsl(120, 60%, 65%); }
+.color-8 { background: hsl(140, 60%, 65%); }
+.color-9 { background: hsl(160, 60%, 65%); }
+.color-10 { background: hsl(180, 60%, 65%); }
+.color-11 { background: hsl(200, 60%, 65%); }
+.color-12 { background: hsl(220, 60%, 65%); }
+
+/* ===========================================
+   7.6 SECTIONS D'OVERFLOW
+   =========================================== */
+.overflow-section {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  max-height: 200px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.overflow-section.above {
+  top: 0;
+  flex-direction: column-reverse;
+}
+
+.overflow-section.below {
+  bottom: 0;
+}
+
+.overflow-header {
+  background: linear-gradient(to right,
+    rgba(255,255,255,0.95) 0%,
+    rgba(40,167,69,0.7) 25%,
+    #28a745 100%);
+  color: white;
+  padding: 1px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-left: 72px;
+  min-height: 20px;
+}
+
+.overflow-content {
+  max-height: 170px;
+  overflow-y: none;
+  padding: 0;
+  background: white;
+}
+
+.overflow-content::-webkit-scrollbar {
+  width: 0px;
+}
+
+/* ===========================================
+   8. STABILISATION DU SURVOL DES LIEUX
+   =========================================== */
+
+/* Structure stable pour éviter les sauts */
+.place-row {
+  /* Transition uniquement sur les propriétés qui ne cassent pas le hover */
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  cursor: pointer;
+  /* Créer un contexte de stacking pour éviter les problèmes de z-index */
+  z-index: 1;
+}
+
+/* Empêcher les transitions de hauteur */
+.place-row.tall-row {
+  /* Pas de transition sur la hauteur */
+  transition: none;
+}
+
+/* Forcer le rendu GPU pour des transitions plus fluides */
+.places-list {
+  will-change: scroll-position;
+}
+
+.place-row {
+  will-change: background-color;
+  /* Empêcher le texte de bouger pendant les transitions */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Supprimer les espaces entre les rows qui causent des mouseleave */
+.places-list {
+  /* Supprimer tout espace entre les éléments */
+  font-size: 0;
+}
+
+.place-row {
+  /* Restaurer la taille de police */
+  font-size: 1rem;
+  /* S'assurer qu'il n'y a pas de marge */
+  margin: 0;
+}
+
+/* Créer une continuité visuelle entre les éléments */
+.place-row + .place-row .place-content {
+  margin-top: -1px;
+  border-top: 1px solid transparent;
+}
+
+/* Amélioration de la zone grisée */
+.place-content.grayed-out {
+  opacity: 0.35;
+  /* Empêcher les interactions avec les éléments grisés */
+  pointer-events: none;
+}
+
+/* Mais permettre la navigation générale */
+.places-list {
+  pointer-events: auto;
+}
+
+/* ===========================================
+   9. PANNEAU D'IDENTITÉ
+   =========================================== */
+.person-panel {
+  position: absolute;
+  left: 64%;
+  width: auto;
+  max-width: 300px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 10;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.person-panel h2 {
+  font-size: 1rem;
+  margin-top: 0;
+  margin-bottom: 0.2rem;
+}
+
+.implex-notice {
+  margin-top: 8px;
+  padding: 4px;
+  background: rgba(0,123,255,0.1);
+  border-radius: 3px; font-size: 12px;
+}
+
+/* ===========================================
+   10. RESPONSIVE ET ACCESSIBILITÉ
+   =========================================== */
+
+/* Support tactile */
+@media (hover: none) and (pointer: coarse) {
+  .btn-fanchart {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .place-row {
+    min-height: 44px;
+  }
+
+  .indicator {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+}
+
+/* Petits écrans */
+@media (max-width: 768px) {
+  .btn-fanchart[id="b-angle-260"] {
+    display: none;
+  }
+
+  .places-panel {
+    width: 280px;
+  }
+}
+
+
+/* Réduction des animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .indicator {
+    animation: none;
+  }
+}
+
+/* ===========================================
+   11. UTILITAIRES ET HELPERS
+   =========================================== */
+
+/* Navigation help */
+#navigation-help {
+  position: absolute;
+  top: 8px;
+  left: 130px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  padding: 8px 12px;
+  font-size: 12px;
+  max-width: 200px;
+  transition: opacity 0.15s;
+}
+
+#navigation-help .help-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+/* Impression */
+@media print {
+  .noprint,
+  .fanchart-controls,
+  .places-panel,
+  #navigation-help {
+    display: none !important;
+  }
 }

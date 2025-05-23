@@ -1,955 +1,5396 @@
-const fanchart = document.getElementById( "fanchart" );
-const places_list = document.getElementById( "places_list" );
-var sheet;
-for( var i in document.styleSheets ) {
-	if( document.styleSheets[i].title == "fc-auto" ) {
-        	sheet = document.styleSheets[i];
-		break;
-	}
-}
 const root = document.documentElement;
+const $ = (id) => document.getElementById(id);
+const fanchart = $("fanchart");
+const pixel = $("pixel").getContext("2d", { willReadFrequently: true });
+var sheet;
+for (var i in document.styleSheets) {
+  if (document.styleSheets[i].title == "fc-auto") {
+    sheet = document.styleSheets[i];
+    break;
+  }
+}
+var standard, standard_width;
+var center_x, center_y, svg_w, svg_h;
+var max_gen_loaded; // Génération max disponible en "mémoire"
+var max_gen, max_r;
+var lieux = {};      // Objet principal des lieux : clé = nom du lieu, valeur = données
+var lieux_a = [];    // Array des lieux pour le tri et l'itération
+var sortMode = "frequency";
+var showEvents = false;
+var svg_viewbox_x = 0, svg_viewbox_y = 0, svg_viewbox_w = 0, svg_viewbox_h = 0;
 
-var pixel = document.getElementById( "pixel" ).getContext( "2d" );
-function relativeLuminance( color ) {
-	pixel.fillStyle = color;
-	pixel.fillRect( 0, 0, 1, 1 );
-	const data = pixel.getImageData(0, 0, 1, 1).data;
-	const rsrgb = data[0] / 255;
-	const gsrgb = data[1] / 255;
-	const bsrgb = data[2] / 255;
-	const r = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
-	const g = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
-	const b = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
-	return r * 0.2126 + g * 0.7152 + b * 0.0722;
-}
-function contrastRatio( color1, color2 ) {
-	return (relativeLuminance(color1) + 0.05) / (relativeLuminance(color2) + 0.05);
-}
-
-function pos_x( r, a ) {
-	return center_x + r * Math.cos( Math.PI / 180 * a );
-}
-function pos_y( r, a ) {
-	return center_y + r * Math.sin( Math.PI / 180 * a );
-}
-function up( g, r, a1, a2, sosa, p ) {
-	l = path1( g, "tpiS"+sosa, r, a1, a2 );
-	link( g, "tpiS"+sosa, p, l );
-}
-function no_up( g, r, a1, a2, sosa, p ) {
-	l = path1( g, "tpiS"+sosa, r, a1, a2 );
-	no_link( g, "tpiS"+sosa, p, l );
-}
-
-function g( id ) {
-	var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-	g.setAttribute( "id", id );
-	fanchart.append(g);
-
-	return g;
-}
-
-function deathAgeClass( age ) {
-	var n = Math.trunc( age / 15 );
-	if( n > 7 ) {
-		n = 7;
-	}
-	return "DA"+n;
-}
-
-function pie_bg( g, r1, r2, a1, a2, p ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "d",
-		 'M ' + pos_x(r2, a1) + ',' + pos_y(r2, a1) +
-		' A ' + r2 + ' ' + r2 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + pos_x(r2, a2) + ',' + pos_y(r2, a2) +
-		' L ' + pos_x(r1, a2) + ',' + pos_y(r1, a2) +
-		' A ' + r1 + ' ' + r1 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 0 ' + pos_x(r1, a1) + ',' + pos_y(r1, a1) +
-		' Z'
-	);
-	var c = "bg";
-	if( p.birth_place !== undefined && p.birth_place != "" ) {
-		c += " bi-"+lieux[p.birth_place].c;
-	}
-	if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-		c += " ba-"+lieux[p.baptism_place].c;
-	}
-	if( p.death_place !== undefined && p.death_place != "" ) {
-		c += " de-"+lieux[p.death_place].c;
-	}
-	if( p.burial_place !== undefined && p.burial_place != "" ) {
-		c += " bu-"+lieux[p.burial_place].c;
-	}
-	if( p.death_age !== undefined && p.death_age != "" ) {
-		c += " "+deathAgeClass(p.death_age);
-	}
-	path.setAttribute( "class", c );
-	g.append(path);
-}
-function pie( g, r1, r2, a1, a2, p ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "d",
-		 'M ' + pos_x(r2, a1) + ',' + pos_y(r2, a1) +
-		' A ' + r2 + ' ' + r2 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + pos_x(r2, a2) + ',' + pos_y(r2, a2) +
-		' L ' + pos_x(r1, a2) + ',' + pos_y(r1, a2) +
-		' A ' + r1 + ' ' + r1 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 0 ' + pos_x(r1, a1) + ',' + pos_y(r1, a1) +
-		' Z'
-	);
-	path.setAttribute( "class", "link" );
-	g.append(path);
-	path.onclick = function( e ) {
-		if( true == e.shiftKey ) {
-			var oc = p.oc;
-			if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-			window.location = link_to_person + "p=" + p.fnk + "&n=" + p.snk + oc
-		}
-	};
-	path.onmouseenter = function() {
-		if( p.birth_place !== undefined && p.birth_place != "" ) {
-			document.getElementById( "bi-" + lieux[p.birth_place].c ).classList.remove("hidden");
-		}
-		if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-			document.getElementById( "ba-" + lieux[p.baptism_place].c ).classList.remove("hidden");
-		}
-		if( p.marriage_place !== undefined && p.marriage_place != "" ) {
-			document.getElementById( "ma-" + lieux[p.marriage_place].c ).classList.remove("hidden");
-		}
-		if( p.death_place !== undefined && p.death_place != "" ) {
-			document.getElementById( "de-" + lieux[p.death_place].c ).classList.remove("hidden");
-		}
-		if( p.burial_place !== undefined && p.burial_place != "" ) {
-			document.getElementById( "bu-" + lieux[p.burial_place].c ).classList.remove("hidden");
-		}
-		if( p.death_age !== undefined && p.death_age != "" ) {
-			var c = deathAgeClass(p.death_age);
-			document.getElementById( c ).classList.add("hl");
-		}
-	};
-	path.onmouseleave = function() {
-		if( p.birth_place !== undefined && p.birth_place != "" ) {
-			document.getElementById( "bi-" + lieux[p.birth_place].c ).classList.add("hidden");
-		}
-		if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-			document.getElementById( "ba-" + lieux[p.baptism_place].c ).classList.add("hidden");
-		}
-		if( p.marriage_place !== undefined && p.marriage_place != "" ) {
-			document.getElementById( "ma-" + lieux[p.marriage_place].c ).classList.add("hidden");
-		}
-		if( p.death_place !== undefined && p.death_place != "" ) {
-			document.getElementById( "de-" + lieux[p.death_place].c ).classList.add("hidden");
-		}
-		if( p.burial_place !== undefined && p.burial_place != "" ) {
-			document.getElementById( "bu-" + lieux[p.burial_place].c ).classList.add("hidden");
-		}
-		if( p.death_age !== undefined && p.death_age != "" ) {
-			var c = deathAgeClass(p.death_age);
-			document.getElementById( c ).classList.remove("hl");
-		}
-	};
-
-	if( p.fn == "=" ) {
-		path.addEventListener( "mouseenter", function() {
-			var ref = document.getElementById( "S"+p.sn );
-			ref.classList.add( "same_hl" );
-		});
-		path.addEventListener( "mouseout", function() {
-			var ref = document.getElementById( "S"+p.sn );
-			ref.classList.remove( "same_hl" );
-		});
-	}
-}
-function pie_m_bg( g, r1, r2, a1, a2, p ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "d",
-		 'M ' + pos_x(r2, a1) + ',' + pos_y(r2, a1) +
-		' A ' + r2 + ' ' + r2 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + pos_x(r2, a2) + ',' + pos_y(r2, a2) +
-		' L ' + pos_x(r1, a2) + ',' + pos_y(r1, a2) +
-		' A ' + r1 + ' ' + r1 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 0 ' + pos_x(r1, a1) + ',' + pos_y(r1, a1) +
-		' Z'
-	);
-	var c = "";
-	if( p.marriage_place !== undefined && p.marriage_place != "" ) {
-		c += " ma-"+lieux[p.marriage_place].c;
-	}
-	path.setAttribute( "class", c );
-	g.append(path);
-}
-function pie_m( g, r1, r2, a1, a2, p ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "d",
-		 'M ' + pos_x(r2, a1) + ',' + pos_y(r2, a1) +
-		' A ' + r2 + ' ' + r2 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + pos_x(r2, a2) + ',' + pos_y(r2, a2) +
-		' L ' + pos_x(r1, a2) + ',' + pos_y(r1, a2) +
-		' A ' + r1 + ' ' + r1 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 0 ' + pos_x(r1, a1) + ',' + pos_y(r1, a1) +
-		' Z'
-	);
-	g.append(path);
-	path.onmouseenter = function() {
-		if( p.marriage_place !== undefined && p.marriage_place != "" ) {
-			document.getElementById( "ma-" + lieux[p.marriage_place].c ).classList.remove("hidden");
-		}
-	};
-	path.onmouseleave = function() {
-		if( p.marriage_place !== undefined && p.marriage_place != "" ) {
-			document.getElementById( "ma-" + lieux[p.marriage_place].c ).classList.add("hidden");
-		}
-	};
-}
-function pie_contour( g, r1, r2, a1, a2 ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "d",
-		 'M ' + pos_x(r2, a1) + ',' + pos_y(r2, a1) +
-		' A ' + r2 + ' ' + r2 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + pos_x(r2, a2) + ',' + pos_y(r2, a2) +
-		' L ' + pos_x(r1, a2) + ',' + pos_y(r1, a2) +
-		' A ' + r1 + ' ' + r1 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 0 ' + pos_x(r1, a1) + ',' + pos_y(r1, a1) +
-		' Z'
-	);
-	path.setAttribute( "class", "contour" );
-	g.append(path);
-}
-function pie_middle( g, r1, r2, a ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "d",
-		 'M ' + pos_x(r2, a) + ',' + pos_y(r2, a) +
-		' L ' + pos_x(r1, a) + ',' + pos_y(r1, a)
-	);
-	path.setAttribute( "class", "middle" );
-	g.append(path);
-}
-function circle_bg( g, r, cx, cy, p ) {
-	var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-	circle.setAttribute( "cx", cx );
-	circle.setAttribute( "cy", cy );
-	circle.setAttribute( "r", r );
-	var c = "bg";
-	if( p.birth_place !== undefined && p.birth_place != "" ) {
-		c += " bi-"+lieux[p.birth_place].c;
-	}
-	if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-		c += " ba-"+lieux[p.baptism_place].c;
-	}
-	if( p.death_place !== undefined && p.death_place != "" ) {
-		c += " de-"+lieux[p.death_place].c;
-	}
-	if( p.burial_place !== undefined && p.burial_place != "" ) {
-		c += " bu-"+lieux[p.burial_place].c;
-	}
-	if( p.death_age !== undefined && p.death_age != "" ) {
-		c += " "+deathAgeClass(p.death_age);
-	}
-	circle.setAttribute( "class", c );
-	g.append(circle);
-}
-function circle( g, r, cx, cy, p ) {
-	var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-	circle.setAttribute( "cx", cx );
-	circle.setAttribute( "cy", cy );
-	circle.setAttribute( "r", r );
-	circle.setAttribute( "class", "link" );
-	g.append(circle);
-	circle.onclick = function( e ) {
-		if( true == e.shiftKey ) {
-			var oc = p.oc;
-			if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-			window.location = link_to_person + "p=" + p.fnk + "&n=" + p.snk + oc
-		}
-	};
-	circle.onmouseenter = function() {
-		if( p.birth_place !== undefined && p.birth_place != "" ) {
-			document.getElementById( "bi-" + lieux[p.birth_place].c ).classList.remove("hidden");
-		}
-		if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-			document.getElementById( "ba-" + lieux[p.baptism_place].c ).classList.remove("hidden");
-		}
-		if( p.death_place !== undefined && p.death_place != "" ) {
-			document.getElementById( "de-" + lieux[p.death_place].c ).classList.remove("hidden");
-		}
-		if( p.burial_place !== undefined && p.burial_place != "" ) {
-			document.getElementById( "bu-" + lieux[p.burial_place].c ).classList.remove("hidden");
-		}
-		if( p.death_age !== undefined && p.death_age != "" ) {
-			var c = deathAgeClass(p.death_age);
-			document.getElementById( c ).classList.add("hl");
-		}
-	};
-	circle.onmouseleave = function() {
-		if( p.birth_place !== undefined && p.birth_place != "" ) {
-			document.getElementById( "bi-" + lieux[p.birth_place].c ).classList.add("hidden");
-		}
-		if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-			document.getElementById( "ba-" + lieux[p.baptism_place].c ).classList.add("hidden");
-		}
-		if( p.death_place !== undefined && p.death_place != "" ) {
-			document.getElementById( "de-" + lieux[p.death_place].c ).classList.add("hidden");
-		}
-		if( p.burial_place !== undefined && p.burial_place != "" ) {
-			document.getElementById( "bu-" + lieux[p.burial_place].c ).classList.add("hidden");
-		}
-		if( p.death_age !== undefined && p.death_age != "" ) {
-			var c = deathAgeClass(p.death_age);
-			document.getElementById( c ).classList.remove("hl");
-		}
-	};
-}
-function text_S1( g, x, y, p ) {
-	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute( "x", x );
-	text.setAttribute( "y", y );
-	var c = "";
-	if( p.birth_place !== undefined && p.birth_place != "" ) {
-		c += " bi-t"+lieux[p.birth_place].c;
-	}
-	if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-		c += " ba-t"+lieux[p.baptism_place].c;
-	}
-	if( p.death_place !== undefined && p.death_place != "" ) {
-		c += " de-t"+lieux[p.death_place].c;
-	}
-	if( p.burial_place !== undefined && p.burial_place != "" ) {
-		c += " bu-t"+lieux[p.burial_place].c;
-	}
-	text.setAttribute( "class", c );
-	var ts1 = 100;
-        standard.textContent = p.fn;
-	if( standard.getBBox().width > 2*a_r[0]*security ) {
-		ts1 = Math.round( 100 * 2*a_r[0]*security / standard.getBBox().width );
-	}
-	var ts2 = 100;
-        standard.textContent = p.sn;
-	if( standard.getBBox().width > 2*a_r[0]*security ) {
-		ts2 = Math.round( 100 * 2*a_r[0]*security / standard.getBBox().width );
-	}
-	text.innerHTML = '<tspan style="font-size:'+ts1+'%">' + p.fn + '</tspan><tspan x="' + x + '" dy="15" style="font-size:'+ts2+'%">' + p.sn + '</tspan><tspan class="dates" x="' + x + '" dy="15">' + p.dates + '</tspan>';
-	g.append(text);
-}
-
-function path1( g, id, r, a1, a2 ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "class", "none" );
-	path.setAttribute( "d",
-		 'M ' + pos_x(r, a1) + ',' + pos_y(r, a1) +
-		' A ' + r + ' ' + r + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + pos_x(r, a2) + ',' + pos_y(r, a2)
-	);
-	path.setAttribute( "id", id );
-	g.append(path);
-
-	return Math.abs(a2-a1)/360*2*Math.PI*r;
-}
-function path2( g, id, r1, r2, a ) {
-	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	path.setAttribute( "class", "none" );
-	path.setAttribute( "d",
-		 'M ' + pos_x(r1, a) + ',' + pos_y(r1, a) +
-		' L ' + pos_x(r2, a) + ',' + pos_y(r2, a)
-	);
-	path.setAttribute( "id", id );
-	g.append(path);
-
-	return Math.abs(r2-r1);
-}
-function text2( g, pid, t, c, l, h ) {
-        standard.textContent = t;
-	var ts_l = 100;
-	if( standard.getBBox().width > l*security ) {
-		ts_l = Math.round( 100 * l*security / standard.getBBox().width );
-	}
-	var ts_h = 100;
-	if( standard.getBBox().height > h*security ) {
-		ts_h = Math.round( 100 * h*security / standard.getBBox().height );
-	}
-
-	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute( "class", "text "+c  );
-	text.innerHTML = '<textPath xlink:href="#' + pid + '" startOffset="50%" style="font-size:'+Math.min(ts_l,ts_h)+'%;">' + t+ '</textPath>';
-	g.append(text);
-}
-function link( g, pid, p, l ) {
-	var ts = 100;
-	if( 2 * standard_width > l ) {
-		ts = Math.round( 100 * l / 2 / standard_width );
-	}
-
-	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute( "class", "link icon"  );
-	text.innerHTML = '<textPath xlink:href="#' + pid + '" startOffset="50%" style="font-size:'+ts+'%;">&#x25B2;</textPath>';
-	g.append(text);
-	text.onclick = function ( e ) {
-		var oc = p.oc;
-		if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-		window.location = link_to_fanchart + "p=" + p.fnk + "&n=" + p.snk + oc + "&v=" + max_gen + "&tool=" + tool +
-			(has_ba ? "&ba=on" : "") +
-			(has_bu ? "&bu=on" : "");
-	};
-}
-function no_link( g, pid, p, l ) {
-	var ts = 100;
-	if( 2 * standard_width > l ) {
-		ts = Math.round( 100 * l / 2 / standard_width );
-	}
-
-	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute( "class", "no-link"  );
-	text.innerHTML = '<textPath xlink:href="#' + pid + '" startOffset="50%" style="font-size:'+ts+'%;">&#x2716;</textPath>';
-	g.append(text);
-}
-function text_C3( g, r1, r2, a1, a2, sosa, p, c ) {
-	var l, h;
-	h = Math.abs(r2-r1)/3;
-	l = path1( g, "tp1S"+sosa, (r2-r1)*3/4 + r1, a1, a2 );
-	text2( g, "tp1S"+sosa, p.fn, c, l, h );
-	l = path1( g, "tp2S"+sosa, (r2-r1)*2/4 + r1, a1, a2 );
-	text2( g, "tp2S"+sosa, p.sn, c, l, h );
-	l = path1( g, "tp3S"+sosa, (r2-r1)/4 + r1, a1, a2 );
-	text2( g, "tp3S"+sosa, p.dates, c+" dates", l, h );
-}
-function text_R3( g, r1, r2, a1, a2, sosa, p, c ) {
-	var my_r1, my_r2, my_a1, my_a2, my_a3, l, h;
-	if( a1 >= -90 ) {
-		my_r1 = r1;
-		my_r2 = r2;
-		my_a3 = a2 - (a2-a1)/4;
-		my_a2 = a2 - (a2-a1)*2/4;
-		my_a1 = a2 - (a2-a1)*3/4;
-	} else {
-		my_r1 = r2;
-		my_r2 = r1;
-		my_a3 = a1 + (a2-a1)/4;
-		my_a2 = a1 + (a2-a1)*2/4;
-		my_a1 = a1 + (a2-a1)*3/4;
-	}
-	h = Math.abs(a2-a1)/360*2*Math.PI*r1 / 3;
-	l = path2( g, "tp1S"+sosa, my_r1, my_r2, my_a1 );
-	text2( g, "tp1S"+sosa, p.fn, c, l, h );
-	l = path2( g, "tp2S"+sosa, my_r1, my_r2, my_a2 );
-	text2( g, "tp2S"+sosa, p.sn, c, l, h );
-	l = path2( g, "tp3S"+sosa, my_r1, my_r2, my_a3 );
-	text2( g, "tp3S"+sosa, p.dates, c+" dates", l, h );
-}
-function text_R2( g, r1, r2, a1, a2, sosa, p, c ) {
-	var my_r1, my_r2, my_a1, my_a2, m, l;
-	if( a1 >= -90 ) {
-		my_r1 = r1;
-		my_r2 = r2;
-		my_a2 = a2 - (a2-a1)/3;
-		my_a1 = a2 - (a2-a1)*2/3;
-	} else {
-		my_r1 = r2;
-		my_r2 = r1;
-		my_a2 = a1 + (a2-a1)/3
-		my_a1 = a1 + (a2-a1)*2/3;
-	}
-	h = Math.abs(a2-a1)/360*2*Math.PI*r1 / 2;
-	l = path2( g, "tp1S"+sosa, my_r1, my_r2, my_a1 );
-	text2( g, "tp1S"+sosa, p.fn + ' ' + p.sn, c, l, h );
-	l = path2( g, "tp2S"+sosa, my_r1, my_r2, my_a2 );
-	text2( g, "tp2S"+sosa, p.dates, c+" dates", l, h );
-}
-function text_R1( g, r1, r2, a1, a2, sosa, p, c ) {
-	var my_r1, my_r2, my_a1, my_a2, l, h;
-	if( a1 >= -90 ) {
-		my_r1 = r1;
-		my_r2 = r2;
-		my_a1 = a2 - (a2-a1)/2;
-	} else {
-		my_r1 = r2;
-		my_r2 = r1;
-		my_a1 = a1 + (a2-a1)/2;
-	}
-	h = Math.abs(a2-a1)/360*2*Math.PI*r1;
-	l = path2( g, "tp1S"+sosa, my_r1, my_r2, my_a1 );
-	text2( g, "tp1S"+sosa, p.fn + ' ' + p.sn, c, l, h );
-}
-
-function zoom (zx, zy, factor, direction) {
-	var w = svg_viewbox_w;
-	var h = svg_viewbox_h;
-	if( direction > 0 ) {
-		h = Math.round(h/factor);
-		w = Math.round(w/factor);
-	} else {
-		h = Math.round(h*factor);
-		w = Math.round(w*factor);
-	}
-	set_svg_viewbox(
-		svg_viewbox_x + Math.round(zx * (svg_viewbox_w - w) / window_w),
-		svg_viewbox_y + Math.round(zy * (svg_viewbox_h - h) / window_h),
-		w, h );
-}
-
-fanchart.addEventListener( "wheel", function( event ) {
-	zoom( event.clientX, event.clientY, zoom_factor, (event.deltaY < 0 ? +1 : -1) );
-}, { passive: false });
-
-var drag_state = false;
-fanchart.onmousedown = function(e) {
-	e.preventDefault();
-	drag_state = true;
-};
-fanchart.onmouseup = function() {
-	drag_state = false;
-};
-fanchart.onmousemove = function(e) {
-	if( drag_state ) {
-		e.preventDefault();
-		set_svg_viewbox( svg_viewbox_x - Math.round(e.movementX * svg_viewbox_w / window_w),
-                                 svg_viewbox_y - Math.round(e.movementY * svg_viewbox_h / window_h),
-                                 svg_viewbox_w, svg_viewbox_h );
-	}
+// ========== CONSTANTES D'ÉVÉNEMENTS ==========
+const EVENT_CONFIG = {
+  eventOrder: ['birth', 'baptism', 'marriage', 'death', 'burial'],
+  eventToClass: { 'birth': 'n', 'baptism': 'b', 'marriage': 'm', 'death': 'd', 'burial': 's' },
+  eventToLabel: { 'birth': 'N', 'baptism': 'B', 'marriage': 'M', 'death': 'D', 'burial': 'S' }
 };
 
-const security = 0.95;
-const zoom_factor = 1.25;
-const d_all = 220;
-const a_r = [   50,   50,   50,   50,   80,   70,  100,  150,  130,   90 ];
-const a_m = [ "S1", "C3", "C3", "C3", "R3", "R3", "R2", "R1", "R1", "R1" ];
+const EVENT_COLORS = {
+  'birth': '#9FD1A4',
+  'baptism': '#C7E0C9',
+  'marriage': '#E67E22',
+  'death': '#A5CCC9',
+  'burial': '#6FA8A2'
+};
 
-var ak = Object.keys(ancestor)
-max_gen = Math.trunc(Math.log(Number(ak[ak.length-1].replace( /^S/, "")))/Math.log(2));
+const Events = {
+  get types() { return EVENT_CONFIG.eventOrder; },
+  cssClass: (type) => EVENT_CONFIG.eventToClass[type],
+  label: (type) => EVENT_CONFIG.eventToLabel[type],
+  count: (type) => type + '_count', // 'birth' -> 'birth_count'
+  place: (type) => type + '_place', // 'birth' -> 'birth_place'
+  svgPrefix: (type) => type.substring(0, 2), // 'birth' → 'bi'
+  flagProp: (type) => 'has_' + Events.svgPrefix(type), // 'birth' → 'has_bi' > TODO DEPRECIATE THIS!
+  findByClass: (cssClass) => EVENT_CONFIG.eventOrder.find(type => Events.cssClass(type) === cssClass),
+  findBySvgPrefix: (prefix) => EVENT_CONFIG.eventOrder.find(type => Events.svgPrefix(type) === prefix),
+  isValid: (type) => EVENT_CONFIG.eventOrder.includes(type),
+  translate: (type, count = 1) => {
+    const translationKey = count > 1 ? type + 's' : type;
+    return window.FC_TRANSLATIONS?.[translationKey] || type;
+  }
+};
 
-var max_r = 0 ;
-for( var i = 0 ; i < max_gen+1 && i < a_r.length ; i++ ) {
-	max_r += a_r[i];
+// ====== Configuration =======
+const CONFIG = {
+  security: 0.95,
+  zoom_factor: 1.12,
+  default_angle: 220,
+  available_angles: [180, 220, 359],
+  a_r: [56, 56, 54, 54, 70, 72, 100, 150, 130, 90],
+  a_m: ["S1", "C3", "C2", "C1", "R4", "R3", "R2", "R1", "R1", "R1"],
+  text_mode_factors: { "C3": 1.10, "C2": 1.05 }, // Mode circulaire (parents/grand-parents)
+  marriage_length_thresholds: [4, 14, 24, 34, 44, 54],
+  text_reduction_factor: 1,
+  svg_margin: 4
+};
+
+const svgEl = (tag) => document.createElementNS("http://www.w3.org/2000/svg", tag);
+
+let isCircularMode = false;
+let renderContext = { target: null, idSuffix: '' };
+let current_angle = CONFIG.default_angle;
+let currentRotation = 0;
+
+
+// Génère un ID unique selon le contexte de rendu (mode 360° ou standard)
+function contextualId(baseId) {
+    return baseId + renderContext.idSuffix;
 }
 
-const svg_margin = 5;
-const center_x = max_r + svg_margin;
-const center_y = max_r + svg_margin;
+// Trouve un élément SVG par son ID de base, en tenant compte du préfixe de contexte
+function findElementById(baseId) {
+    // D'abord essayer sans préfixe (mode normal)
+    let element = $(baseId);
+    if (element) return element;
 
-const svg_w = 2 * center_x;
-const svg_h = 2 * svg_margin + max_r +
-              Math.max( a_r[0], Math.round( max_r * Math.sin(Math.PI/180*(d_all-180)/2) ) );
-const svg_ratio = svg_w / svg_h;
+    // En mode circulaire, essayer avec les suffixes
+    if (isCircularMode) {
+        const northEl = $(baseId + '-N');
+        if (northEl) elements.push(northEl);
+        const southEl = $(baseId + '-S');
+        if (southEl) elements.push(southEl);
+    }
 
-var svg_viewbox_x, svg_viewbox_y, svg_viewbox_w, svg_viewbox_h;
-function set_svg_viewbox( x, y, w, h ) {
-	svg_viewbox_x = x;
-	svg_viewbox_y = y;
-	svg_viewbox_w = w;
-	svg_viewbox_h = h;
-	fanchart.setAttribute( "viewBox", x + " " + y + " " + w + " " + h );
-}
-function fitScreen() {
-	set_svg_viewbox( 0, 0, svg_w, svg_h );
+    return null;
 }
 
-var lieux = {};
-var has_bi = false;
-var has_ba = false;
-var has_ma = false;
-var has_de = false;
-var has_bu = false;
-ak.forEach( function(s) {
-	var p = ancestor[s];
-	if( p.birth_place !== undefined ) {
-		has_bi = true;
-		ancestor[s].birth_place = p.birth_place.replace( /^\?, /, "" );
-	}
-	if( p.baptism_place !== undefined ) {
-		has_ba = true;
-		ancestor[s].baptism_place = p.baptism_place.replace( /^\?, /, "" );
-	}
-	if( p.marriage_place !== undefined ) {
-		has_ma = true;
-		ancestor[s].marriage_place = p.marriage_place.replace( /^\?, /, "" );
-	}
-	if( p.death_place !== undefined ) {
-		has_de = true;
-		ancestor[s].death_place = p.death_place.replace( /^\?, /, "" );
-	}
-	if( p.burial_place !== undefined ) {
-		has_bu = true;
-		ancestor[s].burial_place = p.burial_place.replace( /^\?, /, "" );
-	}
-	if( p.death_age !== undefined ) {
-		ancestor[s].death_age = p.death_age.replace( /[^0123456789]/g, "" );
-	}
-	ancestor[s].dates = p.dates.replace( /\s?<\/?bdo[^>]*>/g, "" );
-	p = ancestor[s];
+// Trouve tous les éléments avec le même ID de base (les deux hémisphères)
+function findAllElementsById(baseId) {
+    const elements = [];
 
-	if( p.birth_place !== undefined && p.birth_place != "" ) {
-		if( lieux[p.birth_place] === undefined ) {
-			lieux[p.birth_place] = { "cnt": 1, "bi": true };
-		} else {
-			lieux[p.birth_place].cnt++;
-			lieux[p.birth_place].bi = true;
-		}
-	}
-	if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-		if( lieux[p.baptism_place] === undefined ) {
-			lieux[p.baptism_place] = { "cnt": 1, "ba": true };
-		} else {
-			lieux[p.baptism_place].cnt++;
-			lieux[p.baptism_place].ba = true;
-		}
-	}
-	if( p.marriage_place !== undefined && p.marriage_place != "" ) {
-		if( lieux[p.marriage_place] === undefined ) {
-			lieux[p.marriage_place] = { "cnt": 1, "ma": true };
-		} else {
-			lieux[p.marriage_place].cnt++;
-			lieux[p.marriage_place].ma = true;
-		}
-	}
-	if( p.death_place !== undefined && p.death_place != "" ) {
-		if( lieux[p.death_place] === undefined ) {
-			lieux[p.death_place] = { "cnt": 1, "de": true };
-		} else {
-			lieux[p.death_place].cnt++;
-			lieux[p.death_place].de = true;
-		}
-	}
-	if( p.burial_place !== undefined && p.burial_place != "" ) {
-		if( lieux[p.burial_place] === undefined ) {
-			lieux[p.burial_place] = { "cnt": 1, "bu": true };
-		} else {
-			lieux[p.burial_place].cnt++;
-			lieux[p.burial_place].bu = true;
-		}
-	}
-});
-var lieux_a = [];
-for( var key in lieux ) {
-	lieux_a.push([key, lieux[key]]);
-}
-lieux_a.sort( function(e1,e2) {
-	return e2[1].cnt - e1[1].cnt
-});
-var c_h = 0;
-var c_dh = 60;
-var c_l = 90;
-lieux_a.forEach( function( l, i ) {
-	lieux[l[0]].c = "L"+i;
-	var li = document.createElement( "li" );
-	li.innerHTML =
-		(has_bi ? '<span id="bi-L'+i+'" class="hidden">N</span>' : '') +
-		(has_ba ? '<span id="ba-L'+i+'" class="hidden">B</span>' : '') +
-		(has_ma ? '<span id="ma-L'+i+'" class="hidden">M</span>' : '') +
-		(has_de ? '<span id="de-L'+i+'" class="hidden">D</span>' : '') +
-		(has_bu ? '<span id="bu-L'+i+'" class="hidden">S</span>' : '') +
-		'<span class="square">■</span> ' + l[0];
-	li.setAttribute( "id", "L"+i );
-	li.setAttribute( "title", lieux[l[0]].cnt + " occurence(s)" );
-	li.onmouseenter = function() {
-		[ "bi", "ba", "ma", "de", "bu" ].forEach( function(ev) {
-			var a = document.getElementsByClassName( ev+"-L"+i );
-			for( var e of a ) {
-				e.classList.add( "highlight" );
-			}
-			var a = document.getElementsByClassName( ev+"-tL"+i );
-			for( var e of a ) {
-				e.classList.add( "text_highlight" );
-			}
-		});
-		if( lieux[l[0]].bi !== undefined ) {
-			document.getElementById( "bi-L"+i ).classList.remove( "hidden" );
-		}
-		if( lieux[l[0]].ba !== undefined ) {
-			document.getElementById( "ba-L"+i ).classList.remove( "hidden" );
-		}
-		if( lieux[l[0]].ma !== undefined ) {
-			document.getElementById( "ma-L"+i ).classList.remove( "hidden" );
-		}
-		if( lieux[l[0]].de !== undefined ) {
-			document.getElementById( "de-L"+i ).classList.remove( "hidden" );
-		}
-		if( lieux[l[0]].bu !== undefined ) {
-			document.getElementById( "bu-L"+i ).classList.remove( "hidden" );
-		}
-	};
-	li.onmouseleave = function() {
-		[ "bi", "ba", "ma", "de", "bu" ].forEach( function(ev) {
-			var a = document.getElementsByClassName( ev+"-L"+i );
-			for( var e of a ) {
-				e.classList.remove( "highlight" );
-			}
-			var a = document.getElementsByClassName( ev+"-tL"+i );
-			for( var e of a ) {
-				e.classList.remove( "text_highlight" );
-			}
-		});
-		if( lieux[l[0]].bi !== undefined ) {
-			document.getElementById( "bi-L"+i ).classList.add( "hidden" );
-		}
-		if( lieux[l[0]].ba !== undefined ) {
-			document.getElementById( "ba-L"+i ).classList.add( "hidden" );
-		}
-		if( lieux[l[0]].ma !== undefined ) {
-			document.getElementById( "ma-L"+i ).classList.add( "hidden" );
-		}
-		if( lieux[l[0]].de !== undefined ) {
-			document.getElementById( "de-L"+i ).classList.add( "hidden" );
-		}
-		if( lieux[l[0]].bu !== undefined ) {
-			document.getElementById( "bu-L"+i ).classList.add( "hidden" );
-		}
-	};
-	places_list.append( li );
+    // Mode normal
+    const element = $(baseId);
+    if (element) {
+        elements.push(element);
+    }
 
-	sheet.insertRule( 'body.place_color svg.bi .bi-L'+i+'  {fill: var(--fc-color-'+i+', transparent);}' );
-	sheet.insertRule( 'body.place_color svg.bi .bi-tL'+i+'  {fill: var(--fc-text-color-'+i+', black);}' );
-	if( has_ba ) {
-		sheet.insertRule( 'body.place_color svg.ba .ba-L'+i+'  {fill: var(--fc-color-'+i+', transparent);}' );
-		sheet.insertRule( 'body.place_color svg.ba .ba-tL'+i+'  {fill: var(--fc-text-color-'+i+', black);}' );
-	}
-	sheet.insertRule( 'body.place_color svg.ma .ma-L'+i+'  {fill: var(--fc-color-'+i+', transparent);}' );
-	sheet.insertRule( 'body.place_color svg.ma .ma-tL'+i+'  {fill: var(--fc-text-color-'+i+', black);}' );
-	sheet.insertRule( 'body.place_color svg.de .de-L'+i+'  {fill: var(--fc-color-'+i+', transparent);}' );
-	sheet.insertRule( 'body.place_color svg.de .de-tL'+i+'  {fill: var(--fc-text-color-'+i+', black);}' );
-	if( has_bu ) {
-		sheet.insertRule( 'body.place_color svg.bu .bu-L'+i+'  {fill: var(--fc-color-'+i+', transparent);}' );
-		sheet.insertRule( 'body.place_color svg.bu .bu-tL'+i+'  {fill: var(--fc-text-color-'+i+', black);}' );
-	}
-	sheet.insertRule( 'body.place_color #L'+i+' .square  { color: var(--fc-color-'+i+', transparent); }' );
-	root.style.setProperty( '--fc-color-'+i, 'hsl('+c_h+',100%,'+c_l+'%)' );
-	var rb = contrastRatio( 'hsl('+c_h+',100%,'+c_l+'%)', 'black' );
-	var rw = contrastRatio( 'white', 'hsl('+c_h+',100%,'+c_l+'%)' );
-	if( rw > rb ) {
-		root.style.setProperty( '--fc-text-color-'+i, 'white' );
-	}
-	c_h += c_dh;
-	if( c_h >= 360 ) {
-		c_dh = Math.round( c_dh / 2 );
-		c_h = c_dh;
-		c_l -= 15;
-	}
-});
+    // Mode circulaire - chercher dans les deux hémisphères
+    if (isCircularMode) {
+        const northEl = $('-N' + baseId);
+        if (northEl) elements.push(northEl);
+        const southEl = $('-S' + baseId);
+        if (southEl) elements.push(southEl);
+    }
 
-[ "DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6", "DA7" ].forEach( function( id ) {
-	var el = document.getElementById( id );
-	el.onmouseenter = function() {
-		var a = document.getElementsByClassName( id );
-		for( var e of a ) {
-			e.classList.add( "highlight" );
-		}
-		document.getElementById( id ).classList.add("hl");
-	};
-	el.onmouseleave = function() {
-		var a = document.getElementsByClassName( id );
-		for( var e of a ) {
-			e.classList.remove( "highlight" );
-		}
-		document.getElementById( id ).classList.remove("hl");
-	};
-});
-
-var standard_height, standard_width;
-var standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
-standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz";
-standard.setAttribute( "id", "standard" );
-standard.setAttribute( "x", center_x );
-standard.setAttribute( "y", center_y );
-fanchart.append(standard);
-standard_width = standard.getBBox().width / standard.textContent.length;
-standard_height = standard.getBBox().height;
-
-var gen = 1;
-var sosa = 1;
-var r1 = 0;
-var r2 = a_r[0];
-var a1, a2;
-var delta = d_all;
-
-// Sosa 1
-var g1 = g( "S"+sosa );
-circle_bg( g1, r2, center_x, center_y, ancestor["S"+sosa] );
-text_S1( g1, center_x, center_y-10, ancestor["S"+sosa] );
-circle( g1, r2, center_x, center_y, ancestor["S"+sosa] );
-
-while( true ) {
-	sosa++;
-	if( sosa >= (2 ** gen) ) {
-		gen++;
-		if( gen >= a_r.length+1 ) {
-			break;
-		}
-		delta = delta / 2;
-		r1 = r2;
-		r2 = r1 + a_r[gen-1];
-		a1 = -90 - d_all/2;
-		a2 = a1 + delta;
-	} else {
-		a1 += delta;
-		a2 += delta;
-	}
-	var p = ancestor["S"+sosa];
-	if( p !== undefined ) {
-		var pg = g( "S"+sosa );
-		var same = (p.fn == "=" ? true : false);
-		if( same &&  implex != "" ) {
-			var p2 = ancestor["S"+(2 * p.sn)];
-			if( p2 !== undefined ) {
-				ancestor["S"+(2*sosa)] = { "fn" : "=", "sn": 2*p.sn, "fnk": p2.fnk, "snk": p2.snk, "oc": p2.oc, "dates": "", "has_parents": p2.has_parents };
-			}
-			p2 = ancestor["S"+(2*p.sn+1)];
-			if( p2 !== undefined ) {
-				ancestor["S"+(2*sosa+1)] = { "fn" : "=", "sn": 2*p.sn+1, "fnk": p2.fnk, "snk": p2.snk, "oc": p2.oc, "dates": "", "has_parents": p2.has_parents };
-			}
-			p = ancestor["S"+p.sn];
-			same = false;
-		}
-		pie_bg( pg, r1+10, r2, a1, a2, p );
-		if( p.fn != "?" ) {
-			var c = "";
-			if( p.birth_place !== undefined && p.birth_place != "" ) {
-				c += " bi-t"+lieux[p.birth_place].c;
-			}
-			if( p.baptism_place !== undefined && p.baptism_place != "" ) {
-				c += " ba-t"+lieux[p.baptism_place].c;
-			}
-			if( p.death_place !== undefined && p.death_place != "" ) {
-				c += " de-t"+lieux[p.death_place].c;
-			}
-			if( p.burial_place !== undefined && p.burial_place != "" ) {
-				c += " bu-t"+lieux[p.burial_place].c;
-			}
-			if( a_m[gen-1] == "C3" ) {
-				text_C3( pg, r1+10, r2, a1, a2, sosa, p, c );
-			} else if( a_m[gen-1] == "R3" && !same) {
-				text_R3( pg, r1+10, r2, a1, a2, sosa, p, c );
-			} else if( a_m[gen-1] == "R2" && !same) {
-				text_R2( pg, r1+10, r2, a1, a2, sosa, p, c );
-			} else if( a_m[gen-1] == "R1" || same) {
-				text_R1( pg, r1+10, r2, a1, a2, sosa, p, c );
-			}
-		}
-		if( sosa % 2 == 0 ) {
-			pie_m_bg( pg, r1, r1+10, a1, a2+delta, p );
-			if( p.marriage_date !== undefined ) {
-				var c = "";
-				if( p.marriage_place !== undefined && p.marriage_place != "" ) {
-					c += " ma-t"+lieux[p.marriage_place].c;
-				}
-				var l = path1( pg, "pmS"+sosa, r1+5, a1, a2+delta );
-				text2( pg, "pmS"+sosa, p.marriage_date, c, l, 10 );
-			}
-			pie_contour( pg, r1, r2, a1, a2+delta );
-			pie_middle( pg, r1+10, r2, a2 );
-			pie_m( pg, r1, r1+10, a1, a2+delta, p );
-		} else {
-			ancestor["S"+sosa].marriage_place = ancestor["S"+(sosa-1)].marriage_place;
-		}
-		pie( pg, r1+10, r2, a1, a2, p );
-		if( p.has_parents) {
-			up( pg, r1+10, a1, a2, sosa, p );
-		} else {
-			no_up( pg, r1+10, a1, a2, sosa, p );
-		}
-	}
+    return elements;
 }
 
-//document.documentElement.style.overflow = 'hidden';
+const DOMCache = {
+  // Cache pour les éléments individuels
+  elements: {},
 
-const window_h = window.innerHeight;
-const window_w = Math.round( window_h * svg_ratio );
-const window_cx = Math.round( window_w / 2 );
-const window_cy = Math.round( window_h / 2 );
-root.style.setProperty( '--fc-tool-size', (window.innerWidth - window_w) + "px" );
+  // Cache pour les collections d'éléments par classe
+  collections: {},
 
-fanchart.setAttribute( "height", window_h );
-fanchart.setAttribute( "width", window_w );
+  // Récupérer un élément par ID avec mise en cache
+  getElementById: function(id) {
+    if (!this.elements[id]) {
+      this.elements[id] = $(id);
+    }
+    return this.elements[id];
+  },
 
-// Tools
-document.getElementById("b-home").onclick = function() {
-	window.location = link_to_person;
+  // Récupérer des éléments par classe avec mise en cache
+  getElementsByClassName: function(className) {
+    if (!this.collections[className]) {
+      // Convertir en Array pour avoir une référence stable
+      this.collections[className] = Array.from(document.getElementsByClassName(className));
+    }
+    return this.collections[className];
+  },
+
+  // Invalider le cache quand le DOM change
+  invalidate: function(type = 'all') {
+    if (type === 'all') {
+      this.elements = {};
+      this.collections = {};
+    } else if (type === 'collections') {
+      this.collections = {};
+    }
+  },
+
+  // Pré-charger les éléments fréquemment utilisés
+  preload: function() {
+    // Boutons fréquemment utilisés
+    ["b-age", "b-places-colorise", "b-sort-places"].forEach(id => {
+      this.getElementById(id);
+    });
+    // s indicateurs d'âge et de mariage
+    ["DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6"].forEach(id => {
+      this.getElementById(id);
+    });
+    ["DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6"].forEach(id => {
+      this.getElementById(id);
+    });
+  }
 };
-document.getElementById("b-refresh").onclick = function() {
-	fitScreen();
+
+const LayoutCalculator = {
+  /**
+   * Mesure la largeur nécessaire pour afficher confortablement la liste des lieux
+   * Utilise un élément temporaire pour mesurer le texte réel
+   */
+  calculatePlacesListWidth: function() {
+    if (!document.body.classList.contains('place')) {
+      if (document.body.classList.contains('age')) {
+        return 160;
+      }
+      return 0;
+    }
+
+    const panel = document.querySelector('.places-panel');
+
+    if (panel && panel.classList.contains('panel-collapsed')) {
+      return 64;
+    }
+
+    return 340; // --fc-panel-width
+
+    const measurer = document.createElement('div');
+    measurer.style.cssText = `
+      position: absolute;
+      visibility: hidden;
+      white-space: nowrap;
+      font-family: inherit;
+      font-size: inherit;
+    `;
+    document.body.appendChild(measurer);
+
+    let maxWidth = 200; // Largeur minimale par défaut
+
+    // Mesurer chaque lieu
+    lieux_a.forEach(([placeName, data]) => {
+      // Construire le texte complet comme il apparaîtra
+      let text = '';
+
+      // Indicateurs d'événements (N B M D S)
+      if (has_bi && data.bi) text += 'N ';
+      if (has_ba && data.ba) text += 'B ';
+      if (has_ma && data.ma) text += 'M ';
+      if (has_de && data.de) text += 'D ';
+      if (has_bu && data.bu) text += 'S ';
+
+      // Carré coloré et nom du lieu
+      text += '■ ' + placeName;
+
+      measurer.textContent = text;
+      const width = measurer.offsetWidth;
+
+      if (width > maxWidth) {
+        maxWidth = width;
+      }
+    });
+
+    // Nettoyer
+    document.body.removeChild(measurer);
+
+    // Ajouter des marges (padding, scrollbar, etc.)
+    return maxWidth + 40; // 20px de chaque côté pour le confort
+  }
 };
-document.getElementById("b-zoom-in").onclick = function() {
-	zoom( window_cx, window_cy, zoom_factor, +1 );
+
+
+// ========== URLManager centralisé ==========
+const URLManager = {
+  config: {
+    basePerson: link_to_person, // URL de base
+    defaultParams: { module: 'A', template: 'FC' }, // Paramètres par défaut
+    specialParams: { place: { module: 'MOD_DATA', data: 'place' } } // Paramètres spéciaux
+  },
+
+  readCurrentState: function() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    return {
+      tool: urlParams.get('tool') || '',
+      sortMode: urlParams.has('sort') ? 'alphabetical' : 'frequency',
+      showEvents: urlParams.has('events'),
+      isCircular: urlParams.get('mode') === 'couple',
+      angle: parseInt(urlParams.get('angle')) || 220,
+      implexMode: urlParams.get('implex') === 'num' ? 'numbered' :
+                  urlParams.get('implex') === 'full' ? 'full' : 'reduced',
+      lockedPlace: urlParams.get('lock') || null
+    };
+  },
+
+  /**
+   * Méthode principale : construit une URL pour une personne
+   *
+   * @param {Object} person - Objet personne avec fnk, snk, oc
+   * @param {Object} options - Options de construction de l'URL
+   * @returns {string} URL complète
+   */
+  buildPersonURL: function(person, options = {}) {
+    // Options par défaut avec fusion intelligente
+    const opts = {
+      // Comportement de navigation
+      useCurrentState: true,     // Inclure l'état actuel (générations, mode, etc.)
+      externalNavigation: false, // true = fiche individuelle, false = fanchart
+      targetGeneration: null,    // Forcer une génération spécifique
+
+      // Préservation de l'état existant
+      preserveTools: true,       // Garder les outils actifs (colorisation, etc.)
+      preserveMode: true,        // Garder le mode (circulaire, angle)
+      preserveView: true,        // Garder la vue (zoom, position)
+
+      // Fusion avec les options passées
+      ...options
+    };
+
+    // Construction de l'URL selon le type de navigation
+    if (opts.externalNavigation) {
+      // Navigation externe : URL simple vers la fiche individuelle
+      return this._buildExternalPersonURL(person);
+    } else {
+      // Navigation interne : URL complète avec état du fanchart
+      return this._buildFanchartPersonURL(person, opts);
+    }
+  },
+
+  /**
+   * Construit une URL pour une recherche de lieu
+   *
+   * @param {string} placeName - Nom du lieu à rechercher
+   * @param {Object} options - Options de recherche
+   * @returns {string} URL de recherche
+   */
+  buildPlaceURL: function(placeName, options = {}) {
+    const opts = {
+      exactSearch: true,    // Recherche exacte ou partielle
+      searchPrefix: true,   // Inclure une recherche par préfixe
+      ...options
+    };
+
+    const baseURL = this.config.basePerson;
+    const params = [];
+
+    // Paramètres de base pour la recherche de lieux
+    params.push(`m=${this.config.specialParams.place.module}`);
+    params.push(`data=${this.config.specialParams.place.data}`);
+
+    // Logique de recherche intelligente
+    if (opts.exactSearch && placeName.length > 2) {
+      // Recherche principale avec nom tronqué (logique existante)
+      const searchTerm = placeName.slice(0, -2);
+      params.push(`s=${encodeURIComponent(searchTerm)}`);
+    }
+
+    // Recherche exacte complémentaire
+    params.push(`s1=${encodeURIComponent(placeName)}`);
+
+    return baseURL + params.join('&');
+  },
+
+  /**
+   * Met à jour l'URL de la page courante avec l'état actuel
+   *
+   * @param {Object} stateOverrides - Remplacements ponctuels de l'état
+   */
+  updateCurrentURL: function(stateOverrides = {}) {
+    const person = ancestor["S1"];
+    if (!person) return;
+
+    // Construire l'URL avec l'état actuel + les remplacements
+    const options = {
+      useCurrentState: true,
+      preserveTools: true,
+      preserveMode: true,
+      preserveView: false, // Ne pas préserver le zoom pour les URL
+      ...stateOverrides
+    };
+
+    const newURL = this.buildPersonURL(person, options);
+
+    // Mise à jour de l'historique sans rechargement
+    history.replaceState(null, '', newURL);
+  },
+
+  /**
+   * Navigation vers une nouvelle personne avec paramètres
+   * Remplace Utils.navigateWithParams
+   *
+   * @param {number} targetGeneration - Génération cible
+   * @param {Object} additionalOptions - Options supplémentaires
+   */
+  navigateToGeneration: function(targetGeneration, additionalOptions = {}) {
+    const person = ancestor["S1"];
+    if (!person) return;
+
+    // Sauvegarder l'état actuel pour restauration
+    const savedMaxGen = max_gen;
+
+    // Construire l'URL avec la nouvelle génération
+    max_gen = targetGeneration;
+    const options = {
+      targetGeneration: targetGeneration,
+      useCurrentState: true,
+      preserveTools: true,
+      preserveMode: true,
+      ...additionalOptions
+    };
+
+    const url = this.buildPersonURL(person, options);
+
+    // Restaurer l'état et naviguer
+    max_gen = savedMaxGen;
+    window.location = url;
+  },
+
+  /**
+   * Navigation directe vers une personne
+   * Centralise les appels depuis les événements SVG et les clics
+   *
+   * @param {Object} person - Personne cible
+   * @param {boolean} newTab - Ouvrir dans un nouvel onglet
+   * @param {boolean} stayInFanchart - Rester dans le fanchart vs fiche individuelle
+   */
+  navigateToPerson: function(person, newTab = false, stayInFanchart = false) {
+    // Nettoyer le cache car on change de contexte
+    if (!stayInFanchart && !newTab) {
+      LocationDataBuilder.clearCache();
+    }
+
+    if (!person || !person.fnk || !person.snk) {
+      console.warn('URLManager: Personne invalide pour navigation', person);
+      return false;
+    }
+
+    const url = this.buildPersonURL(person, {
+      externalNavigation: !stayInFanchart,
+      useCurrentState: stayInFanchart
+    });
+
+    // Exécution de la navigation
+    if (newTab) {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+
+    return true;
+  },
+
+  /**
+   * Navigation vers un lieu (recherche)
+   * @param {string} placeName - Nom du lieu
+   * @param {boolean} newTab - Nouvel onglet
+   */
+  navigateToPlace: function(placeName, newTab = false) {
+    const url = this.buildPlaceURL(placeName);
+
+    if (newTab) {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+
+    return true;
+  },
+
+  // ========== MÉTHODES PRIVÉES ==========
+  /**
+   * Construit une URL externe simple (fiche individuelle)
+   * @private
+   */
+  _buildExternalPersonURL: function(person) {
+    const params = [`p=${person.fnk}`, `n=${person.snk}`];
+
+    if (person.oc) {
+      params.push(`oc=${person.oc}`);
+    }
+
+    return this.config.basePerson + params.join('&');
+  },
+
+  /**
+   * Construit une URL complète pour navigation fanchart
+   * @private
+   */
+  _buildFanchartPersonURL: function(person, options) {
+    // Paramètres de base obligatoires
+    const params = [
+      `m=${this.config.defaultParams.module}`,
+      `t=${this.config.defaultParams.template}`,
+      `p=${person.fnk}`,
+      `n=${person.snk}`
+    ];
+
+    // Paramètres optionnels de la personne
+    if (person.oc) params.push(`oc=${person.oc}`);
+
+    // État du fanchart si demandé
+    if (options.useCurrentState) this._addFanchartState(params, options);
+
+    return this.config.basePerson + params.join('&');
+  },
+
+   /**
+   * Ajoute l'état actuel du fanchart aux paramètres
+   * @private
+   */
+  _addFanchartState: function(params, options) {
+    const targetGen = options.targetGeneration || max_gen;
+    params.push(`v=${targetGen}`);
+
+    if (options.preserveMode) {
+      if (isCircularMode) {
+        params.push('mode=couple');
+      } else if (current_angle !== 220) {
+        params.push(`angle=${current_angle}`);
+      }
+    }
+
+    if (options.preserveTools) {
+      if (tool) params.push(`tool=${tool}`);
+      if (tool === 'place') {
+        if (sortMode === 'alphabetical') params.push('sort');
+
+        const placesPanel = document.querySelector('.places-panel');
+        if (placesPanel?.classList.contains('show-events')) {
+          params.push('events');
+        }
+
+        const lockedPlace = PlacesHighlighter?.state?.lockedPlace ||
+                            new URLSearchParams(window.location.search).get('lock');
+        if (lockedPlace) {
+          params.push(`lock=${encodeURIComponent(lockedPlace)}`);
+        }
+      }
+      if (implexMode === 'numbered') params.push('implex=num');
+      else if (implexMode === 'full') params.push('implex=full');
+    }
+  }
 };
-document.getElementById("b-zoom-out").onclick = function() {
-	zoom( window_cx, window_cy, zoom_factor, -1 );
+
+// ========== Utilitaires généraux ==========
+const Utils = {
+  ageCategory: function (age) {
+    const a = Number(age);
+    if (!Number.isFinite(a) || a <= 0) return null;
+
+    const limits = [40, 55, 70, 85];
+    for (let i = 0; i < limits.length; i++) {
+      if (a < limits[i]) return i;
+    }
+
+    return 4;
+  },
+
+  ageClass: function(age) {
+    const category = this.ageCategory(age);
+    return category !== null ? "DA" + category : "";
+  },
+
+  marriageLengthClass: function (length) {
+    const l = Number(length);
+    if (!Number.isFinite(l) || l < 0) return "";
+
+    const limits = [10, 25, 40, 55];
+    for (let i = 0; i < limits.length; i++) {
+      if (l < limits[i]) return "DAM" + i;
+    }
+    return "DAM4";
+  },
+
+  relativeLuminance: function(color) {
+    pixel.fillStyle = color;
+    pixel.fillRect(0, 0, 1, 1);
+    const data = pixel.getImageData(0, 0, 1, 1).data;
+    const rsrgb = data[0] / 255;
+    const gsrgb = data[1] / 255;
+    const bsrgb = data[2] / 255;
+    const r = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
+    const g = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
+    const b = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
+    return r * 0.2126 + g * 0.7152 + b * 0.0722;
+  },
+
+  contrastRatio: function(color1, color2) {
+    return (this.relativeLuminance(color1) + 0.05) / (this.relativeLuminance(color2) + 0.05);
+  },
 };
-document.getElementById("b-gen-add").onclick = function() {
-	if( max_gen < 10 ) {
-		var p = ancestor["S1"];
-		var oc = p.oc;
-		if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-		window.location = link_to_person + "m=A&t=FC&mono=" + mono + "&tool=" + tool + "&implex=" + implex + "&p=" + p.fnk + "&n=" + p.snk + oc + "&v=" + (max_gen+1);
-	}
+
+// ========== Module de construction des données de lieux ==========
+const LocationDataBuilder = {
+  _locationCache: new Map(),
+  _generationCache: new Map(),
+
+  /*
+   * Fonction principale qui orchestre toute la construction des données de lieux
+   * @param {number} maxGeneration - Génération maximum à considérer
+   */
+  buildCompleteLocationData: function(maxGeneration = null) {
+    const targetGeneration = maxGeneration || max_gen;
+
+    // Invalider le cache de tri car les lieux ont changé
+    if (PlacesInterface.cache) {
+        PlacesInterface.cache.invalidateSort();
+    }
+
+    // Vérifier le cache de génération
+    if (this._generationCache.has(targetGeneration)) {
+      const cached = this._generationCache.get(targetGeneration);
+      lieux = cached.lieux;
+      lieux_a = cached.lieux_a;
+      this.restoreGlobalFlags();
+      return;
+    }
+
+    // Construction normale si pas en cache
+    this.resetLocationData();
+    const filteredAncestors = this.filterAncestorsByGeneration(targetGeneration);
+
+    // Traitement principal
+    Object.values(filteredAncestors).forEach(person => {
+      this.processPersonAllLocations(person);
+    });
+
+    // Construction de l'array final
+    this.buildFinalLocationArray();
+
+    // Mettre en cache pour cette génération
+    this._generationCache.set(targetGeneration, {
+      lieux: { ...lieux },
+      lieux_a: [...lieux_a],
+      flags: this.captureGlobalFlags()
+    });
+  },
+
+  /**
+   * Filtre les ancêtres selon la génération maximum
+   * Optimisé avec calcul direct des plages de Sosa
+   */
+  filterAncestorsByGeneration: function(maxGeneration) {
+    const filteredAncestors = {};
+
+    for (let gen = 1; gen <= maxGeneration + 1; gen++) {
+      const startSosa = 1 << (gen - 1);  // Décalage à gauche de bits = 2^(gen-1)
+      const endSosa = (1 << gen) - 1;    // Décalage à gauche de bits = 2^gen-1
+
+      for (let sosa = startSosa; sosa <= endSosa; sosa++) {
+        const key = "S" + sosa;
+        if (ancestor[key]) {
+          filteredAncestors[key] = ancestor[key];
+        }
+      }
+    }
+
+    return filteredAncestors;
+  },
+
+  /**
+   * Réinitialise toutes les structures de données globales
+   */
+  resetLocationData: function() {
+    lieux = {};
+    lieux_a = [];
+
+    // Reset des flags globaux via Events
+    Events.types.forEach(eventType => {
+      window[Events.flagProp(eventType)] = false;
+    });
+  },
+
+  /**
+   * Traite tous les lieux associés à une personne
+   */
+  processPersonAllLocations: function(person) {
+    Events.types.forEach(eventType => {
+      const placeField = Events.place(eventType);
+
+      if (person[placeField]?.trim()) {
+        this.processSingleLocation(person[placeField], eventType, person);
+      }
+    });
+  },
+
+  /**
+   * Traite un lieu spécifique pour un type d'événement donné
+   * @param {string} placeName - Nom du lieu brut
+   * @param {string} eventType - Type d'événement (bi, ba, ma, de, bu)
+   * @param {Object} person - Référence à la personne (pour de futures extensions)
+   * @returns {Object} Information sur la méthode utilisée
+   */
+  processSingleLocation: function(placeName, eventType, person) {
+    // Nettoyage du nom de lieu
+    const cleanPlaceName = placeName.replace(/^\?, /, "");
+
+     // Initialisation de l'entrée si première occurrence de ce lieu
+    if (!lieux[cleanPlaceName]) {
+      const locationStructure = this.extractLocationStructure(cleanPlaceName, eventType, person);
+      lieux[cleanPlaceName] = this.createLocationEntry(cleanPlaceName, locationStructure);
+    }
+
+    // Mise à jour des compteurs
+    this.updateLocationCounters(lieux[cleanPlaceName], eventType), person.sosa;
+  },
+
+  /**
+   * Extrait la structure du lieu
+   */
+  extractLocationStructure: function(placeName, eventType, person) {
+    const subField = eventType + '_sub';
+    const mainField = eventType + '_main';
+
+    return {
+      fullName: placeName,
+      isSubLocation: !!person[subField],
+      subName: person[subField] || null,
+      parentLocation: person[mainField] || null
+    };
+  },
+
+  /**
+   * Crée une entrée de lieu optimisée avec les métadonnées nécessaires
+   * @param {string} cleanPlaceName - Nom nettoyé du lieu
+   * @param {Object} locationStructure - Structure du lieu
+   * @returns {Object} Entrée complète pour l'objet lieux
+   */
+  createLocationEntry: function(cleanPlaceName, locationStructure) {
+    const entry = {
+      cnt: 0,
+      c: null,
+      maxGeneration: 0,
+
+      // Métadonnées géographiques
+      isSubLocation: locationStructure.isSubLocation,
+      subName: locationStructure.subName,
+      parentLocation: locationStructure.parentLocation,
+
+      // Données DOM préparées
+      domAttributes: {
+        'data-place': cleanPlaceName,
+        'data-is-sublocation': locationStructure.isSubLocation,
+        'data-events': []
+      }
+    };
+
+    // Initialisation des compteurs et flags via Events
+    Events.types.forEach(eventType => {
+      entry[Events.count(eventType)] = 0;
+      entry[Events.svgPrefix(eventType)] = false;
+    });
+
+    return entry;
+  },
+
+  /**
+   * Met à jour les compteurs pour un lieu donné avec tracking de la génération
+   * @param {Object} locationEntry - Entrée de lieu dans l'objet lieux
+   * @param {string} eventType - Type d'événement à incrémenter
+   */
+  updateLocationCounters: function(locationEntry, eventType, sosa) {
+    const countField = Events.count(eventType);
+    const flagField = Events.svgPrefix(eventType);
+
+    // Calculer la génération depuis le Sosa
+    const generation = sosa ? Math.floor(Math.log2(sosa)) + 1 : 0;
+    locationEntry.maxGeneration = Math.max(locationEntry.maxGeneration, generation);
+
+    // Incréments
+    locationEntry[countField]++;
+    locationEntry.cnt++;
+
+    // Flags et DOM attributes
+    if (!locationEntry[flagField]) {
+      locationEntry[flagField] = true;
+      window[Events.flagProp(eventType)] = true;
+      locationEntry.domAttributes['data-events'].push(eventType);
+    }
+  },
+
+  /**
+   * Construit l’array final lieux_a et assigne les IDs CSS pour la colorisation
+   * Transforme l’objet lieux en array utilisable par les fonctions de tri
+   */
+  buildFinalLocationArray: function() {
+    if (!lieux || typeof lieux !== 'object') {
+      console.error('❌ Objet lieux corrompu, réinitialisation');
+      lieux = {};
+      lieux_a = [];
+      return;
+    }
+
+    // Conversion en array avec validation
+    try {
+      lieux_a = Object.entries(lieux);
+    } catch (error) {
+      console.error('❌ Erreur lors de la conversion lieux->array:', error);
+      lieux_a = [];
+      return;
+    }
+
+    // Assignation des IDs avec protection
+    lieux_a.forEach(([placeName, locationData], index) => {
+      if (locationData && typeof locationData === 'object') {
+        locationData.c = "L" + index;
+      } else {
+        console.warn(`⚠️ Données corrompues pour le lieu: ${placeName}`);
+      }
+    });
+  },
+
+  /**
+   * Capture l'état des flags globaux pour le cache
+   */
+  captureGlobalFlags: function() {
+    const flags = {};
+    Events.types.forEach(eventType => {
+      flags[Events.flagProp(eventType)] = window[Events.flagProp(eventType)];
+    });
+    return flags;
+  },
+
+  /**
+   * Restaure les flags depuis le cache
+   */
+  restoreGlobalFlags: function() {
+    const cached = this._generationCache.get(max_gen);
+    if (cached?.flags) {
+      Object.entries(cached.flags).forEach(([flag, value]) => {
+        window[flag] = value;
+      });
+    }
+  },
+
+  /**
+   * Valide et corrige les relations parent-enfant
+   * @returns {Object} Rapport de validation
+   */
+  validateLocationHierarchy: function() {
+    let corrections = 0;
+    let subLocations = 0;
+    let orphans = [];
+
+    Object.entries(lieux).forEach(([placeName, locationData]) => {
+      if (locationData.isSubLocation && locationData.parentLocation) {
+        subLocations++;
+
+        // Vérifier l'existence du parent
+        if (!lieux[locationData.parentLocation]) {
+          orphans.push(placeName);
+
+          // Correction automatique
+          locationData.isSubLocation = false;
+          locationData.subName = null;
+          locationData.parentLocation = null;
+          locationData.domAttributes['data-is-sublocation'] = false;
+          corrections++;
+        }
+      }
+    });
+
+    if (orphans.length > 0) {
+      console.warn(`⚠️ Sous-lieux orphelins corrigés:`, orphans);
+    }
+
+    return {
+      corrections,
+      subLocations,
+      orphans,
+      totalLocations: Object.keys(lieux).length
+    };
+  },
+
+  /**
+   * Pré-calcule les classes CSS pour optimisation
+   */
+  precomputeCSSClasses: function(locationData, index) {
+    const classes = {
+      colorClass: `color-${(index % 12) + 1}`,
+      eventClasses: []
+    };
+
+    Events.types.forEach(eventType => {
+      if (locationData[Events.svgPrefix(eventType)]) {
+        classes.eventClasses.push(Events.cssClass(eventType));
+      }
+    });
+
+    return classes;
+  },
+
+  /**
+   * Statistiques par type d’événement
+   * @returns {Object} Statistiques détaillées par type
+   */
+  getEventStatistics: function() {
+    const stats = {};
+    Events.types.forEach(eventType => { stats[eventType] = 0; });
+
+    Object.values(lieux).forEach(locationData => {
+      Events.types.forEach(eventType => {
+        const count = Events.count(eventType);
+        stats[eventType] += locationData[count] || 0;
+      });
+    });
+
+    return stats;
+  },
+
+ /**
+   * Nettoie le cache (appelé lors des changements majeurs)
+   */
+  clearCache: function() {
+    this._locationCache.clear();
+    this._generationCache.clear();
+  }
 };
-document.getElementById("b-gen-del").onclick = function() {
-	if( max_gen > 1 ) {
-		var p = ancestor["S1"];
-		var oc = p.oc;
-		if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-		window.location = link_to_person + "m=A&t=FC&mono=" + mono + "&tool=" + tool + "&implex=" + implex + "&p=" + p.fnk + "&n=" + p.snk + oc + "&v=" + (max_gen-1);
-	}
+
+// ========== Interface du panneau des lieux ==========
+const PlacesInterface = {
+  cache: { // Cache avec invalidation sélective
+    elements: {},
+    sortedPlaces: null,
+    lastSortMode: null,
+    fragment: null, // Réutilisation du fragment DOM
+
+    invalidateSort: function() {
+      this.sortedPlaces = null;
+    }
+  },
+
+ initialize: function() {
+    this.cache.elements = { // Cache des éléments critiques
+      panel: document.querySelector('.places-panel'),
+      placesList: document.querySelector('.places-list'),
+      summaryPlaces: document.querySelector('.summary-places-info'),
+      summaryEventCounts: document.querySelectorAll('.summary-event-count'),
+      summaryTotal: document.querySelector('.summary-total-events'),
+      summaryPersons: document.querySelector('.summary-persons-count')
+    };
+
+    if (!this.cache.elements.placesList) {
+      console.error('❌ Éléments HTML requis manquants');
+      return false;
+    }
+
+    this.generatePlacesList();
+    this.updateSummarySection();
+    this.setupEventListeners();
+
+    return true;
+  },
+
+  placeRowTemplate: function(placeName, placeData, index) {
+    // Calculer l'index de couleur (rotation sur 12 couleurs)
+    const colorIndex = (index % 12) + 1;
+
+    // Préparer les attributs data-* en une seule chaîne
+    const dataAttributes = `
+      data-place="${placeName}"
+      data-place-class="${placeData.c || ''}"
+      data-total="${placeData.cnt || 0}"
+    `.trim();
+
+    // Template HTML complet
+    return `
+      <div class="place-row" data-index="${index}">
+        <div class="place-indicators" id="indic-${index}"></div>
+        <div class="place-content" id="place-${index}" ${dataAttributes}>
+          <div class="place-left">
+            <div class="place-color color-${colorIndex}"></div>
+            <div class="place-name">${this.formatPlaceName(placeName, placeData)}</div>
+          </div>
+          <div class="place-right">
+            <div class="place-events">
+              ${this.generateEventItemsHTML(placeData)}
+            </div>
+            <div class="place-count">${placeData.cnt || 0}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  formatPlaceName: function(placeName, placeData) {
+    if (sortMode === 'alphabetical' && placeData.isSubLocation) {
+      // Mode alphabétique : afficher le sous-nom avec indentation
+      const label = placeData.subName || placeName;
+      return `<span class="sublocation-indicator">└ </span>${label}`;
+    }
+    // Mode fréquence ou lieu principal : afficher le nom complet
+    return placeName;
+  },
+
+  generateEventItemsHTML: function(placeData) {
+    const htmlParts = Events.types.map(eventType => {
+      const label = Events.label(eventType);
+      const eventCount = Events.count(eventType);
+      const count = placeData[eventCount] || 0;
+      const isActive = count > 0;
+
+      return `
+        <div class="event-item ${isActive ? 'active' : ''}" data-event="${eventType}">
+          <span class="event-count">${count > 1 ? count : ''}</span>
+          <span class="event-label">${label}</span>
+        </div>
+      `;
+    });
+
+    return htmlParts.join('');
+  },
+
+  /**
+   * Génèration de la liste des lieux enrichie
+   */
+  generatePlacesList: function() {
+    const container = this.cache.elements.placesList;
+    if (!container) return;
+
+    // Utiliser le cache de tri
+    const sortedPlaces = this.getCachedSortedPlaces();
+
+    // Fragment DOM pour performance
+    const fragment = document.createDocumentFragment();
+
+    sortedPlaces.forEach(([placeName, placeData], index) => {
+      const row = this.createPlaceRow(placeName, placeData, index);
+
+      // Enrichissement immédiat des références DOM
+      placeData.domElement = row.querySelector('.place-content');
+      placeData.visualIndex = index;
+      placeData.indicatorElement = row.querySelector('.place-indicators');
+
+      fragment.appendChild(row);
+    });
+
+    // Une seule manipulation DOM
+    container.innerHTML = '';
+    container.appendChild(fragment);
+  },
+
+  /**
+   * Tri avec cache intelligent
+   */
+  getCachedSortedPlaces: function() {
+    if (this.cache.sortedPlaces && this.cache.lastSortMode === sortMode) {
+      return this.cache.sortedPlaces;
+    }
+
+    this.cache.sortedPlaces = this.getSortedPlaces();
+    this.cache.lastSortMode = sortMode;
+    return this.cache.sortedPlaces;
+  },
+
+  /**
+   * Tri optimisé avec support des données natives
+     */
+  getSortedPlaces: function() {
+    if (sortMode === 'alphabetical') {
+      // Utilisation directe des données natives _main pour le regroupement
+      const groups = new Map();
+
+      Object.entries(lieux).forEach(([name, data]) => {
+        if (data.isSubLocation && data.parentLocation) {
+          // Sous-lieu : l'ajouter au groupe du parent
+          if (!groups.has(data.parentLocation)) {
+            groups.set(data.parentLocation, { main: null, subs: [] });
+          }
+          groups.get(data.parentLocation).subs.push([name, data]);
+        } else {
+          // Lieu principal
+          if (!groups.has(name)) {
+            groups.set(name, { main: null, subs: [] });
+          }
+          groups.get(name).main = [name, data];
+        }
+      });
+
+      // Construire l'array trié
+      const sorted = [];
+      Array.from(groups.entries())
+        .sort(([a], [b]) => a.localeCompare(b, 'fr', { sensitivity: 'base' }))
+        .forEach(([groupName, group]) => {
+          if (group.main) sorted.push(group.main);
+          group.subs
+            .sort(([a], [b]) => a.localeCompare(b, 'fr', { sensitivity: 'base' }))
+            .forEach(sub => sorted.push(sub));
+        });
+
+      return sorted;
+    }
+
+    // Mode fréquence : simple tri par compteur
+    return Object.entries(lieux).sort((a, b) => b[1].cnt - a[1].cnt);
+  },
+
+  /**
+   * Création optimisée des éléments DOM
+   */
+  createPlaceRow: function(placeName, placeData, index) {
+    const row = document.createElement('div');
+    row.className = 'place-row';
+    row.dataset.index = index;
+
+    // Indicateurs d'événements
+    const indicators = document.createElement('div');
+    indicators.className = 'place-indicators';
+    indicators.id = `indic-${index}`;
+
+    // Contenu principal
+    const content = document.createElement('div');
+    content.className = 'place-content';
+    content.id = `place-${index}`;
+    content.dataset.place = placeName;
+    content.dataset.placeClass = placeData.c || '';
+    content.dataset.total = placeData.cnt || 0;
+
+    // Construction du contenu interne
+    content.innerHTML = this.buildPlaceContentHTML(placeName, placeData, index);
+
+    row.appendChild(indicators);
+    row.appendChild(content);
+
+    return row;
+  },
+
+  /**
+   * Construction optimisée du HTML interne
+   */
+  buildPlaceContentHTML: function(placeName, placeData, index) {
+    const colorIndex = (index % 12) + 1;
+    const displayName = this.getDisplayName(placeName, placeData);
+    const eventItemsHTML = this.buildEventItemsHTML(placeData);
+
+    return `
+      <div class="place-left">
+        <div class="place-color color-${colorIndex}"></div>
+        <div class="place-name">${displayName}</div>
+      </div>
+      <div class="place-right">
+        <div class="place-events">${eventItemsHTML}</div>
+        <div class="place-count">${placeData.cnt || 0}</div>
+      </div>
+    `;
+  },
+
+  /**
+   * Nom d'affichage selon le mode et les données natives
+   */
+  getDisplayName: function(placeName, placeData) {
+    if (sortMode === 'alphabetical' && placeData.isSubLocation && placeData.subName) {
+      return `<span class="sublocation-indicator">└ </span>${placeData.subName}`;
+    }
+    return placeName;
+  },
+
+  /**
+   * Construction des indicateurs d'événements
+   */
+  buildEventItemsHTML: function(placeData) {
+    return Events.types.map(eventType => {
+      const count = placeData[Events.count(eventType)] || 0;
+      const isActive = count > 0;
+
+      return `
+        <div class="event-item ${isActive ? 'active' : ''}" data-event="${eventType}">
+          <span class="event-count">${count > 1 ? count : ''}</span>
+          <span class="event-label">${Events.label(eventType)}</span>
+        </div>
+      `;
+    }).join('');
+  },
+
+  /**
+   * Mise à jour du résumé et support du survol des totaux
+   */
+  updateSummarySection: function() {
+    // Générations
+    const genElement = this.cache.elements.panel.querySelector('.generation-count');
+    if (genElement) {
+      const genLabel = window.FC_TRANSLATIONS?.[max_gen > 1 ? 'generations' : 'generation'] || 'génération';
+      genElement.textContent = `${max_gen} ${genLabel}`;
+    }
+
+    // Lieux
+    const placeCount = Object.keys(lieux).length;
+    const placeLabel = window.FC_TRANSLATIONS?.[placeCount > 1 ? 'places' : 'place'] || 'lieu';
+    this.cache.elements.summaryPlaces.textContent = `${placeCount} ${placeLabel}`;
+
+    // Statistiques par événement
+    const stats = LocationDataBuilder.getEventStatistics();
+
+    Events.types.forEach((eventType, index) => {
+      const countElement = this.cache.elements.summaryEventCounts[index];
+      if (countElement) {
+        const count = stats[eventType] || 0;
+        countElement.textContent = count;
+
+        // Préparation pour le futur surlignage NBMDS
+        const labelElement = countElement.previousElementSibling;
+        if (labelElement) {
+          labelElement.dataset.eventType = eventType;
+          labelElement.dataset.eventCount = count;
+        }
+      }
+    });
+
+    // Total
+    const totalEvents = Object.values(stats).reduce((sum, count) => sum + count, 0);
+    this.cache.elements.summaryTotal.textContent = totalEvents;
+
+    // Personnes
+    this.updatePersonsCounter();
+  },
+
+  /**
+   * Compteur de personnes
+   */
+  updatePersonsCounter: function() {
+    const personsElement = this.cache.elements.summaryPersons;
+    if (!personsElement) return;
+
+    // Utiliser le cache des ancêtres filtrés de LocationDataBuilder
+    const filteredAncestors = LocationDataBuilder.filterAncestorsByGeneration(max_gen);
+
+    let personsWithPlaces = 0;
+    Object.values(filteredAncestors).forEach(person => {
+      // Vérifier si au moins un lieu existe
+      const hasPlace = Events.types.some(eventType => {
+        const placeField = Events.place(eventType);
+        return person[placeField]?.trim();
+      });
+
+      if (hasPlace) personsWithPlaces++;
+    });
+
+    personsElement.textContent = personsWithPlaces;
+    const label = window.FC_TRANSLATIONS?.[personsWithPlaces > 1 ? 'persons' : 'person'] || 'personne';
+    personsElement.title = `${personsWithPlaces} ${label} avec lieux`;
+  },
+
+ /**
+   * Configuration des événements avec support du surlignage bidirectionnel
+   */
+  setupEventListeners: function() {
+    if (!this.cache.elements.placesList) return;
+    PlacesHighlighter.initialize();
+
+    this.cache.elements.placesList.addEventListener('click', (e) => {
+      const placeContent = e.target.closest('.place-content');
+      if (placeContent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (e.ctrlKey || e.metaKey) {
+          const placeName = placeContent.dataset.place;
+          if (placeName && URLManager.navigateToPlace) {
+            URLManager.navigateToPlace(placeName, true);
+          }
+        }
+      }
+    });
+  },
+
+/**
+   * Configuration du surlignage des totaux d'événements
+   */
+  setupEventTotalHighlights: function() {
+    // Sauvegarde du lock pendant le survol des totaux
+    let savedLockState = null;
+
+    document.querySelectorAll('.summary-event-label').forEach(label => {
+      const eventType = label.dataset.eventType;
+      if (!eventType) return;
+
+      label.style.cursor = 'pointer';
+
+      label.addEventListener('mouseenter', () => {
+        // Sauvegarder l'état complet du lock
+        savedLockState = PlacesHighlighter.state.lockedPlace ? {
+          place: PlacesHighlighter.state.lockedPlace,
+          events: [...PlacesHighlighter.state.lockedPlaceEvents]
+        } : null;
+
+        // Afficher le surlignage des totaux (efface tout)
+        PlacesHighlighter.highlightByEventType(eventType);
+      });
+
+      label.addEventListener('mouseleave', () => {
+        PlacesHighlighter.clearAllHighlights();
+
+        // Restaurer le lock s'il y en avait un
+        if (savedLockState) {
+          PlacesHighlighter.state.lockedPlace = savedLockState.place;
+          PlacesHighlighter.state.lockedPlaceEvents = savedLockState.events;
+
+          const lockedPlaceData = lieux[savedLockState.place];
+          if (lockedPlaceData?.domElement) {
+            lockedPlaceData.domElement.classList.add('locked');
+          }
+          PlacesHighlighter.restoreLockedPlaceState();
+        }
+
+        savedLockState = null;
+      });
+    });
+  },
+
+  handlePlaceClick: function(placeName, event) {
+    if (!event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+      return;
+    }
+
+    if (placeName && URLManager.navigateToPlace) {
+      const newTab = true;
+      URLManager.navigateToPlace(placeName, newTab);
+    }
+  }
 };
-document.getElementById("b-implex").onclick = function() {
-	if( implex == "" ) {
-		implex = "off";
-	} else {
-		implex = "";
-	}
-	var p = ancestor["S1"];
-	var oc = p.oc;
-	if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-	window.location = link_to_person + "m=A&t=FC&mono=" + mono + "&tool=" + tool + "&implex=" + implex + "&p=" + p.fnk + "&n=" + p.snk + oc + "&v=" + max_gen;
+
+// ========== Interface utilisateur pour le panneau des lieux ==========
+const PlacesPanelControls = {
+  searchDebounceTimer: null, // Timers pour optimisation
+
+  initialize: function() {
+    const panel = PlacesInterface.cache.elements.panel;
+    if (!panel) {
+      console.error('❌ PlacesInterface doit être initialisé avant PlacesPanelControls');
+      return false;
+    }
+
+    this.initializeDefaultStates();
+    this.setupEventListeners();
+    return true;
+  },
+
+  /**
+   * Configuration des listeners avec délégation
+   */
+  setupEventListeners: function() {
+    const panel = PlacesInterface.cache.elements.panel;
+
+    // Supprimer l'ancien listener avant d'en ajouter un nouveau
+    if (this._clickHandler) {
+      panel.removeEventListener('click', this._clickHandler);
+    }
+
+    // Stocker la référence pour pouvoir la supprimer plus tard
+    this._clickHandler = (e) => {
+      if (e.target.matches('.panel-close') || e.target.closest('.panel-close') ||
+          e.target.matches('.panel-toggle') || e.target.closest('.panel-toggle')) {
+        e.preventDefault();
+        this.togglePanel();
+      }
+      else if (e.target.closest('.sort-toggle')) {
+        e.preventDefault();
+        this.toggleSort();
+      }
+      else if (e.target.closest('.events-toggle')) {
+        e.preventDefault();
+        this.toggleEventsDisplay();
+      }
+      else if (e.target.matches('.search-clear')) {
+        e.preventDefault();
+        this.clearSearch();
+      }
+    };
+
+    panel.addEventListener('click', this._clickHandler);
+    this.setupSearchListener();
+  },
+
+  /**
+   * Recherche optimisée avec debounce
+   */
+  setupSearchListener: function() {
+    const panel = PlacesInterface.cache.elements.panel;
+    const searchInput = panel.querySelector('.search-input');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(this.searchDebounceTimer);
+      const query = e.target.value;
+
+      // Recherche immédiate si effacement
+      if (!query) {
+        this.filterPlaces('');
+        return;
+      }
+
+      // Debounce pour les autres cas
+      this.searchDebounceTimer = setTimeout(() => {
+        this.filterPlaces(query);
+      }, 150);
+    });
+  },
+
+  /**
+   * États par défaut cohérents
+   */
+  initializeDefaultStates: function() {
+    this.updateSortButtonIcon();
+
+    const panel = PlacesInterface.cache.elements.panel;
+
+    // État des événements
+    if (showEvents) {
+      panel.classList.add('show-events');
+      const icon = document.querySelector('.events-toggle i');
+      if (icon) icon.className = 'far fa-lightbulb';
+    }
+
+    // Recherche
+    const searchInput = panel.querySelector('.search-input');
+    if (searchInput) searchInput.value = '';
+  },
+
+  /**
+   * Basculement du panneau (masquer/afficher)
+   * Conserve le mode place actif, seul l'affichage change
+   */
+  togglePanel: function() {
+    const panel = PlacesInterface.cache.elements.panel;
+    const isCollapsed = panel.classList.contains('panel-collapsed');
+
+    panel.classList.toggle('panel-collapsed');
+
+    FanchartApp.calculateDimensions();
+    FanchartApp.fitScreen();
+
+    // Mettre à jour l'icône du bouton close
+    const closeBtn = panel.querySelector('.panel-close i');
+    if (closeBtn) {
+      closeBtn.className = isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+    }
+  },
+
+  /**
+   * Basculement du tri
+   */
+  toggleSort: function() {
+    sortMode = sortMode === 'frequency' ? 'alphabetical' : 'frequency';
+
+    PlacesInterface.cache.invalidateSort();
+    this.updateSortButtonIcon();
+    PlacesInterface.generatePlacesList();
+    PlacesHighlighter.restoreLock();
+    URLManager.updateCurrentURL();
+  },
+
+  /**
+   * Mise à jour de l'icône de tri
+   */
+  updateSortButtonIcon: function() {
+    const icon = document.querySelector('.sort-toggle i');
+    if (icon) {
+      icon.className = sortMode === 'alphabetical'
+        ? 'fas fa-arrow-down-wide-short'
+        : 'fas fa-arrow-down-a-z';
+    }
+
+    const button = document.querySelector('.sort-toggle');
+    if (button) {
+      const key = sortMode === 'alphabetical' ? 'sort_alphabetically' : 'sort_by_frequency';
+      button.title = window.FC_TRANSLATIONS?.[key] || 'Changer le tri';
+    }
+  },
+
+  /**
+   * Basculement de l'affichage détaillé
+   */
+  toggleEventsDisplay: function() {
+    showEvents = !showEvents;
+
+    const panel = PlacesInterface.cache.elements.panel;
+    panel.classList.toggle('show-events');
+
+    const icon = document.querySelector('.events-toggle i');
+    if (icon) {
+      icon.className = panel.classList.contains('show-events')
+        ? 'fas fa-lightbulb'
+        : 'far fa-lightbulb';
+    }
+
+    URLManager.updateCurrentURL();
+  },
+
+  /**
+   * Filtrage optimisé
+   */
+  filterPlaces: function(query) {
+    const normalizedQuery = query.toLowerCase().trim();
+
+    requestAnimationFrame(() => {
+      const rows = document.querySelectorAll('.place-row');
+      let visibleCount = 0;
+      let totalCount = rows.length;
+
+      if (!normalizedQuery) {
+        // Réafficher tout rapidement
+        rows.forEach(row => {
+          row.style.display = '';
+        });
+        visibleCount = totalCount;
+      } else {
+        // Filtrer
+        rows.forEach(row => {
+          const nameEl = row.querySelector('.place-name');
+          const placeName = nameEl ? nameEl.textContent.toLowerCase() : '';
+          const matches = placeName.includes(normalizedQuery);
+
+          row.style.display = matches ? '' : 'none';
+          if (matches) visibleCount++;
+        });
+      }
+
+      this.updateClearButtonVisibility(normalizedQuery);
+      this.updateSearchResultsCount(visibleCount, totalCount);
+    });
+  },
+
+  /**
+   * Affichage du compteur de résultats
+   */
+  updateSearchResultsCount: function(visible, total) {
+    let counter = document.querySelector('.search-results-count');
+
+    if (visible < total) {
+      if (!counter) {
+        counter = document.createElement('div');
+        counter.className = 'search-results-count';
+        counter.style.cssText = 'font-size: 10px; color: #666; margin-top: 2px;';
+        const section = document.querySelector('.controls-search-section');
+        if (section) section.appendChild(counter);
+      }
+      counter.textContent = `${visible}/${total}`;
+      counter.style.display = 'block';
+    } else if (counter) {
+      counter.style.display = 'none';
+    }
+  },
+
+  /**
+   * Visibilité du bouton clear
+   */
+  updateClearButtonVisibility: function(query) {
+    const clearBtn = document.querySelector('.search-clear');
+    if (clearBtn) {
+      clearBtn.style.display = query ? 'block' : 'none';
+    }
+  },
+
+  /**
+   * Effacement de la recherche
+   */
+  clearSearch: function() {
+    const input = document.querySelector('.search-input');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+
+    this.filterPlaces('');
+  }
+};
+
+
+// ========== Module de surlignage bidirectionnel pour les lieux ==========
+const PlacesHighlighter = {
+  // État interne
+  state: {
+    highlighted: new Set(),
+    svgElements: new Map(),
+    indicators: new Map(),
+    expandedNames: new Map(),
+    currentHoveredPlace: null,
+    hoverTimeout: null,
+    lockedPlace: null,
+    lockedPlaceEvents: [],
+    tempIndicators: false
+  },
+
+  /**
+  * Configure les événements de survol et clic pour le panneau des lieux
+  */
+  setupEventHandlers: function() {
+    const placesList = document.querySelector('.places-list');
+    if (!placesList) return;
+
+    // Clic : verrouiller/déverrouiller le surlignage
+    placesList.addEventListener('click', (e) => {
+      const placeContent = e.target.closest('.place-content');
+      if (!placeContent) return;
+
+      const placeName = placeContent.dataset.place;
+      if (!placeName) return;
+
+      if (this.state.lockedPlace === placeName) {
+        // Second clic : déverrouiller
+        const placeData = lieux[placeName];
+        if (placeData?.indicatorElement) {
+          placeData.indicatorElement.querySelectorAll('.indicator').forEach(el => el.remove());
+        }
+
+        this.state.lockedPlace = null;
+        this.state.lockedPlaceEvents = [];
+        placeContent.classList.remove('locked');
+        this.clearAllHighlights();
+        URLManager.updateCurrentURL();  // ← Ajout
+      } else {
+        // Clic sur un nouveau lieu : transférer le lock
+        if (this.state.lockedPlace) {
+          const oldPlaceData = lieux[this.state.lockedPlace];
+          if (oldPlaceData?.indicatorElement) {
+            oldPlaceData.indicatorElement.querySelectorAll('.indicator, .line-break').forEach(el => el.remove());
+          }
+          document.querySelector('.place-content.locked')?.classList.remove('locked');
+        }
+
+        this.clearAllHighlights();
+        this.state.lockedPlace = placeName;
+
+        // Collecter les types d'événements du lieu
+        const placeData = lieux[placeName];
+        if (placeData) {
+          this.state.lockedPlaceEvents = Events.types.filter(
+            eventType => placeData[Events.svgPrefix(eventType)]
+          );
+        }
+
+        placeContent.classList.add('locked');
+        this.highlightPlace(placeName, 'list');
+        URLManager.updateCurrentURL();
+      }
+    });
+
+    // Survol de la liste
+    placesList.addEventListener('mousemove', (e) => {
+      const placeContent = e.target.closest('.place-content');
+
+      // Hors d'un lieu : nettoyer et restaurer le lock
+      if (!placeContent) {
+        this.cleanupHoveredPlaces();
+        this.restoreLockedPlaceState();
+        this.state.currentHoveredPlace = null;
+        return;
+      }
+
+      const placeName = placeContent.dataset.place;
+      if (!placeName || this.state.currentHoveredPlace === placeName) return;
+
+      const previousHoveredPlace = this.state.currentHoveredPlace;
+      this.state.currentHoveredPlace = placeName;
+
+      // Retour sur le lieu locké
+      if (placeName === this.state.lockedPlace) {
+        if (previousHoveredPlace && previousHoveredPlace !== placeName) {
+          this.clearHighlightForPlace(previousHoveredPlace);
+        }
+        this.restoreLockedPlaceState();
+        return;
+      }
+
+      // Nettoyer le survol précédent (sauf si c'était le lieu locké)
+      if (previousHoveredPlace && previousHoveredPlace !== this.state.lockedPlace) {
+        this.clearHighlightForPlace(previousHoveredPlace);
+      }
+
+      // Suspendre visuellement le lieu locké pendant le survol d'un autre
+      if (this.state.lockedPlace) {
+        const lockedData = lieux[this.state.lockedPlace];
+        if (lockedData) {
+          this.highlightInSVG(this.state.lockedPlace, lockedData, false);
+          if (lockedData.indicatorElement) {
+            lockedData.indicatorElement.querySelectorAll('.indicator, .line-break').forEach(el => el.remove());
+          }
+        }
+      }
+
+      this.highlightPlace(placeName, 'list');
+    }, { capture: true, passive: true });
+
+    // Sortie de la liste
+    placesList.addEventListener('mouseleave', (e) => {
+      if (!placesList.contains(e.relatedTarget)) {
+        clearTimeout(this.state.hoverTimeout);
+        this.state.hoverTimeout = setTimeout(() => {
+          this.cleanupHoveredPlaces();
+          this.state.currentHoveredPlace = null;
+
+          if (this.state.lockedPlace) {
+            this.restoreLockedPlaceState();
+          } else {
+            this.clearAllHighlights();
+          }
+        }, 50);
+      }
+    });
+
+    // Annuler le timeout si retour dans la liste
+    placesList.addEventListener('mouseenter', () => {
+      clearTimeout(this.state.hoverTimeout);
+    });
+  },
+
+  /**
+   * Nettoie tous les lieux survolés sauf le lieu locké
+   * Utilise state.highlighted car currentHoveredPlace peut être désynchronisé
+   */
+  cleanupHoveredPlaces: function() {
+    this.state.highlighted.forEach(placeName => {
+      if (placeName !== this.state.lockedPlace) {
+        this.clearHighlightForPlace(placeName);
+      }
+    });
+  },
+
+  /**
+   * Nettoie les indicateurs temporaires créés lors du survol SVG
+   */
+  clearTemporaryIndicators: function() {
+    this.state.indicators.forEach((indicators, element) => {
+      indicators.forEach(el => el.remove());
+    });
+    this.state.indicators.clear();
+    this.state.tempIndicators = false;
+  },
+
+  /**
+   * Restaure l'état visuel complet du lieu locké (violet, pas vert)
+   * Reconstruit highlighted, réactive le SVG, réaffiche les indicateurs
+   */
+  restoreLockedPlaceState: function() {
+    if (!this.state.lockedPlace) return;
+    if (!document.body.classList.contains('place')) return;
+
+    // Reconstruire le state avec uniquement le lieu locké
+    this.state.highlighted.clear();
+    this.state.highlighted.add(this.state.lockedPlace);
+
+    const lockedData = lieux[this.state.lockedPlace];
+    if (!lockedData) return;
+
+    // Retirer person-match pour que le lieu redevienne violet (pas vert)
+    if (lockedData.domElement) {
+      lockedData.domElement.classList.remove('person-match');
+    }
+
+    // Restaurer le surlignage SVG et les indicateurs
+    this.highlightInSVG(this.state.lockedPlace, lockedData, true);
+    if (lockedData.indicatorElement && this.state.lockedPlaceEvents.length > 0) {
+      this.addIndicators(lockedData.indicatorElement, this.state.lockedPlaceEvents);
+    }
+
+    this.grayOutOthers();
+  },
+
+  /**
+   * Nettoyage spécifique pour un lieu
+   */
+  clearHighlightForPlace: function(placeName) {
+    const placeData = lieux[placeName];
+    if (!placeData) return;
+
+    // Nettoyer le surlignage visuel
+    if (placeData.domElement) {
+      placeData.domElement.classList.remove('person-match');
+
+      // Restaurer la hauteur minimale
+      const placeRow = placeData.domElement.closest('.place-row');
+      if (placeRow) {
+        placeRow.style.minHeight = '';
+        placeRow.classList.remove('tall-row');
+      }
+    }
+
+    // Restaurer le nom si expansé
+    if (this.state.expandedNames.has(placeData.domElement)) {
+      const originalHtml = this.state.expandedNames.get(placeData.domElement);
+      const nameElement = placeData.domElement.querySelector('.place-name');
+      if (nameElement) {
+        nameElement.innerHTML = originalHtml;
+        nameElement.style.fontWeight = '';
+      }
+      this.state.expandedNames.delete(placeData.domElement);
+    }
+
+    // Nettoyer les indicateurs - toujours nettoyer le DOM directement
+    if (placeData.indicatorElement) {
+      placeData.indicatorElement.querySelectorAll('.indicator, .line-break').forEach(el => el.remove());
+      this.state.indicators.delete(placeData.indicatorElement);
+    }
+
+    // Nettoyer le surlignage SVG
+    this.highlightInSVG(placeName, placeData, false);
+
+    this.state.highlighted.delete(placeName);
+  },
+
+  highlight: function(placeNames, eventTypes, source = 'svg', preserveLock = false) {
+    this.clearAllHighlights(preserveLock);
+
+    if (!placeNames?.length) return;
+
+    // Créer une map pour organiser les données
+    const highlightMap = new Map();
+
+    placeNames.forEach((placeName, index) => {
+        const placeData = lieux[placeName];
+        if (!placeData) return;
+
+        const events = eventTypes[index] || [];
+
+        if (highlightMap.has(placeName)) {
+            const existing = highlightMap.get(placeName);
+            const mergedEvents = [...new Set([...existing.events, ...events])];
+            highlightMap.set(placeName, { placeData, events: mergedEvents });
+        } else {
+            highlightMap.set(placeName, { placeData, events: [...events] });
+        }
+
+        this.state.highlighted.add(placeName);
+    });
+
+    this.applyHighlights(highlightMap, source);
+  },
+
+
+  /**
+   * Version améliorée de addIndicators qui gère mieux les changements de hauteur
+   */
+  addIndicatorsWithHeightManagement: function(placeData, events) {
+    const container = placeData.indicatorElement;
+    const placeRow = container.closest('.place-row');
+    if (!container || !events.length) return;
+
+    // Préparer le conteneur pour recevoir les indicateurs
+    container.style.visibility = 'hidden'; // Masquer temporairement
+
+    // Ajouter les indicateurs
+    const indicators = [];
+    events.forEach((event, index) => {
+      const indicator = document.createElement('div');
+      indicator.className = `indicator ${Events.cssClass(event)}`;
+      indicator.textContent = Events.label(event);
+      container.appendChild(indicator);
+      indicators.push(indicator);
+
+      // Line break pour 4+ événements
+      if (index === 1 && events.length >= 4) {
+        const breaker = document.createElement('div');
+        breaker.className = 'line-break';
+        container.appendChild(breaker);
+        indicators.push(breaker);
+      }
+    });
+
+    // Ajuster la classe tall-row si nécessaire
+    if (events.length >= 4 && placeRow) {
+      placeRow.classList.add('tall-row');
+    }
+
+    // Rendre visible avec une micro-animation
+    requestAnimationFrame(() => {
+      container.style.visibility = 'visible';
+      container.style.opacity = '0';
+      container.style.transition = 'opacity 0.1s ease-in';
+
+      requestAnimationFrame(() => {
+        container.style.opacity = '1';
+      });
+    });
+
+    // Stocker pour nettoyage
+    this.state.indicators.set(container, indicators);
+  },
+
+  /**
+   * Application des surlignages
+   */
+  applyHighlights: function(highlightMap, source) {
+    const elementsToShow = [];
+
+    highlightMap.forEach(({ placeData, events }, placeName) => {
+      // Surlignage dans la liste
+      if (placeData.domElement) {
+        placeData.domElement.classList.add('person-match');
+
+        // Expansion du nom si nécessaire
+        if (placeData.isSubLocation && sortMode === 'alphabetical') {
+          this.expandSubLocationName(placeData);
+        }
+
+        // Ajout des indicateurs
+        if (placeData.indicatorElement && events.length > 0) {
+          this.addIndicators(placeData.indicatorElement, events);
+        }
+
+        elementsToShow.push({
+          element: placeData.domElement,
+          index: placeData.visualIndex,
+          placeName: placeName
+        });
+      }
+
+      // Surlignage dans le SVG (bidirectionnel)
+      if (source === 'list' || source === 'totals') {
+        this.highlightInSVG(placeName, placeData, true);
+      }
+    });
+
+    // Griser les autres
+    this.grayOutOthers();
+
+    // Gestion de l'overflow
+    if (elementsToShow.length > 0 && typeof ModernOverflowManager !== 'undefined') {
+      setTimeout(() => {
+        ModernOverflowManager.handleOverflow(elementsToShow);
+      }, 50);
+    }
+  },
+
+  /**
+   * Surlignage d'un lieu unique depuis la liste
+   */
+  highlightPlace: function(placeName, source = 'list') {
+    // Deux logiques distinctes :
+    // - preserveLock : il y a un lock actif à préserver
+    // - isLockingThisPlace : ce lieu EST le lieu locké (ne pas ajouter person-match)
+    const preserveLock = !!this.state.lockedPlace;
+    const isLockingThisPlace = (this.state.lockedPlace === placeName);
+    this.clearAllHighlights(preserveLock);
+
+    const placeData = lieux[placeName];
+    if (!placeData) return;
+
+    // Surligner dans la liste
+    if (placeData.domElement) {
+      // Ne pas ajouter person-match si c'est le lieu locké lui-même
+      if (!isLockingThisPlace) {
+        placeData.domElement.classList.add('person-match');
+      }
+      this.state.highlighted.add(placeName);
+
+      // Expansion du nom si nécessaire
+      if (placeData.isSubLocation && sortMode === 'alphabetical') {
+        this.expandSubLocationName(placeData);
+      }
+
+      // Collecter TOUS les types d'événements pour ce lieu
+      const eventTypes = [];
+      Events.types.forEach(eventType => {
+        if (placeData[Events.svgPrefix(eventType)]) {
+          eventTypes.push(eventType);
+        }
+      });
+
+      // Ajouter les indicateurs pour tous les événements
+      if (placeData.indicatorElement && eventTypes.length > 0) {
+        this.addIndicators(placeData.indicatorElement, eventTypes);
+      }
+    }
+
+    // Surligner dans le SVG avec colorisation
+    this.highlightInSVG(placeName, placeData, true);
+
+    // Griser les autres éléments
+    this.grayOutOthers();
+  },
+
+  /**
+   * Surlignage bidirectionnel avec colorisation
+   * Logique de groupe directe : groupes M pour les mariages et S pour les autres événements
+   */
+  highlightInSVG: function(placeName, placeData, highlight) {
+    const placeClass = placeData.c; // Ex: "L0"
+
+    // Traiter chaque type d'événement présent dans ce lieu
+    Events.types.forEach(eventType => {
+      if (placeData[Events.svgPrefix(eventType)]) {
+        const svgClass = `${Events.svgPrefix(eventType)}-${placeClass}`;
+        const elements = document.getElementsByClassName(svgClass);
+
+        Array.from(elements).forEach(element => {
+          if (highlight) {
+            // Déterminer le contexte grâce à la structure DOM claire
+            const parentGroup = element.parentNode;
+            const groupId = parentGroup?.id || '';
+
+            // Ignorer le préfixe de contexte (-N, -S) pour le mode circulaire
+            const baseId = groupId.replace(/^-[NS]/, '');
+
+            if (eventType === 'marriage') {
+              // Mariages : coloriser UNIQUEMENT les éléments dans les groupes M
+              if (baseId.startsWith('M')) {
+                this.applyEventHighlight(element, eventType, placeName);
+              }
+            } else {
+              // NBDS : coloriser UNIQUEMENT les éléments dans les groupes S
+              if (baseId.startsWith('S')) {
+                this.applyEventHighlight(element, eventType, placeName);
+              }
+            }
+          } else {
+            this.removeEventHighlight(element);
+          }
+        });
+      }
+    });
+  },
+
+  /**
+   * Application du surlignage d'événement
+   */
+  applyEventHighlight: function(element, eventType, placeName) {
+    // Sauvegarder l'état original seulement si nécessaire
+    if (!element.dataset.originalFill) {
+      element.dataset.originalFill = element.style.fill || '';
+    }
+
+    // Appliquer les classes CSS appropriées
+    element.classList.add('svg-place-highlight');
+    element.classList.add(`event-highlight-${eventType}`);
+
+    // Enregistrer pour le nettoyage
+    this.state.svgElements.set(element, placeName);
+  },
+
+  /**
+   * Suppression du surlignage d'événement
+   */
+  removeEventHighlight: function(element) {
+    // Nettoyer toutes les classes de surlignage
+    element.classList.remove('svg-place-highlight');
+
+    // Nettoyer chaque classe d'événement possible
+    Events.types.forEach(eventType => {
+      element.classList.remove(`event-highlight-${eventType}`);
+    });
+
+    // Restaurer le style original
+    if (element.dataset.originalFill !== undefined) {
+      element.style.fill = element.dataset.originalFill;
+      delete element.dataset.originalFill;
+    }
+
+    // Supprimer du tracking
+    this.state.svgElements.delete(element);
+  },
+
+  /**
+   * Surlignage spécialisé pour les totaux d’événement NBMDS
+   */
+  highlightByEventType: function(eventType) {
+    this.clearAllHighlights();
+
+    const placesToHighlight = [];
+
+    // Collecter tous les lieux ayant ce type d'événement
+    Object.entries(lieux).forEach(([placeName, placeData]) => {
+      if (placeData[Events.svgPrefix(eventType)]) {
+        placesToHighlight.push(placeName);
+      }
+    });
+
+    // Surligner les lieux dans la liste (inchangé)
+    placesToHighlight.forEach(placeName => {
+      const placeData = lieux[placeName];
+      if (placeData?.domElement) {
+        placeData.domElement.classList.add('person-match');
+        this.state.highlighted.add(placeName);
+      }
+    });
+
+    // Logique SVG simplifiée par type d'événement
+    if (eventType === 'marriage') {
+      this.highlightMarriageSectors(placesToHighlight);
+    } else {
+      this.highlightPersonSectorsByEvent(placesToHighlight, eventType);
+    }
+
+    this.grayOutOthers();
+  },
+
+  /**
+   * Surlignage des secteurs de mariage
+   * Cible exclusivement les éléments de mariage dans les groupes M
+   *
+   * @param {Array<string>} placesToHighlight - Liste des noms de lieux à surligner
+   */
+  highlightMarriageSectors: function(placesToHighlight) {
+    placesToHighlight.forEach(placeName => {
+      const placeData = lieux[placeName];
+      if (!placeData) {
+        console.warn(`PlacesHighlighter: Lieu inexistant "${placeName}"`);
+        return;
+      }
+
+      // Construire la classe CSS pour les mariages dans ce lieu
+      const placeClass = placeData.c; // Ex: "L0", "L1", etc.
+      const svgClass = `ma-${placeClass}`;
+      const elements = document.getElementsByClassName(svgClass);
+
+      // Traiter chaque élément avec la classe de mariage correspondante
+      Array.from(elements).forEach(element => {
+        const parentGroup = element.parentNode;
+
+        // Vérification stricte : l'élément doit être dans un groupe de mariage
+        // Ignorer le préfixe de contexte (-N, -S) pour le mode circulaire
+        const baseId = parentGroup?.id?.replace(/^-[NS]/, '') || '';
+        if (baseId.startsWith('M')) {
+          this.applyEventHighlight(element, 'marriage', placeName);
+        }
+      });
+    });
+  },
+
+  /**
+   * Surlignage des secteurs de personnes par type d'événement
+   * Cible les événements individuels (NBDS) dans les groupes S
+   *
+   * @param {Array<string>} placesToHighlight - Liste des noms de lieux à surligner
+   * @param {string} eventType - Type d'événement ('birth', 'baptism', 'death', 'burial')
+   */
+  highlightPersonSectorsByEvent: function(placesToHighlight, eventType) {
+    // Validation du type d'événement
+    if (!Events.isValid(eventType)) {
+      console.error(`PlacesHighlighter: Type d’événement invalide "${eventType}"`);
+      return;
+    }
+
+    placesToHighlight.forEach(placeName => {
+      const placeData = lieux[placeName];
+      if (!placeData) {
+        console.warn(`PlacesHighlighter: Lieu inexistant "${placeName}"`);
+        return;
+      }
+
+      // Construire la classe CSS pour cet événement dans ce lieu
+      const placeClass = placeData.c; // Ex: "L0", "L1", etc.
+      const svgPrefix = Events.svgPrefix(eventType); // Ex: "bi", "ba", "de", "bu"
+      const svgClass = `${svgPrefix}-${placeClass}`;
+      const elements = document.getElementsByClassName(svgClass);
+
+      // Traiter chaque élément avec la classe d'événement correspondante
+      Array.from(elements).forEach(element => {
+        const parentGroup = element.parentNode;
+
+        // Vérification stricte : l'élément doit être dans un groupe de personne
+        // Ignorer le préfixe de contexte (-N, -S) pour le mode circulaire
+        const baseId = parentGroup?.id?.replace(/^-[NS]/, '') || '';
+        if (baseId.startsWith('S')) {
+          this.applyEventHighlight(element, eventType, placeName);
+        }
+      });
+    });
+  },
+
+  // Surligner les individus par type d'événement > TODO : DEPRECIATE/REMOVE ?
+  highlightIndividualsByEventType: function(placesToHighlight, eventType) {
+    placesToHighlight.forEach(placeName => {
+      const placeData = lieux[placeName];
+      if (!placeData) return;
+
+      const placeClass = placeData.c;
+      const svgPrefix = Events.svgPrefix(eventType);
+      const svgClass = `${svgPrefix}-${placeClass}`;
+      const elements = document.getElementsByClassName(svgClass);
+
+      Array.from(elements).forEach(element => {
+        // Vérifier que c'est bien un secteur de personne
+        const parentGroup = element.parentNode;
+        if (parentGroup && parentGroup.id && parentGroup.id.startsWith('S')) {
+          if (!element.dataset.originalFill) {
+            element.dataset.originalFill = element.style.fill || '';
+          }
+          element.classList.add(`event-highlight-${eventType}`);
+          this.state.svgElements.set(element, placeName);
+        }
+      });
+    });
+  },
+
+  /**
+   * Expansion du nom de sous-lieu
+   */
+  expandSubLocationName: function(placeData) {
+    const nameElement = placeData.domElement.querySelector('.place-name');
+    if (!nameElement || this.state.expandedNames.has(placeData.domElement)) return;
+
+    // Sauvegarder l'original
+    this.state.expandedNames.set(placeData.domElement, nameElement.innerHTML);
+
+    // Créer le nouveau contenu sans vider l'élément
+    const fullName = placeData.parentLocation ?
+      `   ${placeData.subName} – ${placeData.parentLocation}` :
+      placeName;
+
+    // Mettre à jour le texte sans perdre le style
+    nameElement.textContent = fullName;
+  },
+
+  /**
+   * Ajout des indicateurs d'événements
+   */
+  addIndicators: function(container, events) {
+    container.querySelectorAll('.indicator, .line-break').forEach(el => el.remove());
+    if (!container || !events.length) return;
+
+    const eventArray = Array.isArray(events) ? events : [events];
+    const indicators = [];
+
+    events.forEach((event, index) => {
+      const indicator = document.createElement('div');
+      indicator.className = `indicator ${Events.cssClass(event)}`;
+      indicator.textContent = Events.label(event);
+      container.appendChild(indicator);
+      indicators.push(indicator);
+
+      // Line break pour 4+ événements
+      if (index === 1 && events.length >= 4) {
+        const breaker = document.createElement('div');
+        breaker.className = 'line-break';
+        container.appendChild(breaker);
+        indicators.push(breaker);
+      }
+    });
+
+    // Ajuster la hauteur si nécessaire
+    if (events.length >= 4) {
+      container.closest('.place-row')?.classList.add('tall-row');
+    }
+
+    // Stocker pour nettoyage
+    this.state.indicators.set(container, indicators);
+  },
+
+  /**
+   * Grise les éléments non surlignés
+   */
+  grayOutOthers: function() {
+    document.querySelectorAll('.place-content').forEach(el => {
+      // Ne pas griser les lieux matchés NI le lieu locké
+      if (!el.classList.contains('person-match') && !el.classList.contains('locked')) {
+        el.classList.add('grayed-out');
+      }
+    });
+  },
+
+/**
+   * Nettoie tous les surlignages
+   */
+  clearAllHighlights: function(preserveLock = false) {
+    const lockedPlace = preserveLock ? this.state.lockedPlace : null;
+
+    // Nettoyer chaque lieu individuellement (sauf le lieu locké si preserveLock)
+    this.state.highlighted.forEach(placeName => {
+      if (placeName === lockedPlace) return;
+      this.clearHighlightForPlace(placeName);
+    });
+
+    // Toujours nettoyer les éléments grisés (ils seront recalculés par grayOutOthers)
+    document.querySelectorAll('.grayed-out').forEach(el => {
+      el.classList.remove('grayed-out');
+    });
+
+    // Reset de l'état
+    this.state.highlighted.clear();
+    this.state.svgElements.clear();
+    this.state.indicators.clear();
+    this.state.expandedNames.clear();
+    // Ne pas toucher à currentHoveredPlace si on préserve le lock (transition entre lieux)
+    if (!preserveLock) {
+      this.state.currentHoveredPlace = null;
+    }
+
+    // Restaurer le lieu locké dans le state si préservé
+    if (lockedPlace) {
+      this.state.highlighted.add(lockedPlace);
+    }
+
+    // Nettoyer l'overflow si présent
+    if (typeof ModernOverflowManager !== 'undefined' && ModernOverflowManager.clearOverflowSections) {
+      ModernOverflowManager.clearOverflowSections();
+    }
+
+    // Nettoyer le verrou visuel (sauf si préservé)
+    if (!preserveLock) {
+      const lockedElement = document.querySelector('.place-content.locked');
+      if (lockedElement) {
+        lockedElement.classList.remove('locked');
+      }
+      this.state.lockedPlace = null;
+      this.state.lockedPlaceEvents = [];
+    }
+  },
+
+  /**
+   * Nettoie uniquement le surlignage SVG des lieux (classes event-highlight-*)
+   * sans modifier l'état du lock (pour changement de mode place → age)
+   */
+  clearPlaceSVGHighlights: function() {
+    Events.types.forEach(eventType => {
+      document.querySelectorAll(`svg .event-highlight-${eventType}`).forEach(el => {
+        el.classList.remove(`event-highlight-${eventType}`);
+      });
+    });
+
+    document.querySelectorAll('.grayed-out').forEach(el => {
+      el.classList.remove('grayed-out');
+    });
+  },
+
+/**
+   * Restaure l'état visuel du lock après redessin ou chargement
+   */
+  restoreLock: function() {
+    // Si pas de lock en mémoire, lire depuis l'URL
+    if (!this.state.lockedPlace) {
+      const lockedPlace = new URLSearchParams(window.location.search).get('lock');
+      if (lockedPlace && lieux[lockedPlace]) {
+        this.state.lockedPlace = lockedPlace;
+        const placeData = lieux[lockedPlace];
+        if (placeData) {
+          this.state.lockedPlaceEvents = Events.types.filter(
+            eventType => placeData[Events.svgPrefix(eventType)]
+          );
+        }
+      }
+    }
+
+    if (!this.state.lockedPlace) return;
+
+    const placeData = lieux[this.state.lockedPlace];
+    if (!placeData || !placeData.domElement) {
+      this.state.lockedPlace = null;
+      this.state.lockedPlaceEvents = [];
+      return;
+    }
+
+    placeData.domElement.classList.add('locked');
+    this.restoreLockedPlaceState();
+  },
+
+  initialize: function() {
+    this.setupEventHandlers();
+    // Configurer les événements pour les totaux NBMDS
+    PlacesInterface.setupEventTotalHighlights();
+  }
+};
+
+// ========== Module de rendu circulaire ==========
+const CircularModeRenderer = {
+  // Rend le centre en mode couple (S2 au nord, S3 au sud)
+  renderCoupleCenter: function() {
+    const centerGroup = svgEl("g");
+    centerGroup.setAttribute("id", "couple-center");
+    const contentGroup = $('fanchart-content') || fanchart;
+    contentGroup.appendChild(centerGroup);
+
+    const s2 = ancestor["S2"];
+    const s3 = ancestor["S3"];
+    const r = CONFIG.a_r[0];
+
+    // Père (nord)
+    if (s2) {
+      const s2Group = svgEl("g");
+      s2Group.setAttribute("id", "S2-N");
+      centerGroup.appendChild(s2Group);
+      SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person', isBackground: true });
+      this.renderCenterText(s2Group, s2, center_x, center_y - r/2, false);
+      s2.sosa = 2;
+      SVGRenderer.drawPie(s2Group, 0, r, -180, 0, s2, { type: 'person' });
+      this.drawCenterNavigationIndicator(s2Group, s2, r, 'north');
+    }
+
+    // Mère (sud)
+    if (s3) {
+      const s3Group = svgEl("g");
+      s3Group.setAttribute("id", "S3-S");
+      centerGroup.appendChild(s3Group);
+      SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person', isBackground: true });
+      this.renderCenterText(s3Group, s3, center_x, center_y + r/2, true);
+      s3.sosa = 3;
+      SVGRenderer.drawPie(s3Group, 0, r, 0, 180, s3, { type: 'person' });
+      this.drawCenterNavigationIndicator(s3Group, s3, r, 'south');
+    }
+
+    // Séparateur
+    const sepMargin = 10;
+    const sep = svgEl("line");
+    sep.setAttribute("x1", center_x - r + sepMargin);
+    sep.setAttribute("y1", center_y);
+    sep.setAttribute("x2", center_x + r);
+    sep.setAttribute("y2", center_y);
+    sep.setAttribute("stroke", "#ccc");
+    sep.setAttribute("class", "middle");
+    centerGroup.appendChild(sep);
+
+    // Boîte de mariage à  gauche du cercle central
+    if (s2 && s2.marriage_date) {
+      this.renderCoupleMarriage(centerGroup, s2, r);
+    }
+
+      /*
+      // Optionnel : Ajouter un petit texte pour le S1 au centre
+      if (ancestor["S1"]) {
+        const s1Text = svgEl("text");
+        s1Text.setAttribute("x", center_x);
+        s1Text.setAttribute("y", center_y);
+        s1Text.setAttribute("text-anchor", "middle");
+        s1Text.setAttribute("class", "s1-indicator");
+        s1Text.setAttribute("font-size", "10");
+        s1Text.setAttribute("fill", "#666");
+        s1Text.textContent = "⬤"; // Point central discret
+        const s1Title = svgEl("title");
+        s1Title.textContent = `${ancestor["S1"].fn} ${ancestor["S1"].sn} (enfant du couple)`;
+        s1Text.appendChild(s1Title);
+        centerGroup.appendChild(s1Text);
+      }*/
+  },
+
+  /**
+   * Indicateur de navigation pour les secteurs centraux du mode couple
+   * @param {SVGElement} group - Groupe SVG parent
+   * @param {Object} person - Données de la personne
+   * @param {number} r - Rayon du cercle central
+   * @param {string} position - 'north' ou 'south'
+   */
+  drawCenterNavigationIndicator: function(group, person, r, position) {
+    if (!person || !person.fn || person.fn === "?") return;
+    const fontSize = Math.max(35, Math.min(65, Math.round((r / 2) * 2)));
+
+    const text = svgEl("text");
+    text.setAttribute("x", center_x);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+
+    const offset = r * 0.87;
+    const yPos = position === "north"
+      ? center_y - offset
+      : center_y + offset;
+
+    text.setAttribute("y", yPos);
+
+    const symbol = person.has_parents
+      ? (position === "north" ? "&#x25B2;" : "&#x25BC;") : "&#x2716;";
+
+    text.setAttribute("class", person.has_parents ? "link icon" : "no-link");
+
+    text.innerHTML = `<tspan style="font-size:${fontSize}%;">${symbol}</tspan>`;
+
+    if (person.has_parents) {
+      text.onclick = (e) => {
+        const useNewTab = e.ctrlKey || e.metaKey;
+        URLManager.navigateToPerson(person, useNewTab, true);
+      };
+    }
+
+    const title = svgEl("title");
+    title.textContent = person.has_parents
+      ? `Recentrer l’arbre sur ${person.fn} ${person.sn}`
+      : `${person.fn} ${person.sn} : aucun parent connu`;
+    text.appendChild(title);
+
+    group.appendChild(text);
+    return text;
+  },
+
+ /**
+   * Secteur de mariage du couple central (mode 360°)
+   * Arc positioné à l’ouest, même structure que les mariages standards
+   *
+   * @param {SVGElement} centerGroup - Groupe parent du centre
+   * @param {Object} s2 - Données de l’époux (marriage_date, marriage_place, marriage_length)
+   * @param {number} r - Rayon du cercle central
+   */
+  renderCoupleMarriage: function(centerGroup, s2, r) {
+    const arcSpan = 30;
+    const geometry = {
+      innerRadius: r - 10,
+      outerRadius: r,
+      startAngle: 180 - arcSpan / 2,
+      endAngle: 180 + arcSpan / 2
+    };
+
+    const marriageGroup = svgEl("g");
+    marriageGroup.setAttribute("id", "M1-NS");
+    if (s2.marriage_place) {
+      marriageGroup.setAttribute("data-place-name", s2.marriage_place);
+    }
+    centerGroup.appendChild(marriageGroup);
+
+    // Secteur de fond
+    SVGRenderer.drawPie(marriageGroup,
+      geometry.innerRadius, geometry.outerRadius,
+      geometry.startAngle, geometry.endAngle,
+      s2, { type: 'marriage', isBackground: true });
+
+    // Contour
+    SVGRenderer.drawContour(marriageGroup,
+      geometry.innerRadius, geometry.outerRadius,
+      geometry.startAngle, geometry.endAngle);
+
+    // Secteur interactif
+    SVGRenderer.drawPie(marriageGroup,
+      geometry.innerRadius, geometry.outerRadius,
+      geometry.startAngle, geometry.endAngle,
+      s2, { type: 'marriage' });
+
+    // Date de mariage sur un arc au sud avec rotation de 90° à droite
+    if (s2.marriage_date) {
+      let textClasses = "";
+      if (s2.marriage_place && lieux[s2.marriage_place]) {
+        textClasses = " ma-t" + lieux[s2.marriage_place].c;
+      }
+      const textRadius = (geometry.innerRadius + geometry.outerRadius) / 2;
+
+      const textGroup = svgEl("g");
+      textGroup.setAttribute("transform", `rotate(90 ${center_x} ${center_y})`);
+      marriageGroup.appendChild(textGroup);
+      textGroup.style.pointerEvents = "none";
+
+      TextRenderer.drawMarriageDate(textGroup, "1-NS", textRadius,
+        90 - arcSpan / 2, 90 + arcSpan / 2, s2.marriage_date, textClasses);
+    }
+  },
+
+  renderCenterText: function(group, person, x, y, inverted) {
+    const r = CONFIG.a_r[0];
+    // Convertir la largeur disponible en unités de mesure du texte
+    // standard_width = largeur d'un "M" de référence, permet la conversion
+    const availableWidth = 1.7 * r;
+    const conversionFactor = standard_width / 10; // approximation basée sur la taille standard
+
+    const texts = [person.fn, person.sn, person.dates || ''];
+    const fontSizes = texts.map(text => {
+      if (!text) return 100;
+      const bbox = TextRenderer.getBBoxCached(text);
+      // Comparer bbox.width à la largeur disponible convertie
+      const targetWidth = availableWidth * conversionFactor;
+      const widthRatio = bbox.width > targetWidth ? targetWidth / bbox.width : 1;
+      return Math.round(widthRatio * 88);
+    });
+
+
+    const dy = Math.min(r / 3, 16);
+
+    const text = svgEl("text");
+    text.setAttribute("x", x);
+    text.setAttribute("y", y);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    if (inverted) {
+      text.setAttribute("transform", `rotate(180, ${x}, ${y})`);
+    }
+
+    text.innerHTML =
+      `<tspan x="${x}" dy="-${dy * 0.4}px" style="font-size:${fontSizes[0]}%">${person.fn}</tspan>` +
+      `<tspan x="${x}" dy="${dy * 0.9}px" class="bold-sn" style="font-size:${fontSizes[1]}%">${person.sn}</tspan>` +
+      `<tspan x="${x}" dy="${dy * 0.7}px" class="dates" style="font-size:${Math.round(fontSizes[2] * 0.7)}%">${person.dates || ''}</tspan>`;
+
+    group.appendChild(text);
+  },
+
+  /**
+   * Décale une branche d'ancêtres pour qu'un parent devienne S1
+   */
+  shiftAncestorsForParent: function(originalAncestors, parentSosa) {
+    const shifted = {};
+
+    // Le parent devient S1 pour le rendu
+    const parent = originalAncestors["S" + parentSosa];
+    if (parent) {
+      shifted["S1"] = { ...parent, originalSosa: parentSosa };
+    }
+
+    // Fonction récursive pour décaler toute la branche
+    const shiftBranch = (oldSosa, newSosa) => {
+      const person = originalAncestors["S" + oldSosa];
+      if (person) {
+        // Copier la personne ET stocker son Sosa original
+        shifted["S" + newSosa] = { ...person, originalSosa: oldSosa };
+        // Décaler récursivement les parents
+        shiftBranch(oldSosa * 2, newSosa * 2);       // Père
+        shiftBranch(oldSosa * 2 + 1, newSosa * 2 + 1); // Mère
+      }
+    };
+
+    // Décaler les grands-parents
+    shiftBranch(parentSosa * 2, 2);
+    shiftBranch(parentSosa * 2 + 1, 3);
+
+    return shifted;
+  }
+};
+
+// ========== Fonctions utilitaires pour la géométrie ==========
+function polarToCartesian(r, angle) {
+  const rad = Math.PI / 180 * angle;
+  return {
+    x: center_x + r * Math.cos(rad),
+    y: center_y + r * Math.sin(rad)
+  };
 }
-document.getElementById("b-places-hl").onclick = function() {
-	document.body.className = "places-list place_hl";
-	tool = "place_hl";
-};
-document.getElementById("b-places-colorise").onclick = function() {
-	document.body.className = "places-list place_color";
-	tool = "place_color";
-	fanchart.classList.add( "bi" );
-	fanchart.classList.add( "ba" );
-	fanchart.classList.add( "ma" );
-	fanchart.classList.add( "de" );
-	fanchart.classList.add( "bu" );
-	document.getElementById( "bi" ).checked = true;
-	document.getElementById( "ba" ).checked = true;
-	document.getElementById( "ma" ).checked = true;
-	document.getElementById( "de" ).checked = true;
-	document.getElementById( "bu" ).checked = true;
-};
-document.getElementById( "bi" ).checked = true;
-document.getElementById( "ba" ).checked = true;
-document.getElementById( "ma" ).checked = true;
-document.getElementById( "de" ).checked = true;
-document.getElementById( "bu" ).checked = true;
-if( !has_ba ) {
-	document.getElementById( "ba" ).classList.add( "none" );
-}
-if( !has_bu ) {
-	document.getElementById( "bu" ).classList.add( "none" );
-}
-document.getElementById("bi").onclick = function() {
-	fanchart.classList.toggle( "bi" );
-};
-document.getElementById("ba").onclick = function() {
-	fanchart.classList.toggle( "ba" );
-};
-document.getElementById("ma").onclick = function() {
-	fanchart.classList.toggle( "ma" );
-};
-document.getElementById("de").onclick = function() {
-	fanchart.classList.toggle( "de" );
-};
-document.getElementById("bu").onclick = function() {
-	fanchart.classList.toggle( "bu" );
-};
-document.getElementById("b-death-age").onclick = function() {
-	document.body.className = "death-age";
-	tool = "death-age";
-};
-document.getElementById("b-no-tool").onclick = function() {
-	document.body.className = "";
-	tool = "";
-};
-document.getElementById("b-no-buttons").onclick = function() {
-	document.getElementById("buttons").style.display = "none";
+
+// ========== Rendu SVG ==========
+const SVGRenderer = {
+  drawContour: function(g, r1, r2, a1, a2) {
+    var path = svgEl("path");
+    const p1 = polarToCartesian(r2, a1);
+    const p2 = polarToCartesian(r2, a2);
+    const p3 = polarToCartesian(r1, a2);
+    const p4 = polarToCartesian(r1, a1);
+
+    path.setAttribute("d",
+      `M ${p1.x},${p1.y} ` +
+      `A ${r2} ${r2} 0 ${(a2 - a1 > 180 ? 1 : 0)} 1 ${p2.x},${p2.y} ` +
+      `L ${p3.x},${p3.y} ` +
+      `A ${r1} ${r1} 0 ${(a2 - a1 > 180 ? 1 : 0)} 0 ${p4.x},${p4.y} Z`
+    );
+    path.setAttribute("class", "contour");
+    g.append(path);
+  },
+
+  drawRadialLine: function(g, r1, r2, a) {
+    var path = svgEl("path");
+    const p1 = polarToCartesian(r2, a);
+    const p2 = polarToCartesian(r1, a);
+
+    path.setAttribute("d", `M ${p1.x},${p1.y} L ${p2.x},${p2.y}`);
+    path.setAttribute("class", "middle");
+    g.append(path);
+  },
+
+  drawCircle: function(g, r, cx, cy, p, options = {}) {
+    const circle = svgEl("circle");
+    circle.setAttribute("cx", cx);
+    circle.setAttribute("cy", cy);
+    circle.setAttribute("r", r);
+
+    if (options.isBackground) {
+      let classes = ['bg'];
+
+      if (p.birth_place && lieux[p.birth_place]) {
+        classes.push("bi-" + lieux[p.birth_place].c);
+      }
+      if (p.baptism_place && lieux[p.baptism_place]) {
+        classes.push("ba-" + lieux[p.baptism_place].c);
+      }
+      if (p.death_place && lieux[p.death_place]) {
+        classes.push("de-" + lieux[p.death_place].c);
+      }
+      if (p.burial_place && lieux[p.burial_place]) {
+        classes.push("bu-" + lieux[p.burial_place].c);
+      }
+      if (p.age) {
+        const ageClass = Utils.ageClass(Number(p.age));
+        if (ageClass) classes.push(ageClass);
+      }
+
+      circle.setAttribute("class", classes.join(' '));
+    } else {
+      circle.setAttribute("class", "link");
+
+      const title = svgEl("title");
+      title.textContent = `(Sosa 1) ${p.fn} ${p.sn} (${p.age_text})\nCtrl+clic pour la fiche individuelle`;
+      circle.appendChild(title);
+
+      this.applyInteractiveFeatures(circle, p, 'person');
+    }
+
+    g.append(circle);
+    return circle;
+  },
+
+  drawPie: function(g, r1, r2, a1, a2, p, options = {}) {
+    const path = svgEl("path");
+    const p1 = polarToCartesian(r2, a1);
+    const p2 = polarToCartesian(r2, a2);
+    const p3 = polarToCartesian(r1, a2);
+    const p4 = polarToCartesian(r1, a1);
+
+    path.setAttribute("d",
+      `M ${p1.x},${p1.y} ` +
+      `A ${r2} ${r2} 0 ${(a2 - a1 > 180 ? 1 : 0)} 1 ${p2.x},${p2.y} ` +
+      `L ${p3.x},${p3.y} ` +
+      `A ${r1} ${r1} 0 ${(a2 - a1 > 180 ? 1 : 0)} 0 ${p4.x},${p4.y} Z`
+    );
+
+    if (options.isBackground) {
+      // Version background - applique les classes CSS pour les lieux et âges
+      this.applyBackgroundClasses(path, p, options.type);
+    } else {
+      if (options.type === 'marriage' && !p.marriage_place) {
+        path.setAttribute("class", ""); // Secteur de mariage sans lieu
+      } else {
+        this.applyInteractiveFeatures(path, p, options.type);
+      }
+    }
+
+    g.append(path);
+    return path;
+  },
+
+  applyBackgroundClasses: function(element, p, type) {
+    let classes = ['bg'];
+
+    if (type === 'person') {
+      Events.types.forEach(eventType => {
+        // Éviter l'erreur sur Events.place pour les mariages
+        if (eventType === 'marriage') {
+          // Les mariages d'individus ne sont pas directement dans p.marriage_place
+          // mais gérés séparément dans les secteurs de mariage
+          return;
+        }
+
+        const placeField = Events.place ? Events.place(eventType) : `${eventType}_place`;
+        const svgPrefix = Events.svgPrefix(eventType);
+
+        if (p[placeField] && lieux[p[placeField]]) {
+          classes.push(svgPrefix + "-" + lieux[p[placeField]].c);
+        }
+      });
+
+      if (p.age) {
+        const ageClass = Utils.ageClass(Number(p.age));
+        if (ageClass) classes.push(ageClass);
+      }
+
+    } else if (type === 'marriage') {
+      // Pour les secteurs de mariage, traiter directement
+      if (p.marriage_place && lieux[p.marriage_place]) {
+        const svgPrefix = Events.svgPrefix('marriage');
+        classes.push(svgPrefix + "-" + lieux[p.marriage_place].c);
+      }
+
+      if (p.marriage_length) {
+        const marriageClass = Utils.marriageLengthClass(p.marriage_length);
+        if (marriageClass) classes.push(marriageClass);
+      }
+    }
+
+    element.setAttribute("class", classes.join(' '));
+  },
+
+  applyInteractiveFeatures: function(element, p, type) {
+    if (!p || (p.fn === "?" && !p.sosasame) || (!p.fn && !p.sosasame && type !== 'marriage')) return;
+
+    element.setAttribute("class", "link");
+
+    element.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.handleClick(e, p);
+    });
+
+    element.addEventListener("mouseenter", (e) => {
+      e.stopPropagation();
+      this.handleMouseEnter(p, type, e);
+    });
+
+    element.addEventListener("mouseleave", (e) => {
+      e.stopPropagation();
+      this.handleMouseLeave(p, type, e);
+    });
+  },
+
+  buildTooltipContent: function(panel, p, type) {
+    panel.className = 'person-panel';
+
+    if (type === "person") {
+        const isImplex = p.sosasame !== undefined;
+        let displayPerson = p;
+        let currentSosa = p.sosa || parseInt(p.id?.replace('S', '')) || 1;
+
+        // HTML de base
+        let html = `<h2>`;
+        html += `${displayPerson.fn} ${displayPerson.sn}`;
+
+        // Affichage spécifique selon le mode d'implexe
+        if (isImplex) {
+            if (implexMode === "reduced") {
+                // Mode réduit : afficher la redirection simple
+                html += `<small> (Sosa ${currentSosa} → ${p.sosasame})</small>`;
+            } else if (implexMode === "numbered") {
+                // Mode numéroté : essayer d'afficher la chaîne si disponible
+                if (typeof ImplexResolver !== 'undefined' && ImplexResolver.resolveImplexChain) {
+                    const resolution = ImplexResolver.resolveImplexChain(currentSosa);
+                    if (resolution && resolution.chain) {
+                        html += `<small> (${resolution.chain.join(' › ')})</small>`;
+                    } else {
+                        html += `<small> (Sosa ${currentSosa} › ${p.sosasame})</small>`;
+                    }
+                } else {
+                    html += `<small> (Sosa ${currentSosa} › ${p.sosasame})</small>`;
+                }
+            }
+            // Mode full : pas d'affichage spécial, juste le Sosa
+            else {
+                html += `<small> (Sosa ${currentSosa})</small>`;
+            }
+        } else {
+            html += `<small> (Sosa ${currentSosa})</small>`;
+        }
+        html += `</h2>`;
+
+      // Événements vitaux
+      if (displayPerson.birth_date || displayPerson.birth_place) {
+        html += `<div><strong>Naissance :</strong> `;
+        if (displayPerson.birth_date) html += `${displayPerson.birth_date}`;
+        if (displayPerson.birth_place) html += ` – ${displayPerson.birth_place}`;
+        html += `</div>`;
+      }
+
+      if (displayPerson.baptism_date || displayPerson.baptism_place) {
+        html += `<div><strong>Baptême :</strong> `;
+        if (displayPerson.baptism_date) html += `${displayPerson.baptism_date}`;
+        if (displayPerson.baptism_place) html += ` – ${displayPerson.baptism_place}`;
+        html += `</div>`;
+      }
+
+      if (displayPerson.death_date || displayPerson.death_place) {
+        html += `<div><strong>Décès :</strong> `;
+        if (displayPerson.death_date) html += `${displayPerson.death_date}`;
+        if (displayPerson.death_place) html += ` – ${displayPerson.death_place}`;
+        html += `</div>`;
+      }
+
+      if (displayPerson.burial_date || displayPerson.burial_place) {
+        html += `<div><strong>Sépulture :</strong> `;
+        if (displayPerson.burial_date) html += `${displayPerson.burial_date}`;
+        if (displayPerson.burial_place) html += ` – ${displayPerson.burial_place}`;
+        html += `</div>`;
+      }
+
+      if (displayPerson.age_text) {
+        html += `<div><strong>Âge :</strong> ${displayPerson.age_text}</div>`;
+      }
+
+      // Notice d'implexe améliorée
+      if (isImplex) {
+        const cloneCount = ImplexResolver.getAllClones(p.sosasame || currentSosa).length;
+        html += `<div class="implex-notice">`;
+        html += `<strong>💡 Implexe :</strong> apparaît ${cloneCount + 1} fois.`;
+        html += `</div>`;
+      }
+
+      panel.innerHTML = html;
+
+    } else if (type === "marriage") {
+      // Code existant pour les mariages - copier depuis l'original
+      const years = parseInt(p.marriage_length) || -1;
+      let html = `<h2>Mariage</h2>`;
+
+      const marriageDate = p.marriage_date_ || p.marriage_date;
+      if (marriageDate) {
+        html += `<div><strong>Date :</strong> ${marriageDate}</div>`;
+      }
+
+      if (p.marriage_place) {
+        html += `<div><strong>Lieu :</strong> ${p.marriage_place}</div>`;
+      }
+
+      if (years >= 0) {
+        const yearLabel = years === 1 ? "an" : "ans";
+        html += `<div><strong>Durée :</strong> ${years} ${yearLabel}</div>`;
+      }
+
+      if (p.marriage_age) {
+        html += `<div><strong>Âge au mariage :</strong> ${p.marriage_age} ans</div>`;
+      }
+
+      panel.innerHTML = html;
+    }
+  },
+
+  handleClick: function(e, person) {
+    const sortToggle = e.target.closest('#b-sort-places');
+      if (sortToggle) {
+      e.preventDefault();
+      UIManager.toggleSort();
+      return;
+    }
+    // Pour la navigation vers les fiches, exiger Ctrl/Cmd
+    if (!e.ctrlKey && !e.metaKey) {
+      // Pas de navigation sans modificateur
+      return;
+    }
+    if (!link_to_person) {
+      alert("Erreur: Impossible d'accéder à la fiche individuelle");
+      return;
+    }
+    const li = e.target.closest('li[data-location]');
+
+    // Clic sur une personne (secteur du fanchart)
+    if (person && person.fnk && person.snk) {
+      URLManager.navigateToPerson(person, true, false);
+      return;
+    }
+
+    // Clic sur un lieu en mode wizard
+    if (li && document.body.dataset.wizard === "1") {
+      e.preventDefault();
+      const placeName = li.dataset.location;
+      URLManager.navigateToPlace(placeName, true);
+      return;
+    }
+  },
+
+  /**
+   * Gestion du survol d'éléments SVG
+   */
+  handleMouseEnter: function(p, type, event) {
+    // 1. Panneau d'information (inchangé)
+    const panel = $("person-panel");
+    if (panel && type === "person" && p.sosa) {
+      // En mode circulaire, p contient déjà les bonnes données
+      // On utilise originalSosa pour l'affichage du numéro Sosa
+      const displaySosa = p.originalSosa || p.sosa;
+      const displayData = isCircularMode ? p : ImplexResolver.getDisplayData(p.sosa);
+      if (displayData) {
+        const enhancedPerson = {
+          ...displayData,
+          sosa: displaySosa,  // Afficher le Sosa original
+          sosasame: p.sosasame
+        };
+        this.buildTooltipContent(panel, enhancedPerson, type);
+        panel.style.display = "block";
+      }
+    } else if (panel) {
+      this.buildTooltipContent(panel, p, type);
+      panel.style.display = "block";
+    }
+
+    // 2. Surlignage de l'élément survolé (simplifié)
+    if (event?.target) {
+      event.target.classList.add('highlight');
+
+      // Surlignage du fond correspondant
+      const parentGroup = event.target.parentNode;
+      if (parentGroup) {
+        const bgElement = parentGroup.querySelector('.bg');
+        if (bgElement) {
+          bgElement.classList.add('highlight');
+
+          // Pour les mariages en mode lieux : ajouter la couleur orange
+          if (type === 'marriage' && p.marriage_place && document.body.classList.contains('place')) {
+            event.target.classList.add('highlight');
+            bgElement.classList.add('highlight');
+          }
+        }
+      }
+    }
+
+    // 3. Modes spéciaux
+    if (document.body.classList.contains('age')) {
+      AgeHighlighter.handleSVGHover(p, type, 'enter');
+    }
+
+    if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
+        const displayPerson = isCircularMode ? p :
+            ((type === 'person' && p.sosa) ? ImplexResolver.getDisplayData(p.sosa) : p);
+
+        if (displayPerson) {
+            const displaySosa = p.originalSosa || p.sosa;
+            const enhancedPerson = { ...displayPerson, sosa: p.sosa };
+            const places = this.extractPlacesFromPerson(enhancedPerson, type);
+
+            if (places.length > 0) {
+              const placeMap = new Map();
+              places.forEach(({ place, event }) => {
+                if (!placeMap.has(place)) {
+                  placeMap.set(place, []);
+                }
+                placeMap.get(place).push(event);
+              });
+
+              const placeNames = Array.from(placeMap.keys());
+              const events = Array.from(placeMap.values());
+
+              if (PlacesHighlighter.state.lockedPlace) {
+                // Mode locké : supprimer visuellement les indicateurs du lieu locké
+                const lockedPlaceData = lieux[PlacesHighlighter.state.lockedPlace];
+                if (lockedPlaceData?.indicatorElement) {
+                  // Supprimer directement les .indicator du DOM
+                  const existingIndicators = lockedPlaceData.indicatorElement.querySelectorAll('.indicator');
+                  existingIndicators.forEach(el => el.remove());
+                  PlacesHighlighter.state.indicators.delete(lockedPlaceData.indicatorElement);
+                }
+                PlacesHighlighter.state.tempIndicators = true;
+              }
+
+              // Afficher les indicateurs de l'individu (comportement normal)
+              const hasLock = !!PlacesHighlighter.state.lockedPlace;
+              PlacesHighlighter.highlight(placeNames, events, 'svg', hasLock);
+            } else if (PlacesHighlighter.state.lockedPlace) {
+              // L'individu n'a aucun lieu - supprimer les indicateurs du lieu locké
+              const lockedPlaceData = lieux[PlacesHighlighter.state.lockedPlace];
+              if (lockedPlaceData?.indicatorElement) {
+                const existingIndicators = lockedPlaceData.indicatorElement.querySelectorAll('.indicator');
+                existingIndicators.forEach(el => el.remove());
+                PlacesHighlighter.state.indicators.delete(lockedPlaceData.indicatorElement);
+              }
+              PlacesHighlighter.state.tempIndicators = true;
+            }
+        }
+    }
+
+    // 4. Surlignage des implexes
+    if (type === "person" && p.sosa) {
+      // En mode circulaire, utiliser le Sosa original et chercher par classe os-{sosa}
+      const effectiveSosa = isCircularMode ? (p.originalSosa || p.sosa) : p.sosa;
+      const targetsToHighlight = ImplexResolver.getHighlightTargets(effectiveSosa);
+
+      targetsToHighlight.forEach(targetSosa => {
+        if (targetSosa !== effectiveSosa) {
+          // En mode circulaire : chercher par classe os-{sosa} (cross-hémisphères)
+          // En mode standard : chercher par ID
+          const targetElements = isCircularMode
+            ? Array.from(document.getElementsByClassName("os-" + targetSosa))
+            : findAllElementsById("S" + targetSosa);
+
+          targetElements.forEach(targetElement => {
+            targetElement.classList.add("same_hl");
+            const targetPath = targetElement.querySelector('path.link');
+            if (targetPath) {
+              targetPath.classList.add('highlight');
+            }
+          });
+        }
+      });
+    }
+  },
+
+  /**
+   * Gestion de la sortie de survol (nettoyage)
+   */
+  handleMouseLeave: function(p, type, event) {
+    // 1. Panneau d'information (inchangé)
+    const panel = $("person-panel");
+    if (panel) {
+      panel.style.display = "none";
+      panel.innerHTML = "";
+    }
+
+    // 2. Nettoyage du surlignage de l'élément
+    if (event?.target) {
+      event.target.classList.remove('highlight');
+      event.target.classList.remove('event-highlight-marriage');
+
+      const parentGroup = event.target.parentNode;
+      if (parentGroup) {
+        const bgElements = parentGroup.querySelectorAll('.bg');
+        bgElements.forEach(bg => {
+          bg.classList.remove('highlight');
+          bg.classList.remove('event-highlight-marriage');
+        });
+      }
+    }
+
+    // 3. Modes spéciaux place puis age
+    if (document.body.classList.contains('place')) {
+      if (PlacesHighlighter.state.lockedPlace) {
+        PlacesHighlighter.clearTemporaryIndicators();
+        PlacesHighlighter.cleanupHoveredPlaces();
+        PlacesHighlighter.restoreLockedPlaceState();
+      } else {
+        PlacesHighlighter.clearAllHighlights();
+      }
+    }
+
+    if (document.body.classList.contains('age')) {
+      AgeHighlighter.clearAllHighlights();
+    }
+
+    // 4. Nettoyage des implexes
+    if (type === "person" && p.sosa) {
+      const effectiveSosa = isCircularMode ? (p.originalSosa || p.sosa) : p.sosa;
+      const targetsToClean = ImplexResolver.getHighlightTargets(effectiveSosa);
+
+      targetsToClean.forEach(targetSosa => {
+        const targetElements = isCircularMode
+          ? Array.from(document.getElementsByClassName("os-" + targetSosa))
+          : findAllElementsById("S" + targetSosa);
+
+        targetElements.forEach(targetElement => {
+          targetElement.classList.remove("same_hl");
+          const highlightedPaths = targetElement.querySelectorAll('.highlight');
+          highlightedPaths.forEach(path => {
+            path.classList.remove('highlight');
+          });
+        });
+      });
+    }
+  },
+
+  extractPlacesFromPerson: function(person, type) {
+    const places = [];
+
+    const addPlaceIfExists = (place, event) => {
+      if (place) {
+        places.push({ place, event });
+      }
+    };
+
+    if (type === 'marriage') {
+      addPlaceIfExists(person.marriage_place, 'marriage');
+    } else if (type === 'person') {
+      Events.types.forEach(eventType => {
+        if (eventType === 'marriage') return;
+
+        const placeField = Events.place(eventType);
+        addPlaceIfExists(person[placeField], eventType);
+      });
+
+      // Gérer les mariages selon le Sosa
+      if (!isCircularMode) {
+        if (person.sosa && person.sosa % 2 === 1) {
+          const spouse = ancestor["S" + (person.sosa - 1)];
+          addPlaceIfExists(spouse?.marriage_place, 'marriage');
+        } else {
+          addPlaceIfExists(person.marriage_place, 'marriage');
+        }
+      }
+      // En mode circulaire, le mariage est géré par son propre secteur interactif
+    }
+    return places;
+  },
+
+  drawSectorText: function(pg, r1, r2, a1, a2, sosa, p, classes, generation, isSame = false) {
+    let mode;
+
+    if (CONFIG.a_m[generation - 1] === "C3") {
+      mode = 'C3';
+    } else if (CONFIG.a_m[generation - 1] === "C2") {
+      mode = 'C2';
+    } else if (CONFIG.a_m[generation - 1] === "C1") {
+      mode = 'C1';
+    } else if (CONFIG.a_m[generation - 1] === "R4" && !isSame) {
+      mode = 'R4';
+    } else if (CONFIG.a_m[generation - 1] === "R3" && !isSame) {
+      mode = 'R3';
+    } else if (CONFIG.a_m[generation - 1] === "R2" && !isSame) {
+      mode = 'R2';
+    } else if (CONFIG.a_m[generation - 1] === "R1" || isSame) {
+      mode = 'R1';
+    }
+
+    return T.drawText(pg, mode, {
+      r1: r1 + 10,
+      r2: r2,
+      a1: a1,
+      a2: a2,
+      sosa: sosa,
+      p: p,
+      classes: classes
+    });
+  },
+
+  drawNavigationSymbol: function(g, pathId, p, pathLength, hasParents) {
+    let fontSize = 55;
+    if (2 * standard_width > pathLength) {
+      fontSize = Math.round(100 * pathLength / 2 / standard_width);
+    }
+    const text = svgEl("text");
+    if (hasParents) {
+      text.setAttribute("class", "link icon");
+      text.innerHTML = `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${fontSize}%;">&#x25B2;</textPath>`;
+      text.onclick = (e) => {
+        const useNewTab = e.ctrlKey || e.metaKey;
+        URLManager.navigateToPerson(p, useNewTab, true);
+      };
+    } else {
+      text.setAttribute("class", "no-link");
+      text.innerHTML = `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${fontSize}%;">&#x2716;</textPath>`;
+    }
+    const title = svgEl("title");
+    title.textContent = hasParents ? `Recentrer l’arbre sur ${p.fn} ${p.sn}` : `${p.fn} ${p.sn} : aucun parent connu`;
+    text.appendChild(title);
+    g.append(text);
+    return text;
+  },
+
+  /**
+   * Indicateur de navigation
+   */
+  drawParentIndicator: function(g, r, a1, a2, sosa, p) {
+    if (!p || p.fn === "?" || p.fn === "" || !p.fn) {
+      return; // Pas d'icône du tout
+    }
+
+    // Créer le chemin circulaire au milieu de la zone de la personne
+    const middleAngle = (a1 + a2) / 2;
+    const pathId = `tpiS${sosa}`;
+
+    // Créer un petit arc centré pour l'icône
+    const arcLength = Math.min(20, Math.abs(a2 - a1) * Math.PI * r / 180); // Limiter la taille
+    const deltaAngle = arcLength / (2 * Math.PI * r) * 180;
+
+    const pathLength = TextRenderer.createCircularPath(g, pathId, r,
+      middleAngle - deltaAngle, middleAngle + deltaAngle);
+
+    return this.drawNavigationSymbol(g, pathId, p, pathLength, p.has_parents);
+  }
 };
 
-// Initial state for tools
-if( tool == "place_hl" ) {
-	document.body.className = "places-list place_hl";
-} else if( tool == "place_color" ) {
-	document.body.className = "places-list place_color";
-} else if( tool == "death-age" ) {
-	document.body.className = "death-age";
-}
+// ========== Système de rendu de texte unifié ==========
+const TextRenderer = {
+  _bboxCache: {},
 
-fitScreen();
+  getBBoxCached: function(textContent) {
+    if (!this._bboxCache[textContent]) {
+      standard.textContent = textContent;
+      this._bboxCache[textContent] = standard.getBBox();
+      standard.textContent = "";
+    }
+    return this._bboxCache[textContent];
+  },
+
+  drawText: function(g, mode, params) {
+    // Construire les classes CSS pour les lieux
+    const textClasses = this.buildLocationClasses(params.p, params.classes || "");
+    const modeFactor = CONFIG.text_mode_factors[mode] || 1.0;
+
+    switch(mode) {
+      case 'S1':
+        return this.drawCentralText(g, params.x, params.y, params.p, textClasses);
+
+      case 'C3':
+        return this.drawCircularText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, modeFactor);
+
+      case 'C2':
+        return this.drawCircularText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, modeFactor);
+
+      case 'C1':
+        return this.drawCircularText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, modeFactor);
+
+      case 'R4':
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 4, modeFactor);
+
+      case 'R3':
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 3, modeFactor);
+
+      case 'R2':
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 2, modeFactor);
+
+      case 'R1':
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 1, modeFactor);
+
+      default:
+        console.warn(`Mode de texte non reconnu: ${mode}`);
+        return null;
+    }
+  },
+
+  buildLocationClasses: function(p, baseClasses) {
+    let classes = baseClasses;
+
+    Events.types.forEach(eventType => {
+      const placeField = Events.place(eventType);
+      const svgPrefix = Events.svgPrefix(eventType);
+
+      if (p[placeField] && lieux[p[placeField]]) {
+        classes += ` ${svgPrefix}-t${lieux[p[placeField]].c}`;
+      }
+    });
+
+    return classes.trim();
+  },
+
+  drawCentralText: function(g, x, y, p, classes) {
+    const text = svgEl("text");
+    text.setAttribute("x", x);
+    text.setAttribute("y", y);
+    text.setAttribute("class", classes);
+
+    // Calcul des tailles de police adaptatives pour éviter le débordement
+    const fontSizes = this.calculateAdaptiveFontSizes([p.fn, p.sn]);
+
+    // Construction du texte avec tailles adaptatives
+    text.innerHTML =
+      `<tspan style="font-size:${fontSizes[0]}%">${p.fn}</tspan>` +
+      `<tspan x="${x}" dy="15" class="bold-sn" style="font-size:${fontSizes[1]}%">${p.sn}</tspan>` +
+      `<tspan class="dates" x="${x}" dy="15">${p.dates}</tspan>`;
+
+    g.append(text);
+    return text;
+  },
+
+  drawCircularText: function(g, r1, r2, a1, a2, sosa, p, classes, sizeFactor = 1.0) {
+      const height = Math.abs(r2 - r1) / 3;
+      // Trois arcs concentriques pour prénom, nom, dates
+      const pathId1 = contextualId(`tp1S${sosa}`);
+      const pathLength1 = this.createCircularPath(g, pathId1, (r2-r1)*3/4 + r1, a1, a2);
+      this.placeTextOnPath(g, pathId1, p.fn, classes, pathLength1, height, sizeFactor);
+
+      const pathId2 = contextualId(`tp2S${sosa}`);
+      const pathLength2 = this.createCircularPath(g, pathId2, (r2-r1)*2/4 + r1, a1, a2);
+      this.placeTextOnPath(g, pathId2, p.sn, classes, pathLength2, height, sizeFactor);
+
+      const pathId3 = contextualId(`tp3S${sosa}`);
+      const pathLength3 = this.createCircularPath(g, pathId3, (r2-r1)/4 + r1, a1, a2);
+      this.placeTextOnPath(g, pathId3, p.dates, classes + " dates", pathLength3, height, sizeFactor);
+      return g;
+  },
+
+  drawRadialText: function(g, r1, r2, a1, a2, sosa, p, classes, lineCount, sizeFactor = 1.0) {
+    // Calcul des paramètres de direction selon l'orientation
+    const params = this.calculateRadialParameters(r1, r2, a1, a2, lineCount);
+    const height = Math.abs(a2 - a1) / 360 * 2 * Math.PI * r1 / lineCount;
+
+    if (lineCount >= 3) {
+        // Trois lignes : prénom, nom, dates
+        const pathId1 = contextualId(`tp1S${sosa}`);
+        const pathLength1 = this.createRadialPath(g, pathId1, params.r1, params.r2, params.angles[0]);
+        this.placeTextOnPath(g, pathId1, p.fn, classes, pathLength1, height, sizeFactor);
+
+        const pathId2 = contextualId(`tp2S${sosa}`);
+        const pathLength2 = this.createRadialPath(g, pathId2, params.r1, params.r2, params.angles[1]);
+        this.placeTextOnPath(g, pathId2, p.sn, classes, pathLength2, height, sizeFactor);
+
+        const pathId3 = contextualId(`tp3S${sosa}`);
+        const pathLength3 = this.createRadialPath(g, pathId3, params.r1, params.r2, params.angles[2]);
+        this.placeTextOnPath(g, pathId3, p.dates, classes + " dates", pathLength3, height, sizeFactor);
+    } else if (lineCount === 2) {
+        // Deux lignes : nom complet, dates
+        const pathId1 = contextualId(`tp1S${sosa}`);
+        const pathLength1 = this.createRadialPath(g, pathId1, params.r1, params.r2, params.angles[0]);
+        this.placeTextOnPath(g, pathId1, `${p.fn} ${p.sn}`, classes, pathLength1, height);
+
+        const pathId2 = contextualId(`tp2S${sosa}`);
+        const pathLength2 = this.createRadialPath(g, pathId2, params.r1, params.r2, params.angles[1]);
+        this.placeTextOnPath(g, pathId2, p.dates, classes + " dates", pathLength2, height);
+    } else { // lineCount === 1
+        // Une ligne : nom complet seulement
+        const pathId1 = contextualId(`tp1S${sosa}`);
+        const pathLength = this.createRadialPath(g, pathId1, params.r1, params.r2, params.angles[0]);
+        this.placeTextOnPath(g, pathId1, `${p.fn} ${p.sn}`, classes, pathLength, height);
+    }
+    return g;
+  },
+
+  calculateRadialParameters: function(r1, r2, a1, a2, lineCount) {
+    let myR1, myR2, angles = [];
+
+    if (a1 >= -90) {
+      // Orientation normale
+      myR1 = r1;
+      myR2 = r2;
+
+      if (lineCount === 4) {
+        angles = [
+         a2 - (a2-a1)*4/6,  // Position 4/6
+         a2 - (a2-a1)*3/6,  // Position 3/6
+         a2 - (a2-a1)*2/6   // Position 2/6
+        ];
+      } else if (lineCount === 3) {
+        angles = [
+          a2 - (a2-a1)*3/4,  // Position 3/4
+          a2 - (a2-a1)*2/4,  // Position 1/2
+          a2 - (a2-a1)/4     // Position 1/4
+        ];
+      } else if (lineCount === 2) {
+        angles = [
+          a2 - (a2-a1)*2/3,  // Position 2/3
+          a2 - (a2-a1)/3     // Position 1/3
+        ];
+      } else {
+        angles = [a2 - (a2-a1)/2]; // Position centrale
+      }
+    } else {
+      // Orientation inversée
+      myR1 = r2;
+      myR2 = r1;
+
+      if (lineCount === 4) {
+        angles = [
+         a1 + (a2-a1)*4/6,  // Position 4/6
+         a1 + (a2-a1)*3/6,  // Position 3/6
+         a1 + (a2-a1)*2/6   // Position 2/6
+        ];
+      } else if (lineCount === 3) {
+        angles = [
+          a1 + (a2-a1)*3/4,
+          a1 + (a2-a1)*2/4,
+          a1 + (a2-a1)/4
+        ];
+      } else if (lineCount === 2) {
+        angles = [
+          a1 + (a2-a1)*2/3,
+          a1 + (a2-a1)/3
+        ];
+      } else {
+        angles = [a1 + (a2-a1)/2];
+      }
+    }
+
+    return { r1: myR1, r2: myR2, angles: angles };
+  },
+
+  createCircularPath: function(g, id, r, a1, a2) {
+    const path = svgEl("path");
+    path.setAttribute("class", "none");
+    const p1 = polarToCartesian(r, a1);
+    const p2 = polarToCartesian(r, a2);
+    path.setAttribute("d",
+      `M ${p1.x},${p1.y} A ${r} ${r} 0 ${(a2 - a1 > 180 ? 1 : 0)} 1 ${p2.x},${p2.y}`
+    );
+    path.setAttribute("id", id);
+    g.append(path);
+
+    // Retourne la longueur approximative du chemin
+    return Math.abs(a2 - a1) / 360 * 2 * Math.PI * r;
+  },
+
+  createRadialPath: function(g, id, r1, r2, a) {
+    const path = svgEl("path");
+    path.setAttribute("class", "none");
+    const p1 = polarToCartesian(r1, a);
+    const p2 = polarToCartesian(r2, a);
+    path.setAttribute("d", `M ${p1.x},${p1.y} L ${p2.x},${p2.y}`);
+    path.setAttribute("id", id);
+    g.append(path);
+
+    // Retourne la longueur du chemin
+    return Math.abs(r2 - r1);
+  },
+
+  placeTextOnPath: function(g, pathId, textContent, classes, pathLength, pathHeight, sizeFactor = 1.0) {
+    const bbox = this.getBBoxCached(textContent);
+    const textWidth = bbox.width;
+    const textHeight = bbox.height;
+
+    let fontSizeByWidth = 100;
+    if (textWidth > pathLength * CONFIG.security) {
+      fontSizeByWidth = Math.round(100 * pathLength * CONFIG.security / textWidth);
+    }
+
+    let fontSizeByHeight = 100;
+    if (textHeight > pathHeight * CONFIG.security) {
+      fontSizeByHeight = Math.round(100 * pathHeight * CONFIG.security / textHeight);
+    }
+
+    let finalFontSize = Math.min(fontSizeByWidth, fontSizeByHeight) * sizeFactor;
+
+    // Création de l'élément text avec textPath
+    const text = svgEl("text");
+    text.setAttribute("class", "text " + classes);
+    text.style.pointerEvents = "none";
+    text.innerHTML =
+      `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${finalFontSize}%;">` +
+      textContent +
+      `</textPath>`;
+
+    g.append(text);
+    return text;
+  },
+
+  calculateAdaptiveFontSizes: function(texts) {
+    const textReductionFactor = CONFIG.text_reduction_factor || 0.9;
+    const maxWidth = 2 * CONFIG.a_r[0] * CONFIG.security;
+
+    return texts.map(text => {
+      const bbox = this.getBBoxCached(text);
+      const width = bbox.width;
+
+      if (width > maxWidth) {
+        return Math.round(100 * maxWidth / width * textReductionFactor);
+      } else {
+        return Math.round(100 * textReductionFactor);
+      }
+    });
+  },
+
+  drawMarriageDate: function(g, sosa, r, a1, a2, marriageDate, classes) {
+    const pathId = "pmS" + sosa;
+
+    // Réutilise createCircularPath qui remplace path1
+    const pathLength = T.createCircularPath(g, pathId, r, a1, a2);
+
+    // Réutilise placeTextOnPath qui remplace text2
+    return this.placeTextOnPath(g, pathId, marriageDate, classes, pathLength, 10);
+  }
+};
+
+// ========== Interface utilisateur ==========
+const UIManager = {
+  addNavigationHelp: function() {
+    var helpPanel = document.createElement('div');
+    helpPanel.id = 'navigation-help';
+    helpPanel.style.display = 'none'; // Caché par défaut
+    helpPanel.innerHTML = `
+      <div class="help-title">💡 Aide Navigation</div>
+      <div><strong>Souris :</strong></div>
+      <div>– Glisser : déplacer l’arbre</div>
+      <div>– Molette : zoomer</div>
+      <div>– Survol : voir les détails</div>
+      <div><strong>Raccourcis :</strong></div>
+      <div>– <kbd>Ctrl</kbd>+clic : fiche individuelle</div>
+      <div>– ▲ : navigation sur ancêtre</div>
+      <div style="margin-top: 8px; text-align: center;">
+      </div>
+    `;
+    document.body.appendChild(helpPanel);
+  },
+};
+
+const ColorManager = {
+  EVENT_TYPES: ["bi", "ba", "ma", "de", "bu"],
+
+  createLocationStyles: function(index, c_h, c_l) {
+    const root = document.documentElement;
+    const sheet = [...document.styleSheets].find(s => s.title === "fc-auto");
+
+    root.style.setProperty('--fc-color-' + index, 'hsl(' + c_h + ',100%,' + c_l + '%)');
+
+    // Créer les règles CSS pour les secteurs SVG
+    const eventTypes = ['bi', 'ba', 'ma', 'de', 'bu'];
+    eventTypes.forEach(eventType => {
+      sheet.insertRule(
+        `body.place svg .${eventType}-L${index} { fill: var(--fc-color-${index}); }`,
+        sheet.cssRules.length
+      );
+    });
+    // Règle générique sans préfixe
+    sheet.insertRule(
+      `body.place svg .L${index} { fill: var(--fc-color-${index}); }`,
+      sheet.cssRules.length
+    );
+  },
+
+  setColorMode: function(newMode) {
+    // Nettoyer l'état précédent
+    document.body.classList.remove('place', 'age');
+
+
+    // Désactiver tous les toggles NMBDS
+    this.EVENT_TYPES.forEach(id => {
+      const checkbox = $(id);
+      if (checkbox) checkbox.checked = false;
+    });
+
+    // Appliquer le nouveau mode
+    if (newMode === 'place') {
+      document.body.className = "place";
+      tool = "place";
+      // Activer M par défaut
+      const maCheckbox = $("ma");
+      if (maCheckbox) maCheckbox.checked = true;
+      this.applyColorization();
+    } else if (newMode === 'age') {
+      document.body.className = "age";
+      tool = "age";
+    } else {
+      document.body.className = "";
+      tool = "";
+    }
+
+    // Mettre à jour la visibilité des contrôles
+    this.updateControlsVisibility();
+
+    // Mettre à jour l'état visuel des boutons
+    this.updateButtonStates();
+
+    // Synchroniser l'URL
+    URLManager.updateCurrentURL();
+  },
+
+  updateControlsVisibility: function() {
+    const isPlaceColorActive = document.body.classList.contains('place');
+
+    // Event toggles NMBDS
+    const eventToggles = document.querySelector('.event-toggles');
+    if (eventToggles) {
+      eventToggles.style.display = isPlaceColorActive ? 'flex' : 'none';
+    }
+
+    // Bouton de tri
+    const sortButton = $("b-sort-places");
+    if (sortButton) {
+      sortButton.style.display = isPlaceColorActive ? 'inline-flex' : 'none';
+    }
+  },
+
+  updateButtonStates: function() {
+    // Tous les boutons utilisent la même classe .active
+    const ageButton = $("b-age");
+    const placesButton = $("b-places-colorise");
+    const sortButton = $("b-sort-places");
+
+    if (ageButton) ageButton.classList.toggle("active", tool === "age");
+    if (placesButton) placesButton.classList.toggle("active", tool === "place");
+    if (sortButton) sortButton.classList.toggle("active", sortMode === "alphabetical");
+  },
+
+  applyColorization: function() {
+    const fanchart = $("fanchart");
+
+    Events.types.forEach(eventType => {
+      const svgPrefix = Events.svgPrefix(eventType);
+      const checkbox = $(svgPrefix);
+      const isChecked = checkbox ? checkbox.checked : false;
+
+      fanchart.classList.toggle(svgPrefix, isChecked);
+    });
+
+    URLManager.updateCurrentURL();
+  },
+
+  initializeColorEvents: function() {
+    // Événements des checkboxes NMBDS
+    Events.types.forEach(eventType => {
+      const svgPrefix = Events.svgPrefix(eventType); // 'bi', 'ba', 'ma', 'de', 'bu'
+      const checkbox = $(svgPrefix);
+      if (checkbox) {
+        checkbox.onclick = this.applyColorization.bind(this);
+      }
+    });
+
+    $("b-angle-360").onclick = () => AngleManager.setAngle(360);
+
+    // Bouton colorisation lieux
+    $("b-places-colorise").onclick = function() {
+      const isActive = document.body.classList.contains("place");
+
+      if (isActive) {
+        // DÉSACTIVER le mode place
+        // 1. Nettoyer TOUS les surlignages (SVG + panneau)
+        PlacesHighlighter.clearAllHighlights();
+        PlacesHighlighter.clearPlaceSVGHighlights();
+
+        // 2. Réinitialiser l'état
+        document.body.className = "";
+        tool = "";
+        this.classList.remove("active");
+
+        // 3. Recalculer les dimensions SVG (panneau fermé = plus d'espace)
+        FanchartApp.calculateDimensions();
+        FanchartApp.fitScreen();
+      } else {
+        document.body.className = "place";
+        tool = "place";
+        this.classList.add("active");
+
+        // Désactiver age si actif
+        const ageButton = $("b-age");
+        if (ageButton) ageButton.classList.remove("active");
+
+        // Restaurer le lock SVG si un lieu était verrouillé
+        PlacesHighlighter.restoreLockedPlaceState();
+
+        // Recalculer les dimensions SVG (panneau ouvert = moins d'espace)
+        FanchartApp.calculateDimensions();
+        FanchartApp.fitScreen();
+      }
+
+      // Appliquer la colorisation
+      ColorManager.applyColorization();
+      ColorManager.updateControlsVisibility();
+      URLManager.updateCurrentURL();
+    };
+
+    // Bouton âges (exclusion mutuelle)
+    $("b-age").onclick = function() {
+      const isActive = document.body.classList.contains("age");
+
+      if (isActive) {
+        // Désactiver complètement
+        document.body.className = "";
+        tool = "";
+        this.classList.remove("active");
+      } else {
+        // Nettoyer le surlignage SVG des lieux AVANT de changer de mode
+        PlacesHighlighter.clearPlaceSVGHighlights();
+
+        document.body.className = "age";
+        tool = "age";
+        this.classList.add("active");
+
+        // Désactiver colorisation lieux si active
+        const placesButton = $("b-places-colorise");
+        if (placesButton) placesButton.classList.remove("active");
+      }
+
+      URLManager.updateCurrentURL();
+    };
+  }
+};
+
+const AgeHighlighter = {
+  currentHighlight: null,
+  emptyCategories: new Set(),
+
+  /**
+   * Gère le survol des secteurs SVG en mode âge
+   * Surligne la catégorie correspondante dans la légende
+   * @param {Object} p - Données de la personne ou du mariage
+   * @param {string} type - 'person' ou 'marriage'
+   * @param {string} action - 'enter' (leave géré par clearAllHighlights)
+   */
+  handleSVGHover: function(p, type, action) {
+    if (action !== 'enter') return;
+
+    let categoryClass = '';
+
+    if (type === 'person' && p.age) {
+      // Catégorie d'âge au décès (DA0-DA4)
+      categoryClass = Utils.ageClass(p.age);
+    } else if (type === 'marriage' && p.marriage_length) {
+      // Catégorie de durée de mariage (DAM0-DAM4)
+      categoryClass = Utils.marriageLengthClass(p.marriage_length);
+    }
+
+    if (categoryClass && !this.emptyCategories.has(categoryClass)) {
+      this.setHighlight(categoryClass);
+    }
+  },
+
+  initialize: function() {
+    const closeBtn = document.querySelector('.legend-close');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        $('age-legend').style.display = 'none';
+        document.body.classList.remove('age');
+        if (typeof tool !== 'undefined') tool = '';
+        this.clearAllHighlights();
+      };
+    }
+
+    const container = $('age-legend');
+    if (container) {
+      container.addEventListener('mouseenter', this.handleLegendEnter.bind(this), true);
+      container.addEventListener('mouseleave', this.handleLegendLeave.bind(this), true);
+    }
+  },
+
+  // Analyser les catégories vides
+  analyzeAndHideEmptyCategories: function() {
+    this.emptyCategories.clear();
+
+    // D'abord, remettre toutes les catégories visibles
+    const categoryTypes = [
+      { prefix: 'DA', title: 'Aucune personne dans cette tranche d’âge' },
+      { prefix: 'DAM', title: 'Aucun mariage dans cette tranche de durée' }
+    ];
+
+    categoryTypes.forEach(type => {
+      for (let category = 0; category <= 4; category++) {
+        const className = type.prefix + category;
+        const legendItem = $(className);
+        if (legendItem) {
+          // Réinitialiser l'état
+          legendItem.style.opacity = '';
+          legendItem.style.pointerEvents = '';
+          legendItem.title = '';
+        }
+      }
+    });
+
+    // Puis analyser dans le SVG actuel
+    const svg = $('fanchart');
+    if (!svg) return;
+
+    categoryTypes.forEach(type => {
+      for (let category = 0; category <= 4; category++) {
+        const className = type.prefix + category;
+        const elements = svg.getElementsByClassName(className);
+
+        if (elements.length === 0) {
+          this.emptyCategories.add(className);
+          const legendItem = $(className);
+          if (legendItem) {
+            legendItem.style.opacity = '0.3';
+            legendItem.style.pointerEvents = 'none';
+            legendItem.title = type.title;
+          }
+        }
+      }
+    });
+  },
+
+  handleLegendEnter: function(e) {
+    const legendItem = e.target.closest('.legend-item');
+    if (!legendItem || !legendItem.id || this.emptyCategories.has(legendItem.id)) return;
+    this.setHighlight(legendItem.id);
+  },
+
+  handleLegendLeave: function(e) {
+    if (!e.relatedTarget || !$('age-legend').contains(e.relatedTarget)) {
+      this.clearAllHighlights();
+    }
+  },
+
+  setHighlight: function(legendId) {
+    if (this.emptyCategories.has(legendId)) return;
+
+    this.clearAllHighlights();
+    this.currentHighlight = legendId;
+
+    requestAnimationFrame(() => {
+      const legendItem = $(legendId);
+      if (legendItem) legendItem.classList.add('hl');
+
+      const svgElements = document.getElementsByClassName(legendId);
+      for (let i = 0; i < svgElements.length; i++) {
+        svgElements[i].classList.add('highlight');
+      }
+    });
+  },
+
+  clearAllHighlights: function() {
+    document.querySelectorAll('.legend-item.hl').forEach(item => {
+      item.classList.remove('hl');
+    });
+
+    document.querySelectorAll('svg .highlight').forEach(element => {
+      element.classList.remove('highlight');
+    });
+
+    this.currentHighlight = null;
+  }
+};
+
+const AngleManager = {
+  // Obtenir l'angle actuel
+  getCurrentAngle: function() {
+    return current_angle;
+  },
+
+  // Changer l'angle et redessiner
+  setAngle: function(angle) {
+    // Gérer le mode circulaire automatiquement
+    const wasCircular = isCircularMode;
+
+    if (angle === 360) {
+      isCircularMode = true;
+      current_angle = 180;  // Le mode 360 utilise deux demi-cercles de 180°
+      currentRotation = 0;  // Réinitialiser la rotation
+    } else {
+      isCircularMode = false;
+      current_angle = angle;
+      if (wasCircular) {
+        currentRotation = 0;  // Réinitialiser si on quitte le mode circulaire
+      }
+    }
+
+    this.updateAngleButtons();
+    URLManager.updateCurrentURL();
+
+    // Recalculer complètement
+    FanchartApp.window_w = window.innerWidth;
+    FanchartApp.window_h = window.innerHeight;
+    FanchartApp.calculateDimensions();
+    FanchartApp.reRenderWithCurrentGenerations();
+    // Force le reset du viewBox après changement de mode
+    FanchartApp.fitScreen();
+  },
+
+  // Mettre à jour l'état visuel des boutons
+  updateAngleButtons: function() {
+    // Désactiver tous les boutons d'angle
+    [180, 220, 359, 360].forEach(angle => {
+      const btn = $(`b-angle-${angle}`);
+      if (btn) {
+        // Actif si : c'est 360 et on est en mode circulaire, OU c'est l'angle courant hors mode circulaire
+        const isActive = (angle === 360)
+          ? isCircularMode
+          : (!isCircularMode && current_angle === angle);
+        btn.classList.toggle('active', isActive);
+      }
+    });
+  },
+
+  // Initialiser les boutons (appelé depuis FanchartApp.init)
+  initialize: function() {
+    this.updateAngleButtons();
+
+    // Mettre à jour l'état du bouton circulaire
+    const circularBtn = $('b-circular-mode');
+    if (circularBtn && isCircularMode) {
+      circularBtn.classList.add('active');
+    }
+  }
+};
+
+// ========== MODULE DE GESTION DE L'OVERFLOW ==========
+const ModernOverflowManager = {
+  // Configuration
+  config: {
+    itemHeight: 30,        // Hauteur d'un élément (sync avec CSS --place-height-compact)
+    headerHeight: 28,      // Hauteur header overflow
+    tolerance: { compact: 6, extended: 3 },
+    maxIterations: 5,
+    maxSpaceRatio: 0.5     // Maximum 50% de l'écran pour l'overflow
+  },
+
+  // État
+  originalListHeight: null,
+  currentOverflowSections: [],
+  isProcessing: false,
+
+  /**
+   * Initialise le système d'overflow
+   * @returns {boolean} true si l'initialisation réussit
+   */
+  initialize: function() {
+    const list = document.querySelector('.places-list');
+    if (!list) return false;
+
+    // Sauvegarder la hauteur originale
+    this.originalListHeight = list.clientHeight;
+    return true;
+  },
+
+  /**
+   * Gère l'overflow après un surlignage
+   * @param {Array} matchingItems - Éléments surlignés à garder visibles
+   */
+  handleOverflow: function(matchingItems) {
+    // Prévenir les appels multiples simultanés
+    if (this.isProcessing) {
+      return;
+    }
+
+    this.isProcessing = true;
+
+    if (!this.initialize() || !matchingItems?.length) {
+      this.isProcessing = false;
+      return;
+    }
+
+    // Déduplication par lieu pour éviter les collisions
+    const uniqueItems = this.deduplicateByPlace(matchingItems);
+
+    // Nettoyer les sections d'overflow précédentes
+    this.clearOverflowSections();
+
+    // Lancer la stabilisation
+    this.stabilizeOverflow(uniqueItems);
+
+    this.isProcessing = false;
+  },
+
+  // Gestion de la déduplication
+  deduplicateByPlace: function(matchingItems) {
+    const seenPlaces = new Set();
+    return matchingItems.filter(item => {
+      const placeName = item.placeName || item.element?.dataset?.place;
+      if (!placeName || seenPlaces.has(placeName)) {
+        return false;
+      }
+      seenPlaces.add(placeName);
+      return true;
+    });
+  },
+
+  /**
+   * Algorithme principal de stabilisation de l'overflow
+   * @param {Array} matchingItems - Éléments à garder visibles
+   */
+  stabilizeOverflow: function(matchingItems) {
+    const list = document.querySelector('.places-list');
+    if (!list) return;
+
+    const currentOverflow = this.calculateOverflowWithConstraints(matchingItems, list.clientHeight);
+
+    if (!currentOverflow.above?.length && !currentOverflow.below?.length) {
+      return;
+    }
+
+    this.displayOverflowInReservedSpace(currentOverflow);
+  },
+
+  /**
+   * Calcule l'espace requis pour afficher l'overflow
+   * @param {Object} overflowData - Données d'overflow {above: [], below: []}
+   * @returns {number} Espace requis en pixels
+   */
+  calculateRequiredSpace: function(overflowData) {
+    if (!overflowData || (!overflowData.above?.length && !overflowData.below?.length)) {
+      return 0;
+    }
+
+    let requiredSpace = 0;
+
+    // Espace pour overflow au-dessus
+    if (overflowData.above?.length > 0) {
+      const count = Math.min(overflowData.above.length, 5); // Max 5 éléments affichés
+      requiredSpace += this.config.headerHeight + (count * this.config.itemHeight);
+    }
+
+    // Espace pour overflow en-dessous
+    if (overflowData.below?.length > 0) {
+      const count = Math.min(overflowData.below.length, 5);
+      requiredSpace += this.config.headerHeight + (count * this.config.itemHeight);
+    }
+
+    // Limiter l'espace maximum
+    const maxAllowedSpace = Math.floor(this.originalListHeight * this.config.maxSpaceRatio);
+    const finalSpace = Math.min(requiredSpace, maxAllowedSpace);
+
+    return finalSpace;
+  },
+
+  /**
+   * Détecte quels éléments sont en overflow
+   * @param {Array} highlightedItems - Éléments à vérifier
+   * @param {number} maxHeight - Hauteur maximale de la liste
+   * @returns {Object} {above: [], below: []} éléments en overflow
+   */
+  calculateOverflowWithConstraints: function(highlightedItems, maxHeight) {
+    const list = document.querySelector('.places-list');
+    if (!list || !highlightedItems.length || maxHeight <= 0) {
+      return { above: [], below: [] };
+    }
+
+    const scrollTop = list.scrollTop;
+    const scrollBottom = scrollTop + maxHeight;
+
+    const overflowAbove = [];
+    const overflowBelow = [];
+
+    highlightedItems.forEach(item => {
+      const element = item.element || item.place;
+      if (!element) return;
+
+      const row = element.closest('.place-row');
+      if (!row) return;
+
+      const itemTop = row.offsetTop;
+      const itemBottom = itemTop + row.offsetHeight;
+
+      // Simple test de visibilité : l'élément est-il entièrement visible ?
+      const isCompletelyVisible = (itemTop >= scrollTop && itemBottom <= scrollBottom);
+
+      if (!isCompletelyVisible) {
+        // Déterminer si l'élément est plutôt au-dessus ou en-dessous du viewport
+        const itemCenter = (itemTop + itemBottom) / 2;
+        const viewCenter = (scrollTop + scrollBottom) / 2;
+
+        if (itemCenter < viewCenter) {
+          overflowAbove.push({
+            element: element,
+            index: item.index,
+            row: row,
+            placeName: item.placeName
+          });
+        } else {
+          overflowBelow.push({
+            element: element,
+            index: item.index,
+            row: row,
+            placeName: item.placeName
+          });
+        }
+      }
+    });
+
+    return { above: overflowAbove, below: overflowBelow };
+  },
+
+  /**
+   * Vérifie si l'overflow est stable entre deux itérations
+   * @param {Object} current - Overflow actuel
+   * @param {Object} previous - Overflow précédent
+   * @returns {boolean} true si stable
+   */
+  isOverflowStable: function(current, previous) {
+    if (!previous) return false;
+
+    const currentCounts = {
+      above: current.above?.length || 0,
+      below: current.below?.length || 0
+    };
+
+    const previousCounts = {
+      above: previous.above?.length || 0,
+      below: previous.below?.length || 0
+    };
+
+    return (currentCounts.above === previousCounts.above) &&
+           (currentCounts.below === previousCounts.below);
+  },
+
+  /**
+   * Détecte une oscillation dans le calcul
+   * @param {Object} current - Overflow actuel
+   * @param {Object} previous - Overflow précédent
+   * @returns {boolean} true si oscillation détectée
+   */
+  detectOscillation: function(current, previous) {
+    if (!previous) return false;
+
+    // Oscillation = les éléments changent de côté
+    const currentAboveIds = current.above.map(item => item.index).join(',');
+    const currentBelowIds = current.below.map(item => item.index).join(',');
+    const previousAboveIds = previous.above.map(item => item.index).join(',');
+    const previousBelowIds = previous.below.map(item => item.index).join(',');
+
+    return (currentAboveIds === previousBelowIds) || (currentBelowIds === previousAboveIds);
+  },
+
+  /**
+   * Affiche l'overflow dans l'espace réservé
+   * @param {Object} overflowData - Données d'overflow
+   * @param {number} reservedSpace - Espace réservé en pixels
+   */
+  displayOverflowInReservedSpace: function(overflowData, reservedSpace) {
+    this.clearOverflowSections();
+
+    if (!overflowData.above?.length && !overflowData.below?.length) {
+      return;
+    }
+
+    const container = document.querySelector('.places-container');
+    if (!container) return;
+
+    // Overflow au-dessus - positionner en HAUT de la liste
+    if (overflowData.above?.length > 0) {
+      const aboveSection = this.createOverflowSection('above', overflowData.above);
+      aboveSection.style.top = '0px';
+      container.appendChild(aboveSection);
+      this.currentOverflowSections.push(aboveSection);
+    }
+
+    // Overflow en-dessous - utiliser les classes CSS (bottom: 0)
+    if (overflowData.below?.length > 0) {
+      const belowSection = this.createOverflowSection('below', overflowData.below);
+      // La CSS gére avec .overflow-section.below
+      container.appendChild(belowSection);
+      this.currentOverflowSections.push(belowSection);
+    }
+  },
+
+  /**
+   * Crée une section d'overflow
+   * @param {string} position - 'above' ou 'below'
+   * @param {Array} items - Éléments en overflow
+   * @returns {HTMLElement} Section créée
+   */
+  createOverflowSection: function(position, items) {
+    const section = document.createElement('div');
+    section.className = `overflow-section ${position} stabilized`;
+
+    // Header - utilise uniquement la classe CSS existante
+    const header = document.createElement('div');
+    header.className = 'overflow-header';
+    header.innerHTML = `
+      <i class="fas fa-arrow-${position === 'above' ? 'up' : 'down'} fa-sm"></i>
+      ${items.length} lieu${items.length > 1 ? 'x' : ''} hors écran
+    `;
+
+    // Contenu - utilise uniquement la classe CSS existante
+    const content = document.createElement('div');
+    content.className = 'overflow-content';
+
+    // Trier les items selon l'ordre alphabétique au lieu de l'ordre DOM
+    const sortedItems = this.sortItemsByLogicalOrder(items);
+
+    items.slice(0, 5).forEach(item => {
+      const row = item.row;
+      if (row) {
+        const clone = row.cloneNode(true);
+
+        // Nettoyer IDs et classes conflictuelles
+        const indicators = clone.querySelector('.place-indicators');
+        const placeContent = clone.querySelector('.place-content');
+
+        if (indicators) indicators.removeAttribute('id');
+        if (placeContent) {
+          placeContent.removeAttribute('id');
+          placeContent.classList.remove('grayed-out');
+        }
+
+        content.appendChild(clone);
+      }
+    });
+
+    section.appendChild(header);
+    section.appendChild(content);
+    return section;
+  },
+
+  // Trier selon l’ordre logique (parent avant enfant)
+  sortItemsByLogicalOrder: function(items) {
+    return items.sort((a, b) => {
+      const aPlace = a.placeName;
+      const bPlace = b.placeName;
+      const aData = lieux[aPlace];
+      const bData = lieux[bPlace];
+
+      // Si A est parent de B, A avant B
+      if (bData?.isSubLocation && bData.parentLocation === aPlace) return -1;
+      // Si B est parent de A, B avant A
+      if (aData?.isSubLocation && aData.parentLocation === bPlace) return 1;
+
+      // Sinon tri alphabétique normal
+      return aPlace.localeCompare(bPlace, 'fr', { sensitivity: 'base' });
+    });
+  },
+
+  /**
+   * Nettoie toutes les sections d'overflow
+   */
+  clearOverflowSections: function() {
+    // Nettoyer les sections trackées
+    this.currentOverflowSections.forEach(section => {
+      if (section.parentNode) {
+        section.parentNode.removeChild(section);
+      }
+    });
+    this.currentOverflowSections = [];
+
+    // Nettoyer toutes les sections d'overflow orphelines
+    document.querySelectorAll('.overflow-section').forEach(el => el.remove());
+
+    // Réinitialiser l’état de traitement au cas où
+    this.isProcessing = false;
+  }
+};
+
+// ========== MODULE DE RÉSOLUTION DES IMPLEXES ==========
+const ImplexResolver = {
+  resolutionCache: new Map(),
+  reverseMap: new Map(),
+
+  initialize: function() {
+    this.resolutionCache.clear();
+    this.reverseMap.clear();
+
+    // Parcourir tous les ancêtres pour construire les maps
+    Object.keys(ancestor).forEach(key => {
+      const sosa = parseInt(key.replace('S', ''));
+      const person = ancestor[key];
+
+      if (person && person.sosasame) {
+        // Résoudre la chaîne complète
+        const resolution = this.resolveImplexChain(sosa);
+
+        // Ajouter au reverse map pour le Sosa source
+        if (!this.reverseMap.has(resolution.source)) {
+          this.reverseMap.set(resolution.source, []);
+        }
+        this.reverseMap.get(resolution.source).push(sosa);
+      }
+    });
+  },
+
+  resolveImplexChain: function(sosa) {
+    // S'assurer que sosa est un nombre
+    sosa = parseInt(sosa);
+
+    // Vérifier le cache
+    if (this.resolutionCache.has(sosa)) {
+      return this.resolutionCache.get(sosa);
+    }
+
+    const chain = [];
+    let currentSosa = sosa;
+    let visitedSosas = new Set();
+
+    // Remonter la chaîne jusqu'à la source
+    while (currentSosa) {
+      if (visitedSosas.has(currentSosa)) {
+        console.warn(`ImplexResolver: Boucle détectée pour Sosa ${sosa}`);
+        break;
+      }
+
+      visitedSosas.add(currentSosa);
+      chain.push(currentSosa);
+
+      const person = ancestor["S" + currentSosa];
+      if (!person || !person.sosasame) {
+        // On a trouvé la source
+        break;
+      }
+
+      // IMPORTANT : Forcer la conversion en nombre !
+      currentSosa = parseInt(person.sosasame);
+    }
+
+    // La source est le dernier élément de la chaîne
+    const sourceSosa = chain[chain.length - 1];
+    const sourceData = ancestor["S" + sourceSosa];
+
+    const resolution = {
+      source: sourceSosa,
+      chain: chain,
+      data: sourceData || null
+    };
+
+    // Mettre en cache
+    this.resolutionCache.set(sosa, resolution);
+
+    return resolution;
+  },
+
+  getAllClones: function(sourceSosa) {
+    // S'assurer que sourceSosa est un nombre
+    sourceSosa = parseInt(sourceSosa);
+    return this.reverseMap.get(sourceSosa) || [];
+  },
+
+  getHighlightTargets: function(sosa) {
+    // S'assurer que sosa est un nombre
+    sosa = parseInt(sosa);
+    const person = ancestor["S" + sosa];
+
+    if (!person) {
+      return [sosa];
+    }
+
+    if (person.sosasame) {
+      // C'est un implexe : résoudre la chaîne
+      const resolution = this.resolveImplexChain(sosa);
+      // Retourner toute la chaîne (déjà des nombres grâce à resolveImplexChain)
+      return resolution.chain || [sosa];
+    } else {
+      // C'est peut-être une source : trouver tous ses clones
+      const clones = this.getAllClones(sosa);
+      return [sosa, ...clones];
+    }
+  },
+
+  getDisplayData: function(sosa) {
+    // S'assurer que sosa est un nombre
+    sosa = parseInt(sosa);
+    const person = ancestor["S" + sosa];
+
+    if (!person) {
+      return null;
+    }
+
+    if (person.sosasame && implexMode === "numbered") {
+      // Résoudre jusqu'à la source pour obtenir les vraies données
+      const resolution = this.resolveImplexChain(sosa);
+      return resolution.data;
+    }
+
+    return person;
+  }
+};
+
+const ImplexResolverEnhanced = {
+  ...ImplexResolver, // Hériter de l'existant
+
+  // Cache amélioré pour la performance
+  fullChainCache: new Map(),
+
+  /**
+   * Résout la chaîne COMPLÈTE d'implexes avec récursion profonde
+   */
+  resolveFullChain: function(sosa) {
+    sosa = parseInt(sosa);
+
+    if (this.fullChainCache.has(sosa)) {
+      return this.fullChainCache.get(sosa);
+    }
+
+    const chain = [];
+    const dataChain = [];
+    let currentSosa = sosa;
+    let visitedSosas = new Set();
+    let depth = 0;
+    const maxDepth = 10; // Sécurité contre les boucles infinies
+
+    // Parcourir toute la chaîne jusqu'à la source réelle
+    while (currentSosa && depth < maxDepth) {
+      if (visitedSosas.has(currentSosa)) {
+        console.warn(`ImplexResolver: Boucle détectée pour Sosa ${sosa} à ${currentSosa}`);
+        break;
+      }
+
+      visitedSosas.add(currentSosa);
+      const person = ancestor["S" + currentSosa];
+
+      if (!person) {
+        console.warn(`ImplexResolver: Personne manquante pour Sosa ${currentSosa}`);
+        break;
+      }
+
+      chain.push(currentSosa);
+      dataChain.push(person);
+
+      // Si pas d'implexe, on a trouvé la source
+      if (!person.sosasame) {
+        break;
+      }
+
+      // Continuer avec la cible de l'implexe
+      currentSosa = parseInt(person.sosasame);
+      depth++;
+    }
+
+    // La source est le dernier élément (celui sans sosasame)
+    const sourceSosa = chain[chain.length - 1];
+    const sourceData = dataChain[dataChain.length - 1];
+
+    const result = {
+      source: sourceSosa,
+      chain: chain,
+      dataChain: dataChain,
+      data: sourceData,
+      depth: depth
+    };
+
+    this.fullChainCache.set(sosa, result);
+    return result;
+  },
+
+  /**
+   * Obtient les données d'affichage pour un Sosa en suivant toute la chaîne
+   */
+  getCompleteDisplayData: function(sosa) {
+    const resolution = this.resolveFullChain(sosa);
+    return resolution.data;
+  },
+
+  /**
+   * Détermine TOUS les Sosas à surligner pour un implexe donné
+   */
+  getAllHighlightTargets: function(sosa) {
+    sosa = parseInt(sosa);
+    const person = ancestor["S" + sosa];
+
+    if (!person) return [sosa];
+
+    // Obtenir la chaîne complète
+    const resolution = this.resolveFullChain(sosa);
+    const sourceSosa = resolution.source;
+
+    // Trouver tous les clones de la source
+    const allClones = this.getAllClones(sourceSosa);
+
+    // Retourner la chaîne complète + tous les clones
+    const allTargets = new Set(resolution.chain);
+    allClones.forEach(clone => allTargets.add(clone));
+
+    return Array.from(allTargets);
+  }
+};
+
+const SVGGeometry = {
+  /**
+   * Détermine si un Sosa correspond à un père (pair) ou une mère (impair)
+   */
+  isFather: function(sosa) {
+    return sosa % 2 === 0;
+  },
+
+  /**
+   * Calcule le Sosa du père à partir de n'importe quel Sosa du couple
+   * Utilisé pour identifier le groupe famille
+   */
+  getFatherSosa: function(sosa) {
+    return sosa % 2 === 0 ? sosa : sosa - 1;
+  },
+
+  /**
+   * Calcul de la géométrie des secteurs individuels (père/mère)
+   */
+  getPersonGeometry: function(sosa, position) {
+    return {
+      startAngle: position.a1,
+      endAngle: position.a2,
+      innerRadius: position.r1 + 10,    // Couche externe pour éviter des conflits
+      outerRadius: position.r2
+    };
+  },
+
+  /**
+   * Calcul la géométrie du secteur de mariage pour un couple
+   */
+  getMarriageGeometry: function(fatherPosition) {
+    const marriageEndAngle = fatherPosition.a2 + fatherPosition.delta;
+
+    return {
+      startAngle: fatherPosition.a1,
+      endAngle: marriageEndAngle,
+      innerRadius: fatherPosition.r1, // Couche interne pour éviter des conflits
+      outerRadius: fatherPosition.r1 + 10
+    };
+  }
+};
+
+// ========== Application principale ==========
+const FanchartApp = {
+  window_w: 0,
+  window_h: 0,
+  zoom_factor: CONFIG.zoom_factor,
+
+  // Méthodes de ViewManager intégrées
+  zoom: function(zx, zy, factor, direction) {
+    var w = svg_viewbox_w;
+    var h = svg_viewbox_h;
+    if (direction > 0) {
+      h = Math.round(h/factor);
+      w = Math.round(w/factor);
+    } else {
+      h = Math.round(h*factor);
+      w = Math.round(w*factor);
+    }
+    this.set_svg_viewbox(
+      svg_viewbox_x + Math.round(zx * (svg_viewbox_w - w) / this.window_w),
+      svg_viewbox_y + Math.round(zy * (svg_viewbox_h - h) / this.window_h),
+      w, h
+    );
+  },
+
+  set_svg_viewbox: function(x, y, w, h) {
+    svg_viewbox_x = x;
+    svg_viewbox_y = y;
+    svg_viewbox_w = w;
+    svg_viewbox_h = h;
+    fanchart.setAttribute("viewBox", x + " " + y + " " + w + " " + h);
+  },
+
+  fitScreen: function() {
+    this.set_svg_viewbox(0, 0, svg_w, svg_h);
+  },
+
+  init: function() {
+    // LECTURE DE L'ÉTAT URL
+    const state = URLManager.readCurrentState();
+    tool = state.tool;
+    sortMode = state.sortMode;
+    showEvents = state.showEvents;
+    isCircularMode = state.isCircular;
+    current_angle = state.angle;
+    implexMode = state.implexMode;
+
+    this.applyInitialBodyClass();
+    this.calculateDimensions();
+    this.processAncestorData();
+
+    ImplexResolver.initialize();
+
+    // CONSTRUCTION DES DONNÉES
+    LocationDataBuilder.buildCompleteLocationData();
+
+    // INTERFACE DES LIEUX
+    if (document.querySelector('.places-panel')) {
+      PlacesInterface.initialize();
+      PlacesPanelControls.initialize();
+    }
+
+    // MISE À JOUR DES BOUTONS
+    AngleManager.updateAngleButtons();
+    if (isCircularMode) {
+      const circularBtn = $('b-circular-mode');
+      if (circularBtn) circularBtn.classList.add('active');
+    }
+
+    // INITIALISATION DES ÉVÉNEMENTS
+    DOMCache.preload();
+    this.initializeEvents();
+    this.initializeAngleEvents();
+    ColorManager.initializeColorEvents();
+    if ($('age-legend')) {
+      AgeHighlighter.initialize();
+    }
+
+    // RENDU ET FINALISATION
+    this.renderFanchart();
+    this.updateGenerationTitle();
+    this.applyInitialState();
+    PlacesHighlighter.restoreLock();
+    UIManager.addNavigationHelp();
+    this.fitScreen();
+  },
+
+  // Appliquer la classe de l'outil au body AVANT les calculs de dimensions
+  applyInitialBodyClass: function() {
+    if (tool === "age") {
+      document.body.className = "age";
+    } else if (tool === "place") {
+      document.body.className = "place";
+    } else {
+      document.body.className = "";
+    }
+  },
+
+  processAncestorData: function() {
+    // Vue d'ensemble claire : on voit immédiatement les étapes du traitement
+    const ancestorKeys = Object.keys(ancestor);
+
+    ancestorKeys.forEach(key => {
+      const person = ancestor[key];
+
+      // Chaque transformation a sa propre fonction dédiée
+      this.cleanPersonPlaces(person, key);
+      this.cleanPersonDates(person, key);
+    });
+
+    // Après le nettoyage, mettre à jour les flags globaux
+    this.updateGlobalFlags();
+  },
+
+  // Nettoyage des lieux
+  cleanPersonPlaces: function(person, key) {
+    Events.types.forEach(eventType => {
+      const placeField = Events.place(eventType); // 'birth_place', etc.
+      const flagName = Events.flagProp(eventType); // 'has_b', etc.
+
+      if (person[placeField] !== undefined) {
+        ancestor[key][placeField] = this.cleanPlaceName(person[placeField]);
+        window[flagName] = true;
+      }
+    });
+  },
+
+  // Fonction pure pour nettoyer un nom de lieu
+  cleanPlaceName: function(placeName) {
+    // Cette fonction est pure : même entrée = même sortie, pas d'effets de bord
+    return placeName.replace(/^\?, /, "");
+  },
+
+  // Fonction dédiée au nettoyage des dates
+  cleanPersonDates: function(person, key) {
+    if (person.dates !== undefined) {
+      // Chaînage des transformations de manière claire
+      let cleanedDates = person.dates;
+      cleanedDates = this.removeHtmlTags(cleanedDates);
+      cleanedDates = this.abbreviateCirca(cleanedDates);
+      ancestor[key].dates = cleanedDates;
+    }
+  },
+
+  // Fonctions pures pour les transformations de dates
+  removeHtmlTags: function(text) {
+    return text.replace(/\s?<\/?bdo[^>]*>/g, "");
+  },
+
+  abbreviateCirca: function(text) {
+    return text.replace(/\bca\s+/g, "~");
+  },
+
+  // Mise à jour des flags globaux basée sur l'état actuel des données
+  updateGlobalFlags: function() {
+    // Réinitialiser tous les flags via Events
+    Events.types.forEach(eventType => {
+      const flagName = Events.flagProp(eventType); // 'has_b', 'has_ba', etc.
+      window[flagName] = false;
+    });
+
+    // Parcourir les ancêtres pour déterminer quels types sont présents
+    Object.values(ancestor).forEach(person => {
+      Events.types.forEach(eventType => {
+        const placeField = Events.place(eventType);
+        const flagName = Events.flagProp(eventType);
+        if (person[placeField]) {
+          window[flagName] = true;
+        }
+      });
+    });
+  },
+
+  checkForImplexes: function() {
+    for (let key in ancestor) {
+      if (ancestor[key].sosasame) {
+        return true;
+      }
+    }
+    return false;
+  },
+
+  hasParentsInNextGeneration: function() {
+    const lastGenStart = Math.pow(2, max_gen);
+    const lastGenEnd = Math.pow(2, max_gen + 1) - 1;
+
+    for (let sosa = lastGenStart; sosa <= lastGenEnd; sosa++) {
+      const person = ancestor["S" + sosa];
+      if (person && person.has_parents) {
+        return true;
+      }
+    }
+    return false;
+  },
+
+  updateButtonStates: function() {
+    // Gestion du bouton implexes
+    const implexButton = $("b-implex");
+    if (implexButton) {
+      if (this.checkForImplexes()) {
+        implexButton.style.display = "inline-flex";
+      } else {
+        implexButton.style.display = "none";
+      }
+    }
+
+    // Gestion intelligente du bouton ajouter génération
+    const addButton = $("b-gen-add");
+    if (addButton) {
+      let canAdd = false;
+      let hasParentsAvailable = false;
+
+      if (max_gen < max_gen_loaded) {
+        canAdd = true;
+      } else if (max_gen < 10) {
+        hasParentsAvailable = FanchartApp.hasParentsInNextGeneration();
+        canAdd = hasParentsAvailable;
+      }
+
+      addButton.classList.toggle("disabled", !canAdd);
+      addButton.disabled = !canAdd;
+
+      if (max_gen < max_gen_loaded) {
+        addButton.title = "Afficher la génération suivante (données en mémoire)";
+      } else if (hasParentsAvailable) {
+        addButton.title = "Charger la génération suivante";
+      } else {
+        addButton.title = "Aucun parent dans la génération suivante";
+      }
+    }
+  },
+
+  calculateDimensions: function() {
+    // Calculer max_gen depuis ancestor
+    var ak = Object.keys(ancestor);
+    max_gen_loaded = Math.trunc(Math.log(Number(ak[ak.length-1].replace(/^S/, "")))/Math.log(2));
+
+    if (typeof max_gen === 'undefined') {
+      max_gen = max_gen_loaded;
+    }
+    if (max_gen > max_gen_loaded) {
+      max_gen = max_gen_loaded;
+      URLManager.updateCurrentURL();
+    }
+
+    // Calculer max_r avec validation
+    let max_r = 0;
+    let rings = max_gen + 1;
+
+    // En mode circulaire, on a un anneau de moins car les parents sont au centre
+    if (isCircularMode) {
+      rings += -1;
+    }
+
+    for (let i = 0; i < rings; i++) {
+      max_r += CONFIG.a_r[i] || CONFIG.a_r[CONFIG.a_r.length - 1];
+    }
+
+    if (isNaN(max_r) || max_r <= 0) {
+      console.error("max_r invalide:", max_r);
+      max_r = 300;
+    }
+
+    // Définir les dimensions du SVG avec validation
+    const margin = CONFIG.svg_margin;
+
+    if (isCircularMode) {
+      // Mode circulaire : même logique que le 359° mais avec un cercle complet
+      // Le viewBox est carré, mais on le positionne comme un éventail large
+      const size = 2 * (max_r + margin);
+      svg_w = size;
+      svg_h = size;
+      center_x = size / 2;
+      center_y = size / 2;
+    } else {
+      // Calcul standard pour tous les angles
+      center_x = max_r + margin;
+      center_y = max_r + margin;
+      svg_w = 2 * center_x;
+
+      if (current_angle === 180) {
+        // Demi-cercle : hauteur réduite, le centre est positionné en haut
+        // MAIS le cercle S1 dépasse vers le bas de CONFIG.a_r[0]
+        svg_h = max_r + CONFIG.a_r[0] + 2 * margin; // Ajouter le rayon du cercle central
+      } else if (current_angle <= 270) {
+        center_y = max_r + margin;
+        // Angles standard : calcul avec extension
+        const halfAngleRad = Math.PI/180 * (current_angle - 180) / 2;
+        const extraHeight = Math.max(CONFIG.a_r[0], Math.round(max_r * Math.sin(halfAngleRad)));
+        svg_h = 2 * margin + max_r + extraHeight;
+      } else {
+        // Angles > 270° : hauteur complète nécessaire
+        svg_h = 2 * (max_r + margin);
+      }
+    }
+
+    if (isNaN(svg_w) || isNaN(svg_h) || svg_w <= 0 || svg_h <= 0) {
+      console.error("Dimensions SVG calculées invalides:", { svg_w, svg_h, max_r, center_x, center_y });
+      svg_w = 800;
+      svg_h = 600;
+      center_x = svg_w / 2;
+      center_y = svg_h / 2;
+    }
+
+    // Dimensions de la fenêtre avec limitation pour la liste des lieux
+
+    // 1. D'abord calculer et appliquer la largeur du panneau des lieux
+    const actualListWidth = LayoutCalculator.calculatePlacesListWidth();
+    root.style.setProperty('--fc-tool-size', actualListWidth + 'px');
+
+    // 2. Déterminer la marge gauche selon le mode
+    const isSquareChart = (current_angle >= 310 || isCircularMode);
+
+    // 3. Calculer l'espace réellement disponible pour le SVG
+    const availableWidth = window.innerWidth - actualListWidth;
+    const availableHeight = window.innerHeight;
+
+    // 4. Le SVG occupe tout l'espace disponible pour permettre zoom et navigation
+    this.window_w = availableWidth;
+    this.window_h = availableHeight;
+
+    // 5. Configurer le SVG à la taille complète de l'espace de travail
+    fanchart.setAttribute("width", this.window_w);
+    fanchart.setAttribute("height", this.window_h);
+
+    // Initialisation de la viewbox
+    svg_viewbox_x = 0;
+    svg_viewbox_y = 0;
+    svg_viewbox_w = svg_w;
+    svg_viewbox_h = svg_h;
+  },
+
+  renderFanchart: function() {
+    // Nettoyer complètement le SVG
+    while (fanchart.firstChild) {
+      fanchart.removeChild(fanchart.firstChild);
+    }
+
+    // Créer le groupe conteneur pour permettre la rotation
+    const contentGroup = svgEl("g");
+    contentGroup.setAttribute("id", "fanchart-content");
+    if (currentRotation !== 0) {
+      contentGroup.setAttribute("transform", `rotate(${currentRotation} ${center_x} ${center_y})`);
+    }
+    fanchart.appendChild(contentGroup);
+
+    // Initialiser le texte standard
+    const standardInfo = this.initializeStandardText();
+    standard = standardInfo.element;
+    standard_width = standardInfo.width;
+
+    if (isCircularMode) {
+      // Sauvegarder l'état
+      const savedAngle = current_angle;
+      const originalAncestors = ancestor;
+
+      // Forcer l'angle à 180° pour les demi-cercles
+      current_angle = 180;
+
+      // Créer les groupes pour les deux hémisphères DANS contentGroup
+      const northGroup = svgEl("g");
+      northGroup.setAttribute("id", "north-hemisphere");
+      contentGroup.appendChild(northGroup);  // ← Dans contentGroup, pas fanchart
+
+      const southGroup = svgEl("g");
+      southGroup.setAttribute("id", "south-hemisphere");
+      southGroup.setAttribute("transform", `rotate(180 ${center_x} ${center_y})`);
+      contentGroup.appendChild(southGroup);  // ← Dans contentGroup, pas fanchart
+
+      // RENDU NORD : Lignée paternelle (S2)
+      try {
+        ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 2);
+        renderContext = { target: northGroup, idSuffix: '-N' };
+        this.renderAncestorsByGeneration();
+
+        // RENDU SUD : Lignée maternelle (S3)
+        ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 3);
+        renderContext = { target: southGroup, idSuffix: '-S' };
+        this.renderAncestorsByGeneration();
+      } finally {
+        renderContext = { target: null, idSuffix: '' };
+        ancestor = originalAncestors;
+        current_angle = savedAngle;
+      }
+
+      // Ajouter le centre en mode couple (dans contentGroup)
+      CircularModeRenderer.renderCoupleCenter();
+
+    } else {
+      // Mode éventail normal
+      this.renderCenterPerson();
+      this.renderAncestorsByGeneration();
+    }
+
+    this.updateButtonStates();
+  },
+
+  renderAncestorsByGeneration: function() {
+    // rayon total accumulé
+    let cumulativeR = CONFIG.a_r[0];
+    const rings = isCircularMode ? max_gen : max_gen + 1;
+
+    for (let gen = 2; gen <= rings; gen++) {
+      const innerR = cumulativeR;                // rayon intérieur
+      const outerR = innerR + CONFIG.a_r[gen-1]; // rayon extérieur
+      cumulativeR = outerR;                      // pour la génération suivante
+
+      // angle total à découper - utilise l'angle dynamique
+      const delta = current_angle / Math.pow(2, gen-1);
+      // angle de départ au-dessus du centre
+      let angle = -90 - current_angle / 2 + delta/2;
+
+      // on itère sur les 2^(gen-1) cases de cette génération
+      const firstSosa = Math.pow(2, gen-1);
+      const lastSosa  = Math.pow(2, gen) - 1;
+
+      for (let sosa = firstSosa; sosa <= lastSosa; sosa++, angle += delta) {
+        const person = this.getEffectivePerson(sosa);
+        if (!person) continue;
+
+        // prépare la position de ce secteur
+        const pos = {
+          r1: innerR, r2: outerR,
+          a1: angle - delta/2, a2: angle + delta/2,
+          generation: gen, delta: delta
+        };
+
+        this.renderAncestorSector(sosa, pos, person);
+      }
+    }
+
+    this.updateButtonStates();
+  },
+
+  initializeAngleEvents: function() {
+    CONFIG.available_angles.forEach(angle => {
+      const btn = $(`b-angle-${angle}`);
+      if (btn) {
+        btn.onclick = function() {
+          AngleManager.setAngle(angle);
+        };
+      }
+    });
+  },
+
+  // Résoudre les implexes virtuellement
+  getEffectivePerson: function(sosa) {
+    let person = ancestor["S" + sosa];
+    // Si pas de personne à ce sosa, chercher si c’est un enfant d’implexe
+    if (!person && implexMode !== "reduced") {
+      const parentSosa = Math.floor(sosa / 2);
+      const parentPerson = ancestor["S" + parentSosa];
+
+      if (parentPerson && parentPerson.sosasame) {
+        const refSosa = parentPerson.sosasame;
+        const childSosa = sosa % 2 === 0 ? 2 * refSosa : 2 * refSosa + 1;
+        const childPerson = ancestor["S" + childSosa];
+
+        if (childPerson) {
+          // Créer un enfant virtuel basé sur l'implexe
+          return {
+            ...childPerson,
+            fn: implexMode === "numbered" ? "" : childPerson.fn,
+            sn: implexMode === "numbered" ? `${sosa} › ${childSosa}` : childPerson.sn,
+            sosasame: implexMode === "numbered" ? childSosa : undefined,
+            dates: implexMode === "numbered" ? "" : childPerson.dates
+          };
+        }
+      }
+    }
+    return person;
+  },
+
+  initializeStandardText: function() {
+    const target = renderContext.target || $('fanchart-content') || fanchart;
+    const standard = svgEl("text");
+    standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz 0123456789 ’'–-?~/";
+    standard.setAttribute("id", "standard");
+    standard.setAttribute("x", center_x);
+    standard.setAttribute("y", center_y);
+    target.append(standard);
+
+    const bbox = standard.getBBox();
+    return {
+      element: standard,
+      width: bbox.width / standard.textContent.length,
+      height: bbox.height // Si besoin plus tard
+    };
+  },
+
+  // Rendu du centre (Sosa 1)
+  renderCenterPerson: function() {
+    const sosa = 1;
+    const person = ancestor["S" + sosa];
+    const r = CONFIG.a_r[0];
+
+    // Créer le groupe SVG
+    const group = svgEl("g");
+    group.setAttribute("id", "S" + sosa);
+    fanchart.append(group);
+
+    // Dessiner les éléments
+    SVGRenderer.drawCircle(group, r, center_x, center_y, person, { isBackground: true });
+    T.drawText(group, 'S1', {
+      x: center_x,
+      y: center_y - 10,
+      p: person,
+      classes: ""
+    });
+    SVGRenderer.drawCircle(group, r, center_x, center_y, person);
+
+    return group;
+  },
+
+  // Gestion des implexes
+  handleImplex: function(sosa, person) {
+    if (!person.sosasame) {
+      return { person: person, isImplex: false };
+    }
+
+    const referenceSosa = person.sosasame;
+    const referencedPerson = ancestor["S" + referenceSosa];
+
+    if (implexMode === "reduced") {
+      return { person: person, isImplex: false };
+    }
+
+    if (implexMode === "numbered") {
+      return {
+        person: {
+          ...referencedPerson,
+          fn: "",
+          sn: `${sosa} › ${referenceSosa}`,
+          dates: "",
+          sosasame: referenceSosa  // ✓ Préservé
+        },
+        isImplex: true,
+        originalSosa: referenceSosa
+      };
+    }
+
+    // Mode "full"
+    return { person: referencedPerson, isImplex: false };
+  },
+
+  /**
+   * Rendu des secteurs avec géométrie en couches et groupes famille
+   *
+   * Trois zones d'interaction sans chevauchement géométrique (aucun conflits d'interaction) :
+   * - couronne interne : mariage (rayon r1 → r1+10, angle complet) ;
+   * - secteur externe gauche : époux (rayon r1+10 → r2, demi-angle) ;
+   * - secteur externe droit : épouse (rayon r1+10 → r2, demi-angle).
+   */
+  renderAncestorSector: function(sosa, position, person) {
+    const target = renderContext.target || $('fanchart-content') || fanchart;
+
+    // Créer le groupe famille (basé sur le père) si il n'existe pas encore
+    const fatherSosa = SVGGeometry.getFatherSosa(sosa);
+    const familyGroupId = contextualId("G" + fatherSosa);
+
+    let familyGroup = target.querySelector("#" + CSS.escape(familyGroupId));
+    if (!familyGroup) {
+      familyGroup = svgEl("g");
+      familyGroup.setAttribute("id", familyGroupId);
+      target.append(familyGroup);
+
+      // Créer d'abord le secteur de mariage
+      if (sosa % 2 === 0) { // Seul l'époux crée le mariage
+        this.renderMarriageSector(familyGroup, sosa, position, person);
+      }
+    }
+
+    // Créer le groupe de la personne dans le groupe famille
+    const personGroup = svgEl("g");
+    personGroup.setAttribute("id", contextualId("S" + sosa));
+    // En mode circulaire, ajouter une classe avec le Sosa original pour le surlignage des implexes
+    if (isCircularMode && person.originalSosa) {
+      personGroup.classList.add("os-" + person.originalSosa);
+    }
+    familyGroup.append(personGroup);
+
+    // Résolution des implexes
+    const implexInfo = this.handleImplex(sosa, person);
+    const actualPerson = implexInfo.person;
+    actualPerson.sosa = sosa;
+
+    // Calculer la géométrie spécifique à cette personne
+    const personGeom = SVGGeometry.getPersonGeometry(sosa, position);
+
+    // Secteur de fond
+    SVGRenderer.drawPie(personGroup, personGeom.innerRadius, personGeom.outerRadius,
+      personGeom.startAngle, personGeom.endAngle, actualPerson,
+      { type: 'person', isBackground: true });
+
+    // Texte de la personne
+    if (actualPerson.fn !== "?") {
+      const textClasses = this.buildTextClasses(actualPerson);
+      const isImplexCompact = person.sosasame && (implexMode === "reduced" || implexMode === "numbered");
+      if (isImplexCompact) {
+        personGroup.classList.add('implex-compact');
+      }
+
+      SVGRenderer.drawSectorText(personGroup, personGeom.innerRadius - 10, personGeom.outerRadius,
+        personGeom.startAngle, personGeom.endAngle, sosa, actualPerson,
+        textClasses, position.generation, isImplexCompact);
+    }
+
+    // Secteur interactif
+    SVGRenderer.drawPie(personGroup, personGeom.innerRadius, personGeom.outerRadius,
+      personGeom.startAngle, personGeom.endAngle, actualPerson,
+      { type: 'person' });
+
+    // Indicateur de navigation
+    SVGRenderer.drawParentIndicator(personGroup, personGeom.innerRadius,
+      personGeom.startAngle, personGeom.endAngle, sosa, actualPerson);
+
+    return personGroup;
+  },
+
+  /**
+   * Rendu du secteur de mariage dans une couronne interne
+   */
+  renderMarriageSector: function(familyGroup, fatherSosa, position, person) {
+    // Créer le groupe mariage en premier dans l’ordre DOM
+    const marriageGroup = svgEl("g");
+    marriageGroup.setAttribute("id", contextualId("M" + fatherSosa));
+
+    if (familyGroup.firstChild) {
+      familyGroup.insertBefore(marriageGroup, familyGroup.firstChild);
+    } else {
+      familyGroup.appendChild(marriageGroup);
+    }
+
+    const marriageGeometry = SVGGeometry.getMarriageGeometry(position);
+
+    // Secteur de fond
+    SVGRenderer.drawPie(marriageGroup, marriageGeometry.innerRadius, marriageGeometry.outerRadius,
+      marriageGeometry.startAngle, marriageGeometry.endAngle, person,
+      { type: 'marriage', isBackground: true });
+
+    // Éléments structurels avec géométrie corrigée
+    SVGRenderer.drawContour(marriageGroup, marriageGeometry.innerRadius, position.r2,
+      marriageGeometry.startAngle, marriageGeometry.endAngle);
+
+    // Ligne de séparation entre père et mère
+    SVGRenderer.drawRadialLine(marriageGroup, marriageGeometry.outerRadius, position.r2, position.a2);
+
+    // Secteur interactif du mariage dans sa couronne exclusive
+    SVGRenderer.drawPie(marriageGroup, marriageGeometry.innerRadius, marriageGeometry.outerRadius,
+      marriageGeometry.startAngle, marriageGeometry.endAngle, person,
+      { type: 'marriage' });
+
+    // Date de mariage centrée
+    if (person.marriage_date !== undefined && person.marriage_date !== "") {
+      let marriageTextClasses = "";
+      if (person.marriage_place && lieux[person.marriage_place]) {
+        marriageTextClasses += " ma-t" + lieux[person.marriage_place].c;
+      }
+
+      const textRadius = (marriageGeometry.innerRadius + marriageGeometry.outerRadius) / 2;
+      TextRenderer.drawMarriageDate(marriageGroup, fatherSosa, textRadius,
+        marriageGeometry.startAngle, marriageGeometry.endAngle, person.marriage_date, marriageTextClasses);
+    }
+
+    // Métadonnée lieu
+    if (person.marriage_place) {
+      marriageGroup.setAttribute("data-place-name", person.marriage_place);
+    }
+
+    return marriageGroup;
+  },
+  /**
+   * Fonction utilitaire pour accéder à un groupe famille complet
+   * Simplifie les interactions futures au niveau couple
+   */
+  getFamilyGroup: function(sosa) {
+    const fatherSosa = SVGGeometry.getFatherSosa(sosa);
+    return $("G" + fatherSosa);
+  },
+
+  /**
+   * Fonction utilitaire pour obtenir tous les éléments d'une famille
+   * Retourne {father, mother, marriage} ou les éléments disponibles
+   */
+  getFamilyElements: function(sosa) {
+    const fatherSosa = SVGGeometry.getFatherSosa(sosa);
+    return {
+      group: $("G" + fatherSosa),
+      father: $("S" + fatherSosa),
+      mother: $("S" + (fatherSosa + 1)),
+      marriage: $("M" + fatherSosa)
+    };
+  },
+
+  buildTextClasses: function(person) {
+    let classes = "";
+
+    if (person.birth_place && person.birth_place !== "" && lieux[person.birth_place]) {
+      classes += " bi-t" + lieux[person.birth_place].c;
+    }
+    if (person.baptism_place && person.baptism_place !== "" && lieux[person.baptism_place]) {
+      classes += " ba-t" + lieux[person.baptism_place].c;
+    }
+    if (person.death_place && person.death_place !== "" && lieux[person.death_place]) {
+      classes += " de-t" + lieux[person.death_place].c;
+    }
+    if (person.burial_place && person.burial_place !== "" && lieux[person.burial_place]) {
+      classes += " bu-t" + lieux[person.burial_place].c;
+    }
+
+    return classes.trim();
+  },
+
+  updateGenerationTitle: function() {
+    const genTitle = $('generation-section-title');
+    if (genTitle) {
+      const genLabel = window.t(max_gen > 1 ? 'generations' : 'generation',
+                               max_gen > 1 ? 'générations' : 'génération');
+      genTitle.textContent = `${max_gen} ${genLabel}`;
+    }
+  },
+
+reRenderWithCurrentGenerations: function() {
+    if (max_gen > LocationDataBuilder._generationCache.size) {
+      LocationDataBuilder.clearCache();
+    }
+    DOMCache.invalidate();
+    this.calculateDimensions();
+    LocationDataBuilder.buildCompleteLocationData(max_gen);
+    const fanchart = $("fanchart");
+    fanchart.innerHTML = "";
+    this.renderFanchart();
+
+    ImplexResolver.initialize();
+
+    if (document.body.classList.contains('age')) {
+      AgeHighlighter.analyzeAndHideEmptyCategories();
+    }
+    if (document.querySelector('.places-panel')) {
+      PlacesInterface.generatePlacesList();
+      PlacesInterface.updateSummarySection();
+      PlacesPanelControls.initialize();
+      PlacesInterface.setupEventListeners();
+      PlacesHighlighter.setupEventHandlers();
+      PlacesHighlighter.restoreLock();
+    }
+
+    this.fitScreen();
+    this.updateButtonStates();
+    this.updateGenerationTitle();
+  },
+
+  initializeEvents: function() {
+    // Zoom
+    fanchart.addEventListener("wheel", (event) => {
+      this.zoom(event.clientX, event.clientY, CONFIG.zoom_factor,
+      (event.deltaY < 0 ? +1 : -1));
+    }, { passive: false });
+
+    // Drag (clic gauche) + Rotation (clic droit, mode circulaire seulement)
+    // États des interactions
+    let dragState = false;
+    let rotateState = false;
+    let lastMouseAngle = 0;
+
+    // Calcule l'angle de la souris par rapport au centre du SVG
+    const getMouseAngle = (e) => {
+      const rect = fanchart.getBoundingClientRect();
+      const svgCenterX = rect.left + rect.width / 2;
+      const svgCenterY = rect.top + rect.height / 2;
+      return Math.atan2(e.clientY - svgCenterY, e.clientX - svgCenterX) * 180 / Math.PI;
+    };
+
+    // Applique la rotation au contenu du SVG
+    const applyRotation = () => {
+      const content = fanchart.querySelector('#fanchart-content');
+      if (content) {
+        content.setAttribute('transform', `rotate(${currentRotation} ${center_x} ${center_y})`);
+      }
+    };
+
+    fanchart.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      if ((e.button === 2 || (e.button === 0 && e.shiftKey)) && isCircularMode) {
+        // Clic droit (mode circulaire seulement) : rotation (également avec shift+clic droit pour macOS)
+        rotateState = true;
+        lastMouseAngle = getMouseAngle(e);
+      } else if (e.button === 0) {
+        // Clic gauche : déplacement
+        dragState = true;
+
+      }
+    });
+
+    fanchart.addEventListener('mouseup', (e) => {
+      dragState = false;
+      rotateState = false;
+    });
+
+    fanchart.addEventListener('mouseleave', () => {
+      dragState = false;
+      rotateState = false;
+    });
+
+    fanchart.addEventListener('mousemove', (e) => {
+      if (dragState) {
+        e.preventDefault();
+        this.set_svg_viewbox(
+          svg_viewbox_x - Math.round(e.movementX * svg_viewbox_w / this.window_w),
+          svg_viewbox_y - Math.round(e.movementY * svg_viewbox_h / this.window_h),
+          svg_viewbox_w, svg_viewbox_h
+        );
+      } else if (rotateState) {
+        e.preventDefault();
+        const currentMouseAngle = getMouseAngle(e);
+        const deltaAngle = currentMouseAngle - lastMouseAngle;
+        currentRotation = (currentRotation + deltaAngle) % 360;
+        lastMouseAngle = currentMouseAngle;
+        applyRotation();
+      }
+    });
+
+    // Désactiver le menu contextuel sur le SVG (pour permettre le clic droit)
+    fanchart.addEventListener('contextmenu', (e) => {
+      if (isCircularMode) {
+        e.preventDefault();
+      }
+    });
+
+    // Boutons de navigation
+    $("b-no-buttons").onclick = function() {
+      $("fanchart-controls").style.display = "none";
+    };
+    $("b-help").onclick = function() {
+      const helpPanel = $('navigation-help');
+      if (helpPanel) {
+        const isVisible = helpPanel.style.display !== 'none';
+        helpPanel.style.display = isVisible ? 'none' : 'block';
+        this.classList.toggle("active", !isVisible);
+      }
+    };
+    $("b-home").onclick = () => {
+      window.location = link_to_person;
+    };
+    $("b-rng").onclick = function() {
+      const url = this.getAttribute("data-url");
+      if (url) { window.location = url; }
+    };
+
+    $("b-refresh").onclick = () => {
+      this.calculateDimensions();
+      this.fitScreen();
+    };
+    $("b-zoom-in").onclick = () => {
+      this.zoom(this.window_w / 2, this.window_h / 2, this.zoom_factor, +1);
+    };
+    $("b-zoom-out").onclick = () => {
+      this.zoom(this.window_w / 2, this.window_h / 2, this.zoom_factor, -1);
+    };
+    $("b-gen-add").onclick = () => {
+      if (this.disabled) return;
+      if (max_gen < max_gen_loaded) {
+        max_gen++;
+        FanchartApp.reRenderWithCurrentGenerations();
+        URLManager.updateCurrentURL();
+      } else {
+        URLManager.navigateToGeneration(max_gen + 1);
+      }
+    };
+    $("b-gen-del").onclick = () => {
+      if(max_gen > 1) {
+        max_gen--;
+        FanchartApp.reRenderWithCurrentGenerations();
+        URLManager.updateCurrentURL();
+      }
+    };
+    $("b-implex").onclick = function() {
+      // Cycle : reduced → numbered → full → reduced
+      switch(implexMode) {
+        case "reduced":
+          implexMode = "numbered";
+          this.title = "Afficher tous les ancêtres";
+          this.querySelector("i").className = "fa fa-comment fa-fw";
+          break;
+        case "numbered":
+          implexMode = "full";
+          this.title = "Réduire les implexes";
+          this.querySelector("i").className = "fa fa-comment-slash fa-fw";
+          break;
+        case "full":
+          implexMode = "reduced";
+          this.title = "Numéroter les implexes";
+          this.querySelector("i").className = "fa fa-comment-dots fa-fw";
+          break;
+      }
+
+      FanchartApp.reRenderWithCurrentGenerations();
+      URLManager.updateCurrentURL();
+    };
+    $("font-selector").onchange = function() {
+      const fanchart = $("fanchart");
+
+      ['mono', 'serif', 'large', 'readable'].forEach(cls => {
+        fanchart.classList.remove(cls);
+      });
+
+      if (this.value) {
+        fanchart.classList.add(this.value);
+      }
+
+      // Mettre à jour l'URL si nécessaire
+      // URLManager.updateCurrentURL();
+    };
+
+  },
+
+  applyInitialState: function() {
+    // Configurer l'état initial des outils selon l'URL
+    if (tool === "age") {
+      document.body.className = "age";
+      const ageButton = $("b-age");
+      if (ageButton) ageButton.classList.add("active");
+
+      if ($('age-legend')) {
+        AgeHighlighter.analyzeAndHideEmptyCategories();
+      }
+    } else if (tool === "place") {
+      // Mode place activé explicitement dans l'URL
+      document.body.className = "place";
+      const placesButton = $("b-places-colorise");
+      if (placesButton) placesButton.classList.add("active");
+
+      ColorManager.applyColorization();
+    }
+  }
+};
+
+// Alias pour la rétrocompatibilité
+const R = SVGRenderer;
+const T = TextRenderer;
+
+window.toggleFanchartSort = () => PlacesPanelControls.toggleSort();
+window.toggleFanchartEventsDisplay = () => PlacesPanelControls.toggleEventsDisplay();
+window.filterFanchartPlaces = (query) => PlacesPanelControls.filterPlaces(query);
+window.clearFanchartSearch = () => PlacesPanelControls.clearSearch();
+window.toggleFanchartPlacesPanel = () => document.body.classList.toggle('place');
+
+// Lancement de l'application
+FanchartApp.init();
