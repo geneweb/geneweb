@@ -7,24 +7,30 @@
 <link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;">
 <style title="fc-auto"></style>
 </head>
-
 %define;somebody_fanchart_info(xx,iii)
   "S%xx.anc_sosa.v;":{"fn":"%if(xx.public_name != "")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key","sn":"%xx.surname","snk":"%xx.surname_key;","oc":"%xx.occ","dates":'%xx.dates;',"birth_place":"%xx.birth_place;","death_place":"%xx.death_place","death_age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age;%end;%else;%if;xx.computable_age;%xx.age;%end;%end;","has_parents":%if(xx.has_parents)true%else;false%end;%nn;
   %if;(e.ba = "on" and xx.baptism_place != ""),"baptism_place":"%xx.baptism_place;"%end;
-  %if;(e.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;
+  %if;(e.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;,"sosa":"%xx.anc_sosa.v;"
   %if;(xx.index!=iii and xx.is_male)
     %foreach;xx.family;
       %if;(family.index = xx.family.index)
         ,"marriage_date":"%family.date_s;","marriage_place":"%marriage_place;"
         ,"marriage_length":"%nn;
-        %if;(not (are_separated or are_divorced))
-          %if;(xx.death_date!="" and xx.spouse.death_date!="")
-            %if;(xx.death_date.year<xx.spouse.death_date.year)%expr(xx.death_date.year-family.marriage_date.year)
-            %else;%expr(xx.spouse.death_date.year-family.marriage_date.year)
+        %if;(family.marriage_date.year!="")
+          %if;(not (are_separated or are_divorced))
+            %if;(xx.death_date!="" or xx.spouse.death_date!="")
+              %if;(xx.death_date.year<xx.spouse.death_date.year)%expr(xx.death_date.year-family.marriage_date.year)
+              %else;%expr(xx.spouse.death_date.year-family.marriage_date.year)
+              %end;
+            %elseif;(not (xx.is_dead or xx.spouse.is_dead))
+              %expr(today.year-family.marriage_date.year)
             %end;
-          %end;
-        %else;%(TODO create a new %divorce_date.year; only%)
-        %end;"
+          %else;
+            %if;(family.marriage_date.year<family.divorce_date.year)
+              %expr(family.divorce_date.year-family.marriage_date.year)
+            %end;
+          %end;"
+        %end;
       %end;
     %end;
   %end;},
