@@ -18,19 +18,27 @@
         ,"marriage_length":"%nn;
         %if;(family.marriage_date.year!="")
           %if;(not (are_separated or are_divorced))
-            %if;(xx.death_date!="" or xx.spouse.death_date!="")
-              %if;(xx.death_date.year<xx.spouse.death_date.year)%expr(xx.death_date.year-family.marriage_date.year)
-              %else;%expr(xx.spouse.death_date.year-family.marriage_date.year)
+            %if;(xx.is_dead and xx.death_date.year!="")
+              %if;(xx.spouse.is_dead and xx.spouse.death_date.year!="")
+                %if;(xx.death_date.year<xx.spouse.death_date.year)
+                  %expr(xx.death_date.year-family.marriage_date.year)
+                %else;
+                  %expr(xx.spouse.death_date.year-family.marriage_date.year)
+                %end;
+              %else;
+                %expr(xx.death_date.year-family.marriage_date.year)
               %end;
-            %elseif;(not (xx.is_dead or xx.spouse.is_dead))
+            %elseif;(xx.spouse.is_dead and xx.spouse.death_date.year!="")
+              %expr(xx.spouse.death_date.year-family.marriage_date.year)
+            %else;
               %expr(today.year-family.marriage_date.year)
             %end;
           %else;
-            %if;(family.marriage_date.year<family.divorce_date.year)
+            %if;(family.divorce_date.year!="" and family.divorce_date.year>family.marriage_date.year)
               %expr(family.divorce_date.year-family.marriage_date.year)
             %end;
-          %end;"
-        %end;
+          %end;
+        %end;"
       %end;
     %end;
   %end;},
