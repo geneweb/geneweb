@@ -178,6 +178,12 @@ function pie_m_bg( g, r1, r2, a1, a2, p ) {
 	if( p.marriage_place !== undefined && p.marriage_place != "" ) {
 		c += " ma-"+lieux[p.marriage_place].c;
 	}
+	if (p.marriage_length !== undefined && p.marriage_length != "") {
+			var marriageClass = marriageLengthClass(p.marriage_length);
+			if (marriageClass !== "") {
+					c += " " + marriageClass;
+			}
+	}
 	path.setAttribute( "class", c );
 	g.append(path);
 }
@@ -195,10 +201,28 @@ function pie_m( g, r1, r2, a1, a2, p ) {
 		if( p.marriage_place !== undefined && p.marriage_place != "" ) {
 			document.getElementById( "ma-" + lieux[p.marriage_place].c ).classList.remove("hidden");
 		}
+		if (p.marriage_length !== undefined && p.marriage_length != "") {
+				var marriageClass = marriageLengthClass(p.marriage_length);
+				if (marriageClass !== "") {
+						var element = document.getElementById(marriageClass);
+						if (element) {
+								element.classList.add("hl");
+						}
+				}
+		}
 	};
 	path.onmouseleave = function() {
 		if( p.marriage_place !== undefined && p.marriage_place != "" ) {
 			document.getElementById( "ma-" + lieux[p.marriage_place].c ).classList.add("hidden");
+		}
+		if (p.marriage_length !== undefined && p.marriage_length != "") {
+			var marriageClass = marriageLengthClass(p.marriage_length);
+			if (marriageClass !== "") {
+					var element = document.getElementById(marriageClass);
+					if (element) {
+							element.classList.remove("hl");
+					}
+			}
 		}
 	};
 }
@@ -743,6 +767,30 @@ lieux_a.forEach( function( l, i ) {
 	};
 });
 
+[ "DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6", "DAM7" ].forEach(function(id) {
+		var el = document.getElementById(id);
+		if (el) {
+				el.onmouseenter = function() {
+						// Highlight tous les éléments avec cette classe de durée de mariage
+						var elements = document.getElementsByClassName(id);
+						for (var e of elements) {
+								e.classList.add("highlight");
+						}
+						// Highlight de l'élément de légende lui-même
+						document.getElementById(id).classList.add("hl");
+				};
+				
+				el.onmouseleave = function() {
+						// Retirer le highlight
+						var elements = document.getElementsByClassName(id);
+						for (var e of elements) {
+								e.classList.remove("highlight");
+						}
+						document.getElementById(id).classList.remove("hl");
+				};
+		}
+});
+
 var standard_height, standard_width;
 var standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
 standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz";
@@ -1009,6 +1057,22 @@ if (tool == "place_hl") {
 		// Les checkboxes sont déjà configurées par setColorPreset() plus haut
 		applyColorization();
 }
+function marriageLengthClass(length) {
+    var years = parseInt(length);
+    if (isNaN(years) || years < 0) {
+        return ""; 
+    }
+    
+    // Paliers basés sur une courte analyse démographique historique
+    if (years <= 4) return "DAM0";      // 0-4 ans
+    if (years <= 14) return "DAM1";     // 5-14 ans
+    if (years <= 24) return "DAM2";     // 15-24 ans
+    if (years <= 34) return "DAM3";     // 25-34 ans
+    if (years <= 44) return "DAM4";     // 35-44 ans
+    if (years <= 54) return "DAM5";     // 45-54 ans
+    if (years <= 64) return "DAM6";     // 55-64 ans
+    return "DAM7";                      // 65+ ans
+}
 function addNavigationHelp() {
 	var helpPanel = document.createElement('div');
 	helpPanel.id = 'navigation-help';
@@ -1041,5 +1105,23 @@ function addNavigationHelp() {
 	
 	document.body.appendChild(helpPanel);
 }
+function debugMarriageLength() {
+    console.log("=== DEBUG DURÉE DE MARIAGE ===");
+    var count = 0;
+    Object.keys(ancestor).forEach(function(key) {
+        var person = ancestor[key];
+        if (person.marriage_length !== undefined && person.marriage_length !== "") {
+            console.log(key + " - " + person.fn + " " + person.sn + 
+                       " - Durée mariage: " + person.marriage_length + " ans" +
+                       " - Classe: " + marriageLengthClass(person.marriage_length));
+            count++;
+        }
+    });
+    console.log("Total mariages avec durée: " + count);
+}
+
+// Appeler le debug pour vérifier que les données sont bien présentes
+console.log("🎨 Support durée de mariage chargé");
+
 addNavigationHelp();
 fitScreen();
