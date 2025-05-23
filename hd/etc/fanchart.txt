@@ -55,10 +55,10 @@
     <br>
   <button id="b-places-colorise" class="button btn btn-lg" title="Activer la colorisation globale des lieux" tabindex="8"><i class="fa fa-paintbrush fa-fw"></i></button>
   <input type="checkbox" id="bi" title="N" tabindex="9"><label for="bi">N</label>
-  <input type="checkbox" id="ba" title="B"><label for="ba">B</label>
+  <span id="bal"><input type="checkbox" id="ba" title="B"><label for="ba">B</label></span>
   <input type="checkbox" id="ma" title="M" tabindex="10"><label for="ma">M</label>
   <input type="checkbox" id="de" title="D"><label for="de">D</label>
-  <input type="checkbox" id="bu" title="S" tabindex="11"><label for="bu">S</label>
+  <span id="bul"><input type="checkbox" id="bu" title="S" tabindex="11"><label for="bu">S</label></span>
   <br>
   <button id="b-death-age" class="button btn btn-lg" title="Activer la colorisation de l'âge de décès" tabindex="12"><i class="fa fa-cross fa-fw"></i></button>
   <button id="b-no-tool" class="button btn btn-lg" title="Désactiver les outils" tabindex="13"><i class="fa fa-power-off fa-fw"></i></button>
