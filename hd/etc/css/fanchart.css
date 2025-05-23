@@ -64,36 +64,69 @@ body.place_color .square { display: inline; color: transparent; }
 
 /* death age */
 #death-age {
-  margin: 5px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 18px;
+  transform: translateX(-160%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px;
+  z-index: 1000;
+  display: flex;
+  gap: 20px;
 }
 
-body.death-age svg .DA0  { fill: hsl(30, 100%, 90%)}
-body.death-age svg .DA1  { fill: hsl(30, 100%, 80%)}
-body.death-age svg .DA2  { fill: hsl(30, 100%, 70%)}
-body.death-age svg .DA3  { fill: hsl(30, 100%, 60%)}
-body.death-age svg .DA4  { fill: hsl(30, 100%, 50%)}
-body.death-age svg .DA5  { fill: hsl(30, 100%, 45%)}
-body.death-age svg .DA6  { fill: hsl(30, 100%, 40%)}
-body.death-age svg .DA7  { fill: hsl(30, 100%, 35%)}
+/* === PALETTE ACCESSIBLE BLEU/ROSE (RECOMMANDÉE WCAG) === */
+/* Âges au décès - Dégradé BLEU (hsl 210° - bleu accessible) */
+body.death-age svg .DA0 { fill: hsl(210, 100%, 90%) }  /* Bleu très clair */
+body.death-age svg .DA1 { fill: hsl(210, 100%, 85%) }  /* Bleu clair */
+body.death-age svg .DA2 { fill: hsl(210, 100%, 80%) }  /* Bleu moyen-clair */
+body.death-age svg .DA3 { fill: hsl(210, 100%, 75%) }  /* Bleu moyen */
+body.death-age svg .DA4 { fill: hsl(210, 100%, 70%) }  /* Bleu */
+body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }  /* Bleu foncé */
+body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }  /* Bleu plus foncé */
+body.death-age svg .DA7 { fill: hsl(210, 100%, 55%) }  /* Bleu marine */
+
+/* Durées de mariage - Dégradé ROSE (hsl 330° - rose accessible) */
+/* Commence à 85% pour éviter le "trop blanc" */
+body.death-age svg .DAM0 { fill: hsl(330, 100%, 85%) } /* Rose clair mais visible */
+body.death-age svg .DAM1 { fill: hsl(330, 100%, 80%) } /* Rose */
+body.death-age svg .DAM2 { fill: hsl(330, 100%, 75%) } /* Rose moyen */
+body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) } /* Rose foncé */
+body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) } /* Rose très foncé */
+body.death-age svg .DAM5 { fill: hsl(330, 100%, 60%) } /* Magenta clair */
+body.death-age svg .DAM6 { fill: hsl(330, 100%, 55%) } /* Magenta */
+body.death-age svg .DAM7 { fill: hsl(330, 100%, 50%) } /* Magenta foncé */
+
+/* Couleurs correspondantes pour la légende */
+body.death-age span.DA0 { color: hsl(210, 100%, 90%) }
+body.death-age span.DA1 { color: hsl(210, 100%, 80%) }
+body.death-age span.DA2 { color: hsl(210, 100%, 70%) }
+body.death-age span.DA3 { color: hsl(210, 100%, 60%) }
+body.death-age span.DA4 { color: hsl(210, 100%, 50%) }
+body.death-age span.DA5 { color: hsl(210, 100%, 45%) }
+body.death-age span.DA6 { color: hsl(210, 100%, 40%) }
+body.death-age span.DA7 { color: hsl(210, 100%, 35%) }
+
+body.death-age span.DAM0 { color: hsl(330, 100%, 80%) }
+body.death-age span.DAM1 { color: hsl(330, 100%, 75%) }
+body.death-age span.DAM2 { color: hsl(330, 100%, 70%) }
+body.death-age span.DAM3 { color: hsl(330, 100%, 65%) }
+body.death-age span.DAM4 { color: hsl(330, 100%, 60%) }
+body.death-age span.DAM5 { color: hsl(330, 100%, 55%) }
+body.death-age span.DAM6 { color: hsl(330, 100%, 50%) }
+body.death-age span.DAM7 { color: hsl(330, 100%, 45%) }
 
 body:not(.death-age) #death-age {
   display: none;
 }
 
-body.death-age span.DA0  { color: hsl(30, 100%, 90%)}
-body.death-age span.DA1  { color: hsl(30, 100%, 80%)}
-body.death-age span.DA2  { color: hsl(30, 100%, 70%)}
-body.death-age span.DA3  { color: hsl(30, 100%, 60%)}
-body.death-age span.DA4  { color: hsl(30, 100%, 50%)}
-body.death-age span.DA5  { color: hsl(30, 100%, 45%)}
-body.death-age span.DA6  { color: hsl(30, 100%, 40%)}
-body.death-age span.DA7  { color: hsl(30, 100%, 35%)}
-
 .arrow {
-  color: transparent;
+  color: #F4F4F4;
 }
 body.death-age .hl .arrow {
-  color: black;
+  color: lightgrey;
+  cursor: pointer;
 }
 
 body {
