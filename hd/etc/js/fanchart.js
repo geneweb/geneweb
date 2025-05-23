@@ -96,7 +96,7 @@ function pie( g, r1, r2, a1, a2, p ) {
 	);
 	path.setAttribute( "class", "link" );
 	var title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-	title.textContent = "(Ancestor) " + p.fn + " " + p.sn;
+	title.textContent = "(Sosa " + p.sosa + ") " + p.fn + " " + p.sn + " (" + p.death_age + " ans)";
 	path.appendChild(title);
 	g.append(path);
 	path.onclick = function( e ) {
@@ -196,6 +196,10 @@ function pie_m( g, r1, r2, a1, a2, p ) {
 		' A ' + r1 + ' ' + r1 + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 0 ' + pos_x(r1, a1) + ',' + pos_y(r1, a1) +
 		' Z'
 	);
+	path.setAttribute( "class", "link" );
+	var title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+	title.textContent = p.marriage_length + " années de mariage";
+	path.appendChild(title);
 	g.append(path);
 	path.onmouseenter = function() {
 		if( p.marriage_place !== undefined && p.marriage_place != "" ) {
@@ -278,7 +282,7 @@ function circle( g, r, cx, cy, p ) {
 	circle.setAttribute( "r", r );
 	circle.setAttribute( "class", "link" );
 	var title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-	title.textContent = "(Cujus) " + p.fn + " " + p.sn;
+	title.textContent = "(Sosa 1) " + p.fn + " " + p.sn + " (" + p.death_age + " ans)";
 	circle.appendChild(title);
 	g.append(circle);
 	circle.onclick = function( e ) {

@@ -4156,6 +4156,13 @@ and eval_family_field_var conf base env
   | [ "date_s" ] | [ "dates" ] ->
       VVstring
         (DateDisplay.short_family_dates_text conf base true fam :> string)
+  | "divorce_date" :: sl -> (
+      match get_divorce fam with
+      | Divorced cd when m_auth -> (
+          match Date.od_of_cdate cd with
+          | Some d -> eval_date_field_var conf d sl
+          | None -> null_val)
+      | _ -> null_val)
   | "father" :: sl -> (
       match get_env "f_link" env with
       | Vbool _ -> raise Not_found
