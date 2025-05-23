@@ -396,7 +396,7 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;i=%index;&m=A&t=F&tf1=sb&v=%max_anc_level;&maxv=%max_anc_level;"><span class="fa fa-align-justify fa-fw mr-2"></span>[*surnames branch]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=4&tool=place"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=CT&hi=H&v=5&scale=100&fs=17&sosa=on" title="[*compact tree] [with] %self;"><span class="fa fa-table-cells fa-fw mr-2"></span>[*compact tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h6&sosa=1" title="H-tree 6 generation with CSS (127 ind.)"><span class="fa fa-border-none fa-fw mr-2"></span>6 [generation/generations]1</a>
