@@ -3,7 +3,7 @@ const places_list = document.getElementById( "places_list" );
 var sheet;
 for( var i in document.styleSheets ) {
 	if( document.styleSheets[i].title == "fc-auto" ) {
-        	sheet = document.styleSheets[i];
+					sheet = document.styleSheets[i];
 		break;
 	}
 }
@@ -95,13 +95,21 @@ function pie( g, r1, r2, a1, a2, p ) {
 		' Z'
 	);
 	path.setAttribute( "class", "link" );
+	var title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+	title.textContent = "(Ancestor) " + p.fn + " " + p.sn;
+	path.appendChild(title);
 	g.append(path);
 	path.onclick = function( e ) {
-		if( true == e.shiftKey ) {
-			var oc = p.oc;
-			if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-			window.location = link_to_person + "p=" + p.fnk + "&n=" + p.snk + oc
+		if (typeof link_to_person === 'undefined' || link_to_person === '') {
+			alert("Erreur: Impossible d’accéder à la fiche individuelle");
+			return;
 		}
+		var oc = p.oc;
+		if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
+		if (e.ctrlKey || e.shiftKey) {
+			window.open(link_to_person + "p=" + p.fnk + "&n=" + p.snk + oc, '_blank');
+		}
+		e.stopPropagation();
 	};
 	path.onmouseenter = function() {
 		if( p.birth_place !== undefined && p.birth_place != "" ) {
@@ -245,13 +253,17 @@ function circle( g, r, cx, cy, p ) {
 	circle.setAttribute( "cy", cy );
 	circle.setAttribute( "r", r );
 	circle.setAttribute( "class", "link" );
+	var title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+	title.textContent = "(Cujus) " + p.fn + " " + p.sn;
+	circle.appendChild(title);
 	g.append(circle);
 	circle.onclick = function( e ) {
-		if( true == e.shiftKey ) {
-			var oc = p.oc;
-			if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
-			window.location = link_to_person + "p=" + p.fnk + "&n=" + p.snk + oc
+		var oc = p.oc;
+		if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }
+		if (e.ctrlKey || e.shiftKey) {
+			window.open(link_to_person + "p=" + p.fnk + "&n=" + p.snk + oc, '_blank');
 		}
+		e.stopPropagation();
 	};
 	circle.onmouseenter = function() {
 		if( p.birth_place !== undefined && p.birth_place != "" ) {
@@ -309,12 +321,12 @@ function text_S1( g, x, y, p ) {
 	}
 	text.setAttribute( "class", c );
 	var ts1 = 100;
-        standard.textContent = p.fn;
+				standard.textContent = p.fn;
 	if( standard.getBBox().width > 2*a_r[0]*security ) {
 		ts1 = Math.round( 100 * 2*a_r[0]*security / standard.getBBox().width );
 	}
 	var ts2 = 100;
-        standard.textContent = p.sn;
+				standard.textContent = p.sn;
 	if( standard.getBBox().width > 2*a_r[0]*security ) {
 		ts2 = Math.round( 100 * 2*a_r[0]*security / standard.getBBox().width );
 	}
@@ -347,7 +359,7 @@ function path2( g, id, r1, r2, a ) {
 	return Math.abs(r2-r1);
 }
 function text2( g, pid, t, c, l, h ) {
-        standard.textContent = t;
+				standard.textContent = t;
 	var ts_l = 100;
 	if( standard.getBBox().width > l*security ) {
 		ts_l = Math.round( 100 * l*security / standard.getBBox().width );
@@ -491,8 +503,8 @@ fanchart.onmousemove = function(e) {
 	if( drag_state ) {
 		e.preventDefault();
 		set_svg_viewbox( svg_viewbox_x - Math.round(e.movementX * svg_viewbox_w / window_w),
-                                 svg_viewbox_y - Math.round(e.movementY * svg_viewbox_h / window_h),
-                                 svg_viewbox_w, svg_viewbox_h );
+																 svg_viewbox_y - Math.round(e.movementY * svg_viewbox_h / window_h),
+																 svg_viewbox_w, svg_viewbox_h );
 	}
 };
 
@@ -516,7 +528,7 @@ const center_y = max_r + svg_margin;
 
 const svg_w = 2 * center_x;
 const svg_h = 2 * svg_margin + max_r +
-              Math.max( a_r[0], Math.round( max_r * Math.sin(Math.PI/180*(d_all-180)/2) ) );
+							Math.max( a_r[0], Math.round( max_r * Math.sin(Math.PI/180*(d_all-180)/2) ) );
 const svg_ratio = svg_w / svg_h;
 
 var svg_viewbox_x, svg_viewbox_y, svg_viewbox_w, svg_viewbox_h;
@@ -891,46 +903,83 @@ document.getElementById("b-places-hl").onclick = function() {
 	document.body.className = "places-list place_hl";
 	tool = "place_hl";
 };
-document.getElementById("b-places-colorise").onclick = function() {
-	document.body.className = "places-list place_color";
-	tool = "place_color";
-	fanchart.classList.add( "bi" );
-	fanchart.classList.add( "ba" );
-	fanchart.classList.add( "ma" );
-	fanchart.classList.add( "de" );
-	fanchart.classList.add( "bu" );
-	document.getElementById( "bi" ).checked = true;
-	document.getElementById( "ba" ).checked = true;
-	document.getElementById( "ma" ).checked = true;
-	document.getElementById( "de" ).checked = true;
-	document.getElementById( "bu" ).checked = true;
-};
-document.getElementById( "bi" ).checked = true;
-document.getElementById( "ba" ).checked = true;
-document.getElementById( "ma" ).checked = true;
-document.getElementById( "de" ).checked = true;
-document.getElementById( "bu" ).checked = true;
-if( !has_ba ) {
-	document.getElementById( "ba" ).classList.add( "none" );
+function applyColorization() {
+		var bi_checked = document.getElementById("bi").checked;
+		var ba_checked = document.getElementById("ba").checked;
+		var ma_checked = document.getElementById("ma").checked;
+		var de_checked = document.getElementById("de").checked;
+		var bu_checked = document.getElementById("bu").checked;
+		
+		fanchart.classList.toggle("bi", bi_checked);
+		fanchart.classList.toggle("ba", ba_checked);
+		fanchart.classList.toggle("ma", ma_checked);
+		fanchart.classList.toggle("de", de_checked);
+		fanchart.classList.toggle("bu", bu_checked);
+		
+		console.log("🎨 Colorisation appliquée - N:" + bi_checked + " B:" + ba_checked + " M:" + ma_checked + " D:" + de_checked + " S:" + bu_checked);
 }
-if( !has_bu ) {
-	document.getElementById( "bu" ).classList.add( "none" );
+function setColorPreset(bi, ba, ma, de, bu) {
+		document.getElementById("bi").checked = bi;
+		document.getElementById("ba").checked = ba;
+		document.getElementById("ma").checked = ma;
+		document.getElementById("de").checked = de;
+		document.getElementById("bu").checked = bu;
+		applyColorization();
 }
-document.getElementById("bi").onclick = function() {
-	fanchart.classList.toggle( "bi" );
-};
-document.getElementById("ba").onclick = function() {
-	fanchart.classList.toggle( "ba" );
-};
-document.getElementById("ma").onclick = function() {
-	fanchart.classList.toggle( "ma" );
-};
-document.getElementById("de").onclick = function() {
-	fanchart.classList.toggle( "de" );
-};
-document.getElementById("bu").onclick = function() {
-	fanchart.classList.toggle( "bu" );
-};
+function toggleColorMode() {
+		console.log("🔄 toggleColorMode() appelé");
+		
+		if (!document.body.classList.contains('place_color')) {
+				// Si pas en mode colorisation, l'activer en mode "Mariages seuls"
+				document.body.className = "places-list place_color";
+				tool = "place_color";
+				setColorPreset(false, false, true, false, false);
+				console.log("🎨 Mode: Mariages seuls activé");
+				return;
+		}
+
+		// Détecter le mode actuel
+		var bi = document.getElementById("bi").checked;
+		var ba = document.getElementById("ba").checked;
+		var ma = document.getElementById("ma").checked;
+		var de = document.getElementById("de").checked;
+		var bu = document.getElementById("bu").checked;
+
+		console.log("État actuel - N:" + bi + " B:" + ba + " M:" + ma + " D:" + de + " S:" + bu);
+
+		// Cycle entre les modes
+		if (!bi && !ba && ma && !de && !bu) {
+				// Mode 1 → Mode 2 : Naissances + Mariages
+				setColorPreset(true, false, true, false, false);
+				console.log("🎨 Mode: Naissances + Mariages");
+		} else if (bi && !ba && ma && !de && !bu) {
+				// Mode 2 → Mode 3 : Mariages + Décès
+				setColorPreset(false, false, true, true, false);
+				console.log("🎨 Mode: Mariages + Décès");
+		} else if (!bi && !ba && ma && de && !bu) {
+				// Mode 3 → Mode 4 : Tout activé (si données disponibles)
+				setColorPreset(true, has_ba, true, true, has_bu);
+				console.log("🎨 Mode: Toutes couleurs");
+		} else {
+				// Mode 4 → Désactivation
+				document.body.className = "";
+				tool = "";
+				setColorPreset(false, false, false, false, false); // AJOUT : décocher toutes les cases
+				console.log("🎨 Mode: Sans colorisation");
+		}
+}
+setColorPreset(false, false, true, false, false);
+if (!has_ba) {
+		document.getElementById("bal").classList.add("none");
+}
+if (!has_bu) {
+		document.getElementById("bul").classList.add("none");
+}
+document.getElementById("bi").onclick = applyColorization;
+document.getElementById("ba").onclick = applyColorization;
+document.getElementById("ma").onclick = applyColorization;
+document.getElementById("de").onclick = applyColorization;
+document.getElementById("bu").onclick = applyColorization;
 document.getElementById("b-death-age").onclick = function() {
 	document.body.className = "death-age";
 	tool = "death-age";
@@ -942,14 +991,55 @@ document.getElementById("b-no-tool").onclick = function() {
 document.getElementById("b-no-buttons").onclick = function() {
 	document.getElementById("buttons").style.display = "none";
 };
-
+document.getElementById("b-places-colorise").onclick = function() {
+		toggleColorMode();
+};
 // Initial state for tools
-if( tool == "place_hl" ) {
-	document.body.className = "places-list place_hl";
-} else if( tool == "place_color" ) {
-	document.body.className = "places-list place_color";
-} else if( tool == "death-age" ) {
-	document.body.className = "death-age";
+if (tool == "place_hl") {
+		document.body.className = "places-list place_hl";
+} else if (tool == "place_color") {
+		document.body.className = "places-list place_color";
+		applyColorization(); // Applique selon l'état des checkboxes
+} else if (tool == "death-age") {
+		document.body.className = "death-age";
+} else {
+		// Par défaut : activer la colorisation en mode "Mariages seuls"
+		document.body.className = "places-list place_color";
+		tool = "place_color";
+		// Les checkboxes sont déjà configurées par setColorPreset() plus haut
+		applyColorization();
 }
-
+function addNavigationHelp() {
+	var helpPanel = document.createElement('div');
+	helpPanel.id = 'navigation-help';
+	helpPanel.style.cssText = `
+		position: absolute;
+		top: 5px;
+		left: 110px;
+		background: rgba(0,0,0,0.8);
+		color: white;
+		padding: 8px 12px;
+		border-radius: 4px;
+		font-size: 12px;
+		z-index: 1000;
+		max-width: 200px;
+		transition: opacity 0.3s;
+	`;
+	helpPanel.innerHTML = `
+		<div style="font-weight: bold; margin-bottom: 4px;">💡 Navigation</div>
+		<div>– Ctrl+clic: fiche individuelle</div>
+		<div>– <span class="text-success">▲</span> redéfinir la racine</div>
+	`;
+	
+	setTimeout(() => {
+		helpPanel.style.opacity = '0.4';
+	}, 10000);
+	
+	helpPanel.onclick = function() {
+		helpPanel.style.display = 'none';
+	};
+	
+	document.body.appendChild(helpPanel);
+}
+addNavigationHelp();
 fitScreen();
