@@ -235,7 +235,6 @@ let bold_italic_syntax s =
 
 let syntax_links conf wi s =
   let buff = Buffer.create 80 in
-  let chars = [ '{'; '%'; '\''; '[' ] in
   let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
   let slen = String.length s in
   let rec loop quot_lev pos i =
@@ -254,12 +253,9 @@ let syntax_links conf wi s =
          || s.[i + 1] = '{'
          || s.[i + 1] = '}'
          || s.[i + 1] = '\'')
-      && List.mem s.[i + 1] [ '['; ']'; '{'; '}'; '\'' ]
     then (
       Buffer.add_char buff s.[i + 1];
       loop quot_lev pos (i + 2))
-    else if s.[i] = '%' && i < slen - 1 && s.[i + 1] = '/' then
-      loop quot_lev pos (i + 2) (* ignore !!?? *)
     else if s.[i] = '%' then (
       Buffer.add_char buff '%';
       loop quot_lev pos (i + 1))
@@ -378,16 +374,8 @@ let syntax_links conf wi s =
           Buffer.add_string buff t;
           loop quot_lev (pos + 1) j
       | NotesLinks.WLnone (j, none_s) -> (
-          match find_first_char_from_list none_s 0 chars with
-          | None ->
-              Buffer.add_string buff none_s;
-              loop quot_lev pos j
-          | Some k when none_s.[k] <> '[' ->
-              Buffer.add_string buff (String.sub none_s 0 k);
-              loop quot_lev pos (j - String.length none_s + k)
-          | Some k ->
-              Buffer.add_char buff '[';
-              loop quot_lev pos (j - String.length none_s + k + 1))
+          Buffer.add_string buff none_s;
+          loop quot_lev pos j)
   in
   loop Zero 1 0;
   Buffer.contents buff

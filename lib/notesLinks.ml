@@ -37,7 +37,9 @@ let misc_notes_link s i =
     (* assume no link up to [j] and find next link position *)
     if j < slen then
       match s.[j] with
-      | '%' -> wlnone (j + 2)
+      | '%' -> WLnone (j, cut j)
+      | '\'' -> WLnone (j, cut j)
+      | '{' -> WLnone (j, cut j)
       | '[' ->
           if j > i && j + 1 < slen && s.[j + 1] = '[' then WLnone (j, cut j)
           else wlnone (j + 1)
