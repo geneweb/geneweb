@@ -76,29 +76,29 @@ body.place_color .square { display: inline; color: transparent; }
   gap: 20px;
 }
 
-/* === PALETTE ACCESSIBLE BLEU/ROSE (RECOMMANDÉE WCAG) === */
-/* Âges au décès - Dégradé BLEU (hsl 210° - bleu accessible) */
-body.death-age svg .DA0 { fill: hsl(210, 100%, 90%) }  /* Bleu très clair */
+/* === PALETTE ACCESSIBLE BLEU/ROSE (RECOMMANDÃ‰E WCAG) === */
+/* Ã‚ges au dÃ©cÃ¨s - DÃ©gradÃ© BLEU (hsl 210Â° - bleu accessible) */
+body.death-age svg .DA0 { fill: hsl(210, 100%, 90%) }  /* Bleu trÃ¨s clair */
 body.death-age svg .DA1 { fill: hsl(210, 100%, 85%) }  /* Bleu clair */
 body.death-age svg .DA2 { fill: hsl(210, 100%, 80%) }  /* Bleu moyen-clair */
 body.death-age svg .DA3 { fill: hsl(210, 100%, 75%) }  /* Bleu moyen */
 body.death-age svg .DA4 { fill: hsl(210, 100%, 70%) }  /* Bleu */
-body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }  /* Bleu foncé */
-body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }  /* Bleu plus foncé */
+body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }  /* Bleu foncÃ© */
+body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }  /* Bleu plus foncÃ© */
 body.death-age svg .DA7 { fill: hsl(210, 100%, 55%) }  /* Bleu marine */
 
-/* Durées de mariage - Dégradé ROSE (hsl 330° - rose accessible) */
-/* Commence à 85% pour éviter le "trop blanc" */
+/* DurÃ©es de mariage - DÃ©gradÃ© ROSE (hsl 330Â° - rose accessible) */
+/* Commence Ã  85% pour Ã©viter le "trop blanc" */
 body.death-age svg .DAM0 { fill: hsl(330, 100%, 85%) } /* Rose clair mais visible */
 body.death-age svg .DAM1 { fill: hsl(330, 100%, 80%) } /* Rose */
 body.death-age svg .DAM2 { fill: hsl(330, 100%, 75%) } /* Rose moyen */
-body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) } /* Rose foncé */
-body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) } /* Rose très foncé */
+body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) } /* Rose foncÃ© */
+body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) } /* Rose trÃ¨s foncÃ© */
 body.death-age svg .DAM5 { fill: hsl(330, 100%, 60%) } /* Magenta clair */
 body.death-age svg .DAM6 { fill: hsl(330, 100%, 55%) } /* Magenta */
-body.death-age svg .DAM7 { fill: hsl(330, 100%, 50%) } /* Magenta foncé */
+body.death-age svg .DAM7 { fill: hsl(330, 100%, 50%) } /* Magenta foncÃ© */
 
-/* Couleurs correspondantes pour la légende */
+/* Couleurs correspondantes pour la lÃ©gende */
 body.death-age span.DA0 { color: hsl(210, 100%, 90%) }
 body.death-age span.DA1 { color: hsl(210, 100%, 80%) }
 body.death-age span.DA2 { color: hsl(210, 100%, 70%) }
@@ -185,11 +185,74 @@ textPath {
  fill: transparent;
 }
 
-#places-list, #death-age {
+#places-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#places-header {
+  flex-shrink: 0;
+  margin-top: 4px;
+  padding-left: 54px;
+  margin-bottom:Â 4px;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#sort-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  padding: 2px 6px;
+  margin-right: 4px;
+  border-radius: 3px;
+}
+#sort-toggle:hover {
+  background-color: #e9ecef !important;
+}
+
+#places-list li .square {
+  margin-left: 4px;
+}
+
+#places-list li {
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  padding-left: 4px;
+}
+
+#places-list li:hover {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+#places-list li.location-highlighted {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+#places-list {
  position: absolute;
  right: 0;
  top: 0;
 }
+
+#places-list li.sublocation .square {
+  margin-left: 4px;
+}
+
+.sublocation-indicator {
+  color: #999;
+  font-family: monospace;
+  margin-left: 8px;
+  margin-right: 2px;
+}
+
 svg {
  position: absolute;
  left: 0;
@@ -216,4 +279,24 @@ svg {
 
 svg.mono text {
  font-family: monospace;
+}
+
+/* Panneau d'aide navigation */
+#navigation-help {
+  position: absolute;
+  top: 5px;
+  left: 110px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 1000;
+  max-width: 200px;
+  transition: opacity 0.3s;
+}
+
+#navigation-help .help-title {
+  font-weight: bold;
+  margin-bottom: 4px;
 }
