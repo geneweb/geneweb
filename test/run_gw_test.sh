@@ -211,6 +211,10 @@ crl () {
            ! grep $GREPOPT -E "Not.found:|Unknown.person:" /tmp/tmp.txt; then
         echo "missing 'Not found' page, issue 2220, ${urlprfix}w=$PWD&$cmd"
         RC=$(($RC+1))
+      elif test "$cmd" = 'p=anthoine&n=geruzet&oc=0' && \
+           grep $GREPOPT "une.1ere..ligne.*ligne.terminal" /tmp/tmp.txt; then
+        echo "'text in pre tags not properly formatted, issue 2221, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
       fi
     fi
   fi
