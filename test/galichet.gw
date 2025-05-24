@@ -57,6 +57,14 @@ beg
 * et un texte alternatif '''avec''' apostrophe pour la femme [[Marie Elisabeth/Loche]]
 
 * les vues individuelles sont correctes, mais la vue sous forme de table des ascendants est incorrecte à cause de cette apostrophe.
+
+* ici je teste le tag html de prefix, dans une liste '''wiki'''
+<pre>une 1ere  ligne
+suivie d'une 2eme ligne
+et d'une 3eme
+et une ligne terminale</pre>
+*voir la fiche de [[Anthoine/Geruzet]]
+pour les même ligne dans une liste html.
 end notes
 
 pevt Galichet Jean_Charles
@@ -209,6 +217,21 @@ beg
 - h Anthoine #occu Maître_Menuisier_reçu_le_25.01.1695_à_Reims 1667 #bp _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France 16/2/1755 #dp _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
 end
 
+notes Geruzet Anthoine
+beg
+<li>exemple de note
+<li>avec des tags html et pas wiki
+<li>le 3eme élément de la liste
+<br>suivi d'un saut de ligne
+<li>ici je teste le tag de prefix, dans une liste <b>html</b>
+<pre>une 1ere  ligne
+suivie d'une 2eme ligne
+et d'une 3eme
+et une ligne terminale</pre>
+<li>voir la fiche de [[Jean Pierre/Galichet]]
+pour les même ligne dans une liste wiki.
+end notes
+
 pevt Geruzet Anthoine
 #birt 1667 #p _[Saint-Roch]_-_Paris,75,Ville-de-Paris,Ile-de-France,France
 #deat 16/2/1755 #p _[Saint-Symphorien]_-_Reims,51,Marne,Champagne-Ardenne,France
@@ -317,6 +340,14 @@ notes-db
   * test la présence d'une apostrophe dans le texte alternate d'une image,
   (https://github.com/geneweb/geneweb/issues/1558)
   <br>voir les notes du couple [[Jean Pierre/Galichet]] et [[Marie Elisabeth/Loche]]
+
+  * Add '''pre''' html tag in galichet.gw in two individual notes
+  (https://github.com/geneweb/geneweb/issues/2221)
+  ** [[anthoine/geruzet]]
+     The '''pre''' is badly formatted while in a html list.
+     all lines are merged in only one line.
+  ** [[jean pierre/galichet]]
+     The '''pre''' is correctly formatted while in a wiki list.
 end notes-db
 
 # extended page "Andre" used by:
