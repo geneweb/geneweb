@@ -7,10 +7,21 @@
 <link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;">
 <style title="fc-auto"></style>
 </head>
-%define;somebody_fanchart_info(xx,iii)
-  "S%xx.anc_sosa.v;":{"fn":"%if(xx.public_name != "")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key","sn":"%xx.surname","snk":"%xx.surname_key;","oc":"%xx.occ","dates":'%xx.dates;',"birth_place":"%xx.birth_place;","death_place":"%xx.death_place","death_age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age;%end;%else;%if;xx.computable_age;%xx.age;%end;%end;","has_parents":%if(xx.has_parents)true%else;false%end;%nn;
+%define;get_random(xxx)
+  %random.init;
+  %random.xxx;
+%end;
+%define;dice()
+  %random.init;
+  %apply;nth%with;one/two/three/four/five/six%and;%random.6;%end;
+%end;
+%let;random_index;%if;(nb_persons.v!=0)%apply;get_random(nb_persons.v)%end;%in;
+%define;somebody_fanchart_info(xx,iii,ccc)
+  "%if;("xx"="ancestor")S%xx.anc_sosa.v;%nn;
+  %elseif;("xx"="spouse")SPccc%nn;
+  %elseif;("xx"="child")CHccc%end;":{"fn":"%if(xx.public_name != "")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key","sn":"%xx.surname","snk":"%xx.surname_key;","oc":"%xx.occ","dates":'%xx.dates;',"birth_place":"%xx.birth_place;","death_place":"%xx.death_place","death_age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age;%end;%else;%if;xx.computable_age;%xx.age;%end;%end;"%if;("xx"!="child"),"has_parents":%if(xx.has_parents)true%else;false%end;%end;%nn;
   %if;(e.ba = "on" and xx.baptism_place != ""),"baptism_place":"%xx.baptism_place;"%end;
-  %if;(e.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;,"sosa":"%xx.anc_sosa.v;"
+  %if;(e.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;%if;("xx"="ancestor"),"sosa":"%xx.anc_sosa.v;"%end;
   %if;(xx.index!=iii and xx.is_male)
     %foreach;xx.family;
       %if;(family.index = xx.family.index)
@@ -30,7 +41,7 @@
               %end;
             %elseif;(xx.spouse.is_dead and xx.spouse.death_date.year!="")
               %expr(xx.spouse.death_date.year-family.marriage_date.year)
-            %else;
+            %elseif;(not xx.is_dead or not xx.spouse.is_dead)
               %expr(today.year-family.marriage_date.year)
             %end;
           %else;
@@ -52,14 +63,13 @@
 <div id="places-list"><ul id="places_list"></ul></div>
 <div id="death-age">
 <div><b>[*age]</b><ul>
-<li id="DA0"><span class="arrow">▶</span><span class="DA0">■</span>  0-14</li>
-<li id="DA1"><span class="arrow">▶</span><span class="DA1">■</span> 15-29</li>
-<li id="DA2"><span class="arrow">▶</span><span class="DA2">■</span> 30-44</li>
-<li id="DA3"><span class="arrow">▶</span><span class="DA3">■</span> 45-59</li>
-<li id="DA4"><span class="arrow">▶</span><span class="DA4">■</span> 60-74</li>
-<li id="DA5"><span class="arrow">▶</span><span class="DA5">■</span> 75-89</li>
-<li id="DA6"><span class="arrow">▶</span><span class="DA6">■</span> 90-104</li>
-<li id="DA7"><span class="arrow">▶</span><span class="DA7">■</span> 105+</li>
+<li id="DA1"><span class="arrow">▶</span><span class="DA0">■</span>  0-29</li>
+<li id="DA2"><span class="arrow">▶</span><span class="DA1">■</span> 30-44</li>
+<li id="DA3"><span class="arrow">▶</span><span class="DA2">■</span> 45-59</li>
+<li id="DA4"><span class="arrow">▶</span><span class="DA3">■</span> 60-74</li>
+<li id="DA5"><span class="arrow">▶</span><span class="DA4">■</span> 75-89</li>
+<li id="DA6"><span class="arrow">▶</span><span class="DA5">■</span> 90-104</li>
+<li id="DA7"><span class="arrow">▶</span><span class="DA6">■</span> 105+</li>
 </ul></div>
 <div><b>[*marriage/marriages]0</b><ul>
 <li id="DAM0"><span class="arrow">▶</span><span class="DAM0">■</span>  0- 4</li>
@@ -68,8 +78,8 @@
 <li id="DAM3"><span class="arrow">▶</span><span class="DAM3">■</span> 25-34</li>
 <li id="DAM4"><span class="arrow">▶</span><span class="DAM4">■</span> 35-44</li>
 <li id="DAM5"><span class="arrow">▶</span><span class="DAM5">■</span> 45-54</li>
-<li id="DAM6"><span class="arrow">▶</span><span class="DAM6">■</span> 55-65</li>
-<li id="DAM7"><span class="arrow">▶</span><span class="DAM7">■</span> 65+</li>
+<li id="DAM6"><span class="arrow">▶</span><span class="DAM6">■</span> 55+</li>
+
 </ul></div>
 </div>
 %if;(e.pdf!="on")
@@ -97,6 +107,10 @@
   <button id="b-no-tool" class="button btn btn-lg" title="Désactiver les outils" tabindex="13"><i class="fa fa-power-off fa-fw"></i></button>
   <br>
   <button id="b-no-buttons" class="button" title="Masquer tous les boutons" tabindex="14"><i class="fa fa-minus fa-fw"></i></button>
+  <a role="button" class="button btn btn-lg" id="b-rng" title="[*random individual]" tabindex="15"
+        href="%apply;url_set%with;i/p/n/oc/file%and;%random_index;%end;"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs"></i>
+        <span class="sr-only">[*random individual]</span>
+   </a>
   </div>
 %end;
 <svg id="fanchart" class="bi ba ma de bu%if;(e.mono = "on") mono%end;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
@@ -115,9 +129,33 @@ var ancestor = {
 %foreach;ancestor_level(e.v)
   %foreach;ancestor;
     %if;(ancestor.same = "")
-      %apply;somebody_fanchart_info("ancestor", index)
+      %apply;somebody_fanchart_info("ancestor", index, "")
     %else;
       %apply;somebody_fanchart_same("ancestor")
+    %end;
+  %end;
+%end;
+};
+
+%reset_count;
+var spouses = {
+%if;has_families;
+  %foreach;family;
+    %apply;somebody_fanchart_info("spouse", index, count)
+    %incr_count;
+  %end;
+%end;
+};
+
+%reset_count;
+var children = {
+%if;has_families;
+  %foreach;family;
+    %if;has_children;
+      %foreach;child;
+      %apply;somebody_fanchart_info("child", index, count)
+      %incr_count;
+      %end;
     %end;
   %end;
 %end;
