@@ -46,7 +46,7 @@ BIN_DIR="$DIST_DIR/gw"
 BASES_DIR="$DIST_DIR/bases"
 LEXICON=
 TAGS=
-GWDLOG=./distribution/gw/gwd.log
+GWDLOG=$BIN_DIR/gwd.log
 GWCGI=gwd.cgi # the cgi script name that call gwd with cgi parameter
 GWDLOGCGI=/tmp/gwd.log # associated error log
 CLEANLOG=1
@@ -203,6 +203,10 @@ crl () {
       test -n "$tstmsg" && echo "Failed $tstmsg, $nberr detected error(s)"
       grep "var.errors_list.=" /tmp/tmp.txt;
       RC=$(($RC+1))
+    elif test "$DBNAME" = "galichet" && \
+         test -z "$cmd" && ! grep $GREPOPT "m=MISC_NOTES" /tmp/tmp.txt; then
+      echo "missing Notes index button on Welcome page ${urlprfix}w=$PWD&$cmd"
+      RC=$(($RC+1))
     fi
   fi
   unset tstmsg
@@ -280,7 +284,7 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
 done
 if [ $attempt -eq $MAX_ATTEMPTS ]; then
-  echo "gwd does not seem to be running after $attempt trys"
+  echo "gwd does not seem to be running after $attempt trys\nhave a look to $GWDLOG"
   exit 1
 else
   echo "gwd start after $attempt trys"
