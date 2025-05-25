@@ -298,6 +298,14 @@ fevt
 #marr 30/10/1794 #p Paris,75000,Ville-de-Paris,Ile-de-France,France #s base_michelbonnet
 end fevt
 
+notes Dupond Marie
+beg
+* en 1ere ligne un lien vers un autre individu [[Jean Pierre/Galichet]]
+* je continue ma liste wiki
+* une ligne avec [un commentaire entre crochets qui n'est pas un url]
+* en cas d'erreur (issue #2218) tous le texte avant le 1er crochet est supprimé depuis le précédent crochet fermant.
+end notes
+
 pevt Geruzet Jean-Baptiste
 #birt 23/9/1768 #p Laon,02,Aisne,Picardie,France
 #deat 20/5/1846 #p Laon,02,Aisne,Picardie,France
@@ -348,6 +356,11 @@ notes-db
      all lines are merged in only one line.
   ** [[jean pierre/galichet]]
      The '''pre''' is correctly formatted while in a wiki list.
+
+  * Add comment line between brackets as basic test of issue #2218
+    may be other use cases to be checked.
+  ** [[marie/dupond]]
+     with brackets in a wiki list.
 end notes-db
 
 # extended page "Andre" used by:
