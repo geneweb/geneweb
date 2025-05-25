@@ -202,10 +202,15 @@ crl () {
       test -n "$tstmsg" && echo "Failed $tstmsg, $nberr detected error(s)"
       grep "var.errors_list.=" /tmp/tmp.txt;
       RC=$(($RC+1))
-    elif test "$DBNAME" = "galichet" && \
-         test -z "$cmd" && ! grep $GREPOPT "m=MISC_NOTES" /tmp/tmp.txt; then
-      echo "missing Notes index button on Welcome page ${urlprfix}w=$PWD&$cmd"
-      RC=$(($RC+1))
+    elif test "$DBNAME" = "galichet"; then
+      if test -z "$cmd" && ! grep $GREPOPT "m=MISC_NOTES" /tmp/tmp.txt; then
+        echo "missing Notes index button on Welcome page ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      elif test "$cmd" = "p=xxx&n=yyy" && \
+           ! grep $GREPOPT "Not.found:" /tmp/tmp.txt; then
+        echo "missing 'Not found' page, issue 2220, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      fi
     fi
   fi
   unset tstmsg
