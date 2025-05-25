@@ -218,7 +218,7 @@ crl () {
         echo "'text in pre tags not properly formatted, issue 2221, ${urlprfix}w=$PWD&$cmd"
         RC=$(($RC+1))
       elif test "$cmd" = 'p=marie&n=dupond&oc=0' && \
-           ! grep $GREPOPT "Galichet.*un.commentaire.entre.crochets" /tmp/tmp.txt; then
+           grep $GREPOPT "Galichet.*un.commentaire.entre.crochets" /tmp/tmp.txt; then
         echo "'Failure parsing notes with brackets, issue 2218, ${urlprfix}w=$PWD&$cmd"
         RC=$(($RC+1))
       fi
