@@ -2,6 +2,18 @@
 open Config
 open Def
 
+val hash_file : string -> string option
+(** [hash_file path] Compute the MD5 hash of the file at [path]. Returns
+    [Some hex] on success or [None] if the file couldn’t be read. *)
+
+val hash_file_cached : string -> string option
+(** [hash_file_cached path] Like [hash_file], but memoizes by file modification
+    time to avoid recomputing the hash on repeated calls. *)
+
+val resolve_asset_file : Config.config -> string -> string
+(** [resolve_asset_file conf name] Find and return the full filesystem path for
+    asset [name] according to base directory and Secure.assets(). *)
+
 val is_welcome : bool ref
 
 val print_default_gwf_file : string -> unit
