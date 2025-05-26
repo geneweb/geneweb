@@ -225,6 +225,31 @@ let search_in_path p s =
 
 let search_in_assets = search_in_path Secure.assets
 
+let hash_file file =
+  try Some (Digest.to_hex (Digest.file file)) with Sys_error _ -> None
+
+let hash_cache = Hashtbl.create 100
+
+let hash_file_cached file =
+  try
+    let stats = Unix.stat file in
+    let mtime = stats.st_mtime in
+    match Hashtbl.find hash_cache file with
+    | cached_mtime, hash when Float.equal cached_mtime mtime -> Some hash
+    | _ -> (
+        match hash_file file with
+        | Some hash ->
+            Hashtbl.replace hash_cache file (mtime, hash);
+            Some hash
+        | None -> None)
+    | exception Not_found -> (
+        match hash_file file with
+        | Some hash ->
+            Hashtbl.replace hash_cache file (mtime, hash);
+            Some hash
+        | None -> None)
+  with Unix.Unix_error _ -> None
+
 (* Internationalization *)
 
 let start_with s i p =
@@ -1275,105 +1300,95 @@ let bpath bname = !GWPARAM.bpath bname
 
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
-
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie le chemin vers le fichier de template passé en
-    paramètre. [Args] :
+(** [Description] : Trouve un fichier template selon la hiérarchie configurée
+    [Args] :
     - conf : configuration de la base
-    - fname : le fichier de template [Retour] :
-    - string : le chemin vers le fichier de template
+    - fname : nom du fichier (ajout automatique de .txt) [Retour] : chemin
+      complet vers le fichier trouvé [Rem] : Parcourt templates configurés ->
+      base -> assets, comme un PATH *)
 
-    On cherche le fichier dans cet ordre : etc_d vaut :
-    - bases/etc/mybase en mode classique
-    - bases/mybase.gwb/etc/ en mode reorg on cherche dans :
-    - etc_d/templx/name.txt (base specific)
-    - etc_d/name.txt (base specific)
-    - gw/etc/templx/name.txt (distribution)
-    - gw/etc/name.txt (distribution)
+let find_file_in_directories directories filename =
+  let rec search = function
+    | [] -> None
+    | dir :: remaining ->
+        let full_path = Filename.concat dir filename in
+        if Sys.file_exists full_path then Some full_path else search remaining
+  in
+  search directories
 
-    [Rem] : Exporté en clair hors de ce module. *)
+let generate_search_directories conf =
+  let base_etc = !GWPARAM.etc_d conf.bname in
+  let asset_dirs = Secure.assets () in
+  let configured_templates =
+    try
+      String.split_on_char ',' (List.assoc "template" conf.base_env)
+      |> List.map String.trim
+      |> List.filter (( <> ) "*")
+    with Not_found -> [ conf.bname ]
+  in
+  let current_template =
+    match p_getenv conf.env "templ" with
+    | Some t when List.mem t configured_templates -> Some t
+    | _ -> ( match configured_templates with [] -> None | t :: _ -> Some t)
+  in
+  let ordered_templates =
+    match current_template with
+    | Some t -> t :: List.filter (( <> ) t) configured_templates
+    | None -> configured_templates
+  in
+  let template_dirs = List.map (Filename.concat base_etc) ordered_templates in
+  let asset_template_dirs =
+    List.concat
+      (List.map
+         (fun asset_dir ->
+           let etc_dir = Filename.concat asset_dir "etc" in
+           List.map (Filename.concat etc_dir) ordered_templates)
+         asset_dirs)
+  in
+  let base_dirs =
+    base_etc
+    :: List.map (fun asset_dir -> Filename.concat asset_dir "etc") asset_dirs
+  in
+  template_dirs @ asset_template_dirs @ base_dirs
+
+let resolve_filename_with_txt_extension fname =
+  if Filename.check_suffix fname ".txt" then fname else fname ^ ".txt"
 
 let etc_file_name conf fname =
-  let open Config in
-  (* On recherche si dans le nom du fichier, on a specifié son *)
-  (* répertoire, i.e. si fname est écrit comme ceci : dir/file *)
-  (* on le reconstitue avec le bon dir_separateur *)
-  let fname =
+  let normalized_fname =
     List.fold_left Filename.concat "" (String.split_on_char '/' fname)
   in
-  let file_exist dir =
-    (* etc_d/templx/name.txt or etc_d/name.txt *)
-    let fn =
-      String.concat Filename.dir_sep
-        (if dir <> "" then [ !GWPARAM.etc_d conf.bname; dir; fname ^ ".txt" ]
-         else [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ])
-    in
-    if Sys.file_exists fn then fn
-    else
-      (* etc_d/name.txt *)
-      let fn =
-        String.concat Filename.dir_sep
-          [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ]
-      in
-      (* on a déjà testé le cas dir = "" *)
-      if dir <> "" && Sys.file_exists fn then fn
-      else
-        (* assets/templx/name.txt or assets/name.txt *)
-        let fn =
-          search_in_assets
-            (String.concat Filename.dir_sep
-               (if dir <> "" then [ "etc"; dir; fname ^ ".txt" ]
-                else [ "etc"; fname ^ ".txt" ]))
-        in
-        if Sys.file_exists fn then fn
-        else
-          (* assets/name.txt *)
-          let fn =
-            search_in_assets
-              (String.concat Filename.dir_sep [ "etc"; fname ^ ".txt" ])
-          in
-          (* on a déjà testé le cas dir = "" *)
-          if dir <> "" && Sys.file_exists fn then fn else ""
-  in
-  (* Recherche le fichier template par défaut dans la liste des      *)
-  (* dossiers template définis par la variable gwf                   *)
-  (* template = templ1,templ2,*                                      *)
-  (* la valeur * autorise tous les templates                         *)
-  let rec default_templ config_templ std_fname =
-    match config_templ with
-    | [] | [ "*" ] -> std_fname
-    | x :: l -> (
-        match file_exist x with "" -> default_templ l std_fname | s -> s)
-  in
-  let config_templ =
-    try
-      let s = List.assoc "template" conf.base_env in
-      let rec loop list i len =
-        if i = String.length s then List.rev (Buff.get len :: list)
-        else if s.[i] = ',' then loop (Buff.get len :: list) (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
-      in
-      loop [] 0 0
-    with Not_found -> [ conf.bname; "*" ]
-  in
-  (* the current template folder *)
-  let dir =
-    match p_getenv conf.env "templ" with
-    | Some x when List.mem "*" config_templ -> x
-    | Some x when List.mem x config_templ -> x
-    | Some _ | None -> (
-        match config_templ with [] | [ "*" ] -> "" | x :: _ -> x)
-  in
-  (* default template file (gw/etc/fname.txt) *)
-  let std_fname = search_in_assets (Filename.concat "etc" (fname ^ ".txt")) in
+  let final_fname = resolve_filename_with_txt_extension normalized_fname in
+  let search_dirs = generate_search_directories conf in
+  match find_file_in_directories search_dirs final_fname with
+  | Some path -> path
+  | None -> search_in_assets (Filename.concat "etc" final_fname)
 
-  (* On cherche le fichier template dans l'ordre de file_exist.   *)
-  (* Si on ne trouve rien, alors on cherche le premier template   *)
-  (* par défaut tel que défini par la variable template du gwf    *)
-  match file_exist dir with
-  | "" -> default_templ config_templ std_fname
-  | s -> s
+(* ************************************************************************ *)
+(*  [Fonc] resolve_asset_file : config -> string -> string                  *)
+(* ************************************************************************ *)
+
+(** [Description] : Résout le chemin d’un asset (CSS/JS) sans ajout de .txt
+    [Args] :
+    - conf : configuration de la base
+    - fname : nom du fichier asset [Retour] : chemin complet vers l’asset [Rem]
+      : Pour les assets non-template, pas de gestion des templates *)
+
+let resolve_asset_file conf fname =
+  let normalized_fname =
+    List.fold_left Filename.concat "" (String.split_on_char '/' fname)
+  in
+  let base_etc = !GWPARAM.etc_d conf.bname in
+  let asset_dirs = Secure.assets () in
+  let search_dirs =
+    base_etc
+    :: List.map (fun asset_dir -> Filename.concat asset_dir "etc") asset_dirs
+  in
+  match find_file_in_directories search_dirs normalized_fname with
+  | Some path -> path
+  | None -> search_in_assets (Filename.concat "etc" normalized_fname)
 
 let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
