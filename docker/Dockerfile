@@ -10,14 +10,9 @@ ENV OPAMJOBS=2
 USER root
 # Install required system dependencies
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt install -yq --no-install-recommends \
-    m4=1.4.19-3 \
-    libgmp-dev=2:6.2.1+dfsg1-1.1 \
-    libpcre3-dev=2:8.39-15 \
-    libipc-system-simple-perl=1.30-2 \
-    xdot=1.2-3 \
-    zlib1g-dev=1:1.2.13.dfsg-1 \
-    pkg-config=1.8.1-1 \
+    && apt-get update \
+    && apt-get install -yq --no-install-recommends \
+    m4 libgmp-dev libpcre3-dev libipc-system-simple-perl xdot zlib1g-dev pkg-config \
     && ln -sf /usr/bin/opam-2.3 /usr/bin/opam
 
 # Initialize OPAM
@@ -32,7 +27,7 @@ RUN eval "$(opam env)" && opam install . --deps-only --with-test && opam pin add
 # Clone repository and build Geneweb
 WORKDIR /home/opam/geneweb
 COPY --chown=opam:opam . .
-RUN eval "$(opam env)" && ocaml ./configure.ml --sosa-zarith && make distrib
+RUN eval "$(opam env)" && ocaml ./configure.ml --sosa-zarith --gwd-caching --release && make distrib
 
 ###############################################################################
 #                                       STAGE 2: Export build via blank image
