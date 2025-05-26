@@ -3,6 +3,9 @@ open Config
 open Def
 open Gwdb
 
+val hash_file : string -> string
+val hash_file_cached : string -> string
+val resolve_asset_file : Config.config -> string -> string
 val is_welcome : bool ref
 
 val print_default_gwf_file : string -> unit

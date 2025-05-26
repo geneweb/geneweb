@@ -5490,6 +5490,9 @@ let eval_predefined_apply conf env f vl =
           l := SortedList.add sl !l;
           ""
       | _ -> raise Not_found)
+  | "hash", [ file ] ->
+      let fpath = resolve_asset_file conf file in
+      hash_file_cached fpath
   | "hexa", [ s ] -> Util.hexa_string s
   | "initial", [ s ] ->
       if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
