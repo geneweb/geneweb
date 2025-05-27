@@ -420,33 +420,27 @@ let w_lock ~onerror fn conf (base_name : string option) =
 let w_base ~none fn conf (bfile : string option) =
   match bfile with
   | None -> none conf
-  | Some bfile -> (
-      try
-        Gwdb.with_database bfile (fun base ->
-            let conf = make_henv conf base in
-            let conf = make_senv conf base in
-            let conf =
-              match Util.default_sosa_ref conf base with
-              | Some p ->
-                  {
-                    conf with
-                    default_sosa_ref = (get_iper p, Some p);
-                    nb_of_persons = Gwdb.nb_of_persons base;
-                    nb_of_families = Gwdb.nb_of_families base;
-                  }
-              | None ->
-                  {
-                    conf with
-                    nb_of_persons = Gwdb.nb_of_persons base;
-                    nb_of_families = Gwdb.nb_of_families base;
-                  }
-            in
-            fn conf base)
-      with _ ->
-        (* FIXME: If the exception is raised after printing the HTTP header,
-           the function [none] fails and raises an exception with a cryptic
-           backtrace. *)
-        none conf)
+  | Some bfile ->
+      Gwdb.with_database bfile (fun base ->
+          let conf = make_henv conf base in
+          let conf = make_senv conf base in
+          let conf =
+            match Util.default_sosa_ref conf base with
+            | Some p ->
+                {
+                  conf with
+                  default_sosa_ref = (get_iper p, Some p);
+                  nb_of_persons = Gwdb.nb_of_persons base;
+                  nb_of_families = Gwdb.nb_of_families base;
+                }
+            | None ->
+                {
+                  conf with
+                  nb_of_persons = Gwdb.nb_of_persons base;
+                  nb_of_families = Gwdb.nb_of_families base;
+                }
+          in
+          fn conf base)
 
 let w_person ~none fn conf base =
   match find_person_in_env conf base "" with
