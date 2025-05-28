@@ -18,6 +18,12 @@ module IperSet = Set.Make (struct
   let compare = compare_iper
 end)
 
+module IperMap = Map.Make (struct
+  type t = iper
+
+  let compare = compare_iper
+end)
+
 module IfamSet = Set.Make (struct
   type t = ifam
 
@@ -25,6 +31,12 @@ module IfamSet = Set.Make (struct
 end)
 
 module IstrSet = Set.Make (struct
+  type t = istr
+
+  let compare = compare_istr
+end)
+
+module IstrMap = Map.Make (struct
   type t = istr
 
   let compare = compare_istr
