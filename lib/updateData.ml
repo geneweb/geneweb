@@ -10,12 +10,6 @@ module PersSet = Set.Make (struct
   let compare p1 p2 = compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 end)
 
-module IstrSet = Set.Make (struct
-  type t = Gwdb.istr
-
-  let compare = compare
-end)
-
 let get_data conf =
   match Util.p_getenv conf.Config.env "data" with
   | Some "occu" -> ([ Gwdb.get_occupation ], [], [], [])
@@ -46,10 +40,10 @@ let get_data conf =
 
 let get_all_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
-  let aux : 'a. 'a -> IstrSet.t -> ('a -> Gwdb.istr) -> IstrSet.t =
+  let aux : 'a. 'a -> Gwdb.IstrSet.t -> ('a -> Gwdb.istr) -> Gwdb.IstrSet.t =
    fun arg acc get ->
     let istr = get arg in
-    if not (Gwdb.is_empty_string istr) then IstrSet.add istr acc else acc
+    if not (Gwdb.is_empty_string istr) then Gwdb.IstrSet.add istr acc else acc
   in
   let acc =
     Gwdb.Collection.fold
@@ -60,7 +54,7 @@ let get_all_data conf base =
         List.fold_left
           (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc pevents)
           acc get_pe)
-      IstrSet.empty (Gwdb.ipers base)
+      Gwdb.IstrSet.empty (Gwdb.ipers base)
   in
   let acc =
     if get_f = [] && get_fe = [] then acc
@@ -76,7 +70,7 @@ let get_all_data conf base =
             acc get_fe)
         acc (Gwdb.ifams base)
   in
-  IstrSet.elements acc
+  Gwdb.IstrSet.elements acc
 
 let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in

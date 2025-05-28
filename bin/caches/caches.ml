@@ -1,19 +1,13 @@
-module IstrSet = Set.Make (struct
-  type t = Gwdb.istr
-
-  let compare = Gwdb.compare_istr
-end)
-
 type cache = {
-  lastname : IstrSet.t;
-  first_name : IstrSet.t;
-  source : IstrSet.t;
-  occupation : IstrSet.t;
-  place : IstrSet.t;
+  lastname : Gwdb.IstrSet.t;
+  first_name : Gwdb.IstrSet.t;
+  source : Gwdb.IstrSet.t;
+  occupation : Gwdb.IstrSet.t;
+  place : Gwdb.IstrSet.t;
 }
 
 let add istr_set istr =
-  if not (Gwdb.is_empty_string istr) then IstrSet.add istr istr_set
+  if not (Gwdb.is_empty_string istr) then Gwdb.IstrSet.add istr istr_set
   else istr_set
 
 let add_lastname cache istr = { cache with lastname = add cache.lastname istr }
@@ -42,11 +36,11 @@ let add_source_from_fevent cache fevent =
 
 let empty_cache =
   {
-    lastname = IstrSet.empty;
-    first_name = IstrSet.empty;
-    source = IstrSet.empty;
-    occupation = IstrSet.empty;
-    place = IstrSet.empty;
+    lastname = Gwdb.IstrSet.empty;
+    first_name = Gwdb.IstrSet.empty;
+    source = Gwdb.IstrSet.empty;
+    occupation = Gwdb.IstrSet.empty;
+    place = Gwdb.IstrSet.empty;
   }
 
 let add_person_infos_to_cache cache person =
@@ -87,7 +81,9 @@ let occupation_cache_fname base_file =
   Filename.concat base_file "cache_occupation"
 
 let sorted_list_of_istr_set base cmp istr_set =
-  let str_list = List.rev_map (Gwdb.sou base) (IstrSet.elements istr_set) in
+  let str_list =
+    List.rev_map (Gwdb.sou base) (Gwdb.IstrSet.elements istr_set)
+  in
   List.sort cmp str_list
 
 let write_cache_data fname cache_data =

@@ -14,6 +14,10 @@ module IfamSet : sig
   include Set.S with type elt = ifam
 end
 
+module IstrSet : sig
+  include Set.S with type elt = istr
+end
+
 val insert_person :
   base ->
   (_, iper, istr) Def.gen_person ->

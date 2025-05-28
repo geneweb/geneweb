@@ -24,6 +24,12 @@ module IfamSet = Set.Make (struct
   let compare = compare_ifam
 end)
 
+module IstrSet = Set.Make (struct
+  type t = istr
+
+  let compare = compare_istr
+end)
+
 (** [insert_person base p a u]
     Add a new person with its union and ascendants in the [base].
     Allocate and returns the fresh new id for this person.
