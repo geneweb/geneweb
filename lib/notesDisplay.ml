@@ -516,14 +516,10 @@ let print conf base =
         Output.print_sstring conf
           (transl conf "note is restricted" |> Utf8.capitalize_fst)
       else
-        let templ =
-          match List.assoc "TYPE" nenv with
-          | "album" | "gallery" -> Util.open_etc_file conf "notes_gallery"
-          | (exception Not_found) | _ -> None
-        in
-        match templ with
-        | Some (ic, _) -> Templ.copy_from_templ conf Templ.Env.empty ic
-        | None -> (
+        match List.assoc "TYPE" nenv with
+        | "album" | "gallery" ->
+            Templ.output_builtin conf Templ.Env.empty "notes_gallery"
+        | (exception Not_found) | _ -> (
             let title = try List.assoc "TITLE" nenv with Not_found -> "" in
             let title = Util.safe_html title in
             match p_getint conf.env "v" with
@@ -553,22 +549,16 @@ let print_mod conf base =
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
   else
-    let title _ =
-      Output.printf conf "%s - %s%s"
-        (Utf8.capitalize_fst (transl conf "base notes"))
-        conf.bname
-        (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
-    in
     match List.assoc "TYPE" nenv with
-    | ("gallery" | "album") as typ -> (
-        match Util.open_etc_file conf ("notes_upd_" ^ typ) with
-        | Some (ic, _fname) -> Templ.copy_from_templ conf Templ.Env.empty ic
-        | None ->
-            (* FIXME: We should emit an error instead of ignoring silently the
-               absence of the template? *)
-            Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes
-              title nenv s)
+    | ("gallery" | "album") as typ ->
+        Templ.output_builtin conf Templ.Env.empty ("notes_upd_" ^ typ)
     | (exception Not_found) | _ ->
+        let title _ =
+          Output.printf conf "%s - %s%s"
+            (Utf8.capitalize_fst (transl conf "base notes"))
+            conf.bname
+            (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
+        in
         Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
           nenv s
 

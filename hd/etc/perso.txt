@@ -68,8 +68,9 @@
   %misc_names;<p>
 %end;
 %if;(not cancel_links)
-  %base_trailer;
+  %include;trl
   %include;copyr
+  %query_time;
 %end;
 </div>
 </div>

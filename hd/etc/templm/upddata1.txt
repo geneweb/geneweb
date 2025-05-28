@@ -148,8 +148,9 @@
 %else;
   %apply;print_long()
 %end;
-%base_trailer;
+%include;trl
 %include;copyr
+%query_time;
 
 </body>
 </html>

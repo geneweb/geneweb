@@ -55,15 +55,6 @@ val link_to_referer : config -> Adef.safe_string
 val incorrect_request : ?comment:string -> config -> unit
 (** Sends [Bad Request] HTTP response (same as [GWPARAM.output_error conf Bad_Request]) *)
 
-(* TODO OCP *)
-val interp :
-  config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.Env.t -> 'b -> unit
-
-val interp_no_header :
-  config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.Env.t -> 'b -> unit
-
-val interp_no_env : config -> string -> unit
-
 val print_calendar : config -> Gwdb.base -> unit
 (** Displays the calendar; if no key is set, it will use today's date.
     Based on template file calendar.txt *)

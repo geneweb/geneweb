@@ -4,8 +4,8 @@
 open Config
 open Def
 open Gwdb
-open TemplAst
 open Util
+module Ast = Geneweb_templ.Ast
 
 (* S: Fail if conf.bname is undefined? *)
 let file_name conf = Filename.concat (Util.bpath conf.bname) "history"
@@ -365,12 +365,12 @@ let possibly_highlight env s =
       if in_text case_sens h s then html_highlight case_sens h s else s
   | _ -> s
 
-let safe_val (s : Adef.safe_string) = VVstring (s :> string)
+let safe_val (s : Adef.safe_string) = Templ.VVstring (s :> string)
 
 let rec eval_var conf base env _ _ = function
   | [ "count" ] -> (
       match get_env "count" env with
-      | Vcnt c -> VVstring (string_of_int !c)
+      | Vcnt c -> Templ.VVstring (string_of_int !c)
       | _ -> VVstring "")
   | [ "first_name" ] -> (
       match get_env "info" env with
@@ -606,16 +606,18 @@ let gen_print conf base hoo =
     | Some ho -> Templ.Env.add "search" (Vsearch ho) env
     | None -> env
   in
-  Hutil.interp conf "updhist"
-    {
-      eval_var = eval_var conf base;
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach = print_foreach conf base;
-    }
-    env ()
+  let ifun =
+    Templ.
+      {
+        eval_var = eval_var conf base;
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = print_foreach conf base;
+      }
+  in
+  Templ.output conf ifun env () "updhist"
 
 let print conf base = gen_print conf base None
 

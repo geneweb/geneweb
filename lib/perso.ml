@@ -3,10 +3,11 @@
 open Config
 open Def
 open Gwdb
-open TemplAst
 open Util
 module Logs = Geneweb_logs.Logs
 module Sosa = Geneweb_sosa
+module Ast = Geneweb_templ.Ast
+module Loc = Geneweb_templ.Loc
 
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
@@ -1166,7 +1167,13 @@ end)
 *)
 type ancestor_surname_info =
   | Branch of
-      (string * date option * date option * string * person * Sosa.t list * loc)
+      (string
+      * date option
+      * date option
+      * string
+      * person
+      * Sosa.t list
+      * Loc.t)
   | Eclair of
       (string
       * Adef.safe_string
@@ -1174,7 +1181,7 @@ type ancestor_surname_info =
       * date option
       * person
       * iper list
-      * loc)
+      * Loc.t)
 
 (*
 TODO, this is not consistant with Def
@@ -1228,7 +1235,9 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
-(** [has_witness_for_event event_name events] is [true] iff there is an event with name [event_name] in [events] and this event had witnesses. It do not check for permissions *)
+(** [has_witness_for_event event_name events] is [true] iff there is an event
+    with name [event_name] in [events] and this event had witnesses. It do not
+    check for permissions *)
 let has_witness_for_event conf base p event_name =
   List.exists
     (fun ((name, _, _, _, _, wl, _) : istr Event.event_item) ->
@@ -1250,19 +1259,18 @@ let extract_var sini s =
 
 let template_file = ref "perso.txt"
 
-let warning_use_has_parents_before_parent (fname, bp, ep) var r =
-  Printf.sprintf
-    "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
-    fname bp ep var
-  |> Logs.syslog `LOG_WARNING;
+let warning_use_has_parents_before_parent loc var r =
+  Logs.warn (fun k ->
+      k "%a: since v5.00, must test \"has_parents\" before using \"%s\"\n"
+        Loc.pp loc var);
   r
 
-let bool_val x = VVbool x
-let str_val x = VVstring x
-let null_val = VVstring ""
+let bool_val x = Templ.VVbool x
+let str_val x = Templ.VVstring x
+let null_val = Templ.VVstring ""
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
-  VVstring ((x :> Adef.safe_string) :> string)
+  Templ.VVstring ((x :> Adef.safe_string) :> string)
 
 let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
   if p_auth then
@@ -1413,7 +1421,8 @@ let number_of_descendants_aux conf base env all_levels sl eval_int =
                 else cnt)
               0 (Gwdb.ipers base)
           in
-          VVstring (eval_int conf (if all_levels then cnt - 1 else cnt) sl)
+          Templ.VVstring
+            (eval_int conf (if all_levels then cnt - 1 else cnt) sl)
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
@@ -2760,7 +2769,8 @@ and eval_int conf n = function
   | [] -> Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found
 
-and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
+and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
+  function
   | [ "access_status" ] -> VVstring (Util.access_status p)
   | "anc1" :: sl -> (
       match get_env "anc1" env with
@@ -3139,7 +3149,7 @@ and eval_date_field_var conf d = function
 and _eval_place_field_var conf place = function
   | [] ->
       (* Compatibility before eval_place_field_var *)
-      VVstring place
+      Templ.VVstring place
   | [ "other" ] -> (
       match place_of_string conf place with
       | Some p -> VVstring p.other
@@ -3243,7 +3253,7 @@ and eval_str_event_field conf base (p, p_auth)
   | _ -> raise Not_found
 
 and eval_event_field_var conf base env (p, p_auth)
-    (name, date, place, note, src, w, isp) loc = function
+    (name, date, place, note, src, w, isp) (loc : Loc.t) = function
   | "date" :: sl -> (
       match (p_auth, Date.od_of_cdate date) with
       | true, Some d -> eval_date_field_var conf d sl
@@ -5548,7 +5558,9 @@ let print_foreach conf base print_ast eval_expr =
   print_foreach
 
 let eval_predefined_apply conf env f vl =
-  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let vl =
+    List.map (function Templ.VVstring s -> s | _ -> raise Not_found) vl
+  in
   match (f, vl) with
   | "a_of_b", [ s1; s2 ] -> Util.translate_eval (transl_a_of_b conf s1 s2 s2)
   | "a_of_b2", [ s1; s2; s3 ] ->
@@ -5708,17 +5720,17 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       |> add "nldb" (Vlazy (Lazy.from_fun nldb))
       |> add "all_gp" (Vlazy (Lazy.from_fun all_gp)))
   in
-  if no_headers then
-    Hutil.interp_no_header conf templ_fname
-      {
-        eval_var = eval_var conf base;
-        eval_transl = eval_transl conf base;
-        eval_predefined_apply = eval_predefined_apply conf;
-        get_vother;
-        set_vother;
-        print_foreach = print_foreach conf base;
-      }
-      env ep
+  let ifun =
+    {
+      Templ.eval_var = eval_var conf base;
+      Templ.eval_transl = eval_transl conf base;
+      Templ.eval_predefined_apply = eval_predefined_apply conf;
+      Templ.get_vother;
+      Templ.set_vother;
+      Templ.print_foreach = print_foreach conf base;
+    }
+  in
+  if no_headers then Templ.output conf ifun env ep templ_fname
   else if menu then
     let size =
       match Util.open_etc_file conf templ_fname with
@@ -5730,28 +5742,8 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       | None -> 0
     in
     if size = 0 then Hutil.header conf title
-    else
-      Hutil.interp_no_header conf templ_fname
-        {
-          eval_var = eval_var conf base;
-          eval_transl = eval_transl conf base;
-          eval_predefined_apply = eval_predefined_apply conf;
-          get_vother;
-          set_vother;
-          print_foreach = print_foreach conf base;
-        }
-        env ep
-  else
-    Hutil.interp conf templ_fname
-      {
-        eval_var = eval_var conf base;
-        eval_transl = eval_transl conf base;
-        eval_predefined_apply = eval_predefined_apply conf;
-        get_vother;
-        set_vother;
-        print_foreach = print_foreach conf base;
-      }
-      env ep
+    else Templ.output conf ifun env ep templ_fname
+  else Templ.output conf ifun env ep templ_fname
 
 let interp_templ ?no_headers = gen_interp_templ ?no_headers false (fun _ -> ())
 let interp_templ_with_menu = gen_interp_templ true

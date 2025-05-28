@@ -118,9 +118,9 @@ let update_ci conf create key =
 
 (* -- Template stuff -- *)
 
-let bool_val x = TemplAst.VVbool x
-let str_val x = TemplAst.VVstring x
-let safe_val (x : Adef.safe_string) = TemplAst.VVstring (x :> string)
+let bool_val x = Templ.VVbool x
+let str_val x = Templ.VVstring x
+let safe_val (x : Adef.safe_string) = Templ.VVstring (x :> string)
 
 (* TODO : rewrite, looks bad + find a better name *)
 let eval_default_var conf s =

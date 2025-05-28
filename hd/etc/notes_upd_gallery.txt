@@ -177,16 +177,17 @@
 %include;trl
 %include;copyr
 %include;js
+%query_time;
 %if;(b.use_cdn="yes")
   <script src="https://cdn.datatables.net/v/bs4/dt-2.1.8/rr-1.5.0/datatables.min.js"
     integrity="sha256-K9K34UCeIOBQFuVbrfi4kQaVBXYWi6SHYHUamWfbuHA=
                sha384-BrJUYe9FafQMFfINSlrNOR8+oJJuHwBdOPAcyzC97//5IVyyNQliyxZ17l3wFXv2
-               sha512-msL+zow8mrATk2FqGH77oNNLqagj8iKqRMMolKducDvkKFsxk5+qO++GqKu+A7vs1L5JFIGdW22LXFLKiBs1nw==" 
+               sha512-msL+zow8mrATk2FqGH77oNNLqagj8iKqRMMolKducDvkKFsxk5+qO++GqKu+A7vs1L5JFIGdW22LXFLKiBs1nw=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/maphilight@1.4.2/jquery.maphilight.min.js"
     integrity="sha256-CMISu7vXb6gfvgekngAzo/Mk2GOoFeLy9UIqjtJrt5Y=
                sha384-+gw07sufgVITpP4bHCQQeafUY2NQfyPBM3+931FUWejozbZ0+hCcd8dTUP4epnQK
-               sha512-1YiTT24MNHA6DRzyu+w9F5Egc8evYlyEnzSSTD4/M7q42xEb5fSpNgn0+1CPy3evubHs3xdlh8uXgae0DOhR7Q==" 
+               sha512-1YiTT24MNHA6DRzyu+w9F5Egc8evYlyEnzSSTD4/M7q42xEb5fSpNgn0+1CPy3evubHs3xdlh8uXgae0DOhR7Q=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 %else;
   <script src="%etc_prefix;js/datatables.min.js?version=dt-2.1.8+rr-1.5.0"></script>
@@ -426,15 +427,15 @@ function updateGroupsLegend() {
     if (!groupTable) return;
     const groups = groupTable.rows().data().toArray();
     const $groupsLegend = $('#ul_groups_legend');
-    
+
     $groupsLegend.empty();
-    
+
     const labeledGroups = groups.filter(g => g.label);
     if (labeledGroups.length > 0) {
-        $groupsLegend.append(labeledGroups.length === 1 ? 
-            '[*group/groups]0[:] ' : 
+        $groupsLegend.append(labeledGroups.length === 1 ?
+            '[*group/groups]0[:] ' :
             '[*group/groups]1[:] ');
-        
+
         groups.forEach(group => {
             if (group.label) {
                 $groupsLegend.append(`
@@ -519,12 +520,12 @@ function highlightGroup(groupNum) {
 
     $(`input[value="${groupNum}"]`).closest('tr').addClass('group-highlight');
     $(`#g_row${groupNum}`).addClass('group-highlight');
-    
+
     $('area').each(function() {
         const $area = $(this);
         const rowId = $area.attr('id').replace('area', '');
         const rowData = table.row(`#row${rowId}`).data();
-        
+
         if (rowData && rowData.group === groupNum) {
             const highlightConfig = {
                 ...MAPHILIGHT_CONFIG,
@@ -534,7 +535,7 @@ function highlightGroup(groupNum) {
                 fillColor: 'ffd700',
                 fillOpacity: 0.1
             };
-            
+
             $area
                 .data('maphilight', highlightConfig)
                 .attr('class', `group${groupNum}`)
@@ -547,22 +548,22 @@ $(document).on("mouseout", "area", function(e) {
     const $area = $(this);
     const areaId = $area.attr("id").replace(/[a-z]/g, "");
     const storedGroupClass = $area.data('originalGroup');
-    
+
     if (storedGroupClass) {
         $area.addClass(storedGroupClass);
-        
+
         const groupConfig = {
             ...MAPHILIGHT_CONFIG,
             groupBy: `.${storedGroupClass}`
         };
-        
+
         $area.data('maphilight', groupConfig);
     } else {
         $area.data('maphilight', MAPHILIGHT_CONFIG);
     }
-    
+
     $('#image').maphilight(MAPHILIGHT_CONFIG);
-    
+
     $("#a" + areaId + " span").removeClass("in");
     $("#row" + areaId).removeClass("in");
 });
@@ -646,7 +647,7 @@ function createLegendHTML(areaIndex, data) {
 function updateAreaAndLegend(data, areaIndex) {
     const displayText = formatAreaLabel(areaIndex, data);
     const group = get(data.group);  // Récupère le groupe
-    const groupAttr = group ? 
+    const groupAttr = group ?
         ` class="group${group}" data-maphilight='{"groupBy":".group${group}"}'` : '';
 
     $("#map").append(`
@@ -823,19 +824,19 @@ function handleLegendClick(targetId, tablePrefix) {
 // Unified group hover handling for both table and legend
 function handleGroupHover(action, groupNum) {
     if (!groupNum) return;
-    
+
     if (action === 'enter') {
         // Highlight table rows and group row
         $(`input[value="${groupNum}"]`).closest('tr').addClass('group-highlight');
         $(`#g_row${groupNum}`).addClass('group-highlight');
         $(`.group-legend[data-group="${groupNum}"]`).addClass('group-highlight');
-        
+
         // Highlight areas belonging to this group
         $('area').each(function() {
             const $area = $(this);
             const rowId = $area.attr('id').replace('area', '');
             const rowData = table.row(`#row${rowId}`).data();
-            
+
             if (rowData && rowData.group == groupNum) {
                 $area.data('maphilight', {
                     ...MAPHILIGHT_CONFIG,
@@ -850,13 +851,13 @@ function handleGroupHover(action, groupNum) {
     } else {
         // Remove all highlights
         $('.group-highlight').removeClass('group-highlight');
-        
+
         // Reset area highlighting
         $('area').each(function() {
             const $area = $(this);
             const rowId = $area.attr('id').replace('area', '');
             const rowData = table.row(`#row${rowId}`).data();
-            
+
             if (rowData?.group) {
                 $area.data('maphilight', {
                     ...MAPHILIGHT_CONFIG,
@@ -866,7 +867,7 @@ function handleGroupHover(action, groupNum) {
                 $area.data('maphilight', MAPHILIGHT_CONFIG);
             }
         });
-        
+
         $('#image').maphilight(MAPHILIGHT_CONFIG);
     }
 }
@@ -953,7 +954,7 @@ function initializeHandlers() {
         %end;
         .on("mouseover", "tr", function(e) {
              if ($(e.target).closest('.btn-up, .btn-down').length) return;
-            
+
             if (typeof $(this).attr("id") !== "undefined") {
                 var areaId = $(this).attr("id").replace(/[a-z]/g, "");
                 $("#area" + areaId).mouseover();
@@ -963,7 +964,7 @@ function initializeHandlers() {
         })
         .on("mouseout", "tr", function(e) {
             if ($(e.target).closest('.btn-up, .btn-down').length) return;
-            
+
             if (typeof $(this).attr("id") !== "undefined") {
                 var areaId = $(this).attr("id").replace(/[a-z]/g, "");
                 $("#area" + areaId).mouseout();
@@ -1010,19 +1011,19 @@ function initializeHandlers() {
         })
         .on('order.dt', function() {
             $("#map, #ul_legend").empty();
-            
+
             table.rows({ order: 'current' }).every(function(index) {
                 const data = this.data();
                 const counter = index + 1;
-                
+
                 $(this.node())
                     .attr('id', `row${counter}`)
                     .find('.drag-handle')
                     .text(counter);
-                
+
                 updateAreaAndLegend(data, counter);
             });
-            
+
             $('#image').maphilight(MAPHILIGHT_CONFIG);
         })
         .on("row-reorder", handleAreaReorder)
@@ -1037,12 +1038,12 @@ function initializeHandlers() {
         const $input = $(this);
         const $row = $input.closest('tr');
         const row = groupTable.row($row);
-        
+
         if (!row.data()) {
             console.error('Unable to update row: Row data not found.');
             return;
         }
-        
+
         const currentData = row.data();
         currentData.label = $input.val();
         row.data(currentData).draw(false);
@@ -1063,7 +1064,7 @@ function initializeHandlers() {
                 handleGroupHover('leave');
             }
         });
-       
+
     $("#map_table, #grp_table")
         .on("click", ".remove", function(event) {
           const tr = $(this).closest("tr");
@@ -1135,7 +1136,7 @@ function initializeHandlers() {
             }
         }
     });
-    
+
     // Hover legend
     $("#ul_legend")
         .on("mouseover", ".legend", function() {
@@ -1206,16 +1207,16 @@ function initializeHandlers() {
                 }
             }
         });
-        
+
     $("#ul_groups_legend, #grp_table tbody")
         .on("mouseleave", "*", function() {
             $('.group-highlight').removeClass('group-highlight');
-            
+
             $('area').each(function() {
                 const $area = $(this);
                 const rowId = $area.attr('id').replace('area', '');
                 const rowData = table.row(`#row${rowId}`).data();
-                
+
                 if (rowData && rowData.group) {
                     $area
                         .data('maphilight', {
@@ -1227,15 +1228,15 @@ function initializeHandlers() {
                     $area.data('maphilight', MAPHILIGHT_CONFIG).removeAttr('class');
                 }
             });
-            
+
             $('#image').maphilight(MAPHILIGHT_CONFIG);
         });
-    
+
     // Handlers search
     $('.search-input').on('input search', Utils.debounce((e) => {
         const value = e.target.value;
         const hasSearch = value.length > 0;
-        
+
         if (hasSearch) {
             $('.drag-handle').css('cursor', 'default').attr('title', '');
             $('.btn-up, .btn-down').css('visibility', 'hidden');
@@ -1409,7 +1410,7 @@ function initTables() {
                 return get(data).toLowerCase();
               }
               const disabled = (get(row.t) !== "" && row.t !== "p") ? " disabled" : "";
-              return '<input class="form-control update p-input" type="text" value="' + get(data) + '"' + disabled + 
+              return '<input class="form-control update p-input" type="text" value="' + get(data) + '"' + disabled +
                      '%if;(b.datalist_snames=1) list="datalist_snames" data-book="sn"%end;>';
             }
           },
@@ -1664,7 +1665,7 @@ function setupFormHandler() {
       if (item.alt) clean.alt = item.alt;
       if (item.group) clean.group = item.group;
       if (item.gw) clean.gw = item.gw;
-      
+
       // Clean based on type
       if (clean.t === "p" || !clean.t) {
         delete clean.misc;
@@ -1678,7 +1679,7 @@ function setupFormHandler() {
         delete clean.oc;
         delete clean.gw;
       }
-      
+
       return clean;
     });
 

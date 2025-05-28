@@ -357,8 +357,8 @@
         </div>
         %foreach;img_in_carrousel;
           <div class="d-flex mt-1">
-            <a role="button" href="#" id="source_%img_cnt;" 
-              onclick='editImageNote(%img_cnt;, "%carrousel_img_raw;"); return false;' 
+            <a role="button" href="#" id="source_%img_cnt;"
+              onclick='editImageNote(%img_cnt;, "%carrousel_img_raw;"); return false;'
               data-source="%carrousel_img_src;" data-note="%carrousel_img_note;"
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong><br>
@@ -434,10 +434,11 @@
   %end;
 %end;
 
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 %define;input_snd(xxx,yyy)
 $('.xxx').change(function() {
   let fileName = $(this).val().split('\\').pop();
@@ -462,27 +463,27 @@ $(function() {
     html: true,
     boundary: 'window'
   });
-  
+
   // Gestion du bouton d'envoi rapide (le premier bouton)
   $('.btn-quick-upload').click(function() {
     if($('#others_file').val()) {
       $('form').submit();
     }
   });
-  
-  // Gestion de l'URL d'image 
+
+  // Gestion de l'URL d'image
   $('#image_url').on('input', function() {
     if(this.value.length) {
       // Si une URL est saisie
       $('.btn-quick-upload').prop('disabled', false);
       $('#image_note, #image_source').prop('disabled', false);
       $('.submit-button').prop('disabled', false);
-      
+
       // Désactiver l'input de fichier puisqu'une URL est saisie
       $('#others_file').prop('disabled', true);
       $('.custom-file-label').html('[*select] [image/images]0');
       $('#image_name').prop('disabled', false);
-      
+
       // Afficher le bouton d'annulation
       $('#btn-cancel-edit').removeClass('d-none').addClass('d-flex align-items-center');
     } else {
@@ -491,21 +492,21 @@ $(function() {
         $('.btn-quick-upload').prop('disabled', true);
         $('#image_note, #image_source').prop('disabled', true);
         $('.submit-button').prop('disabled', true);
-        
+
         // Cacher le bouton d'annulation si on est revenu à l'état initial
         $('#btn-cancel-edit').addClass('d-none');
         $('#image_name').prop('disabled', true).val('');
       }
     }
   });
-  
+
   // Activer le bouton du bas si des métadonnées sont saisies
   $('#image_name, #image_note, #image_source').on('input', function() {
     if($('#others_file').val() || $('#image_url').val().trim() !== '' || $(this).val().trim() !== '') {
       $('.submit-button').prop('disabled', false);
     }
   });
-  
+
   // Désactiver les champs après l'envoi
   $('form').on('submit', function() {
     // Ne pas réinitialiser tout de suite si on est en mode édition
@@ -515,7 +516,7 @@ $(function() {
       }, 100);
     }
   });
-  
+
  // Annuler l'édition
   $('#btn-cancel-edit').click(function() {
     // Réinitialiser les champs
@@ -524,14 +525,14 @@ $(function() {
     $('#mode_2').val('carrousel');
     $('#which_img_show').text('[*send image with note and source]');
     $('.submit-button').prop('disabled', true);
-    
+
     // Réinitialiser les champs spécifiques
     $('#others_file').val('').prop('disabled', false);
     $('.custom-file-label').html('[*select] [image/images]0');
     $('#image_url').val('').prop('disabled', false);
     $('#image_name').val('').prop('disabled', true);
     $('.btn-quick-upload').prop('disabled', true);
-    
+
     // Cacher le bouton d'annulation
     $(this).addClass('d-none').removeClass('d-flex');
   });
@@ -546,7 +547,7 @@ const updateTextareaSize = () => {
 function formatButtonText(noteText, imageName, maxLen = 37) {
   const ext = imageName.lastIndexOf('.');
   const name = ext !== -1 ? imageName.slice(0, ext) : imageName;
-  const truncName = name.length > maxLen 
+  const truncName = name.length > maxLen
     ? name.slice(0, maxLen - 3) + '[…]'
     : name;
   const fullText = `${noteText}\n${truncName}${ext !== -1 ? imageName.slice(ext) : ''}`;
@@ -562,43 +563,43 @@ function formatButtonText(noteText, imageName, maxLen = 37) {
 const editImageNote = (cnt, name) => {
   const noteData = $(`#source_${cnt}`).data('note');
   const sourceData = $(`#source_${cnt}`).data('source');
-  
+
   // Désactiver l'input de fichier et l'URL pendant l'édition
   $('#others_file').prop('disabled', true);
   $('#image_url, #image_name').prop('disabled', true);
-  
+
   // Désactiver le bouton d'envoi rapide pendant l'édition
   $('.btn-quick-upload').prop('disabled', true);
-  
+
   // Afficher le bouton d'annulation
   $('#btn-cancel-edit').removeClass('d-none').addClass('d-flex align-items-center');
-  
+
   $('#image_note').val(noteData || '').prop('disabled', false).focus();
   $('#image_source').val(sourceData || '').prop('disabled', false);
-  
+
   updateTextareaSize();
   $('#image_note').focus();
 
   $('#file_name_2').val(name);
   $('#mode_2').val('note');
-  const buttonText = noteData 
+  const buttonText = noteData
     ? formatButtonText(`[*update image note]`, name)
     : formatButtonText(`[*add note]/[source/sources]0`, name);
   $('#which_img_show').text(buttonText);
   $('.submit-button').prop('disabled', false);
-  
+
   $('#image_note, #image_source').off('input').on('input', function() {
     $('.submit-button').prop('disabled', !this.value.length);
     updateTextareaSize();
   });
-  
+
   return false;
 };
 
 $('#image_url').on('input', function() {
   const url = this.value.trim();
   const nameField = $('#image_name');
-  
+
   if (url && !nameField.val()) {
     // Extraire le nom depuis l'URL pour prévisualisation
     const filename = url.split('/').pop().split('?')[0];

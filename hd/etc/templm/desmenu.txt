@@ -222,7 +222,8 @@
 </form>
 <div style="clear:both;"></div>
 
-%base_trailer;
+%include;trl
 %include;copyr
+%query_time;
 </body>
 </html>

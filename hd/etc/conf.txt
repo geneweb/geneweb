@@ -62,9 +62,10 @@
   </div>
 </section>
 
-%base_trailer;
+%include;trl
 %include;copyr
 %include;js
+%query_time;
 </div>
 </body>
 </html>

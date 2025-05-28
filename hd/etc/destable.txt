@@ -622,9 +622,10 @@
     %apply;desc_count(max_desc_level,0,1,1,list_size)
   %end;.
 </div>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 </body>
 </html>

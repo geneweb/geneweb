@@ -893,7 +893,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Output.print_sstring conf
     {|<div class="d-flex flex-column"><div class="pt-1">|};
   let env = Templ.Env.(add "name" (Adef.encoded "notes") empty) in
-  Templ.include_template conf env "toolbar" ignore;
+  Templ.output_builtin conf env "toolbar";
   Output.print_sstring conf {|</div><div class="row editor-container">|};
   Output.print_sstring conf
     {|<div class="d-flex flex-column col-9"><textarea name="notes" id="notes_comments"
@@ -910,7 +910,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf "</button>");
   Output.print_sstring conf "</div><div class=\"col mx-2 p-2\"";
   let env = Templ.Env.(add "name" (Adef.encoded "notes") empty) in
-  Templ.include_template conf env "characters" ignore;
+  Templ.output_builtin conf env "toolbar";
   Output.print_sstring conf "</div></div>";
   Output.print_sstring conf "</div></form>";
   Hutil.trailer conf

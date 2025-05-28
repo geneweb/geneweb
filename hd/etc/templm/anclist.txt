@@ -155,8 +155,9 @@
   %if;not cancel_links;
     %include;tools
     %apply;tools_anclist()
-    %base_trailer;
+    %include;trl
     %include;copyr
+    %query_time;
   %end;
 %end;
 </body>

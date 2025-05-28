@@ -50,13 +50,14 @@
 %else;
   This should not happen (probably a bad variable in URL: check t=/t1=)
 %end;
-%base_trailer;
+%include;trl
 %if;(e.t!="T" and e.t!="A" and e.t!="C" and e.t1="")
 %include;copyr
 %end;
 </div>
 %if;(not (e.t="T" and e.t1="CT"))
 %include;js
+%query_time;
 %end;
 </body>
 </html>

@@ -255,10 +255,11 @@ zh: 网络家谱
      </td></tr>
   </table>
 <br>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 </div>
 %include;js
+%query_time;
 </body>
 </html>
