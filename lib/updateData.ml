@@ -4,12 +4,6 @@ module PersMap = Map.Make (struct
   let compare = compare
 end)
 
-module PersSet = Set.Make (struct
-  type t = Gwdb.person
-
-  let compare p1 p2 = compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
-end)
-
 let get_data conf =
   match Util.p_getenv conf.Config.env "data" with
   | Some "occu" -> ([ Gwdb.get_occupation ], [], [], [])
@@ -76,11 +70,14 @@ let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : Gwdb.istr) p =
-    try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
-    with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
+    try PersMap.add istr (Gwdb.PersonSet.add p @@ PersMap.find istr acc) acc
+    with Not_found ->
+      PersMap.add istr (Gwdb.PersonSet.add p Gwdb.PersonSet.empty) acc
   in
-  let aux (fn : PersSet.t PersMap.t -> Gwdb.istr -> PersSet.t PersMap.t) arg acc
-      get =
+  let aux
+      (fn :
+        Gwdb.PersonSet.t PersMap.t -> Gwdb.istr -> Gwdb.PersonSet.t PersMap.t)
+      arg acc get =
     let istr' = get arg in
     if istr = istr' then fn acc istr else acc
   in
@@ -118,7 +115,7 @@ let get_person_from_data conf base =
         acc (Gwdb.ifams base)
   in
   PersMap.fold
-    (fun istr pset acc -> (istr, PersSet.elements pset) :: acc)
+    (fun istr pset acc -> (istr, Gwdb.PersonSet.elements pset) :: acc)
     acc []
 
 let combine_by_ini ~ignore_case ini list =
