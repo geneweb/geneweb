@@ -36,19 +36,13 @@ let get_dag_elems conf base =
 
 let make_dag conf base set =
   let list = Pset.elements set in
-  let module O = struct
-    type t = Gwdb.iper
-
-    let compare = compare
-  end in
-  let module M = Map.Make (O) in
   let nodes = Array.of_list list in
   let map =
     let rec loop map i =
       if i = Array.length nodes then map
-      else loop (M.add nodes.(i) (Dag2html.idag_of_int i) map) (i + 1)
+      else loop (Gwdb.IperMap.add nodes.(i) (Dag2html.idag_of_int i) map) (i + 1)
     in
-    loop M.empty 0
+    loop Gwdb.IperMap.empty 0
   in
   let nodes =
     Array.map
@@ -58,9 +52,11 @@ let make_dag conf base set =
           | Some ifam -> (
               let c = Gwdb.foi base ifam in
               let l =
-                try [ M.find (Gwdb.get_mother c) map ] with Not_found -> []
+                try [ Gwdb.IperMap.find (Gwdb.get_mother c) map ]
+                with Not_found -> []
               in
-              try M.find (Gwdb.get_father c) map :: l with Not_found -> l)
+              try Gwdb.IperMap.find (Gwdb.get_father c) map :: l
+              with Not_found -> l)
           | None -> []
         in
         let chil =
@@ -70,7 +66,7 @@ let make_dag conf base set =
               let des = Gwdb.foi base ifam in
               Array.fold_left
                 (fun chil ip ->
-                  try M.find ip map :: chil with Not_found -> chil)
+                  try Gwdb.IperMap.find ip map :: chil with Not_found -> chil)
                 chil (Gwdb.get_children des))
             [] (Gwdb.get_family u)
         in
@@ -93,7 +89,8 @@ let make_dag conf base set =
                     let cpl = Gwdb.foi base ifam in
                     let isp = Gutil.spouse ip cpl in
                     let jdo =
-                      try Some (M.find isp map) with Not_found -> None
+                      try Some (Gwdb.IperMap.find isp map)
+                      with Not_found -> None
                     in
                     match jdo with
                     | Some jd ->

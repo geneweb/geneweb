@@ -672,33 +672,27 @@ let print_solution conf base long n p1 p2 sol =
 let max_br = 33
 
 let print_dag_links conf base p1 p2 rl =
-  let module O = struct
-    type t = Gwdb.iper
-
-    let compare = compare
-  end in
-  let module M = Map.Make (O) in
   let anc_map =
     List.fold_left
       (fun anc_map (pp1, pp2, (x1, x2, list), _) ->
         List.fold_left
           (fun anc_map (p, n) ->
             let pp1, pp2, nn, nt, maxlev =
-              try M.find (Gwdb.get_iper p) anc_map
+              try Gwdb.IperMap.find (Gwdb.get_iper p) anc_map
               with Not_found -> (pp1, pp2, 0, 0, 0)
             in
             if nn >= max_br then anc_map
             else
               let v = (pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2)) in
-              M.add (Gwdb.get_iper p) v anc_map)
+              Gwdb.IperMap.add (Gwdb.get_iper p) v anc_map)
           anc_map list)
-      M.empty rl
+      Gwdb.IperMap.empty rl
   in
   let is_anc =
     match rl with (_, _, (x1, x2, _), _) :: _ -> x1 = 0 || x2 = 0 | _ -> false
   in
   let something =
-    M.fold
+    Gwdb.IperMap.fold
       (fun _ (_, _, nn, nt, _) something ->
         something || (nt > 1 && nn > 1 && nn < max_br))
       anc_map false
@@ -710,7 +704,7 @@ let print_dag_links conf base p1 p2 rl =
       Output.print_string conf (Image.prefix conf);
       Output.print_sstring conf {|/picto_fleche_bleu.png" alt="">|})
     else Output.print_sstring conf "<ul>";
-    M.iter
+    Gwdb.IperMap.iter
       (fun ip (pp1, pp2, nn, nt, _) ->
         let dp1 = match pp1 with Some p -> p | _ -> p1 in
         let dp2 = match pp2 with Some p -> p | _ -> p2 in
