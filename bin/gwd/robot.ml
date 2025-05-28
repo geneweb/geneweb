@@ -2,12 +2,6 @@
 
 let magic_robot = "GWRB0007"
 
-module W = Map.Make (struct
-  type t = string
-
-  let compare = compare
-end)
-
 type norfriwiz = Normal | Friend of string | Wizard of string
 
 type who = {
@@ -20,7 +14,7 @@ type who = {
 
 type excl = {
   mutable excl : (string * int ref) list;
-  mutable who : who W.t;
+  mutable who : who Ext_string.Map.t;
   mutable max_conn : int * string;
 }
 
@@ -45,14 +39,14 @@ let robot_error conf cnt sec =
 let purge_who tm xcl sec =
   let sec = float sec in
   let to_remove =
-    W.fold
+    Ext_string.Map.fold
       (fun k who l ->
         match who.acc_times with
         | tm0 :: _ -> if tm -. tm0 > sec then k :: l else l
         | [] -> k :: l)
       xcl.who []
   in
-  List.iter (fun k -> xcl.who <- W.remove k xcl.who) to_remove
+  List.iter (fun k -> xcl.who <- Ext_string.Map.remove k xcl.who) to_remove
 
 let input_excl ic =
   let b = really_input_string ic (String.length magic_robot) in
@@ -69,11 +63,12 @@ let robot_excl () =
     | Some ic ->
         let v =
           try input_excl ic
-          with _ -> { excl = []; who = W.empty; max_conn = (0, "") }
+          with _ ->
+            { excl = []; who = Ext_string.Map.empty; max_conn = (0, "") }
         in
         close_in ic;
         v
-    | None -> { excl = []; who = W.empty; max_conn = (0, "") }
+    | None -> { excl = []; who = Ext_string.Map.empty; max_conn = (0, "") }
   in
   (xcl, fname)
 
@@ -98,7 +93,10 @@ let check tm from max_call sec conf suicide =
         true
     | None ->
         purge_who tm xcl sec;
-        let r = try (W.find from xcl.who).acc_times with Not_found -> [] in
+        let r =
+          try (Ext_string.Map.find from xcl.who).acc_times
+          with Not_found -> []
+        in
         let cnt, tml, tm0 =
           let sec = float sec in
           let rec count cnt tml = function
@@ -114,7 +112,7 @@ let check tm from max_call sec conf suicide =
         in
         let r = List.rev tml in
         xcl.who <-
-          W.add from
+          Ext_string.Map.add from
             {
               acc_times = tm :: r;
               oldest_time = tm0;
@@ -134,7 +132,7 @@ let check tm from max_call sec conf suicide =
                     " (%d > %d connections in %g <= %d seconds)\n" cnt max_call
                     (tm -. tm0) sec);
             xcl.excl <- (from, ref 1) :: xcl.excl;
-            xcl.who <- W.remove from xcl.who;
+            xcl.who <- Ext_string.Map.remove from xcl.who;
             xcl.max_conn <- (0, "");
             true)
           else false
@@ -151,7 +149,7 @@ let check tm from max_call sec conf suicide =
                   fname)
         | _ -> ());
         let list, nconn =
-          W.fold
+          Ext_string.Map.fold
             (fun k w (list, nconn) ->
               let tm = w.oldest_time in
               let nb = w.nb_connect in
@@ -182,7 +180,7 @@ let check tm from max_call sec conf suicide =
       close_out oc
   | None -> ());
   if refused then robot_error conf max_call sec;
-  W.fold
+  Ext_string.Map.fold
     (fun _ w (c, cw, cf, wl) ->
       if w.nbase = conf.bname && w.nbase <> "" then
         match w.utype with
