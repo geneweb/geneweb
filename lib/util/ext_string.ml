@@ -75,6 +75,7 @@ let strip_all_trailing_spaces s =
   loop 0
 
 module Set = Set.Make (String)
+module Map = Map.Make (String)
 
 let tr c1 c2 s =
   match String.rindex_opt s c1 with
