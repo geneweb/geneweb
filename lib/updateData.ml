@@ -1,9 +1,3 @@
-module PersMap = Map.Make (struct
-  type t = Gwdb.istr
-
-  let compare = compare
-end)
-
 let get_data conf =
   match Util.p_getenv conf.Config.env "data" with
   | Some "occu" -> ([ Gwdb.get_occupation ], [], [], [])
@@ -70,14 +64,18 @@ let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : Gwdb.istr) p =
-    try PersMap.add istr (Gwdb.PersonSet.add p @@ PersMap.find istr acc) acc
+    try
+      Gwdb.IstrMap.add istr
+        (Gwdb.PersonSet.add p @@ Gwdb.IstrMap.find istr acc)
+        acc
     with Not_found ->
-      PersMap.add istr (Gwdb.PersonSet.add p Gwdb.PersonSet.empty) acc
+      Gwdb.IstrMap.add istr (Gwdb.PersonSet.add p Gwdb.PersonSet.empty) acc
   in
   let aux
       (fn :
-        Gwdb.PersonSet.t PersMap.t -> Gwdb.istr -> Gwdb.PersonSet.t PersMap.t)
-      arg acc get =
+        Gwdb.PersonSet.t Gwdb.IstrMap.t ->
+        Gwdb.istr ->
+        Gwdb.PersonSet.t Gwdb.IstrMap.t) arg acc get =
     let istr' = get arg in
     if istr = istr' then fn acc istr else acc
   in
@@ -92,7 +90,7 @@ let get_person_from_data conf base =
           (fun acc fn ->
             List.fold_left (fun acc e -> aux add e acc fn) acc pevents)
           acc get_pe)
-      PersMap.empty (Gwdb.ipers base)
+      Gwdb.IstrMap.empty (Gwdb.ipers base)
   in
   let acc =
     if get_f = [] && get_fe = [] then acc
@@ -114,7 +112,7 @@ let get_person_from_data conf base =
             acc get_fe)
         acc (Gwdb.ifams base)
   in
-  PersMap.fold
+  Gwdb.IstrMap.fold
     (fun istr pset acc -> (istr, Gwdb.PersonSet.elements pset) :: acc)
     acc []
 
