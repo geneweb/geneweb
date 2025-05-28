@@ -4,12 +4,6 @@ open Gwdb
 
 let ns = "export"
 
-module IPS = Set.Make (struct
-  type t = Gwdb.iper
-
-  let compare = compare
-end)
-
 module IFS = Set.Make (struct
   type t = Gwdb.ifam
 
@@ -55,19 +49,20 @@ let export conf base =
       in
       let find_p i = try find_iper i with Not_found -> find_npoc i in
       let rec loop acc cnt =
-        try loop (IPS.add (find_p cnt) acc) (cnt + 1) with Not_found -> acc
+        try loop (Gwdb.IperSet.add (find_p cnt) acc) (cnt + 1)
+        with Not_found -> acc
       in
-      let ini = loop IPS.empty 1 in
+      let ini = loop Gwdb.IperSet.empty 1 in
       let fname =
         Gwdb.bname base ^ match output with `ged -> ".ged" | `gw -> ".gw"
       in
       let ipers =
         if getenv_opt "spouses" conf.env = Some "on" then
-          IPS.fold
+          Gwdb.IperSet.fold
             (fun iper acc ->
               Array.fold_left
                 (fun acc ifam ->
-                  IPS.add (Gutil.spouse iper @@ foi base ifam) acc)
+                  Gwdb.IperSet.add (Gutil.spouse iper @@ foi base ifam) acc)
                 acc
                 (get_family (poi base iper)))
             ini ini
@@ -75,24 +70,25 @@ let export conf base =
       in
       let ipers =
         if getenv_opt "parents" conf.env = Some "on" then
-          IPS.fold
+          Gwdb.IperSet.fold
             (fun iper acc ->
               match get_parents (poi base iper) with
               | None -> acc
               | Some ifam ->
                   let fam = foi base ifam in
-                  IPS.add (get_father fam) (IPS.add (get_mother fam) acc))
+                  Gwdb.IperSet.add (get_father fam)
+                    (Gwdb.IperSet.add (get_mother fam) acc))
             ini ipers
         else ipers
       in
       let ipers =
         if getenv_opt "children" conf.env = Some "on" then
-          IPS.fold
+          Gwdb.IperSet.fold
             (fun iper acc ->
               Array.fold_left
                 (fun acc ifam ->
                   Array.fold_left
-                    (fun acc iper -> IPS.add iper acc)
+                    (fun acc iper -> Gwdb.IperSet.add iper acc)
                     acc
                     (get_children @@ foi base ifam))
                 acc
@@ -101,13 +97,16 @@ let export conf base =
         else ipers
       in
       let ifams =
-        IPS.fold
+        Gwdb.IperSet.fold
           (fun iper acc ->
             Array.fold_left
               (fun acc ifam ->
                 if
                   IFS.mem ifam acc
-                  || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+                  || not
+                       (Gwdb.IperSet.mem
+                          (Gutil.spouse iper @@ foi base ifam)
+                          ipers)
                 then acc
                 else IFS.add ifam acc)
               acc
@@ -133,7 +132,9 @@ let export conf base =
           base = Some (Gwdb.bname base, base);
         }
       in
-      let select = ((fun i -> IPS.mem i ipers), fun i -> IFS.mem i ifams) in
+      let select =
+        ((fun i -> Gwdb.IperSet.mem i ipers), fun i -> IFS.mem i ifams)
+      in
       Wserver.http Def.OK;
       Wserver.header "Content-type: text/plain";
       Wserver.header
