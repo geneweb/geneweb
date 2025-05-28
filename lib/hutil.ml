@@ -19,49 +19,20 @@ let error_cannot_access conf fname =
       ^<^ (Util.escape_html fname : Adef.escaped_string :> Adef.safe_string)
       ^>^ ".txt\".")
 
-let gen_interp header conf fname ifun env ep =
-  Templ_parser.wrap fname (fun () ->
-      match Templ.input_templ conf fname with
-      | Some astl ->
-          if header then Util.html conf;
-          let full_name = Util.etc_file_name conf fname in
-          Templ.interp_ast conf ifun env ep [ Ainclude (full_name, astl) ]
-      | None -> error_cannot_access conf fname)
-
-let interp_no_header conf fname ifun env ep =
-  gen_interp false conf fname ifun env ep
-
-let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
-
-let interp_no_env conf fname =
-  interp_no_header conf fname
-    {
-      eval_var = (fun _ -> raise Not_found);
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach = (fun _ -> raise Not_found);
-    }
-    Templ.Env.empty ()
-
 let include_home_template conf =
-  Templ_parser.wrap "home" (fun () ->
-      match Templ.input_templ conf "home" with
-      | Some astl ->
-          let full_name = Util.etc_file_name conf "home" in
-          Templ.interp_ast conf
-            {
-              eval_var = (fun _ -> raise Not_found);
-              eval_transl = (fun _ -> Templ.eval_transl conf);
-              eval_predefined_apply = (fun _ -> raise Not_found);
-              get_vother;
-              set_vother;
-              print_foreach = (fun _ -> raise Not_found);
-            }
-            Templ.Env.empty ()
-            [ Ainclude (full_name, astl) ]
-      | None -> error_cannot_access conf "home")
+  let ifun =
+    Templ.
+      {
+        eval_var = (fun _ -> raise Not_found);
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = (fun _ -> raise Not_found);
+      }
+  in
+  try Templ.output conf ifun Templ.Env.empty () "home"
+  with _ -> error_cannot_access conf "home"
 
 let link_to_referer conf =
   let referer = Util.get_referer conf in
@@ -101,7 +72,7 @@ let header_without_http_nor_home conf title =
   Output.print_sstring conf str1;
   title true;
   Output.print_sstring conf str2;
-  Templ.include_template conf Templ.Env.empty "css" (fun () -> ());
+  Templ.output_builtin conf Templ.Env.empty "css";
   Output.print_sstring conf "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
@@ -109,7 +80,7 @@ let header_without_http_nor_home conf title =
   in
   let s = s ^ Util.body_prop conf in
   Output.printf conf "<body%s>\n" s;
-  Templ.include_hed_trl conf "hed";
+  Templ.output_builtin conf Templ.Env.empty "hed";
   Util.message_to_wizard conf
 
 let is_fluid conf =
@@ -170,9 +141,12 @@ let rheader conf title = header_with_title ~error:true conf title
 
 let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
-  Templ.include_hed_trl conf "trl";
-  Templ.print_copyright conf;
-  Templ.include_template conf Templ.Env.empty "js" (fun () -> ());
+  Templ.output_builtin conf Templ.Env.empty "trl";
+  Templ.output_builtin conf Templ.Env.empty "copyr";
+  Templ.output_builtin conf Templ.Env.empty "js";
+  let query_time = Unix.gettimeofday () -. conf.query_start in
+  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+    !GWPARAM.errors_other !GWPARAM.set_vars;
   Output.print_sstring conf "</body>\n</html>\n"
 
 (* Calendar request *)
@@ -239,15 +213,15 @@ let eval_julian_day conf =
 (* *)
 
 let eval_var conf env jd _loc =
-  let open TemplAst in
+  let module Ast = Geneweb_templ.Ast in
   function
   | [ "integer" ] -> (
       match get_env "integer" env with
-      | Vint i -> VVstring (string_of_int i)
+      | Vint i -> Templ.VVstring (string_of_int i)
       | _ -> raise Not_found)
-  | "date" :: sl -> TemplDate.eval_date_var conf jd sl
+  | "date" :: sl -> Templ.eval_date_var conf jd sl
   | "today" :: sl ->
-      TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+      Templ.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
   | _ -> raise Not_found
 
 let print_foreach print_ast eval_expr =
@@ -273,13 +247,15 @@ let print_foreach print_ast eval_expr =
   print_foreach
 
 let print_calendar conf _base =
-  interp conf "calendar"
-    {
-      eval_var = eval_var conf;
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach;
-    }
-    Templ.Env.empty (eval_julian_day conf)
+  let ifun =
+    Templ.
+      {
+        eval_var = eval_var conf;
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach;
+      }
+  in
+  Templ.output conf ifun Templ.Env.empty (eval_julian_day conf) "calendar"

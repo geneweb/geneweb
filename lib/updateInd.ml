@@ -3,8 +3,8 @@
 open Config
 open Def
 open Gwdb
-open TemplAst
 open Util
+module Ast = Geneweb_templ.Ast
 
 let string_person_of base p =
   let fp ip =
@@ -636,16 +636,18 @@ let print_update_ind conf base p digest =
           |> add "digest" (Vstring digest)
           |> add "next_pevent" (Vcnt (ref (List.length p.pevents + 1))))
       in
-      Hutil.interp conf "updind"
-        {
-          eval_var = eval_var conf base;
-          eval_transl = (fun _ -> Templ.eval_transl conf);
-          eval_predefined_apply = (fun _ -> raise Not_found);
-          get_vother;
-          set_vother;
-          print_foreach;
-        }
-        env p
+      let ifun =
+        Templ.
+          {
+            eval_var = eval_var conf base;
+            eval_transl = (fun _ -> Templ.eval_transl conf);
+            eval_predefined_apply = (fun _ -> raise Not_found);
+            get_vother;
+            set_vother;
+            print_foreach;
+          }
+      in
+      Templ.output conf ifun env p "updind"
   | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base p =
@@ -739,13 +741,15 @@ let print_change_event_order conf base =
   | None -> Hutil.incorrect_request conf
   | Some i ->
       let p = string_person_of base (poi base (iper_of_string i)) in
-      Hutil.interp conf "updindevt"
-        {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach;
-        }
-        Templ.Env.empty p
+      let ifun =
+        Templ.
+          {
+            eval_var = eval_var conf base;
+            eval_transl = (fun _ -> Templ.eval_transl conf);
+            eval_predefined_apply = (fun _ -> raise Not_found);
+            get_vother;
+            set_vother;
+            print_foreach;
+          }
+      in
+      Templ.output conf ifun Templ.Env.empty p "updindevt"

@@ -4,7 +4,6 @@
 open Config
 open Def
 open Gwdb
-open TemplAst
 open Util
 
 let default_source conf =
@@ -114,7 +113,7 @@ and eval_var conf base env (fam, cpl, des) _loc sl =
 
 and eval_bvar conf v =
   match List.assoc_opt v conf.base_env with
-  | Some v -> VVstring v
+  | Some v -> Templ.VVstring v
   | None -> VVstring ""
 
 and eval_divorce fam =
@@ -517,16 +516,18 @@ let print_update_fam conf base fcd digest =
       | "MOD_FAM_OK" | "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK"
       | "MRG_MOD_FAM_OK" ) ->
       let env = Templ.Env.(add "digest" (Vstring digest) empty) in
-      Hutil.interp conf "updfam"
-        {
-          eval_var = eval_var conf base;
-          eval_transl = (fun _ -> Templ.eval_transl conf);
-          eval_predefined_apply = (fun _ -> raise Not_found);
-          get_vother;
-          set_vother;
-          print_foreach;
-        }
-        env fcd
+      let ifun =
+        Templ.
+          {
+            eval_var = eval_var conf base;
+            eval_transl = (fun _ -> Templ.eval_transl conf);
+            eval_predefined_apply = (fun _ -> raise Not_found);
+            get_vother;
+            set_vother;
+            print_foreach;
+          }
+      in
+      Templ.output conf ifun env fcd "updfam"
   | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base ifam =
@@ -811,13 +812,15 @@ let print_change_event_order conf base =
   | Some i ->
       let i = ifam_of_string i in
       let sfam = string_family_of conf base i in
-      Hutil.interp conf "updfamevt"
-        {
-          eval_var = eval_var conf base;
-          eval_transl = (fun _ -> Templ.eval_transl conf);
-          eval_predefined_apply = (fun _ -> raise Not_found);
-          get_vother;
-          set_vother;
-          print_foreach;
-        }
-        Templ.Env.empty sfam
+      let ifun =
+        Templ.
+          {
+            eval_var = eval_var conf base;
+            eval_transl = (fun _ -> Templ.eval_transl conf);
+            eval_predefined_apply = (fun _ -> raise Not_found);
+            get_vother;
+            set_vother;
+            print_foreach;
+          }
+      in
+      Templ.output conf ifun Templ.Env.empty sfam "updfamevt"

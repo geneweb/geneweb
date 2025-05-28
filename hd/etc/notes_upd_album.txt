@@ -42,7 +42,7 @@
 <div id="fd_error"></div>
 
 <form id="form" class="mt-2" method="post" action="%action;">
- 
+
   <div class="form-row">
     <label for="page_title" class="col-form-label col-sm-2">[*title/titles]0</label>
     <input type="text" class="form-control col-sm" id="page_title">
@@ -86,7 +86,7 @@
       %end;
     </div>
   </div>
-    
+
   <div class="my-2 ml-2 mr-4">
     <div class="d-flex justify-content-center">
       <div class="p-2 bd-highlight"><a id="first" href="#" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
@@ -139,8 +139,9 @@
 
 </div>
 %include;js
+%query_time;
 %if;(b.use_cdn="yes")
-  <script src="https://cdn.datatables.net/v/bs4/dt-2.0.8/datatables.min.js" 
+  <script src="https://cdn.datatables.net/v/bs4/dt-2.0.8/datatables.min.js"
   integrity="sha256-L8giEO/bNvvREMEyML6g5LLiwxHGT5FJ7aOmmVivU/k=
              sha384-f4F8uiQ2tF8dSztvc3FlhuLLLszAYYPsFS5JXR2OyfX0mnZotJH1o5PIbC3q5PNy
              sha512-UJy2UCxUNbuXbEYnIG5IqWyzlgMZSx4+fk4twICYpc+otPn1bq6549abP7wNTvM9OGEO2K9Vb+e4nQD03J1Prg=="
@@ -216,13 +217,13 @@ function displayLinks() {
 function loadFirstImage() {
   current = 0;
   displayLinks();
-  loadCurrentImage(); 
+  loadCurrentImage();
 }
 
 function loadLastImage() {
   current = imagesCount - 1;
   displayLinks();
-  loadCurrentImage(); 
+  loadCurrentImage();
 }
 
 function loadNextImage() {
@@ -230,7 +231,7 @@ function loadNextImage() {
     saveCurrentImageToJson();
     current = current + 1;
     displayLinks();
-    loadCurrentImage(); 
+    loadCurrentImage();
   }
 }
 
@@ -462,7 +463,7 @@ function initComplete() {
   // Init map and legend from JSON
   json.images[current].map.forEach( function( r ) {
     var cnt = ++global_cnt;
-    
+
     if(get(r.group) != 0)
       { group = " class='group" + get(r.group) + "' data-maphilight='{\"groupBy\":\".group" + get(r.group) + "\"}'"; }
     else { group = ""; }
@@ -478,7 +479,7 @@ function initComplete() {
     } else {
       $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
     }
-    
+
     // Make sure we can find the row in table
     table.row(cnt-1).node().id = "row" + cnt;
   });
@@ -700,10 +701,10 @@ $(document).ready(function() {
   });
 
   $.ajax( "%url;&ajax=on" )
-  .done( function(j) { 
+  .done( function(j) {
     $("#digest").val( j.digest );
-    json = j.r; 
-    imagesCount = json.images.length; 
+    json = j.r;
+    imagesCount = json.images.length;
     document.title = json.title;
 
     $("#page_title").val( json.title );

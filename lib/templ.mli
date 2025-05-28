@@ -1,3 +1,6 @@
+module Ast = Geneweb_templ.Ast
+module Loc = Geneweb_templ.Loc
+
 module Env : sig
   type 'a t
 
@@ -6,55 +9,46 @@ module Env : sig
   val find : string -> 'a t -> 'a
 end
 
+type 'a expr_val =
+  | VVbool of bool
+  | VVstring of string
+  | VVother of (string list -> 'a expr_val)
+
 type 'a vother =
-  | Vdef of (string * TemplAst.ast option) list * TemplAst.ast list
-  | Vval of 'a TemplAst.expr_val
+  | Vdef of (string * Ast.t option) list * Ast.t list
+  | Vval of 'a expr_val
   | Vbind of string * Adef.encoded_string
 
 type ('a, 'b) interp_fun = {
-  eval_var :
-    'a Env.t -> 'b -> TemplAst.loc -> string list -> 'b TemplAst.expr_val;
+  eval_var : 'a Env.t -> 'b -> Loc.t -> string list -> 'b expr_val;
   eval_transl : 'a Env.t -> bool -> string -> string -> string;
-  eval_predefined_apply :
-    'a Env.t -> string -> 'b TemplAst.expr_val list -> string;
+  eval_predefined_apply : 'a Env.t -> string -> 'b expr_val list -> string;
   get_vother : 'a -> 'b vother option;
   set_vother : 'b vother -> 'a;
   print_foreach :
-    ('a Env.t -> 'b -> TemplAst.ast -> unit) ->
-    ('a Env.t -> 'b -> TemplAst.ast -> string) ->
+    ('a Env.t -> 'b -> Ast.t -> unit) ->
+    ('a Env.t -> 'b -> Ast.t -> string) ->
     'a Env.t ->
     'b ->
-    TemplAst.loc ->
+    Loc.t ->
     string ->
     string list ->
-    TemplAst.ast list list ->
-    TemplAst.ast list ->
+    Ast.t list list ->
+    Ast.t list ->
     unit;
 }
 
-val input_templ : Config.config -> string -> TemplAst.ast list option
-
-val interp_ast :
-  Config.config ->
-  ('a, 'b) interp_fun ->
-  'a Env.t ->
-  'b ->
-  TemplAst.ast list ->
-  unit
-
+val apply_format : Config.config -> int option -> string -> string -> string
 val eval_transl : Config.config -> bool -> string -> string -> string
 val eval_transl_lexicon : Config.config -> bool -> string -> string -> string
+val eval_date_var : Config.config -> int -> string list -> 'a expr_val
 
-val copy_from_templ :
-  Config.config -> Adef.encoded_string Env.t -> in_channel -> unit
+val output :
+  Config.config -> ('a, 'b) interp_fun -> 'a Env.t -> 'b -> string -> unit
+(** [output conf ifun env v fl] outputs on the client socket the template [fl]
+    using the functions [ifun] and the environment [env]. *)
 
-val include_hed_trl : Config.config -> string -> unit
-
-val include_template :
-  Config.config -> Adef.encoded_string Env.t -> string -> (unit -> unit) -> unit
-
-val apply_format : Config.config -> int option -> string -> string -> string
-
-val print_copyright : Config.config -> unit
-(** Evaluates and prints content of {i cpr} template.
-    If template wasn't found prints basic copyrigth HTML structure. *)
+val output_builtin :
+  Config.config -> Adef.encoded_string Env.t -> string -> unit
+(** [output_builtin conf env fl] outputs on the client socket the template [fl]
+    using only builtin evaluator and the environment [env]. *)

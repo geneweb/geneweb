@@ -1,6 +1,5 @@
 open Config
 open Gwdb
-open TemplAst
 open Util
 open UpdateData
 module Logs = Geneweb_logs.Logs
@@ -186,8 +185,8 @@ let unfold_place_long inverted s =
 let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
-let bool_val x = VVbool x
-let str_val x = VVstring x
+let bool_val x = Templ.VVbool x
+let str_val x = Templ.VVstring x
 
 let rec eval_var conf base env xx _loc sl =
   try eval_simple_var conf base env xx sl
@@ -482,13 +481,15 @@ let print_mod conf base =
     Templ.Env.(
       empty |> add "list" (Vlist_data list) |> add "count" (Vcnt (ref 0)))
   in
-  Hutil.interp conf "upddata"
-    {
-      eval_var = eval_var conf base;
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach = print_foreach conf;
-    }
-    env ()
+  let ifun =
+    Templ.
+      {
+        eval_var = eval_var conf base;
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = print_foreach conf;
+      }
+  in
+  Templ.output conf ifun env () "upddata"

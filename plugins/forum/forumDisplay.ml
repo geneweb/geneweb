@@ -3,7 +3,6 @@
 open Geneweb
 open Config
 open Def
-open TemplAst
 open Util
 open Forum
 
@@ -60,13 +59,13 @@ let print_foreach conf _base print_ast eval_expr =
   in
   print_foreach
 
-let str_val x = VVstring x
+let str_val x = Templ.VVstring x
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
-  VVstring ((x :> Adef.safe_string) :> string)
+  Templ.VVstring ((x :> Adef.safe_string) :> string)
 
 let rec eval_var conf base env _xx _loc = function
-  | [ "can_post" ] -> VVbool (can_post conf)
+  | [ "can_post" ] -> Templ.VVbool (can_post conf)
   | [ "is_moderated_forum" ] -> VVbool (moderators conf <> [])
   | [ "is_moderator" ] -> VVbool (is_moderator conf)
   | "message" :: sl -> eval_message_var conf base env sl
@@ -242,19 +241,24 @@ and eval_message_string_var conf str so = function
       safe_val s
   | _ -> raise Not_found
 
+let print conf base env =
+  let ifun =
+    Templ.
+      {
+        eval_var = eval_var conf base;
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = print_foreach conf base;
+      }
+  in
+  Templ.output conf ifun env () "forum"
+
 let visualize conf base mess =
   let vmess = Vmess (mess, None, MF.not_a_pos, MF.not_a_pos, None) in
   let env = Templ.Env.(add "mess" vmess empty) in
-  Hutil.interp conf "forum"
-    {
-      eval_var = eval_var conf base;
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach = print_foreach conf base;
-    }
-    env ()
+  print conf base env
 
 let message_txt conf n =
   transl_nth conf "message/previous message/previous messages/next message" n
@@ -304,29 +308,11 @@ let print_forum_message conf base r so =
           |> add "pos" (Vpos (ref pos)))
     | Some _ | None -> Templ.Env.(add "pos" (Vpos (ref MF.not_a_pos)) empty)
   in
-  Hutil.interp conf "forum"
-    {
-      eval_var = eval_var conf base;
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach = print_foreach conf base;
-    }
-    env ()
+  print conf base env
 
 let print_forum_headers conf base =
   let env = Templ.Env.(add "pos" (Vpos (ref MF.not_a_pos)) empty) in
-  Hutil.interp conf "forum"
-    {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf base;
-    }
-    env ()
+  print conf base env
 
 let valid_forum_message conf base pos =
   match get_message conf pos with

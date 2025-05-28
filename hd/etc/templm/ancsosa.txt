@@ -118,8 +118,9 @@
   %include;tools
 
   %apply;tools_ancsosa()
-  %base_trailer;
+  %include;trl
   %include;copyr
+  %query_time;
 %end;
 </body>
 </html>
