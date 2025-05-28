@@ -10,8 +10,6 @@ module PersSet = Set.Make (struct
   let compare p1 p2 = compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
 end)
 
-module StringSet = Set.Make (String)
-
 module IstrSet = Set.Make (struct
   type t = Gwdb.istr
 
@@ -502,10 +500,10 @@ let build_list_short conf list =
     in
     (* Fonction pour supprimer les doublons. *)
     let remove_dup list =
-      StringSet.elements
+      Ext_string.Set.elements
         (List.fold_left
-           (fun accu ini -> StringSet.add ini accu)
-           StringSet.empty list)
+           (fun accu ini -> Ext_string.Set.add ini accu)
+           Ext_string.Set.empty list)
     in
     (* Astuce pour gérer les espaces. *)
     let inis = List.rev_map (fun p -> Ext_string.tr ' ' '_' p) inis in
