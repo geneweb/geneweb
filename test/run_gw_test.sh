@@ -46,7 +46,7 @@ BIN_DIR="$DIST_DIR/gw"
 BASES_DIR="$DIST_DIR/bases"
 LEXICON=
 TAGS=
-GWDLOG=./distribution/gw/gwd.log
+GWDLOG=$BIN_DIR/gwd.log
 GWCGI=gwd.cgi # the cgi script name that call gwd with cgi parameter
 GWDLOGCGI=/tmp/gwd.log # associated error log
 CLEANLOG=1
@@ -131,7 +131,7 @@ if test -n "$TAGS"; then
     gwdopt="$gwdopt --allowed_tags $TAGS"
 fi
 if test "$test_diff" || test "$set_ref"; then
-    gwdopt="$gwdopt -predictable_mode"
+    gwdopt="$gwdopt -predictable_mode -n_workers 0"
 fi
 
 pgrep gwd >/dev/null && \
@@ -148,8 +148,6 @@ OCAMLRUNPARAM=b $SUDOPRFX $BIN_DIR/gwd \
   -lang en \
   -log "<stderr>" \
   -plugins -unsafe $BIN_DIR/plugins \
-  -n_workers 0 \
-  -predictable_mode \
   2>> $GWDLOG &
 fi
 
@@ -204,6 +202,23 @@ crl () {
       test -n "$tstmsg" && echo "Failed $tstmsg, $nberr detected error(s)"
       grep "var.errors_list.=" /tmp/tmp.txt;
       RC=$(($RC+1))
+    elif test "$DBNAME" = "galichet"; then
+      if test -z "$cmd" && ! grep $GREPOPT "m=MISC_NOTES" /tmp/tmp.txt; then
+        echo "missing Notes index button on Welcome page ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      elif test "$cmd" = "p=xxx&n=yyy" && \
+           ! grep $GREPOPT "Not.found:" /tmp/tmp.txt; then
+        echo "missing 'Not found' page, issue 2220, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      elif test "$cmd" = 'p=anthoine&n=geruzet&oc=0' && \
+           grep $GREPOPT "une.1ere..ligne.*ligne.terminal" /tmp/tmp.txt; then
+        echo "'text in pre tags not properly formatted, issue 2221, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      elif test "$cmd" = 'p=marie&n=dupond&oc=0' && \
+           grep $GREPOPT "Galichet.*un.commentaire.entre.crochets" /tmp/tmp.txt; then
+        echo "'Failure parsing notes with brackets, issue 2218, ${urlprfix}w=$PWD&$cmd"
+        RC=$(($RC+1))
+      fi
     fi
   fi
   unset tstmsg
@@ -281,7 +296,7 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
 done
 if [ $attempt -eq $MAX_ATTEMPTS ]; then
-  echo "gwd does not seem to be running after $attempt trys"
+  echo "gwd does not seem to be running after $attempt trys\nhave a look to $GWDLOG"
   exit 1
 else
   echo "gwd start after $attempt trys"
