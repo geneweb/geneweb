@@ -30,6 +30,12 @@ module IstrSet = Set.Make (struct
   let compare = compare_istr
 end)
 
+module PersonSet = Set.Make (struct
+  type t = person
+
+  let compare p1 p2 = compare_iper (get_iper p1) (get_iper p2)
+end)
+
 (** [insert_person base p a u]
     Add a new person with its union and ascendants in the [base].
     Allocate and returns the fresh new id for this person.

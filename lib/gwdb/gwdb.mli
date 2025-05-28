@@ -18,6 +18,10 @@ module IstrSet : sig
   include Set.S with type elt = istr
 end
 
+module PersonSet : sig
+  include Set.S with type elt = person
+end
+
 val insert_person :
   base ->
   (_, iper, istr) Def.gen_person ->
