@@ -1,108 +1,10 @@
 {
 
-open TemplAst
-
-module Logs = Geneweb_logs.Logs
-
-let dump_list pp a = String.concat ";" (List.map pp a)
-let rec dump_ast trk depth =
-  let dump_ast a = if depth > 0 then dump_ast trk (depth - 1) a else "..." in
-  let dump_ast_list a = if depth > 0 then dump_list dump_ast a else "..." in
-  let dump_ast_list_list a = if depth > 0 then dump_list dump_ast_list a else "..." in
-  let trk s =
-    let s = Str.global_replace (Str.regexp "\n") " " s in
-    if String.length s > trk then String.sub s 0 trk ^ "..." else s in
-  function
-  | Atext (_, a) ->
-    "(Atext " ^ trk a ^ ")"
-  | Avar (_, a, b) ->
-    "(Avar " ^ trk (String.concat "." (a :: b)) ^ ")"
-  | Atransl (_, a, b, c) ->
-    "(Atransl " ^ (if a then "T," else "F,") ^ trk b ^ "," ^ trk c ^ ")"
-  | Aconcat (_, a) ->
-    "(Aconcat " ^ dump_ast_list a ^ ")"
-  | Awid_hei a ->
-    "(Awid_hei " ^ trk a ^ ")"
-  | Aif (a, b, c) ->
-    "(Aif " ^ dump_ast a ^ "," ^ dump_ast_list b ^ "," ^ dump_ast_list c ^ ")"
-  | Aforeach ((_, a, b), c, d) ->
-    "(Aif " ^ trk a ^ "," ^ trk (String.concat "." b) ^ "," ^ dump_ast_list_list c ^ "," ^ dump_ast_list d ^ ")"
-  | Afor (a, b, c, d) ->
-    "(Afor " ^ trk a ^ "," ^ dump_ast b ^ "," ^ dump_ast c ^ "," ^ dump_ast_list d ^ ")"
-  | Adefine (a, b, c, d) ->
-    "(Adefine " ^ trk a ^ "," ^ String.concat "." (List.map (fun (a, dft) -> a ^
-    	      match dft with None -> "" | Some dft -> "=" ^ dump_ast dft) b) ^ "," ^ dump_ast_list c ^ "," ^ dump_ast_list d ^ ")"
-  | Aapply (_, a, b) ->
-    "(Aapply " ^ trk a ^ "," ^ (String.concat "," (List.map (fun (id, ast) ->
-    match id with
-    | Some id -> id ^ ":" ^ dump_ast_list ast
-    | None -> dump_ast_list ast) b)) ^ ")"
-  | Alet (a, b, c) ->
-    "(Alet " ^ trk a ^ "," ^ dump_ast_list b ^ "," ^ dump_ast_list c ^ ")"
-  | Aop1 (_, a, b) ->
-    "(Aop1 " ^ trk a ^ "," ^ dump_ast b ^ ")"
-  | Aop2 (_, a, b, c) ->
-    "(Aop2 " ^ trk a ^ "," ^ dump_ast b ^ "," ^ dump_ast c ^ ")"
-  | Aint (_, a) ->
-    "(Aint " ^ a ^ ")"
-  | Ainclude (a, b) ->
-    "(Ainclude " ^ trk a ^ "," ^ dump_ast_list b ^ ")"
-
-let current_file = ref ""
-
-let wrap fname fn =
-  let old = !current_file in
-  current_file := fname ;
-  try
-    let r = fn () in
-    current_file := old ;
-    r
-  with e ->
-    current_file := old ;
-    raise e
-
-let line_of_loc (fname, bp, ep) =
-  try
-    Secure.with_open_in_text fname (fun ic ->
-    try
-      let rec line i j =
-        let rec column j j0 =
-          if j < bp
-          then match input_char ic with
-            | '\n' -> line (i + 1) (j + 1)
-            | _ -> column (j + 1) j0
-          else
-            (i+1, bp - j0, ep - j0)
-        in column j j
-      in Some (line 0 0)
-    with _ -> None)
-  with _ -> None
-
-let dummy_pos = (-1, -1)
-
-let pos lex = !current_file, Lexing.lexeme_start lex, Lexing.lexeme_end lex
-
-exception Templ_parser_exc of string * int * int
-
-let fail lex ?(pos = pos lex) () =
-  let (file, bp, ep) = pos in
-  raise (Templ_parser_exc (file, bp, ep))
-
-let dump_ast ?(truncate=max_int) ?(depth=max_int) a = dump_ast truncate depth a
-
-module HS = Hashtbl.Make (struct
-  type t = string
-  let equal = String.equal
-  let hash = Hashtbl.hash
-end)
-
-(* Cache used for already parsed files. This cache is only hit while
-   parsing included files. *)
-let included_files : ast list HS.t = HS.create 17
+(* let pos lex = !current_file, Lexing.lexeme_start lex, Lexing.lexeme_end lex *)
 
 (* Leading ([' ' '\t' '\r']* '\n') will be removed, except if
    the previous node is a Atransl. *)
-let flush ast b lexbuf =
+let flush ast b _lexbuf =
   let s = Buffer.contents b in
   let trim s =
     let rec loop i =
@@ -116,12 +18,12 @@ let flush ast b lexbuf =
     loop 0
   in
   let s = match ast with
-    | TemplAst.Atransl _ :: _ | TemplAst.Awid_hei _ :: _ -> s
+    | Ast.{ desc = Atransl _; _ } :: _ | { desc = Awid_hei _; _ } :: _ -> s
     | _ -> trim s
   in
   let ast =
     if s = "" then ast
-    else Atext ((!current_file, lexbuf.Lexing.lex_curr_pos - String.length s, lexbuf.Lexing.lex_curr_pos), s) :: ast
+    else Ast.mk_text s :: ast
   in
   let () = Buffer.reset b in
   ast
@@ -138,69 +40,65 @@ let var = (r_ident ('.' (r_ident|num))*)
 
 let value = ([^ ' ' '>' ';' '\n' '\r'  '\t' ]+)
 
-rule parse_ast conf b closing ast = parse
+rule parse_ast b closing ast = parse
 
   (* Special variable: strip whitespaces coming after this. *)
   | "%sq;" ws* {
-      parse_ast conf b closing ast lexbuf
+      parse_ast b closing ast lexbuf
     }
 
   (* Special variable: strip on newline and its surrounding whitespaces. *)
   | "%nn;" [ ' ' '\t' '\r' ]* '\n'? [ ' ' '\t' '\r' ]* {
-      parse_ast conf b closing ast lexbuf
+      parse_ast b closing ast lexbuf
     }
 
   | '%' {
       match match variable lexbuf with `variable [] -> `escaped '%' | x -> x with
-      | `escaped c -> Buffer.add_char b c ; parse_ast conf b closing ast lexbuf
-      | `comment -> parse_ast conf b closing ast lexbuf
+      | `escaped c -> Buffer.add_char b c ; parse_ast b closing ast lexbuf
+      | `comment -> parse_ast b closing ast lexbuf
       | x ->
-        let pos = pos lexbuf in
+        let loc = Loc.of_lexbuf lexbuf in
         let ast = flush ast b lexbuf in
         match x with
         | `variable [v] when List.mem v closing -> List.rev ast, v
-        | `variable ["define"] -> parse_define conf b closing ast lexbuf
-        | `variable ["let"] -> parse_let conf b closing ast lexbuf
-        | `variable ["include"] -> parse_include conf b closing ast lexbuf
+        | `variable ["define"] -> parse_define b closing ast lexbuf
+        | `variable ["let"] -> parse_let b closing ast lexbuf
+        | `variable ["include"] -> parse_include b closing ast lexbuf
         | x ->
           let a = match x with
-            | `variable ["if"] -> parse_if conf b lexbuf
-            | `variable ["foreach"] -> parse_foreach conf b lexbuf
-            | `variable ["apply"] -> parse_apply conf b lexbuf
+            | `variable ["if"] -> parse_if b lexbuf
+            | `variable ["foreach"] -> parse_foreach b lexbuf
+            | `variable ["apply"] -> parse_apply b lexbuf
             | `variable ["expr"] -> parse_expr_stmt lexbuf
-            | `variable ["for"] -> parse_for conf b lexbuf
-            | `variable ["wid_hei"] -> Awid_hei (value lexbuf)
-            | `variable (hd :: tl) -> Avar (pos, hd, tl)
-          [@@warning "-8"]
+            | `variable ["for"] -> parse_for b lexbuf
+            | `variable ["wid_hei"] -> Ast.mk_wid_hei (value lexbuf)
+            | `variable (hd :: tl) -> Ast.mk_var ~loc hd tl
+            | `variable [] | `escaped _ | `comment -> assert false
           in
-          parse_ast conf b closing (a :: ast) lexbuf
+          parse_ast b closing (a :: ast) lexbuf
     }
 
   | '[' {
       let ast = flush ast b lexbuf in
       let a =
-        let pos = pos lexbuf in
+        let loc = Loc.of_lexbuf lexbuf in
         let (upp, s, n) = lexicon_word lexbuf in
-        if String.length s > 1 && (s.[0] = '[' || s.[0] = '@')
-        then
-          try
-            let (ast, _) = parse_ast conf b [] [] (Lexing.from_string s) in
-            Aconcat (pos, ast)
-          with _ -> fail lexbuf ~pos ()
+        if String.length s > 1 && (s.[0] = '[' || s.[0] = '@') then
+            Ast.mk_include ~loc (`Raw s)
         else
-          Atransl (pos, upp, s, n)
+          Ast.mk_transl ~loc upp s n
       in
-      parse_ast conf b closing (a :: ast) lexbuf
+      parse_ast b closing (a :: ast) lexbuf
     }
 
   | '\n' [ ' ' '\n' '\t' '\r' ]* {
       let () = Buffer.add_char b '\n' in
-      parse_ast conf b closing ast lexbuf
+      parse_ast b closing ast lexbuf
     }
 
   | _ as c {
       let () = Buffer.add_char b c in
-      parse_ast conf b closing ast lexbuf
+      parse_ast b closing ast lexbuf
     }
 
   | eof {
@@ -236,7 +134,7 @@ and parse_expr_if_1 e1 = parse
 and parse_expr_if_2 e1 e2 = parse
   | ws* "else" {
       let e3 = parse_expr_or lexbuf in
-      Aif (e1, [e2], [e3])
+      Ast.mk_if e1 [e2] [e3]
     }
 
 and parse_expr_or = parse
@@ -246,9 +144,9 @@ and parse_expr_or = parse
     }
 and parse_expr_or_1 e1 = parse
   | ws* "or" {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e2 = parse_expr_or lexbuf in
-      Aop2 (pos, "or", e1, e2)
+      Ast.mk_op2 ~loc "or" e1 e2
     }
   | ws* {
       e1
@@ -261,9 +159,9 @@ and parse_expr_and = parse
     }
 and parse_expr_and_1 e1 = parse
   | ws* "and" {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e2 = parse_expr_and lexbuf in
-      Aop2 (pos, "and", e1, e2)
+      Ast.mk_op2 ~loc "and" e1 e2
     }
   | ws* {
       e1
@@ -276,9 +174,9 @@ and parse_expr_is_substr = parse
     }
 and parse_expr_is_substr_1 e1 = parse
   | ws* "is_substr" {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e2 = parse_expr_is_substr lexbuf in
-      Aop2 (pos, "is_substr", e1, e2)
+      Ast.mk_op2 ~loc "is_substr" e1 e2
     }
   | ws* {
       e1
@@ -291,9 +189,9 @@ and parse_expr_in = parse
     }
 and parse_expr_in_1 e1 = parse
   | ws* "in" {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e2 = parse_expr_in lexbuf in
-      Aop2 (pos, "in", e1, e2)
+      Ast.mk_op2 ~loc "in" e1 e2
     }
   | ws* {
       e1
@@ -306,9 +204,9 @@ and parse_expr_3 = parse
     }
 and parse_expr_3_1 e1 = parse
   | ws* (("="|"!="|">"|">="|"<"|"<=") as op) {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e2 = parse_expr_4 lexbuf in
-      Aop2 (pos, op, e1, e2)
+      Ast.mk_op2 ~loc op e1 e2
     }
   | ws* {
       e1
@@ -321,9 +219,10 @@ and parse_expr_4 = parse
     }
 and parse_expr_4_1 e1 = parse
   | ws* (("+"|"-") as op) ws* {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e2 = parse_expr_5 lexbuf in
-      parse_expr_4_1 (Aop2 (pos, String.make 1 op, e1, e2)) lexbuf
+      let a = Ast.mk_op2 ~loc (String.make 1 op) e1 e2 in
+      parse_expr_4_1 a lexbuf
     }
   | ws*  { e1 }
 
@@ -335,9 +234,10 @@ and parse_expr_5 = parse
 
 and parse_expr_5_1 e1 = parse
   | ws* (("*" | "^" | "/" | "|" | "%" |"/.") as op) {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e2 = parse_simple_expr lexbuf in
-      parse_expr_5_1 (Aop2 (pos, op, e1, e2)) lexbuf
+      let a = Ast.mk_op2 ~loc op e1 e2 in
+      parse_expr_5_1 a lexbuf
     }
   | ws* {
       e1
@@ -350,27 +250,34 @@ and parse_simple_expr = parse
       e
     }
   | ws* "not" {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let e = parse_simple_expr lexbuf in
-      Aop1 (pos, "not", e)
+      Ast.mk_op1 ~loc "not" e
     }
   | ws* '"' ([^'"']* as s) '"' {
-      Atext (pos lexbuf, s)
+      let loc = Loc.of_lexbuf lexbuf in
+      Ast.mk_text ~loc s
     }
   | ws* (num as s) {
-      Aint (pos lexbuf, s)
+      let loc = Loc.of_lexbuf lexbuf in
+      Ast.mk_int ~loc s
     }
   | ws* '[' {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let u, w, n = lexicon_word lexbuf in
-      Atransl (pos, u, w, n)
+      Ast.mk_transl ~loc u w n
     }
   | ws* (var as id) {
-      let pos = pos lexbuf in
-      let [@warning "-8"] hd :: tl = String.split_on_char '.' id in
-      try
-        Aapply (pos, hd, List.map (fun v -> None, v) (parse_tuple lexbuf))
-      with _ -> Avar (pos, hd, tl)
+      let loc = Loc.of_lexbuf lexbuf in
+      match String.split_on_char '.' id with
+      | hd :: tl -> (
+        (* FIXME: This hack introduces backtracking in the parser. We should
+           parse our syntax without backtracking at all. *)
+        try
+          let l = List.map (fun v -> None, v) (parse_tuple lexbuf) in
+          Ast.mk_apply ~loc hd l
+        with _ -> Ast.mk_var ~loc hd tl)
+      | [] -> assert false
     }
 
 and parse_simple_expr_1 = parse
@@ -553,12 +460,13 @@ and comment = parse
       comment lexbuf
     }
 
-and parse_define conf b closing ast = parse
+and parse_define b closing ast = parse
   | ws* (r_ident as f) ws* '(' {
       let args = parse_params lexbuf in
-      let (a, _) = parse_ast conf b ["end"] [] lexbuf in
-      let (k, t) = parse_ast conf b closing [] lexbuf in
-      (List.rev (Adefine (f, args, a, k) :: ast), t)
+      let (a, _) = parse_ast b ["end"] [] lexbuf in
+      let (k, t) = parse_ast b closing [] lexbuf in
+      let u = Ast.mk_define f args a k in
+      (List.rev (u :: ast), t)
     }
 and parse_params = parse
   | ws* (r_ident as a) ws* '=' ws* {
@@ -583,60 +491,38 @@ and parse_params_1 = parse
       []
     }
 
-and parse_let conf b closing ast = parse
+and parse_let b closing ast = parse
   |  ws* (r_ident as k) ';' ws* {
-      let (v, _) = parse_ast conf b ["in"] [] lexbuf in
-      let (a, t) = parse_ast conf b closing [] lexbuf in
-      (List.rev (Alet (k, v, a) :: ast), t)
+      let (v, _) = parse_ast b ["in"] [] lexbuf in
+      let (a, t) = parse_ast b closing [] lexbuf in
+      let u = Ast.mk_let k v a in
+      (List.rev (u :: ast), t)
     }
 
-and parse_include conf b closing ast = parse
+and parse_include b closing ast = parse
   | value as file {
-    let ast =
-      let fname = Util.etc_file_name conf file in
-      match HS.find included_files fname with
-      | a -> Ainclude (fname, a) :: ast
-      | exception Not_found ->
-        try
-          Secure.with_open_in_text fname @@ fun ic ->
-            wrap fname @@ fun () ->
-              let lex = Lexing.from_channel ic in
-              try
-                let (a, _) =
-                  parse_ast conf (Buffer.create 1024) [] [] lex
-                in
-                HS.add included_files fname a;
-                Ainclude (fname, a) :: ast
-              with _ ->
-                (* FIXME: The backtrace is lost. *)
-                fail lex ()
-        with Sys_error _ ->
-          GWPARAM.errors_other :=
-            (Format.sprintf "Missing template: %s" file) ::
-            !GWPARAM.errors_other;
-          Logs.syslog `LOG_WARNING ("Missing template: " ^ file) ;
-        ast
-     in
-     parse_ast conf b closing ast lexbuf
+    let loc = Loc.of_lexbuf lexbuf in
+    let a = Ast.mk_include ~loc (`File file) in
+    parse_ast b closing (a :: ast) lexbuf
   }
 
-and parse_apply conf b = parse
+and parse_apply b = parse
   | (r_ident as f) '%' {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       assert (`variable ["with"] = variable lexbuf) ;
       let app =
         let rec loop () =
-          match parse_ast conf b ["and"; "end"] [] lexbuf with
+          match parse_ast b ["and"; "end"] [] lexbuf with
           | a, "and" -> a :: loop ()
           | a, _ -> [ a ]
         in loop ()
       in
-      Aapply (pos, f, List.map (fun v -> None, v) app)
+      Ast.mk_apply ~loc f (List.map (fun v -> None, v) app)
     }
   | (r_ident as f) {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let app = parse_apply_tuple lexbuf in
-      Aapply (pos, f, app)
+      Ast.mk_apply ~loc f app
     }
 
 and parse_expr_stmt = parse
@@ -644,41 +530,41 @@ and parse_expr_stmt = parse
       parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf
     }
 
-and parse_if conf b = parse
+and parse_if b = parse
   | "" {
       let e = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
       let (a1, a2) =
         let rec loop () =
-          let (a1, t) = parse_ast conf b ["elseif"; "else"; "end"] [] lexbuf in
+          let (a1, t) = parse_ast b ["elseif"; "else"; "end"] [] lexbuf in
           match t with
           | "elseif" ->
             let e2 = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
             let (a2, a3) = loop () in
-            a1, [ Aif (e2, a2, a3) ]
+            a1, [ Ast.mk_if e2 a2 a3 ]
           | "else" ->
-            let (a2, _) = parse_ast conf b ["end"] [] lexbuf in
+            let (a2, _) = parse_ast b ["end"] [] lexbuf in
             a1, a2
           | _ -> a1, []
         in loop ()
       in
-      Aif (e, a1, a2)
+      Ast.mk_if e a1 a2
     }
 
-and parse_for conf b = parse
+and parse_for b = parse
   | (r_ident as iterator) ';' {
       let min = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
       let max = parse_char_stream_semi parse_simple_expr parse_simple_expr_1 lexbuf in
-      let (a, _) = parse_ast conf b ["end"] [] lexbuf in
-      Afor (iterator, min, max, a)
+      let (a, _) = parse_ast b ["end"] [] lexbuf in
+      Ast.mk_for iterator min max a
     }
 
-and parse_foreach conf b = parse
+and parse_foreach b = parse
   | "" {
-      let pos = pos lexbuf in
+      let loc = Loc.of_lexbuf lexbuf in
       let [@warning "-8"] hd :: tl = compound_var lexbuf in
       let params = parse_foreach_params lexbuf in
-      let (a, _) = parse_ast conf b ["end"] [] lexbuf in
-      Aforeach ((pos, hd, tl), params, a)
+      let (a, _) = parse_ast b ["end"] [] lexbuf in
+      Ast.mk_foreach ~loc (hd, tl) params a
     }
 
 and parse_foreach_params = parse
@@ -688,12 +574,3 @@ and parse_foreach_params = parse
   | ';'? {
       []
     }
-
-{
-
-  let parse_templ conf lexbuf =
-    try parse_ast conf (Buffer.create 1024) [] [] lexbuf |> fst
-    with Templ_parser_exc _ as e -> raise e
-       | _ -> fail lexbuf ()
-
-}

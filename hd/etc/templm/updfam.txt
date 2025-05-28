@@ -259,8 +259,9 @@
     %end;
 </fieldset>
 </form>
-%base_trailer;
+%include;trl
 %include;copyr
 %include;js
+%query_time;
 </body>
 </html>

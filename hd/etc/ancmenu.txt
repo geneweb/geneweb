@@ -586,10 +586,11 @@ function missing_events_options () {
     </div>
   </div>
 </form>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 %let;redlight2;rgb(255,136,46)%in;
 <script>
 $(document).ready(function() {
@@ -604,7 +605,7 @@ $(document).ready(function() {
   }).maximizeSelect2Height();
 });
   $("body").on('change', '#only', function() {
-   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]"), $('.noa').addClass("d-none"), $('.noa_l').removeClass("d-none")) 
+   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]"), $('.noa').addClass("d-none"), $('.noa_l').removeClass("d-none"))
                                : ($('.onlycheck').text("[up to]"), $('.noa').removeClass("d-none"), $('.noa_l').addClass("d-none"))
   });
 </script>

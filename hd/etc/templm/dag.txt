@@ -144,8 +144,9 @@
 %if;not cancel_links;
   %include;tools
   %apply;tools_dag()
-  %base_trailer;
+  %include;trl
   %include;copyr
+  %query_time;
 %end;
 </body>
 </html>

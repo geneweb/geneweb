@@ -1904,9 +1904,10 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     </div>
   %end;
 %end;
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 </body>
 </html>

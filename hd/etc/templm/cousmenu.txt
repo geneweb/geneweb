@@ -44,5 +44,6 @@
 
 %include;trl
 %include;copyr
+%query_time;
 </body>
 </html>

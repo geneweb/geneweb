@@ -37,13 +37,14 @@ let robot_error conf cnt sec =
       |> add "cnt" (Adef.encoded @@ string_of_int cnt)
       |> add "sec" (Adef.encoded @@ string_of_int sec))
   in
-  Templ.include_template conf env "robot" (fun () ->
-      let title _ = Output.print_sstring conf "Access refused" in
-      Output.print_sstring conf "<head><title>";
-      title true;
-      Output.print_sstring conf "</title>\n<body>\n<h1>";
-      title false;
-      Output.print_sstring conf "</body>\n");
+  (try Templ.output_builtin conf env "robot"
+   with _ ->
+     let title _ = Output.print_sstring conf "Access refused" in
+     Output.print_sstring conf "<head><title>";
+     title true;
+     Output.print_sstring conf "</title>\n<body>\n<h1>";
+     title false;
+     Output.print_sstring conf "</body>\n");
   raise Exit
 
 let purge_who tm xcl sec =

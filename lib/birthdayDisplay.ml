@@ -590,13 +590,15 @@ let set_vother x = Vother x
 let print_anniversaries conf =
   if p_getenv conf.env "old" = Some "on" then ()
   else
-    Hutil.interp conf "annivmenu"
-      {
-        Templ.eval_var = (fun _ -> raise Not_found);
-        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = (fun _ -> raise Not_found);
-      }
-      Templ.Env.empty ()
+    let ifun =
+      Templ.
+        {
+          eval_var = (fun _ -> raise Not_found);
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother;
+          set_vother;
+          print_foreach = (fun _ -> raise Not_found);
+        }
+    in
+    Templ.output conf ifun Templ.Env.empty () "annivmenu"

@@ -193,9 +193,10 @@
   </div>
 %end;
 
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 </body>
 </html>

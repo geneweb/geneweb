@@ -685,17 +685,20 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   Hutil.header conf title;
-  Hutil.interp_no_header conf "buttons_places"
-    {
-      eval_var = (fun _ -> raise Not_found);
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach = (fun _ -> raise Not_found);
-    }
-    Templ.Env.empty
-    (Gwdb.empty_person base Gwdb.dummy_iper);
+  let ifun =
+    Templ.
+      {
+        eval_var = (fun _ -> raise Not_found);
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = (fun _ -> raise Not_found);
+      }
+  in
+  Templ.output conf ifun Templ.Env.empty
+    (Gwdb.empty_person base Gwdb.dummy_iper)
+    "buttons_places";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   let link_to_ind =
     match List.assoc_opt "place_surname_link_to_ind" conf.base_env with
@@ -763,13 +766,15 @@ let print_all_places_surnames conf base =
       ~add_death ~add_burial ~add_marriage lim true filter
 
 let print_list conf _base =
-  Hutil.interp conf "list"
-    {
-      eval_var = (fun _ -> raise Not_found);
-      eval_transl = (fun _ -> Templ.eval_transl conf);
-      eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother;
-      set_vother;
-      print_foreach = (fun _ -> raise Not_found);
-    }
-    Templ.Env.empty ()
+  let ifun =
+    Templ.
+      {
+        eval_var = (fun _ -> raise Not_found);
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = (fun _ -> raise Not_found);
+      }
+  in
+  Templ.output conf ifun Templ.Env.empty () "list"

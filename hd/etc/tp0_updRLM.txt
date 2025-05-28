@@ -86,11 +86,12 @@
   </table>
 </form>
 %if;(not cancel_links)
-  %base_trailer;
+  %include;trl
   %include;copyr
 %end;
 </div>
 %include;js
+%query_time;
 <script>
 $(document).on( "click", ".row_add_before", function() {
   $(this).closest("tr").before( $("#template_line").clone().removeAttr("id").removeAttr("style").get(0) );

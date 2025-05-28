@@ -3,7 +3,7 @@
 open Config
 open Def
 open Gwdb
-open TemplAst
+module Ast = Geneweb_templ.Ast
 open Util
 open HistoryDiff
 
@@ -485,19 +485,19 @@ type 'a env =
 let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
-let str_val x = VVstring x
-let safe_val (x : Adef.safe_string) = VVstring (x :> string)
+let str_val x = Templ.VVstring x
+let safe_val (x : Adef.safe_string) = Templ.VVstring (x :> string)
 
 let rec eval_var conf base env (bef, aft, p_auth) _loc sl =
   try eval_simple_var conf base env (bef, aft, p_auth) sl
   with Not_found -> eval_compound_var conf base env (bef, aft, p_auth) sl
 
 and eval_simple_var conf base env (bef, aft, p_auth) :
-    string list -> 'a expr_val = function
+    string list -> 'a Templ.expr_val = function
   | [ s ] -> eval_simple_str_var conf base env (bef, aft, p_auth) s
   | _ -> raise Not_found
 
-and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b expr_val =
+and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b Templ.expr_val =
   let loop = function
     | [ s ] -> eval_simple_str_var conf base env (bef, aft, p_auth) s
     | [ "evar"; s ] -> (
@@ -512,7 +512,7 @@ and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b expr_val =
   loop sl
 
 and eval_gen_record conf base env (bef, aft, p_auth) :
-    string list -> 'a expr_val * 'b expr_val = function
+    string list -> 'a Templ.expr_val * 'b Templ.expr_val = function
   | [ "date" ] -> (safe_val bef.date, safe_val aft.date)
   | [ "wizard" ] ->
       (safe_val bef.HistoryDiff.wizard, safe_val aft.HistoryDiff.wizard)
@@ -520,7 +520,7 @@ and eval_gen_record conf base env (bef, aft, p_auth) :
   | _ -> raise Not_found
 
 and eval_str_gen_record conf base env (bef, aft, p_auth) :
-    string -> 'a expr_val * 'b expr_val =
+    string -> 'a Templ.expr_val * 'b Templ.expr_val =
   let diff_string a b =
     let a, b = diff_string a b in
     (safe_val a, safe_val b)
@@ -737,12 +737,12 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) :
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_simple_str_var conf base env (bef, aft, p_auth) : string -> 'a expr_val
-    = function
+and eval_simple_str_var conf base env (bef, aft, p_auth) :
+    string -> 'a Templ.expr_val = function
   | "acces" ->
       person_of_gen_p_key base aft.gen_p
       |> acces conf base
-      |> (safe_val :> Adef.escaped_string -> 'a expr_val)
+      |> (safe_val :> Adef.escaped_string -> 'a Templ.expr_val)
   | "date" -> eval_string_env "date" env
   | "history_len" -> eval_int_env "history_len" env
   | "line" -> eval_int_env "line" env
@@ -925,7 +925,9 @@ let print_foreach conf base print_ast _eval_expr =
   print_foreach
 
 let eval_predefined_apply conf _env f vl =
-  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let vl =
+    List.map (function Templ.VVstring s -> s | _ -> raise Not_found) vl
+  in
   match (f, vl) with
   | "transl_date", [ date_txt ] -> (
       (* date_tpl = "0000-00-00 00:00:00" *)
@@ -973,15 +975,17 @@ let print conf base =
           let eval_predefined_apply _env f vl =
             (eval_predefined_apply conf _env f vl :> string)
           in
-          Hutil.interp conf "updhist_diff"
-            {
-              eval_var = eval_var conf base;
-              eval_transl = (fun _ -> Templ.eval_transl conf);
-              eval_predefined_apply;
-              get_vother;
-              set_vother;
-              print_foreach = print_foreach conf base;
-            }
-            env (before, after, p_auth)
+          let ifun =
+            Templ.
+              {
+                eval_var = eval_var conf base;
+                eval_transl = (fun _ -> Templ.eval_transl conf);
+                eval_predefined_apply;
+                get_vother;
+                set_vother;
+                print_foreach = print_foreach conf base;
+              }
+          in
+          Templ.output conf ifun env (before, after, p_auth) "updhist_diff"
       | _ -> Hutil.incorrect_request conf ~comment:"bad f parameter")
   | _ -> Hutil.incorrect_request conf ~comment:"bad t parameter"

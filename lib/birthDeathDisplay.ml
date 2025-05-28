@@ -393,16 +393,18 @@ let set_vother x = Vother x
 let print_statistics conf =
   if p_getenv conf.env "old" = Some "on" then old_print_statistics conf
   else
-    Hutil.interp conf "stats"
-      {
-        eval_var = (fun _ -> raise Not_found);
-        eval_transl = (fun _ -> Templ.eval_transl conf);
-        eval_predefined_apply = (fun _ -> raise Not_found);
-        get_vother;
-        set_vother;
-        print_foreach = (fun _ -> raise Not_found);
-      }
-      Templ.Env.empty ()
+    let ifun =
+      Templ.
+        {
+          eval_var = (fun _ -> raise Not_found);
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother;
+          set_vother;
+          print_foreach = (fun _ -> raise Not_found);
+        }
+    in
+    Templ.output conf ifun Templ.Env.empty () "stats"
 
 let print_population_pyramid conf base =
   let interval =

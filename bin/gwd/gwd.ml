@@ -303,11 +303,12 @@ let print_renamed conf new_n =
       |> add "new" (Mutil.encode new_n)
       |> add "link" (Mutil.encode link))
   in
-  Templ.include_template conf env "renamed" (fun () ->
-      let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
-      Hutil.header conf title;
-      Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link;
-      Hutil.trailer conf)
+  try Templ.output_builtin conf env "renamed"
+  with _ ->
+    let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
+    Hutil.header conf title;
+    Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link;
+    Hutil.trailer conf
 
 let log_redirect from request req =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
@@ -324,12 +325,13 @@ let print_redirected conf from request new_addr =
   let link = "http://" ^ new_addr ^ req in
   let env = Templ.Env.(add "link" (Mutil.encode link) empty) in
   log_redirect from request req;
-  Templ.include_template conf env "redirect" (fun () ->
-      let title _ = Output.print_sstring conf "Address changed" in
-      Hutil.header conf title;
-      Output.print_sstring conf "Use the following address:\n<p>\n";
-      Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link;
-      Hutil.trailer conf)
+  try Templ.output_builtin conf env "redirect"
+  with _ ->
+    let title _ = Output.print_sstring conf "Address changed" in
+    Hutil.header conf title;
+    Output.print_sstring conf "Use the following address:\n<p>\n";
+    Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link;
+    Hutil.trailer conf
 
 let nonce_private_key =
   Lazy.from_fun (fun () ->

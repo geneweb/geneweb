@@ -46,8 +46,9 @@
   </ul>
 %end;
 
-%base_trailer;
+%include;trl
 %include;copyr
+%query_time;
 </div>
 %include;js
 </body>

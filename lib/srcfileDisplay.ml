@@ -3,7 +3,7 @@
 open Config
 open Def
 open Gwdb
-open TemplAst
+module Ast = Geneweb_templ.Ast
 open Util
 
 type counter = {
@@ -378,7 +378,7 @@ let rec copy_from_stream conf base strm mode =
           | '%' -> Output.print_sstring conf "%"
           | '[' | ']' -> Output.printf conf "%c" c
           | 'h' -> hidden_env conf
-          | 'j' -> Templ.include_hed_trl conf "hed"
+          | 'j' -> Templ.output_builtin conf Templ.Env.empty "hed"
           | 'P' ->
               let _ = Stream.next strm in
               ()
@@ -483,7 +483,7 @@ let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
 let eval_var conf base env () _loc = function
-  | [ "base"; "has_notes" ] -> VVbool (not (base_notes_are_empty base ""))
+  | [ "base"; "has_notes" ] -> Templ.VVbool (not (base_notes_are_empty base ""))
   | [ "base"; "name" ] -> VVstring conf.bname
   | [ "base"; "nb_persons"; "v" ] ->
       VVstring (string_of_int (Gwdb.nb_of_persons base))
@@ -542,7 +542,9 @@ let eval_var conf base env () _loc = function
 let print_foreach _conf _print_ast _eval_expr = raise Not_found
 
 let eval_predefined_apply conf _env f vl =
-  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let vl =
+    List.map (function Templ.VVstring s -> s | _ -> raise Not_found) vl
+  in
   match (f, vl) with
   | "a_of_b", [ s1; s2 ] -> Util.translate_eval (transl_a_of_b conf s1 s2 s2)
   | "a_of_b2", [ s1; s2; s3 ] ->
@@ -561,21 +563,8 @@ let print_welcome conf base =
     in
     Templ.Env.(add "sosa_ref" (Vsosa_ref sosa_ref_l) empty)
   in
-  Hutil.interp conf "welcome"
-    {
-      eval_var = eval_var conf base;
-      eval_transl = (fun _env -> Templ.eval_transl conf);
-      eval_predefined_apply = eval_predefined_apply conf;
-      get_vother;
-      set_vother;
-      print_foreach = print_foreach conf;
-    }
-    env ()
-
-(* code déplacé et modifié pour gérer advanced.txt *)
-let print conf base fname =
-  if Sys.file_exists (Util.etc_file_name conf fname) then
-    Hutil.interp conf fname
+  let ifun =
+    Templ.
       {
         eval_var = eval_var conf base;
         eval_transl = (fun _env -> Templ.eval_transl conf);
@@ -584,5 +573,22 @@ let print conf base fname =
         set_vother;
         print_foreach = print_foreach conf;
       }
-      Templ.Env.empty ()
+  in
+  Templ.output conf ifun env () "welcome"
+
+(* code déplacé et modifié pour gérer advanced.txt *)
+let print conf base fname =
+  if Sys.file_exists (Util.etc_file_name conf fname) then
+    let ifun =
+      Templ.
+        {
+          eval_var = eval_var conf base;
+          eval_transl = (fun _env -> Templ.eval_transl conf);
+          eval_predefined_apply = eval_predefined_apply conf;
+          get_vother;
+          set_vother;
+          print_foreach = print_foreach conf;
+        }
+    in
+    Templ.output conf ifun Templ.Env.empty () fname
   else gen_print Lang conf base fname
