@@ -77,6 +77,15 @@ jobs:
         with:
           command: start-timer
 
+      - name: Configure Git for Windows
+        if: runner.os == 'Windows'
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+          git config --global core.ignorecase false
+          git config --global core.filemode false
+        shell: bash
+
       - name: Cache Opam dependencies (Unix)
         id: cache-opam-unix
         if: runner.os != 'Windows'
