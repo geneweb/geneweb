@@ -11025,19 +11025,27 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
-    linked pages
+    pages where page appears
+en: pages or notes where page is referenced
+fr: pages ou notes où la page est citée
+
+    albums galleries where person appears
+en: albums or galleries where person is referenced
+fr: albums ou galleries où la personne est citée
+
+    pages where person appears
 bg: свързани страници
 ca: enllaços
 co: pagine ligate
 cs: spojený stránky
 da: lænkede sider
 de: verknüpfte Seiten
-en: linked pages
+en: pages or notes where person is referenced
 eo: linkitaj paĝoj
 es: páginas enlazadas
 et: seotud leheküljed
 fi: linkitettyjä sivuja
-fr: pages liées
+fr: pages ou notes où la personne est citée
 he: דפים מקושרים
 it: pagine collegate
 lt: susieti puslapiai
@@ -16068,6 +16076,10 @@ fr: partiel
     not exact hlp
 en: partial matching (exact matching by default)
 fr: correspondance partielle (correspondance exacte par défaut)
+
+    note is restricted
+en: access to this page is restricted
+fr: l'accès à cette page est restreint
 
     optional/mandatory
 en: optional/mandatory
