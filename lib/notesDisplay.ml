@@ -303,11 +303,19 @@ let linked_page_rows conf base pg =
           (Format.sprintf
              {|
 <td><a href="%sm=NOTES&f=%s">%s</a></td>
-<td>%s</td>|}
+<td>%s</td>%s|}
              (commd conf :> string)
              (Util.uri_encode fnotes)
              (fnotes :> string)
-             (Util.safe_html fnote_title :> string)))
+             (Util.safe_html fnote_title :> string)
+             (if n_type = "album" || n_type = "gallery" then ""
+             else
+              Format.sprintf
+                {|<td><a href="%sm=NOTES&f=%s&ref=on"
+       title="%s"><-</a></td>|}
+                (commd conf :> string)
+                (fnotes :> string)
+                (Utf8.capitalize_fst (transl conf "pages where page appears")))))
   | Def.NLDB.PgWizard wizname, _ ->
       if conf.wizard then
         Output.print_sstring conf
