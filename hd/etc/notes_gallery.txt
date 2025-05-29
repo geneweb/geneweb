@@ -1,4 +1,4 @@
-<!-- $Id: notes_upd.txt v7.1 06/06/2024 05:51:09 $ -->
+<!-- $Id: notes_gallery.txt v7.1 06/06/2024 05:51:09 $ -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -202,7 +202,7 @@ function displayByGroup(images_l) {
           old_grp = group;
         };
 
-        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "' target='_blank'>" + txt + "</a></span></li>" );
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href=\"" + href + "\" target='_blank'>" + txt + "</a></span></li>" );
         $("#div_legend").removeClass( "d-none" );
         $("#rlm").attr( "href", $("#rlm").attr("href") + "&p" + cnt_rlm + "=" + r.fn + "&n" + cnt_rlm + "=" + r.sn + (get(r.oc) == "" ? "" : "&oc" + cnt_rlm + "=" + r.oc ) );
         cnt_rlm++;
@@ -231,14 +231,15 @@ function displayByIndi(images_l) {
     if( get(r.fn) != "" && get(r.sn) != "" ) {
         href = "%prefix;&p=" + r.fn + "&n=" + r.sn + oc;
         txt = r.fn + " " + r.sn;
-        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href='" + href + "' target='_blank'>" + txt + "</a></span></li>" );
+        $("#legend").append( "<li class='legend' id='a" + cnt + "'><span><a href=\"" + href + "\" target='_blank'>" + txt + "</a>" + (get(r.alt) != "" ? " (" + r.alt + ")" : "") + "</span></li>" );
         $("#div_legend").removeClass( "d-none" );
         $("#rlm").attr( "href", $("#rlm").attr("href") + "&p" + cnt_rlm + "=" + r.fn + "&n" + cnt_rlm + "=" + r.sn + (get(r.oc) == "" ? "" : "&oc" + cnt_rlm + "=" + r.oc ) );
         cnt_rlm++;
     }
 
+    if( get(r.alt) != "") { txt += " (" + r.alt + ")"; }
     maps.forEach( function (item) {
-        $("#map").append( "<area class='area" + cnt + "' shape='" + get(item.shape) + "' coords='" + get(item.coords) + "' alt='" + txt + "' title='" + txt + "' href='" + href + "' target='_blank'>" );
+        $("#map").append( "<area class='area" + cnt + "' shape='" + get(item.shape) + "' coords='" + get(item.coords) + "' alt=\"" + txt + "\" title=\"" + txt + "\" href=\"" + href + "\" target='_blank'>" );
     });
     cnt++;
   });
