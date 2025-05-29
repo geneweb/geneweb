@@ -15,7 +15,8 @@
 <div class="container-fluid">
   %include;home
   <div class="small float-right mr-2 mt-2">
-    (<a href="%url;&ref=on">[linked pages]</a>)
+    (<a href="%url;&ref=on"
+        title="[pages where page appears]"><-</a>)
   </div>
   <h1 id="h1" class="ml-3 mb-0">Chargement en cours…</h1>
   %if(wizard)
