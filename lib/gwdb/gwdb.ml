@@ -18,10 +18,34 @@ module IperSet = Set.Make (struct
   let compare = compare_iper
 end)
 
+module IperMap = Map.Make (struct
+  type t = iper
+
+  let compare = compare_iper
+end)
+
 module IfamSet = Set.Make (struct
   type t = ifam
 
   let compare = compare_ifam
+end)
+
+module IstrSet = Set.Make (struct
+  type t = istr
+
+  let compare = compare_istr
+end)
+
+module IstrMap = Map.Make (struct
+  type t = istr
+
+  let compare = compare_istr
+end)
+
+module PersonSet = Set.Make (struct
+  type t = person
+
+  let compare p1 p2 = compare_iper (get_iper p1) (get_iper p2)
 end)
 
 (** [insert_person base p a u]

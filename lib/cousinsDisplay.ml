@@ -334,21 +334,16 @@ let sosa_of_persons conf base =
   loop 1
 
 let print_anniv conf base p dead_people level =
-  let module S = Map.Make (struct
-    type t = Gwdb.iper
-
-    let compare = compare
-  end) in
   let s_mem x m =
     try
-      let _ = S.find x m in
+      let _ = Gwdb.IperMap.find x m in
       true
     with Not_found -> false
   in
   let rec insert_desc set up_sosa down_br n ip =
     if s_mem ip set then set
     else
-      let set = S.add ip (up_sosa, down_br) set in
+      let set = Gwdb.IperMap.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
         let u = Gwdb.get_family (Util.pget conf base ip) in
@@ -396,13 +391,13 @@ let print_anniv conf base p dead_people level =
           in
           loop set a
     in
-    loop S.empty a
+    loop Gwdb.IperMap.empty a
   in
   let set =
-    S.fold
+    Gwdb.IperMap.fold
       (fun ip (up_sosa, down_br) set ->
         let u = Gwdb.get_family (Util.pget conf base ip) in
-        let set = S.add ip (up_sosa, down_br, None) set in
+        let set = Gwdb.IperMap.add ip (up_sosa, down_br, None) set in
         if Array.length u = 0 then set
         else
           let rec loop set i =
@@ -410,10 +405,10 @@ let print_anniv conf base p dead_people level =
             else
               let cpl = Gwdb.foi base u.(i) in
               let c = Gutil.spouse ip cpl in
-              loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1)
+              loop (Gwdb.IperMap.add c (up_sosa, down_br, Some ip) set) (i + 1)
           in
           loop set 0)
-      set S.empty
+      set Gwdb.IperMap.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
     let href : Adef.escaped_string =
@@ -438,7 +433,9 @@ let print_anniv conf base p dead_people level =
     ^>^ "</a>"
   in
   let f_scan =
-    let list = ref (S.fold (fun ip b list -> (ip, b) :: list) set []) in
+    let list =
+      ref (Gwdb.IperMap.fold (fun ip b list -> (ip, b) :: list) set [])
+    in
     fun () ->
       match !list with
       | (x, b) :: l ->

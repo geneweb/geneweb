@@ -708,11 +708,6 @@ let acces conf base x = acces_n conf base (Adef.escaped "") x
 (**/**)
 
 let max_ancestor_level conf base ip max_lvl =
-  let module Person_id_map = Map.Make (struct
-    type t = Gwdb.iper
-
-    let compare = Gwdb.compare_iper
-  end) in
   let module Node = struct
     type kind = At_max_level | Internal | Leaf
     type t = { kind : kind; level : int }
@@ -720,14 +715,14 @@ let max_ancestor_level conf base ip max_lvl =
   (* Loading ITL cache, up to 10 generations. *)
   let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
   let rec loop ~visited_nodes level ip =
-    match Person_id_map.find_opt ip visited_nodes with
+    match Gwdb.IperMap.find_opt ip visited_nodes with
     | None -> visit ~visited_nodes level ip
     | Some node ->
         if level < node.Node.level then visit ~visited_nodes level ip
         else visited_nodes
   and visit ~visited_nodes level ip =
     if level = max_lvl then
-      Person_id_map.add ip
+      Gwdb.IperMap.add ip
         { Node.kind = Node.At_max_level; level = max_lvl }
         visited_nodes
     else
@@ -735,7 +730,7 @@ let max_ancestor_level conf base ip max_lvl =
       | Some ifam ->
           let cpl = Gwdb.foi base ifam in
           let visited_nodes =
-            Person_id_map.add ip
+            Gwdb.IperMap.add ip
               { Node.kind = Node.Internal; level }
               visited_nodes
           in
@@ -754,15 +749,15 @@ let max_ancestor_level conf base ip max_lvl =
             in
             Some { Node.kind = Node.Leaf; level }
           in
-          Person_id_map.update ip update_node visited_nodes
+          Gwdb.IperMap.update ip update_node visited_nodes
   in
   let max_level { Node.kind; level } current_max_level =
     match kind with
     | Node.Internal -> current_max_level
     | Node.Leaf | Node.At_max_level -> max current_max_level level
   in
-  Person_id_map.fold (Fun.const max_level)
-    (loop ~visited_nodes:Person_id_map.empty 0 ip)
+  Gwdb.IperMap.fold (Fun.const max_level)
+    (loop ~visited_nodes:Gwdb.IperMap.empty 0 ip)
     0
 
 let main_title conf base p =

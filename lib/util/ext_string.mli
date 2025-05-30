@@ -21,6 +21,8 @@ val strip_all_trailing_spaces : string -> string
 module Set : Set.S with type elt = string
 (** Set of strings *)
 
+module Map : Map.S with type key = string
+
 val tr : char -> char -> string -> string
 (** [tr c1 c2 str]
     Return a new string which is the same as [str] with all occurences of [c1]

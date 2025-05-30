@@ -1,23 +1,3 @@
-module PersMap = Map.Make (struct
-  type t = Gwdb.istr
-
-  let compare = compare
-end)
-
-module PersSet = Set.Make (struct
-  type t = Gwdb.person
-
-  let compare p1 p2 = compare (Gwdb.get_iper p1) (Gwdb.get_iper p2)
-end)
-
-module StringSet = Set.Make (String)
-
-module IstrSet = Set.Make (struct
-  type t = Gwdb.istr
-
-  let compare = compare
-end)
-
 let get_data conf =
   match Util.p_getenv conf.Config.env "data" with
   | Some "occu" -> ([ Gwdb.get_occupation ], [], [], [])
@@ -48,10 +28,10 @@ let get_data conf =
 
 let get_all_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
-  let aux : 'a. 'a -> IstrSet.t -> ('a -> Gwdb.istr) -> IstrSet.t =
+  let aux : 'a. 'a -> Gwdb.IstrSet.t -> ('a -> Gwdb.istr) -> Gwdb.IstrSet.t =
    fun arg acc get ->
     let istr = get arg in
-    if not (Gwdb.is_empty_string istr) then IstrSet.add istr acc else acc
+    if not (Gwdb.is_empty_string istr) then Gwdb.IstrSet.add istr acc else acc
   in
   let acc =
     Gwdb.Collection.fold
@@ -62,7 +42,7 @@ let get_all_data conf base =
         List.fold_left
           (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc pevents)
           acc get_pe)
-      IstrSet.empty (Gwdb.ipers base)
+      Gwdb.IstrSet.empty (Gwdb.ipers base)
   in
   let acc =
     if get_f = [] && get_fe = [] then acc
@@ -78,17 +58,24 @@ let get_all_data conf base =
             acc get_fe)
         acc (Gwdb.ifams base)
   in
-  IstrSet.elements acc
+  Gwdb.IstrSet.elements acc
 
 let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : Gwdb.istr) p =
-    try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
-    with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
+    try
+      Gwdb.IstrMap.add istr
+        (Gwdb.PersonSet.add p @@ Gwdb.IstrMap.find istr acc)
+        acc
+    with Not_found ->
+      Gwdb.IstrMap.add istr (Gwdb.PersonSet.add p Gwdb.PersonSet.empty) acc
   in
-  let aux (fn : PersSet.t PersMap.t -> Gwdb.istr -> PersSet.t PersMap.t) arg acc
-      get =
+  let aux
+      (fn :
+        Gwdb.PersonSet.t Gwdb.IstrMap.t ->
+        Gwdb.istr ->
+        Gwdb.PersonSet.t Gwdb.IstrMap.t) arg acc get =
     let istr' = get arg in
     if istr = istr' then fn acc istr else acc
   in
@@ -103,7 +90,7 @@ let get_person_from_data conf base =
           (fun acc fn ->
             List.fold_left (fun acc e -> aux add e acc fn) acc pevents)
           acc get_pe)
-      PersMap.empty (Gwdb.ipers base)
+      Gwdb.IstrMap.empty (Gwdb.ipers base)
   in
   let acc =
     if get_f = [] && get_fe = [] then acc
@@ -125,8 +112,8 @@ let get_person_from_data conf base =
             acc get_fe)
         acc (Gwdb.ifams base)
   in
-  PersMap.fold
-    (fun istr pset acc -> (istr, PersSet.elements pset) :: acc)
+  Gwdb.IstrMap.fold
+    (fun istr pset acc -> (istr, Gwdb.PersonSet.elements pset) :: acc)
     acc []
 
 let combine_by_ini ~ignore_case ini list =
@@ -502,10 +489,10 @@ let build_list_short conf list =
     in
     (* Fonction pour supprimer les doublons. *)
     let remove_dup list =
-      StringSet.elements
+      Ext_string.Set.elements
         (List.fold_left
-           (fun accu ini -> StringSet.add ini accu)
-           StringSet.empty list)
+           (fun accu ini -> Ext_string.Set.add ini accu)
+           Ext_string.Set.empty list)
     in
     (* Astuce pour gérer les espaces. *)
     let inis = List.rev_map (fun p -> Ext_string.tr ' ' '_' p) inis in

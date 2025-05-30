@@ -10,8 +10,24 @@ module IperSet : sig
   include Set.S with type elt = iper
 end
 
+module IperMap : sig
+  include Map.S with type key = iper
+end
+
 module IfamSet : sig
   include Set.S with type elt = ifam
+end
+
+module IstrSet : sig
+  include Set.S with type elt = istr
+end
+
+module IstrMap : sig
+  include Map.S with type key = istr
+end
+
+module PersonSet : sig
+  include Set.S with type elt = person
 end
 
 val insert_person :

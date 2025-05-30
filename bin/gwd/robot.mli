@@ -1,8 +1,6 @@
 (** A module handling robots requests *)
 (* S: This module seems obsolete *)
 
-module W : Map.S with type key = string
-
 type norfriwiz = Normal | Friend of string | Wizard of string
 
 type who = private {
@@ -18,7 +16,7 @@ type who = private {
 
 type excl = {
   mutable excl : (string * int ref) list;
-  mutable who : who W.t;
+  mutable who : who Ext_string.Map.t;
   mutable max_conn : int * string;
 }
 (** A collection of robots: the list contains forbidden robots and
