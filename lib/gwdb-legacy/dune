@@ -5,6 +5,7 @@
    geneweb.def
    geneweb.util
    geneweb.ancient
+   geneweb_compat
    re
    unix
    fmt)

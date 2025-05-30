@@ -1,3 +1,5 @@
+module Compat = Geneweb_compat
+
 type desc =
   | Atext of string
   | Avar of string * string list
@@ -24,7 +26,7 @@ let rec equal_desc d1 d2 =
   | Atext s1, Atext s2 -> String.equal s1 s2
   | Atext _, _ | _, Atext _ -> false
   | Avar (s1, l1), Avar (s2, l2) ->
-      String.equal s1 s2 && List.equal String.equal l1 l2
+      String.equal s1 s2 && Compat.List.equal String.equal l1 l2
   | Avar _, _ | _, Avar _ -> false
   | Atransl (b1, s11, s21), Atransl (b2, s12, s22) ->
       Bool.equal b1 b2 && String.equal s11 s12 && String.equal s21 s22
@@ -32,31 +34,38 @@ let rec equal_desc d1 d2 =
   | Awid_hei s1, Awid_hei s2 -> String.equal s1 s2
   | Awid_hei _, _ | _, Awid_hei _ -> false
   | Aif (t1, l11, l21), Aif (t2, l12, l22) ->
-      equal t1 t2 && List.equal equal l11 l12 && List.equal equal l21 l22
+      equal t1 t2
+      && Compat.List.equal equal l11 l12
+      && Compat.List.equal equal l21 l22
   | Aif _, _ | _, Aif _ -> false
   | Aforeach ((s1, l11), l21, l31), Aforeach ((s2, l12), l22, l32) ->
       String.equal s1 s2
-      && List.equal String.equal l11 l12
-      && List.equal (List.equal equal) l21 l22
-      && List.equal equal l31 l32
+      && Compat.List.equal String.equal l11 l12
+      && Compat.List.equal (Compat.List.equal equal) l21 l22
+      && Compat.List.equal equal l31 l32
   | Aforeach _, _ | _, Aforeach _ -> false
   | Afor (s1, t11, t21, l1), Afor (s2, t12, t22, l2) ->
       String.equal s1 s2 && equal t11 t12 && equal t21 t22
-      && List.equal equal l1 l2
+      && Compat.List.equal equal l1 l2
   | Afor _, _ | _, Afor _ -> false
   | Adefine (s1, l11, l21, l31), Adefine (s2, l12, l22, l32) ->
       String.equal s1 s2
-      && List.equal (equal_pair String.equal (Option.equal equal)) l11 l12
-      && List.equal equal l21 l22 && List.equal equal l31 l32
+      && Compat.List.equal
+           (equal_pair String.equal (Option.equal equal))
+           l11 l12
+      && Compat.List.equal equal l21 l22
+      && Compat.List.equal equal l31 l32
   | Adefine _, _ | _, Adefine _ -> false
   | Aapply (s1, l1), Aapply (s2, l2) ->
       String.equal s1 s2
-      && List.equal
-           (equal_pair (Option.equal String.equal) (List.equal equal))
+      && Compat.List.equal
+           (equal_pair (Option.equal String.equal) (Compat.List.equal equal))
            l1 l2
   | Aapply _, _ | _, Aapply _ -> false
   | Alet (s1, l11, l21), Alet (s2, l12, l22) ->
-      String.equal s1 s2 && List.equal equal l11 l12 && List.equal equal l21 l22
+      String.equal s1 s2
+      && Compat.List.equal equal l11 l12
+      && Compat.List.equal equal l21 l22
   | Alet _, _ | _, Alet _ -> false
   | Aop1 (s1, t1), Aop1 (s2, t2) -> String.equal s1 s2 && equal t1 t2
   | Aop1 _, _ | _, Aop1 _ -> false
@@ -68,7 +77,7 @@ let rec equal_desc d1 d2 =
   | Ainclude s1, Ainclude s2 ->
       Loc.equal_source (s1 :> Loc.source) (s2 :> Loc.source)
   | Ainclude _, _ | _, Ainclude _ -> false
-  | Apack l1, Apack l2 -> List.equal equal l1 l2
+  | Apack l1, Apack l2 -> Compat.List.equal equal l1 l2
 
 and equal { desc = d1; loc = l1 } { desc = d2; loc = l2 } =
   Loc.equal l1 l2 && equal_desc d1 d2
