@@ -48,8 +48,7 @@ let syslog (level : level) msg =
   then begin
     let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
     Syslog.syslog log level msg ;
-    Syslog.closelog log ;
-    if !debug_flag then Printexc.print_backtrace stderr ;
+    Syslog.closelog log
   end
 #else
   let () = () in
@@ -68,14 +67,12 @@ let syslog (level : level) msg =
       | `LOG_DEBUG -> "DEBUG"
     in
     let print oc = Printf.fprintf oc "%a %s %s\n%!" pp_tm tm level msg in
-    begin match Sys.getenv_opt "GW_SYSLOG_FILE" with
-      | Some fn ->
-          Compat.Out_channel.with_open_gen
-            [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn print
-      | None ->
-          print stderr
-    end ;
-    if !debug_flag then Printexc.print_backtrace stderr ;
+    match Sys.getenv_opt "GW_SYSLOG_FILE" with
+    | Some fn ->
+        Compat.Out_channel.with_open_gen
+          [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn print
+    | None ->
+        print stderr
   end
 #endif
 
