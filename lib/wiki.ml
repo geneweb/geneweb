@@ -502,7 +502,7 @@ let summary_of_tlsw_lines conf short lines =
           let summary =
             let s =
               Printf.sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
-                (if short then "" else section_num ^ " Ð ")
+                (if short then "" else section_num ^ " â€“ ")
                 (String.trim (String.sub s slev (len - (2 * slev))))
             in
             if short then if summary = [] then [ s ] else s :: "&" :: summary
@@ -525,7 +525,7 @@ let summary_of_tlsw_lines conf short lines =
       Format.sprintf
         {|<div id="summary">
   <div class="d-flex align-items-center">
-    <h2>0 Ð %s</h2>
+    <h2>0 â€“ %s</h2>
     <a href="#" class="toc-toggle ml-2">(%s)</a>
   </div>
 <div id="toc-content">|}
@@ -675,7 +675,7 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
             let slev = section_level s len in
             let section_num, sections_nums =
               match sections_nums with
-              | (_, a) :: l -> (a ^ " Ð ", l)
+              | (_, a) :: l -> (a ^ " â€“ ", l)
               | [] -> ("", [])
             in
             let s =
