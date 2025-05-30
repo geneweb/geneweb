@@ -1,9 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 module Logs = Geneweb_logs.Logs
-
-let () = if Sys.getenv_opt "DEBUG" <> None then Sys.enable_runtime_warnings true
-
 open Geneweb
 open Config
 open Def
@@ -2178,7 +2175,8 @@ let print_version_commit () =
 let set_debug_flag () =
   debug := true;
   Logs.debug_flag := true;
-  Printexc.record_backtrace true
+  Printexc.record_backtrace true;
+  Sys.enable_runtime_warnings true
 
 let set_verbosity_level lvl = Logs.verbosity_level := lvl
 
@@ -2434,7 +2432,6 @@ let main () =
     try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
     with Not_found -> ("" |> Adef.encoded, !force_cgi)
   in
-  if not !debug then Sys.enable_runtime_warnings false;
   Util.is_welcome := false;
   if cgi then (
     Wserver.cgi := true;
