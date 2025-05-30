@@ -206,6 +206,15 @@ let output_notes_d base dst_dir =
       Compat.Out_channel.with_open_text dst (fun oc -> output_string oc content))
     l
 
+let safe_rename src dst =
+  try
+    Mutil.rm dst;
+    Sys.rename src dst
+  with _ ->
+    (* Windows fallback to avoid "Permission denied" errors on files *)
+    Filesystem.copy_file src dst;
+    Mutil.rm src
+
 let output base =
   (* create database directory *)
   let bname = base.data.bdir in
@@ -360,25 +369,16 @@ let output base =
      Mutil.rm tmp_strings_inx;
      Mutil.rm_rf tmp_notes_d;
      raise e);
-  Mutil.rm (Filename.concat bname "base");
-  Sys.rename tmp_base (Filename.concat bname "base");
-  Mutil.rm (Filename.concat bname "base.acc");
-  Sys.rename tmp_base_acc (Filename.concat bname "base.acc");
-  Mutil.rm (Filename.concat bname "names.inx");
-  Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
-  Mutil.rm (Filename.concat bname "names.acc");
-  Sys.rename tmp_names_acc (Filename.concat bname "names.acc");
-  Mutil.rm (Filename.concat bname "snames.dat");
-  Sys.rename tmp_snames_dat (Filename.concat bname "snames.dat");
-  Mutil.rm (Filename.concat bname "snames.inx");
-  Sys.rename tmp_snames_inx (Filename.concat bname "snames.inx");
-  Mutil.rm (Filename.concat bname "fnames.dat");
-  Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
-  Mutil.rm (Filename.concat bname "fnames.inx");
-  Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
-  Mutil.rm (Filename.concat bname "strings.inx");
-  Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
-  Sys.rename tmp_particles (Filename.concat bname "particles.txt");
+  safe_rename tmp_base (Filename.concat bname "base");
+  safe_rename tmp_base_acc (Filename.concat bname "base.acc");
+  safe_rename tmp_names_inx (Filename.concat bname "names.inx");
+  safe_rename tmp_names_acc (Filename.concat bname "names.acc");
+  safe_rename tmp_snames_dat (Filename.concat bname "snames.dat");
+  safe_rename tmp_snames_inx (Filename.concat bname "snames.inx");
+  safe_rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
+  safe_rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
+  safe_rename tmp_strings_inx (Filename.concat bname "strings.inx");
+  safe_rename tmp_particles (Filename.concat bname "particles.txt");
   Mutil.rm (Filename.concat bname "notes");
   if Sys.file_exists tmp_notes then
     Sys.rename tmp_notes (Filename.concat bname "notes");
