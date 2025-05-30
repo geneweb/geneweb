@@ -8,7 +8,8 @@
    camlzip
    stdlib-shims
    unidecode
-   geneweb.def
+   geneweb_def
+   geneweb_compat
    re
    unix
    uucp

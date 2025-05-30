@@ -1,3 +1,5 @@
+module Compat = Geneweb_compat
+
 module HS = Hashtbl.Make (struct
   type t = string
 
@@ -15,7 +17,7 @@ let parse_source =
     | `File s -> (
         match HS.find cache s with
         | exception Not_found ->
-            In_channel.with_open_text s @@ fun ic ->
+            Compat.In_channel.with_open_text s @@ fun ic ->
             let lexbuf = Lexing.from_channel ic in
             Lexing.set_filename lexbuf s;
             let r = parse_ast lexbuf in

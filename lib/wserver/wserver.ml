@@ -1,5 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+module Compat = Geneweb_compat
 module Logs = Geneweb_logs.Logs
 
 type handler =

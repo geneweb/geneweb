@@ -891,8 +891,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
       let vl = List.map (eval_expr ceva) al in
       let sl = List.map string_of_expr_val vl in
       VVstring (String.concat "" sl)
-  | e ->
-      raise_with_loc loc (Failure (not_impl "eval_expr" e))
+  | e -> raise_with_loc loc (Failure (not_impl "eval_expr" e))
 
 let eval_bool_expr conf (eval_var, eval_apply) e =
   match eval_expr (conf, eval_var, eval_apply) e with
