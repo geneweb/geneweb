@@ -164,7 +164,7 @@
     </div>
   </div>
 </form>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 <script>
@@ -199,5 +199,6 @@
 -->
 </script>
 %include;js
+%query_time;
 </body>
 </html>

@@ -44,6 +44,7 @@
     uutf
     yojson
     digestif
+    pp_loc
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.24.1")))
   )

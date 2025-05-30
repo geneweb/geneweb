@@ -270,10 +270,11 @@
   %end;
   %apply;search_form(1)
 %end;
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 <script>
   //  Make table row clickable
   $(document).ready(function(){

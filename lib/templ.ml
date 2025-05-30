@@ -1,48 +1,55 @@
-open Config
-open TemplAst
 module Logs = Geneweb_logs.Logs
 module Sosa = Geneweb_sosa
+module Parser = Geneweb_templ.Parser
+module Ast = Geneweb_templ.Ast
+module Loc = Geneweb_templ.Loc
 
-exception Exc_located of loc * exn
 exception BadApplyArity
 exception NamedArgumentNotMatched of string
 
+type 'a expr_val =
+  | VVbool of bool
+  | VVstring of string
+  | VVother of (string list -> 'a expr_val)
+
+exception Exc_located of Loc.t * exn
+
 let raise_with_loc loc = function
-  | Exc_located (_, _) as e ->
-      incr GWPARAM.nb_errors;
-      raise e
+  | Exc_located (_, _) as e -> raise e
   | e ->
       incr GWPARAM.nb_errors;
       raise (Exc_located (loc, e))
 
-let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string)
-    =
-  if conf.debug then
-    match Filename.extension (fname :> string) with
-    | ".css" | ".js" ->
-        Output.print_sstring conf "\n/* ";
-        Output.print_string conf k;
-        Output.print_sstring conf " ";
-        Output.print_string conf fname;
-        Output.print_sstring conf " */\n"
-    | _ ->
-        Output.print_sstring conf "\n<!-- ";
-        Output.print_string conf k;
-        Output.print_sstring conf " ";
-        Output.print_string conf fname;
-        Output.print_sstring conf " -->\n"
+let pp_exception ppf (e, bt) =
+  let pp_header ppf () = Fmt.pf ppf "Uncaught exception in templates:" in
+  let pp_header = Fmt.(styled (`Fg `Red) pp_header) in
+  let lines =
+    String.split_on_char '\n' @@ Printexc.raw_backtrace_to_string bt
+  in
+  match e with
+  | Exc_located (loc, e) ->
+      Fmt.pf ppf "@[%a@ %s@ %a@]" pp_header () (Printexc.to_string e) Loc.pp loc
+  | _ ->
+      Fmt.pf ppf "@[%a@ %s@ %a@]" pp_header () (Printexc.to_string e)
+        Fmt.(list ~sep:cut string)
+        lines
 
-let include_begin = include_begin_end_aux (Adef.safe "begin")
-let include_end = include_begin_end_aux (Adef.safe "end")
+let on_exn e bt =
+  incr GWPARAM.nb_errors;
+  Logs.debug (fun k -> k "%a" pp_exception (e, bt))
 
-let input_templ conf fname =
-  match Util.open_etc_file conf fname with
-  | None -> None
-  | Some (ic, _fname) ->
-      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
-      Templ_parser.wrap fname @@ fun () ->
-      let lex = Lexing.from_channel ic in
-      Some (Templ_parser.parse_templ conf lex)
+let resolve_include conf loc fl =
+  let r = Util.etc_file_name conf fl in
+  Logs.debug (fun k -> k "%a: resolved %s into: %s" Loc.pp loc fl r);
+  r
+
+let parse conf fl =
+  let fl = Util.etc_file_name conf fl in
+  try Parser.parse ~on_exn ~resolve_include:(resolve_include conf) (`File fl)
+  with e ->
+    let bt = Printexc.get_raw_backtrace () in
+    Logs.debug (fun k -> k "%a" pp_exception (e, bt));
+    Printexc.raise_with_backtrace e bt
 
 let sort_apply_parameters loc f_expr xl vl =
   let named_vl, unnamed_vl =
@@ -88,63 +95,6 @@ let subst_text x v s =
     in
     loop 0 0 0
 
-let rec subst sf = function
-  | Atext (loc, s) -> Atext (loc, sf s)
-  | Avar (loc, s, sl) -> (
-      let s1 = sf s in
-      if
-        sl = []
-        &&
-        try
-          let _ = int_of_string s1 in
-          true
-        with Failure _ -> false
-      then Aint (loc, s1)
-      else
-        let sl1 = List.map sf sl in
-        match String.split_on_char '.' s1 with
-        | [ _ ] -> Avar (loc, s1, sl1)
-        | s2 :: sl2 -> Avar (loc, s2, sl2 @ sl1)
-        | _ -> assert false)
-  | Atransl (loc, b, s, c) -> Atransl (loc, b, sf s, c)
-  | Aconcat (loc, al) -> Aconcat (loc, List.map (subst sf) al)
-  | Awid_hei s -> Awid_hei (sf s)
-  | Aif (e, alt, ale) -> Aif (subst sf e, substl sf alt, substl sf ale)
-  | Aforeach ((loc, s, sl), pl, al) ->
-      (* Dans le cas d'une "compound variable", il faut la décomposer. *)
-      (* Ex: "ancestor.father".family  =>  ancestor.father.family      *)
-      let s1 = sf s in
-      let sl1 = List.map sf sl in
-      let s, sl =
-        match
-          String.split_on_char '.' s1 (* Templ_parser.compound_var lex *)
-        with
-        | [ _ ] -> (s1, sl1)
-        | s2 :: sl2 -> (s2, List.rev_append (List.rev_map sf sl2) sl1)
-        | _ -> assert false
-      in
-      Aforeach ((loc, s, sl), List.map (substl sf) pl, substl sf al)
-  | Afor (i, min, max, al) ->
-      Afor (sf i, subst sf min, subst sf max, substl sf al)
-  | Adefine (f, xl, al, alk) ->
-      Adefine
-        ( sf f,
-          List.map (fun (x, ast) -> (sf x, Option.map (subst sf) ast)) xl,
-          substl sf al,
-          substl sf alk )
-  | Aapply (loc, f, all) ->
-      Aapply
-        ( loc,
-          sf f,
-          List.map (fun (x, asts) -> (Option.map sf x, substl sf asts)) all )
-  | Alet (k, v, al) -> Alet (sf k, substl sf v, substl sf al)
-  | Ainclude (file, al) -> Ainclude (sf file, substl sf al)
-  | Aint (loc, s) -> Aint (loc, s)
-  | Aop1 (loc, op, e) -> Aop1 (loc, op, subst sf e)
-  | Aop2 (loc, op, e1, e2) -> Aop2 (loc, sf op, subst sf e1, subst sf e2)
-
-and substl sf al = List.map (subst sf) al
-
 let split_at_coloncolon s =
   let rec loop i =
     if i >= String.length s - 1 then None
@@ -166,7 +116,7 @@ let not_impl func x =
   in
   "Templ." ^ func ^ ": not impl " ^ desc
 
-let setup_link conf =
+let setup_link (conf : Config.config) =
   let s = Mutil.extract_param "host: " '\r' conf.request in
   try
     let i = String.rindex s ':' in
@@ -176,7 +126,7 @@ let setup_link conf =
 
 let esc s = (Util.escape_html s :> string)
 
-let url_aux ?(pwd = true) conf =
+let url_aux ?(pwd = true) (conf : Config.config) =
   let l =
     List.filter_map
       (fun (k, v) ->
@@ -216,7 +166,7 @@ let order =
     "v";
   ]
 
-let reorder conf url_env =
+let reorder (conf : Config.config) url_env =
   let new_lang =
     match List.assoc "lang" url_env with exception Not_found -> "" | l -> l
   in
@@ -262,7 +212,7 @@ let reorder conf url_env =
   in
   String.concat "&" (List.rev env1 @ List.rev env2)
 
-let find_sosa_ref conf =
+let find_sosa_ref (conf : Config.config) =
   let env = conf.henv @ conf.senv @ conf.env in
   let get_env evar env =
     match List.assoc_opt evar env with Some s -> Adef.as_string s | None -> ""
@@ -334,7 +284,7 @@ let substr_start_aux n s =
   in
   loop 0 n
 
-let rec eval_variable conf = function
+let rec eval_variable (conf : Config.config) = function
   | [ "base"; "name" ] -> conf.bname
   | [ "lang"; "full" ] ->
       let rec func x lst c =
@@ -708,10 +658,11 @@ let apply_format conf nth s1 s2 =
       Printf.sprintf "Format error in %s\n" s1 |> Logs.syslog `LOG_WARNING;
       s1
 
-let rec eval_ast conf = function
-  | Atext (_, s) -> s
-  | Avar (_, s, sl) -> eval_var_handled conf (s :: sl)
-  | Atransl (_, upp, s, c) -> eval_transl conf upp s c
+let rec eval_ast conf Ast.{ desc; _ } =
+  match desc with
+  | Ast.Atext s -> s
+  | Avar (s, sl) -> eval_var_handled conf (s :: sl)
+  | Atransl (upp, s, c) -> eval_transl conf upp s c
   | ast -> not_impl "eval_ast" ast
 
 and eval_transl conf upp s c =
@@ -786,7 +737,8 @@ and eval_transl_lexicon conf upp s c =
                   loop (0, s)
                 in
                 let astl =
-                  Templ_parser.parse_templ conf (Lexing.from_string s)
+                  Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
+                    (`Raw s)
                 in
                 (* parse_templ handles only text, evars and translations *)
                 (* more complex parsing (%surname;, %if; ...) not available *)
@@ -813,17 +765,7 @@ and eval_transl_lexicon conf upp s c =
   let r = Util.translate_eval r in
   if upp then Utf8.capitalize_fst r else r
 
-let loc_of_expr = function
-  | Atext (loc, _) -> loc
-  | Avar (loc, _, _) -> loc
-  | Atransl (loc, _, _, _) -> loc
-  | Aapply (loc, _, _) -> loc
-  | Aop1 (loc, _, _) -> loc
-  | Aop2 (loc, _, _, _) -> loc
-  | Aint (loc, _) -> loc
-  | _ -> ("", -1, -1)
-
-let templ_eval_var conf = function
+let templ_eval_var (conf : Config.config) = function
   | [ "browsing_with_sosa_ref" ] -> (
       match Util.p_getenv conf.env "sosa_ref" with
       | Some _ -> VVbool true
@@ -857,58 +799,47 @@ let templ_eval_var conf = function
   | [ "is_printed_by_template" ] -> VVbool conf.is_printed_by_template
   | _ -> raise Not_found
 
-let bool_of e = function
+let bool_of Ast.{ loc; _ } = function
   | VVbool b -> b
-  | VVstring _ | VVother _ ->
-      raise_with_loc (loc_of_expr e) (Failure "bool value expected")
+  | VVstring _ | VVother _ -> raise_with_loc loc (Failure "bool value expected")
 
-let string_of e = function
+let string_of Ast.{ loc; _ } = function
   | VVstring s -> s
-  | VVbool _ | VVother _ ->
-      raise_with_loc (loc_of_expr e) (Failure "string value expected")
+  | VVbool _ | VVother _ -> raise_with_loc loc (Failure "string value expected")
 
-let int_of e = function
+let int_of Ast.{ loc; _ } = function
   | VVstring s -> (
       try int_of_string s
       with Failure _ ->
-        raise_with_loc (loc_of_expr e)
-          (Failure ("int value expected\nFound = " ^ s)))
-  | VVbool _ | VVother _ ->
-      raise_with_loc (loc_of_expr e) (Failure "int value expected")
+        raise_with_loc loc (Failure ("int value expected\nFound = " ^ s)))
+  | VVbool _ | VVother _ -> raise_with_loc loc (Failure "int value expected")
 
-let float_of e = function
+let float_of Ast.{ loc; _ } = function
   | VVstring s -> (
       try Float.of_string s
       with Failure _ ->
-        raise_with_loc (loc_of_expr e)
-          (Failure ("float value expected\nFound = " ^ s)))
-  | VVbool _ | VVother _ ->
-      raise_with_loc (loc_of_expr e) (Failure "float value expected")
+        raise_with_loc loc (Failure ("float value expected\nFound = " ^ s)))
+  | VVbool _ | VVother _ -> raise_with_loc loc (Failure "float value expected")
 
-let num_of e = function
+let num_of Ast.{ loc; _ } = function
   | VVstring s -> (
       try Sosa.of_string s
       with Failure _ ->
-        raise_with_loc (loc_of_expr e)
-          (Failure ("num value expected\nFound = " ^ s)))
-  | VVbool _ | VVother _ ->
-      raise_with_loc (loc_of_expr e) (Failure "num value expected")
+        raise_with_loc loc (Failure ("num value expected\nFound = " ^ s)))
+  | VVbool _ | VVother _ -> raise_with_loc loc (Failure "num value expected")
 
-let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
-  | Atext (_, s) -> VVstring s
-  | Avar (loc, s, sl) as e -> (
+let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
+  match desc with
+  | Atext s -> VVstring s
+  | Avar (s, sl) -> (
       try eval_var loc (s :: sl)
       with Not_found -> (
         try templ_eval_var conf (s :: sl)
         with Not_found ->
-          raise_with_loc (loc_of_expr e)
+          raise_with_loc loc
             (Failure ("unbound var \"" ^ String.concat "." (s :: sl) ^ "\""))))
-  | Atransl (_, upp, s, c) -> VVstring (eval_transl conf upp s c)
-  | Aconcat (_, al) ->
-      let vl = List.map (eval_expr ceva) al in
-      let sl = List.map string_of_expr_val vl in
-      VVstring (String.concat "" sl)
-  | Aapply (loc, s, ell) ->
+  | Atransl (upp, s, c) -> VVstring (eval_transl conf upp s c)
+  | Aapply (s, ell) ->
       let vl =
         List.map
           (fun (id, el) ->
@@ -921,12 +852,12 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
           ell
       in
       VVstring (eval_apply loc s vl)
-  | Aop1 (loc, op, e) -> (
+  | Aop1 (op, e) -> (
       let v = eval_expr ceva e in
       match op with
       | "not" -> VVbool (not (bool_of e v))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\"")))
-  | Aop2 (loc, op, e1, e2) -> (
+  | Aop2 (op, e1, e2) -> (
       let int e = int_of e (eval_expr ceva e) in
       let float e = float_of e (eval_expr ceva e) in
       let num e = num_of e (eval_expr ceva e) in
@@ -955,47 +886,26 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
              else Float.to_string fl)
       | "%" -> VVstring (Sosa.to_string (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\"")))
-  | Aint (_, s) -> VVstring s
-  | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
-
-let print_error ((fname, bp, ep) as pos) exc =
-  incr GWPARAM.nb_errors;
-  if !GWPARAM.nb_errors <= 10 then (
-    if fname = "" then Printf.eprintf "*** <W> template file"
-    else Printf.eprintf "File %s" fname;
-    let line = if fname = "" then None else Templ_parser.line_of_loc pos in
-    Printf.eprintf ", ";
-    (match line with
-    | Some (lin, col1, col2) ->
-        Printf.eprintf "line %d, characters %d-%d:\n" lin col1 col2
-    | None -> Printf.eprintf "characters %d-%d:\n" bp ep);
-    (match exc with
-    | Failure s -> Printf.eprintf "Failed - %s" s
-    | _ -> Printf.eprintf "%s" (Printexc.to_string exc));
-    Printf.eprintf "\n\n";
-    flush stderr)
+  | Aint s -> VVstring s
+  | Apack al ->
+      let vl = List.map (eval_expr ceva) al in
+      let sl = List.map string_of_expr_val vl in
+      VVstring (String.concat "" sl)
+  | e -> raise_with_loc loc (Failure (not_impl "eval_expr" e))
 
 let eval_bool_expr conf (eval_var, eval_apply) e =
-  try
-    match eval_expr (conf, eval_var, eval_apply) e with
-    | VVbool b -> b
-    | VVstring _ | VVother _ ->
-        raise_with_loc (loc_of_expr e) (Failure "bool value expected")
-  with Exc_located (loc, exc) ->
-    print_error loc exc;
-    false
+  match eval_expr (conf, eval_var, eval_apply) e with
+  | VVbool b -> b
+  | VVstring _ | VVother _ ->
+      raise_with_loc e.Ast.loc (Failure "bool value expected")
 
 let eval_string_expr conf (eval_var, eval_apply) e =
-  try
-    match eval_expr (conf, eval_var, eval_apply) e with
-    | VVstring s -> Util.translate_eval s
-    | VVbool _ | VVother _ ->
-        raise_with_loc (loc_of_expr e) (Failure "string value expected")
-  with Exc_located (loc, exc) ->
-    print_error loc exc;
-    ""
+  match eval_expr (conf, eval_var, eval_apply) e with
+  | VVstring s -> Util.translate_eval s
+  | VVbool _ | VVother _ ->
+      raise_with_loc e.Ast.loc (Failure "string value expected")
 
-let print_body_prop conf =
+let print_body_prop (conf : Config.config) =
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
     with Not_found -> ""
@@ -1003,28 +913,28 @@ let print_body_prop conf =
   Output.print_sstring conf (s ^ Util.body_prop conf)
 
 type 'a vother =
-  | Vdef of (string * ast option) list * ast list
+  | Vdef of (string * Ast.t option) list * Ast.t list
   | Vval of 'a expr_val
   | Vbind of string * Adef.encoded_string
 
 module Env = Map.Make (String)
 
 type ('a, 'b) interp_fun = {
-  eval_var : 'a Env.t -> 'b -> loc -> string list -> 'b expr_val;
+  eval_var : 'a Env.t -> 'b -> Loc.t -> string list -> 'b expr_val;
   eval_transl : 'a Env.t -> bool -> string -> string -> string;
   eval_predefined_apply : 'a Env.t -> string -> 'b expr_val list -> string;
   get_vother : 'a -> 'b vother option;
   set_vother : 'b vother -> 'a;
   print_foreach :
-    ('a Env.t -> 'b -> ast -> unit) ->
-    ('a Env.t -> 'b -> ast -> string) ->
+    ('a Env.t -> 'b -> Ast.t -> unit) ->
+    ('a Env.t -> 'b -> Ast.t -> string) ->
     'a Env.t ->
     'b ->
-    loc ->
+    Loc.t ->
     string ->
     string list ->
-    ast list list ->
-    ast list ->
+    Ast.t list list ->
+    Ast.t list ->
     unit;
 }
 
@@ -1053,12 +963,12 @@ let set_val set_vother k v env =
 let eval_subst loc f set_vother env xl vl a =
   let rec loop env a xl vl =
     match (xl, vl) with
-    | x :: xl, VVstring v :: vl -> loop env (subst (subst_text x v) a) xl vl
+    | x :: xl, VVstring v :: vl -> loop env (Ast.subst (subst_text x v) a) xl vl
     | x :: xl, v :: vl ->
         let env = set_val set_vother x v env in
         loop env a xl vl
     | [], [] -> (env, a)
-    | _ -> (env, Atext (loc, f ^ ": bad # of params"))
+    | _ -> (env, Ast.mk_text ~loc (f ^ ": bad # of params"))
   in
   loop env a xl vl
 
@@ -1077,15 +987,15 @@ let print_apply loc f set_vother print_ast env ep gxl al gvl =
     let env, a =
       let rec loop env a xl vl =
         match (xl, vl) with
-        | x :: xl, VVstring v :: vl -> loop env (subst (subst_text x v) a) xl vl
+        | x :: xl, VVstring v :: vl ->
+            loop env (Ast.subst (subst_text x v) a) xl vl
         | x :: xl, v :: vl -> loop (set_val set_vother x v env) a xl vl
         | [], [] -> (env, a)
         | _ ->
             ( env,
-              Atext
-                ( loc,
-                  Printf.sprintf "%s: bad # of params (%d instead of %d)" f
-                    (List.length gvl) (List.length gxl) ) )
+              Ast.mk_text ~loc
+                (Printf.sprintf "%s: bad # of params (%d instead of %d)" f
+                   (List.length gvl) (List.length gxl)) )
       in
       loop env a gxl gvl
     in
@@ -1093,9 +1003,9 @@ let print_apply loc f set_vother print_ast env ep gxl al gvl =
   in
   let rec loop = function
     | [] -> ()
-    | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+    | Ast.{ desc = Avar ("sq", []); _ } :: { desc = Atext s; loc } :: al ->
         let s = squeeze_spaces s in
-        loop (Atext (loc, s) :: al)
+        loop (Ast.mk_text ~loc s :: al)
     | a :: al ->
         local_print_ast a;
         loop al
@@ -1111,7 +1021,8 @@ let rec templ_print_foreach conf print_ast set_vother env ep _loc s sl _el al =
       print_foreach_env_binding conf print_ast set_vother env ep al
   | _ -> raise Not_found
 
-and print_foreach_env_binding conf print_ast set_vother env ep al =
+and print_foreach_env_binding (conf : Config.config) print_ast set_vother env ep
+    al =
   let env_vars =
     let rec loop acc env_vars =
       match env_vars with
@@ -1161,6 +1072,69 @@ let rgb_of_str_hsv h s v =
   let ios s = int_of_string s in
   rgb_of_hsv (ios h) (ios s) (ios v)
 
+let rec eval_date_var conf jd = function
+  | "french" :: sl -> eval_dmy_var (Calendar.french_of_sdn Sure jd) sl
+  | "gregorian" :: sl -> eval_dmy_var (Calendar.gregorian_of_sdn Sure jd) sl
+  | "hebrew" :: sl -> eval_dmy_var (Calendar.hebrew_of_sdn Sure jd) sl
+  | "julian" :: sl -> eval_dmy_var (Calendar.julian_of_sdn Sure jd) sl
+  | [ "julian_day" ] -> VVstring (string_of_int jd)
+  | [ "julian_day"; "sep1000" ] ->
+      VVstring
+        (Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") jd)
+  | [ "moon_age" ] -> (
+      try
+        let _, md = Calendar.moon_phase_of_sdn jd in
+        VVstring (string_of_int md)
+      with Failure _ -> VVstring "")
+  | "moon_phase" :: sl -> (
+      try
+        let mp, _ = Calendar.moon_phase_of_sdn jd in
+        eval_moon_phase_var mp sl
+      with Failure _ -> VVstring "")
+  | [ "week_day" ] ->
+      let wday =
+        let jd_today = Calendar.sdn_of_gregorian conf.today in
+        let x = conf.today_wd - jd_today + jd in
+        if x < 0 then 6 + ((x + 1) mod 7) else x mod 7
+      in
+      VVstring (string_of_int wday)
+  | sl -> eval_dmy_var (Calendar.gregorian_of_sdn Sure jd) sl
+
+and eval_moon_phase_var mp = function
+  | [ "hour" ] ->
+      let s =
+        match mp with None -> "" | Some (_, hh, _) -> Printf.sprintf "%02d" hh
+      in
+      VVstring s
+  | [ "index" ] ->
+      let i =
+        match mp with
+        | None -> 0
+        | Some (Calendar.NewMoon, _, _) -> 1
+        | Some (Calendar.FirstQuarter, _, _) -> 2
+        | Some (Calendar.FullMoon, _, _) -> 3
+        | Some (Calendar.LastQuarter, _, _) -> 4
+      in
+      VVstring (string_of_int i)
+  | [ "minute" ] ->
+      let s =
+        match mp with None -> "" | Some (_, _, mm) -> Printf.sprintf "%02d" mm
+      in
+      VVstring s
+  | _ -> raise Not_found
+
+and eval_dmy_var dmy = function
+  | [ "day" ] -> VVstring (string_of_int dmy.day)
+  | [ "month" ] -> VVstring (string_of_int dmy.month)
+  | "year" :: sl -> eval_integer dmy.year sl
+  | [] -> VVstring (Printf.sprintf "%d-%02d-%02d" dmy.year dmy.month dmy.day)
+  | _ -> raise Not_found
+
+and eval_integer i = function
+  | [ "roman" ] -> VVstring (Mutil.roman_of_arabian i)
+  | [] -> VVstring (string_of_int i)
+  | _ -> raise Not_found
+
 let eval_var conf ifun env ep loc sl =
   try
     match sl with
@@ -1178,7 +1152,7 @@ let eval_var conf ifun env ep loc sl =
         | Some (Vbind (_, v)) -> VVstring (Mutil.decode v)
         | _ -> raise Not_found)
     | "today" :: sl ->
-        TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+        eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
     | [ "trace"; s ] ->
         Printf.eprintf "%s; " s;
         VVstring ""
@@ -1203,34 +1177,36 @@ let print_wid_hei conf fname =
   | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
   | Error () -> ()
 
-let rec interp_ast conf ifun env =
+let rec eval conf ifun env =
   let m_env = ref env in
   let rec eval_ast env ep a = string_of_expr_val (eval_ast_expr env ep a)
   and eval_ast_list env ep = function
     | [] -> []
-    | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+    | Ast.{ desc = Avar ("sq", []); _ } :: { desc = Atext s; loc } :: al ->
         let s = squeeze_spaces s in
-        eval_ast_list env ep (Atext (loc, s) :: al)
+        eval_ast_list env ep (Ast.mk_text ~loc s :: al)
     | a :: al -> eval_ast env ep a :: eval_ast_list env ep al
-  and eval_ast_expr env ep = function
-    | Atext (_, s) -> VVstring s
-    | Avar (loc, s, sl) ->
+  and eval_ast_expr env ep (Ast.{ desc; loc } as a) =
+    match desc with
+    | Atext s -> VVstring s
+    | Avar (s, sl) ->
         eval_string_var conf (eval_var conf ifun env ep loc) (s :: sl)
-    | Atransl (_, upp, s, n) -> VVstring (ifun.eval_transl env upp s n)
+    | Atransl (upp, s, n) -> VVstring (ifun.eval_transl env upp s n)
     | Aif (e, alt, ale) -> VVstring (eval_if env ep e alt ale)
-    | Aapply (loc, f, all) ->
+    | Aapply (f, all) ->
         let vl =
           List.map (fun (id, ast) -> (id, eval_ast_expr_list env ep ast)) all
         in
         VVstring (eval_apply env ep loc f vl)
     | Afor (i, min, max, al) -> VVstring (eval_for env ep i min max al)
-    | x -> VVstring (eval_expr env ep x)
+    | _ -> VVstring (eval_expr env ep a)
   and eval_ast_expr_list env ep v =
     let rec loop = function
       | [] -> []
-      | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+      | Ast.{ desc = Avar ("sq", []); _ } :: Ast.{ desc = Atext s; loc } :: al
+        ->
           let s = squeeze_spaces s in
-          loop (Atext (loc, s) :: al)
+          loop (Ast.mk_text ~loc s :: al)
       | a :: al -> eval_ast_expr env ep a :: loop al
     in
     match loop v with
@@ -1238,7 +1214,7 @@ let rec interp_ast conf ifun env =
     | el ->
         let sl = List.map string_of_expr_val el in
         VVstring (String.concat "" sl)
-  and eval_expr env ep e =
+  and eval_expr env ep (e : Ast.t) =
     let eval_apply = eval_apply env ep in
     let eval_var = eval_var conf ifun env ep in
     templ_eval_expr conf (eval_var, eval_apply) e
@@ -1270,7 +1246,10 @@ let rec interp_ast conf ifun env =
             let wl = List.map (fun w -> Utf8.capitalize_fst w) wl in
             String.concat " " wl
         | "interp", [ (None, VVstring s) ] ->
-            let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
+            let astl =
+              Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
+                (`Raw s)
+            in
             String.concat "" (eval_ast_list env ep astl)
         | "language_name", [ (None, VVstring s) ] ->
             Translate.language_name s (Util.transl conf "!languages")
@@ -1346,36 +1325,36 @@ let rec interp_ast conf ifun env =
       if int_min < int_max then
         let instr = String.concat "" (List.map eval_ast al) in
         let accu = accu ^ instr in
-        loop new_env
-          (Aop2 (("", 0, 0), "+", min, Aint (("", 0, 0), "1")))
-          max accu
+        let a = Ast.mk_op2 "+" min (Ast.mk_int "1") in
+        loop new_env a max accu
       else accu
     in
     loop env min max ""
   in
-  let rec print_ast env ep = function
-    | Avar (loc, s, sl) ->
-        print_var print_ast_list conf ifun env ep loc (s :: sl)
+  let rec print_ast env ep (Ast.{ desc; loc } as a) =
+    match desc with
+    | Avar (s, sl) -> print_var print_ast_list conf ifun env ep loc (s :: sl)
     | Awid_hei s -> print_wid_hei conf s
     | Aif (e, alt, ale) -> print_if env ep e alt ale
-    | Aforeach ((loc, s, sl), el, al) -> (
+    | Aforeach ((s, sl), el, al) -> (
         try print_foreach conf ifun print_ast eval_expr env ep loc s sl el al
         with Not_found ->
           Output.printf conf " %%foreach;%s?" (String.concat "." (s :: sl)))
     | Adefine (f, xl, al, alk) -> print_define env ep f xl al alk
-    | Aapply (loc, f, ell) -> print_apply env ep loc f ell
+    | Aapply (f, ell) -> print_apply env ep loc f ell
     | Alet (k, v, al) -> print_let env ep k v al
     | Afor (i, min, max, al) -> print_for env ep i min max al
-    | x -> Output.print_sstring conf (eval_ast env ep x)
+    | _ -> Output.print_sstring conf (eval_ast env ep a)
   and print_ast_list env ep = function
     | [] -> m_env := env
-    | Avar (_, "sq", []) :: Atext (loc, s) :: al ->
+    | Ast.{ desc = Avar ("sq", []); _ } :: Ast.{ desc = Atext s; loc } :: al ->
         let s = squeeze_spaces s in
-        print_ast_list env ep (Atext (loc, s) :: al)
-    | Ainclude (fname, astl) :: al ->
-        include_begin conf (Adef.safe fname);
-        print_ast_list env ep astl;
-        include_end conf (Adef.safe fname);
+        print_ast_list env ep (Ast.mk_text ~loc s :: al)
+    | Ast.{ desc = Ainclude _; _ } :: _ ->
+        (* Excluded by [Geneweb_templ.Parser.parse]. *)
+        assert false
+    | Ast.{ desc = Apack l; _ } :: al ->
+        print_ast_list env ep l;
         print_ast_list !m_env ep al
     | [ a ] -> print_ast env ep a
     | a :: al ->
@@ -1389,15 +1368,13 @@ let rec interp_ast conf ifun env =
       List.map (fun (id, asts) -> (id, eval_ast_expr_list env ep asts)) ell
     in
     match get_def ifun.get_vother f env with
-    | Some (xl, al) -> (
-        try
-          let xl, vl =
-            sort_apply_parameters loc
-              (fun e -> VVstring (eval_expr env ep e))
-              xl vl
-          in
-          templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
-        with e -> print_error loc e)
+    | Some (xl, al) ->
+        let xl, vl =
+          sort_apply_parameters loc
+            (fun e -> VVstring (eval_expr env ep e))
+            xl vl
+        in
+        templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
     | None -> Output.print_sstring conf (eval_apply env ep loc f vl)
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
@@ -1425,7 +1402,8 @@ let rec interp_ast conf ifun env =
       in
       if int_min < int_max then
         let _ = print_ast_list new_env ep al in
-        loop new_env (Aop2 (("", 0, 0), "+", min, Aint (("", 0, 0), "1"))) max
+        let a = Ast.mk_op2 "+" min (Ast.mk_int "1") in
+        loop new_env a max
     in
     loop env min max
   in
@@ -1443,34 +1421,25 @@ and print_var print_ast_list conf ifun env ep loc sl =
       match sl with
       (* covers case of %include.file; *)
       | [ "include"; templ ] -> (
-          match Util.open_etc_file conf templ with
-          | Some (_, fname) -> (
-              match input_templ conf templ with
-              | Some astl ->
-                  Templ_parser.(HS.replace included_files templ astl);
-                  include_begin conf (Adef.safe fname);
-                  print_ast_list env ep astl;
-                  include_end conf (Adef.safe fname)
-              | None ->
-                  GWPARAM.errors_other :=
-                    Format.sprintf "%%%s?" (String.concat "." sl)
-                    :: !GWPARAM.errors_other;
-                  Output.printf conf " %%%s?" (String.concat "." sl))
-          | None ->
-              GWPARAM.errors_other :=
-                Format.sprintf "%%%s?" (String.concat "." sl)
-                :: !GWPARAM.errors_other;
-              Output.printf conf " %%%s?" (String.concat "." sl))
-      | sl -> print_variable ep conf sl)
+          try
+            let fl = Util.etc_file_name conf templ in
+            let astl =
+              Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
+                (`File fl)
+            in
+            print_ast_list env ep astl
+          with _ ->
+            GWPARAM.errors_other :=
+              Format.sprintf "%%%s?" (String.concat "." sl)
+              :: !GWPARAM.errors_other;
+            Output.printf conf " %%%s?" (String.concat "." sl))
+      | sl -> print_variable conf sl)
   in
   let eval_var = eval_var conf ifun env ep loc in
   print_var1 eval_var sl
 
-and print_simple_variable dummy conf = function
-  | "base_header" -> include_hed_trl dummy conf "hed"
-  | "base_trailer" -> include_hed_trl dummy conf "trl"
+and print_simple_variable conf = function
   | "body_prop" -> print_body_prop conf
-  | "copyright" -> print_copyright dummy conf
   | "number_of_bases" ->
       Output.print_sstring conf
         (string_of_int (List.length (Util.get_bases_list ())))
@@ -1488,6 +1457,16 @@ and print_simple_variable dummy conf = function
         (String.concat ", " (Util.get_bases_list ~format_fun:format_link ()))
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
+  | "query_time" ->
+      (* FIXME: This variable have been introduced in order to display the
+         query time on pages generated with the template engine. This is a
+         workaround and we should refactor our approach to output trailers
+         in order to remove it.
+
+         See issue https://github.com/geneweb/geneweb/issues/2231 *)
+      let query_time = Unix.gettimeofday () -. conf.query_start in
+      Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+        !GWPARAM.errors_other !GWPARAM.set_vars
   | "src_images_list" ->
       let dir = !GWPARAM.images_d conf.bname in
       let f_list = Sys.readdir dir |> Array.to_list |> List.sort compare in
@@ -1506,62 +1485,18 @@ and print_simple_variable dummy conf = function
       Output.print_sstring conf res
   | _ -> raise Not_found
 
-and print_variable dummy conf sl =
+and print_variable conf sl =
   try Output.print_sstring conf (eval_variable conf sl)
   with Not_found -> (
     try
       match sl with
-      | [ s ] -> print_simple_variable dummy conf s
+      | [ s ] -> print_simple_variable conf s
       | _ -> raise Not_found
-    with Not_found ->
-      GWPARAM.errors_undef :=
-        Format.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
-      Output.printf conf " %%%s?" (String.concat "." sl))
+    with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
 
-and include_hed_trl dummy conf name =
-  match name with
-  | "hed" -> include_template_without_env dummy conf name (fun () -> ())
-  | "trl" ->
-      include_template_without_env dummy conf name (fun () -> ());
-      let query_time = Unix.gettimeofday () -. conf.query_start in
-      Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
-        !GWPARAM.errors_other !GWPARAM.set_vars
-  | _ -> ()
+let output conf ifun env ep fl = eval conf ifun env ep @@ parse conf fl
 
-and include_template_without_env dummy conf fname failure =
-  match Util.open_etc_file conf fname with
-  | Some (ic, fname) ->
-      include_begin conf @@ Adef.safe fname;
-      let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
-      close_in ic;
-      let ifun =
-        {
-          eval_var = (fun _ _ _ -> raise Not_found);
-          eval_transl = (fun _ -> eval_transl conf);
-          eval_predefined_apply = (fun _ -> raise Not_found);
-          get_vother = (fun _ -> None);
-          set_vother = (fun _ -> assert false);
-          print_foreach = (fun _ -> raise Not_found);
-        }
-      in
-      Templ_parser.wrap "" (fun () -> interp_ast conf ifun Env.empty dummy astl);
-      include_end conf @@ Adef.safe fname
-  | None -> failure ()
-
-and print_copyright dummy conf =
-  include_template_without_env dummy conf "copyr" (fun () ->
-      Output.print_sstring conf "<hr style=\"margin:0\">\n";
-      Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
-      Output.print_sstring conf "<em>";
-      Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
-      Output.print_sstring conf Version.ver;
-      Output.print_sstring conf "</em>";
-      Output.print_sstring conf "</div>\n";
-      Output.print_sstring conf "<br>\n")
-
-let copy_from_templ conf env ic =
-  let astl = Templ_parser.parse_templ conf (Lexing.from_channel ic) in
-  close_in ic;
+let output_builtin conf env fl =
   let ifun =
     {
       eval_var =
@@ -1575,15 +1510,4 @@ let copy_from_templ conf env ic =
       print_foreach = (fun _ -> raise Not_found);
     }
   in
-  Templ_parser.wrap "" (fun () -> interp_ast conf ifun env () astl)
-
-let include_template conf env fname failure =
-  match Util.open_etc_file conf fname with
-  | Some (ic, fname) ->
-      include_begin conf @@ Adef.safe fname;
-      copy_from_templ conf env ic;
-      include_end conf @@ Adef.safe fname
-  | None -> failure ()
-
-let include_hed_trl = include_hed_trl ()
-let print_copyright = print_copyright ()
+  output conf ifun env () fl

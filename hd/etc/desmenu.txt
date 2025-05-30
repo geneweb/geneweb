@@ -252,7 +252,7 @@ function table_spouse_disabled () {
             <div class="custom-control custom-checkbox custom-control-inline">
               <input type="checkbox" class="custom-control-input" id="t_nowrap" name="nowrap">
               <label class="custom-control-label" for="t_nowrap">[*no line break in names]</label>
-            </div>  
+            </div>
             <div class="custom-control custom-checkbox custom-control-inline">
               <input type="checkbox" class="custom-control-input" id="t_tt" name="tt" value="1">
               <label class="custom-control-label" for="t_tt">[*title/titles]1</label>
@@ -395,10 +395,11 @@ function table_spouse_disabled () {
     </div>
   </div>
 </form>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 <script>
 (function () {
   'use strict';

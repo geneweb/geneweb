@@ -1,7 +1,5 @@
 (dirs :standard \ %%%DUNE_DIRS_EXCLUDE%%%)
 
-(ocamllex (modules templ_parser))
-
 (library
  (name geneweb)
  (public_name geneweb)
@@ -16,6 +14,7 @@
             geneweb_gwdb
             geneweb_sosa
             geneweb_util
+            geneweb_templ
             geneweb_logs
             yojson
             markup

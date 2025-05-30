@@ -1,0 +1,3 @@
+(library
+  (name geneweb_compat)
+  (public_name geneweb.compat))

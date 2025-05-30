@@ -1,0 +1,6 @@
+(ocamllex lexer)
+
+(library
+  (name geneweb_templ)
+  (public_name geneweb.templ)
+  (libraries geneweb_compat fmt pp_loc))

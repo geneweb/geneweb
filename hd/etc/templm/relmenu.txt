@@ -256,7 +256,8 @@
   </fieldset>
 </form>
 
-%base_trailer;
+%include;trl
 %include;copyr
+%query_time;
 </body>
 </html>

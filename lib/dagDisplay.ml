@@ -2,7 +2,6 @@ open Config
 open Dag2html
 open Def
 open Gwdb
-open TemplAst
 open Util
 open Dag
 module Logs = Geneweb_logs.Logs
@@ -810,7 +809,7 @@ let print_slices_menu conf hts =
   in
   let title _ = header 0 in
   Hutil.header conf title;
-  if cgl then () else Hutil.interp_no_env conf "buttons_rel";
+  if cgl then () else Templ.output_builtin conf Templ.Env.empty "buttons_rel";
   Output.print_sstring conf {|<form method="get" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
@@ -850,7 +849,7 @@ let print_dag_page conf page_title hts next_txt =
   Hutil.header conf title;
   (* title goes into <title> ... </title> *)
   (* page <h1> title is handled by buttons_rel!! *)
-  if cgl then () else Hutil.interp_no_env conf "buttons_rel";
+  if cgl then () else Templ.output_builtin conf Templ.Env.empty "buttons_rel";
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then
     if cgl then Output.print_sstring conf {|">&gt;&gt;</p>|}
@@ -893,7 +892,7 @@ let eval_predefined_apply f vl =
   let vl =
     List.map
       (function
-        | VVstring "" -> (
+        | Templ.VVstring "" -> (
             match f with
             | "min" -> max_int
             | "max" -> 0 - max_int
@@ -921,7 +920,8 @@ let parents_access_aux conf base td get_parent =
       match get_parents (poi base ip) with
       | Some ifam ->
           let cpl = foi base ifam in
-          VVstring (Util.acces conf base (poi base (get_parent cpl)) :> string)
+          Templ.VVstring
+            (Util.acces conf base (poi base (get_parent cpl)) :> string)
       | None -> VVstring "")
   | _ -> VVstring ""
 
@@ -944,17 +944,17 @@ let has_sibling_aux base td next_or_prev =
 
 let sibling_access_aux conf base td next_or_prev =
   match has_sibling_aux base td next_or_prev with
-  | Some s_ip -> VVstring (Util.acces conf base (poi base s_ip) :> string)
+  | Some s_ip -> Templ.VVstring (Util.acces conf base (poi base s_ip) :> string)
   | None -> raise Not_found
 
 let rec eval_var conf base env _xx _loc = function
   | [ "browsing_with_sosa_ref" ] -> (
       match (Util.p_getenv conf.env "pz", Util.p_getenv conf.env "nz") with
-      | Some _, Some _ -> VVbool true
+      | Some _, Some _ -> Templ.VVbool true
       | _, _ -> VVbool false)
   | [ "cell_nbr" ] -> (
       match get_env "cell_nbr" env with
-      | Vint i -> VVstring (string_of_int i)
+      | Vint i -> Templ.VVstring (string_of_int i)
       | _ -> raise Not_found)
   | "dag" :: sl -> (
       match get_env "dag" env with
@@ -1343,16 +1343,18 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
         |> add "p_title" (Vsstring page_title)
         |> add "next_txt" (Vestring next_txt))
     in
-    Hutil.interp conf "dag"
-      {
-        eval_var = eval_var conf base;
-        eval_transl = (fun _ -> Templ.eval_transl conf);
-        eval_predefined_apply = (fun _ -> eval_predefined_apply);
-        get_vother;
-        set_vother;
-        print_foreach = print_foreach conf hts;
-      }
-      env ()
+    let ifun =
+      Templ.
+        {
+          eval_var = eval_var conf base;
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> eval_predefined_apply);
+          get_vother;
+          set_vother;
+          print_foreach = print_foreach conf hts;
+        }
+    in
+    Templ.output conf ifun env () "dag"
 
 let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
     next_txt =

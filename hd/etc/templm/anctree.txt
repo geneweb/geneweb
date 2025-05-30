@@ -1,4 +1,4 @@
-﻿%doctype;
+%doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: templm/anctree.txt v7.0 2015/12/10 21:34:32 $ -->
@@ -244,8 +244,9 @@
   %include;tools
   %apply;tools_anctree()
   <div style="clear:both;"></div>
-  %base_trailer;
+  %include;trl
   %include;copyr
+  %query_time;
 %end;
 </body>
 </html>
