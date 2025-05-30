@@ -1,4 +1,9 @@
-module HS = Hashtbl.Make (String)
+module HS = Hashtbl.Make (struct
+  type t = string
+
+  let equal = String.equal
+  let hash = Hashtbl.hash
+end)
 
 let parse_source =
   let cache : Ast.t list HS.t = HS.create 17 in
