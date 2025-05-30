@@ -503,7 +503,7 @@
   %else;%apply;min(evarv, max_desc_level, bvar.max_desc_level)%end;
 %end;
 
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js

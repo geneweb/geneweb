@@ -22,7 +22,7 @@ fr: La base de données "%bname;" se trouve maintenant à l'adresse:
 </dd></dt></dl>
 </p>
 
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 </body>

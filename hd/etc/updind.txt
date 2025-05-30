@@ -360,7 +360,7 @@
         <input type="text" name="excnt_ins_witnwcnt_n" size="1" maxlength="1" value="1" onkeydown= "if(event.keyCode == 13) document.getElementById('excnt_ins_witnwcnt').value = 'on';">
         </label>[nouveau(x)::witness/witnesses]0 %if;("evt_name" = "#bapt")/ [godfather/godmother/godparents]2%end;
         <input type="hidden" name="excnt_ins_witnwcnt" id="excnt_ins_witnwcnt" readonly>
-        <input type="submit" 
+        <input type="submit"
           onclick="%if;("evt_name" = "buri_or_crem")set_buri(xcnt);%end;
                    %if;("evt_name" = "#deat")set_insert_death(xcnt);%end; document.forms['form_pers'].action += '#witn';document.getElementById('excnt_ins_witnwcnt').value = 'on'" value="ok" readonly>
       </td>
@@ -395,7 +395,7 @@
     <div class="row">
       <label for="excnt_witnwcnt_fn" class="col-2 col-form-label">[*first name/first names]0</label>
       <div class="col-6">
-        <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn" 
+        <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn"
           value="%witness.first_name;"placeholder="[*first name/first names]0"%datalist_fnames;>
       </div>
       <label for="excnt_witnwcnt_occ" class="col-2 col-form-label">[*number]0</label>
@@ -743,7 +743,7 @@
       <input type="hidden" name="m" value="ADD_IND_OK">
     %end;
   </div>
-  
+
   <div class="card">
     <h2 class="card-header%if;(mrg=1) mt-5%end;">%nn;
       %if;(mrg=1)[*merge::person/persons]1%nn;
@@ -956,7 +956,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="card">
     %apply;card_header("birth","birth")
     <div class="card-body">
@@ -1313,7 +1313,7 @@
     </div>
   </div>
 </form>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js

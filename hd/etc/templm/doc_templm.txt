@@ -170,7 +170,7 @@
   </td>
 </tr>
 </table>
-%base_trailer;
+%include;trl
 %include;copyr
 </body>
 </html>

@@ -175,7 +175,7 @@
         %if;dag_cell.is_nothing;&nbsp;%nn;
         %elseif;dag_cell.is_bar;
           %if;(dag_cell.bar_link!="" and not cancel_links)
-             %( added em!=R here condition because first button_rel is static and does the same 
+             %( added em!=R here condition because first button_rel is static and does the same
                No! each vbar has a different action, suppressing a particular path %)
             <a href="%dag_cell.bar_link;" title="[*suppress this path]">│</a>%nn;
           %else;│%end;
@@ -212,7 +212,7 @@
     </table>
   %end;
 %end;
-%base_trailer;
+%include;trl
 </div>
 %include;js
 </body>

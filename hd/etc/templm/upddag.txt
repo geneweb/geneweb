@@ -178,7 +178,7 @@
 %end;
 
 <div style="height:300px;clear:both;"> </div>
-  %base_trailer;
+  %include;trl
   %include;copyr
 </body>
 </html>

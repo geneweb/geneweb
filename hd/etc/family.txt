@@ -29,7 +29,7 @@
     %include;modules/arbre_famille
   </div>
   %if;(not cancel_links)
-    %base_trailer;
+    %include;trl
     %include;copyr
   %end;
 </div>

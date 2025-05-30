@@ -222,7 +222,7 @@
 </form>
 <div style="clear:both;"></div>
 
-%base_trailer;
+%include;trl
 %include;copyr
 </body>
 </html>

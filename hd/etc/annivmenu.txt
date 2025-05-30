@@ -30,7 +30,7 @@
   </ul>
 </p>
 
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js

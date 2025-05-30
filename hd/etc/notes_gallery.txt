@@ -41,7 +41,7 @@
     <a id="rlm" href="%prefix;m=RLM" title="[*relations tree]"><img src="%image_prefix;/gui_create.png" height="18" alt="Tree"></a>
     <div id="legend" class="list-comma list-unstyled pl-1"></div>
   </div>
- 
+
   <div class="d-none" id="div_unknown">%nn;
     [*unknown person][:]%nn; <ul id="unknown" class="d-inline list-comma list-unstyled pl-0"></ul>
   </div>

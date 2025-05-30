@@ -351,7 +351,7 @@ function update_old () {
 %else;
   %apply;print_diff()
 %end;
-%base_trailer;
+%include;trl
 %include;copyr
 
 </div>
