@@ -1,3 +1,5 @@
+module Compat = Geneweb_compat
+
 exception File_error of string
 
 let raise_error ppf = Format.ksprintf (fun s -> raise (File_error s)) ppf

@@ -1,3 +1,5 @@
+module Compat = Geneweb_compat
+
 (* By default, we do not want to print debug messages. *)
 let verbosity_level = ref 6
 let debug_flag = ref false

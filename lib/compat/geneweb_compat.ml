@@ -47,3 +47,15 @@ module Out_channel = struct
   let flush = Stdlib.flush
   let output = Stdlib.output
 end
+
+module List = struct
+  open List
+
+  let rec equal eq l1 l2 =
+    match (l1, l2) with
+    | [], [] -> true
+    | [], _ :: _ | _ :: _, [] -> false
+    | a1 :: l1, a2 :: l2 -> eq a1 a2 && equal eq l1 l2
+
+  include List
+end

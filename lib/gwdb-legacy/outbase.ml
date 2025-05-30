@@ -1,5 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
-
+module Compat = Geneweb_compat
 open Dbdisk
 
 let load_ascends_array base = base.data.ascends.load_array ()
