@@ -44,6 +44,13 @@ val infer_death_from_parents :
   Config.config -> Gwdb.base -> Gwdb.family -> Def.death
 (** [infer_death_from_parents conf base fam] infer death status for a new children in this family *)
 
+val infer_witness_death_from_event :
+  conf:Config.config ->
+  base:Gwdb.base ->
+  date:Date.date option ->
+  existing_witnesses:Gwdb.iper list ->
+  Def.death
+
 val print_same_name : Config.config -> Gwdb.base -> Gwdb.person -> unit
 
 val print_person_parents_and_spouse :

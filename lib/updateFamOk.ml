@@ -130,7 +130,7 @@ let reconstitute_insert_event conf ext cnt el =
     (el, true)
   else (el, ext)
 
-let rec reconstitute_events conf ext cnt =
+let rec reconstitute_events ~base conf ext cnt =
   match Update_util.get_nth conf "e_name" cnt with
   | None -> ([], ext)
   | Some efam_name ->
@@ -239,6 +239,10 @@ let rec reconstitute_events conf ext cnt =
         in
         loop 1 ext
       in
+      let witnesses =
+        Update_util.witnesses_with_inferred_death_from_event ~conf ~base
+          ~date:efam_date witnesses
+      in
       let witnesses, ext =
         let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
         match Util.p_getenv conf.Config.env evt_ins with
@@ -278,7 +282,7 @@ let rec reconstitute_events conf ext cnt =
           efam_witnesses = Array.of_list witnesses;
         }
       in
-      let el, ext = reconstitute_events conf ext (cnt + 1) in
+      let el, ext = reconstitute_events ~base conf ext (cnt + 1) in
       let el, ext = reconstitute_insert_event conf ext cnt el in
       (e :: el, ext)
 
@@ -409,7 +413,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   (marr, div, wit)
 
 let reconstitute_family conf base nsck =
-  let events, ext = reconstitute_events conf false 1 in
+  let events, ext = reconstitute_events ~base conf false 1 in
   let events, ext = reconstitute_insert_event conf ext 0 events in
   let surname = Update_util.getn conf "pa1" "sn" in
   let children, ext =

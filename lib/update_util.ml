@@ -196,3 +196,45 @@ let eval_date_var od s =
   | "prec_yearint" ->
       eval_is_prec (function YearInt _ -> true | _ -> false) od
   | _ -> raise Not_found
+
+let witnesses_with_inferred_death_from_event ~conf ~base ~date witnesses =
+  let death =
+    let existing_witnesses =
+      List.filter_map
+        (fun ((first_name, surname, occurrence_number, update_kind, _), _, _) ->
+          match update_kind with
+          | Update.Create _ -> None
+          | Update.Link ->
+              Gwdb.person_of_key base first_name surname occurrence_number)
+        witnesses
+    in
+    Update.infer_witness_death_from_event ~conf ~base ~date ~existing_witnesses
+  in
+  let substitute_death
+      ( (first_name, surname, occurrence_number, update_kind, var),
+        witness_kind,
+        witness_note ) =
+    let update_kind =
+      match update_kind with
+      | Update.Link -> update_kind
+      | Update.Create (sex, Some info) ->
+          Update.Create (sex, Some { info with Update.ci_death = death })
+      | Update.Create (sex, None) ->
+          Update.Create
+            ( sex,
+              Some
+                {
+                  Update.ci_birth_date = None;
+                  ci_birth_place = "";
+                  ci_death = death;
+                  ci_death_date = None;
+                  ci_death_place = "";
+                  ci_occupation = "";
+                  ci_public = false;
+                } )
+    in
+    ( (first_name, surname, occurrence_number, update_kind, var),
+      witness_kind,
+      witness_note )
+  in
+  List.map substitute_death witnesses
