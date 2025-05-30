@@ -86,8 +86,7 @@
     %end;
   %end;
 %end;
-%if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
-    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
+%if;("MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m or "REFRESH" in e.m
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
     or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")

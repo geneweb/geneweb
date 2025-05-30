@@ -55,7 +55,8 @@ val string_of_parent_age :
   config -> base -> person * bool -> (family -> iper) -> Adef.safe_string
 
 val string_of_image_url :
-  config -> base -> person * bool -> bool -> Adef.escaped_string
+  config -> base -> person * bool -> bool -> bool -> Adef.escaped_string
+(** [string_of_image_url conf base p html saved] *)
 
 val round_2_dec : float -> float
 
