@@ -234,9 +234,7 @@ let rec reconstitute_pevents conf ext cnt =
                   "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
                 in
                 match Util.p_getenv conf.Config.env var_note with
-                | Some wnote ->
-                    (*print_endline ("NOTE:" ^ wnote);*)
-                    wnote
+                | Some wnote -> wnote
                 | _ -> ""
               in
 

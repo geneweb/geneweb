@@ -127,25 +127,6 @@ let rec infer_death conf base p =
       | None -> DontKnowIfDead
       | Some ifam -> infer_death_from_parents conf base (Gwdb.foi base ifam)
 
-(*let restrict_to_small_list el =
-  let rec begin_list n rl el =
-     TODO suppress this limit
-    if n > 25 then
-      let rec end_list n sl el =
-        if n > 25 then List.rev_append rl (None :: sl)
-        else
-          match el with
-            e :: el -> end_list (n + 1) (Some e :: sl) el
-          | [] -> List.rev_append rl sl
-      in
-      end_list 0 [] (List.rev el)
-    else
-      match el with
-        e :: el -> begin_list (n + 1) (Some e :: rl) el
-      | [] -> List.rev rl
-  in
-  begin_list 0 [] el*)
-
 (* ************************************************************************** *)
 (* [Fonc] print_person_parents_and_spouses :
             config -> base -> person -> unit *)
