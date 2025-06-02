@@ -104,6 +104,8 @@
               pp_loc
               logs
               syslog-message # shouldn't be necessary
+              tyxml
+              progress
             ]);
           };
         };
