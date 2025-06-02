@@ -95,6 +95,7 @@
               promise_jsoo
               benchmark
               pp_loc
+              tyxml
             ]);
           };
         };
