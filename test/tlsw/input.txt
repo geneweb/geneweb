@@ -1,0 +1,114 @@
+= Title 1 =
+== Title 2 ==
+=== Title 3 ===
+==== Title 4 ====
+===== Title 5 =====
+====== Title 6 ======
+
+== Rule ==
+----
+--------
+
+== Tables of contents ==
+__TOC__
+__SHORT_TOC__
+__NOTOC__
+
+== Normal paragraph ==
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis
+ipsum augue, vitae suscipit nisi tincidunt at. Aliquam erat volutpat. Integer
+consectetur est sapien, vel imperdiet massa fermentum et. Nunc sagittis tempor
+erat, eget eleifend metus malesuada quis. Etiam ullamcorper mi sit amet libero
+tempus hendrerit.
+
+== Formatted paragraph ==
+Lorem ''ipsum'' dolor sit amet, __consectetur__ adipiscing elit. Suspendisse sagittis
+ipsum augue, vitae suscipit nisi tincidunt at. Aliquam ~~erat~~ volutpat. Integer
+consectetur '''''est''''' sapien, vel imperdiet massa {fermentum} et. Nunc sagittis tempor
+erat, eget eleifend metus '''malesuada''' quis. Etiam ullamcorper mi sit amet libero
+tempus hendrerit.
+
+== Pre paragraph ==
+
+ Lorem ''ipsum'' dolor sit amet, __consectetur__ adipiscing elit. Suspendisse sagittis
+ ipsum augue, vitae suscipit nisi tincidunt at. Aliquam ~~erat~~ volutpat. Integer
+ consectetur '''''est''''' sapien, vel imperdiet massa {fermentum} et. Nunc sagittis tempor
+ erat, eget eleifend metus '''malesuada''' quis. Etiam ullamcorper mi sit amet libero
+ tempus hendrerit.
+
+== Not pre paragraph ==
+ Lorem ''ipsum'' dolor sit amet, __consectetur__ adipiscing elit. Suspendisse sagittis
+ ipsum augue, vitae suscipit nisi tincidunt at. Aliquam ~~erat~~ volutpat. Integer
+ consectetur '''''est''''' sapien, vel imperdiet massa {fermentum} et. Nunc sagittis tempor
+ erat, eget eleifend metus '''malesuada''' quis. Etiam ullamcorper mi sit amet libero
+ tempus hendrerit.
+
+== Not pre paragraph ==
+
+ Lorem ''ipsum'' dolor sit amet, __consectetur__ adipiscing elit. Suspendisse sagittis
+ipsum augue, vitae suscipit nisi tincidunt at. Aliquam ~~erat~~ volutpat. Integer
+consectetur '''''est''''' sapien, vel imperdiet massa {fermentum} et. Nunc sagittis tempor
+erat, eget eleifend metus '''malesuada''' quis. Etiam ullamcorper mi sit amet libero
+tempus hendrerit.
+
+== Indentation ==
+: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis
+:: ipsum augue, vitae suscipit nisi tincidunt at. Aliquam erat volutpat. Integer
+: consectetur est sapien, vel imperdiet massa fermentum et. Nunc sagittis tempor
+::: erat, eget eleifend metus malesuada quis. Etiam ullamcorper mi sit amet libero
+tempus hendrerit.
+
+== Person links ==
+[[jean/martin]]
+[[jean/martin/10]]
+[[jean/martin/10/dolor sit amet]]
+
+== Note links ==
+[[[file.txt]]]
+[[[dir1:dir2:file.txt]]]
+[[[file.txt/dolor sit amet]]]
+[[[dir1:dir2:file.txt]]]
+[[[dir1:dir2:file.txt/dolor sit amet]]]
+
+== Wizard note links ==
+[[w:file.txt]]
+[[w:dir1:dir2:file.txt]]
+[[w:file.txt/dolor sit amet]]
+[[w:dir1:dir2:file.txt]]
+[[w:dir1:dir2:file.txt/dolor sit amet]]
+
+== Image links ==
+[[image:file.jpg]]
+[[image:dir1:dir2:file.jpg]]
+[[image:file.jpg/dolor sit amet]]
+[[image:dir1:dir2:file.jpg/dolor sit amet/120px]]
+
+== Simple lists ==
+* First element
+* Second element
+* Third element
+
+# First element
+# Second element
+# Third element
+
+== Nested lists ==
+* First level
+** Second level
+* First level
+** Second level
+*** Third level
+
+# First level
+## Second level
+# First level
+## Second level
+### Third level
+
+== Nested ordered and unordered lists ==
+* First unordered level
+** Second unordered level
+# First ordered level
+# First ordered level
+## Second ordered level
+# First ordered level

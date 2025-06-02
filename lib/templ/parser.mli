@@ -1,8 +1,8 @@
 val parse :
   ?cached:bool ->
   on_exn:(exn -> Printexc.raw_backtrace -> unit) ->
-  resolve_include:(Loc.t -> string -> string) ->
-  Loc.source ->
+  resolve_include:(Geneweb_loc.t -> string -> string) ->
+  Geneweb_loc.source ->
   Ast.t list
 (** [parse ?cached ~on_exn ~find src] parses [src] and expands included
     templates.

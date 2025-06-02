@@ -57,6 +57,19 @@ module In_channel : sig
       A newline is the character [\n] unless the file is open in text mode and
       {!Sys.win32} is [true] in which case it is the sequence of characters
       [\r\n]. *)
+
+  val input_all : t -> string
+  (** [input_all ic] reads all remaining data from [ic].
+
+      If the same channel is read concurrently by multiple threads, the returned
+      string is not guaranteed to contain contiguous characters from the input.
+  *)
+
+  val is_binary_mode : t -> bool
+  (** [is_binary_mode ic] returns whether the channel [ic] is in binary mode
+      (see {!set_binary_mode}).
+
+      @since 5.2 *)
 end
 
 module Out_channel : sig
