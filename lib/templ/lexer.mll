@@ -1,4 +1,5 @@
 {
+module Loc = Geneweb_loc
 
 module State : sig
   type t = private {
@@ -32,7 +33,7 @@ end = struct
 
   let current_loc (st : t) =
     let stop = st.lexbuf.Lexing.lex_abs_pos + st.lexbuf.Lexing.lex_curr_pos in
-    Loc.of_offsets st.src st.start stop
+    Loc.mk st.src st.start stop
 
   let push_token tk st =
     { st with tokens = tk :: st.tokens }

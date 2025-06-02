@@ -28,3 +28,17 @@
 (test
  (name heap_test)
  (libraries qcheck qcheck-alcotest geneweb_compat geneweb_search))
+
+(executable
+ (name wiki_check)
+ (modules wiki_check)
+ (libraries
+  geneweb_compat
+  geneweb_util
+  geneweb_db
+  geneweb_tlsw
+  cmdliner
+  tyxml
+  fmt
+  logs
+  progress))

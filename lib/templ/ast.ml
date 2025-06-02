@@ -1,4 +1,5 @@
 module Compat = Geneweb_compat
+module Loc = Geneweb_loc
 
 type desc =
   | Atext of string
@@ -17,7 +18,7 @@ type desc =
   | Ainclude of [ `File of string | `Raw of string ]
   | Apack of t list
 
-and t = { desc : desc; loc : Loc.t }
+and t = { desc : desc; loc : Geneweb_loc.t }
 
 let equal_pair eq1 eq2 (x1, y1) (x2, y2) = eq1 x1 x2 && eq2 y1 y2
 
