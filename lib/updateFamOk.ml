@@ -3,17 +3,6 @@
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
 let removed_string = ref []
-
-type create_info = Update.create_info = {
-  ci_birth_date : Date.date option;
-  ci_birth_place : string;
-  ci_death : Def.death;
-  ci_death_date : Date.date option;
-  ci_death_place : string;
-  ci_occupation : string;
-  ci_public : bool;
-}
-
 let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
@@ -44,7 +33,7 @@ let reconstitute_parent_or_child conf var default_surname =
     in
     let public = Update_util.getn conf (var ^ "b") "yyyy" = "p" in
     {
-      ci_birth_date = b;
+      Update.ci_birth_date = b;
       ci_birth_place = bpl;
       ci_death = death;
       ci_death_date = d;
