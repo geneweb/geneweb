@@ -45,6 +45,10 @@
     yojson
     digestif
     pp_loc
+    tyxml
+    cmdliner
+    progress
+    logs
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.27.0")))
   )
