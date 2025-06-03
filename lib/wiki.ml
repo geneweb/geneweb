@@ -786,6 +786,7 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_nth conf "modify all note" 1));
     Output.print_sstring conf "</a>");
+
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (commd conf);
   Output.print_sstring conf {|m=|};
@@ -796,6 +797,17 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "modify all note" 0));
   Output.print_sstring conf "</a>";
+
+  Output.print_sstring conf {|<a href="|};
+  Output.print_string conf (commd conf);
+  Output.print_sstring conf {|m=|};
+  Output.print_sstring conf "NOTES";
+  Output.print_string conf sfn;
+  Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
+  Output.print_sstring conf {|<i class="fa fa-image fa-fw"></i> |};
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "visualize"));
+  Output.print_sstring conf "</a>";
+
   if not is_empty then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
