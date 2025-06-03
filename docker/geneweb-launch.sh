@@ -58,7 +58,7 @@ start() {
 	${GENEWEB_HOME}/share/dist/gw/gwsetup \
 	-daemon \
 	-gd ${GENEWEB_HOME}/share/dist/gw \
-	-only ${GENEWEB_HOME}/etc/gwsetup_only \
+	-only etc/gwsetup_only \
 	>>${GENEWEB_HOME}/log/gwsetup.log 2>&1
 	gwlaunch_log "-- Started gwsetup!"
 
