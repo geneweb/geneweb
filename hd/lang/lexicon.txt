@@ -12406,6 +12406,10 @@ de: die ganze Notiz bearbeiten/vorheriger Abschnitt/nächster Abschnitt
 en: modify all the note/previous section/next section
 fr: éditer toute la note/section précédente/section suivante
 
+    visualize
+en: display
+fr: afficher
+
     modify note
 co: mudificà a nota
 de: Notiz bearbeiten
