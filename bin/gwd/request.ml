@@ -64,7 +64,6 @@ let relation_print conf base p =
   RelationDisplay.print conf base p p1
 
 let specify conf base n pl1 pl2 pl3 =
-  Printf.eprintf "specify\n";
   let title _ = Output.printf conf "%s : %s" n (transl conf "specify") in
   let n = Name.crush_lower n in
   let ptll pl =
@@ -119,7 +118,6 @@ let specify conf base n pl1 pl2 pl3 =
       l
     |> List.rev_map (fun (p, v, _) -> (p, v))
   in
-  Printf.eprintf "sort ptll\n";
   let ptll1 = ptll pl1 |> sort_ptll in
   let ptll2 = ptll pl2 |> sort_ptll in
   let ptll3 = ptll pl3 |> sort_ptll in
