@@ -107,7 +107,7 @@ let bench () =
       let conf = Config.empty in
       let bench_w_base ?t ?(load = []) name fn args =
         Secure.set_base_dir (Filename.dirname bname);
-        Gwdb.with_database bname @@ fun base ->
+        Driver.with_database bname @@ fun base ->
         List.iter (fun load -> load base) load;
         let r = bench ?t name (fn base) args in
         r
@@ -145,14 +145,14 @@ let bench () =
              };
            ]
       :: bench_w_base
-           ~load:[ Gwdb.load_persons_array ]
+           ~load:[ Geneweb_db.load_persons_array ]
            "Util.authorized_age"
            (fun base conf ->
-             Gwdb.Collection.iter
+             Geneweb_db.Collection.iter
                (Sys.opaque_identity (fun p ->
                     Sys.opaque_identity ignore
                     @@ Util.authorized_age conf base p))
-               (Gwdb.persons base))
+               (Geneweb_db.Driver.persons base))
            [
              { conf with wizard = true };
              { conf with wizard = false; friend = false };
@@ -166,17 +166,19 @@ let bench () =
            [ conf ]
       :: bench_w_base "Perso.first_possible_duplication" ~t:10
            (fun base _conf ->
-             Gwdb.Collection.fold
+             Geneweb_db.Collection.fold
                (fun acc p ->
-                 Perso.first_possible_duplication base (Gwdb.get_iper p) ([], [])
+                 Perso.first_possible_duplication base (Geneweb_db.get_iper p)
+                   ([], [])
                  :: acc)
-               [] (Gwdb.persons base))
+               []
+               (Geneweb_db.Driver.persons base))
            [ conf ]
       :: bench_w_base "BirthDeath.select_person" ~t:10
            (fun base get ->
              (Sys.opaque_identity BirthDeath.select_person) conf base get true
              |> Sys.opaque_identity ignore)
-           [ (fun p -> Date.od_of_cdate (Gwdb.get_birth p)) ]
+           [ (fun p -> Date.od_of_cdate (Geneweb_db.get_birth p)) ]
       :: suite
   | _ -> suite
 

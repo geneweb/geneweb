@@ -2,9 +2,9 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open Update_util
+module Driver = Geneweb_db.Driver
 
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
@@ -547,8 +547,9 @@ let reconstitute_person conf =
   let key_index =
     match p_getenv conf.env "i" with
     | Some s -> (
-        try iper_of_string (String.trim s) with Failure _ -> dummy_iper)
-    | None -> dummy_iper
+        try Driver.iper_of_string (String.trim s)
+        with Failure _ -> Driver.dummy_iper)
+    | None -> Driver.dummy_iper
   in
   let first_name = only_printable (get conf "first_name") in
   let surname = only_printable (get conf "surname") in
@@ -776,13 +777,13 @@ let default_prerr conf base = function
 
 let check_sex_married ?(prerr = default_prerr) conf base sp op =
   if
-    sp.sex <> get_sex op
+    sp.sex <> Driver.get_sex op
     && Array.exists
          (fun ifam ->
-           let fam = foi base ifam in
-           (sp.sex = Male && sp.key_index <> get_father fam)
-           || (sp.sex = Female && sp.key_index <> get_mother fam))
-         (get_family op)
+           let fam = Driver.foi base ifam in
+           (sp.sex = Male && sp.key_index <> Driver.get_father fam)
+           || (sp.sex = Female && sp.key_index <> Driver.get_mother fam))
+         (Driver.get_family op)
   then prerr conf base (Update.UERR_sex_married op)
 
 let rparents_of rparents =
@@ -805,17 +806,19 @@ let pwitnesses_of pevents =
 (* sp.death *)
 let effective_mod ?prerr ?skip_conflict conf base sp =
   let pi = sp.key_index in
-  let op = poi base pi in
-  let ofn = p_first_name base op in
-  let osn = p_surname base op in
-  let oocc = get_occ op in
+  let op = Driver.poi base pi in
+  let ofn = Driver.p_first_name base op in
+  let osn = Driver.p_surname base op in
+  let oocc = Driver.get_occ op in
   (if
    (not (String.equal ofn sp.first_name && String.equal osn sp.surname))
    || oocc <> sp.occ
   then
-   match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
+   match
+     Geneweb_db.Driver.person_of_key base sp.first_name sp.surname sp.occ
+   with
    | Some p' when p' <> pi && Some p' <> skip_conflict ->
-       Update.print_create_conflict conf base (poi base p') ""
+       Update.print_create_conflict conf base (Driver.poi base p') ""
    | _ ->
        Image.rename_portrait_and_blason conf base op
          (sp.first_name, sp.surname, sp.occ));
@@ -825,12 +828,13 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let np =
     Futil.map_person_ps
       (Update.insert_person conf base "" created_p)
-      (Gwdb.insert_string base) sp
+      (Driver.insert_string base)
+      sp
   in
-  let np = { np with related = get_related op } in
-  let ol_rparents = rparents_of (get_rparents op) in
+  let np = { np with related = Driver.get_related op } in
+  let ol_rparents = rparents_of (Driver.get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
-  let ol_pevents = pwitnesses_of (get_pevents op) in
+  let ol_pevents = pwitnesses_of (Driver.get_pevents op) in
   let nl_pevents = pwitnesses_of np.pevents in
   let ol = List.append ol_rparents ol_pevents in
   let nl = List.append nl_rparents nl_pevents in
@@ -839,25 +843,32 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   np
 
 let effective_add conf base sp =
-  (match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
-  | Some p' -> Update.print_create_conflict conf base (poi base p') ""
+  (match
+     Geneweb_db.Driver.person_of_key base sp.first_name sp.surname sp.occ
+   with
+  | Some p' -> Update.print_create_conflict conf base (Driver.poi base p') ""
   | None -> ());
   let created_p = ref [] in
-  let pi = insert_person base (no_person dummy_iper) no_ascend no_union in
+  let pi =
+    Driver.insert_person_with_union_and_ascendants base
+      (Driver.no_person Driver.dummy_iper)
+      Driver.no_ascend Driver.no_union
+  in
   let np =
     Futil.map_person_ps
       (Update.insert_person conf base "" created_p)
-      (Gwdb.insert_string base) { sp with key_index = pi }
+      (Driver.insert_string base)
+      { sp with key_index = pi }
   in
-  patch_person base pi np;
-  patch_ascend base pi no_ascend;
-  patch_union base pi no_union;
-  (np, no_ascend)
+  Driver.patch_person base pi np;
+  Driver.patch_ascend base pi Driver.no_ascend;
+  Driver.patch_union base pi Driver.no_union;
+  (np, Driver.no_ascend)
 
 let update_relations_of_related base ip old_related =
   List.iter
     (fun ip1 ->
-      let p1 = poi base ip1 in
+      let p1 = Driver.poi base ip1 in
       let rparents, rparents_are_different =
         List.fold_right
           (fun rel (list, rad) ->
@@ -875,7 +886,7 @@ let update_relations_of_related base ip old_related =
             else
               let rel = { rel with r_fath = rfath; r_moth = rmoth } in
               (rel :: list, rad))
-          (get_rparents p1) ([], false)
+          (Driver.get_rparents p1) ([], false)
       in
       let pevents, pevents_are_different =
         List.fold_right
@@ -888,18 +899,18 @@ let update_relations_of_related base ip old_related =
             in
             let e = { e with epers_witnesses = Array.of_list witnesses } in
             (e :: list, rad))
-          (get_pevents p1) ([], false)
+          (Driver.get_pevents p1) ([], false)
       in
       (if rparents_are_different || pevents_are_different then
-       let p = gen_person_of_person p1 in
+       let p = Driver.gen_person_of_person p1 in
        let rparents = if rparents_are_different then rparents else p.rparents in
        let pevents = if pevents_are_different then pevents else p.pevents in
-       patch_person base ip1 { p with rparents; pevents });
-      let families = get_family p1 in
+       Driver.patch_person base ip1 { p with rparents; pevents });
+      let families = Driver.get_family p1 in
       for i = 0 to Array.length families - 1 do
         let ifam = families.(i) in
-        let fam = foi base ifam in
-        let old_witnesses = Array.to_list (get_witnesses fam) in
+        let fam = Driver.foi base ifam in
+        let old_witnesses = Array.to_list (Driver.get_witnesses fam) in
         let new_witnesses = List.filter (( <> ) ip) old_witnesses in
         let fevents, fevents_are_different =
           List.fold_right
@@ -912,10 +923,10 @@ let update_relations_of_related base ip old_related =
               in
               let e = { e with efam_witnesses = Array.of_list witnesses } in
               (e :: list, rad))
-            (get_fevents fam) ([], false)
+            (Driver.get_fevents fam) ([], false)
         in
         if new_witnesses <> old_witnesses || fevents_are_different then
-          let fam = gen_family_of_family fam in
+          let fam = Driver.gen_family_of_family fam in
           let witnesses =
             if new_witnesses <> old_witnesses then Array.of_list new_witnesses
             else fam.witnesses
@@ -923,7 +934,7 @@ let update_relations_of_related base ip old_related =
           let fevents =
             if fevents_are_different then fevents else fam.fevents
           in
-          patch_family base ifam { fam with witnesses; fevents }
+          Driver.patch_family base ifam { fam with witnesses; fevents }
       done)
     old_related
 
@@ -932,12 +943,13 @@ let effective_del_no_commit base op =
   Update.update_related_pointers base op.key_index
     (rparents_of op.rparents @ pwitnesses_of op.pevents)
     [];
-  Gwdb.delete_person base op.key_index
+  Driver.delete_person base op.key_index
 
 let effective_del_commit conf base op =
   Notes.update_notes_links_db base (Def.NLDB.PgInd op.key_index) "";
   let key =
-    Util.make_key base (Gwdb.gen_person_of_person (poi base op.key_index))
+    Util.make_key base
+      (Driver.gen_person_of_person (Driver.poi base op.key_index))
   in
   Notes.update_cache_linked_pages conf Notes.Delete key key 0;
   Util.commit_patches conf base;
@@ -945,7 +957,7 @@ let effective_del_commit conf base op =
   History.record conf base changed "dp"
 
 let effective_del conf base p =
-  let op = Util.string_gen_person base (gen_person_of_person p) in
+  let op = Util.string_gen_person base (Driver.gen_person_of_person p) in
   effective_del_no_commit base op;
   effective_del_commit conf base op
 
@@ -985,14 +997,14 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
       Output.print_sstring conf "</p>\n");
   Output.print_sstring conf "<p>";
   Output.print_string conf
-    (referenced_person_text conf base (poi base p.key_index));
+    (referenced_person_text conf base (Driver.poi base p.key_index));
   Output.print_sstring conf "</p>";
   Update.print_warnings conf base wl;
   let pi = p.key_index in
-  let np = poi base pi in
-  let nfn = p_first_name base np in
-  let nsn = p_surname base np in
-  let nocc = get_occ np in
+  let np = Driver.poi base pi in
+  let nfn = Driver.p_first_name base np in
+  let nsn = Driver.p_surname base np in
+  let nocc = Driver.get_occ np in
   if
     pgl <> []
     && ((not (String.equal ofn nfn && String.equal osn nsn)) || oocc <> nocc)
@@ -1026,13 +1038,13 @@ let relation_sex_is_coherent base warning p =
     (fun r ->
       (match r.r_fath with
       | Some ip ->
-          let p = poi base ip in
-          if get_sex p <> Male then warning (IncoherentSex (p, 0, 0))
+          let p = Driver.poi base ip in
+          if Driver.get_sex p <> Male then warning (IncoherentSex (p, 0, 0))
       | None -> ());
       match r.r_moth with
       | Some ip ->
-          let p = poi base ip in
-          if get_sex p <> Female then warning (IncoherentSex (p, 0, 0))
+          let p = Driver.poi base ip in
+          if Driver.get_sex p <> Female then warning (IncoherentSex (p, 0, 0))
       | None -> ())
     p.rparents
 
@@ -1041,7 +1053,7 @@ let all_checks_person base p a u =
   let warning w =
     if not (List.exists (CheckItem.eq_warning base w) !wl) then wl := w :: !wl
   in
-  let pp = person_of_gen_person base (p, a, u) in
+  let pp = Driver.person_of_gen_person base (p, a, u) in
   ignore @@ CheckItem.person base warning pp;
   relation_sex_is_coherent base warning p;
   CheckItem.on_person_update base warning pp;
@@ -1049,9 +1061,9 @@ let all_checks_person base p a u =
   List.iter
     (function
       | ChangedOrderOfChildren (ifam, _, _, after) ->
-          patch_descend base ifam { children = after }
+          Driver.patch_descend base ifam { children = after }
       | ChangedOrderOfPersonEvents (_, _, after) ->
-          patch_person base p.key_index { p with pevents = after }
+          Driver.patch_person base p.key_index { p with pevents = after }
       | _ -> ())
     wl;
   wl
@@ -1073,7 +1085,7 @@ let print_add_ok conf base wl p =
     !deleted_relation;
   Output.print_sstring conf "\n";
   Output.print_string conf
-    (referenced_person_text conf base (poi base p.key_index));
+    (referenced_person_text conf base (Driver.poi base p.key_index));
   Output.print_sstring conf "\n";
   Update.print_warnings conf base wl;
   Hutil.trailer conf
@@ -1087,7 +1099,7 @@ let print_change_event_order_ok conf base wl p =
   Update.print_warnings conf base wl;
   Output.print_sstring conf "\n";
   Output.print_string conf
-    (referenced_person_text conf base (poi base p.key_index));
+    (referenced_person_text conf base (Driver.poi base p.key_index));
   Output.print_sstring conf "\n";
   Hutil.trailer conf
 
@@ -1105,7 +1117,7 @@ let print_add o_conf base =
     | Some err -> error_person conf err
     | None ->
         let p, a = effective_add conf base sp in
-        let u = { family = get_family (poi base p.key_index) } in
+        let u = { family = Driver.get_family (Driver.poi base p.key_index) } in
         let wl = all_checks_person base p a u in
         Util.commit_patches conf base;
         let changed = U_Add_person (Util.string_gen_person base p) in
@@ -1115,8 +1127,8 @@ let print_add o_conf base =
 let print_del conf base =
   match p_getenv conf.env "i" with
   | Some i ->
-      let ip = iper_of_string i in
-      let p = poi base ip in
+      let ip = Driver.iper_of_string i in
+      let p = Driver.poi base ip in
       effective_del conf base p;
       print_del_ok conf
   | None -> Hutil.incorrect_request conf
@@ -1124,7 +1136,7 @@ let print_del conf base =
 let print_mod_aux conf base callback =
   let p, ext = reconstitute_person conf in
   let redisp = Option.is_some (p_getenv conf.env "return") in
-  let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
+  let ini_ps = UpdateInd.string_person_of base (Driver.poi base p.key_index) in
   let salt = Option.get conf.secret_salt in
   let digest = Update.digest_person ~salt ini_ps in
   if digest = get conf "digest" then
@@ -1144,27 +1156,30 @@ let print_mod ?prerr o_conf base =
     match p_getenv o_conf.env "i" with
     | Some ip ->
         Util.string_gen_person base
-          (gen_person_of_person (poi base (iper_of_string ip)))
+          (Driver.gen_person_of_person
+             (Driver.poi base (Driver.iper_of_string ip)))
     | None ->
-        Util.string_gen_person base (gen_person_of_person (poi base dummy_iper))
+        Util.string_gen_person base
+          (Driver.gen_person_of_person (Driver.poi base Driver.dummy_iper))
   in
   let ofn = o_p.first_name in
   let osn = o_p.surname in
   let oocc = o_p.occ in
   let old_key =
-    Util.make_key base (Gwdb.gen_person_of_person (poi base o_p.key_index))
+    Util.make_key base
+      (Driver.gen_person_of_person (Driver.poi base o_p.key_index))
   in
   let conf = Update.update_conf o_conf in
   let pgl =
-    let db = Gwdb.read_nldb base in
+    let db = Driver.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
     Notes.links_to_ind conf base db old_key None
   in
   let callback sp =
     let p = effective_mod ?prerr conf base sp in
-    let op = poi base p.key_index in
-    let u = { family = get_family op } in
-    patch_person base p.key_index p;
+    let op = Driver.poi base p.key_index in
+    let u = { family = Driver.get_family op } in
+    Driver.patch_person base p.key_index p;
     let new_key = Util.make_key base p in
     if old_key <> new_key then (
       (* Needs the updates in this order in case of self-reference *)
@@ -1172,8 +1187,10 @@ let print_mod ?prerr o_conf base =
       Notes.update_ind_key conf base pgl old_key new_key;
       Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0);
     let wl =
-      let a = poi base p.key_index in
-      let a = { parents = get_parents a; consang = get_consang a } in
+      let a = Driver.poi base p.key_index in
+      let a =
+        { parents = Driver.get_parents a; consang = Driver.get_consang a }
+      in
       all_checks_person base p a u
     in
     Util.commit_patches conf base;
@@ -1188,8 +1205,8 @@ let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some s ->
-      let p = poi base (iper_of_string s) in
-      let o_p = Util.string_gen_person base (gen_person_of_person p) in
+      let p = Driver.poi base (Driver.iper_of_string s) in
+      let o_p = Util.string_gen_person base (Driver.gen_person_of_person p) in
       (* TODO_EVENT use Event.sorted_event *)
       let ht = Hashtbl.create 50 in
       let _ =
@@ -1197,7 +1214,7 @@ let print_change_event_order conf base =
           (fun id evt ->
             Hashtbl.add ht id evt;
             succ id)
-          1 (get_pevents p)
+          1 (Driver.get_pevents p)
       in
       let sorted_pevents =
         List.sort
@@ -1211,14 +1228,16 @@ let print_change_event_order conf base =
             with Not_found -> failwith "Sorting event")
           sorted_pevents []
       in
-      let p = gen_person_of_person p in
+      let p = Driver.gen_person_of_person p in
       let p = { p with pevents } in
-      patch_person base p.key_index p;
+      Driver.patch_person base p.key_index p;
       let wl =
-        let a = poi base p.key_index in
-        let a = { parents = get_parents a; consang = get_consang a } in
-        let u = poi base p.key_index in
-        let u = { family = get_family u } in
+        let a = Driver.poi base p.key_index in
+        let a =
+          { parents = Driver.get_parents a; consang = Driver.get_consang a }
+        in
+        let u = Driver.poi base p.key_index in
+        let u = { family = Driver.get_family u } in
         all_checks_person base p a u
       in
       Util.commit_patches conf base;

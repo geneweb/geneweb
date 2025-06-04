@@ -1,56 +1,25 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-type istr
-(** String id *)
-
-type ifam
-(** Family id *)
-
-type iper
-(** Person id *)
-
-val string_of_iper : iper -> string
-(** Convert [iper] to string *)
-
-val string_of_ifam : ifam -> string
-(** Convert [ifam] to string *)
-
-val string_of_istr : istr -> string
-(** Convert [istr] to string *)
-
-val iper_of_string : string -> iper
-(** Convert [iper] from string *)
-
-val ifam_of_string : string -> ifam
-(** Convert [ifam] from string *)
-
-val istr_of_string : string -> istr
-(** Convert [istr] from string *)
-
-type person
-(** Person data structure *)
-
-type family
-(** Family data structure *)
-
-type relation = (iper, istr) Def.gen_relation
-(** Database implementation for [Def.gen_relation] *)
-
-type title = istr Def.gen_title
-(** Database implementation for [Def.gen_title] *)
-
-type pers_event = (iper, istr) Def.gen_pers_event
-(** Database implementation for [Def.pers_event] *)
-
-type fam_event = (iper, istr) Def.gen_fam_event
-(** Database implementation for [Def.fam_event] *)
-
-type string_person_index
-(** Data structure for optimised search throughout index by name
-    (surname or first name). *)
+(** {2 Database management} *)
 
 type base
 (** The database representation. *)
+
+val make :
+  string ->
+  string list ->
+  ((int, int, int) Def.gen_person array
+  * int Def.gen_ascend array
+  * int Def.gen_union array)
+  * ((int, int, int) Def.gen_family array
+    * int Def.gen_couple array
+    * int Def.gen_descend array)
+  * string array
+  * Def.base_notes ->
+  (base -> 'a) ->
+  'a
+(** [make bname particles arrays k] create a base with [bname] name and
+    [arrays] as content and invokes the continuation [k] with it. *)
 
 val load_database : string -> unit
 (** [load_database bname] loads the database [bname] into memory.
@@ -79,11 +48,52 @@ val with_database : string -> (base -> 'a) -> 'a
     If the database [bname] was not loaded in memory, it is unloaded
     after [k] is executed. *)
 
+val sync : ?scratch:bool -> base -> unit
+(** [sync scratch base]
+    Ensure that everything is synced on disk.
+
+    Depending on the backend,
+    it may perform various operation such as indexes rebuilding,
+    and it might be a lengthy operation.
+
+    Use [scratch] (default false) to sync and rebuild
+    the whole database. Otherwise, only changes that occured
+    since the last [sync] call are treated. *)
+
+(** {2 Unique identifiers} *)
+
+type istr
+(** String identifier. *)
+
+type ifam
+(** Family identifier. *)
+
+type iper
+(** Person identifier. *)
+
 val dummy_iper : iper
-(** Dummy person id *)
+(** Dummy person identifier. *)
 
 val dummy_ifam : ifam
-(** Dummy family id *)
+(** Dummy family identifier. *)
+
+val string_of_iper : iper -> string
+(** Convert [iper] to string *)
+
+val string_of_ifam : ifam -> string
+(** Convert [ifam] to string *)
+
+val string_of_istr : istr -> string
+(** Convert [istr] to string *)
+
+val iper_of_string : string -> iper
+(** Convert [iper] from string *)
+
+val ifam_of_string : string -> ifam
+(** Convert [ifam] from string *)
+
+val istr_of_string : string -> istr
+(** Convert [istr] from string *)
 
 val eq_istr : istr -> istr -> bool
 (** [true] if strings with the giving ids are equal *)
@@ -111,6 +121,28 @@ val empty_string : istr
 
 val quest_string : istr
 (** Id of the question mark ("?") *)
+
+type person
+(** Person data structure *)
+
+type family
+(** Family data structure *)
+
+type relation = (iper, istr) Def.gen_relation
+(** Database implementation for [Def.gen_relation] *)
+
+type title = istr Def.gen_title
+(** Database implementation for [Def.gen_title] *)
+
+type pers_event = (iper, istr) Def.gen_pers_event
+(** Database implementation for [Def.pers_event] *)
+
+type fam_event = (iper, istr) Def.gen_fam_event
+(** Database implementation for [Def.fam_event] *)
+
+type string_person_index
+(** Data structure for optimised search throughout index by name
+    (surname or first name). *)
 
 val empty_person : base -> iper -> person
 (** Returns unitialised person with the giving id. *)
@@ -421,8 +453,30 @@ val insert_union : base -> iper -> ifam Def.gen_union -> unit
 val insert_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
 (** Same as [patch_family] *)
 
+val insert_family_with_couple_and_descendants :
+  base ->
+  (iper, ifam, istr) Def.gen_family ->
+  iper Def.gen_couple ->
+  iper Def.gen_descend ->
+  ifam
+(** [insert_family base f c d]
+    Add a new family with its couple and descendants the in the [base].
+    Allocate and returns the fresh new id for this family.
+    [f] SHOULD be defined using [dummy_ifam]. *)
+
 val insert_descend : base -> ifam -> iper Def.gen_descend -> unit
 (** Same as [patch_couple] *)
+
+val insert_person_with_union_and_ascendants :
+  base ->
+  (iper, iper, istr) Def.gen_person ->
+  ifam Def.gen_ascend ->
+  ifam Def.gen_union ->
+  iper
+(** [insert_person base p a u]
+    Add a new person with its union and ascendants in the [base].
+    Allocate and returns the fresh new id for this person.
+    [p] SHOULD be defined using [dummy_iper]. *)
 
 val insert_couple : base -> ifam -> iper Def.gen_couple -> unit
 (** Same as [patch_descend] *)
@@ -430,6 +484,18 @@ val insert_couple : base -> ifam -> iper Def.gen_couple -> unit
 val delete_person : base -> iper -> unit
 (** Remplace person with the giving id by bogus definition and clear
     person's data structure. *)
+
+val delete_person_rec : base -> iper -> unit
+(** [delete_person_rec base iper] recursively deletes data as follows:
+    - If data to be deleted is linked and useful, it is replaced by empty
+      data. Otherwise, it is deleted.
+    - If empty data is linked to deleted data, it is clean up as well. *)
+
+val delete_family_rec : base -> ifam -> unit
+(** [delete_family_rec base iper] recursively deletes data as follows:
+    - If data to be deleted is linked and useful, it is replaced by empty
+      data. Otherwise, it is deleted.
+    - If empty data is linked to deleted data, it is clean up as well. *)
 
 val delete_ascend : base -> iper -> unit
 (** Clear person's ascendants data structure *)
@@ -573,69 +639,6 @@ val base_wiznotes_dir : base -> string
 val date_of_last_change : base -> float
 (** Returns last modification time of the database on disk *)
 
-(** Collections of elemetns *)
-module Collection : sig
-  type 'a t
-  (** Collections are sets of elements you want to traverse. *)
-
-  val length : 'a t -> int
-  (** Return the number of elements of a colletion *)
-
-  val map : ('a -> 'b) -> 'a t -> 'b t
-  (** [map fn c]
-      Return a collection corresponding to [c]
-      where [fn] would have been applied to each of its elements.
-  *)
-
-  val iter : ('a -> unit) -> 'a t -> unit
-  (** [iter fn c]
-      Apply [fn] would have been applied to each elements of [c].
-  *)
-
-  val iteri : (int -> 'a -> unit) -> 'a t -> unit
-  (** [iter fn c]
-      Apply [fn i] would have been applied to each elements of [c]
-      where [i] is the index (starting with 0) of the element.
-  *)
-
-  val fold : ?from:int -> ?until:int -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
-  (** [fold fn acc c]
-      Combine each element of [c] into a single value using [fn].
-      [fn] first argument is the result computed so far as we traverse the
-      collection, and second element is the current element being combined.
-      [acc] is the starting combined value.
-      Start at [from]-nth and finish with [until]-nth element (included).
-  *)
-
-  val fold_until : ('a -> bool) -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
-  (** [fold_until continue fn acc c]
-      Same as [fold fn acc c], but computation stops as soon as [continue]
-      is not satisfied by combined value anymore.
-  *)
-
-  val iterator : 'a t -> unit -> 'a option
-  (** [iterator c]
-      Return a function returning [Some next_element] when it is called,
-      or [None] if you reached the end of the collection.
-  *)
-end
-
-(** Markers for elements inside [Collection.t] *)
-module Marker : sig
-  type ('k, 'v) t
-  (** Markers are way to annotate (add extra information to) elements of a {!val:Collection.t}. *)
-
-  val get : ('k, 'v) t -> 'k -> 'v
-  (** [get marker key]
-      Return the annotation associated to [key].
-  *)
-
-  val set : ('k, 'v) t -> 'k -> 'v -> unit
-  (** [set marker key value]
-      Set [value] as annotation associated to [key].
-  *)
-end
-
 (** {2 Useful collections} *)
 
 val ipers : base -> iper Collection.t
@@ -650,58 +653,37 @@ val ifams : ?select:(ifam -> bool) -> base -> ifam Collection.t
 val families : ?select:(family -> bool) -> base -> family Collection.t
 (** Collection of families *)
 
-val dummy_collection : 'a -> 'a Collection.t
-(** [dummy_collection x] create a dummy collection with no element.
-    [x] is only used for typing.
-    Useful for placeholders or for typing purpose. *)
-
 (** {2 Useful markers} *)
 
-val iper_marker : iper Collection.t -> 'a -> (iper, 'a) Marker.t
+val iper_marker : iper Collection.t -> 'a -> (iper, 'a) Collection.Marker.t
 (** [iper_marker c v] create marker over collection of person's ids and initialise it
     for every element with [v] *)
 
-val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Marker.t
+val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Collection.Marker.t
 (** [ifam_marker c v] create marker over collection of family's ids and initialise it
     for every element with [v] *)
-
-val dummy_marker : 'a -> 'b -> ('a, 'b) Marker.t
-(** [dummy_marker k v] create a dummy collection with no element.
-    [k] and [v] are only used for typing.
-    Useful for placeholders or for typing purpose. *)
-
-(** {2 Database creation} *)
-
-val make :
-  string ->
-  string list ->
-  ((int, int, int) Def.gen_person array
-  * int Def.gen_ascend array
-  * int Def.gen_union array)
-  * ((int, int, int) Def.gen_family array
-    * int Def.gen_couple array
-    * int Def.gen_descend array)
-  * string array
-  * Def.base_notes ->
-  (base -> 'a) ->
-  'a
-(** [make bname particles arrays k] create a base with [bname] name and
-    [arrays] as content and invokes the continuation [k] with it. *)
 
 val read_nldb : base -> (iper, ifam) Def.NLDB.t
 (** TODOOCP : doc *)
 
 val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
 
-val sync : ?scratch:bool -> base -> unit
-(** [sync scratch base]
-    Ensure that everything is synced on disk.
+val person_misc_names : base -> person -> (person -> title list) -> string list
+(** [person_misc_names base p nobtit] computes various mix between all kind
+    of names of a person's entry [p] from the database [base]. [nobtit] is
+    used to return a title entries for passed in argument person. *)
 
-    Depending on the backend,
-    it may perform various operation such as indexes rebuilding,
-    and it might be a lengthy operation.
+val p_first_name : base -> person -> string
+(** Returns first name of person. *)
 
-    Use [scratch] (default false) to sync and rebuild
-    the whole database. Otherwise, only changes that occured
-    since the last [sync] call are treated.
-*)
+val p_surname : base -> person -> string
+(** Returns surname of person *)
+
+val children_of_p : base -> person -> iper list
+(** Returns list of children ids for every family for giving person *)
+
+val nobtitles :
+  base -> string list Lazy.t -> string list Lazy.t -> person -> title list
+(** [nobtitles base allowed_titles denied_titles p] returns list of titles of a person [p]
+    that apprears in [allowed_titles] and doesn't appears in [denied_titles]. If [allowed_titles]
+    is empty the every title is allowed *)

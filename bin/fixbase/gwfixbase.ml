@@ -1,17 +1,20 @@
 open Geneweb
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let aux txt
     (fn :
-      ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> base -> unit)
-    ~v1 ~v2 base n cnt =
+      ?report:(Fixbase.patch -> unit) ->
+      (int -> int -> unit) ->
+      Driver.base ->
+      unit) ~v1 ~v2 base n cnt =
   let string_of_patch =
-    let string_of_p i = Gutil.designation base (poi base i) in
+    let string_of_p i = Gutil.designation base (Driver.poi base i) in
     let string_of_f i =
-      let fam = foi base i in
+      let fam = Driver.foi base i in
       Printf.sprintf "[%s & %s]"
-        (string_of_p @@ get_father fam)
-        (string_of_p @@ get_mother fam)
+        (string_of_p @@ Driver.get_father fam)
+        (string_of_p @@ Driver.get_mother fam)
     in
     function
     | Fixbase.Fix_NBDS ip ->
@@ -24,11 +27,13 @@ let aux txt
     | Fix_AddedChild ifam ->
         Printf.sprintf "Added child in: %s" (string_of_f ifam)
     | Fix_RemovedUnion (ip, ifam) ->
-        Printf.sprintf "Removing ifam %s from [%s] unions" (string_of_ifam ifam)
+        Printf.sprintf "Removing ifam %s from [%s] unions"
+          (Driver.string_of_ifam ifam)
           (string_of_p ip)
     | Fix_RemovedDuplicateUnion (ip, ifam) ->
         Printf.sprintf "Removing duplicate ifam %s from [%s] unions"
-          (string_of_ifam ifam) (string_of_p ip)
+          (Driver.string_of_ifam ifam)
+          (string_of_p ip)
     | Fix_AddedRelatedFromPevent (ip, ip2) | Fix_AddedRelatedFromFevent (ip, ip2)
       ->
         Printf.sprintf "Added related %s to %s" (string_of_p ip2)
@@ -42,13 +47,14 @@ let aux txt
     | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
         Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
           (match ifam_opt with
-          | Some i -> "ifam " ^ string_of_ifam i
+          | Some i -> "ifam " ^ Driver.string_of_ifam i
           | None -> (
               match iper_opt with
-              | Some i -> "iper " ^ string_of_iper i
+              | Some i -> "iper " ^ Driver.string_of_iper i
               | None -> assert false))
           (match opt with
-          | Some (i, i') -> string_of_istr i ^ " -> " ^ string_of_istr i'
+          | Some (i, i') ->
+              Driver.string_of_istr i ^ " -> " ^ Driver.string_of_istr i'
           | None -> "Dtext")
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
         Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
@@ -115,13 +121,13 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
-  Gwdb.with_database bname @@ fun base ->
+  Driver.with_database bname @@ fun base ->
   let fix = ref 0 in
-  let nb_fam = nb_of_families base in
-  let nb_ind = nb_of_persons base in
+  let nb_fam = Driver.nb_of_families base in
+  let nb_ind = Driver.nb_of_persons base in
   if fast then (
-    load_strings_array base;
-    load_persons_array base);
+    Driver.load_strings_array base;
+    Driver.load_persons_array base);
   if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
   if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
   if !p_parents then check_persons_parents ~v1 ~v2 base nb_ind fix;
@@ -133,11 +139,11 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
   if !key then fix_key ~v1 ~v2 base nb_ind fix;
   if fast then (
-    clear_strings_array base;
-    clear_persons_array base);
+    Driver.clear_strings_array base;
+    Driver.clear_persons_array base);
   if not !dry_run then (
     if !fix <> 0 then (
-      Gwdb.commit_patches base;
+      Driver.commit_patches base;
       if v1 then (
         Printf.printf "%n changes commited\n" !fix;
         flush stdout))
@@ -147,7 +153,7 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     if v1 then (
       Printf.printf "Rebuilding the indexes..\n";
       flush stdout);
-    Gwdb.sync base;
+    Driver.sync base;
     if v1 then (
       Printf.printf "Done";
       flush stdout))

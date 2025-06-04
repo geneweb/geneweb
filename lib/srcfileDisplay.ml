@@ -2,9 +2,9 @@
 
 open Config
 open Def
-open Gwdb
-module Ast = Geneweb_templ.Ast
 open Util
+module Ast = Geneweb_templ.Ast
+module Driver = Geneweb_db.Driver
 
 type counter = {
   mutable welcome_cnt : int;
@@ -205,7 +205,7 @@ let macro conf base = function
         if s = "" then Adef.safe "20"
         else (Util.escape_html s :> Adef.safe_string)
       with Not_found -> Adef.safe "20")
-  | 'n' -> string_of_int_sep_aux conf (nb_of_persons base)
+  | 'n' -> string_of_int_sep_aux conf (Driver.nb_of_persons base)
   | 'N' -> (
       try
         (List.assoc "base_notes_title" conf.base_env |> Util.escape_html
@@ -325,8 +325,8 @@ let rec copy_from_stream conf base strm mode =
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
-    | 'm' -> Gwdb.read_nldb base <> []
-    | 'n' -> not (base_notes_are_empty base "")
+    | 'm' -> Driver.read_nldb base <> []
+    | 'n' -> not (Driver.base_notes_are_empty base "")
     | 'o' -> Sys.file_exists (WiznotesDisplay.dir conf base)
     | 'p' -> (
         match List.assoc_opt (get_variable strm) conf.base_env with
@@ -476,35 +476,36 @@ let print_source = gen_print Source
 
 (* welcome page *)
 
-type 'a env = Vsosa_ref of person option Lazy.t | Vother of 'a | Vnone
+type 'a env = Vsosa_ref of Driver.person option Lazy.t | Vother of 'a | Vnone
 
 let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
 let eval_var conf base env () _loc = function
-  | [ "base"; "has_notes" ] -> Templ.VVbool (not (base_notes_are_empty base ""))
+  | [ "base"; "has_notes" ] ->
+      Templ.VVbool (not (Driver.base_notes_are_empty base ""))
   | [ "base"; "name" ] -> VVstring conf.bname
   | [ "base"; "nb_persons"; "v" ] ->
-      VVstring (string_of_int (Gwdb.nb_of_persons base))
+      VVstring (string_of_int (Driver.nb_of_persons base))
   | [ "base"; "nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (nb_of_persons base))
+           (Driver.nb_of_persons base))
   | [ "base"; "real_nb_persons"; "v" ] ->
-      VVstring (string_of_int (Gwdb.nb_of_real_persons base))
+      VVstring (string_of_int (Driver.nb_of_real_persons base))
   | [ "base"; "real_nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (Gwdb.nb_of_real_persons base))
+           (Driver.nb_of_real_persons base))
   | [ "browsing_with_sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> VVbool (Lazy.force v <> None)
       | _ -> raise Not_found)
   | [ "has_history" ] -> VVbool (Sys.file_exists (History.file_name conf))
-  | [ "has_misc_notes" ] -> VVbool (Gwdb.read_nldb base <> [])
+  | [ "has_misc_notes" ] -> VVbool (Driver.read_nldb base <> [])
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "nb_accesses" ] ->
       let r = count conf in

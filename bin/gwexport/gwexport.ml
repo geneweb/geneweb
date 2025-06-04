@@ -1,5 +1,7 @@
 open Geneweb
-open Gwdb
+module Collection = Geneweb_db.Collection
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 type gwexport_charset = Ansel | Ansi | Ascii | Utf8
 
@@ -129,21 +131,21 @@ module IFS = Util.IfamSet
     its visibility is not public
 *)
 let is_censored_person threshold p =
-  match Date.cdate_to_dmy_opt (get_birth p) with
+  match Date.cdate_to_dmy_opt (Driver.get_birth p) with
   | None -> false
-  | Some dmy -> dmy.Adef.year >= threshold && get_access p != Def.Public
+  | Some dmy -> dmy.Adef.year >= threshold && Driver.get_access p != Def.Public
 
 (** [is_censored_couple base max_year family]
     Returns [true] if either the father or the mother of a given family in the
     base is censored
 *)
 let is_censored_couple base threshold cpl =
-  (is_censored_person threshold @@ poi base (get_father cpl))
-  || (is_censored_person threshold @@ poi base (get_mother cpl))
+  (is_censored_person threshold @@ Driver.poi base (Driver.get_father cpl))
+  || (is_censored_person threshold @@ Driver.poi base (Driver.get_mother cpl))
 
 (* The following functions are utils set people as "censored" by marking them.
    Censoring a person consists in setting a mark defined as:
-   `Marker.get pmark p lor flag`
+   `Collection.Marker.get pmark p lor flag`
 
    This gets the current mark, being 0 or 1, and `lor`s it with `flag` which is `1`.
    TODO: replace integer markers by booleans
@@ -151,86 +153,90 @@ let is_censored_couple base threshold cpl =
 
 (** Marks a censored person *)
 let censor_person base pmark flag threshold p no_check =
-  let ps = poi base p in
+  let ps = Driver.poi base p in
   if no_check || is_censored_person threshold ps then
-    Marker.set pmark p (Marker.get pmark p lor flag)
+    Collection.Marker.set pmark p (Collection.Marker.get pmark p lor flag)
 
 (** Marks all the members of a family that are censored.
     If a couple is censored, its parents and all its descendants are marked.
 *)
 let rec censor_family base pmark fmark flag threshold i no_check =
   let censor_unions p =
-    let uni = poi base p in
+    let uni = Driver.poi base p in
     Array.iter
       (fun ifam ->
         censor_family base pmark fmark flag threshold ifam true;
         censor_person base pmark flag threshold p true)
-      (get_family uni)
+      (Driver.get_family uni)
   in
   let censor_descendants f =
-    let des = foi base f in
+    let des = Driver.foi base f in
     Array.iter
-      (fun iper -> if Marker.get pmark iper = 0 then censor_unions iper)
-      (get_children des)
+      (fun iper ->
+        if Collection.Marker.get pmark iper = 0 then censor_unions iper)
+      (Driver.get_children des)
   in
   let all_families_censored p =
     (* FIXME: replace with forall *)
-    let uni = poi base p in
+    let uni = Driver.poi base p in
     Array.fold_left
-      (fun check ifam -> check && Marker.get fmark ifam = 0)
-      true (get_family uni)
+      (fun check ifam -> check && Collection.Marker.get fmark ifam = 0)
+      true (Driver.get_family uni)
   in
   let censor_spouse iper =
     if all_families_censored iper then
-      Marker.set pmark iper (Marker.get pmark iper lor flag)
+      Collection.Marker.set pmark iper
+        (Collection.Marker.get pmark iper lor flag)
     (* S: Replace this line by `censor_person`? *)
   in
-  if Marker.get fmark i = 0 then
-    let fam = foi base i in
+  if Collection.Marker.get fmark i = 0 then
+    let fam = Driver.foi base i in
     if no_check || is_censored_couple base threshold fam then (
-      Marker.set fmark i (Marker.get fmark i lor flag);
-      censor_spouse (get_father fam);
-      censor_spouse (get_mother fam);
+      Collection.Marker.set fmark i (Collection.Marker.get fmark i lor flag);
+      censor_spouse (Driver.get_father fam);
+      censor_spouse (Driver.get_mother fam);
       censor_descendants i)
 
 (** Marks all the families that are censored in the given base. *)
 let censor_base base pmark fmark flag threshold =
   Collection.iter
     (fun i -> censor_family base pmark fmark flag threshold i false)
-    (ifams base);
+    (Driver.ifams base);
   Collection.iter
     (fun i -> censor_person base pmark flag threshold i false)
-    (ipers base)
+    (Driver.ipers base)
 
 (** Set non visible persons and families as censored *)
 let restrict_base base per_tab fam_tab flag =
   (* Starts by censoring non visible persons of the base *)
   Collection.iter
     (fun i ->
-      if base_visible_get base (fun _ -> false) i then
-        Marker.set per_tab i (Marker.get per_tab i lor flag))
+      if Driver.base_visible_get base (fun _ -> false) i then
+        Collection.Marker.set per_tab i
+          (Collection.Marker.get per_tab i lor flag))
       (* S: replace by `censor_person` ? *)
-    (ipers base);
+    (Driver.ipers base);
 
   Collection.iter
     (fun i ->
-      let fam = foi base i in
+      let fam = Driver.foi base i in
       let des_visible =
         (* There exists a children of the family that is not censored *)
         (* FIXME: replace with exists *)
         Array.fold_left
-          (fun check iper -> check || Marker.get per_tab iper = 0)
-          false (get_children fam)
+          (fun check iper -> check || Collection.Marker.get per_tab iper = 0)
+          false (Driver.get_children fam)
       in
       let cpl_not_visible =
         (* Father or mother is censored *)
-        Marker.get per_tab (get_father fam) <> 0
-        || Marker.get per_tab (get_mother fam) <> 0
+        Collection.Marker.get per_tab (Driver.get_father fam) <> 0
+        || Collection.Marker.get per_tab (Driver.get_mother fam) <> 0
       in
       (* If all the children, father and mother are censored, then censor family *)
       if (not des_visible) && cpl_not_visible then
-        Marker.set fam_tab i (Marker.get fam_tab i lor flag))
-    (ifams base)
+        Collection.Marker.set fam_tab i
+          (Collection.Marker.get fam_tab i lor flag))
+    (Driver.ifams base)
 
 (** [select_asc conf base max_gen ips]
     Returns all the ancestors of persons in the list `ips` up to the `max_gen`
@@ -241,11 +247,11 @@ let select_asc conf base max_gen ips =
       let set = IPS.add ip set in
       let p = Util.pget conf base ip in
       if gen < max_gen then
-        match get_parents p with
+        match Driver.get_parents p with
         | Some ifam ->
-            let cpl = foi base ifam in
-            let set = loop_asc (gen + 1) set (get_father cpl) in
-            loop_asc (gen + 1) set (get_mother cpl)
+            let cpl = Driver.foi base ifam in
+            let set = loop_asc (gen + 1) set (Driver.get_father cpl) in
+            loop_asc (gen + 1) set (Driver.get_mother cpl)
         | _ -> set
       else set
     else set
@@ -264,25 +270,27 @@ let select_surname base pmark fmark surname =
   let surname = Name.strip_lower surname in
   Collection.iter
     (fun i ->
-      let fam = foi base i in
-      let fath = poi base (get_father fam) in
-      let moth = poi base (get_mother fam) in
+      let fam = Driver.foi base i in
+      let fath = Driver.poi base (Driver.get_father fam) in
+      let moth = Driver.poi base (Driver.get_mother fam) in
       if
-        Name.strip_lower (sou base (get_surname fath)) = surname
-        || Name.strip_lower (sou base (get_surname moth)) = surname
+        Name.strip_lower (Driver.sou base (Driver.get_surname fath)) = surname
+        || Name.strip_lower (Driver.sou base (Driver.get_surname moth))
+           = surname
       then (
-        Marker.set fmark i true;
-        Marker.set pmark (get_father fam) true;
-        Marker.set pmark (get_mother fam) true;
+        Collection.Marker.set fmark i true;
+        Collection.Marker.set pmark (Driver.get_father fam) true;
+        Collection.Marker.set pmark (Driver.get_mother fam) true;
         Array.iter
           (fun ic ->
-            let p = poi base ic in
+            let p = Driver.poi base ic in
             if
-              (not (Marker.get pmark ic))
-              && Name.strip_lower (sou base (get_surname p)) = surname
-            then Marker.set pmark ic true)
-          (get_children fam)))
-    (ifams base)
+              (not (Collection.Marker.get pmark ic))
+              && Name.strip_lower (Driver.sou base (Driver.get_surname p))
+                 = surname
+            then Collection.Marker.set pmark ic true)
+          (Driver.get_children fam)))
+    (Driver.ifams base)
 
 (** [select_surnames base surnames]
     Calls `select_surname` on every family that have the given surnames.
@@ -290,11 +298,13 @@ let select_surname base pmark fmark surname =
     * the first takes a person and returns `true` iff it has been selected
     * the second takes a family and returns `false` iff it has been selected
 *)
-let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
-  let pmark = Gwdb.iper_marker (Gwdb.ipers base) false in
-  let fmark = Gwdb.ifam_marker (Gwdb.ifams base) false in
+let select_surnames base surnames :
+    (Driver.iper -> bool) * (Driver.ifam -> bool) =
+  let pmark = Driver.iper_marker (Driver.ipers base) false in
+  let fmark = Driver.ifam_marker (Driver.ifams base) false in
   List.iter (select_surname base pmark fmark) surnames;
-  ((fun i -> Gwdb.Marker.get pmark i), fun i -> Gwdb.Marker.get fmark i)
+  ( (fun i -> Collection.Marker.get pmark i),
+    fun i -> Collection.Marker.get fmark i )
 
 (**/**)
 
@@ -302,7 +312,7 @@ let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
     Returns the set of common descendants of ip1 and the
     ancestors of ip2 and the set of their families. *)
 let select_parentship base ip1 ip2 =
-  let conf = Config.{ empty with wizard = true; bname = Gwdb.bname base } in
+  let conf = Config.{ empty with wizard = true; bname = Driver.bname base } in
   let asc = select_asc conf base max_int [ ip1 ] in
   let desc = Util.select_desc conf base (-max_int) [ (ip2, 0) ] in
   let ipers =
@@ -324,13 +334,13 @@ let select_parentship base ip1 ip2 =
           (fun acc ifam ->
             if
               IFS.mem ifam acc (* S: useless test? *)
-              || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+              || not (IPS.mem (Gutil.spouse iper @@ Driver.foi base ifam) ipers)
               (* S: is the partner of the
                  person not in ipers? *)
             then acc
             else IFS.add ifam acc)
           acc
-          (get_family (poi base iper)))
+          (Driver.get_family (Driver.poi base iper)))
       ipers IFS.empty
   in
   (ipers, ifams)
@@ -356,14 +366,15 @@ let select base opts ips =
   in
   let not_censor_p, not_censor_f =
     if opts.censor <> 0 then (
-      let pmark = iper_marker (ipers base) 0 in
-      let fmark = ifam_marker (ifams base) 0 in
+      let pmark = Driver.iper_marker (Driver.ipers base) 0 in
+      let fmark = Driver.ifam_marker (Driver.ifams base) 0 in
       (if opts.censor = -1 then restrict_base base pmark fmark 1
       else
         let tm = Unix.localtime (Unix.time ()) in
         let threshold = 1900 + tm.Unix.tm_year - opts.censor in
         censor_base base pmark fmark 1 threshold);
-      ((fun i -> Marker.get pmark i = 0), fun i -> Marker.get fmark i = 0))
+      ( (fun i -> Collection.Marker.get pmark i = 0),
+        fun i -> Collection.Marker.get fmark i = 0 ))
     else ((fun _ -> true), fun _ -> true)
   in
   let conf = Config.{ empty with wizard = true } in
@@ -385,7 +396,7 @@ let select base opts ips =
         | None ->
             let ht = Hashtbl.create 0 in
             IPS.iter
-              (fun i -> Hashtbl.add ht i (poi base i))
+              (fun i -> Hashtbl.add ht i (Driver.poi base i))
               (select_asc conf base asc ips);
             ht
       in
@@ -404,11 +415,14 @@ let select base opts ips =
               (fun acc ifam ->
                 if
                   IFS.mem ifam acc
-                  || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+                  || not
+                       (IPS.mem
+                          (Gutil.spouse iper @@ Driver.foi base ifam)
+                          ipers)
                 then acc
                 else IFS.add ifam acc)
               acc
-              (get_family (poi base iper)))
+              (Driver.get_family (Driver.poi base iper)))
           ipers IFS.empty
       in
       let sel_per i = IPS.mem i ipers in
@@ -421,8 +435,8 @@ let select base opts ips =
           let ipers = select_asc conf base asc ips in
           let per_sel i = IPS.mem i ipers in
           let fam_sel i =
-            let f = foi base i in
-            per_sel (get_father f) && per_sel (get_mother f)
+            let f = Driver.foi base i in
+            per_sel (Driver.get_father f) && per_sel (Driver.get_mother f)
           in
           (per_sel, fam_sel)
       | None ->

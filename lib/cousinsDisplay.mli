@@ -1,4 +1,5 @@
-val print : Config.config -> Gwdb.base -> Gwdb.person -> unit
+val print :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
 (** Displays the menu that lists all person's relatives depending on ancestor and his descandant levels
     specified by [conf.env] variables {i v1} (for ancestor) and {i v2} for his descandant. For exemple :
 

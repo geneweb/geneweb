@@ -2,19 +2,21 @@
 
 open Def
 open Config
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
 
 let print_link conf base p =
   Output.print_sstring conf "<a href=\"";
   Output.print_string conf (commd conf);
   Output.print_string conf (acces conf base p);
   Output.print_sstring conf "\">";
-  Output.print_string conf (get_first_name p |> sou base |> escape_html);
+  Output.print_string conf
+    (Driver.get_first_name p |> Driver.sou base |> escape_html);
   Output.print_sstring conf ".";
-  Output.print_sstring conf (get_occ p |> string_of_int);
+  Output.print_sstring conf (Driver.get_occ p |> string_of_int);
   Output.print_sstring conf " ";
-  Output.print_string conf (get_surname p |> sou base |> escape_html);
+  Output.print_string conf
+    (Driver.get_surname p |> Driver.sou base |> escape_html);
   Output.print_sstring conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   match main_title conf base p with
@@ -58,9 +60,9 @@ let print_cand_ind conf base (ip, _p) (iexcl, fexcl) ip1 ip2 =
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul><li>";
-  print_link conf base (poi base ip1);
+  print_link conf base (Driver.poi base ip1);
   Output.print_sstring conf "</li><li>";
-  print_link conf base (poi base ip2);
+  print_link conf base (Driver.poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
   transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf " ?\n";
@@ -70,15 +72,15 @@ let print_cand_ind conf base (ip, _p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_IND_Y_N");
-  Util.hidden_input conf "ip" (string_of_iper ip |> Mutil.encode);
+  Util.hidden_input conf "ip" (Driver.string_of_iper ip |> Mutil.encode);
   print_input_excl conf
-    (fun x -> string_of_iper x |> Mutil.encode)
+    (fun x -> Driver.string_of_iper x |> Mutil.encode)
     ((ip1, ip2) :: iexcl) "iexcl";
   print_input_excl conf
-    (fun x -> string_of_ifam x |> Mutil.encode)
+    (fun x -> Driver.string_of_ifam x |> Mutil.encode)
     fexcl "fexcl";
-  Util.hidden_input conf "i" (string_of_iper ip1 |> Mutil.encode);
-  Util.hidden_input conf "select" (string_of_iper ip2 |> Mutil.encode);
+  Util.hidden_input conf "i" (Driver.string_of_iper ip1 |> Mutil.encode);
+  Util.hidden_input conf "select" (Driver.string_of_iper ip2 |> Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
   Output.print_sstring conf "</form></p>";
@@ -92,17 +94,17 @@ let print_cand_fam conf base (ip, _p) (iexcl, fexcl) ifam1 ifam2 =
   in
   Hutil.header conf title;
   let ip1, ip2 =
-    let cpl = foi base ifam1 in
-    (Gwdb.get_father cpl, Gwdb.get_mother cpl)
+    let cpl = Driver.foi base ifam1 in
+    (Driver.get_father cpl, Driver.get_mother cpl)
   in
   Output.print_sstring conf "<ul><li>";
-  print_link conf base (poi base ip1);
+  print_link conf base (Driver.poi base ip1);
   Output.print_sstring conf " &amp; ";
-  print_link conf base (poi base ip2);
+  print_link conf base (Driver.poi base ip2);
   Output.print_sstring conf "</li><li>";
-  print_link conf base (poi base ip1);
+  print_link conf base (Driver.poi base ip1);
   Output.print_sstring conf " &amp; ";
-  print_link conf base (poi base ip2);
+  print_link conf base (Driver.poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "merge"));
   Output.print_sstring conf " ? ";
@@ -111,15 +113,15 @@ let print_cand_fam conf base (ip, _p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_FAM_Y_N");
-  Util.hidden_input conf "ip" (string_of_iper ip |> Mutil.encode);
+  Util.hidden_input conf "ip" (Driver.string_of_iper ip |> Mutil.encode);
   print_input_excl conf
-    (fun x -> string_of_iper x |> Mutil.encode)
+    (fun x -> Driver.string_of_iper x |> Mutil.encode)
     iexcl "iexcl";
   print_input_excl conf
-    (fun x -> string_of_ifam x |> Mutil.encode)
+    (fun x -> Driver.string_of_ifam x |> Mutil.encode)
     ((ifam1, ifam2) :: fexcl) "fexcl";
-  Util.hidden_input conf "i" (string_of_ifam ifam1 |> Mutil.encode);
-  Util.hidden_input conf "i2" (string_of_ifam ifam2 |> Mutil.encode);
+  Util.hidden_input conf "i" (Driver.string_of_ifam ifam1 |> Mutil.encode);
+  Util.hidden_input conf "i2" (Driver.string_of_ifam ifam2 |> Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
   Output.print_sstring conf "</form></p>";
@@ -129,8 +131,8 @@ let main_page conf base =
   let ipp =
     match p_getenv conf.env "ip" with
     | Some i ->
-        let i = iper_of_string i in
-        Some (i, poi base i)
+        let i = Driver.iper_of_string i in
+        Some (i, Driver.poi base i)
     | None -> None
   in
   let excl = Perso.excluded_possible_duplications conf in

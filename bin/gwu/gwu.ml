@@ -1,4 +1,5 @@
 open GwuLib
+module Driver = Geneweb_db.Driver
 
 let isolated = ref false
 
@@ -46,25 +47,25 @@ let anonfun s =
     bname := Some s)
   else raise (Arg.Bad "Cannot treat several databases")
 
-let main () =
+let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun Gwexport.errmsg;
   let opts = !opts in
   match !bname with
   | None -> raise @@ Arg.Bad "Expect a database"
   | Some bname ->
-      Gwdb.with_database bname @@ fun base ->
+      Driver.with_database bname @@ fun base ->
       let select = Gwexport.select base opts [] in
       let in_dir =
         if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
       in
       let src_oc_ht = Hashtbl.create 1009 in
-      Gwdb.load_ascends_array base;
-      Gwdb.load_strings_array base;
+      Driver.load_ascends_array base;
+      Driver.load_strings_array base;
       if not opts.Gwexport.mem then (
-        Gwdb.load_couples_array base;
-        Gwdb.load_unions_array base;
-        Gwdb.load_descends_array base;
+        Driver.load_couples_array base;
+        Driver.load_unions_array base;
+        Driver.load_descends_array base;
         ());
       let _ofile, oc, close = opts.Gwexport.oc in
       if not !GwuLib.raw_output then oc "encoding: utf-8\n";
@@ -73,5 +74,3 @@ let main () =
       GwuLib.gwu opts !isolated base in_dir !out_dir src_oc_ht select;
       Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;
       close ()
-
-let _ = main ()

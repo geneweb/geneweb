@@ -1,3 +1,5 @@
+module Driver = Geneweb_db.Driver
+
 let with_indexes = ref false
 
 let speclist opts =
@@ -19,6 +21,6 @@ let () =
   match !bname with
   | None -> raise @@ Arg.Bad "Expect a database"
   | Some bname ->
-      Gwdb.with_database bname @@ fun base ->
+      Driver.with_database bname @@ fun base ->
       let select = Gwexport.select base !opts [] in
       Gwb2gedLib.gwb2ged base !with_indexes !opts select

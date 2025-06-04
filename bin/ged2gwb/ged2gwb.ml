@@ -3,6 +3,8 @@
 open Geneweb
 open Def
 
+module Driver = Geneweb_db.Driver
+
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend
 type union = int Def.gen_union
@@ -465,6 +467,7 @@ let date_lexer =
   ; Token.tok_match = tparse
   ; Token.tok_text = (fun _ -> "<tok>")
   ; Token.tok_comm = None
+  ; Token.kwds = Hashtbl.create 301
   }
 
 type 'a range =
@@ -3325,7 +3328,7 @@ let main () =
   Gc.compact ();
   let arrays = make_subarrays arrays in
   finish_base arrays ;
-  Gwdb.make !out_file !particles arrays @@ fun base ->
+  Driver.make !out_file !particles arrays @@ fun base ->
   warning_month_number_dates ();
   if !do_check then begin
     let base_error x =

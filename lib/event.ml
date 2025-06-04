@@ -1,5 +1,6 @@
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 type 'a event_name =
   | Pevent of 'a gen_pers_event_name
@@ -50,11 +51,11 @@ let sort_events get_name get_date events =
 type 'a event_item =
   'a event_name
   * cdate
-  * istr
-  * istr
-  * istr
-  * (iper * witness_kind) array
-  * iper option
+  * Driver.istr
+  * Driver.istr
+  * Driver.istr
+  * (Driver.iper * witness_kind) array
+  * Driver.iper option
 
 let events conf base p =
   if not (Util.authorized_age conf base p) then []
@@ -70,13 +71,13 @@ let events conf base p =
           let wl = evt.epers_witnesses in
           let x = (name, date, place, note, src, wl, None) in
           x :: events)
-        (get_pevents p) []
+        (Driver.get_pevents p) []
     in
     let fevents =
       Array.fold_right
         (fun ifam fevents ->
-          let fam = foi base ifam in
-          let isp = Gutil.spouse (get_iper p) fam in
+          let fam = Driver.foi base ifam in
+          let isp = Gutil.spouse (Driver.get_iper p) fam in
           let m_auth =
             Util.authorized_age conf base (Util.pget conf base isp)
           in
@@ -92,11 +93,11 @@ let events conf base p =
                   let wl = evt.efam_witnesses in
                   let x = (name, date, place, note, src, wl, Some isp) in
                   x :: fam_fevents)
-                (get_fevents fam) []
+                (Driver.get_fevents fam) []
             else []
           in
           fam_fevents @ fevents)
-        (get_family p) []
+        (Driver.get_family p) []
     in
     pevents @ fevents
 

@@ -3,11 +3,11 @@
 
 open Config
 module Logs = Geneweb_logs.Logs
+module Driver = Geneweb_db.Driver
 
 let print_placeholder_gendered_portrait conf p size =
-  let open Gwdb in
   let image, alt =
-    match get_sex p with
+    match Driver.get_sex p with
     | Male -> ("male.png", "M")
     | Female -> ("female.png", "F")
     | Neuter -> ("sexunknown.png", "?")
@@ -88,7 +88,7 @@ let print_image_file conf fname =
         Error e)
 
 (* ************************************************************************** *)
-(*  [Fonc] print_portrait : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(*  [Fonc] print_portrait : Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit *)
 (* ************************************************************************** *)
 
 (** [Description] : Affiche l'image d'une personne en réponse HTTP.

@@ -2,8 +2,10 @@
 
 open Geneweb
 open Def
-open Gwdb
 open Gwexport
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
+module Gutil = Geneweb_db.Gutil
 
 let old_gw = ref false
 let only_file = ref ""
@@ -29,15 +31,19 @@ let put_events_in_notes base p =
           match evt.epers_name with
           | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
           | Epers_Cremation ->
-              if sou base evt.epers_note <> "" || evt.epers_witnesses <> [||]
+              if
+                Driver.sou base evt.epers_note <> ""
+                || evt.epers_witnesses <> [||]
               then true
               else loop events
           | _ -> true)
     in
-    loop (get_pevents p)
+    loop (Driver.get_pevents p)
   else false
 
-let (ht_dup_occ : (Gwdb.iper, int) Hashtbl.t) = Hashtbl.create 20001
+let (ht_dup_occ : (Geneweb_db.Driver.iper, int) Hashtbl.t) =
+  Hashtbl.create 20001
+
 let (ht_orig_occ : (string, int list) Hashtbl.t) = Hashtbl.create 20001
 
 let prepare_free_occ ?(select = fun _ -> true) base =
@@ -46,33 +52,33 @@ let prepare_free_occ ?(select = fun _ -> true) base =
   let fn = "?" in
   let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
   Hashtbl.add ht_orig_occ key [ 0 ];
-  Gwdb.Collection.iter
+  Collection.iter
     (fun ip ->
       if select ip then
-        let p = poi base ip in
-        let sn = sou base (get_surname p) in
-        let fn = sou base (get_first_name p) in
+        let p = Driver.poi base ip in
+        let sn = Driver.sou base (Driver.get_surname p) in
+        let fn = Driver.sou base (Driver.get_first_name p) in
         if sn = "?" && fn = "?" then ()
         else
           let fn = Name.lower fn in
           let sn = Name.lower sn in
           if fn = "" || sn = "" then
             let key = fn ^ " #@# " ^ sn in
-            let occ = get_occ p in
+            let occ = Driver.get_occ p in
             try
               let l = Hashtbl.find ht_orig_occ key in
               if List.mem occ l then Hashtbl.add ht_dup_occ ip occ
               else Hashtbl.replace ht_orig_occ key (occ :: l)
             with Not_found -> Hashtbl.add ht_orig_occ key [ occ ])
-    (Gwdb.ipers base);
+    (Geneweb_db.Driver.ipers base);
   Hashtbl.iter
     (fun key l -> Hashtbl.replace ht_orig_occ key (List.sort compare l))
     ht_orig_occ;
   Hashtbl.iter
     (fun ip _ ->
-      let p = poi base ip in
-      let sn = sou base (get_surname p) in
-      let fn = sou base (get_first_name p) in
+      let p = Driver.poi base ip in
+      let sn = Driver.sou base (Driver.get_surname p) in
+      let fn = Driver.sou base (Driver.get_first_name p) in
       let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
       try
         let list_occ = Hashtbl.find ht_orig_occ key in
@@ -90,14 +96,15 @@ let prepare_free_occ ?(select = fun _ -> true) base =
     ht_dup_occ
 
 let get_new_occ p =
-  try Hashtbl.find ht_dup_occ (get_iper p) with Not_found -> get_occ p
+  try Hashtbl.find ht_dup_occ (Driver.get_iper p)
+  with Not_found -> Driver.get_occ p
 
 type mfam = {
-  m_ifam : ifam;
-  m_fam : family;
-  m_fath : person;
-  m_moth : person;
-  m_chil : person array;
+  m_ifam : Driver.ifam;
+  m_fam : Driver.family;
+  m_fath : Driver.person;
+  m_moth : Driver.person;
+  m_chil : Driver.person array;
 }
 
 let soy y = if y = 0 then "-0" else string_of_int y
@@ -176,10 +183,10 @@ let s_correct_string_nonum s =
   let s = gen_correct_string true false s in
   if s = "" then "_" else s
 
-let correct_string base is = s_correct_string (sou base is)
+let correct_string base is = s_correct_string (Driver.sou base is)
 
 let correct_string_no_colon base is =
-  gen_correct_string false true (sou base is)
+  gen_correct_string false true (Driver.sou base is)
 
 let gen_print_date opts no_colon = function
   | Dgreg (d, Dgregorian) -> print_date_dmy opts d
@@ -218,40 +225,41 @@ let lines_list_of_string s =
 
 let has_infos_not_dates opts base p =
   let has_picture_to_export =
-    sou base (get_image p) <> "" && not opts.no_picture
+    Driver.sou base (Driver.get_image p) <> "" && not opts.no_picture
   in
-  get_first_names_aliases p <> []
-  || get_surnames_aliases p <> []
-  || sou base (get_public_name p) <> ""
+  Driver.get_first_names_aliases p <> []
+  || Driver.get_surnames_aliases p <> []
+  || Driver.sou base (Driver.get_public_name p) <> ""
   || has_picture_to_export
-  || get_qualifiers p <> []
-  || get_aliases p <> []
-  || get_titles p <> []
-  || get_access p <> IfTitles
-  || sou base (get_occupation p) <> ""
-  || (opts.source <> None || sou base @@ get_psources p <> "")
-  || sou base (get_birth_place p) <> ""
-  || (opts.source = None && sou base (get_birth_src p) <> "")
-  || sou base (get_baptism_place p) <> ""
-  || (opts.source = None && sou base (get_baptism_src p) <> "")
-  || sou base (get_death_place p) <> ""
-  || (opts.source = None && sou base (get_death_src p) <> "")
-  || sou base (get_burial_place p) <> ""
-  || (opts.source = None && sou base (get_burial_src p) <> "")
+  || Driver.get_qualifiers p <> []
+  || Driver.get_aliases p <> []
+  || Driver.get_titles p <> []
+  || Driver.get_access p <> IfTitles
+  || Driver.sou base (Driver.get_occupation p) <> ""
+  || (opts.source <> None || Driver.sou base @@ Driver.get_psources p <> "")
+  || Driver.sou base (Driver.get_birth_place p) <> ""
+  || (opts.source = None && Driver.sou base (Driver.get_birth_src p) <> "")
+  || Driver.sou base (Driver.get_baptism_place p) <> ""
+  || (opts.source = None && Driver.sou base (Driver.get_baptism_src p) <> "")
+  || Driver.sou base (Driver.get_death_place p) <> ""
+  || (opts.source = None && Driver.sou base (Driver.get_death_src p) <> "")
+  || Driver.sou base (Driver.get_burial_place p) <> ""
+  || (opts.source = None && Driver.sou base (Driver.get_burial_src p) <> "")
 
 let has_infos opts base p =
   has_infos_not_dates opts base p
-  || get_birth p <> Date.cdate_None
-  || get_baptism p <> Date.cdate_None
-  || get_death p <> NotDead
+  || Driver.get_birth p <> Date.cdate_None
+  || Driver.get_baptism p <> Date.cdate_None
+  || Driver.get_death p <> NotDead
 
 let print_if_not_equal_to opts x base lab is =
-  if sou base is <> x then
+  if Driver.sou base is <> x then
     Printf.ksprintf (oc opts) " %s %s" lab (correct_string base is)
 
 let print_src_if_not_equal_to opts x base lab is =
   match opts.source with
-  | None -> if sou base is <> "" then print_if_not_equal_to opts x base lab is
+  | None ->
+      if Driver.sou base is <> "" then print_if_not_equal_to opts x base lab is
   | Some "" -> ()
   | Some x -> Printf.ksprintf (oc opts) " %s %s" lab (s_correct_string x)
 
@@ -315,54 +323,58 @@ let print_title opts base t =
   Printf.ksprintf (oc opts) "]"
 
 let zero_birth_is_required opts base is_child p =
-  if get_baptism p <> Date.cdate_None then false
+  if Driver.get_baptism p <> Date.cdate_None then false
   else
-    match get_death p with
+    match Driver.get_death p with
     | Death (_, _) | DeadYoung | DeadDontKnowWhen | OfCourseDead -> true
     | DontKnowIfDead
       when (not is_child)
            && (not (has_infos_not_dates opts base p))
-           && p_first_name base p <> "?"
-           && p_surname base p <> "?" ->
+           && Driver.p_first_name base p <> "?"
+           && Driver.p_surname base p <> "?" ->
         true
     | _ -> false
 
 let print_infos opts base is_child csrc cbp p =
-  List.iter (print_first_name_alias opts base) (get_first_names_aliases p);
-  List.iter (print_surname_alias opts base) (get_surnames_aliases p);
-  (match get_public_name p with
-  | s when sou base s <> "" ->
+  List.iter
+    (print_first_name_alias opts base)
+    (Driver.get_first_names_aliases p);
+  List.iter (print_surname_alias opts base) (Driver.get_surnames_aliases p);
+  (match Driver.get_public_name p with
+  | s when Driver.sou base s <> "" ->
       Printf.ksprintf (oc opts) " (%s)" (correct_string base s)
   | _ -> ());
-  if not opts.no_picture then print_if_no_empty opts base "#image" (get_image p);
-  List.iter (print_qualifier opts base) (get_qualifiers p);
-  List.iter (print_alias opts base) (get_aliases p);
-  List.iter (print_title opts base) (get_titles p);
-  (match get_access p with
+  if not opts.no_picture then
+    print_if_no_empty opts base "#image" (Driver.get_image p);
+  List.iter (print_qualifier opts base) (Driver.get_qualifiers p);
+  List.iter (print_alias opts base) (Driver.get_aliases p);
+  List.iter (print_title opts base) (Driver.get_titles p);
+  (match Driver.get_access p with
   | IfTitles -> ()
   | Public -> Printf.ksprintf (oc opts) " #apubl"
   | Private -> Printf.ksprintf (oc opts) " #apriv"
   | SemiPublic -> Printf.ksprintf (oc opts) " #semipub");
-  print_if_no_empty opts base "#occu" (get_occupation p);
-  print_src_if_not_equal_to opts csrc base "#src" (get_psources p);
-  (match Date.od_of_cdate (get_birth p) with
+  print_if_no_empty opts base "#occu" (Driver.get_occupation p);
+  print_src_if_not_equal_to opts csrc base "#src" (Driver.get_psources p);
+  (match Date.od_of_cdate (Driver.get_birth p) with
   | Some d ->
       Printf.ksprintf (oc opts) " ";
       print_date opts d
   | _ when zero_birth_is_required opts base is_child p ->
       Printf.ksprintf (oc opts) " 0"
   | None -> ());
-  print_if_not_equal_to opts cbp base "#bp" (get_birth_place p);
-  if opts.source = None then print_if_no_empty opts base "#bs" (get_birth_src p);
-  (match Date.od_of_cdate (get_baptism p) with
+  print_if_not_equal_to opts cbp base "#bp" (Driver.get_birth_place p);
+  if opts.source = None then
+    print_if_no_empty opts base "#bs" (Driver.get_birth_src p);
+  (match Date.od_of_cdate (Driver.get_baptism p) with
   | Some d ->
       Printf.ksprintf (oc opts) " !";
       print_date opts d
   | None -> ());
-  print_if_no_empty opts base "#pp" (get_baptism_place p);
+  print_if_no_empty opts base "#pp" (Driver.get_baptism_place p);
   if opts.source = None then
-    print_if_no_empty opts base "#ps" (get_baptism_src p);
-  (match get_death p with
+    print_if_no_empty opts base "#ps" (Driver.get_baptism_src p);
+  (match Driver.get_death p with
   | Death (dr, d) ->
       Printf.ksprintf (oc opts) " ";
       (match dr with
@@ -376,29 +388,31 @@ let print_infos opts base is_child csrc cbp p =
   | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
   | DontKnowIfDead -> (
       match
-        (Date.od_of_cdate (get_birth p), Date.od_of_cdate (get_baptism p))
+        ( Date.od_of_cdate (Driver.get_birth p),
+          Date.od_of_cdate (Driver.get_baptism p) )
       with
       | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
       | _ -> ())
   | OfCourseDead -> Printf.ksprintf (oc opts) " od"
   | NotDead -> ());
-  print_if_no_empty opts base "#dp" (get_death_place p);
-  if opts.source = None then print_if_no_empty opts base "#ds" (get_death_src p);
-  print_burial opts (get_burial p);
-  print_if_no_empty opts base "#rp" (get_burial_place p);
+  print_if_no_empty opts base "#dp" (Driver.get_death_place p);
   if opts.source = None then
-    print_if_no_empty opts base "#rs" (get_burial_src p)
+    print_if_no_empty opts base "#ds" (Driver.get_death_src p);
+  print_burial opts (Driver.get_burial p);
+  print_if_no_empty opts base "#rp" (Driver.get_burial_place p);
+  if opts.source = None then
+    print_if_no_empty opts base "#rs" (Driver.get_burial_src p)
 
 type gen = {
-  mark : (iper, bool) Gwdb.Marker.t;
-  mark_rel : (iper, bool) Gwdb.Marker.t;
-  per_sel : iper -> bool;
-  fam_sel : ifam -> bool;
-  fam_done : (ifam, bool) Gwdb.Marker.t;
-  mutable notes_pl_p : person list;
+  mark : (Driver.iper, bool) Collection.Marker.t;
+  mark_rel : (Driver.iper, bool) Collection.Marker.t;
+  per_sel : Driver.iper -> bool;
+  fam_sel : Driver.ifam -> bool;
+  fam_done : (Driver.ifam, bool) Collection.Marker.t;
+  mutable notes_pl_p : Driver.person list;
   mutable ext_files : (string * string list ref) list;
   mutable notes_alias : (string * string) list;
-  mutable pevents_pl_p : person list;
+  mutable pevents_pl_p : Driver.person list;
 }
 
 let map_notes aliases f = try List.assoc f aliases with Not_found -> f
@@ -447,18 +461,20 @@ let add_linked_files gen from s some_linked_files =
 
 let print_parent opts base gen p =
   let has_printed_parents =
-    match get_parents p with Some ifam -> gen.fam_sel ifam | None -> false
+    match Driver.get_parents p with
+    | Some ifam -> gen.fam_sel ifam
+    | None -> false
   in
   let first_parent_definition =
-    if Gwdb.Marker.get gen.mark (get_iper p) then false
+    if Collection.Marker.get gen.mark (Driver.get_iper p) then false
     else (
-      Gwdb.Marker.set gen.mark (get_iper p) true;
+      Collection.Marker.set gen.mark (Driver.get_iper p) true;
       true)
   in
   let pr = (not has_printed_parents) && first_parent_definition in
   let has_infos = if pr then has_infos opts base p else false in
-  let first_name = sou base (get_first_name p) in
-  let surname = sou base (get_surname p) in
+  let first_name = Driver.sou base (Driver.get_first_name p) in
+  let surname = Driver.sou base (Driver.get_surname p) in
   Printf.ksprintf (oc opts) "%s %s%s" (s_correct_string surname)
     (s_correct_string first_name)
     (if first_name = "?" && surname = "?" then ""
@@ -471,27 +487,30 @@ let print_parent opts base gen p =
 
 let print_child opts base fam_surname csrc cbp p =
   Printf.ksprintf (oc opts) "-";
-  (match get_sex p with
+  (match Driver.get_sex p with
   | Male -> Printf.ksprintf (oc opts) " h"
   | Female -> Printf.ksprintf (oc opts) " f"
   | _ -> ());
   Printf.ksprintf (oc opts) " %s"
-    (s_correct_string (sou base (get_first_name p)));
-  if p_first_name base p = "?" && p_surname base p = "?" then ()
+    (s_correct_string (Driver.sou base (Driver.get_first_name p)));
+  if Driver.p_first_name base p = "?" && Driver.p_surname base p = "?" then ()
   else if get_new_occ p = 0 then ()
   else Printf.ksprintf (oc opts) ".%d" (get_new_occ p);
-  if not (eq_istr (get_surname p) fam_surname) then
+  if not (Driver.eq_istr (Driver.get_surname p) fam_surname) then
     Printf.ksprintf (oc opts) " %s"
-      (s_correct_string_nonum (sou base (get_surname p)));
+      (s_correct_string_nonum (Driver.sou base (Driver.get_surname p)));
   print_infos opts base true csrc cbp p;
   Printf.ksprintf (oc opts) "\n"
 
-let bogus_person base p = p_first_name base p = "?" && p_surname base p = "?"
+let bogus_person base p =
+  Driver.p_first_name base p = "?" && Driver.p_surname base p = "?"
 
 let common_children proj base children =
   if Array.length children <= 1 then None
   else
-    let list = List.map (fun p -> sou base (proj p)) (Array.to_list children) in
+    let list =
+      List.map (fun p -> Driver.sou base (proj p)) (Array.to_list children)
+    in
     if List.mem "" list then None
     else
       let list = List.sort compare list in
@@ -506,8 +525,8 @@ let common_children proj base children =
       in
       if n_max > 1 then Some src_max else None
 
-let common_children_sources = common_children get_psources
-let common_children_birth_place = common_children get_birth_place
+let common_children_sources = common_children Driver.get_psources
+let common_children_birth_place = common_children Driver.get_birth_place
 
 let empty_family base m =
   bogus_person base m.m_fath && bogus_person base m.m_moth
@@ -526,22 +545,22 @@ let string_of_witness_kind :
 
 let print_witness opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s"
-    (correct_string base (get_surname p))
-    (correct_string base (get_first_name p))
+    (correct_string base (Driver.get_surname p))
+    (correct_string base (Driver.get_first_name p))
     (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
   if
-    Array.length (get_family p) = 0
-    && get_parents p = None
-    && not (Gwdb.Marker.get gen.mark (get_iper p))
+    Array.length (Driver.get_family p) = 0
+    && Driver.get_parents p = None
+    && not (Collection.Marker.get gen.mark (Driver.get_iper p))
   then (
-    Gwdb.Marker.set gen.mark (get_iper p) true;
+    Collection.Marker.set gen.mark (Driver.get_iper p) true;
     if has_infos opts base p then print_infos opts base false "" "" p
     else Printf.ksprintf (oc opts) " 0";
-    (match sou base (get_notes p) with
+    (match Driver.sou base (Driver.get_notes p) with
     | "" ->
         if put_events_in_notes base p then gen.notes_pl_p <- p :: gen.notes_pl_p
     | _ -> gen.notes_pl_p <- p :: gen.notes_pl_p);
-    if get_pevents p <> [] then gen.pevents_pl_p <- p :: gen.pevents_pl_p)
+    if Driver.get_pevents p <> [] then gen.pevents_pl_p <- p :: gen.pevents_pl_p)
 
 let print_pevent opts base gen e =
   (match e.epers_name with
@@ -607,9 +626,9 @@ let print_pevent opts base gen e =
   Array.iter
     (fun (ip, wk) ->
       if gen.per_sel ip then (
-        let p = poi base ip in
+        let p = Driver.poi base ip in
         Printf.ksprintf (oc opts) "wit";
-        (match get_sex p with
+        (match Driver.get_sex p with
         | Male -> Printf.ksprintf (oc opts) " m"
         | Female -> Printf.ksprintf (oc opts) " f"
         | _ -> ());
@@ -621,7 +640,9 @@ let print_pevent opts base gen e =
         print_witness opts base gen p;
         Printf.ksprintf (oc opts) "\n"))
     e.epers_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.epers_note else "" in
+  let note =
+    if opts.no_notes <> `nnn then Driver.sou base e.epers_note else ""
+  in
   if note <> "" then
     List.iter
       (fun line -> Printf.ksprintf (oc opts) "note %s\n" line)
@@ -631,23 +652,23 @@ let get_persons_with_pevents m list =
   let fath = m.m_fath in
   let moth = m.m_moth in
   let list =
-    match (get_pevents fath, get_parents fath) with
+    match (Driver.get_pevents fath, Driver.get_parents fath) with
     | [], _ | _, Some _ -> list
     | _ -> fath :: list
   in
   let list =
-    match (get_pevents moth, get_parents moth) with
+    match (Driver.get_pevents moth, Driver.get_parents moth) with
     | [], _ | _, Some _ -> list
     | _ -> moth :: list
   in
   Array.fold_right
-    (fun p list -> if get_pevents p = [] then list else p :: list)
+    (fun p list -> if Driver.get_pevents p = [] then list else p :: list)
     m.m_chil list
 
 let print_pevents_for_person opts base gen p =
-  let pevents = get_pevents p in
-  let surn = s_correct_string (p_surname base p) in
-  let fnam = s_correct_string (p_first_name base p) in
+  let pevents = Driver.get_pevents p in
+  let surn = s_correct_string (Driver.p_surname base p) in
+  let fnam = s_correct_string (Driver.p_first_name base p) in
   if pevents <> [] && surn <> "?" && fnam <> "?" then (
     Printf.ksprintf (oc opts) "\n";
     Printf.ksprintf (oc opts) "pevt %s %s%s\n" surn fnam
@@ -659,8 +680,8 @@ let rec list_memf f x = function
   | [] -> false
   | a :: l -> f x a || list_memf f x l
 
-let eq_key p1 p2 = get_iper p1 = get_iper p2
-let eq_key_fst (p1, _) (p2, _) = get_iper p1 = get_iper p2
+let eq_key p1 p2 = Driver.get_iper p1 = Driver.get_iper p2
+let eq_key_fst (p1, _) (p2, _) = Driver.get_iper p1 = Driver.get_iper p2
 
 let print_pevents opts base gen ml =
   let pl = List.fold_right get_persons_with_pevents ml gen.pevents_pl_p in
@@ -671,7 +692,8 @@ let print_pevents opts base gen ml =
   in
   List.iter
     (fun p ->
-      if gen.per_sel (get_iper p) then print_pevents_for_person opts base gen p)
+      if gen.per_sel (Driver.get_iper p) then
+        print_pevents_for_person opts base gen p)
     pl
 
 let print_fevent opts base gen in_comment e =
@@ -703,9 +725,9 @@ let print_fevent opts base gen in_comment e =
   Array.iter
     (fun (ip, wk) ->
       if gen.per_sel ip then (
-        let p = poi base ip in
+        let p = Driver.poi base ip in
         Printf.ksprintf (oc opts) "wit";
-        (match get_sex p with
+        (match Driver.get_sex p with
         | Male -> Printf.ksprintf (oc opts) " m"
         | Female -> Printf.ksprintf (oc opts) " f"
         | _ -> ());
@@ -717,7 +739,9 @@ let print_fevent opts base gen in_comment e =
         print_witness opts base gen p;
         print_sep ()))
     e.efam_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.efam_note else "" in
+  let note =
+    if opts.no_notes <> `nnn then Driver.sou base e.efam_note else ""
+  in
   if note <> "" then
     List.iter
       (fun line ->
@@ -726,7 +750,10 @@ let print_fevent opts base gen in_comment e =
       (lines_list_of_string note)
 
 let print_comment_for_family opts base gen fam =
-  let comm = if opts.no_notes <> `nnn then sou base (get_comment fam) else "" in
+  let comm =
+    if opts.no_notes <> `nnn then Driver.sou base (Driver.get_comment fam)
+    else ""
+  in
   (* Si on est en mode old_gw, on mets tous les évènements dans les notes. *)
   (* On supprime les 2 évènements principaux. *)
   let fevents =
@@ -737,18 +764,19 @@ let print_comment_for_family opts base gen fam =
         | Efam_NoMention | Efam_Separated ->
             false
         | _ -> true)
-      (get_fevents fam)
+      (Driver.get_fevents fam)
   in
   let has_evt =
-    !old_gw && (fevents <> [] || sou base (get_marriage_note fam) <> "")
+    !old_gw
+    && (fevents <> [] || Driver.sou base (Driver.get_marriage_note fam) <> "")
   in
   if comm <> "" || has_evt then (
     Printf.ksprintf (oc opts) "comm";
     if comm <> "" then Printf.ksprintf (oc opts) " %s" (no_newlines comm);
     if !old_gw then (
-      if sou base (get_marriage_note fam) <> "" then
+      if Driver.sou base (Driver.get_marriage_note fam) <> "" then
         Printf.ksprintf (oc opts) " marriage: %s"
-          (no_newlines (sou base (get_marriage_note fam)));
+          (no_newlines (Driver.sou base (Driver.get_marriage_note fam)));
       List.iter
         (fun e ->
           Printf.ksprintf (oc opts) " ";
@@ -757,7 +785,7 @@ let print_comment_for_family opts base gen fam =
     Printf.ksprintf (oc opts) "\n")
 
 let print_empty_family opts base p =
-  let string_quest = Gwdb.insert_string base "?" in
+  let string_quest = Driver.insert_string base "?" in
   Printf.ksprintf (oc opts) "fam ? ?.0 + #noment ? ?.0\n";
   Printf.ksprintf (oc opts) "beg\n";
   print_child opts base string_quest "" "" p;
@@ -768,14 +796,14 @@ let print_family opts base gen m =
   Printf.ksprintf (oc opts) "fam ";
   print_parent opts base gen m.m_fath;
   Printf.ksprintf (oc opts) " +";
-  print_date_option opts (Date.od_of_cdate (get_marriage fam));
+  print_date_option opts (Date.od_of_cdate (Driver.get_marriage fam));
   let print_sexes s =
     let c x =
-      match get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
+      match Driver.get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
     in
     Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
   in
-  (match get_relation fam with
+  (match Driver.get_relation fam with
   | Married -> ()
   | NotMarried -> Printf.ksprintf (oc opts) " #nm"
   | Engaged -> Printf.ksprintf (oc opts) " #eng"
@@ -790,19 +818,19 @@ let print_family opts base gen m =
   | MarriageLicense -> if not !old_gw then print_sexes "#license"
   | Pacs -> if not !old_gw then print_sexes "#pacs"
   | Residence -> if not !old_gw then print_sexes "#residence");
-  print_if_no_empty opts base "#mp" (get_marriage_place fam);
+  print_if_no_empty opts base "#mp" (Driver.get_marriage_place fam);
   if opts.source = None then
-    print_if_no_empty opts base "#ms" (get_marriage_src fam);
+    print_if_no_empty opts base "#ms" (Driver.get_marriage_src fam);
   (* divorce and separation are events, but we keep it if old_gw *)
   (if !old_gw then
-   match get_divorce fam with
+   match Driver.get_divorce fam with
    | Divorced d ->
        let d = Date.od_of_cdate d in
        Printf.ksprintf (oc opts) " -";
        print_date_option opts d
    | _ -> ());
   (if !old_gw then
-   match get_separation fam with
+   match Driver.get_separation fam with
    | Separated _ -> Printf.ksprintf (oc opts) " #sep"
    | Separated_old -> Printf.ksprintf (oc opts) " #sep"
    | _ -> ());
@@ -812,21 +840,21 @@ let print_family opts base gen m =
   Array.iter
     (fun ip ->
       if gen.per_sel ip then (
-        let p = poi base ip in
+        let p = Driver.poi base ip in
         Printf.ksprintf (oc opts) "wit";
-        (match get_sex p with
+        (match Driver.get_sex p with
         | Male -> Printf.ksprintf (oc opts) " m"
         | Female -> Printf.ksprintf (oc opts) " f"
         | _ -> ());
         Printf.ksprintf (oc opts) ": ";
         print_witness opts base gen p;
         Printf.ksprintf (oc opts) "\n"))
-    (get_witnesses fam);
+    (Driver.get_witnesses fam);
   (match opts.source with
   | None ->
-      if sou base (get_fsources fam) <> "" then
+      if Driver.sou base (Driver.get_fsources fam) <> "" then
         Printf.ksprintf (oc opts) "src %s\n"
-          (correct_string base (get_fsources fam))
+          (correct_string base (Driver.get_fsources fam))
   | Some "" -> ()
   | Some x -> Printf.ksprintf (oc opts) "src %s\n" (s_correct_string x));
   let csrc =
@@ -844,35 +872,41 @@ let print_family opts base gen m =
     | _ -> ""
   in
   print_comment_for_family opts base gen fam;
-  if (not !old_gw) && get_fevents fam <> [] then (
+  if (not !old_gw) && Driver.get_fevents fam <> [] then (
     Printf.ksprintf (oc opts) "fevt\n";
-    List.iter (print_fevent opts base gen false) (get_fevents fam);
+    List.iter (print_fevent opts base gen false) (Driver.get_fevents fam);
     Printf.ksprintf (oc opts) "end fevt\n");
   (match Array.length m.m_chil with
   | 0 -> ()
   | _ ->
-      let fam_surname = get_surname m.m_fath in
+      let fam_surname = Driver.get_surname m.m_fath in
       Printf.ksprintf (oc opts) "beg\n";
       Array.iter
         (fun p ->
-          if gen.per_sel (get_iper p) then
+          if gen.per_sel (Driver.get_iper p) then
             print_child opts base fam_surname csrc cbp p)
         m.m_chil;
       Printf.ksprintf (oc opts) "end\n");
-  Gwdb.Marker.set gen.fam_done m.m_ifam true;
+  Collection.Marker.set gen.fam_done m.m_ifam true;
   let f _ =
     Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
-      (p_first_name base m.m_fath)
-      (get_new_occ m.m_fath) (p_surname base m.m_fath)
-      (p_first_name base m.m_moth)
-      (get_new_occ m.m_moth) (p_surname base m.m_moth)
+      (Driver.p_first_name base m.m_fath)
+      (get_new_occ m.m_fath)
+      (Driver.p_surname base m.m_fath)
+      (Driver.p_first_name base m.m_moth)
+      (get_new_occ m.m_moth)
+      (Driver.p_surname base m.m_moth)
   in
   let s =
     let sl =
       let acc =
-        [ get_comment fam; get_marriage_note fam; get_marriage_src fam ]
+        [
+          Driver.get_comment fam;
+          Driver.get_marriage_note fam;
+          Driver.get_marriage_src fam;
+        ]
       in
-      if opts.source = None then get_fsources fam :: acc else acc
+      if opts.source = None then Driver.get_fsources fam :: acc else acc
     in
     let sl =
       if not !old_gw then
@@ -886,21 +920,21 @@ let print_family opts base gen m =
               in
               loop l acc
         in
-        loop (get_fevents fam) sl
+        loop (Driver.get_fevents fam) sl
       else sl
     in
-    String.concat " " (List.map (sou base) sl)
+    String.concat " " (List.map (Driver.sou base) sl)
   in
   ignore (add_linked_files gen f s [] : _ list)
 
 let get_persons_with_notes m list =
   let list =
     let fath = m.m_fath in
-    match get_parents fath with Some _ -> list | None -> fath :: list
+    match Driver.get_parents fath with Some _ -> list | None -> fath :: list
   in
   let list =
     let moth = m.m_moth in
-    match get_parents moth with Some _ -> list | None -> moth :: list
+    match Driver.get_parents moth with Some _ -> list | None -> moth :: list
   in
   Array.fold_right List.cons m.m_chil list
 
@@ -931,9 +965,9 @@ let print_notes_for_person opts base gen p =
   let print_witness_in_notes witnesses =
     Array.iter
       (fun (ip, wk) ->
-        let p = poi base ip in
+        let p = Driver.poi base ip in
         Printf.ksprintf (oc opts) "wit";
-        (match get_sex p with
+        (match Driver.get_sex p with
         | Male -> Printf.ksprintf (oc opts) " m"
         | Female -> Printf.ksprintf (oc opts) " f"
         | _ -> ());
@@ -955,9 +989,11 @@ let print_notes_for_person opts base gen p =
     | Epers_Cremation -> "cremation"
     | _ -> ""
   in
-  let notes = if opts.no_notes <> `nnn then sou base (get_notes p) else "" in
-  let surn = s_correct_string (p_surname base p) in
-  let fnam = s_correct_string (p_first_name base p) in
+  let notes =
+    if opts.no_notes <> `nnn then Driver.sou base (Driver.get_notes p) else ""
+  in
+  let surn = s_correct_string (Driver.p_surname base p) in
+  let fnam = s_correct_string (Driver.p_first_name base p) in
   (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
   if (notes <> "" || put_events_in_notes base p) && surn <> "?" && fnam <> "?"
   then (
@@ -976,7 +1012,8 @@ let print_notes_for_person opts base gen p =
            | Epers_Cremation ->
                let name = epers_name_to_string evt in
                let notes =
-                 if opts.no_notes <> `nnn then sou base evt.epers_note else ""
+                 if opts.no_notes <> `nnn then Driver.sou base evt.epers_note
+                 else ""
                in
                if notes <> "" then
                  Printf.ksprintf (oc opts) "%s: %s\n" name notes;
@@ -986,22 +1023,23 @@ let print_notes_for_person opts base gen p =
                print_pevent opts base gen evt;
                loop events)
      in
-     loop (get_pevents p));
+     loop (Driver.get_pevents p));
     Printf.ksprintf (oc opts) "end notes\n");
   let f _ =
-    Printf.sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
-      (p_surname base p)
+    Printf.sprintf "person \"%s.%d %s\""
+      (Driver.p_first_name base p)
+      (get_new_occ p) (Driver.p_surname base p)
   in
   let s =
-    let aux g = sou base (g p) in
+    let aux g = Driver.sou base (g p) in
     let sl =
       if opts.no_notes <> `nnn then
         [
-          aux get_notes;
-          aux get_birth_note;
-          aux get_baptism_note;
-          aux get_death_note;
-          aux get_burial_note;
+          aux Driver.get_notes;
+          aux Driver.get_birth_note;
+          aux Driver.get_baptism_note;
+          aux Driver.get_death_note;
+          aux Driver.get_burial_note;
         ]
       else []
     in
@@ -1010,20 +1048,23 @@ let print_notes_for_person opts base gen p =
       | Some "" -> sl
       | Some src -> src :: sl
       | None ->
-          aux get_birth_src :: aux get_baptism_src :: aux get_death_src
-          :: aux get_burial_src :: aux get_psources :: sl
+          aux Driver.get_birth_src :: aux Driver.get_baptism_src
+          :: aux Driver.get_death_src :: aux Driver.get_burial_src
+          :: aux Driver.get_psources :: sl
     in
     if (not !old_gw) && opts.source = None then
       List.fold_left
         (fun acc e ->
           let acc =
-            if opts.no_notes <> `nnn then sou base e.epers_note :: acc else acc
+            if opts.no_notes <> `nnn then Driver.sou base e.epers_note :: acc
+            else acc
           in
           let acc =
-            if opts.source = None then sou base e.epers_src :: acc else acc
+            if opts.source = None then Driver.sou base e.epers_src :: acc
+            else acc
           in
           acc)
-        sl (get_pevents p)
+        sl (Driver.get_pevents p)
     else sl
   in
   let s = String.concat " " s in
@@ -1038,84 +1079,92 @@ let print_notes opts base gen ml =
   in
   List.iter
     (fun p ->
-      if gen.per_sel (get_iper p) then print_notes_for_person opts base gen p)
+      if gen.per_sel (Driver.get_iper p) then
+        print_notes_for_person opts base gen p)
     pl
 
 let is_isolated p =
-  match get_parents p with
+  match Driver.get_parents p with
   | Some _ -> false
-  | None -> Array.length (get_family p) = 0
+  | None -> Array.length (Driver.get_family p) = 0
 
 let is_definition_for_parent p =
-  match get_parents p with Some _ -> false | None -> true
+  match Driver.get_parents p with Some _ -> false | None -> true
 
 let get_isolated_related base m list =
   let concat_isolated p_relation ip list =
-    let p = poi base ip in
+    let p = Driver.poi base ip in
     if List.mem_assq p list then list
     else if is_isolated p then
-      match get_rparents p with
-      | { r_fath = Some x; _ } :: _ when x = get_iper p_relation ->
+      match Driver.get_rparents p with
+      | { r_fath = Some x; _ } :: _ when x = Driver.get_iper p_relation ->
           list @ [ (p, true) ]
-      | { r_fath = None; r_moth = Some x; _ } :: _ when x = get_iper p_relation
-        ->
+      | { r_fath = None; r_moth = Some x; _ } :: _
+        when x = Driver.get_iper p_relation ->
           list @ [ (p, true) ]
       | _ -> list
     else list
   in
   let list =
     if is_definition_for_parent m.m_fath then
-      List.fold_right (concat_isolated m.m_fath) (get_related m.m_fath) list
+      List.fold_right (concat_isolated m.m_fath)
+        (Driver.get_related m.m_fath)
+        list
     else list
   in
   let list =
     if is_definition_for_parent m.m_moth then
-      List.fold_right (concat_isolated m.m_moth) (get_related m.m_moth) list
+      List.fold_right (concat_isolated m.m_moth)
+        (Driver.get_related m.m_moth)
+        list
     else list
   in
   Array.fold_right
-    (fun p list -> List.fold_right (concat_isolated p) (get_related p) list)
+    (fun p list ->
+      List.fold_right (concat_isolated p) (Driver.get_related p) list)
     m.m_chil list
 
 let get_persons_with_relations base m list =
   let fath = m.m_fath in
   let moth = m.m_moth in
   let list =
-    match (get_rparents fath, get_parents fath) with
+    match (Driver.get_rparents fath, Driver.get_parents fath) with
     | [], _ | _, Some _ -> list
     | _ -> (fath, false) :: list
   in
   let list =
-    match (get_rparents moth, get_parents moth) with
+    match (Driver.get_rparents moth, Driver.get_parents moth) with
     | [], _ | _, Some _ -> list
     | _ -> (moth, false) :: list
   in
   let list =
     Array.fold_right
       (fun ip list ->
-        let p = poi base ip in
-        match (get_rparents p, get_parents p) with
+        let p = Driver.poi base ip in
+        match (Driver.get_rparents p, Driver.get_parents p) with
         | [], _ | _, Some _ -> list
-        | { r_fath = Some x; _ } :: _, _ when x <> get_iper m.m_fath -> list
+        | { r_fath = Some x; _ } :: _, _ when x <> Driver.get_iper m.m_fath ->
+            list
         | _ -> (p, false) :: list)
-      (get_witnesses m.m_fam) list
+      (Driver.get_witnesses m.m_fam)
+      list
   in
   Array.fold_right
     (fun p list ->
-      match get_rparents p with [] -> list | _ -> (p, false) :: list)
+      match Driver.get_rparents p with [] -> list | _ -> (p, false) :: list)
     m.m_chil list
 
 let print_relation_parent opts base mark defined_p p =
   Printf.ksprintf (oc opts) "%s %s%s"
-    (correct_string base (get_surname p))
-    (correct_string base (get_first_name p))
+    (correct_string base (Driver.get_surname p))
+    (correct_string base (Driver.get_first_name p))
     (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
   if
-    Array.length (get_family p) = 0
-    && get_parents p = None
-    && not (Gwdb.Marker.get mark (get_iper p))
+    Array.length (Driver.get_family p) = 0
+    && Driver.get_parents p = None
+    && not (Collection.Marker.get mark (Driver.get_iper p))
   then (
-    Gwdb.Marker.set mark (get_iper p) true;
+    Collection.Marker.set mark (Driver.get_iper p) true;
     if has_infos opts base p then print_infos opts base false "" "" p
     else Printf.ksprintf (oc opts) " 0";
     defined_p := p :: !defined_p)
@@ -1125,8 +1174,10 @@ let print_relation_for_person opts base gen def_p r =
     match r.r_fath with
     | Some ip ->
         if gen.per_sel ip then
-          let p = poi base ip in
-          if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
+          let p = Driver.poi base ip in
+          if
+            Driver.sou base (Driver.get_first_name p) = "?"
+            || Driver.sou base (Driver.get_surname p) = "?"
           then None
           else Some p
         else None
@@ -1136,8 +1187,10 @@ let print_relation_for_person opts base gen def_p r =
     match r.r_moth with
     | Some ip ->
         if gen.per_sel ip then
-          let p = poi base ip in
-          if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?"
+          let p = Driver.poi base ip in
+          if
+            Driver.sou base (Driver.get_first_name p) = "?"
+            || Driver.sou base (Driver.get_surname p) = "?"
           then None
           else Some p
         else None
@@ -1145,7 +1198,7 @@ let print_relation_for_person opts base gen def_p r =
   in
   let err_same_sex =
     match (fath, moth) with
-    | Some fath, Some moth -> get_sex fath = get_sex moth
+    | Some fath, Some moth -> Driver.get_sex fath = Driver.get_sex moth
     | _ -> false
   in
   let print_err_one_relation p =
@@ -1156,7 +1209,7 @@ let print_relation_for_person opts base gen def_p r =
     | CandidateParent -> Printf.ksprintf (oc opts) "cand"
     | GodParent -> Printf.ksprintf (oc opts) "godp"
     | FosterParent -> Printf.ksprintf (oc opts) "fost");
-    if get_sex p = Male then Printf.ksprintf (oc opts) " fath"
+    if Driver.get_sex p = Male then Printf.ksprintf (oc opts) " fath"
     else Printf.ksprintf (oc opts) " moth";
     Printf.ksprintf (oc opts) ": ";
     print_relation_parent opts base gen.mark def_p p;
@@ -1181,10 +1234,11 @@ let print_relation_for_person opts base gen def_p r =
         | FosterParent -> Printf.ksprintf (oc opts) "fost");
         (match (fath, moth) with
         | Some fath, None ->
-            if get_sex fath = Male then Printf.ksprintf (oc opts) " fath"
+            if Driver.get_sex fath = Male then Printf.ksprintf (oc opts) " fath"
             else Printf.ksprintf (oc opts) " moth"
         | None, Some moth ->
-            if get_sex moth = Female then Printf.ksprintf (oc opts) " moth"
+            if Driver.get_sex moth = Female then
+              Printf.ksprintf (oc opts) " moth"
             else Printf.ksprintf (oc opts) " fath"
         | _ -> ());
         Printf.ksprintf (oc opts) ": ";
@@ -1192,7 +1246,7 @@ let print_relation_for_person opts base gen def_p r =
         | Some fath, None -> print_relation_parent opts base gen.mark def_p fath
         | None, Some moth -> print_relation_parent opts base gen.mark def_p moth
         | Some fath, Some moth ->
-            if get_sex fath = Male && get_sex moth = Female then (
+            if Driver.get_sex fath = Male && Driver.get_sex moth = Female then (
               print_relation_parent opts base gen.mark def_p fath;
               Printf.ksprintf (oc opts) " + ";
               print_relation_parent opts base gen.mark def_p moth)
@@ -1204,8 +1258,8 @@ let print_relation_for_person opts base gen def_p r =
         Printf.ksprintf (oc opts) "\n")
 
 let print_relations_for_person opts base gen def_p is_definition p =
-  let surn = correct_string base (get_surname p) in
-  let fnam = correct_string base (get_first_name p) in
+  let surn = correct_string base (Driver.get_surname p) in
+  let fnam = correct_string base (Driver.get_first_name p) in
   let exist_relation =
     List.exists
       (fun r ->
@@ -1214,28 +1268,30 @@ let print_relations_for_person opts base gen def_p is_definition p =
         | Some ip1, _ -> gen.per_sel ip1
         | _, Some ip2 -> gen.per_sel ip2
         | _ -> false)
-      (get_rparents p)
+      (Driver.get_rparents p)
   in
   if
     surn <> "?" && fnam <> "?" && exist_relation
-    && not (Gwdb.Marker.get gen.mark_rel (get_iper p))
+    && not (Collection.Marker.get gen.mark_rel (Driver.get_iper p))
   then (
-    Gwdb.Marker.set gen.mark_rel (get_iper p) true;
+    Collection.Marker.set gen.mark_rel (Driver.get_iper p) true;
     Printf.ksprintf (oc opts) "\n";
     Printf.ksprintf (oc opts) "rel %s %s%s" surn fnam
       (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
     if is_definition then (
-      Gwdb.Marker.set gen.mark (get_iper p) true;
+      Collection.Marker.set gen.mark (Driver.get_iper p) true;
       def_p := p :: !def_p;
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
-      match get_sex p with
+      match Driver.get_sex p with
       | Male -> Printf.ksprintf (oc opts) " #h"
       | Female -> Printf.ksprintf (oc opts) " #f"
       | Neuter -> ());
     Printf.ksprintf (oc opts) "\n";
     Printf.ksprintf (oc opts) "beg\n";
-    List.iter (print_relation_for_person opts base gen def_p) (get_rparents p);
+    List.iter
+      (print_relation_for_person opts base gen def_p)
+      (Driver.get_rparents p);
     Printf.ksprintf (oc opts) "end\n")
 
 let print_relations opts base gen ml =
@@ -1250,7 +1306,7 @@ let print_relations opts base gen ml =
     | [] -> ()
     | (p, if_def) :: pl ->
         let def_p = ref [] in
-        if get_rparents p <> [] && gen.per_sel (get_iper p) then (
+        if Driver.get_rparents p <> [] && gen.per_sel (Driver.get_iper p) then (
           print_relations_for_person opts base gen def_p if_def p;
           List.iter (print_notes_for_person opts base gen) !def_p;
           if not !old_gw then
@@ -1270,7 +1326,7 @@ let print_isolated_relations opts base gen p =
     | [] -> ()
     | (p, if_def) :: pl ->
         let def_p = ref [] in
-        if get_rparents p <> [] && gen.per_sel (get_iper p) then (
+        if Driver.get_rparents p <> [] && gen.per_sel (Driver.get_iper p) then (
           print_relations_for_person opts base gen def_p if_def p;
           List.iter (print_notes_for_person opts base gen) !def_p);
         loop (pl @ List.map (fun p -> (p, false)) !def_p)
@@ -1318,7 +1374,7 @@ let rec merge_families ifaml1f ifaml2f =
  *             in
  *             (acci, accf)
  *           else (acci, accf)
- *         end (get_family @@ poi base ip) (ipl, ifaml)
+ *         end (get_family @@ Driver.poi base ip) (ipl, ifaml)
  *       in
  *       loop ifaml scanned ipl
  *     | [] -> ifaml
@@ -1335,21 +1391,21 @@ let connected_families base fam_sel ifam cpl =
     | ip :: ipl ->
         if List.mem ip ipl_scanned then loop ifaml ipl_scanned ipl
         else
-          let u = poi base ip in
-          let ifaml1 = Array.to_list (get_family u) in
+          let u = Driver.poi base ip in
+          let ifaml1 = Array.to_list (Driver.get_family u) in
           let ifaml1 = filter fam_sel ifaml1 in
           let ifaml = merge_families ifaml ifaml1 in
           let ipl =
             List.fold_right
               (fun ifam ipl ->
-                let cpl = foi base ifam in
-                get_father cpl :: get_mother cpl :: ipl)
+                let cpl = Driver.foi base ifam in
+                Driver.get_father cpl :: Driver.get_mother cpl :: ipl)
               ifaml1 ipl
           in
           loop ifaml (ip :: ipl_scanned) ipl
     | [] -> ifaml
   in
-  loop [ ifam ] [] [ get_father cpl ]
+  loop [ ifam ] [] [ Driver.get_father cpl ]
 
 let read_file_contents fname =
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
@@ -1369,46 +1425,52 @@ let read_file_contents fname =
 type separate = ToSeparate | NotScanned | BeingScanned | Scanned
 
 let rec find_ancestors base surn p list =
-  match get_parents p with
+  match Driver.get_parents p with
   | Some ifam ->
-      let cpl = foi base ifam in
-      let fath = poi base (get_father cpl) in
-      let moth = poi base (get_mother cpl) in
+      let cpl = Driver.foi base ifam in
+      let fath = Driver.poi base (Driver.get_father cpl) in
+      let moth = Driver.poi base (Driver.get_mother cpl) in
       if
-        (not (eq_istr (get_surname fath) surn))
-        && not (eq_istr (get_surname moth) surn)
+        (not (Driver.eq_istr (Driver.get_surname fath) surn))
+        && not (Driver.eq_istr (Driver.get_surname moth) surn)
       then p :: list
       else
         let list =
-          if eq_istr (get_surname fath) surn then
+          if Driver.eq_istr (Driver.get_surname fath) surn then
             find_ancestors base surn fath list
           else list
         in
-        if eq_istr (get_surname moth) surn then
+        if Driver.eq_istr (Driver.get_surname moth) surn then
           find_ancestors base surn moth list
         else list
   | None -> p :: list
 
 let mark_branch base mark surn p =
   let rec loop top p =
-    for i = 0 to Array.length (get_family p) - 1 do
-      let ifam = (get_family p).(i) in
-      if Gwdb.Marker.get mark ifam = NotScanned then
+    for i = 0 to Array.length (Driver.get_family p) - 1 do
+      let ifam = (Driver.get_family p).(i) in
+      if Collection.Marker.get mark ifam = NotScanned then
         let ifaml =
-          connected_families base (fun _ -> true) ifam (foi base ifam)
+          connected_families base (fun _ -> true) ifam (Driver.foi base ifam)
         in
         let children =
           List.fold_left
             (fun list ifam ->
-              let desc = foi base ifam in
+              let desc = Driver.foi base ifam in
               Array.fold_left
-                (fun list ip -> poi base ip :: list)
-                list (get_children desc))
+                (fun list ip -> Driver.poi base ip :: list)
+                list (Driver.get_children desc))
             [] ifaml
         in
-        if top || List.exists (fun p -> eq_istr (get_surname p) surn) children
+        if
+          top
+          || List.exists
+               (fun p -> Driver.eq_istr (Driver.get_surname p) surn)
+               children
         then (
-          List.iter (fun ifam -> Gwdb.Marker.set mark ifam ToSeparate) ifaml;
+          List.iter
+            (fun ifam -> Collection.Marker.set mark ifam ToSeparate)
+            ifaml;
           List.iter (loop false) children)
     done
   in
@@ -1417,9 +1479,9 @@ let mark_branch base mark surn p =
 let mark_someone base mark s =
   match Gutil.person_ht_find_all base s with
   | [ ip ] ->
-      let p = poi base ip in
-      let plist = find_ancestors base (get_surname p) p [] in
-      List.iter (mark_branch base mark (get_surname p)) plist
+      let p = Driver.poi base ip in
+      let plist = find_ancestors base (Driver.get_surname p) p [] in
+      List.iter (mark_branch base mark (Driver.get_surname p)) plist
   | [] ->
       Printf.eprintf "Error: \"%s\" is not found\n" s;
       flush stderr;
@@ -1431,47 +1493,51 @@ let mark_someone base mark s =
 
 let scan_connex_component base test_action len ifam =
   let rec loop len ifam =
-    let fam = foi base ifam in
-    let fath = poi base (get_father fam) in
-    let moth = poi base (get_mother fam) in
+    let fam = Driver.foi base ifam in
+    let fath = Driver.poi base (Driver.get_father fam) in
+    let moth = Driver.poi base (Driver.get_mother fam) in
     let len =
       Array.fold_left
         (fun len ifam1 ->
           if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family fath)
+        len (Driver.get_family fath)
     in
     let len =
       Array.fold_left
         (fun len ifam1 ->
           if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family moth)
+        len (Driver.get_family moth)
     in
     let len =
-      match get_parents fath with
+      match Driver.get_parents fath with
       | Some ifam -> test_action loop len ifam
       | _ -> len
     in
     let len =
-      match get_parents moth with
+      match Driver.get_parents moth with
       | Some ifam -> test_action loop len ifam
       | _ -> len
     in
-    let children = get_children fam in
+    let children = Driver.get_children fam in
     Array.fold_left
       (fun len ip ->
-        Array.fold_left (test_action loop) len (get_family (poi base ip)))
+        Array.fold_left (test_action loop) len
+          (Driver.get_family (Driver.poi base ip)))
       len children
   in
   loop len ifam
 
 let mark_one_connex_component base mark ifam =
-  let origin_file = sou base (get_origin_file (foi base ifam)) in
+  let origin_file =
+    Driver.sou base (Driver.get_origin_file (Driver.foi base ifam))
+  in
   let test_action loop len ifam =
     if
-      Gwdb.Marker.get mark ifam = NotScanned
-      && sou base (get_origin_file (foi base ifam)) = origin_file
+      Collection.Marker.get mark ifam = NotScanned
+      && Driver.sou base (Driver.get_origin_file (Driver.foi base ifam))
+         = origin_file
     then (
-      Gwdb.Marker.set mark ifam BeingScanned;
+      Collection.Marker.set mark ifam BeingScanned;
       loop (len + 1) ifam)
     else len
   in
@@ -1479,8 +1545,8 @@ let mark_one_connex_component base mark ifam =
   let len = 1 + scan_connex_component base test_action 0 ifam in
   let set_mark x =
     let test_action loop () ifam =
-      if Gwdb.Marker.get mark ifam = BeingScanned then (
-        Gwdb.Marker.set mark ifam x;
+      if Collection.Marker.get mark ifam = BeingScanned then (
+        Collection.Marker.set mark ifam x;
         loop () ifam)
     in
     test_action (fun _ _ -> ()) () ifam;
@@ -1490,44 +1556,46 @@ let mark_one_connex_component base mark ifam =
     set_mark ToSeparate
   else (
     Printf.eprintf "%s: group of size %d not included\n" origin_file len;
-    let cpl = foi base ifam in
+    let cpl = Driver.foi base ifam in
     Printf.eprintf "    %s + %s\n"
-      (Gutil.designation base (poi base (get_father cpl)))
-      (Gutil.designation base (poi base (get_mother cpl)));
+      (Gutil.designation base (Driver.poi base (Driver.get_father cpl)))
+      (Gutil.designation base (Driver.poi base (Driver.get_mother cpl)));
     flush stderr;
     set_mark Scanned)
 
 let mark_connex_components base mark ifam =
   let test_action _loop _len ifam =
-    if Gwdb.Marker.get mark ifam = NotScanned then
+    if Collection.Marker.get mark ifam = NotScanned then
       mark_one_connex_component base mark ifam
   in
   scan_connex_component base test_action () ifam
 
 let add_small_connex_components base mark =
-  Gwdb.Collection.iter
+  Collection.iter
     (fun i ->
-      if Gwdb.Marker.get mark i = ToSeparate then
+      if Collection.Marker.get mark i = ToSeparate then
         mark_connex_components base mark i)
-    (Gwdb.ifams base)
+    (Geneweb_db.Driver.ifams base)
 
 let separate base =
   match List.rev !separate_list with
   | [] -> fun _ -> false
   | list ->
-      let ifams = Gwdb.ifams base in
-      let mark = Gwdb.ifam_marker (Gwdb.ifams base) NotScanned in
+      let ifams = Geneweb_db.Driver.ifams base in
+      let mark =
+        Geneweb_db.Driver.ifam_marker (Geneweb_db.Driver.ifams base) NotScanned
+      in
       List.iter (mark_someone base mark) list;
       add_small_connex_components base mark;
       let len =
-        Gwdb.Collection.fold
+        Collection.fold
           (fun acc i ->
-            if Gwdb.Marker.get mark i = ToSeparate then acc + 1 else acc)
+            if Collection.Marker.get mark i = ToSeparate then acc + 1 else acc)
           0 ifams
       in
       Printf.eprintf "*** extracted %d families\n" len;
       flush stderr;
-      fun ifam -> Gwdb.Marker.get mark ifam = ToSeparate
+      fun ifam -> Collection.Marker.get mark ifam = ToSeparate
 
 let rs_printf opts s =
   let rec loop bol i =
@@ -1564,9 +1632,15 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         x
   in
   let gen =
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-    let mark_rel = Gwdb.iper_marker (Gwdb.ipers base) false in
-    let fam_done = Gwdb.ifam_marker (Gwdb.ifams base) false in
+    let mark =
+      Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+    in
+    let mark_rel =
+      Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+    in
+    let fam_done =
+      Geneweb_db.Driver.ifam_marker (Geneweb_db.Driver.ifams base) false
+    in
     {
       mark;
       mark_rel;
@@ -1579,37 +1653,42 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       pevents_pl_p = [];
     }
   in
-  let nb_fam = nb_of_families base in
+  let nb_fam = Driver.nb_of_families base in
   if !Mutil.verbose then ProgrBar.start ();
-  Gwdb.Collection.iteri
+  Collection.iteri
     (fun i ifam ->
       if !Mutil.verbose then ProgrBar.run i nb_fam;
-      if not (Gwdb.Marker.get gen.fam_done ifam) then
-        let fam = foi base ifam in
+      if not (Collection.Marker.get gen.fam_done ifam) then
+        let fam = Driver.foi base ifam in
         let ifaml = connected_families base gen.fam_sel ifam fam in
         let oc, first, _close =
           if to_separate ifam then (oc, out_oc_first, close)
           else
-            let fname = get_origin_file fam in
-            origin_file (if is_empty_string fname then "" else sou base fname)
+            let fname = Driver.get_origin_file fam in
+            origin_file
+              (if Driver.is_empty_string fname then ""
+              else Driver.sou base fname)
         in
         let f, _ooc, c = opts.oc in
         let opts = { opts with oc = (f, oc, c) } in
         let ml =
           List.fold_right
             (fun ifam ml ->
-              let fam = foi base ifam in
+              let fam = Driver.foi base ifam in
               let m =
                 {
                   m_ifam = ifam;
                   m_fam = fam;
-                  m_fath = poi base (get_father fam);
-                  m_moth = poi base (get_mother fam);
-                  m_chil = Array.map (fun ip -> poi base ip) (get_children fam);
+                  m_fath = Driver.poi base (Driver.get_father fam);
+                  m_moth = Driver.poi base (Driver.get_mother fam);
+                  m_chil =
+                    Array.map
+                      (fun ip -> Driver.poi base ip)
+                      (Driver.get_children fam);
                 }
               in
               if empty_family base m then (
-                Gwdb.Marker.set gen.fam_done m.m_ifam true;
+                Collection.Marker.set gen.fam_done m.m_ifam true;
                 ml)
               else m :: ml)
             ifaml []
@@ -1623,61 +1702,63 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           print_notes opts base gen ml;
           print_relations opts base gen ml;
           if not !old_gw then print_pevents opts base gen ml))
-    (Gwdb.ifams ~select:gen.fam_sel base);
+    (Geneweb_db.Driver.ifams ~select:gen.fam_sel base);
   (* Ajout des personnes isolée à l'export. On leur ajoute des    *)
   (* parents pour pouvoir utiliser les autres fonctions normales. *)
   (* Export que si c'est toute la base.                           *)
   if isolated && opts.asc = None && opts.desc = None && opts.ascdesc = None then
-    Gwdb.Collection.iter
+    Collection.iter
       (fun i ->
         if
-          (not @@ Gwdb.Marker.get gen.mark i)
-          && (not @@ Gwdb.Marker.get gen.mark_rel i)
+          (not @@ Collection.Marker.get gen.mark i)
+          && (not @@ Collection.Marker.get gen.mark_rel i)
           && per_sel i
         then
-          let p = poi base i in
-          match get_parents p with
+          let p = Driver.poi base i in
+          match Driver.get_parents p with
           | Some _ -> ()
           | None ->
               if
                 bogus_person base p
                 && not
-                     (get_birth p <> Date.cdate_None
-                     || get_baptism p <> Date.cdate_None
-                     || get_first_names_aliases p <> []
-                     || get_surnames_aliases p <> []
-                     || sou base (get_public_name p) <> ""
-                     || get_qualifiers p <> []
-                     || get_aliases p <> []
-                     || get_titles p <> []
-                     || sou base (get_occupation p) <> ""
-                     || sou base (get_birth_place p) <> ""
-                     || sou base (get_birth_src p) <> ""
-                     || sou base (get_baptism_place p) <> ""
-                     || sou base (get_baptism_src p) <> ""
-                     || sou base (get_death_place p) <> ""
-                     || sou base (get_death_src p) <> ""
-                     || sou base (get_burial_place p) <> ""
-                     || sou base (get_burial_src p) <> ""
-                     || sou base (get_notes p) <> ""
-                     || sou base (get_psources p) <> ""
-                     || get_rparents p <> []
-                     || get_related p <> [])
+                     (Driver.get_birth p <> Date.cdate_None
+                     || Driver.get_baptism p <> Date.cdate_None
+                     || Driver.get_first_names_aliases p <> []
+                     || Driver.get_surnames_aliases p <> []
+                     || Driver.sou base (Driver.get_public_name p) <> ""
+                     || Driver.get_qualifiers p <> []
+                     || Driver.get_aliases p <> []
+                     || Driver.get_titles p <> []
+                     || Driver.sou base (Driver.get_occupation p) <> ""
+                     || Driver.sou base (Driver.get_birth_place p) <> ""
+                     || Driver.sou base (Driver.get_birth_src p) <> ""
+                     || Driver.sou base (Driver.get_baptism_place p) <> ""
+                     || Driver.sou base (Driver.get_baptism_src p) <> ""
+                     || Driver.sou base (Driver.get_death_place p) <> ""
+                     || Driver.sou base (Driver.get_death_src p) <> ""
+                     || Driver.sou base (Driver.get_burial_place p) <> ""
+                     || Driver.sou base (Driver.get_burial_src p) <> ""
+                     || Driver.sou base (Driver.get_notes p) <> ""
+                     || Driver.sou base (Driver.get_psources p) <> ""
+                     || Driver.get_rparents p <> []
+                     || Driver.get_related p <> [])
               then ()
               else
-                let oc, _first, _ = origin_file (base_notes_origin_file base) in
+                let oc, _first, _ =
+                  origin_file (Driver.base_notes_origin_file base)
+                in
                 let f, _ooc, c = opts.oc in
                 let opts = { opts with oc = (f, oc, c) } in
                 Printf.ksprintf oc "\n";
                 print_empty_family opts base p;
                 print_notes_for_person opts base gen p;
-                Gwdb.Marker.set gen.mark i true;
+                Collection.Marker.set gen.mark i true;
                 print_isolated_relations opts base gen p)
-      (Gwdb.ipers base);
+      (Geneweb_db.Driver.ipers base);
   if !Mutil.verbose then ProgrBar.finish ();
   if opts.no_notes = `none then (
-    let s = base_notes_read base "" in
-    let oc, first, _ = origin_file (base_notes_origin_file base) in
+    let s = Driver.base_notes_read base "" in
+    let oc, first, _ = origin_file (Driver.base_notes_origin_file base) in
     let f, _ooc, c = opts.oc in
     let opts = { opts with oc = (f, oc, c) } in
     if s <> "" then (
@@ -1689,7 +1770,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       ignore (add_linked_files gen (fun _ -> "database notes") s [] : _ list));
     (try
        let files =
-         Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
+         Sys.readdir (Filename.concat in_dir (Driver.base_wiznotes_dir base))
        in
        Array.sort compare files;
        for i = 0 to Array.length files - 1 do
@@ -1697,7 +1778,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
          if Filename.check_suffix file ".txt" then
            let wfile =
              List.fold_left Filename.concat in_dir
-               [ base_wiznotes_dir base; file ]
+               [ Driver.base_wiznotes_dir base; file ]
            in
            let s = read_file_contents wfile in
            ignore
@@ -1713,7 +1794,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             | Some (dl, f) -> List.fold_right Filename.concat dl f
             | None -> "bad"
           in
-          let s = base_notes_read base fn in
+          let s = Driver.base_notes_read base fn in
           let files =
             add_linked_files gen
               (fun _ -> Printf.sprintf "extended page \"%s\"" f)
@@ -1729,7 +1810,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           | Some (dl, f) -> List.fold_right Filename.concat dl f
           | None -> "bad"
         in
-        let s = String.trim (base_notes_read base fn) in
+        let s = String.trim (Driver.base_notes_read base fn) in
         if s <> "" then (
           if not !first then Printf.ksprintf oc "\n";
           first := false;
@@ -1748,7 +1829,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     in
     try
       let files =
-        Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
+        Sys.readdir (Filename.concat in_dir (Driver.base_wiznotes_dir base))
       in
       Array.sort compare files;
       for i = 0 to Array.length files - 1 do
@@ -1757,7 +1838,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           let wizid = Filename.chop_suffix file ".txt" in
           let wfile =
             List.fold_left Filename.concat in_dir
-              [ base_wiznotes_dir base; file ]
+              [ Driver.base_wiznotes_dir base; file ]
           in
           let s = String.trim (read_file_contents wfile) in
           Printf.ksprintf oc "\nwizard-note %s\n" wizid;

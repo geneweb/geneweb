@@ -3,8 +3,10 @@
 open Config
 open Def
 open Dag2html
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Collection = Geneweb_db.Collection
 
 let limit_by_tree conf =
   match List.assoc_opt "max_desc_tree" conf.base_env with
@@ -52,40 +54,48 @@ let descendants_title conf base p h =
 let display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let levt, _ = Perso.make_desc_level_table conf base max_level ancestor in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+  let mark =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+  in
   let rec get_level level u list =
     Array.fold_left
       (fun list ifam ->
-        let des = foi base ifam in
-        let enfants = get_children des in
+        let des = Driver.foi base ifam in
+        let enfants = Driver.get_children des in
         Array.fold_left
           (fun list ix ->
             let x = pget conf base ix in
-            if Gwdb.Marker.get mark ix then list
+            if Collection.Marker.get mark ix then list
             else
-              let _ = Gwdb.Marker.set mark ix true in
-              if Gwdb.Marker.get levt ix > max_level then list
+              let _ = Collection.Marker.set mark ix true in
+              if Collection.Marker.get levt ix > max_level then list
               else if level = max_level then
-                if p_first_name base x = "x" || Gwdb.Marker.get levt ix != level
+                if
+                  Driver.p_first_name base x = "x"
+                  || Collection.Marker.get levt ix != level
                 then list
                 else x :: list
               else if level < max_level then
                 get_level (succ level) (pget conf base ix) list
               else list)
           list enfants)
-      list (get_family u)
+      list (Driver.get_family u)
   in
   let len = ref 0 in
-  let list = get_level 1 (pget conf base (get_iper ancestor)) [] in
+  let list = get_level 1 (pget conf base (Driver.get_iper ancestor)) [] in
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
+        let c =
+          Gutil.alphabetic (Driver.p_surname base p2) (Driver.p_surname base p1)
+        in
         if c = 0 then
           let c =
-            Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
+            Gutil.alphabetic
+              (Driver.p_first_name base p2)
+              (Driver.p_first_name base p1)
           in
-          if c = 0 then compare (get_occ p2) (get_occ p1) else c
+          if c = 0 then compare (Driver.get_occ p2) (Driver.get_occ p1) else c
         else c)
       list
   in
@@ -93,7 +103,8 @@ let display_descendants_level conf base max_level ancestor =
     List.fold_left
       (fun pl p ->
         match pl with
-        | (p1, n) :: pl when get_iper p = get_iper p1 -> (p1, succ n) :: pl
+        | (p1, n) :: pl when Driver.get_iper p = Driver.get_iper p1 ->
+            (p1, succ n) :: pl
         | _ ->
             incr len;
             (p, 1) :: pl)
@@ -113,7 +124,10 @@ let display_descendants_level conf base max_level ancestor =
   print_alphab_list conf
     (fun (p, _) ->
       if is_hidden p then "?"
-      else String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
+      else
+        String.sub (Driver.p_surname base p)
+          (Mutil.initial (Driver.p_surname base p))
+          1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
       Output.print_string conf (referenced_person_title_text conf base p);
@@ -128,12 +142,12 @@ let display_descendants_level conf base max_level ancestor =
 let mark_descendants conf base marks max_lev ip =
   let rec loop lev ip u =
     if lev <= max_lev then (
-      Gwdb.Marker.set marks ip true;
+      Collection.Marker.set marks ip true;
       Array.iter
         (fun ifam ->
-          let el = get_children (foi base ifam) in
+          let el = Driver.get_children (Driver.foi base ifam) in
           Array.iter (fun e -> loop (succ lev) e (pget conf base e)) el)
-        (get_family u))
+        (Driver.get_family u))
   in
   loop 0 ip (pget conf base ip)
 
@@ -143,18 +157,21 @@ let label_descendants conf base marks paths max_lev =
       ignore
       @@ Array.fold_left
            (fun cnt ifam ->
-             let fam = foi base ifam in
-             let c = Gutil.spouse (get_iper p) fam in
-             let el = get_children fam in
+             let fam = Driver.foi base ifam in
+             let c = Gutil.spouse (Driver.get_iper p) fam in
+             let el = Driver.get_children fam in
              Array.fold_left
                (fun cnt e ->
-                 if get_sex p = Male || not (Gwdb.Marker.get marks c) then (
+                 if
+                   Driver.get_sex p = Male
+                   || not (Collection.Marker.get marks c)
+                 then (
                    let path = Char.chr (Char.code 'A' + cnt) :: path in
-                   Gwdb.Marker.set paths e path;
+                   Collection.Marker.set paths e path;
                    loop path (succ lev) (pget conf base e));
                  succ cnt)
                cnt el)
-           0 (get_family p)
+           0 (Driver.get_family p)
   in
   loop [] 0
 
@@ -166,32 +183,32 @@ let close_to_end conf base marks max_lev lev p =
     let rec short dlev p =
       Array.for_all
         (fun ifam ->
-          let fam = foi base ifam in
-          let c = Gutil.spouse (get_iper p) fam in
-          let el = get_children fam in
-          if get_sex p = Male || not (Gwdb.Marker.get marks c) then
+          let fam = Driver.foi base ifam in
+          let c = Gutil.spouse (Driver.get_iper p) fam in
+          let el = Driver.get_children fam in
+          if Driver.get_sex p = Male || not (Collection.Marker.get marks c) then
             if dlev = close_lev then Array.length el = 0
             else
               Array.for_all (fun e -> short (succ dlev) (pget conf base e)) el
           else true)
-        (get_family p)
+        (Driver.get_family p)
     in
     short 1 p
 
 let labelled conf base marks max_lev lev ip =
   let a = pget conf base ip in
   let u = a in
-  Array.length (get_family u) <> 0
+  Array.length (Driver.get_family u) <> 0
   &&
-  match get_parents a with
+  match Driver.get_parents a with
   | Some ifam ->
-      let fam = foi base ifam in
-      let el = get_children fam in
+      let fam = Driver.foi base ifam in
+      let el = Driver.get_children fam in
       Array.exists
         (fun ie ->
           let e = pget conf base ie in
           let u = e in
-          Array.length (get_family u) <> 0
+          Array.length (Driver.get_family u) <> 0
           && not (close_to_end conf base marks max_lev lev e))
         el
   | _ -> false
@@ -201,13 +218,15 @@ let label_of_path paths p =
     | [] -> Adef.escaped ""
     | c :: cl -> loop cl ^^^ Util.escape_html (String.make 1 c)
   in
-  get_iper p |> Gwdb.Marker.get paths |> loop
+  Driver.get_iper p |> Collection.Marker.get paths |> loop
 
 let print_child conf base p1 p2 e =
   Output.print_sstring conf "<strong>";
   if
-    (get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1))
-    || (get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2))
+    Driver.get_sex p1 = Male
+    && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p1)
+    || Driver.get_sex p2 = Male
+       && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p2)
   then
     Output.print_string conf
       (referenced_person_text_without_surname conf base e)
@@ -220,8 +239,10 @@ let print_child conf base p1 p2 e =
 let print_repeat_child conf base p1 p2 e =
   Output.print_sstring conf "<em>";
   if
-    (get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1))
-    || (get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2))
+    Driver.get_sex p1 = Male
+    && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p1)
+    || Driver.get_sex p2 = Male
+       && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p2)
   then Output.print_string conf (gen_person_text ~sn:false conf base e)
   else Output.print_string conf (gen_person_text conf base e);
   Output.print_sstring conf "</em>"
@@ -233,7 +254,7 @@ let display_spouse conf base marks paths fam p c =
   Output.print_sstring conf " <strong> ";
   Output.print_string conf (referenced_person_text conf base c);
   Output.print_sstring conf "</strong>";
-  if Gwdb.Marker.get marks (get_iper c) then (
+  if Collection.Marker.get marks (Driver.get_iper c) then (
     Output.print_sstring conf " (<tt><b>";
     Output.print_string conf (label_of_path paths c);
     Output.print_sstring conf "</b></tt>)")
@@ -247,16 +268,17 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
       ignore
       @@ Array.fold_left
            (fun (cnt, first, need_br) ifam ->
-             let fam = foi base ifam in
-             let c = Gutil.spouse (get_iper p) fam in
-             let el = get_children fam in
+             let fam = Driver.foi base ifam in
+             let c = Gutil.spouse (Driver.get_iper p) fam in
+             let el = Driver.get_children fam in
              let c = pget conf base c in
              if need_br then Output.print_sstring conf "<br>";
              if not first then print_repeat_child conf base p1 c1 p;
              display_spouse conf base marks paths fam p c;
              Output.print_sstring conf "\n";
              let print_children =
-               get_sex p = Male || not (Gwdb.Marker.get marks (get_iper c))
+               Driver.get_sex p = Male
+               || not (Collection.Marker.get marks (Driver.get_iper c))
              in
              if print_children then
                Output.printf conf "<ol start=\"%d\">\n" (succ cnt);
@@ -272,9 +294,9 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
                      if succ lev = max_lev then
                        Array.iteri
                          (fun i ifam ->
-                           let fam = foi base ifam in
+                           let fam = Driver.foi base ifam in
                            let c1 = Gutil.spouse ie fam in
-                           let el = get_children fam in
+                           let el = Driver.get_children fam in
                            let c1 = pget conf base c1 in
                            if i <> 0 then (
                              Output.print_sstring conf "<br>";
@@ -283,14 +305,14 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
                            if Array.length el <> 0 then
                              Output.print_sstring conf ".....";
                            Output.print_sstring conf "\n")
-                         (get_family (pget conf base ie))
+                         (Driver.get_family (pget conf base ie))
                      else loop (succ lev) e);
                    succ cnt)
                  cnt el
              in
              if print_children then Output.print_sstring conf "</ol>\n";
              (cnt, false, not print_children))
-           (0, true, false) (get_family p)
+           (0, true, false) (Driver.get_family p)
   in
   loop lev e
 
@@ -306,9 +328,9 @@ let print_family conf base marks paths max_lev lev p =
   ignore
   @@ Array.fold_left
        (fun cnt ifam ->
-         let fam = foi base ifam in
-         let c = Gutil.spouse (get_iper p) fam in
-         let el = get_children fam in
+         let fam = Driver.foi base ifam in
+         let c = Gutil.spouse (Driver.get_iper p) fam in
+         let el = Driver.get_children fam in
          let c = pget conf base c in
          Output.print_sstring conf "<strong> ";
          Output.print_string conf (referenced_person_text conf base p);
@@ -321,7 +343,9 @@ let print_family conf base marks paths max_lev lev p =
            Array.fold_left
              (fun cnt ie ->
                let e = pget conf base ie in
-               if get_sex p = Male || not (Gwdb.Marker.get marks (get_iper c))
+               if
+                 Driver.get_sex p = Male
+                 || not (Collection.Marker.get marks (Driver.get_iper c))
                then (
                  Output.print_sstring conf {|<li type="A">|};
                  print_child conf base p c e;
@@ -334,15 +358,15 @@ let print_family conf base marks paths max_lev lev p =
                  else if succ lev = max_lev then
                    Array.iter
                      (fun ifam ->
-                       let fam = foi base ifam in
+                       let fam = Driver.foi base ifam in
                        let c = Gutil.spouse ie fam in
-                       let el = get_children fam in
+                       let el = Driver.get_children fam in
                        let c = pget conf base c in
                        display_spouse conf base marks paths fam e c;
                        if Array.length el <> 0 then
                          Output.print_sstring conf ".....";
                        Output.print_sstring conf "\n")
-                     (get_family (pget conf base ie))
+                     (Driver.get_family (pget conf base ie))
                  else
                    print_family_locally conf base marks paths max_lev (succ lev)
                      p c e);
@@ -351,7 +375,7 @@ let print_family conf base marks paths max_lev lev p =
          in
          Output.print_sstring conf "</ol>";
          cnt)
-       0 (get_family p)
+       0 (Driver.get_family p)
 
 let print_families conf base marks paths max_lev =
   let rec loop lev p =
@@ -359,18 +383,21 @@ let print_families conf base marks paths max_lev =
       print_family conf base marks paths max_lev lev p;
       Array.iter
         (fun ifam ->
-          let fam = foi base ifam in
-          let c = Gutil.spouse (get_iper p) fam in
-          let el = get_children fam in
+          let fam = Driver.foi base ifam in
+          let c = Gutil.spouse (Driver.get_iper p) fam in
+          let el = Driver.get_children fam in
           let c = pget conf base c in
-          if get_sex p = Male || not (Gwdb.Marker.get marks (get_iper c)) then
+          if
+            Driver.get_sex p = Male
+            || not (Collection.Marker.get marks (Driver.get_iper c))
+          then
             Array.iter
               (fun ie ->
                 let e = pget conf base ie in
                 if labelled conf base marks max_lev lev ie then
                   loop (succ lev) e)
               el)
-        (get_family p))
+        (Driver.get_family p))
   in
   loop 0
 
@@ -381,7 +408,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
     else
       wprint_geneweb_link conf
         ("m=D&i="
-         ^ string_of_iper (get_iper ancestor)
+         ^ Driver.string_of_iper (Driver.get_iper ancestor)
          ^ "&v=" ^ string_of_int max_level ^ "&t=G"
         |> Adef.escaped)
         (let s1 = gen_person_text conf base ancestor in
@@ -392,20 +419,22 @@ let display_descendants_with_numbers conf base max_level ancestor =
            (s2 : Adef.safe_string :> string)
          |> Utf8.capitalize_fst |> Adef.safe)
   in
-  let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
-  let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
+  let marks =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+  in
+  let paths = Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) [] in
   Hutil.header conf title;
   total := 0;
   Output.print_string conf (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
   (if authorized_age conf base p then
-   match (Date.od_of_cdate (get_birth p), get_death p) with
+   match (Date.od_of_cdate (Driver.get_birth p), Driver.get_death p) with
    | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
    | _ -> ());
   (text_to conf max_level : Adef.safe_string :> string)
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf ".<p>";
-  mark_descendants conf base marks max_level (get_iper ancestor);
+  mark_descendants conf base marks max_level (Driver.get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   print_families conf base marks paths max_level ancestor;
   if !total > 1 then (
@@ -420,24 +449,25 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Hutil.trailer conf
 
 let print_ref conf base paths p =
-  if Gwdb.Marker.get paths (get_iper p) <> [] then (
+  if Collection.Marker.get paths (Driver.get_iper p) <> [] then (
     Output.print_sstring conf " =&gt; <tt><b>";
     Output.print_string conf (label_of_path paths p);
     Output.print_sstring conf "</b></tt>")
   else
     Array.iter
       (fun ifam ->
-        let c = Gutil.spouse (get_iper p) (foi base ifam) in
-        if Gwdb.Marker.get paths c <> [] then (
+        let c = Gutil.spouse (Driver.get_iper p) (Driver.foi base ifam) in
+        if Collection.Marker.get paths c <> [] then (
           let c = pget conf base c in
           Output.print_sstring conf " =&gt; ";
-          Output.print_string conf (p_first_name base c |> Util.escape_html);
+          Output.print_string conf
+            (Driver.p_first_name base c |> Util.escape_html);
           Output.print_sstring conf " ";
-          Output.print_string conf (p_surname base c |> Util.escape_html);
+          Output.print_string conf (Driver.p_surname base c |> Util.escape_html);
           Output.print_sstring conf " <tt><b>";
           Output.print_string conf (label_of_path paths c);
           Output.print_sstring conf "</b></tt>"))
-      (get_family p)
+      (Driver.get_family p)
 
 let print_elem conf base paths precision (n, pll) =
   Output.print_sstring conf "<li>";
@@ -470,7 +500,8 @@ let print_elem conf base paths precision (n, pll) =
             (fun p ->
               Output.print_sstring conf "<li><strong>";
               wprint_geneweb_link conf (acces conf base p)
-                (p_first_name base p |> Util.escape_html :> Adef.safe_string);
+                (Driver.p_first_name base p |> Util.escape_html
+                  :> Adef.safe_string);
               Output.print_sstring conf "</strong>";
               if several && precision then (
                 Output.print_sstring conf "<em>";
@@ -488,9 +519,13 @@ let sort_and_display conf base paths precision list =
   let list =
     List.sort
       (fun p1 p2 ->
-        let c = Gutil.alphabetic (p_surname base p2) (p_surname base p1) in
+        let c =
+          Gutil.alphabetic (Driver.p_surname base p2) (Driver.p_surname base p1)
+        in
         if c = 0 then
-          Gutil.alphabetic (p_first_name base p2) (p_first_name base p1)
+          Gutil.alphabetic
+            (Driver.p_first_name base p2)
+            (Driver.p_first_name base p1)
         else c)
       list
   in
@@ -498,8 +533,9 @@ let sort_and_display conf base paths precision list =
     List.fold_left
       (fun npll p ->
         match npll with
-        | (n, pl) :: npll when n = p_surname base p -> (n, p :: pl) :: npll
-        | _ -> (p_surname base p, [ p ]) :: npll)
+        | (n, pl) :: npll when n = Driver.p_surname base p ->
+            (n, p :: pl) :: npll
+        | _ -> (Driver.p_surname base p, [ p ]) :: npll)
       [] list
   in
   let list =
@@ -510,7 +546,8 @@ let sort_and_display conf base paths precision list =
             (fun pll p ->
               match pll with
               | (p1 :: _ as pl) :: pll
-                when eq_istr (get_first_name p1) (get_first_name p) ->
+                when Driver.eq_istr (Driver.get_first_name p1)
+                       (Driver.get_first_name p) ->
                   (p :: pl) :: pll
               | _ -> [ p ] :: pll)
             [] pl
@@ -532,31 +569,33 @@ let display_descendant_index conf base max_level ancestor =
     if not h then
       wprint_geneweb_link conf
         ("m=D&i="
-         ^ string_of_iper (get_iper ancestor)
+         ^ Driver.string_of_iper (Driver.get_iper ancestor)
          ^ "&v=" ^ string_of_int max_level ^ "&t=C"
         |> Adef.escaped)
         txt
     else Output.print_string conf txt
   in
   Hutil.header conf title;
-  let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
-  let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
-  mark_descendants conf base marks max_level (get_iper ancestor);
+  let marks =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+  in
+  let paths = Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) [] in
+  mark_descendants conf base marks max_level (Driver.get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   let list =
-    Gwdb.Collection.fold
+    Collection.fold
       (fun acc i ->
         let p = pget conf base i in
-        if Gwdb.Marker.get paths i <> [] then
+        if Collection.Marker.get paths i <> [] then
           if
-            p_first_name base p <> "?"
-            && p_surname base p <> "?"
-            && p_first_name base p <> "x"
+            Driver.p_first_name base p <> "?"
+            && Driver.p_surname base p <> "?"
+            && Driver.p_first_name base p <> "x"
             && ((not (is_hide_names conf p)) || authorized_age conf base p)
-          then get_iper p :: acc
+          then Driver.get_iper p :: acc
           else acc
         else acc)
-      [] (ipers base)
+      [] (Driver.ipers base)
   in
   sort_and_display conf base paths true list;
   Hutil.trailer conf
@@ -568,39 +607,43 @@ let display_spouse_index conf base max_level ancestor =
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
-  let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
-  let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
-  mark_descendants conf base marks max_level (get_iper ancestor);
+  let marks =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+  in
+  let paths = Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) [] in
+  mark_descendants conf base marks max_level (Driver.get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   let list =
-    Gwdb.Collection.fold
+    Collection.fold
       (fun acc i ->
         let p = pget conf base i in
-        if Gwdb.Marker.get paths i <> [] then
+        if Collection.Marker.get paths i <> [] then
           if
-            p_first_name base p <> "?"
-            && p_surname base p <> "?"
-            && p_first_name base p <> "x"
+            Driver.p_first_name base p <> "?"
+            && Driver.p_surname base p <> "?"
+            && Driver.p_first_name base p <> "x"
           then
             Array.fold_left
               (fun acc ifam ->
-                let c = Gutil.spouse (get_iper p) (foi base ifam) in
-                if Gwdb.Marker.get paths c = [] then
+                let c =
+                  Gutil.spouse (Driver.get_iper p) (Driver.foi base ifam)
+                in
+                if Collection.Marker.get paths c = [] then
                   let c = pget conf base c in
                   if
-                    p_first_name base c <> "?"
-                    && p_surname base c <> "?"
-                    && p_first_name base p <> "x"
+                    Driver.p_first_name base c <> "?"
+                    && Driver.p_surname base c <> "?"
+                    && Driver.p_first_name base p <> "x"
                     && ((not (is_hide_names conf c))
                        || authorized_age conf base c)
-                    && not (List.mem (get_iper c) acc)
-                  then get_iper c :: acc
+                    && not (List.mem (Driver.get_iper c) acc)
+                  then Driver.get_iper c :: acc
                   else acc
                 else acc)
-              acc (get_family p)
+              acc (Driver.get_family p)
           else acc
         else acc)
-      [] (ipers base)
+      [] (Driver.ipers base)
   in
   sort_and_display conf base paths false list;
   Hutil.trailer conf
@@ -664,7 +707,7 @@ let print_desc_table_header conf =
       [Rem] : Non exporté en clair hors de ce module.                        *)
 let print_person_table conf base p lab =
   let p_auth = Util.authorized_age conf base p in
-  let nb_families = Array.length (get_family p) in
+  let nb_families = Array.length (Driver.get_family p) in
   let birth, birth_place =
     if
       p_auth
@@ -744,8 +787,8 @@ let print_person_table conf base p lab =
         Output.print_sstring conf {| style="border-bottom:none"|};
       Output.print_sstring conf ">";
       if nb_families > 0 then
-        let fam = foi base (get_family p).(0) in
-        let spouse = pget conf base (Gutil.spouse (get_iper p) fam) in
+        let fam = Driver.foi base (Driver.get_family p).(0) in
+        let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) fam) in
         f fam spouse
       else Output.print_sstring conf "&nbsp;";
       Output.print_sstring conf "</td>")
@@ -759,7 +802,7 @@ let print_person_table conf base p lab =
   aux [ "marr_date" ] (fun fam spouse ->
       let mdate =
         if authorized_age conf base p && authorized_age conf base spouse then
-          match Date.od_of_cdate (get_marriage fam) with
+          match Date.od_of_cdate (Driver.get_marriage fam) with
           | Some d -> DateDisplay.string_slash_of_date conf d
           | None -> Adef.safe "&nbsp;"
         else Adef.safe "&nbsp;"
@@ -767,14 +810,15 @@ let print_person_table conf base p lab =
       Output.print_string conf mdate);
   aux [ "marr_place" ] (fun fam spouse ->
       if authorized_age conf base p && authorized_age conf base spouse then
-        get_marriage_place fam |> sou base |> Util.string_of_place conf
+        Driver.get_marriage_place fam
+        |> Driver.sou base |> Util.string_of_place conf
         |> Output.print_string conf;
       Output.print_sstring conf " &nbsp;");
   aux [ "child" ]
     ~attr:[ ("align", "center") ]
     (fun fam _spouse ->
       Output.print_sstring conf
-        (get_children fam |> Array.length |> string_of_int);
+        (Driver.get_children fam |> Array.length |> string_of_int);
       Output.print_sstring conf " &nbsp;");
   if p_getenv conf.env "death" = Some "on" then
     td (fun () -> Output.print_string conf death);
@@ -802,7 +846,7 @@ let print_person_table conf base p lab =
   if p_getenv conf.env "occu" = Some "on" then
     td (fun () ->
         if p_auth then
-          get_occupation p |> sou base |> Util.escape_html
+          Driver.get_occupation p |> Driver.sou base |> Util.escape_html
           |> Output.print_string conf;
         Output.print_sstring conf " &nbsp;");
   Output.print_sstring conf "</tr>";
@@ -837,9 +881,9 @@ let print_person_table conf base p lab =
       in
       let u = p in
       for i = 1 to nb_families - 1 do
-        let cpl = foi base (get_family u).(i) in
-        let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-        let fam = foi base (get_family u).(i) in
+        let cpl = Driver.foi base (Driver.get_family u).(i) in
+        let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) cpl) in
+        let fam = Driver.foi base (Driver.get_family u).(i) in
         Output.print_sstring conf "<tr>\n";
         aux i "marr" (fun () ->
             ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
@@ -849,8 +893,8 @@ let print_person_table conf base p lab =
         aux i "marr_date" (fun () ->
             if authorized_age conf base p && authorized_age conf base spouse
             then
-              let fam = foi base (get_family u).(i) in
-              match Date.od_of_cdate (get_marriage fam) with
+              let fam = Driver.foi base (Driver.get_family u).(i) in
+              match Date.od_of_cdate (Driver.get_marriage fam) with
               | Some d ->
                   DateDisplay.string_slash_of_date conf d
                   |> Output.print_string conf
@@ -859,7 +903,8 @@ let print_person_table conf base p lab =
         aux i "marr_place" (fun () ->
             if authorized_age conf base p && authorized_age conf base spouse
             then
-              get_marriage_place cpl |> sou base |> Util.string_of_place conf
+              Driver.get_marriage_place cpl
+              |> Driver.sou base |> Util.string_of_place conf
               |> Output.print_string conf;
             Output.print_sstring conf " &nbsp;");
         aux
@@ -867,7 +912,7 @@ let print_person_table conf base p lab =
           i "child"
           (fun () ->
             Output.print_sstring conf
-              (get_children fam |> Array.length |> string_of_int);
+              (Driver.get_children fam |> Array.length |> string_of_int);
             Output.print_sstring conf " &nbsp;");
         Output.print_sstring conf "</tr>"
       done
@@ -901,13 +946,13 @@ let build_desc conf base l : ('a * Adef.safe_string) list =
           (* lab correspond au numéro d'Aboville de p.              *)
           Array.fold_left
             (fun accu ifam ->
-              let fam = foi base ifam in
+              let fam = Driver.foi base ifam in
               Array.fold_left
                 (fun accu ip ->
                   let _ = incr cnt in
                   (pget conf base ip, lab ^>^ string_of_int !cnt ^ ".") :: accu)
-                accu (get_children fam))
-            accu (get_family p)
+                accu (Driver.get_children fam))
+            accu (Driver.get_family p)
         in
         loop l nx_accu
   in
@@ -992,18 +1037,18 @@ let make_tree_hts conf base gv p =
         " class=\"" ^<^ (Util.escape_html x :> Adef.safe_string) ^>^ "\""
   in
   let rec nb_column n v u =
-    if v = 0 then n + max 1 (Array.length (get_family u))
-    else if Array.length (get_family u) = 0 then n + 1
+    if v = 0 then n + max 1 (Array.length (Driver.get_family u))
+    else if Array.length (Driver.get_family u) = 0 then n + 1
     else
       Array.fold_left
-        (fun n ifam -> fam_nb_column n v (foi base ifam))
-        n (get_family u)
+        (fun n ifam -> fam_nb_column n v (Driver.foi base ifam))
+        n (Driver.get_family u)
   and fam_nb_column n v des =
-    if Array.length (get_children des) = 0 then n + 1
+    if Array.length (Driver.get_children des) = 0 then n + 1
     else
       Array.fold_left
         (fun n iper -> nb_column n (v - 1) (pget conf base iper))
-        n (get_children des)
+        n (Driver.get_children des)
   in
   let vertical_bar_txt v tdl po =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
@@ -1029,21 +1074,21 @@ let make_tree_hts conf base gv p =
   let spouses_vertical_bar_txt v tdl po =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
     match po with
-    | Some (p, _) when Array.length (get_family p) > 0 ->
+    | Some (p, _) when Array.length (Driver.get_family p) > 0 ->
         fst
         @@ Array.fold_left
              (fun (tdl, first) ifam ->
                let tdl = if first then tdl else (1, LeftA, TDnothing) :: tdl in
-               let des = foi base ifam in
+               let des = Driver.foi base ifam in
                let td =
-                 if Array.length (get_children des) = 0 then
+                 if Array.length (Driver.get_children des) = 0 then
                    (1, LeftA, TDnothing)
                  else
                    let ncol = fam_nb_column 0 (v - 1) des in
                    ((2 * ncol) - 1, CenterA, TDbar None)
                in
                (td :: tdl, false))
-             (tdl, true) (get_family p)
+             (tdl, true) (Driver.get_family p)
     | _ -> (1, LeftA, TDnothing) :: tdl
   in
   let spouses_vertical_bar v gen =
@@ -1053,24 +1098,24 @@ let make_tree_hts conf base gv p =
   let horizontal_bar_txt v tdl po =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
     match po with
-    | Some (p, _) when Array.length (get_family p) > 0 ->
+    | Some (p, _) when Array.length (Driver.get_family p) > 0 ->
         fst
         @@ Array.fold_left
              (fun (tdl, first) ifam ->
                let tdl = if first then tdl else (1, LeftA, TDnothing) :: tdl in
-               let des = foi base ifam in
+               let des = Driver.foi base ifam in
                let tdl =
-                 if Array.length (get_children des) = 0 then
+                 if Array.length (Driver.get_children des) = 0 then
                    (1, LeftA, TDnothing) :: tdl
-                 else if Array.length (get_children des) = 1 then
-                   let u = pget conf base (get_children des).(0) in
+                 else if Array.length (Driver.get_children des) = 1 then
+                   let u = pget conf base (Driver.get_children des).(0) in
                    let ncol = nb_column 0 (v - 1) u in
                    ((2 * ncol) - 1, CenterA, TDbar None) :: tdl
                  else
                    let rec loop tdl i =
-                     if i = Array.length (get_children des) then tdl
+                     if i = Array.length (Driver.get_children des) then tdl
                      else
-                       let iper = (get_children des).(i) in
+                       let iper = (Driver.get_children des).(i) in
                        let u = pget conf base iper in
                        let tdl =
                          if i > 0 then
@@ -1081,8 +1126,8 @@ let make_tree_hts conf base gv p =
                        let ncol = nb_column 0 (v - 1) u in
                        let align =
                          if i = 0 then RightA
-                         else if i = Array.length (get_children des) - 1 then
-                           LeftA
+                         else if i = Array.length (Driver.get_children des) - 1
+                         then LeftA
                          else CenterA
                        in
                        let td = ((2 * ncol) - 1, align, TDhr align) in
@@ -1091,7 +1136,7 @@ let make_tree_hts conf base gv p =
                    loop tdl 0
                in
                (tdl, false))
-             (tdl, true) (get_family p)
+             (tdl, true) (Driver.get_family p)
     | _ -> (1, LeftA, TDnothing) :: tdl
   in
   let horizontal_bars v gen =
@@ -1104,7 +1149,8 @@ let make_tree_hts conf base gv p =
       match po with
       | Some (p, auth) ->
           let ncol =
-            if v > 1 then nb_column 0 (v - 1) p else Array.length (get_family p)
+            if v > 1 then nb_column 0 (v - 1) p
+            else Array.length (Driver.get_family p)
           in
           let txt = reference conf base p (person_title_text conf base p) in
           let txt =
@@ -1121,7 +1167,9 @@ let make_tree_hts conf base gv p =
               ^<^ txt ^>^ {|</td></tr></table>|}
             else txt
           in
-          ((2 * ncol) - 1, CenterA, TDitem (get_iper p, txt, Adef.safe ""))
+          ( (2 * ncol) - 1,
+            CenterA,
+            TDitem (Driver.get_iper p, txt, Adef.safe "") )
       | None -> (1, LeftA, TDnothing)
     in
     td :: tdl
@@ -1129,22 +1177,24 @@ let make_tree_hts conf base gv p =
   let spouses_txt v tdl po =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
     match po with
-    | Some (p, auth) when Array.length (get_family p) > 0 ->
+    | Some (p, auth) when Array.length (Driver.get_family p) > 0 ->
         let rec loop tdl i =
-          if i = Array.length (get_family p) then tdl
+          if i = Array.length (Driver.get_family p) then tdl
           else
-            let ifam = (get_family p).(i) in
+            let ifam = (Driver.get_family p).(i) in
             let tdl =
               if i > 0 then
-                (1, LeftA, TDtext (Gwdb.dummy_iper, Adef.safe "...")) :: tdl
+                (1, LeftA, TDtext (Driver.dummy_iper, Adef.safe "...")) :: tdl
               else tdl
             in
             let td =
-              let fam = foi base ifam in
+              let fam = Driver.foi base ifam in
               let ncol = if v > 1 then fam_nb_column 0 (v - 1) fam else 1 in
-              let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
+              let sp = pget conf base (Gutil.spouse (Driver.get_iper p) fam) in
               let s =
-                let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
+                let sp =
+                  pget conf base (Gutil.spouse (Driver.get_iper p) fam)
+                in
                 let txt =
                   reference conf base sp (person_title_text conf base sp)
                 in
@@ -1168,7 +1218,7 @@ let make_tree_hts conf base gv p =
               in
               ( (2 * ncol) - 1,
                 CenterA,
-                TDitem (get_iper sp, s, Adef.safe "spouse_x") )
+                TDitem (Driver.get_iper sp, s, Adef.safe "spouse_x") )
             in
             loop (td :: tdl) (i + 1)
         in
@@ -1180,24 +1230,24 @@ let make_tree_hts conf base gv p =
       (fun po gen ->
         match po with
         | Some (p, _) ->
-            if Array.length (get_family p) = 0 then None :: gen
+            if Array.length (Driver.get_family p) = 0 then None :: gen
             else
               Array.fold_right
                 (fun ifam gen ->
-                  let des = foi base ifam in
-                  if Array.length (get_children des) = 0 then None :: gen
+                  let des = Driver.foi base ifam in
+                  if Array.length (Driver.get_children des) = 0 then None :: gen
                   else
                     let age_auth =
                       Array.for_all
                         (fun ip -> authorized_age conf base (pget conf base ip))
-                        (get_children des)
+                        (Driver.get_children des)
                     in
                     Array.fold_right
                       (fun iper gen ->
                         let g = (pget conf base iper, age_auth) in
                         Some g :: gen)
-                      (get_children des) gen)
-                (get_family p) gen
+                      (Driver.get_children des) gen)
+                (Driver.get_family p) gen
         | None -> None :: gen)
       gen []
   in
@@ -1259,13 +1309,13 @@ let print_aboville conf base max_level p =
     Output.print_string conf (DateDisplay.short_dates_text conf base p);
     let u = p in
     if lev < max_level then
-      for i = 0 to Array.length (get_family u) - 1 do
-        let cpl = foi base (get_family u).(i) in
-        let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
+      for i = 0 to Array.length (Driver.get_family u) - 1 do
+        let cpl = Driver.foi base (Driver.get_family u).(i) in
+        let spouse = pget conf base (Gutil.spouse (Driver.get_iper p) cpl) in
         Output.print_sstring conf "&amp;";
         if authorized_age conf base p && authorized_age conf base spouse then
-          let fam = foi base (get_family u).(i) in
-          match Date.cdate_to_dmy_opt (get_marriage fam) with
+          let fam = Driver.foi base (Driver.get_family u).(i) in
+          match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
           | Some d ->
               Output.print_sstring conf {|<font size="-2"><em>|};
               Output.print_sstring conf (DateDisplay.prec_year_text conf d);
@@ -1278,17 +1328,18 @@ let print_aboville conf base max_level p =
     Output.print_sstring conf "<br>";
     if lev < max_level then
       let rec loop_fam cnt_chil i =
-        if i = Array.length (get_family u) then ()
+        if i = Array.length (Driver.get_family u) then ()
         else
-          let des = foi base (get_family u).(i) in
+          let des = Driver.foi base (Driver.get_family u).(i) in
           let rec loop_chil cnt_chil j =
-            if j = Array.length (get_children des) then loop_fam cnt_chil (i + 1)
+            if j = Array.length (Driver.get_children des) then
+              loop_fam cnt_chil (i + 1)
             else (
               loop_ind (lev + 1)
                 (if num_aboville then lab ^>^ string_of_int cnt_chil ^ "."
                 else
                   lab ^>^ {|<span class="descends_aboville_pipe">&nbsp;</span>|})
-                (pget conf base (get_children des).(j));
+                (pget conf base (Driver.get_children des).(j));
               loop_chil (cnt_chil + 1) (j + 1))
           in
           loop_chil cnt_chil 0
@@ -1376,14 +1427,14 @@ let reference conf base p s =
   let cgl =
     match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
   in
-  let iper = get_iper p in
+  let iper = Driver.get_iper p in
   if is_hidden p || cgl then s
   else
     Printf.sprintf
       {|<a href="%s%s" id="i%s" class="normal_anchor" title="%s">%s</a>|}
       (commd conf :> string)
       (acces conf base p :> string)
-      (string_of_iper iper)
+      (Driver.string_of_iper iper)
       (Utf8.capitalize_fst (Util.transl conf "open individual page"))
       s
 
@@ -1429,14 +1480,14 @@ let lastx tdal ir =
   x
 
 let _both_parents_in_only_anc p sp only_anc =
-  let ip = get_iper p in
-  let isp = get_iper sp in
+  let ip = Driver.get_iper p in
+  let isp = Driver.get_iper sp in
   List.mem ip only_anc && List.mem isp only_anc
 
 let get_spouse base iper ifam =
-  let f = foi base ifam in
-  if iper = get_father f then poi base (get_mother f)
-  else poi base (get_father f)
+  let f = Driver.foi base ifam in
+  if iper = Driver.get_father f then Driver.poi base (Driver.get_mother f)
+  else Driver.poi base (Driver.get_father f)
 
 (* the heart of Jean Vaucher algo                                    *)
 (* to manage sps=on, one must handle different ir numbering *)
@@ -1463,7 +1514,7 @@ let get_spouse base iper ifam =
 let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let lx = lastx tdal ir in
   let x = if lx + 2 > x0 then lx + 2 else x0 in
-  let ifaml = List.rev (Array.to_list (get_family p)) in
+  let ifaml = List.rev (Array.to_list (Driver.get_family p)) in
   let ifam_nbr = List.length ifaml in
   let descendants = ifaml <> [] in
   (* find right family there *)
@@ -1507,11 +1558,15 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   in
   let pp = Util.find_person_in_env conf base "" in
   let pp_index =
-    match pp with Some p -> "&i=" ^ string_of_iper (get_iper p) | None -> ""
+    match pp with
+    | Some p -> "&i=" ^ Driver.string_of_iper (Driver.get_iper p)
+    | None -> ""
   in
   let pz = Util.find_person_in_env conf base "z" in
   let pz_index =
-    match pz with Some p -> "&iz=" ^ string_of_iper (get_iper p) | None -> ""
+    match pz with
+    | Some p -> "&iz=" ^ Driver.string_of_iper (Driver.get_iper p)
+    | None -> ""
   in
   let txt = get_text conf base p (ifaml <> [] && sps) img cgl in
   let only =
@@ -1520,7 +1575,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
       Printf.sprintf "<a href=\"%sm=D&t=TV%s%s%s%s%s%s\" %s title=\"%s\">│</a>"
         (commd conf :> string)
         vv pz_index pp_index
-        ("&oi=" ^ string_of_iper (get_iper p))
+        ("&oi=" ^ Driver.string_of_iper (Driver.get_iper p))
         (if sps then "" else "&sp=0")
         (if img then "" else "&im=0")
         "class=\"normal_anchor px-3 btn-outline-primary border-0\""
@@ -1534,7 +1589,8 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let lx = if lx > -1 then lx else -1 in
   let tdal =
     tdal_add tdal ir
-      (td_fill lx (x - 1) @ td_cell 1 CenterA (get_iper p) txt (Adef.safe ""))
+      (td_fill lx (x - 1)
+      @ td_cell 1 CenterA (Driver.get_iper p) txt (Adef.safe ""))
       x
   in
   (* row 2: Hbar over sps *)
@@ -1551,7 +1607,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
          else
            tdal_add tdal (ir+1)
              ((td_fill lx (x - 1))
-             @ (td_cell 1 CenterA Gwdb.dummy_iper "|" (Adef.safe "")))
+             @ (td_cell 1 CenterA Geneweb_db.dummy_iper "|" (Adef.safe "")))
              x
        else tdal
      in
@@ -1561,7 +1617,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
 (* ifam_nbr = -1 = 1 family, otherwize rank *)
 and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     sps img marr cgl =
-  let sp = get_spouse base (get_iper p) ifam in
+  let sp = get_spouse base (Driver.get_iper p) ifam in
   let continue = only_anc = [] || List.mem ifam only_anc in
   let lx = lastx tdal ir2 + 2 in
   let x = if lx > x0 then lx else x0 in
@@ -1569,9 +1625,9 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     let xn = x in *)
   let kids =
     Array.fold_left
-      (fun l k -> poi base k :: l)
+      (fun l k -> Driver.poi base k :: l)
       []
-      (get_children (foi base ifam))
+      (Driver.get_children (Driver.foi base ifam))
   in
   let tdal, x, x1, xn =
     if kids <> [] && continue && v > 0 then
@@ -1597,7 +1653,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   let br_sp = if has_image && img then "" else "<br>" in
   let auth = authorized_age conf base p && authorized_age conf base sp in
-  let fam = foi base ifam in
+  let fam = Driver.foi base ifam in
   let marr_d =
     if marr && auth then DateDisplay.short_family_dates_text conf base true fam
     else Adef.safe ""
@@ -1617,14 +1673,15 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let txt = if sps then m_txt ^ txt else if v > 0 then m_txt else "" in
   let txt = if v > 0 && kids <> [] then txt ^ "<br>|" else txt in
   let flag =
-    string_of_ifam ifam
+    Driver.string_of_ifam ifam
     ^ if v > 0 && kids <> [] then "-spouse_no_d" else "-spouse"
   in
   let lx = lastx tdal ir2 in
   let lx = if lx > -1 then lx else -1 in
   let tdal =
     tdal_add tdal ir2
-      (td_fill lx (x - 1) @ td_cell 1 CenterA (get_iper sp) txt (Adef.safe flag))
+      (td_fill lx (x - 1)
+      @ td_cell 1 CenterA (Driver.get_iper sp) txt (Adef.safe flag))
       x
   in
   (* rox 4: Hbar over kids *)
@@ -1771,8 +1828,8 @@ let manage_vbars tdal =
   let vbar_only_in_row row =
     List.fold_left
       (fun res (_, _, td) ->
-        if td <> TDnothing && td <> TDtext (Gwdb.dummy_iper, Adef.safe "|") then
-          false && res
+        if td <> TDnothing && td <> TDtext (Driver.dummy_iper, Adef.safe "|")
+        then false && res
         else true && res)
       true row
   in
@@ -1785,11 +1842,11 @@ let manage_vbars tdal =
 
 (* build a list of families (ifam) between iap and ip *)
 let rec find_ancestors base iap ip list v =
-  match get_parents (poi base ip) with
+  match Driver.get_parents (Driver.poi base ip) with
   | Some ifam ->
-      let cpl = foi base ifam in
-      let ifath = get_father cpl in
-      let imoth = get_mother cpl in
+      let cpl = Driver.foi base ifam in
+      let ifath = Driver.get_father cpl in
+      let imoth = Driver.get_mother cpl in
       let list =
         if v > 1 && not (iap = ifath) then
           find_ancestors base iap ifath list (v - 1)
@@ -1813,10 +1870,11 @@ let make_vaucher_tree_hts conf base gv p =
   let only_anc, op =
     match Util.find_person_in_env_pref conf base "o" with
     | Some p -> (true, p)
-    | None -> (false, Gwdb.empty_person base Gwdb.dummy_iper)
+    | None -> (false, Driver.empty_person base Driver.dummy_iper)
   in
   let only_anc =
-    if only_anc then find_ancestors base (get_iper p) (get_iper op) [] gv
+    if only_anc then
+      find_ancestors base (Driver.get_iper p) (Driver.get_iper op) [] gv
     else []
   in
   let tdal = init_tdal gv in

@@ -3,23 +3,22 @@
 
 open Config
 open Def
-open Gwdb
 
 type info = {
-  ip : iper;
+  ip : Geneweb_db.Driver.iper;
   sp : sex;
-  ip1 : iper;
-  ip2 : iper;
-  b1 : (iper * sex) list;
-  b2 : (iper * sex) list;
+  ip1 : Geneweb_db.Driver.iper;
+  ip2 : Geneweb_db.Driver.iper;
+  b1 : (Geneweb_db.Driver.iper * sex) list;
+  b2 : (Geneweb_db.Driver.iper * sex) list;
   c1 : int;
   c2 : int;
-  pb1 : (iper * sex) list option;
-  pb2 : (iper * sex) list option;
-  nb1 : (iper * sex) list option;
-  nb2 : (iper * sex) list option;
-  sp1 : person option;
-  sp2 : person option;
+  pb1 : (Geneweb_db.Driver.iper * sex) list option;
+  pb2 : (Geneweb_db.Driver.iper * sex) list option;
+  nb1 : (Geneweb_db.Driver.iper * sex) list option;
+  nb2 : (Geneweb_db.Driver.iper * sex) list option;
+  sp1 : Geneweb_db.Driver.person option;
+  sp2 : Geneweb_db.Driver.person option;
   bd : int;
   td_prop : Adef.safe_string;
 }
@@ -27,17 +26,21 @@ type info = {
 val threshold : int ref
 
 val make_dist_tab :
-  config -> base -> iper -> int -> (iper -> int) * (iper -> int)
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper ->
+  int ->
+  (Geneweb_db.Driver.iper -> int) * (Geneweb_db.Driver.iper -> int)
 
 val find_first_branch :
   config ->
-  base ->
-  (iper -> int) * (iper -> int) ->
-  iper ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper -> int) * (Geneweb_db.Driver.iper -> int) ->
+  Geneweb_db.Driver.iper ->
   int ->
-  iper ->
+  Geneweb_db.Driver.iper ->
   sex ->
-  (iper * sex) list option
+  (Geneweb_db.Driver.iper * sex) list option
 
-val print_relation_path : config -> base -> info -> unit
-val print : config -> base -> unit
+val print_relation_path : config -> Geneweb_db.Driver.base -> info -> unit
+val print : config -> Geneweb_db.Driver.base -> unit

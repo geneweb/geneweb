@@ -2,8 +2,9 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 type date_event = DeBirth | DeDeath of death_reason
 
@@ -25,7 +26,7 @@ let print_anniversary_day conf base dead_people liste =
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (p, a, date_event, txt_of) ->
-      let is = index_of_sex (get_sex p) in
+      let is = index_of_sex (Driver.get_sex p) in
       Output.print_sstring conf "<li>";
       Output.print_string conf (txt_of conf base p);
       if not dead_people then print_age conf a_ref a
@@ -63,7 +64,9 @@ let gen_print conf base mois f_scan dead_people =
      while true do
        let p, txt_of = f_scan () in
        if not dead_people then
-         match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+         match
+           (Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+         with
          | Some d, (NotDead | DontKnowIfDead) ->
              if
                d.prec = Sure && d.day <> 0 && d.month <> 0 && d.month = mois
@@ -74,10 +77,10 @@ let gen_print conf base mois f_scan dead_people =
                  tab.(pred j) <- (p, d.year, DeBirth, txt_of) :: tab.(pred j)
          | _ -> ()
        else
-         match get_death p with
+         match Driver.get_death p with
          | NotDead | DontKnowIfDead -> ()
          | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> (
-             (match Date.cdate_to_dmy_opt (get_birth p) with
+             (match Date.cdate_to_dmy_opt (Driver.get_birth p) with
              | None -> ()
              | Some dt ->
                  if
@@ -88,7 +91,7 @@ let gen_print conf base mois f_scan dead_people =
                      let j = dt.day in
                      tab.(pred j) <-
                        (p, dt.year, DeBirth, txt_of) :: tab.(pred j));
-             match get_death p with
+             match Driver.get_death p with
              | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
              | OfCourseDead ->
                  ()
@@ -153,13 +156,15 @@ let print_anniversary_list conf base dead_people dt liste =
       else (
         Output.print_string conf (txt_of conf base p);
         (* TODO year of birth *)
-        match get_death p with NotDead -> print_age conf a_ref a | _ -> ());
+        match Driver.get_death p with
+        | NotDead -> print_age conf a_ref a
+        | _ -> ());
       Output.print_sstring conf "</li>")
     liste;
   Output.print_sstring conf "</ul>"
 
 let f_scan conf base =
-  let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
+  let next = Collection.iterator (Driver.ipers base) in
   fun () ->
     match next () with
     | Some i -> (pget conf base i, referenced_person_title_text)
@@ -271,13 +276,13 @@ let list_aux conf base list cb =
       Output.print_sstring conf "<li>";
       Output.print_string conf
         (referenced_person_title_text conf base
-           (pget conf base (get_father fam)));
+           (pget conf base (Driver.get_father fam)));
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl_nth conf "and" 0);
       Output.print_sstring conf " ";
       Output.print_string conf
         (referenced_person_title_text conf base
-           (pget conf base (get_mother fam)));
+           (pget conf base (Driver.get_mother fam)));
       Output.print_sstring conf ", <em>";
       Output.print_sstring conf (transl conf "in (year)");
       Output.print_sstring conf " ";
@@ -296,14 +301,14 @@ let print_marriage conf base month =
   in
   let tab = Array.make 31 [] in
   Hutil.header conf title;
-  Gwdb.Collection.iter
+  Collection.iter
     (fun ifam ->
-      let fam = foi base ifam in
-      match Date.cdate_to_dmy_opt (get_marriage fam) with
+      let fam = Driver.foi base ifam in
+      match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
       | Some { day = d; month = m; year = y; prec = Sure; _ }
         when d <> 0 && m <> 0 ->
-          let father = pget conf base (get_father fam) in
-          let mother = pget conf base (get_mother fam) in
+          let father = pget conf base (Driver.get_father fam) in
+          let mother = pget conf base (Driver.get_mother fam) in
           if
             m = month
             && authorized_age conf base father
@@ -312,7 +317,7 @@ let print_marriage conf base month =
             && not (is_hidden mother)
           then tab.(pred d) <- (fam, y) :: tab.(pred d)
       | _ -> ())
-    (Gwdb.ifams base);
+    (Geneweb_db.Driver.ifams base);
   Output.print_sstring conf "<ul>";
   for i = 1 to 31 do
     match tab.(i - 1) with
@@ -382,7 +387,9 @@ let gen_print_menu_birth conf base f_scan mode =
   (try
      while true do
        let p, txt_of = f_scan () in
-       match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+       match
+         (Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+       with
        | Some d, (NotDead | DontKnowIfDead) ->
            if d.prec = Sure && d.day <> 0 && d.month <> 0 then
              if match_dates conf base p d conf.today then
@@ -419,7 +426,7 @@ let gen_print_menu_birth conf base f_scan mode =
 
 let print_menu_birth conf base =
   let f_scan =
-    let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
+    let next = Collection.iterator (Geneweb_db.Driver.ipers base) in
     fun () ->
       match next () with
       | Some i -> (pget conf base i, referenced_person_title_text)
@@ -445,10 +452,10 @@ let gen_print_menu_dead conf base f_scan mode =
   (try
      while true do
        let p, txt_of = f_scan () in
-       match get_death p with
+       match Driver.get_death p with
        | NotDead | DontKnowIfDead -> ()
        | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> (
-           (match Date.cdate_to_dmy_opt (get_birth p) with
+           (match Date.cdate_to_dmy_opt (Driver.get_birth p) with
            | None -> ()
            | Some d ->
                if d.prec = Sure && d.day <> 0 && d.month <> 0 then
@@ -458,7 +465,7 @@ let gen_print_menu_dead conf base f_scan mode =
                    list_tom := (p, d.year, DeBirth, txt_of) :: !list_tom
                  else if match_dates conf base p d aft then
                    list_aft := (p, d.year, DeBirth, txt_of) :: !list_aft);
-           match get_death p with
+           match Driver.get_death p with
            | Death (dr, d) -> (
                match Date.cdate_to_dmy_opt d with
                | None -> ()
@@ -500,7 +507,7 @@ let gen_print_menu_dead conf base f_scan mode =
 
 let print_menu_dead conf base =
   let f_scan =
-    let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
+    let next = Collection.iterator (Geneweb_db.Driver.ipers base) in
     fun () ->
       match next () with
       | Some i -> (pget conf base i, referenced_person_title_text)
@@ -511,14 +518,14 @@ let print_menu_dead conf base =
 
 let match_mar_dates conf base cpl d1 d2 =
   if d1.day = d2.day && d1.month = d2.month then
-    authorized_age conf base (pget conf base (get_father cpl))
-    && authorized_age conf base (pget conf base (get_mother cpl))
+    authorized_age conf base (pget conf base (Driver.get_father cpl))
+    && authorized_age conf base (pget conf base (Driver.get_mother cpl))
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
     && not (Date.leap_year d2.year)
   then
-    authorized_age conf base (pget conf base (get_father cpl))
-    && authorized_age conf base (pget conf base (get_mother cpl))
+    authorized_age conf base (pget conf base (Driver.get_father cpl))
+    && authorized_age conf base (pget conf base (Driver.get_mother cpl))
   else false
 
 let print_menu_marriage conf base =
@@ -532,13 +539,13 @@ let print_menu_marriage conf base =
   let list_tom = ref [] in
   let list_aft = ref [] in
   Hutil.header conf title;
-  Gwdb.Collection.iter
+  Collection.iter
     (fun ifam ->
-      let fam = foi base ifam in
+      let fam = Driver.foi base ifam in
       match
-        ( Date.cdate_to_dmy_opt (get_marriage fam),
-          get_divorce fam,
-          get_separation fam )
+        ( Date.cdate_to_dmy_opt (Driver.get_marriage fam),
+          Driver.get_divorce fam,
+          Driver.get_separation fam )
       with
       | Some d, NotDivorced, NotDivorced
         when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
@@ -551,13 +558,13 @@ let print_menu_marriage conf base =
               list_aft := (cpl, d.year) :: !list_aft
           in
           if conf.use_restrict then (
-            let father = pget conf base (get_father fam) in
-            let mother = pget conf base (get_mother fam) in
+            let father = pget conf base (Driver.get_father fam) in
+            let mother = pget conf base (Driver.get_mother fam) in
             if (not (is_hidden father)) && not (is_hidden mother) then
               update_list fam)
           else update_list fam
       | _ -> ())
-    (Gwdb.ifams base);
+    (Driver.ifams base);
   List.iter
     (fun xx -> xx := List.sort (fun (_, y1) (_, y2) -> compare y1 y2) !xx)
     [ list_tod; list_tom; list_aft ];

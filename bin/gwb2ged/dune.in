@@ -16,7 +16,4 @@
     gwb2ged_lib
     gwu_lib
     str
-    unix
-    %%%GWDB_PKG%%%
-  )
-)
+    unix))

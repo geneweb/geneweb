@@ -2,10 +2,11 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open Cousins
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let default_max_cnt = Cousins.default_max_cnt
 
@@ -83,15 +84,16 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
     Output.print_string conf (DateDisplay.short_dates_text conf base sp)
   in
   if p_getenv conf.env "spouse" = Some "on" then
-    match get_family p2 with
+    match Driver.get_family p2 with
     | [||] -> print_nospouse ()
     | u ->
         Array.iteri
           (fun i ifam ->
-            let cpl = foi base ifam in
+            let cpl = Driver.foi base ifam in
             let sp =
-              if get_sex p2 = Female then pget conf base (get_father cpl)
-              else pget conf base (get_mother cpl)
+              if Driver.get_sex p2 = Female then
+                pget conf base (Driver.get_father cpl)
+              else pget conf base (Driver.get_mother cpl)
             in
             print_spouse sp (i = 0))
           u
@@ -105,20 +107,21 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
         let p = pget conf base ip in
         (* détecter l'époux de p, parent des enfants qui seront listés *)
         let get_spouse base iper ifam =
-          let f = foi base ifam in
-          if iper = get_father f then poi base (get_mother f)
-          else poi base (get_father f)
+          let f = Driver.foi base ifam in
+          if iper = Driver.get_father f then
+            Driver.poi base (Driver.get_mother f)
+          else Driver.poi base (Driver.get_father f)
         in
         (* if more than one spouse, this will be split on multiple lines *)
         (* we ignore the case where two spouses, but only one with descendants! *)
         let with_sp =
-          if Array.length (get_family p) = 1 then
-            let sp = get_spouse base ip (get_family p).(0) in
+          if Array.length (Driver.get_family p) = 1 then
+            let sp = get_spouse base ip (Driver.get_family p).(0) in
             " " ^<^ Util.transl conf "with" ^<^ " "
             ^<^ person_title_text conf base sp
           else Adef.safe ""
         in
-        let br = List.rev ((ip, get_sex p) :: rev_br) in
+        let br = List.rev ((ip, Driver.get_sex p) :: rev_br) in
         let is_valid_rel = br_inter_is_empty ini_br br in
         if is_valid_rel && !cnt < max_cnt && has_desc_lev conf base lev p then (
           if lev <= 2 then (
@@ -143,12 +146,13 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
             (fun ifam ->
               let children =
                 List.map
-                  (fun i -> (i, ia_asex, (get_iper p, get_sex p) :: rev_br))
+                  (fun i ->
+                    (i, ia_asex, (Driver.get_iper p, Driver.get_sex p) :: rev_br))
                   (children_of_fam base ifam)
               in
               let sp = get_spouse base ip ifam in
               if
-                Array.length (get_family p) > 1
+                Array.length (Driver.get_family p) > 1
                 && lev >= 2
                 && List.length children > 0
                 && has_desc_lev conf base lev sp
@@ -159,13 +163,13 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                 Output.print_sstring conf (Util.transl conf ":"));
               print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
                 children)
-            (get_family p);
+            (Driver.get_family p);
           if lev <= 2 then Output.print_sstring conf "</li>"))
       children;
     Output.print_sstring conf "</ul>")
 
 let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
-  let sib = siblings conf base (get_iper a) in
+  let sib = siblings conf base (Driver.get_iper a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then (
     if lev1 > 1 then (
       Output.print_sstring conf "<li>";
@@ -197,7 +201,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     let rec loop sosa some =
       if !cnt < max_cnt && Sosa.gt last_sosa sosa then
         let some =
-          match Util.old_branch_of_sosa conf base (get_iper p) sosa with
+          match Util.old_branch_of_sosa conf base (Driver.get_iper p) sosa with
           | Some ((ia, _) :: _ as br) ->
               print_cousins_side_of conf base max_cnt (pget conf base ia) p br
                 lev1 lev2
@@ -276,14 +280,15 @@ let sosa_of_persons conf base =
     | ip :: list ->
         (* do no works if sex = Neuter *)
         loop
-          (if get_sex (pget conf base ip) = Male then 2 * n else (2 * n) + 1)
+          (if Driver.get_sex (pget conf base ip) = Male then 2 * n
+          else (2 * n) + 1)
           list
   in
   loop 1
 
 let print_anniv conf base p dead_people level =
   let module S = Map.Make (struct
-    type t = iper
+    type t = Driver.iper
 
     let compare = compare
   end) in
@@ -299,12 +304,12 @@ let print_anniv conf base p dead_people level =
       let set = S.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
-        let u = get_family (pget conf base ip) in
+        let u = Driver.get_family (pget conf base ip) in
         let down_br = ip :: down_br in
         let rec loop set i =
           if i = Array.length u then set
           else
-            let chil = get_children (foi base u.(i)) in
+            let chil = Driver.get_children (Driver.foi base u.(i)) in
             let set =
               let rec loop set i =
                 if i = Array.length chil then set
@@ -320,11 +325,11 @@ let print_anniv conf base p dead_people level =
   in
   let set =
     let module P = Pqueue.Make (struct
-      type t = iper * int * int
+      type t = Driver.iper * int * int
 
       let leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2
     end) in
-    let a = P.add (get_iper p, 0, 1) P.empty in
+    let a = P.add (Driver.get_iper p, 0, 1) P.empty in
     let rec loop set a =
       if P.is_empty a then set
       else
@@ -333,13 +338,13 @@ let print_anniv conf base p dead_people level =
         if n >= level then set
         else
           let a =
-            match get_parents (pget conf base ip) with
+            match Driver.get_parents (pget conf base ip) with
             | Some ifam ->
-                let cpl = foi base ifam in
+                let cpl = Driver.foi base ifam in
                 let n = n + 1 in
                 let up_sosa = 2 * up_sosa in
-                let a = P.add (get_father cpl, n, up_sosa) a in
-                P.add (get_mother cpl, n, up_sosa + 1) a
+                let a = P.add (Driver.get_father cpl, n, up_sosa) a in
+                P.add (Driver.get_mother cpl, n, up_sosa + 1) a
             | None -> a
           in
           loop set a
@@ -349,14 +354,14 @@ let print_anniv conf base p dead_people level =
   let set =
     S.fold
       (fun ip (up_sosa, down_br) set ->
-        let u = get_family (pget conf base ip) in
+        let u = Driver.get_family (pget conf base ip) in
         let set = S.add ip (up_sosa, down_br, None) set in
         if Array.length u = 0 then set
         else
           let rec loop set i =
             if i = Array.length u then set
             else
-              let cpl = foi base u.(i) in
+              let cpl = Driver.foi base u.(i) in
               let c = Gutil.spouse ip cpl in
               loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1)
           in
@@ -389,7 +394,8 @@ let print_anniv conf base p dead_people level =
   in
   let mode () =
     Util.hidden_input conf "m" (Adef.encoded "C");
-    Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Adef.encoded);
+    Util.hidden_input conf "i"
+      (Driver.get_iper p |> Driver.string_of_iper |> Adef.encoded);
     Util.hidden_input conf "t"
       (Adef.encoded (if dead_people then "AD" else "AN"))
   in

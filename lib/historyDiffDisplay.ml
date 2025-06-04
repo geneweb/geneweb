@@ -2,10 +2,11 @@
 
 open Config
 open Def
-open Gwdb
-module Ast = Geneweb_templ.Ast
 open Util
 open HistoryDiff
+module Ast = Geneweb_templ.Ast
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let escape_html s = (Util.escape_html s :> Adef.safe_string)
 
@@ -99,9 +100,9 @@ let print_clean_ok conf =
 (**/**) (* Template *)
 
 let person_of_gen_p_key base gen_p =
-  match person_of_key base gen_p.first_name gen_p.surname gen_p.occ with
-  | Some ip -> poi base ip
-  | None -> Gwdb.empty_person base Gwdb.dummy_iper
+  match Driver.person_of_key base gen_p.first_name gen_p.surname gen_p.occ with
+  | Some ip -> Driver.poi base ip
+  | None -> Driver.empty_person base Driver.dummy_iper
 
 (* N'est pas forcément très précis. En effet, on enregistre que     *)
 (* les ipers. Or lors d'un nettoyage de la base, il se peut que     *)
@@ -179,7 +180,7 @@ let string_of_related conf base ip related : Adef.safe_string =
       let p = person_of_iper conf base ip in
       if (p :> string) = "" then acc
       else
-        let c = try pget conf base ic with _ -> Gwdb.empty_person base ic in
+        let c = try pget conf base ic with _ -> Driver.empty_person base ic in
         let rel =
           let rec loop rp =
             match rp with
@@ -190,7 +191,7 @@ let string_of_related conf base ip related : Adef.safe_string =
                     Util.rchild_type_text conf r.r_type 2
                 | _ -> loop l)
           in
-          loop (get_rparents c)
+          loop (Driver.get_rparents c)
         in
         (Utf8.capitalize_fst (rel : Adef.safe_string :> string)
         ^<^ transl conf ":" ^<^ p)
@@ -268,7 +269,11 @@ let string_of_event_witness conf base witnesses =
   Array.fold_right
     (fun (ip, wk) accu ->
       let witn = person_of_iper conf base ip in
-      let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
+      let kind =
+        Util.string_of_witness_kind conf
+          (Driver.get_sex @@ Driver.poi base ip)
+          wk
+      in
       if (witn :> string) = "" then (kind ^^^ transl conf ":" ^<^ witn) :: accu
       else accu)
     witnesses []
@@ -466,17 +471,17 @@ let diff_string (before : Adef.safe_string) (after : Adef.safe_string) :
 
 type 'a env =
   | Vfam of
-      (iper, ifam, string) gen_family option
-      * (iper, ifam, string) gen_family option
+      (Driver.iper, Driver.ifam, string) gen_family option
+      * (Driver.iper, Driver.ifam, string) gen_family option
       * bool
-  | Vchild of iper array option * iper array option
+  | Vchild of Driver.iper array option * Driver.iper array option
   | Vfevent of
-      (iper, string) gen_fam_event option
-      * (iper, string) gen_fam_event option
+      (Driver.iper, string) gen_fam_event option
+      * (Driver.iper, string) gen_fam_event option
       * bool
   | Vpevent of
-      (iper, string) gen_pers_event option
-      * (iper, string) gen_pers_event option
+      (Driver.iper, string) gen_pers_event option
+      * (Driver.iper, string) gen_pers_event option
   | Vint of int
   | Vstring of string
   | Vother of 'a
@@ -782,10 +787,12 @@ let print_foreach conf base print_ast _eval_expr =
       match (bef_f, aft_f) with
       | [], [] -> ()
       | [], gen_f :: l ->
-          let fam = foi base gen_f.fam_index in
+          let fam = Driver.foi base gen_f.fam_index in
           let isp = Gutil.spouse aft.gen_p.key_index fam in
           let sp = person_of_iper conf base isp in
-          let m_auth = authorized_age conf base (poi base isp) && p_auth in
+          let m_auth =
+            authorized_age conf base (Driver.poi base isp) && p_auth
+          in
           let vfam = Vfam (None, Some gen_f, m_auth) in
           let vchild, c =
             match (bef_c, aft_c) with
@@ -802,10 +809,12 @@ let print_foreach conf base print_ast _eval_expr =
           List.iter (print_ast env xx) al;
           loop [] bef_c l c
       | gen_f :: l, [] ->
-          let fam = foi base gen_f.fam_index in
+          let fam = Driver.foi base gen_f.fam_index in
           let isp = Gutil.spouse aft.gen_p.key_index fam in
           let sp = person_of_iper conf base isp in
-          let m_auth = authorized_age conf base (poi base isp) && p_auth in
+          let m_auth =
+            authorized_age conf base (Driver.poi base isp) && p_auth
+          in
           let vfam = Vfam (Some gen_f, None, m_auth) in
           let vchild, c =
             match (bef_c, aft_c) with
@@ -822,12 +831,14 @@ let print_foreach conf base print_ast _eval_expr =
           List.iter (print_ast env xx) al;
           loop l c [] aft_c
       | gen_f1 :: l1, gen_f2 :: l2 ->
-          let fam = foi base gen_f2.fam_index in
+          let fam = Driver.foi base gen_f2.fam_index in
           let isp1 = Gutil.spouse bef.gen_p.key_index fam in
           let isp2 = Gutil.spouse aft.gen_p.key_index fam in
           let sp1 = person_of_iper conf base isp1 in
           let sp2 = person_of_iper conf base isp2 in
-          let m_auth = authorized_age conf base (poi base isp2) && p_auth in
+          let m_auth =
+            authorized_age conf base (Driver.poi base isp2) && p_auth
+          in
           let vfam = Vfam (Some gen_f1, Some gen_f2, m_auth) in
           let vchild, c1, c2 =
             match (bef_c, aft_c) with

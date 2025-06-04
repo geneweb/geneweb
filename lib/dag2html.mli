@@ -1,5 +1,4 @@
 (* $Id: dag2html.mli,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
-open Gwdb
 
 (* TODOCP *)
 type 'a dag = { mutable dag : 'a node array }
@@ -18,8 +17,8 @@ and ghost_id
 type align = LeftA | CenterA | RightA
 
 type 'a table_data =
-  | TDitem of iper * 'a * Adef.safe_string
-  | TDtext of iper * Adef.safe_string
+  | TDitem of Geneweb_db.Driver.iper * 'a * Adef.safe_string
+  | TDtext of Geneweb_db.Driver.iper * Adef.safe_string
   | TDhr of align
   | TDbar of Adef.escaped_string option
   | TDnothing
@@ -28,7 +27,7 @@ type 'a html_table_line = (int * align * 'a table_data) array
 type 'a html_table = 'a html_table_line array
 
 val html_table_struct :
-  ('a node -> iper) ->
+  ('a node -> Geneweb_db.Driver.iper) ->
   ('a node -> 'b) ->
   ('a node -> Adef.escaped_string) ->
   ('a node -> bool) ->

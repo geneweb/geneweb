@@ -1,5 +1,5 @@
 open Def
-module Gwdb_driver = Gwdb_legacy.Gwdb_driver
+module Driver = Geneweb_db.Driver
 
 module type ConverterDriver = sig
   type t
@@ -104,8 +104,8 @@ module Make (D : ConverterDriver) = struct
          x
 
   let conv_event_witness_kind x = str @@ Def_show.show_witness_kind x
-  let handler_of_iper i = str @@ Gwdb_driver.string_of_iper i
-  let handler_of_ifam i = str @@ Gwdb_driver.string_of_ifam i
+  let handler_of_iper i = str @@ Driver.string_of_iper i
+  let handler_of_ifam i = str @@ Driver.string_of_ifam i
 
   let conv_event_witness (i, kind) =
     obj
@@ -194,10 +194,10 @@ module Make (D : ConverterDriver) = struct
     | OfCourseDead -> str "OfCourseDead"
 
   let conv_person base p =
-    let pp = Gwdb.gen_person_of_person p in
-    let pp = Futil.map_person_ps (fun i -> i) (Gwdb.sou base) pp in
-    let pa = Gwdb.gen_ascend_of_person p in
-    let pu = Gwdb.gen_union_of_person p in
+    let pp = Driver.gen_person_of_person p in
+    let pp = Futil.map_person_ps (fun i -> i) (Driver.sou base) pp in
+    let pa = Driver.gen_ascend_of_person p in
+    let pu = Driver.gen_union_of_person p in
     obj
       [|
         ( "access",
@@ -228,10 +228,12 @@ module Make (D : ConverterDriver) = struct
       |]
 
   let conv_family base f =
-    let ff = Gwdb.gen_family_of_family f in
-    let ff = Futil.map_family_ps (fun i -> i) (fun i -> i) (Gwdb.sou base) ff in
-    let fc = Gwdb.gen_couple_of_family f in
-    let fd = Gwdb.gen_descend_of_family f in
+    let ff = Driver.gen_family_of_family f in
+    let ff =
+      Futil.map_family_ps (fun i -> i) (fun i -> i) (Driver.sou base) ff
+    in
+    let fc = Driver.gen_couple_of_family f in
+    let fd = Driver.gen_descend_of_family f in
     obj
       [|
         ("fevents", list (List.map conv_fevent ff.fevents));

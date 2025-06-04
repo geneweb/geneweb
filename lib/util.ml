@@ -2,9 +2,10 @@
 
 open Config
 open Def
-open Gwdb
 module Logs = Geneweb_logs.Logs
 module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
@@ -211,7 +212,7 @@ let escape_attribute =
           loop (istr + 1) (ibuf + 1))
 
 let is_hide_names conf p =
-  if conf.hide_names || get_access p = Private then true else false
+  if conf.hide_names || Driver.get_access p = Private then true else false
 
 let search_in_path p s =
   let rec loop = function
@@ -748,7 +749,7 @@ let p_getint env label =
   with Failure _ -> None
 
 let nobtit conf base p =
-  Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
+  Driver.nobtitles base conf.allowed_titles conf.denied_titles p
 
 let strictly_after_private_years a lim =
   if a.year > lim then true
@@ -778,37 +779,38 @@ let is_old_person conf p =
 
 let authorized_age conf base p = GWPARAM.p_auth conf base p
 
-let is_restricted (conf : config) base (ip : iper) =
+let is_restricted (conf : config) base (ip : Driver.iper) =
   let fct p =
-    (not (is_quest_string (get_surname p)))
-    && (not (is_quest_string (get_first_name p)))
+    (not (Driver.is_quest_string (Driver.get_surname p)))
+    && (not (Driver.is_quest_string (Driver.get_first_name p)))
     && not (authorized_age conf base p)
   in
-  if conf.use_restrict then base_visible_get base fct ip else false
+  if conf.use_restrict then Driver.base_visible_get base fct ip else false
 
 let pget_opt conf base ip =
-  if is_restricted conf base ip then None else Some (poi base ip)
+  if is_restricted conf base ip then None else Some (Driver.poi base ip)
 
 let pget conf base ip =
-  Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
+  Option.value ~default:(Driver.empty_person base ip) (pget_opt conf base ip)
 
-let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
+let string_gen_person base p =
+  Futil.map_person_ps (fun p -> p) (Driver.sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (fun f -> f) (sou base) fam
+  Futil.map_family_ps (fun p -> p) (fun f -> f) (Driver.sou base) fam
 
-let is_hidden p = is_empty_string (get_surname p)
+let is_hidden p = Driver.is_empty_string (Driver.get_surname p)
 
 let is_empty_name p =
-  Gwdb.is_quest_string (Gwdb.get_surname p)
-  && Gwdb.is_quest_string (Gwdb.get_first_name p)
+  Driver.is_quest_string (Driver.get_surname p)
+  && Driver.is_quest_string (Driver.get_first_name p)
 
 let is_public conf base p =
-  get_access p = Public
+  Driver.get_access p = Public
   || conf.public_if_titles
-     && get_access p = IfTitles
+     && Driver.get_access p = IfTitles
      && nobtit conf base p <> []
-  || is_old_person conf (gen_person_of_person p)
+  || is_old_person conf (Driver.gen_person_of_person p)
 
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
@@ -839,7 +841,7 @@ let accessible_by_key conf base p fn sn =
 (* ********************************************************************** *)
 
 let access_status p =
-  match get_access p with
+  match Driver.get_access p with
   | Private -> "Private"
   | SemiPublic -> "SemiPublic"
   | Public -> "Public"
@@ -855,8 +857,8 @@ let access_status p =
       [Retour] : string
       [Rem] : Exporté en clair hors de ce module.                           *)
 let acces_n conf base n x : Adef.escaped_string =
-  let first_name = p_first_name base x in
-  let surname = p_surname base x in
+  let first_name = Driver.p_first_name base x in
+  let surname = Driver.p_surname base x in
   if surname = "" then Adef.escaped ""
   else if accessible_by_key conf base x first_name surname then
     "p" ^<^ n ^^^ "="
@@ -864,14 +866,15 @@ let acces_n conf base n x : Adef.escaped_string =
     ^^^ "&n" ^<^ n ^^^ "="
     ^<^ (Mutil.encode (Name.lower surname) :> Adef.escaped_string)
     ^^^
-    if get_occ x <> 0 then "&oc" ^<^ n ^>^ "=" ^ string_of_int (get_occ x)
+    if Driver.get_occ x <> 0 then
+      "&oc" ^<^ n ^>^ "=" ^ string_of_int (Driver.get_occ x)
     else Adef.escaped ""
   else
     "i" ^<^ n ^^^ "="
-    ^<^ string_of_iper (get_iper x)
+    ^<^ Driver.string_of_iper (Driver.get_iper x)
     ^<^
-    if conf.wizard && get_occ x <> 0 then
-      "&oc" ^<^ n ^>^ "=" ^ string_of_int (get_occ x)
+    if conf.wizard && Driver.get_occ x <> 0 then
+      "&oc" ^<^ n ^>^ "=" ^ string_of_int (Driver.get_occ x)
     else Adef.escaped ""
 
 (* ********************************************************************** *)
@@ -899,19 +902,22 @@ let private_txt conf k =
   | _ -> transl conf "hidden person"
 
 let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
-    ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
+    ?(p_first_name = Driver.p_first_name) ?(p_surname = Driver.p_surname) conf
+    base p =
   let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
   else if GWPARAM.p_auth_sp conf base p then
     let beg =
-      match (sou base (get_public_name p), get_qualifiers p) with
+      match
+        (Driver.sou base (Driver.get_public_name p), Driver.get_qualifiers p)
+      with
       | "", nn :: _ ->
           esc (p_first_name base p)
           ^^^ (if html then " <em>" else " ")
-          ^<^ esc (sou base nn)
+          ^<^ esc (Driver.sou base nn)
           ^>^ if html then "</em>" else ""
       | "", [] -> esc (p_first_name base p)
-      | n, nn :: _ -> esc n ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
+      | n, nn :: _ -> esc n ^^^ " <em>" ^<^ esc (Driver.sou base nn) ^>^ "</em>"
       | n, [] -> esc n
     in
     if sn then
@@ -927,30 +933,33 @@ let main_title conf base p =
 
 let titled_person_text conf base p t : Adef.safe_string =
   if List.assoc_opt "print_advanced_title" conf.base_env = Some "yes" then
-    let estate = sou base t.t_place in
-    let surname = p_surname base p in
+    let estate = Driver.sou base t.t_place in
+    let surname = Driver.p_surname base p in
     (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
     (*   - le nom du titre                                               *)
     (*   - le nom du titre et le premier sobriquet                       *)
     (*   - le nom de la personne (donné par son nom de domaine) en       *)
     (*     fonction du nom public et sobriquet                           *)
     if Name.strip_lower estate = Name.strip_lower surname then
-      match (t.t_name, get_qualifiers p) with
-      | Tname n, [] -> (esc (sou base n) :> Adef.safe_string)
+      match (t.t_name, Driver.get_qualifiers p) with
+      | Tname n, [] -> (esc (Driver.sou base n) :> Adef.safe_string)
       | Tname n, nn :: _ ->
-          (esc (sou base n) :> Adef.safe_string)
+          (esc (Driver.sou base n) :> Adef.safe_string)
           ^^^ " <em>"
-          ^<^ (esc (sou base nn) :> Adef.safe_string)
+          ^<^ (esc (Driver.sou base nn) :> Adef.safe_string)
           ^>^ "</em>"
       | _ -> gen_person_text ~sn:false conf base p
     else
       let elen = String.length estate in
       let slen = String.length surname in
       if elen < slen && String.sub surname (slen - elen) elen = estate then
-        match (t.t_name, get_qualifiers p) with
-        | Tname n, [] -> esc (sou base n)
+        match (t.t_name, Driver.get_qualifiers p) with
+        | Tname n, [] -> esc (Driver.sou base n)
         | Tname n, nn :: _ ->
-            esc (sou base n) ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
+            esc (Driver.sou base n)
+            ^^^ " <em>"
+            ^<^ esc (Driver.sou base nn)
+            ^>^ "</em>"
         | _ ->
             gen_person_text
               ~p_surname:(fun _ _ ->
@@ -959,10 +968,10 @@ let titled_person_text conf base p t : Adef.safe_string =
       else
         match t.t_name with
         | Tname s -> (
-            let s = esc (sou base s) in
-            match get_qualifiers p with
+            let s = esc (Driver.sou base s) in
+            match Driver.get_qualifiers p with
             | [] -> s
-            | nn :: _ -> s ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>")
+            | nn :: _ -> s ^^^ " <em>" ^<^ esc (Driver.sou base nn) ^>^ "</em>")
         | _ -> gen_person_text conf base p
   else gen_person_text conf base p
 
@@ -979,8 +988,8 @@ let titled_person_text conf base p t : Adef.safe_string =
     [Retour] : string
     [Rem] : Non exporté en clair hors de ce module.                        *)
 let one_title_text base t : Adef.safe_string =
-  let place = sou base t.t_place in
-  let s = sou base t.t_ident in
+  let place = Driver.sou base t.t_place in
+  let s = Driver.sou base t.t_ident in
   let s = if place = "" then s else s ^ " " ^ place in
   " <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
@@ -999,7 +1008,7 @@ let mod_ind_link conf p (s : Adef.safe_string) =
   if is_hidden p || cgl || not conf.wizard then s
   else
     let s = (s :> string) in
-    let href = "m=MOD_IND&i=" ^ string_of_iper (get_iper p) in
+    let href = "m=MOD_IND&i=" ^ Driver.string_of_iper (Driver.get_iper p) in
     let txt =
       if s = "" then {|<i class="fa fa-wrench fa-xs ml-1" alt=" (edit)"></i>|}
       else s
@@ -1011,14 +1020,14 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   let cgl =
     match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
   in
-  let iper = get_iper p in
+  let iper = Driver.get_iper p in
   (* let is_hidden = is_empty_string (get_surname p) !! *)
   if (not (GWPARAM.p_auth conf base p)) || cgl then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
     ^^^ (if with_id then "\" id=\"i" else "")
-    ^<^ (if with_id then string_of_iper iper else "")
+    ^<^ (if with_id then Driver.string_of_iper iper else "")
     ^<^ "\">" ^<^ s ^>^ "</a>"
 
 let reference = reference_flags true
@@ -1045,10 +1054,12 @@ let reference_noid = reference_flags false
 let update_family_loop conf base p s =
   if is_hidden p then s
   else
-    let iper = get_iper p in
-    let list = get_family p in
+    let iper = Driver.get_iper p in
+    let list = Driver.get_family p in
     let list =
-      Array.map (fun ifam -> (ifam, get_children (foi base ifam))) list
+      Array.map
+        (fun ifam -> (ifam, Driver.get_children (Driver.foi base ifam)))
+        list
     in
     let res =
       Array.fold_left
@@ -1059,14 +1070,14 @@ let update_family_loop conf base p s =
     if conf.wizard then
       match res with
       | [ res ] ->
-          let iper = string_of_iper iper in
-          let ifam = string_of_ifam res in
+          let iper = Driver.string_of_iper iper in
+          let ifam = Driver.string_of_ifam res in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
           ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^ "\">" ^<^ s
           ^>^ "</a>"
       | _ ->
-          let iper = string_of_iper iper in
+          let iper = Driver.string_of_iper iper in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
           ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
@@ -1095,13 +1106,16 @@ let referenced_person_text_without_surname conf base p =
 let person_text_without_title conf base p =
   match main_title conf base p with
   | Some t -> (
-      if eq_istr t.t_place (get_surname p) then
+      if Driver.eq_istr t.t_place (Driver.get_surname p) then
         gen_person_text ~sn:false conf base p
       else
-        match (t.t_name, get_qualifiers p) with
+        match (t.t_name, Driver.get_qualifiers p) with
         | Tname s, nn :: _ ->
-            esc (sou base s) ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
-        | Tname s, _ -> esc (sou base s)
+            esc (Driver.sou base s)
+            ^^^ " <em>"
+            ^<^ esc (Driver.sou base nn)
+            ^>^ "</em>"
+        | Tname s, _ -> esc (Driver.sou base s)
         | _ -> gen_person_text conf base p)
   | None -> gen_person_text conf base p
 
@@ -1113,17 +1127,19 @@ let person_title conf base p =
   else Adef.safe ""
 
 let make_key base p =
-  (Name.lower (sou base p.first_name), Name.lower (sou base p.surname), p.occ)
+  ( Name.lower (Driver.sou base p.first_name),
+    Name.lower (Driver.sou base p.surname),
+    p.occ )
 
 let name_key base s =
-  let part = Mutil.get_particle (Gwdb.base_particles base) s in
+  let part = Mutil.get_particle (Driver.base_particles base) s in
   if part = "" then s
   else
     let i = String.length part in
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 
 let surname_particle base s =
-  let part = Mutil.get_particle (Gwdb.base_particles base) s in
+  let part = Mutil.get_particle (Driver.base_particles base) s in
   let len = String.length part in
   if len = 0 then ""
   else if part.[len - 1] = ' ' then " (" ^ String.sub part 0 (len - 1) ^ ")"
@@ -1131,7 +1147,7 @@ let surname_particle base s =
 
 let surname_without_particle base s =
   let part_len =
-    String.length (Mutil.get_particle (Gwdb.base_particles base) s)
+    String.length (Mutil.get_particle (Geneweb_db.Driver.base_particles base) s)
   in
   String.sub s part_len (String.length s - part_len)
 
@@ -1217,7 +1233,7 @@ let string_of_pevent_name conf base epers_name =
   | Epers_ScellentSpouseLDS -> Adef.safe @@ transl conf "scellentSpouseLDS"
   | Epers_VenteBien -> Adef.safe @@ transl conf "venteBien"
   | Epers_Will -> Adef.safe @@ transl conf "will"
-  | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | Epers_Name n -> (escape_html (Driver.sou base n) :> Adef.safe_string)
 
 let string_of_fevent_name conf base = function
   | Efam_Marriage -> Adef.safe @@ transl conf "marriage event"
@@ -1232,7 +1248,7 @@ let string_of_fevent_name conf base = function
   | Efam_MarriageLicense -> Adef.safe @@ transl conf "marriage licence"
   | Efam_PACS -> Adef.safe @@ transl conf "PACS"
   | Efam_Residence -> Adef.safe @@ transl conf "residence"
-  | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | Efam_Name n -> (escape_html (Driver.sou base n) :> Adef.safe_string)
 
 let string_of_witness_kind conf sex witness_kind =
   let n = if witness_kind = Witness then 0 else index_of_sex sex in
@@ -1799,7 +1815,7 @@ let print_alphab_list conf crit print_elem liste =
 
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
-  match get_relation fam with
+  match Driver.get_relation fam with
   | NotMarried | NoSexesCheckNotMarried ->
       ftransl_nth conf "relationship%t to" is
   | MarriageContract -> ftransl_nth conf "marriage contract%t with" is
@@ -1814,7 +1830,7 @@ let relation_txt conf sex fam =
 let relation_date conf fam : Adef.safe_string =
   Adef.safe
   @@
-  match Date.cdate_to_dmy_opt (get_marriage fam) with
+  match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
   | None -> ""
   | Some dmy -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
 
@@ -1822,22 +1838,22 @@ let child_of_parent conf base p =
   (* Si le père a un nom de famille différent de la personne *)
   (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
   let print_father fath =
-    if not (eq_istr (get_surname p) (get_surname fath)) then
-      gen_person_text conf base fath
+    if not (Driver.eq_istr (Driver.get_surname p) (Driver.get_surname fath))
+    then gen_person_text conf base fath
     else gen_person_text ~sn:false conf base fath
   in
-  let a = pget conf base (get_iper p) in
+  let a = pget conf base (Driver.get_iper p) in
   let ifam =
-    match get_parents a with
+    match Driver.get_parents a with
     | Some ifam ->
-        let cpl = foi base ifam in
+        let cpl = Driver.foi base ifam in
         let fath =
-          let fath = pget conf base (get_father cpl) in
-          if p_first_name base fath = "?" then None else Some fath
+          let fath = pget conf base (Driver.get_father cpl) in
+          if Driver.p_first_name base fath = "?" then None else Some fath
         in
         let moth =
-          let moth = pget conf base (get_mother cpl) in
-          if p_first_name base moth = "?" then None else Some moth
+          let moth = pget conf base (Driver.get_mother cpl) in
+          if Driver.p_first_name base moth = "?" then None else Some moth
         in
         Some (fath, moth)
     | None -> None
@@ -1854,7 +1870,7 @@ let child_of_parent conf base p =
             ^<^ gen_person_text conf base moth
         | _ -> Adef.safe ""
       in
-      let is = index_of_sex (get_sex p) in
+      let is = index_of_sex (Driver.get_sex p) in
       let s = (s :> string) in
       transl_a_of_gr_eq_gen_lev conf
         (transl_nth conf "son/daughter/child" is)
@@ -1864,9 +1880,9 @@ let child_of_parent conf base p =
 let husband_wife conf base p all =
   let multiple =
     let rec loop i kind =
-      if i < Array.length (get_family p) then
-        let fam = foi base (get_family p).(i) in
-        let cur_type = get_relation fam in
+      if i < Array.length (Driver.get_family p) then
+        let fam = Driver.foi base (Driver.get_family p).(i) in
+        let cur_type = Driver.get_relation fam in
         if i = 0 then loop (i + 1) cur_type
         else if cur_type = kind then loop (i + 1) kind
         else -1
@@ -1875,20 +1891,20 @@ let husband_wife conf base p all =
     loop 0 NoMention
   in
   let relation =
-    if Array.length (get_family p) > 0 then
+    if Array.length (Driver.get_family p) > 0 then
       if multiple >= 0 then
-        let fam = foi base (get_family p).(0) in
-        Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
+        let fam = Driver.foi base (Driver.get_family p).(0) in
+        Printf.sprintf (relation_txt conf (Driver.get_sex p) fam) (fun () -> "")
         |> translate_eval |> Adef.safe
       else transl conf "marriages with" |> Adef.safe
     else Adef.safe ""
   in
-  let nb_fam = Array.length (get_family p) in
+  let nb_fam = Array.length (Driver.get_family p) in
   let res =
     let rec loop i res =
       if i < nb_fam then
-        let fam = foi base (get_family p).(i) in
-        let conjoint = Gutil.spouse (get_iper p) fam in
+        let fam = Driver.foi base (Driver.get_family p).(i) in
+        let conjoint = Gutil.spouse (Driver.get_iper p) fam in
         let conjoint = pget conf base conjoint in
         if not @@ is_empty_name conjoint then
           let res =
@@ -1916,18 +1932,21 @@ let husband_wife conf base p all =
   Adef.safe res
 
 let first_child conf base p =
-  let is = index_of_sex (get_sex p) in
+  let is = index_of_sex (Driver.get_sex p) in
   let rec loop i =
-    if i < Array.length (get_family p) then
-      let fam = foi base (get_family p).(i) in
-      let ct = get_children fam in
+    if i < Array.length (Driver.get_family p) then
+      let fam = Driver.foi base (Driver.get_family p).(i) in
+      let ct = Driver.get_children fam in
       if Array.length ct > 0 then
         let enfant = pget conf base ct.(0) in
         let child =
           if is_hide_names conf enfant && not (authorized_age conf base enfant)
           then Adef.safe "xx"
-          else if not (eq_istr (get_surname p) (get_surname enfant)) then
-            gen_person_text conf base enfant
+          else if
+            not
+              (Driver.eq_istr (Driver.get_surname p)
+                 (Driver.get_surname enfant))
+          then gen_person_text conf base enfant
           else gen_person_text ~sn:false conf base enfant
         in
         let child = (child :> string) in
@@ -1939,22 +1958,22 @@ let first_child conf base p =
   loop 0
 
 let specify_homonymous conf base p specify_public_name =
-  match (get_public_name p, get_qualifiers p) with
-  | n, nn :: _ when sou base n <> "" && specify_public_name ->
+  match (Driver.get_public_name p, Driver.get_qualifiers p) with
+  | n, nn :: _ when Driver.sou base n <> "" && specify_public_name ->
       Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ sou base n);
+      Output.print_string conf (esc @@ Driver.sou base n);
       Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ sou base nn);
+      Output.print_string conf (esc @@ Driver.sou base nn);
       Output.print_sstring conf "</em>"
   | _, nn :: _ when specify_public_name ->
       Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ p_first_name base p);
+      Output.print_string conf (esc @@ Driver.p_first_name base p);
       Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ sou base nn);
+      Output.print_string conf (esc @@ Driver.sou base nn);
       Output.print_sstring conf "</em>"
-  | n, [] when sou base n <> "" && specify_public_name ->
+  | n, [] when Driver.sou base n <> "" && specify_public_name ->
       Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ sou base n)
+      Output.print_string conf (esc @@ Driver.sou base n)
   | _, _ ->
       (* Le nom public et le qualificatif ne permettent pas de distinguer *)
       (* la personne, donc on affiche les informations sur les parents,   *)
@@ -1986,24 +2005,32 @@ let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string)
   | None, _, Some x, y -> if y = "" then (Some x, p1) else (Some x, p2)
 
 let get_approx_birth_date_place conf base p =
-  let birth = Date.od_of_cdate (get_birth p) in
-  let birth_place = string_of_place conf (sou base (get_birth_place p)) in
-  let baptism = Date.od_of_cdate (get_baptism p) in
-  let baptism_place = string_of_place conf (sou base (get_baptism_place p)) in
+  let birth = Date.od_of_cdate (Driver.get_birth p) in
+  let birth_place =
+    string_of_place conf (Driver.sou base (Driver.get_birth_place p))
+  in
+  let baptism = Date.od_of_cdate (Driver.get_baptism p) in
+  let baptism_place =
+    string_of_place conf (Driver.sou base (Driver.get_baptism_place p))
+  in
   get_approx_date_place birth
     (birth_place :> Adef.safe_string)
     baptism
     (baptism_place :> Adef.safe_string)
 
 let get_approx_death_date_place conf base p =
-  let death = Date.date_of_death (get_death p) in
-  let death_place = string_of_place conf (sou base (get_death_place p)) in
+  let death = Date.date_of_death (Driver.get_death p) in
+  let death_place =
+    string_of_place conf (Driver.sou base (Driver.get_death_place p))
+  in
   let buri =
-    match get_burial p with
+    match Driver.get_burial p with
     | Buried cd | Cremated cd -> Date.od_of_cdate cd
     | UnknownBurial -> None
   in
-  let buri_place = string_of_place conf (sou base (get_burial_place p)) in
+  let buri_place =
+    string_of_place conf (Driver.sou base (Driver.get_burial_place p))
+  in
   get_approx_date_place death
     (death_place :> Adef.safe_string)
     buri
@@ -2027,8 +2054,8 @@ let string_of_decimal_num conf f =
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
   | Some i when i <> "" ->
-      let i = Gwdb.iper_of_string i in
-      if Gwdb.iper_exists base i then
+      let i = Geneweb_db.Driver.iper_of_string i in
+      if Geneweb_db.Driver.iper_exists base i then
         let p = pget conf base i in
         if is_hidden p then None else Some p
       else None
@@ -2045,7 +2072,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           | None -> None)
       | Some p, Some n -> (
           let occ = Option.value ~default:0 (p_getint conf.env env_occ) in
-          match person_of_key base p n occ with
+          match Driver.person_of_key base p n occ with
           | Some ip ->
               let p = pget conf base ip in
               if is_hidden p then None
@@ -2065,7 +2092,7 @@ let find_person_in_env_pref conf base pref =
 
 let person_exists conf base (fn, sn, oc) =
   let auth =
-    match person_of_key base fn sn oc with
+    match Driver.person_of_key base fn sn oc with
     | Some ip -> authorized_age conf base (pget conf base ip)
     | None -> false
   in
@@ -2076,8 +2103,8 @@ let person_exists conf base (fn, sn, oc) =
 let mark_if_not_public conf base (fn, sn, oc) =
   match p_getenv conf.env "red_if_not_public" with
   | Some "on" -> (
-      match person_of_key base fn sn oc with
-      | Some ip -> get_access (poi base ip) <> Public
+      match Driver.person_of_key base fn sn oc with
+      | Some ip -> Driver.get_access (Driver.poi base ip) <> Public
       | None -> false)
   | _ -> false
 
@@ -2122,9 +2149,9 @@ let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
   let sosa_ref_key =
     match snd conf.default_sosa_ref with
     | Some p ->
-        p_first_name base p ^ "."
-        ^ string_of_int (get_occ p)
-        ^ " " ^ p_surname base p
+        Driver.p_first_name base p ^ "."
+        ^ string_of_int (Driver.get_occ p)
+        ^ " " ^ Driver.p_surname base p
     | None -> ""
   in
   let new_key = fn ^ "." ^ string_of_int occ ^ " " ^ sn in
@@ -2134,10 +2161,10 @@ let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
 let create_topological_sort conf base =
   match p_getenv conf.env "opt" with
   | Some "no_tsfile" ->
-      let () = load_ascends_array base in
-      let () = load_couples_array base in
+      let () = Driver.load_ascends_array base in
+      let () = Driver.load_couples_array base in
       Consang.topological_sort base (pget conf)
-  | Some "no_tstab" -> Gwdb.iper_marker (Gwdb.ipers base) 0
+  | Some "no_tstab" -> Driver.iper_marker (Driver.ipers base) 0
   | _ ->
       let bfile = bpath (conf.bname ^ ".gwb") in
       let tstab_file =
@@ -2147,14 +2174,14 @@ let create_topological_sort conf base =
       in
       Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
-          load_ascends_array base;
-          load_couples_array base;
+          Driver.load_ascends_array base;
+          Driver.load_couples_array base;
           let tstab = Consang.topological_sort base (pget conf) in
           (* FIXME: we silently ignores error if we cannot lock the database. *)
           let on_exn _exn _bt = () in
           if conf.use_restrict && (not conf.wizard) && not conf.friend then
             Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bfile)
-              (fun () -> base_visible_write base);
+              (fun () -> Driver.base_visible_write base);
           tstab)
 
 let p_of_sosa conf base sosa p0 =
@@ -2162,11 +2189,11 @@ let p_of_sosa conf base sosa p0 =
   let rec aux acc = function
     | [] -> Some acc
     | hd :: tl -> (
-        match get_parents acc with
+        match Driver.get_parents acc with
         | Some ifam ->
-            let cpl = foi base ifam in
-            if hd = 0 then aux (pget conf base (get_father cpl)) tl
-            else aux (pget conf base (get_mother cpl)) tl
+            let cpl = Driver.foi base ifam in
+            if hd = 0 then aux (pget conf base (Driver.get_father cpl)) tl
+            else aux (pget conf base (Driver.get_mother cpl)) tl
         | None -> None)
   in
   aux p0 path
@@ -2180,11 +2207,12 @@ let branch_of_sosa conf base sosa p =
   let rec loop pl p = function
     | [] -> Some (p :: pl)
     | male :: tl -> (
-        match get_parents p with
+        match Driver.get_parents p with
         | Some ifam ->
-            let cpl = foi base ifam in
-            if male then loop (p :: pl) (pget conf base @@ get_father cpl) tl
-            else loop (p :: pl) (pget conf base @@ get_mother cpl) tl
+            let cpl = Driver.foi base ifam in
+            if male then
+              loop (p :: pl) (pget conf base @@ Driver.get_father cpl) tl
+            else loop (p :: pl) (pget conf base @@ Driver.get_mother cpl) tl
         | _ -> None)
   in
   loop [] p (expand [] sosa)
@@ -2195,20 +2223,20 @@ let sosa_of_branch ipl =
   List.fold_left
     (fun b p ->
       let b = Sosa.twice b in
-      match get_sex p with
+      match Driver.get_sex p with
       | Male -> b
       | Female -> Sosa.inc b 1
       | Neuter -> assert false)
     Sosa.one ipl
 
 (* FIXME: remove this and use sosa_of_branch only *)
-let old_sosa_of_branch conf base (ipl : (iper * sex) list) =
+let old_sosa_of_branch conf base (ipl : (Driver.iper * sex) list) =
   sosa_of_branch (List.map (fun (ip, _) -> pget conf base ip) ipl)
 
 (* FIXME: remove this and use branch_of_sosa only *)
 let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
-  |> Option.map @@ List.map (fun p -> (get_iper p, get_sex p))
+  |> Option.map @@ List.map (fun p -> (Driver.get_iper p, Driver.get_sex p))
 
 let gen_only_printable or_nl s =
   let s' =
@@ -2264,19 +2292,21 @@ exception Ok
 let has_nephews_or_nieces conf base p =
   try
     let a = p in
-    match get_parents a with
+    match Driver.get_parents a with
     | Some ifam ->
-        let fam = foi base ifam in
+        let fam = Driver.foi base ifam in
         Array.iter
           (fun ip ->
-            if ip = get_iper p then ()
+            if ip = Driver.get_iper p then ()
             else
               Array.iter
                 (fun ifam ->
-                  if Array.length (get_children (foi base ifam)) > 0 then
-                    raise Ok)
-                (get_family (pget conf base ip)))
-          (get_children fam);
+                  if
+                    Array.length (Driver.get_children (Driver.foi base ifam))
+                    > 0
+                  then raise Ok)
+                (Driver.get_family (pget conf base ip)))
+          (Driver.get_children fam);
         false
     | _ -> false
   with Ok -> true
@@ -2307,14 +2337,14 @@ let browser_doesnt_have_tables conf =
   String.lowercase_ascii user_agent = "lynx"
 
 let of_course_died conf p =
-  match Date.cdate_to_dmy_opt (get_birth p) with
+  match Date.cdate_to_dmy_opt (Driver.get_birth p) with
   | Some d ->
       (* TODO this value should be defined elsewhere *)
       conf.today.year - d.year > conf.private_years + 20
   | None -> false
 
 let escache_value base =
-  let t = Gwdb.date_of_last_change base in
+  let t = Driver.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in
   Adef.encoded (string_of_int v)
 
@@ -2390,7 +2420,7 @@ let test_cnt_d conf =
 
 let commit_patches conf base =
   let _ = test_cnt_d in
-  Gwdb.commit_patches base;
+  Driver.commit_patches base;
   conf.henv <-
     List.map
       (fun (k, v) -> if k = "escache" then (k, escache_value base) else (k, v))
@@ -2714,7 +2744,7 @@ let display_options conf =
 
 (* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)
 (* On en profite aussi pour stocker la date de la dernière visite.          *)
-type cache_visited_t = (string, (iper * string) list) Hashtbl.t
+type cache_visited_t = (string, (Driver.iper * string) list) Hashtbl.t
 
 (* ************************************************************************ *)
 (*  [Fonc] cache_visited : config -> string                                 *)
@@ -2816,7 +2846,10 @@ let array_mem_witn conf base x a =
   let rec loop i =
     if i = Array.length a then None
     else if x = fst a.(i) then
-      Some (string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
+      Some
+        (string_of_witness_kind conf
+           (Driver.get_sex @@ Driver.poi base x)
+           (snd a.(i)))
     else loop (i + 1)
   in
   loop 0
@@ -2827,19 +2860,19 @@ let nb_char_occ c s =
   !cnt
 
 module IperSet = Set.Make (struct
-  type t = iper
+  type t = Driver.iper
 
   let compare = Stdlib.compare
 end)
 
 module IfamSet = Set.Make (struct
-  type t = ifam
+  type t = Driver.ifam
 
   let compare = Stdlib.compare
 end)
 
 let select_masc conf base ips =
-  let poi = if conf.wizard || conf.friend then poi else pget conf in
+  let poi = if conf.wizard || conf.friend then Driver.poi else pget conf in
   let fam = Hashtbl.create 1024 in
   let asc = Hashtbl.create 1024 in
   let add_asc gen i p =
@@ -2856,9 +2889,9 @@ let select_masc conf base ips =
           | _ ->
               Hashtbl.replace fam ifam gen;
               if gen = max_gen then (
-                let cpl = foi base ifam in
-                let fa = get_father cpl in
-                let mo = get_mother cpl in
+                let cpl = Driver.foi base ifam in
+                let fa = Driver.get_father cpl in
+                let mo = Driver.get_mother cpl in
                 add_asc gen fa (poi base fa);
                 add_asc gen mo (poi base mo);
                 loop tl)
@@ -2866,7 +2899,7 @@ let select_masc conf base ips =
                 let pgen = gen + 1 in
                 let aux acc i =
                   let p = poi base i in
-                  match get_parents p with
+                  match Driver.get_parents p with
                   | None ->
                       add_asc gen i p;
                       acc
@@ -2877,16 +2910,16 @@ let select_masc conf base ips =
                           Hashtbl.replace fam pifam (pgen + 1);
                           (pgen, pifam) :: acc)
                 in
-                let cpl = foi base ifam in
-                let fa = get_father cpl in
-                let mo = get_mother cpl in
+                let cpl = Driver.foi base ifam in
+                let fa = Driver.get_father cpl in
+                let mo = Driver.get_mother cpl in
                 loop (aux (aux tl fa) mo))
     in
     loop
   in
   List.iter
     (fun (ip, max_gen) ->
-      match get_parents @@ poi base ip with
+      match Driver.get_parents @@ poi base ip with
       | Some ifam -> select_masc max_gen [ (1, ifam) ]
       | None -> ())
     ips;
@@ -2902,11 +2935,11 @@ let select_desc conf base gen_desc ips =
       Hashtbl.replace desc ip p;
       Array.iter
         (fun ifam ->
-          let sp = Gutil.spouse ip (foi base ifam) in
+          let sp = Gutil.spouse ip (Driver.foi base ifam) in
           Hashtbl.replace desc sp (pget conf base sp))
-        (get_family p);
+        (Driver.get_family p);
       if gen > gen_desc then
-        List.iter (loop_desc (gen - 1)) @@ children_of_p base p)
+        List.iter (loop_desc (gen - 1)) @@ Driver.children_of_p base p)
   in
   List.iter (fun (ip, gen) -> loop_desc gen ip) ips;
   desc
@@ -2920,8 +2953,9 @@ let select_mascdesc conf base ips gen_desc =
 let auth_warning conf base w =
   let pauth p = authorized_age conf base p in
   let fauth ifam =
-    let fam = foi base ifam in
-    pauth (get_father fam |> poi base) && pauth (get_mother fam |> poi base)
+    let fam = Driver.foi base ifam in
+    pauth (Driver.get_father fam |> Driver.poi base)
+    && pauth (Driver.get_mother fam |> Driver.poi base)
   in
   match w with
   | BigAgeBetweenSpouses (p1, p2, _) -> pauth p1 && pauth p2
@@ -2997,9 +3031,9 @@ let designation base p = Gutil.designation base p |> escape_html
 let has_children base u =
   Array.exists
     (fun ifam ->
-      let des = foi base ifam in
-      Array.length (get_children des) > 0)
-    (get_family u)
+      let des = Driver.foi base ifam in
+      Array.length (Driver.get_children des) > 0)
+    (Driver.get_family u)
 
 let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
