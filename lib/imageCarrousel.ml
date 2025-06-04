@@ -4,23 +4,7 @@ open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
 
-let file_copy input_name output_name =
-  let fd_in = Unix.openfile input_name [ O_RDONLY ] 0 in
-  let fd_out = Unix.openfile output_name [ O_WRONLY; O_CREAT; O_TRUNC ] 0o666 in
-  let buffer_size = 8192 in
-  let buffer = Bytes.create buffer_size in
-  let rec copy_loop () =
-    match Unix.read fd_in buffer 0 buffer_size with
-    | 0 -> ()
-    | r ->
-        ignore (Unix.write fd_out buffer 0 r);
-        copy_loop ()
-  in
-  copy_loop ();
-  Unix.close fd_in;
-  Unix.close fd_out
-
-let cp = file_copy
+let cp = Filesystem.copy_file ~perm:0o666
 
 let rn fname s =
   try if Sys.file_exists fname then Sys.rename fname s
