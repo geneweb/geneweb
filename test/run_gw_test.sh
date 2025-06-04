@@ -78,6 +78,7 @@ FN2=marie
 SN2=dupond
 OC2=0
 NOTE="chantal" # one specific note
+GALLERY="Gallery" # for test
 PLACE="Australie" # one specific place
 #=== hardcoded vars (end)   ===
 
@@ -387,6 +388,7 @@ crl "m=N&tri=A"
 crl "m=N&tri=F"
 crl "m=NOTES"
 crl "m=NOTES&f=$NOTE" $nodiff
+crl "m=NOTES&f=$GALLERY" $nodiff
 crl "m=OA&k=30"
 crl "m=OE&k=30"
 crl "m=P&tri=A"
