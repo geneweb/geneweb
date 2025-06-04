@@ -10,6 +10,7 @@
  (embed_in_plugin_libraries
   geneweb.gwexport_lib
   geneweb.gwu_lib
+  geneweb.def_show
   geneweb.gwb2ged_lib)
  (flags
   (:standard -w -40-27))
