@@ -23,6 +23,7 @@ notes Galichet Jean_Charles
 beg
 What about [[[Chantal]]]  notes,
 and [[[Andre]]] as second creation ?
+and [[[Gallery]]] for full test
 end notes
 
 notes Galichet lolo
@@ -334,4 +335,18 @@ page-ext Chantal
   TITLE=la 1ere ligne correspond au titre
   * et j'utilise une syntax wiki pour le reste
   * avec un lien vers [[Laurent/Geruzet]]
+end page-ext
+
+# extended page "Gallery" used by:
+#  - person "Jean Charles.0 Galichet"
+page-ext Gallery
+  TITLE=la 1ere ligne correspond au titre
+  TYPE=gallery
+  {
+  "title": "Gallery test",
+  "desc": "test",
+  "path": "doc",
+  "img": "jean_pierre.0.galichet.jpg",
+  "map": []
+  }
 end page-ext
