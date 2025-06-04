@@ -396,7 +396,6 @@ crl "m=PS"
 crl "m=PPS&bi=on&ba=on&ma=on&de=on&bu=on"
 crl "m=PPS&k=$PLACE&bi=on&ba=on&ma=on&de=on&bu=on&all=on&any=on&max_rlm_nbr="
 crl "m=R&i=$ID"
-crl "m=REFRESH&i=$ID" $nodiff
 #crl "m=RL&i=$ID&i1" # m=RL&i=5316&l1=3&i1=1711&l2=2&i2=6223&dag=on
 crl "m=RLM&i1=$ID&p2=$FN2&n2=$SN2&oc2=$OC2"
 crl "m=SND_IMAGE&i=$ID"
