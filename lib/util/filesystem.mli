@@ -53,8 +53,11 @@ val walk_folder : ?recursive:bool -> (entry -> 'a -> 'a) -> string -> 'a -> 'a
     If [recursive] is [true], subdirectories are explored recursively.
     The default is [false]. *)
 
-val copy_file : string -> string -> unit
-(** [copy_file src dst] copies the file [src] into the destination [dst].
-    The file [dst] is created, if it does not exist.
+val copy_file : ?perm:int -> string -> string -> unit
+(** [copy_file ?perm src dst] copies the file [src] into the
+    destination [dst]. The file [dst] is created, if it does not exist.
+
+    If the file [dst] does not exist, it is created with permissions [perm].
+    The default is [0o644]. If the file [dst] exists, it is erased.
 
     This function can be used to copy binary files. *)
