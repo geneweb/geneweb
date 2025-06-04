@@ -19,7 +19,9 @@ let parse_source =
         | exception Not_found ->
             Compat.In_channel.with_open_text s @@ fun ic ->
             let lexbuf = Lexing.from_channel ic in
-            Lexing.set_filename lexbuf s;
+            (* TODO: This function is not available in OCaml 4.08. We should
+               find a workaround after fixing locations in the parser. *)
+            (* Lexing.set_filename lexbuf s; *)
             let r = parse_ast lexbuf in
             HS.add cache s r;
             r
