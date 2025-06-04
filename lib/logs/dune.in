@@ -4,6 +4,7 @@
   (libraries
     %%%SYSLOG_PKG%%%
     fmt
+    unix
     geneweb_compat)
   (preprocess
     (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file}))))
