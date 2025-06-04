@@ -86,7 +86,7 @@
     %end;
   %end;
 %end;
-%if;("MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m or "REFRESH" in e.m
+%if;("MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
     or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
@@ -424,7 +424,7 @@ const inputToBook = {
 
     let preVal = value;
     if (book === "place") {
-      const place = value.split(/\]\s+[-–—]\s+/);
+      const place = value.split(/\]\s+[-Â–Â—]\s+/);
       preVal = place.length > 1 ? place[1] : value;
     }
 
@@ -471,7 +471,7 @@ function initializeWelcomeSearchFunctionality() {
 
   Object.values(searchForms).forEach(form => {
     if (!form) return;
-    
+
     form.querySelectorAll('input[type="search"]').forEach(input => {
       input.addEventListener('input', () => {
         $(searchBtn).tooltip('hide')
@@ -517,13 +517,13 @@ function setupModalAutofocus() {
 // Floating placeholders for all textual inputs
 function setupFloatingPlaceholders() {
   const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
-  
+
   inputs.forEach(input => {
     // Ignore placeholders that are only non-breaking spaces
     if (input.placeholder.trim() === '') return;
-    
+
     const hadFocus = document.activeElement === input;
-    
+
     const wrapper = document.createElement('div');
     wrapper.className = 'input-wrapper';
     input.parentNode.insertBefore(wrapper, input);
