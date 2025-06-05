@@ -1,3 +1,145 @@
+/* ========== POSITIONNEMENT PRINCIPAL ========== */
+.fanchart-controls {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  max-width: 200px;
+  font-size: 0.95rem;
+}
+
+.fanchart-controls.hidden {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+/* ========== STRUCTURE INTERNE ========== */
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.control-section {
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 2px;
+}
+
+/* ========== BOUTONS ========== */
+.btn-fanchart {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  transition: all 0.2s ease;
+  font-size: 1em;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-fanchart:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.btn-fanchart.disabled {
+  background: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-fanchart.btn-toggle.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+/* Bouton X */
+.btn-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: #dc3545;
+}
+
+.btn-group-fanchart {
+  display: flex;
+  gap: 3px;
+}
+
+.event-toggles {
+  display: flex;
+  gap: 1px;
+  margin-top: 6px;
+}
+
+.event-toggles.hidden {
+  display: none;
+}
+
+.event-toggle input[type="checkbox"] {
+  display: none;
+}
+
+.event-toggle label {
+  display: block;
+  padding: 2px 3px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  width: 16px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.event-toggle input[type="checkbox"]:checked + label {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
 :root {
   --fc-stroke-width: 0.1%;
   --fc-stroke-dasharray: 5px;
@@ -122,6 +264,14 @@ body:not(.death-age) #death-age {
   display: none;
 }
 
+#death-age li {
+  cursor: pointer;
+  user-select: none;
+}
+#death-age li:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
 .arrow {
   color: #F4F4F4;
 }
@@ -194,27 +344,10 @@ textPath {
 #places-header {
   flex-shrink: 0;
   margin-top: 4px;
-  padding-left: 54px;
-  margin-bottom: 4px;
+  padding-left: 4px;
+  margin-bottom: 4px;
   font-size: 16px;
   font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#sort-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  color: #333;
-  padding: 2px 6px;
-  margin-right: 4px;
-  border-radius: 3px;
-}
-#sort-toggle:hover {
-  background-color: #e9ecef !important;
 }
 
 #places-list li .square {
@@ -278,6 +411,16 @@ svg {
   color: lightgrey;
 }
 
+/.btn-fanchart.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+body:not(.place_color) .event-toggles,
+body:not(.place_color) #b-sort-places {
+  display: none !important;
+}
 svg.mono text {
  font-family: monospace;
 }
@@ -285,16 +428,20 @@ svg.mono text {
 /* Panneau d'aide navigation */
 #navigation-help {
   position: absolute;
-  top: 5px;
-  left: 110px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
+  top: 12px;
+  left: 140px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 12px;
   z-index: 1000;
   max-width: 200px;
-  transition: opacity 0.3s;
+  transition: opacity 0.15s;
 }
 
 #navigation-help .help-title {
