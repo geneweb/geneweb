@@ -1229,14 +1229,14 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
               (DeadDontKnowWhen, dpl)
           | Some
               {
-                ci_death = (DeadDontKnowWhen | NotDead) as dead;
+                ci_death =
+                  ( DeadDontKnowWhen | NotDead | DeadYoung | OfCourseDead
+                  | Death _ ) as dead;
                 ci_death_date = None;
                 ci_death_place = dpl;
               } ->
               (dead, dpl)
-          | Some
-              { ci_death = DeadYoung | DontKnowIfDead | OfCourseDead | Death _ }
-          | None ->
+          | Some { ci_death = DontKnowIfDead } | None ->
               (infer_death_bb conf birth baptism, "")
         in
         let occupation =
