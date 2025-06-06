@@ -1,33 +1,30 @@
 module Compat = Geneweb_compat
 
-module HS = Hashtbl.Make (struct
-  type t = string
+let with_cache (type a b) (f : a -> b) : a -> b =
+  let cache : (a, b) Hashtbl.t = Hashtbl.create 17 in
+  fun x ->
+    match Hashtbl.find cache x with
+    | exception Not_found ->
+        let r = f x in
+        Hashtbl.add cache x r;
+        r
+    | r -> r
 
-  let equal = String.equal
-  let hash = Hashtbl.hash
-end)
+let parse_ast lexbuf = Lexer.parse_ast (Buffer.create 1024) [] [] lexbuf |> fst
 
-let parse_source =
-  let cache : Ast.t list HS.t = HS.create 17 in
-  fun src ->
-    let parse_ast lexbuf =
-      Lexer.parse_ast (Buffer.create 1024) [] [] lexbuf |> fst
-    in
-    match src with
-    | `File s -> (
-        match HS.find cache s with
-        | exception Not_found ->
-            Compat.In_channel.with_open_text s @@ fun ic ->
-            let lexbuf = Lexing.from_channel ic in
-            (* TODO: This function is not available in OCaml 4.08. We should
-               find a workaround after fixing locations in the parser. *)
-            (* Lexing.set_filename lexbuf s; *)
-            let r = parse_ast lexbuf in
-            HS.add cache s r;
-            r
-        | r -> r)
-    | `In_channel ic -> parse_ast @@ Lexing.from_channel ic
-    | `Raw s -> parse_ast @@ Lexing.from_string s
+let parse_file s =
+  Compat.In_channel.with_open_text s @@ fun ic ->
+  let lexbuf = Lexing.from_channel ic in
+  (* TODO: This function is not available in OCaml 4.08. We should
+     find a workaround after fixing locations in the parser. *)
+  (* Lexing.set_filename lexbuf s; *)
+  parse_ast lexbuf
+
+let parse_source ~cached src =
+  match src with
+  | `File s -> if cached then with_cache parse_file s else parse_file s
+  | `In_channel ic -> parse_ast @@ Lexing.from_channel ic
+  | `Raw s -> parse_ast @@ Lexing.from_string s
 
 let comment fl =
   let s =
@@ -37,9 +34,9 @@ let comment fl =
   in
   Ast.mk_text s
 
-let parse ~on_exn ~resolve_include src =
+let parse ?(cached = true) ~on_exn ~resolve_include src =
   let parse_include ~loc src =
-    try Ast.mk_pack ~loc @@ parse_source src
+    try Ast.mk_pack ~loc @@ parse_source ~cached src
     with e ->
       let bt = Printexc.get_raw_backtrace () in
       on_exn e bt;
@@ -63,4 +60,4 @@ let parse ~on_exn ~resolve_include src =
             Ast.mk_pack @@ [ comment fl; expand t; comment fl ]
         | `Raw s -> expand @@ parse_include ~loc (`Raw s))
   and expand_list l = List.map expand l in
-  expand_list @@ parse_source src
+  expand_list @@ parse_source ~cached src

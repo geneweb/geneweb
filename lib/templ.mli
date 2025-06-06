@@ -48,7 +48,8 @@ val output :
 (** [output conf ifun env v fl] outputs on the client socket the template [fl]
     using the functions [ifun] and the environment [env]. *)
 
-val output_builtin :
-  Config.config -> Adef.encoded_string Env.t -> string -> unit
-(** [output_builtin conf env fl] outputs on the client socket the template [fl]
+type simple_env = Vstring of Adef.encoded_string | Vother of unit vother
+
+val output_simple : Config.config -> simple_env Env.t -> string -> unit
+(** [output_simple conf env fl] outputs on the client socket the template [fl]
     using only builtin evaluator and the environment [env]. *)
