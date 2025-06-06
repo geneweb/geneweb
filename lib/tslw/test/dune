@@ -1,0 +1,3 @@
+(executable
+  (name parse)
+  (libraries geneweb_tslw pp_loc tyxml))

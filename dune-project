@@ -45,6 +45,7 @@
     yojson
     digestif
     pp_loc
+    tyxml
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.24.1")))
   )

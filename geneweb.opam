@@ -37,6 +37,7 @@ depends: [
   "yojson"
   "digestif"
   "pp_loc"
+  "tyxml"
   "utop" {with-dev-setup}
   "ocamlformat" {with-dev-setup & = "0.24.1"}
   "odoc" {with-doc}
