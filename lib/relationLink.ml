@@ -632,7 +632,7 @@ let print_relation_ok conf base info =
   | Some "on" -> ()
   | _ ->
       let conf = { conf with is_printed_by_template = false } in
-      Templ.output_builtin conf Templ.Env.empty "buttons_rel");
+      Templ.output_simple conf Templ.Env.empty "buttons_rel");
   Output.print_sstring conf {|<p style="clear:both">|};
   print_relation_path conf base info;
   Hutil.trailer conf
