@@ -204,12 +204,12 @@ let newline =
 
 let toplevel_ul =
   C.(
-    let* ul in
+    let* ul = ul in
     ret (ul :> Ast.t))
 
 let toplevel_text =
   C.(
-    let* text in
+    let* text = text in
     ret (text :> Ast.t))
 
 let block =

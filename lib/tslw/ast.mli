@@ -34,15 +34,14 @@ val mk_node : ?loc:Loc.t -> text option -> kind -> node list -> node
 type size = One | Two | Three | Four | Five | Six
 type toc = Std | Short | No
 
-type block = [
-  | `Header of size * string
+type block =
+  [ `Header of size * string
   | `Toc of toc
   | `Newline
   | `Indent of int * text
   | `Pre of string
   | node_desc
-  | text_desc
-]
+  | text_desc ]
 
 and t = block located
 

@@ -17,7 +17,6 @@ type span_desc = [ `Span of tag * string ]
 type span = span_desc located
 type text_desc = [ `Text of span list ]
 type text = text_desc located
-
 type kind = Ordered | Unordered
 
 type node_desc = [ `Node of text option * kind * node list ]
@@ -26,15 +25,14 @@ and node = node_desc located
 type size = One | Two | Three | Four | Five | Six
 type toc = Std | Short | No
 
-type block = [
-  | `Header of size * string
+type block =
+  [ `Header of size * string
   | `Toc of toc
   | `Newline
   | `Indent of int * text
   | `Pre of string
   | node_desc
-  | text_desc
-]
+  | text_desc ]
 
 and t = block located
 
@@ -68,7 +66,9 @@ let pp_toc ppf toc =
   | Short -> Fmt.pf ppf "Short"
   | No -> Fmt.pf ppf "No"
 
-let pp_span ppf { desc = `Span (tag, s); _ } = Fmt.pf ppf "Span (%a, %s)" pp_tag tag s
+let pp_span ppf { desc = `Span (tag, s); _ } =
+  Fmt.pf ppf "Span (%a, %s)" pp_tag tag s
+
 let pp_text_desc ppf (`Text l) = Fmt.(list ~sep:comma pp_span) ppf l
 let pp_text ppf { desc; _ } = pp_text_desc ppf desc
 
