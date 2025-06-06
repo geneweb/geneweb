@@ -60,11 +60,12 @@
   cursor: pointer;
 }
 
-.btn-fanchart:hover {
-  background: #f8f9fa;
-  border-color: #007bff;
-  color: #007bff;
-  text-decoration: none;
+.btn-fanchart.active,
+.btn-fanchart.active:hover,
+.btn-fanchart.active:focus {
+  background-color: #007bff !important;
+  border-color: #007bff !important;
+  color: white !important;
 }
 
 .btn-fanchart.disabled {
@@ -83,7 +84,7 @@
 /* Bouton X */
 .btn-close {
   position: absolute;
-  top: 4px;
+  bottom: 4px;
   right: 4px;
   background: none;
   border: none;
@@ -171,6 +172,10 @@ svg .same_hl .bg {
 }
 svg .same_hl .text {
  fill: black !important;
+}
+
+svg .bg {
+  fill: white;
 }
 
 /* places list */
@@ -350,6 +355,19 @@ textPath {
   font-weight: bold;
 }
 
+#places-list li span[id^="bi-"],
+#places-list li span[id^="ba-"],
+#places-list li span[id^="ma-"],
+#places-list li span[id^="de-"],
+#places-list li span[id^="bu-"] {
+  display: inline-block;
+  width: 12px;
+  text-align: center;
+  margin-right: 2px;
+  font-size: 16px;
+}
+
+
 #places-list li .square {
   margin-left: 4px;
 }
@@ -358,11 +376,16 @@ textPath {
   cursor: pointer;
   border-left: 4px solid transparent;
   padding-left: 4px;
+  position: relative;
 }
 
 #places-list li:hover {
   background-color: #fff3cd !important;
   border-left: 4px solid #ffc107 !important;
+}
+
+#places-list li > * {
+  pointer-events: none;
 }
 
 #places-list li.location-highlighted {
@@ -412,24 +435,47 @@ svg {
 }
 
 /.btn-fanchart.active {
-  background: #007bff;
+  background: #007bff !important;
   border-color: #007bff;
   color: white;
 }
+
+.btn-fanchart.active:hover {
+  background: #0056b3 !important;
+  border-color: #0056b3;
+  color: white;
+}
+
 
 body:not(.place_color) .event-toggles,
 body:not(.place_color) #b-sort-places {
   display: none !important;
 }
+
+svg.serif text {
+  font-family: Georgia, "Times New Roman", serif ;
+}
+
+svg.large text {
+  font-size: 107%;
+}
+
 svg.mono text {
- font-family: monospace;
+  font-family: monospace, "Courier New", Courier;
+  font-size: 90%;
+}
+
+/* Police optimisée pour la lisibilité */
+svg.readable text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.5px;
 }
 
 /* Panneau d'aide navigation */
 #navigation-help {
   position: absolute;
-  top: 12px;
-  left: 140px;
+  top: 8px;
+  left: 130px;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
@@ -447,4 +493,41 @@ svg.mono text {
 #navigation-help .help-title {
   font-weight: bold;
   margin-bottom: 4px;
+}
+
+#fanchart-container {
+  position: relative;
+}
+
+.identity-panel {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 230px;
+  max-width: 35%;
+  padding: 4px;
+  display: none;
+  z-index: 10;
+  font-size: 1.1rem;
+}
+
+body.places-list .identity-panel {
+  right: calc(var(--fc-tool-size, 18%) + 20px);
+}
+
+.identity-panel h2 {
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.identity-panel .subtitle {
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: #555;
+}
+
+.identity-panel img.photo {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 1rem 0;
 }

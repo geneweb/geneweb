@@ -2,12 +2,22 @@
 <html lang="%lang;">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="%images_prefix;favicon_gwd.png">
 <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
 <title>Arbre en éventail %self; (g%e.v;)</title>
-<link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
-<link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;">
 <style title="fc-auto"></style>
+<style>
+  body { margin: 0; padding: 0; }
+  svg { position: absolute; left: 0; top: 0; }
+  .hidden { display: none; }
+</style>
+<link rel="preload" href="%etc_prefix;css/all.min.css?version=6.4.0" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+  <link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
+  <link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;">
+</noscript>
 </head>
 %define;get_random(xxx)
   %random.init;
@@ -60,7 +70,7 @@
 "S%xx.anc_sosa.v;":{"fn":"=","sn":"%xx.same","fnk":"%xx.first_name_key","snk":"%xx.surname_key;","oc":"","dates":"","has_parents":%if;(xx.has_parents)true%else;false%end;},
 %end;
 
-<body id="body" class="bg-light p-4">
+<body id="body" class="bg-light p-4"%if;wizard; data-wizard="1"%end;>
 <canvas id="pixel" width="1" height="1" style="display: none;"></canvas>
 <div id="places-list"><ul id="places_list"></ul></div>
 <div id="death-age">
@@ -89,10 +99,13 @@
 
   <div class="control-section">
     <div class="btn-group-fanchart">
-      <button id="b-home" class="btn-fanchart" title="[*home]" data-toggle="tooltip">
+      <button id="b-home" class="btn-fanchart" title="[*home]">
         <i class="fa fa-house fa-fw"></i>
       </button>
-      <button id="b-rng" class="btn-fanchart" title="[*random individual]" data-toggle="tooltip" data-url="%apply;url_set%with;i/p/n/oc/file%and;%random_index;%end;">
+      <button id="b-help" class="btn-fanchart" title="Aide et raccourcis">
+        <i class="fa fa-info fa-fw"></i>
+      </button>
+      <button id="b-rng" class="btn-fanchart" title="[*random individual]" data-url="%apply;url_set%with;i/p/n/oc/file/v%and;%random_index;%end;&v=5">
         <i class="fa fa-dice-%apply;dice() fa-fw"></i>
       </button>
     </div>
@@ -103,13 +116,13 @@
   <div class="control-section">
     <div class="section-title">[*display]%(TODO%)</div>
     <div class="btn-group-fanchart">
-      <button id="b-zoom-out" class="btn-fanchart" title="[*zoom/unzoom]1" data-toggle="tooltip">
+      <button id="b-zoom-out" class="btn-fanchart" title="[*zoom/unzoom]1">
         <i class="fa fa-magnifying-glass-minus fa-fw"></i>
       </button>
-      <button id="b-zoom-in" class="btn-fanchart" title="[*zoom/unzoom]0" data-toggle="tooltip">
+      <button id="b-zoom-in" class="btn-fanchart" title="[*zoom/unzoom]0">
         <i class="fa fa-magnifying-glass-plus fa-fw"></i>
       </button>
-      <button id="b-refresh" class="btn-fanchart" title="[*resize fanchart]" data-toggle="tooltip">
+      <button id="b-refresh" class="btn-fanchart" title="[*resize fanchart]">
         <i class="fa fa-arrow-rotate-right fa-fw"></i>
       </button>
     </div>
@@ -118,36 +131,38 @@
   <div class="control-section">
     <div class="section-title" id="generation-section-title">[generation/generations]1</div>
     <div class="btn-group-fanchart">
-      <button id="b-gen-del" class="btn-fanchart %if;(e.v <= 1)disabled%end;" title="Supprimer une génération" data-toggle="tooltip">
+      <button id="b-gen-del" class="btn-fanchart %if;(e.v <= 1)disabled%end;" title="Supprimer une génération">
         <i class="fa fa-minus fa-fw"></i>
       </button>
-      <button id="b-gen-add" class="btn-fanchart %if;(e.v >= 10)disabled%end;" title="Ajouter une génération" data-toggle="tooltip">
+      <button id="b-gen-add" class="btn-fanchart %if;(e.v >= 10)disabled%end;" title="Ajouter une génération">
         <i class="fa fa-plus fa-fw"></i>
       </button>
-      <button id="b-implex" class="btn-fanchart" title="%if;(e.implex="")Développer%else;Réduire%end; les implexes" data-toggle="tooltip">
+      <button id="b-implex" class="btn-fanchart" title="%if;(e.implex="")Développer%else;Réduire%end; les implexes">
         <i class="fa fa-comment-%if;(e.implex="")dots%else;slash%end; fa-fw"></i>
       </button>
     </div>
   </div>
-
   <div class="control-section">
-    <div class="section-title">[*tools]</div>
+    <div class="section-title">[*font]</div>
     <div class="btn-group-fanchart">
-      <button id="b-death-age" class="btn-fanchart cycle-0"
-              title="Âges décès et durées mariage"
-              data-toggle="tooltip" data-cycle="0">
-        <i class="fa fa-cross fa-fw"></i>
-      </button>
-      <button id="b-mono" class="btn-fanchart"
-        title="[*use monospace font]" data-toggle="tooltip">
-        <i class="fa fa-align-justify fa-fw"></i>
-      </button>
+     <select id="font-selector" class="custom-select custom-select-sm mx-0">
+       <option value="">Standard</option>
+       <option value="mono">Monospace</option>
+       <option value="serif">Serif</option>
+       <option value="large">Grande</option>
+       <option value="readable">Lisible</option>
+    </select>
     </div>
   </div>
   <div class="control-section">
+    <div class="section-title">[*tools]</div>
     <div class="btn-group-fanchart">
-      <button id="b-places-colorise" class="btn-fanchart cycle-0"
-        title="Colorisation des lieux (cycle entre les événements)" data-toggle="tooltip" data-cycle="0">
+      <button id="b-death-age" class="btn-fanchart"
+              title="Âges décès et durées mariage">
+        <i class="fa fa-cross fa-fw"></i>
+      </button>
+       <button id="b-places-colorise" class="btn-fanchart"
+        title="Colorisation des lieux (cycle entre les événements)">
         <i class="fa fa-paintbrush fa-fw"></i>
       </button>
       <button id="b-sort-places" class="btn-fanchart"
@@ -181,15 +196,14 @@
     </div>
   </div>
 </div>
-<svg id="fanchart" class="bi ba ma de bu%if;(e.mono=1) mono%end;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
-
-</body>
-
+<div id="fanchart-container" style="position: relative;">
+  <svg id="fanchart" class="bi ba ma de bu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+  <div id="person-panel" class="identity-panel"></div>
+</div>
 <script>
 var link_to_person = "%prefix;";
 var max_gen = %e.v;;
 var tool = "%e.tool;";
-var mono = "%e.mono;";
 var implex = "%e.implex;";
 
 var ancestor = {
@@ -286,7 +300,7 @@ window.t = function(key, defaultValue = key) {
 
   return typeof value === 'string' ? value : defaultValue;
 };
-
 </script>
 <script src="%etc_prefix;js/fanchart.js?hash=%apply;hash%with;%etc_prefix;js/fanchart.js%end;"></script>
+</body>
 </html>

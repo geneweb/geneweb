@@ -1,7 +1,7 @@
 const root = document.documentElement;
 const fanchart = document.getElementById("fanchart");
 const places_list = document.getElementById("places_list");
-const pixel = document.getElementById("pixel").getContext("2d");
+const pixel = document.getElementById("pixel").getContext("2d", { willReadFrequently: true });
 var sheet;
 for (var i in document.styleSheets) {
   if (document.styleSheets[i].title == "fc-auto") {
@@ -31,20 +31,72 @@ const CONFIG = {
   svg_margin: 5
 };
 
+// Créer un module DOMCache au début du fichier, après CONFIG
+const DOMCache = {
+  // Cache pour les éléments individuels
+  elements: {},
+
+  // Cache pour les collections d'éléments par classe
+  collections: {},
+
+  // Récupérer un élément par ID avec mise en cache
+  getElementById: function(id) {
+    if (!this.elements[id]) {
+      this.elements[id] = document.getElementById(id);
+    }
+    return this.elements[id];
+  },
+
+  // Récupérer des éléments par classe avec mise en cache
+  getElementsByClassName: function(className) {
+    if (!this.collections[className]) {
+      // Convertir en Array pour avoir une référence stable
+      this.collections[className] = Array.from(document.getElementsByClassName(className));
+    }
+    return this.collections[className];
+  },
+
+  // Invalider le cache quand le DOM change
+  invalidate: function(type = 'all') {
+    if (type === 'all') {
+      this.elements = {};
+      this.collections = {};
+    } else if (type === 'collections') {
+      this.collections = {};
+    }
+  },
+
+  // Pré-charger les éléments fréquemment utilisés
+  preload: function() {
+    // Boutons fréquemment utilisés
+    ["b-death-age", "b-places-colorise", "b-sort-places"].forEach(id => {
+      this.getElementById(id);
+    });
+    // s indicateurs d'âge et de mariage
+    ["DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6"].forEach(id => {
+      this.getElementById(id);
+    });
+    ["DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6"].forEach(id => {
+      this.getElementById(id);
+    });
+  }
+};
+
 // ========== Utilitaires généraux ==========
 const Utils = {
+  calculateAgeCategory: function(age) {
+    const boundaries = [30, 45, 60, 75, 90, 105, Infinity];
+    const category = boundaries.findIndex(boundary => age < boundary);
+    return Math.min(category, 6);
+  },
+
   deathAgeClass: function(age) {
-    if (age < 30) return "DA0";
-    var adjustedAge = age - 30;
-    var n = Math.trunc(adjustedAge / 15) + 1;
-    if (n > 6) { n = 6; }
-    return "DA" + n;
+    return "DA" + this.calculateAgeCategory(age);
   },
 
   marriageLengthClass: function(length) {
     const years = parseInt(length);
     if (isNaN(years) || years < 0) return "";
-
     const index = CONFIG.marriage_length_thresholds.findIndex(threshold => years <= threshold);
     return index === -1 ? "DAM6" : `DAM${index}`;
   },
@@ -67,7 +119,11 @@ const Utils = {
   },
 
   buildUrlParams: function(p) {
-    return `m=A&t=FC${mono === "1" ? "&mono=1" : ""}${tool ? "&tool=" + tool : ""}${implex === "0" ? "&implex=0" : ""}&p=${p.fnk}&n=${p.snk}${p.oc ? "&oc=" + p.oc : ""}`;
+    let url = `m=A&t=FC&p=${p.fnk}&n=${p.snk}`;
+    if (p.oc) url += `&oc=${p.oc}`;
+    if (tool && tool !== "") url += `&tool=${tool}`;
+    if (implex === "0") url += "&implex=0";
+    return url;
   },
 
   navigateWithParams: function(newGen) {
@@ -199,7 +255,7 @@ const SVGRenderer = {
   },
 
   applyBackgroundClasses: function(element, p, type) {
-    let classes = [];
+    let classes = ['bg'];
 
     if (type === 'person') {
       classes.push('bg');
@@ -223,47 +279,83 @@ const SVGRenderer = {
   },
 
   applyInteractiveFeatures: function(element, p, type) {
-    if (!p || p.fn === "?" || p.fn === "" || !p.fn) {
-      return;
-    }
+    if (!p || p.fn === "?" || p.fn === "" || !p.fn) return;
+
     element.setAttribute("class", "link");
+    const panel = document.getElementById("person-panel");
 
-    // Titre contextuel
-    const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-    if (type === 'person') {
-      const age = (p.death_age && p.death_age !== "" && !isNaN(parseInt(p.death_age)))
-        ? ` (${p.death_age} ans)`
-        : "";
-      title.textContent = `(Sosa ${p.sosa}) ${p.fn} ${p.sn}${age}`;
-    } else if (type === 'marriage') {
-      const years = parseInt(p.marriage_length) || -1;
-      if (years >= 0) {
-        title.textContent = years === 1 ? "1 année de mariage" : `${years} années de mariage`;
+    // Gestion du clic avec propagation contrôlée
+    element.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.handleClick(e, p);
+    });
+
+    element.addEventListener("mouseenter", (e) => {
+      e.stopPropagation();
+      if (panel) {
+        this.buildTooltipContent(panel, p, type);
+        panel.style.display = "block";
       }
-    }
-    element.appendChild(title);
+      this.handleMouseEnter(p, type, e);
+    });
 
-    // Événements de clic
-    element.onclick = (e) => this.handleClick(e, p);
-
-    // Événements de survol
-    element.onmouseenter = (e) => this.handleMouseEnter(p, type, e);
-    element.onmouseleave = (e) => this.handleMouseLeave(p, type, e);
+    element.addEventListener("mouseleave", (e) => {
+      e.stopPropagation();
+      if (panel) {
+        panel.style.display = "none";
+        panel.innerHTML = "";
+      }
+      this.handleMouseLeave(p, type, e);
+    });
   },
 
-  handleClick: function(e, p) {
+  buildTooltipContent: function(panel, p, type) {
+    if (type === "person") {
+      panel.innerHTML = `
+        <h2>${p.fn} ${p.sn}</h2>
+        <div class="subtitle">${p.dates}${p.death_age && !isNaN(parseInt(p.death_age)) ? ` ${p.death_age} ans` : ""}</div>
+        ${p.birth_place ? `<div><strong>Naissance :</strong> ${p.birth_place}</div>` : ""}
+        ${p.death_place ? `<div><strong>Décès :</strong> ${p.death_place}</div>` : ""}
+      `;
+    } else if (type === "marriage") {
+      const years = parseInt(p.marriage_length) || -1;
+      panel.innerHTML = `
+        <h2>Mariage</h2>
+        ${p.marriage_date ? `<div><strong>Date :</strong> ${p.marriage_date}</div>` : ""}
+        ${p.marriage_place ? `<div><strong>Lieu :</strong> ${p.marriage_place}</div>` : ""}
+        ${years >= 0 ? `<div><strong>Durée :</strong> ${years} ${years === 1 ? "an" : "ans"}</div>` : ""}
+      `;
+    }
+  },
+
+  handleClick: function(e, person) {
     if (!link_to_person) {
       alert("Erreur: Impossible d'accéder à la fiche individuelle");
       return;
     }
+    const li = e.target.closest('li[data-location]');
 
-    const oc = p.oc ? `&oc=${p.oc}` : '';
-    const url = `${link_to_person}p=${p.fnk}&n=${p.snk}${oc}`;
-
-    if (e.ctrlKey || e.shiftKey) {
-      window.open(url, '_blank');
+    // Clic sur une personne (secteur du fanchart)
+    if (person && person.fnk && person.snk) {
+      const useNewTab = e.ctrlKey || e.metaKey;
+      NavigationHelper.openPersonLink(person, useNewTab, false);
+      return;
     }
-    e.stopPropagation();
+
+    // Clic sur un lieu en mode wizard
+    if (li && document.body.dataset.wizard === "1") {
+      e.preventDefault();
+      const placeName = li.dataset.location;
+      const useNewTab = e.ctrlKey || e.metaKey;
+      NavigationHelper.openPlaceLink(placeName, useNewTab);
+      return;
+    }
+
+    // Autres clics (bouton de tri, etc.)
+    if (e.target.closest('#sort-toggle')) {
+      e.preventDefault();
+      UIManager.toggleSort();
+    }
   },
 
   togglePlaceHighlights: function(p, show) {
@@ -277,7 +369,7 @@ const SVGRenderer = {
 
     places.forEach(place => {
       if (p[place.prop]) {
-        const el = document.getElementById(`${place.prefix}-${lieux[p[place.prop]].c}`);
+        const el = DOMCache.getElementById(`${place.prefix}-${lieux[p[place.prop]].c}`);
         if (el) el.classList.toggle("hidden", !show);
         LocationManager.hlPlace(p[place.prop], show);
       }
@@ -292,14 +384,16 @@ const SVGRenderer = {
     if (event && event.currentTarget) {
       const group = event.currentTarget.parentNode;
       const backgroundSector = group.querySelector('.bg');
-      if (backgroundSector) {
+
+      if (backgroundSector && backgroundSector.style.fill !== "lightgrey") {
         backgroundSector.style.fill = "lightgrey";
+        backgroundSector.dataset.highlighted = "true";
       }
     }
 
     // Gestion spécifique par type
     if (type === 'person' && p.death_age) {
-      const ageEl = document.getElementById(Utils.deathAgeClass(p.death_age));
+      const ageEl = DOMCache.getElementById(Utils.deathAgeClass(p.death_age));
       if (ageEl) ageEl.classList.add("hl");
     } else if (type === 'marriage' && p.marriage_length) {
       const marriageClass = Utils.marriageLengthClass(p.marriage_length);
@@ -323,15 +417,17 @@ const SVGRenderer = {
     // Gestion du background
     if (event && event.currentTarget) {
       const group = event.currentTarget.parentNode;
-      const backgroundSector = group.querySelector('.bg');
-      if (backgroundSector) {
+      const backgroundSector = group.querySelector('.bg')
+
+      if (backgroundSector.style.fill !== "") {
         backgroundSector.style.fill = "";
+        delete backgroundSector.dataset.highlighted;
       }
     }
 
     // Gestion spécifique par type
     if (type === 'person' && p.death_age) {
-      const ageEl = document.getElementById(Utils.deathAgeClass(p.death_age));
+      const ageEl = DOMCache.getElementById(Utils.deathAgeClass(p.death_age));
       if (ageEl) ageEl.classList.remove("hl");
     } else if (type === 'marriage' && p.marriage_length) {
       const marriageClass = Utils.marriageLengthClass(p.marriage_length);
@@ -382,7 +478,8 @@ const SVGRenderer = {
       text.setAttribute("class", "link icon");
       text.innerHTML = `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${fontSize}%;">&#x25B2;</textPath>`;
       text.onclick = (e) => {
-        Utils.navigateWithParams(max_gen);
+        const useNewTab = e.ctrlKey || e.metaKey;
+        NavigationHelper.openPersonLink(p, false, true);
       };
     } else {
       text.setAttribute("class", "no-link");
@@ -406,6 +503,16 @@ const SVGRenderer = {
 
 // ========== Système de rendu de texte unifié ==========
 const TextRenderer = {
+  _bboxCache: {},
+
+  getBBoxCached: function(textContent) {
+    if (!this._bboxCache[textContent]) {
+      standard.textContent = textContent;
+      this._bboxCache[textContent] = standard.getBBox();
+    }
+    return this._bboxCache[textContent];
+  },
+
   drawText: function(g, mode, params) {
     // Construire les classes CSS pour les lieux
     const textClasses = this.buildLocationClasses(params.p, params.classes || "");
@@ -594,10 +701,9 @@ const TextRenderer = {
   },
 
   placeTextOnPath: function(g, pathId, textContent, classes, pathLength, pathHeight) {
-    // Calcul de la taille de police optimale
-    standard.textContent = textContent;
-    const textWidth = standard.getBBox().width;
-    const textHeight = standard.getBBox().height;
+    const bbox = this.getBBoxCached(textContent);
+    const textWidth = bbox.width;
+    const textHeight = bbox.height;
 
     let fontSizeByWidth = 100;
     if (textWidth > pathLength * CONFIG.security) {
@@ -628,8 +734,8 @@ const TextRenderer = {
     const maxWidth = 2 * CONFIG.a_r[0] * CONFIG.security;
 
     return texts.map(text => {
-      standard.textContent = text;
-      const width = standard.getBBox().width;
+      const bbox = this.getBBoxCached(text);
+      const width = bbox.width;
 
       if (width > maxWidth) {
         return Math.round(100 * maxWidth / width * textReductionFactor);
@@ -661,34 +767,17 @@ const UIManager = {
       sortMode = "alphabetical";
       icon.className = "fa fa-arrow-down-wide-short fa-fw";
       button.title = "Trier par fréquence";
-
-      lieux_a.sort(function(e1, e2) {
-        var place1 = LocationManager.parseLocationName(e1[0]);
-        var place2 = LocationManager.parseLocationName(e2[0]);
-
-        var mainComparison = place1.mainPlace.localeCompare(place2.mainPlace, 'fr', {
-          sensitivity: 'base', ignorePunctuation: true, numeric: true
-        });
-
-        if (mainComparison !== 0) return mainComparison;
-        if (!place1.isSubPlace && place2.isSubPlace) return -1;
-        if (place1.isSubPlace && !place2.isSubPlace) return 1;
-
-        if (place1.isSubPlace && place2.isSubPlace) {
-          return place1.subPlace.localeCompare(place2.subPlace, 'fr', {
-            sensitivity: 'base', ignorePunctuation: true, numeric: true
-          });
-        }
-        return 0;
-      });
-
     } else {
       sortMode = "frequency";
       icon.className = "fa fa-arrow-down-a-z fa-fw";
       button.title = "Trier par ordre alphabétique";
-      lieux_a.sort(function(e1, e2) {
-        return e2[1].cnt - e1[1].cnt;
-      });
+    }
+
+    const headerIcon = document.getElementById('header-sort-icon');
+    if (headerIcon) {
+      headerIcon.className = sortMode === "alphabetical"
+        ? 'fa fa-arrow-down-a-z'
+        : 'fa fa-arrow-down-wide-short';
     }
 
     LocationManager.rebuildListVisualOnly();
@@ -697,40 +786,33 @@ const UIManager = {
   addNavigationHelp: function() {
     var helpPanel = document.createElement('div');
     helpPanel.id = 'navigation-help';
-    helpPanel.setAttribute('role', 'complementary');
-    helpPanel.setAttribute('aria-label', 'Aide à la navigation');
-    helpPanel.setAttribute('tabindex', '0');
-    helpPanel.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' || e.key === 'Enter') {
-        helpPanel.style.display = 'none';
-      }
-    });
+    helpPanel.style.display = 'none'; // Caché par défaut
     helpPanel.innerHTML = `
-    <div class="help-title">💡 Navigation</div>
-    <div>– Ctrl+clic : fiche individuelle</div>
-    <div>– <span class="text-success">▲</span> redéfinir la racine</div>
+      <div class="help-title">💡 Aide Navigation</div>
+      <div><strong>Souris :</strong></div>
+      <div>– Glisser : déplacer l'arbre</div>
+      <div>– Molette : zoomer</div>
+      <div>– Survol : voir les détails</div>
+      <div><strong>Raccourcis :</strong></div>
+      <div>– Ctrl+clic : fiche individuelle</div>
+      <div>– ▲ clic : navigation ancêtre</div>
+      <div style="margin-top: 8px; text-align: center;">
+      </div>
     `;
-
-    setTimeout(() => {
-      helpPanel.style.opacity = '0.5';
-    }, 8000);
-
-    helpPanel.onclick = function() {
-      helpPanel.style.display = 'none';
-    };
-
     document.body.appendChild(helpPanel);
-  }
+  },
 };
 
 const ColorManager = {
+  EVENT_TYPES: ["bi", "ba", "ma", "de", "bu"],
+
   setColorMode: function(newMode) {
     // Nettoyer l'état précédent
     document.body.classList.remove('place_color', 'death-age', 'places-list');
 
 
     // Désactiver tous les toggles NMBDS
-    ["bi", "ba", "ma", "de", "bu"].forEach(id => {
+    this.EVENT_TYPES.forEach(id => {
       const checkbox = document.getElementById(id);
       if (checkbox) checkbox.checked = false;
     });
@@ -779,12 +861,10 @@ const ColorManager = {
 
   updateButtonStates: function() {
     // Tous les boutons utilisent la même classe .active
-    const monoButton = document.getElementById("b-mono");
     const ageButton = document.getElementById("b-death-age");
     const placesButton = document.getElementById("b-places-colorise");
     const sortButton = document.getElementById("b-sort-places");
 
-    if (monoButton) monoButton.classList.toggle("active", mono === "1");
     if (ageButton) ageButton.classList.toggle("active", tool === "death-age");
     if (placesButton) placesButton.classList.toggle("active", tool === "place_color");
     if (sortButton) sortButton.classList.toggle("active", sortMode === "alphabetical");
@@ -809,11 +889,9 @@ const ColorManager = {
 
   initializeColorEvents: function() {
     // Événements des checkboxes NMBDS
-    ["bi", "ba", "ma", "de", "bu"].forEach(id => {
+    this.EVENT_TYPES.forEach(id => {
       const checkbox = document.getElementById(id);
-      if (checkbox) {
-        checkbox.onclick = this.applyColorization.bind(this);
-      }
+      if (checkbox) checkbox.onclick = this.applyColorization.bind(this);
     });
 
     // Bouton colorisation lieux
@@ -827,11 +905,9 @@ const ColorManager = {
         this.classList.remove("active");
 
         // Tout désactiver
-        document.getElementById("bi").checked = false;
-        document.getElementById("ba").checked = false;
-        document.getElementById("ma").checked = false;
-        document.getElementById("de").checked = false;
-        document.getElementById("bu").checked = false;
+        ColorManager.EVENT_TYPES.forEach(id => {
+          document.getElementById(id).checked = false;
+        });
       } else {
         // Activer avec M par défaut uniquement
         document.body.className = "places-list place_color";
@@ -891,53 +967,20 @@ const ColorManager = {
 };
 
 const LegendManager = {
-  initializeAgeEvents: function() {
-    const ageIds = ["DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6"];
-
-    ageIds.forEach(function(id) {
+  initializeLegendEvents: function(ids) {
+    ids.forEach(function(id) {
       var element = document.getElementById(id);
-      if (!element) return; // Protection si l'élément n'existe pas
+      if (!element) return;
 
       element.onmouseenter = function() {
-        // Surligner tous les éléments avec cette classe
         var elements = document.getElementsByClassName(id);
         for (var i = 0; i < elements.length; i++) {
           elements[i].classList.add("highlight");
         }
-        // Surligner l'élément de légende lui-même
         document.getElementById(id).classList.add("hl");
       };
 
       element.onmouseleave = function() {
-        // Retirer le surlignage
-        var elements = document.getElementsByClassName(id);
-        for (var i = 0; i < elements.length; i++) {
-          elements[i].classList.remove("highlight");
-        }
-        document.getElementById(id).classList.remove("hl");
-      };
-    });
-  },
-
-  initializeMarriageEvents: function() {
-    const marriageIds = ["DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6", "DAM7"];
-
-    marriageIds.forEach(function(id) {
-      var element = document.getElementById(id);
-      if (!element) return; // Protection si l'élément n'existe pas
-
-      element.onmouseenter = function() {
-        // Surligner tous les éléments avec cette classe
-        var elements = document.getElementsByClassName(id);
-        for (var i = 0; i < elements.length; i++) {
-          elements[i].classList.add("highlight");
-        }
-        // Surligner l'élément de légende lui-même
-        document.getElementById(id).classList.add("hl");
-      };
-
-      element.onmouseleave = function() {
-        // Retirer le surlignage
         var elements = document.getElementsByClassName(id);
         for (var i = 0; i < elements.length; i++) {
           elements[i].classList.remove("highlight");
@@ -948,32 +991,115 @@ const LegendManager = {
   },
 
   initializeAllEvents: function() {
-    this.initializeAgeEvents();
-    this.initializeMarriageEvents();
+    this.initializeLegendEvents(["DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6"]);
+    this.initializeLegendEvents(["DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6", "DAM7"]);
   }
 };
 
-const LocationManager = {
-  parseLocationName: function(placeName) {
-    // Regexp pour capturer « [sous-lieu] [–—-] lieu-principal »
-    var match = placeName.match(/^(.+?)\s+[–—-]\s+(.+)$/);
+const NavigationHelper = {
+  openPersonLink: function(person, newTab = false, stayInFanchart = false) {
+    if (!person || !person.fnk || !person.snk) return false;
 
-    if (match) {
+    const oc = person.oc ? `&oc=${person.oc}` : '';
+    let url;
+
+    if (stayInFanchart) {
+      url = `${link_to_person}p=${person.fnk}&n=${person.snk}${oc}&m=A&t=FC&v=${max_gen}`;
+      if (tool && tool !== "") url += `&tool=${tool}`;
+    } else {
+      // Navigation externe: va vers fiche individuelle
+      url = `${link_to_person}p=${person.fnk}&n=${person.snk}${oc}`;
+    }
+
+    if (newTab) {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+    return true;
+  },
+
+  openPlaceLink: function(placeName, newTab = false) {
+    const searchTerm = placeName.length > 2 ? placeName.slice(0, -2) : placeName;
+    const url = `${link_to_person}m=MOD_DATA&data=place&s=${encodeURIComponent(searchTerm)}&s1=${encodeURIComponent(placeName)}`;
+
+    if (newTab) {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+    return true;
+  }
+};
+
+
+const LocationManager = {
+  _sortedIndexes: {
+    frequency: null,
+    alphabetical: null
+  },
+
+  getSortedData: function() {
+    if (!this._sortedIndexes[sortMode]) {
+      if (sortMode === "frequency") {
+        this._sortedIndexes.frequency = [...lieux_a].sort(function(e1, e2) {
+          return e2[1].cnt - e1[1].cnt;
+        });
+      } else { // alphabetical
+        this._sortedIndexes.alphabetical = [...lieux_a].sort(function(e1, e2) {
+          var place1 = LocationManager.parseLocationName(e1[0]);
+          var place2 = LocationManager.parseLocationName(e2[0]);
+
+          var mainComparison = place1.mainPlace.localeCompare(place2.mainPlace, 'fr', {
+            sensitivity: 'base', ignorePunctuation: true, numeric: true
+          });
+
+          if (mainComparison !== 0) return mainComparison;
+          if (!place1.isSubPlace && place2.isSubPlace) return -1;
+          if (place1.isSubPlace && !place2.isSubPlace) return 1;
+
+          if (place1.isSubPlace && place2.isSubPlace) {
+            return place1.subPlace.localeCompare(place2.subPlace, 'fr', {
+              sensitivity: 'base', ignorePunctuation: true, numeric: true
+            });
+          }
+          return 0;
+        });
+      }
+    }
+    return this._sortedIndexes[sortMode];
+  },
+
+  invalidateSortCache: function() {
+    this._sortedIndexes = { frequency: null, alphabetical: null };
+  },
+
+  parseLocationName: function(placeName) {
+    // Extraction du pattern de matching en constante
+    const SUBLOCATION_PATTERN = /^(.+?)\s+[–—-]\s+(.+)$/;
+    const match = placeName.match(SUBLOCATION_PATTERN);
+
+    // Structure de retour cohérente
+    const baseStructure = {
+      original: placeName,
+      isSubPlace: false,
+      mainPlace: placeName,
+      subPlace: null
+    };
+
+    if (!match) {
       return {
-        mainPlace: match[2].trim(),      // "Montigny"
-        subPlace: match[1].trim(),       // "[Bourg]" ou "Bourg"
-        isSubPlace: true,
-        original: placeName,             // "[Bourg] – Montigny"
-        sortKey: match[2].trim().toLowerCase() + "|" + match[1].trim().toLowerCase()
+        ...baseStructure,
+        sortKey: placeName.toLowerCase() + "|"
       };
     }
 
     return {
-      mainPlace: placeName,
-      subPlace: null,
-      isSubPlace: false,
-      original: placeName,
-      sortKey: placeName.toLowerCase() + "|"  // "|" place les lieux principaux avant leurs sous-lieux
+      ...baseStructure,
+      mainPlace: match[2].trim(),
+      subPlace: match[1].trim(),
+      isSubPlace: true,
+      sortKey: match[2].trim().toLowerCase() + "|" + match[1].trim().toLowerCase()
     };
   },
 
@@ -1042,34 +1168,56 @@ const LocationManager = {
     }
   },
 
-  togglePlaceHl: function(locationKey, index, show) {
-    const eventTypes = ["bi", "ba", "ma", "de", "bu"];
+  calculateHighlightState: function(locationKey, index, eventTypes) {
+    const state = {
+      elementsToHighlight: [],
+      elementsToShow: [],
+      indicatorsToToggle: []
+    };
 
-    eventTypes.forEach(function(ev) {
-      // Toggle sur les éléments graphiques et textes
-      [`${ev}-L${index}`, `${ev}-tL${index}`].forEach(className => {
-        const elements = document.getElementsByClassName(className);
-        const isText = className.includes('-t');
-        
-        for (const element of elements) {
-          if (isText) {
-            element.classList.toggle("text_highlight", show);
-          } else {
-            element.classList.toggle("highlight", show);
-            element.classList.toggle("highlight-from-list", show);
-          }
-        }
-      });
-
-      // Toggle sur l'indicateur si le lieu a cet événement
-      if (lieux[locationKey] && lieux[locationKey][ev]) {
-        const indicator = document.getElementById(`${ev}-L${index}`);
-        if (indicator) {
-          indicator.classList.toggle("hidden", !show);
-        }
+    eventTypes.forEach(eventType => {
+      if (lieux[locationKey] && lieux[locationKey][eventType]) {
+        state.elementsToHighlight.push({
+          className: `${eventType}-L${index}`,
+          textClassName: `${eventType}-tL${index}`
+        });
+        state.indicatorsToToggle.push(`${eventType}-L${index}`);
       }
     });
 
+    return state;
+  },
+
+  applyHighlightState: function(state, show) {
+    // Cette fonction ne contient que de la manipulation DOM
+    state.elementsToHighlight.forEach(({ className, textClassName }) => {
+      // Manipulation des éléments graphiques
+      const graphElements = DOMCache.getElementsByClassName(className);
+      graphElements.forEach(el => {
+        el.classList.toggle("highlight", show);
+        el.classList.toggle("highlight-from-list", show);
+      });
+
+      // Manipulation des éléments texte
+      const textElements = DOMCache.getElementsByClassName(textClassName);
+      textElements.forEach(el => {
+        el.classList.toggle("text_highlight", show);
+      });
+    });
+
+    // Toggle des indicateurs
+    state.indicatorsToToggle.forEach(id => {
+      const indicator = DOMCache.getElementById(id);
+      if (indicator) {
+        indicator.classList.toggle("hidden", !show);
+      }
+    });
+  },
+
+
+  togglePlaceHl: function(locationKey, index, show) {
+    const state = this.calculateHighlightState(locationKey, index , ["bi", "ba", "ma", "de", "bu"]);
+    this.applyHighlightState(state, show);
     this.hlPlace(locationKey, show);
   },
 
@@ -1128,7 +1276,6 @@ const LocationManager = {
       if (previousLi) {
         var previousPlace = previousLi.dataset.location;
         var previousInfo = LocationManager.parseLocationName(previousPlace);
-
         if (!previousInfo.isSubPlace && previousInfo.mainPlace === locationInfo.mainPlace) {
           showSubIndicator = true;
           li.classList.add("sublocation");
@@ -1140,12 +1287,28 @@ const LocationManager = {
 
     var subIndicator = showSubIndicator ? '<span class="sublocation-indicator">└</span>' : '';
 
-    li.innerHTML =
-      this.buildEventIndicators(originalIndex) +
-      '<span class="square">■</span>' + subIndicator + ' ' + placeName;
+    // Structure HTML simple - pas de liens imbriqués
+    li.innerHTML = this.buildEventIndicators(originalIndex) +
+                   '<span class="square">■</span>' +
+                   subIndicator + ' ' + placeName;
 
     li.setAttribute("id", lieux[placeName].c);
-    li.setAttribute("title", LocationManager.buildLocationTooltip(lieux[placeName]));
+    li.setAttribute("title", this.buildLocationTooltip(lieux[placeName]));
+
+    // Indiquer visuellement que c'est cliquable en mode wizard
+    if (document.body.dataset.wizard === "1") {
+      li.classList.add("clickable-place");
+    }
+  },
+
+  shouldShowSubIndicator: function(li, locationInfo) {
+    if (!locationInfo.isSubPlace) return false;
+    const previousLi = li.previousElementSibling;
+    if (!previousLi) return false;
+
+    const previousPlace = previousLi.dataset.location;
+    const previousInfo = this.parseLocationName(previousPlace);
+    return !previousInfo.isSubPlace && previousInfo.mainPlace === locationInfo.mainPlace;
   },
 
   calculateAndBuild: function(maxGeneration) {
@@ -1176,10 +1339,8 @@ const LocationManager = {
     for (var key in lieux) {
       lieux_a.push([key, lieux[key]]);
     }
-    lieux_a.sort(function(e1, e2) {
-      return e2[1].cnt - e1[1].cnt;
-    });
 
+    this.invalidateSortCache();
     this.buildInterface();
   },
 
@@ -1196,7 +1357,7 @@ const LocationManager = {
     var c_dh = 60;
     var c_l = 90;
 
-    lieux_a.forEach(function(l, i) {
+    LocationManager.getSortedData().forEach(function(l, i) {
       var placeName = l[0];
       lieux[placeName].c = "L" + i;
 
@@ -1217,14 +1378,16 @@ const LocationManager = {
       }
     });
 
-    this.initializeEvents();
+    this.initializeLocationEvents();
   },
 
   rebuildListVisualOnly: function() {
     var places_list = document.getElementById("places_list");
     places_list.innerHTML = "";
 
-    lieux_a.forEach(function(l, index) {
+    DOMCache.invalidate();
+
+    LocationManager.getSortedData().forEach(function(l, visualIndex) {
       var placeName = l[0];
       var originalIndex = parseInt(lieux[placeName].c.substring(1));
 
@@ -1233,50 +1396,19 @@ const LocationManager = {
       li.dataset.index = originalIndex;
       li.dataset.originalIndex = originalIndex;
 
-      var locationInfo = LocationManager.parseLocationName(placeName);
-      var showSubIndicator = false;
-
-      if (sortMode === "alphabetical" && locationInfo.isSubPlace) {
-        if (index > 0) {
-          var previousPlace = lieux_a[index - 1][0];
-          var previousInfo = LocationManager.parseLocationName(previousPlace);
-
-          if (!previousInfo.isSubPlace && previousInfo.mainPlace === locationInfo.mainPlace) {
-            showSubIndicator = true;
-            li.classList.add("sublocation");
-          }
-        }
-      }
-
-      var subIndicator = showSubIndicator ? '<span class="sublocation-indicator">└</span>' : '';
-
-      li.innerHTML =
-        (has_bi ? '<span id="bi-L'+originalIndex+'" class="hidden">N</span>' : '') +
-        (has_ba ? '<span id="ba-L'+originalIndex+'" class="hidden">B</span>' : '') +
-        (has_ma ? '<span id="ma-L'+originalIndex+'" class="hidden">M</span>' : '') +
-        (has_de ? '<span id="de-L'+originalIndex+'" class="hidden">D</span>' : '') +
-        (has_bu ? '<span id="bu-L'+originalIndex+'" class="hidden">S</span>' : '') +
-        '<span class="square">■</span>' + subIndicator + ' ' + placeName;
-
-      li.setAttribute("id", lieux[placeName].c);
-      li.setAttribute("title", LocationManager.buildLocationTooltip(lieux[placeName]));
-
+      LocationManager.updateLocationListItem(li, placeName, visualIndex);
       places_list.append(li);
     });
 
-    this.initializeEvents();
+    this.initializeLocationEvents();
   },
 
   buildHeader: function() {
     var placesContainer = document.getElementById("places-list");
     var existingHeader = document.getElementById('places-header');
 
-    // Supprimer l'ancien header s'il existe
-    if (existingHeader) {
-      existingHeader.remove();
-    }
+    if (existingHeader) { existingHeader.remove(); }
 
-    // Créer le nouveau header avec les bons comptages
     var header = this.createHeader();
     placesContainer.insertBefore(header, placesContainer.firstChild);
   },
@@ -1288,31 +1420,33 @@ const LocationManager = {
     const eventsKey = totals.events > 1 ? 'events' : 'event';
     const eventsLabel = window.t(eventsKey, eventsKey);
 
+    const sortIconClass = sortMode === "alphabetical"
+      ? 'fa-arrow-down-a-z'
+      : 'fa-arrow-down-wide-short';
+
     var header = document.createElement('div');
     header.id = 'places-header';
     header.innerHTML = `
       <span style="color: #666;">
         ${max_gen} gén. : ${totals.places} ${placesLabel}, ${totals.events} ${eventsLabel}
+        <i id="header-sort-icon" class="fa ${sortIconClass}" style="font-size: 12px; margin-left: 8px;"></i>
       </span>
     `;
     return header;
   },
 
   calculateTotals: function() {
-    var totalPlaces = Object.keys(lieux).length;
-    var totalEvents = 0;
+    const totals = Object.values(lieux).reduce((acc, lieu) => {
+      return {
+        places: acc.places + 1,
+        events: acc.events + (lieu.cnt || 0)
+      };
+    }, { places: 0, events: 0 });
 
-    Object.keys(lieux).forEach(function(placeName) {
-      totalEvents += lieux[placeName].cnt;
-    });
-
-    return {
-      places: totalPlaces,
-      events: totalEvents
-    };
+    return totals;
   },
 
-  initializeEvents: function() {
+  initializeLocationEvents: function() {
     const placesList = document.getElementById("places_list");
     if (!placesList) return;
 
@@ -1328,6 +1462,33 @@ const LocationManager = {
       };
     }
 
+    // Survol identique à la version qui marchait
+    placesList.addEventListener("mouseenter", (e) => {
+      const data = getLocationData(e.target);
+      if (data) {
+        data.element.classList.add("hovered");
+        LocationManager.togglePlaceHl(data.locationKey, data.index, true);
+      }
+    }, true);
+
+    placesList.addEventListener("mouseleave", (e) => {
+      const data = getLocationData(e.target);
+      if (data) {
+        data.element.classList.remove("hovered");
+        LocationManager.togglePlaceHl(data.locationKey, data.index, false);
+      }
+    }, true);
+
+    placesList.addEventListener("click", (e) => {
+      if (document.body.dataset.wizard !== "1") return;
+      const data = getLocationData(e.target);
+      if (data) {
+        e.preventDefault();
+        NavigationHelper.openPlaceLink(data.locationKey, true);
+      }
+    });
+
+    // Gestionnaire pour le tri (délégation aussi)
     const placesContainer = document.getElementById("places-list");
     if (placesContainer) {
       placesContainer.addEventListener('click', function(e) {
@@ -1337,23 +1498,7 @@ const LocationManager = {
         }
       });
     }
-
-    placesList.addEventListener("mouseenter", function(e) {
-      const data = getLocationData(e.target);
-      if (data && data.index >= 0) {
-        data.element.classList.add("hovered");
-        LocationManager.togglePlaceHl(data.locationKey, data.index, true);
-      }
-    }, true);
-
-    placesList.addEventListener("mouseleave", function(e) {
-      const data = getLocationData(e.target);
-      if (data && data.index >= 0) {
-        data.element.classList.remove("hovered");
-        LocationManager.togglePlaceHl(data.locationKey, data.index, false);
-      }
-    }, true);
-  }
+  },
 };
 
 // ========== Application principale ==========
@@ -1396,9 +1541,11 @@ const FanchartApp = {
     this.calculateDimensions();
     this.processAncestorData();
     LocationManager.calculateAndBuild()
+    DOMCache.preload();
     this.renderFanchart();
     this.updateGenerationTitle();
     this.initializeEvents();
+    LocationManager.initializeLocationEvents();
     ColorManager.initializeColorEvents();
     LegendManager.initializeAllEvents();
     this.applyInitialState();
@@ -1407,38 +1554,93 @@ const FanchartApp = {
   },
 
   processAncestorData: function() {
-    // Nettoyer les données des ancêtres (une seule fois au chargement)
-    var ak = Object.keys(ancestor);
-    ak.forEach(function(s) {
-      var p = ancestor[s];
+    // Vue d'ensemble claire : on voit immédiatement les étapes du traitement
+    const ancestorKeys = Object.keys(ancestor);
 
-      // Nettoyer les données et définir les flags
-      if (p.birth_place !== undefined) {
-        has_bi = true;
-        ancestor[s].birth_place = p.birth_place.replace(/^\?, /, "");
+    ancestorKeys.forEach(key => {
+      const person = ancestor[key];
+
+      // Chaque transformation a sa propre fonction dédiée
+      this.cleanPersonPlaces(person, key);
+      this.cleanPersonDates(person, key);
+      this.cleanPersonAge(person, key);
+    });
+
+    // Après le nettoyage, mettre à jour les flags globaux
+    this.updateGlobalFlags();
+  },
+
+  // Fonction dédiée au nettoyage des lieux
+  cleanPersonPlaces: function(person, key) {
+    // Cette fonction a une responsabilité unique : nettoyer les lieux
+    const placeFields = [
+      { field: 'birth_place', flag: 'has_bi' },
+      { field: 'baptism_place', flag: 'has_ba' },
+      { field: 'marriage_place', flag: 'has_ma' },
+      { field: 'death_place', flag: 'has_de' },
+      { field: 'burial_place', flag: 'has_bu' }
+    ];
+
+    placeFields.forEach(({ field, flag }) => {
+      if (person[field] !== undefined) {
+        // Le nettoyage lui-même est extrait dans une fonction pure
+        ancestor[key][field] = this.cleanPlaceName(person[field]);
+        // On ne modifie pas les flags globaux ici, c'est une autre responsabilité
+        window[flag] = true;
       }
-      if (p.baptism_place !== undefined) {
-        has_ba = true;
-        ancestor[s].baptism_place = p.baptism_place.replace(/^\?, /, "");
-      }
-      if (p.marriage_place !== undefined) {
-        has_ma = true;
-        ancestor[s].marriage_place = p.marriage_place.replace(/^\?, /, "");
-      }
-      if (p.death_place !== undefined) {
-        has_de = true;
-        ancestor[s].death_place = p.death_place.replace(/^\?, /, "");
-      }
-      if (p.burial_place !== undefined) {
-        has_bu = true;
-        ancestor[s].burial_place = p.burial_place.replace(/^\?, /, "");
-      }
-      if (p.death_age !== undefined) {
-        ancestor[s].death_age = p.death_age.replace(/[^0123456789]/g, "");
-      }
-      // Nettoyer les dates (balises HTML)
-      ancestor[s].dates = p.dates.replace(/\s?<\/?bdo[^>]*>/g, "");
-      ancestor[s].dates = ancestor[s].dates.replace(/\bca\s+/g, "~");
+    });
+  },
+
+  // Fonction pure pour nettoyer un nom de lieu
+  cleanPlaceName: function(placeName) {
+    // Cette fonction est pure : même entrée = même sortie, pas d'effets de bord
+    return placeName.replace(/^\?, /, "");
+  },
+
+  // Fonction dédiée au nettoyage des dates
+  cleanPersonDates: function(person, key) {
+    if (person.dates !== undefined) {
+      // Chaînage des transformations de manière claire
+      let cleanedDates = person.dates;
+      cleanedDates = this.removeHtmlTags(cleanedDates);
+      cleanedDates = this.abbreviateCirca(cleanedDates);
+      ancestor[key].dates = cleanedDates;
+    }
+  },
+
+  // Fonctions pures pour les transformations de dates
+  removeHtmlTags: function(text) {
+    return text.replace(/\s?<\/?bdo[^>]*>/g, "");
+  },
+
+  abbreviateCirca: function(text) {
+    return text.replace(/\bca\s+/g, "~");
+  },
+
+  // Fonction dédiée au nettoyage de l'âge
+  cleanPersonAge: function(person, key) {
+    if (person.death_age !== undefined) {
+      ancestor[key].death_age = this.extractNumericAge(person.death_age);
+    }
+  },
+
+  // Fonction pure pour extraire l'âge numérique
+  extractNumericAge: function(ageString) {
+    return ageString.replace(/[^0-9]/g, "");
+  },
+
+  // Mise à jour des flags globaux basée sur l'état actuel des données
+  updateGlobalFlags: function() {
+    // Réinitialiser les flags
+    has_bi = has_ba = has_ma = has_de = has_bu = false;
+
+    // Parcourir les ancêtres pour déterminer quels types de données sont présents
+    Object.values(ancestor).forEach(person => {
+      if (person.birth_place) has_bi = true;
+      if (person.baptism_place) has_ba = true;
+      if (person.marriage_place) has_ma = true;
+      if (person.death_place) has_de = true;
+      if (person.burial_place) has_bu = true;
     });
   },
 
@@ -1525,11 +1727,13 @@ const FanchartApp = {
     }
 
     // Définir les dimensions du SVG avec validation
-    center_x = max_r + CONFIG.svg_margin;
-    center_y = max_r + CONFIG.svg_margin;
+    const margin = CONFIG.svg_margin;
+    center_x = max_r + margin;
+    center_y = max_r + margin;
     svg_w = 2 * center_x;
-    svg_h = 2 * CONFIG.svg_margin + max_r +
-            Math.max(CONFIG.a_r[0], Math.round(max_r * Math.sin(Math.PI/180*(CONFIG.d_all-180)/2)));
+    const halfAngleRad = Math.PI/180 * (CONFIG.d_all-180) / 2;
+    const extraHeight = Math.max(CONFIG.a_r[0], Math.round(max_r * Math.sin(halfAngleRad)));
+    svg_h = 2 * margin + max_r + extraHeight;
     if (isNaN(svg_w) || isNaN(svg_h) || svg_w <= 0 || svg_h <= 0) {
       console.error("Dimensions SVG calculées invalides:", { svg_w, svg_h, max_r, center_x, center_y });
       svg_w = 800;
@@ -1555,102 +1759,242 @@ const FanchartApp = {
   },
 
   renderFanchart: function() {
-    standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    const standardInfo = this.initializeStandardText();
+    standard = standardInfo.element;
+    standard_width = standardInfo.width;
+
+    this.renderCenterPerson();
+    this.renderAncestorsByGeneration();
+    this.updateButtonStates();
+
+    const svg = document.getElementById("fanchart");
+    const container = document.getElementById("fanchart-container");
+    /* todo calculate dynamicaly good position for the perso/marr info panel
+    panel.style.left = (bbox.left + 20) + "px";
+    panel.style.top = (bbox.top + 20) + "px";
+    */
+  },
+
+  renderAncestorsByGeneration: function() {
+    // rayon total accumulé
+    let cumulativeR = CONFIG.a_r[0];
+    const rings = max_gen + 1;
+    for (let gen = 2; gen <= rings; gen++) {
+      const innerR = cumulativeR;              // rayon intérieur
+      const outerR = innerR + CONFIG.a_r[gen-1]; // rayon extérieur
+      cumulativeR = outerR;                      // pour la génération suivante
+
+      // angle total à découper
+      const delta = CONFIG.d_all / Math.pow(2, gen-1);
+      // angle de départ (au-dessus du centre)
+      let angle = -90 - CONFIG.d_all / 2 + delta/2;
+
+      // on itère sur les 2^(gen-1) cases de cette génération
+      const firstSosa = Math.pow(2, gen-1);
+      const lastSosa  = Math.pow(2, gen) - 1;
+
+      for (let sosa = firstSosa; sosa <= lastSosa; sosa++, angle += delta) {
+        const person = ancestor["S" + sosa];
+        if (!person) continue;
+
+        // préparez votre position pour ce secteur
+        const pos = {
+          r1: innerR,
+          r2: outerR,
+          a1: angle - delta/2,
+          a2: angle + delta/2,
+          generation: gen,
+          delta: delta
+        };
+
+        // et on réutilise la même méthode pour dessiner
+        this.renderAncestorSector(sosa, pos, person);
+      }
+    }
+
+    // enfin on met à jour vos boutons / UI
+    this.updateButtonStates();
+  },
+
+  initializeStandardText: function() {
+    const standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
     standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz";
     standard.setAttribute("id", "standard");
     standard.setAttribute("x", center_x);
     standard.setAttribute("y", center_y);
     fanchart.append(standard);
-    standard_width = standard.getBBox().width / standard.textContent.length;
 
-    var gen = 1;
-    var sosa = 1;
-    var r1 = 0;
-    var r2 = CONFIG.a_r[0];
-    var a1, a2;
-    var delta = CONFIG.d_all;
+    const bbox = standard.getBBox();
 
-    // Création du groupe pour sosa 1
-    var g1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    g1.setAttribute("id", "S"+sosa);
-    fanchart.append(g1);
+    return {
+      element: standard,
+      width: bbox.width / standard.textContent.length,
+      height: bbox.height  // Si besoin plus tard
+    };
+  },
 
-    SVGRenderer.drawCircle(g1, r2, center_x, center_y, ancestor["S"+sosa], { isBackground: true });
-    T.drawText(g1, 'S1', { x: center_x, y: center_y - 10, p: ancestor["S"+sosa], classes: "" });
-    SVGRenderer.drawCircle(g1, r2, center_x, center_y, ancestor["S"+sosa]);
+  // Rendu du centre (Sosa 1)
+  renderCenterPerson: function() {
+    const sosa = 1;
+    const person = ancestor["S" + sosa];
+    const r = CONFIG.a_r[0];
 
-    while(true) {
-      sosa++;
-      if(sosa >= (2 ** gen)) {
-        gen++;
-        if(gen >= CONFIG.a_r.length+1 || gen > max_gen + 1) {
-          break;
-        }
-        delta = delta / 2;
-        r1 = r2;
-        r2 = r1 + CONFIG.a_r[gen-1];
-        a1 = -90 - CONFIG.d_all/2;
-        a2 = a1 + delta;
-      } else {
-        a1 += delta;
-        a2 += delta;
-      }
-      var p = ancestor["S"+sosa];
-      if(p !== undefined) {
-        var pg = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        pg.setAttribute("id", "S"+sosa);
-        fanchart.append(pg);
+    // Créer le groupe SVG
+    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    group.setAttribute("id", "S" + sosa);
+    fanchart.append(group);
 
-        var same = (p.fn == "=" ? true : false);
-        if(same && implex != "") {
-          var p2 = ancestor["S"+(2 * p.sn)];
-          if(p2 !== undefined) {
-            ancestor["S"+(2*sosa)] = { "fn" : "=", "sn": 2*p.sn, "fnk": p2.fnk, "snk": p2.snk, "oc": p2.oc, "dates": "", "has_parents": p2.has_parents };
-          }
-          p2 = ancestor["S"+(2*p.sn+1)];
-          if(p2 !== undefined) {
-            ancestor["S"+(2*sosa+1)] = { "fn" : "=", "sn": 2*p.sn+1, "fnk": p2.fnk, "snk": p2.snk, "oc": p2.oc, "dates": "", "has_parents": p2.has_parents };
-          }
-          p = ancestor["S"+p.sn];
-          same = false;
-        }
-        SVGRenderer.drawPie(pg, r1+10, r2, a1, a2, p, { type: 'person', isBackground: true });
-        if(p.fn != "?") {
-          var c = "";
-          if(p.birth_place !== undefined && p.birth_place != "") {
-            c += " bi-t"+lieux[p.birth_place].c;
-          }
-          if(p.baptism_place !== undefined && p.baptism_place != "") {
-            c += " ba-t"+lieux[p.baptism_place].c;
-          }
-          if(p.death_place !== undefined && p.death_place != "") {
-            c += " de-t"+lieux[p.death_place].c;
-          }
-          if(p.burial_place !== undefined && p.burial_place != "") {
-            c += " bu-t"+lieux[p.burial_place].c;
-          }
-          SVGRenderer.drawSectorText(pg, r1, r2, a1, a2, sosa, p, c, gen, same);
-        }
-        if(sosa % 2 == 0) {
-          SVGRenderer.drawPie(pg, r1, r1+10, a1, a2+delta, p, { type: 'marriage', isBackground: true });
-          if(p.marriage_date !== undefined) {
-            var c = "";
-            if(p.marriage_place !== undefined && p.marriage_place != "") {
-              c += " ma-t"+lieux[p.marriage_place].c;
-            }
-            T.drawMarriageDate(pg, sosa, r1+5, a1, a2+delta, p.marriage_date, c);
-          }
-          SVGRenderer.drawContour(pg, r1, r2, a1, a2+delta);
-          SVGRenderer.drawRadialLine(pg, r1+10, r2, a2);
-          SVGRenderer.drawPie(pg, r1, r1+10, a1, a2+delta, p, { type: 'marriage' });
-        } else {
-          ancestor["S"+sosa].marriage_place = ancestor["S"+(sosa-1)].marriage_place;
-        }
-        SVGRenderer.drawPie(pg, r1+10, r2, a1, a2, p, { type: 'person' });
-        SVGRenderer.drawParentIndicator(pg, r1+10, a1, a2, sosa, p);
-      }
+    // Dessiner les éléments
+    SVGRenderer.drawCircle(group, r, center_x, center_y, person, { isBackground: true });
+    T.drawText(group, 'S1', {
+      x: center_x,
+      y: center_y - 10,
+      p: person,
+      classes: ""
+    });
+    SVGRenderer.drawCircle(group, r, center_x, center_y, person);
+
+    return group;
+  },
+
+  // Gestion des implexes
+  handleImplex: function(sosa, person) {
+    if (person.fn !== "=" || implex === "") {
+      return { person: person, isImplex: false };
     }
-    this.updateButtonStates();
+
+    // Propagation des implexes aux enfants
+    const childSosa1 = 2 * sosa;
+    const childSosa2 = 2 * sosa + 1;
+    const referenceSosa = person.sn;
+
+    // Créer les références pour les enfants si elles existent
+    const ref1 = ancestor["S" + (2 * referenceSosa)];
+    const ref2 = ancestor["S" + (2 * referenceSosa + 1)];
+
+    if (ref1) {
+      ancestor["S" + childSosa1] = {
+        fn: "=",
+        sn: 2 * referenceSosa,
+        fnk: ref1.fnk,
+        snk: ref1.snk,
+        oc: ref1.oc,
+        dates: "",
+        has_parents: ref1.has_parents
+      };
+    }
+
+    if (ref2) {
+      ancestor["S" + childSosa2] = {
+        fn: "=",
+        sn: 2 * referenceSosa + 1,
+        fnk: ref2.fnk,
+        snk: ref2.snk,
+        oc: ref2.oc,
+        dates: "",
+        has_parents: ref2.has_parents
+      };
+    }
+
+    // Retourner la personne réelle référencée
+    return {
+      person: ancestor["S" + referenceSosa],
+      isImplex: true,
+      originalSosa: referenceSosa
+    };
+  },
+
+  // Rendre un secteur complet d’ancêtre
+  renderAncestorSector: function(sosa, position, person) {
+    // Créer le groupe pour cet ancêtre
+    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    group.setAttribute("id", "S" + sosa);
+    fanchart.append(group);
+
+    // Gérer les implexes
+    const implexInfo = this.handleImplex(sosa, person);
+    const actualPerson = implexInfo.person;
+    actualPerson.sosa = sosa;
+
+    // Dessiner le secteur de fond
+    SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
+      position.a1, position.a2, actualPerson,
+      { type: 'person', isBackground: true });
+
+    // Dessiner le texte si la personne est connue
+    if (actualPerson.fn !== "?") {
+      const textClasses = this.buildTextClasses(actualPerson);
+      SVGRenderer.drawSectorText(group, position.r1, position.r2,
+        position.a1, position.a2, sosa, actualPerson,
+        textClasses, position.generation, implexInfo.isImplex);
+    }
+
+    // Gérer le mariage pour les ancêtres pairs (pères)
+    if (sosa % 2 === 0) {
+      this.renderMarriageInfo(group, sosa, position, actualPerson);
+    } else {
+      // Propager l'info de mariage aux ancêtres impairs (mères)
+      ancestor["S" + sosa].marriage_place = ancestor["S" + (sosa - 1)].marriage_place;
+    }
+
+    // Dessiner le secteur interactif
+    SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
+      position.a1, position.a2, actualPerson,
+      { type: 'person' });
+
+    // Ajouter l'indicateur de navigation
+    SVGRenderer.drawParentIndicator(group, position.r1 + 10,
+      position.a1, position.a2, sosa, actualPerson);
+
+    return group;
+  },
+
+  buildTextClasses: function(person) {
+    let classes = "";
+
+    if (person.birth_place && person.birth_place !== "" && lieux[person.birth_place]) {
+      classes += " bi-t" + lieux[person.birth_place].c;
+    }
+    if (person.baptism_place && person.baptism_place !== "" && lieux[person.baptism_place]) {
+      classes += " ba-t" + lieux[person.baptism_place].c;
+    }
+    if (person.death_place && person.death_place !== "" && lieux[person.death_place]) {
+      classes += " de-t" + lieux[person.death_place].c;
+    }
+    if (person.burial_place && person.burial_place !== "" && lieux[person.burial_place]) {
+      classes += " bu-t" + lieux[person.burial_place].c;
+    }
+
+    return classes.trim();
+  },
+
+  // Informations de mariage
+  renderMarriageInfo: function(group, sosa, position, person) {
+    const extendedA2 = position.a2 + position.delta;
+
+    // Dessiner le secteur de mariage (fond)
+    SVGRenderer.drawPie(group, position.r1, position.r1 + 10,
+      position.a1, extendedA2, person,
+      { type: 'marriage', isBackground: true });
+
+    // Dessiner la date de mariage si elle existe
+    if (person.marriage_date !== undefined) {
+      let classes = "";
+      if (person.marriage_place && person.marriage_place !== "" && lieux[person.marriage_place]) {
+        classes += " ma-t" + lieux[person.marriage_place].c;
+      }
+      T.drawMarriageDate(group, sosa, position.r1 + 5,
+        position.a1, extendedA2, person.marriage_date, classes);
+    }
+
+    // Dessiner le contour et la ligne radiale
+    SVGRenderer.drawContour(group, position.r1, position.r2, position.a1, extendedA2);
+    SVGRenderer.drawRadialLine(group, position.r1 + 10, position.r2, position.a2);
+
+    // Dessiner le secteur de mariage interactif
+    SVGRenderer.drawPie(group, position.r1, position.r1 + 10,
+      position.a1, extendedA2, person,
+      { type: 'marriage' });
   },
 
   updateGenerationTitle: function() {
@@ -1663,6 +2007,7 @@ const FanchartApp = {
   },
 
   reRenderWithCurrentGenerations: function() {
+    DOMCache.invalidate();
     this.calculateDimensions();
     LocationManager.calculateAndBuild(max_gen);
     const fanchart = document.getElementById("fanchart");
@@ -1698,9 +2043,18 @@ const FanchartApp = {
       }
     };
 
+
     // Boutons de navigation
     document.getElementById("b-no-buttons").onclick = function() {
       document.getElementById("fanchart-controls").style.display = "none";
+    };
+    document.getElementById("b-help").onclick = function() {
+      const helpPanel = document.getElementById('navigation-help');
+      if (helpPanel) {
+        const isVisible = helpPanel.style.display !== 'none';
+        helpPanel.style.display = isVisible ? 'none' : 'block';
+        this.classList.toggle("active", !isVisible);
+      }
     };
     document.getElementById("b-home").onclick = () => {
       window.location = link_to_person;
@@ -1739,14 +2093,21 @@ const FanchartApp = {
       implex = (implex === "0") ? "" : "0";
       Utils.navigateWithParams(max_gen);
     };
-    document.getElementById("b-mono").onclick = () => {
+    document.getElementById("font-selector").onchange = function() {
       const fanchart = document.getElementById("fanchart");
-      const isCurrentlyMono = fanchart.classList.contains("mono");
-      fanchart.classList.toggle("mono", !isCurrentlyMono);
-      mono = isCurrentlyMono ? "" : "1";
-      ColorManager.updateButtonStates();
-      Utils.updateUrlWithCurrentState();
+
+      ['mono', 'serif', 'large', 'readable'].forEach(cls => {
+        fanchart.classList.remove(cls);
+      });
+
+      if (this.value) {
+        fanchart.classList.add(this.value);
+      }
+
+      // Mettre à jour l'URL si nécessaire
+      // Utils.updateUrlWithCurrentState();
     };
+
     document.getElementById("b-sort-places").onclick = () => {
       if (!document.body.classList.contains('place_color')) return;
       UIManager.toggleSort();
@@ -1768,15 +2129,6 @@ const FanchartApp = {
       const maCheckbox = document.getElementById("ma");
       if (maCheckbox) maCheckbox.checked = true;
       ColorManager.applyColorization();
-    }
-
-    const monoButton = document.getElementById("b-mono");
-    const fanchart = document.getElementById("fanchart");
-    if (monoButton && fanchart) {
-      if (mono === "1") {
-        fanchart.classList.add("mono");
-        monoButton.classList.add("active");
-      }
     }
   }
 };
