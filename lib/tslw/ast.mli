@@ -1,4 +1,4 @@
-type 'a located = private { desc : 'a; loc : Loc.t }
+type +'a located = private { desc : 'a; loc : Loc.t }
 
 type tag =
   | Plain
@@ -11,45 +11,50 @@ type tag =
   | Person of string * string * int option
   | Note of string
 
-type span_desc = tag * string
+type span_desc = [ `Span of tag * string ]
 type span = span_desc located
-type text_desc = span list
-type text = text_desc located
-type size = One | Two | Three | Four | Five | Six
-type toc = Std | Short | No
 
-(** {2 Type for ordered and unordered lists} *)
+(** {2 Text language} *)
+
+type text_desc = [ `Text of span list ]
+type text = text_desc located
+
+val mk_span : ?loc:Loc.t -> tag -> string -> span
+val mk_text : ?loc:Loc.t -> span list -> text
+
+(** {2 List language} *)
 
 type kind = Ordered | Unordered
 
-type node_desc = Node of text option * kind * node list
+type node_desc = [ `Node of text option * kind * node list ]
 and node = node_desc located
 
-type block =
-  | Header of size * string
-  | Toc of toc
-  | Text of text_desc
-  | Indent of int * text_desc
-  | Pre of string
-  | List of node_desc
-  | Newline
+val mk_node : ?loc:Loc.t -> text option -> kind -> node list -> node
+
+type size = One | Two | Three | Four | Five | Six
+type toc = Std | Short | No
+
+type block = [
+  | `Header of size * string
+  | `Toc of toc
+  | `Newline
+  | `Indent of int * text
+  | `Pre of string
+  | node_desc
+  | text_desc
+]
 
 and t = block located
 
 val equal : t -> t -> bool
-val mk : ?loc:Loc.t -> 'a -> 'a located
-val mk_span : ?loc:Loc.t -> tag -> string -> span
-val mk_node : ?loc:Loc.t -> text option -> kind -> node list -> node
 
 (** {2 Constructors for blocks} *)
 
 val mk_header : ?loc:Loc.t -> size -> string -> t
 val mk_toc : ?loc:Loc.t -> toc -> t
-val mk_text : ?loc:Loc.t -> text_desc -> t
-val mk_indent : ?loc:Loc.t -> int -> text_desc -> t
+val mk_indent : ?loc:Loc.t -> int -> text -> t
 val mk_pre : ?loc:Loc.t -> string -> t
 val mk_newline : ?loc:Loc.t -> unit -> t
-val mk_list : ?loc:Loc.t -> node_desc -> t
 
 (** {2 Printers} *)
 

@@ -135,12 +135,10 @@ let span =
     ])
     [@ocamlformat "disable"]
 
-let text_desc = C.many1 span
-
 let text =
   C.(
-    let* t, loc = with_loc text_desc in
-    ret (Ast.mk ~loc t))
+    let* l, loc = with_loc @@ many1 span in
+    ret (Ast.mk_text ~loc l))
 
 (********* Parsing header *********)
 
@@ -177,22 +175,25 @@ let pre =
 
 (********* Parser list *********)
 
-let ul_from_lvl =
+let ul_at_lvl =
   C.(
     fix @@ fun lvl self ->
     let* c = count ul_tk in
-    if c < lvl then fail
+    if c != lvl then fail
     else
       let* text_opt = option text <* nl in
-      let* nested = option @@ self (c + 1) in
+      let* nested = option @@ self (lvl + 1) in
       let hd =
         let nested = match nested with None -> [] | Some l -> l in
         Ast.mk_node text_opt Unordered nested
       in
-      let* tl = option (self c) in
+      let* tl = option (self lvl) in
       match tl with None -> ret [ hd ] | Some tl -> ret (hd :: tl))
 
-let ul = ul_from_lvl 1
+let ul =
+  C.(
+    let* l, loc = with_loc @@ ul_at_lvl 1 in
+    ret (Ast.mk_node ~loc None Unordered l))
 
 (********* Parser block *********)
 
@@ -201,15 +202,15 @@ let newline =
     let* _, loc = with_loc nl in
     ret (Ast.mk_newline ~loc ()))
 
-let toplevel_text =
-  C.(
-    let* l, loc = with_loc text_desc in
-    ret (Ast.mk_text ~loc l))
-
 let toplevel_ul =
   C.(
-    let* l, loc = with_loc ul in
-    ret (Ast.mk_list ~loc (Node (None, Unordered, l))))
+    let* ul in
+    ret (ul :> Ast.t))
+
+let toplevel_text =
+  C.(
+    let* text in
+    ret (text :> Ast.t))
 
 let block =
   C.(
