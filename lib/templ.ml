@@ -45,11 +45,8 @@ let resolve_include conf loc fl =
 
 let parse conf fl =
   let fl = Util.etc_file_name conf fl in
-  try Parser.parse ~on_exn ~resolve_include:(resolve_include conf) (`File fl)
-  with e ->
-    let bt = Printexc.get_raw_backtrace () in
-    Logs.debug (fun k -> k "%a" pp_exception (e, bt));
-    Printexc.raise_with_backtrace e bt
+  Parser.parse ~cached:!Logs.debug_flag ~on_exn
+    ~resolve_include:(resolve_include conf) (`File fl)
 
 let sort_apply_parameters loc f_expr xl vl =
   let named_vl, unnamed_vl =
@@ -1424,8 +1421,8 @@ and print_var print_ast_list conf ifun env ep loc sl =
           try
             let fl = Util.etc_file_name conf templ in
             let astl =
-              Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
-                (`File fl)
+              Parser.parse ~cached:!Logs.debug_flag ~on_exn
+                ~resolve_include:(resolve_include conf) (`File fl)
             in
             print_ast_list env ep astl
           with _ ->
@@ -1494,19 +1491,30 @@ and print_variable conf sl =
       | _ -> raise Not_found
     with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
 
-let output conf ifun env ep fl = eval conf ifun env ep @@ parse conf fl
+let output conf ifun env ep fl =
+  try eval conf ifun env ep @@ parse conf fl
+  with e ->
+    let bt = Printexc.get_raw_backtrace () in
+    Logs.debug (fun k -> k "%a" pp_exception (e, bt))
 
-let output_builtin conf env fl =
+type simple_env = Vstring of Adef.encoded_string | Vother of unit vother
+
+let output_simple conf env fl =
+  let get_vother = function Vother x -> Some x | _ -> None in
+  let set_vother x = Vother x in
   let ifun =
     {
       eval_var =
         (fun env _ _ -> function
-          | [ s ] -> VVstring ((Env.find s env : Adef.encoded_string) :> string)
+          | [ s ] -> (
+              match Env.find s env with
+              | Vstring s -> VVstring (s :> string)
+              | _ -> raise Not_found)
           | _ -> raise Not_found);
       eval_transl = (fun _ -> eval_transl conf);
       eval_predefined_apply = (fun _ -> raise Not_found);
-      get_vother = (fun _ -> None);
-      set_vother = (fun _ -> Adef.encoded "");
+      get_vother;
+      set_vother;
       print_foreach = (fun _ -> raise Not_found);
     }
   in

@@ -299,11 +299,11 @@ let print_renamed conf new_n =
   let env =
     Templ.Env.(
       empty
-      |> add "old" (Mutil.encode conf.bname)
-      |> add "new" (Mutil.encode new_n)
-      |> add "link" (Mutil.encode link))
+      |> add "old" (Templ.Vstring (Mutil.encode conf.bname))
+      |> add "new" (Templ.Vstring (Mutil.encode new_n))
+      |> add "link" (Templ.Vstring (Mutil.encode link)))
   in
-  try Templ.output_builtin conf env "renamed"
+  try Templ.output_simple conf env "renamed"
   with _ ->
     let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
     Hutil.header conf title;
@@ -323,9 +323,9 @@ let log_redirect from request req =
 let print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
   let link = "http://" ^ new_addr ^ req in
-  let env = Templ.Env.(add "link" (Mutil.encode link) empty) in
+  let env = Templ.Env.(add "link" (Templ.Vstring (Mutil.encode link)) empty) in
   log_redirect from request req;
-  try Templ.output_builtin conf env "redirect"
+  try Templ.output_simple conf env "redirect"
   with _ ->
     let title _ = Output.print_sstring conf "Address changed" in
     Hutil.header conf title;
@@ -2199,7 +2199,7 @@ let set_predictable_mode () =
   Logs.warn (fun k ->
       k
         "Predictable mode must not be enabled in production. It disables \
-         security enhancements.");
+         security enhancements and caching.");
   predictable_mode := true
 
 let main () =

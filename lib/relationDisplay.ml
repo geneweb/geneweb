@@ -143,7 +143,7 @@ let print_shortest_path conf base p1 p2 =
         | Some "on" -> ()
         | _ ->
             let conf = { conf with is_printed_by_template = false } in
-            Templ.output_builtin conf Templ.Env.empty "buttons_rel");
+            Templ.output_simple conf Templ.Env.empty "buttons_rel");
         if excl_faml = [] then (
           ([ s1; s2 ] : Adef.safe_string list :> string list)
           |> cftransl conf "no known relationship link between %s and %s"
@@ -860,7 +860,7 @@ let print_main_relationship conf base long p1 p2 rel =
   | Some "on" -> ()
   | _ ->
       let conf = { conf with is_printed_by_template = false } in
-      Templ.output_builtin conf Templ.Env.empty "buttons_rel");
+      Templ.output_simple conf Templ.Env.empty "buttons_rel");
   (match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
   | Some ("off" | "0"), _ | _, Some "off" ->
       conf.senv <- conf.senv @ [ ("sp", Mutil.encode "0") ]

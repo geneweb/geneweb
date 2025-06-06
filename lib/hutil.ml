@@ -72,7 +72,7 @@ let header_without_http_nor_home conf title =
   Output.print_sstring conf str1;
   title true;
   Output.print_sstring conf str2;
-  Templ.output_builtin conf Templ.Env.empty "css";
+  Templ.output_simple conf Templ.Env.empty "css";
   Output.print_sstring conf "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
@@ -80,7 +80,7 @@ let header_without_http_nor_home conf title =
   in
   let s = s ^ Util.body_prop conf in
   Output.printf conf "<body%s>\n" s;
-  Templ.output_builtin conf Templ.Env.empty "hed";
+  Templ.output_simple conf Templ.Env.empty "hed";
   Util.message_to_wizard conf
 
 let is_fluid conf =
@@ -141,9 +141,9 @@ let rheader conf title = header_with_title ~error:true conf title
 
 let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
-  Templ.output_builtin conf Templ.Env.empty "trl";
-  Templ.output_builtin conf Templ.Env.empty "copyr";
-  Templ.output_builtin conf Templ.Env.empty "js";
+  Templ.output_simple conf Templ.Env.empty "trl";
+  Templ.output_simple conf Templ.Env.empty "copyr";
+  Templ.output_simple conf Templ.Env.empty "js";
   let query_time = Unix.gettimeofday () -. conf.query_start in
   Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
     !GWPARAM.errors_other !GWPARAM.set_vars;

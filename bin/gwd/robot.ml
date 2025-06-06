@@ -34,10 +34,10 @@ let robot_error conf cnt sec =
   let env =
     Templ.Env.(
       empty
-      |> add "cnt" (Adef.encoded @@ string_of_int cnt)
-      |> add "sec" (Adef.encoded @@ string_of_int sec))
+      |> add "cnt" (Templ.Vstring (Adef.encoded @@ string_of_int cnt))
+      |> add "sec" (Templ.Vstring (Adef.encoded @@ string_of_int sec)))
   in
-  (try Templ.output_builtin conf env "robot"
+  (try Templ.output_simple conf env "robot"
    with _ ->
      let title _ = Output.print_sstring conf "Access refused" in
      Output.print_sstring conf "<head><title>";

@@ -378,7 +378,7 @@ let rec copy_from_stream conf base strm mode =
           | '%' -> Output.print_sstring conf "%"
           | '[' | ']' -> Output.printf conf "%c" c
           | 'h' -> hidden_env conf
-          | 'j' -> Templ.output_builtin conf Templ.Env.empty "hed"
+          | 'j' -> Templ.output_simple conf Templ.Env.empty "hed"
           | 'P' ->
               let _ = Stream.next strm in
               ()

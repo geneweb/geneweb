@@ -809,7 +809,7 @@ let print_slices_menu conf hts =
   in
   let title _ = header 0 in
   Hutil.header conf title;
-  if cgl then () else Templ.output_builtin conf Templ.Env.empty "buttons_rel";
+  if cgl then () else Templ.output_simple conf Templ.Env.empty "buttons_rel";
   Output.print_sstring conf {|<form method="get" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
@@ -849,7 +849,7 @@ let print_dag_page conf page_title hts next_txt =
   Hutil.header conf title;
   (* title goes into <title> ... </title> *)
   (* page <h1> title is handled by buttons_rel!! *)
-  if cgl then () else Templ.output_builtin conf Templ.Env.empty "buttons_rel";
+  if cgl then () else Templ.output_simple conf Templ.Env.empty "buttons_rel";
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then
     if cgl then Output.print_sstring conf {|">&gt;&gt;</p>|}
