@@ -1,3 +1,145 @@
+/* ========== POSITIONNEMENT PRINCIPAL ========== */
+.fanchart-controls {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  max-width: 200px;
+  font-size: 0.95rem;
+}
+
+.fanchart-controls.hidden {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+/* ========== STRUCTURE INTERNE ========== */
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.control-section {
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 2px;
+}
+
+/* ========== BOUTONS ========== */
+.btn-fanchart {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  transition: all 0.2s ease;
+  font-size: 1em;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-fanchart:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.btn-fanchart.disabled {
+  background: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-fanchart.btn-toggle.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+/* Bouton X */
+.btn-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: #dc3545;
+}
+
+.btn-group-fanchart {
+  display: flex;
+  gap: 3px;
+}
+
+.event-toggles {
+  display: flex;
+  gap: 1px;
+  margin-top: 6px;
+}
+
+.event-toggles.hidden {
+  display: none;
+}
+
+.event-toggle input[type="checkbox"] {
+  display: none;
+}
+
+.event-toggle label {
+  display: block;
+  padding: 2px 3px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  width: 16px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.event-toggle input[type="checkbox"]:checked + label {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
 :root {
   --fc-stroke-width: 0.1%;
   --fc-stroke-dasharray: 5px;
@@ -15,6 +157,11 @@
 svg .highlight {
  fill: lightgrey !important;
 }
+
+svg .highlight .text {
+  fill: black !important;
+}
+
 svg .text_highlight {
  fill: black !important;
 }
@@ -64,36 +211,73 @@ body.place_color .square { display: inline; color: transparent; }
 
 /* death age */
 #death-age {
-  margin: 5px;
+  position: absolute;
+  top: 10;
+  right: 0;
+  font-size: 18px;
+  transform: translateX(-175%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px;
+  z-index: 1000;
+  display: flex;
+  gap: 20px;
 }
 
-body.death-age svg .DA0  { fill: hsl(30, 100%, 90%)}
-body.death-age svg .DA1  { fill: hsl(30, 100%, 80%)}
-body.death-age svg .DA2  { fill: hsl(30, 100%, 70%)}
-body.death-age svg .DA3  { fill: hsl(30, 100%, 60%)}
-body.death-age svg .DA4  { fill: hsl(30, 100%, 50%)}
-body.death-age svg .DA5  { fill: hsl(30, 100%, 45%)}
-body.death-age svg .DA6  { fill: hsl(30, 100%, 40%)}
-body.death-age svg .DA7  { fill: hsl(30, 100%, 35%)}
+/* === PALETTE ACCESSIBLE BLEU/ROSE (RECOMMANDÉE WCAG) === */
+/* Âges au décès - Dégradé BLEU (hsl 210° - bleu accessible) */
+body.death-age svg .DA0 { fill: hsl(210, 100%, 80%) }  /* Bleu très clair */
+body.death-age svg .DA1 { fill: hsl(210, 100%, 85%) }  /* Bleu clair */
+body.death-age svg .DA2 { fill: hsl(210, 100%, 80%) }  /* Bleu moyen-clair */
+body.death-age svg .DA3 { fill: hsl(210, 100%, 75%) }  /* Bleu moyen */
+body.death-age svg .DA4 { fill: hsl(210, 100%, 70%) }  /* Bleu */
+body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }  /* Bleu foncé */
+body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }  /* Bleu plus foncé */
+
+/* Durées de mariage - Dégradé ROSE (hsl 330° - rose accessible) */
+/* Commence à 85% pour éviter le "trop blanc" */
+body.death-age svg .DAM0 { fill: hsl(330, 100%, 85%) } /* Rose clair mais visible */
+body.death-age svg .DAM1 { fill: hsl(330, 100%, 80%) } /* Rose */
+body.death-age svg .DAM2 { fill: hsl(330, 100%, 75%) } /* Rose moyen */
+body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) } /* Rose foncé */
+body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) } /* Rose très foncé */
+body.death-age svg .DAM5 { fill: hsl(330, 100%, 60%) } /* Magenta clair */
+body.death-age svg .DAM6 { fill: hsl(330, 100%, 55%) } /* Magenta */
+
+/* Couleurs correspondantes pour la légende */
+body.death-age span.DA0 { color: hsl(210, 100%, 90%) }
+body.death-age span.DA1 { color: hsl(210, 100%, 80%) }
+body.death-age span.DA2 { color: hsl(210, 100%, 70%) }
+body.death-age span.DA3 { color: hsl(210, 100%, 60%) }
+body.death-age span.DA4 { color: hsl(210, 100%, 50%) }
+body.death-age span.DA5 { color: hsl(210, 100%, 45%) }
+body.death-age span.DA6 { color: hsl(210, 100%, 40%) }
+
+body.death-age span.DAM0 { color: hsl(330, 100%, 80%) }
+body.death-age span.DAM1 { color: hsl(330, 100%, 75%) }
+body.death-age span.DAM2 { color: hsl(330, 100%, 70%) }
+body.death-age span.DAM3 { color: hsl(330, 100%, 65%) }
+body.death-age span.DAM4 { color: hsl(330, 100%, 60%) }
+body.death-age span.DAM5 { color: hsl(330, 100%, 55%) }
+body.death-age span.DAM6 { color: hsl(330, 100%, 50%) }
 
 body:not(.death-age) #death-age {
   display: none;
 }
 
-body.death-age span.DA0  { color: hsl(30, 100%, 90%)}
-body.death-age span.DA1  { color: hsl(30, 100%, 80%)}
-body.death-age span.DA2  { color: hsl(30, 100%, 70%)}
-body.death-age span.DA3  { color: hsl(30, 100%, 60%)}
-body.death-age span.DA4  { color: hsl(30, 100%, 50%)}
-body.death-age span.DA5  { color: hsl(30, 100%, 45%)}
-body.death-age span.DA6  { color: hsl(30, 100%, 40%)}
-body.death-age span.DA7  { color: hsl(30, 100%, 35%)}
-
+#death-age li {
+  cursor: pointer;
+  user-select: none;
+}
+#death-age li:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
 .arrow {
-  color: transparent;
+  color: #F4F4F4;
 }
 body.death-age .hl .arrow {
-  color: black;
+  color: lightgrey;
+  cursor: pointer;
 }
 
 body {
@@ -152,11 +336,57 @@ textPath {
  fill: transparent;
 }
 
-#places-list, #death-age {
+#places-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#places-header {
+  flex-shrink: 0;
+  margin-top: 4px;
+  padding-left: 4px;
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#places-list li .square {
+  margin-left: 4px;
+}
+
+#places-list li {
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  padding-left: 4px;
+}
+
+#places-list li:hover {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+#places-list li.location-highlighted {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+#places-list {
  position: absolute;
  right: 0;
  top: 0;
 }
+
+#places-list li.sublocation .square {
+  margin-left: 4px;
+}
+
+.sublocation-indicator {
+  color: #999;
+  font-family: monospace;
+  margin-left: 8px;
+  margin-right: 2px;
+}
+
 svg {
  position: absolute;
  left: 0;
@@ -181,6 +411,40 @@ svg {
   color: lightgrey;
 }
 
+/.btn-fanchart.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+body:not(.place_color) .event-toggles,
+body:not(.place_color) #b-sort-places {
+  display: none !important;
+}
 svg.mono text {
  font-family: monospace;
+}
+
+/* Panneau d'aide navigation */
+#navigation-help {
+  position: absolute;
+  top: 12px;
+  left: 140px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 1000;
+  max-width: 200px;
+  transition: opacity 0.15s;
+}
+
+#navigation-help .help-title {
+  font-weight: bold;
+  margin-bottom: 4px;
 }
