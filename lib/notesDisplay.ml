@@ -513,7 +513,7 @@ let print conf base =
   else
     match List.assoc "TYPE" nenv with
     | "album" | "gallery" ->
-        Templ.output_builtin conf Templ.Env.empty "notes_gallery"
+        Templ.output_simple conf Templ.Env.empty "notes_gallery"
     | (exception Not_found) | _ -> (
         let title = try List.assoc "TITLE" nenv with Not_found -> "" in
         let title = Util.safe_html title in
@@ -546,7 +546,7 @@ let print_mod conf base =
   else
     match List.assoc "TYPE" nenv with
     | ("gallery" | "album") as typ ->
-        Templ.output_builtin conf Templ.Env.empty ("notes_upd_" ^ typ)
+        Templ.output_simple conf Templ.Env.empty ("notes_upd_" ^ typ)
     | (exception Not_found) | _ ->
         let title _ =
           Output.printf conf "%s - %s%s"
