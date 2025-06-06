@@ -21,6 +21,7 @@ val case : (_ t * 'a t) list -> 'a t
 val until : _ t -> string t
 (** [until t] accumulates the input until the parser [t] succeeds. *)
 
+val fix : ('st -> ('st -> 'a t) -> 'a t) -> 'st -> 'a t
 val skip : _ t -> unit t
 val many : 'a t -> 'a list t
 val many1 : 'a t -> 'a list t

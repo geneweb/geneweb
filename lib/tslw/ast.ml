@@ -13,23 +13,25 @@ type tag =
   | Person of string * string * int option
   | Note of string
 
-type span = (tag * string) located
-type text = span list
+type span_desc = tag * string
+type span = span_desc located
+type text_desc = span list
+type text = text_desc located
 type size = One | Two | Three | Four | Five | Six
 type toc = Std | Short | No
 
+(** {2 Type for ordered and unordered lists} *)
+
 type kind = Ordered | Unordered
 
-type node_desc =
-  | Node of text option * kind * node list
-
+type node_desc = Node of text option * kind * node list
 and node = node_desc located
 
 type block =
   | Header of size * string
   | Toc of toc
-  | Text of text
-  | Indent of int * text
+  | Text of text_desc
+  | Indent of int * text_desc
   | Pre of string
   | List of node_desc
   | Newline
@@ -67,7 +69,8 @@ let pp_toc ppf toc =
   | No -> Fmt.pf ppf "No"
 
 let pp_span ppf { desc = t, s; _ } = Fmt.pf ppf "Span (%a, %s)" pp_tag t s
-let pp_text = Fmt.(list ~sep:comma pp_span)
+let pp_text_desc = Fmt.(list ~sep:comma pp_span)
+let pp_text ppf { desc; _ } = pp_text_desc ppf desc
 
 let pp_kind ppf k =
   match k with
@@ -75,8 +78,11 @@ let pp_kind ppf k =
   | Unordered -> Fmt.pf ppf "Unordered"
 
 let rec pp_node ppf (Node (t, k, l)) =
-  Fmt.pf ppf "Node (%a, %a, %a)" Fmt.(option pp_text) t pp_kind k
-    Fmt.(list ~sep:comma pp_node_located) l
+  Fmt.pf ppf "Node (%a, %a, %a)"
+    Fmt.(option pp_text)
+    t pp_kind k
+    Fmt.(list ~sep:comma pp_node_located)
+    l
 
 and pp_node_located ppf { desc; _ } = pp_node ppf desc
 
@@ -84,8 +90,8 @@ let pp_block ppf t =
   match t with
   | Header (sz, t) -> Fmt.pf ppf "Header (%a, %s)" pp_size sz t
   | Toc toc -> Fmt.pf ppf "Toc (%a)" pp_toc toc
-  | Text t -> Fmt.pf ppf "Text (%a)" pp_text t
-  | Indent (c, t) -> Fmt.pf ppf "Indent (%d, %a)" c pp_text t
+  | Text t -> Fmt.pf ppf "Text (%a)" pp_text_desc t
+  | Indent (c, t) -> Fmt.pf ppf "Indent (%d, %a)" c pp_text_desc t
   | Pre s -> Fmt.pf ppf "Pre (%s)" s
   | List n -> pp_node ppf n
   | Newline -> Fmt.pf ppf "Newline"
@@ -115,19 +121,20 @@ let span_to_html { desc = tag, s; _ } =
   | Highlight -> Html.(mark [ txt s ])
   | _ -> assert false
 
-let text_to_html l = List.map span_to_html l
+let text_desc_to_html l = List.map span_to_html l
+let text_to_html { desc; _ } = text_desc_to_html desc
 
 let rec node_to_html (Node (t, k, l)) =
   let l = node_list_to_html k l in
   match t with
-  | Some t -> Html.(li (text_to_html t @ [l]))
-  | None -> Html.(li [l])
+  | Some t -> Html.(li (text_to_html t @ [ l ]))
+  | None -> Html.(li [ l ])
 
 and node_list_to_html k l =
   let l = List.map (fun { desc; _ } -> node_to_html desc) l in
-  match k with
-  | Ordered -> Html.(ol l)
-  | Unordered -> Html.(ul l)
+  match l with
+  | [] -> Html.(txt "")
+  | _ -> ( match k with Ordered -> Html.(ol l) | Unordered -> Html.(ul l))
 
 let to_html { desc; _ } =
   match desc with
@@ -140,8 +147,8 @@ let to_html { desc; _ } =
   | Toc Std -> Html.(div [ txt "__TOC__" ])
   | Toc Short -> Html.(div [ txt "__SHORT_TOC__" ])
   | Toc No -> Html.(div [ txt "__NOTOC__" ])
-  | Text t -> Html.(p @@ text_to_html t)
-  | Indent (_, t) -> Html.(div @@ text_to_html t)
+  | Text t -> Html.(p @@ text_desc_to_html t)
+  | Indent (_, t) -> Html.(div @@ text_desc_to_html t)
   | Pre s -> Html.(pre [ txt s ])
   | List (Node (None, k, l)) -> node_list_to_html k l
   | List (Node (Some _, _, _)) ->

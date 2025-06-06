@@ -6,6 +6,8 @@ let std_toc_tk = C.string "__TOC__"
 let short_toc_tk = C.string "__SHORT_TOC__"
 let no_toc_tk = C.string "__NOTOC__"
 let pre_tk = C.string "\n "
+let ul_tk = C.string "*"
+let ol_tk = C.string "#"
 let h1_del = C.string "="
 let h2_del = C.string "=="
 let h3_del = C.string "==="
@@ -31,17 +33,17 @@ let highlight_close = C.string "}"
 
 (* Parse an input of the form `start s close` where `s` is any string
    that does not contain `s`. Output a text block with the kind [k]. *)
-let special_text start close k =
+let span_text start close k =
   C.(
     let* s, loc = with_loc (start *> until close <* close) in
     ret (Ast.mk_span ~loc k s))
 
-let italic = special_text italic_del italic_del Italic
-let bold = special_text bold_del bold_del Bold
-let bold_italic = special_text bold_italic_del bold_italic_del BoldItalic
-let strike = special_text strike_del strike_del Strike
-let underline = special_text underline_del underline_del Underline
-let highlight = special_text highlight_open highlight_close Highlight
+let italic = span_text italic_del italic_del Italic
+let bold = span_text bold_del bold_del Bold
+let bold_italic = span_text bold_italic_del bold_italic_del BoldItalic
+let strike = span_text strike_del strike_del Strike
+let underline = span_text underline_del underline_del Underline
+let highlight = span_text highlight_open highlight_close Highlight
 
 (********* Parsing links *********)
 
@@ -96,6 +98,8 @@ let special_nl =
     std_toc_tk;
     short_toc_tk;
     no_toc_tk;
+    ul_tk;
+    ol_tk;
   ]
   [@ocamlformat "disable"]
 
@@ -131,10 +135,12 @@ let span =
     ])
     [@ocamlformat "disable"]
 
+let text_desc = C.many1 span
+
 let text =
   C.(
-    let* l, loc = with_loc @@ many1 span in
-    ret (Ast.mk_text ~loc l))
+    let* t, loc = with_loc text_desc in
+    ret (Ast.mk ~loc t))
 
 (********* Parsing header *********)
 
@@ -169,12 +175,41 @@ let pre =
     let* s, loc = with_loc (pre_tk *> until pre_end <* pre_end) in
     ret (Ast.mk_pre ~loc s))
 
+(********* Parser list *********)
+
+let ul_from_lvl =
+  C.(
+    fix @@ fun lvl self ->
+    let* c = count ul_tk in
+    if c < lvl then fail
+    else
+      let* text_opt = option text <* nl in
+      let* nested = option @@ self (c + 1) in
+      let hd =
+        let nested = match nested with None -> [] | Some l -> l in
+        Ast.mk_node text_opt Unordered nested
+      in
+      let* tl = option (self c) in
+      match tl with None -> ret [ hd ] | Some tl -> ret (hd :: tl))
+
+let ul = ul_from_lvl 1
+
 (********* Parser block *********)
 
 let newline =
   C.(
     let* _, loc = with_loc nl in
     ret (Ast.mk_newline ~loc ()))
+
+let toplevel_text =
+  C.(
+    let* l, loc = with_loc text_desc in
+    ret (Ast.mk_text ~loc l))
+
+let toplevel_ul =
+  C.(
+    let* l, loc = with_loc ul in
+    ret (Ast.mk_list ~loc (Node (None, Unordered, l))))
 
 let block =
   C.(
@@ -190,7 +225,8 @@ let block =
       std_toc_tk, std_toc;
       short_toc_tk, short_toc;
       no_toc_tk, no_toc;
-      any, text
+      ul_tk, toplevel_ul;
+      any, toplevel_text
     ])
     [@ocamlformat "disable"]
 

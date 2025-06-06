@@ -73,6 +73,10 @@ let count t =
   in
   { run = loop 0 }
 
+let fix f x =
+  let rec run y st = (f y (fun z -> { run = run z })).run st in
+  { run = run x }
+
 let until a =
   let run st =
     let buf = Buffer.create 17 in

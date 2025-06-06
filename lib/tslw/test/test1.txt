@@ -14,8 +14,20 @@ comme ceci ''toto'' et aussi ceci '''ldl''' et {plop} puis
  même encore ici
 
 mais plus maintenant?
+* Un élément
+* Deux élément
+* Trois élément
 
-* Une liste
-** plop
-** blabla
-* Simple
+* Une autre liste
+* qui continue ici
+
+* Ceci est une première liste avec
+un saut de ligne dedans puis
+* Encore un élément puis
+** Une sous-liste! incroyable
+** etncodo
+
+* element 1
+** element 2
+* retour en dessous
+
