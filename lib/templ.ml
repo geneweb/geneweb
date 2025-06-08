@@ -485,8 +485,7 @@ and eval_simple_variable conf = function
       in
       let s = (s :> string) in
       if s = "" then s else s ^ Filename.dir_sep
-  | "images_prefix" | "image_prefix" ->
-      Util.images_prefix conf ^ Filename.dir_sep
+  | "images_prefix" | "image_prefix" -> Util.images_prefix conf ^ "/"
   | "lang" -> conf.lang
   | "lang_fallback" -> (
       match List.assoc_opt conf.lang !Mutil.fallback with
@@ -530,7 +529,7 @@ and eval_simple_variable conf = function
         if conf.cgi then Adef.escaped conf.etc_prefix else Adef.escaped ""
       in
       let s = (s :> string) in
-      if s = "" then s else s ^ Filename.dir_sep
+      if s = "" then s else s ^ "/"
   | "suffix" ->
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l =

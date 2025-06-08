@@ -502,29 +502,24 @@ let print conf base =
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  match p_getenv conf.env "ref" with
-  | Some "on" ->
-      print_what_links conf base fnotes
-      (* print pages where fnotes is referenced *)
-  | _ -> (
-      let nenv, s = read_notes base fnotes in
-      let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
-      let restrict_l =
-        if restrict_l = "" then [] else String.split_on_char ',' restrict_l
-      in
-      if restrict_l <> [] && is_restricted conf base restrict_l then
-        Output.print_sstring conf
-          (transl conf "note is restricted" |> Utf8.capitalize_fst)
-      else
-        match List.assoc "TYPE" nenv with
-        | "album" | "gallery" ->
-            Templ.output_simple conf Templ.Env.empty "notes_gallery"
-        | (exception Not_found) | _ -> (
-            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-            let title = Util.safe_html title in
-            match p_getint conf.env "v" with
-            | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-            | None -> print_whole_notes conf base fnotes title s None))
+  let nenv, s = read_notes base fnotes in
+  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
+  let restrict_l =
+    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+  in
+  if restrict_l <> [] && is_restricted conf base restrict_l then
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
+  else
+    match List.assoc "TYPE" nenv with
+    | "album" | "gallery" ->
+        Templ.output_builtin conf Templ.Env.empty "notes_gallery"
+    | (exception Not_found) | _ -> (
+        let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+        let title = Util.safe_html title in
+        match p_getint conf.env "v" with
+        | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+        | None -> print_whole_notes conf base fnotes title s None)
 
 let print_mod_json conf base =
   let nenv, s = read_notes_from_conf conf base in
