@@ -805,7 +805,8 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
   Output.print_string conf sfn;
   Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
   Output.print_sstring conf {|<i class="fa fa-image fa-fw"></i> |};
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "visualize"));
+  Output.print_sstring conf (transl_nth conf "visualize/show/hide/summary" 1
+    |> Utf8.capitalize_fst);
   Output.print_sstring conf "</a>";
 
   if not is_empty then (
