@@ -174,10 +174,6 @@ svg .same_hl .text {
  fill: black !important;
 }
 
-svg .bg {
-  fill: white;
-}
-
 /* places list */
 body:not(.places-list) #places-list {
   display: none;

@@ -259,7 +259,6 @@ const SVGRenderer = {
     let classes = ['bg'];
 
     if (type === 'person') {
-      classes.push('bg');
       // Classes pour les lieux de vie
       if (p.birth_place) classes.push(`bi-${lieux[p.birth_place].c}`);
       if (p.baptism_place) classes.push(`ba-${lieux[p.baptism_place].c}`);
@@ -280,7 +279,7 @@ const SVGRenderer = {
   },
 
   applyInteractiveFeatures: function(element, p, type) {
-    if (!p || (p.fn === "?" || (!p.fn && !p.sosasame))) return;
+    if (!p || (p.fn === "?" || (!p.fn && !p.sosasame && type !== 'marriage'))) return;
 
     element.setAttribute("class", "link");
     const panel = document.getElementById("person-panel");
@@ -359,27 +358,36 @@ const SVGRenderer = {
     }
   },
 
-  togglePlaceHighlights: function(p, show) {
-    const places = [
-      { prop: 'birth_place', prefix: 'bi' },
-      { prop: 'baptism_place', prefix: 'ba' },
-      { prop: 'marriage_place', prefix: 'ma' },
-      { prop: 'death_place', prefix: 'de' },
-      { prop: 'burial_place', prefix: 'bu' }
-    ];
-
-    places.forEach(place => {
-      if (p[place.prop]) {
-        const el = DOMCache.getElementById(`${place.prefix}-${lieux[p[place.prop]].c}`);
+  togglePlaceHighlights: function(p, show, type) {
+    if (type === 'marriage') {
+      // Pour les mariages, seulement le lieu de mariage
+      if (p.marriage_place) {
+        const el = DOMCache.getElementById(`ma-${lieux[p.marriage_place].c}`);
         if (el) el.classList.toggle("hidden", !show);
-        LocationManager.hlPlace(p[place.prop], show);
+        LocationManager.hlPlace(p.marriage_place, show);
       }
-    });
+    } else {
+      const places = [
+        { prop: 'birth_place', prefix: 'bi' },
+        { prop: 'baptism_place', prefix: 'ba' },
+        { prop: 'marriage_place', prefix: 'ma' },
+        { prop: 'death_place', prefix: 'de' },
+        { prop: 'burial_place', prefix: 'bu' }
+      ];
+
+      places.forEach(place => {
+        if (p[place.prop]) {
+          const el = DOMCache.getElementById(`${place.prefix}-${lieux[p[place.prop]].c}`);
+          if (el) el.classList.toggle("hidden", !show);
+          LocationManager.hlPlace(p[place.prop], show);
+        }
+      });
+    }
   },
 
   handleMouseEnter: function(p, type, event) {
     // Gestion des lieux
-    this.togglePlaceHighlights(p, true);
+    this.togglePlaceHighlights(p, true, type);
 
     // Gestion du background
     if (event && event.currentTarget) {
@@ -413,14 +421,14 @@ const SVGRenderer = {
 
   handleMouseLeave: function(p, type, event) {
     // Gestion des lieux
-    this.togglePlaceHighlights(p, false);
+    this.togglePlaceHighlights(p, false, type);
 
     // Gestion du background
     if (event && event.currentTarget) {
       const group = event.currentTarget.parentNode;
-      const backgroundSector = group.querySelector('.bg')
-
-      if (backgroundSector.style.fill !== "") {
+      const backgroundSector = group.querySelector('.bg');
+      
+      if (backgroundSector) {
         backgroundSector.style.fill = "";
         delete backgroundSector.dataset.highlighted;
       }
@@ -1893,14 +1901,23 @@ const FanchartApp = {
 
 
     if (implexMode === "reduced") {
-      // Mode initial (réduit) : garder les "=" et pas de propagation
+      // Mode initial (réduit) : garder les " < " et pas de propagation
       return { person: person, isImplex: false };
     }
 
     if (implexMode === "numbered") {
-      // Mode "num" : garder les "=" visibles mais marquer pour propagation
-
-      return { person: person, isImplex: true, originalSosa: referenceSosa };
+     // Mode numéroté : utiliser les vraies données mais avec numérotation
+      return { 
+        person: {
+          ...referencedPerson,  // Utiliser les vraies données pour les couleurs
+          fn: "",               // Mais remplacer le prénom
+          sn: `${sosa} › ${referenceSosa}`,  // Et le nom par la numérotation
+          dates: "",            // Et les dates
+          sosasame: referenceSosa
+        }, 
+        isImplex: true,
+        originalSosa: referenceSosa 
+      };
     }
 
     // Mode "full" : remplacer par les vraies données
@@ -1909,51 +1926,61 @@ const FanchartApp = {
 
   // Rendre un secteur complet d’ancêtre
   renderAncestorSector: function(sosa, position, person) {
-    // Créer le groupe pour cet ancêtre
-    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    group.setAttribute("id", "S" + sosa);
-    fanchart.append(group);
+      // Créer le groupe pour cet ancêtre
+      const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttribute("id", "S" + sosa);
+      fanchart.append(group);
 
-    // Gérer les implexes
-    const implexInfo = this.handleImplex(sosa, person);
-    const actualPerson = implexInfo.person;
-    actualPerson.sosa = sosa;
+      // Gérer les implexes
+      const implexInfo = this.handleImplex(sosa, person);
+      const actualPerson = implexInfo.person;
+      actualPerson.sosa = sosa;
 
-    // Dessiner le secteur de fond
-    SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
-      position.a1, position.a2, actualPerson,
-      { type: 'person', isBackground: true });
+      // Dessiner le secteur de fond
+      SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
+        position.a1, position.a2, actualPerson,
+        { type: 'person', isBackground: true });
 
-    // Dessiner le texte si la personne est connue
-    if (actualPerson.fn !== "?") {
-      const textClasses = this.buildTextClasses(actualPerson);
-      SVGRenderer.drawSectorText(group, position.r1, position.r2,
-        position.a1, position.a2, sosa, actualPerson,
-        textClasses, position.generation, implexInfo.isImplex);
-    }
+      // Dessiner le texte si la personne est connue
+      if (actualPerson.fn !== "?") {
+        const textClasses = this.buildTextClasses(actualPerson);
+        SVGRenderer.drawSectorText(group, position.r1, position.r2,
+          position.a1, position.a2, sosa, actualPerson,
+          textClasses, position.generation, implexInfo.isImplex);
+      }
 
-    // Gérer le mariage pour les ancêtres pairs (pères)
-    if (sosa % 2 === 0) {
-      this.renderMarriageInfo(group, sosa, position, actualPerson);
-    } else {
-      // Propager l'info de mariage aux ancêtres impairs (mères)
+      // Gérer le mariage pour les ancêtres pairs (pères) - AVANT le secteur interactif
+      if (sosa % 2 === 0) {
+        const marriageGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        marriageGroup.setAttribute("id", "M" + sosa);
+        group.appendChild(marriageGroup);  // Ajouter au groupe de la personne, pas au fanchart
+        
+        let marriagePerson = actualPerson;
+        if (implexInfo.isImplex && implexMode === "numbered" && implexInfo.originalSosa) {
+          marriagePerson = ancestor["S" + implexInfo.originalSosa];
+        }
+        
+        this.renderMarriageInfo(marriageGroup, sosa, position, marriagePerson);
+      } else if (sosa % 2 !== 0) {
+        // Pour les mères, propager les infos de mariage
         const fatherSosa = sosa - 1;
         const father = this.getEffectivePerson(fatherSosa);
+        
         if (father && father.marriage_place) {
           actualPerson.marriage_place = father.marriage_place;
         }
       }
 
-    // Dessiner le secteur interactif
-    SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
-      position.a1, position.a2, actualPerson,
-      { type: 'person' });
+      // Dessiner le secteur interactif EN DERNIER pour qu'il soit au-dessus
+      SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
+        position.a1, position.a2, actualPerson,
+        { type: 'person' });
 
-    // Ajouter l'indicateur de navigation
-    SVGRenderer.drawParentIndicator(group, position.r1 + 10,
-      position.a1, position.a2, sosa, actualPerson);
+      // Ajouter l'indicateur de navigation
+      SVGRenderer.drawParentIndicator(group, position.r1 + 10,
+        position.a1, position.a2, sosa, actualPerson);
 
-    return group;
+      return group;
   },
 
   buildTextClasses: function(person) {
@@ -1976,13 +2003,13 @@ const FanchartApp = {
   },
 
   // Informations de mariage
-  renderMarriageInfo: function(group, sosa, position, person) {
+  renderMarriageInfo: function(marriageGroup, sosa, position, person) {
     const extendedA2 = position.a2 + position.delta;
 
     // Dessiner le secteur de mariage (fond)
-    SVGRenderer.drawPie(group, position.r1, position.r1 + 10,
-      position.a1, extendedA2, person,
-      { type: 'marriage', isBackground: true });
+    SVGRenderer.drawPie(marriageGroup, position.r1, position.r1 + 10,
+    position.a1, extendedA2, person,
+    { type: 'marriage', isBackground: true });
 
     // Dessiner la date de mariage si elle existe
     if (person.marriage_date !== undefined) {
@@ -1990,18 +2017,18 @@ const FanchartApp = {
       if (person.marriage_place && person.marriage_place !== "" && lieux[person.marriage_place]) {
         classes += " ma-t" + lieux[person.marriage_place].c;
       }
-      T.drawMarriageDate(group, sosa, position.r1 + 5,
+      T.drawMarriageDate(marriageGroup, sosa, position.r1 + 5,
         position.a1, extendedA2, person.marriage_date, classes);
     }
 
     // Dessiner le contour et la ligne radiale
-    SVGRenderer.drawContour(group, position.r1, position.r2, position.a1, extendedA2);
-    SVGRenderer.drawRadialLine(group, position.r1 + 10, position.r2, position.a2);
+    SVGRenderer.drawContour(marriageGroup, position.r1, position.r2, position.a1, extendedA2);
+    SVGRenderer.drawRadialLine(marriageGroup, position.r1 + 10, position.r2, position.a2);
 
     // Dessiner le secteur de mariage interactif
-    SVGRenderer.drawPie(group, position.r1, position.r1 + 10,
-      position.a1, extendedA2, person,
-      { type: 'marriage' });
+    SVGRenderer.drawPie(marriageGroup, position.r1, position.r1 + 10,
+    position.a1, extendedA2, person,
+    { type: 'marriage' });
   },
 
   updateGenerationTitle: function() {
