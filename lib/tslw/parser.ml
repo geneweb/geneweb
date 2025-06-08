@@ -35,7 +35,7 @@ let highlight_close = C.string "}"
    that does not contain `s`. Output a text block with the kind [k]. *)
 let span_text start close k =
   C.(
-    let* s, loc = with_loc (start *> until close <* close) in
+    let* s, loc = located (start *> until close <* close) in
     ret (Ast.mk_span ~loc k s))
 
 let italic = span_text italic_del italic_del Italic
@@ -62,7 +62,7 @@ let link_person =
       ret (fn, sn, occ_opt, text_opt)
     in
     let* (fn, sn, occ_opt, text_opt), loc =
-      with_loc (link_person_open *> content <* link_person_close)
+      located (link_person_open *> content <* link_person_close)
     in
     let text = Option.value ~default:fn text_opt in
     ret (Ast.mk_span ~loc (Person (fn, sn, occ_opt)) text))
@@ -78,7 +78,7 @@ let link_note =
       ret (fl, text_opt)
     in
     let* (fl, text_opt), loc =
-      with_loc (link_note_open *> content <* link_note_close)
+      located (link_note_open *> content <* link_note_close)
     in
     let text = Option.value ~default:fl text_opt in
     ret (Ast.mk_span ~loc (Note fl) text))
@@ -114,7 +114,7 @@ let special =
 
 let plain =
   C.(
-    let* s, loc = with_loc @@ until special in
+    let* s, loc = located @@ until special in
     if String.length s = 0 then fail else ret (Ast.mk_span ~loc Plain s))
 
 (********* Parsing text *********)
@@ -136,14 +136,14 @@ let span =
 
 let text =
   C.(
-    let* l, loc = with_loc @@ many1 span in
+    let* l, loc = located @@ many1 span in
     ret (Ast.mk_text ~loc l))
 
 (********* Parsing header *********)
 
 let header del sz =
   C.(
-    let* s, loc = with_loc (del *> until del <* del <* many ws <* nl) in
+    let* s, loc = located (del *> until del <* del <* many ws <* nl) in
     ret (Ast.mk_header ~loc sz s))
 
 let h1 = header h1_del Ast.One
@@ -157,7 +157,7 @@ let h6 = header h6_del Ast.Six
 
 let toc tk k =
   C.(
-    let* (), loc = with_loc (tk *> skip ws <* nl) in
+    let* (), loc = located (tk *> skip ws <* nl) in
     ret (Ast.mk_toc ~loc k))
 
 let std_toc = toc std_toc_tk Std
@@ -169,7 +169,7 @@ let no_toc = toc no_toc_tk No
 let pre =
   C.(
     let pre_end = nl *> many ws *> nl in
-    let* s, loc = with_loc (pre_tk *> until pre_end <* pre_end) in
+    let* s, loc = located (pre_tk *> until pre_end <* pre_end) in
     ret (Ast.mk_pre ~loc s))
 
 (********* Parser list *********)
@@ -191,14 +191,14 @@ let ul_at_lvl =
 
 let ul =
   C.(
-    let* l, loc = with_loc @@ ul_at_lvl 1 in
+    let* l, loc = located @@ ul_at_lvl 1 in
     ret (Ast.mk_node ~loc None Unordered l))
 
 (********* Parser block *********)
 
 let newline =
   C.(
-    let* _, loc = with_loc nl in
+    let* _, loc = located nl in
     ret (Ast.mk_newline ~loc ()))
 
 let toplevel_ul =

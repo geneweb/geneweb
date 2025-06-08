@@ -149,7 +149,7 @@ let int =
   let* r = digit in
   { run = loop r }
 
-let with_loc t =
+let located t =
   let run st =
     let start = Input.offset st in
     match t.run st with
