@@ -11049,13 +11049,17 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
-    pages where page appears
-en: pages or notes where page is referenced
-fr: pages ou notes où la page est citée
+    linked pages (all)
+en: notes, pages albums or galleries where person is mentionned
+fr: notes, pages, albums ou galleries ou la personne est citée
 
     albums galleries where person appears
 en: albums or galleries where person is referenced
 fr: albums ou galleries où la personne est citée
+
+    pages where page appears
+en: pages or notes where page is referenced
+fr: pages ou notes où la page est citée
 
     pages where person appears
 bg: свързани страници
@@ -11064,12 +11068,12 @@ co: pagine ligate
 cs: spojený stránky
 da: lænkede sider
 de: verknüpfte Seiten
-en: pages or notes where person is referenced
+en: notes, pages, albums or galleries where person is referenced
 eo: linkitaj paĝoj
 es: páginas enlazadas
 et: seotud leheküljed
 fi: linkitettyjä sivuja
-fr: pages ou notes où la personne est citée
+fr: notes, pages, albums ou galleries où la personne est citée
 he: דפים מקושרים
 it: pagine collegate
 lt: susieti puslapiai
@@ -12433,10 +12437,6 @@ tr: %s ailesinin etkinliklerini değiştir
 de: die ganze Notiz bearbeiten/vorheriger Abschnitt/nächster Abschnitt
 en: modify all the note/previous section/next section
 fr: éditer toute la note/section précédente/section suivante
-
-    visualize
-en: display
-fr: afficher
 
     modify note
 co: mudificà a nota
