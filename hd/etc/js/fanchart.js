@@ -122,7 +122,8 @@ const Utils = {
     let url = `m=A&t=FC&p=${p.fnk}&n=${p.snk}`;
     if (p.oc) url += `&oc=${p.oc}`;
     if (tool && tool !== "") url += `&tool=${tool}`;
-    if (implex === "0") url += "&implex=0";
+    if (implexMode === "numbered") url += "&implex=num";
+    else if (implexMode === "full") url += "&implex=full";
     return url;
   },
 
@@ -279,7 +280,7 @@ const SVGRenderer = {
   },
 
   applyInteractiveFeatures: function(element, p, type) {
-    if (!p || p.fn === "?" || p.fn === "" || !p.fn) return;
+    if (!p || (p.fn === "?" || (!p.fn && !p.sosasame))) return;
 
     element.setAttribute("class", "link");
     const panel = document.getElementById("person-panel");
@@ -404,8 +405,8 @@ const SVGRenderer = {
     }
 
     // Gestion des implexes
-    if (p.fn === "=") {
-      const ref = document.getElementById("S" + p.sn);
+    if (p.sosasame) {
+      const ref = document.getElementById("S" + p.sosasame);
       if (ref) ref.classList.add("same_hl");
     }
   },
@@ -438,8 +439,8 @@ const SVGRenderer = {
     }
 
     // Gestion des implexes
-    if (p.fn === "=") {
-      const ref = document.getElementById("S" + p.sn);
+    if (p.sosasame) {
+      const ref = document.getElementById("S" + p.sosasame);
       if (ref) ref.classList.remove("same_hl");
     }
   },
@@ -1646,7 +1647,7 @@ const FanchartApp = {
 
   checkForImplexes: function() {
     for (let key in ancestor) {
-      if (ancestor[key].fn === "=") {
+      if (ancestor[key].sosasame) {
         return true;
       }
     }
@@ -1779,14 +1780,15 @@ const FanchartApp = {
     // rayon total accumulé
     let cumulativeR = CONFIG.a_r[0];
     const rings = max_gen + 1;
+
     for (let gen = 2; gen <= rings; gen++) {
-      const innerR = cumulativeR;              // rayon intérieur
+      const innerR = cumulativeR;                // rayon intérieur
       const outerR = innerR + CONFIG.a_r[gen-1]; // rayon extérieur
       cumulativeR = outerR;                      // pour la génération suivante
 
       // angle total à découper
       const delta = CONFIG.d_all / Math.pow(2, gen-1);
-      // angle de départ (au-dessus du centre)
+      // angle de départ au-dessus du centre
       let angle = -90 - CONFIG.d_all / 2 + delta/2;
 
       // on itère sur les 2^(gen-1) cases de cette génération
@@ -1794,26 +1796,49 @@ const FanchartApp = {
       const lastSosa  = Math.pow(2, gen) - 1;
 
       for (let sosa = firstSosa; sosa <= lastSosa; sosa++, angle += delta) {
-        const person = ancestor["S" + sosa];
+        const person = this.getEffectivePerson(sosa);
         if (!person) continue;
 
-        // préparez votre position pour ce secteur
+        // prépare la position de ce secteur
         const pos = {
-          r1: innerR,
-          r2: outerR,
-          a1: angle - delta/2,
-          a2: angle + delta/2,
-          generation: gen,
-          delta: delta
+          r1: innerR, r2: outerR,
+          a1: angle - delta/2, a2: angle + delta/2,
+          generation: gen, delta: delta
         };
 
-        // et on réutilise la même méthode pour dessiner
         this.renderAncestorSector(sosa, pos, person);
       }
     }
 
-    // enfin on met à jour vos boutons / UI
     this.updateButtonStates();
+  },
+
+  // Résoudre les implexes virtuellement
+  getEffectivePerson: function(sosa) {
+    let person = ancestor["S" + sosa];
+    // Si pas de personne à ce sosa, chercher si c’est un enfant d’implexe
+    if (!person && implexMode !== "reduced") {
+      const parentSosa = Math.floor(sosa / 2);
+      const parentPerson = ancestor["S" + parentSosa];
+
+      if (parentPerson && parentPerson.sosasame) {
+        const refSosa = parentPerson.sosasame;
+        const childSosa = sosa % 2 === 0 ? 2 * refSosa : 2 * refSosa + 1;
+        const childPerson = ancestor["S" + childSosa];
+
+        if (childPerson) {
+          // Créer un enfant virtuel basé sur l'implexe
+          return {
+            ...childPerson,
+            fn: implexMode === "numbered" ? "" : childPerson.fn,
+            sn: implexMode === "numbered" ? `${sosa} › ${childSosa}` : childPerson.sn,
+            sosasame: implexMode === "numbered" ? childSosa : undefined,
+            dates: implexMode === "numbered" ? "" : childPerson.dates
+          };
+        }
+      }
+    }
+    return person;
   },
 
   initializeStandardText: function() {
@@ -1859,49 +1884,27 @@ const FanchartApp = {
 
   // Gestion des implexes
   handleImplex: function(sosa, person) {
-    if (person.fn !== "=" || implex === "") {
+    if (!person.sosasame) {
       return { person: person, isImplex: false };
     }
 
-    // Propagation des implexes aux enfants
-    const childSosa1 = 2 * sosa;
-    const childSosa2 = 2 * sosa + 1;
-    const referenceSosa = person.sn;
+    const referenceSosa = person.sosasame;
+    const referencedPerson = ancestor["S" + referenceSosa];
 
-    // Créer les références pour les enfants si elles existent
-    const ref1 = ancestor["S" + (2 * referenceSosa)];
-    const ref2 = ancestor["S" + (2 * referenceSosa + 1)];
 
-    if (ref1) {
-      ancestor["S" + childSosa1] = {
-        fn: "=",
-        sn: 2 * referenceSosa,
-        fnk: ref1.fnk,
-        snk: ref1.snk,
-        oc: ref1.oc,
-        dates: "",
-        has_parents: ref1.has_parents
-      };
+    if (implexMode === "reduced") {
+      // Mode initial (réduit) : garder les "=" et pas de propagation
+      return { person: person, isImplex: false };
     }
 
-    if (ref2) {
-      ancestor["S" + childSosa2] = {
-        fn: "=",
-        sn: 2 * referenceSosa + 1,
-        fnk: ref2.fnk,
-        snk: ref2.snk,
-        oc: ref2.oc,
-        dates: "",
-        has_parents: ref2.has_parents
-      };
+    if (implexMode === "numbered") {
+      // Mode "num" : garder les "=" visibles mais marquer pour propagation
+
+      return { person: person, isImplex: true, originalSosa: referenceSosa };
     }
 
-    // Retourner la personne réelle référencée
-    return {
-      person: ancestor["S" + referenceSosa],
-      isImplex: true,
-      originalSosa: referenceSosa
-    };
+    // Mode "full" : remplacer par les vraies données
+    return { person: referencedPerson, isImplex: false };
   },
 
   // Rendre un secteur complet d’ancêtre
@@ -1934,8 +1937,12 @@ const FanchartApp = {
       this.renderMarriageInfo(group, sosa, position, actualPerson);
     } else {
       // Propager l'info de mariage aux ancêtres impairs (mères)
-      ancestor["S" + sosa].marriage_place = ancestor["S" + (sosa - 1)].marriage_place;
-    }
+        const fatherSosa = sosa - 1;
+        const father = this.getEffectivePerson(fatherSosa);
+        if (father && father.marriage_place) {
+          actualPerson.marriage_place = father.marriage_place;
+        }
+      }
 
     // Dessiner le secteur interactif
     SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
@@ -2089,9 +2096,28 @@ const FanchartApp = {
         Utils.updateUrlWithCurrentState();
       }
     };
-    document.getElementById("b-implex").onclick = () => {
-      implex = (implex === "0") ? "" : "0";
-      Utils.navigateWithParams(max_gen);
+    document.getElementById("b-implex").onclick = function() {
+      // Cycle : reduced → numbered → full → reduced
+      switch(implexMode) {
+        case "reduced":
+          implexMode = "numbered";
+          this.title = "Afficher tous les ancêtres";
+          this.querySelector("i").className = "fa fa-comment fa-fw";
+          break;
+        case "numbered":
+          implexMode = "full";
+          this.title = "Réduire les implexes";
+          this.querySelector("i").className = "fa fa-comment-slash fa-fw";
+          break;
+        case "full":
+          implexMode = "reduced";
+          this.title = "Numéroter les implexes";
+          this.querySelector("i").className = "fa fa-comment-dots fa-fw";
+          break;
+      }
+
+      FanchartApp.reRenderWithCurrentGenerations();
+      Utils.updateUrlWithCurrentState();
     };
     document.getElementById("font-selector").onchange = function() {
       const fanchart = document.getElementById("fanchart");

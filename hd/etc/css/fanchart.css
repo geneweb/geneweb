@@ -457,7 +457,7 @@ svg.serif text {
 }
 
 svg.large text {
-  font-size: 107%;
+  font-size: 105%;
 }
 
 svg.mono text {
@@ -468,7 +468,8 @@ svg.mono text {
 /* Police optimisée pour la lisibilité */
 svg.readable text {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  letter-spacing: 0.5px;
+  font-size: 90%;
+  letter-spacing: 0.4px;
 }
 
 /* Panneau d'aide navigation */

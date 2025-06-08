@@ -67,7 +67,7 @@
   %end;},
 %end;
 %define;somebody_fanchart_same(xx)
-"S%xx.anc_sosa.v;":{"fn":"=","sn":"%xx.same","fnk":"%xx.first_name_key","snk":"%xx.surname_key;","oc":"","dates":"","has_parents":%if;(xx.has_parents)true%else;false%end;},
+"S%xx.anc_sosa.v;":{"fn":"","sn":"%xx.anc_sosa.v › %xx.same","sosasame":"%xx.same;","fnk":"%xx.first_name_key","snk":"%xx.surname_key;","oc":"","dates":"","has_parents":%if;(xx.has_parents)true%else;false%end;},
 %end;
 
 <body id="body" class="bg-light p-4"%if;wizard; data-wizard="1"%end;>
@@ -204,8 +204,8 @@
 var link_to_person = "%prefix;";
 var max_gen = %e.v;;
 var tool = "%e.tool;";
-var implex = "%e.implex;";
-
+var implexMode = "%e.implex;" === "num" ? "numbered" : 
+                 "%e.implex;" === "full" ? "full" : "reduced";
 var ancestor = {
 %foreach;ancestor_level(e.v)
   %foreach;ancestor;
