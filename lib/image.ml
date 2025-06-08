@@ -377,7 +377,7 @@ let get_blason_owner conf base p =
     loop p
   else None
 
-let rename_portrait_or_blason conf base _mode p (nfn, nsn, noc) =
+let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
   let sp2_ = Mutil.tr ' ' '_' in
   let old_key =
     Format.sprintf "%s.%d.%s"
@@ -397,33 +397,34 @@ let rename_portrait_or_blason conf base _mode p (nfn, nsn, noc) =
     let i_dir = !GWPARAM.images_d conf.bname in
     let old_carrousel = Filename.concat i_dir old_key in
     let new_carrousel = Filename.concat i_dir new_key in
-    if Sys.file_exists old_carrousel && Sys.is_directory old_carrousel then (
-      try Sys.rename old_carrousel new_carrousel
-      with Sys_error e ->
-        Logs.syslog `LOG_ERR
-          (Format.sprintf "Error renaming carrousel directory %s to %s: %s"
-             old_carrousel new_carrousel e);
-        let rename_files_with_extensions dir base_name =
-          Array.iter
-            (fun ext ->
-              let old_file = Filename.concat dir (base_name ^ ext) in
-              if Sys.file_exists old_file then
-                let new_file = Filename.concat dir (new_key ^ ext) in
-                try Sys.rename old_file new_file
-                with Sys_error e ->
-                  Logs.syslog `LOG_ERR
-                    (Format.sprintf "Error renaming %s to %s: %s" old_file
-                       new_file e))
-            [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
-        in
-        rename_files_with_extensions p_dir old_key;
-        let saved_dir = Filename.concat p_dir "saved" in
-        if Sys.file_exists saved_dir then
-          rename_files_with_extensions saved_dir old_key;
-        rename_files_with_extensions p_dir (old_key ^ ".blason"))
-
-let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
-  rename_portrait_or_blason conf base "all" p (nfn, nsn, noc)
+    (if Sys.file_exists old_carrousel && Sys.is_directory old_carrousel then
+     try Sys.rename old_carrousel new_carrousel
+     with Sys_error e ->
+       Logs.syslog `LOG_ERR
+         (Format.sprintf "Error renaming carrousel directory %s to %s: %s"
+            old_carrousel new_carrousel e));
+    let rename_files_with_extensions dir base_name =
+      Array.iter
+        (fun ext ->
+          let blason =
+            if Filename.check_suffix base_name ".blason" then ".blason" else ""
+          in
+          let old_file = Filename.concat dir (base_name ^ ext) in
+          if Sys.file_exists old_file then
+            let new_file = Filename.concat dir (new_key ^ blason ^ ext) in
+            try Sys.rename old_file new_file
+            with Sys_error e ->
+              Logs.syslog `LOG_ERR
+                (Format.sprintf "Error renaming %s to %s: %s" old_file new_file
+                   e))
+        [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".stop" |]
+    in
+    rename_files_with_extensions p_dir old_key;
+    rename_files_with_extensions p_dir (old_key ^ ".blason");
+    let saved_dir = Filename.concat p_dir "saved" in
+    if Sys.file_exists saved_dir then (
+      rename_files_with_extensions saved_dir old_key;
+      rename_files_with_extensions saved_dir (old_key ^ ".blason"))
 
 let get_portrait_with_size conf base p =
   if has_access_to_image "portraits" conf base p then
