@@ -1090,7 +1090,9 @@ let reconstitute_date conf var =
         | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
         | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
         | Some "H" -> (Calendar.gregorian_of_hebrew d, Dhebrew)
-        | _ -> (d, Dgregorian)
+        | _ ->
+            check_greg_day conf d;
+            (d, Dgregorian)
       in
       Some (Dgreg (d, cal))
   | Some d, true -> Some (Dgreg (Calendar.gregorian_of_french d, Dfrench))
