@@ -190,6 +190,14 @@ let reconstitute conf base p1 p2 =
     | Some "2" -> x2
     | _ -> if null x1 then x2 else x1
   in
+  let merge_field name proj =
+    let x1 = proj p1 in
+    let x2 = proj p2 in
+    match p_getenv conf.env name with
+    | Some "1" -> x1
+    | Some "2" -> x2
+    | _ -> merge_strings base x1 "<br>\n" x2 |> Driver.insert_string base
+  in
   let list conv proj =
     let l1 = List.map conv (proj p1) in
     let l2 = List.map conv (proj p2) in
@@ -246,26 +254,22 @@ let reconstitute conf base p1 p2 =
           (fun p -> Driver.sou base (Driver.get_birth_place p))
           (( = ) "");
       birth_note =
-        merge_strings base (Driver.get_birth_note p1) "<br>\n"
-          (Driver.get_birth_note p2);
+        merge_field "birth_note" (fun p -> Driver.get_birth_note p)
+        |> Driver.sou base;
       birth_src =
-        merge_strings base (Driver.get_birth_src p1) ", "
-          (Driver.get_birth_src p2);
+        merge_field "birth_source" (fun p -> Driver.get_birth_src p)
+        |> Driver.sou base;
       baptism = field "baptism" Driver.get_baptism (( = ) Date.cdate_None);
       baptism_place =
         field "baptism_place"
           (fun p -> Driver.sou base (Driver.get_baptism_place p))
           (( = ) "");
       baptism_note =
-        merge_strings base
-          (Driver.get_baptism_note p1)
-          "<br>\n"
-          (Driver.get_baptism_note p2);
+        merge_field "baptism_note" (fun p -> Driver.get_baptism_note p)
+        |> Driver.sou base;
       baptism_src =
-        merge_strings base
-          (Driver.get_baptism_src p1)
-          ", "
-          (Driver.get_baptism_src p2);
+        merge_field "baptism_source" (fun p -> Driver.get_baptism_src p)
+        |> Driver.sou base;
       death =
         field "death" Driver.get_death (fun x ->
             match x with DontKnowIfDead | OfCourseDead -> true | _ -> false);
@@ -274,33 +278,31 @@ let reconstitute conf base p1 p2 =
           (fun p -> Driver.sou base (Driver.get_death_place p))
           (( = ) "");
       death_note =
-        merge_strings base (Driver.get_death_note p1) "<br>\n"
-          (Driver.get_death_note p2);
+        merge_field "death_note" (fun p -> Driver.get_death_note p)
+        |> Driver.sou base;
       death_src =
-        merge_strings base (Driver.get_death_src p1) ", "
-          (Driver.get_death_src p2);
+        merge_field "death_src" (fun p -> Driver.get_death_src p)
+        |> Driver.sou base;
       burial = field "burial" Driver.get_burial (( = ) UnknownBurial);
       burial_place =
         field "burial_place"
           (fun p -> Driver.sou base (Driver.get_burial_place p))
           (( = ) "");
       burial_note =
-        merge_strings base
-          (Driver.get_burial_note p1)
-          "<br>\n"
-          (Driver.get_burial_note p2);
+        merge_field "burial_note" (fun p -> Driver.get_burial_note p)
+        |> Driver.sou base;
       burial_src =
-        merge_strings base (Driver.get_burial_src p1) ", "
-          (Driver.get_burial_src p2);
+        merge_field "burial_source" (fun p -> Driver.get_burial_src p)
+        |> Driver.sou base;
       pevents =
         list
           (Futil.map_pers_event (sorp base) (Driver.sou base))
           Driver.get_pevents;
       notes =
-        merge_strings base (Driver.get_notes p1) "<br>\n" (Driver.get_notes p2);
+        merge_field "notes" (fun p -> Driver.get_notes p) |> Driver.sou base;
       psources =
-        merge_strings base (Driver.get_psources p1) ", "
-          (Driver.get_psources p2);
+        merge_field "sources" (fun p -> Driver.get_psources p)
+        |> Driver.sou base;
       key_index = Driver.get_iper p1;
     }
   in
