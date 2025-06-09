@@ -8,7 +8,7 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
 let print_differences conf base branches p1 p2 =
-  let gen_string_field chk1 chk2 (title : Adef.safe_string)
+  let gen_string_field ?(check = true) chk1 chk2 (title : Adef.safe_string)
       (name : Adef.encoded_string) proj =
     let name = (name :> string) in
     let x1 : Adef.safe_string = proj p1 in
@@ -32,7 +32,7 @@ let print_differences conf base branches p1 p2 =
         Output.print_sstring conf {|" value="|};
         Output.print_sstring conf (string_of_int i);
         Output.print_sstring conf {|"|};
-        if chk then Output.print_sstring conf " checked";
+        if chk && check then Output.print_sstring conf " checked";
         Output.print_sstring conf {|>|};
         Output.printf conf {|<label class="custom-control-label" for="|};
         Output.print_sstring conf name;
@@ -43,11 +43,17 @@ let print_differences conf base branches p1 p2 =
       in
       Output.print_sstring conf "<h4>";
       Output.print_string conf (Adef.safe_fn Utf8.capitalize_fst title);
+      if not check then
+        Output.print_sstring conf
+          (Format.sprintf
+             {|<sup title="%s">
+            <i class="fa fa-info fa-xs"></i></sup>|}
+             (transl conf "help merge" |> Utf8.capitalize_fst));
       Output.print_sstring conf {|</h4>|};
       aux 1 x1 chk1;
       aux 2 x2 chk2)
   in
-  let string_field = gen_string_field true false in
+  let string_field ?(check = true) = gen_string_field ~check true false in
   Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|">|};
@@ -119,6 +125,30 @@ let print_differences conf base branches p1 p2 =
           |> Adef.safe
       | None -> Adef.safe "");
   string_field
+    (transl_nth conf "blason/blasons" 0 |> Adef.safe)
+    ("blason" |> Adef.encoded)
+    (fun p ->
+      match Image.get_blason conf base p true with
+      | Some (`Url url) ->
+          ({|<img src="|} ^<^ escape_html url
+           ^>^ {|" style="max-width:75px;max-height:100px">|} ^ url
+            :> Adef.safe_string)
+      | Some (`Path path) ->
+          let s = Unix.stat path in
+          Printf.sprintf
+            {|<img src="%sm=FIM&d=%s&p=%s&n=%s&oc=%d&k=%s" \
+              style="max-width:75px;max-height:100px"> %s|}
+            (commd conf :> string)
+            (string_of_int
+            @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+            (Driver.get_first_name p |> Driver.sou base)
+            (Driver.get_surname p |> Driver.sou base)
+            (Driver.get_occ p)
+            ((acces conf base p : Adef.escaped_string :> string) ^ ".blason")
+            path
+          |> Adef.safe
+      | None -> Adef.safe "");
+  string_field
     (transl conf "public name" |> Adef.safe)
     ("public_name" |> Adef.encoded)
     (fun p ->
@@ -153,10 +183,28 @@ let print_differences conf base branches p1 p2 =
       name
       (fun p -> get p |> Driver.sou base |> safe_html)
   in
+  let note_field trans name get =
+    string_field ~check:false
+      (transl conf trans ^<^ Adef.safe " / " ^>^ transl_nth conf "note/notes" 0)
+      name
+      (fun p -> get p |> Driver.sou base |> safe_html)
+  in
+  let source_field trans name get =
+    string_field ~check:false
+      (transl conf trans ^<^ Adef.safe " / "
+      ^>^ transl_nth conf "source/sources" 0)
+      name
+      (fun p -> get p |> Driver.sou base |> safe_html)
+  in
+
   date_field "birth" (Adef.encoded "birth") Driver.get_birth;
   place_field "birth" (Adef.encoded "birth_place") Driver.get_birth_place;
+  note_field "birth" (Adef.encoded "birth_note") Driver.get_birth_note;
+  source_field "birth" (Adef.encoded "birth_source") Driver.get_birth_src;
   date_field "baptism" (Adef.encoded "baptism") Driver.get_baptism;
   place_field "baptism" (Adef.encoded "baptism_place") Driver.get_baptism_place;
+  note_field "baptism" (Adef.encoded "baptism_note") Driver.get_baptism_note;
+  source_field "baptism" (Adef.encoded "baptism_source") Driver.get_baptism_src;
   string_field
     (transl conf "death" |> Adef.safe)
     (Adef.encoded "death")
@@ -179,6 +227,8 @@ let print_differences conf base branches p1 p2 =
       | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
       | DontKnowIfDead | OfCourseDead -> Adef.safe "");
   place_field "death" (Adef.encoded "death_place") Driver.get_death_place;
+  note_field "death" (Adef.encoded "death_note") Driver.get_death_note;
+  source_field "death" (Adef.encoded "death_source") Driver.get_death_src;
   string_field
     (transl conf "burial" |> Adef.safe)
     (Adef.encoded "burial")
@@ -200,6 +250,13 @@ let print_differences conf base branches p1 p2 =
           | None -> Adef.safe ""
           | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d));
   place_field "burial" (Adef.encoded "burial_place") Driver.get_burial_place;
+  note_field "burial" (Adef.encoded "burial_note") Driver.get_burial_note;
+  source_field "burial" (Adef.encoded "burial_source") Driver.get_burial_src;
+  string_field ~check:false
+    (transl_nth conf "note/notes" 1 |> Adef.safe)
+    ("notes" |> Adef.encoded)
+    (fun p ->
+      (Driver.get_notes p |> Driver.sou base |> escape_html :> Adef.safe_string));
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf

@@ -9431,6 +9431,10 @@ ru: супруг(а) и дети не известы
 sv: har ingen familj
 tr: eş ve çocuklar bilinmiyor
 
+    help merge
+en: if none is checked, both entries will be concatenated
+fr: en cas de non selection, les deux entrées seront concaténées
+
     help modify data
 co: Fate casu ! E currezzioni fatte in u dizziunariu mudificheghjanu l’inseme di i dati chì currispondenu in a basa.
 de: Klicken Sie auf das zu korrigierende „Listen-Element”: alle Dateien Ihres Baumes werden sofort korrigiert.
