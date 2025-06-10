@@ -56,7 +56,7 @@ let relation_print conf base p =
     match p_getenv conf.senv "ei" with
     | Some i ->
         conf.senv <- [];
-        let i = Driver.iper_of_string i in
+        let i = Driver.Iper.of_string i in
         if Geneweb_db.Driver.iper_exists base i then Some (pget conf base i)
         else None
     | None -> (
@@ -80,8 +80,8 @@ let specify conf base n pl1 pl2 pl3 =
             let rec add_rec = function
               | t1 :: tl1 ->
                   if
-                    Driver.eq_istr t1.t_ident t.t_ident
-                    && Driver.eq_istr t1.t_place t.t_place
+                    Driver.Istr.equal t1.t_ident t.t_ident
+                    && Driver.Istr.equal t1.t_place t.t_place
                   then t1 :: tl1
                   else t1 :: add_rec tl1
               | [] -> [ t ]
@@ -263,7 +263,7 @@ let make_henv conf base =
             ]
           else
             [
-              ("iz", Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+              ("iz", Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
             ]
         in
         { conf with henv = conf.henv @ x }
@@ -392,7 +392,7 @@ let make_senv conf base =
               ~comment:"Incorrect em=, ei=, ep=, en=, eoc= configuration";
             raise Exit
       in
-      let vi = Driver.string_of_iper ip in
+      let vi = Driver.Iper.to_string ip in
       set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
@@ -696,7 +696,7 @@ let treat_request =
              | "L" ->
                  w_base @@ fun conf base ->
                  Perso.interp_templ "list" conf base
-                   (Driver.empty_person base Driver.dummy_iper)
+                   (Driver.empty_person base Driver.Iper.dummy)
              | "LB" when conf.wizard || conf.friend ->
                  w_base @@ BirthDeathDisplay.print_birth
              | "LD" when conf.wizard || conf.friend ->
@@ -813,7 +813,7 @@ let treat_request =
                                ~comment:"Missing fn= and sn= for m=NG"))
                  | Some i ->
                      relation_print conf base
-                       (pget conf base (Driver.iper_of_string i)))
+                       (pget conf base (Driver.Iper.of_string i)))
              | "NOTES" ->
                  w_base (fun conf base ->
                      match
@@ -893,7 +893,7 @@ let treat_request =
                      | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
                      | _ ->
                          Perso.interp_templ ("tp0_" ^ f) conf base
-                           (Driver.empty_person base Driver.dummy_iper))
+                           (Driver.empty_person base Driver.Iper.dummy))
                  | None ->
                      incorrect_request conf base ~comment:"Missing v= for m=TP")
              | "TT" -> w_base @@ TitleDisplay.print

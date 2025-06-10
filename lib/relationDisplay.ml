@@ -86,12 +86,12 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   let sl, _ =
     List.fold_left
       (fun (sl, i) ifam ->
-        ("&ef" ^ string_of_int i ^ "=" ^ Driver.string_of_ifam ifam ^ sl, i - 1))
+        ("&ef" ^ string_of_int i ^ "=" ^ Driver.Ifam.to_string ifam ^ sl, i - 1))
       ("", List.length excl_faml - 1)
       excl_faml
   in
-  commd conf ^^^ "em=R&ei=" ^<^ Driver.string_of_iper ip1 ^<^ "&i="
-  ^<^ Driver.string_of_iper ip2
+  commd conf ^^^ "em=R&ei=" ^<^ Driver.Iper.to_string ip1 ^<^ "&i="
+  ^<^ Driver.Iper.to_string ip2
   ^<^ (if sps then "" else "&sp=0")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
 
@@ -971,7 +971,7 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
             in
             let acc =
               "&i" ^<^ string_of_int n ^<^ "="
-              ^<^ (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode
+              ^<^ (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode
                     :> Adef.escaped_string)
               ^^^ acc
             in

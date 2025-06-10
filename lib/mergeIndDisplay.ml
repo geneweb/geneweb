@@ -61,15 +61,15 @@ let print_differences conf base branches p1 p2 =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND_OK");
   Util.hidden_input conf "i1"
-    (Driver.get_iper p1 |> Driver.string_of_iper |> Mutil.encode);
+    (Driver.get_iper p1 |> Driver.Iper.to_string |> Mutil.encode);
   Util.hidden_input conf "i2"
-    (Driver.get_iper p2 |> Driver.string_of_iper |> Mutil.encode);
+    (Driver.get_iper p2 |> Driver.Iper.to_string |> Mutil.encode);
   let rec loop = function
     | [ (ip1, ip2) ] ->
         Util.hidden_input conf "ini1"
-          (ip1 |> Driver.string_of_iper |> Mutil.encode);
+          (ip1 |> Driver.Iper.to_string |> Mutil.encode);
         Util.hidden_input conf "ini2"
-          (ip2 |> Driver.string_of_iper |> Mutil.encode)
+          (ip2 |> Driver.Iper.to_string |> Mutil.encode)
     | _ :: branches -> loop branches
     | [] -> ()
   in
@@ -411,7 +411,7 @@ let print_merged conf base wl p =
   Output.print_sstring conf "</li></ul>";
   (match (p_getenv conf.env "m", p_getenv conf.env "ip") with
   | Some "MRG_DUP_IND_Y_N", Some ip ->
-      let ip = Driver.iper_of_string ip in
+      let ip = Driver.Iper.of_string ip in
       let s1 =
         match p_getenv conf.env "iexcl" with
         | Some "" | None -> Adef.encoded ""
@@ -426,7 +426,7 @@ let print_merged conf base wl p =
       Output.print_sstring conf "<a href=";
       Output.print_string conf (commd conf);
       Output.print_sstring conf "m=MRG_DUP&ip=";
-      Output.print_string conf (Driver.string_of_iper ip |> Mutil.encode);
+      Output.print_string conf (Driver.Iper.to_string ip |> Mutil.encode);
       Output.print_string conf s1;
       Output.print_string conf s2;
       Output.print_sstring conf ">";
@@ -450,19 +450,19 @@ let print_merged conf base wl p =
 let print conf base =
   let p1 =
     match p_getenv conf.env "i" with
-    | Some i1 -> Some (Driver.poi base (Driver.iper_of_string i1))
+    | Some i1 -> Some (Driver.poi base (Driver.Iper.of_string i1))
     | None -> None
   in
   let p2 =
     match p_getenv conf.env "i2" with
-    | Some i2 -> Some (Driver.poi base (Driver.iper_of_string i2))
+    | Some i2 -> Some (Driver.poi base (Driver.Iper.of_string i2))
     | None -> (
         match (p_getenv conf.env "select", p_getenv conf.env "n") with
         | (Some "input" | None), Some n -> (
             let ipl = Gutil.person_ht_find_all base n in
             match ipl with [ ip2 ] -> Some (Driver.poi base ip2) | _ -> None)
         | Some x, (Some "" | None) ->
-            Some (Driver.poi base (Driver.iper_of_string x))
+            Some (Driver.poi base (Driver.Iper.of_string x))
         | _ -> None)
   in
   match (p1, p2) with

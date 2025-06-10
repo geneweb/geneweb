@@ -395,7 +395,7 @@ let print_anniv conf base p dead_people level =
   let mode () =
     Util.hidden_input conf "m" (Adef.encoded "C");
     Util.hidden_input conf "i"
-      (Driver.get_iper p |> Driver.string_of_iper |> Adef.encoded);
+      (Driver.get_iper p |> Driver.Iper.to_string |> Adef.encoded);
     Util.hidden_input conf "t"
       (Adef.encoded (if dead_people then "AD" else "AN"))
   in

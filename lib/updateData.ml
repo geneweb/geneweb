@@ -98,7 +98,7 @@ let get_all_data conf base =
     let strings = get arg in
     List.fold_left
       (fun acc istr ->
-        if not (Driver.is_empty_string istr) then IstrSet.add istr acc else acc)
+        if not (Driver.Istr.is_empty istr) then IstrSet.add istr acc else acc)
       acc strings
   in
   let acc =
@@ -132,7 +132,7 @@ let get_all_data conf base =
 
 let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
-  let istr = Driver.istr_of_string @@ (List.assoc "key" conf.env :> string) in
+  let istr = Driver.Istr.of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : Driver.istr) p =
     try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
     with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc

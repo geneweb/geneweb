@@ -42,7 +42,7 @@ let person_string base iper =
   let fn = Driver.sou base (Driver.get_first_name p) in
   let sn = Driver.sou base (Driver.get_surname p) in
   if sn = "?" || fn = "?" then
-    fn ^ " " ^ sn ^ " (#" ^ Driver.string_of_iper iper ^ ")"
+    fn ^ " " ^ sn ^ " (#" ^ Driver.Iper.to_string iper ^ ")"
   else fn ^ "." ^ string_of_int (Driver.get_occ p) ^ " " ^ sn
 
 (** Returns the string associated to a person in HTML if the html option is set,
@@ -50,7 +50,7 @@ let person_string base iper =
 let person_link bname base iper target =
   if !html then
     Printf.sprintf "<A HREF=\"%s%s_w?i=%s\" TARGET=\"%s\">%s</A>" !root bname
-      (Driver.string_of_iper iper)
+      (Driver.Iper.to_string iper)
       target (person_string base iper)
   else person_string base iper
 
@@ -119,7 +119,7 @@ let compatible_names src_name dest_name_list =
     identifiers, i.e. if istr1 is not the empty string identifier, then istr2
     must not be. *)
 let compatible_str_field istr1 istr2 =
-  Driver.is_empty_string istr1 || not (Driver.is_empty_string istr2)
+  Driver.Istr.is_empty istr1 || not (Driver.Istr.is_empty istr2)
 
 (** Returns a list of intervals of SDN (SDN 1 is November 25, 4714 BC Gregorian
     calendar) of the date in argument. An interval has the format (b, b'), where

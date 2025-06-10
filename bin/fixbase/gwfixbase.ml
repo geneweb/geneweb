@@ -28,11 +28,11 @@ let aux txt
         Printf.sprintf "Added child in: %s" (string_of_f ifam)
     | Fix_RemovedUnion (ip, ifam) ->
         Printf.sprintf "Removing ifam %s from [%s] unions"
-          (Driver.string_of_ifam ifam)
+          (Driver.Ifam.to_string ifam)
           (string_of_p ip)
     | Fix_RemovedDuplicateUnion (ip, ifam) ->
         Printf.sprintf "Removing duplicate ifam %s from [%s] unions"
-          (Driver.string_of_ifam ifam)
+          (Driver.Ifam.to_string ifam)
           (string_of_p ip)
     | Fix_AddedRelatedFromPevent (ip, ip2) | Fix_AddedRelatedFromFevent (ip, ip2)
       ->
@@ -47,14 +47,14 @@ let aux txt
     | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
         Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
           (match ifam_opt with
-          | Some i -> "ifam " ^ Driver.string_of_ifam i
+          | Some i -> "ifam " ^ Driver.Ifam.to_string i
           | None -> (
               match iper_opt with
-              | Some i -> "iper " ^ Driver.string_of_iper i
+              | Some i -> "iper " ^ Driver.Iper.to_string i
               | None -> assert false))
           (match opt with
           | Some (i, i') ->
-              Driver.string_of_istr i ^ " -> " ^ Driver.string_of_istr i'
+              Driver.Istr.to_string i ^ " -> " ^ Driver.Istr.to_string i'
           | None -> "Dtext")
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
         Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc

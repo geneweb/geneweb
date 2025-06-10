@@ -1,5 +1,55 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+type istr
+(** String id *)
+
+type ifam
+(** Family id *)
+
+type iper
+(** Person id *)
+
+module type Indexed = sig
+  type t
+
+  val dummy : t
+  val is_dummy : t -> bool
+
+  val hash : t -> int
+  (** Compute a hash of an indexed value. This function is just the identity
+      because a [t] value is already a hash.
+
+      The hash should use only on values from a common database index. *)
+
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+  val to_string : t -> string
+  val of_string : string -> t
+  val pp : t Fmt.t
+
+  module Set : Set.S with type elt = t
+  module Map : Map.S with type key = t
+  module Table : Hashtbl.S with type key = t
+end
+
+module Istr : sig
+  type t = istr
+
+  include Indexed with type t := t
+
+  val empty : t
+  (** Identifier of the empty string (""). *)
+
+  val quest : t
+  (** Identifier of the question mark ("?") *)
+
+  val is_empty : t -> bool
+  val is_quest : t -> bool
+end
+
+module Ifam : Indexed with type t = ifam
+module Iper : Indexed with type t = iper
+
 (** {2 Database management} *)
 
 type base
@@ -59,66 +109,6 @@ val sync : ?scratch:bool -> base -> unit
 *)
 
 (** {2 Unique identifiers} *)
-
-type istr
-(** String identifier. *)
-
-type ifam
-(** Family identifier. *)
-
-type iper
-(** Person identifier. *)
-
-val dummy_iper : iper
-(** Dummy person identifier. *)
-
-val dummy_ifam : ifam
-(** Dummy family identifier. *)
-
-val string_of_iper : iper -> string
-(** Convert [iper] to string *)
-
-val string_of_ifam : ifam -> string
-(** Convert [ifam] to string *)
-
-val string_of_istr : istr -> string
-(** Convert [istr] to string *)
-
-val iper_of_string : string -> iper
-(** Convert [iper] from string *)
-
-val ifam_of_string : string -> ifam
-(** Convert [ifam] from string *)
-
-val istr_of_string : string -> istr
-(** Convert [istr] from string *)
-
-val eq_istr : istr -> istr -> bool
-(** [true] if strings with the giving ids are equal *)
-
-val hash_istr : istr -> int
-(** Compute a hash of a [istr] value. This function is just the identity because
-    a [istr] value is already a hash.
-
-    The hash should use only on strings from a common database. *)
-
-val eq_ifam : ifam -> ifam -> bool
-(** [true] if families with the giving ids are equal *)
-
-val eq_iper : iper -> iper -> bool
-(** [true] if persons with the giving ids are equal *)
-
-val is_empty_string : istr -> bool
-(** [true] if string with the giving id is empty ("") *)
-
-val is_quest_string : istr -> bool
-(** [true] if string with the giving id is a question mark ("?") *)
-
-val empty_string : istr
-(** Id of the empty string ("") *)
-
-val quest_string : istr
-(** Id of the question mark ("?") *)
 
 type person
 (** Person data structure *)

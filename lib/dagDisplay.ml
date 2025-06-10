@@ -732,7 +732,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   in
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let indi_ip n =
-    match n.valu with Left ip -> ip | Right _ -> Driver.dummy_iper
+    match n.valu with Left ip -> ip | Right _ -> Driver.Iper.dummy
   in
   let indi_txt n =
     match n.valu with
@@ -989,7 +989,7 @@ let rec eval_var conf base env _xx _loc = function
       | _ -> VVstring "")
   | [ "person_index" ] -> (
       match find_person_in_env conf base "" with
-      | Some p -> VVstring (Driver.string_of_iper (Driver.get_iper p))
+      | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
       | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
@@ -1009,7 +1009,7 @@ let rec eval_var conf base env _xx _loc = function
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
-      | Some p -> VVstring (Driver.string_of_iper (Driver.get_iper p))
+      | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
       | None -> VVstring "")
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
@@ -1083,7 +1083,7 @@ and eval_dag_cell_var conf base env (colspan, align, td) = function
   | [ "index" ] -> (
       match td with
       | TDitem (ip, _, _) | TDtext (ip, _) ->
-          VVstring (Driver.string_of_iper ip)
+          VVstring (Driver.Iper.to_string ip)
       | _ -> VVstring "")
   | [ "is_bar" ] -> VVbool (match td with TDbar _ -> true | _ -> false)
   | [ "is_hr" ] -> (
@@ -1315,7 +1315,7 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
     let p =
       match find_person_in_env conf base "" with
       | Some p -> p
-      | None -> Driver.poi base Driver.dummy_iper
+      | None -> Driver.poi base Driver.Iper.dummy
     in
     let env =
       let table_pre_dim () =

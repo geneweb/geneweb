@@ -25,7 +25,7 @@ let mk_pevent name date place note src =
     epers_name = name;
     epers_date = date;
     epers_place = place;
-    epers_reason = Driver.empty_string;
+    epers_reason = Driver.Istr.empty;
     epers_note = note;
     epers_src = src;
     epers_witnesses = [||];
@@ -41,28 +41,16 @@ let fix_pevents ?report base pp =
   (* TODO clean up *)
   let p = Driver.gen_person_of_person pp in
   let empty_bi =
-    ( Date.cdate_None,
-      Driver.empty_string,
-      Driver.empty_string,
-      Driver.empty_string )
+    (Date.cdate_None, Driver.Istr.empty, Driver.Istr.empty, Driver.Istr.empty)
   in
   let empty_bp =
-    ( Date.cdate_None,
-      Driver.empty_string,
-      Driver.empty_string,
-      Driver.empty_string )
+    (Date.cdate_None, Driver.Istr.empty, Driver.Istr.empty, Driver.Istr.empty)
   in
   let empty_de =
-    ( Date.cdate_None,
-      Driver.empty_string,
-      Driver.empty_string,
-      Driver.empty_string )
+    (Date.cdate_None, Driver.Istr.empty, Driver.Istr.empty, Driver.Istr.empty)
   in
   let empty_bu =
-    ( Date.cdate_None,
-      Driver.empty_string,
-      Driver.empty_string,
-      Driver.empty_string )
+    (Date.cdate_None, Driver.Istr.empty, Driver.Istr.empty, Driver.Istr.empty)
   in
   let pevents = p.pevents in
   let aux name date place note src empty pevents =
@@ -81,13 +69,13 @@ let fix_pevents ?report base pp =
             epers_date =
               (if e.epers_date = Date.cdate_None then date else e.epers_date);
             epers_place =
-              (if e.epers_place = Driver.empty_string then place
+              (if e.epers_place = Driver.Istr.empty then place
                else e.epers_place);
             epers_reason = e.epers_reason;
             epers_note =
-              (if e.epers_note = Driver.empty_string then note else e.epers_note);
+              (if e.epers_note = Driver.Istr.empty then note else e.epers_note);
             epers_src =
-              (if e.epers_src = Driver.empty_string then src else e.epers_src);
+              (if e.epers_src = Driver.Istr.empty then src else e.epers_src);
             epers_witnesses = e.epers_witnesses;
           }
         in
@@ -209,7 +197,7 @@ let check_families_children ?report progress base =
         let ip = children.(j) in
         let a = Driver.poi base ip in
         let parents = Driver.get_parents a in
-        if parents = Some Driver.dummy_ifam || parents = None then (
+        if parents = Some Driver.Ifam.dummy || parents = None then (
           Driver.patch_ascend base ip
             { parents = Some ifam; consang = Driver.get_consang a };
           match report with Some fn -> fn (Fix_AddedParents ip) | None -> ())
@@ -230,7 +218,7 @@ let check_persons_parents ?report progress base =
       |> Option.iter @@ fun ifam ->
          let ip = Driver.get_iper p in
          let fam = Driver.foi base ifam in
-         if Driver.get_ifam fam = Driver.dummy_ifam then (
+         if Driver.get_ifam fam = Driver.Ifam.dummy then (
            Driver.patch_ascend base ip
              { parents = None; consang = Adef.no_consang };
            match report with Some fn -> fn (Fix_ParentDeleted ip) | None -> ())
@@ -373,7 +361,7 @@ let fix_missing_spouses ?report progress base =
       progress i nb_fam;
       let aux i =
         let p = Driver.poi base i in
-        if Driver.get_iper p = Driver.dummy_iper then (
+        if Driver.get_iper p = Driver.Iper.dummy then (
           Driver.patch_union base i { family = [| Driver.get_ifam fam |] };
           Driver.patch_person base i
             { (Driver.gen_person_of_person p) with key_index = i };

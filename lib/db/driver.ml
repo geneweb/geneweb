@@ -6,22 +6,66 @@ type istr = int
 type ifam = int
 type iper = int
 
-let string_of_iper = string_of_int
-let string_of_ifam = string_of_int
-let string_of_istr = string_of_int
-let iper_of_string = int_of_string
-let ifam_of_string = int_of_string
-let istr_of_string = int_of_string
-let dummy_iper = -1
-let dummy_ifam = -1
-let empty_string = 0
-let quest_string = 1
-let eq_istr i1 i2 = i1 = i2
-let hash_istr i = i
-let eq_ifam i1 i2 = i1 = i2
-let eq_iper i1 i2 = i1 = i2
-let is_empty_string istr = istr = 0
-let is_quest_string istr = istr = 1
+module type Indexed = sig
+  type t
+
+  val dummy : t
+  val is_dummy : t -> bool
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+  val to_string : t -> string
+  val of_string : string -> t
+  val pp : t Fmt.t
+
+  module Set : Set.S with type elt = t
+  module Map : Map.S with type key = t
+  module Table : Hashtbl.S with type key = t
+end
+
+module I = struct
+  type t = int
+
+  let dummy = -1
+  let[@inline always] hash x = x
+  let equal = Int.equal
+  let[@inline always] is_dummy t = equal t dummy
+  let compare = Int.compare
+  let to_string = string_of_int
+  let of_string = int_of_string
+  let pp = Fmt.int
+
+  module Set = Set.Make (struct
+    type nonrec t = t
+
+    let compare = compare
+  end)
+
+  module Map = Map.Make (struct
+    type nonrec t = t
+
+    let compare = compare
+  end)
+
+  module Table = Hashtbl.Make (struct
+    type nonrec t = t
+
+    let equal = equal
+    let hash = hash
+  end)
+end
+
+module Istr = struct
+  include I
+
+  let empty = 0
+  let quest = 1
+  let[@inline always] is_empty i = i = 0
+  let[@inline always] is_quest i = i = 1
+end
+
+module Ifam = I
+module Iper = I
 
 type string_person_index = Dbdisk.string_person_index
 
@@ -149,40 +193,40 @@ let insert_descend = patch_descend
 let delete_person base ip =
   patch_person base ip
     {
-      first_name = quest_string;
-      surname = quest_string;
+      first_name = Istr.quest;
+      surname = Istr.quest;
       occ = 0;
-      image = empty_string;
+      image = Istr.empty;
       first_names_aliases = [];
       surnames_aliases = [];
-      public_name = empty_string;
+      public_name = Istr.empty;
       qualifiers = [];
       titles = [];
       rparents = [];
       related = [];
       aliases = [];
-      occupation = empty_string;
+      occupation = Istr.empty;
       sex = Neuter;
       access = Private;
       birth = Date.cdate_None;
-      birth_place = empty_string;
-      birth_note = empty_string;
-      birth_src = empty_string;
+      birth_place = Istr.empty;
+      birth_note = Istr.empty;
+      birth_src = Istr.empty;
       baptism = Date.cdate_None;
-      baptism_place = empty_string;
-      baptism_note = empty_string;
-      baptism_src = empty_string;
+      baptism_place = Istr.empty;
+      baptism_note = Istr.empty;
+      baptism_src = Istr.empty;
       death = DontKnowIfDead;
-      death_place = empty_string;
-      death_note = empty_string;
-      death_src = empty_string;
+      death_place = Istr.empty;
+      death_note = Istr.empty;
+      death_src = Istr.empty;
       burial = UnknownBurial;
-      burial_place = empty_string;
-      burial_note = empty_string;
-      burial_src = empty_string;
+      burial_place = Istr.empty;
+      burial_note = Istr.empty;
+      burial_src = Istr.empty;
       pevents = [];
-      notes = empty_string;
-      psources = empty_string;
+      notes = Istr.empty;
+      psources = Istr.empty;
       key_index = ip;
     }
 
@@ -195,21 +239,21 @@ let delete_family base ifam =
   patch_family base ifam
     {
       marriage = Date.cdate_None;
-      marriage_place = empty_string;
-      marriage_note = empty_string;
-      marriage_src = empty_string;
+      marriage_place = Istr.empty;
+      marriage_note = Istr.empty;
+      marriage_src = Istr.empty;
       relation = Married;
       divorce = NotDivorced;
       fevents = [];
       witnesses = [||];
-      comment = empty_string;
-      origin_file = empty_string;
-      fsources = empty_string;
-      fam_index = dummy_ifam;
+      comment = Istr.empty;
+      origin_file = Istr.empty;
+      fsources = Istr.empty;
+      fam_index = Ifam.dummy;
     }
 
 let delete_couple base ifam =
-  patch_couple base ifam (Adef.couple dummy_iper dummy_iper)
+  patch_couple base ifam (Adef.couple Iper.dummy Iper.dummy)
 
 let delete_descend base ifam = patch_descend base ifam { children = [||] }
 let new_iper base = base.data.persons.len
@@ -409,10 +453,8 @@ let get_origin_file = cache_fam (fun f -> f.Def.origin_file)
 let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
-
-let no_person ip =
-  { (Mutil.empty_person empty_string empty_string) with key_index = ip }
-
+let empty_person = Mutil.empty_person Istr.empty Istr.empty
+let no_person ip = Def.{ empty_person with key_index = ip }
 let no_ascend = Def.{ parents = None; consang = Adef.no_consang }
 let no_union = Def.{ family = [||] }
 
@@ -424,25 +466,22 @@ let empty_person base iper =
     a = Some no_ascend;
     u = Some no_union;
   }
-  [@ocaml.warning "-42"]
 
 let person_of_gen_person base (p, a, u) =
   Def.{ base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
-  [@ocaml.warning "-42"]
 
 let family_of_gen_family base (f, c, d) =
   Def.{ base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
-  [@ocaml.warning "-42"]
 
 let iper_exists base = base.func.iper_exists
 let ifam_exists base = base.func.ifam_exists
 
 let poi base iper =
-  if iper = dummy_iper then empty_person base iper
-  else { base; iper; p = None; a = None; u = None } [@ocaml.warning "-42"]
+  if Iper.is_dummy iper then empty_person base iper
+  else { base; iper; p = None; a = None; u = None }
 
-let no_family ifam = { (Mutil.empty_family empty_string) with fam_index = ifam }
-let no_couple = Adef.couple dummy_iper dummy_iper
+let no_family ifam = { (Mutil.empty_family Istr.empty) with fam_index = ifam }
+let no_couple = Adef.couple Iper.dummy Iper.dummy
 let no_descend = { Def.children = [||] }
 
 let empty_family base ifam =
@@ -455,7 +494,7 @@ let empty_family base ifam =
   }
 
 let foi base ifam =
-  if ifam = dummy_ifam then empty_family base ifam
+  if ifam = Ifam.dummy then empty_family base ifam
   else { base; ifam; f = None; c = None; d = None }
 
 let persons base =
@@ -467,13 +506,13 @@ let iper_marker c i = Collection.Marker.make (fun i -> i) c i
 let ifams ?(select = fun _ -> true) base =
   Collection.make ~len:(nb_of_families base) (fun i ->
       if select i then
-        if get_ifam (foi base i) = dummy_ifam then None else Some i
+        if get_ifam (foi base i) = Ifam.dummy then None else Some i
       else None)
 
 let families ?(select = fun _ -> true) base =
   Collection.make ~len:(nb_of_families base) (fun i ->
       let f = foi base i in
-      if get_ifam f <> dummy_ifam && select f then Some f else None)
+      if get_ifam f <> Ifam.dummy && select f then Some f else None)
 
 let ifam_marker c i = Collection.Marker.make (fun i -> i) c i
 
@@ -627,7 +666,7 @@ let father_titles_places base p (nobtit : person -> title list) =
   | None -> []
 
 let gen_gen_person_misc_names base (p : _ Def.gen_person) nobtit nobtit_fun =
-  Futil.gen_person_misc_names (sou base) empty_string quest_string p.first_name
+  Futil.gen_person_misc_names (sou base) Istr.empty Istr.quest p.first_name
     p.surname p.public_name p.qualifiers p.aliases p.first_names_aliases
     p.surnames_aliases nobtit
     (if p.sex = Female then husbands base p else [||])
@@ -648,10 +687,10 @@ let get_gen_descend = getf gen_descend_of_family
 
 let rec delete_person_aux excl base ip =
   let iexcl, fexcl = excl in
-  if ip = dummy_iper || List.mem ip iexcl then
+  if Istr.is_dummy ip || List.mem ip iexcl then
     failwith
-      ("gwdb.delete_person(" ^ string_of_iper ip ^ ",["
-      ^ (List.map string_of_iper iexcl |> String.concat ",")
+      ("gwdb.delete_person(" ^ Iper.to_string ip ^ ",["
+      ^ (List.map Iper.to_string iexcl |> String.concat ",")
       ^ "])");
   let a = get_gen_ascend base ip in
   (* if person is the single child and their parents are empty persons
@@ -705,7 +744,7 @@ let rec delete_person_aux excl base ip =
   if del then delete_person base ip
   else
     patch_person base ip
-      { (no_person ip) with first_name = quest_string; surname = quest_string };
+      { (no_person ip) with first_name = Istr.quest; surname = Istr.quest };
   let iexcl = if del then ip :: iexcl else iexcl in
   let excl = (iexcl, fexcl) in
   let excl =
@@ -718,14 +757,14 @@ and is_empty_p ?ifam base sp =
   && ((get_gen_union base sp).family
      = match ifam with Some i -> [| i |] | None -> [||])
   && get_gen_person base sp
-     = { (no_person sp) with first_name = quest_string; surname = quest_string }
+     = { (no_person sp) with first_name = Istr.quest; surname = Istr.quest }
 
 and delete_family_aux excl base ifam =
   let iexcl, fexcl = excl in
-  if ifam = dummy_ifam || List.mem ifam fexcl then
+  if ifam = Ifam.dummy || List.mem ifam fexcl then
     failwith
-      ("gwdb.delete_family(" ^ string_of_ifam ifam ^ ",["
-      ^ (List.map string_of_ifam fexcl |> String.concat ",")
+      ("gwdb.delete_family(" ^ Ifam.to_string ifam ^ ",["
+      ^ (List.map Ifam.to_string fexcl |> String.concat ",")
       ^ "])");
   let fam = foi base ifam in
   let fath = get_father fam in

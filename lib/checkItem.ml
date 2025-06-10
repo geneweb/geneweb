@@ -699,16 +699,16 @@ let check_children ?(onchange = true) base warning (ifam, fam) fath moth =
 
 let has_family_sources fam =
   not
-    (Driver.is_empty_string (Driver.get_fsources fam)
-    && Driver.is_empty_string (Driver.get_marriage_src fam))
+    (Driver.Istr.is_empty (Driver.get_fsources fam)
+    && Driver.Istr.is_empty (Driver.get_marriage_src fam))
 
 let has_person_sources p =
   not
-    (Driver.is_empty_string (Driver.get_psources p)
-    && Driver.is_empty_string (Driver.get_baptism_src p)
-    && Driver.is_empty_string (Driver.get_birth_src p)
-    && Driver.is_empty_string (Driver.get_death_src p)
-    && Driver.is_empty_string (Driver.get_burial_src p))
+    (Driver.Istr.is_empty (Driver.get_psources p)
+    && Driver.Istr.is_empty (Driver.get_baptism_src p)
+    && Driver.Istr.is_empty (Driver.get_birth_src p)
+    && Driver.Istr.is_empty (Driver.get_death_src p)
+    && Driver.Istr.is_empty (Driver.get_burial_src p))
 
 (* ************************************************************************* *)
 (* [Fonc] check_sources :
@@ -808,14 +808,14 @@ let check_possible_duplicate_family ?p base warning family father mother =
         current_parent_iper,
         current_parent_fn,
         current_parent_sn ) parent_source ifam' =
-    if Driver.eq_ifam ifam ifam' then ()
+    if Driver.Ifam.equal ifam ifam' then ()
     else
       let fam' = Driver.foi base ifam' in
       let parent' = get_parent fam' in
       let person = Driver.poi base parent' in
       let fn, sn = (first_name person, surname person) in
       (* Parent is strictly the same *)
-      if Driver.eq_iper parent' current_parent_iper then
+      if Driver.Iper.equal parent' current_parent_iper then
         warning (PossibleDuplicateFam (ifam, ifam')) (*  Homonymous parents *)
       else if fn = current_parent_fn && sn = current_parent_sn then
         warning (PossibleDuplicateFamHomonymous (ifam, ifam', parent_source))
@@ -823,11 +823,11 @@ let check_possible_duplicate_family ?p base warning family father mother =
   in
 
   match p with
-  | Some p when Driver.eq_iper (Driver.get_iper p) ifath ->
+  | Some p when Driver.Iper.equal (Driver.get_iper p) ifath ->
       Array.iter
         (f Driver.get_mother (mother, imoth, mother_fn, mother_sn) father)
         fath_families
-  | Some p when Driver.eq_iper (Driver.get_iper p) imoth ->
+  | Some p when Driver.Iper.equal (Driver.get_iper p) imoth ->
       Array.iter
         (f Driver.get_father (father, ifath, father_fn, father_sn) mother)
         moth_families
@@ -1024,14 +1024,17 @@ let hom_fam base f1 f2 =
   in
   hom_person base fa1 fa2 && hom_person base mo1 mo2
 
-let eq_person p1 p2 = Driver.eq_iper (Driver.get_iper p1) (Driver.get_iper p2)
-let eq_family f1 f2 = Driver.eq_ifam (Driver.get_ifam f1) (Driver.get_ifam f2)
+let eq_person p1 p2 =
+  Driver.Iper.equal (Driver.get_iper p1) (Driver.get_iper p2)
+
+let eq_family f1 f2 =
+  Driver.Ifam.equal (Driver.get_ifam f1) (Driver.get_ifam f2)
 
 let eq_warning base w1 w2 =
   match (w1, w2) with
   | PossibleDuplicateFam (f1, f2), PossibleDuplicateFam (f1', f2') ->
-      (Driver.eq_ifam f1 f1' && Driver.eq_ifam f2 f2')
-      || (Driver.eq_ifam f1 f2' && Driver.eq_ifam f2 f1')
+      (Driver.Ifam.equal f1 f1' && Driver.Ifam.equal f2 f2')
+      || (Driver.Ifam.equal f1 f2' && Driver.Ifam.equal f2 f1')
   | ( PossibleDuplicateFamHomonymous (f1, f2, _),
       PossibleDuplicateFamHomonymous (f1', f2', _) ) ->
       (hom_fam base f1 f1' && hom_fam base f2 f2')
@@ -1045,38 +1048,38 @@ let eq_warning base w1 w2 =
       eq_person p p' && ((s1 = s1' && s2 = s2') || (s1 = s2' && s2 = s1'))
   | ( ChangedOrderOfChildren (ifam, fam, ipers1, ipers2),
       ChangedOrderOfChildren (ifam', fam', ipers1', ipers2') ) ->
-      Driver.eq_ifam ifam ifam' && eq_family fam fam' && ipers1 = ipers1'
-      && ipers2 = ipers2'
+      Driver.Ifam.equal ifam ifam'
+      && eq_family fam fam' && ipers1 = ipers1' && ipers2 = ipers2'
   | ( ChangedOrderOfMarriages (p, ifams, ifams2),
       ChangedOrderOfMarriages (p', ifams', ifams2') ) ->
       eq_person p p' && ifams = ifams' && ifams2 = ifams2'
   | ( ChangedOrderOfFamilyEvents (ifam, fevents, fevents2),
       ChangedOrderOfFamilyEvents (ifam', fevents', fevents2') ) ->
-      Driver.eq_ifam ifam ifam' && fevents = fevents' && fevents2 = fevents2'
+      Driver.Ifam.equal ifam ifam' && fevents = fevents' && fevents2 = fevents2'
   | ( ChangedOrderOfPersonEvents (p, pevents, pevents2),
       ChangedOrderOfPersonEvents (p', pevents', pevents2') ) ->
       eq_person p p' && pevents = pevents' && pevents2 = pevents2'
   | ( ChildrenNotInOrder (ifam, fam, p1, p2),
       ChildrenNotInOrder (ifam', fam', p1', p2') ) ->
-      Driver.eq_ifam ifam ifam' && eq_family fam fam' && eq_person p1 p1'
-      && eq_person p2 p2'
+      Driver.Ifam.equal ifam ifam'
+      && eq_family fam fam' && eq_person p1 p1' && eq_person p2 p2'
   | CloseChildren (ifam, p1, p2), CloseChildren (ifam', p1', p2') ->
-      Driver.eq_ifam ifam ifam'
+      Driver.Ifam.equal ifam ifam'
       && ((eq_person p1 p1' && eq_person p2 p2')
          || (eq_person p1 p2' && eq_person p2 p1'))
   | DeadOld (p, d), DeadOld (p', d') -> eq_person p p' && d = d'
   | DeadTooEarlyToBeFather (p1, p2), DeadTooEarlyToBeFather (p1', p2') ->
       eq_person p1 p1' && eq_person p2 p2'
   | DistantChildren (ifam, p1, p2), DistantChildren (ifam', p1', p2') ->
-      Driver.eq_ifam ifam ifam' && eq_person p1 p1' && eq_person p2 p2'
+      Driver.Ifam.equal ifam ifam' && eq_person p1 p1' && eq_person p2 p2'
   | FEventOrder (p, fevent, fevent2), FEventOrder (p', fevent', fevent2') ->
       eq_person p p' && fevent = fevent' && fevent2 = fevent2'
   | ( FWitnessEventAfterDeath (p, fevent, ifam),
       FWitnessEventAfterDeath (p', fevent', ifam') ) ->
-      eq_person p p' && fevent = fevent' && Driver.eq_ifam ifam ifam'
+      eq_person p p' && fevent = fevent' && Driver.Ifam.equal ifam ifam'
   | ( FWitnessEventBeforeBirth (p, fevent, ifam),
       FWitnessEventBeforeBirth (p', fevent', ifam') ) ->
-      eq_person p p' && fevent = fevent' && Driver.eq_ifam ifam ifam'
+      eq_person p p' && fevent = fevent' && Driver.Ifam.equal ifam ifam'
   | IncoherentAncestorDate (p1, p2), IncoherentAncestorDate (p1', p2') ->
       eq_person p1 p1' && eq_person p2 p2'
   | MarriageDateAfterDeath p, MarriageDateAfterDeath p' -> eq_person p p'
@@ -1102,9 +1105,9 @@ let eq_warning base w1 w2 =
       eq_person p p' && title = title'
   | UndefinedSex p, UndefinedSex p' -> eq_person p p'
   | YoungForMarriage (p, d, ifam), YoungForMarriage (p', d', ifam') ->
-      eq_person p p' && d = d' && Driver.eq_ifam ifam ifam'
+      eq_person p p' && d = d' && Driver.Ifam.equal ifam ifam'
   | OldForMarriage (p, d, ifam), OldForMarriage (p', d', ifam') ->
-      eq_person p p' && d = d' && Driver.eq_ifam ifam ifam'
+      eq_person p p' && d = d' && Driver.Ifam.equal ifam ifam'
   | _ -> false
 
 let person_warnings conf base p =

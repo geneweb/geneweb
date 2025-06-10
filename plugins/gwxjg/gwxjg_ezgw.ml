@@ -148,13 +148,13 @@ module Person = struct
         in
         let hs =
           let ifath = Driver.get_father f in
-          if ifath = Driver.dummy_iper then []
+          if ifath = Driver.Iper.dummy then []
           else
             Array.fold_left filter []
               (Driver.get_family @@ Driver.poi base ifath)
         in
         let imoth = Driver.get_mother f in
-        if imoth = Driver.dummy_iper then hs
+        if imoth = Driver.Iper.dummy then hs
         else
           Array.fold_left filter hs (Driver.get_family @@ Driver.poi base imoth)
     | None -> []
@@ -187,7 +187,7 @@ module Family = struct
     else []
 
   let father (_, _, (ifath, _, _), _) = ifath
-  let ifam (ifam, _, _, _) = Driver.string_of_ifam ifam
+  let ifam (ifam, _, _, _) = Driver.Ifam.to_string ifam
 
   let marriage_date (_, fam, (_, _, _), auth) =
     if auth then Date.od_of_cdate (Driver.get_marriage fam) else None
@@ -195,10 +195,10 @@ module Family = struct
   let marriage_place (_, fam, _, _) = Driver.get_marriage_place fam
 
   let marriage_note (_, fam, _, auth) =
-    if auth then Driver.get_marriage_note fam else Driver.empty_string
+    if auth then Driver.get_marriage_note fam else Driver.Istr.empty
 
   let marriage_source (_, fam, _, auth) =
-    if auth then Driver.get_marriage_src fam else Driver.empty_string
+    if auth then Driver.get_marriage_src fam else Driver.Istr.empty
 
   let mother (_, _, (_, imoth, _), _) = imoth
 

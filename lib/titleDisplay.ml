@@ -4,6 +4,16 @@ open Util
 open Title
 module Driver = Geneweb_db.Driver
 
+let sort_by_key cmp key l =
+  let l = List.map (fun x -> (x, key x)) l in
+  let l = List.sort (fun (_, k1) (_, k2) -> cmp k1 k2) l in
+  List.map fst l
+
+let sort_uniq_by_key cmp key l =
+  let l = List.map (fun x -> (x, key x)) l in
+  let l = List.sort_uniq (fun (_, k1) (_, k2) -> cmp k1 k2) l in
+  List.map fst l
+
 let my_alphabetic n1 n2 = compare (Name.lower n1) (Name.lower n2)
 
 let string_cnt_list_uniq l =
@@ -119,7 +129,7 @@ let propose_tree_for_list list conf =
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";
              Output.print_sstring conf
-               (Driver.string_of_iper @@ Driver.get_iper p);
+               (Driver.Iper.to_string @@ Driver.get_iper p);
              Output.print_sstring conf "&t";
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";
@@ -187,20 +197,20 @@ let print_all_with_place_list conf base p list =
   Hutil.trailer conf
 
 let select_title_place conf base title place =
-  select_title_place conf base title place
+  Title.select_title_place conf base title place
     ~absolute:(p_getenv conf.env "a" = Some "A")
 
 let select_title conf base title =
-  select_title conf base title ~absolute:(p_getenv conf.env "a" = Some "A")
+  Title.select_title conf base title ~absolute:(p_getenv conf.env "a" = Some "A")
 
 let print_title_place conf base t p =
   let l, t, p, t_equiv = select_title_place conf base t p in
-  let list = List.sort (compare_title_order conf base) l in
+  let list = List.sort (Title.compare_title_order conf base) l in
   print_title_place_list conf base t p t_equiv list
 
 let print_all_with_place conf base p =
-  let l, p = select_all_with_place conf base p in
-  let list = List.sort (compare_title_dates conf base) l in
+  let l, p = Title.select_all_with_place conf base p in
+  let list = List.sort (Title.compare_title_dates conf base) l in
   print_all_with_place_list conf base p list
 
 let print_places_list conf base t t_equiv list =
@@ -217,7 +227,7 @@ let print_places_list conf base t t_equiv list =
   let order s =
     Utf8.capitalize_fst (Name.lower (surname_without_particle base s))
   in
-  let list = List.sort (fun s1 s2 -> compare (order s1) (order s2)) list in
+  let list = sort_by_key String.compare order list in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
     give_access_title_aux conf
@@ -235,14 +245,14 @@ let print_places_list conf base t t_equiv list =
 
 let print_places conf base t =
   let l, t, t_equiv = select_title conf base t in
-  let list = List.sort_uniq my_alphabetic l in
+  let list = sort_uniq_by_key String.compare Name.lower l in
   match list with
   | [ p ] -> print_title_place conf base t p
   | _ -> print_places_list conf base t t_equiv list
 
 let print_titles conf base p =
-  let l, p = select_place conf base p in
-  let list = List.sort_uniq my_alphabetic l in
+  let l, p = Title.select_place conf base p in
+  let list = sort_uniq_by_key String.compare Name.lower l in
   let title _ =
     Output.print_sstring conf "... ";
     Output.print_string conf (escape_html p)
@@ -274,7 +284,8 @@ let print_all_titles conf base =
   in
   let list =
     let l = select_all_titles conf base in
-    string_cnt_list_uniq (List.sort compare_titles2 l)
+    string_cnt_list_uniq
+      (sort_by_key String.compare (fun (t, _) -> Name.lower t) l)
   in
   let order (s, _) = Utf8.capitalize_fst (Name.lower s) in
   let wprint_elem (t, cnt) =
@@ -290,9 +301,9 @@ let print_all_places conf base =
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "all the estates"))
   in
-  let list =
+  let l =
     let l = select_all_places conf base in
-    List.sort_uniq my_alphabetic l
+    sort_uniq_by_key String.compare Name.lower l
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
@@ -301,7 +312,7 @@ let print_all_places conf base =
       Output.print_sstring conf "<li>";
       give_access_all_places conf t;
       Output.print_sstring conf "</li>\n")
-    list;
+    l;
   Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf
 

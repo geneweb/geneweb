@@ -275,7 +275,7 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
      let aux b fn p =
        if b then
          let x = fn p in
-         if not (Driver.is_empty_string x) then ht_add x p
+         if not (Driver.Istr.is_empty x) then ht_add x p
      in
      Collection.iter
        (fun i ->
@@ -291,7 +291,7 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
       (fun i ->
         let fam = Driver.foi base i in
         let pl_ma = Driver.get_marriage_place fam in
-        if not (Driver.is_empty_string pl_ma) then
+        if not (Driver.Istr.is_empty pl_ma) then
           let fath = pget conf base (Driver.get_father fam) in
           let moth = pget conf base (Driver.get_mother fam) in
           if authorized_age conf base fath && authorized_age conf base moth then (
@@ -382,7 +382,7 @@ let print_ip_list conf places opt link_to_ind ipl =
         | [] -> acc
         | ip :: ipl ->
             loop (i + 1)
-              (Printf.sprintf "&i%d=%s" i (Driver.string_of_iper ip) ^ acc)
+              (Printf.sprintf "&i%d=%s" i (Driver.Iper.to_string ip) ^ acc)
               ipl
       in
       loop 0 "" ipl
@@ -524,7 +524,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
                     | [] -> loop1 i l
                     | ip :: ipl ->
                         Output.printf conf "&i%d=%s%s" i
-                          (Driver.string_of_iper ip)
+                          (Driver.Iper.to_string ip)
                           (Printf.sprintf "&p%d=%s" i
                              (places_to_string false pl));
                         loop2 (i + 1) ipl
@@ -699,7 +699,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
       }
   in
   Templ.output conf ifun Templ.Env.empty
-    (Driver.empty_person base Driver.dummy_iper)
+    (Driver.empty_person base Driver.Iper.dummy)
     "buttons_places";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   let link_to_ind =

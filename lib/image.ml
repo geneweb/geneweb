@@ -201,7 +201,7 @@ let has_access_to_image mode conf base p =
   (conf.wizard || conf.friend)
   || (not conf.no_image)
      && Util.authorized_age conf base p
-     && ((not (Driver.is_empty_string img))
+     && ((not (Driver.Istr.is_empty img))
         || full_image_path mode conf base p false <> None)
      && is_not_private_img conf (Driver.sou base img)
 

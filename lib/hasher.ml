@@ -1,3 +1,5 @@
+module Driver = Geneweb_db.Driver
+
 module type S = sig
   type ctx
   type 'a feeder = 'a -> ctx -> ctx
@@ -114,14 +116,9 @@ module Make (H : Digestif.S) = struct
   let dmy Adef.{ day; month; year; prec; delta } =
     int day <+> int month <+> int year <+> precision prec <+> int delta
 
-  let iper (i : Geneweb_db.Driver.iper) =
-    string @@ Geneweb_db.Driver.string_of_iper i
-
-  let ifam (i : Geneweb_db.Driver.ifam) =
-    string @@ Geneweb_db.Driver.string_of_ifam i
-
-  let istr (i : Geneweb_db.Driver.istr) =
-    string @@ Geneweb_db.Driver.string_of_istr i
+  let iper (i : Geneweb_db.Driver.iper) = string @@ Driver.Iper.to_string i
+  let ifam (i : Geneweb_db.Driver.ifam) = string @@ Driver.Ifam.to_string i
+  let istr (i : Geneweb_db.Driver.istr) = string @@ Driver.Istr.to_string i
 
   let calendar (c : Adef.calendar) =
     match c with

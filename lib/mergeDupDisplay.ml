@@ -72,15 +72,15 @@ let print_cand_ind conf base (ip, _p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_IND_Y_N");
-  Util.hidden_input conf "ip" (Driver.string_of_iper ip |> Mutil.encode);
+  Util.hidden_input conf "ip" (Driver.Iper.to_string ip |> Mutil.encode);
   print_input_excl conf
-    (fun x -> Driver.string_of_iper x |> Mutil.encode)
+    (fun x -> Driver.Iper.to_string x |> Mutil.encode)
     ((ip1, ip2) :: iexcl) "iexcl";
   print_input_excl conf
-    (fun x -> Driver.string_of_ifam x |> Mutil.encode)
+    (fun x -> Driver.Ifam.to_string x |> Mutil.encode)
     fexcl "fexcl";
-  Util.hidden_input conf "i" (Driver.string_of_iper ip1 |> Mutil.encode);
-  Util.hidden_input conf "select" (Driver.string_of_iper ip2 |> Mutil.encode);
+  Util.hidden_input conf "i" (Driver.Iper.to_string ip1 |> Mutil.encode);
+  Util.hidden_input conf "select" (Driver.Iper.to_string ip2 |> Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
   Output.print_sstring conf "</form></p>";
@@ -113,15 +113,15 @@ let print_cand_fam conf base (ip, _p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_FAM_Y_N");
-  Util.hidden_input conf "ip" (Driver.string_of_iper ip |> Mutil.encode);
+  Util.hidden_input conf "ip" (Driver.Iper.to_string ip |> Mutil.encode);
   print_input_excl conf
-    (fun x -> Driver.string_of_iper x |> Mutil.encode)
+    (fun x -> Driver.Iper.to_string x |> Mutil.encode)
     iexcl "iexcl";
   print_input_excl conf
-    (fun x -> Driver.string_of_ifam x |> Mutil.encode)
+    (fun x -> Driver.Ifam.to_string x |> Mutil.encode)
     ((ifam1, ifam2) :: fexcl) "fexcl";
-  Util.hidden_input conf "i" (Driver.string_of_ifam ifam1 |> Mutil.encode);
-  Util.hidden_input conf "i2" (Driver.string_of_ifam ifam2 |> Mutil.encode);
+  Util.hidden_input conf "i" (Driver.Ifam.to_string ifam1 |> Mutil.encode);
+  Util.hidden_input conf "i2" (Driver.Ifam.to_string ifam2 |> Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
   Output.print_sstring conf "</form></p>";
@@ -131,7 +131,7 @@ let main_page conf base =
   let ipp =
     match p_getenv conf.env "ip" with
     | Some i ->
-        let i = Driver.iper_of_string i in
+        let i = Driver.Iper.of_string i in
         Some (i, Driver.poi base i)
     | None -> None
   in

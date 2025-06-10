@@ -8,10 +8,10 @@ module Gutil = Geneweb_db.Gutil
 
 (* TODO use function from Util instead? *)
 let empty_sn_or_fn base p =
-  Driver.is_empty_string (Driver.get_surname p)
-  || Driver.is_quest_string (Driver.get_surname p)
-  || Driver.is_empty_string (Driver.get_first_name p)
-  || Driver.is_quest_string (Driver.get_first_name p)
+  Driver.Istr.is_empty (Driver.get_surname p)
+  || Driver.Istr.is_quest (Driver.get_surname p)
+  || Driver.Istr.is_empty (Driver.get_first_name p)
+  || Driver.Istr.is_quest (Driver.get_first_name p)
   || Name.lower (Driver.sou base (Driver.get_surname p)) = ""
   || Name.lower (Driver.sou base (Driver.get_first_name p)) = ""
 
