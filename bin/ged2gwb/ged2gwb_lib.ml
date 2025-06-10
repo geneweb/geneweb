@@ -439,7 +439,7 @@ let parse_alias s = match parse_name s with
 
 let string_of_first_name_option = function
   | Some f -> f
-  | None -> "x"
+  | None -> "?"
 
 let string_of_surname_option = function
   | Some s -> s
@@ -819,6 +819,9 @@ let add_string gen ?format s =
     match format with
     | Some `Html -> s
     | None | Some `Plain_text -> Html.text_content s
+    | Some (`First_name | `Surname) ->
+       let s = Html.text_content s in
+       if s = "" then "?" else s
   in
   try Hashtbl.find gen.g_hstr s
   with Not_found ->
@@ -864,7 +867,6 @@ let fam_index gen lab =
 
 let string_empty = 0
 let string_quest = 1
-let string_x = 2
 
 let unknown_per i sex =
   let p = { (Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
@@ -2054,8 +2056,8 @@ let add_indi gen r =
   let (death, death_place, death_note, death_src) = de in
   let (burial, burial_place, burial_note, burial_src) = bu in
   let person =
-    {Def.first_name = add_string gen first_name;
-     surname = add_string gen surname; occ = occ;
+    {Def.first_name = add_string gen ~format:`First_name first_name;
+     surname = add_string gen ~format:`Surname surname; occ = occ;
      public_name = add_string gen public_name; image = add_string gen image;
      qualifiers =
        if qualifier <> "" then [add_string gen qualifier] else [];
@@ -2889,7 +2891,6 @@ let make_arrays in_file =
   in
   assert (add_string gen "" = string_empty);
   assert (add_string gen "?" = string_quest);
-  assert (add_string gen "x" = string_x);
   Printf.eprintf "*** pass 1 (note)\n";
   flush stderr;
   pass1 gen fname;
@@ -3167,15 +3168,8 @@ let finish_base (persons, families, strings, _) =
     && Array.length u.Def.family != 0
  || p.notes <> string_empty
     then
-      let (fn, occ) =
-        if strings.(p.Def.first_name) = "?" then string_x, i
-        else p.Def.first_name, p.occ
-      in
-      let (sn, occ) =
-        if strings.(p.surname) = "?" then string_x, i
-        else p.surname, occ
-      in
-      persons.(i) <- { p with Def.first_name = fn; surname = sn; occ }
+      if strings.(p.Def.first_name) = "?" || strings.(p.surname) = "?"
+      then persons.(i) <- { p with occ = i }
   done;
   check_parents_sex persons families couples strings ;
   check_parents_children persons ascends unions families couples descends strings ;

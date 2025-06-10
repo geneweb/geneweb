@@ -403,11 +403,23 @@ let fix_map_str ~report ~base ?format istr =
     let clean =
       match format with
       | Some `Html -> Fun.id
-      | None | Some `Plain_text -> Html.text_content
+      | None | Some (`Plain_text | `First_name | `Surname) -> Html.text_content
     in
     Utf8.normalize @@ clean s
   in
-  let istr' = Gwdb.insert_string base ?format s' in
+  let istr' =
+    let s =
+      match format with
+      | None | Some (`Html | `Plain_text) -> s'
+      | Some (`First_name | `Surname) -> if s' = "" then "?" else s'
+    in
+    let format =
+      match format with
+      | (None | Some (`Html | `Plain_text)) as format -> format
+      | Some (`First_name | `Surname) -> Some `Plain_text
+    in
+    Gwdb.insert_string base ?format s
+  in
   if istr <> istr' then report istr istr';
   istr'
 
@@ -428,7 +440,10 @@ let fix_person_strings ~report ~base ~person =
   let fix_map_str ?format = fix_map_str ~report:report_str ~base ?format in
   let gen_pers = Gwdb.gen_person_of_person person in
   let gen_pers' =
-    Futil.map_person_ps ~fd:fix_map_date Fun.id fix_map_str gen_pers
+    Futil.map_person_ps ~fd:fix_map_date
+      ~f_first_name:(fix_map_str ~format:`First_name)
+      ~f_surname:(fix_map_str ~format:`Surname)
+      Fun.id fix_map_str gen_pers
   in
   if gen_pers' <> gen_pers then (
     Gwdb.patch_person base iper gen_pers';
