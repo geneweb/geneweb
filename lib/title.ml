@@ -6,10 +6,9 @@ open Util
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
+module T = Driver.Istr.Table
 
 type date_search = JustSelf | AddSpouse | AddChildren
-
-module StrSet = Mutil.StrSet
 
 let date_interval conf base t x =
   let d1 = ref { day = 0; month = 0; year = max_int; prec = Sure; delta = 0 } in
@@ -124,94 +123,109 @@ let compare_title_order conf base (x1, t1) (x2, t2) =
 
 (**)
 
+let to_string_list base ht =
+  T.to_seq ht |> Seq.map (fun (i, ()) -> Driver.sou base i) |> List.of_seq
+
 let select_title_place conf base ~absolute title place =
-  let list = ref [] in
-  let clean_title = ref title in
-  let clean_place = ref place in
-  let all_names = ref [] in
-  let title1 = Name.lower title in
-  let place1 = Name.lower place in
-  let select x t =
-    if
-      absolute
-      && Driver.sou base t.t_ident = title
-      && Driver.sou base t.t_place = place
+  let names : unit T.t = T.create 17 in
+  let select =
+    let tl1 = Name.lower title in
+    let pl1 = Name.lower place in
+    fun t ->
+      let tl2 = Driver.sou base t.t_ident in
+      let pl2 = Driver.sou base t.t_place in
+      (absolute && String.equal tl1 tl2 && String.equal pl1 pl2)
       || (not absolute)
-         && Name.lower (Driver.sou base t.t_ident) = title1
-         && Name.lower (Driver.sou base t.t_place) = place1
-    then (
-      let tn = Driver.sou base t.t_ident in
-      clean_title := tn;
-      clean_place := Driver.sou base t.t_place;
-      list := (x, t) :: !list;
-      if not (List.mem tn !all_names) then all_names := tn :: !all_names)
+         && String.equal (Name.lower tl2) tl1
+         && String.equal (Name.lower pl1) pl2
   in
-  Collection.iter
-    (fun i ->
-      let x = pget conf base i in
-      List.iter (select x) (nobtit conf base x))
-    (Geneweb_db.Driver.ipers base);
-  (!list, !clean_title, !clean_place, !all_names)
+  let clean_place, l =
+    Collection.fold
+      (fun acc i ->
+        let x = pget conf base i in
+        let titles = nobtit conf base x in
+        List.fold_left
+          (fun (c, acc) t ->
+            if select t then (
+              T.replace names t.t_ident ();
+              (Some t.t_place, (x, t) :: acc))
+            else (c, acc))
+          acc titles)
+      (None, [])
+      (Geneweb_db.Driver.ipers base)
+  in
+  let names = to_string_list base names in
+  let clean_place =
+    match clean_place with Some i -> Driver.sou base i | None -> place
+  in
+  let clean_title = match names with [] -> title | t :: _ -> t in
+  (l, clean_title, clean_place, names)
 
 let select_all_with_place conf base place =
-  let list = ref [] in
-  let clean_place = ref place in
-  let place = Name.lower place in
-  let select x t =
-    if Name.lower (Driver.sou base t.t_place) = place then (
-      clean_place := Driver.sou base t.t_place;
-      list := (x, t) :: !list)
+  let select =
+    let p = Name.lower place in
+    fun t -> String.equal (Name.lower (Driver.sou base t.t_place)) p
   in
-  Collection.iter
-    (fun i ->
-      let x = pget conf base i in
-      List.iter (select x) (nobtit conf base x))
-    (Geneweb_db.Driver.ipers base);
-  (!list, !clean_place)
+  let l =
+    Collection.fold
+      (fun acc i ->
+        let x = pget conf base i in
+        let titles = nobtit conf base x in
+        List.fold_left
+          (fun acc t -> if select t then (x, t) :: acc else acc)
+          acc titles)
+      []
+      (Geneweb_db.Driver.ipers base)
+  in
+  let clean_place =
+    match l with [] -> place | (_, t) :: _ -> Driver.sou base t.t_place
+  in
+  (l, clean_place)
 
 let select_title conf base ~absolute title =
-  let set = ref StrSet.empty in
-  let clean_name = ref title in
-  let all_names = ref [] in
-  let title2 = Name.lower title in
-  let add_place t =
-    let tn = Driver.sou base t.t_ident in
-    if (absolute && tn = title) || ((not absolute) && Name.lower tn = title2)
-    then (
-      let pn = Driver.sou base t.t_place in
-      if not (StrSet.mem pn !set) then (
-        clean_name := tn;
-        set := StrSet.add pn !set);
-      if not (List.mem tn !all_names) then all_names := tn :: !all_names)
+  let places : unit T.t = T.create 17 in
+  let names : unit T.t = T.create 17 in
+  let select =
+    let tl = Name.lower title in
+    fun t ->
+      let tn = Driver.sou base t.t_ident in
+      (absolute && String.equal tn title)
+      || ((not absolute) && String.equal (Name.lower tn) tl)
   in
   Collection.iter
     (fun i ->
       let x = pget conf base i in
-      List.iter add_place (nobtit conf base x))
+      List.iter
+        (fun t ->
+          if select t then (
+            T.replace names t.t_ident ();
+            T.replace places t.t_place ()))
+        (nobtit conf base x))
     (Geneweb_db.Driver.ipers base);
-  (StrSet.elements !set, !clean_name, !all_names)
+  let places = to_string_list base places in
+  let names = to_string_list base names in
+  let clean_name = match names with [] -> title | t :: _ -> t in
+  (places, clean_name, names)
 
 let select_place conf base place =
-  let list = ref [] in
-  let clean_name = ref place in
-  let place2 = Name.lower place in
-  let add_title t =
-    let pn = Driver.sou base t.t_place in
-    if Name.lower pn = place2 then
-      let tn = Driver.sou base t.t_ident in
-      if not (List.mem tn !list) then (
-        clean_name := pn;
-        list := tn :: !list)
+  let names : unit T.t = T.create 17 in
+  let select =
+    let p = Name.lower place in
+    fun t ->
+      let pn = Driver.sou base t.t_place in
+      String.equal (Name.lower pn) p
   in
   Collection.iter
     (fun i ->
       let x = pget conf base i in
-      List.iter add_title (nobtit conf base x))
+      let titles = nobtit conf base x in
+      List.iter (fun t -> if select t then T.replace names t.t_ident ()) titles)
     (Geneweb_db.Driver.ipers base);
-  (!list, !clean_name)
+  let names = to_string_list base names in
+  let clean_name = match names with [] -> place | t :: _ -> t in
+  (names, clean_name)
 
 let select_all proj conf base =
-  let module T = Driver.Istr.Table in
   let ht : unit T.t = T.create 17 in
   Collection.iter
     (fun i ->
@@ -219,10 +233,9 @@ let select_all proj conf base =
       let titles = nobtit conf base x in
       List.iter (fun t -> T.add ht (proj t) ()) titles)
     (Geneweb_db.Driver.ipers base);
-  T.to_seq ht |> Seq.map (fun (i, _) -> Driver.sou base i) |> List.of_seq
+  to_string_list base ht
 
 let select_all_with_counter proj conf base =
-  let module T = Driver.Istr.Table in
   let ht : int T.t = T.create 17 in
   Collection.iter
     (fun i ->
