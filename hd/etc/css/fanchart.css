@@ -585,3 +585,103 @@ body[data-angle="260"] svg text {
   justify-content: center;
   font-weight: bold;
 }
+
+/* Bouton mode circulaire */
+#b-circular-mode {
+  transition: all 0.3s ease;
+}
+
+#b-circular-mode.active {
+  background: #007bff;
+  color: white;
+}
+
+#b-circular-mode.active i {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Ajustements visuels en mode circulaire */
+body[data-mode="circular"] svg text {
+  /* Les textes dans l'hémisphère sud peuvent nécessiter une rotation */
+}
+
+/* Indicateur visuel de séparation des lignées */
+body[data-mode="circular"] .lineage-separator {
+  stroke: #ccc;
+  stroke-width: 1px;
+  stroke-dasharray: 3,3;
+  fill: none;
+}
+
+/* Mise en évidence des lignées au survol */
+body[data-mode="circular"] .paternal-highlight {
+  opacity: 0.3;
+  fill: #4169E1; /* Bleu royal pour la lignée paternelle */
+}
+
+body[data-mode="circular"] .maternal-highlight {
+  opacity: 0.3;
+  fill: #DC143C; /* Cramoisi pour la lignée maternelle */
+}
+
+/* Adaptation de la légende en mode circulaire */
+body[data-mode="circular"] #places-list {
+  max-height: calc(100vh - 20px);
+  overflow-y: auto;
+}
+
+/* Désactivation visuelle des contrôles d'angle en mode circulaire */
+body[data-mode="circular"] .btn-fanchart[id^="b-angle-"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ajustement du conteneur en mode circulaire */
+body[data-mode="circular"] #fanchart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Animation de transition entre les modes */
+.mode-transition {
+  animation: fadeTransition 0.3s ease-out;
+}
+
+@keyframes fadeTransition {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Styles pour la rotation interactive (futur) */
+body[data-mode="circular"][data-rotating="true"] {
+  cursor: grab;
+}
+
+body[data-mode="circular"][data-rotating="true"]:active {
+  cursor: grabbing;
+}
+
+/* Indicateurs de lignée dans le panneau d'info */
+.identity-panel .lineage-indicator {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  margin-left: 8px;
+}
+
+.identity-panel .lineage-indicator.paternal {
+  background: #E6F2FF;
+  color: #4169E1;
+}
+
+.identity-panel .lineage-indicator.maternal {
+  background: #FFE6E6;
+  color: #DC143C;
+}

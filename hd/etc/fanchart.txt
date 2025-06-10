@@ -153,6 +153,15 @@
   </div>
 
   <div class="control-section">
+    <div class="section-title">Mode</div>
+    <div class="btn-group-fanchart">
+      <button id="b-circular-mode" class="btn-fanchart" title="Mode circulaire (360°)">
+        <i class="fa fa-circle-notch fa-fw"></i>360
+      </button>
+    </div>
+  </div>
+
+  <div class="control-section">
     <div class="section-title">[*font]</div>
     <div class="btn-group-fanchart">
      <select id="font-selector" class="custom-select custom-select-sm mx-0">

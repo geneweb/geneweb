@@ -11,7 +11,7 @@ for (var i in document.styleSheets) {
 }
 var standard, standard_width;
 var center_x, center_y, svg_w, svg_h;
-var max_gen_loaded; // Génération max disponible en mémoire
+var max_gen_loaded; // Génération max disponible en "mémoire"
 var max_gen, max_r;
 var lieux = {};
 var lieux_a = [];
@@ -19,7 +19,7 @@ var sortMode = "frequency";
 var has_bi = false, has_ba = false, has_ma = false, has_de = false, has_bu = false;
 var svg_viewbox_x = 0, svg_viewbox_y = 0, svg_viewbox_w = 0, svg_viewbox_h = 0;
 
-// ====== Configuration et constantes =======
+// ====== Configuration =======
 const CONFIG = {
   security: 0.95,
   zoom_factor: 1.25,
@@ -31,14 +31,15 @@ const CONFIG = {
   text_reduction_factor: 0.9,
   svg_margin: 5
 };
-
+let isCircularMode = false;
+let renderTarget = null; // Cible de rendu actuelle (null = fanchart direct)
 let current_angle = CONFIG.default_angle;
 
-// 2. Fonction pour récupérer l'angle depuis l'URL
+// Récupérer l’angle depuis l’URL
 function getAngleFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const angleParam = urlParams.get('angle');
-  
+
   if (angleParam) {
     const angle = parseInt(angleParam);
     // Vérifier que l'angle est valide
@@ -46,24 +47,134 @@ function getAngleFromURL() {
       return angle;
     }
   }
-  
+
   return CONFIG.default_angle;
 }
 
-// 3. Fonction pour mettre à jour l'URL avec le nouvel angle
+// Mettre à jour l’URL avec le nouvel angle
 function updateURLWithAngle(angle) {
   const urlParams = new URLSearchParams(window.location.search);
-  
+
   if (angle === CONFIG.default_angle) {
     // Si c'est l'angle par défaut, on peut omettre le paramètre
     urlParams.delete('angle');
   } else {
     urlParams.set('angle', angle);
   }
-  
+
   const newURL = window.location.pathname + '?' + urlParams.toString();
   history.replaceState(null, '', newURL);
 }
+
+// ========== Module de rendu circulaire ==========
+const CircularModeRenderer = {
+  /**
+   * Active/désactive le mode circulaire
+   */
+  toggle: function() {
+    isCircularMode = !isCircularMode;
+
+    const btn = document.getElementById('b-circular-mode');
+    if (btn) {
+      btn.classList.toggle('active', isCircularMode);
+      const icon = btn.querySelector('i');
+      if (icon) {
+        icon.className = isCircularMode ? 'fa fa-circle fa-fw' : 'fa fa-fan fa-fw';
+        btn.title = isCircularMode ? 'Revenir au mode éventail' : 'Mode circulaire (360°)';
+      }
+    }
+
+    // Masquer les boutons d'angle en mode circulaire
+    document.querySelectorAll('[id^="b-angle-"]').forEach(btn => {
+      btn.style.display = isCircularMode ? 'none' : '';
+    });
+
+    FanchartApp.reRenderWithCurrentGenerations();
+  },
+
+  /**
+   * Rend le centre en mode couple (S2 au nord, S3 au sud)
+   */
+  renderCoupleCenter: function() {
+    const centerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    centerGroup.setAttribute("id", "couple-center");
+    fanchart.appendChild(centerGroup);
+
+    const s2 = ancestor["S2"]; // Père
+    const s3 = ancestor["S3"]; // Mère
+    const r = CONFIG.a_r[0];
+
+    // Demi-cercle nord pour le père
+    if (s2) {
+      SVGRenderer.drawPie(centerGroup, 0, r, -90, 90, s2,
+        { type: 'person', isBackground: true });
+
+      // Texte centré dans le demi-cercle nord
+      const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text2.setAttribute("x", center_x);
+      text2.setAttribute("y", center_y - r/3);
+      text2.setAttribute("text-anchor", "middle");
+      text2.setAttribute("class", "couple-text");
+      text2.innerHTML = `<tspan>${s2.fn}</tspan><tspan x="${center_x}" dy="15">${s2.sn}</tspan>`;
+      centerGroup.appendChild(text2);
+
+      SVGRenderer.drawPie(centerGroup, 0, r, -90, 90, s2, { type: 'person' });
+    }
+
+    // Demi-cercle sud pour la mère
+    if (s3) {
+      SVGRenderer.drawPie(centerGroup, 0, r, 90, 270, s3,
+        { type: 'person', isBackground: true });
+
+      const text3 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text3.setAttribute("x", center_x);
+      text3.setAttribute("y", center_y + r/3);
+      text3.setAttribute("text-anchor", "middle");
+      text3.setAttribute("class", "couple-text");
+      text3.innerHTML = `<tspan>${s3.fn}</tspan><tspan x="${center_x}" dy="15">${s3.sn}</tspan>`;
+      centerGroup.appendChild(text3);
+
+      SVGRenderer.drawPie(centerGroup, 0, r, 90, 270, s3, { type: 'person' });
+    }
+
+    // Ligne de séparation élégante
+    const separator = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    separator.setAttribute("x1", center_x - r);
+    separator.setAttribute("y1", center_y);
+    separator.setAttribute("x2", center_x + r);
+    separator.setAttribute("y2", center_y);
+    separator.setAttribute("stroke", "#ccc");
+    separator.setAttribute("stroke-width", "1");
+    centerGroup.appendChild(separator);
+  },
+
+  /**
+   * Décale une branche d'ancêtres pour qu'un parent devienne S1
+   */
+  shiftAncestorsForParent: function(originalAncestors, parentSosa) {
+    const shifted = {};
+
+    // Le parent devient S1 pour le rendu
+    shifted["S1"] = originalAncestors["S" + parentSosa];
+
+    // Fonction récursive pour décaler toute la branche
+    const shiftBranch = (oldSosa, newSosa) => {
+      const person = originalAncestors["S" + oldSosa];
+      if (person) {
+        shifted["S" + newSosa] = person;
+        // Décaler récursivement les parents
+        shiftBranch(oldSosa * 2, newSosa * 2);       // Père
+        shiftBranch(oldSosa * 2 + 1, newSosa * 2 + 1); // Mère
+      }
+    };
+
+    // Décaler les grands-parents
+    shiftBranch(parentSosa * 2, 2);
+    shiftBranch(parentSosa * 2 + 1, 3);
+
+    return shifted;
+  }
+};
 
 // Créer un module DOMCache au début du fichier, après CONFIG
 const DOMCache = {
@@ -464,7 +575,7 @@ const SVGRenderer = {
     if (event && event.currentTarget) {
       const group = event.currentTarget.parentNode;
       const backgroundSector = group.querySelector('.bg');
-      
+
       if (backgroundSector) {
         backgroundSector.style.fill = "";
         delete backgroundSector.dataset.highlighted;
@@ -939,6 +1050,8 @@ const ColorManager = {
       const checkbox = document.getElementById(id);
       if (checkbox) checkbox.onclick = this.applyColorization.bind(this);
     });
+
+    document.getElementById("b-circular-mode").onclick = () => CircularModeRenderer.toggle();
 
     // Bouton colorisation lieux
     document.getElementById("b-places-colorise").onclick = function() {
@@ -1552,28 +1665,28 @@ const AngleManager = {
   getCurrentAngle: function() {
     return current_angle;
   },
-  
+
   // Changer l'angle et redessiner
   setAngle: function(newAngle) {
     if (!CONFIG.available_angles.includes(newAngle)) {
       console.warn(`Angle ${newAngle} non supporté`);
       return;
     }
-    
+
     if (newAngle === current_angle) {
       return; // Pas de changement nécessaire
     }
-    
+
     current_angle = newAngle;
     updateURLWithAngle(newAngle);
-    
+
     // Mettre à jour l'interface
     this.updateAngleButtons();
-    
+
     // Redessiner le graphique
     FanchartApp.reRenderWithCurrentGenerations();
   },
-  
+
   // Mettre à jour l'état visuel des boutons
   updateAngleButtons: function() {
     CONFIG.available_angles.forEach(angle => {
@@ -1583,7 +1696,7 @@ const AngleManager = {
       }
     });
   },
-  
+
   // Obtenir le label pour un angle
   getAngleLabel: function(angle) {
     switch(angle) {
@@ -1593,7 +1706,7 @@ const AngleManager = {
       default: return `${angle}°`;
     }
   },
-  
+
   // Initialiser depuis l'URL
   initialize: function() {
     current_angle = getAngleFromURL();
@@ -1816,7 +1929,7 @@ const FanchartApp = {
       max_gen = max_gen_loaded;
       Utils.updateUrlWithCurrentState();
     }
-    
+
     // Calculer max_r avec validation
     max_r = 0;
     for (var i = 0; i < max_gen+1 && i < CONFIG.a_r.length; i++) {
@@ -1830,13 +1943,19 @@ const FanchartApp = {
 
     // Définir les dimensions du SVG avec validation
     const margin = CONFIG.svg_margin;
-    if (current_angle === 180) {
-      // À 180°, on n'a pas besoin d'autant de largeur car l'arbre
-      // ne s'étend pas au-delà du demi-cercle
+
+    if (isCircularMode) {
+      // Mode circulaire : forcer un carré pour contenir le cercle complet
+      const size = 2 * (max_r + margin);
+      svg_w = size;
+      svg_h = size;
+      center_x = size / 2;
+      center_y = size / 2;
+    } else if (current_angle === 180) {
       svg_w = 2 * max_r + 2 * margin;
       center_x = max_r + margin;
-      
-      // La hauteur reste max_r + margin car pas d'extension vers le bas
+
+      // La hauteur reste max_r + margin (pas d'extension vers le bas
       svg_h = max_r + 2 * margin;
       center_y = max_r + margin;
     } else {
@@ -1876,20 +1995,67 @@ const FanchartApp = {
   },
 
   renderFanchart: function() {
+    // Initialiser le texte standard
     const standardInfo = this.initializeStandardText();
     standard = standardInfo.element;
     standard_width = standardInfo.width;
 
-    this.renderCenterPerson();
-    this.renderAncestorsByGeneration();
-    this.updateButtonStates();
+    if (isCircularMode) {
+      // Nettoyer complètement le SVG
+      while (fanchart.firstChild) {
+        fanchart.removeChild(fanchart.firstChild);
+      }
 
-    const svg = document.getElementById("fanchart");
-    const container = document.getElementById("fanchart-container");
-    /* todo calculate dynamicaly good position for the perso/marr info panel
-    panel.style.left = (bbox.left + 20) + "px";
-    panel.style.top = (bbox.top + 20) + "px";
-    */
+      // Réinitialiser après nettoyage
+      const newStandardInfo = this.initializeStandardText();
+      standard = newStandardInfo.element;
+      standard_width = newStandardInfo.width;
+
+      // Sauvegarder l'état
+      const savedAngle = current_angle;
+      const originalAncestors = ancestor;
+
+      // Forcer l'angle à 180° pour les demi-cercles
+      current_angle = 180;
+
+      // Créer les groupes pour les deux hémisphères
+      const northGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      northGroup.setAttribute("id", "north-hemisphere");
+      fanchart.appendChild(northGroup);
+
+      const southGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      southGroup.setAttribute("id", "south-hemisphere");
+      southGroup.setAttribute("transform", `rotate(180 ${center_x} ${center_y})`);
+      fanchart.appendChild(southGroup);
+
+      // RENDU NORD : Lignée paternelle (S2)
+      ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 2);
+      renderTarget = northGroup; // CRITIQUE : rediriger TOUS les rendus vers le groupe
+
+      // Pas de centre S1 pour les demi-disques
+      this.renderAncestorsByGeneration();
+
+      // RENDU SUD : Lignée maternelle (S3)
+      ancestor = CircularModeRenderer.shiftAncestorsForParent(originalAncestors, 3);
+      renderTarget = southGroup;
+
+      this.renderAncestorsByGeneration();
+
+      // Restaurer l'état
+      renderTarget = null;
+      ancestor = originalAncestors;
+      current_angle = savedAngle;
+
+      // Ajouter le centre en mode couple
+      CircularModeRenderer.renderCoupleCenter();
+
+    } else {
+      // Mode éventail normal
+      this.renderCenterPerson();
+      this.renderAncestorsByGeneration();
+    }
+
+    this.updateButtonStates();
   },
 
   renderAncestorsByGeneration: function() {
@@ -1969,15 +2135,15 @@ const FanchartApp = {
   },
 
   initializeStandardText: function() {
+    const target = renderTarget || fanchart;
     const standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
     standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz";
     standard.setAttribute("id", "standard");
     standard.setAttribute("x", center_x);
     standard.setAttribute("y", center_y);
-    fanchart.append(standard);
+    target.append(standard);
 
     const bbox = standard.getBBox();
-
     return {
       element: standard,
       width: bbox.width / standard.textContent.length,
@@ -2026,16 +2192,16 @@ const FanchartApp = {
 
     if (implexMode === "numbered") {
      // Mode numéroté : utiliser les vraies données mais avec numérotation
-      return { 
+      return {
         person: {
           ...referencedPerson,  // Utiliser les vraies données pour les couleurs
           fn: "",               // Mais remplacer le prénom
           sn: `${sosa} › ${referenceSosa}`,  // Et le nom par la numérotation
           dates: "",            // Et les dates
           sosasame: referenceSosa
-        }, 
+        },
         isImplex: true,
-        originalSosa: referenceSosa 
+        originalSosa: referenceSosa
       };
     }
 
@@ -2045,10 +2211,11 @@ const FanchartApp = {
 
   // Rendre un secteur complet d’ancêtre
   renderAncestorSector: function(sosa, position, person) {
+      const target = renderTarget || fanchart;
       // Créer le groupe pour cet ancêtre
       const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       group.setAttribute("id", "S" + sosa);
-      fanchart.append(group);
+      target.append(group);
 
       // Gérer les implexes
       const implexInfo = this.handleImplex(sosa, person);
@@ -2073,18 +2240,18 @@ const FanchartApp = {
         const marriageGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
         marriageGroup.setAttribute("id", "M" + sosa);
         group.appendChild(marriageGroup);  // Ajouter au groupe de la personne, pas au fanchart
-        
+
         let marriagePerson = actualPerson;
         if (implexInfo.isImplex && implexMode === "numbered" && implexInfo.originalSosa) {
           marriagePerson = ancestor["S" + implexInfo.originalSosa];
         }
-        
+
         this.renderMarriageInfo(marriageGroup, sosa, position, marriagePerson);
       } else if (sosa % 2 !== 0) {
         // Pour les mères, propager les infos de mariage
         const fatherSosa = sosa - 1;
         const father = this.getEffectivePerson(fatherSosa);
-        
+
         if (father && father.marriage_place) {
           actualPerson.marriage_place = father.marriage_place;
         }
