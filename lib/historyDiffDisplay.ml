@@ -100,7 +100,7 @@ let print_clean_ok conf =
 let person_of_gen_p_key base gen_p =
   match Driver.person_of_key base gen_p.first_name gen_p.surname gen_p.occ with
   | Some ip -> Driver.poi base ip
-  | None -> Driver.empty_person base Driver.dummy_iper
+  | None -> Driver.empty_person base Driver.Iper.dummy
 
 (* N'est pas forcément très précis. En effet, on enregistre que     *)
 (* les ipers. Or lors d'un nettoyage de la base, il se peut que     *)

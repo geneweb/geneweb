@@ -328,7 +328,7 @@ let init_cousins_cnt conf base p =
       with Failure _ -> failwith "Cousins table too large for system (2)"
     in
     cousins_cnt.(0).(0) <-
-      [ (Driver.get_iper p, [ Driver.dummy_ifam ], Driver.dummy_iper, 0) ];
+      [ (Driver.get_iper p, [ Driver.Ifam.dummy ], Driver.Iper.dummy, 0) ];
     cousins_dates.(0).(0) <- get_min_max_dates base cousins_cnt.(0).(0);
     loop0 1 cousins_cnt cousins_dates;
     loop1 1 cousins_cnt cousins_dates;
@@ -485,7 +485,7 @@ let cousins_fold l =
         if first || cnt0 = 0 then acc
         else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc
   in
-  loop false [] (Driver.dummy_iper, ([], [], 0), [ 0 ]) l
+  loop false [] (Driver.Iper.dummy, ([], [], 0), [ 0 ]) l
 
 let cousins_implex_cnt conf base l1 l2 p =
   (* warning, this is expensive: two nested loops *)
@@ -534,7 +534,7 @@ let init_asc_cnt conf base p =
       let t' =
         let asc_cnt = Array.make (max_a_l + 2) [] in
         asc_cnt.(0) <-
-          [ (Driver.get_iper p, [ Driver.dummy_ifam ], Driver.dummy_iper, 0) ];
+          [ (Driver.get_iper p, [ Driver.Ifam.dummy ], Driver.Iper.dummy, 0) ];
         for i = 1 to max_a_l do
           asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1)
         done;
@@ -552,7 +552,7 @@ let init_desc_cnt conf base p =
       let t' =
         let desc_cnt = Array.make (max_d_l + 2) [] in
         desc_cnt.(0) <-
-          [ (Driver.get_iper p, [ Driver.dummy_ifam ], Driver.dummy_iper, 0) ];
+          [ (Driver.get_iper p, [ Driver.Ifam.dummy ], Driver.Iper.dummy, 0) ];
         for i = 1 to min max_d_l (Array.length desc_cnt - 1) do
           desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) []
         done;

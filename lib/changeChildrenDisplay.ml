@@ -7,7 +7,7 @@ open ChangeChildren
 module Driver = Geneweb_db.Driver
 
 let print_child_person conf base p =
-  let var = Adef.encoded ("c" ^ Driver.string_of_iper (Driver.get_iper p)) in
+  let var = Adef.encoded ("c" ^ Driver.Iper.to_string (Driver.get_iper p)) in
   let first_name =
     match p_getenv conf.env ((var :> string) ^ "_first_name") with
     | Some v -> v
@@ -105,7 +105,7 @@ let print_change conf base p =
        (DateDisplay.short_dates_text conf base p :> string)
        (conf.command :> string));
   Util.hidden_env conf;
-  Util.hidden_input_s conf "ip" (Driver.string_of_iper (Driver.get_iper p));
+  Util.hidden_input_s conf "ip" (Driver.Iper.to_string (Driver.get_iper p));
   Util.hidden_input_s conf "digest" digest;
   Util.hidden_input_s conf "m" "CHG_CHN_OK";
   print_children conf base children;
@@ -119,7 +119,7 @@ let print_change conf base p =
 let print conf base =
   match p_getenv conf.env "ip" with
   | Some i ->
-      let p = Driver.poi base (Driver.iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       print_change conf base p
   | _ -> Hutil.incorrect_request conf
 
@@ -155,7 +155,7 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let var = "c" ^ Driver.string_of_iper ip_var in
+  let var = "c" ^ Driver.Iper.to_string ip_var in
   Update.print_create_conflict conf base p var
 
 let error_person conf err =
@@ -200,6 +200,6 @@ let print_ok o_conf base =
   let conf = Update.update_conf o_conf in
   match p_getenv conf.env "ip" with
   | Some i ->
-      let p = Driver.poi base (Driver.iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       print_change_ok conf base p
   | _ -> Hutil.incorrect_request conf

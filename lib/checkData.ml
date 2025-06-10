@@ -471,7 +471,7 @@ let collect_attributes base p
         (Driver.get_fevents fam))
     (Driver.get_family p);
   !attrs
-  |> List.filter (fun i -> not (Driver.is_empty_string i))
+  |> List.filter (fun i -> not (Driver.Istr.is_empty i))
   |> List.sort_uniq compare
 
 let collect_places base p =

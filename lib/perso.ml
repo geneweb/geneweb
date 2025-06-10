@@ -38,7 +38,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
   let escape_html = if not safe then Util.escape_html else Adef.escaped in
   let place, places_tl =
     match places with
-    | [] -> (Driver.empty_string, [])
+    | [] -> (Driver.Istr.empty, [])
     | place :: places_tl -> (place, places_tl)
   in
   let acc = safe_html (Driver.sou base title ^ " " ^ Driver.sou base place) in
@@ -120,7 +120,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
   if paren then acc ^>^ ")" else acc
 
 let name_equiv n1 n2 =
-  Futil.eq_title_names Driver.eq_istr n1 n2
+  Futil.eq_title_names Driver.Istr.equal n1 n2
   || (n1 = Tmain && n2 = Tnone)
   || (n1 = Tnone && n2 = Tmain)
 
@@ -133,8 +133,8 @@ let nobility_titles_list conf base p =
         match l with
         | (nth, name, title, place, dates) :: rl
           when (not conf.is_rtl) && nth = t.t_nth && name_equiv name t.t_name
-               && Driver.eq_istr title t.t_ident
-               && Driver.eq_istr place t.t_place ->
+               && Driver.Istr.equal title t.t_ident
+               && Driver.Istr.equal place t.t_place ->
             (nth, name, title, place, (t_date_start, t_date_end) :: dates) :: rl
         | _ ->
             ( t.t_nth,
@@ -150,7 +150,7 @@ let nobility_titles_list conf base p =
       match l with
       | (nth, name, title, places, dates) :: rl
         when (not conf.is_rtl) && nth = t_nth && name_equiv name t_name
-             && Driver.eq_istr title t_ident
+             && Driver.Istr.equal title t_ident
              && dates = t_dates ->
           (nth, name, title, t_place :: places, dates) :: rl
       | _ -> (t_nth, t_name, t_ident, [ t_place ], t_dates) :: l)
@@ -755,8 +755,8 @@ let gen_excluded_possible_duplications conf s i_of_string =
   | None -> []
 
 let excluded_possible_duplications conf =
-  ( gen_excluded_possible_duplications conf "iexcl" Driver.iper_of_string,
-    gen_excluded_possible_duplications conf "fexcl" Driver.ifam_of_string )
+  ( gen_excluded_possible_duplications conf "iexcl" Driver.Iper.of_string,
+    gen_excluded_possible_duplications conf "fexcl" Driver.Ifam.of_string )
 
 let first_possible_duplication_children iexcl len child eq =
   let rec loop i =
@@ -876,12 +876,12 @@ let merge_date_place conf base surn ((d1, d2, pl), auth) p =
   let (pd1, pd2, ppl), auth = get_date_place conf base auth p in
   let nd1 =
     if pd1 <> None then pd1
-    else if Driver.eq_istr (Driver.get_surname p) surn then
+    else if Driver.Istr.equal (Driver.get_surname p) surn then
       if pd2 <> None then pd2 else d1
     else None
   in
   let nd2 =
-    if Driver.eq_istr (Driver.get_surname p) surn then
+    if Driver.Istr.equal (Driver.get_surname p) surn then
       if d2 <> None then d2
       else if d1 <> None then d1
       else if pd1 <> None then pd2
@@ -892,7 +892,7 @@ let merge_date_place conf base surn ((d1, d2, pl), auth) p =
   in
   let pl =
     if ppl <> "" then ppl
-    else if Driver.eq_istr (Driver.get_surname p) surn then pl
+    else if Driver.Istr.equal (Driver.get_surname p) surn then pl
     else ""
   in
   ((nd1, nd2, pl), auth)
@@ -933,8 +933,8 @@ let build_surnames_list conf base v p =
           let fath = pget conf base (Driver.get_father cpl) in
           let moth = pget conf base (Driver.get_mother cpl) in
           if
-            (not (Driver.eq_istr surn (Driver.get_surname fath)))
-            && not (Driver.eq_istr surn (Driver.get_surname moth))
+            (not (Driver.Istr.equal surn (Driver.get_surname fath)))
+            && not (Driver.Istr.equal surn (Driver.get_surname moth))
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
           (if not (is_hidden fath) then
@@ -993,7 +993,7 @@ let build_list_eclair conf base v p =
   (* Astuce: le nombre d'élément de la liste correspond au nombre             *)
   (* d'évènements et le nombre d'iper unique correspond au nombre d'individu. *)
   let add_surname p surn pl d =
-    if not (Driver.is_empty_string pl) then
+    if not (Driver.Istr.is_empty pl) then
       let pl = Util.string_of_place conf (Driver.sou base pl) in
       let r =
         try Hashtbl.find ht (surn, pl)
@@ -1406,7 +1406,7 @@ let mode_local env =
 
 (* for family Driver.sources, p is not provided *)
 let get_note_or_source conf base
-    ?(p = Driver.empty_person base Driver.dummy_iper) auth no_note
+    ?(p = Driver.empty_person base Driver.Iper.dummy) auth no_note
     note_or_source =
   let note_or_source = Driver.sou base note_or_source in
   if auth && not no_note then
@@ -1414,7 +1414,7 @@ let get_note_or_source conf base
     (* in notes, %i becomes index. Other use ??  *)
     let env =
       [
-        ('i', fun () -> Driver.string_of_iper (Driver.get_iper p));
+        ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
         ('k', fun () -> Image.default_image_filename "portraits" base p);
       ]
     in
@@ -2249,7 +2249,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | [ "person_index" ] -> (
       match find_person_in_env conf base "" with
-      | Some p -> VVstring (Driver.string_of_iper (Driver.get_iper p))
+      | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
       | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
@@ -2261,7 +2261,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
-      | Some p -> VVstring (Driver.string_of_iper (Driver.get_iper p))
+      | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
       | None -> VVstring "")
   | "prev_item" :: sl -> (
       match get_env "prev_item" env with
@@ -2275,7 +2275,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "prefix_new_ix"; ip ] ->
       let p =
         Driver.poi base
-          (try Driver.iper_of_string ip with Failure _ -> raise Not_found)
+          (try Driver.Iper.of_string ip with Failure _ -> raise Not_found)
       in
       str_val
         ((Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
@@ -2297,7 +2297,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       (* %qvar.index_v.surname;
          direct access to a person whose index value is v
       *)
-      let v1 = Driver.iper_of_string v in
+      let v1 = Driver.Iper.of_string v in
       let v0 = int_of_string v in
       if v0 >= 0 && v0 < Driver.nb_of_persons base then
         let ep = make_ep conf base v1 in
@@ -2310,7 +2310,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       *)
       let i = int_of_string v in
       if i >= 0 && i < Driver.nb_of_persons base then
-        let ip = Driver.iper_of_string v in
+        let ip = Driver.Iper.of_string v in
         let ep = make_ep conf base ip in
         if is_hidden (fst ep) then str_val ""
         else eval_person_field_var conf base env ep loc sl
@@ -2321,7 +2321,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       *)
       let i = int_of_string v in
       if i >= 0 && i < Driver.nb_of_families base then
-        let ifam = Driver.ifam_of_string v in
+        let ifam = Driver.Ifam.of_string v in
         let f, c, a = make_efam conf base (Driver.get_iper a) ifam in
         eval_family_field_var conf base env (ifam, f, c, a) loc sl
       else raise Not_found
@@ -3934,7 +3934,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "p_link" env with
       | Vbool _ -> null_val
       | _ ->
-          Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode |> safe_val
+          Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode |> safe_val
       )
   | "carrousel" -> Image.default_image_filename "portraits" base p |> str_val
   | "blason_carrousel" ->
@@ -4178,17 +4178,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "prev_fam_father" -> (
       match get_env "prev_fam" env with
       | Vfam (_, _, (ifath, _, _), _) ->
-          Driver.string_of_iper ifath |> Mutil.encode |> safe_val
+          Driver.Iper.to_string ifath |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "prev_fam_index" -> (
       match get_env "prev_fam" env with
       | Vfam (ifam, _, _, _) ->
-          Driver.string_of_ifam ifam |> Mutil.encode |> safe_val
+          Driver.Ifam.to_string ifam |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "prev_fam_mother" -> (
       match get_env "prev_fam" env with
       | Vfam (_, _, (_, imoth, _), _) ->
-          Driver.string_of_iper imoth |> Mutil.encode |> safe_val
+          Driver.Iper.to_string imoth |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "public_name" ->
       if p_auth then
@@ -4216,8 +4216,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           match get_sosa conf base env x p with
           | Some (n, q) ->
               Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
-                (Driver.string_of_iper (Driver.get_iper p))
-                (Driver.string_of_iper (Driver.get_iper q))
+                (Driver.Iper.to_string (Driver.get_iper p))
+                (Driver.Iper.to_string (Driver.get_iper q))
                 (Sosa.to_string n)
               |> str_val
           | None -> null_val)
@@ -4227,7 +4227,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vstring s ->
           let env =
             [
-              ('i', fun () -> Driver.string_of_iper (Driver.get_iper p));
+              ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
               ('k', fun () -> Image.default_image_filename "portraits" base p);
             ]
           in
@@ -4362,7 +4362,7 @@ and eval_str_family_field env (ifam, _, _, _) = function
           let _, flevt = Lazy.force levt in
           string_of_int (Collection.Marker.get flevt ifam)
       | _ -> raise Not_found)
-  | "index" -> Driver.string_of_ifam ifam
+  | "index" -> Driver.Ifam.to_string ifam
   | "set_infinite_desc_level" -> (
       match get_env "desc_level_table" env with
       | Vdesclevtab levt ->
@@ -4631,12 +4631,12 @@ let print_foreach conf base print_ast eval_expr =
                      Templ.Env.(
                        env
                        |> add "anc1" (Vind (pget conf base ianc1))
-                       |> add "anc2" (Vind (Driver.poi base Driver.dummy_iper)))
+                       |> add "anc2" (Vind (Driver.poi base Driver.Iper.dummy)))
                  | _ ->
                      Templ.Env.(
                        env
-                       |> add "anc1" (Vind (Driver.poi base Driver.dummy_iper))
-                       |> add "anc2" (Vind (Driver.poi base Driver.dummy_iper)))
+                       |> add "anc1" (Vind (Driver.poi base Driver.Iper.dummy))
+                       |> add "anc2" (Vind (Driver.poi base Driver.Iper.dummy)))
                in
                let env =
                  Templ.Env.(
@@ -4752,7 +4752,7 @@ let print_foreach conf base print_ast eval_expr =
     let p, max_level =
       match el with
       | [ [ e1 ]; [ e2 ] ] ->
-          let ip = Driver.iper_of_string @@ eval_expr env ep e1 in
+          let ip = Driver.Iper.of_string @@ eval_expr env ep e1 in
           let max_level = eval_int_expr env ep e2 in
           (pget conf base ip, max_level)
       | [ [ e ] ] -> (p, eval_int_expr env ep e)
@@ -5880,7 +5880,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       |> add "listd" (Vslist (ref SortedList.empty))
       |> add "liste" (Vslist (ref SortedList.empty))
       |> add "desc_mark"
-           (Vdmark (ref @@ Collection.Marker.dummy Driver.dummy_iper false))
+           (Vdmark (ref @@ Collection.Marker.dummy Driver.Iper.dummy false))
       |> add "lazy_print" (Vlazyp (ref None))
       |> add "sosa" (Vsosa (ref []))
       |> add "sosa_ref" (Vsosa_ref sosa_ref)

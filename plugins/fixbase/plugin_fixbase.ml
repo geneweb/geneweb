@@ -197,19 +197,19 @@ let fixbase_ok conf base =
     let dump_p p p' =
       let mka p =
         let a = Driver.gen_ascend_of_person p in
-        { a with parents = Option.map Driver.string_of_ifam a.parents }
+        { a with parents = Option.map Driver.Ifam.to_string a.parents }
       in
       let mku p =
         {
           Def.family =
-            Array.map Driver.string_of_ifam
+            Array.map Driver.Ifam.to_string
               (Driver.gen_union_of_person p).family;
         }
       in
       let mkp p =
         let p = Driver.gen_person_of_person p in
-        let p = Futil.map_person_ps Driver.string_of_iper (Driver.sou base) p in
-        { p with key_index = Driver.string_of_iper p.key_index }
+        let p = Futil.map_person_ps Driver.Iper.to_string (Driver.sou base) p in
+        { p with key_index = Driver.Iper.to_string p.key_index }
       in
       let a1 = mka p in
       let u1 = mku p in
@@ -263,16 +263,16 @@ let fixbase_ok conf base =
     in
     let dump_f f f' =
       let mkf f =
-        Futil.map_family_ps Driver.string_of_iper Driver.string_of_ifam
+        Futil.map_family_ps Driver.Iper.to_string Driver.Ifam.to_string
           (Driver.sou base)
           (Driver.gen_family_of_family f)
       in
       let mkc f =
-        Futil.map_couple_p false Driver.string_of_iper
+        Futil.map_couple_p false Driver.Iper.to_string
           (Driver.gen_couple_of_family f)
       in
       let mkd f =
-        Futil.map_descend_p Driver.string_of_iper
+        Futil.map_descend_p Driver.Iper.to_string
           (Driver.gen_descend_of_family f)
       in
       let f1 = mkf f in
@@ -302,7 +302,7 @@ let fixbase_ok conf base =
     let string_of_p i =
       Printf.sprintf {|<a href="%s&i=%s">%s</a>|}
         (Util.commd conf :> string)
-        (Driver.string_of_iper i |> Mutil.encode :> string)
+        (Driver.Iper.to_string i |> Mutil.encode :> string)
         (Util.designation base (Driver.poi base i)
           : Adef.escaped_string
           :> string)
@@ -333,8 +333,7 @@ let fixbase_ok conf base =
         let aux, sou =
           match opt with
           | Some (i, i') -> (ifneq i i', Driver.sou base)
-          | None ->
-              (ifneq Driver.empty_string Driver.quest_string, fun _ -> "Dtext")
+          | None -> (ifneq Driver.Istr.empty Driver.Istr.quest, fun _ -> "Dtext")
         in
         Output.print_sstring conf "<table>";
         aux

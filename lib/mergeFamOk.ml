@@ -12,7 +12,7 @@ let cat_strings base is1 sep is2 =
   if n1 = "" then n2 else if n2 = "" then n1 else n1 ^ sep ^ n2
 
 let merge_strings base is1 sep is2 =
-  if Driver.eq_istr is1 is2 then Driver.sou base is1
+  if Driver.Istr.equal is1 is2 then Driver.sou base is1
   else cat_strings base is1 sep is2
 
 let sorp base ip =
@@ -216,9 +216,9 @@ let reconstitute conf base ifam1 fam1 fam2 =
 let print_merge conf base =
   match (p_getenv conf.env "i", p_getenv conf.env "i2") with
   | Some f1, Some f2 ->
-      let ifam1 = Driver.ifam_of_string f1 in
+      let ifam1 = Driver.Ifam.of_string f1 in
       let fam1 = Driver.foi base ifam1 in
-      let fam2 = Driver.foi base (Driver.ifam_of_string f2) in
+      let fam2 = Driver.foi base (Driver.Ifam.of_string f2) in
       let sfam, sdes = reconstitute conf base ifam1 fam1 fam2 in
       let digest =
         let ini_sfam = UpdateFam.string_family_of conf base ifam1 in
@@ -245,8 +245,8 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
   match p_getenv conf.env "i2" with
   | None -> Hutil.incorrect_request conf
   | Some i2 ->
-      let ifam2 = Driver.ifam_of_string i2 in
-      UpdateFamOk.effective_del conf base Driver.dummy_iper
+      let ifam2 = Driver.Ifam.of_string i2 in
+      UpdateFamOk.effective_del conf base Driver.Iper.dummy
         (Driver.foi base ifam2);
       let ifam, fam, cpl, des =
         UpdateFamOk.effective_mod conf base true sfam scpl sdes
@@ -277,7 +277,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
           let p =
             match p_getenv conf.env "ip" with
             | Some i ->
-                let ip = Driver.iper_of_string i in
+                let ip = Driver.Iper.of_string i in
                 if Adef.mother cpl = ip then Driver.poi base (Adef.mother cpl)
                 else Driver.poi base (Adef.father cpl)
             | None -> Driver.poi base (Adef.father cpl)
@@ -294,10 +294,10 @@ let print_mod_merge o_conf base =
   let get_gen_family i =
     match p_getenv o_conf.env i with
     | Some i ->
-        let fam = Driver.foi base (Driver.ifam_of_string i) in
+        let fam = Driver.foi base (Driver.Ifam.of_string i) in
         Util.string_gen_family base (Driver.gen_family_of_family fam)
     | None ->
-        let fam = Driver.foi base Driver.dummy_ifam in
+        let fam = Driver.foi base Driver.Ifam.dummy in
         Util.string_gen_family base (Driver.gen_family_of_family fam)
   in
   let o_f1 = get_gen_family "i" in

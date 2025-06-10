@@ -547,9 +547,9 @@ let reconstitute_person conf =
   let key_index =
     match p_getenv conf.env "i" with
     | Some s -> (
-        try Driver.iper_of_string (String.trim s)
-        with Failure _ -> Driver.dummy_iper)
-    | None -> Driver.dummy_iper
+        try Driver.Iper.of_string (String.trim s)
+        with Failure _ -> Driver.Iper.dummy)
+    | None -> Driver.Iper.dummy
   in
   let first_name = only_printable (get conf "first_name") in
   let surname = only_printable (get conf "surname") in
@@ -851,7 +851,7 @@ let effective_add conf base sp =
   let created_p = ref [] in
   let pi =
     Driver.insert_person_with_union_and_ascendants base
-      (Driver.no_person Driver.dummy_iper)
+      (Driver.no_person Driver.Iper.dummy)
       Driver.no_ascend Driver.no_union
   in
   let np =
@@ -1129,7 +1129,7 @@ let print_add o_conf base =
 let print_del conf base =
   match p_getenv conf.env "i" with
   | Some i ->
-      let ip = Driver.iper_of_string i in
+      let ip = Driver.Iper.of_string i in
       let p = Driver.poi base ip in
       effective_del conf base p;
       print_del_ok conf
@@ -1159,10 +1159,10 @@ let print_mod ?prerr o_conf base =
     | Some ip ->
         Util.string_gen_person base
           (Driver.gen_person_of_person
-             (Driver.poi base (Driver.iper_of_string ip)))
+             (Driver.poi base (Driver.Iper.of_string ip)))
     | None ->
         Util.string_gen_person base
-          (Driver.gen_person_of_person (Driver.poi base Driver.dummy_iper))
+          (Driver.gen_person_of_person (Driver.poi base Driver.Iper.dummy))
   in
   let ofn = o_p.first_name in
   let osn = o_p.surname in
@@ -1207,7 +1207,7 @@ let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some s ->
-      let p = Driver.poi base (Driver.iper_of_string s) in
+      let p = Driver.poi base (Driver.Iper.of_string s) in
       let o_p = Util.string_gen_person base (Driver.gen_person_of_person p) in
       (* TODO_EVENT use Event.sorted_event *)
       let ht = Hashtbl.create 50 in

@@ -500,7 +500,7 @@ let print_child opts base fam_surname csrc cbp p =
   if Driver.p_first_name base p = "?" && Driver.p_surname base p = "?" then ()
   else if get_new_occ p = 0 then ()
   else Printf.ksprintf (oc opts) ".%d" (get_new_occ p);
-  if not (Driver.eq_istr (Driver.get_surname p) fam_surname) then
+  if not (Driver.Istr.equal (Driver.get_surname p) fam_surname) then
     Printf.ksprintf (oc opts) " %s"
       (s_correct_string_nonum (Driver.sou base (Driver.get_surname p)));
   print_infos opts base true csrc cbp p;
@@ -1435,16 +1435,16 @@ let rec find_ancestors base surn p list =
       let fath = Driver.poi base (Driver.get_father cpl) in
       let moth = Driver.poi base (Driver.get_mother cpl) in
       if
-        (not (Driver.eq_istr (Driver.get_surname fath) surn))
-        && not (Driver.eq_istr (Driver.get_surname moth) surn)
+        (not (Driver.Istr.equal (Driver.get_surname fath) surn))
+        && not (Driver.Istr.equal (Driver.get_surname moth) surn)
       then p :: list
       else
         let list =
-          if Driver.eq_istr (Driver.get_surname fath) surn then
+          if Driver.Istr.equal (Driver.get_surname fath) surn then
             find_ancestors base surn fath list
           else list
         in
-        if Driver.eq_istr (Driver.get_surname moth) surn then
+        if Driver.Istr.equal (Driver.get_surname moth) surn then
           find_ancestors base surn moth list
         else list
   | None -> p :: list
@@ -1469,7 +1469,7 @@ let mark_branch base mark surn p =
         if
           top
           || List.exists
-               (fun p -> Driver.eq_istr (Driver.get_surname p) surn)
+               (fun p -> Driver.Istr.equal (Driver.get_surname p) surn)
                children
         then (
           List.iter
@@ -1670,8 +1670,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           else
             let fname = Driver.get_origin_file fam in
             origin_file
-              (if Driver.is_empty_string fname then ""
-               else Driver.sou base fname)
+              (if Driver.Istr.is_empty fname then "" else Driver.sou base fname)
         in
         let f, _ooc, c = opts.oc in
         let opts = { opts with oc = (f, oc, c) } in

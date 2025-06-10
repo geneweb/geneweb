@@ -214,7 +214,7 @@ and eval_simple_var conf base env p = function
   | [ "has_surnames_aliases" ] -> bool_val (p.surnames_aliases <> [])
   | [ "has_titles" ] -> bool_val (p.titles <> [])
   | [ "image" ] -> safe_val (Util.escape_html p.image :> Adef.safe_string)
-  | [ "index" ] -> str_val (Driver.string_of_iper p.key_index)
+  | [ "index" ] -> str_val (Driver.Iper.to_string p.key_index)
   | [ "is_female" ] -> bool_val (p.sex = Female)
   | [ "is_male" ] -> bool_val (p.sex = Male)
   | [ "is_first" ] -> (
@@ -490,8 +490,8 @@ and eval_person_var base (fn, sn, oc, create, _) = function
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | [ "index" ] -> (
       match Driver.person_of_key base fn sn oc with
-      | Some ip -> str_val (Driver.string_of_iper ip)
-      | _ -> str_val (Driver.string_of_iper Driver.dummy_iper))
+      | Some ip -> str_val (Driver.Iper.to_string ip)
+      | _ -> str_val (Driver.Iper.to_string Driver.Iper.dummy))
   | [ "sex" ] ->
       let sex =
         match Driver.person_of_key base fn sn oc with
@@ -524,7 +524,7 @@ and eval_special_var conf base = function
           in
           if has_base_loop then VVstring ""
           else
-            let p = Driver.poi base (Driver.iper_of_string i) in
+            let p = Driver.poi base (Driver.Iper.of_string i) in
             Perso.interp_templ_with_menu
               (fun _ -> ())
               "perso_header" conf base p;
@@ -670,7 +670,7 @@ let print_del1 conf base p =
   Output.print_sstring conf
     "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (Driver.string_of_iper (Driver.get_iper p));
+    (Driver.Iper.to_string (Driver.get_iper p));
   Output.print_sstring conf
     "<button type=\"submit\" class=\"btn btn-danger btn-lg m-3\">\n";
   Output.print_sstring conf
@@ -717,7 +717,7 @@ let print_add conf base =
       pevents = [];
       notes = "";
       psources = "";
-      key_index = Driver.dummy_iper;
+      key_index = Driver.Iper.dummy;
     }
   in
   print_update_ind conf base p ""
@@ -726,7 +726,7 @@ let print_mod conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = Driver.poi base (Driver.iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       let sp = string_person_of base p in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_person ~salt sp in
@@ -736,7 +736,7 @@ let print_del conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = Driver.poi base (Driver.iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       print_del1 conf base p
 
 let print_change_event_order conf base =
@@ -744,7 +744,7 @@ let print_change_event_order conf base =
   | None -> Hutil.incorrect_request conf
   | Some i ->
       let p =
-        string_person_of base (Driver.poi base (Driver.iper_of_string i))
+        string_person_of base (Driver.poi base (Driver.Iper.of_string i))
       in
       Templ.output conf
         Templ.

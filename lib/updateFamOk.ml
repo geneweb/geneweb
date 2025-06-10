@@ -421,8 +421,8 @@ let reconstitute_family conf base nsck =
   in
   let fam_index =
     match p_getenv conf.env "i" with
-    | Some i -> Driver.ifam_of_string i
-    | None -> Driver.dummy_ifam
+    | Some i -> Driver.Ifam.of_string i
+    | None -> Driver.Ifam.dummy
   in
   (* Mise à jour des évènements principaux. *)
   (* Attention, dans le cas où fevent est vide, i.e. on a valider   *)
@@ -688,7 +688,7 @@ let patch_person_with_pevents base ip =
       epers_name = name;
       epers_date = date;
       epers_place = place;
-      epers_reason = Driver.empty_string;
+      epers_reason = Driver.Istr.empty;
       epers_note = note;
       epers_src = src;
       epers_witnesses = [||];
@@ -949,7 +949,7 @@ let effective_mod conf base nsck sfam scpl sdes =
 let effective_add conf base nsck sfam scpl sdes =
   let fi =
     Driver.insert_family_with_couple_and_descendants base
-      (Driver.no_family Driver.dummy_ifam)
+      (Driver.no_family Driver.Ifam.dummy)
       Driver.no_couple Driver.no_descend
   in
   let origin_file _nfam ncpl ndes = infer_origin_file conf base fi ncpl ndes in
@@ -1162,7 +1162,7 @@ let print_del_ok conf base wl =
   Hutil.header conf @@ print_title conf "family deleted";
   (match p_getenv conf.env "ip" with
   | Some i ->
-      let p = Driver.poi base (Driver.iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       Output.print_sstring conf "<ul><li>";
       Output.print_string conf
         (reference conf base p (gen_person_text conf base p));
@@ -1174,11 +1174,11 @@ let print_del_ok conf base wl =
 let print_del conf base =
   match p_getenv conf.env "i" with
   | Some i ->
-      let ifam = Driver.ifam_of_string i in
+      let ifam = Driver.Ifam.of_string i in
       let fam = Driver.foi base ifam in
       let ip =
         match p_getenv conf.env "ip" with
-        | Some i when Driver.get_mother fam = Driver.iper_of_string i ->
+        | Some i when Driver.get_mother fam = Driver.Iper.of_string i ->
             Driver.get_mother fam
         | Some _ | None -> Driver.get_father fam
       in
@@ -1222,7 +1222,7 @@ let print_add o_conf base =
     | Some ip ->
         string_of_int
           (Array.length
-             (Driver.get_family (Driver.poi base (Driver.iper_of_string ip))))
+             (Driver.get_family (Driver.poi base (Driver.Iper.of_string ip))))
     | None -> ""
   in
   let sdigest = get conf "digest" in
@@ -1249,7 +1249,7 @@ let print_add o_conf base =
           let ip, act =
             match p_getenv conf.env "ip" with
             | Some i -> (
-                let i = Driver.iper_of_string i in
+                let i = Driver.Iper.of_string i in
                 if Adef.mother cpl = i then (Adef.mother cpl, "af")
                 else
                   let a = Driver.poi base i in
@@ -1305,7 +1305,7 @@ let print_add_parents o_conf base =
          ]
     && sfam.comment = "" && sfam.origin_file = ""
     && sfam.fsources = Option.value ~default:"" (p_getenv conf.env "dsrc")
-    && sfam.fam_index = Driver.dummy_ifam
+    && sfam.fam_index = Driver.Ifam.dummy
   then
     match (Adef.father scpl, Adef.mother scpl, sdes.children) with
     | ( (ff, fs, fo, Update.Link, _),
@@ -1394,8 +1394,8 @@ let print_mod o_conf base =
   let o_f =
     let ifam =
       match p_getenv o_conf.env "i" with
-      | Some i -> Driver.ifam_of_string i
-      | None -> Driver.dummy_ifam
+      | Some i -> Driver.Ifam.of_string i
+      | None -> Driver.Ifam.dummy
     in
     Util.string_gen_family base
       (Driver.gen_family_of_family (Driver.foi base ifam))
@@ -1418,8 +1418,8 @@ let print_mod o_conf base =
     let changed =
       let ip =
         match p_getenv o_conf.env "ip" with
-        | Some i -> Driver.iper_of_string i
-        | None -> Driver.dummy_iper
+        | Some i -> Driver.Iper.of_string i
+        | None -> Driver.Iper.dummy
       in
       let p =
         Util.string_gen_person base
@@ -1437,8 +1437,8 @@ let print_mod o_conf base =
 let print_inv conf base =
   match (p_getenv conf.env "i", p_getenv conf.env "f") with
   | Some ip, Some ifam ->
-      let ip = Driver.iper_of_string ip in
-      let ifam = Driver.ifam_of_string ifam in
+      let ip = Driver.Iper.of_string ip in
+      let ifam = Driver.Ifam.of_string ifam in
       let p = Driver.poi base ip in
       effective_inv conf base (Driver.get_iper p) p ifam;
       Util.commit_patches conf base;
@@ -1457,8 +1457,8 @@ let print_change_order_ok conf base =
     (p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n")
   with
   | Some ip, Some ifam, Some n ->
-      let ip = Driver.iper_of_string ip in
-      let ifam = Driver.ifam_of_string ifam in
+      let ip = Driver.Iper.of_string ip in
+      let ifam = Driver.Ifam.of_string ifam in
       let p = Driver.poi base ip in
       effective_chg_order base (Driver.get_iper p) p ifam n;
       Util.commit_patches conf base;
@@ -1476,7 +1476,7 @@ let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some s ->
-      let ifam = Driver.ifam_of_string s in
+      let ifam = Driver.Ifam.of_string s in
       let fam = Driver.foi base ifam in
       let o_f = Util.string_gen_family base (Driver.gen_family_of_family fam) in
       (* TODO_EVENT use Event.sorted_event *)
@@ -1525,8 +1525,8 @@ let print_change_event_order conf base =
       let changed =
         let ip =
           match p_getenv conf.env "ip" with
-          | Some i -> Driver.iper_of_string i
-          | None -> Driver.dummy_iper
+          | Some i -> Driver.Iper.of_string i
+          | None -> Driver.Iper.dummy
         in
         let p =
           Util.string_gen_person base

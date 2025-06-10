@@ -16,7 +16,7 @@ let person_key base ip =
   let surname = Driver.sou base (Driver.get_surname p) in
   let occ =
     if first_name = "?" || surname = "?" then
-      int_of_string @@ Driver.string_of_iper ip (* FIXME *)
+      int_of_string @@ Driver.Iper.to_string ip (* FIXME *)
     else Driver.get_occ p
   in
   (first_name, surname, occ, Update.Link, "")
@@ -389,8 +389,8 @@ and eval_key conf base (fn, sn, oc, create, _) = function
       else Update_util.eval_create create "sex"
   | [ "index" ] -> (
       match Driver.person_of_key base fn sn oc with
-      | Some ip -> str_val (Driver.string_of_iper ip)
-      | _ -> str_val (Driver.string_of_iper Driver.dummy_iper))
+      | Some ip -> str_val (Driver.Iper.to_string ip)
+      | _ -> str_val (Driver.Iper.to_string Driver.Iper.dummy))
   | [ "sexes" ] ->
       (* this is somewhat of a hack to determine same sex situations *)
       (* updateFam.ml does not provide adequate mechanisms to test   *)
@@ -433,7 +433,7 @@ and eval_special_var conf base = function
           in
           if has_base_loop then VVstring ""
           else
-            let p = Driver.poi base (Driver.iper_of_string i) in
+            let p = Driver.poi base (Driver.Iper.of_string i) in
             Perso.interp_templ_with_menu
               (fun _ -> ())
               "perso_header" conf base p;
@@ -563,7 +563,7 @@ let print_del1 conf base ifam =
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
   Util.hidden_env conf;
-  Util.hidden_input conf "i" (Adef.encoded @@ Driver.string_of_ifam ifam);
+  Util.hidden_input conf "i" (Adef.encoded @@ Driver.Ifam.to_string ifam);
   (match p_getenv conf.env "ip" with
   | Some ip -> Util.hidden_input conf "ip" (Adef.encoded ip)
   | None -> ());
@@ -605,8 +605,8 @@ let print_inv1 conf base p ifam1 ifam2 =
   Output.print_sstring conf {|"><p>|};
   Util.hidden_env conf;
   Util.hidden_input conf "i"
-    (Driver.get_iper p |> Driver.string_of_iper |> Adef.encoded);
-  Util.hidden_input conf "f" (Driver.string_of_ifam ifam2 |> Adef.encoded);
+    (Driver.get_iper p |> Driver.Iper.to_string |> Adef.encoded);
+  Util.hidden_input conf "f" (Driver.Ifam.to_string ifam2 |> Adef.encoded);
   Util.hidden_input conf "m" (Adef.encoded "INV_FAM_OK");
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
@@ -619,7 +619,7 @@ let print_add conf base =
   let fath, moth, digest =
     match p_getenv conf.env "ip" with
     | Some i ->
-        let p = Driver.poi base (Driver.iper_of_string i) in
+        let p = Driver.poi base (Driver.Iper.of_string i) in
         let fath =
           if
             Driver.get_sex p = Male
@@ -654,7 +654,7 @@ let print_add conf base =
       comment = "";
       origin_file = "";
       fsources = default_source conf;
-      fam_index = Driver.dummy_ifam;
+      fam_index = Driver.Ifam.dummy;
     }
   and cpl = Gutil.couple conf.multi_parents fath moth
   and des = { children = [||] } in
@@ -677,7 +677,7 @@ let print_add_parents conf base =
           comment = "";
           origin_file = "";
           fsources = default_source conf;
-          fam_index = Driver.dummy_ifam;
+          fam_index = Driver.Ifam.dummy;
         }
       and cpl =
         Gutil.couple conf.multi_parents
@@ -704,7 +704,7 @@ let print_add_parents conf base =
 let print_mod conf base =
   match p_getenv conf.env "i" with
   | Some i ->
-      let sfam = string_family_of conf base (Driver.ifam_of_string i) in
+      let sfam = string_family_of conf base (Driver.Ifam.of_string i) in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_family ~salt sfam in
       print_update_fam conf base sfam digest
@@ -712,7 +712,7 @@ let print_mod conf base =
 
 let print_del conf base =
   match p_getenv conf.env "i" with
-  | Some i -> print_del1 conf base (Driver.ifam_of_string i)
+  | Some i -> print_del1 conf base (Driver.Ifam.of_string i)
   | _ -> Hutil.incorrect_request conf
 
 let rec find_families ifam = function
@@ -724,14 +724,14 @@ let rec find_families ifam = function
 let print_inv conf base =
   match (p_getenv conf.env "i", p_getenv conf.env "f") with
   | Some ip, Some ifam -> (
-      let u = Driver.poi base (Driver.iper_of_string ip) in
+      let u = Driver.poi base (Driver.Iper.of_string ip) in
       match
         find_families
-          (Driver.ifam_of_string ifam)
+          (Driver.Ifam.of_string ifam)
           (Array.to_list (Driver.get_family u))
       with
       | Some (ifam1, ifam2) ->
-          let p = Driver.poi base (Driver.iper_of_string ip) in
+          let p = Driver.poi base (Driver.Iper.of_string ip) in
           print_inv1 conf base p ifam1 ifam2
       | _ -> Hutil.incorrect_request conf)
   | _ -> Hutil.incorrect_request conf
@@ -756,8 +756,8 @@ let print_change_order conf base =
     (p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n")
   with
   | Some ip, Some ifam, Some n ->
-      let ip = Driver.iper_of_string ip in
-      let ifam = Driver.ifam_of_string ifam in
+      let ip = Driver.Iper.of_string ip in
+      let ifam = Driver.Ifam.of_string ifam in
       let p = Driver.poi base ip in
       let print_person p sn =
         Output.print_string conf (escape_html @@ Driver.p_first_name base p);
@@ -808,8 +808,8 @@ let print_change_order conf base =
       Output.print_sstring conf conf.command;
       Output.print_sstring conf {|"><p>|};
       Util.hidden_env conf;
-      Util.hidden_input conf "i" (Adef.encoded @@ Driver.string_of_iper ip);
-      Util.hidden_input conf "f" (Adef.encoded @@ Driver.string_of_ifam ifam);
+      Util.hidden_input conf "i" (Adef.encoded @@ Driver.Iper.to_string ip);
+      Util.hidden_input conf "f" (Adef.encoded @@ Driver.Ifam.to_string ifam);
       Util.hidden_input conf "n" (Adef.encoded @@ string_of_int n);
       Util.hidden_input conf "m" (Adef.encoded "CHG_FAM_ORD_OK");
       Output.print_sstring conf
@@ -824,7 +824,7 @@ let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let i = Driver.ifam_of_string i in
+      let i = Driver.Ifam.of_string i in
       let sfam = string_family_of conf base i in
       let ifun =
         Templ.

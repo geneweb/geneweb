@@ -224,9 +224,9 @@ let print_child conf base p1 p2 e =
   Output.print_sstring conf "<strong>";
   if
     Driver.get_sex p1 = Male
-    && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p1)
+    && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p1)
     || Driver.get_sex p2 = Male
-       && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p2)
+       && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p2)
   then
     Output.print_string conf
       (referenced_person_text_without_surname conf base e)
@@ -240,9 +240,9 @@ let print_repeat_child conf base p1 p2 e =
   Output.print_sstring conf "<em>";
   if
     Driver.get_sex p1 = Male
-    && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p1)
+    && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p1)
     || Driver.get_sex p2 = Male
-       && Driver.eq_istr (Driver.get_surname e) (Driver.get_surname p2)
+       && Driver.Istr.equal (Driver.get_surname e) (Driver.get_surname p2)
   then Output.print_string conf (gen_person_text ~sn:false conf base e)
   else Output.print_string conf (gen_person_text conf base e);
   Output.print_sstring conf "</em>"
@@ -408,7 +408,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
     else
       wprint_geneweb_link conf
         ("m=D&i="
-         ^ Driver.string_of_iper (Driver.get_iper ancestor)
+         ^ Driver.Iper.to_string (Driver.get_iper ancestor)
          ^ "&v=" ^ string_of_int max_level ^ "&t=G"
         |> Adef.escaped)
         (let s1 = gen_person_text conf base ancestor in
@@ -546,7 +546,7 @@ let sort_and_display conf base paths precision list =
             (fun pll p ->
               match pll with
               | (p1 :: _ as pl) :: pll
-                when Driver.eq_istr (Driver.get_first_name p1)
+                when Driver.Istr.equal (Driver.get_first_name p1)
                        (Driver.get_first_name p) ->
                   (p :: pl) :: pll
               | _ -> [ p ] :: pll)
@@ -569,7 +569,7 @@ let display_descendant_index conf base max_level ancestor =
     if not h then
       wprint_geneweb_link conf
         ("m=D&i="
-         ^ Driver.string_of_iper (Driver.get_iper ancestor)
+         ^ Driver.Iper.to_string (Driver.get_iper ancestor)
          ^ "&v=" ^ string_of_int max_level ^ "&t=C"
         |> Adef.escaped)
         txt
@@ -1174,7 +1174,7 @@ let make_tree_hts conf base gv p =
             let ifam = (Driver.get_family p).(i) in
             let tdl =
               if i > 0 then
-                (1, LeftA, TDtext (Driver.dummy_iper, Adef.safe "...")) :: tdl
+                (1, LeftA, TDtext (Driver.Iper.dummy, Adef.safe "...")) :: tdl
               else tdl
             in
             let td =
@@ -1425,7 +1425,7 @@ let reference conf base p s =
       {|<a href="%s%s" id="i%s" class="normal_anchor" title="%s">%s</a>|}
       (commd conf :> string)
       (acces conf base p :> string)
-      (Driver.string_of_iper iper)
+      (Driver.Iper.to_string iper)
       (Utf8.capitalize_fst (Util.transl conf "open individual page"))
       s
 
@@ -1550,13 +1550,13 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let pp = Util.find_person_in_env conf base "" in
   let pp_index =
     match pp with
-    | Some p -> "&i=" ^ Driver.string_of_iper (Driver.get_iper p)
+    | Some p -> "&i=" ^ Driver.Iper.to_string (Driver.get_iper p)
     | None -> ""
   in
   let pz = Util.find_person_in_env conf base "z" in
   let pz_index =
     match pz with
-    | Some p -> "&iz=" ^ Driver.string_of_iper (Driver.get_iper p)
+    | Some p -> "&iz=" ^ Driver.Iper.to_string (Driver.get_iper p)
     | None -> ""
   in
   let txt = get_text conf base p (ifaml <> [] && sps) img cgl in
@@ -1566,7 +1566,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
       Printf.sprintf "<a href=\"%sm=D&t=TV%s%s%s%s%s%s\" %s title=\"%s\">│</a>"
         (commd conf :> string)
         vv pz_index pp_index
-        ("&oi=" ^ Driver.string_of_iper (Driver.get_iper p))
+        ("&oi=" ^ Driver.Iper.to_string (Driver.get_iper p))
         (if sps then "" else "&sp=0")
         (if img then "" else "&im=0")
         "class=\"normal_anchor px-3 btn-outline-primary border-0\""
@@ -1664,7 +1664,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let txt = if sps then m_txt ^ txt else if v > 0 then m_txt else "" in
   let txt = if v > 0 && kids <> [] then txt ^ "<br>|" else txt in
   let flag =
-    Driver.string_of_ifam ifam
+    Driver.Ifam.to_string ifam
     ^ if v > 0 && kids <> [] then "-spouse_no_d" else "-spouse"
   in
   let lx = lastx tdal ir2 in
@@ -1819,7 +1819,7 @@ let manage_vbars tdal =
   let vbar_only_in_row row =
     List.fold_left
       (fun res (_, _, td) ->
-        if td <> TDnothing && td <> TDtext (Driver.dummy_iper, Adef.safe "|")
+        if td <> TDnothing && td <> TDtext (Driver.Iper.dummy, Adef.safe "|")
         then false && res
         else true && res)
       true row
@@ -1861,7 +1861,7 @@ let make_vaucher_tree_hts conf base gv p =
   let only_anc, op =
     match Util.find_person_in_env_pref conf base "o" with
     | Some p -> (true, p)
-    | None -> (false, Driver.empty_person base Driver.dummy_iper)
+    | None -> (false, Driver.empty_person base Driver.Iper.dummy)
   in
   let only_anc =
     if only_anc then

@@ -128,7 +128,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
           let iperl =
             List.fold_left
               (fun iperl iper ->
-                if Driver.eq_istr (proj (pget conf base iper)) istr then
+                if Driver.Istr.equal (proj (pget conf base iper)) istr then
                   iper :: iperl
                 else iperl)
               [] iperl
@@ -170,7 +170,7 @@ let print_elem conf base is_surname (p, xl) =
       Output.print_string conf (commd conf);
       Output.print_string conf (acces conf base x);
       Output.print_sstring conf {|" id="i|};
-      Output.print_sstring conf (Driver.string_of_iper iper);
+      Output.print_sstring conf (Driver.Iper.to_string iper);
       Output.print_sstring conf {|">|};
       if is_surname then (
         Output.print_string conf (escape_html @@ surname_without_particle base p);
@@ -313,7 +313,7 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
             (fun iperl iper ->
               let p = pget conf base iper in
               if
-                Driver.eq_istr (get_field p) istr
+                Driver.Istr.equal (get_field p) istr
                 && ((not (is_hide_names conf p))
                    || Util.authorized_age conf base p)
               then iper :: iperl
@@ -377,7 +377,7 @@ let print_selection_bullet conf = function
 let unselected_bullets conf =
   List.fold_left
     (fun sl (k, v) ->
-      try if k = "u" then Driver.ifam_of_string (Mutil.decode v) :: sl else sl
+      try if k = "u" then Driver.Ifam.of_string (Mutil.decode v) :: sl else sl
       with Failure _ -> sl)
     [] conf.env
 
@@ -405,7 +405,7 @@ let print_branch conf base psn name =
           let sel = not (List.mem i unsel_list) in
           ( fam,
             c,
-            if down then Some (Mutil.encode @@ Driver.string_of_ifam i, sel)
+            if down then Some (Mutil.encode @@ Driver.Ifam.to_string i, sel)
             else None ))
         (Driver.get_family u)
     in
@@ -622,7 +622,8 @@ let print_family_alphabetic x conf base liste =
     let list =
       List.fold_left
         (fun list p ->
-          if List.exists (Driver.eq_istr (Driver.get_surname p)) list then list
+          if List.exists (Driver.Istr.equal (Driver.get_surname p)) list then
+            list
           else Driver.get_surname p :: list)
         [] liste
     in
