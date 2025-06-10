@@ -528,3 +528,60 @@ body.places-list .identity-panel {
   border-radius: 6px;
   margin: 1rem 0;
 }
+
+/* ========== ANGLE D'OUVERTURE ========== */
+/* Styles pour les boutons d'angle */
+.btn-fanchart[id^="b-angle-"] {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Animation de transition lors du changement d'angle */
+svg#fanchart {
+  transition: viewBox 0.3s ease-out;
+}
+
+/* Ajustements visuels selon l'angle */
+/* Vue compacte 180° - textes plus petits pour compenser la compression */
+body[data-angle="180"] svg text {
+  font-size: 95%;
+}
+
+/* Vue étendue 260° - espacement supplémentaire */
+body[data-angle="260"] svg text {
+  letter-spacing: 0.3px;
+}
+
+/* Styles responsifs pour petits écrans */
+@media (max-width: 768px) {
+  /* Sur mobile, forcer l'angle compact par défaut */
+  .btn-fanchart[id="b-angle-260"] {
+    display: none;
+  }
+}
+
+/* Feedback visuel pendant le recalcul */
+.fanchart-recalculating {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+#b-angle-toggle .angle-indicator {
+  font-size: 10px;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}

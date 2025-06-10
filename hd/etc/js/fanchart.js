@@ -23,13 +23,47 @@ var svg_viewbox_x = 0, svg_viewbox_y = 0, svg_viewbox_w = 0, svg_viewbox_h = 0;
 const CONFIG = {
   security: 0.95,
   zoom_factor: 1.25,
-  d_all: 220,
+  default_angle: 220,
+  available_angles: [180, 220, 260],
   a_r: [50, 50, 50, 50, 80, 70, 100, 150, 130, 90],
   a_m: ["S1", "C3", "C3", "C3", "R3", "R3", "R2", "R1", "R1", "R1"],
   marriage_length_thresholds: [4, 14, 24, 34, 44, 54],
   text_reduction_factor: 0.9,
   svg_margin: 5
 };
+
+let current_angle = CONFIG.default_angle;
+
+// 2. Fonction pour récupérer l'angle depuis l'URL
+function getAngleFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const angleParam = urlParams.get('angle');
+  
+  if (angleParam) {
+    const angle = parseInt(angleParam);
+    // Vérifier que l'angle est valide
+    if (CONFIG.available_angles.includes(angle)) {
+      return angle;
+    }
+  }
+  
+  return CONFIG.default_angle;
+}
+
+// 3. Fonction pour mettre à jour l'URL avec le nouvel angle
+function updateURLWithAngle(angle) {
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  if (angle === CONFIG.default_angle) {
+    // Si c'est l'angle par défaut, on peut omettre le paramètre
+    urlParams.delete('angle');
+  } else {
+    urlParams.set('angle', angle);
+  }
+  
+  const newURL = window.location.pathname + '?' + urlParams.toString();
+  history.replaceState(null, '', newURL);
+}
 
 // Créer un module DOMCache au début du fichier, après CONFIG
 const DOMCache = {
@@ -124,6 +158,9 @@ const Utils = {
     if (tool && tool !== "") url += `&tool=${tool}`;
     if (implexMode === "numbered") url += "&implex=num";
     else if (implexMode === "full") url += "&implex=full";
+    if (current_angle !== CONFIG.default_angle) {
+      url += `&angle=${current_angle}`;
+    }
     return url;
   },
 
@@ -1510,6 +1547,60 @@ const LocationManager = {
   },
 };
 
+const AngleManager = {
+  // Obtenir l'angle actuel
+  getCurrentAngle: function() {
+    return current_angle;
+  },
+  
+  // Changer l'angle et redessiner
+  setAngle: function(newAngle) {
+    if (!CONFIG.available_angles.includes(newAngle)) {
+      console.warn(`Angle ${newAngle} non supporté`);
+      return;
+    }
+    
+    if (newAngle === current_angle) {
+      return; // Pas de changement nécessaire
+    }
+    
+    current_angle = newAngle;
+    updateURLWithAngle(newAngle);
+    
+    // Mettre à jour l'interface
+    this.updateAngleButtons();
+    
+    // Redessiner le graphique
+    FanchartApp.reRenderWithCurrentGenerations();
+  },
+  
+  // Mettre à jour l'état visuel des boutons
+  updateAngleButtons: function() {
+    CONFIG.available_angles.forEach(angle => {
+      const btn = document.getElementById(`b-angle-${angle}`);
+      if (btn) {
+        btn.classList.toggle('active', angle === current_angle);
+      }
+    });
+  },
+  
+  // Obtenir le label pour un angle
+  getAngleLabel: function(angle) {
+    switch(angle) {
+      case 180: return "Compact";
+      case 220: return "Standard";
+      case 260: return "Étendu";
+      default: return `${angle}°`;
+    }
+  },
+  
+  // Initialiser depuis l'URL
+  initialize: function() {
+    current_angle = getAngleFromURL();
+    this.updateAngleButtons();
+  }
+};
+
 // ========== Application principale ==========
 const FanchartApp = {
   window_w: 0,
@@ -1554,6 +1645,7 @@ const FanchartApp = {
     this.renderFanchart();
     this.updateGenerationTitle();
     this.initializeEvents();
+    this.initializeAngleEvents();
     LocationManager.initializeLocationEvents();
     ColorManager.initializeColorEvents();
     LegendManager.initializeAllEvents();
@@ -1724,6 +1816,7 @@ const FanchartApp = {
       max_gen = max_gen_loaded;
       Utils.updateUrlWithCurrentState();
     }
+    
     // Calculer max_r avec validation
     max_r = 0;
     for (var i = 0; i < max_gen+1 && i < CONFIG.a_r.length; i++) {
@@ -1737,12 +1830,27 @@ const FanchartApp = {
 
     // Définir les dimensions du SVG avec validation
     const margin = CONFIG.svg_margin;
-    center_x = max_r + margin;
-    center_y = max_r + margin;
-    svg_w = 2 * center_x;
-    const halfAngleRad = Math.PI/180 * (CONFIG.d_all-180) / 2;
-    const extraHeight = Math.max(CONFIG.a_r[0], Math.round(max_r * Math.sin(halfAngleRad)));
-    svg_h = 2 * margin + max_r + extraHeight;
+    if (current_angle === 180) {
+      // À 180°, on n'a pas besoin d'autant de largeur car l'arbre
+      // ne s'étend pas au-delà du demi-cercle
+      svg_w = 2 * max_r + 2 * margin;
+      center_x = max_r + margin;
+      
+      // La hauteur reste max_r + margin car pas d'extension vers le bas
+      svg_h = max_r + 2 * margin;
+      center_y = max_r + margin;
+    } else {
+      // Calcul standard pour les autres angles
+      center_x = max_r + margin;
+      center_y = max_r + margin;
+      svg_w = 2 * center_x;
+
+      // Utiliser l'angle dynamique pour calculer la hauteur
+      const halfAngleRad = Math.PI/180 * (current_angle - 180) / 2;
+      const extraHeight = Math.max(CONFIG.a_r[0], Math.round(max_r * Math.sin(halfAngleRad)));
+      svg_h = 2 * margin + max_r + extraHeight;
+    }
+
     if (isNaN(svg_w) || isNaN(svg_h) || svg_w <= 0 || svg_h <= 0) {
       console.error("Dimensions SVG calculées invalides:", { svg_w, svg_h, max_r, center_x, center_y });
       svg_w = 800;
@@ -1794,10 +1902,10 @@ const FanchartApp = {
       const outerR = innerR + CONFIG.a_r[gen-1]; // rayon extérieur
       cumulativeR = outerR;                      // pour la génération suivante
 
-      // angle total à découper
-      const delta = CONFIG.d_all / Math.pow(2, gen-1);
+      // angle total à découper - utilise l'angle dynamique
+      const delta = current_angle / Math.pow(2, gen-1);
       // angle de départ au-dessus du centre
-      let angle = -90 - CONFIG.d_all / 2 + delta/2;
+      let angle = -90 - current_angle / 2 + delta/2;
 
       // on itère sur les 2^(gen-1) cases de cette génération
       const firstSosa = Math.pow(2, gen-1);
@@ -1819,6 +1927,17 @@ const FanchartApp = {
     }
 
     this.updateButtonStates();
+  },
+
+  initializeAngleEvents: function() {
+    CONFIG.available_angles.forEach(angle => {
+      const btn = document.getElementById(`b-angle-${angle}`);
+      if (btn) {
+        btn.onclick = function() {
+          AngleManager.setAngle(angle);
+        };
+      }
+    });
   },
 
   // Résoudre les implexes virtuellement
