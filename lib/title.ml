@@ -211,35 +211,32 @@ let select_place conf base place =
   (!list, !clean_name)
 
 let select_all proj conf base =
-  Collection.fold
-    (fun acc i ->
-      let x = pget conf base i in
-      List.fold_left
-        (fun s t -> StrSet.add (Driver.sou base (proj t)) s)
-        acc (nobtit conf base x))
-    StrSet.empty
-    (Geneweb_db.Driver.ipers base)
-  |> StrSet.elements
-
-let select_all2 proj conf base =
-  let ht = Hashtbl.create 1 in
+  let module T = Driver.Istr.Table in
+  let ht : unit T.t = T.create 17 in
   Collection.iter
     (fun i ->
       let x = pget conf base i in
+      let titles = nobtit conf base x in
+      List.iter (fun t -> T.add ht (proj t) ()) titles)
+    (Geneweb_db.Driver.ipers base);
+  T.to_seq ht |> Seq.map (fun (i, _) -> Driver.sou base i) |> List.of_seq
+
+let select_all_with_counter proj conf base =
+  let module T = Driver.Istr.Table in
+  let ht : int T.t = T.create 17 in
+  Collection.iter
+    (fun i ->
+      let x = pget conf base i in
+      let titles = nobtit conf base x in
       List.iter
         (fun t ->
-          let s = Driver.sou base (proj t) in
-          let cnt =
-            try Hashtbl.find ht s
-            with Not_found ->
-              let cnt = ref 0 in
-              Hashtbl.add ht s cnt;
-              cnt
-          in
-          incr cnt)
-        (nobtit conf base x))
+          let y = proj t in
+          match T.find ht y with
+          | i -> T.replace ht y (i + 1)
+          | exception Not_found -> T.add ht y 1)
+        titles)
     (Geneweb_db.Driver.ipers base);
-  Hashtbl.fold (fun s cnt list -> (s, !cnt) :: list) ht []
+  T.to_seq ht |> Seq.map (fun (i, c) -> (Driver.sou base i, c)) |> List.of_seq
 
-let select_all_titles = select_all2 (fun t -> t.t_ident)
+let select_all_titles = select_all_with_counter (fun t -> t.t_ident)
 let select_all_places = select_all (fun t -> t.t_place)
