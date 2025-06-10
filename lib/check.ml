@@ -11,7 +11,7 @@ module Collection = Geneweb_db.Collection
 let designation base p =
   let s = Gutil.designation base p in
   if String.get s 0 = '?' || String.get s (String.length s - 1) = '?' then
-    s ^ " (i=" ^ Driver.string_of_iper (Driver.get_iper p) ^ ")"
+    s ^ " (i=" ^ Driver.Iper.to_string (Driver.get_iper p) ^ ")"
   else s
 
 let string_of_epers_name base epers_name =
@@ -193,19 +193,19 @@ let print_base_warning oc base = function
         a.year
   | PossibleDuplicateFam (f1, f2) ->
       Printf.fprintf oc "possible duplicate families: %s and %s\n"
-        (Driver.string_of_ifam f1) (Driver.string_of_ifam f2)
+        (Driver.Ifam.to_string f1) (Driver.Ifam.to_string f2)
   | PossibleDuplicateFamHomonymous (f1, f2, p) ->
       let f = Driver.foi base f1 in
       let fath = Driver.get_father f in
       let moth = Driver.get_mother f in
       let curr, hom =
-        if Driver.eq_iper fath (Driver.get_iper p) then (moth, fath)
+        if Driver.Iper.equal fath (Driver.get_iper p) then (moth, fath)
         else (fath, moth)
       in
       Printf.fprintf oc
         "possible duplicate families: %s and %s, %s has unions with several \
          persons named %s\n"
-        (Driver.string_of_ifam f1) (Driver.string_of_ifam f2)
+        (Driver.Ifam.to_string f1) (Driver.Ifam.to_string f2)
         (designation base (Driver.poi base curr))
         (designation base (Driver.poi base hom))
   | PEventOrder (p, e1, e2) ->

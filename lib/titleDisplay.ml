@@ -119,7 +119,7 @@ let propose_tree_for_list list conf =
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";
              Output.print_sstring conf
-               (Driver.string_of_iper @@ Driver.get_iper p);
+               (Driver.Iper.to_string @@ Driver.get_iper p);
              Output.print_sstring conf "&t";
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";

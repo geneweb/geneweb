@@ -50,11 +50,11 @@ module HT = struct
   include Hashtbl.Make (struct
     type t = Driver.istr
 
-    let equal = Driver.eq_istr
-    let hash = Driver.hash_istr
+    let equal = Driver.Istr.equal
+    let hash = Driver.Istr.hash
   end)
 
-  let replace s i v = if not @@ Driver.is_empty_string i then replace s i v
+  let replace s i v = if not @@ Driver.Istr.is_empty i then replace s i v
 end
 
 let fullname bname fname = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz")
