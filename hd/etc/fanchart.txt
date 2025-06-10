@@ -142,6 +142,16 @@
       </button>
     </div>
   </div>
+
+  <div class="control-section">
+    <div class="section-title">Ouverture</div>
+    <div class="btn-group-fanchart">
+      <button id="b-angle-180" class="btn-fanchart" title="Vue en demi-cercle">180</button>
+      <button id="b-angle-220" class="btn-fanchart active" title="Vue standard">220</button>
+      <button id="b-angle-260" class="btn-fanchart" title="Vue étendue">260</button>
+    </div>
+  </div>
+
   <div class="control-section">
     <div class="section-title">[*font]</div>
     <div class="btn-group-fanchart">
@@ -206,6 +216,7 @@ var max_gen = %e.v;;
 var tool = "%e.tool;";
 var implexMode = "%e.implex;" === "num" ? "numbered" : 
                  "%e.implex;" === "full" ? "full" : "reduced";
+var initial_angle = %if;(e.angle != "")%e.angle;%else;220%end;;
 var ancestor = {
 %foreach;ancestor_level(e.v)
   %foreach;ancestor;
