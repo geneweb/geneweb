@@ -453,10 +453,8 @@ let get_origin_file = cache_fam (fun f -> f.Def.origin_file)
 let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
-
-let no_person ip =
-  { (Mutil.empty_person Istr.empty Istr.empty) with key_index = ip }
-
+let empty_person = Mutil.empty_person Istr.empty Istr.empty
+let no_person ip = Def.{ empty_person with key_index = ip }
 let no_ascend = Def.{ parents = None; consang = Adef.no_consang }
 let no_union = Def.{ family = [||] }
 
@@ -468,22 +466,19 @@ let empty_person base iper =
     a = Some no_ascend;
     u = Some no_union;
   }
-  [@ocaml.warning "-42"]
 
 let person_of_gen_person base (p, a, u) =
-  (Def.{ base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
-  [@ocaml.warning "-42"])
+  Def.{ base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
 
 let family_of_gen_family base (f, c, d) =
-  (Def.{ base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
-  [@ocaml.warning "-42"])
+  Def.{ base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
 
 let iper_exists base = base.func.iper_exists
 let ifam_exists base = base.func.ifam_exists
 
 let poi base iper =
   if Iper.is_dummy iper then empty_person base iper
-  else { base; iper; p = None; a = None; u = None } [@ocaml.warning "-42"]
+  else { base; iper; p = None; a = None; u = None }
 
 let no_family ifam = { (Mutil.empty_family Istr.empty) with fam_index = ifam }
 let no_couple = Adef.couple Iper.dummy Iper.dummy

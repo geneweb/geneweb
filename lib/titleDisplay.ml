@@ -284,7 +284,8 @@ let print_all_titles conf base =
   in
   let list =
     let l = select_all_titles conf base in
-    string_cnt_list_uniq (sort_by_key String.compare (fun (t, _) -> Name.lower t) l)
+    string_cnt_list_uniq
+      (sort_by_key String.compare (fun (t, _) -> Name.lower t) l)
   in
   let order (s, _) = Utf8.capitalize_fst (Name.lower s) in
   let wprint_elem (t, cnt) =
