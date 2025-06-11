@@ -14,6 +14,7 @@ let raw_output = ref false
 let sep_limit = ref 21
 let separate_list = ref []
 let dummy = ref [ "" ]
+let all_files = ref false
 
 (* Returns true if `old_gw` is `true` and there exist an event associated to a
    person that:
@@ -1827,7 +1828,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
 
     (* gen.ext_files does not list all files in notes_d. Format is note_link *)
     let ext_files_1 = List.map (fun (f, _) -> f) gen.ext_files in
-    let notes_d = Filename.concat in_dir (base_notes_dir base) in
+    let notes_d = Filename.concat in_dir (Driver.base_notes_dir base) in
     let notes_d_length = String.length notes_d in
     let ext_files_2 =
       Filesystem.walk_folder ~recursive:true
@@ -1880,7 +1881,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           in
           loop s 0
         in
-        if contains_wiki_link s && s <> "" then (
+        if (contains_wiki_link s || !all_files) && s <> "" then (
           if not !first then Printf.ksprintf oc "\n";
           first := false;
           let f = Util.sys_to_note_link f in
