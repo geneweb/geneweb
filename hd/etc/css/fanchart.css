@@ -1,3 +1,146 @@
+/* ========== POSITIONNEMENT PRINCIPAL ========== */
+.fanchart-controls {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  max-width: 200px;
+  font-size: 0.95rem;
+}
+
+.fanchart-controls.hidden {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+/* ========== STRUCTURE INTERNE ========== */
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.control-section {
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 2px;
+}
+
+/* ========== BOUTONS ========== */
+.btn-fanchart {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  transition: all 0.2s ease;
+  font-size: 1em;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-fanchart.active,
+.btn-fanchart.active:hover,
+.btn-fanchart.active:focus {
+  background-color: #007bff !important;
+  border-color: #007bff !important;
+  color: white !important;
+}
+
+.btn-fanchart.disabled {
+  background: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-fanchart.btn-toggle.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+/* Bouton X */
+.btn-close {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: #dc3545;
+}
+
+.btn-group-fanchart {
+  display: flex;
+  gap: 3px;
+}
+
+.event-toggles {
+  display: flex;
+  gap: 1px;
+  margin-top: 6px;
+}
+
+.event-toggles.hidden {
+  display: none;
+}
+
+.event-toggle input[type="checkbox"] {
+  display: none;
+}
+
+.event-toggle label {
+  display: block;
+  padding: 2px 3px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  width: 16px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.event-toggle input[type="checkbox"]:checked + label {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
 :root {
   --fc-stroke-width: 0.1%;
   --fc-stroke-dasharray: 5px;
@@ -15,6 +158,11 @@
 svg .highlight {
  fill: lightgrey !important;
 }
+
+svg .highlight .text {
+  fill: black !important;
+}
+
 svg .text_highlight {
  fill: black !important;
 }
@@ -64,36 +212,73 @@ body.place_color .square { display: inline; color: transparent; }
 
 /* death age */
 #death-age {
-  margin: 5px;
+  position: absolute;
+  top: 10;
+  right: 0;
+  font-size: 18px;
+  transform: translateX(-175%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px;
+  z-index: 1000;
+  display: flex;
+  gap: 20px;
 }
 
-body.death-age svg .DA0  { fill: hsl(30, 100%, 90%)}
-body.death-age svg .DA1  { fill: hsl(30, 100%, 80%)}
-body.death-age svg .DA2  { fill: hsl(30, 100%, 70%)}
-body.death-age svg .DA3  { fill: hsl(30, 100%, 60%)}
-body.death-age svg .DA4  { fill: hsl(30, 100%, 50%)}
-body.death-age svg .DA5  { fill: hsl(30, 100%, 45%)}
-body.death-age svg .DA6  { fill: hsl(30, 100%, 40%)}
-body.death-age svg .DA7  { fill: hsl(30, 100%, 35%)}
+/* === PALETTE ACCESSIBLE BLEU/ROSE (RECOMMANDÉE WCAG) === */
+/* Âges au décès - Dégradé BLEU (hsl 210° - bleu accessible) */
+body.death-age svg .DA0 { fill: hsl(210, 100%, 80%) }  /* Bleu très clair */
+body.death-age svg .DA1 { fill: hsl(210, 100%, 85%) }  /* Bleu clair */
+body.death-age svg .DA2 { fill: hsl(210, 100%, 80%) }  /* Bleu moyen-clair */
+body.death-age svg .DA3 { fill: hsl(210, 100%, 75%) }  /* Bleu moyen */
+body.death-age svg .DA4 { fill: hsl(210, 100%, 70%) }  /* Bleu */
+body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }  /* Bleu foncé */
+body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }  /* Bleu plus foncé */
+
+/* Durées de mariage - Dégradé ROSE (hsl 330° - rose accessible) */
+/* Commence à 85% pour éviter le "trop blanc" */
+body.death-age svg .DAM0 { fill: hsl(330, 100%, 85%) } /* Rose clair mais visible */
+body.death-age svg .DAM1 { fill: hsl(330, 100%, 80%) } /* Rose */
+body.death-age svg .DAM2 { fill: hsl(330, 100%, 75%) } /* Rose moyen */
+body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) } /* Rose foncé */
+body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) } /* Rose très foncé */
+body.death-age svg .DAM5 { fill: hsl(330, 100%, 60%) } /* Magenta clair */
+body.death-age svg .DAM6 { fill: hsl(330, 100%, 55%) } /* Magenta */
+
+/* Couleurs correspondantes pour la légende */
+body.death-age span.DA0 { color: hsl(210, 100%, 90%) }
+body.death-age span.DA1 { color: hsl(210, 100%, 80%) }
+body.death-age span.DA2 { color: hsl(210, 100%, 70%) }
+body.death-age span.DA3 { color: hsl(210, 100%, 60%) }
+body.death-age span.DA4 { color: hsl(210, 100%, 50%) }
+body.death-age span.DA5 { color: hsl(210, 100%, 45%) }
+body.death-age span.DA6 { color: hsl(210, 100%, 40%) }
+
+body.death-age span.DAM0 { color: hsl(330, 100%, 80%) }
+body.death-age span.DAM1 { color: hsl(330, 100%, 75%) }
+body.death-age span.DAM2 { color: hsl(330, 100%, 70%) }
+body.death-age span.DAM3 { color: hsl(330, 100%, 65%) }
+body.death-age span.DAM4 { color: hsl(330, 100%, 60%) }
+body.death-age span.DAM5 { color: hsl(330, 100%, 55%) }
+body.death-age span.DAM6 { color: hsl(330, 100%, 50%) }
 
 body:not(.death-age) #death-age {
   display: none;
 }
 
-body.death-age span.DA0  { color: hsl(30, 100%, 90%)}
-body.death-age span.DA1  { color: hsl(30, 100%, 80%)}
-body.death-age span.DA2  { color: hsl(30, 100%, 70%)}
-body.death-age span.DA3  { color: hsl(30, 100%, 60%)}
-body.death-age span.DA4  { color: hsl(30, 100%, 50%)}
-body.death-age span.DA5  { color: hsl(30, 100%, 45%)}
-body.death-age span.DA6  { color: hsl(30, 100%, 40%)}
-body.death-age span.DA7  { color: hsl(30, 100%, 35%)}
-
+#death-age li {
+  cursor: pointer;
+  user-select: none;
+}
+#death-age li:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
 .arrow {
-  color: transparent;
+  color: #F4F4F4;
 }
 body.death-age .hl .arrow {
-  color: black;
+  color: lightgrey;
+  cursor: pointer;
 }
 
 body {
@@ -152,11 +337,75 @@ textPath {
  fill: transparent;
 }
 
-#places-list, #death-age {
+#places-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#places-header {
+  flex-shrink: 0;
+  margin-top: 4px;
+  padding-left: 4px;
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#places-list li span[id^="bi-"],
+#places-list li span[id^="ba-"],
+#places-list li span[id^="ma-"],
+#places-list li span[id^="de-"],
+#places-list li span[id^="bu-"] {
+  display: inline-block;
+  width: 12px;
+  text-align: center;
+  margin-right: 2px;
+  font-size: 16px;
+}
+
+
+#places-list li .square {
+  margin-left: 4px;
+}
+
+#places-list li {
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  padding-left: 4px;
+  position: relative;
+}
+
+#places-list li:hover {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+#places-list li > * {
+  pointer-events: none;
+}
+
+#places-list li.location-highlighted {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+#places-list {
  position: absolute;
  right: 0;
  top: 0;
 }
+
+#places-list li.sublocation .square {
+  margin-left: 4px;
+}
+
+.sublocation-indicator {
+  color: #999;
+  font-family: monospace;
+  margin-left: 8px;
+  margin-right: 2px;
+}
+
 svg {
  position: absolute;
  left: 0;
@@ -181,6 +430,258 @@ svg {
   color: lightgrey;
 }
 
+/.btn-fanchart.active {
+  background: #007bff !important;
+  border-color: #007bff;
+  color: white;
+}
+
+.btn-fanchart.active:hover {
+  background: #0056b3 !important;
+  border-color: #0056b3;
+  color: white;
+}
+
+
+body:not(.place_color) .event-toggles,
+body:not(.place_color) #b-sort-places {
+  display: none !important;
+}
+
+svg.serif text {
+  font-family: Georgia, "Times New Roman", serif ;
+}
+
+svg.large text {
+  font-size: 105%;
+}
+
 svg.mono text {
- font-family: monospace;
+  font-family: monospace, "Courier New", Courier;
+  font-size: 90%;
+}
+
+/* Police optimisée pour la lisibilité */
+svg.readable text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 90%;
+  letter-spacing: 0.4px;
+}
+
+/* Panneau d'aide navigation */
+#navigation-help {
+  position: absolute;
+  top: 8px;
+  left: 130px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 1000;
+  max-width: 200px;
+  transition: opacity 0.15s;
+}
+
+#navigation-help .help-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+#fanchart-container {
+  position: relative;
+}
+
+.identity-panel {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 230px;
+  max-width: 35%;
+  padding: 4px;
+  display: none;
+  z-index: 10;
+  font-size: 1.1rem;
+}
+
+body.places-list .identity-panel {
+  right: calc(var(--fc-tool-size, 18%) + 20px);
+}
+
+.identity-panel h2 {
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.identity-panel .subtitle {
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: #555;
+}
+
+.identity-panel img.photo {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+/* ========== ANGLE D'OUVERTURE ========== */
+/* Styles pour les boutons d'angle */
+.btn-fanchart[id^="b-angle-"] {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Animation de transition lors du changement d'angle */
+svg#fanchart {
+  transition: viewBox 0.3s ease-out;
+}
+
+/* Ajustements visuels selon l'angle */
+/* Vue compacte 180° - textes plus petits pour compenser la compression */
+body[data-angle="180"] svg text {
+  font-size: 95%;
+}
+
+/* Vue étendue 260° - espacement supplémentaire */
+body[data-angle="260"] svg text {
+  letter-spacing: 0.3px;
+}
+
+/* Styles responsifs pour petits écrans */
+@media (max-width: 768px) {
+  /* Sur mobile, forcer l'angle compact par défaut */
+  .btn-fanchart[id="b-angle-260"] {
+    display: none;
+  }
+}
+
+/* Feedback visuel pendant le recalcul */
+.fanchart-recalculating {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+#b-angle-toggle .angle-indicator {
+  font-size: 10px;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Bouton mode circulaire */
+#b-circular-mode {
+  transition: all 0.3s ease;
+}
+
+#b-circular-mode.active {
+  background: #007bff;
+  color: white;
+}
+
+#b-circular-mode.active i {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Ajustements visuels en mode circulaire */
+body[data-mode="circular"] svg text {
+  /* Les textes dans l'hémisphère sud peuvent nécessiter une rotation */
+}
+
+/* Indicateur visuel de séparation des lignées */
+body[data-mode="circular"] .lineage-separator {
+  stroke: #ccc;
+  stroke-width: 1px;
+  stroke-dasharray: 3,3;
+  fill: none;
+}
+
+/* Mise en évidence des lignées au survol */
+body[data-mode="circular"] .paternal-highlight {
+  opacity: 0.3;
+  fill: #4169E1; /* Bleu royal pour la lignée paternelle */
+}
+
+body[data-mode="circular"] .maternal-highlight {
+  opacity: 0.3;
+  fill: #DC143C; /* Cramoisi pour la lignée maternelle */
+}
+
+/* Adaptation de la légende en mode circulaire */
+body[data-mode="circular"] #places-list {
+  max-height: calc(100vh - 20px);
+  overflow-y: auto;
+}
+
+/* Désactivation visuelle des contrôles d'angle en mode circulaire */
+body[data-mode="circular"] .btn-fanchart[id^="b-angle-"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ajustement du conteneur en mode circulaire */
+body[data-mode="circular"] #fanchart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Animation de transition entre les modes */
+.mode-transition {
+  animation: fadeTransition 0.3s ease-out;
+}
+
+@keyframes fadeTransition {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Styles pour la rotation interactive (futur) */
+body[data-mode="circular"][data-rotating="true"] {
+  cursor: grab;
+}
+
+body[data-mode="circular"][data-rotating="true"]:active {
+  cursor: grabbing;
+}
+
+/* Indicateurs de lignée dans le panneau d'info */
+.identity-panel .lineage-indicator {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  margin-left: 8px;
+}
+
+.identity-panel .lineage-indicator.paternal {
+  background: #E6F2FF;
+  color: #4169E1;
+}
+
+.identity-panel .lineage-indicator.maternal {
+  background: #FFE6E6;
+  color: #DC143C;
 }
