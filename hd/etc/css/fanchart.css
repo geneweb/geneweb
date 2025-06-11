@@ -44,15 +44,15 @@
 
 /* ========== BOUTONS ========== */
 .btn-fanchart {
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
   border: 1px solid #dee2e6;
   background: white;
   color: #495057;
   transition: all 0.2s ease;
   font-size: 1em;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -70,9 +70,15 @@
 
 .btn-fanchart.disabled {
   background: #f8f9fa;
-  color: #6c757d;
+  color: #adb5bd;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.btn-fanchart.disabled:hover {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
 }
 
 .btn-fanchart.btn-toggle.active {
@@ -395,6 +401,11 @@ textPath {
  top: 0;
 }
 
+
+#places-list li.sublocation {
+  padding-left: 16px;
+}
+
 #places-list li.sublocation .square {
   margin-left: 4px;
 }
@@ -405,6 +416,7 @@ textPath {
   margin-left: 8px;
   margin-right: 2px;
 }
+
 
 svg {
  position: absolute;

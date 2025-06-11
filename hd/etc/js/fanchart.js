@@ -24,7 +24,7 @@ const CONFIG = {
   security: 0.95,
   zoom_factor: 1.25,
   default_angle: 220,
-  available_angles: [180, 220, 260],
+  available_angles: [180, 220, 359],
   a_r: [50, 50, 50, 50, 80, 70, 100, 150, 130, 90],
   a_m: ["S1", "C3", "C3", "C3", "R3", "R3", "R2", "R1", "R1", "R1"],
   marriage_length_thresholds: [4, 14, 24, 34, 44, 54],
@@ -35,42 +35,157 @@ let isCircularMode = false;
 let renderTarget = null; // Cible de rendu actuelle (null = fanchart direct)
 let current_angle = CONFIG.default_angle;
 
-// Récupérer l’angle depuis l’URL
-function getAngleFromURL() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const angleParam = urlParams.get('angle');
-
-  if (angleParam) {
-    const angle = parseInt(angleParam);
-    // Vérifier que l'angle est valide
-    if (CONFIG.available_angles.includes(angle)) {
-      return angle;
+const LayoutCalculator = {
+  /**
+   * Mesure la largeur nécessaire pour afficher confortablement la liste des lieux
+   * Utilise un élément temporaire pour mesurer le texte réel
+   */
+  calculatePlacesListWidth: function() {
+    // Si pas de liste de lieux, retourner une largeur minimale
+    if (!document.body.classList.contains('places-list')) {
+      return 0;
     }
+    
+    // Créer un élément de mesure temporaire
+    const measurer = document.createElement('div');
+    measurer.style.cssText = `
+      position: absolute;
+      visibility: hidden;
+      white-space: nowrap;
+      font-family: inherit;
+      font-size: inherit;
+    `;
+    document.body.appendChild(measurer);
+    
+    let maxWidth = 200; // Largeur minimale par défaut
+    
+    // Mesurer chaque lieu
+    lieux_a.forEach(([placeName, data]) => {
+      // Construire le texte complet comme il apparaîtra
+      let text = '';
+      
+      // Indicateurs d'événements (N B M D S)
+      if (has_bi && data.bi) text += 'N ';
+      if (has_ba && data.ba) text += 'B ';
+      if (has_ma && data.ma) text += 'M ';
+      if (has_de && data.de) text += 'D ';
+      if (has_bu && data.bu) text += 'S ';
+      
+      // Carré coloré et nom du lieu
+      text += '■ ' + placeName;
+      
+      measurer.textContent = text;
+      const width = measurer.offsetWidth;
+      
+      if (width > maxWidth) {
+        maxWidth = width;
+      }
+    });
+    
+    // Nettoyer
+    document.body.removeChild(measurer);
+    
+    // Ajouter des marges (padding, scrollbar, etc.)
+    return maxWidth + 40; // 20px de chaque côté pour le confort
+  },
+  
+  /**
+   * Calcule la largeur maximale disponible pour le fanchart
+   * en tenant compte du contenu réel
+   */
+  calculateMaxFanchartWidth: function() {
+    const windowWidth = window.innerWidth;
+    const placesListWidth = this.calculatePlacesListWidth();
+    
+    // Pour le mode 359° (très carré), ajouter une marge à gauche
+    const isSquareChart = (current_angle >= 310 || isCircularMode);
+    const leftMargin = isSquareChart ? 150 : 0; // Espace pour les contrôles
+    
+    // Calculer l'espace disponible
+    const availableWidth = windowWidth - placesListWidth - leftMargin;
+    
+    // S'assurer qu'on utilise au moins 50% de l'écran pour le graphique
+    return Math.max(availableWidth, windowWidth * 0.5);
   }
+};
 
-  return CONFIG.default_angle;
-}
 
-// Mettre à jour l’URL avec le nouvel angle
-function updateURLWithAngle(angle) {
-  const urlParams = new URLSearchParams(window.location.search);
+// ========== Utilitaires généraux ==========
+const Utils = {
+  // Fonction unique et directe pour construire l'URL
+  buildPersonUrl: function(p) {
+    let params = ['m=A', 't=FC', `p=${p.fnk}`, `n=${p.snk}`];
+    if (p.oc) params.push(`oc=${p.oc}`);
+    params.push(`v=${max_gen}`);
+    
+    // Seulement les paramètres non-défaut
+    if (isCircularMode) params.push('mode=couple');
+    else if (current_angle !== 220) params.push(`angle=${current_angle}`);
+    
+    if (tool) params.push(`tool=${tool}`);
+    if (implexMode === 'numbered') params.push('implex=num');
+    else if (implexMode === 'full') params.push('implex=full');
+    if (has_ba) params.push('ba=on');
+    if (has_bu) params.push('bu=on');
+    
+    return link_to_person + params.join('&');
+  },
 
-  if (angle === CONFIG.default_angle) {
-    // Si c'est l'angle par défaut, on peut omettre le paramètre
-    urlParams.delete('angle');
-  } else {
-    urlParams.set('angle', angle);
-  }
+  // Mise à jour de l'URL courante
+  updateUrlWithCurrentState: function() {
+    const p = ancestor["S1"];
+    const newUrl = this.buildPersonUrl(p);
+    history.replaceState(null, '', newUrl);
+  },
 
-  const newURL = window.location.pathname + '?' + urlParams.toString();
-  history.replaceState(null, '', newURL);
-}
+  // Navigation vers une nouvelle personne
+  navigateWithParams: function(newGen) {
+    const p = ancestor["S1"];
+    const saved_max_gen = max_gen;
+    max_gen = newGen;
+    const url = this.buildPersonUrl(p);
+    max_gen = saved_max_gen;
+    window.location = url;
+  },
+
+  calculateAgeCategory: function(age) {
+    const boundaries = [30, 45, 60, 75, 90, 105, Infinity];
+    const category = boundaries.findIndex(boundary => age < boundary);
+    return Math.min(category, 6);
+  },
+
+  deathAgeClass: function(age) {
+    return "DA" + this.calculateAgeCategory(age);
+  },
+
+  marriageLengthClass: function(length) {
+    const years = parseInt(length);
+    if (isNaN(years) || years < 0) return "";
+    const index = CONFIG.marriage_length_thresholds.findIndex(threshold => years <= threshold);
+    return index === -1 ? "DAM6" : `DAM${index}`;
+  },
+
+  relativeLuminance: function(color) {
+    pixel.fillStyle = color;
+    pixel.fillRect(0, 0, 1, 1);
+    const data = pixel.getImageData(0, 0, 1, 1).data;
+    const rsrgb = data[0] / 255;
+    const gsrgb = data[1] / 255;
+    const bsrgb = data[2] / 255;
+    const r = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
+    const g = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
+    const b = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
+    return r * 0.2126 + g * 0.7152 + b * 0.0722;
+  },
+
+  contrastRatio: function(color1, color2) {
+    return (this.relativeLuminance(color1) + 0.05) / (this.relativeLuminance(color2) + 0.05);
+  },
+};
 
 // ========== Module de rendu circulaire ==========
 const CircularModeRenderer = {
-  /**
-   * Active/désactive le mode circulaire
-   */
+  // Active/désactive le mode circulaire
   toggle: function() {
     isCircularMode = !isCircularMode;
 
@@ -79,16 +194,28 @@ const CircularModeRenderer = {
       btn.classList.toggle('active', isCircularMode);
       const icon = btn.querySelector('i');
       if (icon) {
-        icon.className = isCircularMode ? 'fa fa-circle fa-fw' : 'fa fa-fan fa-fw';
-        btn.title = isCircularMode ? 'Revenir au mode éventail' : 'Mode circulaire (360°)';
+        icon.className = isCircularMode ? 'fa fa-circle fa-fw' : 'fa fa-circle-notch fa-fw';
+        btn.innerHTML = isCircularMode
+          ? '<i class="fa fa-circle fa-fw"></i>360'
+          : '<i class="fa fa-circle-notch fa-fw"></i>360';
+        btn.title = isCircularMode ? 'Revenir au mode éventail' : 'Mode circulaire/couple parents';
       }
     }
 
-    // Masquer les boutons d'angle en mode circulaire
-    document.querySelectorAll('[id^="b-angle-"]').forEach(btn => {
-      btn.style.display = isCircularMode ? 'none' : '';
+    // Désactiver/activer les boutons d'angle au lieu de les masquer
+    CONFIG.available_angles.forEach(angle => {
+      const angleBtn = document.getElementById(`b-angle-${angle}`);
+      if (angleBtn) {
+        angleBtn.classList.toggle('disabled', isCircularMode);
+        angleBtn.disabled = isCircularMode;
+      }
     });
 
+    // Mettre à jour l'URL
+    Utils.updateUrlWithCurrentState();
+
+    // Redessiner
+    FanchartApp.calculateDimensions();
     FanchartApp.reRenderWithCurrentGenerations();
   },
 
@@ -104,49 +231,81 @@ const CircularModeRenderer = {
     const s3 = ancestor["S3"]; // Mère
     const r = CONFIG.a_r[0];
 
-    // Demi-cercle nord pour le père
+    // Groupes individuels pour chaque parent,
+    // facilite la gestion des événements et du surlignage —
+    // Groupe pour le père (demi-cercle nord)
     if (s2) {
-      SVGRenderer.drawPie(centerGroup, 0, r, -90, 90, s2,
-        { type: 'person', isBackground: true });
+        const s2Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        s2Group.setAttribute("id", "couple-s2");
+        centerGroup.appendChild(s2Group);
 
-      // Texte centré dans le demi-cercle nord
-      const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text2.setAttribute("x", center_x);
-      text2.setAttribute("y", center_y - r/3);
-      text2.setAttribute("text-anchor", "middle");
-      text2.setAttribute("class", "couple-text");
-      text2.innerHTML = `<tspan>${s2.fn}</tspan><tspan x="${center_x}" dy="15">${s2.sn}</tspan>`;
-      centerGroup.appendChild(text2);
+        // Secteur de fond
+        SVGRenderer.drawPie(s2Group, 0, r, -90, 90, s2,
+          { type: 'person', isBackground: true });
 
-      SVGRenderer.drawPie(centerGroup, 0, r, -90, 90, s2, { type: 'person' });
-    }
+        // Texte centré dans le demi-cercle nord
+        const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text2.setAttribute("x", center_x);
+        text2.setAttribute("y", center_y - r/3);
+        text2.setAttribute("text-anchor", "middle");
+        text2.setAttribute("class", "couple-text");
+        text2.innerHTML = `<tspan>${s2.fn}</tspan><tspan x="${center_x}" dy="15">${s2.sn}</tspan>`;
+        s2Group.appendChild(text2);
 
-    // Demi-cercle sud pour la mère
-    if (s3) {
-      SVGRenderer.drawPie(centerGroup, 0, r, 90, 270, s3,
-        { type: 'person', isBackground: true });
+        // Secteur interactif (doit être en dernier pour capturer les événements)
+        SVGRenderer.drawPie(s2Group, 0, r, -90, 90, s2, { type: 'person' });
+      }
 
-      const text3 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text3.setAttribute("x", center_x);
-      text3.setAttribute("y", center_y + r/3);
-      text3.setAttribute("text-anchor", "middle");
-      text3.setAttribute("class", "couple-text");
-      text3.innerHTML = `<tspan>${s3.fn}</tspan><tspan x="${center_x}" dy="15">${s3.sn}</tspan>`;
-      centerGroup.appendChild(text3);
+      // Groupe pour la mère (demi-cercle sud)
+      if (s3) {
+        const s3Group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        s3Group.setAttribute("id", "couple-s3");
+        centerGroup.appendChild(s3Group);
 
-      SVGRenderer.drawPie(centerGroup, 0, r, 90, 270, s3, { type: 'person' });
-    }
+        // Secteur de fond
+        SVGRenderer.drawPie(s3Group, 0, r, 90, 270, s3,
+          { type: 'person', isBackground: true });
 
-    // Ligne de séparation élégante
-    const separator = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    separator.setAttribute("x1", center_x - r);
-    separator.setAttribute("y1", center_y);
-    separator.setAttribute("x2", center_x + r);
-    separator.setAttribute("y2", center_y);
-    separator.setAttribute("stroke", "#ccc");
-    separator.setAttribute("stroke-width", "1");
-    centerGroup.appendChild(separator);
-  },
+        // Texte centré dans le demi-cercle sud
+        const text3 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text3.setAttribute("x", center_x);
+        text3.setAttribute("y", center_y + r/3);
+        text3.setAttribute("text-anchor", "middle");
+        text3.setAttribute("class", "couple-text");
+        text3.innerHTML = `<tspan>${s3.fn}</tspan><tspan x="${center_x}" dy="15">${s3.sn}</tspan>`;
+        s3Group.appendChild(text3);
+
+        // Secteur interactif
+        SVGRenderer.drawPie(s3Group, 0, r, 90, 270, s3, { type: 'person' });
+      }
+
+      // Ligne de séparation élégante
+      const separator = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      separator.setAttribute("x1", center_x - r);
+      separator.setAttribute("y1", center_y);
+      separator.setAttribute("x2", center_x + r);
+      separator.setAttribute("y2", center_y);
+      separator.setAttribute("stroke", "#ccc");
+      separator.setAttribute("stroke-width", "1");
+      separator.setAttribute("stroke-dasharray", "3,3"); // Ligne pointillée pour plus d'élégance
+      centerGroup.appendChild(separator);
+      /*
+      // Optionnel : Ajouter un petit texte pour le S1 au centre
+      if (ancestor["S1"]) {
+        const s1Text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        s1Text.setAttribute("x", center_x);
+        s1Text.setAttribute("y", center_y);
+        s1Text.setAttribute("text-anchor", "middle");
+        s1Text.setAttribute("class", "s1-indicator");
+        s1Text.setAttribute("font-size", "10");
+        s1Text.setAttribute("fill", "#666");
+        s1Text.textContent = "⬤"; // Point central discret
+        const s1Title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        s1Title.textContent = `${ancestor["S1"].fn} ${ancestor["S1"].sn} (enfant du couple)`;
+        s1Text.appendChild(s1Title);
+        centerGroup.appendChild(s1Text);
+      }*/
+    },
 
   /**
    * Décale une branche d'ancêtres pour qu'un parent devienne S1
@@ -227,69 +386,6 @@ const DOMCache = {
   }
 };
 
-// ========== Utilitaires généraux ==========
-const Utils = {
-  calculateAgeCategory: function(age) {
-    const boundaries = [30, 45, 60, 75, 90, 105, Infinity];
-    const category = boundaries.findIndex(boundary => age < boundary);
-    return Math.min(category, 6);
-  },
-
-  deathAgeClass: function(age) {
-    return "DA" + this.calculateAgeCategory(age);
-  },
-
-  marriageLengthClass: function(length) {
-    const years = parseInt(length);
-    if (isNaN(years) || years < 0) return "";
-    const index = CONFIG.marriage_length_thresholds.findIndex(threshold => years <= threshold);
-    return index === -1 ? "DAM6" : `DAM${index}`;
-  },
-
-  relativeLuminance: function(color) {
-    pixel.fillStyle = color;
-    pixel.fillRect(0, 0, 1, 1);
-    const data = pixel.getImageData(0, 0, 1, 1).data;
-    const rsrgb = data[0] / 255;
-    const gsrgb = data[1] / 255;
-    const bsrgb = data[2] / 255;
-    const r = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
-    const g = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
-    const b = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
-    return r * 0.2126 + g * 0.7152 + b * 0.0722;
-  },
-
-  contrastRatio: function(color1, color2) {
-    return (this.relativeLuminance(color1) + 0.05) / (this.relativeLuminance(color2) + 0.05);
-  },
-
-  buildUrlParams: function(p) {
-    let url = `m=A&t=FC&p=${p.fnk}&n=${p.snk}`;
-    if (p.oc) url += `&oc=${p.oc}`;
-    if (tool && tool !== "") url += `&tool=${tool}`;
-    if (implexMode === "numbered") url += "&implex=num";
-    else if (implexMode === "full") url += "&implex=full";
-    if (current_angle !== CONFIG.default_angle) {
-      url += `&angle=${current_angle}`;
-    }
-    return url;
-  },
-
-  navigateWithParams: function(newGen) {
-    var p = ancestor["S1"];
-    var url = link_to_person + this.buildUrlParams(p) + "&v=" + newGen;
-    if (has_ba) url += "&ba=on";
-    if (has_bu) url += "&bu=on";
-    window.location = url;
-  },
-
-  updateUrlWithCurrentState: function() {
-    const p = ancestor["S1"];
-    const newUrl = link_to_person + Utils.buildUrlParams(p) + "&v=" + max_gen;
-    history.replaceState(null, '', newUrl);
-  }
-};
-
 // ========== Fonctions utilitaires pour la géométrie ==========
 function polarToCartesian(r, angle) {
   const rad = Math.PI / 180 * angle;
@@ -364,7 +460,7 @@ const SVGRenderer = {
       const age = (p.death_age && p.death_age !== "" && !isNaN(parseInt(p.death_age)))
         ? ` (${p.death_age} ans)`
         : "";
-      title.textContent = `(Sosa 1) ${p.fn} ${p.sn}${age}`;
+      title.textContent = `(Sosa 1) ${p.fn} ${p.sn}${age}\nCtrl+clic pour la fiche individuelle`;
       circle.appendChild(title);
 
       // Événements - réutilisation des méthodes universelles
@@ -477,6 +573,17 @@ const SVGRenderer = {
   },
 
   handleClick: function(e, person) {
+    const sortToggle = e.target.closest('#b-sort-places');
+      if (sortToggle) {
+      e.preventDefault();
+      UIManager.toggleSort();
+      return;
+    }
+    // Pour la navigation vers les fiches, exiger Ctrl/Cmd
+    if (!e.ctrlKey && !e.metaKey) {
+      // Pas de navigation sans modificateur
+      return;
+    }
     if (!link_to_person) {
       alert("Erreur: Impossible d'accéder à la fiche individuelle");
       return;
@@ -485,8 +592,7 @@ const SVGRenderer = {
 
     // Clic sur une personne (secteur du fanchart)
     if (person && person.fnk && person.snk) {
-      const useNewTab = e.ctrlKey || e.metaKey;
-      NavigationHelper.openPersonLink(person, useNewTab, false);
+      NavigationHelper.openPersonLink(person, true, false);
       return;
     }
 
@@ -494,15 +600,8 @@ const SVGRenderer = {
     if (li && document.body.dataset.wizard === "1") {
       e.preventDefault();
       const placeName = li.dataset.location;
-      const useNewTab = e.ctrlKey || e.metaKey;
-      NavigationHelper.openPlaceLink(placeName, useNewTab);
+      NavigationHelper.openPlaceLink(placeName, true);
       return;
-    }
-
-    // Autres clics (bouton de tri, etc.)
-    if (e.target.closest('#sort-toggle')) {
-      e.preventDefault();
-      UIManager.toggleSort();
     }
   },
 
@@ -951,8 +1050,8 @@ const UIManager = {
       <div>– Molette : zoomer</div>
       <div>– Survol : voir les détails</div>
       <div><strong>Raccourcis :</strong></div>
-      <div>– Ctrl+clic : fiche individuelle</div>
-      <div>– ▲ clic : navigation ancêtre</div>
+      <div>– <kbd>Ctrl</kbd>+clic : fiche individuelle</div>
+      <div>– ▲ : navigation sur ancêtre</div>
       <div style="margin-top: 8px; text-align: center;">
       </div>
     `;
@@ -1159,14 +1258,17 @@ const NavigationHelper = {
   openPersonLink: function(person, newTab = false, stayInFanchart = false) {
     if (!person || !person.fnk || !person.snk) return false;
 
-    const oc = person.oc ? `&oc=${person.oc}` : '';
     let url;
-
     if (stayInFanchart) {
-      url = `${link_to_person}p=${person.fnk}&n=${person.snk}${oc}&m=A&t=FC&v=${max_gen}`;
-      if (tool && tool !== "") url += `&tool=${tool}`;
+      // Utiliser la fonction centralisée
+      // Astuce : temporairement faire comme si cette personne était S1
+      const saved_ancestor = ancestor["S1"];
+      ancestor["S1"] = person;
+      url = Utils.buildPersonUrl(person);
+      ancestor["S1"] = saved_ancestor; // Restaurer
     } else {
       // Navigation externe: va vers fiche individuelle
+      const oc = person.oc ? `&oc=${person.oc}` : '';
       url = `${link_to_person}p=${person.fnk}&n=${person.snk}${oc}`;
     }
 
@@ -1646,17 +1748,6 @@ const LocationManager = {
         NavigationHelper.openPlaceLink(data.locationKey, true);
       }
     });
-
-    // Gestionnaire pour le tri (délégation aussi)
-    const placesContainer = document.getElementById("places-list");
-    if (placesContainer) {
-      placesContainer.addEventListener('click', function(e) {
-        if (e.target.closest('#sort-toggle')) {
-          e.preventDefault();
-          UIManager.toggleSort();
-        }
-      });
-    }
   },
 };
 
@@ -1674,11 +1765,13 @@ const AngleManager = {
     }
 
     if (newAngle === current_angle) {
-      return; // Pas de changement nécessaire
+      return;
     }
 
     current_angle = newAngle;
-    updateURLWithAngle(newAngle);
+
+    // Mettre à jour l'URL avec le système existant
+    Utils.updateUrlWithCurrentState();
 
     // Mettre à jour l'interface
     this.updateAngleButtons();
@@ -1697,20 +1790,15 @@ const AngleManager = {
     });
   },
 
-  // Obtenir le label pour un angle
-  getAngleLabel: function(angle) {
-    switch(angle) {
-      case 180: return "Compact";
-      case 220: return "Standard";
-      case 260: return "Étendu";
-      default: return `${angle}°`;
-    }
-  },
-
-  // Initialiser depuis l'URL
+  // Initialiser les boutons (appelé depuis FanchartApp.init)
   initialize: function() {
-    current_angle = getAngleFromURL();
     this.updateAngleButtons();
+
+    // Mettre à jour l'état du bouton circulaire
+    const circularBtn = document.getElementById('b-circular-mode');
+    if (circularBtn && isCircularMode) {
+      circularBtn.classList.add('active');
+    }
   }
 };
 
@@ -1753,6 +1841,44 @@ const FanchartApp = {
   init: function() {
     this.calculateDimensions();
     this.processAncestorData();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    // Mode circulaire
+    const modeParam = urlParams.get('mode');
+
+    if (modeParam === 'couple') {
+      isCircularMode = true;
+    } else {
+      // Mode éventail : lire l'angle
+      const angleParam = urlParams.get('angle');
+      if (angleParam) {
+        const angle = parseInt(angleParam);
+        if (CONFIG.available_angles.includes(angle)) {
+          current_angle = angle;
+        }
+      } else if (typeof initial_angle !== 'undefined' && initial_angle) {
+        current_angle = initial_angle;
+      }
+    }
+
+    const toolParam = urlParams.get('tool');
+    if (toolParam === 'death-age' || toolParam === 'place_color') {
+      tool = toolParam;
+    }
+
+    const implexParam = urlParams.get('implex');
+    if (implexParam === 'num') {
+      implexMode = 'numbered';
+    } else if (implexParam === 'full') {
+      implexMode = 'full';
+    }
+
+    AngleManager.updateAngleButtons();
+    if (isCircularMode) {
+      const circularBtn = document.getElementById('b-circular-mode');
+      if (circularBtn) circularBtn.classList.add('active');
+    }
+
     LocationManager.calculateAndBuild()
     DOMCache.preload();
     this.renderFanchart();
@@ -1951,23 +2077,26 @@ const FanchartApp = {
       svg_h = size;
       center_x = size / 2;
       center_y = size / 2;
-    } else if (current_angle === 180) {
-      svg_w = 2 * max_r + 2 * margin;
-      center_x = max_r + margin;
-
-      // La hauteur reste max_r + margin (pas d'extension vers le bas
-      svg_h = max_r + 2 * margin;
-      center_y = max_r + margin;
     } else {
-      // Calcul standard pour les autres angles
+      // Calcul standard pour tous les angles
       center_x = max_r + margin;
       center_y = max_r + margin;
       svg_w = 2 * center_x;
 
-      // Utiliser l'angle dynamique pour calculer la hauteur
-      const halfAngleRad = Math.PI/180 * (current_angle - 180) / 2;
-      const extraHeight = Math.max(CONFIG.a_r[0], Math.round(max_r * Math.sin(halfAngleRad)));
-      svg_h = 2 * margin + max_r + extraHeight;
+      if (current_angle === 180) {
+        // Demi-cercle : hauteur réduite, le centre est positionné en haut
+        // MAIS le cercle S1 dépasse vers le bas de CONFIG.a_r[0]
+        svg_h = max_r + CONFIG.a_r[0] + 2 * margin; // Ajouter le rayon du cercle central
+      } else if (current_angle <= 270) {
+        center_y = max_r + margin;
+        // Angles standard : calcul avec extension
+        const halfAngleRad = Math.PI/180 * (current_angle - 180) / 2;
+        const extraHeight = Math.max(CONFIG.a_r[0], Math.round(max_r * Math.sin(halfAngleRad)));
+        svg_h = 2 * margin + max_r + extraHeight;
+      } else {
+        // Angles > 270° : hauteur complète nécessaire
+        svg_h = 2 * (max_r + margin);
+      }
     }
 
     if (isNaN(svg_w) || isNaN(svg_h) || svg_w <= 0 || svg_h <= 0) {
@@ -1978,14 +2107,32 @@ const FanchartApp = {
       center_y = svg_h / 2;
     }
 
-    // Dimensions de la fenêtre
+    // Dimensions de la fenêtre avec limitation pour la liste des lieux
+
     this.window_h = window.innerHeight;
-    this.window_w = Math.round(this.window_h * svg_w / svg_h);
+    const maxAllowedWidth = window.innerWidth * 0.85; // 85% max de la largeur
+    const calculatedWidth = Math.round(this.window_h * svg_w / svg_h);
+    this.window_w = Math.min(calculatedWidth, maxAllowedWidth);
+
+    // Si on a dû réduire la largeur, ajuster la hauteur en conséquence
+    if (this.window_w < calculatedWidth) {
+      this.window_h = Math.round(this.window_w * svg_h / svg_w);
+    }
+
+    // Ajuster la position pour les modes carrés (éviter l'empiètement)
+    if (current_angle >= 310 || isCircularMode) {
+      fanchart.style.marginLeft = '120px';
+    } else {
+      fanchart.style.marginLeft = '0';
+    }
 
     // Configurer le SVG
     fanchart.setAttribute("height", this.window_h);
     fanchart.setAttribute("width", this.window_w);
-    root.style.setProperty('--fc-tool-size', (window.innerWidth - this.window_w) + "px");
+    
+    // Mettre à jour la variable CSS pour la largeur de la liste
+     const actualListWidth = LayoutCalculator.calculatePlacesListWidth();
+     root.style.setProperty('--fc-tool-size', actualListWidth + 'px');
 
     // Initialisation de la viewbox
     svg_viewbox_x = 0;

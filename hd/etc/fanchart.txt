@@ -146,9 +146,9 @@
   <div class="control-section">
     <div class="section-title">Ouverture</div>
     <div class="btn-group-fanchart">
-      <button id="b-angle-180" class="btn-fanchart" title="Vue en demi-cercle">180</button>
-      <button id="b-angle-220" class="btn-fanchart active" title="Vue standard">220</button>
-      <button id="b-angle-260" class="btn-fanchart" title="Vue étendue">260</button>
+      <button id="b-angle-180" class="btn-fanchart" title="Vue en demi-cercle (180°)">180</button>
+      <button id="b-angle-220" class="btn-fanchart active" title="Vue standard (220°)">220</button>
+      <button id="b-angle-359" class="btn-fanchart" title="Vue complète (359°)">359</button>
     </div>
   </div>
 
@@ -162,11 +162,10 @@
   </div>
 
   <div class="control-section">
-    <div class="section-title">[*font]</div>
     <div class="btn-group-fanchart">
      <select id="font-selector" class="custom-select custom-select-sm mx-0">
-       <option value="">Standard</option>
-       <option value="mono">Monospace</option>
+       <option value="">[*font]</option>
+       <option value="mono">Mono</option>
        <option value="serif">Serif</option>
        <option value="large">Grande</option>
        <option value="readable">Lisible</option>
