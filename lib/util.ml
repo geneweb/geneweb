@@ -791,7 +791,8 @@ let pget_opt conf base ip =
   if is_restricted conf base ip then None else Some (Driver.poi base ip)
 
 let pget conf base ip =
-  Option.value ~default:(Driver.empty_person base ip) (pget_opt conf base ip)
+  if is_restricted conf base ip then Driver.empty_person base ip
+  else Driver.poi base ip
 
 let string_gen_person base p =
   Futil.map_person_ps (fun p -> p) (Driver.sou base) p
