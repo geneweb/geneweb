@@ -222,32 +222,6 @@ let register_plugin dir =
      raise (Register_plugin_failure (plugin, `dynlink_error e)));
   Gwd_lib.GwdPlugin.assets := ""
 
-let alias_lang lang =
-  if String.length lang < 2 then lang
-  else
-    let fname =
-      Geneweb.Util.search_in_assets (Filename.concat "lang" "alias_lg.txt")
-    in
-    try
-      let ic = Secure.open_in fname in
-      let lang =
-        let rec loop () =
-          match input_line ic with
-          | line -> (
-              match String.index_opt line '=' with
-              | Some i ->
-                  if lang = String.sub line 0 i then
-                    String.sub line (i + 1) (String.length line - i - 1)
-                  else loop ()
-              | None -> loop ())
-          | exception End_of_file -> lang
-        in
-        loop ()
-      in
-      close_in ic;
-      lang
-    with Sys_error _ -> lang
-
 let log_redirect from request req =
   Lock.control
     (Geneweb.SrcfileDisplay.adm_file "gwd.lck")
@@ -1149,7 +1123,6 @@ let make_conf from_addr request script_name env =
     if lang = "" && !choose_browser_lang then http_preferred_language request
     else lang
   in
-  let lang = alias_lang lang in
   let from, env =
     let x, env = extract_assoc "opt" env in
     match x with
