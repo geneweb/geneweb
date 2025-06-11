@@ -406,7 +406,7 @@ let rec eval_variable (conf : Config.config) = function
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "index" ] -> (
       match conf.user_iper with
-      | Some ip -> Driver.string_of_iper ip
+      | Some ip -> Driver.Iper.to_string ip
       | None -> "")
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey

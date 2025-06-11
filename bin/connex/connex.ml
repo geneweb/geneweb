@@ -81,7 +81,7 @@ let utf8_designation base p =
   let surname = Driver.p_surname base p in
   let s = first_name ^ "." ^ string_of_int (Driver.get_occ p) ^ " " ^ surname in
   if first_name = "?" || surname = "?" then
-    s ^ " (i=" ^ Driver.string_of_iper (Driver.get_iper p) ^ ")"
+    s ^ " (i=" ^ Driver.Iper.to_string (Driver.get_iper p) ^ ")"
   else s
 
 let wiki_designation base basename p =
@@ -95,7 +95,7 @@ let wiki_designation base basename p =
     ^ " " ^ surname ^ "]]"
   in
   if first_name = "?" || surname = "?" then
-    let indx = Driver.string_of_iper (Driver.get_iper p) in
+    let indx = Driver.Iper.to_string (Driver.get_iper p) in
     s ^ " <a href=\"http://" ^ !server ^ ":" ^ string_of_int !gwd_port ^ "/"
     ^ basename ^ "?i=" ^ indx ^ "\">(i=" ^ indx ^ ")</a><br>"
   else s ^ "<br>"
@@ -107,7 +107,7 @@ let print_family base basename ifam =
     if
       Driver.sou base (Driver.get_first_name p) = "?"
       || Driver.sou base (Driver.get_surname p) = "?"
-    then Printf.eprintf "i=%s" (Driver.string_of_iper (Driver.get_iper p))
+    then Printf.eprintf "i=%s" (Driver.Iper.to_string (Driver.get_iper p))
     else Printf.eprintf "  - %s" (utf8_designation base p);
     Printf.eprintf "\n";
     Printf.eprintf "  - %s\n"
@@ -117,7 +117,7 @@ let print_family base basename ifam =
     Driver.sou base (Driver.get_first_name p) = "?"
     || Driver.sou base (Driver.get_surname p) = "?"
   then
-    let indx = Driver.string_of_iper (Driver.get_iper p) in
+    let indx = Driver.Iper.to_string (Driver.get_iper p) in
     Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>" !server
       !gwd_port basename indx indx
   else Printf.printf "  - %s" (wiki_designation base basename p);
@@ -168,8 +168,9 @@ let move base basename =
                 if
                   (not (Collection.Marker.get mark j))
                   && (!ignore_files
-                     || Driver.eq_istr (Driver.get_origin_file fam) origin_file
-                     )
+                     || Driver.Istr.equal
+                          (Driver.get_origin_file fam)
+                          origin_file)
                 then (
                   Collection.Marker.set mark j true;
                   let nl = neighbourgs base ifam in

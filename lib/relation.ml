@@ -170,7 +170,7 @@ type node = NotVisited | Visited of (bool * Driver.iper * famlink)
 let excl_faml conf base =
   let rec loop list i =
     match p_getenv conf.Config.env ("ef" ^ string_of_int i) with
-    | Some k -> loop (Driver.ifam_of_string k :: list) (i + 1)
+    | Some k -> loop (Driver.Ifam.of_string k :: list) (i + 1)
     | None -> (
         match find_person_in_env conf base ("ef" ^ string_of_int i) with
         | Some p ->

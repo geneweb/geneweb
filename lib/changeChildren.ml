@@ -43,7 +43,7 @@ let check_conflict base p key new_occ ipl =
 
 let change_child conf base parent_surname changed ip =
   let p = Driver.poi base ip in
-  let var = "c" ^ Driver.string_of_iper (Driver.get_iper p) in
+  let var = "c" ^ Driver.Iper.to_string (Driver.get_iper p) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
     | Some x -> only_printable x

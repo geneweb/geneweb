@@ -36,8 +36,8 @@ let update_stats base current_year s p =
   | Female -> s.women <- s.women + 1
   | Neuter -> s.neutre <- s.neutre + 1);
   if
-    Driver.is_quest_string (Driver.get_first_name p)
-    && Driver.is_quest_string (Driver.get_surname p)
+    Driver.Istr.is_quest (Driver.get_first_name p)
+    && Driver.Istr.is_quest (Driver.get_surname p)
   then s.noname <- s.noname + 1;
   (match (birth_year p, death_year current_year p) with
   | Some y1, Some y2 ->
@@ -71,8 +71,8 @@ let update_stats base current_year s p =
 let stat_base : Geneweb_db.Driver.base -> stats =
  fun base ->
   let s =
-    let y = (1000, Driver.poi base Driver.dummy_iper) in
-    let o = (0, Driver.poi base Driver.dummy_iper) in
+    let y = (1000, Driver.poi base Driver.Iper.dummy) in
+    let o = (0, Driver.poi base Driver.Iper.dummy) in
     {
       men = 0;
       women = 0;

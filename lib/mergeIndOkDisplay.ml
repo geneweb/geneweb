@@ -9,8 +9,8 @@ module Driver = Geneweb_db.Driver
 let print_merge conf base =
   match (p_getenv conf.env "i1", p_getenv conf.env "i2") with
   | Some i1, Some i2 ->
-      let p1 = Driver.poi base (Driver.iper_of_string i1) in
-      let p2 = Driver.poi base (Driver.iper_of_string i2) in
+      let p1 = Driver.poi base (Driver.Iper.of_string i1) in
+      let p2 = Driver.poi base (Driver.Iper.of_string i2) in
       let p = reconstitute conf base p1 p2 in
       let sp = UpdateInd.string_person_of base p1 in
       let salt = Option.get conf.secret_salt in
@@ -78,7 +78,7 @@ let print_mod_merge o_conf base =
     | Some i ->
         Util.string_gen_person base
           (Driver.gen_person_of_person
-             (Driver.poi base (Driver.iper_of_string i)))
+             (Driver.poi base (Driver.Iper.of_string i)))
     | None -> assert false
   in
   let o_p1 = get_gen_person "i" in
