@@ -467,9 +467,7 @@ let print_population_pyramid conf base =
       Output.print_sstring conf "/";
       Output.print_string conf iname;
       Output.print_sstring conf {|" alt="|};
-      Output.print_sstring conf (Util.transl_nth conf "M/F" sex);
-      Output.print_sstring conf {|" title="|};
-      Output.print_sstring conf (Util.transl_nth conf "M/F" sex);
+      Output.print_sstring conf (Util.transl_nth conf "sex_pictogram_alt" sex);
       Output.print_sstring conf {|">|})
     else Output.print_sstring conf "&nbsp;";
     Output.print_sstring conf "</td>"

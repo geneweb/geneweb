@@ -3,16 +3,17 @@
 
 let print_placeholder_gendered_portrait conf p size =
   let open Gwdb in
-  let image, alt =
+  let image, lexicon_field =
     match get_sex p with
-    | Male -> ("male.png", "M")
-    | Female -> ("female.png", "F")
-    | Neuter -> ("sexunknown.png", "?")
+    | Male -> ("male.png", 0)
+    | Female -> ("female.png", 1)
+    | Neuter -> ("sexunknown.png", 2)
   in
-  Output.printf conf
-    {|<img src="%s/%s" alt="%s" title="sex" width="%d" height="%d">|}
+  Output.printf conf {|<img src="%s/%s" alt="%s" width="%d" height="%d">|}
     (Image.prefix conf |> Adef.as_string)
-    image alt size size
+    image
+    (Util.transl_nth conf "sex_pictogram_alt" lexicon_field)
+    size size
 
 (* ************************************************************************** *)
 (*  [Fonc] content : string -> int -> string -> unit                          *)
