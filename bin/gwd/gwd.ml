@@ -18,7 +18,6 @@ let conn_timeout = ref 120
 let daemon = ref false
 let default_lang = ref "fr"
 let friend_passwd = ref ""
-let green_color = "#2f6400"
 let images_dir = ref ""
 let images_url = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
@@ -1199,9 +1198,6 @@ let make_conf from_addr request script_name env =
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;
       indep_command = (if !Wserver.cgi then ar.ar_command else "geneweb") ^ "?";
-      highlight =
-        (try List.assoc "highlight_color" base_env
-         with Not_found -> green_color);
       lang = (if lang = "" then default_lang else lang);
       default_lang;
       default_sosa_ref;

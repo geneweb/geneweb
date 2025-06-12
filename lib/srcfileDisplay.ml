@@ -198,7 +198,6 @@ let macro conf base = function
   | 'f' -> Adef.safe conf.Config.command
   | 'g' -> (Util.prefix_base conf :> Adef.safe_string)
   | 'G' -> (Util.prefix_base_password conf :> Adef.safe_string)
-  | 'i' -> Adef.safe conf.Config.highlight
   | 'k' -> Adef.safe conf.Config.indep_command
   | 'l' -> Adef.safe conf.Config.lang
   | 'L' -> Adef.safe conf.Config.left

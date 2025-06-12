@@ -219,7 +219,6 @@ and eval_simple_variable conf = function
       in
       string_of_dates_format conf.dates_format
   | "doctype" -> (Util.doctype :> string)
-  | "highlight" -> conf.highlight
   | "image_prefix" ->
       (let s =
          if conf.cgi then
