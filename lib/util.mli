@@ -2,6 +2,9 @@
 open Config
 open Def
 
+val hash_file : string -> string option
+val hash_file_cached : string -> string option
+val resolve_asset_file : Config.config -> string -> string
 val is_welcome : bool ref
 
 val print_default_gwf_file : string -> unit
