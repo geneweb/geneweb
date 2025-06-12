@@ -3,17 +3,6 @@
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
 let removed_string = ref []
-
-type create_info = Update.create_info = {
-  ci_birth_date : Date.date option;
-  ci_birth_place : string;
-  ci_death : Def.death;
-  ci_death_date : Date.date option;
-  ci_death_place : string;
-  ci_occupation : string;
-  ci_public : bool;
-}
-
 let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
@@ -44,7 +33,7 @@ let reconstitute_parent_or_child conf var default_surname =
     in
     let public = Update_util.getn conf (var ^ "b") "yyyy" = "p" in
     {
-      ci_birth_date = b;
+      Update.ci_birth_date = b;
       ci_birth_place = bpl;
       ci_death = death;
       ci_death_date = d;
@@ -141,7 +130,7 @@ let reconstitute_insert_event conf ext cnt el =
     (el, true)
   else (el, ext)
 
-let rec reconstitute_events conf ext cnt =
+let rec reconstitute_events ~base conf ext cnt =
   match Update_util.get_nth conf "e_name" cnt with
   | None -> ([], ext)
   | Some efam_name ->
@@ -212,9 +201,7 @@ let rec reconstitute_events conf ext cnt =
                   "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
                 in
                 match Util.p_getenv conf.Config.env var_note with
-                | Some wnote ->
-                    (* print_endline ("NOTE:" ^ wnote); *)
-                    wnote
+                | Some wnote -> wnote
                 | _ -> ""
               in
               let c = (c, wkind, wnote) in
@@ -251,6 +238,10 @@ let rec reconstitute_events conf ext cnt =
               | Some _ | None -> (c :: witnesses, ext))
         in
         loop 1 ext
+      in
+      let witnesses =
+        Update_util.witnesses_with_inferred_death_from_event ~conf ~base
+          ~date:efam_date witnesses
       in
       let witnesses, ext =
         let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
@@ -291,7 +282,7 @@ let rec reconstitute_events conf ext cnt =
           efam_witnesses = Array.of_list witnesses;
         }
       in
-      let el, ext = reconstitute_events conf ext (cnt + 1) in
+      let el, ext = reconstitute_events ~base conf ext (cnt + 1) in
       let el, ext = reconstitute_insert_event conf ext cnt el in
       (e :: el, ext)
 
@@ -422,7 +413,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   (marr, div, wit)
 
 let reconstitute_family conf base nsck =
-  let events, ext = reconstitute_events conf false 1 in
+  let events, ext = reconstitute_events ~base conf false 1 in
   let events, ext = reconstitute_insert_event conf ext 0 events in
   let surname = Update_util.getn conf "pa1" "sn" in
   let children, ext =
