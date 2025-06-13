@@ -9,10 +9,10 @@ val only_printable_or_nl : string -> string
 val nb_char_occ : char -> string -> int
 (** [nb_char_occ c s] return the number of times [c] appears in [s]. *)
 
-val cut_words : string -> string list
-(** [cut_words str]
+val split_on_char : char -> string -> string list
+(** [split_on_char separator str]
     Same output as
-    [String.split_on_char ' ' s |> List.map String.trim |> List.filter ((<>) "")]
+    [String.split_on_char separator s |> List.map String.trim |> List.filter ((<>) "")]
 *)
 
 val strip_all_trailing_spaces : string -> string
