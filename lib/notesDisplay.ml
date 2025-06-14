@@ -829,7 +829,9 @@ let print_misc_notes conf base =
          {|<h4>%s <sup><i class="fa fa-info fa-xs" title="%s"></i></sup></h4>|}
          (transl conf "files not in db" |> Utf8.capitalize_fst)
          (transl conf "save help" |> Utf8.capitalize_fst));
-    if d <> "" then path_hierarchy d;
+    if d <> "" then (
+      format_folder_entry conf 0 ".." "" false true |> Output.print_sstring conf;
+      path_hierarchy d);
     List.iter (fun r -> one_folder r) dirs;
     Output.print_sstring conf "<p>";
     List.iter
