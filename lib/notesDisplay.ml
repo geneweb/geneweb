@@ -660,16 +660,24 @@ let format_folder_entry conf depth r path_to is_current is_path =
 (* Format file entry with proper indentation level *)
 let format_file_entry conf depth d f n_type title =
   let icon = match n_type with "gallery" -> "image" | _ -> "file-lines" in
+  let color, mod_edit =
+    let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
+    let f = notes_d ^ Filename.dir_sep ^ d ^ f ^ ".txt" in
+    let f = Util.note_link_to_sys f in
+    if Sys.file_exists f then ("", "") else (" text-danger", "MOD_")
+  in
   Format.sprintf
     {|<div class="py-1" style="margin-left: %.1fem;">
-         <a href="%sm=NOTES&f=%s"><i class="far fa-%s fa-fw mr-2"></i>%s</a>
+         <a class="%s" href="%sm=%sNOTES&f=%s"><i class="far fa-%s fa-fw mr-2"></i>%s</a>
          %s
        </div>|}
     (1.5 *. float_of_int depth)
+    color
     (commd conf :> string)
+    mod_edit
     (Mutil.encode (if d = "" then f else d ^ ":" ^ f) :> string)
     icon
-    (Util.escape_html f :> string)
+    (Util.escape_html f :> string) (* nom du fichier *)
     (if (title :> string) <> "" then
      Format.sprintf {|<span class="text-muted ml-2">%s</span>|}
        (title :> string)
@@ -749,6 +757,7 @@ let print_misc_notes conf base =
       db []
   in
   let db = sort_entries db in
+
   let one_folder r =
     let simple_d =
       if d = "" then r else d ^ String.make 1 NotesLinks.char_dir_sep ^ r
@@ -775,28 +784,29 @@ let print_misc_notes conf base =
 
   let dirs_in_db, files_in_db =
     List.partition
-      (fun f -> match f with _, Some _f -> true | _, None -> false)
+      (fun f -> match f with _, None -> true | _, Some _f -> false)
       db
   in
   let files_in_db =
     List.fold_left
       (fun acc e -> match e with _, Some f -> f :: acc | _ -> acc)
       [] files_in_db
+    |> List.rev
   in
   let dirs_in_db =
     List.fold_left
       (fun acc e -> match e with d, None -> d :: acc | _ -> acc)
       [] dirs_in_db
+    |> List.rev
   in
-
   if db <> [] then (
     Output.print_sstring conf {|<div class="px-1">|};
     if d <> "" then (
       format_folder_entry conf 0 ".." "" false true |> Output.print_sstring conf;
       path_hierarchy d);
     Output.print_sstring conf {|<div class="px-1">|};
-    List.iter (fun f -> one_file f) files_in_db;
     List.iter (fun d -> one_folder d) dirs_in_db;
+    List.iter (fun f -> one_file f) files_in_db;
     Output.print_sstring conf "</div>");
 
   let d = Util.note_link_to_sys d in
@@ -812,9 +822,11 @@ let print_misc_notes conf base =
         | S_REG ->
             if f.[String.length f - 1] <> '~' && f.[0] <> '.' then
               let f =
-                d
-                ^ String.make 1 NotesLinks.char_dir_sep
-                ^ Filename.remove_extension f
+                if d = "" then Filename.remove_extension f
+                else
+                  d
+                  ^ String.make 1 NotesLinks.char_dir_sep
+                  ^ Filename.remove_extension f
               in
               if List.mem (Util.sys_to_note_link f) files_in_db then
                 (acc_f, acc_d)
