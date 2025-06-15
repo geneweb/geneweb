@@ -12176,6 +12176,7 @@ ru: прочие сведения
 sv: övriga fält
 tr: diğer alan
 
+
     miscellaneous notes
 bg: разни бележки
 ca: miscel·lània
@@ -12204,6 +12205,10 @@ sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
 tr: çeşitli notlar
+
+    miscellaneous notes help
+en: external pages referenced in the base as [[[filename]]]
+fr: pages externes réfécencées dans la base sous la forme [[[fichier]]]
 
     missing %s
 co: %s assente

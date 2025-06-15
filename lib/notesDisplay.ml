@@ -723,13 +723,13 @@ let print_misc_notes conf base =
       (build_path_hierarchy d)
   in
   Hutil.header conf (fun _ -> ());
-  Format.sprintf
-    {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
-    (if d <> "" then d
-    else
-      transl conf "miscellaneous notes"
-      |> Util.translate_eval |> Utf8.capitalize_fst)
-  |> Output.print_sstring conf;
+  Output.print_sstring conf
+    (Format.sprintf
+       {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s
+        <sup><i class="fa fa-info fa-xs" title="%s"></i></sup></h1>|}
+       (if d <> "" then d
+       else transl conf "miscellaneous notes" |> Utf8.capitalize_fst)
+       (transl conf "miscellaneous notes help" |> Utf8.capitalize_fst));
   if d <> "" then format_back_button conf d |> Output.print_sstring conf;
   let db = notes_links_db conf base true in
   let db =
