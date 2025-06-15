@@ -159,7 +159,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
      title="%s">(<-)</a>|}
         (commd conf :> string)
         (fnotes :> string)
-        (Utf8.capitalize_fst (transl conf "pages where page appears"))
+        (transl conf "linked pages (pages) help" |> Utf8.capitalize_fst)
     else ""
   in
   Output.printf conf {|<div class="d-flex mb-3">%s%s%s</div>|} title_html modbtn
@@ -235,7 +235,7 @@ let linked_page_rows conf base pg pgl =
       Output.print_sstring conf
         (Format.sprintf {|
 <td>%s%s</td>
-<td><i>%s</i></td>|}
+<td><i>%s</i></td><td></td>|}
            (Util.referenced_person_title_text conf base p :> string)
            (DateDisplay.short_dates_text conf base p :> string)
            (Utf8.capitalize_fst (transl conf "individual notes")))
@@ -260,7 +260,7 @@ let linked_page_rows conf base pg pgl =
         (Format.sprintf
            {|
 <td>%s%s<br>& %s%s</td>
-<td class="align-middle"><i>%s %s</i></td>|}
+<td class="align-middle"><i>%s %s</i></td><td></td>|}
            (Util.referenced_person_title_text conf base fath :> string)
            (DateDisplay.short_dates_text conf base fath :> string)
            (Util.referenced_person_title_text conf base moth :> string)
@@ -279,9 +279,10 @@ let linked_page_rows conf base pg pgl =
              (commd conf :> string)
              (Utf8.capitalize_fst (transl conf "modify note")));
       Output.print_sstring conf
-        (Format.sprintf {|
+        (Format.sprintf
+           {|
 <td><a href="%sm=NOTES">%s</a></td>
-<td>%s</td>|}
+<td>%s</td><td></td>|}
            (commd conf :> string)
            (Utf8.capitalize (transl conf "base notes"))
            (Util.safe_html fnote_title :> string))
@@ -323,8 +324,8 @@ let linked_page_rows conf base pg pgl =
        title="%s"><-</a></td>|}
                 (commd conf :> string)
                 (fnotes :> string)
-                (Utf8.capitalize_fst (transl conf "pages where page appears"))
-             else "")))
+                (Utf8.capitalize_fst (transl conf "linked pages (pages) help"))
+             else "<td></td>")))
   | Def.NLDB.PgWizard wizname, _ ->
       if conf.wizard then
         Output.print_sstring conf
@@ -341,7 +342,7 @@ let linked_page_rows conf base pg pgl =
         (Format.sprintf
            {|
 <td><a href="%sm=WIZNOTES&f=%s">%s</a></td>
-<td><i>%s</i></td>|}
+<td><i>%s</i></td><td></td>|}
            (commd conf :> string)
            (Util.uri_encode wizname)
            (wizname :> string)
@@ -434,13 +435,15 @@ let print_what_links_p conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = Notes.links_to_ind conf base db key None in
     let title h =
-      let lnkd_typ =
+      let lnkd_typ, lnkd_typ_help =
         match p_getenv conf.env "type" with
         | Some "gallery" | Some "album" ->
-            "albums galleries where person appears"
-        | _ -> "pages where person appears"
+            ("linked albums", "linked albums help")
+        | _ -> ("linked pages", "linked pages help")
       in
-      Util.transl conf lnkd_typ |> Utf8.capitalize_fst
+      Format.sprintf {|<span title="%s">%s</span>|}
+        (Util.transl conf lnkd_typ_help |> Utf8.capitalize_fst)
+        (Util.transl conf lnkd_typ |> Utf8.capitalize_fst)
       |> Output.print_sstring conf;
       Util.transl conf ":" |> Output.print_sstring conf;
       Output.print_sstring conf " ";
@@ -461,9 +464,10 @@ let print_what_links_p conf base p =
 let print_what_links conf base fnotes =
   let title h =
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "pages where page appears"));
-    Util.transl conf ":" |> Output.print_sstring conf;
-    Output.print_sstring conf " ";
+      (Format.sprintf {|<span title="%s">%s%s </span>|}
+         (Util.transl conf "linked pages (pages) help" |> Utf8.capitalize_fst)
+         (Util.transl conf "linked pages" |> Utf8.capitalize_fst)
+         (Util.transl conf ":"));
     if h then (
       Output.print_sstring conf "[";
       Output.print_string conf (Util.escape_html fnotes);
@@ -725,11 +729,10 @@ let print_misc_notes conf base =
   Hutil.header conf (fun _ -> ());
   Output.print_sstring conf
     (Format.sprintf
-       {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s
-        <sup><i class="fa fa-info fa-xs" title="%s"></i></sup></h1>|}
+       {|<h1 class="mb-3" title="%s"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
+       (transl conf "miscellaneous notes help" |> Utf8.capitalize_fst)
        (if d <> "" then d
-       else transl conf "miscellaneous notes" |> Utf8.capitalize_fst)
-       (transl conf "miscellaneous notes help" |> Utf8.capitalize_fst));
+       else transl conf "miscellaneous notes" |> Utf8.capitalize_fst));
   if d <> "" then format_back_button conf d |> Output.print_sstring conf;
   let db = notes_links_db conf base true in
   let db =

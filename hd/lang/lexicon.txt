@@ -11053,31 +11053,35 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
-    linked pages (all)
-en: notes, pages albums or galleries where person is mentionned
-fr: notes, pages, albums ou galleries ou la personne est citée
-
-    albums galleries where person appears
+    linked albums help
 en: albums or galleries where person is referenced
 fr: albums ou galleries où la personne est citée
 
-    pages where page appears
+    linked albums
+en: linked albums or galleries
+fr: albums ou galleries liés
+
+    linked pages (pages) help
 en: pages or notes where page is referenced
 fr: pages ou notes où la page est citée
 
-    pages where person appears
+    linked pages help
+en: notes, pages, albums or galleries where person is referenced
+fr: notes, pages, albums ou galleries où la personne est citée
+
+    linked pages
 bg: свързани страници
 ca: enllaços
 co: pagine ligate
 cs: spojený stránky
 da: lænkede sider
 de: verknüpfte Seiten
-en: notes, pages, albums or galleries where person is referenced
+en: linked pages
 eo: linkitaj paĝoj
 es: páginas enlazadas
 et: seotud leheküljed
 fi: linkitettyjä sivuja
-fr: notes, pages, albums ou galleries où la personne est citée
+fr: pages liées
 he: דפים מקושרים
 it: pagine collegate
 lt: susieti puslapiai
