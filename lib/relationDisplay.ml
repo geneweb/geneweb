@@ -477,7 +477,7 @@ let print_link_name conf base n p1 p2 sol =
   in
   let s1 =
     let open Def in
-    "<strong>" ^<^ Util.std_color conf s ^>^ "</strong>"
+    "<strong>" ^<^ s ^>^ "</strong>"
   in
   let s2 =
     if Util.is_hide_names conf p1 && not (Person.is_visible conf base p1) then

@@ -551,13 +551,6 @@ fr: Contenu du fichier comm.log
 it: Contenuto del file "comm.log"
 sv: Innehållet i filen "comm.log"
 
-    Content of result file
-aa: bso_log.htm
-co: Cuntenutu di u schedariu risultatu
-de: Inhalt der Ergebnisdatei
-en: Content of result file
-fr: Contenu du fichier résultat
-
     Convert first names to lowercase letters, with initials in uppercase.
 aa: ged2gwb.htm
 co: Cunvertisce i nomi in minuscule, cù e so iniziali in maiuscula.
@@ -2511,17 +2504,6 @@ it: Backup and restore
 lv: Saglabâðanu un atjaunoðanu
 sv: Spara och återskapa
 
-    Search
-aa: recover.htm
-co: Circà
-de: Suchen
-en: Search
-es: Buscar
-fr: Chercher
-it: Cercare
-lv: Meklçt
-sv: Sök
-
     Select the database or databases you want to delete, by clicking on the associated buttons.
 aa: delete.htm
 co: Selezziunate a basa o e base di dati ch’ellu ci vole à squassà clicchendu nant’à u so buttone assuciatu.
@@ -2544,17 +2526,6 @@ fr: Sélectionnez la base que vous voulez récupérer
 it: Selezionate la base che volete recuperare
 lv: Izvçlieties datu bâzi, kuru jûs vçlaties atjauninât
 sv: Välj den databas du vill återskapa
-
-    Select the name of the <em>directory</em> where your old version of %G is located (it must contain a filen named <tt>gwu</tt> or <tt>gwu.exe</tt>).
-aa: recover.htm
-co: Selezziunate u nome di u <em>cartulare</em> induve si trova a vostra vechja versione di %G (chì deve cuntene un schedariu chjamatu <tt>gwu</tt> o <tt>gwu.exe</tt>).
-de: Gib den vollständigen Namen des <em>Verzeichnisses</em> an, in dem deine alte %G-Version installiert ist.
-en: Select the name of the <em>directory</em> where your old version of %G is located (it must contain a filen named <tt>gwu</tt> or <tt>gwu.exe</tt>).
-es: Indique Ud. el nombre completo de la <em>carpeta</em> en la cual se encuetra su versión aneterior de %G.
-fr: Sélectionnez le <em>répertoire</em> où se trouve votre ancienne version de %G (il doit contenir un fichier nommé <tt>gwu</tt> ou <tt>gwu.exe</tt>).
-it: Selezionate la <em>directoty</em> dove si trova la vecchia versione di %G (e che deve contenere un file chiamato <tt>gwu</tt> o <tt>gwu.exe</tt>).
-lv: Uzrakstiet pilnu <em>kataloga</em> vârdu, kurâ atrodas vecâs %G versijas datu bâze.
-sv: Skriv in hela namnet för <em>katalogen</em> där din gamla version av %G ligger.
 
     Select the name of your GeneWeb source file (ending with ".gw");
 aa: gwc.htm
