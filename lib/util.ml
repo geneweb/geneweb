@@ -1398,7 +1398,7 @@ let print_alphabetically_indexed_list (type entry) conf index_key print_elem
             |> List.mapi (fun rank entry -> (entry, rank))
             |> List.to_seq |> Entry_map.of_seq
           in
-          compare
+          Option.compare Int.compare
             (Entry_map.find_opt entry entry_ranks)
             (Entry_map.find_opt entry' entry_ranks)
       in
