@@ -1390,7 +1390,8 @@ let print_alphabetically_indexed_list (type entry) conf index_key print_elem
         let module Entry_map = Map.Make (struct
           type t = entry
 
-          let compare = compare
+          let compare entry entry' =
+            Int.compare (Hashtbl.hash entry) (Hashtbl.hash entry')
         end) in
         fun entry entry' ->
           let entry_ranks =
