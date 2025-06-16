@@ -1396,9 +1396,7 @@ let print conf base p =
   let templ =
     match Util.p_getenv conf.Config.env "t" with
     | Some ("F" | "L" | "M") -> "deslist"
-    | Some "D" -> "deslist_hr"
     | Some "I" -> "destable"
-    | Some "V" -> "destree"
     | Some _ -> ""
     | _ -> "desmenu"
   in
