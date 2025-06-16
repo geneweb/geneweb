@@ -28,6 +28,33 @@ let ext_string_start_with () =
     (Ext_string.start_with "" 0 "foo");
   ()
 
+let ext_string_split_on_char () =
+  let test ~__POS__ ~expected ~separator s =
+    Alcotest.check' ~pos:__POS__
+      (Alcotest.list Alcotest.string)
+      ~msg:"" ~expected
+      ~actual:(Ext_string.split_on_char separator s)
+  in
+  let space = ' ' in
+  let comma = ',' in
+  test ~__POS__ ~expected:[] ~separator:space "";
+  test ~__POS__ ~expected:[ "foo" ] ~separator:space "foo";
+  test ~__POS__ ~expected:[ "foo," ] ~separator:space "foo,";
+  test ~__POS__ ~expected:[ "foo" ] ~separator:space " foo ";
+  test ~__POS__ ~expected:[ "foo," ] ~separator:space "foo, ";
+  test ~__POS__ ~expected:[ "foo"; "bar" ] ~separator:space "foo bar";
+  test ~__POS__ ~expected:[ "foo,bar" ] ~separator:space "foo,bar";
+  test ~__POS__ ~expected:[ "foo,"; "bar,baz" ] ~separator:space "foo,  bar,baz";
+  test ~__POS__ ~expected:[] ~separator:comma "";
+  test ~__POS__ ~expected:[ "foo" ] ~separator:comma "foo";
+  test ~__POS__ ~expected:[ "foo" ] ~separator:comma "foo,";
+  test ~__POS__ ~expected:[ "foo" ] ~separator:comma " foo ";
+  test ~__POS__ ~expected:[ "foo" ] ~separator:comma "foo, ";
+  test ~__POS__ ~expected:[ "foo bar" ] ~separator:comma "foo bar";
+  test ~__POS__ ~expected:[ "foo"; "bar" ] ~separator:comma "foo,bar";
+  test ~__POS__ ~expected:[ "foo"; "bar"; "baz" ] ~separator:comma
+    "foo,  bar,baz"
+
 let mutil_arabian_romian () =
   let test a r =
     (Alcotest.check Alcotest.int)
@@ -504,6 +531,8 @@ let v =
       [
         Alcotest.test_case "Ext_string.contains" `Quick ext_string_contains;
         Alcotest.test_case "Ext_string.start_with" `Quick ext_string_start_with;
+        Alcotest.test_case "Ext_string.split_on_char" `Quick
+          ext_string_split_on_char;
       ] );
     ( "mutil",
       [

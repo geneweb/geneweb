@@ -2424,6 +2424,20 @@ let strip_trailing_spaces s =
   in
   String.sub s 0 len
 
+let authorized_client_preference_keys =
+  [
+    "default_landing";
+    "long_date";
+    "module_parent";
+    "module_union";
+    "module_freresoeur";
+    "module_famille";
+    "module_relations";
+    "module_notes";
+    "module_sources";
+    "module_arbre";
+  ]
+
 let read_base_env ~bname =
   let fname = GWPARAM.bpath (bname ^ ".gwf") in
   try
@@ -2434,7 +2448,12 @@ let read_base_env ~bname =
         | s ->
             let s = strip_trailing_spaces s in
             if s = "" || s.[0] = '#' then loop env
-            else loop (cut_at_equal 0 s :: env)
+            else
+              let setting = cut_at_equal 0 s in
+              loop
+                (if List.mem (fst setting) authorized_client_preference_keys
+                then env
+                else setting :: env)
         | exception End_of_file -> env
       in
       loop []
