@@ -1,17 +1,6 @@
 (* $Id: updateFam.ml,v 5.24 2008-01-09 03:34:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* TODO this is defined 2 times *)
-type create_info = Update.create_info = {
-  ci_birth_date : Date.date option;
-  ci_birth_place : string;
-  ci_death : Def.death;
-  ci_death_date : Date.date option;
-  ci_death_place : string;
-  ci_occupation : string;
-  ci_public : bool;
-}
-
 let default_source conf =
   match Util.p_getenv conf.Config.env "dsrc" with Some s -> s | None -> ""
 
