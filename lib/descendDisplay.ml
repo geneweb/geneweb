@@ -1398,7 +1398,7 @@ let print conf base p =
     | Some ("F" | "L" | "M") -> "deslist"
     | Some "I" -> "destable"
     | Some _ -> ""
-    | _ -> "desmenu"
+    | None -> "desmenu"
   in
   if templ <> "" then Perso.interp_templ templ conf base p
   else
