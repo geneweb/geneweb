@@ -1,4 +1,4 @@
-/* ========== POSITIONNEMENT PRINCIPAL ========== */
+/* ========== PANNEAU DE CONTRÔLES PRINCIPAL ========== */
 .fanchart-controls {
   position: absolute;
   left: 8px;
@@ -19,7 +19,7 @@
   transition: all 0.3s ease;
 }
 
-/* ========== STRUCTURE INTERNE ========== */
+/* ========== STRUCTURE DES CONTRÔLES ========== */
 .control-header {
   display: flex;
   justify-content: space-between;
@@ -42,7 +42,7 @@
   padding-bottom: 2px;
 }
 
-/* ========== BOUTONS ========== */
+/* ========== BOUTONS DE CONTRÔLE ========== */
 .btn-fanchart {
   padding: 3px 6px;
   border-radius: 4px;
@@ -58,6 +58,12 @@
   justify-content: center;
   text-decoration: none;
   cursor: pointer;
+}
+
+.btn-fanchart:hover {
+  background: #e7f3ff;
+  border-color: #007bff;
+  color: #007bff;
 }
 
 .btn-fanchart.active,
@@ -78,16 +84,9 @@
 .btn-fanchart.disabled:hover {
   background: #f8f9fa;
   border-color: #dee2e6;
-  color: #6c757d;
+  color: #adb5bd;
 }
 
-.btn-fanchart.btn-toggle.active {
-  background: #007bff;
-  border-color: #007bff;
-  color: white;
-}
-
-/* Bouton X */
 .btn-close {
   position: absolute;
   bottom: 4px;
@@ -111,6 +110,7 @@
   gap: 3px;
 }
 
+/* ========== TOGGLES D'ÉVÉNEMENTS ========== */
 .event-toggles {
   display: flex;
   gap: 1px;
@@ -147,22 +147,22 @@
   color: white;
 }
 
+/* ========== VARIABLES ET CONFIGURATION GLOBALE ========== */
 :root {
   --fc-stroke-width: 0.1%;
   --fc-stroke-dasharray: 5px;
 }
 
+/* ========== STYLES D'IMPRESSION ========== */
 @media print {
   .noprint {
     display: none;
   }
-  #place_list {
-    position: static;
-  }
 }
 
+/* ========== STYLES SVG DE BASE ========== */
 svg .highlight {
- fill: lightgrey !important;
+  fill: lightgrey !important;
 }
 
 svg .highlight .text {
@@ -170,56 +170,32 @@ svg .highlight .text {
 }
 
 svg .text_highlight {
- fill: black !important;
+  fill: black !important;
 }
 
 svg .same_hl .bg {
- fill: lightgrey !important;
+  fill: lightgrey !important;
 }
+
 svg .same_hl .text {
- fill: black !important;
+  fill: black !important;
 }
 
-/* places list */
-body:not(.places-list) #places-list {
-  display: none;
-}
-
-#places-list {
- overflow: scroll;
- height: 100%;
- width: var(--fc-tool-size, 18%);
- white-space: nowrap;
-}
-/*
-#places-list>ul>li {
- font-size: 70%;
-}
-*/
-
-ul {
- list-style: none;
- margin: 0;
- margin-left: 5px;
- margin-top: 5px;
- padding: 0;
-}
+/* ========== VISIBILITÉ DES PANNEAUX ========== */
 .hidden {
   visibility: hidden;
 }
 
-/* Place hilight */
-body.place_hl .square, .square {
-  display: none;
+/* ========== COLORISATION PAR LIEUX (CONSERVÉ POUR COMPATIBILITÉ) ========== */
+body.place_color .square { 
+  display: inline; 
+  color: transparent; 
 }
 
-/* Colorise places */
-body.place_color .square { display: inline; color: transparent; }
-
-/* death age */
+/* ========== PANNEAU DES ÂGES AU DÉCÈS ========== */
 #death-age {
   position: absolute;
-  top: 10;
+  top: 10px;
   right: 0;
   font-size: 18px;
   transform: translateX(-175%);
@@ -230,25 +206,47 @@ body.place_color .square { display: inline; color: transparent; }
   gap: 20px;
 }
 
-/* === PALETTE ACCESSIBLE BLEU/ROSE (RECOMMANDÉE WCAG) === */
-/* Âges au décès - Dégradé BLEU (hsl 210° - bleu accessible) */
-body.death-age svg .DA0 { fill: hsl(210, 100%, 80%) }  /* Bleu très clair */
-body.death-age svg .DA1 { fill: hsl(210, 100%, 85%) }  /* Bleu clair */
-body.death-age svg .DA2 { fill: hsl(210, 100%, 80%) }  /* Bleu moyen-clair */
-body.death-age svg .DA3 { fill: hsl(210, 100%, 75%) }  /* Bleu moyen */
-body.death-age svg .DA4 { fill: hsl(210, 100%, 70%) }  /* Bleu */
-body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }  /* Bleu foncé */
-body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }  /* Bleu plus foncé */
+body:not(.death-age) #death-age {
+  display: none;
+}
 
-/* Durées de mariage - Dégradé ROSE (hsl 330° - rose accessible) */
-/* Commence à 85% pour éviter le "trop blanc" */
-body.death-age svg .DAM0 { fill: hsl(330, 100%, 85%) } /* Rose clair mais visible */
-body.death-age svg .DAM1 { fill: hsl(330, 100%, 80%) } /* Rose */
-body.death-age svg .DAM2 { fill: hsl(330, 100%, 75%) } /* Rose moyen */
-body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) } /* Rose foncé */
-body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) } /* Rose très foncé */
-body.death-age svg .DAM5 { fill: hsl(330, 100%, 60%) } /* Magenta clair */
-body.death-age svg .DAM6 { fill: hsl(330, 100%, 55%) } /* Magenta */
+#death-age li {
+  cursor: pointer;
+  user-select: none;
+}
+
+#death-age li:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.arrow {
+  color: #F4F4F4;
+}
+
+body.death-age .hl .arrow {
+  color: lightgrey;
+  cursor: pointer;
+}
+
+/* ========== PALETTE DE COULEURS - ÂGES AU DÉCÈS ========== */
+/* Dégradé BLEU (hsl 210°) pour les âges */
+body.death-age svg .DA0 { fill: hsl(210, 100%, 80%) }
+body.death-age svg .DA1 { fill: hsl(210, 100%, 85%) }
+body.death-age svg .DA2 { fill: hsl(210, 100%, 80%) }
+body.death-age svg .DA3 { fill: hsl(210, 100%, 75%) }
+body.death-age svg .DA4 { fill: hsl(210, 100%, 70%) }
+body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }
+body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }
+
+/* Dégradé ROSE (hsl 330°) pour les durées de mariage */
+body.death-age svg .DAM0 { fill: hsl(330, 100%, 85%) }
+body.death-age svg .DAM1 { fill: hsl(330, 100%, 80%) }
+body.death-age svg .DAM2 { fill: hsl(330, 100%, 75%) }
+body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) }
+body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) }
+body.death-age svg .DAM5 { fill: hsl(330, 100%, 60%) }
+body.death-age svg .DAM6 { fill: hsl(330, 100%, 55%) }
 
 /* Couleurs correspondantes pour la légende */
 body.death-age span.DA0 { color: hsl(210, 100%, 90%) }
@@ -267,220 +265,82 @@ body.death-age span.DAM4 { color: hsl(330, 100%, 60%) }
 body.death-age span.DAM5 { color: hsl(330, 100%, 55%) }
 body.death-age span.DAM6 { color: hsl(330, 100%, 50%) }
 
-body:not(.death-age) #death-age {
-  display: none;
-}
-
-#death-age li {
-  cursor: pointer;
-  user-select: none;
-}
-#death-age li:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-}
-.arrow {
-  color: #F4F4F4;
-}
-body.death-age .hl .arrow {
-  color: lightgrey;
-  cursor: pointer;
-}
-
+/* ========== STYLES GÉNÉRAUX DU FANCHART ========== */
 body {
   margin: 0;
   padding: 0;
+}
+
+svg {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 svg .link {
   cursor: pointer;
 }
 
+/* ========== STYLES DES ÉLÉMENTS SVG ========== */
 path {
- stroke: transparent;
- stroke-width: var(--fc-stroke-width);
- fill: transparent;
+  stroke: transparent;
+  stroke-width: var(--fc-stroke-width);
+  fill: transparent;
 }
-circle, path.contour {
- stroke: #A0A0A0;
- stroke-width: var(--fc-stroke-width);
- fill: transparent;
+
+circle, 
+path.contour {
+  stroke: #A0A0A0;
+  stroke-width: var(--fc-stroke-width);
+  fill: transparent;
 }
+
 path.middle {
- stroke: #A0A0A0;
- stroke-dasharray: var(--fc-stroke-dasharray);
- stroke-width: var(--fc-stroke-width);
- fill: transparent;
+  stroke: #A0A0A0;
+  stroke-dasharray: var(--fc-stroke-dasharray);
+  stroke-width: var(--fc-stroke-width);
+  fill: transparent;
 }
+
 text {
- fill: black;
- text-anchor: middle;
+  fill: black;
+  text-anchor: middle;
 }
+
 textPath {
- dominant-baseline: central;
+  dominant-baseline: central;
 }
-.dates { font-size: 80%; }
+
+.dates { 
+  font-size: 80%; 
+}
+
 .none {
- display: none;
+  display: none;
 }
 
 .icon {
- fill: transparent;
+  fill: transparent;
 }
+
 .icon:hover {
- fill: green;
+  fill: green;
 }
 
 .no-link {
- fill: transparent;
+  fill: transparent;
 }
+
 .no-link:hover {
- fill: brown;
+  fill: brown;
 }
 
 #standard {
- font-size: 100%;
- fill: transparent;
+  font-size: 100%;
+  fill: transparent;
 }
 
-#places-list {
-  display: flex;
-  flex-direction: column;
-}
-
-#places-header {
-  flex-shrink: 0;
-  margin-top: 4px;
-  padding-left: 4px;
-  margin-bottom: 4px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-#places-list li span[id^="bi-"],
-#places-list li span[id^="ba-"],
-#places-list li span[id^="ma-"],
-#places-list li span[id^="de-"],
-#places-list li span[id^="bu-"] {
-  display: inline-block;
-  width: 12px;
-  text-align: center;
-  margin-right: 2px;
-  font-size: 16px;
-}
-
-
-#places-list li .square {
-  margin-left: 4px;
-}
-
-#places-list li {
-  cursor: pointer;
-  border-left: 4px solid transparent;
-  padding-left: 4px;
-  position: relative;
-}
-
-#places-list li:hover {
-  background-color: #fff3cd !important;
-  border-left: 4px solid #ffc107 !important;
-}
-
-#places-list li > * {
-  pointer-events: none;
-}
-
-#places-list li.location-highlighted {
-  background-color: #fff3cd !important;
-  border-left: 4px solid #ffc107 !important;
-}
-
-#places-list {
- position: absolute;
- right: 0;
- top: 0;
-}
-
-
-#places-list li.sublocation {
-  padding-left: 16px;
-}
-
-#places-list li.sublocation .square {
-  margin-left: 4px;
-}
-
-.sublocation-indicator {
-  color: #999;
-  font-family: monospace;
-  margin-left: 8px;
-  margin-right: 2px;
-}
-
-
-svg {
- position: absolute;
- left: 0;
- top: 0;
-}
-
-#buttons {
- position: absolute;
- left: 0;
- top: 0;
- z-index: 1;
- margin: 2px;
-}
-.button {
- font-size: 140%;
- text-align: center;
-}
-.button:hover {
- cursor: pointer;
-}
-.disabled {
-  color: lightgrey;
-}
-
-/.btn-fanchart.active {
-  background: #007bff !important;
-  border-color: #007bff;
-  color: white;
-}
-
-.btn-fanchart.active:hover {
-  background: #0056b3 !important;
-  border-color: #0056b3;
-  color: white;
-}
-
-
-body:not(.place_color) .event-toggles,
-body:not(.place_color) #b-sort-places {
-  display: none !important;
-}
-
-svg.serif text {
-  font-family: Georgia, "Times New Roman", serif ;
-}
-
-svg.large text {
-  font-size: 105%;
-}
-
-svg.mono text {
-  font-family: monospace, "Courier New", Courier;
-  font-size: 90%;
-}
-
-/* Police optimisée pour la lisibilité */
-svg.readable text {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 90%;
-  letter-spacing: 0.4px;
-}
-
-/* Panneau d'aide navigation */
+/* ========== PANNEAU DE NAVIGATION ========== */
 #navigation-help {
   position: absolute;
   top: 8px;
@@ -504,10 +364,12 @@ svg.readable text {
   margin-bottom: 4px;
 }
 
+/* ========== CONTENEUR PRINCIPAL ========== */
 #fanchart-container {
   position: relative;
 }
 
+/* ========== PANNEAU D'IDENTITÉ ========== */
 .identity-panel {
   position: absolute;
   top: 0px;
@@ -518,10 +380,6 @@ svg.readable text {
   display: none;
   z-index: 10;
   font-size: 1.1rem;
-}
-
-body.places-list .identity-panel {
-  right: calc(var(--fc-tool-size, 18%) + 20px);
 }
 
 .identity-panel h2 {
@@ -541,32 +399,28 @@ body.places-list .identity-panel {
   margin: 1rem 0;
 }
 
-/* ========== ANGLE D'OUVERTURE ========== */
-/* Styles pour les boutons d'angle */
+/* ========== STYLES D'ANGLE D'OUVERTURE ========== */
 .btn-fanchart[id^="b-angle-"] {
   position: relative;
   transition: all 0.3s ease;
 }
 
-/* Animation de transition lors du changement d'angle */
 svg#fanchart {
   transition: viewBox 0.3s ease-out;
 }
 
-/* Ajustements visuels selon l'angle */
-/* Vue compacte 180° - textes plus petits pour compenser la compression */
+/* Vue compacte 180° */
 body[data-angle="180"] svg text {
   font-size: 95%;
 }
 
-/* Vue étendue 260° - espacement supplémentaire */
+/* Vue étendue 260° */
 body[data-angle="260"] svg text {
   letter-spacing: 0.3px;
 }
 
-/* Styles responsifs pour petits écrans */
+/* Responsive mobile */
 @media (max-width: 768px) {
-  /* Sur mobile, forcer l'angle compact par défaut */
   .btn-fanchart[id="b-angle-260"] {
     display: none;
   }
@@ -582,23 +436,7 @@ body[data-angle="260"] svg text {
   to { opacity: 1; }
 }
 
-#b-angle-toggle .angle-indicator {
-  font-size: 10px;
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  background: #007bff;
-  color: white;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-/* Bouton mode circulaire */
+/* ========== MODE CIRCULAIRE ========== */
 #b-circular-mode {
   transition: all 0.3s ease;
 }
@@ -617,12 +455,7 @@ body[data-angle="260"] svg text {
   to { transform: rotate(360deg); }
 }
 
-/* Ajustements visuels en mode circulaire */
-body[data-mode="circular"] svg text {
-  /* Les textes dans l'hémisphère sud peuvent nécessiter une rotation */
-}
-
-/* Indicateur visuel de séparation des lignées */
+/* Indicateur de séparation des lignées */
 body[data-mode="circular"] .lineage-separator {
   stroke: #ccc;
   stroke-width: 1px;
@@ -633,18 +466,12 @@ body[data-mode="circular"] .lineage-separator {
 /* Mise en évidence des lignées au survol */
 body[data-mode="circular"] .paternal-highlight {
   opacity: 0.3;
-  fill: #4169E1; /* Bleu royal pour la lignée paternelle */
+  fill: #4169E1;
 }
 
 body[data-mode="circular"] .maternal-highlight {
   opacity: 0.3;
-  fill: #DC143C; /* Cramoisi pour la lignée maternelle */
-}
-
-/* Adaptation de la légende en mode circulaire */
-body[data-mode="circular"] #places-list {
-  max-height: calc(100vh - 20px);
-  overflow-y: auto;
+  fill: #DC143C;
 }
 
 /* Désactivation visuelle des contrôles d'angle en mode circulaire */
@@ -670,15 +497,6 @@ body[data-mode="circular"] #fanchart-container {
   100% { opacity: 1; }
 }
 
-/* Styles pour la rotation interactive (futur) */
-body[data-mode="circular"][data-rotating="true"] {
-  cursor: grab;
-}
-
-body[data-mode="circular"][data-rotating="true"]:active {
-  cursor: grabbing;
-}
-
 /* Indicateurs de lignée dans le panneau d'info */
 .identity-panel .lineage-indicator {
   display: inline-block;
@@ -696,4 +514,688 @@ body[data-mode="circular"][data-rotating="true"]:active {
 .identity-panel .lineage-indicator.maternal {
   background: #FFE6E6;
   color: #DC143C;
+}
+
+/* ========== VARIANTES DE POLICE ========== */
+svg.serif text {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+svg.large text {
+  font-size: 105%;
+}
+
+svg.mono text {
+  font-family: monospace, "Courier New", Courier;
+  font-size: 90%;
+}
+
+svg.readable text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 90%;
+  letter-spacing: 0.4px;
+}
+
+/* ========== VISIBILITÉ CONDITIONNELLE DES CONTRÔLES ========== */
+body:not(.place_color) .event-toggles,
+body:not(.place_color) #b-sort-places {
+  display: none !important;
+}
+
+/* ===== STYLES DU PANNEAU DES LIEUX À PORTER DANS FANCHART.CSS ===== */
+
+/* Variables CSS à ajouter dans :root */
+:root {
+  --panel-offset: 64px;
+  --panel-border: 1px solid rgba(0,0,0,0.08);
+  --place-height-compact: 26px;
+}
+
+/* ===== PANNEAU PRINCIPAL ===== */
+body:not(.place_color) .places-panel {
+  display: none;
+}
+
+.places-panel {
+  display: flex;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  width: 340px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(15px);
+  box-shadow: -3px 0 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER DU PANNEAU ===== */
+.places-header {
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: var(--panel-offset);
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.places-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.generation-count {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.panel-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.panel-close:hover {
+  opacity: 0.8;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+
+/* ===== SECTION CONTRÔLES & RECHERCHE ===== */
+.controls-search-section {
+  padding: 5px;
+  background: rgba(248, 249, 250, 0.95);
+  border-bottom: var(--panel-border);
+  border-left: var(--panel-border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: var(--panel-offset);
+}
+
+.places-panel.show-events .controls-search-section {
+  border-bottom: none;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-input {
+  width: 93%;
+  flex: 1;
+  padding: 3px 6px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 11px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+}
+
+.search-clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.search-clear:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.controls-buttons {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.sort-toggle, .events-toggle {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 3px 5px;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #495057;
+  width: 26px;
+  height: 22px;
+  outline: none;
+}
+
+.sort-toggle:hover, .events-toggle:hover {
+  background: #e7f3ff;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.sort-toggle.active, .events-toggle.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* ===== SECTION RÉSUMÉ ===== */
+.summary-section {
+  padding: 4px 4px 4px 8px;
+  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  display: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  flex-shrink: 0;
+  margin-left: var(--panel-offset);
+  border-left: var(--panel-border);
+  border-bottom: var(--panel-border);
+  transition: all 0.2s ease;
+}
+
+.places-panel.show-events .summary-section {
+  display: flex;
+  padding-top: 2px;
+}
+
+.summary-helper-icon {
+  color: #17a2b8;
+  font-size: 10px;
+  flex-shrink: 0;
+  cursor: help;
+  opacity: 0.8;
+}
+
+.summary-helper-icon:hover {
+  opacity: 1;
+}
+
+.summary-places-info {
+  font-weight: 600;
+  color: #495057;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.summary-events-table {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 4px;
+  align-items: end;
+  font-size: 10px;
+}
+
+.summary-event-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.summary-event-count {
+  font-weight: 700;
+  color: #495057;
+}
+
+.summary-event-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 9px;
+  background: white;
+  cursor: help;
+  box-sizing: border-box;
+}
+
+.places-panel.show-events .summary-event-label.birth-label {
+  background: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.places-panel.show-events .summary-event-label.baptism-label {
+  background: #66BB6A;
+  color: white;
+  border-color: #66BB6A;
+}
+
+.places-panel.show-events .summary-event-label.marriage-label {
+  background: #E67E22;
+  color: white;
+  border-color: #E67E22;
+}
+
+.places-panel.show-events .summary-event-label.death-label {
+  background: #757575;
+  color: white;
+  border-color: #757575;
+}
+
+.places-panel.show-events .summary-event-label.burial-label {
+  background: #9E9E9E;
+  color: white;
+  border-color: #9E9E9E;
+}
+
+.summary-event-label {
+  transition: all 0.2s ease;
+}
+
+.summary-total-events {
+  background: #ffffff;
+  color: #495057;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 20px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: help;
+}
+
+/* ===== CONTENEUR DE LA LISTE ===== */
+.places-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.places-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  padding-bottom: 0;
+}
+
+.places-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.places-list::-webkit-scrollbar-thumb {
+  background: rgba(40, 167, 69, 0.4);
+  border-radius: 3px;
+}
+
+.places-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(40, 167, 69, 0.6);
+}
+
+/* ===== LIGNE DE LIEU ===== */
+.place-row {
+  display: flex;
+  align-items: center;
+  min-height: var(--place-height-compact);
+}
+
+.place-row.tall-row {
+  display: flex;
+  align-items: stretch;
+}
+
+/* ===== INDICATEURS D'ÉVÉNEMENTS ===== */
+.place-indicators {
+  width: 60px;
+  height: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  gap: 2px;
+  min-height: var(--place-height-compact);
+}
+
+.place-row.tall-row .place-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  width: 60px;
+  height: 42px;
+  align-content: center;
+  justify-content: flex-end;
+  padding: 2px 4px;
+  gap: 2px;
+}
+
+.line-break {
+  flex-basis: 100%;
+  height: 0;
+  width: 0;
+}
+
+.place-row.tall-row .place-content {
+  min-height: 42px;
+  align-items: center;
+  display: grid;
+  align-content: center;
+}
+
+/* ===== INDICATEUR INDIVIDUEL ===== */
+.indicator {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1px;
+}
+
+/* Couleurs des indicateurs */
+.indicator.n { background: #4CAF50; } /* Vert nature - naissance */
+.indicator.b { background: #66BB6A; } /* Vert clair - baptême */
+.indicator.m { background: #E67E22; } /* Orange - mariage */
+.indicator.d { background: #757575; } /* Gris - décès */
+.indicator.s { background: #9E9E9E; } /* Gris clair - sépulture */
+
+/* ===== CONTENU DU LIEU ===== */
+.place-content {
+  flex: 1;
+  padding: 0px 2px 0px 6px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-height: var(--place-height-compact);
+  border-left: 1px solid #dee2e6;
+}
+
+.place-content:hover {
+  background: rgba(40, 167, 69, 0.08);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-top: -1px;
+  margin-bottom: -1px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.places-panel.show-events .place-content {
+  border-top: none;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-top: 0px;
+  margin-bottom: -1px;
+  min-height: 30px;
+  padding: 3px 2px 3px 4px;
+}
+
+.places-panel.show-events .place-row:nth-child(even) .place-content {
+  background: linear-gradient(to right,
+    rgba(255,255,255,0) 0%,
+    rgba(240,242,245,0.6) 80%);
+}
+
+.places-panel.show-events .place-row:nth-child(odd) .place-content:hover {
+  background: linear-gradient(to right,
+    rgba(40, 167, 69, 0.06) 0%,
+    rgba(40, 167, 69, 0.10) 80%);
+}
+
+.places-panel.show-events .place-row:nth-child(even) .place-content:hover {
+  background: linear-gradient(to right,
+    rgba(40, 167, 69, 0.08) 0%,
+    rgba(40, 167, 69, 0.18) 80%);
+}
+
+.place-row:last-child .place-content {
+  border-bottom: var(--panel-border);
+}
+
+.place-content.person-match {
+  background: rgba(40, 167, 69, 0.08) !important;
+  border-bottom: var(--panel-border);
+  margin-bottom: -1px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.place-content.grayed-out {
+  opacity: 0.35;
+}
+
+.place-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.place-right {
+  display: flex;
+  align-items: center;
+}
+
+.place-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.place-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: #495057;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.place-content:hover .place-name,
+.place-content.person-match .place-name,
+.places-panel.show-events .place-name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  font-weight: 600;
+}
+
+.place-events {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 6px;
+  color: #95989b;
+}
+
+.place-content:hover .place-events,
+.places-panel.show-events .place-events {
+  display: flex !important;
+}
+
+.event-item {
+  display: none;
+  align-items: baseline;
+  gap: 3px;
+  min-width: 36px;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  font-family: monospace;
+}
+
+.event-item.active {
+  display: flex;
+}
+
+.event-count {
+  font-weight: 700;
+  font-size: 9px;
+  text-align: right;
+  min-width: 12px;
+}
+
+.event-label {
+  font-weight: 600;
+  font-size: 8px;
+  text-transform: uppercase;
+  width: 8px;
+  text-align: left;
+}
+
+.place-count {
+  font-size: 8px;
+  color: #495057;
+  background: #f1f3f4;
+  padding: 0px 3px;
+  border-radius: 4px;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #e8eaed;
+  box-sizing: border-box;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.places-panel.show-events .place-row:nth-child(odd) .place-count {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.places-panel.show-events .place-row:nth-child(even) .place-count {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+/* ===== SOUS-LIEUX ===== */
+.place-content.sublocation .place-name {
+  padding-left: 14px;
+  position: relative;
+}
+
+.place-content.sublocation .place-name::before {
+  content: "└ ";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* ===== PALETTE DE COULEURS POUR LIEUX ===== */
+.color-1 { background: hsl(0, 60%, 65%); }
+.color-2 { background: hsl(20, 60%, 65%); }
+.color-3 { background: hsl(40, 60%, 65%); }
+.color-4 { background: hsl(60, 60%, 65%); }
+.color-5 { background: hsl(80, 60%, 65%); }
+.color-6 { background: hsl(100, 60%, 65%); }
+.color-7 { background: hsl(120, 60%, 65%); }
+.color-8 { background: hsl(140, 60%, 65%); }
+.color-9 { background: hsl(160, 60%, 65%); }
+.color-10 { background: hsl(180, 60%, 65%); }
+.color-11 { background: hsl(200, 60%, 65%); }
+.color-12 { background: hsl(220, 60%, 65%); }
+
+/* ===== SECTIONS D'OVERFLOW ===== */
+.overflow-section {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  max-height: 200px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.overflow-section.above {
+  top: 0;
+  flex-direction: column-reverse;
+}
+
+.overflow-section.below {
+  bottom: 0;
+  flex-direction: column;
+}
+
+.overflow-header {
+  background: #28a745;
+  color: white;
+  padding: 1px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-left: 52px;
+}
+
+.overflow-content {
+  max-height: 170px;
+  overflow-y: auto;
+  padding: 0;
+  background: white;
+}
+
+.overflow-content::-webkit-scrollbar {
+  width: 0px;
 }

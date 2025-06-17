@@ -1,6 +1,5 @@
 const root = document.documentElement;
 const fanchart = document.getElementById("fanchart");
-const places_list = document.getElementById("places_list");
 const pixel = document.getElementById("pixel").getContext("2d", { willReadFrequently: true });
 var sheet;
 for (var i in document.styleSheets) {
@@ -13,11 +12,33 @@ var standard, standard_width;
 var center_x, center_y, svg_w, svg_h;
 var max_gen_loaded; // Génération max disponible en "mémoire"
 var max_gen, max_r;
-var lieux = {};
-var lieux_a = [];
 var sortMode = "frequency";
 var has_bi = false, has_ba = false, has_ma = false, has_de = false, has_bu = false;
 var svg_viewbox_x = 0, svg_viewbox_y = 0, svg_viewbox_w = 0, svg_viewbox_h = 0;
+
+// ========== CONSTANTES D'ÉVÉNEMENTS ==========
+const EVENT_CONFIG = {
+  // Mapping événement → classe courte
+  eventToClass: {
+    'birth': 'n',
+    'baptism': 'b',
+    'marriage': 'm',
+    'death': 'd',
+    'burial': 's'
+  },
+
+  // Mapping événement → label
+  eventToLabel: {
+    'birth': 'N',
+    'baptism': 'B',
+    'marriage': 'M',
+    'death': 'D',
+    'burial': 'S'
+  },
+
+  // Ordre d'affichage des événements
+  eventOrder: ['birth', 'baptism', 'marriage', 'death', 'burial']
+};
 
 // ====== Configuration =======
 const CONFIG = {
@@ -31,9 +52,60 @@ const CONFIG = {
   text_reduction_factor: 0.9,
   svg_margin: 5
 };
+
 let isCircularMode = false;
 let renderTarget = null; // Cible de rendu actuelle (null = fanchart direct)
 let current_angle = CONFIG.default_angle;
+
+const DOMCache = {
+  // Cache pour les éléments individuels
+  elements: {},
+
+  // Cache pour les collections d'éléments par classe
+  collections: {},
+
+  // Récupérer un élément par ID avec mise en cache
+  getElementById: function(id) {
+    if (!this.elements[id]) {
+      this.elements[id] = document.getElementById(id);
+    }
+    return this.elements[id];
+  },
+
+  // Récupérer des éléments par classe avec mise en cache
+  getElementsByClassName: function(className) {
+    if (!this.collections[className]) {
+      // Convertir en Array pour avoir une référence stable
+      this.collections[className] = Array.from(document.getElementsByClassName(className));
+    }
+    return this.collections[className];
+  },
+
+  // Invalider le cache quand le DOM change
+  invalidate: function(type = 'all') {
+    if (type === 'all') {
+      this.elements = {};
+      this.collections = {};
+    } else if (type === 'collections') {
+      this.collections = {};
+    }
+  },
+
+  // Pré-charger les éléments fréquemment utilisés
+  preload: function() {
+    // Boutons fréquemment utilisés
+    ["b-death-age", "b-places-colorise", "b-sort-places"].forEach(id => {
+      this.getElementById(id);
+    });
+    // s indicateurs d'âge et de mariage
+    ["DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6"].forEach(id => {
+      this.getElementById(id);
+    });
+    ["DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6"].forEach(id => {
+      this.getElementById(id);
+    });
+  }
+};
 
 const LayoutCalculator = {
   /**
@@ -42,10 +114,10 @@ const LayoutCalculator = {
    */
   calculatePlacesListWidth: function() {
     // Si pas de liste de lieux, retourner une largeur minimale
-    if (!document.body.classList.contains('places-list')) {
+    if (!document.body.classList.contains('place_color')) {
       return 0;
     }
-    
+
     // Créer un élément de mesure temporaire
     const measurer = document.createElement('div');
     measurer.style.cssText = `
@@ -56,39 +128,39 @@ const LayoutCalculator = {
       font-size: inherit;
     `;
     document.body.appendChild(measurer);
-    
+
     let maxWidth = 200; // Largeur minimale par défaut
-    
+
     // Mesurer chaque lieu
     lieux_a.forEach(([placeName, data]) => {
       // Construire le texte complet comme il apparaîtra
       let text = '';
-      
+
       // Indicateurs d'événements (N B M D S)
       if (has_bi && data.bi) text += 'N ';
       if (has_ba && data.ba) text += 'B ';
       if (has_ma && data.ma) text += 'M ';
       if (has_de && data.de) text += 'D ';
       if (has_bu && data.bu) text += 'S ';
-      
+
       // Carré coloré et nom du lieu
       text += '■ ' + placeName;
-      
+
       measurer.textContent = text;
       const width = measurer.offsetWidth;
-      
+
       if (width > maxWidth) {
         maxWidth = width;
       }
     });
-    
+
     // Nettoyer
     document.body.removeChild(measurer);
-    
+
     // Ajouter des marges (padding, scrollbar, etc.)
     return maxWidth + 40; // 20px de chaque côté pour le confort
   },
-  
+
   /**
    * Calcule la largeur maximale disponible pour le fanchart
    * en tenant compte du contenu réel
@@ -96,18 +168,19 @@ const LayoutCalculator = {
   calculateMaxFanchartWidth: function() {
     const windowWidth = window.innerWidth;
     const placesListWidth = this.calculatePlacesListWidth();
-    
+
     // Pour le mode 359° (très carré), ajouter une marge à gauche
     const isSquareChart = (current_angle >= 310 || isCircularMode);
     const leftMargin = isSquareChart ? 150 : 0; // Espace pour les contrôles
-    
+
     // Calculer l'espace disponible
     const availableWidth = windowWidth - placesListWidth - leftMargin;
-    
+
     // S'assurer qu'on utilise au moins 50% de l'écran pour le graphique
     return Math.max(availableWidth, windowWidth * 0.5);
   }
 };
+
 
 
 // ========== Utilitaires généraux ==========
@@ -117,17 +190,17 @@ const Utils = {
     let params = ['m=A', 't=FC', `p=${p.fnk}`, `n=${p.snk}`];
     if (p.oc) params.push(`oc=${p.oc}`);
     params.push(`v=${max_gen}`);
-    
+
     // Seulement les paramètres non-défaut
     if (isCircularMode) params.push('mode=couple');
     else if (current_angle !== 220) params.push(`angle=${current_angle}`);
-    
+
     if (tool) params.push(`tool=${tool}`);
     if (implexMode === 'numbered') params.push('implex=num');
     else if (implexMode === 'full') params.push('implex=full');
     if (has_ba) params.push('ba=on');
     if (has_bu) params.push('bu=on');
-    
+
     return link_to_person + params.join('&');
   },
 
@@ -183,6 +256,1046 @@ const Utils = {
   },
 };
 
+// ========== Module de construction des données de lieux ==========
+const LocationDataBuilder = {
+  /**
+   * Fonction principale qui orchestre toute la construction des données de lieux
+   * @param {number} maxGeneration - Génération maximum à considérer (optionnel, utilise max_gen par défaut)
+   */
+  buildCompleteLocationData: function(maxGeneration = null) {
+    const targetGeneration = maxGeneration || max_gen;
+    console.log(`🏗️ Construction des données de lieux pour ${targetGeneration} génération(s)...`);
+
+    // Réinitialisation complète des structures globales existantes
+    this.resetLocationData();
+
+    // Filtrer les ancêtres selon la génération maximum
+    const filteredAncestors = this.filterAncestorsByGeneration(targetGeneration);
+    console.log(`📊 ${Object.keys(filteredAncestors).length} ancêtres retenus sur ${Object.keys(ancestor).length} disponibles`);
+
+    // Passe unique sur les ancêtres filtrés pour extraire les données de lieux
+    Object.values(filteredAncestors).forEach(person => {
+      this.processPersonAllLocations(person);
+    });
+
+    // Construction de l'array final pour les fonctions de tri et d'affichage
+    this.buildFinalLocationArray();
+
+    console.log(`✅ Analyse terminée : ${Object.keys(lieux).length} lieux trouvés, ${this.getTotalEvents()} événements`);
+  },
+
+  /**
+   * Filtre les ancêtres selon la génération maximum
+   */
+  filterAncestorsByGeneration: function(maxGeneration) {
+    const filteredAncestors = {};
+
+    // Calculer la plage de Sosa pour les générations à inclure
+    for (let gen = 1; gen <= maxGeneration; gen++) {
+      const startSosa = Math.pow(2, gen - 1);
+      const endSosa = Math.pow(2, gen) - 1;
+
+      for (let sosa = startSosa; sosa <= endSosa; sosa++) {
+        const key = "S" + sosa;
+        if (ancestor[key]) {
+          filteredAncestors[key] = ancestor[key];
+        }
+      }
+    }
+
+    return filteredAncestors;
+  },
+
+  /**
+   * Réinitialise toutes les structures de données globales
+   * Préserve la cohérence avec les variables existantes de fanchart.js
+   */
+  resetLocationData: function() {
+    // Structures principales (déjà déclarées globalement dans fanchart.js)
+    lieux = {};
+    lieux_a = [];
+
+    // Flags globaux existants (les remettre à false, ils seront recalculés)
+    has_bi = false;
+    has_ba = false;
+    has_ma = false;
+    has_de = false;
+    has_bu = false;
+  },
+
+  /**
+   * Traite tous les lieux associés à une personne donnée
+   * @param {Object} person - Objet personne de l'ancestor
+   */
+  processPersonAllLocations: function(person) {
+    // Définition des types de lieux à traiter (cohérent avec l'existant)
+    const locationTypes = [
+      { field: 'birth_place', eventType: 'bi' },
+      { field: 'baptism_place', eventType: 'ba' },
+      { field: 'marriage_place', eventType: 'ma' },
+      { field: 'death_place', eventType: 'de' },
+      { field: 'burial_place', eventType: 'bu' }
+    ];
+
+    locationTypes.forEach(({ field, eventType }) => {
+      if (person[field] && person[field].trim() !== '') {
+        this.processSingleLocation(person[field], eventType, person);
+      }
+    });
+  },
+
+  /**
+   * Traite un lieu spécifique pour un type d'événement donné
+   * @param {string} placeName - Nom du lieu brut
+   * @param {string} eventType - Type d'événement (bi, ba, ma, de, bu)
+   * @param {Object} person - Référence à la personne (pour de futures extensions)
+   */
+  processSingleLocation: function(placeName, eventType, person) {
+    // Nettoyage du nom de lieu (réutilise la logique existante de fanchart.js)
+    const cleanPlaceName = placeName.replace(/^\?, /, "");
+
+    // Analyse de la structure géographique du nom de lieu
+    const locationStructure = this.analyzeLocationName(cleanPlaceName);
+
+    // Initialisation de l'entrée si première occurrence de ce lieu
+    if (!lieux[cleanPlaceName]) {
+      lieux[cleanPlaceName] = this.createLocationEntry(cleanPlaceName, locationStructure);
+    }
+
+    // Mise à jour des compteurs et flags pour ce lieu
+    this.updateLocationCounters(lieux[cleanPlaceName], eventType);
+  },
+
+  /**
+   * Analyse la structure géographique d'un nom de lieu
+   * Extrait les sous-lieux et précisions géographiques de manière générique
+   * @param {string} placeName - Nom du lieu à analyser
+   * @returns {Object} Structure analysée du lieu
+   */
+  analyzeLocationName: function(placeName) {
+    const result = {
+      fullName: placeName,
+      isSubLocation: false,
+      subName: null,
+      parentLocation: null,
+      geographicPrecision: null
+    };
+
+    // Première étape : extraction de la précision géographique entre parenthèses
+    // Pattern : "Nom du lieu (Précision)" -> garde "Nom du lieu" et extrait "Précision"
+    const precisionPattern = /^(.+?)\s*\(([^)]+)\)\s*$/;
+    const precisionMatch = placeName.match(precisionPattern);
+
+    let nameWithoutPrecision = placeName;
+    if (precisionMatch) {
+      nameWithoutPrecision = precisionMatch[1].trim();
+      result.geographicPrecision = precisionMatch[2].trim();
+    }
+
+    // Deuxième étape : détection des sous-lieux avec séparateurs
+    // Pattern : "Sous-lieu – Lieu principal" ou variations avec — et -
+    const subLocationPattern = /^(.+?)\s+[–—-]\s+(.+)$/;
+    const subMatch = placeName.match(subLocationPattern);
+
+    if (subMatch) {
+      result.isSubLocation = true;
+      result.subName = subMatch[1].trim();
+      result.parentLocation = subMatch[2].trim();
+    }
+
+    return result;
+  },
+
+  /**
+   * Crée une nouvelle entrée de lieu avec toutes les métadonnées nécessaires
+   * @param {string} cleanPlaceName - Nom nettoyé du lieu
+   * @param {Object} locationStructure - Structure analysée du lieu
+   * @returns {Object} Entrée complète pour l'objet lieux
+   */
+  createLocationEntry: function(cleanPlaceName, locationStructure) {
+    return {
+      // Compteurs par type d'événement (pour les statistiques et l'affichage)
+      bi_count: 0,
+      ba_count: 0,
+      ma_count: 0,
+      de_count: 0,
+      bu_count: 0,
+
+      // Flags de présence d'événements (pour l'affichage conditionnel)
+      bi: false,
+      ba: false,
+      ma: false,
+      de: false,
+      bu: false,
+
+      // Compteur total consolidé
+      cnt: 0,
+
+      // Métadonnées géographiques extraites
+      isSubLocation: locationStructure.isSubLocation,
+      subName: locationStructure.subName,
+      parentLocation: locationStructure.parentLocation,
+      geographicPrecision: locationStructure.geographicPrecision,
+
+      // ID CSS (sera assigné lors de buildFinalLocationArray)
+      c: null,
+
+      // Données préparées pour le DOM futur (évite les recalculs)
+      domAttributes: {
+        'data-place': cleanPlaceName,
+        'data-is-sublocation': locationStructure.isSubLocation,
+        'data-events': [] // Sera rempli progressivement
+      }
+    };
+  },
+
+  /**
+   * Met à jour les compteurs et flags pour un lieu donné
+   * @param {Object} locationEntry - Entrée de lieu dans l'objet lieux
+   * @param {string} eventType - Type d'événement à incrémenter
+   */
+  updateLocationCounters: function(locationEntry, eventType) {
+    // Incrément du compteur spécifique à ce type d'événement
+    const countKey = eventType + '_count';
+    locationEntry[countKey]++;
+
+    // Activation du flag de présence pour ce type d'événement
+    locationEntry[eventType] = true;
+
+    // Incrément du compteur total pour ce lieu
+    locationEntry.cnt++;
+
+    // Mise à jour des data-attributes pour le DOM futur
+    if (!locationEntry.domAttributes['data-events'].includes(eventType)) {
+      locationEntry.domAttributes['data-events'].push(eventType);
+    }
+  },
+
+  /**
+   * Construit l'array final lieux_a et assigne les IDs CSS pour la colorisation
+   * Cette fonction transforme l'objet lieux en array utilisable par les fonctions de tri
+   */
+  buildFinalLocationArray: function() {
+    // Conversion de l'objet lieux en array de paires [nom, données]
+    lieux_a = Object.entries(lieux);
+
+    // Assignation des IDs CSS pour la colorisation (cohérent avec l'ancien système)
+    lieux_a.forEach(([placeName, locationData], index) => {
+      locationData.c = "L" + index;
+      // Mise à jour finale des data-attributes
+      locationData.domAttributes['data-total'] = locationData.cnt;
+    });
+  },
+
+  /**
+   * Fonction utilitaire pour obtenir le nombre total d'événements
+   * @returns {number} Nombre total d'événements tous lieux confondus
+   */
+  getTotalEvents: function() {
+    return Object.values(lieux).reduce((total, locationData) => total + locationData.cnt, 0);
+  },
+
+  /**
+   * Fonction utilitaire pour obtenir les statistiques par type d'événement
+   * @returns {Object} Statistiques détaillées par type
+   */
+  getEventStatistics: function() {
+    const stats = { births: 0, baptisms: 0, marriages: 0, deaths: 0, burials: 0 };
+
+    Object.values(lieux).forEach(locationData => {
+      stats.births += locationData.bi_count;
+      stats.baptisms += locationData.ba_count;
+      stats.marriages += locationData.ma_count;
+      stats.deaths += locationData.de_count;
+      stats.burials += locationData.bu_count;
+    });
+
+    return stats;
+  }
+};
+
+// ========== Interface du panneau des lieux ==========
+const ModernPlacesInterface = {
+  // Cache pour les éléments DOM fréquemment utilisés (optimisation)
+  elements: {
+    panel: null,
+    placesList: null,
+    template: null,
+    summaryPlaces: null,
+    summaryEventCounts: null,
+    summaryTotal: null
+  },
+
+  /**
+   * Initialisation du module - à appeler après LocationDataBuilder.buildCompleteLocationData()
+   * Cache les références DOM pour éviter les recherches répétées
+   */
+  initialize: function() {
+    console.log('🎨 Initialisation de l’interface des lieux…');
+
+    // Mise en cache des éléments DOM critiques pour la performance
+    this.elements.panel = document.querySelector('.places-panel');
+    this.elements.placesList = document.querySelector('.places-list');
+    this.elements.summaryPlaces = document.querySelector('.summary-places-info');
+    this.elements.summaryEventCounts = document.querySelectorAll('.summary-event-count');
+    this.elements.summaryTotal = document.querySelector('.summary-total-events');
+
+    // Vérification critique : est-ce que tous les éléments existent ?
+    if (!this.elements.placesList) {
+      console.error('❌ Éléments HTML requis manquants pour l’interface des lieux');
+      return false;
+    }
+
+    // Générer l'interface complète
+    this.generatePlacesList();
+    this.updateSummarySection();
+    this.initializeEventListeners();
+
+    console.log('✅ Interface des lieux initialisée');
+    return true;
+  },
+
+  /**
+   * Met à jour la section de résumé avec les statistiques calculées
+   * Utilise les données de LocationDataBuilder pour éviter les recalculs
+   */
+  updateSummarySection: function() {
+    // Mise à jour du nombre de génération en titre
+    const generationElement = this.elements.panel.querySelector('.generation-count');
+    if (generationElement) {
+      generationElement.textContent = `${max_gen} génération${max_gen > 1 ? 's' : ''}`;
+    }
+
+    // Mise à jour du nombre de lieux
+    const placeCount = Object.keys(lieux).length;
+    this.elements.summaryPlaces.textContent = `${placeCount} lieu${placeCount > 1 ? 'x' : ''}`;
+
+    // Récupération des statistiques pré-calculées
+    const stats = LocationDataBuilder.getEventStatistics();
+
+    // Injection des compteurs par type d'événement
+    // L'ordre suit celui défini dans le HTML : birth, baptism, marriage, death, burial
+    const counts = [stats.births, stats.baptisms, stats.marriages, stats.deaths, stats.burials];
+    this.elements.summaryEventCounts.forEach((element, index) => {
+      element.textContent = counts[index] || 0;
+    });
+
+    // Total général
+    const totalEvents = Object.values(stats).reduce((sum, count) => sum + count, 0);
+    this.elements.summaryTotal.textContent = totalEvents;
+  },
+
+
+ /* ========== ENRICHISSEMENT DES RÉFÉRENCES DOM ==========
+   TODO: write doc */
+  enrichLocationDataWithDOMReferences: function() {
+    console.log('🔗 Enrichissement des références DOM...');
+
+    let enrichedCount = 0;
+    let notFoundCount = 0;
+
+    // Pour chaque lieu dans l'objet lieux
+    Object.entries(lieux).forEach(([placeName, placeData]) => {
+      // Chercher l'élément DOM avec ce data-place
+      const element = document.querySelector(`.place-content[data-place="${CSS.escape(placeName)}"]`);
+
+      if (element) {
+        // Enrichir avec les références DOM
+        placeData.domElement = element;
+
+        // Obtenir l'index depuis data-index du parent
+        const row = element.closest('.place-row');
+        if (row) {
+          placeData.visualIndex = parseInt(row.dataset.index) || 0;
+
+          // Trouver l'élément indicateur
+          const indicatorElement = row.querySelector('.place-indicators');
+          if (indicatorElement) {
+            placeData.indicatorElement = indicatorElement;
+          }
+        }
+
+        enrichedCount++;
+      } else {
+        notFoundCount++;
+        console.warn(`❌ Élément DOM non trouvé pour : "${placeName}"`);
+      }
+    });
+
+    console.log(`✅ Enrichissement terminé : ${enrichedCount} lieux enrichis, ${notFoundCount} non trouvés`);
+
+    return {
+      enriched: enrichedCount,
+      notFound: notFoundCount,
+      total: Object.keys(lieux).length
+    };
+  },
+
+  placeRowTemplate: function(placeName, placeData, index) {
+    // Calculer l'index de couleur (rotation sur 12 couleurs)
+    const colorIndex = (index % 12) + 1;
+
+    // Préparer les attributs data-* en une seule chaîne
+    const dataAttributes = `
+      data-place="${placeName}"
+      data-place-class="${placeData.c || ''}"
+      data-total="${placeData.cnt || 0}"
+    `.trim();
+
+    // Template HTML complet
+    return `
+      <div class="place-row" data-index="${index}">
+        <div class="place-indicators" id="indic-${index}"></div>
+        <div class="place-content" id="place-${index}" ${dataAttributes}>
+          <div class="place-left">
+            <div class="place-color color-${colorIndex}"></div>
+            <div class="place-name">${this.formatPlaceName(placeName, placeData)}</div>
+          </div>
+          <div class="place-right">
+            <div class="place-events">
+              ${this.generateEventItemsHTML(placeData)}
+            </div>
+            <div class="place-count">${placeData.cnt || 0}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  formatPlaceName: function(placeName, placeData) {
+    if (sortMode === 'alphabetical' && placeData.isSubLocation) {
+      // Mode alphabétique : afficher le sous-nom avec indentation
+      const label = placeData.subName || placeName;
+      return `<span class="sublocation-indicator">└ </span>${label}`;
+    }
+    // Mode fréquence ou lieu principal : afficher le nom complet
+    return placeName;
+  },
+
+  generateEventItemsHTML: function(placeData) {
+    const events = [
+      { key: 'bi_count', type: 'birth', label: 'N' },
+      { key: 'ba_count', type: 'baptism', label: 'B' },
+      { key: 'ma_count', type: 'marriage', label: 'M' },
+      { key: 'de_count', type: 'death', label: 'D' },
+      { key: 'bu_count', type: 'burial', label: 'S' }
+    ];
+
+    return events.map(event => {
+      const count = placeData[event.key] || 0;
+      const isActive = count > 0 ? 'active' : '';
+
+      return `
+        <div class="event-item ${isActive}" data-event="${event.type}">
+          <span class="event-count">${count > 0 ? count : ''}</span>
+          <span class="event-label">${event.label}</span>
+        </div>
+      `;
+    }).join('');
+  },
+
+  /**
+   * Génère la liste complète des lieux en utilisant le template
+   * Question critique : le clonage est-il vraiment plus performant que innerHTML ?
+   * Réponse : Pour <150 éléments, la différence est négligeable, mais la maintenabilité est meilleure
+   */
+  generatePlacesList: function() {
+    console.log('📝 Génération de la liste des lieux...');
+
+    const container = document.querySelector('.places-list');
+    if (!container) {
+      console.error("❌ Container places-list introuvable");
+      return;
+    }
+
+    // Nettoyer le conteneur
+    container.innerHTML = "";
+
+    // Obtenir les lieux triés selon le mode actuel
+    const sortedPlaces = this.getSortedPlaces();
+
+    // Générer le HTML pour chaque lieu
+    let htmlBuffer = [];
+    sortedPlaces.forEach(([placeName, placeData], index) => {
+      const rowHtml = this.placeRowTemplate(placeName, placeData, index);
+      htmlBuffer.push(rowHtml);
+    });
+
+    // Injecter tout le HTML d'un coup (plus performant)
+    container.innerHTML = htmlBuffer.join('');
+
+    console.log(`✅ ${sortedPlaces.length} lieux générés dans le DOM`);
+
+    // Enrichir les références DOM maintenant que le HTML existe
+    this.enrichLocationDataWithDOMReferences();
+  },
+
+  /**
+   * Crée un élément de lieu en clonant et remplissant le template
+   * @param {Array} placeData - [placeName, data] du format lieux_a
+   * @param {number} index - Index pour l'attribution des couleurs
+   * @returns {Element} Élément DOM prêt à insérer
+   */
+  createPlaceElement: function(placeData, index) {
+    const [placeName, data] = placeData;
+
+    // Clonage du template (deep clone pour copier tous les enfants)
+    const element = this.elements.template.cloneNode(true);
+
+    // Transformation en élément visible
+    element.className = 'place-row';
+    element.style.display = '';
+
+    // Injection des totaux
+    const eventsContainer = element.querySelector('.place-events');
+    if (eventsContainer) {
+      eventsContainer.innerHTML = this.generateEventItemsHTML(data);
+    }
+
+    // Injection des données de base
+    element.querySelector('.place-name').textContent = placeName;
+    element.querySelector('.place-count').textContent = data.cnt;
+
+    // Attribution de la couleur cyclique (réutilise la logique existante)
+    const colorIndex = (index % 12) + 1;
+    element.querySelector('.place-color').className = `place-color color-${colorIndex}`;
+
+    // Attribution des données pour les interactions futures
+    element.dataset.place = placeName;
+    element.dataset.index = index;
+
+    // Gestion des sous-lieux (utilise les données pré-calculées)
+    if (data.isSubLocation && sortMode === 'alphabetical') {
+      element.querySelector('.place-content').classList.add('sublocation');
+    }
+
+    return element;
+    this.enrichLocationDataWithDOMReferences();
+  },
+
+  /**
+   * Retourne les lieux triés selon le mode actuel
+   * Réutilise la variable globale sortMode existante pour la cohérence
+     */
+  getSortedPlaces: function() {
+    if (sortMode === 'alphabetical') {
+      const main = new Map();
+      const subs = [];
+
+      // Séparer lieux principaux et sous-lieux SANS modifier les originaux
+      Object.entries(lieux).forEach(([name, data]) => {
+        if (data.isSubLocation && data.parentLocation) {
+          subs.push({ name, data });
+        } else {
+          main.set(name, { name, data, subs: [] });
+        }
+      });
+
+      // Rattacher les sous-lieux à leurs parents
+      subs.forEach(({ name, data }) => {
+        const group = main.get(data.parentLocation);
+        if (group) {
+          group.subs.push({ name, data });
+        } else {
+          // Parent introuvable, traiter comme principal
+          main.set(name, { name, data, subs: [] });
+        }
+      });
+
+      // Construire l'array trié avec métadonnées d'affichage
+      const sorted = [];
+      Array.from(main.values())
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }))
+        .forEach(group => {
+          // Lieu principal
+          sorted.push([group.name, group.data, { isIndented: false, displayName: group.name }]);
+
+          // Sous-lieux indentés
+          group.subs
+            .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }))
+            .forEach(sub => {
+              sorted.push([sub.name, sub.data, { isIndented: true, displayName: sub.data.subName }]);
+            });
+        });
+
+      return sorted;
+    }
+
+    // Mode fréquence : noms complets, pas d'indentation
+    return Object.entries(lieux)
+      .sort((a, b) => b[1].cnt - a[1].cnt)
+      .map(([name, data]) => [name, data, { isIndented: false, displayName: name }]);
+  },
+
+  handlePlaceClick: function(placeName, event) {
+    // Navigation vers la recherche de lieu
+    if (placeName && NavigationHelper && NavigationHelper.openPlaceLink) {
+      const newTab = event.ctrlKey || event.metaKey;
+      NavigationHelper.openPlaceLink(placeName, newTab);
+    }
+  },
+
+  /**
+   * Initialise les écouteurs d'événements de base
+   * Commencer simple, enrichir selon les besoins réels
+   */
+  initializeEventListeners: function() {
+    if (!this.elements.placesList) return;
+
+    // Écouteur pour les survols de lieux (délégation d'événements)
+    this.elements.placesList.addEventListener('mouseenter', (e) => {
+      const placeRow = e.target.closest('.place-row');
+      if (placeRow) {
+        placeRow.classList.add('hovered');
+        // TODO: Intégration avec le highlighting SVG existant
+      }
+    }, true);
+
+    this.elements.placesList.addEventListener('mouseleave', (e) => {
+      const placeRow = e.target.closest('.place-row');
+      if (placeRow) {
+        placeRow.classList.remove('hovered');
+        // TODO: Nettoyage du highlighting SVG
+      }
+    }, true);
+
+    this.elements.placesList.addEventListener('click', (e) => {
+      const placeRow = e.target.closest('.place-content');
+      if (placeRow) {
+        const placeName = placeRow.dataset.place;
+        if (placeName && NavigationHelper && NavigationHelper.openPlaceLink) {
+          const newTab = e.ctrlKey || e.metaKey;
+          NavigationHelper.openPlaceLink(placeName, newTab);
+        }
+      }
+    });
+  }
+};
+
+// ========== Interface utilisateur pour le panneau des lieux ==========
+const PlacesPanelControls = {
+  /**
+   * Initialise les contrôles du panneau
+   * Cette méthode doit être appelée après l’initialisation de ModernPlacesInterface
+   */
+  initialize: function() {
+    console.log('🎛️ Initialisation des contrôles du panneau des lieux...');
+
+    if (!ModernPlacesInterface.elements.panel) {
+      console.error('❌ ModernPlacesInterface doit être initialisé avant PlacesPanelControls');
+      return false;
+    }
+
+    // Initialisation des states par défaut
+    this.initializeDefaultStates();
+
+    // Configuration des event listeners modernes
+    this.setupEventListeners();
+
+    console.log('✅ Contrôles du panneau initialisés');
+    return true;
+  },
+
+  /**
+   * Configure tous les event listeners du panneau en utilisant la délégation d'événements
+   * Cette approche est plus maintenable et performante que les onclick inline
+   */
+  setupEventListeners: function() {
+    const panel = ModernPlacesInterface.elements.panel;
+
+    // Délégation d'événements sur le panneau entier
+    // Cette technique permet de gérer tous les clics d'un seul endroit
+    panel.addEventListener('click', (e) => {
+      // Identification de l'élément cliqué par ses classes CSS
+      if (e.target.matches('.panel-close')) {
+        e.preventDefault();
+        this.togglePanel();
+      }
+      else if (e.target.matches('.sort-toggle') || e.target.closest('.sort-toggle')) {
+        e.preventDefault();
+        this.toggleSort();
+      }
+      else if (e.target.matches('.events-toggle') || e.target.closest('.events-toggle')) {
+        e.preventDefault();
+        this.toggleEventsDisplay();
+      }
+      else if (e.target.matches('.search-clear')) {
+        e.preventDefault();
+        this.clearSearch();
+      }
+    });
+
+    // Event listener spécifique pour le champ de recherche
+    // L'événement 'input' est plus approprié que 'oninput' pour la réactivité
+    const searchInput = panel.querySelector('.search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.filterPlaces(e.target.value);
+      });
+    }
+  },
+
+  /**
+   * Configure les états par défaut des contrôles
+   * Centralise la logique d'initialisation pour éviter les incohérences
+   */
+  initializeDefaultStates: function() {
+    // État initial du tri (cohérent avec la variable globale sortMode)
+    this.updateSortButtonIcon();
+
+    // État initial des événements (masqué par défaut)
+    const panel = ModernPlacesInterface.elements.panel;
+    panel.classList.remove('show-events');
+
+    // Réinitialisation du champ de recherche
+    const searchInput = panel.querySelector('.search-input');
+    if (searchInput) searchInput.value = '';
+  },
+
+  /**
+   * Bascule l'affichage du panneau des lieux
+   * Fonction globale référencée par le HTML onclick="togglePlacesPanel()"
+   */
+  togglePanel: function() {
+    const panel = ModernPlacesInterface.elements.panel;
+    const isCurrentlyVisible = panel.style.display !== 'none';
+
+    panel.style.display = isCurrentlyVisible ? 'none' : 'block';
+
+    // Log pour le débogage en développement
+    console.log(`📋 Panneau des lieux ${isCurrentlyVisible ? 'masqué' : 'affiché'}`);
+  },
+
+  /**
+   * Bascule le mode de tri entre fréquence et alphabétique
+   * Met à jour l'interface et régénère la liste
+   */
+  toggleSort: function() {
+    // Modification de la variable globale (maintient la cohérence avec le reste du système)
+    sortMode = sortMode === 'frequency' ? 'alphabetical' : 'frequency';
+
+    // Mise à jour visuelle du bouton
+    this.updateSortButtonIcon();
+
+    // Régénération de la liste avec le nouveau tri
+    ModernPlacesInterface.generatePlacesList();
+
+    console.log(`🔄 Tri basculé vers: ${sortMode}`);
+  },
+
+  /**
+   * Met à jour l'icône du bouton de tri selon le mode actuel
+   * Centralise la logique d'affichage pour éviter les incohérences
+   */
+  updateSortButtonIcon: function() {
+    const icon = document.querySelector('.sort-toggle i');
+    if (icon) {
+      icon.className = sortMode === 'alphabetical'
+        ? 'fas fa-arrow-down-a-z'
+        : 'fas fa-arrow-down-wide-short';
+    }
+
+    // Mise à jour du title pour l'accessibilité
+    const button = document.querySelector('.sort-toggle');
+    if (button) {
+      button.title = sortMode === 'alphabetical'
+        ? 'Trier par fréquence'
+        : 'Trier par ordre alphabétique';
+    }
+  },
+
+  /**
+   * Bascule l'affichage détaillé des événements
+   * Active/désactive le mode d'affichage étendu du panneau
+   */
+  toggleEventsDisplay: function() {
+    const panel = ModernPlacesInterface.elements.panel;
+    const isShowingEvents = panel.classList.contains('show-events');
+
+    // Basculement de la classe CSS qui contrôle l'affichage
+    panel.classList.toggle('show-events', !isShowingEvents);
+
+    // Mise à jour de l'icône du bouton
+    const icon = document.querySelector('.events-toggle i');
+    if (icon) {
+      icon.className = !isShowingEvents ? 'far fa-eye-slash' : 'far fa-eye';
+    }
+
+    console.log(`👁️ Affichage des événements ${!isShowingEvents ? 'activé' : 'désactivé'}`);
+  },
+
+  /**
+   * Filtre la liste des lieux selon une requête de recherche
+   * @param {string} query - Terme de recherche saisi par l'utilisateur
+   */
+  filterPlaces: function(query) {
+    const rows = document.querySelectorAll('.place-row');
+    const normalizedQuery = query.toLowerCase().trim();
+
+    // Application du filtrage sur chaque élément de lieu
+    rows.forEach(row => {
+      const placeName = row.querySelector('.place-name').textContent.toLowerCase();
+      const shouldShow = !normalizedQuery || placeName.includes(normalizedQuery);
+      row.style.display = shouldShow ? '' : 'none';
+    });
+
+    // Gestion de l'affichage de la croix de nettoyage
+    this.updateClearButtonVisibility(normalizedQuery);
+
+    // Statistiques de filtrage pour le débogage
+    const visibleCount = document.querySelectorAll('.place-row[style=""]').length;
+    console.log(`🔍 Filtrage: ${visibleCount} lieux affichés sur ${rows.length}`);
+  },
+
+  /**
+   * Gère l'affichage conditionnel du bouton de nettoyage de recherche
+   * @param {string} query - Requête de recherche actuelle
+   */
+  updateClearButtonVisibility: function(query) {
+    const clearBtn = document.querySelector('.search-clear');
+    if (clearBtn) {
+      clearBtn.style.display = query ? 'block' : 'none';
+    }
+  },
+
+  /**
+   * Efface la recherche et réaffiche tous les lieux
+   * Fonction globale référencée par le HTML onclick="clearSearch()"
+   */
+  clearSearch: function() {
+    const input = document.querySelector('.search-input');
+    if (input) {
+      input.value = '';
+    }
+
+    // Réapplication du filtrage avec une requête vide
+    this.filterPlaces('');
+
+    console.log('🧹 Recherche effacée, tous les lieux réaffichés');
+  }
+};
+
+// ========== Module de surlignage bidirectionnel pour les lieux ==========
+const ModernPlacesHighlighter = {
+  // Stockage des éléments actuellement surlignés
+  currentHighlights: [],
+  currentIndicators: [],
+
+  /**
+   * Simule le survol d'une personne - appelé depuis SVGRenderer
+   * @param {Array<string>} placeNames - Noms des lieux à surligner
+   * @param {Array<string>} eventTypes - Types d'événements pour chaque lieu
+   */
+  simulatePersonHover: function(placeNames, eventTypes) {
+    console.log('🎯 Surlignage pour:', placeNames, eventTypes);
+
+    // Nettoyage préalable
+    this.clearAllHighlights();
+
+    if (!placeNames || placeNames.length === 0) return;
+
+    const matchingElements = [];
+
+    // Traiter chaque lieu
+    placeNames.forEach((placeName, index) => {
+      const placeData = lieux[placeName];
+      if (!placeData || !placeData.domElement) {
+        console.warn(`⚠️ Lieu non trouvé ou sans élément DOM: ${placeName}`);
+        return;
+      }
+
+      // Surligner l'élément de la liste
+      placeData.domElement.classList.add('person-match');
+      this.currentHighlights.push(placeData.domElement);
+
+      // Ajouter les indicateurs d'événements
+      const events = eventTypes.length === 1
+        ? eventTypes  // Si un seul type, l'appliquer à tous les lieux
+        : [eventTypes[index]].filter(Boolean); // Sinon, un événement par lieu
+
+      if (events.length > 0 && placeData.indicatorElement) {
+        this.addIndicatorsForPlace(placeData.indicatorElement, events);
+      }
+
+      matchingElements.push({
+        element: placeData.domElement,
+        index: placeData.visualIndex,
+        placeName: placeName
+      });
+    });
+
+    // Griser les autres lieux
+    this.grayOutOtherPlaces();
+
+    // Scroll vers le premier élément si nécessaire
+    if (matchingElements.length > 0) {
+      this.ensureVisibility(matchingElements[0].element);
+    }
+
+    if (matchingElements.length > 0) {
+      setTimeout(() => {
+        ModernOverflowManager.handleOverflow(matchingElements);
+      }, 100);
+    }
+  },
+
+  /**
+   * Ajoute les indicateurs visuels d'événements pour un lieu
+   * @param {HTMLElement} container - Conteneur des indicateurs
+   * @param {Array<string>} events - Types d'événements à afficher
+   */
+  addIndicatorsForPlace: function(container, events) {
+    if (!container) return;
+
+    // Mapping des événements vers les classes courtes
+    const eventToClass = {
+      'birth': 'n',
+      'baptism': 'b',
+      'marriage': 'm',
+      'death': 'd',
+      'burial': 's'
+    };
+
+    events.forEach((event, index) => {
+      const indicator = document.createElement('div');
+      const shortClass = eventToClass[event] || event.charAt(0);
+
+      indicator.className = `indicator ${shortClass}`;
+      indicator.textContent = shortClass.toUpperCase();
+
+      container.appendChild(indicator);
+      this.currentIndicators.push(indicator);
+
+      // Saut de ligne après le 2e indicateurs si 4+ événements
+      if (index === 1 && events.length >= 4) {
+        const breaker = document.createElement('div');
+        breaker.className = 'line-break';
+        container.appendChild(breaker);
+        this.currentIndicators.push(breaker); // Pour le nettoyage
+      }
+    });
+
+    if (events.length >= 4) {
+      const row = container.closest('.place-row');
+      if (row) row.classList.add('tall-row');
+    }
+  },
+
+  /**
+   * Nettoie tous les surlignages et indicateurs
+   */
+  clearAllHighlights: function() {
+    // Nettoyer les surlignages
+    this.currentHighlights.forEach(element => {
+      element.classList.remove('person-match');
+    });
+    this.currentHighlights = [];
+
+    // Nettoyer les indicateurs
+    this.currentIndicators.forEach(indicator => {
+      indicator.remove();
+    });
+    this.currentIndicators = [];
+
+    // Retirer le grisage
+    document.querySelectorAll('.place-content.grayed-out').forEach(element => {
+      element.classList.remove('grayed-out');
+    });
+
+    //Restaurer la hauteur de liste et nettoyer overflow (comme dans demo2.html)
+    const list = document.querySelector('.places-list');
+    if (list) {
+      list.style.maxHeight = 'none';
+      list.style.height = 'auto';
+    }
+
+    // Nettoyer les sections d'overflow
+    document.querySelectorAll('.overflow-section').forEach(section => {
+      section.remove();
+    });
+  },
+
+  /**
+   * Grise tous les lieux non surlignés
+   */
+  grayOutOtherPlaces: function() {
+    document.querySelectorAll('.place-content').forEach(element => {
+      if (!element.classList.contains('person-match')) {
+        element.classList.add('grayed-out');
+      }
+    });
+  },
+
+  /**
+   * S'assure qu'un élément est visible dans la liste scrollable
+   * @param {HTMLElement} element - Élément à rendre visible
+   */
+  ensureVisibility: function(element) {
+    if (!element) return;
+
+    const container = document.querySelector('.places-list');
+    if (!container) return;
+
+    const rect = element.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // Vérifier si l'élément est déjà visible
+    if (rect.top >= containerRect.top && rect.bottom <= containerRect.bottom) {
+      return;
+    }
+
+    // Scroll pour centrer l'élément
+    const scrollTop = element.offsetTop - container.offsetTop - (container.clientHeight / 2) + (element.clientHeight / 2);
+    container.scrollTo({
+      top: scrollTop,
+      behavior: 'smooth'
+    });
+  },
+
+  /**
+   * Surligne les secteurs SVG pour un lieu donné (Liste → SVG)
+   * @param {string} placeName - Nom du lieu
+   * @param {boolean} highlight - true pour surligner, false pour nettoyer
+   */
+  highlightSVGSectorsForPlace: function(placeName, highlight) {
+    if (!placeName || !lieux[placeName]) return;
+
+    const placeData = lieux[placeName];
+    const placeClass = placeData.c; // Ex: "L0"
+
+    // Trouver tous les secteurs SVG avec cette classe
+    const sectors = document.querySelectorAll(`svg .${placeClass}`);
+
+    sectors.forEach(sector => {
+      if (highlight) {
+        // Utiliser une couleur différente pour distinguer la direction du highlighting
+        sector.style.fill = 'lightblue';
+        sector.dataset.listHighlighted = 'true';
+      } else {
+        // Nettoyer seulement si c'était un highlighting depuis la liste
+        if (sector.dataset.listHighlighted === 'true') {
+          sector.style.fill = '';
+          delete sector.dataset.listHighlighted;
+        }
+      }
+    });
+  },
+
+  adjustRowHeightForEvents: function(placeElement, eventCount) {
+    if (!placeElement) return;
+
+    const row = placeElement.closest('.place-row');
+    if (!row) return;
+
+    // Ajuster la hauteur si beaucoup d'événements
+    if (eventCount >= 4) {
+      row.classList.add('tall-row');
+    } else {
+      row.classList.remove('tall-row');
+    }
+  },
+};
+
 // ========== Module de rendu circulaire ==========
 const CircularModeRenderer = {
   // Active/désactive le mode circulaire
@@ -192,14 +1305,7 @@ const CircularModeRenderer = {
     const btn = document.getElementById('b-circular-mode');
     if (btn) {
       btn.classList.toggle('active', isCircularMode);
-      const icon = btn.querySelector('i');
-      if (icon) {
-        icon.className = isCircularMode ? 'fa fa-circle fa-fw' : 'fa fa-circle-notch fa-fw';
-        btn.innerHTML = isCircularMode
-          ? '<i class="fa fa-circle fa-fw"></i>360'
-          : '<i class="fa fa-circle-notch fa-fw"></i>360';
-        btn.title = isCircularMode ? 'Revenir au mode éventail' : 'Mode circulaire/couple parents';
-      }
+      btn.title = isCircularMode ? 'Revenir au mode éventail' : 'Mode circulaire (360°)';
     }
 
     // Désactiver/activer les boutons d'angle au lieu de les masquer
@@ -335,57 +1441,6 @@ const CircularModeRenderer = {
   }
 };
 
-// Créer un module DOMCache au début du fichier, après CONFIG
-const DOMCache = {
-  // Cache pour les éléments individuels
-  elements: {},
-
-  // Cache pour les collections d'éléments par classe
-  collections: {},
-
-  // Récupérer un élément par ID avec mise en cache
-  getElementById: function(id) {
-    if (!this.elements[id]) {
-      this.elements[id] = document.getElementById(id);
-    }
-    return this.elements[id];
-  },
-
-  // Récupérer des éléments par classe avec mise en cache
-  getElementsByClassName: function(className) {
-    if (!this.collections[className]) {
-      // Convertir en Array pour avoir une référence stable
-      this.collections[className] = Array.from(document.getElementsByClassName(className));
-    }
-    return this.collections[className];
-  },
-
-  // Invalider le cache quand le DOM change
-  invalidate: function(type = 'all') {
-    if (type === 'all') {
-      this.elements = {};
-      this.collections = {};
-    } else if (type === 'collections') {
-      this.collections = {};
-    }
-  },
-
-  // Pré-charger les éléments fréquemment utilisés
-  preload: function() {
-    // Boutons fréquemment utilisés
-    ["b-death-age", "b-places-colorise", "b-sort-places"].forEach(id => {
-      this.getElementById(id);
-    });
-    // s indicateurs d'âge et de mariage
-    ["DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6"].forEach(id => {
-      this.getElementById(id);
-    });
-    ["DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6"].forEach(id => {
-      this.getElementById(id);
-    });
-  }
-};
-
 // ========== Fonctions utilitaires pour la géométrie ==========
 function polarToCartesian(r, angle) {
   const rad = Math.PI / 180 * angle;
@@ -504,15 +1559,15 @@ const SVGRenderer = {
 
     if (type === 'person') {
       // Classes pour les lieux de vie
-      if (p.birth_place) classes.push(`bi-${lieux[p.birth_place].c}`);
+     /* if (p.birth_place) classes.push(`bi-${lieux[p.birth_place].c}`);
       if (p.baptism_place) classes.push(`ba-${lieux[p.baptism_place].c}`);
       if (p.death_place) classes.push(`de-${lieux[p.death_place].c}`);
-      if (p.burial_place) classes.push(`bu-${lieux[p.burial_place].c}`);
+      if (p.burial_place) classes.push(`bu-${lieux[p.burial_place].c}`); */
       // Classe pour l'âge au décès
       if (p.death_age) classes.push(Utils.deathAgeClass(p.death_age));
     } else if (type === 'marriage') {
       // Classes pour les mariages
-      if (p.marriage_place) classes.push(`ma-${lieux[p.marriage_place].c}`);
+    /*  if (p.marriage_place) classes.push(`ma-${lieux[p.marriage_place].c}`); */
       if (p.marriage_length) {
         const marriageClass = Utils.marriageLengthClass(p.marriage_length);
         if (marriageClass) classes.push(marriageClass);
@@ -606,29 +1661,53 @@ const SVGRenderer = {
   },
 
   togglePlaceHighlights: function(p, show, type) {
+    // Nettoyer d'abord si on désactive
+    if (!show) {
+      ModernPlacesHighlighter.clearAllHighlights();
+    }
+
     if (type === 'marriage') {
       // Pour les mariages, seulement le lieu de mariage
       if (p.marriage_place) {
         const el = DOMCache.getElementById(`ma-${lieux[p.marriage_place].c}`);
         if (el) el.classList.toggle("hidden", !show);
-        LocationManager.hlPlace(p.marriage_place, show);
+
+        if (show && ModernPlacesInterface.elements.panel) {
+          ModernPlacesHighlighter.simulatePersonHover(
+            [p.marriage_place],
+            ['marriage']
+          );
+        }
       }
     } else {
+      // Pour les personnes, collecter tous les lieux et événements
       const places = [
-        { prop: 'birth_place', prefix: 'bi' },
-        { prop: 'baptism_place', prefix: 'ba' },
-        { prop: 'marriage_place', prefix: 'ma' },
-        { prop: 'death_place', prefix: 'de' },
-        { prop: 'burial_place', prefix: 'bu' }
+        { prop: 'birth_place', prefix: 'bi', event: 'birth' },
+        { prop: 'baptism_place', prefix: 'ba', event: 'baptism' },
+        { prop: 'marriage_place', prefix: 'ma', event: 'marriage' },
+        { prop: 'death_place', prefix: 'de', event: 'death' },
+        { prop: 'burial_place', prefix: 'bu', event: 'burial' }
       ];
 
+      const placesToHighlight = [];
+      const eventsToShow = [];
+
       places.forEach(place => {
-        if (p[place.prop]) {
+        if (p[place.prop] && lieux[p[place.prop]]) {
           const el = DOMCache.getElementById(`${place.prefix}-${lieux[p[place.prop]].c}`);
           if (el) el.classList.toggle("hidden", !show);
-          LocationManager.hlPlace(p[place.prop], show);
+
+          // Collecter pour le highlighting moderne
+          if (show) {
+            placesToHighlight.push(p[place.prop]);
+            eventsToShow.push(place.event);
+          }
         }
       });
+
+      if (show && placesToHighlight.length > 0 && ModernPlacesInterface.elements.panel) {
+        ModernPlacesHighlighter.simulatePersonHover(placesToHighlight, eventsToShow);
+      }
     }
   },
 
@@ -1014,31 +2093,6 @@ const TextRenderer = {
 
 // ========== Interface utilisateur ==========
 const UIManager = {
-  toggleSort: function() {
-    const button = document.getElementById("b-sort-places");
-    if (!button) return;
-    const icon = button.querySelector("i");
-
-    if (sortMode === "frequency") {
-      sortMode = "alphabetical";
-      icon.className = "fa fa-arrow-down-wide-short fa-fw";
-      button.title = "Trier par fréquence";
-    } else {
-      sortMode = "frequency";
-      icon.className = "fa fa-arrow-down-a-z fa-fw";
-      button.title = "Trier par ordre alphabétique";
-    }
-
-    const headerIcon = document.getElementById('header-sort-icon');
-    if (headerIcon) {
-      headerIcon.className = sortMode === "alphabetical"
-        ? 'fa fa-arrow-down-a-z'
-        : 'fa fa-arrow-down-wide-short';
-    }
-
-    LocationManager.rebuildListVisualOnly();
-  },
-
   addNavigationHelp: function() {
     var helpPanel = document.createElement('div');
     helpPanel.id = 'navigation-help';
@@ -1062,9 +2116,30 @@ const UIManager = {
 const ColorManager = {
   EVENT_TYPES: ["bi", "ba", "ma", "de", "bu"],
 
+  createLocationStyles: function(index, c_h, c_l) {
+    const root = document.documentElement;
+    const sheet = [...document.styleSheets].find(s => s.title === "fc-auto");
+
+    root.style.setProperty('--fc-color-' + index, 'hsl(' + c_h + ',100%,' + c_l + '%)');
+
+    // Créer les règles CSS pour les secteurs SVG
+    const eventTypes = ['bi', 'ba', 'ma', 'de', 'bu'];
+    eventTypes.forEach(eventType => {
+      sheet.insertRule(
+        `body.place_color svg .${eventType}-L${index} { fill: var(--fc-color-${index}); }`,
+        sheet.cssRules.length
+      );
+    });
+    // Règle générique sans préfixe
+    sheet.insertRule(
+      `body.place_color svg .L${index} { fill: var(--fc-color-${index}); }`,
+      sheet.cssRules.length
+    );
+  },
+
   setColorMode: function(newMode) {
     // Nettoyer l'état précédent
-    document.body.classList.remove('place_color', 'death-age', 'places-list');
+    document.body.classList.remove('place_color', 'death-age');
 
 
     // Désactiver tous les toggles NMBDS
@@ -1075,7 +2150,7 @@ const ColorManager = {
 
     // Appliquer le nouveau mode
     if (newMode === 'place_color') {
-      document.body.className = "places-list place_color";
+      document.body.className = "place_color";
       tool = "place_color";
       // Activer M par défaut
       const maCheckbox = document.getElementById("ma");
@@ -1168,7 +2243,7 @@ const ColorManager = {
         });
       } else {
         // Activer avec M par défaut uniquement
-        document.body.className = "places-list place_color";
+        document.body.className = "place_color";
         tool = "place_color";
         this.classList.add("active");
 
@@ -1293,464 +2368,6 @@ const NavigationHelper = {
   }
 };
 
-
-const LocationManager = {
-  _sortedIndexes: {
-    frequency: null,
-    alphabetical: null
-  },
-
-  getSortedData: function() {
-    if (!this._sortedIndexes[sortMode]) {
-      if (sortMode === "frequency") {
-        this._sortedIndexes.frequency = [...lieux_a].sort(function(e1, e2) {
-          return e2[1].cnt - e1[1].cnt;
-        });
-      } else { // alphabetical
-        this._sortedIndexes.alphabetical = [...lieux_a].sort(function(e1, e2) {
-          var place1 = LocationManager.parseLocationName(e1[0]);
-          var place2 = LocationManager.parseLocationName(e2[0]);
-
-          var mainComparison = place1.mainPlace.localeCompare(place2.mainPlace, 'fr', {
-            sensitivity: 'base', ignorePunctuation: true, numeric: true
-          });
-
-          if (mainComparison !== 0) return mainComparison;
-          if (!place1.isSubPlace && place2.isSubPlace) return -1;
-          if (place1.isSubPlace && !place2.isSubPlace) return 1;
-
-          if (place1.isSubPlace && place2.isSubPlace) {
-            return place1.subPlace.localeCompare(place2.subPlace, 'fr', {
-              sensitivity: 'base', ignorePunctuation: true, numeric: true
-            });
-          }
-          return 0;
-        });
-      }
-    }
-    return this._sortedIndexes[sortMode];
-  },
-
-  invalidateSortCache: function() {
-    this._sortedIndexes = { frequency: null, alphabetical: null };
-  },
-
-  parseLocationName: function(placeName) {
-    // Extraction du pattern de matching en constante
-    const SUBLOCATION_PATTERN = /^(.+?)\s+[–—-]\s+(.+)$/;
-    const match = placeName.match(SUBLOCATION_PATTERN);
-
-    // Structure de retour cohérente
-    const baseStructure = {
-      original: placeName,
-      isSubPlace: false,
-      mainPlace: placeName,
-      subPlace: null
-    };
-
-    if (!match) {
-      return {
-        ...baseStructure,
-        sortKey: placeName.toLowerCase() + "|"
-      };
-    }
-
-    return {
-      ...baseStructure,
-      mainPlace: match[2].trim(),
-      subPlace: match[1].trim(),
-      isSubPlace: true,
-      sortKey: match[2].trim().toLowerCase() + "|" + match[1].trim().toLowerCase()
-    };
-  },
-
-  buildEventIndicators: function(index) {
-    const events = [
-      { id: 'bi', label: 'N', condition: has_bi },
-      { id: 'ba', label: 'B', condition: has_ba },
-      { id: 'ma', label: 'M', condition: has_ma },
-      { id: 'de', label: 'D', condition: has_de },
-      { id: 'bu', label: 'S', condition: has_bu }
-    ];
-
-    return events
-      .filter(e => e.condition)
-      .map(e => `<span id="${e.id}-L${index}" class="hidden">${e.label}</span>`)
-      .join('');
-  },
-
-  buildLocationTooltip: function(lieuData) {
-    if (!lieuData || typeof lieuData !== 'object') {
-      return window.t('no_info_available', "Aucune information disponible");
-    }
-
-    var total = parseInt(lieuData.cnt) || 0;
-    var details = [];
-
-    var eventTypes = [
-      { key: 'bi_count', singular: 'birth', plural: 'births' },
-      { key: 'ba_count', singular: 'baptism', plural: 'baptisms' },
-      { key: 'ma_count', singular: 'marriage', plural: 'marriages' },
-      { key: 'de_count', singular: 'death', plural: 'deaths' },
-      { key: 'bu_count', singular: 'burial', plural: 'burials' }
-    ];
-
-    eventTypes.forEach(function(event) {
-      var count = parseInt(lieuData[event.key]) || 0;
-      if (count > 0) {
-        var labelKey = count > 1 ? event.plural : event.singular;
-        var label = window.t(labelKey, labelKey);
-        details.push(count + " " + label);
-      }
-    });
-
-    var occurrenceKey = total > 1 ? 'occurrences' : 'occurrence';
-    var occurrenceLabel = window.t(occurrenceKey, occurrenceKey);
-
-    return total + " " + occurrenceLabel +
-           (details.length > 0 ? " : " + details.join(", ") : "");
-  },
-
-  addPlaceCount: function(placeName, eventType) {
-    if (placeName === undefined || placeName === "") return;
-
-    var countKey = eventType + "_count";
-
-    if (lieux[placeName] === undefined) {
-      lieux[placeName] = {
-        "cnt": 1
-      };
-      lieux[placeName][eventType] = true;
-      lieux[placeName][countKey] = 1;
-    } else {
-      lieux[placeName].cnt++;
-      lieux[placeName][eventType] = true;
-      lieux[placeName][countKey] = (lieux[placeName][countKey] || 0) + 1;
-    }
-  },
-
-  calculateHighlightState: function(locationKey, index, eventTypes) {
-    const state = {
-      elementsToHighlight: [],
-      elementsToShow: [],
-      indicatorsToToggle: []
-    };
-
-    eventTypes.forEach(eventType => {
-      if (lieux[locationKey] && lieux[locationKey][eventType]) {
-        state.elementsToHighlight.push({
-          className: `${eventType}-L${index}`,
-          textClassName: `${eventType}-tL${index}`
-        });
-        state.indicatorsToToggle.push(`${eventType}-L${index}`);
-      }
-    });
-
-    return state;
-  },
-
-  applyHighlightState: function(state, show) {
-    // Cette fonction ne contient que de la manipulation DOM
-    state.elementsToHighlight.forEach(({ className, textClassName }) => {
-      // Manipulation des éléments graphiques
-      const graphElements = DOMCache.getElementsByClassName(className);
-      graphElements.forEach(el => {
-        el.classList.toggle("highlight", show);
-        el.classList.toggle("highlight-from-list", show);
-      });
-
-      // Manipulation des éléments texte
-      const textElements = DOMCache.getElementsByClassName(textClassName);
-      textElements.forEach(el => {
-        el.classList.toggle("text_highlight", show);
-      });
-    });
-
-    // Toggle des indicateurs
-    state.indicatorsToToggle.forEach(id => {
-      const indicator = DOMCache.getElementById(id);
-      if (indicator) {
-        indicator.classList.toggle("hidden", !show);
-      }
-    });
-  },
-
-
-  togglePlaceHl: function(locationKey, index, show) {
-    const state = this.calculateHighlightState(locationKey, index , ["bi", "ba", "ma", "de", "bu"]);
-    this.applyHighlightState(state, show);
-    this.hlPlace(locationKey, show);
-  },
-
-  hlPlace: function(placeKey, highlight = true) {
-    if (!placeKey || !lieux[placeKey]) return;
-
-    var locationElement = document.getElementById(lieux[placeKey].c);
-
-    if (locationElement) {
-      if (highlight) {
-        locationElement.classList.add("location-highlighted");
-      } else {
-        locationElement.classList.remove("location-highlighted");
-      }
-    }
-  },
-
-  createLocationStyles: function(index, c_h, c_l) {
-    root.style.setProperty('--fc-color-' + index, 'hsl(' + c_h + ',100%,' + c_l + '%)');
-
-    // Déterminer la couleur du texte selon le contraste
-    var rb = Utils.contrastRatio('hsl(' + c_h + ',100%,' + c_l + '%)', 'black');
-    var rw = Utils.contrastRatio('white', 'hsl(' + c_h + ',100%,' + c_l + '%)');
-    if (rw > rb) {
-      root.style.setProperty('--fc-text-color-' + index, 'white');
-    }
-
-    // Définir les types d'événements à styliser
-    const eventTypes = [
-      { prefix: 'bi', condition: true },
-      { prefix: 'ba', condition: has_ba },
-      { prefix: 'ma', condition: true },
-      { prefix: 'de', condition: true },
-      { prefix: 'bu', condition: has_bu }
-    ];
-
-    // Créer les règles CSS pour chaque type d'événement
-    eventTypes.forEach(event => {
-      if (event.condition) {
-        sheet.insertRule(`body.place_color svg.${event.prefix} .${event.prefix}-L${index} {fill: var(--fc-color-${index}, transparent);}`);
-        sheet.insertRule(`body.place_color svg.${event.prefix} .${event.prefix}-tL${index} {fill: var(--fc-text-color-${index}, black);}`);
-      }
-    });
-
-    // Règle pour le carré coloré dans la liste
-    sheet.insertRule(`body.place_color #L${index} .square { color: var(--fc-color-${index}, transparent); }`);
-  },
-
-  updateLocationListItem: function(li, placeName, displayIndex) {
-    var locationInfo = LocationManager.parseLocationName(placeName);
-    var originalIndex = parseInt(li.dataset.originalIndex);
-    var showSubIndicator = false;
-
-    if (sortMode === "alphabetical" && locationInfo.isSubPlace) {
-      var previousLi = li.previousElementSibling;
-      if (previousLi) {
-        var previousPlace = previousLi.dataset.location;
-        var previousInfo = LocationManager.parseLocationName(previousPlace);
-        if (!previousInfo.isSubPlace && previousInfo.mainPlace === locationInfo.mainPlace) {
-          showSubIndicator = true;
-          li.classList.add("sublocation");
-        }
-      }
-    } else {
-      li.classList.remove("sublocation");
-    }
-
-    var subIndicator = showSubIndicator ? '<span class="sublocation-indicator">└</span>' : '';
-
-    // Structure HTML simple - pas de liens imbriqués
-    li.innerHTML = this.buildEventIndicators(originalIndex) +
-                   '<span class="square">■</span>' +
-                   subIndicator + ' ' + placeName;
-
-    li.setAttribute("id", lieux[placeName].c);
-    li.setAttribute("title", this.buildLocationTooltip(lieux[placeName]));
-
-    // Indiquer visuellement que c'est cliquable en mode wizard
-    if (document.body.dataset.wizard === "1") {
-      li.classList.add("clickable-place");
-    }
-  },
-
-  shouldShowSubIndicator: function(li, locationInfo) {
-    if (!locationInfo.isSubPlace) return false;
-    const previousLi = li.previousElementSibling;
-    if (!previousLi) return false;
-
-    const previousPlace = previousLi.dataset.location;
-    const previousInfo = this.parseLocationName(previousPlace);
-    return !previousInfo.isSubPlace && previousInfo.mainPlace === locationInfo.mainPlace;
-  },
-
-  calculateAndBuild: function(maxGeneration) {
-    lieux = {};
-    lieux_a = [];
-
-    let maxSosa;
-    if (maxGeneration !== undefined) {
-      maxSosa = Math.pow(2, maxGeneration + 1) - 1;
-    } else {
-      const ak = Object.keys(ancestor);
-      maxSosa = Number(ak[ak.length-1].replace(/^S/, ""));
-    }
-
-    for (let sosa = 1; sosa <= maxSosa; sosa++) {
-      const key = "S" + sosa;
-      const p = ancestor[key];
-
-      if (p) {
-        this.addPlaceCount(p.birth_place, "bi");
-        this.addPlaceCount(p.baptism_place, "ba");
-        this.addPlaceCount(p.marriage_place, "ma");
-        this.addPlaceCount(p.death_place, "de");
-        this.addPlaceCount(p.burial_place, "bu");
-      }
-    }
-
-    for (var key in lieux) {
-      lieux_a.push([key, lieux[key]]);
-    }
-
-    this.invalidateSortCache();
-    this.buildInterface();
-  },
-
-  buildInterface: function() {
-    this.buildList();
-    this.buildHeader();
-  },
-
-  buildList: function() {
-    var places_list = document.getElementById("places_list");
-    places_list.innerHTML = "";
-
-    var c_h = 0;
-    var c_dh = 60;
-    var c_l = 90;
-
-    LocationManager.getSortedData().forEach(function(l, i) {
-      var placeName = l[0];
-      lieux[placeName].c = "L" + i;
-
-      var li = document.createElement("li");
-      li.dataset.location = placeName;
-      li.dataset.index = i;
-      li.dataset.originalIndex = i;
-
-      LocationManager.updateLocationListItem(li, placeName, i);
-      places_list.append(li);
-      LocationManager.createLocationStyles(i, c_h, c_l);
-
-      c_h += c_dh;
-      if (c_h >= 360) {
-        c_dh = Math.round(c_dh / 2);
-        c_h = c_dh;
-        c_l -= 15;
-      }
-    });
-
-    this.initializeLocationEvents();
-  },
-
-  rebuildListVisualOnly: function() {
-    var places_list = document.getElementById("places_list");
-    places_list.innerHTML = "";
-
-    DOMCache.invalidate();
-
-    LocationManager.getSortedData().forEach(function(l, visualIndex) {
-      var placeName = l[0];
-      var originalIndex = parseInt(lieux[placeName].c.substring(1));
-
-      var li = document.createElement("li");
-      li.dataset.location = placeName;
-      li.dataset.index = originalIndex;
-      li.dataset.originalIndex = originalIndex;
-
-      LocationManager.updateLocationListItem(li, placeName, visualIndex);
-      places_list.append(li);
-    });
-
-    this.initializeLocationEvents();
-  },
-
-  buildHeader: function() {
-    var placesContainer = document.getElementById("places-list");
-    var existingHeader = document.getElementById('places-header');
-
-    if (existingHeader) { existingHeader.remove(); }
-
-    var header = this.createHeader();
-    placesContainer.insertBefore(header, placesContainer.firstChild);
-  },
-
-  createHeader: function() {
-    const totals = this.calculateTotals();
-    const placesKey = totals.places > 1 ? 'places' : 'place';
-    const placesLabel = window.t(placesKey, placesKey);
-    const eventsKey = totals.events > 1 ? 'events' : 'event';
-    const eventsLabel = window.t(eventsKey, eventsKey);
-
-    const sortIconClass = sortMode === "alphabetical"
-      ? 'fa-arrow-down-a-z'
-      : 'fa-arrow-down-wide-short';
-
-    var header = document.createElement('div');
-    header.id = 'places-header';
-    header.innerHTML = `
-      <span style="color: #666;">
-        ${max_gen} gén. : ${totals.places} ${placesLabel}, ${totals.events} ${eventsLabel}
-        <i id="header-sort-icon" class="fa ${sortIconClass}" style="font-size: 12px; margin-left: 8px;"></i>
-      </span>
-    `;
-    return header;
-  },
-
-  calculateTotals: function() {
-    const totals = Object.values(lieux).reduce((acc, lieu) => {
-      return {
-        places: acc.places + 1,
-        events: acc.events + (lieu.cnt || 0)
-      };
-    }, { places: 0, events: 0 });
-
-    return totals;
-  },
-
-  initializeLocationEvents: function() {
-    const placesList = document.getElementById("places_list");
-    if (!placesList) return;
-
-    function getLocationData(target) {
-      const li = target.closest("li[data-location]");
-      if (!li) return null;
-
-      const index = li.dataset.index;
-      return {
-        locationKey: li.dataset.location,
-        index: index !== undefined ? parseInt(index) : null,
-        element: li
-      };
-    }
-
-    // Survol identique à la version qui marchait
-    placesList.addEventListener("mouseenter", (e) => {
-      const data = getLocationData(e.target);
-      if (data) {
-        data.element.classList.add("hovered");
-        LocationManager.togglePlaceHl(data.locationKey, data.index, true);
-      }
-    }, true);
-
-    placesList.addEventListener("mouseleave", (e) => {
-      const data = getLocationData(e.target);
-      if (data) {
-        data.element.classList.remove("hovered");
-        LocationManager.togglePlaceHl(data.locationKey, data.index, false);
-      }
-    }, true);
-
-    placesList.addEventListener("click", (e) => {
-      if (document.body.dataset.wizard !== "1") return;
-      const data = getLocationData(e.target);
-      if (data) {
-        e.preventDefault();
-        NavigationHelper.openPlaceLink(data.locationKey, true);
-      }
-    });
-  },
-};
-
 const AngleManager = {
   // Obtenir l'angle actuel
   getCurrentAngle: function() {
@@ -1802,6 +2419,460 @@ const AngleManager = {
   }
 };
 
+// ========== GESTIONNAIRE D'ÉVÉNEMENTS GLOBAL ==========
+const FanchartPlacesEventManager = {
+  /**
+   * Initialise tous les événements liés au panneau des lieux
+   * Cette fonction centralise l'initialisation pour éviter les doublons
+   */
+  initializeAll: function() {
+    console.log('🎮 Initialisation des événements du panneau des lieux...');
+
+    // Vérifier que les modules sont chargés
+    if (!ModernPlacesInterface.elements.panel) {
+      console.error('❌ Le panneau des lieux doit être initialisé d\'abord');
+      return;
+    }
+
+    // Initialiser les événements de base
+    this.initializeHoverEvents();
+    this.initializeClickEvents();
+    this.initializeKeyboardShortcuts();
+
+    console.log('✅ Événements initialisés');
+  },
+
+  /**
+   * Événements de survol (délégation)
+   */
+  initializeHoverEvents: function() {
+    const placesList = ModernPlacesInterface.elements.placesList;
+    if (!placesList) return;
+
+    // Survol entrée
+    placesList.addEventListener('mouseenter', (e) => {
+      const placeContent = e.target.closest('.place-content');
+      if (placeContent) {
+        const placeName = placeContent.dataset.place;
+        if (placeName) {
+          placeContent.classList.add('hovered');
+          ModernPlacesHighlighter.highlightSVGSectorsForPlace(placeName, true);
+        }
+      }
+    }, true);
+
+    // Survol sortie
+    placesList.addEventListener('mouseleave', (e) => {
+      const placeContent = e.target.closest('.place-content');
+      if (placeContent) {
+        const placeName = placeContent.dataset.place;
+        if (placeName) {
+          placeContent.classList.remove('hovered');
+          ModernPlacesHighlighter.highlightSVGSectorsForPlace(placeName, false);
+        }
+      }
+    }, true);
+  },
+
+  /**
+   * Événements de clic
+   */
+  initializeClickEvents: function() {
+    const placesList = ModernPlacesInterface.elements.placesList;
+    if (!placesList) return;
+
+    placesList.addEventListener('click', (e) => {
+      const placeContent = e.target.closest('.place-content');
+      if (placeContent) {
+        const placeName = placeContent.dataset.place;
+        if (placeName) {
+          ModernPlacesInterface.handlePlaceClick(placeName, e);
+        }
+      }
+    });
+  },
+
+  /**
+   * Raccourcis clavier (optionnel)
+   */
+  initializeKeyboardShortcuts: function() {
+    document.addEventListener('keydown', (e) => {
+      // Ctrl/Cmd + L : Focus sur la recherche de lieux
+      if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+        e.preventDefault();
+        const searchInput = document.getElementById('fanchart-search-input');
+        if (searchInput) searchInput.focus();
+      }
+
+      // Escape : Nettoyer les surlignages
+      if (e.key === 'Escape') {
+        ModernPlacesHighlighter.clearAllHighlights();
+      }
+    });
+  }
+};
+
+// ========== MODULE DE GESTION DE L'OVERFLOW ==========
+const ModernOverflowManager = {
+  // Configuration
+  config: {
+    itemHeight: 30,        // Hauteur d'un élément (sync avec CSS --place-height-compact)
+    headerHeight: 28,      // Hauteur header overflow
+    tolerance: { compact: 6, extended: 3 },
+    maxIterations: 5,
+    maxSpaceRatio: 0.5     // Maximum 50% de l'écran pour l'overflow
+  },
+
+  // État
+  originalListHeight: null,
+  currentOverflowSections: [],
+
+  /**
+   * Initialise le système d'overflow
+   * @returns {boolean} true si l'initialisation réussit
+   */
+  initialize: function() {
+    const list = document.querySelector('.places-list');
+    if (!list) return false;
+
+    // Sauvegarder la hauteur originale
+    this.originalListHeight = list.clientHeight;
+    console.log('📏 Hauteur liste initiale:', this.originalListHeight);
+
+    return true;
+  },
+
+  /**
+   * Gère l'overflow après un surlignage
+   * @param {Array} matchingItems - Éléments surlignés à garder visibles
+   */
+  handleOverflow: function(matchingItems) {
+    console.log('🚀 Gestion de l\'overflow pour', matchingItems.length, 'éléments');
+
+    if (!this.initialize() || !matchingItems?.length) {
+      console.warn('⚠️ Impossible d\'initialiser le système d\'overflow');
+      return;
+    }
+
+    // Nettoyer les sections d'overflow précédentes
+    this.clearOverflowSections();
+
+    // Lancer la stabilisation
+    this.stabilizeOverflow(matchingItems);
+  },
+
+  /**
+   * Algorithme principal de stabilisation de l'overflow
+   * @param {Array} matchingItems - Éléments à garder visibles
+   */
+  stabilizeOverflow: function(matchingItems) {
+    const list = document.querySelector('.places-list');
+    if (!list) return;
+
+    // Reset état initial
+    list.style.maxHeight = 'none';
+
+    let iteration = 0;
+    let reservedSpace = 0;
+    let previousOverflow = null;
+    let hasOscillation = false;
+
+    // Boucle de stabilisation
+    do {
+      iteration++;
+      console.log(`🔄 Itération ${iteration}/${this.config.maxIterations}`);
+
+      // Appliquer contrainte de hauteur
+      const availableHeight = Math.max(0, this.originalListHeight - reservedSpace);
+      if (availableHeight <= 50) { // Hauteur minimum critique
+        console.warn('⚠️ Hauteur disponible trop faible, abandon');
+        break;
+      }
+
+      list.style.maxHeight = `${availableHeight}px`;
+
+      // Recalculer overflow avec nouvelle contrainte
+      const currentOverflow = this.calculateOverflowWithConstraints(matchingItems, availableHeight);
+
+      // Test de stabilité
+      if (this.isOverflowStable(currentOverflow, previousOverflow)) {
+        console.log('✅ Stabilité atteinte !');
+        this.displayOverflowInReservedSpace(currentOverflow, reservedSpace);
+        break;
+      }
+
+      // Détecter oscillation
+      if (previousOverflow && this.detectOscillation(currentOverflow, previousOverflow)) {
+        hasOscillation = true;
+        console.warn('🔀 Oscillation détectée !');
+        // Stratégie : moyenner l'espace réservé
+        const avgSpace = (reservedSpace + this.calculateRequiredSpace(previousOverflow)) / 2;
+        reservedSpace = Math.round(avgSpace);
+        const finalHeight = Math.max(0, this.originalListHeight - reservedSpace);
+        list.style.maxHeight = `${finalHeight}px`;
+        const finalOverflow = this.calculateOverflowWithConstraints(matchingItems, finalHeight);
+        this.displayOverflowInReservedSpace(finalOverflow, reservedSpace);
+        break;
+      }
+
+      // Ajuster l'espace réservé
+      reservedSpace = this.calculateRequiredSpace(currentOverflow);
+      previousOverflow = currentOverflow;
+
+    } while (iteration < this.config.maxIterations);
+
+    if (iteration >= this.config.maxIterations) {
+      console.warn('⚠️ Maximum d\'itérations atteint sans stabilité');
+    }
+  },
+
+  /**
+   * Calcule l'espace requis pour afficher l'overflow
+   * @param {Object} overflowData - Données d'overflow {above: [], below: []}
+   * @returns {number} Espace requis en pixels
+   */
+  calculateRequiredSpace: function(overflowData) {
+    if (!overflowData || (!overflowData.above?.length && !overflowData.below?.length)) {
+      return 0;
+    }
+
+    let requiredSpace = 0;
+
+    // Espace pour overflow au-dessus
+    if (overflowData.above?.length > 0) {
+      const count = Math.min(overflowData.above.length, 5); // Max 5 éléments affichés
+      requiredSpace += this.config.headerHeight + (count * this.config.itemHeight);
+    }
+
+    // Espace pour overflow en-dessous
+    if (overflowData.below?.length > 0) {
+      const count = Math.min(overflowData.below.length, 5);
+      requiredSpace += this.config.headerHeight + (count * this.config.itemHeight);
+    }
+
+    // Limiter l'espace maximum
+    const maxAllowedSpace = Math.floor(this.originalListHeight * this.config.maxSpaceRatio);
+    const finalSpace = Math.min(requiredSpace, maxAllowedSpace);
+
+    console.log(`📐 Espace: ${requiredSpace}px → ${finalSpace}px (max: ${maxAllowedSpace}px)`);
+    return finalSpace;
+  },
+
+  /**
+   * Détecte quels éléments sont en overflow
+   * @param {Array} highlightedItems - Éléments à vérifier
+   * @param {number} maxHeight - Hauteur maximale de la liste
+   * @returns {Object} {above: [], below: []} éléments en overflow
+   */
+  calculateOverflowWithConstraints: function(highlightedItems, maxHeight) {
+    const list = document.querySelector('.places-list');
+    if (!list || !highlightedItems.length || maxHeight <= 0) {
+      return { above: [], below: [] };
+    }
+
+    const scrollTop = list.scrollTop;
+    const scrollBottom = scrollTop + maxHeight;
+
+    const overflowAbove = [];
+    const overflowBelow = [];
+
+    highlightedItems.forEach(item => {
+      const element = item.element || item.place;
+      if (!element) return;
+
+      const row = element.closest('.place-row');
+      if (!row) return;
+
+      const itemTop = row.offsetTop;
+      const itemBottom = itemTop + row.offsetHeight;
+
+      // Calculer la partie réellement visible
+      const visibleTop = Math.max(itemTop, scrollTop);
+      const visibleBottom = Math.min(itemBottom, scrollBottom);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+      const totalHeight = itemBottom - itemTop;
+
+      // L'élément doit être ENTIÈREMENT visible
+      const isCompletelyVisible = (visibleHeight >= totalHeight);
+
+      if (!isCompletelyVisible) {
+        // Déterminer si l'élément est plutôt au-dessus ou en-dessous
+        const itemCenter = (itemTop + itemBottom) / 2;
+        const viewCenter = (scrollTop + scrollBottom) / 2;
+
+        if (itemCenter < viewCenter) {
+          overflowAbove.push({
+            element: element,
+            index: item.index,
+            row: row,
+            placeName: item.placeName
+          });
+        } else {
+          overflowBelow.push({
+            element: element,
+            index: item.index,
+            row: row,
+            placeName: item.placeName
+          });
+        }
+      }
+    });
+
+    console.log(`🔍 Overflow: ${overflowAbove.length} au-dessus, ${overflowBelow.length} en-dessous`);
+    return { above: overflowAbove, below: overflowBelow };
+  },
+
+  /**
+   * Vérifie si l'overflow est stable entre deux itérations
+   * @param {Object} current - Overflow actuel
+   * @param {Object} previous - Overflow précédent
+   * @returns {boolean} true si stable
+   */
+  isOverflowStable: function(current, previous) {
+    if (!previous) return false;
+
+    const currentCounts = {
+      above: current.above?.length || 0,
+      below: current.below?.length || 0
+    };
+
+    const previousCounts = {
+      above: previous.above?.length || 0,
+      below: previous.below?.length || 0
+    };
+
+    return (currentCounts.above === previousCounts.above) &&
+           (currentCounts.below === previousCounts.below);
+  },
+
+  /**
+   * Détecte une oscillation dans le calcul
+   * @param {Object} current - Overflow actuel
+   * @param {Object} previous - Overflow précédent
+   * @returns {boolean} true si oscillation détectée
+   */
+  detectOscillation: function(current, previous) {
+    if (!previous) return false;
+
+    // Oscillation = les éléments changent de côté
+    const currentAboveIds = current.above.map(item => item.index).join(',');
+    const currentBelowIds = current.below.map(item => item.index).join(',');
+    const previousAboveIds = previous.above.map(item => item.index).join(',');
+    const previousBelowIds = previous.below.map(item => item.index).join(',');
+
+    return (currentAboveIds === previousBelowIds) || (currentBelowIds === previousAboveIds);
+  },
+
+  /**
+   * Affiche l'overflow dans l'espace réservé
+   * @param {Object} overflowData - Données d'overflow
+   * @param {number} reservedSpace - Espace réservé en pixels
+   */
+  displayOverflowInReservedSpace: function(overflowData, reservedSpace) {
+    // Nettoyer les anciens overflows
+    this.clearOverflowSections();
+
+    if (!reservedSpace || (!overflowData.above?.length && !overflowData.below?.length)) {
+      return;
+    }
+
+    const container = document.querySelector('.places-container');
+    if (!container) return;
+
+    let topOffset = this.originalListHeight - reservedSpace;
+
+    // Overflow au-dessus
+    if (overflowData.above?.length > 0) {
+      const aboveSection = this.createOverflowSection('above', overflowData.above);
+      aboveSection.style.cssText = `
+        position: absolute;
+        top: ${topOffset}px;
+        left: 0;
+        right: 0;
+        z-index: 15;
+      `;
+      container.appendChild(aboveSection);
+      this.currentOverflowSections.push(aboveSection);
+      topOffset += aboveSection.offsetHeight;
+    }
+
+    // Overflow en-dessous
+    if (overflowData.below?.length > 0) {
+      const belowSection = this.createOverflowSection('below', overflowData.below);
+      belowSection.style.cssText = `
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 15;
+      `;
+      container.appendChild(belowSection);
+      this.currentOverflowSections.push(belowSection);
+    }
+  },
+
+  /**
+   * Crée une section d'overflow
+   * @param {string} position - 'above' ou 'below'
+   * @param {Array} items - Éléments en overflow
+   * @returns {HTMLElement} Section créée
+   */
+  createOverflowSection: function(position, items) {
+    const section = document.createElement('div');
+    section.className = `overflow-section ${position} stabilized`;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'overflow-header';
+    header.innerHTML = `
+      <i class="fas fa-arrow-${position === 'above' ? 'down' : 'up'} fa-sm"></i>
+      ${items.length} lieu${items.length > 1 ? 'x' : ''} hors écran
+    `;
+
+    // Contenu (max 5 items)
+    const content = document.createElement('div');
+    content.className = 'overflow-content';
+
+    items.slice(0, 5).forEach(item => {
+      const row = item.row;
+      if (row) {
+        const clone = row.cloneNode(true);
+
+        // Nettoyer IDs et classes conflictuelles
+        const indicators = clone.querySelector('.place-indicators');
+        const placeContent = clone.querySelector('.place-content');
+
+        if (indicators) indicators.removeAttribute('id');
+        if (placeContent) {
+          placeContent.removeAttribute('id');
+          placeContent.classList.remove('grayed-out');
+
+          // Masquer événements internes pour éviter débordement
+          const events = placeContent.querySelector('.place-events');
+          if (events) events.style.display = 'none';
+        }
+
+        content.appendChild(clone);
+      }
+    });
+
+    section.appendChild(header);
+    section.appendChild(content);
+    return section;
+  },
+
+  /**
+   * Nettoie toutes les sections d'overflow
+   */
+  clearOverflowSections: function() {
+    this.currentOverflowSections.forEach(section => section.remove());
+    this.currentOverflowSections = [];
+
+    // Nettoyer aussi les anciennes sections stabilisées
+    document.querySelectorAll('.overflow-section.stabilized').forEach(el => el.remove());
+  }
+};
+
 // ========== Application principale ==========
 const FanchartApp = {
   window_w: 0,
@@ -1841,7 +2912,21 @@ const FanchartApp = {
   init: function() {
     this.calculateDimensions();
     this.processAncestorData();
-
+    // Construire les données de lieux
+    LocationDataBuilder.buildCompleteLocationData();
+    // Générer l'interface si le panneau existe
+    if (document.querySelector('.places-panel')) {
+      // Initialiser l'interface (récupère les références aux éléments)
+      if (ModernPlacesInterface.initialize()) {
+        // Générer la liste HTML avec tous les attributs
+        ModernPlacesInterface.generatePlacesList();
+        ModernPlacesInterface.updateSummarySection();
+        // Initialiser les contrôles
+        PlacesPanelControls.initialize();
+        // Attacher les événements de survol
+        ModernPlacesInterface.initializeEventListeners();
+      }
+    }
     const urlParams = new URLSearchParams(window.location.search);
     // Mode circulaire
     const modeParam = urlParams.get('mode');
@@ -1879,13 +2964,11 @@ const FanchartApp = {
       if (circularBtn) circularBtn.classList.add('active');
     }
 
-    LocationManager.calculateAndBuild()
     DOMCache.preload();
     this.renderFanchart();
     this.updateGenerationTitle();
     this.initializeEvents();
     this.initializeAngleEvents();
-    LocationManager.initializeLocationEvents();
     ColorManager.initializeColorEvents();
     LegendManager.initializeAllEvents();
     this.applyInitialState();
@@ -2129,7 +3212,7 @@ const FanchartApp = {
     // Configurer le SVG
     fanchart.setAttribute("height", this.window_h);
     fanchart.setAttribute("width", this.window_w);
-    
+
     // Mettre à jour la variable CSS pour la largeur de la liste
      const actualListWidth = LayoutCalculator.calculatePlacesListWidth();
      root.style.setProperty('--fc-tool-size', actualListWidth + 'px');
@@ -2476,10 +3559,16 @@ const FanchartApp = {
   reRenderWithCurrentGenerations: function() {
     DOMCache.invalidate();
     this.calculateDimensions();
-    LocationManager.calculateAndBuild(max_gen);
+    LocationDataBuilder.buildCompleteLocationData(max_gen);
     const fanchart = document.getElementById("fanchart");
     fanchart.innerHTML = "";
     this.renderFanchart();
+    const placesPanel = document.querySelector('.places-panel');
+    if (placesPanel) {
+      ModernPlacesInterface.generatePlacesList();
+      ModernPlacesInterface.updateSummarySection();
+      ModernPlacesInterface.initializeEventListeners();
+  }
     this.fitScreen();
     this.updateButtonStates();
     this.updateGenerationTitle();
@@ -2509,7 +3598,6 @@ const FanchartApp = {
         );
       }
     };
-
 
     // Boutons de navigation
     document.getElementById("b-no-buttons").onclick = function() {
@@ -2594,10 +3682,6 @@ const FanchartApp = {
       // Utils.updateUrlWithCurrentState();
     };
 
-    document.getElementById("b-sort-places").onclick = () => {
-      if (!document.body.classList.contains('place_color')) return;
-      UIManager.toggleSort();
-    };
   },
 
   applyInitialState: function() {
@@ -2607,7 +3691,7 @@ const FanchartApp = {
       const ageButton = document.getElementById("b-death-age");
       if (ageButton) ageButton.classList.add("active");
     } else {
-      document.body.className = "places-list place_color";
+      document.body.className = "place_color";
       tool = "place_color";
       const placesButton = document.getElementById("b-places-colorise");
       if (placesButton) placesButton.classList.add("active");
@@ -2625,3 +3709,9 @@ const T = TextRenderer;
 
 // Lancement de l'application
 FanchartApp.init();
+
+window.toggleFanchartSort = () => PlacesPanelControls.toggleSort();
+window.toggleFanchartEventsDisplay = () => PlacesPanelControls.toggleEventsDisplay();
+window.filterFanchartPlaces = (query) => PlacesPanelControls.filterPlaces(query);
+window.clearFanchartSearch = () => PlacesPanelControls.clearSearch();
+window.toggleFanchartPlacesPanel = () => document.body.classList.toggle('place_color');

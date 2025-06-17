@@ -16,6 +16,7 @@
 <link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript>
   <link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
+
   <link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;">
 </noscript>
 </head>
@@ -72,7 +73,6 @@
 
 <body id="body" class="bg-light p-4"%if;wizard; data-wizard="1"%end;>
 <canvas id="pixel" width="1" height="1" style="display: none;"></canvas>
-<div id="places-list"><ul id="places_list"></ul></div>
 <div id="death-age">
 <div><b>[*age]</b><ul>
 <li id="DA0"><span class="arrow">▶</span><span class="DA0">■</span>  0-29</li>
@@ -91,11 +91,10 @@
 <li id="DAM4"><span class="arrow">▶</span><span class="DAM4">■</span> 35-44</li>
 <li id="DAM5"><span class="arrow">▶</span><span class="DAM5">■</span> 45-54</li>
 <li id="DAM6"><span class="arrow">▶</span><span class="DAM6">■</span> 55+</li>
-
 </ul></div>
 </div>
 %if;(e.pdf!="on")
-<div class="fanchart-controls" id="fanchart-controls">
+<div class="fanchart-controls" id="controls">
 
   <div class="control-section">
     <div class="btn-group-fanchart">
@@ -111,7 +110,6 @@
     </div>
     <button class="btn-close" id="b-no-buttons" title="[*visualize/show/hide/summary]2">×</button>
   </div>
-
 
   <div class="control-section">
     <div class="section-title">[*display]%(TODO%)</div>
@@ -155,9 +153,7 @@
   <div class="control-section">
     <div class="section-title">Mode</div>
     <div class="btn-group-fanchart">
-      <button id="b-circular-mode" class="btn-fanchart" title="Mode circulaire (360°)">
-        <i class="fa fa-circle-notch fa-fw"></i>360
-      </button>
+      <button id="b-circular-mode" class="btn-fanchart" title="Mode circulaire (360°)">360</button>
     </div>
   </div>
 
@@ -183,10 +179,12 @@
         title="Colorisation des lieux (cycle entre les événements)">
         <i class="fa fa-paintbrush fa-fw"></i>
       </button>
+     %(
       <button id="b-sort-places" class="btn-fanchart"
         title="Trier par ordre alphabétique">
         <i class="fa fa-arrow-down-a-z fa-fw"></i>
       </button>
+     %)
     </div>
 
     <!-- Événements NBMDS ultra-compacts -->
@@ -214,15 +212,78 @@
     </div>
   </div>
 </div>
-<div id="fanchart-container" style="position: relative;">
+<div id="container" style="position: relative;">
   <svg id="fanchart" class="bi ba ma de bu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
   <div id="person-panel" class="identity-panel"></div>
 </div>
+
+<!-- Panneau des lieux modernisé -->
+<div class="places-panel" id="places-panel">
+  <!-- Header avec bouton pour masquer -->
+  <div class="places-header">
+    <div class="header-left">
+      <div class="places-title">Lieux &amp; Événements</div>
+      <div class="generation-count"></div>
+    </div>
+    <button class="panel-close" title="Masquer">×</button>
+  </div>
+
+  <!-- Contrôles de recherche, tri et mode complet -->
+  <div class="controls-search-section">
+    <div class="search-input-wrapper">
+      <input type="text" class="search-input" placeholder="Rechercher…">
+      <button class="search-clear" title="Effacer" style="display: none;">×</button>
+    </div>
+    <div class="controls-buttons">
+      <button class="sort-toggle" title="Tri">
+        <i class="fas fa-arrow-down-wide-short"></i>
+      </button>
+      <button class="events-toggle" title="Événements">
+        <i class="far fa-eye"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Section de résumé avec compteurs -->
+  <div class="summary-section">
+    <i class="fas fa-lightbulb summary-helper-icon" title="Totaux"></i>
+    <div class="summary-places-info">0 lieux</div>
+    <div class="summary-events-table">
+      <div class="summary-event-column">
+        <span class="summary-event-label birth-label" title="Naissances">N</span>
+        <span class="summary-event-count">0</span>
+      </div>
+      <div class="summary-event-column">
+        <span class="summary-event-label baptism-label" title="Baptêmes">B</span>
+        <span class="summary-event-count">0</span>
+      </div>
+      <div class="summary-event-column">
+        <span class="summary-event-label marriage-label" title="Mariages">M</span>
+        <span class="summary-event-count">0</span>
+      </div>
+      <div class="summary-event-column">
+        <span class="summary-event-label death-label" title="Décès">D</span>
+        <span class="summary-event-count">0</span>
+      </div>
+      <div class="summary-event-column">
+        <span class="summary-event-label burial-label" title="Sépultures">S</span>
+        <span class="summary-event-count">0</span>
+      </div>
+    </div>
+    <div class="summary-total-events" title="Total des événements">0</div>
+  </div>
+
+  <!-- Container de la liste des lieux -->
+  <div class="places-container">
+    <div class="places-list"></div>
+  </div>
+</div>
+
 <script>
 var link_to_person = "%prefix;";
 var max_gen = %e.v;;
 var tool = "%e.tool;";
-var implexMode = "%e.implex;" === "num" ? "numbered" : 
+var implexMode = "%e.implex;" === "num" ? "numbered" :
                  "%e.implex;" === "full" ? "full" : "reduced";
 var initial_angle = %if;(e.angle != "")%e.angle;%else;220%end;;
 var ancestor = {
