@@ -1397,8 +1397,8 @@ let print conf base p =
     match Util.p_getenv conf.Config.env "t" with
     | Some ("F" | "L" | "M") -> "deslist"
     | Some "I" -> "destable"
-    | Some _ -> ""
     | None -> "desmenu"
+    | Some _ -> ""
   in
   if templ <> "" then Perso.interp_templ templ conf base p
   else
