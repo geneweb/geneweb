@@ -89,16 +89,14 @@
 
 .btn-close {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
   background: none;
   border: none;
   font-size: 1.1rem;
   color: #6c757d;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: color 0.2s ease;
+  padding: 2px 8px;
+  border-radius: 6px;
+  transition: color 0.1s ease;
 }
 
 .btn-close:hover {
@@ -566,7 +564,6 @@ body:not(.place_color) .places-panel {
   height: 100vh;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(15px);
-  box-shadow: -3px 0 15px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
 }
@@ -593,11 +590,13 @@ body:not(.place_color) .places-panel {
   font-size: 15px;
   font-weight: 600;
   margin: 0;
+  white-space: nowrap
 }
 
 .generation-count {
   font-size: 11px;
   opacity: 0.85;
+  white-space: nowrap
 }
 
 .panel-close {
@@ -758,7 +757,7 @@ body:not(.place_color) .places-panel {
 .summary-events-table {
   display: grid;
   grid-template-columns: repeat(5, auto);
-  gap: 8px;
+  gap: 6px;
   margin-left: auto;
   margin-right: 4px;
   align-items: end;
@@ -782,9 +781,7 @@ body:not(.place_color) .places-panel {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  margin-right: 2px;
-  margin-left: 1px;
-}
+  }
 
 .summary-persons-icon {
   color: #495057;
@@ -1120,6 +1117,7 @@ body:not(.place_color) .places-panel {
   border-radius: 4px;
   font-weight: 600;
   min-width: 20px;
+  width: 26px;
   text-align: center;
   display: flex;
   justify-content: center;
@@ -1128,6 +1126,7 @@ body:not(.place_color) .places-panel {
   box-sizing: border-box;
   margin-left: 4px;
   margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .places-panel.show-events .place-row:nth-child(odd) .place-count {
@@ -1188,17 +1187,26 @@ body:not(.place_color) .places-panel {
 }
 
 .overflow-section.above {
-  top: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 15;
   flex-direction: column-reverse;
 }
 
 .overflow-section.below {
   bottom: 0;
-  flex-direction: column;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 15;
 }
 
 .overflow-header {
-  background: #28a745;
+  background: linear-gradient(to right, 
+    rgba(255,255,255,0.95) 0%, 
+    rgba(40,167,69,0.7) 25%, 
+    #28a745 100%);
   color: white;
   padding: 1px;
   font-size: 10px;
@@ -1207,7 +1215,8 @@ body:not(.place_color) .places-panel {
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  padding-left: 52px;
+  padding-left: 72px;
+  min-height: 20px;
 }
 
 .overflow-content {

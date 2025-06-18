@@ -31,13 +31,13 @@ const Events = {
   // Réutilise directement les mappings existants
   cssClass: (type) => EVENT_CONFIG.eventToClass[type],
   label: (type) => EVENT_CONFIG.eventToLabel[type],
-  
+
   // Générateurs cohérents pour les noms longs
   count: (type) => type + '_count', // 'birth' -> 'birth_count'
   place: (type) => type + '_place', // 'birth' -> 'birth_place'
   svgPrefix: (type) => type.substring(0, 2), // 'birth' → 'bi'
   flagProp: (type) => 'has_' + Events.svgPrefix(type), // 'birth' → 'has_bi'
-  
+
   // Recherche inverse
   findByClass: (cssClass) => EVENT_CONFIG.eventOrder.find(type => Events.cssClass(type) === cssClass),
   findBySvgPrefix: (prefix) => EVENT_CONFIG.eventOrder.find(type => Events.svgPrefix(type) === prefix),
@@ -716,14 +716,24 @@ const LocationDataBuilder = {
    * Cette fonction transforme l'objet lieux en array utilisable par les fonctions de tri
    */
   buildFinalLocationArray: function() {
-    // Conversion de l'objet lieux en array de paires [nom, données]
     lieux_a = Object.entries(lieux);
 
-    // Assignation des IDs CSS pour la colorisation (cohérent avec l'ancien système)
+    // ✅ VALIDATION POST-CRÉATION - corriger les fausses détections
+    Object.entries(lieux).forEach(([placeName, locationData]) => {
+      if (locationData.isSubLocation && locationData.parentLocation) {
+        // Vérifier si le parent existe réellement dans lieux
+        if (!lieux[locationData.parentLocation]) {
+          console.log(`❌ CORRECTION: "${placeName}" n'est pas un sous-lieu (parent "${locationData.parentLocation}" inexistant)`);
+          locationData.isSubLocation = false;
+          locationData.subName = null;
+          locationData.parentLocation = null;
+        }
+      }
+    });
+
+    // Assignation des IDs CSS
     lieux_a.forEach(([placeName, locationData], index) => {
       locationData.c = "L" + index;
-      // Mise à jour finale des data-attributes
-      locationData.domAttributes['data-total'] = locationData.cnt;
     });
   },
 
@@ -848,10 +858,12 @@ const PlacesInterface = {
     const personsElement = this.elements.panel.querySelector('.summary-persons-count');
     if (!personsElement) return;
 
+    const filteredAncestors = LocationDataBuilder.filterAncestorsByGeneration(max_gen);
+
     // Compter les personnes uniques avec au moins un lieu
     let personsWithPlaces = 0;
-    
-    Object.values(ancestor).forEach(person => {
+
+    Object.values(filteredAncestors).forEach(person => {
       let hasPlace = false;
       Events.types.forEach(eventType => {
         const placeField = Events.place(eventType);
@@ -863,7 +875,7 @@ const PlacesInterface = {
     });
 
     personsElement.textContent = personsWithPlaces;
-    
+
     // Tooltip avec traduction
     const personLabel = window.FC_TRANSLATIONS?.[personsWithPlaces > 1 ? 'persons' : 'person'] || 'personne';
     personsElement.title = `${personsWithPlaces} ${personLabel} avec lieux`;
@@ -956,50 +968,21 @@ const PlacesInterface = {
   },
 
   generateEventItemsHTML: function(placeData) {
-    // Fonction locale pour les tooltips
-    function buildEventTooltip(eventType, count) {
-      const eventName = Events.translate(eventType, count);
-      return count > 0 ? `${count} ${eventName}` : eventName;
-    }
-
-    // Génération des indicateurs ET comptage des actifs en une seule passe
-    let activeEventsCount = 0;
     const htmlParts = Events.types.map(eventType => {
-      const cssClass = Events.cssClass(eventType);
       const label = Events.label(eventType);
       const eventCount = Events.count(eventType);
       const count = placeData[eventCount] || 0;
       const isActive = count > 0;
 
-      // Comptage intelligent pendant la génération HTML
-      if (isActive) activeEventsCount++;
-
-      const tooltip = buildEventTooltip(eventType, count);
-
       return `
-        <div class="event-item ${isActive ? 'active' : ''}"
-             data-event="${eventType}" title="${tooltip}">
+        <div class="event-item ${isActive ? 'active' : ''}" data-event="${eventType}">
           <span class="event-count">${count > 1 ? count : ''}</span>
           <span class="event-label">${label}</span>
         </div>
       `;
     });
 
-    this.adjustRowHeightIfNeeded(placeData, activeEventsCount);
     return htmlParts.join('');
-  },
-
-  /**
-   * Ajuste la hauteur de ligne pour 4+ indicateurs actifs
-   * Utilise le count déjà calculé pendant la génération HTML
-   */
-  adjustRowHeightIfNeeded: function(placeData, activeCount) {
-    if (activeCount >= 4) {
-      requestAnimationFrame(() => {
-        const placeElement = document.querySelector(`[data-place="${CSS.escape(placeData.fullName || '')}"]`);
-        if (placeElement) this.adjustRowHeightForEvents(placeElement, activeCount);
-      });
-    }
   },
 
   /**
@@ -1090,25 +1073,30 @@ const PlacesInterface = {
       const main = new Map();
       const subs = [];
 
-      // Séparer lieux principaux et sous-lieux SANS modifier les originaux
-      Object.entries(lieux).forEach(([name, data]) => {
-        if (data.isSubLocation && data.parentLocation) {
-          subs.push({ name, data });
-        } else {
-          main.set(name, { name, data, subs: [] });
-        }
-      });
+    // Debug : voir ce qui se passe
+    console.log('=== DEBUG TRI ALPHABÉTIQUE ===');
+    
+    Object.entries(lieux).forEach(([name, data]) => {
+      if (data.isSubLocation && data.parentLocation) {
+        console.log(`SOUS-LIEU: "${name}" → parent: "${data.parentLocation}"`);
+        subs.push({ name, data });
+      } else {
+        console.log(`LIEU PRINCIPAL: "${name}"`);
+        main.set(name, { name, data, subs: [] });
+      }
+    });
 
-      // Rattacher les sous-lieux à leurs parents
-      subs.forEach(({ name, data }) => {
-        const group = main.get(data.parentLocation);
-        if (group) {
-          group.subs.push({ name, data });
-        } else {
-          // Parent introuvable, traiter comme principal
-          main.set(name, { name, data, subs: [] });
-        }
-      });
+    // Rattacher les sous-lieux à leurs parents
+    subs.forEach(({ name, data }) => {
+      const group = main.get(data.parentLocation);
+      if (group) {
+        console.log(`✅ RATTACHEMENT: "${name}" → "${data.parentLocation}"`);
+        group.subs.push({ name, data });
+      } else {
+        console.log(`❌ PARENT INTROUVABLE: "${name}" cherche "${data.parentLocation}"`);
+        main.set(name, { name, data, subs: [] });
+      }
+    });
 
       // Construire l'array trié avec métadonnées d'affichage
       const sorted = [];
@@ -1299,8 +1287,8 @@ const PlacesPanelControls = {
     const icon = document.querySelector('.sort-toggle i');
     if (icon) {
       icon.className = sortMode === 'alphabetical'
-        ? 'fas fa-arrow-down-a-z'
-        : 'fas fa-arrow-down-wide-short';
+        ? 'fas fa-arrow-down-wide-short'
+        : 'fas fa-arrow-down-a-z';
     }
 
     // Mise à jour du title pour l'accessibilité
@@ -1402,6 +1390,7 @@ const PlacesHighlighter = {
 
     if (!placeNames || placeNames.length === 0) return;
 
+    const highlightedPlaces = new Set(placeNames);
     const matchingElements = [];
 
     // Traiter chaque lieu
@@ -1417,13 +1406,14 @@ const PlacesHighlighter = {
       this.currentHighlights.push(placeData.domElement);
 
       // Ajouter les indicateurs d'événements
-      const events = eventTypes.length === 1
-        ? eventTypes  // Si un seul type, l'appliquer à tous les lieux
-        : [eventTypes[index]].filter(Boolean); // Sinon, un événement par lieu
+      if (placeData.indicatorElement) {
+        const events = eventTypes.length === 1 ? eventTypes : [eventTypes[index]].filter(Boolean);
+        if (events.length > 0) {
+          this.addIndicatorsForPlace(placeData.indicatorElement, events);
+        }
+     }
 
-      if (events.length > 0 && placeData.indicatorElement) {
-        this.addIndicatorsForPlace(placeData.indicatorElement, events);
-      }
+     this.expandPlaceNameIfNeeded(placeData.domElement, placeName, highlightedPlaces);
 
       matchingElements.push({
         element: placeData.domElement,
@@ -1435,15 +1425,45 @@ const PlacesHighlighter = {
     // Griser les autres lieux
     this.grayOutOtherPlaces();
 
-    // Scroll vers le premier élément si nécessaire
-    if (matchingElements.length > 0) {
-      this.ensureVisibility(matchingElements[0].element);
-    }
-
     if (matchingElements.length > 0) {
       setTimeout(() => {
         ModernOverflowManager.handleOverflow(matchingElements);
       }, 100);
+    }
+  },
+
+  /**
+   * Affiche le nom complet d'un sous-lieu si nécessaire
+   */
+  expandPlaceNameIfNeeded: function(placeElement, placeName, highlightedPlaces = null, forceExpand = false) {
+    const placeData = lieux[placeName];
+    const placeNameElement = placeElement.querySelector('.place-name');
+    
+    if (placeNameElement && placeData) {
+      let shouldExpand = false;
+      
+      if (forceExpand) {
+        // Cas survol liste : toujours afficher
+        shouldExpand = true;
+      } else if (sortMode === 'alphabetical' && placeData.isSubLocation) {
+        // Cas survol secteur : vérifier le parent
+        shouldExpand = !highlightedPlaces || !highlightedPlaces.has(placeData.parentLocation);
+      }
+      
+      if (shouldExpand) {
+        if (!placeNameElement.dataset.originalName) {
+          placeNameElement.dataset.originalName = placeNameElement.textContent;
+        }
+        placeNameElement.textContent = placeName; // Nom complet original
+      }
+    }
+  },
+
+  restorePlaceNameIfNeeded: function(placeElement) {
+    const placeNameElement = placeElement.querySelector('.place-name');
+    if (placeNameElement && placeNameElement.dataset.originalName) {
+      placeNameElement.textContent = placeNameElement.dataset.originalName;
+      delete placeNameElement.dataset.originalName;
     }
   },
 
@@ -1455,34 +1475,28 @@ const PlacesHighlighter = {
   addIndicatorsForPlace: function(container, events) {
     if (!container) return;
 
-    // Mapping des événements vers les classes courtes
-    const eventToClass = {
-      'birth': 'n',
-      'baptism': 'b',
-      'marriage': 'm',
-      'death': 'd',
-      'burial': 's'
-    };
-
     events.forEach((event, index) => {
       const indicator = document.createElement('div');
-      const shortClass = eventToClass[event] || event.charAt(0);
+
+      const shortClass = Events.cssClass(event);
+      const label = Events.label(event);
 
       indicator.className = `indicator ${shortClass}`;
-      indicator.textContent = shortClass.toUpperCase();
+      indicator.textContent = label;
 
       container.appendChild(indicator);
       this.currentIndicators.push(indicator);
 
-      // Saut de ligne après le 2e indicateurs si 4+ événements
+      // Line-break après le 2e si 4+ événements
       if (index === 1 && events.length >= 4) {
         const breaker = document.createElement('div');
         breaker.className = 'line-break';
         container.appendChild(breaker);
-        this.currentIndicators.push(breaker); // Pour le nettoyage
+        this.currentIndicators.push(breaker);
       }
     });
 
+    // Ajouter tall-row seulement si 4+ événements
     if (events.length >= 4) {
       const row = container.closest('.place-row');
       if (row) row.classList.add('tall-row');
@@ -1510,7 +1524,7 @@ const PlacesHighlighter = {
       element.classList.remove('grayed-out');
     });
 
-    //Restaurer la hauteur de liste et nettoyer overflow (comme dans demo2.html)
+    //Restaurer la hauteur de liste et nettoyer overflow
     const list = document.querySelector('.places-list');
     if (list) {
       list.style.maxHeight = 'none';
@@ -1520,6 +1534,16 @@ const PlacesHighlighter = {
     // Nettoyer les sections d'overflow
     document.querySelectorAll('.overflow-section').forEach(section => {
       section.remove();
+    });
+
+    // Retirer toutes les classes tall-row
+    document.querySelectorAll('.place-row.tall-row').forEach(row => {
+      row.classList.remove('tall-row');
+    });
+
+    this.currentHighlights.forEach(element => {
+      element.classList.remove('person-match');
+      this.restorePlaceNameIfNeeded(element); // ← Nouveau
     });
   },
 
@@ -1531,32 +1555,6 @@ const PlacesHighlighter = {
       if (!element.classList.contains('person-match')) {
         element.classList.add('grayed-out');
       }
-    });
-  },
-
-  /**
-   * S'assure qu'un élément est visible dans la liste scrollable
-   * @param {HTMLElement} element - Élément à rendre visible
-   */
-  ensureVisibility: function(element) {
-    if (!element) return;
-
-    const container = document.querySelector('.places-list');
-    if (!container) return;
-
-    const rect = element.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-
-    // Vérifier si l'élément est déjà visible
-    if (rect.top >= containerRect.top && rect.bottom <= containerRect.bottom) {
-      return;
-    }
-
-    // Scroll pour centrer l'élément
-    const scrollTop = element.offsetTop - container.offsetTop - (container.clientHeight / 2) + (element.clientHeight / 2);
-    container.scrollTo({
-      top: scrollTop,
-      behavior: 'smooth'
     });
   },
 
@@ -1587,21 +1585,7 @@ const PlacesHighlighter = {
         }
       }
     });
-  },
-
-  adjustRowHeightForEvents: function(placeElement, eventCount) {
-    if (!placeElement) return;
-
-    const row = placeElement.closest('.place-row');
-    if (!row) return;
-
-    // Ajuster la hauteur si beaucoup d'événements
-    if (eventCount >= 4) {
-      row.classList.add('tall-row');
-    } else {
-      row.classList.remove('tall-row');
-    }
-  },
+  }
 };
 
 // ========== Module de rendu circulaire ==========
@@ -1869,21 +1853,21 @@ const SVGRenderer = {
       Events.types.forEach(eventType => {
         const placeField = Events.place(eventType);
         const svgPrefix = Events.svgPrefix(eventType); // 'bi', 'ba', 'ma', 'de', 'bu'
-        
+
         if (p[placeField] && lieux[p[placeField]]) {
           classes.push(`${svgPrefix}-${lieux[p[placeField]].c}`);
         }
       });
 
       if (p.death_age) classes.push(Utils.deathAgeClass(p.death_age));
-      
+
     } else if (type === 'marriage') {
       const marriagePlaceField = Events.place('marriage');
       if (p[marriagePlaceField] && lieux[p[marriagePlaceField]]) {
         const svgPrefix = Events.svgPrefix('marriage'); // 'ma'
         classes.push(`${svgPrefix}-${lieux[p[marriagePlaceField]].c}`);
       }
-      
+
       if (p.marriage_length) {
         const marriageClass = Utils.marriageLengthClass(p.marriage_length);
         if (marriageClass) classes.push(marriageClass);
@@ -1988,11 +1972,13 @@ const SVGRenderer = {
       if (!placeName || !lieux[placeName]) return false;
 
       const placeData = lieux[placeName];
-      const elementId = `${Events.svgPrefix(eventType)}-${placeData.c}`;
-      const el = DOMCache.getElementById(elementId);
+      const className = `${Events.svgPrefix(eventType)}-${placeData.c}`;
+      const elements = document.getElementsByClassName(className);
 
-      if (el) {
-        el.classList.toggle("hidden", !show);
+      if (elements.length > 0) {
+        Array.from(elements).forEach(el => {
+          el.classList.toggle("hidden", !show);
+        });
         return true;
       }
       return false;
@@ -2197,7 +2183,7 @@ const TextRenderer = {
     Events.types.forEach(eventType => {
       const placeField = Events.place(eventType);
       const svgPrefix = Events.svgPrefix(eventType);
-      
+
       if (p[placeField] && lieux[p[placeField]]) {
         classes += ` ${svgPrefix}-t${lieux[p[placeField]].c}`;
       }
@@ -2516,12 +2502,12 @@ const ColorManager = {
 
   applyColorization: function() {
     const fanchart = document.getElementById("fanchart");
-    
+
     Events.types.forEach(eventType => {
       const svgPrefix = Events.svgPrefix(eventType);
       const checkbox = document.getElementById(svgPrefix);
       const isChecked = checkbox ? checkbox.checked : false;
-      
+
       fanchart.classList.toggle(svgPrefix, isChecked);
     });
 
@@ -2730,6 +2716,7 @@ const FanchartPlacesEventManager = {
         const placeName = placeContent.dataset.place;
         if (placeName) {
           placeContent.classList.add('hovered');
+          PlacesHighlighter.expandPlaceNameIfNeeded(placeContent, placeName, null, true);
           PlacesHighlighter.highlightSVGSectorsForPlace(placeName, true);
         }
       }
@@ -2742,6 +2729,7 @@ const FanchartPlacesEventManager = {
         const placeName = placeContent.dataset.place;
         if (placeName) {
           placeContent.classList.remove('hovered');
+          PlacesHighlighter.restorePlaceNameIfNeeded(placeContent);
           PlacesHighlighter.highlightSVGSectorsForPlace(placeName, false);
         }
       }
@@ -2800,6 +2788,7 @@ const ModernOverflowManager = {
   // État
   originalListHeight: null,
   currentOverflowSections: [],
+  isProcessing: false,
 
   /**
    * Initialise le système d'overflow
@@ -2821,18 +2810,42 @@ const ModernOverflowManager = {
    * @param {Array} matchingItems - Éléments surlignés à garder visibles
    */
   handleOverflow: function(matchingItems) {
-    console.log('🚀 Gestion de l\'overflow pour', matchingItems.length, 'éléments');
-
-    if (!this.initialize() || !matchingItems?.length) {
-      console.warn('⚠️ Impossible d\'initialiser le système d\'overflow');
+    // Prévenir les appels multiples simultanés
+    if (this.isProcessing) {
+      console.log('⚠️ Overflow déjà en cours, ignoré');
       return;
     }
+
+    this.isProcessing = true;
+
+    if (!this.initialize() || !matchingItems?.length) {
+      this.isProcessing = false;
+      return;
+    }
+
+    // Déduplication par lieu pour éviter les collisions
+    const uniqueItems = this.deduplicateByPlace(matchingItems);
 
     // Nettoyer les sections d'overflow précédentes
     this.clearOverflowSections();
 
     // Lancer la stabilisation
-    this.stabilizeOverflow(matchingItems);
+    this.stabilizeOverflow(uniqueItems);
+
+    this.isProcessing = false;
+  },
+
+  // Gestion de la déduplication
+  deduplicateByPlace: function(matchingItems) {
+    const seenPlaces = new Set();
+    return matchingItems.filter(item => {
+      const placeName = item.placeName || item.element?.dataset?.place;
+      if (!placeName || seenPlaces.has(placeName)) {
+        return false;
+      }
+      seenPlaces.add(placeName);
+      return true;
+    });
   },
 
   /**
@@ -2843,61 +2856,17 @@ const ModernOverflowManager = {
     const list = document.querySelector('.places-list');
     if (!list) return;
 
-    // Reset état initial
-    list.style.maxHeight = 'none';
+    const currentOverflow = this.calculateOverflowWithConstraints(matchingItems, list.clientHeight);
 
-    let iteration = 0;
-    let reservedSpace = 0;
-    let previousOverflow = null;
-    let hasOscillation = false;
-
-    // Boucle de stabilisation
-    do {
-      iteration++;
-      console.log(`🔄 Itération ${iteration}/${this.config.maxIterations}`);
-
-      // Appliquer contrainte de hauteur
-      const availableHeight = Math.max(0, this.originalListHeight - reservedSpace);
-      if (availableHeight <= 50) { // Hauteur minimum critique
-        console.warn('⚠️ Hauteur disponible trop faible, abandon');
-        break;
-      }
-
-      list.style.maxHeight = `${availableHeight}px`;
-
-      // Recalculer overflow avec nouvelle contrainte
-      const currentOverflow = this.calculateOverflowWithConstraints(matchingItems, availableHeight);
-
-      // Test de stabilité
-      if (this.isOverflowStable(currentOverflow, previousOverflow)) {
-        console.log('✅ Stabilité atteinte !');
-        this.displayOverflowInReservedSpace(currentOverflow, reservedSpace);
-        break;
-      }
-
-      // Détecter oscillation
-      if (previousOverflow && this.detectOscillation(currentOverflow, previousOverflow)) {
-        hasOscillation = true;
-        console.warn('🔀 Oscillation détectée !');
-        // Stratégie : moyenner l'espace réservé
-        const avgSpace = (reservedSpace + this.calculateRequiredSpace(previousOverflow)) / 2;
-        reservedSpace = Math.round(avgSpace);
-        const finalHeight = Math.max(0, this.originalListHeight - reservedSpace);
-        list.style.maxHeight = `${finalHeight}px`;
-        const finalOverflow = this.calculateOverflowWithConstraints(matchingItems, finalHeight);
-        this.displayOverflowInReservedSpace(finalOverflow, reservedSpace);
-        break;
-      }
-
-      // Ajuster l'espace réservé
-      reservedSpace = this.calculateRequiredSpace(currentOverflow);
-      previousOverflow = currentOverflow;
-
-    } while (iteration < this.config.maxIterations);
-
-    if (iteration >= this.config.maxIterations) {
-      console.warn('⚠️ Maximum d\'itérations atteint sans stabilité');
+    if (!currentOverflow.above?.length && !currentOverflow.below?.length) {
+      console.log('✅ Aucun overflow détecté');
+      return;
     }
+
+    console.log(`📊 Overflow détecté: ${currentOverflow.above?.length || 0} au-dessus, ${currentOverflow.below?.length || 0} en-dessous`);
+
+    // ✅ FIXÉ - ne pas passer de reservedSpace
+    this.displayOverflowInReservedSpace(currentOverflow);
   },
 
   /**
@@ -2960,17 +2929,11 @@ const ModernOverflowManager = {
       const itemTop = row.offsetTop;
       const itemBottom = itemTop + row.offsetHeight;
 
-      // Calculer la partie réellement visible
-      const visibleTop = Math.max(itemTop, scrollTop);
-      const visibleBottom = Math.min(itemBottom, scrollBottom);
-      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-      const totalHeight = itemBottom - itemTop;
-
-      // L'élément doit être ENTIÈREMENT visible
-      const isCompletelyVisible = (visibleHeight >= totalHeight);
+      // Simple test de visibilité : l'élément est-il entièrement visible ?
+      const isCompletelyVisible = (itemTop >= scrollTop && itemBottom <= scrollBottom);
 
       if (!isCompletelyVisible) {
-        // Déterminer si l'élément est plutôt au-dessus ou en-dessous
+        // Déterminer si l'élément est plutôt au-dessus ou en-dessous du viewport
         const itemCenter = (itemTop + itemBottom) / 2;
         const viewCenter = (scrollTop + scrollBottom) / 2;
 
@@ -2992,7 +2955,6 @@ const ModernOverflowManager = {
       }
     });
 
-    console.log(`🔍 Overflow: ${overflowAbove.length} au-dessus, ${overflowBelow.length} en-dessous`);
     return { above: overflowAbove, below: overflowBelow };
   },
 
@@ -3043,43 +3005,27 @@ const ModernOverflowManager = {
    * @param {number} reservedSpace - Espace réservé en pixels
    */
   displayOverflowInReservedSpace: function(overflowData, reservedSpace) {
-    // Nettoyer les anciens overflows
     this.clearOverflowSections();
 
-    if (!reservedSpace || (!overflowData.above?.length && !overflowData.below?.length)) {
+    if (!overflowData.above?.length && !overflowData.below?.length) {
       return;
     }
 
     const container = document.querySelector('.places-container');
     if (!container) return;
 
-    let topOffset = this.originalListHeight - reservedSpace;
-
-    // Overflow au-dessus
+    // Overflow au-dessus - positionner en HAUT de la liste
     if (overflowData.above?.length > 0) {
       const aboveSection = this.createOverflowSection('above', overflowData.above);
-      aboveSection.style.cssText = `
-        position: absolute;
-        top: ${topOffset}px;
-        left: 0;
-        right: 0;
-        z-index: 15;
-      `;
+      aboveSection.style.top = '0px'; // ✅ FIXÉ - en haut !
       container.appendChild(aboveSection);
       this.currentOverflowSections.push(aboveSection);
-      topOffset += aboveSection.offsetHeight;
     }
 
-    // Overflow en-dessous
+    // Overflow en-dessous - utiliser les classes CSS (bottom: 0)
     if (overflowData.below?.length > 0) {
       const belowSection = this.createOverflowSection('below', overflowData.below);
-      belowSection.style.cssText = `
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 15;
-      `;
+      // ✅ FIXÉ - laisser le CSS gérer avec .overflow-section.below
       container.appendChild(belowSection);
       this.currentOverflowSections.push(belowSection);
     }
@@ -3095,15 +3041,15 @@ const ModernOverflowManager = {
     const section = document.createElement('div');
     section.className = `overflow-section ${position} stabilized`;
 
-    // Header
+    // Header - utilise uniquement la classe CSS existante
     const header = document.createElement('div');
     header.className = 'overflow-header';
     header.innerHTML = `
-      <i class="fas fa-arrow-${position === 'above' ? 'down' : 'up'} fa-sm"></i>
+      <i class="fas fa-arrow-${position === 'above' ? 'up' : 'down'} fa-sm"></i>
       ${items.length} lieu${items.length > 1 ? 'x' : ''} hors écran
     `;
 
-    // Contenu (max 5 items)
+    // Contenu - utilise uniquement la classe CSS existante
     const content = document.createElement('div');
     content.className = 'overflow-content';
 
@@ -3120,10 +3066,6 @@ const ModernOverflowManager = {
         if (placeContent) {
           placeContent.removeAttribute('id');
           placeContent.classList.remove('grayed-out');
-
-          // Masquer événements internes pour éviter débordement
-          const events = placeContent.querySelector('.place-events');
-          if (events) events.style.display = 'none';
         }
 
         content.appendChild(clone);
@@ -3139,11 +3081,19 @@ const ModernOverflowManager = {
    * Nettoie toutes les sections d'overflow
    */
   clearOverflowSections: function() {
-    this.currentOverflowSections.forEach(section => section.remove());
+    // Nettoyer les sections trackées
+    this.currentOverflowSections.forEach(section => {
+      if (section.parentNode) {
+        section.parentNode.removeChild(section);
+      }
+    });
     this.currentOverflowSections = [];
 
-    // Nettoyer aussi les anciennes sections stabilisées
-    document.querySelectorAll('.overflow-section.stabilized').forEach(el => el.remove());
+    // Nettoyer toutes les sections d'overflow orphelines
+    document.querySelectorAll('.overflow-section').forEach(el => el.remove());
+
+    // Réinitialiser l’état de traitement au cas où
+    this.isProcessing = false;
   }
 };
 
