@@ -777,6 +777,27 @@ body:not(.place_color) .places-panel {
   color: #495057;
 }
 
+.summary-persons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-right: 2px;
+  margin-left: 1px;
+}
+
+.summary-persons-icon {
+  color: #495057;
+  font-size: 10px;
+  cursor: help;
+}
+
+.summary-persons-count {
+  font-weight: 700;
+  color: #495057;
+  font-size: 10px;
+}
+
 .summary-event-label {
   display: inline-flex;
   align-items: center;

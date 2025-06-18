@@ -17,27 +17,39 @@ var has_bi = false, has_ba = false, has_ma = false, has_de = false, has_bu = fal
 var svg_viewbox_x = 0, svg_viewbox_y = 0, svg_viewbox_w = 0, svg_viewbox_h = 0;
 
 // ========== CONSTANTES D'ÉVÉNEMENTS ==========
+// Source unique de vérité - tout le reste est généré automatiquement
 const EVENT_CONFIG = {
-  // Mapping événement → classe courte
-  eventToClass: {
-    'birth': 'n',
-    'baptism': 'b',
-    'marriage': 'm',
-    'death': 'd',
-    'burial': 's'
-  },
+  eventOrder: ['birth', 'baptism', 'marriage', 'death', 'burial'],
+  eventToClass: { 'birth': 'n', 'baptism': 'b', 'marriage': 'm', 'death': 'd', 'burial': 's' },
+  eventToLabel: { 'birth': 'N', 'baptism': 'B', 'marriage': 'M', 'death': 'D', 'burial': 'S' }
+};
 
-  // Mapping événement → label
-  eventToLabel: {
-    'birth': 'N',
-    'baptism': 'B',
-    'marriage': 'M',
-    'death': 'D',
-    'burial': 'S'
-  },
+const Events = {
+  // Accès direct à la liste complète
+  get types() { return EVENT_CONFIG.eventOrder; },
 
-  // Ordre d'affichage des événements
-  eventOrder: ['birth', 'baptism', 'marriage', 'death', 'burial']
+  // Réutilise directement les mappings existants
+  cssClass: (type) => EVENT_CONFIG.eventToClass[type],
+  label: (type) => EVENT_CONFIG.eventToLabel[type],
+  
+  // Générateurs cohérents pour les noms longs
+  count: (type) => type + '_count', // 'birth' -> 'birth_count'
+  place: (type) => type + '_place', // 'birth' -> 'birth_place'
+  svgPrefix: (type) => type.substring(0, 2), // 'birth' → 'bi'
+  flagProp: (type) => 'has_' + Events.svgPrefix(type), // 'birth' → 'has_bi'
+  
+  // Recherche inverse
+  findByClass: (cssClass) => EVENT_CONFIG.eventOrder.find(type => Events.cssClass(type) === cssClass),
+  findBySvgPrefix: (prefix) => EVENT_CONFIG.eventOrder.find(type => Events.svgPrefix(type) === prefix),
+
+  // Validation
+  isValid: (type) => EVENT_CONFIG.eventOrder.includes(type),
+
+  // Traduction
+  translate: (type, count = 1) => {
+    const translationKey = count > 1 ? type + 's' : type;
+    return window.FC_TRANSLATIONS?.[translationKey] || type;
+  }
 };
 
 // ====== Configuration =======
@@ -526,7 +538,7 @@ const LocationDataBuilder = {
     const filteredAncestors = {};
 
     // Calculer la plage de Sosa pour les générations à inclure
-    for (let gen = 1; gen <= maxGeneration; gen++) {
+    for (let gen = 1; gen <= maxGeneration + 1; gen++) {
       const startSosa = Math.pow(2, gen - 1);
       const endSosa = Math.pow(2, gen) - 1;
 
@@ -560,21 +572,13 @@ const LocationDataBuilder = {
 
   /**
    * Traite tous les lieux associés à une personne donnée
-   * @param {Object} person - Objet personne de l'ancestor
+   * @param {Object} person - Objet personne de l’ancêtre
    */
   processPersonAllLocations: function(person) {
-    // Définition des types de lieux à traiter (cohérent avec l'existant)
-    const locationTypes = [
-      { field: 'birth_place', eventType: 'bi' },
-      { field: 'baptism_place', eventType: 'ba' },
-      { field: 'marriage_place', eventType: 'ma' },
-      { field: 'death_place', eventType: 'de' },
-      { field: 'burial_place', eventType: 'bu' }
-    ];
-
-    locationTypes.forEach(({ field, eventType }) => {
-      if (person[field] && person[field].trim() !== '') {
-        this.processSingleLocation(person[field], eventType, person);
+    Events.types.forEach(eventType => {
+      const placeField = Events.place(eventType); // 'birth_place', etc.
+      if (person[placeField] && person[placeField].trim() !== '') {
+        this.processSingleLocation(person[placeField], eventType, person);
       }
     });
   },
@@ -648,23 +652,23 @@ const LocationDataBuilder = {
    * @returns {Object} Entrée complète pour l'objet lieux
    */
   createLocationEntry: function(cleanPlaceName, locationStructure) {
+    const counters = {};
+    const flags = {};
+
+    Events.types.forEach(eventType => {
+      const eventCount = Events.count(eventType);
+      const flagProp = Events.svgPrefix(eventType);
+
+      counters[eventCount] = 0;  // birth_count: 0, baptism_count: 0, etc.
+      flags[flagProp] = false;  // n: false, b: false, etc.
+    });
+
     return {
-      // Compteurs par type d'événement (pour les statistiques et l'affichage)
-      bi_count: 0,
-      ba_count: 0,
-      ma_count: 0,
-      de_count: 0,
-      bu_count: 0,
+      // Compteurs et flags de présence générés automatiquement
+      ...counters,
+      ...flags,
 
-      // Flags de présence d'événements (pour l'affichage conditionnel)
-      bi: false,
-      ba: false,
-      ma: false,
-      de: false,
-      bu: false,
-
-      // Compteur total consolidé
-      cnt: 0,
+      cnt: 0, // Compteur total
 
       // Métadonnées géographiques extraites
       isSubLocation: locationStructure.isSubLocation,
@@ -672,14 +676,13 @@ const LocationDataBuilder = {
       parentLocation: locationStructure.parentLocation,
       geographicPrecision: locationStructure.geographicPrecision,
 
-      // ID CSS (sera assigné lors de buildFinalLocationArray)
-      c: null,
+      c: null, // ID CSS
 
-      // Données préparées pour le DOM futur (évite les recalculs)
+      // Données préparées pour le DOM futur
       domAttributes: {
         'data-place': cleanPlaceName,
         'data-is-sublocation': locationStructure.isSubLocation,
-        'data-events': [] // Sera rempli progressivement
+        'data-events': []
       }
     };
   },
@@ -690,14 +693,16 @@ const LocationDataBuilder = {
    * @param {string} eventType - Type d'événement à incrémenter
    */
   updateLocationCounters: function(locationEntry, eventType) {
-    // Incrément du compteur spécifique à ce type d'événement
-    const countKey = eventType + '_count';
-    locationEntry[countKey]++;
+    const eventCount = Events.count(eventType);
+    const flagProp = Events.svgPrefix(eventType);
 
-    // Activation du flag de présence pour ce type d'événement
-    locationEntry[eventType] = true;
+    // Incrément du compteur spécifique
+    locationEntry[eventCount]++;
 
-    // Incrément du compteur total pour ce lieu
+    // Activation du flag de présence
+    locationEntry[flagProp] = true;
+
+    // Incrément du compteur total
     locationEntry.cnt++;
 
     // Mise à jour des data-attributes pour le DOM futur
@@ -731,18 +736,18 @@ const LocationDataBuilder = {
   },
 
   /**
-   * Fonction utilitaire pour obtenir les statistiques par type d'événement
+   * Fonction utilitaire pour colleter les statistiques par type d’événement
    * @returns {Object} Statistiques détaillées par type
    */
   getEventStatistics: function() {
-    const stats = { births: 0, baptisms: 0, marriages: 0, deaths: 0, burials: 0 };
+    const stats = {};
+    Events.types.forEach(eventType => { stats[eventType] = 0; });
 
     Object.values(lieux).forEach(locationData => {
-      stats.births += locationData.bi_count;
-      stats.baptisms += locationData.ba_count;
-      stats.marriages += locationData.ma_count;
-      stats.deaths += locationData.de_count;
-      stats.burials += locationData.bu_count;
+      Events.types.forEach(eventType => {
+        const count = Events.count(eventType);
+        stats[eventType] += locationData[count] || 0;
+      });
     });
 
     return stats;
@@ -750,7 +755,7 @@ const LocationDataBuilder = {
 };
 
 // ========== Interface du panneau des lieux ==========
-const ModernPlacesInterface = {
+const PlacesInterface = {
   // Cache pour les éléments DOM fréquemment utilisés (optimisation)
   elements: {
     panel: null,
@@ -795,31 +800,74 @@ const ModernPlacesInterface = {
    * Utilise les données de LocationDataBuilder pour éviter les recalculs
    */
   updateSummarySection: function() {
-    // Mise à jour du nombre de génération en titre
+    // Mise à jour du nombre de génération avec traduction
     const generationElement = this.elements.panel.querySelector('.generation-count');
     if (generationElement) {
-      generationElement.textContent = `${max_gen} génération${max_gen > 1 ? 's' : ''}`;
+      const generationLabel = window.FC_TRANSLATIONS?.[max_gen > 1 ? 'generations' : 'generation'] || 'génération';
+      generationElement.textContent = `${max_gen} ${generationLabel}`;
     }
 
-    // Mise à jour du nombre de lieux
+    // Mise à jour du nombre de lieux avec traduction
     const placeCount = Object.keys(lieux).length;
-    this.elements.summaryPlaces.textContent = `${placeCount} lieu${placeCount > 1 ? 'x' : ''}`;
+    const placeLabel = window.FC_TRANSLATIONS?.[placeCount > 1 ? 'places' : 'place'] || 'lieu';
+    this.elements.summaryPlaces.textContent = `${placeCount} ${placeLabel}`;
 
-    // Récupération des statistiques pré-calculées
+    // Utilisation de nos statistiques cohérentes
     const stats = LocationDataBuilder.getEventStatistics();
 
-    // Injection des compteurs par type d'événement
-    // L'ordre suit celui défini dans le HTML : birth, baptism, marriage, death, burial
-    const counts = [stats.births, stats.baptisms, stats.marriages, stats.deaths, stats.burials];
-    this.elements.summaryEventCounts.forEach((element, index) => {
-      element.textContent = counts[index] || 0;
+    // Injection des compteurs dans l'ordre défini par Events.types
+    // Chaque compteur utilise maintenant les traductions appropriées pour les tooltips
+    Events.types.forEach((eventType, index) => {
+      const countElement = this.elements.summaryEventCounts[index];
+      if (countElement) {
+        const count = stats[eventType] || 0;
+        countElement.textContent = count;
+
+        // Enrichissement avec tooltip traduit et contextualisé
+        const eventLabel = Events.translate(eventType, count);
+        countElement.title = count > 0 ? `${count} ${eventLabel}` : `Aucun ${eventLabel.toLowerCase()}`;
+      }
     });
 
-    // Total général
-    const totalEvents = Object.values(stats).reduce((sum, count) => sum + count, 0);
+    // Total général avec traduction contextuelle
+    const totalEvents = Events.types.reduce((sum, eventType) => {
+      return sum + (stats[eventType] || 0);
+    }, 0);
+
     this.elements.summaryTotal.textContent = totalEvents;
+
+    // Tooltip informatif pour le total avec traduction appropriée
+    const eventLabel = window.FC_TRANSLATIONS?.[totalEvents > 1 ? 'events' : 'event'] || 'événement';
+    this.elements.summaryTotal.title = `Total : ${totalEvents} ${eventLabel}`;
+
+    //Mise à jour du compteur de personnes
+    this.updatePersonsCounter();
   },
 
+  updatePersonsCounter: function() {
+    const personsElement = this.elements.panel.querySelector('.summary-persons-count');
+    if (!personsElement) return;
+
+    // Compter les personnes uniques avec au moins un lieu
+    let personsWithPlaces = 0;
+    
+    Object.values(ancestor).forEach(person => {
+      let hasPlace = false;
+      Events.types.forEach(eventType => {
+        const placeField = Events.place(eventType);
+        if (person[placeField] && person[placeField].trim() !== '') {
+          hasPlace = true;
+        }
+      });
+      if (hasPlace) personsWithPlaces++;
+    });
+
+    personsElement.textContent = personsWithPlaces;
+    
+    // Tooltip avec traduction
+    const personLabel = window.FC_TRANSLATIONS?.[personsWithPlaces > 1 ? 'persons' : 'person'] || 'personne';
+    personsElement.title = `${personsWithPlaces} ${personLabel} avec lieux`;
+  },
 
  /* ========== ENRICHISSEMENT DES RÉFÉRENCES DOM ==========
    TODO: write doc */
@@ -908,25 +956,50 @@ const ModernPlacesInterface = {
   },
 
   generateEventItemsHTML: function(placeData) {
-    const events = [
-      { key: 'bi_count', type: 'birth', label: 'N' },
-      { key: 'ba_count', type: 'baptism', label: 'B' },
-      { key: 'ma_count', type: 'marriage', label: 'M' },
-      { key: 'de_count', type: 'death', label: 'D' },
-      { key: 'bu_count', type: 'burial', label: 'S' }
-    ];
+    // Fonction locale pour les tooltips
+    function buildEventTooltip(eventType, count) {
+      const eventName = Events.translate(eventType, count);
+      return count > 0 ? `${count} ${eventName}` : eventName;
+    }
 
-    return events.map(event => {
-      const count = placeData[event.key] || 0;
-      const isActive = count > 0 ? 'active' : '';
+    // Génération des indicateurs ET comptage des actifs en une seule passe
+    let activeEventsCount = 0;
+    const htmlParts = Events.types.map(eventType => {
+      const cssClass = Events.cssClass(eventType);
+      const label = Events.label(eventType);
+      const eventCount = Events.count(eventType);
+      const count = placeData[eventCount] || 0;
+      const isActive = count > 0;
+
+      // Comptage intelligent pendant la génération HTML
+      if (isActive) activeEventsCount++;
+
+      const tooltip = buildEventTooltip(eventType, count);
 
       return `
-        <div class="event-item ${isActive}" data-event="${event.type}">
-          <span class="event-count">${count > 0 ? count : ''}</span>
-          <span class="event-label">${event.label}</span>
+        <div class="event-item ${isActive ? 'active' : ''}"
+             data-event="${eventType}" title="${tooltip}">
+          <span class="event-count">${count > 1 ? count : ''}</span>
+          <span class="event-label">${label}</span>
         </div>
       `;
-    }).join('');
+    });
+
+    this.adjustRowHeightIfNeeded(placeData, activeEventsCount);
+    return htmlParts.join('');
+  },
+
+  /**
+   * Ajuste la hauteur de ligne pour 4+ indicateurs actifs
+   * Utilise le count déjà calculé pendant la génération HTML
+   */
+  adjustRowHeightIfNeeded: function(placeData, activeCount) {
+    if (activeCount >= 4) {
+      requestAnimationFrame(() => {
+        const placeElement = document.querySelector(`[data-place="${CSS.escape(placeData.fullName || '')}"]`);
+        if (placeElement) this.adjustRowHeightForEvents(placeElement, activeCount);
+      });
+    }
   },
 
   /**
@@ -1111,13 +1184,13 @@ const ModernPlacesInterface = {
 const PlacesPanelControls = {
   /**
    * Initialise les contrôles du panneau
-   * Cette méthode doit être appelée après l’initialisation de ModernPlacesInterface
+   * Cette méthode doit être appelée après l’initialisation de PlacesInterface
    */
   initialize: function() {
     console.log('🎛️ Initialisation des contrôles du panneau des lieux...');
 
-    if (!ModernPlacesInterface.elements.panel) {
-      console.error('❌ ModernPlacesInterface doit être initialisé avant PlacesPanelControls');
+    if (!PlacesInterface.elements.panel) {
+      console.error('❌ PlacesInterface doit être initialisé avant PlacesPanelControls');
       return false;
     }
 
@@ -1136,7 +1209,7 @@ const PlacesPanelControls = {
    * Cette approche est plus maintenable et performante que les onclick inline
    */
   setupEventListeners: function() {
-    const panel = ModernPlacesInterface.elements.panel;
+    const panel = PlacesInterface.elements.panel;
 
     // Délégation d'événements sur le panneau entier
     // Cette technique permet de gérer tous les clics d'un seul endroit
@@ -1179,7 +1252,7 @@ const PlacesPanelControls = {
     this.updateSortButtonIcon();
 
     // État initial des événements (masqué par défaut)
-    const panel = ModernPlacesInterface.elements.panel;
+    const panel = PlacesInterface.elements.panel;
     panel.classList.remove('show-events');
 
     // Réinitialisation du champ de recherche
@@ -1192,7 +1265,7 @@ const PlacesPanelControls = {
    * Fonction globale référencée par le HTML onclick="togglePlacesPanel()"
    */
   togglePanel: function() {
-    const panel = ModernPlacesInterface.elements.panel;
+    const panel = PlacesInterface.elements.panel;
     const isCurrentlyVisible = panel.style.display !== 'none';
 
     panel.style.display = isCurrentlyVisible ? 'none' : 'block';
@@ -1213,7 +1286,7 @@ const PlacesPanelControls = {
     this.updateSortButtonIcon();
 
     // Régénération de la liste avec le nouveau tri
-    ModernPlacesInterface.generatePlacesList();
+    PlacesInterface.generatePlacesList();
 
     console.log(`🔄 Tri basculé vers: ${sortMode}`);
   },
@@ -1244,7 +1317,7 @@ const PlacesPanelControls = {
    * Active/désactive le mode d'affichage étendu du panneau
    */
   toggleEventsDisplay: function() {
-    const panel = ModernPlacesInterface.elements.panel;
+    const panel = PlacesInterface.elements.panel;
     const isShowingEvents = panel.classList.contains('show-events');
 
     // Basculement de la classe CSS qui contrôle l'affichage
@@ -1311,7 +1384,7 @@ const PlacesPanelControls = {
 };
 
 // ========== Module de surlignage bidirectionnel pour les lieux ==========
-const ModernPlacesHighlighter = {
+const PlacesHighlighter = {
   // Stockage des éléments actuellement surlignés
   currentHighlights: [],
   currentIndicators: [],
@@ -1793,16 +1866,24 @@ const SVGRenderer = {
     let classes = ['bg'];
 
     if (type === 'person') {
-      // Classes pour les lieux de vie
-     /* if (p.birth_place) classes.push(`bi-${lieux[p.birth_place].c}`);
-      if (p.baptism_place) classes.push(`ba-${lieux[p.baptism_place].c}`);
-      if (p.death_place) classes.push(`de-${lieux[p.death_place].c}`);
-      if (p.burial_place) classes.push(`bu-${lieux[p.burial_place].c}`); */
-      // Classe pour l'âge au décès
+      Events.types.forEach(eventType => {
+        const placeField = Events.place(eventType);
+        const svgPrefix = Events.svgPrefix(eventType); // 'bi', 'ba', 'ma', 'de', 'bu'
+        
+        if (p[placeField] && lieux[p[placeField]]) {
+          classes.push(`${svgPrefix}-${lieux[p[placeField]].c}`);
+        }
+      });
+
       if (p.death_age) classes.push(Utils.deathAgeClass(p.death_age));
+      
     } else if (type === 'marriage') {
-      // Classes pour les mariages
-    /*  if (p.marriage_place) classes.push(`ma-${lieux[p.marriage_place].c}`); */
+      const marriagePlaceField = Events.place('marriage');
+      if (p[marriagePlaceField] && lieux[p[marriagePlaceField]]) {
+        const svgPrefix = Events.svgPrefix('marriage'); // 'ma'
+        classes.push(`${svgPrefix}-${lieux[p[marriagePlaceField]].c}`);
+      }
+      
       if (p.marriage_length) {
         const marriageClass = Utils.marriageLengthClass(p.marriage_length);
         if (marriageClass) classes.push(marriageClass);
@@ -1898,50 +1979,51 @@ const SVGRenderer = {
   togglePlaceHighlights: function(p, show, type) {
     // Nettoyer d'abord si on désactive
     if (!show) {
-      ModernPlacesHighlighter.clearAllHighlights();
+      PlacesHighlighter.clearAllHighlights();
+      return;
     }
 
-    if (type === 'marriage') {
-      // Pour les mariages, seulement le lieu de mariage
-      if (p.marriage_place) {
-        const el = DOMCache.getElementById(`ma-${lieux[p.marriage_place].c}`);
-        if (el) el.classList.toggle("hidden", !show);
+    // Fonction utilitaire pour vérifier et highlighter un lieu de façon robuste
+    const safeHighlightPlace = (placeName, eventType) => {
+      if (!placeName || !lieux[placeName]) return false;
 
-        if (show && ModernPlacesInterface.elements.panel) {
-          ModernPlacesHighlighter.simulatePersonHover(
-            [p.marriage_place],
-            ['marriage']
-          );
-        }
+      const placeData = lieux[placeName];
+      const elementId = `${Events.svgPrefix(eventType)}-${placeData.c}`;
+      const el = DOMCache.getElementById(elementId);
+
+      if (el) {
+        el.classList.toggle("hidden", !show);
+        return true;
+      }
+      return false;
+    };
+
+    if (type === 'marriage') {
+      // Pour les mariages, traiter seulement le lieu de mariage
+      const placeName = p[Events.place('marriage')];
+      const highlighted = safeHighlightPlace(placeName, 'marriage');
+
+      if (highlighted && show && PlacesInterface.elements.panel) {
+        PlacesHighlighter.simulatePersonHover([placeName], ['marriage']);
       }
     } else {
-      // Pour les personnes, collecter tous les lieux et événements
-      const places = [
-        { prop: 'birth_place', prefix: 'bi', event: 'birth' },
-        { prop: 'baptism_place', prefix: 'ba', event: 'baptism' },
-        { prop: 'marriage_place', prefix: 'ma', event: 'marriage' },
-        { prop: 'death_place', prefix: 'de', event: 'death' },
-        { prop: 'burial_place', prefix: 'bu', event: 'burial' }
-      ];
-
+      // Pour les personnes, traiter tous les lieux
       const placesToHighlight = [];
       const eventsToShow = [];
 
-      places.forEach(place => {
-        if (p[place.prop] && lieux[p[place.prop]]) {
-          const el = DOMCache.getElementById(`${place.prefix}-${lieux[p[place.prop]].c}`);
-          if (el) el.classList.toggle("hidden", !show);
+      Events.types.forEach(eventType => {
+        const placeName = p[Events.place(eventType)];
 
-          // Collecter pour le highlighting moderne
+        if (safeHighlightPlace(placeName, eventType)) {
           if (show) {
-            placesToHighlight.push(p[place.prop]);
-            eventsToShow.push(place.event);
+            placesToHighlight.push(placeName);
+            eventsToShow.push(eventType);
           }
         }
       });
 
-      if (show && placesToHighlight.length > 0 && ModernPlacesInterface.elements.panel) {
-        ModernPlacesHighlighter.simulatePersonHover(placesToHighlight, eventsToShow);
+      if (show && placesToHighlight.length > 0 && PlacesInterface.elements.panel) {
+        PlacesHighlighter.simulatePersonHover(placesToHighlight, eventsToShow);
       }
     }
   },
@@ -2112,18 +2194,14 @@ const TextRenderer = {
   buildLocationClasses: function(p, baseClasses) {
     let classes = baseClasses;
 
-    if (p.birth_place && lieux[p.birth_place]) {
-      classes += " bi-t" + lieux[p.birth_place].c;
-    }
-    if (p.baptism_place && lieux[p.baptism_place]) {
-      classes += " ba-t" + lieux[p.baptism_place].c;
-    }
-    if (p.death_place && lieux[p.death_place]) {
-      classes += " de-t" + lieux[p.death_place].c;
-    }
-    if (p.burial_place && lieux[p.burial_place]) {
-      classes += " bu-t" + lieux[p.burial_place].c;
-    }
+    Events.types.forEach(eventType => {
+      const placeField = Events.place(eventType);
+      const svgPrefix = Events.svgPrefix(eventType);
+      
+      if (p[placeField] && lieux[p[placeField]]) {
+        classes += ` ${svgPrefix}-t${lieux[p[placeField]].c}`;
+      }
+    });
 
     return classes.trim();
   },
@@ -2437,27 +2515,27 @@ const ColorManager = {
   },
 
   applyColorization: function() {
-    var bi_checked = document.getElementById("bi").checked;
-    var ba_checked = document.getElementById("ba").checked;
-    var ma_checked = document.getElementById("ma").checked;
-    var de_checked = document.getElementById("de").checked;
-    var bu_checked = document.getElementById("bu").checked;
-
     const fanchart = document.getElementById("fanchart");
-    fanchart.classList.toggle("bi", bi_checked);
-    fanchart.classList.toggle("ba", ba_checked);
-    fanchart.classList.toggle("ma", ma_checked);
-    fanchart.classList.toggle("de", de_checked);
-    fanchart.classList.toggle("bu", bu_checked);
+    
+    Events.types.forEach(eventType => {
+      const svgPrefix = Events.svgPrefix(eventType);
+      const checkbox = document.getElementById(svgPrefix);
+      const isChecked = checkbox ? checkbox.checked : false;
+      
+      fanchart.classList.toggle(svgPrefix, isChecked);
+    });
 
     URLManager.updateCurrentURL();
   },
 
   initializeColorEvents: function() {
     // Événements des checkboxes NMBDS
-    this.EVENT_TYPES.forEach(id => {
-      const checkbox = document.getElementById(id);
-      if (checkbox) checkbox.onclick = this.applyColorization.bind(this);
+    Events.types.forEach(eventType => {
+      const svgPrefix = Events.svgPrefix(eventType); // 'bi', 'ba', 'ma', 'de', 'bu'
+      const checkbox = document.getElementById(svgPrefix);
+      if (checkbox) {
+        checkbox.onclick = this.applyColorization.bind(this);
+      }
     });
 
     document.getElementById("b-circular-mode").onclick = () => CircularModeRenderer.toggle();
@@ -2625,7 +2703,7 @@ const FanchartPlacesEventManager = {
     console.log('🎮 Initialisation des événements du panneau des lieux...');
 
     // Vérifier que les modules sont chargés
-    if (!ModernPlacesInterface.elements.panel) {
+    if (!PlacesInterface.elements.panel) {
       console.error('❌ Le panneau des lieux doit être initialisé d\'abord');
       return;
     }
@@ -2642,7 +2720,7 @@ const FanchartPlacesEventManager = {
    * Événements de survol (délégation)
    */
   initializeHoverEvents: function() {
-    const placesList = ModernPlacesInterface.elements.placesList;
+    const placesList = PlacesInterface.elements.placesList;
     if (!placesList) return;
 
     // Survol entrée
@@ -2652,7 +2730,7 @@ const FanchartPlacesEventManager = {
         const placeName = placeContent.dataset.place;
         if (placeName) {
           placeContent.classList.add('hovered');
-          ModernPlacesHighlighter.highlightSVGSectorsForPlace(placeName, true);
+          PlacesHighlighter.highlightSVGSectorsForPlace(placeName, true);
         }
       }
     }, true);
@@ -2664,7 +2742,7 @@ const FanchartPlacesEventManager = {
         const placeName = placeContent.dataset.place;
         if (placeName) {
           placeContent.classList.remove('hovered');
-          ModernPlacesHighlighter.highlightSVGSectorsForPlace(placeName, false);
+          PlacesHighlighter.highlightSVGSectorsForPlace(placeName, false);
         }
       }
     }, true);
@@ -2674,7 +2752,7 @@ const FanchartPlacesEventManager = {
    * Événements de clic
    */
   initializeClickEvents: function() {
-    const placesList = ModernPlacesInterface.elements.placesList;
+    const placesList = PlacesInterface.elements.placesList;
     if (!placesList) return;
 
     placesList.addEventListener('click', (e) => {
@@ -2682,7 +2760,7 @@ const FanchartPlacesEventManager = {
       if (placeContent) {
         const placeName = placeContent.dataset.place;
         if (placeName) {
-          ModernPlacesInterface.handlePlaceClick(placeName, e);
+          PlacesInterface.handlePlaceClick(placeName, e);
         }
       }
     });
@@ -2702,7 +2780,7 @@ const FanchartPlacesEventManager = {
 
       // Escape : Nettoyer les surlignages
       if (e.key === 'Escape') {
-        ModernPlacesHighlighter.clearAllHighlights();
+        PlacesHighlighter.clearAllHighlights();
       }
     });
   }
@@ -3113,14 +3191,14 @@ const FanchartApp = {
     // Générer l'interface si le panneau existe
     if (document.querySelector('.places-panel')) {
       // Initialiser l'interface (récupère les références aux éléments)
-      if (ModernPlacesInterface.initialize()) {
+      if (PlacesInterface.initialize()) {
         // Générer la liste HTML avec tous les attributs
-        ModernPlacesInterface.generatePlacesList();
-        ModernPlacesInterface.updateSummarySection();
+        PlacesInterface.generatePlacesList();
+        PlacesInterface.updateSummarySection();
         // Initialiser les contrôles
         PlacesPanelControls.initialize();
         // Attacher les événements de survol
-        ModernPlacesInterface.initializeEventListeners();
+        PlacesInterface.initializeEventListeners();
       }
     }
     const urlParams = new URLSearchParams(window.location.search);
@@ -3189,23 +3267,15 @@ const FanchartApp = {
     this.updateGlobalFlags();
   },
 
-  // Fonction dédiée au nettoyage des lieux
+  // Nettoyage des lieux
   cleanPersonPlaces: function(person, key) {
-    // Cette fonction a une responsabilité unique : nettoyer les lieux
-    const placeFields = [
-      { field: 'birth_place', flag: 'has_bi' },
-      { field: 'baptism_place', flag: 'has_ba' },
-      { field: 'marriage_place', flag: 'has_ma' },
-      { field: 'death_place', flag: 'has_de' },
-      { field: 'burial_place', flag: 'has_bu' }
-    ];
+    Events.types.forEach(eventType => {
+      const placeField = Events.place(eventType); // 'birth_place', etc.
+      const flagName = Events.flagProp(eventType); // 'has_b', etc.
 
-    placeFields.forEach(({ field, flag }) => {
-      if (person[field] !== undefined) {
-        // Le nettoyage lui-même est extrait dans une fonction pure
-        ancestor[key][field] = this.cleanPlaceName(person[field]);
-        // On ne modifie pas les flags globaux ici, c'est une autre responsabilité
-        window[flag] = true;
+      if (person[placeField] !== undefined) {
+        ancestor[key][placeField] = this.cleanPlaceName(person[placeField]);
+        window[flagName] = true;
       }
     });
   },
@@ -3250,16 +3320,21 @@ const FanchartApp = {
 
   // Mise à jour des flags globaux basée sur l'état actuel des données
   updateGlobalFlags: function() {
-    // Réinitialiser les flags
-    has_bi = has_ba = has_ma = has_de = has_bu = false;
+    // Réinitialiser tous les flags via Events
+    Events.types.forEach(eventType => {
+      const flagName = Events.flagProp(eventType); // 'has_b', 'has_ba', etc.
+      window[flagName] = false;
+    });
 
-    // Parcourir les ancêtres pour déterminer quels types de données sont présents
+    // Parcourir les ancêtres pour déterminer quels types sont présents
     Object.values(ancestor).forEach(person => {
-      if (person.birth_place) has_bi = true;
-      if (person.baptism_place) has_ba = true;
-      if (person.marriage_place) has_ma = true;
-      if (person.death_place) has_de = true;
-      if (person.burial_place) has_bu = true;
+      Events.types.forEach(eventType => {
+        const placeField = Events.place(eventType);
+        const flagName = Events.flagProp(eventType);
+        if (person[placeField]) {
+          window[flagName] = true;
+        }
+      });
     });
   },
 
@@ -3761,9 +3836,9 @@ const FanchartApp = {
     this.renderFanchart();
     const placesPanel = document.querySelector('.places-panel');
     if (placesPanel) {
-      ModernPlacesInterface.generatePlacesList();
-      ModernPlacesInterface.updateSummarySection();
-      ModernPlacesInterface.initializeEventListeners();
+      PlacesInterface.generatePlacesList();
+      PlacesInterface.updateSummarySection();
+      PlacesInterface.initializeEventListeners();
   }
     this.fitScreen();
     this.updateButtonStates();

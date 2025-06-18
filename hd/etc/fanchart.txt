@@ -33,8 +33,8 @@
   "%if;("xx"="ancestor")S%xx.anc_sosa.v;%nn;
   %elseif;("xx"="spouse")SPccc%nn;
   %elseif;("xx"="child")CHccc%end;":{"fn":"%if(xx.public_name != "")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key","sn":"%xx.surname","snk":"%xx.surname_key;"%if;(xx.occ!=0),"oc":"%xx.occ"%end;,"dates":'%xx.dates;',"birth_place":"%xx.birth_place;","death_place":"%xx.death_place","death_age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age;%end;%else;%if;xx.computable_age;%xx.age;%end;%end;"%if;("xx"!="child"),"has_parents":%if(xx.has_parents)true%else;false%end;%end;%nn;
-  %if;(e.ba = "on" and xx.baptism_place != ""),"baptism_place":"%xx.baptism_place;"%end;
-  %if;(e.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;%if;("xx"="ancestor"),"sosa":"%xx.anc_sosa.v;"%end;
+  %if;(xx.baptism_place != ""),"baptism_place":"%xx.baptism_place;"%end;
+  %if;(xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;%if;("xx"="ancestor"),"sosa":"%xx.anc_sosa.v;"%end;
   %if;(xx.index!=iii and xx.is_male and "xx"!="spouse")
     %foreach;xx.family;
       %if;(family.index = xx.family.index)
@@ -270,6 +270,10 @@
         <span class="summary-event-count">0</span>
       </div>
     </div>
+    <div class="summary-persons">
+      <i class="fas fa-user summary-persons-icon" title="[*person/persons]1"></i>
+      <span class="summary-persons-count">0</span>
+    </div>
     <div class="summary-total-events" title="Total des événements">0</div>
   </div>
 
@@ -328,6 +332,8 @@ window.FC_TRANSLATIONS = {
   'no_info_available': '[*no information available]',
   'generation': '[generation/generations]0',
   'generations': '[generation/generations]1',
+  'person': '[person/persons]0',
+  'persons': '[person/persons]1',
   'occurrence': '[occurence]0',
   'occurrences': '[occurence]1',
   'place': '[place/places]0',
