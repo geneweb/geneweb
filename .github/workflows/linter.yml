@@ -44,12 +44,12 @@ jobs:
           dune-cache: true
 
       - name: Install ocamlformat
-        run: opam install dune ocamlformat.0.24.1
+        run: opam install dune ocamlformat.0.27.0
 
       - name: Check formatting with dune
         id: format-check
         run: opam exec -- dune build @fmt
-        
+
       - name: Report formatting status
         if: always()
         run: |
