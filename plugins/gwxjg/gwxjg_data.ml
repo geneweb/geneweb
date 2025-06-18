@@ -1301,9 +1301,12 @@ let mk_conf conf =
     | "wizard" -> wizard
     | _ -> raise Not_found)
 
+let prefix conf = escaped (Geneweb.Util.commd conf)
+let prefix_base conf = escaped (Geneweb.Util.prefix_base_password conf)
+
 let mk_env_no_base conf =
-  let prefix = escaped (Geneweb.Util.commd conf) in
-  let prefix_base = escaped (Geneweb.Util.prefix_base_password conf) in
+  let prefix = prefix conf in
+  let prefix_base = prefix_base conf in
   Jingoo.Jg_types.Tpat
     (function
     | "prefix" -> prefix
@@ -1311,8 +1314,8 @@ let mk_env_no_base conf =
     | x -> Jingoo.Jg_types.Tstr (Mutil.decode @@ List.assoc x conf.env))
 
 let mk_env conf base =
-  let prefix = escaped (Geneweb.Util.commd conf) in
-  let prefix_base = escaped (Geneweb.Util.prefix_base_password conf) in
+  let prefix = prefix conf in
+  let prefix_base = prefix_base conf in
   let sosa_ref =
     Jingoo.Jg_types.box_lazy
     @@ lazy
