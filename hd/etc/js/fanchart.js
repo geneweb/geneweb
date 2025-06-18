@@ -13,11 +13,11 @@ var center_x, center_y, svg_w, svg_h;
 var max_gen_loaded; // Génération max disponible en "mémoire"
 var max_gen, max_r;
 var sortMode = "frequency";
+var showEvents = false;
 var has_bi = false, has_ba = false, has_ma = false, has_de = false, has_bu = false;
 var svg_viewbox_x = 0, svg_viewbox_y = 0, svg_viewbox_w = 0, svg_viewbox_h = 0;
 
 // ========== CONSTANTES D'ÉVÉNEMENTS ==========
-// Source unique de vérité - tout le reste est généré automatiquement
 const EVENT_CONFIG = {
   eventOrder: ['birth', 'baptism', 'marriage', 'death', 'burial'],
   eventToClass: { 'birth': 'n', 'baptism': 'b', 'marriage': 'm', 'death': 'd', 'burial': 's' },
@@ -25,27 +25,16 @@ const EVENT_CONFIG = {
 };
 
 const Events = {
-  // Accès direct à la liste complète
   get types() { return EVENT_CONFIG.eventOrder; },
-
-  // Réutilise directement les mappings existants
   cssClass: (type) => EVENT_CONFIG.eventToClass[type],
   label: (type) => EVENT_CONFIG.eventToLabel[type],
-
-  // Générateurs cohérents pour les noms longs
   count: (type) => type + '_count', // 'birth' -> 'birth_count'
   place: (type) => type + '_place', // 'birth' -> 'birth_place'
   svgPrefix: (type) => type.substring(0, 2), // 'birth' → 'bi'
   flagProp: (type) => 'has_' + Events.svgPrefix(type), // 'birth' → 'has_bi'
-
-  // Recherche inverse
   findByClass: (cssClass) => EVENT_CONFIG.eventOrder.find(type => Events.cssClass(type) === cssClass),
   findBySvgPrefix: (prefix) => EVENT_CONFIG.eventOrder.find(type => Events.svgPrefix(type) === prefix),
-
-  // Validation
   isValid: (type) => EVENT_CONFIG.eventOrder.includes(type),
-
-  // Traduction
   translate: (type, count = 1) => {
     const translationKey = count > 1 ? type + 's' : type;
     return window.FC_TRANSLATIONS?.[translationKey] || type;
@@ -66,7 +55,7 @@ const CONFIG = {
 };
 
 let isCircularMode = false;
-let renderTarget = null; // Cible de rendu actuelle (null = fanchart direct)
+let renderTarget = null; // (null = fanchart direct)
 let current_angle = CONFIG.default_angle;
 
 const DOMCache = {
@@ -196,24 +185,24 @@ const LayoutCalculator = {
 
 // ========== URLManager centralisé ==========
 const URLManager = {
-  /**
-   * Configuration de base pour tous les types d'URL
-   * Centralise les paramètres par défaut et les formats
-   */
   config: {
-    // URL de base héritée du système existant
-    basePerson: link_to_person,
+    basePerson: link_to_person, // URL de base
+    defaultParams: { module: 'A', template: 'FC' }, // Paramètres par défaut
+    specialParams: { place: { module: 'MOD_DATA', data: 'place' } } // Paramètres spéciaux
+  },
 
-    // Paramètres par défaut pour éviter la redondance
-    defaultParams: {
-      module: 'A',
-      template: 'FC'
-    },
+  readCurrentState: function() {
+    const urlParams = new URLSearchParams(window.location.search);
 
-    // Paramètres spéciaux selon le type de navigation
-    specialParams: {
-      place: { module: 'MOD_DATA', data: 'place' }
-    }
+    return {
+      tool: urlParams.get('tool') || '',
+      sortMode: urlParams.has('sort') ? 'alphabetical' : 'frequency',
+      showEvents: urlParams.has('events'),
+      isCircular: urlParams.get('mode') === 'couple',
+      angle: parseInt(urlParams.get('angle')) || 220,
+      implexMode: urlParams.get('implex') === 'num' ? 'numbered' :
+                  urlParams.get('implex') === 'full' ? 'full' : 'reduced'
+    };
   },
 
   /**
@@ -249,20 +238,6 @@ const URLManager = {
       return this._buildFanchartPersonURL(person, opts);
     }
   },
-
-readCurrentState: function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  
-  return {
-    tool: urlParams.get('tool') || '',
-    sortMode: urlParams.has('sort') ? 'alphabetical' : 'frequency',
-    showEvents: urlParams.has('events'),
-    isCircular: urlParams.get('mode') === 'couple',
-    angle: parseInt(urlParams.get('angle')) || 220,
-    implexMode: urlParams.get('implex') === 'num' ? 'numbered' : 
-                urlParams.get('implex') === 'full' ? 'full' : 'reduced'
-  };
-},
 
   /**
    * Construit une URL pour une recherche de lieu
@@ -428,14 +403,10 @@ readCurrentState: function() {
     ];
 
     // Paramètres optionnels de la personne
-    if (person.oc) {
-      params.push(`oc=${person.oc}`);
-    }
+    if (person.oc) params.push(`oc=${person.oc}`);
 
     // État du fanchart si demandé
-    if (options.useCurrentState) {
-      this._addFanchartState(params, options);
-    }
+    if (options.useCurrentState) this._addFanchartState(params, options);
 
     return this.config.basePerson + params.join('&');
   },
@@ -458,18 +429,17 @@ readCurrentState: function() {
 
     if (options.preserveTools) {
       if (tool) params.push(`tool=${tool}`);
-      
-      // ✅ LECTURE DEPUIS LES VARIABLES GLOBALES
+
       if (sortMode === 'alphabetical') params.push('sort');
-      
+
       const placesPanel = document.querySelector('.places-panel');
       if (placesPanel?.classList.contains('show-events')) {
         params.push('events');
       }
-      
+
       if (implexMode === 'numbered') params.push('implex=num');
       else if (implexMode === 'full') params.push('implex=full');
-      
+
       if (has_ba) params.push('ba=on');
       if (has_bu) params.push('bu=on');
     }
@@ -894,8 +864,6 @@ const PlacesInterface = {
  /* ========== ENRICHISSEMENT DES RÉFÉRENCES DOM ==========
    TODO: write doc */
   enrichLocationDataWithDOMReferences: function() {
-    console.log('🔗 Enrichissement des références DOM...');
-
     let enrichedCount = 0;
     let notFoundCount = 0;
 
@@ -926,8 +894,6 @@ const PlacesInterface = {
         console.warn(`❌ Élément DOM non trouvé pour : "${placeName}"`);
       }
     });
-
-    console.log(`✅ Enrichissement terminé : ${enrichedCount} lieux enrichis, ${notFoundCount} non trouvés`);
 
     return {
       enriched: enrichedCount,
@@ -1083,9 +1049,6 @@ const PlacesInterface = {
       const main = new Map();
       const subs = [];
 
-    // Debug : voir ce qui se passe
-    console.log('=== DEBUG TRI ALPHABÉTIQUE ===');
-    
     Object.entries(lieux).forEach(([name, data]) => {
       if (data.isSubLocation && data.parentLocation) {
         console.log(`SOUS-LIEU: "${name}" → parent: "${data.parentLocation}"`);
@@ -1153,7 +1116,7 @@ const PlacesInterface = {
       const placeRow = e.target.closest('.place-row');
       if (placeRow) {
         placeRow.classList.add('hovered');
-        
+
         const placeContent = placeRow.querySelector('.place-content');
         if (placeContent) {
           const placeName = placeContent.dataset.place;
@@ -1173,9 +1136,8 @@ const PlacesInterface = {
         if (placeContent) {
           const placeName = placeContent.dataset.place;
           PlacesHighlighter.restorePlaceNameIfNeeded(placeContent);
-          PlacesHighlighter.highlightSVGSectorsForPlace(placeName, false);
+          PlacesHighlighter.highlightSVGSectorsForPlace(placeName, false); // TODO: FIX ME
         }
-        // TODO: FIX ME
       }
     }, true);
 
@@ -1199,32 +1161,24 @@ const PlacesPanelControls = {
    * Cette méthode doit être appelée après l’initialisation de PlacesInterface
    */
   initialize: function() {
-    console.log('🎛️ Initialisation des contrôles du panneau des lieux...');
-
     if (!PlacesInterface.elements.panel) {
       console.error('❌ PlacesInterface doit être initialisé avant PlacesPanelControls');
       return false;
     }
-
     // Initialisation des states par défaut
     this.initializeDefaultStates();
-
     // Configuration des event listeners modernes
     this.setupEventListeners();
-
-    console.log('✅ Contrôles du panneau initialisés');
     return true;
   },
 
   /**
-   * Configure tous les event listeners du panneau en utilisant la délégation d'événements
-   * Cette approche est plus maintenable et performante que les onclick inline
+   * Configuration des event listeners en utilisant la délégation d'événements
    */
   setupEventListeners: function() {
     const panel = PlacesInterface.elements.panel;
 
-    // Délégation d'événements sur le panneau entier
-    // Cette technique permet de gérer tous les clics d'un seul endroit
+    // Délégation d'événements sur le panneau entier, centralise la gestion des clics
     panel.addEventListener('click', (e) => {
       // Identification de l'élément cliqué par ses classes CSS
       if (e.target.matches('.panel-close')) {
@@ -1259,9 +1213,7 @@ const PlacesPanelControls = {
    * Configure les états par défaut des contrôles
    * Centralise la logique d'initialisation pour éviter les incohérences
    */
-  initializeDefaultStates: function(showEvents = false) {
-    console.log('🔍 initializeDefaultStates appelé avec showEvents:', showEvents); // ← AJOUTER ÇA
-
+  initializeDefaultStates: function() {
     // État initial du tri (cohérent avec la variable globale sortMode)
     this.updateSortButtonIcon();
 
@@ -1270,16 +1222,12 @@ const PlacesPanelControls = {
 
     if (showEvents) {
       panel.classList.add('show-events');
-      console.log('✅ Classe show-events AJOUTÉE'); // ← ET ÇA
-
-      // Mettre à jour l'icône du bouton
       const icon = document.querySelector('.events-toggle i');
       if (icon) {
         icon.className = 'far fa-eye-slash';
       }
     } else {
       panel.classList.remove('show-events');
-      console.log('❌ Classe show-events SUPPRIMÉE'); // ← ET ÇA
       // Icône par défaut
       const icon = document.querySelector('.events-toggle i');
       if (icon) {
@@ -1311,7 +1259,7 @@ const PlacesPanelControls = {
    * Met à jour l'interface et régénère la liste
    */
   toggleSort: function() {
-    // Modification de la variable globale (maintient la cohérence avec le reste du système)
+    // Modification de la variable globale
     sortMode = sortMode === 'frequency' ? 'alphabetical' : 'frequency';
 
     // Mise à jour visuelle du bouton
@@ -1319,9 +1267,8 @@ const PlacesPanelControls = {
 
     // Régénération de la liste avec le nouveau tri
     PlacesInterface.generatePlacesList();
-    
+
     URLManager.updateCurrentURL();
-    console.log(`🔄 Tri basculé vers: ${sortMode}`);
   },
 
   /**
@@ -1350,6 +1297,8 @@ const PlacesPanelControls = {
    * Active/désactive le mode d'affichage étendu du panneau
    */
   toggleEventsDisplay: function() {
+    showEvents = !showEvents;
+
     const panel = PlacesInterface.elements.panel;
     const isShowingEvents = panel.classList.contains('show-events');
 
@@ -1363,7 +1312,6 @@ const PlacesPanelControls = {
     }
 
     URLManager.updateCurrentURL();
-    console.log(`👁️ Affichage des événements ${!isShowingEvents ? 'activé' : 'désactivé'}`);
   },
 
   /**
@@ -1429,18 +1377,13 @@ const PlacesHighlighter = {
    * @param {Array<string>} eventTypes - Types d'événements pour chaque lieu
    */
   simulatePersonHover: function(placeNames, eventTypes) {
-    console.log('🎯 Surlignage pour:', placeNames, eventTypes);
-
-    // Nettoyage préalable
-    this.clearAllHighlights();
-
+    this.clearAllHighlights(); // Nettoyage préalable
     if (!placeNames || placeNames.length === 0) return;
 
     const highlightedPlaces = new Set(placeNames);
     const matchingElements = [];
 
-    // Traiter chaque lieu
-    placeNames.forEach((placeName, index) => {
+    placeNames.forEach((placeName, index) => { // Traiter chaque lieu
       const placeData = lieux[placeName];
       if (!placeData || !placeData.domElement) {
         console.warn(`⚠️ Lieu non trouvé ou sans élément DOM: ${placeName}`);
@@ -1457,9 +1400,9 @@ const PlacesHighlighter = {
         if (events.length > 0) {
           this.addIndicatorsForPlace(placeData.indicatorElement, events);
         }
-     }
+      }
 
-     this.expandPlaceNameIfNeeded(placeData.domElement, placeName, highlightedPlaces);
+      this.expandPlaceNameIfNeeded(placeData.domElement, placeName, highlightedPlaces);
 
       matchingElements.push({
         element: placeData.domElement,
@@ -1483,16 +1426,16 @@ const PlacesHighlighter = {
    */
   expandPlaceNameIfNeeded: function(placeElement, placeName, highlightedPlaces = null, forceExpand = false) {
       console.log('🚀 expandPlaceNameIfNeeded appelé avec:', {
-    placeName, 
-    forceExpand, 
+    placeName,
+    forceExpand,
     'placeData.isSubLocation': lieux[placeName]?.isSubLocation
-  }); 
+  });
     const placeData = lieux[placeName];
     const placeNameElement = placeElement.querySelector('.place-name');
-    
+
     if (placeNameElement && placeData) {
       let shouldExpand = false;
-      
+
       if (forceExpand && placeData.isSubLocation) {
         // Cas survol liste : toujours afficher pour les sous-lieux uniquement
         shouldExpand = true;
@@ -1500,7 +1443,7 @@ const PlacesHighlighter = {
         // Cas survol secteur : vérifier le parent
         shouldExpand = !highlightedPlaces || !highlightedPlaces.has(placeData.parentLocation);
       }
-      
+
       if (shouldExpand) {
         if (!placeNameElement.dataset.originalHtml) {
           placeNameElement.dataset.originalHtml = placeNameElement.innerHTML;
@@ -1524,42 +1467,34 @@ const PlacesHighlighter = {
    * @param {HTMLElement} container - Conteneur des indicateurs
    * @param {Array<string>} events - Types d'événements à afficher
    */
-addIndicatorsForPlace: function(container, events) {
-  if (!container) return;
+  addIndicatorsForPlace: function(container, events) {
+    if (!container) return;
 
-  console.log('🔍 addIndicatorsForPlace appelé avec:', events.length, 'événements:', events);
+    events.forEach((event, index) => {
+      const indicator = document.createElement('div');
+      const shortClass = Events.cssClass(event);
+      const label = Events.label(event);
 
-  events.forEach((event, index) => {
-    console.log(`  → Index ${index}: ${event}`);
-    
-    const indicator = document.createElement('div');
-    const shortClass = Events.cssClass(event);
-    const label = Events.label(event);
+      indicator.className = `indicator ${shortClass}`;
+      indicator.textContent = label;
+      container.appendChild(indicator);
+      this.currentIndicators.push(indicator);
 
-    indicator.className = `indicator ${shortClass}`;
-    indicator.textContent = label;
-    container.appendChild(indicator);
-    this.currentIndicators.push(indicator);
+      // Line-break après le 2e si 4+ événements
+      if (index === 1 && events.length >= 4) {
+        const breaker = document.createElement('div');
+        breaker.className = 'line-break';
+        container.appendChild(breaker);
+        this.currentIndicators.push(breaker);
+      }
+    });
 
-    // DEBUG : Line-break après le 2e si 4+ événements
-    if (index === 1 && events.length >= 4) {
-      console.log('✅ AJOUT LINE-BREAK car index=1 et length=', events.length);
-      const breaker = document.createElement('div');
-      breaker.className = 'line-break';
-      container.appendChild(breaker);
-      this.currentIndicators.push(breaker);
-    } else {
-      console.log('❌ PAS de line-break car index=', index, 'et length=', events.length);
+    // Ajouter tall-row seulement si 4+ événements
+    if (events.length >= 4) {
+      const row = container.closest('.place-row');
+      if (row) row.classList.add('tall-row');
     }
-  });
-
-  // Ajouter tall-row seulement si 4+ événements
-  if (events.length >= 4) {
-    console.log('✅ AJOUT tall-row car length=', events.length);
-    const row = container.closest('.place-row');
-    if (row) row.classList.add('tall-row');
-  }
-},
+  },
 
   /**
    * Nettoie tous les surlignages et indicateurs
@@ -1601,14 +1536,11 @@ addIndicatorsForPlace: function(container, events) {
 
     this.currentHighlights.forEach(element => {
       element.classList.remove('person-match');
-      this.restorePlaceNameIfNeeded(element); // ← Nouveau
+      this.restorePlaceNameIfNeeded(element);
     });
   },
 
-  /**
-   * Grise tous les lieux non surlignés
-   */
-  grayOutOtherPlaces: function() {
+  grayOutOtherPlaces: function() { // Grise tous les lieux non surlignés
     document.querySelectorAll('.place-content').forEach(element => {
       if (!element.classList.contains('person-match')) {
         element.classList.add('grayed-out');
@@ -2065,7 +1997,7 @@ const SVGRenderer = {
           }
         }
       });
-      
+
       if (show && placeEventMap.size > 0 && PlacesInterface.elements.panel) {
         const placesToHighlight = Array.from(placeEventMap.keys());
         const eventsToShow = Array.from(placeEventMap.values()).flat();
@@ -3146,12 +3078,12 @@ const ModernOverflowManager = {
       const bPlace = b.placeName;
       const aData = lieux[aPlace];
       const bData = lieux[bPlace];
-      
+
       // Si A est parent de B, A avant B
       if (bData?.isSubLocation && bData.parentLocation === aPlace) return -1;
-      // Si B est parent de A, B avant A  
+      // Si B est parent de A, B avant A
       if (aData?.isSubLocation && aData.parentLocation === bPlace) return 1;
-      
+
       // Sinon tri alphabétique normal
       return aPlace.localeCompare(bPlace, 'fr', { sensitivity: 'base' });
     });
@@ -3217,45 +3149,45 @@ const FanchartApp = {
     // ========== PHASE 1: CALCULS DE BASE ==========
     this.calculateDimensions();
     this.processAncestorData();
-    
+
     // ========== PHASE 2: LECTURE CENTRALISÉE DE L'ÉTAT ==========
     const state = URLManager.readCurrentState();
-    
+
     // Application directe aux variables globales (une seule fois)
     tool = state.tool;
     sortMode = state.sortMode;
+    showEvents = state.showEvents;
     isCircularMode = state.isCircular;
     current_angle = state.angle;
     implexMode = state.implexMode;
-    
+
     // ========== PHASE 3: CONSTRUCTION DES DONNÉES ==========
     LocationDataBuilder.buildCompleteLocationData();
-    
+
     // ========== PHASE 4: INTERFACE DES LIEUX ==========
     if (document.querySelector('.places-panel')) {
       if (PlacesInterface.initialize()) {
         PlacesInterface.generatePlacesList();
         PlacesInterface.updateSummarySection();
-        // Passage propre de l'état events (pas de re-lecture)
-        PlacesPanelControls.initialize(state.showEvents);
+        PlacesPanelControls.initialize();
         PlacesInterface.initializeEventListeners();
       }
     }
-    
+
     // ========== PHASE 5: MISE À JOUR DES BOUTONS ==========
     AngleManager.updateAngleButtons();
     if (isCircularMode) {
       const circularBtn = document.getElementById('b-circular-mode');
       if (circularBtn) circularBtn.classList.add('active');
     }
-    
+
     // ========== PHASE 6: INITIALISATION DES ÉVÉNEMENTS ==========
     DOMCache.preload();
     this.initializeEvents();
     this.initializeAngleEvents();
     ColorManager.initializeColorEvents();
     LegendManager.initializeAllEvents();
-    
+
     // ========== PHASE 7: RENDU ET FINALISATION ==========
     this.renderFanchart();
     this.updateGenerationTitle();
@@ -3992,11 +3924,11 @@ const FanchartApp = {
 const R = SVGRenderer;
 const T = TextRenderer;
 
-// Lancement de l'application
-FanchartApp.init();
-
 window.toggleFanchartSort = () => PlacesPanelControls.toggleSort();
 window.toggleFanchartEventsDisplay = () => PlacesPanelControls.toggleEventsDisplay();
 window.filterFanchartPlaces = (query) => PlacesPanelControls.filterPlaces(query);
 window.clearFanchartSearch = () => PlacesPanelControls.clearSearch();
 window.toggleFanchartPlacesPanel = () => document.body.classList.toggle('place_color');
+
+// Lancement de l'application
+FanchartApp.init();
