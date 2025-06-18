@@ -182,45 +182,280 @@ const LayoutCalculator = {
 };
 
 
+// ========== URLManager centralisé ==========
+const URLManager = {
+  /**
+   * Configuration de base pour tous les types d'URL
+   * Centralise les paramètres par défaut et les formats
+   */
+  config: {
+    // URL de base héritée du système existant
+    basePerson: link_to_person,
 
-// ========== Utilitaires généraux ==========
-const Utils = {
-  // Fonction unique et directe pour construire l'URL
-  buildPersonUrl: function(p) {
-    let params = ['m=A', 't=FC', `p=${p.fnk}`, `n=${p.snk}`];
-    if (p.oc) params.push(`oc=${p.oc}`);
-    params.push(`v=${max_gen}`);
+    // Paramètres par défaut pour éviter la redondance
+    defaultParams: {
+      module: 'A',
+      template: 'FC'
+    },
 
-    // Seulement les paramètres non-défaut
-    if (isCircularMode) params.push('mode=couple');
-    else if (current_angle !== 220) params.push(`angle=${current_angle}`);
-
-    if (tool) params.push(`tool=${tool}`);
-    if (implexMode === 'numbered') params.push('implex=num');
-    else if (implexMode === 'full') params.push('implex=full');
-    if (has_ba) params.push('ba=on');
-    if (has_bu) params.push('bu=on');
-
-    return link_to_person + params.join('&');
+    // Paramètres spéciaux selon le type de navigation
+    specialParams: {
+      place: { module: 'MOD_DATA', data: 'place' }
+    }
   },
 
-  // Mise à jour de l'URL courante
-  updateUrlWithCurrentState: function() {
-    const p = ancestor["S1"];
-    const newUrl = this.buildPersonUrl(p);
-    history.replaceState(null, '', newUrl);
+  /**
+   * Méthode principale : construit une URL pour une personne
+   *
+   * @param {Object} person - Objet personne avec fnk, snk, oc
+   * @param {Object} options - Options de construction de l'URL
+   * @returns {string} URL complète
+   */
+  buildPersonURL: function(person, options = {}) {
+    // Options par défaut avec fusion intelligente
+    const opts = {
+      // Comportement de navigation
+      useCurrentState: true,     // Inclure l'état actuel (générations, mode, etc.)
+      externalNavigation: false, // true = fiche individuelle, false = fanchart
+      targetGeneration: null,    // Forcer une génération spécifique
+
+      // Préservation de l'état existant
+      preserveTools: true,       // Garder les outils actifs (colorisation, etc.)
+      preserveMode: true,        // Garder le mode (circulaire, angle)
+      preserveView: true,        // Garder la vue (zoom, position)
+
+      // Fusion avec les options passées
+      ...options
+    };
+
+    // Construction de l'URL selon le type de navigation
+    if (opts.externalNavigation) {
+      // Navigation externe : URL simple vers la fiche individuelle
+      return this._buildExternalPersonURL(person);
+    } else {
+      // Navigation interne : URL complète avec état du fanchart
+      return this._buildFanchartPersonURL(person, opts);
+    }
   },
 
-  // Navigation vers une nouvelle personne
-  navigateWithParams: function(newGen) {
-    const p = ancestor["S1"];
-    const saved_max_gen = max_gen;
-    max_gen = newGen;
-    const url = this.buildPersonUrl(p);
-    max_gen = saved_max_gen;
+  /**
+   * Construit une URL pour une recherche de lieu
+   * Remplace URLManager.navigateToPlace
+   *
+   * @param {string} placeName - Nom du lieu à rechercher
+   * @param {Object} options - Options de recherche
+   * @returns {string} URL de recherche
+   */
+  buildPlaceURL: function(placeName, options = {}) {
+    const opts = {
+      exactSearch: true,    // Recherche exacte ou partielle
+      searchPrefix: true,   // Inclure une recherche par préfixe
+      ...options
+    };
+
+    const baseURL = this.config.basePerson;
+    const params = [];
+
+    // Paramètres de base pour la recherche de lieux
+    params.push(`m=${this.config.specialParams.place.module}`);
+    params.push(`data=${this.config.specialParams.place.data}`);
+
+    // Logique de recherche intelligente
+    if (opts.exactSearch && placeName.length > 2) {
+      // Recherche principale avec nom tronqué (logique existante)
+      const searchTerm = placeName.slice(0, -2);
+      params.push(`s=${encodeURIComponent(searchTerm)}`);
+    }
+
+    // Recherche exacte complémentaire
+    params.push(`s1=${encodeURIComponent(placeName)}`);
+
+    return baseURL + params.join('&');
+  },
+
+  /**
+   * Met à jour l'URL de la page courante avec l'état actuel
+   * Remplace URLManager.updateCurrentURL
+   *
+   * @param {Object} stateOverrides - Remplacements ponctuels de l'état
+   */
+  updateCurrentURL: function(stateOverrides = {}) {
+    const person = ancestor["S1"];
+    if (!person) return;
+
+    // Construire l'URL avec l'état actuel + les remplacements
+    const options = {
+      useCurrentState: true,
+      preserveTools: true,
+      preserveMode: true,
+      preserveView: false, // Ne pas préserver le zoom pour les URL
+      ...stateOverrides
+    };
+
+    const newURL = this.buildPersonURL(person, options);
+
+    // Mise à jour de l'historique sans rechargement
+    history.replaceState(null, '', newURL);
+  },
+
+  /**
+   * Navigation vers une nouvelle personne avec paramètres
+   * Remplace Utils.navigateWithParams
+   *
+   * @param {number} targetGeneration - Génération cible
+   * @param {Object} additionalOptions - Options supplémentaires
+   */
+  navigateToGeneration: function(targetGeneration, additionalOptions = {}) {
+    const person = ancestor["S1"];
+    if (!person) return;
+
+    // Sauvegarder l'état actuel pour restauration
+    const savedMaxGen = max_gen;
+
+    // Construire l'URL avec la nouvelle génération
+    max_gen = targetGeneration;
+    const options = {
+      targetGeneration: targetGeneration,
+      useCurrentState: true,
+      preserveTools: true,
+      preserveMode: true,
+      ...additionalOptions
+    };
+
+    const url = this.buildPersonURL(person, options);
+
+    // Restaurer l'état et naviguer
+    max_gen = savedMaxGen;
     window.location = url;
   },
 
+  /**
+   * Navigation directe vers une personne
+   * Centralise les appels depuis les événements SVG et les clics
+   *
+   * @param {Object} person - Personne cible
+   * @param {boolean} newTab - Ouvrir dans un nouvel onglet
+   * @param {boolean} stayInFanchart - Rester dans le fanchart vs fiche individuelle
+   */
+  navigateToPerson: function(person, newTab = false, stayInFanchart = false) {
+    if (!person || !person.fnk || !person.snk) {
+      console.warn('URLManager: Personne invalide pour navigation', person);
+      return false;
+    }
+
+    const url = this.buildPersonURL(person, {
+      externalNavigation: !stayInFanchart,
+      useCurrentState: stayInFanchart
+    });
+
+    // Exécution de la navigation
+    if (newTab) {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+
+    return true;
+  },
+
+  /**
+   * Navigation vers un lieu (recherche)
+   * @param {string} placeName - Nom du lieu
+   * @param {boolean} newTab - Nouvel onglet
+   */
+  navigateToPlace: function(placeName, newTab = false) {
+    const url = this.buildPlaceURL(placeName);
+
+    if (newTab) {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+
+    return true;
+  },
+
+  // ========== MÉTHODES PRIVÉES ==========
+  /**
+   * Construit une URL externe simple (fiche individuelle)
+   * @private
+   */
+  _buildExternalPersonURL: function(person) {
+    const params = [`p=${person.fnk}`, `n=${person.snk}`];
+
+    if (person.oc) {
+      params.push(`oc=${person.oc}`);
+    }
+
+    return this.config.basePerson + params.join('&');
+  },
+
+  /**
+   * Construit une URL complète pour navigation fanchart
+   * @private
+   */
+  _buildFanchartPersonURL: function(person, options) {
+    // Paramètres de base obligatoires
+    const params = [
+      `m=${this.config.defaultParams.module}`,
+      `t=${this.config.defaultParams.template}`,
+      `p=${person.fnk}`,
+      `n=${person.snk}`
+    ];
+
+    // Paramètres optionnels de la personne
+    if (person.oc) {
+      params.push(`oc=${person.oc}`);
+    }
+
+    // État du fanchart si demandé
+    if (options.useCurrentState) {
+      this._addFanchartState(params, options);
+    }
+
+    return this.config.basePerson + params.join('&');
+  },
+
+  /**
+   * Ajoute l'état actuel du fanchart aux paramètres
+   * @private
+   */
+  _addFanchartState: function(params, options) {
+    // Génération (toujours incluse)
+    const targetGen = options.targetGeneration || max_gen;
+    params.push(`v=${targetGen}`);
+
+    // Mode et angle si préservés
+    if (options.preserveMode) {
+      if (isCircularMode) {
+        params.push('mode=couple');
+      } else if (current_angle !== 220) { // 220 = défaut
+        params.push(`angle=${current_angle}`);
+      }
+    }
+
+    // Outils si préservés
+    if (options.preserveTools) {
+      if (tool) {
+        params.push(`tool=${tool}`);
+      }
+
+      // État des implexes
+      if (implexMode === 'numbered') {
+        params.push('implex=num');
+      } else if (implexMode === 'full') {
+        params.push('implex=full');
+      }
+
+      // État des événements baptême/sépulture
+      if (has_ba) params.push('ba=on');
+      if (has_bu) params.push('bu=on');
+    }
+  }
+};
+
+// ========== Utilitaires généraux ==========
+const Utils = {
   calculateAgeCategory: function(age) {
     const boundaries = [30, 45, 60, 75, 90, 105, Infinity];
     const category = boundaries.findIndex(boundary => age < boundary);
@@ -829,9 +1064,9 @@ const ModernPlacesInterface = {
 
   handlePlaceClick: function(placeName, event) {
     // Navigation vers la recherche de lieu
-    if (placeName && NavigationHelper && NavigationHelper.openPlaceLink) {
+    if (placeName && URLManager.navigateToPlace) {
       const newTab = event.ctrlKey || event.metaKey;
-      NavigationHelper.openPlaceLink(placeName, newTab);
+      URLManager.navigateToPlace(placeName, newTab);
     }
   },
 
@@ -863,9 +1098,9 @@ const ModernPlacesInterface = {
       const placeRow = e.target.closest('.place-content');
       if (placeRow) {
         const placeName = placeRow.dataset.place;
-        if (placeName && NavigationHelper && NavigationHelper.openPlaceLink) {
+        if (placeName && URLManager.navigateToPlace) {
           const newTab = e.ctrlKey || e.metaKey;
-          NavigationHelper.openPlaceLink(placeName, newTab);
+          URLManager.navigateToPlace(placeName, newTab);
         }
       }
     });
@@ -1318,7 +1553,7 @@ const CircularModeRenderer = {
     });
 
     // Mettre à jour l'URL
-    Utils.updateUrlWithCurrentState();
+    URLManager.updateCurrentURL();
 
     // Redessiner
     FanchartApp.calculateDimensions();
@@ -1647,7 +1882,7 @@ const SVGRenderer = {
 
     // Clic sur une personne (secteur du fanchart)
     if (person && person.fnk && person.snk) {
-      NavigationHelper.openPersonLink(person, true, false);
+      URLManager.navigateToPerson(person, true, false);
       return;
     }
 
@@ -1655,7 +1890,7 @@ const SVGRenderer = {
     if (li && document.body.dataset.wizard === "1") {
       e.preventDefault();
       const placeName = li.dataset.location;
-      NavigationHelper.openPlaceLink(placeName, true);
+      URLManager.navigateToPlace(placeName, true);
       return;
     }
   },
@@ -1814,7 +2049,7 @@ const SVGRenderer = {
       text.innerHTML = `<textPath xlink:href="#${pathId}" startOffset="50%" style="font-size:${fontSize}%;">&#x25B2;</textPath>`;
       text.onclick = (e) => {
         const useNewTab = e.ctrlKey || e.metaKey;
-        NavigationHelper.openPersonLink(p, false, true);
+        URLManager.navigateToPerson(p, useNewTab, true);
       };
     } else {
       text.setAttribute("class", "no-link");
@@ -2171,7 +2406,7 @@ const ColorManager = {
     this.updateButtonStates();
 
     // Synchroniser l'URL
-    Utils.updateUrlWithCurrentState();
+    URLManager.updateCurrentURL();
   },
 
   updateControlsVisibility: function() {
@@ -2215,7 +2450,7 @@ const ColorManager = {
     fanchart.classList.toggle("de", de_checked);
     fanchart.classList.toggle("bu", bu_checked);
 
-    Utils.updateUrlWithCurrentState();
+    URLManager.updateCurrentURL();
   },
 
   initializeColorEvents: function() {
@@ -2262,7 +2497,7 @@ const ColorManager = {
       // Appliquer la colorisation
       ColorManager.applyColorization();
       ColorManager.updateControlsVisibility();
-      Utils.updateUrlWithCurrentState();
+      URLManager.updateCurrentURL();
     };
 
     // Bouton âges (exclusion mutuelle)
@@ -2284,7 +2519,7 @@ const ColorManager = {
         if (placesButton) placesButton.classList.remove("active");
       }
 
-      Utils.updateUrlWithCurrentState();
+      URLManager.updateCurrentURL();
     };
 
     // Masquer les contrôles au démarrage si nécessaire
@@ -2329,45 +2564,6 @@ const LegendManager = {
   }
 };
 
-const NavigationHelper = {
-  openPersonLink: function(person, newTab = false, stayInFanchart = false) {
-    if (!person || !person.fnk || !person.snk) return false;
-
-    let url;
-    if (stayInFanchart) {
-      // Utiliser la fonction centralisée
-      // Astuce : temporairement faire comme si cette personne était S1
-      const saved_ancestor = ancestor["S1"];
-      ancestor["S1"] = person;
-      url = Utils.buildPersonUrl(person);
-      ancestor["S1"] = saved_ancestor; // Restaurer
-    } else {
-      // Navigation externe: va vers fiche individuelle
-      const oc = person.oc ? `&oc=${person.oc}` : '';
-      url = `${link_to_person}p=${person.fnk}&n=${person.snk}${oc}`;
-    }
-
-    if (newTab) {
-      window.open(url, '_blank');
-    } else {
-      window.location.href = url;
-    }
-    return true;
-  },
-
-  openPlaceLink: function(placeName, newTab = false) {
-    const searchTerm = placeName.length > 2 ? placeName.slice(0, -2) : placeName;
-    const url = `${link_to_person}m=MOD_DATA&data=place&s=${encodeURIComponent(searchTerm)}&s1=${encodeURIComponent(placeName)}`;
-
-    if (newTab) {
-      window.open(url, '_blank');
-    } else {
-      window.location.href = url;
-    }
-    return true;
-  }
-};
-
 const AngleManager = {
   // Obtenir l'angle actuel
   getCurrentAngle: function() {
@@ -2388,7 +2584,7 @@ const AngleManager = {
     current_angle = newAngle;
 
     // Mettre à jour l'URL avec le système existant
-    Utils.updateUrlWithCurrentState();
+    URLManager.updateCurrentURL();
 
     // Mettre à jour l'interface
     this.updateAngleButtons();
@@ -3136,7 +3332,7 @@ const FanchartApp = {
     }
     if (max_gen > max_gen_loaded) {
       max_gen = max_gen_loaded;
-      Utils.updateUrlWithCurrentState();
+      URLManager.updateCurrentURL();
     }
 
     // Calculer max_r avec validation
@@ -3632,16 +3828,16 @@ const FanchartApp = {
       if (max_gen < max_gen_loaded) {
         max_gen++;
         FanchartApp.reRenderWithCurrentGenerations();
-        Utils.updateUrlWithCurrentState();
+        URLManager.updateCurrentURL();
       } else {
-        Utils.navigateWithParams(max_gen + 1);
+        URLManager.navigateToGeneration(max_gen + 1);
       }
     };
     document.getElementById("b-gen-del").onclick = () => {
       if(max_gen > 1) {
         max_gen--;
         FanchartApp.reRenderWithCurrentGenerations();
-        Utils.updateUrlWithCurrentState();
+        URLManager.updateCurrentURL();
       }
     };
     document.getElementById("b-implex").onclick = function() {
@@ -3665,7 +3861,7 @@ const FanchartApp = {
       }
 
       FanchartApp.reRenderWithCurrentGenerations();
-      Utils.updateUrlWithCurrentState();
+      URLManager.updateCurrentURL();
     };
     document.getElementById("font-selector").onchange = function() {
       const fanchart = document.getElementById("fanchart");
@@ -3679,7 +3875,7 @@ const FanchartApp = {
       }
 
       // Mettre à jour l'URL si nécessaire
-      // Utils.updateUrlWithCurrentState();
+      // URLManager.updateCurrentURL();
     };
 
   },
