@@ -11,7 +11,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        ocamlPackages = pkgs.ocaml-ng.ocamlPackages_5_1;
+        ocamlPackages = pkgs.ocaml-ng.ocamlPackages;
 
         # Due to Nix's package isolation principle, the findlib package cannot
         # install the topfind script into the OCaml directory. This wrapper
@@ -36,7 +36,6 @@
           unidecode = ocamlPackages.callPackage ./nix/unidecode.nix { };
           calendars = ocamlPackages.callPackage ./nix/calendars.nix { };
           syslog = ocamlPackages.callPackage ./nix/syslog.nix { };
-          camlzip = ocamlPackages.callPackage ./nix/camlzip { };
           not-ocamlfind =
             ocamlPackages.callPackage ./nix/not-ocamlfind.nix { inherit ocamlPackages; };
 
@@ -51,7 +50,6 @@
               ancient
               unidecode
               calendars
-              camlzip
               syslog
             ] ++ (with pkgs; [
               bash
@@ -66,6 +64,7 @@
             ]) ++ (with ocamlPackages; [
               camlp5
               camlp-streams
+              camlzip
               cppo
               fmt
               jingoo
@@ -107,7 +106,7 @@
             utop
             odoc
             ocaml-lsp
-            ocamlformat_0_24_1
+            ocamlformat_0_27_0
             patdiff
           ]);
 
