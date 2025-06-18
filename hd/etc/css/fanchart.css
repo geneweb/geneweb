@@ -916,12 +916,12 @@ body:not(.place_color) .places-panel {
 .place-row.tall-row .place-indicators {
   display: flex;
   flex-wrap: wrap;
-  width: 60px;
+  width: 56px;
   height: 42px;
   align-content: center;
   justify-content: flex-end;
-  padding: 2px 4px;
-  gap: 2px;
+  padding: 1px 4px;
+  gap: 1px;
 }
 
 .line-break {

@@ -250,9 +250,22 @@ const URLManager = {
     }
   },
 
+readCurrentState: function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  return {
+    tool: urlParams.get('tool') || '',
+    sortMode: urlParams.has('sort') ? 'alphabetical' : 'frequency',
+    showEvents: urlParams.has('events'),
+    isCircular: urlParams.get('mode') === 'couple',
+    angle: parseInt(urlParams.get('angle')) || 220,
+    implexMode: urlParams.get('implex') === 'num' ? 'numbered' : 
+                urlParams.get('implex') === 'full' ? 'full' : 'reduced'
+  };
+},
+
   /**
    * Construit une URL pour une recherche de lieu
-   * Remplace URLManager.navigateToPlace
    *
    * @param {string} placeName - Nom du lieu à rechercher
    * @param {Object} options - Options de recherche
@@ -287,7 +300,6 @@ const URLManager = {
 
   /**
    * Met à jour l'URL de la page courante avec l'état actuel
-   * Remplace URLManager.updateCurrentURL
    *
    * @param {Object} stateOverrides - Remplacements ponctuels de l'état
    */
@@ -433,33 +445,31 @@ const URLManager = {
    * @private
    */
   _addFanchartState: function(params, options) {
-    // Génération (toujours incluse)
     const targetGen = options.targetGeneration || max_gen;
     params.push(`v=${targetGen}`);
 
-    // Mode et angle si préservés
     if (options.preserveMode) {
       if (isCircularMode) {
         params.push('mode=couple');
-      } else if (current_angle !== 220) { // 220 = défaut
+      } else if (current_angle !== 220) {
         params.push(`angle=${current_angle}`);
       }
     }
 
-    // Outils si préservés
     if (options.preserveTools) {
-      if (tool) {
-        params.push(`tool=${tool}`);
+      if (tool) params.push(`tool=${tool}`);
+      
+      // ✅ LECTURE DEPUIS LES VARIABLES GLOBALES
+      if (sortMode === 'alphabetical') params.push('sort');
+      
+      const placesPanel = document.querySelector('.places-panel');
+      if (placesPanel?.classList.contains('show-events')) {
+        params.push('events');
       }
-
-      // État des implexes
-      if (implexMode === 'numbered') {
-        params.push('implex=num');
-      } else if (implexMode === 'full') {
-        params.push('implex=full');
-      }
-
-      // État des événements baptême/sépulture
+      
+      if (implexMode === 'numbered') params.push('implex=num');
+      else if (implexMode === 'full') params.push('implex=full');
+      
       if (has_ba) params.push('ba=on');
       if (has_bu) params.push('bu=on');
     }
@@ -1143,7 +1153,14 @@ const PlacesInterface = {
       const placeRow = e.target.closest('.place-row');
       if (placeRow) {
         placeRow.classList.add('hovered');
-        // TODO: Intégration avec le highlighting SVG existant
+        
+        const placeContent = placeRow.querySelector('.place-content');
+        if (placeContent) {
+          const placeName = placeContent.dataset.place;
+          PlacesHighlighter.expandPlaceNameIfNeeded(placeContent, placeName, null, true);
+          PlacesHighlighter.highlightSVGSectorsForPlace(placeName, true);
+          // TODO: FIX intégration avec le highlighting SVG existant
+        }
       }
     }, true);
 
@@ -1151,7 +1168,14 @@ const PlacesInterface = {
       const placeRow = e.target.closest('.place-row');
       if (placeRow) {
         placeRow.classList.remove('hovered');
-        // TODO: Nettoyage du highlighting SVG
+
+        const placeContent = placeRow.querySelector('.place-content');
+        if (placeContent) {
+          const placeName = placeContent.dataset.place;
+          PlacesHighlighter.restorePlaceNameIfNeeded(placeContent);
+          PlacesHighlighter.highlightSVGSectorsForPlace(placeName, false);
+        }
+        // TODO: FIX ME
       }
     }, true);
 
@@ -1235,13 +1259,33 @@ const PlacesPanelControls = {
    * Configure les états par défaut des contrôles
    * Centralise la logique d'initialisation pour éviter les incohérences
    */
-  initializeDefaultStates: function() {
+  initializeDefaultStates: function(showEvents = false) {
+    console.log('🔍 initializeDefaultStates appelé avec showEvents:', showEvents); // ← AJOUTER ÇA
+
     // État initial du tri (cohérent avec la variable globale sortMode)
     this.updateSortButtonIcon();
 
-    // État initial des événements (masqué par défaut)
+    // État initial des événements - NE PAS écraser si vient de l'URL
     const panel = PlacesInterface.elements.panel;
-    panel.classList.remove('show-events');
+
+    if (showEvents) {
+      panel.classList.add('show-events');
+      console.log('✅ Classe show-events AJOUTÉE'); // ← ET ÇA
+
+      // Mettre à jour l'icône du bouton
+      const icon = document.querySelector('.events-toggle i');
+      if (icon) {
+        icon.className = 'far fa-eye-slash';
+      }
+    } else {
+      panel.classList.remove('show-events');
+      console.log('❌ Classe show-events SUPPRIMÉE'); // ← ET ÇA
+      // Icône par défaut
+      const icon = document.querySelector('.events-toggle i');
+      if (icon) {
+        icon.className = 'far fa-eye';
+      }
+    }
 
     // Réinitialisation du champ de recherche
     const searchInput = panel.querySelector('.search-input');
@@ -1275,7 +1319,8 @@ const PlacesPanelControls = {
 
     // Régénération de la liste avec le nouveau tri
     PlacesInterface.generatePlacesList();
-
+    
+    URLManager.updateCurrentURL();
     console.log(`🔄 Tri basculé vers: ${sortMode}`);
   },
 
@@ -1317,6 +1362,7 @@ const PlacesPanelControls = {
       icon.className = !isShowingEvents ? 'far fa-eye-slash' : 'far fa-eye';
     }
 
+    URLManager.updateCurrentURL();
     console.log(`👁️ Affichage des événements ${!isShowingEvents ? 'activé' : 'désactivé'}`);
   },
 
@@ -1407,7 +1453,7 @@ const PlacesHighlighter = {
 
       // Ajouter les indicateurs d'événements
       if (placeData.indicatorElement) {
-        const events = eventTypes.length === 1 ? eventTypes : [eventTypes[index]].filter(Boolean);
+        const events = placeNames.length === 1 ? eventTypes : [eventTypes[index]].filter(Boolean);
         if (events.length > 0) {
           this.addIndicatorsForPlace(placeData.indicatorElement, events);
         }
@@ -1436,14 +1482,19 @@ const PlacesHighlighter = {
    * Affiche le nom complet d'un sous-lieu si nécessaire
    */
   expandPlaceNameIfNeeded: function(placeElement, placeName, highlightedPlaces = null, forceExpand = false) {
+      console.log('🚀 expandPlaceNameIfNeeded appelé avec:', {
+    placeName, 
+    forceExpand, 
+    'placeData.isSubLocation': lieux[placeName]?.isSubLocation
+  }); 
     const placeData = lieux[placeName];
     const placeNameElement = placeElement.querySelector('.place-name');
     
     if (placeNameElement && placeData) {
       let shouldExpand = false;
       
-      if (forceExpand) {
-        // Cas survol liste : toujours afficher
+      if (forceExpand && placeData.isSubLocation) {
+        // Cas survol liste : toujours afficher pour les sous-lieux uniquement
         shouldExpand = true;
       } else if (sortMode === 'alphabetical' && placeData.isSubLocation) {
         // Cas survol secteur : vérifier le parent
@@ -1451,19 +1502,20 @@ const PlacesHighlighter = {
       }
       
       if (shouldExpand) {
-        if (!placeNameElement.dataset.originalName) {
-          placeNameElement.dataset.originalName = placeNameElement.textContent;
+        if (!placeNameElement.dataset.originalHtml) {
+          placeNameElement.dataset.originalHtml = placeNameElement.innerHTML;
         }
-        placeNameElement.textContent = placeName; // Nom complet original
+        // Remplacer par le nom complet sans indicateur de sous-lieu
+        placeNameElement.innerHTML = placeName;
       }
     }
   },
 
   restorePlaceNameIfNeeded: function(placeElement) {
     const placeNameElement = placeElement.querySelector('.place-name');
-    if (placeNameElement && placeNameElement.dataset.originalName) {
-      placeNameElement.textContent = placeNameElement.dataset.originalName;
-      delete placeNameElement.dataset.originalName;
+    if (placeNameElement && placeNameElement.dataset.originalHtml) {
+      placeNameElement.innerHTML = placeNameElement.dataset.originalHtml;
+      delete placeNameElement.dataset.originalHtml;
     }
   },
 
@@ -1472,36 +1524,42 @@ const PlacesHighlighter = {
    * @param {HTMLElement} container - Conteneur des indicateurs
    * @param {Array<string>} events - Types d'événements à afficher
    */
-  addIndicatorsForPlace: function(container, events) {
-    if (!container) return;
+addIndicatorsForPlace: function(container, events) {
+  if (!container) return;
 
-    events.forEach((event, index) => {
-      const indicator = document.createElement('div');
+  console.log('🔍 addIndicatorsForPlace appelé avec:', events.length, 'événements:', events);
 
-      const shortClass = Events.cssClass(event);
-      const label = Events.label(event);
+  events.forEach((event, index) => {
+    console.log(`  → Index ${index}: ${event}`);
+    
+    const indicator = document.createElement('div');
+    const shortClass = Events.cssClass(event);
+    const label = Events.label(event);
 
-      indicator.className = `indicator ${shortClass}`;
-      indicator.textContent = label;
+    indicator.className = `indicator ${shortClass}`;
+    indicator.textContent = label;
+    container.appendChild(indicator);
+    this.currentIndicators.push(indicator);
 
-      container.appendChild(indicator);
-      this.currentIndicators.push(indicator);
-
-      // Line-break après le 2e si 4+ événements
-      if (index === 1 && events.length >= 4) {
-        const breaker = document.createElement('div');
-        breaker.className = 'line-break';
-        container.appendChild(breaker);
-        this.currentIndicators.push(breaker);
-      }
-    });
-
-    // Ajouter tall-row seulement si 4+ événements
-    if (events.length >= 4) {
-      const row = container.closest('.place-row');
-      if (row) row.classList.add('tall-row');
+    // DEBUG : Line-break après le 2e si 4+ événements
+    if (index === 1 && events.length >= 4) {
+      console.log('✅ AJOUT LINE-BREAK car index=1 et length=', events.length);
+      const breaker = document.createElement('div');
+      breaker.className = 'line-break';
+      container.appendChild(breaker);
+      this.currentIndicators.push(breaker);
+    } else {
+      console.log('❌ PAS de line-break car index=', index, 'et length=', events.length);
     }
-  },
+  });
+
+  // Ajouter tall-row seulement si 4+ événements
+  if (events.length >= 4) {
+    console.log('✅ AJOUT tall-row car length=', events.length);
+    const row = container.closest('.place-row');
+    if (row) row.classList.add('tall-row');
+  }
+},
 
   /**
    * Nettoie tous les surlignages et indicateurs
@@ -1993,22 +2051,24 @@ const SVGRenderer = {
         PlacesHighlighter.simulatePersonHover([placeName], ['marriage']);
       }
     } else {
-      // Pour les personnes, traiter tous les lieux
-      const placesToHighlight = [];
-      const eventsToShow = [];
+      // Pour les personnes, GROUPER par lieu
+      const placeEventMap = new Map();
 
       Events.types.forEach(eventType => {
         const placeName = p[Events.place(eventType)];
-
         if (safeHighlightPlace(placeName, eventType)) {
           if (show) {
-            placesToHighlight.push(placeName);
-            eventsToShow.push(eventType);
+            if (!placeEventMap.has(placeName)) {
+              placeEventMap.set(placeName, []);
+            }
+            placeEventMap.get(placeName).push(eventType);
           }
         }
       });
-
-      if (show && placesToHighlight.length > 0 && PlacesInterface.elements.panel) {
+      
+      if (show && placeEventMap.size > 0 && PlacesInterface.elements.panel) {
+        const placesToHighlight = Array.from(placeEventMap.keys());
+        const eventsToShow = Array.from(placeEventMap.values()).flat();
         PlacesHighlighter.simulatePersonHover(placesToHighlight, eventsToShow);
       }
     }
@@ -2717,7 +2777,6 @@ const FanchartPlacesEventManager = {
         if (placeName) {
           placeContent.classList.add('hovered');
           PlacesHighlighter.expandPlaceNameIfNeeded(placeContent, placeName, null, true);
-          PlacesHighlighter.highlightSVGSectorsForPlace(placeName, true);
         }
       }
     }, true);
@@ -3053,6 +3112,9 @@ const ModernOverflowManager = {
     const content = document.createElement('div');
     content.className = 'overflow-content';
 
+    // Trier les items selon l'ordre alphabétique au lieu de l'ordre DOM
+    const sortedItems = this.sortItemsByLogicalOrder(items);
+
     items.slice(0, 5).forEach(item => {
       const row = item.row;
       if (row) {
@@ -3075,6 +3137,24 @@ const ModernOverflowManager = {
     section.appendChild(header);
     section.appendChild(content);
     return section;
+  },
+
+  // Trier selon l’ordre logique (parent avant enfant)
+  sortItemsByLogicalOrder: function(items) {
+    return items.sort((a, b) => {
+      const aPlace = a.placeName;
+      const bPlace = b.placeName;
+      const aData = lieux[aPlace];
+      const bData = lieux[bPlace];
+      
+      // Si A est parent de B, A avant B
+      if (bData?.isSubLocation && bData.parentLocation === aPlace) return -1;
+      // Si B est parent de A, B avant A  
+      if (aData?.isSubLocation && aData.parentLocation === bPlace) return 1;
+      
+      // Sinon tri alphabétique normal
+      return aPlace.localeCompare(bPlace, 'fr', { sensitivity: 'base' });
+    });
   },
 
   /**
@@ -3134,67 +3214,51 @@ const FanchartApp = {
   },
 
   init: function() {
+    // ========== PHASE 1: CALCULS DE BASE ==========
     this.calculateDimensions();
     this.processAncestorData();
-    // Construire les données de lieux
+    
+    // ========== PHASE 2: LECTURE CENTRALISÉE DE L'ÉTAT ==========
+    const state = URLManager.readCurrentState();
+    
+    // Application directe aux variables globales (une seule fois)
+    tool = state.tool;
+    sortMode = state.sortMode;
+    isCircularMode = state.isCircular;
+    current_angle = state.angle;
+    implexMode = state.implexMode;
+    
+    // ========== PHASE 3: CONSTRUCTION DES DONNÉES ==========
     LocationDataBuilder.buildCompleteLocationData();
-    // Générer l'interface si le panneau existe
+    
+    // ========== PHASE 4: INTERFACE DES LIEUX ==========
     if (document.querySelector('.places-panel')) {
-      // Initialiser l'interface (récupère les références aux éléments)
       if (PlacesInterface.initialize()) {
-        // Générer la liste HTML avec tous les attributs
         PlacesInterface.generatePlacesList();
         PlacesInterface.updateSummarySection();
-        // Initialiser les contrôles
-        PlacesPanelControls.initialize();
-        // Attacher les événements de survol
+        // Passage propre de l'état events (pas de re-lecture)
+        PlacesPanelControls.initialize(state.showEvents);
         PlacesInterface.initializeEventListeners();
       }
     }
-    const urlParams = new URLSearchParams(window.location.search);
-    // Mode circulaire
-    const modeParam = urlParams.get('mode');
-
-    if (modeParam === 'couple') {
-      isCircularMode = true;
-    } else {
-      // Mode éventail : lire l'angle
-      const angleParam = urlParams.get('angle');
-      if (angleParam) {
-        const angle = parseInt(angleParam);
-        if (CONFIG.available_angles.includes(angle)) {
-          current_angle = angle;
-        }
-      } else if (typeof initial_angle !== 'undefined' && initial_angle) {
-        current_angle = initial_angle;
-      }
-    }
-
-    const toolParam = urlParams.get('tool');
-    if (toolParam === 'death-age' || toolParam === 'place_color') {
-      tool = toolParam;
-    }
-
-    const implexParam = urlParams.get('implex');
-    if (implexParam === 'num') {
-      implexMode = 'numbered';
-    } else if (implexParam === 'full') {
-      implexMode = 'full';
-    }
-
+    
+    // ========== PHASE 5: MISE À JOUR DES BOUTONS ==========
     AngleManager.updateAngleButtons();
     if (isCircularMode) {
       const circularBtn = document.getElementById('b-circular-mode');
       if (circularBtn) circularBtn.classList.add('active');
     }
-
+    
+    // ========== PHASE 6: INITIALISATION DES ÉVÉNEMENTS ==========
     DOMCache.preload();
-    this.renderFanchart();
-    this.updateGenerationTitle();
     this.initializeEvents();
     this.initializeAngleEvents();
     ColorManager.initializeColorEvents();
     LegendManager.initializeAllEvents();
+    
+    // ========== PHASE 7: RENDU ET FINALISATION ==========
+    this.renderFanchart();
+    this.updateGenerationTitle();
     this.applyInitialState();
     UIManager.addNavigationHelp();
     this.fitScreen();
