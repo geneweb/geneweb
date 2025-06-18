@@ -2823,6 +2823,11 @@ and eval_int conf n = function
   | [] -> Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found
 
+and eval_place_field conf pl = function
+  | [ "sub" ] -> Place.only_suburb pl |> str_val
+  | [ "main" ] -> Place.without_suburb pl |> str_val
+  | _ -> Util.string_of_place conf pl |> safe_val
+
 and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
   function
   | [ "access_status" ] -> VVstring (Util.access_status p)
@@ -2852,10 +2857,16 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       match Date.od_of_cdate (Driver.get_baptism p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
+  | "baptism_place" :: sl ->
+      let pl = Driver.get_baptism_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | "birth_date" :: sl -> (
       match Date.od_of_cdate (Driver.get_birth p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
+  | "birth_place" :: sl ->
+      let pl = Driver.get_birth_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | "burial_date" :: sl -> (
       match Driver.get_burial p with
       | Buried cod when p_auth -> (
@@ -2863,6 +2874,9 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | Buried _ | Cremated _ | UnknownBurial -> null_val)
+  | "burial_place" :: sl ->
+      let pl = Driver.get_burial_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | [ "cnt" ] -> (
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
@@ -2933,6 +2947,9 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | Buried _ | Cremated _ | UnknownBurial -> null_val)
+  | "cremated_place" :: sl ->
+      let pl = Driver.get_burial_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | "death_date" :: sl -> (
       match Driver.get_death p with
       | Death (_, cd) when p_auth ->
@@ -2940,6 +2957,9 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
       | OfCourseDead ->
           null_val)
+  | "death_place" :: sl ->
+      let pl = Driver.get_death_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | [ "exist" ] -> VVbool true
   | "event" :: sl -> (
       match get_env "event" env with
@@ -3058,6 +3078,12 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           match Date.od_of_cdate (Driver.get_marriage fam) with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
+      | _ -> null_val)
+  | "marriage_place" :: sl -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, true) ->
+          let pl = Driver.get_marriage_place fam |> Driver.sou base in
+          if p_auth then eval_place_field conf pl sl else null_val
       | _ -> null_val)
   | "mother" :: sl -> (
       match Driver.get_parents p with
