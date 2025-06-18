@@ -6,8 +6,8 @@ module type S = sig
   (** Type of a feeder function for ['a]. *)
 
   type 'a hasher = ?salt:string -> 'a -> string
-  (** Type of a hash function for ['a]. The salt [salt] is added to
-      context before producing the final result. *)
+  (** Type of a hash function for ['a]. The salt [salt] is added to context
+      before producing the final result. *)
 
   val feeder_to_hasher : 'a feeder -> 'a hasher
   (** [feeder_to_hasher f] converts the feeder [f] into a hash function. *)

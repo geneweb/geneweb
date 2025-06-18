@@ -19,7 +19,7 @@ val make_tree_hts :
   list ->
   (Geneweb_db.Driver.iper, 'a) Def.choice Dag2html.dag ->
   (int * Dag2html.align * Adef.safe_string Dag2html.table_data) array array
-(** [make_tree_hts conf base elem_txt vbar_txt invert set spl d]  *)
+(** [make_tree_hts conf base elem_txt vbar_txt invert set spl d] *)
 
 val print_slices_menu_or_dag_page :
   Config.config ->
@@ -43,6 +43,7 @@ val make_and_print_dag :
   Adef.safe_string ->
   Adef.escaped_string ->
   unit
-(** [make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title next_txt] *)
+(** [make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
+     next_txt] *)
 
 val print : Config.config -> Geneweb_db.Driver.base -> unit

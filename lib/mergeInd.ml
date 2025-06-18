@@ -154,25 +154,25 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
       (Driver.gen_person_of_person p1) with
       sex =
         (if Driver.get_sex p2 <> Neuter then Driver.get_sex p2
-        else Driver.get_sex p1);
+         else Driver.get_sex p1);
       birth =
         (if Driver.get_birth p1 = Date.cdate_None then Driver.get_birth p2
-        else Driver.get_birth p1);
+         else Driver.get_birth p1);
       birth_place = get_string Driver.get_birth_place;
       birth_src = get_string Driver.get_birth_src;
       baptism =
         (if Driver.get_baptism p1 = Date.cdate_None then Driver.get_baptism p2
-        else Driver.get_baptism p1);
+         else Driver.get_baptism p1);
       baptism_place = get_string Driver.get_baptism_place;
       baptism_src = get_string Driver.get_baptism_src;
       death =
         (if Driver.get_death p1 = DontKnowIfDead then Driver.get_death p2
-        else Driver.get_death p1);
+         else Driver.get_death p1);
       death_place = get_string Driver.get_death_place;
       death_src = get_string Driver.get_death_src;
       burial =
         (if Driver.get_burial p1 = UnknownBurial then Driver.get_burial p2
-        else Driver.get_burial p1);
+         else Driver.get_burial p1);
       burial_place = get_string Driver.get_burial_place;
       burial_src = get_string Driver.get_burial_src;
       occupation = get_string Driver.get_occupation;
@@ -268,20 +268,20 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
       (Driver.gen_family_of_family fam1) with
       marriage =
         (if Driver.get_marriage fam1 = Date.cdate_None then
-         Driver.get_marriage fam2
-        else Driver.get_marriage fam1);
+           Driver.get_marriage fam2
+         else Driver.get_marriage fam1);
       marriage_place =
         (if Driver.is_empty_string (Driver.get_marriage_place fam1) then
-         Driver.get_marriage_place fam2
-        else Driver.get_marriage_place fam1);
+           Driver.get_marriage_place fam2
+         else Driver.get_marriage_place fam1);
       marriage_src =
         (if Driver.is_empty_string (Driver.get_marriage_src fam1) then
-         Driver.get_marriage_src fam2
-        else Driver.get_marriage_src fam1);
+           Driver.get_marriage_src fam2
+         else Driver.get_marriage_src fam1);
       fsources =
         (if Driver.is_empty_string (Driver.get_fsources fam1) then
-         Driver.get_fsources fam2
-        else Driver.get_fsources fam1);
+           Driver.get_fsources fam2
+         else Driver.get_fsources fam1);
     }
   in
   let des1 =
@@ -364,12 +364,12 @@ let merge conf base p1 p2 propose_merge_ind propose_merge_fam =
   in
   if changes_done then Util.commit_patches conf base;
   (if ok then
-   let changed =
-     let p1 = Util.string_gen_person base (Driver.gen_person_of_person p1) in
-     let p2 = Util.string_gen_person base (Driver.gen_person_of_person p2) in
-     U_Merge_person (p2, p1, p1)
-   in
-   History.record conf base changed "fp");
+     let changed =
+       let p1 = Util.string_gen_person base (Driver.gen_person_of_person p1) in
+       let p2 = Util.string_gen_person base (Driver.gen_person_of_person p2) in
+       U_Merge_person (p2, p1, p1)
+     in
+     History.record conf base changed "fp");
   Update.delete_topological_sort conf base;
   (ok, List.rev !rev_wl)
 

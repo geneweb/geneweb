@@ -18,22 +18,22 @@ val make :
   * Def.base_notes ->
   (base -> 'a) ->
   'a
-(** [make bname particles arrays k] create a base with [bname] name and
-    [arrays] as content and invokes the continuation [k] with it. *)
+(** [make bname particles arrays k] create a base with [bname] name and [arrays]
+    as content and invokes the continuation [k] with it. *)
 
 val load_database : string -> unit
 (** [load_database bname] loads the database [bname] into memory.
 
-    The base is read-only and any attempt to modify its values will
-    result in failure.
+    The base is read-only and any attempt to modify its values will result in
+    failure.
 
     A caveat of this function is that the allocated memory cannot be freed
-    before the current process terminates. Under the hood, it uses
-    the Ancient library to map the database into memory, outside the
-    OCaml heap. As a result, the OCaml garbage collector cannot reclaim it and
-    the delete function of Ancient is flawed. For this reason, this function
-    should only be used with databases that are intended to remain in
-    memory during the entire execution of the current process.
+    before the current process terminates. Under the hood, it uses the Ancient
+    library to map the database into memory, outside the OCaml heap. As a
+    result, the OCaml garbage collector cannot reclaim it and the delete
+    function of Ancient is flawed. For this reason, this function should only be
+    used with databases that are intended to remain in memory during the entire
+    execution of the current process.
 
     @raise Failwith if the base has already been loaded. *)
 
@@ -42,23 +42,21 @@ val with_database : string -> (base -> 'a) -> 'a
     continuation [k] with it.
 
     If the database [bname] has already been loaded into memory with
-    [load_database], the function uses this in-memory base instead of
-    reloading it.
+    [load_database], the function uses this in-memory base instead of reloading
+    it.
 
-    If the database [bname] was not loaded in memory, it is unloaded
-    after [k] is executed. *)
+    If the database [bname] was not loaded in memory, it is unloaded after [k]
+    is executed. *)
 
 val sync : ?scratch:bool -> base -> unit
-(** [sync scratch base]
-    Ensure that everything is synced on disk.
+(** [sync scratch base] Ensure that everything is synced on disk.
 
-    Depending on the backend,
-    it may perform various operation such as indexes rebuilding,
-    and it might be a lengthy operation.
+    Depending on the backend, it may perform various operation such as indexes
+    rebuilding, and it might be a lengthy operation.
 
-    Use [scratch] (default false) to sync and rebuild
-    the whole database. Otherwise, only changes that occured
-    since the last [sync] call are treated. *)
+    Use [scratch] (default false) to sync and rebuild the whole database.
+    Otherwise, only changes that occured since the last [sync] call are treated.
+*)
 
 (** {2 Unique identifiers} *)
 
@@ -99,8 +97,8 @@ val eq_istr : istr -> istr -> bool
 (** [true] if strings with the giving ids are equal *)
 
 val hash_istr : istr -> int
-(** Compute a hash of a [istr] value. This function is just the identity
-    because a [istr] value is already a hash.
+(** Compute a hash of a [istr] value. This function is just the identity because
+    a [istr] value is already a hash.
 
     The hash should use only on strings from a common database. *)
 
@@ -141,8 +139,8 @@ type fam_event = (iper, istr) Def.gen_fam_event
 (** Database implementation for [Def.fam_event] *)
 
 type string_person_index
-(** Data structure for optimised search throughout index by name
-    (surname or first name). *)
+(** Data structure for optimised search throughout index by name (surname or
+    first name). *)
 
 val empty_person : base -> iper -> person
 (** Returns unitialised person with the giving id. *)
@@ -157,9 +155,9 @@ val ifam_exists : base -> ifam -> bool
 (** Tells if family with giving id exists in the base. *)
 
 (** {2 Getters}
-    Getters are used to extract information about person and family.
-    If corresponding information part isn't present, driver load it from
-    the disk and cache it so further gets will return result immediately. *)
+    Getters are used to extract information about person and family. If
+    corresponding information part isn't present, driver load it from the disk
+    and cache it so further gets will return result immediately. *)
 
 val get_access : person -> Def.access
 (** Get privacy settings that define access to person's data *)
@@ -231,7 +229,8 @@ val get_separation : family -> Def.divorce
 (** Get family's separation status *)
 
 val get_family : person -> ifam array
-(** Get array of family's ids to which a person belongs as parent (person's union) *)
+(** Get array of family's ids to which a person belongs as parent (person's
+    union) *)
 
 val get_father : family -> iper
 (** Get family's father id (from the family's couple) *)
@@ -387,8 +386,8 @@ val nb_of_persons : base -> int
 (** Returns number of persons inside the database *)
 
 val nb_of_real_persons : base -> int
-(** Returns number of defined persons (without bogus definition "? ?")
-    inside the database *)
+(** Returns number of defined persons (without bogus definition "? ?") inside
+    the database *)
 
 val nb_of_families : base -> int
 (** Returns number of families inside the database *)
@@ -397,29 +396,30 @@ val bname : base -> string
 (** Returns database name *)
 
 val patch_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
-(** Modify/add person with the giving id in the base. New names are added
-    to the patched name index for the cosidered person and for evey member of family to
-    which he belongs. Modification stay blocked until call of [commit_patches]. *)
+(** Modify/add person with the giving id in the base. New names are added to the
+    patched name index for the cosidered person and for evey member of family to
+    which he belongs. Modification stay blocked until call of [commit_patches].
+*)
 
 val patch_ascend : base -> iper -> ifam Def.gen_ascend -> unit
-(** Modify/add ascendants of a person with a giving id. Modification stay blocked until
-    call of [commit_patches]. *)
+(** Modify/add ascendants of a person with a giving id. Modification stay
+    blocked until call of [commit_patches]. *)
 
 val patch_union : base -> iper -> ifam Def.gen_union -> unit
-(** Modify/add union of a person with a giving id. Modification stay blocked until
-    call of [commit_patches]. *)
+(** Modify/add union of a person with a giving id. Modification stay blocked
+    until call of [commit_patches]. *)
 
 val patch_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
-(** Modify/add family with a giving id. Modification stay blocked until
-    call of [commit_patches]. *)
+(** Modify/add family with a giving id. Modification stay blocked until call of
+    [commit_patches]. *)
 
 val patch_descend : base -> ifam -> iper Def.gen_descend -> unit
-(** Modify/add descendants of a family with a giving id. Modification stay blocked until
-    call of [commit_patches]. *)
+(** Modify/add descendants of a family with a giving id. Modification stay
+    blocked until call of [commit_patches]. *)
 
 val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
-(** Modify/add couple of a family with a giving id. Modification stay blocked until
-    call of [commit_patches]. *)
+(** Modify/add couple of a family with a giving id. Modification stay blocked
+    until call of [commit_patches]. *)
 
 val insert_string : base -> string -> istr
 (** Modify/add string with a giving id. If string already exists return its id.
@@ -427,13 +427,15 @@ val insert_string : base -> string -> istr
 
 val commit_patches : base -> unit
 (** Commit blocked modifications (patches) and update database files in order to
-    apply modifications on the disk.  *)
+    apply modifications on the disk. *)
 
 val commit_notes : base -> string -> string -> unit
-(** [commit_notes fname s] Update content of the notes/extended page file [fname] if exists. *)
+(** [commit_notes fname s] Update content of the notes/extended page file
+    [fname] if exists. *)
 
 val commit_wiznotes : base -> string -> string -> unit
-(** [commit_wiznotes fname s] Update content of the wizard notes page file [fname] if exists. *)
+(** [commit_wiznotes fname s] Update content of the wizard notes page file
+    [fname] if exists. *)
 
 val new_iper : base -> iper
 (** Retruns new unused person's id *)
@@ -459,9 +461,8 @@ val insert_family_with_couple_and_descendants :
   iper Def.gen_couple ->
   iper Def.gen_descend ->
   ifam
-(** [insert_family base f c d]
-    Add a new family with its couple and descendants the in the [base].
-    Allocate and returns the fresh new id for this family.
+(** [insert_family base f c d] Add a new family with its couple and descendants
+    the in the [base]. Allocate and returns the fresh new id for this family.
     [f] SHOULD be defined using [dummy_ifam]. *)
 
 val insert_descend : base -> ifam -> iper Def.gen_descend -> unit
@@ -473,28 +474,27 @@ val insert_person_with_union_and_ascendants :
   ifam Def.gen_ascend ->
   ifam Def.gen_union ->
   iper
-(** [insert_person base p a u]
-    Add a new person with its union and ascendants in the [base].
-    Allocate and returns the fresh new id for this person.
-    [p] SHOULD be defined using [dummy_iper]. *)
+(** [insert_person base p a u] Add a new person with its union and ascendants in
+    the [base]. Allocate and returns the fresh new id for this person. [p]
+    SHOULD be defined using [dummy_iper]. *)
 
 val insert_couple : base -> ifam -> iper Def.gen_couple -> unit
 (** Same as [patch_descend] *)
 
 val delete_person : base -> iper -> unit
-(** Remplace person with the giving id by bogus definition and clear
-    person's data structure. *)
+(** Remplace person with the giving id by bogus definition and clear person's
+    data structure. *)
 
 val delete_person_rec : base -> iper -> unit
 (** [delete_person_rec base iper] recursively deletes data as follows:
-    - If data to be deleted is linked and useful, it is replaced by empty
-      data. Otherwise, it is deleted.
+    - If data to be deleted is linked and useful, it is replaced by empty data.
+      Otherwise, it is deleted.
     - If empty data is linked to deleted data, it is clean up as well. *)
 
 val delete_family_rec : base -> ifam -> unit
 (** [delete_family_rec base iper] recursively deletes data as follows:
-    - If data to be deleted is linked and useful, it is replaced by empty
-      data. Otherwise, it is deleted.
+    - If data to be deleted is linked and useful, it is replaced by empty data.
+      Otherwise, it is deleted.
     - If empty data is linked to deleted data, it is clean up as well. *)
 
 val delete_ascend : base -> iper -> unit
@@ -504,8 +504,8 @@ val delete_union : base -> iper -> unit
 (** Clear person's union data structure *)
 
 val delete_family : base -> ifam -> unit
-(** Remplace family with the giving id by dummy family and clear
-    family's data structure. *)
+(** Remplace family with the giving id by dummy family and clear family's data
+    structure. *)
 
 val delete_descend : base -> ifam -> unit
 (** Clear family's descendants data structure *)
@@ -514,19 +514,20 @@ val delete_couple : base -> ifam -> unit
 (** Clear family's couple data structure *)
 
 val person_of_key : base -> string -> string -> int -> iper option
-(** [person_of_key first_name surname occ] returns person from his key information
-    (first name, surname and occurence number) *)
+(** [person_of_key first_name surname occ] returns person from his key
+    information (first name, surname and occurence number) *)
 
 val persons_of_name : base -> string -> iper list
-(** Return list of person ids that have giving name (could be one of the mix). *)
+(** Return list of person ids that have giving name (could be one of the mix).
+*)
 
 val persons_of_first_name : base -> string_person_index
-(** Returns data structure that allows to make optimised search throughout
-    index by first name *)
+(** Returns data structure that allows to make optimised search throughout index
+    by first name *)
 
 val persons_of_surname : base -> string_person_index
-(** Returns data structure that allows to make optimised search throughout
-    index by surname *)
+(** Returns data structure that allows to make optimised search throughout index
+    by surname *)
 
 val spi_first : string_person_index -> string -> istr
 (** Returns first [first/sur]name id starting with that string *)
@@ -539,30 +540,27 @@ val spi_find : string_person_index -> istr -> iper list
 (** Retruns all persons id having that [first/sur]name. *)
 
 val base_visible_get : base -> (person -> bool) -> iper -> bool
-(** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not visible
-    (restrited)) from the [base]. If file {i restrict} is present then read it to get
-    visibility information. If person's visibility isn't known, then set it with [fct].
-    Used when mode `use_restrict` is ativated *)
+(** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not
+    visible (restrited)) from the [base]. If file {i restrict} is present then
+    read it to get visibility information. If person's visibility isn't known,
+    then set it with [fct]. Used when mode `use_restrict` is ativated *)
 
 val base_visible_write : base -> unit
 (** Write updated visibility information to the {i restricted} file. *)
 
 val base_particles : base -> Re.re
-(** Return regular expression that matches all defined in the [base] particles. *)
+(** Return regular expression that matches all defined in the [base] particles.
+*)
 
 val base_strings_of_first_name : base -> string -> istr list
-(** [base_strings_of_first_name base x]
-    Return the list of first names (as [istr]) being equal or to [x]
-    using {!val:Name.crush_lower} comparison. [x] could be also a substring
-    of the matched first name.
-*)
+(** [base_strings_of_first_name base x] Return the list of first names (as
+    [istr]) being equal or to [x] using {!val:Name.crush_lower} comparison. [x]
+    could be also a substring of the matched first name. *)
 
 val base_strings_of_surname : base -> string -> istr list
-(** [base_strings_of_surname base x]
-    Return the list of surnames (as [istr]) being equal to [x]
-    using  {!val:Name.crush_lower} comparison. [x] could be also a substring
-    of the matched surname.
-*)
+(** [base_strings_of_surname base x] Return the list of surnames (as [istr])
+    being equal to [x] using {!val:Name.crush_lower} comparison. [x] could be
+    also a substring of the matched surname. *)
 
 val load_ascends_array : base -> unit
 (** Load array of ascendants in the memory and cache it so it could be accessed
@@ -614,8 +612,8 @@ val clear_families_array : base -> unit
 (** Remove array of families from the memory *)
 
 val base_notes_read : base -> string -> string
-(** [base_notes_read base fname] read and return content of [fname] note
-    (either database note either extended page). *)
+(** [base_notes_read base fname] read and return content of [fname] note (either
+    database note either extended page). *)
 
 val base_wiznotes_read : base -> string -> string
 (** [base_wiznotes_read base fname] read and return content of [fname] note
@@ -656,12 +654,12 @@ val families : ?select:(family -> bool) -> base -> family Collection.t
 (** {2 Useful markers} *)
 
 val iper_marker : iper Collection.t -> 'a -> (iper, 'a) Collection.Marker.t
-(** [iper_marker c v] create marker over collection of person's ids and initialise it
-    for every element with [v] *)
+(** [iper_marker c v] create marker over collection of person's ids and
+    initialise it for every element with [v] *)
 
 val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Collection.Marker.t
-(** [ifam_marker c v] create marker over collection of family's ids and initialise it
-    for every element with [v] *)
+(** [ifam_marker c v] create marker over collection of family's ids and
+    initialise it for every element with [v] *)
 
 val read_nldb : base -> (iper, ifam) Def.NLDB.t
 (** TODOOCP : doc *)
@@ -669,9 +667,9 @@ val read_nldb : base -> (iper, ifam) Def.NLDB.t
 val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
 
 val person_misc_names : base -> person -> (person -> title list) -> string list
-(** [person_misc_names base p nobtit] computes various mix between all kind
-    of names of a person's entry [p] from the database [base]. [nobtit] is
-    used to return a title entries for passed in argument person. *)
+(** [person_misc_names base p nobtit] computes various mix between all kind of
+    names of a person's entry [p] from the database [base]. [nobtit] is used to
+    return a title entries for passed in argument person. *)
 
 val p_first_name : base -> person -> string
 (** Returns first name of person. *)
@@ -684,6 +682,6 @@ val children_of_p : base -> person -> iper list
 
 val nobtitles :
   base -> string list Lazy.t -> string list Lazy.t -> person -> title list
-(** [nobtitles base allowed_titles denied_titles p] returns list of titles of a person [p]
-    that apprears in [allowed_titles] and doesn't appears in [denied_titles]. If [allowed_titles]
-    is empty the every title is allowed *)
+(** [nobtitles base allowed_titles denied_titles p] returns list of titles of a
+    person [p] that apprears in [allowed_titles] and doesn't appears in
+    [denied_titles]. If [allowed_titles] is empty the every title is allowed *)

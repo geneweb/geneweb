@@ -427,12 +427,12 @@ let empty_person base iper =
   [@ocaml.warning "-42"]
 
 let person_of_gen_person base (p, a, u) =
-  (Def.{ base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
-  [@ocaml.warning "-42"])
+  Def.{ base; iper = p.key_index; p = Some p; a = Some a; u = Some u }
+  [@ocaml.warning "-42"]
 
 let family_of_gen_family base (f, c, d) =
-  (Def.{ base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
-  [@ocaml.warning "-42"])
+  Def.{ base; ifam = f.fam_index; f = Some f; c = Some c; d = Some d }
+  [@ocaml.warning "-42"]
 
 let iper_exists base = base.func.iper_exists
 let ifam_exists base = base.func.ifam_exists
@@ -604,9 +604,8 @@ let get_separation fam =
 (*let get_separation = cache_fam (fun f -> get_separation_aux)
 *)
 
-(** Returns array of surnames of person's husbands.
-    First element of a couple in the array is husband's surname,
-    second - is a husband's surname aliases *)
+(** Returns array of surnames of person's husbands. First element of a couple in
+    the array is husband's surname, second - is a husband's surname aliases *)
 let husbands base (gp : _ Def.gen_person) =
   let p = poi base gp.key_index in
   Array.map

@@ -477,13 +477,11 @@ let search conf base an search_order specify unknown =
 (* ************************************************************************ *)
 
 (** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
-      trouver la meilleure combinaison de résultat pour afficher la réponse
-      la plus probable.
-    [Args] :
-      - conf : configuration de la base
-      - base : base
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    trouver la meilleure combinaison de résultat pour afficher la réponse la
+    plus probable. [Args] :
+    - conf : configuration de la base
+    - base : base [Retour] : Néant [Rem] : Exporté en clair hors de ce module.
+*)
 let print conf base specify unknown =
   let real_input label =
     match p_getenv conf.env label with

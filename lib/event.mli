@@ -32,4 +32,5 @@ val sorted_events :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   Geneweb_db.Driver.istr event_item list
-(** [sorted_events conf base p] is the list of [p]'s events, sorted by Checkitem.sorted_events *)
+(** [sorted_events conf base p] is the list of [p]'s events, sorted by
+    Checkitem.sorted_events *)

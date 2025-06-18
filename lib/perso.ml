@@ -161,14 +161,13 @@ let nobility_titles_list conf base p =
 
 (* ********************************************************************** *)
 
-(** [Description] : Indique si l'individu a été modifiée.
-    [Args] :
-      - conf   : configuration de la base
-      - base   : arbre
-      - p      : person
-      - p_auth : indique si l'utilisateur est authentifié
-    [Retour] : Vrai si la personne a été modifiée, Faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
+(** [Description] : Indique si l'individu a été modifiée. [Args] :
+    - conf : configuration de la base
+    - base : arbre
+    - p : person
+    - p_auth : indique si l'utilisateur est authentifié [Retour] : Vrai si la
+      personne a été modifiée, Faux sinon. [Rem] : Exporté en clair hors de ce
+      module. *)
 let has_history conf base p p_auth =
   let fn = Driver.sou base (Driver.get_first_name p) in
   let sn = Driver.sou base (Driver.get_surname p) in
@@ -181,14 +180,11 @@ let has_history conf base p p_auth =
 
 (* ************************************************************************ *)
 
-(** [Description] : Retourne une description de la mort de la personne
-    [Args] :
+(** [Description] : Retourne une description de la mort de la personne [Args] :
     - conf : configuration de la base
-    - p    : la personne que l'on veut afficher
-    - p_auth : authentifié ou non
-      [Retour] :
-    - string
-      [Rem] : Exporté en clair hors de ce module.                             *)
+    - p : la personne que l'on veut afficher
+    - p_auth : authentifié ou non [Retour] :
+    - string [Rem] : Exporté en clair hors de ce module. *)
 let get_death_text conf p p_auth =
   let died =
     if p_auth then
@@ -942,8 +938,8 @@ let build_surnames_list conf base v p =
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
           (if not (is_hidden fath) then
-           let dp1 = merge_date_place conf base surn dp fath in
-           loop (lev + 1) sosa fath (Driver.get_surname fath) dp1);
+             let dp1 = merge_date_place conf base surn dp fath in
+             loop (lev + 1) sosa fath (Driver.get_surname fath) dp1);
           let sosa = Sosa.inc sosa 1 in
           if not (is_hidden moth) then
             let dp2 = merge_date_place conf base surn dp moth in
@@ -980,14 +976,12 @@ let build_surnames_list conf base v p =
 (* ************************************************************************* *)
 
 (** [Description] : Construit la liste éclair des ascendants de p jusqu'à la
-                    génération v.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - v    : le nombre de génération
-      - p    : person
-    [Retour] : (surname * place * date begin * date end * person * list iper)
-    [Rem] : Exporté en clair hors de ce module.                              *)
+    génération v. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - v : le nombre de génération
+    - p : person [Retour] : (surname * place * date begin * date end * person *
+      list iper) [Rem] : Exporté en clair hors de ce module. *)
 let build_list_eclair conf base v p =
   let ht = Hashtbl.create 701 in
   let mark =
@@ -1374,12 +1368,12 @@ let get_sosa conf base env r p =
 
 (** [Description] : Permet de récupérer un lien de la chronique familiale.
     [Args] :
-      - conf : configuration
-      - base : base de donnée
-      - p    : person
-      - s    : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH")
-    [Retour] : string : "<a href="xxx">description du lien</a>"
-    [Rem] : Exporté en clair hors de ce module.                               *)
+    - conf : configuration
+    - base : base de donnée
+    - p : person
+    - s : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH") [Retour]
+      : string : "<a href="xxx">description du lien</a>" [Rem] : Exporté en
+      clair hors de ce module. *)
 let get_linked_page conf base p s =
   let db = Driver.read_nldb base in
   let db = Notes.merge_possible_aliases conf db in
@@ -2290,8 +2284,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
         ^ "&nz="
         ^ Driver.sou base (Driver.get_surname p)
         ^ (if Driver.get_occ p <> 0 then
-           "&ocz=" ^ string_of_int (Driver.get_occ p)
-          else "")
+             "&ocz=" ^ string_of_int (Driver.get_occ p)
+           else "")
         ^ "&")
   | "pvar" :: v :: sl -> (
       match find_person_in_env conf base v with
@@ -2344,11 +2338,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "vars" env with
       | Vvars lv ->
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
@@ -2360,11 +2354,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   | "svar" :: i :: sl -> (
@@ -4486,7 +4480,9 @@ let eval_transl conf base env upp s c =
         | "n" -> (
             (* select nth value *)
             (* replaced by %apply;nth([...],sex) or "s" below *)
-            match get_env "count" env with Vcnt i -> !i | _ -> 0)
+            match get_env "count" env with
+            | Vcnt i -> !i
+            | _ -> 0)
         | "s" -> (
             (* male/female/neuter *)
             match get_env "child" env with
@@ -5132,36 +5128,37 @@ let print_foreach conf base print_ast eval_expr =
         |> ignore
     | _ ->
         (if Array.length (Driver.get_family p) > 0 then
-         let rec loop prev i =
-           if i = Array.length (Driver.get_family p) then ()
-           else
-             let ifam = (Driver.get_family p).(i) in
-             let fam = Driver.foi base ifam in
-             let ifath = Driver.get_father fam in
-             let imoth = Driver.get_mother fam in
-             let ispouse = Gutil.spouse (Driver.get_iper p) fam in
-             let cpl = (ifath, imoth, ispouse) in
-             let m_auth =
-               authorized_age conf base (pget conf base ifath)
-               && authorized_age conf base (pget conf base imoth)
-             in
+           let rec loop prev i =
+             if i = Array.length (Driver.get_family p) then ()
+             else
+               let ifam = (Driver.get_family p).(i) in
+               let fam = Driver.foi base ifam in
+               let ifath = Driver.get_father fam in
+               let imoth = Driver.get_mother fam in
+               let ispouse = Gutil.spouse (Driver.get_iper p) fam in
+               let cpl = (ifath, imoth, ispouse) in
+               let m_auth =
+                 authorized_age conf base (pget conf base ifath)
+                 && authorized_age conf base (pget conf base imoth)
+               in
 
-             let vfam = Vfam (ifam, fam, cpl, m_auth) in
-             let env =
-               Templ.Env.(
-                 env |> add "fam" vfam |> add "family_cnt" (Vint (i + 1)))
-             in
-             let env =
-               match prev with
-               | Some vfam -> Templ.Env.add "prev_fam" vfam env
-               | None -> env
-             in
-             List.iter (print_ast env ini_ep) al;
-             loop (Some vfam) (i + 1)
-         in
-         loop None 0);
+               let vfam = Vfam (ifam, fam, cpl, m_auth) in
+               let env =
+                 Templ.Env.(
+                   env |> add "fam" vfam |> add "family_cnt" (Vint (i + 1)))
+               in
+               let env =
+                 match prev with
+                 | Some vfam -> Templ.Env.add "prev_fam" vfam env
+                 | None -> env
+               in
+               List.iter (print_ast env ini_ep) al;
+               loop (Some vfam) (i + 1)
+           in
+           loop None 0);
         List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
+          (fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge)
+             ->
             if can_merge then (None, i)
             else
               let cpl = (ifath, imoth, Driver.get_iper sp) in

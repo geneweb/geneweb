@@ -63,9 +63,8 @@ let rec noloop_aux base error tab i =
   | BeingVisited -> error (OwnAncestor (Driver.poi base i))
   | Visited -> ()
 
-(** It is highly recommended to load ascends and couples array before
-    running [check_noloop]
-*)
+(** It is highly recommended to load ascends and couples array before running
+    [check_noloop] *)
 let check_noloop base error =
   let tab = Driver.iper_marker (Driver.ipers base) NotVisited in
   Collection.iter (noloop_aux base error tab) (Driver.ipers base)
@@ -226,8 +225,8 @@ let relationship_and_links base ri b ip1 ip2 =
       let v = Collection.Marker.get tstab u in
       reset u;
       (if v >= Array.length ri.queue then
-       let len = Array.length ri.queue in
-       ri.queue <- Array.append ri.queue (Array.make (v + 1 - len) []));
+         let len = Array.length ri.queue in
+         ri.queue <- Array.append ri.queue (Array.make (v + 1 - len) []));
       if !qmax < 0 then (
         for i = !qi to v - 1 do
           ri.queue.(i) <- []

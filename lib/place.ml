@@ -272,20 +272,20 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
           if Hashtbl.length ht > max_length && long then raise List_too_long
   in
   (if add_birth || add_death || add_baptism || add_burial then
-   let aux b fn p =
-     if b then
-       let x = fn p in
-       if not (Driver.is_empty_string x) then ht_add x p
-   in
-   Collection.iter
-     (fun i ->
-       let p = pget conf base i in
-       if authorized_age conf base p then (
-         aux add_birth Driver.get_birth_place p;
-         aux add_baptism Driver.get_baptism_place p;
-         aux add_death Driver.get_death_place p;
-         aux add_burial Driver.get_burial_place p))
-     (Geneweb_db.Driver.ipers base));
+     let aux b fn p =
+       if b then
+         let x = fn p in
+         if not (Driver.is_empty_string x) then ht_add x p
+     in
+     Collection.iter
+       (fun i ->
+         let p = pget conf base i in
+         if authorized_age conf base p then (
+           aux add_birth Driver.get_birth_place p;
+           aux add_baptism Driver.get_baptism_place p;
+           aux add_death Driver.get_death_place p;
+           aux add_burial Driver.get_burial_place p))
+       (Geneweb_db.Driver.ipers base));
   if add_marriage then
     Collection.iter
       (fun i ->

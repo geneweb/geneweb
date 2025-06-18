@@ -306,8 +306,8 @@ let make_henv conf base =
           conf with
           semi_public =
             (if conf.semi_public then
-             Driver.get_access (Driver.poi base ip) = SemiPublic
-            else true);
+               Driver.get_access (Driver.poi base ip) = SemiPublic
+             else true);
           user_iper = Some ip;
         }
     | None -> conf
@@ -476,12 +476,12 @@ let treat_request =
   let print_page conf l =
     w_base
       (if only_special_env conf.env then SrcfileDisplay.print_welcome
-      else
-        w_person @@ fun conf base p ->
-        match p_getenv conf.env "ptempl" with
-        | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
-            Perso.interp_templ t conf base p
-        | _ -> person_selected conf base p)
+       else
+         w_person @@ fun conf base p ->
+         match p_getenv conf.env "ptempl" with
+         | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
+             Perso.interp_templ t conf base p
+         | _ -> person_selected conf base p)
       conf l
   in
   let handle_no_bfile conf l =
@@ -512,18 +512,18 @@ let treat_request =
             ~comment:"Wizard actions not allowed on this base"
         else (
           (if Sys.unix then
-           match bfile with
-           | None -> ()
-           | Some bfile ->
-               let stat = Unix.stat bfile in
-               let fuid = stat.Unix.st_uid in
-               let fgid = stat.Unix.st_gid in
-               let pgid = Unix.getgid () in
-               let puid = Unix.getuid () in
-               (* FIXME possible issue with effective uid/gid! *)
-               (* see setuid, setgid man pages *)
-               if puid <> fuid then Unix.setuid fuid;
-               if pgid <> fgid then Unix.setgid fgid);
+             match bfile with
+             | None -> ()
+             | Some bfile ->
+                 let stat = Unix.stat bfile in
+                 let fuid = stat.Unix.st_uid in
+                 let fgid = stat.Unix.st_gid in
+                 let pgid = Unix.getgid () in
+                 let puid = Unix.getuid () in
+                 (* FIXME possible issue with effective uid/gid! *)
+                 (* see setuid, setgid man pages *)
+                 if puid <> fuid then Unix.setuid fuid;
+                 if pgid <> fgid then Unix.setgid fgid);
 
           let plugins =
             match List.assoc_opt "plugins" conf.Config.base_env with
@@ -539,24 +539,24 @@ let treat_request =
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
           if not @@ try_plugin plugins conf bfile m then
             ((if
-              List.assoc_opt "counter" conf.base_env <> Some "no"
-              && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
-             then
-              match
-                if only_special_env conf.env then
-                  SrcfileDisplay.incr_welcome_counter conf
-                else SrcfileDisplay.incr_request_counter conf
-              with
-              | Some (welcome_cnt, request_cnt, start_date) ->
-                  Logs.log (fun oc ->
-                      let thousand oc x =
-                        output_string oc @@ Mutil.string_of_int_sep "," x
-                      in
-                      Printf.fprintf oc
-                        "  #accesses %a (#welcome %a) since %s\n" thousand
-                        (welcome_cnt + request_cnt)
-                        thousand welcome_cnt start_date)
-              | None -> ());
+                List.assoc_opt "counter" conf.base_env <> Some "no"
+                && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
+              then
+                match
+                  if only_special_env conf.env then
+                    SrcfileDisplay.incr_welcome_counter conf
+                  else SrcfileDisplay.incr_request_counter conf
+                with
+                | Some (welcome_cnt, request_cnt, start_date) ->
+                    Logs.log (fun oc ->
+                        let thousand oc x =
+                          output_string oc @@ Mutil.string_of_int_sep "," x
+                        in
+                        Printf.fprintf oc
+                          "  #accesses %a (#welcome %a) since %s\n" thousand
+                          (welcome_cnt + request_cnt)
+                          thousand welcome_cnt start_date)
+                | None -> ());
              let incorrect_request ?(comment = "") conf _ =
                incorrect_request ~comment conf
              in

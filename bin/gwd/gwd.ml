@@ -509,8 +509,8 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
 let get_actlog check_from utm from_addr base_password =
   let fname = !GWPARAM.adm_file "actlog" in
   (if not (Sys.file_exists fname) then
-   let oc = Secure.open_out fname in
-   close_out oc);
+     let oc = Secure.open_out fname in
+     close_out oc);
   try
     let ic = Secure.open_in fname in
     let tmout = float_of_int !login_timeout in
@@ -1373,24 +1373,24 @@ let make_conf ~secret_salt from_addr request script_name env =
          with Not_found | Failure _ -> private_years);
       hide_names =
         (if ar.ar_wizard || ar.ar_friend then false
-        else
-          try List.assoc "hide_private_names" base_env = "yes"
-          with Not_found -> false);
+         else
+           try List.assoc "hide_private_names" base_env = "yes"
+           with Not_found -> false);
       use_restrict =
         (if ar.ar_wizard || ar.ar_friend then false
-        else
-          try List.assoc "use_restrict" base_env = "yes"
-          with Not_found -> false);
+         else
+           try List.assoc "use_restrict" base_env = "yes"
+           with Not_found -> false);
       no_image =
         (if ar.ar_wizard || ar.ar_friend then false
-        else
-          try List.assoc "no_image_for_visitor" base_env = "yes"
-          with Not_found -> false);
+         else
+           try List.assoc "no_image_for_visitor" base_env = "yes"
+           with Not_found -> false);
       no_note =
         (if ar.ar_wizard || ar.ar_friend then false
-        else
-          try List.assoc "no_note_for_visitor" base_env = "yes"
-          with Not_found -> false);
+         else
+           try List.assoc "no_note_for_visitor" base_env = "yes"
+           with Not_found -> false);
       bname = Filename.remove_extension base_file;
       nb_of_persons = 0;
       nb_of_families = 0;
@@ -1399,8 +1399,8 @@ let make_conf ~secret_salt from_addr request script_name env =
       cgi_passwd = ar.ar_passwd;
       henv =
         ((if not !Wserver.cgi then []
-         else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
-         else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
+          else if ar.ar_passwd = "" then [ ("b", Mutil.encode base_file) ]
+          else [ ("b", Mutil.encode @@ base_file ^ "_" ^ ar.ar_passwd) ])
         @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
         @ if from = "" then [] else [ ("opt", Mutil.encode from) ]);
       base_env;
@@ -1433,7 +1433,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       ctime = utm;
       gw_prefix =
         (if !gw_prefix <> "" then !gw_prefix
-        else String.concat Filename.dir_sep [ "gw" ]);
+         else String.concat Filename.dir_sep [ "gw" ]);
       images_prefix =
         (match (!gw_prefix, !images_prefix) with
         | gw_p, im_p when gw_p <> "" && im_p = "" ->
@@ -1554,7 +1554,8 @@ let conf_and_connection =
     ^<^ (if conf.wizard then "_w?" else if conf.friend then "_f?" else "?")
     ^<^ contents
   in
-  fun ~secret_salt from request script_name (contents : Adef.encoded_string) env ->
+  fun ~secret_salt from request script_name (contents : Adef.encoded_string) env
+    ->
     let conf, passwd_err =
       make_conf ~secret_salt from request script_name env
     in
@@ -1568,11 +1569,12 @@ let conf_and_connection =
         in
         let mode = Util.p_getenv conf.env "m" in
         (if mode <> Some "IM" then
-         let contents =
-           if List.mem_assoc "log_pwd" env then Adef.encoded "..." else contents
-         in
-         log_and_robot_check conf auth from request script_name
-           (contents :> string));
+           let contents =
+             if List.mem_assoc "log_pwd" env then Adef.encoded "..."
+             else contents
+           in
+           log_and_robot_check conf auth from request script_name
+             (contents :> string));
         match (!Wserver.cgi, auth_err, passwd_err) with
         | true, true, _ ->
             if is_robot from then Robot.robot_error conf 0 0 else no_access conf
@@ -2399,15 +2401,15 @@ let main () =
   let speclist = Arg.align speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   (if Sys.unix then
-   default_lang :=
-     let s = try Sys.getenv "LANG" with Not_found -> "" in
-     if List.mem s Version.available_languages then s
-     else
-       let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
-       if String.length s >= 2 then
-         let s = String.sub s 0 2 in
-         if List.mem s Version.available_languages then s else "en"
-       else "en");
+     default_lang :=
+       let s = try Sys.getenv "LANG" with Not_found -> "" in
+       if List.mem s Version.available_languages then s
+       else
+         let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+         if String.length s >= 2 then
+           let s = String.sub s 0 2 in
+           if List.mem s Version.available_languages then s else "en"
+         else "en");
   arg_parse_in_file
     (chop_extension Sys.argv.(0) ^ ".arg")
     speclist anonfun usage;
@@ -2443,12 +2445,14 @@ let main () =
   if !use_auth_digest_scheme && !force_cgi then
     Logs.syslog `LOG_WARNING "-digest option is not compatible with CGI mode.\n";
   (if !images_dir <> "" then
-   let abs_dir =
-     let f = Util.search_in_assets (Filename.concat !images_dir "gwback.jpg") in
-     let d = Filename.dirname f in
-     if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
-   in
-   images_prefix := "file://" ^ slashify abs_dir);
+     let abs_dir =
+       let f =
+         Util.search_in_assets (Filename.concat !images_dir "gwback.jpg")
+       in
+       let d = Filename.dirname f in
+       if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
+     in
+     images_prefix := "file://" ^ slashify abs_dir);
   GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
   Wserver.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];

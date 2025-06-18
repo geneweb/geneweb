@@ -11,12 +11,11 @@ type sosa_t = {
 
 val build_sosa_tree_ht :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
-(** Construts from the given person sosa table strored in the cache. Sosa table contains association
-    {i person_id -> sosa number} for each person in the base.
-    Person has sosa [Sosa.one] and his ancestors have sosa > [Sosa.one].
-    For non ancestor person sosa number is set to [Sosa.zero].
-    If multiple sosa (implex) only smalest sosa is stored
-    *)
+(** Construts from the given person sosa table strored in the cache. Sosa table
+    contains association {i person_id -> sosa number} for each person in the
+    base. Person has sosa [Sosa.one] and his ancestors have sosa > [Sosa.one].
+    For non ancestor person sosa number is set to [Sosa.zero]. If multiple sosa
+    (implex) only smalest sosa is stored *)
 
 val init_sosa_t :
   Config.config ->
@@ -26,21 +25,20 @@ val init_sosa_t :
 (** Create sosa hash table for person if sosa_ref exists *)
 
 val build_sosa_ht : Config.config -> Geneweb_db.Driver.base -> unit
-(** Extract referenced person from environement and constructs for him sosa table wiht [build_sosa_tree_ht]. *)
+(** Extract referenced person from environement and constructs for him sosa
+    table wiht [build_sosa_tree_ht]. *)
 
 val get_sosa_person : Geneweb_db.Driver.person -> Geneweb_sosa.t
-(** get sosa value for a person. returns Sosa.zero if none
-    assumes that init_sosa_t has been executed
-    *)
+(** get sosa value for a person. returns Sosa.zero if none assumes that
+    init_sosa_t has been executed *)
 
 val get_single_sosa :
   Config.config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   Geneweb_sosa.t
-(** get sosa value for a person. returns Sosa.zero if none
-    calls init_sosa_t if needed
-    *)
+(** get sosa value for a person. returns Sosa.zero if none calls init_sosa_t if
+    needed *)
 
 val print_sosa :
   Config.config ->
@@ -48,9 +46,8 @@ val print_sosa :
   Geneweb_db.Driver.person ->
   bool (* print link if true *) ->
   unit
-(** Prints the sosa pictogram
-    and a link to display relationship with sosa 1 if requested
-    *)
+(** Prints the sosa pictogram and a link to display relationship with sosa 1 if
+    requested *)
 
 val find_sosa :
   Config.config ->
@@ -59,9 +56,8 @@ val find_sosa :
   Geneweb_db.Driver.person option (* sosa_ref *) ->
   sosa_t (* sosa hash table *) ->
   (Geneweb_sosa.t * Geneweb_db.Driver.person) option
-(** TODO Needs better documentation!!
-    Seems to check if person has a sosa number relative to sosa_ref
-    *)
+(** TODO Needs better documentation!! Seems to check if person has a sosa number
+    relative to sosa_ref *)
 
 val next_sosa : Geneweb_sosa.t -> Geneweb_sosa.t * Geneweb_db.Driver.iper
 (** Get next sosa; returns Sosa.zero if none *)

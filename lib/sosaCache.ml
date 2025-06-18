@@ -117,17 +117,14 @@ let sosa_ht = Hashtbl.create 5003
 
 (* ************************************************************************ *)
 
-(** [Description] : Construit à partir d'une personne la base, la
-      liste de tous ses ancêtres directs et la stocke dans une hashtbl. La
-      clé de la table est l'iper de la personne et on lui associe son numéro
-      de sosa. Les sosa multiples ne sont représentés qu'une seule fois par
-      leur plus petit numéro sosa.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Construit à partir d'une personne la base, la liste de tous
+    ses ancêtres directs et la stocke dans une hashtbl. La clé de la table est
+    l'iper de la personne et on lui associe son numéro de sosa. Les sosa
+    multiples ne sont représentés qu'une seule fois par leur plus petit numéro
+    sosa. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let build_sosa_tree_ht conf base person =
   Driver.load_ascends_array base;
   Driver.load_couples_array base;
@@ -180,14 +177,11 @@ let build_sosa_tree_ht conf base person =
 
 (* ************************************************************************ *)
 
-(** [Description] : Fait appel à la construction de la
-      liste de tous les ancêtres directs de la souche de l'arbre
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Fait appel à la construction de la liste de tous les
+    ancêtres directs de la souche de l'arbre [Args] :
+    - conf : configuration de la base
+    - base : base de donnée [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let build_sosa_ht conf base =
   match Util.find_sosa_ref conf base with
   | Some sosa_ref -> build_sosa_tree_ht conf base sosa_ref
@@ -198,11 +192,9 @@ let build_sosa_ht conf base =
 
 (* ******************************************************************** *)
 
-(** [Description] : Recherche le sosa suivant
-    [Args] :
-      - s    : sosa
-    [Retour] :
-      - Sosa.t : retourne Sosa.zero s'il n'y a pas de sosa suivant      *)
+(** [Description] : Recherche le sosa suivant [Args] :
+    - s : sosa [Retour] :
+    - Sosa.t : retourne Sosa.zero s'il n'y a pas de sosa suivant *)
 let next_sosa s =
   (* La clé de la table est l'iper de la personne et on lui associe son numéro
      de sosa. On inverse pour trier sur les sosa *)
@@ -247,14 +239,12 @@ let prev_sosa s =
 
 (* ******************************************************************** *)
 
-(** [Description] : Recherche si la personne passée en argument a un
-                    numéro de sosa.
-    [Args] :
-      - p    : personne dont on cherche si elle a un numéro sosa
-    [Retour] :
-      - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
-                sosa, ou retourne son numéro de sosa sinon
-    [Rem] : Exporté en clair hors de ce module.                         *)
+(** [Description] : Recherche si la personne passée en argument a un numéro de
+    sosa. [Args] :
+    - p : personne dont on cherche si elle a un numéro sosa [Retour] :
+    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de sosa, ou
+      retourne son numéro de sosa sinon [Rem] : Exporté en clair hors de ce
+      module. *)
 let get_sosa_person p =
   try Hashtbl.find sosa_ht (Driver.get_iper p) with Not_found -> Sosa.zero
 
@@ -263,16 +253,14 @@ let get_sosa_person p =
 
 (* ******************************************************************** *)
 
-(** [Description] : Recherche si la personne passée en argument a un
-                    numéro de sosa.
-    [Args] :
+(** [Description] : Recherche si la personne passée en argument a un numéro de
+    sosa. [Args] :
     - conf : configuration de la base
     - base : base de donnée
-    - p    : personne dont on cherche si elle a un numéro sosa
-      [Retour] :
-    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
-                sosa, ou retourne son numéro de sosa sinon
-      [Rem] : Exporté en clair hors de ce module.                         *)
+    - p : personne dont on cherche si elle a un numéro sosa [Retour] :
+    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de sosa, ou
+      retourne son numéro de sosa sinon [Rem] : Exporté en clair hors de ce
+      module. *)
 let get_single_sosa conf base p =
   match Util.find_sosa_ref conf base with
   | None -> Sosa.zero
@@ -290,35 +278,32 @@ let get_single_sosa conf base p =
 (* ************************************************************************ *)
 
 (** [Description] : Affiche le picto sosa ainsi que le lien de calcul de
-      relation entre la personne et le sosa 1 (si l'option cancel_link
-      n'est pas activée).
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : la personne que l'on veut afficher
-      - link : ce booléen permet d'afficher ou non le lien sur le picto
-               sosa. Il n'est pas nécessaire de mettre le lien si on a
-               déjà affiché cette personne.
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    relation entre la personne et le sosa 1 (si l'option cancel_link n'est pas
+    activée). [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : la personne que l'on veut afficher
+    - link : ce booléen permet d'afficher ou non le lien sur le picto sosa. Il
+      n'est pas nécessaire de mettre le lien si on a déjà affiché cette
+      personne. [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_sosa conf base p link =
   let sosa_num = get_sosa_person p in
   if Sosa.gt sosa_num Sosa.zero then
     match Util.find_sosa_ref conf base with
     | Some r ->
         (if not link then ()
-        else
-          let sosa_link =
-            let i1 = Driver.string_of_iper (Driver.get_iper p) in
-            let i2 = Driver.string_of_iper (Driver.get_iper r) in
-            let b2 = Sosa.to_string sosa_num in
-            "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
-          in
-          Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_string conf (sosa_link |> Adef.safe);
-          Output.print_sstring conf {|"> |});
+         else
+           let sosa_link =
+             let i1 = Driver.string_of_iper (Driver.get_iper p) in
+             let i2 = Driver.string_of_iper (Driver.get_iper r) in
+             let b2 = Sosa.to_string sosa_num in
+             "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
+           in
+           Output.print_sstring conf {|<a href="|};
+           Output.print_string conf (Util.commd conf);
+           Output.print_string conf (sosa_link |> Adef.safe);
+           Output.print_sstring conf {|"> |});
         let title =
           if Util.is_hide_names conf r && not (Util.authorized_age conf base r)
           then ""

@@ -92,9 +92,9 @@ let compute base bdir =
   flush stderr;
   let list = notes_links (Driver.base_notes_read base "") in
   (if list = ([], []) then ()
-  else
-    let pg = NLDB.PgNotes in
-    db := NotesLinks.add_in_db !db pg list);
+   else
+     let pg = NLDB.PgNotes in
+     db := NotesLinks.add_in_db !db pg list);
 
   Printf.eprintf "--- wizard notes\n";
   flush stderr;
@@ -178,7 +178,7 @@ let compute base bdir =
           else
             loop (Filename.concat dir file)
               (if name = "" then file
-              else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
+               else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
       done;
       flush stderr
     with Sys_error _ ->
@@ -239,8 +239,8 @@ let compute base bdir =
   Collection.iteri
     (fun i fam ->
       (if !debug then
-       let fath = Driver.poi base (Driver.get_father fam) in
-       Printf.eprintf "Family: (%d) %s\n" i (Gutil.designation base fath));
+         let fath = Driver.poi base (Driver.get_father fam) in
+         Printf.eprintf "Family: (%d) %s\n" i (Gutil.designation base fath));
       ProgrBar.run i nb_fam;
       Buffer.reset buffer;
       add_string @@ Driver.get_comment fam;

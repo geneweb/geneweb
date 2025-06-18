@@ -13,22 +13,22 @@ val start :
   n_workers:int ->
   handler ->
   unit
-(** [Wserver.start ~secret_salt ?addr ~port ?timeout ~n_workers callback]
-    starts a HTTP 1.1 server that listens on the address [addr] and port [port].
+(** [Wserver.start ~secret_salt ?addr ~port ?timeout ~n_workers callback] starts
+    a HTTP 1.1 server that listens on the address [addr] and port [port].
 
     On Unix, worker jobs managed by [n_workers] workers have a time limit of
     [timeout]. If [timeout] is [0], there is no limit. This is the default.
 
-    The [max_pending_requests] argument specified the maximum number of
-    pending requests that the server can store. If the queue is full, new
-    requests are ignored until space becomes available.
+    The [max_pending_requests] argument specified the maximum number of pending
+    requests that the server can store. If the queue is full, new requests are
+    ignored until space becomes available.
 
     When a client connects, [callback] is invoked with the arguments
     [(addr, request) path query] where:
-      - [addr] is the client address,
-      - [request] is the client request,
-      - [path] is the path of the request,
-      - [query] is the query content.
+    - [addr] is the client address,
+    - [request] is the client request,
+    - [path] is the path of the request,
+    - [query] is the query content.
 
     Listening on ports < 1024 may require root privileges. *)
 
@@ -44,7 +44,8 @@ val print_string : string -> unit
 (* To be called to print page contents. *)
 
 val header : string -> unit
-(** Prints a header; cannot be called if part of content part already has been sent *)
+(** Prints a header; cannot be called if part of content part already has been
+    sent *)
 (* To print an http header line *)
 
 val wflush : unit -> unit
@@ -52,8 +53,8 @@ val wflush : unit -> unit
 (* To flush page contents print. *)
 
 val http : Def.httpStatus -> unit
-(** [Output.status conf answer] sends the http header where [answer]
-    represents the answer status. *)
+(** [Output.status conf answer] sends the http header where [answer] represents
+    the answer status. *)
 
 val http_redirect_temporarily : string -> unit
 (** [Output.status conf_redirect url] sends the http header where [url]
@@ -69,17 +70,16 @@ val woc : unit -> out_channel
 (** Return the out_channel associated to the socket *)
 
 val sock_in : string ref
-(** Names of the files used in windows implementation to communicate
-    http requests and html answers. Default "wserver.sin" and
-    "wserver.sou". Can have relative or absolute paths. *)
+(** Names of the files used in windows implementation to communicate http
+    requests and html answers. Default "wserver.sin" and "wserver.sou". Can have
+    relative or absolute paths. *)
 
 val sock_out : string ref
 
 val stop_server : string ref
-(** Name of the file whose presence tells the server to stop (at least
-    one request is necessary to unfreeze the server to make it check
-    that this file exits. Default "STOP_SERVER". Can have relative
-    or absolute path. *)
+(** Name of the file whose presence tells the server to stop (at least one
+    request is necessary to unfreeze the server to make it check that this file
+    exits. Default "STOP_SERVER". Can have relative or absolute path. *)
 
 val cgi : bool ref
 (** CGI (Common Gateway Interface) mode (default false). *)

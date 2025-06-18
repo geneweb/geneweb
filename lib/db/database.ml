@@ -945,8 +945,7 @@ let with_database ?(read_only = false) bname k =
         im_families,
         im_couples,
         im_descends,
-        im_strings )
-        : ro_data_records =
+        im_strings ) : ro_data_records =
     let bid =
       let s = Unix.stat bname in
       (s.st_dev, s.st_ino)

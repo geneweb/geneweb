@@ -1055,7 +1055,8 @@ and mk_warning conf base =
 let module_OPT =
   let map =
     func_arg2_no_kw (fun fn -> function
-      | Tnull -> Tnull | x -> (unbox_fun fn) x)
+      | Tnull -> Tnull
+      | x -> (unbox_fun fn) x)
   in
   Tpat (function "map" -> map | _ -> raise Not_found)
 

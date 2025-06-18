@@ -19,7 +19,8 @@ external fix_repr : fix -> int = "%identity"
 val no_consang : fix
 (** No consanguinity *)
 
-(** Date data type that can be either concrete date associated to a calendar or a textual form of the date. *)
+(** Date data type that can be either concrete date associated to a calendar or
+    a textual form of the date. *)
 type date = Dgreg of dmy * calendar | Dtext of string
 
 (** Supported calendars *)
@@ -52,8 +53,8 @@ type cdate =
   | Cnone
 
 type 'person gen_couple = private { father : 'person; mother : 'person }
-(** Polymorphic type to represent a family's couple.
-    Couple consists of the father and of the mother. *)
+(** Polymorphic type to represent a family's couple. Couple consists of the
+    father and of the mother. *)
 
 val father : 'a gen_couple -> 'a
 (** Get father from couple *)
@@ -65,10 +66,12 @@ val couple : 'a -> 'a -> 'a gen_couple
 (** [couple f m] creates a couple from father [f] and mother [m] *)
 
 val parent : 'a array -> 'a gen_couple
-(** Create [gen_couple] from array. First element of array should be father, second - mother  *)
+(** Create [gen_couple] from array. First element of array should be father,
+    second - mother *)
 
 val parent_array : 'a gen_couple -> 'a array
-(** Returns array from [gen_couple]. First element of array is father, second - mother  *)
+(** Returns array from [gen_couple]. First element of array is father, second -
+    mother *)
 
 val multi_couple : 'a -> 'a -> 'a gen_couple
 (** @deprecated Use [couple] instead *)

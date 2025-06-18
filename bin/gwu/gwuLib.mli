@@ -7,8 +7,8 @@ val sep_limit : int ref
 
 val prepare_free_occ :
   ?select:(Geneweb_db.Driver.iper -> bool) -> Geneweb_db.Driver.base -> unit
-(** Initializes the internal hashtables. Person whose identifier is
-    not selected (`select p = false`) are ignored. *)
+(** Initializes the internal hashtables. Person whose identifier is not selected
+    (`select p = false`) are ignored. *)
 
 val gwu :
   Gwexport.gwexport_opts ->

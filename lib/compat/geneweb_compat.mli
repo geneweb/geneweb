@@ -19,8 +19,8 @@ module In_channel : sig
 
   val with_open_bin : string -> (t -> 'a) -> 'a
   (** [with_open_bin fn f] opens a channel [ic] on file [fn] and returns [f ic].
-      After [f] returns, either with a value or by raising an exception, [ic]
-      is guaranteed to be closed.
+      After [f] returns, either with a value or by raising an exception, [ic] is
+      guaranteed to be closed.
 
       @since 4.14 *)
 
@@ -39,13 +39,14 @@ module In_channel : sig
   val input : t -> bytes -> int -> int -> int
   (** [input ic buf pos len] reads up to [len] characters from the given channel
       [ic], storing them in byte sequence [buf], starting at character number
-      [pos]. It returns the actual number of characters read, between 0 and [len]
-      (inclusive). A return value of 0 means that the end of file was reached.
+      [pos]. It returns the actual number of characters read, between 0 and
+      [len] (inclusive). A return value of 0 means that the end of file was
+      reached.
 
       Use {!really_input} to read exactly [len] characters.
 
-      @raise Invalid_argument if [pos] and [len] do not designate a valid range of
-      [buf]. *)
+      @raise Invalid_argument
+        if [pos] and [len] do not designate a valid range of [buf]. *)
 end
 
 module Out_channel : sig
@@ -54,8 +55,8 @@ module Out_channel : sig
 
   val with_open_bin : string -> (t -> 'a) -> 'a
   (** [with_open_bin fn f] opens a channel [oc] on file [fn] and returns [f oc].
-      After [f] returns, either with a value or by raising an exception, [oc]
-      is guaranteed to be closed.
+      After [f] returns, either with a value or by raising an exception, [oc] is
+      guaranteed to be closed.
 
       @since 4.14 *)
 
@@ -73,28 +74,26 @@ module Out_channel : sig
 
   val flush : t -> unit
   (** Flush the buffer associated with the given output channel, performing all
-      pending writes on that channel.  Interactive programs must be careful about
+      pending writes on that channel. Interactive programs must be careful about
       flushing standard output and standard error at the right time. *)
 
   val output : t -> bytes -> int -> int -> unit
   (** [output oc buf pos len] writes [len] characters from byte sequence [buf],
       starting at offset [pos], to the given output channel [oc].
 
-      @raise Invalid_argument if [pos] and [len] do not designate a valid range of
-      [buf]. *)
+      @raise Invalid_argument
+        if [pos] and [len] do not designate a valid range of [buf]. *)
 end
 
 module List : sig
   val equal : ('a -> 'a -> bool) -> 'a list -> 'a list -> bool
-  (** [equal eq [a1; ...; an] [b1; ..; bm]] holds when
-      the two input lists have the same length, and for each
-      pair of elements [ai], [bi] at the same position we have
-      [eq ai bi].
+  (** [equal eq [a1; ...; an] [b1; ..; bm]] holds when the two input lists have
+      the same length, and for each pair of elements [ai], [bi] at the same
+      position we have [eq ai bi].
 
-      Note: the [eq] function may be called even if the
-      lists have different length. If you know your equality
-      function is costly, you may want to check {!compare_lengths}
-      first.
+      Note: the [eq] function may be called even if the lists have different
+      length. If you know your equality function is costly, you may want to
+      check {!compare_lengths} first.
 
       @since OCaml 4.12 *)
 end

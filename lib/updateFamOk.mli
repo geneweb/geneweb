@@ -5,16 +5,15 @@ val reconstitute_from_fevents :
   (Def.relation_kind * Def.cdate * 'string * 'string * 'string)
   * Def.divorce
   * ('person * Def.witness_kind) array
-(** [reconstitute_from_fevents nsck empty_string family_events]
-    Iterate over family's events and returns a tuple with:
+(** [reconstitute_from_fevents nsck empty_string family_events] Iterate over
+    family's events and returns a tuple with:
 
     - marriage information (relation kind, date, place, notes, source);
     - divorce information;
     - marriage witnesses;
 
-    Boolean `nsck' is true if no check have been made on the married
-    persons sex.
- *)
+    Boolean `nsck' is true if no check have been made on the married persons
+    sex. *)
 
 val effective_mod :
   Config.config ->
@@ -61,8 +60,7 @@ val print_family :
   Geneweb_db.Driver.iper Adef.gen_couple ->
   Geneweb_db.Driver.iper Def.gen_descend ->
   unit
-(** Displays a family page in HTML after an update.
-    Used by MergeFamOk *)
+(** Displays a family page in HTML after an update. Used by MergeFamOk *)
 
 val print_del : Config.config -> Geneweb_db.Driver.base -> unit
 (** Deletes a family and displays a page confirming its deletion *)
@@ -100,17 +98,15 @@ val check_family :
   (string * string * _ * _ * _, _, _) Def.gen_family ->
   (string * string * _ * _ * _) Def.gen_couple ->
   Update.update_error option * Update.update_error option
-(** [check_family conf fam cpl]
-    Checks that no name is missing.
-*)
+(** [check_family conf fam cpl] Checks that no name is missing. *)
 
 val strip_family :
   (string * 'a * 'b * 'c * 'd, 'e, string) Def.gen_family ->
   (string * 'f * 'g * 'h * 'i) Def.gen_descend ->
   (string * 'a * 'b * 'c * 'd, 'e, string) Def.gen_family
   * (string * 'f * 'g * 'h * 'i) Def.gen_descend
-(** [strip_family fam des]
-    Removes empty person from witness list and empty events from event list. *)
+(** [strip_family fam des] Removes empty person from witness list and empty
+    events from event list. *)
 
 val effective_add :
   Config.config ->
@@ -126,26 +122,24 @@ val effective_add :
     Def.gen_family
   * Geneweb_db.Driver.iper Def.gen_couple
   * Geneweb_db.Driver.iper Def.gen_descend
-(** [effective_add conf base nsck sfam scpl sdes]
-    Patch base without commiting changes. *)
+(** [effective_add conf base nsck sfam scpl sdes] Patch base without commiting
+    changes. *)
 
 val patch_person_with_pevents :
   Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> unit
-(** [patch_parent_with_pevents base cpl]
-    If parents have information about birth or death but no pevent,
-    add a pevent with these info *)
+(** [patch_parent_with_pevents base cpl] If parents have information about birth
+    or death but no pevent, add a pevent with these info *)
 
 val patch_parent_with_pevents :
   Geneweb_db.Driver.base -> Geneweb_db.Driver.iper Adef.gen_couple -> unit
-(** See patch_person_with_pevents  *)
+(** See patch_person_with_pevents *)
 
 val patch_children_with_pevents :
   Geneweb_db.Driver.base -> Geneweb_db.Driver.iper Def.gen_descend -> unit
-(** See patch_person_with_pevents  *)
+(** See patch_person_with_pevents *)
 
 val family_structure :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.ifam ->
   Geneweb_db.Driver.iper array * Geneweb_db.Driver.iper array
-(** [family_structure base ifam]
-    Returns (parents, children) *)
+(** [family_structure base ifam] Returns (parents, children) *)

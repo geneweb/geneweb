@@ -343,8 +343,8 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       let socket =
         Unix.socket
           (if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
-           Unix.PF_INET
-          else Unix.PF_INET6)
+             Unix.PF_INET
+           else Unix.PF_INET6)
           Unix.SOCK_STREAM 0
       in
       if Unix.string_of_inet_addr Unix.inet6_addr_any <> "::" then

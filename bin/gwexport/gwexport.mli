@@ -31,18 +31,16 @@ val default_opts : gwexport_opts
 val speclist : gwexport_opts ref -> (Arg.key * Arg.spec * Arg.doc) list
 (** Given a set of options, returns default command line arguments for selecting
     elements from a base. The output of this function is the first input of
-    Arg.parse.
-*)
+    Arg.parse. *)
 (* Used for gwd2ged and gwu. *)
 
 val errmsg : Arg.usage_msg
-(** Default error message.
-    This is the third argument of Arg.parse. *)
+(** Default error message. This is the third argument of Arg.parse. *)
 
 val select :
   Geneweb_db.Driver.base ->
   gwexport_opts ->
   Geneweb_db.Driver.iper list ->
   (Geneweb_db.Driver.iper -> bool) * (Geneweb_db.Driver.ifam -> bool)
-(** [select base opts ips] returns filters for [iper] and [ifam] to be used
-    when exporting a portion of the [base]. *)
+(** [select base opts ips] returns filters for [iper] and [ifam] to be used when
+    exporting a portion of the [base]. *)

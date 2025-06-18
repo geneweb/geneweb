@@ -256,8 +256,8 @@ let rec reconstitute_events conf ext cnt =
       (e :: el, ext)
 
 (* S:
-   * why is marriage record transformed into a tuple?
-*)
+ * why is marriage record transformed into a tuple?
+ *)
 let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
     (fevents : ('person, 'string) Def.gen_fam_event list) =
   (* On tri les évènements pour être sûr. *)
@@ -901,7 +901,7 @@ let effective_mod conf base nsck sfam scpl sdes =
           parents = None;
           consang =
             (if not (Array.mem ip ndes.children) then Adef.fix (-1)
-            else a.consang);
+             else a.consang);
         }
       in
       Hashtbl.replace cache ip a)
@@ -917,8 +917,8 @@ let effective_mod conf base nsck sfam scpl sdes =
               parents = Some fi;
               consang =
                 (if (not (Array.mem ip ochildren)) || not same_parents then
-                 Adef.fix (-1)
-                else a.consang);
+                   Adef.fix (-1)
+                 else a.consang);
             }
           in
           Hashtbl.replace cache ip a)
@@ -1001,15 +1001,14 @@ let effective_inv conf base ip u ifam =
 (* ************************************************************************ *)
 
 (** [Description] : Modifie l'ordre de la famille en positionnant la famille
-      ifam à la position n. Exemple : [f1 f2 f3 f4] f1 3 => [f2 f3 f1 f4].
-    [Args] :
-      - base : base de donnée
-      - ip   : iper
-      - u    : person
-      - ifam : famille à changer de place
-      - n    : nouvelle position de la famille
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    ifam à la position n. Exemple : [f1 f2 f3 f4] f1 3 => [f2 f3 f1 f4]. [Args]
+    :
+    - base : base de donnée
+    - ip : iper
+    - u : person
+    - ifam : famille à changer de place
+    - n : nouvelle position de la famille [Retour] : Néant [Rem] : Non exporté
+      en clair hors de ce module. *)
 let effective_chg_order base ip u ifam n =
   let fam = UpdateFam.change_order u ifam n in
   let u = { family = Array.of_list fam } in

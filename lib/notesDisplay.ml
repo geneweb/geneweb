@@ -302,11 +302,11 @@ let linked_page_rows conf base pg pgl =
                (Utf8.capitalize_fst
                   (transl conf
                      (if n_type = "gallery" then "modify gallery"
-                     else if n_type = "album" then "modify album"
-                     else "modify note")))
+                      else if n_type = "album" then "modify album"
+                      else "modify note")))
                (if n_type = "gallery" || n_type = "album" then
-                "far fa-image fa-fw"
-               else "far fa-file-lines fa-fw"));
+                  "far fa-image fa-fw"
+                else "far fa-file-lines fa-fw"));
         Output.print_sstring conf
           (Format.sprintf
              {|
@@ -317,14 +317,14 @@ let linked_page_rows conf base pg pgl =
              (fnotes :> string)
              (Util.safe_html fnote_title :> string)
              (if pgl then
-              Format.sprintf
-                {|
+                Format.sprintf
+                  {|
 <td><a href="%sm=NOTES&f=%s&ref=on"
        title="%s"><-</a></td>|}
-                (commd conf :> string)
-                (fnotes :> string)
-                (Utf8.capitalize_fst (transl conf "pages where page appears"))
-             else "")))
+                  (commd conf :> string)
+                  (fnotes :> string)
+                  (Utf8.capitalize_fst (transl conf "pages where page appears"))
+              else "")))
   | Def.NLDB.PgWizard wizname, _ ->
       if conf.wizard then
         Output.print_sstring conf
@@ -633,30 +633,30 @@ let format_folder_entry conf depth r path_to is_current is_path =
   Format.sprintf {|<div class="my-1" style="margin-left: %.1fem;">%s</div>|}
     (1.5 *. float_of_int depth)
     (if is_current then
-     Format.sprintf
-       {|<span class="text-muted">
+       Format.sprintf
+         {|<span class="text-muted">
              <i class="far fa-folder-open fa-fw mr-2"></i>%s
           </span>|}
-       (Util.escape_html r :> string)
-    else
-      let title_attr =
-        let back_txt = Utf8.capitalize_fst (transl conf "back") in
-        if is_path then
-          if r = ".." then Format.sprintf {| title="%s .."|} back_txt
-          else
-            Format.sprintf {| title="%s %s"|} back_txt
-              (Util.escape_html r :> string)
-        else ""
-      in
-      Format.sprintf
-        {|<a href="%sm=MISC_NOTES&d=%s"%s>
+         (Util.escape_html r :> string)
+     else
+       let title_attr =
+         let back_txt = Utf8.capitalize_fst (transl conf "back") in
+         if is_path then
+           if r = ".." then Format.sprintf {| title="%s .."|} back_txt
+           else
+             Format.sprintf {| title="%s %s"|} back_txt
+               (Util.escape_html r :> string)
+         else ""
+       in
+       Format.sprintf
+         {|<a href="%sm=MISC_NOTES&d=%s"%s>
              <i class="far fa-folder%s fa-fw mr-2"></i>%s
           </a>|}
-        (commd conf :> string)
-        (Mutil.encode path_to :> string)
-        title_attr
-        (if is_path then "-open" else "")
-        (Util.escape_html r :> string))
+         (commd conf :> string)
+         (Mutil.encode path_to :> string)
+         title_attr
+         (if is_path then "-open" else "")
+         (Util.escape_html r :> string))
 
 (* Format file entry with proper indentation level *)
 let format_file_entry conf depth d f n_type title =
@@ -672,9 +672,9 @@ let format_file_entry conf depth d f n_type title =
     icon
     (Util.escape_html f :> string)
     (if (title :> string) <> "" then
-     Format.sprintf {|<span class="text-muted ml-2">%s</span>|}
-       (title :> string)
-    else "")
+       Format.sprintf {|<span class="text-muted ml-2">%s</span>|}
+         (title :> string)
+     else "")
 
 (* Format back button *)
 let format_back_button conf d =
@@ -705,9 +705,9 @@ let print_misc_notes conf base =
   Format.sprintf
     {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
     (if d <> "" then d
-    else
-      transl conf "miscellaneous notes"
-      |> Util.translate_eval |> Utf8.capitalize_fst)
+     else
+       transl conf "miscellaneous notes"
+       |> Util.translate_eval |> Utf8.capitalize_fst)
   |> Output.print_sstring conf;
 
   if d <> "" then format_back_button conf d |> Output.print_sstring conf;
@@ -781,7 +781,7 @@ let print_misc_notes conf base =
         | r, None ->
             format_folder_entry conf current_depth r
               (if d = "" then r
-              else d ^ String.make 1 NotesLinks.char_dir_sep ^ r)
+               else d ^ String.make 1 NotesLinks.char_dir_sep ^ r)
               false false
             |> Output.print_sstring conf)
       db;

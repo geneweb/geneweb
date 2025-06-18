@@ -310,14 +310,16 @@ let print_title opts base t =
   Printf.ksprintf (oc opts) ":";
   Printf.ksprintf (oc opts) "%s" (correct_string_no_colon base t.t_place);
   (if t.t_nth <> 0 then Printf.ksprintf (oc opts) ":"
-  else
-    match (t_date_start, t_date_end) with
-    | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) ":"
-    | _ -> ());
+   else
+     match (t_date_start, t_date_end) with
+     | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) ":"
+     | _ -> ());
   print_title_date_option opts t_date_start;
   (if t.t_nth <> 0 then Printf.ksprintf (oc opts) ":"
-  else
-    match t_date_end with Some _ -> Printf.ksprintf (oc opts) ":" | None -> ());
+   else
+     match t_date_end with
+     | Some _ -> Printf.ksprintf (oc opts) ":"
+     | None -> ());
   print_title_date_option opts t_date_end;
   if t.t_nth <> 0 then Printf.ksprintf (oc opts) ":%d" t.t_nth;
   Printf.ksprintf (oc opts) "]"
@@ -478,8 +480,8 @@ let print_parent opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s" (s_correct_string surname)
     (s_correct_string first_name)
     (if first_name = "?" && surname = "?" then ""
-    else if get_new_occ p = 0 then ""
-    else "." ^ string_of_int (get_new_occ p));
+     else if get_new_occ p = 0 then ""
+     else "." ^ string_of_int (get_new_occ p));
   if pr then
     if has_infos then print_infos opts base false "" "" p
     else if first_name <> "?" && surname <> "?" then
@@ -823,17 +825,17 @@ let print_family opts base gen m =
     print_if_no_empty opts base "#ms" (Driver.get_marriage_src fam);
   (* divorce and separation are events, but we keep it if old_gw *)
   (if !old_gw then
-   match Driver.get_divorce fam with
-   | Divorced d ->
-       let d = Date.od_of_cdate d in
-       Printf.ksprintf (oc opts) " -";
-       print_date_option opts d
-   | _ -> ());
+     match Driver.get_divorce fam with
+     | Divorced d ->
+         let d = Date.od_of_cdate d in
+         Printf.ksprintf (oc opts) " -";
+         print_date_option opts d
+     | _ -> ());
   (if !old_gw then
-   match Driver.get_separation fam with
-   | Separated _ -> Printf.ksprintf (oc opts) " #sep"
-   | Separated_old -> Printf.ksprintf (oc opts) " #sep"
-   | _ -> ());
+     match Driver.get_separation fam with
+     | Separated _ -> Printf.ksprintf (oc opts) " #sep"
+     | Separated_old -> Printf.ksprintf (oc opts) " #sep"
+     | _ -> ());
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;
   Printf.ksprintf (oc opts) "\n";
@@ -1003,27 +1005,27 @@ let print_notes_for_person opts base gen p =
     Printf.ksprintf (oc opts) "beg\n";
     if notes <> "" then Printf.ksprintf (oc opts) "%s\n" notes;
     (if put_events_in_notes base p then
-     let rec loop pevents =
-       match pevents with
-       | [] -> ()
-       | evt :: events -> (
-           match evt.epers_name with
-           | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-           | Epers_Cremation ->
-               let name = epers_name_to_string evt in
-               let notes =
-                 if opts.no_notes <> `nnn then Driver.sou base evt.epers_note
-                 else ""
-               in
-               if notes <> "" then
-                 Printf.ksprintf (oc opts) "%s: %s\n" name notes;
-               print_witness_in_notes evt.epers_witnesses;
-               loop events
-           | _ ->
-               print_pevent opts base gen evt;
-               loop events)
-     in
-     loop (Driver.get_pevents p));
+       let rec loop pevents =
+         match pevents with
+         | [] -> ()
+         | evt :: events -> (
+             match evt.epers_name with
+             | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+             | Epers_Cremation ->
+                 let name = epers_name_to_string evt in
+                 let notes =
+                   if opts.no_notes <> `nnn then Driver.sou base evt.epers_note
+                   else ""
+                 in
+                 if notes <> "" then
+                   Printf.ksprintf (oc opts) "%s: %s\n" name notes;
+                 print_witness_in_notes evt.epers_witnesses;
+                 loop events
+             | _ ->
+                 print_pevent opts base gen evt;
+                 loop events)
+       in
+       loop (Driver.get_pevents p));
     Printf.ksprintf (oc opts) "end notes\n");
   let f _ =
     Printf.sprintf "person \"%s.%d %s\""
@@ -1667,7 +1669,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             let fname = Driver.get_origin_file fam in
             origin_file
               (if Driver.is_empty_string fname then ""
-              else Driver.sou base fname)
+               else Driver.sou base fname)
         in
         let f, _ooc, c = opts.oc in
         let opts = { opts with oc = (f, oc, c) } in

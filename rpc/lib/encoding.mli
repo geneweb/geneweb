@@ -1,5 +1,5 @@
-(** This module provides type-aware functions for encoding and decoding
-    JSON messages. *)
+(** This module provides type-aware functions for encoding and decoding JSON
+    messages. *)
 
 (* The type [!'a t] would be more precise, but OCaml 4.08 does not support
    the injectivity annotation. *)
@@ -14,8 +14,8 @@ val pp_error : error Fmt.t
 type 'a res = ('a, error) result
 
 val val_of_json : 'a t -> Yojson.Safe.t -> 'a res
-(** [val_of_json e j] returns the value of type 'a that is encoded in [j]
-    or a string error if [j] does not encode such a value. *)
+(** [val_of_json e j] returns the value of type 'a that is encoded in [j] or a
+    string error if [j] does not encode such a value. *)
 
 val val_to_json : 'a t -> 'a -> Yojson.Safe.t
 (** [val_to_json e v j] returns the JSON representation of the value [v]. *)
@@ -26,17 +26,17 @@ val enum : name:string -> ('a * string) list -> 'a t
 
     The [name] string is used for printing.
 
-    The underlying encoding will raise {exception:Failwith} if it is called
-    on a constructor of type ['a] that is not present in [l]. *)
+    The underlying encoding will raise {!exception:Failwith} if it is called on
+    a constructor of type ['a] that is not present in [l]. *)
 
 val generic :
   to_json:('a -> Yojson.Safe.t) ->
   of_json:(Yojson.Safe.t -> 'a res) ->
   pp:unit Fmt.t ->
   'a t
-(** [generic ~to_json ~of_jon ~pp] creates a encoding for the type ['a]
-    using the encoder and decoder given as argument. [pp] is used to
-    print this encoding in [pp] and [pp_desc]. *)
+(** [generic ~to_json ~of_jon ~pp] creates a encoding for the type ['a] using
+    the encoder and decoder given as argument. [pp] is used to print this
+    encoding in [pp] and [pp_desc]. *)
 
 val pp : 'a t Fmt.t
 (** [pp ppf e] prints the encoding [e] for debugging purposes. *)

@@ -1,8 +1,8 @@
-(** Implementation of the JSON-RPC 2.0 Specification.
-    See https://www.jsonrpc.org/specification for details.
+(** Implementation of the JSON-RPC 2.0 Specification. See
+    https://www.jsonrpc.org/specification for details.
 
-    The API is partially inspired by the JSON-RPC implementation
-    in ocaml-lsp: https://github.com/ocaml/ocaml-lsp/tree/master *)
+    The API is partially inspired by the JSON-RPC implementation in ocaml-lsp:
+    https://github.com/ocaml/ocaml-lsp/tree/master *)
 
 type json = Yojson.Safe.t
 
@@ -50,8 +50,8 @@ module Response : sig
     type t = private { code : int; message : string; data : json option }
 
     val parse_error : ?data:json -> unit -> t
-    (** Invalid JSON was received by the server. An error occurred on the
-      server while parsing the JSON text. *)
+    (** Invalid JSON was received by the server. An error occurred on the server
+        while parsing the JSON text. *)
 
     val invalid_request : ?data:json -> unit -> t
     (** The JSON sent is not a valid Request object. *)

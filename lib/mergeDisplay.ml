@@ -9,8 +9,7 @@ module Gutil = Geneweb_db.Gutil
 let print_someone conf base p =
   Output.printf conf "%s%s %s"
     (Driver.p_first_name base p)
-    (if Driver.get_occ p = 0 then ""
-    else "." ^ string_of_int (Driver.get_occ p))
+    (if Driver.get_occ p = 0 then "" else "." ^ string_of_int (Driver.get_occ p))
     (Driver.p_surname base p)
 
 let print conf base p =
@@ -34,7 +33,7 @@ let print conf base p =
 <form method="get" action="%s" class="mx-3 mb-3">|}
        (Driver.p_first_name base p)
        (if Driver.get_occ p = 0 then ""
-       else "." ^ string_of_int (Driver.get_occ p))
+        else "." ^ string_of_int (Driver.get_occ p))
        (Driver.p_surname base p)
        (transl_decline conf "with" "")
        (transl conf ":")

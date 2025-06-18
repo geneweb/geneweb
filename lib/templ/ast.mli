@@ -47,5 +47,5 @@ val mk_include : ?loc:Loc.t -> [ `File of string | `Raw of string ] -> t
 val mk_pack : ?loc:Loc.t -> t list -> t
 
 val subst : (string -> string) -> t -> t
-(** [subst f t] applies the substitution [f] on all variables of the ast
-    node [t]. *)
+(** [subst f t] applies the substitution [f] on all variables of the ast node
+    [t]. *)

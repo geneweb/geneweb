@@ -463,15 +463,15 @@ and eval_simple_variable conf = function
             " - "
             ^ Printf.sprintf "%s %d" (Util.transl conf "connections") c
             ^ (if cw > 0 then
-               Printf.sprintf ", %s %s"
-                 (Util.transl_nth conf "wizard/wizards/friend/friends/exterior"
-                    1)
-                 (if conf.wizard then
-                  Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
-                    (Util.commd conf :> string)
-                    cw
-                 else string_of_int cw)
-              else "")
+                 Printf.sprintf ", %s %s"
+                   (Util.transl_nth conf
+                      "wizard/wizards/friend/friends/exterior" 1)
+                   (if conf.wizard then
+                      Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
+                        (Util.commd conf :> string)
+                        cw
+                    else string_of_int cw)
+               else "")
             ^
             if cf > 0 then
               Printf.sprintf ", %s %d"
@@ -713,7 +713,8 @@ and eval_transl_lexicon conf upp s c =
         with Failure _ ->
           raise Not_found
           (* TODO check the use of if c = "n" then s else Mutil.nominative s
-             nominative expects a : in the string ! *))
+             nominative expects a : in the string ! *)
+        )
     | Some (s1, s2) -> (
         try
           if String.length s2 > 0 && s2.[0] = '|' then
@@ -1449,7 +1450,7 @@ and print_simple_variable conf = function
         Format.sprintf {|<a href="%s%s">%s</a>|}
           ((if conf.cgi then "?b=" else "") ^ bname)
           (if conf.lang = conf.default_lang then ""
-          else (if conf.cgi then "&" else "?") ^ "lang=" ^ conf.lang)
+           else (if conf.cgi then "&" else "?") ^ "lang=" ^ conf.lang)
           bname
       in
       Output.print_sstring conf

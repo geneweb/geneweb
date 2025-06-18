@@ -24,5 +24,5 @@ val check_base :
   unit
 (** [check_base base onwarning onerror _] makes full database proprety check.
     Checks every person and family separetely with corresponding function inside
-    [CheckItem] module. Checks also person's graph in order to find cycles
-    (if person is own ancestor). *)
+    [CheckItem] module. Checks also person's graph in order to find cycles (if
+    person is own ancestor). *)

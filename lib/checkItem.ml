@@ -223,7 +223,7 @@ let check_difference_age_between_cpl warning fath moth =
       | None -> ()
       | Some d2 ->
           (if d1.year < d2.year then Date.time_elapsed_opt d1 d2
-          else Date.time_elapsed_opt d2 d1)
+           else Date.time_elapsed_opt d2 d1)
           |> Option.iter @@ fun a ->
              if strictly_older a max_age_btw_cpl then
                warning (BigAgeBetweenSpouses (fath, moth, a)))
@@ -539,8 +539,8 @@ let check_witness_pevents base warning origin =
     (Driver.get_pevents origin)
 
 (** Returns wether [iper] can be found in the provided associative array and
-    wether it was found associated only with the Mentionned or Other witness kind.
-**)
+    wether it was found associated only with the Mentionned or Other witness
+    kind. **)
 let witness_occur :
     Driver.iper -> (Driver.iper * witness_kind) array -> bool * bool =
   let f iper (is_witness, only_mentioned_or_other) (i, wk) =
@@ -717,15 +717,13 @@ let has_person_sources p =
 (* ************************************************************************* *)
 
 (** [Description] : Il y a un avertissment 'miscellaneous' si aucune des
-                    personnes (conjoint1 ET conjoint2) n'a de sources
-                    (indiduelles ou familliales).
-    [Args] :
-      - base : base
-      - misc : fonction qui ajoute un misc à la liste des miscs
-      - ifam : ifam
-      - fam  : family
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+    personnes (conjoint1 ET conjoint2) n'a de sources (indiduelles ou
+    familliales). [Args] :
+    - base : base
+    - misc : fonction qui ajoute un misc à la liste des miscs
+    - ifam : ifam
+    - fam : family [Retour] : Néant [Rem] : Non exporté en clair hors de ce
+      module. *)
 let check_sources base misc ifam fam =
   if has_family_sources fam then ()
   else
@@ -995,15 +993,13 @@ let on_person_update base warning p =
 
 (* ************************************************************************* *)
 
-(** [Description] : Vérifie les autres champs de saisie des formulaires
-                    individu et famille.
-    [Args] :
-      - base : base
-      - misc : fonction qui ajoute un misc à la liste des miscs
-      - ifam : ifam
-      - fam  : family
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Vérifie les autres champs de saisie des formulaires individu
+    et famille. [Args] :
+    - base : base
+    - misc : fonction qui ajoute un misc à la liste des miscs
+    - ifam : ifam
+    - fam : family [Retour] : Néant [Rem] : Exporté en clair hors de ce module.
+*)
 let check_other_fields base misc ifam fam = check_sources base misc ifam fam
 
 let first_name base p =

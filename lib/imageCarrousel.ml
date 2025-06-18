@@ -369,8 +369,8 @@ let effective_send_ok conf base p file =
   let fname =
     Filename.concat dir
       (if mode = "portraits" || mode = "blasons" then
-       fname ^ extension_of_type typ
-      else fname)
+         fname ^ extension_of_type typ
+       else fname)
   in
   let _moved = move_file_to_save dir fname in
   write_file fname content;
@@ -461,8 +461,8 @@ let effective_send_c_ok conf base p file file_name =
   let fname =
     Filename.concat dir
       (if mode = "portraits" || mode = "blasons" then
-       keydir ^ extension_of_type typ
-      else file_name)
+         keydir ^ extension_of_type typ
+       else file_name)
   in
   (* move pre-existing file to saved *)
   if mode = "portraits" || mode = "blasons" then
@@ -701,10 +701,10 @@ let effective_copy_portrait_to_blason conf base p =
   (* attention, xxx.url has to be removed too *)
   let _deleted =
     (if has_blason_self then
-     effective_delete_c_ok conf base
-       ~f_name:(Filename.basename blason_filename)
-       p
-    else "OK")
+       effective_delete_c_ok conf base
+         ~f_name:(Filename.basename blason_filename)
+         p
+     else "OK")
     <> ""
   in
   cp portrait_filename blason_filename;
@@ -730,10 +730,10 @@ let effective_copy_image_to_blason conf base p =
   let has_blason_self = Image.has_blason conf base p true in
   let _deleted =
     (if has_blason_self then
-     effective_delete_c_ok conf base
-       ~f_name:(Filename.basename blason_filename)
-       p
-    else "OK")
+       effective_delete_c_ok conf base
+         ~f_name:(Filename.basename blason_filename)
+         p
+     else "OK")
     <> ""
   in
   let fname =
@@ -920,8 +920,8 @@ let print_main_c conf base =
                        url_params := ("file_name_2", fn2) :: !url_params
                    with Not_found -> ());
                   (if m = "IMAGE_TO_BLASON" then
-                   let ext = Filename.extension processed_filename in
-                   if ext <> "" then url_params := ("ext", ext) :: !url_params);
+                     let ext = Filename.extension processed_filename in
+                     if ext <> "" then url_params := ("ext", ext) :: !url_params);
                   let params_string =
                     List.fold_left
                       (fun acc (key, value) ->

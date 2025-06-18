@@ -281,7 +281,7 @@ let sosa_of_persons conf base =
         (* do no works if sex = Neuter *)
         loop
           (if Driver.get_sex (pget conf base ip) = Male then 2 * n
-          else (2 * n) + 1)
+           else (2 * n) + 1)
           list
   in
   loop 1
@@ -378,8 +378,8 @@ let print_anniv conf base p dead_people level =
         :> string)
       (sosa_of_persons conf base down_br)
       (if spouse = None then
-       "&" ^ (acces_n conf base (Adef.escaped "4") c :> string)
-      else "")
+         "&" ^ (acces_n conf base (Adef.escaped "4") c :> string)
+       else "")
       (person_title_text conf base c :> string)
     |> Adef.safe
   in

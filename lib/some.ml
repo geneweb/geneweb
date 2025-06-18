@@ -28,16 +28,13 @@ let surname_not_found conf = not_found conf (transl conf "surname not found")
 
 (* ******************************************************************** *)
 
-(** [Description] : A partir de l'affichage par branches, permet
-                    d'afficher les liens pour un affichage par ordre
-                    alphabétique.
-    [Args] :
-      - conf      : configuration de la base
-      - base      : base
-      - x         : 'nom/prénom/sosa...' recherché
-      - nb_branch : nombre de branches dans le résultat de la recherche
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                     *)
+(** [Description] : A partir de l'affichage par branches, permet d'afficher les
+    liens pour un affichage par ordre alphabétique. [Args] :
+    - conf : configuration de la base
+    - base : base
+    - x : 'nom/prénom/sosa...' recherché
+    - nb_branch : nombre de branches dans le résultat de la recherche [Retour] :
+      Néant [Rem] : Non exporté en clair hors de ce module. *)
 let print_branch_to_alphabetic conf x nb_branch =
   Output.print_sstring conf "<div class=\"mb-3\">";
   Output.print_sstring conf
@@ -76,14 +73,12 @@ let print_branch_to_alphabetic conf x nb_branch =
 
 (* ******************************************************************** *)
 
-(** [Description] : A partir de l'affichage alphabétique, permet
-                    d'afficher les liens pour un affichage par branches.
-    [Args] :
-      - conf      : configuration de la base
-      - base      : base
-      - x         : 'nom/prénom/sosa...' recherché
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                     *)
+(** [Description] : A partir de l'affichage alphabétique, permet d'afficher les
+    liens pour un affichage par branches. [Args] :
+    - conf : configuration de la base
+    - base : base
+    - x : 'nom/prénom/sosa...' recherché [Retour] : Néant [Rem] : Non exporté en
+      clair hors de ce module. *)
 let print_alphabetic_to_branch conf x =
   Output.print_sstring conf "<div class=\"mb-3\">";
   Output.print_sstring conf
@@ -430,10 +425,10 @@ let print_branch conf base psn name =
       Output.print_string conf
         (render p
            (if is_hide_names conf p && not (authorized_age conf base p) then
-            Adef.safe "x"
-           else if (not psn) && (not with_sn) && Driver.p_surname base p = name
-          then gen_person_text ~sn:false conf base p
-           else gen_person_text conf base p));
+              Adef.safe "x"
+            else if (not psn) && (not with_sn) && Driver.p_surname base p = name
+            then gen_person_text ~sn:false conf base p
+            else gen_person_text conf base p));
       Output.print_sstring conf @@ if with_link then "</strong>" else "</em>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf "\n"

@@ -37,9 +37,8 @@ val change_order :
   Geneweb_db.Driver.ifam ->
   int ->
   Geneweb_db.Driver.ifam list
-(** [change_order p f i]
-    Returns the families of `p` where `f` is at the ith position.
-    `i` must not be 0. *)
+(** [change_order p f i] Returns the families of `p` where `f` is at the ith
+    position. `i` must not be 0. *)
 
 val print_change_order : config -> Geneweb_db.Driver.base -> unit
 (** Displays a menu to change the family order *)

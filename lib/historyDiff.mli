@@ -7,11 +7,12 @@ type gen_record = {
     (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam, string) Def.gen_family list;
   gen_c : Geneweb_db.Driver.iper array list;
 }
-(** Type that represents one update record stored in the history file for concerned person. *)
+(** Type that represents one update record stored in the history file for
+    concerned person. *)
 
 val history_file : string -> string -> int -> string
-(** Returns history filename for the person with the given key.
-    Has format : {i firstname.occ.surname} *)
+(** Returns history filename for the person with the given key. Has format :
+    {i firstname.occ.surname} *)
 
 val history_path : Config.config -> string -> string
 (** Returns path to the history file inside {i history_d} with given filename *)
@@ -29,5 +30,5 @@ val record_diff :
     inside the history files of concerned by [change] persons. *)
 
 val load_person_history : Config.config -> string -> gen_record list
-(** Load list of modification records for a giving person's history file.
-    The most recent modification is at the head of the list *)
+(** Load list of modification records for a giving person's history file. The
+    most recent modification is at the head of the list *)

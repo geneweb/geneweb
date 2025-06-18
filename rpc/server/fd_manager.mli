@@ -8,9 +8,9 @@ val make : ?max_connection:int -> ?idle_timeout:float -> unit -> t
     no limit. *)
 
 val add : t -> Lwt_unix.file_descr -> bool Lwt.t
-(** [add t fd] adds the file descriptor [fd] to the manager [t]. Return
-    [false] if [max_connection] limit is reached, in which case the file
-    descriptor is closed. *)
+(** [add t fd] adds the file descriptor [fd] to the manager [t]. Return [false]
+    if [max_connection] limit is reached, in which case the file descriptor is
+    closed. *)
 
 val close : t -> Lwt_unix.file_descr -> unit Lwt.t
 (** [close t s fd] closes the file descriptor [fd]. The function does not fail
@@ -23,5 +23,5 @@ val ping : t -> Lwt_unix.file_descr -> unit
 (** [ping t fd] signales that [fd] is still active. *)
 
 val loop : ?sleep:float -> t -> unit
-(** [loop t] starts a loop that periodically closes idle file descriptors
-    at intervals of [slee] seconds. *)
+(** [loop t] starts a loop that periodically closes idle file descriptors at
+    intervals of [slee] seconds. *)

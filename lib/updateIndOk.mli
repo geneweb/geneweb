@@ -16,7 +16,8 @@ val effective_del_commit :
 
 val effective_del :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
-(** [effective_del] applies [effective_del_no_commit] and [effective_del_commit] *)
+(** [effective_del] applies [effective_del_no_commit] and [effective_del_commit]
+*)
 
 val effective_mod :
   ?prerr:(config -> Geneweb_db.Driver.base -> Update.update_error -> unit) ->
@@ -46,8 +47,8 @@ val all_checks_person :
   Geneweb_db.Driver.ifam gen_ascend ->
   Geneweb_db.Driver.ifam gen_union ->
   CheckItem.base_warning list
-(** Patches the informations of a person by checking the order of events:
-    for example, a birth should happen before the death of a mother. *)
+(** Patches the informations of a person by checking the order of events: for
+    example, a birth should happen before the death of a mother. *)
 
 val print_mod_aux :
   config ->

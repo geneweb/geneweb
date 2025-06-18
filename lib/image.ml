@@ -8,10 +8,10 @@ let path_str path =
 let portrait_folder conf = !GWPARAM.portraits_d conf.bname
 let carrousel_folder conf = !GWPARAM.images_d conf.bname
 
-(** [default_portrait_filename_of_key fn sn occ] is the default filename
- of the corresponding person's portrait. WITHOUT its file extenssion.
- e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
- *)
+(** [default_portrait_filename_of_key fn sn occ] is the default filename of the
+    corresponding person's portrait. WITHOUT its file extenssion. e.g:
+    default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is
+    "jean_claude.3.dupond" *)
 let default_image_filename_of_key mode first_name surname occ =
   let sp2_ = Mutil.tr ' ' '_' in
   let f = sp2_ (Name.lower first_name) in
@@ -63,8 +63,8 @@ let find_file_without_ext f =
   else
     match Mutil.array_find_map exists ext_list_2 with None -> "" | Some f -> f
 
-(** [full_image_path mode conf base p] is [Some path] if [p] has a portrait or a blason.
-    [path] is a the full path of the file with file extension. *)
+(** [full_image_path mode conf base p] is [Some path] if [p] has a portrait or a
+    blason. [path] is a the full path of the file with file extension. *)
 let full_image_path mode conf base p saved =
   (* TODO why is extension not in filename..? *)
   let s = default_image_filename_aux mode base p saved in
@@ -194,7 +194,8 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 let is_not_private_img _conf fname =
   not (Mutil.contains fname ("private" ^ Filename.dir_sep))
 
-(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
+(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait.
+*)
 let has_access_to_image mode conf base p =
   let img = Driver.get_image p in
   (conf.wizard || conf.friend)
@@ -400,11 +401,11 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
     let old_carrousel = Filename.concat i_dir old_key in
     let new_carrousel = Filename.concat i_dir new_key in
     (if Sys.file_exists old_carrousel && Sys.is_directory old_carrousel then
-     try Sys.rename old_carrousel new_carrousel
-     with Sys_error e ->
-       Logs.syslog `LOG_ERR
-         (Format.sprintf "Error renaming carrousel directory %s to %s: %s"
-            old_carrousel new_carrousel e));
+       try Sys.rename old_carrousel new_carrousel
+       with Sys_error e ->
+         Logs.syslog `LOG_ERR
+           (Format.sprintf "Error renaming carrousel directory %s to %s: %s"
+              old_carrousel new_carrousel e));
     let rename_files_with_extensions dir base_name =
       Array.iter
         (fun ext ->

@@ -15,8 +15,8 @@ val dummy : t
 (** Dummy location. *)
 
 val of_lexbuf : Lexing.lexbuf -> t
-(** [of_lexbuf lexbuf] creates a location from the current state of the
-    lexing buffer [lexbuf]. *)
+(** [of_lexbuf lexbuf] creates a location from the current state of the lexing
+    buffer [lexbuf]. *)
 
 val equal : t -> t -> bool
 (** [equal t1 t2] checks if the locations [t1] and [t2] are equal. *)

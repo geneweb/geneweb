@@ -374,7 +374,7 @@ let replace_person person_json (new_fn, new_sn, new_oc) =
          | "fn", _ -> ("fn", `String new_fn)
          | "sn", _ -> ("sn", `String new_sn)
          | "oc", _ -> ("oc", `String (string_of_int new_oc))
-         | key, value -> (key, value) (* Preserve any other fields *))
+         | key, value -> (* Preserve any other fields *) (key, value))
        (Yojson.Basic.Util.to_assoc person_json))
 
 (* Processes the map to replace target person

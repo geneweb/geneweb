@@ -179,4 +179,5 @@ val string_of_title :
   * Geneweb_db.Driver.istr list
   * (Def.date option * Def.date option) list ->
   Adef.safe_string
-(** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)
+(** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate}
+*)

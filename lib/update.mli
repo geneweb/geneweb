@@ -43,7 +43,8 @@ val infer_death_bb : config -> date option -> date option -> death
 
 val infer_death_from_parents :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.family -> death
-(** [infer_death_from_parents conf base fam] infer death status for a new children in this family *)
+(** [infer_death_from_parents conf base fam] infer death status for a new
+    children in this family *)
 
 val print_same_name :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
@@ -75,8 +76,8 @@ val update_related_pointers :
   unit
 
 val print_return : config -> unit
-(** Helper function printing a hidden form containing current env,
-    with a submit button "return", plus a hidden field [return=on].  *)
+(** Helper function printing a hidden form containing current env, with a submit
+    button "return", plus a hidden field [return=on]. *)
 
 val print_continue :
   config ->
@@ -84,18 +85,15 @@ val print_continue :
   string ->
   Adef.encoded_string ->
   unit
-(** [print_continue conf param value]
-    Helper function printing a hidden form containing current env,
-    with a submit button "continue", plus a hidden field [param=value].
-    Optionnal [continue] parameter is the label used for the submit button.
-*)
+(** [print_continue conf param value] Helper function printing a hidden form
+    containing current env, with a submit button "continue", plus a hidden field
+    [param=value]. Optionnal [continue] parameter is the label used for the
+    submit button. *)
 
 val prerr : config -> update_error -> (unit -> unit) -> 'a
-(** [prerr conf err callback]
-    Regular mode: print error page using [callback] (wrapped in header/trailer)
-    and and raise [ModErr err]
-    API mode: only raise [ModErr err]
-*)
+(** [prerr conf err callback] Regular mode: print error page using [callback]
+    (wrapped in header/trailer) and and raise [ModErr err] API mode: only raise
+    [ModErr err] *)
 
 val string_of_error : config -> update_error -> Adef.safe_string
 val print_error : config -> update_error -> unit
@@ -124,11 +122,11 @@ val digest_person :
   ?salt:string -> (Geneweb_db.Driver.iper, key, string) gen_person -> string
 (** [digest_person ?salt per] generates a digest of the person [pers]. The
     function is intended for use in form to help prevent:
-      - Concurrent edits of the same person.
-      - Cross-site Request Forgery (CSRF) attacks.
+    - Concurrent edits of the same person.
+    - Cross-site Request Forgery (CSRF) attacks.
 
-    The optional [salt] parameter should be set to a secret value generated
-    at server startup to strengthen security. *)
+    The optional [salt] parameter should be set to a secret value generated at
+    server startup to strengthen security. *)
 
 val digest_family :
   ?salt:string ->
@@ -138,11 +136,11 @@ val digest_family :
   string
 (** [digest_family ?salt fam] generates a digest of the family [fam]. The
     function is intended for use in form to help prevent:
-      - Concurrent edits of the same family.
-      - Cross-site Request Forgery (CSRF) attacks.
+    - Concurrent edits of the same family.
+    - Cross-site Request Forgery (CSRF) attacks.
 
-    The optional [salt] parameter should be set to a secret value generated
-    at server startup to strengthen security. *)
+    The optional [salt] parameter should be set to a secret value generated at
+    server startup to strengthen security. *)
 
 val reconstitute_date : config -> string -> date option
 
@@ -166,14 +164,12 @@ val check_missing_name :
 
 val print_create_conflict :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> string -> 'exn
-(** [print_create_conflict conf base p var]
-    Print a message because a personne with same key already exists,
-    and display a form with two options:
+(** [print_create_conflict conf base p var] Print a message because a personne
+    with same key already exists, and display a form with two options:
     - create a personne with the next occurence number available
     - go back to the previous pre-filled form.
 
-    [var] is used for the input with name "field". Leave it empty if unused.
- *)
+    [var] is used for the input with name "field". Leave it empty if unused. *)
 
 val print_order_changed :
   config -> ('a array -> bool array -> unit) -> 'a array -> 'a array -> unit

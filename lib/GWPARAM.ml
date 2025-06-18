@@ -1,8 +1,7 @@
 (** This module allows plugins to modify geneweb configuration.
 
-    This approch is preffered to Functors or library variants
-    for simple functions if it does not come with a performance cost.
-*)
+    This approch is preffered to Functors or library variants for simple
+    functions if it does not come with a performance cost. *)
 
 module Logs = Geneweb_logs.Logs
 module Driver = Geneweb_db.Driver
@@ -135,10 +134,8 @@ module Legacy = struct
     else Filename.concat (Secure.base_dir ()) (bname ^ ".gwb")
 end
 
-(** [output_error ?headers ?content conf code]
-    Send the http status [code], [headers] and
-    [content] if provided, or default content otherwise.
-*)
+(** [output_error ?headers ?content conf code] Send the http status [code],
+    [headers] and [content] if provided, or default content otherwise. *)
 let output_error =
   let output_file conf fn =
     let ic = open_in fn in
@@ -298,23 +295,20 @@ let is_related conf base p =
         else false
   else false
 
-(** Calcul les droits de visualisation d'une personne en
-    fonction de son age.
+(** Calcul les droits de visualisation d'une personne en fonction de son age.
     pour les test impliquant une date, si elle existe, on renvoie vrai ou faux
     sinon, on passe au test suivant dans l'ordre ci dessous) :
-    - Vrai si : magicien
-                ou ami
-                ou la personne est public
-                ou la personne est en IfTitles, si elle a au moins un
-                   titre et que public_if_title = yes dans le fichier gwf
-                ou la personne s'est mariée depuis plus de private_years_marriage
-    - Vrai si : la personne est plus agée (en fonction de la date de
-                naissance ou de la date de baptème) que privates_years
+    - Vrai si : magicien ou ami ou la personne est public ou la personne est en
+      IfTitles, si elle a au moins un titre et que public_if_title = yes dans le
+      fichier gwf ou la personne s'est mariée depuis plus de
+      private_years_marriage
+    - Vrai si : la personne est plus agée (en fonction de la date de naissance
+      ou de la date de baptème) que privates_years
     - Vrai si : la personne est décédée depuis plus de privates_years_death
     - Vrai si : la personne n'est pas Private et public_if_no_date = yes
     - Faux si : la personne n'est pas décédée et private_years > 0
-    - Faux si : la personne est plus jeune (en fonction de la date de
-                naissance ou de la date de baptème) que privates_years
+    - Faux si : la personne est plus jeune (en fonction de la date de naissance
+      ou de la date de baptème) que privates_years
     - Faux si : la personne est décédée depuis moins de privates_years
     - Faux dans tous les autres cas *)
 (* check that p is parent or descendant of conf.key *)
@@ -446,10 +440,8 @@ let p_auth conf base p =
 let p_auth_sp conf base p =
   p_auth conf base p || (conf.Config.friend && Driver.get_access p <> Private)
 
-(** [wrap_output conf title content]
-  Plugins defining a page content but not a complete UI
-  may want to wrap their page using [wrap_output].
-*)
+(** [wrap_output conf title content] Plugins defining a page content but not a
+    complete UI may want to wrap their page using [wrap_output]. *)
 
 let wrap_output (conf : Config.config) (title : Adef.safe_string)
     (content : unit -> unit) =
@@ -459,7 +451,7 @@ let wrap_output (conf : Config.config) (title : Adef.safe_string)
   Output.print_sstring conf {|</title>|};
   Output.print_sstring conf
     (if robot then {|<meta name="robots" content="index,follow">|}
-    else {|<meta name="robots" content="none">|});
+     else {|<meta name="robots" content="none">|});
   Output.print_sstring conf {|<meta charset="|};
   Output.print_sstring conf conf.charset;
   Output.print_sstring conf {|">|};
@@ -526,31 +518,31 @@ let init_etc bname =
   let fname = Filename.concat (!bpath bname) "caches" in
   let bdir = !bpath bname in
   (if Sys.file_exists bdir && not (Sys.file_exists fname) then
-   try Unix.mkdir fname 0o755
-   with Unix.Unix_error (_, _, _) ->
-     Logs.syslog `LOG_WARNING
-       (Printf.sprintf "Error when creating (init) %s" fname));
+     try Unix.mkdir fname 0o755
+     with Unix.Unix_error (_, _, _) ->
+       Logs.syslog `LOG_WARNING
+         (Printf.sprintf "Error when creating (init) %s" fname));
   if !reorg then (
     (if not (Sys.file_exists (!bpath bname)) then
-     try
-       Unix.mkdir (!bpath bname) 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating base_dir: %s" (!bpath bname)));
+       try
+         Unix.mkdir (!bpath bname) 0o755;
+         force := true
+       with Unix.Unix_error (_, _, _) ->
+         Logs.syslog `LOG_WARNING
+           (Printf.sprintf "Failure when creating base_dir: %s" (!bpath bname)));
 
     (if not (Sys.file_exists (!etc_d bname)) then
-     try Unix.mkdir (!etc_d bname) 0o755
-     with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)));
+       try Unix.mkdir (!etc_d bname) 0o755
+       with Unix.Unix_error (_, _, _) ->
+         Logs.syslog `LOG_WARNING
+           (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)));
 
     (if not (Sys.file_exists (!config_d bname)) then
-     try Unix.mkdir (!config_d bname) 0o755
-     with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating config_dir: %s"
-            (!config_d bname)));
+       try Unix.mkdir (!config_d bname) 0o755
+       with Unix.Unix_error (_, _, _) ->
+         Logs.syslog `LOG_WARNING
+           (Printf.sprintf "Failure when creating config_dir: %s"
+              (!config_d bname)));
 
     if not (Sys.file_exists (!cnt_d bname)) then
       try Unix.mkdir (!cnt_d bname) 0o755
@@ -559,25 +551,25 @@ let init_etc bname =
           (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)))
   else (
     (if not (Sys.file_exists "etc") then
-     try
-       Unix.mkdir "etc" 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
+       try
+         Unix.mkdir "etc" 0o755;
+         force := true
+       with Unix.Unix_error (_, _, _) ->
+         Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
 
     (if not (Sys.file_exists "lang") then
-     try
-       Unix.mkdir "lang" 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
+       try
+         Unix.mkdir "lang" 0o755;
+         force := true
+       with Unix.Unix_error (_, _, _) ->
+         Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
 
     (if not (Sys.file_exists "cnt") then
-     try
-       Unix.mkdir "cnt" 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
+       try
+         Unix.mkdir "cnt" 0o755;
+         force := true
+       with Unix.Unix_error (_, _, _) ->
+         Logs.syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
 
     if not (Sys.file_exists (!etc_d bname)) then
       try

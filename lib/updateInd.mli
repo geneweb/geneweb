@@ -15,8 +15,8 @@ val print_update_ind :
   (Geneweb_db.Driver.iper, Update.key, string) gen_person ->
   string ->
   unit
-(** The main HTML page displayed after an update.
-    Based on template updind.txt *)
+(** The main HTML page displayed after an update. Based on template updind.txt
+*)
 
 val print_add : config -> Geneweb_db.Driver.base -> unit
 (** Displays an HTML form with empty fields for adding a person *)

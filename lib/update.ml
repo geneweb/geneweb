@@ -156,14 +156,11 @@ let rec infer_death conf base p =
 (* ************************************************************************** *)
 
 (** [Description] : Print several information to distinguish homonyms. The
-      information includes name of the person, name of the parents,
-      name of the spouse.
-    [Args] :
-      - conf : configuration of the base
-      - base : base
-      - p    : person
-    [Retour] : unit
-    [Rem] : Not visible.                                                      *)
+    information includes name of the person, name of the parents, name of the
+    spouse. [Args] :
+    - conf : configuration of the base
+    - base : base
+    - p : person [Retour] : unit [Rem] : Not visible. *)
 let print_person_parents_and_spouses conf base p =
   if GWPARAM.p_auth conf base p then (
     Output.print_sstring conf {|<a href="|};
@@ -216,14 +213,11 @@ let print_same_name conf base p =
 
 (* ************************************************************************* *)
 
-(** [Description] : Test si le label contient le mot 'note' pour savoir si
-      dans les évènement secondaires, il faut traiter la note comme un
-      textarea.
-    [Args] :
-      - lbl : le label
-    [Retour] :
-      - bool
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Test si le label contient le mot 'note' pour savoir si dans
+    les évènement secondaires, il faut traiter la note comme un textarea. [Args]
+    :
+    - lbl : le label [Retour] :
+    - bool [Rem] : Non exporté en clair hors de ce module. *)
 let is_label_note lbl =
   let rec loop i =
     if i = String.length lbl then false
@@ -376,8 +370,7 @@ let delete_topological_sort conf base =
 let print_someone conf base p =
   Output.printf conf "%s%s %s"
     (Driver.p_first_name base p)
-    (if Driver.get_occ p = 0 then ""
-    else "." ^ string_of_int (Driver.get_occ p))
+    (if Driver.get_occ p = 0 then "" else "." ^ string_of_int (Driver.get_occ p))
     (Driver.p_surname base p)
 
 let print_first_name conf base p =
@@ -390,7 +383,7 @@ let someone_strong base p =
   "<strong>"
   ^<^ escape_html (Driver.p_first_name base p)
   ^^^ (if Driver.get_occ p = 0 then Adef.escaped ""
-      else Adef.escaped @@ "." ^ string_of_int (Driver.get_occ p))
+       else Adef.escaped @@ "." ^ string_of_int (Driver.get_occ p))
   ^^^ " "
   ^<^ escape_html (Driver.p_surname base p)
   ^>^ "</strong>"
@@ -398,8 +391,7 @@ let someone_strong base p =
 let print_first_name_strong conf base p =
   Output.printf conf "<strong>%s%s</strong>"
     (Driver.p_first_name base p)
-    (if Driver.get_occ p = 0 then ""
-    else "." ^ string_of_int (Driver.get_occ p))
+    (if Driver.get_occ p = 0 then "" else "." ^ string_of_int (Driver.get_occ p))
 
 let print_error conf e = Output.print_string conf @@ string_of_error conf e
 
@@ -751,14 +743,11 @@ let print_warnings conf base wl =
 
 (* ************************************************************************* *)
 
-(** [Description] : Fonction d'impression des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - fun  : Def.misc (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Fonction d'impression des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - fun : Def.misc (miscellaneous) [Retour] :
+    - unit [Rem] : Non exporté en clair hors de ce module. *)
 let print_misc conf _base = function
   | MissingSources ->
       Output.print_sstring conf "<em>";
@@ -771,14 +760,11 @@ let print_misc conf _base = function
 
 (* ************************************************************************* *)
 
-(** [Description] : Affiche la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                          *)
+(** [Description] : Affiche la liste des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - ml : Def.misc list (miscellaneous) [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_miscs conf base ml =
   print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
   List.iter (fun m ->
@@ -792,16 +778,13 @@ let print_miscs conf base ml =
 
 (* ************************************************************************* *)
 
-(** [Description] : Affiche sous la même rubrique, la liste des warnings
-                    et la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - wl   : Def.warning list
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Affiche sous la même rubrique, la liste des warnings et la
+    liste des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - wl : Def.warning list
+    - ml : Def.misc list (miscellaneous) [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then (
     Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "warnings"));
