@@ -13,6 +13,8 @@ let out_dir = ref ""
 let raw_output = ref false
 let sep_limit = ref 21
 let separate_list = ref []
+let dummy = ref [ "" ]
+let all_files = ref false
 
 (* Returns true if `old_gw` is `true` and there exist an event associated to a
    person that:
@@ -1805,6 +1807,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           loop files
     in
     loop gen.ext_files;
+
     List.iter
       (fun (f, r) ->
         let fn =
@@ -1824,6 +1827,71 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           rs_printf opts s;
           Printf.ksprintf oc "\nend page-ext\n"))
       (List.sort compare gen.ext_files);
+
+    (* gen.ext_files does not list all files in notes_d. Format is note_link *)
+    let ext_files_1 = List.map (fun (f, _) -> f) gen.ext_files in
+    let notes_d = Filename.concat in_dir (Driver.base_notes_dir base) in
+    let notes_d_length = String.length notes_d in
+    let ext_files_2 =
+      Filesystem.walk_folder ~recursive:true
+        (fun fl files ->
+          match fl with
+          | File f when Filename.check_suffix f ".txt" ->
+              Filename.chop_suffix f ".txt" :: files
+          | File _ | Dir _ | Exn _ ->
+              (* TODO: we may print a warning for errors. *)
+              files)
+        notes_d []
+    in
+    (* ext_files_2 list all files in notes_d. Format is system *)
+    (* remove header part *)
+    let ext_files_2 =
+      List.map
+        (fun f ->
+          String.sub f (notes_d_length + 1)
+            (String.length f - notes_d_length - 1))
+        ext_files_2
+    in
+    (* remove from ext_files_2 those already in ext_files_1 *)
+    let ext_files_2 =
+      List.fold_left
+        (fun acc f ->
+          if List.mem (Util.sys_to_note_link f) ext_files_1 then acc
+          else f :: acc)
+        [] ext_files_2
+    in
+    (* ext_files_2 is the list of additional files that need to be saved *)
+    (* dummy as these files are not referenced *)
+    let ext_files_2 = List.map (fun f -> (f, dummy)) ext_files_2 in
+    List.iter
+      (fun (f, _) ->
+        let fn = Filename.concat notes_d f ^ ".txt" in
+        let s =
+          if Sys.file_exists fn then read_file_contents fn
+          else (
+            Printf.eprintf "Missing file: %s\n" f;
+            "")
+        in
+        let s_len = String.length s in
+        (* false if there are no wiki links in the file ! *)
+        let contains_wiki_link s =
+          let rec loop s i =
+            match NotesLinks.misc_notes_link s i with
+            | NotesLinks.WLnone (j, _) when j < s_len -> loop s j
+            | NotesLinks.WLnone _ -> false
+            | _ -> true
+          in
+          loop s 0
+        in
+        if (contains_wiki_link s || !all_files) && s <> "" then (
+          if not !first then Printf.ksprintf oc "\n";
+          first := false;
+          let f = Util.sys_to_note_link f in
+          Printf.ksprintf oc "# extended page \"%s\" not referenced\n" f;
+          Printf.ksprintf oc "page-ext %s\n" f;
+          rs_printf opts s;
+          Printf.ksprintf oc "\nend page-ext\n"))
+      ext_files_2;
     let close () =
       flush_all ();
       close ();

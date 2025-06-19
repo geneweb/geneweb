@@ -1222,17 +1222,21 @@ let with_database ?(read_only = false) bname k =
   let commit_wiznotes =
     if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
     else fun fnotes s ->
-      let fname =
-        (try Unix.mkdir (Filename.concat bname "wiznotes") 0o755 with _ -> ());
-        Filename.concat "wiznotes" (fnotes ^ ".txt")
-      in
-      let fname = Filename.concat bname fname in
-      (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
-      (try Sys.rename fname (fname ^ "~") with _ -> ());
-      if s <> "" then (
-        let oc = Secure.open_out fname in
-        output_string oc s;
-        close_out oc)
+      if fnotes <> "" then (
+        let wiznotes_dir = Filename.concat bname "wiznotes" in
+        let fname =
+          (try
+             if Sys.file_exists wiznotes_dir then ()
+             else Unix.mkdir (Filename.concat bname "wiznotes") 0o755
+           with _ -> ());
+          Filename.concat wiznotes_dir (fnotes ^ ".txt")
+        in
+        (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
+        (try Sys.rename fname (fname ^ "~") with _ -> ());
+        if s <> "" then (
+          let oc = Secure.open_out fname in
+          output_string oc s;
+          close_out oc))
   in
   let ext_files () =
     Filesystem.walk_folder ~recursive:true

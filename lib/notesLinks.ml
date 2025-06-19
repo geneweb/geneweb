@@ -2,6 +2,7 @@ open Def.NLDB
 module Driver = Geneweb_db.Driver
 
 let char_dir_sep = ':'
+let dir_sep = ":"
 
 let check_file_name s =
   let rec loop path ibeg i =
