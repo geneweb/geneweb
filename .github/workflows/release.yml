@@ -43,7 +43,7 @@ jobs:
 
       - name: setup
         run: |
-          opam install dune ocamlformat.0.24.1
+          opam install dune ocamlformat.0.27.0
           opam exec -- dune build @fmt
           opam pin add . -y --no-action
           opam depext -y geneweb
