@@ -3714,6 +3714,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           |> DateDisplay.string_of_age conf
           |> safe_val
       | _ -> null_val)
+  | "age_years" -> (
+      match
+        (p_auth, Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+      with
+      | true, Some d, NotDead -> d.year |> string_of_int |> str_val
+      | _ -> null_val)
   | "alias" -> (
       match Driver.get_aliases p with
       | nn :: _ when p_auth ->
@@ -3818,6 +3824,16 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
               else transl_decline conf "possibly (date)" "" ^ " "
             in
             s ^<^ DateDisplay.string_of_age conf a |> safe_val
+        | _ -> null_val
+      else null_val
+  | "death_age_years" ->
+      if p_auth then
+        match Gutil.get_birth_death_date p with
+        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
+            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+            _ )
+          when d1 <> d2 ->
+            (Date.time_elapsed d1 d2).year |> string_of_int |> str_val
         | _ -> null_val
       else null_val
   | "death_place" ->
@@ -3983,6 +3999,20 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
                 Date.time_elapsed d1 d2
                 |> DateDisplay.string_of_age conf
                 |> safe_val
+            | _ -> null_val
+          else null_val
+      | _ -> raise Not_found)
+  | "marriage_age_years" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) ->
+          if m_auth then
+            match
+              ( Date.cdate_to_dmy_opt (Driver.get_birth p),
+                Date.cdate_to_dmy_opt (Driver.get_marriage fam) )
+            with
+            | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
+                Some ({ prec = Sure | About | Maybe; _ } as d2) ) ->
+                (Date.time_elapsed d1 d2).year |> string_of_int |> str_val
             | _ -> null_val
           else null_val
       | _ -> raise Not_found)
