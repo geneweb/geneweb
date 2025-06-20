@@ -144,7 +144,7 @@ let rec mk_family (conf : Config.config) base
     | "source_raw" -> source_raw
     | _ -> raise Not_found)
 
-and get_n_mk_family conf base ?(origin = Driver.dummy_iper) ifam cpl =
+and get_n_mk_family conf base ?(origin = Driver.Iper.dummy) ifam cpl =
   let ifath = Driver.get_father cpl in
   let imoth = Driver.get_mother cpl in
   let cpl =
@@ -351,7 +351,7 @@ and lazy_list : 'a. ('a -> tvalue) -> 'a list -> tvalue =
 
 and lazy_get_n_mk_person conf base i =
   let lp = lazy (get_n_mk_person conf base i) in
-  let iper = Tstr (Driver.string_of_iper i) in
+  let iper = Tstr (Driver.Iper.to_string i) in
   Tpat (function "iper" -> iper | s -> unbox_pat (Lazy.force lp) s)
 
 and ppget conf base p =
@@ -374,7 +374,7 @@ and ppget conf base p =
   else unsafe_mk_person conf base p
 
 and pget conf base ip =
-  if ip = Driver.dummy_iper then
+  if ip = Driver.Iper.dummy then
     unsafe_mk_person conf base (Driver.empty_person base ip)
   else ppget conf base (Driver.poi base ip)
 
@@ -387,7 +387,7 @@ and get_n_mk_person conf base (i : Driver.iper) =
 
 and mk_rparent_aux kind conf base acc =
   let mk_rel i t s =
-    let iper = Tstr (Driver.string_of_iper i) in
+    let iper = Tstr (Driver.Iper.to_string i) in
     let kind = kind t in
     let sources = Tstr (Driver.sou base s) in
     let lp = lazy (get_n_mk_person conf base i) in
@@ -458,7 +458,7 @@ and mk_event conf base d =
           (Array.mapi
              (fun i (ip, k) ->
                let kind = mk_witness_kind k in
-               let iper = Tstr (Driver.string_of_iper ip) in
+               let iper = Tstr (Driver.Iper.to_string ip) in
                Tpat
                  (function
                  | "kind" -> kind
@@ -528,7 +528,7 @@ and mk_ancestors conf base (p : Driver.person) =
              let ifam = Driver.get_ifam cpl in
              let ifath = Driver.get_father cpl in
              let imoth = Driver.get_mother cpl in
-             let cpl = (ifath, imoth, Driver.dummy_iper) in
+             let cpl = (ifath, imoth, Driver.Iper.dummy) in
              let m_auth =
                Util.authorized_age conf base (Driver.poi base ifath)
                && Util.authorized_age conf base (Driver.poi base imoth)
@@ -598,7 +598,7 @@ and unsafe_mk_semi_public_person conf base (p : Driver.person) =
   let first_name = Tstr (E.first_name base p) in
   let first_name_aliases = mk_str_lst base (Driver.get_first_names_aliases p) in
   let children = lazy_list (get_n_mk_person conf base) (E.children base p) in
-  let iper = Tstr (Driver.string_of_iper iper') in
+  let iper = Tstr (Driver.Iper.to_string iper') in
   let related = mk_rparents conf base p in
   let siblings_aux fn = lazy_list (get_n_mk_person conf base) (fn base p) in
   let siblings = siblings_aux E.siblings in
@@ -692,7 +692,7 @@ and unsafe_mk_person conf base (p : Driver.person) =
       (Image.get_portrait conf base p
       |> Option.fold ~none:"" ~some:Image.src_to_string)
   in
-  let iper = Tstr (Driver.string_of_iper iper') in
+  let iper = Tstr (Driver.Iper.to_string iper') in
   let linked_page =
     Tlazy
       (lazy
@@ -1146,7 +1146,7 @@ let mk_env conf base =
     box_lazy
     @@ lazy
          (match Util.p_getenv conf.Config.env "iz" with
-         | Some i -> get_n_mk_person conf base (Driver.iper_of_string i)
+         | Some i -> get_n_mk_person conf base (Driver.Iper.of_string i)
          | None -> (
              match Util.p_getenv conf.env "pz" with
              | None -> (
@@ -1303,13 +1303,13 @@ let module_CAST =
 let module_GWDB conf base =
   let poi =
     func_arg1_no_kw @@ function
-    | Tstr i | Tsafe i -> get_n_mk_person conf base (Driver.iper_of_string i)
+    | Tstr i | Tsafe i -> get_n_mk_person conf base (Driver.Iper.of_string i)
     | x -> failwith_type_error_1 "GWDB.poi" x
   in
   let foi =
     func_arg1_no_kw @@ function
     | Tstr i | Tsafe i ->
-        let i = Driver.ifam_of_string i in
+        let i = Driver.Ifam.of_string i in
         get_n_mk_family conf base i (Driver.foi base i)
     | x -> failwith_type_error_1 "GWDB.foi" x
   in

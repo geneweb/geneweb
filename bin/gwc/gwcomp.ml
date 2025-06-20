@@ -861,7 +861,7 @@ let read_line ic =
 
 (** Create a dummy [gen_person]. *)
 let create_person () =
-  { (Mutil.empty_person "" "") with key_index = Driver.dummy_iper }
+  { (Mutil.empty_person "" "") with key_index = Driver.Iper.dummy }
 
 (** Person is unknown (bogus definition) *)
 let bogus_def p n = p = "?" || n = "?"
@@ -1257,7 +1257,7 @@ let read_family ic fname = function
               comment = comm;
               origin_file = Filename.basename fname;
               fsources = fsrc;
-              fam_index = Driver.dummy_ifam;
+              fam_index = Driver.Ifam.dummy;
             }
           in
           let deo = { children = Array.of_list cles_enfants } in
@@ -1279,7 +1279,7 @@ let read_family ic fname = function
               comment = comm;
               origin_file = Filename.basename fname;
               fsources = fsrc;
-              fam_index = Driver.dummy_ifam;
+              fam_index = Driver.Ifam.dummy;
             }
           in
           let deo = { children = [||] } in

@@ -73,15 +73,15 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   Output.print_sstring conf "\">";
   Util.hidden_env conf;
   Util.hidden_input_s conf "m" "MRG_FAM_OK";
-  Util.hidden_input_s conf "i" (Driver.string_of_ifam ifam1);
-  Util.hidden_input_s conf "i2" (Driver.string_of_ifam ifam2);
+  Util.hidden_input_s conf "i" (Driver.Ifam.to_string ifam1);
+  Util.hidden_input_s conf "i2" (Driver.Ifam.to_string ifam2);
   (match p_getenv conf.env "ip" with
   | Some ip -> Util.hidden_input conf "ip" (Mutil.encode ip)
   | None -> ());
   (let rec loop = function
      | [ (ip1, ip2) ] ->
-         Util.hidden_input_s conf "ini1" (Driver.string_of_iper ip1);
-         Util.hidden_input_s conf "ini2" (Driver.string_of_iper ip2)
+         Util.hidden_input_s conf "ini1" (Driver.Iper.to_string ip1);
+         Util.hidden_input_s conf "ini2" (Driver.Iper.to_string ip2)
      | _ :: branches -> loop branches
      | _ -> ()
    in
@@ -184,8 +184,8 @@ let merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
 let print conf base =
   match (p_getenv conf.env "i", p_getenv conf.env "i2") with
   | Some f1, Some f2 ->
-      let ifam1 = Driver.ifam_of_string f1 in
-      let ifam2 = Driver.ifam_of_string f2 in
+      let ifam1 = Driver.Ifam.of_string f1 in
+      let ifam2 = Driver.Ifam.of_string f2 in
       let fam1 = Driver.foi base ifam1 in
       let fam2 = Driver.foi base ifam2 in
       merge_fam conf base (ifam1, fam1) (ifam2, fam2)

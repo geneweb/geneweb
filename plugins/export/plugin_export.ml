@@ -40,7 +40,7 @@ let export conf base =
   | Some output ->
       Mutil.verbose := false;
       let find_iper i =
-        getenv ("i" ^ string_of_int i) conf.env |> Driver.iper_of_string
+        getenv ("i" ^ string_of_int i) conf.env |> Driver.Iper.of_string
       in
       let find_npoc i =
         let n = getenv ("n" ^ string_of_int i) conf.env in

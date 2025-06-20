@@ -135,7 +135,7 @@ let build_sosa_tree_ht conf base person =
   (* Tableau qui va stocker au fur et à mesure les ancêtres de person. *)
   (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
   (* commence à l'indice 1 !                                            *)
-  let sosa_accu = Array.make (nb_persons + 1) (Sosa.zero, Driver.dummy_iper) in
+  let sosa_accu = Array.make (nb_persons + 1) (Sosa.zero, Driver.Iper.dummy) in
   Array.set sosa_accu 1 (Sosa.one, Driver.get_iper person);
   let rec loop i len =
     if i > nb_persons then ()
@@ -204,11 +204,11 @@ let next_sosa s =
   in
   let rec find_n x lst =
     match lst with
-    | [] -> (Sosa.zero, Driver.dummy_iper)
+    | [] -> (Sosa.zero, Driver.Iper.dummy)
     | (so, _) :: tl ->
         if Sosa.eq so x then
           match tl with
-          | [] -> (Sosa.zero, Driver.dummy_iper)
+          | [] -> (Sosa.zero, Driver.Iper.dummy)
           | tl :: _tll -> tl
         else find_n x tl
   in
@@ -223,11 +223,11 @@ let prev_sosa s =
   let sosa_list = List.rev sosa_list in
   let rec find_n x lst =
     match lst with
-    | [] -> (Sosa.zero, Driver.dummy_iper)
+    | [] -> (Sosa.zero, Driver.Iper.dummy)
     | (so, _) :: tl ->
         if Sosa.eq so x then
           match tl with
-          | [] -> (Sosa.zero, Driver.dummy_iper)
+          | [] -> (Sosa.zero, Driver.Iper.dummy)
           | tl :: _tll -> tl
         else find_n x tl
   in
@@ -295,8 +295,8 @@ let print_sosa conf base p link =
         (if not link then ()
          else
            let sosa_link =
-             let i1 = Driver.string_of_iper (Driver.get_iper p) in
-             let i2 = Driver.string_of_iper (Driver.get_iper r) in
+             let i1 = Driver.Iper.to_string (Driver.get_iper p) in
+             let i2 = Driver.Iper.to_string (Driver.get_iper r) in
              let b2 = Sosa.to_string sosa_num in
              "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
            in

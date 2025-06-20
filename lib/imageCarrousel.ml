@@ -258,7 +258,7 @@ let print_link_delete_image conf base p =
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=DEL_IMAGE&i=";
     Output.print_string conf
-      (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+      (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
     Output.print_sstring conf {|">|};
     transl conf "delete" |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf {| |};
@@ -291,7 +291,7 @@ let print_send_image conf base mode p =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
   Util.hidden_input conf "i"
-    (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+    (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
   Util.hidden_input conf "mode" (Adef.encoded mode);
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
   Output.print_sstring conf (Util.transl conf ":");
@@ -382,7 +382,7 @@ let effective_send_ok conf base p file =
 
 let print_send_ok conf base =
   let ip =
-    try raw_get conf "i" |> Mutil.decode |> Driver.iper_of_string
+    try raw_get conf "i" |> Mutil.decode |> Driver.Iper.of_string
     with Failure _ -> incorrect conf "print send ok"
   in
   let p = Driver.poi base ip in
@@ -563,7 +563,7 @@ let print_delete_image conf base p =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK");
   Util.hidden_input conf "i"
-    (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+    (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
   Output.print_sstring conf
     {|<div class="mt-3"><button type="submit" class="btn btn-danger">|};
   transl_nth conf "validate/delete" 1
@@ -600,7 +600,7 @@ let effective_delete_ok conf base p =
 let print_del_ok conf base =
   match p_getenv conf.env "i" with
   | Some ip ->
-      let p = Driver.poi base (Driver.iper_of_string ip) in
+      let p = Driver.poi base (Driver.Iper.of_string ip) in
       effective_delete_ok conf base p
   | None -> incorrect conf "print del ok"
 
@@ -608,7 +608,7 @@ let print_del conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some ip -> (
-      let p = Driver.poi base (Driver.iper_of_string ip) in
+      let p = Driver.poi base (Driver.Iper.of_string ip) in
       match Image.get_portrait conf base p with
       | Some _ -> print_delete_image conf base p
       | None -> Hutil.incorrect_request conf)
@@ -820,7 +820,7 @@ let print_main_c conf base =
       | Some m -> (
           match Util.p_getenv conf.env "i" with
           | Some ip -> (
-              let p = Driver.poi base (Driver.iper_of_string ip) in
+              let p = Driver.poi base (Driver.Iper.of_string ip) in
               let processed_filename =
                 match m with
                 | "SND_IMAGE_C_OK" ->
@@ -856,7 +856,7 @@ let print_main_c conf base =
                     if Image.has_blason conf base p true then
                       match Util.p_getenv conf.env "ia" with
                       | Some ia ->
-                          let fa = Driver.poi base (Driver.iper_of_string ia) in
+                          let fa = Driver.poi base (Driver.Iper.of_string ia) in
                           Filename.basename (move_blason_file conf base p fa)
                       | None -> ""
                     else ""
@@ -939,7 +939,7 @@ let print_main_c conf base =
   | Some _ ->
       let p =
         match Util.p_getint conf.env "i" with
-        | Some ip -> Driver.poi base (Driver.iper_of_string (string_of_int ip))
+        | Some ip -> Driver.poi base (Driver.Iper.of_string (string_of_int ip))
         | None -> failwith "No person index in success display"
       in
       Perso.interp_templ "carrousel" conf base p
@@ -948,7 +948,7 @@ let print conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some ip ->
-      let p = Driver.poi base (Driver.iper_of_string ip) in
+      let p = Driver.poi base (Driver.Iper.of_string ip) in
       let fn = Driver.p_first_name base p in
       let sn = Driver.p_surname base p in
       if fn = "?" || sn = "?" then Hutil.incorrect_request conf
@@ -958,7 +958,7 @@ let print_family conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some ip ->
-      let p = Driver.poi base (Driver.iper_of_string ip) in
+      let p = Driver.poi base (Driver.Iper.of_string ip) in
       let sn = Driver.p_surname base p in
       if sn = "?" then Hutil.incorrect_request conf
       else print_send_image conf base "blasons" p

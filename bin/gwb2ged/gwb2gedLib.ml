@@ -259,7 +259,7 @@ let string_of_list =
 
 let ged_index opts per =
   Printf.ksprintf (oc opts) "1 _GWID %s\n"
-    (Driver.string_of_iper (Driver.get_iper per))
+    (Driver.Iper.to_string (Driver.get_iper per))
 
 let ged_name opts base per =
   Printf.ksprintf (oc opts) "1 NAME %s /%s/\n"

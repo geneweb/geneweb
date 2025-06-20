@@ -230,7 +230,7 @@ let linked_page_rows conf base pg pgl =
   <a href="%sm=MOD_IND&i=%s#notes" title="%s">
     <i class="fa fa-user"></i></a></td>|}
              (commd conf :> string)
-             (Driver.string_of_iper ip)
+             (Driver.Iper.to_string ip)
              (Utf8.capitalize_fst (transl conf "modify note")));
       Output.print_sstring conf
         (Format.sprintf {|
@@ -251,8 +251,8 @@ let linked_page_rows conf base pg pgl =
   <a href="%sm=MOD_FAM&i=%s&ip=%s#events" title="%s %s %s">
     <i class="fa fa-user fa-sm"></i><i class="fa fa-user fa-sm"></i></a></td>|}
              (commd conf :> string)
-             (Driver.string_of_ifam ifam)
-             (Driver.get_iper fath |> Driver.string_of_iper)
+             (Driver.Ifam.to_string ifam)
+             (Driver.get_iper fath |> Driver.Iper.to_string)
              (Utf8.capitalize_fst (transl conf "modify"))
              (transl_nth conf "event/events" 0)
              (transl_nth conf "family/families" 0));

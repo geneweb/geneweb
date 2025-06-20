@@ -9,7 +9,7 @@ let url_no_index conf base pwd =
   let scratch s = Mutil.encode (Name.lower (Driver.sou base s)) in
   let get_a_person v =
     try
-      let i = Driver.iper_of_string (Mutil.decode v) in
+      let i = Driver.Iper.of_string (Mutil.decode v) in
       let p = Util.pget conf base i in
       if
         (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
@@ -24,7 +24,7 @@ let url_no_index conf base pwd =
   in
   let get_a_family v =
     try
-      let i = Driver.ifam_of_string (Mutil.decode v) in
+      let i = Driver.Ifam.of_string (Mutil.decode v) in
       let fam = Driver.foi base i in
       let p = Util.pget conf base (Driver.get_father fam) in
       let f = scratch (Driver.get_first_name p) in

@@ -46,17 +46,6 @@ let with_timer f =
   let stop = Unix.gettimeofday () in
   (r, stop -. start)
 
-module HT = struct
-  include Hashtbl.Make (struct
-    type t = Driver.istr
-
-    let equal = Driver.eq_istr
-    let hash = Driver.hash_istr
-  end)
-
-  let replace s i v = if not @@ Driver.is_empty_string i then replace s i v
-end
-
 let fullname bname fname = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz")
 
 let iteri_places f base =
@@ -84,11 +73,11 @@ let iteri_pers f base =
 
 let collect_places base bar =
   let len = Driver.nb_of_persons base + Driver.nb_of_families base in
-  let set : unit HT.t = HT.create 2048 in
+  let set : unit Driver.Istr.Table.t = Driver.Istr.Table.create 2048 in
   iteri_places
     (fun i istr ->
       if !prog then ProgrBar.progress bar i len;
-      HT.replace set istr ())
+      Driver.Istr.Table.replace set istr ())
     base;
   set
 
@@ -128,16 +117,18 @@ let field_to_string = function
 
 let collect_names base field bar =
   let len = Driver.nb_of_persons base in
-  let set : unit HT.t = HT.create 17 in
+  let set : unit Driver.Istr.Table.t = Driver.Istr.Table.create 17 in
   iteri_pers
     (fun i p ->
       if !prog then ProgrBar.progress bar i len;
-      iter_field base p (fun istr -> HT.replace set istr ()) field)
+      iter_field base p
+        (fun istr -> Driver.Istr.Table.replace set istr ())
+        field)
     base;
   set
 
 let process_data base set =
-  HT.fold (fun k () acc -> Driver.sou base k :: acc) set []
+  Driver.Istr.Table.fold (fun k () acc -> Driver.sou base k :: acc) set []
   |> List.sort String.compare
 
 let speclist =

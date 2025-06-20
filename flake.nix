@@ -11,13 +11,19 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        ocamlPackages = pkgs.ocaml-ng.ocamlPackages;
+        ancient = ocaml-ancient.outputs.packages.${system}.default;
+        fetchFromGitHub = pkgs.fetchFromGitHub;
+
+        ocamlPackages = pkgs.ocaml-ng.ocamlPackages.overrideScope (final: super: {
+          # Add frame pointers for better profiling with Perf.
+          ocaml = super.ocaml.override { framePointerSupport = true; };
+        });
 
         # Due to Nix's package isolation principle, the findlib package cannot
         # install the topfind script into the OCaml directory. This wrapper
         # provides a workaround by adding the absolute path to this script to
         # directories searched by the OCaml compiler.
-        ocaml = pkgs.symlinkJoin {
+        ocamlWrapped = pkgs.symlinkJoin {
           name = "ocaml";
           paths = [ ocamlPackages.ocaml ];
           buildInputs = [ pkgs.makeWrapper ];
@@ -26,9 +32,6 @@
               --add-flags "-I ${ocamlPackages.findlib}/lib/ocaml/${ocamlPackages.ocaml.version}/site-lib"
           '';
         };
-
-        ancient = ocaml-ancient.outputs.packages.${system}.default;
-        fetchFromGitHub = pkgs.fetchFromGitHub;
       in
       {
         packages = rec {
@@ -101,7 +104,7 @@
         formatter = pkgs.nixpkgs-fmt;
 
         devShells.default = pkgs.mkShell {
-          packages = [ ocaml ] ++ (with ocamlPackages; [
+          packages = [ ocamlWrapped ] ++ (with ocamlPackages; [
             findlib
             utop
             odoc

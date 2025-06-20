@@ -104,8 +104,8 @@ module Make (D : ConverterDriver) = struct
          x
 
   let conv_event_witness_kind x = str @@ Def_show.show_witness_kind x
-  let handler_of_iper i = str @@ Driver.string_of_iper i
-  let handler_of_ifam i = str @@ Driver.string_of_ifam i
+  let handler_of_iper i = str @@ Driver.Iper.to_string i
+  let handler_of_ifam i = str @@ Driver.Ifam.to_string i
 
   let conv_event_witness (i, kind) =
     obj

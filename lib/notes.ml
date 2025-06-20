@@ -577,7 +577,7 @@ let note conf base env str = wiki_aux (fun x -> x) conf base env str
 let person_note conf base p str =
   let env =
     [
-      ('i', fun () -> Driver.string_of_iper (Driver.get_iper p));
+      ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
       ('k', fun () -> Image.default_image_filename "portraits" base p);
     ]
   in
@@ -586,7 +586,7 @@ let person_note conf base p str =
 let source_note conf base p str =
   let env =
     [
-      ('i', fun () -> Driver.string_of_iper (Driver.get_iper p));
+      ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
       ('k', fun () -> Image.default_image_filename "portraits" base p);
     ]
   in

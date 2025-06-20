@@ -1286,7 +1286,7 @@ let make_conf ~secret_salt from_addr request script_name env =
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
-  let default_sosa_ref = (Driver.dummy_iper, None) in
+  let default_sosa_ref = (Driver.Iper.dummy, None) in
   let ar =
     authorization from_addr request base_env passwd access_type utm base_file
       command

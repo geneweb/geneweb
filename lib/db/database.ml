@@ -432,12 +432,12 @@ let persons_of_name bname patches =
       close_in ic_inx;
       ai
     in
-    match Hashtbl.find_opt patches i with
-    | Some patches ->
+    match Hashtbl.find patches i with
+    | patches ->
         List.fold_left
           (fun acc ip -> if Array.mem ip ai then acc else ip :: acc)
           (Array.to_list ai) patches
-    | None -> Array.to_list ai
+    | exception Not_found -> Array.to_list ai
 
 let old_strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
@@ -668,9 +668,7 @@ let apply_patches tab patches plen =
     new_tab
 
 let make_record_exists patches pending len i =
-  Hashtbl.find_opt pending i <> None
-  || Hashtbl.find_opt patches i <> None
-  || (i < len && i >= 0)
+  Hashtbl.mem pending i || Hashtbl.mem patches i || (i < len && i >= 0)
 
 type 'a data_array =
   | ReadOnly of 'a array Gw_ancient.ancient
@@ -740,20 +738,22 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
   r
 
 let make_record_access immut_record (plenr, patches) (_, pending) len =
-  let gen_get nopending i =
-    match if nopending then None else Hashtbl.find_opt pending i with
-    | Some v -> v
-    | None -> (
-        match Hashtbl.find_opt patches i with
-        | Some v -> v
-        | None -> immut_record.im_get i)
+  let get_nopending i =
+    match Hashtbl.find patches i with
+    | v -> v
+    | exception Not_found -> immut_record.im_get i
+  in
+  let get i =
+    match Hashtbl.find pending i with
+    | v -> v
+    | exception Not_found -> get_nopending i
   in
   let len = max len !plenr in
   let rec r =
     {
       load_array = (fun () -> ignore @@ immut_record.im_array ());
-      get = gen_get false;
-      get_nopending = gen_get true;
+      get;
+      get_nopending;
       len;
       output_array =
         (fun oc ->

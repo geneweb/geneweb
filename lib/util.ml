@@ -781,8 +781,8 @@ let authorized_age conf base p = GWPARAM.p_auth conf base p
 
 let is_restricted (conf : config) base (ip : Driver.iper) =
   let fct p =
-    (not (Driver.is_quest_string (Driver.get_surname p)))
-    && (not (Driver.is_quest_string (Driver.get_first_name p)))
+    (not (Driver.Istr.is_quest (Driver.get_surname p)))
+    && (not (Driver.Istr.is_quest (Driver.get_first_name p)))
     && not (authorized_age conf base p)
   in
   if conf.use_restrict then Driver.base_visible_get base fct ip else false
@@ -791,7 +791,8 @@ let pget_opt conf base ip =
   if is_restricted conf base ip then None else Some (Driver.poi base ip)
 
 let pget conf base ip =
-  Option.value ~default:(Driver.empty_person base ip) (pget_opt conf base ip)
+  if is_restricted conf base ip then Driver.empty_person base ip
+  else Driver.poi base ip
 
 let string_gen_person base p =
   Futil.map_person_ps (fun p -> p) (Driver.sou base) p
@@ -799,11 +800,11 @@ let string_gen_person base p =
 let string_gen_family base fam =
   Futil.map_family_ps (fun p -> p) (fun f -> f) (Driver.sou base) fam
 
-let is_hidden p = Driver.is_empty_string (Driver.get_surname p)
+let is_hidden p = Driver.Istr.is_empty (Driver.get_surname p)
 
 let is_empty_name p =
-  Driver.is_quest_string (Driver.get_surname p)
-  && Driver.is_quest_string (Driver.get_first_name p)
+  Driver.Istr.is_quest (Driver.get_surname p)
+  && Driver.Istr.is_quest (Driver.get_first_name p)
 
 let is_public conf base p =
   Driver.get_access p = Public
@@ -867,7 +868,7 @@ let acces_n conf base n x : Adef.escaped_string =
     else Adef.escaped ""
   else
     "i" ^<^ n ^^^ "="
-    ^<^ Driver.string_of_iper (Driver.get_iper x)
+    ^<^ Driver.Iper.to_string (Driver.get_iper x)
     ^<^
     if conf.wizard && Driver.get_occ x <> 0 then
       "&oc" ^<^ n ^>^ "=" ^ string_of_int (Driver.get_occ x)
@@ -1001,7 +1002,7 @@ let mod_ind_link conf p (s : Adef.safe_string) =
   if is_hidden p || cgl || not conf.wizard then s
   else
     let s = (s :> string) in
-    let href = "m=MOD_IND&i=" ^ Driver.string_of_iper (Driver.get_iper p) in
+    let href = "m=MOD_IND&i=" ^ Driver.Iper.to_string (Driver.get_iper p) in
     let txt =
       if s = "" then {|<i class="fa fa-wrench fa-xs ml-1" alt=" (edit)"></i>|}
       else s
@@ -1020,7 +1021,7 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
     ^^^ (if with_id then "\" id=\"i" else "")
-    ^<^ (if with_id then Driver.string_of_iper iper else "")
+    ^<^ (if with_id then Driver.Iper.to_string iper else "")
     ^<^ "\">" ^<^ s ^>^ "</a>"
 
 let reference = reference_flags true
@@ -1061,14 +1062,14 @@ let update_family_loop conf base p s =
     if conf.wizard then
       match res with
       | [ res ] ->
-          let iper = Driver.string_of_iper iper in
-          let ifam = Driver.string_of_ifam res in
+          let iper = Driver.Iper.to_string iper in
+          let ifam = Driver.Ifam.to_string res in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
           ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^ "\">" ^<^ s
           ^>^ "</a>"
       | _ ->
-          let iper = Driver.string_of_iper iper in
+          let iper = Driver.Iper.to_string iper in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
           ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
@@ -1097,7 +1098,7 @@ let referenced_person_text_without_surname conf base p =
 let person_text_without_title conf base p =
   match main_title conf base p with
   | Some t -> (
-      if Driver.eq_istr t.t_place (Driver.get_surname p) then
+      if Driver.Istr.equal t.t_place (Driver.get_surname p) then
         gen_person_text ~sn:false conf base p
       else
         match (t.t_name, Driver.get_qualifiers p) with
@@ -1825,7 +1826,7 @@ let child_of_parent conf base p =
   (* Si le père a un nom de famille différent de la personne *)
   (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
   let print_father fath =
-    if not (Driver.eq_istr (Driver.get_surname p) (Driver.get_surname fath))
+    if not (Driver.Istr.equal (Driver.get_surname p) (Driver.get_surname fath))
     then gen_person_text conf base fath
     else gen_person_text ~sn:false conf base fath
   in
@@ -1931,7 +1932,7 @@ let first_child conf base p =
           then Adef.safe "xx"
           else if
             not
-              (Driver.eq_istr (Driver.get_surname p)
+              (Driver.Istr.equal (Driver.get_surname p)
                  (Driver.get_surname enfant))
           then gen_person_text conf base enfant
           else gen_person_text ~sn:false conf base enfant
@@ -2041,7 +2042,7 @@ let string_of_decimal_num conf f =
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
   | Some i when i <> "" ->
-      let i = Geneweb_db.Driver.iper_of_string i in
+      let i = Geneweb_db.Driver.Iper.of_string i in
       if Geneweb_db.Driver.iper_exists base i then
         let p = pget conf base i in
         if is_hidden p then None else Some p

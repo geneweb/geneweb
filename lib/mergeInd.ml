@@ -32,27 +32,27 @@ let compatible_burials b1 b2 =
     | _ -> false
 
 let compatible_strings s1 s2 =
-  Driver.eq_istr s1 s2 || Driver.is_empty_string s2 || Driver.is_empty_string s1
+  Driver.Istr.equal s1 s2 || Driver.Istr.is_empty s2 || Driver.Istr.is_empty s1
 
 let compatible_divorces d1 d2 = d1 = d2
 let compatible_separations d1 d2 = d1 = d2
 let compatible_relation_kinds rk1 rk2 = rk1 = rk2
 
 let compatible_titles t1 t2 =
-  Futil.eq_lists (Futil.eq_titles Driver.eq_istr) t1 t2 || t2 = []
+  Futil.eq_lists (Futil.eq_titles Driver.Istr.equal) t1 t2 || t2 = []
 
 let compatible_pevents pevt1 pevt2 = pevt1 = [] && pevt2 = []
 let compatible_fevents fevt1 fevt2 = fevt1 = [] && fevt2 = []
 
 let compatible_strings_lists sl1 sl2 =
-  sl2 = [] || Futil.eq_lists Driver.eq_istr sl1 sl2
+  sl2 = [] || Futil.eq_lists Driver.Istr.equal sl1 sl2
 
 let compatible_notes base s1 s2 =
   compatible_strings s1 s2 || Driver.sou base s1 = Driver.sou base s2
 
 let compatible_ind base p1 p2 =
-  Driver.eq_istr (Driver.get_first_name p1) (Driver.get_first_name p2)
-  && Driver.eq_istr (Driver.get_surname p1) (Driver.get_surname p2)
+  Driver.Istr.equal (Driver.get_first_name p1) (Driver.get_first_name p2)
+  && Driver.Istr.equal (Driver.get_surname p1) (Driver.get_surname p2)
   && compatible_strings (Driver.get_image p1) (Driver.get_image p2)
   && compatible_strings (Driver.get_public_name p1) (Driver.get_public_name p2)
   && compatible_strings_lists (Driver.get_qualifiers p1)
@@ -147,9 +147,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
     let u2 = { family = [||] } in
     Driver.patch_union base (Driver.get_iper p2) u2);
   let p1 =
-    let get_string fn =
-      if Driver.is_empty_string (fn p1) then fn p2 else fn p1
-    in
+    let get_string fn = if Driver.Istr.is_empty (fn p1) then fn p2 else fn p1 in
     {
       (Driver.gen_person_of_person p1) with
       sex =
@@ -271,15 +269,15 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
            Driver.get_marriage fam2
          else Driver.get_marriage fam1);
       marriage_place =
-        (if Driver.is_empty_string (Driver.get_marriage_place fam1) then
+        (if Driver.Istr.is_empty (Driver.get_marriage_place fam1) then
            Driver.get_marriage_place fam2
          else Driver.get_marriage_place fam1);
       marriage_src =
-        (if Driver.is_empty_string (Driver.get_marriage_src fam1) then
+        (if Driver.Istr.is_empty (Driver.get_marriage_src fam1) then
            Driver.get_marriage_src fam2
          else Driver.get_marriage_src fam1);
       fsources =
-        (if Driver.is_empty_string (Driver.get_fsources fam1) then
+        (if Driver.Istr.is_empty (Driver.get_fsources fam1) then
            Driver.get_fsources fam2
          else Driver.get_fsources fam1);
     }
@@ -291,7 +289,7 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
     let _ = (CheckItem.sort_children base children : _ option) in
     { children }
   in
-  UpdateFamOk.effective_del conf base Driver.dummy_iper fam2;
+  UpdateFamOk.effective_del conf base Driver.Iper.dummy fam2;
   for i = 0 to Array.length (Driver.get_children des2) - 1 do
     let ip = (Driver.get_children des2).(i) in
     let a = { parents = Some ifam1; consang = Adef.fix (-1) } in
@@ -385,7 +383,7 @@ let rec kill_ancestors conf base included_self p nb_ind nb_fam =
       kill_ancestors conf base true
         (Driver.poi base (Driver.get_mother cpl))
         nb_ind nb_fam;
-      UpdateFamOk.effective_del conf base Driver.dummy_iper cpl;
+      UpdateFamOk.effective_del conf base Driver.Iper.dummy cpl;
       incr nb_fam
   | None -> ());
   if included_self then (

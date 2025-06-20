@@ -455,7 +455,8 @@ let print_warning conf base = function
               Output.print_sstring conf {| style="background:pink"|};
             Output.print_sstring conf ">";
             Output.print_sstring conf "\n";
-            if Driver.eq_istr (Driver.get_surname p) (Driver.get_surname fath)
+            if
+              Driver.Istr.equal (Driver.get_surname p) (Driver.get_surname fath)
             then print_first_name conf base p
             else print_someone conf base p;
             Output.print_string conf (DateDisplay.short_dates_text conf base p);
@@ -674,7 +675,7 @@ let print_warning conf base = function
       let fath = Driver.get_father f in
       let moth = Driver.get_mother f in
       let curr, hom =
-        if Driver.eq_iper fath (Driver.get_iper p) then (moth, fath)
+        if Driver.Iper.equal fath (Driver.get_iper p) then (moth, fath)
         else (fath, moth)
       in
       Output.printf conf
@@ -1047,7 +1048,7 @@ let check_missing_name base p =
   let quest f g =
     (* only raise error if `?` is not already recorded in the database *)
     f = "?"
-    && p.key_index <> Driver.dummy_iper
+    && p.key_index <> Driver.Iper.dummy
     && Driver.poi base p.key_index |> g |> Driver.sou base |> ( <> ) "?"
   in
   if p.first_name = "" || quest p.first_name Driver.get_first_name then
@@ -1177,7 +1178,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
           if o <= 0 || o >= Driver.nb_of_persons base then raise Not_found
           else
             (* FIXME: this would fail if internal repr of iper is not int *)
-            let ip = Driver.iper_of_string @@ string_of_int o in
+            let ip = Driver.Iper.of_string @@ string_of_int o in
             let p = Driver.poi base ip in
             if Driver.p_first_name base p = f && Driver.p_surname base p = s
             then ip
@@ -1188,7 +1189,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
           | None -> raise Not_found
       with Not_found ->
         let o = if f = "?" || s = "?" then 0 else o in
-        let empty_string = Driver.empty_string in
+        let empty_string = Driver.Istr.empty in
         let birth, birth_place, baptism, baptism_place =
           match info with
           | Some { ci_birth_date = b; ci_birth_place = bpl; _ } ->
@@ -1261,7 +1262,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             pevents = [];
             notes = empty_string;
             psources = Driver.insert_string base (only_printable src);
-            key_index = Driver.dummy_iper;
+            key_index = Driver.Iper.dummy;
           }
         in
         let a = Driver.no_ascend in
@@ -1276,7 +1277,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
           print_err_unknown conf (f, s, o)
         else
           (* FIXME: this would fail if internal repr of iper is not int *)
-          let ip = Driver.iper_of_string @@ string_of_int o in
+          let ip = Driver.Iper.of_string @@ string_of_int o in
           let p = Driver.poi base ip in
           if Driver.p_first_name base p = f && Driver.p_surname base p = s then
             ip

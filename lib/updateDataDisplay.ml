@@ -57,7 +57,7 @@ let print_mod_ok conf base =
     Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
   in
   let new_istr_s =
-    Driver.string_of_istr (Driver.insert_string base new_input)
+    Driver.Istr.to_string (Driver.insert_string base new_input)
   in
   let new_ini = ini_of_update_data ini new_input in
   let list = get_person_from_data conf base in
@@ -224,7 +224,7 @@ and eval_simple_var conf base env xx = function
           | p :: pl ->
               let ip = Driver.get_iper p in
               loop (i + 1)
-                (acc ^ Printf.sprintf "&i%d=%s" i (Driver.string_of_iper ip))
+                (acc ^ Printf.sprintf "&i%d=%s" i (Driver.Iper.to_string ip))
                 pl
         in
         loop 0 "" p_list
@@ -456,7 +456,7 @@ let print_foreach conf print_ast _eval_expr =
               env |> add "cnt" (Vint i) |> add "max" (Vint max)
               |> add "entry_value" (Vstring s)
               |> add "entry_value_rev" (Vstring (unfold_place_long false s))
-              |> add "entry_key" (Vstring (Driver.string_of_istr k))
+              |> add "entry_key" (Vstring (Driver.Istr.to_string k))
               |> add "first" (Vbool (Place.without_suburb s <> prev)))
           in
           List.iter (print_ast env xx) al;

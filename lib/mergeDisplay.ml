@@ -41,7 +41,7 @@ let print conf base p =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
   Util.hidden_input conf "i"
-    (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+    (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
   Output.print_sstring conf
     "<span class=\"form-row align-items-center\"><span \
      class=\"col-auto\"><span class=\"custom-control custom-radio\"><input \
@@ -73,14 +73,14 @@ let print conf base p =
           "<input type=\"radio\" class=\"custom-control-input\" \
            name=\"select\" id=\"";
         Output.print_string conf
-          (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
         Output.print_sstring conf "\" value=\"";
         Output.print_string conf
-          (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
         Output.print_sstring conf "\">\n";
         Output.print_sstring conf "<label class=\"custom-control-label\" for=\"";
         Output.print_string conf
-          (Driver.get_iper p |> Driver.string_of_iper |> Mutil.encode);
+          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
         Output.print_sstring conf "\">";
         let cop = (Util.child_of_parent conf base p :> string) in
         let cop = if cop = "" then "" else ", " ^ cop in
@@ -105,16 +105,16 @@ let print_possible_continue_merging conf base =
   let open Adef in
   match (p_getenv conf.env "ini1", p_getenv conf.env "ini2") with
   | Some ini1, Some ini2 ->
-      let ini1 = Driver.iper_of_string ini1 in
-      let ini2 = Driver.iper_of_string ini2 in
+      let ini1 = Driver.Iper.of_string ini1 in
+      let ini2 = Driver.Iper.of_string ini2 in
       let p1 = Driver.poi base ini1 in
       let p2 = Driver.poi base ini2 in
       Output.print_sstring conf {|<p><a href="|};
       Output.print_string conf (commd conf);
       Output.print_sstring conf {|m=MRG_IND&i=|};
-      Output.print_string conf (Driver.string_of_iper ini1 |> Mutil.encode);
+      Output.print_string conf (Driver.Iper.to_string ini1 |> Mutil.encode);
       Output.print_sstring conf {|&i2=|};
-      Output.print_string conf (Driver.string_of_iper ini2 |> Mutil.encode);
+      Output.print_string conf (Driver.Iper.to_string ini2 |> Mutil.encode);
       Output.print_sstring conf {|">|};
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl conf "continue merging"));
@@ -128,7 +128,7 @@ let print_possible_continue_merging conf base =
   | _ -> (
       match p_getenv conf.env "ip" with
       | Some ip ->
-          let ip = Driver.iper_of_string ip in
+          let ip = Driver.Iper.of_string ip in
           let s1 =
             match p_getenv conf.env "iexcl" with
             | Some "" | None -> Adef.encoded ""
@@ -145,7 +145,7 @@ let print_possible_continue_merging conf base =
             Output.print_sstring conf {|<p><a href="|};
             Output.print_string conf (commd conf);
             Output.print_sstring conf {|m=MRG_DUP&ip=|};
-            Output.print_string conf (Driver.string_of_iper ip |> Mutil.encode);
+            Output.print_string conf (Driver.Iper.to_string ip |> Mutil.encode);
             Output.print_string conf s1;
             Output.print_string conf s2;
             Output.print_sstring conf {|">|};
