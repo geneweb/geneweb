@@ -11,7 +11,10 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        ocamlPackages = pkgs.ocaml-ng.ocamlPackages;
+        ocamlPackages = pkgs.ocaml-ng.ocamlPackages.overrideScope (final: super: {
+          # Add frame pointers for better profiling with Perf.
+          ocaml = super.ocaml.override { framePointerSupport = true; };
+        });
 
         # Due to Nix's package isolation principle, the findlib package cannot
         # install the topfind script into the OCaml directory. This wrapper
@@ -94,6 +97,8 @@
               promise_jsoo
               benchmark
               pp_loc
+              tyxml
+              progress
             ]);
           };
         };

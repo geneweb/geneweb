@@ -2,3 +2,8 @@
  (name test)
  (modules test sosa_test place_test calendar_test wiki_test merge_test util_test)
  (libraries alcotest geneweb fmt))
+
+(executable
+  (name wiki_check)
+  (modules wiki_check)
+  (libraries geneweb_compat geneweb_util geneweb_db geneweb_tlsw cmdliner tyxml fmt logs progress))

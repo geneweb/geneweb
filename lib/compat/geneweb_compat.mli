@@ -47,6 +47,13 @@ module In_channel : sig
 
       @raise Invalid_argument
         if [pos] and [len] do not designate a valid range of [buf]. *)
+
+  val input_all : t -> string
+  (** [input_all ic] reads all remaining data from [ic].
+
+      If the same channel is read concurrently by multiple threads, the returned
+      string is not guaranteed to contain contiguous characters from the input.
+  *)
 end
 
 module Out_channel : sig
