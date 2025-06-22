@@ -32,14 +32,12 @@
 }
 
 .section-title {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.4rem;
+  font-weight: 500;
   color: #6c757d;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   margin-bottom: 4px;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 2px;
 }
 
 /* ========== BOUTONS DE CONTRÔLE ========== */
@@ -89,6 +87,8 @@
 
 .btn-close {
   position: absolute;
+  bottom: 4px;
+  right: 4px;
   background: none;
   border: none;
   font-size: 1.1rem;
@@ -158,25 +158,116 @@
   }
 }
 
-/* ========== STYLES SVG DE BASE ========== */
+/* ========== SURLIGNAGE SVG ========== */
 svg .highlight {
-  fill: lightgrey !important;
+  fill: rgba(225, 225, 225, 0.3) !important; /* Gris léger transparent */
 }
 
 svg .highlight .text {
   fill: black !important;
+  font-weight: bold !important;
 }
 
-svg .text_highlight {
+/* Cibler spécifiquement les éléments de mariage */
+svg g[id^="M"] path.event-highlight-marriage {
+  fill: rgba(230, 126, 34, 0.3) !important;
+}
+
+svg g[id^="M"] path.link:hover:not(.event-highlight-marriage) {
+  fill: rgba(200, 200, 200, 0.3) !important;
+}
+
+/* Éviter la propagation au secteur de personne adjacent */
+svg g[id^="S"] > path.event-highlight-marriage {
+  fill: inherit !important; /* Annuler la colorisation mariage sur les personnes */
+}
+
+/* Texte directement surligné */
+svg .text_high. {
   fill: black !important;
+  font-weight: bold !important;
+  text-shadow: 0 0 2px white, 0 0 4px white, 0 0 6px white !important;
 }
 
+/* Groupes avec same_hl */
 svg .same_hl .bg {
-  fill: lightgrey !important;
+  fill: rgba(128, 128, 128, 0.2) !important;
 }
 
 svg .same_hl .text {
   fill: black !important;
+  font-weight: bold !important;
+  text-shadow: 0 0 2px white, 0 0 4px white, 0 0 6px white !important;
+}
+
+/* Amélioration globale : tous les textes dans un élément highlight */
+svg .highlight text,
+svg .highlight .text,
+svg path.highlight + text,
+svg .bg.highlight ~ text {
+  fill: black !important;
+  font-weight: bold !important;
+  text-shadow: 0 0 2px white, 0 0 4px white, 0 0 6px white !important;
+}
+
+/* Pour les dates (plus petites) */
+svg .highlight .dates,
+svg .same_hl .dates {
+  font-size: 80%;
+  font-weight: bold !important;
+  text-shadow: 0 0 2px white, 0 0 3px white !important;
+}
+
+/* ========== COLORISATION DES ÉVÉNEMENTS AVEC TEXTE LISIBLE ========== */
+svg .event-highlight-birth {
+  fill: rgba(159, 209, 164, 0.4) !important;
+}
+
+svg .event-highlight-baptism {
+  fill: rgba(199, 224, 201, 0.4) !important;
+}
+
+svg .event-highlight-marriage {
+  fill: rgba(230, 146, 54, 0.2) !important;
+}
+
+svg .event-highlight-death {
+  fill: rgba(165, 204, 201, 0.4) !important;
+}
+
+svg .event-highlight-burial {
+  fill: rgba(111, 168, 162, 0.4) !important;
+}
+
+/* Texte sur les événements colorés */
+svg [class*="event-highlight-"] text,
+svg [class*="event-highlight-"] .text {
+  fill: black !important;
+  font-weight: bold !important;
+  text-shadow: 0 0 2px white, 0 0 4px white, 0 0 6px white !important;
+}
+
+/* ========== MODE HAUTE VISIBILITÉ (SENIORS) ========== */
+
+@media (prefers-contrast: high), (prefers-contrast: more) {
+  /* Renforcer encore plus le texte */
+  svg .highlight text,
+  svg .same_hl text,
+  svg [class*="event-highlight-"] text {
+    font-weight: 900 !important; /* Extra bold */
+    font-size: 105% !important;
+    text-shadow:
+      0 0 2px white, 0 0 4px white, 0 0 6px white,
+      1px 1px 2px white, -1px -1px 2px white !important;
+  }
+
+  /* Gris encore plus léger */
+  svg .highlight,
+  svg .same_hl .bg {
+    fill: rgba(128, 128, 128, 0.15) !important;
+    stroke: #333333;
+    stroke-width: 0.5px;
+  }
 }
 
 /* ========== VISIBILITÉ DES PANNEAUX ========== */
@@ -185,18 +276,17 @@ svg .same_hl .text {
 }
 
 /* ========== COLORISATION PAR LIEUX (CONSERVÉ POUR COMPATIBILITÉ) ========== */
-body.place_color .square { 
-  display: inline; 
-  color: transparent; 
+body.place .square {
+  display: inline;
+  color: transparent;
 }
 
 /* ========== PANNEAU DES ÂGES AU DÉCÈS ========== */
 #death-age {
   position: absolute;
   top: 10px;
-  right: 0;
+  right: 10px;
   font-size: 18px;
-  transform: translateX(-175%);
   background: rgba(255, 255, 255, 0.9);
   padding: 8px;
   z-index: 1000;
@@ -286,7 +376,7 @@ path {
   fill: transparent;
 }
 
-circle, 
+circle,
 path.contour {
   stroke: #A0A0A0;
   stroke-width: var(--fc-stroke-width);
@@ -309,8 +399,8 @@ textPath {
   dominant-baseline: central;
 }
 
-.dates { 
-  font-size: 80%; 
+.dates {
+  font-size: 80%;
 }
 
 .none {
@@ -370,23 +460,22 @@ textPath {
 /* ========== PANNEAU D'IDENTITÉ ========== */
 .identity-panel {
   position: absolute;
-  top: 0px;
-  right: 0px;
-  width: 230px;
+  left: 65%;
+  width: 300px;
   max-width: 35%;
-  padding: 4px;
+  padding: 2px;
   display: none;
   z-index: 10;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .identity-panel h2 {
-  font-size: 1.3rem;
-  margin-bottom: 0.3rem;
+  font-size: 1.2rem;
+  margin-bottom: 0.1rem;
 }
 
 .identity-panel .subtitle {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: normal;
   color: #555;
 }
@@ -400,11 +489,11 @@ textPath {
 /* ========== STYLES D'ANGLE D'OUVERTURE ========== */
 .btn-fanchart[id^="b-angle-"] {
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 svg#fanchart {
-  transition: viewBox 0.3s ease-out;
+  transition: viewBox 0.2s ease-out;
 }
 
 /* Vue compacte 180° */
@@ -535,8 +624,8 @@ svg.readable text {
 }
 
 /* ========== VISIBILITÉ CONDITIONNELLE DES CONTRÔLES ========== */
-body:not(.place_color) .event-toggles,
-body:not(.place_color) #b-sort-places {
+body:not(.place) .event-toggles,
+body:not(.place) #b-sort-places {
   display: none !important;
 }
 
@@ -550,7 +639,7 @@ body:not(.place_color) #b-sort-places {
 }
 
 /* ===== PANNEAU PRINCIPAL ===== */
-body:not(.place_color) .places-panel {
+body:not(.place) .places-panel {
   display: none;
 }
 
@@ -685,35 +774,6 @@ body:not(.place_color) .places-panel {
   flex-shrink: 0;
 }
 
-.sort-toggle, .events-toggle {
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  padding: 3px 5px;
-  cursor: pointer;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  color: #495057;
-  width: 26px;
-  height: 22px;
-  outline: none;
-}
-
-.sort-toggle:hover, .events-toggle:hover {
-  background: #e7f3ff;
-  border-color: #007bff;
-  color: #007bff;
-}
-
-.sort-toggle.active, .events-toggle.active {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
 /* ===== SECTION RÉSUMÉ ===== */
 .summary-section {
   padding: 4px 4px 4px 8px;
@@ -796,52 +856,23 @@ body:not(.place_color) .places-panel {
 }
 
 .summary-event-label {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 16px;
   height: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
   font-weight: 600;
-  font-size: 9px;
+  font-size: 7px;
   background: white;
   cursor: help;
   box-sizing: border-box;
-}
-
-.places-panel.show-events .summary-event-label.birth-label {
-  background: #4CAF50;
-  color: white;
-  border-color: #4CAF50;
-}
-
-.places-panel.show-events .summary-event-label.baptism-label {
-  background: #66BB6A;
-  color: white;
-  border-color: #66BB6A;
-}
-
-.places-panel.show-events .summary-event-label.marriage-label {
-  background: #E67E22;
-  color: white;
-  border-color: #E67E22;
-}
-
-.places-panel.show-events .summary-event-label.death-label {
-  background: #757575;
-  color: white;
-  border-color: #757575;
-}
-
-.places-panel.show-events .summary-event-label.burial-label {
-  background: #9E9E9E;
-  color: white;
-  border-color: #9E9E9E;
-}
-
-.summary-event-label {
   transition: all 0.2s ease;
+}
+
+.summary-event-label:hover {
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
 }
 
 .summary-total-events {
@@ -890,19 +921,21 @@ body:not(.place_color) .places-panel {
 /* ===== LIGNE DE LIEU ===== */
 .place-row {
   display: flex;
-  align-items: center;
-  min-height: var(--place-height-compact);
+  align-items: stretch;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  position: relative;
 }
 
 .place-row.tall-row {
   display: flex;
-  align-items: stretch;
+  min-height: 42px;
+  align-items: center;
 }
 
 /* ===== INDICATEURS D'ÉVÉNEMENTS ===== */
 .place-indicators {
   width: 60px;
-  height: 26px;
   display: flex;
   flex-wrap: wrap;
   align-content: center;
@@ -917,12 +950,25 @@ body:not(.place_color) .places-panel {
   display: flex;
   flex-wrap: wrap;
   width: 56px;
-  height: 42px;
   align-content: center;
+  align-items: center;
   justify-content: flex-end;
   padding: 1px 4px;
   gap: 1px;
 }
+
+/* alternavite avec grid
+.place-row.tall-row .place-indicators {
+  display: grid;
+  grid-template-columns: repeat(2, 16px);
+  grid-auto-rows: 16px;
+  gap: 2px;
+  align-content: center;
+  justify-content: end;
+  padding: 0 4px;
+  width: 56px;
+  height: 42px;
+} */
 
 .line-break {
   flex-basis: 100%;
@@ -950,15 +996,50 @@ body:not(.place_color) .places-panel {
   align-items: center;
   justify-content: center;
   margin: 1px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
 }
 
 /* Couleurs des indicateurs */
-.indicator.n { background: #4CAF50; } /* Vert nature - naissance */
-.indicator.b { background: #66BB6A; } /* Vert clair - baptême */
-.indicator.m { background: #E67E22; } /* Orange - mariage */
-.indicator.d { background: #757575; } /* Gris - décès */
-.indicator.s { background: #9E9E9E; } /* Gris clair - sépulture */
+.indicator.n,
+.summary-event-label.birth-label,
+.places-panel.show-events .summary-event-label.birth-label {
+  background: #9FD1A4;
+  color: white;
+  border-color: #9FD1A4;
+}
 
+.indicator.b,
+.summary-event-label.baptism-label,
+.places-panel.show-events .summary-event-label.baptism-label {
+  background: #C7E0C9;
+  color: white;
+  border-color: #C7E0C9;
+}
+
+.indicator.m,
+.summary-event-label.marriage-label,
+.places-panel.show-events .summary-event-label.marriage-label {
+  background: #E67E22;
+  color: white;
+  border-color: #E67E22;
+}
+
+.indicator.d,
+.summary-event-label.death-label,
+.places-panel.show-events .summary-event-label.death-label {
+  background: #A5CCC9;
+  color: white;
+  border-color: #A5CCC9;
+}
+
+.indicator.s,
+.summary-event-label.burial-label,
+.places-panel.show-events .summary-event-label.burial-label {
+  background: #6FA8A2;
+  color: white;
+  border-color: #6FA8A2;
+}
 /* ===== CONTENU DU LIEU ===== */
 .place-content {
   flex: 1;
@@ -975,12 +1056,15 @@ body:not(.place_color) .places-panel {
 
 .place-content:hover {
   background: rgba(40, 167, 69, 0.08);
-  border-top: 1px solid rgba(0,0,0,0.05);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
   margin-top: -1px;
   margin-bottom: -1px;
   padding-top: 2px;
   padding-bottom: 2px;
+}
+
+.place-content:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
 }
 
 .places-panel.show-events .place-content {
@@ -990,24 +1074,6 @@ body:not(.place_color) .places-panel {
   margin-bottom: -1px;
   min-height: 30px;
   padding: 3px 2px 3px 4px;
-}
-
-.places-panel.show-events .place-row:nth-child(even) .place-content {
-  background: linear-gradient(to right,
-    rgba(255,255,255,0) 0%,
-    rgba(240,242,245,0.6) 80%);
-}
-
-.places-panel.show-events .place-row:nth-child(odd) .place-content:hover {
-  background: linear-gradient(to right,
-    rgba(40, 167, 69, 0.06) 0%,
-    rgba(40, 167, 69, 0.10) 80%);
-}
-
-.places-panel.show-events .place-row:nth-child(even) .place-content:hover {
-  background: linear-gradient(to right,
-    rgba(40, 167, 69, 0.08) 0%,
-    rgba(40, 167, 69, 0.18) 80%);
 }
 
 .place-row:last-child .place-content {
@@ -1049,9 +1115,9 @@ body:not(.place_color) .places-panel {
 
 .place-name {
   flex: 1;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  color: #495057;
+  color: black;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -1067,10 +1133,20 @@ body:not(.place_color) .places-panel {
   font-weight: 600;
 }
 
+.places-panel.show-events .place-name {
+  font-weight: 500;
+}
+
+.places-panel.show-events .place-content:hover .place-name,
+.place-content.person-match .place-name {
+  font-weight: 600;
+}
+
 .place-events {
   display: none;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-end;
   font-size: 6px;
   color: #95989b;
 }
@@ -1129,7 +1205,7 @@ body:not(.place_color) .places-panel {
   flex-shrink: 0;
 }
 
-.places-panel.show-events .place-row:nth-child(odd) .place-count {
+places-panel.show-events .place-row:nth-child(odd) .place-count {
   border: 1px solid rgba(0, 0, 0, 0.15);
   box-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
@@ -1138,6 +1214,52 @@ body:not(.place_color) .places-panel {
   background: rgba(255, 255, 255, 0.98);
   border: 1px solid rgba(0, 0, 0, 0.15);
   box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.places-panel.show-events .place-row:nth-child(even) .place-content {
+  background: linear-gradient(to right,
+    rgba(255,255,255,0) 0%,
+    rgb(97 166 120 / 12%) 50%)
+}
+
+.places-panel.show-events .place-row:nth-child(odd) .place-content:hover {
+  background: linear-gradient(to right,
+    rgba(40, 167, 69, 0.05) 0%,
+    rgba(40, 167, 69, 0.6) 100%);
+}
+
+.places-panel.show-events .place-row:nth-child(even) .place-content:hover {
+  background: linear-gradient(to right,
+    rgba(40, 167, 69, 0.08) 0%,
+    rgba(40, 167, 69, 0.18) 80%);
+}
+
+/* Correction des conflits de surlignage en mode Events */
+.places-panel.show-events .place-row.row-hover .place-content,
+.places-panel.show-events .place-content.person-match {
+  background: rgba(40, 167, 69, 0.15) !important;
+}
+
+.places-panel.show-events .place-row.row-hover .place-content:hover,
+.places-panel.show-events .place-content.person-match:hover {
+  background: rgba(40, 167, 69, 0.25) !important;
+}
+
+/* Éviter le clignotement sur les éléments internes */
+.place-row.row-hover * {
+  pointer-events: none;
+}
+
+.place-row.row-hover .place-content {
+  pointer-events: auto;
+}
+
+/* Surlignage uniforme pour toute la ligne */
+.place-row.row-hover {
+  background: rgba(40, 167, 69, 0.08);
+  border-radius: 4px;
+  margin: 0 2px;
+  padding: 0 2px;
 }
 
 /* ===== SOUS-LIEUX ===== */
@@ -1203,9 +1325,9 @@ body:not(.place_color) .places-panel {
 }
 
 .overflow-header {
-  background: linear-gradient(to right, 
-    rgba(255,255,255,0.95) 0%, 
-    rgba(40,167,69,0.7) 25%, 
+  background: linear-gradient(to right,
+    rgba(255,255,255,0.95) 0%,
+    rgba(40,167,69,0.7) 25%,
     #28a745 100%);
   color: white;
   padding: 1px;
@@ -1228,4 +1350,271 @@ body:not(.place_color) .places-panel {
 
 .overflow-content::-webkit-scrollbar {
   width: 0px;
+}
+
+/* TODO À INTÉGRER PROPREMENMT QUE CE BLOC EN SURPLUS FINAL */
+/* ========== CORRECTIONS POUR LE SURLIGNAGE STABLE ========== */
+
+/* ===== LIGNE DE LIEU - Structure stable ===== */
+.place-row {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  /* Transition uniquement sur les propriétés qui ne cassent pas le hover */
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  cursor: pointer;
+  /* Créer un contexte de stacking pour éviter les problèmes de z-index */
+  z-index: 1;
+}
+
+/* Empêcher les transitions de hauteur qui causent des problèmes */
+.place-row.tall-row {
+  display: flex;
+  min-height: 42px;
+  align-items: stretch;
+  /* Pas de transition sur la hauteur */
+  transition: none;
+}
+
+/* ===== INDICATEURS - Positionnement stable ===== */
+.place-indicators {
+  width: 60px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  gap: 2px;
+  min-height: var(--place-height-compact);
+  /* Éviter les débordements qui causent des problèmes de hover */
+  overflow: hidden;
+  /* Transition douce pour l'opacité seulement */
+  transition: opacity 0.1s ease-in;
+}
+
+/* ===== CONTENU DU LIEU - Zone interactive stable ===== */
+.place-content {
+  flex: 1;
+  padding: 2px 2px 2px 6px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  min-height: var(--place-height-compact);
+  border-left: 1px solid #dee2e6;
+  /* Position relative pour contenir les pseudo-éléments */
+  position: relative;
+  /* Transition sans hauteur */
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Créer une zone de hover étendue avec un pseudo-élément */
+.place-content::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  z-index: -1;
+  /* Invisible mais capteur d'événements */
+  pointer-events: auto;
+}
+
+/* État de survol - sans changement de dimensions */
+.place-content.person-match,
+.place-content:hover {
+  background: rgba(40, 167, 69, 0.08);
+}
+
+/* Suppression des changements de padding/margin au hover */
+.place-content:hover,
+.place-content.person-match {
+  /* Plus de changements de padding ou margin */
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ===== NOM DU LIEU - Gestion de l'expansion ===== */
+.place-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: black;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Transition douce pour le poids de police seulement */
+  transition: font-weight 0.1s ease;
+}
+
+/* Expansion du texte sans affecter la hauteur */
+.place-content.person-match .place-name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  font-weight: 600;
+  /* Utiliser line-clamp pour limiter l'expansion verticale */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+}
+
+/* ===== MODE ÉVÉNEMENTS - Ajustements ===== */
+.places-panel.show-events .place-content {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  min-height: 30px;
+  padding: 3px 2px 3px 4px;
+  /* Garder une hauteur stable */
+  height: auto;
+}
+
+/* Éviter les changements de hauteur en mode événements */
+.places-panel.show-events .place-row {
+  min-height: 30px;
+}
+
+/* ===== INDICATEURS D'ÉVÉNEMENTS - Animation douce ===== */
+.indicator {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  /* Animation d'apparition */
+  animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== OPTIMISATIONS POUR LA STABILITÉ ===== */
+
+/* Forcer le rendu GPU pour des transitions plus fluides */
+.places-list {
+  will-change: scroll-position;
+}
+
+.place-row {
+  will-change: background-color;
+  /* Empêcher le texte de bouger pendant les transitions */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Réduire les reflows en fixant les largeurs */
+.place-color {
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.place-count {
+  min-width: 26px;
+  width: 26px;
+  height: 18px;
+  /* Reste du style existant... */
+}
+
+/* ===== CORRECTION DES GAPS ===== */
+
+/* Supprimer les espaces entre les rows qui causent des mouseleave */
+.places-list {
+  /* Supprimer tout espace entre les éléments */
+  font-size: 0;
+}
+
+.place-row {
+  /* Restaurer la taille de police */
+  font-size: 1rem;
+  /* S'assurer qu'il n'y a pas de marge */
+  margin: 0;
+}
+
+/* Créer une continuité visuelle entre les éléments */
+.place-row + .place-row .place-content {
+  margin-top: -1px;
+  border-top: 1px solid transparent;
+}
+
+/* ===== AMÉLIORATION DE LA ZONE GRISÉE ===== */
+.place-content.grayed-out {
+  opacity: 0.35;
+  /* Empêcher les interactions avec les éléments grisés */
+  pointer-events: none;
+}
+
+/* Mais permettre la navigation générale */
+.places-list {
+  pointer-events: auto;
+}
+
+/* ===== RESPONSIVE ET ACCESSIBILITÉ ===== */
+
+/* Pour les écrans tactiles, augmenter les zones interactives */
+@media (hover: none) and (pointer: coarse) {
+  .place-row {
+    min-height: 44px; /* Taille minimum recommandée pour le tactile */
+  }
+  
+  .place-content {
+    padding: 6px;
+  }
+  
+  .indicator {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+}
+
+/* Mode haute visibilité */
+@media (prefers-contrast: high) {
+  .place-content.person-match,
+  .place-content:hover {
+    outline: 2px solid #28a745;
+    outline-offset: -2px;
+  }
+  
+  .place-content.grayed-out {
+    opacity: 0.25;
+  }
+}
+
+/* Réduction des animations pour l'accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .indicator {
+    animation: none;
+  }
 }

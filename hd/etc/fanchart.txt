@@ -114,8 +114,7 @@
 </ul></div>
 </div>
 %if;(e.pdf!="on")
-<div class="fanchart-controls" id="controls">
-
+<div class="fanchart-controls" id="fanchart-controls">
   <div class="control-section">
     <div class="btn-group-fanchart">
       <button id="b-home" class="btn-fanchart" title="[*home]">
@@ -207,29 +206,7 @@
      %)
     </div>
 
-    <!-- Événements NBMDS ultra-compacts -->
-    <div class="event-toggles">
-      <div class="event-toggle">
-        <input type="checkbox" id="bi" title="N">
-        <label for="bi">N</label>
-      </div>
-      <div class="event-toggle" id="bal">
-        <input type="checkbox" id="ba" title="B">
-        <label for="ba">B</label>
-      </div>
-      <div class="event-toggle">
-        <input type="checkbox" id="ma" title="M">
-        <label for="ma">M</label>
-      </div>
-      <div class="event-toggle">
-        <input type="checkbox" id="de" title="D">
-        <label for="de">D</label>
-      </div>
-      <div class="event-toggle" id="bul">
-        <input type="checkbox" id="bu" title="S">
-        <label for="bu">S</label>
-      </div>
-    </div>
+
   </div>
 </div>
 <div id="container" style="position: relative;">
