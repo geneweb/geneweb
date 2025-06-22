@@ -1827,6 +1827,7 @@ sv: lägg till noteringar
 tr: not ekle
 
     add coat of arms
+de: ein Wappen hinzufügen
 en: add a coat of arms
 fr: ajouter un blason
 
@@ -4396,22 +4397,27 @@ sv: ändrade ordningen för personhändelser
 tr: bireysel etkinliklerin sırasını değiştir
 
     chk_data invisible characters
+de: Unsichtbare Zeichen
 en: Invisible characters
 fr: Caractères invisibles
 
     chk_data bad capitalization
+de: Fehlerhafte Großschreibung
 en: Bad capitalization
 fr: Capitalisation erronée
 
     chk_data multiple spaces
+de: Mehrere Leerzeichen
 en: Multiple spaces
 fr: Espaces multiples
 
     chk_data mutiples characters
+de: Mehrere Zeichen
 en: Multiple characters
 fr: Caractères multiples
 
     chk_data non-breaking spaces
+de: Geschützte Leerzeichen
 en: Non-breaking spaces
 fr: Espaces insécables
 
@@ -4667,6 +4673,7 @@ sv: en släkting
 tr: bir ebeveyn
 
     blason/blasons
+de: Wappen/Wappen
 en: coat of arms/coats of arms
 fr: blason/blasons
 
@@ -5090,6 +5097,7 @@ sv: forts
 tr: devam eden
 
     copied/copied
+de: kopiert/kopiert
 en: copied/copied
 fr: copié/copiée
 
@@ -6972,10 +6980,12 @@ sv: ta bort
 tr: sil
 
     delete coat of arms
+de: lösche das Wappen
 en: delete the coat of arms
 fr: supprimer le blason
 
     delete saved coat of arms
+de: lösche das gespeicherte Wappen
 en: delete the saved coat of arms
 fr: supprimer le blason sauvegardé
 
@@ -8197,10 +8207,12 @@ sv: utöver släktträdet
 tr: aile öyküsü
 
     family mode
+de: Familienmodus
 en: family mode
 fr: mode famille
 
     family mode-hlp
+de: SemiPublic-Status auf Familienmitglieder ausweiten (zweiter Klick deaktiviert)
 en: extend the SemiPublic status to family members (on/off toggle)
 fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
 
@@ -8666,6 +8678,7 @@ sv: för listan över sista ändringsdatum
 tr: son değişiklik tarihine göre sıralanmış liste için
 
     for url only
+de: für Bilder, die durch eine URL definiert sind
 en: for URL defined images
 fr: pour les images définies par une URL
 
@@ -9432,6 +9445,7 @@ sv: har ingen familj
 tr: eş ve çocuklar bilinmiyor
 
     help merge
+de: Bei Nichtauswahl werden die beiden Einträge verkettet
 en: if none is checked, both entries will be concatenated
 fr: en cas de non selection, les deux entrées seront concaténées
 
@@ -9508,14 +9522,17 @@ sv: dölj personbilder
 tr: portreleri gizle
 
     hiddden person
+de: versteckte Person
 en: hidden person
 fr: individu masqué
 
     hiddden first_name
+de: versteckter Vorname
 en: hidden first name
 fr: prénom masqué
 
     hiddden surname
+de: versteckter Nachname
 en: hidden surname
 fr: patronyme masqué
 
@@ -9940,6 +9957,7 @@ en: add a note for the image.
 fr: ajouter une note pour l’image.
 
     image map
+de: eine klickbare Grafik
 en: an image map
 fr: une image réactive
 
@@ -11054,14 +11072,17 @@ tr: bağlantılı resimler
 zh: 关联图像
 
     linked pages (all)
+de: Notizen, Seiten, Alben oder Gallerien, wo die Person erwähnt wird
 en: notes, pages albums or galleries where person is mentionned
 fr: notes, pages, albums ou galleries ou la personne est citée
 
     albums galleries where person appears
+de: Alben oder Gallerien, wo die Person verlinkt ist
 en: albums or galleries where person is referenced
 fr: albums ou galleries où la personne est citée
 
     pages where page appears
+de: Seiten oder Notizen, wo die Seite referenziert wird
 en: pages or notes where page is referenced
 fr: pages ou notes où la page est citée
 
@@ -11071,7 +11092,7 @@ ca: enllaços
 co: pagine ligate
 cs: spojený stránky
 da: lænkede sider
-de: verknüpfte Seiten
+de: Notizen, Seiten, Alben oder Gallerien, wo die Person verlinkt ist
 en: notes, pages, albums or galleries where person is referenced
 eo: linkitaj paĝoj
 es: páginas enlazadas
@@ -12425,6 +12446,7 @@ sv: ändra
 tr: güncelleme
 
     modify coat of arms
+de: das Wappen ändern
 en: modify the coat of arms
 fr: modifier le blason
 
@@ -12505,10 +12527,12 @@ en: modify the portrait
 fr: modifier le portrait
 
     copy portrait to blason
+de: das Portrait als Wappen verwenden
 en: use portrait as coats of arme
 fr: utiliser le portrait comme blason
 
     copy image to blason
+de: das Bild als Wappen verwenden
 en: use image as coats of arme
 fr: utiliser l'image comme blason
 
@@ -12631,6 +12655,7 @@ sv: fler än %d svar
 tr: %d cevaptan daha fazla
 
     move coat of arms to
+de: das Wappen verschieben zu/das Wappen zum ersten bekannten Vorfahren zurückführen, der es getragen hat
 en: move the coat of arms to/raise the coat of arms to first known holder who bored it
 fr: déplacer le blason vers/remonter le blason au premier ancêtre connu l’ayant porté
 
@@ -13034,6 +13059,7 @@ sv: nytt namn
 tr: yeni ad
 
     new note name
+de: Name der neuen Notiz
 en: name of the new note
 fr: nom de la nouvelle note
 
@@ -13863,6 +13889,7 @@ sv: annummer med som proband (Kekules system)
 tr: Sosa'ya göre
 
     occ
+de: Vorkommen-Zahl/Vorkommen
 en: occurence number/occurence
 fr: numéro d’occurrence/occurence
 
@@ -14338,10 +14365,12 @@ sv: eller
 tr: veya
 
     order
+de: gleiche Reihenfolge
 en: same order
 fr: même ordre
 
     order hlp
+de: die gleiche Reihenfolge behalten
 en: keep the same order
 fr: conserver le même ordre
 
@@ -14402,6 +14431,7 @@ pt: outro/outra/outro
 sv: annat/annat/annat
 
     other possibilities
+de: andere Möglichkeiten
 en: other possibilities
 fr: autres possibilités
 
@@ -14983,6 +15013,7 @@ en: previous
 fr: précédent
 
     previous coat of arms
+de: eine mögliche vorherige Version des gespeicherten Wappens wird gelöscht.
 en: a possible previous version of the saved coat of arms will be deleted.
 fr: une sauvegarde pré-existante du blason sera supprimée.
 
@@ -15786,6 +15817,7 @@ en: restore
 fr: restaurer
 
     restore coat of arms saved
+de: gespeichertes Wappen wiederherstellen
 en: restore coat of arms
 fr: restaurer le blason
 
@@ -16032,6 +16064,7 @@ sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
 
     mentions legales
+de: rechtlich
 en: legal
 fr: mentions légales
 
@@ -16051,6 +16084,7 @@ en: shortest path between this individual and the Sosa nº 1
 fr: chemin le plus court entre cet individu et le Sosa nº 1
 
     search format
+de: Suchformat
 en: search formats
 fr: formats de recherche
 
@@ -16102,34 +16136,42 @@ sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
 
     other base
+de: andere Datenbank
 en: other base
 fr: autre base
 
     hidden first_name
+de: versteckter Vorname
 en: hidden first name
 fr: prénom masqué
 
     hidden surname
+de: versteckter Nachname
 en: hidden surname
 fr: patronyme masqué
 
     hidden person
+de: versteckte Person
 en: hidden person
 fr: personne masquée
 
     not all
+de: ein Vorname
 en: one first name
 fr: un prénom
 
     not all hlp
+de: enthält nur einen Vornamen (enthält standardmäßig alle Vornamen)
 en: contains only one first name (contains all first names by default)
 fr: contient un seul prénom (contient tous les prénoms par défaut)
 
     not exact
+de: teilweise
 en: partial
 fr: partiel
 
     not exact hlp
+de: teilweise passend (standardmäßig exakt passend)
 en: partial matching (exact matching by default)
 fr: correspondance partielle (correspondance exacte par défaut)
 
@@ -16138,6 +16180,7 @@ en: access to this page is restricted
 fr: l'accès à cette page est restreint
 
     optional/mandatory
+de: optional/obligatorisch
 en: optional/mandatory
 fr: facultatif/obligatoire
 
@@ -16299,6 +16342,7 @@ sv: se bilder
 tr: resimleri görüntüle
 
     see coat of arms
+de: siehe das Wappen
 en: see the coat of arms
 fr: voir le blason
 
@@ -17399,6 +17443,7 @@ tr: bu araç üzerinde kalırken
 zh: 在此工具上停留时
 
     stop using the coat of arms of
+de: das Wappen dieser Person nicht mehr verwenden/diese Person hat aufgehört, das Wappen ihres Vorfahren zu verwenden
 en: stop using the coat of arms of/this individual stopped using his ancestor coat of arms
 fr: arrêter d’utiliser le blason de/cet individu a arrêté d’utiliser le blason de son ancêtre
 
@@ -17409,6 +17454,7 @@ en: the selected image will be copied to
 fr: l’image sélectionnée sera enregistrée dans
 
     subplace help
+de: Seien Sie vorsichtig, die Syntax von Ortsteilen ist "[Ortsteil] – Ort" mit einem Gedanken- oder Bindestrich.
 en: be carefull, the syntax of subplaces is “[subplace] – place” with a dash that can be emdash or endash.
 fr: attention, la syntaxe des sous-lieux est « [sous-lieu] – lieu » avec un tiret qui peut être cadratin ou demi-cadratin.
 
@@ -18779,7 +18825,7 @@ ca: títol/títols
 co: titulu/tituli
 cs: titul/tituly
 da: titel/titler (nob.)
-de: Titel/Titel
+de: Titel/Titel/Titel
 en: title/titles/title(s)
 eo: nobeltitolo:a:+n/nobeltitoloj:a:+n
 es: título/títulos
@@ -18804,6 +18850,7 @@ sv: titel/titlar
 tr: konu başlığı/başlıkları
 
     to
+de: zu
 en: to
 fr: vers
 
@@ -19429,6 +19476,7 @@ sv: försök ett annat beräkningssätt
 tr: başka bir hesaplama seçeneği deneyin
 
     data typographic checker
+de: Typografischer Daten-Checker
 en: Data typographic checker
 fr: Vérificateur typographique des données
 
@@ -19733,6 +19781,7 @@ sv: använd "länk" istället för "skapa"
 tr: "oluştur" yerine "bağlantı" kullanın
 
     use coat of arms of
+de: verwende das Wappen von
 en: use the coat of arms of
 fr: utilise le blason de
 
@@ -19930,10 +19979,12 @@ sv: se källa
 tr: kaynağı görüntüle
 
     visibility
+de: Sichtbarkeit
 en: visibility
 fr: visibilité
 
     visibility-hlp
+de: Hilfe zur Sichtbarkeit von Personen
 en: help for visibility of individuals
 fr: aide pour la visibilité des individus
 
@@ -20175,6 +20226,7 @@ sv: med rot, partners och okända
 tr: kök atası, eşler ve bilinmeyenler ile
 
     with spouse name
+de: mit dem Namen des Ehegatten
 en: with spouse's name
 fr: avec le nom de son conjoint
 
@@ -20333,6 +20385,7 @@ sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
 
     word/words
+de: nur ein Wort/kompletter Nachname
 en: only one word/full surname
 fr: un seul mot/patronyme complet
 
@@ -20587,5 +20640,6 @@ sv: ditt meddelande väntar på godkännande
 tr: mesajınız doğrulama için bekliyor
 
     zero-width character
+de: Dieses Zeichen mit der Breite Null wurde vergrößert, damit es sichtbar ist
 en: this zero-width character has been widened to be visible
 fr: ce caractère sans chasse a été élargi pour être visible
