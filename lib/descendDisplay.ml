@@ -1393,25 +1393,22 @@ let print_aboville conf base max_level p =
 let desmenu_print = Perso.interp_templ "desmenu"
 
 let print conf base p =
-  let templ =
-    match Util.p_getenv conf.Config.env "t" with
-    | Some ("F" | "L" | "M") -> "deslist"
-    | Some "D" -> "deslist_hr"
-    | Some "I" -> "destable"
-    | Some "V" -> "destree"
-    | Some _ -> ""
-    | _ -> "desmenu"
+  let with_menu_fallback =
+    let v = Util.p_getint conf.Config.env "v" in
+    fun display ->
+      match v with
+      | None -> desmenu_print conf base p
+      | Some v -> display conf base v p
   in
-  if templ <> "" then Perso.interp_templ templ conf base p
-  else
-    match
-      (Util.p_getenv conf.Config.env "t", Util.p_getint conf.Config.env "v")
-    with
-    | Some "A", Some v -> print_aboville conf base v p
-    | Some "S", Some v -> display_descendants_level conf base v p
-    | Some "H", Some v -> display_descendant_with_table conf base v p
-    | Some "N", Some v -> display_descendants_with_numbers conf base v p
-    | Some "G", Some v -> display_descendant_index conf base v p
-    | Some "C", Some v -> display_spouse_index conf base v p
-    | Some "T", Some v -> print_tree conf base v p
-    | _ -> desmenu_print conf base p
+  match Util.p_getenv conf.Config.env "t" with
+  | Some ("F" | "L" | "M") -> Perso.interp_templ "deslist" conf base p
+  | Some "I" -> Perso.interp_templ "destable" conf base p
+  | None -> Perso.interp_templ "desmenu" conf base p
+  | Some "A" -> with_menu_fallback print_aboville
+  | Some "S" -> with_menu_fallback display_descendants_level
+  | Some "H" -> with_menu_fallback display_descendant_with_table
+  | Some "N" -> with_menu_fallback display_descendants_with_numbers
+  | Some "G" -> with_menu_fallback display_descendant_index
+  | Some "C" -> with_menu_fallback display_spouse_index
+  | Some "T" -> with_menu_fallback print_tree
+  | Some _ -> desmenu_print conf base p
