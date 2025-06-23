@@ -59,8 +59,8 @@ const CONFIG = {
   a_r: [50, 50, 50, 50, 80, 70, 100, 150, 130, 90],
   a_m: ["S1", "C3", "C3", "C3", "R3", "R3", "R2", "R1", "R1", "R1"],
   marriage_length_thresholds: [4, 14, 24, 34, 44, 54],
-  text_reduction_factor: 0.9,
-  svg_margin: 5
+  text_reduction_factor: 1,
+  svg_margin: 4
 };
 
 let isCircularMode = false;
@@ -1446,13 +1446,14 @@ const PlacesHighlighter = {
     expandedNames: new Map(),
     currentHoveredPlace: null,
     hoverTimeout: null
+
   },
 
   /**
    * Configure un système d'événements robuste pour le surlignage
    * Utilise une approche basée sur l'état plutôt que sur les événements directs
    */
-  setupRobustEventHandlers: function() {
+  setupEventHandlers: function() {
     const placesList = document.querySelector('.places-list');
     if (!placesList) return;
 
@@ -1987,10 +1988,8 @@ const PlacesHighlighter = {
   },
 
   initialize: function() {
-    // Remplacer les anciens event listeners par le nouveau système
-    this.setupRobustEventHandlers();
-    
-    // Configurer aussi les événements pour les totaux NBMDS
+    this.setupEventHandlers()
+    // Configurer les événements pour les totaux NBMDS
     PlacesInterface.setupEventTotalHighlights();
   }
 };
@@ -3419,7 +3418,7 @@ const ModernOverflowManager = {
     // Overflow au-dessus - positionner en HAUT de la liste
     if (overflowData.above?.length > 0) {
       const aboveSection = this.createOverflowSection('above', overflowData.above);
-      aboveSection.style.top = '0px'; // ✅ FIXÉ - en haut !
+      aboveSection.style.top = '0px';
       container.appendChild(aboveSection);
       this.currentOverflowSections.push(aboveSection);
     }
@@ -3427,7 +3426,7 @@ const ModernOverflowManager = {
     // Overflow en-dessous - utiliser les classes CSS (bottom: 0)
     if (overflowData.below?.length > 0) {
       const belowSection = this.createOverflowSection('below', overflowData.below);
-      // ✅ FIXÉ - laisser le CSS gérer avec .overflow-section.below
+      // La CSS gére avec .overflow-section.below
       container.appendChild(belowSection);
       this.currentOverflowSections.push(belowSection);
     }
@@ -3989,7 +3988,7 @@ const FanchartApp = {
   initializeStandardText: function() {
     const target = renderTarget || fanchart;
     const standard = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz";
+    standard.textContent = "ABCDEFGHIJKLMNOPQRSTUVW abcdefghijklmnopqrstuvwxyz 0123456789 ’'–-?~/";
     standard.setAttribute("id", "standard");
     standard.setAttribute("x", center_x);
     standard.setAttribute("y", center_y);
@@ -3999,7 +3998,7 @@ const FanchartApp = {
     return {
       element: standard,
       width: bbox.width / standard.textContent.length,
-      height: bbox.height  // Si besoin plus tard
+      height: bbox.height // Si besoin plus tard
     };
   },
 
