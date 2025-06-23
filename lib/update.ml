@@ -127,24 +127,58 @@ let rec infer_death conf base p =
       | None -> DontKnowIfDead
       | Some ifam -> infer_death_from_parents conf base (Gwdb.foi base ifam)
 
-(*let restrict_to_small_list el =
-  let rec begin_list n rl el =
-     TODO suppress this limit
-    if n > 25 then
-      let rec end_list n sl el =
-        if n > 25 then List.rev_append rl (None :: sl)
-        else
-          match el with
-            e :: el -> end_list (n + 1) (Some e :: sl) el
-          | [] -> List.rev_append rl sl
+let infer_event_date_from_witnesses ~base witnesses =
+  let date_lower_bound, date_upper_bound =
+    let narrow_interval (date_lower_bound, date_upper_bound) witness =
+      let witness = Gwdb.poi base witness in
+      let date_lower_bound =
+        let birth = witness |> Gwdb.get_birth |> Date.od_of_cdate in
+        match (date_lower_bound, birth) with
+        | None, None -> None
+        | None, Some date | Some date, None -> Some date
+        | Some date_lower_bound, Some birth ->
+            Some
+              (if Date.compare_date date_lower_bound birth < 0 then birth
+              else date_lower_bound)
       in
-      end_list 0 [] (List.rev el)
-    else
-      match el with
-        e :: el -> begin_list (n + 1) (Some e :: rl) el
-      | [] -> List.rev rl
+      let date_upper_bound =
+        let death = witness |> Gwdb.get_death |> Date.date_of_death in
+        match (date_upper_bound, death) with
+        | None, None -> None
+        | None, Some date | Some date, None -> Some date
+        | Some date_upper_bound, Some death ->
+            Some
+              (if Date.compare_date date_upper_bound death > 0 then death
+              else date_upper_bound)
+      in
+      (date_lower_bound, date_upper_bound)
+    in
+    List.fold_left narrow_interval (None, None) witnesses
   in
-  begin_list 0 [] el*)
+  let with_upper_bound = function
+    | Date.Dtext _ as date -> date
+    | Date.Dgreg (date, calendar) ->
+        let prec =
+          let date_upper_bound =
+            date_upper_bound |> Date.cdate_of_od |> Date.cdate_to_dmy_opt
+            |> Option.map Date.dmy2_of_dmy
+          in
+          Option.fold ~none:date.Date.prec
+            ~some:(fun date_upper_bound -> Date.YearInt date_upper_bound)
+            date_upper_bound
+        in
+
+        Date.Dgreg ({ date with Date.prec }, calendar)
+  in
+  Option.map with_upper_bound date_lower_bound
+
+let infer_witness_death_from_event ~conf ~base ~date ~existing_witnesses =
+  let date =
+    match date with
+    | Some _ -> date
+    | None -> infer_event_date_from_witnesses ~base existing_witnesses
+  in
+  date |> Date.cdate_of_od |> infer_death_from_cdate conf
 
 (* ************************************************************************** *)
 (* [Fonc] print_person_parents_and_spouses :
@@ -1248,12 +1282,15 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
               (DeadDontKnowWhen, dpl)
           | Some
               {
-                ci_death = (DeadDontKnowWhen | NotDead) as dead;
+                ci_death =
+                  ( DeadDontKnowWhen | NotDead | DeadYoung | OfCourseDead
+                  | Death _ ) as dead;
                 ci_death_date = None;
                 ci_death_place = dpl;
               } ->
               (dead, dpl)
-          | Some _ | None -> (infer_death_bb conf birth baptism, "")
+          | Some { ci_death = DontKnowIfDead } | None ->
+              (infer_death_bb conf birth baptism, "")
         in
         let occupation =
           match info with

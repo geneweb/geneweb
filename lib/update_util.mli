@@ -25,3 +25,10 @@ val str_val : string -> _ TemplAst.expr_val
 val safe_val : Adef.safe_string -> _ TemplAst.expr_val
 val eval_default_var : Config.config -> string -> _ TemplAst.expr_val
 val eval_date_var : Date.date option -> string -> _ TemplAst.expr_val
+
+val witnesses_with_inferred_death_from_event :
+  conf:Config.config ->
+  base:Gwdb.base ->
+  date:Date.date option ->
+  (Update.key * Def.witness_kind * string) list ->
+  (Update.key * Def.witness_kind * string) list
