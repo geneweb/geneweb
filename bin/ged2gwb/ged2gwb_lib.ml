@@ -1133,7 +1133,7 @@ let treat_notes gen rl =
          else if n = "" then ()
          else
            begin
-             Buffer.add_string buf (if spc then "\n" else "");
+             Buffer.add_string buf (if spc then " " else "");
              Buffer.add_string buf n;
              Buffer.add_string buf (if end_spc then " " else "")
            end)
