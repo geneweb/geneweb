@@ -189,8 +189,7 @@ let print_birth_day conf base day_name fphrase wd dt list =
       let open Def in
       Output.printf conf fphrase
         (Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
-         ^<^ ",\n"
-         ^<^ Util.std_color conf ("<b>" ^<^ txt ^>^ "</b>")
+         ^<^ ",\n" ^<^ "<b>" ^<^ txt ^>^ "</b>"
           : Adef.safe_string
           :> string)
         (Util.transl conf "the birthday");
@@ -261,8 +260,7 @@ let print_anniv conf base day_name fphrase wd dt = function
       let open Def in
       Output.printf conf fphrase
         (Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
-         ^<^ ",\n"
-         ^<^ Util.std_color conf ("<b>" ^<^ txt ^>^ "</b>")
+         ^<^ ",\n" ^<^ "<b>" ^<^ txt ^>^ "</b>"
           : Adef.safe_string
           :> string)
         (Util.transl conf "the anniversary");
@@ -356,14 +354,13 @@ let print_marriage_day conf base day_name fphrase wd dt = function
       Output.printf conf fphrase
         (Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
          ^<^ ",\n"
-         ^<^ Util.std_color conf
-               ("<b>"
-                ^ Util.transl_decline conf "on (weekday day month year)"
-                    (Util.transl_nth conf "(week day)" wd
-                    ^ " "
-                    ^ DateDisplay.code_dmy conf dt)
-                ^ "</b>"
-               |> Adef.safe)
+         ^<^ ("<b>"
+              ^ Util.transl_decline conf "on (weekday day month year)"
+                  (Util.transl_nth conf "(week day)" wd
+                  ^ " "
+                  ^ DateDisplay.code_dmy conf dt)
+              ^ "</b>"
+             |> Adef.safe)
           : Adef.safe_string
           :> string)
         (Util.transl conf "the anniversary of marriage");

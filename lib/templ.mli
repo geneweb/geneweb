@@ -25,7 +25,6 @@ type ('a, 'b) interp_fun = {
     unit;
 }
 
-val print_copyright : Config.config -> unit
 val include_hed_trl : Config.config -> string -> unit
 
 val interp_ast :

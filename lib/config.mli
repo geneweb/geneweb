@@ -58,7 +58,6 @@ type config = {
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;
-  highlight : string;
   lang : string;
   default_lang : string;
   default_sosa_ref : Gwdb.iper * Gwdb.person option;

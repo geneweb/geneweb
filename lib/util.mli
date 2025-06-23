@@ -233,10 +233,6 @@ val transl_a_of_b : Config.config -> string -> string -> string -> string
 val transl_a_of_gr_eq_gen_lev :
   Config.config -> string -> string -> string -> string
 
-val std_color : Config.config -> Adef.safe_string -> Adef.safe_string
-(** Colorise HTML element with [conf.highlight] color
-    (wrap text in <span> with inline style). *)
-
 val index_of_sex : Def.sex -> int
 (** Sex index used in translations (0 for male, 1 for female, 2 for neuter) *)
 

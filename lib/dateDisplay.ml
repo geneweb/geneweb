@@ -649,8 +649,7 @@ let short_marriage_date_text conf base fam p1 p2 =
   @@
   if Person.is_visible conf base p1 && Person.is_visible conf base p2 then
     match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
-    | Some d ->
-        "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
+    | Some d -> prec_year_text conf d
     | None -> ""
   else ""
 
