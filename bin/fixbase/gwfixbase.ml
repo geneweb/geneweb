@@ -1,6 +1,45 @@
 open Geneweb
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module Collection = Geneweb_db.Collection
+
+let i = ref 0
+let nb_ind_init = ref 0
+
+let dump_persons bname ofile =
+  Driver.with_database bname @@ fun base ->
+  let nb_ind = Driver.nb_of_persons base in
+  let nb_fam = Driver.nb_of_families base in
+  let undef = ref 0 in
+  let result =
+    Collection.fold
+      (fun acc p ->
+        let designation = Gutil.designation base p in
+        let head =
+          String.sub designation 0 (min 3 (String.length designation))
+          |> Name.lower
+        in
+        if designation <> "?.0 ?" then (head, designation) :: acc
+        else (
+          incr undef;
+          acc))
+      [] (Driver.persons base)
+    |> List.sort (fun (h1, _) (h2, _) -> String.compare h1 h2)
+  in
+  let oc = if ofile <> "" then Some (open_out ofile) else None in
+  List.iter
+    (fun (_, d) ->
+      match oc with
+      | Some oc -> output_string oc (d ^ "\n")
+      | None -> print_endline d)
+    result;
+  let real_count = List.length result in
+  let check = real_count + !undef in
+  Printf.eprintf "Base %s\n" bname;
+  Printf.eprintf "Final state: %d persons (initial value %d), %d families\n"
+    nb_ind !nb_ind_init nb_fam;
+  Printf.eprintf "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n"
+    real_count !undef real_count !undef check !nb_ind_init
 
 let aux txt
     (fn :
@@ -114,14 +153,13 @@ let fix_utf8_sequence =
 
 let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
 
-let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
+let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key bname =
+    ~invalid_utf8 ~key =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
-  Driver.with_database bname @@ fun base ->
   let fix = ref 0 in
   let nb_fam = Driver.nb_of_families base in
   let nb_ind = Driver.nb_of_persons base in
@@ -155,7 +193,7 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
       flush stdout);
     Driver.sync base;
     if v1 then (
-      Printf.printf "Done";
+      Printf.printf "Done\n";
       flush stdout))
 
 (**/**)
@@ -175,6 +213,8 @@ let invalid_utf8 = ref false
 let key = ref false
 let index = ref false
 let dry_run = ref false
+let dump = ref false
+let ofile = ref ""
 
 let speclist =
   [
@@ -191,6 +231,8 @@ let speclist =
     ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
     ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
     ("-person-key", Arg.Set key, " missing doc");
+    ("-dump", Arg.Set dump, " dump list of persons");
+    ("-o", Arg.String (fun x -> ofile := x), " dump list of persons in ofile");
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enabled by any other option." );
@@ -212,6 +254,15 @@ let main () =
     Format.eprintf "%a@." Lock.pp_exception (exn, bt);
     exit 2
   in
+  Driver.with_database !bname @@ fun base ->
+  let nb_fam = Driver.nb_of_families base in
+  let nb_ind = Driver.nb_of_persons base in
+  let nb_real_ind = Driver.nb_of_real_persons base in
+  nb_ind_init := nb_ind;
+  Printf.eprintf "GwFixbase for base %s\n" !bname;
+  Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
+    nb_ind nb_real_ind nb_fam;
+
   Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
   if
     !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
@@ -229,8 +280,9 @@ let main () =
     p_NBDS := true;
     invalid_utf8 := true;
     key := true);
-  check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
+  check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
     ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key !bname
+    ~invalid_utf8 ~key;
+  if !dump then dump_persons !bname !ofile
 
 let _ = main ()
