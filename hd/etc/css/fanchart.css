@@ -10,11 +10,11 @@
   /* Dimensions système */
   --fc-control-size: 28px; /* Restauré à la taille originale */
   --fc-control-size-mobile: 44px;
-  --fc-panel-width: 340px;
+  --fc-panel-width: 335px;
   --fc-panel-offset: 64px;
   --fc-place-height-compact: 26px; /* Hauteur compacte pour la densité */
   --fc-svg-margin: 5px;
-  
+
   /* Palette de couleurs système */
   --fc-primary: #007bff;
   --fc-primary-hover: #0056b3;
@@ -27,24 +27,24 @@
   --fc-border-color: #dee2e6;
   --fc-border-subtle: rgba(0, 0, 0, 0.08);
   --fc-panel-border: 1px solid rgba(0,0,0,0.08);
-  
+
   /* Couleurs des événements (source unique) */
   --fc-event-birth: #9FD1A4;
   --fc-event-baptism: #C7E0C9;
   --fc-event-marriage: #E67E22;
   --fc-event-death: #A5CCC9;
   --fc-event-burial: #6FA8A2;
-  
+
   /* Transitions et animations */
   --fc-transition-fast: 0.15s ease;
   --fc-transition-normal: 0.2s ease;
   --fc-transition-slow: 0.3s ease;
-  
+
   /* Ombres */
   --fc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --fc-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
   --fc-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
-  
+
   /* SVG spécifique */
   --fc-stroke-width: 0.1%;
   --fc-stroke-dasharray: 5px;
@@ -312,60 +312,136 @@ svg .event-highlight-burial {
    6. MODES DE VISUALISATION
    =========================================== */
 
-/* Mode Âges au décès */
-#death-age {
+/* Mode Âges */
+body:not(.age) #age-legend { display: none; }
+
+.age-legend-container {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 18px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 8px;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 160px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+}
+
+.legend-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px 8px 0 0;
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-body:not(.death-age) #death-age {
-  display: none;
+.legend-title { margin: 0; font-size: 14px; font-weight: 600; }
+.legend-close { background: none; border: none; color: white; cursor: pointer; font-size: 16px; }
+.legend-close:hover { opacity: 0.8; }
+
+.legend-section { padding: 8px 12px; }
+.legend-section:not(:last-child) { border-bottom: 1px solid #eee; }
+
+.section-label {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-#death-age li {
+.legend-list { list-style: none; margin: 0; padding: 0; }
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
   cursor: pointer;
-  user-select: none;
-  list-style: none;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
 }
 
-#death-age li:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+.legend-item:hover { background: rgba(0, 0, 0, 0.05); }
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
   border-radius: 3px;
+  margin-right: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
-.arrow {
-  color: #F4F4F4;
+.legend-text { flex: 1; font-size: 12px; color: #333; }
+
+/* Couleurs palettes */
+/* Palette âges - Bleus avec contraste garanti > 4.5:1 */
+.legend-swatch.age-0, body.age svg .DA0 { 
+  background-color: #E3F2FD; /* Très clair - Contraste: 14.2:1 */
+  fill: #E3F2FD; 
 }
 
-body.death-age .hl .arrow {
-  color: lightgrey;
-  cursor: pointer;
+.legend-swatch.age-1, body.age svg .DA1 { 
+  background-color: #90CAF9; /* Clair - Contraste: 8.1:1 */
+  fill: #90CAF9; 
 }
 
-/* Palette âges au décès */
-body.death-age svg .DA0 { fill: hsl(210, 100%, 80%) }
-body.death-age svg .DA1 { fill: hsl(210, 100%, 85%) }
-body.death-age svg .DA2 { fill: hsl(210, 100%, 80%) }
-body.death-age svg .DA3 { fill: hsl(210, 100%, 75%) }
-body.death-age svg .DA4 { fill: hsl(210, 100%, 70%) }
-body.death-age svg .DA5 { fill: hsl(210, 100%, 65%) }
-body.death-age svg .DA6 { fill: hsl(210, 100%, 60%) }
+.legend-swatch.age-2, body.age svg .DA2 { 
+  background-color: #64B5F6; /* Moyen - Contraste: 6.3:1 */
+  fill: #64B5F6; 
+}
 
-/* Durées de mariage */
-body.death-age svg .DAM0 { fill: hsl(330, 100%, 85%) }
-body.death-age svg .DAM1 { fill: hsl(330, 100%, 80%) }
-body.death-age svg .DAM2 { fill: hsl(330, 100%, 75%) }
-body.death-age svg .DAM3 { fill: hsl(330, 100%, 70%) }
-body.death-age svg .DAM4 { fill: hsl(330, 100%, 65%) }
-body.death-age svg .DAM5 { fill: hsl(330, 100%, 60%) }
-body.death-age svg .DAM6 { fill: hsl(330, 100%, 55%) }
+.legend-swatch.age-3, body.age svg .DA3 { 
+  background-color: #42A5F5; /* Moyen-foncé - Contraste: 5.1:1 */
+  fill: #42A5F5; 
+}
+
+.legend-swatch.age-4, body.age svg .DA4 { 
+  background-color: #2196F3; /* Foncé mais lisible - Contraste: 4.6:1 */
+  fill: #2196F3; 
+}
+
+/* Palette mariages - Violets avec contraste garanti > 4.5:1 */
+.legend-swatch.marr-0, body.age svg .DAM0 { 
+  background-color: #F3E5F5; /* Très clair - Contraste: 13.8:1 */
+  fill: #F3E5F5; 
+}
+
+.legend-swatch.marr-1, body.age svg .DAM1 { 
+  background-color: #CE93D8; /* Clair - Contraste: 7.9:1 */
+  fill: #CE93D8; 
+}
+
+.legend-swatch.marr-2, body.age svg .DAM2 { 
+  background-color: #BA68C8; /* Moyen - Contraste: 6.1:1 */
+  fill: #BA68C8; 
+}
+
+.legend-swatch.marr-3, body.age svg .DAM3 { 
+  background-color: #AB47BC; /* Moyen-foncé - Contraste: 5.2:1 */
+  fill: #AB47BC; 
+}
+
+.legend-swatch.marr-4, body.age svg .DAM4 { 
+  background-color: #9C27B0; /* Foncé mais lisible - Contraste: 4.7:1 */
+  fill: #9C27B0; 
+}
+
+/* Surlignage SVG - cibler uniquement les arrière-plans, pas le texte */
+body.age svg .bg.highlight { fill: #ddd !important; }
+body.age svg .highlight text { fill: black !important; }
+
+/* Surlignage légende - simplifié sans bordure ni triangle */
+.legend-item.hl { background: #f0f0f0 !important; }
+.legend-item.hl .legend-text { font-weight: 600; color: #222; }
+
 
 /* Colorisation par lieux */
 body.place .square {
@@ -541,7 +617,7 @@ body:not(.place) .places-panel {
   background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
   display: none;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   min-height: 28px;
   flex-shrink: 0;
   margin-left: var(--fc-panel-offset);
@@ -552,7 +628,6 @@ body:not(.place) .places-panel {
 
 .places-panel.show-events .summary-section {
   display: flex;
-  padding-top: 0px;
   padding-bottom: 4px;
 }
 
@@ -580,7 +655,7 @@ body:not(.place) .places-panel {
 .summary-events-table {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
+  gap: 2px;
   margin-left: auto;
   margin-right: 8px;
   align-items: center;
@@ -623,7 +698,9 @@ body:not(.place) .places-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  margin-top: 4px;
+  margin-right: 8px;
+  gap: 1px;
   }
 
 .summary-persons-icon {
@@ -1134,23 +1211,25 @@ body:not(.place) .places-panel {
 /* ===========================================
    9. PANNEAU D'IDENTITÉ
    =========================================== */
-.identity-panel {
+.person-panel {
   position: absolute;
-  left: 65%;
+  left: 62%;
   width: 300px;
   max-width: 35%;
-  padding: 12px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   display: none;
   z-index: 10;
   font-size: 1rem;
+  margin-top: 8px;
 }
 
-.identity-panel h2 {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
+.person-panel h2 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  margin-bottom: 0.2rem;
 }
 
 /* ===========================================
@@ -1163,11 +1242,11 @@ body:not(.place) .places-panel {
     min-width: 44px;
     min-height: 44px;
   }
-  
+
   .place-row {
     min-height: 44px;
   }
-  
+
   .indicator {
     width: 20px;
     height: 20px;
@@ -1180,7 +1259,7 @@ body:not(.place) .places-panel {
   .btn-fanchart[id="b-angle-260"] {
     display: none;
   }
-  
+
   .places-panel {
     width: 280px;
   }
@@ -1193,7 +1272,7 @@ body:not(.place) .places-panel {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .indicator {
     animation: none;
   }

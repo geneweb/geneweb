@@ -105,7 +105,7 @@ const DOMCache = {
   // Pré-charger les éléments fréquemment utilisés
   preload: function() {
     // Boutons fréquemment utilisés
-    ["b-death-age", "b-places-colorise", "b-sort-places"].forEach(id => {
+    ["b-age", "b-places-colorise", "b-sort-places"].forEach(id => {
       this.getElementById(id);
     });
     // s indicateurs d'âge et de mariage
@@ -454,31 +454,33 @@ const URLManager = {
 
       if (implexMode === 'numbered') params.push('implex=num');
       else if (implexMode === 'full') params.push('implex=full');
-
-      // ❌ SUPPRIMÉ : Paramètres ba/bu inutiles
-      // if (has_ba) params.push('ba=on');
-      // if (has_bu) params.push('bu=on');
     }
   }
 };
 
 // ========== Utilitaires généraux ==========
 const Utils = {
-  calculateAgeCategory: function(age) {
-    const boundaries = [30, 45, 60, 75, 90, 105, Infinity];
-    const category = boundaries.findIndex(boundary => age < boundary);
-    return Math.min(category, 6);
+  ageCategory: function(age) {
+    const numericAge = parseInt(age);
+    if (isNaN(numericAge) || numericAge <= 0) return null;
+    
+    const boundaries = [40, 55, 70, 85, Infinity];
+    const category = boundaries.findIndex(boundary => numericAge < boundary);
+    return Math.min(category, 4);
   },
 
-  deathAgeClass: function(age) {
-    return "DA" + this.calculateAgeCategory(age);
+  ageClass: function(age) {
+    const category = this.ageCategory(age);
+    return category !== null ? "DA" + category : "";
   },
 
   marriageLengthClass: function(length) {
     const years = parseInt(length);
     if (isNaN(years) || years < 0) return "";
-    const index = CONFIG.marriage_length_thresholds.findIndex(threshold => years <= threshold);
-    return index === -1 ? "DAM6" : `DAM${index}`;
+    
+    const thresholds = [10, 25, 40, 55];
+    const index = thresholds.findIndex(threshold => years < threshold);
+    return index === -1 ? "DAM4" : `DAM${index}`;
   },
 
   relativeLuminance: function(color) {
@@ -1161,7 +1163,7 @@ const PlacesInterface = {
       if (placeContent) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (e.ctrlKey || e.metaKey) {
           const placeName = placeContent.dataset.place;
           if (placeName && URLManager.navigateToPlace) {
@@ -1462,22 +1464,22 @@ const PlacesHighlighter = {
     placesList.addEventListener('mousemove', (e) => {
       // Trouver le place-row le plus proche
       const placeRow = e.target.closest('.place-row');
-      
+
       if (placeRow) {
         const placeContent = placeRow.querySelector('.place-content');
         if (placeContent) {
           const placeName = placeContent.dataset.place;
-          
+
           // Si on est déjà sur ce lieu, ne rien faire
           if (this.state.currentHoveredPlace === placeName) {
             return;
           }
-          
+
           // Si on était sur un autre lieu, le nettoyer d'abord
           if (this.state.currentHoveredPlace && this.state.currentHoveredPlace !== placeName) {
             this.clearHighlightForPlace(this.state.currentHoveredPlace);
           }
-          
+
           // Appliquer le nouveau surlignage
           this.state.currentHoveredPlace = placeName;
           this.highlightPlace(placeName, 'list');
@@ -1516,7 +1518,7 @@ const PlacesHighlighter = {
     // Nettoyer le surlignage visuel
     if (placeData.domElement) {
       placeData.domElement.classList.remove('person-match');
-      
+
       // Restaurer la hauteur minimale
       const placeRow = placeData.domElement.closest('.place-row');
       if (placeRow) {
@@ -1626,7 +1628,7 @@ const PlacesHighlighter = {
 
     // Préparer le conteneur pour recevoir les indicateurs
     container.style.visibility = 'hidden'; // Masquer temporairement
-    
+
     // Ajouter les indicateurs
     const indicators = [];
     events.forEach((event, index) => {
@@ -1655,7 +1657,7 @@ const PlacesHighlighter = {
       container.style.visibility = 'visible';
       container.style.opacity = '0';
       container.style.transition = 'opacity 0.1s ease-in';
-      
+
       requestAnimationFrame(() => {
         container.style.opacity = '1';
       });
@@ -2199,8 +2201,8 @@ const SVGRenderer = {
       if (p.burial_place && lieux[p.burial_place]) {
         classes.push(`bu-${lieux[p.burial_place].c}`);
       }
-      if (p.death_age) {
-        classes.push(Utils.deathAgeClass(p.death_age));
+      if (p.age) {
+        classes.push(Utils.ageClass(p.age));
       }
 
       circle.setAttribute("class", classes.join(' '));
@@ -2208,10 +2210,7 @@ const SVGRenderer = {
       circle.setAttribute("class", "link");
 
       const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-      const age = (p.death_age && p.death_age !== "" && !isNaN(parseInt(p.death_age)))
-        ? ` (${p.death_age} ans)`
-        : "";
-      title.textContent = `(Sosa 1) ${p.fn} ${p.sn}${age}\nCtrl+clic pour la fiche individuelle`;
+      title.textContent = `(Sosa 1) ${p.fn} ${p.sn} (${p.age_text})\nCtrl+clic pour la fiche individuelle`;
       circle.appendChild(title);
 
       circle.onclick = (e) => this.handleClick(e, p);
@@ -2290,7 +2289,7 @@ const SVGRenderer = {
         }
       });
 
-      if (p.death_age) classes.push(Utils.deathAgeClass(p.death_age));
+      if (p.age) classes.push(Utils.ageClass(p.age));
 
     } else if (type === 'marriage') {
       // Pour les secteurs de mariage, traiter directement
@@ -2312,7 +2311,7 @@ const SVGRenderer = {
     if (!p || (p.fn === "?" || (!p.fn && !p.sosasame && type !== 'marriage'))) return;
 
     element.setAttribute("class", "link");
-    
+
     element.addEventListener("click", (e) => {
       e.stopPropagation();
       this.handleClick(e, p);
@@ -2320,17 +2319,17 @@ const SVGRenderer = {
 
     element.addEventListener("mouseenter", (e) => {
       e.stopPropagation();
-      
+
       // 1. Panneau d'information
       const panel = document.getElementById("person-panel");
       if (panel) {
         this.buildTooltipContent(panel, p, type);
         panel.style.display = "block";
       }
-      
+
       // 2. Surlignage du secteur
       element.classList.add('highlight');
-      
+
       // 3. Surlignage du fond correspondant
       const parentGroup = element.parentNode;
       if (parentGroup) {
@@ -2352,11 +2351,11 @@ const SVGRenderer = {
           }
         }
       }
-      
+
       // 4. Surlignage dans la liste des lieux (uniquement si lieu présent)
       if (PlacesHighlighter && document.body.classList.contains('place')) {
         const placesMap = new Map();
-        
+
         if (type === 'person') {
           Events.types.forEach(eventType => {
             if (eventType === 'marriage') return;
@@ -2372,7 +2371,7 @@ const SVGRenderer = {
           // ✅ CORRECTION : Ajouter à la map seulement si lieu présent
           placesMap.set(p.marriage_place, ['marriage']);
         }
-        
+
         if (placesMap.size > 0) {
           const places = Array.from(placesMap.keys());
           const events = Array.from(placesMap.values());
@@ -2383,17 +2382,17 @@ const SVGRenderer = {
 
     element.addEventListener("mouseleave", (e) => {
       e.stopPropagation();
-      
+
       // Nettoyage identique pour tous les types
       const panel = document.getElementById("person-panel");
       if (panel) {
         panel.style.display = "none";
         panel.innerHTML = "";
       }
-      
+
       element.classList.remove('highlight');
       element.classList.remove('event-highlight-marriage');
-      
+
       const parentGroup = element.parentNode;
       if (parentGroup) {
         const bgElements = parentGroup.querySelectorAll('.bg.highlight, .bg.event-highlight-marriage');
@@ -2402,7 +2401,7 @@ const SVGRenderer = {
           bg.classList.remove('event-highlight-marriage');
         });
       }
-      
+
       if (PlacesHighlighter && PlacesHighlighter.clearAllHighlights) {
         PlacesHighlighter.clearAllHighlights();
       }
@@ -2410,11 +2409,11 @@ const SVGRenderer = {
   },
 
   buildTooltipContent: function(panel, p, type) {
-    panel.className = 'identity-panel';
+    panel.className = 'person-panel';
 
     if (type === "person") {
       let html = `<h2>${p.fn} ${p.sn}</h2>`;
-      
+
       // Utiliser les dates détaillées si disponibles
       if (p.birth_date || p.birth_place) {
         html += `<div><strong>Naissance :</strong> `;
@@ -2422,14 +2421,14 @@ const SVGRenderer = {
         if (p.birth_place) html += ` – ${p.birth_place}`;
         html += `</div>`;
       }
-      
+
       if (p.baptism_date || p.baptism_place) {
         html += `<div><strong>Baptême :</strong> `;
         if (p.baptism_date) html += `${p.baptism_date}`;
         if (p.baptism_place) html += ` – ${p.baptism_place}`;
         html += `</div>`;
       }
-      
+
       if (p.death_date || p.death_place) {
         html += `<div><strong>Décès :</strong> `;
         if (p.death_date) html += `${p.death_date}`;
@@ -2442,35 +2441,35 @@ const SVGRenderer = {
         if (p.burial_place) html += ` – ${p.burial_place}`;
         html += `</div>`;
       }
-      if (p.death_age && !isNaN(parseInt(p.death_age))) {
-        html += `<strong>Âge :</strong> ${p.death_age}`;
+      if (p.age_text) {
+        html += `<strong>Âge :</strong> ${p.age_text}`;
         html += `</div>`;
       }
 
       panel.innerHTML = html;
-      
+
     } else if (type === "marriage") {
       const years = parseInt(p.marriage_length) || -1;
       let html = `<h2>Mariage</h2>`;
-      
+
       // Utiliser marriage_date_ (format détaillé) si disponible, sinon marriage_date
       const marriageDate = p.marriage_date_ || p.marriage_date;
       if (marriageDate) {
         html += `<div><strong>Date :</strong> ${marriageDate}</div>`;
       }
-      
+
       if (p.marriage_place) {
         html += `<div><strong>Lieu :</strong> ${p.marriage_place}</div>`;
       }
-      
+
       if (years >= 0) {
         html += `<div><strong>Durée :</strong> ${years} ${years === 1 ? "an" : "ans"}</div>`;
       }
-      
+
       if (p.marriage_age) {
-        html += `<div><strong>Âge au mariage :</strong> ${p.marriage_age} ans</div>`;
+        html += `<div><strong>Âge au mariage (!TO RM) :</strong> ${p.marriage_age} ans</div>`;
       }
-      
+
       panel.innerHTML = html;
     }
   },
@@ -2514,44 +2513,31 @@ const SVGRenderer = {
       this.buildTooltipContent(panel, p, type);
         panel.style.display = "block";
     }
-    if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
-        const placesToHighlight = [];
-        const eventsToHighlight = [];
 
-        if (type === 'marriage' && p.marriage_place) {
-            placesToHighlight.push(p.marriage_place);
-            eventsToHighlight.push(['marriage']);
-        } else if (type === 'person') {
-            Events.types.forEach(eventType => {
-                if (eventType === 'marriage') return; // Esquiver marriage
-                const placeField = Events.place(eventType);
-                if (p[placeField]) {
-                    placesToHighlight.push(p[placeField]);
-                    eventsToHighlight.push([eventType]);
-                }
-            });
-        }
+    if (document.body.classList.contains('age')) {
+      AgeHighlighter.handleSVGHover(p, type, 'enter');
+    } else if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
+          const placesToHighlight = [];
+          const eventsToHighlight = [];
 
-        if (placesToHighlight.length > 0) {
-          PlacesHighlighter.highlight(placesToHighlight, eventsToHighlight, 'svg');
-        }
+          if (type === 'marriage' && p.marriage_place) {
+              placesToHighlight.push(p.marriage_place);
+              eventsToHighlight.push(['marriage']);
+          } else if (type === 'person') {
+              Events.types.forEach(eventType => {
+                  if (eventType === 'marriage') return; // Esquiver marriage
+                  const placeField = Events.place(eventType);
+                  if (p[placeField]) {
+                      placesToHighlight.push(p[placeField]);
+                      eventsToHighlight.push([eventType]);
+                  }
+              });
+          }
+
+          if (placesToHighlight.length > 0) {
+            PlacesHighlighter.highlight(placesToHighlight, eventsToHighlight, 'svg');
+          }
     }
-
-    // Gestion spécifique par type
-if (document.body.classList.contains('death-age') && type === 'person') {
-  if (p.death_age) {
-    const ageClass = Utils.deathAgeClass(p.death_age);
-    const ageEl = document.getElementById(ageClass);
-    if (ageEl) {
-      ageEl.classList.add("hl");
-      const arrow = ageEl.querySelector('.arrow');
-      if (arrow) {
-        arrow.style.color = '#666';
-        arrow.style.transform = 'scale(1.2)';
-      }
-    }
-  }
-}
 
     // Gestion des implexes
     if (p.sosasame) {
@@ -2570,19 +2556,8 @@ if (document.body.classList.contains('death-age') && type === 'person') {
     if (document.body.classList.contains('place')) {
       PlacesHighlighter.clearAllHighlights();
     }
-
-    // Correction pour death-age
-    if (document.body.classList.contains('death-age')) {
-      if (type === 'person' && p.death_age) {
-        const ageEl = DOMCache.getElementById(Utils.deathAgeClass(p.death_age));
-        if (ageEl) ageEl.classList.remove("hl");
-      } else if (type === 'marriage' && p.marriage_length) {
-        const marriageClass = Utils.marriageLengthClass(p.marriage_length);
-        if (marriageClass) {
-          const marriageEl = document.getElementById(marriageClass);
-          if (marriageEl) marriageEl.classList.remove("hl");
-        }
-      }
+    else if (document.body.classList.contains('age')) {
+      AgeHighlighter.clearAllHighlights();
     }
 
     // Gestion des implexes
@@ -2995,7 +2970,7 @@ const ColorManager = {
 
   setColorMode: function(newMode) {
     // Nettoyer l'état précédent
-    document.body.classList.remove('place', 'death-age');
+    document.body.classList.remove('place', 'age');
 
 
     // Désactiver tous les toggles NMBDS
@@ -3012,9 +2987,9 @@ const ColorManager = {
       const maCheckbox = document.getElementById("ma");
       if (maCheckbox) maCheckbox.checked = true;
       this.applyColorization();
-    } else if (newMode === 'death-age') {
-      document.body.className = "death-age";
-      tool = "death-age";
+    } else if (newMode === 'age') {
+      document.body.className = "age";
+      tool = "age";
     } else {
       document.body.className = "";
       tool = "";
@@ -3048,11 +3023,11 @@ const ColorManager = {
 
   updateButtonStates: function() {
     // Tous les boutons utilisent la même classe .active
-    const ageButton = document.getElementById("b-death-age");
+    const ageButton = document.getElementById("b-age");
     const placesButton = document.getElementById("b-places-colorise");
     const sortButton = document.getElementById("b-sort-places");
 
-    if (ageButton) ageButton.classList.toggle("active", tool === "death-age");
+    if (ageButton) ageButton.classList.toggle("active", tool === "age");
     if (placesButton) placesButton.classList.toggle("active", tool === "place");
     if (sortButton) sortButton.classList.toggle("active", sortMode === "alphabetical");
   },
@@ -3097,8 +3072,8 @@ const ColorManager = {
         tool = "place";
         this.classList.add("active");
 
-        // Désactiver death-age si actif
-        const ageButton = document.getElementById("b-death-age");
+        // Désactiver age si actif
+        const ageButton = document.getElementById("b-age");
         if (ageButton) ageButton.classList.remove("active");
       }
 
@@ -3109,8 +3084,8 @@ const ColorManager = {
     };
 
     // Bouton âges (exclusion mutuelle)
-    document.getElementById("b-death-age").onclick = function() {
-      const isActive = document.body.classList.contains("death-age");
+    document.getElementById("b-age").onclick = function() {
+      const isActive = document.body.classList.contains("age");
 
       if (isActive) {
         // Désactiver complètement
@@ -3118,8 +3093,8 @@ const ColorManager = {
         tool = "";
         this.classList.remove("active");
       } else {
-        document.body.className = "death-age";
-        tool = "death-age";
+        document.body.className = "age";
+        tool = "age";
         this.classList.add("active");
 
         // Désactiver colorisation lieux si active
@@ -3132,33 +3107,91 @@ const ColorManager = {
   }
 };
 
-const LegendManager = {
-  initializeLegendEvents: function(ids) {
-    ids.forEach(function(id) {
-      var element = document.getElementById(id);
-      if (!element) return;
+const AgeHighlighter = {
+  currentHighlight: null,
 
-      element.onmouseenter = function() {
-        var elements = document.getElementsByClassName(id);
-        for (var i = 0; i < elements.length; i++) {
-          elements[i].classList.add("highlight");
-        }
-        document.getElementById(id).classList.add("hl");
+  initialize: function() {
+    const closeBtn = document.querySelector('.legend-close');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        document.getElementById('age-legend').style.display = 'none';
+        document.body.classList.remove('age');
+        if (typeof tool !== 'undefined') tool = '';
+        this.clearAllHighlights();
       };
+    }
 
-      element.onmouseleave = function() {
-        var elements = document.getElementsByClassName(id);
-        for (var i = 0; i < elements.length; i++) {
-          elements[i].classList.remove("highlight");
-        }
-        document.getElementById(id).classList.remove("hl");
-      };
+    const container = document.getElementById('age-legend');
+    if (container) {
+      container.addEventListener('mouseenter', this.handleLegendEnter.bind(this), true);
+      container.addEventListener('mouseleave', this.handleLegendLeave.bind(this), true);
+    }
+  },
+
+  handleLegendEnter: function(e) {
+    const legendItem = e.target.closest('.legend-item');
+    if (!legendItem || !legendItem.id) return;
+    this.setHighlight(legendItem.id);
+  },
+
+  handleLegendLeave: function(e) {
+    if (!e.relatedTarget || !document.getElementById('age-legend').contains(e.relatedTarget)) {
+      this.clearAllHighlights();
+    }
+  },
+
+  // Nouvelle méthode centralisée pour gérer les interactions SVG
+  handleSVGHover: function(person, type, action) {
+    if (action === 'enter') {
+      this.handleSVGEnter(person, type);
+    } else if (action === 'leave') {
+      this.clearAllHighlights();
+    }
+  },
+
+  handleSVGEnter: function(person, type) {
+    this.clearAllHighlights();
+
+    let ageClassToHighlight = null;
+
+    if (type === 'person' && person.age) {
+      ageClassToHighlight = Utils.ageClass(person.age);
+    } else if (type === 'marriage' && person.marriage_length) {
+      ageClassToHighlight = Utils.marriageLengthClass(person.marriage_length);
+    }
+
+    if (ageClassToHighlight) {
+      this.setHighlight(ageClassToHighlight);
+    }
+  },
+
+  setHighlight: function(legendId) {
+    this.clearAllHighlights();
+    this.currentHighlight = legendId;
+
+    requestAnimationFrame(() => {
+      const legendItem = document.getElementById(legendId);
+      if (legendItem) {
+        legendItem.classList.add('hl');
+      }
+
+      const svgElements = document.getElementsByClassName(legendId);
+      for (let i = 0; i < svgElements.length; i++) {
+        svgElements[i].classList.add('highlight');
+      }
     });
   },
 
-  initializeAllEvents: function() {
-    this.initializeLegendEvents(["DA0", "DA1", "DA2", "DA3", "DA4", "DA5", "DA6"]);
-    this.initializeLegendEvents(["DAM0", "DAM1", "DAM2", "DAM3", "DAM4", "DAM5", "DAM6", "DAM7"]);
+  clearAllHighlights: function() {
+    document.querySelectorAll('.legend-item.hl').forEach(item => {
+      item.classList.remove('hl');
+    });
+
+    document.querySelectorAll('svg .highlight').forEach(element => {
+      element.classList.remove('highlight');
+    });
+
+    this.currentHighlight = null;
   }
 };
 
@@ -3620,7 +3653,9 @@ const FanchartApp = {
     this.initializeEvents();
     this.initializeAngleEvents();
     ColorManager.initializeColorEvents();
-    LegendManager.initializeAllEvents();
+    if (document.getElementById('age-legend')) {
+      AgeHighlighter.initialize();
+    }
 
     // RENDU ET FINALISATION
     this.renderFanchart();
@@ -3640,7 +3675,6 @@ const FanchartApp = {
       // Chaque transformation a sa propre fonction dédiée
       this.cleanPersonPlaces(person, key);
       this.cleanPersonDates(person, key);
-      this.cleanPersonAge(person, key);
     });
 
     // Après le nettoyage, mettre à jour les flags globaux
@@ -3684,18 +3718,6 @@ const FanchartApp = {
 
   abbreviateCirca: function(text) {
     return text.replace(/\bca\s+/g, "~");
-  },
-
-  // Fonction dédiée au nettoyage de l'âge
-  cleanPersonAge: function(person, key) {
-    if (person.death_age !== undefined) {
-      ancestor[key].death_age = this.extractNumericAge(person.death_age);
-    }
-  },
-
-  // Fonction pure pour extraire l'âge numérique
-  extractNumericAge: function(ageString) {
-    return ageString.replace(/[^0-9]/g, "");
   },
 
   // Mise à jour des flags globaux basée sur l'état actuel des données
@@ -4347,9 +4369,9 @@ const FanchartApp = {
 
   applyInitialState: function() {
     // Configurer l'état initial des outils
-    if (tool == "death-age") {
-      document.body.className = "death-age";
-      const ageButton = document.getElementById("b-death-age");
+    if (tool == "age") {
+      document.body.className = "age";
+      const ageButton = document.getElementById("b-age");
       if (ageButton) ageButton.classList.add("active");
     } else {
       document.body.className = "place";

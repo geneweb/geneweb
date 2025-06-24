@@ -41,7 +41,7 @@
   {"fn":"%if(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key"%nn;
   ,"sn":"%xx.surname","snk":"%xx.surname_key;"%if;(xx.occ!=0),"oc":"%xx.occ"%end;,"dates":"%xx.dates;"%nn;
   %if;(xx.computable_death_age or xx.computable_age)
-    ,"death_age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age;%end;%else;%if;xx.computable_age;%xx.age;%end;%end;"%nn;
+    ,"age_text":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age;%end;%else;%if;xx.computable_age;%xx.age;%end;%end;"%nn;
     ,"age":"%if;xx.is_dead;%if;xx.computable_death_age;%xx.death_age_years;%end;%else;%if;xx.computable_age;%xx.age_years;%end;%end;"%end;
   %apply;event("xx","birth")
   %apply;event("xx","baptism")
@@ -90,28 +90,40 @@
 %define;somebody_fanchart_same(xx)
 "S%xx.anc_sosa.v;":{"fn":"","sn":"%xx.anc_sosa.v › %xx.same","sosasame":"%xx.same;","fnk":"%xx.first_name_key","snk":"%xx.surname_key;","oc":"","dates":"","has_parents":%if;(xx.has_parents)true%else;false%end;},
 %end;
-
+%define;age_li_item(xx,yy,zz)
+      <li id="DA%if;("xx"="marr")M%end;yy" class="legend-item xx-item" role="listitem">
+        <span class="legend-swatch xx-yy" aria-hidden="true"></span>
+        <span class="legend-text">zz [years old]</span>
+      </li>
+%end;
 <body id="body" class="bg-light p-4"%if;wizard; data-wizard="1"%end;>
 <canvas id="pixel" width="1" height="1" style="display: none;"></canvas>
-<div id="death-age">
-<div><b>[*age]</b><ul>
-<li id="DA0"><span class="arrow">▶</span><span class="DA0">■</span>  0-29</li>
-<li id="DA1"><span class="arrow">▶</span><span class="DA1">■</span> 30-44</li>
-<li id="DA2"><span class="arrow">▶</span><span class="DA2">■</span> 45-59</li>
-<li id="DA3"><span class="arrow">▶</span><span class="DA3">■</span> 60-74</li>
-<li id="DA4"><span class="arrow">▶</span><span class="DA4">■</span> 75-89</li>
-<li id="DA5"><span class="arrow">▶</span><span class="DA5">■</span> 90-104</li>
-<li id="DA6"><span class="arrow">▶</span><span class="DA6">■</span> 105+</li>
-</ul></div>
-<div><b>[*marriage/marriages]0</b><ul>
-<li id="DAM0"><span class="arrow">▶</span><span class="DAM0">■</span>  0- 4</li>
-<li id="DAM1"><span class="arrow">▶</span><span class="DAM1">■</span>  5-14</li>
-<li id="DAM2"><span class="arrow">▶</span><span class="DAM2">■</span> 15-24</li>
-<li id="DAM3"><span class="arrow">▶</span><span class="DAM3">■</span> 25-34</li>
-<li id="DAM4"><span class="arrow">▶</span><span class="DAM4">■</span> 35-44</li>
-<li id="DAM5"><span class="arrow">▶</span><span class="DAM5">■</span> 45-54</li>
-<li id="DAM6"><span class="arrow">▶</span><span class="DAM6">■</span> 55+</li>
-</ul></div>
+<div id="age-legend" class="age-legend-container">
+  <div class="legend-header">
+    <h3 class="legend-title">[*age]</h3>
+    <button class="legend-close" title="Masquer">×</button>
+  </div>
+  <div class="legend-section ages-section">
+    <h4 class="section-label"><i class="fas fa-user" aria-hidden="true"></i>[*person/persons]1</h4>
+    <ul class="legend-list" role="list">
+      %apply;age_li_item("age",0,"0-39")
+      %apply;age_li_item("age",1,"40-54")
+      %apply;age_li_item("age",2,"55-69")
+      %apply;age_li_item("age",3,"70-84")
+      %apply;age_li_item("age",4,"85+")
+      </li>
+    </ul>
+  </div>
+  <div class="legend-section marriages-section">
+    <h4 class="section-label"><i class="fas fa-heart" aria-hidden="true"></i>[*marriage/marriages]1</h4>
+    <ul class="legend-list" role="list">
+      %apply;age_li_item("marr",0,"0-9")
+      %apply;age_li_item("marr",1,"10-24")
+      %apply;age_li_item("marr",2,"25-39")
+      %apply;age_li_item("marr",3,"40-54")
+      %apply;age_li_item("marr",4,"55+")
+    </ul>
+  </div>
 </div>
 %if;(e.pdf!="on")
 <div class="fanchart-controls" id="fanchart-controls">
@@ -190,7 +202,7 @@
   <div class="control-section">
     <div class="section-title">[*tools]</div>
     <div class="btn-group-fanchart">
-      <button id="b-death-age" class="btn-fanchart"
+      <button id="b-age" class="btn-fanchart"
               title="Âges décès et durées mariage">
         <i class="fa fa-cross fa-fw"></i>
       </button>
