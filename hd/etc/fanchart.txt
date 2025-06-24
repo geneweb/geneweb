@@ -359,6 +359,7 @@ window.FC_TRANSLATIONS = {
   'deaths': "[death]1",
   'burial': "[burial]0",
   'burials': "[burial]1",
+  'implex': "[implex/implexes]0",
 
   // À vérifier…
   'marriage_years': "[*marriage years]",

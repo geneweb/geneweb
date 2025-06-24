@@ -252,14 +252,26 @@ svg .highlight .text {
 }
 
 /* Groupes avec same_hl */
-svg .same_hl .bg {
+svg .same_hl .bg:not([class*="ma-"]) {
   fill: rgba(128, 128, 128, 0.2) !important;
 }
 
-svg .same_hl .text {
+svg .same_hl .text:not([class*="ma-"]) {
   fill: black !important;
   font-weight: bold !important;
   text-shadow: 0 0 2px white, 0 0 4px white, 0 0 6px white !important;
+}
+
+svg .implex-compact text,
+svg .implex-compact .text {
+  font-size: 80% !important;
+}
+
+.implex-notice {
+  margin-top: 8px;
+  padding: 4px;
+  background: rgba(0,123,255,0.1);
+  border-radius: 3px; font-size: 12px;
 }
 
 .dates {
@@ -1213,21 +1225,21 @@ body:not(.place) .places-panel {
    =========================================== */
 .person-panel {
   position: absolute;
-  left: 62%;
-  width: 300px;
-  max-width: 35%;
-  padding: 10px;
+  left: 64%;
+  width: auto;
+  max-width: 300px;
+  padding: 8px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   display: none;
   z-index: 10;
-  font-size: 1rem;
+  font-size: 0.7rem;
   margin-top: 8px;
 }
 
 .person-panel h2 {
-  font-size: 1.1rem;
+  font-size: 0.8rem;
   margin-top: 0;
   margin-bottom: 0.2rem;
 }

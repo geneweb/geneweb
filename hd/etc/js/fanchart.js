@@ -463,7 +463,7 @@ const Utils = {
   ageCategory: function(age) {
     const numericAge = parseInt(age);
     if (isNaN(numericAge) || numericAge <= 0) return null;
-    
+
     const boundaries = [40, 55, 70, 85, Infinity];
     const category = boundaries.findIndex(boundary => numericAge < boundary);
     return Math.min(category, 4);
@@ -477,7 +477,7 @@ const Utils = {
   marriageLengthClass: function(length) {
     const years = parseInt(length);
     if (isNaN(years) || years < 0) return "";
-    
+
     const thresholds = [10, 25, 40, 55];
     const index = thresholds.findIndex(threshold => years < threshold);
     return index === -1 ? "DAM4" : `DAM${index}`;
@@ -2213,27 +2213,7 @@ const SVGRenderer = {
       title.textContent = `(Sosa 1) ${p.fn} ${p.sn} (${p.age_text})\nCtrl+clic pour la fiche individuelle`;
       circle.appendChild(title);
 
-      circle.onclick = (e) => this.handleClick(e, p);
-      circle.onmouseenter = (e) => {
-        circle.classList.add('highlight');
-
-        const bgCircle = g.querySelector('circle.bg');
-        if (bgCircle) {
-          bgCircle.classList.add('highlight');
-        }
-
-        this.handleMouseEnter(p, 'person', e);
-      };
-      circle.onmouseleave = (e) => {
-        circle.classList.remove('highlight');
-
-        const bgCircle = g.querySelector('circle.bg');
-        if (bgCircle) {
-          bgCircle.classList.remove('highlight');
-        }
-
-        this.handleMouseLeave(p, 'person', e);
-      };
+      this.applyInteractiveFeatures(circle, p, 'person');
     }
 
     g.append(circle);
@@ -2308,7 +2288,7 @@ const SVGRenderer = {
   },
 
   applyInteractiveFeatures: function(element, p, type) {
-    if (!p || (p.fn === "?" || (!p.fn && !p.sosasame && type !== 'marriage'))) return;
+    if (!p || (p.fn === "?" && !p.sosasame) || (!p.fn && !p.sosasame && type !== 'marriage')) return;
 
     element.setAttribute("class", "link");
 
@@ -2319,92 +2299,12 @@ const SVGRenderer = {
 
     element.addEventListener("mouseenter", (e) => {
       e.stopPropagation();
-
-      // 1. Panneau d'information
-      const panel = document.getElementById("person-panel");
-      if (panel) {
-        this.buildTooltipContent(panel, p, type);
-        panel.style.display = "block";
-      }
-
-      // 2. Surlignage du secteur
-      element.classList.add('highlight');
-
-      // 3. Surlignage du fond correspondant
-      const parentGroup = element.parentNode;
-      if (parentGroup) {
-        if (type === 'person') {
-          const bgElement = parentGroup.querySelector('.bg:not([class*="ma-"])');
-          if (bgElement) {
-            bgElement.classList.add('highlight');
-          }
-        } else if (type === 'marriage') {
-          const bgElement = parentGroup.querySelector('.bg');
-          if (bgElement) {
-            // Surlignage gris standard pour tous les mariages
-            bgElement.classList.add('highlight');
-            // Surlignage orange SEULEMENT si lieu ET mode place
-            if (p.marriage_place && document.body.classList.contains('place')) {
-              element.classList.add('event-highlight-marriage');
-              bgElement.classList.add('event-highlight-marriage');
-            }
-          }
-        }
-      }
-
-      // 4. Surlignage dans la liste des lieux (uniquement si lieu présent)
-      if (PlacesHighlighter && document.body.classList.contains('place')) {
-        const placesMap = new Map();
-
-        if (type === 'person') {
-          Events.types.forEach(eventType => {
-            if (eventType === 'marriage') return;
-            const placeField = Events.place(eventType);
-            if (p[placeField]) {
-              if (!placesMap.has(p[placeField])) {
-                placesMap.set(p[placeField], []);
-              }
-              placesMap.get(p[placeField]).push(eventType);
-            }
-          });
-        } else if (type === 'marriage' && p.marriage_place) {
-          // ✅ CORRECTION : Ajouter à la map seulement si lieu présent
-          placesMap.set(p.marriage_place, ['marriage']);
-        }
-
-        if (placesMap.size > 0) {
-          const places = Array.from(placesMap.keys());
-          const events = Array.from(placesMap.values());
-          PlacesHighlighter.highlight(places, events, 'svg');
-        }
-      }
+      this.handleMouseEnter(p, type, e);
     });
 
     element.addEventListener("mouseleave", (e) => {
       e.stopPropagation();
-
-      // Nettoyage identique pour tous les types
-      const panel = document.getElementById("person-panel");
-      if (panel) {
-        panel.style.display = "none";
-        panel.innerHTML = "";
-      }
-
-      element.classList.remove('highlight');
-      element.classList.remove('event-highlight-marriage');
-
-      const parentGroup = element.parentNode;
-      if (parentGroup) {
-        const bgElements = parentGroup.querySelectorAll('.bg.highlight, .bg.event-highlight-marriage');
-        bgElements.forEach(bg => {
-          bg.classList.remove('highlight');
-          bg.classList.remove('event-highlight-marriage');
-        });
-      }
-
-      if (PlacesHighlighter && PlacesHighlighter.clearAllHighlights) {
-        PlacesHighlighter.clearAllHighlights();
-      }
+      this.handleMouseLeave(p, type, e);
     });
   },
 
@@ -2412,37 +2312,57 @@ const SVGRenderer = {
     panel.className = 'person-panel';
 
     if (type === "person") {
-      let html = `<h2>${p.fn} ${p.sn}</h2>`;
+      // Pour les implexes, toujours résoudre vers les vraies données
+      const isImplex = p.sosasame !== undefined;
+      let displayPerson = p;
+      let currentSosa = p.sosa || parseInt(p.id?.replace('S', '')) || 1;
 
-      // Utiliser les dates détaillées si disponibles
-      if (p.birth_date || p.birth_place) {
+      if (isImplex) {
+        const referencedPerson = ancestor["S" + p.sosasame];
+        if (referencedPerson) {
+          displayPerson = referencedPerson;
+        }
+      }
+
+      let html= `<h2>`;
+      html += `${displayPerson.fn} ${displayPerson.sn}`;
+      html += `<small> (Sosa ${currentSosa}${isImplex ? ' › ' + p.sosasame : ''})</small></h2>`;
+
+      if (displayPerson.birth_date || displayPerson.birth_place) {
         html += `<div><strong>Naissance :</strong> `;
-        if (p.birth_date) html += `${p.birth_date}`;
-        if (p.birth_place) html += ` – ${p.birth_place}`;
+        if (displayPerson.birth_date) html += `${displayPerson.birth_date}`;
+        if (displayPerson.birth_place) html += ` – ${displayPerson.birth_place}`;
         html += `</div>`;
       }
 
-      if (p.baptism_date || p.baptism_place) {
+      if (displayPerson.baptism_date || displayPerson.baptism_place) {
         html += `<div><strong>Baptême :</strong> `;
-        if (p.baptism_date) html += `${p.baptism_date}`;
-        if (p.baptism_place) html += ` – ${p.baptism_place}`;
+        if (displayPerson.baptism_date) html += `${displayPerson.baptism_date}`;
+        if (displayPerson.baptism_place) html += ` – ${displayPerson.baptism_place}`;
         html += `</div>`;
       }
 
-      if (p.death_date || p.death_place) {
+      if (displayPerson.death_date || displayPerson.death_place) {
         html += `<div><strong>Décès :</strong> `;
-        if (p.death_date) html += `${p.death_date}`;
-        if (p.death_place) html += ` – ${p.death_place}`;
+        if (displayPerson.death_date) html += `${displayPerson.death_date}`;
+        if (displayPerson.death_place) html += ` – ${displayPerson.death_place}`;
         html += `</div>`;
       }
-      if (p.burial_date || p.burial_place) {
+
+      if (displayPerson.burial_date || displayPerson.burial_place) {
         html += `<div><strong>Sépulture :</strong> `;
-        if (p.burial_date) html += `${p.burial_date}`;
-        if (p.burial_place) html += ` – ${p.burial_place}`;
+        if (displayPerson.burial_date) html += `${displayPerson.burial_date}`;
+        if (displayPerson.burial_place) html += ` – ${displayPerson.burial_place}`;
         html += `</div>`;
       }
-      if (p.age_text) {
-        html += `<strong>Âge :</strong> ${p.age_text}`;
+
+      if (displayPerson.age_text) {
+        html += `<div><strong>Âge :</strong> ${displayPerson.age_text}</div>`;
+      }
+
+      if (isImplex) {
+        html += `<div class="implex-notice">`;
+        html += `<strong>💡 Implexe :</strong> apparaît plusieurs fois dans l’arbre`;
         html += `</div>`;
       }
 
@@ -2463,11 +2383,12 @@ const SVGRenderer = {
       }
 
       if (years >= 0) {
-        html += `<div><strong>Durée :</strong> ${years} ${years === 1 ? "an" : "ans"}</div>`;
+        const yearLabel = years === 1 ? "an" : "ans";
+        html += `<div><strong>Durée :</strong> ${years} ${yearLabel}</div>`;
       }
 
       if (p.marriage_age) {
-        html += `<div><strong>Âge au mariage (!TO RM) :</strong> ${p.marriage_age} ans</div>`;
+        html += `<div><strong>Âge au mariage :</strong> ${p.marriage_age} ans</div>`;
       }
 
       panel.innerHTML = html;
@@ -2508,59 +2429,112 @@ const SVGRenderer = {
   },
 
   handleMouseEnter: function(p, type, event) {
+    // 1. PANNEAU D'INFORMATION
     const panel = document.getElementById("person-panel");
     if (panel) {
       this.buildTooltipContent(panel, p, type);
-        panel.style.display = "block";
+      panel.style.display = "block";
     }
 
+    // 2. SURLIGNAGE DU SECTEUR SURVOLÉ
+    if (event && event.target) {
+      event.target.classList.add('highlight');
+
+      // Surlignage du fond correspondant
+      const parentGroup = event.target.parentNode;
+      if (parentGroup) {
+        if (type === 'person') {
+          const bgElement = parentGroup.querySelector('.bg:not([class*="ma-"])');
+          if (bgElement) {
+            bgElement.classList.add('highlight');
+          }
+        } else if (type === 'marriage') {
+          const bgElement = parentGroup.querySelector('.bg');
+          if (bgElement) {
+            bgElement.classList.add('highlight');
+            // Surlignage orange SEULEMENT si lieu ET mode place
+            if (p.marriage_place && document.body.classList.contains('place')) {
+              event.target.classList.add('event-highlight-marriage');
+              bgElement.classList.add('event-highlight-marriage');
+            }
+          }
+        }
+      }
+    }
+
+    // 3. MODE ÂGE
     if (document.body.classList.contains('age')) {
       AgeHighlighter.handleSVGHover(p, type, 'enter');
-    } else if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
-          const placesToHighlight = [];
-          const eventsToHighlight = [];
-
-          if (type === 'marriage' && p.marriage_place) {
-              placesToHighlight.push(p.marriage_place);
-              eventsToHighlight.push(['marriage']);
-          } else if (type === 'person') {
-              Events.types.forEach(eventType => {
-                  if (eventType === 'marriage') return; // Esquiver marriage
-                  const placeField = Events.place(eventType);
-                  if (p[placeField]) {
-                      placesToHighlight.push(p[placeField]);
-                      eventsToHighlight.push([eventType]);
-                  }
-              });
-          }
-
-          if (placesToHighlight.length > 0) {
-            PlacesHighlighter.highlight(placesToHighlight, eventsToHighlight, 'svg');
-          }
     }
 
-    // Gestion des implexes
+    // 4. MODE PLACE - Surlignage bidirectionnel
+    if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
+      const placesMap = new Map();
+
+      if (type === 'person') {
+        Events.types.forEach(eventType => {
+          if (eventType === 'marriage') return;
+          const placeField = Events.place(eventType);
+          if (p[placeField]) {
+            if (!placesMap.has(p[placeField])) {
+              placesMap.set(p[placeField], []);
+            }
+            placesMap.get(p[placeField]).push(eventType);
+          }
+        });
+      } else if (type === 'marriage' && p.marriage_place) {
+        placesMap.set(p.marriage_place, ['marriage']);
+      }
+
+      if (placesMap.size > 0) {
+        const places = Array.from(placesMap.keys());
+        const events = Array.from(placesMap.values());
+        PlacesHighlighter.highlight(places, events, 'svg');
+      }
+    }
+
+    // 5. IMPLEXES
     if (p.sosasame) {
       const ref = document.getElementById("S" + p.sosasame);
       if (ref) ref.classList.add("same_hl");
     }
   },
 
+  // TOUT le nettoyage
   handleMouseLeave: function(p, type, event) {
+    // 1. PANNEAU D'INFORMATION
     const panel = document.getElementById("person-panel");
     if (panel) {
       panel.style.display = "none";
-    panel.innerHTML = "";
+      panel.innerHTML = "";
     }
 
+    // 2. SURLIGNAGE DU SECTEUR
+    if (event && event.target) {
+      event.target.classList.remove('highlight');
+      event.target.classList.remove('event-highlight-marriage');
+
+      const parentGroup = event.target.parentNode;
+      if (parentGroup) {
+        const bgElements = parentGroup.querySelectorAll('.bg.highlight, .bg.event-highlight-marriage');
+        bgElements.forEach(bg => {
+          bg.classList.remove('highlight');
+          bg.classList.remove('event-highlight-marriage');
+        });
+      }
+    }
+
+    // 3. MODE PLACE
     if (document.body.classList.contains('place')) {
       PlacesHighlighter.clearAllHighlights();
     }
-    else if (document.body.classList.contains('age')) {
+
+    // 4. MODE ÂGE
+    if (document.body.classList.contains('age')) {
       AgeHighlighter.clearAllHighlights();
     }
 
-    // Gestion des implexes
+    // 5. IMPLEXES
     if (p.sosasame) {
       const ref = document.getElementById("S" + p.sosasame);
       if (ref) ref.classList.remove("same_hl");
@@ -4087,28 +4061,25 @@ const FanchartApp = {
     const referenceSosa = person.sosasame;
     const referencedPerson = ancestor["S" + referenceSosa];
 
-
     if (implexMode === "reduced") {
-      // Mode initial (réduit) : garder les " < " et pas de propagation
       return { person: person, isImplex: false };
     }
 
     if (implexMode === "numbered") {
-     // Mode numéroté : utiliser les vraies données mais avec numérotation
       return {
         person: {
-          ...referencedPerson,  // Utiliser les vraies données pour les couleurs
-          fn: "",               // Mais remplacer le prénom
-          sn: `${sosa} › ${referenceSosa}`,  // Et le nom par la numérotation
-          dates: "",            // Et les dates
-          sosasame: referenceSosa
+          ...referencedPerson,
+          fn: "",
+          sn: `${sosa} › ${referenceSosa}`,
+          dates: "",
+          sosasame: referenceSosa  // ✓ Préservé
         },
         isImplex: true,
         originalSosa: referenceSosa
       };
     }
 
-    // Mode "full" : remplacer par les vraies données
+    // Mode "full"
     return { person: referencedPerson, isImplex: false };
   },
 
@@ -4133,9 +4104,12 @@ const FanchartApp = {
       // Dessiner le texte si la personne est connue
       if (actualPerson.fn !== "?") {
         const textClasses = this.buildTextClasses(actualPerson);
+        const isImplexCompact = person.sosasame && (implexMode === "reduced" || implexMode === "numbered");
+        if (isImplexCompact) { group.classList.add('implex-compact'); }
+
         SVGRenderer.drawSectorText(group, position.r1, position.r2,
           position.a1, position.a2, sosa, actualPerson,
-          textClasses, position.generation, implexInfo.isImplex);
+          textClasses, position.generation, isImplexCompact);
       }
 
       // Gérer le mariage pour les ancêtres pairs (pères) - AVANT le secteur interactif
