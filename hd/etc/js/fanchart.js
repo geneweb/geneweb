@@ -56,8 +56,9 @@ const CONFIG = {
   zoom_factor: 1.25,
   default_angle: 220,
   available_angles: [180, 220, 359],
-  a_r: [50, 50, 50, 50, 80, 70, 100, 150, 130, 90],
-  a_m: ["S1", "C3", "C3", "C3", "R3", "R3", "R2", "R1", "R1", "R1"],
+  a_r: [56, 56, 54, 54, 70, 72, 100, 150, 130, 90],
+  a_m: ["S1", "C3", "C2", "C1", "R4", "R3", "R2", "R1", "R1", "R1"],
+  text_mode_factors: { "C3": 1.10, "C2": 1.05 }, // Mode circulaire (parents/grand-parents)
   marriage_length_thresholds: [4, 14, 24, 34, 44, 54],
   text_reduction_factor: 1,
   svg_margin: 4
@@ -2614,6 +2615,12 @@ if (document.body.classList.contains('death-age') && type === 'person') {
 
     if (CONFIG.a_m[generation - 1] === "C3") {
       mode = 'C3';
+    } else if (CONFIG.a_m[generation - 1] === "C2") {
+      mode = 'C2';
+    } else if (CONFIG.a_m[generation - 1] === "C1") {
+      mode = 'C1';
+    } else if (CONFIG.a_m[generation - 1] === "R4" && !isSame) {
+      mode = 'R4';
     } else if (CONFIG.a_m[generation - 1] === "R3" && !isSame) {
       mode = 'R3';
     } else if (CONFIG.a_m[generation - 1] === "R2" && !isSame) {
@@ -2674,6 +2681,7 @@ const TextRenderer = {
     if (!this._bboxCache[textContent]) {
       standard.textContent = textContent;
       this._bboxCache[textContent] = standard.getBBox();
+      standard.textContent = "";
     }
     return this._bboxCache[textContent];
   },
@@ -2681,22 +2689,32 @@ const TextRenderer = {
   drawText: function(g, mode, params) {
     // Construire les classes CSS pour les lieux
     const textClasses = this.buildLocationClasses(params.p, params.classes || "");
+    const modeFactor = CONFIG.text_mode_factors[mode] || 1.0;
 
     switch(mode) {
       case 'S1':
         return this.drawCentralText(g, params.x, params.y, params.p, textClasses);
 
       case 'C3':
-        return this.drawCircularText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses);
+        return this.drawCircularText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, modeFactor);
+
+      case 'C2':
+        return this.drawCircularText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, modeFactor);
+
+      case 'C1':
+        return this.drawCircularText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, modeFactor);
+
+      case 'R4':
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 4, modeFactor);
 
       case 'R3':
-        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 3);
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 3, modeFactor);
 
       case 'R2':
-        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 2);
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 2, modeFactor);
 
       case 'R1':
-        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 1);
+        return this.drawRadialText(g, params.r1, params.r2, params.a1, params.a2, params.sosa, params.p, textClasses, 1, modeFactor);
 
       default:
         console.warn(`Mode de texte non reconnu: ${mode}`);
@@ -2738,37 +2756,37 @@ const TextRenderer = {
     return text;
   },
 
-  drawCircularText: function(g, r1, r2, a1, a2, sosa, p, classes) {
+  drawCircularText: function(g, r1, r2, a1, a2, sosa, p, classes, sizeFactor = 1.0) {
     const height = Math.abs(r2 - r1) / 3;
 
     // Trois arcs concentriques pour prénom, nom, dates
     const pathLength1 = this.createCircularPath(g, `tp1S${sosa}`, (r2-r1)*3/4 + r1, a1, a2);
-    this.placeTextOnPath(g, `tp1S${sosa}`, p.fn, classes, pathLength1, height);
+    this.placeTextOnPath(g, `tp1S${sosa}`, p.fn, classes, pathLength1, height, sizeFactor);
 
     const pathLength2 = this.createCircularPath(g, `tp2S${sosa}`, (r2-r1)*2/4 + r1, a1, a2);
-    this.placeTextOnPath(g, `tp2S${sosa}`, p.sn, classes, pathLength2, height);
+    this.placeTextOnPath(g, `tp2S${sosa}`, p.sn, classes, pathLength2, height, sizeFactor);
 
     const pathLength3 = this.createCircularPath(g, `tp3S${sosa}`, (r2-r1)/4 + r1, a1, a2);
-    this.placeTextOnPath(g, `tp3S${sosa}`, p.dates, classes + " dates", pathLength3, height);
+    this.placeTextOnPath(g, `tp3S${sosa}`, p.dates, classes + " dates", pathLength3, height, sizeFactor);
 
     return g;
   },
 
-  drawRadialText: function(g, r1, r2, a1, a2, sosa, p, classes, lineCount) {
+  drawRadialText: function(g, r1, r2, a1, a2, sosa, p, classes, lineCount, sizeFactor = 1.0) {
     // Calcul des paramètres de direction selon l'orientation
     const params = this.calculateRadialParameters(r1, r2, a1, a2, lineCount);
     const height = Math.abs(a2 - a1) / 360 * 2 * Math.PI * r1 / lineCount;
 
-    if (lineCount === 3) {
+    if (lineCount >= 3) {
       // Trois lignes : prénom, nom, dates
       const pathLength1 = this.createRadialPath(g, `tp1S${sosa}`, params.r1, params.r2, params.angles[0]);
-      this.placeTextOnPath(g, `tp1S${sosa}`, p.fn, classes, pathLength1, height);
+      this.placeTextOnPath(g, `tp1S${sosa}`, p.fn, classes, pathLength1, height, sizeFactor);
 
       const pathLength2 = this.createRadialPath(g, `tp2S${sosa}`, params.r1, params.r2, params.angles[1]);
-      this.placeTextOnPath(g, `tp2S${sosa}`, p.sn, classes, pathLength2, height);
+      this.placeTextOnPath(g, `tp2S${sosa}`, p.sn, classes, pathLength2, height, sizeFactor);
 
       const pathLength3 = this.createRadialPath(g, `tp3S${sosa}`, params.r1, params.r2, params.angles[2]);
-      this.placeTextOnPath(g, `tp3S${sosa}`, p.dates, classes + " dates", pathLength3, height);
+      this.placeTextOnPath(g, `tp3S${sosa}`, p.dates, classes + " dates", pathLength3, height, sizeFactor);
 
     } else if (lineCount === 2) {
       // Deux lignes : nom complet, dates
@@ -2795,7 +2813,13 @@ const TextRenderer = {
       myR1 = r1;
       myR2 = r2;
 
-      if (lineCount === 3) {
+      if (lineCount === 4) {
+        angles = [
+         a2 - (a2-a1)*4/6,  // Position 4/6
+         a2 - (a2-a1)*3/6,  // Position 3/6
+         a2 - (a2-a1)*2/6   // Position 2/6
+        ];
+      } else if (lineCount === 3) {
         angles = [
           a2 - (a2-a1)*3/4,  // Position 3/4
           a2 - (a2-a1)*2/4,  // Position 1/2
@@ -2814,7 +2838,13 @@ const TextRenderer = {
       myR1 = r2;
       myR2 = r1;
 
-      if (lineCount === 3) {
+      if (lineCount === 4) {
+        angles = [
+         a1 + (a2-a1)*4/6,  // Position 4/6
+         a1 + (a2-a1)*3/6,  // Position 3/6
+         a1 + (a2-a1)*2/6   // Position 2/6
+        ];
+      } else if (lineCount === 3) {
         angles = [
           a1 + (a2-a1)*3/4,
           a1 + (a2-a1)*2/4,
@@ -2861,7 +2891,7 @@ const TextRenderer = {
     return Math.abs(r2 - r1);
   },
 
-  placeTextOnPath: function(g, pathId, textContent, classes, pathLength, pathHeight) {
+  placeTextOnPath: function(g, pathId, textContent, classes, pathLength, pathHeight, sizeFactor = 1.0) {
     const bbox = this.getBBoxCached(textContent);
     const textWidth = bbox.width;
     const textHeight = bbox.height;
@@ -2876,7 +2906,7 @@ const TextRenderer = {
       fontSizeByHeight = Math.round(100 * pathHeight * CONFIG.security / textHeight);
     }
 
-    const finalFontSize = Math.min(fontSizeByWidth, fontSizeByHeight);
+    let finalFontSize = Math.min(fontSizeByWidth, fontSizeByHeight) * sizeFactor;
 
     // Création de l'élément text avec textPath
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
