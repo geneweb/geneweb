@@ -200,12 +200,14 @@
     &nbsp;&nbsp;<input type="submit" value="Ok"%/>
   </legend>
   <table>
+  
     %foreach;parent;
-    %apply;one_parent(cnt)%end;
+      %apply;one_parent(cnt)
+    
  %if;(cnt=2)
  <tr><td colspan=4 style="border:0;text-align:left;padding:5px"><label><input type="checkbox" id="nsck" name="nsck" value="on"
     %if;(parent.sexes=3) checked="checked"%end;%/> [no sexes check]</label></td></tr>
-   %end;
+   %end;%end;
   </table>
 
 </fieldset>
