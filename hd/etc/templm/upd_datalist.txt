@@ -16,8 +16,8 @@
 %apply;dlist("place")
 %apply;dlist("occu")
 %apply;dlist("src")
-%apply;dlist("qualifier")
-%apply;dlist("alias")
+%apply;dlist("qualifiers")
+%apply;dlist("aliases")
 <datalist id="dlmonth">
   <option value=VD label="[(french revolution month)]0 VD">
   <option value=BR label="[(french revolution month)]1 BR">
