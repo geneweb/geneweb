@@ -2312,22 +2312,42 @@ const SVGRenderer = {
     panel.className = 'person-panel';
 
     if (type === "person") {
-      // Pour les implexes, toujours résoudre vers les vraies données
-      const isImplex = p.sosasame !== undefined;
-      let displayPerson = p;
-      let currentSosa = p.sosa || parseInt(p.id?.replace('S', '')) || 1;
+        const isImplex = p.sosasame !== undefined;
+        let displayPerson = p;
+        let currentSosa = p.sosa || parseInt(p.id?.replace('S', '')) || 1;
 
-      if (isImplex) {
-        const referencedPerson = ancestor["S" + p.sosasame];
-        if (referencedPerson) {
-          displayPerson = referencedPerson;
+        // HTML de base
+        let html = `<h2>`;
+        html += `${displayPerson.fn} ${displayPerson.sn}`;
+
+        // Affichage spécifique selon le mode d'implexe
+        if (isImplex) {
+            if (implexMode === "reduced") {
+                // Mode réduit : afficher la redirection simple
+                html += `<small> (Sosa ${currentSosa} → ${p.sosasame})</small>`;
+            } else if (implexMode === "numbered") {
+                // Mode numéroté : essayer d'afficher la chaîne si disponible
+                if (typeof ImplexResolver !== 'undefined' && ImplexResolver.resolveImplexChain) {
+                    const resolution = ImplexResolver.resolveImplexChain(currentSosa);
+                    if (resolution && resolution.chain) {
+                        html += `<small> (${resolution.chain.join(' › ')})</small>`;
+                    } else {
+                        html += `<small> (Sosa ${currentSosa} › ${p.sosasame})</small>`;
+                    }
+                } else {
+                    html += `<small> (Sosa ${currentSosa} › ${p.sosasame})</small>`;
+                }
+            }
+            // Mode full : pas d'affichage spécial, juste le Sosa
+            else {
+                html += `<small> (Sosa ${currentSosa})</small>`;
+            }
+        } else {
+            html += `<small> (Sosa ${currentSosa})</small>`;
         }
-      }
+        html += `</h2>`;
 
-      let html= `<h2>`;
-      html += `${displayPerson.fn} ${displayPerson.sn}`;
-      html += `<small> (Sosa ${currentSosa}${isImplex ? ' › ' + p.sosasame : ''})</small></h2>`;
-
+      // Événements vitaux
       if (displayPerson.birth_date || displayPerson.birth_place) {
         html += `<div><strong>Naissance :</strong> `;
         if (displayPerson.birth_date) html += `${displayPerson.birth_date}`;
@@ -2360,19 +2380,21 @@ const SVGRenderer = {
         html += `<div><strong>Âge :</strong> ${displayPerson.age_text}</div>`;
       }
 
+      // Notice d'implexe améliorée
       if (isImplex) {
+        const cloneCount = ImplexResolver.getAllClones(p.sosasame || currentSosa).length;
         html += `<div class="implex-notice">`;
-        html += `<strong>💡 Implexe :</strong> apparaît plusieurs fois dans l’arbre`;
+        html += `<strong>💡 Implexe :</strong> apparaît ${cloneCount + 1} fois.`;
         html += `</div>`;
       }
 
       panel.innerHTML = html;
 
     } else if (type === "marriage") {
+      // Code existant pour les mariages - copier depuis l'original
       const years = parseInt(p.marriage_length) || -1;
       let html = `<h2>Mariage</h2>`;
 
-      // Utiliser marriage_date_ (format détaillé) si disponible, sinon marriage_date
       const marriageDate = p.marriage_date_ || p.marriage_date;
       if (marriageDate) {
         html += `<div><strong>Date :</strong> ${marriageDate}</div>`;
@@ -2432,71 +2454,93 @@ const SVGRenderer = {
     // 1. PANNEAU D'INFORMATION
     const panel = document.getElementById("person-panel");
     if (panel) {
-      this.buildTooltipContent(panel, p, type);
-      panel.style.display = "block";
+        // Pour les implexes, utiliser les données de la personne cible
+        let personToDisplay = p;
+
+        if (type === "person" && p.sosasame) {
+            const targetPerson = ancestor["S" + p.sosasame];
+            if (targetPerson) {
+                // objet combiné : données réelles + infos d'implexe
+                personToDisplay = {
+                    ...targetPerson,      // Toutes les vraies données (dates, lieux, etc.)
+                    sosa: p.sosa,        // Garder le Sosa actuel pour l'affichage
+                    sosasame: p.sosasame // Garder l'info d'implexe pour le panneau
+                };
+            }
+        }
+
+        this.buildTooltipContent(panel, personToDisplay, type);
+        panel.style.display = "block";
     }
 
     // 2. SURLIGNAGE DU SECTEUR SURVOLÉ
     if (event && event.target) {
-      event.target.classList.add('highlight');
+        event.target.classList.add('highlight');
 
-      // Surlignage du fond correspondant
-      const parentGroup = event.target.parentNode;
-      if (parentGroup) {
-        if (type === 'person') {
-          const bgElement = parentGroup.querySelector('.bg:not([class*="ma-"])');
-          if (bgElement) {
-            bgElement.classList.add('highlight');
-          }
+        // Surlignage du fond correspondant
+        const parentGroup = event.target.parentNode;
+        if (parentGroup && type === 'person') {
+            const bgElement = parentGroup.querySelector('.bg:not([class*="ma-"])');
+            if (bgElement) {
+                bgElement.classList.add('highlight');
+            }
         } else if (type === 'marriage') {
-          const bgElement = parentGroup.querySelector('.bg');
-          if (bgElement) {
-            bgElement.classList.add('highlight');
-            // Surlignage orange SEULEMENT si lieu ET mode place
-            if (p.marriage_place && document.body.classList.contains('place')) {
-              event.target.classList.add('event-highlight-marriage');
-              bgElement.classList.add('event-highlight-marriage');
+            const bgElement = parentGroup.querySelector('.bg');
+            if (bgElement) {
+                bgElement.classList.add('highlight');
+                // Surlignage orange SEULEMENT si lieu ET mode place
+                if (p.marriage_place && document.body.classList.contains('place')) {
+                    event.target.classList.add('event-highlight-marriage');
+                    bgElement.classList.add('event-highlight-marriage');
+                }
+            }
+        }
+    }
+
+    // 3. MODES SPÉCIAUX (âge, lieux)
+    if (document.body.classList.contains('age')) {
+        const dataForAge = (type === "person" && p.sosasame && personToDisplay) ? personToDisplay : p;
+        AgeHighlighter.handleSVGHover(dataForAge, type, 'enter');
+    }
+
+    if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
+        let dataForPlaces = p;
+        if (type === "person" && p.sosasame) {
+            const targetPerson = ancestor["S" + p.sosasame];
+            if (targetPerson) {
+                dataForPlaces = targetPerson;
+            }
+        }
+
+        const places = this.extractPlacesFromPerson(dataForPlaces, type);
+        if (places.length > 0) {
+            const placeNames = places.map(p => p.place);
+            const events = places.map(p => [p.event]);
+            PlacesHighlighter.highlight(placeNames, events, 'svg');
+        }
+    }
+
+    // 4. SURLIGNAGE MULTIPLE DES IMPLEXES
+    if (type === "person" && p.sosa) {
+      const targetsToHighlight = ImplexResolver.getHighlightTargets(p.sosa);
+
+      console.log(`Surlignage de Sosa ${p.sosa}, cibles:`, targetsToHighlight);
+
+      // Surligner tous les éléments de la chaîne
+      targetsToHighlight.forEach(targetSosa => {
+        if (targetSosa !== p.sosa) { // Ne pas retraiter l'élément actuel
+          const targetElement = document.getElementById("S" + targetSosa);
+          if (targetElement) {
+            targetElement.classList.add("same_hl");
+
+            // Surligner aussi le secteur interactif
+            const targetPath = targetElement.querySelector('path.link');
+            if (targetPath) {
+              targetPath.classList.add('highlight');
             }
           }
         }
-      }
-    }
-
-    // 3. MODE ÂGE
-    if (document.body.classList.contains('age')) {
-      AgeHighlighter.handleSVGHover(p, type, 'enter');
-    }
-
-    // 4. MODE PLACE - Surlignage bidirectionnel
-    if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
-      const placesMap = new Map();
-
-      if (type === 'person') {
-        Events.types.forEach(eventType => {
-          if (eventType === 'marriage') return;
-          const placeField = Events.place(eventType);
-          if (p[placeField]) {
-            if (!placesMap.has(p[placeField])) {
-              placesMap.set(p[placeField], []);
-            }
-            placesMap.get(p[placeField]).push(eventType);
-          }
-        });
-      } else if (type === 'marriage' && p.marriage_place) {
-        placesMap.set(p.marriage_place, ['marriage']);
-      }
-
-      if (placesMap.size > 0) {
-        const places = Array.from(placesMap.keys());
-        const events = Array.from(placesMap.values());
-        PlacesHighlighter.highlight(places, events, 'svg');
-      }
-    }
-
-    // 5. IMPLEXES
-    if (p.sosasame) {
-      const ref = document.getElementById("S" + p.sosasame);
-      if (ref) ref.classList.add("same_hl");
+      });
     }
   },
 
@@ -2524,20 +2568,31 @@ const SVGRenderer = {
       }
     }
 
-    // 3. MODE PLACE
+    // 3. MODES SPÉCIAUX
     if (document.body.classList.contains('place')) {
       PlacesHighlighter.clearAllHighlights();
     }
 
-    // 4. MODE ÂGE
     if (document.body.classList.contains('age')) {
       AgeHighlighter.clearAllHighlights();
     }
 
-    // 5. IMPLEXES
-    if (p.sosasame) {
-      const ref = document.getElementById("S" + p.sosasame);
-      if (ref) ref.classList.remove("same_hl");
+    // 4. NETTOYAGE DES IMPLEXES MULTIPLES
+    if (type === "person" && p.sosa) {
+      const targetsToClean = ImplexResolver.getHighlightTargets(p.sosa);
+
+      targetsToClean.forEach(targetSosa => {
+        const targetElement = document.getElementById("S" + targetSosa);
+        if (targetElement) {
+          targetElement.classList.remove("same_hl");
+
+          // Nettoyer aussi les highlights sur les paths
+          const highlightedPaths = targetElement.querySelectorAll('.highlight');
+          highlightedPaths.forEach(path => {
+            path.classList.remove('highlight');
+          });
+        }
+      });
     }
   },
 
@@ -3556,6 +3611,231 @@ const ModernOverflowManager = {
   }
 };
 
+// ========== MODULE DE RÉSOLUTION DES IMPLEXES ==========
+const ImplexResolver = {
+  resolutionCache: new Map(),
+  reverseMap: new Map(),
+
+  initialize: function() {
+    console.log("ImplexResolver: Initialisation...");
+    this.resolutionCache.clear();
+    this.reverseMap.clear();
+
+    // Parcourir tous les ancêtres pour construire les maps
+    Object.keys(ancestor).forEach(key => {
+      const sosa = parseInt(key.replace('S', ''));
+      const person = ancestor[key];
+
+      if (person && person.sosasame) {
+        // Résoudre la chaîne complète
+        const resolution = this.resolveImplexChain(sosa);
+
+        // Ajouter au reverse map pour le Sosa source
+        if (!this.reverseMap.has(resolution.source)) {
+          this.reverseMap.set(resolution.source, []);
+        }
+        this.reverseMap.get(resolution.source).push(sosa);
+      }
+    });
+
+    console.log(`ImplexResolver: ${this.resolutionCache.size} implexes résolus`);
+    console.log(`ImplexResolver: ${this.reverseMap.size} sources avec clones`);
+  },
+
+  resolveImplexChain: function(sosa) {
+    // S'assurer que sosa est un nombre
+    sosa = parseInt(sosa);
+
+    // Vérifier le cache
+    if (this.resolutionCache.has(sosa)) {
+      return this.resolutionCache.get(sosa);
+    }
+
+    const chain = [];
+    let currentSosa = sosa;
+    let visitedSosas = new Set();
+
+    // Remonter la chaîne jusqu'à la source
+    while (currentSosa) {
+      if (visitedSosas.has(currentSosa)) {
+        console.warn(`ImplexResolver: Boucle détectée pour Sosa ${sosa}`);
+        break;
+      }
+
+      visitedSosas.add(currentSosa);
+      chain.push(currentSosa);
+
+      const person = ancestor["S" + currentSosa];
+      if (!person || !person.sosasame) {
+        // On a trouvé la source
+        break;
+      }
+
+      // IMPORTANT : Forcer la conversion en nombre !
+      currentSosa = parseInt(person.sosasame);
+    }
+
+    // La source est le dernier élément de la chaîne
+    const sourceSosa = chain[chain.length - 1];
+    const sourceData = ancestor["S" + sourceSosa];
+
+    const resolution = {
+      source: sourceSosa,
+      chain: chain,
+      data: sourceData || null
+    };
+
+    // Mettre en cache
+    this.resolutionCache.set(sosa, resolution);
+
+    return resolution;
+  },
+
+  getAllClones: function(sourceSosa) {
+    // S'assurer que sourceSosa est un nombre
+    sourceSosa = parseInt(sourceSosa);
+    return this.reverseMap.get(sourceSosa) || [];
+  },
+
+  getHighlightTargets: function(sosa) {
+    // S'assurer que sosa est un nombre
+    sosa = parseInt(sosa);
+    const person = ancestor["S" + sosa];
+
+    if (!person) {
+      return [sosa];
+    }
+
+    if (person.sosasame) {
+      // C'est un implexe : résoudre la chaîne
+      const resolution = this.resolveImplexChain(sosa);
+      // Retourner toute la chaîne (déjà des nombres grâce à resolveImplexChain)
+      return resolution.chain || [sosa];
+    } else {
+      // C'est peut-être une source : trouver tous ses clones
+      const clones = this.getAllClones(sosa);
+      return [sosa, ...clones];
+    }
+  },
+
+  getDisplayData: function(sosa) {
+    // S'assurer que sosa est un nombre
+    sosa = parseInt(sosa);
+    const person = ancestor["S" + sosa];
+
+    if (!person) {
+      return null;
+    }
+
+    if (person.sosasame && implexMode === "numbered") {
+      // Résoudre jusqu'à la source pour obtenir les vraies données
+      const resolution = this.resolveImplexChain(sosa);
+      return resolution.data;
+    }
+
+    return person;
+  }
+};
+
+const ImplexResolverEnhanced = {
+  ...ImplexResolver, // Hériter de l'existant
+
+  // Cache amélioré pour la performance
+  fullChainCache: new Map(),
+
+  /**
+   * Résout la chaîne COMPLÈTE d'implexes avec récursion profonde
+   */
+  resolveFullChain: function(sosa) {
+    sosa = parseInt(sosa);
+
+    if (this.fullChainCache.has(sosa)) {
+      return this.fullChainCache.get(sosa);
+    }
+
+    const chain = [];
+    const dataChain = [];
+    let currentSosa = sosa;
+    let visitedSosas = new Set();
+    let depth = 0;
+    const maxDepth = 10; // Sécurité contre les boucles infinies
+
+    // Parcourir toute la chaîne jusqu'à la source réelle
+    while (currentSosa && depth < maxDepth) {
+      if (visitedSosas.has(currentSosa)) {
+        console.warn(`ImplexResolver: Boucle détectée pour Sosa ${sosa} à ${currentSosa}`);
+        break;
+      }
+
+      visitedSosas.add(currentSosa);
+      const person = ancestor["S" + currentSosa];
+
+      if (!person) {
+        console.warn(`ImplexResolver: Personne manquante pour Sosa ${currentSosa}`);
+        break;
+      }
+
+      chain.push(currentSosa);
+      dataChain.push(person);
+
+      // Si pas d'implexe, on a trouvé la source
+      if (!person.sosasame) {
+        break;
+      }
+
+      // Continuer avec la cible de l'implexe
+      currentSosa = parseInt(person.sosasame);
+      depth++;
+    }
+
+    // La source est le dernier élément (celui sans sosasame)
+    const sourceSosa = chain[chain.length - 1];
+    const sourceData = dataChain[dataChain.length - 1];
+
+    const result = {
+      source: sourceSosa,
+      chain: chain,
+      dataChain: dataChain,
+      data: sourceData,
+      depth: depth
+    };
+
+    this.fullChainCache.set(sosa, result);
+    return result;
+  },
+
+  /**
+   * Obtient les données d'affichage pour un Sosa en suivant toute la chaîne
+   */
+  getCompleteDisplayData: function(sosa) {
+    const resolution = this.resolveFullChain(sosa);
+    return resolution.data;
+  },
+
+  /**
+   * Détermine TOUS les Sosas à surligner pour un implexe donné
+   */
+  getAllHighlightTargets: function(sosa) {
+    sosa = parseInt(sosa);
+    const person = ancestor["S" + sosa];
+
+    if (!person) return [sosa];
+
+    // Obtenir la chaîne complète
+    const resolution = this.resolveFullChain(sosa);
+    const sourceSosa = resolution.source;
+
+    // Trouver tous les clones de la source
+    const allClones = this.getAllClones(sourceSosa);
+
+    // Retourner la chaîne complète + tous les clones
+    const allTargets = new Set(resolution.chain);
+    allClones.forEach(clone => allTargets.add(clone));
+
+    return Array.from(allTargets);
+  }
+};
+
 // ========== Application principale ==========
 const FanchartApp = {
   window_w: 0,
@@ -3596,6 +3876,8 @@ const FanchartApp = {
     // CALCULS INITIAUX
     this.calculateDimensions();
     this.processAncestorData();
+
+    ImplexResolver.initialize();
 
     // LECTURE DE L'ÉTAT URL
     const state = URLManager.readCurrentState();
@@ -4213,6 +4495,7 @@ const FanchartApp = {
     const fanchart = document.getElementById("fanchart");
     fanchart.innerHTML = "";
     this.renderFanchart();
+    ImplexResolver.initialize();
 
     const placesPanel = document.querySelector('.places-panel');
     if (placesPanel) {
