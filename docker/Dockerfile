@@ -23,7 +23,7 @@ RUN opam init --disable-sandboxing --auto-setup --bare
 
 # Copy opam file for dependency resolution then install dependencies
 COPY --chown=opam:opam *.opam ./
-RUN eval "$(opam env)" && opam install . --deps-only --with-test && opam install ancient.0.10.0
+RUN eval "$(opam env)" && opam update && opam install . --deps-only --with-test && opam install ancient.0.10.0
 
 # Clone repository and build Geneweb
 WORKDIR /home/opam/geneweb
