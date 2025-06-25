@@ -50,7 +50,7 @@
   )
   (depopts
     ocaml-option-nnp
-    ancient
+    (ancient (>= 0.10.0))
     zarith
   )
 )

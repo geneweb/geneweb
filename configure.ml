@@ -8,11 +8,6 @@ let rm = ref ""
 let ext = ref ""
 let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
-
-let nnp_compiler =
-  if not Sys.win32 then 1 = Sys.command "$(ocamlc -config-var naked_pointers)"
-  else false
-
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let syslog = ref false
@@ -54,20 +49,11 @@ let () =
   let ancient_lib, ancient_file =
     let no_cache = ("", "gw_ancient.dum.ml") in
     if !caching then
-      if nnp_compiler then
-        if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
-        else (
-          Format.eprintf
-            "Warning: ocaml-ancient not installed. Cannot enable database \
-             caching.@.";
-          no_cache)
+      if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
       else (
         Format.eprintf
-          "Warning: the OCaml compiler was not installed with the \
-           no-naked-pointers@ option. The gwd caching feature requires this \
-           option because GeneWeb@ uses the Marshal module on values from the \
-           database, which is not compatible@ with Ancient when naked pointers \
-           could be present.@.";
+          "Warning: `ocaml-ancient` not installed. Require version 0.10.0 or \
+           later. Cannot enable database caching.@.";
         no_cache)
     else no_cache
   in
