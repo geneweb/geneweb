@@ -2,7 +2,7 @@
 #                                                      STAGE 1: Build Geneweb
 ###############################################################################
 
-FROM ocaml/opam:debian-ocaml-4.14-nnp AS builder
+FROM ocaml/opam:debian-ocaml-4.14-nnp@sha256:ddd652d354faad46a4d44ef58fc5a2e3d75dce855065e1f2de7ab50ac36992d0 AS builder
 
 ENV OPAMYES=yes
 ENV OPAMJOBS=2
@@ -16,6 +16,11 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     m4 libgmp-dev libpcre3-dev libipc-system-simple-perl xdot zlib1g-dev pkg-config \
     && ln -sf /usr/bin/opam-2.3 /usr/bin/opam
 
+# Update local opam repository
+USER opam
+WORKDIR /home/opam/opam-repository
+RUN git fetch origin master && git checkout 2ca36230be22748ea153057760524e23defe5fc7 && opam update
+
 # Initialize OPAM
 USER opam
 WORKDIR /home/opam
@@ -23,7 +28,7 @@ RUN opam init --disable-sandboxing --auto-setup --bare
 
 # Copy opam file for dependency resolution then install dependencies
 COPY --chown=opam:opam *.opam ./
-RUN eval "$(opam env)" && opam install . --deps-only --with-test && opam pin add ancient "https://github.com/OCamlPro/ocaml-ancient.git#ea8df144ee96c660b2401c832a10f30f8c69994a"
+RUN eval "$(opam env)" && opam install . --deps-only --with-test && opam install ancient
 
 # Clone repository and build Geneweb
 WORKDIR /home/opam/geneweb

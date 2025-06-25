@@ -126,7 +126,7 @@ jobs:
 
       - name: Install ancient dependency
         if: env.USE_NNP == 'true'
-        run: opam pin ancient -y https://github.com/OCamlPro/ocaml-ancient.git
+        run: opam install ancient
 
       - name: Configure
         run: opam exec -- ocaml ./configure.ml --sosa-zarith ${{ env.USE_NNP == 'true' && '--gwd-caching' || '' }}

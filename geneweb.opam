@@ -41,7 +41,11 @@ depends: [
   "ocamlformat" {with-dev-setup & = "0.27.0"}
   "odoc" {with-doc}
 ]
-depopts: ["ocaml-option-nnp" "ancient" "zarith"]
+depopts: [
+  "ocaml-option-nnp"
+  "ancient" {>= "0.10.0"}
+  "zarith"
+]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build-env: DUNE_PROFILE = "release"
 
