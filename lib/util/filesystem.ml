@@ -103,14 +103,15 @@ let walk_folder ?(recursive = false) f path acc =
   in
   traverse [ path ] acc
 
-let copy_file ?(perm = 0o640) src dst =
+let copy_file ?(perm = 0o640) ?(overwrite = true) src dst =
   let sz = 8192 in
   let buf = Bytes.create sz in
+  let flags =
+    if overwrite then [ Open_wronly; Open_creat; Open_trunc; Open_binary ]
+    else [ Open_wronly; Open_creat; Open_excl; Open_binary ]
+  in
   Compat.In_channel.with_open_bin src @@ fun ic ->
-  Compat.Out_channel.with_open_gen
-    [ Open_wronly; Open_append; Open_trunc ]
-    perm dst
-  @@ fun oc ->
+  Compat.Out_channel.with_open_gen flags perm dst @@ fun oc ->
   let rec loop () =
     match Compat.In_channel.input ic buf 0 sz with
     | 0 -> ()
