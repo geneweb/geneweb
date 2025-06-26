@@ -1753,12 +1753,13 @@ const PlacesHighlighter = {
   },
 
   /**
-   * Surlignage bidirectionnel corrigé avec colorisation
+   * Surlignage bidirectionnel avec colorisation
+   * Logique de groupe directe : groupes M pour les mariages et S pour les autres événements
    */
   highlightInSVG: function(placeName, placeData, highlight) {
     const placeClass = placeData.c; // Ex: "L0"
 
-    // Pour chaque type d'événement présent dans ce lieu
+    // Traiter chaque type d'événement présent dans ce lieu
     Events.types.forEach(eventType => {
       if (placeData[Events.svgPrefix(eventType)]) {
         const svgClass = `${Events.svgPrefix(eventType)}-${placeClass}`;
@@ -1766,43 +1767,24 @@ const PlacesHighlighter = {
 
         Array.from(elements).forEach(element => {
           if (highlight) {
-            // Déterminer le contexte de l'élément
-            const isMarriageClass = svgClass.startsWith('ma-');
+            // Déterminer le contexte grâce à la structure DOM claire
             const parentGroup = element.parentNode;
-            const isInMarriageGroup = parentGroup && parentGroup.id && parentGroup.id.startsWith('M');
-            const isInPersonGroup = parentGroup && parentGroup.id && parentGroup.id.startsWith('S');
+            const groupId = parentGroup?.id || '';
 
-            // Pour les mariages, coloriser uniquement les éléments dans les groupes de mariage
-            if (isMarriageClass && isInPersonGroup && !isInMarriageGroup) {
-              // Ne pas coloriser les secteurs de personnes avec la couleur mariage
-              return;
+            // Logique simplifiée grâce à la séparation des groupes
+            if (eventType === 'marriage') {
+              // Mariages : coloriser UNIQUEMENT les éléments dans les groupes M
+              if (groupId.startsWith('M')) {
+                this.applyEventHighlight(element, eventType, placeName);
+              }
+            } else {
+              // NBDS : coloriser UNIQUEMENT les éléments dans les groupes S
+              if (groupId.startsWith('S')) {
+                this.applyEventHighlight(element, eventType, placeName);
+              }
             }
-
-            // Sauvegarder l'état original
-            if (!element.dataset.originalFill) {
-              element.dataset.originalFill = element.style.fill || '';
-              element.dataset.originalClass = element.getAttribute('class') || '';
-            }
-
-            // Appliquer la colorisation selon le type d'événement
-            element.classList.add('svg-place-highlight');
-            element.classList.add(`event-highlight-${eventType}`);
-
-            // Tracker pour éviter les conflits
-            this.state.svgElements.set(element, placeName);
           } else {
-            // Restaurer l'état original
-            element.classList.remove('svg-place-highlight');
-            Events.types.forEach(et => {
-              element.classList.remove(`event-highlight-${et}`);
-            });
-
-            element.style.fill = element.dataset.originalFill || '';
-
-            delete element.dataset.originalFill;
-            delete element.dataset.originalClass;
-
-            this.state.svgElements.delete(element);
+            this.removeEventHighlight(element);
           }
         });
       }
@@ -1810,24 +1792,60 @@ const PlacesHighlighter = {
   },
 
   /**
-   * Surlignage par type d'événement (pour les totaux NBMDS)
+   * Application du surlignage d'événement
+   */
+  applyEventHighlight: function(element, eventType, placeName) {
+    // Sauvegarder l'état original seulement si nécessaire
+    if (!element.dataset.originalFill) {
+      element.dataset.originalFill = element.style.fill || '';
+    }
+
+    // Appliquer les classes CSS appropriées
+    element.classList.add('svg-place-highlight');
+    element.classList.add(`event-highlight-${eventType}`);
+
+    // Enregistrer pour le nettoyage
+    this.state.svgElements.set(element, placeName);
+  },
+
+  /**
+   * Suppression du surlignage d'événement
+   */
+  removeEventHighlight: function(element) {
+    // Nettoyer toutes les classes de surlignage
+    element.classList.remove('svg-place-highlight');
+
+    // Nettoyer chaque classe d'événement possible
+    Events.types.forEach(eventType => {
+      element.classList.remove(`event-highlight-${eventType}`);
+    });
+
+    // Restaurer le style original
+    if (element.dataset.originalFill !== undefined) {
+      element.style.fill = element.dataset.originalFill;
+      delete element.dataset.originalFill;
+    }
+
+    // Supprimer du tracking
+    this.state.svgElements.delete(element);
+  },
+
+  /**
+   * Surlignage spécialisé pour les totaux d’événement NBMDS
    */
   highlightByEventType: function(eventType) {
     this.clearAllHighlights();
 
     const placesToHighlight = [];
-    const eventsForEachPlace = [];
 
     // Collecter tous les lieux ayant ce type d'événement
     Object.entries(lieux).forEach(([placeName, placeData]) => {
       if (placeData[Events.svgPrefix(eventType)]) {
         placesToHighlight.push(placeName);
-        eventsForEachPlace.push([eventType]);
       }
     });
 
-    // NE PAS ajouter d'indicateurs pour le survol des totaux
-    // Surligner uniquement les lieux dans la liste
+    // Surligner les lieux dans la liste (inchangé)
     placesToHighlight.forEach(placeName => {
       const placeData = lieux[placeName];
       if (placeData?.domElement) {
@@ -1836,44 +1854,93 @@ const PlacesHighlighter = {
       }
     });
 
-    // Coloriser les éléments SVG avec la couleur de l'événement
+    // Logique SVG simplifiée par type d'événement
     if (eventType === 'marriage') {
-      // Pour les mariages, coloriser UNIQUEMENT les secteurs de mariage
-      this.highlightMarriageSectorsOnly(placesToHighlight);
+      this.highlightMarriageSectors(placesToHighlight);
     } else {
-      // Pour NBDS, coloriser les individus avec la couleur de l'événement
-      this.highlightIndividualsByEventType(placesToHighlight, eventType);
+      this.highlightPersonSectorsByEvent(placesToHighlight, eventType);
     }
 
-    // Griser les autres éléments
     this.grayOutOthers();
   },
 
-  // Surligner uniquement les secteurs de mariage
-  highlightMarriageSectorsOnly: function(placesToHighlight) {
+  /**
+   * Surlignage des secteurs de mariage
+   * Cible exclusivement les éléments de mariage dans les groupes M
+   *
+   * @param {Array<string>} placesToHighlight - Liste des noms de lieux à surligner
+   */
+  highlightMarriageSectors: function(placesToHighlight) {
     placesToHighlight.forEach(placeName => {
       const placeData = lieux[placeName];
-      if (!placeData) return;
+      if (!placeData) {
+        console.warn(`PlacesHighlighter: Lieu inexistant "${placeName}"`);
+        return;
+      }
 
-      const placeClass = placeData.c;
+      // Construire la classe CSS pour les mariages dans ce lieu
+      const placeClass = placeData.c; // Ex: "L0", "L1", etc.
       const svgClass = `ma-${placeClass}`;
       const elements = document.getElementsByClassName(svgClass);
 
+      // Traiter chaque élément avec la classe de mariage correspondante
       Array.from(elements).forEach(element => {
-        // Vérifier que c'est bien dans un groupe de mariage
         const parentGroup = element.parentNode;
-        if (parentGroup && parentGroup.id && parentGroup.id.startsWith('M')) {
-          if (!element.dataset.originalFill) {
-            element.dataset.originalFill = element.style.fill || '';
-          }
-          element.classList.add('event-highlight-marriage');
-          this.state.svgElements.set(element, placeName);
+
+        // Vérification stricte : l'élément doit être dans un groupe de mariage
+        // Grâce à la restructuration DOM, cette vérification est simple et fiable
+        if (parentGroup?.id?.startsWith('M')) {
+          this.applyEventHighlight(element, 'marriage', placeName);
         }
+        // Note: avec l'ancienne structure imbriquée, nous aurions dû ajouter
+        // des vérifications complexes pour éviter les secteurs de personnes
       });
     });
   },
 
-  // Surligner les individus par type d'événement
+  /**
+   * Surlignage des secteurs de personnes par type d'événement
+   * Cible les événements individuels (NBDS) dans les groupes S
+   *
+   * @param {Array<string>} placesToHighlight - Liste des noms de lieux à surligner
+   * @param {string} eventType - Type d'événement ('birth', 'baptism', 'death', 'burial')
+   */
+  highlightPersonSectorsByEvent: function(placesToHighlight, eventType) {
+    // Validation du type d'événement
+    if (!Events.isValid(eventType)) {
+      console.error(`PlacesHighlighter: Type d'événement invalide "${eventType}"`);
+      return;
+    }
+
+    placesToHighlight.forEach(placeName => {
+      const placeData = lieux[placeName];
+      if (!placeData) {
+        console.warn(`PlacesHighlighter: Lieu inexistant "${placeName}"`);
+        return;
+      }
+
+      // Construire la classe CSS pour cet événement dans ce lieu
+      const placeClass = placeData.c; // Ex: "L0", "L1", etc.
+      const svgPrefix = Events.svgPrefix(eventType); // Ex: "bi", "ba", "de", "bu"
+      const svgClass = `${svgPrefix}-${placeClass}`;
+      const elements = document.getElementsByClassName(svgClass);
+
+      // Traiter chaque élément avec la classe d'événement correspondante
+      Array.from(elements).forEach(element => {
+        const parentGroup = element.parentNode;
+
+        // Vérification stricte : l'élément doit être dans un groupe de personne
+        // Cette simplicité est rendue possible par la restructuration DOM
+        if (parentGroup?.id?.startsWith('S')) {
+          this.applyEventHighlight(element, eventType, placeName);
+        }
+        // Note: dans l'ancienne architecture, nous devions gérer les cas où
+        // un secteur de personne contenait aussi un secteur de mariage
+      });
+    });
+  },
+
+  // Surligner les individus par type d'événement > TODO : DEPRECIATE/REMOVE ?
   highlightIndividualsByEventType: function(placesToHighlight, eventType) {
     placesToHighlight.forEach(placeName => {
       const placeData = lieux[placeName];
@@ -2450,90 +2517,75 @@ const SVGRenderer = {
     }
   },
 
+  /**
+   * Gestion du survol d'éléments SVG
+   */
   handleMouseEnter: function(p, type, event) {
-    // 1. PANNEAU D'INFORMATION
+    // 1. Panneau d'information (inchangé)
     const panel = document.getElementById("person-panel");
-    if (panel) {
-        // Pour les implexes, utiliser les données de la personne cible
-        let personToDisplay = p;
-
-        if (type === "person" && p.sosasame) {
-            const targetPerson = ancestor["S" + p.sosasame];
-            if (targetPerson) {
-                // objet combiné : données réelles + infos d'implexe
-                personToDisplay = {
-                    ...targetPerson,      // Toutes les vraies données (dates, lieux, etc.)
-                    sosa: p.sosa,        // Garder le Sosa actuel pour l'affichage
-                    sosasame: p.sosasame // Garder l'info d'implexe pour le panneau
-                };
-            }
-        }
-
-        this.buildTooltipContent(panel, personToDisplay, type);
+    if (panel && type === "person" && p.sosa) {
+      const displayData = ImplexResolver.getDisplayData(p.sosa);
+      if (displayData) {
+        const enhancedPerson = {
+          ...displayData,
+          sosa: p.sosa,
+          sosasame: p.sosasame
+        };
+        this.buildTooltipContent(panel, enhancedPerson, type);
         panel.style.display = "block";
+      }
+    } else if (panel) {
+      this.buildTooltipContent(panel, p, type);
+      panel.style.display = "block";
     }
 
-    // 2. SURLIGNAGE DU SECTEUR SURVOLÉ
-    if (event && event.target) {
-        event.target.classList.add('highlight');
+    // 2. Surlignage de l'élément survolé (simplifié)
+    if (event?.target) {
+      event.target.classList.add('highlight');
 
-        // Surlignage du fond correspondant
-        const parentGroup = event.target.parentNode;
-        if (parentGroup && type === 'person') {
-            const bgElement = parentGroup.querySelector('.bg:not([class*="ma-"])');
-            if (bgElement) {
-                bgElement.classList.add('highlight');
-            }
-        } else if (type === 'marriage') {
-            const bgElement = parentGroup.querySelector('.bg');
-            if (bgElement) {
-                bgElement.classList.add('highlight');
-                // Surlignage orange SEULEMENT si lieu ET mode place
-                if (p.marriage_place && document.body.classList.contains('place')) {
-                    event.target.classList.add('event-highlight-marriage');
-                    bgElement.classList.add('event-highlight-marriage');
-                }
-            }
+      // Surlignage du fond correspondant
+      const parentGroup = event.target.parentNode;
+      if (parentGroup) {
+        const bgElement = parentGroup.querySelector('.bg');
+        if (bgElement) {
+          bgElement.classList.add('highlight');
+
+          // Pour les mariages en mode lieux : ajouter la couleur orange
+          if (type === 'marriage' && p.marriage_place && document.body.classList.contains('place')) {
+            event.target.classList.add('event-highlight-marriage');
+            bgElement.classList.add('event-highlight-marriage');
+          }
         }
+      }
     }
 
-    // 3. MODES SPÉCIAUX (âge, lieux)
+    // 3. Modes spéciaux
     if (document.body.classList.contains('age')) {
-        const dataForAge = (type === "person" && p.sosasame && personToDisplay) ? personToDisplay : p;
-        AgeHighlighter.handleSVGHover(dataForAge, type, 'enter');
+      AgeHighlighter.handleSVGHover(p, type, 'enter');
     }
 
     if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
-        let dataForPlaces = p;
-        if (type === "person" && p.sosasame) {
-            const targetPerson = ancestor["S" + p.sosasame];
-            if (targetPerson) {
-                dataForPlaces = targetPerson;
-            }
-        }
-
-        const places = this.extractPlacesFromPerson(dataForPlaces, type);
+      const displayPerson = p.sosa ? ImplexResolver.getDisplayData(p.sosa) : p;
+      if (displayPerson) {
+        const places = this.extractPlacesFromPerson(displayPerson, type);
         if (places.length > 0) {
-            const placeNames = places.map(p => p.place);
-            const events = places.map(p => [p.event]);
-            PlacesHighlighter.highlight(placeNames, events, 'svg');
+          const placeNames = places.map(p => p.place);
+          const events = places.map(p => [p.event]);
+          PlacesHighlighter.highlight(placeNames, events, 'svg');
         }
+      }
     }
 
-    // 4. SURLIGNAGE MULTIPLE DES IMPLEXES
+    // 4. Surlignage des implexes
     if (type === "person" && p.sosa) {
       const targetsToHighlight = ImplexResolver.getHighlightTargets(p.sosa);
 
-      console.log(`Surlignage de Sosa ${p.sosa}, cibles:`, targetsToHighlight);
-
-      // Surligner tous les éléments de la chaîne
       targetsToHighlight.forEach(targetSosa => {
-        if (targetSosa !== p.sosa) { // Ne pas retraiter l'élément actuel
+        if (targetSosa !== p.sosa) {
           const targetElement = document.getElementById("S" + targetSosa);
           if (targetElement) {
             targetElement.classList.add("same_hl");
 
-            // Surligner aussi le secteur interactif
             const targetPath = targetElement.querySelector('path.link');
             if (targetPath) {
               targetPath.classList.add('highlight');
@@ -2544,23 +2596,25 @@ const SVGRenderer = {
     }
   },
 
-  // TOUT le nettoyage
+  /**
+   * Gestion de la sortie de survol (nettoyage)
+   */
   handleMouseLeave: function(p, type, event) {
-    // 1. PANNEAU D'INFORMATION
+    // 1. Panneau d'information (inchangé)
     const panel = document.getElementById("person-panel");
     if (panel) {
       panel.style.display = "none";
       panel.innerHTML = "";
     }
 
-    // 2. SURLIGNAGE DU SECTEUR
-    if (event && event.target) {
+    // 2. Nettoyage du surlignage de l'élément
+    if (event?.target) {
       event.target.classList.remove('highlight');
       event.target.classList.remove('event-highlight-marriage');
 
       const parentGroup = event.target.parentNode;
       if (parentGroup) {
-        const bgElements = parentGroup.querySelectorAll('.bg.highlight, .bg.event-highlight-marriage');
+        const bgElements = parentGroup.querySelectorAll('.bg');
         bgElements.forEach(bg => {
           bg.classList.remove('highlight');
           bg.classList.remove('event-highlight-marriage');
@@ -2568,7 +2622,7 @@ const SVGRenderer = {
       }
     }
 
-    // 3. MODES SPÉCIAUX
+    // 3. Modes spéciaux
     if (document.body.classList.contains('place')) {
       PlacesHighlighter.clearAllHighlights();
     }
@@ -2577,7 +2631,7 @@ const SVGRenderer = {
       AgeHighlighter.clearAllHighlights();
     }
 
-    // 4. NETTOYAGE DES IMPLEXES MULTIPLES
+    // 4. Nettoyage des implexes
     if (type === "person" && p.sosa) {
       const targetsToClean = ImplexResolver.getHighlightTargets(p.sosa);
 
@@ -2586,7 +2640,6 @@ const SVGRenderer = {
         if (targetElement) {
           targetElement.classList.remove("same_hl");
 
-          // Nettoyer aussi les highlights sur les paths
           const highlightedPaths = targetElement.querySelectorAll('.highlight');
           highlightedPaths.forEach(path => {
             path.classList.remove('highlight');
@@ -2645,7 +2698,7 @@ const SVGRenderer = {
   },
 
   drawNavigationSymbol: function(g, pathId, p, pathLength, hasParents) {
-    let fontSize = 80;
+    let fontSize = 55;
     if (2 * standard_width > pathLength) {
       fontSize = Math.round(100 * pathLength / 2 / standard_width);
     }
@@ -2668,12 +2721,26 @@ const SVGRenderer = {
     return text;
   },
 
+  /**
+   * Indicateur de navigation
+   */
   drawParentIndicator: function(g, r, a1, a2, sosa, p) {
     if (!p || p.fn === "?" || p.fn === "" || !p.fn) {
       return; // Pas d'icône du tout
     }
-    const pathLength = T.createCircularPath(g, `tpiS${sosa}`, r, a1, a2);
-    return this.drawNavigationSymbol(g, `tpiS${sosa}`, p, pathLength, p.has_parents);
+
+    // Créer le chemin circulaire au milieu de la zone de la personne
+    const middleAngle = (a1 + a2) / 2;
+    const pathId = `tpiS${sosa}`;
+    
+    // Créer un petit arc centré pour l'icône
+    const arcLength = Math.min(20, Math.abs(a2 - a1) * Math.PI * r / 180); // Limiter la taille
+    const deltaAngle = arcLength / (2 * Math.PI * r) * 180;
+    
+    const pathLength = TextRenderer.createCircularPath(g, pathId, r, 
+      middleAngle - deltaAngle, middleAngle + deltaAngle);
+    
+    return this.drawNavigationSymbol(g, pathId, p, pathLength, p.has_parents);
   }
 };
 
@@ -3836,6 +3903,49 @@ const ImplexResolverEnhanced = {
   }
 };
 
+const SVGGeometry = {
+  /**
+   * Détermine si un Sosa correspond à un père (pair) ou une mère (impair)
+   */
+  isFather: function(sosa) {
+    return sosa % 2 === 0;
+  },
+
+  /**
+   * Calcule le Sosa du père à partir de n'importe quel Sosa du couple
+   * Utilisé pour identifier le groupe famille
+   */
+  getFatherSosa: function(sosa) {
+    return sosa % 2 === 0 ? sosa : sosa - 1;
+  },
+
+  /**
+   * Calcul de la géométrie des secteurs individuels (père/mère)
+   */
+  getPersonGeometry: function(sosa, position) {
+    return {
+      startAngle: position.a1,
+      endAngle: position.a2,
+      innerRadius: position.r1 + 10,    // Couche externe pour éviter des conflits
+      outerRadius: position.r2
+    };
+  },
+
+  /**
+   * Calcul la géométrie du secteur de mariage pour un couple
+   */
+  getMarriageGeometry: function(fatherPosition) {
+    const marriageEndAngle = fatherPosition.a2 + fatherPosition.delta;
+
+    return {
+      startAngle: fatherPosition.a1,
+      endAngle: marriageEndAngle,
+      innerRadius: fatherPosition.r1, // Couche interne pour éviter des conflits
+      outerRadius: fatherPosition.r1 + 10
+    };
+  }
+};
+
 // ========== Application principale ==========
 const FanchartApp = {
   window_w: 0,
@@ -4365,67 +4475,149 @@ const FanchartApp = {
     return { person: referencedPerson, isImplex: false };
   },
 
-  // Rendre un secteur complet d’ancêtre
+  /**
+   * Rendu des secteurs avec géométrie en couches et groupes famille
+   *
+   * Trois zones d'interaction sans chevauchement géométrique (aucun conflits d'interaction) :
+   * - couronne interne : mariage (rayon r1 → r1+10, angle complet) ;
+   * - secteur externe gauche : époux (rayon r1+10 → r2, demi-angle) ;
+   * - secteur externe droit : épouse (rayon r1+10 → r2, demi-angle).
+   */
   renderAncestorSector: function(sosa, position, person) {
-      const target = renderTarget || fanchart;
-      // Créer le groupe pour cet ancêtre
-      const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      group.setAttribute("id", "S" + sosa);
-      target.append(group);
+    const target = renderTarget || fanchart;
 
-      // Gérer les implexes
-      const implexInfo = this.handleImplex(sosa, person);
-      const actualPerson = implexInfo.person;
-      actualPerson.sosa = sosa;
+    // Créer le groupe famille (basé sur le père) si il n'existe pas encore
+    const fatherSosa = SVGGeometry.getFatherSosa(sosa);
+    const familyGroupId = "G" + fatherSosa;
 
-      // Dessiner le secteur de fond
-      SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
-        position.a1, position.a2, actualPerson,
-        { type: 'person', isBackground: true });
+    let familyGroup = document.getElementById(familyGroupId);
+    if (!familyGroup) {
+      familyGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      familyGroup.setAttribute("id", familyGroupId);
+      target.append(familyGroup);
 
-      // Dessiner le texte si la personne est connue
-      if (actualPerson.fn !== "?") {
-        const textClasses = this.buildTextClasses(actualPerson);
-        const isImplexCompact = person.sosasame && (implexMode === "reduced" || implexMode === "numbered");
-        if (isImplexCompact) { group.classList.add('implex-compact'); }
+      // Créer d'abord le secteur de mariage
+      if (sosa % 2 === 0) { // Seul l'époux crée le mariage
+        this.renderMarriageSector(familyGroup, sosa, position, person);
+      }
+    }
 
-        SVGRenderer.drawSectorText(group, position.r1, position.r2,
-          position.a1, position.a2, sosa, actualPerson,
-          textClasses, position.generation, isImplexCompact);
+    // Créer le groupe de la personne dans le groupe famille
+    const personGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    personGroup.setAttribute("id", "S" + sosa);
+    familyGroup.append(personGroup);
+
+    // Résolution des implexes
+    const implexInfo = this.handleImplex(sosa, person);
+    const actualPerson = implexInfo.person;
+    actualPerson.sosa = sosa;
+
+    // Calculer la géométrie spécifique à cette personne
+    const personGeom = SVGGeometry.getPersonGeometry(sosa, position);
+
+    // Secteur de fond
+    SVGRenderer.drawPie(personGroup, personGeom.innerRadius, personGeom.outerRadius,
+      personGeom.startAngle, personGeom.endAngle, actualPerson,
+      { type: 'person', isBackground: true });
+
+    // Texte de la personne
+    if (actualPerson.fn !== "?") {
+      const textClasses = this.buildTextClasses(actualPerson);
+      const isImplexCompact = person.sosasame && (implexMode === "reduced" || implexMode === "numbered");
+      if (isImplexCompact) {
+        personGroup.classList.add('implex-compact');
       }
 
-      // Gérer le mariage pour les ancêtres pairs (pères) - AVANT le secteur interactif
-      if (sosa % 2 === 0) {
-        const marriageGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        marriageGroup.setAttribute("id", "M" + sosa);
-        group.appendChild(marriageGroup);  // Ajouter au groupe de la personne, pas au fanchart
+      SVGRenderer.drawSectorText(personGroup, personGeom.innerRadius - 10, personGeom.outerRadius,
+        personGeom.startAngle, personGeom.endAngle, sosa, actualPerson,
+        textClasses, position.generation, isImplexCompact);
+    }
 
-        let marriagePerson = actualPerson;
-        if (implexInfo.isImplex && implexMode === "numbered" && implexInfo.originalSosa) {
-          marriagePerson = ancestor["S" + implexInfo.originalSosa];
-        }
+    // Secteur interactif
+    SVGRenderer.drawPie(personGroup, personGeom.innerRadius, personGeom.outerRadius,
+      personGeom.startAngle, personGeom.endAngle, actualPerson,
+      { type: 'person' });
 
-        this.renderMarriageInfo(marriageGroup, sosa, position, marriagePerson);
-      } else if (sosa % 2 !== 0) {
-        // Pour les mères, propager les infos de mariage
-        const fatherSosa = sosa - 1;
-        const father = this.getEffectivePerson(fatherSosa);
+    // Indicateur de navigation
+    SVGRenderer.drawParentIndicator(personGroup, personGeom.innerRadius,
+      personGeom.startAngle, personGeom.endAngle, sosa, actualPerson);
 
-        if (father && father.marriage_place) {
-          actualPerson.marriage_place = father.marriage_place;
-        }
+    return personGroup;
+  },
+
+  /**
+   * Rendu du secteur de mariage dans une couronne interne
+   */
+  renderMarriageSector: function(familyGroup, fatherSosa, position, person) {
+    // Créer le groupe mariage en premier dans l’ordre DOM
+    const marriageGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    marriageGroup.setAttribute("id", "M" + fatherSosa);
+ 
+    if (familyGroup.firstChild) {
+      familyGroup.insertBefore(marriageGroup, familyGroup.firstChild);
+    } else {
+      familyGroup.appendChild(marriageGroup);
+    }
+
+    const marriageGeometry = SVGGeometry.getMarriageGeometry(position);
+
+    // Secteur de fond
+    SVGRenderer.drawPie(marriageGroup, marriageGeometry.innerRadius, marriageGeometry.outerRadius,
+      marriageGeometry.startAngle, marriageGeometry.endAngle, person,
+      { type: 'marriage', isBackground: true });
+
+    // Date de mariage centrée
+    if (person.marriage_date !== undefined && person.marriage_date !== "") {
+      let marriageTextClasses = "";
+      if (person.marriage_place && lieux[person.marriage_place]) {
+        marriageTextClasses += " ma-t" + lieux[person.marriage_place].c;
       }
+      
+      const textRadius = (marriageGeometry.innerRadius + marriageGeometry.outerRadius) / 2;
+      TextRenderer.drawMarriageDate(marriageGroup, fatherSosa, textRadius,
+        marriageGeometry.startAngle, marriageGeometry.endAngle, person.marriage_date, marriageTextClasses);
+    }
 
-      // Dessiner le secteur interactif EN DERNIER pour qu'il soit au-dessus
-      SVGRenderer.drawPie(group, position.r1 + 10, position.r2,
-        position.a1, position.a2, actualPerson,
-        { type: 'person' });
+    // Éléments structurels avec géométrie corrigée
+    SVGRenderer.drawContour(marriageGroup, marriageGeometry.innerRadius, position.r2, 
+      marriageGeometry.startAngle, marriageGeometry.endAngle);
+    
+    // Ligne de séparation entre père et mère
+    SVGRenderer.drawRadialLine(marriageGroup, marriageGeometry.outerRadius, position.r2, position.a2);
 
-      // Ajouter l'indicateur de navigation
-      SVGRenderer.drawParentIndicator(group, position.r1 + 10,
-        position.a1, position.a2, sosa, actualPerson);
+    // Secteur interactif du mariage dans sa couronne exclusive
+    SVGRenderer.drawPie(marriageGroup, marriageGeometry.innerRadius, marriageGeometry.outerRadius,
+      marriageGeometry.startAngle, marriageGeometry.endAngle, person,
+      { type: 'marriage' });
 
-      return group;
+    // Métadonnée lieu
+    if (person.marriage_place) {
+      marriageGroup.setAttribute("data-place-name", person.marriage_place);
+    }
+
+    return marriageGroup;
+  },
+  /**
+   * Fonction utilitaire pour accéder à un groupe famille complet
+   * Simplifie les interactions futures au niveau couple
+   */
+  getFamilyGroup: function(sosa) {
+    const fatherSosa = SVGGeometry.getFatherSosa(sosa);
+    return document.getElementById("G" + fatherSosa);
+  },
+
+  /**
+   * Fonction utilitaire pour obtenir tous les éléments d'une famille
+   * Retourne {father, mother, marriage} ou les éléments disponibles
+   */
+  getFamilyElements: function(sosa) {
+    const fatherSosa = SVGGeometry.getFatherSosa(sosa);
+    return {
+      group: document.getElementById("G" + fatherSosa),
+      father: document.getElementById("S" + fatherSosa),
+      mother: document.getElementById("S" + (fatherSosa + 1)),
+      marriage: document.getElementById("M" + fatherSosa)
+    };
   },
 
   buildTextClasses: function(person) {
@@ -4445,35 +4637,6 @@ const FanchartApp = {
     }
 
     return classes.trim();
-  },
-
-  // Informations de mariage
-  renderMarriageInfo: function(marriageGroup, sosa, position, person) {
-    const extendedA2 = position.a2 + position.delta;
-
-    // Dessiner le secteur de mariage (fond)
-    SVGRenderer.drawPie(marriageGroup, position.r1, position.r1 + 10,
-    position.a1, extendedA2, person,
-    { type: 'marriage', isBackground: true });
-
-    // Dessiner la date de mariage si elle existe
-    if (person.marriage_date !== undefined) {
-      let classes = "";
-      if (person.marriage_place && person.marriage_place !== "" && lieux[person.marriage_place]) {
-        classes += " ma-t" + lieux[person.marriage_place].c;
-      }
-      T.drawMarriageDate(marriageGroup, sosa, position.r1 + 5,
-        position.a1, extendedA2, person.marriage_date, classes);
-    }
-
-    // Dessiner le contour et la ligne radiale
-    SVGRenderer.drawContour(marriageGroup, position.r1, position.r2, position.a1, extendedA2);
-    SVGRenderer.drawRadialLine(marriageGroup, position.r1 + 10, position.r2, position.a2);
-
-    // Dessiner le secteur de mariage interactif
-    SVGRenderer.drawPie(marriageGroup, position.r1, position.r1 + 10,
-    position.a1, extendedA2, person,
-    { type: 'marriage' });
   },
 
   updateGenerationTitle: function() {

@@ -208,20 +208,19 @@ textPath {
   cursor: pointer;
 }
 
-/* Masquer les indicateurs de navigation par défaut */
-.icon {
-  fill: transparent;
+/* Indicateurs de navigation (triangles et croix) */
+svg .icon {
+  fill: transparent !important;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-/* Triangle noir au survol de l'individu */
-svg g:hover .icon {
-  opacity: 1;
-  fill: black !important; 
+svg g[id^="S"]:hover .icon { /* Triangle noir au survol de l'individu */
+  opacity: 1 !important;
+  fill: black !important;
 }
 
-.icon:hover {
+svg .icon:hover { /* Triangle blanc avec bordure au survol de l'icône elle-même */
   fill: white !important;
   stroke: black;
   stroke-width: 1px;
@@ -229,15 +228,16 @@ svg g:hover .icon {
   filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
 }
 
-.no-link {
+svg .no-link {
   fill: transparent;
 }
 
-.no-link:hover {
+svg .no-link:hover {
   fill: brown;
   opacity: 0.8;
 }
 
+/* Masque l’élément nécessaire aux calculs de métrique */
 #standard {
   fill: transparent;
 }
@@ -246,64 +246,86 @@ svg g:hover .icon {
    5. SURLIGNAGE ET INTERACTIONS SVG
    =========================================== */
 
-svg .highlight {
+/* Survol d’une personne */
+svg g[id^="S"]:hover > path.bg { /*arrière-plan légèrement grisé */
   fill: rgba(225, 225, 225, 0.3) !important;
 }
 
-/* Amélioration de la graisse du texte au survol */
-svg g[id^="S"]:hover > text,
-svg g[id^="S"]:hover .text,
-svg .highlight text:not([id*="pmS"]),
-svg .highlight .text:not([id*="pmS"]),
-svg .same_hl text:not([id*="pmS"]),
-svg .same_hl .text:not([id*="pmS"]) {
-  fill: black !important;
+svg g[id^="S"]:hover > text, /* texte en gras et noir */
+svg g[id^="S"]:hover > .text {
   font-weight: 600 !important;
-  font-size:95% !important;
+  fill: black !important;
+  font-size: 95% !important;
 }
 
-/* Secteur de mariage */
-svg g[id^="M"] text {
-  font-weight: normal !important;
-  text-shadow: none !important;
+/* Survol d'un mariage */
+svg g[id^="M"]:hover > path.bg { /* arrière-plan orange léger */
+  fill: rgba(230, 146, 54, 0.2) !important;
 }
 
-svg g[id^="M"]:hover text {
-  fill: #333 !important;
+svg g[id^="M"]:hover > text, /* texte gras avec ombre blanche */
+svg g[id^="M"]:hover > .text {
   font-weight: 600 !important;
   text-shadow: 0 0 1px white !important;
 }
 
-/* Surlignage des secteurs des implexes */
-svg .same_hl .bg:not([class*="ma-"]) {
+/* Surlignage programmatique des personnes et mariages (classe .highlight)
+   Appliqué par JavaScript lors des interactions avec la liste des lieux */
+svg g[id^="S"] > path.bg.highlight {
+  fill: rgba(225, 225, 225, 0.3) !important;
+}
+
+svg g[id^="S"] .highlight text,
+svg g[id^="S"] .highlight .text {
+  font-weight: 600 !important;
+  fill: black !important;
+  font-size: 95% !important;
+}
+
+svg g[id^="M"] > path.bg.highlight {
+  fill: rgba(230, 146, 54, 0.2) !important;
+}
+
+svg g[id^="M"] .highlight text,
+svg g[id^="M"] .highlight .text {
+  font-weight: 600 !important;
+  fill: black !important;
+  text-shadow: 0 0 1px white !important;
+}
+
+/* Surlignage multiple des secteurs des implexes */
+svg .same_hl .bg:not([class*="ma-"]) { /* arrière-plan grisé léger */
   fill: rgba(128, 128, 128, 0.2) !important;
 }
 
-svg .same_hl .text:not([class*="ma-"]) {
+svg .same_hl .text:not([class*="ma-"]) { /* texte en gras et ombre blanche multiple */
   fill: black !important;
   font-weight: bold !important;
   text-shadow: 0 0 2px white, 0 0 4px white, 0 0 6px white !important;
 }
 
-svg .implex-compact text,
+/* Amélioration générale du contraste au survol */
+svg g:hover > text,
+svg g:hover > .text {
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Secteurs de personnes : léger agrandissement de la police au survol */
+svg g[id^="S"]:hover > text,
+svg g[id^="S"]:hover > .text {
+  font-size: 95% !important;
+}
+
+svg .implex-compact text, /* réduction de la taille de police en mode "reduced" ou "numbered" */
 svg .implex-compact .text {
   font-size: 80% !important;
 }
 
-
-
-.implex-notice {
-  margin-top: 8px;
-  padding: 4px;
-  background: rgba(0,123,255,0.1);
-  border-radius: 3px; font-size: 12px;
-}
-
+/* Tailles et variantes de police */
 .dates {
   font-size: 80%;
 }
 
-/* Variantes de police */
 svg.serif text {
   font-size: 85%;
   font-family: Georgia, "Times New Roman", serif;
@@ -333,8 +355,8 @@ svg .event-highlight-baptism {
   fill: rgba(199, 224, 201, 0.4) !important;
 }
 
-svg .event-highlight-marriage {
-  fill: rgba(230, 146, 54, 0.2) !important;
+svg g[id^="M"] .event-highlight-marriage {
+  fill: rgba(230, 146, 54, 0.3) !important;
 }
 
 svg .event-highlight-death {
@@ -343,6 +365,20 @@ svg .event-highlight-death {
 
 svg .event-highlight-burial {
   fill: rgba(111, 168, 162, 0.4) !important;
+}
+
+/* Accélération GPU pour les transformations fréquentes */
+svg g[id^="G"] {
+  will-change: transform;
+  transform-origin: center;
+}
+
+/* Optimisation du rendu texte (améliore l’antialiasing) */
+svg text,
+svg .text {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ===========================================
@@ -420,60 +456,66 @@ body:not(.age) #age-legend { display: none; }
 
 /* Couleurs palettes */
 /* Palette âges - Bleus avec contraste garanti > 4.5:1 */
-.legend-swatch.age-0, body.age svg .DA0 { 
+.legend-swatch.age-0, body.age svg .DA0 {
   background-color: #E3F2FD; /* Très clair - Contraste: 14.2:1 */
-  fill: #E3F2FD; 
+  fill: #E3F2FD;
 }
 
-.legend-swatch.age-1, body.age svg .DA1 { 
+.legend-swatch.age-1, body.age svg .DA1 {
   background-color: #90CAF9; /* Clair - Contraste: 8.1:1 */
-  fill: #90CAF9; 
+  fill: #90CAF9;
 }
 
-.legend-swatch.age-2, body.age svg .DA2 { 
+.legend-swatch.age-2, body.age svg .DA2 {
   background-color: #64B5F6; /* Moyen - Contraste: 6.3:1 */
-  fill: #64B5F6; 
+  fill: #64B5F6;
 }
 
-.legend-swatch.age-3, body.age svg .DA3 { 
+.legend-swatch.age-3, body.age svg .DA3 {
   background-color: #42A5F5; /* Moyen-foncé - Contraste: 5.1:1 */
-  fill: #42A5F5; 
+  fill: #42A5F5;
 }
 
-.legend-swatch.age-4, body.age svg .DA4 { 
+.legend-swatch.age-4, body.age svg .DA4 {
   background-color: #2196F3; /* Foncé mais lisible - Contraste: 4.6:1 */
-  fill: #2196F3; 
+  fill: #2196F3;
 }
 
 /* Palette mariages - Violets avec contraste garanti > 4.5:1 */
-.legend-swatch.marr-0, body.age svg .DAM0 { 
+.legend-swatch.marr-0, body.age svg .DAM0 {
   background-color: #F3E5F5; /* Très clair - Contraste: 13.8:1 */
-  fill: #F3E5F5; 
+  fill: #F3E5F5;
 }
 
-.legend-swatch.marr-1, body.age svg .DAM1 { 
+.legend-swatch.marr-1, body.age svg .DAM1 {
   background-color: #CE93D8; /* Clair - Contraste: 7.9:1 */
-  fill: #CE93D8; 
+  fill: #CE93D8;
 }
 
-.legend-swatch.marr-2, body.age svg .DAM2 { 
+.legend-swatch.marr-2, body.age svg .DAM2 {
   background-color: #BA68C8; /* Moyen - Contraste: 6.1:1 */
-  fill: #BA68C8; 
+  fill: #BA68C8;
 }
 
-.legend-swatch.marr-3, body.age svg .DAM3 { 
+.legend-swatch.marr-3, body.age svg .DAM3 {
   background-color: #AB47BC; /* Moyen-foncé - Contraste: 5.2:1 */
-  fill: #AB47BC; 
+  fill: #AB47BC;
 }
 
-.legend-swatch.marr-4, body.age svg .DAM4 { 
+.legend-swatch.marr-4, body.age svg .DAM4 {
   background-color: #9C27B0; /* Foncé mais lisible - Contraste: 4.7:1 */
-  fill: #9C27B0; 
+  fill: #9C27B0;
 }
 
 /* Surlignage SVG - cibler uniquement les arrière-plans, pas le texte */
-body.age svg .bg.highlight { fill: #ddd !important; }
-body.age svg .highlight text { fill: black !important; }
+body.age svg .bg.highlight {
+  fill: #ddd !important;
+}
+
+body.age svg .highlight text {
+  fill: black !important;
+  font-weight: 600 !important;
+}
 
 /* Surlignage légende - simplifié sans bordure ni triangle */
 .legend-item.hl { background: #f0f0f0 !important; }
@@ -1268,6 +1310,13 @@ body:not(.place) .places-panel {
   margin-bottom: 0.2rem;
 }
 
+.implex-notice {
+  margin-top: 8px;
+  padding: 4px;
+  background: rgba(0,123,255,0.1);
+  border-radius: 3px; font-size: 12px;
+}
+
 /* ===========================================
    10. RESPONSIVE ET ACCESSIBILITÉ
    =========================================== */
@@ -1348,38 +1397,4 @@ body:not(.place) .places-panel {
   #navigation-help {
     display: none !important;
   }
-}
-
-/* Sélecteurs très spécifiques pour éviter les conflits */
-
-/* Surlignage des personnes uniquement dans leur groupe */
-svg g[id^="S"] > path.link.highlight:not([id^="M"]) {
-  fill: rgba(225, 225, 225, 0.3) !important;
-}
-
-/* Surlignage des mariages uniquement dans leur groupe */
-svg g[id^="M"] > path.link.highlight {
-  fill: rgba(255, 200, 100, 0.3) !important;
-}
-
-/* Empêcher la propagation du surlignage entre époux et mariage */
-svg g[id^="S"] > g[id^="M"] path.highlight {
-  fill: transparent !important;
-}
-
-/* Surlignage spécifique pour les implexes */
-svg g.same_hl > path.bg:not([id^="M"]) {
-  fill: rgba(128, 128, 128, 0.3) !important;
-}
-
-/* Texte en gras uniquement pour le bon élément */
-svg g[id^="S"]:hover > text:not([id*="pmS"]),
-svg g[id^="S"].same_hl > text:not([id*="pmS"]) {
-  font-weight: 600 !important;
-  fill: black !important;
-}
-
-/* Éviter que le survol du mariage affecte le texte de la personne */
-svg g[id^="M"]:hover ~ text {
-  font-weight: normal !important;
 }
