@@ -2732,14 +2732,14 @@ const SVGRenderer = {
     // Créer le chemin circulaire au milieu de la zone de la personne
     const middleAngle = (a1 + a2) / 2;
     const pathId = `tpiS${sosa}`;
-    
+
     // Créer un petit arc centré pour l'icône
     const arcLength = Math.min(20, Math.abs(a2 - a1) * Math.PI * r / 180); // Limiter la taille
     const deltaAngle = arcLength / (2 * Math.PI * r) * 180;
-    
-    const pathLength = TextRenderer.createCircularPath(g, pathId, r, 
+
+    const pathLength = TextRenderer.createCircularPath(g, pathId, r,
       middleAngle - deltaAngle, middleAngle + deltaAngle);
-    
+
     return this.drawNavigationSymbol(g, pathId, p, pathLength, p.has_parents);
   }
 };
@@ -3205,6 +3205,7 @@ const ColorManager = {
 
 const AgeHighlighter = {
   currentHighlight: null,
+  emptyCategories: new Set(),
 
   initialize: function() {
     const closeBtn = document.querySelector('.legend-close');
@@ -3224,9 +3225,54 @@ const AgeHighlighter = {
     }
   },
 
+  // Analyser les catégories vides
+  analyzeAndHideEmptyCategories: function() {
+    this.emptyCategories.clear();
+
+    // D'abord, remettre toutes les catégories visibles
+    const categoryTypes = [
+      { prefix: 'DA', title: 'Aucune personne dans cette tranche d\'âge' },
+      { prefix: 'DAM', title: 'Aucun mariage dans cette tranche de durée' }
+    ];
+
+    categoryTypes.forEach(type => {
+      for (let category = 0; category <= 4; category++) {
+        const className = `${type.prefix}${category}`;
+        const legendItem = document.getElementById(className);
+        if (legendItem) {
+          // Réinitialiser l'état
+          legendItem.style.opacity = '';
+          legendItem.style.pointerEvents = '';
+          legendItem.title = '';
+        }
+      }
+    });
+
+    // Puis analyser dans le SVG actuel
+    const svg = document.getElementById('fanchart');
+    if (!svg) return;
+
+    categoryTypes.forEach(type => {
+      for (let category = 0; category <= 4; category++) {
+        const className = `${type.prefix}${category}`;
+        const elements = svg.getElementsByClassName(className);
+
+        if (elements.length === 0) {
+          this.emptyCategories.add(className);
+          const legendItem = document.getElementById(className);
+          if (legendItem) {
+            legendItem.style.opacity = '0.3';
+            legendItem.style.pointerEvents = 'none';
+            legendItem.title = type.title;
+          }
+        }
+      }
+    });
+  },
+
   handleLegendEnter: function(e) {
     const legendItem = e.target.closest('.legend-item');
-    if (!legendItem || !legendItem.id) return;
+    if (!legendItem || !legendItem.id || this.emptyCategories.has(legendItem.id)) return;
     this.setHighlight(legendItem.id);
   },
 
@@ -3236,40 +3282,15 @@ const AgeHighlighter = {
     }
   },
 
-  // Nouvelle méthode centralisée pour gérer les interactions SVG
-  handleSVGHover: function(person, type, action) {
-    if (action === 'enter') {
-      this.handleSVGEnter(person, type);
-    } else if (action === 'leave') {
-      this.clearAllHighlights();
-    }
-  },
-
-  handleSVGEnter: function(person, type) {
-    this.clearAllHighlights();
-
-    let ageClassToHighlight = null;
-
-    if (type === 'person' && person.age) {
-      ageClassToHighlight = Utils.ageClass(person.age);
-    } else if (type === 'marriage' && person.marriage_length) {
-      ageClassToHighlight = Utils.marriageLengthClass(person.marriage_length);
-    }
-
-    if (ageClassToHighlight) {
-      this.setHighlight(ageClassToHighlight);
-    }
-  },
-
   setHighlight: function(legendId) {
+    if (this.emptyCategories.has(legendId)) return;
+
     this.clearAllHighlights();
     this.currentHighlight = legendId;
 
     requestAnimationFrame(() => {
       const legendItem = document.getElementById(legendId);
-      if (legendItem) {
-        legendItem.classList.add('hl');
-      }
+      if (legendItem) legendItem.classList.add('hl');
 
       const svgElements = document.getElementsByClassName(legendId);
       for (let i = 0; i < svgElements.length; i++) {
@@ -4552,7 +4573,7 @@ const FanchartApp = {
     // Créer le groupe mariage en premier dans l’ordre DOM
     const marriageGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     marriageGroup.setAttribute("id", "M" + fatherSosa);
- 
+
     if (familyGroup.firstChild) {
       familyGroup.insertBefore(marriageGroup, familyGroup.firstChild);
     } else {
@@ -4572,16 +4593,16 @@ const FanchartApp = {
       if (person.marriage_place && lieux[person.marriage_place]) {
         marriageTextClasses += " ma-t" + lieux[person.marriage_place].c;
       }
-      
+
       const textRadius = (marriageGeometry.innerRadius + marriageGeometry.outerRadius) / 2;
       TextRenderer.drawMarriageDate(marriageGroup, fatherSosa, textRadius,
         marriageGeometry.startAngle, marriageGeometry.endAngle, person.marriage_date, marriageTextClasses);
     }
 
     // Éléments structurels avec géométrie corrigée
-    SVGRenderer.drawContour(marriageGroup, marriageGeometry.innerRadius, position.r2, 
+    SVGRenderer.drawContour(marriageGroup, marriageGeometry.innerRadius, position.r2,
       marriageGeometry.startAngle, marriageGeometry.endAngle);
-    
+
     // Ligne de séparation entre père et mère
     SVGRenderer.drawRadialLine(marriageGroup, marriageGeometry.outerRadius, position.r2, position.a2);
 
@@ -4658,10 +4679,13 @@ const FanchartApp = {
     const fanchart = document.getElementById("fanchart");
     fanchart.innerHTML = "";
     this.renderFanchart();
+
     ImplexResolver.initialize();
 
-    const placesPanel = document.querySelector('.places-panel');
-    if (placesPanel) {
+    if (document.body.classList.contains('age')) {
+      AgeHighlighter.analyzeAndHideEmptyCategories();
+    }
+    if (document.querySelector('.places-panel')) {
       PlacesInterface.generatePlacesList();
       PlacesInterface.updateSummarySection();
       PlacesPanelControls.initialize();
@@ -4793,6 +4817,10 @@ const FanchartApp = {
       document.body.className = "age";
       const ageButton = document.getElementById("b-age");
       if (ageButton) ageButton.classList.add("active");
+
+      if (document.getElementById('age-legend')) {
+        AgeHighlighter.analyzeAndHideEmptyCategories();
+      }
     } else {
       document.body.className = "place";
       tool = "place";

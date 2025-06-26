@@ -391,8 +391,7 @@ body:not(.age) #age-legend { display: none; }
 .age-legend-container {
   position: absolute;
   right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 25%;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -442,6 +441,16 @@ body:not(.age) #age-legend { display: none; }
 }
 
 .legend-item:hover { background: rgba(0, 0, 0, 0.05); }
+
+.legend-item[style*="opacity: 0.3"] {
+  cursor: not-allowed !important;
+  filter: grayscale(1);
+}
+
+.legend-item[style*="opacity: 0.3"] .legend-text {
+  color: #999 !important;
+  font-style: italic;
+}
 
 .legend-swatch {
   width: 14px;
@@ -509,7 +518,7 @@ body:not(.age) #age-legend { display: none; }
 
 /* Surlignage SVG - cibler uniquement les arrière-plans, pas le texte */
 body.age svg .bg.highlight {
-  fill: #ddd !important;
+  fill: #aaa !important;
 }
 
 body.age svg .highlight text {
