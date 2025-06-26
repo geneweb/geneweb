@@ -831,7 +831,8 @@ body:not(.place) .places-panel {
 
 .places-list {
   flex: 1;
-  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-y: overlay;
   padding: 0;
   padding-bottom: 0;
 }
@@ -965,6 +966,7 @@ body:not(.place) .places-panel {
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 6px;
+  min-width: 0;
   cursor: pointer;
   min-height: var(--fc-place-height-compact);
   border-left: 1px solid #dee2e6;
@@ -1224,7 +1226,7 @@ body:not(.place) .places-panel {
 
 .overflow-content {
   max-height: 170px;
-  overflow-y: auto;
+  overflow-y: none;
   padding: 0;
   background: white;
 }
