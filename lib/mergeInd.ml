@@ -219,8 +219,9 @@ exception Error_loop of Driver.person
 exception Same_person
 exception Different_sexes of Driver.person * Driver.person
 
+module IperSet = Driver.Iper.Set
+
 let is_ancestor base p1 p2 =
-  let module IperSet = Util.IperSet in
   let ip1 = Driver.get_iper p1 in
   let ip2 = Driver.get_iper p2 in
   if ip1 = ip2 then raise Same_person

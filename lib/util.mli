@@ -699,9 +699,6 @@ val is_empty_name : Geneweb_db.Driver.person -> bool
 (** [is_empty_name p] [false] if we knwon the first name or the last name of
     [p]. *)
 
-module IperSet : Set.S with type elt = Geneweb_db.Driver.iper
-module IfamSet : Set.S with type elt = Geneweb_db.Driver.ifam
-
 val select_masc :
   config ->
   Geneweb_db.Driver.base ->

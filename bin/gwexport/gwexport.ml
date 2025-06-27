@@ -120,8 +120,8 @@ let speclist c =
     ("-v", Arg.Unit (fun () -> c := { !c with verbose = true }), " verbose");
   ]
 
-module IPS = Util.IperSet
-module IFS = Util.IfamSet
+module IPS = Geneweb_db.Driver.Iper.Set
+module IFS = Geneweb_db.Driver.Ifam.Set
 
 (* S: Does it mean private persons whose birth year is before 'max_year'
    are uncensored? *)

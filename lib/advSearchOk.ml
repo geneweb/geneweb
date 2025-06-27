@@ -6,6 +6,8 @@ open Util
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
+module IperSet = Driver.Iper.Set
+module IfamSet = Driver.Ifam.Set
 
 let get_number var key env = p_getint env (var ^ "_" ^ key)
 

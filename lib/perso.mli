@@ -119,7 +119,7 @@ val string_of_image_small_size :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person * bool -> string
 
 val get_link :
-  generation_person list -> Util.IperSet.elt -> generation_person option
+  generation_person list -> Geneweb_db.Driver.iper -> generation_person option
 
 (**)
 
@@ -131,7 +131,7 @@ val make_desc_level_table :
   Geneweb_db.Driver.base ->
   int ->
   Geneweb_db.Driver.person ->
-  (Util.IperSet.elt, int) Geneweb_db.Collection.Marker.t
+  (Geneweb_db.Driver.iper, int) Geneweb_db.Collection.Marker.t
   * (Geneweb_db.Driver.ifam, int) Geneweb_db.Collection.Marker.t
 
 type dup =

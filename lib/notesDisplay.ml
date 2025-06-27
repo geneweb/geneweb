@@ -5,6 +5,7 @@ open Util
 open Notes
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module IperSet = Driver.Iper.Set
 
 (* FIXME code copied/adapted from MergeInd. To be factorized *)
 let test_ancestor conf base p1 p2 =
@@ -13,7 +14,6 @@ let test_ancestor conf base p1 p2 =
     | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
     | None -> 32
   in
-  let module IperSet = Util.IperSet in
   let ip1 = Driver.get_iper p1 in
   let ip2 = Driver.get_iper p2 in
   if ip1 = ip2 then true

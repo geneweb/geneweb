@@ -2834,18 +2834,6 @@ let nb_char_occ c s =
   String.iter (fun x -> if x = c then incr cnt) s;
   !cnt
 
-module IperSet = Set.Make (struct
-  type t = Driver.iper
-
-  let compare = Stdlib.compare
-end)
-
-module IfamSet = Set.Make (struct
-  type t = Driver.ifam
-
-  let compare = Stdlib.compare
-end)
-
 let select_masc conf base ips =
   let poi = if conf.wizard || conf.friend then Driver.poi else pget conf in
   let fam = Hashtbl.create 1024 in

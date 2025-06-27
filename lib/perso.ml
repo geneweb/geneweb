@@ -10,6 +10,7 @@ module Loc = Geneweb_templ.Loc
 module Collection = Geneweb_db.Collection
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
+module IperSet = Driver.Iper.Set
 
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
