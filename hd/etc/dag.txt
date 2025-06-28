@@ -185,15 +185,14 @@
             %if;(e.m="RLM" or e.dag="on" or e.em="R")
               <a href="%prefix;i=%dag_cell.index;" title="[*open this individual page]"></a>
             %else;
-              <div class="position-relative"
               %if;(not cancel_links)
-                <a href="%prefix_set.pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
-                %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
-                          env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
-                class="stretched-link"
-                title="[*navigation with this individual]"></a>
+                <div class="position-relative">
+                  <a href="%prefix_set.pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
+                    %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
+                       env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
+                    class="stretched-link" title="[*navigation with this individual]"></a>
+                </div>
               %end;
-              </div>
             %end;
           %end;
           <div class="d-flex-row flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
