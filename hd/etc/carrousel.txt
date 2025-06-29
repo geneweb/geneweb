@@ -221,7 +221,7 @@
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a href="%prefix;m=PORTRAIT_TO_BLASON&i=%index;" class="mx-1"
                title="[*copy portrait to blason]">
-                 <i class="fa-solid fa-user-shield"></i></a>
+                 <i class="fa fa-user-shield"></i></a>
             %if;has_portrait_url;%portrait_name;%else;
               <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%portrait_name;%end;</samp>
             <a role="button" class="ml-auto"
@@ -370,7 +370,7 @@
                 %if;(carrousel_img_src!="")<br><strong>[*source/sources]0[:]</strong> %carrousel_img_src;%end;'>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a href="%prefix;m=IMAGE_TO_BLASON&i=%index;&mode=blasons&file_name=%carrousel_img;"
-            title="[*copy image to blason]"><i class="fa-solid fa-user-shield text-success"></i></a>
+            title="[*copy image to blason]"><i class="fa fa-user-shield text-success"></i></a>
             <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img_raw;">%carrousel_img_raw;</samp>
             <div class="ml-auto">
               <a role="button"
