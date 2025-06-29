@@ -12961,6 +12961,10 @@ de: im Baum mit dieser Person navigieren
 en: navigation in tree with this individual
 fr: naviguer dans l’arbre avec cet individu
 
+    navigate with someone
+en: click on %s to change the root individual
+fr: cliquer sur %s pour changer l’individu racine
+
     nb branches
 co: num. ghjembe
 de: Zweige
