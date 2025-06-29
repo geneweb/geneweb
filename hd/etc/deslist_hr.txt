@@ -231,7 +231,40 @@
       <span class="sr-only"> (==)</span></a>
     %end;
   </span>
-  <br>
+%end;
+%define;ancestors_grid(level)
+  %if;(level!=0)
+    <div class="text-center mt-2 mb-1">
+      <h5 class="mb-1">
+        %if;(level=1)[*parents]
+        %elseif;(level=2)[*grand-parents]
+        %elseif;(level=3)[*great-grand-parents]
+        %elseif;(level=4)[*great-great-grandparents]%end;</h5>
+      %reset_count;
+      %foreach;ancestor;
+        %incr_count;
+        %if;(count%2!=0)<div class="row mb-1 couple-row">%end;
+          %let;unknown;%if;(ancestor.first_name="?" and ancestor.surname="?")1%end;%in;
+          <div class="col-6 p%if;(count%2=0)l%else;r%end;-2 d-flex align-content-center">
+            <a role="button" class="btn btn-outline-%if;(count%2!=0)primary%else;success%end; btn-sm w-100 d-flex
+              %if;(unknown=1) border-secondary disabled" tabindex="-1" aria-disabled="true"
+              %else;" title="[*select] %ancestor;"
+                href="%prefix;%ancestor.access;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i" and env.key!="v" and env.key!="")&%env.key=%env.val;%end;%end;&v=%expr(evar.v+level)"
+              %end;>
+              <div class="flex-grow-1 order-%if;(count%2!=0)1%else;2%end;">
+                %if;(unknown!=1)<strong>%ancestor.first_name;</strong>
+                  %if;(ancestor.qualifier!="") <em>%ancestor.qualifier;</em>%end;
+                  %sp;<span>%ancestor.surname;</span>
+                  %if;(ancestor.dates!="") <small>%ancestor.dates;</small>%end;
+                %end;
+              </div>
+              <span class="badge badge-pill badge-light small order-%if;(count%2!=0)2 mr-auto%else;1 ml-auto%end; align-self-center" style="min-width: 26px; top: 0px;">%ancestor.anc_sosa;</span>
+            </a>
+          </div>
+        %if;(count%2=0)</div>%end;
+      %end;
+    </div>
+  %end;
 %end;
 %mark_descendants;
 %empty_sorted_list;%( persons %)
@@ -239,57 +272,28 @@
 %empty_sorted_listc;%( descendants %)
 %let;maxlvl;%if;(static_max_anc_level>4)4%else;%static_max_anc_level;%end;%in;
 %if;(has_parents and evar.templ="")
-  <div class="modal" id="switch_modal" tabindex="-1" aria-labelledby="switch-ancestor-modal" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+  <div class="modal fade" id="switch_modal" tabindex="-1" aria-labelledby="switch-ancestor-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header align-self-center py-2">
-          <h5 class="modal-title font-weight-bold" id="switch-ancestor-modal">[*choose an ancestor]</h5>
+        <div class="modal-header py-2">
+          <h4 class="modal-title text-primary" id="switch-ancestor-modal">
+            <i class="fa fa-sitemap fa-fw mr-2"></i>[*choose an ancestor]
+          </h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body py-2">
-          %reset_count2;
+        <div class="modal-body pt-1 pb-2">
           %foreach;ancestor_level(maxlvl)
-            %if;(level!=0)
-              <div class="text-center font-weight-bold mb-2">%nn;
-                %if;(level=1)[*parents]
-                %elseif;(level=2)[*grand-parents]
-                %elseif;(level=3)[*great-grand-parents]
-                %elseif;(level=4)[*great-great-grandparents]
-                %end;%nn;
-              </div>
-              %reset_count;
-              %foreach;ancestor;
-                %incr_count;
-                %incr_count2;
-                %if;(count%2!=0)
-                  <div class="d-flex align-items-center mx-0">
-                %end;
-                <div class="col-6%if;(count%2!=0) pl-1 pr-0 mr-1%else; pl-0 pr-1 ml-1%end; mb-2">
-                  <a role="button"
-                    class="%if;(ancestor.first_name="?" and ancestor.surname="?") d-none border-0
-                      %else;btn bg-gradient-success btn-outline-%if;(count2%4=1 or count2%4=2)primary%else;success%end; w-100 px-1 text-center%end;"
-                    title="[*select] %ancestor" href="%prefix;%ancestor.access;%nn;
-                    %foreach;env_binding;
-                      %if;(env.key!="p" and env.key!="n" and env.key!="oc"
-                       and env.key!="i" and env.key!="v" and env.key!="")
-                        &%env.key=%env.val;%nn;
-                      %end;
-                    %end;%nn;
-                    &v=%expr(evar.v+level)">%nn;
-                    %if;(ancestor.first_name!="?" and ancestor.surname!="?")
-                      %ancestor.first_name; %ancestor.surname;%if;(ancestor.dates!="") %ancestor.dates;%end;
-                    %end;
-                  </a>
-                </div>
-                %if;(count%2=0)
-                  </div>
-                %end;
-              %end;
-            %end;
+            %apply;ancestors_grid(level)
           %end;
-         %(<div class="text-center font-weight-bold mb-2">%if;(static_max_anc_level>5)+ %expr(static_max_anc_level-maxlvl-1) [generation/generations]1%end;</div>%)
+        </div>
+        <div class="modal-footer py-1 bg-light">
+          <small class="text-muted w-100 text-center">
+            <i class="fa fa-hand-pointer fa-fw"></i>
+            %define;navwith(xx)[*navigate with someone:::xx]%end;
+            %apply;navwith([an ancestor]0)
+          </small>
         </div>
       </div>
     </div>
