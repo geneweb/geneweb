@@ -20,23 +20,6 @@
   %end;
 %end;
 
-%define;li_SD_box(xx)
-  <li class="list-group-item list-group-item-action %if;xx.has_parents;list-group-item-warning%end;" style="list-style-type: %nn;
-    %if;xx.has_parents;disc%else;circle%end;">%nn;
-%end;
-
-%define;li_SDC_box(xx)
-  %if;xx.has_families;
-    %reset_count;
-    %foreach;family;
-      %if;(nb_children>0)%incr_count;%end;
-    %end;
-  %end;
-  <li class="list-group-item list-group-item-action list-group%if;xx.has_families;%if;(count!=0)-warning%else;-info%end;%end;" style="list-style-type: %nn;
-    %if;xx.has_families;
-      %if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
-%end;
-
 %define;li_SD(xx)
   <li style="vertical-align: middle;list-style-type: %nn;
     %if;xx.has_parents;disc%else;circle%end;">%nn;
@@ -241,6 +224,7 @@
   %end;
 %end;
 
+%( keeping desc_count_l even if no more used %)
 %define;desc_count_l(xxx)
   %foreach;descendant_level;
     %if;(level=xxx)%number_of_descendants_at_level;%end;
