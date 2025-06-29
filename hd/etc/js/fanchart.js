@@ -1293,7 +1293,7 @@ const PlacesPanelControls = {
     if (showEvents) {
       panel.classList.add('show-events');
       const icon = document.querySelector('.events-toggle i');
-      if (icon) icon.className = 'far fa-eye-slash';
+      if (icon) icon.className = 'far fa-calendar-plus';
     }
 
     // Recherche
@@ -1352,8 +1352,8 @@ const PlacesPanelControls = {
     const icon = document.querySelector('.events-toggle i');
     if (icon) {
       icon.className = panel.classList.contains('show-events')
-        ? 'far fa-eye-slash'
-        : 'far fa-eye';
+        ? 'far fa-calendar-plus'
+        : 'far fa-calendar-minus';
     }
 
     URLManager.updateCurrentURL();

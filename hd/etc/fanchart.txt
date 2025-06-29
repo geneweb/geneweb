@@ -12,13 +12,12 @@
   svg { position: absolute; left: 0; top: 0; }
   .hidden { display: none; }
 </style>
-<link rel="preload" href="%etc_prefix;css/all.min.css?version=6.4.0" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript>
-  <link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
-
-  <link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;">
-</noscript>
+%if;(b.use_cdn="yes")
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+%else;
+  <link rel="preload" href="%etc_prefix;css/all.min.css?version=6.7.2" as="style" onload="this.onload=null;this.rel='stylesheet'">
+%end;
+<link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 </head>
 %define;get_random(xxx)
   %random.init;
@@ -204,11 +203,11 @@
     <div class="btn-group-fanchart">
       <button id="b-age" class="btn-fanchart"
               title="Âges décès et durées mariage">
-        <i class="fa fa-cross fa-fw"></i>
+        <i class="fa fa-cake-candles fa-fw"></i>
       </button>
        <button id="b-places-colorise" class="btn-fanchart"
         title="Colorisation des lieux (cycle entre les événements)">
-        <i class="fa fa-paintbrush fa-fw"></i>
+        <i class="fa fa-map-location-dot fa-fw"></i>
       </button>
      %(
       <button id="b-sort-places" class="btn-fanchart"
