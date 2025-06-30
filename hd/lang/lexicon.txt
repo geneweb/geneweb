@@ -13458,7 +13458,7 @@ eo: ne trovita
 es: no encontrado
 et: ei leitud
 fi: ei löydy
-fr: pas trouvé
+fr: non trouvé
 he:  לא נמצא
 is: fannst ekki
 it: non trovato
