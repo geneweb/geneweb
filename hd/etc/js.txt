@@ -424,12 +424,13 @@ const inputToBook = {
 
     let preVal = value;
     if (book === "place") {
-      const place = value.split(/\]\s+[-]\s+/);
+      const place = value.split(/\]\s+[-–—]\s+/);
       preVal = place.length > 1 ? place[1] : value;
     }
 
     preVal = preVal.substring(0, Math.min(preVal.length, 12))
-                   .split(/[, ]+/)[0];
+                   .split(/[, ]+/)[0]
+                   .substring(0, Math.floor(value.length / 2));
 
     const encVal = encodeURIComponent(value);
     const encPreVal = encodeURIComponent(preVal);

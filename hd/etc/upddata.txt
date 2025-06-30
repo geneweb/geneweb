@@ -128,6 +128,14 @@
     %end;
   </div>
   %if;(e.data!="" and e.s!="")
+    <div id="notfound-warning" class="d-none">
+      <div class="d-flex justify-content-center">
+        <div class="alert alert-danger text-center w-auto my-2" role="alert">
+          <i class="fa fa-exclamation text-danger ml-2"></i>
+          "<span id="notfound-value"></span>" [not found]
+        </div>
+      </div>
+    </div>
     <h1 class="text-sm-center mt-0 mt-sm-1 h3">%title;</h1>
     <h2 class="text-sm-center mt-0 h4">%subtitle;</h2>
     <div class="mt-2 mt-sm-3 mx-1 mx-sm-3 px-sm-3">
@@ -344,19 +352,67 @@ function removeLoadingOverlay() {
 }
 
 // Function to auto-select link based on URL parameters
+// Fallback on book if s1 not found and print a warning
 function autoSelectLink() {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('key') || (!urlParams.has('s1') && !urlParams.has('s2'))) return;
-    const sParam = urlParams.get('s');
-    const s1Param = urlParams.get('s1');
-    const s2Param = urlParams.get('s2');
-    const value = s1Param !== null && s1Param !== '' ? s1Param : sParam;
-    if (s2Param) { localStorage.setItem('s2Tmp', decodeURIComponent(s2Param)); }
-    if (value) {
-        const link = Array.from(document.getElementsByTagName('a')).find(
-            a => a.getAttribute('data-entry') === decodeURIComponent(value) && a.href.includes('key')
-        );
-        if (link) { link.click(); }
+
+    // Clic automatique quand s1= ou s2= présent
+    if (urlParams.has('s1') || urlParams.has('s2')) {
+        if (urlParams.has('key')) return; // Skip si déjà en mode édition
+
+        const s1Param = urlParams.get('s1');
+        const s2Param = urlParams.get('s2');
+        const sParam = urlParams.get('s');
+        const value = s1Param || sParam;
+
+        // Stockage s2 pour updateInputField()
+        if (s2Param) {
+            localStorage.setItem('s2Tmp', decodeURIComponent(s2Param));
+        }
+
+        // Tentative de clic automatique
+        if (value && value.trim()) {
+            const link = Array.from(document.getElementsByTagName('a')).find(
+                a => a.getAttribute('data-entry') === decodeURIComponent(value) &&
+                     a.href.includes('key')
+            );
+
+            if (link) {
+                link.click(); // Cible trouvée → Édition automatique
+            } else {
+                // Cible introuvable → Stockage pour warning + fallback
+                const decodedValue = decodeURIComponent(s1Param || sParam);
+                if (decodedValue && decodedValue.trim()) {
+                    localStorage.setItem('notFoundValue', decodedValue);
+                }
+
+                // Redirection vers mode consultation (URL nettoyée)
+                urlParams.delete('s1');
+                urlParams.delete('s2');
+                if (s1Param && !sParam) urlParams.set('s', s1Param);
+                window.location.href = window.location.pathname + '?' + urlParams.toString();
+            }
+        } else {
+            urlParams.delete('s1');
+            urlParams.delete('s2');
+            window.location.href = window.location.pathname + '?' + urlParams.toString();
+        }
+    }
+    // Navigation normale ou après fallback
+    else {
+        const notFoundValue = localStorage.getItem('notFoundValue');
+
+        if (notFoundValue && notFoundValue.trim()) {
+            const valueSpan = document.getElementById('notfound-value');
+            const notFoundDiv = document.getElementById('notfound-warning');
+
+            if (valueSpan && notFoundDiv) {
+                valueSpan.textContent = notFoundValue;
+                notFoundDiv.classList.remove('d-none');
+            }
+        }
+
+        localStorage.removeItem('notFoundValue');
     }
 }
 
