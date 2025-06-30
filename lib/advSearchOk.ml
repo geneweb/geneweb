@@ -58,6 +58,11 @@ let string_incl =
 let abbrev_lower x = Name.abbrev (Name.lower x)
 let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
 
+let is_subset_pfx s1 s2 =
+  List.for_all
+    (fun e -> List.exists (fun s -> Ext_string.start_with e 0 s) s2)
+    s1
+
 module Fields : sig
   type search = And | Or
   type name = string
@@ -128,7 +133,10 @@ module AdvancedSearchMatch : sig
   type place = string * Gwdb.istr option
 
   val match_name :
-    search_list:string list list -> exact:bool -> string list -> bool
+    search_list:string list list ->
+    mode:[ `Exact | `Not_Exact | `Not_Exact_Prefix ] ->
+    string list ->
+    bool
 
   val match_civil_status :
     base:Gwdb.base ->
@@ -140,8 +148,8 @@ module AdvancedSearchMatch : sig
     surname_list:string list list ->
     skip_fname:bool ->
     skip_sname:bool ->
-    exact_first_name:bool ->
-    exact_surname:bool ->
+    exact_first_name:[ `Exact | `Not_Exact | `Not_Exact_Prefix ] ->
+    exact_surname:[ `Exact | `Not_Exact | `Not_Exact_Prefix ] ->
     bool
 
   val match_marriage :
@@ -328,26 +336,29 @@ end = struct
       |> List.exists (fun event_date_f ->
              match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
 
-  let match_name ~search_list ~exact : string list -> bool =
+  let match_name ~search_list ~mode : string list -> bool =
     let matching : string list -> string list -> bool =
-      if exact then Ext_list.elements_cmp else Ext_list.is_subset
+      match mode with
+      | `Exact -> Ext_list.elements_cmp
+      | `Not_Exact -> Ext_list.is_subset
+      | `Not_Exact_Prefix -> is_subset_pfx
     in
     fun x -> List.exists (fun s -> matching s x) search_list
 
-  let wrap_match_name ~base ~search_list ~exact ~get =
+  let wrap_match_name ~base ~search_list ~mode ~get =
     if search_list = [] then fun _ -> true
     else
-      let eq = match_name ~search_list ~exact in
+      let eq = match_name ~search_list ~mode in
       fun p -> eq (List.map Name.lower @@ Name.split @@ Gwdb.sou base @@ get p)
 
-  let match_first_name ~base ~first_name_list ~exact =
-    wrap_match_name ~base ~search_list:first_name_list ~exact
+  let match_first_name ~base ~first_name_list ~mode =
+    wrap_match_name ~base ~search_list:first_name_list ~mode
       ~get:Gwdb.get_first_name
 
-  let match_surname ~base ~surname_list ~exact =
-    wrap_match_name ~base ~search_list:surname_list ~exact ~get:Gwdb.get_surname
+  let match_surname ~base ~surname_list ~mode =
+    wrap_match_name ~base ~search_list:surname_list ~mode ~get:Gwdb.get_surname
 
-  let match_alias ~base ~alias_list ~exact ~kind p =
+  let match_alias ~base ~alias_list ~mode ~kind p =
     let gets =
       let get =
         match kind with
@@ -357,28 +368,28 @@ end = struct
       List.map (fun alias _ -> alias) (get p)
     in
     List.exists
-      (fun get -> wrap_match_name ~base ~search_list:alias_list ~get ~exact p)
+      (fun get -> wrap_match_name ~base ~search_list:alias_list ~get ~mode p)
       gets
 
   (* We use [first_name_list] as the list of aliases to search for, so
      searching for a first name will also look at first name aliases. *)
-  let match_first_name_alias ~base ~first_name_list ~exact p =
-    match_alias ~base ~alias_list:first_name_list ~exact ~kind:`First_name p
+  let match_first_name_alias ~base ~first_name_list ~mode p =
+    match_alias ~base ~alias_list:first_name_list ~mode ~kind:`First_name p
 
-  let match_surname_alias ~base ~surname_list ~exact p =
-    match_alias ~base ~alias_list:surname_list ~exact ~kind:`Surname p
+  let match_surname_alias ~base ~surname_list ~mode p =
+    match_alias ~base ~alias_list:surname_list ~mode ~kind:`Surname p
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
       ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
     match_sex ~p ~sex
     && (skip_fname
-       || match_first_name ~base ~first_name_list ~exact:exact_first_name p
-       || match_first_name_alias ~base ~first_name_list ~exact:exact_first_name
-            p)
+       || match_first_name ~base ~first_name_list ~mode:exact_first_name p
+       || match_first_name_alias ~base ~first_name_list ~mode:exact_first_name p
+       )
     && (skip_sname
-       || match_surname ~base ~surname_list ~exact:exact_surname p
-       || match_surname_alias ~base ~surname_list ~exact:exact_surname p)
+       || match_surname ~base ~surname_list ~mode:exact_surname p
+       || match_surname_alias ~base ~surname_list ~mode:exact_surname p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
@@ -463,6 +474,15 @@ end
 (* Search type can be AND or OR. *)
 let get_search_type gets =
   match gets "search_type" with "OR" -> Fields.Or | _ -> Fields.And
+
+let get_name_search_mode gets key =
+  let key_pfx = key ^ "_prefix" in
+  let value_pfx = gets key_pfx in
+  let value = gets key in
+  if value_pfx = "on" then `Not_Exact_Prefix
+  else if value = "on" then `Exact
+  else if value = "pfx" then `Not_Exact_Prefix
+  else `Not_Exact
 
 (*
   Search for other persons in the base matching with the provided infos.
@@ -558,6 +578,8 @@ let advanced_search conf base max_answers =
   let marriage_place_searched = place_searched Fields.marriage_place in
   let other_events_place_searched = place_searched Fields.other_events_place in
 
+  let get_name_search_mode = get_name_search_mode gets in
+
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
     let auth = Person.is_visible conf base p in
@@ -567,8 +589,8 @@ let advanced_search conf base max_answers =
            ~sex:(gets "sex" |> sex_of_string)
            ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
            ~skip_sname ~first_name_list:fn_list ~surname_list:sn_list
-           ~exact_first_name:(gets "exact_first_name" = "on")
-           ~exact_surname:(gets "exact_surname" = "on"))
+           ~exact_first_name:(get_name_search_mode "exact_first_name")
+           ~exact_surname:(get_name_search_mode "exact_surname"))
     in
     let pmatch =
       match search_type with
@@ -659,11 +681,11 @@ let advanced_search conf base max_answers =
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
-      let list_aux strings_of persons_of n_list exact =
+      let list_aux strings_of persons_of n_list mode =
         List.map
           (List.map (fun x ->
                let eq =
-                 AdvancedSearchMatch.match_name ~search_list:n_list ~exact
+                 AdvancedSearchMatch.match_name ~search_list:n_list ~mode
                in
                let istrs = strings_of base x in
                List.fold_left
@@ -678,30 +700,65 @@ let advanced_search conf base max_answers =
         |> List.map (Gwdb.spi_find @@ persons_of base)
         |> List.flatten |> List.sort_uniq compare
       in
-      let skip_fname, skip_sname, list =
-        if sn_list <> [] then
-          ( false,
-            true,
-            list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-              sn_list
-              (gets "exact_surname" = "on") )
-        else
-          ( true,
-            false,
-            list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
-              fn_list
-              (gets "exact_first_name" = "on") )
-      in
-      let rec loop ((_, len) as acc) = function
-        | [] -> acc
-        | _ when len > max_answers -> acc
-        | ip :: l ->
-            loop
-              (match_person ~skip_fname ~skip_sname acc (Util.pget conf base ip)
-                 search_type)
-              l
-      in
-      loop ([], 0) list
+      if
+        sn_list <> []
+        && get_name_search_mode "exact_surname" = `Not_Exact_Prefix
+      then
+        let filter p =
+          let r =
+            match_person ~skip_fname:false ~skip_sname:true ([], 0) p
+              search_type
+          in
+          r <> ([], 0)
+        in
+        let list =
+          SearchName.persons_starting_with ~conf ~base ~filter
+            ~first_name_prefix:"" ~surname_prefix:(gets "surname")
+            ~limit:max_answers
+        in
+        (List.map (Gwdb.poi base) list, List.length list)
+      else if
+        fn_list <> []
+        && get_name_search_mode "exact_first_name" = `Not_Exact_Prefix
+      then
+        let filter p =
+          let r =
+            match_person ~skip_fname:true ~skip_sname:false ([], 0) p
+              search_type
+          in
+          r <> ([], 0)
+        in
+        let list =
+          SearchName.persons_starting_with ~conf ~base ~filter
+            ~first_name_prefix:(gets "first_name") ~surname_prefix:""
+            ~limit:max_answers
+        in
+        (List.map (Gwdb.poi base) list, List.length list)
+      else
+        let skip_fname, skip_sname, list =
+          if sn_list <> [] then
+            ( false,
+              true,
+              list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
+                sn_list
+                (get_name_search_mode "exact_surname") )
+          else
+            ( true,
+              false,
+              list_aux Gwdb.base_strings_of_first_name
+                Gwdb.persons_of_first_name fn_list
+                (get_name_search_mode "exact_first_name") )
+        in
+        let rec loop ((_, len) as acc) = function
+          | [] -> acc
+          | _ when len > max_answers -> acc
+          | ip :: l ->
+              loop
+                (match_person ~skip_fname ~skip_sname acc
+                   (Util.pget conf base ip) search_type)
+                l
+        in
+        loop ([], 0) list
     else (
       Gwdb.load_persons_array base;
       let result =
@@ -747,8 +804,8 @@ let searching_fields conf base =
   in
   let sex = match gets "sex" with "M" -> 0 | "F" -> 1 | _ -> 2 in
   (* Fonction pour tester un simple champ texte (e.g: first_name). *)
-  let string_field x search =
-    if test_string x then search ^ " " ^ gets x else search
+  let string_field ?(map_field = Fun.id) x search =
+    if test_string x then search ^ " " ^ map_field (gets x) else search
   in
   (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
   let get_place_date_request place_prefix_field_name date_prefix_field_name
@@ -815,8 +872,15 @@ let searching_fields conf base =
   in
   let search_type = get_search_type gets in
   let search = "" in
-  let search = string_field "first_name" search in
-  let search = string_field "surname" search in
+  let map_field key s =
+    if get_name_search_mode gets key = `Not_Exact_Prefix then s ^ "(...)" else s
+  in
+  let search =
+    string_field ~map_field:(map_field "exact_first_name") "first_name" search
+  in
+  let search =
+    string_field ~map_field:(map_field "exact_surname") "surname" search
+  in
   let search = sosa_field search in
   let build_event_search event_search (s1, s2) =
     let date_field_name =
@@ -889,8 +953,14 @@ let matching_first_name_aliases ~first_name =
 let exact_matching_first_name_aliases ~first_name =
   filter_alias ~name:first_name ~matching:Ext_list.elements_cmp
 
+let prefix_matching_first_name_aliases ~first_name =
+  filter_alias ~name:first_name ~matching:is_subset_pfx
+
 let matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.is_subset
 
 let exact_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:Ext_list.elements_cmp
+
+let prefix_matching_surname_aliases ~surname =
+  filter_alias ~name:surname ~matching:is_subset_pfx
