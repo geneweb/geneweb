@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Arbre en éventail</title>
 <link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
-<link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash("css/fanchart.css")">
+<link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash("%etc_prefix;css/fanchart.css")">
 <style title="fc-auto"></style>
 </head>
 
@@ -91,5 +91,5 @@ var ancestor = {
 %end;
 };
 </script>
-<script src="%etc_prefix;js/fanchart.js?hash=%apply;hash("js/fanchart.js")"></script>
+<script src="%etc_prefix;js/fanchart.js?hash=%apply;hash("%etc_prefix;js/fanchart.js")"></script>
 </html>
