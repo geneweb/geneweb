@@ -99,7 +99,7 @@ let speclist c =
         (fun s ->
           let oc = open_out s in
           c := { !c with oc = (s, output_string oc, fun () -> close_out oc) }),
-      "<GED> output file name (default: stdout)." );
+      "<FILE> output file name (default: stdout)." );
     ( "-parentship",
       Arg.Unit (fun () -> c := { !c with parentship = true }),
       " select individuals involved in parentship computation between pairs of \
