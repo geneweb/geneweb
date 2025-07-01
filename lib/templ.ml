@@ -1255,6 +1255,11 @@ let rec eval conf ifun env =
                let w = Util.surname_particle base w not available *)
             let wl = List.map (fun w -> Utf8.capitalize_fst w) wl in
             String.concat " " wl
+        | "hash", [ (None, VVstring file) ] -> (
+            let fpath = Util.resolve_asset_file conf file in
+            match Util.hash_file_cached fpath with
+            | Some hash -> hash
+            | None -> "")
         | "interp", [ (None, VVstring s) ] ->
             let astl =
               Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
