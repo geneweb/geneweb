@@ -29,13 +29,13 @@
     %end;
   %else;
     <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=4.6.2">
-    <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash("css/all.min.css")">
+    <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash("%etc_prefix;css/all.min.css")">
     %if;(e.m="A" and e.t="")
       <link rel="stylesheet" href="%etc_prefix;css/select2.min.css?version=4.1.0rc">
     %end;
   %end;
 %end;
-<link rel="stylesheet" href="%etc_prefix;css/css.css?hash=%apply;hash("css/css.css")">
+<link rel="stylesheet" href="%etc_prefix;css/css.css?hash=%apply;hash("%etc_prefix;css/css.css")">
 %if;(bvar.css_prop != "")
-<link rel="stylesheet" href="%etc_prefix;css/%bvar.css_prop;">
+<link rel="stylesheet" href="%etc_prefix;css/%bvar.css_prop;?hash=%apply;hash("%etc_prefix;css/%bvar.css_prop;")">
 %end;
