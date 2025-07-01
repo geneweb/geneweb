@@ -11,7 +11,7 @@ val next_chars_if_equiv : string -> int -> string -> int -> (int * int) option
 val lower : string -> string
 (** Convert every letter to lowercase and use *unidecode* library to
     represent unicode characters with ASCII. Non-alphanumeric characters
-    (except '.') are remplaced by space. *)
+    (except '.') are replaced by space. *)
 
 val title : string -> string
 (** Apply uppercasing to the first letter of each name (sequence of alphabetic characters) part,
