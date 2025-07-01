@@ -228,23 +228,26 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
             <div class="d-flex flex-column flex-md-row">
               <div class="w-100 w-md-auto flex-md-grow-1">
                 <div class="d-flex flex-grow-1">
+                  <div class="d-flex align-items-center ml-1 mr-2">
+                    <abbr data-toggle="tooltip" data-placement="top" data-html="true"
+                       title="<div class='text-left font-weight-bold'><h5>[*search format][:]</h5>
+                              1. [*person/persons]0[:]<br>
+                                 a. [first name/first names]2 [surname/surnames]0 ¹<br>
+                                     <i class='font-weight-lighter'>John Doe</i><br><br>
+                                 b. [first name/first names]2/[surname/surnames]0 ²/[occ]1 ³<br>
+                                     <i class='font-weight-lighter'>James William/Smith-Johnson/2<br>       James William/Smith-Johnson<br>
+                                     James William/<br>       /Smith-Jonhson</i><br><br>
+                              2. [*surname/surnames]0 ¹[:] <i class='font-weight-lighter'>Doe</i><br><br>
+                              3. [*public name][:] <i class='font-weight-lighter'>James Smith</i><br><br>
+                              4. [*alias][:] <i class='font-weight-lighter'>Jimmy</i><br><br>
+                              5. [*key]0[:] [first name/first names]2.[occ]1 [surname/surnames]0 ²<br>
+                                     <i class='font-weight-lighter'>James William.2 Smith-Johnson<br>       james william.2 smith johnson</i><br>
+                              <br><div class='font-weight-lighter small'>¹ [word/words]0<br>² [word/words]1<br>³ [optional/mandatory]0</div></div>">
+                      <i class="far fa-circle-question text-primary text-primary"></i>
+                    </abbr>
+                  </div>
                   <input type="search" id="fullname" class="form-control form-control-lg py-0 border border-top-0" autofocus tabindex="1"
-                    name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias], [key]0%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
-                     data-toggle="tooltip" data-html="true"
-                     title="<div class='text-left font-weight-bold'><h5>[*search format][:]</h5>
-                            1. [*person/persons]0[:]<br>
-                               a. [first name/first names]2 [surname/surnames]0 ¹<br>
-                                   <i class='font-weight-lighter'>John Doe</i><br><br>
-                               b. [first name/first names]2/[surname/surnames]0 ²/[occ]1 ³<br>
-                                   <i class='font-weight-lighter'>James William/Smith-Johnson/2<br>       James William/Smith-Johnson<br>
-                                   James William/<br>       /Smith-Jonhson</i><br><br>
-                            2. [*surname/surnames]0 ¹[:] <i class='font-weight-lighter'>Doe</i><br><br>
-                            3. [*public name][:] <i class='font-weight-lighter'>James Smith</i><br><br>
-                            4. [*alias][:] <i class='font-weight-lighter'>Jimmy</i><br><br>
-
-                            5. [*key]0[:] [first name/first names]2.[occ]1 [surname/surnames]0 ²<br>
-                                   <i class='font-weight-lighter'>James William.2 Smith-Johnson<br>       james william.2 smith johnson</i><br>
-                            <br><div class='font-weight-lighter small'>¹ [word/words]0<br>² [word/words]1<br>³ [optional/mandatory]0</div></div>">
+                    name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias], [key]0%if;browsing_with_sosa_ref;, [n° Sosa]%end;">
                 </div>
                 <div class="d-flex mt-3">
                   <div class="btn-group-vertical mr-2">
