@@ -1511,6 +1511,14 @@ let comma_separated_of_list =
   with Invalid_argument _ ->
     Jingoo.Jg_types.failwith_type_error_1 "comma_separated_of_list" l
 
+let assets_version =
+  Jingoo.Jg_types.func_arg1_no_kw @@ function
+  | Tnull -> (
+      match Geneweb.Util.read_assets_version () with
+      | Some number -> Jingoo.Jg_types.Tstr (string_of_int number)
+      | None -> Jingoo.Jg_types.Tstr "")
+  | x -> Jingoo.Jg_types.failwith_type_error_1 "assets_version" x
+
 let default_env_aux conf =
   [
     ("trans", trans conf);
@@ -1525,6 +1533,7 @@ let default_env_aux conf =
     ("LOG", log);
     ("CAST", module_CAST);
     ("comma_separated_of_list", comma_separated_of_list);
+    ("assets_version", assets_version);
   ]
 
 let default_env_no_base conf =

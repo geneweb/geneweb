@@ -187,6 +187,10 @@ and eval_time_var conf = function
 
 and eval_simple_variable conf = function
   | "action" -> conf.command
+  | "assets_version" -> (
+      match Util.read_assets_version () with
+      | Some num -> string_of_int num
+      | None -> "")
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
   | "connections" -> (
