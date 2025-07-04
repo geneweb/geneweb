@@ -837,7 +837,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
         try templ_eval_var conf (s :: sl)
         with Not_found ->
           raise_with_loc loc
-            (Failure ("unbound var \"" ^ String.concat "." (s :: sl) ^ "\""))))
+            (Failure ("unbound var: " ^ String.concat "." (s :: sl)))))
   | Atransl (upp, s, c) -> VVstring (eval_transl conf upp s c)
   | Aapply (s, ell) ->
       let vl =
