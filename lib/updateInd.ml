@@ -512,23 +512,12 @@ and eval_is_relation_type rt = function
   | _ -> bool_val false
 
 and eval_special_var conf base = function
-  | [ "include_perso_header" ] -> (
-      (* TODO merge with mainstream includes ?? *)
+  | [ "include_menubar" ] -> (
       match p_getenv conf.env "i" with
       | Some i ->
-          let has_base_loop =
-            try
-              let _ = Util.create_topological_sort conf base in
-              false
-            with Consang.TopologicalSortError _ -> true
-          in
-          if has_base_loop then VVstring ""
-          else
-            let p = Driver.poi base (Driver.Iper.of_string i) in
-            Perso.interp_templ_with_menu
-              (fun _ -> ())
-              "perso_header" conf base p;
-            VVstring ""
+          let p = Driver.poi base (Driver.Iper.of_string i) in
+          Perso.interp_templ ~no_headers:true "menubar" conf base p;
+          VVstring ""
       | None -> VVstring "")
   | _ -> raise Not_found
 

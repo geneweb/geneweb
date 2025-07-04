@@ -40,6 +40,12 @@ val open_etc_file : Config.config -> string -> (in_channel * string) option
     base directory or inside one of assets directories. Returns input channel
     and the path to given template. *)
 
+val is_full_html_template : config -> string -> bool
+(** [is_full_html_template conf fname] returns [true] if the template file
+    [fname] contains <!DOCTYPE html> in its first 3 lines, indicating it's a
+    complete HTML page rather than a fragment. This is used to determine whether
+    HTTP headers should be sent before the template content. *)
+
 val escache_value : Geneweb_db.Driver.base -> Adef.encoded_string
 (** Returns the date of the base directory last update *)
 

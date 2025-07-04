@@ -505,10 +505,10 @@ let string_of_ctime conf =
 
 let html ?(content_type = "text/html") conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
+  Output.header conf "Content-type: %s; charset=%s" content_type charset;
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
   Output.header conf "Date: %s" (string_of_ctime conf);
-  Output.header conf "Connection: close";
-  Output.header conf "Content-type: %s; charset=%s" content_type charset
+  Output.header conf "Connection: close"
 
 let unauthorized conf auth_type =
   Output.status conf Def.Unauthorized;
@@ -1425,6 +1425,24 @@ let open_etc_file conf fname =
     Logs.syslog `LOG_ERR
       (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
+
+(* Detect if a template file is a full HTML page *)
+let is_full_html_template conf fname =
+  match open_etc_file conf fname with
+  | None -> false
+  | Some (ic, _) ->
+      let rec check_lines n =
+        if n <= 0 then false
+        else
+          try
+            let line = input_line ic in
+            let normalized = String.trim line |> String.lowercase_ascii in
+            if normalized = "<!doctype html>" then true else check_lines (n - 1)
+          with End_of_file -> false
+      in
+      let result = check_lines 3 in
+      close_in ic;
+      result
 
 let body_prop conf =
   try match List.assoc "body_prop" conf.base_env with "" -> "" | s -> " " ^ s
