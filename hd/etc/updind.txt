@@ -22,8 +22,8 @@
 %include;hed
 <div class="container pl-lg-0 pr-lg-3 px-xl-3">
 %message_to_wizard;
-%( do not use %include;perso_header %)
-%include_perso_header;
+%( do not use %include;menubar %)
+%include_menubar;
 %let;datalist_aliases; list="datalist_aliases" data-book="alias"%in;
 %let;datalist_estates; list="datalist_estates" data-book="domain"%in;
 %let;datalist_fnames; list="datalist_fnames" data-book="fn"%in;

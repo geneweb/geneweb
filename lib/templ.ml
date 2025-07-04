@@ -1512,6 +1512,8 @@ and print_variable conf sl =
     with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
 
 let output conf ifun env ep fl =
+  (if Util.is_full_html_template conf fl then
+     try Util.html conf with Failure _ -> ());
   try eval conf ifun env ep @@ parse conf fl
   with e ->
     let bt = Printexc.get_raw_backtrace () in
