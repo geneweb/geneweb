@@ -505,10 +505,12 @@ let string_of_ctime conf =
 
 let html ?(content_type = "text/html") conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
+  if conf.cgi then 
+    prerr_endline "DEBUG: html() called in CGI mode";
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
+  Output.header conf "Content-type: %s; charset=%s" content_type charset;
   Output.header conf "Date: %s" (string_of_ctime conf);
-  Output.header conf "Connection: close";
-  Output.header conf "Content-type: %s; charset=%s" content_type charset
+  Output.header conf "Connection: close"
 
 let unauthorized conf auth_type =
   Output.status conf Def.Unauthorized;
@@ -1367,14 +1369,12 @@ let generate_search_directories conf =
 
   (* Ajouter les répertoires des assets avec la même logique *)
   let asset_template_dirs =
-    List.concat
-      (List.map
-         (fun asset_dir ->
-           let etc_dir = Filename.concat asset_dir "etc" in
-           match current_template with
-           | Some t -> [ Filename.concat etc_dir t; etc_dir ]
-           | None -> [ etc_dir ])
-         asset_dirs)
+    List.concat (List.map (fun asset_dir ->
+      let etc_dir = Filename.concat asset_dir "etc" in
+      match current_template with
+      | Some t -> [ Filename.concat etc_dir t; etc_dir ]
+      | None -> [ etc_dir ])
+    asset_dirs)
   in
 
   template_dirs @ asset_template_dirs
