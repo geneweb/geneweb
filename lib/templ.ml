@@ -1256,7 +1256,9 @@ let rec eval conf ifun env =
             let wl = List.map (fun w -> Utf8.capitalize_fst w) wl in
             String.concat " " wl
         | "hash", [ (None, VVstring file) ] -> (
-            let fpath = Util.resolve_asset_file conf file in
+            let fpath =
+              if conf.cgi then file else Util.resolve_asset_file conf file
+            in
             match Util.hash_file_cached fpath with
             | Some hash -> hash
             | None -> "")
