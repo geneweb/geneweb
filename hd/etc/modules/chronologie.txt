@@ -461,7 +461,7 @@
           %and;%apply;dprec("spouse.death_date")%nn;
           %and;%count2;
           %and;%if;(spouse.death_date!="")%spouse.death_date;%else;([missing date]0)%end;%nn;
-          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end;%apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age;)%end;%nn;
+          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end; %apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age;)%end;%nn;
           %and;%nn;
           %and;%nn;
           %and;%nn;
