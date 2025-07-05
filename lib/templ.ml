@@ -837,7 +837,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
         try templ_eval_var conf (s :: sl)
         with Not_found ->
           raise_with_loc loc
-            (Failure ("unbound var \"" ^ String.concat "." (s :: sl) ^ "\""))))
+            (Failure ("unbound var: " ^ String.concat "." (s :: sl)))))
   | Atransl (upp, s, c) -> VVstring (eval_transl conf upp s c)
   | Aapply (s, ell) ->
       let vl =
@@ -894,16 +894,28 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
   | e -> raise_with_loc loc (Failure (not_impl "eval_expr" e))
 
 let eval_bool_expr conf (eval_var, eval_apply) e =
-  match eval_expr (conf, eval_var, eval_apply) e with
-  | VVbool b -> b
-  | VVstring _ | VVother _ ->
-      raise_with_loc e.Ast.loc (Failure "bool value expected")
+  try
+    match eval_expr (conf, eval_var, eval_apply) e with
+    | VVbool b -> b
+    | VVstring s ->
+        raise_with_loc e.Ast.loc
+          (Failure (Printf.sprintf "bool value expected. Got: %s" s))
+    | VVother _ -> raise_with_loc e.Ast.loc (Failure "bool value expected")
+  with Exc_located _ as exn ->
+    let bt = Printexc.get_raw_backtrace () in
+    Logs.warn (fun k -> k "%a" pp_exception (exn, bt));
+    false
 
 let eval_string_expr conf (eval_var, eval_apply) e =
-  match eval_expr (conf, eval_var, eval_apply) e with
-  | VVstring s -> Util.translate_eval s
-  | VVbool _ | VVother _ ->
-      raise_with_loc e.Ast.loc (Failure "string value expected")
+  try
+    match eval_expr (conf, eval_var, eval_apply) e with
+    | VVstring s -> Util.translate_eval s
+    | VVbool _ | VVother _ ->
+        raise_with_loc e.Ast.loc (Failure "string value expected")
+  with Exc_located _ as exn ->
+    let bt = Printexc.get_raw_backtrace () in
+    Logs.warn (fun k -> k "%a" pp_exception (exn, bt));
+    ""
 
 let print_body_prop (conf : Config.config) =
   let s =
@@ -1245,6 +1257,13 @@ let rec eval conf ifun env =
                let w = Util.surname_particle base w not available *)
             let wl = List.map (fun w -> Utf8.capitalize_fst w) wl in
             String.concat " " wl
+        | "hash", [ (None, VVstring file) ] -> (
+            let fpath =
+              if conf.cgi then file else Util.resolve_asset_file conf file
+            in
+            match Util.hash_file_cached fpath with
+            | Some hash -> hash
+            | None -> "")
         | "interp", [ (None, VVstring s) ] ->
             let astl =
               Parser.parse ~on_exn ~resolve_include:(resolve_include conf)
@@ -1495,6 +1514,7 @@ and print_variable conf sl =
     with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
 
 let output conf ifun env ep fl =
+  if Util.is_full_html_template conf fl then Util.html conf;
   try eval conf ifun env ep @@ parse conf fl
   with e ->
     let bt = Printexc.get_raw_backtrace () in
