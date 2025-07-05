@@ -169,7 +169,7 @@
                 %elseif;(b.semi_public="yes" and is_semi_public)
                   <i class="fa fa-person fa-fw text-warning mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]2)%nn;
                 %elseif;(is_public or (b.public_if_titles="yes" and has_titles))
-                  <i class="fa fa-person fa-fw text-success mr-2"></i>.[*visibility] ([iftitles/public/semipublic/private]1)%nn;
+                  <i class="fa fa-person fa-fw text-success mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]1)%nn;
                 %else;
                   <i class="fa fa-person fa-fw text-muted mr-2"></i>[*visibility] ([iftitles/public/semipublic/private]0)%nn;
                 %end;
