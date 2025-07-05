@@ -490,7 +490,7 @@ let prec_text conf d =
       (* On utilise le dictionnaire pour être sur *)
       (* que ce soit compréhensible de tous.      *)
       match transl conf "about (short date)" with
-      | "ca" -> "ca "
+      | "ca" -> "ca "
       | s -> s)
   | Maybe -> "?"
   | Before -> "<"
@@ -542,7 +542,7 @@ let prec_year_text conf d =
         (* On utilise le dictionnaire pour être sur *)
         (* que ce soit compréhensible de tous.      *)
         match transl conf "about (short date)" with
-        | "ca" -> "ca "
+        | "ca" -> "ca "
         | s -> s)
     | Maybe -> "?"
     | Before -> "/"
