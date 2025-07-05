@@ -178,7 +178,10 @@ let has_legitimate_mixed_case dict s =
   | _ -> false
 
 let has_bad_capitalization dict s =
-  has_bad_capitalization_pattern s && not (has_legitimate_mixed_case dict s)
+  match dict with
+  | Sources -> false
+  | _ ->
+      has_bad_capitalization_pattern s && not (has_legitimate_mixed_case dict s)
 
 let find_bad_capitalization_positions s =
   let re = Str.regexp "\\([A-Z]\\{2,\\}\\|[a-z][A-Z]\\|[A-Z][a-z][A-Z]\\)" in
