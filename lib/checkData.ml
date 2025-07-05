@@ -421,7 +421,9 @@ let make_error_html conf data entry error_type =
   let highlighted = make_highlight_html entry positions error_type conf in
 
   let url =
-    Printf.sprintf "?m=MOD_DATA&data=%s&s=%s&s1=%s&s2=%s" data
+    Printf.sprintf "%sm=MOD_DATA&data=%s&s=%s&s1=%s&s2=%s"
+      (Util.commd conf :> string)
+      data
       (Mutil.encode s :> string)
       (Mutil.encode s1 :> string)
       (Mutil.encode s2 :> string)

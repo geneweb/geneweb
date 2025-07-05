@@ -1,7 +1,9 @@
 open Config
 
 let print_nav_button conf current_data data icon title =
-  let href = Printf.sprintf "?m=CHK_DATA&data=%s" data in
+  let href =
+    Printf.sprintf "%sm=CHK_DATA&data=%s" (Util.commd conf :> string) data
+  in
   let active = if current_data = data then "active" else "" in
   Output.printf conf
     {|<a href="%s" class="btn btn-outline-primary %s">
@@ -41,7 +43,8 @@ let display_error_section conf data entries error_type error_title =
       (fun html ->
         Output.printf conf "<li class=\"list-group-item\">%s</li>" html)
       filtered_entries;
-    Output.print_sstring conf "</ul>")
+    Output.print_sstring conf "</ul>");
+  List.length filtered_entries
 
 let print conf base =
   let data = Util.p_getenv conf.env "data" |> Option.value ~default:"" in
@@ -74,16 +77,28 @@ let print conf base =
 
   print_nav_buttons conf data;
 
-  display_error_section conf data entries CheckData.InvisibleCharacters
-    (Util.transl conf "chk_data invisible characters");
+  let total_errors =
+    let count1 =
+      display_error_section conf data entries CheckData.InvisibleCharacters
+        (Util.transl conf "chk_data invisible characters")
+    in
+    let count2 =
+      display_error_section conf data entries CheckData.BadCapitalization
+        (Util.transl conf "chk_data bad capitalization")
+    in
+    let count3 =
+      display_error_section conf data entries CheckData.MultipleSpaces
+        (Util.transl conf "chk_data multiple spaces")
+    in
+    let count4 =
+      display_error_section conf data entries CheckData.NonBreakingSpace
+        (Util.transl conf "chk_data non-breaking spaces")
+    in
+    count1 + count2 + count3 + count4
+  in
 
-  display_error_section conf data entries CheckData.BadCapitalization
-    (Util.transl conf "chk_data bad capitalization");
-
-  display_error_section conf data entries CheckData.MultipleSpaces
-    (Util.transl conf "chk_data multiple spaces");
-
-  display_error_section conf data entries CheckData.NonBreakingSpace
-    (Util.transl conf "chk_data non-breaking spaces");
+  if total_errors = 0 && dict <> None then
+    Output.printf conf "<h3 class=\"mt-3\">%s</h3>"
+      (Utf8.capitalize_fst (Util.transl conf "no match"));
 
   Hutil.trailer conf
