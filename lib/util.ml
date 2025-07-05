@@ -505,8 +505,7 @@ let string_of_ctime conf =
 
 let html ?(content_type = "text/html") conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
-  if conf.cgi then 
-    prerr_endline "DEBUG: html() called in CGI mode";
+  if conf.cgi then prerr_endline "DEBUG: html() called in CGI mode";
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
   Output.header conf "Content-type: %s; charset=%s" content_type charset;
   Output.header conf "Date: %s" (string_of_ctime conf);
@@ -1369,12 +1368,14 @@ let generate_search_directories conf =
 
   (* Ajouter les répertoires des assets avec la même logique *)
   let asset_template_dirs =
-    List.concat (List.map (fun asset_dir ->
-      let etc_dir = Filename.concat asset_dir "etc" in
-      match current_template with
-      | Some t -> [ Filename.concat etc_dir t; etc_dir ]
-      | None -> [ etc_dir ])
-    asset_dirs)
+    List.concat
+      (List.map
+         (fun asset_dir ->
+           let etc_dir = Filename.concat asset_dir "etc" in
+           match current_template with
+           | Some t -> [ Filename.concat etc_dir t; etc_dir ]
+           | None -> [ etc_dir ])
+         asset_dirs)
   in
 
   template_dirs @ asset_template_dirs
@@ -1447,6 +1448,26 @@ let open_etc_file conf fname =
     Logs.syslog `LOG_ERR
       (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
+
+(* Détecte si un fichier template est une page HTML complète (contient <!DOCTYPE html>) *)
+let is_full_html_template conf fname =
+  match open_etc_file conf fname with
+  | None -> false
+  | Some (ic, _) ->
+      let rec check_lines n =
+        if n <= 0 then false
+        else
+          try
+            let line = input_line ic in
+            (* Normaliser la ligne : supprimer les espaces en début/fin et mettre en minuscules *)
+            let normalized = String.trim line |> String.lowercase_ascii in
+            (* Vérifier si c'est une ligne DOCTYPE html *)
+            if normalized = "<!doctype html>" then true else check_lines (n - 1)
+          with End_of_file -> false
+      in
+      let result = check_lines 3 in
+      close_in ic;
+      result
 
 let body_prop conf =
   try match List.assoc "body_prop" conf.base_env with "" -> "" | s -> " " ^ s
