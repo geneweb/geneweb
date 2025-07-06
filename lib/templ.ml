@@ -894,16 +894,26 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) Ast.{ desc; loc } =
   | e -> raise_with_loc loc (Failure (not_impl "eval_expr" e))
 
 let eval_bool_expr conf (eval_var, eval_apply) e =
-  match eval_expr (conf, eval_var, eval_apply) e with
-  | VVbool b -> b
-  | VVstring _ | VVother _ ->
-      raise_with_loc e.Ast.loc (Failure "bool value expected")
+  try
+    match eval_expr (conf, eval_var, eval_apply) e with
+    | VVbool b -> b
+    | VVstring _ | VVother _ ->
+        raise_with_loc e.Ast.loc (Failure "bool value expected")
+  with Exc_located _ as exn ->
+    let bt = Printexc.get_raw_backtrace () in
+    Logs.debug (fun k -> k "%a" pp_exception (exn, bt));
+    false
 
 let eval_string_expr conf (eval_var, eval_apply) e =
-  match eval_expr (conf, eval_var, eval_apply) e with
-  | VVstring s -> Util.translate_eval s
-  | VVbool _ | VVother _ ->
-      raise_with_loc e.Ast.loc (Failure "string value expected")
+  try
+    match eval_expr (conf, eval_var, eval_apply) e with
+    | VVstring s -> Util.translate_eval s
+    | VVbool _ | VVother _ ->
+        raise_with_loc e.Ast.loc (Failure "string value expected")
+  with Exc_located _ as exn ->
+    let bt = Printexc.get_raw_backtrace () in
+    Logs.debug (fun k -> k "%a" pp_exception (exn, bt));
+    ""
 
 let print_body_prop (conf : Config.config) =
   let s =
