@@ -79,7 +79,7 @@ let ( nb_real_persons_1,
 
 let test_royal_ged () =
   (Alcotest.check Alcotest.int)
-    "nb_real_persons_1 = 3006" 3006 nb_real_persons_1;
+    "nb_real_persons_1 = 3010" 3010 nb_real_persons_1;
   (Alcotest.check Alcotest.int) "nb_families_1 = 1425" 1425 nb_families_1;
   (Alcotest.check Alcotest.int)
     "nb_real_persons_1 = nb_real_persons_2" nb_real_persons_1 nb_real_persons_2;

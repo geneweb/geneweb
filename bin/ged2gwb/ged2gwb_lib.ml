@@ -439,7 +439,7 @@ let parse_alias s = match parse_name s with
 
 let string_of_first_name_option = function
   | Some f -> f
-  | None -> "?"
+  | None -> "x"
 
 let string_of_surname_option = function
   | Some s -> s
@@ -867,6 +867,7 @@ let fam_index gen lab =
 
 let string_empty = 0
 let string_quest = 1
+let string_x = 2
 
 let unknown_per i sex =
   let p = { (Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
@@ -2891,6 +2892,7 @@ let make_arrays in_file =
   in
   assert (add_string gen "" = string_empty);
   assert (add_string gen "?" = string_quest);
+  assert (add_string gen "x" = string_x);
   Printf.eprintf "*** pass 1 (note)\n";
   flush stderr;
   pass1 gen fname;
@@ -3168,8 +3170,15 @@ let finish_base (persons, families, strings, _) =
     && Array.length u.Def.family != 0
  || p.notes <> string_empty
     then
-      if strings.(p.Def.first_name) = "?" || strings.(p.surname) = "?"
-      then persons.(i) <- { p with occ = i }
+      let (fn, occ) =
+        if strings.(p.Def.first_name) = "?" then string_x, i
+        else p.Def.first_name, p.occ
+      in
+      let (sn, occ) =
+        if strings.(p.surname) = "?" then string_x, i
+        else p.surname, occ
+      in
+      persons.(i) <- { p with Def.first_name = fn; surname = sn; occ }
   done;
   check_parents_sex persons families couples strings ;
   check_parents_children persons ascends unions families couples descends strings ;
