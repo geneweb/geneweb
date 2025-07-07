@@ -441,8 +441,10 @@ let rec select_list_lines conf prompt list = function
       else (List.rev list, s :: sl)
   | [] -> (List.rev list, [])
 
-let rec hotl conf wlo cnt edit_opt sections_nums list = function
-  | "__NOTOC__" :: sl -> hotl conf wlo cnt edit_opt sections_nums list sl
+let rec hotl ?(keep_newlines = false) conf wlo cnt edit_opt sections_nums list =
+  function
+  | "__NOTOC__" :: sl ->
+      hotl ~keep_newlines conf wlo cnt edit_opt sections_nums list sl
   | "__TOC__" :: sl ->
       let list =
         match wlo with
@@ -451,7 +453,7 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
             List.rev_append summary list
         | None -> list
       in
-      hotl conf wlo cnt edit_opt sections_nums list sl
+      hotl ~keep_newlines conf wlo cnt edit_opt sections_nums list sl
   | "__SHORT_TOC__" :: sl ->
       let list =
         match wlo with
@@ -460,27 +462,36 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
             List.rev_append summary list
         | None -> list
       in
-      hotl conf wlo cnt edit_opt sections_nums list sl
+      hotl ~keep_newlines conf wlo cnt edit_opt sections_nums list sl
   | "" :: sl ->
       let parag =
-        let rec loop1 parag = function
+        let rec loop1 parag nl = function
           | "" :: sl -> Some (parag, sl, true)
           | s :: sl ->
               if
                 List.mem s.[0] [ '*'; '#'; ':'; ';'; '=' ]
                 || List.mem s toc_list
               then if parag = [] then None else Some (parag, s :: sl, true)
-              else if s.[0] = ' ' && parag = [] then loop2 [ s ] sl
-              else loop1 (s :: parag) sl
+              else if s.[0] = ' ' && parag = [] then loop2 [ s ] false sl
+              else
+                let s =
+                  if
+                    keep_newlines && nl
+                    && not (Ext_string.start_with "<br>" 0 s)
+                  then "<br>" ^ s
+                  else s
+                in
+                let nl = not (Ext_string.end_with s "<br>") in
+                loop1 (s :: parag) nl sl
           | [] -> Some (parag, [], true)
-        and loop2 parag = function
+        and loop2 parag nl = function
           | "" :: sl -> Some (parag, sl, false)
           | s :: sl ->
-              if s.[0] = ' ' then loop2 (s :: parag) sl
-              else loop1 parag (s :: sl)
+              if s.[0] = ' ' then loop2 (s :: parag) nl sl
+              else loop1 parag nl (s :: sl)
           | [] -> Some (parag, [], true)
         in
-        loop1 [] sl
+        loop1 [] false sl
       in
       let list, sl =
         match parag with
@@ -489,7 +500,7 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
             ("</pre>" :: (parag @ ("<pre>" :: list)), "" :: sl)
         | Some (parag, sl, _) -> ("</p>" :: (parag @ ("<p>" :: list)), "" :: sl)
       in
-      hotl conf wlo cnt edit_opt sections_nums list sl
+      hotl ~keep_newlines conf wlo cnt edit_opt sections_nums list sl
   | s :: sl -> (
       let len = String.length s in
       let tago =
@@ -506,7 +517,8 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
       | Some (tag1, tag2) ->
           let sl, rest = select_list_lines conf s.[0] [] (s :: sl) in
           let list = tlsw_list tag1 tag2 0 list sl in
-          hotl conf wlo cnt edit_opt sections_nums list ("" :: rest)
+          hotl ~keep_newlines conf wlo cnt edit_opt sections_nums list
+            ("" :: rest)
       | None ->
           if len > 2 && s.[0] = '=' && s.[len - 1] = '=' then
             let slev = section_level s len in
@@ -531,16 +543,20 @@ let rec hotl conf wlo cnt edit_opt sections_nums list = function
               let s = string_of_modify_link conf cnt false edit_opt in
               if s = "" then list else s :: list
             in
-            hotl conf wlo (cnt + 1) edit_opt sections_nums list (s :: sl)
-          else hotl conf wlo cnt edit_opt sections_nums (s :: list) sl)
+            hotl ~keep_newlines conf wlo (cnt + 1) edit_opt sections_nums list
+              (s :: sl)
+          else
+            hotl ~keep_newlines conf wlo cnt edit_opt sections_nums (s :: list)
+              sl)
   | [] -> List.rev list
 
-let html_of_tlsw conf s =
+let html_of_tlsw ?(keep_newlines = false) conf s =
   let lines, _ = lines_list_of_string s in
   let sections_nums =
     match sections_nums_of_tlsw_lines lines with [ _ ] -> [] | l -> l
   in
-  hotl conf (Some lines) first_cnt None sections_nums [] ("" :: lines)
+  hotl ~keep_newlines conf (Some lines) first_cnt None sections_nums []
+    ("" :: lines)
 
 let html_with_summary_of_tlsw conf wi edit_opt s =
   let lines, no_toc = lines_list_of_string s in
