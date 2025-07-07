@@ -251,7 +251,7 @@
               %else;" title="[*select] %ancestor;"
                 href="%prefix;%ancestor.access;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i" and env.key!="v" and env.key!="")&%env.key=%env.val;%end;%end;&v=%expr(evar.v+level)"
               %end;>
-              <div class="flex-grow-1 order-%if;(count%2!=0)1%else;2%end;">
+              <div class="flex-grow-1 order-%if;(count%2!=0)1%else;2%end; align-self-center">
                 %if;(unknown!=1)<strong>%ancestor.first_name;</strong>
                   %if;(ancestor.qualifier!="") <em>%ancestor.qualifier;</em>%end;
                   %sp;<span>%ancestor.surname;</span>
@@ -273,7 +273,7 @@
 %let;maxlvl;%if;(static_max_anc_level>4)4%else;%static_max_anc_level;%end;%in;
 %if;(has_parents and evar.templ="")
   <div class="modal fade" id="switch_modal" tabindex="-1" aria-labelledby="switch-ancestor-modal" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header py-2">
           <h4 class="modal-title text-primary" id="switch-ancestor-modal">
