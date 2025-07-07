@@ -1366,7 +1366,8 @@ let get_note_source conf base ?p auth no_note note_source =
       | None -> []
       | Some p -> [ ('i', fun () -> Image.default_portrait_filename base p) ]
     in
-    Notes.source_note_with_env conf base env (Gwdb.sou base note_source)
+    Notes.source_note_with_env ~keep_newlines:true conf base env
+      (Gwdb.sou base note_source)
   else Adef.safe ""
 
 let date_aux conf p_auth date =
