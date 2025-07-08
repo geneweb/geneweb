@@ -54,14 +54,33 @@
       %end;
       <br>
     %end;
+    %( Nobility title format:
+         “13ᵉ prince de Monaco (Rainier III, 9 mai 1949–6 avril 2005)” %)
     %if;has_nobility_titles;
-      <em>%nn;
       %foreach;nobility_title;%nn;
-       %if;not is_first;,%sp;%end;
+        %if;not is_first;,%sp;%end;
         %nobility_title;%nn;
-      %end;
-      </em><br>
-    %end;
+      %end;<br>
+      %( Currently unused because it lacks concatenation of places in hyperlinks
+      %foreach;nob_title;%nn;
+        %if;not is_first;,%sp;%end;
+        %if;(nob_title.nth!="" and nob_title.nth>0)%apply;nth%with;[nth]%and;%nob_title.nth;%end; %end;%nn;
+        %if;not cancel_links;
+          <a href="%prefix;m=TT&sm=S&t=%apply;uri_encode(nob_title.title)&p=%if;(nob_title.places!="")%apply;uri_encode(nob_title.places)%end;">%nn;
+        %end;
+          %nob_title.title;%if;(nob_title.places!="")%sp;%nob_title.places;%end;%nn;
+        %if;not cancel_links;</a>%end;
+        %if;(nob_title.name!="" or nob_title.date_begin!="" or nob_title.date_end!="")
+          %sp;(%nn;
+          %if;(nob_title.name != "")%nob_title.name;%end;%nn;
+          %if;(nob_title.date_begin != "" or nob_title.date_end != "")
+            %if;(nob_title.name != ""),%sp;%end;%nn;
+            %if;(nob_title.date_begin!="")%nob_title.date_begin;%end;%nn;
+            %if;(nob_title.date_end!="")–%nob_title.date_end;%end;
+          %end;)%nn;
+        %end;
+      %end;%)
+    %end;</br>
     %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;<br>%end;
     %if;has_first_names_aliases;
       %apply;lazy_print("")
