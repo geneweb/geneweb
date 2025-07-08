@@ -1013,9 +1013,12 @@ let one_title_text base t : Adef.safe_string =
   " <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
 let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
-  "<a href=\""
-  ^<^ (commd conf ^^^ href :> Adef.safe_string)
-  ^^^ "\">" ^<^ s ^>^ "</a>"
+  let cancel_links = p_getenv conf.env "cgl" = Some "on" in
+  if cancel_links then s
+  else
+    "<a href=\""
+    ^<^ (commd conf ^^^ href :> Adef.safe_string)
+    ^^^ "\">" ^<^ s ^>^ "</a>"
 
 let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
