@@ -2,6 +2,7 @@
 
 open Dbdisk
 open Def
+module Logs = Geneweb_logs.Logs
 
 type person = dsk_person
 type ascend = dsk_ascend
@@ -113,38 +114,6 @@ let move_with_backup src dst =
 
     restrict - defines visibility of each person in the base
 *)
-
-exception Found of int
-
-let hashtbl_right_assoc s ht =
-  try
-    Hashtbl.iter (fun i1 s1 -> if s = s1 then raise (Found i1)) ht;
-    raise Not_found
-  with Found x -> x
-
-let index_of_string strings ic start_pos hash_len string_patches string_pending
-    s =
-  try hashtbl_right_assoc s string_pending
-  with Not_found -> (
-    try hashtbl_right_assoc s string_patches
-    with Not_found -> (
-      match (ic, hash_len) with
-      | Some ic, Some hash_len ->
-          let ia = Hashtbl.hash s mod hash_len in
-          seek_in ic (start_pos + (ia * Dutil.int_size));
-          let i1 = input_binary_int ic in
-          let rec loop i =
-            if i = -1 then raise Not_found
-            else if strings.get i = s then i
-            else (
-              seek_in ic (start_pos + ((hash_len + i) * Dutil.int_size));
-              loop (input_binary_int ic))
-          in
-          loop i1
-      | _ ->
-          Printf.eprintf "Sorry. I really need string.inx\n";
-          flush stderr;
-          failwith "database access"))
 
 (* deprecated version using the old btree implementation.
    It will be kept for a while, but it will eventually be remove.
@@ -654,6 +623,106 @@ module Old = struct
   }
 end
 
+module type X = sig
+  val equal : string -> string -> bool
+  (** [equal s1 s2] checks if [s1] and [s2] are equal. *)
+
+  val hash : string -> int
+  (** [hash s] computes a hash of the string [s]. *)
+
+  val string_of_id : int -> string
+  (** [string_of_id i] returns the string of identifier [i]. *)
+end
+
+module InvertedIndex (X : X) : sig
+  type t
+  type idx = (int, string) Hashtbl.t
+
+  exception Conflict of string * int * int
+  (** Exception raised when a conflict between indexes is detected. *)
+
+  val load : base_version -> inx:string -> idx list -> t
+  (** [load version ~inx l] loads the inverted index of strings from file [inx],
+      assuming that the binary format is [version]. The list of indexes [l] are
+      loaded. *)
+
+  val find : t -> string -> int
+  (** [find t s] searches for string [s] in the inverted index [t].
+
+      @raise Not_found if string [s] is not found in [t]. *)
+
+  val insert : t -> string -> int -> unit
+  (** [insert t s i] adds string [s] with its index [i] in [t].
+
+      @raise Conflict
+        if string [s] is already present in [t] with a different index. *)
+end = struct
+  module HS = Hashtbl.Make (struct
+    type t = string
+
+    let equal = X.equal
+    let hash = X.hash
+  end)
+
+  type inx = { fl : string; start : int; size : int }
+  type t = { inx : inx option; tbl : int HS.t }
+  type idx = (int, string) Hashtbl.t
+
+  let int_size = 4
+
+  exception Conflict of string * int * int
+
+  let insert t s i =
+    match HS.find t.tbl s with
+    | j when i <> j -> raise (Conflict (s, j, i))
+    | _ | (exception Not_found) -> HS.add t.tbl s i
+
+  let load_inx version ~inx =
+    Secure.with_open_in_bin inx @@ fun ic ->
+    let start =
+      match version with
+      | GnWb0024 | GnWb0023 | GnWb0022 -> int_size
+      | GnWb0021 | GnWb0020 -> 3 * int_size
+    in
+    let size = input_binary_int ic in
+    ignore (input_binary_int ic : int);
+    ignore (input_binary_int ic : int);
+    { fl = inx; start; size }
+
+  let load version ~inx indexes =
+    let inx =
+      if Sys.file_exists inx then Some (load_inx version ~inx)
+      else (
+        Logs.warn (fun k -> k "cannot load the inverted index file %S" inx);
+        None)
+    in
+    let tbl = HS.create 17 in
+    let t = { inx; tbl } in
+    List.iter (Hashtbl.iter (fun i s -> insert t s i)) indexes;
+    t
+
+  let find t s =
+    match HS.find t.tbl s with
+    | i -> i
+    | exception Not_found -> (
+        match t.inx with
+        | None -> raise Not_found
+        | Some inx ->
+            Secure.with_open_in_bin inx.fl @@ fun ic ->
+            let h = X.hash s mod inx.size in
+            seek_in ic (inx.start + (h * int_size));
+            let rec loop i =
+              if i = -1 then raise Not_found
+              else if X.equal (X.string_of_id i) s then i
+              else (
+                seek_in ic (inx.start + ((inx.size + i) * int_size));
+                loop @@ input_binary_int ic)
+            in
+            loop @@ input_binary_int ic)
+end
+
+let ( // ) = Filename.concat
+
 let apply_patches tab patches plen =
   if plen = 0 then tab
   else
@@ -865,7 +934,6 @@ let try_with_open openfun s f =
   Fun.protect ~finally (fun () -> f ic)
 
 let try_with_open_bin s f = try_with_open Secure.open_in_bin s f
-let ( // ) = Filename.concat
 
 let with_database ?(read_only = false) bname k =
   let bname =
@@ -914,23 +982,6 @@ let with_database ?(read_only = false) bname k =
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
   try_with_open_bin (bname // "base.acc") @@ fun ic_acc ->
-  try_with_open_bin (bname // "strings.inx") @@ fun ic2 ->
-  (* skipping array length *)
-  let ic2_string_start_pos =
-    match version with
-    | GnWb0024 | GnWb0023 | GnWb0022 -> Dutil.int_size
-    | GnWb0021 | GnWb0020 -> 3 * Dutil.int_size
-  in
-  let ic2_string_hash_len =
-    match ic2 with Some ic2 -> Some (input_binary_int ic2) | None -> None
-  in
-  (match ic2 with
-  | Some ic2 ->
-      ignore @@ input_binary_int ic2;
-      (* ic2_surname_start_pos *)
-      ignore @@ input_binary_int ic2
-      (* ic2_first_name_start_pos *)
-  | None -> ());
   let shift = 0 in
   let iper_exists =
     make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len
@@ -1157,17 +1208,27 @@ let with_database ?(read_only = false) bname k =
     Hashtbl.replace (snd pending.h_descend) i c;
     synchro_family := i :: !synchro_family
   in
-  let index_of_string =
-    index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
-      (snd patches.h_string) (snd pending.h_string)
+  let module I = InvertedIndex (struct
+    let hash = Hashtbl.hash
+    let equal = String.equal
+    let string_of_id = strings.get
+  end) in
+  let inv_idx =
+    I.load version ~inx:(bname // "strings.inx")
+      [ snd patches.h_string; snd pending.h_string ]
   in
+  if read_only then
+    for i = 0 to strings.len - 1 do
+      I.insert inv_idx (strings.get i) i
+    done;
   let insert_string s =
-    try index_of_string s
+    try I.find inv_idx s
     with Not_found ->
       let i = strings.len in
-      strings.len <- max strings.len (i + 1);
+      strings.len <- strings.len + 1;
       fst pending.h_string := strings.len;
-      Hashtbl.replace (snd pending.h_string) i s;
+      Hashtbl.add (snd pending.h_string) i s;
+      I.insert inv_idx s i;
       i
   in
   let patch_name s ip =
