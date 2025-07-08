@@ -37,6 +37,15 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
   let safe_html = if not safe then Util.safe_html else Adef.safe in
   let escape_html = if not safe then Util.escape_html else Adef.escaped in
+  let first = nth <= 0 in
+  let ordinal =
+    if first then Adef.safe ""
+    else
+      let nth_str =
+        if nth >= 100 then string_of_int nth else transl_nth conf "nth" nth
+      in
+      safe_html (nth_str ^ " ")
+  in
   let place, places_tl =
     match places with
     | [] -> (Driver.Istr.empty, [])
@@ -54,7 +63,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
       geneweb_link conf (href : Adef.encoded_string :> Adef.escaped_string) s
     else s
   in
-  let acc = href place acc in
+  let acc = ordinal ^^^ href place acc in
   let rec loop acc places =
     let acc =
       match places with
@@ -70,45 +79,34 @@ let string_of_title ?(safe = false) ?(link = true) conf base
   in
   let acc = loop acc places_tl in
   let paren =
-    match (nth, dates, name) with
-    | n, _, _ when n > 0 -> true
-    | _, _, Tname _ -> true
-    | _, (Some _, _) :: _, _ -> authorized_age conf base p
+    match (name, dates) with
+    | Tname _, _ -> true
+    | _, (Some _, _) :: _ -> authorized_age conf base p
     | _ -> false
   in
   let acc = if paren then acc ^>^ " (" else acc in
-  let first = nth <= 0 in
-  let acc =
-    if first then acc
-    else
-      acc
-      ^>^ if nth >= 100 then string_of_int nth else transl_nth conf "nth" nth
-  in
   let acc, first =
     match name with
     | Tname n ->
-        let acc = if not first then acc ^>^ " ," else acc in
         (acc ^^^ (Driver.sou base n |> escape_html :> Adef.safe_string), false)
-    | _ -> (acc, first)
+    | _ -> (acc, true)
   in
   let acc =
     if authorized_age conf base p && dates <> [ (None, None) ] then
       fst
       @@ List.fold_left
            (fun (acc, first) (date_start, date_end) ->
-             let acc = if not first then acc ^>^ ", " else acc in
+             let acc =
+               if (not first) && name <> Tmain && name <> Tnone then
+                 acc ^>^ ", "
+               else acc
+             in
              let acc =
                match date_start with
                | Some d -> acc ^^^ DateDisplay.string_of_date conf d
                | None -> acc
              in
-             let acc =
-               match date_end with
-               | Some (Dgreg (d, _)) ->
-                   if d.month <> 0 then acc ^>^ " - " else acc ^>^ "-"
-               | Some (Dtext _) -> acc ^>^ " - "
-               | _ -> acc
-             in
+             let acc = match date_end with Some _ -> acc ^>^ "–" | _ -> acc in
              let acc =
                match date_end with
                | Some d -> acc ^^^ DateDisplay.string_of_date conf d
@@ -2606,9 +2604,9 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
         List.map
           (fun (d1, d2) ->
             match (date_opt_to_string d1, date_opt_to_string d2) with
-            | Some s1, Some s2 -> Format.sprintf "%s - %s" s1 s2
-            | Some s1, None -> Format.sprintf "%s -" s1
-            | None, Some s2 -> Format.sprintf "- %s" s2
+            | Some s1, Some s2 -> Format.sprintf "%s–%s" s1 s2
+            | Some s1, None -> Format.sprintf "%s" s1
+            | None, Some s2 -> Format.sprintf "–%s" s2
             | None, None -> "")
           dates
       in
