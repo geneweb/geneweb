@@ -18,7 +18,6 @@ let conn_timeout = ref 120
 let daemon = ref false
 let default_lang = ref "fr"
 let friend_passwd = ref ""
-let green_color = "#2f6400"
 let images_dir = ref ""
 let images_url = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
@@ -221,32 +220,6 @@ let register_plugin dir =
    with Dynlink.Error e ->
      raise (Register_plugin_failure (plugin, `dynlink_error e)));
   Gwd_lib.GwdPlugin.assets := ""
-
-let alias_lang lang =
-  if String.length lang < 2 then lang
-  else
-    let fname =
-      Geneweb.Util.search_in_assets (Filename.concat "lang" "alias_lg.txt")
-    in
-    try
-      let ic = Secure.open_in fname in
-      let lang =
-        let rec loop () =
-          match input_line ic with
-          | line -> (
-              match String.index_opt line '=' with
-              | Some i ->
-                  if lang = String.sub line 0 i then
-                    String.sub line (i + 1) (String.length line - i - 1)
-                  else loop ()
-              | None -> loop ())
-          | exception End_of_file -> lang
-        in
-        loop ()
-      in
-      close_in ic;
-      lang
-    with Sys_error _ -> lang
 
 let log_redirect from request req =
   Lock.control
@@ -1149,7 +1122,6 @@ let make_conf from_addr request script_name env =
     if lang = "" && !choose_browser_lang then http_preferred_language request
     else lang
   in
-  let lang = alias_lang lang in
   let from, env =
     let x, env = extract_assoc "opt" env in
     match x with
@@ -1226,9 +1198,6 @@ let make_conf from_addr request script_name env =
       auth_scheme = ar.ar_scheme;
       command = ar.ar_command;
       indep_command = (if !Wserver.cgi then ar.ar_command else "geneweb") ^ "?";
-      highlight =
-        (try List.assoc "highlight_color" base_env
-         with Not_found -> green_color);
       lang = (if lang = "" then default_lang else lang);
       default_lang;
       default_sosa_ref;

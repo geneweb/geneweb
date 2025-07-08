@@ -894,10 +894,6 @@ let create_env s =
   in
   List.map (separate 0) (get_assoc 0 0)
 
-let std_color conf (s : Adef.safe_string) =
-  let open Def in
-  "<span style=\"color:" ^<^ conf.Config.highlight ^<^ "\">" ^<^ s ^>^ "</span>"
-
 let index_of_sex = function Def.Male -> 0 | Def.Female -> 1 | Def.Neuter -> 2
 
 let string_of_pevent_name_without_base conf = function

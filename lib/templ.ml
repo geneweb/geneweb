@@ -219,7 +219,6 @@ and eval_simple_variable conf = function
       in
       string_of_dates_format conf.dates_format
   | "doctype" -> (Util.doctype :> string)
-  | "highlight" -> conf.highlight
   | "image_prefix" ->
       (let s =
          if conf.cgi then
@@ -740,19 +739,6 @@ let print_wid_hei conf fname =
   | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
   | Error () -> ()
 
-(** Evaluates and prints content of {i cpr} template.
-    If template wasn't found prints basic copyrigth HTML structure. *)
-let print_copyright conf =
-  Util.include_template conf [] "copyr" (fun () ->
-      Output.print_sstring conf "<hr style=\"margin:0\">\n";
-      Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
-      Output.print_sstring conf "<em>";
-      Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
-      Output.print_sstring conf Version.txt;
-      Output.print_sstring conf "</em>";
-      Output.print_sstring conf "</div>\n";
-      Output.print_sstring conf "<br>\n")
-
 let include_hed_trl conf name =
   Util.include_template conf [] name (fun () -> ())
 
@@ -999,9 +985,7 @@ and print_var print_ast_list conf ifun env ep loc sl =
 
 and print_simple_variable conf = function
   | "base_header" -> include_hed_trl conf "hed"
-  | "base_trailer" -> include_hed_trl conf "trl"
   | "body_prop" -> print_body_prop conf
-  | "copyright" -> print_copyright conf
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found

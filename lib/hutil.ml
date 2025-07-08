@@ -95,11 +95,6 @@ let rheader conf title =
 
 let trailer conf =
   let conf = { conf with Config.is_printed_by_template = false } in
-  (match Util.open_etc_file "trl" with
-  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
-  | None -> ());
-  Templ.print_copyright conf;
-  Util.include_template conf [] "js" (fun () -> ());
   Output.print_sstring conf "</body>\n</html>\n"
 
 let () =
