@@ -5,6 +5,7 @@
    unix
    re
    fmt
+   geneweb.logs
    geneweb.def
    geneweb.ancient
    geneweb.util))
