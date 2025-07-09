@@ -1389,12 +1389,12 @@ let print_alphabetically_indexed_list (type entry) conf index_key print_elem
           let compare entry entry' =
             Int.compare (Hashtbl.hash entry) (Hashtbl.hash entry')
         end) in
+        let entry_ranks =
+          list
+          |> List.mapi (fun rank entry -> (entry, rank))
+          |> List.to_seq |> Entry_map.of_seq
+        in
         fun entry entry' ->
-          let entry_ranks =
-            list
-            |> List.mapi (fun rank entry -> (entry, rank))
-            |> List.to_seq |> Entry_map.of_seq
-          in
           Option.compare Int.compare
             (Entry_map.find_opt entry entry_ranks)
             (Entry_map.find_opt entry' entry_ranks)
