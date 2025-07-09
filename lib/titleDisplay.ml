@@ -38,16 +38,17 @@ let give_access_someone conf base (x, t) list =
     | Some _d, _ | _, Some _d -> true
     | _ -> false
   in
-  if has_dates then Output.print_sstring conf "<em>";
-  (match t_date_start with
-  | None -> ()
-  | Some d -> Output.print_sstring conf (string_of_int d.year));
+  (if has_dates then
+     match t_date_start with
+     | None -> ()
+     | Some d -> Output.print_sstring conf (string_of_int d.year));
   (match t_date_end with
   | None -> ()
   | Some d ->
-      Output.print_sstring conf "-";
+      Output.print_sstring conf "–";
       Output.print_sstring conf (string_of_int d.year));
-  if has_dates then Output.print_sstring conf "</em>: ";
+  if has_dates then Output.print_sstring conf (transl conf ":");
+  Output.print_sstring conf " ";
   if List.mem x list then Output.print_sstring conf "<em>"
   else
     Output.print_string conf
