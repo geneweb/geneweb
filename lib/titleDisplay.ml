@@ -231,9 +231,10 @@ let print_places_list conf base t t_equiv list =
   let list = sort_by_key String.compare order list in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
+    let add_absolute = absolute && p = "" in
     give_access_title_aux conf
       ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p
-      ^>^ if absolute then "&a=A" else "")
+      ^>^ if add_absolute then "&a=A" else "")
       (if p = "" then Adef.safe "..."
        else
          ((escape_html @@ surname_without_particle base p)
