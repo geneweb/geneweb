@@ -139,48 +139,38 @@ let select_title_place conf base ~absolute title place =
          && String.equal tl1 (Name.lower tl2)
          && String.equal pl1 (Name.lower pl2)
   in
-  let clean_place, l =
-    Collection.fold
-      (fun acc i ->
-        let x = pget conf base i in
-        let titles = nobtit conf base x in
-        List.fold_left
-          (fun (c, acc) t ->
-            if select t then (
-              T.replace names t.t_ident ();
-              (Some t.t_place, (x, t) :: acc))
-            else (c, acc))
-          acc titles)
-      (None, [])
-      (Geneweb_db.Driver.ipers base)
-  in
-  let names = to_string_list base names in
-  let clean_place =
-    match clean_place with Some i -> Driver.sou base i | None -> place
-  in
-  let clean_title = match names with [] -> title | t :: _ -> t in
-  (l, clean_title, clean_place, names)
-
-let select_all_with_place conf base place =
-  let select =
-    let p = Name.lower place in
-    fun t -> String.equal (Name.lower (Driver.sou base t.t_place)) p
-  in
   let l =
     Collection.fold
       (fun acc i ->
         let x = pget conf base i in
         let titles = nobtit conf base x in
         List.fold_left
-          (fun acc t -> if select t then (x, t) :: acc else acc)
+          (fun acc t ->
+            if select t then (
+              T.replace names t.t_ident ();
+              (x, t) :: acc)
+            else acc)
           acc titles)
       []
       (Geneweb_db.Driver.ipers base)
   in
-  let clean_place =
-    match l with [] -> place | (_, t) :: _ -> Driver.sou base t.t_place
+  let names = to_string_list base names in
+  (l, names)
+
+let select_all_with_place conf base place =
+  let select =
+    let p = Name.lower place in
+    fun t -> String.equal (Name.lower (Driver.sou base t.t_place)) p
   in
-  (l, clean_place)
+  Collection.fold
+    (fun acc i ->
+      let x = pget conf base i in
+      let titles = nobtit conf base x in
+      List.fold_left
+        (fun acc t -> if select t then (x, t) :: acc else acc)
+        acc titles)
+    []
+    (Geneweb_db.Driver.ipers base)
 
 let select_title conf base ~absolute title =
   let places : unit T.t = T.create 17 in
@@ -204,8 +194,7 @@ let select_title conf base ~absolute title =
     (Geneweb_db.Driver.ipers base);
   let places = to_string_list base places in
   let names = to_string_list base names in
-  let clean_name = match names with [] -> title | t :: _ -> t in
-  (places, clean_name, names)
+  (places, names)
 
 let select_place conf base place =
   let names : unit T.t = T.create 17 in
@@ -221,9 +210,7 @@ let select_place conf base place =
       let titles = nobtit conf base x in
       List.iter (fun t -> if select t then T.replace names t.t_ident ()) titles)
     (Geneweb_db.Driver.ipers base);
-  let names = to_string_list base names in
-  let clean_name = match names with [] -> place | t :: _ -> t in
-  (names, clean_name)
+  to_string_list base names
 
 let select_all proj conf base =
   let ht : unit T.t = T.create 17 in
