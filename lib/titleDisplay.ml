@@ -190,7 +190,7 @@ let print_all_with_place_list conf base p list =
       give_access_someone conf base x [];
       Output.print_sstring conf ", ";
       Output.print_string conf (Driver.sou base t.t_ident |> escape_html);
-      Output.printf conf "<li>")
+      Output.printf conf "</li>")
     list;
   Output.print_sstring conf "</ul>\n";
   propose_tree_for_list list conf;
