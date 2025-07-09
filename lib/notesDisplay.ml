@@ -72,11 +72,6 @@ let is_ancestor conf base anc =
           || restrict_for_spouses
              &&
              let families = Driver.get_family (Driver.poi base user_ip) in
-             (* FIXME
-                 use of
-                 !GWPARAM_ITL.get_families conf base (Driver.poi base user_ip)
-                 fails (returns list of length 0)
-             *)
              Array.exists
                (fun fam ->
                  let fam = Driver.foi base fam in

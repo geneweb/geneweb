@@ -57,10 +57,6 @@
   %xx.title;%xx.dates;
 %end;
 
-%define;p_link(aa, xx)
-  %if;(evar.cgl = "on")xx%else;<a href="%prefix;aa">xx</a>%end;
-%end;
-
 %define;somebody_long_info(xx)
   %if;xx.has_nobility_titles;
     <em>%nn;

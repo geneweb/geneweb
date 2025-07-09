@@ -110,8 +110,6 @@ let max_ancestor_level conf base ip max_lvl =
   let mark =
     Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
   in
-  (* Loading ITL cache, up to 10 generations. *)
-  let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
   let rec loop level ip =
     (* Ne traite pas l'index s'il a déjà été traité. *)
     (* Pose surement probleme pour des implexes. *)
@@ -125,11 +123,7 @@ let max_ancestor_level conf base ip max_lvl =
             let cpl = Driver.foi base ifam in
             loop (succ level) (Driver.get_father cpl);
             loop (succ level) (Driver.get_mother cpl)
-        | _ ->
-            x :=
-              max !x
-                (!GWPARAM_ITL.max_ancestor_level
-                   conf base ip conf.bname max_lvl level))
+        | _ -> x := max !x level)
   in
   loop 0 ip;
   !x
