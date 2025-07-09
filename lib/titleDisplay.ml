@@ -205,8 +205,8 @@ let select_title conf base title =
 
 let print_title_place conf base t p =
   let l, t, p, t_equiv = select_title_place conf base t p in
-  let list = List.sort (Title.compare_title_order conf base) l in
-  print_title_place_list conf base t p t_equiv list
+  let l = List.sort (Title.compare_title_order conf base) l in
+  print_title_place_list conf base t p t_equiv l
 
 let print_all_with_place conf base p =
   let l, p = Title.select_all_with_place conf base p in

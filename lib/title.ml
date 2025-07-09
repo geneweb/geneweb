@@ -134,10 +134,10 @@ let select_title_place conf base ~absolute title place =
     fun t ->
       let tl2 = Driver.sou base t.t_ident in
       let pl2 = Driver.sou base t.t_place in
-      (absolute && String.equal tl1 tl2 && String.equal pl1 pl2)
+      (absolute && String.equal title tl2 && String.equal place pl2)
       || (not absolute)
-         && String.equal (Name.lower tl2) tl1
-         && String.equal (Name.lower pl1) pl2
+         && String.equal tl1 (Name.lower tl2)
+         && String.equal pl1 (Name.lower pl2)
   in
   let clean_place, l =
     Collection.fold
