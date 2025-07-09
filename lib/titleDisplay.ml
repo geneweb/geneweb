@@ -204,14 +204,14 @@ let select_title conf base title =
   Title.select_title conf base title ~absolute:(p_getenv conf.env "a" = Some "A")
 
 let print_title_place conf base t p =
-  let l, t, p, t_equiv = select_title_place conf base t p in
+  let l, t_equiv = select_title_place conf base t p in
   let l = List.sort (Title.compare_title_order conf base) l in
   print_title_place_list conf base t p t_equiv l
 
 let print_all_with_place conf base p =
-  let l, p = Title.select_all_with_place conf base p in
-  let list = List.sort (Title.compare_title_dates conf base) l in
-  print_all_with_place_list conf base p list
+  let l = Title.select_all_with_place conf base p in
+  let l = List.sort (Title.compare_title_dates conf base) l in
+  print_all_with_place_list conf base p l
 
 let print_places_list conf base t t_equiv list =
   let title h =
@@ -244,15 +244,14 @@ let print_places_list conf base t t_equiv list =
   Hutil.trailer conf
 
 let print_places conf base t =
-  let l, t, t_equiv = select_title conf base t in
-  let list = sort_uniq_by_key String.compare Name.lower l in
-  match list with
+  let l, t_equiv = select_title conf base t in
+  match sort_uniq_by_key String.compare Name.lower l with
   | [ p ] -> print_title_place conf base t p
-  | _ -> print_places_list conf base t t_equiv list
+  | _ -> print_places_list conf base t t_equiv l
 
 let print_titles conf base p =
-  let l, p = Title.select_place conf base p in
-  let list = sort_uniq_by_key String.compare Name.lower l in
+  let l = Title.select_place conf base p in
+  let l = sort_uniq_by_key String.compare Name.lower l in
   let title _ =
     Output.print_sstring conf "... ";
     Output.print_string conf (escape_html p)
@@ -264,9 +263,9 @@ let print_titles conf base p =
       Output.print_sstring conf "<li>";
       give_access_title conf t p;
       Output.print_sstring conf "</li>\n")
-    list;
+    l;
   Output.print_sstring conf "</ul>\n";
-  if List.length list > 1 then (
+  if List.compare_length_with l 1 > 0 then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=TT&sm=A&p=";
