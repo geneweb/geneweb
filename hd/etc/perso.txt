@@ -27,15 +27,11 @@
 %include;perso_utils
 %include;menubar
 <div id="content" tabindex="-1">
-%define;init_cache(nb_asc, from_gen_desc, nb_desc)
-  %init_cache.nb_asc.from_gen_desc.nb_desc;
-%end;
 
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
 %if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or
     (bvar.p_mod="" and evar.p_mod=""))
   %(Statique%)
-  %apply;init_cache(3, 2, 2)
  <div class="row">
     %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> in individu.txt %)
       %let;op_m;3%in;%include;modules/individu
@@ -52,7 +48,6 @@
   </div>
 %else;
   %(Dynamic %)
-  %apply;init_cache(3, 2, 2)
   <div class="mt-2">
     %for;i;0;p_mod_nbr;
       %let;mmi;%apply;mm(i)%in;

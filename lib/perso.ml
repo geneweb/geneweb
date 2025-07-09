@@ -602,7 +602,7 @@ let tree_generation_list conf base gv p =
       (fun po l ->
         match po with
         | Empty -> Empty :: l
-        | Cell (p, _, _, _, _, base_prefix) -> (
+        | Cell (p, _, _, _, _, _base_prefix) -> (
             match Driver.get_parents p with
             | Some ifam -> (
                 let cpl = Driver.foi base ifam in
@@ -629,25 +629,7 @@ let tree_generation_list conf base gv p =
                 | Some f, None -> Cell (f, fo, Alone, true, 1, base_prefix) :: l
                 | None, Some m -> Cell (m, fo, Alone, true, 1, base_prefix) :: l
                 | None, None -> Empty :: l)
-            | None -> (
-                match
-                  !GWPARAM_ITL.tree_generation_list conf base base_prefix p
-                with
-                | Some (fath, if1, base_prefix1), Some (moth, if2, base_prefix2)
-                  ->
-                    if mf then
-                      Cell (moth, Some if2, Left, true, 1, base_prefix1)
-                      :: Cell (fath, Some if1, Right, true, 1, base_prefix2)
-                      :: l
-                    else
-                      Cell (fath, Some if1, Left, true, 1, base_prefix1)
-                      :: Cell (moth, Some if2, Right, true, 1, base_prefix2)
-                      :: l
-                | Some (fath, ifam, base_prefix), None ->
-                    Cell (fath, Some ifam, Alone, true, 1, base_prefix) :: l
-                | None, Some (moth, ifam, base_prefix) ->
-                    Cell (moth, Some ifam, Alone, true, 1, base_prefix) :: l
-                | None, None -> Empty :: l)))
+            | None -> Empty :: l))
       pol []
   in
   let gen =
@@ -2128,18 +2110,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let auth = authorized_age conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
-      | _ -> (
-          match get_env "child_link" env with
-          | Vind p ->
-              let ep = (p, true) in
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring b -> b
-                | _ -> conf.command
-              in
-              let conf = { conf with command = baseprefix } in
-              eval_person_field_var conf base env ep loc sl
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "cousin" :: sl -> (
       match get_env "cousin" env with
       | Vind p when mode_local env ->
@@ -2185,16 +2156,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let cpl = Driver.foi base ifam in
           let ep = make_ep conf base (Driver.get_father cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_father conf base conf.command (Driver.get_iper a)
-          with
-          | Some (ep, base_prefix) ->
-              let conf = { conf with command = base_prefix } in
-              let env = Templ.Env.add "p_link" (Vbool true) env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "father" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "father" null_val)
   | "item" :: sl -> (
       match get_env "item" env with
       | Vslistlm ell -> eval_item_field_var ell sl
@@ -2205,16 +2167,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let cpl = Driver.foi base ifam in
           let ep = make_ep conf base (Driver.get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_mother conf base conf.command (Driver.get_iper a)
-          with
-          | Some (ep, base_prefix) ->
-              let conf = { conf with command = base_prefix } in
-              let env = Templ.Env.add "p_link" (Vbool true) env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "mother" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "mother" null_val)
   | "next_item" :: sl -> (
       match get_env "item" env with
       | Vslistlm (_ :: ell) -> eval_item_field_var ell sl
@@ -2445,21 +2398,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vfam (_, _, (_, _, ip), _) when mode_local env ->
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, _, (_, _, ip), _) -> (
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> baseprefix
-                | _ -> conf.command
-              in
-              match !GWPARAM_ITL.get_person conf base baseprefix ip with
-              | Some (ep, baseprefix) ->
-                  let conf = { conf with command = baseprefix } in
-                  let env = Templ.Env.add "p_link" (Vbool true) env in
-                  eval_person_field_var conf base env ep loc sl
-              | None -> raise Not_found)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "witness" :: sl -> (
       match get_env "witness" env with
       | Vind p ->
@@ -2649,16 +2588,10 @@ and eval_cell_field_var conf base env cell loc = function
       | Cell (_, _, _, _, s, _) -> VVstring (string_of_int s))
   | "family" :: sl -> (
       match cell with
-      | Cell (p, Some ifam, _, _, _, base_prefix) -> (
-          if conf.bname = base_prefix then
-            let f, c, a = make_efam conf base (Driver.get_iper p) ifam in
-            eval_family_field_var conf base env (ifam, f, c, a) loc sl
-          else
-            let conf = { conf with command = base_prefix } in
-            match !GWPARAM_ITL.get_family conf base base_prefix p ifam with
-            | Some (f, c, a) ->
-                eval_family_field_var conf base env (ifam, f, c, a) loc sl
-            | None -> assert false)
+      | Cell (p, Some ifam, _, _, _, base_prefix) ->
+          assert (conf.bname = base_prefix);
+          let f, c, a = make_efam conf base (Driver.get_iper p) ifam in
+          eval_family_field_var conf base env (ifam, f, c, a) loc sl
       | _ -> VVstring "")
   | [ "is_center" ] -> (
       match cell with
@@ -2962,16 +2895,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           let cpl = Driver.foi base ifam in
           let ep = make_ep conf base (Driver.get_father cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_father conf base conf.command (Driver.get_iper p)
-          with
-          | Some (ep, baseprefix) ->
-              let conf = { conf with command = baseprefix } in
-              let env = Templ.Env.add "p_link" (Vbool true) env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "father" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "father" null_val)
   | [ "has_linked_page"; s ] ->
       if p_auth then
         match get_env "nldb" env with
@@ -3051,23 +2975,9 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           VVstring (string_of_int n)
       | _ -> raise Not_found)
   | [ "has_sosa" ] -> (
-      match get_env "p_link" env with
-      | Vbool _ -> VVbool false
-      | _ -> (
-          match get_env "sosa" env with
-          | Vsosa r -> VVbool (get_sosa conf base env r p <> None)
-          | _ -> VVbool false))
-  | [ "init_cache"; nb_asc; from_gen_desc; nb_desc ] -> (
-      try
-        let nb_asc = int_of_string nb_asc in
-        let from_gen_desc = int_of_string from_gen_desc in
-        let nb_desc = int_of_string nb_desc in
-        let () =
-          !GWPARAM_ITL.init_cache conf base (Driver.get_iper p) nb_asc
-            from_gen_desc nb_desc
-        in
-        null_val
-      with _ -> raise Not_found)
+      match get_env "sosa" env with
+      | Vsosa r -> VVbool (get_sosa conf base env r p <> None)
+      | _ -> VVbool false)
   | [ "is_visible" ] -> VVbool p_auth
   | [ "is_public" ] -> VVbool (Driver.get_access p = Public)
   | [ "is_semi_public" ] -> VVbool (Driver.get_access p = SemiPublic)
@@ -3099,16 +3009,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
           let cpl = Driver.foi base ifam in
           let ep = make_ep conf base (Driver.get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match
-            !GWPARAM_ITL.get_mother conf base conf.command (Driver.get_iper p)
-          with
-          | Some (ep, baseprefix) ->
-              let conf = { conf with command = baseprefix } in
-              let env = Templ.Env.add "p_link" (Vbool true) env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "mother" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "mother" null_val)
   | [ "nbr" ] -> (
       match get_env "nbr" env with
       | Vint nbr -> VVstring (string_of_int nbr)
@@ -3503,25 +3404,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Burial)
   | "has_children" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) ->
-          if Array.length (Driver.get_children fam) > 0 then true
-          else !GWPARAM_ITL.has_children conf base p fam
-      | _ -> (
+      | Vfam (_, fam, _, _) -> Array.length (Driver.get_children fam) > 0
+      | _ ->
           Array.exists
             (fun ifam -> [||] <> Driver.get_children (Driver.foi base ifam))
-            (Driver.get_family p)
-          ||
-          match get_env "fam_link" env with
-          | Vfam (ifam, _, (ifath, imoth, _), _) ->
-              let conf =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> { conf with command = baseprefix }
-                | _ -> conf
-              in
-              []
-              <> !GWPARAM_ITL.get_children_of_parents
-                   base conf.command ifam ifath imoth
-          | _ -> false))
+            (Driver.get_family p))
   | "has_consanguinity" ->
       p_auth
       && Driver.get_consang p != Adef.fix (-1)
@@ -3616,9 +3503,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             in
             loop events 0 0 0 0 0
       else false
-  | "has_families" ->
-      Array.length (Driver.get_family p) > 0
-      || !GWPARAM_ITL.has_family_correspondance conf.command (Driver.get_iper p)
+  | "has_families" -> Array.length (Driver.get_family p) > 0
   | "has_first_names_aliases" ->
       if hide_person conf base p then false
       else Driver.get_first_names_aliases p <> []
@@ -3652,15 +3537,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth && (not conf.no_note) && Driver.sou base (Driver.get_notes p) <> ""
   | "has_occupation" ->
       p_auth && Driver.sou base (Driver.get_occupation p) <> ""
-  | "has_parents" ->
-      Driver.get_parents p <> None
-      ||
-      let conf =
-        match get_env "baseprefix" env with
-        | Vstring baseprefix -> { conf with command = baseprefix }
-        | _ -> conf
-      in
-      !GWPARAM_ITL.has_parents_link conf.command (Driver.get_iper p)
+  | "has_parents" -> Driver.get_parents p <> None
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
       if hide_person conf base p then false
@@ -3685,13 +3562,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       match Driver.get_parents p with
       | Some ifam ->
           Array.length (Driver.get_children (Driver.foi base ifam)) > 1
-      | None ->
-          let conf =
-            match get_env "baseprefix" env with
-            | Vstring baseprefix -> { conf with command = baseprefix }
-            | _ -> conf
-          in
-          !GWPARAM_ITL.has_siblings conf.command (Driver.get_iper p))
+      | None -> false)
   | "has_sources" ->
       p_auth
       && (Driver.sou base (Driver.get_psources p) <> ""
@@ -3931,12 +3802,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       string_of_image_url conf base ep false true |> safe_val
   | "blason_url" -> string_of_blason_url conf base ep false false |> safe_val
   | "old_blason_url" -> string_of_blason_url conf base ep false true |> safe_val
-  | "index" -> (
-      match get_env "p_link" env with
-      | Vbool _ -> null_val
-      | _ ->
-          Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode |> safe_val
-      )
+  | "index" ->
+      Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode |> safe_val
   | "carrousel" -> Image.default_image_filename "portraits" base p |> str_val
   | "blason_carrousel" ->
       Image.default_image_filename "blasons" base p |> str_val
@@ -4082,29 +3949,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "fam" env with
       | Vfam (_, fam, _, _) ->
           Driver.get_children fam |> Array.length |> string_of_int |> str_val
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (ifam, _, _, _) ->
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> baseprefix
-                | _ -> conf.command
-              in
-              string_of_int (!GWPARAM_ITL.nb_children baseprefix ifam)
-              |> str_val
-          | _ ->
-              Array.fold_left
-                (fun n ifam ->
-                  n + Array.length (Driver.get_children (Driver.foi base ifam)))
-                0 (Driver.get_family p)
-              |> string_of_int |> str_val))
-  | "nb_families" -> (
-      match get_env "p_link" env with
-      | Vbool _ ->
-          Driver.get_iper p
-          |> !GWPARAM_ITL.nb_families conf.command
-          |> string_of_int |> str_val
-      | _ -> Driver.get_family p |> Array.length |> string_of_int |> str_val)
+      | _ ->
+          Array.fold_left
+            (fun n ifam ->
+              n + Array.length (Driver.get_children (Driver.foi base ifam)))
+            0 (Driver.get_family p)
+          |> string_of_int |> str_val)
+  | "nb_families" ->
+      Driver.get_family p |> Array.length |> string_of_int |> str_val
   | "notes" | "pnotes" ->
       Driver.get_notes p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "occ" ->
@@ -4299,22 +4151,16 @@ and eval_family_field_var conf base env
   | [ "date_s" ] | [ "dates" ] ->
       VVstring
         (DateDisplay.short_family_dates_text conf base true fam :> string)
-  | "father" :: sl -> (
-      match get_env "f_link" env with
-      | Vbool _ -> raise Not_found
-      | _ ->
-          let ep = make_ep conf base ifath in
-          eval_person_field_var conf base env ep loc sl)
+  | "father" :: sl ->
+      let ep = make_ep conf base ifath in
+      eval_person_field_var conf base env ep loc sl
   | "marriage_date" :: sl -> (
       match Date.od_of_cdate (Driver.get_marriage fam) with
       | Some d when m_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
-  | "mother" :: sl -> (
-      match get_env "f_link" env with
-      | Vbool _ -> raise Not_found
-      | _ ->
-          let ep = make_ep conf base imoth in
-          eval_person_field_var conf base env ep loc sl)
+  | "mother" :: sl ->
+      let ep = make_ep conf base imoth in
+      eval_person_field_var conf base env ep loc sl
   | "marriage" :: sl -> eval_family_marriage_field_var fam sl
   | [ "sep_date_s" ] | [ "sep_dates" ] ->
       VVstring
@@ -4790,85 +4636,43 @@ let print_foreach conf base print_ast eval_expr =
         List.iter (print_ast env ep) al)
       celll
   in
-  let print_foreach_child env al ep = function
-    | Vfam (ifam, fam, (ifath, imoth, isp), _) -> (
-        match get_env "f_link" env with
-        | Vbool _ ->
-            let baseprefix =
-              match get_env "baseprefix" env with
-              | Vstring baseprefix -> baseprefix
-              | _ -> conf.command
+  let print_foreach_child env al = function
+    | Vfam (_, fam, _, _) ->
+        let auth =
+          Array.for_all
+            (fun ip -> authorized_age conf base (pget conf base ip))
+            (Driver.get_children fam)
+        in
+        let env = Templ.Env.add "auth" (Vbool auth) env in
+        let n =
+          let p =
+            match get_env "p" env with Vind p -> p | _ -> assert false
+          in
+          let rec loop i =
+            if i = Array.length (Driver.get_children fam) then -2
+            else if (Driver.get_children fam).(i) = Driver.get_iper p then i
+            else loop (i + 1)
+          in
+          loop 0
+        in
+        Array.iteri
+          (fun i ip ->
+            let p = pget conf base ip in
+            let env =
+              Templ.Env.(
+                env |> add "child" (Vind p) |> add "child_cnt" (Vint (i + 1)))
             in
-            let children =
-              !GWPARAM_ITL.get_children base baseprefix ifam ifath imoth
+            let env =
+              if i = n - 1 && not (is_hidden p) then
+                Templ.Env.add "pos" (Vstring "prev") env
+              else if i = n then Templ.Env.add "pos" (Vstring "self") env
+              else if i = n + 1 && not (is_hidden p) then
+                Templ.Env.add "pos" (Vstring "next") env
+              else env
             in
-            let len = List.length children in
-            List.iteri
-              (fun i (((p, _) as ep), baseprefix) ->
-                let env =
-                  Templ.Env.(
-                    env |> add "child_link" (Vind p)
-                    |> add "baseprefix" (Vstring baseprefix)
-                    |> add "p_link" (Vbool true)
-                    |> add "last" (Vbool (i = len - 1)))
-                in
-                List.iter (print_ast env ep) al)
-              children
-        | _ ->
-            let auth =
-              Array.for_all
-                (fun ip -> authorized_age conf base (pget conf base ip))
-                (Driver.get_children fam)
-            in
-            let env = Templ.Env.add "auth" (Vbool auth) env in
-            let n =
-              let p =
-                match get_env "p" env with Vind p -> p | _ -> assert false
-              in
-              let rec loop i =
-                if i = Array.length (Driver.get_children fam) then -2
-                else if (Driver.get_children fam).(i) = Driver.get_iper p then i
-                else loop (i + 1)
-              in
-              loop 0
-            in
-            Array.iteri
-              (fun i ip ->
-                let p = pget conf base ip in
-                let env =
-                  Templ.Env.(
-                    env |> add "child" (Vind p)
-                    |> add "child_cnt" (Vint (i + 1)))
-                in
-                let env =
-                  if i = n - 1 && not (is_hidden p) then
-                    Templ.Env.add "pos" (Vstring "prev") env
-                  else if i = n then Templ.Env.add "pos" (Vstring "self") env
-                  else if i = n + 1 && not (is_hidden p) then
-                    Templ.Env.add "pos" (Vstring "next") env
-                  else env
-                in
-                let ep = (p, authorized_age conf base p) in
-                List.iter (print_ast env ep) al)
-              (Driver.get_children fam);
-
-            List.iter
-              (fun (_, _, children) ->
-                List.iter
-                  (fun ((p, _), baseprefix, can_merge) ->
-                    if not can_merge then
-                      let env =
-                        Templ.Env.(
-                          env |> add "child_link" (Vind p)
-                          |> add "baseprefix" (Vstring baseprefix)
-                          |> add "p_link" (Vbool true))
-                      in
-                      let ep = (p, true) in
-                      List.iter (print_ast env ep) al)
-                  children)
-              (!GWPARAM_ITL.get_children' conf base
-                 (Driver.get_iper (fst ep))
-                 fam isp))
+            let ep = (p, authorized_age conf base p) in
+            List.iter (print_ast env ep) al)
+          (Driver.get_children fam)
     | _ -> ()
   in
   let print_foreach_descendant env al (p, _) count_paths =
@@ -5099,88 +4903,34 @@ let print_foreach conf base print_ast eval_expr =
   in
 
   let print_foreach_family env al ini_ep (p, _) =
-    match get_env "p_link" env with
-    | Vbool _ ->
-        let conf =
-          match get_env "baseprefix" env with
-          | Vstring baseprefix -> { conf with command = baseprefix }
-          | _ -> conf
-        in
-        List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, spouse), baseprefix, _) ->
-            let cpl = (ifath, imoth, Driver.get_iper spouse) in
-            let vfam = Vfam (ifam, fam, cpl, true) in
-            let env =
-              Templ.Env.(
-                env |> add "fam_link" vfam |> add "f_link" (Vbool true)
-                |> add "is_link" (Vbool true)
-                |> add "baseprefix" (Vstring baseprefix)
-                |> add "family_cnt" (Vint (i + 1)))
-            in
-            let env =
-              match prev with
-              | Some vfam -> Templ.Env.add "prev_fam" vfam env
-              | None -> env
-            in
-            List.iter (print_ast env ini_ep) al;
-            (Some vfam, i + 1))
-          (None, 0)
-          (!GWPARAM_ITL.get_families conf base p)
-        |> ignore
-    | _ ->
-        (if Array.length (Driver.get_family p) > 0 then
-           let rec loop prev i =
-             if i = Array.length (Driver.get_family p) then ()
-             else
-               let ifam = (Driver.get_family p).(i) in
-               let fam = Driver.foi base ifam in
-               let ifath = Driver.get_father fam in
-               let imoth = Driver.get_mother fam in
-               let ispouse = Gutil.spouse (Driver.get_iper p) fam in
-               let cpl = (ifath, imoth, ispouse) in
-               let m_auth =
-                 authorized_age conf base (pget conf base ifath)
-                 && authorized_age conf base (pget conf base imoth)
-               in
+    if Array.length (Driver.get_family p) > 0 then
+      let rec loop prev i =
+        if i = Array.length (Driver.get_family p) then ()
+        else
+          let ifam = (Driver.get_family p).(i) in
+          let fam = Driver.foi base ifam in
+          let ifath = Driver.get_father fam in
+          let imoth = Driver.get_mother fam in
+          let ispouse = Gutil.spouse (Driver.get_iper p) fam in
+          let cpl = (ifath, imoth, ispouse) in
+          let m_auth =
+            authorized_age conf base (pget conf base ifath)
+            && authorized_age conf base (pget conf base imoth)
+          in
 
-               let vfam = Vfam (ifam, fam, cpl, m_auth) in
-               let env =
-                 Templ.Env.(
-                   env |> add "fam" vfam |> add "family_cnt" (Vint (i + 1)))
-               in
-               let env =
-                 match prev with
-                 | Some vfam -> Templ.Env.add "prev_fam" vfam env
-                 | None -> env
-               in
-               List.iter (print_ast env ini_ep) al;
-               loop (Some vfam) (i + 1)
-           in
-           loop None 0);
-        List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge)
-             ->
-            if can_merge then (None, i)
-            else
-              let cpl = (ifath, imoth, Driver.get_iper sp) in
-              let vfam = Vfam (ifam, fam, cpl, true) in
-              let env =
-                Templ.Env.(
-                  env |> add "fam_link" vfam |> add "f_link" (Vbool true)
-                  |> add "is_link" (Vbool true)
-                  |> add "baseprefix" (Vstring baseprefix)
-                  |> add "family_cnt" (Vint (i + 1)))
-              in
-              let env =
-                match prev with
-                | Some vfam -> Templ.Env.add "prev_fam" vfam env
-                | None -> env
-              in
-              List.iter (print_ast env ini_ep) al;
-              (Some vfam, i + 1))
-          (None, 0)
-          (!GWPARAM_ITL.get_families conf base p)
-        |> ignore
+          let vfam = Vfam (ifam, fam, cpl, m_auth) in
+          let env =
+            Templ.Env.(env |> add "fam" vfam |> add "family_cnt" (Vint (i + 1)))
+          in
+          let env =
+            match prev with
+            | Some vfam -> Templ.Env.add "prev_fam" vfam env
+            | None -> env
+          in
+          List.iter (print_ast env ini_ep) al;
+          loop (Some vfam) (i + 1)
+      in
+      loop None 0
   in
 
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
@@ -5544,7 +5294,7 @@ let print_foreach conf base print_ast eval_expr =
     | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
-    | "child" -> print_foreach_child env al ep efam
+    | "child" -> print_foreach_child env al efam
     | "path" | "cous_path" -> print_foreach_cousin_path env el al ep false
     | "path_at_level" | "cous_path_at_level" ->
         print_foreach_cousin_path env el al ep true
@@ -5626,18 +5376,7 @@ let print_foreach conf base print_ast eval_expr =
               let auth = authorized_age conf base p in
               let ep = (p, auth) in
               loop env ep efam sl
-          | _ -> (
-              match get_env "child_link" env with
-              | Vind p ->
-                  let env =
-                    Templ.Env.(
-                      env |> add "p_link" (Vbool true)
-                      |> add "f_link" (Vbool true))
-                  in
-                  let auth = authorized_age conf base p in
-                  let ep = (p, auth) in
-                  loop env ep efam sl
-              | _ -> raise Not_found))
+          | _ -> raise Not_found)
       | "father" :: sl -> (
           match Driver.get_parents a with
           | Some ifam ->
@@ -5652,23 +5391,7 @@ let print_foreach conf base print_ast eval_expr =
               in
               let efam = Vfam (ifam, Driver.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
-          | None -> (
-              let conf =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> { conf with command = baseprefix }
-                | _ -> conf
-              in
-              match !GWPARAM_ITL.get_father' conf base (Driver.get_iper a) with
-              | Some (baseprefix, ep, ifam, fam, cpl) ->
-                  let efam = Vfam (ifam, fam, cpl, true) in
-                  let env =
-                    Templ.Env.(
-                      env |> add "p_link" (Vbool true)
-                      |> add "f_link" (Vbool true)
-                      |> add "baseprefix" (Vstring baseprefix))
-                  in
-                  loop env ep efam sl
-              | None -> warning_use_has_parents_before_parent loc "father" ()))
+          | None -> warning_use_has_parents_before_parent loc "father" ())
       | "mother" :: sl -> (
           match Driver.get_parents a with
           | Some ifam ->
@@ -5683,42 +5406,14 @@ let print_foreach conf base print_ast eval_expr =
               in
               let efam = Vfam (ifam, Driver.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
-          | None -> (
-              match !GWPARAM_ITL.get_mother' conf base (Driver.get_iper a) with
-              | Some (baseprefix, ep, ifam, fam, cpl) ->
-                  let efam = Vfam (ifam, fam, cpl, true) in
-                  let env =
-                    Templ.Env.(
-                      env |> add "p_link" (Vbool true)
-                      |> add "f_link" (Vbool true)
-                      |> add "baseprefix" (Vstring baseprefix))
-                  in
-                  loop env ep efam sl
-              | None -> warning_use_has_parents_before_parent loc "mother" ()))
+          | None -> warning_use_has_parents_before_parent loc "mother" ())
       | "self" :: sl -> loop env ep efam sl
       | "spouse" :: sl -> (
           match efam with
           | Vfam (_, _, (_, _, ip), _) ->
               let ep = make_ep conf base ip in
               loop env ep efam sl
-          | _ -> (
-              match get_env "fam_link" env with
-              | Vfam (_, _, (_, _, ip), _) -> (
-                  let baseprefix =
-                    match get_env "baseprefix" env with
-                    | Vstring baseprefix -> baseprefix
-                    | _ -> conf.command
-                  in
-                  match !GWPARAM_ITL.get_person conf base baseprefix ip with
-                  | Some (ep, baseprefix) ->
-                      let env =
-                        Templ.Env.(
-                          env |> add "p_link" (Vbool true)
-                          |> add "baseprefix" (Vstring baseprefix))
-                      in
-                      loop env ep efam sl
-                  | None -> raise Not_found)
-              | _ -> raise Not_found))
+          | _ -> raise Not_found)
       | _ -> raise Not_found
     in
     let efam =
@@ -5851,12 +5546,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     (* Récupère le nombre maximal de niveaux de descendance en prenant en
        compte les liens inter-arbres (limité à 10 générations car
        problématique en terme de perf). *)
-    let mdl () =
-      Vint
-        (max
-           (max_descendant_level base desc_level_table_l)
-           (!GWPARAM_ITL.max_descendant_level conf base (Driver.get_iper p) 10))
-    in
+    let mdl () = Vint (max_descendant_level base desc_level_table_l) in
     (* Static max descendant level *)
     let smdl () = Vint (max_descendant_level base desc_level_table_m) in
     let nldb () =

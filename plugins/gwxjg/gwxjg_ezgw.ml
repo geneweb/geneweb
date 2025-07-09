@@ -17,10 +17,8 @@ type env = {
   baseprefix : string option;
   desc_level_table : (int array * int array) Lazy.t option;
   desc_mark : bool array ref option;
-  f_link : bool option;
   fam : fam option;
   fam_link : fam option;
-  p_link : bool option;
   prev_fam : fam option;
   sosa : (Driver.iper * (Sosa.t * Driver.person) option) list ref option;
   sosa_ref : Driver.person option Lazy.t option;
@@ -39,9 +37,7 @@ let empty =
     desc_level_table = None;
     desc_mark = None;
     fam = None;
-    f_link = None;
     fam_link = None;
-    p_link = None;
     prev_fam = None;
     sosa = None;
     sosa_ref = None;
