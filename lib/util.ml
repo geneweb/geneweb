@@ -1039,6 +1039,29 @@ let open_etc_file fname =
   let fname = etc_file_name fname in
   try Some (Secure.open_in fname, fname) with Sys_error _ -> None
 
+let read_assets_version =
+  let version_number : int option option ref = ref None in
+  fun () ->
+    match !version_number with
+    | Some num_opt -> num_opt
+    | None ->
+        let etc = open_etc_file "assets_version" in
+        let num_opt =
+          Option.bind etc (fun (ic, _fname) ->
+              let read_number =
+                try
+                  let line = input_line ic in
+                  Some (Scanf.sscanf line "assets_version: %d" Fun.id)
+                with
+                | End_of_file -> None
+                | Scanf.Scan_failure _ -> None
+              in
+              close_in ic;
+              read_number)
+        in
+        version_number := Some num_opt;
+        num_opt
+
 let include_template conf env fname failure =
   match open_etc_file fname with
   | Some (ic, fname) ->
