@@ -1217,10 +1217,6 @@ let with_database ?(read_only = false) bname k =
     I.load version ~inx:(bname // "strings.inx")
       [ snd patches.h_string; snd pending.h_string ]
   in
-  if read_only then
-    for i = 0 to strings.len - 1 do
-      I.insert inv_idx (strings.get i) i
-    done;
   let insert_string s =
     try I.find inv_idx s
     with Not_found ->
