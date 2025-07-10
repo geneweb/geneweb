@@ -5,14 +5,14 @@ open Title
 module Driver = Geneweb_db.Driver
 
 let sort_by_key cmp key l =
-  let l = List.map (fun x -> (x, key x)) l in
-  let l = List.sort (fun (_, k1) (_, k2) -> cmp k1 k2) l in
-  List.map fst l
+  let l = List.rev_map (fun x -> (x, key x)) l in
+  let l = List.sort (fun (_, k1) (_, k2) -> cmp k2 k1) l in
+  List.rev_map fst l
 
 let sort_uniq_by_key cmp key l =
-  let l = List.map (fun x -> (x, key x)) l in
-  let l = List.sort_uniq (fun (_, k1) (_, k2) -> cmp k1 k2) l in
-  List.map fst l
+  let l = List.rev_map (fun x -> (x, key x)) l in
+  let l = List.sort_uniq (fun (_, k1) (_, k2) -> cmp k2 k1) l in
+  List.rev_map fst l
 
 let my_alphabetic n1 n2 = compare (Name.lower n1) (Name.lower n2)
 
