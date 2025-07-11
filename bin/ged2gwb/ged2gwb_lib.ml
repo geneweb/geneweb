@@ -821,7 +821,7 @@ let add_string gen ?format s =
     | None | Some `Plain_text -> Html.text_content s
     | Some (`First_name | `Surname) ->
        let s = Html.text_content s in
-       if s = "" then "?" else s
+       if s = "" then "x" else s
   in
   try Hashtbl.find gen.g_hstr s
   with Not_found ->

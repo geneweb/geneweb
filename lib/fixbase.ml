@@ -411,7 +411,7 @@ let fix_map_str ~report ~base ?format istr =
     let s =
       match format with
       | None | Some (`Html | `Plain_text) -> s'
-      | Some (`First_name | `Surname) -> if s' = "" then "?" else s'
+      | Some (`First_name | `Surname) -> if s' = "" then "x" else s'
     in
     let format =
       match format with
