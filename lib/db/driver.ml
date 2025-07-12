@@ -140,10 +140,13 @@ let with_database bname k =
   | exception Not_found ->
       Database.with_database ~read_only:false bname (fun base ->
           Fun.protect ~finally:(fun () -> clear_base base) @@ fun () -> k base)
-  | base ->
-      (* If the base has already been loaded in memory, we do not
-         process it again. *)
-      k base
+  | _base ->
+      (* FIXME: We cannot reuse [_base] because it contains closures that
+         captured old versions of patches. It is important to read patches
+         on disk before each request to process the latest version of the
+         base. Otherwise, workers could keep different old versions in
+         memory. *)
+      Database.with_database ~read_only:true bname k
 
 let date_of_last_change base =
   let s =
