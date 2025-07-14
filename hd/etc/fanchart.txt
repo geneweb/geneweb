@@ -17,7 +17,7 @@
 %else;
   <link rel="preload" href="%etc_prefix;css/all.min.css?version=6.7.2" as="style" onload="this.onload=null;this.rel='stylesheet'">
 %end;
-<link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;" as="style" onload="this.onload=null;this.rel='stylesheet'">
 </head>
 %define;get_random(xxx)
   %random.init;

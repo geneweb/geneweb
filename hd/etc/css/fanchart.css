@@ -582,7 +582,7 @@ body:not(.place) .places-panel {
 }
 
 .generation-count {
-  font-size: 11px;
+  font-size: 12px;
   opacity: 0.85;
   white-space: nowrap;
 }
@@ -637,7 +637,7 @@ body:not(.place) .places-panel {
   padding: 3px 24px 3px 6px; /* Espace pour le bouton clear */
   border: 1px solid #dee2e6;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 12px;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
@@ -763,21 +763,19 @@ body:not(.place) .places-panel {
   height: 14px;
   border-radius: 3px;
   font-weight: bold;
-  font-size: 8px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   cursor: pointer;
-  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
   margin-bottom: 1px;
 }
 
 .summary-event-count {
   font-weight: 700;
   color: #495057;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1;
 }
 
@@ -792,14 +790,14 @@ body:not(.place) .places-panel {
 
 .summary-persons-icon {
   color: #495057;
-  font-size: 10px;
+  font-size: 11px;
   cursor: help;
 }
 
 .summary-persons-count {
   font-weight: 700;
   color: #495057;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 /* Badge du total d'événements */
@@ -885,7 +883,7 @@ body:not(.place) .places-panel {
 }
 
 .place-row.tall-row .place-indicators {
-  padding: 1px 4px;
+  padding: 1px 4px 1px 0px;
   gap: 1px;
 }
 
@@ -903,7 +901,7 @@ body:not(.place) .places-panel {
   background: #007bff;
   color: white;
   font-weight: bold;
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -994,6 +992,7 @@ body:not(.place) .places-panel {
 .place-content.person-match {
   background: rgba(40, 167, 69, 0.08) !important;
   font-weight: 600;
+  min-height: inherit;
 }
 
 .place-content.grayed-out {
@@ -1083,14 +1082,14 @@ body:not(.place) .places-panel {
 
 .event-count {
   font-weight: 700;
-  font-size: 9px;
+  font-size: 10px;
   text-align: right;
   min-width: 10px;
 }
 
 .event-label {
   font-weight: 600;
-  font-size: 8px;
+  font-size: 10px;
   text-transform: uppercase;
   width: 8px;
   text-align: left;
@@ -1098,7 +1097,7 @@ body:not(.place) .places-panel {
 
 /* Badge total du lieu */
 .place-count {
-  font-size: 9px;
+  font-size: 11px;
   color: #495057;
   background: #f1f3f4;
   padding: 0px 3px;
@@ -1248,7 +1247,7 @@ body:not(.place) .places-panel {
   z-index: 1;
 }
 
-/* Empêcher les transitions de hauteur qui causent des problèmes */
+/* Empêcher les transitions de hauteur */
 .place-row.tall-row {
   /* Pas de transition sur la hauteur */
   transition: none;
@@ -1311,12 +1310,12 @@ body:not(.place) .places-panel {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   display: none;
   z-index: 10;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   margin-top: 8px;
 }
 
 .person-panel h2 {
-  font-size: 0.8rem;
+  font-size: 1rem;
   margin-top: 0;
   margin-bottom: 0.2rem;
 }

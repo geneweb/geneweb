@@ -1560,15 +1560,22 @@ const PlacesHighlighter = {
     const highlightMap = new Map();
 
     placeNames.forEach((placeName, index) => {
-      const placeData = lieux[placeName];
-      if (!placeData) return;
-
-      const events = eventTypes[index] || [];
-      highlightMap.set(placeName, { placeData, events });
-      this.state.highlighted.add(placeName);
+        const placeData = lieux[placeName];
+        if (!placeData) return;
+        
+        const events = eventTypes[index] || [];
+        
+        if (highlightMap.has(placeName)) {
+            const existing = highlightMap.get(placeName);
+            const mergedEvents = [...new Set([...existing.events, ...events])];
+            highlightMap.set(placeName, { placeData, events: mergedEvents });
+        } else {
+            highlightMap.set(placeName, { placeData, events: [...events] });
+        }
+        
+        this.state.highlighted.add(placeName);
     });
 
-    // Appliquer les surlignages
     this.applyHighlights(highlightMap, source);
   },
 
@@ -1982,7 +1989,6 @@ const PlacesHighlighter = {
 
     // Mettre à jour le texte sans perdre le style
     nameElement.textContent = fullName;
-    nameElement.style.fontWeight = '600';
   },
 
   /**
@@ -2565,15 +2571,31 @@ const SVGRenderer = {
     }
 
     if (document.body.classList.contains('place') && PlacesInterface.cache.elements.panel) {
-      const displayPerson = p.sosa ? ImplexResolver.getDisplayData(p.sosa) : p;
-      if (displayPerson) {
-        const places = this.extractPlacesFromPerson(displayPerson, type);
-        if (places.length > 0) {
-          const placeNames = places.map(p => p.place);
-          const events = places.map(p => [p.event]);
-          PlacesHighlighter.highlight(placeNames, events, 'svg');
+        const displayPerson = (type === 'person' && p.sosa) ? 
+            ImplexResolver.getDisplayData(p.sosa) : p;
+        
+        if (displayPerson) {
+            // Passer aussi le sosa original pour la détection époux/épouse
+            const enhancedPerson = { ...displayPerson, sosa: p.sosa };
+            const places = this.extractPlacesFromPerson(enhancedPerson, type);
+            
+            if (places.length > 0) {
+                // Grouper par lieu pour éviter les doublons
+                const placeMap = new Map();
+                places.forEach(({ place, event }) => {
+                    if (!placeMap.has(place)) {
+                        placeMap.set(place, []);
+                    }
+                    placeMap.get(place).push(event);
+                });
+                
+                // Convertir en arrays parallèles
+                const placeNames = Array.from(placeMap.keys());
+                const events = Array.from(placeMap.values());
+                
+                PlacesHighlighter.highlight(placeNames, events, 'svg');
+            }
         }
-      }
     }
 
     // 4. Surlignage des implexes
@@ -2649,19 +2671,32 @@ const SVGRenderer = {
     }
   },
 
-  // Extraire les lieux
   extractPlacesFromPerson: function(person, type) {
     const places = [];
 
-    if (type === 'marriage' && person.marriage_place) {
-      places.push({ place: person.marriage_place, event: 'marriage' });
+    const addPlaceIfExists = (place, event) => {
+      if (place) {
+        places.push({ place, event });
+      }
+    };
+
+    if (type === 'marriage') {
+      addPlaceIfExists(person.marriage_place, 'marriage');
     } else if (type === 'person') {
       Events.types.forEach(eventType => {
+        if (eventType === 'marriage') return;
+
         const placeField = Events.place(eventType);
-        if (person[placeField]) {
-          places.push({ place: person[placeField], event: eventType });
-        }
+        addPlaceIfExists(person[placeField], eventType);
       });
+
+      // Gérer les mariages selon le Sosa
+      if (person.sosa && person.sosa % 2 === 1) {
+        const spouse = ancestor["S" + (person.sosa - 1)];
+        addPlaceIfExists(spouse?.marriage_place, 'marriage');
+      } else {
+        addPlaceIfExists(person.marriage_place, 'marriage');
+      }
     }
 
     return places;
