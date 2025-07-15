@@ -197,15 +197,6 @@ let first_char s =
     let len = Utf8.next s 0 in
     if len < String.length s then String.sub s 0 len else s
 
-let name_unaccent s =
-  let rec copy i len =
-    if i = String.length s then Buff.get len
-    else
-      let t, j = Utf8.unaccent_next false s i in
-      copy j (Buff.mstore len t)
-  in
-  copy 0 0
-
 let first_name_print_list conf base x1 xl liste =
   let liste =
     let l =
@@ -261,7 +252,7 @@ let first_name_print_list conf base x1 xl liste =
         let txt =
           Util.surname_without_particle base sn ^ Util.surname_particle base sn
         in
-        let ord = name_unaccent txt in
+        let ord = Utf8.unaccent txt in
         (ord, txt, ipl))
       liste
   in
@@ -645,7 +636,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
         let txt =
           Util.surname_without_particle base sn ^ Util.surname_particle base sn
         in
-        let ord = name_unaccent txt in
+        let ord = Utf8.unaccent txt in
         (ord, txt, sn))
       homonymes
   in

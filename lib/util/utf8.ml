@@ -311,3 +311,12 @@ let filter_map f s =
     iter (fun c -> Option.iter (Buffer.add_utf_8_uchar buffer) (f c)) s
   in
   Buffer.contents buffer
+
+let unaccent s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let t, j = unaccent_next false s i in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0

@@ -109,3 +109,5 @@ val filter_map :
   ([ `Uchar of Uchar.t | `Malformed of string ] -> Uchar.t option) ->
   string ->
   string
+
+val unaccent : string -> string
