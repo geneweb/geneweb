@@ -44,8 +44,8 @@ module C : sig
   (** Utf8 char type.  *)
   type t = Str of string | Chr of char | Empty
 
-  val unaccent : bool -> string -> int -> int -> t * int * int
-  (** [unaccent trimmed s i0 len]
+  val unaccent_next : bool -> string -> int -> int -> t * int * int
+  (** [unaccent_next trimmed s i0 len]
       Returns [(t, start, next)]: next UTF-8 character in string [s] starting at position [i0].
       The diacritic marks are removed, character is also case lowered, and any character
       returning [Empty] (unsupported or reported as empty) is ignored: the next character in [s]
@@ -95,12 +95,12 @@ val normalize : string -> string
     {{:http://unicode.org/glossary/#replacement_character}the replacement character}
 *)
 
-val unaccent : bool -> string -> int -> string * int
-(** [unaccent lower s i] checks UTF-8 characher that starts at position [i] inside [s]
+val unaccent_next : bool -> string -> int -> string * int
+(** [unaccent_next lower s i] checks UTF-8 characher that starts at position [i] inside [s]
     and returns couple (cs,np) where [cs] is ASCII representation of this character (characters
     between 0x00 and 0x7F) and [np] it's a position of next utf8 character inside [s]. If [lower]
     is true then [cs] will contain only lowercase letters.
-    Example : unaccent "aÈa" 1 -> ("e",3) *)
+    Example : unaccent_next "aÈa" 1 -> ("e",3) *)
 
 val alphabetic_order : string -> string -> int
 (** Compare two UTF-8 encoded strings by alphabetic order *)

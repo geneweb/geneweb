@@ -201,7 +201,7 @@ let name_unaccent s =
   let rec copy i len =
     if i = String.length s then Buff.get len
     else
-      let t, j = Utf8.unaccent false s i in
+      let t, j = Utf8.unaccent_next false s i in
       copy j (Buff.mstore len t)
   in
   copy 0 0
