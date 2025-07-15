@@ -305,7 +305,7 @@ end = struct
           | `Malformed _ -> None
           | `Uchar c ->
               Ext_option.return_if (not @@ is_delimiter c) (fun () -> c))
-        (Utf8.lowercase s)
+        (Utf8.unaccent @@ Utf8.lowercase s)
     in
     occupation = ""
     || string_incl (clean occupation)
