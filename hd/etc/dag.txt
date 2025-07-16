@@ -24,6 +24,7 @@
 %define;of(xxx)
   [of%s:::xxx]
 %end;
+<div class="d-flex">
 <h3 class="mt-2 ml-3 text-no-wrap">%nn;
   %if;(e.slices="on")
     [*display by slices/slice width/overlap/total width]0
@@ -57,6 +58,12 @@
     %if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;
   %end;
 </h3>
+%if;(e.m="DAG")
+<div class="ml-auto">
+  %include;buttons_dag
+</div>
+%end;
+</div>
 %if;(not cancel_links)
   %if;(e.m="A" or e.m="D")
     <div class="d-flex justify-content-center">
