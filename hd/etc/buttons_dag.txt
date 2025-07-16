@@ -42,7 +42,7 @@
         %end;
       %end;
   %end;
-%elseif;(e.em!="R" and e.m!="RLM" and e.m!="RL" and e.dag!="on")
+%elseif;(e.em!="R" and e.m!="RLM" and e.m!="RL" and e.dag!="on" and e.m!="DAG")
   %if;has_parents;
     %foreach;father.child;
       %if;is_sibling_before;
@@ -56,8 +56,8 @@
   %end;
 %else;
 %end;
-%let;father_access;%if;(dtree=1)%get_var.fatheraccess;%elseif;(e.dag!="on")%if;has_parents;%father.access;%end;%end;%in;
-%let;mother_access;%if;(dtree=1)%get_var.motheraccess;%elseif;(e.dag!="on")%if;has_parents;%mother.access;%end;%end;%in;
+%let;father_access;%if;(dtree=1)%get_var.fatheraccess;%elseif;(e.dag!="on" and e.m!="DAG")%if;has_parents;%father.access;%end;%end;%in;
+%let;mother_access;%if;(dtree=1)%get_var.motheraccess;%elseif;(e.dag!="on" and e.m!="DAG")%if;has_parents;%mother.access;%end;%end;%in;
 %let;withparents;%if;(mother_access!="" or father_access!="")1%end;%in;
 %let;prev_sibling_access;%get_var.prevsiblingaccess;%in;
 %let;next_sibling_access;%get_var.nextsiblingaccess;%in;
@@ -182,7 +182,8 @@
   </div>
 </div>
 </nav>
-%elseif;(not cancel_links and e.m="RLM")
+%end;
+%if;(not cancel_links and (e.m="RLM" or e.m="DAG"))
   <div class="btn-group ml-auto align-items-center mr-5" role="group" arial-label="RLM button group">
     <a class="btn btn-outline-primary border-0" title="[*add/clear/show/edit the graph]3"
       href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
@@ -191,11 +192,11 @@
       href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
       title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
       <i class="fa fa-image fa-lg fa-fw"></i> [*image/images]1</a>
-    <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp!=0)2%else;0%end; w-100 h-100"
+    <a role="button" class="btn btn-outline-%if;(e.sp=0)primary%else;danger%end; ml-1 border-0"
       href="%if;(e.sp!=0)%url_set.sp.0;%else;%url_set.sp;%end;"
       title="%if;(e.sp!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
       <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1</a>
     <a role="button" class="btn btn-outline-primary ml-1 border-0" href="%url_set.cgl.on;"
-      title="[cancel links]"><i class="fa fa-link-slash fa-lg fa-fw"></i> Cgl</a>
+      title="[*cancel GeneWeb links]"><i class="fa fa-link-slash fa-lg fa-fw"></i> Cgl</a>
   </div>
 %end;

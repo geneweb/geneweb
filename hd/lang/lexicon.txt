@@ -10553,6 +10553,26 @@ sl: zamenjano
 sv: omflyttning klar
 tr: ters çevrilmiş
 
+    add/insert/delete/up/down person
+de: eine neue Person und einen neuen Vorfahren am Ende hinzufügen/eine neue Person und einen neuen Vorfahren vor dieser einfügen/diese Person und ihre Vorfahren aus der Tabelle löschen/diese Person und ihre Vorfahren vor die vorherige Person verschieben/diese Person und ihre Vorfahren nach der nächsten Person verschieben
+en: add a new person and a new ancestor at the end/insert a new person and a new ancestor before this one/delete this person and their ancestors from the table/move this person and their ancestors before the previous person/move this person and their ancestors after the next person
+fr: ajouter un nouvel individu et un nouvel ancêtre à la fin/insérer un nouvel individu et un nouvel ancêtre avant celui-ci/supprimer cet individu et ses ancêtres du tableau/déplacer cet individu et ses ancêtres avant le précédent/déplacer cet individu et ses ancêtres après le suivant
+
+    add/insert/delete/up/down person aria-label
+de: Person hinzufügen/Person und Vorfahren einfügen/Person und Vorfahren löschen/Person und Vorfahren hoch/Person und Vorfahren runter
+en: add person/insert person and ancestor/delete person and ancestors/move person and ancestors up/move person and ancestors down
+fr: ajouter individu/insérer individu et ancêtre/supprimer individu et ancêtres/remonter individu et ancêtres/descendre individu et ancêtres
+
+    add/insert/delete/up/down row
+de: eine neue Zeile am Ende hinzufügen/eine neue Zeile vor dieser einfügen/diese Zeile aus der Tabelle löschen/diese Zeile eine Position nach oben verschieben/diese Zeile eine Position nach unten verschieben
+en: add a new row at the end/insert a new row before this one/delete this row from the table/move this row one position up/move this row one position down
+fr: ajouter une nouvelle ligne à la fin/insérer une nouvelle ligne avant celle-ci/supprimer cette ligne du tableau/déplacer cette ligne d’une position vers le haut/déplacer cette ligne d’une position vers le bas
+
+    add/insert/delete/up/down row aria-label
+de: Zeile hinzufügen/Zeile einfügen/Zeile löschen/Zeile hoch/Zeile runter
+en: add row/insert row/delete row/move up/move down
+fr: ajouter ligne/insérer ligne/supprimer ligne/remonter ligne/descendre ligne
+
     invert
 af: omruil
 bg: да се смени подредбата
@@ -19945,6 +19965,11 @@ ru: проверить/удалить
 sk: potvrdiť/zmazať
 sv: utför/tag bort
 tr: gönder/sil
+
+    validate form
+de: die Formularänderungen speichern
+en: save the form changes
+fr: enregistrer les modifications apportées au formulaire
 
     venteBien
 co: vendita d’un bè

@@ -94,6 +94,7 @@
     %end;
     <a class="ml-2" href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;" target="_blank"><i class="fa fa-shuffle fa-fw" title="[*dag]"></i></a>
     <a class="ml-2" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw" title="[*cancel GeneWeb links]"></i></a>
+    %if;(e.m="RLM")
     <a class="ml-4" title="[*add/clear/show/edit the graph]3" href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
       <i class="far fa-pen-to-square fa-lg fa-fw"></i></a>
   </div>
