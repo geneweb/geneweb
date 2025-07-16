@@ -4174,6 +4174,11 @@ sl: baza podatkov ni dostopna
 sv: kan inte nå databasen
 tr: tabana erişilemiyor
 
+    RLM update data/save data/show graph
+de:
+en:
+fr: actualiser les données en URL pour vérifier les individus et leurs événements/sauvegarder ces données en mémoire du navigateur/afficher l’arbre avec ces données
+
     cannot change sex of a married person
 af: kan die geslag van 'n getroude persoon nie verander nie
 bg: не може да се промени полът на човек в брак

@@ -58,9 +58,11 @@
     %if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;
   %end;
 </h3>
+%if;(e.m="DAG")
 <div class="ml-auto">
   %include;buttons_dag
 </div>
+%end;
 </div>
 %if;(not cancel_links)
   %if;(e.m="A" or e.m="D")

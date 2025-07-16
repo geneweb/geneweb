@@ -69,11 +69,18 @@
     %apply;one_pvar(zz+1)
   %end;
 %end;
+%define;one_pvar_json(zz)
+  %if;(e.izz!="" or e.pzz!="")
+    %if;(zz!=1),%end;
+    {"i":"%pvar.zz.index;","p":"%pvar.zz.first_name;","n":"%pvar.zz.surname;"%if;(pvar.zz.occ!=0),"oc":"%pvar.zz.occ;"%end;%if;(e.tzz!=""),"t":"%e.tzz;"%end;,"self":"%pvar.zz.first_name; %pvar.zz.surname;"}%nn;
+    %apply;one_pvar_json(zz+1)
+  %end;
+%end;
 %define;my_hidden(xx)
   %if;(e.xx!="")<input type="hidden" name="xx" value="%e.xx;">%end;
 %end;
 <div class="container-xl">
-<form id="upd" method="post" action="%action;">
+<form id="upd">
   <div class="h2 m-3">[*add/clear/show/edit the graph]3 RLM</div>
   %hidden;
   <input type="hidden" name="m" value='RLM'>
@@ -110,13 +117,24 @@
     </tbody>
     <tfoot>
       <td colspan="8" class="text-center p-2">
-        <button type="button" class="btn btn-success row_add mr-3"
+        <button type="button" class="btn btn-success row_add mr-4"
                 title="[*add/insert/delete/up/down row]0">
-          <i class="fas fa-plus" aria-hidden="true"></i>
+          <i class="fas fa-plus mr-2" aria-hidden="true"></i>%nn;
           [*add/insert/delete/up/down row aria-label]0
         </button>
-        <input type="submit" class="btn btn-primary"
-               value="[*validate/delete]0" title="[*validate form]">
+        <button type="button" class="btn btn-outline-info mr-2" id="refreshForm"
+                title="[*RLM update data/save data/show graph]0" disabled>
+           <i class="fas fa-sync mr-2"></i>[*validate/delete]0
+        </button>
+        <div id="rlm-data" class="d-none">%[%apply;one_pvar_json(1)%]</div>
+        <button type="button" class="btn btn-info mr-4" id="saveRLMToStorage"
+                title="[*RLM update data/save data/show graph]1">
+          <i class="fas fa-download mr-2" aria-hidden="true"></i>[*Save]
+        </button>
+        <button type="button" class="btn btn-primary" id="showGraph"
+                title="[*RLM update data/save data/show graph]2">
+          <i class="fas fa-eye mr-2"></i>[*add/clear/show/edit the graph]2
+        </button>
       </td>
     </tfoot>
   </table>
@@ -144,6 +162,10 @@ function updateArrowVisibility() {
 }
 $(document).ready(function() {
   updateArrowVisibility();
+  const enableRefresh = () => $('#refreshForm').prop('disabled', false);
+  $(document)
+    .on('input change', 'tbody input', enableRefresh)
+    .on('click', '.row_add, .row_delete', enableRefresh);
 });
 $(document).on( "click", ".row_add", function() {
   var newRow = $("#template_line").clone().removeAttr("id").removeAttr("style");
@@ -177,24 +199,44 @@ $(document).on("click", ".row_move_down", function() {
 $(document).on( "change", ".reset_bd_text", function() {
   $(this).closest( "tr" ).children( ".bd_text").html( "" );
 });
-$("#upd").submit(function(event) {
-  event.preventDefault();
+$('#saveRLMToStorage').on('click', function() {
+  const jsonData = $('#rlm-data').text().trim();
+  if (jsonData) { localStorage.setItem('inds', jsonData); }
+});
+function buildUrl(mode = 'RLM') {
   var dataIndex = 1;
+  var params = new URLSearchParams();
+  if (mode === 'RLM') {
+    params.set('m', 'RLM');
+  } else {
+    params.set('m', 'TP');
+    params.set('v', 'updRLM');
+  }
   $('tbody tr:visible').each(function() {
     var $row = $(this);
     var firstName = $row.find("input[name='p']").val().trim();
     var lastName = $row.find("input[name='n']").val().trim();
-    if(firstName !== "" && lastName !== "") {
-      $row.find("input[name='oc']").attr("name", "oc" + dataIndex);
-      $row.find("input[name='p']").attr("name", "p" + dataIndex);
-      $row.find("input[name='n']").attr("name", "n" + dataIndex);
-      $row.find("input[name='t']").attr("name", "t" + dataIndex);
+    if (firstName !== "" && lastName !== "") {
+      params.set('p' + dataIndex, firstName);
+      params.set('n' + dataIndex, lastName);
+      var oc = $row.find("input[name='oc']").val().trim();
+      if (oc !== "" && oc !== "0") {
+        params.set('oc' + dataIndex, oc);
+      }
+      var text = $row.find("input[name='t']").val().trim();
+      if (text !== "") {
+        params.set('t' + dataIndex, text);
+      }
       dataIndex++;
-    } else {
-      $row.find("input").prop("disabled", true);
     }
   });
-  $(this).unbind('submit').submit();
+  return '?' + params.toString();
+}
+$('#showGraph').on('click', function() {
+  window.location.href = buildUrl('RLM');
+});
+$('#refreshForm').on('click', function() {
+  window.location.href = buildUrl('TP');
 });
 </script>
 </body>
