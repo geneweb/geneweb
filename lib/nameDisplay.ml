@@ -412,15 +412,7 @@ let specify_homonymous conf base p specify_public_name =
     | Some n, None ->
         Output.print_sstring conf " ";
         Output.print_string conf (esc @@ Gwdb.sou base n)
-    | None, None ->
-        (* Le nom public et le qualificatif ne permettent pas de distinguer *)
-        (* la personne, donc on affiche les informations sur les parents,   *)
-        (* le mariage et/ou le premier enfant.                              *)
-        print_relations ()
+    | None, None -> ()
   in
-  if specify_public_name then print_public_name ()
-  else
-    (* Le nom public et le qualificatif ne permettent pas de distinguer *)
-    (* la personne, donc on affiche les informations sur les parents,   *)
-    (* le mariage et/ou le premier enfant.                              *)
-    print_relations ()
+  if specify_public_name then print_public_name ();
+  print_relations ()
