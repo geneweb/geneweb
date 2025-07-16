@@ -10,76 +10,123 @@
   %include;css
 </head>
 <body%body_prop;>
+%include;home
 %include;hed
 %let;mid;%sp;class="align-middle"%in;
 %define;pline(znz,zocz,zfnz,zsnz,zbdz,zparamz)
   <tr class="row_p"zparamz>
-    <td>
-      <i class="fa fa-plus row_add_before"></i>
-      <i class="fa fa-minus row_del"></i>
+    <td class="align-middle text-center text-nowrap px-3">
+      <button type="button" class="btn btn-success btn-sm row_add_p_before"
+              title="[*add/insert/delete/up/down person]1"
+              aria-label="[*add/insert/delete/up/down person aria-label]1">
+        <i class="fas fa-user-plus" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="btn btn-danger btn-sm row_del"
+              title="[*add/insert/delete/up/down person]2"
+              aria-label="[*add/insert/delete/up/down person aria-label]2">
+        <i class="fas fa-user-minus" aria-hidden="true"></i>
+      </button>
     </td>
-    <td>
-      <i class="fa fa-up-long row_move_up"></i>
-      <i class="fa fa-down-long row_move_down"></i>
+    <td class="align-middle text-center text-nowrap pr-3">
+      <button type="button" class="btn btn-secondary btn-sm row_move_up"
+              title="[*add/insert/delete/up/down person]3"
+              aria-label="[*add/insert/delete/up/down person aria-label]3">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm row_move_down"
+              title="[*add/insert/delete/up/down person]4"
+              aria-label="[*add/insert/delete/up/down person aria-label]4">
+        <i class="fas fa-arrow-down" aria-hidden="true"></i>
+      </button>
     </td>
-    <td%mid;><input name="oc" class="form-control reset_bd_text" size="5" value="zocz"></td>
-    <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz"></td>
-    <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz"></td>
+    <td class="align-middle font-weight-bold border-left px-3 line-number"></td>
+    <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz" aria-label="[*first name/first names]1"></td>
+    <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz" aria-label="[*surname/surnames]0"></td>
+    <td%mid;><input name="oc" type="number" min="0" class="form-control reset_bd_text" value="zocz" aria-label="[*occ]0"></td>
     <td class="bd_text align-middle">zbdz</td>
-    <td%mid;><input name="t" class="form-control" size="30" value="ztz"></td>
+    <td%mid;><input name="t" class="form-control" size="30" value="1" aria-label="[*n° Sosa]" disabled></td>
   </tr>
 %end;
 %define;sline(znz,zocz,zfnz,zsnz,zbdz,zsz,zparamz)
   <tr class="row_s"zparamz>
-    <td>
-      <i class="fa fa-plus row_add_before"></i>
-      <i class="fa fa-minus row_del"></i>
+    <td class="align-middle text-center text-nowrap px-3">
+      <button type="button" class="btn btn-outline-success btn-sm row_add_s_before"
+              title="[*add/insert/delete/up/down row]1"
+              aria-label="[*add/insert/delete/up/down row aria-label]1">
+        <i class="fas fa-plus" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="btn btn-outline-danger btn-sm row_del"
+              title="[*add/insert/delete/up/down row]2"
+              aria-label="[*add/insert/delete/up/down row aria-label]2">
+        <i class="fas fa-minus" aria-hidden="true"></i>
+      </button>
     </td>
-    <td>
-      <i class="fa fa-up-long row_move_up"></i>
-      <i class="fa fa-down-long row_move_down"></i>
+    <td class="align-middle text-center text-nowrap pr-3">
+      <button type="button" class="btn btn-outline-secondary btn-sm row_move_up"
+              title="[*add/insert/delete/up/down row]3"
+              aria-label="[*add/insert/delete/up/down row aria-label]3">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="btn btn-outline-secondary btn-sm row_move_down"
+              title="[*add/insert/delete/up/down row]4"
+              aria-label="[*add/insert/delete/up/down row aria-label]4">
+        <i class="fas fa-arrow-down" aria-hidden="true"></i>
+      </button>
     </td>
-    <td class="n_p_oc align-middle">zocz</td>
-    <td class="n_p_oc align-middle">zfnz</td>
-    <td class="n_p_oc align-middle">zsnz</td>
-    <td class="n_p_oc align-middle">zbdz</td>
-    <td%mid;><input name="s" class="form-control reset_n_p_oc" size="30" value="zsz"</td>
+    <td class="n_p_oc align-middle font-weight-light border-left px-3"></td>
+    <td class="n_p_oc align-middle font-weight-light pl-3">zfnz</td>
+    <td class="n_p_oc align-middle font-weight-light pl-3">zsnz</td>
+    <td class="n_p_oc align-middle font-weight-light pl-3">zocz</td>
+    <td class="n_p_oc align-middle font-weight-light">zbdz</td>
+    <td%mid;><input name="s" class="form-control reset_n_p_oc" size="30" value="zsz" aria-label="[*n° Sosa]"></td>
   </tr>
 %end;
 %define;one_p_line(zz)
-  %let;tmp;
-    %if;pvar.zz.has_birth_date;° %pvar.zz.slash_birth_date;
-    %elseif;pvar.zz.has_baptism_date; %pvar.zz.slash_baptism_date;
-    %end;
-    <br>
-    %if;pvar.zz.has_death_date;! %pvar.zz.slash_death_date;
-    %elseif;pvar.zz.has_burial_date;%pvar.zz.slash_burial_date;
-    %elseif;pvar.zz.has_cremation_date;%pvar.zz.slash_cremation_date;
-    %end;
+  %let;datespan;
+    <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
+      %if;pvar.zz.has_birth_date;
+        <div aria-label="[*birth date]">° %pvar.zz.slash_birth_date;</div>
+      %elseif;pvar.zz.has_baptism_date;
+        <div aria-label="[*baptism date]"><span class="text-danger">°</span> %pvar.zz.slash_baptism_date;</div>
+      %end;
+      %if;pvar.zz.has_death_date;
+        <div aria-label="[*death date]">† %pvar.zz.slash_death_date;</div>
+      %elseif;pvar.zz.has_burial_date;
+        <div aria-label="[*burial date]"><span class="text-danger">†</span> %pvar.zz.slash_burial_date;</div>
+      %elseif;pvar.zz.has_cremation_date;
+        <div aria-label="[*cremation date]"><span class="text-danger">†</span> %pvar.zz.slash_cremation_date;</div>
+      %end;
+    </div>
   %in;
-  %apply;pline("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, tmp, "")
+  %apply;pline("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, datespan, "")
 %end;
 %define;one_s_line(zz)
-  %if;(evar.szz != "")
-    %let;tmp;
-      %if;svar.zz.has_birth_date;° %svar.zz.slash_birth_date;
-      %elseif;svar.zz.has_baptism_date; %svar.zz.slash_baptism_date;
-      %end;
-      <br>
-      %if;svar.zz.has_death_date;† %svar.zz.slash_death_date;
-      %elseif;svar.zz.has_burial_date;%svar.zz.slash_burial_date;
-      %elseif;svar.zz.has_cremation_date;%svar.zz.slash_cremation_date;
-      %end;
+  %if;(evar.szz!="")
+    %let;datespan;
+      <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
+        %if;svar.zz.has_birth_date;
+          <div aria-label="[*birth date]">° %svar.zz.slash_birth_date;</div>
+        %elseif;svar.zz.has_baptism_date;
+          <div aria-label="[*baptism date]"><span class="text-danger">°</span> %svar.zz.slash_baptism_date;</div>
+        %end;
+        %if;svar.zz.has_death_date;
+          <div aria-label="[*death date]">† %svar.zz.slash_death_date;</div>
+        %elseif;svar.zz.has_burial_date;
+          <div aria-label="[*burial date]"><span class="text-danger">†</span> %svar.zz.slash_burial_date;</div>
+        %elseif;svar.zz.has_cremation_date;
+          <div aria-label="[*cremation date]"><span class="text-danger">†</span> %svar.zz.slash_cremation_date;</div>
+        %end;
+      </div>
     %in;
-    %apply;sline("zz", svar.zz.occ, svar.zz.first_name, svar.zz.surname, tmp, evar.szz, "")
+    %apply;sline("zz", svar.zz.occ, svar.zz.first_name, svar.zz.surname, datespan, evar.szz, "")
   %end;
 %end;
 %define;one_svar(zz)
-  %if;(evar.izz != "" or evar.pzz != "")
+  %if;(evar.izz!="" or evar.pzz!="")
     %apply;one_p_line("zz")
     %apply;one_s_line("zz")
     %apply;one_svar(zz+1)
-  %elseif;(evar.szz != "" and "zz" != "1")
+  %elseif;(evar.szz!="" and "zz"!="1")
     %apply;one_s_line("zz")
     %apply;one_svar(zz+1)
   %end;
@@ -87,136 +134,236 @@
 %define;my_hidden(xx)
   %if;(evar.xx!="")<input type="hidden" name="xx" value="%evar.xx;">%end;
 %end;
-<div class="container-fluid">
+<div class="container-xl">
 <form id="upd" method="post" action="%action;">
-  <div class="d-flex justify-content-end m-2">
-    <div class="h2">[*add/clear/show/edit the graph]3</div>
-    <input type="submit" class="btn btn-primary ml-auto" value="OK">
-  </div>
+  <div class="h2 m-3">[*add/clear/show/edit the graph]3 DAG</div>
   %hidden;
   <input type="hidden" name="m" value='DAG'>
   %apply;my_hidden("spouse")
   %apply;my_hidden("image")
   %apply;my_hidden("bd")
   %apply;my_hidden("new")
-  <table class="table table-hover table-sm">
+  <div class="table-responsive">
+  <table class="table table-hover table-sm w-auto">
     <thead>
       <tr>
-        <td></td><td></td><td>#</td>
-        <td%mid;>[*first name/first names]0</td>
-        <td%mid;>[*surname/surnames]0</td>
-        <td%mid;>[*birth]<br>[*death]</td>
-        <td%mid;>Sosa</td>
+        <th scope="col" class="border-top-0"></th>
+        <th scope="col" class="border-top-0"></th>
+        <th scope="col" class="align-middle font-weight-bold border-left px-3">#</th>
+        <th scope="col" class="align-middle pl-2">[*first name/first names]0</th>
+        <th scope="col" class="align-middle pl-2">[*surname/surnames]0</th>
+        <th scope="col" class="align-middle" style="width:90px">[*occ]1</th>
+        <th scope="col" class="align-middle">
+          <div class="d-flex flex-column justify-content-center" style="line-height:0.9">
+            <div>[*birth]</div>
+            <div>[*death]</div>
+          </div>
+        </th>
+        <th scope="col" class="align-middle pl-2">[Sosa]</th>
       </tr>
     </thead>
     <tbody>
       %apply;pline("", "", "", "", "", " id='template_line_p' style='display:none;'")
       %apply;sline("", "", "", "", "", "", " id='template_line_s' style='display:none;'")
       %apply;one_svar(1)
-      <tr class="last_row">
-       <td>
-        <span class="fa fa-user-plus row_add_p_before">
-        <br>
-        <span class="fa fa-plus row_add_s_before">
-       </td>
-       <td></td><td></td><td></td><td></td><td></td><td></td>
-      </tr>
     </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="8" class="text-center p-2">
+          <button type="button" class="btn btn-success row_add_p_before mr-3"
+                  title="[*add/insert/delete/up/down person]0">
+            <i class="fas fa-user-plus" aria-hidden="true"></i>
+            [*add/insert/delete/up/down person aria-label]0
+          </button>
+          <button type="button" class="btn btn-outline-success row_add_s_before mr-3"
+                  title="[*add/insert/delete/up/down row]0">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+            [*add/insert/delete/up/down row aria-label]0
+          </button>
+          <input type="submit" class="btn btn-primary"
+                 value="[*validate/delete]0" title="[*validate form]">
+        </td>
+      </tr>
+    </tfoot>
   </table>
+  </div>
 </form>
 %if;(not cancel_links)
   %include;trl
   %include;copyr
-  %query_time;
 %end;
 </div>
 %include;js
+%query_time;
 <script>
-$(document).on( "click", ".row_add_p_before", function() {
-  $(this).closest("tr").before( $("#template_line_p").clone().removeAttr("id").removeAttr("style").get(0) );
-  $(this).closest("tr").before( $("#template_line_s").clone().removeAttr("id").removeAttr("style").get(0) );
+function updateLineNumbers() {
+  var lineNumber = 1;
+  $('tbody tr:visible').each(function() {
+    if($(this).hasClass('row_p')) {
+      $(this).find('.line-number').text(lineNumber++);
+    } else if($(this).hasClass('row_s')) {
+      $(this).find('.line-number').text(''); // Ancestor lines don't get numbers
+    }
+  });
+}
+function updateArrowVisibility() {
+  $('.row_move_up, .row_move_down').css('visibility', 'visible');
+  var visibleRows = $('tbody tr:visible');
+  var personRows = visibleRows.filter('.row_p');
+
+  personRows.each(function(index) {
+    if(index === 0) {
+      $(this).find('.row_move_up').css('visibility', 'hidden');
+    }
+    if(index === personRows.length - 1) {
+      $(this).find('.row_move_down').css('visibility', 'hidden');
+    }
+  });
+
+  personRows.each(function() {
+    var personRow = $(this);
+    var ancestorGroup = personRow.nextUntil('.row_p').filter('.row_s');
+
+    if(ancestorGroup.length <= 1) {
+      ancestorGroup.find('.row_move_up, .row_move_down').css('visibility', 'hidden');
+    } else {
+      ancestorGroup.first().find('.row_move_up').css('visibility', 'hidden');
+      ancestorGroup.last().find('.row_move_down').css('visibility', 'hidden');
+    }
+  });
+
+  updateLineNumbers();
+}
+$(document).ready(function() {
+  updateArrowVisibility();
 });
-$(document).on( "click", ".row_add_s_before", function() {
-  $(this).closest("tr").before( $("#template_line_s").clone().removeAttr("id").removeAttr("style").get(0) );
+$(document).on("click", ".row_add_p_before", function() {
+  var newRowP = $("#template_line_p").clone().removeAttr("id").removeAttr("style");
+  var newRowS = $("#template_line_s").clone().removeAttr("id").removeAttr("style");
+
+  if($(this).closest('tfoot').length) {
+    $('tbody').append(newRowP.get(0));
+    $('tbody').append(newRowS.get(0));
+  } else {
+    $(this).closest("tr").before(newRowP.get(0));
+    $(this).closest("tr").before(newRowS.get(0));
+  }
+
+  newRowP.find('input:first').focus();
+  updateArrowVisibility();
 });
-$(document).on( "click", ".row_del", function() {
-  var row = $(this).closest( "tr" );
-  if( row.attr("class") == "row_p" ) {
-    var row_s_next = row.nextUntil( ".row_p,.last_row" );
-    row_s_next.each( function( index ) {
-      $(this).remove();
-    } );
+$(document).on("click", ".row_add_s_before", function() {
+  var newRowS = $("#template_line_s").clone().removeAttr("id").removeAttr("style");
+
+  if($(this).closest('tfoot').length) {
+    $('tbody').append(newRowS.get(0));
+  } else {
+    $(this).closest("tr").before(newRowS.get(0));
+  }
+
+  newRowS.find('input:first').focus();
+  updateArrowVisibility();
+});
+$(document).on("click", ".row_del", function() {
+  var row = $(this).closest("tr");
+  if(row.hasClass("row_p")) {
+    // Delete person + all following ancestor rows until next person
+    var row_s_next = row.nextUntil(".row_p");
+    row_s_next.remove();
     row.remove();
-  } else { // row_s
-    if( row.prev().attr("class") == "row_s" ||
-        row.next().attr("class") == "row_s" ) {
+  } else if(row.hasClass("row_s")) {
+    // Only delete ancestor if there are other ancestors
+    if(row.prev().hasClass("row_s") || row.next().hasClass("row_s")) {
       row.remove();
     }
   }
+  updateArrowVisibility();
 });
-$(document).on( "click", ".row_move_up", function() {
-  var row = $(this).closest( "tr" );
-  if( row.attr("class") == "row_s" ) {
-    if( row.index() >  2 &&      // The two first rows are templates
-        row.prev().attr("class") == "row_s" ) {
-      row.insertBefore( row.prev() );
+$(document).on("click", ".row_move_up", function() {
+  var row = $(this).closest("tr");
+  if(row.hasClass("row_s")) {
+    // Move ancestor up within ancestor group
+    if(row.index() > 2 && row.prev().hasClass("row_s")) {
+      row.insertBefore(row.prev());
     }
-  } else { // row_p
-    if( row.index() >  3 ) {
+  } else if(row.hasClass("row_p")) {
+    // Move entire person block (person + ancestors) up
+    if(row.index() > 3) {
       var row_prev = row.prevAll(".row_p").first();
-      var row_s_next = row.nextUntil( ".row_p,.last_row" );
-      row.insertBefore( row_prev );
-      row_s_next.each( function( index ) {
-        $(this).insertAfter( row );
-      } );
+      var row_s_next = row.nextUntil(".row_p");
+      row.insertBefore(row_prev);
+      row_s_next.each(function() {
+        $(this).insertAfter(row);
+        row = $(this); // Update reference for chaining
+      });
     }
   }
-} );
-$(document).on( "click", ".row_move_down", function() {
-  var row = $(this).closest( "tr" );
-  if( row.attr("class") == "row_s" ) {
+  updateArrowVisibility();
+});
+$(document).on("click", ".row_move_down", function() {
+  var row = $(this).closest("tr");
+  if(row.hasClass("row_s")) {
+    // Move ancestor down within ancestor group
     var row_next = row.next(".row_s");
-    if( 0 != row_next.length ) {
-      row.insertAfter( row_next );
+    if(row_next.length) {
+      row.insertAfter(row_next);
     }
-  } else { // row_p
-    var row_s_next = row.nextUntil( ".row_p,.last_row" );
-    var row_next = row.nextAll(".row_p,.last_row")[1];
-    if( typeof row_next !== "undefined" ) {
-      row.insertBefore( row_next );
-      row_s_next.each( function( index ) {
-        $(this).insertBefore( row_next );
-      } );
+  } else if(row.hasClass("row_p")) {
+    // Move entire person block down
+    var row_s_next = row.nextUntil(".row_p");
+    var row_target = row.nextAll(".row_p").first();
+    if(row_target.length) {
+      var target_ancestors = row_target.nextUntil(".row_p");
+      if(target_ancestors.length) {
+        row.insertAfter(target_ancestors.last());
+      } else {
+        row.insertAfter(row_target);
+      }
+      row_s_next.each(function() {
+        $(this).insertAfter(row);
+        row = $(this);
+      });
     }
   }
+  updateArrowVisibility();
 });
-$(document).on( "change", ".reset_bd_text", function() {
-  $(this).closest( "tr" ).children( ".bd_text").html( "" );
-} );
-$(document).on( "change", ".reset_n_p_oc", function() {
-  $(this).closest( "tr" ).children( ".n_p_oc").html( "" );
+$(document).on("change", ".reset_bd_text", function() {
+  $(this).closest("tr").children(".bd_text").html("");
 });
-$("#upd").submit( function() {
+$(document).on("change", ".reset_n_p_oc", function() {
+  $(this).closest("tr").children(".n_p_oc").html("");
+});
+$("#upd").submit(function(event) {
+  event.preventDefault();
   var gi = 1;
 
-  event.preventDefault();
-  $(this).find("tr").each( function( index ) {
-    if( $(this).attr("id") == "template_line_p" ||
-        $(this).attr("id") == "template_line_s" ) {
-      $(this).find( "input[name=oc]" ).prop("disabled", true);
-      $(this).find( "input[name=p]" ).prop("disabled", true);
-      $(this).find( "input[name=n]" ).prop("disabled", true);
-      $(this).find( "input[name=s]" ).prop("disabled", true);
-    } else {
-      $(this).find( "input[name=oc]" ).attr("name", "oc"+gi );
-      $(this).find( "input[name=p]" ).attr("name", "p"+gi );
-      $(this).find( "input[name=n]" ).attr("name", "n"+gi );
-      $(this).find( "input[name=s]" ).attr("name", "s"+gi );
-      if( $(this).hasClass("row_s") ) {
-        gi++;
+  $('tbody tr:visible').each(function() {
+    var $row = $(this);
+
+    if($row.hasClass("row_p")) {
+      var firstName = $row.find("input[name='p']").val().trim();
+      var lastName = $row.find("input[name='n']").val().trim();
+
+      if(firstName !== "" && lastName !== "") {
+        $row.find("input[name='oc']").attr("name", "oc" + gi);
+        $row.find("input[name='p']").attr("name", "p" + gi);
+        $row.find("input[name='n']").attr("name", "n" + gi);
+        $row.find("input[name='t']").attr("name", "t" + gi);
+      } else {
+        $row.find("input").prop("disabled", true);
+      }
+    } else if($row.hasClass("row_s")) {
+      var sosaValue = $row.find("input[name='s']").val().trim();
+
+      if(sosaValue !== "") {
+        $row.find("input[name='s']").attr("name", "s" + gi);
+        gi++; // Only increment on ancestor rows with data
+      } else {
+        $row.find("input").prop("disabled", true);
       }
     }
   });
+
   $(this).unbind('submit').submit();
 });
 </script>
