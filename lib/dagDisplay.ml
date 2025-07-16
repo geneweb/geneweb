@@ -1367,12 +1367,82 @@ let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
   print_slices_menu_or_dag_page conf base page_title hts next_txt
 
 let print conf base =
-  let set = get_dag_elems conf base in
-  let elem_txt p = Item (p, Adef.safe "") in
-  let vbar_txt _ = Adef.escaped "" in
-  let invert = Util.p_getenv conf.env "invert" = Some "on" in
-  let page_title =
-    Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+  (* Vérifier si URL en pnoc ou si on a déjà les index *)
+  let has_form_params =
+    List.exists
+      (fun (key, _) ->
+        String.length key >= 2
+        && (String.get key 0 = 'p' || String.get key 0 = 'n')
+        && String.for_all
+             (function '0' .. '9' -> true | _ -> false)
+             (String.sub key 1 (String.length key - 1)))
+      conf.env
   in
-  make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
-    (Adef.escaped "")
+  if has_form_params then (
+    (* Récupérer tous les index *)
+    let all_indexes =
+      List.fold_left
+        (fun acc (key, _) ->
+          if String.length key >= 2 then
+            let prefix = String.get key 0 in
+            let idx_str = String.sub key 1 (String.length key - 1) in
+            try
+              let idx = int_of_string idx_str in
+              if (prefix = 'p' || prefix = 's') && not (List.mem idx acc) then
+                idx :: acc
+              else acc
+            with _ -> acc
+          else acc)
+        [] conf.env
+      |> List.sort compare
+    in
+
+    let converted_params = ref [] in
+
+    (* Traiter chaque index *)
+    List.iter
+      (fun idx ->
+        let k = string_of_int idx in
+        (* Traiter p* *)
+        (match p_getenv conf.env ("p" ^ k) with
+        | Some fn when fn <> "" -> (
+            let sn = Option.value ~default:"" (p_getenv conf.env ("n" ^ k)) in
+            let oc =
+              try
+                int_of_string
+                  (Option.value ~default:"0" (p_getenv conf.env ("oc" ^ k)))
+              with _ -> 0
+            in
+
+            match Driver.person_of_key base fn sn oc with
+            | Some ip ->
+                converted_params :=
+                  ("i" ^ k ^ "=" ^ Driver.Iper.to_string ip)
+                  :: !converted_params
+            | None -> ())
+        | _ -> ());
+
+        (* Traiter s* *)
+        match p_getenv conf.env ("s" ^ k) with
+        | Some s when s <> "" ->
+            converted_params :=
+              ("s" ^ k ^ "=" ^ (Mutil.encode s :> string)) :: !converted_params
+        | _ -> ())
+      all_indexes;
+
+    let clean_url =
+      Printf.sprintf "%s?m=DAG&%s"
+        (conf.command :> string)
+        (String.concat "&" (List.rev !converted_params))
+    in
+    Wserver.http_redirect_temporarily clean_url)
+  else
+    let set = get_dag_elems conf base in
+    let elem_txt p = Item (p, Adef.safe "") in
+    let vbar_txt _ = Adef.escaped "" in
+    let invert = Util.p_getenv conf.env "invert" = Some "on" in
+    let page_title =
+      Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+    in
+    make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
+      (Adef.escaped "")

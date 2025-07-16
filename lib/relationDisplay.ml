@@ -1087,6 +1087,17 @@ let print_multi conf base =
   let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t =
     Hashtbl.create 53
   in
+  (* Vérifier si URL en pnoc ou si on a déjà les index *)
+  let has_form_params =
+    List.exists
+      (fun (key, _) ->
+        String.length key >= 2
+        && (String.get key 0 = 'p' || String.get key 0 = 'n')
+        && String.for_all
+             (function '0' .. '9' -> true | _ -> false)
+             (String.sub key 1 (String.length key - 1)))
+      conf.env
+  in
   let pl =
     let rec loop pl i =
       let k = string_of_int i in
@@ -1100,5 +1111,32 @@ let print_multi conf base =
     in
     loop [] 1
   in
-  let lim = Option.value ~default:0 (p_getint conf.env "lim") in
-  print_multi_relation conf base pl lim assoc_txt
+  (* Construire URL en index au lieu de p/n/oc *)
+  if has_form_params then
+    let id_params =
+      List.mapi
+        (fun i p ->
+          let id = Driver.get_iper p |> Driver.Iper.to_string in
+          let txt_param =
+            try
+              let txt = Hashtbl.find assoc_txt (Driver.get_iper p) in
+              if txt <> "" then
+                "&t"
+                ^ string_of_int (i + 1)
+                ^ "="
+                ^ (Mutil.encode txt :> string)
+              else ""
+            with Not_found -> ""
+          in
+          "i" ^ string_of_int (i + 1) ^ "=" ^ id ^ txt_param)
+        pl
+      |> String.concat "&"
+    in
+    (* Redirection vers URL propre avec index *)
+    let clean_url =
+      Printf.sprintf "%s?m=RLM&%s" (conf.command :> string) id_params
+    in
+    Wserver.http_redirect_temporarily clean_url
+  else
+    let lim = Option.value ~default:0 (p_getint conf.env "lim") in
+    print_multi_relation conf base pl lim assoc_txt
