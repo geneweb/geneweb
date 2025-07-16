@@ -138,42 +138,25 @@ let code_hebrew_date conf d m y =
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 
 let string_of_on_prec_dmy_aux conf sy sy2 d =
+  let string_of_dmy d m y s =
+    if d = 0 && m = 0 then Util.transl conf "in (year)" ^ " " ^ s
+    else if d = 0 then Util.transl_decline conf "in (month year)" s
+    else Util.transl_decline conf "on (day month year)" s
+  in
   match d.Date.prec with
-  | Date.Sure ->
-      if d.Date.day = 0 && d.Date.month = 0 then
-        Util.transl conf "in (year)" ^ " " ^ sy
-      else if d.Date.day = 0 then Util.transl_decline conf "in (month year)" sy
-      else Util.transl_decline conf "on (day month year)" sy
+  | Date.Sure -> string_of_dmy d.Date.day d.Date.month d.Date.year sy
   | Date.About | Date.Before | Date.After ->
-      let s = sy in
+      let s = string_of_dmy d.Date.day d.Date.month d.Date.year sy in
       if d.Date.prec = Date.About then Util.transl_decline conf "about (date)" s
       else if d.Date.prec = Date.Before then
         Util.transl_decline conf "before (date)" s
       else Util.transl_decline conf "after (date)" s
   | Date.Maybe ->
-      let s =
-        if d.Date.day = 0 && d.Date.month = 0 then
-          Util.transl conf "in (year)" ^ " " ^ sy
-        else if d.Date.day = 0 then
-          Util.transl_decline conf "in (month year)" sy
-        else Util.transl_decline conf "on (day month year)" sy
-      in
+      let s = string_of_dmy d.Date.day d.Date.month d.Date.year sy in
       Util.transl_decline conf "possibly (date)" s
   | Date.OrYear d2 ->
-      let s =
-        if d.Date.day = 0 && d.Date.month = 0 then
-          Util.transl conf "in (year)" ^ " " ^ sy
-        else if d.Date.day = 0 then
-          Util.transl_decline conf "in (month year)" sy
-        else Util.transl_decline conf "on (day month year)" sy
-      in
-      let s2 =
-        if d2.Date.day2 = 0 && d2.Date.month2 = 0 then
-          Util.transl conf "in (year)" ^ " " ^ sy2
-        else if d2.Date.day2 = 0 then
-          Util.transl_decline conf "in (month year)" sy2
-        else Util.transl_decline conf "on (day month year)" sy2
-      in
+      let s = string_of_dmy d.Date.day d.Date.month d.Date.year sy in
+      let s2 = string_of_dmy d2.Date.day2 d2.Date.month2 d2.Date.year2 sy2 in
       s ^ " " ^ Util.transl conf "or" ^ " " ^ Mutil.nominative s2
   | Date.YearInt d2 ->
       let s =
