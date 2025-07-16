@@ -18,6 +18,14 @@ let int_of_ifam =
       Hashtbl.add ht i x;
       x
 
+(* We use negative ifams to avoid conflicts with existing ids *)
+let fresh_ifam =
+  let i = ref (-1) in
+  fun () ->
+    let n = !i in
+    decr i;
+    Gwdb.ifam_of_int n
+
 let month_txt =
   [|
     "JAN";
@@ -621,8 +629,8 @@ let ged_pevent opts base per_sel evt =
 
 let adop_fam_list = ref []
 
-let ged_fam_adop opts i (fath, moth, _) =
-  Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" i;
+let ged_fam_adop opts (fath, moth, i) =
+  Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" (i + 1);
   Option.iter
     (fun i -> Printf.ksprintf (oc opts) "1 HUSB @I%d@\n" (int_of_iper i + 1))
     fath;
@@ -697,12 +705,32 @@ let ged_witness opts fam_sel ifam =
     Printf.ksprintf (oc opts) "2 TYPE FAM\n";
     Printf.ksprintf (oc opts) "2 RELA witness\n")
 
+let ged_adoption ~opts ~per_sel ~ip ~fath ~moth =
+  if per_sel ip then (
+    let n_ifam = int_of_ifam (fresh_ifam ()) in
+    adop_fam_list := (fath, moth, n_ifam) :: !adop_fam_list;
+    let adop =
+      match (fath, moth) with
+      | Some _, Some _ -> "BOTH"
+      | Some _, None -> "HUSB"
+      | None, Some _ -> "WIFE"
+      | None, None -> ""
+    in
+    Printf.ksprintf (oc opts) "1 ADOP\n";
+    Printf.ksprintf (oc opts) "2 FAMC @F%d@\n" (n_ifam + 1);
+    Printf.ksprintf (oc opts) "3 ADOP %s\n" adop)
+
 let ged_asso opts base (per_sel, fam_sel) per =
   List.iter
     (fun r ->
-      if r.Def.r_type = Def.GodParent then (
-        ged_godparent opts per_sel "GODF" r.Def.r_fath;
-        ged_godparent opts per_sel "GODM" r.Def.r_moth))
+      match r.Def.r_type with
+      | Def.GodParent ->
+          ged_godparent opts per_sel "GODF" r.Def.r_fath;
+          ged_godparent opts per_sel "GODM" r.Def.r_moth
+      | Adoption ->
+          ged_adoption ~opts ~per_sel ~ip:(Gwdb.get_iper per) ~fath:r.Def.r_fath
+            ~moth:r.Def.r_moth
+      | Recognition | CandidateParent | FosterParent -> ())
     (Gwdb.get_rparents per);
   List.iter
     (fun ic ->
@@ -873,14 +901,7 @@ let gwb2ged with_indexes opts ((per_sel, fam_sel) as sel) =
       Gwdb.Collection.iter
         (fun i -> if fam_sel i then ged_fam_record opts base sel i)
         (Gwdb.ifams base);
-      let _ =
-        List.fold_right
-          (fun adop i ->
-            ged_fam_adop opts i adop;
-            i + 1)
-          !adop_fam_list
-          (Gwdb.nb_of_families base + 1)
-      in
+      let () = List.iter (fun adop -> ged_fam_adop opts adop) !adop_fam_list in
       Printf.ksprintf oc "0 TRLR\n";
       close ()
   | None -> assert false
