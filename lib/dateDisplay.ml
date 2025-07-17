@@ -145,12 +145,18 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
   in
   match d.Date.prec with
   | Date.Sure -> string_of_dmy d.Date.day d.Date.month sy
-  | Date.About | Date.Before | Date.After ->
+  | Date.About when d.Date.day <> 0 ->
+      let s = Util.transl_decline conf "on (day month year)" sy in
+      Util.transl_decline conf "about (date)" s
+  | Date.About -> Util.transl_decline conf "about (date)" sy
+  | Date.Before when d.Date.day <> 0 ->
       let s = string_of_dmy d.Date.day d.Date.month sy in
-      if d.Date.prec = Date.About then Util.transl_decline conf "about (date)" s
-      else if d.Date.prec = Date.Before then
-        Util.transl_decline conf "before (date)" s
-      else Util.transl_decline conf "after (date)" s
+      Util.transl_decline conf "before (date)" s
+  | Date.Before -> Util.transl_decline conf "before (date)" sy
+  | Date.After when d.Date.day <> 0 ->
+      let s = string_of_dmy d.Date.day d.Date.month sy in
+      Util.transl_decline conf "after (date)" s
+  | Date.After -> Util.transl_decline conf "after (date)" sy
   | Date.Maybe ->
       let s = string_of_dmy d.Date.day d.Date.month sy in
       Util.transl_decline conf "possibly (date)" s
