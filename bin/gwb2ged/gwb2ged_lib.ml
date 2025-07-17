@@ -594,11 +594,11 @@ let oc' opts s = Printf.ksprintf (oc opts) (s ^^ "\n")
 let oc_witness_kind opts wk = oc' opts (relation_format_of_witness_kind wk)
 
 let witness_format opts base per_sel (ip, wk, wnote) =
-  if per_sel ip then
+  if per_sel ip then (
     Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
-  Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-  oc_witness_kind opts wk;
-  display_note opts 3 (Gwdb.sou base wnote)
+    Printf.ksprintf (oc opts) "3 TYPE INDI\n";
+    oc_witness_kind opts wk;
+    display_note opts 3 (Gwdb.sou base wnote))
 
 let ged_pevent opts base per_sel evt =
   let name = Gwdb.get_pevent_name evt in
