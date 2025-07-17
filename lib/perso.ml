@@ -2244,7 +2244,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Some p ->
           let ep = make_ep conf base (Driver.get_iper p) in
           eval_person_field_var conf base env ep loc sl
-      | None -> raise Not_found)
+      | None -> (
+          match sl with [ "exist" ] -> VVbool false | _ -> raise Not_found))
   | "qvar" :: v :: sl ->
       (* %qvar.index_v.surname;
          direct access to a person whose index value is v
@@ -2883,6 +2884,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
       | OfCourseDead ->
           null_val)
+  | [ "exist" ] -> VVbool true
   | "event" :: sl -> (
       match get_env "event" env with
       | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl

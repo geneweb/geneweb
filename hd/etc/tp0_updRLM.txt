@@ -13,7 +13,7 @@
 %include;home
 %include;hed
 %let;mid;%sp;class="align-middle"%in;
-%define;one_pvar_line(znz,zocz,zfnz,zsnz,zbdz,ztz,zparamz)
+%define;one_pvar_line(znz,zfnz,zsnz,zocz,zbdz,ztz,zparamz)
   <trzparamz>
     <td class="align-middle text-center text-nowrap px-3">
       <button type="button" class="btn btn-success btn-sm row_add"
@@ -50,30 +50,43 @@
 %define;one_pvar(zz)
   %if;(e.izz!="" or e.pzz!="")
     %let;datespan;
-      <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
-        %if;pvar.zz.has_birth_date;
-          <div aria-label="[*birth date]">° %pvar.zz.slash_birth_date;</div>
-        %elseif;pvar.zz.has_baptism_date;
-          <div aria-label="[*baptism date]"><span class="text-danger">°</span> %pvar.zz.slash_baptism_date;</div>
-        %end;
-        %if;pvar.zz.has_death_date;
-          <div aria-label="[*death date]">† %pvar.zz.slash_death_date;</div>
-        %elseif;pvar.zz.has_burial_date;
-          <div aria-label="[*burial date]"><span class="text-danger">†</span> %pvar.zz.slash_burial_date;</div>
-        %elseif;pvar.zz.has_cremation_date;
-          <div aria-label="[*cremation date]"><span class="text-danger">†</span>%pvar.zz.slash_cremation_date;</div>
-        %end;
-      </div>
+      %if;pvar.zz.exist;
+        <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
+          %if;pvar.zz.has_birth_date;
+            <div aria-label="[*birth date]">° %pvar.zz.slash_birth_date;</div>
+          %elseif;pvar.zz.has_baptism_date;
+            <div aria-label="[*baptism date]"><span class="text-danger">°</span> %pvar.zz.slash_baptism_date;</div>
+          %end;
+          %if;pvar.zz.has_death_date;
+            <div aria-label="[*death date]">† %pvar.zz.slash_death_date;</div>
+          %elseif;pvar.zz.has_burial_date;
+            <div aria-label="[*burial date]"><span class="text-danger">†</span> %pvar.zz.slash_burial_date;</div>
+          %elseif;pvar.zz.has_cremation_date;
+            <div aria-label="[*cremation date]"><span class="text-danger">†</span>%pvar.zz.slash_cremation_date;</div>
+          %end;
+        </div>
+      %else;
+        <div class="text-center">[unknown person]!!</div>
+      %end;
     %in;
-    %apply;one_pvar_line("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, datespan, e.tzz, "")
+    %if;(pvar.zz.exist)
+      %apply;one_pvar_line("zz", pvar.zz.first_name, pvar.zz.surname, pvar.zz.occ, datespan, e.tzz, "")
+    %else;
+      %apply;one_pvar_line("zz", e.pzz, e.nzz, e.oczz, datespan, e.tzz, " class='bg-warning'")
+    %end;
+  %end;
+  %( todo catch max zz with ml function %)
+  %if;(zz<=150)
     %apply;one_pvar(zz+1)
   %end;
 %end;
 %define;one_pvar_json(zz)
   %if;(e.izz!="" or e.pzz!="")
-    %if;(zz!=1),%end;
-    {"i":"%pvar.zz.index;","p":"%pvar.zz.first_name;","n":"%pvar.zz.surname;"%if;(pvar.zz.occ!=0),"oc":"%pvar.zz.occ;"%end;%if;(e.tzz!=""),"t":"%e.tzz;"%end;,"self":"%pvar.zz.first_name; %pvar.zz.surname;"}%nn;
-    %apply;one_pvar_json(zz+1)
+    %if;pvar.zz.exist;
+      %if;(zz!=1),%end;
+      {"i":"%pvar.zz.index;","p":"%pvar.zz.first_name;","n":"%pvar.zz.surname;"%if;(pvar.zz.occ!=0),"oc":"%pvar.zz.occ;"%end;%if;(e.tzz!=""),"t":"%e.tzz;"%end;,"self":"%pvar.zz;"}%nn;
+      %apply;one_pvar_json(zz+1)
+    %end;
   %end;
 %end;
 %define;my_hidden(xx)
@@ -82,6 +95,9 @@
 <div class="container-xl">
 <form id="upd">
   <div class="h2 m-3">[*add/clear/show/edit the graph]3 RLM</div>
+  <div class="d-flex">
+  <div class="alert alert-warning mx-auto d-none">[*RLM unknowns persons]</div>
+  </div>
   %hidden;
   <input type="hidden" name="m" value='RLM'>
   %apply;my_hidden("spouse")
@@ -127,12 +143,12 @@
            <i class="fas fa-sync mr-2"></i>[*validate/delete]0
         </button>
         <div id="rlm-data" class="d-none">%[%apply;one_pvar_json(1)%]</div>
-        <button type="button" class="btn btn-info mr-4" id="saveRLMToStorage"
-                title="[*RLM update data/save data/show graph]1">
-          <i class="fas fa-download mr-2" aria-hidden="true"></i>[*Save]
+        <button type="button" class="btn btn-info mr-4" id="saveRLM"
+                title="[*RLM update data/save data/show graph]1" disabled>
+          <i class="fas fa-download mr-2" aria-hidden="true"></i>[*save]
         </button>
         <button type="button" class="btn btn-primary" id="showGraph"
-                title="[*RLM update data/save data/show graph]2">
+                title="[*RLM update data/save data/show graph]2" disabled>
           <i class="fas fa-eye mr-2"></i>[*add/clear/show/edit the graph]2
         </button>
       </td>
@@ -160,13 +176,6 @@ function updateArrowVisibility() {
   $('tbody tr:last .row_move_down').css('visibility', 'hidden');
   updateLineNumbers();
 }
-$(document).ready(function() {
-  updateArrowVisibility();
-  const enableRefresh = () => $('#refreshForm').prop('disabled', false);
-  $(document)
-    .on('input change', 'tbody input', enableRefresh)
-    .on('click', '.row_add, .row_delete', enableRefresh);
-});
 $(document).on( "click", ".row_add", function() {
   var newRow = $("#template_line").clone().removeAttr("id").removeAttr("style");
   if($(this).closest('tfoot').length) {
@@ -199,19 +208,15 @@ $(document).on("click", ".row_move_down", function() {
 $(document).on( "change", ".reset_bd_text", function() {
   $(this).closest( "tr" ).children( ".bd_text").html( "" );
 });
-$('#saveRLMToStorage').on('click', function() {
+$('#saveRLM').on('click', function() {
   const jsonData = $('#rlm-data').text().trim();
   if (jsonData) { localStorage.setItem('inds', jsonData); }
 });
 function buildUrl(mode = 'RLM') {
   var dataIndex = 1;
   var params = new URLSearchParams();
-  if (mode === 'RLM') {
-    params.set('m', 'RLM');
-  } else {
-    params.set('m', 'TP');
-    params.set('v', 'updRLM');
-  }
+  params.set('m', mode);
+  if (mode === 'TP') params.set('v', 'updRLM');
   $('tbody tr:visible').each(function() {
     var $row = $(this);
     var firstName = $row.find("input[name='p']").val().trim();
@@ -219,7 +224,7 @@ function buildUrl(mode = 'RLM') {
     if (firstName !== "" && lastName !== "") {
       params.set('p' + dataIndex, firstName);
       params.set('n' + dataIndex, lastName);
-      var oc = $row.find("input[name='oc']").val().trim();
+      var oc = $row.find("input[name='oc']").val();
       if (oc !== "" && oc !== "0") {
         params.set('oc' + dataIndex, oc);
       }
@@ -232,11 +237,31 @@ function buildUrl(mode = 'RLM') {
   });
   return '?' + params.toString();
 }
+$('#refreshForm').on('click', function() {
+  window.location.href = buildUrl('TP');
+});
 $('#showGraph').on('click', function() {
   window.location.href = buildUrl('RLM');
 });
-$('#refreshForm').on('click', function() {
-  window.location.href = buildUrl('TP');
+function checkFormValidity() {
+  const warningRows = $('tbody tr.bg-warning, tbody tr .bg-warning').length;
+  const noErrors = warningRows === 0;
+  if (noErrors) {
+    $('#saveRLM, #showGraph').prop('disabled', false);
+  } else {
+    $('.alert-warning').removeClass('d-none');
+  }
+}
+$(document).ready(function() {
+  updateArrowVisibility();
+  checkFormValidity();
+  const enableRefresh = () => {
+    $('#refreshForm').prop('disabled', false);
+    setTimeout(checkFormValidity, 100);
+  };
+  $(document)
+    .on('input change', 'tbody input', enableRefresh)
+    .on('click', '.row_add, .row_del, .row_move_up, .row_move_down', enableRefresh);
 });
 </script>
 </body>
