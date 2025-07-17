@@ -1087,18 +1087,78 @@ let print_multi conf base =
   let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t =
     Hashtbl.create 53
   in
-  let pl =
-    let rec loop pl i =
-      let k = string_of_int i in
-      match find_person_in_env conf base k with
-      | Some p ->
-          (match p_getenv conf.env ("t" ^ k) with
-          | Some x -> Hashtbl.add assoc_txt (Driver.get_iper p) x
-          | None -> ());
-          loop (p :: pl) (i + 1)
-      | None -> List.rev pl
-    in
-    loop [] 1
+  let has_pnoc_params =
+    List.exists
+      (fun (key, _) ->
+        String.length key >= 2
+        && (String.get key 0 = 'p' || String.get key 0 = 'n')
+        && String.for_all
+             (function '0' .. '9' -> true | _ -> false)
+             (String.sub key 1 (String.length key - 1)))
+      conf.env
   in
-  let lim = Option.value ~default:0 (p_getint conf.env "lim") in
-  print_multi_relation conf base pl lim assoc_txt
+  if has_pnoc_params then (
+    let converted_params = ref [] in
+    let new_index = ref 1 in
+    let rec loop i =
+      let k = string_of_int i in
+      let has_i = p_getenv conf.env ("i" ^ k) <> None in
+      let has_p = p_getenv conf.env ("p" ^ k) <> None in
+      if has_i || has_p then (
+        (if has_i then (
+           (* i* déjà présent → garder tel quel *)
+           let id = Option.get (p_getenv conf.env ("i" ^ k)) in
+           let txt_param =
+             match p_getenv conf.env ("t" ^ k) with
+             | Some txt when txt <> "" ->
+                 "&t" ^ string_of_int !new_index ^ "="
+                 ^ (Mutil.encode txt :> string)
+             | _ -> ""
+           in
+           converted_params :=
+             ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+             :: !converted_params;
+           incr new_index)
+         else
+           (* p/n/oc → essayer de convertir *)
+           match find_person_in_env conf base k with
+           | Some p ->
+               let id = Driver.Iper.to_string (Driver.get_iper p) in
+               let txt_param =
+                 match p_getenv conf.env ("t" ^ k) with
+                 | Some txt when txt <> "" ->
+                     Hashtbl.add assoc_txt (Driver.get_iper p) txt;
+                     "&t" ^ string_of_int !new_index ^ "="
+                     ^ (Mutil.encode txt :> string)
+                 | _ -> ""
+               in
+               converted_params :=
+                 ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+                 :: !converted_params;
+               incr new_index
+           | None -> ());
+        loop (i + 1))
+    in
+    loop 1;
+    let clean_url =
+      Printf.sprintf "%s?m=RLM&%s"
+        (conf.command :> string)
+        (String.concat "&" (List.rev !converted_params))
+    in
+    Wserver.http_redirect_temporarily clean_url)
+  else
+    let pl =
+      let rec loop pl i =
+        let k = string_of_int i in
+        match find_person_in_env conf base k with
+        | Some p ->
+            (match p_getenv conf.env ("t" ^ k) with
+            | Some x -> Hashtbl.add assoc_txt (Driver.get_iper p) x
+            | None -> ());
+            loop (p :: pl) (i + 1)
+        | None -> List.rev pl
+      in
+      loop [] 1
+    in
+    let lim = Option.value ~default:0 (p_getint conf.env "lim") in
+    print_multi_relation conf base pl lim assoc_txt
