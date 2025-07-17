@@ -295,10 +295,21 @@ end = struct
         if places = [] then default else test_date_place (fun _ -> true)
 
   let match_occupation ~base ~p ~occupation =
-    if occupation = "" then true
-    else
-      string_incl (abbrev_lower occupation)
-        (abbrev_lower @@ Gwdb.sou base @@ Gwdb.get_occupation p)
+    let clean s =
+      let is_delimiter c =
+        let delimiters = [ ','; ';'; '.' ] in
+        List.exists (Uchar.equal c) (List.map Uchar.of_char delimiters)
+      in
+      Utf8.filter_map
+        (function
+          | `Malformed _ -> None
+          | `Uchar c ->
+              Ext_option.return_if (not @@ is_delimiter c) (fun () -> c))
+        (Utf8.unaccent @@ Utf8.lowercase s)
+    in
+    occupation = ""
+    || string_incl (clean occupation)
+         (clean @@ Gwdb.sou base @@ Gwdb.get_occupation p)
 
   let match_baptism_date =
     match_date ~df:(fun p -> Date.cdate_to_dmy_opt (Gwdb.get_baptism p))

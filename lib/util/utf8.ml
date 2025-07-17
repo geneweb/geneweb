@@ -98,7 +98,7 @@ let initial n =
 module C = struct
   type t = Str of string | Chr of char | Empty
 
-  let unaccent trimmed s i0 len =
+  let unaccent_next trimmed s i0 len =
     let rec loop i =
       if i < len then
         match
@@ -193,8 +193,8 @@ module C = struct
       else if i1 >= String.length n1 then -1
       else if i2 >= String.length n2 then 1
       else
-        let c1, i1, ii1 = unaccent !trimmed1 n1 i1 (String.length n1) in
-        let c2, i2, ii2 = unaccent !trimmed2 n2 i2 (String.length n2) in
+        let c1, i1, ii1 = unaccent_next !trimmed1 n1 i1 (String.length n1) in
+        let c2, i2, ii2 = unaccent_next !trimmed2 n2 i2 (String.length n2) in
         let () = trimmed1 := true in
         let () = trimmed2 := true in
         let cmp_aux = function
@@ -274,7 +274,7 @@ let start_with_wildcard ?(ignore_case = false) ini i s =
 
 let normalize s = Uunf_string.normalize_utf_8 `NFC s
 
-let unaccent lower s i =
+let unaccent_next lower s i =
   let fns =
     if lower then fun n s -> (String.lowercase_ascii s, n) else fun n s -> (s, n)
   in
@@ -295,11 +295,28 @@ let alphabetic_utf_8 n1 n2 =
     else if i1 >= String.length n1 then -1
     else if i2 >= String.length n2 then 1
     else
-      let cv1, ii1 = unaccent false n1 i1 in
-      let cv2, ii2 = unaccent false n2 i2 in
+      let cv1, ii1 = unaccent_next false n1 i1 in
+      let cv2, ii2 = unaccent_next false n2 i2 in
       let c = Stdlib.compare cv1 cv2 in
       if c = 0 then loop ii1 ii2 else c
   in
   if n1 = n2 then 0 else loop 0 0
 
 let alphabetic_order n1 n2 = alphabetic_utf_8 n1 n2
+let iter f s = Uutf.String.fold_utf_8 (fun () _ c -> f c) () s
+
+let filter_map f s =
+  let buffer = Buffer.create @@ String.length s in
+  let () =
+    iter (fun c -> Option.iter (Buffer.add_utf_8_uchar buffer) (f c)) s
+  in
+  Buffer.contents buffer
+
+let unaccent s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let t, j = unaccent_next false s i in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0
