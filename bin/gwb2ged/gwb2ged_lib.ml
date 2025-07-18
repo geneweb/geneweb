@@ -270,13 +270,13 @@ let display_note opts ?source_page tagn s =
     let tag = Printf.sprintf "%d NOTE " tagn in
     Printf.ksprintf (oc opts) "%s" tag;
     display_note_aux opts tagn (encode opts s) (String.length tag) 0);
-  match source_page with
-  | None -> ()
-  | Some source_page ->
+  Option.iter
+    (fun source_page ->
       (* source_page is used to add a source with page information;
          so we can re-import wiki notes and correctly re-link them together *)
       Printf.ksprintf (oc opts) "%d SOUR\n" (tagn + 1);
-      Printf.ksprintf (oc opts) "%d PAGE %s\n" (tagn + 2) source_page
+      Printf.ksprintf (oc opts) "%d PAGE %s\n" (tagn + 2) source_page)
+    source_page
 
 let write_base_notes opts base =
   (* TODO WIKI what about wizard notes *)
@@ -492,12 +492,12 @@ let ged_ev_detail opts n typ d pl note src =
   | _ -> ());
   Printf.ksprintf (oc opts) "\n";
   if typ = "" then () else Printf.ksprintf (oc opts) "%d TYPE %s\n" n typ;
-  (match d with
-  | Some d ->
+  Option.iter
+    (fun d ->
       Printf.ksprintf (oc opts) "%d DATE " n;
       ged_date opts d;
-      Printf.ksprintf (oc opts) "\n"
-  | None -> ());
+      Printf.ksprintf (oc opts) "\n")
+    d;
   if pl <> "" then Printf.ksprintf (oc opts) "%d PLAC %s\n" n (encode opts pl);
   display_note opts n note;
   if opts.Gwexport.source = None && src <> "" then
@@ -623,12 +623,12 @@ let adop_fam_list = ref []
 
 let ged_fam_adop opts i (fath, moth, _) =
   Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" i;
-  (match fath with
-  | Some i -> Printf.ksprintf (oc opts) "1 HUSB @I%d@\n" (int_of_iper i + 1)
-  | None -> ());
-  match moth with
-  | Some i -> Printf.ksprintf (oc opts) "1 WIFE @I%d@\n" (int_of_iper i + 1)
-  | None -> ()
+  Option.iter
+    (fun i -> Printf.ksprintf (oc opts) "1 HUSB @I%d@\n" (int_of_iper i + 1))
+    fath;
+  Option.iter
+    (fun i -> Printf.ksprintf (oc opts) "1 WIFE @I%d@\n" (int_of_iper i + 1))
+    moth
 
 let ged_ind_ev_str opts base per per_sel =
   List.iter (ged_pevent opts base per_sel) (Gwdb.get_pevents per)
@@ -674,23 +674,22 @@ let ged_ind_attr_str opts base per =
   List.iter (ged_title opts base per) (Gwdb.get_titles per)
 
 let ged_famc opts fam_sel asc =
-  match Gwdb.get_parents asc with
-  | Some ifam ->
+  Option.iter
+    (fun ifam ->
       if fam_sel ifam then
-        Printf.ksprintf (oc opts) "1 FAMC @F%d@\n" (int_of_ifam ifam + 1)
-  | None -> ()
+        Printf.ksprintf (oc opts) "1 FAMC @F%d@\n" (int_of_ifam ifam + 1))
+    (Gwdb.get_parents asc)
 
 let ged_fams opts fam_sel ifam =
   if fam_sel ifam then
     Printf.ksprintf (oc opts) "1 FAMS @F%d@\n" (int_of_ifam ifam + 1)
 
-let ged_godparent opts per_sel godp = function
-  | Some ip ->
+let ged_godparent opts per_sel godp =
+  Option.iter (fun ip ->
       if per_sel ip then (
         Printf.ksprintf (oc opts) "1 ASSO @I%d@\n" (int_of_iper ip + 1);
         Printf.ksprintf (oc opts) "2 TYPE INDI\n";
-        Printf.ksprintf (oc opts) "2 RELA %s\n" godp)
-  | None -> ()
+        Printf.ksprintf (oc opts) "2 RELA %s\n" godp))
 
 let ged_witness opts fam_sel ifam =
   if fam_sel ifam then (
@@ -736,13 +735,13 @@ let has_image_file opts base p =
 
 let ged_multimedia_link opts base per =
   match Gwdb.sou base (Gwdb.get_image per) with
-  | "" -> (
+  | "" ->
       if (not opts.Gwexport.no_picture) && opts.Gwexport.picture_path then
-        match has_image_file opts base per with
-        | Some s ->
+        Option.iter
+          (fun s ->
             Printf.ksprintf (oc opts) "1 OBJE\n";
-            Printf.ksprintf (oc opts) "2 FILE %s\n" s
-        | None -> ())
+            Printf.ksprintf (oc opts) "2 FILE %s\n" s)
+          (has_image_file opts base per)
   | s ->
       if not opts.Gwexport.no_picture then (
         Printf.ksprintf (oc opts) "1 OBJE\n";
