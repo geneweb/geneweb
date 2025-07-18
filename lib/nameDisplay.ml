@@ -369,36 +369,50 @@ let first_child conf base p =
   loop 0
 
 let specify_homonymous conf base p specify_public_name =
-  match (Gwdb.get_public_name p, Gwdb.get_qualifiers p) with
-  | n, nn :: _ when Gwdb.sou base n <> "" && specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ Gwdb.sou base n);
-      Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ Gwdb.sou base nn);
-      Output.print_sstring conf "</em>"
-  | _, nn :: _ when specify_public_name ->
-      Output.print_sstring conf " ";
+  let public_name () =
+    let n = Gwdb.get_public_name p in
+    Ext_option.return_if (Gwdb.sou base n <> "") (fun () -> n)
+  in
+  let first_qualifier () =
+    match Gwdb.get_qualifiers p with
+    | [] -> None
+    | qualifier :: _ -> Some qualifier
+  in
+  let print_first_qualifier ~with_first_name nn =
+    if with_first_name then
       Output.print_string conf (esc @@ Gwdb.p_first_name base p);
-      Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ Gwdb.sou base nn);
-      Output.print_sstring conf "</em>"
-  | n, [] when Gwdb.sou base n <> "" && specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ Gwdb.sou base n)
-  | _, _ ->
-      (* Le nom public et le qualificatif ne permettent pas de distinguer *)
-      (* la personne, donc on affiche les informations sur les parents,   *)
-      (* le mariage et/ou le premier enfant.                              *)
-      let cop = child_of_parent conf base p in
-      if (cop :> string) <> "" then (
+    Output.print_sstring conf " <em>";
+    Output.print_string conf (esc @@ Gwdb.sou base nn);
+    Output.print_sstring conf "</em>"
+  in
+  let print_relations () =
+    let cop = child_of_parent conf base p in
+    if (cop :> string) <> "" then (
+      Output.print_sstring conf ", ";
+      Output.print_string conf cop);
+    let hw = husband_wife conf base p true in
+    if (hw :> string) = "" then (
+      let fc = first_child conf base p in
+      if (fc :> string) <> "" then (
         Output.print_sstring conf ", ";
-        Output.print_string conf cop);
-      let hw = husband_wife conf base p true in
-      if (hw :> string) = "" then (
-        let fc = first_child conf base p in
-        if (fc :> string) <> "" then (
-          Output.print_sstring conf ", ";
-          Output.print_string conf fc))
-      else (
-        Output.print_sstring conf ", ";
-        Output.print_string conf hw)
+        Output.print_string conf fc))
+    else (
+      Output.print_sstring conf ", ";
+      Output.print_string conf hw)
+  in
+  let print_public_name () =
+    match (public_name (), first_qualifier ()) with
+    | Some n, Some nn ->
+        Output.print_sstring conf " ";
+        Output.print_string conf (esc @@ Gwdb.sou base n);
+        print_first_qualifier ~with_first_name:false nn
+    | None, Some nn ->
+        Output.print_sstring conf " ";
+        print_first_qualifier ~with_first_name:true nn
+    | Some n, None ->
+        Output.print_sstring conf " ";
+        Output.print_string conf (esc @@ Gwdb.sou base n)
+    | None, None -> ()
+  in
+  if specify_public_name then print_public_name ();
+  print_relations ()
