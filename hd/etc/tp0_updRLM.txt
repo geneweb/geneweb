@@ -13,7 +13,8 @@
 %include;home
 %include;hed
 %let;mid;%sp;class="align-middle"%in;
-%define;one_pvar_line(znz,zocz,zfnz,zsnz,zbdz,ztz,zparamz)
+%let;max_index;%pvar.highest;%in;
+%define;one_pvar_line(znz,zfnz,zsnz,zocz,zbdz,ztz,zparamz)
   <trzparamz>
     <td class="align-middle text-center text-nowrap px-3">
       <button type="button" class="btn btn-success btn-sm row_add"
@@ -50,31 +51,55 @@
 %define;one_pvar(zz)
   %if;(e.izz!="" or e.pzz!="")
     %let;datespan;
-      <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
-        %if;pvar.zz.has_birth_date;
-          <div aria-label="[*birth date]">° %pvar.zz.slash_birth_date;</div>
-        %elseif;pvar.zz.has_baptism_date;
-          <div aria-label="[*baptism date]"><span class="text-danger">°</span> %pvar.zz.slash_baptism_date;</div>
-        %end;
-        %if;pvar.zz.has_death_date;
-          <div aria-label="[*death date]">† %pvar.zz.slash_death_date;</div>
-        %elseif;pvar.zz.has_burial_date;
-          <div aria-label="[*burial date]"><span class="text-danger">†</span> %pvar.zz.slash_burial_date;</div>
-        %elseif;pvar.zz.has_cremation_date;
-          <div aria-label="[*cremation date]"><span class="text-danger">†</span>%pvar.zz.slash_cremation_date;</div>
-        %end;
-      </div>
+      %if;pvar.zz.exist;
+        <div class="d-flex flex-column justify-content-center" style="line-height: 0.9;">
+          %if;pvar.zz.has_birth_date;
+            <div aria-label="[*birth date]">° %pvar.zz.slash_birth_date;</div>
+          %elseif;pvar.zz.has_baptism_date;
+            <div aria-label="[*baptism date]"><span class="text-danger">°</span> %pvar.zz.slash_baptism_date;</div>
+          %end;
+          %if;pvar.zz.has_death_date;
+            <div aria-label="[*death date]">† %pvar.zz.slash_death_date;</div>
+          %elseif;pvar.zz.has_burial_date;
+            <div aria-label="[*burial date]"><span class="text-danger">†</span> %pvar.zz.slash_burial_date;</div>
+          %elseif;pvar.zz.has_cremation_date;
+            <div aria-label="[*cremation date]"><span class="text-danger">†</span>%pvar.zz.slash_cremation_date;</div>
+          %end;
+        </div>
+      %else;
+        <div class="text-center">[unknown person]!!</div>
+      %end;
     %in;
-    %apply;one_pvar_line("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, datespan, e.tzz, "")
+    %if;(pvar.zz.exist)
+      %apply;one_pvar_line("zz", pvar.zz.first_name, pvar.zz.surname, pvar.zz.occ, datespan, e.tzz, "")
+    %else;
+      %apply;one_pvar_line("zz", e.pzz, e.nzz, e.oczz, datespan, e.tzz, " class='bg-warning'")
+    %end;
+  %end;
+  %if;(zz<=max_index)
     %apply;one_pvar(zz+1)
+  %end;
+%end;
+%define;one_pvar_json(zz)
+  %if;(e.izz!="" or e.pzz!="")
+    %if;pvar.zz.exist;
+      %if;(zz!=1),%end;
+      {"i":"%pvar.zz.index;","p":"%pvar.zz.first_name;","n":"%pvar.zz.surname;"%if;(pvar.zz.occ!=0),"oc":"%pvar.zz.occ;"%end;%if;(e.tzz!=""),"t":"%e.tzz;"%end;,"self":"%pvar.zz;"}%nn;
+    %end;
+  %end;
+  %if;(zz<=max_index)
+    %apply;one_pvar_json(zz+1)
   %end;
 %end;
 %define;my_hidden(xx)
   %if;(e.xx!="")<input type="hidden" name="xx" value="%e.xx;">%end;
 %end;
 <div class="container-xl">
-<form id="upd" method="post" action="%action;">
+<form id="upd">
   <div class="h2 m-3">[*add/clear/show/edit the graph]3 RLM</div>
+  <div class="d-flex">
+  <div class="alert alert-warning mx-auto d-none">[*RLM unknowns persons]</div>
+  </div>
   %hidden;
   <input type="hidden" name="m" value='RLM'>
   %apply;my_hidden("spouse")
@@ -110,13 +135,30 @@
     </tbody>
     <tfoot>
       <td colspan="8" class="text-center p-2">
-        <button type="button" class="btn btn-success row_add mr-3"
+        <button type="button" class="btn btn-success row_add mr-4"
                 title="[*add/insert/delete/up/down row]0">
-          <i class="fas fa-plus" aria-hidden="true"></i>
+          <i class="fas fa-plus mr-2" aria-hidden="true"></i>%nn;
           [*add/insert/delete/up/down row aria-label]0
         </button>
-        <input type="submit" class="btn btn-primary"
-               value="[*validate/delete]0" title="[*validate form]">
+        <button type="button" class="btn btn-outline-info mr-2" id="refreshForm"
+                title="[*RLM update data/save data/show graph]0" disabled>
+           <span class="mr-2">
+             <i class="fas fa-check toggle-icon"></i>
+             <i class="fas fa-sync toggle-icon d-none"></i>
+           </span>[*validate/delete]0
+        </button>
+        <div id="rlm-data" class="d-none">%[%apply;one_pvar_json(1)%]</div>
+        <button type="button" class="btn btn-info mr-4" id="saveRLM"
+                title="[*RLM update data/save data/show graph]1" disabled>
+          <span class="mr-2">
+            <i class="fas fa-download toggle-icon"></i>
+            <i class="fas fa-check toggle-icon d-none"></i>
+          </span>[*save]
+        </button>
+        <button type="button" class="btn btn-primary" id="showGraph"
+                title="[*RLM update data/save data/show graph]2" disabled>
+          <i class="fas fa-eye mr-2"></i>[*add/clear/show/edit the graph]2
+        </button>
       </td>
     </tfoot>
   </table>
@@ -142,9 +184,9 @@ function updateArrowVisibility() {
   $('tbody tr:last .row_move_down').css('visibility', 'hidden');
   updateLineNumbers();
 }
-$(document).ready(function() {
-  updateArrowVisibility();
-});
+function toggleIcons(buttonId) {
+  $(buttonId + ' .toggle-icon').toggleClass('d-none');
+}
 $(document).on( "click", ".row_add", function() {
   var newRow = $("#template_line").clone().removeAttr("id").removeAttr("style");
   if($(this).closest('tfoot').length) {
@@ -177,24 +219,85 @@ $(document).on("click", ".row_move_down", function() {
 $(document).on( "change", ".reset_bd_text", function() {
   $(this).closest( "tr" ).children( ".bd_text").html( "" );
 });
-$("#upd").submit(function(event) {
-  event.preventDefault();
+$('#saveRLM').on('click', function() {
+  const jsonData = $('#rlm-data').text().trim();
+  if (jsonData) { 
+    localStorage.setItem('inds', jsonData);
+    toggleIcons('#saveRLM');
+    setTimeout(() => toggleIcons('#saveRLM'), 2000);
+  }
+});
+function buildUrl(mode = 'RLM') {
   var dataIndex = 1;
+  var params = new URLSearchParams();
+  params.set('m', mode);
+  if (mode === 'TP') params.set('v', 'updRLM');
   $('tbody tr:visible').each(function() {
     var $row = $(this);
     var firstName = $row.find("input[name='p']").val().trim();
     var lastName = $row.find("input[name='n']").val().trim();
-    if(firstName !== "" && lastName !== "") {
-      $row.find("input[name='oc']").attr("name", "oc" + dataIndex);
-      $row.find("input[name='p']").attr("name", "p" + dataIndex);
-      $row.find("input[name='n']").attr("name", "n" + dataIndex);
-      $row.find("input[name='t']").attr("name", "t" + dataIndex);
+    if (firstName !== "" || lastName !== "") {
+      if (firstName !== "") params.set('p' + dataIndex, firstName);
+      if (lastName !== "") params.set('n' + dataIndex, lastName);
+      var oc = $row.find("input[name='oc']").val();
+      if (oc !== "" && oc !== "0") {
+        params.set('oc' + dataIndex, oc);
+      }
+      var text = $row.find("input[name='t']").val().trim();
+      if (text !== "") {
+        params.set('t' + dataIndex, text);
+      }
       dataIndex++;
-    } else {
-      $row.find("input").prop("disabled", true);
     }
   });
-  $(this).unbind('submit').submit();
+  return '?' + params.toString();
+}
+$('#refreshForm').on('click', function() {
+  window.location.href = buildUrl('TP');
+});
+$('#showGraph').on('click', function() {
+  window.location.href = buildUrl('RLM');
+});
+function checkFormValidity() {
+  const warningRows = $('tbody tr.bg-warning, tbody tr .bg-warning').length;
+  const noErrors = warningRows === 0;
+  if (noErrors) {
+    $('#saveRLM, #showGraph').prop('disabled', false);
+  } else {
+    $('.alert-warning').removeClass('d-none');
+  }
+}
+$(document).ready(function() {
+  updateArrowVisibility();
+  checkFormValidity();
+  setTimeout(() => {
+    const $firstWarning = $('tbody tr.bg-warning:first input[name="p"]');
+    if ($firstWarning.length > 0) {
+      const input = $firstWarning[0];
+      $firstWarning.focus();
+      if (input.setSelectionRange) {
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    } else {
+      $('#saveRLM').focus();
+    }
+  }, 300);
+  const enableRefresh = () => {
+    if ($('#refreshForm').prop('disabled')) {
+      $('#refreshForm').prop('disabled', false);
+      setTimeout(checkFormValidity, 100);
+      toggleIcons('#refreshForm');
+    }
+  };
+  $(document)
+    .on('input change', 'tbody input', enableRefresh)
+    .on('click', '.row_add, .row_del, .row_move_up, .row_move_down', enableRefresh)
+    .on('keydown', function(e) {
+      if (e.key === 'Enter' && !$('#refreshForm').prop('disabled')) {
+        e.preventDefault();
+        $('#refreshForm').click();
+      }
+    });
 });
 </script>
 </body>

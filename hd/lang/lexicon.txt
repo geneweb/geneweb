@@ -4174,6 +4174,16 @@ sl: baza podatkov ni dostopna
 sv: kan inte nå databasen
 tr: tabana erişilemiyor
 
+    RLM update data/save data/show graph
+de: die URL-Daten aktualisieren um geänderte Personen zu überprüfen/diese Daten im Browser-Speicher speichern/den Baum mit diesen Daten anzeigen
+en: update the URL data to verify modified individuals/save this data in browser memory/display the tree with this data
+fr: actualiser les données en URL pour vérifier les individus modifiés/sauvegarder ces données en mémoire du navigateur/afficher l’arbre avec ces données
+
+    RLM unknowns persons
+de: unbekannte Person(en): korrigieren Sie die gelb markierten Personen um speichern oder anzeigen zu können!
+en: unknown person(s): correct the individuals highlighted in yellow to be able to save or display the graph!
+fr: personne(s) non trouvée(s) : corriger les individus en jaune pour pour pouvoir sauvegarder ou afficher le graphe !
+
     cannot change sex of a married person
 af: kan die geslag van 'n getroude persoon nie verander nie
 bg: не може да се промени полът на човек в брак
