@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2025]
+        os: [ubuntu-24.04, macos-15, windows-2022]
         ocaml-compiler: [4.14.2, 5.3.0]
         setup-version: [v3]
         include:
@@ -76,6 +76,10 @@ jobs:
         uses: ./.github/actions/ci-utils
         with:
           command: start-timer
+
+      - name: Update apt cache (Ubuntu only)
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt-get update
 
       - name: Configure Git for Windows
         if: runner.os == 'Windows'
@@ -112,7 +116,7 @@ jobs:
 
       - name: Setup Ocaml with v3
         if: matrix.setup-version == 'v3'
-        uses: ocaml/setup-ocaml@v3
+        uses: ocaml/setup-ocaml@v3.4.0
         with:
           ocaml-compiler: ${{ (!startsWith(matrix.os, 'windows') && matrix.ocaml-compiler == '4.14.2') && 'ocaml-variants.4.14.2+options,ocaml-option-nnp' || matrix.ocaml-compiler }}
 
