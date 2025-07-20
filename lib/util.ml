@@ -3099,3 +3099,23 @@ let sys_to_note_link p =
 let note_link_to_sys p =
   String.split_on_char NotesLinks.char_dir_sep p
   |> String.concat Filename.dir_sep
+
+(* TODO: Equivalent of String.for_all , removable when OCaml >= 4.13 *)
+let string_for_all pred s =
+  let len = String.length s in
+  let rec loop i =
+    if i >= len then true
+    else if pred (String.get s i) then loop (i + 1)
+    else false
+  in
+  loop 0
+
+let url_has_pnoc_params env =
+  List.exists
+    (fun (key, _) ->
+      String.length key >= 2
+      && (String.get key 0 = 'p' || String.get key 0 = 'n')
+      && string_for_all
+           (function '0' .. '9' -> true | _ -> false)
+           (String.sub key 1 (String.length key - 1)))
+    env
