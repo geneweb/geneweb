@@ -793,3 +793,8 @@ val sys_to_note_link : string -> string
 
 val note_link_to_sys : string -> string
 (** convert note_link path (a:b:c) to system format (a/b/c) *)
+
+val url_has_pnoc_params : (string * 'a) list -> bool
+(** [url_has_pnoc_params env] checks if the environment contains parameters
+    starting with 'p' or 'n' followed by digits (e.g., p1, n2, p34). Used to
+    detect persons accessed by key in URL parameters. *)

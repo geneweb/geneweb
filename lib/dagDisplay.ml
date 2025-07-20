@@ -1368,17 +1368,8 @@ let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
 
 let print conf base =
   (* Vérifier si URL en pnoc ou si on a déjà les index *)
-  let has_form_params =
-    List.exists
-      (fun (key, _) ->
-        String.length key >= 2
-        && (String.get key 0 = 'p' || String.get key 0 = 'n')
-        && String.for_all
-             (function '0' .. '9' -> true | _ -> false)
-             (String.sub key 1 (String.length key - 1)))
-      conf.env
-  in
-  if has_form_params then (
+  let has_pnoc_params = Util.url_has_pnoc_params conf.env in
+  if has_pnoc_params then (
     (* Récupérer tous les index *)
     let all_indexes =
       List.fold_left

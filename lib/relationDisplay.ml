@@ -1087,16 +1087,7 @@ let print_multi conf base =
   let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t =
     Hashtbl.create 53
   in
-  let has_pnoc_params =
-    List.exists
-      (fun (key, _) ->
-        String.length key >= 2
-        && (String.get key 0 = 'p' || String.get key 0 = 'n')
-        && String.for_all
-             (function '0' .. '9' -> true | _ -> false)
-             (String.sub key 1 (String.length key - 1)))
-      conf.env
-  in
+  let has_pnoc_params = Util.url_has_pnoc_params conf.env in
   if has_pnoc_params then (
     let converted_params = ref [] in
     let new_index = ref 1 in
