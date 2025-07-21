@@ -389,7 +389,7 @@ let rec reconstitute_pevents ~base conf form_is_modified cnt =
         | Epers_Death when is_empty_death conf cnt -> true
         | _ -> false
       in
-      let el = if (not skip) || form_is_modified then e :: el else el in
+      let el = if not skip then e :: el else el in
       (el, form_is_modified)
 
 let reconstitute_add_relation conf form_is_modified cnt rl =
