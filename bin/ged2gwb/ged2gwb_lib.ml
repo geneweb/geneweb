@@ -1238,7 +1238,8 @@ let adop_parent gen ip r =
   | Def.Right (p, a, u) ->
     if List.mem ip p.related then ()
     else
-      begin let p = { p with related = ip :: p.related } in
+      begin
+        let p = { p with related = ip :: p.related } in
         gen.g_per.arr.(i) <- Def.Right (p, a, u)
       end;
     Some p.key_index
@@ -2080,14 +2081,12 @@ let add_indi gen r =
   let ascend = {Def.parents = parents; consang = Adef.fix (-1)} in
   let union = {Def.family = Array.of_list family} in
   gen.g_per.arr.(ip) <- Def.Right (person, ascend, union);
-  begin match find_field "ADOP" r.rsons with
-    | Some r ->
+  let adoptions = find_all_fields "ADOP" r.rsons in
+  List.iter (fun r ->
       begin match find_field "FAMC" r.rsons with
         | Some r -> forward_adop gen ip r.rval (find_field "ADOP" r.rsons)
         | _ -> ()
-      end
-    | _ -> ()
-  end;
+      end) adoptions;
   r.rused <- true
 
 let find_fevent_name_from_tag gen tag tagv =
