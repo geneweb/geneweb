@@ -188,7 +188,7 @@
           <a href="%prefix;%sosa_ref.access;"
             title="[Sosa 1]">%sosa_ref;</a>%nn;
         %end;
-        %if;(l1!=0)%sp;[passing by]
+        %if;(l1!=0)%sp;[passing by](% TODO: use undecomposed translation %)
           %apply;ancestor%with;%apply;getvar(ancestor1)
                                %and;%apply;getvar(ancestor1_access)
                                %and;%apply;getvar(ancestor1_anc_sosa)
