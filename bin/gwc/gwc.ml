@@ -146,6 +146,9 @@ let speclist =
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
     ("-stats", Arg.Set Db1link.pr_stats, " Print statistics");
     ("-v", Arg.Set Gwcomp.verbose, " Verbose");
+    ( "-roglo_special",
+      Arg.Set Gwcomp.roglo_special,
+      " Spesial treatment for Roglo" );
   ]
   |> List.sort compare |> Arg.align
 
