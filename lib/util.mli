@@ -798,3 +798,16 @@ val url_has_pnoc_params : (string * 'a) list -> bool
 (** [url_has_pnoc_params env] checks if the environment contains parameters
     starting with 'p' or 'n' followed by digits (e.g., p1, n2, p34). Used to
     detect persons accessed by key in URL parameters. *)
+
+val print_loading_overlay :
+  Config.config -> ?custom_translation_key:string -> unit -> unit
+(** [print_loading_overlay conf ?custom_translation_key ()] generates a loading
+    overlay with a spinner and message. Uses the translation key
+    [waiting overlay] by default, or the provided custom translation key. The
+    overlay is initially hidden and can controlled via JavaScript functions. *)
+
+val print_loading_overlay_js : Config.config -> unit
+(** [print_loading_overlay_js conf] generates JavaScript functions to control
+    the loading overlay: showOverlay() to display it, hideOverlay() to hide it,
+    and automatic hiding when the page finishes loading. Works with any overlay
+    that has the "loading-overlay" CSS class. *)

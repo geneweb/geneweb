@@ -3119,3 +3119,38 @@ let url_has_pnoc_params env =
            (function '0' .. '9' -> true | _ -> false)
            (String.sub key 1 (String.length key - 1)))
     env
+
+(* Génère un overlay de chargement avec traduction possible *)
+let print_loading_overlay conf ?custom_translation_key () =
+  let translation_key =
+    Option.value custom_translation_key ~default:"waiting overlay"
+  in
+  let title = Utf8.capitalize_fst (transl_nth conf translation_key 0) in
+  let subtitle = Utf8.capitalize_fst (transl_nth conf translation_key 1) in
+  Output.printf conf
+    {|
+<div class="loading-overlay hidden">
+  <div class="text-center">
+    <div class="spinner-border text-light mb-3" role="status">
+      <span class="sr-only">Loading…</span>
+    </div>
+    <h4>%s</h4>
+    <p>%s</p>
+  </div>
+</div>|}
+    title subtitle
+
+let print_loading_overlay_js conf =
+  Output.printf conf
+    {|
+<script>
+function showOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.remove('hidden');
+}
+function hideOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', hideOverlay);
+</script>|}
