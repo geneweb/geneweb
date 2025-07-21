@@ -3120,6 +3120,60 @@ let url_has_pnoc_params env =
            (String.sub key 1 (String.length key - 1)))
     env
 
+let normalize_person_pool_url conf base target_module assoc_txt_opt =
+  let converted_params = ref [] in
+  let new_index = ref 1 in
+  let preserve_text = target_module = "RLM" in
+  let rec loop i =
+    let k = string_of_int i in
+    let has_i = p_getenv conf.env ("i" ^ k) <> None in
+    let has_p = p_getenv conf.env ("p" ^ k) <> None in
+    if has_i || has_p then (
+      (if has_i then (
+         let id = Option.get (p_getenv conf.env ("i" ^ k)) in
+         let txt_param =
+           if preserve_text then
+             match p_getenv conf.env ("t" ^ k) with
+             | Some txt when txt <> "" ->
+                 "&t" ^ string_of_int !new_index ^ "="
+                 ^ (Mutil.encode txt :> string)
+             | _ -> ""
+           else ""
+         in
+         converted_params :=
+           ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+           :: !converted_params;
+         incr new_index)
+       else
+         match find_person_in_env conf base k with
+         | Some p ->
+             let id = Driver.Iper.to_string (Driver.get_iper p) in
+             let txt_param =
+               if preserve_text then
+                 match p_getenv conf.env ("t" ^ k) with
+                 | Some txt when txt <> "" ->
+                     (match assoc_txt_opt with
+                     | Some assoc_txt ->
+                         Hashtbl.add assoc_txt (Driver.get_iper p) txt
+                     | None -> ());
+                     "&t" ^ string_of_int !new_index ^ "="
+                     ^ (Mutil.encode txt :> string)
+                 | _ -> ""
+               else ""
+             in
+             converted_params :=
+               ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+               :: !converted_params;
+             incr new_index
+         | None -> ());
+      loop (i + 1))
+  in
+  loop 1;
+  Printf.sprintf "%s?m=%s&%s"
+    (conf.command :> string)
+    target_module
+    (String.concat "&" (List.rev !converted_params))
+
 (* Génère un overlay de chargement avec traduction possible *)
 let print_loading_overlay conf ?custom_translation_key () =
   let translation_key =

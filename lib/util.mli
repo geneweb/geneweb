@@ -799,6 +799,27 @@ val url_has_pnoc_params : (string * 'a) list -> bool
     starting with 'p' or 'n' followed by digits (e.g., p1, n2, p34). Used to
     detect persons accessed by key in URL parameters. *)
 
+val normalize_person_pool_url :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  string ->
+  (Geneweb_db.Driver.iper, string) Hashtbl.t option ->
+  string
+(** [normalize_person_pool_url conf base target_module assoc_txt_opt] Converts
+    mixed person parameters (p/n/oc and i) to normalized index-only URLs.
+
+    - Converts p1/n1/oc1 → i1, p2/n2/oc2 → i2, etc.
+    - Preserves existing i1, i2, etc. parameters as-is
+    - For RLM mode: preserves t= text parameters in URL and fills assoc_txt
+    - For RM mode: strips all t= parameters (cleaner URLs)
+    - Returns clean URL with format: "?m=TARGET&i1=123&i2=456..."
+
+    @param conf Configuration
+    @param base Database
+    @param target_module Target module name ("RLM" or "RM")
+    @param assoc_txt_opt Optional hashtable for text descriptions (RLM only)
+    @return Normalized URL string *)
+
 val print_loading_overlay :
   Config.config -> ?custom_translation_key:string -> unit -> unit
 (** [print_loading_overlay conf ?custom_translation_key ()] generates a loading
