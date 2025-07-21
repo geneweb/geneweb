@@ -2,7 +2,7 @@
 #                                                      STAGE 1: Build Geneweb
 ###############################################################################
 
-FROM ocaml/opam:debian-ocaml-4.14-nnp@sha256:adb86241b87b40c074ff5dcdb172aa3b408209f1cf57c85db8a1350d56a4a650 AS builder
+FROM ocaml/opam:debian-ocaml-4.14-nnp@sha256:cbcd007203b1245aaba5b4e20eb5854769da2dadcf20d4957e3a8ff97c745175 AS builder
 
 ENV OPAMYES=yes
 ENV OPAMJOBS=2
