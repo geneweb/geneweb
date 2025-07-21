@@ -29,9 +29,9 @@ type highlight_style = {
 let first_word s =
   try
     let i = String.index s ' ' in
-    if i = String.length s then if i > 6 then String.sub s 0 6 else s
+    if i = String.length s then if i > 7 then String.sub s 0 7 else s
     else String.sub s 0 i
-  with Not_found -> if String.length s > 6 then String.sub s 0 6 else s
+  with Not_found -> if String.length s > 7 then String.sub s 0 7 else s
 
 (* Split a string into its words, filtering out empty strings *)
 let split_words s =
@@ -417,7 +417,13 @@ let make_highlight_html s positions error_type conf =
   process_char 0 false
 
 let make_error_html conf data entry error_type =
-  let s = first_word entry in
+  let s =
+    if data = "place" then
+      let main_place = Place.without_suburb entry in
+      if String.length main_place > 7 then String.sub main_place 0 7
+      else main_place
+    else first_word entry
+  in
   let s1 = entry in
   let s2 = fix_error error_type entry in
   let positions = find_error_positions error_type entry in
