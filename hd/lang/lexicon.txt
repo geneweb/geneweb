@@ -20085,6 +20085,11 @@ ru: личность
 sv: individ
 tr: bireysel
 
+    waiting overlay
+de: Datenbank wird analysiert/dies kann einen Moment dauern
+en: analyzing the database/this may take a moment
+fr: analyse de la base de données/ceci peut prendre quelques instants
+
     warning refresh
 co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale osinnò si ripiteria u scambiu di e fiure.
 de: Aktualisieren Sie die Seite nicht, ohne vorher auf das Symbol zu klicken, da dies den Bildaustausch wiederholen würde.
