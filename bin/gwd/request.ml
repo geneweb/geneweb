@@ -896,6 +896,7 @@ let treat_request =
                    conf.Config.request
              | "RESET_IMAGE_C_OK" -> w_base @@ ImageCarrousel.print_main_c
              | "RL" -> w_base @@ RelationLink.print
+             | "RM" -> w_base @@ RelationMatrix.print
              | "RLM" -> w_base @@ RelationDisplay.print_multi
              | "S" ->
                  w_base @@ fun conf base ->

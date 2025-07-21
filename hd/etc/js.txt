@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
     populateDatalists();
   %end;
 %end;
-%if;(is_welcome or "MOD_DATA" in e.m)
+%if;(is_welcome or "MOD_DATA" in e.m or e.m="RM")
   initTooltips();
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")

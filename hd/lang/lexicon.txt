@@ -1916,37 +1916,37 @@ sv: lägg till det förra namnet som efternamnsalias
 tr: önceki adı, takma soyadı olarak ekleyin
 
     add/clear/show/edit the graph
-af: voeg %tby die grafiek/verwyder die grafiek/wys die grafiek/wysig die grafiek
-ar: أضف %tإلى الرسم البياني/مسح الرسم البياني/عرض الرسم البياني/تعديل الرسم البياني
-bg: добави %tкъм графиката/изчисти графиката/покажи графиката/редактирай графиката
-br: ouzhpennañ %td'ar grafik/sileiñ ar grafik/diskouez ar grafik/digentañ ar grafik
-ca: afegir %tal gràfic/esborrar el gràfic/mostrar el gràfic/editar el gràfic
-co: aghjunghje %tà u graficu/squassà u graficu/affissà u graficu/mudificà u graficu
-cs: přidat %tdo grafu/vymazat graf/zobrazit graf/upravit graf
-da: tilføj %ttil grafen/ryd grafen/vis grafen/rediger grafen
-de: hinzufügen %tzum Graphen/den Graphen löschen/den Graphen anzeigen/den Graphen editieren
-en: add %tto the graph/clear the graph/show the graph/edit the graph
-eo: aldoni %tal la grafiko/forigi la grafikon/montri la grafikon/redakti la grafikon
-es: añadir %tal gráfico/borrar el gráfico/mostrar el gráfico/editar el gráfico
-et: lisa %tgraafikusse/kustuta graafik/näita graafikut/muuda graafikut
-fi: lisää %tgraafiin/tyhjennä graafi/näytä graafi/muokkaa graafia
-fr: ajouter %tau graphe/effacer le graphe/afficher le graphe/éditer le graphe
-he: הוסף %tלגרף/נקה את הגרף/הצג את הגרף/ערוך את הגרף
-is: bæta %tvið gröfina/hreinsa gröfina/sýna gröfina/breyta gröfina
-it: aggiungi %tal grafico/pulisci il grafico/mostra il grafico/modifica il grafico
-lt: pridėti %tprie grafiko/išvalyti grafiką/rodyti grafiką/redaguoti grafiką
-lv: pievienot %tgrafikā/iztīrīt grafiku/parādīt grafiku/labot grafiku
-nl: voeg %ttoe aan de grafiek/verwijder de grafiek/laat de grafiek zien/bewerk de grafiek
-no: legg %ttil grafen/tøm grafen/vis grafen/rediger grafen
-oc: apondre %tau grafic/esfaçar lo grafic/afichar lo grafic/editar lo grafic
-pl: dodaj %tdo wykresu/wyczyść wykres/pokaż wykres/edytuj wykres
-pt: adicionar %tao gráfico/limpar o gráfico/mostrar o gráfico/editar o gráfico
-ro: adăuga %tla grafic/șterge graficul/arată graficul/editează graficul
-ru: добавить %tк графику/очистить график/показать график/редактировать график
-sk: pridať %tk grafu/vymazať graf/zobraziť graf/upraviť graf
-sl: dodaj %tv graf/počisti graf/pokaži graf/uredi graf
-sv: lägg till %tpå grafen/rensa grafen/visa grafen/redigera grafen
-tr: grafiğe %tekle/grafiği temizle/grafiği göster/grafiği düzenle
+af: voeg %tby die data/verwyder die data/wys die grafiek/wysig die data
+ar: أضف %tإلى البيانات/مسح البيانات/عرض الرسم البياني/تعديل البيانات
+bg: добави %tкъм данните/изчисти данните/покажи графиката/редактирай данните
+br: ouzhpennañ %td'ar roadennoù/sileiñ ar roadennoù/diskouez ar grafik/digentañ ar roadennoù
+ca: afegir %ta les dades/esborrar les dades/mostrar el gràfic/editar les dades
+co: aghjunghje %tà i dati/squassà i dati/affissà u graficu/mudificà i dati
+cs: přidat %tdo dat/vymazat data/zobrazit graf/upravit data
+da: tilføj %ttil dataene/ryd dataene/vis grafen/rediger dataene
+de: hinzufügen %tzu den Daten/die Daten löschen/den Graphen anzeigen/die Daten editieren
+en: add %tto the data/clear the data/show the graph/edit the data
+eo: aldoni %tal la datenoj/forigi la datenojn/montri la grafikon/redakti la datenojn
+es: añadir %ta los datos/borrar los datos/mostrar el gráfico/editar los datos
+et: lisa %tandmetesse/kustuta andmed/näita graafikut/muuda andmeid
+fi: lisää %tdataan/tyhjennä data/näytä graafi/muokkaa dataa
+fr: ajouter %taux données/effacer les données/afficher le graphe/modifier les données
+he: הוסף %tלנתונים/נקה את הנתונים/הצג את הגרף/ערוך את הנתונים
+is: bæta %tvið gögnin/hreinsa gögnin/sýna gröfina/breyta gögnunum
+it: aggiungi %tai dati/pulisci i dati/mostra il grafico/modifica i dati
+lt: pridėti %tprie duomenų/išvalyti duomenis/rodyti grafiką/redaguoti duomenis
+lv: pievienot %tdatiem/iztīrīt datus/parādīt grafiku/labot datus
+nl: voeg %ttoe aan de data/verwijder de data/laat de grafiek zien/bewerk de data
+no: legg %ttil dataene/tøm dataene/vis grafen/rediger dataene
+oc: apondre %taus donadas/esfaçar las donadas/afichar lo grafic/editar las donadas
+pl: dodaj %tdo danych/wyczyść dane/pokaż wykres/edytuj dane
+pt: adicionar %taos dados/limpar os dados/mostrar o gráfico/editar os dados
+ro: adăuga %tla date/șterge datele/arată graficul/editează datele
+ru: добавить %tк данным/очистить данные/показать график/редактировать данные
+sk: pridať %tk dátam/vymazať dáta/zobraziť graf/upraviť dáta
+sl: dodaj %tv podatke/počisti podatke/pokaži graf/uredi podatke
+sv: lägg till %tpå datan/rensa datan/visa grafen/redigera datan
+tr: veriye %tekle/veriyi temizle/grafiği göster/veriyi düzenle
 
     adhesion
 co: adesione
@@ -2921,10 +2921,38 @@ sv: antavla
 tr: soyağacı
 
     ascending/descending (degree)
+af: opwaartse graad/afwaartse graad/opwaartse grade/afwaartse grade
+ar: درجة صاعدة/درجة نازلة/درجات صاعدة/درجات نازلة
+bg: възходяща степен/низходяща степен/възходящи степени/низходящи степени
+br: derez pignat/derez diskenn/derezioù pignat/derezioù diskenn
+ca: grau ascendent/grau descendent/graus ascendents/graus descendents
 co: gradu d’ascendenza/gradu di discendenza/gradi d’ascendenza/gradi di discendenza
-de: aufsteigender Grad/absteigender Grad/aufsteigender Grade/absteigender Grade
+cs: vzestupný stupeň/sestupný stupeň/vzestupné stupně/sestupné stupně
+da: stigende grad/faldende grad/stigende grader/faldende grader
+de: aufsteigender Grad/absteigender Grad/aufsteigende Grade/absteigende Grade
 en: ascending degree/descending degree/ascending degrees/descending degrees
+eo: supreniра grado/malsuprenira grado/supreniraj gradoj/malsuprenira gradoj
+es: grado ascendente/grado descendente/grados ascendentes/grados descendentes
+et: tõusev aste/laskuv aste/tõusvad astmed/laskuvad astmed
+fi: nouseva aste/laskeva aste/nousevat asteet/laskevat asteet
 fr: degré ascendant/degré descendant/degrés ascendants/degrés descendants
+he: דרגה עולה/דרגה יורדת/דרגות עולות/דרגות יורדות
+is: hækkandi stig/lækkandi stig/hækkandi stig/lækkandi stig
+it: grado ascendente/grado discendente/gradi ascendenti/gradi discendenti
+lt: kylantis laipsnis/besileidžiantis laipsnis/kylantys laipsniai/besileidžiantys laipsniai
+lv: kāpjošā pakāpe/krītošā pakāpe/kāpjošās pakāpes/krītošās pakāpes
+nl: stijgende graad/dalende graad/stijgende graden/dalende graden
+no: stigende grad/synkende grad/stigende grader/synkende grader
+oc: gras montant/gras descendant/grases montants/grases descendents
+pl: stopień wstępujący/stopień zstępujący/stopnie wstępujące/stopnie zstępujące
+pt: grau ascendente/grau descendente/graus ascendentes/graus descendentes
+ro: grad ascendent/grad descendent/grade ascendente/grade descendente
+ru: восходящая степень/нисходящая степень/восходящие степени/нисходящие степени
+sk: stúpajúci stupeň/klesajúci stupeň/stúpajúce stupne/klesajúce stupne
+sl: naraščajoča stopnja/padajoča stopnja/naraščajoče stopnje/padajoče stopnje
+sv: stigande grad/fallande grad/stigande grader/fallande grader
+tr: yükselen derece/alçalan derece/yükselen dereceler/alçalan dereceler
+zh: 上行度/下行度/上行度数/下行度数
 
     at new location
 co: à u locu novu
@@ -4174,16 +4202,6 @@ sl: baza podatkov ni dostopna
 sv: kan inte nå databasen
 tr: tabana erişilemiyor
 
-    RLM update data/save data/show graph
-de: die URL-Daten aktualisieren um geänderte Personen zu überprüfen/diese Daten im Browser-Speicher speichern/den Baum mit diesen Daten anzeigen
-en: update the URL data to verify modified individuals/save this data in browser memory/display the tree with this data
-fr: actualiser les données en URL pour vérifier les individus modifiés/sauvegarder ces données en mémoire du navigateur/afficher l’arbre avec ces données
-
-    RLM unknowns persons
-de: unbekannte Person(en): korrigieren Sie die gelb markierten Personen um speichern oder anzeigen zu können!
-en: unknown person(s): correct the individuals highlighted in yellow to be able to save or display the graph!
-fr: personne(s) non trouvée(s) : corriger les individus en jaune pour pour pouvoir sauvegarder ou afficher le graphe !
-
     cannot change sex of a married person
 af: kan die geslag van 'n getroude persoon nie verander nie
 bg: не може да се промени полът на човек в брак
@@ -4739,6 +4757,40 @@ co: un scornu culuritu indicheghja l’esistenza di nota (turchinu), di fonte (g
 de: Eine farbige Ecke zeigt das Vorhandensein von Notizen (blau), Quellen (gelb) oder beidem (grün) für ein Ereignis an. Die Daten können dann in einem Popup angezeigt werden, indem man auf den Hintergrund der Zellen klickt.
 en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
 fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
+
+    first common ancestor
+af: eerste gemeenskaplike voorvader/eerste gemeenskaplike voorvaders
+ar: السلف المشترك الأول/الأسلاف المشتركة الأولى
+bg: първи общ предшественик/първи общи предшественици
+br: kentañ hendad boutin/kentañ hendadoù boutin
+ca: primer avantpassat comú/primers avantpassats comuns
+co: primu antenatu cumunu/primi antenati cumuni
+cs: první společný předek/první společní předci
+da: første fælles forfader/første fælles forfædre
+de: erster gemeinsamer Vorfahre/erste gemeinsame Vorfahren
+en: first common ancestor/first common ancestors
+eo: unua komuna praavo/unuaj komunaj praavoj
+es: primer antepasado común/primeros antepasados comunes
+et: esimene ühine esivanem/esimesed ühised esivanemad
+fi: ensimmäinen yhteinen esivanhempi/ensimmäiset yhteiset esivanhemmat
+fr: premier ancêtre commun/premiers ancêtres communs
+he: הקדמון המשותף הראשון/הקדמונים המשותפים הראשונים
+is: fyrsti sameiginlegi forföðurinn/fyrstu sameiginlegu forfeðurnir
+it: primo antenato comune/primi antenati comuni
+lt: pirmasis bendras protėvis/pirmieji bendri protėviai
+lv: pirmais kopīgais senčs/pirmie kopīgie senči
+nl: eerste gemeenschappelijke voorouder/eerste gemeenschappelijke voorouders
+no: første felles forfar/første felles forfedre
+oc: primièr ancèstre comun/primièrs ancèstres comuns
+pl: pierwszy wspólny przodek/pierwsi wspólni przodkowie
+pt: primeiro antepassado comum/primeiros antepassados comuns
+ro: primul strămoș comun/primii strămoși comuni
+ru: первый общий предок/первые общие предки
+sk: prvý spoločný predok/prví spoloční predkovia
+sl: prvi skupni prednik/prvi skupni predniki
+sv: första gemensamma förfader/första gemensamma förfäder
+tr: ilk ortak ata/ilk ortak atalar
+zh: 第一个共同祖先/第一批共同祖先
 
     comment
 af: kommentaar
@@ -6949,13 +7001,38 @@ en: define %s as Sosa 1 to see or reduce the implexes/restore previous Sosa 1 
 fr: définir %s comme Sosa 1 pour voir ou réduire les implexes/remettre le précédent Sosa 1 %s
 
     degree of kinship
+af: graad van verwantskap/grade van verwantskap
+ar: درجة القرابة/درجات القرابة
+bg: степен на родство/степени на родство
+br: derez ar c’heneliezh/derezioù ar c’heneliezh
+ca: grau de parentiu/graus de parentiu
 co: gradu di parentia/gradi di parentia
-de: Grad der Elternschaft
+cs: stupeň příbuzenství/stupně příbuzenství
+da: slægtskabsgrad/slægtskabsgrader
+de: Grad der Verwandtschaft/Grade der Verwandtschaft
 en: degree of kinship/degrees of kinship
+eo: grado de parenceco/gradoj de parenceco
+es: grado de parentesco/grados de parentesco
+et: suguluse aste/suguluse astmed
+fi: sukulaisuusaste/sukulaisuusasteet
 fr: degré de parenté/degrés de parenté
-pt: grau de parentesco
-sv: släktskapsgrad
-tr: akrabalık derecesi
+he: דרגת קרבה/דרגות קרבה
+is: skyldleikastig/skyldleikastig
+it: grado di parentela/gradi di parentela
+lt: giminystės laipsnis/giminystės laipsniai
+lv: radniecības pakāpe/radniecības pakāpes
+nl: graad van verwantschap/graden van verwantschap
+no: slektskapsgrad/slektskapsgrader
+oc: gras de parentat/grases de parentat
+pl: stopień pokrewieństwa/stopnie pokrewieństwa
+pt: grau de parentesco/graus de parentesco
+ro: grad de rudenie/grade de rudenie
+ru: степень родства/степени родства
+sk: stupeň príbuzenstva/stupne príbuzenstva
+sl: stopnja sorodstva/stopnje sorodstva
+sv: släktskapsgrad/släktskapsgrader
+tr: akrabalık derecesi/akrabalık dereceleri
+zh: 亲属关系度/亲属关系度数
 
     delete
 af: verwyder
@@ -10564,24 +10641,140 @@ sv: omflyttning klar
 tr: ters çevrilmiş
 
     add/insert/delete/up/down person
+af: voeg 'n nuwe persoon en 'n nuwe voorvader aan die einde by/voeg 'n nuwe persoon en 'n nuwe voorvader voor hierdie een in/verwyder hierdie persoon en hul voorvaders uit die tabel/skuif hierdie persoon en hul voorvaders voor die vorige persoon/skuif hierdie persoon en hul voorvaders na die volgende persoon
+ar: إضافة شخص جديد وسلف جديد في النهاية/إدراج شخص جديد وسلف جديد قبل هذا/حذف هذا الشخص وأسلافه من الجدول/نقل هذا الشخص وأسلافه قبل الشخص السابق/نقل هذا الشخص وأسلافه بعد الشخص التالي
+bg: добави нов човек и нов предшественик в края/вмъкни нов човек и нов предшественик преди този/изтрий този човек и неговите предшественици от таблицата/премести този човек и неговите предшественици преди предишния/премести този човек и неговите предшественици след следващия
+br: ouzhpennañ un den nevez hag un hendad nevez er fin/enlakaat un den nevez hag un hendad nevez a-raok an hini-mañ/dilemel an den-mañ hag e hendadoù eus an daolenn/dilec'hiañ an den-mañ hag e hendadoù a-raok ar re kent/dilec'hiañ an den-mañ hag e hendadoù goude ar re war-lerc'h
+ca: afegir una nova persona i un nou avantpassat al final/inserir una nova persona i un nou avantpassat abans d'aquest/eliminar aquesta persona i els seus avantpassats de la taula/moure aquesta persona i els seus avantpassats abans de l'anterior/moure aquesta persona i els seus avantpassats després del següent
+co: aghjunghje una nova persona è un novu antenatu à a fine/inserisce una nova persona è un novu antenatu nanzu à questu/squassà sta persona è i so antenati da a tavula/spustà sta persona è i so antenati nanzu à u precedente/spustà sta persona è i so antenati dopu à u seguente
+cs: přidat novou osobu a nového předka na konec/vložit novou osobu a nového předka před tuto/smazat tuto osobu a její předky z tabulky/přesunout tuto osobu a její předky před předchozí/přesunout tuto osobu a její předky za následující
+da: tilføj en ny person og en ny forfader til sidst/indsæt en ny person og en ny forfader før denne/slet denne person og deres forfædre fra tabellen/flyt denne person og deres forfædre før den forrige/flyt denne person og deres forfædre efter den næste
 de: eine neue Person und einen neuen Vorfahren am Ende hinzufügen/eine neue Person und einen neuen Vorfahren vor dieser einfügen/diese Person und ihre Vorfahren aus der Tabelle löschen/diese Person und ihre Vorfahren vor die vorherige Person verschieben/diese Person und ihre Vorfahren nach der nächsten Person verschieben
 en: add a new person and a new ancestor at the end/insert a new person and a new ancestor before this one/delete this person and their ancestors from the table/move this person and their ancestors before the previous person/move this person and their ancestors after the next person
+eo: aldoni novan personon kaj novan praavon fine/enmeti novan personon kaj novan praavon antaŭ ĉi tiu/forigi ĉi tiun personon kaj ĝiajn praavoj el la tabelo/movi ĉi tiun personon kaj ĝiajn praavoj antaŭ la antaŭan/movi ĉi tiun personon kaj ĝiajn praavoj post la sekvan
+es: añadir una nueva persona y un nuevo antepasado al final/insertar una nueva persona y un nuevo antepasado antes de este/eliminar esta persona y sus antepasados de la tabla/mover esta persona y sus antepasados antes del anterior/mover esta persona y sus antepasados después del siguiente
+et: lisa uus isik ja uus esivanem lõppu/sisesta uus isik ja uus esivanem enne seda/kustuta see isik ja tema esivanemad tabelist/liiguta see isik ja tema esivanemad eelmise ette/liiguta see isik ja tema esivanemad järgmise järele
+fi: lisää uusi henkilö ja uusi esivanhempi loppuun/lisää uusi henkilö ja uusi esivanhempi ennen tätä/poista tämä henkilö ja hänen esivanhempansa taulukosta/siirrä tämä henkilö ja hänen esivanhempansa edellisen eteen/siirrä tämä henkilö ja hänen esivanhempansa seuraavan jälkeen
 fr: ajouter un nouvel individu et un nouvel ancêtre à la fin/insérer un nouvel individu et un nouvel ancêtre avant celui-ci/supprimer cet individu et ses ancêtres du tableau/déplacer cet individu et ses ancêtres avant le précédent/déplacer cet individu et ses ancêtres après le suivant
+he: הוסף אדם חדש וקדמון חדש בסוף/הכנס אדם חדש וקדמון חדש לפני זה/מחק את האדם הזה ואת קדמוניו מהטבלה/העבר את האדם הזה ואת קדמוניו לפני הקודם/העבר את האדם הזה ואת קדמוניו אחרי הבא
+is: bæta við nýjum einstaklingi og nýjum forföður í lokin/setja inn nýjan einstakling og nýjan forföður á undan þessum/eyða þessum einstaklingi og forfeðrum hans úr töflunni/færa þennan einstakling og forfeður hans á undan þeim fyrri/færa þennan einstakling og forfeður hans á eftir þeim næsta
+it: aggiungi una nuova persona e un nuovo antenato alla fine/inserisci una nuova persona e un nuovo antenato prima di questo/elimina questa persona e i suoi antenati dalla tabella/sposta questa persona e i suoi antenati prima del precedente/sposta questa persona e i suoi antenati dopo il successivo
+lt: pridėti naują asmenį ir naują protėvį pabaigoje/įterpti naują asmenį ir naują protėvį prieš šį/ištrinti šį asmenį ir jo protėvius iš lentelės/perkelti šį asmenį ir jo protėvius prieš ankstesnį/perkelti šį asmenį ir jo protėvius po kito
+lv: pievienot jaunu personu un jaunu senči beigās/ievietot jaunu personu un jaunu senči pirms šī/dzēst šo personu un viņas sencēšus no tabulas/pārvietot šo personu un viņas sencēšus pirms iepriekšējā/pārvietot šo personu un viņas sencēšus pēc nākamā
+nl: voeg een nieuwe persoon en een nieuwe voorouder toe aan het einde/voeg een nieuwe persoon en een nieuwe voorouder in vóór deze/verwijder deze persoon en hun voorouders uit de tabel/verplaats deze persoon en hun voorouders vóór de vorige/verplaats deze persoon en hun voorouders na de volgende
+no: legg til en ny person og en ny forfar til slutt/sett inn en ny person og en ny forfar før denne/slett denne personen og deres forfedre fra tabellen/flytt denne personen og deres forfedre før den forrige/flytt denne personen og deres forfedre etter den neste
+oc: apondre una persona novèla e un ancèstre novèl a la fin/inserir una persona novèla e un ancèstre novèl abans d'aqueste/suprimir aquesta persona e sos ancèstres de la taula/desplaçar aquesta persona e sos ancèstres abans del precedent/desplaçar aquesta persona e sos ancèstres aprèp lo seguent
+pl: dodaj nową osobę i nowego przodka na końcu/wstaw nową osobę i nowego przodka przed tym/usuń tę osobę i jej przodków z tabeli/przenieś tę osobę i jej przodków przed poprzednią/przenieś tę osobę i jej przodków za następną
+pt: adicionar uma nova pessoa e um novo antepassado no final/inserir uma nova pessoa e um novo antepassado antes deste/excluir esta pessoa e seus antepassados da tabela/mover esta pessoa e seus antepassados antes do anterior/mover esta pessoa e seus antepassados após o próximo
+ro: adaugă o persoană nouă și un strămoș nou la sfârșit/inserează o persoană nouă și un strămoș nou înaintea acesteia/șterge această persoană și strămoșii ei din tabel/mută această persoană și strămoșii ei înaintea celei precedente/mută această persoană și strămoșii ei după cea următoare
+ru: добавить нового человека и нового предка в конец/вставить нового человека и нового предка перед этим/удалить этого человека и его предков из таблицы/переместить этого человека и его предков перед предыдущим/переместить этого человека и его предков после следующего
+sk: pridať novú osobu a nového predka na koniec/vložiť novú osobu a nového predka pred túto/vymazať túto osobu a jej predkov z tabuľky/presunúť túto osobu a jej predkov pred predchádzajúcu/presunúť túto osobu a jej predkov za nasledujúcu
+sl: dodaj novo osebo in novega prednika na konec/vstavi novo osebo in novega prednika pred to/izbriši to osebo in njene prednike iz tabele/premakni to osebo in njene prednike pred prejšnjo/premakni to osebo in njene prednike za naslednjo
+sv: lägg till en ny person och en ny förfader i slutet/infoga en ny person och en ny förfader före denna/ta bort denna person och deras förfäder från tabellen/flytta denna person och deras förfäder före den föregående/flytta denna person och deras förfäder efter nästa
+tr: sonuna yeni bir kişi ve yeni bir ata ekle/bundan önce yeni bir kişi ve yeni bir ata ekle/bu kişiyi ve atalarını tablodan sil/bu kişiyi ve atalarını öncekinin önüne taşı/bu kişiyi ve atalarını sonrakinin arkasına taşı
+zh: 在末尾添加新人员和新祖先/在此之前插入新人员和新祖先/从表格中删除此人员及其祖先/将此人员及其祖先移到前一个之前/将此人员及其祖先移到下一个之后
 
     add/insert/delete/up/down person aria-label
+af: voeg persoon by/voeg persoon en voorvader in/verwyder persoon en voorvaders/skuif persoon en voorvaders op/skuif persoon en voorvaders af
+ar: إضافة شخص/إدراج شخص وسلف/حذف شخص وأسلاف/رفع شخص وأسلاف/خفض شخص وأسلاف
+bg: добави човек/вмъкни човек и предшественик/изтрий човек и предшественици/премести човек и предшественици нагоре/премести човек и предшественици надолу
+br: ouzhpennañ den/enlakaat den hag hendad/dilemel den hag hendadoù/pignat den hag hendadoù/diskenn den hag hendadoù
+ca: afegir persona/inserir persona i avantpassat/eliminar persona i avantpassats/pujar persona i avantpassats/baixar persona i avantpassats
+co: aghjunghje persona/inserisce persona è antenatu/squassà persona è antenati/cullà persona è antenati/falà persona è antenati
+cs: přidat osobu/vložit osobu a předka/smazat osobu a předky/posunout osobu a předky nahoru/posunout osobu a předky dolů
+da: tilføj person/indsæt person og forfader/slet person og forfædre/flyt person og forfædre op/flyt person og forfædre ned
 de: Person hinzufügen/Person und Vorfahren einfügen/Person und Vorfahren löschen/Person und Vorfahren hoch/Person und Vorfahren runter
 en: add person/insert person and ancestor/delete person and ancestors/move person and ancestors up/move person and ancestors down
+eo: aldoni personon/enmeti personon kaj praavon/forigi personon kaj praavoj/movi personon kaj praavoj supren/movi personon kaj praavoj malsupren
+es: añadir persona/insertar persona y antepasado/eliminar persona y antepasados/subir persona y antepasados/bajar persona y antepasados
+et: lisa isik/sisesta isik ja esivanem/kustuta isik ja esivanemad/liiguta isik ja esivanemad üles/liiguta isik ja esivanemad alla
+fi: lisää henkilö/lisää henkilö ja esivanhempi/poista henkilö ja esivanhemmat/siirrä henkilö ja esivanhemmat ylös/siirrä henkilö ja esivanhemmat alas
 fr: ajouter individu/insérer individu et ancêtre/supprimer individu et ancêtres/remonter individu et ancêtres/descendre individu et ancêtres
+he: הוסף אדם/הכנס אדם וקדמון/מחק אדם וקדמונים/העלה אדם וקדמונים/הורד אדם וקדמונים
+is: bæta við einstakling/setja inn einstakling og forföður/eyða einstaklingi og forfeðrum/færa einstakling og forfeður upp/færa einstakling og forfeður niður
+it: aggiungi persona/inserisci persona e antenato/elimina persona e antenati/sposta persona e antenati su/sposta persona e antenati giù
+lt: pridėti asmenį/įterpti asmenį ir protėvį/ištrinti asmenį ir protėvius/perkelti asmenį ir protėvius aukštyn/perkelti asmenį ir protėvius žemyn
+lv: pievienot personu/ievietot personu un senči/dzēst personu un sencēšus/pārvietot personu un sencēšus augšup/pārvietot personu un sencēšus lejup
+nl: voeg persoon toe/voeg persoon en voorouder in/verwijder persoon en voorouders/verplaats persoon en voorouders omhoog/verplaats persoon en voorouders omlaag
+no: legg til person/sett inn person og forfar/slett person og forfedre/flytt person og forfedre opp/flytt person og forfedre ned
+oc: apondre persona/inserir persona e ancèstre/suprimir persona e ancèstres/montar persona e ancèstres/davalar persona e ancèstres
+pl: dodaj osobę/wstaw osobę i przodka/usuń osobę i przodków/przenieś osobę i przodków w górę/przenieś osobę i przodków w dół
+pt: adicionar pessoa/inserir pessoa e antepassado/excluir pessoa e antepassados/mover pessoa e antepassados para cima/mover pessoa e antepassados para baixo
+ro: adaugă persoană/inserează persoană și strămoș/șterge persoană și strămoși/mută persoană și strămoși sus/mută persoană și strămoși jos
+ru: добавить человека/вставить человека и предка/удалить человека и предков/переместить человека и предков вверх/переместить человека и предков вниз
+sk: pridať osobu/vložiť osobu a predka/vymazať osobu a predkov/presunúť osobu a predkov hore/presunúť osobu a predkov dole
+sl: dodaj osebo/vstavi osebo in prednika/izbriši osebo in prednike/premakni osebo in prednike gor/premakni osebo in prednike dol
+sv: lägg till person/infoga person och förfader/ta bort person och förfäder/flytta person och förfäder upp/flytta person och förfäder ner
+tr: kişi ekle/kişi ve ata ekle/kişi ve ataları sil/kişi ve ataları yukarı taşı/kişi ve ataları aşağı taşı
+zh: 添加人员/插入人员和祖先/删除人员和祖先/向上移动人员和祖先/向下移动人员和祖先
 
     add/insert/delete/up/down row
+af: voeg 'n nuwe ry aan die einde by/voeg 'n nuwe ry voor hierdie een in/verwyder hierdie ry uit die tabel/skuif hierdie ry een posisie op/skuif hierdie ry een posisie af
+ar: إضافة صف جديد في النهاية/إدراج صف جديد قبل هذا/حذف هذا الصف من الجدول/نقل هذا الصف موضع واحد لأعلى/نقل هذا الصف موضع واحد لأسفل
+bg: добави нов ред в края/вмъкни нов ред преди този/изтрий този ред от таблицата/премести този ред с една позиция нагоре/премести този ред с една позиция надолу
+br: ouzhpennañ ur renk nevez er fin/enlakaat ur renk nevez a-raok an hini-mañ/dilemel ar renk-mañ eus an daolenn/dilec'hiañ ar renk-mañ un taolenn war-zu an nec'h/dilec'hiañ ar renk-mañ un taolenn war-zu an traoñ
+ca: afegir una nova fila al final/inserir una nova fila abans d'aquesta/eliminar aquesta fila de la taula/moure aquesta fila una posició cap amunt/moure aquesta fila una posició cap avall
+co: aghjunghje una linea nova à a fine/inserisce una linea nova nanzu à questa/squassà sta linea da a tavula/spustà sta linea una pusizione in altu/spustà sta linea una pusizione in bassu
+cs: přidat nový řádek na konec/vložit nový řádek před tento/smazat tento řádek z tabulky/přesunout tento řádek o jednu pozici nahoru/přesunout tento řádek o jednu pozici dolů
+da: tilføj en ny række til sidst/indsæt en ny række før denne/slet denne række fra tabellen/flyt denne række en position op/flyt denne række en position ned
 de: eine neue Zeile am Ende hinzufügen/eine neue Zeile vor dieser einfügen/diese Zeile aus der Tabelle löschen/diese Zeile eine Position nach oben verschieben/diese Zeile eine Position nach unten verschieben
 en: add a new row at the end/insert a new row before this one/delete this row from the table/move this row one position up/move this row one position down
+eo: aldoni novan linion fine/enmeti novan linion antaŭ ĉi tiu/forigi ĉi tiun linion el la tabelo/movi ĉi tiun linion unu pozicion supren/movi ĉi tiun linion unu pozicion malsupren
+es: añadir una nueva fila al final/insertar una nueva fila antes de esta/eliminar esta fila de la tabla/mover esta fila una posición hacia arriba/mover esta fila una posición hacia abajo
+et: lisa uus rida lõppu/sisesta uus rida enne seda/kustuta see rida tabelist/liiguta see rida ühe koha võrra üles/liiguta see rida ühe koha võrra alla
+fi: lisää uusi rivi loppuun/lisää uusi rivi ennen tätä/poista tämä rivi taulukosta/siirrä tämä rivi yhden paikan ylöspäin/siirrä tämä rivi yhden paikan alaspäin
 fr: ajouter une nouvelle ligne à la fin/insérer une nouvelle ligne avant celle-ci/supprimer cette ligne du tableau/déplacer cette ligne d’une position vers le haut/déplacer cette ligne d’une position vers le bas
+he: הוסף שורה חדשה בסוף/הכנס שורה חדשה לפני זו/מחק שורה זו מהטבלה/העבר שורה זו מקום אחד למעלה/העבר שורה זו מקום אחד למטה
+is: bæta við nýrri röð í lokin/setja inn nýja röð á undan þessari/eyða þessari röð úr töflunni/færa þessa röð um eina stöðu upp/færa þessa röð um eina stöðu niður
+it: aggiungi una nuova riga alla fine/inserisci una nuova riga prima di questa/elimina questa riga dalla tabella/sposta questa riga di una posizione in alto/sposta questa riga di una posizione in basso
+lt: pridėti naują eilutę pabaigoje/įterpti naują eilutę prieš šią/ištrinti šią eilutę iš lentelės/perkelti šią eilutę viena pozicija aukštyn/perkelti šią eilutę viena pozicija žemyn
+lv: pievienot jaunu rindu beigās/ievietot jaunu rindu pirms šīs/dzēst šo rindu no tabulas/pārvietot šo rindu par vienu pozīciju augšup/pārvietot šo rindu par vienu pozīciju lejup
+nl: voeg een nieuwe rij toe aan het einde/voeg een nieuwe rij in vóór deze/verwijder deze rij uit de tabel/verplaats deze rij één positie omhoog/verplaats deze rij één positie omlaag
+no: legg til en ny rad til slutt/sett inn en ny rad før denne/slett denne raden fra tabellen/flytt denne raden en posisjon opp/flytt denne raden en posisjon ned
+oc: apondre una linha novèla a la fin/inserir una linha novèla abans d'aquesta/suprimir aquesta linha de la taula/desplaçar aquesta linha d'una posicion cap amont/desplaçar aquesta linha d'una posicion cap aval
+pl: dodaj nowy wiersz na końcu/wstaw nowy wiersz przed tym/usuń ten wiersz z tabeli/przenieś ten wiersz o jedną pozycję w górę/przenieś ten wiersz o jedną pozycję w dół
+pt: adicionar uma nova linha no final/inserir uma nova linha antes desta/excluir esta linha da tabela/mover esta linha uma posição para cima/mover esta linha uma posição para baixo
+ro: adaugă o linie nouă la sfârșit/inserează o linie nouă înaintea acesteia/șterge această linie din tabel/mută această linie cu o poziție în sus/mută această linie cu o poziție în jos
+ru: добавить новую строку в конец/вставить новую строку перед этой/удалить эту строку из таблицы/переместить эту строку на одну позицию вверх/переместить эту строку на одну позицию вниз
+sk: pridať nový riadok na koniec/vložiť nový riadok pred tento/vymazať tento riadok z tabuľky/presunúť tento riadok o jednu pozíciu hore/presunúť tento riadok o jednu pozíciu dole
+sl: dodaj novo vrstico na konec/vstavi novo vrstico pred to/izbriši to vrstico iz tabele/premakni to vrstico za eno pozicijo gor/premakni to vrstico za eno pozicijo dol
+sv: lägg till en ny rad i slutet/infoga en ny rad före denna/ta bort denna rad från tabellen/flytta denna rad en position upp/flytta denna rad en position ner
+tr: sonuna yeni bir satır ekle/bundan önce yeni bir satır ekle/bu satırı tablodan sil/bu satırı bir konum yukarı taşı/bu satırı bir konum aşağı taşı
+zh: 在末尾添加新行/在此之前插入新行/从表格中删除此行/将此行向上移动一个位置/将此行向下移动一个位置
 
     add/insert/delete/up/down row aria-label
+af: voeg ry by/voeg ry in/verwyder ry/skuif ry op/skuif ry af
+ar: إضافة صف/إدراج صف/حذف صف/رفع صف/خفض صف
+bg: добави ред/вмъкни ред/изтрий ред/премести ред нагоре/премести ред надолу
+br: ouzhpennañ renk/enlakaat renk/dilemel renk/pignat renk/diskenn renk
+ca: afegir fila/inserir fila/eliminar fila/pujar fila/baixar fila
+co: aghjunghje linea/inserisce linea/squassà linea/cullà linea/falà linea
+cs: přidat řádek/vložit řádek/smazat řádek/posunout řádek nahoru/posunout řádek dolů
+da: tilføj række/indsæt række/slet række/flyt række op/flyt række ned
 de: Zeile hinzufügen/Zeile einfügen/Zeile löschen/Zeile hoch/Zeile runter
 en: add row/insert row/delete row/move up/move down
+eo: aldoni linion/enmeti linion/forigi linion/movi supren/movi malsupren
+es: añadir fila/insertar fila/eliminar fila/subir fila/bajar fila
+et: lisa rida/sisesta rida/kustuta rida/liiguta üles/liiguta alla
+fi: lisää rivi/lisää rivi/poista rivi/siirrä ylös/siirrä alas
 fr: ajouter ligne/insérer ligne/supprimer ligne/remonter ligne/descendre ligne
+he: הוסף שורה/הכנס שורה/מחק שורה/העלה/הורד
+is: bæta við röð/setja inn röð/eyða röð/færa upp/færa niður
+it: aggiungi riga/inserisci riga/elimina riga/sposta su/sposta giù
+lt: pridėti eilutę/įterpti eilutę/ištrinti eilutę/perkelti aukštyn/perkelti žemyn
+lv: pievienot rindu/ievietot rindu/dzēst rindu/pārvietot augšup/pārvietot lejup
+nl: voeg rij toe/voeg rij in/verwijder rij/verplaats omhoog/verplaats omlaag
+no: legg til rad/sett inn rad/slett rad/flytt opp/flytt ned
+oc: apondre linha/inserir linha/suprimir linha/montar linha/davalar linha
+pl: dodaj wiersz/wstaw wiersz/usuń wiersz/przenieś w górę/przenieś w dół
+pt: adicionar linha/inserir linha/excluir linha/mover para cima/mover para baixo
+ro: adaugă linie/inserează linie/șterge linie/mută sus/mută jos
+ru: добавить строку/вставить строку/удалить строку/переместить вверх/переместить вниз
+sk: pridať riadok/vložiť riadok/vymazať riadok/presunúť hore/presunúť dole
+sl: dodaj vrstico/vstavi vrstico/izbriši vrstico/premakni gor/premakni dol
+sv: lägg till rad/infoga rad/ta bort rad/flytta upp/flytta ner
+tr: satır ekle/satır ekle/satırı sil/yukarı taşı/aşağı taşı
+zh: 添加行/插入行/删除行/向上移动/向下移动
 
     invert
 af: omruil
@@ -15549,6 +15742,73 @@ sl: zveza
 sv: släktskap
 tr: ilişki
 
+    %d %s links between %s and %s
+af: %d %s tussen %s en %s
+ar: %d %s بين %s و %s
+bg: %d %s между %s и %s
+br: %d %s etre %s ha %s
+ca: %d %s entre %s i %s
+co: %d %s trà %s è %s
+cs: %d %s mezi %s a %s
+da: %d %s mellem %s og %s
+de: %d %s zwischen %s und %s
+en: %d %s between %s and %s
+eo: %d %s inter %s kaj %s
+es: %d %s entre %s y %s
+et: %d %s %s ja %s vahel
+fi: %d %s %s ja %s välillä
+fr: %d %s entre %s et %s
+he: %d %s בין %s ו %s
+is: %d %s á milli %s og %s
+it: %d %s tra %s e %s
+lt: %d %s tarp %s ir %s
+lv: %d %s starp %s un %s
+nl: %d %s tussen %s en %s
+no: %d %s mellom %s og %s
+oc: %d %s entre %s e %s
+pl: %d %s między %s i %s
+pt: %d %s entre %s e %s
+ro: %d %s между %s и %s
+sk: %d %s medzi %s a %s
+sl: %d %s med %s in %s
+sv: %d %s mellan %s och %s
+tr: %s ve %s arasında %d %s
+zh: %s 和 %s 之间的 %d 个 %ss
+
+    relationship link between %s and %s passing by %s
+af: verwantskapskakel tussen %s en %s deur %s
+ar: رابط قرابة بين %s و %s عبر %s
+bg: връзка на родство между %s и %s чрез %s
+br: liamm c'heneliezh etre %s ha %s dre %s
+ca: enllaç de parentiu entre %s i %s per %s
+co: ligame di parentela trà %s è %s passendu da %s
+cs: příbuzenský vztah mezi %s a %s přes %s
+da: slægtskabsforbindelse mellem %s og %s gennem %s
+de: Verwandtschaftsverbindung zwischen %s und %s über %s
+en: relationship link between %s and %s passing by %s
+eo: genealogia ligo inter %s kaj %s tra %s
+es: enlace de parentesco entre %s y %s por %s
+et: sugulusseos %s ja %s kaudu %s
+fi: sukulaisuuslinkki %s ja %s kautta %s
+fr: lien de parenté entre %s et %s en passant par %s
+he: קשר קרבה בין %s ו %s דרך %s
+is: ættartengsl á milli %s og %s í gegnum %s
+it: legame di parentela tra %s e %s tramite %s
+lt: giminystės ryšys tarp %s ir %s per %s
+lv: radniecības saite starp %s un %s caur %s
+nl: verwantschapsverband tussen %s en %s via %s
+no: slektskapskobling mellom %s og %s gjennom %s
+oc: ligam de parentèla entre %s e %s per %s
+pl: więź pokrewieństwa między %s i %s przez %s
+pt: ligação de parentesco entre %s e %s por %s
+ro: legătură de rudenie între %s și %s prin %s
+ru: родственная связь между %s и %s через %s
+sk: príbuzenský vzťah medzi %s a %s cez %s
+sl: sorodstvena povezava med %s in %s preko %s
+sv: släktskapsförbindelse mellan %s och %s genom %s
+tr: %s ve %s arasındaki %s üzerinden akrabalık bağı
+zh: %s 和 %s 通过 %s 的亲属关系
+
     relationship by ancestors
 co: ascendenti diretti
 de: Direkte Vorfahren
@@ -15679,36 +15939,72 @@ sv: släktskap med...
 tr: ile aile bağı...
 
     relationship link/relationship links
-af: verwantskap/verwantskappe
+af: verwantskapskakel/verwantskapskakels
+ar: رابط قرابة/روابط قرابة
 bg: родствена връзка/родствени връзки
-br: liamm a gerentiezh/liammoù a gerentiezh
-ca: grau de parentesc/graus de parentesc
-co: liame di parentia/liami di parentia
-cs: vztah/vztahy
+br: liamm c'heneliezh/liammoù c'heneliezh
+ca: enllaç de parentiu/enllaços de parentiu
+co: liame di parentela/liami di parentela
+cs: příbuzenský vztah/příbuzenské vztahy
 da: slægtskabsforbindelse/slægtskabsforbindelser
-de: Verwandtschaft/Verwandtschaften
-en: relationship/relationships
-eo: ligo de parenceco/ligoj de parenceco
-es: grado de parentesco/grados de parentesco
-et: sugulussuhe/sugulussuhet
-fi: sukulaisuuskytkentä/sukulaisuuskytkentää
+de: Verwandtschaftsverbindung/Verwandtschaftsverbindungen
+en: relationship link/relationship links
+eo: genealogia ligo/genealogiaj ligoj
+es: enlace de parentesco/enlaces de parentesco
+et: sugulusseos/sugulusseosed
+fi: sukulaisuuslinkki/sukulaisuuslinkit
 fr: lien de parenté/liens de parenté
-he:  קשר משפחתי/ קשרי משפחה
-is: skyldleika tengsl/skyldleika tengsli
-it: grado di parentela/gradi di parentela
-lt: santykių sąsaja/santykių sąsajos
-lv: radniecības saite(s)
-nl: verwantschap/verwantschappen
-no: slektslinje/slektslinjer
-oc: ligam de parentat/ligams de parentat
-pl: linia pokrewieństwa/linie pokrewieństwa
-pt: grau de parentesco/graus de parentesco
-ro: linie de relatii
+he: קשר קרבה/קשרי קרבה
+is: ættartengsl/ættartengsl
+it: legame di parentela/legami di parentela
+lt: giminystės ryšys/giminystės ryšiai
+lv: radniecības saite/radniecības saites
+nl: verwantschapsverband/verwantschapsverbanden
+no: slektskapskobling/slektskapskoblinger
+oc: ligam de parentèla/ligams de parentèla
+pl: więź pokrewieństwa/więzi pokrewieństwa
+pt: ligação de parentesco/ligações de parentesco
+ro: legătură de rudenie/legături de rudenie
 ru: родственная связь/родственные связи
 sk: príbuzenský vzťah/príbuzenské vzťahy
-sl: sorodnik/sorodnikov
-sv: anlinje/anlinjer
-tr: ilişki/ilişkiler
+sl: sorodstvena povezava/sorodstvene povezave
+sv: släktskapsförbindelse/släktskapsförbindelser
+tr: akrabalık bağı/akrabalık bağları
+zh: 亲属关系/亲属关系
+
+    relationship table
+af: wys verwantskaptabel/wys die tabel van verwantskappe vir al hierdie individue/verwantskaptabel/aantal bekende skakels en kortste stygende&#047;dalende grade
+ar: عرض جدول القرابة/عرض جدول علاقات القرابة لجميع هؤلاء الأفراد/جدول القرابة/عدد الروابط المعروفة والدرجات الصاعدة&#047;النازلة الأقصر
+bg: покажи таблица на родството/покажи таблицата на родствените връзки за всички тези индивиди/таблица на родството/брой известни връзки и най-кратки възходящи&#047;низходящи степени
+br: diskouez taolenn ar c'heneliezh/diskouez taolenn liammoù ar c'heneliezh evit an holl dud-se/taolenn ar c'heneliezh/niver a liammoù anavezet ha dereioù pignat&#047;diskenn berrana
+ca: mostrar taula de parentiu/mostrar la taula de relacions de parentiu per a tots aquests individus/taula de parentiu/nombre d'enllaços coneguts i graus ascendent&#047;descendent més curts
+co: affissà tavula di parentela/affissà a tavula di relazioni di parentela per tutti questi individui/tavula di parentela/numeru di ligami cunnisciuti è gradi ascendente&#047;discendente più corti
+cs: zobrazit tabulku příbuzenství/zobrazit tabulku příbuzenských vztahů pro všechny tyto jedince/tabulka příbuzenství/počet známých vazeb a nejkratší vzestupné&#047;sestupné stupně
+da: vis slægtskabstabel/vis tabellen over slægtskabsforhold for alle disse individer/slægtskabstabel/antal kendte forbindelser og korteste stigende&#047;faldende grader
+de: Verwandtschaftstabelle anzeigen/die Tabelle der Verwandtschaftsbeziehungen für alle diese Personen anzeigen/Verwandtschaftstabelle/Anzahl bekannter Verbindungen und kürzeste aufsteigende&#047;absteigende Grade
+en: show relationship table/show the table of relationships for these individuals/relationship table/number of known links and shortest ascending&#047;descending degrees
+eo: montri tabelon de parenceco/montri la tabelon de parencaj rilatoj por ĉiuj ĉi individuoj/tabelo de parenceco/nombro de konataj ligoj kaj plej mallongaj supreniraj&#047;malsuprenaj gradoj
+es: mostrar tabla de parentesco/mostrar la tabla de relaciones de parentesco para todos estos individuos/tabla de parentesco/número de enlaces conocidos y grados ascendente&#047;descendente más cortos
+et: näita sugulustabelit/näita kõigi nende isikute sugulussidemete tabelit/sugulustabel/teadaolevate sidemete arv ja lühimad tõusvad&#047;laskuvad astmed
+fi: näytä sukulaisuustaulukko/näytä kaikkien näiden henkilöiden sukulaisuussuhteiden taulukko/sukulaisuustaulukko/tunnettujen linkkien määrä ja lyhimmät nousevat&#047;laskevat asteet
+fr: afficher tableau de parentés/afficher le tableau des relations de parenté pour tous ces individus/tableau de parentés/nombre de liens connus et degrés ascendant&#047;descendant le plus court
+he: הצג טבלת קרבה/הצג את טבלת יחסי הקרבה עבור כל הפרטים הללו/טבלת קרבה/מספר קישורים ידועים ודרגות עולות&#047;יורדות הקצרות ביותר
+is: sýna ættartöflu/sýna töflu ættartengla fyrir alla þessa einstaklinga/ættartafla/fjöldi þekktra tengla og stystu hækkandi&#047;lækkandi stig
+it: mostra tabella di parentela/mostra la tabella delle relazioni di parentela per tutti questi individui/tabella di parentela/numero di legami conosciuti e gradi ascendente&#047;discendente più brevi
+lt: rodyti giminystės lentelę/rodyti visų šių asmenų giminystės ryšių lentelę/giminystės lentelė/žinomų ryšių skaičius ir trumpiausi kylantys&#047;besileidžiantys laipsniai
+lv: rādīt radniecības tabulu/rādīt visu šo personu radniecības attiecību tabulu/radniecības tabula/zināmo saišu skaits un īsākie kāpjoši&#047;krītoši grādi
+nl: toon verwantschapstabel/toon de tabel van verwantschapsrelaties voor al deze personen/verwantschapstabel/aantal bekende verbindingen en kortste stijgende&#047;dalende graden
+no: vis slektskaptabell/vis tabellen over slektskapsforbindelser for alle disse individene/slektskaptabell/antall kjente koblinger og korteste stigende&#047;synkende grader
+oc: afichar taula de parentat/afichar la taula de relacions de parentat per totes aquelas personas/taula de parentat/nombre de ligams coneguts e grases montants&#047;descendents mai còrts
+pl: pokaż tabelę pokrewieństwa/pokaż tabelę związków pokrewieństwa dla wszystkich tych osób/tabela pokrewieństwa/liczba znanych powiązań i najkrótsze stopnie wstępujące&#047;zstępujące
+pt: mostrar tabela de parentesco/mostrar a tabela de relações de parentesco para todos estes indivíduos/tabela de parentesco/número de ligações conhecidas e graus ascendente&#047;descendente mais curtos
+ro: arată tabelul de rudenie/arată tabelul relațiilor de rudenie pentru toți acești indivizi/tabel de rudenie/numărul de legături cunoscute și gradele ascendente&#047;descendente cele mai scurte
+ru: показать таблицу родства/показать таблицу родственных связей для всех этих лиц/таблица родства/количество известных связей и кратчайшие восходящие&#047;нисходящие степени
+sk: zobraziť tabuľku príbuzenstva/zobraziť tabuľku príbuzenských vzťahov pre všetkých týchto jedincov/tabuľka príbuzenstva/počet známych väzieb a najkratšie stúpajúce&#047;klesajúce stupne
+sl: prikaži tabelo sorodstva/prikaži tabelo sorodstvenih povezav za vse te posameznike/tabela sorodstva/število znanih povezav in najkrajše naraščajoče&#047;padajoče stopnje
+sv: visa släktskaptabell/visa tabellen över släktskapsförhållanden för alla dessa individer/släktskaptabell/antal kända förbindelser och kortaste stigande&#047;fallande grader
+tr: akrabalık tablosunu göster/tüm bu bireyler için akrabalık ilişkileri tablosunu göster/akrabalık tablosu/bilinen bağlantı sayısı ve en kısa yükselen&#047;alçalan dereceler
+zh: 显示亲属关系表/显示所有这些个人的亲属关系表/亲属关系表/已知链接数量和最短上行&#047;下行度数
 
     relationship shortcut
 co: accurtatoghji
@@ -16009,6 +16305,74 @@ sl: Grafikon RLM ni izvedljiv
 sv: RLM-graf omöjlig
 tr: RLM grafiği uygulanamaz
 zh: RLM图不切实际
+
+    RLM update data/save data/show graph
+af: werk die URL-data by om gewysigde individue te verifieer/stoor hierdie data in blaaiergeheue/vertoon die boom met hierdie data
+ar: تحديث بيانات الرابط للتحقق من الأفراد المعدلين/حفظ هذه البيانات في ذاكرة المتصفح/عرض الشجرة مع هذه البيانات
+bg: актуализирай URL данните за проверка на променените лица/запази тези данни в паметта на браузъра/покажи дървото с тези данни
+br: hizivaat ar roadennoù URL evit gwiriañ an dud kemmet/enrollañ ar roadennoù-se e memor ar merdeer/diskouez ar wezenn gant ar roadennoù-se
+ca: actualitzar les dades de l'URL per verificar els individus modificats/desar aquestes dades a la memòria del navegador/mostrar l'arbre amb aquestes dades
+co: attualizzà i dati di l'URL per verificà l’individui mudificati/salvà questi dati in a memoria di u navigatore/affissà l’arburu cù questi dati
+cs: aktualizovat URL data pro ověření změněných osob/uložit tato data do paměti prohlížeče/zobrazit strom s těmito daty
+da: opdater URL-dataene for at verificere ændrede personer/gem disse data i browserhukommelsen/vis træet med disse data
+de: die URL-Daten aktualisieren um geänderte Personen zu überprüfen/diese Daten im Browser-Speicher speichern/den Baum mit diesen Daten anzeigen
+en: update the URL data to verify modified individuals/save this data in browser memory/display the tree with this data
+eo: ĝisdatigi la URL-datenojn por kontroli ŝanĝitajn individuojn/konservi ĉi tiujn datenojn en retumila memoro/montri la arbon kun ĉi tiuj datenoj
+es: actualizar los datos de la URL para verificar los individuos modificados/guardar estos datos en la memoria del navegador/mostrar el árbol con estos datos
+et: värskenda URL-i andmeid muudetud isikute kontrollimiseks/salvesta need andmed brauseri mällu/kuva puu nende andmetega
+fi: päivitä URL-tiedot muokattujen henkilöiden tarkistamiseksi/tallenna nämä tiedot selaimen muistiin/näytä puu näillä tiedoilla
+fr: actualiser les données en URL pour vérifier les individus modifiés/sauvegarder ces données en mémoire du navigateur/afficher l’arbre avec ces données
+he: עדכן את נתוני הכתובת לאימות אנשים שהשתנו/שמור נתונים אלה בזיכרון הדפדפן/הצג את העץ עם הנתונים האלה
+is: uppfæra vefslóðargögnin til að staðfesta breytta einstaklinga/vista þessi gögn í vafravinnslu/sýna tréð með þessum gögnum
+it: aggiorna i dati dell'URL per verificare gli individui modificati/salva questi dati nella memoria del browser/mostra l'albero con questi dati
+lt: atnaujinti URL duomenis pakeistų asmenų patikrinimui/išsaugoti šiuos duomenis naršyklės atmintyje/rodyti medį su šiais duomenimis
+lv: atjaunināt URL datus, lai pārbaudītu mainītos indivīdus/saglabāt šos datus pārlūka atmiņā/parādīt koku ar šiem datiem
+nl: werk de URL-gegevens bij om gewijzigde personen te verifiëren/sla deze gegevens op in browsergeheugen/toon de boom met deze gegevens
+no: oppdater URL-dataene for å verifisere endrede individer/lagre disse dataene i nettleserminnet/vis treet med disse dataene
+oc: actualisar las donadas d'URL per verificar los individus modificats/enregistrar aquestas donadas en memòria del navegador/afichar l'arbre amb aquestas donadas
+pl: zaktualizuj dane URL aby zweryfikować zmodyfikowane osoby/zapisz te dane w pamięci przeglądarki/wyświetl drzewo z tymi danymi
+pt: atualizar os dados da URL para verificar os indivíduos modificados/salvar estes dados na memória do navegador/exibir a árvore com estes dados
+ro: actualizează datele URL pentru a verifica indivizii modificați/salvează aceste date în memoria browserului/afișează arborele cu aceste date
+ru: обновить URL-данные для проверки измененных лиц/сохранить эти данные в памяти браузера/отобразить дерево с этими данными
+sk: aktualizovať URL dáta na overenie zmenených osôb/uložiť tieto dáta do pamäte prehliadača/zobraziť strom s týmito dátami
+sl: posodobi URL podatke za preverjanje spremenjenih posameznikov/shrani te podatke v pomnilnik brskalnika/prikaži drevo s temi podatki
+sv: uppdatera URL-data för att verifiera ändrade individer/spara denna data i webbläsarminnet/visa trädet med denna data
+tr: değiştirilen bireyleri doğrulamak için URL verilerini güncelle/bu verileri tarayıcı belleğinde kaydet/bu verilerle ağacı göster
+zh: 更新URL数据以验证修改的个人/将此数据保存在浏览器内存中/使用此数据显示树状图
+
+    RLM unknowns persons
+af: onbekende persoon/persone: korrigeer die individue wat in geel uitgelig is om te kan stoor of vertoon!
+ar: شخص/أشخاص غير معروفين: صحح الأفراد المميزين باللون الأصفر لتتمكن من الحفظ أو العرض!
+bg: неизвестно лице/лица: коригирайте индивидите, маркирани в жълто, за да можете да запазите или покажете графиката!
+br: den/tud dianav: reizhit an dud war wel e melen evit gallout enrollañ pe ziskouez ar grafik!
+ca: persona/persones desconegudes: corregiu els individus ressaltats en groc per poder desar o mostrar el gràfic!
+co: persona/persone incunnute: curriggite l'individui marcati in giallu per pudè salvà o affissà u graficu!
+cs: neznámá osoba/osoby: opravte jedince zvýrazněné žlutě, abyste mohli uložit nebo zobrazit graf!
+da: ukendt person/personer: ret de personer fremhævet i gult for at kunne gemme eller vise grafen!
+de: unbekannte Person(en): korrigieren Sie die gelb markierten Personen um speichern oder anzeigen zu können!
+en: unknown person(s): correct the individuals highlighted in yellow to be able to save or display the graph!
+eo: nekonata persono/personoj: korektu la individuojn reliefigitajn flavo por povi konservi aŭ montri la grafikon!
+es: persona(s) desconocida(s): corrija los individuos resaltados en amarillo para poder guardar o mostrar el gráfico!
+et: tundmatu isik/isikud: parandage kollasega esile tõstetud isikud, et saaksite salvestada või kuvada graafikut!
+fi: tuntematon henkilö/henkilöt: korjaa keltaisella korostetut henkilöt voidaksesi tallentaa tai näyttää kaavion!
+fr: personne(s) non trouvée(s) : corriger les individus en jaune pour pouvoir sauvegarder ou afficher le graphe !
+he: אדם/אנשים לא ידועים: תקן את האנשים המודגשים בצהוב כדי להיות מסוגל לשמור או להציג את הגרף!
+is: óþekktur einstaklingur/einstaklingar: leiðréttu einstaklingana sem eru auðkenndir í gulu til að geta vistað eða sýnt línuritið!
+it: persona/persone sconosciute: correggi gli individui evidenziati in giallo per poter salvare o mostrare il grafico!
+lt: nežinomas asmuo/asmenys: ištaisykite geltonai pažymėtus asmenis, kad galėtumėte išsaugoti arba rodyti grafiką!
+lv: nezināma persona/personas: labojiet dzeltenā krāsā iezīmētos indivīdus, lai varētu saglabāt vai parādīt grafiku!
+nl: onbekende persoon/personen: corrigeer de in geel gemarkeerde personen om te kunnen opslaan of weergeven!
+no: ukjent person/personer: korriger individene uthevet i gult for å kunne lagre eller vise grafen!
+oc: persona/personas desconegudas: corregissètz los individus marcats en jaune per poder enregistrar o afichar lo grafic!
+pl: nieznana osoba/osoby: popraw osoby podświetlone na żółto aby móc zapisać lub wyświetlić wykres!
+pt: pessoa(s) desconhecida(s): corrija os indivíduos destacados em amarelo para poder salvar ou exibir o gráfico!
+ro: persoană/persoane necunoscute: corectați indivizii evidențiați în galben pentru a putea salva sau afișa graficul!
+ru: неизвестное лицо/лица: исправьте выделенных желтым цветом лиц, чтобы иметь возможность сохранить или отобразить график!
+sk: neznáma osoba/osoby: opravte jedincov zvýraznených žlto, aby ste mohli uložiť alebo zobraziť graf!
+sl: neznana oseba/osebe: popravite posameznike, označene rumeno, da boste lahko shranili ali prikazali graf!
+sv: okänd person/personer: korrigera de individer som är markerade i gult för att kunna spara eller visa grafen!
+tr: bilinmeyen kişi/kişiler: kaydetmek veya göstermek için sarıyla vurgulanan bireyleri düzeltin!
+zh: 未知人员：更正黄色突出显示的个人以便能够保存或显示图表！
 
     same ancestor as n° Sosa
 co: uguale à u n° Sosa
