@@ -441,6 +441,12 @@ let rec select_list_lines conf prompt list = function
       else (List.rev list, s :: sl)
   | [] -> (List.rev list, [])
 
+let starts_with_br s =
+  Ext_string.start_with "<br>" 0 s || Ext_string.start_with "<br/>" 0 s
+
+let ends_with_br s =
+  Ext_string.end_with s "<br>" || Ext_string.end_with s "<br/>"
+
 let rec hotl ?(keep_newlines = false) conf wlo cnt edit_opt sections_nums list =
   function
   | "__NOTOC__" :: sl ->
@@ -475,13 +481,11 @@ let rec hotl ?(keep_newlines = false) conf wlo cnt edit_opt sections_nums list =
               else if s.[0] = ' ' && parag = [] then loop2 [ s ] false sl
               else
                 let s =
-                  if
-                    keep_newlines && nl
-                    && not (Ext_string.start_with "<br>" 0 s)
-                  then "<br>" ^ s
+                  if keep_newlines && nl && not (starts_with_br s) then
+                    "<br>" ^ s
                   else s
                 in
-                let nl = not (Ext_string.end_with s "<br>") in
+                let nl = not (ends_with_br s) in
                 loop1 (s :: parag) nl sl
           | [] -> Some (parag, [], true)
         and loop2 parag nl = function
