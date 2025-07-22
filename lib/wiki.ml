@@ -441,11 +441,12 @@ let rec select_list_lines conf prompt list = function
       else (List.rev list, s :: sl)
   | [] -> (List.rev list, [])
 
-let starts_with_br s =
-  Ext_string.start_with "<br>" 0 s || Ext_string.start_with "<br/>" 0 s
+let br_tags = [ "<br>"; "<br/>"; "<BR>"; "<BR/>" ]
 
-let ends_with_br s =
-  Ext_string.end_with s "<br>" || Ext_string.end_with s "<br/>"
+let starts_with_br s =
+  List.exists (fun br -> Ext_string.start_with br 0 s) br_tags
+
+let ends_with_br s = List.exists (fun br -> Ext_string.end_with s br) br_tags
 
 let rec hotl ?(keep_newlines = false) conf wlo cnt edit_opt sections_nums list =
   function
