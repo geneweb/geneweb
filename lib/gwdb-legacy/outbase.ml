@@ -231,17 +231,25 @@ let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
   (* Sorting will need the new ids to be in the base strings array *)
   StringData.swap_strings_array base strings_store;
 
+  let cmp_iper ip1 ip2 =
+    let p1 = base.data.persons.get ip1 in
+    let p2 = base.data.persons.get ip2 in
+    let c = cmp p1.first_name p2.first_name in
+    if c = 0 then cmp p1.surname p2.surname else c
+  in
+
   ignore
   @@ Dutil.IntHT.fold
        (fun k v i ->
-         let v = List.sort_uniq Int.compare v in
+         let v =
+           List.sort_uniq Int.compare v |> List.sort cmp_iper |> List.rev
+         in
          Array.set a i (k, v);
          succ i)
        ht 0;
 
   (* sort the persons' ids by name *)
   Array.sort (fun (k, _) (k', _) -> cmp k k') a;
-
   let oc_n_dat = Secure.open_out_bin names_dat in
   let bt2 =
     Array.map
