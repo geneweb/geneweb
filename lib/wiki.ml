@@ -471,32 +471,43 @@ let rec hotl ?(keep_newlines = false) conf wlo cnt edit_opt sections_nums list =
       in
       hotl ~keep_newlines conf wlo cnt edit_opt sections_nums list sl
   | "" :: sl ->
+      let count_unclosed_tags n s =
+        Ext_string.fold_left
+          (fun n c ->
+            if c = '<' then n + 1 else if c = '>' && n > 0 then n - 1 else n)
+          n s
+      in
       let parag =
-        let rec loop1 parag nl = function
+        let rec loop1 parag nl unclosed_tags = function
           | "" :: sl -> Some (parag, sl, true)
           | s :: sl ->
               if
                 List.mem s.[0] [ '*'; '#'; ':'; ';'; '=' ]
                 || List.mem s toc_list
               then if parag = [] then None else Some (parag, s :: sl, true)
-              else if s.[0] = ' ' && parag = [] then loop2 [ s ] false sl
+              else if s.[0] = ' ' && parag = [] then
+                loop2 [ s ] false unclosed_tags sl
               else
                 let s =
-                  if keep_newlines && nl && not (starts_with_br s) then
-                    "<br>" ^ s
+                  if
+                    keep_newlines && nl
+                    && (not (starts_with_br s))
+                    && unclosed_tags = 0
+                  then "<br>" ^ s
                   else s
                 in
                 let nl = not (ends_with_br s) in
-                loop1 (s :: parag) nl sl
+                let unclosed_tags = count_unclosed_tags unclosed_tags s in
+                loop1 (s :: parag) nl unclosed_tags sl
           | [] -> Some (parag, [], true)
-        and loop2 parag nl = function
+        and loop2 parag nl unclosed_tags = function
           | "" :: sl -> Some (parag, sl, false)
           | s :: sl ->
-              if s.[0] = ' ' then loop2 (s :: parag) nl sl
-              else loop1 parag nl (s :: sl)
+              if s.[0] = ' ' then loop2 (s :: parag) nl unclosed_tags sl
+              else loop1 parag nl unclosed_tags (s :: sl)
           | [] -> Some (parag, [], true)
         in
-        loop1 [] false sl
+        loop1 [] false 0 sl
       in
       let list, sl =
         match parag with
