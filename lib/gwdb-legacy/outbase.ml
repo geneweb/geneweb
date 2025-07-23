@@ -193,7 +193,8 @@ end = struct
     base.data.strings.set_array arr
 end
 
-let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
+let output_name_index_lower_aux strings_store cmp cmp_per get base names_inx
+    names_dat =
   (* Hashtable associating a string id with the list of corresponding persons' ids *)
   let ht = Dutil.IntHT.create 0 in
   (* Hashtable associating the id of a strings and the id of its lowered form *)
@@ -231,18 +232,17 @@ let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
   (* Sorting will need the new ids to be in the base strings array *)
   StringData.swap_strings_array base strings_store;
 
-  let cmp_iper ip1 ip2 =
+  let cmp_iper istr ip1 ip2 =
     let p1 = base.data.persons.get ip1 in
     let p2 = base.data.persons.get ip2 in
-    let c = cmp p1.first_name p2.first_name in
-    if c = 0 then cmp p1.surname p2.surname else c
+    cmp_per istr p1 p2
   in
 
   ignore
   @@ Dutil.IntHT.fold
        (fun k v i ->
          let v =
-           List.sort_uniq Int.compare v |> List.sort cmp_iper |> List.rev
+           List.sort_uniq Int.compare v |> List.sort (cmp_iper k) |> List.rev
          in
          Array.set a i (k, v);
          succ i)
@@ -250,6 +250,7 @@ let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
 
   (* sort the persons' ids by name *)
   Array.sort (fun (k, _) (k', _) -> cmp k k') a;
+
   let oc_n_dat = Secure.open_out_bin names_dat in
   let bt2 =
     Array.map
@@ -279,16 +280,36 @@ let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
     base tmp_fnames_inx tmp_fnames_dat
 
 let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
-  output_name_index_lower_aux strings_ht
-    (Dutil.compare_snames_i_lower base.data)
+  let cmp_istr = Dutil.compare_snames_i_lower base.data in
+  let cmp_per istr p1 p2 =
+    let c1 = cmp_istr p1.surname istr in
+    let c2 = cmp_istr p2.surname istr in
+    match (c1, c2) with
+    | c1, 0 when c1 <> 0 -> 1
+    | 0, c2 when c2 <> 0 -> -1
+    | _, _ ->
+        let c = cmp_istr p1.surname p2.surname in
+        if c = 0 then cmp_istr p1.first_name p2.first_name else c
+  in
+  output_name_index_lower_aux strings_ht cmp_istr cmp_per
     (fun p -> p.surname :: p.surnames_aliases)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_lower_index strings_ht base tmp_fnames_inx tmp_fnames_dat
     =
-  output_name_index_lower_aux strings_ht
-    (Dutil.compare_snames_i_lower base.data)
+  let cmp_istr = Dutil.compare_snames_i_lower base.data in
+  let cmp_per istr p1 p2 =
+    let c1 = cmp_istr p1.first_name istr in
+    let c2 = cmp_istr p2.first_name istr in
+    match (c1, c2) with
+    | c1, 0 when c1 <> 0 -> 1
+    | 0, c2 when c2 <> 0 -> -1
+    | _, _ ->
+        let c = cmp_istr p1.first_name p2.first_name in
+        if c = 0 then cmp_istr p1.surname p2.surname else c
+  in
+  output_name_index_lower_aux strings_ht cmp_istr cmp_per
     (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
