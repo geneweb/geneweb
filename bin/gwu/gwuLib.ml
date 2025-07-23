@@ -1314,7 +1314,7 @@ let print_relations opts base gen ml =
         if Driver.get_rparents p <> [] && gen.per_sel (Driver.get_iper p) then (
           print_relations_for_person opts base gen def_p if_def p;
           List.iter (print_notes_for_person opts base gen) !def_p;
-            if not !old_gw then
+          if not !old_gw then
             List.iter (print_pevents_for_person opts base gen) !def_p);
         loop (pl @ List.map (fun p -> (p, false)) !def_p)
   in
