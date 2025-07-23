@@ -441,7 +441,7 @@ let rec select_list_lines conf prompt list = function
       else (List.rev list, s :: sl)
   | [] -> (List.rev list, [])
 
-let br_tags = [ "<br>"; "<br/>"; "<BR>"; "<BR/>" ]
+let br_tags = [ "<br>"; "<br/>"; "<br />"; "<BR>"; "<BR/>"; "<BR />" ]
 
 let starts_with_br s =
   List.exists (fun br -> Ext_string.start_with br 0 s) br_tags
