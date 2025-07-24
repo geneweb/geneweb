@@ -6,17 +6,19 @@ let removed_string = ref []
 let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
-let rec reconstitute_string_list conf var ext cnt =
+let rec reconstitute_string_list conf var form_is_modified cnt =
   match Update_util.get_nth conf var cnt with
-  | None -> ([], ext)
+  | None -> ([], form_is_modified)
   | Some s -> (
       let s = Ext_string.only_printable s in
-      let sl, ext = reconstitute_string_list conf var ext (cnt + 1) in
+      let sl, form_is_modified =
+        reconstitute_string_list conf var form_is_modified (cnt + 1)
+      in
       match Update_util.get_nth conf ("add_" ^ var) cnt with
       | Some "on" -> (s :: "" :: sl, true)
-      | Some _ | None -> (s :: sl, ext))
+      | Some _ | None -> (s :: sl, form_is_modified))
 
-let reconstitute_insert_title conf ext cnt tl =
+let reconstitute_insert_title conf form_is_modified cnt tl =
   let var = "ins_title" ^ string_of_int cnt in
   let n =
     match
@@ -47,9 +49,9 @@ let reconstitute_insert_title conf ext cnt tl =
       loop tl n
     in
     (tl, true)
-  else (tl, ext)
+  else (tl, form_is_modified)
 
-let rec reconstitute_titles conf ext cnt =
+let rec reconstitute_titles conf form_is_modified cnt =
   match
     ( Update_util.get_nth conf "t_ident" cnt,
       Update_util.get_nth conf "t_place" cnt,
@@ -83,10 +85,14 @@ let rec reconstitute_titles conf ext cnt =
           t_nth;
         }
       in
-      let tl, ext = reconstitute_titles conf ext (cnt + 1) in
-      let tl, ext = reconstitute_insert_title conf ext cnt tl in
-      (t :: tl, ext)
-  | _ -> ([], ext)
+      let tl, form_is_modified =
+        reconstitute_titles conf form_is_modified (cnt + 1)
+      in
+      let tl, form_is_modified =
+        reconstitute_insert_title conf form_is_modified cnt tl
+      in
+      (t :: tl, form_is_modified)
+  | _ -> ([], form_is_modified)
 
 type 'a form_pevent =
   | FormBirth of ('a, string) Def.gen_pers_event
@@ -104,7 +110,7 @@ type 'a form_pevent =
       [ `UnknownBurial | `Burial | `Cremation ]
       * ('a, string) Def.gen_pers_event
 
-let reconstitute_insert_pevent conf ext el =
+let reconstitute_insert_pevent conf form_is_modified el =
   let var = "ins_event" in
   let n =
     match
@@ -136,7 +142,7 @@ let reconstitute_insert_pevent conf ext el =
       loop el n
     in
     (el, true)
-  else (el, ext)
+  else (el, form_is_modified)
 
 let is_empty_burial conf cnt =
   let buri = Update_util.get_nth conf "buri_select" cnt in
@@ -174,9 +180,9 @@ let death_event conf cnt pe =
   in
   FormDeath (tag, pe)
 
-let rec reconstitute_pevents ~base conf ext cnt =
+let rec reconstitute_pevents ~base conf form_is_modified cnt =
   match Update_util.get_nth conf "e_name" cnt with
-  | None -> ([], ext)
+  | None -> ([], form_is_modified)
   | Some epers_name ->
       let epers_name =
         (* TODO EVENT to/of_string *)
@@ -258,8 +264,8 @@ let rec reconstitute_pevents ~base conf ext cnt =
       let wk =
         if epers_name = Epers_Baptism then Def.Witness_GodParent else Witness
       in
-      let witnesses, ext =
-        let rec loop i ext =
+      let witnesses, form_is_modified =
+        let rec loop i form_is_modified =
           match
             try
               let var = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
@@ -267,7 +273,7 @@ let rec reconstitute_pevents ~base conf ext cnt =
             with Failure _ -> None
           with
           | Some c -> (
-              let witnesses, ext = loop (i + 1) ext in
+              let witnesses, form_is_modified = loop (i + 1) form_is_modified in
               let var_c =
                 "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
               in
@@ -321,16 +327,16 @@ let rec reconstitute_pevents ~base conf ext cnt =
                         (("", "", 0, Update.Create (Neuter, None), ""), wk, "")
                       in
                       (c :: new_witn :: witnesses, true))
-              | _ -> (c :: witnesses, ext))
-          | None -> ([], ext)
+              | _ -> (c :: witnesses, form_is_modified))
+          | None -> ([], form_is_modified)
         in
-        loop 1 ext
+        loop 1 form_is_modified
       in
       let witnesses =
         Update_util.witnesses_with_inferred_death_from_event ~conf ~base
           ~date:epers_date witnesses
       in
-      let witnesses, ext =
+      let witnesses, form_is_modified =
         let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
         match Util.p_getenv conf.Config.env evt_ins with
         | Some "on" -> (
@@ -352,7 +358,7 @@ let rec reconstitute_pevents ~base conf ext cnt =
                   (("", "", 0, Update.Create (Neuter, None), ""), wk, "")
                 in
                 (new_witn :: witnesses, true))
-        | Some _ | None -> (witnesses, ext)
+        | Some _ | None -> (witnesses, form_is_modified)
       in
       let e =
         {
@@ -374,24 +380,26 @@ let rec reconstitute_pevents ~base conf ext cnt =
         | Epers_Death -> death_event conf cnt e
         | _ -> FormPevent e
       in
-      let el, ext = reconstitute_pevents ~base conf ext (cnt + 1) in
+      let el, form_is_modified =
+        reconstitute_pevents ~base conf form_is_modified (cnt + 1)
+      in
       let skip =
         match epers_name with
         | Epers_Burial when is_empty_burial conf cnt -> true
         | Epers_Death when is_empty_death conf cnt -> true
         | _ -> false
       in
-      let el = if (not skip) || ext then e :: el else el in
-      (el, ext)
+      let el = if not skip then e :: el else el in
+      (el, form_is_modified)
 
-let reconstitute_add_relation conf ext cnt rl =
+let reconstitute_add_relation conf form_is_modified cnt rl =
   match Update_util.get_nth conf "add_relation" cnt with
   | Some "on" ->
       let r =
         { Def.r_type = GodParent; r_fath = None; r_moth = None; r_sources = "" }
       in
       (r :: rl, true)
-  | Some _ | None -> (rl, ext)
+  | Some _ | None -> (rl, form_is_modified)
 
 let deleted_relation = ref []
 
@@ -440,13 +448,17 @@ let reconstitute_relation conf var =
     Some { Def.r_type; r_fath; r_moth; r_sources = "" }
   with Failure _ -> None
 
-let rec reconstitute_relations conf ext cnt =
+let rec reconstitute_relations conf form_is_modified cnt =
   match reconstitute_relation conf ("r" ^ string_of_int cnt) with
   | Some r ->
-      let rl, ext = reconstitute_relations conf ext (cnt + 1) in
-      let rl, ext = reconstitute_add_relation conf ext cnt rl in
-      (r :: rl, ext)
-  | None -> ([], ext)
+      let rl, form_is_modified =
+        reconstitute_relations conf form_is_modified (cnt + 1)
+      in
+      let rl, form_is_modified =
+        reconstitute_add_relation conf form_is_modified cnt rl
+      in
+      (r :: rl, form_is_modified)
+  | None -> ([], form_is_modified)
 
 let infer_death death_status burial_status burial_place death_pers_event =
   if death_pers_event.Def.epers_date <> Date.cdate_None then
@@ -563,7 +575,7 @@ let get_main_pevents ?(death_status = `DontKnowIfDead) pevents =
     pevents )
 
 let reconstitute_person ~base conf =
-  let ext = false in
+  let form_is_modified = false in
   let key_index =
     match Util.p_getenv conf.Config.env "i" with
     | Some s -> (
@@ -582,21 +594,31 @@ let reconstitute_person ~base conf =
     with Failure _ -> 0
   in
   let image = Ext_string.only_printable (Update_util.get conf "image") in
-  let first_names_aliases, ext =
-    reconstitute_string_list conf "first_name_alias" ext 0
+  let first_names_aliases, form_is_modified =
+    reconstitute_string_list conf "first_name_alias" form_is_modified 0
   in
-  let surnames_aliases, ext =
-    reconstitute_string_list conf "surname_alias" ext 0
+  let surnames_aliases, form_is_modified =
+    reconstitute_string_list conf "surname_alias" form_is_modified 0
   in
   let public_name =
     Ext_string.only_printable (Update_util.get conf "public_name")
   in
-  let qualifiers, ext = reconstitute_string_list conf "qualifier" ext 0 in
-  let aliases, ext = reconstitute_string_list conf "alias" ext 0 in
-  let titles, ext = reconstitute_titles conf ext 1 in
-  let titles, ext = reconstitute_insert_title conf ext 0 titles in
-  let rparents, ext = reconstitute_relations conf ext 1 in
-  let rparents, ext = reconstitute_add_relation conf ext 0 rparents in
+  let qualifiers, form_is_modified =
+    reconstitute_string_list conf "qualifier" form_is_modified 0
+  in
+  let aliases, form_is_modified =
+    reconstitute_string_list conf "alias" form_is_modified 0
+  in
+  let titles, form_is_modified = reconstitute_titles conf form_is_modified 1 in
+  let titles, form_is_modified =
+    reconstitute_insert_title conf form_is_modified 0 titles
+  in
+  let rparents, form_is_modified =
+    reconstitute_relations conf form_is_modified 1
+  in
+  let rparents, form_is_modified =
+    reconstitute_add_relation conf form_is_modified 0 rparents
+  in
   let access =
     match Util.p_getenv conf.Config.env "access" with
     | Some "Public" -> Def.Public
@@ -610,9 +632,15 @@ let reconstitute_person ~base conf =
     | Some "F" -> Female
     | Some _ | None -> Neuter
   in
-  let pevents, ext = reconstitute_pevents ~base conf ext 1 in
-  let pevents, ext = reconstitute_insert_pevent conf ext pevents in
-  let pevents = if ext then pevents else remove_unnamed_events pevents in
+  let pevents, form_is_modified =
+    reconstitute_pevents ~base conf form_is_modified 1
+  in
+  let pevents, form_is_modified =
+    reconstitute_insert_pevent conf form_is_modified pevents
+  in
+  let pevents =
+    if form_is_modified then pevents else remove_unnamed_events pevents
+  in
   let notes =
     if first_name = "?" || surname = "?" then ""
     else
@@ -683,7 +711,7 @@ let reconstitute_person ~base conf =
       key_index;
     }
   in
-  (p, ext)
+  (p, form_is_modified)
 
 let reconstitute_from_pevents pevents (death_status, _, _, _)
     (_burial_status, _, _, _) =
@@ -1117,9 +1145,9 @@ let print_add o_conf base =
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
-  let sp, ext = reconstitute_person ~base conf in
+  let sp, form_is_modified = reconstitute_person ~base conf in
   let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
-  if ext || redisp then UpdateInd.print_update_ind conf base sp ""
+  if form_is_modified || redisp then UpdateInd.print_update_ind conf base sp ""
   else
     let sp = strip_person sp in
     match check_person conf base sp with
@@ -1143,12 +1171,13 @@ let print_del conf base =
   | None -> Hutil.incorrect_request conf
 
 let print_mod_aux ?(check_person_f = check_person) conf base callback =
-  let p, ext = reconstitute_person ~base conf in
+  let p, form_is_modified = reconstitute_person ~base conf in
   let redisp = Option.is_some (Util.p_getenv conf.Config.env "return") in
   let ini_ps = UpdateInd.string_person_of base (Gwdb.poi base p.key_index) in
   let digest = Update.digest_person ini_ps in
   if digest = Update_util.get conf "digest" then
-    if ext || redisp then UpdateInd.print_update_ind conf base p digest
+    if form_is_modified || redisp then
+      UpdateInd.print_update_ind conf base p digest
     else
       let p = strip_person p in
       match check_person_f conf base p with
