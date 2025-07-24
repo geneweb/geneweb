@@ -852,7 +852,39 @@ let treat_request =
              | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "PPS" -> w_base @@ Place.print_all_places_surnames
-             | "R" -> w_base @@ w_person @@ relation_print
+             | "R" ->
+                 w_base @@ w_person
+                 @@ fun conf base p1 ->
+                 if
+                   p_getenv conf.env "i2" <> None
+                   || p_getenv conf.env "p2" <> None
+                 then
+                   let p2 =
+                     match p_getenv conf.env "i2" with
+                     | Some i -> (
+                         try Some (pget conf base (Driver.Iper.of_string i))
+                         with _ -> None)
+                     | None -> (
+                         match
+                           (p_getenv conf.env "p2", p_getenv conf.env "n2")
+                         with
+                         | Some p2_name, Some n2_name -> (
+                             let oc2 =
+                               Option.value ~default:0 (p_getint conf.env "oc2")
+                             in
+                             match
+                               Driver.person_of_key base p2_name n2_name oc2
+                             with
+                             | Some ip -> Some (pget conf base ip)
+                             | None -> None)
+                         | _ -> None)
+                   in
+                   match p2 with
+                   | Some p2 -> RelationDisplay.print conf base p2 (Some p1)
+                   | None ->
+                       Hutil.incorrect_request conf
+                         ~comment:"Invalid second person"
+                 else relation_print conf base p1
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
                  Output.status conf Def.OK;
