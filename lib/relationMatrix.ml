@@ -3,127 +3,180 @@ open Config
 module Driver = Geneweb_db.Driver
 module Sosa = Geneweb_sosa
 
+type ancestor_item =
+  [ `Couple of Driver.iper * int * Driver.iper * int * Driver.ifam
+  | `Unique of Driver.iper * int ]
+
+type kinship_degree = {
+  len1 : int; (* degré ascendant  *)
+  len2 : int; (* degré descendant *)
+  sols : (Driver.iper * int) list; (* (iper, #chemins)    *)
+  ancestors : (Driver.iper * Driver.ifam) list; (* iper + contexte ifam *)
+}
+
+let compute_relationship_cell conf base tstab p1 p2 :
+    string option * kinship_degree option * Sosa.t * float =
+  let ip1 = Driver.get_iper p1 in
+  let ip2 = Driver.get_iper p2 in
+  match Relation.compute_simple_relationship conf base tstab ip1 ip2 with
+  | None -> (None, None, Sosa.zero, 0.0)
+  | Some (rl, total, relationship, _reltab, ancestors_with_ifam) -> (
+      match rl with
+      | [] -> (None, None, total, relationship)
+      | (len1, len2, sols_person) :: _ ->
+          let sols_iper =
+            List.map (fun (p, cnt) -> (Driver.get_iper p, cnt)) sols_person
+          in
+          let anc_filtered =
+            List.filter
+              (fun (iper, _) -> List.exists (fun (j, _) -> j = iper) sols_iper)
+              ancestors_with_ifam
+          in
+          let kd = { len1; len2; sols = sols_iper; ancestors = anc_filtered } in
+          let notation =
+            if len1 = 0 && len2 = 0 then "="
+            else Printf.sprintf "%d/%d" len1 len2
+          in
+          (Some notation, Some kd, total, relationship))
+
 let get_person_simple_name base person =
   let first_name = Driver.sou base (Driver.get_first_name person) in
   let surname = Driver.sou base (Driver.get_surname person) in
   Printf.sprintf "%s %s" first_name surname
 
-let format_ancestors_names conf base ancestors =
-  match ancestors with
-  | [] -> ""
-  | [ anc ] -> get_person_simple_name base anc
-  | [ anc1; anc2 ] ->
-      Printf.sprintf "%s %s %s"
-        (get_person_simple_name base anc1)
-        (Util.transl conf "and" :> string)
-        (get_person_simple_name base anc2)
-  | _ -> (
-      let names = List.map (get_person_simple_name base) ancestors in
-      let rec build_list = function
-        | [] -> ""
-        | [ last ] -> (Util.transl conf "and" :> string) ^ " " ^ last
-        | head :: tail -> head ^ ", " ^ build_list tail
-      in
-      match names with
-      | [] -> ""
-      | head :: tail -> head ^ ", " ^ build_list tail)
+let group_ancestors_by_couples
+    (ancestors_with_ifam : (Driver.iper * Driver.ifam) list)
+    (sols : (Driver.iper * int) list) : ancestor_item list =
+  let count_tbl = Hashtbl.create 16 in
+  List.iter (fun (iper, cnt) -> Hashtbl.add count_tbl iper cnt) sols;
+  let fam_tbl = Hashtbl.create 16 in
+  List.iter
+    (fun (iper, ifam) ->
+      let lst = try Hashtbl.find fam_tbl ifam with Not_found -> [] in
+      Hashtbl.replace fam_tbl ifam (iper :: lst))
+    ancestors_with_ifam;
+  let couple_map = Hashtbl.create 16 in
+  Hashtbl.iter
+    (fun ifam members ->
+      match members with
+      | [ a; b ] when a <> b -> Hashtbl.add couple_map ifam (a, b)
+      | _ -> ())
+    fam_tbl;
+  let used = Hashtbl.create 16 in
+  let items = ref [] in
+  List.iter
+    (fun (iper, ifam) ->
+      if not (Hashtbl.mem used iper) then (
+        if Hashtbl.mem couple_map ifam then
+          let a, b = Hashtbl.find couple_map ifam in
+          if (not (Hashtbl.mem used a)) && not (Hashtbl.mem used b) then (
+            let ca = try Hashtbl.find count_tbl a with _ -> 1 in
+            let cb = try Hashtbl.find count_tbl b with _ -> 1 in
+            items := `Couple (a, ca, b, cb, ifam) :: !items;
+            Hashtbl.add used a ();
+            Hashtbl.add used b ())
+          else ()
+        else
+          let c = try Hashtbl.find count_tbl iper with _ -> 1 in
+          items := `Unique (iper, c) :: !items;
+          Hashtbl.add used iper ()))
+    ancestors_with_ifam;
+  List.rev !items
 
-let make_tooltip_text conf base p1 p2 ancestors total len1 len2 =
-  if ancestors = [] then ""
-  else
-    let p1_name = get_person_simple_name base p1 in
-    let p2_name = get_person_simple_name base p2 in
-    let total_count =
-      if Sosa.eq total Sosa.zero then 0
-      else try int_of_string (Sosa.to_string total) with _ -> 1
-    in
-    let ancestors_count = List.length ancestors in
+let format_ancestors_with_couples conf base
+    (ancestors_with_ifam : (Driver.iper * Driver.ifam) list)
+    (sols : (Driver.iper * int) list) : string =
+  let items = group_ancestors_by_couples ancestors_with_ifam sols in
+  let fmt = function
+    | `Couple (ip1, c1, ip2, c2, _) ->
+        let p1 = Driver.poi base ip1 in
+        let p2 = Driver.poi base ip2 in
+        Printf.sprintf "%s [%d] %s %s [%d]"
+          (get_person_simple_name base p1)
+          c1
+          (Util.transl conf "and" :> string)
+          (get_person_simple_name base p2)
+          c2
+    | `Unique (iper, cnt) ->
+        let p = Driver.poi base iper in
+        Printf.sprintf "%s [%d]" (get_person_simple_name base p) cnt
+  in
+  String.concat ", " (List.map fmt items)
 
-    (* Ligne 1: nombre de relations entre les personnes *)
-    let line1 =
-      let relationship_text =
-        Util.transl_nth conf "relationship link/relationship links"
-          (if total_count = 1 then 0 else 1)
-      in
-      Printf.sprintf
-        (Util.ftransl conf "%d %s links between %s and %s")
-        total_count relationship_text p1_name p2_name
-    in
-
-    (* Ligne 2: ancêtres communs *)
-    let ancestors_names = format_ancestors_names conf base ancestors in
-    let ancestor_label =
-      Util.transl_nth conf "first common ancestor"
-        (if ancestors_count = 1 then 0 else 1)
-      |> Utf8.capitalize_fst
-    in
-    let colon = Util.transl conf ":" in
-    let line2 =
-      Printf.sprintf "<b>%s%s</b><br>%s" ancestor_label colon ancestors_names
-    in
-
-    (* Ligne 3: degré de parenté (titre) avec MAJUSCULE *)
-    let kinship_label_idx = if len1 + len2 = 1 then 0 else 1 in
-    let kinship_label =
-      Util.transl_nth conf "degree of kinship" kinship_label_idx
-      |> Utf8.capitalize_fst
-    in
-    let line3 = Printf.sprintf "<b>%s%s</b>" kinship_label colon in
-
-    (* Ligne 4: degré ascendant *)
-    let asc_label_idx = if len1 = 1 then 0 else 2 in
-    (* 0=ascendant, 2=ascendants *)
-    let asc_label =
-      Util.transl_nth conf "ascending/descending (degree)" asc_label_idx
-    in
-    let asc_icon =
-      {|<i class="fa-solid fa-person-arrow-up-from-line mr-1"></i>|}
-    in
-    let line4 = Printf.sprintf "%s%d %s" asc_icon len1 asc_label in
-
-    (* Ligne 5: degré descendant *)
-    let desc_label_idx = if len2 = 1 then 1 else 3 in
-    (* 1=descendant, 3=descendants *)
-    let desc_label =
-      Util.transl_nth conf "ascending/descending (degree)" desc_label_idx
-    in
-    let desc_icon =
-      {|<i class="fa-solid fa-person-arrow-down-to-line fa-flip-horizontal mr-1"></i>|}
-    in
-    let line5 = Printf.sprintf "%s%d %s" desc_icon len2 desc_label in
-
-    (* Construction du HTML final pour Bootstrap tooltip avec échappement *)
-    let escaped_content =
-      Printf.sprintf "<b>%s</b><br><br>%s<br><br>%s<br>%s<br>%s" line1 line2
-        line3 line4 line5
-    in
-    (* Échapper les guillemets pour l'attribut HTML title *)
-    String.map (function '"' -> '\'' | c -> c) escaped_content
-
-let compute_relationship_cell conf base tstab p1 p2 =
-  let ip1 = Driver.get_iper p1 in
-  let ip2 = Driver.get_iper p2 in
-  match Relation.compute_simple_relationship conf base tstab ip1 ip2 with
-  | None -> (None, [], Sosa.zero, 0, 0, 0.0)
-  | Some (rl, total, relationship, _reltab) -> (
-      match rl with
-      | [] -> (None, [], Sosa.zero, 0, 0, 0.0)
-      | (len1, len2, sols) :: _ ->
-          let ancestors = List.map (fun (anc, _) -> anc) sols in
-          let relationship_notation =
-            if len1 = 0 && len2 = 0 then "="
-            else Printf.sprintf "%d/%d" len1 len2
-          in
-          ( Some relationship_notation,
-            ancestors,
-            total,
-            len1,
-            len2,
-            relationship ))
+let make_tooltip_text conf base p1 p2 (kd_opt : kinship_degree option)
+    (total_sosa : Sosa.t) : string =
+  let colon = Util.transl conf ":" in
+  let p1_name = get_person_simple_name base p1 in
+  let p2_name = get_person_simple_name base p2 in
+  let total_links =
+    if Sosa.eq total_sosa Sosa.zero then 0
+    else
+      match int_of_string (Sosa.to_string total_sosa) with
+      | n when n >= 0 -> n
+      | _ -> 0
+  in
+  let link_word =
+    Util.transl_nth conf "relationship link/relationship links"
+      (if total_links = 1 then 0 else 1)
+  in
+  let link_between =
+    Printf.sprintf
+      (Util.ftransl conf "%d %s links between %s and %s")
+      total_links link_word p1_name p2_name
+  in
+  let header = Printf.sprintf "<b>%s</b><br><br>" link_between in
+  let body =
+    match kd_opt with
+    | None -> ""
+    | Some kd ->
+        let shortest =
+          Util.transl conf "shortest path" |> Utf8.capitalize_fst
+        in
+        let kin_label =
+          Util.transl_nth conf "degree of kinship"
+            (if kd.len1 + kd.len2 = 1 then 0 else 1)
+        in
+        let l1 =
+          Printf.sprintf "<b>%s%s</b> %d %s<br>" shortest colon
+            (kd.len1 + kd.len2) kin_label
+        in
+        let asc_idx = if kd.len1 = 1 then 0 else 2 in
+        let desc_idx = if kd.len2 = 1 then 1 else 3 in
+        let asc_label =
+          Util.transl_nth conf "ascending/descending (degree)" asc_idx
+        in
+        let desc_label =
+          Util.transl_nth conf "ascending/descending (degree)" desc_idx
+        in
+        let asc_icon =
+          "<i class=\"fa-solid fa-person-arrow-up-from-line mr-1\"></i>"
+        in
+        let desc_icon =
+          "<i class=\"fa-solid fa-person-arrow-down-to-line fa-flip-horizontal \
+           mr-1\"></i>"
+        in
+        let l2 =
+          Printf.sprintf "%s%d %s<br>%s%d %s<br>" asc_icon kd.len1 asc_label
+            desc_icon kd.len2 desc_label
+        in
+        let anc_html =
+          format_ancestors_with_couples conf base kd.ancestors kd.sols
+        in
+        let anc_label =
+          Util.transl_nth conf "first common ancestor"
+            (if List.length kd.ancestors = 1 then 0 else 1)
+          |> Utf8.capitalize_fst
+        in
+        let l3 =
+          Printf.sprintf "<br><b>%s%s</b><br>%s" anc_label colon anc_html
+        in
+        l1 ^ l2 ^ l3
+  in
+  String.map (function '"' -> '\'' | c -> c) (header ^ body)
 
 let encoded_key name = (Mutil.encode (Name.lower name) :> string)
 
-(* TODO: vérifier si access_by_key est voulu/déjà automatisé, pas d'équivalent dans le code ml !? *)
+(* TODO: vérifier si access_by_key est voulu/déjà automatisé, pas d'équivalent dans le code m *)
 let make_relationship_link conf base p1 p2 =
   let p1_accessible =
     Util.accessible_by_key conf base p1
@@ -136,18 +189,143 @@ let make_relationship_link conf base p1 p2 =
       (Driver.p_surname base p2)
   in
   if p1_accessible && p2_accessible then
-    let ep = encoded_key (Driver.p_first_name base p1) in
-    let en = encoded_key (Driver.p_surname base p1) in
-    let fn = encoded_key (Driver.p_first_name base p2) in
-    let sn = encoded_key (Driver.p_surname base p2) in
-    Printf.sprintf "%sm=R&p=%s&n=%s&ep=%s&en=%s"
+    let p1_fname = encoded_key (Driver.p_first_name base p1) in
+    let p1_sname = encoded_key (Driver.p_surname base p1) in
+    let oc1 = Driver.get_occ p1 in
+    let p2_fname = encoded_key (Driver.p_first_name base p2) in
+    let p2_sname = encoded_key (Driver.p_surname base p2) in
+    let oc2 = Driver.get_occ p2 in
+    let oc_param = if oc1 = 0 then "" else "&oc=" ^ string_of_int oc1 in
+    let oc2_param = if oc2 = 0 then "" else "&oc2=" ^ string_of_int oc2 in
+    Printf.sprintf "%sm=R&p=%s&n=%s%s&p2=%s&n2=%s%s"
       (Util.commd conf :> string)
-      ep en fn sn
+      p1_fname p1_sname oc_param p2_fname p2_sname oc2_param
   else
-    Printf.sprintf "%sm=R&i=%s&ei=%s"
+    Printf.sprintf "%sm=R&i=%s&i2=%s"
       (Util.commd conf :> string)
       (Driver.Iper.to_string (Driver.get_iper p1))
       (Driver.Iper.to_string (Driver.get_iper p2))
+
+let format_percentage conf pct =
+  let abs_pct = abs_float pct in
+  let exact_values = [ 50.0; 25.0; 12.5; 6.25 ] in
+  let formatted_num =
+    if List.mem abs_pct exact_values then Util.string_of_decimal_num conf pct
+    else if abs_pct >= 1.0 then
+      let rounded = Float.round (pct *. 100.0) /. 100.0 in
+      Util.string_of_decimal_num conf rounded
+    else
+      let rounded = Float.round (pct *. 1000.0) /. 1000.0 in
+      Util.string_of_decimal_num conf rounded
+  in
+  formatted_num ^ " %"
+
+let print_matrix_cell conf base tstab persons i j person_ipers relation_counts =
+  let person_i = persons.(i) in
+  let person_j = persons.(j) in
+  let iper_i = person_ipers.(i) in
+  let iper_j = person_ipers.(j) in
+  if i = j then
+    Output.printf conf {|<td class="rm-diag" id="§%s_§%s">—</td>|}
+      (Driver.Iper.to_string iper_i)
+      (Driver.Iper.to_string iper_j)
+  else if j > i then
+    let notation_opt, kd_opt, total_sosa, consang_coeff =
+      compute_relationship_cell conf base tstab person_i person_j
+    in
+    match notation_opt with
+    | Some notation ->
+        relation_counts.(i) <- relation_counts.(i) + 1;
+        relation_counts.(j) <- relation_counts.(j) + 1;
+        let tooltip_text =
+          make_tooltip_text conf base person_i person_j kd_opt total_sosa
+        in
+        let links_count =
+          Sosa.to_string_sep
+            (Util.transl conf "(thousand separator)" :> string)
+            total_sosa
+        in
+        let coeff_str =
+          let pct = consang_coeff *. 100.0 in
+          if pct < 0.001 then ""
+          else "<br><small>" ^ format_percentage conf pct ^ "</small>"
+        in
+        let cell_content =
+          Printf.sprintf "<small>%s</small><br><b>%s</b>%s" notation links_count
+            coeff_str
+        in
+        let relationship_url =
+          make_relationship_link conf base person_i person_j
+        in
+        let aria_text=
+          Printf.sprintf "%s %s %s %s"
+            (Util.transl conf "relationship between" :> string)
+            (get_person_simple_name base person_i)
+            (Util.transl conf "and" :> string)
+            (get_person_simple_name base person_j)
+        in
+        let cell_link =
+          Util.make_link ~href:relationship_url ~content:cell_content
+            ~aria_label:aria_text ()
+        in
+        Output.printf conf
+          {|<td class="rm-cell" id="§%s_§%s" title="%s"
+             data-toggle="tooltip" data-html="true" data-placement="top">
+            %s
+          </td>|}
+          (Driver.Iper.to_string iper_i)
+          (Driver.Iper.to_string iper_j)
+          (String.map (function '"' -> '\'' | c -> c) tooltip_text)
+          (cell_link :> string)
+    | None ->
+        Output.printf conf
+          {|<td class="rm-cell" id="§%s_§%s">
+            <span class="text-muted" title="%s">—</span>
+          </td>|}
+          (Driver.Iper.to_string iper_i)
+          (Driver.Iper.to_string iper_j)
+          (Util.transl conf "no known relationship" :> string)
+  else Output.print_sstring conf {|<td class="rm-empty"></td>|}
+
+let print_matrix_headers conf persons person_ipers =
+  let n = Array.length persons in
+  Output.print_sstring conf {|<tr><th class="border-top-0"></th>|};
+  for j = 0 to n - 1 do
+    let iper_j = person_ipers.(j) in
+    Output.printf conf
+      {|<th class="text-center rm-thead" id="§%s_">
+         <span class="badge badge-pill badge-primary">%d</span>
+       </th>|}
+      (Driver.Iper.to_string iper_j)
+      (j + 1)
+  done;
+  Output.print_sstring conf {|</tr>|}
+
+let print_matrix_row conf base persons person_ipers tstab relation_counts i =
+  let person = persons.(i) in
+  let iper_i = person_ipers.(i) in
+  let n = Array.length persons in
+  Output.print_sstring conf "<tr>";
+  Output.printf conf
+    {|
+    <th class="rm-head" id="§%s_">
+      <div class="d-flex align-items-center">
+        <span class="badge badge-pill badge-primary ml-2 mr-3">%d</span>
+        <div class="flex-fill text-left">
+          <div><a href="%s">%s</a></div>
+          <div class="small text-muted ml-3">%s</div>
+        </div>
+      </div>
+    </th>|}
+    (Driver.Iper.to_string iper_i)
+    (i + 1)
+    (Util.acces conf base person :> string)
+    (Util.referenced_person_text conf base person :> string)
+    (DateDisplay.short_dates_text conf base person :> string);
+  for j = 0 to n - 1 do
+    print_matrix_cell conf base tstab persons i j person_ipers relation_counts
+  done;
+  Output.print_sstring conf "</tr>"
 
 let print_matrix_table conf base persons =
   let n = Array.length persons in
@@ -159,94 +337,13 @@ let print_matrix_table conf base persons =
 <div class="d-flex justify-content-center">
   <table class="table table-sm" id="rm-table">
     <tbody>|};
+  print_matrix_headers conf persons person_ipers;
   for i = 0 to n - 1 do
-    let person = persons.(i) in
-    let iper_i = person_ipers.(i) in
-    Output.print_sstring conf "<tr>";
-    Output.printf conf
-      {|
-      <th class="rm-head" id="§%s_">
-        <div class="d-flex align-items-center">
-          <span class="badge badge-pill badge-primary ml-2 mr-3">%d</span>
-          <div class="flex-fill text-left">
-            <div><a href="%s">%s</a></div>
-            <div class="small text-muted ml-3">%s</div>
-          </div>
-        </div>
-      </th>|}
-      (Driver.Iper.to_string iper_i)
-      (i + 1)
-      (Util.acces conf base person :> string)
-      (Util.referenced_person_text conf base person :> string)
-      (DateDisplay.short_dates_text conf base person :> string);
-    for j = 0 to n - 1 do
-      let iper_j = person_ipers.(j) in
-      if i = j then
-        Output.printf conf
-          {|<td class="text-center rm-diag" id="§%s_§%s">—</td>|}
-          (Driver.Iper.to_string iper_i)
-          (Driver.Iper.to_string iper_j)
-      else if i > j then
-        let rel_notation, ancestors, total, len1, len2, relationship =
-          compute_relationship_cell conf base tstab persons.(i) persons.(j)
-        in
-        match rel_notation with
-        | Some notation ->
-            relation_counts.(i) <- relation_counts.(i) + 1;
-            relation_counts.(j) <- relation_counts.(j) + 1;
-            let tooltip_text =
-              make_tooltip_text conf base persons.(i) persons.(j) ancestors
-                total len1 len2
-            in
-            let link_url =
-              make_relationship_link conf base persons.(i) persons.(j)
-            in
-            let links_count =
-              if Sosa.eq total Sosa.zero then "0"
-              else
-                Sosa.to_string_sep
-                  (Util.transl conf "(thousand separator)" :> string)
-                  total
-            in
-            let cell_content =
-              if Sosa.eq total Sosa.zero then notation
-              else
-                Printf.sprintf "<strong>%s</strong><br>%.2f%%<br>%s" links_count
-                  (relationship *. 100.0) notation
-            in
-            Output.printf conf
-              {|<td class="text-center rm-cell" id="§%s_§%s"
-                   data-toggle="tooltip" data-html="true" data-placement="top" title="%s">
-                <a href="%s" class="text-decoration-none">%s</a>
-              </td>|}
-              (Driver.Iper.to_string iper_i)
-              (Driver.Iper.to_string iper_j)
-              tooltip_text link_url cell_content
-        | None ->
-            Output.printf conf
-              {|<td class="text-center rm-cell" id="§%s_§%s">—</td>|}
-              (Driver.Iper.to_string iper_i)
-              (Driver.Iper.to_string iper_j)
-      else Output.print_sstring conf {|<td class="rm-empty"></td>|}
-    done;
-    Output.print_sstring conf "</tr>"
+    print_matrix_row conf base persons person_ipers tstab relation_counts i
   done;
-  Output.print_sstring conf {|<tr><th class="border-top-0"></th>|};
-  for i = 0 to n - 1 do
-    let iper_i = person_ipers.(i) in
-    Output.printf conf
-      {|<th class="text-center rm-bhead border-top-0" id="§%s_">
-         <span class="badge badge-pill badge-primary">%d</span>
-       </th>|}
-      (Driver.Iper.to_string iper_i)
-      (i + 1)
-  done;
-  Output.print_sstring conf {|</tr></tbody></table></div>|};
-
-  (* Affichage des statistiques de relations *)
+  Output.print_sstring conf {|</tbody></table></div>|};
   let max_relations = Array.fold_left max 0 relation_counts in
   let total_relations = Array.fold_left ( + ) 0 relation_counts / 2 in
-
   Output.print_sstring conf
     {|<div class="mt-3">
         <h6 class="text-muted">Statistiques des relations</h6>
@@ -259,14 +356,11 @@ let print_matrix_table conf base persons =
           </div>
           <div class="col-md-6">
             <small class="text-muted">Plus connecté: |};
-
-  (* Trouver la personne avec le plus de relations *)
   let max_person_idx = ref 0 in
   for i = 1 to n - 1 do
     if relation_counts.(i) > relation_counts.(!max_person_idx) then
       max_person_idx := i
   done;
-
   if max_relations > 0 then (
     let max_person = persons.(!max_person_idx) in
     Output.print_sstring conf "<strong>";
@@ -274,7 +368,6 @@ let print_matrix_table conf base persons =
       (Util.person_title_text conf base max_person :> string);
     Output.printf conf "</strong> (%d)" relation_counts.(!max_person_idx))
   else Output.print_sstring conf "<em>Aucune</em>";
-
   Output.print_sstring conf
     {|</small>
           </div>
