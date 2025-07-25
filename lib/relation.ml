@@ -411,11 +411,12 @@ let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
 
 let compute_simple_relationship conf base tstab ip1 ip2 =
   let tab = Consang.make_relationship_info base tstab in
-  let relationship, ancestors =
+  let relationship, ancestors_with_ifam =
     Consang.relationship_and_links base tab true ip1 ip2
   in
-  if ancestors = [] then None
+  if ancestors_with_ifam = [] then None
   else
+    let ancestors = List.map fst ancestors_with_ifam in
     let total =
       try
         List.fold_left
@@ -464,7 +465,13 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
           | _ -> (len1, len2, [ sol ]) :: l)
         [] rl
     in
-    Some (rl, total, relationship, tab.Consang.reltab)
+    Some (rl, total, relationship, tab.Consang.reltab, ancestors_with_ifam)
+
+let compute_simple_relationship_compat conf base tstab ip1 ip2 =
+  match compute_simple_relationship conf base tstab ip1 ip2 with
+  | None -> None
+  | Some (rl, total, relationship, reltab, _ancestors_with_ifam) ->
+      Some (rl, total, relationship, reltab)
 
 let known_spouses_list conf base p excl_p =
   let u = p in
@@ -501,8 +508,8 @@ let combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
       List.fold_right
         (fun p2 sl ->
           let sol =
-            compute_simple_relationship conf base tstab (Driver.get_iper p1)
-              (Driver.get_iper p2)
+            compute_simple_relationship_compat conf base tstab
+              (Driver.get_iper p1) (Driver.get_iper p2)
           in
           match sol with
           | Some (rl, total, _, reltab) ->
@@ -521,7 +528,7 @@ let compute_relationship conf base by_marr p1 p2 =
   if ip1 = ip2 then None
   else
     let tstab = Util.create_topological_sort conf base in
-    let sol = compute_simple_relationship conf base tstab ip1 ip2 in
+    let sol = compute_simple_relationship_compat conf base tstab ip1 ip2 in
     let sol_by_marr =
       if by_marr then
         let spl1 = known_spouses_list conf base p1 p2 in
