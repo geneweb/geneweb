@@ -6,7 +6,7 @@ let print_nav_button conf current_data data icon title =
   in
   let active = if current_data = data then "active" else "" in
   Output.printf conf
-    {|<a href="%s" class="btn btn-outline-primary %s">
+    {|<a href="%s" class="btn btn-outline-primary %s" onclick="showOverlay()">
        <i class="fa fa-%s mr-1"></i>%s
      </a>|}
     href active icon
@@ -74,9 +74,8 @@ let print conf base =
     Output.print_sstring conf (Util.transl conf "data typographic checker")
   in
   Hutil.header conf title;
-
+  Util.print_loading_overlay conf ();
   print_nav_buttons conf data;
-
   let total_errors =
     let count1 =
       display_error_section conf data entries CheckData.InvisibleCharacters
@@ -96,9 +95,8 @@ let print conf base =
     in
     count1 + count2 + count3 + count4
   in
-
   if total_errors = 0 && dict <> None then
     Output.printf conf "<h3 class=\"mt-3\">%s</h3>"
       (Utf8.capitalize_fst (Util.transl conf "no match"));
-
-  Hutil.trailer conf
+  Hutil.trailer conf;
+  Util.print_loading_overlay_js conf

@@ -3099,3 +3099,112 @@ let sys_to_note_link p =
 let note_link_to_sys p =
   String.split_on_char NotesLinks.char_dir_sep p
   |> String.concat Filename.dir_sep
+
+(* TODO: Equivalent of String.for_all , removable when OCaml >= 4.13 *)
+let string_for_all pred s =
+  let len = String.length s in
+  let rec loop i =
+    if i >= len then true
+    else if pred (String.get s i) then loop (i + 1)
+    else false
+  in
+  loop 0
+
+let url_has_pnoc_params env =
+  List.exists
+    (fun (key, _) ->
+      String.length key >= 2
+      && (String.get key 0 = 'p' || String.get key 0 = 'n')
+      && string_for_all
+           (function '0' .. '9' -> true | _ -> false)
+           (String.sub key 1 (String.length key - 1)))
+    env
+
+let normalize_person_pool_url conf base target_module assoc_txt_opt =
+  let converted_params = ref [] in
+  let new_index = ref 1 in
+  let preserve_text = target_module = "RLM" in
+  let rec loop i =
+    let k = string_of_int i in
+    let has_i = p_getenv conf.env ("i" ^ k) <> None in
+    let has_p = p_getenv conf.env ("p" ^ k) <> None in
+    if has_i || has_p then (
+      (if has_i then (
+         let id = Option.get (p_getenv conf.env ("i" ^ k)) in
+         let txt_param =
+           if preserve_text then
+             match p_getenv conf.env ("t" ^ k) with
+             | Some txt when txt <> "" ->
+                 "&t" ^ string_of_int !new_index ^ "="
+                 ^ (Mutil.encode txt :> string)
+             | _ -> ""
+           else ""
+         in
+         converted_params :=
+           ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+           :: !converted_params;
+         incr new_index)
+       else
+         match find_person_in_env conf base k with
+         | Some p ->
+             let id = Driver.Iper.to_string (Driver.get_iper p) in
+             let txt_param =
+               if preserve_text then
+                 match p_getenv conf.env ("t" ^ k) with
+                 | Some txt when txt <> "" ->
+                     (match assoc_txt_opt with
+                     | Some assoc_txt ->
+                         Hashtbl.add assoc_txt (Driver.get_iper p) txt
+                     | None -> ());
+                     "&t" ^ string_of_int !new_index ^ "="
+                     ^ (Mutil.encode txt :> string)
+                 | _ -> ""
+               else ""
+             in
+             converted_params :=
+               ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+               :: !converted_params;
+             incr new_index
+         | None -> ());
+      loop (i + 1))
+  in
+  loop 1;
+  Printf.sprintf "%s?m=%s&%s"
+    (conf.command :> string)
+    target_module
+    (String.concat "&" (List.rev !converted_params))
+
+(* Génère un overlay de chargement avec traduction possible *)
+let print_loading_overlay conf ?custom_translation_key () =
+  let translation_key =
+    Option.value custom_translation_key ~default:"waiting overlay"
+  in
+  let title = Utf8.capitalize_fst (transl_nth conf translation_key 0) in
+  let subtitle = Utf8.capitalize_fst (transl_nth conf translation_key 1) in
+  Output.printf conf
+    {|
+<div class="loading-overlay hidden">
+  <div class="text-center">
+    <div class="spinner-border text-light mb-3" role="status">
+      <span class="sr-only">Loading…</span>
+    </div>
+    <h4>%s</h4>
+    <p>%s</p>
+  </div>
+</div>|}
+    title subtitle
+
+let print_loading_overlay_js conf =
+  Output.printf conf
+    {|
+<script>
+function showOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.remove('hidden');
+}
+function hideOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', hideOverlay);
+</script>|}

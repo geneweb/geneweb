@@ -69,7 +69,7 @@
                 %if;(browsing_with_sosa_ref)
                   <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
-                <label class="sr-only" for="pn">Search person name</label>
+                <label class="sr-only" for="fullname">Search person name</label>
                 <input type="search" id="fullname" class="form-control form-control-lg no-clear-button mb-2"
                   name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end; [or] [key]0"
                   autofocus tabindex="4">
