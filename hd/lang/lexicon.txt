@@ -5069,6 +5069,38 @@ sl: krvno sorodstvo
 sv: blodsband
 tr: akrabalık
 
+    consanguinity coefficient/percentage
+af: bloedverwantskapkoëffisiënt/bloedverwantskappersentasie
+bg: коефициент на кръвно родство/процент на кръвно родство
+br: coeffisient kenwadelezh/percentad kenwadelezh
+ca: coeficient de consanguinitat/percentatge de consanguinitat
+co: coeficiente de consanguinità/percentuale de consanguinità
+cs: koeficient pokrevenství/procento pokrevenství
+da: koefficient for blodsslægtskab/procent for blodsslægtskab
+de: konsanguinitätskoeffizient/konsanguinitätsprozentsatz
+en: consanguinity coefficient/consanguinity percentage
+eo: konsangvinica koeficiento/konsangvinica procento
+es: coeficiente de consanguinidad/porcentaje de consanguinidad
+et: veresuguluse koefitsient/veresuguluse protsent
+fi: verisukulaisuuden koeficientti/verisukulaisuuden prosenttiosuus
+fr: coefficient de consanguinité/pourcentage de consanguinité
+he: מקדם קרבת-דם/אחוז קרבת-דם
+is: skyldleika stuðull/prósenta skyldleika
+it: coefficiente di consanguineità/percentuale di consanguineità
+lt: giminystės koeficientas/giminystės procentas
+lv: asinsradniecības koeficients/asinsradniecības procents
+nl: bloedverwantschapscoëfficiënt/bloedverwantschapspercentage
+no: blodsbåndskoeffisient/blodsbåndsprosent
+oc: coeficient de consanguinitat/percentatge de consanguinitat
+pl: współczynnik pokrewieństwa krwi/procent pokrewieństwa krwi
+pt: coeficiente de consanguinidade/percentual de consanguinidade
+ro: coeficient de consanguinitate/procent de consanguinitate
+ru: коэффициент кровного родства/процент кровного родства
+sk: koeficient krvného príbuzenského vzťahu/percento krvného príbuzenského vzťahu
+sl: koeficient krvnega sorodstva/odstotek krvnega sorodstva
+sv: koefficient för blodsbandsläktskap/procent av blodsbandsläktskap
+tr: akrabalık katsayısı/akrabalık yüzdesi
+
     continue
 co: cuntinuà
 de: weiter
@@ -15843,6 +15875,38 @@ sk: vzťah
 sl: zveza
 sv: släktskap
 tr: ilişki
+
+    relationship coefficient/percentage
+af: verwantskapskoëfficiënt/verwantskappersentasie
+bg: коефициент на родство/процент на родство
+br: coeffisient arvererezh/percentad arvererezh
+ca: coeficient de parentesc/percentatge de parentesc
+co: coeficiente de parentia/percentuale de parentia
+cs: koeficient vztahu/procento vztahu
+da: koefficient for slægtskab/procent for slægtskab
+de: verwandtschaftskoeffizient/verwandtschaftsprozentsatz
+en: relationship coefficient/relationship percentage
+eo: parenceca koeficiento/parenceca procento
+es: coeficiente de parentesco/porcentaje de parentesco
+et: suguluse koefitsient/suguluse protsent
+fi: sukulaisuuden koeficientti/sukulaisuuden prosenttiosuus
+fr: coefficient de parenté/pourcentage de parenté
+he: מקדם קרבה משפחתית/אחוז קרבה משפחתית
+is: skyldleikastuðull/prósenta skyldleika
+it: coefficiente di parentela/percentuale di parentela
+lt: giminystės koeficientas/giminystės procentas
+lv: radniecības koeficients/radniecības procents
+nl: verwantschapscoëfficiënt/verwantschapspercentage
+no: slektskap­skoeffisient/slektskap­sprosent
+oc: coeficient de parentat/percentatge de parentat
+pl: współczynnik pokrewieństwa/procent pokrewieństwa
+pt: coeficiente de parentesco/percentual de parentesco
+ro: coeficient de relație/procent de relație
+ru: коэффициент родства/процент родства
+sk: koeficient príbuzenského vzťahu/percento príbuzenského vzťahu
+sl: koeficient sorodstvene povezave/odstotek sorodstvene povezave
+sv: släktskapskoefficient/släktskapsprocent
+tr: ilişki katsayısı/ilişki yüzdesi
 
     %d %s links between %s and %s
 af: %d %s tussen %s en %s
