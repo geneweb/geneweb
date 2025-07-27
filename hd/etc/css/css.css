@@ -1938,6 +1938,11 @@ span.notesourcecolor {
 .rm-hl0.rm-hl1 {
   background: linear-gradient(45deg, rgba(255, 193, 7, 0.5) 50%, rgba(40, 167, 69, 0.5) 50%) !important;
 }
+.rm-deg {
+  display:inline-block;
+  width:1.5em;
+  text-align:right;
+}
 .tooltip-inner {
   background-color: white !important;
   color: black !important;
