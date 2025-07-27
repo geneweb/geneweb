@@ -2,6 +2,23 @@
 open Config
 open Def
 
+val make_link :
+  ?title:string ->
+  ?css_class:string ->
+  ?tabindex:int option ->
+  ?aria_label:string ->
+  ?disabled:bool ->
+  ?target:string option ->
+  ?data_attrs:(string * string) list ->
+  href:string ->
+  content:string ->
+  unit ->
+  Adef.safe_string
+(** [make_link conf ~href ~content ()] creates an accessible HTML link with
+    proper aria-label, title, and other accessibility attributes. Handles
+    disabled state appropriately. The data_attrs parameter allows custom data-*
+    attributes for JavaScript interaction. *)
+
 val hash_file : string -> string option
 (** [hash_file path] Compute the MD5 hash of the file at [path]. Returns
     [Some hex] on success or [None] if the file couldn’t be read. *)
