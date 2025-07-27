@@ -7,6 +7,41 @@ module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
+    ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
+    ~href ~content () =
+  let href_attr = Printf.sprintf " href=\"%s\"" href in
+  let clean_title = String.map (function '"' -> '\'' | c -> c) title in
+  let title_attr =
+    if title = "" then "" else Printf.sprintf " title=\"%s\"" clean_title
+  in
+  let class_attr =
+    if css_class = "" then "" else Printf.sprintf " class=\"%s\"" css_class
+  in
+  let tabindex_attr =
+    match tabindex with
+    | Some i -> Printf.sprintf " tabindex=\"%d\"" i
+    | None -> ""
+  in
+  let aria_label_attr =
+    if aria_label = "" then ""
+    else Printf.sprintf " aria-label=\"%s\"" aria_label
+  in
+  let target_attr =
+    match target with Some t -> Printf.sprintf " target=\"%s\"" t | None -> ""
+  in
+  let disabled_attr = if disabled then " aria-disabled=\"true\"" else "" in
+  let data_attrs_str =
+    List.fold_left
+      (fun acc (k, v) -> acc ^ Printf.sprintf " data-%s=\"%s\"" k v)
+      "" data_attrs
+  in
+  let full_attrs =
+    href_attr ^ title_attr ^ class_attr ^ tabindex_attr ^ aria_label_attr
+    ^ target_attr ^ disabled_attr ^ data_attrs_str
+  in
+  Printf.sprintf "<a%s>%s</a>" full_attrs content |> Adef.safe
+
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
