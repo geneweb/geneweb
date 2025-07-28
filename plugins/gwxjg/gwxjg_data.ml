@@ -12,10 +12,12 @@ let mk_source_rs conf base str =
   (Jingoo.Jg_types.Tstr str, safe (Geneweb.Notes.source conf base str))
 
 let mk_note_rs conf base env str =
-  (Jingoo.Jg_types.Tstr str, safe (Geneweb.Notes.note conf base env str))
+  ( Jingoo.Jg_types.Tstr str,
+    safe (Geneweb.Notes.note ~keep_newlines:true conf base env str) )
 
 let mk_person_note_rs conf base p str =
-  (Jingoo.Jg_types.Tstr str, safe (Geneweb.Notes.person_note conf base p str))
+  ( Jingoo.Jg_types.Tstr str,
+    safe (Geneweb.Notes.person_note ~keep_newlines:true conf base p str) )
 
 let mk_place str =
   (Jingoo.Jg_types.Tstr str, escaped (Geneweb.Util.string_of_place str))

@@ -136,3 +136,8 @@ let end_with s x =
   let slen = String.length s in
   let xlen = String.length x in
   slen >= xlen && String.sub s (slen - xlen) xlen = x
+
+let fold_left f acc s =
+  let acc_r = ref acc in
+  String.iter (fun c -> acc_r := f !acc_r c) s;
+  !acc_r

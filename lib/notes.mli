@@ -28,6 +28,7 @@ val source : Config.config -> Gwdb.base -> string -> Adef.safe_string
 *)
 
 val note :
+  ?keep_newlines:bool ->
   Config.config ->
   Gwdb.base ->
   (char * (unit -> string)) list ->
@@ -39,7 +40,12 @@ val note :
 *)
 
 val person_note :
-  Config.config -> Gwdb.base -> Gwdb.person -> string -> Adef.safe_string
+  ?keep_newlines:bool ->
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  string ->
+  Adef.safe_string
 (** [person_note conf base person str]
     Interprets wiki syntax in a "note" context:
     - env is available during [str] interpretation with [i] variable bound to person image
@@ -53,6 +59,7 @@ val source_note :
 *)
 
 val source_note_with_env :
+  ?keep_newlines:bool ->
   Config.config ->
   Gwdb.base ->
   (char * (unit -> string)) list ->
