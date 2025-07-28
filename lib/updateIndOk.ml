@@ -150,7 +150,9 @@ let is_empty_burial conf cnt =
 
 let is_empty_death conf cnt =
   let death = Update_util.get_nth conf "death_select" cnt in
-  match death with Some "Auto" | Some "DontKnowIfDead" -> true | _ -> false
+  match death with
+  | Some "Auto" | Some "DontKnowIfDead" | Some "NotDead" -> true
+  | _ -> false
 
 let pevent_of_form_pevent = function
   | FormBirth pe -> pe
