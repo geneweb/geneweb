@@ -2120,19 +2120,45 @@ let get_approx_death_date_place conf base p =
     (buri_place :> Adef.safe_string)
 
 let string_of_decimal_num conf f =
-  let s = string_of_float f in
-  let b = Buffer.create 20 in
-  let rec loop i =
-    if i = String.length s then Buffer.contents b
-    else (
-      (match s.[i] with
-      | '.' ->
-          if i = String.length s - 1 then ()
-          else Buffer.add_string b (transl conf "(decimal separator)")
-      | x -> Buffer.add_char b x);
-      loop (i + 1))
-  in
-  loop 0
+  let abs_f = abs_float f in
+  if abs_f >= 0.001 && abs_f < 1000000.0 then
+    let s = Printf.sprintf "%.6f" f in
+    let s = Str.global_replace (Str.regexp "0+$") "" s in
+    let s = Str.global_replace (Str.regexp "\\.$") "" s in
+    let sig_digits =
+      String.fold_left
+        (fun acc c ->
+          if c >= '0' && c <= '9' && not (acc = 0 && c = '0') then acc + 1
+          else acc)
+        0 s
+    in
+    let needs_approx = sig_digits > 4 in
+    let localized =
+      String.map
+        (function
+          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
+        s
+    in
+    if needs_approx then "≃ " ^ localized else localized
+  else if abs_f > 0.0 then
+    let log_val = log10 abs_f in
+    let exp = int_of_float (floor log_val) in
+    let mantissa = f /. (10.0 ** float_of_int exp) in
+    let m_str = Printf.sprintf "%.3f" mantissa in
+    let m_str = Str.global_replace (Str.regexp "0+$") "" m_str in
+    let m_str = Str.global_replace (Str.regexp "\\.$") "" m_str in
+    let m_loc =
+      String.map
+        (function
+          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
+        m_str
+    in
+    let exp_str =
+      if exp < 0 then "−" ^ string_of_int (abs exp) else string_of_int exp
+    in
+    Printf.sprintf "<span class=\"no-wrap\">≃ %s × 10<sup>%s</sup></span>" m_loc
+      exp_str
+  else "0"
 
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
