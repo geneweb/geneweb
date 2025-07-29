@@ -25,6 +25,22 @@ and 'a dag_fam = {
   df_chil : 'a dag_ind list;
 }
 
+type person_id = Driver.iper
+type family_id = Driver.ifam
+type path_count = int
+type degree = int
+
+(** Structure compacte pour les chemins de parenté
+    - p : person identifier (iper)
+    - f : family identifiers list (ifams)
+    - c : count of paths through this ancestor
+    - l1 : ascending degrees from person 1
+    - l2 : ascendante degrees from/descending degrees to person 2
+    - anc : ancestors list for this path *)
+
+type anc_f = { p : Driver.iper; f : Driver.ifam list; c : int }
+type path_f = { l1 : int; l2 : int; anc : anc_f list }
+
 let dag_ind_list_of_path path =
   let indl, _ =
     let merge l1 l2 = if l1 == l2 then l1 else l1 @ l2 in
@@ -416,6 +432,15 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
   in
   if ancestors_with_ifam = [] then None
   else
+    let ifam_table = Hashtbl.create 17 in
+    List.iter
+      (fun (iper, ifam) ->
+        let existing =
+          try Hashtbl.find ifam_table iper with Not_found -> []
+        in
+        if not (List.mem ifam existing) then
+          Hashtbl.replace ifam_table iper (ifam :: existing))
+      ancestors_with_ifam;
     let ancestors = List.map fst ancestors_with_ifam in
     let total =
       try
@@ -465,12 +490,46 @@ let compute_simple_relationship conf base tstab ip1 ip2 =
           | _ -> (len1, len2, [ sol ]) :: l)
         [] rl
     in
-    Some (rl, total, relationship, tab.Consang.reltab, ancestors_with_ifam)
+    let paths_with_ifams =
+      List.map
+        (fun (l1, l2, person_count_list) ->
+          let count_table = Hashtbl.create 17 in
+          List.iter
+            (fun (person, cnt) ->
+              let iper = Driver.get_iper person in
+              let current =
+                try Hashtbl.find count_table iper with Not_found -> 0
+              in
+              Hashtbl.replace count_table iper (current + cnt))
+            person_count_list;
+          let anc_list =
+            Hashtbl.fold
+              (fun iper count acc ->
+                let ifams =
+                  try Hashtbl.find ifam_table iper with Not_found -> []
+                in
+                { p = iper; f = ifams; c = count } :: acc)
+              count_table []
+          in
+          { l1; l2; anc = anc_list })
+        rl
+    in
+    Some (paths_with_ifams, total, relationship, ancestors_with_ifam)
 
 let compute_simple_relationship_compat conf base tstab ip1 ip2 =
   match compute_simple_relationship conf base tstab ip1 ip2 with
   | None -> None
-  | Some (rl, total, relationship, reltab, _ancestors_with_ifam) ->
+  | Some (paths, total, relationship, _) ->
+      let rl =
+        List.map
+          (fun path ->
+            let person_list =
+              List.map (fun anc -> (Driver.poi base anc.p, anc.c)) path.anc
+            in
+            (path.l1, path.l2, person_list))
+          paths
+      in
+      let reltab = (Consang.make_relationship_info base tstab).Consang.reltab in
       Some (rl, total, relationship, reltab)
 
 let known_spouses_list conf base p excl_p =
