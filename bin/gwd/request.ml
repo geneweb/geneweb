@@ -796,39 +796,23 @@ let treat_request =
              | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "PPS" -> w_base @@ Place.print_all_places_surnames
-             | "R" ->
-                 w_base @@ w_person
-                 @@ fun conf base p1 ->
-                 if
-                   p_getenv conf.env "i2" <> None
-                   || p_getenv conf.env "p2" <> None
-                 then
-                   let p2 =
-                     match p_getenv conf.env "i2" with
-                     | Some i -> (
-                         try Some (pget conf base (Driver.Iper.of_string i))
-                         with _ -> None)
-                     | None -> (
-                         match
-                           (p_getenv conf.env "p2", p_getenv conf.env "n2")
-                         with
-                         | Some p2_name, Some n2_name -> (
-                             let oc2 =
-                               Option.value ~default:0 (p_getint conf.env "oc2")
-                             in
-                             match
-                               Driver.person_of_key base p2_name n2_name oc2
-                             with
-                             | Some ip -> Some (pget conf base ip)
-                             | None -> None)
-                         | _ -> None)
-                   in
-                   match p2 with
-                   | Some p2 -> RelationDisplay.print conf base p2 (Some p1)
-                   | None ->
-                       Hutil.incorrect_request conf
-                         ~comment:"Invalid second person"
-                 else relation_print conf base p1
+             | "R" -> (
+                 w_base @@ fun conf base ->
+                 (* Tout le code du cas R doit être dans une seule expression *)
+                 let p1_new = find_person_in_env conf base "1" in
+                 let p2_new = find_person_in_env conf base "2" in
+                 match (p1_new, p2_new) with
+                 | Some p1, Some p2 ->
+                     RelationDisplay.print conf base p1 (Some p2)
+                 | _ -> (
+                     (* Fallback sur l'ancien format *)
+                     let p1_old = find_person_in_env conf base "" in
+                     let p2_old = find_person_in_env conf base "1" in
+                     match (p1_old, p2_old) with
+                     | Some p1, Some p2 ->
+                         RelationDisplay.print conf base p1 (Some p2)
+                     | Some p1, None -> relation_print conf base p1
+                     | _ -> Hutil.incorrect_request conf))
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
                  Output.status conf Def.OK;
