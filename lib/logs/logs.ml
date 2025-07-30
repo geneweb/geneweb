@@ -4,12 +4,27 @@ module Compat = Geneweb_compat
 let verbosity_level = ref 6
 let debug_flag = ref false
 
-let oc : out_channel option ref = ref None
+type output =
+  | Stdout
+  | Stderr
+  | Channel of out_channel
 
-let log fn =
-  match !oc with
-  | Some oc -> fn oc
-  | None -> ()
+let to_out_channel = function
+  | Stdout -> Stdlib.stdout
+  | Stderr -> Stdlib.stderr
+  | Channel oc -> oc
+
+let close_output o =
+  match o with
+  | Stdout | Stderr -> Printf.fprintf (to_out_channel o) "%!"
+  | Channel oc -> close_out oc
+
+let output : output ref = ref Stderr
+
+let set_output_channel o =
+  if !output <> o then (
+    close_output !output;
+    output := o)
 
 type level =
   [ `LOG_EMERG
@@ -53,7 +68,6 @@ let syslog (level : level) msg =
     Syslog.closelog log
   end
 #else
-  let () = () in
   if !verbosity_level >= lvl
   then begin
     let tm = Unix.(time () |> localtime) in
@@ -74,7 +88,7 @@ let syslog (level : level) msg =
         Compat.Out_channel.with_open_gen
           [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn print
     | None ->
-        print stderr
+        print (to_out_channel !output)
   end
 #endif
 
