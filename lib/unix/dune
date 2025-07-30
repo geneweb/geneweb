@@ -1,0 +1,7 @@
+(library
+  (name geneweb_unix)
+  (public_name geneweb.unix)
+  (libraries unix)
+  (foreign_stubs
+    (language c)
+    (names primitives)))
