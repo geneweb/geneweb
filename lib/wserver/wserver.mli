@@ -9,6 +9,7 @@ val start :
   ?addr:string ->
   port:int ->
   ?timeout:int ->
+  ?credentials:Credentials.t ->
   max_pending_requests:int ->
   n_workers:int ->
   handler ->
@@ -111,3 +112,5 @@ val cgi : bool ref
        "machine.domain:2368"   (your machine name)
        "addr:2368"             (your machine internet address)
 *)
+
+module Credentials : module type of Credentials

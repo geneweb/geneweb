@@ -1967,7 +1967,7 @@ let retrieve_secret_salt () =
       exit 1
   | s -> s
 
-let geneweb_server ~predictable_mode () =
+let geneweb_server ?credentials ~predictable_mode () =
   let secret_salt =
     match Unix.getenv "WSERVER" with
     | exception Not_found ->
@@ -2030,8 +2030,8 @@ let geneweb_server ~predictable_mode () =
     | _ -> retrieve_secret_salt ()
   in
   Wserver.start ?addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
-    ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
-    (connection ~secret_salt)
+    ~max_pending_requests:!max_pending_requests ?credentials
+    ~n_workers:!n_workers (connection ~secret_salt)
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -2207,6 +2207,9 @@ let set_predictable_mode () =
   predictable_mode := true
 
 let main () =
+  let credentials =
+    if Sys.unix then Some (Wserver.Credentials.init ()) else None
+  in
   if not Sys.unix then (
     Wserver.sock_in := "gwd.sin";
     Wserver.sock_out := "gwd.sou");
@@ -2481,7 +2484,7 @@ let main () =
     in
     let secret_salt = match !cgi_secret_salt with None -> "" | Some s -> s in
     geneweb_cgi ~secret_salt addr (Filename.basename script) query)
-  else geneweb_server ~predictable_mode:!predictable_mode ()
+  else geneweb_server ?credentials ~predictable_mode:!predictable_mode ()
 
 let () =
   try main () with

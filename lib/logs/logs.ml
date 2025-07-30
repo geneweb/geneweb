@@ -81,6 +81,7 @@ let syslog (level : level) msg =
 type 'a msgf = (('a, Format.formatter, unit, unit) format4 -> 'a) -> unit
 
 let report level fmt = Fmt.kstr (syslog level) ("@[" ^^ fmt ^^ "@]@?")
+let app (msgf : 'a msgf) = msgf @@ report `LOG_NOTICE
 let info (msgf : 'a msgf) = msgf @@ report `LOG_INFO
 let debug (msgf : 'a msgf) = msgf @@ report `LOG_DEBUG
 let warn (msgf : 'a msgf) = msgf @@ report `LOG_WARNING

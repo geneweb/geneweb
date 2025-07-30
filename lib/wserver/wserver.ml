@@ -271,7 +271,7 @@ let accept_connection_windows socket =
            inside [In_channel.with_open_bin]. *)
         ())
 
-let accept_connections_windows socket =
+let accept_connections_windows socket : unit =
   while true do
     try accept_connection_windows socket with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
@@ -300,7 +300,7 @@ let with_timeout ~timeout handler f =
   else f ()
 
 let accept_connection_unix ~timeout callback socket pid =
-  let client_socket, client_addr = My_unix.accept_noeintr socket in
+  let client_socket, client_addr = Geneweb_unix.accept_noeintr socket in
   Logs.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
@@ -322,42 +322,46 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
         Logs.info (fun k -> k "%a" Util.pp_exception (e, bt))
     done
 
-let accept_connections ~timeout ~n_workers callback socket =
-  if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
-  else accept_connections_windows socket
+let prepare_socket () =
+  let socket =
+    Unix.socket
+      (if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then Unix.PF_INET
+       else Unix.PF_INET6)
+      Unix.SOCK_STREAM 0
+  in
+  if Unix.string_of_inet_addr Unix.inet6_addr_any <> "::" then
+    Unix.setsockopt socket Unix.IPV6_ONLY false;
+  Unix.setsockopt socket Unix.SO_REUSEADDR true;
+  socket
 
-let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
+let default_addr ?addr () =
+  match addr with
+  | None ->
+      if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
+        Unix.inet_addr_any
+      else Unix.inet6_addr_any
+  | Some addr -> (
+      try Unix.inet_addr_of_string addr
+      with Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0))
+
+let bind ~addr ~port socket = Unix.bind socket (Unix.ADDR_INET (addr, port))
+
+let pp_welcome_message ppf port =
+  let tm = Unix.localtime (Unix.time ()) in
+  Fmt.pf ppf "Ready %4d-%02d-%02d %02d:%02d port %d...@."
+    (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
+    tm.Unix.tm_hour tm.Unix.tm_min port
+
+let start_windows ?addr ~port ~max_pending_requests callback =
   match Sys.getenv "WSERVER" with
   | exception Not_found ->
       check_stopping ();
-      let addr =
-        match addr with
-        | None ->
-            if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
-              Unix.inet_addr_any
-            else Unix.inet6_addr_any
-        | Some addr -> (
-            try Unix.inet_addr_of_string addr
-            with Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0))
-      in
-      let socket =
-        Unix.socket
-          (if Unix.string_of_inet_addr Unix.inet6_addr_any = "::" then
-             Unix.PF_INET
-           else Unix.PF_INET6)
-          Unix.SOCK_STREAM 0
-      in
-      if Unix.string_of_inet_addr Unix.inet6_addr_any <> "::" then
-        Unix.setsockopt socket Unix.IPV6_ONLY false;
-      Unix.setsockopt socket Unix.SO_REUSEADDR true;
-      Unix.bind socket (Unix.ADDR_INET (addr, port));
-      My_unix.listen_noeintr socket max_pending_requests;
-      let tm = Unix.localtime (Unix.time ()) in
-      Format.eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...@."
-        (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
-        tm.Unix.tm_hour tm.Unix.tm_min port;
-      if n_workers = 0 then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
-      accept_connections ~timeout ~n_workers callback socket
+      let socket = prepare_socket () in
+      let addr = default_addr ?addr () in
+      bind ~addr ~port socket;
+      Unix.listen socket max_pending_requests;
+      accept_connections_windows socket;
+      Logs.app (fun k -> k "%a" pp_welcome_message port)
   | s ->
       let addr = sockaddr_of_string s in
       let client_socket = Unix.openfile !sock_in [ Unix.O_RDONLY ] 0 in
@@ -365,3 +369,28 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       wserver_oc := oc;
       ignore (treat_connection callback addr client_socket);
       exit 0
+
+let start_unix ~timeout ?addr ~port ~credentials ~max_pending_requests
+    ~n_workers callback =
+  check_stopping ();
+  let socket = prepare_socket () in
+  let addr = default_addr ?addr () in
+  Credentials.restore credentials;
+  Fun.protect
+    ~finally:(fun () -> Credentials.drop credentials)
+    (fun () ->
+      bind ~addr ~port socket;
+      Unix.listen socket max_pending_requests);
+  if n_workers = 0 then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
+  accept_connections_unix ~timeout ~n_workers callback socket;
+  Logs.app (fun k -> k "%a" pp_welcome_message port)
+
+let start ?addr ~port ?(timeout = 0) ?credentials ~max_pending_requests
+    ~n_workers callback =
+  if Sys.unix then
+    let credentials = Option.get credentials in
+    start_unix ~timeout ?addr ~port ~credentials ~max_pending_requests
+      ~n_workers callback
+  else start_windows ?addr ~port ~max_pending_requests callback
+
+module Credentials = Credentials
