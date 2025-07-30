@@ -147,7 +147,7 @@
              <i class="fas fa-sync toggle-icon d-none"></i>
            </span>[*validate/delete]0
         </button>
-        <div id="rlm-data" class="d-none">%[%apply;one_pvar_json(1)%]</div>
+        <script id="rlm-data" type="application/json">%[%apply;one_pvar_json(1)%]</script>
         <button type="button" class="btn btn-info mr-4" id="saveRLM"
                 title="[*RLM update data/save data/show graph]1" disabled>
           <span class="mr-2">
@@ -225,11 +225,14 @@ $(document).on( "change", ".reset_bd_text", function() {
   $(this).closest( "tr" ).children( ".bd_text").html( "" );
 });
 $('#saveRLM').on('click', function() {
-  const jsonData = $('#rlm-data').text().trim();
-  if (jsonData) { 
-    localStorage.setItem('inds', jsonData);
+  const jsonText = $('#rlm-data').html().trim();
+  try {
+    const jsonData = JSON.parse(jsonText);
+    localStorage.setItem('inds', JSON.stringify(jsonData));
     toggleIcons('#saveRLM');
     setTimeout(() => toggleIcons('#saveRLM'), 2000);
+  } catch (e) {
+    console.error("Invalid JSON data in #rlm-data", e);
   }
 });
 function buildUrl(mode = 'RLM') {
