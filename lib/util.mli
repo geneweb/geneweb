@@ -115,6 +115,8 @@ val is_restricted : Config.config -> Gwdb.base -> Gwdb.iper -> bool
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
     disabled returns always [false]. *)
 
+val pget_opt : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person option
+
 val pget : Config.config -> Gwdb.base -> Gwdb.iper -> Gwdb.person
 (** Value of [pget_opt], map None to empty_person *)
 
