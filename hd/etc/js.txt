@@ -44,6 +44,13 @@
   %if;(e.m="A" and e.t="T" and e.t1="CT")
     <script src="%etc_prefix;js/jquery.line.js"></script>
   %end;
+  %if;(e.m="CHK_DATA")
+    <script src="%etc_prefix;js/checkdata.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.js%end;"></script>
+  %end;
+  %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
+  %if;("IND" in e.m or "FAM" in e.m or "MOD_NOTES" in e.m)
+   <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
+  %end;
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")
   %if;wizard;
@@ -86,7 +93,7 @@
     %end;
   %end;
 %end;
-%if;("MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
+%if;("CHK_DATA" in e.m or "MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
     or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
     or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
   %if;(b.use_cdn="yes")
@@ -264,147 +271,6 @@ $.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
 $.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 </script>
 %end;
-%( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
-%if;(not is_welcome)
-<script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-
-function addClearButtonToInputs() {
-    // Utility function to create and setup clear button
-    function createClearButton(element) {
-        const clearButton = document.createElement('i');
-        clearButton.className = 'fas fa-xmark clear-button-icon';
-        clearButton.title = '[*clear input]';
-
-        clearButton.style.cssText = `
-            position: absolute;
-            right: 10px;
-            top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-            transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-            cursor: pointer;
-            color: #667fc9;
-            font-size: 1em;
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-            pointer-events: auto;
-        `;
-        return clearButton;
-    }
-
-    // Initialize or update a single input
-    function initializeInput(element) {
-        // Skip if already initialized
-        if (element.dataset.clearInitialized) {
-            const existingButton = element.parentNode.querySelector('.clear-button-icon');
-            if (existingButton) {
-                existingButton.style.opacity = element.value ? '1' : '0';
-            }
-            return;
-        }
-
-        // Mark as initialized
-        element.dataset.clearInitialized = 'true';
-
-        // Create wrapper if needed
-        let wrapper = element.parentNode;
-        if (!wrapper.classList.contains('clear-button-wrapper')) {
-            wrapper = document.createElement('div');
-            wrapper.className = 'clear-button-wrapper';
-            wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-            element.parentNode.insertBefore(wrapper, element);
-            wrapper.appendChild(element);
-        }
-
-        // Add padding for the clear button
-        element.style.paddingRight = '24px';
-
-        // Create and append clear button
-        const clearButton = createClearButton(element);
-        wrapper.appendChild(clearButton);
-
-        // Update clear button visibility
-        const updateVisibility = () => {
-            requestAnimationFrame(() => {
-                clearButton.style.opacity = element.value ? '1' : '0';
-            });
-        };
-
-        // Event listeners
-        element.addEventListener('input', updateVisibility);
-        element.addEventListener('change', updateVisibility);
-        element.addEventListener('focus', updateVisibility);
-
-        // Hover effects
-        clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-        clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-
-        // Handle clear button click
-        clearButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Clear the input
-            element.value = '';
-            element.focus();
-            updateVisibility();
-
-            // Trigger events
-            const inputEvent = new CustomEvent('clearButton', {
-                bubbles: true,
-                detail: { element }
-            });
-            element.dispatchEvent(inputEvent);
-            element.dispatchEvent(new Event('input', { bubbles: true }));
-            element.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-
-        // Initial visibility state
-        updateVisibility();
-    }
-
-    // Process all matching inputs
-    function processInputs() {
-        const selector = `
-            input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-            input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-            textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-            .clear-button:not([readonly]):not([disabled])
-        `;
-
-        requestAnimationFrame(() => {
-            document.querySelectorAll(selector).forEach(initializeInput);
-        });
-    }
-
-    // Initial processing
-    processInputs();
-
-    // Monitor DOM changes
-    const observer = new MutationObserver((mutations) => {
-        let shouldProcess = false;
-        mutations.forEach(mutation => {
-            if (mutation.addedNodes.length ||
-                mutation.type === 'attributes' &&
-                (mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-                shouldProcess = true;
-            }
-        });
-        if (shouldProcess) {
-            processInputs();
-        }
-    });
-
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['type', 'class']
-    });
-}
-</script>
-%end;
 <script>
 %if;(wizard and (is_welcome or "ADD_FAM" in e.m or "MOD_" in e.m))
 // Manages enhanced input field behaviors (navigation, interaction)
@@ -511,7 +377,7 @@ function initializeWelcomeSearchFunctionality() {
   });
 }
 %end;
-%if;(not is_welcome and e.m!="MOD_DATA")
+%if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
 function initializeLazyModules() {
   $('#load_once_p_mod').one('click', () => $.getScript('%etc_prefix;js/p_mod.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.js%end;'));
   $('#load_once_copylink').one('click', () => $.getScript('%etc_prefix;js/copylink.js?hash=%apply;hash%with;%etc_prefix;js/copylink.js%end;'));
@@ -736,7 +602,6 @@ function populateDatalists() {
   datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
 }
 %end;
-
 const initTooltips = () => {
   const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
   if (tooltipElements.length > 0) {
@@ -747,7 +612,6 @@ const initTooltips = () => {
     });
   }
 };
-
 function safeInitialize(fn) {
   try {
     fn();
@@ -772,8 +636,10 @@ document.addEventListener('DOMContentLoaded', () => {
 %if;(is_welcome or "MOD_DATA" in e.m or e.m="RM")
   initTooltips();
 %end;
-%if;(not is_welcome and e.m!="MOD_DATA")
-  initializeLazyModules();
+%if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
+  if (typeof initializeLazyModules === 'function') {
+    initializeLazyModules();
+  }
 %end;
 %if;(e.templ="" and not is_welcome)
   setupModalAutofocus();
@@ -790,6 +656,15 @@ document.addEventListener('DOMContentLoaded', () => {
 %end;
 %if;("MOD" in e.m)
   setupAutofocusInput();
+%end;
+%if;(e.m="CHK_DATA")
+  if (typeof CheckDataEditor !== 'undefined' && CheckDataEditor.init) {
+    if (document.readyState === 'complete') {
+      CheckDataEditor.init();
+    } else {
+      window.addEventListener('load', () => CheckDataEditor.init());
+    }
+  }
 %end;
 });
 </script>
