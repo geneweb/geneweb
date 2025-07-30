@@ -69,30 +69,18 @@ let is_multipart_form =
 let extract_boundary content_type =
   List.assoc "boundary" (Util.create_env content_type)
 
-let print_and_cut_if_too_big oc str =
-  let rec loop i =
-    if i < String.length str then (
-      output_char oc str.[i];
-      let i =
-        if i > 700 && String.length str - i > 750 then (
-          Printf.fprintf oc " ... ";
-          String.length str - 700)
-        else i + 1
-      in
-      loop i)
-  in
-  loop 0
-
 let deprecated_warning_max_clients () =
-  Format.eprintf
-    "The `-max_clients` option is deprecated and may be removed in a future \
-     release.@ It has no effect.@ Use `-n_workers` and\n\
-    \    `-max_pending_requests` instead.@."
+  Logs.warn (fun k ->
+      k
+        "The `-max_clients` option is deprecated and may be removed in a \
+         future release.@ It has no effect.@ Use `-n_workers` and\n\
+        \    `-max_pending_requests` instead.@.")
 
 let deprecated_warning_no_fork () =
-  Format.eprintf
-    "The `-no-fork` option is deprecated and may be removed in a future \
-     release.@ To achieve the same behavior, use `-n_workers 0` instead.@."
+  Logs.warn (fun k ->
+      k
+        "The `-no-fork` option is deprecated and may be removed in a future \
+         release.@ To achieve the same behavior, use `-n_workers 0` instead.@.")
 
 type auth_report = {
   ar_ok : bool;
@@ -117,17 +105,17 @@ let split_username username =
       (username, "")
 
 let log_passwd_failed ar tm from request base_file =
-  Logs.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
-  Printf.fprintf oc "%s (%d) %s_%s => failed (%s)"
-    (Mutil.sprintf_date tm :> string)
-    (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user;
+  Logs.info (fun k ->
+      k "%s (%d) %s_%s => failed (%s)"
+        (Mutil.sprintf_date tm :> string)
+        (Unix.getpid ()) base_file ar.ar_passwd ar.ar_user);
   if !trace_failed_passwd then
-    Printf.fprintf oc " (%s)" (String.escaped ar.ar_uauth);
-  Printf.fprintf oc "\n  From: %s\n  Agent: %s\n" from user_agent;
-  if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
+    Logs.info (fun k -> k " (%s)" (String.escaped ar.ar_uauth));
+  Logs.info (fun k -> k "\n  From: %s\n  Agent: %s" from user_agent);
+  if referer <> "" then Logs.info (fun k -> k "  Referer: %s" referer)
 
 let copy_file conf fname =
   match Util.open_etc_file conf fname with
@@ -1457,29 +1445,29 @@ let make_conf ~secret_salt from_addr request script_name env =
   GWPARAM.cnt_dir := !GWPARAM.cnt_d conf.bname;
   (conf, ar)
 
+let pp_cut_string ~max ppf s =
+  if String.length s > max then Fmt.pf ppf "%s..." (String.sub s 0 max)
+  else Fmt.string ppf s
+
 let log tm conf from gauth request script_name contents =
-  Logs.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
-  Printf.fprintf oc "%s (%d) %s?"
-    (Mutil.sprintf_date tm :> string)
-    (Unix.getpid ()) script_name;
-  print_and_cut_if_too_big oc contents;
-  output_char oc '\n';
-  Printf.fprintf oc "  From: %s\n" from;
-  if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth;
+  Logs.info (fun k ->
+      k "%s (%d) %s?"
+        (Mutil.sprintf_date tm :> string)
+        (Unix.getpid ()) script_name);
+  Logs.info (fun k -> k "%a" (pp_cut_string ~max:700) contents);
+  Logs.info (fun k -> k "From: %s" from);
+  if gauth <> "" then Logs.info (fun k -> k "User: %s" gauth);
   if conf.wizard && not conf.friend then
-    Printf.fprintf oc "  User: %s%s(wizard)\n" conf.user
-      (if conf.user = "" then "" else " ")
+    Logs.info (fun k ->
+        k "  User: %s%s(wizard)" conf.user (if conf.user = "" then "" else " "))
   else if conf.friend && not conf.wizard then
-    Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
-      (if conf.user = "" then "" else " ");
-  if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent;
-  if referer <> "" then (
-    Printf.fprintf oc "  Referer: ";
-    print_and_cut_if_too_big oc referer;
-    Printf.fprintf oc "\n")
+    Logs.info (fun k ->
+        k "  User: %s%s(friend)" conf.user (if conf.user = "" then "" else " "));
+  if user_agent <> "" then Logs.info (fun k -> k "  Agent: %s" user_agent);
+  if referer <> "" then Logs.info (fun k -> k "  Referer: %s" referer)
 
 let is_robot from =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
@@ -1985,33 +1973,36 @@ let geneweb_server ~predictable_mode () =
                 null_reopen [ Unix.O_WRONLY ] Unix.stderr
             | _ -> exit 0
           else (
-            Printf.eprintf
-              "Possible addresses:\n\
-               http://localhost:%d/base\n\
-               http://127.0.0.1:%d/base\n\
-               http://%s:%d/base\n"
-              !selected_port !selected_port hostn !selected_port;
-            Printf.eprintf
-              "where \"base\" is the name of the database\n\
-               Type “Ctrl+C” to stop the service\n";
-            if !debug then (
-              (* taken from Michel Normand commit 1874dcbf7 *)
-              Printf.eprintf
-                "gwd parameters (after GWPARAM.init & cache_lexicon):\n";
-              Printf.eprintf "  source: %s\n" Version.src;
-              Printf.eprintf "  branch: %s\n" Version.branch;
-              Printf.eprintf "  commit: %s\n" Version.commit_id;
-              Printf.eprintf "  gwd: %s\n" Sys.argv.(0);
-              Printf.eprintf "  current_dir_name: %s\n" (Sys.getcwd ());
-              Printf.eprintf "  gw_prefix: %s\n" !gw_prefix;
-              Printf.eprintf "  etc_prefix: %s\n" !etc_prefix;
-              Printf.eprintf "  images_prefix: %s\n" !images_prefix;
-              Printf.eprintf "  images_dir: %s\n" !images_dir;
-              List.iter
-                (fun a -> Printf.eprintf "  secure asset: %s\n" a)
-                (Secure.assets ());
-              Printf.eprintf "TODO: how to print content of conf ?\n"));
-          flush stderr
+            Logs.info (fun k ->
+                k
+                  "Possible addresses:\n\
+                   http://localhost:%d/base\n\
+                   http://127.0.0.1:%d/base\n\
+                   http://%s:%d/base"
+                  !selected_port !selected_port hostn !selected_port);
+            Logs.info (fun k ->
+                k
+                  "where \"base\" is the name of the database\n\
+                   Type “Ctrl+C” to stop the service");
+            (* taken from Michel Normand commit 1874dcbf7 *)
+            Logs.debug (fun k ->
+                k
+                  "gwd parameters (after GWPARAM.init & cache_lexicon):\n\
+                   source: %s\n\
+                   branch: %s\n\
+                   commit: %s\n\
+                   gwd:%s\n\
+                   current_dir_name: %s\n\
+                   gw_prefix: %s\n\
+                   etc_prefix: %s\n\
+                   images_prefix: %s\n\
+                   images_dir: %s\n\
+                   secure asset: %a"
+                  Version.src Version.branch Version.commit_id Sys.argv.(0)
+                  (Sys.getcwd ()) !gw_prefix !etc_prefix !images_prefix
+                  !images_dir
+                  Fmt.(box @@ brackets @@ list ~sep:comma string)
+                  (Secure.assets ())))
         in
         let () =
           try
@@ -2191,13 +2182,25 @@ let print_version_commit () =
   Printf.printf "Branch %s\nLast commit %s\n" Version.branch Version.commit_id;
   exit 0
 
+let set_log_file f =
+  Logs.set_output_channel
+    (match f with
+    | "-" | "<stdout>" -> Logs.Stdout
+    | "2" | "<stderr>" -> Logs.Stderr
+    | _ ->
+        let oc =
+          open_out_gen [ Open_wronly; Open_creat; Open_append; Open_text ] 644 f
+        in
+        Logs.Channel oc)
+
+let set_verbosity_level lvl = Logs.verbosity_level := lvl
+
 let set_debug_flag () =
   debug := true;
   Logs.debug_flag := true;
   Printexc.record_backtrace true;
+  set_verbosity_level 7;
   Sys.enable_runtime_warnings true
-
-let set_verbosity_level lvl = Logs.verbosity_level := lvl
 
 let set_predictable_mode () =
   Logs.warn (fun k ->
@@ -2302,14 +2305,7 @@ let main () =
         Arg.String (Mutil.list_ref_append lexicon_list),
         "<FILE> Add file as lexicon." );
       ( "-log",
-        Arg.String
-          (fun x ->
-            Logs.oc :=
-              Some
-                (match x with
-                | "-" | "<stdout>" -> stdout
-                | "2" | "<stderr>" -> stderr
-                | _ -> open_out x)),
+        Arg.String set_log_file,
         {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|}
       );
       ( "-log_level",
@@ -2433,10 +2429,9 @@ let main () =
   cache_lexicon ();
   List.iter
     (fun dbn ->
-      Printf.eprintf "Caching database %s in memory… %!" dbn;
+      Logs.info (fun k -> k "Caching database %s in memory… %!" dbn);
       let dbn = !GWPARAM.bpath dbn in
-      Driver.load_database dbn;
-      Printf.eprintf "Done.\n%!")
+      Driver.load_database dbn)
     !cache_databases;
   if !auth_file <> "" && !force_cgi then
     Logs.syslog `LOG_WARNING
@@ -2486,23 +2481,23 @@ let main () =
 let () =
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
-      Printf.eprintf "\nError: ";
-      Printf.eprintf "the port %d" !selected_port;
-      Printf.eprintf
-        " is already used by another GeneWeb daemon or by another program. \
-         Solution: kill the other program or launch GeneWeb with another port \
-         number (option -p)";
-      flush stderr
+      Logs.err (fun k ->
+          k
+            "Error: the port %d\n\
+            \         is already used by another GeneWeb daemon or by another \
+             program. Solution: kill the other program or launch GeneWeb with \
+             another port number (option -p)"
+            !selected_port)
   | Unix.Unix_error (Unix.ENOTCONN, _, _) when Sys.unix ->
       Logs.syslog `LOG_WARNING
         {|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|}
   | Unix.Unix_error (Unix.EACCES, "bind", _) when Sys.unix ->
-      Printf.eprintf
-        "Error: invalid access to the port %d: users port number less than \
-         1024 are reserved to the system. Solution: do it as root or choose \
-         another port number greater than 1024."
-        !selected_port;
-      flush stderr
+      Logs.err (fun k ->
+          k
+            "Error: invalid access to the port %d: users port number less than \
+             1024 are reserved to the system. Solution: do it as root or \
+             choose another port number greater than 1024."
+            !selected_port)
   | Register_plugin_failure (p, `dynlink_error e) ->
       Logs.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->

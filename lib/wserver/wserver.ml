@@ -6,7 +6,6 @@ module Logs = Geneweb_logs.Logs
 type handler =
   Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit
 
-let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
 
@@ -220,9 +219,9 @@ let skip_possible_remaining_chars fd =
 let check_stopping () =
   if Sys.file_exists !stop_server then (
     flush stdout;
-    eprintf "\nServer stopped by presence of file %s.\n" !stop_server;
-    eprintf "Remove that file to allow servers to run again.\n";
-    flush stderr;
+    Logs.err (fun k ->
+        k "Server stopped by presence of file %s.\n" !stop_server);
+    Logs.err (fun k -> k "Remove that file to allow servers to run again.");
     exit 0)
 
 let accept_connection_windows socket =
@@ -353,9 +352,10 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       Unix.bind socket (Unix.ADDR_INET (addr, port));
       My_unix.listen_noeintr socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
-      Format.eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...@."
-        (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
-        tm.Unix.tm_hour tm.Unix.tm_min port;
+      Logs.info (fun k ->
+          k "Ready %4d-%02d-%02d %02d:%02d port %d..." (1900 + tm.Unix.tm_year)
+            (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+            port);
       if n_workers = 0 then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
       accept_connections ~timeout ~n_workers callback socket
   | s ->

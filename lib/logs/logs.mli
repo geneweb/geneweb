@@ -7,11 +7,11 @@ val verbosity_level : int ref
 val debug_flag : bool ref
 (** If set to [true], prints backtrace when printing log. *)
 
-val oc : out_channel option ref
-(** The output channel in which log is written. *)
+type output = Stdout | Stderr | Channel of out_channel
 
-val log : (out_channel -> unit) -> unit
-(** Prints on [oc] *)
+val set_output_channel : output -> unit
+(** Set the output channel for logs. The default is [Stderr]. If the previous
+    output was a file, it is properly closed. *)
 
 type level =
   [ `LOG_EMERG  (** A panic condition. Print if [!verbosity_level >= 0]. *)
