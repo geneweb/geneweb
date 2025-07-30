@@ -28,12 +28,15 @@
     camlp-streams
     camlzip
     cppo
+    digestif
     fmt
     jingoo
     markup
     ounit
+    pp_loc
     ppx_blob
     ppx_deriving
+    ppx_deriving_yojson
     ppx_import
     stdlib-shims
     syslog
@@ -43,8 +46,6 @@
     uunf
     uutf
     yojson
-    digestif
-    pp_loc
     (utop :with-dev-setup)
     (ocamlformat (and :with-dev-setup (= "0.27.0")))
   )

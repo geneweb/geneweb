@@ -2,6 +2,23 @@
 open Config
 open Def
 
+val make_link :
+  ?title:string ->
+  ?css_class:string ->
+  ?tabindex:int option ->
+  ?aria_label:string ->
+  ?disabled:bool ->
+  ?target:string option ->
+  ?data_attrs:(string * string) list ->
+  href:string ->
+  content:string ->
+  unit ->
+  Adef.safe_string
+(** [make_link conf ~href ~content ()] creates an accessible HTML link with
+    proper aria-label, title, and other accessibility attributes. Handles
+    disabled state appropriately. The data_attrs parameter allows custom data-*
+    attributes for JavaScript interaction. *)
+
 val hash_file : string -> string option
 (** [hash_file path] Compute the MD5 hash of the file at [path]. Returns
     [Some hex] on success or [None] if the file couldn’t be read. *)
@@ -793,3 +810,42 @@ val sys_to_note_link : string -> string
 
 val note_link_to_sys : string -> string
 (** convert note_link path (a:b:c) to system format (a/b/c) *)
+
+val url_has_pnoc_params : (string * 'a) list -> bool
+(** [url_has_pnoc_params env] checks if the environment contains parameters
+    starting with 'p' or 'n' followed by digits (e.g., p1, n2, p34). Used to
+    detect persons accessed by key in URL parameters. *)
+
+val normalize_person_pool_url :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  string ->
+  (Geneweb_db.Driver.iper, string) Hashtbl.t option ->
+  string
+(** [normalize_person_pool_url conf base target_module assoc_txt_opt] Converts
+    mixed person parameters (p/n/oc and i) to normalized index-only URLs.
+
+    - Converts p1/n1/oc1 → i1, p2/n2/oc2 → i2, etc.
+    - Preserves existing i1, i2, etc. parameters as-is
+    - For RLM mode: preserves t= text parameters in URL and fills assoc_txt
+    - For RM mode: strips all t= parameters (cleaner URLs)
+    - Returns clean URL with format: "?m=TARGET&i1=123&i2=456..."
+
+    @param conf Configuration
+    @param base Database
+    @param target_module Target module name ("RLM" or "RM")
+    @param assoc_txt_opt Optional hashtable for text descriptions (RLM only)
+    @return Normalized URL string *)
+
+val print_loading_overlay :
+  Config.config -> ?custom_translation_key:string -> unit -> unit
+(** [print_loading_overlay conf ?custom_translation_key ()] generates a loading
+    overlay with a spinner and message. Uses the translation key
+    [waiting overlay] by default, or the provided custom translation key. The
+    overlay is initially hidden and can controlled via JavaScript functions. *)
+
+val print_loading_overlay_js : Config.config -> unit
+(** [print_loading_overlay_js conf] generates JavaScript functions to control
+    the loading overlay: showOverlay() to display it, hideOverlay() to hide it,
+    and automatic hiding when the page finishes loading. Works with any overlay
+    that has the "loading-overlay" CSS class. *)

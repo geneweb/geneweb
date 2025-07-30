@@ -36,7 +36,8 @@ type relationship_info = {
   tstab : (Geneweb_db.Driver.iper, int) Geneweb_db.Collection.Marker.t;
   reltab :
     (Geneweb_db.Driver.iper, relationship) Geneweb_db.Collection.Marker.t;
-  mutable queue : Geneweb_db.Driver.iper list array;
+  mutable queue :
+    (Geneweb_db.Driver.iper * Geneweb_db.Driver.ifam option) list array;
 }
 
 let half x = x *. 0.5
@@ -221,7 +222,7 @@ let relationship_and_links base ri b ip1 ip2 =
         (min (Collection.Marker.get tstab i1) (Collection.Marker.get tstab i2))
     in
     let qmax = ref (-1) in
-    let insert u =
+    let insert u f =
       let v = Collection.Marker.get tstab u in
       reset u;
       (if v >= Array.length ri.queue then
@@ -231,22 +232,21 @@ let relationship_and_links base ri b ip1 ip2 =
         for i = !qi to v - 1 do
           ri.queue.(i) <- []
         done;
-        qmax := v;
-        ri.queue.(v) <- [ u ])
-      else (
-        if v > !qmax then (
-          for i = !qmax + 1 to v do
-            ri.queue.(i) <- []
-          done;
-          qmax := v);
-        ri.queue.(v) <- u :: ri.queue.(v))
+        qmax := v)
+      else if v > !qmax then (
+        for i = !qmax + 1 to v do
+          ri.queue.(i) <- []
+        done;
+        qmax := v);
+      ri.queue.(v) <- (u, f) :: ri.queue.(v)
     in
     let relationship = ref 0.0 in
     let nb_anc1 = ref 1 in
     let nb_anc2 = ref 1 in
     let tops = ref [] in
-    let treat_parent ip_from u y =
-      if (Collection.Marker.get reltab y).inserted <> yes_inserted then insert y;
+    let treat_parent ip_from u y f =
+      if (Collection.Marker.get reltab y).inserted <> yes_inserted then
+        insert y (Some f);
       let ty = Collection.Marker.get reltab y in
       let p1 = half u.weight1 in
       let p2 = half u.weight2 in
@@ -264,7 +264,7 @@ let relationship_and_links base ri b ip1 ip2 =
         ty.lens1 <- List.fold_left (insert_branch_len ip_from) ty.lens1 u.lens1;
         ty.lens2 <- List.fold_left (insert_branch_len ip_from) ty.lens2 u.lens2)
     in
-    let treat_ancestor u =
+    let treat_ancestor (u, f) =
       let tu = Collection.Marker.get reltab u in
       let a = Driver.poi base u in
       let contribution =
@@ -274,17 +274,20 @@ let relationship_and_links base ri b ip1 ip2 =
       if tu.anc_stat2 = IsAnc then decr nb_anc2;
       relationship := !relationship +. contribution;
       if b && contribution <> 0.0 && not tu.elim_ancestors then (
-        tops := u :: !tops;
+        let result_f =
+          match f with Some ifam -> ifam | None -> Driver.Ifam.dummy
+        in
+        tops := (u, result_f) :: !tops;
         tu.elim_ancestors <- true);
       match Driver.get_parents a with
       | Some ifam ->
           let cpl = Driver.foi base ifam in
-          treat_parent u tu (Driver.get_father cpl);
-          treat_parent u tu (Driver.get_mother cpl)
+          treat_parent u tu (Driver.get_father cpl) ifam;
+          treat_parent u tu (Driver.get_mother cpl) ifam
       | _ -> ()
     in
-    insert i1;
-    insert i2;
+    insert i1 None;
+    insert i2 None;
     (Collection.Marker.get reltab i1).weight1 <- 1.0;
     (Collection.Marker.get reltab i2).weight2 <- 1.0;
     (Collection.Marker.get reltab i1).lens1 <- [ (0, 1, []) ];

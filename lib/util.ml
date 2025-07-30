@@ -7,6 +7,41 @@ module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
+    ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
+    ~href ~content () =
+  let href_attr = Printf.sprintf " href=\"%s\"" href in
+  let clean_title = String.map (function '"' -> '\'' | c -> c) title in
+  let title_attr =
+    if title = "" then "" else Printf.sprintf " title=\"%s\"" clean_title
+  in
+  let class_attr =
+    if css_class = "" then "" else Printf.sprintf " class=\"%s\"" css_class
+  in
+  let tabindex_attr =
+    match tabindex with
+    | Some i -> Printf.sprintf " tabindex=\"%d\"" i
+    | None -> ""
+  in
+  let aria_label_attr =
+    if aria_label = "" then ""
+    else Printf.sprintf " aria-label=\"%s\"" aria_label
+  in
+  let target_attr =
+    match target with Some t -> Printf.sprintf " target=\"%s\"" t | None -> ""
+  in
+  let disabled_attr = if disabled then " aria-disabled=\"true\"" else "" in
+  let data_attrs_str =
+    List.fold_left
+      (fun acc (k, v) -> acc ^ Printf.sprintf " data-%s=\"%s\"" k v)
+      "" data_attrs
+  in
+  let full_attrs =
+    href_attr ^ title_attr ^ class_attr ^ tabindex_attr ^ aria_label_attr
+    ^ target_attr ^ disabled_attr ^ data_attrs_str
+  in
+  Printf.sprintf "<a%s>%s</a>" full_attrs content |> Adef.safe
+
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
@@ -2085,19 +2120,45 @@ let get_approx_death_date_place conf base p =
     (buri_place :> Adef.safe_string)
 
 let string_of_decimal_num conf f =
-  let s = string_of_float f in
-  let b = Buffer.create 20 in
-  let rec loop i =
-    if i = String.length s then Buffer.contents b
-    else (
-      (match s.[i] with
-      | '.' ->
-          if i = String.length s - 1 then ()
-          else Buffer.add_string b (transl conf "(decimal separator)")
-      | x -> Buffer.add_char b x);
-      loop (i + 1))
-  in
-  loop 0
+  let abs_f = abs_float f in
+  if abs_f >= 0.001 && abs_f < 1000000.0 then
+    let s = Printf.sprintf "%.6f" f in
+    let s = Str.global_replace (Str.regexp "0+$") "" s in
+    let s = Str.global_replace (Str.regexp "\\.$") "" s in
+    let sig_digits =
+      String.fold_left
+        (fun acc c ->
+          if c >= '0' && c <= '9' && not (acc = 0 && c = '0') then acc + 1
+          else acc)
+        0 s
+    in
+    let needs_approx = sig_digits > 4 in
+    let localized =
+      String.map
+        (function
+          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
+        s
+    in
+    if needs_approx then "≃ " ^ localized else localized
+  else if abs_f > 0.0 then
+    let log_val = log10 abs_f in
+    let exp = int_of_float (floor log_val) in
+    let mantissa = f /. (10.0 ** float_of_int exp) in
+    let m_str = Printf.sprintf "%.3f" mantissa in
+    let m_str = Str.global_replace (Str.regexp "0+$") "" m_str in
+    let m_str = Str.global_replace (Str.regexp "\\.$") "" m_str in
+    let m_loc =
+      String.map
+        (function
+          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
+        m_str
+    in
+    let exp_str =
+      if exp < 0 then "−" ^ string_of_int (abs exp) else string_of_int exp
+    in
+    Printf.sprintf "<span class=\"no-wrap\">≃ %s × 10<sup>%s</sup></span>" m_loc
+      exp_str
+  else "0"
 
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
@@ -3099,3 +3160,112 @@ let sys_to_note_link p =
 let note_link_to_sys p =
   String.split_on_char NotesLinks.char_dir_sep p
   |> String.concat Filename.dir_sep
+
+(* TODO: Equivalent of String.for_all , removable when OCaml >= 4.13 *)
+let string_for_all pred s =
+  let len = String.length s in
+  let rec loop i =
+    if i >= len then true
+    else if pred (String.get s i) then loop (i + 1)
+    else false
+  in
+  loop 0
+
+let url_has_pnoc_params env =
+  List.exists
+    (fun (key, _) ->
+      String.length key >= 2
+      && (String.get key 0 = 'p' || String.get key 0 = 'n')
+      && string_for_all
+           (function '0' .. '9' -> true | _ -> false)
+           (String.sub key 1 (String.length key - 1)))
+    env
+
+let normalize_person_pool_url conf base target_module assoc_txt_opt =
+  let converted_params = ref [] in
+  let new_index = ref 1 in
+  let preserve_text = target_module = "RLM" in
+  let rec loop i =
+    let k = string_of_int i in
+    let has_i = p_getenv conf.env ("i" ^ k) <> None in
+    let has_p = p_getenv conf.env ("p" ^ k) <> None in
+    if has_i || has_p then (
+      (if has_i then (
+         let id = Option.get (p_getenv conf.env ("i" ^ k)) in
+         let txt_param =
+           if preserve_text then
+             match p_getenv conf.env ("t" ^ k) with
+             | Some txt when txt <> "" ->
+                 "&t" ^ string_of_int !new_index ^ "="
+                 ^ (Mutil.encode txt :> string)
+             | _ -> ""
+           else ""
+         in
+         converted_params :=
+           ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+           :: !converted_params;
+         incr new_index)
+       else
+         match find_person_in_env conf base k with
+         | Some p ->
+             let id = Driver.Iper.to_string (Driver.get_iper p) in
+             let txt_param =
+               if preserve_text then
+                 match p_getenv conf.env ("t" ^ k) with
+                 | Some txt when txt <> "" ->
+                     (match assoc_txt_opt with
+                     | Some assoc_txt ->
+                         Hashtbl.add assoc_txt (Driver.get_iper p) txt
+                     | None -> ());
+                     "&t" ^ string_of_int !new_index ^ "="
+                     ^ (Mutil.encode txt :> string)
+                 | _ -> ""
+               else ""
+             in
+             converted_params :=
+               ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+               :: !converted_params;
+             incr new_index
+         | None -> ());
+      loop (i + 1))
+  in
+  loop 1;
+  Printf.sprintf "%s?m=%s&%s"
+    (conf.command :> string)
+    target_module
+    (String.concat "&" (List.rev !converted_params))
+
+(* Génère un overlay de chargement avec traduction possible *)
+let print_loading_overlay conf ?custom_translation_key () =
+  let translation_key =
+    Option.value custom_translation_key ~default:"waiting overlay"
+  in
+  let title = Utf8.capitalize_fst (transl_nth conf translation_key 0) in
+  let subtitle = Utf8.capitalize_fst (transl_nth conf translation_key 1) in
+  Output.printf conf
+    {|
+<div class="loading-overlay hidden">
+  <div class="text-center">
+    <div class="spinner-border text-light mb-3" role="status">
+      <span class="sr-only">Loading…</span>
+    </div>
+    <h4>%s</h4>
+    <p>%s</p>
+  </div>
+</div>|}
+    title subtitle
+
+let print_loading_overlay_js conf =
+  Output.printf conf
+    {|
+<script>
+function showOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.remove('hidden');
+}
+function hideOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', hideOverlay);
+</script>|}
