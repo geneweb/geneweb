@@ -130,13 +130,12 @@ let check tm from max_call sec conf suicide =
             xcl.who;
         let refused =
           if suicide || cnt > max_call then (
-            Logs.log (fun oc ->
-                Printf.fprintf oc "--- %s is a robot" from;
-                if suicide then
-                  Printf.fprintf oc " (called the \"suicide\" request)\n"
-                else
-                  Printf.fprintf oc
-                    " (%d > %d connections in %g <= %d seconds)\n" cnt max_call
+            Logs.info (fun k -> k "--- %s is a robot" from);
+            if suicide then
+              Logs.info (fun k -> k " (called the \"suicide\" request)")
+            else
+              Logs.info (fun k ->
+                  k " (%d > %d connections in %g <= %d seconds)\n" cnt max_call
                     (tm -. tm0) sec);
             xcl.excl <- (from, ref 1) :: xcl.excl;
             xcl.who <- W.remove from xcl.who;
@@ -144,17 +143,17 @@ let check tm from max_call sec conf suicide =
             true)
           else false
         in
-        (match xcl.excl with
-        | [ _; _ ] ->
-            Logs.log (fun oc ->
-                List.iter
-                  (fun (s, att) ->
-                    Printf.fprintf oc "--- excluded:";
-                    Printf.fprintf oc " %s (%d refused attempts)\n" s !att)
-                  xcl.excl;
-                Printf.fprintf oc "--- to restore access, delete file \"%s\"\n"
-                  fname)
-        | _ -> ());
+        let () =
+          match xcl.excl with
+          | [ _; _ ] ->
+              let pp_refused ppf (s, att) =
+                Fmt.pf ppf "--- excluded: %s (%d refused attempts)\n" s !att
+              in
+              Logs.info (fun k -> k "%a" Fmt.(list pp_refused) xcl.excl);
+              Logs.info (fun k ->
+                  k "--- to restore access, delete file %S" fname)
+          | _ -> ()
+        in
         let list, nconn =
           W.fold
             (fun k w (list, nconn) ->
@@ -171,14 +170,13 @@ let check tm from max_call sec conf suicide =
               match compare nb2 nb1 with 0 -> compare tm2 tm1 | x -> x)
             list
         in
-        Logs.log (fun oc ->
-            List.iter
-              (fun (k, tm0, nb) ->
-                Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
-                  (tm -. tm0) k)
-              list;
-            Printf.fprintf oc "--- max %d req by %s / conn %d\n"
-              (fst xcl.max_conn) (snd xcl.max_conn) nconn);
+        let pp_request ppf (k, tm0, nb) =
+          Fmt.pf ppf "--- %3d req - %3.0f sec - %s\n" nb (tm -. tm0) k
+        in
+        Logs.info (fun k -> k "%a" Fmt.(list pp_request) list);
+        Logs.info (fun k ->
+            k "--- max %d req by %s / conn %d\n" (fst xcl.max_conn)
+              (snd xcl.max_conn) nconn);
         refused
   in
   (match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with
