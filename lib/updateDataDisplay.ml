@@ -271,7 +271,10 @@ and eval_simple_str_var conf _base env _xx = function
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
   | "entry_value_unsort" ->
-      let sn = p_getenv conf.env "data" = Some "sn" in
+      let sn =
+        p_getenv conf.env "data" = Some "sn"
+        || p_getenv conf.env "data" = Some "domain"
+      in
       let s = eval_string_env "entry_value" env in
       if sn && s.[String.length s - 1] = ')' then
         match String.rindex_opt s '(' with
@@ -362,6 +365,10 @@ and eval_compound_var conf base env xx sl =
         | None -> "")
     | [ "evar"; s ] | [ "e"; s ] ->
         Option.value ~default:"" (p_getenv conf.env s)
+    | [ "entry_value"; "original" ] ->
+        let istr_string = eval_string_env "entry_key" env in
+        let istr = Driver.Istr.of_string istr_string in
+        Driver.sou base istr
     | "encode" :: sl -> Util.uri_encode (loop sl)
     | "escape" :: sl ->
         let escaped = Util.escape_html (loop sl) in

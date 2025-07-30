@@ -3634,6 +3634,10 @@ ru: список предков
 sv: förteckning över förfäder
 tr: soy kitabı
 
+    book link
+en: link to the dictionary
+fr: lien vers le dictionnaire
+
     book/books
 co: libru/libri
 de: Wörterbuch/Wörterbücher
@@ -4425,35 +4429,55 @@ ru: порядок личных событий был изменён
 sv: ändrade ordningen för personhändelser
 tr: bireysel etkinliklerin sırasını değiştir
 
-    chk_data invisible characters
-co: Caratteri invisibile
-de: Unsichtbare Zeichen
-en: Invisible characters
-fr: Caractères invisibles
+    chk_data error invisible characters
+co: caratteri invisibile
+de: unsichtbare Zeichen
+en: invisible characters
+fr: caractères invisibles
 
-    chk_data bad capitalization
-co: Messa in capitale gattiva
-de: Fehlerhafte Großschreibung
-en: Bad capitalization
-fr: Capitalisation erronée
+    chk_data error bad capitalization
+co: messa in capitale gattiva
+de: fehlerhafte Großschreibung
+en: bad capitalization
+fr: capitalisation erronée
 
-    chk_data multiple spaces
-co: Spazii multiplice
-de: Mehrere Leerzeichen
-en: Multiple spaces
-fr: Espaces multiples
+    chk_data error multiple spaces
+co: spazii multiplice
+de: mehrere Leerzeichen
+en: multiple spaces
+fr: espaces multiples
 
-    chk_data mutiples characters
-co: Caratteri multiplice
-de: Mehrere Zeichen
-en: Multiple characters
-fr: Caractères multiples
+    chk_data error mutiples characters
+co: caratteri multiplice
+de: mehrere Zeichen
+en: multiple characters
+fr: caractères multiples
 
-    chk_data non-breaking spaces
-co: Spazii nonspezzevule
-de: Geschützte Leerzeichen
-en: Non-breaking spaces
-fr: Espaces insécables
+    chk_data error non-breaking spaces
+co: spazii nonspezzevule
+de: geschützte Leerzeichen
+en: non-breaking spaces
+fr: espaces insécables
+
+    chk_data error types
+en: error types
+fr: types d’erreur
+
+    chk_data limit reached
+en: limit reached
+fr: limite atteinte
+
+    chk_data limited to %d results
+en: limited to <abbr title="gwf variable chk_data_max_results">%d results</abbr>.
+fr: limité à <abbr title="Variable gwf chk_data_max_results">%d résultats</abbr>.
+
+    chk_data max results
+en: maximum number of results
+fr: nombre de résultats maximum
+
+    chk_data use database/cache
+en: use database/using <b>database</b> (very slow)/using <b>cached data</b> (very fast but may show entries that have been corrected or deleted)
+fr: utiliser la base de données/utilisation de la <b>base de données</b> (très lent)/utilisation des <b>données en cache</b> (très rapide mais peut afficher des entrées déjà corrigées ou supprimées)
 
     child/children
 af: kind/kinders
@@ -8801,6 +8825,10 @@ no: første forbindelse
 pt: primeira comunhão
 sv: första nattvard
 tr: ilk komünyon
+
+    fix error automatically
+en: fix error automatically
+fr: fixer automatiquement l’erreur
 
     font size
 co: dimensione di grafia
@@ -19881,6 +19909,10 @@ sl: danes
 sv: i dag
 tr: bugün
 
+    toggle all
+en: toggle all
+fr: tout cocher
+
     tomorrow
 af: môre
 bg: утре
@@ -20081,8 +20113,8 @@ tr: başka bir hesaplama seçeneği deneyin
     data typographic checker
 co: verificadore tipograficu di i dati
 de: Typografischer Daten-Checker
-en: Data typographic checker
-fr: Vérificateur typographique des données
+en: data typographic checker
+fr: vérificateur typographique des données
 
     uncheck
 co: diselezziunà
