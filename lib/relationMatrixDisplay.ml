@@ -118,7 +118,7 @@ let print_matrix_row conf base tstab persons i cell_storage n =
 let print_matrix_table conf base persons =
   let n = Array.length persons in
   let tstab = Util.create_topological_sort conf base in
-  let cell_storage = create_triangular_matrix n in
+  let cell_storage = RelationMatrix.create_triangular_matrix n in
   Output.print_sstring conf
     {|<div class="d-flex justify-content-center">
       <table class="table table-sm w-auto" id="rm-table">
@@ -128,11 +128,17 @@ let print_matrix_table conf base persons =
     print_matrix_row conf base tstab persons i cell_storage n
   done;
   Output.print_sstring conf {|</tbody></table></div>|};
-  let json_data = matrix_to_json base persons cell_storage n in
+  let json_data = RelationMatrix.matrix_to_json base persons cell_storage n in
   let json_string = Yojson.Safe.to_string json_data in
   Output.printf conf
-    {|<script type="application/json" id="matrix-data">
-%s
+    {|<script>
+window.rmData = %s;
+window.getRmCellData = function(i, j) {
+  if (i > j) { var tmp = i; i = j; j = tmp; }
+  var key = i + '_' + j;
+  return window.rmData.cells[key];
+};
+console.log('Matrix data loaded:', Object.keys(window.rmData.cells).length, 'cells');
 </script>|}
     json_string
 

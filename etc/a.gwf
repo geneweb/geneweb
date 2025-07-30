@@ -325,8 +325,18 @@
 # By default when not set (or 'zz'), the display is a static choice of module.
 #p_mod=
 
-# Limits the results of Books (m=MOD_DATA) accessible by wizard
+# Limits the results of all books (m=MOD_DATA) accessible by wizard
 #book_max_results=1000
+
+# Limits the results of data typographic checker (m=CHK_DATA) accessible by wizard
+# This variable allows to set up the maximum number of entries with errors
+# that can be displayed at a single time to avoid server timeout on large databases.
+# Default value if not specified is 500.
+# If specified as empty string, no limit will be applied.
+# Examples:
+#   chk_data_max_results=1500    # Limit to 1 500 entries
+#   chk_data_max_results=        # No limit (may cause timeout on large bases)
+#chk_data_max_results=500
 
 # This variable allows to set up the maximum number of updates
 # that can be done at a single time.
