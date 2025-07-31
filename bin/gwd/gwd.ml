@@ -1699,13 +1699,12 @@ type misc_fname =
   | Css of string
   | Eot of string
   | Js of string
+  | Json of string
   | Map of string
   | Otf of string
   | Other of string
   | Png of string
   | Svg of string
-  | Ttf of string
-  | Woff of string
   | Woff2 of string
   | CacheGz of string
 
@@ -1716,13 +1715,12 @@ let content_misc conf len misc_fname =
     | Css fname -> (fname, "text/css; charset=UTF-8")
     | Eot fname -> (fname, "application/font-eot")
     | Js fname -> (fname, "text/javascript; charset=UTF-8")
+    | Json fname -> (fname, "application/json; charset=UTF-8")
     | Map fname -> (fname, "application/json")
     | Otf fname -> (fname, "application/font-otf")
     | Other fname -> (fname, "text/plain")
     | Png fname -> (fname, "image/png")
     | Svg fname -> (fname, "application/font-svg")
-    | Ttf fname -> (fname, "application/font-ttf")
-    | Woff fname -> (fname, "application/font-woff")
     | Woff2 fname -> (fname, "application/font-woff2")
     | CacheGz fname -> (fname, "application/gzip")
   in
@@ -1751,11 +1749,10 @@ let print_misc_file conf misc_fname =
   match misc_fname with
   | Css fname
   | Js fname
+  | Json fname
   | Otf fname
   | Svg fname
-  | Woff fname
   | Eot fname
-  | Ttf fname
   | Woff2 fname
   | CacheGz fname -> (
       try
@@ -1799,12 +1796,11 @@ let misc_request conf fname =
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
       else if Filename.check_suffix fname ".js" then Js fname
+      else if Filename.check_suffix fname ".json" then Json fname
       else if Filename.check_suffix fname ".map" then Map fname
       else if Filename.check_suffix fname ".otf" then Otf fname
       else if Filename.check_suffix fname ".svg" then Svg fname
-      else if Filename.check_suffix fname ".woff" then Woff fname
       else if Filename.check_suffix fname ".eot" then Eot fname
-      else if Filename.check_suffix fname ".ttf" then Ttf fname
       else if Filename.check_suffix fname ".woff2" then Woff2 fname
       else if Filename.check_suffix fname ".png" then Png fname
       else if Filename.check_suffix fname ".cache.gz" then CacheGz fname
