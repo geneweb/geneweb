@@ -19580,6 +19580,18 @@ de: Summe ungefiltert
 en: unfiltered total
 fr: total non filtré
 
+    unknown first_name
+en: unknown first name
+fr: prénom inconnu
+
+    unknown surname
+en: unknown surname
+fr: patronyme inconnu
+
+    unknown index
+en: unknown index
+fr: index inconnu
+
     unknown person
 af: onbekende persoon
 bg: неизвестно лице
