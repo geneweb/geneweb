@@ -18,7 +18,7 @@ let add_worker t k =
          done
        with e ->
          let bt = Printexc.get_raw_backtrace () in
-         Logs.info (fun k -> k "%a" Util.pp_exception (e, bt)));
+         Logs.err (fun k -> k "%a" Util.pp_exception (e, bt)));
       exit 1
   | pid ->
       Logs.debug (fun k -> k "Creating worker %d" pid);
@@ -32,7 +32,7 @@ let cleanup { workers } =
       try Unix.kill pid Sys.sigterm with _ -> ())
     workers
 
-let wait_any_child () = My_unix.waitpid_noeintr [] (-1) |> fst
+let wait_any_child () = Geneweb_unix.waitpid_noeintr [] (-1) |> fst
 
 let start n k =
   if (not Sys.unix) || n < 1 then invalid_arg "start";
