@@ -53,9 +53,6 @@ val crush_lower : string -> string
    - Second comparison of names.
    - Key when index by names *)
 
-val concat : string -> string -> string
-(** [concat fn sn] is [fn ^ " " ^ sn] but faster. *)
-
 val contains_forbidden_char : string -> bool
 (** [contains_forbidden_char s] is [true] iif s contains forbidden characters *)
 
