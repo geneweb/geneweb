@@ -1,5 +1,3 @@
-module Lexicon_parser = Gwxjg_lexicon_parser
-
 let fast_concat = function
   | [] -> ""
   | [ s ] -> s
@@ -28,7 +26,7 @@ let import_trad ht keyword line =
       if i < 0 then acc
       else
         match Array.unsafe_get a i with
-        | Lexicon_parser.Str s -> loop (s :: acc) (i - 1)
+        | Gwxjg_lexicon_parser.Str s -> loop (s :: acc) (i - 1)
         | Arg n ->
             loop (Jingoo.Jg_runtime.string_of_tvalue (arg n) :: acc) (i - 1)
         | Declension (c, n) ->
@@ -77,7 +75,7 @@ let de_en_es_fi_fr_it_nl_no_pt_sv =
            let in_chan = open_in file in
            let lexbuf = Lexing.from_channel in_chan in
            try
-             let acc = Lexicon_parser.p_main acc lexbuf in
+             let acc = Gwxjg_lexicon_parser.p_main acc lexbuf in
              close_in in_chan;
              acc
            with Failure msg ->
