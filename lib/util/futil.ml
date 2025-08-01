@@ -268,8 +268,7 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
                 list s_first_names)
           s_list father_titles_places
     in
-    let list = Ext_list.rev_map_append sou aliases list in
-    list
+    Ext_list.rev_map_append sou aliases list
 
 let eq_title_names eq tn1 tn2 =
   match (tn1, tn2) with
