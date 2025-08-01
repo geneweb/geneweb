@@ -194,6 +194,16 @@ fr: individus<br> tous reliés par des liens familiaux
     %end;
   </div>
 </div>
+%if;(e.i!="" or e.p!="" or e.n!="")
+  <div class="col mt-1">
+    <div class="text-center alert alert-danger alert-dismissible fade show" role="alert">
+      <span>[*unknown person][:]
+      %if(e.i!="")i=%e.i;
+      %else;%e.p;%if;(e.oc!="").%e.oc;%end; %e.n;%end;</span>
+    </div>
+  </div>
+%end;
+
 %if;just_friend_wizard;
   <div class="col mt-1">
     <div class="text-center alert alert-danger alert-dismissible fade show" role="alert">
