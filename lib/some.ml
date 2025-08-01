@@ -795,7 +795,7 @@ let search_surname conf base x =
   | _, [ (_, (_, iperl)) ] -> iperl
   | _ -> []
 
-let search_surname_print conf base not_found_fun x =
+let search_surname_print conf base _not_found_fun x =
   let list, iperl, name_inj = search_surname_list conf base x in
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
@@ -826,7 +826,7 @@ let search_surname_print conf base not_found_fun x =
           bhl
       in
       match (bhl, list) with
-      | [], _ -> not_found_fun conf x
+      | [], _ -> SrcfileDisplay.print_welcome conf base
       | _, [ (s, (strl, _)) ] ->
           print_one_surname_by_branch conf base x strl (bhl, s)
       | _ ->

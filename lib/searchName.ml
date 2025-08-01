@@ -201,7 +201,7 @@ let search conf base an search_order specify unknown =
   in
   let rec loop l =
     match l with
-    | [] -> unknown conf an
+    | [] -> SrcfileDisplay.print_welcome conf base
     | Sosa :: l -> (
         match search_by_sosa conf base an with
         | None -> loop l
@@ -550,4 +550,4 @@ let print conf base specify unknown =
   | None, None, Some sn ->
       let order = [ Surname; ApproxKey; DefaultSurname ] in
       search conf base sn order specify unknown
-  | _ -> Hutil.incorrect_request conf ~comment:"Missing first_name and surname"
+  | _ -> SrcfileDisplay.print_welcome conf base
