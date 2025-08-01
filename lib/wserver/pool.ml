@@ -9,42 +9,10 @@ module Logs = Geneweb_logs.Logs
 type worker = { pid : int } [@@unboxed]
 type t = { workers : (worker, unit) Hashtbl.t } [@@unboxed]
 
-let succeed f =
-  try
-    f ();
-    true
-  with _ -> false
-
-(* The purpose of this function is to permanently drop privileges. We assume
-   that the maiin gwd process is running with setuid capabilities, and is
-   launched by a user or group with fewer privileges than the owner of the
-   executable. We replace the effective user/group ID with the real user/group
-   ID. *)
-let drop_privileges () =
-  let module U = Geneweb_unix in
-  let ngid = Unix.getgid () and nuid = Unix.getuid () in
-  let ogid = Unix.getegid () and ouid = Unix.geteuid () in
-  (* The order in which we drop privileges is crucial for security.
-     The reverse order is a severe security issue because the current process
-     could regain privileges by restoring the real group ID with [Uni.setgid].
-     For more details, see section POS36-C in the POSIX standard. *)
-  if ngid <> ogid then if U.linux then U.setregid ngid ngid else U.setegid ngid;
-  if nuid <> ouid then if U.linux then U.setreuid nuid nuid else U.seteuid nuid;
-  (* Verify that old privileges cannot be restored with best-effort tests. *)
-  if ngid <> ogid then (
-    assert (not @@ succeed (fun () -> U.setegid ogid));
-    assert (Unix.getegid () = ngid));
-  if nuid <> ouid then (
-    assert (not @@ succeed (fun () -> U.seteuid ouid));
-    assert (Unix.geteuid () = nuid))
-
 let add_worker t k =
   match Unix.fork () with
   | 0 ->
       (try
-         (* XXX: Dropping privileges must be the worker's first action.
-            DO NOT MOVE this line without a good reason. *)
-         drop_privileges ();
          while true do
            k @@ Unix.getpid ()
          done

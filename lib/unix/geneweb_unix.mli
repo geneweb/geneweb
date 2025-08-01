@@ -1,6 +1,3 @@
-val linux : bool
-(** Flag to recognize Linux platform. *)
-
 val seteuid : int -> unit
 (** [seteuid euid] shall set the effective user ID of the process.
 
@@ -19,7 +16,7 @@ val setreuid : int -> int -> unit
     is [-1], the effective user ID shall not be changed.
 
     @raise Unix.Unix_error if it cannot change the IDs.
-    @raise Invalid_arg on non-Linux platform. *)
+    @raise Invalid_arg on non-Unix platform. *)
 
 val setregid : int -> int -> unit
 (** [setregid rgid egid] shall set the real and effective group IDs of the
@@ -27,7 +24,7 @@ val setregid : int -> int -> unit
     [egid] is [-1], the effective group ID shall not be changed.
 
     @raise Unix.Unix_error if it cannot change the IDS.
-    @raise Invalid_arg on non-Linux platform. *)
+    @raise Invalid_arg on non-Unix platform. *)
 
 (* As the SA_RESTART flag is no support in Unix OCaml library, the following
    functions provide variants of system calls that automatically restart after
