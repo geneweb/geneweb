@@ -62,7 +62,6 @@ GENERATED_FILES_DEP = \
 	lib/gwlib.ml \
 	lib/dev_config.ml \
 	lib/util/dune \
-	benchmark/dune \
 	bin/caches/dune \
 	bin/consang/dune \
 	bin/fixbase/dune \
@@ -172,27 +171,6 @@ test: | $(GENERATED_FILES_DEP)
 	ocaml ./configure.ml --release
 	dune build @runtest
 .PHONY: test
-
-bench: ## Run benchmarks
-bench: | $(GENERATED_FILES_DEP)
-	dune build @runbench
-.PHONY: bench
-
-BENCH_FILE ?= /tmp/geneweb-bench.bin
-
-bench-marshal: ## Run benchmarks and record the result
-bench-marshal: | $(GENERATED_FILES_DEP)
-ifdef BENCH_NAME
-	dune exec benchmark/bench.exe -- --marshal --name ${BENCH_NAME} ${BENCH_FILE}
-else
-	 $(error BENCH_NAME variable is empty)
-endif
-.PHONY: bench-marshal
-
-bench-tabulate: ## Read BENCH_FILE and print a report
-bench-tabulate: | $(GENERATED_FILES_DEP)
-	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
-.PHONY: bench-tabulate
 
 clean:
 	@echo -n "Cleaning..."

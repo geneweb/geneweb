@@ -21,7 +21,6 @@
   (tags (genealogy))
   (depends
     (alcotest :with-test)
-    benchmark
     calendars
     (camlp5 (>= "8.00.01"))
     camlp-streams

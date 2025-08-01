@@ -1,9 +1,0 @@
-(executable
-  (name bench)
-  (libraries unix %%%GWDB_PKG%%% geneweb benchmark)
-)
-
-(rule
-  (action (run ./bench.exe) )
-  (alias runbench)
-)

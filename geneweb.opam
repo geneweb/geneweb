@@ -15,7 +15,6 @@ doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "alcotest" {with-test}
-  "benchmark"
   "calendars"
   "camlp5" {>= "8.00.01"}
   "camlp-streams"
