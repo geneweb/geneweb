@@ -40,13 +40,14 @@ COMMIT_ID := $(shell git rev-parse --short HEAD)
 COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
 COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
+BRANCH2 := $(shell git branch | sed -n '/\* /s///p')
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
 lib/version.ml:
 	@cp lib/version.txt $@
 	@printf 'let branch = "$(BRANCH)"\n' >> $@
+	@printf 'let branch2 = "$(BRANCH2)"\n' >> $@
 	@printf 'let src = "$(SOURCE)"\n' >> $@
 	@printf 'let commit_id = "$(COMMIT_ID)"\n' >> $@
 	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
