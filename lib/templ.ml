@@ -556,6 +556,7 @@ and eval_simple_variable conf = function
   | "commit_date" -> Version.commit_date
   | "compil_date" -> Version.compil_date
   | "branch" -> Version.branch
+  | "branch2" -> Version.branch2
   | "source" -> Version.src
   | "/" -> ""
   | _ -> raise Not_found
