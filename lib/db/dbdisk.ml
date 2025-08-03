@@ -59,6 +59,7 @@ type base_func = {
   patch_descend : int -> dsk_descend -> unit;
   patch_name : string -> int -> unit;
   insert_string : string -> int;
+  replace_string : string -> string -> int;
   commit_patches : unit -> unit;
   commit_notes : string -> string -> unit;
   commit_wiznotes : string -> string -> unit;

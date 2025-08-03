@@ -415,6 +415,10 @@ val insert_string : base -> string -> istr
 (** Modify/add string with a giving id. If string already exists return its id.
     Modification stay blocked until call of [commit_patches]. *)
 
+val replace_string : base -> string -> string -> istr
+(** replace string with a giving id. If string already exists return its id.
+    Modification stay blocked until call of [commit_patches]. *)
+
 val commit_patches : base -> unit
 (** Commit blocked modifications (patches) and update database files in order to
     apply modifications on the disk. *)
