@@ -563,7 +563,7 @@ let treat_request =
              | "BLASON_STOP" -> w_base @@ ImageCarrousel.print_main_c
              | "C" -> w_base @@ w_person @@ CousinsDisplay.print
              | "CHK_DATA" -> w_base @@ CheckDataDisplay.print
-             | "CAL" -> w_base @@ Hutil.print_calendar
+             | "CAL" -> w_base @@ CalendarDisplay.print_calendar
              | "CHANGE_WIZ_VIS" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ WiznotesDisplay.change_wizard_visibility
