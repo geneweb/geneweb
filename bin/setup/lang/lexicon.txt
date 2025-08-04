@@ -227,6 +227,16 @@ co: Custruisce tutti i schedarii d’impiatta.
 en: Build all cache files.
 fr: Construire tous les fichiers cache.
 
+    checkdata
+aa: cache_file.htm
+en: Build only cache files with binary format (for typographic verification)
+fr: Construit uniquement les fichiers cache au format binaire (pour vérifications typographiques)
+
+    datalist
+aa: cache_file.htm
+en: Build only cache files with text format (for browser input suggestion)
+fr: Construit uniquement les fichiers cache au format texte (pour les suggestion de saisie du navigateur)
+
     fn alias
 aa: cache_file.htm
 co: Aghjunghje i cugnomi di i nomi à a lista di i nomi.
