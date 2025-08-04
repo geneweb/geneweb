@@ -148,9 +148,11 @@ let is_empty_burial conf cnt =
   let buri = Update_util.get_nth conf "buri_select" cnt in
   match buri with Some "#buri" | Some "#crem" -> false | _ -> true
 
-let is_empty_death conf cnt =
-  let death = Update_util.get_nth conf "death_select" cnt in
-  match death with Some "Auto" | Some "DontKnowIfDead" -> true | _ -> false
+let is_empty_event pe =
+  pe.Def.epers_date = Date.cdate_None
+  && pe.epers_place = "" && pe.epers_reason = "" && pe.epers_note = ""
+  && pe.epers_src = ""
+  && Array.length pe.epers_witnesses = 0
 
 let pevent_of_form_pevent = function
   | FormBirth pe -> pe
@@ -158,6 +160,10 @@ let pevent_of_form_pevent = function
   | FormPevent pe -> pe
   | FormDeath (_death_status, pe) -> pe
   | FormBurial (_burial_status, pe) -> pe
+
+let is_empty_death conf cnt =
+  let death = Update_util.get_nth conf "death_select" cnt in
+  match death with Some "Auto" | Some "DontKnowIfDead" -> true | _ -> false
 
 let burial_event conf cnt pe =
   let tag =
@@ -671,7 +677,15 @@ let reconstitute_person ~base conf =
     | `UnknownBurial -> UnknownBurial
   in
   (* Mise à jour des évènements principaux. *)
-  let pevents = List.map pevent_of_form_pevent pevents in
+  let pevents =
+    List.filter_map
+      (function
+        | FormDeath ((`Auto | `NotDead | `DontKnowIfDead), pe)
+          when is_empty_event pe ->
+            None
+        | fe -> Some (pevent_of_form_pevent fe))
+      pevents
+  in
   let p =
     {
       Def.first_name;
