@@ -800,6 +800,11 @@ module SearchingFields : sig
   val test_string : Config.config -> string -> bool
   val test_date : Config.config -> string -> bool
   val event_search : Config.config -> Fields.search -> int -> string
+  val sex : Config.config -> int
+  val first_name : Config.config -> string
+  val surname : Config.config -> string
+  val occupation : Config.config -> string
+  val events : Config.config -> string
 end = struct
   let gets conf x =
     match Util.p_getenv conf.Config.env x with
@@ -919,6 +924,36 @@ end = struct
           else if s = "" then search
           else search ^ ", " ^ s
     else search
+
+  let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
+
+  let map_field conf key s =
+    if get_name_search_mode (gets conf) key = `Not_Exact_Prefix then s ^ "(...)"
+    else s
+
+  let first_name conf =
+    let fn = gets conf "first_name" in
+    map_field conf "exact_first_name" fn
+
+  let surname conf =
+    let sn = gets conf "surname" in
+    map_field conf "exact_surname" sn
+
+  let occupation conf = gets conf "occu"
+
+  let events conf =
+    let search_type = get_search_type (gets conf) in
+    let event_string = event_search conf search_type (sex conf) in
+    (* Adding the place and date at the end for the OR request. *)
+    match search_type with
+    | And -> event_string
+    | Fields.Or ->
+        if
+          gets conf "place" != ""
+          || gets conf "date2_yyyy" != ""
+          || gets conf "date1_yyyy" != ""
+        then get_place_date_request conf "place" "date" event_string
+        else event_string
 end
 
 (*
@@ -927,7 +962,7 @@ end
 *)
 let searching_fields conf base =
   let gets = SearchingFields.gets conf in
-  let sex = match gets "sex" with "M" -> 0 | "F" -> 1 | _ -> 2 in
+  let sex = SearchingFields.sex conf in
   let search_type = get_search_type gets in
   let search = "" in
   let map_field key s =
