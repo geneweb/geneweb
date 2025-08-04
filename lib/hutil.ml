@@ -1,5 +1,3 @@
-(* Copyright (c) 2007 INRIA *)
-
 open Config
 open Def
 
@@ -8,6 +6,273 @@ type 'a value = Vint of int | Vother of 'a | Vnone
 let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
+
+module BufferPool = struct
+  let small_pool = Queue.create ()
+  let small_pool_max = 20
+  let small_size = 2048
+  let page_pool = Queue.create ()
+  let page_pool_max = 5
+  let page_size = 65536
+
+  let acquire_small () =
+    try
+      let buf = Queue.pop small_pool in
+      Buffer.clear buf;
+      buf
+    with Queue.Empty -> Buffer.create small_size
+
+  let release_small buf =
+    if Queue.length small_pool < small_pool_max && Buffer.length buf < 8192 then
+      Queue.push buf small_pool
+
+  let acquire_page () =
+    try
+      let buf = Queue.pop page_pool in
+      Buffer.clear buf;
+      buf
+    with Queue.Empty -> Buffer.create page_size
+
+  let release_page buf =
+    if Queue.length page_pool < page_pool_max then (
+      if Buffer.length buf > 524288 then Buffer.reset buf else Buffer.clear buf;
+      Queue.push buf page_pool)
+
+  let with_buffer f =
+    let buf = acquire_small () in
+    try
+      let result = f buf in
+      release_small buf;
+      result
+    with e ->
+      release_small buf;
+      raise e
+end
+
+module TemplateCache = struct
+  type entry = {
+    content : string;
+    size : int;
+    mutable last_access : float;
+    mutable access_count : int;
+  }
+
+  let cache = Hashtbl.create 64
+  let max_cache_size = 10_485_760
+  let current_size = ref 0
+  let enabled = ref true
+  let hits = ref 0
+  let misses = ref 0
+
+  let evict_lru () =
+    let entries =
+      Hashtbl.fold (fun k v acc -> (k, v) :: acc) cache []
+      |> List.sort (fun (_, a) (_, b) -> compare a.last_access b.last_access)
+    in
+    match entries with
+    | (oldest_key, oldest_entry) :: _ ->
+        Hashtbl.remove cache oldest_key;
+        current_size := !current_size - oldest_entry.size
+    | [] -> ()
+
+  let get_cached name =
+    try
+      let entry = Hashtbl.find cache name in
+      incr hits;
+      entry.last_access <- Unix.time ();
+      entry.access_count <- entry.access_count + 1;
+      Some entry.content
+    with Not_found ->
+      incr misses;
+      None
+
+  let add_to_cache name content =
+    let size = String.length content in
+    if size > max_cache_size / 4 then None
+    else (
+      while !current_size + size > max_cache_size && Hashtbl.length cache > 0 do
+        evict_lru ()
+      done;
+      let entry =
+        { content; size; last_access = Unix.time (); access_count = 0 }
+      in
+      Hashtbl.replace cache name entry;
+      current_size := !current_size + size;
+      Some content)
+
+  let get_or_load conf name =
+    if not !enabled then None
+    else
+      match get_cached name with
+      | Some content -> Some content
+      | None -> (
+          try
+            BufferPool.with_buffer (fun buf ->
+                let output_conf_buf =
+                  { conf.output_conf with body = Buffer.add_string buf }
+                in
+                let conf_buf = { conf with output_conf = output_conf_buf } in
+                Templ.output_simple conf_buf Templ.Env.empty name;
+                let content = Buffer.contents buf in
+                add_to_cache name content)
+          with _ -> None)
+end
+
+module StaticParts = struct
+  let doctype_html = lazy "<!DOCTYPE html>\n"
+  let head_open = lazy "<head>\n  <title>"
+  let title_close = lazy "</title>\n"
+  let head_close = lazy "</head>\n"
+  let body_close = lazy "</body>\n</html>\n"
+  let container_close = lazy "</div><!-- container end -->\n"
+  let h1_close = lazy "</h1>\n"
+  let script_open = lazy "<script>\n"
+  let script_close = lazy "\n</script>\n"
+
+  let meta_viewport =
+    "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, \
+     shrink-to-fit=no\">\n"
+
+  let meta_robots_index = "  <meta name=\"robots\" content=\"index,follow\">\n"
+  let meta_robots_none = "  <meta name=\"robots\" content=\"none\">\n"
+  let meta_robots robot = if robot then meta_robots_index else meta_robots_none
+  let container_normal = "<div class=\"container\">"
+  let container_fluid = "<div class=\"container-fluid\">"
+  let container fluid = if fluid then container_fluid else container_normal
+  let h1_open_normal = "<h1>"
+  let h1_open_error = "<h1 class=\"error\">"
+  let h1_open error = if error then h1_open_error else h1_open_normal
+  let html_cache = Hashtbl.create 8
+  let charset_cache = Hashtbl.create 4
+  let favicon_cache = Hashtbl.create 8
+  let body_cache = Hashtbl.create 16
+
+  let html_open lang =
+    try Hashtbl.find html_cache lang
+    with Not_found ->
+      let result = Printf.sprintf "  <html lang=\"%s\">\n" lang in
+      Hashtbl.add html_cache lang result;
+      result
+
+  let meta_charset charset =
+    try Hashtbl.find charset_cache charset
+    with Not_found ->
+      let result = Printf.sprintf "  <meta charset=\"%s\">\n" charset in
+      Hashtbl.add charset_cache charset result;
+      result
+
+  let favicon prefix =
+    try Hashtbl.find favicon_cache prefix
+    with Not_found ->
+      let result =
+        Printf.sprintf
+          "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\">\n\
+           <link rel=\"apple-touch-icon\" href=\"%s/favicon_gwd.png\">\n"
+          prefix prefix
+      in
+      Hashtbl.add favicon_cache prefix result;
+      result
+
+  let body_open dir_attr body_prop =
+    let key = dir_attr ^ "|" ^ body_prop in
+    try Hashtbl.find body_cache key
+    with Not_found ->
+      let result = Printf.sprintf "<body%s%s>\n" dir_attr body_prop in
+      Hashtbl.add body_cache key result;
+      result
+end
+
+module HtmlBuffer = struct
+  let create_buffered_conf ?(initial_size = 65536) conf =
+    let buffer = Buffer.create initial_size in
+    let original_output = conf.output_conf in
+    let buffered_output =
+      {
+        original_output with
+        body = Buffer.add_string buffer;
+        flush =
+          (fun () ->
+            let content = Buffer.contents buffer in
+            if String.length content > 0 then (
+              original_output.body content;
+              original_output.flush ();
+              Buffer.clear buffer));
+      }
+    in
+    { conf with output_conf = buffered_output }
+
+  let wrap conf f =
+    let buffer = BufferPool.acquire_page () in
+    let original_output = conf.output_conf in
+    let buffered_output =
+      {
+        original_output with
+        body = Buffer.add_string buffer;
+        flush =
+          (fun () ->
+            let content = Buffer.contents buffer in
+            if String.length content > 0 then (
+              original_output.body content;
+              original_output.flush ();
+              Buffer.clear buffer));
+      }
+    in
+    let buffered_conf = { conf with output_conf = buffered_output } in
+    try
+      let result = f buffered_conf in
+      buffered_conf.output_conf.flush ();
+      BufferPool.release_page buffer;
+      result
+    with e ->
+      buffered_conf.output_conf.flush ();
+      BufferPool.release_page buffer;
+      raise e
+
+  let wrap_measured conf f =
+    let start_time = Unix.gettimeofday () in
+    let bytes_before = Gc.allocated_bytes () in
+    let buffer_size = ref 0 in
+    let write_count = ref 0 in
+
+    let buffer = BufferPool.acquire_page () in
+    let original_output = conf.output_conf in
+    let measuring_output =
+      {
+        original_output with
+        body =
+          (fun s ->
+            incr write_count;
+            buffer_size := !buffer_size + String.length s;
+            Buffer.add_string buffer s);
+        flush =
+          (fun () ->
+            let content = Buffer.contents buffer in
+            if String.length content > 0 then (
+              original_output.body content;
+              original_output.flush ();
+              Buffer.clear buffer));
+      }
+    in
+    let measuring_conf = { conf with output_conf = measuring_output } in
+
+    try
+      let result = f measuring_conf in
+      measuring_conf.output_conf.flush ();
+      BufferPool.release_page buffer;
+
+      (if List.mem_assoc "debug_buffer" conf.env then
+         let bytes_after = Gc.allocated_bytes () in
+         let time_elapsed = Unix.gettimeofday () -. start_time in
+         let bytes_allocated = bytes_after -. bytes_before in
+         Printf.eprintf
+           "Buffer stats: %d bytes, %d writes, %.3fs, %.0f bytes allocated\n"
+           !buffer_size !write_count time_elapsed bytes_allocated);
+      result
+    with e ->
+      measuring_conf.output_conf.flush ();
+      BufferPool.release_page buffer;
+      raise e
+end
 
 let incorrect_request ?(comment = "") conf =
   GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
@@ -44,88 +309,68 @@ let link_to_referer conf =
       :> Adef.safe_string)
   else Adef.safe ""
 
-(* S: use Util.include_template for "hed"? *)
-
-let header_without_http_nor_home conf title =
-  let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
-  let str1 =
-    Printf.sprintf {|<!DOCTYPE html>
-<html lang="%s">
-<head>
-<title>|} conf.lang
-  in
-  let str2 =
-    Printf.sprintf
-      {|</title>
-%s
-<meta charset="%s">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link rel="shortcut icon" href="%s/favicon_gwd.png">
-<link rel="apple-touch-icon" href="%s/favicon_gwd.png">
-|}
-      (if robot then {|<meta name="robots" content="index,follow">|}
-       else {|<meta name="robots" content="none">|})
-      conf.charset
-      (Util.images_prefix conf :> string)
-      (Util.images_prefix conf :> string)
-  in
-  Output.print_sstring conf str1;
-  title true;
-  Output.print_sstring conf str2;
-  Templ.output_simple conf Templ.Env.empty "css";
-  Output.print_sstring conf "</head>\n";
-  let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
-    with Not_found -> ""
-  in
-  let s = s ^ Util.body_prop conf in
-  Output.printf conf "<body%s>\n" s;
-  Templ.output_simple conf Templ.Env.empty "hed";
-  Util.message_to_wizard conf
-
 let is_fluid conf =
   (try List.assoc "wide" conf.env = Adef.encoded "on" with Not_found -> false)
   || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
 
-let header_without_title conf =
+let rec header_without_http_nor_home conf title =
+  let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
+  let prefix = (Util.images_prefix conf :> string) in
+
+  Output.print_sstring conf (Lazy.force StaticParts.doctype_html);
+  Output.print_sstring conf (StaticParts.html_open conf.lang);
+  Output.print_sstring conf (Lazy.force StaticParts.head_open);
+  title true;
+  Output.print_sstring conf (Lazy.force StaticParts.title_close);
+
+  BufferPool.with_buffer (fun buf ->
+      Buffer.add_string buf (StaticParts.meta_robots robot);
+      Buffer.add_string buf (StaticParts.meta_charset conf.charset);
+      Buffer.add_string buf StaticParts.meta_viewport;
+      Buffer.add_string buf (StaticParts.favicon prefix);
+      Output.print_sstring conf (Buffer.contents buf));
+
+  Templ.output_simple conf Templ.Env.empty "css";
+  Output.print_sstring conf (Lazy.force StaticParts.head_close);
+
+  let dir_attr =
+    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
+    with Not_found -> ""
+  in
+  Output.print_sstring conf
+    (StaticParts.body_open dir_attr (Util.body_prop conf));
+  Templ.output_simple conf Templ.Env.empty "hed";
+  Util.message_to_wizard conf
+
+and header_without_title conf =
   let fluid = is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf (fun _ -> ());
   include_home_template conf;
-  Output.print_sstring conf
-    (if fluid then "<div class=\"container-fluid\">"
-     else "<div class=\"container\">")
+  Output.print_sstring conf (StaticParts.container fluid)
 
-let header_with_title ?(error = false) ?(fluid = false) conf title =
+and header_with_title ?(error = false) ?(fluid = false) conf title =
   let fluid = fluid || is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf title;
   include_home_template conf;
-  (* balancing </div> in gen_trailer *)
-  Output.print_sstring conf
-    (if fluid then "<div class=\"container-fluid\">"
-     else "<div class=\"container\">");
-  Output.print_sstring conf (if error then "<h1 class = \"error\">" else "<h1>");
+  Output.print_sstring conf (StaticParts.container fluid);
+  Output.print_sstring conf (StaticParts.h1_open error);
   title false;
-  Output.print_sstring conf "</h1>\n"
+  Output.print_sstring conf (Lazy.force StaticParts.h1_close)
 
-let header_fluid conf title = header_with_title ~fluid:true conf title
+and header_fluid conf title = header_with_title ~fluid:true conf title
 
-(* when the use of home.txt is not available *)
-let header_without_home conf title =
+and header_without_home conf title =
   let fluid = is_fluid conf in
   Util.html conf;
   header_without_http_nor_home conf title;
-  (* balancing </div> in gen_trailer *)
-  Output.print_sstring conf
-    (if fluid then "<div class=\"container-fluid\">"
-     else "<div class=\"container\">");
-  Output.print_sstring conf "<h1>";
+  Output.print_sstring conf (StaticParts.container fluid);
+  Output.print_sstring conf (StaticParts.h1_open false);
   title false;
-  Output.print_sstring conf "</h1>\n"
+  Output.print_sstring conf (Lazy.force StaticParts.h1_close)
 
-let header_with_conf_title conf _title =
-  (* title is supplied bt conf.env *)
+and header_with_conf_title conf _title =
   let title _ =
     match Util.p_getenv conf.env "p_title" with
     | None | Some "" -> ()
@@ -133,129 +378,58 @@ let header_with_conf_title conf _title =
   in
   header_with_title conf title
 
-let header ?(error = false) ?(fluid = false) conf title =
+and header ?(error = false) ?(fluid = false) conf title =
   header_with_title ~error ~fluid conf title
 
-(* TODO replace rheader by header ~error:true *)
-let rheader conf title = header_with_title ~error:true conf title
+and rheader conf title = header_with_title ~error:true conf title
 
-let trailer conf =
+and trailer conf =
   let conf = { conf with is_printed_by_template = false } in
   Templ.output_simple conf Templ.Env.empty "trl";
   Templ.output_simple conf Templ.Env.empty "copyr";
+  Output.print_sstring conf (Lazy.force StaticParts.container_close);
   Templ.output_simple conf Templ.Env.empty "js";
   let query_time = Unix.gettimeofday () -. conf.query_start in
   Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
     !GWPARAM.errors_other !GWPARAM.set_vars;
-  Output.print_sstring conf "</body>\n</html>\n"
+  Output.print_sstring conf (Lazy.force StaticParts.body_close)
 
-(* Calendar request *)
-
-let eval_julian_day conf =
-  let open Adef in
-  let getint v = match Util.p_getint conf.env v with Some x -> x | _ -> 0 in
-  List.fold_left
-    (fun d (var, cal, conv, max_month) ->
-      let yy =
-        match Util.p_getenv conf.env ("y" ^ var) with
-        | Some v -> (
+and trailer_with_extra_js conf extra_js_sources =
+  let conf = { conf with is_printed_by_template = false } in
+  Templ.output_simple conf Templ.Env.empty "trl";
+  Templ.output_simple conf Templ.Env.empty "copyr";
+  Output.print_sstring conf (Lazy.force StaticParts.container_close);
+  if extra_js_sources <> "" then (
+    let sources = String.split_on_char '|' extra_js_sources in
+    List.iter
+      (fun source ->
+        let source = String.trim source in
+        if source <> "" then
+          if Filename.check_suffix source ".js" then
+            let js_path =
+              Filename.concat conf.etc_prefix (Filename.concat "js" source)
+            in
+            match Util.open_etc_file conf js_path with
+            | Some (ic, fname) -> (
+                close_in ic;
+                match Util.hash_file_cached fname with
+                | Some hash ->
+                    Output.printf conf {|<script src="js/%s?hash=%s"></script>|}
+                      (* TODO manage etc prefix *)
+                      source hash
+                | None ->
+                    Output.printf conf {|<script src="%sjs/%s"></script>|}
+                      conf.etc_prefix source)
+            | None -> ()
+          else
             try
-              let len = String.length v in
-              if cal = Djulian && len > 2 && v.[len - 2] = '/' then
-                int_of_string (String.sub v 0 (len - 2)) + 1
-              else int_of_string v
-            with Failure _ -> 0)
-        | None -> 0
-      in
-      let mm = getint ("m" ^ var) in
-      let dd = getint ("d" ^ var) in
-      let dt = { day = dd; month = mm; year = yy; prec = Sure; delta = 0 } in
-      match Util.p_getenv conf.env ("t" ^ var) with
-      | Some _ -> conv dt
-      | None -> (
-          match
-            ( Util.p_getenv conf.env ("y" ^ var ^ "1"),
-              Util.p_getenv conf.env ("y" ^ var ^ "2"),
-              Util.p_getenv conf.env ("m" ^ var ^ "1"),
-              Util.p_getenv conf.env ("m" ^ var ^ "2"),
-              Util.p_getenv conf.env ("d" ^ var ^ "1"),
-              Util.p_getenv conf.env ("d" ^ var ^ "2") )
-          with
-          | Some _, _, _, _, _, _ -> conv { dt with year = yy - 1 }
-          | _, Some _, _, _, _, _ -> conv { dt with year = yy + 1 }
-          | _, _, Some _, _, _, _ ->
-              let yy, mm =
-                if mm = 1 then (yy - 1, max_month) else (yy, mm - 1)
-              in
-              conv { dt with year = yy; month = mm }
-          | _, _, _, Some _, _, _ ->
-              let yy, mm =
-                if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
-              in
-              let r = conv { dt with year = yy; month = mm } in
-              if r = conv dt then
-                let yy, mm =
-                  if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
-                in
-                conv { dt with year = yy; month = mm }
-              else r
-          | _, _, _, _, Some _, _ -> conv { dt with day = dd - 1 }
-          | _, _, _, _, _, Some _ -> conv { dt with day = dd + 1 }
-          | _ -> d))
-    (Calendar.sdn_of_gregorian conf.today)
-    [
-      ("g", Dgregorian, Calendar.sdn_of_gregorian, 12);
-      ("j", Djulian, Calendar.sdn_of_julian, 12);
-      ("f", Dfrench, Calendar.sdn_of_french, 13);
-      ("h", Dhebrew, Calendar.sdn_of_hebrew, 13);
-    ]
-
-(* *)
-
-let eval_var conf env jd _loc =
-  let module Ast = Geneweb_templ.Ast in
-  function
-  | [ "integer" ] -> (
-      match get_env "integer" env with
-      | Vint i -> Templ.VVstring (string_of_int i)
-      | _ -> raise Not_found)
-  | "date" :: sl -> Templ.eval_date_var conf jd sl
-  | "today" :: sl ->
-      Templ.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
-  | _ -> raise Not_found
-
-let print_foreach print_ast eval_expr =
-  let eval_int_expr env jd e =
-    let s = eval_expr env jd e in
-    try int_of_string s with Failure _ -> raise Not_found
-  in
-  let rec print_foreach env jd _loc s sl el al =
-    match (s, sl) with
-    | "integer_range", [] -> print_integer_range env jd el al
-    | _ -> raise Not_found
-  and print_integer_range env jd el al =
-    let i1, i2 =
-      match el with
-      | [ [ e1 ]; [ e2 ] ] -> (eval_int_expr env jd e1, eval_int_expr env jd e2)
-      | _ -> raise Not_found
-    in
-    for i = i1 to i2 do
-      let env = Templ.Env.add "integer" (Vint i) env in
-      List.iter (print_ast env jd) al
-    done
-  in
-  print_foreach
-
-let print_calendar conf _base =
-  let ifun =
-    Templ.
-      {
-        eval_var = eval_var conf;
-        eval_transl = (fun _ -> Templ.eval_transl conf);
-        eval_predefined_apply = (fun _ -> raise Not_found);
-        get_vother;
-        set_vother;
-        print_foreach;
-      }
-  in
-  Templ.output conf ifun Templ.Env.empty (eval_julian_day conf) "calendar"
+              Output.print_sstring conf (Lazy.force StaticParts.script_open);
+              Templ.output_simple conf Templ.Env.empty source;
+              Output.print_sstring conf (Lazy.force StaticParts.script_close)
+            with _ -> ())
+      sources;
+    Templ.output_simple conf Templ.Env.empty "js";
+    let query_time = Unix.gettimeofday () -. conf.query_start in
+    Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+      !GWPARAM.errors_other !GWPARAM.set_vars;
+    Output.print_sstring conf (Lazy.force StaticParts.body_close))
