@@ -4,6 +4,13 @@ val advanced_search :
     returns at most [max_answers] persons from the [base] that match conditions described by those fields. Seond result
     represents real number of matches (if less then [max_answers]). *)
 
+module SearchingFields : sig
+  val first_name : Config.config -> string
+  val surname : Config.config -> string
+  val occupation : Config.config -> string
+  val events : Config.config -> string
+end
+
 val searching_fields : Config.config -> Gwdb.base -> Adef.safe_string
 (** Returns a description string for the current advanced search results in the correct language.
     e.g. "Search all Pierre, born in Paris, died in Paris" *)
