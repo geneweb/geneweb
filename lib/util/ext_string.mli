@@ -55,3 +55,6 @@ val trim_trailing_spaces : string -> string
 
 val end_with : string -> string -> bool
 (** [end_with s x] returns [true] iff [s] is ending with [x].  *)
+
+val fold_left : ('acc -> char -> 'acc) -> 'acc -> string -> 'acc
+(** [fold_left f x s] computes [f (... (f (f x s.[0]) s.[1]) ...) s.[n-1]], where [n] is the length of the string [s]. *)
