@@ -21,7 +21,7 @@ let n_persons_of_stream n conf base filter stream =
     | Some iperset -> Gwdb.IperSet.elements iperset
     | None -> Gwdb.IperSet.elements iperset
   in
-  List.rev (consume n Gwdb.IperSet.empty)
+  consume n Gwdb.IperSet.empty
 
 let strip_particle base s =
   let particles = Gwdb.base_particles base in
