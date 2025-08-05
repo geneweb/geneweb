@@ -39,7 +39,7 @@ type wiki_info = {
 
 val syntax_links : Config.config -> wiki_info -> string -> string
 
-val html_of_tlsw : ?keep_newlines:bool -> Config.config -> string -> string list
+val html_of_tlsw : Config.config -> string -> string list
 (** Parses a whole TLSW text to a list of strings *)
 
 val html_with_summary_of_tlsw :
