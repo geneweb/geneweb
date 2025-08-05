@@ -97,7 +97,8 @@ let persons_starting_with ~conf ~base ~filter ~limit ~other_prefixes main_prefix
 
 let split_name ~kind name =
   List.filter_map
-    (fun value -> Ext_option.return_if (name <> "") (fun () -> { kind; value }))
+    (fun value ->
+      Ext_option.return_if (Name.lower name <> "") (fun () -> { kind; value }))
     (Name.split name)
 
 let sort_by_len l =
