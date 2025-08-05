@@ -1,13 +1,11 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Dbdisk
-
-let load_ascends_array base = base.data.ascends.load_array ()
-let load_unions_array base = base.data.unions.load_array ()
-let load_couples_array base = base.data.couples.load_array ()
-let load_descends_array base = base.data.descends.load_array ()
-let load_strings_array base = base.data.strings.load_array ()
-let close_base base = base.func.cleanup ()
+let load_ascends_array base = base.Dbdisk.data.ascends.load_array ()
+let load_unions_array base = base.Dbdisk.data.unions.load_array ()
+let load_couples_array base = base.Dbdisk.data.couples.load_array ()
+let load_descends_array base = base.Dbdisk.data.descends.load_array ()
+let load_strings_array base = base.Dbdisk.data.strings.load_array ()
+let close_base base = base.Dbdisk.func.cleanup ()
 let verbose = Mutil.verbose
 
 let trace s =
@@ -31,7 +29,7 @@ let output_index_aux oc_inx oc_inx_acc ni =
 
 let make_name_index base =
   let t = Array.make Dutil.table_size [] in
-  for i = 0 to base.data.persons.len - 1 do
+  for i = 0 to base.Dbdisk.data.persons.len - 1 do
     let p = base.data.persons.get i in
     (* not ? ? *)
     if p.first_name <> 1 && p.first_name <> 1 then
@@ -52,7 +50,7 @@ let make_strings_of_fsname_aux get base =
     let set' = Ext_int.Set.add value set in
     if set == set' then () else Array.set t key set'
   in
-  for i = 0 to base.data.persons.len - 1 do
+  for i = 0 to base.Dbdisk.data.persons.len - 1 do
     let p = Dutil.poi base i in
     let aux istr =
       if istr <> 1 then (
@@ -96,7 +94,7 @@ let rec prime_after n = if is_prime n then n else prime_after (n + 1)
 
 let output_strings_hash tmp_strings_inx base =
   let oc = Secure.open_out_bin tmp_strings_inx in
-  let () = base.data.strings.load_array () in
+  let () = base.Dbdisk.data.strings.load_array () in
   let strings_array = base.data.strings in
   let taba =
     Array.make
@@ -124,7 +122,7 @@ let output_strings_hash tmp_strings_inx base =
 *)
 let output_name_index_aux cmp get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
-  for i = 0 to base.data.persons.len - 1 do
+  for i = 0 to base.Dbdisk.data.persons.len - 1 do
     let p = base.data.persons.get i in
     let ks = get p in
     List.iter
@@ -169,7 +167,7 @@ end = struct
 
   (* For every entry in the strings array register it in a Hashtbl to perform reverse lookup (find the id of a given string in the base) *)
   let strings_ht_of_strings_array base =
-    let len = base.data.strings.len in
+    let len = base.Dbdisk.data.strings.len in
     let ht : (string, int) Hashtbl.t = Hashtbl.create len in
     for i = 0 to len - 1 do
       Hashtbl.add ht (base.data.strings.get i) i
@@ -190,7 +188,7 @@ end = struct
     let len = Hashtbl.length ht in
     let arr = Array.make len "" in
     Hashtbl.iter (fun k v -> arr.(v) <- k) ht;
-    base.data.strings.set_array arr
+    base.Dbdisk.data.strings.set_array arr
 end
 
 let output_name_index_lower_aux strings_store cmp cmp_per get base names_inx
@@ -207,7 +205,7 @@ let output_name_index_lower_aux strings_store cmp cmp_per get base names_inx
         let lowered_strings_istrs =
           Dutil.insert_lowered_name_suffix_istrs
             ~insert_string:(StringData.insert_string strings_store)
-            ~base_data:base.data ~istr
+            ~base_data:base.Dbdisk.data ~istr
         in
         Dutil.IntHT.add ht_mem istr lowered_strings_istrs;
         lowered_strings_istrs
@@ -269,14 +267,14 @@ let output_name_index_lower_aux strings_store cmp cmp_per get base names_inx
 
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
-    (Dutil.compare_snames_i base.data)
+    (Dutil.compare_snames_i base.Dbdisk.data)
     (fun p -> p.surname :: p.surnames_aliases)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
-    (Dutil.compare_snames_i base.data)
+    (Dutil.compare_snames_i base.Dbdisk.data)
     (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
@@ -291,9 +289,9 @@ let compare_persons cmp_istr proj1 proj2 istr p1 p2 =
       if c = 0 then cmp_istr (proj2 p1) (proj2 p2) else c
 
 let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
-  let cmp_istr = Dutil.compare_snames_i_lower base.data in
+  let cmp_istr = Dutil.compare_snames_i_lower base.Dbdisk.data in
   let cmp_per =
-    compare_persons cmp_istr (fun p -> p.surname) (fun p -> p.first_name)
+    compare_persons cmp_istr (fun p -> p.Dbdisk.surname) (fun p -> p.first_name)
   in
   output_name_index_lower_aux strings_ht cmp_istr cmp_per
     (fun p -> p.surname :: p.surnames_aliases)
@@ -302,9 +300,9 @@ let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
 (* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_lower_index strings_ht base tmp_fnames_inx tmp_fnames_dat
     =
-  let cmp_istr = Dutil.compare_snames_i_lower base.data in
+  let cmp_istr = Dutil.compare_snames_i_lower base.Dbdisk.data in
   let cmp_per =
-    compare_persons cmp_istr (fun p -> p.first_name) (fun p -> p.surname)
+    compare_persons cmp_istr (fun p -> p.Dbdisk.first_name) (fun p -> p.surname)
   in
   output_name_index_lower_aux strings_ht cmp_istr cmp_per
     (fun p -> p.first_name :: p.first_names_aliases)
@@ -320,7 +318,7 @@ let output_particles_file particles fname =
 type pending_operation = { commit : unit -> unit; rollback : unit -> unit }
 
 let generate_base base =
-  let tmp_base = Filename.concat base.data.bdir "1base" in
+  let tmp_base = Filename.concat base.Dbdisk.data.bdir "1base" in
   let tmp_base_acc = Filename.concat base.data.bdir "1base.acc" in
   let remove_temporary_files () =
     Files.rm tmp_base;
@@ -333,7 +331,7 @@ let generate_base base =
       let bpos = pos_out oc in
       if !verbose then Printf.eprintf "*** saving %s array\n" arrname;
       flush stderr;
-      arr.output_array oc;
+      arr.Dbdisk.output_array oc;
       let epos = Iovalue.output_array_access oc_acc arr.get arr.len bpos in
       if epos <> pos_out oc then count_error epos (pos_out oc)
     in
@@ -431,7 +429,7 @@ let generate_base base =
 
 let generate_lowercase_first_name_index ~strings_data base =
   let tmp_fnames_lower_inx =
-    Filename.concat base.data.bdir "1fnames_lower.inx"
+    Filename.concat base.Dbdisk.data.bdir "1fnames_lower.inx"
   in
   let tmp_fnames_lower_dat =
     Filename.concat base.data.bdir "1fnames_lower.dat"
@@ -465,7 +463,7 @@ let generate_lowercase_first_name_index ~strings_data base =
 
 let generate_lowercase_surname_index ~strings_data base =
   let tmp_snames_lower_inx =
-    Filename.concat base.data.bdir "1snames_lower.inx"
+    Filename.concat base.Dbdisk.data.bdir "1snames_lower.inx"
   in
   let tmp_snames_lower_dat =
     Filename.concat base.data.bdir "1snames_lower.dat"
@@ -499,8 +497,8 @@ let generate_lowercase_surname_index ~strings_data base =
 
 let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
     ~kind base =
-  Lock.control ~onerror:on_lock_error (Files.lock_file base.data.bdir) true
-    (fun () ->
+  Lock.control ~onerror:on_lock_error (Files.lock_file base.Dbdisk.data.bdir)
+    true (fun () ->
       let index_files, generate_index =
         match kind with
         | `First_name ->
@@ -539,7 +537,7 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
 
 let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
-  let bname = base.data.bdir in
+  let bname = base.Dbdisk.data.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
   (* temporary files *)
   let tmp_particles = Filename.concat bname "1particles.txt" in
