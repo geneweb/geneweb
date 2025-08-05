@@ -1,24 +1,21 @@
-open Geneweb
-open Config
-open Gwdb
-
 let ns = "export"
 
 let w_lock =
-  Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf)
+  Gwd_lib.Request.w_lock ~onerror:(fun conf _ ->
+      Geneweb.Update.error_locked conf)
 
 let w_base =
   Gwd_lib.Request.w_base ~none:(fun conf ->
-      Hutil.incorrect_request conf;
+      Geneweb.Hutil.incorrect_request conf;
       true)
 
 let getenv var env = List.assoc var env |> Mutil.decode
 let getenv_opt var env = List.assoc_opt var env |> Option.map Mutil.decode
 
 let export conf base =
-  assert conf.wizard;
+  assert conf.Geneweb.Config.wizard;
   match
-    match getenv_opt "output" conf.env with
+    match getenv_opt "output" conf.Geneweb.Config.env with
     | Some "GED" -> Some `ged
     | Some "GW" -> Some `gw
     | _ -> None
@@ -27,13 +24,14 @@ let export conf base =
   | Some output ->
       Mutil.verbose := false;
       let find_iper i =
-        getenv ("i" ^ string_of_int i) conf.env |> Gwdb.iper_of_string
+        getenv ("i" ^ string_of_int i) conf.Geneweb.Config.env
+        |> Gwdb.iper_of_string
       in
       let find_npoc i =
-        let n = getenv ("n" ^ string_of_int i) conf.env in
-        let p = getenv ("p" ^ string_of_int i) conf.env in
+        let n = getenv ("n" ^ string_of_int i) conf.Geneweb.Config.env in
+        let p = getenv ("p" ^ string_of_int i) conf.Geneweb.Config.env in
         let oc =
-          match getenv_opt ("oc" ^ string_of_int i) conf.env with
+          match getenv_opt ("oc" ^ string_of_int i) conf.Geneweb.Config.env with
           | None -> 0
           | Some i -> int_of_string i
         in
@@ -51,32 +49,32 @@ let export conf base =
         Gwdb.bname base ^ match output with `ged -> ".ged" | `gw -> ".gw"
       in
       let ipers =
-        if getenv_opt "spouses" conf.env = Some "on" then
+        if getenv_opt "spouses" conf.Geneweb.Config.env = Some "on" then
           Gwdb.IperSet.fold
             (fun iper acc ->
               Array.fold_left
                 (fun acc ifam ->
-                  Gwdb.IperSet.add (Gutil.spouse iper @@ foi base ifam) acc)
+                  Gwdb.IperSet.add (Gutil.spouse iper @@ Gwdb.foi base ifam) acc)
                 acc
-                (get_family (poi base iper)))
+                (Gwdb.get_family (Gwdb.poi base iper)))
             ini ini
         else ini
       in
       let ipers =
-        if getenv_opt "parents" conf.env = Some "on" then
+        if getenv_opt "parents" conf.Geneweb.Config.env = Some "on" then
           Gwdb.IperSet.fold
             (fun iper acc ->
-              match get_parents (poi base iper) with
+              match Gwdb.get_parents (Gwdb.poi base iper) with
               | None -> acc
               | Some ifam ->
-                  let fam = foi base ifam in
-                  Gwdb.IperSet.add (get_father fam)
-                    (Gwdb.IperSet.add (get_mother fam) acc))
+                  let fam = Gwdb.foi base ifam in
+                  Gwdb.IperSet.add (Gwdb.get_father fam)
+                    (Gwdb.IperSet.add (Gwdb.get_mother fam) acc))
             ini ipers
         else ipers
       in
       let ipers =
-        if getenv_opt "children" conf.env = Some "on" then
+        if getenv_opt "children" conf.Geneweb.Config.env = Some "on" then
           Gwdb.IperSet.fold
             (fun iper acc ->
               Array.fold_left
@@ -84,9 +82,9 @@ let export conf base =
                   Array.fold_left
                     (fun acc iper -> Gwdb.IperSet.add iper acc)
                     acc
-                    (get_children @@ foi base ifam))
+                    (Gwdb.get_children @@ Gwdb.foi base ifam))
                 acc
-                (get_family (poi base iper)))
+                (Gwdb.get_family (Gwdb.poi base iper)))
             ini ipers
         else ipers
       in
@@ -99,29 +97,33 @@ let export conf base =
                   Gwdb.IfamSet.mem ifam acc
                   || not
                        (Gwdb.IperSet.mem
-                          (Gutil.spouse iper @@ foi base ifam)
+                          (Gutil.spouse iper @@ Gwdb.foi base ifam)
                           ipers)
                 then acc
                 else Gwdb.IfamSet.add ifam acc)
               acc
-              (get_family (poi base iper)))
+              (Gwdb.get_family (Gwdb.poi base iper)))
           ipers Gwdb.IfamSet.empty
       in
       let notes, base_notes =
-        match getenv_opt "notes" conf.env with
+        match getenv_opt "notes" conf.Geneweb.Config.env with
         | Some "nn" -> (true, false)
         | Some "nnn" -> (false, false)
         | Some _ | None -> (true, true)
       in
-      let source = getenv_opt "source" conf.env in
-      let isolated = getenv_opt "isolated" conf.env <> Some "off" in
+      let source = getenv_opt "source" conf.Geneweb.Config.env in
+      let isolated =
+        getenv_opt "isolated" conf.Geneweb.Config.env <> Some "off"
+      in
       let opts =
         {
           Gwexport.default_opts with
-          oc = (fname, Output.print_sstring conf, Wserver.close_connection);
+          oc =
+            (fname, Geneweb.Output.print_sstring conf, Wserver.close_connection);
           notes;
           base_notes;
-          no_picture = getenv_opt "pictures" conf.env = Some "off";
+          no_picture =
+            getenv_opt "pictures" conf.Geneweb.Config.env = Some "off";
           source;
           base = Some (Gwdb.bname base, base);
         }
@@ -137,8 +139,8 @@ let export conf base =
       | `ged -> Gwb2ged_lib.gwb2ged false opts select
       | `gw ->
           Gwu_lib.prepare_free_occ ~select:(fst select) base;
-          Output.print_sstring conf "encoding: utf-8\n";
-          Output.print_sstring conf "gwplus\n\n";
+          Geneweb.Output.print_sstring conf "encoding: utf-8\n";
+          Geneweb.Output.print_sstring conf "gwplus\n\n";
           Gwu_lib.gwu opts isolated base "" "" (Hashtbl.create 0) select);
       Wserver.wflush ();
       true

@@ -21,7 +21,6 @@
   (tags (genealogy))
   (depends
     (alcotest :with-test)
-    benchmark
     calendars
     (camlp5 (>= "8.00.01"))
     camlp-streams
@@ -32,7 +31,6 @@
     num
     (ocaml (>= 4.08))
     odoc
-    ounit
     ppx_blob
     ppx_deriving
     ppx_import

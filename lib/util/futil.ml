@@ -230,7 +230,7 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
     let s_list =
       List.fold_left
         (fun list f ->
-          List.fold_left (fun list s -> Name.concat f s :: list) list s_surnames)
+          List.fold_left (fun list s -> (f ^ " " ^ s) :: list) list s_surnames)
         s_list s_first_names
     in
     (* + (first names + (title | (public name)) ) x (titles places) *)
@@ -249,7 +249,7 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
                   else sou public_name :: s_first_names
             in
             List.fold_left
-              (fun list f -> Name.concat f s :: list)
+              (fun list f -> (f ^ " " ^ s) :: list)
               list s_first_names)
         s_list titles
     in
@@ -264,12 +264,11 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
             else
               let s = sou s in
               List.fold_left
-                (fun list f -> Name.concat f s :: list)
+                (fun list f -> (f ^ " " ^ s) :: list)
                 list s_first_names)
           s_list father_titles_places
     in
-    let list = Ext_list.rev_map_append sou aliases list in
-    list
+    Ext_list.rev_map_append sou aliases list
 
 let eq_title_names eq tn1 tn2 =
   match (tn1, tn2) with

@@ -1,7 +1,3 @@
-open Geneweb
-open Config
-open Gwdb
-
 let arg_f_parents = "f_parents"
 let arg_f_children = "f_children"
 let arg_p_parents = "p_parents"
@@ -17,44 +13,47 @@ let arg_tstab = "tstab"
 let arg_password = "password"
 
 module UI = struct
-  let enabled conf s = (List.assoc_opt s conf.env :> string option) = Some "on"
+  let enabled conf s =
+    (List.assoc_opt s conf.Geneweb.Config.env :> string option) = Some "on"
 
   let print_arg conf
       ((name, kind, doc) :
         Adef.encoded_string * [> `Arg_Set | `Arg_String ] * Adef.safe_string) =
     match kind with
     | `Arg_Set ->
-        Output.print_sstring conf {|<p><label><input type="checkbox" name="|};
-        Output.print_string conf name;
-        Output.print_sstring conf {|" value="on"> |};
-        Output.print_string conf doc;
-        Output.print_sstring conf {|</label></p>|}
+        Geneweb.Output.print_sstring conf
+          {|<p><label><input type="checkbox" name="|};
+        Geneweb.Output.print_string conf name;
+        Geneweb.Output.print_sstring conf {|" value="on"> |};
+        Geneweb.Output.print_string conf doc;
+        Geneweb.Output.print_sstring conf {|</label></p>|}
     | `Arg_String ->
-        Output.print_sstring conf {|<p><label><input type="type" name="|};
-        Output.print_string conf name;
-        Output.print_sstring conf {|"> |};
-        Output.print_string conf doc;
-        Output.print_sstring conf {|</label></p>|}
+        Geneweb.Output.print_sstring conf
+          {|<p><label><input type="type" name="|};
+        Geneweb.Output.print_string conf name;
+        Geneweb.Output.print_sstring conf {|"> |};
+        Geneweb.Output.print_string conf doc;
+        Geneweb.Output.print_sstring conf {|</label></p>|}
 
   let form conf (m : Adef.encoded_string) (submit : Adef.safe_string) args =
-    Output.print_sstring conf {|<form action="|};
-    Output.print_string conf (Util.commd conf);
-    Output.print_sstring conf {|" method="GET">|};
-    Output.print_sstring conf {|<input type="hidden" name="m" value="|};
-    Output.print_string conf m;
-    Output.print_sstring conf {|">|};
-    (match List.assoc_opt arg_password conf.env with
+    Geneweb.Output.print_sstring conf {|<form action="|};
+    Geneweb.Output.print_string conf (Geneweb.Util.commd conf);
+    Geneweb.Output.print_sstring conf {|" method="GET">|};
+    Geneweb.Output.print_sstring conf {|<input type="hidden" name="m" value="|};
+    Geneweb.Output.print_string conf m;
+    Geneweb.Output.print_sstring conf {|">|};
+    (match List.assoc_opt arg_password conf.Geneweb.Config.env with
     | Some x ->
-        Output.print_sstring conf
+        Geneweb.Output.print_sstring conf
           {|<input type="hidden" name="password" value="|};
-        Output.print_string conf x;
-        Output.print_sstring conf {|">|}
+        Geneweb.Output.print_string conf x;
+        Geneweb.Output.print_sstring conf {|">|}
     | None -> ());
     List.iter (print_arg conf) args;
-    Output.print_sstring conf {|<input type="submit" value="|};
-    Output.print_string conf submit;
-    Output.print_sstring conf {|">|};
-    Output.print_sstring conf {|</form>|}
+    Geneweb.Output.print_sstring conf {|<input type="submit" value="|};
+    Geneweb.Output.print_string conf submit;
+    Geneweb.Output.print_sstring conf {|">|};
+    Geneweb.Output.print_sstring conf {|</form>|}
 end
 
 let opt_password =
@@ -72,27 +71,31 @@ let missing_password conf =
     [
       ( Mutil.encode arg_password,
         `Arg_String,
-        Util.transl conf "plugin_fixbase_password_missing" |> Adef.safe );
+        Geneweb.Util.transl conf "plugin_fixbase_password_missing" |> Adef.safe
+      );
     ]
   in
-  UI.form conf (List.assoc "m" conf.env)
-    (Util.transl conf "plugin_fixbase_password_submit" |> Adef.safe)
+  UI.form conf
+    (List.assoc "m" conf.Geneweb.Config.env)
+    (Geneweb.Util.transl conf "plugin_fixbase_password_submit" |> Adef.safe)
     args
 
 let wrap conf title fn =
-  GWPARAM.wrap_output conf title @@ fun () ->
-  if opt_password = List.assoc_opt arg_password conf.env then fn ()
+  Geneweb.GWPARAM.wrap_output conf title @@ fun () ->
+  if opt_password = List.assoc_opt arg_password conf.Geneweb.Config.env then
+    fn ()
   else missing_password conf
 
 let fixbase conf _base =
-  wrap conf (Util.transl conf "plugin_fixbase_FIXBASE" |> Adef.safe)
+  wrap conf (Geneweb.Util.transl conf "plugin_fixbase_FIXBASE" |> Adef.safe)
   @@ fun () ->
-  Output.print_sstring conf {|<p>|};
-  Output.print_sstring conf (Util.transl conf "plugin_fixbase_description");
-  Output.print_sstring conf {|</p>|};
+  Geneweb.Output.print_sstring conf {|<p>|};
+  Geneweb.Output.print_sstring conf
+    (Geneweb.Util.transl conf "plugin_fixbase_description");
+  Geneweb.Output.print_sstring conf {|</p>|};
   let args =
     let input name txt =
-      (Mutil.encode name, `Arg_Set, Util.transl conf txt |> Adef.safe)
+      (Mutil.encode name, `Arg_Set, Geneweb.Util.transl conf txt |> Adef.safe)
     in
     [
       input arg_f_parents "plugin_fixbase_f_parents";
@@ -111,35 +114,40 @@ let fixbase conf _base =
   in
   UI.form conf
     (Adef.encoded "FIXBASE_OK")
-    (Util.transl conf "plugin_fixbase_submit" |> Adef.safe)
+    (Geneweb.Util.transl conf "plugin_fixbase_submit" |> Adef.safe)
     args
 
 let fixbase_ok conf base =
-  let dry_run = Util.p_getenv conf.env "dry_run" <> Some "off" in
+  let dry_run =
+    Geneweb.Util.p_getenv conf.Geneweb.Config.env "dry_run" <> Some "off"
+  in
   let process () =
     ignore @@ Unix.alarm 0;
     (* cancel timeout *)
-    let base' = Gwdb.open_base @@ GWPARAM.base_path [] (bname base ^ ".gwb") in
+    let base' =
+      Gwdb.open_base @@ Geneweb.GWPARAM.base_path [] (Gwdb.bname base ^ ".gwb")
+    in
     let ipers = ref [] in
     let ifams = ref [] in
     let istrs = ref [] in
     let report = function
-      | Fixbase.Fix_NBDS ip
-      | Fix_AddedUnion ip
-      | Fix_AddedParents ip
-      | Fix_ParentDeleted ip
-      | Fix_AddedRelatedFromPevent (ip, _)
-      | Fix_AddedRelatedFromFevent (ip, _)
-      | Fix_UpdatedOcc (ip, _, _) ->
+      | Geneweb.Fixbase.Fix_NBDS ip
+      | Geneweb.Fixbase.Fix_AddedUnion ip
+      | Geneweb.Fixbase.Fix_AddedParents ip
+      | Geneweb.Fixbase.Fix_ParentDeleted ip
+      | Geneweb.Fixbase.Fix_AddedRelatedFromPevent (ip, _)
+      | Geneweb.Fixbase.Fix_AddedRelatedFromFevent (ip, _)
+      | Geneweb.Fixbase.Fix_UpdatedOcc (ip, _, _) ->
           ipers := ip :: !ipers
-      | Fix_RemovedUnion (iper, ifam)
-      | Fix_RemovedDuplicateUnion (iper, ifam)
-      | Fix_MissingSpouse (ifam, iper) ->
+      | Geneweb.Fixbase.Fix_RemovedUnion (iper, ifam)
+      | Geneweb.Fixbase.Fix_RemovedDuplicateUnion (iper, ifam)
+      | Geneweb.Fixbase.Fix_MissingSpouse (ifam, iper) ->
           ifams := ifam :: !ifams;
           ipers := iper :: !ipers
-      | Fix_MarriageDivorce ifam | Fix_AddedChild ifam ->
+      | Geneweb.Fixbase.Fix_MarriageDivorce ifam
+      | Geneweb.Fixbase.Fix_AddedChild ifam ->
           ifams := ifam :: !ifams
-      | Fix_WrongString (ifam, iper, istr) ->
+      | Geneweb.Fixbase.Fix_WrongString (ifam, iper, istr) ->
           istrs := (ifam, iper, istr) :: !istrs
     in
     let progress (_ : int) (_ : int) = () in
@@ -160,79 +168,88 @@ let fixbase_ok conf base =
     if enabled [ "f_children"; "p_parents" ] then (
       Gwdb.load_descends_array base;
       Gwdb.load_ascends_array base);
-    load_persons_array base;
+    Gwdb.load_persons_array base;
     let opt s fn fixes = if UI.enabled conf s then fn :: fixes else fixes in
-    wrap conf (Util.transl conf "plugin_fixbase_FIXBASE_OK" |> Adef.safe)
+    wrap conf (Geneweb.Util.transl conf "plugin_fixbase_FIXBASE_OK" |> Adef.safe)
     @@ fun () ->
     let family_fixes = [] in
     let person_fixes = [] in
     let family_fixes =
-      opt "f_parents" Fixbase.fix_family_parents family_fixes
+      opt "f_parents" Geneweb.Fixbase.fix_family_parents family_fixes
     in
     let family_fixes =
-      opt "f_children" Fixbase.fix_family_children family_fixes
+      opt "f_children" Geneweb.Fixbase.fix_family_children family_fixes
     in
     let person_fixes =
-      opt "p_parents" Fixbase.fix_person_parents person_fixes
+      opt "p_parents" Geneweb.Fixbase.fix_person_parents person_fixes
     in
-    let person_fixes = opt "p_NBDS" Fixbase.fix_nbds person_fixes in
+    let person_fixes = opt "p_NBDS" Geneweb.Fixbase.fix_nbds person_fixes in
     let person_fixes =
-      opt "p_families" Fixbase.fix_person_unions person_fixes
-    in
-    let person_fixes =
-      opt "pevents_witnesses" Fixbase.fix_person_events_witnesses person_fixes
-    in
-    let family_fixes =
-      opt "fevents_witnesses" Fixbase.fix_family_events_witnesses family_fixes
-    in
-    let family_fixes =
-      opt "marriage_divorce" Fixbase.fix_family_divorce family_fixes
-    in
-    let family_fixes =
-      opt "missing_spouses" Fixbase.fix_family_spouses family_fixes
+      opt "p_families" Geneweb.Fixbase.fix_person_unions person_fixes
     in
     let person_fixes =
-      opt "invalid_strings" Fixbase.fix_person_strings person_fixes
+      opt "pevents_witnesses" Geneweb.Fixbase.fix_person_events_witnesses
+        person_fixes
     in
     let family_fixes =
-      opt "invalid_strings" Fixbase.fix_family_strings family_fixes
+      opt "fevents_witnesses" Geneweb.Fixbase.fix_family_events_witnesses
+        family_fixes
     in
-    let person_fixes = opt "p_key" (Fixbase.fix_person_key base) person_fixes in
+    let family_fixes =
+      opt "marriage_divorce" Geneweb.Fixbase.fix_family_divorce family_fixes
+    in
+    let family_fixes =
+      opt "missing_spouses" Geneweb.Fixbase.fix_family_spouses family_fixes
+    in
+    let person_fixes =
+      opt "invalid_strings" Geneweb.Fixbase.fix_person_strings person_fixes
+    in
+    let family_fixes =
+      opt "invalid_strings" Geneweb.Fixbase.fix_family_strings family_fixes
+    in
+    let person_fixes =
+      opt "p_key" (Geneweb.Fixbase.fix_person_key base) person_fixes
+    in
     let person_fixes = List.rev person_fixes in
     let family_fixes = List.rev family_fixes in
     ignore
-      (Fixbase.perform_fixes ~report:(Some report) ~progress ~base ~person_fixes
-         ~family_fixes);
-    clear_persons_array base;
-    clear_strings_array base;
-    clear_families_array base;
-    clear_unions_array base;
-    clear_descends_array base;
-    clear_ascends_array base;
+      (Geneweb.Fixbase.perform_fixes ~report:(Some report) ~progress ~base
+         ~person_fixes ~family_fixes);
+    Gwdb.clear_persons_array base;
+    Gwdb.clear_strings_array base;
+    Gwdb.clear_families_array base;
+    Gwdb.clear_unions_array base;
+    Gwdb.clear_descends_array base;
+    Gwdb.clear_ascends_array base;
     let ifneq x1 x2 label s =
       if x1 <> x2 then (
-        Output.print_sstring conf {|<tr><td><b>|};
-        Output.print_string conf label;
-        Output.print_sstring conf {|</b></td><td>|};
-        Output.print_string conf (s x1 |> Util.escape_html);
-        Output.print_sstring conf {|</td><td>|};
-        Output.print_string conf (s x2 |> Util.escape_html);
-        Output.print_sstring conf {|</td></tr>|})
+        Geneweb.Output.print_sstring conf {|<tr><td><b>|};
+        Geneweb.Output.print_string conf label;
+        Geneweb.Output.print_sstring conf {|</b></td><td>|};
+        Geneweb.Output.print_string conf (s x1 |> Geneweb.Util.escape_html);
+        Geneweb.Output.print_sstring conf {|</td><td>|};
+        Geneweb.Output.print_string conf (s x2 |> Geneweb.Util.escape_html);
+        Geneweb.Output.print_sstring conf {|</td></tr>|})
     in
     let dump_p p p' =
       let mka p =
-        let a = gen_ascend_of_person p in
-        { a with parents = Option.map string_of_ifam a.parents }
+        let a = Gwdb.gen_ascend_of_person p in
+        { a with parents = Option.map Gwdb.string_of_ifam a.parents }
       in
       let mku p =
-        { Def.family = Array.map string_of_ifam (gen_union_of_person p).family }
+        {
+          Def.family =
+            Array.map Gwdb.string_of_ifam (Gwdb.gen_union_of_person p).family;
+        }
       in
       let mkp p =
-        let p = gen_person_of_person p in
+        let p = Gwdb.gen_person_of_person p in
         let p =
-          Futil.map_person_ps string_of_iper (fun ?format:_ -> sou base) p
+          Futil.map_person_ps Gwdb.string_of_iper
+            (fun ?format:_ -> Gwdb.sou base)
+            p
         in
-        { p with key_index = string_of_iper p.key_index }
+        { p with key_index = Gwdb.string_of_iper p.key_index }
       in
       let a1 = mka p in
       let u1 = mku p in
@@ -240,7 +257,9 @@ let fixbase_ok conf base =
       let a2 = mka p' in
       let u2 = mku p' in
       let p2 = mkp p' in
-      let ifneq x1 x2 label s = ifneq x1 x2 (Util.escape_html label) s in
+      let ifneq x1 x2 label s =
+        ifneq x1 x2 (Geneweb.Util.escape_html label) s
+      in
       ifneq p1.first_name p2.first_name "first_name" Fun.id;
       ifneq p1.surname p2.surname "surname" Fun.id;
       ifneq p1.occ p2.occ "occ" string_of_int;
@@ -286,13 +305,15 @@ let fixbase_ok conf base =
     in
     let dump_f f f' =
       let mkf f =
-        Futil.map_family_ps string_of_iper string_of_ifam
-          (fun ?format:_ -> sou base)
-          (gen_family_of_family f)
+        Futil.map_family_ps Gwdb.string_of_iper Gwdb.string_of_ifam
+          (fun ?format:_ -> Gwdb.sou base)
+          (Gwdb.gen_family_of_family f)
       in
-      let mkc f = Futil.map_couple_p string_of_iper (gen_couple_of_family f) in
+      let mkc f =
+        Futil.map_couple_p Gwdb.string_of_iper (Gwdb.gen_couple_of_family f)
+      in
       let mkd f =
-        Futil.map_descend_p string_of_iper (gen_descend_of_family f)
+        Futil.map_descend_p Gwdb.string_of_iper (Gwdb.gen_descend_of_family f)
       in
       let f1 = mkf f in
       let c1 = mkc f in
@@ -300,7 +321,9 @@ let fixbase_ok conf base =
       let f2 = mkf f' in
       let c2 = mkc f' in
       let d2 = mkd f' in
-      let ifneq x1 x2 label s = ifneq x1 x2 (Util.escape_html label) s in
+      let ifneq x1 x2 label s =
+        ifneq x1 x2 (Geneweb.Util.escape_html label) s
+      in
       ifneq f1.marriage f2.marriage "marriage" [%show: Def_show.cdate];
       ifneq f1.marriage_place f2.marriage_place "marriage_place" Fun.id;
       ifneq f1.marriage_note f2.marriage_note "marriage_note" Fun.id;
@@ -320,39 +343,41 @@ let fixbase_ok conf base =
     in
     let string_of_p i =
       Printf.sprintf {|<a href="%s&i=%s">%s</a>|}
-        (Util.commd conf :> string)
-        (string_of_iper i |> Mutil.encode :> string)
-        (Util.designation base (poi base i) : Adef.escaped_string :> string)
+        (Geneweb.Util.commd conf :> string)
+        (Gwdb.string_of_iper i |> Mutil.encode :> string)
+        (Geneweb.Util.designation base (Gwdb.poi base i)
+          : Adef.escaped_string
+          :> string)
       |> Adef.safe
     in
     let string_of_f i =
-      let fam = foi base i in
+      let fam = Gwdb.foi base i in
       Printf.sprintf "[%s & %s]"
-        (string_of_p @@ get_father fam : Adef.safe_string :> string)
-        (string_of_p @@ get_mother fam : Adef.safe_string :> string)
+        (string_of_p @@ Gwdb.get_father fam : Adef.safe_string :> string)
+        (string_of_p @@ Gwdb.get_mother fam : Adef.safe_string :> string)
       |> Adef.safe
     in
     let dump string_of dump get data =
       List.iter
         (fun i ->
-          Output.print_sstring conf "<b>";
-          Output.print_string conf (string_of i);
-          Output.print_sstring conf "</b>";
-          Output.print_sstring conf "<table>";
+          Geneweb.Output.print_sstring conf "<b>";
+          Geneweb.Output.print_string conf (string_of i);
+          Geneweb.Output.print_sstring conf "</b>";
+          Geneweb.Output.print_sstring conf "<table>";
           dump (get base' i) (get base i);
-          Output.print_sstring conf "</table>")
+          Geneweb.Output.print_sstring conf "</table>")
         data
     in
-    dump string_of_p dump_p poi !ipers;
-    dump string_of_f dump_f foi !ifams;
+    dump string_of_p dump_p Gwdb.poi !ipers;
+    dump string_of_f dump_f Gwdb.foi !ifams;
     List.iter
       (fun (ifam_opt, iper_opt, opt) ->
         let aux, sou =
           match opt with
-          | Some (i, i') -> (ifneq i i', sou base)
-          | None -> (ifneq empty_string quest_string, fun _ -> "Dtext")
+          | Some (i, i') -> (ifneq i i', Gwdb.sou base)
+          | None -> (ifneq Gwdb.empty_string Gwdb.quest_string, fun _ -> "Dtext")
         in
-        Output.print_sstring conf "<table>";
+        Geneweb.Output.print_sstring conf "<table>";
         aux
           (match ifam_opt with
           | Some i -> string_of_f i
@@ -361,27 +386,27 @@ let fixbase_ok conf base =
               | Some i -> string_of_p i
               | None -> assert false))
           sou;
-        Output.print_sstring conf "</table>")
+        Geneweb.Output.print_sstring conf "</table>")
       !istrs;
     let repost dry txt =
-      Output.print_sstring conf {|<form action="|};
-      Output.print_string conf (Util.commd conf);
-      Output.print_sstring conf {|" method="GET">|};
-      Output.print_sstring conf
+      Geneweb.Output.print_sstring conf {|<form action="|};
+      Geneweb.Output.print_string conf (Geneweb.Util.commd conf);
+      Geneweb.Output.print_sstring conf {|" method="GET">|};
+      Geneweb.Output.print_sstring conf
         {|<input type="hidden" name="m" value="FIXBASE_OK">|};
       if not dry then
-        Output.print_sstring conf
+        Geneweb.Output.print_sstring conf
           {|<input type="hidden" name="dry_run" value="off">|};
-      Output.print_sstring conf
+      Geneweb.Output.print_sstring conf
         {|<input type="hidden" name="date_of_last_change" value="|};
-      Output.print_sstring conf
+      Geneweb.Output.print_sstring conf
         (Gwdb.date_of_last_change base |> string_of_float);
-      Output.print_sstring conf {|">|};
+      Geneweb.Output.print_sstring conf {|">|};
       let opt s =
         if UI.enabled conf s then (
-          Output.print_sstring conf {|<input type="hidden" name="|};
-          Output.print_string conf (Mutil.encode s);
-          Output.print_sstring conf {|" value="on">|})
+          Geneweb.Output.print_sstring conf {|<input type="hidden" name="|};
+          Geneweb.Output.print_string conf (Mutil.encode s);
+          Geneweb.Output.print_sstring conf {|" value="on">|})
       in
       opt "f_parents";
       opt "f_children";
@@ -395,65 +420,76 @@ let fixbase_ok conf base =
       opt "invalid_strings";
       opt "p_key";
       opt "tstab";
-      Output.print_sstring conf {|<p>|};
-      Output.print_sstring conf {|<input type="submit" value="|};
-      Output.print_string conf txt;
-      Output.print_sstring conf {|">|};
-      Output.print_sstring conf {|</p>|};
-      Output.print_sstring conf {|</form>|}
+      Geneweb.Output.print_sstring conf {|<p>|};
+      Geneweb.Output.print_sstring conf {|<input type="submit" value="|};
+      Geneweb.Output.print_string conf txt;
+      Geneweb.Output.print_sstring conf {|">|};
+      Geneweb.Output.print_sstring conf {|</p>|};
+      Geneweb.Output.print_sstring conf {|</form>|}
     in
     let tstab () =
       if UI.enabled conf "tstab" then (
-        let bname = GWPARAM.base_path [] (bname base ^ ".gwb") in
+        let bname = Geneweb.GWPARAM.base_path [] (Gwdb.bname base ^ ".gwb") in
         Files.rm (Filename.concat bname "tstab_visitor");
         Files.rm (Filename.concat bname "tstab");
-        Output.print_sstring conf {|<p>|};
-        Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_tstab");
-        Output.print_sstring conf {|</p>|})
+        Geneweb.Output.print_sstring conf {|<p>|};
+        Geneweb.Output.print_sstring conf
+          (Geneweb.Util.transl conf "plugin_fixbase_ok_tstab");
+        Geneweb.Output.print_sstring conf {|</p>|})
     in
     if not dry_run then
       if
-        Util.p_getenv conf.env "date_of_last_change"
+        Geneweb.Util.p_getenv conf.Geneweb.Config.env "date_of_last_change"
         = Some (Gwdb.date_of_last_change base |> string_of_float)
       then (
         Gwdb.commit_patches base;
-        Output.print_sstring conf {|<p>|};
-        Output.print_sstring conf
-          (Util.transl conf "plugin_fixbase_ok_commit_patches");
-        Output.print_sstring conf {|</p>|};
+        Geneweb.Output.print_sstring conf {|<p>|};
+        Geneweb.Output.print_sstring conf
+          (Geneweb.Util.transl conf "plugin_fixbase_ok_commit_patches");
+        Geneweb.Output.print_sstring conf {|</p>|};
         tstab ())
       else if !ipers <> [] || !ifams <> [] || !istrs <> [] then (
-        Output.print_sstring conf {|<p>|};
-        Output.print_sstring conf
-          (Util.transl conf "plugin_fixbase_ok_base_changed");
-        Output.print_sstring conf {|</p>|};
-        repost true (Util.transl conf "plugin_fixbase_ok_refresh" |> Adef.safe))
+        Geneweb.Output.print_sstring conf {|<p>|};
+        Geneweb.Output.print_sstring conf
+          (Geneweb.Util.transl conf "plugin_fixbase_ok_base_changed");
+        Geneweb.Output.print_sstring conf {|</p>|};
+        repost true
+          (Geneweb.Util.transl conf "plugin_fixbase_ok_refresh" |> Adef.safe))
       else tstab ()
     else if !ipers <> [] || !ifams <> [] || !istrs <> [] then
-      repost false (Util.transl conf "plugin_fixbase_ok_apply" |> Adef.safe)
+      repost false
+        (Geneweb.Util.transl conf "plugin_fixbase_ok_apply" |> Adef.safe)
     else (
-      Output.print_sstring conf {|<p>|};
-      Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_nothing");
-      Output.print_sstring conf {|</p>|});
-    Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (Util.commd conf : Adef.escaped_string);
-    Output.print_sstring conf {|&m=FIXBASE">|};
-    Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_return");
-    Output.print_sstring conf {|</a></p>|}
+      Geneweb.Output.print_sstring conf {|<p>|};
+      Geneweb.Output.print_sstring conf
+        (Geneweb.Util.transl conf "plugin_fixbase_ok_nothing");
+      Geneweb.Output.print_sstring conf {|</p>|});
+    Geneweb.Output.print_sstring conf {|<p><a href="|};
+    Geneweb.Output.print_string conf
+      (Geneweb.Util.commd conf : Adef.escaped_string);
+    Geneweb.Output.print_sstring conf {|&m=FIXBASE">|};
+    Geneweb.Output.print_sstring conf
+      (Geneweb.Util.transl conf "plugin_fixbase_ok_return");
+    Geneweb.Output.print_sstring conf {|</a></p>|}
   in
   if dry_run then process ()
   else
     Lock.control
-      (Files.lock_file @@ GWPARAM.base_path [] (conf.bname ^ ".gwb"))
+      (Files.lock_file
+      @@ Geneweb.GWPARAM.base_path [] (conf.Geneweb.Config.bname ^ ".gwb"))
       false
-      ~onerror:(fun () -> GWPARAM.output_error conf Def.Service_Unavailable)
+      ~onerror:(fun () ->
+        Geneweb.GWPARAM.output_error conf Def.Service_Unavailable)
       process
 
 let ns = "fixbase"
 
 let _ =
   let aux fn _assets conf base =
-    if if opt_manitou then conf.manitou else conf.wizard then (
+    if
+      if opt_manitou then conf.Geneweb.Config.manitou
+      else conf.Geneweb.Config.wizard
+    then (
       fn conf base;
       true)
     else false

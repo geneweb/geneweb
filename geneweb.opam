@@ -15,7 +15,6 @@ doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "alcotest" {with-test}
-  "benchmark"
   "calendars"
   "camlp5" {>= "8.00.01"}
   "camlp-streams"
@@ -26,7 +25,6 @@ depends: [
   "num"
   "ocaml" {>= "4.08"}
   "odoc"
-  "ounit"
   "ppx_blob"
   "ppx_deriving"
   "ppx_import"
