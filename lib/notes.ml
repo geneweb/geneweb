@@ -169,7 +169,47 @@ let commit_notes conf base fnotes s =
     "mn";
   update_notes_links_db base pg s
 
-let wiki_aux pp conf base env str =
+let br_signals =
+  [ `Text [ "\n" ]; `Start_element (("", "br"), []); `Text [ "\n" ] ]
+
+let insert_brs_in_txt ss =
+  let rec conc = function
+    | [ x ] -> [ x ]
+    | (`Text [ txt ] as x) :: xs when Wiki.line_is_in_wiki_syntax txt ->
+        x :: `Text [ "\n" ] :: conc xs
+    | (`Text txt as x) :: `Text [ "" ] :: xs when txt <> [ "" ] ->
+        x :: `Text [ "\n\n" ] :: conc xs
+    | `Text [ "" ] :: xs -> `Text [ "\n" ] :: conc xs
+    | x :: xs -> x :: (br_signals @ conc xs)
+    | [] -> []
+  in
+  let ss : string list =
+    List.flatten @@ List.map (String.split_on_char '\n') ss
+  in
+  let ss = List.map (fun s -> `Text [ s ]) ss in
+  conc ss
+
+let insert_brs s =
+  let decrease_depth d = if d = 0 then d else d - 1 in
+  let insert_brs_in_toplvl_text depth v =
+    match v with
+    | `Start_element (_, _) -> ([ v ], Some (depth + 1))
+    | `End_element -> ([ v ], Some (decrease_depth depth))
+    | `Text txts when depth = 0 ->
+        let txt = insert_brs_in_txt txts in
+        (txt, Some depth)
+    | `Text _ | `Doctype _ | `Xml _ | `PI _ | `Comment _ -> ([ v ], Some depth)
+  in
+  let signals =
+    Markup.string s
+    |> Markup.parse_html ~context:(`Fragment "body")
+    |> Markup.signals
+  in
+  Markup.transform insert_brs_in_toplvl_text 0 signals
+  |> Markup.write_html |> Markup.to_string
+
+let wiki_aux ?(keep_newlines = false) pp conf base env str =
+  let str = if keep_newlines then insert_brs str else str in
   let s = Util.string_with_macros ~conf ~env (limit_display_length str) in
   let lines = pp (Wiki.html_of_tlsw conf s) in
   let wi =
@@ -185,15 +225,18 @@ let wiki_aux pp conf base env str =
 let source conf base str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base [] str
 
-let note conf base env str = wiki_aux Fun.id conf base env str
+let note ?(keep_newlines = false) conf base env str =
+  wiki_aux ~keep_newlines Fun.id conf base env str
 
-let person_note conf base p str =
+let person_note ?(keep_newlines = false) conf base p str =
   let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in
-  note conf base env str
+  note ~keep_newlines conf base env str
 
 let source_note conf base p str =
   let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
 
-let source_note_with_env conf base env str =
-  wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
+let source_note_with_env ?(keep_newlines = false) conf base env str =
+  wiki_aux ~keep_newlines
+    (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x)
+    conf base env str
