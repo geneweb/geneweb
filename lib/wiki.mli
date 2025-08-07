@@ -56,14 +56,12 @@ val extract_sub_part : string -> int -> string list
     Extracts the `i`th first TLSW sections of `tlsw` *)
 
 val split_title_and_text : string -> (string * string) list * string
-(**
-   The argument is expected to have the form "KEY=value\n"...
-   This function calculates each Key/value pair and puts it in a list;
-   except for the key TITLE, that is the second element of the returned tuple.
-   If there is no title defined, checks if the first line is not empty and does
-   not start with '=' nor contains '<' nor '[', in which case it is choosen as a
-   first line. Otherwise, the title is the empty string.
-*)
+(** The argument is expected to have the form "KEY=value\n"... This function
+    calculates each Key/value pair and puts it in a list; except for the key
+    TITLE, that is the second element of the returned tuple. If there is no
+    title defined, checks if the first line is not empty and does not start with
+    '=' nor contains '<' nor '\[', in which case it is choosen as a first line.
+    Otherwise, the title is the empty string. *)
 
 val print_sub_part :
   Config.config ->
