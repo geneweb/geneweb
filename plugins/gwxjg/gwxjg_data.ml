@@ -384,7 +384,7 @@ and module_DATE conf =
     | _ -> raise Not_found)
 
 and lazy_list :
-      'a. ('a -> Jingoo.Jg_types.tvalue) -> 'a list -> Jingoo.Jg_types.tvalue =
+    'a. ('a -> Jingoo.Jg_types.tvalue) -> 'a list -> Jingoo.Jg_types.tvalue =
  fun fn -> function
   | [] -> Jingoo.Jg_types.Tlist []
   | l -> Jingoo.Jg_types.Tlazy (lazy (Jingoo.Jg_types.Tlist (List.map fn l)))
@@ -394,7 +394,8 @@ and lazy_get_n_mk_person conf base i =
   let iper = Jingoo.Jg_types.Tstr (Gwdb.string_of_iper i) in
   Jingoo.Jg_types.Tpat
     (function
-    | "iper" -> iper | s -> Jingoo.Jg_types.unbox_pat (Lazy.force lp) s)
+    | "iper" -> iper
+    | s -> Jingoo.Jg_types.unbox_pat (Lazy.force lp) s)
 
 and ppget conf base p =
   if not (Geneweb.Person.is_visible conf base p) then
@@ -777,7 +778,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         in
         Jingoo.Jg_types.Tpat
           (function
-          | "reason" -> reason | s -> Jingoo.Jg_runtime.jg_obj_lookup e s)
+          | "reason" -> reason
+          | s -> Jingoo.Jg_runtime.jg_obj_lookup e s)
     | DeadYoung -> wrap "DeadYoung"
     | DeadDontKnowWhen -> wrap "DeadDontKnowWhen"
     | DontKnowIfDead -> wrap "DontKnowIfDead"

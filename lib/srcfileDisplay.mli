@@ -10,6 +10,7 @@ val incr_welcome_counter : Config.config -> (int * int * string) option
 val incr_request_counter : Config.config -> (int * int * string) option
 
 val adm_file : string -> string
-(** Compute administration file path with giving name (search inside {i cnt} directory) *)
+(** Compute administration file path with giving name (search inside
+    {i cnt} directory) *)
 
 val source_file_name : Config.config -> string -> string

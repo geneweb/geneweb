@@ -58,8 +58,7 @@ let map_person_name_visibility
   map_person_name_visibility' ~on_hidden_name ~on_restricted_name
     ~on_visible_name ~conf ~base ~person
 
-let map_first_name_data :
-    type a.
+let map_first_name_data : type a.
     (first_name:string -> qualifier:string -> a) ->
     Config.config ->
     Gwdb.base ->

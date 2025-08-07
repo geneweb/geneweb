@@ -4,26 +4,28 @@ val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
     rectangle *)
 
 val source_filename : string -> string -> string
-(** Returns path to the image file with the giving name in directory {i src/}. *)
+(** Returns path to the image file with the giving name in directory {i src/}.
+*)
 
 val prefix : Config.config -> Adef.escaped_string
-(** Returns the image prefix (conf.image_prefix), html escaped  *)
+(** Returns the image prefix (conf.image_prefix), html escaped *)
 
 (* TODO this should be removed *)
 val default_portrait_filename : Gwdb.base -> Gwdb.person -> string
-(** [default_portrait_filename base p] is the default filename of [p]'s portrait. Without it's file extension.
- e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
- *)
+(** [default_portrait_filename base p] is the default filename of [p]'s
+    portrait. Without it's file extension. e.g: default_portrait_filename_of_key
+    "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond" *)
 
 val size_from_path : [ `Path of string ] -> (int * int, unit) result
 (** [size_from_path path]
     - Error () if failed to read or parse file
-    - Ok (width, height) of the file.
-It works by openning the file and reading magic numbers *)
+    - Ok (width, height) of the file. It works by openning the file and reading
+      magic numbers *)
 
 val path_of_filename : string -> [> `Path of string ]
-(** [path_of_filename fname] search for image {i images/fname} inside the base and assets directories.
-    Return the path to found file or [fname] if file isn't found.  *)
+(** [path_of_filename fname] search for image {i images/fname} inside the base
+    and assets directories. Return the path to found file or [fname] if file
+    isn't found. *)
 
 val rename_portrait :
   Config.config -> Gwdb.base -> Gwdb.person -> string * string * int -> unit
@@ -37,8 +39,7 @@ val get_portrait_path :
   Config.config -> Gwdb.base -> Gwdb.person -> [> `Path of string ] option
 (** [get_portrait_path conf base p] is
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
-    - [Some path] with [path] the full path with extension of [p]'s portrait.
-*)
+    - [Some path] with [path] the full path with extension of [p]'s portrait. *)
 
 val get_portrait_with_size :
   Config.config ->
@@ -47,7 +48,9 @@ val get_portrait_with_size :
   ([> `Path of string | `Url of string ] * (int * int) option) option
 (** [get_portrait_with_size conf base p] is
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
-    - [Some (src, size_opt)] with [src] the url or path of [p]'s portrait. [size_opt] is the (width,height) of the portrait if we could recover them *)
+    - [Some (src, size_opt)] with [src] the url or path of [p]'s portrait.
+      [size_opt] is the (width,height) of the portrait if we could recover them
+*)
 
 val get_portrait :
   Config.config ->
@@ -56,8 +59,7 @@ val get_portrait :
   [> `Path of string | `Url of string ] option
 (** [get_portrait conf base p] is
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
-    - [Some src] with [src] the url or path of [p]'s portrait.
-*)
+    - [Some src] with [src] the url or path of [p]'s portrait. *)
 
 val string_of_image_size :
   Config.config -> Gwdb.base -> Gwdb.person * bool -> string

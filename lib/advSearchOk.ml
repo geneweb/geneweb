@@ -815,9 +815,7 @@ end = struct
           match Util.p_getenv conf.Config.env k with
           | Some v ->
               loop
-                (if acc = "" then v
-                else if v = "" then acc
-                else acc ^ " / " ^ v)
+                (if acc = "" then v else if v = "" then acc else acc ^ " / " ^ v)
                 (i + 1)
           | None -> acc
         in
