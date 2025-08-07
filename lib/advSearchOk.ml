@@ -788,7 +788,7 @@ let advanced_search conf base max_answers =
 module SearchingFields : sig
   val gets : Config.config -> string -> string
   val getd : Config.config -> string -> Date.dmy option * Date.dmy option
-
+  val map_field : conf:Config.config -> key:string -> string -> string
   val string_field :
     ?map_field:(string -> string) -> Config.config -> string -> string -> string
 
@@ -927,17 +927,17 @@ end = struct
 
   let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
 
-  let map_field conf key s =
+  let map_field ~conf ~key s =
     if get_name_search_mode (gets conf) key = `Not_Exact_Prefix then s ^ "(...)"
     else s
 
   let first_name conf =
     let fn = gets conf "first_name" in
-    map_field conf "exact_first_name" fn
+    map_field ~conf ~key:"exact_first_name" fn
 
   let surname conf =
     let sn = gets conf "surname" in
-    map_field conf "exact_surname" sn
+    map_field ~conf ~key:"exact_surname" sn
 
   let occupation conf = gets conf "occu"
 
@@ -965,9 +965,7 @@ let searching_fields conf base =
   let sex = SearchingFields.sex conf in
   let search_type = get_search_type gets in
   let search = "" in
-  let map_field key s =
-    if get_name_search_mode gets key = `Not_Exact_Prefix then s ^ "(...)" else s
-  in
+  let map_field key = SearchingFields.map_field ~conf ~key in
   let search =
     SearchingFields.string_field
       ~map_field:(map_field "exact_first_name")
