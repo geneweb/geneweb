@@ -508,10 +508,10 @@ let rec get_aliases str l =
       (cut_space x :: nl, l)
   | _ -> ([], l)
 
-(** [get_name l] parses a last name. Looks up first element of the list and returns a
-    [(name,rest)] couple where [name] is a person's last name and [rest] is a tail of
-    the list. If first element is [#nick], [#alias] start with '{' returns empty string
-    and list unchanged. *)
+(** [get_name l] parses a last name. Looks up first element of the list and
+    returns a [(name,rest)] couple where [name] is a person's last name and
+    [rest] is a tail of the list. If first element is [#nick], [#alias] start
+    with '\{' returns empty string and list unchanged. *)
 let get_name l =
   match l with
   | "#nick" :: _ | "#alias" :: _ -> ("", l)
