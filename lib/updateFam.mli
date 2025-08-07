@@ -30,9 +30,8 @@ val print_add_parents : Config.config -> Gwdb.base -> unit
 (** Associates parents to a person *)
 
 val change_order : Gwdb.person -> Gwdb.ifam -> int -> Gwdb.ifam list
-(** [change_order p f i]
-    Returns the families of `p` where `f` is at the ith position.
-    `i` must not be 0. *)
+(** [change_order p f i] Returns the families of `p` where `f` is at the ith
+    position. `i` must not be 0. *)
 
 val print_change_order : Config.config -> Gwdb.base -> unit
 (** Displays a menu to change the family order *)

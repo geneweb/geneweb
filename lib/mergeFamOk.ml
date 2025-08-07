@@ -38,13 +38,11 @@ let merge_event_witnesses wit1 wit2 =
 
 (* ********************************************************************** *)
 
-(** [Description] : Essaye de merger le plus possible d'evenement famille
-                    a partir des deux listes d'evenements famille.
-    [Args] :
-      - l1   : fevents de fam1
-      - l2   : fevents de fam2
-    [Retour] : la fusion des fevents
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Essaye de merger le plus possible d'evenement famille a
+    partir des deux listes d'evenements famille. [Args] :
+    - l1 : fevents de fam1
+    - l2 : fevents de fam2 [Retour] : la fusion des fevents [Rem] : Non exporté
+      en clair hors de ce module. *)
 let merge_events conf l1 l2 =
   let merge_strings s1 sep s2 =
     if s1 = s2 then s1

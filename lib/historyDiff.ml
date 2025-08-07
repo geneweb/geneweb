@@ -52,12 +52,10 @@ let create_history_dirs conf fname =
 
 (* ************************************************************************ *)
 
-(** [Description] : Enregistre la personne dans son fichier historique.
-    [Args] :
-      - fname : le chemin du fichier
-      - gr : le contenu de la personne
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Enregistre la personne dans son fichier historique. [Args] :
+    - fname : le chemin du fichier
+    - gr : le contenu de la personne [Retour] : Néant [Rem] : Non exporté en
+      clair hors de ce module. *)
 let write_history_file conf person_file fname gr =
   (* On créé toujours les dossiers nécessaires (changement de clé ...). *)
   let () = create_history_dirs conf person_file in
@@ -79,17 +77,14 @@ let write_history_file conf person_file fname gr =
 
 (* ************************************************************************ *)
 
-(** [Description] : Crée un gen_record à partir d'une personne.
-    [Args] :
-      - conf : configuratino de la base
-      - base : base de donnée
-      - first : booléen pour savoir si c'est la première entrée de
-                l'historique. Si c'est le cas, on ne connait pas la date de
-                modification, donc on met "environ" une seconde avant.
-      - gen_p : gen_person
-    [Retour] :
-      - gen_record
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Crée un gen_record à partir d'une personne. [Args] :
+    - conf : configuratino de la base
+    - base : base de donnée
+    - first : booléen pour savoir si c'est la première entrée de l'historique.
+      Si c'est le cas, on ne connait pas la date de modification, donc on met
+      "environ" une seconde avant.
+    - gen_p : gen_person [Retour] :
+    - gen_record [Rem] : Non exporté en clair hors de ce module. *)
 let make_gen_record conf base first gen_p =
   let date =
     let conf =
@@ -128,13 +123,11 @@ let make_gen_record conf base first gen_p =
 
 (* ************************************************************************ *)
 
-(** [Description] : Met à jour le fichier historique d'une personne.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - changed : le type de modification (voir def.mli)
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Met à jour le fichier historique d'une personne. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - changed : le type de modification (voir def.mli) [Retour] : Néant [Rem] :
+      Exporté en clair hors de ce module. *)
 let record_diff conf base changed =
   match List.assoc_opt "history_diff" conf.Config.base_env with
   | Some "yes" when not conf.manitou -> (
@@ -168,10 +161,10 @@ let record_diff conf base changed =
         let fname = history_path conf person_file in
         (* La clé a changé, on reprend l'ancien historique. *)
         (if o_person_file <> person_file && Sys.file_exists ofname then
-         try
-           let () = create_history_dirs conf person_file in
-           Sys.rename ofname fname
-         with Sys_error _ -> ());
+           try
+             let () = create_history_dirs conf person_file in
+             Sys.rename ofname fname
+           with Sys_error _ -> ());
         let gr =
           make_gen_record conf base false (Util.string_gen_person base p)
         in
@@ -314,14 +307,11 @@ let record_diff conf base changed =
 (* ************************************************************************ *)
 
 (** [Description] : Charge la liste des modifications pour une personne.
-      L'avantage est que les versions les plus récentes se trouvent en
-      tête de liste.
-    [Args] :
-      - conf  : configuration de la base
-      - fname : le nom du fichier historique
-    [Retour] :
-      - gen_record list
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    L'avantage est que les versions les plus récentes se trouvent en tête de
+    liste. [Args] :
+    - conf : configuration de la base
+    - fname : le nom du fichier historique [Retour] :
+    - gen_record list [Rem] : Non exporté en clair hors de ce module. *)
 let load_person_history conf fname =
   let history = ref [] in
   let fname = history_path conf fname in

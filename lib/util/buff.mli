@@ -5,22 +5,22 @@ module Make () : sig
 
   val store : int -> char -> int
   (** [store i c] stores a character [c] at the position [i] inside the buffer.
-          Automatically extends buffer if needed. Returns the position that follows
-          inserted character ([i+1]) in buffer. Should be used either with position
-          0 or with position returned by previous calls of store functions. *)
+      Automatically extends buffer if needed. Returns the position that follows
+      inserted character ([i+1]) in buffer. Should be used either with position
+      0 or with position returned by previous calls of store functions. *)
 
   val mstore : int -> string -> int
   (** [mstore i s] stores a string [s] starting from the postion [i] inside the
-          buffer. Automatically extends buffer if needed. Returns the position that
-          follows inserted string in buffer. Should be used either with position 0
-          or with position returned by previous calls of store functions.*)
+      buffer. Automatically extends buffer if needed. Returns the position that
+      follows inserted string in buffer. Should be used either with position 0
+      or with position returned by previous calls of store functions.*)
 
   val gstore : int -> string -> int -> int -> int
   (** [gstore i s si len] stores substring of [s] from [si] position with length
-          [len] inside the buffer starting from the postion [i]. Automatically extends
-          buffer if needed. Returns the position that follows inserted substring in
-          buffer. Should be used either with position 0 or with position returned
-          by previous calls of store functions.*)
+      [len] inside the buffer starting from the postion [i]. Automatically
+      extends buffer if needed. Returns the position that follows inserted
+      substring in buffer. Should be used either with position 0 or with
+      position returned by previous calls of store functions.*)
 
   val get : int -> string
   (** [get len] returns buffer's content until position [len] *)

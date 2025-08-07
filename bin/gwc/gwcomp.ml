@@ -31,24 +31,24 @@ type gw_syntax =
         Def.gen_family
       * (Gwdb.iper, Gwdb.iper, string) Def.gen_person Def.gen_descend
       (** Family definition block. Contains:
-      - Family couple (father's and mother's definition/reference)
-      - Father's sex
-      - Mother's sex
-      - List of witnesses definition/reference with their sex.
-      - List of information about every family event (name, date,
-        place, reason, source, notes and witnesses)
-      - Family definition
-      - Children (descendants) *)
+          - Family couple (father's and mother's definition/reference)
+          - Father's sex
+          - Mother's sex
+          - List of witnesses definition/reference with their sex.
+          - List of information about every family event (name, date, place,
+            reason, source, notes and witnesses)
+          - Family definition
+          - Children (descendants) *)
   | Notes of key * string
-      (** Block that defines personal notes. First element represents
-      reference to person. Second is note's content. *)
+      (** Block that defines personal notes. First element represents reference
+          to person. Second is note's content. *)
   | Relations of
       somebody * Def.sex assumption * (somebody, string) Def.gen_relation list
       (** Block that defines relations of a person with someone outisde of
-      family block (like foster parents) (field {i rparents}). Contains:
-      - Concerned person definition/reference
-      - Sex of person
-      - List of his relations. *)
+          family block (like foster parents) (field {i rparents}). Contains:
+          - Concerned person definition/reference
+          - Sex of person
+          - List of his relations. *)
   | Pevent of
       somebody
       * Def.sex assumption
@@ -60,19 +60,19 @@ type gw_syntax =
         * string
         * (somebody * Def.sex assumption * Def.witness_kind * string) list)
         list
-      (** Block that defines events of a person. Specific to gwplus format. Contains:
-      - Concerned person's definition/reference
-      - Sex of person
-      - List of information about every personal event (name, date,
-      place, reason, source, notes and witnesses)*)
+      (** Block that defines events of a person. Specific to gwplus format.
+          Contains:
+          - Concerned person's definition/reference
+          - Sex of person
+          - List of information about every personal event (name, date, place,
+            reason, source, notes and witnesses)*)
   | Bnotes of string * string
-      (** Block that defines database notes and extended pages.
-      First string represents name of extended page ("" for
-      database notes, only one per file). Second is note's
-      or page's content. *)
+      (** Block that defines database notes and extended pages. First string
+          represents name of extended page ("" for database notes, only one per
+          file). Second is note's or page's content. *)
   | Wnotes of string * string
-      (** Block that defines wizard notes. First string represents
-      First string represents wizard's id. Second is note's content. *)
+      (** Block that defines wizard notes. First string represents First string
+          represents wizard's id. Second is note's content. *)
 
 (** {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
@@ -83,7 +83,8 @@ let make_weak_assumption v = Weak v
 (** .gwo file header *)
 let magic_gwo = "GnWo000o"
 
-(** Checks a .gwo header and prints fails if header is absent or not compatible. *)
+(** Checks a .gwo header and prints fails if header is absent or not compatible.
+*)
 let check_magic fname ic =
   let b = really_input_string ic (String.length magic_gwo) in
   if b <> magic_gwo then
@@ -153,8 +154,7 @@ let get_field lab l =
   | lab1 :: x :: l' when lab1 = lab -> (cut_space x, l')
   | _ -> ("", l)
 
-(** Parses [Def.date] from string that starts at pos [i]
-    inside [s] *)
+(** Parses [Def.date] from string that starts at pos [i] inside [s] *)
 let date_of_string s i =
   let champ i =
     let neg, i =
@@ -301,7 +301,8 @@ let input_a_line state (ic, encoding) =
   | E_utf_8 -> line
   | E_iso_8859_1 -> Utf8.utf_8_of_iso_8859_1 line
 
-(** Read a line. If line is empty or only contains a comment, then read next line  *)
+(** Read a line. If line is empty or only contains a comment, then read next
+    line *)
 let rec input_real_line state ic =
   let x = input_a_line state ic in
   if x = "" || x.[0] = '#' then input_real_line state ic else x
@@ -399,8 +400,8 @@ let get_optional_sexe = function
   | "f" :: l -> (Female, l)
   | l -> (Neuter, l)
 
-(** Parses int that starts at the position [i] inside [x].
-    Raises [Not_found] if integer isn't found. *)
+(** Parses int that starts at the position [i] inside [x]. Raises [Not_found] if
+    integer isn't found. *)
 let make_int x =
   let rec loop found n i =
     if i = String.length x then if found then n else raise Not_found
@@ -412,8 +413,8 @@ let make_int x =
   in
   loop false 0
 
-(** Parses person's first name and occurence number.
-    Occurence number is 0 if not present. *)
+(** Parses person's first name and occurence number. Occurence number is 0 if
+    not present. *)
 let get_fst_name str l =
   match l with
   | x :: l' -> (
@@ -691,21 +692,21 @@ let get_event_witness_kind l =
   | "#othe" :: l' -> (Witness_Other, l')
   | _ -> (Witness, l)
 
-(** Parses the line containing an information about relationship between parents within family
-    and returns [((relk, fath_sex, moth_sex), mar, place, note, src, divorce, rest)].
-    [relk] i a relation kind between parents ([Def.relation_kind]), [fath_sex] and [moth_sex]
-    is a sex of each parent, [mar] is a optional mariage date (if married), [place] is a
-    marriage place if present, [note] is a mariage note if present, [src] is a mariage source
-    if present, [divorce] is a divorce status [Def.divorce], [rest] is the rest of the line to
-    parse
-*)
+(** Parses the line containing an information about relationship between parents
+    within family and returns
+    [((relk, fath_sex, moth_sex), mar, place, note, src, divorce, rest)]. [relk]
+    i a relation kind between parents ([Def.relation_kind]), [fath_sex] and
+    [moth_sex] is a sex of each parent, [mar] is a optional mariage date (if
+    married), [place] is a marriage place if present, [note] is a mariage note
+    if present, [src] is a mariage source if present, [divorce] is a divorce
+    status [Def.divorce], [rest] is the rest of the line to parse *)
 let get_mar_date str = function
   | x :: l ->
       let mar, l =
         match x.[0] with
         | '+' ->
             ( (if String.length x > 1 then Date.cdate_of_od (date_of_string x 1)
-              else Date.cdate_None),
+               else Date.cdate_None),
               l )
         | _ -> failwith str
       in
@@ -790,15 +791,14 @@ let create_person () =
 (** Person is unknown (bogus definition) *)
 let bogus_def p n = p = "?" || n = "?"
 
-(** Parse the line and create person's [gen_person] definition.
-    Doesn't modify following personal information:
+(** Parse the line and create person's [gen_person] definition. Doesn't modify
+    following personal information:
     - Key
     - Parents
     - Related persons
     - Events
-    - Notes
-    If can't parse person's sources use [comm_psources] instead.
-    If can't parse bithdate use [comm_birth_place] instead. *)
+    - Notes If can't parse person's sources use [comm_psources] instead. If
+      can't parse bithdate use [comm_birth_place] instead. *)
 let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
   let first_names_aliases, l = get_fst_names_aliases str l in
   let surnames_aliases, l = get_surnames_aliases str l in
@@ -886,10 +886,12 @@ let set_infos state fn sn occ sex comm_psources comm_birth_place str u l =
   in
   (u, l)
 
-(** Parses the line containing a parent and returns [(somebody,np,rest)]. [somebody] is either [Defined p] if
-    person's definiton was parsed ([p] regroups all personal information) either [Undefined k] if a reference
-    to a person already defined was parsed ([k] is a key to find corresponding definition). [np] is a person's
-    surname. [rest] is a rest of line to parse. Could be used to parse familial witnesses. *)
+(** Parses the line containing a parent and returns [(somebody,np,rest)].
+    [somebody] is either [Defined p] if person's definiton was parsed ([p]
+    regroups all personal information) either [Undefined k] if a reference to a
+    person already defined was parsed ([k] is a key to find corresponding
+    definition). [np] is a person's surname. [rest] is a rest of line to parse.
+    Could be used to parse familial witnesses. *)
 let parse_parent state str l =
   (* last name *)
   let np, l = get_name l in
@@ -909,10 +911,11 @@ let parse_parent state str l =
     let u, l = set_infos state pp np op u.sex "" "" str u l in
     (Defined u, np, l)
 
-(** Parses the line containing a children and returns a person [gen_person] containing
-    all extracted information. If a children definition doesn't provide
-    surname then father's surname is used. ALso if it doesn't provide a children's
-    birth place and source then it uses information provided by family definiton. *)
+(** Parses the line containing a children and returns a person [gen_person]
+    containing all extracted information. If a children definition doesn't
+    provide surname then father's surname is used. ALso if it doesn't provide a
+    children's birth place and source then it uses information provided by
+    family definiton. *)
 let parse_child state str surname sex csrc cbp l =
   let u = create_person () in
   let prenom, occ, l = get_fst_name str l in
@@ -966,8 +969,8 @@ let get_relation state str = function
         | _ -> failwith str)
   | _ -> failwith str
 
-(** Read notes of a person inside [note] block across multiple lines and
-    concat them. *)
+(** Read notes of a person inside [note] block across multiple lines and concat
+    them. *)
 let read_notes state ic =
   let notes =
     try
@@ -1003,7 +1006,7 @@ let read_notes_db state ic end_txt =
   in
   Ext_string.strip_all_trailing_spaces notes
 
-(** Parsing status of .gw block  *)
+(** Parsing status of .gw block *)
 type 'a read_family =
   | F_some of 'a  (** Read block inside .gw file *)
   | F_enc_utf_8  (** Read block that defines that file use utf-8 encoding *)
@@ -1041,8 +1044,9 @@ let loop_witness_note state = aux_loop_note state "wnote"
 let loop_comment state = aux_loop_note state "comm"
 
 (** Parse witnesses across the lines and returns list of [(wit,wsex,wk,wnote)]
-    where wit is a witness definition/reference, [wsex] is a sex of witness
-    , [wk] is a kind of witness relationship to the family, [wnote] is a witness note. *)
+    where wit is a witness definition/reference, [wsex] is a sex of witness ,
+    [wk] is a kind of witness relationship to the family, [wnote] is a witness
+    note. *)
 let loop_witn state line ic =
   let rec loop_witn acc str =
     match fields str with
@@ -1064,8 +1068,8 @@ let loop_witn state line ic =
   in
   loop_witn [] line
 
-(** Read and parse a gw file block from [ic]. Returns also next line if it's
-    not the end of the file. *)
+(** Read and parse a gw file block from [ic]. Returns also next line if it's not
+    the end of the file. *)
 let read_family state ic fname = function
   (* Block that defines that file use utf-8 encoding *)
   | Some (_, [ "encoding:"; "utf-8" ]) -> F_enc_utf_8

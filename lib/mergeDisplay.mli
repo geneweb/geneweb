@@ -8,4 +8,5 @@ val print : Config.config -> Gwdb.base -> Gwdb.person -> unit
 (** Displays a menu for merging two persons *)
 
 val print_possible_continue_merging : Config.config -> Gwdb.base -> unit
-(** Prints link on the page to continue merging two persons (or two duplications). *)
+(** Prints link on the page to continue merging two persons (or two
+    duplications). *)

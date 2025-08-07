@@ -915,13 +915,13 @@ let opendb bname =
     match ic2 with Some ic2 -> Some (input_binary_int ic2) | None -> None
   in
   (if true then
-   match ic2 with
-   | Some ic2 ->
-       ignore @@ input_binary_int ic2;
-       (* ic2_surname_start_pos *)
-       ignore @@ input_binary_int ic2
-       (* ic2_first_name_start_pos *)
-   | None -> ());
+     match ic2 with
+     | Some ic2 ->
+         ignore @@ input_binary_int ic2;
+         (* ic2_surname_start_pos *)
+         ignore @@ input_binary_int ic2
+         (* ic2_first_name_start_pos *)
+     | None -> ());
   let shift = 0 in
   let iper_exists =
     make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len
