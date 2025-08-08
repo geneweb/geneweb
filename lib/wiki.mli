@@ -114,3 +114,5 @@ val notes_aliases : Config.config -> (string * string) list
 
 val map_notes : (string * string) list -> string -> string
 (** Given an alias list, finds the corresponding alias for a given string *)
+
+val line_is_in_wiki_syntax : string -> bool
