@@ -70,3 +70,4 @@ val source_note_with_env :
 *)
 
 val limit_display_length : string -> string
+val insert_brs : string -> string

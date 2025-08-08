@@ -169,43 +169,52 @@ let commit_notes conf base fnotes s =
     "mn";
   update_notes_links_db base pg s
 
-let br_signals =
-  [ `Text [ "\n" ]; `Start_element (("", "br"), []); `Text [ "\n" ] ]
+let remove_empty_txt_head = function `Text [ "" ] :: xs -> xs | xs -> xs
 
-let insert_brs_in_txt ss =
-  let rec conc = function
+let insert_brs_in_txt br_met ss =
+  let rec conc wiki_context = function
     | [ x ] -> [ x ]
-    | (`Text [ txt ] as x) :: xs when Wiki.line_is_in_wiki_syntax txt ->
-        x :: `Text [ "\n" ] :: conc xs
+    | (`Text txt as x) :: [ `Text [ "" ] ] when txt <> [ "" ] ->
+        x :: [ `Text [ "\n" ] ]
     | (`Text txt as x) :: `Text [ "" ] :: xs when txt <> [ "" ] ->
-        x :: `Text [ "\n\n" ] :: conc xs
-    | `Text [ "" ] :: xs -> `Text [ "\n" ] :: conc xs
-    | x :: xs -> x :: (br_signals @ conc xs)
+        x :: `Text [ "\n\n" ] :: conc false xs
+    | (`Text [ txt ] as x) :: xs when Wiki.line_is_in_wiki_syntax txt ->
+        x :: `Text [ "\n" ] :: conc true xs
+    | x :: xs when wiki_context -> x :: `Text [ "\n" ] :: conc true xs
+    | x :: xs ->
+        x :: `Start_element (("", "br"), []) :: `Text [ "\n" ] :: conc false xs
     | [] -> []
   in
-  let ss : string list =
+  let ss' : string list =
     List.flatten @@ List.map (String.split_on_char '\n') ss
   in
-  let ss = List.map (fun s -> `Text [ s ]) ss in
-  conc ss
+  let signals = List.map (fun s -> `Text [ s ]) ss' in
+  let ss' = if br_met then remove_empty_txt_head signals else signals in
+  if List.exists (fun s -> s <> `Text [ "" ]) ss' then
+    if br_met && List.hd signals = `Text [ "" ] then
+      `Text [ "\n" ] :: conc false ss'
+    else conc false ss'
+  else [ `Text ss ]
 
 let insert_brs s =
   let decrease_depth d = if d = 0 then d else d - 1 in
-  let insert_brs_in_toplvl_text depth v =
+  let insert_brs_in_toplvl_text (br_met, depth) v =
     match v with
-    | `Start_element (_, _) -> ([ v ], Some (depth + 1))
-    | `End_element -> ([ v ], Some (decrease_depth depth))
+    | `Start_element ((_, "br"), _) -> ([ v ], Some (true, depth + 1))
+    | `Start_element (_, _) -> ([ v ], Some (false, depth + 1))
+    | `End_element -> ([ v ], Some (br_met, decrease_depth depth))
     | `Text txts when depth = 0 ->
-        let txt = insert_brs_in_txt txts in
-        (txt, Some depth)
-    | `Text _ | `Doctype _ | `Xml _ | `PI _ | `Comment _ -> ([ v ], Some depth)
+        let txt = insert_brs_in_txt br_met txts in
+        (txt, Some (false, depth))
+    | `Text _ | `Doctype _ | `Xml _ | `PI _ | `Comment _ ->
+        ([ v ], Some (false, depth))
   in
   let signals =
     Markup.string s
     |> Markup.parse_html ~context:(`Fragment "body")
     |> Markup.signals
   in
-  Markup.transform insert_brs_in_toplvl_text 0 signals
+  Markup.transform insert_brs_in_toplvl_text (false, 0) signals
   |> Markup.write_html |> Markup.to_string
 
 let wiki_aux ?(keep_newlines = false) pp conf base env str =
