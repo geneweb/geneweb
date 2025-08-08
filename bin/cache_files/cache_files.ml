@@ -1,8 +1,9 @@
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 
+type checkdata_entry = Driver.istr * string
+
 let bname = ref ""
-let trace = ref false
 let fnames = ref false
 let snames = ref false
 let aliases = ref false
@@ -17,17 +18,18 @@ let qualifiers = ref false
 let sources = ref false
 let all = ref false
 let prog = ref false
+let checkdata = ref false
+let datalist = ref false
 let width = ref 50
 let cache_dir = ref ""
 let ( // ) = Filename.concat
 
-(* Attention: cache files are reorg independant *)
 let set_cache_dir bname =
-  let cache_dir = Secure.base_dir () // "etc" // bname // "cache" in
-  Filesystem.create_dir ~parent:true cache_dir;
-  cache_dir
+  let dir = Secure.base_dir () // "etc" // bname // "cache" in
+  Filesystem.create_dir ~parent:true dir;
+  dir
 
-let write_cache_file bname fname l =
+let write_cache_file bname fname data =
   let filename = bname ^ "_" ^ fname ^ ".cache" in
   let file = !cache_dir // filename in
   let gz_file = file ^ ".gz" in
@@ -38,15 +40,30 @@ let write_cache_file bname fname l =
     (fun s ->
       let s = s ^ "\n" in
       Gzip.output_substring oc s 0 (String.length s))
-    l
+    data
+
+let write_checkdata_cache bname fname entries =
+  let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
+  let file = !cache_dir // filename in
+  let oc = Secure.open_out_bin file in
+  let finally () = try close_out oc with Sys_error _ -> () in
+  Fun.protect ~finally @@ fun () -> Marshal.to_channel oc entries []
+
+let should_gen_datalist () =
+  match (!checkdata, !datalist) with
+  | false, false | false, true | true, true -> true
+  | true, false -> false
+
+let should_gen_checkdata () =
+  match (!checkdata, !datalist) with
+  | false, false | true, false | true, true -> true
+  | false, true -> false
 
 let with_timer f =
   let start = Unix.gettimeofday () in
-  let r = f () in
+  let result = f () in
   let stop = Unix.gettimeofday () in
-  (r, stop -. start)
-
-let fullname bname fname = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz")
+  (result, stop -. start)
 
 let iteri_places f base =
   let ipers = Driver.ipers base in
@@ -54,11 +71,11 @@ let iteri_places f base =
   let ifams = Driver.ifams base in
   Collection.iteri
     (fun i iper ->
-      let per = Driver.poi base iper in
-      f i (Driver.get_birth_place per);
-      f i (Driver.get_baptism_place per);
-      f i (Driver.get_death_place per);
-      f i (Driver.get_burial_place per))
+      let p = Driver.poi base iper in
+      f i (Driver.get_birth_place p);
+      f i (Driver.get_baptism_place p);
+      f i (Driver.get_death_place p);
+      f i (Driver.get_burial_place p))
     ipers;
   Collection.iteri
     (fun i ifam ->
@@ -70,16 +87,6 @@ let iteri_pers f base =
   Collection.iteri
     (fun i iper -> f i (Driver.poi base iper))
     (Driver.ipers base)
-
-let collect_places base bar =
-  let len = Driver.nb_of_persons base + Driver.nb_of_families base in
-  let set : unit Driver.Istr.Table.t = Driver.Istr.Table.create 2048 in
-  iteri_places
-    (fun i istr ->
-      if !prog then ProgrBar.progress bar i len;
-      Driver.Istr.Table.replace set istr ())
-    base;
-  set
 
 let iter_field base p f = function
   | `Fnames with_aliases ->
@@ -104,7 +111,7 @@ let iter_field base p f = function
             (Driver.get_fevents (Driver.foi base ifam)))
         (Driver.get_family p)
 
-let field_to_string = function
+let field_name = function
   | `Fnames _ -> "fnames"
   | `Snames _ -> "snames"
   | `Aliases -> "aliases"
@@ -115,114 +122,171 @@ let field_to_string = function
   | `Titles -> "titles"
   | `Sources -> "sources"
 
-let collect_names base field bar =
+let collect_checkdata_places base bar =
+  let len = Driver.nb_of_persons base + Driver.nb_of_families base in
+  let tbl : string Driver.Istr.Table.t = Driver.Istr.Table.create 2048 in
+  let add_istr istr =
+    if not (Driver.Istr.is_empty istr) then
+      let val_ = Driver.sou base istr in
+      if val_ <> "" then Driver.Istr.Table.replace tbl istr val_
+  in
+  iteri_places
+    (fun i istr ->
+      if !prog then ProgrBar.progress bar i len;
+      add_istr istr)
+    base;
+  Driver.Istr.Table.fold (fun istr val_ acc -> (istr, val_) :: acc) tbl []
+  |> List.sort (fun (_, s1) (_, s2) -> String.compare s1 s2)
+
+let collect_checkdata_names base field bar =
   let len = Driver.nb_of_persons base in
-  let set : unit Driver.Istr.Table.t = Driver.Istr.Table.create 17 in
+  let tbl : string Driver.Istr.Table.t = Driver.Istr.Table.create 17 in
+  let add_istr istr =
+    if not (Driver.Istr.is_empty istr) then
+      let val_ = Driver.sou base istr in
+      if val_ <> "" then Driver.Istr.Table.replace tbl istr val_
+  in
   iteri_pers
     (fun i p ->
       if !prog then ProgrBar.progress bar i len;
-      iter_field base p
-        (fun istr -> Driver.Istr.Table.replace set istr ())
-        field)
+      iter_field base p add_istr field)
     base;
-  set
+  Driver.Istr.Table.fold (fun istr val_ acc -> (istr, val_) :: acc) tbl []
+  |> List.sort (fun (_, s1) (_, s2) -> String.compare s1 s2)
 
-let process_data base set =
-  Driver.Istr.Table.fold (fun k () acc -> Driver.sou base k :: acc) set []
-  |> List.sort String.compare
+let gen_checkdata_cache bname fname collect_fn =
+  let entries, duration =
+    with_timer @@ fun () ->
+    ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter collect_fn
+  in
+  write_checkdata_cache bname fname entries;
+  let path = !cache_dir // (bname ^ "_" ^ fname ^ "_checkdata.cache") in
+  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
+    (List.length entries) fname duration;
+  (entries, duration)
+
+let gen_datalist_from_entries bname fname entries =
+  let data, duration =
+    with_timer @@ fun () -> List.map snd entries |> List.sort String.compare
+  in
+  write_cache_file bname fname data;
+  let path = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz") in
+  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
+    (List.length data) fname duration;
+  duration
+
+let gen_both_caches bname fname collect_fn =
+  if !prog then Format.printf "Generating %s checkdata cache...@." fname;
+  let entries, dur1 = gen_checkdata_cache bname fname collect_fn in
+  if !prog then Format.printf "Extracting %s text cache...@." fname;
+  let dur2 = gen_datalist_from_entries bname fname entries in
+  dur1 +. dur2
+
+let gen_checkdata_only bname fname collect_fn =
+  if !prog then Format.printf "Generating %s checkdata cache...@." fname;
+  let _, duration = gen_checkdata_cache bname fname collect_fn in
+  duration
+
+let gen_datalist_only bname fname collect_fn =
+  if !prog then Format.printf "Generating %s cache...@." fname;
+  let entries, _ =
+    with_timer @@ fun () ->
+    ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter collect_fn
+  in
+  gen_datalist_from_entries bname fname entries
+
+let gen_cache bname fname collect_fn =
+  let gen_dl = should_gen_datalist () in
+  let gen_cd = should_gen_checkdata () in
+  match (gen_dl, gen_cd) with
+  | true, true -> gen_both_caches bname fname collect_fn
+  | false, true -> gen_checkdata_only bname fname collect_fn
+  | true, false -> gen_datalist_only bname fname collect_fn
+  | false, false -> assert false
 
 let speclist =
   [
     ( "-bd",
       Arg.String Secure.set_base_dir,
-      "<DIR> Specify where the 'bases' directory with databases is installed \
-       (default if empty is '.')" );
+      "<DIR> Specify where the 'bases' directory is installed (default '.')" );
+    ("", Arg.Unit (fun () -> ()), "");
     ("-fn", Arg.Set fnames, " first names");
+    ("-fna", Arg.Set fname_aliases, " add first name aliases");
     ("-sn", Arg.Set snames, " surnames");
+    ("-sna", Arg.Set sname_aliases, " add surnames aliases");
     ("-al", Arg.Set aliases, " aliases");
     ("-pu", Arg.Set pub_names, " public names");
     ("-qu", Arg.Set qualifiers, " qualifiers");
     ("-pl", Arg.Set places, " places");
-    ("-fna", Arg.Set fname_aliases, " add first name aliases");
-    ("-sna", Arg.Set sname_aliases, " add surnames aliases");
-    ("-es", Arg.Set estates, " estates");
-    ("-ti", Arg.Set titles, " titles");
     ("-oc", Arg.Set occupations, " occupations");
+    ("-ti", Arg.Set titles, " titles");
+    ("-es", Arg.Set estates, " estates");
     ("-so", Arg.Set sources, " sources");
-    ("-all", Arg.Set all, " all");
+    ("", Arg.Unit (fun () -> ()), "");
+    ("-all", Arg.Set all, " build all type of cache files");
+    ("", Arg.Unit (fun () -> ()), "");
+    ( "-checkdata",
+      Arg.Set checkdata,
+      " generate binary caches only (for typographic verification)" );
+    ( "-datalist",
+      Arg.Set datalist,
+      " generate text caches only (for browser input suggestion)" );
+    ("", Arg.Unit (fun () -> ()), "");
     ("-prog", Arg.Set prog, " show progress bar");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.filter (fun (opt, _, _) -> opt <> "") (* retire les séparateurs *)
+  |> Arg.align
 
 let anonfun i = bname := i
-let usage = "Usage: cache_files [options] base\n where [options] are:"
+let usage = "Usage: cache_files [options] base\nwhere [options] are:"
 
 let () =
   Arg.parse speclist anonfun usage;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   let bname = Filename.remove_extension (Filename.basename !bname) in
+
   Driver.with_database (Secure.base_dir () // bname) @@ fun base ->
   cache_dir := set_cache_dir bname;
 
-  Printf.printf "Generating cache(s) compressed with gzip\n";
-  width := String.length (!cache_dir // bname) + 23;
+  let gen_dl = should_gen_datalist () in
+  let gen_cd = should_gen_checkdata () in
 
-  let total_duration =
-    if !all || !places then (
-      if !prog then Format.printf "Generating places cache...@.";
-      let n, duration =
-        with_timer @@ fun () ->
-        ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter
-        @@ fun bar ->
-        let l = collect_places base bar |> process_data base in
-        write_cache_file bname "places" l;
-        List.length l
-      in
-      Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width
-        (fullname bname "places") n "places" duration;
-      duration)
-    else 0.
-  in
+  width := String.length (!cache_dir // bname) + 30;
 
-  let fds = [] in
-  let fds = if !all || !sources then `Sources :: fds else fds in
-  let fds = if !all || !qualifiers then `Qualifiers :: fds else fds in
-  let fds = if !all || !occupations then `Occupations :: fds else fds in
-  let fds = if !all || !titles then `Titles :: fds else fds in
-  let fds = if !all || !estates then `Estates :: fds else fds in
-  let fds = if !all || !pub_names then `Pub_names :: fds else fds in
-  let fds = if !all || !aliases then `Aliases :: fds else fds in
-  let fds =
-    if !all then `Snames true :: fds
-    else if !snames then `Snames !sname_aliases :: fds
-    else fds
+  (match (gen_dl, gen_cd) with
+  | true, true -> Printf.printf "Generating datalist and checkdata caches\n"
+  | false, true -> Printf.printf "Generating CheckData binary caches\n"
+  | true, false -> Printf.printf "Generating datalist compressed caches\n"
+  | false, false -> assert false);
+
+  let total = ref 0. in
+
+  if !all || !places then
+    total := !total +. gen_cache bname "places" (collect_checkdata_places base);
+
+  let fields = [] in
+  let fields = if !all || !sources then `Sources :: fields else fields in
+  let fields = if !all || !qualifiers then `Qualifiers :: fields else fields in
+  let fields =
+    if !all || !occupations then `Occupations :: fields else fields
   in
-  let fds =
-    if !all then `Fnames true :: fds
-    else if !fnames then `Fnames !fname_aliases :: fds
-    else fds
+  let fields = if !all || !titles then `Titles :: fields else fields in
+  let fields = if !all || !estates then `Estates :: fields else fields in
+  let fields = if !all || !pub_names then `Pub_names :: fields else fields in
+  let fields = if !all || !aliases then `Aliases :: fields else fields in
+  let fields =
+    if !all || !snames then `Snames !sname_aliases :: fields else fields
+  in
+  let fields =
+    if !all || !fnames then `Fnames !fname_aliases :: fields else fields
   in
 
-  let total_duration =
-    List.fold_left
-      (fun total_duration field ->
-        let fname = field_to_string field in
-        if !prog then Format.printf "Generating %s cache...@." fname;
-        let n, duration =
-          with_timer @@ fun () ->
-          ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter
-          @@ fun bar ->
-          let l = collect_names base field bar |> process_data base in
-          write_cache_file bname fname l;
-          List.length l
-        in
-        Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2fs@]@." !width
-          (fullname bname fname) n fname duration;
-        total_duration +. duration)
-      total_duration fds
-  in
-  let min, sec =
-    let d = Float.to_int total_duration in
-    (d / 60, mod_float total_duration 60.)
-  in
+  List.iter
+    (fun field ->
+      let fname = field_name field in
+      total :=
+        !total +. gen_cache bname fname (collect_checkdata_names base field))
+    fields;
+
+  let min, sec = (Float.to_int !total / 60, mod_float !total 60.) in
   Format.printf "Total duration: %d min %6.2f s@." min sec
