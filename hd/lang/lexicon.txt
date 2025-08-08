@@ -3639,15 +3639,15 @@ en: link to the dictionary
 fr: lien vers le dictionnaire
 
     book/books
-co: libru/libri
+co: dizziunariu/dizziunarii
 de: Wörterbuch/Wörterbücher
-en: book/books
+en: dictionary/dictionaries
 fr: dictionnaire/dictionnaires
 lt: žodynas/žodynai
 oc: diccionari/diccionaris
 pt: dicionário/dicionários
 sv: förteckning/förteckningar
-tr: kitap/kitaplar
+tr: sözlük/sözlükler
 
     border
 af: rand
@@ -4045,6 +4045,22 @@ pt: por casal
 sv: per par
 tr: çift tarafından
 
+    cache updated
+co: cache aghjurnatu
+de: Cache aktualisiert
+en: cache updated
+es: caché actualizado
+fi: välimuisti päivitetty
+fr: cache mis à jour
+it: cache aggiornata
+nl: cache bijgewerkt
+no: hurtigbuffer oppdatert
+oc: cache mes a jorn
+pt: cache atualizada
+ru: кэш обновлён
+sv: cache uppdaterad
+tr: önbellek güncellendi
+
     calendar/calendars
 af: kalender/kalenders
 ar: تقويم/تقاويم
@@ -4429,6 +4445,25 @@ ru: порядок личных событий был изменён
 sv: ändrade ordningen för personhändelser
 tr: bireysel etkinliklerin sırasını değiştir
 
+    chk_data %d errors found
+de: %d Fehler gefunden
+en: %d error(s) found
+fr: %d erreur(s) détectée(s)
+
+    chk_data books to check
+de: zu prüfende Wörterbücher
+en: dictionaries to check
+fr: dictionnaires à vérifier
+
+    chk_data cache file not found
+de: Cache-Datei(en) nicht gefunden/zur Erzeugung fehlender Caches, gwsetup verwenden oder ausführen
+en: cache file(s) not found/to generate missing caches, use gwsetup or run
+fr: fichier(s) cache absent(s)/pour générer les caches manquants, utiliser gwsetup ou exécutez
+
+    chk_data check data
+en: check data
+fr: vérifier les données
+
     chk_data error invisible characters
 co: caratteri invisibile
 de: unsichtbare Zeichen
@@ -4447,7 +4482,7 @@ de: mehrere Leerzeichen
 en: multiple spaces
 fr: espaces multiples
 
-    chk_data error mutiples characters
+    chk_data error multiple characters
 co: caratteri multiplice
 de: mehrere Zeichen
 en: multiple characters
@@ -12762,6 +12797,22 @@ ru: мобилизация
 sv: mobilisering
 tr: seferberlik
 
+    modification failed
+co: mudificazione fallita
+de: Änderung fehlgeschlagen
+en: modification failed
+es: modificación fallida
+fi: muutos epäonnistui
+fr: modification échouée
+it: modifica fallita
+nl: wijziging mislukt
+no: endring mislyktes
+oc: modificacion fracassada
+pt: modificação falhada
+ru: изменение не удалось
+sv: ändring misslyckades
+tr: değişiklik başarısız
+
     modification successful
 co: mudificazione fatta
 de: Änderung durchgeführt
@@ -19436,7 +19487,6 @@ sl: narišite pravokotno območje na sliki
 sv: rita ett rektangulärt område på bilden
 tr: görüntüde dikdörtgen bir alan çizin
 zh: 在图像上绘制矩形区域
-
 
     alias/aliases
 co: cugnome/cugnomi

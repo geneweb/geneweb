@@ -18,6 +18,14 @@ type error_type =
 
 type checkdata_entry = Geneweb_db.Driver.istr * string
 
+val update_cache_entry :
+  Config.config -> dict_type -> Geneweb_db.Driver.istr -> string -> bool
+(** Update a single entry in the cache file for the specified dictionary. *)
+
+val find_dict_type_for_istr :
+  Config.config -> Geneweb_db.Driver.istr -> dict_type option
+(** Find which dictionary type contains the given istr. *)
+
 val cache_file_exists : Config.config -> dict_type -> bool
 (** Check if a cache file exists for the specified dictionary type. *)
 

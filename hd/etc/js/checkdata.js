@@ -10,7 +10,6 @@ const CheckDataEditor = {
     const container = document.querySelector('#cd');
     if (!container) return;
 
-    // Gestion des clics
     container.addEventListener('click', e => {
       const err = e.target.closest('.err');
       if (err?.classList.contains('disabled') && !e.target.closest('a.s2')) {
@@ -26,21 +25,16 @@ const CheckDataEditor = {
 
       const s2 = e.target.closest('a.s2');
       if (s2?.closest('.err')) {
-        // Les liens ont déjà target="_blank" dans le HTML
-        // On laisse le comportement natif et on passe au suivant
-        requestAnimationFrame(() => {
-          this.focusNext(s2.closest('.err'));
-        });
+        e.preventDefault();
+        this.validateWithAjax(s2, s2.closest('.err'));
       }
     });
 
-    // Navigation globale par flèches (fonctionne aussi sur les boutons s2)
     container.addEventListener('keydown', e => {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         const activeEl = document.activeElement;
         const err = activeEl?.closest('.err');
         
-        // Si on est sur un bouton s2 ou tout autre élément dans .err
         if (err && !err.querySelector('.edit-container')) {
           e.preventDefault();
           this.navigateToNext(err, e.key === 'ArrowUp');
@@ -57,7 +51,6 @@ const CheckDataEditor = {
     const s2 = err.querySelector('.s2');
     const wasHidden = s2?.style.visibility === 'hidden';
     
-    // Sauvegarder l'état pour la navigation
     if (s2 && !s2.hasAttribute('data-orig-hidden')) {
       s2.setAttribute('data-orig-hidden', wasHidden ? 'true' : 'false');
     }
@@ -71,7 +64,7 @@ const CheckDataEditor = {
     
     const container = document.createElement('div');
     container.className = 'edit-container mx-2';
-    container.originalButton = btn; // Garder référence au bouton original
+    container.originalButton = btn;
     
     const orig = document.createElement('div');
     orig.className = 'original-content';
@@ -91,7 +84,6 @@ const CheckDataEditor = {
   setupField(field, btn, s2, origVal, wasHidden, container) {
     const isTextarea = field.tagName === 'TEXTAREA';
     
-    // Mise à jour du bouton s2
     field.addEventListener('input', () => {
       if (!s2) return;
       const newVal = field.value.trim();
@@ -120,26 +112,17 @@ const CheckDataEditor = {
       }
     });
     
-    // Raccourcis clavier
     field.addEventListener('keydown', e => {
-      // Enter pour valider
       if (e.key === 'Enter' && (!isTextarea || e.shiftKey)) {
         e.preventDefault();
         if (s2?.style.visibility !== 'hidden') {
-          // Simuler le clic sur le lien (qui s'ouvre dans target="_blank")
-          s2.click();
-          // Passer au suivant après un court délai
-          requestAnimationFrame(() => {
-            this.focusNext(container.closest('.err'));
-          });
+          this.validateWithAjax(s2, container.closest('.err'));
         }
       }
-      // Escape pour annuler
       else if (e.key === 'Escape') {
         e.preventDefault();
         this.cancelEdit(container, btn, s2, wasHidden);
       }
-      // Flèches pour naviguer
       else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
         const current = container.closest('.err');
@@ -147,7 +130,6 @@ const CheckDataEditor = {
       }
     });
     
-    // Annulation sur blur
     field.addEventListener('blur', e => {
       if (e.relatedTarget === s2) return;
       setTimeout(() => {
@@ -177,18 +159,14 @@ const CheckDataEditor = {
     }
   },
 
-  // Fonction unifiée de navigation
   moveToNext(current, goUp = false, fromValidation = false) {
     if (!current) return;
     
-    // D'abord trouver le prochain AVANT de modifier l'état
     const allErrors = Array.from(document.querySelectorAll('.err'));
     const currentIdx = allErrors.indexOf(current);
     
-    // Trouver le prochain non-désactivé
     let next = null;
     if (goUp) {
-      // Chercher vers le haut
       for (let i = currentIdx - 1; i >= 0; i--) {
         if (!allErrors[i].classList.contains('disabled')) {
           next = allErrors[i];
@@ -196,7 +174,6 @@ const CheckDataEditor = {
         }
       }
     } else {
-      // Chercher vers le bas
       for (let i = currentIdx + 1; i < allErrors.length; i++) {
         if (!allErrors[i].classList.contains('disabled')) {
           next = allErrors[i];
@@ -205,21 +182,20 @@ const CheckDataEditor = {
       }
     }
     
-    // Maintenant on peut modifier l'état de l'élément actuel
     if (fromValidation) {
       current.classList.add('disabled');
       current.classList.remove('editing');
       
-      // Marquer visuellement comme validé avec bouton vert
       const s2 = current.querySelector('.s2');
       if (s2) {
         s2.classList.remove('btn-warning', 'btn-info');
         s2.classList.add('btn-success');
-        s2.style.visibility = 'visible'; // Toujours visible après validation
-        s2.innerHTML = '<i class="fa fa-check"></i>'; // Garder l'icône check
+        s2.style.visibility = 'visible';
+        if (!s2.querySelector('.fa-spell-check')) {
+          s2.innerHTML = '<i class="fa fa-check"></i>';
+        }
       }
     } else {
-      // Si navigation par flèches, fermer proprement l'édition
       const container = current.querySelector('.edit-container');
       if (container) {
         const btn = container.originalButton || document.createElement('button');
@@ -231,7 +207,6 @@ const CheckDataEditor = {
     
     if (!next) return;
     
-    // Logique unifiée : s2 visible prioritaire, sinon ouvrir l'input
     const s2 = next.querySelector('a.s2');
     if (s2 && this.isVisible(s2)) {
       requestAnimationFrame(() => {
@@ -246,7 +221,6 @@ const CheckDataEditor = {
     }
   },
 
-  // Alias pour la compatibilité
   navigateToNext(current, goUp = false) {
     this.moveToNext(current, goUp, false);
   },
@@ -262,7 +236,6 @@ const CheckDataEditor = {
   },
 
   initToggleFunctions() {
-    // Toggle pour les dictionnaires
     const toggleDicts = document.querySelector('[data-action="toggle-dicts"]');
     if (toggleDicts && !toggleDicts.hasAttribute('data-initialized')) {
       toggleDicts.setAttribute('data-initialized', 'true');
@@ -274,7 +247,6 @@ const CheckDataEditor = {
       });
     }
 
-    // Toggle pour les erreurs
     const toggleErrors = document.querySelector('[data-action="toggle-errors"]');
     if (toggleErrors && !toggleErrors.hasAttribute('data-initialized')) {
       toggleErrors.setAttribute('data-initialized', 'true');
@@ -299,8 +271,7 @@ const CheckDataEditor = {
     max.addEventListener('input', e => {
       const val = parseInt(e.target.value);
       e.target.setCustomValidity(
-        val > limit ? `Limité à ${limit} résultats` :
-        val < 1 && e.target.value ? 'Minimum 1 résultat' : ''
+        val > limit ? `Limité à ${limit} résultats` : ''
       );
       e.target.reportValidity();
     });
@@ -317,6 +288,128 @@ const CheckDataEditor = {
         window.scrollTo(0, parseInt(saved));
         sessionStorage.removeItem('checkDataScroll');
       });
+    }
+  },
+  
+  _validating: new Set(),
+
+  async validateWithAjax(s2, errElement) {
+    if (!s2 || !errElement) return;
+    
+    const key = s2.href;
+    if (this._validating.has(key)) return;
+    this._validating.add(key);
+    
+    const originalContent = s2.innerHTML;
+    s2.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+    s2.classList.add('btn-info');
+    s2.classList.remove('btn-warning', 'btn-success', 'btn-danger');
+    
+    try {
+      const ajaxUrl = s2.href + '&ajax';
+      
+      const response = await fetch(ajaxUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        this.showNotification('success', 
+          `✓ ${result.message}${result.cache_updated ? 
+           ' (cache mis à jour)' : ''}`);
+        
+        s2.innerHTML = '<i class="fa fa-spell-check"></i>';
+        s2.classList.remove('btn-info', 'btn-warning', 'btn-danger');
+        s2.classList.add('btn-success');
+        s2.style.pointerEvents = 'none';
+        
+        errElement.classList.add('disabled', 'validated');
+        
+        setTimeout(() => {
+          this.focusNext(errElement);
+        }, 300);
+        
+      } else {
+        this.showNotification('error', `✗ ${result.message}`);
+        
+        s2.innerHTML = '<i class="fa fa-exclamation-triangle"></i>';
+        s2.classList.remove('btn-info', 'btn-warning', 'btn-success');
+        s2.classList.add('btn-danger');
+        s2.title = result.message;
+        
+        setTimeout(() => {
+          s2.innerHTML = originalContent;
+          s2.classList.remove('btn-danger');
+          s2.classList.add('btn-warning');
+          s2.title = '';
+        }, 2000);
+      }
+      
+    } catch (error) {
+      console.error('Erreur AJAX:', error);
+      
+      s2.innerHTML = originalContent;
+      s2.classList.remove('btn-info', 'btn-success', 'btn-danger');
+      s2.classList.add('btn-warning');
+      
+      window.open(s2.href, '_blank');
+      
+    } finally {
+      this._validating.delete(key);
+    }
+  },
+  
+  showNotification(type, message, duration = 4000) {
+    document.querySelectorAll('.ajax-notification')
+      .forEach(n => n.remove());
+    
+    const notification = document.createElement('div');
+    const isSuccess = type === 'success';
+    notification.className = 
+      `alert alert-${isSuccess ? 'success' : 'danger'} ajax-notification`;
+    notification.style.cssText = `
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      min-width: 300px; animation: slideInRight 0.3s ease-out;`;
+    
+    notification.innerHTML = `
+      <div class="d-flex align-items-center">
+        <span class="flex-grow-1">${message}</span>
+        <button type="button" class="close ml-2">&times;</button>
+      </div>`;
+    
+    const remove = () => {
+      notification.style.animation = 'slideOutRight 0.3s ease-in';
+      notification.addEventListener('animationend', () => 
+        notification.remove());
+    };
+    
+    const timeout = setTimeout(remove, duration);
+    notification.querySelector('.close').onclick = () => {
+      clearTimeout(timeout);
+      remove();
+    };
+    
+    document.body.appendChild(notification);
+  },
+  
+  async validateWithRetry(s2, errElement, retries = 2) {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        await this.validateWithAjax(s2, errElement);
+        break;
+      } catch (error) {
+        if (i === retries) throw error;
+        await new Promise(r => setTimeout(r, 500 * (i + 1)));
+      }
     }
   }
 };
