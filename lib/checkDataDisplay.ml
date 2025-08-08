@@ -292,7 +292,7 @@ let render_missing_cache_warning conf missing_caches =
       |> List.map CheckData.dict_to_cache_name
       |> String.concat ", ");
     Printf.bprintf buf
-      {|.<br>%s%s <b><code class="user-select-all">.\\gw\\cache_file -bd ..\\bases -all %s</code></b></div>|}
+      {|.<br>%s%s <b><code class="user-select-all">.\gw\cache_file -bd ..\bases -all %s</code></b></div>|}
       (tn conf "chk_data cache file not found" 1)
       (t conf ":") conf.bname;
     Buffer.contents buf
@@ -519,7 +519,7 @@ let print conf base =
        <div class="form-group mb-0">
          <label for="max-results" class="mb-0">%s%s</label>
          <input type="number" class="form-control" name="max" id="max-results"
-                step="1" value="%s"%s>%s
+                min="1" step="1" value="%s"%s>%s
        </div>|}
         (t conf "chk_data max results")
         (t conf ":")
@@ -563,90 +563,138 @@ let print conf base =
       (*Util.print_loading_overlay_js conf;*)
       Hutil.trailer conf)
 
-let print_chk_ok conf base =
-  let title _ =
-    "✗ " ^ t conf ~c:0 "modification failed" |> Output.print_sstring conf
+type chk_result =
+  | Success of string * string * bool (* before, after, cache_updated *)
+  | Error of string
+
+let perform_check_modification conf base =
+  let k =
+    Geneweb_db.Driver.Istr.of_string (List.assoc "k" conf.env :> string)
   in
-  Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-      try
-        let k =
-          Geneweb_db.Driver.Istr.of_string (List.assoc "k" conf.env :> string)
+  let s =
+    Option.fold ~none:"" ~some:(fun x -> x) (Util.p_getenv conf.env "s")
+  in
+  let s2 =
+    Option.fold ~none:"" ~some:Util.only_printable
+      (Util.p_getenv conf.env "s2")
+  in
+  let dict_param = Util.p_getenv conf.env "d" in
+  let k_actual = Geneweb_db.Driver.sou base k in
+  if k_actual <> s then Error (t conf "modification failed") (* k/s mismatch *)
+  else if s = s2 then Error (t conf "no modification")
+  else
+    let _ = Geneweb_db.Driver.replace_string base s s2 in
+    Util.commit_patches conf base;
+    let cache_updated =
+      match dict_param with
+      | Some d -> (
+          let dict_type_opt =
+            List.find_opt (fun info -> info.url_param = d) DictInfo.all
+          in
+          match dict_type_opt with
+          | Some info -> CheckData.update_cache_entry conf info.dict_type k s2
+          | None -> false)
+      | None -> (
+          match CheckData.find_dict_type_for_istr conf k with
+          | Some dict_type -> CheckData.update_cache_entry conf dict_type k s2
+          | None -> false)
+    in
+    Success (s, s2, cache_updated)
+
+let print_chk_ok_json conf base =
+  try
+    match perform_check_modification conf base with
+    | Success (before, after, cache_updated) ->
+        let success_msg = t conf "modification successful" in
+        let cache_msg =
+          if cache_updated then " (" ^ t ~c:0 conf "cache updated" ^ ")" else ""
         in
-        let s =
-          Option.fold ~none:"" ~some:(fun x -> x) (Util.p_getenv conf.env "s")
+        let validated_msg = t conf "validated" in
+        let json =
+          `Assoc
+            [
+              ("success", `Bool true);
+              ("message", `String (success_msg ^ cache_msg));
+              ("cache_updated", `Bool cache_updated);
+              ("before", `String before);
+              ("after", `String after);
+              ("validated_title", `String validated_msg);
+            ]
         in
-        let s2 =
-          Option.fold ~none:"" ~some:Util.only_printable
-            (Util.p_getenv conf.env "s2")
+        Yojson.Basic.to_string json
+    | Error msg ->
+        let json =
+          `Assoc
+            [
+              ("success", `Bool false);
+              ("message", `String msg);
+              ("cache_updated", `Bool false);
+              ("before", `String "");
+              ("after", `String "");
+            ]
         in
-        let k_actual = Geneweb_db.Driver.sou base k in
-        if k_actual <> s then raise (Failure "Security error: k/s mismatch");
-        if s = s2 then raise (Failure "No modification needed!");
-        let _ = Geneweb_db.Driver.replace_string base s s2 in
-        Util.commit_patches conf base;
+        Yojson.Basic.to_string json
+  with _ ->
+    let json =
+      `Assoc
+        [
+          ("success", `Bool false);
+          ("message", `String (t conf "modification failed"));
+          ("cache_updated", `Bool false);
+          ("before", `String "");
+          ("after", `String "");
+        ]
+    in
+    Yojson.Basic.to_string json
+
+let print_status_message conf ~success ~icon ~title_msg ~alert_msg =
+  let text_class, alert_class =
+    if success then ("text-success", "alert-success")
+    else ("text-danger", "alert-danger")
+  in
+  Output.printf conf "<h3 class=\"%s\">%s %s</h3>\n" text_class icon title_msg;
+  Output.printf conf "<div class=\"alert %s\">%s</div>\n" alert_class alert_msg
+
+let print_chk_ok_html conf base =
+  try
+    match perform_check_modification conf base with
+    | Success (_, _, cache_updated) ->
         let title _ =
           "✓ " ^ t conf ~c:0 "modification successful"
           |> Output.print_sstring conf
         in
         Hutil.header conf title;
-        Output.printf conf
-          {|
-  <div class="container mt-4">
-    <div class="card mt-3">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <h6 class="text-muted">%s</h6>
-            <p class="font-monospace pl-2">%s</p>
-          </div>
-          <div class="col-md-6">
-            <h6 class="text-muted">%s</h6>
-            <p class="font-monospace pl-2">%s</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="text-center mt-4">
-      <button class="btn btn-primary btn-lg" onclick="window.close()" autofocus>
-        <i class="fa fa-times mr-2"></i>%s
-      </button>
-    </div>
-  </div>|}
-          (t conf "before")
-          (Util.escape_html s :> string)
-          (t conf "after")
-          (Util.escape_html s2 :> string)
-          (t conf "close");
+        Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
+            let msg = t conf ~c:0 "modification successful" in
+            print_status_message conf ~success:true ~icon:"✓" ~title_msg:msg
+              ~alert_msg:msg;
+            if cache_updated then
+              Output.printf conf "<div class=\"text-muted\">%s</div>\n"
+                (t conf "cache updated"));
         Hutil.trailer conf
-      with
-      | Failure msg ->
-          Hutil.header conf title;
-          Output.printf conf
-            {|
-  <div class="container mt-4">
-    <div class="alert alert-danger d-flex align-items-center" role="alert">
-      <i class="fa fa-exclamation-triangle fa-2x mr-3"></i>
-      <div>
-        <h4 class="alert-heading">%s</h4>
-        <p class="mb-0">%s</p>
-      </div>
-    </div>
-  </div>|}
-            (t conf "error") msg;
-          Hutil.trailer conf
-      | _ ->
-          Hutil.header conf title;
-          Output.printf conf
-            {|
-  <div class="container mt-4">
-    <div class="alert alert-danger d-flex align-items-center" role="alert">
-      <i class="fa fa-exclamation-triangle fa-2x mr-3"></i>
-      <div>
-        <h4 class="alert-heading">%s</h4>
-        <p class="mb-0">%s</p>
-      </div>
-    </div>
-  </div>|}
-            (t conf "error")
-            (t conf "an error occurred during the modification");
-          Hutil.trailer conf)
+    | Error msg ->
+        let title _ =
+          "✗ " ^ t conf ~c:0 "modification failed" |> Output.print_sstring conf
+        in
+        Hutil.header conf title;
+        Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
+            print_status_message conf ~success:false ~icon:"✗"
+              ~title_msg:(t conf ~c:0 "modification failed")
+              ~alert_msg:msg)
+  with _ ->
+    let title _ =
+      "✗ " ^ t conf ~c:0 "modification failed" |> Output.print_sstring conf
+    in
+    Hutil.header conf title;
+    Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
+        let msg = t conf ~c:0 "modification failed" in
+        print_status_message conf ~success:false ~icon:"✗" ~title_msg:msg
+          ~alert_msg:msg);
+    Hutil.trailer conf
+
+let print_chk_ok conf base =
+  match Util.p_getenv conf.env "ajax" with
+  | Some _ ->
+      Output.header conf "application/json";
+      Output.print_sstring conf (print_chk_ok_json conf base)
+  | _ -> print_chk_ok_html conf base

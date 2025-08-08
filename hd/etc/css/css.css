@@ -171,7 +171,6 @@
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* Check data - États disabled */
 #cd .err.disabled button,
 #cd .err.disabled a {
   cursor: not-allowed;
@@ -194,7 +193,7 @@
   border-color: #28a745;
 }
 
-/* Check data - Édition */
+
 #cd .edit-container {
   position: relative;
 }
@@ -227,10 +226,102 @@
   min-height: 2.5rem;
 }
 
-/* Check data - Divers */
 #cd .card-body h4 {
   margin-top: 12px;
 }
+
+/* Animations pour les notifications AJAX */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.err.critical {
+  animation: pulse 2s infinite;
+}
+
+/* Style pour les erreurs en cours de validation */
+.err.validating {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+/* Style pour les erreurs validées */
+.err.validated {
+  opacity: 0.5;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.err .s2 {
+  transition: all 0.2s ease;
+}
+
+.err .s2:active {
+  transform: scale(0.95);
+}
+
+.err.validated .s2.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  pointer-events: none;
+}
+
+.err.validated .s2.btn-success .fa-spell-check {
+  animation: checkPulse 0.5s ease;
+}
+
+@keyframes checkPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* Style pour le bouton pendant le chargement */
+.btn.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* Amélioration visuelle des notifications */
+.ajax-notification {
+  font-size: 0.9em;
+  font-weight: 500;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+}
+
+.ajax-notification .close {
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ajax-notification .close:hover {
+  opacity: 1;
+}
+
 
 
 /* Toolbar and characters panel */
