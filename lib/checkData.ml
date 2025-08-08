@@ -337,56 +337,6 @@ let find_bad_capitalization_positions dict base s =
     | _ -> ());
   List.sort_uniq compare !positions
 
-(* Table des caractères invisibles indésirables
-   Association code point héxadécimaux -> nom officiel Unicode *)
-(* Table des caractères invisibles indésirables *)
-let invisible_chars =
-  [|
-    ("00AD", "SOFT HYPHEN");
-    ("034F", "COMBINING GRAPHEME JOINER");
-    ("0600", "ARABIC NUMBER SIGN");
-    ("0601", "ARABIC SIGN SANAH");
-    ("0602", "ARABIC FOOTNOTE MARKER");
-    ("0603", "ARABIC SIGN SAFHA");
-    ("06DD", "ARABIC END OF AYAH");
-    ("070F", "SYRIAC ABBREVIATION MARK");
-    ("0F0C", "TIBETAN MARK DELIMITER");
-    ("115F", "HANGUL CHOSEONG FILLER");
-    ("1160", "HANGUL JUNGSEONG FILLER");
-    ("1680", "OGHAM SPACE MARK");
-    ("180E", "MONGOLIAN VOWEL SEPARATOR");
-    ("2000", "EN QUAD");
-    ("2001", "EM QUAD");
-    ("2002", "EN SPACE");
-    ("2003", "EM SPACE");
-    ("2004", "THREE-PER-EM SPACE");
-    ("2005", "FOUR-PER-EM SPACE");
-    ("2006", "SIX-PER-EM SPACE");
-    ("2007", "FIGURE SPACE");
-    ("2008", "PUNCTUATION SPACE");
-    ("2009", "THIN SPACE");
-    ("200A", "HAIR SPACE");
-    ("200B", "ZERO WIDTH SPACE");
-    ("200C", "ZERO WIDTH NON-JOINER");
-    ("200D", "ZERO WIDTH JOINER");
-    ("200E", "LEFT-TO-RIGHT MARK");
-    ("200F", "RIGHT-TO-LEFT MARK");
-    ("205F", "MEDIUM MATHEMATICAL SPACE");
-    ("2060", "WORD JOINER");
-    ("2061", "FUNCTION APPLICATION");
-    ("2062", "INVISIBLE TIMES");
-    ("2063", "INVISIBLE SEPARATOR");
-    ("2064", "INVISIBLE PLUS");
-    ("206A", "INHIBIT SYMMETRIC SWAPPING");
-    ("206B", "ACTIVATE SYMMETRIC SWAPPING");
-    ("206C", "INHIBIT ARABIC FORM SHAPING");
-    ("206D", "ACTIVATE ARABIC FORM SHAPING");
-    ("206E", "NATIONAL DIGIT SHAPES");
-    ("206F", "NOMINAL DIGIT SHAPES");
-    ("3000", "IDEOGRAPHIC SPACE");
-    ("FEFF", "ZERO WIDTH NO-BREAK SPACE");
-  |]
-
 let is_zero_width hex =
   match hex with
   | "00AD" | "034F" | "200B" | "200C" | "200D" | "200E" | "200F" | "2060"
@@ -395,49 +345,25 @@ let is_zero_width hex =
       true
   | _ -> false
 
-let get_unicode_point s i =
-  let n = Char.code (String.get s i) in
-  if n < 0x80 then (n, 1)
-  else if n <= 0xdf && i + 1 < String.length s then
-    (((n - 0xc0) lsl 6) lor (0x7f land Char.code (String.get s (i + 1))), 2)
-  else if n <= 0xef && i + 2 < String.length s then
-    let n' = n - 0xe0 in
-    let m = Char.code (String.get s (i + 1)) in
-    let n' = (n' lsl 6) lor (0x7f land m) in
-    let m = Char.code (String.get s (i + 2)) in
-    ((n' lsl 6) lor (0x7f land m), 3)
-  else if i + 3 < String.length s then
-    let n' = n - 0xf0 in
-    let m = Char.code (String.get s (i + 1)) in
-    let n' = (n' lsl 6) lor (0x7f land m) in
-    let m = Char.code (String.get s (i + 2)) in
-    let n' = (n' lsl 6) lor (0x7f land m) in
-    let m = Char.code (String.get s (i + 3)) in
-    ((n' lsl 6) lor (0x7f land m), 4)
-  else (n, 1)
-
-let hex_to_int hex = int_of_string ("0x" ^ hex)
+let _hex_to_int hex = int_of_string ("0x" ^ hex)
 
 let invisible_chars_tbl =
-  let tbl = Hashtbl.create (Array.length invisible_chars) in
-  Array.iter
-    (fun (hex, name) ->
-      let code = int_of_string ("0x" ^ hex) in
-      Hashtbl.add tbl code name)
-    invisible_chars;
+  let codes =
+    Util.get_problem_chars_codes `Invisible
+    @ Util.get_problem_chars_codes `ZeroWidth
+  in
+  let tbl = Hashtbl.create (List.length codes) in
+  List.iter (fun code -> Hashtbl.add tbl code true) codes;
   tbl
 
 let is_invisible_char code = Hashtbl.mem invisible_chars_tbl code
-
-let get_invisible_char_name code =
-  try Some (Hashtbl.find invisible_chars_tbl code) with Not_found -> None
 
 let has_invisible_chars s =
   let len = String.length s in
   let rec aux i =
     if i >= len then false
     else
-      let code, size = get_unicode_point s i in
+      let code, size = Util.get_unicode_point s i in
       if is_invisible_char code then true else aux (i + size)
   in
   aux 0
@@ -447,28 +373,11 @@ let find_invisible_positions s =
   let rec aux acc i =
     if i >= len then List.rev acc
     else
-      let code, size = get_unicode_point s i in
-      if Array.exists (fun (h, _) -> hex_to_int h = code) invisible_chars then
-        aux (i :: acc) (i + size)
+      let code, size = Util.get_unicode_point s i in
+      if is_invisible_char code then aux (i :: acc) (i + size)
       else aux acc (i + size)
   in
   aux [] 0
-
-let fix_invisible_chars s =
-  let len = String.length s in
-  let buf = Buffer.create len in
-  let rec aux i =
-    if i >= len then Buffer.contents buf
-    else
-      let code, size = get_unicode_point s i in
-      if Array.exists (fun (h, _) -> hex_to_int h = code) invisible_chars then (
-        Buffer.add_char buf ' ';
-        aux (i + size))
-      else (
-        Buffer.add_char buf s.[i];
-        aux (i + 1))
-  in
-  aux 0
 
 let simple_replacements =
   [
@@ -670,7 +579,7 @@ let find_error_positions error_type data base s =
 
 let fix_error error_type s =
   match error_type with
-  | InvisibleCharacters -> fix_invisible_chars s
+  | InvisibleCharacters -> Util.only_printable s
   | BadCapitalization -> s
   | MultipleSpaces -> fix_multiple_spaces s
   | NonBreakingSpace -> s
@@ -766,7 +675,7 @@ let make_highlight_html s positions error_type conf =
         let code = Utf8.C.cp s i in
         let hex = Printf.sprintf "%04X" (Uchar.to_int code) in
         let name =
-          match get_invisible_char_name (Uchar.to_int code) with
+          match Util.get_problem_char_name (Uchar.to_int code) with
           | Some n -> n
           | None -> "UNICODE CHARACTER"
         in

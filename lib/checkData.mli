@@ -34,9 +34,6 @@ val cache_file_exists : Config.config -> dict_type -> bool
 val fix_error : error_type -> string -> string
 (** Fix the specified error type in the string. *)
 
-val fix_invisible_chars : string -> string
-(** Replace all invisible Unicode characters with spaces. *)
-
 val make_error_html :
   Config.config ->
   Geneweb_db.Driver.base ->
