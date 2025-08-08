@@ -62,10 +62,8 @@ let split_words s =
    - English/German style: I., II., III., etc. *)
 let roman_re = lazy (Str.regexp "^[IVX]+[.]?$")
 let first_ordinal_re = lazy (Str.regexp "^I\\(ᵉʳ\\|ʳᵉ\\|er\\|re\\)$")
-
-let bad_cap_re =
-  lazy (Str.regexp "\\([A-Z]\\{2,\\}\\|[a-z][A-Z]\\|[A-Z][a-z][A-Z]\\)")
-
+let bad_cap_re = lazy (Str.regexp "[A-Z][A-Z][a-z]\\|[a-z][A-Z]")
+let lowercase_start_re = lazy (Str.regexp "^[a-z][A-Za-z]")
 let nbsp_re = lazy (Str.regexp "\xC2\xA0\\|\xE2\x80\xAF")
 
 let is_roman_numeral s =
@@ -243,7 +241,22 @@ let has_bad_capitalization dict s =
   match dict with
   | Sources -> false
   | _ ->
-      has_bad_capitalization_pattern s && not (has_legitimate_mixed_case dict s)
+      let has_general_error =
+        has_bad_capitalization_pattern s
+        && not (has_legitimate_mixed_case dict s)
+      in
+      let has_lowercase_error =
+        match dict with
+        | Fnames | Snames ->
+            let words = split_words s in
+            List.exists
+              (fun word ->
+                try Str.string_match (Lazy.force lowercase_start_re) word 0
+                with _ -> false)
+              words
+        | _ -> false
+      in
+      has_general_error || has_lowercase_error
 
 let find_bad_capitalization_positions s =
   let re = Str.regexp "\\([A-Z]\\{2,\\}\\|[a-z][A-Z]\\|[A-Z][a-z][A-Z]\\)" in
@@ -540,7 +553,8 @@ let make_error_html conf base data istr entry error_type =
     Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s s2_p
   in
   let url_chk =
-    Printf.sprintf "%sm=CHK_DATA_OK&k=%s&s=%s&s2=%s" commd istr_ s_ori s2
+    Printf.sprintf "%sm=CHK_DATA_OK&d=%s&k=%s&s=%s&s2=%s" commd data istr_ s_ori
+      s2
   in
   (hl, url_mod, url_chk, entry_escaped, s2_auto)
 
@@ -664,6 +678,48 @@ let read_cache conf dict_type =
       close_in ic;
       raise e
   with Sys_error _ -> []
+
+let update_cache_entry conf dict_type istr new_value =
+  let cache_file = cache_file_path conf dict_type in
+  if Sys.file_exists cache_file then
+    try
+      let entries = read_cache conf dict_type in
+      let updated_entries =
+        List.map
+          (fun (i, s) -> if i = istr then (i, new_value) else (i, s))
+          entries
+      in
+      let oc = Secure.open_out_bin cache_file in
+      try
+        Marshal.to_channel oc updated_entries [ Marshal.No_sharing ];
+        close_out oc;
+        true
+      with e ->
+        close_out oc;
+        raise e
+    with _ -> false
+  else false
+
+let find_dict_type_for_istr conf istr =
+  let check_in_cache dict_type =
+    if cache_file_exists conf dict_type then
+      let entries = read_cache conf dict_type in
+      List.exists (fun (i, _) -> i = istr) entries
+    else false
+  in
+  List.find_opt check_in_cache
+    [
+      Fnames;
+      Snames;
+      Places;
+      PubNames;
+      Qualifiers;
+      Aliases;
+      Occupation;
+      Titles;
+      Estates;
+      Sources;
+    ]
 
 (* Collecter les erreurs depuis le cache binaire checkdata *)
 let collect_all_errors_from_cache conf dict_type max_results
