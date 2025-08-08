@@ -2339,22 +2339,193 @@ let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
   |> Option.map @@ List.map (fun p -> (Driver.get_iper p, Driver.get_sex p))
 
-let gen_only_printable or_nl s =
-  let s' =
-    let conv_char i =
-      if Char.code s.[i] > 127 then s.[i]
-      else
-        match s.[i] with
-        | ' ' .. '~' | '\160' .. '\255' -> s.[i]
-        | '\n' -> if or_nl then '\n' else ' '
-        | _ -> ' '
-    in
-    String.init (String.length s) conv_char
-  in
-  String.trim s'
+type char_category = [ `Control | `Invisible | `Space | `ZeroWidth ]
 
-let only_printable_or_nl = gen_only_printable true
-let only_printable = gen_only_printable false
+(* Table des caractères problématiques indésirables
+   Association code point héxadécimaux -> nom officiel Unicode et catégorie *)
+let problem_chars =
+  [
+    (* Caractères de contrôle ASCII (0x00-0x1F sauf \n et \t) *)
+    (0x0000, "NULL", `Control);
+    (0x0001, "START OF HEADING", `Control);
+    (0x0002, "START OF TEXT", `Control);
+    (0x0003, "END OF TEXT", `Control);
+    (0x0004, "END OF TRANSMISSION", `Control);
+    (0x0005, "ENQUIRY", `Control);
+    (0x0006, "ACKNOWLEDGE", `Control);
+    (0x0007, "BELL", `Control);
+    (0x0008, "BACKSPACE", `Control);
+    (* 0x0009 = TAB - on peut le garder *)
+    (* 0x000A = LF - on peut le garder *)
+    (0x000B, "VERTICAL TAB", `Control);
+    (0x000C, "FORM FEED", `Control);
+    (0x000D, "CARRIAGE RETURN", `Control);
+    (0x000E, "SHIFT OUT", `Control);
+    (0x000F, "SHIFT IN", `Control);
+    (0x0010, "DATA LINK ESCAPE", `Control);
+    (0x0011, "DEVICE CONTROL ONE", `Control);
+    (0x0012, "DEVICE CONTROL TWO", `Control);
+    (0x0013, "DEVICE CONTROL THREE", `Control);
+    (0x0014, "DEVICE CONTROL FOUR", `Control);
+    (0x0015, "NEGATIVE ACKNOWLEDGE", `Control);
+    (0x0016, "SYNCHRONOUS IDLE", `Control);
+    (0x0017, "END OF TRANSMISSION BLOCK", `Control);
+    (0x0018, "CANCEL", `Control);
+    (0x0019, "END OF MEDIUM", `Control);
+    (0x001A, "SUBSTITUTE", `Control);
+    (0x001B, "ESCAPE", `Control);
+    (0x001C, "FILE SEPARATOR", `Control);
+    (0x001D, "GROUP SEPARATOR", `Control);
+    (0x001E, "RECORD SEPARATOR", `Control);
+    (0x001F, "UNIT SEPARATOR", `Control);
+    (0x007F, "DELETE", `Control);
+    (* Caractères invisibles Unicode *)
+    (0x00AD, "SOFT HYPHEN", `Invisible);
+    (0x034F, "COMBINING GRAPHEME JOINER", `Invisible);
+    (0x0600, "ARABIC NUMBER SIGN", `Invisible);
+    (0x0601, "ARABIC SIGN SANAH", `Invisible);
+    (0x0602, "ARABIC FOOTNOTE MARKER", `Invisible);
+    (0x0603, "ARABIC SIGN SAFHA", `Invisible);
+    (0x06DD, "ARABIC END OF AYAH", `Invisible);
+    (0x070F, "SYRIAC ABBREVIATION MARK", `Invisible);
+    (0x0F0C, "TIBETAN MARK DELIMITER", `Invisible);
+    (0x115F, "HANGUL CHOSEONG FILLER", `Invisible);
+    (0x1160, "HANGUL JUNGSEONG FILLER", `Invisible);
+    (0x1680, "OGHAM SPACE MARK", `Invisible);
+    (0x180E, "MONGOLIAN VOWEL SEPARATOR", `Invisible);
+    (* Espaces Unicode variés *)
+    (0x2000, "EN QUAD", `Space);
+    (0x2001, "EM QUAD", `Space);
+    (0x2002, "EN SPACE", `Space);
+    (0x2003, "EM SPACE", `Space);
+    (0x2004, "THREE-PER-EM SPACE", `Space);
+    (0x2005, "FOUR-PER-EM SPACE", `Space);
+    (0x2006, "SIX-PER-EM SPACE", `Space);
+    (0x2007, "FIGURE SPACE", `Space);
+    (0x2008, "PUNCTUATION SPACE", `Space);
+    (0x2009, "THIN SPACE", `Space);
+    (0x200A, "HAIR SPACE", `Space);
+    (0x205F, "MEDIUM MATHEMATICAL SPACE", `Space);
+    (0x3000, "IDEOGRAPHIC SPACE", `Space);
+    (* Zero-width *)
+    (0x200B, "ZERO WIDTH SPACE", `ZeroWidth);
+    (0x200C, "ZERO WIDTH NON-JOINER", `ZeroWidth);
+    (0x200D, "ZERO WIDTH JOINER", `ZeroWidth);
+    (0x200E, "LEFT-TO-RIGHT MARK", `ZeroWidth);
+    (0x200F, "RIGHT-TO-LEFT MARK", `ZeroWidth);
+    (0x2060, "WORD JOINER", `ZeroWidth);
+    (0x2061, "FUNCTION APPLICATION", `ZeroWidth);
+    (0x2062, "INVISIBLE TIMES", `ZeroWidth);
+    (0x2063, "INVISIBLE SEPARATOR", `ZeroWidth);
+    (0x2064, "INVISIBLE PLUS", `ZeroWidth);
+    (0x206A, "INHIBIT SYMMETRIC SWAPPING", `ZeroWidth);
+    (0x206B, "ACTIVATE SYMMETRIC SWAPPING", `ZeroWidth);
+    (0x206C, "INHIBIT ARABIC FORM SHAPING", `ZeroWidth);
+    (0x206D, "ACTIVATE ARABIC FORM SHAPING", `ZeroWidth);
+    (0x206E, "NATIONAL DIGIT SHAPES", `ZeroWidth);
+    (0x206F, "NOMINAL DIGIT SHAPES", `ZeroWidth);
+    (0xFEFF, "ZERO WIDTH NO-BREAK SPACE", `ZeroWidth);
+  ]
+
+let problem_chars_tbl =
+  let tbl = Hashtbl.create 100 in
+  List.iter
+    (fun (code, name, cat) -> Hashtbl.add tbl code (name, cat))
+    problem_chars;
+  tbl
+
+let get_problem_char_name code =
+  match Hashtbl.find_opt problem_chars_tbl code with
+  | Some (name, _) -> Some name
+  | None -> None
+
+let get_problem_chars_codes category =
+  problem_chars
+  |> List.filter_map (fun (code, _, cat) ->
+         if cat = category then Some code else None)
+
+type clean_options = {
+  remove_control : bool; (* Supprimer caractères de contrôle ASCII *)
+  remove_invisible : bool; (* Supprimer caractères invisibles Unicode *)
+  remove_zero_width : bool; (* Supprimer caractères largeur zéro *)
+  normalize_spaces : bool; (* Remplacer espaces exotiques par espace normal *)
+  keep_newlines : bool; (* Garder les sauts de ligne *)
+  keep_tabs : bool; (* Garder les tabulations *)
+}
+
+let default_clean_options =
+  {
+    remove_control = true;
+    remove_invisible = true;
+    remove_zero_width = true;
+    normalize_spaces = true;
+    keep_newlines = false;
+    keep_tabs = false;
+  }
+
+let get_unicode_point s i =
+  let n = Char.code (String.get s i) in
+  if n < 0x80 then (n, 1)
+  else if n <= 0xdf && i + 1 < String.length s then
+    (((n - 0xc0) lsl 6) lor (0x7f land Char.code (String.get s (i + 1))), 2)
+  else if n <= 0xef && i + 2 < String.length s then
+    let n' = n - 0xe0 in
+    let m = Char.code (String.get s (i + 1)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 2)) in
+    ((n' lsl 6) lor (0x7f land m), 3)
+  else if i + 3 < String.length s then
+    let n' = n - 0xf0 in
+    let m = Char.code (String.get s (i + 1)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 2)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 3)) in
+    ((n' lsl 6) lor (0x7f land m), 4)
+  else (n, 1)
+
+let clean_string ?(options = default_clean_options) s =
+  let buf = Buffer.create (String.length s) in
+  let len = String.length s in
+  let rec process i =
+    if i >= len then Buffer.contents buf
+    else
+      let code, nb_bytes = get_unicode_point s i in
+      if code = 0x0A && options.keep_newlines then (
+        Buffer.add_char buf '\n';
+        process (i + nb_bytes))
+      else if code = 0x09 && options.keep_tabs then (
+        Buffer.add_char buf '\t';
+        process (i + nb_bytes))
+      else
+        match Hashtbl.find_opt problem_chars_tbl code with
+        | Some (_, `Control) when options.remove_control ->
+            Buffer.add_char buf ' ';
+            process (i + nb_bytes)
+        | Some (_, `Invisible) when options.remove_invisible ->
+            process (i + nb_bytes)
+        | Some (_, `ZeroWidth) when options.remove_zero_width ->
+            process (i + nb_bytes)
+        | Some (_, `Space) when options.normalize_spaces ->
+            Buffer.add_char buf ' ';
+            process (i + nb_bytes)
+        | _ ->
+            for j = i to i + nb_bytes - 1 do
+              Buffer.add_char buf s.[j]
+            done;
+            process (i + nb_bytes)
+  in
+  process 0
+
+let only_printable s =
+  clean_string ~options:default_clean_options s |> String.trim
+
+let only_printable_or_nl s =
+  clean_string
+    ~options:
+      { default_clean_options with keep_newlines = true; keep_tabs = false }
+    s
+  |> String.trim
 
 let relation_type_text conf t n =
   match t with
@@ -3235,22 +3406,20 @@ let print_loading_overlay conf ?custom_translation_key () =
   let title = Utf8.capitalize_fst (transl_nth conf translation_key 0) in
   let subtitle = Utf8.capitalize_fst (transl_nth conf translation_key 1) in
   Output.printf conf
-    {|
-<div class="loading-overlay hidden">
-  <div class="text-center">
-    <div class="spinner-border text-light mb-3" role="status">
-      <span class="sr-only">Loading…</span>
+    {|  <div class="loading-overlay hidden">
+    <div class="text-center">
+      <div class="spinner-border text-light mb-3" role="status">
+        <span class="sr-only">Loading…</span>
+      </div>
+      <h4>%s</h4>
+      <p>%s</p>
     </div>
-    <h4>%s</h4>
-    <p>%s</p>
   </div>
-</div>|}
+|}
     title subtitle
 
-let print_loading_overlay_js conf =
-  Output.printf conf
-    {|
-<script>
+let loading_overlay_js_content =
+  {|<script>
 function showOverlay() {
   const overlay = document.querySelector('.loading-overlay');
   if (overlay) overlay.classList.remove('hidden');
@@ -3261,3 +3430,6 @@ function hideOverlay() {
 }
 document.addEventListener('DOMContentLoaded', hideOverlay);
 </script>|}
+
+let print_loading_overlay_js conf =
+  Output.print_sstring conf loading_overlay_js_content

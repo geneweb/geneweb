@@ -607,11 +607,37 @@ val old_sosa_of_branch :
 (** @deprecated Use [sosa_of_branch] instead *)
 
 val only_printable : string -> string
-(** Trims and remplaces all non-printable characters by spaces in the given
-    string. *)
+(** Complete input sanitization: removes invisible Unicode chars, ASCII control
+    chars, and trims. Used before saving user input *)
 
 val only_printable_or_nl : string -> string
-(** Same as [only_printable] but also accepts '\n'. *)
+(** Same as [only_printable] but also accepts newlines. *)
+
+type char_category = [ `Control | `Invisible | `Space | `ZeroWidth ]
+
+type clean_options = {
+  remove_control : bool;
+  remove_invisible : bool;
+  remove_zero_width : bool;
+  normalize_spaces : bool;
+  keep_newlines : bool;
+  keep_tabs : bool;
+}
+
+val default_clean_options : clean_options
+(** Default options for clean_string: removes all problematic chars. *)
+
+val clean_string : ?options:clean_options -> string -> string
+(** Generic string cleaning with configurable options. *)
+
+val get_problem_char_name : int -> string option
+(** Get Unicode character name for a problematic character code. *)
+
+val get_problem_chars_codes : char_category -> int list
+(** Get list of Unicode code points for given category. *)
+
+val get_unicode_point : string -> int -> int * int
+(** Parse UTF-8 char at position, returns (codepoint, bytes_count). *)
 
 val relation_type_text : config -> relation_type -> int -> Adef.safe_string
 val rchild_type_text : config -> relation_type -> int -> Adef.safe_string
@@ -843,6 +869,14 @@ val print_loading_overlay :
     overlay with a spinner and message. Uses the translation key
     [waiting overlay] by default, or the provided custom translation key. The
     overlay is initially hidden and can controlled via JavaScript functions. *)
+
+val loading_overlay_js_content : string
+(** [loading_overlay_js_content] contains the JavaScript code for loading
+    overlay functionality as a string constant. This allows modules to compose
+    this JavaScript with their own code rather than printing it directly.
+
+    Contains showOverlay(), hideOverlay() functions and automatic DOM ready
+    initialization. Can be concatenated with other JavaScript before output. *)
 
 val print_loading_overlay_js : Config.config -> unit
 (** [print_loading_overlay_js conf] generates JavaScript functions to control
