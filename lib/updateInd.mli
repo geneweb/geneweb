@@ -10,8 +10,8 @@ val print_update_ind :
   (Gwdb.iper, Update.key, string) Def.gen_person ->
   string ->
   unit
-(** The main HTML page displayed after an update.
-    Based on template updind.txt *)
+(** The main HTML page displayed after an update. Based on template updind.txt
+*)
 
 val print_add : Config.config -> Gwdb.base -> unit
 (** Displays an HTML form with empty fields for adding a person *)

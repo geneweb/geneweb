@@ -25,10 +25,10 @@ let run cnt max_cnt =
   let already_disp = cnt * pb_cnt / max_cnt in
   let to_disp = (cnt + 1) * pb_cnt / max_cnt in
   (if cnt = max_cnt - 1 then Printf.eprintf " \008"
-  else if to_disp > already_disp then
-    let k = to_disp mod draw_len in
-    let k = if k < 0 then draw_len + k else k in
-    Printf.eprintf "%c\008" draw.[k]);
+   else if to_disp > already_disp then
+     let k = to_disp mod draw_len in
+     let k = if k < 0 then draw_len + k else k in
+     Printf.eprintf "%c\008" draw.[k]);
   flush stderr
 
 let suspend () =

@@ -327,14 +327,14 @@ let print_misc_notes conf base =
   let title h =
     Output.print_string conf
       (if d = "" then
-       Util.transl conf "miscellaneous notes"
-       |> Util.translate_eval |> Utf8.capitalize_fst |> Adef.escaped
-      else if h then
-        let open Def in
-        "- " ^<^ Util.escape_html d ^>^ " -"
-      else
-        let open Def in
-        "<tt>- " ^<^ Util.escape_html d ^>^ " -</tt>")
+         Util.transl conf "miscellaneous notes"
+         |> Util.translate_eval |> Utf8.capitalize_fst |> Adef.escaped
+       else if h then
+         let open Def in
+         "- " ^<^ Util.escape_html d ^>^ " -"
+       else
+         let open Def in
+         "<tt>- " ^<^ Util.escape_html d ^>^ " -</tt>")
   in
   let db = Notes.notes_links_db conf base true in
   let db =

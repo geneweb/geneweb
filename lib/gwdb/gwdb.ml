@@ -48,11 +48,9 @@ module PersonSet = Set.Make (struct
   let compare p1 p2 = compare_iper (get_iper p1) (get_iper p2)
 end)
 
-(** [insert_person base p a u]
-    Add a new person with its union and ascendants in the [base].
-    Allocate and returns the fresh new id for this person.
-    [p] SHOULD be defined using [dummy_iper].
-*)
+(** [insert_person base p a u] Add a new person with its union and ascendants in
+    the [base]. Allocate and returns the fresh new id for this person. [p]
+    SHOULD be defined using [dummy_iper]. *)
 let insert_person base p a u =
   let iper = Gwdb_driver.new_iper base in
   let p = { p with Def.key_index = iper } in
@@ -61,11 +59,9 @@ let insert_person base p a u =
   Gwdb_driver.patch_person base iper p;
   iper
 
-(** [insert_family base f c d]
-    Add a new family with its couple and descendants the in the [base].
-    Allocate and returns the fresh new id for this family.
-    [f] SHOULD be defined using [dummy_ifam].
-*)
+(** [insert_family base f c d] Add a new family with its couple and descendants
+    the in the [base]. Allocate and returns the fresh new id for this family.
+    [f] SHOULD be defined using [dummy_ifam]. *)
 let insert_family base f c d =
   let ifam = Gwdb_driver.new_ifam base in
   Gwdb_driver.patch_family base ifam f;
@@ -197,24 +193,23 @@ and rm_union base ifam iper =
   { Def.family = (get_gen_union base iper).family |> Ext_array.except ifam }
   |> patch_union base iper
 
-(** [delete_person base iper] and [delete_family base ifam]
-    recursively delete data trying to do clever things:
-    - if data to be deleted is linked and useful,
-      it is replaced by empty data (and is actually deleted otherwise)
-    - if empty data is linked to deleted data, the former is deleted as well
- *)
+(** [delete_person base iper] and [delete_family base ifam] recursively delete
+    data trying to do clever things:
+    - if data to be deleted is linked and useful, it is replaced by empty data
+      (and is actually deleted otherwise)
+    - if empty data is linked to deleted data, the former is deleted as well *)
 let delete_person base iper = ignore @@ delete_person ([], []) base iper
 
-(** See {!val:delete_person}  *)
+(** See {!val:delete_person} *)
 let delete_family base ifam = ignore @@ delete_family ([], []) base ifam
 
 (**/**)
 
 (** Misc *)
 
-(** [nobtitles base allowed_titles denied_titles p] returns list of titles of a person [p]
-    that apprears in [allowed_titles] and doesn't appears in [denied_titles]. If [allowed_titles]
-    is empty the every title is allowed *)
+(** [nobtitles base allowed_titles denied_titles p] returns list of titles of a
+    person [p] that apprears in [allowed_titles] and doesn't appears in
+    [denied_titles]. If [allowed_titles] is empty the every title is allowed *)
 let nobtitles base allowed_titles denied_titles p =
   let list = get_titles p in
   match Lazy.force allowed_titles with
@@ -253,9 +248,8 @@ let p_first_name base p = Mutil.nominative (sou base (get_first_name p))
 (** Returns surname of person *)
 let p_surname base p = Mutil.nominative (sou base (get_surname p))
 
-(** Returns array of surnames of person's husbands.
-    First element of a couple in the array is husband's surname,
-    second - is a husband's surname aliases *)
+(** Returns array of surnames of person's husbands. First element of a couple in
+    the array is husband's surname, second - is a husband's surname aliases *)
 let husbands base gp =
   let p = poi base gp.Def.key_index in
   Array.map
@@ -284,8 +278,9 @@ let gen_gen_person_misc_names base p nobtit nobtit_fun =
     (father_titles_places base p nobtit_fun)
   |> List.map Name.lower
 
-(** [person_misc_names base p nobtit] computes various mix between all kind of names of a person's entry [p]
-    from the database [base]. [nobtit] is used to return a title entries for passed in argument person. *)
+(** [person_misc_names base p nobtit] computes various mix between all kind of
+    names of a person's entry [p] from the database [base]. [nobtit] is used to
+    return a title entries for passed in argument person. *)
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
 
