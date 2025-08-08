@@ -587,8 +587,7 @@ let perform_check_modification conf base =
     Option.fold ~none:"" ~some:(fun x -> x) (Util.p_getenv conf.env "s")
   in
   let s2 =
-    Option.fold ~none:"" ~some:Util.only_printable
-      (Util.p_getenv conf.env "s2")
+    Option.fold ~none:"" ~some:Util.only_printable (Util.p_getenv conf.env "s2")
   in
   let dict_param = Util.p_getenv conf.env "d" in
   let k_actual = Geneweb_db.Driver.sou base k in
