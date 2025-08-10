@@ -1,0 +1,232 @@
+===============================================================================
+                      GENEWEB ROBOT PROTECTION SYSTEM
+===============================================================================
+
+Geneweb includes an anti-robot system that automatically detects and blocks
+abusive automated access to your genealogy databases.
+
+-------------------------------------------------------------------------------
+HOW IT WORKS
+-------------------------------------------------------------------------------
+
+The system monitors connection patterns by IP address and automatically blocks
+IPs that exceed configured thresholds (e.g., more than 20 requests in 60 
+seconds). Since version GWRB0008, it also supports wildcard patterns for 
+efficient bulk blocking.
+
+-------------------------------------------------------------------------------
+CONFIGURATION
+-------------------------------------------------------------------------------
+
+Enable robot protection when starting gwd:
+
+    gwd -robot_xcl 20,60
+
+- 20: Maximum requests allowed
+- 60: Time window in seconds
+
+-------------------------------------------------------------------------------
+ROBOT MANAGEMENT TOOL
+-------------------------------------------------------------------------------
+
+Use the 'robot' command-line tool to manage blocked IPs and patterns:
+
+Basic usage:
+    robot [options] <command> [args]
+
+Options:
+    -bd <basepath>    Set bases directory (default: bases)
+
+Commands:
+    -status                Show current status
+    -suggest [threshold]   Suggest IP ranges to consolidate
+    -add <ip_or_pattern>   Add IP/pattern to blacklist
+    -rm <ip_or_pattern>    Remove IP/pattern from blacklist
+    -export <output_file>  Export blacklist to text
+    -import  <input_file>  Import blacklist from text
+    -clear                 Clear all data
+    -clear-monitoring      Clear only monitoring data
+
+Examples:
+    robot -status
+    robot -suggest 25
+    robot -add 192.168.1.100
+    robot -add "146.174.*"
+    robot -add "146.174.*,202.76.*,malicious.com"
+    robot -export blacklist.txt
+
+-------------------------------------------------------------------------------
+PATTERN SUPPORT AND CONSOLIDATION
+-------------------------------------------------------------------------------
+
+The system supports wildcard patterns for efficient IP range blocking:
+
+Supported patterns:
+    192.168.1.100     Single IP address
+    146.174.*         Entire /16 range (146.174.0.0 to 146.174.255.255)
+    146.174.180.*     Single /24 range (146.174.180.0 to 146.174.180.255)
+
+Automatic consolidation:
+When you add a wildcard pattern, individual IPs matching that pattern are
+automatically consolidated. Their attempt counts are summed and the individual
+entries are removed.
+
+Example:
+    Before: 146.174.180.1 (5 attempts), 146.174.180.50 (3 attempts)
+    After:  robot -add "146.174.180.*"
+    Result: 146.174.180.* (8 attempts) - individual IPs removed
+
+-------------------------------------------------------------------------------
+SUGGESTED CONSOLIDATION
+-------------------------------------------------------------------------------
+
+For databases with many individual blocked IPs, use the suggest command:
+
+    robot -suggest mybase 10
+
+This analyzes your blacklist and suggests /24 ranges with 10+ individual IPs
+that could be consolidated into patterns. It provides:
+
+- List of suggested ranges sorted alphabetically
+- Number of IPs and total attempts per range
+- Single command to consolidate all suggestions at once
+
+Sample output:
+    146.174.180.*: 89 IPs, 127 total attempts
+    202.76.165.*: 156 IPs, 198 total attempts
+    
+    Single command to add all ranges:
+    robot -add "146.174.180.*,202.76.165.*"
+
+-------------------------------------------------------------------------------
+IMPORT/EXPORT FORMAT
+-------------------------------------------------------------------------------
+
+Text file format for blacklist management:
+
+    Format: ip_address<TAB>attempt_count
+    Simple: ip_address (defaults to 1 attempt)
+    Comments: Lines starting with # are ignored
+
+Example file:
+    # Geneweb Robot Blacklist
+    192.168.1.100    5
+    146.174.*        127    # Consolidated range
+    malicious-bot.example.com    1
+    # Comment line
+
+Usage:
+    robot -export blacklist.txt
+    # Edit blacklist.txt as needed
+    robot -import blacklist.txt
+
+-------------------------------------------------------------------------------
+MONITORING AND LOGS
+-------------------------------------------------------------------------------
+
+Robot detection generates optimized logs:
+
+Individual blocking (logarithmic scale):
+    ROBOT 146.174.180.5: BLOCKED after 1 req in 0s
+    ROBOT 146.174.180.5: 2 refused attempts
+    ROBOT 146.174.180.5: 5 refused attempts
+    ROBOT 146.174.180.5: 10 refused attempts
+
+Summary reports (every 4 hours):
+    === ROBOT SUMMARY ===
+    Blocked IPs: 5, Monitored: 12
+    Most active: 127 req by 146.174.180.*
+    Blocked robots detail:
+      146.174.180.*: 127 attempts
+      202.76.165.*: 98 attempts
+
+This reduces log spam while maintaining visibility of robot activity.
+
+-------------------------------------------------------------------------------
+ADVANCED USAGE
+-------------------------------------------------------------------------------
+
+Multiple operations in one command:
+    robot -add mybase "ip1,ip2,pattern1,pattern2"
+
+Bulk consolidation workflow:
+    1. robot -suggest 15          # Find ranges with 15+ IPs
+    2. Copy the suggested command
+    3. Execute to consolidate all ranges at once
+
+Database status with details:
+    robot -status
+    
+    Shows:
+    - Blocked individual IPs vs patterns count
+    - Total attempts across all entries
+    - Active monitoring status (empty if patterns block everything)
+
+-------------------------------------------------------------------------------
+TROUBLESHOOTING
+-------------------------------------------------------------------------------
+
+Legitimate user blocked by mistake:
+    robot -rm <blocked_ip_or_pattern>
+
+Old robot file format detected:
+    Start gwd once to automatically migrate from GWRB0007 to GWRB0008
+
+Large blacklist becoming unwieldy:
+    robot -suggest
+    # Use suggested consolidation commands
+
+No monitoring activity shown:
+    This is normal when patterns effectively block all traffic from 
+    attack ranges. Individual IPs are blocked before entering monitoring.
+
+-------------------------------------------------------------------------------
+MIGRATION NOTES
+-------------------------------------------------------------------------------
+
+Version GWRB0008 introduces:
+- Wildcard pattern support (*.* format)
+- Automatic consolidation of individual IPs into patterns
+- Optimized logging (logarithmic scale + 4 h summaries)  
+- Suggestion tool for bulk consolidation
+- Backward compatibility with GWRB0007 files
+
+Migration is automatic when gwd starts. Old format files are preserved
+as backup before conversion.
+
+-------------------------------------------------------------------------------
+PERFORMANCE IMPACT
+-------------------------------------------------------------------------------
+
+Using patterns vs individual IPs:
+
+Before (individual IPs):
+    - Large robot file (50+ KB for major attacks)
+    - Slow lookup for each connection
+    - Log spam (1 message per attempt)
+
+After (consolidated patterns):
+    - Compact robot file (1-2 KB)
+    - Fast pattern matching
+    - Minimal logging (logarithmic scale)
+
+Example: 2446 individual IPs → 40 patterns → 55 KB to 1 KB file size
+
+-------------------------------------------------------------------------------
+SECURITY CONSIDERATIONS
+-------------------------------------------------------------------------------
+
+- Patterns block entire ranges efficiently but may affect legitimate users
+  in the same range. Use with appropriate granularity (/24 vs /16).
+
+- The system distinguishes between normal users, friends, and wizards.
+  
+- Failed blocking attempts are logged for security auditing.
+
+- Regular monitoring of suggested consolidations helps maintain an
+  efficient and manageable blacklist.
+
+For technical details, see source code in bin/gwd/robot.ml and 
+bin/robot/robot.ml.
+
+===============================================================================
