@@ -29,9 +29,6 @@ val find_dict_type_for_istr :
 val cache_file_exists : Config.config -> dict_type -> bool
 (** Check if a cache file exists for the specified dictionary type. *)
 
-val find_error_positions : error_type -> string -> int list
-(** Find all positions in string where the specified error occurs. *)
-
 val fix_error : error_type -> string -> string
 (** Fix the specified error type in the string. *)
 

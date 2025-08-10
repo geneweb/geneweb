@@ -63,8 +63,26 @@ let split_words s =
 let roman_re = lazy (Str.regexp "^[IVX]+[.]?$")
 let first_ordinal_re = lazy (Str.regexp "^I\\(ᵉʳ\\|ʳᵉ\\|er\\|re\\)$")
 let bad_cap_re = lazy (Str.regexp "[A-Z][A-Z][a-z]\\|[a-z][A-Z]")
-let lowercase_start_re = lazy (Str.regexp "^[a-z][A-Za-z]")
 let nbsp_re = lazy (Str.regexp "\xC2\xA0\\|\xE2\x80\xAF")
+
+let has_any_particle base s =
+  let particle = Mutil.get_particle (Driver.base_particles base) s in
+  if particle <> "" then true
+  else
+    let rec check_from pos =
+      if pos >= String.length s then false
+      else
+        let remaining = String.sub s pos (String.length s - pos) in
+        let particle =
+          Mutil.get_particle (Driver.base_particles base) remaining
+        in
+        if particle <> "" then true
+        else
+          match String.index_from_opt s pos ' ' with
+          | None -> false
+          | Some space_pos -> check_from (space_pos + 1)
+    in
+    check_from 0
 
 let is_roman_numeral s =
   try
@@ -220,56 +238,77 @@ let has_bad_capitalization_pattern s =
 (* Capitalization check function
    Examines each word for valid patterns for some books
    For other types, just checks for invalid capitalization patterns *)
-let has_legitimate_mixed_case dict s =
-  let words = split_words s in
+let has_legitimate_mixed_case dict base s =
   match dict with
   | Fnames | Snames | PubNames | Aliases | Places ->
-      (* For these types, we check if each word is either:
-         - A Roman numeral (e.g. "MacDonald III")
-         - An Irish prefix name (e.g. "MacArthur", "FitzGerald") *)
-      let rec check_words = function
-        | [] -> true (* All words are valid *)
-        | word :: rest ->
-            if has_bad_capitalization_pattern word && not (is_allowed_word word)
-            then false
-            else check_words rest
-      in
-      check_words words
+      has_any_particle base s
+      ||
+      let words = split_words s in
+      List.for_all
+        (fun w -> (not (has_bad_capitalization_pattern w)) || is_allowed_word w)
+        words
   | _ -> false
 
-let has_bad_capitalization dict s =
+let has_bad_capitalization dict base s =
   match dict with
   | Sources -> false
   | _ ->
-      let has_general_error =
-        has_bad_capitalization_pattern s
-        && not (has_legitimate_mixed_case dict s)
-      in
-      let has_lowercase_error =
-        match dict with
-        | Fnames | Snames ->
-            let words = split_words s in
-            List.exists
-              (fun word ->
-                try Str.string_match (Lazy.force lowercase_start_re) word 0
-                with _ -> false)
-              words
-        | _ -> false
-      in
-      has_general_error || has_lowercase_error
+      let has_particles = has_any_particle base s in
+      if has_particles then false
+      else
+        let has_general =
+          has_bad_capitalization_pattern s
+          && not (has_legitimate_mixed_case dict base s)
+        in
+        let has_lowercase =
+          match dict with
+          | Fnames | Snames ->
+              List.exists
+                (fun w -> String.length w > 0 && w.[0] >= 'a' && w.[0] <= 'z')
+                (split_words s)
+          | _ -> false
+        in
+        has_general || has_lowercase
 
-let find_bad_capitalization_positions s =
-  let re = Str.regexp "\\([A-Z]\\{2,\\}\\|[a-z][A-Z]\\|[A-Z][a-z][A-Z]\\)" in
-  let rec aux acc pos =
-    try
-      let pos' = Str.search_forward re s pos in
-      let len = String.length (Str.matched_string s) in
-      let new_pos = pos' + len in
-      let positions = List.init len (fun i -> pos' + i) in
-      aux (positions @ acc) new_pos
-    with Not_found -> List.rev acc
-  in
-  aux [] 0
+let find_bad_capitalization_positions dict base s =
+  let positions = ref [] in
+  let has_particles = has_any_particle base s in
+  if not has_particles then (
+    let rec scan i =
+      if i >= String.length s - 2 then ()
+      else if
+        s.[i] >= 'A'
+        && s.[i] <= 'Z'
+        && s.[i + 1] >= 'A'
+        && s.[i + 1] <= 'Z'
+        && i + 2 < String.length s
+        && s.[i + 2] >= 'a'
+        && s.[i + 2] <= 'z'
+      then (
+        positions := i :: (i + 1) :: !positions;
+        scan (i + 1))
+      else if
+        i < String.length s - 1
+        && s.[i] >= 'a'
+        && s.[i] <= 'z'
+        && s.[i + 1] >= 'A'
+        && s.[i + 1] <= 'Z'
+      then (
+        positions := i :: (i + 1) :: !positions;
+        scan (i + 1))
+      else scan (i + 1)
+    in
+    scan 0;
+    match dict with
+    | Fnames | Snames ->
+        let i = ref 0 in
+        while !i < String.length s do
+          if (!i = 0 || s.[!i - 1] = ' ') && s.[!i] >= 'a' && s.[!i] <= 'z' then
+            positions := !i :: !positions;
+          incr i
+        done
+    | _ -> ());
+  List.sort_uniq compare !positions
 
 (* Table des caractères invisibles indésirables
    Association code point héxadécimaux -> nom officiel Unicode *)
@@ -404,11 +443,27 @@ let fix_invisible_chars s =
   in
   aux 0
 
+let data_to_dict_type data =
+  match data with
+  | "fn" -> Fnames
+  | "sn" -> Snames
+  | "place" -> Places
+  | "pub_name" -> PubNames
+  | "qualif" -> Qualifiers
+  | "alias" -> Aliases
+  | "occup" -> Occupation
+  | "title" -> Titles
+  | "estate" -> Estates
+  | "src" -> Sources
+  | _ -> Fnames
+
 (* Generic error handling *)
-let find_error_positions error_type s =
+let find_error_positions error_type data base s =
   match error_type with
   | InvisibleCharacters -> find_invisible_positions s
-  | BadCapitalization -> find_bad_capitalization_positions s
+  | BadCapitalization ->
+      let dict_type = data_to_dict_type data in
+      find_bad_capitalization_positions dict_type base s
   | MultipleSpaces -> find_multiple_spaces_positions s
   | NonBreakingSpace -> find_non_breaking_space_positions s
 
@@ -547,8 +602,8 @@ let make_error_html conf base data istr entry error_type =
   let s2 = (Mutil.encode entry_fixed :> string) in
   let s2_auto = entry_fixed <> entry in
   let s2_p = if s2_auto then "&s2=" ^ s2 else "" in
-  let pos = find_error_positions error_type entry in
-  let hl = make_highlight_html entry pos error_type conf in
+  let positions = find_error_positions error_type data base entry in
+  let hl = make_highlight_html entry positions error_type conf in
   let url_mod =
     Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s s2_p
   in
@@ -632,13 +687,13 @@ let collect_dict_strings base = function
 exception Max_results_reached
 
 (* Fonction commune pour analyser les erreurs dans une chaîne *)
-let analyze_string_errors dict_type s =
+let analyze_string_errors dict_type base s =
   let add_if cond error acc = if cond then error :: acc else acc in
   []
   |> add_if (has_non_breaking_space s) NonBreakingSpace
   |> add_if (has_multiple_spaces s) MultipleSpaces
   |> add_if (has_invisible_chars s) InvisibleCharacters
-  |> add_if (has_bad_capitalization dict_type s) BadCapitalization
+  |> add_if (has_bad_capitalization dict_type base s) BadCapitalization
 
 let dict_to_cache_name dict_type =
   match dict_type with
@@ -722,7 +777,7 @@ let find_dict_type_for_istr conf istr =
     ]
 
 (* Collecter les erreurs depuis le cache binaire checkdata *)
-let collect_all_errors_from_cache conf dict_type max_results
+let collect_all_errors_from_cache conf dict_type base max_results
     ?(sel_err_types = []) () =
   let entries = read_cache conf dict_type in
   let check_errors_set = make_error_set sel_err_types in
@@ -732,7 +787,7 @@ let collect_all_errors_from_cache conf dict_type max_results
     | [], _ -> acc
     | _, Some max when count >= max -> acc
     | (istr, s) :: rest, _ ->
-        let errors = analyze_string_errors dict_type s in
+        let errors = analyze_string_errors dict_type base s in
         let filtered_errors =
           if ErrorSet.is_empty check_errors_set then errors
           else List.filter (fun e -> ErrorSet.mem e check_errors_set) errors
@@ -782,7 +837,7 @@ let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
                if s <> "" then (
                  if has_invisible_chars s then
                    add_error istr s InvisibleCharacters;
-                 if has_bad_capitalization dict s then
+                 if has_bad_capitalization dict base s then
                    add_error istr s BadCapitalization;
                  if has_multiple_spaces s then add_error istr s MultipleSpaces;
                  if has_non_breaking_space s then
@@ -804,7 +859,7 @@ let collect_all_errors_with_cache ?(max_results = None) ?(sel_err_types = [])
   in
   if use_cache then
     if cache_file_exists conf dict then
-      collect_all_errors_from_cache conf dict max_results ~sel_err_types ()
+      collect_all_errors_from_cache conf dict base max_results ~sel_err_types ()
     else []
   else
     let is_roglo =
