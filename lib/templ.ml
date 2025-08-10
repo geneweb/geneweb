@@ -39,9 +39,9 @@ let on_exn e bt =
   incr GWPARAM.nb_errors;
   Logs.debug (fun k -> k "%a" pp_exception (e, bt))
 
-let resolve_include conf loc fl =
+let resolve_include conf _loc fl =
   let r = Util.etc_file_name conf fl in
-  Logs.debug (fun k -> k "%a: resolved %s into: %s" Loc.pp loc fl r);
+  (*  Logs.debug (fun k -> k "%a: resolved %s into: %s" Loc.pp loc fl r); *)
   r
 
 let parse conf fl =
