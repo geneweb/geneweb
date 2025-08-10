@@ -5,9 +5,12 @@ open Util
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module Logs = Geneweb_logs.Logs
 module Collection = Geneweb_db.Collection
 module IperSet = Driver.Iper.Set
+
+let src = Logs.Src.create ~doc:"SearchName" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 
 (* ========================================================================= *)
 (* Section 1: Types and Data Structures                                     *)
@@ -416,8 +419,8 @@ let match_fn_lists fn_l fn1_l opts =
   passes_basic_test && passes_order_test
 
 let search_for_multiple_fn conf base fn pl opts batch_size =
-  Logs.debug (fun k -> k "        search_for_multiple_fn: %s" fn);
-  Logs.debug (fun k -> k "order: %b, exact: %b" opts.order opts.exact1);
+  Log.debug (fun k -> k "        search_for_multiple_fn: %s" fn);
+  Log.debug (fun k -> k "order: %b, exact: %b" opts.order opts.exact1);
   let fn_l = cut_words fn in
   let result =
     let rec process_batch acc remaining =
@@ -450,7 +453,7 @@ let search_for_multiple_fn conf base fn pl opts batch_size =
     in
     process_batch [] pl
   in
-  Logs.debug (fun k -> k "          result: %d" (List.length result));
+  Log.debug (fun k -> k "          result: %d" (List.length result));
   result
 
 let rec search_surname conf base x =
@@ -459,14 +462,14 @@ let rec search_surname conf base x =
   | false ->
       let exact_results = search_exact conf base [ x ] in
       if exact_results <> [] then (
-        Logs.debug (fun k ->
+        Log.debug (fun k ->
             k "  → %d results (%d exact, 0 phonetic)"
               (List.length exact_results)
               (List.length exact_results));
         (exact_results, []))
       else
         let phonetic_results = search_phonetic conf base x in
-        Logs.debug (fun k ->
+        Log.debug (fun k ->
             k "  → %d results (0 exact, %d phonetic)"
               (List.length phonetic_results)
               (List.length phonetic_results));
@@ -475,7 +478,7 @@ let rec search_surname conf base x =
       let variants = generate_apostrophe_variants x in
       let exact_results = search_exact conf base variants in
       if exact_results <> [] then (
-        Logs.debug (fun k ->
+        Log.debug (fun k ->
             k "  → %d results (%d exact, 0 phonetic)"
               (List.length exact_results)
               (List.length exact_results));
@@ -483,7 +486,7 @@ let rec search_surname conf base x =
       else
         let fallback_query = List.hd variants in
         let phonetic_results = search_phonetic conf base fallback_query in
-        Logs.debug (fun k ->
+        Log.debug (fun k ->
             k "  → %d results (0 exact, %d phonetic)"
               (List.length phonetic_results)
               (List.length phonetic_results));
@@ -715,7 +718,7 @@ let search_firstname_with_aliases_and_ngrams conf base query =
           Some ip)
         else None)
   in
-  Logs.debug (fun k ->
+  Log.debug (fun k ->
       k
         "  Phonetic + ngrams: %d candidates → %d after dedup (will be split \
          into included/phonetic)"
@@ -745,7 +748,7 @@ let search_firstname_with_cache conf base query opts =
   else
     let nq = normalize_query query in
     let nb_words = match nq.words with Some w -> List.length w | None -> 0 in
-    Logs.debug (fun k ->
+    Log.debug (fun k ->
         k "Search p=%s FirstNameOnly [aliases=%b, order=%b, exact=%b]" query
           opts.incl_aliases opts.order opts.exact1);
     let istrl = Driver.base_strings_of_first_name base query in
@@ -924,7 +927,7 @@ let search_firstname_with_cache conf base query opts =
         (included_iper, included_variants, phonetic_iper, phonetic_variants))
       else ([], Mutil.StrSet.empty, [], Mutil.StrSet.empty)
     in
-    Logs.debug (fun k ->
+    Log.debug (fun k ->
         k
           "  → %d results (%d exact, %d alias, %d permuted, %d included, %d \
            phonetic)"
@@ -968,7 +971,7 @@ let search_fullname conf base fn sn =
     }
   in
   let persons, _ = AdvSearchOk.advanced_search conf_sn base max_int in
-  Logs.debug (fun k ->
+  Log.debug (fun k ->
       k "      search_fullname: %d results" (List.length persons));
   match persons with
   | [] -> { exact = []; partial = []; spouse = [] }
@@ -980,7 +983,7 @@ let search_fullname conf base fn sn =
       let exact = search_for_multiple_fn conf base fn pl opts 1000 in
       let opts_partial = { opts with exact1 = false } in
       let partial = search_for_multiple_fn conf base fn pl opts_partial 1000 in
-      Logs.debug (fun k -> k "        spouses:");
+      Log.debug (fun k -> k "        spouses:");
       let spouse =
         if List.assoc_opt "public_name_as_fn" conf.base_env <> Some "no" then
           let sn_bearers_exact, sn_bearers_phon = search_surname conf base sn in
@@ -1011,8 +1014,7 @@ let search_fullname conf base fn sn =
 
 let search_partial_key conf base query =
   let pl = search_by_name conf base query in
-  Logs.debug (fun k ->
-      k "      search_partial_key: %d results" (List.length pl));
+  Log.debug (fun k -> k "      search_partial_key: %d results" (List.length pl));
   match pl with
   | [] ->
       let n1 = Name.abbrev (Name.lower query) in
@@ -1228,12 +1230,11 @@ let execute_search_method conf base query method_ fn_options =
   match method_ with
   | Sosa ->
       let results = search_sosa_opt conf base query in
-      Logs.debug (fun k ->
-          k "    Method Sosa: %d results" (List.length results));
+      Log.debug (fun k -> k "    Method Sosa: %d results" (List.length results));
       { exact = results; partial = []; spouse = [] }
   | Key ->
       let results = search_key_opt conf base query in
-      Logs.debug (fun k -> k "    Method Key: %d results" (List.length results));
+      Log.debug (fun k -> k "    Method Key: %d results" (List.length results));
       { exact = results; partial = []; spouse = [] }
   | Surname ->
       let exact, partial = search_surname conf base query in
@@ -1255,7 +1256,7 @@ let execute_search_method conf base query method_ fn_options =
       let results =
         search_fullname conf base (if oc <> "" then fn ^ "." ^ oc else fn) sn
       in
-      Logs.debug (fun k ->
+      Log.debug (fun k ->
           k "    Method FullName: %d+%d+%d results"
             (List.length results.exact)
             (List.length results.partial)
@@ -1274,14 +1275,14 @@ let execute_search_method conf base query method_ fn_options =
       in
       let exact_ipers = List.map Driver.get_iper exact_matches in
       let partial_ipers = List.map Driver.get_iper partial_matches in
-      Logs.debug (fun k ->
+      Log.debug (fun k ->
           k "    Method ApproxKey: %d exact, %d partial"
             (List.length exact_ipers)
             (List.length partial_ipers));
       { exact = exact_ipers; partial = partial_ipers; spouse = [] }
   | PartialKey ->
       let results = search_partial_key conf base query in
-      Logs.debug (fun k ->
+      Log.debug (fun k ->
           k "    Method PartialKey: %d+%d+%d results"
             (List.length results.exact)
             (List.length results.partial)
@@ -1408,7 +1409,7 @@ let search conf base query search_order fn_options specify =
     else [ query ]
   in
   if List.length variants > 1 then
-    Logs.debug (fun k ->
+    Log.debug (fun k ->
         k "  %d apostrophe variants: %s" (List.length variants)
           (String.concat ", " variants));
   let final_results =
@@ -1466,9 +1467,9 @@ let print conf base specify =
     }
   in
   let case = components.case in
-  let log_case msg = Logs.debug (fun k -> k "Print case %s" msg) in
+  let log_case msg = Log.debug (fun k -> k "Print case %s" msg) in
   let log_format fmt =
-    Logs.debug (fun k -> k "Print format %s" (Debug.format_str fmt))
+    Log.debug (fun k -> k "Print format %s" (Debug.format_str fmt))
   in
   let search_with query order =
     search conf base query order fn_options specify

@@ -19,7 +19,7 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
 
-CPPO_D=$(OS_D) $(SYSLOG_D)
+CPPO_D=$(OS_D)
 
 %/dune: %/dune.in Makefile.config
 	@printf "Generating $@…" \
@@ -27,7 +27,6 @@ CPPO_D=$(OS_D) $(SYSLOG_D)
 	| cppo -n $(CPPO_D) \
 	| sed \
 	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
-	-e 's/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g' \
 	-e 's/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g' \
 	-e 's/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g' \
 	-e 's/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g' \

@@ -111,3 +111,5 @@ val cgi : bool ref
        "machine.domain:2368"   (your machine name)
        "addr:2368"             (your machine internet address)
 *)
+
+module Pool : module type of Pool

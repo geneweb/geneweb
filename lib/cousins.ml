@@ -1,6 +1,9 @@
 open Def
 open Util
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Cousins" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil

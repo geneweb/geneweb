@@ -2,7 +2,10 @@
 
 open Config
 open Def
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Util" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
@@ -84,8 +87,7 @@ let print_default_gwf_file bname =
         List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
         close_out oc
     with Unix.Unix_error (_, _, _) ->
-      Logs.syslog `LOG_WARNING
-        (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
+      Log.warn (fun k -> k "Error while creating %s or %s" config_d fname)
 
 let rec cut_at_equal i s =
   if i = String.length s then (s, "")
@@ -111,7 +113,7 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      Logs.warn (fun k ->
+      Log.warn (fun k ->
           k "Error %s while loading %s, using empty config" error fname);
       []
   in
@@ -119,7 +121,7 @@ let read_base_env bname gw_prefix debug =
   if Sys.file_exists fname1 then load_file fname1
   else (
     if debug then
-      Logs.info (fun k ->
+      Log.info (fun k ->
           k "No configuration file %s found, see %s for example" fname1
             (Filename.concat gw_prefix "a.gwf"));
     [])
@@ -572,8 +574,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
       match String.split_on_char '_' commd with
       | b :: _p -> b
       | [] ->
-          Logs.syslog `LOG_ERR
-            (Format.sprintf "Poorly formatted command: %s" commd);
+          Log.err (fun k -> k "Poorly formatted command: %s" commd);
           commd
   in
   let s =
@@ -686,13 +687,10 @@ let safe_html_allowed_tags =
              tags
        in
        loop []
-     else
-       let str =
-         Printf.sprintf "Requested allowed_tags file (%s) absent"
-           !allowed_tags_file
-       in
-       Logs.syslog `LOG_WARNING str;
-       default_safe_html_allowed_tags)
+     else (
+       Log.warn (fun k ->
+           k "Requested allowed_tags file (%s) absent" !allowed_tags_file);
+       default_safe_html_allowed_tags))
 
 (* Few notes:
 
@@ -1452,8 +1450,7 @@ let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
-    Logs.syslog `LOG_ERR
-      (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
+    Log.err (fun k -> k "Error opening file %s in open_etc_file: %s" fname e);
     None
 
 (* Detect if a template file is a full HTML page *)
@@ -2717,13 +2714,12 @@ let test_cnt_d conf =
   (if not (Sys.file_exists config_d) then
      try Unix.mkdir config_d 0o755
      with Unix.Unix_error (_, _, _) ->
-       Logs.syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
+       Log.warn (fun k ->
+           k "Failure when creating config_dir (util): %s" config_d));
   if not (Sys.file_exists cnt_d) then
     try Unix.mkdir cnt_d 0o755
     with Unix.Unix_error (_, _, _) ->
-      Logs.syslog `LOG_WARNING
-        (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
+      Log.warn (fun k -> k "Failure when creating cnt_dir (util): %s" cnt_d)
   else ();
   cnt_d
 
@@ -3595,7 +3591,7 @@ let url_set_aux conf url evar_l str_l =
   let href =
     match String.split_on_char '?' url with
     | [] ->
-        Logs.syslog `LOG_WARNING "Empty Url\n";
+        Log.warn (fun k -> k "Empty Url");
         ""
     | server :: _ -> server
   in

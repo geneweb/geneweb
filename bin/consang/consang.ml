@@ -28,6 +28,7 @@ let anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 
 let () =
+  Logs.set_reporter (Logs_fmt.reporter ());
   Arg.parse speclist anonfun errmsg;
   if !fname = "" then (
     Printf.eprintf "Missing file name\n";
@@ -37,7 +38,7 @@ let () =
   Secure.set_base_dir (Filename.dirname !fname);
   let lock_file = Mutil.lock_file !fname in
   let on_exn exn bt =
-    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+    Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));
     exit 2
   in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
@@ -55,7 +56,7 @@ let () =
         if ConsangAll.compute ~verbosity:!verbosity base !scratch then
           Driver.sync base
       with Consang.TopologicalSortError p ->
-        Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
-          (Gutil.designation base p);
-        flush stdout;
+        Logs.err (fun k ->
+            k "Loop in database, %s is his/her own ancestor."
+              (Gutil.designation base p));
         exit 2)

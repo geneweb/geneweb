@@ -1,7 +1,10 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 module Compat = Geneweb_compat
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Wserver" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 
 type handler =
   Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit
@@ -220,10 +223,8 @@ let skip_possible_remaining_chars fd =
 
 let check_stopping () =
   if Sys.file_exists !stop_server then (
-    flush stdout;
-    Logs.err (fun k ->
-        k "Server stopped by presence of file %s.\n" !stop_server);
-    Logs.err (fun k -> k "Remove that file to allow servers to run again.");
+    Log.err (fun k -> k "Server stopped by presence of file %s.\n" !stop_server);
+    Log.err (fun k -> k "Remove that file to allow servers to run again.");
     exit 0)
 
 let accept_connection_windows socket =
@@ -276,9 +277,9 @@ let accept_connections_windows socket =
   while true do
     try accept_connection_windows socket with
     | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->
-        Logs.info (fun k -> k "%s" (Printexc.to_string e))
+        Log.info (fun k -> k "%s" (Printexc.to_string e))
     | Sys_error msg as e when msg = "Broken pipe" ->
-        Logs.info (fun k -> k "%s" (Printexc.to_string e))
+        Log.info (fun k -> k "%s" (Printexc.to_string e))
   done
 
 (* Set a Unix signal with a timeout around the execution of the function [f].
@@ -302,7 +303,7 @@ let with_timeout ~timeout handler f =
 
 let accept_connection_unix ~timeout callback socket pid =
   let client_socket, client_addr = My_unix.accept_noeintr socket in
-  Logs.debug (fun k -> k "Worker %d got a job" pid);
+  Log.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
   connection_closed := false;
   wserver_sock := client_socket;
@@ -320,7 +321,7 @@ let accept_connections_unix ~timeout ~n_workers callback socket =
       try accept_connection_unix ~timeout callback socket (Unix.getpid ())
       with e ->
         let bt = Printexc.get_raw_backtrace () in
-        Logs.info (fun k -> k "%a" Util.pp_exception (e, bt))
+        Log.info (fun k -> k "%a" Util.pp_exception (e, bt))
     done
 
 let accept_connections ~timeout ~n_workers callback socket =
@@ -354,7 +355,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       Unix.bind socket (Unix.ADDR_INET (addr, port));
       Unix.listen socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
-      Logs.debug (fun k ->
+      Log.info (fun k ->
           k "Ready %4d-%02d-%02d %02d:%02d port %d..." (1900 + tm.Unix.tm_year)
             (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
             port);
@@ -367,3 +368,5 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
       wserver_oc := oc;
       ignore (treat_connection callback addr client_socket);
       exit 0
+
+module Pool = Pool

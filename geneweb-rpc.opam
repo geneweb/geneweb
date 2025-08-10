@@ -14,7 +14,7 @@ depends: [
   "qcheck-alcotest" {with-test}
   "lwt"
   "lwt_ppx"
-  "tls-lwt"
+  "tls"
   "cmdliner" {>= "2.0.0"}
   "logs"
   "digestif"

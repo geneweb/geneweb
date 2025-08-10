@@ -1,10 +1,6 @@
-(* TODO: After switching to Logs, the two lines below will directly call the Logs
-      library.
+let src = Logs.Src.create ~doc:"Pool" __MODULE__
 
-   let src = Logs.Src.create ~doc:"Pool" __MODULE__
-   module Log = (val Logs.src_log src : Logs.LOG) *)
-
-module Logs = Geneweb_logs.Logs
+module Log = (val Logs.src_log src : Logs.LOG)
 
 type worker = { pid : int } [@@unboxed]
 type t = { workers : (worker, unit) Hashtbl.t } [@@unboxed]
@@ -21,14 +17,14 @@ let add_worker t k =
          Logs.info (fun k -> k "%a" Util.pp_exception (e, bt)));
       exit 1
   | pid ->
-      Logs.debug (fun k -> k "Creating worker %d" pid);
+      Log.debug (fun k -> k "Creating worker %d" pid);
       Hashtbl.replace t.workers { pid } ()
 
 let cleanup { workers } =
-  Logs.debug (fun k -> k "Cleanup workers...");
+  Log.debug (fun k -> k "Cleanup workers...");
   Hashtbl.iter
     (fun { pid } () ->
-      Logs.debug (fun k -> k "Kill worker %d" pid);
+      Log.debug (fun k -> k "Kill worker %d" pid);
       try Unix.kill pid Sys.sigterm with _ -> ())
     workers
 
@@ -50,7 +46,7 @@ let start n k =
     assert (pid > 0);
     match Hashtbl.find t.workers { pid } with
     | () ->
-        Logs.debug (fun k -> k "Worker %d is dead, replace it" pid);
+        Log.debug (fun k -> k "Worker %d is dead, replace it" pid);
         add_worker t k
     | exception Not_found -> assert false
   done

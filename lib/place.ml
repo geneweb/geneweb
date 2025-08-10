@@ -2,7 +2,10 @@
 
 open Config
 open Util
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Place" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
@@ -118,7 +121,7 @@ let max_rlm_nbr conf =
 let fold_place_long inverted s =
   match String.length s with
   | 0 ->
-      Logs.syslog `LOG_WARNING "Zero length string in fold_place_long!";
+      Log.warn (fun k -> k "Zero length string in fold_place_long!");
       ([], "")
   | _ ->
       let sub = only_suburb s in

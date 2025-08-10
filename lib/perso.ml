@@ -3,7 +3,10 @@
 open Config
 open Def
 open Util
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Perso" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Ast = Geneweb_templ.Ast
 module Loc = Geneweb_templ.Loc
@@ -1304,7 +1307,7 @@ let extract_var sini s =
 let template_file = ref "perso.txt"
 
 let warning_use_has_parents_before_parent loc var r =
-  Logs.warn (fun k ->
+  Log.warn (fun k ->
       k "%a: since v5.00, must test \"has_parents\" before using \"%s\"\n"
         Loc.pp loc var);
   r
@@ -4455,10 +4458,7 @@ let eval_transl conf base env upp s c =
             | _ -> (
                 match get_env "p" env with
                 | Vind p -> index_of_sex (Driver.get_sex p)
-                | _ ->
-                    Printf.sprintf "Sex of unknown person"
-                    |> Logs.syslog `LOG_WARNING;
-                    assert false))
+                | _ -> Fmt.failwith "Sex of unknown person"))
         | "w" -> (
             (* witness/witnesses *)
             match get_env "fam" env with
@@ -4469,10 +4469,7 @@ let eval_transl conf base env upp s c =
             (* family/families *)
             match get_env "p" env with
             | Vind p -> if Array.length (Driver.get_family p) <= 1 then 0 else 1
-            | _ ->
-                Printf.sprintf "families of unknown person"
-                |> Logs.syslog `LOG_WARNING;
-                assert false)
+            | _ -> Fmt.failwith "Families of unknown person")
         | "c" -> (
             (* child/children *)
             match get_env "fam" env with
@@ -4490,10 +4487,7 @@ let eval_transl conf base env upp s c =
                         0 (Driver.get_family p)
                     in
                     if n <= 1 then 0 else 1
-                | _ ->
-                    Printf.sprintf "Children of unknown person"
-                    |> Logs.syslog `LOG_WARNING;
-                    assert false))
+                | _ -> Fmt.failwith "Children of unknown person"))
         | "e" -> (
             (* singular/plural for events *)
             match get_env "p" env with
@@ -4502,10 +4496,7 @@ let eval_transl conf base env upp s c =
                 | [] -> 0
                 | [ _e ] -> 0
                 | _ -> 1)
-            | _ ->
-                Printf.sprintf "Events of unknown person"
-                |> Logs.syslog `LOG_WARNING;
-                assert false)
+            | _ -> Fmt.failwith "Events of unknown person")
         | "t" -> (
             (* singular/plural  titles *)
             match get_env "p" env with
@@ -4514,10 +4505,7 @@ let eval_transl conf base env upp s c =
                 | [] -> 0
                 | [ _t ] -> 0
                 | _ -> 1)
-            | _ ->
-                Printf.sprintf "Titles of unknown person"
-                |> Logs.syslog `LOG_WARNING;
-                assert false)
+            | _ -> Fmt.failwith "Titles of unknown person")
         | _ -> assert false
       in
       let r = Templ.eval_transl_lexicon conf upp s (string_of_int n) in
@@ -4798,14 +4786,14 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "level" env with
       | Vint lev -> lev
       | _ ->
-          Logs.syslog `LOG_WARNING "Missing level info";
+          Log.warn (fun k -> k "Missing level info");
           0
     in
     let ip_l =
       match get_env "cousins" env with
       | Vcousl cl -> !cl
       | _ ->
-          Logs.syslog `LOG_WARNING "Empty cousins list";
+          Log.warn (fun k -> k "Empty cousins list");
           []
     in
     let ip_l =
@@ -5110,7 +5098,7 @@ let print_foreach conf base print_ast eval_expr =
     | Some l ->
         print_foreach_path_aux conf base in_or_less level env al ep
           (Cousins.cousins_fold l)
-    | None -> Logs.syslog `LOG_WARNING "Empty cousins list"
+    | None -> Log.warn (fun k -> k "Empty cousins list")
   in
 
   let print_foreach_cousin_level env al ((_, _) as ep) =

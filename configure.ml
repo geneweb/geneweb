@@ -10,11 +10,9 @@ let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
-let syslog = ref false
 let caching = ref false
 let set_caching () = caching := true
 let set_api () = api := true
-let set_syslog () = syslog := true
 
 let speclist =
   [
@@ -22,7 +20,7 @@ let speclist =
     ( "--sosa-zarith",
       Arg.Unit ignore,
       " Use Sosa module implementation based on `zarith` library" );
-    ("--syslog", Arg.Unit set_syslog, " Log gwd errors using syslog");
+    ("--syslog", Arg.Unit ignore, " Log gwd errors using syslog");
     ( "--gwd-caching",
       Arg.Unit set_caching,
       " Enable database preloading (Unix-only)" );
@@ -32,9 +30,6 @@ let speclist =
 let () =
   Arg.parse speclist failwith errmsg;
   let dune_dirs_exclude = ref "" in
-  let syslog_d, syslog_pkg =
-    match !syslog with true -> (" -D SYSLOG", "syslog") | false -> ("", "")
-  in
   let os_type, os_d, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
@@ -66,8 +61,6 @@ let () =
   var "RM" rm;
   var "EXT" ext;
   var "OS_D" os_d;
-  var "SYSLOG_D" syslog_d;
-  var "SYSLOG_PKG" syslog_pkg;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude;
   var "ANCIENT_LIB" ancient_lib;
   var "ANCIENT_FILE" ancient_file;

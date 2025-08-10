@@ -1,4 +1,4 @@
-(* val src : Logs.src *)
+val src : Logs.src
 (** Source of debugging logs of this module. *)
 
 type t
