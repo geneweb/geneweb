@@ -1,0 +1,6 @@
+(executable
+  (package geneweb)
+  (name robot)
+  (public_name geneweb.robot)
+  (modules robot)
+  (libraries unix geneweb))

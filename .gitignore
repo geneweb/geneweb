@@ -18,6 +18,7 @@ bin/gwd/dune
 bin/gwdiff/dune
 bin/gwgc/dune
 bin/gwu/dune
+bin/robot/dune
 bin/setup/dune
 bin/update_nldb/dune
 lib/core/dune
