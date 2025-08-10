@@ -21,6 +21,7 @@ type excl = {
   mutable excl : (string * int ref) list;
   mutable who : who W.t;
   mutable max_conn : int * string;
+  mutable last_summary : float;
 }
 (** A collection of robots: the list contains forbidden robots and the map
     contains accepted (under conditions) robots. *)
