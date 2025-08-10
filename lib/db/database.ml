@@ -2,7 +2,10 @@
 
 open Dbdisk
 open Def
-module Logs = Geneweb_logs.Logs
+
+let src = Logs.Src.create ~doc:"Database" __MODULE__
+
+module Log = (val Logs.src_log src : Logs.LOG)
 
 type person = dsk_person
 type ascend = dsk_ascend
@@ -698,7 +701,7 @@ end = struct
     let inx =
       if Sys.file_exists inx then Some (load_inx version ~inx)
       else (
-        Logs.warn (fun k -> k "cannot load the inverted index file %S" inx);
+        Log.warn (fun k -> k "cannot load the inverted index file %S" inx);
         None)
     in
     let tbl = HS.create 17 in

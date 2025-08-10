@@ -21,6 +21,8 @@ depends: [
   "camlzip"
   "cppo"
   "fmt"
+  "logs"
+  "logs-syslog"
   "jingoo"
   "markup"
   "ounit"
@@ -28,7 +30,6 @@ depends: [
   "ppx_deriving"
   "ppx_import"
   "stdlib-shims"
-  "syslog"
   "unidecode" {= "0.2.0"}
   "uri"
   "uucp"
