@@ -1,10 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Outbase = Geneweb_db.Outbase
-
 (** Checks a .gwo header and prints fails if header is absent or not compatible.
 *)
-
 let check_magic fname ic =
   let b = really_input_string ic (String.length Gwcomp.magic_gwo) in
   if b <> Gwcomp.magic_gwo then
@@ -125,7 +122,7 @@ let speclist =
     );
     ("-f", Arg.Set Geneweb.GWPARAM.force, " Remove database if already existing");
     ("-gwo", Arg.Set kill_gwo, " Suppress .gwo files after base creation");
-    ("-mem", Arg.Set Outbase.save_mem, " Save memory, but slower");
+    ("-mem", Arg.Set Geneweb_db.Outbase.save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear Db1link.do_check, " No consistency check");
     ("-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error");
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
@@ -214,11 +211,8 @@ let main () =
         gwo := (x, separate, bnotes, shift) :: !gwo
       else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
-  if not !just_comp then (
-    let bdir = !Geneweb.GWPARAM.bpath bname in
-    (* test_base will fail if base exists and force has not been set (-f) *)
-    Geneweb.GWPARAM.test_base bname;
-    Geneweb.GWPARAM.init_etc bname;
+  if not !just_comp then
+    let bdir = Geneweb.GWPARAM.create_base_and_config bname in
     let lock_file = Mutil.lock_file bdir in
     let on_exn exn bt =
       Format.eprintf "%a@." Lock.pp_exception (exn, bt);
@@ -227,7 +221,6 @@ let main () =
     Lock.control ~on_exn ~wait:false ~lock_file (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
         if Db1link.link next_family_fun bdir then (
-          Geneweb.Util.print_default_gwf_file bname;
           if !kill_gwo then
             List.iter
               (fun (x, _separate, _bnotes, _shift) ->
@@ -236,6 +229,6 @@ let main () =
         else (
           Printf.eprintf "*** database not created\n";
           flush stderr;
-          exit 2)))
+          exit 2))
 
 let _ = main ()
