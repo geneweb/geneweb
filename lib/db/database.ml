@@ -1302,7 +1302,7 @@ let with_database ?(read_only = false) bname k =
   let commit_wiznotes =
     if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
     else fun fnotes s ->
-      if fnotes <> "" then (
+      if fnotes <> "" && s <> "" then (
         let wiznotes_dir = Filename.concat bname "wiznotes" in
         let fname =
           (try
