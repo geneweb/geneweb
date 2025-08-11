@@ -789,10 +789,11 @@ module SearchingFields : sig
   val gets : Config.config -> string -> string
   val getd : Config.config -> string -> Date.dmy option * Date.dmy option
   val map_field : conf:Config.config -> key:string -> string -> string
+
   val string_field :
     ?map_field:(string -> string) -> Config.config -> string -> string -> string
 
-  val sosa_field : Config.config -> Gwdb.base -> string -> string
+  val sosa : Config.config -> Gwdb.base -> string
 
   val get_place_date_request :
     Config.config -> string -> string -> string -> string
@@ -910,20 +911,15 @@ end = struct
   let event_search conf search_type sex =
     Array.fold_left (build_event_search conf search_type sex) "" events
 
-  let sosa_field conf base search =
+  let sosa conf base =
     if gets conf "sosa_filter" <> "" then
       match Util.find_sosa_ref conf base with
-      | None -> search
+      | None -> ""
       | Some p ->
-          let s =
-            Printf.sprintf
-              (Util.ftransl conf "direct ancestor(s) of %s")
-              (NameDisplay.fullname_html_of_person conf base p :> string)
-          in
-          if search = "" then s
-          else if s = "" then search
-          else search ^ ", " ^ s
-    else search
+          Printf.sprintf
+            (Util.ftransl conf "direct ancestor(s) of %s")
+            (NameDisplay.fullname_html_of_person conf base p :> string)
+    else ""
 
   let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
 
