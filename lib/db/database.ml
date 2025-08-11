@@ -1403,7 +1403,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   Filesystem.create_dir ~parent:true (bdir // "notes_d");
-  Filesystem.create_dir (bdir // "wiznotes");
+  (* wiznotes sera créé seulement si nécessaire par db1link.ml *)
   Filesystem.create_file (bdir // "notes");
   let persons, ascends, unions = persons in
   let families, couples, descends = families in

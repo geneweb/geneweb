@@ -13,9 +13,6 @@ val reorg : bool ref
 val force : bool ref
 (** force creation of database if already existing *)
 
-type init_s = { status : bool; bname : string }
-
-val init_done : init_s ref
 val config_reorg : string -> string
 val config_legacy : string -> string
 
@@ -39,19 +36,13 @@ val init : string -> unit
 (** Function called before gwd starts e.g. inititialise assets folders in Secure
     module. *)
 
-val init_etc : string -> unit
-(** Function called before gwd starts e.g. inititialise etc folders in reorg
-    mode. *)
-
 val is_reorg_base : string -> bool
 (** returns true if mybase.gwb/config/mybase.gwf exists *)
 
 val test_reorg : string -> unit
 (** set reorg to true if !reorg of is_reorg_base; then calls init *)
 
-val test_base : string -> unit
-(** for gwc and ged2gwb, test_reorg, alert if base exists and force is not set
-*)
+val create_base_and_config : string -> string
 
 module Default : sig
   val config : string -> string
