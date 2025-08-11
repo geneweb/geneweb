@@ -139,9 +139,6 @@ distrib: info ## Build the project and copy what is necessary for distribution
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
-	mkdir -p $(DISTRIB_DIR)/bases/etc
-	mkdir -p $(DISTRIB_DIR)/bases/lang
-	mkdir -p $(DISTRIB_DIR)/bases/src
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
 	cp LICENSE $(DISTRIB_DIR)/LICENSE.txt
 	cp etc/README.txt $(DISTRIB_DIR)/.

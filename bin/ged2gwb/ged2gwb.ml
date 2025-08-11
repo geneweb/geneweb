@@ -3320,9 +3320,9 @@ let main () =
     flush stderr;
     exit 2);
   let bname = !out_file in
-  out_file := Filename.concat (!Geneweb.GWPARAM.bpath "") !out_file;
+  let _bdir = Geneweb.GWPARAM.create_base_and_config bname in
+  out_file := Filename.concat (Secure.base_dir ()) (bname ^ ".gwb");
   Geneweb.GWPARAM.init bname;
-  Geneweb.GWPARAM.test_base bname;
   let arrays = make_arrays !in_file in
   Gc.compact ();
   let arrays = make_subarrays arrays in
