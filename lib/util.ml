@@ -108,26 +108,18 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      Logs.syslog `LOG_WARNING
-        (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
-           error fname);
+      Logs.warn (fun k ->
+          k "Error %s while loading %s, using empty config" error fname);
       []
   in
   let fname1 = !GWPARAM.config bname in
   if Sys.file_exists fname1 then load_file fname1
-  else
-    let fname2 = Filename.concat gw_prefix "a.gwf" in
-    if Sys.file_exists fname2 then (
-      if debug then
-        Logs.syslog `LOG_WARNING
-          (Printf.sprintf "Using configuration from %s\n%!" fname2);
-      load_file fname2)
-    else (
-      if debug then
-        Logs.syslog `LOG_WARNING
-          (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
-             fname2);
-      [])
+  else (
+    if debug then
+      Logs.info (fun k ->
+          k "No configuration file %s found, see %s for example" fname1
+            (Filename.concat gw_prefix "a.gwf"));
+    [])
 
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   (*Printf.eprintf "Errors set_vars:\n";
