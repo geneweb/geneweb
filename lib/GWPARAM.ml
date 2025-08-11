@@ -541,7 +541,7 @@ let p_auth conf base p =
           let a = Date.time_elapsed d conf.today in
           if a.Def.year > lim then true
           else if a.Def.year = 0 then a.month > 0 || a.day > 0
-          else false
+          else none ()
     in
     check_date
       (Driver.get_birth p |> Date.cdate_to_dmy_opt)
