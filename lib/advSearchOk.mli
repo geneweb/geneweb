@@ -9,6 +9,7 @@ module SearchingFields : sig
   val surname : Config.config -> string
   val occupation : Config.config -> string
   val events : Config.config -> string
+  val sosa : Config.config -> Gwdb.base -> string
 end
 
 val matching_first_name_aliases :
