@@ -949,10 +949,4 @@ let treat_request conf =
   GWPARAM.nb_errors := 0;
   GWPARAM.errors_undef := [];
   GWPARAM.errors_other := [];
-  let conf =
-    {
-      conf with
-      base_env = Util.read_base_env conf.bname conf.gw_prefix conf.debug;
-    }
-  in
   try treat_request conf with Update.ModErr _ -> Output.flush conf
