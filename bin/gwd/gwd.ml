@@ -1247,7 +1247,11 @@ let make_conf ~secret_salt from_addr request script_name env =
   if threshold_test <> "" then
     RelationLink.threshold := int_of_string threshold_test;
   GWPARAM.test_reorg base_file;
-  let base_env = Util.read_base_env base_file !gw_prefix !debug in
+  let gw_prefix_computed =
+    if !gw_prefix <> "" then !gw_prefix
+    else String.concat Filename.dir_sep [ "gw" ]
+  in
+  let base_env = Util.read_base_env base_file gw_prefix_computed !debug in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -1419,9 +1423,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       today_wd = tm.Unix.tm_wday;
       time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
       ctime = utm;
-      gw_prefix =
-        (if !gw_prefix <> "" then !gw_prefix
-         else String.concat Filename.dir_sep [ "gw" ]);
+      gw_prefix = gw_prefix_computed;
       images_prefix =
         (match (!gw_prefix, !images_prefix) with
         | gw_p, im_p when gw_p <> "" && im_p = "" ->
