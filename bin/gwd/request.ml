@@ -946,8 +946,6 @@ let treat_request =
     else process ()
 
 let treat_request conf =
-  GWPARAM.init_etc conf.bname;
-  (* TODO verify if we need init_etc here *)
   GWPARAM.nb_errors := 0;
   GWPARAM.errors_undef := [];
   GWPARAM.errors_other := [];
