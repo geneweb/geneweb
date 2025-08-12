@@ -196,6 +196,7 @@ let main () =
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
+  if not !just_comp then Geneweb.GWPARAM.check_base_exists bname;
   let gwo = ref [] in
   List.iter
     (fun (x, separate, bnotes, shift) ->
