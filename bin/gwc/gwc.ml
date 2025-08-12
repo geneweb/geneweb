@@ -192,7 +192,7 @@ let main () =
     flush stderr;
     exit 2);
   let bname = Filename.remove_extension (Filename.basename !Gwcomp.out_file) in
-  Geneweb.GWPARAM.init bname;
+  Geneweb.GWPARAM.init ();
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
@@ -226,7 +226,7 @@ let main () =
                 if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
               (List.rev !files))
         else (
-          Printf.eprintf "*** database not created\n";
+          Printf.eprintf "*** database NOT created!\n";
           flush stderr;
           exit 2))
 
