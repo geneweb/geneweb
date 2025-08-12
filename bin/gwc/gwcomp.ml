@@ -16,6 +16,7 @@ let rgpd = ref false
 let verbose = ref false
 let semi_pub_cnt = ref 0
 let out_file = ref (Filename.concat Filename.current_dir_name "a")
+let roglo_special = ref false
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 
