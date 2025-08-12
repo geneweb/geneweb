@@ -784,22 +784,7 @@ let advanced_search conf base max_answers =
   (List.rev list, len)
 
 module SearchingFields : sig
-  val gets : Config.config -> string -> string
-  val getd : Config.config -> string -> Date.dmy option * Date.dmy option
-  val map_field : conf:Config.config -> key:string -> string -> string
-
-  val string_field :
-    ?map_field:(string -> string) -> Config.config -> string -> string -> string
-
   val sosa : Config.config -> Gwdb.base -> string
-
-  val get_place_date_request :
-    Config.config -> string -> string -> string -> string
-
-  val test_string : Config.config -> string -> bool
-  val test_date : Config.config -> string -> bool
-  val event_search : Config.config -> Fields.search -> int -> string
-  val sex : Config.config -> int
   val first_name : Config.config -> string
   val surname : Config.config -> string
   val occupation : Config.config -> string
@@ -830,11 +815,6 @@ end = struct
   let test_date conf x =
     reconstitute_date_dmy conf (x ^ "1") <> None
     || reconstitute_date_dmy conf (x ^ "2") <> None
-
-  (* Fonction pour tester un simple champ texte (e.g: first_name). *)
-  let string_field ?(map_field = Fun.id) conf x search =
-    if test_string conf x then search ^ " " ^ map_field (gets conf x)
-    else search
 
   (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
   let get_place_date_request conf place_prefix_field_name date_prefix_field_name
