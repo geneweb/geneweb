@@ -990,13 +990,19 @@ let is_exact_search_by_name_key key =
       "exact_surname_prefix";
     ]
 
-let force_exact_search_by_name conf =
+module Config_env = Set.Make (struct
+  type t = string * Adef.encoded_string
+
+  let compare = compare
+end)
+
+let exact_search_by_name_parameters =
   let on = Mutil.encode "on" in
-  {
-    conf with
-    Config.env =
-      ("exact_first_name", on) :: ("exact_surname", on)
-      :: List.filter
-           (fun (key, _) -> not @@ is_exact_search_by_name_key key)
-           conf.Config.env;
-  }
+  Config_env.of_list [ ("exact_first_name", on); ("exact_surname", on) ]
+
+let force_exact_search_by_name conf =
+  let make_env env =
+    Config_env.elements exact_search_by_name_parameters
+    @ List.filter (fun (key, _) -> not @@ is_exact_search_by_name_key key) env
+  in
+  { conf with Config.env = make_env conf.Config.env }
