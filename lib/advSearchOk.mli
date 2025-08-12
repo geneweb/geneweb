@@ -29,3 +29,5 @@ val exact_matching_surname_aliases :
 
 val prefix_matching_surname_aliases :
   surname:string -> aliases:string list -> string list
+
+val force_exact_search_by_name : Config.config -> Config.config
