@@ -14,6 +14,9 @@
 %define;othersexcolor(sex)
   %if;(sex=1)male%elseif;(sex=0)female%else;neuter%end;
 %end;
+%define;ofuser(username)
+  %apply;a_of_b%with;%and;username%end;
+%end;
 %define;spousesexcolor(sex)
   %if;(sex=0)male%elseif;(sex=1)female%else;neuter%end;
 %end;
@@ -162,6 +165,13 @@
                 %end;" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*tools] [person/persons]0</span></a>
             <div class="dropdown-menu dropdown-menu-transl">
+              %if;(wizard and b.wizard_passwd_file!="")
+                <a class="dropdown-item %if;(not has_wiznotes)text-danger%end;"
+                  href="%prefix;m=%if;(not has_wiznotes)MOD_%end;WIZNOTES&f=%user.ident;">%nn;
+                    <i class="fa fa-hat-wizard fa-fw mr-2"></i>
+                    %if;(has_wiznotes)[*wizard note]%else;[*wizard note create]%end;
+                    %sp;%apply;a_of_b%with;%and;%if;(user.name!="")%user.name;%else;%user.ident;%end;%end;</a>
+              %end;
               %( Visibility button %)
               <a class="dropdown-item" href="%prefix;m=H&v=visibility" title="[*visibility-hlp]" target="_blank">
                 %if;is_private;
