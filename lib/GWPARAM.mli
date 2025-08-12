@@ -42,7 +42,11 @@ val is_reorg_base : string -> bool
 val test_reorg : string -> unit
 (** set reorg to true if !reorg of is_reorg_base; then calls init *)
 
+val check_base_exists : string -> unit
+(** Check if database exists and exit if so (unless -f flag is set) *)
+
 val create_base_and_config : string -> string
+(** Create base directory and configuration. *)
 
 module Default : sig
   val config : string -> string

@@ -196,12 +196,17 @@ let create_default_gwf config_path =
   List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf_defaults;
   close_out oc
 
-let rec create_base_and_config bname =
+let check_base_exists bname =
   let clean_bname = Filename.remove_extension bname in
   let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
   if (not !force) && Sys.file_exists bdir then (
-    Printf.eprintf "Database \"%s\" already exists. Use -f to overwrite." bname;
-    exit 2);
+    Printf.eprintf "Database \"%s\" already exists. Use -f to overwrite.\n"
+      bname;
+    exit 2)
+
+let rec create_base_and_config bname =
+  let clean_bname = Filename.remove_extension bname in
+  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
   Filesystem.create_dir bdir;
   let user_wants_reorg = !reorg in
   migrate_gwf_bidirectional clean_bname user_wants_reorg;
