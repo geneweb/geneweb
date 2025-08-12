@@ -55,6 +55,7 @@ let relation_status = ref Married
 let no_picture = ref false
 let do_check = ref true
 let particles = ref Mutil.default_particles
+let no_warn = ref false
 
 (* Reading input *)
 
@@ -3294,6 +3295,7 @@ let speclist =
   ; ( "-particles"
     , Arg.String (fun s -> particles := Mutil.input_particles s)
     , "<FILE> Use the given file as list of particles" )
+  ; ( "-nowarn", Arg.Set no_warn, " Do not show warnings during import")
   ; ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
   ] |> List.sort compare |> Arg.align
 
@@ -3334,9 +3336,10 @@ let main () =
       Check.print_base_error !log_oc base x; Printf.fprintf !log_oc "\n"
     in
     let base_warning = function
-      | UndefinedSex _ -> ()
-      | x ->
-        Check.print_base_warning !log_oc base x; Printf.fprintf !log_oc "\n"
+          | UndefinedSex _ -> ()
+          | _ when !no_warn -> ()
+          | x ->
+            Check.print_base_warning !log_oc base x; Printf.fprintf !log_oc "\n"
     in
     Check.check_base base base_error base_warning ignore; flush !log_oc
   end ;
