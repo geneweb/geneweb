@@ -166,14 +166,15 @@ let errmsg =
    and [options] are:"
 
 let main () =
-  (try
-     if Sys.is_directory !Gwcomp.rgpd_dir then Gwcomp.rgpd := true
-     else Gwcomp.rgpd := false
-   with Sys_error _ ->
-     Printf.eprintf "Warning: failed testing for %s\n" !Gwcomp.rgpd_dir;
-     Gwcomp.rgpd := false);
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  if Array.mem "-rgpd" Sys.argv then (
+    if
+      not (Sys.file_exists !Gwcomp.rgpd_dir && Sys.is_directory !Gwcomp.rgpd_dir)
+    then (
+      Printf.eprintf "Error: RGPD directory not found\n";
+      exit 2);
+    Gwcomp.rgpd := true);
   in_file :=
     if !in_file <> "" then
       Filename.remove_extension (Filename.basename !in_file)
@@ -185,7 +186,6 @@ let main () =
   if !in_file <> "" && not (Array.mem "-o" Sys.argv) then
     Gwcomp.out_file := !in_file;
   if not (Mutil.good_name (Filename.basename !Gwcomp.out_file)) then (
-    (* Util.transl conf not available !*)
     Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
       !Gwcomp.out_file;
     Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
@@ -196,10 +196,6 @@ let main () =
   let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
   if !Db1link.particules_file = "" then
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
-
-  if !Gwcomp.rgpd then
-    Printf.eprintf "Rgpd status: True, files in: %s\n" !Gwcomp.rgpd_dir
-  else Printf.eprintf "Rgpd status: False\n";
   let gwo = ref [] in
   List.iter
     (fun (x, separate, bnotes, shift) ->
