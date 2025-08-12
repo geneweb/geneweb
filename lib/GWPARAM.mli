@@ -32,9 +32,8 @@ val images_d : my_fun_2 ref
 
 (* S: Move it to gwd_lib?  *)
 
-val init : string -> unit
-(** Function called before gwd starts e.g. inititialise assets folders in Secure
-    module. *)
+val init : unit -> unit
+(** Function called to initialize path functions based on the reorg flag. *)
 
 val is_reorg_base : string -> bool
 (** returns true if mybase.gwb/config/mybase.gwf exists *)

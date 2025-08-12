@@ -130,9 +130,8 @@ let is_reorg_base bname =
   Sys.file_exists (config_reorg bname)
 
 (* Initialize path functions based on mode *)
-let init bname =
+let init () =
   Secure.add_assets Filename.current_dir_name;
-  reorg := !reorg || is_reorg_base bname;
   if !reorg then (
     config := Default.config;
     cnt_d := Default.cnt_d;
@@ -159,7 +158,7 @@ let init bname =
 let test_reorg bname =
   if !reorg || is_reorg_base bname then (
     reorg := true;
-    init bname)
+    init ())
 
 let get_timestamp () =
   let tm = Unix.localtime (Unix.time ()) in
@@ -207,11 +206,17 @@ let check_base_exists bname =
 let rec create_base_and_config bname =
   let clean_bname = Filename.remove_extension bname in
   let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
-  Filesystem.create_dir bdir;
   let user_wants_reorg = !reorg in
-  migrate_gwf_bidirectional clean_bname user_wants_reorg;
-  reorg := !reorg || is_reorg_base clean_bname;
-  init clean_bname;
+  if Sys.file_exists bdir then
+    migrate_gwf_bidirectional clean_bname user_wants_reorg;
+  Filesystem.create_dir bdir;
+  if
+    (not (Sys.file_exists (config_reorg clean_bname)))
+    && not (Sys.file_exists (config_legacy clean_bname))
+  then migrate_gwf_bidirectional clean_bname user_wants_reorg;
+  Printf.eprintf "\n";
+  reorg := user_wants_reorg;
+  init ();
   bdir
 
 and migrate_gwf_bidirectional bname user_wants_reorg =
@@ -223,29 +228,34 @@ and migrate_gwf_bidirectional bname user_wants_reorg =
   in
   let legacy_exists = Sys.file_exists legacy_path in
   let reorg_exists = Sys.file_exists reorg_path in
+  Printf.eprintf "Migration check for %s:\n" bname;
+  Printf.eprintf "  Classic .gwf exists: %b%s\n" legacy_exists
+    (if legacy_exists then " (" ^ legacy_path ^ ")" else "");
+  Printf.eprintf "  Reorg .gwf exists: %b%s\n" reorg_exists
+    (if reorg_exists then " (" ^ reorg_path ^ ")" else "");
   match (user_wants_reorg, legacy_exists, reorg_exists) with
   | true, true, false ->
       (* Migration classic → reorg *)
-      Printf.eprintf "Migration: moving .gwf from classic to reorg mode\n";
+      Printf.eprintf "Migrating .gwf from classic to reorg mode:\n";
       Filesystem.create_dir ~parent:true (Filename.dirname reorg_path);
       let timestamp = get_timestamp () in
       let backup_path = legacy_path ^ ".classic." ^ timestamp in
       Filesystem.copy_file legacy_path backup_path;
-      Printf.eprintf "Backup created: %s\n" (Filename.basename backup_path);
+      Printf.eprintf "  Backup created: %s\n" (Filename.basename backup_path);
       Filesystem.copy_file legacy_path reorg_path;
       Sys.remove legacy_path;
-      Printf.eprintf "Configuration migrated: %s\n"
+      Printf.eprintf "  Configuration migrated: %s\n"
         (Filename.basename reorg_path)
   | false, false, true ->
       (* Migration reorg → classic *)
-      Printf.eprintf "Migration: moving .gwf from reorg to classic mode\n";
+      Printf.eprintf "Migrating .gwf from reorg to classic mode:\n";
       let timestamp = get_timestamp () in
       let backup_path = reorg_path ^ ".reorg." ^ timestamp in
       Filesystem.copy_file reorg_path backup_path;
-      Printf.eprintf "Backup created: %s\n" (Filename.basename backup_path);
+      Printf.eprintf "  Backup created: %s\n" (Filename.basename backup_path);
       Filesystem.copy_file reorg_path legacy_path;
       Sys.remove reorg_path;
-      Printf.eprintf "Configuration migrated: %s\n"
+      Printf.eprintf "  Configuration migrated: %s\n"
         (Filename.basename legacy_path)
   | true, false, false ->
       (* Créer nouveau .gwf en mode reorg *)
@@ -272,6 +282,7 @@ and migrate_gwf_bidirectional bname user_wants_reorg =
       Sys.remove remove_path
   | _ ->
       (* .gwf existe déjà au bon endroit selon l'intention utilisateur *)
+      Printf.eprintf "Configuration kept\n";
       ()
 
 (* Utility functions for error handling *)
@@ -429,89 +440,6 @@ let is_related conf base p =
             false)
         else false
   else false
-
-(** Calcul les droits de visualisation d'une personne en fonction de son age.
-    pour les test impliquant une date, si elle existe, on renvoie vrai ou faux
-    sinon, on passe au test suivant dans l'ordre ci dessous) :
-    - Vrai si : magicien ou ami ou la personne est public ou la personne est en
-      IfTitles, si elle a au moins un titre et que public_if_title = yes dans le
-      fichier gwf ou la personne s'est mariée depuis plus de
-      private_years_marriage
-    - Vrai si : la personne est plus agée (en fonction de la date de naissance
-      ou de la date de baptème) que privates_years
-    - Vrai si : la personne est décédée depuis plus de privates_years_death
-    - Vrai si : la personne n'est pas Private et public_if_no_date = yes
-    - Faux si : la personne n'est pas décédée et private_years > 0
-    - Faux si : la personne est plus jeune (en fonction de la date de naissance
-      ou de la date de baptème) que privates_years
-    - Faux si : la personne est décédée depuis moins de privates_years
-    - Faux dans tous les autres cas *)
-(* check that p is parent or descendant of conf.key *)
-
-(* kept for later debugging
-   let check_p_auth conf base p =
-     let mode_semi_public =
-       begin try List.assoc "semi_public" conf.Config.base_env = "yes" with
-         Not_found -> false
-       end;
-     in
-     let access = Geneweb_db.get_access p in
-     let not_private = access <> Private in
-     Printf.eprintf "P_auth for %s\n" (Gutil.designation base p);
-     if conf.Config.wizard
-         then Printf.eprintf "Wizard\n";
-     if (not mode_semi_public) && conf.Config.friend
-         then Printf.eprintf "Friend and not mode_semi_public\n";
-     if conf.user_iper = Some (Geneweb_db.get_iper p)
-         then Printf.eprintf "Self\n";
-     if access = Public
-         then Printf.eprintf "Public\n";
-     if conf.Config.public_if_titles
-        && access = IfTitles
-        && Geneweb_db.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-         then Printf.eprintf "Has titles\n";
-     if conf.Config.friend && conf.Config.semi_public
-        && (is_semi_public p || is_related conf base p)
-        && not_private
-         then Printf.eprintf "visiting a semi_public or family person\n";
-     if (conf.Config.public_if_no_date && access <> Private)
-         then Printf.eprintf "not private and no dates\n";
-     let birth_d = (Geneweb_db.get_birth p |> Date.cdate_to_dmy_opt) in
-     if conf.Config.private_years < -1
-         then Printf.eprintf "private_years < -1\n";
-     let baptism_d = (Geneweb_db.get_baptism  p |> Date.cdate_to_dmy_opt) in
-     let death_d = (Geneweb_db.get_death p |> Date.dmy_of_death) in
-     Printf.eprintf "other conditions date driven\n";
-     begin match birth_d with
-     | None -> Printf.eprintf "no birth date\n"
-     | Some d -> (
-         let a = Date.time_elapsed d conf.today in
-         if (a.Def.year > conf.Config.private_years)
-           || a.Def.year = 0 && (a.month > 0 || a.day > 0)
-         then Printf.eprintf "old enough (bir) (%d)\n" conf.Config.private_years
-         else Printf.eprintf "too young (bir) (%d)\n" conf.Config.private_years)
-     end;
-     begin match baptism_d with
-     | None -> Printf.eprintf "no baptism date\n"
-     | Some d -> (
-         let a = Date.time_elapsed d conf.today in
-         if (a.Def.year > conf.Config.private_years)
-           || a.Def.year = 0 && (a.month > 0 || a.day > 0)
-         then Printf.eprintf "old enough (bap) (%d)\n" conf.Config.private_years
-         else Printf.eprintf "too young (bap) (%d)\n" conf.Config.private_years)
-     end;
-     Printf.eprintf "check death date\n";
-     begin match death_d with
-     | None -> Printf.eprintf "no death date\n"
-     | Some d -> (
-         let a = Date.time_elapsed d conf.today in
-         if (a.Def.year > conf.Config.private_years_death)
-           || a.Def.year = 0 && (a.month > 0 || a.day > 0)
-         then Printf.eprintf "old enough (dea) (%d)\n" conf.Config.private_years_death
-         else Printf.eprintf "too young  (%d)\n" conf.Config.private_years_death)
-     end;
-     Printf.eprintf "no check on marriage date(s)\n"
-*)
 
 (* Authorization checks for person access *)
 let p_auth conf base p =
