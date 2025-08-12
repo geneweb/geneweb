@@ -367,7 +367,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   let s =
     let wi =
       {
-        Wiki.wi_mode = "NOTES";
+        Wiki.wi_mode = "WIZNOTES";
         Wiki.wi_file_path = Notes.file_path conf base;
         Wiki.wi_person_exists = person_exists conf base;
         Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
@@ -396,11 +396,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     in
     Output.print_sstring conf "<p><tt>(";
     Output.print_string conf
-      (DateDisplay.string_of_ondate conf (Dgreg (dmy, Dgregorian)));
-    Output.print_sstring conf " ";
-    Output.print_sstring conf (Printf.sprintf "%02d" tm.Unix.tm_hour);
-    Output.print_sstring conf ":";
-    Output.print_sstring conf (Printf.sprintf "%02d" tm.Unix.tm_min);
+      (DateDisplay.string_of_date conf (Dgreg (dmy, Dgregorian)));
     Output.print_sstring conf ")</tt></p>");
   (match p_getenv conf.env "m" with
   | Some "WIZNOTES_SEARCH" -> print_search_form conf wz
@@ -474,8 +470,7 @@ let print_mod conf base =
         let title = wizard_page_title conf (Util.escape_html wz) in
         let wfile = wzfile (wiz_dir conf base) wz in
         let s, _ = read_wizard_notes wfile in
-        Wiki.print_mod_view_page conf true (Adef.encoded "WIZNOTES") wz title []
-          s
+        Wiki.print_mod_view_page conf true "WIZNOTES" wz title [] s
       else Hutil.incorrect_request conf)
 
 let print_view conf base =
@@ -484,8 +479,7 @@ let print_view conf base =
       let title = wizard_page_title conf (Util.escape_html wz) in
       let wfile = wzfile (wiz_dir conf base) wz in
       let s, _ = read_wizard_notes wfile in
-      Wiki.print_mod_view_page conf false (Adef.encoded "WIZNOTES") wz title []
-        s)
+      Wiki.print_mod_view_page conf false "WIZNOTES" wz title [] s)
 
 let commit_wiznotes conf base wz s =
   let wiznotes_dir = wiz_dir conf base in

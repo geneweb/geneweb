@@ -63,7 +63,7 @@ let make_edit_button conf ?(mode = "") fnotes ?(cnt = None) () =
   in
   Format.sprintf
     {|<a href="%s" class="align-self-center ml-3 mb-1"
-  title="%s">(%s)</a>|}
+  title="%s">(%s)</a><br>|}
     href title (transl conf "modify")
 
 let notes_aliases conf =
@@ -772,37 +772,36 @@ let rev_extract_sub_part (s : string) (v : int) : string list =
 
 let extract_sub_part s v = List.rev (rev_extract_sub_part s v)
 
-let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
+let print_sub_part_links conf mode edit_mode sfn cnt0 is_empty =
   Output.print_sstring conf "<div class=\"btn-group mb-3\">";
   if cnt0 >= first_cnt then (
     Output.print_sstring conf {|<a href="|};
     Output.print_sstring conf (commd conf :> string);
-    Output.print_sstring conf {|m=|};
-    Output.print_string conf edit_mode;
+    Output.print_sstring conf "m=";
+    Output.print_sstring conf (edit_mode ^ mode);
     Output.print_string conf sfn;
     Output.print_sstring conf {|&v=|};
     Output.print_sstring conf (string_of_int @@ (cnt0 - 1));
     Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
     Output.print_sstring conf {|<i class="fa fa-arrow-left fa-fw"></i> |};
-    Output.print_sstring conf
+    Output.print_sstring conf (* edit prev section *)
       (Utf8.capitalize_fst (transl_nth conf "modify all note" 1));
     Output.print_sstring conf "</a>");
 
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (commd conf);
-  Output.print_sstring conf {|m=|};
-  Output.print_string conf edit_mode;
+  Output.print_sstring conf "m=";
+  Output.print_sstring conf (edit_mode ^ mode);
   Output.print_string conf sfn;
   Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
   Output.print_sstring conf {|<i class="fa fa-pencil fa-fw"></i> |};
-  Output.print_sstring conf
+  Output.print_sstring conf (* edit all note *)
     (Utf8.capitalize_fst (transl_nth conf "modify all note" 0));
   Output.print_sstring conf "</a>";
 
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (commd conf);
-  Output.print_sstring conf {|m=|};
-  Output.print_sstring conf "NOTES";
+  Output.print_sstring conf ("m=" ^ mode);
   Output.print_string conf sfn;
   Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
   Output.print_sstring conf {|<i class="fa fa-image fa-fw"></i> |};
@@ -814,12 +813,12 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=";
-    Output.print_string conf edit_mode;
+    Output.print_sstring conf (edit_mode ^ mode);
     Output.print_string conf sfn;
     Output.print_sstring conf "&v=";
     Output.print_sstring conf (string_of_int @@ (cnt0 + 1));
     Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
-    Output.print_sstring conf
+    Output.print_sstring conf (* edit next section *)
       (Utf8.capitalize_fst (transl_nth conf "modify all note" 2));
     Output.print_sstring conf {| <i class="fa fa-arrow-right fa-fw"></i>|};
     Output.print_sstring conf "</a>");
@@ -848,12 +847,12 @@ let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
   let sfn =
     if sub_fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode sub_fname
   in
-  print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 (lines = []);
+  print_sub_part_links conf wi.wi_mode edit_mode sfn cnt0 (lines = []);
   print_sub_part_text conf wi edit_opt cnt0 lines
 
 let print_mod_view_page conf can_edit mode fname title env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
-  let mode_pref = Mutil.encode (if can_edit then "MOD_" else "VIEW_") in
+  let edit_mode = if can_edit then "MOD_" else "VIEW_" in
   let has_v, v =
     match p_getint conf.env "v" with Some v -> (true, v) | None -> (false, 0)
   in
@@ -869,25 +868,15 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Output.print_sstring conf "<h1 class=\"mb-0\">";
   title false;
   Output.print_sstring conf "</h1>";
-  if can_edit then (
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=|};
-    Output.print_string conf mode;
-    if has_v then Output.printf conf "&v=%d" v;
-    Output.print_string conf sfn;
-    Output.print_sstring conf
-      {|" class="btn btn-sm btn-outline-primary align-self-center ml-3 mt-1">|};
-    Output.print_sstring conf (Utf8.capitalize_fst (message_txt conf 0));
-    Output.print_sstring conf "</a>");
   Output.print_sstring conf "</div>";
   if can_edit && has_v then
-    print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
+    print_sub_part_links conf mode edit_mode sfn v is_empty;
   Output.print_sstring conf {|<form method="POST" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
-  if can_edit then Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK");
+  if can_edit then
+    Util.hidden_input conf "m" (Adef.encoded @@ "MOD_" ^ mode ^ "_OK");
   if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
   if fname <> "" then Util.hidden_input conf "f" (Mutil.encode fname);
   if can_edit then
@@ -900,7 +889,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Templ.output_simple conf env "toolbar";
   Output.print_sstring conf {|</div><div class="row editor-container">|};
   Output.print_sstring conf
-    {|<div class="d-flex flex-column col-9"><textarea name="notes" id="notes_comments"
+    {|<div class="d-flex flex-column col-9"><textarea name="notes" rows="20" id="notes_comments"
   class="form-control insert-character-target"|};
   Output.print_sstring conf
     (if can_edit then ">" else " readonly=\"readonly\">");
@@ -913,7 +902,6 @@ let print_mod_view_page conf can_edit mode fname title env s =
       (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
     Output.print_sstring conf "</button>");
   Output.print_sstring conf "</div><div class=\"col mx-2 p-2\"";
-  Templ.output_simple conf env "toolbar";
   Output.print_sstring conf "</div></div>";
   Output.print_sstring conf "</div></form>";
   Hutil.trailer conf

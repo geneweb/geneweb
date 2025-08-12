@@ -3533,6 +3533,13 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
       p_auth && (not conf.no_note) && Driver.sou base (Driver.get_notes p) <> ""
+  | "has_wiznotes" ->
+      let wfile =
+        String.concat Filename.dir_sep
+          [ !GWPARAM.bpath conf.bname; "wiznotes"; conf.user ^ ".txt" ]
+      in
+      Printf.eprintf "Wfile: %s\n" wfile;
+      conf.wizard && Sys.file_exists wfile
   | "has_occupation" ->
       p_auth && Driver.sou base (Driver.get_occupation p) <> ""
   | "has_parents" -> Driver.get_parents p <> None
