@@ -198,6 +198,7 @@ let syntax_links conf wi s =
   loop 0 1 0 0
 
 let toc_list = [ "__NOTOC__"; "__TOC__"; "__SHORT_TOC__" ]
+let wiki_starters = [ '*'; '#'; ':'; ';'; '=' ]
 
 let lines_list_of_string s =
   let rec loop no_toc lines len i =
@@ -867,3 +868,6 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
         let sub_part = string_filter sub_part in
         print_ok conf wi edit_mode fname title_is_1st sub_part
   | None -> Hutil.incorrect_request conf
+
+let line_is_in_wiki_syntax s =
+  s <> "" && (List.mem s toc_list || List.mem s.[0] wiki_starters)
