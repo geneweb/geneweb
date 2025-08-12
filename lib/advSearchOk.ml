@@ -981,17 +981,17 @@ let exact_matching_surname_aliases ~surname =
 let prefix_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:is_subset_pfx
 
+let is_exact_search_by_name_key key =
+  List.mem key
+    [
+      "exact_first_name";
+      "exact_surname";
+      "exact_first_name_prefix";
+      "exact_surname_prefix";
+    ]
+
 let force_exact_search_by_name conf =
   let on = Mutil.encode "on" in
-  let is_exact_search_by_name_key key =
-    List.mem key
-      [
-        "exact_first_name";
-        "exact_surname";
-        "exact_first_name_prefix";
-        "exact_surname_prefix";
-      ]
-  in
   {
     conf with
     Config.env =
