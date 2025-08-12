@@ -108,7 +108,8 @@ let set_wizard_and_friend_traces conf =
       update_wf_trace conf fname
 
 let incr_counter f conf =
-  if conf.bname = "" then None
+  let bpath = !GWPARAM.bpath conf.bname in
+  if conf.bname = "" || not (Sys.file_exists (bpath ^ ".gwb")) then None
   else (
     ignore (Util.test_cnt_d conf : string);
     let lock_file = !GWPARAM.adm_file (conf.bname ^ ".lck") in
