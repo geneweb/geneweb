@@ -101,6 +101,7 @@ let bnotes = ref "merge"
 let shift = ref 0
 let files = ref []
 let kill_gwo = ref false
+let no_warn = ref false
 
 let speclist =
   [
@@ -129,6 +130,7 @@ let speclist =
     ( "-nopicture",
       Arg.Set Gwcomp.no_picture,
       " Do not create associative pictures" );
+    ("-nowarn", Arg.Set no_warn, " Do not show warnings during import");
     ( "-o",
       Arg.Set_string Gwcomp.out_file,
       "<file> Output database (default: <input file name>.gwb, a.gwb if not \
@@ -220,7 +222,7 @@ let main () =
     in
     Lock.control ~on_exn ~wait:false ~lock_file (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-        if Db1link.link next_family_fun bdir then (
+        if Db1link.link ~no_warn:!no_warn next_family_fun bdir then (
           if !kill_gwo then
             List.iter
               (fun (x, _separate, _bnotes, _shift) ->
