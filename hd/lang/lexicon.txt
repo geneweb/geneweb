@@ -4476,6 +4476,16 @@ de: fehlerhafte Großschreibung
 en: bad capitalization
 fr: capitalisation erronée
 
+    chk_data error misc typographic
+de: fehlerhfte Satzzeichen
+en: bad ponctuation
+fr: ponctuation erronée
+
+    chk_data error mixed scripts
+de: gemischte Alphabete
+en: mixed alphabets
+fr: alphabets mélangés
+
     chk_data error multiple spaces
 co: spazii multiplice
 de: mehrere Leerzeichen
@@ -4509,6 +4519,14 @@ fr: limité à <abbr title="Variable gwf chk_data_max_results">%d résultats</a
     chk_data max results
 en: maximum number of results
 fr: nombre de résultats maximum
+
+    chk_data mixed alphabet
+en: greek or cyrillique character
+fr: caractère grec ou cyrillique
+
+    chk_data ponctuation error
+en: punctuation error
+fr: erreur de ponctuation
 
     chk_data use database/cache
 en: use database/using <b>database</b> (very slow)/using <b>cached data</b> (very fast but may show entries that have been corrected or deleted)
