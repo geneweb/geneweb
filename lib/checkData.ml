@@ -25,6 +25,8 @@ type error_type =
   | BadCapitalization
   | MultipleSpaces
   | NonBreakingSpace
+  | MiscTypographicErrors
+  | MixedScripts
 
 type highlight_style = {
   make_class : string -> string;
@@ -48,6 +50,8 @@ let make_error_set = function
           BadCapitalization;
           MultipleSpaces;
           NonBreakingSpace;
+          MiscTypographicErrors;
+          MixedScripts;
         ]
   | lst -> ErrorSet.of_list lst
 
@@ -60,10 +64,41 @@ let split_words s =
    - Basic roman numerals: I, II, III, IV, V, etc.
    - French ordinals: Ier, Ire
    - English/German style: I., II., III., etc. *)
-let roman_re = lazy (Str.regexp "^[IVX]+[.]?$")
-let first_ordinal_re = lazy (Str.regexp "^I\\(ᵉʳ\\|ʳᵉ\\|er\\|re\\)$")
-let bad_cap_re = lazy (Str.regexp "[A-Z][A-Z][a-z]\\|[a-z][A-Z]")
-let nbsp_re = lazy (Str.regexp "\xC2\xA0\\|\xE2\x80\xAF")
+let roman_re =
+  lazy
+    (Re.compile
+       (Re.seq [ Re.bos; Re.rep1 (Re.set "IVX"); Re.opt (Re.char '.'); Re.eos ]))
+
+let first_ordinal_re =
+  lazy
+    (Re.compile
+       (Re.seq
+          [
+            Re.bos;
+            Re.char 'I';
+            Re.alt [ Re.str "ᵉʳ"; Re.str "ʳᵉ"; Re.str "er"; Re.str "re" ];
+            Re.eos;
+          ]))
+
+let bad_cap_re =
+  lazy
+    (Re.compile
+       (Re.alt
+          [
+            Re.seq [ Re.rg 'A' 'Z'; Re.rg 'A' 'Z'; Re.rg 'a' 'z' ];
+            Re.seq [ Re.rg 'a' 'z'; Re.rg 'A' 'Z' ];
+          ]))
+
+let nbsp_re =
+  lazy
+    (Re.compile
+       (Re.alt
+          [
+            Re.str "\xC2\xA0";
+            (* U+00A0 espace insécable *)
+            Re.str "\xE2\x80\xAF";
+            (* U+202F espace insécable fine *)
+          ]))
 
 let has_any_particle base s =
   let particle = Mutil.get_particle (Driver.base_particles base) s in
@@ -86,8 +121,7 @@ let has_any_particle base s =
 
 let is_roman_numeral s =
   try
-    Str.string_match (Lazy.force roman_re) s 0
-    || Str.string_match (Lazy.force first_ordinal_re) s 0
+    Re.execp (Lazy.force roman_re) s || Re.execp (Lazy.force first_ordinal_re) s
   with _ -> false
 
 (* Multiple Spaces functions *)
@@ -194,16 +228,12 @@ let has_non_breaking_space s =
   aux 0
 
 let find_non_breaking_space_positions s =
-  let positions = ref [] in
-  let rec find_all pos =
-    try
-      let pos = Str.search_forward (Lazy.force nbsp_re) s pos in
-      positions := pos :: !positions;
-      find_all (pos + 1)
-    with Not_found -> ()
-  in
-  find_all 0;
-  List.rev !positions
+  let re = Lazy.force nbsp_re in
+  Re.all re s
+  |> List.filter_map (fun grp ->
+         let pos = Re.Group.start grp 0 in
+         if has_roman_after_nbsp s pos then None else Some pos)
+  |> List.sort_uniq compare
 
 (* Detect if a word starts with Irish name prefixes Mac/Mc/Fitz *)
 let is_irish_prefix s =
@@ -230,10 +260,7 @@ let is_allowed_word s = is_roman_numeral s || is_irish_prefix s
 
 (* Bad capitalization functions *)
 let has_bad_capitalization_pattern s =
-  try
-    let _ = Str.search_forward (Lazy.force bad_cap_re) s 0 in
-    true
-  with Not_found -> false
+  try Re.execp (Lazy.force bad_cap_re) s with _ -> false
 
 (* Capitalization check function
    Examines each word for valid patterns for some books
@@ -443,6 +470,178 @@ let fix_invisible_chars s =
   in
   aux 0
 
+let simple_replacements =
+  [
+    (Re.str "--", "-");
+    (Re.str " )", ")");
+    (Re.str "( ", "(");
+    (Re.str "((", "(");
+    (Re.str "))", ")");
+    (Re.str " ,", ",");
+    (Re.str ",,", ",");
+    (Re.str " .", ".");
+    (Re.str "..", ".");
+    (Re.str "...", "…");
+    (Re.str "....", "…");
+    (Re.str "\"\"", "\"");
+    (Re.str "’’", "’");
+    (Re.str "`", "’");
+    (Re.str "´", "’");
+    (Re.str "‘", "’");
+    (Re.str "ʹ", "’");
+    (Re.str "ʻ", "’");
+  ]
+
+let detect_only_patterns =
+  [
+    ( Re.seq [ Re.char '('; Re.rep1 (Re.char ' '); Re.char ')' ],
+      "empty parenthesis" );
+  ]
+
+let char_before_parenthesis_pattern =
+  Re.seq [ Re.group (Re.set "A-Za-z0-9"); Re.char '(' ]
+
+let breton_trigram_pattern =
+  Re.seq [ Re.group (Re.set "cC"); Re.set "’'"; Re.group (Re.set "hH") ]
+
+let compiled_simple =
+  lazy
+    (List.map (fun (pat, repl) -> (Re.compile pat, repl)) simple_replacements)
+
+let compiled_detect =
+  lazy (List.map (fun (pat, msg) -> (Re.compile pat, msg)) detect_only_patterns)
+
+let compiled_complex =
+  lazy
+    [
+      Re.compile char_before_parenthesis_pattern;
+      Re.compile breton_trigram_pattern;
+    ]
+
+let misc_typo_re =
+  lazy
+    (Re.compile
+       (Re.alt
+          (List.map fst simple_replacements
+          @ List.map fst detect_only_patterns
+          @ [ char_before_parenthesis_pattern; breton_trigram_pattern ])))
+
+let has_misc_typographic_errors s =
+  try
+    ignore (Re.exec (Lazy.force misc_typo_re) s);
+    true
+  with Not_found -> false
+
+let find_misc_typographic_positions s =
+  let positions = ref [] in
+  let pos = ref 0 in
+  while !pos < String.length s do
+    try
+      let result = Re.exec ~pos:!pos (Lazy.force misc_typo_re) s in
+      let start_pos = Re.Group.start result 0 in
+      let end_pos = Re.Group.stop result 0 in
+      for i = start_pos to end_pos - 1 do
+        positions := i :: !positions
+      done;
+      pos := end_pos
+    with Not_found -> pos := String.length s
+  done;
+  List.sort_uniq compare !positions
+
+let fix_misc_typographic_errors s =
+  let s =
+    List.fold_left
+      (fun acc (re, repl) -> Re.replace_string re ~by:repl acc)
+      s
+      (Lazy.force compiled_simple)
+  in
+  let patterns = Lazy.force compiled_complex in
+  s
+  |> Re.replace (List.nth patterns 0) ~f:(fun groups ->
+         Re.Group.get groups 1 ^ " (")
+  |> Re.replace (List.nth patterns 1) ~f:(fun groups ->
+         let c = Re.Group.get groups 1 in
+         let h = Re.Group.get groups 2 in
+         c ^ "ʼ" ^ h)
+
+(* Détermine si un caractère est latin, grec ou cyrillique *)
+let script_class_of_uchar u =
+  match Uucp.Script.script u with
+  | `Latn -> Some `Latin
+  | `Grek -> Some `Greek
+  | `Cyrl -> Some `Cyrillic
+  | _ -> None
+
+(* Vérifie si un mot unique contient des scripts mélangés *)
+let has_mixed_scripts_in_word s =
+  let has_latin = ref false in
+  let has_greek = ref false in
+  let has_cyrillic = ref false in
+  let check_char () _ = function
+    | `Uchar u -> (
+        match script_class_of_uchar u with
+        | Some `Latin ->
+            has_latin := true;
+            ()
+        | Some `Greek ->
+            has_greek := true;
+            ()
+        | Some `Cyrillic ->
+            has_cyrillic := true;
+            ()
+        | _ -> ())
+    | `Malformed _ -> ()
+  in
+  Uutf.String.fold_utf_8 check_char () s;
+  !has_latin && (!has_greek || !has_cyrillic)
+
+let has_mixed_scripts s =
+  let words = split_words s in
+  List.exists has_mixed_scripts_in_word words
+
+(* Trouve les positions des caractères grecs et cyrilliques *)
+let find_mixed_scripts_positions s =
+  let positions = ref [] in
+  let len = String.length s in
+  let rec process_from pos =
+    if pos >= len then ()
+    else
+      let c = s.[pos] in
+      if c = ' ' || c = '\t' || c = '\n' || c = '\r' then
+        process_from (pos + 1)
+      else
+        let rec find_word_end p =
+          if p >= len then p
+          else
+            let c = s.[p] in
+            if c = ' ' || c = '\t' || c = '\n' || c = '\r' then p
+            else find_word_end (p + 1)
+        in
+        let word_end = find_word_end pos in
+        let word = String.sub s pos (word_end - pos) in
+        if has_mixed_scripts_in_word word then
+          let add_position char_idx byte_pos = function
+            | `Uchar u -> (
+                match script_class_of_uchar u with
+                | Some `Greek | Some `Cyrillic ->
+                    positions := (pos + byte_pos) :: !positions;
+                    char_idx + 1
+                | _ -> char_idx + 1)
+            | `Malformed _ -> char_idx + 1
+          in
+          ignore (Uutf.String.fold_utf_8 add_position 0 word);
+        process_from word_end
+  in
+  process_from 0;
+  List.sort_uniq compare !positions
+
+let _get_detect_only_message s =
+  try
+    List.find_map
+      (fun (re, msg) -> if Re.execp re s then Some msg else None)
+      (Lazy.force compiled_detect)
+  with Not_found -> None
+
 let data_to_dict_type data =
   match data with
   | "fn" -> Fnames
@@ -466,6 +665,8 @@ let find_error_positions error_type data base s =
       find_bad_capitalization_positions dict_type base s
   | MultipleSpaces -> find_multiple_spaces_positions s
   | NonBreakingSpace -> find_non_breaking_space_positions s
+  | MiscTypographicErrors -> find_misc_typographic_positions s
+  | MixedScripts -> find_mixed_scripts_positions s
 
 let fix_error error_type s =
   match error_type with
@@ -473,6 +674,8 @@ let fix_error error_type s =
   | BadCapitalization -> s
   | MultipleSpaces -> fix_multiple_spaces s
   | NonBreakingSpace -> s
+  | MiscTypographicErrors -> fix_misc_typographic_errors s
+  | MixedScripts -> s
 
 (* Define style and tooltip of error types *)
 let get_highlight_style error_type conf =
@@ -512,6 +715,20 @@ let get_highlight_style error_type conf =
       {
         make_class = (fun _ -> "bc");
         make_title = (fun ?code:_ ?name:_ _ -> None);
+      }
+  | MiscTypographicErrors ->
+      {
+        make_class = (fun _ -> "mt");
+        make_title =
+          (fun ?code:_ ?name:_ _ ->
+            Some (Util.transl conf "chk_data ponctuation error"));
+      }
+  | MixedScripts ->
+      {
+        make_class = (fun _ -> "mx");
+        make_title =
+          (fun ?code:_ ?name:_ _ ->
+            Some (Util.transl conf "chk_data mixed alphabet"));
       }
 
 (* Event accessors *)
@@ -575,9 +792,13 @@ let make_highlight_html s positions error_type conf =
 let first_word s =
   try
     let i = String.index s ' ' in
-    if i = String.length s then if i > 7 then String.sub s 0 7 else s
+    if i = String.length s then if i > 8 then String.sub s 0 8 else s
     else String.sub s 0 i
-  with Not_found -> if String.length s > 7 then String.sub s 0 7 else s
+  with Not_found -> if String.length s > 8 then String.sub s 0 8 else s
+
+let simple_prefix s =
+  let len = String.length s in
+  if len <= 8 then s else String.sub s 0 8
 
 let make_error_html conf base data istr entry error_type =
   let istr_ = Driver.Istr.to_string istr in
@@ -590,10 +811,10 @@ let make_error_html conf base data istr entry error_type =
   let s' =
     if data = "place" then
       let main_place = Place.without_suburb entry in
-      if String.length (first_word main_place) > 7 then
-        String.sub main_place 0 7
+      if String.length (first_word main_place) > 8 then
+        String.sub main_place 0 8
       else first_word main_place
-    else first_word entry_modified
+    else simple_prefix entry_modified
   in
   let s = (Mutil.encode s' :> string) in
   let s_ori = (Mutil.encode entry :> string) in
@@ -694,6 +915,8 @@ let analyze_string_errors dict_type base s =
   |> add_if (has_multiple_spaces s) MultipleSpaces
   |> add_if (has_invisible_chars s) InvisibleCharacters
   |> add_if (has_bad_capitalization dict_type base s) BadCapitalization
+  |> add_if (has_misc_typographic_errors s) MiscTypographicErrors
+  |> add_if (has_mixed_scripts s) MixedScripts
 
 let dict_to_cache_name dict_type =
   match dict_type with
@@ -809,6 +1032,8 @@ let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
            BadCapitalization;
            MultipleSpaces;
            NonBreakingSpace;
+           MiscTypographicErrors;
+           MixedScripts;
          ]
        else sel_err_types)
   in
@@ -841,7 +1066,10 @@ let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
                    add_error istr s BadCapitalization;
                  if has_multiple_spaces s then add_error istr s MultipleSpaces;
                  if has_non_breaking_space s then
-                   add_error istr s NonBreakingSpace))
+                   add_error istr s NonBreakingSpace;
+                 if has_misc_typographic_errors s then
+                   add_error istr s MiscTypographicErrors;
+                 if has_mixed_scripts s then add_error istr s MixedScripts))
            istrs)
        (Driver.ipers base)
    with Max_results_reached -> ());
