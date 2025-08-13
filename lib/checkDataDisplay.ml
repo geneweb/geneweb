@@ -147,6 +147,18 @@ module ErrorInfo = struct
         form_param = "e_nb";
         css_class = "nb";
       };
+      {
+        error_type = CheckData.MiscTypographicErrors;
+        transl_key = "chk_data error misc typographic";
+        form_param = "e_mt";
+        css_class = "mt";
+      };
+      {
+        error_type = CheckData.MixedScripts;
+        transl_key = "chk_data error mixed scripts";
+        form_param = "e_mx";
+        css_class = "mx";
+      };
     ]
 
   let find_by_type e = List.find (fun i -> i.error_type = e) all
@@ -198,7 +210,7 @@ let render_error_entry_fast conf base dict_param istr s error_type =
   let visibility = if visible then "" else " style=\"visibility:hidden\"" in
   Printf.sprintf
     {|    <div class="err" data-ori="%s">
-      <a href="%s" class="btn btn-primary" 
+      <a href="%s" class="btn btn-primary"
          title="%s"><i class="fa fa-book"></i></a>
       <button onclick="return false;">%s</button>
       <a href="%s" target="_blank" class="s2 btn btn-info"
@@ -336,7 +348,7 @@ let render_dict_checkboxes_two_columns conf selected_dicts =
         let checked = List.mem info.dict_type selected_dicts in
         Printf.bprintf buf
           {|<div class="form-check">
-              <input class="form-check-input" type="checkbox" 
+              <input class="form-check-input" type="checkbox"
                      name="%s" id="%s" value="1"%s>
               <label class="form-check-label" for="%s">
                 <i class="fa fa-%s fa-fw mr-1"></i>%s

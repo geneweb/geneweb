@@ -15,6 +15,8 @@ type error_type =
   | BadCapitalization
   | MultipleSpaces
   | NonBreakingSpace
+  | MiscTypographicErrors
+  | MixedScripts
 
 type checkdata_entry = Geneweb_db.Driver.istr * string
 

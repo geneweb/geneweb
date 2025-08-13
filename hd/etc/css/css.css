@@ -74,13 +74,18 @@
 }
 
 /* Check data - Caractères spéciaux */
-#cd .nbsp, #cd .nnbsp, #cd .ic, #cd .bc, #cd .zw, #cd .ms {
+#cd .nbsp, #cd .nnbsp, #cd .ic, #cd .bc, #cd .zw, #cd .ms, #cd .mt {
   background-color: #ffeb3b;
 }
 
-#cd .nbsp, #cd .nnbsp, #cd .ic, #cd .zw, #cd .ms {
+#cd .nbsp, #cd .nnbsp, #cd .ic, #cd .zw, #cd .ms, #cd .mt {
   border-bottom: 1px dashed #e65100;
   border-right: 1px dashed #e65100;
+}
+
+#cd .mx {
+  background-color: #ff9999;
+  border: 1px solid #cc0000;
 }
 
 #cd .nnbsp {
