@@ -46,7 +46,7 @@ COPY --from=builder /home/opam/geneweb/distribution /
 #                                              STAGE 3: Assemble Docker image
 ###############################################################################
 
-FROM debian:12-slim AS container
+FROM debian:13-slim AS container
 
 ENV GENEWEB_HOME=/usr/local/share/geneweb
 ENV GENEWEB_DATA_PATH=${GENEWEB_HOME}/share/data
