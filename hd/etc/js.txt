@@ -52,6 +52,25 @@
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
   %end;
 %end;
+%if;(e.m="CHK_DATA")
+<script>
+  function showOverlay() {
+    const overlay = document.querySelector('.loading-overlay');
+    if (overlay) {
+      overlay.classList.remove('hidden');
+    }
+  }
+  function hideOverlay() {
+    const overlay = document.querySelector('.loading-overlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    hideOverlay();
+  });
+</script>
+%end;
 %if;(not is_welcome and e.m!="MOD_DATA")
   %if;wizard;
     %if;(e.m="MOD_DATA_OK" and e.data!="")

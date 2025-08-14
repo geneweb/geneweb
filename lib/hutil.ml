@@ -136,8 +136,8 @@ module StaticParts = struct
   let meta_robots_index = "  <meta name=\"robots\" content=\"index,follow\">\n"
   let meta_robots_none = "  <meta name=\"robots\" content=\"none\">\n"
   let meta_robots robot = if robot then meta_robots_index else meta_robots_none
-  let container_normal = "<div class=\"container\">"
-  let container_fluid = "<div class=\"container-fluid\">"
+  let container_normal = "<div class=\"container\">\n"
+  let container_fluid = "<div class=\"container-fluid\">\n"
   let container fluid = if fluid then container_fluid else container_normal
   let h1_open_normal = "<h1>"
   let h1_open_error = "<h1 class=\"error\">"

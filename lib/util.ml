@@ -3406,15 +3406,15 @@ let print_loading_overlay conf ?custom_translation_key () =
   let title = Utf8.capitalize_fst (transl_nth conf translation_key 0) in
   let subtitle = Utf8.capitalize_fst (transl_nth conf translation_key 1) in
   Output.printf conf
-    {|  <div class="loading-overlay hidden">
-    <div class="text-center">
-      <div class="spinner-border text-light mb-3" role="status">
-        <span class="sr-only">Loading…</span>
-      </div>
-      <h4>%s</h4>
-      <p>%s</p>
+    {|<div class="loading-overlay hidden">
+  <div class="text-center">
+    <div class="spinner-border text-light mb-3" role="status">
+      <span class="sr-only">Loading…</span>
     </div>
+    <h4>%s</h4>
+    <p>%s</p>
   </div>
+</div>
 |}
     title subtitle
 
