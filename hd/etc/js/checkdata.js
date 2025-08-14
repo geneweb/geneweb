@@ -257,6 +257,14 @@ const CheckDataEditor = {
         boxes.forEach(cb => cb.checked = !allOn);
       });
     }
+
+    const validateSubmit = document.querySelector('[data-action="validate-submit"]');
+    if (validateSubmit && !validateSubmit.hasAttribute('data-initialized')) {
+      validateSubmit.setAttribute('data-initialized', 'true');
+      validateSubmit.addEventListener('click', e => {
+        showOverlay();
+      });
+    }
   },
 
   initMaxValidation() {
@@ -343,7 +351,7 @@ const CheckDataEditor = {
         
         s2.innerHTML = '<i class="fa fa-exclamation-triangle"></i>';
         s2.classList.remove('btn-info', 'btn-warning', 'btn-success');
-        s2.classList.add('btn-danger');
+        s2.classList.add('btn-ädanger');
         s2.title = result.message;
         
         setTimeout(() => {

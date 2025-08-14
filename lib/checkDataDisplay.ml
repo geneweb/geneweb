@@ -312,7 +312,7 @@ let render_missing_cache_warning conf missing_caches =
 let render_summary_message conf total_entries max_results =
   match total_entries with
   | 0 ->
-      Printf.sprintf {|<div class="alert alert-info mt-3">%s</div>|}
+      Printf.sprintf {|    <div class="alert alert-info mt-3">%s</div>|}
         (t conf "no match")
   | n ->
       let errors_msg = Util.ftransl conf "chk_data %d errors found" in
@@ -347,28 +347,28 @@ let render_dict_checkboxes_two_columns conf selected_dicts =
         in
         let checked = List.mem info.dict_type selected_dicts in
         Printf.bprintf buf
-          {|<div class="form-check">
-              <input class="form-check-input" type="checkbox"
-                     name="%s" id="%s" value="1"%s>
+          {|
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="%s" id="%s" value="1"%s>
               <label class="form-check-label" for="%s">
                 <i class="fa fa-%s fa-fw mr-1"></i>%s
               </label>
-            </div>
-|}
+            </div>|}
           info.form_param id
           (if checked then " checked" else "")
           id info.icon
           (tn conf info.transl_key 1))
       infos
   in
-  Buffer.add_string buf {|<div class="w-auto mr-4">
-|};
+  Buffer.add_string buf {|
+          <div class="w-auto mr-4">|};
   render_group left_col;
-  Buffer.add_string buf {|</div>
-<div class="w-auto">
-|};
+  Buffer.add_string buf {|
+          </div>
+          <div class="w-auto">|};
   render_group right_col;
-  Buffer.add_string buf {|</div>|};
+  Buffer.add_string buf {|
+          </div>|};
   Buffer.contents buf
 
 let render_error_checkboxes conf sel_err_types =
@@ -378,10 +378,11 @@ let render_error_checkboxes conf sel_err_types =
       let id = "err-" ^ info.css_class in
       let checked = List.mem info.error_type sel_err_types in
       Printf.bprintf buf
-        {|<div class="form-check form-check-inline">
-         <input class="form-check-input" type="checkbox" name="%s" id="%s" value="1"%s>
-         <label class="form-check-label" for="%s">%s</label>
-       </div>|}
+        {|
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="%s" id="%s" value="1"%s>
+              <label class="form-check-label" for="%s">%s</label>
+           </div>|}
         info.form_param id
         (if checked then " checked" else "")
         id
@@ -468,43 +469,40 @@ let print conf base =
   Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
       Util.print_loading_overlay conf ();
       Output.printf conf
-        {|<div class="container">
-  <form method="get" action="%s" class="mt-2" id="chk-data-form">
-    <input type="hidden" name="m" value="CHK_DATA">
-      <div class="d-flex justify-content-center mb-3">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">%s (%d)</h5>
-          </div>
-          <div class="card-body d-flex align-items-start flex-column">
-            <div class="d-flex flex-row mb-2">%s</div>
-            <div class="mt-auto align-self-center">
-              <button type="button" class="btn btn-sm btn-outline-primary"
-                      data-action="toggle-dicts">
-                <i class="fa fa-check-square mr-1"></i>%s
-              </button>
-            </div>
-          </div>
+        {|<form method="get" action="%s" class="mt-2" id="chk-data-form">
+  <input type="hidden" name="m" value="CHK_DATA">
+  <div class="d-flex justify-content-center mb-3">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">%s (%d)</h5>
+      </div>
+      <div class="card-body d-flex flex-column pt-4">
+        <div class="d-flex flex-row mb-2">%s
         </div>
-        <div class="card mx-3">
-          <div class="card-header">
-            <h5 class="mb-0">%s (%d)</h5>
-          </div>
-          <div class="card-body d-flex align-items-start flex-column">
-            %s
-            <div class="mt-auto align-self-center">
-              <button type="button" class="btn btn-sm btn-outline-primary"
-                      data-action="toggle-errors">
-                <i class="fa fa-check-square mr-1"></i>%s
-              </button>
-            </div>
-          </div>
+        <div class="mt-auto align-self-center">
+          <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle-dicts">
+            <i class="fa fa-check-square mr-1"></i>%s
+          </button>
         </div>
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0"><i class="fa fa-cog mr-1"></i>%s</h5>
-          </div>
-          <div class="card-body pb-1">|}
+      </div>
+    </div>
+    <div class="card mx-3">
+      <div class="card-header">
+        <h5 class="mb-0">%s (%d)</h5>
+      </div>
+      <div class="card-body d-flex flex-column">%s
+        <div class="mt-2 align-self-center">
+          <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle-errors">
+            <i class="fa fa-check-square mr-1"></i>%s
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fa fa-cog mr-1"></i>%s</h5>
+      </div>
+      <div class="card-body d-flex flex-column">|}
         (Util.commd conf :> string)
         (t conf "chk_data books to check")
         (List.length params.selected_dicts)
@@ -518,8 +516,7 @@ let print conf base =
         Output.printf conf
           {|
           <div class="form-check mb-1">
-            <input class="form-check-input" type="checkbox" name="nocache"
-                   id="use-db" value="1"%s>
+            <input class="form-check-input" type="checkbox" name="nocache" id="use-db" value="1"%s>
             <label class="form-check-label" for="use-db">
               <i class="fa fa-database mr-2"></i>%s
             </label>
@@ -528,11 +525,10 @@ let print conf base =
           (tn conf "chk_data use database/cache" 0);
       Output.printf conf
         {|
-       <div class="form-group mb-0">
-         <label for="max-results" class="mb-0">%s%s</label>
-         <input type="number" class="form-control" name="max" id="max-results"
-                min="1" step="1" value="%s"%s>%s
-       </div>|}
+          <div class="form-group mb-0">
+            <label for="max-results" class="mb-0">%s%s</label>
+            <input type="number" class="form-control" name="max" id="max-results" min="1" step="1" value="%s"%s>%s
+          </div>|}
         (t conf "chk_data max results")
         (t conf ":")
         (match params.form_max with Some n -> string_of_int n | None -> "")
@@ -549,30 +545,33 @@ let print conf base =
         | None -> "");
       Output.printf conf
         {|
-          <div class="text-center py-1 px-3 my-1">
-            <button type="submit" class="btn btn-primary w-100"
-                    data-action="validate-submit">
-              <i class="fa fa-search mr-2"></i>%s</button>
+          <div class="text-center py-1 px-3 mt-auto">
+            <button type="submit" class="btn btn-primary w-100" data-action="validate-submit">
+              <i class="fa fa-search mr-2"></i>%s
+            </button>
           </div>
         </div>
       </div>
-   </div>
+    </div>
   </form>|}
         (t conf "chk_data check data");
       if params.selected_dicts <> [] && params.sel_err_types <> [] then (
         let cache_index = if params.nocache_checked then 1 else 2 in
         Output.printf conf
-          {|<div class="alert alert-info mt-3">
-           <i class="fa fa-database mr-2"></i>%s
-         </div><div id="cd" data-ok-title="%s">|}
+          {|
+  <div class="alert alert-info mt-3">
+    <i class="fa fa-database mr-2"></i>%s
+  </div>
+  <div id="cd" data-ok-title="%s">
+|}
           (tn conf "chk_data use database/cache" cache_index)
           (tn conf "validate/delete" 0);
         if params.selected_dicts <> [] && params.sel_err_types <> [] then
           display_results conf base params.selected_dicts params.sel_err_types
             params.max_results);
-      Output.print_sstring conf "</div></div>";
-      (* Hutil.trailer_with_extra_js conf "checkdata.js|overlay";*)
-      (*Util.print_loading_overlay_js conf;*)
+      Output.print_sstring conf {|
+  </div>
+|};
       Hutil.trailer conf)
 
 type chk_result =
