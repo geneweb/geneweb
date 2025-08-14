@@ -617,7 +617,7 @@ let print_chk_ok_json conf base =
     | Success (before, after, cache_updated) ->
         let success_msg = t conf "modification successful" in
         let cache_msg =
-          if cache_updated then " (" ^ t conf "cache updated" ^ ")" else ""
+          if cache_updated then " (" ^ t ~c:0 conf "cache updated" ^ ")" else ""
         in
         let validated_msg = t conf "validated" in
         let json =
