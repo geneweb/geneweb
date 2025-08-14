@@ -1,255 +1,284 @@
-const CheckDataEditor = {
-  init() {
-    this.initToggleFunctions();
-    this.initErrorHandlers();
-    this.initMaxValidation();
-    this.preserveScrollPosition();
-  },
+const CheckData = (() => {
+  'use strict';
+  
+  // Cache DOM et constantes
+  const CACHE = new WeakMap();
+  const VALIDATING = new Set();
+  const RAF = requestAnimationFrame;
+  
+  // Cache des éléments fréquemment accédés
+  let _container = null;
+  let _okTitle = '';
+  
+  // Optimisation: pré-compiler les sélecteurs
+  const SELECTORS = {
+    err: '.err',
+    editContainer: '.edit-container',
+    s2: 'a.s2',
+    button: 'button:not([data-action])',
+    inputField: 'input, textarea',
+    disabled: 'disabled',
+    validated: 'validated',
+    editing: 'editing'
+  };
 
-  initErrorHandlers() {
-    const container = document.querySelector('#cd');
-    if (!container) return;
+  // Fonctions utilitaires optimisées (éviter confusion avec jQuery)
+  const q = (sel, ctx) => (ctx || document).querySelector(sel);
+  const qa = (sel, ctx) => Array.from((ctx || document).querySelectorAll(sel));
+  
+  const isVisible = el => {
+    if (!el) return false;
+    const s = getComputedStyle(el);
+    return s.visibility !== 'hidden' && s.display !== 'none';
+  };
 
-    container.addEventListener('click', e => {
-      const err = e.target.closest('.err');
-      if (err?.classList.contains('disabled') && 
-          !e.target.closest('a.s2')) {
-        e.preventDefault();
-        return;
-      }
+  // Gestion des champs d'édition
+  const createField = (isTextarea, value) => {
+    const f = document.createElement(isTextarea ? 'textarea' : 'input');
+    f.className = 'form-control';
+    f.value = value;
+    if (!isTextarea) f.type = 'text';
+    return f;
+  };
 
-      const btn = e.target.closest('button:not([data-action])');
-      if (btn?.closest('.err')) {
-        e.preventDefault();
-        this.showEditInput(btn);
-      }
-
-      const s2 = e.target.closest('a.s2');
-      if (s2?.closest('.err')) {
-        e.preventDefault();
-        this.validateEntry(s2, s2.closest('.err'));
-      }
-    });
-
-    container.addEventListener('keydown', e => {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        const activeEl = document.activeElement;
-        const err = activeEl?.closest('.err');
-        
-        if (err && !err.querySelector('.edit-container')) {
-          e.preventDefault();
-          this.navigate(err, e.key === 'ArrowUp');
-        }
-      }
-    });
-  },
-
-  showEditInput(btn) {
-    const err = btn.closest('.err');
-    if (err.classList.contains('editing')) return;
-    
-    const val = err.getAttribute('data-ori') || '';
-    const s2 = err.querySelector('.s2');
-    const wasHidden = s2?.style.visibility === 'hidden';
-    
-    if (s2 && !s2.hasAttribute('data-orig-hidden')) {
-      s2.setAttribute('data-orig-hidden', wasHidden ? 'true' : 'false');
-    }
-    
-    err.classList.add('editing');
-    
-    const isTextarea = val.length > 115 || val.includes('\n');
-    const field = document.createElement(isTextarea ? 'textarea' : 'input');
-    field.className = 'form-control';
-    field.value = val;
-    if (!isTextarea) field.type = 'text';
-    
-    const container = document.createElement('div');
-    container.className = 'edit-container';
-    container.originalButton = btn;
+  const createContainer = (btn, field) => {
+    const c = document.createElement('div');
+    c.className = SELECTORS.editContainer.slice(1);
     
     const orig = document.createElement('div');
     orig.className = 'original-content';
     orig.innerHTML = btn.innerHTML;
-    container.appendChild(orig);
-    container.appendChild(field);
+    
+    c.appendChild(orig);
+    c.appendChild(field);
+    CACHE.set(c, { btn });
+    
+    return c;
+  };
+
+  // Handlers optimisés
+  const handleClick = e => {
+    const t = e.target;
+    const err = t.closest(SELECTORS.err);
+    
+    if (err?.classList.contains(SELECTORS.disabled) && !t.closest(SELECTORS.s2)) {
+      e.preventDefault();
+      return;
+    }
+    
+    const btn = t.closest(SELECTORS.button);
+    if (btn?.closest(SELECTORS.err)) {
+      e.preventDefault();
+      showEditInput(btn);
+      return;
+    }
+    
+    const s2 = t.closest(SELECTORS.s2);
+    if (s2?.closest(SELECTORS.err)) {
+      e.preventDefault();
+      validateEntry(s2, s2.closest(SELECTORS.err));
+    }
+  };
+
+  const handleKeydown = e => {
+    const key = e.key;
+    if (key !== 'ArrowDown' && key !== 'ArrowUp') return;
+    
+    const err = document.activeElement?.closest(SELECTORS.err);
+    if (err && !$(SELECTORS.editContainer, err)) {
+      e.preventDefault();
+      navigate(err, key === 'ArrowUp');
+    }
+  };
+
+  const showEditInput = btn => {
+    const err = btn.closest(SELECTORS.err);
+    if (err.classList.contains(SELECTORS.editing)) return;
+    
+    const val = err.dataset.ori || '';
+    const s2 = q(SELECTORS.s2, err);
+    const hidden = s2?.style.visibility === 'hidden';
+    
+    if (s2 && !s2.dataset.origHidden) {
+      s2.dataset.origHidden = hidden ? '1' : '0';
+    }
+    
+    err.classList.add(SELECTORS.editing);
+    
+    const field = createField(val.length > 115 || val.includes('\n'), val);
+    const container = createContainer(btn, field);
     
     btn.replaceWith(container);
-    field.focus();
-    field.setSelectionRange(val.length, val.length);
     
-    if (isTextarea && window.autosize) autosize(field);
+    RAF(() => {
+      field.focus();
+      field.setSelectionRange(val.length, val.length);
+      if (field.tagName === 'TEXTAREA' && window.autosize) autosize(field);
+    });
     
-    this.setupField(field, container, s2, val, wasHidden);
-  },
+    setupField(field, container, s2, val, hidden);
+  };
 
-  setupField(field, container, s2, origVal, wasHidden) {
-    const isTextarea = field.tagName === 'TEXTAREA';
+  const setupField = (field, container, s2, origVal, wasHidden) => {
+    // Cache des attributs
+    const attrs = { href: s2?.href, title: s2?.title || '' };
+    let stored = false;
     
-    field.addEventListener('input', () => {
+    // Input handler optimisé
+    const handleInput = () => {
       if (!s2) return;
+      
       const newVal = field.value.trim();
       const changed = newVal !== origVal && newVal !== '';
       
-      if (!s2.hasAttribute('data-orig-href')) {
-        s2.setAttribute('data-orig-href', s2.href);
-        s2.setAttribute('data-orig-title', s2.title || '');
+      if (!stored) {
+        s2.dataset.origHref = attrs.href;
+        s2.dataset.origTitle = attrs.title;
+        stored = true;
       }
       
-      if (changed) {
-        const href = s2.getAttribute('data-orig-href');
-        s2.href = href.includes('&s2=') 
-          ? href.replace(/(&s2=)[^&]*/, `$1${encodeURIComponent(newVal)}`)
-          : href + `&s2=${encodeURIComponent(newVal)}`;
-        s2.classList.remove('btn-success', 'btn-info');
-        s2.classList.add('btn-warning');
-        s2.style.visibility = 'visible';
-        s2.title = document.querySelector('#cd')?.getAttribute('data-ok-title') || '';
-      } else {
-        s2.href = s2.getAttribute('data-orig-href');
-        s2.classList.remove('btn-warning', 'btn-info');
-        s2.classList.add('btn-success');
-        s2.style.visibility = wasHidden ? 'hidden' : 'visible';
-        s2.title = s2.getAttribute('data-orig-title');
-      }
-    });
+      RAF(() => {
+        if (changed) {
+          const h = s2.dataset.origHref || attrs.href;
+          s2.href = h.includes('&s2=') 
+            ? h.replace(/(&s2=)[^&]*/, `$1${encodeURIComponent(newVal)}`)
+            : `${h}&s2=${encodeURIComponent(newVal)}`;
+          s2.className = 's2 btn btn-warning';
+          s2.style.visibility = 'visible';
+          s2.title = _okTitle;
+        } else {
+          s2.href = attrs.href;
+          s2.className = 's2 btn btn-success';
+          s2.style.visibility = wasHidden ? 'hidden' : 'visible';
+          s2.title = attrs.title;
+        }
+      });
+    };
     
-    field.addEventListener('keydown', e => {
-      const err = container.closest('.err');
+    // Keyboard handler optimisé
+    const handleKey = e => {
+      const key = e.key;
+      const err = container.closest(SELECTORS.err);
       
-      if (e.key === 'Enter') {
+      if (key === 'Enter') {
         e.preventDefault();
         if (s2?.style.visibility !== 'hidden') {
           s2.focus();
-          const err = container.closest('.err');
-          this.validateEntry(s2, err);
+          validateEntry(s2, err);
         }
-      }
-
-      else if (e.key === 'Escape') {
+      } else if (key === 'Escape') {
         e.preventDefault();
-        this.cancelEdit(container, s2, wasHidden);
-      }
-      else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        cancelEdit(container, s2, wasHidden);
+      } else if (key === 'ArrowDown' || key === 'ArrowUp') {
         e.preventDefault();
-        this.navigate(err, e.key === 'ArrowUp');
+        navigate(err, key === 'ArrowUp');
       }
-    });
+    };
     
-    field.addEventListener('blur', e => {
+    // Blur handler
+    const handleBlur = e => {
       if (e.relatedTarget === s2) return;
       setTimeout(() => {
-        if (document.activeElement !== field && 
-            document.activeElement !== s2) {
-          this.cancelEdit(container, s2, wasHidden);
+        if (document.activeElement !== field && document.activeElement !== s2) {
+          cancelEdit(container, s2, wasHidden);
         }
       }, 200);
-    });
-  },
+    };
+    
+    field.addEventListener('input', handleInput);
+    field.addEventListener('keydown', handleKey);
+    field.addEventListener('blur', handleBlur);
+  };
 
-  cancelEdit(container, s2, wasHidden) {
-    const err = container?.closest('.err');
+  const cancelEdit = (container, s2, wasHidden) => {
+    const err = container?.closest(SELECTORS.err);
     if (!err) return;
     
-    err.classList.remove('editing');
-    const origBtn = container.originalButton;
-    if (origBtn) {
-      container.replaceWith(origBtn.cloneNode(true));
+    err.classList.remove(SELECTORS.editing);
+    
+    const cache = CACHE.get(container);
+    if (cache?.btn && container.parentNode) {
+      try {
+        container.replaceWith(cache.btn.cloneNode(true));
+      } catch {}
     }
     
-    if (s2) {
-      if (!s2.classList.contains('btn-info')) {
-        s2.classList.remove('btn-warning');
-        s2.classList.add('btn-success');
-      }
-      if (s2.hasAttribute('data-orig-href')) {
-        s2.href = s2.getAttribute('data-orig-href');
-        s2.title = s2.getAttribute('data-orig-title');
+    if (s2 && !s2.classList.contains('btn-info')) {
+      s2.className = 's2 btn btn-success';
+      if (s2.dataset.origHref) {
+        s2.href = s2.dataset.origHref;
+        s2.title = s2.dataset.origTitle || '';
       }
     }
-  },
+  };
 
-  navigate(current, goUp = false) {
+  const navigate = (current, goUp = false) => {
     if (!current) return;
     
-    if (!current.classList.contains('validated')) {
-      const container = current.querySelector('.edit-container');
-      if (container) {
-        const s2 = current.querySelector('.s2');
-        const wasHidden = s2?.getAttribute('data-orig-hidden') === 'true';
-        this.cancelEdit(container, s2, wasHidden);
+    if (!current.classList.contains(SELECTORS.validated)) {
+      const c = q(SELECTORS.editContainer, current);
+      if (c) {
+        const s2 = q(SELECTORS.s2, current);
+        cancelEdit(c, s2, s2?.dataset.origHidden === '1');
       }
     }
     
-    const allErrors = Array.from(document.querySelectorAll('.err'));
-    const currentIdx = allErrors.indexOf(current);
+    const all = qa(SELECTORS.err);
+    const idx = all.indexOf(current);
+    const step = goUp ? -1 : 1;
     
-    let next = null;
-    const direction = goUp ? -1 : 1;
-    for (let i = currentIdx + direction; 
-         goUp ? i >= 0 : i < allErrors.length; 
-         i += direction) {
-      if (!allErrors[i].classList.contains('disabled')) {
-        next = allErrors[i];
+    let next;
+    for (let i = idx + step; goUp ? i >= 0 : i < all.length; i += step) {
+      if (!all[i].classList.contains(SELECTORS.disabled)) {
+        next = all[i];
         break;
       }
     }
     
     if (!next) return;
     
-    const s2 = next.querySelector('a.s2');
-    const isAutoFix = s2?.classList.contains('btn-info');
+    const s2 = q(SELECTORS.s2, next);
+    const auto = s2?.classList.contains('btn-info');
     
-    if (isAutoFix && this.isVisible(s2)) {
-      requestAnimationFrame(() => {
+    RAF(() => {
+      if (auto && isVisible(s2)) {
         s2.focus();
         s2.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
-    } else {
-      const btn = next.querySelector('button:not([data-action])');
-      if (btn) {
-        requestAnimationFrame(() => {
+      } else {
+        const btn = q(SELECTORS.button, next);
+        if (btn) {
           btn.click();
           btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+        }
       }
-    }
-  },
+    });
+  };
 
-  _validating: new Set(),
-
-  async validateEntry(s2, errElement) {
-    if (!s2 || !errElement) return;
+  const validateEntry = async (s2, errEl) => {
+    if (!s2 || !errEl) return;
     
     const key = s2.href;
-    if (this._validating.has(key)) return;
-    this._validating.add(key);
+    if (VALIDATING.has(key)) return;
+    VALIDATING.add(key);
     
-    const originalContent = s2.innerHTML;
+    const orig = s2.innerHTML;
     s2.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-    s2.classList.add('btn-info');
-    s2.classList.remove('btn-warning', 'btn-success', 'btn-danger');
+    s2.className = 's2 btn btn-info';
     
-    // Récupérer la valeur S2 depuis l'input s'il existe
-    let s2Value = null;
-    const container = errElement.querySelector('.edit-container');
-    if (container) {
-      const field = container.querySelector('input, textarea');
-      if (field) {
-        s2Value = field.value.trim();
-      }
+    let val = null;
+    const c = q(SELECTORS.editContainer, errEl);
+    if (c) {
+      const f = q(SELECTORS.inputField, c);
+      if (f) val = f.value.trim();
     }
     
-    // Si pas d'input, extraire S2 de l'URL
-    if (!s2Value) {
-      const urlParams = new URLSearchParams(s2.href.split('?')[1]);
-      s2Value = urlParams.get('s2');
+    if (!val) {
+      const p = new URLSearchParams(s2.href.split('?')[1]);
+      val = p.get('s2');
     }
     
     try {
-      const ajaxUrl = s2.href + '&ajax';
-      
-      const response = await fetch(ajaxUrl, {
+      const r = await fetch(`${s2.href}&ajax`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -257,202 +286,174 @@ const CheckDataEditor = {
         }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
       
-      const result = await response.json();
+      const res = await r.json();
       
-      if (result.success) {
-        this.showNotification('success', `✓ ${result.message}`);
-        
-        const finalValue = result.after || s2Value;
-        
-        this.completeValidation(errElement, s2, finalValue);
-        
-        setTimeout(() => {
-          this.navigate(errElement, false);
-        }, 300);
-        
+      if (res.success) {
+        notify('success', `✓ ${res.message}`);
+        completeValidation(errEl, s2, res.after || val);
+        setTimeout(() => navigate(errEl), 300);
       } else {
-        this.showNotification('error', `✗ ${result.message}`);
-        
+        notify('error', `✗ ${res.message}`);
         s2.innerHTML = '<i class="fa fa-exclamation-triangle"></i>';
-        s2.classList.remove('btn-info', 'btn-warning', 'btn-success');
-        s2.classList.add('btn-danger');
-        s2.title = result.message;
+        s2.className = 's2 btn btn-danger';
+        s2.title = res.message;
         
         setTimeout(() => {
-          s2.innerHTML = originalContent;
-          s2.classList.remove('btn-danger');
-          s2.classList.add('btn-warning');
-          s2.title = '';
+          s2.innerHTML = orig;
+          s2.className = 's2 btn btn-warning';
         }, 2000);
       }
-      
-    } catch (error) {
-      console.error('Erreur AJAX:', error);
-      
-      s2.innerHTML = originalContent;
-      s2.classList.remove('btn-info', 'btn-success', 'btn-danger');
-      s2.classList.add('btn-warning');
-      
+    } catch (e) {
+      console.error('AJAX error:', e);
+      s2.innerHTML = orig;
+      s2.className = 's2 btn btn-warning';
       window.open(s2.href, '_blank');
-      
     } finally {
-      this._validating.delete(key);
+      VALIDATING.delete(key);
     }
-  },
+  };
 
-  completeValidation(errElement, s2, correctedValue) {
-    s2.innerHTML = '<i class="fa fa-spell-check"></i>';
-    s2.classList.remove('btn-info', 'btn-warning', 'btn-danger');
-    s2.classList.add('btn-success');
-    s2.style.pointerEvents = 'none';
-    s2.style.visibility = 'visible';
-    
-    let container = errElement.querySelector('.edit-container');
-    const btn = errElement.querySelector('button:not([data-action])');
-    
-    if (container) {
-      const field = container.querySelector('input, textarea');
-      if (field && correctedValue) {
-        const s2Text = document.createElement('div');
-        s2Text.className = 'text-muted';
-        s2Text.textContent = correctedValue;
-        field.replaceWith(s2Text);
+  const completeValidation = (errEl, s2, val) => {
+    RAF(() => {
+      s2.innerHTML = '<i class="fa fa-spell-check"></i>';
+      s2.className = 's2 btn btn-success';
+      s2.style.pointerEvents = 'none';
+      s2.style.visibility = 'visible';
+      
+      let c = q(SELECTORS.editContainer, errEl);
+      const btn = q(SELECTORS.button, errEl);
+      
+      if (c) {
+        const f = q(SELECTORS.inputField, c);
+        if (f && val) {
+          const txt = document.createElement('div');
+          txt.className = 'text-muted';
+          txt.textContent = val;
+          f.replaceWith(txt);
+        }
+      } else if (btn && val) {
+        c = document.createElement('div');
+        c.className = SELECTORS.editContainer.slice(1);
+        
+        const orig = document.createElement('div');
+        orig.className = 'original-content';
+        orig.innerHTML = btn.innerHTML;
+        c.appendChild(orig);
+        
+        const txt = document.createElement('div');
+        txt.className = 'text-muted';
+        txt.textContent = val;
+        c.appendChild(txt);
+        
+        btn.replaceWith(c);
       }
-    } else if (btn && correctedValue) {
-      container = document.createElement('div');
-      container.className = 'edit-container';
       
-      const orig = document.createElement('div');
-      orig.className = 'original-content';
-      orig.innerHTML = btn.innerHTML;
-      container.appendChild(orig);
-      
-      const s2Text = document.createElement('div');
-      s2Text.className = 'text-muted';
-      s2Text.textContent = correctedValue;
-      container.appendChild(s2Text);
-      
-      btn.replaceWith(container);
-    }
-    
-    errElement.classList.add('disabled', 'validated');
-    errElement.classList.remove('editing');
-  },
+      errEl.classList.add(SELECTORS.disabled, SELECTORS.validated);
+      errEl.classList.remove(SELECTORS.editing);
+    });
+  };
 
-  showNotification(type, message, duration = 4000) {
-    document.querySelectorAll('.ajax-notification')
-      .forEach(n => n.remove());
+  const notify = (type, msg, duration = 4000) => {
+    qa('.ajax-notification').forEach(n => n.remove());
     
-    const notification = document.createElement('div');
-    const isSuccess = type === 'success';
-    notification.className = 
-      `alert alert-${isSuccess ? 'success' : 'danger'} ajax-notification`;
-    notification.style.cssText = `
-      position: fixed; top: 20px; right: 20px; z-index: 9999;
-      min-width: 300px; animation: slideInRight 0.3s ease-out;`;
-    
-    notification.innerHTML = `
+    const n = document.createElement('div');
+    n.className = `alert alert-${type === 'success' ? 'success' : 'danger'} ajax-notification`;
+    n.innerHTML = `
       <div class="d-flex align-items-center">
-        <span class="flex-grow-1">${message}</span>
+        <span class="flex-grow-1">${msg}</span>
         <button type="button" class="close ml-2">&times;</button>
       </div>`;
     
     const remove = () => {
-      notification.style.animation = 'slideOutRight 0.3s ease-in';
-      notification.addEventListener('animationend', () => 
-        notification.remove());
+      n.classList.add('removing');
+      n.addEventListener('animationend', () => n.remove(), { once: true });
     };
     
-    const timeout = setTimeout(remove, duration);
-    notification.querySelector('.close').onclick = () => {
-      clearTimeout(timeout);
+    const t = setTimeout(remove, duration);
+    q('.close', n).onclick = () => {
+      clearTimeout(t);
       remove();
     };
     
-    document.body.appendChild(notification);
-  },
+    document.body.appendChild(n);
+  };
 
-  isVisible(el) {
-    if (!el) return false;
-    const style = getComputedStyle(el);
-    return style.visibility !== 'hidden' && style.display !== 'none';
-  },
-
-  initToggleFunctions() {
-    const toggleDicts = document.querySelector('[data-action="toggle-dicts"]');
-    if (toggleDicts && !toggleDicts.hasAttribute('data-initialized')) {
-      toggleDicts.setAttribute('data-initialized', 'true');
-      toggleDicts.addEventListener('click', e => {
-        e.preventDefault();
-        const boxes = document.querySelectorAll('[name^="d_"]');
-        const allOn = Array.from(boxes).every(cb => cb.checked);
-        boxes.forEach(cb => cb.checked = !allOn);
-      });
-    }
-
-    const toggleErrors = document.querySelector('[data-action="toggle-errors"]');
-    if (toggleErrors && !toggleErrors.hasAttribute('data-initialized')) {
-      toggleErrors.setAttribute('data-initialized', 'true');
-      toggleErrors.addEventListener('click', e => {
-        e.preventDefault();
-        const boxes = document.querySelectorAll('[name^="e_"]');
-        const allOn = Array.from(boxes).every(cb => cb.checked);
-        boxes.forEach(cb => cb.checked = !allOn);
-      });
-    }
-
-    const validateSubmit = document.querySelector('[data-action="validate-submit"]');
-    if (validateSubmit && !validateSubmit.hasAttribute('data-initialized')) {
-      validateSubmit.setAttribute('data-initialized', 'true');
-      validateSubmit.addEventListener('click', e => {
-        showOverlay();
-      });
-    }
-  },
-
-  initMaxValidation() {
-    const max = document.querySelector('input[name="max"]');
-    if (!max) return;
+  // Fonctions publiques
+  return {
+    init() {
+      // Initialiser les fonctions qui doivent marcher même sans résultats
+      this.initToggles();
+      this.initMaxValidation();
+      this.preserveScroll();
+      
+      // Initialiser le container et les handlers seulement s'il existe
+      _container = q('#cd');
+      if (!_container) return;
+      
+      _okTitle = _container.dataset.okTitle || '';
+      
+      // Event delegation pour les résultats
+      _container.addEventListener('click', handleClick, { passive: false });
+      _container.addEventListener('keydown', handleKeydown, { passive: false });
+    },
     
-    const limit = parseInt(max.getAttribute('max') || '150');
-    max.type = 'number';
-    max.min = '1';
-    max.max = limit.toString();
+    initToggles() {
+      const setupToggle = (action, prefix) => {
+        const btn = q(`[data-action="${action}"]`);
+        if (btn && !btn.dataset.init) {
+          btn.dataset.init = '1';
+          btn.addEventListener('click', e => {
+            e.preventDefault();
+            const boxes = qa(`[name^="${prefix}"]`);
+            const all = boxes.every(b => b.checked);
+            boxes.forEach(b => b.checked = !all);
+          });
+        }
+      };
+      
+      setupToggle('toggle-dicts', 'd_');
+      setupToggle('toggle-errors', 'e_');
+      
+      const submit = q('[data-action="validate-submit"]');
+      if (submit && !submit.dataset.init) {
+        submit.dataset.init = '1';
+        submit.addEventListener('click', () => {
+          if (typeof showOverlay === 'function') showOverlay();
+        });
+      }
+    },
     
-    max.addEventListener('input', e => {
-      const val = parseInt(e.target.value);
-      e.target.setCustomValidity(
-        val > limit ? `Limité à ${limit} résultats` : ''
-      );
-      e.target.reportValidity();
-    });
-  },
-
-  preserveScrollPosition() {
-    window.addEventListener('beforeunload', () => {
-      sessionStorage.setItem('checkDataScroll', window.scrollY);
-    });
-    
-    const saved = sessionStorage.getItem('checkDataScroll');
-    if (saved) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(saved));
-        sessionStorage.removeItem('checkDataScroll');
+    initMaxValidation() {
+      const max = q('input[name="max"]');
+      if (!max) return;
+      
+      const limit = max.getAttribute('max');
+      if (!limit) return;
+      
+      max.type = 'number';
+      max.min = '1';
+      max.addEventListener('input', e => {
+        const v = parseInt(e.target.value);
+        const l = parseInt(limit);
+        e.target.setCustomValidity(v > l ? `Limité à ${l} résultats` : '');
+        e.target.reportValidity();
       });
+    },
+    
+    preserveScroll() {
+      window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('checkDataScroll', window.scrollY);
+      });
+      
+      const saved = sessionStorage.getItem('checkDataScroll');
+      if (saved) {
+        RAF(() => {
+          window.scrollTo(0, parseInt(saved));
+          sessionStorage.removeItem('checkDataScroll');
+        });
+      }
     }
-  }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof CheckDataEditor !== 'undefined' && CheckDataEditor.init) {
-    if (document.readyState === 'complete') {
-      CheckDataEditor.init();
-    } else {
-      window.addEventListener('load', () => CheckDataEditor.init());
-    }
-  }
-});
+  };
+})();

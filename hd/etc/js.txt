@@ -45,7 +45,7 @@
     <script src="%etc_prefix;js/jquery.line.js"></script>
   %end;
   %if;(e.m="CHK_DATA")
-    <script src="%etc_prefix;js/checkdata.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.js%end;"></script>
+    <script src="%etc_prefix;js/checkdata.min.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.min.js%end;"></script>
   %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
   %if;("IND" in e.m or "FAM" in e.m or "MOD_NOTES" in e.m)
@@ -677,11 +677,11 @@ document.addEventListener('DOMContentLoaded', () => {
   setupAutofocusInput();
 %end;
 %if;(e.m="CHK_DATA")
-  if (typeof CheckDataEditor !== 'undefined' && CheckDataEditor.init) {
+  if (typeof CheckData !== 'undefined' && CheckData.init) {
     if (document.readyState === 'complete') {
-      CheckDataEditor.init();
+      CheckData.init();
     } else {
-      window.addEventListener('load', () => CheckDataEditor.init());
+      window.addEventListener('load', () => CheckData.init());
     }
   }
 %end;
