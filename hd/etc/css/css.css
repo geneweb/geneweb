@@ -66,19 +66,19 @@
   word-wrap: break-word;
 }
 
-/* Check data */
-/* Check data - Base */
+/*  Check data  */
 #cd span {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-/* Check data - Caractères spéciaux */
-#cd .nbsp, #cd .nnbsp, #cd .ic, #cd .bc, #cd .zw, #cd .ms, #cd .mt {
-  background-color: #ffeb3b;
+#cd .card-body h4 {
+  margin-top: 12px;
 }
 
-#cd .nbsp, #cd .nnbsp, #cd .ic, #cd .zw, #cd .ms, #cd .mt {
+#cd .nbsp, #cd .nnbsp, #cd .ic,
+#cd .bc, #cd .zw, #cd .ms, #cd .mt {
+  background-color: #ffeb3b;
   border-bottom: 1px dashed #e65100;
   border-right: 1px dashed #e65100;
 }
@@ -88,27 +88,23 @@
   border: 1px solid #cc0000;
 }
 
-#cd .nnbsp {
-  border: 1px dashed #e65100;
-}
-
 #cd .zw {
   display: inline-block;
   min-width: 0.5em;
   max-height: 1.4em;
 }
 
-/* Check data - Erreurs */
 #cd .err {
   display: flex;
   align-items: center;
   padding: 0.5rem;
   border: 1px solid #00000020;
   background-color: #fff;
+  box-sizing: border-box;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  box-sizing: border-box;
   transition: opacity 0.3s ease, transform 0.1s ease;
+  position: relative;
 }
 
 #cd .err:focus-within {
@@ -120,92 +116,40 @@
   background-color: #f0f8ff;
 }
 
-#cd .err.editing .edit-container {
-  flex: 1;
-  min-width: 0;
-}
-
 #cd .err.disabled {
   pointer-events: none;
   opacity: 0.5;
   user-select: none;
 }
 
-/* Check data - Boutons */
-#cd button {
-  flex: 1;
-  margin: 0 0.5rem;
-  padding: 0.75rem 1rem;
-  border: none;
-  background: none;
-  text-align: left;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-#cd button:hover {
-  background-color: rgba(0,123,255,.1);
-  transition: background-color 0.15s ease-in-out;
-}
-
-#cd .err .btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-}
-
-#cd a .btn-primary {
-  align-self: flex-center;
-}
-
-#cd a .s2 {
-  align-self: flex-end !important;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-#cd .s2:focus,
-#cd button:focus {
-  outline: 2px solid #007bff;
-}
-
-#cd .err:has(.s2:focus) {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-#cd .err.disabled button,
-#cd .err.disabled a {
-  cursor: not-allowed;
-}
-
-#cd .err.disabled .s2 {
+#cd .err.validated {
+  opacity: 0.8;
+  background-color: #f8f9fa;
   transition: all 0.3s ease;
 }
 
-#cd .err.disabled .s2.btn-success {
-  opacity: 1 !important;
-  pointer-events: none;
-  cursor: default;
-  background-color: #28a745;
-  border-color: #28a745;
+#cd .err.critical {
+  animation: pulse 2s infinite;
 }
 
-#cd .err.disabled .s2.btn-success:hover {
-  background-color: #28a745;
-  border-color: #28a745;
+#cd .err.validating {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
 }
-
 
 #cd .edit-container {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.5rem;
   position: relative;
 }
 
 #cd .edit-container .form-control {
   flex: 1;
   margin-top: 0;
+  font-size: 1rem;
 }
 
 #cd .original-content {
@@ -216,8 +160,6 @@
   margin-bottom: 0.25rem;
   padding: 0.375rem 0.75rem;
   background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 0.25rem;
   font-size: 1rem;
   opacity: 0.8;
 }
@@ -231,31 +173,89 @@
   min-height: 2.5rem;
 }
 
-#cd .card-body h4 {
-  margin-top: 12px;
+#cd .edit-container .text-muted {
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  color: #6c757d;
 }
 
-/* Animations pour les notifications AJAX */
+#cd button {
+  flex: 1;
+  margin: 0 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  text-align: left;
+  word-break: break-word;
+}
+
+#cd button:hover {
+  background-color: rgba(0, 123, 255, .1);
+  transition: background-color 0.15s ease-in-out;
+}
+
+#cd .err .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+}
+
+#cd .s2 {
+  transition: all 0.2s ease;
+}
+
+#cd .s2:focus,
+#cd button:focus {
+  outline: 2px solid #007bff;
+}
+
+#cd .err:has(.s2:focus) {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#cd .err.disabled .s2, #cd .err.validated .s2 {
+  opacity: 1 !important;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+#cd .s2:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+#cd .err.validated .s2 .fa-spell-check {
+  animation: checkPulse 0.5s ease;
+}
+
+.ajax-notification {
+  font-size: 0.9em;
+  font-weight: 500;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ajax-notification .close {
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ajax-notification .close:hover {
+  opacity: 1;
+}
+
 @keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes slideOutRight {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(100%); opacity: 0; }
 }
 
 @keyframes pulse {
@@ -263,45 +263,11 @@
   50% { opacity: 0.6; }
 }
 
-.err.critical {
-  animation: pulse 2s infinite;
-}
-
-/* Style pour les erreurs en cours de validation */
-.err.validating {
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-/* Style pour les erreurs validées */
-.err.validated {
-  opacity: 0.5;
-  background-color: #f8f9fa;
-  transition: all 0.3s ease;
-}
-
-.err .s2 {
-  transition: all 0.2s ease;
-}
-
-.err .s2:active {
-  transform: scale(0.95);
-}
-
-.err.validated .s2.btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
-  pointer-events: none;
-}
-
-.err.validated .s2.btn-success .fa-spell-check {
-  animation: checkPulse 0.5s ease;
-}
-
 @keyframes checkPulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.2); }
 }
+
 
 /* Style pour le bouton pendant le chargement */
 .btn.loading {
@@ -326,7 +292,6 @@
 .ajax-notification .close:hover {
   opacity: 1;
 }
-
 
 
 /* Toolbar and characters panel */
