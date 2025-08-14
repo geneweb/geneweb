@@ -202,39 +202,6 @@ let person_selected_with_redirect conf base p =
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
-let very_unknown conf _ =
-  match (p_getenv conf.env "n", p_getenv conf.env "p") with
-  | Some sname, Some fname ->
-      let title _ =
-        transl conf "not found" |> Utf8.capitalize_fst
-        |> Output.print_sstring conf;
-        Output.print_sstring conf (transl conf ":");
-        Output.print_sstring conf {| "|};
-        Output.print_string conf (Util.escape_html fname);
-        Output.print_sstring conf {| |};
-        Output.print_string conf (Util.escape_html sname);
-        Output.print_sstring conf {|"|}
-      in
-      Output.status conf Def.Not_Found;
-      Hutil.header ~error:true conf title;
-      Hutil.trailer conf
-  | _ -> (
-      match p_getenv conf.env "i" with
-      | Some i ->
-          let title _ =
-            Output.print_sstring conf "<kbd>";
-            Output.print_string conf (Util.escape_html i);
-            Output.print_sstring conf "</kbd>";
-            Output.print_sstring conf (transl conf ":");
-            Output.print_sstring conf " ";
-            transl conf "not found" |> Utf8.capitalize_fst
-            |> Output.print_sstring conf
-          in
-          Output.status conf Def.Not_Found;
-          Hutil.header ~error:true conf title;
-          Hutil.trailer conf
-      | None -> Hutil.incorrect_request conf ~comment:"Missing p=, n= and i=")
-
 (* Print Not found page *)
 let unknown conf n =
   let title _ =

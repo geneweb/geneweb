@@ -454,7 +454,16 @@ function initializeWelcomeSearchFunctionality() {
     return form && Array.from(form.querySelectorAll('input[type="search"]'))
                       .some(input => input.value.trim() !== '');
   }
-
+  function closeAlertsAndCleanURL() {
+    $('.alert').alert('close');
+    const url = new URL(window.location.href);
+    const bParam = url.searchParams.get('b');
+    url.search = '';
+    if (bParam !== null) {
+      url.searchParams.set('b', bParam); // on remet b=
+    }
+    window.history.replaceState({}, '', url);
+  }
   function getTooltip() {
     if (hasInput(searchForms.main)) {
       return '[*search/case sensitive]0 [person/persons]0';
@@ -475,6 +484,9 @@ function initializeWelcomeSearchFunctionality() {
 
     form.querySelectorAll('input[type="search"]').forEach(input => {
       input.addEventListener('input', () => {
+        if (hasInput(form)) {
+          closeAlertsAndCleanURL();
+        }
         $(searchBtn).tooltip('hide')
                    .attr('data-original-title', getTooltip())
                    .tooltip('show');

@@ -72,7 +72,21 @@
     %end;
   %end;
 %end;
-
+%if;(e.i!="" or e.p!="" or e.n!="" or e.pn!="")
+  <div class="d-flex justify-content-center">
+    <div class="alert alert alert-danger alert-dismissible fade show text-center w-75 m-2" role="alert">
+      %if(e.i!="")[*unknown index][:] %e.i;
+      %elseif;(e.pn!="")[*unknown person][:] %e.pn;
+        %if;(e.p!="") %e.p;%end;%if;(e.n!="") %e.n;%end;
+      %elseif;(e.p!="" and e.n="")[*unknown first_name][:] %e.p;
+      %elseif;(e.n!="" and e.p="")[*unknown surname][:] %e.n;
+      %else;[*unknown person][:] %e.p;%if;(e.oc!="").%e.oc;%end; %e.n;%end;
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+%end;
 <div class="d-flex flex-column flex-md-row align-items-center justify-content-lg-around mt-1 mt-lg-%if;roglo;1%else;3%end;">
   <div class="col-md-3 order-2 order-md-1 align-self-center mt-3 mt-md-0">
     <div class="d-flex justify-content-center">
@@ -247,7 +261,8 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                     </abbr>
                   </div>
                   <input type="search" id="fullname" class="form-control form-control-lg py-0 border border-top-0" autofocus tabindex="1"
-                    name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias], [key]0%if;browsing_with_sosa_ref;, [n° Sosa]%end;">
+                    name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias], [key]0%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
+                    %if;(e.pn!="") value="%e.pn;"%end;>
                 </div>
                 <div class="d-flex mt-3">
                   <div class="btn-group-vertical mr-2">
@@ -263,7 +278,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                       <label for="firstname" class="sr-only col-form-label">[*first name/first names]2</label>
                       <input type="search" id="firstname" class="form-control form-control-lg border-top-0"
                         name="p" placeholder="[*first name/first names]2" tabindex="2"
-                        list="datalist_fnames" data-book="fn">
+                        %if;(e.p!="") value="%e.p;"%end; list="datalist_fnames" data-book="fn">
                     </div>
                   </div>
                 </div>
@@ -282,7 +297,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                       <input type="search" id="surname" class="form-control form-control-lg border border-top-0"
                         title="[*word/words]1" data-toggle="tooltip"
                         name="n" placeholder="[*surname/surnames]0" tabindex="3"
-                        list="datalist_snames" data-book="sn">
+                        %if;(e.n!="") value="%e.n;"%end; list="datalist_snames" data-book="sn">
                     </div>
                   </div>
                 </div>
