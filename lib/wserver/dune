@@ -6,5 +6,6 @@
    geneweb_util
    geneweb_logs
    geneweb_compat
+   geneweb_unix
    unix
    fmt))

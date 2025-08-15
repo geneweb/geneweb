@@ -1,0 +1,16 @@
+(rule
+ (action (copy credentials_unix.ml credentials.ml))
+ (enabled_if (<> %{os_type} "Win32")))
+
+(rule
+ (action (copy credentials_win32.ml credentials.ml))
+ (enabled_if (= %{os_type} "Win32")))
+
+(library
+  (name geneweb_unix)
+  (public_name geneweb.unix)
+  (libraries unix)
+  (modules geneweb_unix credentials network)
+  (foreign_stubs
+    (language c)
+    (names credentials)))

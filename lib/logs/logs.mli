@@ -43,6 +43,7 @@ val syslog : level -> string -> unit
 *)
 type 'a msgf = (('a, Format.formatter, unit, unit) format4 -> 'a) -> unit
 
+val app : 'a msgf -> unit
 val info : 'a msgf -> unit
 val debug : 'a msgf -> unit
 val warn : 'a msgf -> unit
