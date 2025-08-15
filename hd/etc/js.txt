@@ -665,11 +665,11 @@ document.addEventListener('DOMContentLoaded', () => {
   setupAutofocusInput();
 %end;
 %if;(e.m="CHK_DATA")
-  if (typeof CheckDataEditor !== 'undefined' && CheckDataEditor.init) {
+  if (typeof CheckData !== 'undefined' && CheckData.init) {
     if (document.readyState === 'complete') {
-      CheckDataEditor.init();
+      CheckData.init();
     } else {
-      window.addEventListener('load', () => CheckDataEditor.init());
+      window.addEventListener('load', () => CheckData.init());
     }
   }
 %end;

@@ -178,6 +178,7 @@ endif
 	@printf "\n\033[1;1m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	rm $(DISTRIB_DIR)/gw/etc/js/checkdata.js
+	rm $(DISTRIB_DIR)/gw/etc/js/p_mod.js
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
 	mkdir $(DISTRIB_DIR)/gw/setup/lang
