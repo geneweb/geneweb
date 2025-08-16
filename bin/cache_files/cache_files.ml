@@ -10,6 +10,7 @@ let aliases = ref false
 let pub_names = ref false
 let fname_aliases = ref false
 let sname_aliases = ref false
+let merge_aliases = ref false
 let places = ref false
 let estates = ref false
 let titles = ref false
@@ -48,6 +49,19 @@ let write_checkdata_cache bname fname entries =
   let oc = Secure.open_out_bin file in
   let finally () = try close_out oc with Sys_error _ -> () in
   Fun.protect ~finally @@ fun () -> Marshal.to_channel oc entries []
+
+let read_checkdata_cache bname fname =
+  let filename = bname ^ "_" ^ fname ^ "_checkdata.cache" in
+  let file = !cache_dir // filename in
+  if Sys.file_exists file then
+    let ic = Secure.open_in_bin file in
+    let finally () = try close_in ic with Sys_error _ -> () in
+    Fun.protect ~finally @@ fun () ->
+    try
+      let entries = (Marshal.from_channel ic : checkdata_entry list) in
+      Some (List.map snd entries)
+    with _ -> None
+  else None
 
 let should_gen_datalist () =
   match (!checkdata, !datalist) with
@@ -89,12 +103,10 @@ let iteri_pers f base =
     (Driver.ipers base)
 
 let iter_field base p f = function
-  | `Fnames with_aliases ->
-      f (Driver.get_first_name p);
-      if with_aliases then List.iter f (Driver.get_first_names_aliases p)
-  | `Snames with_aliases ->
-      f (Driver.get_surname p);
-      if with_aliases then List.iter f (Driver.get_surnames_aliases p)
+  | `Fnames -> f (Driver.get_first_name p)
+  | `Fnames_alias -> List.iter f (Driver.get_first_names_aliases p)
+  | `Snames -> f (Driver.get_surname p)
+  | `Snames_alias -> List.iter f (Driver.get_surnames_aliases p)
   | `Aliases -> List.iter f (Driver.get_aliases p)
   | `Occupations -> f (Driver.get_occupation p)
   | `Qualifiers -> List.iter f (Driver.get_qualifiers p)
@@ -112,8 +124,10 @@ let iter_field base p f = function
         (Driver.get_family p)
 
 let field_name = function
-  | `Fnames _ -> "fnames"
-  | `Snames _ -> "snames"
+  | `Fnames -> "fnames"
+  | `Fnames_alias -> "fnames_alias"
+  | `Snames -> "snames"
+  | `Snames_alias -> "snames_alias"
   | `Aliases -> "aliases"
   | `Occupations -> "occupations"
   | `Qualifiers -> "qualifiers"
@@ -175,6 +189,27 @@ let gen_datalist_from_entries bname fname entries =
     (List.length data) fname duration;
   duration
 
+let gen_datalist_merged bname fname main_fname alias_fname =
+  let data, duration =
+    with_timer @@ fun () ->
+    let main_data =
+      match read_checkdata_cache bname main_fname with
+      | Some data -> data
+      | None -> []
+    in
+    let alias_data =
+      match read_checkdata_cache bname alias_fname with
+      | Some data -> data
+      | None -> []
+    in
+    List.sort_uniq String.compare (main_data @ alias_data)
+  in
+  write_cache_file bname fname data;
+  let path = !cache_dir // (bname ^ "_" ^ fname ^ ".cache.gz") in
+  Format.printf "@[<h>%-*s@ %8d@ %-14s@ %6.2f s@]@." !width path
+    (List.length data) (fname ^ "+alias") duration;
+  duration
+
 let gen_both_caches bname fname collect_fn =
   if !prog then Format.printf "Generating %s checkdata cache...@." fname;
   let entries, dur1 = gen_checkdata_cache bname fname collect_fn in
@@ -204,6 +239,15 @@ let gen_cache bname fname collect_fn =
   | true, false -> gen_datalist_only bname fname collect_fn
   | false, false -> assert false
 
+let validate_options () =
+  if !merge_aliases && not !datalist then (
+    Printf.eprintf "Error: -merge can only be used with -datalist\n";
+    exit 1);
+
+  if (!fname_aliases || !sname_aliases) && not !checkdata then (
+    Printf.eprintf "Error: -fna and -sna can only be used with -checkdata\n";
+    exit 1)
+
 let speclist =
   [
     ( "-bd",
@@ -211,9 +255,12 @@ let speclist =
       "<DIR> Specify where the 'bases' directory is installed (default '.')" );
     ("", Arg.Unit (fun () -> ()), "");
     ("-fn", Arg.Set fnames, " first names");
-    ("-fna", Arg.Set fname_aliases, " add first name aliases");
+    ("-fna", Arg.Set fname_aliases, " first name aliases (only with -checkdata)");
     ("-sn", Arg.Set snames, " surnames");
-    ("-sna", Arg.Set sname_aliases, " add surnames aliases");
+    ("-sna", Arg.Set sname_aliases, " surname aliases (only with -checkdata)");
+    ( "-merge",
+      Arg.Set merge_aliases,
+      " merge fn/sn aliases with fn/sn (only with -datalist)" );
     ("-al", Arg.Set aliases, " aliases");
     ("-pu", Arg.Set pub_names, " public names");
     ("-qu", Arg.Set qualifiers, " qualifiers");
@@ -243,6 +290,7 @@ let usage = "Usage: cache_files [options] base\nwhere [options] are:"
 let () =
   Arg.parse speclist anonfun usage;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  validate_options ();
   let bname = Filename.remove_extension (Filename.basename !bname) in
 
   Driver.with_database (Secure.base_dir () // bname) @@ fun base ->
@@ -274,12 +322,74 @@ let () =
   let fields = if !all || !estates then `Estates :: fields else fields in
   let fields = if !all || !pub_names then `Pub_names :: fields else fields in
   let fields = if !all || !aliases then `Aliases :: fields else fields in
-  let fields =
-    if !all || !snames then `Snames !sname_aliases :: fields else fields
-  in
-  let fields =
-    if !all || !fnames then `Fnames !fname_aliases :: fields else fields
-  in
+
+  (* Gestion spéciale fn/sn : d'abord checkdata puis datalist merged si besoin *)
+  let should_merge = !merge_aliases || !all in
+
+  if !all || !fnames then (
+    if gen_cd then (
+      (* Génère toujours le cache fnames checkdata *)
+      total :=
+        !total
+        +. gen_checkdata_only bname "fnames"
+             (collect_checkdata_names base `Fnames);
+      (* Si -all, génère aussi fnames_alias checkdata *)
+      if !all then
+        total :=
+          !total
+          +. gen_checkdata_only bname "fnames_alias"
+               (collect_checkdata_names base `Fnames_alias));
+    if gen_dl then
+      if should_merge then (
+        (* Combine fnames + fnames_alias pour datalist *)
+        if !prog then Format.printf "Generating fnames cache (merged)...@.";
+        total :=
+          !total +. gen_datalist_merged bname "fnames" "fnames" "fnames_alias")
+      else
+        (* Datalist normal sans alias *)
+        total :=
+          !total
+          +. gen_datalist_only bname "fnames"
+               (collect_checkdata_names base `Fnames));
+
+  if !all || !snames then (
+    if gen_cd then (
+      (* Génère toujours le cache snames checkdata *)
+      total :=
+        !total
+        +. gen_checkdata_only bname "snames"
+             (collect_checkdata_names base `Snames);
+      (* Si -all, génère aussi snames_alias checkdata *)
+      if !all then
+        total :=
+          !total
+          +. gen_checkdata_only bname "snames_alias"
+               (collect_checkdata_names base `Snames_alias));
+    if gen_dl then
+      if should_merge then (
+        (* Combine snames + snames_alias pour datalist *)
+        if !prog then Format.printf "Generating snames cache (merged)...@.";
+        total :=
+          !total +. gen_datalist_merged bname "snames" "snames" "snames_alias")
+      else
+        (* Datalist normal sans alias *)
+        total :=
+          !total
+          +. gen_datalist_only bname "snames"
+               (collect_checkdata_names base `Snames));
+
+  (* Caches alias séparés pour checkdata uniquement *)
+  if !fname_aliases then
+    total :=
+      !total
+      +. gen_cache bname "fnames_alias"
+           (collect_checkdata_names base `Fnames_alias);
+
+  if !sname_aliases then
+    total :=
+      !total
+      +. gen_cache bname "snames_alias"
+           (collect_checkdata_names base `Snames_alias);
 
   List.iter
     (fun field ->
