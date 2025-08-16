@@ -590,26 +590,72 @@ let perform_check_modification conf base =
   in
   let dict_param = Util.p_getenv conf.env "d" in
   let k_actual = Geneweb_db.Driver.sou base k in
-  if k_actual <> s then Error (t conf "modification failed") (* k/s mismatch *)
+  if k_actual <> s then Error (t conf "modification failed")
   else if s = s2 then Error (t conf "no modification")
   else
-    let _ = Geneweb_db.Driver.replace_string base s s2 in
-    Util.commit_patches conf base;
-    let cache_updated =
-      match dict_param with
-      | Some d -> (
-          let dict_type_opt =
-            List.find_opt (fun info -> info.url_param = d) DictInfo.all
+    match dict_param with
+    | (Some "fn" | Some "sn") when dict_param <> None ->
+        let start_time = Unix.gettimeofday () in
+        let is_fn = dict_param = Some "fn" in
+        let conf_tmp =
+          {
+            conf with
+            env =
+              ("data", Adef.encoded (if is_fn then "fn" else "sn"))
+              :: ("key", Adef.encoded (Geneweb_db.Driver.Istr.to_string k))
+              :: ("nx_input", Adef.encoded s2)
+              :: List.filter
+                   (fun (k, _) -> k <> "data" && k <> "key" && k <> "nx_input")
+                   conf.env;
+          }
+        in
+        let list = UpdateData.get_person_from_data conf_tmp base in
+        let list =
+          List.map
+            (fun (istr, perl) -> (Geneweb_db.Driver.sou base istr, perl))
+            list
+        in
+        let nb_pers =
+          List.fold_left (fun acc (_, perl) -> acc + List.length perl) 0 list
+        in
+        if nb_pers = 0 then Error (t conf "no modification")
+        else
+          let nb_modified =
+            UpdateData.update_person_list conf_tmp base s2 list nb_pers nb_pers
           in
-          match dict_type_opt with
-          | Some info -> CheckData.update_cache_entry conf info.dict_type k s2
-          | None -> false)
-      | None -> (
-          match CheckData.find_dict_type_for_istr conf k with
-          | Some dict_type -> CheckData.update_cache_entry conf dict_type k s2
-          | None -> false)
-    in
-    Success (s, s2, cache_updated)
+          let cache_updated =
+            let dict_type =
+              if is_fn then CheckData.Fnames else CheckData.Snames
+            in
+            CheckData.update_cache_entry conf dict_type k s2
+          in
+          let elapsed = Unix.gettimeofday () -. start_time in
+          Geneweb_logs.Logs.info (fun m ->
+              m "  CHECKDATA | %s | %d modif. | %.1f s | %s | %s"
+                (Geneweb_db.Driver.Istr.to_string k)
+                nb_modified elapsed s s2);
+          Success (s, s2, cache_updated)
+    | _ ->
+        (* Méthode replace_string pour les autres dictionnaires *)
+        let _ = Geneweb_db.Driver.replace_string base s s2 in
+        Util.commit_patches conf base;
+        let cache_updated =
+          match dict_param with
+          | Some d -> (
+              let dict_type_opt =
+                List.find_opt (fun info -> info.url_param = d) DictInfo.all
+              in
+              match dict_type_opt with
+              | Some info ->
+                  CheckData.update_cache_entry conf info.dict_type k s2
+              | None -> false)
+          | None -> (
+              match CheckData.find_dict_type_for_istr conf k with
+              | Some dict_type ->
+                  CheckData.update_cache_entry conf dict_type k s2
+              | None -> false)
+        in
+        Success (s, s2, cache_updated)
 
 let print_chk_ok_json conf base =
   try
