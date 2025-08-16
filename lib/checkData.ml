@@ -516,8 +516,7 @@ let find_mixed_scripts_positions s =
     if pos >= len then ()
     else
       let c = s.[pos] in
-      if c = ' ' || c = '\t' || c = '\n' || c = '\r' then
-        process_from (pos + 1)
+      if c = ' ' || c = '\t' || c = '\n' || c = '\r' then process_from (pos + 1)
       else
         let rec find_word_end p =
           if p >= len then p
@@ -528,7 +527,7 @@ let find_mixed_scripts_positions s =
         in
         let word_end = find_word_end pos in
         let word = String.sub s pos (word_end - pos) in
-        if has_mixed_scripts_in_word word then
+        if has_mixed_scripts_in_word word then (
           let add_position char_idx byte_pos = function
             | `Uchar u -> (
                 match script_class_of_uchar u with
@@ -539,7 +538,7 @@ let find_mixed_scripts_positions s =
             | `Malformed _ -> char_idx + 1
           in
           ignore (Uutf.String.fold_utf_8 add_position 0 word);
-        process_from word_end
+          process_from word_end)
   in
   process_from 0;
   List.sort_uniq compare !positions
