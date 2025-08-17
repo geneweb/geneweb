@@ -1,6 +1,8 @@
 type dict_type =
   | Fnames
   | Snames
+  | Fnames_alias
+  | Snames_alias
   | Places
   | PubNames
   | Qualifiers

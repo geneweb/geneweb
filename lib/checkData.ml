@@ -11,6 +11,8 @@ end)
 type dict_type =
   | Fnames
   | Snames
+  | Fnames_alias
+  | Snames_alias
   | Places
   | PubNames
   | Qualifiers
@@ -734,7 +736,11 @@ let make_error_html conf base data istr entry error_type =
   let positions = find_error_positions error_type data base entry in
   let hl = make_highlight_html entry positions error_type conf in
   let url_mod =
-    Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s s2_p
+    match data with
+    | "fna" | "sna" -> ""
+    | _ ->
+        Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s
+          s2_p
   in
   let url_chk =
     Printf.sprintf "%sm=CHK_DATA_OK&d=%s&k=%s&s=%s&s2=%s" commd data istr_ s_ori
@@ -804,6 +810,8 @@ let collect_sources base p =
 let collect_dict_strings base = function
   | Fnames -> fun p -> [ Driver.get_first_name p ]
   | Snames -> fun p -> [ Driver.get_surname p ]
+  | Fnames_alias -> Driver.get_first_names_aliases
+  | Snames_alias -> Driver.get_surnames_aliases
   | Places -> collect_places base
   | PubNames -> fun p -> [ Driver.get_public_name p ]
   | Qualifiers -> Driver.get_qualifiers
@@ -830,6 +838,8 @@ let dict_to_cache_name dict_type =
   match dict_type with
   | Fnames -> "fnames"
   | Snames -> "snames"
+  | Fnames_alias -> "fnames_alias"
+  | Snames_alias -> "snames_alias"
   | Places -> "places"
   | PubNames -> "pub_names"
   | Qualifiers -> "qualifiers"
@@ -897,6 +907,8 @@ let find_dict_type_for_istr conf istr =
     [
       Fnames;
       Snames;
+      Fnames_alias;
+      Snames_alias;
       Places;
       PubNames;
       Qualifiers;
