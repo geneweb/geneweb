@@ -46,6 +46,20 @@ module DictInfo = struct
         form_param = "d_sn";
       };
       {
+        dict_type = CheckData.Fnames_alias;
+        transl_key = "first name alias";
+        url_param = "fna";
+        icon = "child text-muted";
+        form_param = "d_fna";
+      };
+      {
+        dict_type = CheckData.Snames_alias;
+        transl_key = "surname alias";
+        url_param = "sna";
+        icon = "user text-muted";
+        form_param = "d_sna";
+      };
+      {
         dict_type = CheckData.Places;
         transl_key = "place/places";
         url_param = "place";
@@ -202,22 +216,23 @@ let get_max_results conf =
   | None, None -> None
 
 let render_error_entry_fast conf base dict_param istr s error_type =
-  let book_title = TranslCache.get conf "view person record" in
+  let book_title = TranslCache.get conf "book link" in
   let fix_title = TranslCache.get conf "fix error automatically" in
   let highlighted, url_mod, url_chk, entry, visible =
     CheckData.make_error_html conf base dict_param istr s error_type
   in
-  let visibility = if visible then "" else " style=\"visibility:hidden\"" in
+  let dict_vis = if url_mod = "" then " style=\"visibility:hidden\"" else "" in
+  let chk_vis = if visible then "" else " style=\"visibility:hidden\"" in
   Printf.sprintf
     {|    <div class="err" data-ori="%s">
       <a href="%s" class="btn btn-primary"
-         title="%s"><i class="fa fa-book"></i></a>
+         title="%s"%s><i class="fa fa-book"></i></a>
       <button onclick="return false;">%s</button>
       <a href="%s" target="_blank" class="s2 btn btn-info"
          title="%s"%s><i class="fa fa-check"></i></a>
     </div>
 |}
-    entry url_mod book_title highlighted url_chk fix_title visibility
+    entry url_mod book_title dict_vis highlighted url_chk fix_title chk_vis
 
 let render_dict_section_streaming conf base dict filtrd_entries sel_err_types =
   let dict_title = tn conf (DictInfo.get_name dict) 1 in
@@ -337,7 +352,7 @@ let render_dict_checkboxes_two_columns conf selected_dicts =
         let left, right = split_at (n - 1) t in
         (h :: left, right)
   in
-  let left_col, right_col = split_at 5 DictInfo.all in
+  let left_col, right_col = split_at 6 DictInfo.all in
   let render_group infos =
     List.iter
       (fun (info : dict_info) ->
@@ -575,7 +590,8 @@ let print conf base =
       Hutil.trailer conf)
 
 type chk_result =
-  | Success of string * string * bool (* before, after, cache_updated *)
+  | Success of string * string * bool * int option * float option
+    (* before, after, cache_updated, nb_modified, elapsed_time *)
   | Error of string
 
 let perform_check_modification conf base =
@@ -634,7 +650,7 @@ let perform_check_modification conf base =
               m "  CHECKDATA | %s | %d modif. | %.1f s | %s | %s"
                 (Geneweb_db.Driver.Istr.to_string k)
                 nb_modified elapsed s s2);
-          Success (s, s2, cache_updated)
+          Success (s, s2, cache_updated, Some nb_modified, Some elapsed)
     | _ ->
         (* Méthode replace_string pour les autres dictionnaires *)
         let _ = Geneweb_db.Driver.replace_string base s s2 in
@@ -655,26 +671,41 @@ let perform_check_modification conf base =
                   CheckData.update_cache_entry conf dict_type k s2
               | None -> false)
         in
-        Success (s, s2, cache_updated)
+        Success (s, s2, cache_updated, None, None)
 
 let print_chk_ok_json conf base =
   try
     match perform_check_modification conf base with
-    | Success (before, after, cache_updated) ->
+    | Success (before, after, cache_updated, nb_modified, elapsed) ->
         let success_msg = t conf "modification successful" in
         let cache_msg =
           if cache_updated then " (" ^ t ~c:0 conf "cache updated" ^ ")" else ""
+        in
+        let full_message =
+          match (nb_modified, elapsed) with
+          | Some n, Some time when n > 1 ->
+              let modif_msg =
+                Printf.sprintf "\n%d %s – %.1f s" n
+                  (Util.transl_nth conf "modification/modifications" 1)
+                  time
+              in
+              success_msg ^ cache_msg ^ "\n" ^ modif_msg
+          | _ -> success_msg ^ cache_msg
         in
         let validated_msg = t conf "validated" in
         let json =
           `Assoc
             [
               ("success", `Bool true);
-              ("message", `String (success_msg ^ cache_msg));
+              ("message", `String full_message);
               ("cache_updated", `Bool cache_updated);
               ("before", `String before);
               ("after", `String after);
               ("validated_title", `String validated_msg);
+              ( "nb_modified",
+                match nb_modified with Some n -> `Int n | None -> `Null );
+              ( "elapsed_time",
+                match elapsed with Some t -> `Float t | None -> `Null );
             ]
         in
         Yojson.Basic.to_string json
@@ -714,7 +745,7 @@ let print_status_message conf ~success ~icon ~title_msg ~alert_msg =
 let print_chk_ok_html conf base =
   try
     match perform_check_modification conf base with
-    | Success (_, _, cache_updated) ->
+    | Success (_, _, cache_updated, nb_modified, elapsed) ->
         let title _ =
           "✓ " ^ t conf ~c:0 "modification successful"
           |> Output.print_sstring conf
@@ -726,7 +757,14 @@ let print_chk_ok_html conf base =
               ~alert_msg:msg;
             if cache_updated then
               Output.printf conf "<div class=\"text-muted\">%s</div>\n"
-                (t conf "cache updated"));
+                (t conf "cache updated");
+            match (nb_modified, elapsed) with
+            | Some n, Some time when n > 1 ->
+                Output.printf conf
+                  "<div class=\"text-info\">%d %s – %.1f s</div>\n" n
+                  (Util.transl_nth conf "modification/modifications" 1)
+                  time
+            | _ -> ());
         Hutil.trailer conf
     | Error msg ->
         let title _ =
