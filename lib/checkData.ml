@@ -255,11 +255,16 @@ let is_irish_prefix s =
    - Irish prefixes: "MacDonald", "McLeod", "FitzGerald" *)
 let is_allowed_word s = is_roman_numeral s || is_irish_prefix s
 
+let lowercase_allowed_words =
+  [ "dit"; "dite"; "ou"; "et"; "genannt"; "gennant"; "vel"; "y"; "e" ]
+
+let is_lowercase_allowed word =
+  List.mem (String.lowercase_ascii word) lowercase_allowed_words
+
 (* Detect invalid capitalization patterns:
    - Multiple uppercase letters in sequence
    - Lowercase followed by uppercase
    - Uppercase, lowercase, uppercase sequence *)
-
 (* Bad capitalization functions *)
 let has_bad_capitalization_pattern s =
   try Re.execp (Lazy.force bad_cap_re) s with _ -> false
@@ -269,7 +274,8 @@ let has_bad_capitalization_pattern s =
    For other types, just checks for invalid capitalization patterns *)
 let has_legitimate_mixed_case dict base s =
   match dict with
-  | Fnames | Snames | PubNames | Aliases | Places ->
+  | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Aliases | Places
+    ->
       has_any_particle base s
       ||
       let words = split_words s in
@@ -291,10 +297,15 @@ let has_bad_capitalization dict base s =
         in
         let has_lowercase =
           match dict with
-          | Fnames | Snames ->
+          | Fnames | Snames | Fnames_alias | Snames_alias ->
+              let words = split_words s in
               List.exists
-                (fun w -> String.length w > 0 && w.[0] >= 'a' && w.[0] <= 'z')
-                (split_words s)
+                (fun w ->
+                  String.length w > 0
+                  && w.[0] >= 'a'
+                  && w.[0] <= 'z'
+                  && not (is_lowercase_allowed w))
+                words
           | _ -> false
         in
         has_general || has_lowercase
@@ -330,12 +341,18 @@ let find_bad_capitalization_positions dict base s =
     scan 0;
     match dict with
     | Fnames | Snames ->
-        let i = ref 0 in
-        while !i < String.length s do
-          if (!i = 0 || s.[!i - 1] = ' ') && s.[!i] >= 'a' && s.[!i] <= 'z' then
-            positions := !i :: !positions;
-          incr i
-        done
+        let words = split_words s in
+        let word_pos = ref 0 in
+        List.iter
+          (fun word ->
+            if
+              String.length word > 0
+              && word.[0] >= 'a'
+              && word.[0] <= 'z'
+              && not (is_lowercase_allowed word)
+            then positions := !word_pos :: !positions;
+            word_pos := !word_pos + String.length word + 1)
+          words
     | _ -> ());
   List.sort_uniq compare !positions
 
@@ -391,9 +408,9 @@ let simple_replacements =
     (Re.str " ,", ",");
     (Re.str ",,", ",");
     (Re.str " .", ".");
-    (Re.str "..", ".");
-    (Re.str "...", "…");
     (Re.str "....", "…");
+    (Re.str "...", "…");
+    (Re.str "..", ".");
     (Re.str "\"\"", "\"");
     (Re.str "’’", "’");
     (Re.str "`", "’");
@@ -401,6 +418,13 @@ let simple_replacements =
     (Re.str "‘", "’");
     (Re.str "ʹ", "’");
     (Re.str "ʻ", "’");
+  ]
+
+(* Replacements spécifiques par dictionnaire *)
+let dict_specific_replacements =
+  [
+    (Re.str " -", "-", [ Occupation; Sources ]);
+    (Re.str "- ", "-", [ Occupation; Sources ]);
   ]
 
 let detect_only_patterns =
@@ -415,10 +439,6 @@ let char_before_parenthesis_pattern =
 let breton_trigram_pattern =
   Re.seq [ Re.group (Re.set "cC"); Re.set "’'"; Re.group (Re.set "hH") ]
 
-let compiled_simple =
-  lazy
-    (List.map (fun (pat, repl) -> (Re.compile pat, repl)) simple_replacements)
-
 let compiled_detect =
   lazy (List.map (fun (pat, msg) -> (Re.compile pat, msg)) detect_only_patterns)
 
@@ -429,26 +449,42 @@ let compiled_complex =
       Re.compile breton_trigram_pattern;
     ]
 
-let misc_typo_re =
-  lazy
-    (Re.compile
-       (Re.alt
-          (List.map fst simple_replacements
-          @ List.map fst detect_only_patterns
-          @ [ char_before_parenthesis_pattern; breton_trigram_pattern ])))
+let get_applicable_replacements dict_type =
+  let base = simple_replacements in
+  let specific =
+    List.filter_map
+      (fun (pat, repl, excluded) ->
+        if List.mem dict_type excluded then None else Some (pat, repl))
+      dict_specific_replacements
+  in
+  base @ specific
 
-let has_misc_typographic_errors s =
+let has_misc_typographic_errors dict_type s =
+  let replacements = get_applicable_replacements dict_type in
+  let patterns =
+    List.map fst replacements
+    @ List.map fst detect_only_patterns
+    @ [ char_before_parenthesis_pattern; breton_trigram_pattern ]
+  in
+  let re = Re.compile (Re.alt patterns) in
   try
-    ignore (Re.exec (Lazy.force misc_typo_re) s);
+    ignore (Re.exec re s);
     true
   with Not_found -> false
 
-let find_misc_typographic_positions s =
+let find_misc_typographic_positions dict_type s =
+  let replacements = get_applicable_replacements dict_type in
+  let patterns =
+    List.map fst replacements
+    @ List.map fst detect_only_patterns
+    @ [ char_before_parenthesis_pattern; breton_trigram_pattern ]
+  in
+  let re = Re.compile (Re.alt patterns) in
   let positions = ref [] in
   let pos = ref 0 in
   while !pos < String.length s do
     try
-      let result = Re.exec ~pos:!pos (Lazy.force misc_typo_re) s in
+      let result = Re.exec ~pos:!pos re s in
       let start_pos = Re.Group.start result 0 in
       let end_pos = Re.Group.stop result 0 in
       for i = start_pos to end_pos - 1 do
@@ -459,12 +495,12 @@ let find_misc_typographic_positions s =
   done;
   List.sort_uniq compare !positions
 
-let fix_misc_typographic_errors s =
+let fix_misc_typographic_errors dict_type s =
+  let replacements = get_applicable_replacements dict_type in
   let s =
     List.fold_left
-      (fun acc (re, repl) -> Re.replace_string re ~by:repl acc)
-      s
-      (Lazy.force compiled_simple)
+      (fun acc (pat, repl) -> Re.replace_string (Re.compile pat) ~by:repl acc)
+      s replacements
   in
   let patterns = Lazy.force compiled_complex in
   s
@@ -513,36 +549,47 @@ let has_mixed_scripts s =
 (* Trouve les positions des caractères grecs et cyrilliques *)
 let find_mixed_scripts_positions s =
   let positions = ref [] in
-  let len = String.length s in
-  let rec process_from pos =
-    if pos >= len then ()
+  let rec find_all_words pos acc =
+    if pos >= String.length s then List.rev acc
+    else if s.[pos] = ' ' || s.[pos] = '\t' || s.[pos] = '\n' || s.[pos] = '\r'
+    then find_all_words (pos + 1) acc
     else
-      let c = s.[pos] in
-      if c = ' ' || c = '\t' || c = '\n' || c = '\r' then process_from (pos + 1)
-      else
-        let rec find_word_end p =
-          if p >= len then p
-          else
-            let c = s.[p] in
-            if c = ' ' || c = '\t' || c = '\n' || c = '\r' then p
-            else find_word_end (p + 1)
-        in
-        let word_end = find_word_end pos in
-        let word = String.sub s pos (word_end - pos) in
-        if has_mixed_scripts_in_word word then (
-          let add_position char_idx byte_pos = function
+      let word_start = pos in
+      let rec find_end p =
+        if p >= String.length s then p
+        else if s.[p] = ' ' || s.[p] = '\t' || s.[p] = '\n' || s.[p] = '\r' then
+          p
+        else find_end (p + 1)
+      in
+      let word_end = find_end pos in
+      let word = String.sub s word_start (word_end - word_start) in
+      find_all_words word_end ((word, word_start, word_end) :: acc)
+  in
+  let all_words = find_all_words 0 [] in
+  List.iter
+    (fun (word, start_pos, end_pos) ->
+      if has_mixed_scripts_in_word word then
+        (* Parcourir chaque octet du mot *)
+        let pos = ref start_pos in
+        while !pos < end_pos do
+          let char_size = Utf8.nbc s.[!pos] in
+          let char_str = String.sub s !pos (min char_size (end_pos - !pos)) in
+          let mark_it = ref false in
+          let check () _ = function
             | `Uchar u -> (
                 match script_class_of_uchar u with
-                | Some `Greek | Some `Cyrillic ->
-                    positions := (pos + byte_pos) :: !positions;
-                    char_idx + 1
-                | _ -> char_idx + 1)
-            | `Malformed _ -> char_idx + 1
+                | Some `Greek | Some `Cyrillic -> mark_it := true
+                | _ -> ())
+            | `Malformed _ -> ()
           in
-          ignore (Uutf.String.fold_utf_8 add_position 0 word);
-          process_from word_end)
-  in
-  process_from 0;
+          Uutf.String.fold_utf_8 check () char_str;
+          if !mark_it then
+            for i = 0 to char_size - 1 do
+              positions := (!pos + i) :: !positions
+            done;
+          pos := !pos + char_size
+        done)
+    all_words;
   List.sort_uniq compare !positions
 
 let _get_detect_only_message s =
@@ -568,6 +615,7 @@ let data_to_dict_type data =
 
 (* Generic error handling *)
 let find_error_positions error_type data base s =
+  let dict_type = data_to_dict_type data in
   match error_type with
   | InvisibleCharacters -> find_invisible_positions s
   | BadCapitalization ->
@@ -575,16 +623,16 @@ let find_error_positions error_type data base s =
       find_bad_capitalization_positions dict_type base s
   | MultipleSpaces -> find_multiple_spaces_positions s
   | NonBreakingSpace -> find_non_breaking_space_positions s
-  | MiscTypographicErrors -> find_misc_typographic_positions s
+  | MiscTypographicErrors -> find_misc_typographic_positions dict_type s
   | MixedScripts -> find_mixed_scripts_positions s
 
-let fix_error error_type s =
+let fix_error error_type dict_type s =
   match error_type with
   | InvisibleCharacters -> Util.only_printable s
   | BadCapitalization -> s
   | MultipleSpaces -> fix_multiple_spaces s
   | NonBreakingSpace -> s
-  | MiscTypographicErrors -> fix_misc_typographic_errors s
+  | MiscTypographicErrors -> fix_misc_typographic_errors dict_type s
   | MixedScripts -> s
 
 (* Define style and tooltip of error types *)
@@ -711,6 +759,7 @@ let simple_prefix s =
   if len <= 8 then s else String.sub s 0 8
 
 let make_error_html conf base data istr entry error_type =
+  let dict_type = data_to_dict_type data in
   let istr_ = Driver.Istr.to_string istr in
   let commd = (Util.commd conf :> string) in
   let entry_modified =
@@ -728,7 +777,7 @@ let make_error_html conf base data istr entry error_type =
   in
   let s = (Mutil.encode s' :> string) in
   let s_ori = (Mutil.encode entry :> string) in
-  let entry_fixed = fix_error error_type entry in
+  let entry_fixed = fix_error error_type dict_type entry in
   let entry_escaped = (Util.escape_html entry :> string) in
   let s2 = (Mutil.encode entry_fixed :> string) in
   let s2_auto = entry_fixed <> entry in
@@ -831,7 +880,7 @@ let analyze_string_errors dict_type base s =
   |> add_if (has_multiple_spaces s) MultipleSpaces
   |> add_if (has_invisible_chars s) InvisibleCharacters
   |> add_if (has_bad_capitalization dict_type base s) BadCapitalization
-  |> add_if (has_misc_typographic_errors s) MiscTypographicErrors
+  |> add_if (has_misc_typographic_errors dict_type s) MiscTypographicErrors
   |> add_if (has_mixed_scripts s) MixedScripts
 
 let dict_to_cache_name dict_type =
@@ -987,7 +1036,7 @@ let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
                  if has_multiple_spaces s then add_error istr s MultipleSpaces;
                  if has_non_breaking_space s then
                    add_error istr s NonBreakingSpace;
-                 if has_misc_typographic_errors s then
+                 if has_misc_typographic_errors dict s then
                    add_error istr s MiscTypographicErrors;
                  if has_mixed_scripts s then add_error istr s MixedScripts))
            istrs)
