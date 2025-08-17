@@ -162,7 +162,7 @@
       %let;so;%item.1;%in;
       %let;access;%apply;get_value(myindex, "access")%in;
       %let;sex;%apply;get_value(myindex, "sex")%in;
-      <span class="text-monospace mr-2">%apply;tags(myindex,"1", item.1)</span>%nn;
+      %if;("on" in url)<span class="text-monospace mr-2">%apply;tags(myindex,"1", item.1)</span>%nn;%end;
       <a href="%prefix;%access;">%nn;
       %apply;get_value(myindex, "first_name")%sp;
       %apply;get_value(myindex, "surname")%nn;

@@ -76,6 +76,10 @@
   margin-top: 12px;
 }
 
+#cd .pl {
+  margin-left: 0.3rem;
+}
+
 #cd .nbsp, #cd .nnbsp, #cd .ic,
 #cd .bc, #cd .zw, #cd .ms, #cd .mt {
   background-color: #ffeb3b;

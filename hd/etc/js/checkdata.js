@@ -14,12 +14,46 @@ const CheckData = (() => {
   const SELECTORS = {
     err: '.err',
     editContainer: '.edit-container',
-    s2: 'a.s2',
+    bk: '.bk',
+    pl: ".pl",
+    s2: '.s2',
     button: 'button:not([data-action])',
     inputField: 'input, textarea',
     disabled: 'disabled',
     validated: 'validated',
     editing: 'editing'
+  };
+
+  const initButtons = () => {
+    if (!_container) return;
+    
+    qa(SELECTORS.bk, _container).forEach(btn => {
+      if (!btn.dataset.init) {
+        btn.className = 'bk btn btn-primary';
+        btn.innerHTML = '<i class="fa fa-book fa-xs"></i>';
+        btn.dataset.init = '1';
+      }
+    });
+    
+    qa(SELECTORS.pl, _container).forEach(btn => {
+      if (!btn.dataset.init) {
+        btn.className = 'pl btn btn-success';
+        btn.innerHTML = '<i class="fa fa-users fa-xs"></i>';
+        btn.target = '_blank';
+        btn.dataset.init = '1';
+      }
+    });
+    
+    qa(SELECTORS.s2, _container).forEach(btn => {
+      if (!btn.dataset.init) {
+        btn.classList.add('btn', 'btn-info');
+        btn.target = '_blank';
+        if (!btn.innerHTML.includes('<i')) {
+          btn.innerHTML = '<i class="fa fa-check"></i>';
+        }
+        btn.dataset.init = '1';
+      }
+    });
   };
 
   // Fonctions utilitaires optimisées (éviter confusion avec jQuery)
@@ -66,6 +100,13 @@ const CheckData = (() => {
       return;
     }
     
+    const pl = t.closest(SELECTORS.pl);
+    if (pl?.closest(SELECTORS.err)) {
+      e.preventDefault();
+      handlePersonList(pl);
+      return;
+    }
+    
     const btn = t.closest(SELECTORS.button);
     if (btn?.closest(SELECTORS.err)) {
       e.preventDefault();
@@ -89,6 +130,18 @@ const CheckData = (() => {
       e.preventDefault();
       navigate(err, key === 'ArrowUp');
     }
+  };
+
+  const handlePersonList = btn => {
+    const err = btn.closest(SELECTORS.err);
+    const s2Btn = q(SELECTORS.s2, err);
+    const s2Url = new URL(s2Btn.href);
+    const d = s2Url.searchParams.get('d');
+    const s = s2Url.searchParams.get('s'); 
+    const k = s2Url.searchParams.get('k');
+    const baseUrl = `${s2Url.origin}${s2Url.pathname}`;
+    const newUrl = `${baseUrl}?m=CHK_DATA_L&data=${d}&k=${s}&key=${k}`;
+    window.open(newUrl, '_blank');
   };
 
   const showEditInput = btn => {
@@ -293,6 +346,18 @@ const CheckData = (() => {
       if (res.success) {
         notify('success', `✓ ${res.message}`);
         completeValidation(errEl, s2, res.after || val);
+        
+        if (res.nb_modified !== null && res.elapsed_time !== null) {
+          const statsDiv = document.createElement('div');
+          statsDiv.className = 'small text-center mr-2';
+          statsDiv.innerHTML = `+${res.nb_modified}<br>${res.elapsed_time.toFixed(1)} s`;
+          
+          const s2Btn = errEl.querySelector('.s2');
+          if (s2Btn) {
+            errEl.insertBefore(statsDiv, s2Btn);
+          }
+        }
+        
         setTimeout(() => navigate(errEl), 300);
       } else {
         notify('error', `✗ ${res.message}`);
@@ -393,6 +458,8 @@ const CheckData = (() => {
       if (!_container) return;
       
       _okTitle = _container.dataset.okTitle || '';
+      
+      initButtons();
       
       // Event delegation pour les résultats
       _container.addEventListener('click', handleClick, { passive: false });
