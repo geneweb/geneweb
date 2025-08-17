@@ -33,8 +33,8 @@ val find_dict_type_for_istr :
 val cache_file_exists : Config.config -> dict_type -> bool
 (** Check if a cache file exists for the specified dictionary type. *)
 
-val fix_error : error_type -> string -> string
-(** Fix the specified error type in the string. *)
+val fix_error : error_type -> dict_type -> string -> string
+(** Fix the specified error type in the string for a given dictionary. *)
 
 val make_error_html :
   Config.config ->
