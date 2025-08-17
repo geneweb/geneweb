@@ -2257,6 +2257,11 @@ fr: Fusionner
 it: Fondere
 sv: Slåsamman
 
+    merge fn-sn alias
+aa: cache_files.htm
+en: Merge fn-sn aliases with fn-sn files
+fr: Ajoute les alias fn-sn aux fichiers fn-sn
+
     Merging databases
 aa: merge.htm
 co: Fusione di base di dati
