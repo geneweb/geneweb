@@ -84,6 +84,10 @@ let get_data conf =
         [ get_efam_src_x ] )
   | Some "fn" -> ([ get_first_name_x ], [], [], [])
   | Some "sn" -> ([ get_surname_x ], [], [], [])
+  | Some "fna" ->
+      ([ Driver.get_first_names_aliases ], [], [], []) (* fake book atm *)
+  | Some "sna" ->
+      ([ Driver.get_surnames_aliases ], [], [], []) (* fake book atm *)
   | Some "alias" -> ([ Driver.get_aliases ], [], [], [])
   | Some "qual" -> ([ Driver.get_qualifiers ], [], [], [])
   | Some "pubn" -> ([ get_public_name_x ], [], [], [])

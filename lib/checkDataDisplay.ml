@@ -197,7 +197,6 @@ let get_max_results conf =
         with _ -> Some 150)
     | None -> Some 150
   in
-
   let form_max =
     match Util.p_getenv conf.env "max" with
     | Some "" -> None
@@ -208,31 +207,63 @@ let get_max_results conf =
         with _ -> None)
     | None -> None
   in
-
   match (config_max, form_max) with
   | Some c, Some f -> Some (min c f)
   | Some c, None -> Some c
   | None, Some f -> Some f
   | None, None -> None
 
+let print_redirect_to_list conf base =
+  try
+    let _, p_list = List.hd (UpdateData.get_person_from_data conf base) in
+    let nb = List.length p_list in
+    let base_url = Util.commd conf in
+    let params =
+      List.fold_left
+        (fun acc (k, v) ->
+          if k = "m" then acc
+          else
+            let decoded_v = Mutil.decode v in
+            let base_param = acc ^ "&" ^ k ^ "=" ^ decoded_v in
+            if k = "data" && decoded_v = "place" then
+              base_param ^ "&bi=on&ba=on&ma=on&de=on&bu=on"
+            else base_param)
+        "" conf.env
+    in
+    let redirect_url =
+      Printf.sprintf "%sm=L&nb=%d%s" (base_url :> string) nb params
+    in
+    let person_params =
+      List.mapi
+        (fun i p ->
+          let ip = Geneweb_db.Driver.get_iper p in
+          Printf.sprintf "&i%d=%s" i (Geneweb_db.Driver.Iper.to_string ip))
+        p_list
+    in
+    let final_url = redirect_url ^ String.concat "" person_params in
+    Wserver.http_redirect_temporarily final_url
+  with _ ->
+    let error_url = Printf.sprintf "%sm=CHK_DATA" (Util.commd conf :> string) in
+    Wserver.http_redirect_temporarily error_url
+
 let render_error_entry_fast conf base dict_param istr s error_type =
   let book_title = TranslCache.get conf "book link" in
+  let list_title = TranslCache.get conf "list of linked persons" in
   let fix_title = TranslCache.get conf "fix error automatically" in
-  let highlighted, url_mod, url_chk, entry, visible =
+  let hled, url_mod, url_chk, entry, visible =
     CheckData.make_error_html conf base dict_param istr s error_type
   in
   let dict_vis = if url_mod = "" then " style=\"visibility:hidden\"" else "" in
   let chk_vis = if visible then "" else " style=\"visibility:hidden\"" in
   Printf.sprintf
     {|    <div class="err" data-ori="%s">
-      <a href="%s" class="btn btn-primary"
-         title="%s"%s><i class="fa fa-book"></i></a>
+      <a href="%s" class="bk" title="%s"%s></a>
+      <a class="pl" title="%s"></a>
       <button onclick="return false;">%s</button>
-      <a href="%s" target="_blank" class="s2 btn btn-info"
-         title="%s"%s><i class="fa fa-check"></i></a>
+      <a href="%s" class="s2" title="%s"%s></a>
     </div>
 |}
-    entry url_mod book_title dict_vis highlighted url_chk fix_title chk_vis
+    entry url_mod book_title dict_vis list_title hled url_chk fix_title chk_vis
 
 let render_dict_section_streaming conf base dict filtrd_entries sel_err_types =
   let dict_title = tn conf (DictInfo.get_name dict) 1 in
@@ -646,10 +677,6 @@ let perform_check_modification conf base =
             CheckData.update_cache_entry conf dict_type k s2
           in
           let elapsed = Unix.gettimeofday () -. start_time in
-          Geneweb_logs.Logs.info (fun m ->
-              m "  CHECKDATA | %s | %d modif. | %.1f s | %s | %s"
-                (Geneweb_db.Driver.Istr.to_string k)
-                nb_modified elapsed s s2);
           Success (s, s2, cache_updated, Some nb_modified, Some elapsed)
     | _ ->
         (* Méthode replace_string pour les autres dictionnaires *)
@@ -683,13 +710,15 @@ let print_chk_ok_json conf base =
         in
         let full_message =
           match (nb_modified, elapsed) with
-          | Some n, Some time when n > 1 ->
-              let modif_msg =
-                Printf.sprintf "\n%d %s – %.1f s" n
-                  (Util.transl_nth conf "modification/modifications" 1)
-                  time
+          | Some n, Some time ->
+              let modif_word =
+                Util.transl_nth conf "modification/modifications"
+                  (if n = 1 then 0 else 1)
               in
-              success_msg ^ cache_msg ^ "\n" ^ modif_msg
+              let modif_msg =
+                Printf.sprintf "<br>%d %s – %.1f s" n modif_word time
+              in
+              success_msg ^ cache_msg ^ modif_msg
           | _ -> success_msg ^ cache_msg
         in
         let validated_msg = t conf "validated" in
