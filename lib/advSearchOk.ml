@@ -794,6 +794,7 @@ module SearchingFields : sig
     ?map_field:(string -> string) -> Config.config -> string -> string -> string
 
   val sosa : Config.config -> Gwdb.base -> string
+  val sosa_field : Config.config -> Gwdb.base -> string -> string
 
   val get_place_date_request :
     Config.config -> string -> string -> string -> string
@@ -920,6 +921,10 @@ end = struct
             (Util.ftransl conf "direct ancestor(s) of %s")
             (NameDisplay.fullname_html_of_person conf base p :> string)
     else ""
+
+  let sosa_field conf base search =
+    let s = sosa conf base in
+    if search = "" then s else if s = "" then search else search ^ ", " ^ s
 
   let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
 
