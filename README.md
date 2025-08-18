@@ -98,6 +98,18 @@ documentation at https://geneweb.tuxfamily.org/.
 Quite similar to the MacOS solution, without the security check.
 ```xxx.command``` files have an equivalent ```xxx.sh``` variant.
 
+### Security considerations
+
+On UNIX-like operating systems, special privileges are often required to open
+a port below `1024`. If you have no other choice but to use such a port, we
+recommend the following approaches:
+- On `Linux`, use capabilites as follows:
+```console
+sudo setcap 'cap_net_bind_service=+ep' gwd
+./gwd -p 80
+```
+- On `macOS`, use `launchd` to redirect the port on 80.
+
 ## Resources
 
 * Documentation: https://geneweb.tuxfamily.org/wiki/GeneWeb
