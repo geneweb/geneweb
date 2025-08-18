@@ -2478,13 +2478,28 @@ let main () =
     geneweb_cgi ~secret_salt addr (Filename.basename script) query)
   else geneweb_server ~predictable_mode:!predictable_mode ()
 
+let has_root_privileges () =
+  assert Sys.unix;
+  let root = 0 in
+  Unix.getuid () = root
+  || Unix.getgid () = root
+  || Unix.geteuid () = root
+  || Unix.getegid () = root
+
 let () =
+  if Sys.unix && has_root_privileges () then (
+    Logs.err (fun k ->
+        k
+          "The gwd server should never be run with root privileges. If you \
+           need elevated privileges, for example to open a port below 1024, \
+           see the security section of the documentation.");
+    exit 1);
   try main () with
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Logs.err (fun k ->
           k
             "Error: the port %d\n\
-            \         is already used by another GeneWeb daemon or by another \
+             is already used by another GeneWeb daemon or by another \
              program. Solution: kill the other program or launch GeneWeb with \
              another port number (option -p)"
             !selected_port)
@@ -2495,8 +2510,8 @@ let () =
       Logs.err (fun k ->
           k
             "Error: invalid access to the port %d: users port number less than \
-             1024 are reserved to the system. Solution: do it as root or \
-             choose another port number greater than 1024."
+             1024 are reserved to the system. Please, read the security section \
+             of the documentation."
             !selected_port)
   | Register_plugin_failure (p, `dynlink_error e) ->
       Logs.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
