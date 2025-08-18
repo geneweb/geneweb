@@ -46,7 +46,7 @@ COPY --from=builder /home/opam/geneweb/distribution /
 #                                              STAGE 3: Assemble Docker image
 ###############################################################################
 
-FROM debian:12-slim AS container
+FROM debian:13-slim AS container
 
 ENV GENEWEB_HOME=/usr/local/share/geneweb
 ENV GENEWEB_DATA_PATH=${GENEWEB_HOME}/share/data
@@ -56,7 +56,7 @@ ENV GWSETUP_IP=172.17.0.1
 # Ignore the apt warning here as apt-get does not allow wildcarding versions
 # hadolint ignore=DL3027
 RUN apt-get update -q \
-  && apt install -qy --no-install-recommends sudo openssl \
+  && apt install -qy --no-install-recommends sudo openssl adduser \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && adduser --system --group --uid 1000 \
