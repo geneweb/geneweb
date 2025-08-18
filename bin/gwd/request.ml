@@ -503,28 +503,14 @@ let treat_request =
       if
         conf.wizard || conf.friend
         || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
-      then
+      then (
         if
           List.assoc_opt "wizards_cant_write" conf.base_env = Some "yes"
           && this_request_updates_database conf
         then
           Hutil.incorrect_request conf
             ~comment:"Wizard actions not allowed on this base"
-        else (
-          (if Sys.unix then
-             match bfile with
-             | None -> ()
-             | Some bfile ->
-                 let stat = Unix.stat bfile in
-                 let fuid = stat.Unix.st_uid in
-                 let fgid = stat.Unix.st_gid in
-                 let pgid = Unix.getgid () in
-                 let puid = Unix.getuid () in
-                 (* FIXME possible issue with effective uid/gid! *)
-                 (* see setuid, setgid man pages *)
-                 if puid <> fuid then Unix.setuid fuid;
-                 if pgid <> fgid then Unix.setgid fgid);
-
+        else
           let plugins =
             match List.assoc_opt "plugins" conf.Config.base_env with
             | None -> []
