@@ -351,7 +351,7 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
         Unix.setsockopt socket Unix.IPV6_ONLY false;
       Unix.setsockopt socket Unix.SO_REUSEADDR true;
       Unix.bind socket (Unix.ADDR_INET (addr, port));
-      My_unix.listen_noeintr socket max_pending_requests;
+      Unix.listen socket max_pending_requests;
       let tm = Unix.localtime (Unix.time ()) in
       Format.eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...@."
         (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday

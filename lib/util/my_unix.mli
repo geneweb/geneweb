@@ -10,7 +10,3 @@ val accept_noeintr :
   ?cloexec:bool -> Unix.file_descr -> Unix.file_descr * Unix.sockaddr
 (** Equivalent to [Unix.accept], but this variant restart upon interruption by
     signals. *)
-
-val listen_noeintr : Unix.file_descr -> int -> unit
-(** Equivalent to [Unix.listen], but this variant restart upon interruption by
-    signals. *)
