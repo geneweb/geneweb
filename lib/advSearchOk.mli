@@ -12,6 +12,10 @@ module SearchingFields : sig
   val sosa : Config.config -> Gwdb.base -> string
 end
 
+val searching_fields : Config.config -> Gwdb.base -> Adef.safe_string
+(** Returns a description string for the current advanced search results in the correct language.
+    e.g. "Search all Pierre, born in Paris, died in Paris" *)
+
 val matching_first_name_aliases :
   first_name:string -> aliases:string list -> string list
 
