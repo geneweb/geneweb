@@ -1251,7 +1251,10 @@ let make_conf ~secret_salt from_addr request script_name env =
     if !gw_prefix <> "" then !gw_prefix
     else String.concat Filename.dir_sep [ "gw" ]
   in
-  let base_env = Util.read_base_env base_file gw_prefix_computed !debug in
+  let base_env =
+    if base_file = "" then []
+    else Util.read_base_env base_file gw_prefix_computed !debug
+  in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
