@@ -570,6 +570,7 @@ let treat_request =
                    Geneweb.BirthdayDisplay.print_marriage conf base
                      (int_of_string x)
                | _ -> Geneweb.BirthdayDisplay.print_menu_marriage conf base)
+           | "AS_OK" -> w_base @@ Geneweb.AdvSearchOkDisplay.print
            | "C" -> w_base @@ w_person @@ Geneweb.CousinsDisplay.print
            | "CHG_CHN" when conf.wizard ->
                w_wizard @@ w_base @@ Geneweb.ChangeChildrenDisplay.print
