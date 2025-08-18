@@ -2240,11 +2240,33 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
            else "")
         ^ "&")
   | "pvar" :: v :: sl -> (
-      match find_person_in_env conf base v with
-      | Some p ->
-          let ep = make_ep conf base (Driver.get_iper p) in
-          eval_person_field_var conf base env ep loc sl
-      | None -> raise Not_found)
+      match v with
+      | "highest" ->
+          let max_index =
+            List.fold_left
+              (fun acc (key, _) ->
+                if String.length key >= 2 then
+                  let prefix = String.get key 0 in
+                  if prefix = 'p' || prefix = 'i' then
+                    try
+                      let num =
+                        int_of_string (String.sub key 1 (String.length key - 1))
+                      in
+                      max acc num
+                    with _ -> acc
+                  else acc
+                else acc)
+              0 conf.env
+          in
+          VVstring (string_of_int max_index)
+      | _ -> (
+          match find_person_in_env conf base v with
+          | Some p ->
+              let ep = make_ep conf base (Driver.get_iper p) in
+              eval_person_field_var conf base env ep loc sl
+          | None -> (
+              match sl with [ "exist" ] -> VVbool false | _ -> raise Not_found))
+      )
   | "qvar" :: v :: sl ->
       (* %qvar.index_v.surname;
          direct access to a person whose index value is v
@@ -2883,6 +2905,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
       | OfCourseDead ->
           null_val)
+  | [ "exist" ] -> VVbool true
   | "event" :: sl -> (
       match get_env "event" env with
       | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl

@@ -212,24 +212,25 @@
                           <input type="hidden" name="data" value="%e.data;">
                           <input type="hidden" name="s" value="%e.s;">
                           <input type="hidden" name="k" value="kkk">
+                          %let;val;%if(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.printable.entry_value_unsort;%end;%in;
                           <div class="flex-grow-1">
-                            <div class="pl-2 pr-sm-2 text-muted book-input-text">
+                            <div class="pl-2 mr-2 pr-sm-2 text-muted book-input-text">%nn;
                               %if;(e.data="place" and suburb!="")
                                 %escape.entry_value;
                               %else;
-                                %if;(e.data!="src")%escape.entry_value;%else;%entry_value;
-                                %if;(e.key!="" and is_modified and "<a" in entry_value)<hr class="my-0">%escape.entry_value;%end;%end;
+                                %if;(e.data!="src")%val;%else;%entry_value;
+                                %if;(e.key!="" and is_modified and "<a" in entry_value)<hr class="my-0">%val;%end;%end;
                               %end;
                             </div>
                             <div class="mt-1">
                               %if;(b.notextarea!="yes" or e.data="src" or e.data="place")
-                                <textarea class="form-control pl-2 pr-1" id="nx_input" name="nx_input" rows="1"
+                                <textarea class="form-control pl-2 pr-2" id="nx_input" name="nx_input" rows="1"
                                          maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                                         placeholder="%escape.printable.entry_value;"%if;(e.data!="fn" or e.data!="sn") autofocus%end; required>%escape.printable.entry_value;</textarea>
+                                         placeholder="%val;"%if;(e.data!="fn" or e.data!="sn") autofocus%end; required>%val;</textarea>
                               %else;
                                 <input type="text" class="form-control flex-grow-1 pl-2 pr-1" id="nx_input" name="nx_input"
                                       maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                                      value="%escape.printable.entry_value_unsort;" placeholder="%escape.printable.entry_value_unsort;"
+                                      value="%val;" placeholder="%val;"
                                       %if;(e.data!="fn" or e.data!="sn") autofocus%end; aria-label="Recipient's username" required>
                               %end;
                               %if;(e.data="fn")
@@ -255,9 +256,10 @@
                           </div>
                         </form>
                       %else;
-                        <a role="button" class=" btn-link ml-1 mr-3"
+                        <a role="button" class="btn-link ml-1 mr-3"
                            title="[*modify]" data-toggle="tooltip" data-placement="bottom"
-                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;" data-entry="%escape.printable.entry_value_unsort;">
+                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;"
+                           data-entry="%escape.printable.entry_value;">%nn;
                            %if;(e.data="src")<i class="fa fa-pen-to-square"></i></a>%end;
                            %if;(e.data="place" and suburb!="")
                             %if;(first)

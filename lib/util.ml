@@ -7,6 +7,41 @@ module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 
+let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
+    ?(aria_label = "") ?(disabled = false) ?(target = None) ?(data_attrs = [])
+    ~href ~content () =
+  let href_attr = Printf.sprintf " href=\"%s\"" href in
+  let clean_title = String.map (function '"' -> '\'' | c -> c) title in
+  let title_attr =
+    if title = "" then "" else Printf.sprintf " title=\"%s\"" clean_title
+  in
+  let class_attr =
+    if css_class = "" then "" else Printf.sprintf " class=\"%s\"" css_class
+  in
+  let tabindex_attr =
+    match tabindex with
+    | Some i -> Printf.sprintf " tabindex=\"%d\"" i
+    | None -> ""
+  in
+  let aria_label_attr =
+    if aria_label = "" then ""
+    else Printf.sprintf " aria-label=\"%s\"" aria_label
+  in
+  let target_attr =
+    match target with Some t -> Printf.sprintf " target=\"%s\"" t | None -> ""
+  in
+  let disabled_attr = if disabled then " aria-disabled=\"true\"" else "" in
+  let data_attrs_str =
+    List.fold_left
+      (fun acc (k, v) -> acc ^ Printf.sprintf " data-%s=\"%s\"" k v)
+      "" data_attrs
+  in
+  let full_attrs =
+    href_attr ^ title_attr ^ class_attr ^ tabindex_attr ^ aria_label_attr
+    ^ target_attr ^ disabled_attr ^ data_attrs_str
+  in
+  Printf.sprintf "<a%s>%s</a>" full_attrs content |> Adef.safe
+
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
@@ -73,26 +108,18 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      Logs.syslog `LOG_WARNING
-        (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
-           error fname);
+      Logs.warn (fun k ->
+          k "Error %s while loading %s, using empty config" error fname);
       []
   in
   let fname1 = !GWPARAM.config bname in
   if Sys.file_exists fname1 then load_file fname1
-  else
-    let fname2 = Filename.concat gw_prefix "a.gwf" in
-    if Sys.file_exists fname2 then (
-      if debug then
-        Logs.syslog `LOG_WARNING
-          (Printf.sprintf "Using configuration from %s\n%!" fname2);
-      load_file fname2)
-    else (
-      if debug then
-        Logs.syslog `LOG_WARNING
-          (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
-             fname2);
-      [])
+  else (
+    if debug then
+      Logs.info (fun k ->
+          k "No configuration file %s found, see %s for example" fname1
+            (Filename.concat gw_prefix "a.gwf"));
+    [])
 
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   (*Printf.eprintf "Errors set_vars:\n";
@@ -2085,19 +2112,45 @@ let get_approx_death_date_place conf base p =
     (buri_place :> Adef.safe_string)
 
 let string_of_decimal_num conf f =
-  let s = string_of_float f in
-  let b = Buffer.create 20 in
-  let rec loop i =
-    if i = String.length s then Buffer.contents b
-    else (
-      (match s.[i] with
-      | '.' ->
-          if i = String.length s - 1 then ()
-          else Buffer.add_string b (transl conf "(decimal separator)")
-      | x -> Buffer.add_char b x);
-      loop (i + 1))
-  in
-  loop 0
+  let abs_f = abs_float f in
+  if abs_f >= 0.001 && abs_f < 1000000.0 then
+    let s = Printf.sprintf "%.6f" f in
+    let s = Str.global_replace (Str.regexp "0+$") "" s in
+    let s = Str.global_replace (Str.regexp "\\.$") "" s in
+    let sig_digits =
+      String.fold_left
+        (fun acc c ->
+          if c >= '0' && c <= '9' && not (acc = 0 && c = '0') then acc + 1
+          else acc)
+        0 s
+    in
+    let needs_approx = sig_digits > 4 in
+    let localized =
+      String.map
+        (function
+          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
+        s
+    in
+    if needs_approx then "≃ " ^ localized else localized
+  else if abs_f > 0.0 then
+    let log_val = log10 abs_f in
+    let exp = int_of_float (floor log_val) in
+    let mantissa = f /. (10.0 ** float_of_int exp) in
+    let m_str = Printf.sprintf "%.3f" mantissa in
+    let m_str = Str.global_replace (Str.regexp "0+$") "" m_str in
+    let m_str = Str.global_replace (Str.regexp "\\.$") "" m_str in
+    let m_loc =
+      String.map
+        (function
+          | '.' -> String.get (transl conf "(decimal separator)") 0 | c -> c)
+        m_str
+    in
+    let exp_str =
+      if exp < 0 then "−" ^ string_of_int (abs exp) else string_of_int exp
+    in
+    Printf.sprintf "<span class=\"no-wrap\">≃ %s × 10<sup>%s</sup></span>" m_loc
+      exp_str
+  else "0"
 
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
@@ -2286,22 +2339,193 @@ let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
   |> Option.map @@ List.map (fun p -> (Driver.get_iper p, Driver.get_sex p))
 
-let gen_only_printable or_nl s =
-  let s' =
-    let conv_char i =
-      if Char.code s.[i] > 127 then s.[i]
-      else
-        match s.[i] with
-        | ' ' .. '~' | '\160' .. '\255' -> s.[i]
-        | '\n' -> if or_nl then '\n' else ' '
-        | _ -> ' '
-    in
-    String.init (String.length s) conv_char
-  in
-  String.trim s'
+type char_category = [ `Control | `Invisible | `Space | `ZeroWidth ]
 
-let only_printable_or_nl = gen_only_printable true
-let only_printable = gen_only_printable false
+(* Table des caractères problématiques indésirables
+   Association code point héxadécimaux -> nom officiel Unicode et catégorie *)
+let problem_chars =
+  [
+    (* Caractères de contrôle ASCII (0x00-0x1F sauf \n et \t) *)
+    (0x0000, "NULL", `Control);
+    (0x0001, "START OF HEADING", `Control);
+    (0x0002, "START OF TEXT", `Control);
+    (0x0003, "END OF TEXT", `Control);
+    (0x0004, "END OF TRANSMISSION", `Control);
+    (0x0005, "ENQUIRY", `Control);
+    (0x0006, "ACKNOWLEDGE", `Control);
+    (0x0007, "BELL", `Control);
+    (0x0008, "BACKSPACE", `Control);
+    (* 0x0009 = TAB - on peut le garder *)
+    (* 0x000A = LF - on peut le garder *)
+    (0x000B, "VERTICAL TAB", `Control);
+    (0x000C, "FORM FEED", `Control);
+    (0x000D, "CARRIAGE RETURN", `Control);
+    (0x000E, "SHIFT OUT", `Control);
+    (0x000F, "SHIFT IN", `Control);
+    (0x0010, "DATA LINK ESCAPE", `Control);
+    (0x0011, "DEVICE CONTROL ONE", `Control);
+    (0x0012, "DEVICE CONTROL TWO", `Control);
+    (0x0013, "DEVICE CONTROL THREE", `Control);
+    (0x0014, "DEVICE CONTROL FOUR", `Control);
+    (0x0015, "NEGATIVE ACKNOWLEDGE", `Control);
+    (0x0016, "SYNCHRONOUS IDLE", `Control);
+    (0x0017, "END OF TRANSMISSION BLOCK", `Control);
+    (0x0018, "CANCEL", `Control);
+    (0x0019, "END OF MEDIUM", `Control);
+    (0x001A, "SUBSTITUTE", `Control);
+    (0x001B, "ESCAPE", `Control);
+    (0x001C, "FILE SEPARATOR", `Control);
+    (0x001D, "GROUP SEPARATOR", `Control);
+    (0x001E, "RECORD SEPARATOR", `Control);
+    (0x001F, "UNIT SEPARATOR", `Control);
+    (0x007F, "DELETE", `Control);
+    (* Caractères invisibles Unicode *)
+    (0x00AD, "SOFT HYPHEN", `Invisible);
+    (0x034F, "COMBINING GRAPHEME JOINER", `Invisible);
+    (0x0600, "ARABIC NUMBER SIGN", `Invisible);
+    (0x0601, "ARABIC SIGN SANAH", `Invisible);
+    (0x0602, "ARABIC FOOTNOTE MARKER", `Invisible);
+    (0x0603, "ARABIC SIGN SAFHA", `Invisible);
+    (0x06DD, "ARABIC END OF AYAH", `Invisible);
+    (0x070F, "SYRIAC ABBREVIATION MARK", `Invisible);
+    (0x0F0C, "TIBETAN MARK DELIMITER", `Invisible);
+    (0x115F, "HANGUL CHOSEONG FILLER", `Invisible);
+    (0x1160, "HANGUL JUNGSEONG FILLER", `Invisible);
+    (0x1680, "OGHAM SPACE MARK", `Invisible);
+    (0x180E, "MONGOLIAN VOWEL SEPARATOR", `Invisible);
+    (* Espaces Unicode variés *)
+    (0x2000, "EN QUAD", `Space);
+    (0x2001, "EM QUAD", `Space);
+    (0x2002, "EN SPACE", `Space);
+    (0x2003, "EM SPACE", `Space);
+    (0x2004, "THREE-PER-EM SPACE", `Space);
+    (0x2005, "FOUR-PER-EM SPACE", `Space);
+    (0x2006, "SIX-PER-EM SPACE", `Space);
+    (0x2007, "FIGURE SPACE", `Space);
+    (0x2008, "PUNCTUATION SPACE", `Space);
+    (0x2009, "THIN SPACE", `Space);
+    (0x200A, "HAIR SPACE", `Space);
+    (0x205F, "MEDIUM MATHEMATICAL SPACE", `Space);
+    (0x3000, "IDEOGRAPHIC SPACE", `Space);
+    (* Zero-width *)
+    (0x200B, "ZERO WIDTH SPACE", `ZeroWidth);
+    (0x200C, "ZERO WIDTH NON-JOINER", `ZeroWidth);
+    (0x200D, "ZERO WIDTH JOINER", `ZeroWidth);
+    (0x200E, "LEFT-TO-RIGHT MARK", `ZeroWidth);
+    (0x200F, "RIGHT-TO-LEFT MARK", `ZeroWidth);
+    (0x2060, "WORD JOINER", `ZeroWidth);
+    (0x2061, "FUNCTION APPLICATION", `ZeroWidth);
+    (0x2062, "INVISIBLE TIMES", `ZeroWidth);
+    (0x2063, "INVISIBLE SEPARATOR", `ZeroWidth);
+    (0x2064, "INVISIBLE PLUS", `ZeroWidth);
+    (0x206A, "INHIBIT SYMMETRIC SWAPPING", `ZeroWidth);
+    (0x206B, "ACTIVATE SYMMETRIC SWAPPING", `ZeroWidth);
+    (0x206C, "INHIBIT ARABIC FORM SHAPING", `ZeroWidth);
+    (0x206D, "ACTIVATE ARABIC FORM SHAPING", `ZeroWidth);
+    (0x206E, "NATIONAL DIGIT SHAPES", `ZeroWidth);
+    (0x206F, "NOMINAL DIGIT SHAPES", `ZeroWidth);
+    (0xFEFF, "ZERO WIDTH NO-BREAK SPACE", `ZeroWidth);
+  ]
+
+let problem_chars_tbl =
+  let tbl = Hashtbl.create 100 in
+  List.iter
+    (fun (code, name, cat) -> Hashtbl.add tbl code (name, cat))
+    problem_chars;
+  tbl
+
+let get_problem_char_name code =
+  match Hashtbl.find_opt problem_chars_tbl code with
+  | Some (name, _) -> Some name
+  | None -> None
+
+let get_problem_chars_codes category =
+  problem_chars
+  |> List.filter_map (fun (code, _, cat) ->
+         if cat = category then Some code else None)
+
+type clean_options = {
+  remove_control : bool; (* Supprimer caractères de contrôle ASCII *)
+  remove_invisible : bool; (* Supprimer caractères invisibles Unicode *)
+  remove_zero_width : bool; (* Supprimer caractères largeur zéro *)
+  normalize_spaces : bool; (* Remplacer espaces exotiques par espace normal *)
+  keep_newlines : bool; (* Garder les sauts de ligne *)
+  keep_tabs : bool; (* Garder les tabulations *)
+}
+
+let default_clean_options =
+  {
+    remove_control = true;
+    remove_invisible = true;
+    remove_zero_width = true;
+    normalize_spaces = true;
+    keep_newlines = false;
+    keep_tabs = false;
+  }
+
+let get_unicode_point s i =
+  let n = Char.code (String.get s i) in
+  if n < 0x80 then (n, 1)
+  else if n <= 0xdf && i + 1 < String.length s then
+    (((n - 0xc0) lsl 6) lor (0x7f land Char.code (String.get s (i + 1))), 2)
+  else if n <= 0xef && i + 2 < String.length s then
+    let n' = n - 0xe0 in
+    let m = Char.code (String.get s (i + 1)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 2)) in
+    ((n' lsl 6) lor (0x7f land m), 3)
+  else if i + 3 < String.length s then
+    let n' = n - 0xf0 in
+    let m = Char.code (String.get s (i + 1)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 2)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 3)) in
+    ((n' lsl 6) lor (0x7f land m), 4)
+  else (n, 1)
+
+let clean_string ?(options = default_clean_options) s =
+  let buf = Buffer.create (String.length s) in
+  let len = String.length s in
+  let rec process i =
+    if i >= len then Buffer.contents buf
+    else
+      let code, nb_bytes = get_unicode_point s i in
+      if code = 0x0A && options.keep_newlines then (
+        Buffer.add_char buf '\n';
+        process (i + nb_bytes))
+      else if code = 0x09 && options.keep_tabs then (
+        Buffer.add_char buf '\t';
+        process (i + nb_bytes))
+      else
+        match Hashtbl.find_opt problem_chars_tbl code with
+        | Some (_, `Control) when options.remove_control ->
+            Buffer.add_char buf ' ';
+            process (i + nb_bytes)
+        | Some (_, `Invisible) when options.remove_invisible ->
+            process (i + nb_bytes)
+        | Some (_, `ZeroWidth) when options.remove_zero_width ->
+            process (i + nb_bytes)
+        | Some (_, `Space) when options.normalize_spaces ->
+            Buffer.add_char buf ' ';
+            process (i + nb_bytes)
+        | _ ->
+            for j = i to i + nb_bytes - 1 do
+              Buffer.add_char buf s.[j]
+            done;
+            process (i + nb_bytes)
+  in
+  process 0
+
+let only_printable s =
+  clean_string ~options:default_clean_options s |> String.trim
+
+let only_printable_or_nl s =
+  clean_string
+    ~options:
+      { default_clean_options with keep_newlines = true; keep_tabs = false }
+    s
+  |> String.trim
 
 let relation_type_text conf t n =
   match t with
@@ -3099,3 +3323,113 @@ let sys_to_note_link p =
 let note_link_to_sys p =
   String.split_on_char NotesLinks.char_dir_sep p
   |> String.concat Filename.dir_sep
+
+(* TODO: Equivalent of String.for_all , removable when OCaml >= 4.13 *)
+let string_for_all pred s =
+  let len = String.length s in
+  let rec loop i =
+    if i >= len then true
+    else if pred (String.get s i) then loop (i + 1)
+    else false
+  in
+  loop 0
+
+let url_has_pnoc_params env =
+  List.exists
+    (fun (key, _) ->
+      String.length key >= 2
+      && (String.get key 0 = 'p' || String.get key 0 = 'n')
+      && string_for_all
+           (function '0' .. '9' -> true | _ -> false)
+           (String.sub key 1 (String.length key - 1)))
+    env
+
+let normalize_person_pool_url conf base target_module assoc_txt_opt =
+  let converted_params = ref [] in
+  let new_index = ref 1 in
+  let preserve_text = target_module = "RLM" in
+  let rec loop i =
+    let k = string_of_int i in
+    let has_i = p_getenv conf.env ("i" ^ k) <> None in
+    let has_p = p_getenv conf.env ("p" ^ k) <> None in
+    if has_i || has_p then (
+      (if has_i then (
+         let id = Option.get (p_getenv conf.env ("i" ^ k)) in
+         let txt_param =
+           if preserve_text then
+             match p_getenv conf.env ("t" ^ k) with
+             | Some txt when txt <> "" ->
+                 "&t" ^ string_of_int !new_index ^ "="
+                 ^ (Mutil.encode txt :> string)
+             | _ -> ""
+           else ""
+         in
+         converted_params :=
+           ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+           :: !converted_params;
+         incr new_index)
+       else
+         match find_person_in_env conf base k with
+         | Some p ->
+             let id = Driver.Iper.to_string (Driver.get_iper p) in
+             let txt_param =
+               if preserve_text then
+                 match p_getenv conf.env ("t" ^ k) with
+                 | Some txt when txt <> "" ->
+                     (match assoc_txt_opt with
+                     | Some assoc_txt ->
+                         Hashtbl.add assoc_txt (Driver.get_iper p) txt
+                     | None -> ());
+                     "&t" ^ string_of_int !new_index ^ "="
+                     ^ (Mutil.encode txt :> string)
+                 | _ -> ""
+               else ""
+             in
+             converted_params :=
+               ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+               :: !converted_params;
+             incr new_index
+         | None -> ());
+      loop (i + 1))
+  in
+  loop 1;
+  Printf.sprintf "%s?m=%s&%s"
+    (conf.command :> string)
+    target_module
+    (String.concat "&" (List.rev !converted_params))
+
+(* Génère un overlay de chargement avec traduction possible *)
+let print_loading_overlay conf ?custom_translation_key () =
+  let translation_key =
+    Option.value custom_translation_key ~default:"waiting overlay"
+  in
+  let title = Utf8.capitalize_fst (transl_nth conf translation_key 0) in
+  let subtitle = Utf8.capitalize_fst (transl_nth conf translation_key 1) in
+  Output.printf conf
+    {|<div class="loading-overlay hidden">
+  <div class="text-center">
+    <div class="spinner-border text-light mb-3" role="status">
+      <span class="sr-only">Loading…</span>
+    </div>
+    <h4>%s</h4>
+    <p>%s</p>
+  </div>
+</div>
+|}
+    title subtitle
+
+let loading_overlay_js_content =
+  {|<script>
+function showOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.remove('hidden');
+}
+function hideOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', hideOverlay);
+</script>|}
+
+let print_loading_overlay_js conf =
+  Output.print_sstring conf loading_overlay_js_content
