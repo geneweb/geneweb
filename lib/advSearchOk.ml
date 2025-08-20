@@ -803,6 +803,7 @@ module SearchingFields : sig
   val test_date : Config.config -> string -> bool
   val event_search : Config.config -> Fields.search -> int -> string
   val sex : Config.config -> int
+  val union : Config.config -> int
   val first_name : Config.config -> string
   val surname : Config.config -> string
   val occupation : Config.config -> string
@@ -955,6 +956,8 @@ end = struct
           || gets conf "date1_yyyy" != ""
         then get_place_date_request conf "place" "date" event_string
         else event_string
+
+  let union conf = match gets conf "married" with "Y" -> 0 | "N" -> 1 | _ -> 2
 end
 
 (*
