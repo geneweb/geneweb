@@ -183,8 +183,8 @@ let insert_brs_in_txt br_met ss =
     | x :: xs when wiki_context -> x :: `Text [ "\n" ] :: insert true xs
     | x :: xs ->
         x
-        :: `Start_element (("", "br"), [])
-        :: `Text [ "\n" ] :: insert false xs
+        :: `Start_element ((Markup.Ns.html, "br"), [])
+        :: `End_element :: `Text [ "\n" ] :: insert false xs
     | [] -> []
   in
   let lines : string list =
@@ -199,11 +199,19 @@ let insert_brs_in_txt br_met ss =
   else [ `Text ss ]
 
 let insert_brs s =
+  let depth_stack = Stack.create () in
+  let push_depth d = Stack.push d depth_stack in
+  let pop_depth () = Option.value ~default:0 (Stack.pop_opt depth_stack) in
   let decrease_depth d = if d = 0 then d else d - 1 in
   let insert_brs_in_toplvl_text (br_met, depth) v =
     match v with
     | `Start_element ((_, "br"), _) -> ([ v ], Some (true, depth + 1))
+    | `Start_element
+        ((_, ("em" | "i" | "b" | "s" | "u" | "strong" | "strike")), _) ->
+        push_depth depth;
+        ([ v ], Some (false, 0))
     | `Start_element (_, _) -> ([ v ], Some (false, depth + 1))
+    | `End_element when depth = 0 -> ([ v ], Some (br_met, pop_depth ()))
     | `End_element -> ([ v ], Some (br_met, decrease_depth depth))
     | `Text txts when depth = 0 ->
         let txt = insert_brs_in_txt br_met txts in
