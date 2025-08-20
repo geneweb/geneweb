@@ -1,7 +1,8 @@
 let test_insert_brs ~expected ~input =
   (Alcotest.check Alcotest.string)
     "same_string" expected
-    (Geneweb.Notes.insert_brs input)
+    (Geneweb.Notes.insert_brs
+       (Geneweb.Util.string_with_macros ~conf:Geneweb.Config.empty ~env:[] input))
 
 let s1 = {|A note with
 a newline|}
@@ -97,9 +98,25 @@ let s6' = {|<br>
 <br>
 coucou|}
 
+let s7 = {|<a title="&gt;">&gt;</a>|}
+let s7' = {|<a title=">">&gt;</a>|}
+let s8 = {|https://www.some_site.org?something=value&other_thing=value&pre=42|}
+
+let s8' =
+  {|<a href="https://www.some_site.org?something=value&amp;other_thing=value&amp;pre=42" target="_blank">https://www.some_site.org?something=value&amp;other_thing=value&amp;pre=42</a>|}
+
 let test_insert_brs () =
   let cases =
-    [ (s1, s1'); (s2, s2'); (s3, s3'); (s4, s4'); (s5, s5'); (s6, s6') ]
+    [
+      (s1, s1');
+      (s2, s2');
+      (s3, s3');
+      (s4, s4');
+      (s5, s5');
+      (s6, s6');
+      (s7, s7');
+      (s8, s8');
+    ]
   in
   List.iter (fun (input, expected) -> test_insert_brs ~input ~expected) cases
 

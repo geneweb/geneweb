@@ -220,8 +220,8 @@ let insert_brs s =
   |> Markup.write_html |> Markup.to_string
 
 let wiki_aux ?(keep_newlines = false) pp conf base env str =
-  let str = if keep_newlines then insert_brs str else str in
   let s = Util.string_with_macros ~conf ~env (limit_display_length str) in
+  let s = if keep_newlines then insert_brs s else s in
   let lines = pp (Wiki.html_of_tlsw conf s) in
   let wi =
     {
