@@ -10,6 +10,8 @@ module SearchingFields : sig
   val occupation : Config.config -> string
   val events : Config.config -> string
   val sosa : Config.config -> Gwdb.base -> string
+  val union : Config.config -> int
+  val sex : Config.config -> int
 end
 
 val searching_fields : Config.config -> Gwdb.base -> Adef.safe_string
