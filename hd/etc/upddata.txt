@@ -65,17 +65,19 @@
               %if;(entry_ini!=e.s)
                 %incr_count;
                 <div class="list-group-item list-group-item-action list-group-item-info w-auto px-3 sup-char-div" tabindex="%expr(len_s+(2*cnt)+5)"
-                  title="[*search/case sensitive]0 “%escape.entry_ini;”" data-toggle="tooltip">
-                  <a class="stretched-link sup-char" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;"
-                    >%escape.entry_ini;</a>
-                    %if;(max>0 and nb_results<nb_max)%nn;
-                      <span class="bottom-book-arrow">
-                        <a href="#_%entry_ini;" title="%apply;subsection%with;“%entry_ini;”%end;"
-                          aria-label="%apply;subsection%with;“%entry_ini;”%end;" tabindex="%expr(len_s+(2*cnt)+6)">
-                          <i class="fa-solid fa-sort-down fa-2xs p-0 book-arrow"></i>
-                        </a>
-                      </span>
-                    %end;
+                     title="[*search/case sensitive]0 “%escape.entry_ini;”" data-toggle="tooltip">
+                  <a class="stretched-link sup-char"
+                     href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;">%nn;
+                     %visual_spaces.escape.entry_ini_display;%nn;
+                  </a>
+                  %if;(max>0 and nb_results<nb_max)%nn;
+                    <span class="bottom-book-arrow">
+                      <a href="#_%entry_ini;" title="%apply;subsection%with;“%entry_ini;”%end;"
+                        aria-label="%apply;subsection%with;“%entry_ini;”%end;" tabindex="%expr(len_s+(2*cnt)+6)">
+                        <i class="fa-solid fa-sort-down fa-2xs p-0 book-arrow"></i>
+                      </a>
+                    </span>
+                  %end;
                 </div>
               %end;
             %end;
@@ -102,12 +104,13 @@
           %if;(e.s!="")
             <div class="d-flex flex-grow align-self-sm-center ml-2" id="subinit">
               %foreach;substring.s.6;
-                <a tabindex="%expr(5+cnt)" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;"
-                  class="list-group-item list-group-item-action list-group-item-info w-auto sub-char d-flex align-items-center"
-                  title="[*search/case sensitive]0 “%escape.substr;”" data-toggle="tooltip">%escape.substr;</a>
+                <div class="list-group-item list-group-item-action list-group-item-info w-auto" tabindex="%expr(5+cnt)">
+                  <a class="stretched-link sub-char text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;"
+                     title="[*search/case sensitive]0 “%escape.substr;”" data-toggle="tooltip">%visual_spaces.escape.substr;</a>
+                </div>
               %end;
               %if;(len_s>6)<i class="fa-solid fa-ellipsis align-self-center ml-1"></i>%end;
-              <div class="list-group-item list-group-item-success text-nowrap user-select-all%if;(len_s>1) ml-1%end;">%escape.e.s;</div>
+              <div class="list-group-item list-group-item-success text-nowrap user-select-all ml-1">%visual_spaces.escape.current_s;</div>
             </div>
           %end;
           <div class="d-flex flex-fill align-self-center order-2 d-xs-none">
@@ -164,7 +167,7 @@
           </div>
           <div class="list-group-item-%if;(entry_ini=e.s)success%else;info%end; position-relative w-100 border font-weight-bold text-monospace">
             %if;(entry_ini!=e.s)<a class="stretched-link ml-1" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;" title="[*search/case sensitive]0 “%escape.entry_ini;”">%end;
-            <span class="ml-3">%escape.entry_ini;</span>
+            <span class="ml-3">%visual_spaces.escape.entry_ini;</span>
             %if;(entry_ini!=e.s)</a>%end;
           </div>
         </li>
@@ -207,12 +210,11 @@
                       %if;is_modified;
                         <form class="needs-validation d-flex flex-row" method="post" action="%action;" novalidate>
                           %hidden;
-                          <input type="hidden" name="key" value="%entry_key;">
                           <input type="hidden" name="m" value="MOD_DATA_OK">
                           <input type="hidden" name="data" value="%e.data;">
+                          <input type="hidden" name="key" value="%entry_key;">
                           <input type="hidden" name="s" value="%e.s;">
-                          <input type="hidden" name="k" value="kkk">
-                          %let;val;%if(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.printable.entry_value_unsort;%end;%in;
+                          %let;val;%if(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.entry_value.original;%end;%in;
                           <div class="flex-grow-1">
                             <div class="pl-2 mr-2 pr-sm-2 text-muted book-input-text">%nn;
                               %if;(e.data="place" and suburb!="")
@@ -429,42 +431,7 @@ function updateInputField() {
         }
     }
 }
-%if;(e.s!="")
-// Function to shorten the text in sup-char elements
-function shortenSupCharTexts() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const sParam = urlParams.get('s');
-
-  if (!sParam) return;
-
-  const supCharLinks = document.querySelectorAll('.sup-char');
-  const entryCount = supCharLinks.length;
-
-  if (sParam.length > 6 && entryCount > 4 || sParam.length > 4 && entryCount > 10) {
-    const supCharLinks = document.querySelectorAll('.sup-char');
-
-    supCharLinks.forEach(link => {
-      const fullText = link.textContent.trim();
-
-      if (fullText.startsWith(sParam)) {
-        const suffix = fullText.substring(sParam.length);
-
-        if (suffix) {
-          const secondLastLetter = sParam.charAt(sParam.length - 2);
-          const lastLetter = sParam.charAt(sParam.length - 1);
-          link.textContent = '…' + secondLastLetter + lastLetter + suffix;
-
-          if (link.title) {
-            link.title = link.title + ' (' + fullText + ')';
-          } else {
-            link.title = fullText;
-          }
-        }
-      }
-    });
-  }
-}
-%else;
+%if;(e.s="")
 // Function to highlight non-Latin characters
 const {regex} = Regex;
 const scripts = ['Arabic', 'Armenian', 'Cyrillic', 'Ethiopic', 'Georgian', 'Greek', 'Hebrew', 'Khmer'];

@@ -12,6 +12,7 @@
 %include;css
 </head>
 <body%body_prop;>
+%( TODO: SWITCH evar.k to evar.s as in mod_data and chk_data !! %)
 %include;hed
 %include;home
 %message_to_wizard;
@@ -131,7 +132,7 @@
   %(TODO: would we want to sort by event dates? it was "dates_sort" before %)
   %let;dates;%apply;get_value(myindex, "dates")%in;
   %let;s;%apply;get_var("p",i)%in;
-  %let;so;%if;(s="")%k;%else;%s;%end;%in;
+  %let;so;%if;(s="" and k!="")%k;%else;%s;%end;%in;
   %apply;add_in_sorted_list%with;
     %so;%and;
     %if;(e.datesort=1)%dates;%else;%if;(e.surn="")%surname;%end;%first_name;%occ;%end;%and;
@@ -142,21 +143,22 @@
 %end;
 
 <div class="mt-2">
+  <div class="mb-2">
+    %if;(k!="" and e.data!="fna" and e.data!="sna")
+      %if;wizard;
+        <a href="%prefix;m=MOD_DATA&data=%e.data;&key=%e.key&s=%apply;url_encode(k)"
+          title="%apply;book_of(e.data)[:] [modify::] “%k;”">
+          <i class="fa fa-wand-magic-sparkles fa-fw ml-2"></i>
+        </a>
+      %end;
+      %if;(e.data="place")<a href="%prefix;m=PPS&k=%k;%opt;" title="[place/places]0/[surname/surnames]0">%k;</a>%end;
+    %sp;(%end;
+    %e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;,
+      %if;(e.datesort=1)[date/dates]1%else;[sort by/branch/alphabetic order]2%end;
+    %if;(k!="" and e.data!="fna" and e.data!="sna"))%end;
+  </div>
   %foreach;sorted_list_item;
     %let;sub;%apply;get_sub(5, item.1)%in; %( was item.2 %)
-    %if;(item.1!=prev_item.1 or prev_item.1="")
-      <div class="mb-2">
-        %if;wizard;
-          <a href="%prefix;m=MOD_DATA&data=%e.data;&s=%sub;#%item.1;"
-            title="%apply;book_of(e.data)[:] [modify::] “%item.1;”">
-            <i class="fa fa-wand-magic-sparkles fa-fw ml-2"></i>
-          </a>
-        %end;
-        %if;(k!="" and e.data="place")<a href="%prefix;m=PPS&k=%item.1;%opt;" title="[place/places]0/[surname/surnames]0">%nn;
-          %item.1;</a>%end; (%e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;,
-          %if;(e.datesort=1)[date/dates]1%else;[sort by/branch/alphabetic order]2%end;)
-      </div>
-    %end;
     <div class="ml-4">
       %let;myindex;%item.3;%in;
       %let;so;%item.1;%in;
@@ -192,7 +194,7 @@
 %let;max_rlm_nbr;%if;(e.max_rlm_nbr!="")%e.max_rlm_nbr;%elseif;(b.max_rlm_nbr!="")%b.max_rlm_nbr;%else;80%end;%in;
 
 %( RLM commence à i1 et non i0 on décale i(0) en i(nb), à défaut on pourrait aussi tout décaller à i+1 %)
-<div class="ml-2 mt-2">
+<div class="ml-2 mt-3">
   %if;(e.nb!="")
     %if;(e.nb=1)
     %elseif;(e.nb>1 and e.nb<max_rlm_nbr)

@@ -189,7 +189,10 @@ let get_person_from_data conf base =
 let combine_by_ini ini list =
   let len = Utf8.length ini + 1 in
   Mutil.groupby
-    ~key:(fun (_, s) -> Alln.ini len @@ Place.without_suburb s)
+    ~key:(fun (_, s) ->
+      let s = Place.without_suburb s in
+      if Utf8.length s >= len then Utf8.sub s 0 len
+      else s ^ String.make (len - String.length s) ' ')
     ~value:(fun x -> x)
     list
 
@@ -555,7 +558,7 @@ let move_particle base s =
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
   let list = get_all_data conf base in
   let data_type = p_getenv conf.env "data" in
   let has_particle = data_type = Some "sn" || data_type = Some "domain" in
@@ -567,7 +570,7 @@ let build_list conf base =
         if is_name_type && str = "?" then None
         else
           let str = if has_particle then move_particle base str else str in
-          if Mutil.start_with_wildcard ini 0 @@ Place.without_suburb str then
+          if Mutil.start_with ini 0 @@ Place.without_suburb str then
             Some (istr, str)
           else None)
       list
@@ -582,7 +585,7 @@ let build_list conf base =
       (List.rev list)
 
 let build_list_short conf list =
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -595,7 +598,7 @@ let build_list_short conf list =
         (fun (_, s) ->
           let s = Place.without_suburb s in
           if String.length s > i then String.sub s 0 (Utf8.next s i)
-          else s ^ String.make (i + 1 - String.length s) '_')
+          else s ^ String.make (i + 1 - String.length s) ' ')
         l
     in
     (* Fonction pour supprimer les doublons. *)
@@ -605,8 +608,6 @@ let build_list_short conf list =
            (fun accu ini -> StringSet.add ini accu)
            StringSet.empty list)
     in
-    (* Astuce pour gérer les espaces. *)
-    let inis = List.rev_map (fun p -> Mutil.tr ' ' '_' p) inis in
     let inis = remove_dup inis in
     match inis with
     | [ ini ] -> build_ini list (String.length ini)
@@ -615,6 +616,6 @@ let build_list_short conf list =
   build_ini list (String.length ini)
 
 let build_list_long conf list : (string * (Driver.istr * string) list) list =
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
   let list = combine_by_ini ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list

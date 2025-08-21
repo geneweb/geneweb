@@ -189,6 +189,15 @@ type 'a env =
   | Vother of 'a
   | Vstring of string
 
+let visual_spaces_html s =
+  let buffer = Buffer.create (String.length s * 2) in
+  String.iter
+    (fun c ->
+      if c = ' ' then Buffer.add_string buffer "<span class=\"sp-ul\"> </span>"
+      else Buffer.add_char buffer c)
+    s;
+  Buffer.contents buffer
+
 let unfold_place_long inverted s =
   let pl, sub = Place.fold_place_long inverted s in
   if inverted then String.concat ", " (List.rev (sub :: List.rev pl))
@@ -267,7 +276,9 @@ and eval_simple_str_var conf _base env _xx = function
   | "cnt" -> eval_int_env "cnt" env
   | "count" -> (
       match get_env "count" env with Vcnt c -> string_of_int !c | _ -> "")
+  | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
   | "entry_ini" -> eval_string_env "entry_ini" env
+  | "entry_ini_display" -> eval_string_env "entry_ini_display" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
   | "entry_value_unsort" ->
@@ -337,14 +348,14 @@ and eval_simple_str_var conf _base env _xx = function
           (Sosa.of_int len)
       in
       let _, book_name = translate_title conf len in
-      match p_getenv conf.env "s" with
+      match p_getenv_notrim conf.env "s" with
       | Some ini ->
           if ini = "" then Printf.sprintf "%s %s" len2 book_name
           else
             let fmt_str = ftransl conf "%s %s starting with %s" in
             let escaped_ini =
-              Printf.sprintf "<span class=\"hl-book\">%s</span>"
-                (Util.escape_html ini :> string)
+              Printf.sprintf "<span>%s</span>"
+                (visual_spaces_html (Util.escape_html ini :> string))
             in
             Printf.sprintf fmt_str len2 book_name escaped_ini
       | None -> Printf.sprintf "%s %s" len2 book_name)
@@ -365,6 +376,7 @@ and eval_compound_var conf base env xx sl =
         | None -> "")
     | [ "evar"; s ] | [ "e"; s ] ->
         Option.value ~default:"" (p_getenv conf.env s)
+    | "visual_spaces" :: sl -> visual_spaces_html (loop sl)
     | [ "entry_value"; "original" ] ->
         let istr_string = eval_string_env "entry_key" env in
         let istr = Driver.Istr.of_string istr_string in
@@ -405,41 +417,54 @@ let print_foreach conf print_ast _eval_expr =
     let list = build_list_long conf list in
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
+    let current_s = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
     List.iteri
       (fun i (ini_k, (list_v : (Driver.istr * string) list)) ->
+        (* Logique de troncature pour sup-char *)
+        let display_ini =
+          let should_truncate =
+            (String.length current_s > 6 && max > 6)
+            || (String.length current_s > 4 && max > 10)
+          in
+          if should_truncate && String.length ini_k > String.length current_s
+          then
+            let suffix =
+              String.sub ini_k (String.length current_s)
+                (String.length ini_k - String.length current_s)
+            in
+            if String.length current_s >= 2 then
+              let utf8_len = Utf8.length current_s in
+              if utf8_len >= 2 then
+                let last_two = Utf8.sub current_s (utf8_len - 2) 2 in
+                "…" ^ last_two ^ suffix
+              else ini_k
+            else ini_k
+          else ini_k
+        in
+
         let env =
           Templ.Env.(
             env |> add "cnt" (Vint i) |> add "max" (Vint max)
             |> add "key" (Vstring k)
             |> add "entry_ini" (Vstring ini_k)
+            |> add "entry_ini_display" (Vstring display_ini)
             |> add "list_value" (Vlist_value list_v))
         in
         List.iter (print_ast env xx) al)
       list
   and print_foreach_substring env xx _el al evar n =
-    let evar = match p_getenv conf.env evar with Some s -> s | None -> "" in
-    (* Parse the limiting integer from n *)
-    let limit =
-      match int_of_string_opt n with
-      | Some i -> i
-      | None -> 12 (* Default limit if n is not a valid integer *)
+    let evar =
+      match p_getenv_notrim conf.env evar with Some s -> s | None -> ""
     in
-
-    (* Generate the list of progressive substrings *)
+    let limit = match int_of_string_opt n with Some i -> i | None -> 12 in
     let rec build_substrings i acc =
       if i >= Utf8.length evar || i > limit then List.rev acc
       else
-        let rec get_substr j pos =
-          if j >= i then pos else get_substr (j + 1) (Utf8.next evar pos)
-        in
-        let substr = String.sub evar 0 (get_substr 0 0) in
+        let substr = Utf8.sub evar 0 i in
         build_substrings (i + 1) (substr :: acc)
     in
-
     let substrings = build_substrings 1 [] in
     let max = List.length substrings in
-
-    (* Process each substring *)
     let rec process_items idx = function
       | [] -> ()
       | s :: tail ->
