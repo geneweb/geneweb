@@ -45,6 +45,9 @@ let make_link ?(title = "") ?(css_class = "") ?(tabindex = None)
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
+let p_getenv_notrim env label =
+  Option.map (Mutil.gen_decode false) (List.assoc_opt label env)
+
 let print_default_gwf_file bname =
   let gwf =
     [

@@ -321,10 +321,6 @@
   background: #ffe69c;
 }
 
-.hl-book {
-  background: #6cb2fd59;
-}
-
 .ch a:hover {
   background: #e9ecef;
   transform: scale(1.1);
@@ -396,6 +392,14 @@ html {
   right: 0;
   transform: translateX(-5px) translateY(1px);
   z-index: 1000;
+}
+
+.sp-ul {
+  display: inline-block;
+  width: 0.75ch;
+  border-bottom: 2px solid #0d6efd66;
+  margin: 0px 1px -1px 1px;
+  white-space: normal;
 }
 
 /* Light green background for odd-numbered items */

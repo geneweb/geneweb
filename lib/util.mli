@@ -396,6 +396,11 @@ val update_family_loop :
 val p_getenv : Config.env -> string -> string option
 (** Returns value associated to the label in environnement *)
 
+val p_getenv_notrim :
+  (string * Adef.encoded_string) list -> string -> string option
+(** [p_getenv_notrim env label] like [p_getenv] but preserves leading/trailing
+    spaces *)
+
 val p_getint : Config.env -> string -> int option
 (** Returns integer value associated to the label in environnement *)
 
