@@ -784,22 +784,7 @@ let advanced_search conf base max_answers =
   (List.rev list, len)
 
 module SearchingFields : sig
-  val gets : Config.config -> string -> string
-  val getd : Config.config -> string -> Date.dmy option * Date.dmy option
-  val map_field : conf:Config.config -> key:string -> string -> string
-
-  val string_field :
-    ?map_field:(string -> string) -> Config.config -> string -> string -> string
-
   val sosa : Config.config -> Gwdb.base -> string
-
-  val get_place_date_request :
-    Config.config -> string -> string -> string -> string
-
-  val test_string : Config.config -> string -> bool
-  val test_date : Config.config -> string -> bool
-  val event_search : Config.config -> Fields.search -> int -> string
-  val sex : Config.config -> int
   val first_name : Config.config -> string
   val surname : Config.config -> string
   val occupation : Config.config -> string
@@ -830,11 +815,6 @@ end = struct
   let test_date conf x =
     reconstitute_date_dmy conf (x ^ "1") <> None
     || reconstitute_date_dmy conf (x ^ "2") <> None
-
-  (* Fonction pour tester un simple champ texte (e.g: first_name). *)
-  let string_field ?(map_field = Fun.id) conf x search =
-    if test_string conf x then search ^ " " ^ map_field (gets conf x)
-    else search
 
   (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
   let get_place_date_request conf place_prefix_field_name date_prefix_field_name
@@ -978,3 +958,38 @@ let exact_matching_surname_aliases ~surname =
 
 let prefix_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:is_subset_pfx
+
+let is_search_by_name_mode_key key =
+  List.mem key
+    [
+      "exact_first_name";
+      "exact_surname";
+      "exact_first_name_prefix";
+      "exact_surname_prefix";
+    ]
+
+module Config_env = Set.Make (struct
+  type t = string * Adef.encoded_string
+
+  let compare = compare
+end)
+
+let exact_search_by_name_parameters =
+  let on = Mutil.encode "on" in
+  Config_env.of_list [ ("exact_first_name", on); ("exact_surname", on) ]
+
+let is_exact_search_by_name conf =
+  let search_by_name_mode_parameters =
+    conf.Config.env
+    |> List.filter (fun (key, _) -> is_search_by_name_mode_key key)
+    |> Config_env.of_list
+  in
+  Config_env.equal search_by_name_mode_parameters
+    exact_search_by_name_parameters
+
+let force_exact_search_by_name conf =
+  let make_env env =
+    Config_env.elements exact_search_by_name_parameters
+    @ List.filter (fun (key, _) -> not @@ is_search_by_name_mode_key key) env
+  in
+  { conf with Config.env = make_env conf.Config.env }
