@@ -981,7 +981,7 @@ let exact_matching_surname_aliases ~surname =
 let prefix_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~matching:is_subset_pfx
 
-let is_exact_search_by_name_key key =
+let is_search_by_name_mode_key key =
   List.mem key
     [
       "exact_first_name";
@@ -1003,6 +1003,6 @@ let exact_search_by_name_parameters =
 let force_exact_search_by_name conf =
   let make_env env =
     Config_env.elements exact_search_by_name_parameters
-    @ List.filter (fun (key, _) -> not @@ is_exact_search_by_name_key key) env
+    @ List.filter (fun (key, _) -> not @@ is_search_by_name_mode_key key) env
   in
   { conf with Config.env = make_env conf.Config.env }
