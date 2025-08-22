@@ -270,6 +270,7 @@ and eval_simple_bool_var _conf _base env _xx = function
       | Vstring _ as x -> get_env "entry_key" env = x
       | _ -> false)
   | "first" -> ( match get_env "first" env with Vbool x -> x | _ -> false)
+  | "script" -> ( match get_env "script" env with Vbool x -> x | _ -> false)
   | _ -> raise Not_found
 
 and eval_simple_str_var conf _base env _xx = function
@@ -328,6 +329,8 @@ and eval_simple_str_var conf _base env _xx = function
           c := 0;
           ""
       | _ -> "")
+  | "script_class" -> eval_string_env "script_class" env
+  | "script_title" -> eval_string_env "script_title" env
   | "suburb" -> (
       match p_getenv conf.env "data" with
       | Some "place" -> Place.only_suburb (eval_string_env "entry_value" env)
@@ -418,9 +421,9 @@ let print_foreach conf print_ast _eval_expr =
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
     let current_s = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+
     List.iteri
       (fun i (ini_k, (list_v : (Driver.istr * string) list)) ->
-        (* Logique de troncature pour sup-char *)
         let display_ini =
           let should_truncate =
             (String.length current_s > 6 && max > 6)
@@ -441,13 +444,32 @@ let print_foreach conf print_ast _eval_expr =
             else ini_k
           else ini_k
         in
-
+        let script_info =
+          if String.length ini_k > 0 then
+            let first_char = Utf8.C.cp ini_k 0 in
+            match Uucp.Script.script first_char with
+            | `Arab -> Some ("arab-char", "Arabic")
+            | `Armn -> Some ("armn-char", "Armenian")
+            | `Cyrl -> Some ("cyrl-char", "Cyrillic")
+            | `Ethi -> Some ("ethi-char", "Ethiopic")
+            | `Geor -> Some ("geor-char", "Georgian")
+            | `Grek -> Some ("grek-char", "Greek")
+            | `Hebr -> Some ("hebr-char", "Hebrew")
+            | `Khmr -> Some ("khmr-char", "Khmer")
+            | _ -> None
+          else None
+        in
         let env =
           Templ.Env.(
             env |> add "cnt" (Vint i) |> add "max" (Vint max)
             |> add "key" (Vstring k)
             |> add "entry_ini" (Vstring ini_k)
             |> add "entry_ini_display" (Vstring display_ini)
+            |> add "script" (Vbool (Option.is_some script_info))
+            |> add "script_class"
+                 (Vstring (Option.fold ~none:"" ~some:fst script_info))
+            |> add "script_title"
+                 (Vstring (Option.fold ~none:"" ~some:snd script_info))
             |> add "list_value" (Vlist_value list_v))
         in
         List.iter (print_ast env xx) al)

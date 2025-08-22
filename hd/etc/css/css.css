@@ -421,59 +421,52 @@ a.stretched-link.sup-char:hover, a.stretched-link.sub-char:hover {
 .sup-char-div .bottom-book-arrow a:hover .book-arrow {
     color: #89CAFE !important;
 }
-.arabic-char {
+.arab-char {
     background-color: #ccecf1 !important
 }
-.armenian-char {
+.armn-char {
     background-color: #27fff32e !important
 }
-.cyrillic-char {
+.cyrl-char {
     background-color: #9ef7c5ab !important
 }
-.ethiopic-char {
+.ethi-char {
     background-color: #05fb9033 !important
 }
-.georgian-char {
+.geor-char {
     background-color: #B0C4DE !important
 }
-.greek-char {
+.grek-char {
     background-color: #6edf5e54 !important
 }
-.hebrew-char {
+.hebr-char {
     background-color: #AFEEEE !important
 }
-.khmer-char {
+.khmr-char {
     background-color: #a2df7882 !important
 }
-.arabic-char:hover {
+.arab-char:hover {
     background-color: #d9f0f7 !important;
 }
-
-.armenian-char:hover {
+.armn-char:hover {
     background-color: #33fffa47 !important;
 }
-
-.cyrillic-char:hover {
+.cyrl-char:hover {
     background-color: #b7f7d5ab !important;
 }
-
-.ethiopic-char:hover {
+.ethi-char:hover {
     background-color: #08fb9047 !important;
 }
-
-.georgian-char:hover {
+.geor-char:hover {
     background-color: #c6d9e8 !important;
 }
-
-.greek-char:hover {
+.grek-char:hover {
     background-color: #87e07768 !important;
 }
-
-.hebrew-char:hover {
+.hebr-char:hover {
     background-color: #c6e8e8 !important;
 }
-
-.khmer-char:hover {
+.khmr-char:hover {
     background-color: #b4df8c99 !important;
 }
 a.book-arrow:hover {

@@ -64,8 +64,8 @@
             %foreach;entry;
               %if;(entry_ini!=e.s)
                 %incr_count;
-                <div class="list-group-item list-group-item-action list-group-item-info w-auto px-3 sup-char-div" tabindex="%expr(len_s+(2*cnt)+5)"
-                     title="[*search/case sensitive]0 “%escape.entry_ini;”" data-toggle="tooltip">
+                <div class="list-group-item list-group-item-action list-group-item-info w-auto px-3 sup-char-div%if;script; %script_class;%end;" tabindex="%expr(len_s+(2*cnt)+5)"
+                     title="[*search/case sensitive]0 “%escape.entry_ini;”%if;script; (%script_title;)%end;" data-toggle="tooltip">
                   <a class="stretched-link sup-char"
                      href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;">%nn;
                      %visual_spaces.escape.entry_ini_display;%nn;
@@ -294,189 +294,160 @@
 %include;trl
 %include;copyr
 </div>
-%include;js
-%query_time;
 <script>
-// Function for navigation and keyboard shortcuts
-function setupNavigation() {
-  var navbarHeight = document.getElementById('fixed-nav').offsetHeight;
-  var scrollPaddingTop = navbarHeight + 4;
-  document.getElementById('book').style.scrollPaddingTop = scrollPaddingTop + 'px';
+const updateData = {
+  init() {
+    this.keyboardNavigation();
+    this.stableTooltips();
+    this.removeLoadingOverlay();
+    this.autoSelectLink();
+    this.updateInputField();
+  },
 
-  const linkTrm = document.querySelectorAll('.sub-char');
-  const linkAdd = document.querySelectorAll('.sup-char');
-  let iTrm = -1;
-  let iAdd = -1;
+  keyboardNavigation() {
+    const navbarHeight = document.getElementById('fixed-nav').offsetHeight;
+    document.getElementById('book').style.scrollPaddingTop = (navbarHeight + 4) + 'px';
 
-  document.addEventListener('keydown', (event) => {
-    if (event.altKey && event.key === 't' || event.key === 't' && !['input', 'textarea'].includes(event.target.tagName.toLowerCase())) {
-      event.preventDefault();
-      let len = linkTrm.length;
-      if (iTrm === -1) {
-        iTrm = len - 1;
-        linkTrm[iTrm].focus();
-      } else {
-        linkTrm[iTrm].blur();
-        iTrm = (iTrm + len - 1) % len;
-        linkTrm[iTrm].focus();
-      }
-    }
-    if (event.altKey && event.key === 'd' || event.key === 'd' && !['INPUT', 'TEXTAREA'].includes(event.target.tagName)) {
-      event.preventDefault();
-      if (iAdd === -1) {
-        iAdd = 0;
-        linkAdd[iAdd].parentNode.focus();
-      } else {
-        linkAdd[iAdd].parentNode.blur();
-        iAdd = (iAdd + 1) % linkAdd.length;
-        linkAdd[iAdd].parentNode.focus();
-      }
-    }
-  });
+    const linkTrm = document.querySelectorAll('.sub-char');
+    const linkAdd = document.querySelectorAll('.sup-char');
+    let iTrm = -1, iAdd = -1;
 
-  document.querySelectorAll('.sup-char-div').forEach((div) => {
-    div.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        const hyperlink = div.querySelector('a:first-child');
-        if (hyperlink) {
-          hyperlink.click();
+    const keyActions = new Map(%[
+      %['t', () => {
+        const len = linkTrm.length;
+        if (iTrm === -1) {
+          iTrm = len - 1;
+          linkTrm[iTrm].focus();
+        } else {
+          linkTrm[iTrm].blur();
+          iTrm = (iTrm + len - 1) % len;
+          linkTrm[iTrm].focus();
         }
+      }%],
+      %['d', () => {
+        if (iAdd === -1) {
+          iAdd = 0;
+          linkAdd[iAdd].parentNode.focus();
+        } else {
+          linkAdd[iAdd].parentNode.blur();
+          iAdd = (iAdd + 1) % linkAdd.length;
+          linkAdd[iAdd].parentNode.focus();
+        }
+      }%]
+    %]);
+
+    const inputTags = new Set(['input', 'textarea']);
+
+    document.addEventListener('keydown', (event) => {
+      const action = keyActions.get(event.key);
+      if (action && (event.altKey || !inputTags.has(event.target.tagName.toLowerCase()))) {
+        event.preventDefault();
+        action();
       }
     });
-  });
-}
 
-// Function to remove loading overlay
-function removeLoadingOverlay() {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has('key') || (!urlParams.has('s1'))) {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) { overlay.style.display = 'none'; }
-  }
-}
+    document.querySelectorAll('.sup-char-div').forEach(div => {
+      div.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+          div.querySelector('a')?.click();
+        }
+      });
+    });
+  },
 
-// Function to auto-select link based on URL parameters
-// Fallback on book if s1 not found and print a warning
-function autoSelectLink() {
+  stableTooltips() {
+    $('[data-toggle="tooltip"]').tooltip({
+      trigger: 'hover focus',
+      delay: { "show": 100, "hide": 100 },
+      container: 'body',
+      animation: false,
+      boundary: 'window'
+    });
+  },
+
+  removeLoadingOverlay() {
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('key') || (!urlParams.has('s1'))) {
+      const overlay = document.getElementById('loading-overlay');
+      if (overlay) { overlay.style.display = 'none'; }
+    }
+  },
 
+  // Function to auto-select link based on URL parameters
+  // Fallback on book if s1 not found and print a warning
+  autoSelectLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
     // Clic automatique quand s1= ou s2= présent
     if (urlParams.has('s1') || urlParams.has('s2')) {
-        if (urlParams.has('key')) return; // Skip si déjà en mode édition
-
-        const s1Param = urlParams.get('s1');
-        const s2Param = urlParams.get('s2');
-        const sParam = urlParams.get('s');
-        const value = s1Param || sParam;
-
-        // Stockage s2 pour updateInputField()
-        if (s2Param) {
-            localStorage.setItem('s2Tmp', decodeURIComponent(s2Param));
-        }
-
-        // Tentative de clic automatique
-        if (value && value.trim()) {
-            const link = Array.from(document.getElementsByTagName('a')).find(
-                a => a.getAttribute('data-entry') === decodeURIComponent(value) &&
-                     a.href.includes('key')
-            );
-
-            if (link) {
-                link.click(); // Cible trouvée → Édition automatique
-            } else {
-                // Cible introuvable → Stockage pour warning + fallback
-                const decodedValue = decodeURIComponent(s1Param || sParam);
-                if (decodedValue && decodedValue.trim()) {
-                    localStorage.setItem('notFoundValue', decodedValue);
-                }
-
-                // Redirection vers mode consultation (URL nettoyée)
-                urlParams.delete('s1');
-                urlParams.delete('s2');
-                if (s1Param && !sParam) urlParams.set('s', s1Param);
-                window.location.href = window.location.pathname + '?' + urlParams.toString();
-            }
+      if (urlParams.has('key')) return; // Skip si déjà en mode édition
+      
+      const s1Param = urlParams.get('s1');
+      const s2Param = urlParams.get('s2');
+      const sParam = urlParams.get('s');
+      const value = s1Param || sParam;
+      
+      // Stockage s2 pour updateInputField()
+      if (s2Param) {
+        localStorage.setItem('s2Tmp', decodeURIComponent(s2Param));
+      }
+      
+      // Tentative de clic automatique
+      if (value && value.trim()) {
+        const decodedValue = decodeURIComponent(value);
+        const link = Array.from(document.getElementsByTagName('a')).find(
+          a => a.getAttribute('data-entry') === decodedValue && a.href.includes('key')
+        );
+        
+        if (link) {
+          link.click(); // Cible trouvée → Édition automatique
         } else {
-            urlParams.delete('s1');
-            urlParams.delete('s2');
-            window.location.href = window.location.pathname + '?' + urlParams.toString();
+          // Cible introuvable → Stockage pour warning + fallback
+          if (decodedValue.trim()) {
+            localStorage.setItem('notFoundValue', decodedValue);
+          }
+          
+          // Redirection vers mode consultation (URL nettoyée)
+          urlParams.delete('s1');
+          urlParams.delete('s2');
+          if (s1Param && !sParam) urlParams.set('s', s1Param);
+          window.location.href = window.location.pathname + '?' + urlParams.toString();
         }
+      } else {
+        urlParams.delete('s1');
+        urlParams.delete('s2');
+        window.location.href = window.location.pathname + '?' + urlParams.toString();
+      }
     }
     // Navigation normale ou après fallback
     else {
-        const notFoundValue = localStorage.getItem('notFoundValue');
-
-        if (notFoundValue && notFoundValue.trim()) {
-            const valueSpan = document.getElementById('notfound-value');
-            const notFoundDiv = document.getElementById('notfound-warning');
-
-            if (valueSpan && notFoundDiv) {
-                valueSpan.textContent = notFoundValue;
-                notFoundDiv.classList.remove('d-none');
-            }
+      const notFoundValue = localStorage.getItem('notFoundValue');
+      if (notFoundValue && notFoundValue.trim()) {
+        const valueSpan = document.getElementById('notfound-value');
+        const notFoundDiv = document.getElementById('notfound-warning');
+        
+        if (valueSpan && notFoundDiv) {
+          valueSpan.textContent = notFoundValue;
+          notFoundDiv.classList.remove('d-none');
         }
-
-        localStorage.removeItem('notFoundValue');
+      }
+      localStorage.removeItem('notFoundValue');
     }
-}
+  },
 
-// Function to update input field
-function updateInputField() {
+  updateInputField() {
     const s2 = localStorage.getItem('s2Tmp');
     if (s2 && window.location.href.includes('key=')) {
-        const input = document.getElementById('nx_input');
-        if (input) {
-            input.value = s2;
-            localStorage.removeItem('s2Tmp');
-        }
-    }
-}
-%if;(e.s="")
-// Function to highlight non-Latin characters
-const {regex} = Regex;
-const scripts = ['Arabic', 'Armenian', 'Cyrillic', 'Ethiopic', 'Georgian', 'Greek', 'Hebrew', 'Khmer'];
-
-function highlightNonLatinChars() {
-  const divs = document.querySelectorAll('.sup-char-div');
-
-  divs.forEach(div => {
-    const link = div.querySelector('.sup-char');
-    if (!link) return;
-
-    const char = link.textContent.trim();
-
-    scripts.forEach(script => {
-      if (regex`\p{Script=${script}}`.test(char)) {
-        scriptName = script.toLowerCase();
-        div.classList.add(`${scriptName}-char`);
-        link.title += ` (${scriptName})`;
+      const input = document.getElementById('nx_input');
+      if (input) {
+        input.value = s2;
+        localStorage.removeItem('s2Tmp');
       }
-    });
-  });
-}
-%end;
-function setupStableTooltips() {
-  // Configure tooltips with more stability options
-  $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover focus',
-    delay: { "show": 100, "hide": 100 },
-    container: 'body', // This is important - moves tooltips to body
-    animation: false,  // Disable animations
-    boundary: 'window' // Uses window as positioning boundary
-  });
-}
-document.addEventListener('DOMContentLoaded', function() {
-  setupNavigation();
-  setupStableTooltips()
-  %if;(e.s!="")
-    shortenSupCharTexts();
-  %else;
-    highlightNonLatinChars();
-  %end;
-  removeLoadingOverlay();
-  autoSelectLink();
-  updateInputField();
-});
+    }
+  }
+};
 </script>
+%include;js
+%query_time;
 </body>
 </html>

@@ -676,6 +676,9 @@ document.addEventListener('DOMContentLoaded', () => {
 %if;("MOD" in e.m)
   setupAutofocusInput();
 %end;
+%if;(e.m="MOD_DATA")
+  updateData.init();
+%end;
 %if;(e.m="CHK_DATA")
   if (typeof CheckData !== 'undefined' && CheckData.init) {
     if (document.readyState === 'complete') {
