@@ -1445,29 +1445,30 @@ let make_conf ~secret_salt from_addr request script_name env =
   GWPARAM.cnt_dir := !GWPARAM.cnt_d conf.bname;
   (conf, ar)
 
-let pp_cut_string ~max ppf s =
-  if String.length s > max then Fmt.pf ppf "%s..." (String.sub s 0 max)
-  else Fmt.string ppf s
-
 let log tm conf from gauth request script_name contents =
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
   Logs.info (fun k ->
-      k "%s (%d) %s?"
+      k "%s (%d) %s?%s\n%s%s%s%s%s"
         (Mutil.sprintf_date tm :> string)
-        (Unix.getpid ()) script_name);
-  Logs.info (fun k -> k "%a" (pp_cut_string ~max:700) contents);
-  Logs.info (fun k -> k "From: %s" from);
-  if gauth <> "" then Logs.info (fun k -> k "User: %s" gauth);
-  if conf.wizard && not conf.friend then
-    Logs.info (fun k ->
-        k "  User: %s%s(wizard)" conf.user (if conf.user = "" then "" else " "))
-  else if conf.friend && not conf.wizard then
-    Logs.info (fun k ->
-        k "  User: %s%s(friend)" conf.user (if conf.user = "" then "" else " "));
-  if user_agent <> "" then Logs.info (fun k -> k "  Agent: %s" user_agent);
-  if referer <> "" then Logs.info (fun k -> k "  Referer: %s" referer)
+        (Unix.getpid ()) script_name
+        (if String.length contents > 700 then
+           Printf.sprintf "%s..." (String.sub contents 0 700)
+         else contents)
+        (Printf.sprintf "    From: %s" from)
+        (if gauth <> "" then Printf.sprintf "\n    User: %s" gauth else "")
+        (if conf.wizard && not conf.friend then
+           Printf.sprintf "\n    User: %s%s(wizard)" conf.user
+             (if conf.user = "" then "" else " ")
+         else if conf.friend && not conf.wizard then
+           Printf.sprintf "\n    User: %s%s(friend)" conf.user
+             (if conf.user = "" then "" else " ")
+         else "")
+        (if user_agent <> "" then Printf.sprintf "\n    Agent: %s" user_agent
+         else "")
+        (if referer <> "" then Printf.sprintf "\n    Referer: %s" referer
+         else ""))
 
 let is_robot from =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
