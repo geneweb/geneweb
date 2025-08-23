@@ -531,7 +531,7 @@ let read_or_create_visible base =
   let fname = Filename.concat base.data.bdir "restrict" in
   let visible =
     if Sys.file_exists fname then (
-      let ic = Secure.open_in fname in
+      let ic = Secure.open_in_bin fname in
       let visible =
         if Mutil.check_magic Mutil.executable_magic ic then input_value ic
         else Hashtbl.create (nb_of_persons base)
@@ -549,7 +549,7 @@ let base_visible_write base =
     let fname = Filename.concat base.data.bdir "restrict" in
     match !visible_ref with
     | Some visible ->
-        let oc = Secure.open_out fname in
+        let oc = Secure.open_out_bin fname in
         output_string oc Mutil.executable_magic;
         output_value oc visible;
         close_out oc
