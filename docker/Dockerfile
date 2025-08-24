@@ -60,9 +60,16 @@ RUN apt-get update -q \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && adduser --system --group --uid 1000 \
-     --home ${GENEWEB_HOME} --shell /bin/bash geneweb \
-  && usermod -aG sudo geneweb \
-  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+     --home ${GENEWEB_HOME} --shell /bin/bash geneweb
+
+# Create directory structure as root first
+RUN mkdir -p ${GENEWEB_HOME}/bin \
+             ${GENEWEB_HOME}/etc \
+             ${GENEWEB_HOME}/log \
+             ${GENEWEB_HOME}/share/data \
+             ${GENEWEB_HOME}/share/dist \
+  && echo "${GWSETUP_IP}" > ${GENEWEB_HOME}/etc/gwsetup_only \
+  && chown -R geneweb:geneweb ${GENEWEB_HOME}
 
 # Add required directories and copy geneweb distribution
 USER geneweb
