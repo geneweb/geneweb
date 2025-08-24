@@ -1448,27 +1448,23 @@ let make_conf ~secret_salt from_addr request script_name env =
 let log tm conf from gauth request script_name contents =
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
-  let tm = Unix.localtime tm in
   Logs.info (fun k ->
-      k "%s (%d) %s?%s\n%s%s%s%s%s"
-        (Mutil.sprintf_date tm :> string)
-        (Unix.getpid ()) script_name
-        (if String.length contents > 700 then
-           Printf.sprintf "%s..." (String.sub contents 0 700)
+      k "(%d) %s?%s\n%s%s%s%s%s" (Unix.getpid ()) script_name
+        (if String.length contents > 200 then
+           Printf.sprintf "%s..." (String.sub contents 0 200)
          else contents)
-        (Printf.sprintf "    From: %s" from)
-        (if gauth <> "" then Printf.sprintf "\n    User: %s" gauth else "")
+        (Printf.sprintf "  From: %s" from)
+        (if gauth <> "" then Printf.sprintf "\n  User: %s" gauth else "")
         (if conf.wizard && not conf.friend then
-           Printf.sprintf "\n    User: %s%s(wizard)" conf.user
+           Printf.sprintf "\n  User: %s%s(wizard)" conf.user
              (if conf.user = "" then "" else " ")
          else if conf.friend && not conf.wizard then
-           Printf.sprintf "\n    User: %s%s(friend)" conf.user
+           Printf.sprintf "\n  User: %s%s(friend)" conf.user
              (if conf.user = "" then "" else " ")
          else "")
-        (if user_agent <> "" then Printf.sprintf "\n    Agent: %s" user_agent
+        (if user_agent <> "" then Printf.sprintf "\n  Agent: %s" user_agent
          else "")
-        (if referer <> "" then Printf.sprintf "\n    Referer: %s" referer
-         else ""))
+        (if referer <> "" then Printf.sprintf "\n  Referer: %s" referer else ""))
 
 let is_robot from =
   let lock_file = !GWPARAM.adm_file "gwd.lck" in
@@ -1976,29 +1972,27 @@ let geneweb_server ~predictable_mode () =
           else (
             Logs.info (fun k ->
                 k
-                  "Possible addresses:\n\
-                   http://localhost:%d/base\n\
-                   http://127.0.0.1:%d/base\n\
-                   http://%s:%d/base"
+                  {|  Possible addresses:
+  http://localhost:%d/base
+  http://127.0.0.1:%d/base
+  http://%s:%d/base
+  where "base" is the name of the database
+  Type "Ctrl+C" to stop the service|}
                   !selected_port !selected_port hostn !selected_port);
-            Logs.info (fun k ->
-                k
-                  "where \"base\" is the name of the database\n\
-                   Type “Ctrl+C” to stop the service");
             (* taken from Michel Normand commit 1874dcbf7 *)
             Logs.debug (fun k ->
                 k
-                  "gwd parameters (after GWPARAM.init & cache_lexicon):\n\
-                   source: %s\n\
-                   branch: %s\n\
-                   commit: %s\n\
-                   gwd:%s\n\
-                   current_dir_name: %s\n\
-                   gw_prefix: %s\n\
-                   etc_prefix: %s\n\
-                   images_prefix: %s\n\
-                   images_dir: %s\n\
-                   secure asset: %a"
+                  {|  gwd parameters (after GWPARAM.init & cache_lexicon):
+  source: %s
+  branch: %s
+  commit: %s
+  gwd:%s
+  current_dir_name: %s
+  gw_prefix: %s
+  etc_prefix: %s
+  images_prefix: %s
+  images_dir: %s
+  secure asset: %a|}
                   Version.src Version.branch Version.commit_id Sys.argv.(0)
                   (Sys.getcwd ()) !gw_prefix !etc_prefix !images_prefix
                   !images_dir
