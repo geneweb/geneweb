@@ -70,7 +70,7 @@ RUN mkdir -p bin etc log share/data share/dist \
   && echo "${GWSETUP_IP}" >> etc/gwsetup_only
 
 # Copy application files
-COPY --from=builder --chown=geneweb:geneweb /home/opam/geneweb/distribution share/dist
+COPY --from=builder /home/opam/geneweb/distribution share/dist
 COPY docker/geneweb-launch.sh bin/geneweb-launch.sh
 
 # Make script executable, ensure log files exists and update ownership
