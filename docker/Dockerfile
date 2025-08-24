@@ -71,17 +71,19 @@ RUN mkdir -p ${GENEWEB_HOME}/bin \
   && echo "${GWSETUP_IP}" > ${GENEWEB_HOME}/etc/gwsetup_only \
   && chown -R geneweb:geneweb ${GENEWEB_HOME}
 
-# Add required directories and copy geneweb distribution
+# Copy application files with correct ownership
+COPY --from=builder --chown=geneweb:geneweb /home/opam/geneweb/distribution ${GENEWEB_HOME}/share/dist
+COPY --chown=geneweb:geneweb docker/geneweb-launch.sh ${GENEWEB_HOME}/bin/geneweb-launch.sh
+
+# Make script executable and ensure log files exist
+RUN chmod +x ${GENEWEB_HOME}/bin/geneweb-launch.sh \
+  && touch ${GENEWEB_HOME}/log/gwsetup.log \
+  && touch ${GENEWEB_HOME}/log/gwd.log \
+  && chown geneweb:geneweb ${GENEWEB_HOME}/log/*.log
+
+# Switch to geneweb user
 USER geneweb
 WORKDIR ${GENEWEB_HOME}
-
-# Create directory structure and configure
-RUN mkdir -p bin etc log share/data share/dist \
-  && echo "${GWSETUP_IP}" >> etc/gwsetup_only
-
-# Copy application files
-COPY --from=builder /home/opam/geneweb/distribution share/dist
-COPY docker/geneweb-launch.sh bin/geneweb-launch.sh
 
 # Configure container
 EXPOSE 2316-2317
