@@ -22,7 +22,6 @@ WORKDIR /home/opam/opam-repository
 RUN git fetch origin master && git checkout 2ca36230be22748ea153057760524e23defe5fc7 && opam update
 
 # Initialize OPAM
-USER opam
 WORKDIR /home/opam
 RUN opam init --disable-sandboxing --auto-setup --bare
 
@@ -56,16 +55,13 @@ ENV GWSETUP_IP=172.17.0.1
 # Ignore the apt warning here as apt-get does not allow wildcarding versions
 # hadolint ignore=DL3027
 RUN apt-get update -q \
-  && apt install -qy --no-install-recommends sudo openssl adduser \
+  && apt install -qy --no-install-recommends openssl adduser netcat-openbsd \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && adduser --system --group --uid 1000 \
-     --home ${GENEWEB_HOME} --shell /bin/bash geneweb \
-  && usermod -aG sudo geneweb \
-  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+     --home ${GENEWEB_HOME} --shell /bin/bash geneweb
 
-# Add required directories and copy geneweb distribution
-USER geneweb
+# Do everything in the Geneweb home directory
 WORKDIR ${GENEWEB_HOME}
 
 # Create directory structure and configure
@@ -75,6 +71,15 @@ RUN mkdir -p bin etc log share/data share/dist \
 # Copy application files
 COPY --from=builder /home/opam/geneweb/distribution share/dist
 COPY docker/geneweb-launch.sh bin/geneweb-launch.sh
+
+# Make script executable, ensure log files exists and update ownership
+RUN chmod +x bin/geneweb-launch.sh \
+  && touch log/gwsetup.log \
+  && touch log/gwd.log \
+  && chown -R geneweb:geneweb .
+
+# Switch to geneweb user
+USER geneweb
 
 # Configure container
 EXPOSE 2316-2317
