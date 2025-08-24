@@ -62,28 +62,25 @@ RUN apt-get update -q \
   && adduser --system --group --uid 1000 \
      --home ${GENEWEB_HOME} --shell /bin/bash geneweb
 
-# Create directory structure as root first
-RUN mkdir -p ${GENEWEB_HOME}/bin \
-             ${GENEWEB_HOME}/etc \
-             ${GENEWEB_HOME}/log \
-             ${GENEWEB_HOME}/share/data \
-             ${GENEWEB_HOME}/share/dist \
-  && echo "${GWSETUP_IP}" > ${GENEWEB_HOME}/etc/gwsetup_only \
-  && chown -R geneweb:geneweb ${GENEWEB_HOME}
+# Do everything in the Geneweb home directory
+WORKDIR ${GENEWEB_HOME}
 
-# Copy application files with correct ownership
-COPY --from=builder --chown=geneweb:geneweb /home/opam/geneweb/distribution ${GENEWEB_HOME}/share/dist
-COPY --chown=geneweb:geneweb docker/geneweb-launch.sh ${GENEWEB_HOME}/bin/geneweb-launch.sh
+# Create directory structure and configure
+RUN mkdir -p bin etc log share/data share/dist \
+  && echo "${GWSETUP_IP}" > etc/gwsetup_only
 
-# Make script executable and ensure log files exist
-RUN chmod +x ${GENEWEB_HOME}/bin/geneweb-launch.sh \
-  && touch ${GENEWEB_HOME}/log/gwsetup.log \
-  && touch ${GENEWEB_HOME}/log/gwd.log \
-  && chown geneweb:geneweb ${GENEWEB_HOME}/log/*.log
+# Copy application files
+COPY --from=builder --chown=geneweb:geneweb /home/opam/geneweb/distribution share/dist
+COPY --chown=geneweb:geneweb docker/geneweb-launch.sh bin/geneweb-launch.sh
+
+# Make script executable, ensure log files exist and update ownership
+RUN chmod +x bin/geneweb-launch.sh \
+  && touch log/gwsetup.log \
+  && touch log/gwd.log \
+  && chown -R geneweb:geneweb .
 
 # Switch to geneweb user
 USER geneweb
-WORKDIR ${GENEWEB_HOME}
 
 # Configure container
 EXPOSE 2316-2317
