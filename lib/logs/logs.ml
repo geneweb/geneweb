@@ -61,14 +61,14 @@ let syslog (level : level) msg =
   in
 #ifdef SYSLOG
   let flags = if !debug_flag then [`LOG_PERROR] else [] in
-  if !verbosity_level >= lvl
+  if !verbosity_level >= lvl && msg <> ""
   then begin
     let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
     Syslog.syslog log level msg ;
     Syslog.closelog log
   end
 #else
-  if !verbosity_level >= lvl
+  if !verbosity_level >= lvl && msg <> ""
   then begin
     let tm = Unix.(time () |> localtime) in
     let level =
