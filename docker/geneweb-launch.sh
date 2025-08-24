@@ -46,7 +46,6 @@ init() {
 
 start() {
 	cd ${GENEWEB_HOME}/share/data || exit 1
-	#cp ${GENEWEB_HOME}/etc/gwsetup_only ${GENEWEB_HOME}/share/dist/gw/etc/gwsetup_only
 	echo "${GWSETUP_IP}" > ${GENEWEB_HOME}/share/dist/gw/etc/gwsetup_only
 
 	gwlaunch_log "Starting gwsetup."
