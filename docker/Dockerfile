@@ -67,7 +67,7 @@ WORKDIR ${GENEWEB_HOME}
 
 # Create directory structure and configure
 RUN mkdir -p bin etc log share/data share/dist \
-  && echo "${GWSETUP_IP}" > etc/gwsetup_only
+  && echo "${GWSETUP_IP}" >> etc/gwsetup_only
 
 # Copy application files
 COPY --from=builder --chown=geneweb:geneweb /home/opam/geneweb/distribution share/dist
