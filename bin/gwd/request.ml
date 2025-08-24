@@ -514,15 +514,7 @@ let treat_request =
                     SrcfileDisplay.incr_welcome_counter conf
                   else SrcfileDisplay.incr_request_counter conf
                 with
-                | Some (welcome_cnt, request_cnt, start_date) ->
-                    let thousand ppf x =
-                      Fmt.string ppf (Mutil.string_of_int_sep "," x)
-                    in
-                    Logs.info (fun k ->
-                        k "#accesses %a (#welcome %a) since %s" thousand
-                          (welcome_cnt + request_cnt)
-                          thousand welcome_cnt start_date)
-                | None -> ());
+                | _ -> ());
              let incorrect_request ?(comment = "") conf _ =
                incorrect_request ~comment conf
              in
