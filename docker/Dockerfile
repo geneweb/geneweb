@@ -71,9 +71,9 @@ RUN mkdir -p bin etc log share/data share/dist \
 
 # Copy application files
 COPY --from=builder --chown=geneweb:geneweb /home/opam/geneweb/distribution share/dist
-COPY --chown=geneweb:geneweb docker/geneweb-launch.sh bin/geneweb-launch.sh
+COPY docker/geneweb-launch.sh bin/geneweb-launch.sh
 
-# Make script executable, ensure log files exist and update ownership
+# Make script executable, ensure log files exists and update ownership
 RUN chmod +x bin/geneweb-launch.sh \
   && touch log/gwsetup.log \
   && touch log/gwd.log \
