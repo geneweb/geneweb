@@ -33,7 +33,8 @@ RUN eval "$(opam env)" && opam install . --deps-only --with-test && opam install
 # Clone repository and build Geneweb
 WORKDIR /home/opam/geneweb
 COPY --chown=opam:opam . .
-RUN eval "$(opam env)" && ocaml ./configure.ml --sosa-zarith --gwd-caching && make distrib
+RUN eval "$(opam env)" && ocaml ./configure.ml --sosa-zarith --gwd-caching
+RUN make distrib
 
 ###############################################################################
 #                                       STAGE 2: Export build via blank image
