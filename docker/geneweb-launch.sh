@@ -42,17 +42,11 @@ init() {
 	for setting in $(env | grep GENEWEB_CONFIG_); do
 		set_db_config "$(echo "${setting#GENEWEB_CONFIG_}" | cut -f1 -d=)" "$(echo "${setting#GENEWEB_CONFIG_}" | cut -f2 -d=)"
 	done
-
-	gwlaunch_log "Setting correct ownership of geneweb data."
-	sudo chown -R geneweb:geneweb ${GENEWEB_HOME}/share/data
-	sudo chown -R geneweb:geneweb ${GENEWEB_HOME}/etc
-	sudo chown -R geneweb:geneweb ${GENEWEB_HOME}/log
-	gwlaunch_log "-- Set ownership of geneweb data."
-
 }
 
 start() {
 	cd ${GENEWEB_HOME}/share/data || exit 1
+	cp ${GENEWEB_HOME}/etc/gwsetup_only ${GENEWEB_HOME}/share/dist/gw/etc/gwsetup_only
 
 	gwlaunch_log "Starting gwsetup."
 	${GENEWEB_HOME}/share/dist/gw/gwsetup \
