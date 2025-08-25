@@ -529,7 +529,7 @@ let print conf base =
       <div class="card-header">
         <h5 class="mb-0">%s (%d)</h5>
       </div>
-      <div class="card-body d-flex flex-column pt-4">
+      <div class="card-body d-flex flex-column">
         <div class="d-flex flex-row mb-2">%s
         </div>
         <div class="mt-auto align-self-center">

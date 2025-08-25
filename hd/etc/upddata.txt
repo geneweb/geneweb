@@ -21,7 +21,7 @@
   [*wikidata:::x]%nn;
 %end;
 %define;list_of(xx,yy,zz)
-  <div%if;("xx"!="fn" or e.data!="") class="my-1"%end;>
+  <div%if;("xx"!="fn" or e.data!="") class="justify-content-center w-100 my-1"%end;>
     %if;(e.data!="xx")
       <a href="%prefix;m=MOD_DATA&data=xx" class="sub-char d-flex align-items-center" title="[*book of %s:::yy]"
         data-toggle="tooltip" data-placement="right">
@@ -34,14 +34,17 @@
 %end;
 %define;other_books()
   %if;(e.data="")<div class="h3 mb-3">[*book/books]1</div>%end;
-  <div class="d-flex flex-column mr-2">
+  <div class="d-flex flex-column mr-2 justify-self-center">
     %apply;list_of("fn",[first name/first names]1,"child")
     %apply;list_of("sn",[surname/surnames]1,"user")
+    %apply;list_of("fna",[first name alias]1,"child text-info")
+    %apply;list_of("sna",[surname alias]1,"user text-info")
+  %if;(e.data!="")</div><div class="d-flex flex-column mr-2">%end;
     %apply;list_of("pubn",[public name/public names]1,"signature")
     %apply;list_of("qual",[qualifier/qualifiers]1,"comment")
     %apply;list_of("alias",[alias/aliases]1,"mask")
-  %if;(e.data!="")</div><div class="d-flex flex-column mr-2">%end;
     %apply;list_of("occu",[occupation/occupations]1,"briefcase")
+  %if;(e.data!="")</div><div class="d-flex flex-column mr-2">%end;
     %apply;list_of("place",[place/places]1,"location-dot")
     %apply;list_of("src",[source/sources]1,"box-archive")
     %apply;list_of("title",[title/titles]1,"crown")

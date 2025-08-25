@@ -513,6 +513,8 @@ fr: Mon compte associatif
     <div class="d-flex flex-wrap justify-content-md-center">
       %apply;book_button("fn","first name/first names","child")
       %apply;book_button("sn","surname/surnames","user")
+      %apply;book_button("fna","first name alias","child")
+      %apply;book_button("sna","surname alias","user")
       %apply;book_button("pubn","public name/public names","signature")
       %apply;book_button("qual","qualifier/qualifiers","comment")
       %apply;book_button("alias","alias/aliases","mask")

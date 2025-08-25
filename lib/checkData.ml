@@ -783,11 +783,7 @@ let make_error_html conf base data istr entry error_type =
   let positions = find_error_positions error_type data base entry in
   let hl = make_highlight_html entry positions error_type conf in
   let url_mod =
-    match data with
-    | "fna" | "sna" -> ""
-    | _ ->
-        Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s
-          s2_p
+    Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s s2_p
   in
   let url_chk =
     Printf.sprintf "%sm=CHK_DATA_OK&d=%s&k=%s&s=%s&s2=%s" commd data istr_ s_ori

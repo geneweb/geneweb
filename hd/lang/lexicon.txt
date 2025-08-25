@@ -8740,12 +8740,12 @@ co: cugnome di nome
 cs: alias křestního jména
 da: fornavns alias
 de: Vornamen-Alias
-en: alternate first name
+en: alternate first name/alternate first names
 eo: aliasa:a:+n propra:a:+n nomo:a:+n
 es: nombre alias
 et: muu eesnimi
 fi: etunimen alias
-fr: prénom alias
+fr: prénom alias/prénoms alias
 he:  שם פרטי אחר
 is: gælunafn á fornafni
 it: alias del nome
@@ -18199,12 +18199,12 @@ co: cugnome di casata
 cs: alias příjmení
 da: efternavns alias
 de: Nachnamen-Alias
-en: alternate surname
+en: alternate surname/alternate surnames
 eo: familia:a:+n nomo:a:+n aliasa:a:+n
 es: apellido alias
 et: muu perekonnanimi
 fi: sukunimi alias
-fr: patronyme alias
+fr: patronyme alias/patronymes alias
 he:  שם משפחה אחר
 is: auka eftirnafn
 it: alias del cognome
