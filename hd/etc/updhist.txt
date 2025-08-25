@@ -131,6 +131,7 @@
   %elseif;(uu = "d?")[delete::unknown]0%nn;
   %elseif;(uu = "ff")[merge::family/families]1%nn;
   %elseif;(uu = "fn")[modify::first name/first names]0%nn;
+  %elseif;(uu = "fa")[modify::first name alias]0%nn;
   %elseif;(uu = "fp")[merge::person/persons]1%nn;
   %elseif;(uu = "if")[invert::family/families]1%nn;
   %elseif;(uu = "ma")[modify::alias/aliases]0%nn;
@@ -152,6 +153,7 @@
   %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
   %elseif;(uu = "sf")[send::image/images]0 [to carrousel]%nn;
   %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
+  %elseif;(uu = "sa")[modify::surname alias]0%nn;
   %elseif;(uu = "so")[send::note/notes]0 [to carrousel]%nn;
   %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
   %elseif;(uu = "sx")[send::unknown]0%nn;

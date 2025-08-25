@@ -505,6 +505,8 @@ let update_person_list conf base new_input list nb_pers max_updates =
     | Some "qual" -> "mx"
     | Some "title" -> "mt"
     | Some "domain" -> "md"
+    | Some "fna" -> "fa"
+    | Some "sna" -> "sa"
     | _ -> ""
   in
   let list =
