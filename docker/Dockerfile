@@ -26,15 +26,19 @@ USER opam
 WORKDIR /home/opam
 RUN opam init --disable-sandboxing --auto-setup --bare
 
-# Copy opam file for dependency resolution then install dependencies
-COPY --chown=opam:opam *.opam ./
+# Root handles file copying and directory setup
+USER root
+COPY --chown=opam:opam *.opam /home/opam/
+RUN mkdir -p /home/opam/geneweb && chown opam:opam /home/opam/geneweb
+COPY --chown=opam:opam . /home/opam/geneweb/
+
+# Switch to opam for build operations
+USER opam
+WORKDIR /home/opam
 RUN eval "$(opam env)" && opam install . --deps-only --with-test && opam install ancient
 
-# Clone repository and build Geneweb
 WORKDIR /home/opam/geneweb
-COPY --chown=opam:opam . .
-RUN eval "$(opam env)" && ocaml ./configure.ml --sosa-zarith --gwd-caching
-RUN eval "$(opam env)" && make distrib
+RUN eval "$(opam env)" && ocaml ./configure.ml --sosa-zarith --gwd-caching && make distrib
 
 ###############################################################################
 #                                       STAGE 2: Export build via blank image
