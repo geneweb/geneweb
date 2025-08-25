@@ -8212,9 +8212,9 @@ en: family mode
 fr: mode famille
 
     family mode-hlp
-de: SemiPublic-Status auf Familienmitglieder ausweiten (zweiter Klick deaktiviert)
-en: extend the SemiPublic status to family members (on/off toggle)
-fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
+de: SemiPublic-Status auf Familienmitglieder ausweiten (grün: aktivieren, rot: deaktivieren)
+en: extend the SemiPublic status to family members (green: activate, red: desactivate)
+fr: étendre le statut SemiPublic aux membres de la famille (vert : activer, rouge : désactiver)
 
     family modified
 af: familie verander

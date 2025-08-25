@@ -3538,7 +3538,6 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         String.concat Filename.dir_sep
           [ !GWPARAM.bpath conf.bname; "wiznotes"; conf.user ^ ".txt" ]
       in
-      Printf.eprintf "Wfile: %s\n" wfile;
       conf.wizard && Sys.file_exists wfile
   | "has_occupation" ->
       p_auth && Driver.sou base (Driver.get_occupation p) <> ""

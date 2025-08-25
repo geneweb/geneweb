@@ -466,9 +466,9 @@ fr: Autour de l'arbre
     </div>
     <div class="d-flex flex-wrap justify-content-md-center">
       %if;(b.alt_serv_base!="" and not cgi)
-        <a role="button" class="btn btn-outline-primary"
+        <a role="button" class="btn btn-outline-primary"%sp;
           href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
-            %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
+            %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"%sp;
           title="[*go to alt base]0 %b.alt_serv_base;">
           %if;(b.alt_serv_title!="")%b.alt_serv_title;%else;[*other base]%end;
         </a>
@@ -505,7 +505,8 @@ fr: Mon compte associatif
     </div>
   </div>
 %end;
-%if;(((not roglo and wizard) or (roglo and user.ident!="" and user.ident in b.superwizard)) and nb_persons.v!=0)
+%if;(((not roglo and wizard) or (roglo and user.ident!=""
+    and (user.ident in b.superwizard or b.superwizard="all"))) and nb_persons.v!=0)
   <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-8 mx-auto">
     <div class="h4 text-md-center">
       <i class="fas fa-book fa-sm fa-fw text-success mr-1"></i>[*book/books]1%nn;
