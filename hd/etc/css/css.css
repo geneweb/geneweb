@@ -51,7 +51,7 @@
 }
 
 /* Highlight invisible caracters */
-.hl-evilunichar {
+.hl-evilunichar, .hl {
   background-color: #ffd54f;
   border-radius: 2px;
 }

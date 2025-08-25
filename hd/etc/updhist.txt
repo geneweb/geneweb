@@ -24,9 +24,13 @@
       %if;(e.m="HIST_SEARCH" and found)
         <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
       %end;
-      <input type="text" class="form-control col-4" placeholder="[*search/case sensitive]0"
-        name="s" maxlength="40" value="%e.s.ns;">
-      <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
+      <div class="input-group">
+        <input type="text" class="form-control w-25" placeholder="[*search/case sensitive]0"
+          name="s" maxlength="40" value="%e.s.ns;">
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
+        </div>
+      </div>
       <label class="my-1 ml-3 mr-2" for="rows">[*number of rows]</label>
       <input type="number" class="form-control" id="rows" title="[*number of rows]"
          name="k" value="%kk;" min="0" max="150" step="10">
@@ -58,21 +62,21 @@
         <td>
         %if;is_person;
           %if;(person.is_private)
-            <i class="fa fa-person text-danger"> </i>%nn;
+            <i class="fa fa-person text-danger mr-1"> </i>%nn;
           %elseif;(person.is_semi_public)
-            <i class="fa fa-person text-warning"> </i>%nn;
+            <i class="fa fa-person text-warning mr-1"> </i>%nn;
           %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
-            <i class="fa fa-person text-success"> </i>%nn;
+            <i class="fa fa-person text-success mr-1"> </i>%nn;
           %else;
-            <i class="fa fa-person text-muted"> </i>%nn;
+            <i class="fa fa-person text-muted mr-1"> </i>%nn;
           %end;
         %else;
           &nbsp;&nbsp;
         %end;
         %if;(first_name!="")
           <!--%first_name;/%occ;/%surname;-->
-          <a href="%prefix;%person.access;">%person;</a>, %person.title;
-          %person.dates;
+          <a href="%prefix;%person.access;">%person;</a>%nn;
+          <a href="%prefix;m=MOD_IND&i=%person.index;">%person.dates;</a> %person.title;
         %elseif;is_note;
           - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
           %if;(note.part!="");v=%note.part;%end;">
