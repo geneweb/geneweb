@@ -63,17 +63,10 @@ module DictInfo = struct
         form_param = "d_sna";
       };
       {
-        dict_type = CheckData.Places;
-        transl_key = "place/places";
-        url_param = "place";
-        icon = "map-marker-alt";
-        form_param = "d_pl";
-      };
-      {
         dict_type = CheckData.PubNames;
         transl_key = "public name/public names";
         url_param = "pubn";
-        icon = "bullhorn";
+        icon = "signature";
         form_param = "d_pn";
       };
       {
@@ -98,6 +91,13 @@ module DictInfo = struct
         form_param = "d_oc";
       };
       {
+        dict_type = CheckData.Places;
+        transl_key = "place/places";
+        url_param = "place";
+        icon = "location-dot";
+        form_param = "d_pl";
+      };
+      {
         dict_type = CheckData.Titles;
         transl_key = "title/titles";
         url_param = "title";
@@ -108,7 +108,7 @@ module DictInfo = struct
         dict_type = CheckData.Estates;
         transl_key = "domain/domains";
         url_param = "domain";
-        icon = "building";
+        icon = "chess-rook";
         form_param = "d_es";
       };
       {
@@ -121,6 +121,10 @@ module DictInfo = struct
     ]
 
   let find_by_type d = List.find (fun i -> i.dict_type = d) all
+
+  let find_by_url_param param =
+    List.find_opt (fun info -> info.url_param = param) all
+
   let get_name d = (find_by_type d).transl_key
   let get_url_param d = (find_by_type d).url_param
 end
@@ -530,7 +534,7 @@ let print conf base =
         </div>
         <div class="mt-auto align-self-center">
           <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle-dicts">
-            <i class="fa fa-check-square mr-1"></i>%s
+            <i class="fa fa-square-check mr-1"></i>%s
           </button>
         </div>
       </div>
@@ -542,7 +546,7 @@ let print conf base =
       <div class="card-body d-flex flex-column">%s
         <div class="mt-2 align-self-center">
           <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle-errors">
-            <i class="fa fa-check-square mr-1"></i>%s
+            <i class="fa fa-square-check mr-1"></i>%s
           </button>
         </div>
       </div>
@@ -596,7 +600,7 @@ let print conf base =
         {|
           <div class="text-center py-1 px-3 mt-auto">
             <button type="submit" class="btn btn-primary w-100" data-action="validate-submit">
-              <i class="fa fa-search mr-2"></i>%s
+              <i class="fa fa-magnifying-glass mr-2"></i>%s
             </button>
           </div>
         </div>
@@ -644,22 +648,36 @@ let perform_check_modification conf base =
         (Option.map Util.only_printable (Util.p_getenv conf.env "s2"))
     in
     let dict_param = Util.p_getenv conf.env "d" in
-
-    let k_actual = Geneweb_db.Driver.sou base k in
-
-    if k_actual <> s then Error (t conf "modification failed")
+    if Geneweb_db.Driver.sou base k <> s then
+      Error (t conf "modification failed")
     else if s = s2 then Error (t conf "no modification")
     else
-      match dict_param with
-      | (Some "fn" | Some "sn") when dict_param <> None ->
-          let start_time = Unix.gettimeofday () in
-          let is_fn = dict_param = Some "fn" in
-
+      let start_time = Unix.gettimeofday () in
+      let dict_info_opt =
+        match dict_param with
+        | Some param -> DictInfo.find_by_url_param param
+        | None -> (
+            match CheckData.find_dict_type_for_istr conf k with
+            | Some dict_type -> (
+                try Some (DictInfo.find_by_type dict_type)
+                with Not_found -> None)
+            | None -> None)
+      in
+      match dict_info_opt with
+      | None ->
+          let error_msg =
+            match dict_param with
+            | Some param ->
+                Printf.sprintf "%s: %s" (t conf "incorrect request") param
+            | None -> t conf "cannot determine dictionary type"
+          in
+          Error error_msg
+      | Some dict_info ->
           let conf_tmp =
             {
               conf with
               env =
-                ("data", Adef.encoded (if is_fn then "fn" else "sn"))
+                ("data", Adef.encoded dict_info.url_param)
                 :: ("key", Adef.encoded (Geneweb_db.Driver.Istr.to_string k))
                 :: ("nx_input", Adef.encoded s2)
                 :: List.filter
@@ -677,18 +695,15 @@ let perform_check_modification conf base =
           let nb_pers =
             List.fold_left (fun acc (_, perl) -> acc + List.length perl) 0 list
           in
-
           if nb_pers = 0 then Error (t conf "no modification")
           else
             let nb_modified =
               UpdateData.update_person_list conf_tmp base s2 list nb_pers
                 nb_pers
             in
+            Util.commit_patches conf base;
             let cache_updated =
-              let dict_type =
-                if is_fn then CheckData.Fnames else CheckData.Snames
-              in
-              CheckData.update_cache_entry conf dict_type k s2
+              CheckData.update_cache_entry conf dict_info.dict_type k s2
             in
             let elapsed = Unix.gettimeofday () -. start_time in
             Success
@@ -699,34 +714,6 @@ let perform_check_modification conf base =
                 nb_modified = Some nb_modified;
                 elapsed = Some elapsed;
               }
-      | _ ->
-          let _ = Geneweb_db.Driver.replace_string base s s2 in
-          Util.commit_patches conf base;
-
-          let cache_updated =
-            match dict_param with
-            | Some d -> (
-                let dict_type_opt =
-                  List.find_opt (fun info -> info.url_param = d) DictInfo.all
-                in
-                match dict_type_opt with
-                | Some info ->
-                    CheckData.update_cache_entry conf info.dict_type k s2
-                | None -> false)
-            | None -> (
-                match CheckData.find_dict_type_for_istr conf k with
-                | Some dict_type ->
-                    CheckData.update_cache_entry conf dict_type k s2
-                | None -> false)
-          in
-          Success
-            {
-              before = s;
-              after = s2;
-              cache_updated;
-              nb_modified = None;
-              elapsed = None;
-            }
   with
   | Not_found -> Error (t conf "modification failed")
   | exn ->
@@ -740,8 +727,7 @@ let build_success_message conf r =
   | Success r_data -> (
       let base_msg = t conf "modification successful" in
       let cache_msg =
-        if r_data.cache_updated then " (" ^ t ~c:0 conf "cache updated" ^ ")"
-        else ""
+        if r_data.cache_updated then "✓ " ^ t conf "cache updated" ^ "" else ""
       in
       match (r_data.nb_modified, r_data.elapsed) with
       | Some n, Some time when n > 0 ->
@@ -749,7 +735,7 @@ let build_success_message conf r =
             Util.transl_nth conf "modification/modifications"
               (if n = 1 then 0 else 1)
           in
-          Printf.sprintf "%s%s<br>%d %s — %.1f s" base_msg cache_msg n
+          Printf.sprintf "%s<br>%s<br><br>%d %s – %.1f s" base_msg cache_msg n
             modif_word time
       | _ -> base_msg ^ cache_msg)
   | Error _ -> t conf "modification failed"

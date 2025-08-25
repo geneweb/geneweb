@@ -36,13 +36,13 @@
   %if;(e.data="")<div class="h3 mb-3">[*book/books]1</div>%end;
   <div class="d-flex flex-column mr-2">
     %apply;list_of("fn",[first name/first names]1,"child")
-    %apply;list_of("sn",[surname/surnames]1,"signature")
-    %apply;list_of("pubn",[public name/public names]1,"pen")
+    %apply;list_of("sn",[surname/surnames]1,"user")
+    %apply;list_of("pubn",[public name/public names]1,"signature")
     %apply;list_of("qual",[qualifier/qualifiers]1,"comment")
     %apply;list_of("alias",[alias/aliases]1,"mask")
   %if;(e.data!="")</div><div class="d-flex flex-column mr-2">%end;
-    %apply;list_of("occu",[occupation/occupations]1,"user-doctor")
-    %apply;list_of("place",[place/places]1,"map-location-dot")
+    %apply;list_of("occu",[occupation/occupations]1,"briefcase")
+    %apply;list_of("place",[place/places]1,"location-dot")
     %apply;list_of("src",[source/sources]1,"box-archive")
     %apply;list_of("title",[title/titles]1,"crown")
     %apply;list_of("domain",[domain/domains]1,"chess-rook")

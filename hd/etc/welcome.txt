@@ -48,7 +48,7 @@
   <a role="button" class="btn btn-outline-success" data-toggle="tooltip"
     href="%prefix;m=MOD_DATA&data=xxx" title="[*modify] %apply;book_of%with;[yyy]1%end;%sp;
       ([wizard/wizards/friend/friends/exterior]0)">
-    <i class="fa fa-zzz fa-fw mr-1"></i>
+    <i class="fa fa-zzz fa-fw"></i>
     <span class="text-nowrap">[*yyy]1</span>
   </a>
 %end;
@@ -512,12 +512,12 @@ fr: Mon compte associatif
     </div>
     <div class="d-flex flex-wrap justify-content-md-center">
       %apply;book_button("fn","first name/first names","child")
-      %apply;book_button("sn","surname/surnames","signature")
-      %apply;book_button("pubn","public name/public names","pen")
+      %apply;book_button("sn","surname/surnames","user")
+      %apply;book_button("pubn","public name/public names","signature")
       %apply;book_button("qual","qualifier/qualifiers","comment")
       %apply;book_button("alias","alias/aliases","mask")
-      %apply;book_button("occu","occupation/occupations","user-doctor")
-      %apply;book_button("place","place/places","map-location-dot")
+      %apply;book_button("occu","occupation/occupations","briefcase")
+      %apply;book_button("place","place/places","location-dot")
       %apply;book_button("src","source/sources","box-archive")
       %apply;book_button("title","title/titles","crown")
       %apply;book_button("domain","domain/domains","chess-rook")
