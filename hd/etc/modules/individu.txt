@@ -288,7 +288,7 @@
   <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
       <li %apply;getvar%with;ns[birth]%end;>
-        <span class="fa-li"><i class="fas fa-baby"></i></span>
+        %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;
         %if;has_birth_date;[*born]s %on_birth_date;
           %if;has_birth_place; %in_place; %birth_place;%end;
         %else;
@@ -305,7 +305,7 @@
     %end;
     %if;(has_baptism_date or has_baptism_place)
       <li %apply;getvar%with;ns[baptism]%end;>
-        <span class="fa-li"><i class="fas fa-dove"></i></span>
+        %if;(not roglo)<span class="fa-li"><i class="fas fa-dove"></i></span>%end;
         %if;has_baptism_date;[*baptized]s %on_baptism_date;
             %if;has_baptism_place; %in_place; %baptism_place;%end;
         %else;
@@ -316,7 +316,7 @@
     %end;
     %if;is_dead;
       <li class="mt-1" %apply;getvar%with;ns[death]%end;>
-        <span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>
+        %if;(not roglo)<span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>%end;
         %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
         %if;has_death_place; %in_place; %death_place;%end;
@@ -324,7 +324,7 @@
     %end;
     %if;(is_buried or is_cremated)
       <li %if;(is_buried)%apply;getvar%with;ns[burial]%end;%elseif;(is_cremated)%apply;getvar%with;ns[cremation]%end;%end;>
-        <span class="fa-li"><i class="fas fa-cross"></i></span>
+        %if;(not roglo)<span class="fa-li"><i class="fas fa-cross"></i></span>%end;
         %if;is_buried;[*buried]s
           %if;has_burial_date; %on_burial_date;%end;
           %if;has_burial_place; %in_place; %burial_place;%end;
@@ -335,7 +335,7 @@
         %end;
       </li>%nl;
     %end;
-    %if;(computable_death_age or computable_age)
+    %if;(computable_death_age or computable_age and not roglo)
       <li class="mt-1" title="%nn;
         %if;(is_dead and computable_death_age)[*age at death]
         %elseif;(not is_dead and computable_age)[*age]
@@ -354,7 +354,7 @@
       </li>
     %end;
     %if;has_occupation;
-      <li class="mt-1" title="[*occupation/occupations]0"><span class="fa-li"><i class="fas fa-user-tie"></i></span>
+      %if;(not roglo)<li class="mt-1" title="[*occupation/occupations]0"><span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
         %apply;capitalize(occupation)</li>%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
