@@ -448,14 +448,6 @@ fr: Autour de l'arbre
         <i class="fas fa-user-plus fa-fw mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
       %end;
     %end;
-    %if;(not roglo and b.alt_serv_base!="" and not cgi)
-      <a role="button" class="btn btn-outline-primary"
-        href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
-          %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
-        title="[*go to alt base]0 %b.alt_serv_base;">
-        %if;(b.alt_serv_title!="" and roglo)%b.alt_serv_title;%else;[*other base]%end;
-      </a>
-    %end;
   </div>
 </div>
 %if;roglo;
