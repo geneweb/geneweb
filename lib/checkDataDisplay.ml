@@ -10,13 +10,16 @@ let tn conf ?(c = 1) l n =
 
 module TranslCache = struct
   let cache = Hashtbl.create 32
+  let max_entries = 256
 
   let get conf key =
-    match Hashtbl.find_opt cache (conf.lang, key) with
+    let cache_key = (conf.lang, key) in
+    match Hashtbl.find_opt cache cache_key with
     | Some v -> v
     | None ->
         let v = t conf key in
-        Hashtbl.add cache (conf.lang, key) v;
+        if Hashtbl.length cache > max_entries then Hashtbl.clear cache;
+        Hashtbl.add cache cache_key v;
         v
 end
 
@@ -621,203 +624,216 @@ let print conf base =
       Hutil.trailer conf)
 
 type chk_result =
-  | Success of string * string * bool * int option * float option
-    (* before, after, cache_updated, nb_modified, elapsed_time *)
+  | Success of {
+      before : string;
+      after : string;
+      cache_updated : bool;
+      nb_modified : int option;
+      elapsed : float option;
+    }
   | Error of string
 
 let perform_check_modification conf base =
-  let k =
-    Geneweb_db.Driver.Istr.of_string (List.assoc "k" conf.env :> string)
-  in
-  let s =
-    Option.fold ~none:"" ~some:(fun x -> x) (Util.p_getenv conf.env "s")
-  in
-  let s2 =
-    Option.fold ~none:"" ~some:Util.only_printable (Util.p_getenv conf.env "s2")
-  in
-  let dict_param = Util.p_getenv conf.env "d" in
-  let k_actual = Geneweb_db.Driver.sou base k in
-  if k_actual <> s then Error (t conf "modification failed")
-  else if s = s2 then Error (t conf "no modification")
-  else
-    match dict_param with
-    | (Some "fn" | Some "sn") when dict_param <> None ->
-        let start_time = Unix.gettimeofday () in
-        let is_fn = dict_param = Some "fn" in
-        let conf_tmp =
-          {
-            conf with
-            env =
-              ("data", Adef.encoded (if is_fn then "fn" else "sn"))
-              :: ("key", Adef.encoded (Geneweb_db.Driver.Istr.to_string k))
-              :: ("nx_input", Adef.encoded s2)
-              :: List.filter
-                   (fun (k, _) -> k <> "data" && k <> "key" && k <> "nx_input")
-                   conf.env;
-          }
-        in
-        let list = UpdateData.get_person_from_data conf_tmp base in
-        let list =
-          List.map
-            (fun (istr, perl) -> (Geneweb_db.Driver.sou base istr, perl))
-            list
-        in
-        let nb_pers =
-          List.fold_left (fun acc (_, perl) -> acc + List.length perl) 0 list
-        in
-        if nb_pers = 0 then Error (t conf "no modification")
-        else
-          let nb_modified =
-            UpdateData.update_person_list conf_tmp base s2 list nb_pers nb_pers
+  try
+    let k =
+      Geneweb_db.Driver.Istr.of_string (List.assoc "k" conf.env :> string)
+    in
+    let s = Option.value ~default:"" (Util.p_getenv conf.env "s") in
+    let s2 =
+      Option.value ~default:""
+        (Option.map Util.only_printable (Util.p_getenv conf.env "s2"))
+    in
+    let dict_param = Util.p_getenv conf.env "d" in
+
+    let k_actual = Geneweb_db.Driver.sou base k in
+
+    if k_actual <> s then Error (t conf "modification failed")
+    else if s = s2 then Error (t conf "no modification")
+    else
+      match dict_param with
+      | (Some "fn" | Some "sn") when dict_param <> None ->
+          let start_time = Unix.gettimeofday () in
+          let is_fn = dict_param = Some "fn" in
+
+          let conf_tmp =
+            {
+              conf with
+              env =
+                ("data", Adef.encoded (if is_fn then "fn" else "sn"))
+                :: ("key", Adef.encoded (Geneweb_db.Driver.Istr.to_string k))
+                :: ("nx_input", Adef.encoded s2)
+                :: List.filter
+                     (fun (k, _) ->
+                       k <> "data" && k <> "key" && k <> "nx_input")
+                     conf.env;
+            }
           in
-          let cache_updated =
-            let dict_type =
-              if is_fn then CheckData.Fnames else CheckData.Snames
+          let list = UpdateData.get_person_from_data conf_tmp base in
+          let list =
+            List.map
+              (fun (istr, perl) -> (Geneweb_db.Driver.sou base istr, perl))
+              list
+          in
+          let nb_pers =
+            List.fold_left (fun acc (_, perl) -> acc + List.length perl) 0 list
+          in
+
+          if nb_pers = 0 then Error (t conf "no modification")
+          else
+            let nb_modified =
+              UpdateData.update_person_list conf_tmp base s2 list nb_pers
+                nb_pers
             in
-            CheckData.update_cache_entry conf dict_type k s2
-          in
-          let elapsed = Unix.gettimeofday () -. start_time in
-          Success (s, s2, cache_updated, Some nb_modified, Some elapsed)
-    | _ ->
-        (* Méthode replace_string pour les autres dictionnaires *)
-        let _ = Geneweb_db.Driver.replace_string base s s2 in
-        Util.commit_patches conf base;
-        let cache_updated =
-          match dict_param with
-          | Some d -> (
-              let dict_type_opt =
-                List.find_opt (fun info -> info.url_param = d) DictInfo.all
+            let cache_updated =
+              let dict_type =
+                if is_fn then CheckData.Fnames else CheckData.Snames
               in
-              match dict_type_opt with
-              | Some info ->
-                  CheckData.update_cache_entry conf info.dict_type k s2
-              | None -> false)
-          | None -> (
-              match CheckData.find_dict_type_for_istr conf k with
-              | Some dict_type ->
-                  CheckData.update_cache_entry conf dict_type k s2
-              | None -> false)
-        in
-        Success (s, s2, cache_updated, None, None)
+              CheckData.update_cache_entry conf dict_type k s2
+            in
+            let elapsed = Unix.gettimeofday () -. start_time in
+            Success
+              {
+                before = s;
+                after = s2;
+                cache_updated;
+                nb_modified = Some nb_modified;
+                elapsed = Some elapsed;
+              }
+      | _ ->
+          let _ = Geneweb_db.Driver.replace_string base s s2 in
+          Util.commit_patches conf base;
+
+          let cache_updated =
+            match dict_param with
+            | Some d -> (
+                let dict_type_opt =
+                  List.find_opt (fun info -> info.url_param = d) DictInfo.all
+                in
+                match dict_type_opt with
+                | Some info ->
+                    CheckData.update_cache_entry conf info.dict_type k s2
+                | None -> false)
+            | None -> (
+                match CheckData.find_dict_type_for_istr conf k with
+                | Some dict_type ->
+                    CheckData.update_cache_entry conf dict_type k s2
+                | None -> false)
+          in
+          Success
+            {
+              before = s;
+              after = s2;
+              cache_updated;
+              nb_modified = None;
+              elapsed = None;
+            }
+  with
+  | Not_found -> Error (t conf "modification failed")
+  | exn ->
+      Error
+        (Printf.sprintf "%s: %s"
+           (t conf "modification failed")
+           (Printexc.to_string exn))
+
+let build_success_message conf r =
+  match r with
+  | Success r_data -> (
+      let base_msg = t conf "modification successful" in
+      let cache_msg =
+        if r_data.cache_updated then " (" ^ t ~c:0 conf "cache updated" ^ ")"
+        else ""
+      in
+      match (r_data.nb_modified, r_data.elapsed) with
+      | Some n, Some time when n > 0 ->
+          let modif_word =
+            Util.transl_nth conf "modification/modifications"
+              (if n = 1 then 0 else 1)
+          in
+          Printf.sprintf "%s%s<br>%d %s — %.1f s" base_msg cache_msg n
+            modif_word time
+      | _ -> base_msg ^ cache_msg)
+  | Error _ -> t conf "modification failed"
 
 let print_chk_ok_json conf base =
-  try
-    match perform_check_modification conf base with
-    | Success (before, after, cache_updated, nb_modified, elapsed) ->
-        let success_msg = t conf "modification successful" in
-        let cache_msg =
-          if cache_updated then " (" ^ t ~c:0 conf "cache updated" ^ ")" else ""
-        in
-        let full_message =
-          match (nb_modified, elapsed) with
-          | Some n, Some time ->
-              let modif_word =
-                Util.transl_nth conf "modification/modifications"
-                  (if n = 1 then 0 else 1)
-              in
-              let modif_msg =
-                Printf.sprintf "<br>%d %s – %.1f s" n modif_word time
-              in
-              success_msg ^ cache_msg ^ modif_msg
-          | _ -> success_msg ^ cache_msg
-        in
-        let validated_msg = t conf "validated" in
-        let json =
-          `Assoc
-            [
-              ("success", `Bool true);
-              ("message", `String full_message);
-              ("cache_updated", `Bool cache_updated);
-              ("before", `String before);
-              ("after", `String after);
-              ("validated_title", `String validated_msg);
-              ( "nb_modified",
-                match nb_modified with Some n -> `Int n | None -> `Null );
-              ( "elapsed_time",
-                match elapsed with Some t -> `Float t | None -> `Null );
-            ]
-        in
-        Yojson.Basic.to_string json
-    | Error msg ->
-        let json =
-          `Assoc
-            [
-              ("success", `Bool false);
-              ("message", `String msg);
-              ("cache_updated", `Bool false);
-              ("before", `String "");
-              ("after", `String "");
-            ]
-        in
-        Yojson.Basic.to_string json
-  with _ ->
-    let json =
-      `Assoc
-        [
-          ("success", `Bool false);
-          ("message", `String (t conf "modification failed"));
-          ("cache_updated", `Bool false);
-          ("before", `String "");
-          ("after", `String "");
-        ]
-    in
-    Yojson.Basic.to_string json
+  match perform_check_modification conf base with
+  | Success r ->
+      let msg = build_success_message conf (Success r) in
+      let json =
+        `Assoc
+          [
+            ("success", `Bool true);
+            ("message", `String msg);
+            ("cache_updated", `Bool r.cache_updated);
+            ("before", `String r.before);
+            ("after", `String r.after);
+            ("validated_title", `String (t conf "validated"));
+            ( "nb_modified",
+              match r.nb_modified with Some n -> `Int n | None -> `Null );
+            ( "elapsed_time",
+              match r.elapsed with Some t -> `Float t | None -> `Null );
+          ]
+      in
+      Output.header conf "application/json";
+      Output.print_sstring conf (Yojson.Basic.to_string json)
+  | Error msg ->
+      let json =
+        `Assoc
+          [
+            ("success", `Bool false);
+            ("message", `String msg);
+            ("cache_updated", `Bool false);
+            ("before", `String "");
+            ("after", `String "");
+          ]
+      in
+      Output.header conf "application/json";
+      Output.print_sstring conf (Yojson.Basic.to_string json)
 
-let print_status_message conf ~success ~icon ~title_msg ~alert_msg =
+let print_status_message conf ~success ~icon ~title_msg ~content =
   let text_class, alert_class =
     if success then ("text-success", "alert-success")
     else ("text-danger", "alert-danger")
   in
-  Output.printf conf "<h3 class=\"%s\">%s %s</h3>\n" text_class icon title_msg;
-  Output.printf conf "<div class=\"alert %s\">%s</div>\n" alert_class alert_msg
+  Output.printf conf
+    {|<h3 class="%s">%s %s</h3>
+<div class="alert %s">%s</div>|} text_class icon
+    title_msg alert_class content
 
 let print_chk_ok_html conf base =
-  try
-    match perform_check_modification conf base with
-    | Success (_, _, cache_updated, nb_modified, elapsed) ->
-        let title _ =
-          "✓ " ^ t conf ~c:0 "modification successful"
-          |> Output.print_sstring conf
-        in
-        Hutil.header conf title;
-        Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-            let msg = t conf ~c:0 "modification successful" in
-            print_status_message conf ~success:true ~icon:"✓" ~title_msg:msg
-              ~alert_msg:msg;
-            if cache_updated then
-              Output.printf conf "<div class=\"text-muted\">%s</div>\n"
-                (t conf "cache updated");
-            match (nb_modified, elapsed) with
-            | Some n, Some time when n > 1 ->
-                Output.printf conf
-                  "<div class=\"text-info\">%d %s – %.1f s</div>\n" n
-                  (Util.transl_nth conf "modification/modifications" 1)
-                  time
-            | _ -> ());
-        Hutil.trailer conf
-    | Error msg ->
-        let title _ =
-          "✗ " ^ t conf ~c:0 "modification failed" |> Output.print_sstring conf
-        in
-        Hutil.header conf title;
-        Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-            print_status_message conf ~success:false ~icon:"✗"
-              ~title_msg:(t conf ~c:0 "modification failed")
-              ~alert_msg:msg)
-  with _ ->
-    let title _ =
-      "✗ " ^ t conf ~c:0 "modification failed" |> Output.print_sstring conf
-    in
-    Hutil.header conf title;
-    Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-        let msg = t conf ~c:0 "modification failed" in
-        print_status_message conf ~success:false ~icon:"✗" ~title_msg:msg
-          ~alert_msg:msg);
-    Hutil.trailer conf
+  let result = perform_check_modification conf base in
+  match result with
+  | Success r ->
+      Hutil.header conf (fun _ ->
+          Output.print_sstring conf
+            ("✓ " ^ t conf ~c:0 "modification successful"));
+      Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
+          print_status_message conf ~success:true ~icon:"✓"
+            ~title_msg:(t conf ~c:0 "modification successful")
+            ~content:(t conf "modification successful");
+          if r.cache_updated then
+            Output.printf conf
+              {|<div class="text-muted mt-2"><i class="fa fa-check-circle mr-1"></i>%s</div>|}
+              (t conf "cache updated");
+          match (r.nb_modified, r.elapsed) with
+          | Some n, Some time when n > 1 ->
+              let modif_word =
+                Util.transl_nth conf "modification/modifications" 1
+              in
+              Output.printf conf
+                {|<div class="text-info mt-2"><i class="fa fa-info-circle mr-1"></i>%d %s — %.1f s</div>|}
+                n modif_word time
+          | _ -> ());
+      Hutil.trailer conf
+  | Error msg ->
+      Hutil.header conf (fun _ ->
+          Output.print_sstring conf ("✗ " ^ t conf ~c:0 "modification failed"));
+      Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
+          print_status_message conf ~success:false ~icon:"✗"
+            ~title_msg:(t conf ~c:0 "modification failed")
+            ~content:msg);
+      Hutil.trailer conf
 
 let print_chk_ok conf base =
   match Util.p_getenv conf.env "ajax" with
-  | Some _ ->
-      Output.header conf "application/json";
-      Output.print_sstring conf (print_chk_ok_json conf base)
-  | _ -> print_chk_ok_html conf base
+  | Some _ -> print_chk_ok_json conf base
+  | None -> print_chk_ok_html conf base

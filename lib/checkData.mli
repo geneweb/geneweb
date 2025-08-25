@@ -33,9 +33,6 @@ val find_dict_type_for_istr :
 val cache_file_exists : Config.config -> dict_type -> bool
 (** Check if a cache file exists for the specified dictionary type. *)
 
-val fix_error : error_type -> dict_type -> string -> string
-(** Fix the specified error type in the string for a given dictionary. *)
-
 val make_error_html :
   Config.config ->
   Geneweb_db.Driver.base ->
@@ -45,14 +42,6 @@ val make_error_html :
   error_type ->
   string * string * string * string * bool
 (** Generate HTML markup for displaying an error with highlighting. *)
-
-val collect_all_errors :
-  ?max_results:int option ->
-  ?sel_err_types:error_type list ->
-  Geneweb_db.Driver.base ->
-  dict_type ->
-  (Geneweb_db.Driver.istr * string * error_type list) list
-(** Scan database for typographic errors in the specified dictionary. *)
 
 val collect_all_errors_with_cache :
   ?max_results:int option ->

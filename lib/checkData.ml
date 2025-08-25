@@ -183,30 +183,28 @@ let find_multiple_spaces_positions s =
   in
   find_sequences 0
 
-let fix_multiple_spaces =
-  let buf = Buffer.create 256 in
-  fun s ->
-    Buffer.clear buf;
-    let len = String.length s in
-    let rec loop i in_space =
-      if i >= len then Buffer.contents buf
-      else
-        let is_space = is_any_space s i in
-        let char_size =
-          if
-            i + 2 < len
-            && s.[i] = '\xE2'
-            && s.[i + 1] = '\x80'
-            && s.[i + 2] = '\xAF'
-          then 3
-          else if i + 1 < len && s.[i] = '\xC2' && s.[i + 1] = '\xA0' then 2
-          else 1
-        in
-        if is_space && not in_space then Buffer.add_char buf ' '
-        else if not is_space then Buffer.add_substring buf s i char_size;
-        loop (i + char_size) is_space
-    in
-    loop 0 false
+let fix_multiple_spaces s =
+  let len = String.length s in
+  let buf = Buffer.create len in
+  let rec loop i in_space =
+    if i >= len then Buffer.contents buf
+    else
+      let is_space = is_any_space s i in
+      let char_size =
+        if
+          i + 2 < len
+          && s.[i] = '\xE2'
+          && s.[i + 1] = '\x80'
+          && s.[i + 2] = '\xAF'
+        then 3
+        else if i + 1 < len && s.[i] = '\xC2' && s.[i + 1] = '\xA0' then 2
+        else 1
+      in
+      if is_space && not in_space then Buffer.add_char buf ' '
+      else if not is_space then Buffer.add_substring buf s i char_size;
+      loop (i + char_size) is_space
+  in
+  loop 0 false
 
 (* Non-breaking spaces functions *)
 let has_regular_nbsp s i =
@@ -942,7 +940,10 @@ let update_cache_entry conf dict_type istr new_value =
       with e ->
         close_out oc;
         raise e
-    with _ -> false
+    with
+    | Sys_error _ -> false
+    | End_of_file -> false
+    | Failure _ -> false
   else false
 
 let find_dict_type_for_istr conf istr =
