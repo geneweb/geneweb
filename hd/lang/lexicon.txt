@@ -20417,6 +20417,14 @@ sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
 sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
 
+    wizard note
+en: wizard note
+fr: page magicien
+
+    wizard note create
+en: create wizard page
+fr: créer la page magicien
+
     word/words
 de: nur ein Wort/kompletter Nachname
 en: only one word/full surname

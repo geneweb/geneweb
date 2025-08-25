@@ -1157,13 +1157,15 @@ let insert_relation gen ip r =
 let insert_relations fname gen sb sex rl =
   (* insert concerned person *)
   let p, ip = insert_somebody gen sb in
-  if p.m_rparents <> [] then (
-    Printf.printf "\nFile \"%s\"" fname;
-    Printf.printf "\nError: Relations already defined for \"%s%s %s\"\n"
-      (sou gen.g_base p.m_first_name)
-      (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
-      (sou gen.g_base p.m_surname);
-    check_error gen)
+  if p.m_rparents <> [] then
+    if !Gwcomp.roglo_special then ()
+    else (
+      Printf.printf "\nFile \"%s\"" fname;
+      Printf.printf "\nError: Relations already defined for \"%s%s %s\"\n"
+        (sou gen.g_base p.m_first_name)
+        (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
+        (sou gen.g_base p.m_surname);
+      check_error gen)
   else (
     notice_sex gen p sex;
     let rl = List.map (insert_relation gen ip) rl in
