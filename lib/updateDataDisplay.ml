@@ -14,6 +14,8 @@ let translate_title conf len =
     | Some "src" -> transl_nth conf "source/sources" plural
     | Some "fn" -> transl_nth conf "first name/first names" plural
     | Some "sn" -> transl_nth conf "surname/surnames" plural
+    | Some "fna" -> transl_nth conf "first name alias" plural
+    | Some "sna" -> transl_nth conf "surname alias" plural
     | Some "alias" -> transl_nth conf "alias/aliases" plural
     | Some "qual" -> transl_nth conf "qualifier/qualifiers" plural
     | Some "pubn" -> transl_nth conf "public name/public names" plural

@@ -84,10 +84,8 @@ let get_data conf =
         [ get_efam_src_x ] )
   | Some "fn" -> ([ get_first_name_x ], [], [], [])
   | Some "sn" -> ([ get_surname_x ], [], [], [])
-  | Some "fna" ->
-      ([ Driver.get_first_names_aliases ], [], [], []) (* fake book atm *)
-  | Some "sna" ->
-      ([ Driver.get_surnames_aliases ], [], [], []) (* fake book atm *)
+  | Some "fna" -> ([ Driver.get_first_names_aliases ], [], [], [])
+  | Some "sna" -> ([ Driver.get_surnames_aliases ], [], [], [])
   | Some "alias" -> ([ Driver.get_aliases ], [], [], [])
   | Some "qual" -> ([ Driver.get_qualifiers ], [], [], [])
   | Some "pubn" -> ([ get_public_name_x ], [], [], [])
@@ -372,6 +370,26 @@ let update_person conf base old new_input p =
         else surnames_aliases
       in
       { (Driver.gen_person_of_person p) with surname; occ; surnames_aliases }
+  | Some "fna" ->
+      let new_istr = Driver.insert_string base (only_printable new_input) in
+      let old_fna = Driver.get_first_names_aliases p in
+      let first_names_aliases =
+        List.fold_left
+          (fun acc a ->
+            if old = Driver.sou base a then new_istr :: acc else a :: acc)
+          [] old_fna
+      in
+      { (Driver.gen_person_of_person p) with first_names_aliases }
+  | Some "sna" ->
+      let new_istr = Driver.insert_string base (only_printable new_input) in
+      let old_sna = Driver.get_surnames_aliases p in
+      let surnames_aliases =
+        List.fold_left
+          (fun acc a ->
+            if old = Driver.sou base a then new_istr :: acc else a :: acc)
+          [] old_sna
+      in
+      { (Driver.gen_person_of_person p) with surnames_aliases }
   | Some "alias" ->
       let new_istr = Driver.insert_string base (only_printable new_input) in
       let old_aliases = Driver.get_aliases p in
@@ -403,7 +421,6 @@ let update_person conf base old new_input p =
           (fun t ->
             if old = Driver.sou base t.t_ident then
               { t with t_ident = new_istr }
-              (* FIXME I thought is should be sou base new_istr *)
             else t)
           old_titles
       in
@@ -416,7 +433,6 @@ let update_person conf base old new_input p =
           (fun t ->
             if old = Driver.sou base t.t_place then
               { t with t_place = new_istr }
-              (* FIXME I thought is should be sou base new_istr *)
             else t)
           old_titles
       in
