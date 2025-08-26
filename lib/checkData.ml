@@ -32,16 +32,40 @@ type error_type =
 
 type highlight_style = {
   make_class : string -> string;
-  make_title : ?code:string -> ?name:string -> Config.config -> string option;
+  make_title :
+    ?code:string ->
+    ?name:string ->
+    ?misc_msg:string ->
+    Config.config ->
+    string option;
 }
 
 type checkdata_entry = Driver.istr * string
+type misc_error_info = { pos : int; message : string }
+
+type highlight_info =
+  | SimplePositions of int list
+  | WithMessages of misc_error_info list
 
 module ErrorSet = Set.Make (struct
   type t = error_type
 
   let compare = compare
 end)
+
+let data_to_dict_type data =
+  match data with
+  | "fn" -> Fnames
+  | "sn" -> Snames
+  | "place" -> Places
+  | "pub_name" -> PubNames
+  | "qualif" -> Qualifiers
+  | "alias" -> Aliases
+  | "occup" -> Occupation
+  | "title" -> Titles
+  | "estate" -> Estates
+  | "src" -> Sources
+  | _ -> Fnames
 
 (* Pré-calcul des sets d'erreurs *)
 let make_error_set = function
@@ -425,20 +449,11 @@ let dict_specific_replacements =
     (Re.str "- ", "-", [ Occupation; Sources ]);
   ]
 
-let detect_only_patterns =
-  [
-    ( Re.seq [ Re.char '('; Re.rep1 (Re.char ' '); Re.char ')' ],
-      "empty parenthesis" );
-  ]
-
 let char_before_parenthesis_pattern =
   Re.seq [ Re.group (Re.set "A-Za-z0-9"); Re.char '(' ]
 
 let breton_trigram_pattern =
   Re.seq [ Re.group (Re.set "cC"); Re.set "’'"; Re.group (Re.set "hH") ]
-
-let compiled_detect =
-  lazy (List.map (fun (pat, msg) -> (Re.compile pat, msg)) detect_only_patterns)
 
 let compiled_complex =
   lazy
@@ -461,7 +476,6 @@ let has_misc_typographic_errors dict_type s =
   let replacements = get_applicable_replacements dict_type in
   let patterns =
     List.map fst replacements
-    @ List.map fst detect_only_patterns
     @ [ char_before_parenthesis_pattern; breton_trigram_pattern ]
   in
   let re = Re.compile (Re.alt patterns) in
@@ -470,28 +484,59 @@ let has_misc_typographic_errors dict_type s =
     true
   with Not_found -> false
 
-let find_misc_typographic_positions dict_type s =
+let find_misc_typographic_positions dict_type s conf =
   let replacements = get_applicable_replacements dict_type in
-  let patterns =
-    List.map fst replacements
-    @ List.map fst detect_only_patterns
-    @ [ char_before_parenthesis_pattern; breton_trigram_pattern ]
-  in
-  let re = Re.compile (Re.alt patterns) in
-  let positions = ref [] in
+  let errors = ref [] in
   let pos = ref 0 in
-  while !pos < String.length s do
-    try
-      let result = Re.exec ~pos:!pos re s in
-      let start_pos = Re.Group.start result 0 in
-      let end_pos = Re.Group.stop result 0 in
+  let len = String.length s in
+  let try_pattern pattern message_or_key add_positions found_match =
+    if !found_match = None then
+      try
+        let result = Re.exec ~pos:!pos pattern s in
+        let start_pos = Re.Group.start result 0 in
+        let end_pos = Re.Group.stop result 0 in
+        if start_pos = !pos then (
+          add_positions start_pos end_pos message_or_key;
+          found_match := Some end_pos)
+      with Not_found -> ()
+  in
+  while !pos < len do
+    let found_match = ref None in
+    List.iter
+      (fun (pat, repl) ->
+        let add_pos start_pos end_pos _ =
+          let matched = String.sub s start_pos (end_pos - start_pos) in
+          let msg = Util.transl conf "chk_data ponctuation error" in
+          let col = Util.transl conf ":" in
+          let message =
+            Printf.sprintf "%s%s ‹%s› → ‹%s›" msg col matched repl
+          in
+          for i = start_pos to end_pos - 1 do
+            errors := { pos = i; message } :: !errors
+          done
+        in
+        try_pattern (Re.compile pat) "" add_pos found_match)
+      replacements;
+    let complex_patterns = Lazy.force compiled_complex in
+    let add_single_pos start_pos _end_pos msg_key =
+      let message = Util.transl conf msg_key in
+      errors := { pos = start_pos; message } :: !errors
+    in
+    let add_range_pos start_pos end_pos msg_key =
+      let message = Util.transl conf msg_key in
       for i = start_pos to end_pos - 1 do
-        positions := i :: !positions
-      done;
-      pos := end_pos
-    with Not_found -> pos := String.length s
+        errors := { pos = i; message } :: !errors
+      done
+    in
+    try_pattern
+      (List.nth complex_patterns 0)
+      "chk_data ponctuation error missing space" add_single_pos found_match;
+    try_pattern
+      (List.nth complex_patterns 1)
+      "chk_data ponctuation error breton trigram help" add_range_pos found_match;
+    pos := match !found_match with Some p -> p | None -> !pos + 1
   done;
-  List.sort_uniq compare !positions
+  List.rev !errors
 
 let fix_misc_typographic_errors dict_type s =
   let replacements = get_applicable_replacements dict_type in
@@ -590,39 +635,23 @@ let find_mixed_scripts_positions s =
     all_words;
   List.sort_uniq compare !positions
 
-let _get_detect_only_message s =
-  try
-    List.find_map
-      (fun (re, msg) -> if Re.execp re s then Some msg else None)
-      (Lazy.force compiled_detect)
-  with Not_found -> None
-
-let data_to_dict_type data =
-  match data with
-  | "fn" -> Fnames
-  | "sn" -> Snames
-  | "place" -> Places
-  | "pub_name" -> PubNames
-  | "qualif" -> Qualifiers
-  | "alias" -> Aliases
-  | "occup" -> Occupation
-  | "title" -> Titles
-  | "estate" -> Estates
-  | "src" -> Sources
-  | _ -> Fnames
-
 (* Generic error handling *)
 let find_error_positions error_type data base s =
   let dict_type = data_to_dict_type data in
   match error_type with
   | InvisibleCharacters -> find_invisible_positions s
-  | BadCapitalization ->
-      let dict_type = data_to_dict_type data in
-      find_bad_capitalization_positions dict_type base s
+  | BadCapitalization -> find_bad_capitalization_positions dict_type base s
   | MultipleSpaces -> find_multiple_spaces_positions s
   | NonBreakingSpace -> find_non_breaking_space_positions s
-  | MiscTypographicErrors -> find_misc_typographic_positions dict_type s
+  | MiscTypographicErrors -> []
   | MixedScripts -> find_mixed_scripts_positions s
+
+let find_error_highlight_info error_type data base s conf =
+  let dict_type = data_to_dict_type data in
+  match error_type with
+  | MiscTypographicErrors ->
+      WithMessages (find_misc_typographic_positions dict_type s conf)
+  | _ -> SimplePositions (find_error_positions error_type data base s)
 
 let fix_error error_type dict_type s =
   match error_type with
@@ -640,7 +669,7 @@ let get_highlight_style error_type conf =
       {
         make_class = (fun hex -> if hex = "202F" then "nnbsp" else "nbsp");
         make_title =
-          (fun ?code ?name:_ _ ->
+          (fun ?code ?name:_ ?misc_msg:_ _ ->
             match code with
             | Some "00A0" -> Some "U+00A0 NON-BREAKING SPACE"
             | Some "202F" -> Some "U+202F NARROW NON-BREAKING SPACE"
@@ -649,13 +678,13 @@ let get_highlight_style error_type conf =
   | MultipleSpaces ->
       {
         make_class = (fun _ -> "ms");
-        make_title = (fun ?code:_ ?name:_ _ -> None);
+        make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
       }
   | InvisibleCharacters ->
       {
         make_class = (fun hex -> if is_zero_width hex then "zw" else "ic");
         make_title =
-          (fun ?code ?name _ ->
+          (fun ?code ?name ?misc_msg:_ _ ->
             let base =
               Printf.sprintf "U+%s %s"
                 (Option.value code ~default:"")
@@ -670,20 +699,18 @@ let get_highlight_style error_type conf =
   | BadCapitalization ->
       {
         make_class = (fun _ -> "bc");
-        make_title = (fun ?code:_ ?name:_ _ -> None);
+        make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
       }
   | MiscTypographicErrors ->
       {
         make_class = (fun _ -> "mt");
-        make_title =
-          (fun ?code:_ ?name:_ _ ->
-            Some (Util.transl conf "chk_data ponctuation error"));
+        make_title = (fun ?code:_ ?name:_ ?misc_msg _ -> misc_msg);
       }
   | MixedScripts ->
       {
         make_class = (fun _ -> "mx");
         make_title =
-          (fun ?code:_ ?name:_ _ ->
+          (fun ?code:_ ?name:_ ?misc_msg:_ _ ->
             Some (Util.transl conf "chk_data mixed alphabet"));
       }
 
@@ -708,9 +735,22 @@ let get_marriage_src_x fam = [ Driver.get_marriage_src fam ]
 let get_fsources_x fam = [ Driver.get_fsources fam ]
 
 (* HTML Generation *)
-let make_highlight_html s positions error_type conf =
+let make_highlight_html s highlight_info error_type conf =
   let buf = Buffer.create (String.length s * 2) in
   let style = get_highlight_style error_type conf in
+  let pos_to_message =
+    match (error_type, highlight_info) with
+    | MiscTypographicErrors, WithMessages infos ->
+        let map = Hashtbl.create (List.length infos) in
+        List.iter (fun info -> Hashtbl.replace map info.pos info.message) infos;
+        Some map
+    | _ -> None
+  in
+  let positions =
+    match highlight_info with
+    | SimplePositions pos_list -> pos_list
+    | WithMessages infos -> List.map (fun info -> info.pos) infos
+  in
   let rec process_char i in_span =
     if i >= String.length s then (
       if in_span then Buffer.add_string buf "</span>";
@@ -726,8 +766,13 @@ let make_highlight_html s positions error_type conf =
           | Some n -> n
           | None -> "UNICODE CHARACTER"
         in
+        let misc_msg =
+          match pos_to_message with
+          | Some map -> Hashtbl.find_opt map i
+          | None -> None
+        in
         let title_attr =
-          match style.make_title ~code:hex ~name conf with
+          match style.make_title ~code:hex ~name ?misc_msg conf with
           | Some t -> Printf.sprintf " title=\"%s\"" t
           | None -> ""
         in
@@ -780,8 +825,10 @@ let make_error_html conf base data istr entry error_type =
   let s2 = (Mutil.encode entry_fixed :> string) in
   let s2_auto = entry_fixed <> entry in
   let s2_p = if s2_auto then "&s2=" ^ s2 else "" in
-  let positions = find_error_positions error_type data base entry in
-  let hl = make_highlight_html entry positions error_type conf in
+  let highlight_info =
+    find_error_highlight_info error_type data base entry conf
+  in
+  let hl = make_highlight_html entry highlight_info error_type conf in
   let url_mod =
     Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s s2_p
   in
