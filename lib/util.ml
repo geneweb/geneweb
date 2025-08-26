@@ -2121,11 +2121,16 @@ let string_of_decimal_num conf f =
     let s = Str.global_replace (Str.regexp "0+$") "" s in
     let s = Str.global_replace (Str.regexp "\\.$") "" s in
     let sig_digits =
-      String.fold_left
-        (fun acc c ->
-          if c >= '0' && c <= '9' && not (acc = 0 && c = '0') then acc + 1
-          else acc)
-        0 s
+      (* can be replaced with a String.fold_left if Ocaml >= 4.14 *)
+      let rec count_digits acc i =
+        if i >= String.length s then acc
+        else
+          let c = s.[i] in
+          if c >= '0' && c <= '9' && not (acc = 0 && c = '0') then
+            count_digits (acc + 1) (i + 1)
+          else count_digits acc (i + 1)
+      in
+      count_digits 0 0
     in
     let needs_approx = sig_digits > 4 in
     let localized =
