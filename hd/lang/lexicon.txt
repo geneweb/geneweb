@@ -4528,6 +4528,14 @@ fr: caractère grec ou cyrillique
 en: punctuation error
 fr: erreur de ponctuation
 
+    chk_data ponctuation error breton trigram help
+en: modified letter apostrophe recommended for breton trigram cʼh
+fr: lettre modificative apostrophe recommandée pour le trigramme breton cʼh
+
+    chk_data ponctuation error missing space
+en: missing space before parenthesis
+fr: espace manquante avant la parenthèse
+
     chk_data use database/cache
 en: use database/using <b>database</b> (very slow)/using <b>cached data</b> (very fast but may show entries that have been corrected or deleted)
 fr: utiliser la base de données/utilisation de la <b>base de données</b> (très lent)/utilisation des <b>données en cache</b> (très rapide mais peut afficher des entrées déjà corrigées ou supprimées)
