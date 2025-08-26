@@ -61,7 +61,7 @@ ENV GWSETUP_IP=172.17.0.1
 # Ignore the apt warning here as apt-get does not allow wildcarding versions
 # hadolint ignore=DL3027
 RUN apt-get update -q \
-  && apt install -qy --no-install-recommends openssl adduser \
+  && apt install -qy --no-install-recommends openssl adduser netcat-openbsd \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && adduser --system --group --uid 1000 \
