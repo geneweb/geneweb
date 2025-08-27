@@ -38,14 +38,14 @@
     %foreach;qualifier;
       %if;not is_first;
         %if;has_public_name;%public_name; %qualifier;
-        %else;%first_name; %qualifier;%end;<br>
+        %else;%first_name; %qualifier;%end;
       %end;
     %end;
     %if;(has_public_name or has_qualifiers)
-      <span class="font-weight-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</span><br>
+      <span class="font-weight-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</span>
     %end;
     %if;has_aliases;
-      Alias%sp;
+      alias%sp;
       %apply;lazy_print("")
       %foreach;alias;
         %if;(lazy_printed)/%end;
@@ -80,8 +80,8 @@
           %end;)%nn;
         %end;
       %end;%)
-    %end;</br>
-    %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;<br>%end;
+    %end;
+    %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;%end;
     %if;has_first_names_aliases;
       %apply;lazy_print("")
       %apply;link(first_name,"P")/%sq;
@@ -90,8 +90,7 @@
         %lazy_force;
         %apply;link(first_name_alias,"P")
       %end;
-      <br>
-    %end;
+    %end;%sp;
     %if;has_surnames_aliases;
       %apply;lazy_print("")
       %apply;link(surname,"N")/%sq;
@@ -100,7 +99,6 @@
         %lazy_force;
         %apply;link(surname_alias,"N")
       %end;
-      <br>
     %end;
   %end;
 %end;
@@ -395,17 +393,17 @@
 %end;
 %define;portrait()
   %if;(has_image or has_blason or b.default_image="yes")
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center align-self-stretch">
       %if;has_image;
         %if;not cancel_links;<a href="%image_url;" target="_blank">%end;
-          <img src="%image_url;"%image_size; class=" %if;(op_m=3)align-self-center mx-1%end; rounded" alt="[image/images]0" title="[him/her]s">%nn;
+          <img src="%image_url;"%image_size; class="%if;(op_m=3) mx-1%end; rounded" alt="[image/images]0" title="[him/her]s">%nn;
         %if;not cancel_links;</a>%end;
       %elseif;has_blason;
         %if;not cancel_links;<a href="%blason_url;" target="_blank">%end;
-            <img src="%blason_url;"%blason_size; class="%if;(op_m=3)align-self-center mx-1%end;" alt="[blason/blasons]0">%nn;
-        %if;not cancel_links</a>%end;
+            <img src="%blason_url;"%blason_size;%if;(op_m=3) class=" mx-1"%end; alt="[blason/blasons]0">%nn;
+        %if;not cancel_links;</a>%end;
       %elseif;(b.default_image="yes")
-        <img class="%if;(op_m=3)d-flex align-self-center mx-1%end; rounded" src="%images_prefix;img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]">
+        <img class="%if;(op_m=3) mx-1%end; rounded" src="%images_prefix;img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]">
       %end;
     </div>
   %end;
@@ -420,7 +418,7 @@
   <h1 class="%if;(op_m=2)text-center%else;text-xs-center text-md-left%end;">
     %if;(has_portrait and has_blason) %(has_portrait is false if no portrait !! TODO: FIXME!%)
       %if;not cancel_links;<a href="%blason_url;" target="_blank">%end;
-       <img src="%blason_url;"%blason_small_size; class="%if;(op_m=3)align-self-center mx-1%end; mx-2" alt="[blason/blasons]0">%nn;
+       <img src="%blason_url;"%blason_small_size; class="%if;(op_m=3) mx-1%end; mx-2" alt="[blason/blasons]0">%nn;
       %if;not cancel_links;</a>%end;
     %end;
     %if;has_public_name;
@@ -432,7 +430,7 @@
         %if;cancel_links;%first_name; %surname;
         %else;
           <a href="%prefix;m=P&v=%first_name_key;#i%index;">%first_name;</a>
-          <a href="%prefix;m=N&v=%surname_key;#i%index;">%surname;</a>
+          <a href="%prefix;m=N&v=%surname_key;#i%index;">%surname;</a>%nn;
         %end;
       %end;
     %end;
@@ -461,10 +459,8 @@
   
   %elseif;(op_m=3)
     <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
-      <div>
-        %apply;portrait()
-      </div>
-      <div>
+      %apply;portrait()
+      <div class="flex-grow-1 min-width-0">
         <div class="text-center mb-2 mx-2">
           %apply;detailed_names()
         </div>
