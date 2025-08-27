@@ -128,7 +128,7 @@
           %if;(iswiz=1 and not has_parents and first_name!="?" and surname!="?")
             <li class="nav-item">
               <a class="nav-link %if;(e.m="ADD_PAR" or e.m="ADD_PAR_OK")active%end;" id="add_par"
-                href="%prefix;m=ADD_PAR&ip=%index;" %laL;>
+                href="%prefix;m=ADD_PAR&ip=%index;" %laL;>%nn;
                 <sup><span class="fa fa-user male" aria-hidden="true"></span></sup>%nn;
                 <sub><span class="fa fa-plus %sexcolor;" aria-hidden="true"></span></sub>%nn;
                 <sup><span class="fa fa-user female" aria-hidden="true"></span></sup>%nn;
@@ -138,7 +138,7 @@
           %( SELF button %)
           <li class="nav-item">
             <a class="nav-link %if;(e.m="")active bg-light%end;" id="self"
-              href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
+              href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">%nn;
               <span class="fa fa-user-large fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span></a>
           </li>
@@ -146,7 +146,7 @@
           %if;(iswiz=1)
             <li class="nav-item">
               <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active%end;" id="mod_ind" href="%prefix;m=MOD_IND&i=%index;" %laP;>%nn;
-                <span class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></span>%nn;
+                <span class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></span>
                 <span class="sr-only">[*modify::person/persons]0 (P)</span></a>
             </li>
           %end;
@@ -484,7 +484,7 @@
           %if;(carrousel_img_nbr>0)
             <li class="nav-item">
               <a class="nav-link text-secondary" data-toggle="modal" data-target="#carousel_modal"
-                title="[*display carrousel]">
+                title="[*display carrousel]">%nn;
                 <span class="far fa-image fa-fw mr-1" aria-hidden="true"></span>%nn;
                 <sup class="small">%carrousel_img_nbr;</sup>%nn;
                 <span class="sr-only">[*image/images]1</span></a>
@@ -492,7 +492,7 @@
           %end;
           %if;(wizard and carrousel_img_nbr=0)
             <li class="nav-item">
-              <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>
+              <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>%nn;
                 <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
                 <span class="sr-only">icon button</span></a>
             </li>
@@ -501,7 +501,7 @@
           %if;has_linked_pages;
             <li class="nav-item">
               <a class="nav-link text-secondary" href="%url_set.m.LINKED;"
-                title="[*linked pages help]">
+                title="[*linked pages help]">%nn;
                 <i class="fa fa-file-lines fa-fw" aria-hidden="true"></i>%nn;
                 <sup class="small">%linked_pages_nbr;</sup>%nn;
                 <span class="sr-only">file-lines icon</span></a>
@@ -509,7 +509,7 @@
             %if;(nb_linked_pages_type.gallery>0)
               <li class="nav-item">
                 <a class="nav-link text-secondary" href="%url_set.m_type.LINKED_gallery"
-                  title="[*linked albums help]">
+                  title="[*linked albums help]">%nn;
                   <i class="fa fa-images fa-fw mr-1" aria-hidden="true"></i>%nn;
                   %let;nbalb;%nb_linked_pages_type.album;%in;
                   <sup class="small">%nb_linked_pages_type.gallery;

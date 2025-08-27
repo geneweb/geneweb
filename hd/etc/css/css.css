@@ -1,3 +1,11 @@
+a, .pre {
+  white-space: pre;
+}
+
+a:has(i), .deslist a, .ind-notes a {
+  white-space: normal;
+}
+
 /* cousins relation table m=C */
 .toggle-button:focus {
   outline: none; /* On generation picker, hide the toggle +/- button outline+shadow */
