@@ -794,6 +794,7 @@ module SearchingFields : sig
     ?map_field:(string -> string) -> Config.config -> string -> string -> string
 
   val sosa : Config.config -> Gwdb.base -> string
+  val sosa_field : Config.config -> Gwdb.base -> string -> string
 
   val get_place_date_request :
     Config.config -> string -> string -> string -> string
@@ -802,6 +803,7 @@ module SearchingFields : sig
   val test_date : Config.config -> string -> bool
   val event_search : Config.config -> Fields.search -> int -> string
   val sex : Config.config -> int
+  val union : Config.config -> int
   val first_name : Config.config -> string
   val surname : Config.config -> string
   val occupation : Config.config -> string
@@ -921,6 +923,10 @@ end = struct
             (NameDisplay.fullname_html_of_person conf base p :> string)
     else ""
 
+  let sosa_field conf base search =
+    let s = sosa conf base in
+    if search = "" then s else if s = "" then search else search ^ ", " ^ s
+
   let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
 
   let map_field ~conf ~key s =
@@ -950,7 +956,68 @@ end = struct
           || gets conf "date1_yyyy" != ""
         then get_place_date_request conf "place" "date" event_string
         else event_string
+
+  let union conf = match gets conf "married" with "Y" -> 0 | "N" -> 1 | _ -> 2
 end
+
+(*
+  Returns a description string for the current advanced search results in the correct language.
+  e.g. "Search all Pierre, born in Paris, died in Paris"
+*)
+let searching_fields conf base =
+  let gets = SearchingFields.gets conf in
+  let sex = SearchingFields.sex conf in
+  let search_type = get_search_type gets in
+  let search = "" in
+  let map_field key = SearchingFields.map_field ~conf ~key in
+  let search =
+    SearchingFields.string_field
+      ~map_field:(map_field "exact_first_name")
+      conf "first_name" search
+  in
+  let search =
+    SearchingFields.string_field
+      ~map_field:(map_field "exact_surname")
+      conf "surname" search
+  in
+  let search = SearchingFields.sosa_field conf base search in
+  let event_search = SearchingFields.event_search conf search_type sex in
+  let search =
+    if search = "" then event_search
+    else if event_search = "" then search
+    else search ^ ", " ^ event_search
+  in
+  (* Adding the place and date at the end for the OR request. *)
+  let search =
+    match search_type with
+    | And -> search
+    | Fields.Or ->
+        if
+          gets "place" != ""
+          || gets "date2_yyyy" != ""
+          || gets "date1_yyyy" != ""
+        then SearchingFields.get_place_date_request conf "place" "date" search
+        else search
+  in
+  let search =
+    let marriage_place_field_name =
+      Fields.get_event_field_name gets "place" "marriage" search_type
+    in
+    if
+      not
+        (SearchingFields.test_string conf marriage_place_field_name
+        || SearchingFields.test_date conf "marriage")
+    then
+      let sep = if search <> "" then ", " else "" in
+      if gets "married" = "Y" then
+        search ^ sep ^ Util.transl conf "having a family"
+      else if gets "married" = "N" then
+        search ^ sep ^ Util.transl conf "having no family"
+      else search
+    else search
+  in
+  let sep = if search <> "" then "," else "" in
+  Adef.safe @@ SearchingFields.string_field conf "occu" (search ^ sep)
 
 let filter_alias ~name ~matching =
   let search_list = List.map Name.lower (Name.split name) in
