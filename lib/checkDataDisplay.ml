@@ -619,12 +619,11 @@ let print conf base =
 |}
           (tn conf "chk_data use database/cache" cache_index)
           (tn conf "validate/delete" 0);
-        if params.selected_dicts <> [] && params.sel_err_types <> [] then
-          display_results conf base params.selected_dicts params.sel_err_types
-            params.max_results);
-      Output.print_sstring conf {|
+        display_results conf base params.selected_dicts params.sel_err_types
+          params.max_results;
+        Output.print_sstring conf {|
   </div>
-|};
+|});
       Hutil.trailer conf)
 
 type chk_result =
