@@ -363,16 +363,17 @@ let path_to_json path =
       ("anc", `List (List.map anc_to_json path.Relation.anc));
     ]
 
-let cell_data_to_json cell =
+let cell_data_to_json conf cell =
+  let coeff = Util.string_of_decimal_num conf (cell.coeff *. 100.0) ^ " %" in
   `Assoc
     [
       ("paths", `List (List.map path_to_json cell.paths));
       ("total", `String (Sosa.to_string cell.total));
-      ("coeff", `Float cell.coeff);
+      ("coeff", `String coeff);
     ]
 
 (* Générer le JSON pour la partie supérieure de la matrice uniquement *)
-let matrix_to_json base persons cell_storage n =
+let matrix_to_json conf base persons cell_storage n =
   let cells = ref [] in
   let used_ipers = ref IperSet.empty in
   (* Ne parcourir que la partie supérieure de la matrice *)
@@ -415,7 +416,7 @@ let matrix_to_json base persons cell_storage n =
                           (Driver.Iper.to_string (Driver.get_iper persons.(j)))
                       );
                     ] );
-                ("data", cell_data_to_json cell_data);
+                ("data", cell_data_to_json conf cell_data);
               ]
           in
           cells := (key, cell_json) :: !cells

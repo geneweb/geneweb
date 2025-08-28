@@ -179,6 +179,7 @@ endif
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	rm $(DISTRIB_DIR)/gw/etc/js/checkdata.js
 	rm $(DISTRIB_DIR)/gw/etc/js/p_mod.js
+	rm $(DISTRIB_DIR)/gw/etc/js/relationmatrix.js
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
 	mkdir $(DISTRIB_DIR)/gw/setup/lang
