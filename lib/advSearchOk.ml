@@ -787,7 +787,6 @@ let advanced_search conf base max_answers =
 
 module SearchingFields : sig
   val gets : Config.config -> string -> string
-  val getd : Config.config -> string -> Date.dmy option * Date.dmy option
   val map_field : conf:Config.config -> key:string -> string -> string
 
   val string_field :
