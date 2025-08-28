@@ -6,6 +6,72 @@ a:has(i), .deslist a, .ind-notes a {
   white-space: normal;
 }
 
+/* Styles pour les modals de relationMatrix m=RM */
+/* Masquer le header du modal */
+#rmModal table {
+  line-height: 1.3;
+}
+
+#rmModal tr:first-child td {
+  border-top: none;
+}
+
+#rmModal td {
+  vertical-align: middle;
+  text-align: center;
+  padding: 5px 10px;
+}
+
+#rmModal tfoot td {
+  font-weight: bold;
+  padding-top: 0.8em;
+}
+
+td .rm-cell {
+  cursor: pointer;
+}
+
+#rmModal .person {
+  padding-top: 0.8em;
+  width: 45%;
+}
+
+#rmModal tfoot {
+  border-top: 1px solid #dee2e6;
+}
+
+#rmModal tr td:first-child{
+  border-right: 1px solid #dee2e6;
+}
+#rmModal tr td:last-child {
+  border-left: 1px solid #dee2e6;
+}
+
+/* Wrapper principal avec scroll */
+.rm-modal-wrapper {
+  padding: 10px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Section debug */
+.rm-debug {
+  font-size: 0.85em;
+  margin-top: 15px;
+}
+
+.rm-debug summary {
+  cursor: pointer;
+  color: #6c757d;
+}
+
+#rmModal pre {
+  font-size: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 5px;
+}
+
 /* cousins relation table m=C */
 .toggle-button:focus {
   outline: none; /* On generation picker, hide the toggle +/- button outline+shadow */
@@ -543,17 +609,20 @@ p {
 
 /* Relation menu table */
 #quickrel.table td{
-	padding: 0px;
-	line-height:1em;
-	}
+  padding: 0px;
+  line-height:1em;
+}
 
 .tooltip-inner {
    min-width: 100px;
-   max-width: 450px;
+   max-width: 550px;
    white-space: normal;
    opacity: 1 !important;
-   padding: 6px 10px;
-   line-height: 1.2;
+   padding: 10px 14px;
+   line-height: 1.5;
+   background-color: #faf8f3;
+   color: #2c2c2c;
+   border: 1px solid #d4c5b0;
 }
 
 .tooltip.show {
@@ -2165,7 +2234,7 @@ span.notesourcecolor {
   width:1.5em;
   text-align:right;
 }
-.tooltip-inner {
+.rm-tooltip .tooltip-inner {
   background-color: white !important;
   color: black !important;
   border: 1px solid #ddd !important;

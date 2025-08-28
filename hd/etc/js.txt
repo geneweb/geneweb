@@ -47,6 +47,9 @@
   %if;(e.m="CHK_DATA")
     <script src="%etc_prefix;js/checkdata.min.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.min.js%end;"></script>
   %end;
+  %if;(e.m="RM")
+    <script src="%etc_prefix;js/relationmatrix.min.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.min.js%end;"></script>
+  %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
   %if;("IND" in e.m or "FAM" in e.m or "MOD_NOTES" in e.m)
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;"></script>
@@ -678,6 +681,11 @@ document.addEventListener('DOMContentLoaded', () => {
 %end;
 %if;(e.m="MOD_DATA")
   updateData.init();
+%end;
+%if;(e.m="RM")
+  if (typeof RelationMatrix !== 'undefined') {
+    RelationMatrix.init();
+  }
 %end;
 %if;(e.m="CHK_DATA")
   if (typeof CheckData !== 'undefined' && CheckData.init) {

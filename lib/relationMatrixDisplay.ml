@@ -1,4 +1,3 @@
-(* lib/relationMatrixDisplay.ml *)
 open Config
 open RelationMatrix
 module Driver = Geneweb_db.Driver
@@ -59,20 +58,18 @@ let print_matrix_cell conf base tstab persons i j cell_storage n =
             let relationship_url =
               make_relationship_link conf base (MatrixLink (person_i, person_j))
             in
-            let cell_link =
-              Util.make_link ~href:relationship_url ~content:cell_content ()
-            in
             let tooltip_text =
               make_tooltip_text conf base person_i person_j shortest
                 cell_data.total cell_data.coeff
             in
             Output.printf conf
-              {|<td class="rm-cell" data-id="§%s_§%s" title="%s"
-                 data-toggle="tooltip" data-html="true" data-placement="top">%s</td>|}
+              {|
+<td class="rm-cell" data-id="§%s_§%s" title="%s" data-url="%s"
+    data-toggle="tooltip" data-html="true" data-placement="top">%s</td>|}
               (Driver.Iper.to_string iper_i)
               (Driver.Iper.to_string iper_j)
               (String.map (function '"' -> '\'' | c -> c) tooltip_text)
-              (cell_link :> string))
+              relationship_url cell_content)
 
 (* Afficher les en-têtes de colonnes *)
 let print_matrix_headers conf persons =
@@ -96,19 +93,17 @@ let print_matrix_row conf base tstab persons i cell_storage n =
   Output.print_sstring conf "<tr>";
   Output.printf conf
     {|<th class="rm-head" data-id="§%s_">
-      <div class="d-flex align-items-center">
-        <span class="badge badge-pill badge-primary ml-2 mr-3">%d</span>
-        <div class="flex-fill text-left">
-          <div><a href="%s">%s</a></div>
-          <div class="small text-muted ml-3">%s</div>
-        </div>
-      </div>
-    </th>|}
+    <div class="d-flex align-items-center">
+      <span class="badge badge-pill badge-primary mx-2">%d</span>
+      %s%s
+    </div>
+  </th>|}
     (Driver.Iper.to_string iper_i)
     (i + 1)
-    (Util.acces conf base person :> string)
     (Util.referenced_person_text conf base person :> string)
-    (DateDisplay.short_dates_text conf base person :> string);
+    (Util.mod_ind_link conf person
+       (DateDisplay.short_dates_text conf base person)
+      :> string);
   for j = 0 to n - 1 do
     print_matrix_cell conf base tstab persons i j cell_storage n
   done;
@@ -119,17 +114,32 @@ let print_matrix_table conf base persons =
   let n = Array.length persons in
   let tstab = Util.create_topological_sort conf base in
   let cell_storage = RelationMatrix.create_triangular_matrix n in
-  Output.print_sstring conf
+  Output.printf conf
     {|<div class="d-flex justify-content-center">
-      <table class="table table-sm w-auto" id="rm-table">
-        <tbody>|};
+      <table class="table table-sm w-auto" id="rm-table"
+             data-links-label="%s" data-coeff-label="%s">
+        <tbody>|}
+    (Util.transl_nth conf "relationship link/relationship links" 1)
+    (Util.transl_nth conf "relationship coefficient/percentage" 1);
   print_matrix_headers conf persons;
   for i = 0 to n - 1 do
     print_matrix_row conf base tstab persons i cell_storage n
   done;
   Output.print_sstring conf {|</tbody></table></div>|};
-  let json_data = RelationMatrix.matrix_to_json base persons cell_storage n in
+  let json_data =
+    RelationMatrix.matrix_to_json conf base persons cell_storage n
+  in
   let json_string = Yojson.Safe.to_string json_data in
+  Output.print_sstring conf
+    {|
+<div class="modal fade" id="rmModal" tabindex="-1" role="dialog"
+     aria-labelledby="rmModalBody" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-body" id="rmModalBody"></div>
+    </div>
+  </div>
+</div>|};
   Output.printf conf
     {|<script>
 window.rmData = %s;
@@ -189,6 +199,9 @@ let print conf base =
         {|<script>
 document.addEventListener('DOMContentLoaded', function() {
   $('[data-toggle="tooltip"]').tooltip();
+  $('#rm-table [data-toggle="tooltip"]').tooltip('dispose').tooltip({
+    customClass: 'rm-tooltip'
+  });
   $('.table [data-id]').hover(function() {
     var ids = $(this).data('id').split('_');
     $('[data-id*="' + ids[0] + '"]').toggleClass('rm-hl0');
