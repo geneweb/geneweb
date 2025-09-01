@@ -489,8 +489,9 @@ let open_base bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  try Hashtbl.find base_store bname
-  with Not_found -> raise (Invalid_argument bname)
+  match Hashtbl.find_opt base_store bname with
+  | Some b -> b
+  | None -> raise (Invalid_argument bname)
 
 let make bname _particles
     ((persons, ascends, unions), (families, couples, descends), strings, _) =

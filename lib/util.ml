@@ -132,11 +132,14 @@ let nth_field w n =
 let tnf s = "[" ^ s ^ "]"
 
 let transl conf w =
-  try Hashtbl.find conf.Config.lexicon w with Not_found -> tnf w
+  match Hashtbl.find_opt conf.Config.lexicon w with
+  | Some s -> s
+  | None -> tnf w
 
 let transl_nth conf w n =
-  try nth_field (Hashtbl.find conf.Config.lexicon w) n
-  with Not_found -> tnf (nth_field w n)
+  match Hashtbl.find_opt conf.Config.lexicon w with
+  | Some s -> nth_field s n
+  | None -> tnf (nth_field w n)
 
 let gen_decline_basic wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
@@ -2221,24 +2224,24 @@ let record_visited conf ip =
     let ht = read_visited conf in
     let time = sprintf_today conf in
     let () =
-      try
-        let vl = Hashtbl.find ht conf.Config.user in
-        let vl = (ip, time) :: vl in
-        (* On rend la liste unique sur les ip. *)
-        let uniq = function
-          | ([ _ ] | []) as l -> l
-          | ((ip, _) as x) :: l ->
-              let rec loop rl x = function
-                | ((ip2, _) as y) :: l ->
-                    if ip = ip2 then loop rl x l else loop (x :: rl) y l
-                | [] -> List.rev (x :: rl)
-              in
-              loop [] x l
-        in
-        let vl = uniq vl in
-        let vl = Ext_list.take vl 10 in
-        Hashtbl.replace ht conf.Config.user vl
-      with Not_found -> Hashtbl.add ht conf.Config.user [ (ip, time) ]
+      match Hashtbl.find_opt ht conf.Config.user with
+      | Some vl ->
+          let vl = (ip, time) :: vl in
+          (* On rend la liste unique sur les ip. *)
+          let uniq = function
+            | ([ _ ] | []) as l -> l
+            | ((ip, _) as x) :: l ->
+                let rec loop rl x = function
+                  | ((ip2, _) as y) :: l ->
+                      if ip = ip2 then loop rl x l else loop (x :: rl) y l
+                  | [] -> List.rev (x :: rl)
+                in
+                loop [] x l
+          in
+          let vl = uniq vl in
+          let vl = Ext_list.take vl 10 in
+          Hashtbl.replace ht conf.Config.user vl
+      | None -> Hashtbl.add ht conf.Config.user [ (ip, time) ]
     in
     write_visited conf ht
 

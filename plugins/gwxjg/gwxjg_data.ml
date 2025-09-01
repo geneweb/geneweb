@@ -430,11 +430,12 @@ and pget conf base ip =
   else ppget conf base (Gwdb.poi base ip)
 
 and get_n_mk_person conf base (i : Gwdb.iper) =
-  try Hashtbl.find person_ht i
-  with Not_found ->
-    let p = pget conf base i in
-    Hashtbl.add person_ht i p;
-    p
+  match Hashtbl.find_opt person_ht i with
+  | Some p -> p
+  | None ->
+      let p = pget conf base i in
+      Hashtbl.add person_ht i p;
+      p
 
 and mk_rparent_aux kind conf base acc =
   let mk_rel i t s =

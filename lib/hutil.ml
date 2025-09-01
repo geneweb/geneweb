@@ -51,8 +51,10 @@ let header_without_http conf title =
   | None -> ());
   Output.print_sstring conf "\n</head>\n";
   let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
-    with Not_found -> ""
+    Option.fold
+      (Hashtbl.find_opt conf.lexicon "!dir")
+      ~some:(fun d -> " dir=\"" ^ d ^ "\"")
+      ~none:""
   in
   let s = s ^ Util.body_prop conf in
   Output.printf conf "<body%s>\n" s;

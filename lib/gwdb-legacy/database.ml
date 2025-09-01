@@ -1134,11 +1134,11 @@ let opendb bname =
   let patch_name s ip =
     (* FIXME: pending patches? *)
     let i = Dutil.name_index s in
-    try
-      let ipl = Hashtbl.find patches.h_name i in
-      if List.mem ip ipl then ()
-      else Hashtbl.replace patches.h_name i (ip :: ipl)
-    with Not_found -> Hashtbl.add patches.h_name i [ ip ]
+    match Hashtbl.find_opt patches.h_name i with
+    | Some ipl ->
+        if List.mem ip ipl then ()
+        else Hashtbl.replace patches.h_name i (ip :: ipl)
+    | None -> Hashtbl.add patches.h_name i [ ip ]
   in
   let read_notes fnotes rn_mode =
     let fname =

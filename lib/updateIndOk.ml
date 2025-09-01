@@ -1289,8 +1289,9 @@ let print_change_event_order conf base =
       let pevents =
         List.fold_right
           (fun (id, _) accu ->
-            try (Hashtbl.find ht id |> Gwdb.gen_pevent_of_pers_event) :: accu
-            with Not_found -> failwith "Sorting event")
+            match Hashtbl.find_opt ht id with
+            | Some event -> Gwdb.gen_pevent_of_pers_event event :: accu
+            | None -> failwith "Sorting event")
           sorted_pevents []
       in
       let p = Gwdb.gen_person_of_person p in

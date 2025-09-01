@@ -903,11 +903,12 @@ let build_surnames_list conf base v p =
   let auth = conf.Config.wizard || conf.Config.friend in
   let add_surname sosa p surn dp =
     let r =
-      try Hashtbl.find ht surn
-      with Not_found ->
-        let r = ref ((fst dp, p), []) in
-        Hashtbl.add ht surn r;
-        r
+      match Hashtbl.find_opt ht surn with
+      | Some r -> r
+      | None ->
+          let r = ref ((fst dp, p), []) in
+          Hashtbl.add ht surn r;
+          r
     in
     r := (fst !r, sosa :: snd !r)
   in
@@ -990,11 +991,12 @@ let build_list_eclair conf base v p =
     if not (Gwdb.is_empty_string pl) then
       let pl = Util.trimmed_string_of_place (Gwdb.sou base pl) in
       let r =
-        try Hashtbl.find ht (surn, pl)
-        with Not_found ->
-          let r = ref (p, None, None, []) in
-          Hashtbl.add ht (surn, pl) r;
-          r
+        match Hashtbl.find_opt ht (surn, pl) with
+        | Some r -> r
+        | None ->
+            let r = ref (p, None, None, []) in
+            Hashtbl.add ht (surn, pl) r;
+            r
       in
       (* Met la jour le binding : dates et liste des iper. *)
       r :=

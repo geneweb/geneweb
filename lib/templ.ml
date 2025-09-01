@@ -548,8 +548,10 @@ let eval_string_expr conf (eval_var, eval_apply) e =
 
 let print_body_prop conf =
   let s =
-    try " dir=\"" ^ Hashtbl.find conf.Config.lexicon "!dir" ^ "\""
-    with Not_found -> ""
+    Option.fold
+      (Hashtbl.find_opt conf.Config.lexicon "!dir")
+      ~some:(fun d -> " dir=\"" ^ d ^ "\"")
+      ~none:""
   in
   Output.print_sstring conf (s ^ Util.body_prop conf)
 

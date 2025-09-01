@@ -498,23 +498,25 @@ let advanced_search conf base max_answers =
   let hss = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
   let getd x =
-    try Hashtbl.find hd x
-    with Not_found ->
-      let v =
-        ( reconstitute_date_dmy conf (x ^ "1"),
-          reconstitute_date_dmy conf (x ^ "2") )
-      in
-      Hashtbl.add hd x v;
-      v
+    match Hashtbl.find_opt hd x with
+    | Some v -> v
+    | None ->
+        let v =
+          ( reconstitute_date_dmy conf (x ^ "1"),
+            reconstitute_date_dmy conf (x ^ "2") )
+        in
+        Hashtbl.add hd x v;
+        v
   in
   let gets x =
-    try Hashtbl.find hs x
-    with Not_found ->
-      let v =
-        match Util.p_getenv conf.Config.env x with Some v -> v | None -> ""
-      in
-      Hashtbl.add hs x v;
-      v
+    match Hashtbl.find_opt hs x with
+    | Some v -> v
+    | None ->
+        let v =
+          match Util.p_getenv conf.Config.env x with Some v -> v | None -> ""
+        in
+        Hashtbl.add hs x v;
+        v
   in
 
   let exact_place = "on" = gets "exact_place" in

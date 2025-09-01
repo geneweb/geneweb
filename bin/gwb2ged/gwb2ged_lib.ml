@@ -3,20 +3,22 @@
 let int_of_iper =
   let ht = Hashtbl.create 0 in
   fun i ->
-    try Hashtbl.find ht i
-    with Not_found ->
-      let x = Hashtbl.length ht in
-      Hashtbl.add ht i x;
-      x
+    match Hashtbl.find_opt ht i with
+    | Some x -> x
+    | None ->
+        let x = Hashtbl.length ht in
+        Hashtbl.add ht i x;
+        x
 
 let int_of_ifam =
   let ht = Hashtbl.create 0 in
   fun i ->
-    try Hashtbl.find ht i
-    with Not_found ->
-      let x = Hashtbl.length ht in
-      Hashtbl.add ht i x;
-      x
+    match Hashtbl.find_opt ht i with
+    | Some x -> x
+    | None ->
+        let x = Hashtbl.length ht in
+        Hashtbl.add ht i x;
+        x
 
 (* We use negative ifams to avoid conflicts with existing ids *)
 let fresh_ifam =

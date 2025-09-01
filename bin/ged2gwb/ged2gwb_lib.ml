@@ -825,8 +825,9 @@ let add_string gen ?format s =
        let s = Html.text_content s in
        if s = "" then "x" else s
   in
-  try Hashtbl.find gen.g_hstr s
-  with Not_found ->
+  match Hashtbl.find_opt gen.g_hstr s with
+  | Some i -> i
+  | None ->
     let i = gen.g_str.tlen in
     assume_tab gen.g_str "";
     gen.g_str.arr.(i) <- s;
@@ -846,8 +847,9 @@ let output_pindex i str =
 
 let per_index gen lab =
   let lab = extract_addr lab in
-  try Hashtbl.find gen.g_hper lab
-  with Not_found ->
+  match Hashtbl.find_opt gen.g_hper lab with
+  | Some i -> i
+  | None ->
     let i = gen.g_per.tlen in
     assume_tab gen.g_per (Def.Left "");
     gen.g_per.arr.(i) <- Def.Left lab;
@@ -858,8 +860,9 @@ let per_index gen lab =
 
 let fam_index gen lab =
   let lab = extract_addr lab in
-  try Hashtbl.find gen.g_hfam lab
-  with Not_found ->
+  match Hashtbl.find_opt gen.g_hfam lab with
+  | Some i -> i
+  | None ->
     let i = gen.g_fam.tlen in
     assume_tab gen.g_fam (Def.Left "");
     gen.g_fam.arr.(i) <- Def.Left lab;
@@ -1031,7 +1034,7 @@ let get_lev0 (strm__ : _ Stream.t) =
    rpos = !state.line_cnt; rused = false}
 
 let find_notes_record gen addr =
-  match try Some (Hashtbl.find gen.g_not addr) with Not_found -> None with
+  match Hashtbl.find_opt gen.g_not addr with
     Some i ->
       seek_in gen.g_ic i;
       begin try Some (get_lev0 (Stream.of_channel gen.g_ic)) with
@@ -1040,7 +1043,7 @@ let find_notes_record gen addr =
   | None -> None
 
 let find_sources_record gen addr =
-  match try Some (Hashtbl.find gen.g_src addr) with Not_found -> None with
+  match Hashtbl.find_opt gen.g_src addr with
     Some i ->
       seek_in gen.g_ic i;
       begin try Some (get_lev '0' (Stream.of_channel gen.g_ic)) with
@@ -1737,8 +1740,9 @@ let add_indi gen r =
       let s = applycase_surname s in
       let r =
         let key = Name.strip_lower (Mutil.nominative f ^ " " ^ Mutil.nominative s) in
-        try Hashtbl.find gen.g_hnam key
-        with Not_found ->
+        match Hashtbl.find_opt gen.g_hnam key with
+        | Some r -> r
+        | None ->
           let r = ref (-1) in
           Hashtbl.add gen.g_hnam key r ;
           r

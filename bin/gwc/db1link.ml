@@ -171,21 +171,22 @@ let no_string = ""
     associate this string to its index in mentioned array. Extens array if needed.
     Returns associated index. *)
 let unique_string gen x =
-  try Hashtbl.find gen.g_strings x
-  with Not_found ->
-    (* string not found *)
-    if gen.g_scnt = Array.length gen.g_base.c_strings then (
-      (* extend arrray of strings and copy previus elements *)
-      let arr = gen.g_base.c_strings in
-      let new_size = (2 * Array.length arr) + 1 in
-      let new_arr = Array.make new_size no_string in
-      Array.blit arr 0 new_arr 0 (Array.length arr);
-      gen.g_base.c_strings <- new_arr);
-    let u = gen.g_scnt in
-    gen.g_base.c_strings.(gen.g_scnt) <- x;
-    gen.g_scnt <- gen.g_scnt + 1;
-    Hashtbl.add gen.g_strings x u;
-    u
+  match Hashtbl.find_opt gen.g_strings x with
+  | Some u -> u
+  | None ->
+      (* string not found *)
+      if gen.g_scnt = Array.length gen.g_base.c_strings then (
+        (* extend arrray of strings and copy previus elements *)
+        let arr = gen.g_base.c_strings in
+        let new_size = (2 * Array.length arr) + 1 in
+        let new_arr = Array.make new_size no_string in
+        Array.blit arr 0 new_arr 0 (Array.length arr);
+        gen.g_base.c_strings <- new_arr);
+      let u = gen.g_scnt in
+      gen.g_base.c_strings.(gen.g_scnt) <- x;
+      gen.g_scnt <- gen.g_scnt + 1;
+      Hashtbl.add gen.g_strings x u;
+      u
 
 (** Dummy [family] with its empty [couple] and [descendants]. *)
 let no_family gen =
@@ -371,8 +372,9 @@ let add_person_by_name gen first_name surname int =
     with the giving information. *)
 let find_first_available_occ gen fn sn occ =
   let occ =
-    try max occ (Hashtbl.find gen.g_first_av_occ (fn, sn))
-    with Not_found -> occ
+    Option.fold ~some:(max occ)
+      (Hashtbl.find_opt gen.g_first_av_occ (fn, sn))
+      ~none:occ
   in
   let rec loop occ =
     match

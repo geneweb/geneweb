@@ -187,8 +187,10 @@ let macro conf base = function
       | None -> Adef.safe "")
   | 'b' ->
       let s =
-        try " dir=\"" ^ Hashtbl.find conf.Config.lexicon "!dir" ^ "\""
-        with Not_found -> ""
+        Option.fold
+          (Hashtbl.find_opt conf.Config.lexicon "!dir")
+          ~some:(fun d -> " dir=\"" ^ d ^ "\"")
+          ~none:""
       in
       Adef.safe (s ^ Util.body_prop conf)
   | 'c' -> string_of_int_sep_aux conf (count conf).welcome_cnt

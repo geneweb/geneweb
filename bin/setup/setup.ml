@@ -32,10 +32,12 @@ type config = {
 }
 
 let transl conf w =
-  try Hashtbl.find conf.lexicon w with Not_found -> "[" ^ w ^ "]"
+  match Hashtbl.find_opt conf.lexicon w with
+  | Some s -> s
+  | None -> "[" ^ w ^ "]"
 
 let charset conf =
-  try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
+  Option.value (Hashtbl.find_opt conf.lexicon "!charset") ~default:"utf-8"
 
 let header_no_page_title conf title =
   Geneweb.Output.status printer_conf Def.OK;

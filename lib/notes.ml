@@ -110,7 +110,7 @@ let notes_links_db conf base eliminate_unlinked =
          if Hashtbl.mem mark s then loop sl
          else (
            Hashtbl.add mark s ();
-           let sl1 = try Hashtbl.find misc s with Not_found -> [] in
+           let sl1 = Option.value (Hashtbl.find_opt misc s) ~default:[] in
            loop (List.rev_append sl1 sl))
      | [] -> ()
    in

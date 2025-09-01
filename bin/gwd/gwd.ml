@@ -1156,9 +1156,7 @@ let make_conf from_addr request script_name env =
       try List.assoc "wizard_just_friend" base_env = "yes"
       with Not_found -> false
   in
-  let is_rtl =
-    try Hashtbl.find lexicon " !dir" = "rtl" with Not_found -> false
-  in
+  let is_rtl = Hashtbl.find_opt lexicon " !dir" = Some "rtl" in
   let manitou =
     try
       ar.ar_wizard && ar.ar_user <> ""
@@ -1935,14 +1933,14 @@ let arg_plugins opt doc =
         | GwdPluginDep.Sorted deps ->
             List.iter
               (fun pname ->
-                try
-                  let s = Hashtbl.find deps_ht pname in
-                  if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
-                  if force then forced_plugins := !forced_plugins @ [ pname ];
-                  plugins := !plugins @ [ s ]
-                with Not_found ->
-                  raise
-                    (Register_plugin_failure (pname, `string "Missing plugin")))
+                match Hashtbl.find_opt deps_ht pname with
+                | Some s ->
+                    if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
+                    if force then forced_plugins := !forced_plugins @ [ pname ];
+                    plugins := !plugins @ [ s ]
+                | None ->
+                    raise
+                      (Register_plugin_failure (pname, `string "Missing plugin")))
               deps),
     arg_plugin_doc opt doc )
 

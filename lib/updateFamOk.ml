@@ -945,14 +945,15 @@ let effective_mod conf base nsck sfam scpl sdes =
   done;
   let cache = Hashtbl.create 101 in
   let find_asc ip =
-    try Hashtbl.find cache ip
-    with Not_found ->
-      let a = Gwdb.poi base ip in
-      let a =
-        { Def.parents = Gwdb.get_parents a; consang = Gwdb.get_consang a }
-      in
-      Hashtbl.add cache ip a;
-      a
+    match Hashtbl.find_opt cache ip with
+    | Some a -> a
+    | None ->
+        let a = Gwdb.poi base ip in
+        let a =
+          { Def.parents = Gwdb.get_parents a; consang = Gwdb.get_consang a }
+        in
+        Hashtbl.add cache ip a;
+        a
   in
   let same_parents = Adef.father ncpl = ofather && Adef.mother ncpl = omother in
   Array.iter
@@ -1566,8 +1567,9 @@ let print_change_event_order conf base =
       let fevents =
         List.fold_right
           (fun (id, _) accu ->
-            try (Hashtbl.find ht id |> Gwdb.gen_fevent_of_fam_event) :: accu
-            with Not_found -> failwith "Sorting event")
+            match Hashtbl.find_opt ht id with
+            | Some event -> Gwdb.gen_fevent_of_fam_event event :: accu
+            | None -> failwith "Sorting event")
           sorted_fevents []
       in
       let fam = Gwdb.gen_family_of_family fam in
