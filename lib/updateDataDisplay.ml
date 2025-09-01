@@ -284,30 +284,6 @@ and eval_simple_str_var conf _base env _xx = function
   | "entry_ini_display" -> eval_string_env "entry_ini_display" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
-  | "entry_value_unsort" ->
-      let sn =
-        p_getenv conf.env "data" = Some "sn"
-        || p_getenv conf.env "data" = Some "domain"
-      in
-      let s = eval_string_env "entry_value" env in
-      if sn && s.[String.length s - 1] = ')' then
-        match String.rindex_opt s '(' with
-        | Some i ->
-            let part = String.sub s (i + 1) (String.length s - i - 2) in
-            let part =
-              if
-                part.[String.length part - 1] = '\''
-                || String.length part >= 3
-                   && Char.code part.[String.length part - 3] = 0xE2
-                   && Char.code part.[String.length part - 2] = 0x80
-                   && (Char.code part.[String.length part - 1] = 0x98
-                      || Char.code part.[String.length part - 1] = 0x99)
-              then part
-              else part ^ " "
-            in
-            part ^ String.sub s 0 i
-        | _ -> s
-      else s
   | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
   | "incr_count" -> (
