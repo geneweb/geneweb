@@ -420,7 +420,7 @@ let delete_topological_sort_v conf _base =
   Files.rm tstab_file
 
 let delete_topological_sort conf base =
-  let _ = delete_topological_sort_v conf base in
+  let () = delete_topological_sort_v conf base in
   let bfile = GWPARAM.bpath (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab" in
   Files.rm tstab_file

@@ -1005,8 +1005,8 @@ let capitalize_name = aux Name.title
 let uppercase_name = aux Utf8.uppercase
 
 let get_lev0 (strm__ : _ Stream.t) =
-  let _ = line_start '0' strm__ in
-  let _ =
+  let () = line_start '0' strm__ in
+  let () =
     try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   let r1 =
@@ -1082,7 +1082,7 @@ let rebuild_text r =
   let s = strip_spaces r.rval in
   List.fold_left
     (fun s e ->
-       let _ = e.rused <- true in
+       let () = e.rused <- true in
        let n = e.rval in
        let end_spc =
          if String.length n > 1 && n.[String.length n - 1] = ' ' then " "
@@ -2540,7 +2540,7 @@ let add_fam_norm gen r adop_list =
       let p = { p with notes = new_notes } in
       gen.g_per.arr.(iper) <- Def.Right (p, a, u)
   in
-  let _ =
+  let () =
     if ext_notes = "" then ()
     else begin add_in_person_notes fath; add_in_person_notes moth end
   in
@@ -2667,8 +2667,8 @@ let sort_by_date proj array =
 
 let find_lev0 (strm__ : _ Stream.t) =
   let bp = Stream.count strm__ in
-  let _ = line_start '0' strm__ in
-  let _ =
+  let () = line_start '0' strm__ in
+  let () =
     try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   let r1 =
@@ -2677,7 +2677,7 @@ let find_lev0 (strm__ : _ Stream.t) =
   let r2 =
     try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
   in
-  let _ =
+  let () =
     try skip_to_eoln strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   bp, r1, r2

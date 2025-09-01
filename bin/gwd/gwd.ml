@@ -295,7 +295,7 @@ let unauth_server conf ar =
   Geneweb.Output.status conf Def.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
-    let _ =
+    let () =
       let tm = Unix.localtime (Unix.time ()) in
       trace_auth conf.base_env (fun oc ->
           Printf.fprintf oc
@@ -606,7 +606,7 @@ let parse_digest s =
   let rec parse_main (strm__ : _ Stream.t) =
     match try Some (ident strm__) with Stream.Failure -> None with
     | Some s ->
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         let kvl =
@@ -650,7 +650,7 @@ let parse_digest s =
     match Stream.peek strm__ with
     | Some ',' ->
         Stream.junk strm__;
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         let kv =
@@ -679,13 +679,13 @@ let parse_digest s =
         let v =
           try string 0 strm__ with Stream.Failure -> raise (Stream.Error "")
         in
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         v
     | _ ->
         let v = any_val 0 strm__ in
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         v
@@ -927,7 +927,7 @@ let digest_authorization request base_env passwd utm base_file command =
         | None -> "POST"
         | Some _ -> "GET"
       in
-      let _ =
+      let () =
         trace_auth base_env (fun oc ->
             Printf.fprintf oc "\nauth = \"%s\"\n" auth)
       in
@@ -947,7 +947,7 @@ let digest_authorization request base_env passwd utm base_file command =
         }
       in
       let nonce = digest_nonce utm in
-      let _ =
+      let () =
         trace_auth base_env (fun oc ->
             Printf.fprintf oc
               "\n\

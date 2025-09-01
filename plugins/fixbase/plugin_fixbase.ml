@@ -484,7 +484,7 @@ let fixbase_ok conf base =
 
 let ns = "fixbase"
 
-let _ =
+let () =
   let aux fn _assets conf base =
     if
       if opt_manitou then conf.Geneweb.Config.manitou

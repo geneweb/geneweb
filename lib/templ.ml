@@ -951,7 +951,7 @@ let rec interp_ast :
         int_of_string (eval_string_expr conf (eval_var, eval_apply) max)
       in
       if int_min < int_max then
-        let _ = print_ast_list new_env ep al in
+        let () = print_ast_list new_env ep al in
         loop new_env (Aop2 (("", 0, 0), "+", min, Aint (("", 0, 0), "1"))) max
     in
     loop env min max
@@ -1023,4 +1023,4 @@ let copy_from_templ :
   in
   Templ_parser.wrap "" (fun () -> interp_ast conf ifun env () astl)
 
-let _ = Util.copy_from_templ_ref := copy_from_templ
+let () = Util.copy_from_templ_ref := copy_from_templ

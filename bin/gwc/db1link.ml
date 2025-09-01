@@ -1662,7 +1662,7 @@ let empty_base : cbase =
 
 (** Extract information from the [gen.g_base] and create database *)
 let make_base state bname gen per_index_ic per_ic =
-  let _ =
+  let () =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
     flush stderr
@@ -1683,7 +1683,7 @@ let make_base state bname gen per_index_ic per_ic =
     gen.g_base.c_unions <- [||];
     a
   in
-  let _ =
+  let () =
     Printf.eprintf "fcnt %d families %d\n" gen.g_fcnt
       (Array.length gen.g_base.c_couples);
     flush stderr
@@ -1703,7 +1703,7 @@ let make_base state bname gen per_index_ic per_ic =
     gen.g_base.c_descends <- [||];
     a
   in
-  let _ =
+  let () =
     Printf.eprintf "scnt %d strings %d\n" gen.g_scnt
       (Array.length gen.g_base.c_strings);
     flush stderr
