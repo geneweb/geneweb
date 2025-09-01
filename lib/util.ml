@@ -1902,7 +1902,9 @@ let read_gen_auth_file fname =
             | Some i ->
                 let user = String.sub line 0 i in
                 let j =
-                  try String.index_from line (i + 1) ':' with Not_found -> len
+                  Option.value
+                    (String.index_from_opt line (i + 1) ':')
+                    ~default:len
                 in
                 let passwd = String.sub line (i + 1) (j - i - 1) in
                 let rest =

@@ -730,13 +730,16 @@ let gen_excluded_possible_duplications conf s i_of_string =
         if i >= String.length s then ipl
         else
           let j =
-            try String.index_from s i ',' with Not_found -> String.length s
+            match String.index_from_opt s i ',' with
+            | Some j -> j
+            | None -> String.length s
           in
           if j = String.length s then ipl
           else
             let k =
-              try String.index_from s (j + 1) ','
-              with Not_found -> String.length s
+              match String.index_from_opt s (j + 1) ',' with
+              | Some k -> k
+              | None -> String.length s
             in
             let s1 = String.sub s i (j - i) in
             let s2 = String.sub s (j + 1) (k - j - 1) in

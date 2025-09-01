@@ -403,7 +403,11 @@ let variables bname =
 
 let nth_field s n =
   let rec loop nth i =
-    let j = try String.index_from s i '|' with Not_found -> String.length s in
+    let j =
+      match String.index_from_opt s i '|' with
+      | Some j -> j
+      | None -> String.length s
+    in
     if nth = n then String.sub s i (j - i)
     else if j = String.length s then s
     else loop (nth + 1) (j + 1)
@@ -1459,7 +1463,7 @@ let update_nldb conf ok_file =
 
 let separate_slashed_filename s =
   let rec loop i =
-    match try Some (String.index_from s i '/') with Not_found -> None with
+    match String.index_from_opt s i '/' with
     | Some j ->
         if j > i then String.sub s i (j - i) :: loop (j + 1) else loop (j + 1)
     | None ->

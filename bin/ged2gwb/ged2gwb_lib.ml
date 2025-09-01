@@ -837,8 +837,8 @@ let add_string gen ?format s =
 
 let extract_addr addr =
   if String.length addr > 0 && addr.[0] = '@' then
-    try let r = String.index_from addr 1 '@' in String.sub addr 0 (r + 1) with
-      Not_found -> addr
+    let r = String.index_from_opt addr 1 '@' in
+    Option.fold r ~some:(fun r -> String.sub addr 0 (r + 1)) ~none:addr
   else addr
 
 (* Output Pindex in file *)
@@ -1164,7 +1164,10 @@ let source gen r =
 
 let p_index_from s i c =
   if i >= String.length s then String.length s
-  else try String.index_from s i c with Not_found -> String.length s
+  else
+    match String.index_from_opt s i c with
+    | Some i -> i
+    | None -> String.length s
 
 let strip_sub s beg len = strip_spaces (String.sub s beg len)
 

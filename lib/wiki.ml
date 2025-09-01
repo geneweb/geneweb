@@ -768,11 +768,8 @@ let insert_sub_part s v sub_part =
 
 (* TODO: simplify with Str *)
 let rec find_env s i =
-  match
-    try Some (String.index_from s i '=', String.index_from s i '\n')
-    with Not_found -> None
-  with
-  | Some (j, k) ->
+  match (String.index_from_opt s i '=', String.index_from_opt s i '\n') with
+  | Some j, Some k ->
       if j > i && j < k then
         let is_key =
           let rec loop i =
@@ -788,7 +785,7 @@ let rec find_env s i =
           ((key, v) :: env, i)
         else ([], i)
       else ([], i)
-  | None -> ([], i)
+  | None, None | None, Some _ | Some _, None -> ([], i)
 
 let split_title_and_text s =
   let env, i = find_env s 0 in
