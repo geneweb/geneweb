@@ -1804,15 +1804,15 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> null_val)
   | "carrousel_img_raw" -> (
       match get_env "carrousel_img" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   | "carrousel_note" -> (
       match get_env "carrousel_note" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   | "carrousel_src" -> (
       match get_env "carrousel_src" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   (* end carrousel *)
   | "lazy_force" -> (
