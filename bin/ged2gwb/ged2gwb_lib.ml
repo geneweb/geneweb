@@ -528,8 +528,7 @@ let date_value = Grammar.Entry.create date_g "date value"
 let date_interval = Grammar.Entry.create date_g "date interval"
 let date_value_recover = Grammar.Entry.create date_g "date value"
 
-let is_roman_int x =
-  try let _ = Mutil.arabian_of_roman x in true with Not_found -> false
+let is_roman_int x = Option.is_some @@ Mutil.arabian_of_roman x
 
 let start_with_int x =
   try let s = String.sub x 0 1 in let _ = int_of_string s in true with
@@ -537,7 +536,10 @@ let start_with_int x =
 
 let roman_int =
   let p =
-    parser [< '("ID", x) when is_roman_int x >] -> Mutil.arabian_of_roman x
+    parser [< '("ID", x) >] ->
+      match Mutil.arabian_of_roman x with
+      | None -> raise Stream.Failure
+      | Some i -> i
   in
   Grammar.Entry.of_parser date_g "roman int" p
 
