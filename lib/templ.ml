@@ -153,8 +153,8 @@ let setup_link conf =
 let esc s = (Util.escape_html s :> string)
 
 let rec eval_variable conf = function
-  | [ "bvar"; v ] -> (
-      try List.assoc v conf.Config.base_env with Not_found -> "")
+  | [ "bvar"; v ] ->
+      Option.value (List.assoc_opt v conf.Config.base_env) ~default:""
   | [ "evar"; v; "ns" ] -> (
       try
         let vv = List.assoc v (conf.env @ conf.henv) in

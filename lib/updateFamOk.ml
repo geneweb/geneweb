@@ -726,8 +726,7 @@ let infer_origin_file conf base ifam ncpl ndes =
             loop 0)
   in
   let no_dec =
-    try List.assoc "propose_add_family" conf.Config.base_env = "no"
-    with Not_found -> false
+    List.assoc_opt "propose_add_family" conf.Config.base_env = Some "no"
   in
   if no_dec && Gwdb.sou base r = "" then print_error_disconnected conf else r
 
@@ -1271,8 +1270,7 @@ let get_create (_, _, _, create, _) = create
 
 let forbidden_disconnected conf scpl sdes =
   let no_dec =
-    try List.assoc "propose_add_family" conf.Config.base_env = "no"
-    with Not_found -> false
+    List.assoc_opt "propose_add_family" conf.Config.base_env = Some "no"
   in
   if no_dec then
     if

@@ -331,7 +331,7 @@ let wizard_page_title conf wizname _ = Output.print_string conf wizname
 let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   let wizname =
     let wizdata = read_auth_file auth_file in
-    try fst (List.assoc wz wizdata) with Not_found -> wz
+    match List.assoc_opt wz wizdata with Some v -> fst v | None -> wz
   in
   let edit_opt =
     Some
@@ -696,6 +696,6 @@ let search_text conf base s =
   | None -> print conf base
 
 let print_search conf base =
-  match try Some (List.assoc "s" conf.Config.env) with Not_found -> None with
+  match List.assoc_opt "s" conf.Config.env with
   | Some s -> search_text conf base (Mutil.gen_decode false s)
   | None -> print conf base

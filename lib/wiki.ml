@@ -46,7 +46,7 @@ let notes_aliases conf =
       loop []
   | None -> []
 
-let map_notes aliases f = try List.assoc f aliases with Not_found -> f
+let map_notes aliases f = Option.value (List.assoc_opt f aliases) ~default:f
 let fname_of_path (dirs, file) = List.fold_right Filename.concat dirs file
 
 let str_start_with str i x =
@@ -790,7 +790,7 @@ let rec find_env s i =
 let split_title_and_text s =
   let env, i = find_env s 0 in
   let s = if i = 0 then s else String.sub s i (String.length s - i) in
-  if (try List.assoc "TITLE" env with Not_found -> "") = "" then
+  if Option.value (List.assoc_opt "TITLE" env) ~default:"" = "" then
     let tit, txt =
       Option.fold (String.index_opt s '\n')
         ~some:(fun i ->
@@ -825,7 +825,7 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   let title, s =
     if v = 0 && title_is_1st then
       let env, s = split_title_and_text s in
-      ((try List.assoc "TITLE" env with Not_found -> ""), s)
+      (Option.value (List.assoc_opt "TITLE" env) ~default:"", s)
     else ("", s)
   in
   let lines, _ = lines_list_of_string s in

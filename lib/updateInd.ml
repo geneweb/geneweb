@@ -29,7 +29,7 @@ type 'a value =
   | Vnone
 
 let bind x v e = (x, v) :: e
-let get_env x e = try List.assoc x e with Not_found -> Vnone
+let get_env x e = Option.value (List.assoc_opt x e) ~default:Vnone
 
 let nth_pevent n e =
   match get_env "pevents" e with

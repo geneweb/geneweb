@@ -82,10 +82,9 @@ let notes_links_db conf base eliminate_unlinked =
         if record_it then
           List.fold_left
             (fun db2 s ->
-              try
-                let list = List.assoc s db2 in
-                (s, pg :: list) :: List.remove_assoc s db2
-              with Not_found -> (s, [ pg ]) :: db2)
+              match List.assoc_opt s db2 with
+              | Some list -> (s, pg :: list) :: List.remove_assoc s db2
+              | None -> (s, [ pg ]) :: db2)
             db2 sl
         else db2)
       [] db

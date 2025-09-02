@@ -198,7 +198,7 @@ let eval_julian_day conf =
 
 type 'a env = Vint of int | Vother of 'a | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = Option.value (List.assoc_opt v env) ~default:Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 

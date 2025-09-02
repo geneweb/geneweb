@@ -58,7 +58,9 @@ let import_trad ht keyword line =
 let default_lang = "en"
 
 let find_lang lang tr =
-  try List.assoc lang tr with Not_found -> List.assoc default_lang tr
+  match List.assoc_opt lang tr with
+  | Some lang -> lang
+  | None -> List.assoc default_lang tr
 
 let make_lang lexicon len lang =
   let ht = Hashtbl.create len in

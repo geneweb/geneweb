@@ -889,7 +889,7 @@ let print_default_gwf_file conf =
       "p_mod=";
     ]
   in
-  let bname = try List.assoc "o" conf.env with Not_found -> "" in
+  let bname = Option.value (List.assoc_opt "o" conf.env) ~default:"" in
   let dir = Sys.getcwd () in
   let fname = Filename.concat dir (bname ^ ".gwf") in
   if Sys.file_exists fname then ()
@@ -1398,7 +1398,7 @@ let gwf_1 conf =
 
 let gwd conf =
   let aenv = read_gwd_arg () in
-  let get v = try List.assoc v aenv with Not_found -> "" in
+  let get v = Option.value (List.assoc_opt v aenv) ~default:"" in
   let conf =
     {
       conf with

@@ -93,7 +93,7 @@ let eval_default_var conf s =
     let v = extract_var "bvar_" s in
     let v = if v = "" then extract_var "cvar_" s else v in
     if v <> "" then
-      str_val (try List.assoc v conf.Config.base_env with Not_found -> "")
+      str_val (Option.value (List.assoc_opt v conf.Config.base_env) ~default:"")
     else raise Not_found
 
 let eval_date_field = function

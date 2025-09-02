@@ -898,7 +898,10 @@ let build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark =
     let n =
-      try int_of_string (List.assoc "max_ancestor_implex" conf.Config.base_env)
+      try
+        Option.value ~default:5
+          (Option.map int_of_string
+             (List.assoc_opt "max_ancestor_implex" conf.Config.base_env))
       with _ -> 5
     in
     Gwdb.iper_marker (Gwdb.ipers base) n
@@ -1283,8 +1286,10 @@ let has_witness_for_event conf base p event_name =
     (Event.events conf base p)
 
 let get_env v env =
-  try match List.assoc v env with Vlazy l -> Lazy.force l | x -> x
-  with Not_found -> Vnone
+  match List.assoc_opt v env with
+  | Some (Vlazy l) -> Lazy.force l
+  | Some x -> x
+  | None -> Vnone
 
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
@@ -4591,8 +4596,9 @@ let print ?no_headers conf base p =
         | Some ifam -> Gwdb.sou base (Gwdb.get_origin_file (Gwdb.foi base ifam))
         | None -> ""
       in
-      try Some (src, List.assoc ("passwd_" ^ src) conf.Config.base_env)
-      with Not_found -> None
+      Option.map
+        (fun passwd -> (src, passwd))
+        (List.assoc_opt ("passwd_" ^ src) conf.Config.base_env)
   in
   match passwd with
   | Some (src, passwd)

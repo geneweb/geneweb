@@ -371,7 +371,7 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = Option.value (List.assoc_opt v env) ~default:Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -670,7 +670,7 @@ let search_text conf base s =
 
 let print_search conf base =
   if conf.Config.wizard || conf.friend then
-    match try Some (List.assoc "s" conf.env) with Not_found -> None with
+    match List.assoc_opt "s" conf.env with
     | Some s -> search_text conf base (Mutil.gen_decode false s)
     | None -> print conf base
   else print conf base

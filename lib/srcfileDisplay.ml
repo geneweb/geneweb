@@ -83,8 +83,9 @@ let write_counter conf r =
 let set_wizard_and_friend_traces conf =
   if conf.Config.wizard && conf.Config.user <> "" then (
     let wpf =
-      try List.assoc "wizard_passwd_file" conf.Config.base_env
-      with Not_found -> ""
+      Option.value
+        (List.assoc_opt "wizard_passwd_file" conf.Config.base_env)
+        ~default:""
     in
     if wpf <> "" then
       let fname = adm_file (conf.Config.bname ^ "_w.txt") in
@@ -95,11 +96,14 @@ let set_wizard_and_friend_traces conf =
     && conf.Config.user <> ""
   then
     let fpf =
-      try List.assoc "friend_passwd_file" conf.Config.base_env
-      with Not_found -> ""
+      Option.value
+        (List.assoc_opt "friend_passwd_file" conf.Config.base_env)
+        ~default:""
     in
     let fp =
-      try List.assoc "friend_passwd" conf.Config.base_env with Not_found -> ""
+      Option.value
+        (List.assoc_opt "friend_passwd" conf.Config.base_env)
+        ~default:""
     in
     if
       fpf <> ""
@@ -404,8 +408,9 @@ let rec copy_from_stream conf base strm mode =
               Output.print_sstring conf (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =
-                try List.assoc (get_variable strm) conf.Config.base_env
-                with Not_found -> ""
+                Option.value
+                  (List.assoc_opt (get_variable strm) conf.Config.base_env)
+                  ~default:""
               in
               copy_from_string conf base txt mode
           | c -> Output.print_string conf (macro conf base c))
@@ -487,7 +492,7 @@ let print_source = gen_print Source
 
 type 'a env = Vsosa_ref of Gwdb.person option Lazy.t | Vother of 'a | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = Option.value (List.assoc_opt v env) ~default:Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
