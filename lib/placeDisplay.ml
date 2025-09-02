@@ -201,12 +201,10 @@ let print_all_places_surnames conf base =
       | None -> (
           try
             let lim =
-              try
-                Option.value ~default:500
-                  (Option.map int_of_string
-                     (List.assoc_opt "short_place_threshold"
-                        conf.Config.base_env))
-              with _ -> 500
+              Option.value ~default:500
+                (Option.bind
+                   (List.assoc_opt "short_place_threshold" conf.Config.base_env)
+                   int_of_string_opt)
             in
             print_all_places_surnames_long conf base "" ~add_birth ~add_baptism
               ~add_death ~add_burial ~add_marriage lim

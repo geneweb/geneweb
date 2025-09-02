@@ -3,12 +3,11 @@
 let get_k conf =
   match Util.p_getint conf.Config.env "k" with
   | Some x -> x
-  | _ -> (
-      try
-        Option.value ~default:20
-          (Option.map int_of_string
-             (List.assoc_opt "latest_event" conf.Config.base_env))
-      with Failure _ -> 20)
+  | _ ->
+      Option.value ~default:20
+        (Option.bind
+           (List.assoc_opt "latest_event" conf.Config.base_env)
+           int_of_string_opt)
 
 let select (type a)
     (module Q : Pqueue.S with type elt = a * Date.dmy * Date.calendar) nb_of

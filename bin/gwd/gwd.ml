@@ -1183,11 +1183,10 @@ let make_conf from_addr request script_name env =
     Option.value ~default:Geneweb.Config.DMY df_opt
   in
   let default_contemporary_private_years =
-    try
-      Option.value ~default:100
-        (Option.map int_of_string
-           (List.assoc_opt "default_contemporary_private_years" base_env))
-    with _ -> 100
+    Option.value ~default:100
+      (Option.bind
+         (List.assoc_opt "default_contemporary_private_years" base_env)
+         int_of_string_opt)
   in
   let conf =
     {
@@ -1219,11 +1218,10 @@ let make_conf from_addr request script_name env =
         | Some access_by_key -> access_by_key = "yes"
         | None -> ar.ar_wizard && ar.ar_friend);
       private_years =
-        (try
-           Option.value ~default:150
-             (Option.map int_of_string
-                (List.assoc_opt "private_years" base_env))
-         with Failure _ -> 150);
+        Option.value ~default:150
+          (Option.bind
+             (List.assoc_opt "private_years" base_env)
+             int_of_string_opt);
       default_contemporary_private_years;
       hide_private_names =
         List.assoc_opt "hide_private_names" base_env = Some "yes";
@@ -2129,7 +2127,10 @@ let main () =
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
         let len =
-          try int_of_string (Sys.getenv "CONTENT_LENGTH") with Not_found -> -1
+          try
+            Option.value ~default:(-1)
+              (int_of_string_opt (Sys.getenv "CONTENT_LENGTH"))
+          with Not_found -> -1
         in
         set_binary_mode_in stdin true;
         read_input len |> Adef.encoded)

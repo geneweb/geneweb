@@ -339,12 +339,11 @@ let get_cremation_text conf p p_auth =
   cremated ^^^ " " ^<^ on_cremation_date
 
 let limit_desc conf =
-  match
-    Option.map int_of_string
-    @@ List.assoc_opt "max_desc_level" conf.Config.base_env
-  with
-  | Some x -> max 1 x
-  | None -> 12
+  Option.fold
+    (Option.bind
+       (List.assoc_opt "max_desc_level" conf.Config.base_env)
+       int_of_string_opt)
+    ~some:(max 1) ~none:12
 
 let infinite = 10000
 
@@ -898,11 +897,10 @@ let build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark =
     let n =
-      try
-        Option.value ~default:5
-          (Option.map int_of_string
-             (List.assoc_opt "max_ancestor_implex" conf.Config.base_env))
-      with _ -> 5
+      Option.value ~default:5
+        (Option.bind
+           (List.assoc_opt "max_ancestor_implex" conf.Config.base_env)
+           int_of_string_opt)
     in
     Gwdb.iper_marker (Gwdb.ipers base) n
   in
@@ -1201,8 +1199,10 @@ let rec compare_ls sl1 sl2 =
       (* soit plus petit que "2". J'espère qu'on ne casse pas  *)
       (* les performances à cause du try..with.                *)
       let c =
-        try Stdlib.compare (int_of_string s1) (int_of_string s2)
-        with Failure _ -> Utf8.alphabetic_order s1 s2
+        match (int_of_string_opt s1, int_of_string_opt s2) with
+        | Some i1, Some i2 -> Stdlib.compare i1 i2
+        | None, None | None, Some _ | Some _, None ->
+            Utf8.alphabetic_order s1 s2
       in
       if c = 0 then compare_ls sl1 sl2 else c
   | _ :: _, [] -> 1
@@ -3625,7 +3625,7 @@ let event_count events = ("event_count", Vint (List.length events))
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
     let s = eval_expr env ep e in
-    try int_of_string s with Failure _ -> raise Not_found
+    match int_of_string_opt s with Some i -> i | None -> raise Not_found
   in
   let print_foreach_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
@@ -4608,12 +4608,11 @@ let print ?no_headers conf base p =
   | Some _ | None -> interp_templ ?no_headers "perso" conf base p
 
 let limit_by_tree conf =
-  match
-    Option.map int_of_string
-      (List.assoc_opt "max_anc_tree" conf.Config.base_env)
-  with
-  | Some x -> max 1 x
-  | None -> 7
+  Option.fold
+    (Option.bind
+       (List.assoc_opt "max_anc_tree" conf.Config.base_env)
+       int_of_string_opt)
+    ~some:(max 1) ~none:7
 
 let print_ancestors_dag conf base v p =
   let v = min (limit_by_tree conf) v in

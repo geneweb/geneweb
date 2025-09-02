@@ -71,9 +71,9 @@ let rec reconstitute_titles conf form_is_modified cnt =
         Update.reconstitute_date conf ("t_date_end" ^ string_of_int cnt)
       in
       let t_nth =
-        match Update_util.get_nth conf "t_nth" cnt with
-        | Some s -> ( try int_of_string s with Failure _ -> 0)
-        | None -> 0
+        Option.value
+          (Option.bind (Update_util.get_nth conf "t_nth" cnt) int_of_string_opt)
+          ~default:0
       in
       let t =
         {
@@ -427,7 +427,9 @@ let reconstitute_relation_parent conf var key sex =
       (* S'il y a des caractères interdits, on les supprime *)
       let fn, sn = get_purged_fn_sn fn sn in
       let occ =
-        try int_of_string (Update_util.getn conf var (key ^ "_occ"))
+        try
+          Option.value ~default:0
+            (int_of_string_opt (Update_util.getn conf var (key ^ "_occ")))
         with Failure _ -> 0
       in
       let create =
@@ -596,7 +598,9 @@ let reconstitute_person ~base conf =
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
   let occ =
-    try int_of_string (String.trim (Update_util.get conf "occ"))
+    try
+      Option.value ~default:0
+        (int_of_string_opt (String.trim (Update_util.get conf "occ")))
     with Failure _ -> 0
   in
   let image = Ext_string.only_printable (Update_util.get conf "image") in

@@ -66,14 +66,7 @@ let rec subst sf = function
   | TemplAst.Atext (loc, s) -> TemplAst.Atext (loc, sf s)
   | Avar (loc, s, sl) -> (
       let s1 = sf s in
-      if
-        sl = []
-        &&
-        try
-          let _ = int_of_string s1 in
-          true
-        with Failure _ -> false
-      then Aint (loc, s1)
+      if sl = [] && Option.is_some (int_of_string_opt s1) then Aint (loc, s1)
       else
         let sl1 = List.map sf sl in
         match String.split_on_char '.' s1 with
@@ -347,7 +340,7 @@ and eval_transl_inline conf s =
 
 and eval_transl_lexicon conf upp s c =
   let r =
-    let nth = try Some (int_of_string c) with Failure _ -> None in
+    let nth = int_of_string_opt c in
     match split_at_coloncolon s with
     | None ->
         let s2 =
@@ -434,10 +427,11 @@ let string_of e = function
 
 let int_of e = function
   | TemplAst.VVstring s -> (
-      try int_of_string s
-      with Failure _ ->
-        raise_with_loc (loc_of_expr e)
-          (Failure ("int value expected\nFound = " ^ s)))
+      match int_of_string_opt s with
+      | Some i -> i
+      | None ->
+          raise_with_loc (loc_of_expr e)
+            (Failure ("int value expected\nFound = " ^ s)))
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "int value expected")
 
@@ -821,10 +815,10 @@ let rec interp_ast :
         | "language_name", [ (None, VVstring s) ] ->
             Translate.language_name s (Util.transl conf "!languages")
         | "nth", [ (None, VVstring s1); (None, VVstring s2) ] ->
-            let n = try int_of_string s2 with Failure _ -> 0 in
+            let n = Option.value (int_of_string_opt s2) ~default:0 in
             Util.translate_eval (Util.nth_field s1 n)
         | "nth_c", [ (None, VVstring s1); (None, VVstring s2) ] -> (
-            let n = try int_of_string s2 with Failure _ -> 0 in
+            let n = Option.value (int_of_string_opt s2) ~default:0 in
             try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
         | ( "red_of_hsv",
             [ (None, VVstring h); (None, VVstring s); (None, VVstring v) ] )

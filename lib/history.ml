@@ -512,7 +512,7 @@ and simple_person_text conf base p =
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
     let s = eval_expr env ep e in
-    try int_of_string s with Failure _ -> raise Not_found
+    match int_of_string_opt s with Some i -> i | None -> raise Not_found
   in
   let rec print_foreach env xx _ s sl el al =
     match (s, sl) with
@@ -580,8 +580,9 @@ let print_foreach conf base print_ast eval_expr =
                     in
                     let pg = String.sub key 0 i in
                     let s = String.sub key j (String.length key - j) in
-                    try HI_notes (pg, Some (int_of_string s))
-                    with Failure _ -> HI_notes (key, None))
+                    match int_of_string_opt s with
+                    | Some i -> HI_notes (pg, Some i)
+                    | None -> HI_notes (key, None))
                 | _ -> (
                     match Gutil.person_ht_find_all base key with
                     | [ ip ] -> HI_ind (Util.pget conf base ip)

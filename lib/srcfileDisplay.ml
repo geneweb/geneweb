@@ -17,7 +17,8 @@ let adm_file f = List.fold_right Filename.concat [ !Util.cnt_dir; "cnt" ] f
 let cnt conf ext = adm_file (conf.Config.bname ^ ext)
 
 let input_int ic =
-  try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
+  try Option.value ~default:0 (int_of_string_opt (input_line ic))
+  with End_of_file -> 0
 
 let count conf =
   let fname = cnt conf ".txt" in
@@ -537,8 +538,13 @@ let eval_var conf base env () _loc = function
       Random.self_init ();
       TemplAst.VVstring ""
   | [ "random"; s ] -> (
-      try TemplAst.VVstring (string_of_int (Random.int (int_of_string s)))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
+      match
+        Option.map
+          (fun i -> TemplAst.VVstring (string_of_int (Random.int i)))
+          (int_of_string_opt s)
+      with
+      | Some v -> v
+      | None | (exception Invalid_argument _) -> raise Not_found)
   | [ "sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> (

@@ -552,7 +552,9 @@ let submit_input conf k v =
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
-  try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
+  try
+    Option.bind (p_getenv env label) (fun s ->
+        int_of_string_opt (String.trim s))
   with Failure _ -> None
 
 let nobtit conf base p =

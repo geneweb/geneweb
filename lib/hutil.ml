@@ -140,13 +140,16 @@ let eval_julian_day conf =
       let conv d = Date.to_sdn ~from:cal d in
       let yy =
         match Util.p_getenv conf.env ("y" ^ var) with
-        | Some v -> (
-            try
+        | Some v ->
+            let i =
               let len = String.length v in
               if cal = Djulian && len > 2 && v.[len - 2] = '/' then
-                int_of_string (String.sub v 0 (len - 2)) + 1
-              else int_of_string v
-            with Failure _ -> 0)
+                Option.map
+                  (fun i -> i + 1)
+                  (int_of_string_opt (String.sub v 0 (len - 2)))
+              else int_of_string_opt v
+            in
+            Option.value ~default:0 i
         | None -> 0
       in
       let mm = getint ("m" ^ var) in
@@ -217,7 +220,7 @@ let eval_var conf env jd _loc =
 let print_foreach print_ast eval_expr =
   let eval_int_expr env jd e =
     let s = eval_expr env jd e in
-    try int_of_string s with Failure _ -> raise Not_found
+    match int_of_string_opt s with Some i -> i | None -> raise Not_found
   in
   let rec print_foreach env jd _loc s sl el al =
     match (s, sl) with

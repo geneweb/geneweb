@@ -762,9 +762,13 @@ EXTEND
   ;
   int:
     [ [ i = INT ->
-          (try int_of_string i with Failure _ -> raise Stream.Failure)
+          (match int_of_string_opt i with
+           | Some i -> i
+           | None -> raise Stream.Failure)
       | "-"; i = INT ->
-          (try (- int_of_string i) with  Failure _ -> raise Stream.Failure) ] ]
+          (match int_of_string_opt i with
+           | Some i -> - i
+           | None -> raise Stream.Failure) ] ]
   ;
 END
 [@@@ocaml.warning "+27"]
@@ -1179,12 +1183,13 @@ let decode_title s =
     if i1 = String.length s then "", 0
     else if i2 = String.length s then
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
-      try "", int_of_string s1 with Failure _ -> s1, 0
+      Option.fold (int_of_string_opt s1) ~some:(fun i -> ("", i)) ~none:(s1, 0)
     else
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
       let s2 = strip_sub s (i2 + 1) (String.length s - i2 - 1) in
-      try s1, int_of_string s2 with
-        Failure _ -> strip_sub s i1 (String.length s - i1), 0
+      match int_of_string_opt s2 with
+      | Some i -> s1, i
+      | None -> strip_sub s i1 (String.length s - i1), 0
   in
   title, place, nth
 
@@ -2603,7 +2608,10 @@ let treat_header2 r =
         let vs = String.split_on_char '.' r.rval in
         begin match vs with
         | major::_ ->
-           let is_major_post7 = (try int_of_string major >= 7 with _ -> false) in
+           let is_major_post7 =
+             Option.fold
+               (int_of_string_opt major) ~some:(fun v -> v >= 7) ~none:false
+           in
            if is_major_post7 then !state.charset_option <- Some Utf8;
         | _ -> ();
         end

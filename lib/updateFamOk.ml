@@ -15,7 +15,10 @@ let reconstitute_parent_or_child conf var default_surname =
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
   let occ =
-    try int_of_string (Update_util.getn conf var "occ") with Failure _ -> 0
+    try
+      Option.value ~default:0
+        (int_of_string_opt (Update_util.getn conf var "occ"))
+    with Failure _ -> 0
   in
   let create_info =
     let b = Update.reconstitute_date conf (var ^ "b") in
