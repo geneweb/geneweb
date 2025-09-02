@@ -584,8 +584,7 @@ let treat_request =
              | "BLASON_MOVE_TO_ANC" -> w_base @@ ImageCarrousel.print_main_c
              | "BLASON_STOP" -> w_base @@ ImageCarrousel.print_main_c
              | "C" -> w_base @@ w_person @@ CousinsDisplay.print
-             | "CHK_DATA" -> w_base @@ CheckDataDisplay.print
-             | "CAL" -> w_base @@ Hutil.print_calendar
+             | "CAL" -> w_base @@ CalendarDisplay.print_calendar
              | "CHANGE_WIZ_VIS" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ WiznotesDisplay.change_wizard_visibility
@@ -608,6 +607,10 @@ let treat_request =
              | "CHG_FAM_ORD_OK" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ UpdateFamOk.print_change_order_ok
+             | "CHK_DATA" -> w_base @@ CheckDataDisplay.print
+             | "CHK_DATA_L" -> w_base @@ CheckDataDisplay.print_redirect_to_list
+             | "CHK_DATA_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ CheckDataDisplay.print_chk_ok
              | "CONN_WIZ" ->
                  w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
              | "D" -> w_base @@ w_person @@ DescendDisplay.print
@@ -818,7 +821,23 @@ let treat_request =
              | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "PPS" -> w_base @@ Place.print_all_places_surnames
-             | "R" -> w_base @@ w_person @@ relation_print
+             | "R" -> (
+                 w_base @@ fun conf base ->
+                 (* Tout le code du cas R doit être dans une seule expression *)
+                 let p1_new = find_person_in_env conf base "1" in
+                 let p2_new = find_person_in_env conf base "2" in
+                 match (p1_new, p2_new) with
+                 | Some p1, Some p2 ->
+                     RelationDisplay.print conf base p1 (Some p2)
+                 | _ -> (
+                     (* Fallback sur l'ancien format *)
+                     let p1_old = find_person_in_env conf base "" in
+                     let p2_old = find_person_in_env conf base "1" in
+                     match (p1_old, p2_old) with
+                     | Some p1, Some p2 ->
+                         RelationDisplay.print conf base p1 (Some p2)
+                     | Some p1, None -> relation_print conf base p1
+                     | _ -> Hutil.incorrect_request conf))
              | "REQUEST" ->
                  w_wizard @@ fun _ _ ->
                  Output.status conf Def.OK;
@@ -830,6 +849,7 @@ let treat_request =
                    conf.Config.request
              | "RESET_IMAGE_C_OK" -> w_base @@ ImageCarrousel.print_main_c
              | "RL" -> w_base @@ RelationLink.print
+             | "RM" -> w_base @@ RelationMatrixDisplay.print
              | "RLM" -> w_base @@ RelationDisplay.print_multi
              | "S" ->
                  w_base @@ fun conf base ->
@@ -949,15 +969,7 @@ let treat_request =
     else process ()
 
 let treat_request conf =
-  GWPARAM.init_etc conf.bname;
-  (* TODO verify if we need init_etc here *)
   GWPARAM.nb_errors := 0;
   GWPARAM.errors_undef := [];
   GWPARAM.errors_other := [];
-  let conf =
-    {
-      conf with
-      base_env = Util.read_base_env conf.bname conf.gw_prefix conf.debug;
-    }
-  in
   try treat_request conf with Update.ModErr _ -> Output.flush conf

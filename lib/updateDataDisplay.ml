@@ -14,6 +14,8 @@ let translate_title conf len =
     | Some "src" -> transl_nth conf "source/sources" plural
     | Some "fn" -> transl_nth conf "first name/first names" plural
     | Some "sn" -> transl_nth conf "surname/surnames" plural
+    | Some "fna" -> transl_nth conf "first name alias" plural
+    | Some "sna" -> transl_nth conf "surname alias" plural
     | Some "alias" -> transl_nth conf "alias/aliases" plural
     | Some "qual" -> transl_nth conf "qualifier/qualifiers" plural
     | Some "pubn" -> transl_nth conf "public name/public names" plural
@@ -34,137 +36,150 @@ let translate_title conf len =
     - base : base [Retour] :
     - unit [Rem] : Non exporté en clair hors de ce module. *)
 let print_mod_ok conf base =
-  let sn = p_getenv conf.env "data" = Some "sn" in
-  let ini_of_update_data ini new_input =
-    (* Utf8. returns the number of "real" characters *)
-    let len = Utf8.length ini in
-    let len = if len = 1 then len + 1 else len in
-    let len = min len (Utf8.length new_input) in
-    let new_input =
-      if sn then Util.surname_without_particle base new_input else new_input
+  if p_getenv conf.env "direct_istr" = Some "on" then
+    let old_istr =
+      Driver.Istr.of_string @@ (List.assoc "key" conf.env :> string)
     in
-    let j =
-      let rec loop i j =
-        if i = len then j else loop (i + 1) (Utf8.next new_input j)
+    let old_string = Driver.sou base old_istr in
+    let new_string =
+      Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
+    in
+    let _ = Driver.replace_string base old_string new_string in
+    Util.commit_patches conf base
+  else
+    let sn = p_getenv conf.env "data" = Some "sn" in
+    let ini_of_update_data ini new_input =
+      (* Utf8. returns the number of "real" characters *)
+      let len = Utf8.length ini in
+      let len = if len = 1 then len + 1 else len in
+      let len = min len (Utf8.length new_input) in
+      let new_input =
+        if sn then Util.surname_without_particle base new_input else new_input
       in
-      loop 0 0
+      let j =
+        let rec loop i j =
+          if i = len then j else loop (i + 1) (Utf8.next new_input j)
+        in
+        loop 0 0
+      in
+      String.sub new_input 0 j
     in
-    String.sub new_input 0 j
-  in
-  let data = Option.value ~default:"" (p_getenv conf.env "data") in
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
-  let new_input =
-    Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
-  in
-  let new_istr_s =
-    Driver.Istr.to_string (Driver.insert_string base new_input)
-  in
-  let new_ini = ini_of_update_data ini new_input in
-  let list = get_person_from_data conf base in
-  let list = List.map (fun (istr, perl) -> (Driver.sou base istr, perl)) list in
-  let nb_pers =
-    List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
-  in
-  let data_modified = List.for_all (fun (old, _) -> new_input <> old) list in
-  (* Indication : 1000 fiches prend environ 1 seconde de traitement. *)
-  (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
-  (* pour ne pas dépasser le time out du serveur.                    *)
-  let max_updates =
-    match List.assoc_opt "max_nb_update" conf.base_env with
-    | Some n ->
-        let n = int_of_string n in
-        if n > 5000 then 5000 else n
-    | _ -> 5000
-  in
-  if nb_pers <> 0 && data_modified then (
-    let nb_pers_reel =
-      update_person_list conf base new_input list nb_pers max_updates
+    let data = Option.value ~default:"" (p_getenv conf.env "data") in
+    let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+    let new_input =
+      Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
     in
-    let title _ =
+    let new_istr_s =
+      Driver.Istr.to_string (Driver.insert_string base new_input)
+    in
+    let new_ini = ini_of_update_data ini new_input in
+    let list = get_person_from_data conf base in
+    let list =
+      List.map (fun (istr, perl) -> (Driver.sou base istr, perl)) list
+    in
+    let nb_pers =
+      List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
+    in
+    let data_modified = List.for_all (fun (old, _) -> new_input <> old) list in
+    (* Indication : 1000 fiches prend environ 1 seconde de traitement. *)
+    (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
+    (* pour ne pas dépasser le time out du serveur.                    *)
+    let max_updates =
+      match List.assoc_opt "max_nb_update" conf.base_env with
+      | Some n ->
+          let n = int_of_string n in
+          if n > 5000 then 5000 else n
+      | _ -> 5000
+    in
+    if nb_pers <> 0 && data_modified then (
+      let nb_pers_reel =
+        update_person_list conf base new_input list nb_pers max_updates
+      in
+      let title _ =
+        transl conf "modification successful"
+        |> Utf8.capitalize_fst |> Output.print_sstring conf
+      in
+      Hutil.header conf title;
+      Output.print_sstring conf "<p>";
       transl conf "modification successful"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf
-    in
-    Hutil.header conf title;
-    Output.print_sstring conf "<p>";
-    transl conf "modification successful"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf (transl conf ":");
-    Output.print_sstring conf " ";
-    Output.print_sstring conf (min nb_pers_reel max_updates |> string_of_int);
-    Output.print_sstring conf " ";
-    if List.assoc_opt "history" conf.base_env = Some "yes" then (
-      Output.print_sstring conf "<a href=\"";
+      |> Utf8.capitalize_fst |> Output.print_sstring conf;
+      Output.print_sstring conf (transl conf ":");
+      Output.print_sstring conf " ";
+      Output.print_sstring conf (min nb_pers_reel max_updates |> string_of_int);
+      Output.print_sstring conf " ";
+      if List.assoc_opt "history" conf.base_env = Some "yes" then (
+        Output.print_sstring conf "<a href=\"";
+        Output.print_string conf (commd conf);
+        Output.print_sstring conf "m=HIST&k=20\">";
+        Output.print_sstring conf
+          (transl_nth conf "modification/modifications"
+             (if nb_pers_reel > 1 then 1 else 0));
+        Output.print_sstring conf ".</a>")
+      else (
+        Output.print_sstring conf
+          (transl_nth conf "modification/modifications"
+             (if nb_pers_reel > 1 then 1 else 0));
+        Output.print_sstring conf ".");
+      Output.print_sstring conf "</p>";
+      if nb_pers > max_updates then (
+        Output.printf conf {|<form method="post" action="%s"><p>|} conf.command;
+        Util.hidden_env conf;
+        Util.hidden_input conf "key" (List.assoc "key" conf.env);
+        Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
+        Util.hidden_input conf "data" (Mutil.encode data);
+        Util.hidden_input conf "s" (Mutil.encode ini);
+        Output.print_sstring conf
+          {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
+        Output.print_string conf (Util.escape_html (only_printable new_input));
+        Output.print_sstring conf {|" id="data">|};
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (transl conf "continue correcting"));
+        Output.print_sstring conf
+          {|<button type="submit" class="btn btn-primary btn-lg">|};
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+        Output.print_sstring conf "</button></p></form>");
+      Output.print_sstring conf {|<a href="|};
       Output.print_string conf (commd conf);
-      Output.print_sstring conf "m=HIST&k=20\">";
+      Output.print_sstring conf {|m=MOD_DATA&data=|};
+      Output.print_string conf (Mutil.encode data);
+      Output.print_sstring conf {|&s=|};
+      Output.print_string conf (Mutil.encode new_ini);
+      Output.print_sstring conf ("#k" ^ new_istr_s);
+      Output.print_sstring conf {|" id="reference">|};
       Output.print_sstring conf
-        (transl_nth conf "modification/modifications"
-           (if nb_pers_reel > 1 then 1 else 0));
-      Output.print_sstring conf ".</a>")
+        (Utf8.capitalize_fst (transl conf "new modification"));
+      Output.print_sstring conf " ";
+      Output.print_sstring conf (transl conf "at new location");
+      Output.print_sstring conf {|</a>|};
+      if not (Mutil.start_with ini 0 new_ini) then (
+        Output.print_sstring conf {| / <a href="|};
+        Output.print_string conf (commd conf);
+        Output.print_sstring conf {|m=MOD_DATA&data=|};
+        Output.print_string conf (Mutil.encode data);
+        Output.print_sstring conf {|&s=|};
+        Output.print_string conf (Mutil.encode ini);
+        Output.print_sstring conf {|">|};
+        Output.print_sstring conf (transl conf "at old location");
+        Output.print_sstring conf {|</a>|});
+      Output.print_sstring conf ".";
+      Hutil.trailer conf)
     else (
-      Output.print_sstring conf
-        (transl_nth conf "modification/modifications"
-           (if nb_pers_reel > 1 then 1 else 0));
-      Output.print_sstring conf ".");
-    Output.print_sstring conf "</p>";
-    if nb_pers > max_updates then (
-      Output.printf conf {|<form method="post" action="%s"><p>|} conf.command;
-      Util.hidden_env conf;
-      Util.hidden_input conf "key" (List.assoc "key" conf.env);
-      Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
-      Util.hidden_input conf "data" (Mutil.encode data);
-      Util.hidden_input conf "s" (Mutil.encode ini);
-      Output.print_sstring conf
-        {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
-      Output.print_string conf (Util.escape_html (only_printable new_input));
-      Output.print_sstring conf {|" id="data">|};
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "continue correcting"));
-      Output.print_sstring conf
-        {|<button type="submit" class="btn btn-primary btn-lg">|};
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-      Output.print_sstring conf "</button></p></form>");
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=MOD_DATA&data=|};
-    Output.print_string conf (Mutil.encode data);
-    Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode new_ini);
-    Output.print_sstring conf ("#k" ^ new_istr_s);
-    Output.print_sstring conf {|" id="reference">|};
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "new modification"));
-    Output.print_sstring conf " ";
-    Output.print_sstring conf (transl conf "at new location");
-    Output.print_sstring conf {|</a>|};
-    if not (Mutil.start_with ini 0 new_ini) then (
-      Output.print_sstring conf {| / <a href="|};
+      Hutil.header conf (fun _ ->
+          transl conf "no modification"
+          |> Utf8.capitalize_fst |> Output.print_sstring conf);
+      Output.print_sstring conf {|<p><a href="|};
       Output.print_string conf (commd conf);
       Output.print_sstring conf {|m=MOD_DATA&data=|};
       Output.print_string conf (Mutil.encode data);
       Output.print_sstring conf {|&s=|};
       Output.print_string conf (Mutil.encode ini);
-      Output.print_sstring conf {|">|};
-      Output.print_sstring conf (transl conf "at old location");
-      Output.print_sstring conf {|</a>|});
-    Output.print_sstring conf ".";
-    Hutil.trailer conf)
-  else (
-    Hutil.header conf (fun _ ->
-        transl conf "no modification"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf);
-    Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=MOD_DATA&data=|};
-    Output.print_string conf (Mutil.encode data);
-    Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode ini);
-    Output.print_sstring conf ("#k" ^ new_istr_s);
-    Output.print_sstring conf {|" id="reference">|};
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "new modification"));
-    Output.print_sstring conf {|</a></p>|};
-    Hutil.trailer conf)
+      Output.print_sstring conf ("#k" ^ new_istr_s);
+      Output.print_sstring conf {|" id="reference">|};
+      Output.print_sstring conf
+        (Utf8.capitalize_fst (transl conf "new modification"));
+      Output.print_sstring conf {|</a></p>|};
+      Hutil.trailer conf)
 
 type 'a env =
   | Vbool of bool
@@ -175,6 +190,15 @@ type 'a env =
   | Vnone
   | Vother of 'a
   | Vstring of string
+
+let visual_spaces_html s =
+  let buffer = Buffer.create (String.length s * 2) in
+  String.iter
+    (fun c ->
+      if c = ' ' then Buffer.add_string buffer "<span class=\"sp-ul\"> </span>"
+      else Buffer.add_char buffer c)
+    s;
+  Buffer.contents buffer
 
 let unfold_place_long inverted s =
   let pl, sub = Place.fold_place_long inverted s in
@@ -248,36 +272,18 @@ and eval_simple_bool_var _conf _base env _xx = function
       | Vstring _ as x -> get_env "entry_key" env = x
       | _ -> false)
   | "first" -> ( match get_env "first" env with Vbool x -> x | _ -> false)
+  | "script" -> ( match get_env "script" env with Vbool x -> x | _ -> false)
   | _ -> raise Not_found
 
 and eval_simple_str_var conf _base env _xx = function
   | "cnt" -> eval_int_env "cnt" env
   | "count" -> (
       match get_env "count" env with Vcnt c -> string_of_int !c | _ -> "")
+  | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
   | "entry_ini" -> eval_string_env "entry_ini" env
+  | "entry_ini_display" -> eval_string_env "entry_ini_display" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
-  | "entry_value_unsort" ->
-      let sn = p_getenv conf.env "data" = Some "sn" in
-      let s = eval_string_env "entry_value" env in
-      if sn && s.[String.length s - 1] = ')' then
-        match String.rindex_opt s '(' with
-        | Some i ->
-            let part = String.sub s (i + 1) (String.length s - i - 2) in
-            let part =
-              if
-                part.[String.length part - 1] = '\''
-                || String.length part >= 3
-                   && Char.code part.[String.length part - 3] = 0xE2
-                   && Char.code part.[String.length part - 2] = 0x80
-                   && (Char.code part.[String.length part - 1] = 0x98
-                      || Char.code part.[String.length part - 1] = 0x99)
-              then part
-              else part ^ " "
-            in
-            part ^ String.sub s 0 i
-        | _ -> s
-      else s
   | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
   | "incr_count" -> (
@@ -301,6 +307,8 @@ and eval_simple_str_var conf _base env _xx = function
           c := 0;
           ""
       | _ -> "")
+  | "script_class" -> eval_string_env "script_class" env
+  | "script_title" -> eval_string_env "script_title" env
   | "suburb" -> (
       match p_getenv conf.env "data" with
       | Some "place" -> Place.only_suburb (eval_string_env "entry_value" env)
@@ -321,14 +329,14 @@ and eval_simple_str_var conf _base env _xx = function
           (Sosa.of_int len)
       in
       let _, book_name = translate_title conf len in
-      match p_getenv conf.env "s" with
+      match p_getenv_notrim conf.env "s" with
       | Some ini ->
           if ini = "" then Printf.sprintf "%s %s" len2 book_name
           else
             let fmt_str = ftransl conf "%s %s starting with %s" in
             let escaped_ini =
-              Printf.sprintf "<span class=\"hl-book\">%s</span>"
-                (Util.escape_html ini :> string)
+              Printf.sprintf "<span>%s</span>"
+                (visual_spaces_html (Util.escape_html ini :> string))
             in
             Printf.sprintf fmt_str len2 book_name escaped_ini
       | None -> Printf.sprintf "%s %s" len2 book_name)
@@ -349,6 +357,11 @@ and eval_compound_var conf base env xx sl =
         | None -> "")
     | [ "evar"; s ] | [ "e"; s ] ->
         Option.value ~default:"" (p_getenv conf.env s)
+    | "visual_spaces" :: sl -> visual_spaces_html (loop sl)
+    | [ "entry_value"; "original" ] ->
+        let istr_string = eval_string_env "entry_key" env in
+        let istr = Driver.Istr.of_string istr_string in
+        Driver.sou base istr
     | "encode" :: sl -> Util.uri_encode (loop sl)
     | "escape" :: sl ->
         let escaped = Util.escape_html (loop sl) in
@@ -385,41 +398,73 @@ let print_foreach conf print_ast _eval_expr =
     let list = build_list_long conf list in
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
+    let current_s = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+
     List.iteri
       (fun i (ini_k, (list_v : (Driver.istr * string) list)) ->
+        let display_ini =
+          let should_truncate =
+            (String.length current_s > 6 && max > 6)
+            || (String.length current_s > 4 && max > 10)
+          in
+          if should_truncate && String.length ini_k > String.length current_s
+          then
+            let suffix =
+              String.sub ini_k (String.length current_s)
+                (String.length ini_k - String.length current_s)
+            in
+            if String.length current_s >= 2 then
+              let utf8_len = Utf8.length current_s in
+              if utf8_len >= 2 then
+                let last_two = Utf8.sub current_s (utf8_len - 2) 2 in
+                "…" ^ last_two ^ suffix
+              else ini_k
+            else ini_k
+          else ini_k
+        in
+        let script_info =
+          if String.length ini_k > 0 then
+            let first_char = Utf8.C.cp ini_k 0 in
+            match Uucp.Script.script first_char with
+            | `Arab -> Some ("arab-char", "Arabic")
+            | `Armn -> Some ("armn-char", "Armenian")
+            | `Cyrl -> Some ("cyrl-char", "Cyrillic")
+            | `Ethi -> Some ("ethi-char", "Ethiopic")
+            | `Geor -> Some ("geor-char", "Georgian")
+            | `Grek -> Some ("grek-char", "Greek")
+            | `Hebr -> Some ("hebr-char", "Hebrew")
+            | `Khmr -> Some ("khmr-char", "Khmer")
+            | _ -> None
+          else None
+        in
         let env =
           Templ.Env.(
             env |> add "cnt" (Vint i) |> add "max" (Vint max)
             |> add "key" (Vstring k)
             |> add "entry_ini" (Vstring ini_k)
+            |> add "entry_ini_display" (Vstring display_ini)
+            |> add "script" (Vbool (Option.is_some script_info))
+            |> add "script_class"
+                 (Vstring (Option.fold ~none:"" ~some:fst script_info))
+            |> add "script_title"
+                 (Vstring (Option.fold ~none:"" ~some:snd script_info))
             |> add "list_value" (Vlist_value list_v))
         in
         List.iter (print_ast env xx) al)
       list
   and print_foreach_substring env xx _el al evar n =
-    let evar = match p_getenv conf.env evar with Some s -> s | None -> "" in
-    (* Parse the limiting integer from n *)
-    let limit =
-      match int_of_string_opt n with
-      | Some i -> i
-      | None -> 12 (* Default limit if n is not a valid integer *)
+    let evar =
+      match p_getenv_notrim conf.env evar with Some s -> s | None -> ""
     in
-
-    (* Generate the list of progressive substrings *)
+    let limit = match int_of_string_opt n with Some i -> i | None -> 12 in
     let rec build_substrings i acc =
       if i >= Utf8.length evar || i > limit then List.rev acc
       else
-        let rec get_substr j pos =
-          if j >= i then pos else get_substr (j + 1) (Utf8.next evar pos)
-        in
-        let substr = String.sub evar 0 (get_substr 0 0) in
+        let substr = Utf8.sub evar 0 i in
         build_substrings (i + 1) (substr :: acc)
     in
-
     let substrings = build_substrings 1 [] in
     let max = List.length substrings in
-
-    (* Process each substring *)
     let rec process_items idx = function
       | [] -> ()
       | s :: tail ->

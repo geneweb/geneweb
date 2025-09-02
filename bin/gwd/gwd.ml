@@ -1247,7 +1247,14 @@ let make_conf ~secret_salt from_addr request script_name env =
   if threshold_test <> "" then
     RelationLink.threshold := int_of_string threshold_test;
   GWPARAM.test_reorg base_file;
-  let base_env = Util.read_base_env base_file !gw_prefix !debug in
+  let gw_prefix_computed =
+    if !gw_prefix <> "" then !gw_prefix
+    else String.concat Filename.dir_sep [ "gw" ]
+  in
+  let base_env =
+    if base_file = "" then []
+    else Util.read_base_env base_file gw_prefix_computed !debug
+  in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -1419,9 +1426,7 @@ let make_conf ~secret_salt from_addr request script_name env =
       today_wd = tm.Unix.tm_wday;
       time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
       ctime = utm;
-      gw_prefix =
-        (if !gw_prefix <> "" then !gw_prefix
-         else String.concat Filename.dir_sep [ "gw" ]);
+      gw_prefix = gw_prefix_computed;
       images_prefix =
         (match (!gw_prefix, !images_prefix) with
         | gw_p, im_p when gw_p <> "" && im_p = "" ->
@@ -1687,13 +1692,12 @@ type misc_fname =
   | Css of string
   | Eot of string
   | Js of string
+  | Json of string
   | Map of string
   | Otf of string
   | Other of string
   | Png of string
   | Svg of string
-  | Ttf of string
-  | Woff of string
   | Woff2 of string
   | CacheGz of string
 
@@ -1704,13 +1708,12 @@ let content_misc conf len misc_fname =
     | Css fname -> (fname, "text/css; charset=UTF-8")
     | Eot fname -> (fname, "application/font-eot")
     | Js fname -> (fname, "text/javascript; charset=UTF-8")
+    | Json fname -> (fname, "application/json; charset=UTF-8")
     | Map fname -> (fname, "application/json")
     | Otf fname -> (fname, "application/font-otf")
     | Other fname -> (fname, "text/plain")
     | Png fname -> (fname, "image/png")
     | Svg fname -> (fname, "application/font-svg")
-    | Ttf fname -> (fname, "application/font-ttf")
-    | Woff fname -> (fname, "application/font-woff")
     | Woff2 fname -> (fname, "application/font-woff2")
     | CacheGz fname -> (fname, "application/gzip")
   in
@@ -1739,11 +1742,10 @@ let print_misc_file conf misc_fname =
   match misc_fname with
   | Css fname
   | Js fname
+  | Json fname
   | Otf fname
   | Svg fname
-  | Woff fname
   | Eot fname
-  | Ttf fname
   | Woff2 fname
   | CacheGz fname -> (
       try
@@ -1787,12 +1789,11 @@ let misc_request conf fname =
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
       else if Filename.check_suffix fname ".js" then Js fname
+      else if Filename.check_suffix fname ".json" then Json fname
       else if Filename.check_suffix fname ".map" then Map fname
       else if Filename.check_suffix fname ".otf" then Otf fname
       else if Filename.check_suffix fname ".svg" then Svg fname
-      else if Filename.check_suffix fname ".woff" then Woff fname
       else if Filename.check_suffix fname ".eot" then Eot fname
-      else if Filename.check_suffix fname ".ttf" then Ttf fname
       else if Filename.check_suffix fname ".woff2" then Woff2 fname
       else if Filename.check_suffix fname ".png" then Png fname
       else if Filename.check_suffix fname ".cache.gz" then CacheGz fname
@@ -2425,7 +2426,7 @@ let main () =
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter register_plugin !plugins;
-  GWPARAM.init "";
+  GWPARAM.init ();
   cache_lexicon ();
   List.iter
     (fun dbn ->

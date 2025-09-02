@@ -30,9 +30,9 @@
 %let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<static_max_anc_level)%bvar.max_anc_level;%else;%max_anc_level;%end;%in;
 %let;maxp;%expr(max+1)%in;
 %define;picklvl(vvv)
-  <a role="button" class="btn btn-sm btn-light%if;(vvv=e_v or (e_v>max and vvv=max)) disabled font-weight-bold text-white bg-dark%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
-  aria-label="select ascending generation level vvv to display ancestors up to that degree."%sp;
-  title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([ascending/descending (degree)]1 [up to] %max_desc_level;)%end;">vvv</a>%nn;
+  <a role="button" class="btn btn-sm btn-light%if;(vvv=e_v or (e_v>max and vvv=max)) disabled font-weight-bold text-white bg-dark%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;" onclick="showOverlay()"
+    aria-label="select ascending generation level vvv to display ancestors up to that degree."
+    title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([ascending/descending (degree)]1 [up to] %max_desc_level;)%end;">vvv</a>%nn;
 %end;
 %if;(max!=0 and not (max=1 and not has_children))
   <div class="d-flex flex-wrap align-self-center btn-toolbar py-0 mx-3 mt-1" role="toolbar" aria-label="buttons to select maximum ascending level v">
@@ -379,6 +379,7 @@
 %include;trl
 %include;copyr
 </div>
+%include;overlay
 %include;js
 %query_time;
 <script>

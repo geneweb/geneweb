@@ -84,6 +84,9 @@ let nb_of_families base = base.data.families.len
 let insert_string base s =
   base.func.Dbdisk.insert_string @@ Mutil.normalize_utf_8 s
 
+let replace_string base old_s new_s =
+  base.func.Dbdisk.replace_string old_s @@ Mutil.normalize_utf_8 new_s
+
 let commit_patches base = base.func.Dbdisk.commit_patches ()
 let commit_notes base s = base.func.Dbdisk.commit_notes s
 let commit_wiznotes base s = base.func.Dbdisk.commit_wiznotes s
@@ -528,7 +531,7 @@ let read_or_create_visible base =
   let fname = Filename.concat base.data.bdir "restrict" in
   let visible =
     if Sys.file_exists fname then (
-      let ic = Secure.open_in fname in
+      let ic = Secure.open_in_bin fname in
       let visible =
         if Mutil.check_magic Mutil.executable_magic ic then input_value ic
         else Hashtbl.create (nb_of_persons base)
@@ -546,7 +549,7 @@ let base_visible_write base =
     let fname = Filename.concat base.data.bdir "restrict" in
     match !visible_ref with
     | Some visible ->
-        let oc = Secure.open_out fname in
+        let oc = Secure.open_out_bin fname in
         output_string oc Mutil.executable_magic;
         output_value oc visible;
         close_out oc

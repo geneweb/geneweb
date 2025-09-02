@@ -142,9 +142,10 @@ let set_error base gen x =
   check_error gen
 
 (** Function that will be called if base's checker will find a warning *)
-let set_warning base x =
-  Printf.printf "Warning: ";
-  Check.print_base_warning stdout base x
+let set_warning base no_warn x =
+  if not no_warn then (
+    Printf.printf "Warning: ";
+    Check.print_base_warning stdout base x)
 
 (** Returns person's entry from [base] at position [i] *)
 let poi base i = base.c_persons.(i)
@@ -1633,7 +1634,7 @@ let output_command_line bdir =
   close_out oc
 
 (** Link .gwo files and create a database. *)
-let link next_family_fun bdir =
+let link ?(no_warn = false) next_family_fun bdir =
   let tmp_dir = Filename.concat bdir "gw_tmp" in
   Mutil.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
@@ -1698,7 +1699,7 @@ let link next_family_fun bdir =
   close_in per_index_ic;
   close_in per_ic;
   if !do_check && gen.g_pcnt > 0 then (
-    Check.check_base base (set_error base gen) (set_warning base) ignore;
+    Check.check_base base (set_error base gen) (set_warning base no_warn) ignore;
     if !pr_stats then Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
     if !do_consang then ignore @@ ConsangAll.compute base true;
