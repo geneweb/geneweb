@@ -22,9 +22,7 @@ let main () =
         in
         Fun.protect
           ~finally:(fun () -> Gwdb.close_base database)
-          (fun () ->
-            if not @@ Gwdb.search_indexes_can_be_initialized_on_the_fly database
-            then initialize_search_indexes database))
+          (fun () -> initialize_search_indexes database))
       usage
 
 let () = main ()
