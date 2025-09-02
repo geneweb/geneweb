@@ -442,10 +442,7 @@ let add_linked_files gen from s some_linked_files =
       if j > i + 6 then
         let b = String.sub s (i + 3) (j - i - 6) in
         let fname =
-          try
-            let k = String.index b '/' in
-            String.sub b 0 k
-          with Not_found -> b
+          Option.fold (String.index_opt b '/') ~some:(String.sub b 0) ~none:b
         in
         let fname =
           Option.value ~default:fname (List.assoc_opt fname gen.notes_alias)
@@ -953,12 +950,12 @@ let notes_aliases bdir =
         match try Some (input_line ic) with End_of_file -> None with
         | Some s ->
             let list =
-              try
-                let i = String.index s ' ' in
-                ( String.sub s 0 i,
-                  String.sub s (i + 1) (String.length s - i - 1) )
-                :: list
-              with Not_found -> list
+              Option.fold (String.index_opt s ' ')
+                ~some:(fun i ->
+                  ( String.sub s 0 i,
+                    String.sub s (i + 1) (String.length s - i - 1) )
+                  :: list)
+                ~none:list
             in
             loop list
         | None ->

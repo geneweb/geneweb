@@ -373,17 +373,17 @@ let gen_match_auth_file test_user_and_password auth_file =
       | au :: aul ->
           if test_user_and_password au then
             let s =
-              try
-                let i = String.index au.Geneweb.Util.au_info ':' in
-                String.sub au.Geneweb.Util.au_info 0 i
-              with Not_found -> ""
+              Option.fold
+                (String.index_opt au.Geneweb.Util.au_info ':')
+                ~some:(fun i -> String.sub au.Geneweb.Util.au_info 0 i)
+                ~none:""
             in
             let username =
-              try
-                let i = String.index s '/' in
-                let len = String.length s in
-                String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
-              with Not_found -> s
+              Option.fold (String.index_opt s '/')
+                ~some:(fun i ->
+                  let len = String.length s in
+                  String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1))
+                ~none:s
             in
             Some username
           else loop aul

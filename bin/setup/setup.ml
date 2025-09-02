@@ -137,10 +137,7 @@ let numbered_key k =
     | _ -> None
 
 let stringify s =
-  try
-    let _ = String.index s ' ' in
-    "\"" ^ s ^ "\""
-  with Not_found -> s
+  if Option.is_some @@ String.index_opt s ' ' then "\"" ^ s ^ "\"" else s
 
 let parameters =
   let rec loop comm = function

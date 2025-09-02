@@ -31,12 +31,12 @@ let notes_aliases conf =
         | Some s ->
             let list =
               (* S: is it replacable by `String.split_on_char ' '` s? *)
-              try
-                let i = String.index s ' ' in
-                ( String.sub s 0 i,
-                  String.sub s (i + 1) (String.length s - i - 1) )
-                :: list
-              with Not_found -> list
+              Option.fold (String.index_opt s ' ')
+                ~some:(fun i ->
+                  ( String.sub s 0 i,
+                    String.sub s (i + 1) (String.length s - i - 1) )
+                  :: list)
+                ~none:list
             in
             loop list
         | None ->
@@ -792,12 +792,12 @@ let split_title_and_text s =
   let s = if i = 0 then s else String.sub s i (String.length s - i) in
   if (try List.assoc "TITLE" env with Not_found -> "") = "" then
     let tit, txt =
-      try
-        let i = String.index s '\n' in
-        let tit = String.sub s 0 i in
-        let txt = String.sub s (i + 1) (String.length s - i - 1) in
-        (tit, txt)
-      with Not_found -> (s, "")
+      Option.fold (String.index_opt s '\n')
+        ~some:(fun i ->
+          let tit = String.sub s 0 i in
+          let txt = String.sub s (i + 1) (String.length s - i - 1) in
+          (tit, txt))
+        ~none:(s, "")
     in
     let tit, txt =
       if
