@@ -539,7 +539,7 @@ let print_foreach print_ast _eval_expr =
   and print_foreach_fwitness env fcd al list =
     match get_env "cnt" env with
     | Vint i -> (
-        match try Some (List.nth list (i - 1)) with Failure _ -> None with
+        match List.nth_opt list (i - 1) with
         | Some e ->
             let rec loop first wcnt = function
               | _ :: l ->

@@ -2128,7 +2128,7 @@ and eval_item_field_var ell = function
         match ell with
         | el :: _ ->
             let v = int_of_string s in
-            let r = try List.nth el (v - 1) with Failure _ -> "" in
+            let r = Option.value (List.nth_opt el (v - 1)) ~default:"" in
             TemplAst.VVstring r
         | [] -> null_val
       with Failure _ -> raise Not_found)
