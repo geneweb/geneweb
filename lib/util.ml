@@ -1955,11 +1955,13 @@ let child_of_parent conf base p =
         s s
       |> translate_eval |> Adef.safe
 
-let husband_wife conf base p all =
+let husband_wife ?(buf : Buffer.t option) conf base p all =
+  let families = Driver.get_family p in
+  let nb_fam = Array.length families in
   let multiple =
     let rec loop i kind =
-      if i < Array.length (Driver.get_family p) then
-        let fam = Driver.foi base (Driver.get_family p).(i) in
+      if i < nb_fam then
+        let fam = Driver.foi base families.(i) in
         let cur_type = Driver.get_relation fam in
         if i = 0 then loop (i + 1) cur_type
         else if cur_type = kind then loop (i + 1) kind
@@ -1969,45 +1971,56 @@ let husband_wife conf base p all =
     loop 0 NoMention
   in
   let relation =
-    if Array.length (Driver.get_family p) > 0 then
+    if nb_fam > 0 then
       if multiple >= 0 then
-        let fam = Driver.foi base (Driver.get_family p).(0) in
+        let fam = Driver.foi base families.(0) in
         Printf.sprintf (relation_txt conf (Driver.get_sex p) fam) (fun () -> "")
-        |> translate_eval |> Adef.safe
-      else transl conf "marriages with" |> Adef.safe
-    else Adef.safe ""
+        |> translate_eval
+      else transl conf "marriages with"
+    else ""
   in
-  let nb_fam = Array.length (Driver.get_family p) in
-  let res =
-    let rec loop i res =
-      if i < nb_fam then
-        let fam = Driver.foi base (Driver.get_family p).(i) in
-        let conjoint = Gutil.spouse (Driver.get_iper p) fam in
-        let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint then
-          let res =
-            res
-            ^>^ translate_eval
-                  ((if nb_fam > 1 then Format.sprintf " &%d " (i + 1) else " ")
-                   ^<^ gen_person_text conf base conjoint
-                   ^^^ relation_date conf fam
-                    :> string)
-            ^ ","
-          in
-          if all then loop (i + 1) res else res
-        else loop (i + 1) res ^>^ " ? ?,"
-      else res
+  let sep idx =
+    if nb_fam > 1 && idx > 0 then
+      Format.sprintf ", &<sup><small>%d</small></sup> " (idx + 1)
+    else if idx > 0 then ", "
+    else ""
+  in
+  let spouses =
+    let _, lst =
+      Array.to_list families
+      |> List.fold_left
+           (fun (i, acc) ifam ->
+             let fam = Driver.foi base ifam in
+             let sp = Gutil.spouse (Driver.get_iper p) fam |> pget conf base in
+             if is_empty_name sp then (i, acc)
+             else
+               let txt =
+                 (translate_eval (sep i)
+                  ^<^ gen_person_text conf base sp
+                  ^^^ relation_date conf fam
+                   :> string)
+               in
+               (i + 1, txt :: acc))
+           (0, [])
     in
-    loop 0 relation
+    let xs = List.rev lst in
+    if all then xs else match xs with [] -> [] | hd :: _ -> [ hd ]
   in
-  let res = (res :> string) in
-  (* suppress last , *)
-  let res =
-    if String.length res > 1 && res.[String.length res - 1] = ',' then
-      String.sub res 0 (String.length res - 1)
-    else res
-  in
-  Adef.safe res
+  match buf with
+  | Some b ->
+      if spouses <> [] then (
+        Buffer.add_string b ", ";
+        Buffer.add_string b relation;
+        Buffer.add_char b ' ';
+        Buffer.add_string b (String.concat "" spouses));
+      Adef.safe ""
+  | None ->
+      let full_text =
+        match spouses with
+        | [] -> ""
+        | _ -> ", " ^ relation ^ " " ^ String.concat "" spouses
+      in
+      Adef.safe full_text
 
 let first_child conf base p =
   let is = index_of_sex (Driver.get_sex p) in

@@ -147,11 +147,15 @@ let rec infer_death conf base p =
   in
   begin_list 0 [] el*)
 
+let add_safe_string buf (s : Adef.safe_string) =
+  Buffer.add_string buf (s :> string)
+
+let add_escaped_string buf (s : Adef.escaped_string) =
+  Buffer.add_string buf (s :> string)
+
 (* ************************************************************************** *)
 (* [Fonc] print_person_parents_and_spouses :
             config -> base -> person -> unit *)
-
-(* ************************************************************************** *)
 
 (* ************************************************************************** *)
 
@@ -162,34 +166,36 @@ let rec infer_death conf base p =
     - base : base
     - p : person [Retour] : unit [Rem] : Not visible. *)
 let print_person_parents_and_spouses conf base p =
-  if GWPARAM.p_auth conf base p then (
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_string conf (acces conf base p);
-    Output.print_sstring conf {|">|};
-
+  if not (GWPARAM.p_auth conf base p) then ()
+  else
+    let buf = Buffer.create 256 in
+    Buffer.add_string buf "<a href=\"";
+    add_escaped_string buf (commd conf);
+    add_escaped_string buf (acces conf base p);
+    Buffer.add_string buf "\">";
     let pub_name = Driver.sou base (Driver.get_public_name p) in
-    if pub_name <> "" then
-      Output.print_sstring conf (Printf.sprintf "%s" pub_name)
-    else Output.print_string conf (escape_html @@ Driver.p_first_name base p);
-    Output.print_sstring conf " ";
-    Output.print_string conf (escape_html @@ Driver.p_surname base p);
-    Output.print_sstring conf "</a>";
-    Output.print_string conf (DateDisplay.short_dates_text conf base p);
-    let cop = Util.child_of_parent conf base p in
-    if String.length (cop :> string) > 0 then (
-      Output.print_sstring conf ", ";
+    let first_name = (escape_html (Driver.p_first_name base p) :> string) in
+    let surname = (escape_html (Driver.p_surname base p) :> string) in
+    let name = if pub_name <> "" then (pub_name :> string) else first_name in
+    Buffer.add_string buf name;
+    Buffer.add_char buf ' ';
+    Buffer.add_string buf surname;
+    Buffer.add_string buf "</a>";
+    add_safe_string buf (DateDisplay.short_dates_text conf base p);
+    let cop = (Util.child_of_parent conf base p :> string) in
+    if cop <> "" then (
       if pub_name <> "" then (
-        Output.print_sstring conf "(";
-        Output.print_string conf (escape_html @@ Driver.p_first_name base p);
-        Output.print_sstring conf "), ");
-      Output.print_string conf cop);
-    let hbw = Util.husband_wife conf base p true in
-    if String.length (hbw :> string) > 0 then (
-      Output.print_sstring conf ", ";
-      Output.print_string conf hbw);
-    Output.print_sstring conf ". ")
-  else ()
+        Buffer.add_string buf " (";
+        Buffer.add_string buf first_name;
+        Buffer.add_string buf ")");
+      Buffer.add_string buf ", ";
+      Buffer.add_string buf cop);
+    let spouses_buf = Buffer.create 128 in
+    ignore (Util.husband_wife ~buf:spouses_buf conf base p true);
+    let spouses_text = Buffer.contents spouses_buf in
+    Buffer.add_string buf spouses_text;
+    Buffer.add_char buf '.';
+    Output.print_sstring conf (Buffer.contents buf)
 
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
