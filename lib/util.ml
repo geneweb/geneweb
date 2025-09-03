@@ -1085,8 +1085,10 @@ let get_request_string conf =
     Option.value ~default:""
       (Mutil.extract_param "GET " ' ' conf.Config.request)
   else
-    let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
-    let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
+    let script_name = Option.value (Sys.getenv_opt "SCRIPT_NAME") ~default:"" in
+    let query_string =
+      Option.value (Sys.getenv_opt "QUERY_STRING") ~default:""
+    in
     script_name ^ "?" ^ query_string
 
 let message_to_wizard conf =

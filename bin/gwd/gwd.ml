@@ -1760,12 +1760,7 @@ let null_reopen flags fd =
   Unix.close fd2
 
 let geneweb_server () =
-  let auto_call =
-    try
-      let _ = Sys.getenv "WSERVER" in
-      true
-    with Not_found -> false
-  in
+  let auto_call = Option.is_some @@ Sys.getenv_opt "WSERVER" in
   if not auto_call then (
     let hostn =
       match !selected_addr with
@@ -1819,10 +1814,10 @@ let geneweb_cgi addr script_name contents =
   (try Unix.mkdir (Filename.concat !Geneweb.Util.cnt_dir "cnt") 0o755
    with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
-    try
-      let v = Sys.getenv x in
-      if v = "" then raise Not_found else (k ^ ": " ^ v) :: request
-    with Not_found -> request
+    Option.value
+      (Option.bind (Sys.getenv_opt x) (fun v ->
+           Ext_option.return_if (v <> "") (fun () -> (k ^ ": " ^ v) :: request)))
+      ~default:request
   in
   let request = [] in
   let request = add "cookie" "HTTP_COOKIE" request in
@@ -2088,10 +2083,10 @@ let main () =
   let speclist = Arg.align speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   (default_lang :=
-     let s = try Sys.getenv "LANG" with Not_found -> "" in
+     let s = Option.value (Sys.getenv_opt "LANG") ~default:"" in
      if List.mem s Geneweb.Version.available_languages then s
      else
-       let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+       let s = Option.value (Sys.getenv_opt "LC_CTYPE") ~default:"" in
        if String.length s >= 2 then
          let s = String.sub s 0 2 in
          if List.mem s Geneweb.Version.available_languages then s else "en"
@@ -2119,29 +2114,31 @@ let main () =
     List.fold_left Filename.concat !Geneweb.Util.cnt_dir
       [ "cnt"; "STOP_SERVER" ];
   let query, cgi =
-    try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
-    with Not_found -> ("" |> Adef.encoded, !force_cgi)
+    match Sys.getenv_opt "QUERY_STRING" with
+    | Some query -> (Adef.encoded query, true)
+    | None -> ("" |> Adef.encoded, !force_cgi)
   in
   if cgi then (
     Wserver.cgi := true;
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
         let len =
-          try
-            Option.value ~default:(-1)
-              (int_of_string_opt (Sys.getenv "CONTENT_LENGTH"))
-          with Not_found -> -1
+          Option.value ~default:(-1)
+            (Option.bind (Sys.getenv_opt "CONTENT_LENGTH") int_of_string_opt)
         in
         set_binary_mode_in stdin true;
         read_input len |> Adef.encoded)
       else query
     in
     let addr =
-      try Sys.getenv "REMOTE_HOST"
-      with Not_found -> ( try Sys.getenv "REMOTE_ADDR" with Not_found -> "")
+      match Sys.getenv_opt "REMOTE_HOST" with
+      | Some addr -> addr
+      | None -> Option.value (Sys.getenv_opt "REMOTE_ADDR") ~default:""
     in
     let script =
-      try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
+      match Sys.getenv_opt "SCRIPT_NAME" with
+      | Some script -> script
+      | None -> Sys.argv.(0)
     in
     geneweb_cgi addr (Filename.basename script) query)
   else geneweb_server ()

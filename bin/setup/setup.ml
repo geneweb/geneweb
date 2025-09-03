@@ -443,7 +443,9 @@ let print_selector conf print =
   let sel =
     try getenv conf.env "sel"
     with Not_found -> (
-      try Sys.getenv "HOME" with Not_found -> Sys.getcwd ())
+      match Sys.getenv_opt "HOME" with
+      | Some home -> home
+      | None -> Sys.getcwd ())
   in
   let list =
     try
@@ -1749,11 +1751,11 @@ let setup_available_languages = [ "de"; "en"; "es"; "fr"; "it"; "lv"; "sv" ]
 
 let intro () =
   let default_gwd_lang, default_setup_lang =
-    let s = try Sys.getenv "LANG" with Not_found -> "" in
+    let s = Option.value (Sys.getenv_opt "LANG") ~default:"" in
     if List.mem s Geneweb.Version.available_languages then
       (s, if List.mem s setup_available_languages then s else "en")
     else
-      let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+      let s = Option.value (Sys.getenv_opt "LC_CTYPE") ~default:"" in
       if String.length s >= 2 then
         let s = String.sub s 0 2 in
         if List.mem s Geneweb.Version.available_languages then
