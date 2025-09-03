@@ -530,13 +530,15 @@ val mark_if_not_public :
     if url contains red_if_not_public=on *)
 
 val husband_wife :
+  ?buf:Buffer.t ->
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   bool ->
   Adef.safe_string
 (** returns a string listing the spouses of a person [bool] if true return all
-    spouses otherwise the first one only *)
+    spouses otherwise the first one only optionally writes directly into the
+    provided [Buffer.t] *)
 
 val find_person_in_env :
   config -> Geneweb_db.Driver.base -> string -> Geneweb_db.Driver.person option
