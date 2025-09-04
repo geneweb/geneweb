@@ -65,4 +65,4 @@ let main () =
         flush stdout;
         exit 2)
 
-let _ = Printexc.print main ()
+let () = Printexc.print main ()

@@ -564,9 +564,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
   let psn =
     match Util.p_getenv conf.Config.env "alwsurn" with
     | Some x -> x = "yes"
-    | None -> (
-        try List.assoc "always_surname" conf.Config.base_env = "yes"
-        with Not_found -> false)
+    | None -> List.assoc_opt "always_surname" conf.Config.base_env = Some "yes"
   in
   let title h =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
@@ -853,10 +851,9 @@ let search_surname conf base x : surname_search_result =
       (fun (str, (_, iperl1)) (iperl, strl) ->
         let len = List.length iperl1 in
         let strl =
-          try
-            let len1 = List.assoc str strl in
-            (str, len + len1) :: List.remove_assoc str strl
-          with Not_found -> (str, len) :: strl
+          match List.assoc_opt str strl with
+          | Some len1 -> (str, len + len1) :: List.remove_assoc str strl
+          | None -> (str, len) :: strl
         in
         (List.fold_right Gwdb.IperSet.add iperl1 iperl, strl))
       list (Gwdb.IperSet.empty, [])

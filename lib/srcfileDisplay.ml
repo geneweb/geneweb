@@ -17,7 +17,8 @@ let adm_file f = List.fold_right Filename.concat [ !Util.cnt_dir; "cnt" ] f
 let cnt conf ext = adm_file (conf.Config.bname ^ ext)
 
 let input_int ic =
-  try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
+  try Option.value ~default:0 (int_of_string_opt (input_line ic))
+  with End_of_file -> 0
 
 let count conf =
   let fname = cnt conf ".txt" in
@@ -83,8 +84,9 @@ let write_counter conf r =
 let set_wizard_and_friend_traces conf =
   if conf.Config.wizard && conf.Config.user <> "" then (
     let wpf =
-      try List.assoc "wizard_passwd_file" conf.Config.base_env
-      with Not_found -> ""
+      Option.value
+        (List.assoc_opt "wizard_passwd_file" conf.Config.base_env)
+        ~default:""
     in
     if wpf <> "" then
       let fname = adm_file (conf.Config.bname ^ "_w.txt") in
@@ -95,11 +97,14 @@ let set_wizard_and_friend_traces conf =
     && conf.Config.user <> ""
   then
     let fpf =
-      try List.assoc "friend_passwd_file" conf.Config.base_env
-      with Not_found -> ""
+      Option.value
+        (List.assoc_opt "friend_passwd_file" conf.Config.base_env)
+        ~default:""
     in
     let fp =
-      try List.assoc "friend_passwd" conf.Config.base_env with Not_found -> ""
+      Option.value
+        (List.assoc_opt "friend_passwd" conf.Config.base_env)
+        ~default:""
     in
     if
       fpf <> ""
@@ -187,8 +192,10 @@ let macro conf base = function
       | None -> Adef.safe "")
   | 'b' ->
       let s =
-        try " dir=\"" ^ Hashtbl.find conf.Config.lexicon "!dir" ^ "\""
-        with Not_found -> ""
+        Option.fold
+          (Hashtbl.find_opt conf.Config.lexicon "!dir")
+          ~some:(fun d -> " dir=\"" ^ d ^ "\"")
+          ~none:""
       in
       Adef.safe (s ^ Util.body_prop conf)
   | 'c' -> string_of_int_sep_aux conf (count conf).welcome_cnt
@@ -402,8 +409,9 @@ let rec copy_from_stream conf base strm mode =
               Output.print_sstring conf (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =
-                try List.assoc (get_variable strm) conf.Config.base_env
-                with Not_found -> ""
+                Option.value
+                  (List.assoc_opt (get_variable strm) conf.Config.base_env)
+                  ~default:""
               in
               copy_from_string conf base txt mode
           | c -> Output.print_string conf (macro conf base c))
@@ -485,7 +493,7 @@ let print_source = gen_print Source
 
 type 'a env = Vsosa_ref of Gwdb.person option Lazy.t | Vother of 'a | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = Option.value (List.assoc_opt v env) ~default:Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -530,8 +538,13 @@ let eval_var conf base env () _loc = function
       Random.self_init ();
       TemplAst.VVstring ""
   | [ "random"; s ] -> (
-      try TemplAst.VVstring (string_of_int (Random.int (int_of_string s)))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
+      match
+        Option.map
+          (fun i -> TemplAst.VVstring (string_of_int (Random.int i)))
+          (int_of_string_opt s)
+      with
+      | Some v -> v
+      | None | (exception Invalid_argument _) -> raise Not_found)
   | [ "sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> (

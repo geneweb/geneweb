@@ -171,21 +171,22 @@ let no_string = ""
     associate this string to its index in mentioned array. Extens array if needed.
     Returns associated index. *)
 let unique_string gen x =
-  try Hashtbl.find gen.g_strings x
-  with Not_found ->
-    (* string not found *)
-    if gen.g_scnt = Array.length gen.g_base.c_strings then (
-      (* extend arrray of strings and copy previus elements *)
-      let arr = gen.g_base.c_strings in
-      let new_size = (2 * Array.length arr) + 1 in
-      let new_arr = Array.make new_size no_string in
-      Array.blit arr 0 new_arr 0 (Array.length arr);
-      gen.g_base.c_strings <- new_arr);
-    let u = gen.g_scnt in
-    gen.g_base.c_strings.(gen.g_scnt) <- x;
-    gen.g_scnt <- gen.g_scnt + 1;
-    Hashtbl.add gen.g_strings x u;
-    u
+  match Hashtbl.find_opt gen.g_strings x with
+  | Some u -> u
+  | None ->
+      (* string not found *)
+      if gen.g_scnt = Array.length gen.g_base.c_strings then (
+        (* extend arrray of strings and copy previus elements *)
+        let arr = gen.g_base.c_strings in
+        let new_size = (2 * Array.length arr) + 1 in
+        let new_arr = Array.make new_size no_string in
+        Array.blit arr 0 new_arr 0 (Array.length arr);
+        gen.g_base.c_strings <- new_arr);
+      let u = gen.g_scnt in
+      gen.g_base.c_strings.(gen.g_scnt) <- x;
+      gen.g_scnt <- gen.g_scnt + 1;
+      Hashtbl.add gen.g_strings x u;
+      u
 
 (** Dummy [family] with its empty [couple] and [descendants]. *)
 let no_family gen =
@@ -371,8 +372,9 @@ let add_person_by_name gen first_name surname int =
     with the giving information. *)
 let find_first_available_occ gen fn sn occ =
   let occ =
-    try max occ (Hashtbl.find gen.g_first_av_occ (fn, sn))
-    with Not_found -> occ
+    Option.fold ~some:(max occ)
+      (Hashtbl.find_opt gen.g_first_av_occ (fn, sn))
+      ~none:occ
   in
   let rec loop occ =
     match
@@ -1241,8 +1243,6 @@ let insert_bnotes fname gen nfname str =
 let insert_wiznote gen wizid str =
   gen.g_wiznotes <- (wizid, str) :: gen.g_wiznotes
 
-let map_option f = function Some x -> Some (f x) | None -> None
-
 (** Insert parent in the base and adjust his sex if needed. Concerned
     person is added in the list of parent's related persons. *)
 let insert_relation_parent state gen ip s k =
@@ -1258,12 +1258,12 @@ let insert_relation state gen ip r =
   {
     Def.r_type = r.Def.r_type;
     r_fath =
-      map_option
+      Option.map
         (insert_relation_parent state gen ip
            (Gwc_lib__.Gwcomp.make_weak_assumption Def.Male))
         r.r_fath;
     r_moth =
-      map_option
+      Option.map
         (insert_relation_parent state gen ip
            (Gwc_lib__.Gwcomp.make_weak_assumption Def.Female))
         r.r_moth;
@@ -1662,7 +1662,7 @@ let empty_base : cbase =
 
 (** Extract information from the [gen.g_base] and create database *)
 let make_base state bname gen per_index_ic per_ic =
-  let _ =
+  let () =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
     flush stderr
@@ -1683,7 +1683,7 @@ let make_base state bname gen per_index_ic per_ic =
     gen.g_base.c_unions <- [||];
     a
   in
-  let _ =
+  let () =
     Printf.eprintf "fcnt %d families %d\n" gen.g_fcnt
       (Array.length gen.g_base.c_couples);
     flush stderr
@@ -1703,7 +1703,7 @@ let make_base state bname gen per_index_ic per_ic =
     gen.g_base.c_descends <- [||];
     a
   in
-  let _ =
+  let () =
     Printf.eprintf "scnt %d strings %d\n" gen.g_scnt
       (Array.length gen.g_base.c_strings);
     flush stderr

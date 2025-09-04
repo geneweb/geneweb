@@ -8,7 +8,7 @@
 let index64 = Array.make 128 0
 
 (* Init the index *)
-let _ =
+let () =
   for i = 0 to 25 do
     index64.(i + Char.code 'A') <- i
   done;
@@ -43,7 +43,7 @@ let decode s =
 
 let char64 = Array.make 64 'a'
 
-let _ =
+let () =
   for i = 0 to 25 do
     char64.(i) <- Char.chr (Char.code 'A' + i)
   done;

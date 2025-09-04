@@ -177,7 +177,7 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "</a></tt>"
       | Def.NLDB.PgMisc fnotes ->
           let nenv, _ = Notes.read_notes base fnotes in
-          let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+          let title = Option.value (List.assoc_opt "TITLE" nenv) ~default:"" in
           let title = Util.safe_html title in
           Output.print_sstring conf "<tt>";
           if conf.Config.wizard then (
@@ -256,7 +256,7 @@ let print conf base =
   | Some "on" -> print_what_links conf base fnotes
   | _ -> (
       let nenv, s = Notes.read_notes base fnotes in
-      let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+      let title = Option.value (List.assoc_opt "TITLE" nenv) ~default:"" in
       let title = Util.safe_html title in
       match Util.p_getint conf.Config.env "v" with
       | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
@@ -380,7 +380,7 @@ let print_misc_notes conf base =
         | r, Some f ->
             let txt =
               let n, s = Notes.read_notes base f in
-              let t = try List.assoc "TITLE" n with Not_found -> "" in
+              let t = Option.value (List.assoc_opt "TITLE" n) ~default:"" in
               if t <> "" then Util.escape_html t
               else if s = "" then Adef.escaped ""
               else
@@ -445,7 +445,7 @@ let search_text conf base s =
     let rec loop = function
       | fnotes :: list ->
           let nenv, nt = Notes.read_notes base fnotes in
-          let tit = try List.assoc "TITLE" nenv with Not_found -> "" in
+          let tit = Option.value (List.assoc_opt "TITLE" nenv) ~default:"" in
           if Util.in_text case_sens s tit || Util.in_text case_sens s nt then
             Some (fnotes, tit, nt)
           else loop list
@@ -460,6 +460,6 @@ let search_text conf base s =
   | None -> print_misc_notes conf base
 
 let print_misc_notes_search conf base =
-  match try Some (List.assoc "s" conf.Config.env) with Not_found -> None with
+  match List.assoc_opt "s" conf.Config.env with
   | Some s -> search_text conf base (Mutil.gen_decode false s)
   | None -> print_misc_notes conf base

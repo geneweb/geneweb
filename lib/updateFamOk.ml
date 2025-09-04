@@ -15,7 +15,10 @@ let reconstitute_parent_or_child conf var default_surname =
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
   let occ =
-    try int_of_string (Update_util.getn conf var "occ") with Failure _ -> 0
+    try
+      Option.value ~default:0
+        (int_of_string_opt (Update_util.getn conf var "occ"))
+    with Failure _ -> 0
   in
   let create_info =
     let b = Update.reconstitute_date conf (var ^ "b") in
@@ -726,8 +729,7 @@ let infer_origin_file conf base ifam ncpl ndes =
             loop 0)
   in
   let no_dec =
-    try List.assoc "propose_add_family" conf.Config.base_env = "no"
-    with Not_found -> false
+    List.assoc_opt "propose_add_family" conf.Config.base_env = Some "no"
   in
   if no_dec && Gwdb.sou base r = "" then print_error_disconnected conf else r
 
@@ -945,14 +947,15 @@ let effective_mod conf base nsck sfam scpl sdes =
   done;
   let cache = Hashtbl.create 101 in
   let find_asc ip =
-    try Hashtbl.find cache ip
-    with Not_found ->
-      let a = Gwdb.poi base ip in
-      let a =
-        { Def.parents = Gwdb.get_parents a; consang = Gwdb.get_consang a }
-      in
-      Hashtbl.add cache ip a;
-      a
+    match Hashtbl.find_opt cache ip with
+    | Some a -> a
+    | None ->
+        let a = Gwdb.poi base ip in
+        let a =
+          { Def.parents = Gwdb.get_parents a; consang = Gwdb.get_consang a }
+        in
+        Hashtbl.add cache ip a;
+        a
   in
   let same_parents = Adef.father ncpl = ofather && Adef.mother ncpl = omother in
   Array.iter
@@ -1270,8 +1273,7 @@ let get_create (_, _, _, create, _) = create
 
 let forbidden_disconnected conf scpl sdes =
   let no_dec =
-    try List.assoc "propose_add_family" conf.Config.base_env = "no"
-    with Not_found -> false
+    List.assoc_opt "propose_add_family" conf.Config.base_env = Some "no"
   in
   if no_dec then
     if
@@ -1566,8 +1568,9 @@ let print_change_event_order conf base =
       let fevents =
         List.fold_right
           (fun (id, _) accu ->
-            try (Hashtbl.find ht id |> Gwdb.gen_fevent_of_fam_event) :: accu
-            with Not_found -> failwith "Sorting event")
+            match Hashtbl.find_opt ht id with
+            | Some event -> Gwdb.gen_fevent_of_fam_event event :: accu
+            | None -> failwith "Sorting event")
           sorted_fevents []
       in
       let fam = Gwdb.gen_family_of_family fam in

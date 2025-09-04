@@ -82,7 +82,7 @@ let check tm from max_call sec conf suicide =
   in
   let xcl, fname = robot_excl () in
   let refused =
-    match try Some (List.assoc from xcl.excl) with Not_found -> None with
+    match List.assoc_opt from xcl.excl with
     | Some att ->
         incr att;
         if !att mod max_call = 0 then

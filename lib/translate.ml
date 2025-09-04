@@ -13,10 +13,10 @@ let skip_lang s =
 let inline lang macro_char macro s =
   let lang = lang ^ ":" in
   let derived_lang =
-    try
-      let i = String.index lang '-' in
-      String.sub lang 0 i ^ ":"
-    with Not_found -> ""
+    Option.fold
+      (String.index_opt lang '-')
+      ~some:(fun i -> String.sub lang 0 i ^ ":")
+      ~none:""
   in
   let rec loop alt_version bol i =
     if i = String.length s then

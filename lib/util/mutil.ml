@@ -226,7 +226,7 @@ let arabian_of_roman s =
   let r, i = decode_digit 'C' 'D' 'M' r i in
   let r, i = decode_digit 'X' 'L' 'C' r i in
   let r, i = decode_digit 'I' 'V' 'X' r i in
-  if i = String.length s then r else raise Not_found
+  Ext_option.return_if (i = String.length s) (fun () -> r)
 
 let compile_particles list =
   let parts =

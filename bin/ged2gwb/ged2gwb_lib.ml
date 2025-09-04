@@ -528,8 +528,7 @@ let date_value = Grammar.Entry.create date_g "date value"
 let date_interval = Grammar.Entry.create date_g "date interval"
 let date_value_recover = Grammar.Entry.create date_g "date value"
 
-let is_roman_int x =
-  try let _ = Mutil.arabian_of_roman x in true with Not_found -> false
+let is_roman_int x = Option.is_some @@ Mutil.arabian_of_roman x
 
 let start_with_int x =
   try let s = String.sub x 0 1 in let _ = int_of_string s in true with
@@ -537,7 +536,10 @@ let start_with_int x =
 
 let roman_int =
   let p =
-    parser [< '("ID", x) when is_roman_int x >] -> Mutil.arabian_of_roman x
+    parser [< '("ID", x) >] ->
+      match Mutil.arabian_of_roman x with
+      | None -> raise Stream.Failure
+      | Some i -> i
   in
   Grammar.Entry.of_parser date_g "roman int" p
 
@@ -760,9 +762,13 @@ EXTEND
   ;
   int:
     [ [ i = INT ->
-          (try int_of_string i with Failure _ -> raise Stream.Failure)
+          (match int_of_string_opt i with
+           | Some i -> i
+           | None -> raise Stream.Failure)
       | "-"; i = INT ->
-          (try (- int_of_string i) with  Failure _ -> raise Stream.Failure) ] ]
+          (match int_of_string_opt i with
+           | Some i -> - i
+           | None -> raise Stream.Failure) ] ]
   ;
 END
 [@@@ocaml.warning "+27"]
@@ -823,8 +829,9 @@ let add_string gen ?format s =
        let s = Html.text_content s in
        if s = "" then "x" else s
   in
-  try Hashtbl.find gen.g_hstr s
-  with Not_found ->
+  match Hashtbl.find_opt gen.g_hstr s with
+  | Some i -> i
+  | None ->
     let i = gen.g_str.tlen in
     assume_tab gen.g_str "";
     gen.g_str.arr.(i) <- s;
@@ -834,8 +841,8 @@ let add_string gen ?format s =
 
 let extract_addr addr =
   if String.length addr > 0 && addr.[0] = '@' then
-    try let r = String.index_from addr 1 '@' in String.sub addr 0 (r + 1) with
-      Not_found -> addr
+    let r = String.index_from_opt addr 1 '@' in
+    Option.fold r ~some:(fun r -> String.sub addr 0 (r + 1)) ~none:addr
   else addr
 
 (* Output Pindex in file *)
@@ -844,8 +851,9 @@ let output_pindex i str =
 
 let per_index gen lab =
   let lab = extract_addr lab in
-  try Hashtbl.find gen.g_hper lab
-  with Not_found ->
+  match Hashtbl.find_opt gen.g_hper lab with
+  | Some i -> i
+  | None ->
     let i = gen.g_per.tlen in
     assume_tab gen.g_per (Def.Left "");
     gen.g_per.arr.(i) <- Def.Left lab;
@@ -856,8 +864,9 @@ let per_index gen lab =
 
 let fam_index gen lab =
   let lab = extract_addr lab in
-  try Hashtbl.find gen.g_hfam lab
-  with Not_found ->
+  match Hashtbl.find_opt gen.g_hfam lab with
+  | Some i -> i
+  | None ->
     let i = gen.g_fam.tlen in
     assume_tab gen.g_fam (Def.Left "");
     gen.g_fam.arr.(i) <- Def.Left lab;
@@ -1005,8 +1014,8 @@ let capitalize_name = aux Name.title
 let uppercase_name = aux Utf8.uppercase
 
 let get_lev0 (strm__ : _ Stream.t) =
-  let _ = line_start '0' strm__ in
-  let _ =
+  let () = line_start '0' strm__ in
+  let () =
     try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   let r1 =
@@ -1029,7 +1038,7 @@ let get_lev0 (strm__ : _ Stream.t) =
    rpos = !state.line_cnt; rused = false}
 
 let find_notes_record gen addr =
-  match try Some (Hashtbl.find gen.g_not addr) with Not_found -> None with
+  match Hashtbl.find_opt gen.g_not addr with
     Some i ->
       seek_in gen.g_ic i;
       begin try Some (get_lev0 (Stream.of_channel gen.g_ic)) with
@@ -1038,7 +1047,7 @@ let find_notes_record gen addr =
   | None -> None
 
 let find_sources_record gen addr =
-  match try Some (Hashtbl.find gen.g_src addr) with Not_found -> None with
+  match Hashtbl.find_opt gen.g_src addr with
     Some i ->
       seek_in gen.g_ic i;
       begin try Some (get_lev '0' (Stream.of_channel gen.g_ic)) with
@@ -1082,7 +1091,7 @@ let rebuild_text r =
   let s = strip_spaces r.rval in
   List.fold_left
     (fun s e ->
-       let _ = e.rused <- true in
+       let () = e.rused <- true in
        let n = e.rval in
        let end_spc =
          if String.length n > 1 && n.[String.length n - 1] = ' ' then " "
@@ -1159,7 +1168,10 @@ let source gen r =
 
 let p_index_from s i c =
   if i >= String.length s then String.length s
-  else try String.index_from s i c with Not_found -> String.length s
+  else
+    match String.index_from_opt s i c with
+    | Some i -> i
+    | None -> String.length s
 
 let strip_sub s beg len = strip_spaces (String.sub s beg len)
 
@@ -1171,12 +1183,13 @@ let decode_title s =
     if i1 = String.length s then "", 0
     else if i2 = String.length s then
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
-      try "", int_of_string s1 with Failure _ -> s1, 0
+      Option.fold (int_of_string_opt s1) ~some:(fun i -> ("", i)) ~none:(s1, 0)
     else
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
       let s2 = strip_sub s (i2 + 1) (String.length s - i2 - 1) in
-      try s1, int_of_string s2 with
-        Failure _ -> strip_sub s i1 (String.length s - i1), 0
+      match int_of_string_opt s2 with
+      | Some i -> s1, i
+      | None -> strip_sub s i1 (String.length s - i1), 0
   in
   title, place, nth
 
@@ -1735,8 +1748,9 @@ let add_indi gen r =
       let s = applycase_surname s in
       let r =
         let key = Name.strip_lower (Mutil.nominative f ^ " " ^ Mutil.nominative s) in
-        try Hashtbl.find gen.g_hnam key
-        with Not_found ->
+        match Hashtbl.find_opt gen.g_hnam key with
+        | Some r -> r
+        | None ->
           let r = ref (-1) in
           Hashtbl.add gen.g_hnam key r ;
           r
@@ -2540,7 +2554,7 @@ let add_fam_norm gen r adop_list =
       let p = { p with notes = new_notes } in
       gen.g_per.arr.(iper) <- Def.Right (p, a, u)
   in
-  let _ =
+  let () =
     if ext_notes = "" then ()
     else begin add_in_person_notes fath; add_in_person_notes moth end
   in
@@ -2594,7 +2608,10 @@ let treat_header2 r =
         let vs = String.split_on_char '.' r.rval in
         begin match vs with
         | major::_ ->
-           let is_major_post7 = (try int_of_string major >= 7 with _ -> false) in
+           let is_major_post7 =
+             Option.fold
+               (int_of_string_opt major) ~some:(fun v -> v >= 7) ~none:false
+           in
            if is_major_post7 then !state.charset_option <- Some Utf8;
         | _ -> ();
         end
@@ -2667,8 +2684,8 @@ let sort_by_date proj array =
 
 let find_lev0 (strm__ : _ Stream.t) =
   let bp = Stream.count strm__ in
-  let _ = line_start '0' strm__ in
-  let _ =
+  let () = line_start '0' strm__ in
+  let () =
     try skip_space strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   let r1 =
@@ -2677,7 +2694,7 @@ let find_lev0 (strm__ : _ Stream.t) =
   let r2 =
     try get_ident 0 strm__ with Stream.Failure -> raise (Stream.Error "")
   in
-  let _ =
+  let () =
     try skip_to_eoln strm__ with Stream.Failure -> raise (Stream.Error "")
   in
   bp, r1, r2

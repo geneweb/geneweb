@@ -919,13 +919,13 @@ let tablify phony no_optim no_group d =
       let t =
         if no_group && not (has_phony_children phony d t) then t
         else
-          let _ = if no_optim then () else equilibrate t in
-          let _ = group_elem t in
-          let _ = group_ghost t in
-          let _ = group_children t in
-          let _ = group_span_by_common_children d t in
+          let () = if no_optim then () else equilibrate t in
+          let () = group_elem t in
+          let () = group_ghost t in
+          let () = group_children t in
+          let () = group_span_by_common_children d t in
           let t = if no_optim then t else treat_gaps t in
-          let _ = group_span_last_row t in
+          let () = group_span_last_row t in
           t
       in
       loop t
@@ -1408,5 +1408,5 @@ let table_of_dag phony no_optim invert no_group d =
   let d = if invert then invert_dag d else d in
   let t = tablify phony no_optim no_group d in
   let t = if invert then invert_table t else t in
-  let _ = fall t in
+  let () = fall t in
   fall2_right t |> fall2_left |> shorten_too_long |> top_adjust |> bottom_adjust

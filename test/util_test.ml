@@ -57,8 +57,8 @@ let ext_string_split_on_char () =
 
 let mutil_arabian_romian () =
   let test a r =
-    (Alcotest.check Alcotest.int)
-      "arabian_of_roman" a (Mutil.arabian_of_roman r);
+    (Alcotest.check @@ Alcotest.option Alcotest.int)
+      "arabian_of_roman" (Some a) (Mutil.arabian_of_roman r);
     (Alcotest.check Alcotest.string)
       "roman_of_arabian" r (Mutil.roman_of_arabian a)
   in

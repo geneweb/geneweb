@@ -114,8 +114,8 @@ let misc_notes_link s i =
                   with Not_found ->
                     ("", String.sub b (l + 1) (String.length b - l - 1))
                 in
-                let oc1 = try int_of_string name with Failure _ -> -1 in
-                let oc = try int_of_string oc with Failure _ -> 0 in
+                let oc1 = Option.value (int_of_string_opt name) ~default:(-1) in
+                let oc = Option.value (int_of_string_opt oc) ~default:0 in
                 if oc1 = -1 then (fn, sn, oc, name)
                 else (fn, sn, oc1, fn ^ " " ^ sn)
               with Not_found ->

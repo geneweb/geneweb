@@ -57,7 +57,7 @@ let merge_events l1 l2 p =
                       epers_witnesses = witnesses;
                     }
                   in
-                  let _ = found_birth := true in
+                  let () = found_birth := true in
                   (true, e1 :: l1)
                 else (mem, e1 :: l1)
             | Epers_Baptism ->
@@ -76,7 +76,7 @@ let merge_events l1 l2 p =
                       epers_witnesses = witnesses;
                     }
                   in
-                  let _ = found_baptism := true in
+                  let () = found_baptism := true in
                   (true, e1 :: l1)
                 else (mem, e1 :: l1)
             | Epers_Death ->
@@ -102,7 +102,7 @@ let merge_events l1 l2 p =
                       epers_witnesses = witnesses;
                     }
                   in
-                  let _ = found_death := true in
+                  let () = found_death := true in
                   if is_dead then (true, e1 :: l1) else (true, l1)
                 else (mem, e1 :: l1)
             | Epers_Burial ->
@@ -110,7 +110,7 @@ let merge_events l1 l2 p =
                 else if e.epers_name = e1.epers_name then
                   match p.burial with
                   | UnknownBurial ->
-                      let _ = found_burial := true in
+                      let () = found_burial := true in
                       (true, l1)
                   | Buried cd ->
                       let witnesses =
@@ -127,10 +127,10 @@ let merge_events l1 l2 p =
                           epers_witnesses = witnesses;
                         }
                       in
-                      let _ = found_burial := true in
+                      let () = found_burial := true in
                       (true, e1 :: l1)
                   | _ ->
-                      let _ = found_burial := true in
+                      let () = found_burial := true in
                       (mem, e1 :: l1)
                 else (mem, e1 :: l1)
             | Epers_Cremation ->
@@ -138,7 +138,7 @@ let merge_events l1 l2 p =
                 else if e.epers_name = e1.epers_name then
                   match p.burial with
                   | UnknownBurial ->
-                      let _ = found_burial := true in
+                      let () = found_burial := true in
                       (true, l1)
                   | Cremated cd ->
                       let witnesses =
@@ -155,10 +155,10 @@ let merge_events l1 l2 p =
                           epers_witnesses = witnesses;
                         }
                       in
-                      let _ = found_burial := true in
+                      let () = found_burial := true in
                       (true, e1 :: l1)
                   | _ ->
-                      let _ = found_burial := true in
+                      let () = found_burial := true in
                       (mem, e1 :: l1)
                 else (mem, e1 :: l1)
             | _ -> (mem, e1 :: l1))

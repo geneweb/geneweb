@@ -145,7 +145,9 @@ let make_indexer a b =
   let htb = Hashtbl.create (10 * Array.length b) in
   Array.iteri
     (fun i e ->
-      try b.(i) <- Hashtbl.find htb e with Not_found -> Hashtbl.add htb e e)
+      match Hashtbl.find_opt htb e with
+      | Some v -> b.(i) <- v
+      | None -> Hashtbl.add htb e e)
     b;
   let ai = Array.make n 0 in
   let k =
@@ -153,12 +155,14 @@ let make_indexer a b =
       if i = n then k
       else
         let k =
-          try
-            a.(i) <- Hashtbl.find htb a.(i);
-            (* line found (since "Not_found" not raised) *)
-            ai.(k) <- i;
-            k + 1
-          with Not_found -> k
+          Option.fold
+            (Hashtbl.find_opt htb a.(i))
+            ~some:(fun v ->
+              a.(i) <- v;
+              (* line found (since "Not_found" not raised) *)
+              ai.(k) <- i;
+              k + 1)
+            ~none:k
         in
         loop (i + 1) k
     in

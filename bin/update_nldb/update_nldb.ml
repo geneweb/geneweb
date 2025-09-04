@@ -191,4 +191,4 @@ let main () =
     flush stderr;
     ()
 
-let _ = Printexc.print main ()
+let () = Printexc.print main ()

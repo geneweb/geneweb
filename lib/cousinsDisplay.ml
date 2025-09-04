@@ -287,8 +287,10 @@ let print_cousins conf base p lev1 lev2 =
       Output.print_sstring conf (string_of_int lev2))
   in
   let max_cnt =
-    try int_of_string (List.assoc "max_cousins" conf.Config.base_env)
-    with Not_found | Failure _ -> default_max_cnt
+    Option.value ~default:default_max_cnt
+      (Option.bind
+         (List.assoc_opt "max_cousins" conf.Config.base_env)
+         int_of_string_opt)
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<div>";

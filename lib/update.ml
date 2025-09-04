@@ -420,7 +420,7 @@ let delete_topological_sort_v conf _base =
   Files.rm tstab_file
 
 let delete_topological_sort conf base =
-  let _ = delete_topological_sort_v conf base in
+  let () = delete_topological_sort_v conf base in
   let bfile = GWPARAM.bpath (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab" in
   Files.rm tstab_file
@@ -958,9 +958,9 @@ let bad_date conf d =
   Output.print_string conf (string_of_error conf err)
 
 let int_of_field s =
-  match int_of_string (String.trim s) with
-  | exception Failure _ -> None
-  | x -> if x <> 0 then Some x else None
+  Option.bind
+    (int_of_string_opt (String.trim s))
+    (fun x -> Ext_option.return_if (x <> 0) (fun () -> x))
 
 let reconstitute_date_dmy2 conf var =
   let m =

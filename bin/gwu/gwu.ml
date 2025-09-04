@@ -43,4 +43,4 @@ let main () =
   let opts = !opts in
   Gwu_lib.gwu_simple ~export_isolated:!isolated opts
 
-let _ = Printexc.catch main ()
+let () = Printexc.catch main ()

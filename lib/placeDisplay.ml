@@ -75,8 +75,7 @@ let print_aux conf title fn =
 let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
     ~add_burial ~add_marriage =
   let inverted =
-    try List.assoc "places_inverted" conf.Config.base_env = "yes"
-    with Not_found -> false
+    List.assoc_opt "places_inverted" conf.Config.base_env = Some "yes"
   in
   let array =
     Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
@@ -127,8 +126,7 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
     else function x :: _ when x = ini -> true | _ -> false
   in
   let inverted =
-    try List.assoc "places_inverted" conf.Config.base_env = "yes"
-    with Not_found -> false
+    List.assoc_opt "places_inverted" conf.Config.base_env = Some "yes"
   in
   let array =
     Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
@@ -203,10 +201,10 @@ let print_all_places_surnames conf base =
       | None -> (
           try
             let lim =
-              try
-                int_of_string
-                @@ List.assoc "short_place_threshold" conf.Config.base_env
-              with _ -> 500
+              Option.value ~default:500
+                (Option.bind
+                   (List.assoc_opt "short_place_threshold" conf.Config.base_env)
+                   int_of_string_opt)
             in
             print_all_places_surnames_long conf base "" ~add_birth ~add_baptism
               ~add_death ~add_burial ~add_marriage lim

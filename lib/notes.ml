@@ -82,10 +82,9 @@ let notes_links_db conf base eliminate_unlinked =
         if record_it then
           List.fold_left
             (fun db2 s ->
-              try
-                let list = List.assoc s db2 in
-                (s, pg :: list) :: List.remove_assoc s db2
-              with Not_found -> (s, [ pg ]) :: db2)
+              match List.assoc_opt s db2 with
+              | Some list -> (s, pg :: list) :: List.remove_assoc s db2
+              | None -> (s, [ pg ]) :: db2)
             db2 sl
         else db2)
       [] db
@@ -110,7 +109,7 @@ let notes_links_db conf base eliminate_unlinked =
          if Hashtbl.mem mark s then loop sl
          else (
            Hashtbl.add mark s ();
-           let sl1 = try Hashtbl.find misc s with Not_found -> [] in
+           let sl1 = Option.value (Hashtbl.find_opt misc s) ~default:[] in
            loop (List.rev_append sl1 sl))
      | [] -> ()
    in

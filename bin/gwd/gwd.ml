@@ -295,7 +295,7 @@ let unauth_server conf ar =
   Geneweb.Output.status conf Def.Unauthorized;
   if !use_auth_digest_scheme then
     let nonce = digest_nonce conf.ctime in
-    let _ =
+    let () =
       let tm = Unix.localtime (Unix.time ()) in
       trace_auth conf.base_env (fun oc ->
           Printf.fprintf oc
@@ -373,17 +373,17 @@ let gen_match_auth_file test_user_and_password auth_file =
       | au :: aul ->
           if test_user_and_password au then
             let s =
-              try
-                let i = String.index au.Geneweb.Util.au_info ':' in
-                String.sub au.Geneweb.Util.au_info 0 i
-              with Not_found -> ""
+              Option.fold
+                (String.index_opt au.Geneweb.Util.au_info ':')
+                ~some:(fun i -> String.sub au.Geneweb.Util.au_info 0 i)
+                ~none:""
             in
             let username =
-              try
-                let i = String.index s '/' in
-                let len = String.length s in
-                String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
-              with Not_found -> s
+              Option.fold (String.index_opt s '/')
+                ~some:(fun i ->
+                  let len = String.length s in
+                  String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1))
+                ~none:s
             in
             Some username
           else loop aul
@@ -596,7 +596,9 @@ let allowed_denied_titles key extra_line env base_env () =
 
 let allowed_titles env =
   let extra_line =
-    try List.assoc "extra_title" env with Not_found -> Adef.encoded ""
+    match List.assoc_opt "extra_title" env with
+    | Some extra_title -> extra_title
+    | None -> Adef.encoded ""
   in
   allowed_denied_titles "allowed_titles_file" extra_line env
 
@@ -606,7 +608,7 @@ let parse_digest s =
   let rec parse_main (strm__ : _ Stream.t) =
     match try Some (ident strm__) with Stream.Failure -> None with
     | Some s ->
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         let kvl =
@@ -650,7 +652,7 @@ let parse_digest s =
     match Stream.peek strm__ with
     | Some ',' ->
         Stream.junk strm__;
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         let kv =
@@ -679,13 +681,13 @@ let parse_digest s =
         let v =
           try string 0 strm__ with Stream.Failure -> raise (Stream.Error "")
         in
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         v
     | _ ->
         let v = any_val 0 strm__ in
-        let _ =
+        let () =
           try spaces strm__ with Stream.Failure -> raise (Stream.Error "")
         in
         v
@@ -710,16 +712,20 @@ let parse_digest s =
 let basic_authorization from_addr request base_env passwd access_type utm
     base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
+    Option.value
+      (List.assoc_opt "wizard_passwd" base_env)
+      ~default:!wizard_passwd
   in
   let wizard_passwd_file =
-    try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
+    Option.value (List.assoc_opt "wizard_passwd_file" base_env) ~default:""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
+    Option.value
+      (List.assoc_opt "friend_passwd" base_env)
+      ~default:!friend_passwd
   in
   let friend_passwd_file =
-    try List.assoc "friend_passwd_file" base_env with Not_found -> ""
+    Option.value (List.assoc_opt "friend_passwd_file" base_env) ~default:""
   in
   let passwd1 =
     let auth = Mutil.extract_param "authorization: " '\r' request in
@@ -891,16 +897,20 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz =
 
 let digest_authorization request base_env passwd utm base_file command =
   let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with Not_found -> !wizard_passwd
+    Option.value
+      (List.assoc_opt "wizard_passwd" base_env)
+      ~default:!wizard_passwd
   in
   let wizard_passwd_file =
-    try List.assoc "wizard_passwd_file" base_env with Not_found -> ""
+    Option.value (List.assoc_opt "wizard_passwd_file" base_env) ~default:""
   in
   let friend_passwd =
-    try List.assoc "friend_passwd" base_env with Not_found -> !friend_passwd
+    Option.value
+      (List.assoc_opt "friend_passwd" base_env)
+      ~default:!friend_passwd
   in
   let friend_passwd_file =
-    try List.assoc "friend_passwd_file" base_env with Not_found -> ""
+    Option.value (List.assoc_opt "friend_passwd_file" base_env) ~default:""
   in
   let command = if !Wserver.cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
@@ -927,12 +937,12 @@ let digest_authorization request base_env passwd utm base_file command =
         | None -> "POST"
         | Some _ -> "GET"
       in
-      let _ =
+      let () =
         trace_auth base_env (fun oc ->
             Printf.fprintf oc "\nauth = \"%s\"\n" auth)
       in
       let digenv = parse_digest auth in
-      let get_digenv s = try List.assoc s digenv with Not_found -> "" in
+      let get_digenv s = Option.value (List.assoc_opt s digenv) ~default:"" in
       let ds =
         {
           Geneweb.Config.ds_username = get_digenv "username";
@@ -947,7 +957,7 @@ let digest_authorization request base_env passwd utm base_file command =
         }
       in
       let nonce = digest_nonce utm in
-      let _ =
+      let () =
         trace_auth base_env (fun oc ->
             Printf.fprintf oc
               "\n\
@@ -1136,10 +1146,10 @@ let make_conf from_addr request script_name env =
     get_client_preferences request @ Geneweb.Util.read_base_env ~bname:base_file
   in
   let default_lang =
-    try
-      let x = List.assoc "default_lang" base_env in
-      if x = "" then !default_lang else x
-    with Not_found -> !default_lang
+    Option.fold
+      (List.assoc_opt "default_lang" base_env)
+      ~some:(fun x -> if x = "" then !default_lang else x)
+      ~none:!default_lang
   in
   let lexicon_lang = if lang = "" then default_lang else lang in
   let lexicon = load_lexicon lexicon_lang in
@@ -1152,25 +1162,19 @@ let make_conf from_addr request script_name env =
   in
   let wizard_just_friend =
     if !wizard_just_friend then true
-    else
-      try List.assoc "wizard_just_friend" base_env = "yes"
-      with Not_found -> false
+    else List.assoc_opt "wizard_just_friend" base_env = Some "yes"
   in
-  let is_rtl =
-    try Hashtbl.find lexicon " !dir" = "rtl" with Not_found -> false
-  in
+  let is_rtl = Hashtbl.find_opt lexicon " !dir" = Some "rtl" in
   let manitou =
     try
       ar.ar_wizard && ar.ar_user <> ""
       && Geneweb.Util.p_getenv env "manitou" <> Some "off"
-      && List.assoc "manitou" base_env = ar.ar_user
+      && List.assoc_opt "manitou" base_env = Some ar.ar_user
     with Not_found -> false
   in
   let supervisor =
-    try
-      ar.ar_wizard && ar.ar_user <> ""
-      && List.assoc "supervisor" base_env = ar.ar_user
-    with Not_found -> false
+    ar.ar_wizard && ar.ar_user <> ""
+    && List.assoc_opt "supervisor" base_env = Some ar.ar_user
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
   let dates_format =
@@ -1179,8 +1183,10 @@ let make_conf from_addr request script_name env =
     Option.value ~default:Geneweb.Config.DMY df_opt
   in
   let default_contemporary_private_years =
-    try int_of_string (List.assoc "default_contemporary_private_years" base_env)
-    with _ -> 100
+    Option.value ~default:100
+      (Option.bind
+         (List.assoc_opt "default_contemporary_private_years" base_env)
+         int_of_string_opt)
   in
   let conf =
     {
@@ -1202,40 +1208,32 @@ let make_conf from_addr request script_name env =
       default_lang;
       default_sosa_ref;
       authorized_wizards_notes =
-        (try List.assoc "authorized_wizards_notes" base_env = "yes"
-         with Not_found -> false);
-      public_if_titles =
-        (try List.assoc "public_if_titles" base_env = "yes"
-         with Not_found -> false);
+        List.assoc_opt "authorized_wizards_notes" base_env = Some "yes";
+      public_if_titles = List.assoc_opt "public_if_titles" base_env = Some "yes";
       public_if_no_date =
-        (try List.assoc "public_if_no_date" base_env = "yes"
-         with Not_found -> false);
+        List.assoc_opt "public_if_no_date" base_env = Some "yes";
       setup_link = !setup_link;
       access_by_key =
-        (try List.assoc "access_by_key" base_env = "yes"
-         with Not_found -> ar.ar_wizard && ar.ar_friend);
+        (match List.assoc_opt "access_by_key" base_env with
+        | Some access_by_key -> access_by_key = "yes"
+        | None -> ar.ar_wizard && ar.ar_friend);
       private_years =
-        (try int_of_string (List.assoc "private_years" base_env)
-         with Not_found | Failure _ -> 150);
+        Option.value ~default:150
+          (Option.bind
+             (List.assoc_opt "private_years" base_env)
+             int_of_string_opt);
       default_contemporary_private_years;
       hide_private_names =
-        (try List.assoc "hide_private_names" base_env = "yes"
-         with Not_found -> false);
+        List.assoc_opt "hide_private_names" base_env = Some "yes";
       use_restrict =
         (if ar.ar_wizard || ar.ar_friend then false
-        else
-          try List.assoc "use_restrict" base_env = "yes"
-          with Not_found -> false);
+        else List.assoc_opt "use_restrict" base_env = Some "yes");
       no_image =
         (if ar.ar_wizard || ar.ar_friend then false
-        else
-          try List.assoc "no_image_for_visitor" base_env = "yes"
-          with Not_found -> false);
+        else List.assoc_opt "no_image_for_visitor" base_env = Some "yes");
       no_note =
         (if ar.ar_wizard || ar.ar_friend then false
-        else
-          try List.assoc "no_note_for_visitor" base_env = "yes"
-          with Not_found -> false);
+        else List.assoc_opt "no_note_for_visitor" base_env = Some "yes");
       bname = base_file;
       env;
       senv = [];
@@ -1256,10 +1254,11 @@ let make_conf from_addr request script_name env =
       left = (if is_rtl then "right" else "left");
       right = (if is_rtl then "left" else "right");
       auth_file =
-        (try
-           let x = List.assoc "auth_file" base_env in
-           if x = "" then !auth_file else Geneweb.GWPARAM.bpath x
-         with Not_found -> !auth_file);
+        Option.fold
+          (List.assoc_opt "auth_file" base_env)
+          ~some:(fun x ->
+            if x = "" then !auth_file else Geneweb.GWPARAM.bpath x)
+          ~none:!auth_file;
       border =
         (match Geneweb.Util.p_getint env "border" with
         | Some i -> i
@@ -1435,8 +1434,9 @@ let conf_and_connection =
             else
               let auth_type =
                 let x =
-                  try List.assoc "auth_file" conf.base_env
-                  with Not_found -> ""
+                  Option.value
+                    (List.assoc_opt "auth_file" conf.base_env)
+                    ~default:""
                 in
                 if x = "" then "GeneWeb service" else "database " ^ conf.bname
               in
@@ -1760,12 +1760,7 @@ let null_reopen flags fd =
   Unix.close fd2
 
 let geneweb_server () =
-  let auto_call =
-    try
-      let _ = Sys.getenv "WSERVER" in
-      true
-    with Not_found -> false
-  in
+  let auto_call = Option.is_some @@ Sys.getenv_opt "WSERVER" in
   if not auto_call then (
     let hostn =
       match !selected_addr with
@@ -1819,10 +1814,10 @@ let geneweb_cgi addr script_name contents =
   (try Unix.mkdir (Filename.concat !Geneweb.Util.cnt_dir "cnt") 0o755
    with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
-    try
-      let v = Sys.getenv x in
-      if v = "" then raise Not_found else (k ^ ": " ^ v) :: request
-    with Not_found -> request
+    Option.value
+      (Option.bind (Sys.getenv_opt x) (fun v ->
+           Ext_option.return_if (v <> "") (fun () -> (k ^ ": " ^ v) :: request)))
+      ~default:request
   in
   let request = [] in
   let request = add "cookie" "HTTP_COOKIE" request in
@@ -1935,14 +1930,14 @@ let arg_plugins opt doc =
         | GwdPluginDep.Sorted deps ->
             List.iter
               (fun pname ->
-                try
-                  let s = Hashtbl.find deps_ht pname in
-                  if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
-                  if force then forced_plugins := !forced_plugins @ [ pname ];
-                  plugins := !plugins @ [ s ]
-                with Not_found ->
-                  raise
-                    (Register_plugin_failure (pname, `string "Missing plugin")))
+                match Hashtbl.find_opt deps_ht pname with
+                | Some s ->
+                    if unsafe then unsafe_plugins := !unsafe_plugins @ [ s ];
+                    if force then forced_plugins := !forced_plugins @ [ pname ];
+                    plugins := !plugins @ [ s ]
+                | None ->
+                    raise
+                      (Register_plugin_failure (pname, `string "Missing plugin")))
               deps),
     arg_plugin_doc opt doc )
 
@@ -2088,10 +2083,10 @@ let main () =
   let speclist = Arg.align speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   (default_lang :=
-     let s = try Sys.getenv "LANG" with Not_found -> "" in
+     let s = Option.value (Sys.getenv_opt "LANG") ~default:"" in
      if List.mem s Geneweb.Version.available_languages then s
      else
-       let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+       let s = Option.value (Sys.getenv_opt "LC_CTYPE") ~default:"" in
        if String.length s >= 2 then
          let s = String.sub s 0 2 in
          if List.mem s Geneweb.Version.available_languages then s else "en"
@@ -2119,26 +2114,31 @@ let main () =
     List.fold_left Filename.concat !Geneweb.Util.cnt_dir
       [ "cnt"; "STOP_SERVER" ];
   let query, cgi =
-    try (Sys.getenv "QUERY_STRING" |> Adef.encoded, true)
-    with Not_found -> ("" |> Adef.encoded, !force_cgi)
+    match Sys.getenv_opt "QUERY_STRING" with
+    | Some query -> (Adef.encoded query, true)
+    | None -> ("" |> Adef.encoded, !force_cgi)
   in
   if cgi then (
     Wserver.cgi := true;
     let query =
       if Sys.getenv_opt "REQUEST_METHOD" = Some "POST" then (
         let len =
-          try int_of_string (Sys.getenv "CONTENT_LENGTH") with Not_found -> -1
+          Option.value ~default:(-1)
+            (Option.bind (Sys.getenv_opt "CONTENT_LENGTH") int_of_string_opt)
         in
         set_binary_mode_in stdin true;
         read_input len |> Adef.encoded)
       else query
     in
     let addr =
-      try Sys.getenv "REMOTE_HOST"
-      with Not_found -> ( try Sys.getenv "REMOTE_ADDR" with Not_found -> "")
+      match Sys.getenv_opt "REMOTE_HOST" with
+      | Some addr -> addr
+      | None -> Option.value (Sys.getenv_opt "REMOTE_ADDR") ~default:""
     in
     let script =
-      try Sys.getenv "SCRIPT_NAME" with Not_found -> Sys.argv.(0)
+      match Sys.getenv_opt "SCRIPT_NAME" with
+      | Some script -> script
+      | None -> Sys.argv.(0)
     in
     geneweb_cgi addr (Filename.basename script) query)
   else geneweb_server ()

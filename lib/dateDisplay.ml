@@ -13,7 +13,7 @@ let get_wday conf = function
   | _ -> ""
 
 let death_symbol conf =
-  try List.assoc "death_symbol" conf.Config.base_env with Not_found -> "†"
+  Option.value (List.assoc_opt "death_symbol" conf.Config.base_env) ~default:"†"
 
 let code_date conf encoding d m y =
   let apply_date_code = function

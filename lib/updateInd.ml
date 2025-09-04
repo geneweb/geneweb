@@ -29,7 +29,7 @@ type 'a value =
   | Vnone
 
 let bind x v e = (x, v) :: e
-let get_env x e = try List.assoc x e with Not_found -> Vnone
+let get_env x e = Option.value (List.assoc_opt x e) ~default:Vnone
 
 let nth_pevent n e =
   match get_env "pevents" e with
@@ -255,8 +255,7 @@ and eval_simple_var conf env p = function
   | "relation" :: sl ->
       let r =
         match get_env "cnt" env with
-        | Vint i -> (
-            try Some (List.nth p.rparents (i - 1)) with Failure _ -> None)
+        | Vint i -> List.nth_opt p.rparents (i - 1)
         | _ -> None
       in
       eval_relation_var r sl
@@ -266,8 +265,7 @@ and eval_simple_var conf env p = function
   | "title" :: sl ->
       let t =
         match get_env "cnt" env with
-        | Vint i -> (
-            try Some (List.nth p.titles (i - 1)) with Failure _ -> None)
+        | Vint i -> List.nth_opt p.titles (i - 1)
         | _ -> None
       in
       eval_title_var t sl

@@ -103,7 +103,7 @@ let merge_events conf l1 l2 =
                         efam_witnesses = witnesses;
                       }
                     in
-                    let _ = found_marriage := true in
+                    let () = found_marriage := true in
                     (true, e1 :: l1)
                   else (mem, e1 :: l1)
               | Efam_Annulation | Efam_Divorce | Efam_Separated ->
@@ -131,7 +131,7 @@ let merge_events conf l1 l2 =
                         efam_witnesses = witnesses;
                       }
                     in
-                    let _ = found_marriage := true in
+                    let () = found_marriage := true in
                     (true, e1 :: l1)
                   else (mem, e1 :: l1)
               | _ -> (mem, e1 :: l1)

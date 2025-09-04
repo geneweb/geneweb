@@ -354,14 +354,12 @@ let base_strings_of_first_name _base _str = assert false
 let base_strings_of_surname _base _str = assert false
 
 module Collection = struct
-  let opt_map o f = match o with Some v -> Some (f v) | None -> None
-
   type 'a t = { length : int; get : int -> 'a option }
 
   let length c = c.length
 
   let map f c =
-    let get i = opt_map (c.get i) f in
+    let get i = Option.map f (c.get i) in
     let length = c.length in
     { length; get }
 
@@ -369,7 +367,7 @@ module Collection = struct
     let rec aux i =
       if i = c.length then ()
       else
-        let _ = opt_map (c.get i) (f i) in
+        let _ = Option.map (f i) (c.get i) in
         aux (i + 1)
     in
     aux 0
@@ -491,8 +489,9 @@ let open_base bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  try Hashtbl.find base_store bname
-  with Not_found -> raise (Invalid_argument bname)
+  match Hashtbl.find_opt base_store bname with
+  | Some b -> b
+  | None -> raise (Invalid_argument bname)
 
 let make bname _particles
     ((persons, ascends, unions), (families, couples, descends), strings, _) =

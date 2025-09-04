@@ -1,9 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 let limit_by_tree conf =
-  match List.assoc_opt "max_desc_tree" conf.Config.base_env with
-  | None -> 4
-  | Some x -> ( try max 1 (int_of_string x) with _ -> 4)
+  Option.fold
+    (Option.bind
+       (List.assoc_opt "max_desc_tree" conf.Config.base_env)
+       int_of_string_opt)
+    ~some:(max 1) ~none:4
 
 let max_children = 100
 

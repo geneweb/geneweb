@@ -86,7 +86,7 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
       match magic with
       | Some m when check_magic m ic ->
           let r = Some (read ic) in
-          let _ = seek_in ic (in_channel_length ic - String.length m) in
+          let () = seek_in ic (in_channel_length ic - String.length m) in
           assert (check_magic m ic);
           r
       | Some _ -> None
@@ -105,7 +105,7 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
       (match magic with Some m -> seek_out oc (String.length m) | None -> ());
       let v = write oc in
       flush oc;
-      let _ = seek_out oc (out_channel_length oc) in
+      let () = seek_out oc (out_channel_length oc) in
       (match magic with Some m -> output_string oc m | None -> ());
       (match magic with
       | Some m ->

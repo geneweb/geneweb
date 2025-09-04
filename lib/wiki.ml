@@ -31,12 +31,12 @@ let notes_aliases conf =
         | Some s ->
             let list =
               (* S: is it replacable by `String.split_on_char ' '` s? *)
-              try
-                let i = String.index s ' ' in
-                ( String.sub s 0 i,
-                  String.sub s (i + 1) (String.length s - i - 1) )
-                :: list
-              with Not_found -> list
+              Option.fold (String.index_opt s ' ')
+                ~some:(fun i ->
+                  ( String.sub s 0 i,
+                    String.sub s (i + 1) (String.length s - i - 1) )
+                  :: list)
+                ~none:list
             in
             loop list
         | None ->
@@ -46,7 +46,7 @@ let notes_aliases conf =
       loop []
   | None -> []
 
-let map_notes aliases f = try List.assoc f aliases with Not_found -> f
+let map_notes aliases f = Option.value (List.assoc_opt f aliases) ~default:f
 let fname_of_path (dirs, file) = List.fold_right Filename.concat dirs file
 
 let str_start_with str i x =
@@ -768,11 +768,8 @@ let insert_sub_part s v sub_part =
 
 (* TODO: simplify with Str *)
 let rec find_env s i =
-  match
-    try Some (String.index_from s i '=', String.index_from s i '\n')
-    with Not_found -> None
-  with
-  | Some (j, k) ->
+  match (String.index_from_opt s i '=', String.index_from_opt s i '\n') with
+  | Some j, Some k ->
       if j > i && j < k then
         let is_key =
           let rec loop i =
@@ -788,19 +785,19 @@ let rec find_env s i =
           ((key, v) :: env, i)
         else ([], i)
       else ([], i)
-  | None -> ([], i)
+  | None, None | None, Some _ | Some _, None -> ([], i)
 
 let split_title_and_text s =
   let env, i = find_env s 0 in
   let s = if i = 0 then s else String.sub s i (String.length s - i) in
-  if (try List.assoc "TITLE" env with Not_found -> "") = "" then
+  if Option.value (List.assoc_opt "TITLE" env) ~default:"" = "" then
     let tit, txt =
-      try
-        let i = String.index s '\n' in
-        let tit = String.sub s 0 i in
-        let txt = String.sub s (i + 1) (String.length s - i - 1) in
-        (tit, txt)
-      with Not_found -> (s, "")
+      Option.fold (String.index_opt s '\n')
+        ~some:(fun i ->
+          let tit = String.sub s 0 i in
+          let txt = String.sub s (i + 1) (String.length s - i - 1) in
+          (tit, txt))
+        ~none:(s, "")
     in
     let tit, txt =
       if
@@ -828,7 +825,7 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   let title, s =
     if v = 0 && title_is_1st then
       let env, s = split_title_and_text s in
-      ((try List.assoc "TITLE" env with Not_found -> ""), s)
+      (Option.value (List.assoc_opt "TITLE" env) ~default:"", s)
     else ("", s)
   in
   let lines, _ = lines_list_of_string s in

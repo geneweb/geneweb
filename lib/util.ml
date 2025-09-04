@@ -132,11 +132,14 @@ let nth_field w n =
 let tnf s = "[" ^ s ^ "]"
 
 let transl conf w =
-  try Hashtbl.find conf.Config.lexicon w with Not_found -> tnf w
+  match Hashtbl.find_opt conf.Config.lexicon w with
+  | Some s -> s
+  | None -> tnf w
 
 let transl_nth conf w n =
-  try nth_field (Hashtbl.find conf.Config.lexicon w) n
-  with Not_found -> tnf (nth_field w n)
+  match Hashtbl.find_opt conf.Config.lexicon w with
+  | Some s -> nth_field s n
+  | None -> tnf (nth_field w n)
 
 let gen_decline_basic wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
@@ -549,7 +552,9 @@ let submit_input conf k v =
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
-  try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
+  try
+    Option.bind (p_getenv env label) (fun s ->
+        int_of_string_opt (String.trim s))
   with Failure _ -> None
 
 let nobtit conf base p =
@@ -1071,19 +1076,19 @@ let include_template conf env fname failure =
   | None -> failure ()
 
 let body_prop conf =
-  try
-    match List.assoc "body_prop" conf.Config.base_env with
-    | "" -> ""
-    | s -> " " ^ s
-  with Not_found -> ""
+  match List.assoc_opt "body_prop" conf.Config.base_env with
+  | None | Some "" -> ""
+  | Some s -> " " ^ s
 
 let get_request_string conf =
   if not conf.Config.cgi then
     Option.value ~default:""
       (Mutil.extract_param "GET " ' ' conf.Config.request)
   else
-    let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
-    let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
+    let script_name = Option.value (Sys.getenv_opt "SCRIPT_NAME") ~default:"" in
+    let query_string =
+      Option.value (Sys.getenv_opt "QUERY_STRING") ~default:""
+    in
     script_name ^ "?" ^ query_string
 
 let message_to_wizard conf =
@@ -1275,53 +1280,54 @@ let string_with_macros ?(with_links_target_attribute = true) ~conf ~env str =
     if i < String.length str then
       if i + 1 < String.length str && str.[i] = '%' then
         let i =
-          try
-            Buffer.add_string buff (List.assoc str.[i + 1] env ());
-            i + 2
-          with Not_found -> (
-            match str.[i + 1] with
-            | 's' ->
-                Buffer.add_string buff (commd conf :> string);
-                i + 2
-            | 'v' ->
-                let k, vl, j = get_variable str (i + 2) in
-                let v, i =
-                  let v =
-                    try
-                      let v = List.assoc ("var_" ^ k) conf.Config.base_env in
-                      Some (expand_env conf v)
-                    with Not_found -> None
-                  in
-                  match v with
-                  | Some s ->
-                      let s =
-                        let rec loop vl len i =
-                          if i = String.length s then Buff.get len
-                          else if
-                            i + 1 < String.length s
-                            && s.[i] = '%'
-                            && s.[i + 1] = 's'
-                          then
-                            match vl with
-                            | v :: vl -> loop vl (Buff.mstore len v) (i + 2)
-                            | [] ->
-                                Buff.get len
-                                ^ String.sub s i (String.length s - i)
-                          else loop vl (Buff.store len s.[i]) (i + 1)
+          match List.assoc_opt str.[i + 1] env with
+          | Some f ->
+              Buffer.add_string buff (f ());
+              i + 2
+          | None -> (
+              match str.[i + 1] with
+              | 's' ->
+                  Buffer.add_string buff (commd conf :> string);
+                  i + 2
+              | 'v' ->
+                  let k, vl, j = get_variable str (i + 2) in
+                  let v, i =
+                    let v =
+                      try
+                        let v = List.assoc ("var_" ^ k) conf.Config.base_env in
+                        Some (expand_env conf v)
+                      with Not_found -> None
+                    in
+                    match v with
+                    | Some s ->
+                        let s =
+                          let rec loop vl len i =
+                            if i = String.length s then Buff.get len
+                            else if
+                              i + 1 < String.length s
+                              && s.[i] = '%'
+                              && s.[i + 1] = 's'
+                            then
+                              match vl with
+                              | v :: vl -> loop vl (Buff.mstore len v) (i + 2)
+                              | [] ->
+                                  Buff.get len
+                                  ^ String.sub s i (String.length s - i)
+                            else loop vl (Buff.store len s.[i]) (i + 1)
+                          in
+                          loop vl 0 0
                         in
-                        loop vl 0 0
-                      in
-                      (s, j)
-                  | None -> ("%", i + 1)
-                in
-                Buffer.add_string buff v;
-                i
-            | '%' ->
-                Buffer.add_string buff "%";
-                i + 2
-            | _ ->
-                Buffer.add_string buff "%";
-                i + 1)
+                        (s, j)
+                    | None -> ("%", i + 1)
+                  in
+                  Buffer.add_string buff v;
+                  i
+              | '%' ->
+                  Buffer.add_string buff "%";
+                  i + 2
+              | _ ->
+                  Buffer.add_string buff "%";
+                  i + 1)
         in
         loop tt i
       else
@@ -1858,8 +1864,9 @@ let commit_patches conf base =
       conf.Config.henv;
   if conf.Config.user <> "" then
     let wpf =
-      try List.assoc "wizard_passwd_file" conf.Config.base_env
-      with Not_found -> ""
+      Option.value
+        (List.assoc_opt "wizard_passwd_file" conf.Config.base_env)
+        ~default:""
     in
     if wpf <> "" then
       let fname = adm_file (conf.Config.bname ^ "_u.txt") in
@@ -1899,7 +1906,9 @@ let read_gen_auth_file fname =
             | Some i ->
                 let user = String.sub line 0 i in
                 let j =
-                  try String.index_from line (i + 1) ':' with Not_found -> len
+                  Option.value
+                    (String.index_from_opt line (i + 1) ':')
+                    ~default:len
                 in
                 let passwd = String.sub line (i + 1) (j - i - 1) in
                 let rest =
@@ -2221,24 +2230,24 @@ let record_visited conf ip =
     let ht = read_visited conf in
     let time = sprintf_today conf in
     let () =
-      try
-        let vl = Hashtbl.find ht conf.Config.user in
-        let vl = (ip, time) :: vl in
-        (* On rend la liste unique sur les ip. *)
-        let uniq = function
-          | ([ _ ] | []) as l -> l
-          | ((ip, _) as x) :: l ->
-              let rec loop rl x = function
-                | ((ip2, _) as y) :: l ->
-                    if ip = ip2 then loop rl x l else loop (x :: rl) y l
-                | [] -> List.rev (x :: rl)
-              in
-              loop [] x l
-        in
-        let vl = uniq vl in
-        let vl = Ext_list.take vl 10 in
-        Hashtbl.replace ht conf.Config.user vl
-      with Not_found -> Hashtbl.add ht conf.Config.user [ (ip, time) ]
+      match Hashtbl.find_opt ht conf.Config.user with
+      | Some vl ->
+          let vl = (ip, time) :: vl in
+          (* On rend la liste unique sur les ip. *)
+          let uniq = function
+            | ([ _ ] | []) as l -> l
+            | ((ip, _) as x) :: l ->
+                let rec loop rl x = function
+                  | ((ip2, _) as y) :: l ->
+                      if ip = ip2 then loop rl x l else loop (x :: rl) y l
+                  | [] -> List.rev (x :: rl)
+                in
+                loop [] x l
+          in
+          let vl = uniq vl in
+          let vl = Ext_list.take vl 10 in
+          Hashtbl.replace ht conf.Config.user vl
+      | None -> Hashtbl.add ht conf.Config.user [ (ip, time) ]
     in
     write_visited conf ht
 
