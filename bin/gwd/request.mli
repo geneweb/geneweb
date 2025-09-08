@@ -6,9 +6,8 @@ val w_base :
   Geneweb.Config.config ->
   string option ->
   'a
-(** [w_lock ~none callback conf base]
-    Acquire a write lock on the base and call [callback], or fail with [none].
-*)
+(** [w_lock ~none callback conf base] Acquire a write lock on the base and call
+    [callback], or fail with [none]. *)
 
 val w_lock :
   onerror:(Geneweb.Config.config -> string option -> 'a) ->
@@ -16,9 +15,8 @@ val w_lock :
   Geneweb.Config.config ->
   string option ->
   'a
-(** [w_lock ~onerror callback conf base]
-    Acquire a write lock on the base and call the callback, or fail with [onerror].
-*)
+(** [w_lock ~onerror callback conf base] Acquire a write lock on the base and
+    call the callback, or fail with [onerror]. *)
 
 val w_person :
   none:(Geneweb.Config.config -> Gwdb.base -> 'a) ->
@@ -26,9 +24,8 @@ val w_person :
   Geneweb.Config.config ->
   Gwdb.base ->
   'a
-(** [w_person ~none callback conf base]
-    Find a person in environement and call [callback], or fail with [none].
-*)
+(** [w_person ~none callback conf base] Find a person in environement and call
+    [callback], or fail with [none]. *)
 
 (**/**)
 
@@ -38,6 +35,14 @@ val treat_request : Geneweb.Config.config -> unit
 (**/**)
 
 (**/**)
+
+val person_selected_with_redirect :
+  conf:Geneweb.Config.config ->
+  base:Gwdb.base ->
+  ?parameters:(string * string) list ->
+  person:Gwdb.person ->
+  unit ->
+  unit
 
 (* Used by v7 plugin *)
 val incorrect_request : Geneweb.Config.config -> unit

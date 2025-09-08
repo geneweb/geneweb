@@ -31,23 +31,19 @@ val default_opts : gwexport_opts
 val speclist : gwexport_opts ref -> (Arg.key * Arg.spec * Arg.doc) list
 (** Given a set of options, returns default command line arguments for selecting
     elements from a base. The output of this function is the first input of
-    Arg.parse.
-*)
+    Arg.parse. *)
 (* Used for gwd2ged and gwu. *)
 
 val anonfun : gwexport_opts ref -> Arg.anon_fun
-(** [anonfun opts = fun base_name -> ...]
-    Given a set of options `opts` where `!opts.base` is uninitialized,
-    opens the dir `base_name` and initializes !opts.base with the base name.
-    The output of this function is the second argument of Arg.parse.
-*)
+(** [anonfun opts = fun base_name -> ...] Given a set of options `opts` where
+    `!opts.base` is uninitialized, opens the dir `base_name` and initializes
+    !opts.base with the base name. The output of this function is the second
+    argument of Arg.parse. *)
 (* Arg.anon_fun = string -> unit *)
 
 val errmsg : Arg.usage_msg
-(** Default error message.
-    This is the third argument of Arg.parse. *)
+(** Default error message. This is the third argument of Arg.parse. *)
 
 val select : gwexport_opts -> (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
-(** [select opts]
-    Return filters for [iper] and [ifam] to be used when exporting a (portion of a) base.
-*)
+(** [select opts] Return filters for [iper] and [ifam] to be used when exporting
+    a (portion of a) base. *)

@@ -133,17 +133,17 @@ let specify conf base n pl =
       Geneweb.Output.print_string conf
         (Geneweb.DateDisplay.short_dates_text conf base p);
       (if Geneweb.Person.is_visible conf base p then
-       match Gwdb.get_first_names_aliases p with
-       | [] -> ()
-       | fnal ->
-           Geneweb.Output.print_sstring conf "\n<em>(";
-           Ext_list.iter_first
-             (fun first fna ->
-               if not first then Geneweb.Output.print_sstring conf ", ";
-               Gwdb.sou base fna |> Geneweb.Util.escape_html
-               |> Geneweb.Output.print_string conf)
-             fnal;
-           Geneweb.Output.print_sstring conf ")</em>");
+         match Gwdb.get_first_names_aliases p with
+         | [] -> ()
+         | fnal ->
+             Geneweb.Output.print_sstring conf "\n<em>(";
+             Ext_list.iter_first
+               (fun first fna ->
+                 if not first then Geneweb.Output.print_sstring conf ", ";
+                 Gwdb.sou base fna |> Geneweb.Util.escape_html
+                 |> Geneweb.Output.print_string conf)
+               fnal;
+             Geneweb.Output.print_sstring conf ")</em>");
       let spouses =
         Array.fold_right
           (fun ifam spouses ->
@@ -182,14 +182,23 @@ let person_selected conf base p =
       Geneweb.Util.record_visited conf (Gwdb.get_iper p);
       Geneweb.Perso.print conf base p
 
-let person_selected_with_redirect conf base p =
+let person_selected_with_redirect ~conf ~base ?(parameters = []) ~person () =
   match Geneweb.Util.p_getenv conf.Geneweb.Config.senv "em" with
-  | Some "R" -> relation_print conf base p
+  | Some "R" -> relation_print conf base person
   | Some _ -> incorrect_request conf
   | None ->
       let open Def in
-      Wserver.http_redirect_temporarily
-        (Geneweb.Util.commd conf ^^^ Geneweb.Util.acces conf base p :> string)
+      let url =
+        (Geneweb.Util.commd conf ^^^ Geneweb.Util.acces conf base person
+          :> string)
+      in
+      let url =
+        List.fold_left
+          (fun url (param_name, param_value) ->
+            Printf.sprintf "%s&%s=%s" url param_name param_value)
+          url parameters
+      in
+      Wserver.http_redirect_temporarily url
 
 let updmenu_print = Geneweb.Perso.interp_templ "updmenu"
 
@@ -477,21 +486,21 @@ let treat_request =
         let m = Option.value ~default:"" (Geneweb.Util.p_getenv conf.env "m") in
         if not @@ try_plugin plugins conf bfile m then
           ((if List.assoc_opt "counter" conf.base_env <> Some "no" then
-            match
-              if only_special_env conf.env then
-                Geneweb.SrcfileDisplay.incr_welcome_counter conf
-              else Geneweb.SrcfileDisplay.incr_request_counter conf
-            with
-            | Some (welcome_cnt, request_cnt, start_date) ->
-                Log.log (fun oc ->
-                    let thousand oc x =
-                      output_string oc @@ Mutil.string_of_int_sep "," x
-                    in
-                    Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
-                      thousand
-                      (welcome_cnt + request_cnt)
-                      thousand welcome_cnt start_date)
-            | None -> ());
+              match
+                if only_special_env conf.env then
+                  Geneweb.SrcfileDisplay.incr_welcome_counter conf
+                else Geneweb.SrcfileDisplay.incr_request_counter conf
+              with
+              | Some (welcome_cnt, request_cnt, start_date) ->
+                  Log.log (fun oc ->
+                      let thousand oc x =
+                        output_string oc @@ Mutil.string_of_int_sep "," x
+                      in
+                      Printf.fprintf oc
+                        "  #accesses %a (#welcome %a) since %s\n" thousand
+                        (welcome_cnt + request_cnt)
+                        thousand welcome_cnt start_date)
+              | None -> ());
            let incorrect_request conf _ = incorrect_request conf in
            match m with
            | "" ->
@@ -519,15 +528,15 @@ let treat_request =
                else
                  w_base
                    (if only_special_env conf.env then
-                    Geneweb.SrcfileDisplay.print_start
-                   else
-                     w_person @@ fun conf base p ->
-                     match Geneweb.Util.p_getenv conf.env "ptempl" with
-                     | Some t
-                       when List.assoc_opt "ptempl" conf.base_env = Some "yes"
-                       ->
-                         Geneweb.Perso.interp_templ t conf base p
-                     | _ -> person_selected conf base p)
+                      Geneweb.SrcfileDisplay.print_start
+                    else
+                      w_person @@ fun conf base p ->
+                      match Geneweb.Util.p_getenv conf.env "ptempl" with
+                      | Some t
+                        when List.assoc_opt "ptempl" conf.base_env = Some "yes"
+                        ->
+                          Geneweb.Perso.interp_templ t conf base p
+                      | _ -> person_selected conf base p)
            | "A" -> Geneweb.Perso.print_ascend |> w_person |> w_base
            | "ADD_FAM" -> w_wizard @@ w_base @@ Geneweb.UpdateFam.print_add
            | "ADD_FAM_OK" ->
@@ -561,7 +570,6 @@ let treat_request =
                    Geneweb.BirthdayDisplay.print_marriage conf base
                      (int_of_string x)
                | _ -> Geneweb.BirthdayDisplay.print_menu_marriage conf base)
-           | "AS_OK" -> w_base @@ Geneweb.AdvSearchOkDisplay.print
            | "C" -> w_base @@ w_person @@ Geneweb.CousinsDisplay.print
            | "CAL" -> fun conf _ -> Geneweb.Hutil.print_calendar conf
            | "CHG_CHN" when conf.wizard ->
@@ -719,7 +727,9 @@ let treat_request =
                            sosa_acc
                            || Gutil.person_of_string_key base n <> None
                            || person_is_std_key conf base p n
-                         then person_selected_with_redirect conf base p
+                         then
+                           person_selected_with_redirect ~conf ~base ~person:p
+                             ()
                          else specify conf base n pl
                      | pl -> specify conf base n pl
                    in

@@ -111,7 +111,7 @@ let fix_pevents ~report base pp =
               (if e.epers_date = Date.cdate_None then date else e.epers_date);
             epers_place =
               (if e.epers_place = Gwdb.empty_string then place
-              else e.epers_place);
+               else e.epers_place);
             epers_reason = e.epers_reason;
             epers_note =
               (if e.epers_note = Gwdb.empty_string then note else e.epers_note);
@@ -349,7 +349,7 @@ let fix_family_divorce ~report ~base ~family =
     (relation', marriage', marriage_place', marriage_note', marriage_src')
   in
   let ( ((relation, marriage, marriage_place, marriage_note, marriage_src) as
-        marriage_data),
+         marriage_data),
         divorce,
         _ ) =
     UpdateFamOk.reconstitute_from_fevents false
