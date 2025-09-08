@@ -86,6 +86,8 @@
               digestif
               pcre2
               alcotest
+              qcheck
+              qcheck-alcotest
               ojs
               js_of_ocaml
               js_of_ocaml-ppx
