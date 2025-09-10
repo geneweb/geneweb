@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwdiff.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Compute the difference between two bases]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Compute the difference between two bases]</h1>
+</div>
+<form method=GET action="gwdiff">
+<input type=hidden name=opt value="check">
+<input type=hidden name=lang value="%l">
+<table>
+<tr>
+<td>
+<ul><li>
+[Select your first database][:]
+<p>
+<table class="setup">
+%b{<tr align=left>
+<td><input type=radio name=anon1 value="%a">   </td>
+<td>%a</td></tr>|
+<tr align=left><td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>[Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>]
+%(
+Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parame
+ter</span>
+%)
+</td></tr>
+<tr align=left><td>[First name]
+</td>
+<td><input name="a1" size=30 maxlength=200></td>
+<td>[Num]
+</td>
+<td><input name="a2" size=5 maxlength=8></td></tr>
+
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="a3" size=40 maxlength=200></td></tr>
+</table>
+</ul>
+</td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+<td>
+<ul><li>
+[Select your second database][:]
+<p>
+<table class="setup">
+%b{<tr align=left>
+<td><input type=radio name=anon2 value="%a">   </td>
+<td>%a</td></tr>|
+}
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
+[Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>]
+</td></tr>
+<tr align=left><td>[First name]
+</td>
+<td><input name="b1" size=30 maxlength=200></td>
+<td>[Num]
+</td>
+<td><input name="b2" size=5 maxlength=8></td></tr>
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="b3" size=40 maxlength=200></td></tr>
+</table>
+</ul>
+</td>
+</tr>
+</table>
+<p>
+<li>
+[Select the options you want][:]
+<p>
+<dl><dt><dd><table class="setup">
+<tr align=left>
+<td><input type=checkbox name=ad value="on">-ad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td>[Checks descendants of all ascendants.]
+</td>
+</tr>
+</table></dl>
+<dl><dt><dd><table class="setup">
+<tr align=left>
+<td><input type=checkbox name=d value="on">-d &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td>[Checks descendants (default).]
+</td>
+</tr>
+</table></dl>
+<dl><dt><dd><table class="setup">
+<tr align=left>
+<td><input type=checkbox name=mem value="on">-mem &nbsp;</td>
+<td>[Save memory space during operation (but it will be slower).]
+</td>
+</tr>
+</table></dl>
+<!--
+<p>
+<dl><dt><dd><table class="setup">
+<tr align="left">
+<td>
+<label for="o">-o&nbsp;
+<input type="input" name="o" size="20" maxlength="50" style="padding-left:4px"></label>&nbsp;&nbsp;[Output results to this file.]
+</td>
+</tr>
+</table></dl>-->
+<p>
+<li>
+[Then click on this button][:]
+<input type=submit value="[Compare]">
+</ul>
+</form>

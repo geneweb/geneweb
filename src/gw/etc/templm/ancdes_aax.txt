@@ -1,0 +1,85 @@
+<!-- $Id: templm/ancdes_aax.txt v7.0 2014/11/22 21:42:28 $ -->
+
+%include;ancdes_stat
+
+%( age at spouse birth date by generation tf1/tl1 = aax %)
+
+%define;stat_a2()
+  <table class="title" width="100%%"><tr>
+    %if;(evar.m = "A")
+      <td>[*generation/generations]0</td>
+    %end;
+    <td align="center">[*age at %s birth date:::x]</td>
+    <td align="right">[*date of birth]</td>
+  </tr></table>
+%end;
+
+%define;anc_a()
+  <div class="stat2 bcbg1">
+    %apply;stat_a2()
+    %foreach;ancestor_level(l_v)
+      %empty_sorted_list;
+      %reset_count;
+      %if;(level > 1 and (evar.only != "on" or level = l_v))
+        %foreach;ancestor;
+          %if;(ancestor.is_male and ancestor.same = "")
+            %if;(ancestor.birth_date.year != "" and ancestor.spouse.birth_date.year != "")
+              %let;l1;%ancestor.birth_date.year;%in;
+              %let;l2;%ancestor.spouse.birth_date.year;%in;
+              %if;(l1 >= l2)
+                %let;l3;%expr(l1 - l2)%in;
+                %incr_count;
+                %apply;add_in_sorted_list(l1,l3,ancestor.spouse.sex,ancestor.spouse.index)
+              %elseif;(l1 < l2)
+                %let;l3;%expr(l2 - l1)%in;
+                %incr_count;
+                %apply;add_in_sorted_list(l2,l3,ancestor.sex,ancestor.index)
+              %end;
+            %end;
+          %end;
+        %end;
+        %apply;stat2()
+      %end;
+    %end;
+  </div>
+%end;
+
+%define;des_a2(curlev, maxlev)
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev)
+      %family.set_infinite_desc_level;
+      %if;(birth_date.year != "" and spouse.birth_date.year != "")
+        %let;a;%birth_date.year;%in;
+        %let;b;%spouse.birth_date.year;%in;
+        %incr_count;
+        %if;(a >= b)
+          %let;l_age;%expr(a - b)%in;
+          %apply;add_in_sorted_list(a,l_age,spouse.sex,spouse.index)
+        %elseif;(a < b)
+          %let;l_age;%expr(b - a)%in;
+          %apply;add_in_sorted_list(b,l_age,sex,index)
+        %end;
+      %end;
+      %if;(has_children)
+        %foreach;child;
+          %apply;des_a2(curlev+1, maxlev)
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%( main %)
+%apply;togen()
+%if;(evar.m = "A")
+  %apply;anc_a()
+%else;
+  <div class="stat2 bcbg1">
+    %apply;stat_a2()
+    %reset_desc_level;
+    %reset_count;
+    %empty_sorted_list;
+    %apply;des_a2(0,l_v)
+    %apply;stat2()
+  </div>
+%end;

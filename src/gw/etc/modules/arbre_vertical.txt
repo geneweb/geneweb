@@ -1,0 +1,273 @@
+<!-- $Id: modules/arbre_vertical.txt v7.1 04/03/2023 10:39:16 $ -->
+%( Arbre ascendant vertical %)
+
+%define;a_tree_line()
+  %if;(not is_first)
+    <tr>
+      %foreach;cell;
+        %if;(not is_first)
+          <td></td>
+        %end;
+        <td colspan="%cell.colspan;" class="text-center py-0 mx-0">%nn;
+          %if;(cell.is_empty or cell.is_top)%else;│%end;
+        </td>
+      %end;
+    </tr>
+  %end;
+  <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td></td>
+      %end;
+      <td colspan="%expr(cell.colspan)" class="text-center align-bottom p-0 fix_size">%nn;
+        %if;(cell.is_empty)%nn;
+        %else;
+          %if;(e.im="" and (cell.person.has_image or cell.person.has_blason))
+            %if;(cell.person.has_image and cell.person.has_blason)
+              %if;not cancel_links;<a
+                href="%cell.person.blason_url;">%end;
+              <img class="rounded mb-1"
+                src="%cell.person.blason_url;"%nn;
+                %cell.person.blason_extra_small_size;%sp;%nn;
+                alt="[blason]0 " title="[blason]0">%nn;
+              %if;not cancel_links;</a>%end;
+            %end;
+            %if;not cancel_links;<a
+              href="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;">%end;
+            <img class="rounded mb-1"
+              src="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;"%nn;
+              %if;cell.person.has_image;%cell.person.image_small_size;%else;%cell.person.blason_small_size;%end;%sp;%nn;
+              alt="[image/images]0 " title="[image/images]0">%nn;
+            %if;not cancel_links;</a>%end;<br>
+          %end;
+          %( Checking if the ancestors are falsly alive by verifying three first generations (self/parents/grand-parents births)
+             + also cell.person birth and death + his cell.family.marriage + cell.family.”parents” infos too
+              we can’t do a single mark from bottom to mark upper cells because table %foreach;cell start at top rows %)
+          %let;self_parent_dead;
+            %if;(birth_date!="" and birth_date.year<today.year-120)1%end;
+            %if;has_parents;
+              %if;((father.birth_date!="" and father.birth_date.year<today.year-120)
+               or (mother.birth_date!="" and mother.birth_date.year<today.year-120))1%end;
+              %if;father.has_parents;
+                %if;((father.father.birth_date!="" and father.father.birth_date.year<today.year-120)
+                 or (father.mother.birth_date!="" and father.mother.birth_date.year<today.year-120))1%end;
+               %end;
+              %if;mother.has_parents;
+                %if;((mother.father.birth_date!="" and mother.father.birth_date.year<today.year-120)
+                 or (mother.mother.birth_date!="" and mother.mother.birth_date.year<today.year-120))1%end;
+               %end;
+            %end;
+          %in;
+          %let;cell_person_dead;
+            %if;(not cell.person.is_dead)
+              %if;(self_parent_dead!="")1%end;
+              %if;(cell.person.birth_date.year!="" and cell.person.birth_date.prec="")
+                %if;(cell.person.birth_date.year<today.year-120)1%end;%end;
+              %if;(cell.family.marriage_date.year!="" and cell.family.marriage_date.prec="")%if;(cell.family.marriage_date.year<today.year-100)1%end;%end;
+              %if;cell.person.has_parents;
+                %if;(cell.person.father!="")
+                  %if;(cell.person.father.birth_date.year!="" and cell.person.father.birth_date.prec="")%if;(cell.person.father.birth_date.year<today.year-135)1%end;%end;
+                  %if;(cell.person.father.is_dead and cell.person.father.death_date!="" and cell.person.father.death_date.prec="")%if;(cell.person.father.death_date.year<today.year-120)1%end;%end;
+                %end;
+                %if;(cell.person.mother!="")
+                  %if;(cell.person.mother.birth_date.year!="" and cell.person.mother.birth_date.prec="")%if;(cell.person.mother.birth_date.year<today.year-135)1%end;%end;
+                  %if;(cell.person.mother.is_dead and cell.person.mother.death_date!="" and cell.person.mother.death_date.prec="")%if;(cell.person.mother.death_date.year<today.year-120)1%end;%end;
+                %end;
+              %end;
+            %end;
+          %in;
+          %apply;short_display_person_tree("cell.person")%nn;
+          %if;(cell_person_dead!="" and cell.person!=self and cell.person!=self.mother and cell.person!=self.father)
+            <div class="text-danger" title="Please! Let me rest in peace!">†</div>
+          %end;
+          %if;cell.person.has_nobility_titles;%cell.person.title;%end;
+        %end;
+      </td>
+    %end;
+  </tr>
+  %if;(not is_last)
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td class="text-center py-0">%nn;
+        %if;cell.is_right;
+          %if;(e.ma!=0)
+            %if;(wizard and not cancel_links)
+              <a href="%prefix;m=MOD_FAM&i=%cell.family.index;&ip=%index;"
+            %else;
+              <span
+            %end;
+              %let;spouses_dead;%if;(not cell.family.mother.is_dead and not cell.family.father.is_dead and cell.family.marriage_date.year!="")%if;(today.year-cell.family.marriage_date.year>100)1%end;%end;%in;
+              class="small font-italic text-center text-nowrap%if;(spouses_dead=1) text-danger%end;"
+              title="%if;(cell.family.marriage_date.year!="" and ((not (cell.family.father.is_dead and cell.family.mother.is_dead)) or ("-" in cell.family.date_s and cell.family.sep_date_s!="" and cell.family.marriage_date.prec="")))
+                       %if;(cell.family.sep_date_s!="")
+                         %apply;a_of_b%with;%expr(cell.family.sep_date_s-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;%nn;
+                       %elseif;(cell.family.sep_date_s="" and not (("-" in cell.family.date_s) and cell.family.father.is_dead and cell.family.mother.is_dead))
+                         %apply;a_of_b%with;%expr(today.year-cell.family.marriage_date.year) [years old]%if;(spouses_dead=1) (?!)%end;%and;[relation/relations]0%end;
+                         %if;(spouses_dead=1)&#10;&#10;Please let both spouses rest in peace!%end;
+                       %end;%nn;
+                     %end;
+                     %if;(wizard and not cancel_links)
+                       &#10;&#10;%nn;
+                       %if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0
+                       %else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;
+                     %end;">%nn;
+            %if;(cell.family.marriage_date.year="")
+              -%nn;
+            %else;
+              %let;fw;%( first widow different cases %)
+                %if;(cell.family.father.death_date.year!="" and cell.family.father.death_date.prec=""
+                 and cell.family.mother.death_date.year!="" and cell.family.mother.death_date.prec="")
+                  %if;(cell.family.father.death_date.year-cell.family.mother.death_date.year=0)1%nn;
+                  %elseif;(cell.family.mother.death_date.year>cell.family.father.death_date.year)0%else;3%end;
+                %else;
+                  %if;(cell.family.father.death_date.year!="" and cell.family.father.death_date.prec="")
+                    %if;(cell.family.mother.death_date.year!="" and (cell.family.mother.death_date.prec="&#62;" or cell.family.mother.death_date.prec="?"))
+                      %if;(cell.family.mother.death_date.year>cell.family.father.death_date.year)0%else;3%end;
+                    %elseif;cell.family.mother.is_dead;2%else;5%end;
+                  %elseif;(cell.family.mother.death_date.year!="" and cell.family.mother.death_date.prec="")
+                    %if;(cell.family.father.death_date.year!="" and (cell.family.father.death_date.prec="&#62;" or cell.family.father.death_date.prec="?"))
+                      %if;(cell.family.father.death_date.year>cell.family.mother.death_date.year)3%else;0%end;
+                    %elseif;cell.family.father.is_dead;4%else;6%end;
+                  %end;
+                %end;
+              %in;
+              %let;widow_year;%( year of first death/widow %)
+                %if;(fw!="")
+                  %if;(fw<3 or fw=5)%cell.family.father.death_date.year;%nn;
+                  %elseif;(fw=3 or fw=4 or fw=6)%cell.family.mother.death_date.year;%nn;
+                  %end;
+                %end;
+              %in;
+              %let;widow_period;
+                %if;(fw!="")
+                  %if;(fw=0)%expr(cell.family.mother.death_date.year-cell.family.father.death_date.year)%nn;
+                  %elseif;(fw=3)%expr(cell.family.father.death_date.year-cell.family.mother.death_date.year)%nn;
+                  %elseif;(fw=5)%expr(today.year-cell.family.father.death_date.year)%nn;
+                  %elseif;(fw=6)%expr(today.year-cell.family.mother.death_date.year)%nn;
+                  %end;
+                %end;
+              %in;
+              %if;(fw!="" and (cell.family.date_s=cell.family.marriage_date.year)and cell.family.sep_date_s="")
+                 %( DEBUG %fw;|%widow_year;|%widow_period;<br> %)
+                <span class="small" style="font-size:8px;">%cell.family.date_s;</span>%nn;
+                <span style="font-size:8px;" class="%nn;
+                  %if;(not cancel_links)small%sp;
+                    %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
+                    %elseif;(fw=5 or fw=6)
+                      %if;(widow_period!="" and widow_period>100)text-danger%nn;
+                      %else;text-success%end;
+                    %end;
+                  %end;"
+                 title="%nn;
+                 %if;(widow_year!="")
+                   %if;(cell.family.marriage_date.year!="" and cell.family.marriage_date.prec="")
+                     %if;((fw=2 or fw=4) or ((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?")))[possibly (date)] %end;
+                     %apply;a_of_b%with;%expr(widow_year-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;
+                   %end;
+                 %end;
+                 %if;(widow_period!="")
+                   %apply;a_of_b%with;&#10;&#10;
+                     %if;(fw=0 or fw=5)%cell.family.mother;%else;%cell.family.father;%end;%sp;
+                     %if;(fw=0 or fw=5)[widower/widow]1%else;[widower/widow]0%end;%sp;
+                     %if;(fw=5 or fw=6)[for/since]1%else;[for/since]0%end;%sp;
+                     %if;((fw=0 and cell.family.mother.death_date.prec="&#62;")
+                       or (fw=3 and cell.family.father.death_date.prec="&#62;"))&#62;%end;
+                     %if;((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?"))[possibly (date)] %end;
+                     %if;(widow_period!="")%widow_period; %if;(widow_period=1)[year/month/day]0%else;[years old]%if;(widow_period>100) (?!)%end;%end;
+                     %end;
+                   %and;
+                     %if;(fw=0 or fw=5)%cell.family.father;%else;%cell.family.mother;%end;
+                   %end;
+                   %if;(widow_period>100)&#10;Please let both spouses rest in peace!%end;
+                 %end;">%if;(not ("-" in cell.family.date_s))-%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
+              %else;
+                %cell.family.date_s;
+                %end;
+            %end;
+            %if;(wizard and not cancel_links)</a>%elseif;friend;</span>%end;
+          %else;
+            
+          %end;
+        %else;
+        %end;
+        </td>
+      %end;
+      <td colspan="%expr(cell.colspan)" class="text-center py-0">%nn;
+        %if;cell.is_empty;
+        %elseif;(cell.person.has_parents and not cancel_links)
+          <a href="%prefix;%cell.person.access;%nn;
+            &m=%if;(e.m!="")%e.m;%else;A%end;%nn;
+            &t=%if;(e.t!="")%e.t;%else;T%end;%nn;
+            &v=%if;(e.v!="")%e.v;%else;3%end;%nn;
+            %if;(e.im=0)&im=0%end;%nn;
+            %if;(e.ma=0)&ma=0%end;"
+            title="[*navigation] [with] %cell.person;">│</a>%nn;
+        %else;│%nn;
+        %end;
+      </td>
+    %end;
+    </tr>
+    <tr>
+      %foreach;cell;
+        %if;(not is_first)
+          <td class="text-center px-0 py-0">%nn;
+          %if;(cell.is_right)<hr class="full">%nn;
+          %else;%end;
+          </td>
+        %end;
+        <td colspan="%cell.colspan;" class="px-0 py-0 text-%nn;
+           %if;cell.is_left;%right;
+           %elseif;cell.is_right;%left;
+           %else;center%end;">%nn;
+          %if;cell.is_empty;%nn;
+          %elseif;cell.is_left;<hr class="%right;">%nn;
+          %elseif;cell.is_right;<hr class="%left;">%nn;
+          %else;%(│%)%end;
+        </td>
+      %end;
+    </tr>
+  %end;
+%end;
+%( male/agnatic t=A and female/cognatic t=C lines %)
+%define;line(xx, vv)
+  %if;(vv>0)
+    %if;(xx.has_parents)
+      %apply;line%with;%if;(e.t="A")xx.father%else;xx.mother%end;%and;%expr(vv-1)%end;
+    %end;
+    %if;not cancel_links;<a href="%prefix;%xx.access">%end;%xx;
+    %if;not cancel_links;</a>%end;%xx.title;
+    %if;not cancel_links;<a href="%prefix;%xx.index">%end;<i>%xx.dates;</i>
+    %if;not cancel_links;</a>%end;
+    %if;(xx.has_image and e.im!=0)
+      <div>
+        %if;not cancel_links;<a href="%xx.image_html_url;">%end;
+        <img class="rounded" src="%xx.image_url;"%xx.image_small_size;
+          alt="[image/images]0 %xx;" title="[image/images]0">%nn;
+        %if;not cancel_links;</a>%end;
+      </div>
+    %end;
+    %if;(xx!=self)<div>|</div>%end;
+  %end;%nl;
+%end;
+%let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
+%if;has_parents;
+  %if;(e.t="T" and e.t1="m")
+    <div class="row mx-auto mt-2">
+      %include;modules/arbre_8gen
+    </div>
+  %elseif;(e.t="A" or e.t="C")
+    <div class="text-center col-6 mt-2">
+      %apply;line("self",e_v+1)
+    </div>
+  %else;
+    <div class="d-flex mt-2 mx-3%if;(e_v<3) justify-content-center col-6%end;">
+      <table class="tree-vert">
+        %foreach;ancestor_tree_line(e_v+1)
+          %apply;a_tree_line()
+        %end;
+      </table>
+    </div>
+  %end;
+%end;
+%include;buttons_dag

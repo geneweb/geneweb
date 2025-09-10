@@ -1,0 +1,41 @@
+<!-- $Id: css.txt v7.1 04/11/2023 04:28:54 $ -->
+%( Put here only properties that uses variables %)
+%if;(e.m="MISC_NOTES")
+<style>
+  li.folder { list-style-type: disc; list-style-image: url('%images_prefix;folder.png'); }
+  li.file { list-style-type: circle; list-style-image: url('%images_prefix;file.png'); }
+  li.parent { list-style-type: disc; list-style-image: url('%images_prefix;left.png'); }
+</style>
+%end;
+%if;(e.templ!="templ")
+  %if;(bvar.use_cdn="yes")
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+      integrity="sha256-+IZRbz1B6ee9mUx/ejmonK+ulIP5A5bLDd6v6NHqXnI=
+                 sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N
+                 sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w=="
+      crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"
+      integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=
+                 sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a
+                 sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+                 crossorigin="anonymous" referrerpolicy="no-referrer">
+    %if;(e.m="A" and e.t="")
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+        integrity="sha256-zaSoHBhwFdle0scfGEFUCwggPN7F+ip9XRglo8IWb4w=
+                   sha384-OXVF05DQEe311p6ohU11NwlnX08FzMCsyoXzGOaL+83dKAb3qS17yZJxESl8YrJQ
+                   sha512-aD9ophpFQ61nFZP6hXYu4Q/b/USW7rpLCQLX6Bi0WJHXNO7Js/fUENpBQf/+P4NtpzNX0jSgR5zVvPOJp+W2Kg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    %end;
+  %else;
+    <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=4.6.2">
+    <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
+    %if;(e.m="A" and e.t="")
+      <link rel="stylesheet" href="%etc_prefix;css/select2.min.css?version=4.1.0rc">
+    %end;
+  %end;
+%end;
+<link rel="stylesheet" href="%etc_prefix;css/css.css?hash=%apply;hash%with;%etc_prefix;css/css.css%end;">
+%if;(b.css_prop!="" and b.css_prop!="stylesheet")
+  <link rel="stylesheet" href="%etc_prefix;css/%bvar.css_prop;?hash=%apply;hash%with;%etc_prefix;css/%bvar.css_prop;%end;">
+%end;

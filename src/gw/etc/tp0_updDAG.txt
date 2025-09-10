@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>[*modify::tree]</title>
+  <meta name="robots" content="none"%/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%let;mid;%sp;class="align-middle"%in;
+%define;pline(znz,zocz,zfnz,zsnz,zbdz,zparamz)
+  <tr class="row_p"zparamz>
+    <td>
+      <i class="fa fa-plus row_add_before"></i>
+      <i class="fa fa-minus row_del"></i>
+    </td>
+    <td>
+      <i class="fa fa-up-long row_move_up"></i>
+      <i class="fa fa-down-long row_move_down"></i>
+    </td>
+    <td%mid;><input name="oc" class="form-control reset_bd_text" size="5" value="zocz"></td>
+    <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz"></td>
+    <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz"></td>
+    <td class="bd_text align-middle">zbdz</td>
+    <td%mid;><input name="t" class="form-control" size="30" value="ztz"></td>
+  </tr>
+%end;
+%define;sline(znz,zocz,zfnz,zsnz,zbdz,zsz,zparamz)
+  <tr class="row_s"zparamz>
+    <td>
+      <i class="fa fa-plus row_add_before"></i>
+      <i class="fa fa-minus row_del"></i>
+    </td>
+    <td>
+      <i class="fa fa-up-long row_move_up"></i>
+      <i class="fa fa-down-long row_move_down"></i>
+    </td>
+    <td class="n_p_oc align-middle">zocz</td>
+    <td class="n_p_oc align-middle">zfnz</td>
+    <td class="n_p_oc align-middle">zsnz</td>
+    <td class="n_p_oc align-middle">zbdz</td>
+    <td%mid;><input name="s" class="form-control reset_n_p_oc" size="30" value="zsz"</td>
+  </tr>
+%end;
+%define;one_p_line(zz)
+  %let;tmp;
+    %if;pvar.zz.has_birth_date;° %pvar.zz.slash_birth_date;
+    %elseif;pvar.zz.has_baptism_date; %pvar.zz.slash_baptism_date;
+    %end;
+    <br>
+    %if;pvar.zz.has_death_date;! %pvar.zz.slash_death_date;
+    %elseif;pvar.zz.has_burial_date;%pvar.zz.slash_burial_date;
+    %elseif;pvar.zz.has_cremation_date;%pvar.zz.slash_cremation_date;
+    %end;
+  %in;
+  %apply;pline("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, tmp, "")
+%end;
+%define;one_s_line(zz)
+  %if;(evar.szz != "")
+    %let;tmp;
+      %if;svar.zz.has_birth_date;° %svar.zz.slash_birth_date;
+      %elseif;svar.zz.has_baptism_date; %svar.zz.slash_baptism_date;
+      %end;
+      <br>
+      %if;svar.zz.has_death_date;† %svar.zz.slash_death_date;
+      %elseif;svar.zz.has_burial_date;%svar.zz.slash_burial_date;
+      %elseif;svar.zz.has_cremation_date;%svar.zz.slash_cremation_date;
+      %end;
+    %in;
+    %apply;sline("zz", svar.zz.occ, svar.zz.first_name, svar.zz.surname, tmp, evar.szz, "")
+  %end;
+%end;
+%define;one_svar(zz)
+  %if;(evar.izz != "" or evar.pzz != "")
+    %apply;one_p_line("zz")
+    %apply;one_s_line("zz")
+    %apply;one_svar(zz+1)
+  %elseif;(evar.szz != "" and "zz" != "1")
+    %apply;one_s_line("zz")
+    %apply;one_svar(zz+1)
+  %end;
+%end;
+%define;my_hidden(xx)
+  %if;(evar.xx!="")<input type="hidden" name="xx" value="%evar.xx;">%end;
+%end;
+<div class="container-fluid">
+<form id="upd" method="post" action="%action;">
+  <div class="d-flex justify-content-end m-2">
+    <div class="h2">[*add/clear/show/edit the graph]3</div>
+    <input type="submit" class="btn btn-primary ml-auto" value="OK">
+  </div>
+  %hidden;
+  <input type="hidden" name="m" value='DAG'>
+  %apply;my_hidden("spouse")
+  %apply;my_hidden("image")
+  %apply;my_hidden("bd")
+  %apply;my_hidden("new")
+  <table class="table table-hover table-sm">
+    <thead>
+      <tr>
+        <td></td><td></td><td>#</td>
+        <td%mid;>[*first name/first names]0</td>
+        <td%mid;>[*surname/surnames]0</td>
+        <td%mid;>[*birth]<br>[*death]</td>
+        <td%mid;>Sosa</td>
+      </tr>
+    </thead>
+    <tbody>
+      %apply;pline("", "", "", "", "", " id='template_line_p' style='display:none;'")
+      %apply;sline("", "", "", "", "", "", " id='template_line_s' style='display:none;'")
+      %apply;one_svar(1)
+      <tr class="last_row">
+       <td>
+        <span class="fa fa-user-plus row_add_p_before">
+        <br>
+        <span class="fa fa-plus row_add_s_before">
+       </td>
+       <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+    </tbody>
+  </table>
+</form>
+%if;(not cancel_links)
+  %include;trl
+  %include;copyr
+  %query_time;
+%end;
+</div>
+%include;js
+<script>
+$(document).on( "click", ".row_add_p_before", function() {
+  $(this).closest("tr").before( $("#template_line_p").clone().removeAttr("id").removeAttr("style").get(0) );
+  $(this).closest("tr").before( $("#template_line_s").clone().removeAttr("id").removeAttr("style").get(0) );
+});
+$(document).on( "click", ".row_add_s_before", function() {
+  $(this).closest("tr").before( $("#template_line_s").clone().removeAttr("id").removeAttr("style").get(0) );
+});
+$(document).on( "click", ".row_del", function() {
+  var row = $(this).closest( "tr" );
+  if( row.attr("class") == "row_p" ) {
+    var row_s_next = row.nextUntil( ".row_p,.last_row" );
+    row_s_next.each( function( index ) {
+      $(this).remove();
+    } );
+    row.remove();
+  } else { // row_s
+    if( row.prev().attr("class") == "row_s" ||
+        row.next().attr("class") == "row_s" ) {
+      row.remove();
+    }
+  }
+});
+$(document).on( "click", ".row_move_up", function() {
+  var row = $(this).closest( "tr" );
+  if( row.attr("class") == "row_s" ) {
+    if( row.index() >  2 &&      // The two first rows are templates
+        row.prev().attr("class") == "row_s" ) {
+      row.insertBefore( row.prev() );
+    }
+  } else { // row_p
+    if( row.index() >  3 ) {
+      var row_prev = row.prevAll(".row_p").first();
+      var row_s_next = row.nextUntil( ".row_p,.last_row" );
+      row.insertBefore( row_prev );
+      row_s_next.each( function( index ) {
+        $(this).insertAfter( row );
+      } );
+    }
+  }
+} );
+$(document).on( "click", ".row_move_down", function() {
+  var row = $(this).closest( "tr" );
+  if( row.attr("class") == "row_s" ) {
+    var row_next = row.next(".row_s");
+    if( 0 != row_next.length ) {
+      row.insertAfter( row_next );
+    }
+  } else { // row_p
+    var row_s_next = row.nextUntil( ".row_p,.last_row" );
+    var row_next = row.nextAll(".row_p,.last_row")[1];
+    if( typeof row_next !== "undefined" ) {
+      row.insertBefore( row_next );
+      row_s_next.each( function( index ) {
+        $(this).insertBefore( row_next );
+      } );
+    }
+  }
+});
+$(document).on( "change", ".reset_bd_text", function() {
+  $(this).closest( "tr" ).children( ".bd_text").html( "" );
+} );
+$(document).on( "change", ".reset_n_p_oc", function() {
+  $(this).closest( "tr" ).children( ".n_p_oc").html( "" );
+});
+$("#upd").submit( function() {
+  var gi = 1;
+
+  event.preventDefault();
+  $(this).find("tr").each( function( index ) {
+    if( $(this).attr("id") == "template_line_p" ||
+        $(this).attr("id") == "template_line_s" ) {
+      $(this).find( "input[name=oc]" ).prop("disabled", true);
+      $(this).find( "input[name=p]" ).prop("disabled", true);
+      $(this).find( "input[name=n]" ).prop("disabled", true);
+      $(this).find( "input[name=s]" ).prop("disabled", true);
+    } else {
+      $(this).find( "input[name=oc]" ).attr("name", "oc"+gi );
+      $(this).find( "input[name=p]" ).attr("name", "p"+gi );
+      $(this).find( "input[name=n]" ).attr("name", "n"+gi );
+      $(this).find( "input[name=s]" ).attr("name", "s"+gi );
+      if( $(this).hasClass("row_s") ) {
+        gi++;
+      }
+    }
+  });
+  $(this).unbind('submit').submit();
+});
+</script>
+</body>
+</html>

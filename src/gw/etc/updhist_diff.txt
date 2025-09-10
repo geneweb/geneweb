@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: updhist_diff.txt v7.1 10/01/2023 20:01:49 $ -->
+  <title>[*revision history]</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%include;home
+<div class="container">
+<script><!--
+
+function update_new () {
+  var input_new = $('input[type=radio][name=new]:checked').val(),
+      input_old = $('input[type=radio][name=old]:checked').val();
+  if (input_new >= input_old){
+    var tmp = parseInt(input_new) + 1;
+    $('input[type=radio][name=old][value='+input_old+']').prop('checked', false);
+    $('input[type=radio][name=old][value='+tmp+']').prop('checked', true);
+  }
+}
+
+function update_old () {
+  var input_new = $('input[type=radio][name=new]:checked').val(),
+      input_old = $('input[type=radio][name=old]:checked').val();
+  if (input_old <= input_new){
+    var tmp = parseInt(input_old) - 1;
+    $('input[type=radio][name=new][value='+input_new+']').prop('checked', false);
+    $('input[type=radio][name=new][value='+tmp+']').prop('checked', true);
+  }
+}
+--></script>
+
+<h1 class="text-center">
+  <a href="%prefix;%acces;">%person;</a>%nn;
+  %if;(evar.t = "SUM"), [revision history]
+  %else;<br>[difference between the two revisions]
+  %end;
+</h1>
+
+
+%define;no_diff(xx)
+  [*insufficient revision history for %s:::xx]
+%end;
+
+%define;print_summary()
+  <form method="GET" action="%action;">
+    <p>%hidden;</p>
+    <input type="hidden" name="m" value="HIST_DIFF"%/>
+    <input type="hidden" name="t" value="DIFF"%/>
+    <input type="hidden" name="f" value="%evar.f;"%/>
+    %if;(history_len >= 2)
+      <button type="submit" class="btn btn-outline-primary mb-2">[*compare selected revisions]</button>
+    %else;
+      %apply;no_diff(person)
+    %end;
+    <table class="table table-hover table-sm">
+      <tr class="text-center">
+        <th>[*compare]</th>
+        <th>[*date/dates]0</th>
+        <th>[*wizard/wizards/friend/friends/exterior]0</th>
+      </tr>
+      %foreach;history_line;
+        <tr>
+          <td %if;(line % 2 != 0) class="odd" %end;>
+            <div class="form-inline">
+              <input type="radio" class="form-control" name="old" value="%line;" onclick="update_old()" %if;(line = 0)style="visibility: hidden"%elseif;(line = 1)checked%end;%/>
+              <input type="radio" class="form-control ml-2" name="new" value="%line;" onclick="update_new()" %if;(line = 0)checked%elseif;(line = history_len - 1)style="visibility: hidden"%end;%/>
+            </div>
+          </td>
+          <td %if;(line % 2 != 0) class="odd" %end;>%apply;transl_date%with;%date;%end;</td>
+          <td %if;(line % 2 != 0) class="odd" %end;>%wizard;</td>
+        </tr>
+      %end;
+    </table>
+  </form>
+%end;
+
+%define;empty()
+  <tr>
+    <td colspan="3"></td>
+  </tr>
+%end;
+
+%define;print_diff_person()
+  %if;(before.first_name!=after.first_name or before.surname!=after.surname or before.occ!=after.occ)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*name]</th>
+      <td class="odd">%before.first_name;.%before.occ; %before.surname;</td>
+      <td class="odd">%after.first_name;.%after.occ; %after.surname;</td>
+    </tr>
+  %end;
+  %if;(before.sex!=after.sex)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*sex]</th>
+      <td class="odd">%before.sex;</td>
+      <td class="odd">%after.sex;</td>
+    </tr>
+  %end;
+  %if;(before.public_name!=after.public_name)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*public name]</th>
+      <td class="odd">%before.public_name;</td>
+      <td class="odd">%after.public_name;</td>
+    </tr>
+  %end;
+  %if;(before.image!=after.image)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*image/images]0</th>
+      <td class="odd">%before.image;</td>
+      <td class="odd">%after.image;</td>
+    </tr>
+  %end;
+  %if;(before.qualifiers!=after.qualifiers)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*qualifier]</th>
+      <td class="odd">%before.qualifiers;</td>
+      <td class="odd">%after.qualifiers;</td>
+    </tr>
+  %end;
+  %if;(before.aliases!=after.aliases)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*alias]</th>
+      <td class="odd">%before.aliases;</td>
+      <td class="odd">%after.aliases;</td>
+    </tr>
+  %end;
+  %if;(before.first_names_aliases!=after.first_names_aliases)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*first name alias]</th>
+      <td class="odd">%before.first_names_aliases;</td>
+      <td class="odd">%after.first_names_aliases;</td>
+    </tr>
+  %end;
+  %if;(before.surnames_aliases!=after.surnames_aliases)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*surname alias]</th>
+      <td class="odd">%before.surnames_aliases;</td>
+      <td class="odd">%after.surnames_aliases;</td>
+    </tr>
+  %end;
+  %if;(before.occupation!=after.occupation)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*occupation/occupations]1</th>
+      <td class="odd">%before.occupation;</td>
+      <td class="odd">%after.occupation;</td>
+    </tr>
+  %end;
+  %foreach;pevent;
+    %if;(before.pevent_name!=after.pevent_name or before.pevent_date!=after.pevent_date
+      or before.pevent_place!=after.pevent_place or before.pevent_note!=after.pevent_note
+      or before.pevent_src!=after.pevent_src or before.pevent_witness!=after.pevent_witness)
+      <tr>
+        <th scope="row" class="table-success text-nowrap">[*event/events]0</th>
+        <td class="odd">%before.pevent_name;</td>
+        <td class="odd">%after.pevent_name;</td>
+      </tr>
+      %if;(before.pevent_date!=after.pevent_date)
+        <tr>
+          <th scope="row" class="table-success text-nowrap">[*date/dates]0</th>
+          <td class="odd">%before.pevent_date;</td>
+          <td class="odd">%after.pevent_date;</td>
+        </tr>
+      %end;
+      %if;(before.pevent_place!=after.pevent_place)
+        <tr>
+          <th scope="row" class="table-success text-nowrap">[*place/places]0</th>
+          <td class="odd">%before.pevent_place;</td>
+          <td class="odd">%after.pevent_place;</td>
+        </tr>
+      %end;
+      %if;(before.pevent_note!=after.pevent_note)
+        <tr>
+          <th scope="row" class="table-success text-nowrap">[*note/notes]0</th>
+          <td class="odd">%before.pevent_note;</td>
+          <td class="odd">%after.pevent_note;</td>
+        </tr>
+      %end;
+      %if;(before.pevent_src!=after.pevent_src)
+        <tr>
+          <th scope="row" class="table-success text-nowrap">[*source/sources]0</th>
+          <td class="odd">%before.pevent_src;</td>
+          <td class="odd">%after.pevent_src;</td>
+        </tr>
+      %end;
+      %if;(before.pevent_witness!=after.pevent_witness)
+        <tr>
+          <th scope="row" class="table-success text-nowrap">[*witness/witnesses]1</th>
+          <td class="odd">%before.pevent_witness;</td>
+          <td class="odd">%after.pevent_witness;</td>
+        </tr>
+      %end;
+      %apply;empty()
+    %end;
+  %end;
+  %if;(before.relations!=after.relations)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*relation/relations]1</th>
+      <td class="odd">%before.relations;</td>
+      <td class="odd">%after.relations;</td>
+    </tr>
+  %end;
+  %if;(before.titles!=after.titles)
+    %apply;empty()
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*title/titles]1</th>
+      <td class="odd">%before.titles;</td>
+      <td class="odd">%after.titles;</td>
+    </tr>
+  %end;
+  %if;(before.psources!=after.psources)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*person source]</th>
+      <td class="odd">%before.psources;</td>
+      <td class="odd">%after.psources;</td>
+    </tr>
+  %end;
+  %if;(before.notes!=after.notes)
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*note/notes]1</th>
+      <td class="odd">%before.notes;</td>
+      <td class="odd">%after.notes;</td>
+    </tr>
+  %end;
+  %if;(before.access!=after.access)
+    %apply;empty()
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*access]</th>
+      <td class="odd">%before.access;</td>
+      <td class="odd">%after.access;</td>
+    </tr>
+  %end;
+%end;
+
+%define;print_diff_family()
+  %foreach;family;
+    %foreach;fevent;
+      %if;(before.fevent_name!=after.fevent_name or before.fevent_date!=after.fevent_date
+        or before.fevent_place!=after.fevent_place or before.fevent_note!=after.fevent_note
+        or before.fevent_src!=after.fevent_src or before.fevent_witness!=after.fevent_witness)
+        <tr>
+          <th scope="row" class="table-success text-nowrap">[*event/events]0</th>
+          <td class="odd">%before.fevent_name;: %before.spouse;</td>
+          <td class="odd">%after.fevent_name;: %after.spouse;</td>
+        </tr>
+        %if;(before.fevent_date!=after.fevent_date)
+          <tr>
+            <th scope="row" class="table-success text-nowrap">[*date/dates]0</th>
+            <td class="odd">%before.fevent_date;</td>
+            <td class="odd">%after.fevent_date;</td>
+          </tr>
+        %end;
+        %if;(before.fevent_place!=after.fevent_place)
+          <tr>
+            <th scope="row" class="table-success text-nowrap">[*place/places]0</th>
+            <td class="odd">%before.fevent_place;</td>
+            <td class="odd">%after.fevent_place;</td>
+          </tr>
+        %end;
+        %if;(before.fevent_note!=after.fevent_note)
+          <tr>
+            <th scope="row" class="table-success text-nowrap">[*note/notes]0</th>
+            <td class="odd">%before.fevent_note;</td>
+            <td class="odd">%after.fevent_note;</td>
+          </tr>
+        %end;
+        %if;(before.fevent_src!=after.fevent_src)
+          <tr>
+            <th scope="row" class="table-success text-nowrap">[*source/sources]0</th>
+            <td class="odd">%before.fevent_src;</td>
+            <td class="odd">%after.fevent_src;</td>
+          </tr>
+        %end;
+        %if;(before.fevent_witness!=after.fevent_witness)
+          <tr>
+            <th scope="row" class="table-success text-nowrap">[*witness/witnesses]1</th>
+            <td class="odd">%before.fevent_witness;</td>
+            <td class="odd">%after.fevent_witness;</td>
+          </tr>
+        %end;
+        %apply;empty()
+      %end;
+    %end;
+    %if;(before.children!=after.children)
+      <tr>
+        <th scope="row" class="table-success text-nowrap">[*child/children]1</td>
+        <td class="odd">%before.children;</td>
+        <td class="odd">%after.children;</td>
+      </tr>
+    %end;
+    %apply;empty()
+  %end;
+%end;
+
+%define;print_diff()
+  <div class="text-center">
+    <a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%evar.old;&old=%expr(evar.old+1)" title="[*previous/next diff]0"><span class="fa fa-arrow-left"></span> [previous/next diff]0</a> |
+    <a href="%prefix;m=%evar.m;&t=SUM&f=%evar.f;">%if;(evar.old-evar.new>1)%expr(evar.old-evar.new-1) [intermediate revisions not shown]%else;[revision history]%end;</a>
+    | %if;(evar.new!=0)<a href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%expr(evar.new-1)&old=%evar.new;" title="[*previous/next diff]1"> [previous/next diff]1 <span class="fa fa-arrow-right"></span></a>%elseif;(evar.new=0)[last diff]%end;
+  </div>
+  <table class="table mb-0 mt-3">
+    <colgroup>
+      <col style="width:8%%;border-right-style:inset">
+      <col style="width:46%%;border-right-style:inset">
+      <col style="width:46%%">
+    </colgroup>
+    <tr>
+      <th scope="row" class="table-success text-nowrap">[*revision of]</th>
+      <td><b>%apply;transl_date%with;%before.date;%end;</b></td>
+      <td><b>%apply;transl_date%with;%after.date;%end;</b></td>
+    </tr>
+    <tr>
+      <th scope="row" class="table-success text-nowrap"> [*wizard/wizards/friend/friends/exterior]0</th>
+      <td><b>%before.wizard;</b></td>
+      <td><b>%after.wizard;</b></td>
+    </tr>
+  </table>
+  <table class="table mb-0">
+     <colgroup>
+      <col style="width:8%%;;border-right-style:inset">
+      <col style="width:46%%;border-right-style:inset">
+      <col style="width:46%%">
+    </colgroup>
+    <tr>
+      <td colspan="3">
+        <h2 class="highlight text-center">
+          [*person/persons]0
+        </h2>
+      </td>
+    </tr>
+    %apply;print_diff_person()
+    %if;(nb_families > 0)
+      <tr>
+        <td colspan="3">
+          <h2 class="highlight text-center">
+            [*family/families]0
+          </h2>
+        </td>
+      </tr>
+      %apply;print_diff_family()
+    %end;
+  </table>
+%end;
+%if;(evar.t = "SUM")
+  %apply;print_summary()
+%else;
+  %apply;print_diff()
+%end;
+%include;trl
+%include;copyr
+
+</div>
+%include;js
+%query_time;
+</body>
+</html>

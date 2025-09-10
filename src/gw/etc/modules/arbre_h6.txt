@@ -1,0 +1,148 @@
+  <!-- $Id: modules/arbre_h7.txt v7.1 14/11/2023 20:45:45 $ -->
+  <link rel="stylesheet" href="%etc_prefix;modules/arbre_h6%if;(b.css!="")%b.css;%end;.css">
+  %let;l_fs;%if;(e.fs!="")%e.fs;%else;9%end;%in;
+  %let;l_wi;%if;(e.wi!="")%e.wi;%else;980%end;%in;
+  %let;l_he;%if;(e.he!="")%e.he;%else;600%end;%in;
+  %let;l_sosa_ref;%if;(e.sosa=1 and browsing_with_sosa_ref and has_sosa)1%end;%in;
+  <style id="s">
+    #htree{font-size:%l_fs;px;width:%l_wi;px;height:%l_he;px}
+  </style>
+  <script>
+  <!--
+    function over1(xx)
+    { 
+     document.getElementById(xx).style.outline="#00F solid 4px";
+     return false;
+    }
+    function out1(xx)
+    {
+     document.getElementById(xx).style.outline="none";
+     return false;
+    }
+    function ob()
+    {
+      var a = new Array(3)
+      for (var i=0; i < a.length; ++i)
+      {
+        a[i] = document.getElementById("e" + i).value;
+      }
+      document.getElementById("s").outerHTML = '\
+      <style id="s">\n\
+        @page{size:'+a[1]+'px '+a[2]+'px;}\n\
+        #htree{position:relative;font-size:'+a[0]+'px;width:'+a[1]+'px;height:'+a[2]+'px;margin:3em}\n\
+      <\/style>';
+    }
+   -->
+  </script>
+</head>
+%if;(not cancel_links)
+  <div class="col-12 d-flex justify-content-end my-1">
+    %(TODO: navigation interne en cliquant sur le fond de cellule %)
+    <div class="text-right mr-3">
+      <a href="%if;(e.image!="")%url_set.image;%else;%url_set.image.0;%end;"
+        class="btn btn-outline-primary btn-sm border-0 px-1"
+        title="%if;(e.image=0)[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [image/images]0">
+        <i class="fa fa-image fa-fw"></i>
+        <i class="fa fa-toggle-%if;(e.image=0)off%else;on%end;"></i>
+      </a>%nn;
+      <a href="%if;(e.siblings!="")%url_set.siblings;%else;%url_set.siblings.1;%end;"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        title="%if;(e.siblings!=1)[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [siblings]">
+        <i class="fa fa-users mx-1"></i>
+        <i class="fa fa-toggle-%if;(e.siblings!=1)off%else;on%end;"></i>
+      </a>%nn;
+      <a href="%if;(e.sosa!="")%url_set.sosa;%else;%url_set.sosa.1;%end;"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        title="%if;(e.sosa!=1)[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [Sosa]">
+        <span class="mx-1">Sosa</span>
+        <i class="fa fa-toggle-%if;(e.sosa!=1)off%else;on%end;"></i>
+      </a>
+      <a href="%if;(e.bp!="")%url_set.bp;%else;%url_set.bp.1;%end;"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        title="%if;(e.bp!=1)[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [birth place]">
+        <span class="mx-1">[*birth place]</span>
+        <i class="fa fa-toggle-%if;(e.bp!=1)off%else;on%end;"></i>
+      </a>
+      <a href="%if;(e.nav!="")%url_set.nav;%else;%url_set.nav.1;%end;"
+        class="btn btn-outline-primary btn-sm border-0 px-1 ml-1"
+        title="[*internal navigation]%(TODO: translation%)">
+        <i class="fa fa-user"></i>
+        <i class="fa fa-toggle-%if;(e.nav!=1)off%else;on%end;"></i>
+      </a>
+    </div>
+  </div>
+%end;
+
+%define;somebody()
+  <a %if;(e.nav="1")%if;(e.i="")%apply;url_set%with;p/n/oc%and;%first_name;/%surname;/%if;(occ!=0)%occ;%end;%end;%nn;
+             %else;%url_set.i.index;%end;
+    %else;href="%prefix;%access;" class="s%sex; nc%has_children;"
+    %end;>
+    %if;(e.image!=0 and has_image)
+      <img src="%image_url;"><br>
+    %end;
+    %if;(e.sosa=1 and browsing_with_sosa_ref and has_sosa)
+      &middot; %sosa; &middot;<br>
+    %end;
+    %first_name;<br>%dates;
+    %if;(e.bp=1 and has_birth_place)<br>%birth_place;%end;
+  </a>
+%end;
+
+<div id="htree">
+  %foreach;ancestor_level(6)
+    <div id="l%expr(level+1)">
+      %if;(e.image!=0 and level>0 and level<4)
+        %foreach;ancestor;
+          %if;ancestor.has_image;
+            <p id="pi%ancestor.anc_sosa.v;"><img src="%ancestor.image_url;"></p>
+          %end;
+        %end;
+      %end;
+      %if;(level=0)
+        <table id="pc1"><tr><td>
+          %if;(e.siblings=1 and has_parents)
+            %foreach;father.child;
+              %apply;somebody()
+            %end;
+          %else;
+            %apply;somebody()
+          %end;
+        </td></tr></table>
+      %else;
+        %foreach;ancestor;
+          <a id="p%ancestor.anc_sosa.v;"%sp;
+          %if;(e.nav=1)href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%ancestor.first_name;/%ancestor.surname;/%if;(ancestor.occ!=0)%ancestor.occ;%end;%end;%nn;
+             %else;%apply;url_set("i", ancestor.index)%end;"
+          %else;href="%prefix;%ancestor.access;"
+          %end;
+          %if;(ancestor.same!="")
+            onmouseover="over1('p%ancestor.same.v;')"
+            onmouseout="out1('p%ancestor.same.v;')"
+            >= %if;(l_sosa_ref=1)%ancestor.sosa;%else;%ancestor.same;%end; =</a>
+          %else;
+            >
+            %if;(l_sosa_ref=1)
+              &middot; %ancestor.sosa; &middot;<br>
+            %elseif;(e.sosa=1)
+              &middot; %ancestor.anc_sosa;
+              %if;(browsing_with_sosa_ref and ancestor.has_sosa) ~ %ancestor.sosa;%end;
+               &middot;<br>
+            %end;
+            %ancestor;<br>
+            %ancestor.dates;
+            %if;(e.bp=1 and ancestor.has_birth_place)
+              <br>%ancestor.birth_place;
+            %end;
+            </a>
+          %end;
+          %if;(level<6)<div id="ps%ancestor.anc_sosa.v;"></div>%end;
+        %end;
+      %end;
+    </div>
+  %end;
+</div>

@@ -1,0 +1,107 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: templm/deslist.txt v7.0 2016/02/04 21:22:17 $ -->
+  <title>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*descendants]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+</head>
+
+%( <!-- Begin define --> %)
+%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;l_v0;%if;(evar.v > max_desc_level)%max_desc_level;%else;%evar.v;%end;%in;
+%let;l_v;%if;(bvar.max_desc_level = "")%l_v0;%elseif;(bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
+%let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
+
+%define;tothegen(xx)
+  [*upto the %s generation:::xx]
+%end;
+
+%define;togen1(xx)
+  %if;(xx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[*to the children]%nn;
+  %elseif;(xx = 2)[*to the grandchildren]%nn;
+  %elseif;(xx = 3)[*to the great-grandchildren]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+
+%define;togen()
+  <p>
+    %if;(evar.only != "on")
+      %apply;togen1(l_v)
+    %else;
+      [*generation/generations]0 %l_v;
+    %end;
+  </p>
+%end;
+
+%( <!-- End define --> %)
+
+%(   Main   %)
+<body%body_prop; id="deslist">
+%include;hed
+  %message_to_wizard;
+  <h1>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*descendants]
+    %and;
+      %if;(not cancel_links)<a href="%prefix;%access;">%end;
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") <em>%qualifier;</em>%end;
+        %sp;%surname;
+        %if;(alias != "") <em>(%alias;)</em>%end;
+      %if;(not cancel_links)</a>%end;
+    %end;
+      %sp;%dates;<br>
+  </h1>
+  %if;(evar.m = "D" and evar.t = "L" and evar.tl1 = "aad")
+    %include;ancdes_aad
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "aax")
+    %include;ancdes_aax
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "nxd")
+    %include;ancdes_nxd
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "afm")
+    %include;ancdes_afm
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "cal")
+    %include;ancdes_cal
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "mm")
+    %include;ancdes_mm
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "bmdm")
+    %include;ancdes_bmdm
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "ars")
+    %include;ancdes_ars
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "tag")
+    %include;ancdes_tag
+  %elseif;(evar.m = "D" and evar.t = "D")
+    %include;deslist_mr
+  %else;
+    %include;deslist_list
+  %end;
+  %if;(evar.tl1 != "tag")
+    %if;not cancel_links;
+      %include;tools
+      %apply;tools_deslist()
+      %include;trl
+      %include;copyr
+      %query_time;
+    %end;
+  %end;
+</body>
+</html>

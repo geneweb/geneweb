@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: perso.txt %version; 08/12/2023 23:04:39 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %if;has_public_name;
+      %if;has_qualifiers;%public_name; %qualifier;
+      %else;%public_name; %surname;%if;(occ!="" and occ!=0) (%occ;)%end;%end;
+    %else;
+      %if;has_qualifiers;%first_name; %qualifier;
+      %else;%first_name; %surname;%if;(occ!="" and occ!=0) (%occ;)%end;%end;
+    %end;
+  </title>
+  %if;(bvar.robot_index="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+<a href="#content" class="sr-only sr-only-focusable">[*skip to main content]</a>
+<div class="container%if;(evar.wide="on")-fluid%end;">
+%include;perso_utils
+%include;menubar
+<div id="content" tabindex="-1">
+
+%(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
+%if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or
+    (bvar.p_mod="" and evar.p_mod=""))
+  %(Statique%)
+ <div class="row">
+    %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> in individu.txt %)
+      %let;op_m;3%in;%include;modules/individu
+      %let;op_m;2%in;%include;modules/unions
+      %let;op_m;1%in;%include;modules/chronologie
+      %let;op_m;1%in;%include;modules/notes
+      %let;op_m;2%in;%include;modules/sources
+    %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from individu.txt %)
+    <div class="col-lg-4">
+      %let;op_m;2%in;%include;modules/arbre_3gen_photo
+      %let;op_m;1%in;%include;modules/fratrie
+      %let;op_m;1%in;%include;modules/relations
+    </div>
+  </div>
+%else;
+  %(Dynamic %)
+  <div class="mt-2">
+    %for;i;0;p_mod_nbr;
+      %let;mmi;%apply;mm(i)%in;
+      %let;ooi;%apply;oo(i)%in;
+      %if;(mmi!="" and ooi!=0)
+        %apply;get_mod(mmi, ooi)
+      %end;
+    %end;
+  </div>
+%end;
+
+%if;(evar.opt="misc")
+  %misc_names;<p>
+%end;
+%if;(not cancel_links)
+  %include;trl
+  %include;copyr
+  %query_time;
+%end;
+</div>
+</div>
+%include;js
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!-- $Id: templm/menubar.txt v7.0 2015/03/25 12:32:46 $ -->
+%if;(evar.m!="SND_IMAGE" and evar.m!="MRG")
+%define;navsosa(xx)
+  [*navigation with %t as Sosa reference:::xx].
+%end;
+
+<style type="text/css">
+.menu{margin:1em;padding:0;border:0;position:relative;top:0;left:0;font-size:14px;line-height:14px;}
+.menu span{position:relative;display:inline-block;float:left;}
+.menu span a{float:left;}
+.menu span:hover > .s_menu{display:block;position:absolute;left:0;top:24px;z-index:10;background-color:#d1c9cc;}
+.menu .s_menu{display:none;float:left;margin-left:0;margin-top:0;padding:4px;border:0;width:210px;}
+.menu .s_menu a{width:200px;}
+.menu a,.menu1 a{vertical-align:middle;background-color:#e2e2e2;border:solid 1px #cdc3c6;margin:0 -1px -1px 0;padding:4px;color:#51464a;text-decoration:none;}
+.menu a:hover,.menu1 a:hover{background-color:#d1c9cc;}
+.menu1{font-size:14px;line-height:24px;}
+.menu1{clear:both;padding:5px;margin:5px;border-top:solid 1px #888;}
+.menu1 > span{display:block;margin:10px;}
+</style>
+
+%let;laA;title="[add::family/families]0 (A)" accesskey="A"%in;
+%let;laD;title="[difference between the two revisions] (D)" accesskey="D"%in;
+%let;laI;title="[send::image/images]0 (I)" accesskey="I"%in;
+%let;laL;title="[add::parents] (L)" accesskey="L"%in;
+%let;laP;title="[modify::person/persons]0 (P)" accesskey="P"%in;
+%let;laR;title="[relationship computing] (R)" accesskey="R"%in;
+%let;laU;title="[update::] (U)" accesskey="U"%in;
+%let;laS;title="(S)" accesskey="S"%in;
+%let;lcS;<code>(S)</code>%in; %( Sosa reference %)
+%let;laY;title="[tree] (Y)" accesskey="Y"%in;
+<div class="menu%bvar.menu;">
+  <span>
+    <a href="%prefix;%access;">[*person/persons]0</a>
+    %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
+      <span class="s_menu">
+        <a href="%prefix_set.iz;iz=%self.index;&%self.access;" %laS;>
+          %apply;navsosa%with;
+            %self; %if;has_nobility_titles;, <em>%nobility_title;</em>%end;
+          %end;
+        </a>
+      </span>
+    %end;
+  </span>
+  %if;wizard;
+    <span><a id="upd" href="%prefix;m=U;%access;" %laU;>[*update]</a>
+      <span class="s_menu">
+        <a id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;>[modify::person/persons]0</a>%nn;
+        %foreach;family;
+          %if;(family_cnt < 4)
+            %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%end;%in;
+            <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0 %family_cnt; (%a_k;)"
+               accesskey="%a_k;">[modify::family/families]0 %family_cnt;</a>%nn;
+          %else;
+            <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0 %family_cnt;"
+            >[modify::family/families]0 %family_cnt;</a>%nn;
+          %end;
+        %end;
+        %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
+        %elseif;(is_male or is_female)
+          <a id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;>[add::family/families]0</a>%nn;
+        %end;
+        %if;(not has_parents and first_name != "?" and surname != "?")
+          <a id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;>[add::parents]</a>%nn;
+        %end;
+        <a id="snd_image" href="%prefix;m=SND_IMAGE;i=%index;" %laI;>[send::image/images]0</a>%nn;
+        <a href="%prefix;m=MRG;i=%index;">[merge::]0 (oc=%occ;)</a>%nn;
+        <a href="%prefix;%access;&i=%index;&m=DEL_IND;">[delete::person/persons]0</a>%nn;
+      </span>
+    </span>
+    %if;(bvar.setup_link != "no")
+      %let;l1;%if;(bvar.setup_http != "")%bvar.setup_http;%else;http://127.0.0.1:2316/%end;%in;
+      %let;l2;%if;(has_sosa)s%sosa.v;%else;i%index;%end;%apply;initial(first_name_key)%apply;initial(surname_key)-%base.name;%in;
+      %let;l_gwu;%l1;gwu?opt=check&anon=%base.name;&nn=on&c=%in;
+      <span>
+        %if;(version = "7.00 - gwmr")
+          <a href="%l1;gwstp?v=main.htm;">Gwstp</a>
+        %else;
+          <a href="%l1;gwsetup?v=main.htm;">Gwsetup</a>
+        %end;
+        %if;(has_parents or has_children)
+          <span class="s_menu">
+            %if;has_parents;
+              <a href="%l_gwu;&a1=%first_name_key;&a2=%occ;&a3=%surname_key;&o=A%l2;.gw"
+               title="[ancestor/ancestors]1 %self;">A%l2;.gw</a>%nn;
+              <a href="%l_gwu;&aws1=%first_name_key;&aws2=%occ;&aws3=%surname_key;&o=AWS%l2;.gw"
+               title="[ancestor/ancestors]1 + [full siblings] %self;">AWS%l2;.gw</a>%nn;
+            %end;
+            %if;(has_parents and has_children)
+              <a href="%l_gwu;&ad1=%first_name_key;&ad2=%occ;&ad3=%surname_key;&maxlev=40&o=AD%l2;.gw"
+               title="[ancestor/ancestors]1 + [descendants] %self;">AD%l2;.gw</a>%nn;
+              %if;(has_sosa and sosa_ref.index != index)
+                %let;l3;As1%apply;initial(sosa_ref.first_name_key)%apply;initial(sosa_ref.surname_key)D%l2;%in;
+                <a href="%l_gwu;&a1=%sosa_ref.first_name_key;&a2=%sosa_ref.occ;&a3=%sosa_ref.surname_key;&d1=%first_name_key;&d2=%occ;&d3=%surname_key;&nsp=on&o=%l3;.gw"
+                 title="%apply;a_of_b%with;[*ancestor/ancestors]1%and;%sosa_ref;%end; [up to] %self;">%l3;.gw</a>%nn;
+              %end;
+            %end;
+            %if;has_children;
+              <a href="%l_gwu;&d1=%first_name_key;&d2=%occ;&d3=%surname_key;&o=D%l2;.gw"
+               title="[descendants] %self;">D%l2;.gw</a>%nn;
+            %end;
+            <a href="%l_gwu;&s=%surname_key;&o=S-%surname_key;-%base.name;.gw"
+             title="[surname/surnames]0 %surname;">S-%surname_key;-%base.name;.gw</a>%nn;
+          </span>
+        %end;
+      </span>
+    %end;
+  %end;
+  %if;(bvar.history_diff="yes" and has_history)
+    <span><a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;">[*history]</a>
+      <span class="s_menu">
+        <a id="hist" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;>[difference between the two revisions]</a>
+      </span>
+    </span>
+  %end;
+  %if;has_parents;
+    <span>
+      <a href="%prefix;m=A;%access;">[*ancestor/ancestors]1</a>
+      <span class="s_menu">
+        <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;" %laY;>[tree]</a>%nn;
+        <a href="%prefix;m=A&t=Z&image=%evar.image;&v=7;maxv=%max_anc_level;&%access;">[table]</a>%nn;
+        <a href="%prefix;m=A&t=G&v=3&maxv=%max_anc_level;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on&%access;">[long display]</a>%nn;
+        <a href="%prefix;m=A&t=F&tf1=sb&v=%max_anc_level;&maxv=%max_anc_level;&i=%index;">[surnames branch]</a>%nn;
+      </span>
+    </span>
+  %end;
+  %if;has_children;
+    <span>
+      <a href="%prefix;m=D;%access;">[*descendants]</a>
+      <span class="s_menu">
+        <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[tree]</a>%nn;
+        <a href="%prefix;m=D&t=H&v=%max_desc_level;&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&death_age=on&occu=on&gen=1&%access;">[table]</a>%nn;
+        <a href="%prefix;m=D&t=L&v=3&maxv=%max_desc_level;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on&%access;">[long display]</a>%nn;
+        <a href="%prefix;m=D&t=A&num=on&v=%max_desc_level;&%access">d’Aboville</a>%nn;
+      </span>
+    </span>
+  %end;
+  <span><a href="%prefix;m=R;%access;" %laR;>[*relationship computing]</a>
+    %apply;lazy_print("<span class=s_menu>")
+      %if;(browsing_with_sosa_ref)
+        %if;(sosa_ref.index != "" and sosa_ref.index != index)
+          %lazy_force;
+          <a href="%prefix;em=R&ei=%index;&i=%sosa_ref.index;&m=NG&n=1&t=PN&spouse=on&image=on&et=S" title="…[shortest path]… %sosa_ref;">[shortest path]</a>%nn;
+        %end;
+      %end;
+      %if;(has_parents)
+        %if;(father.has_siblings or mother.has_siblings)
+          %lazy_force;
+          <a href="%prefix;%access;&m=C&v1=2&v2=1">[uncles and aunts]</a>%nn;
+        %end;
+      %end;
+      %if;has_nephews_or_nieces;
+        %lazy_force;
+        <a href="%prefix;%access;&m=C&v1=1&v2=2">[a nephew/a niece]4</a>%nn;
+      %end;
+    %if;lazy_printed;</span>%else;%apply;lazy_print("")%end;
+  </span>
+  %if;has_parents;
+    %foreach;father.child;
+      %if;is_sibling_before;
+        <span><a href="%prefix;%child.access;">%apply;capitalize(nth([previous sibling],sex))</a></span>
+      %end;
+      %if;is_sibling_after;
+        <span><a href="%prefix;%child.access;">%apply;capitalize(nth([next sibling],sex))</a></span>
+      %end;
+    %end;
+  %end;
+  <div style="clear:both;"></div>
+</div>
+%end;

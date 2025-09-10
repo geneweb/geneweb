@@ -1,0 +1,25 @@
+<!-- $Id: modules/htree.txt v7.1 29/04/2024 05:27:27 $ -->
+%(
+Options
+1: arbre vertical ascendants 3 gen. + self + descendants 3 gen. (7 gen.)
+2: arbre famille
+3: htree 6 generations (MR)
+4: htree 8 generations (HG)
+5: hi-trees with options
+%)
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%let;op_ph;%if;(op_m=4)1%else;0%end;%in;
+%if;(op_m=1)
+  %include;modules/arbre_7gen
+%elseif;(op_m=2)
+  %include;modules/arbre_famille
+%elseif;(op_m=3)
+  %include;modules/arbre_h6
+%elseif;(op_m=4)
+  %include;modules/arbre_8gen
+%elseif;(op_m=5)
+  %include;modules/arbre_hi_tools
+  %include;modules/arbre_hi_indexes
+  %include;modules/arbre_hi
+%else;
+%end;

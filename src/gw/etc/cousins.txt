@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: cousins.txt v7.1 23/11/2023 21:01:47 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+%define;cousin_lex(vvv,www)
+  [*cousins.vvv.www]1
+%end;
+%define;tt()
+  %apply;clean_html_tags%with;
+    %apply;a_of_b_gr_eq_lev%with;
+      %apply;cousin_lex(evar.v1,evar.v2)%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  %end;
+%end;
+%define;tturl()
+  %apply;url_encode%with;%apply;tt()%end;
+%end;
+<title>%apply;tt()</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+<div class="container%if;(evar.wide="on")-fluid%end;">
+%include;perso_utils
+%include;menubar
+<div class="alert alert-warning pl-5" role="alert">
+  [*select person to compute relationship]
+</div>
+%define;on_side(xxx)
+  [*on %s's side:::xxx]
+%end;
+%let;my_first_name_key;%first_name_key;%in;
+%let;my_surname_key;%surname_key;%in;
+%let;my_occ;%occ;%in;
+%define;url(xxx,yyy)
+  <a href="%prefix;m=RL%nn;
+    %if;("xxx"="ancestor")&p=%xxx.first_name_key;&n=%xxx.surname_key;%if;(xxx.occ!=0)&oc=%xxx.occ;%end;
+    %elseif;("xxx"="descendant")&p=%my_first_name_key;&n=%my_surname_key;%if;(occ!=0)&oc=%my_occ;%end;
+    %elseif;("xxx"="child")&p=%yyy.first_name_key;&n=%yyy.surname_key;%if;(occ!=0)&oc=%yyy.occ;%end;
+    %end;%nn;
+    &p1=%my_first_name_key;&n1=%my_surname_key;%if;(occ!=0)&oc1=%my_occ;%end;&%if;("xxx"="ancestor" or "xxx"="descendant" or "xxx"="child")l%else;b%end;1=%evar.v1;%nn;
+    &p2=%xxx.first_name_key;&n2=%xxx.surname_key;%if;(xxx.occ!=0)&oc2=%xxx.occ;%end;&%if;("xxx"="ancestor" or "xxx"="descendant" or "xxx"="child")l%else;b%end;2=%evar.v2;%nn;
+    %if;(evar.image="off")&image=off;%end;%nn;
+    %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+    %if;(evar.long!="")&long=%evar.long;%end;">%xxx; %xxx.dates;</a>
+    %if;(evar.spouse="on" and "xxx"!="ancestor")%foreach;family;%if;(xxx.spouse!="? ?") & %xxx.spouse; %xxx.spouse.dates;%end;%end;%end;
+%end;
+%empty_sorted_list;
+%define;add_to_sorted_list(xxx,ccc)
+  %apply;add_in_sorted_list%with;&i%expr(ccc+1)=%xxx.index;%end;
+%end;
+<h3>%if;(evar.v1=0 and evar.v2=0)%if;(sex=0)[*him/her]0%else;[*him/her]1%end;
+   %else;<h3>%apply;a_of_b%with;%apply;cousin_lex(evar.v1,evar.v2)%and;%self;%end;%end;</h3>
+%( siblings and half-siblings %)
+%if;(evar.v1=1 and evar.v2=1)
+  %if;(has_parents)
+    %let;my_index;%self.index;%in;
+    %let;my_father;%self.father;%in;
+    %let;my_mother;%self.mother;%in;
+    %if;father.has_children;
+    <ul>
+      %foreach;father.family;
+        %if;(has_children and father.spouse = my_mother)
+          <li>%apply;on_side%with;%father;%end; [and] %father.spouse;[:]</li>
+            <ul>
+              %reset_count;
+              %foreach;child;
+                %if;(child.index!=my_index)
+                  %incr_count;
+                  <li>%apply;url("child","father")</li>
+                  %apply;add_to_sorted_list("child",count)
+                %end;
+              %end;
+            </ul>
+        %end;
+      %end;
+      %foreach;father.family;
+        %if;(has_children and father.spouse != my_mother)
+          <li>%apply;on_side%with;%father;%end; [and] %father.spouse;[:]</li>
+            <ul>
+              %foreach;child;
+                %incr_count;
+                <li>%apply;url("child","father")</li>
+                %apply;add_to_sorted_list("child",count)
+              %end;
+            </ul>
+          </li>
+        %end;
+      %end;
+      </ul>
+    %end;
+    %if;mother.has_children;
+    <ul>
+      %foreach;mother.family;
+        %if;(has_children and mother.spouse != my_father)
+          <li>%apply;on_side%with;%mother;%end; [and] %mother.spouse;[:]</li>
+            <ul>
+              %foreach;child;
+                %incr_count;
+                <li>%apply;url("child","mother")</li>
+                %apply;add_to_sorted_list("child",count)
+              %end;
+            </ul>
+        %end;
+      %end;
+    </ul>
+    %end;
+  %end;
+%elseif;(evar.v1=0)
+  %if;(evar.v2=0 or evar.v2="")
+    <a href="%prefix;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
+              &p2=%my_first_name_key;&n2=%my_surname_key;&b2=2%nn;
+              %if;(evar.image="off")&image=off;%end;%nn;
+              %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+              %if;(evar.long!="")&long=%evar.long;%end;">%self;</a>
+  %else;
+    %reset_count;
+    <ul>
+    %foreach;descendant_level;
+      %if;(level=evar.v2)
+        %foreach;descendant;
+          %incr_count;
+          <li>%apply;url("descendant","")</li>
+          %apply;add_to_sorted_list("descendant",count)
+        %end;
+      %end;
+    %end;
+    </ul>
+  %end;
+%elseif;(evar.v2=0)
+  %reset_count;%reset_count1;%reset_count2;
+  <ul>
+  %foreach;ancestor_level;
+    %if;(level=evar.v1)
+      %foreach;ancestor;
+        %incr_count;
+        %if;(count%2=1)<li>%if;(ancestor="? ?")%incr_count1;%end;%end;
+        %if;(count%2=0 and ancestor!="? ?" and count1!=1) & %end;
+        %if;(ancestor!="? ?")%apply;url("ancestor","")%end;
+        %if;(count%2=0)</li>%reset_count1;%end;
+        %apply;add_to_sorted_list("ancestor",count)
+        %if;(ancestor="? ?")%incr_count2;%end;
+      %end;
+    %end;
+  %end;
+  </ul>
+%else;
+ That should not happen!
+%end;
+
+%if;(count!="" and count>1)
+<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt_url()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-diagram-project fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
+%if;(evar.v2=0 or evar.v2="")<a id="asc" class="ml-3" href="%prefix;m=A&t=T&%access;&spouse=on&v=%expr(evar.v1+1)"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>Graphe ASC.</a>%end;
+%if;(evar.v1=0 and evar.v2>0)<a id="desc" class="ml-3" href="%prefix;m=D&t=T&%access;&spouse=on&v=%evar.v2;"><i class="fa fa-sitemap fa-fw mr-1"></i>Graphe DESC.</a>%end;
+%end;
+
+<div class="my-3">Total[:] %if;(evar.v2=0)%expr(count-count2)%else;%count;%end; %if;(count=0 or count=1)[person/persons]0%else;[person/persons]1%end;.</div>
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: cleanup.htm,v 7.00 2018-04-20 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Cleanup]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[Cleaning up a database]
+</h1>
+</div>
+
+[If you made many modifications in your database, or if you simply entered much data, it is advised to make a cleaning up, especially if you observe that the access to your database has slowed down.]
+%(
+If you made many modifications in your database, or if you simply entered much d
+ata, it is advised to make a cleaning up, especially if you observe that the acc
+ess to your database has slowed down.
+%)
+<p>
+<ul><li>
+[For a simple cleaning up, apply the initialisation of consanguinities.]
+(<a href="gwsetup?lang=%l;v=consang.htm">consang</a>)
+<p >
+<li>
+<form method="get" action="cleanup">
+<input type="hidden" name="lang" value="%l" />
+
+[For a radical cleaning up, select your database by clicking on the associated button][:]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td><input type="radio" name="anon" value="%a" />   </td>
+<td><a href="http://%m:%P/%a">%a</a></td>
+</tr>|
+<tr align="left"><td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<li>
+[Then push this button][:]
+<p>
+<input type="submit" value="[Cleanup]
+" />
+
+</form>
+
+</ul>

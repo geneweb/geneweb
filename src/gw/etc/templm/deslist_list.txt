@@ -1,0 +1,91 @@
+<!-- $Id: deslist_list.txt,v 7.00 2014/11/20 15:11:46 mr Exp $ -->
+
+%include;ancsosa_deslist
+
+%define;descendants_by_list(xx,yy,curlev,maxlev)
+  %if;(curlev = 0)<div>%nl;%end;
+  %apply;link1("xx","yy")
+  %apply;somebody_info1("xx")
+  %apply;somebody_info2("xx")
+  %foreach;xx.family;
+    %if;(evar.spouse="on")
+      <div class="f1">
+        %if;(family_cnt != 1 and curlev = 0)<div>%nl;%end;
+        %apply;marriage_info()
+        %apply;link1("spouse","spouse")
+        %apply;somebody_info1("spouse")
+        %apply;somebody_spouse_parent()
+        %apply;somebody_info2("spouse")
+      </div>
+    %end;
+    %if;(curlev < maxlev)
+      %if;(curlev = 0 or
+           evar.t = "M" and xx.is_male or
+           evar.t = "F" and xx.is_female or
+           evar.t = "L" and evar.t1 = "1" and xx.has_sosa or
+           evar.t = "L" and evar.t1 = "")
+        %if;(family.desc_level < curlev)
+          &rArr; [see further]
+          %apply;lazy_print%with;<br>%nl;%end;
+        %elseif;(family.desc_level > curlev)
+          &rArr; [see above]
+          %apply;lazy_print%with;<br>%nl;%end;
+        %elseif;has_children;
+          %family.set_infinite_desc_level;
+          %if;(curlev = 0)</div>%nl;%end;
+          <ol style="list-style-type:lower-latin;padding-left:1.2em;">
+          %foreach;child;
+            %if;(evar.t1 = "" or
+                 evar.t1 = "1" and evar.siblings = "on" or
+                 evar.siblings != "on" and has_sosa)
+              <li class="li_%sex; li_%has_families;%has_sosa;">
+                %apply;descendants_by_list("child",lchild,curlev+1,maxlev)
+              </li>
+            %end;
+          %end;
+          </ol>
+          %apply;lazy_print%with;%end;
+        %else;
+          %if;(curlev = 0)%nl;</div>%nl;
+          %else;%apply;lazy_print%with;<br>%nl;%end;
+          %end;
+        %end;
+      %end;
+    %else;%nl;
+      %apply;lazy_print%with;<br>%nl;%end;
+    %end;
+  %end;
+%end;
+
+%define;by_list()
+  %reset_count;
+  <p>
+    %if;(evar.t = "F")
+      [*male line/female line]1<br>
+    %elseif;(evar.t = "M")
+      [*male line/female line]0<br>
+    %end;
+    %if;(evar.t1 = "1" and has_sosa)
+      [*branch/branches]0 : Sosa
+    <br>
+    %end;
+    %if;(evar.i1 = "" and evar.p1 = "")
+      %apply;togen()
+    %else;
+      [*up to] %pvar.1; %pvar.1.dates;
+    %end;
+  </p>
+  %apply;descendants_by_list("self","self",0,l_v)%nl;
+  %if;(evar.t1 != "1")
+    <p>
+      %foreach;descendant_level;
+        %if;(level = l_v)
+          [*total] : %number_of_descendants; [[person/persons]1@(c)]
+        %end;
+      %end;
+    </p>
+  %end;
+%end;
+
+%( main %)
+  %apply;by_list()

@@ -1,0 +1,39 @@
+<!-- $Id: annivmenu.txt v7.1 19/10/2023 02:10:08 $ -->
+<!-- Copyright (c) 2006-2007 INRIA -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+<div class="container">
+%( %include;menubar not complete %)
+%include;home
+<h1>[*anniversaries]</h1>
+
+<p>
+  <ul>
+    <li>
+      <a href="%prefix;m=AN">[*anniversaries of birth]</a>
+    </li>
+    <li>
+      <a href="%prefix;m=AD">[*anniversaries of dead people]</a>
+    </li>
+    <li>
+      <a href="%prefix;m=AM">[*anniversaries of marriage]</a>
+    </li>
+  </ul>
+</p>
+
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

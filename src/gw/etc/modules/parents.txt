@@ -1,0 +1,174 @@
+<!-- $Id: modules/parents.txt v7.1 03/10/2024 03:28:35 $ -->
+%( op_m=1 simple: name %)
+%( op_m=3 simple with photo in 2 cols %)
+%( op_m=2 evolved: name, occupation %)
+%( op_m=4 complete: name, birth, death, occupation, marriages %)
+%( op_m=5 complete with photo in 2 centered cols %)
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%let;op_ph;%if;has_parents;
+             %if;(father.has_image or mother.has_image)1%else;0%end;
+           %else;nn;
+             0%nn;
+           %end;%nn;
+%in;
+%if;((op_m=1 or op_m=3 or op_m=4 or (op_m=5 and op_ph=0)) and has_parents)
+  <h2>[*parents]</h2>
+  <ul>
+  %apply;li_SD("father")
+  %if;(op_m=1 or op_m=3)
+    %apply;short_display_person("father")%nn;
+    %if;(op_m=3 and father.has_occupation), %father.occupation;%nl;%end;
+  %elseif;(op_m=4)
+    %apply;long_display_person("father")%sp;
+  %elseif;(op_m=5)
+    %apply;display_horizontal("father")
+  %end;
+  %if;(op_m=4 or op_m=5)
+    <br>
+    %foreach;father.family;
+      %if;(op_m=4 and spouse.access=mother.access)
+        <em>%apply;married_to("father", 0)</em>&hellip;
+      %end;
+      %if;(op_m=5 and spouse.access=mother.access)<em style="font-size: 90%%">%nn;
+        %apply;married_to("father", 0)</em>&hellip;
+      %end;
+    %end;
+  %end;
+  </li>
+  %apply;li_SD("mother")
+  %if;(op_m=1 or op_m=3)
+    %apply;short_display_person("mother")%nn;
+    %if;(op_m=3 and mother.has_occupation), %mother.occupation;%nl;%end;
+  %end;
+  %if;(op_m=4 or op_m=5)
+    %if;(op_m=4)
+      %apply;long_display_person("mother")%sp;
+    %elseif;(op_m=5)
+      %apply;display_horizontal("mother")
+    %end;
+    %foreach;father.family;
+      %if;(spouse.access=mother.access)
+        %if;(are_divorced or are_separated)
+          <br>
+          <em style="font-size: 90%%">%nn;
+            %if;are_divorced;[divorced]0%on_divorce_date;%end;
+            %if;are_separated;[separated]0%end;
+          </em>
+        %end;
+      %end;
+    %end;
+    %if;(op_m=5)
+      </li>
+    %end;
+  %end;
+  </li>
+  </ul>
+%elseif;(op_m=5 and op_ph=1 and has_parents)
+  <table id="parents" class="text-center">
+    <tr>
+      <td>
+        %if;father.has_image;
+          %if;(evar.cgl!="on") 
+            <a href="%father.image_html_url;"><img %father.image_medium_size;%sp;
+             src="%father.image_url;" style="border: none" alt="" title="[image/images]0"></a>
+          %else;
+            <img %father.image_medium_size;%sp;
+             src="%father.image_url;" style="border: none" alt="" title="[image/images]0">
+          %end;
+        %elseif;(bvar.default_image="yes")
+          <img class="small_image rounded align-self-center ml-2"
+            src="%images_prefix;img_unknown_%if;(father.is_female)wo%elseif;(father.is_male)%else;u_%end;man.png" alt="[missing image]"
+            title="%if;(father.is_male)[father/mother]0%else;[father/mother]1%end;">
+        %else;
+          <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+        %end;
+      </td>
+      <td>
+        <h2>[*parents]</h2>
+        %if;(has_birth_date and (father.has_birth_date or mother.has_birth_date))
+          <table style="border-width:%border;">
+            <tr>
+              <td colspan="3" style="text-align: center">%apply;age_at_birth_of(central_person)</td>
+            </tr>
+            <tr>
+              <td style="text-align: %right;;width:50%%">%nn;
+                %if;father.has_birth_date;%father_age_at_birth;%end;&nbsp;</td>
+              <td style="text-align: center">|</td>
+              <td style="text-align: %left;;width:50%%">%nn;
+                &nbsp;%if;mother.has_birth_date;%mother_age_at_birth;%end;</td>
+            </tr>
+          </table>
+        %end;
+      </td>
+      <td>
+        %if;mother.has_image;
+          %if;(evar.cgl!="on") 
+            <a href="%mother.image_html_url;"><img %mother.image_medium_size;%sp;
+             src="%mother.image_url;" style="border: none" alt="" title="[image/images]0">
+            </a>
+          %else;
+            <img %mother.image_medium_size;%sp;
+             src="%mother.image_url;" style="border: none" alt="" title="[image/images]0">
+          %end;
+        %elseif;(bvar.default_image="yes")
+          <img class="small_image rounded align-self-center ml-2"
+            src="%images_prefix;img_unknown_%if;(mother.is_female)wo%elseif;(mother.is_male)%else;u_%end;man.png" alt="[missing image]"
+            title="%if;(mother.is_male)[father/mother]0%else;[father/mother]1%end;">
+        %else;
+          <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+        %end;
+      </td>
+    </tr>
+    <tr>
+      <td class="text-left align-top pt-2">
+        %apply;display_vertical("father")
+      </td>
+      <td class="align-top pt-2">
+        %foreach;father.family;
+          %if;(spouse.access=mother.access)
+            %apply;married_to("father", 0)&hellip;
+            %if;are_divorced;<br>[divorced]0%on_divorce_date;%end;
+            %if;are_separated;<br>[separated]0%end;
+          %end;
+        %end;
+      </td>
+      <td class="text-left align-top pt-2">
+        %apply;display_vertical("mother")
+      </td>
+    </tr>
+  </table>
+
+%( Parents photo %)
+%elseif;(op_m=2 and has_parents)
+  <h2>[*parents]</h2>
+  <div class="d-inline-flex flex-wrap">
+    %foreach;parent;
+      <div class="media %if;(parent.is_male)mr-2%else;mb-1%end;">
+        %if;parent.has_image;
+          %if;(evar.cgl!="on") 
+            <a href="%parent.image_url;" class="align-self-center" target="_blank">
+              <img class="small_image rounded align-self-center"
+                src="%parent.image_url;" alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;"
+                title="%parent; (%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;)">
+            </a>
+          %else;
+            <img class="small_image rounded align-self-center"
+              src="%parent.image_url;" alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;"
+              title="%parent; (%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;)">
+          %end;
+        %elseif;(bvar.default_image="yes")
+          <img class="small_image rounded align-self-center ml-2"
+            src="%images_prefix;img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]"
+            title="%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;">
+        %else;
+          <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+        %end;
+        <div class="media-body ml-2 align-self-center">
+          %apply;short_display_person_tree("parent")
+          <br>%if;parent.computable_age;%sp;%parent.age;%end;
+          %if;parent.computable_death_age;%sp;%parent.death_age;%end;
+        </div>
+      </div>
+    %end;
+  </div>
+%end;

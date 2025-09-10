@@ -1,0 +1,66 @@
+<!-- $Id: templm/anclist_same.txt v7.0 2014/11/12 14:33:31 $ -->
+
+%define;same()
+  %if;(ancestor.same != "")
+    <li class="li_%ancestor.sex; li_10">%ancestor.anc_sosa; -
+      <a href="%prefix;%ancestor.access;">%ancestor;</a> %ancestor.dates; == 
+      <a href="%prefix;em=R&ei=%index;&i=%ancestor.index;&et=M&spouse=on" title="%ancestor; …[relationship]… %self;">
+      %ancestor.same;
+    </a>
+    </li>
+  %end;
+%end;
+
+%define;same_consang()
+  %reset_count;
+  <p class="highlight">[*display smallest sosa number relative to ancestor] + [*consanguinity]</p>
+  %apply;togen()
+  <ul>
+  %foreach;ancestor_level(l_v)
+    <li><span class="highlight">[*generation/generations]0 %level;</span>
+      <ul class="ul_0">
+      %foreach;ancestor
+        %if;(ancestor.same = "" and ancestor.has_consanguinity)
+          %incr_count;
+          <li class="li_%ancestor.sex; li_10">
+            %ancestor.anc_sosa; -
+            <a href="%prefix;%ancestor.access;">%ancestor;</a> %ancestor.dates; :
+            <a href="%prefix;em=R&ei=%ancestor.mother.index;&m=NG&t=PN&select=%ancestor.father.index;&et=A&spouse=on&image=on"
+               title="[relationship computing], [parents]">
+               %ancestor.consanguinity;
+            </a><br>
+          </li>
+        %end;
+        %apply;same()
+      %end;
+      </ul>
+    </li>
+  %end;
+  </ul>
+  <p>[*total] = %evar.same; + %count; = %expr(evar.same + count)</p>
+%end;
+
+%define;same_same()
+  %reset_count;
+  <p class="highlight">[*display smallest sosa number relative to ancestor]</p>
+  %apply;togen()
+  <ul>
+  %foreach;ancestor_level(l_v)
+    <li><span class="highlight">[*generation/generations]0 %level;</span>
+      <ul class="ul_0">
+        %foreach;ancestor
+          %apply;same()
+        %end;
+      </ul>
+    </li>
+  %end;
+  </ul>
+  <p>[*total] = %evar.same;</p>
+%end;
+
+%(short display smallest sosa number relative to ancestor %)
+%if;(bvar.show_consang != "no" or manitou)
+  %apply;same_consang()
+%else;
+  %apply;same_same()
+%end;

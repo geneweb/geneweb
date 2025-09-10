@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="%lang;" id="updform">
+<head>
+  <!-- $Id: updfam.txt v7.1 12/12/2024 05:28:35 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  <title>%nn;
+    %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
+      [*add::family/families]0%nn;
+    %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")[*add::parents]0%nn;
+    %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
+      [*modify::family/families]0 # %evar_i;
+    %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
+             evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
+      [*merge::family/families]1 # %evar_i;
+    %end;
+  </title>
+  %include;css
+</head>
+<body%body_prop; id="family">
+%include;hed
+%message_to_wizard;
+<div class="container">
+%( do not use %include;menubar %)
+%include_menubar
+%let;datalist_fnames; list="datalist_fnames" data-book="fn"%in;
+%let;datalist_snames; list="datalist_snames" data-book="sn"%in;
+%let;datalist_places; list="datalist_places" data-book="place"%in;
+%let;datalist_occupations; list="datalist_occupations" data-book="occu"%in;
+%let;datalist_sources; list="datalist_sources" data-book="src"%in;
+%define;nav()
+  <div class="container fixed-top" role="navigation">
+    <nav class="navbar navbar-light justify-content-center mx-2" id="banner">
+      <nav class="nav nav-pills nav-fill">
+        <a class="nav-item nav-link px-2 py-1" href="#family" title="[*parents]"><i class="fa fa-person fa-fw" aria-hidden="true"></i><i class="fa fa-person-dress" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#comments" title="[*comment]1"><i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
+      </nav>
+    </nav>
+  </div>
+%end;
+
+%define;date(xlab,xvar,xdt)
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" placeholder=" "%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" placeholder=" "%in;
+  %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8" placeholder=" "%in;
+  <div class="row mt-1">
+    <div class="col-sm-1 col-md-2 col-form-label">
+      xlab
+    </div>
+    <div class="col col-sm-auto form-inline">
+      %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
+        <label>
+          <input type="text" class="form-control" name="xvar_dd" value="%xdt.day;" %day_input; placeholder="[year/month/day]2">
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
+        </label>
+        <label>
+          <span id="xvar_mm_sel">
+            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;>
+          </span>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
+        </label>
+      %elseif;([!dates order]0="mmddyyyy")
+        <label>
+          <span id="xvar_mm_sel">
+            <input type="text" class="form-control" name="xvar_mm" value="%xdt.month;" %month_input;>
+          </span>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
+        </label>
+      %else;
+        <label>
+          <input type="text" class="form-control" name="xvar_yyyy" value="%xdt.year;" %year_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
+        </label>
+        <label>
+          <span id="xvar_mm_sel">
+            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;>
+          </span>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
+        </label>
+      %end;
+    </div>
+    <div class="col-10 col-lg ml-auto form-inline">
+      <label for="xvar_prec" class="sr-only col-form-label">[precision]0</label>
+      <select class="form-control pl-lg-1 pr-lg-0 px-xl-2" name="xvar_prec" id="xvar_prec">
+        %(<option value="-"%if;(xdt.prec="") selected%end;>&nbsp;</option>%)
+        <option value="sure"%if;(xdt.prec="sure") selected%end;>[exact]0</option>
+        <option value="about"%if;(xdt.prec="about") selected%end;>[about (date)]0</option>
+        <option value="maybe"%if;(xdt.prec="maybe") selected%end;>[possibly (date)]0</option>
+        <option value="before"%if;(xdt.prec="before") selected%end;>[before (date)]0</option>
+        <option value="after"%if;(xdt.prec="after") selected%end;>[after (date)]0</option>
+        <option value="oryear"%if;(xdt.prec="oryear") selected%end;>…[or]…</option>
+        <option value="yearint"%if;(xdt.prec="yearint") selected%end;>…[between (date)]…</option>
+      </select>
+      <label for="xvar_cal" class="sr-only col-form-label">[calendar/calendars]0</label>
+      <select class="form-control pl-lg-1 pr-lg-0 px-xl-2 ml-sm-1 ml-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
+                                        changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)">
+        <option value=""%if;(xdt.calendar="") selected%end;>
+          -
+        </option>
+        <option value="G"%if;(xdt.calendar="gregorian") selected%end;>
+          [*gregorian/julian/french/hebrew]0
+        </option>
+        <option value="J"%if;(xdt.calendar="julian") selected%end;>
+          [*gregorian/julian/french/hebrew]1
+        </option>
+        <option value="F"%if;(xdt.calendar="french") selected%end;>
+          [*gregorian/julian/french/hebrew]2
+        </option>
+        <option value="H"%if;(xdt.calendar="hebrew") selected%end;>
+          [*gregorian/julian/french/hebrew]3
+        </option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-1 col-md-2"></div>
+    <div class="col col-sm-auto form-inline">
+      %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
+        <label>
+          <input type="text" class="form-control" name="xvar_orday" value="%xdt.orday;" %day_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
+        </label>
+        <label>
+          <span id="xvar_ormonth_sel">
+            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;>
+          </span>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
+        </label>
+      %elseif;([!dates order]0="mmddyyyy")
+        <label>
+          <span id="xvar_ormonth_sel">
+            <input type="text" class="form-control" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;>
+          </span>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
+        </label>
+      %else;
+        <label>
+          <input type="text" class="form-control" name="xvar_oryear" value="%xdt.oryear;" %year_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
+        </label>
+        <label>
+          <span id="xvar_ormonth_sel">
+            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;>
+          </span>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
+        </label>
+        <label>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
+        </label>
+      %end;
+    </div>
+    <div class="col-10 col-lg">
+      <label for="xvar_text" class="col-form-label sr-only"></label>
+      <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0">
+    </div>
+  </div>
+%end;
+
+%define;source(xvar,xx)
+  <div class="row">
+    <label for="xvar_src" class="col-sm-1 col-form-label">[*source/sources]0</label>
+    <div class="col-sm-11">
+      <textarea class="form-control" name="xvar_src" id="xvar_src" rows="1">%xx_src;</textarea>
+    </div>
+  </div>
+%end;
+
+%define;note(xvar,xx)
+  <div class="row">
+    <label for="xvar_note" class="col-sm-1 col-form-label">[*note/notes]0</label>
+    <div class="col-sm-11">
+      <textarea class="form-control" name="xvar_note" id="xvar_note" rows="1">%xx_note;</textarea>
+    </div>
+  </div>
+%end;
+
+%define;small_date(kind,xvar,xx,verbose)
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
+  %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8"%in;
+  <div class="row align-items-center">
+    <span class="col-sm-2 col-form-label">[*kind]</span>
+    <div class="col-sm-auto d-inline-flex">
+      %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+      %elseif;([!dates order]0="mmddyyyy")
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+      %else;
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+      %end;
+    </div>
+    <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place/places]0</label>%nn;
+    <div class="col">
+      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place/places]0"%datalist_places;>
+    </div>
+  </div>
+%end;
+
+%define;birth(xvar,xx,verbose)
+  %apply;small_date("birth","xvarb","xx","verbose")
+%end;
+
+%define;death(xvar,xx,verbose)
+  %apply;small_date("death","xvard","xx","verbose")
+%end;
+
+%define;w_birth(xcnt, wcnt,xx,verbose)
+  %apply;small_date("birth","excnt_witnwcnt_b","fwitness","verbose")
+%end;
+
+%define;w_death(xcnt, wcnt,xx,verbose)
+  %apply;small_date("death","excnt_witnwcnt_d","fwitness","verbose")
+%end;
+
+%define;parent(xcnt,xx,psex)
+  <div class="row%if;(xcnt>1) mt-3%end;">
+   <label for="paxcnt_fn" class="col-sm-2 col-form-label">%nn;
+     [*first name/first names]0 <span class="font-weight-bold text-uppercase">
+     (%if;(xx.first_name!="" or xx.surname!="")%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;
+      %else;%if;(xcnt=1)[M/F]0%else;[M/F]1%end;%end;)</span></label>
+    <div class="col-sm-8">
+      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%datalist_fnames;%if;(evar.m="ADD_FAM" and xx.first_name="") autofocus%end; >
+    </div>
+    <label for="paxcnt_occ" class="col-auto col-form-label sr-only">[*number]</label>
+    <div class="col-sm-2">
+       <input class="form-control" type="number" name="paxcnt_occ" min="0" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" title="[*number] (occurence)">
+    </div>
+  </div>
+  <div class="row mt-2">
+    <label for="paxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
+    <div class="col-sm-8">
+      <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0"%datalist_snames;>
+    </div>
+    <div class="col-sm-2">
+      <select class="form-control" id="paxcnt_p_selct" name="paxcnt_p">
+        <option value="create"%if;(xx.create="create") selected%end;>[*create]0</option>
+        <option value="link"%if;(xx.create="link") selected%end;>[*link]0</option>
+      </select>
+    </div>
+  </div>
+  <div id="paxcnt_p_selct_data">
+    %apply;birth("paxcnt","xx","true")
+    %apply;death("paxcnt","xx","true")
+    <div class="row">
+      <label for="paxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-sm">
+        <input class="form-control" name="paxcnt_occu" id="paxcnt_occu" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;"%datalist_occupations;>
+      </div>
+    </div>
+  </div>
+%end;
+
+%define;insert_parent(xcnt)
+  <div class="row my-2">
+    <label for="ins_paxcnt_n" class="col-form-label col-2">[*insert]</label>
+    <div class="form-inline col-10 ml-auto">
+      <div class="input-group">
+        <select class="custom-select form-control bg-light" id="ins_paxcnt_n" name="ins_paxcnt_n">
+          %for;i;1;6;<option>%i;</option> %end;
+        </select>
+        <div class="input-group-append">
+          <label class="btn btn-outline-primary"> [parents]0
+            <input class="ml-1" type="checkbox" name="ins_paxcnt" value="on">
+          </label>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;
+
+%define;selector_fevent(xcnt)
+  <select class="form-control custom-select font-weight-bold" id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
+    <option value=""%if;(event.e_name="") selected%end; disabled>[*select/delete an event]0</option>
+    <option disabled>───────────────</option>
+    <option value="#marr"%if;(event.e_name="#marr") selected%end;>[*marriage event]</option>
+    <option value="#nmar"%if;(event.e_name="#nmar") selected%end;>[*no marriage event]</option>
+    <option value="#enga"%if;(event.e_name="#enga") selected%end;>[*engage event]</option>
+    <option value="#nmen"%if;(event.e_name="#nmen") selected%end;>[*no mention]</option>
+    <option value="#marb"%if;(event.e_name="#marb") selected%end;>[*marriage bann]</option>
+    <option value="#marc"%if;(event.e_name="#marc") selected%end;>[*marriage contract]</option>
+    <option value="#marl"%if;(event.e_name="#marl") selected%end;>[*marriage licence]</option>
+    <option value="#pacs"%if;(event.e_name="#pacs") selected%end;>[*PACS]</option>
+    <option value="#div"%if;(event.e_name="#div") selected%end;>[*divorce event]</option>
+    <option value="#sep"%if;(event.e_name="#sep") selected%end;>[*separate event]</option>
+    <option value="#anul"%if;(event.e_name="#anul") selected%end;>[*annulation]</option>
+    <option value="#resi"%if;(event.e_name="#resi") selected%end;>[*residence]</option>
+    <option disabled>───────────────</option>
+    <option value=""%if;(not ("#" in event.e_name) and event.e_name!="") selected%end; id="customxcnt">[*custom event]</option>
+    <option disabled>───────────────</option>
+    <option value="" id="deletexcnt"> [*select/delete an event]1</option>
+  </select>
+%end;
+
+%define;insert_fevent(xcnt)
+  <div class="row mt-2">
+    <label for="ins_eventxcnt_n" class="col-form-label col-2">[*insert]</label>
+    <div class="form-inline col-10 ml-auto">
+      <div class="input-group">
+        <select class="form-control bg-light border-primary border-right-0" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
+          %for;i;1;11;<option>%i;</option> %end;
+        </select>
+        <div class="input-group-append">
+          <label class="btn btn-outline-primary border-left-0"> [event/events]2
+            <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
+          </label>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;
+
+%define;insert_witness(xcnt, wcnt)
+  <div class="row mt-3 mb-1">
+    <label for="excnt_ins_witnwcnt_n" class="col-form-label col-2">[*insert]</label>
+    <div class="form-inline col-10 ml-auto">
+      <div class="input-group">
+        <select class="form-control bg-light border-primary border-right-0" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n" >
+          %for;i;1;11;<option>%i;</option> %end;
+        </select>
+        <div class="input-group-append">
+          <label class="btn btn-outline-primary border-left-0"> [witness/witness/witnesses]3
+            <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
+          </label>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;
+
+%define;one_witness(xcnt, wcnt)
+  <hr>
+  <div class="form-group mt-1">
+    <div class="row">
+      <h5 class="col-form-label col-2">[*witness/witness/witnesses]0 wcnt</h5>
+      <div class="col-2">
+        <select class="form-control" name="excnt_witnwcnt_p" id="excnt_witnwcnt_p_selct">
+          <option value="create"%if;((fwitness.surname="" and fwitness.first_name="") or fwitness.create="create") selected%end;>[*create]0</option>
+          <option value="link"%if;(fwitness.create="link") selected%end;>[*link]0</option>
+        </select>
+      </div>
+      <div class="col-4">
+        <select class="form-control" name="excnt_witnwcnt_kind">
+          <option value=""%if;(fwitness_kind="") selected%end;>[*witness/witnesses]0</option>
+          <option value="info"%if;(fwitness_kind="info") selected%end;>[*informant/informant/informant]2</option>
+          <option value="atte"%if;(fwitness_kind="atte") selected%end;>[*present/present/present]2</option>
+          <option value="ment"%if;(fwitness_kind="ment") selected%end;>[*mentioned/mentioned/mentioned]2</option>
+          <option value="offi"%if;(fwitness_kind="offi") selected%end;>[*civil registrar/civil registrar/civil registrar]2</option>
+          <option value="reli"%if;(fwitness_kind="reli") selected%end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
+          <option value="othe"%if;(fwitness_kind="othe") selected%end;>[*other/other/other]2</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn"
+          value="%fwitness.first_name;" placeholder="[*first name/first names]0"%datalist_fnames;>
+      </div>
+      <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
+      <div class="col-sm-2">
+        <input type="number" class="form-control" name="excnt_witnwcnt_occ" id="excnt_witnwcnt_occ"
+          min="0" value="%fwitness.occ;" placeholder="#">
+       </div>
+    </div>
+    <div class="row">
+      <label for="excnt_witnwcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" name="excnt_witnwcnt_sn" id="excnt_witnwcnt_sn"
+          value="%fwitness.surname;" placeholder="[*surname/surnames]0"%datalist_snames;>
+      </div>
+      <div id="excnt_witnwcnt_p_selct_mod" class="col-form-label ml-2">
+        %if;(fwitness.index!="-1")
+          <a href="%prefix_base_password;m=MOD_IND&i=%fwitness.index;" title="[*modify::person/persons]0
+            %fwitness.first_name;%if;(fwitness.occ!="").%fwitness.occ%end; %fwitness.surname;"
+            aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%fwitness.sex;%end;">
+            <i class="fa fa-user-pen fa-fw %if;(fwitness.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"></i>
+            [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>
+          </a>
+        %end;
+      </div>
+      <div id="excnt_witnwcnt_p_selct_sex" class="col-form-label">
+        <div class="form-inline">
+          <div class="col-sm-auto">[*sex]</div>
+          <div class="form-check form-check-inline ml-5">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+              value="M"%if;(fwitness.create.sex="male") checked%end;>[M/F]0
+          </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                value="N"%if;(fwitness.create.sex="neuter") checked%end;>?
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                value="F"%if;(fwitness.create.sex="female") checked%end;>[M/F]1
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" id="excnt_witnwcnt_p_selct_data">
+      <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-sm-6">
+        <input class="form-control" type="text" name="excnt_witnwcnt_occu" id="excnt_witnwcnt_occu"
+           value="%fwitness.create.occupation;" placeholder="[*occupation/occupations]0"%datalist_occupations;>
+      </div>
+      <div class="form-inline col-sm-auto">
+        <div class="custom-control custom-checkbox mr-3">
+          <input class="custom-control-input" type="checkbox" name="excnt_witnwcnt_od" id="excnt_witnwcnt_od">
+          <label for="excnt_witnwcnt_od" class="custom-control-label">[*of course dead]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input class="custom-control-input" type="checkbox" name="excnt_witnwcnt_pub" id="excnt_witnwcnt_pub">
+          <label for="excnt_witnwcnt_pub" class="custom-control-label">[*public]</label>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;
+
+%define;one_fevent(xcnt, has_fevents)
+  <div class="row">
+    <h5 class="col-form-label col-sm-2 mb-1 text-uppercase"><label for="e_namexcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
+    <div class="col-sm-3">
+      %apply;selector_fevent(xcnt)
+    </div>
+    <div class="col-sm-7">
+      <label id="fevent_label_selectorxcnt" style="display:none" class="other_evts w-100">
+        <input type="text" class="form-control font-weight-bold" name="e_namexcnt" value="%if;(event.e_name="")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
+      </label>
+    </div>
+  </div>
+  <div class="row mb-2">
+    <label for="e_placexcnt" class="col-sm-2 col-form-label">[*place/places]0</label>
+    <div class="col-sm-10">
+      <input class="form-control" type="text" name="e_placexcnt" value="%event.e_place;" id="e_placexcnt" placeholder="[*place/places]0"%datalist_places;>
+    </div>
+  </div>
+  %apply;date([*date/dates]0, "e_datexcnt", "event_date")
+  <div class="row mt-2">
+    <label for="e_notexcnt" class="col-sm-2 col-form-label">[*note/notes]1</label>
+    <div class="col-sm-10 d-inline-flex align-items-start">
+      %if;(event.e_name="#marr" and event.e_note="" and comment!="" and not ("ADD" in e.m))
+        <a type="button" class="btn btn-warning transfer-btn col-form-label font-weight-bold text-monospace mr-1"
+          title="[*move union comments to notes]">┎></a>
+      %end;
+      <textarea class="form-control" name="e_notexcnt" rows="1" id="e_notexcnt"
+        %if;(event.e_name="#marr") data-marr%end; placeholder="[*note/notes]1">%event.e_note;</textarea>
+    </div>
+  </div>
+  <div class="row mt-0">
+    <label for="e_srcxcnt" class="col-sm-2 col-form-label">[*source/sources]0</label>
+    <div class="col-sm-10">
+      %if;(event.e_src!="")
+        <textarea class="form-control" name="e_srcxcnt" rows="1" id="e_srcxcnt" placeholder="[*source/sources]0" %l_on1s;>%event.e_src;</textarea>
+      %else;
+        <input type="text" class="form-control" name="e_srcxcnt" maxlength="1000" id="e_srcxcnt" placeholder="[*source/sources]0" value="%event.e_src;"%datalist_sources;>
+      %end;
+    </div>
+  </div>
+  <div class="row">
+    %if;(has_fevents and has_fwitness)
+      %foreach;fwitness;
+      <div class="col-12">
+        %apply;one_witness(xcnt, wcnt)
+        %if;is_last;%apply;insert_witness(xcnt, wcnt)%end;
+      </div>
+      %end;
+    %else;
+      <div class="col-12">
+      %apply;insert_witness(xcnt, "0")
+      </div>
+    %end;
+  </div>
+  <hr class="w-100">
+%end;
+
+%define;card_header(xx,yy)
+  <h3 class="card-header py-1 text-center" id="xx" aria-label="§ [*yy]1">[*yy]1</h3>
+%end;
+
+<h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%nn;
+  %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
+    [*add::family/families]0
+  %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")
+    [*add::parents] %foreach;child;%child.first_name;%if;(child.occ!="").%child.occ;%end; %child.surname;%end;
+  %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
+    [*modify::family/families]0 # %evar_i;
+  %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
+           evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
+    [*merge::family/families]1 # %evar_i;
+  %end;
+</h1>
+%let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
+%define;ev(vv,xx)%e.ins_vvxx;%end;
+<form method="post" action="%action;" id="updfam"
+  data-insert="%for;j;1;100;
+                 %let;test_ev;%apply;ev("event",j)%in;
+                 %if;(test_ev="on")%(e_place%)fevent_select%expr(j+1)/%end;
+               %end;
+               %for;j;1;100;
+                 %let;test_ch;%apply;ev("ch",j-1)%in;
+                 %if;(test_ch="on")ch%j;_fn/%end;
+               %end;">
+  <div class="row">
+    %apply;nav()
+  </div>
+  <p class="my-0">
+    %hidden;
+    <input type="hidden" name="digest" value="%digest;">
+    %if;(evar_ip!="")<input type="hidden" name="ip" value="%evar_ip;">%nl;%end;
+    %if;(evar_i!="")<input type="hidden" name="i" value="%evar_i;">%nl;%end;
+    %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
+      <input type="hidden" name="m" value="ADD_FAM_OK">%nl;
+    %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")
+      <input type="hidden" name="m" value="ADD_PAR_OK">%nl;
+    %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
+      <input type="hidden" name="m" value="MOD_FAM_OK">%nl;
+    %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
+             evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
+      <input type="hidden" name="i2" value="%evar_i2;">
+      %if;(evar_ini1!="" and evar_ini2!="")
+        <input type="hidden" name="ini1" value="%evar_ini1;">
+        <input type="hidden" name="ini2" value="%evar_ini2;">
+      %end;
+      %if;(evar.iexcl!="")
+        <input type="hidden" name="iexcl" value="%evar.iexcl;">
+      %end;
+      %if;(evar.fexcl!="")
+        <input type="hidden" name="fexcl" value="%evar.fexcl;">
+      %end;
+      <input type="hidden" name="m" value="MRG_MOD_FAM_OK">%nl;
+    %end;
+  </p>
+
+  <div class="card">
+    %apply;card_header("parents","parents")
+    <div class="card-body">
+      <div class="row">
+          %foreach;parent;
+            %let;os;%parent.sexes;%in;
+            %if;(cnt!=1 and bvar.multi_parents="yes")<hr class="w-100">%end;
+            <div class="col-12">
+              %apply;parent(cnt,"parent",parent.sex)
+              %if;(bvar.multi_parents="yes")%apply;insert_parent(cnt)%end;
+            </div>
+            %if;(cnt=2)
+              <div class="custom-control custom-checkbox mt-3 ml-3">
+                <input type="checkbox" class="custom-control-input" name="nsck" id="nsck" value="on"%if;(os=3) checked%end;>
+                <label for="nsck" class="custom-control-label">[*no sexes check]</label>
+              </div>
+            %end;
+          %end;
+          <button type="submit" class="btn btn-outline-primary col-3 ml-auto mt-3 mr-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+            <span class="font-weight-bold text-uppercase sr-only">[*validate/delete]0</span>
+            OK <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
+          </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    %apply;card_header("events","event/events")
+    <div class="card-body">
+      %if;has_fevents;
+        %foreach;fevent;
+          %apply;one_fevent(cnt, has_fevents)
+          %if;is_last;
+            %apply;insert_fevent(cnt)
+          %end;
+        %end;
+      %else;
+        %apply;one_fevent("1", has_fevents)
+        %apply;insert_fevent("1")
+      %end;
+    </div>
+  </div>
+
+%define;insert_child(xcnt)
+  <label for="ins_chxcnt_n" class="col-form-label col-2">[*insert]</label>
+  <div class="form-inline col-5">
+    <div class="input-group">
+      <select class="form-control bg-light border-primary border-right-0" id="ins_chxcnt_n" name="ins_chxcnt_n">
+        %for;i;1;11;<option>%i;</option>%end;
+      </select>
+      <div class="input-group-append">
+        <label class="btn btn-outline-primary border-left-0"> [child/children]2
+          <input class="ml-1" type="checkbox" name="ins_chxcnt" value="on">
+        </label>
+        <button type="submit" class="btn btn-outline-primary" title="[*insert::child/children]2">OK</button>
+      </div>
+    </div>
+  </div>
+%end;
+
+%define;invert_children(xcnt)
+  <div class="form-inline col-2 ml-auto">
+    <button type="submit" class="btn btn-outline-secondary btn-sm" name="inv_chxcnt" value="on"
+      title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt">%nn;
+      <i class="far fa-user"></i> %expr(xcnt-1)%nn;
+      <i class="fa fa-right-left fa-rotate-90 mx-2"></i>%nn;
+       xcnt <i class="far fa-user"></i>%nn;
+    </button>
+  </div>
+%end;
+
+%define;child(xcnt)
+  <div class="row">
+    <hr class="w-100">
+    <h5 class="col-form-label col-sm-2 text-uppercase">%apply;nth%with;[nth]%and;%cnt;%end; [*child/children]0</h5>
+    <div class="col-sm-2">
+      <select class="form-control" name="chxcnt_p" id="chxcnt_p_selct">
+        <option value="link"%if;(child.create="link") selected%end;>[*link]0</option>
+        <option value="create"%if;(child.create="create") selected%end;>[*create]0</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <label for="chxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
+    <div class="col-sm-6">
+        <input class="form-control" type="text" name="chxcnt_fn" value="%child.first_name;" id="chxcnt_fn" placeholder="[*first name/first names]0"%datalist_fnames;>
+    </div>
+    <label for="chxcnt_occ" class="col-sm-auto col-form-label">[*number]</label>
+    <div class="col-sm-2">
+      <input class="form-control" type="number" name="chxcnt_occ" min="0" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
+    </div>
+  </div>
+  <div class="row">
+    <label for="chxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
+    <div class="col-sm-6">
+      <input class="form-control" type="text" name="chxcnt_sn" value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;"%datalist_snames;>
+    </div>
+    <div id="chxcnt_p_selct_mod" class="col-form-label ml-2">
+      %if;(child.index!="-1")
+        <a href="%prefix_base_password;m=MOD_IND&i=%child.index;" title="[*modify::person/persons]0
+          %child.first_name;%if;(child.occ!="").%child.occ%end; %child.surname;"
+          aria-hidden="true" aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%child.sex;%end;">
+          <i class="fa fa-user-pen fa-fw %if;(child.sex=1)fe%end;male ml-2 mr-1"></i>
+          [*modify] %apply;nth%with;[nth]%and;%cnt;%end; [child/children]0</a>
+      %end;
+    </div>
+    <div id="chxcnt_p_selct_sex">
+      <div class="d-inline-flex">
+        <span class="col-sm-auto col-form-label">[*sex]</span>
+        <div class="col-sm-auto mt-2">
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex"
+                value="M"%if;(child.create.sex="male") checked%end;>[M/F]0
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex"
+                value="N"%if;(child.create.sex="neuter") checked%end;>?
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex"
+                value="F"%if;(child.create.sex="female") checked%end;>[M/F]1
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="chxcnt_p_selct_data">
+    %apply;birth("chxcnt", "child", "true")
+    %apply;death("chxcnt", "child", "true")
+    <div class="row">
+      <label for="chxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-sm">
+         <input class="form-control" type="text" name="chxcnt_occu" value="%child.create.occupation;" id="chxcnt_occu" placeholder="[*occupation/occupations]0"%datalist_occupations;>
+      </div>
+    </div>
+  </div>
+%end;
+
+  <div class="card">
+    %apply;card_header("children","child/children")
+    <div class="card-body">
+      <div class="row">
+        %apply;insert_child("0")
+        %foreach;child;
+          %if;(cnt!=1)
+            %apply;invert_children(cnt)
+          %end;
+          </div>
+          %apply;child(cnt)
+          <div class="row mt-2">
+            <hr class="w-100">
+            %apply;insert_child(cnt)
+        %end;
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    %apply;card_header("sources","source/sources")
+    <div class="card-body">
+      <div class="row">
+        <label for="psrc" class="col-sm-2 col-form-label">[[*person/persons]1]</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" rows="1" name="psrc" id="psrc" placeholder="[*source/sources]1 [person/persons]1"datalist_sources;>
+            %if;(evar_psrc!="")%evar_psrc;%else;%evar_dsrc;%end;
+          </textarea>
+        </div>
+      </div>
+      <div class="row">
+        <label for="src" class="col-sm-2 col-form-label">[*family/families]0</label>
+        <div class="col-sm-9">
+          %if;(fsources!="")
+            <textarea class="form-control" name="src" rows="1" id="src" placeholder="[*source/sources]1 [family/families]0" %l_on1s;>%fsources;</textarea>
+          %else;
+            <input class="form-control" name="src" id="src" placeholder="[*source/sources]1 [family/families]0" value="%fsources;"datalist_sources;>
+          %end;
+        </div>
+        <div class="col-sm-1">
+          <label class="form-check-label">
+            <input type="checkbox" name="rdsrc" value="on" %if;(evar_rdsrc="on")checked%end;>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  %if;(bvar.origin_file="on")
+    <input type="text" name="origin_file" size="50" maxlength="200" value="%origin_file;">
+  %end;
+
+  <div class="card">
+    %apply;card_header("comments","comment")
+    <div class="d-inline-flex flex-column">
+      <div class="col py-1">
+        %include;toolbar
+      </div>
+      <div class="row">
+        <div class="d-flex flex-column col-9">
+          <textarea class="form-control insert-character-target no-clear-button ml-2" id="notes_comments" name="comment" rows="21">%comment;</textarea>%sq;
+          <button type="submit" class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+            <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="col mx-2 pl-0 pr-3 py-0">
+          %include;characters
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+%include;upd_js
+<script>
+function show_fevent_label(xxname, xcnt) {
+  var selector = document.getElementById('fevent_select' + xcnt);
+  var label = document.getElementById('fevent_label_selector' + xcnt);
+  var input = document.getElementById('e_name' + xcnt);
+
+  if (selector.value == "") {
+    if (xxname.charAt(0) != "#" && xxname != "") {
+      input.value = xxname;
+    } else {
+      input.value = "";
+    }
+  } else {
+    input.value = selector.value;
+  }
+
+  if (selector.options[selector.selectedIndex].id === "custom" + xcnt) {
+    label.style.display = 'inline';
+    input.style.display = 'inline';
+  } else {
+    label.style.display = 'none';
+    input.style.display = 'none';
+  }
+}
+
+$(document).ready(function() {
+  //show evt perso
+  $(".other_evts").each(function() {
+    var inp = $(this).find("input").first();
+    if (inp.val().charAt(0) != "#" && inp.val() != "") {
+      $(this).show();
+    }
+  });
+});
+</script>
+<script>
+$(document).ready(function() {
+    var targetId = $('#updfam').data('insert').split('/')[0];
+    if (!targetId) {
+        var $inputs = $('#updfam').find('input[type="text"]');
+        targetId = $inputs.filter(function() {
+            return (this.id.startsWith('e_place') || this.id.endsWith('_fn')) && this.value === '';
+        }).first().attr('id');
+    }
+    if (targetId) {
+        $('#' + targetId).focus();
+    }
+});
+</script>
+</body>
+</html>

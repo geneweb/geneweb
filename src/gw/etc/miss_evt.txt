@@ -1,0 +1,436 @@
+%( Missing events table %)
+
+%let;mid;class="align-middle"%in;
+
+%define;has_missing_birth_date(xx)
+  %if;(xx.has_birth_date or xx.has_baptism_date)
+    %if;(e.date="on")
+      %if;(xx.has_birth_date and (xx.birth_date.prec="" and xx.birth_date.day!=""))
+      %elseif;(xx.has_baptism_date and (xx.baptism_date.prec="" and xx.baptism_date.day!=""))
+      %else;
+        %incr_count;
+      %end;
+    %end;
+  %else;
+    %incr_count;
+  %end;
+%end;
+
+%define;has_missing_birth_place(xx)
+  %if;(xx.has_birth_date)
+    %if;not xx.has_birth_place;
+      %incr_count;
+    %end;
+  %elseif;(xx.has_baptism_date)
+    %if;not xx.has_baptism_place;
+      %incr_count;
+    %end;
+  %else;
+    %if;(not (xx.has_birth_place or xx.has_baptism_place))
+      %incr_count;
+    %end;
+  %end;
+%end;
+
+%define;has_missing_death_date(xx)
+  %if;xx.is_dead;
+    %if;(xx.has_death_date or xx.has_burial_date)
+      %if;(e.date="on")
+        %if;(xx.has_death_date and (xx.death_date.prec="" and xx.death_date.day!=""))
+        %elseif;(xx.has_burial_date and (xx.burial_date.prec="" and xx.burial_date.day!=""))
+        %else;
+          %incr_count;
+        %end;
+      %end;
+    %else;
+      %incr_count;
+    %end;
+  %end;
+%end;
+
+%define;has_missing_death_place(xx)
+  %if;xx.is_dead;
+    %if;(xx.has_death_date)
+      %if;not xx.has_death_place;
+        %incr_count;
+      %end;
+    %elseif;(xx.has_burial_date)
+      %if;not xx.has_burial_place;
+        %incr_count;
+      %end;
+    %else;
+      %if;(not (xx.has_death_place or xx.has_burial_place))
+        %incr_count;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;has_missing_marriage_date()
+  %if;(on_marriage_date="")
+    %incr_count;
+  %else;
+    %if;(e.date="on" and (marriage_date.prec!="" or marriage_date.day=""))
+      %incr_count;
+    %end;
+  %end;
+%end;
+
+%define;has_missing_marriage_place()
+  %if;(marriage_place="")
+    %incr_count;
+  %end;
+%end;
+
+%define;has_missing_events(xx)
+  %reset_count;
+  %apply;has_missing_birth_date("xx")
+  %if;(count=0)
+    %apply;has_missing_birth_place("xx")
+  %end;
+  %if;(count=0)
+    %apply;has_missing_death_date("xx")
+  %end;
+  %if;(count=0)
+    %apply;has_missing_death_place("xx")
+  %end;
+  %if;(count=0)
+    %if;xx.has_families;
+      %foreach;xx.family;
+        %if;(count=0)
+          %apply;has_missing_marriage_place()
+        %end;
+        %if;(count=0)
+          %apply;has_missing_marriage_date()
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;display_edit_ind_btn(label)
+  %if;(wizard and not cancel_links)
+    <div>
+      <a href="%prefix;m=MOD_IND&i=%ancestor.index;#label" title="[modify::person/persons]0">
+        <i class="fa fa-wrench fa-lg"></i>
+      </a>
+    </div>
+  %end;
+%end;
+
+%define;display_edit_fam_btn()
+  %if;(wizard and not cancel_links)
+    <div>
+      <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%ancestor.index;#marr" title="[modify::family/families]0">
+        <i class="fa fa-wrench fa-lg"></i>
+      </a>
+    </div>
+  %end;
+%end;
+
+%define;td_missing_events_rowspan(xx)
+  %if;(xx.same="" and (e.marr="on" or (is_first and level=1)) and xx.nb_families>1)
+    rowspan="%xx.nb_families;"
+  %end;
+%end;
+
+%define;td_missing_events(xx)
+  %apply;td_missing_events_rowspan("xx") class="%if;(count>0)table-warning%end;
+%end;
+
+%define;td_family_missing_class(xx)
+  class="align-middle%if;(count>0) table-warning%end;"
+%end;
+
+%define;table_missing_events(xx)
+  %lazy_force;
+  <td %apply;td_missing_events_rowspan("xx") %mid;>%nn;
+    %xx.anc_sosa;
+  </td>
+
+   %( ancestor %)
+  <td %if;(xx.same!="")colspan="8"%else;%apply;td_missing_events_rowspan("xx")%end;
+    class="text-left align-middle" id="%xx.index;">
+    %apply;image_MF("xx")
+    %apply;short_display_person("xx")
+    %if;(xx.same!="" and e.repeat="on")
+      %sp;->
+      [same ancestor as n° Sosa]
+      <a href="#%xx.index;">
+        %if;(e.sosab=16)%xx.same.hexa;
+        %elseif;(e.sosab=8)%xx.same.octal;
+        %else;%xx.same;
+        %end;
+      </a>
+    %end;
+  </td>
+
+  %( birth date %)
+  %if;(xx.same = "")
+    %reset_count;
+    %apply;has_missing_birth_date("xx")
+    <td %apply;td_missing_events("xx") align-middle">
+      %if;xx.has_birth_date;
+        %xx.slash_birth_date;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("birth")
+        %end;
+      %elseif;xx.has_baptism_date;
+        %xx.slash_baptism_date;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("birth")
+        %end;
+      %else;
+        %apply;display_edit_ind_btn("birth")
+      %end;
+    </td>
+
+    %( birth place %)
+    %reset_count;
+    %apply;has_missing_birth_place("xx")
+    <td %apply;td_missing_events("xx") align-middle">
+      %if;xx.has_birth_date;
+        %xx.birth_place;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("birth")
+        %end;
+      %elseif;xx.has_baptism_date;
+        %xx.baptism_place;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("birth")
+        %end;
+      %else;
+        %if;xx.has_birth_place;
+          %xx.birth_place;
+        %elseif;xx.has_baptism_place;
+          %xx.baptism_place;
+        %else;
+          %apply;display_edit_ind_btn("birth")
+        %end;
+      %end;
+    </td>
+
+    %( spouse %)
+    %if;(e.marr="on" or (is_first and level=0))
+      %if;xx.has_families;
+        %foreach;xx.family;
+          %if;(family_cnt=1)
+            <td class="text-left align-middle">
+              %apply;image_MF("spouse")
+              %apply;short_display_person("spouse")
+            </td>
+          %end;
+        %end;
+      %else;
+        <td></td>
+      %end;
+    %else;
+      <td class="text-left align-middle">
+        %if;xx.has_families;
+          %apply;image_MF("xx.spouse")
+          %apply;short_display_person("xx.spouse")
+        %end;
+      </td>
+    %end;
+
+    %( marriage date %)
+    %if;(e.marr="on" or (is_first and level=0))
+      %if;xx.has_families;
+        %foreach;xx.family;
+          %if;(family_cnt=1)
+            %reset_count;
+            %apply;has_missing_marriage_date()
+            <td %apply;td_family_missing_class("xx")>
+              %slash_marriage_date;
+              %if;(count>0)
+                %apply;display_edit_fam_btn()
+              %end;
+            </td>
+          %end;
+        %end;
+      %else;
+        <td></td>
+      %end;
+    %else;
+      %if;xx.has_families;
+        %foreach;xx.family;
+          %if;(spouse.index=xx.spouse.index)
+            %reset_count;
+            %apply;has_missing_marriage_date()
+            <td %apply;td_family_missing_class("xx")>
+              %slash_marriage_date;
+              %if;(count>0)
+                %apply;display_edit_fam_btn()
+              %end;
+            </td>
+          %end;
+        %end;
+      %else;
+        <td></td>
+      %end;
+    %end;
+
+    %( marriage place %)
+    %if;(e.marr="on" or (is_first and level=0))
+      %if;xx.has_families;
+        %foreach;ancestor.family;
+          %if;(family_cnt=1)
+            %reset_count;
+            %apply;has_missing_marriage_place()
+            <td %apply;td_family_missing_class("xx")>
+              %marriage_place;
+              %if;(count>0)
+                %apply;display_edit_fam_btn()
+              %end;
+            </td>
+          %end;
+        %end;
+      %else;
+        <td></td>
+      %end;
+    %else;
+      %if;ancestor.has_families;
+        %foreach;ancestor.family;
+          %if;(spouse.index=ancestor.spouse.index)
+            %reset_count;
+            %apply;has_missing_marriage_place()
+            <td %apply;td_family_missing_class("xx")>
+              %marriage_place;
+              %if;(count>0)
+                %apply;display_edit_fam_btn()
+              %end;
+            </td>
+          %end;
+        %end;
+      %else;
+        <td></td>
+      %end;
+    %end;
+
+    %( death date %)
+    %reset_count;
+    %apply;has_missing_death_date("xx")
+    <td %apply;td_missing_events("xx") align-middle">
+      %if;xx.has_death_date;
+        %xx.slash_death_date;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("death")
+        %end;
+      %elseif;xx.has_burial_date;
+        %xx.slash_burial_date;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("death")
+        %end;
+      %else;
+        %if;xx.is_dead;
+          %apply;display_edit_ind_btn("death")
+        %end;
+      %end;
+    </td>
+
+    %( death place %)
+    %reset_count;
+    %apply;has_missing_death_place("xx")
+    <td %apply;td_missing_events("xx") align-middle">
+      %if;xx.has_death_date;
+        %xx.death_place;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("death")
+        %end;
+      %elseif;xx.has_burial_date;
+        %xx.burial_place;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("death")
+        %end;
+      %else;
+        %if;xx.has_death_place;
+          %xx.death_place;
+        %elseif;xx.has_burial_place;
+          %xx.burial_place;
+        %end;
+        %if;(count>0)
+          %apply;display_edit_ind_btn("death")
+        %end;
+      %end;
+    </td>
+  %end;
+%end;
+
+%define;td_family_missing_class(xx)
+  class="text-center align-middle%if;(count>0) table-warning%end; "
+%end;
+
+%define;table_family_missing_events(xx)
+  %foreach;ancestor.family;
+    %if;(family_cnt!=1)
+      <tr>
+        <td class="text-left align-middle">
+          %apply;image_MF("spouse")
+          %apply;short_display_person("spouse")
+        </td>
+
+        %reset_count;
+        %apply;has_missing_marriage_date()
+        <td %apply;td_family_missing_class("xx")>
+          %slash_marriage_date;
+          %if;(count>0)
+            %apply;display_edit_fam_btn()
+          %end;
+        </td>
+
+        %reset_count;
+        %apply;has_missing_marriage_place()
+        <td %apply;td_family_missing_class("xx")>
+          %marriage_place;
+          %if;(count>0)
+            %apply;display_edit_fam_btn()
+          %end;
+        </td>
+      </tr>
+    %end;
+  %end;
+%end;
+
+%( Main %)
+%let;nb_gena;%apply;min(e.v, max_anc_level)%in;
+%let;only_v;%if;(e.only="on")%nb_gena;%else;0%end;%in;
+<div class="ml-2">%if;(e.only="on")[only] %apply;gena(only_v+1)%else;%apply;togena(nb_gena)%end;.</div>
+<table class="table table-bordered table-sm asc-desc-table w-auto m-2 text-center">
+  <thead %mid;>
+    <tr>
+      <th %mid;>[*Sosa]</th>
+      <th class="text-left align-middle pl-2">[*person/persons]0</th>
+      <th %mid;>[*date of birth]</th>
+      <th %mid;>[*where born]</th>
+      <th class="text-left align-middle pl-2">%if;(e.marr="on")[*spouse/spouses]1%else;[*spouse/spouses]0%end;</th>
+      <th %mid;>[*date of marriage]</th>
+      <th %mid;>[*where married]</th>
+      <th %mid;>[*date of death]</th>
+      <th %mid;>[*where dead]</th>
+    </tr>
+  </thead>
+  <tbody>
+    %foreach;ancestor_level(nb_gena)
+      %if;(level>=only_v)
+        %if;(level!=0 and e.gen="on" and e.only!="on")
+          <tr>
+            <th colspan="9" class="text-left border-0">[*generation/generations]0 %level;</th>
+          </tr>
+        %end;
+        %foreach;ancestor;
+            %apply;has_missing_events("ancestor")
+            %if;(count>0 and ancestor!="? ?")
+              %if;(ancestor.same="" or e.repeat="on")
+                <tr>
+                  %apply;table_missing_events("ancestor")
+                </tr>
+                %if;(ancestor.same="" and (e.marr="on" or (is_first and level=0)) and ancestor.nb_families > 1)
+                  %apply;table_family_missing_events("ancestor")
+                %end;
+              %end;
+            %end;
+        %end;
+      %end;
+    %end;
+  <tbody>
+</table>

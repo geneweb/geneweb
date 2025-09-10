@@ -1,0 +1,106 @@
+<!-- $Id: templm/upd_datalist.txt v7.0 21/02/2016 07:29:34 $ -->
+%define;dlist(z1)
+  <datalist id="dlz1">
+  <option id="oz1">0</option>
+    %if;(bvar.datalist_z1 = 1 or "z1"="qualifier" or "z1"="alias")
+      %if;(bvar.datalist_book = 1)
+        <script>$("#dlz1").delay(1000).load("%prefix;m=MOD_DATA;data=z1;datalist=on");</script>
+      %else;
+        <script>$("#dlz1").load("cache/a2_z1.cache");</script>
+      %end;
+    %end;
+  </datalist>
+%end;
+%apply;dlist("fn")
+%apply;dlist("sn")
+%apply;dlist("place")
+%apply;dlist("occu")
+%apply;dlist("src")
+%apply;dlist("qualifiers")
+%apply;dlist("aliases")
+<datalist id="dlmonth">
+  <option value=VD label="[(french revolution month)]0 VD">
+  <option value=BR label="[(french revolution month)]1 BR">
+  <option value=FM label="[(french revolution month)]2 FM">
+  <option value=NI label="[(french revolution month)]3 NI">
+  <option value=PL label="[(french revolution month)]4 PL">
+  <option value=VT label="[(french revolution month)]5 VT">
+  <option value=GE label="[(french revolution month)]6 GE">
+  <option value=FL label="[(french revolution month)]7 FL">
+  <option value=PR label="[(french revolution month)]8 PR">
+  <option value=ME label="[(french revolution month)]9 ME">
+  <option value=TH label="[(french revolution month)]10 TH">
+  <option value=FT label="[(french revolution month)]11 FT">
+  <option value=JC label="[(french revolution month)]12 JC">
+</datalist>%nl;
+%if;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK" or evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
+  <datalist id="dlevent">
+    <option value="" label="&nbsp;"></option>
+    <option id="#birt" value="[*birth]">[*birth]</option>
+    <option id="#bapt" value="[*baptism]">[*baptism]</option>
+    <option id="#deat" value="[*death]">[*death]</option>
+    <option id="#buri" value="[*burial]">[*burial]</option>
+    <option id="#crem" value="[*cremation]">[*cremation]</option>
+    <option id="#acco" value="[*accomplishment]">[*accomplishment]</option>
+    <option id="#acqu" value="[*acquisition]">[*acquisition]</option>
+    <option id="#adhe" value="[*adhesion]">[*adhesion]</option>
+    <option id="#bapl" value="[*baptismLDS]">[*baptismLDS]</option>
+    <option id="#barm" value="[*bar mitzvah]">[*bar mitzvah]</option>
+    <option id="#basm" value="[*bat mitzvah]">[*bat mitzvah]</option>
+    <option id="#bles" value="[*benediction]">[*benediction]</option>
+    <option id="#chgn" value="[*change name]">[*change name]</option>
+    <option id="#circ" value="[*circumcision]">[*circumcision]</option>
+    <option id="#conf" value="[*confirmation]">[*confirmation]</option>
+    <option id="#conl" value="[*confirmation LDS]">[*confirmation LDS]</option>
+    <option id="#awar" value="[*decoration]">[*decoration]</option>
+    <option id="#demm" value="[*demobilisationMilitaire]">[*demobilisationMilitaire]</option>
+    <option id="#degr" value="[*diploma]">[*diploma]</option>
+    <option id="#dist" value="[*distinction]">[*distinction]</option>
+    <option id="#dotl" value="[*dotation]">[*dotation]</option>
+    <option id="#endl" value="[*dotationLDS]">[*dotationLDS]</option>
+    <option id="#educ" value="[*education]">[*education]</option>
+    <option id="#elec" value="[*election]">[*election]</option>
+    <option id="#emig" value="[*emigration]">[*emigration]</option>
+    <option id="#exco" value="[*excommunication]">[*excommunication]</option>
+    <option id="#flkl" value="[*familyLinkLDS]">[*familyLinkLDS]</option>
+    <option id="#fcom" value="[*firstCommunion]">[*firstCommunion]</option>
+    <option id="#fune" value="[*funeral]">[*funeral]</option>
+    <option id="#grad" value="[*graduate]">[*graduate]</option>
+    <option id="#hosp" value="[*hospitalisation]">[*hospitalisation]</option>
+    <option id="#illn" value="[*illness]">[*illness]</option>
+    <option id="#immi" value="[*immigration]">[*immigration]</option>
+    <option id="#lpas" value="[*listePassenger]">[*listePassenger]</option>
+    <option id="#mdis" value="[*militaryDistinction]">[*militaryDistinction]</option>
+    <option id="#mpro" value="[*militaryPromotion]">[*militaryPromotion]</option>
+    <option id="#mser" value="[*militaryService]">[*militaryService]</option>
+    <option id="#mobm" value="[*mobilisationMilitaire]">[*mobilisationMilitaire]</option>
+    <option id="#natu" value="[*naturalisation]">[*naturalisation]</option>
+    <option id="#occu" value="[*occupation/occupations]0">[*occupation/occupations]0</option>
+    <option id="#ordn" value="[*ordination]">[*ordination]</option>
+    <option id="#prop" value="[*property]">[*property]</option>
+    <option id="#cens" value="[*recensement]">[*recensement]</option>
+    <option id="#resi" value="[*residence]">[*residence]</option>
+    <option id="#reti" value="[*retired]">[*retired]</option>
+    <option id="#slgc" value="[*scellentChildLDS]">[*scellentChildLDS]</option>
+    <option id="#slgp" value="[*scellentParentLDS]">[*scellentParentLDS]</option>
+    <option id="#slgs" value="[*scellentSpouseLDS]">[*scellentSpouseLDS]</option>
+    <option id="#vteb" value="[*venteBien]">[*venteBien]</option>
+    <option id="#will" value="[*will]">[*will]</option>
+  </datalist>%nl;
+%else;
+  <datalist id="dlevent">
+    <option value="" label="&nbsp;"></option>
+    <option id="#marr" value="[*marriage event]">[*marriage event]</option>
+    <option id="#nmar" value="[*no marriage event]">[*no marriage event]</option>
+    <option id="#nmen" value="[*no mention]">[*no mention]</option>
+    <option id="#enga" value="[*engage event]">[*engage event]</option>
+    <option id="#div" value="[*divorce event]">[*divorce event]</option>
+    <option id="#sep" value="[*separate event]">[*separate event]</option>
+    <option id="#anul" value="[*annulation]">[*annulation]</option>
+    <option id="#marb" value="[*marriage bann]">[*marriage bann]</option>
+    <option id="#marc" value="[*marriage contract]">[*marriage contract]</option>
+    <option id="#marl" value="[*marriage licence]">[*marriage licence]</option>
+    <option id="#pacs" value="[*PACS]">[*PACS]</option>
+    <option id="#resi" value="[*residence]">[*residence]</option>
+  </datalist>%nl;
+%end;%nl;

@@ -1,0 +1,260 @@
+<!-- $Id: buttons.txt v7.1 19/02/2025 06:36:28 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
+%( Boutons de configurations et d'options %)
+%let;l_v0;%if;(e.v!="")
+            %if;(e.m="A" and e.v>static_max_anc_level)%static_max_anc_level;
+            %elseif;(e.m="D" and e.v>static_max_desc_level)%static_max_desc_level;
+            %else;%e.v;%end;
+          %else;1%end;%in;
+%let;l_v;%if;(e.m="A")
+           %if;(bvar.max_anc_level="" or bvar.max_anc_level>l_v0)%l_v0;%else;%bvar.max_anc_level;%end;
+         %elseif;(e.m="D")
+           %if;(bvar.max_desc_level="" or bvar.max_desc_level>l_v0)%l_v0;%else;%bvar.max_desc_level;%end;
+         %end;%in;
+%let;v0;%if;(e.v0="")
+          %if;(e.t="Y")1%else;0%end;
+        %else;
+          %if;(e.only="on" or e.v0>l_v)%l_v;
+          %elseif;(e.v0!="" and e.v0>0 and e.v0<=l_v)%e.v0;
+          %else;0%end;
+        %end;%in;
+%let;only;%if;(e.only="on" or (v0=l_v and v0>1))1%else;0%end;%in;
+%( DEBUG<br>v0 = %v0;<br>v = %l_v;<br>only=%only; %)
+%define;urlset(xx,yy)
+  %url_set.xx.yy;
+%end;
+%let;istable;%if;((e.m="D" and (e.t="H" or e.t="I")) or (e.m="A" and (e.t="Z" or e.t="Y")))1%end;%in;
+%if;(not cancel_links)
+  <div class="button-groug ml-2" role="group" aria-label="nav buttons">
+    <a role="button" class="btn btn-link ml-1 mt-0 px-0"%sp;
+      href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=%evar.m;"><i class="fa fa-gear fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
+      [*options] %if;(evar.m="D")[descendants]%elseif;(evar.m="A")[ancestor/ancestors]1%end;%nn;
+    </a>
+    %let;cond;%if;((evar.m="A" and (evar.t="Z" or evar.t="X" or evar.t="Y")) or (evar.m="D" and (evar.t="D" or evar.t="T")))1%end;%in;
+    %let;root;%if;(evar.iz!="")&iz=%evar.iz;%end;%if;(evar.pz!="")&pz=%evar.pz;%end;%if;(evar.nz!="")&nz=%evar.nz;%end;%if;(evar.ocz!="" and evar.ocz!=0)&ocz=%evar.ocz;%end;%in;
+    <span class="sr-only">—</span>
+    <a role="button" class="btn btn-link ml-1 mt-0 px-0%if;(cond=1 and not has_children) disabled%end;"%sp;
+    href="%prefix_base_password;%nn;
+          %foreach;env_binding;
+            %if;(env.key="m")&m=%if;(cond=1)D%else;A%end;%nn;
+            %elseif;(env.key="t")&t=%if;(cond=1)H%else;Z%end;%nn;
+            %elseif;(env.key="v")&v=%if;(e.v!="")
+                                      %if;(e.m="D")
+                                        %if;(e.v>static_max_anc_level)%static_max_anc_level;%else;%expr(e.v-1)%end;
+                                      %elseif(e.m="A")
+                                        %if;(e.v>static_max_desc_level)%static_max_desc_level;%else;%expr(e.v+1)%end;
+                                      %end;
+                                    %else;1%end;
+            %elseif;(env.key!="")&%env.key=%env.val;%nn;
+            %end;%nn;
+          %end;
+          %if;(istable!=1 or e.t="Y")
+            %if;(evar.num="")&num=on%end;%if;(evar.birth="")&birth=on%end;%nn;
+            %if;(evar.birth_place="")&birth_place=on%end;%nn;
+            %if;(evar.marr="")&marr=on%end;%if;(evar.marr_date="")&marr_date=on%end;%nn;
+            %if;(evar.marr_place="")&marr_place=on%end;%if;(evar.child="")&child=on%end;%nn;
+            %if;(evar.death="")&death=on%end;%if;(evar.death_place="")&death_place=on%end;%nn;
+            %if;(evar.age="")&age=on%end;%if;(evar.occu="")&occu=on%end;%nn;
+            %if;(e.gen="")&gen=1%end;%if;(evar.repeat="" and evar.m="A")&repeat=on%end;
+            %if;(e.ns="")&ns=1%end;%if;(e.hl="")&hl=1%end;%if;(e.fn="")&fn=1%end;%nn;
+          %end;
+          ">%nn;
+    <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>[*table] %if;(cond=1)[descendants]%else;[ancestor/ancestors]1%end;</a>
+    <span class="sr-only">—</span>
+    <a role="button" class="btn btn-link ml-1 my-0 px-0"%sp;
+      href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;%root;&m=%evar.m;&t=T&v=%evar.v;%if;(e.im=0)&im=0%end;">%nn;
+      <i class="fa fa-sitemap%if;(evar.m="A") fa-rotate-180%end; fa-fw mr-1" aria-hidden="true"></i>%if;(evar.m="D")[*descendants tree]%elseif;(evar.m="A")[*ascendants tree]%end;%nn;
+    </a>
+    <span class="sr-only">—</span>
+    %let;cond2;%if;((evar.m="A" and evar.t!="H") or (evar.m="D" and evar.t="D"))1%end;%in;
+    <a role="button" class="btn btn-link ml-1 my-0 px-0%if;(cond2!=1 and not has_children) disabled%end;"%sp;
+      href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;%root;%nn;
+            %if;(cond2=1)&m=A&t=H%nn;
+            %else;&m=D&t=D%nn;
+            %end;&v=%if;(evar.v="")1%else;%if;(cond2=1)%expr(evar.v+1)%else;%expr(evar.v-1);%end;%end;">%nn;
+      <i class="fa fa-%if;(e.m="D")code-branch fa-flip-vertical%elseif;(e.m="A")code-fork%end; fa-rotate-90 fa-fw mr-1" aria-hidden="true"></i>%nn;
+      %if;(cond2=1)[*horizontal tree]%else;[*descendant tree view]%end;%nn;
+    </a>
+  </div>
+  %define;size_btn(xxx,yyy)
+      <a role="button" class="btn btn-link px-0%if;(e.csv=1 or e.t="Y" or e.im=0) disabled%end;"
+        title="[*modify the size of images to] xxx px"
+        href="%prefix_base_password;%nn;
+               %foreach;env_binding;
+                 %if;(env.key!="px" and env.key!="")&%env.key=%env.val;%end;%nn;
+               %end;&px=xxx">%nn;
+        <i class="fa fa-image yyy" aria-hidden="true"></i>%nn;
+      </a>
+  %end;
+  <div class="input-group ml-2">
+    <div class="button-group ml-1" role="group" aria-label="nav buttons">
+      %if;(istable=1)
+        %( TODO allfn sur table/couple %)
+        <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(e.t="Y" or e.csv=1) disabled%end;"
+          href="%if;(e.fn=1)%url_set.fn;%else;%url_set.fn.1;%end;" title="[*visualize/show/hide/summary]1 %if;(e.fn=1)[public name]%else;[first name/first names]1%end;">%nn;
+          <i class="fas fa-address-%if;(e.fn=1)book%else;card%end; fa-fw fa-lg" aria-hidden="true"></i>%nn;
+        </a>
+        <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(e.t="Y" or e.csv=1) disabled%end;%if;(e.tt=1) text-danger%end;"
+          href="%if;(e.tt=1)%url_set.tt;%else;%url_set.tt.1;%end;" title="%if;(e.tt=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [title/titles]1">%nn;
+          <i class="fas fa-crown fa-fw fa-lg" aria-hidden="true"></i>%nn;
+        </a>
+        <a role="button" class="btn btn-link mx-0 px-0%if;(e.csv=1) disabled%end;%if;(e.im=0) text-danger%end;"
+          href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
+            title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">%nn;
+          <i class="fa fa-image fa-lg fa-fw" aria-hidden="true"></i>%nn;
+        </a>
+        <span class="sr-only">—</span>
+        %apply;size_btn(60,"fa-sm")
+        %apply;size_btn(90,"")
+        %apply;size_btn(120,"fa-lg")
+        %if;(e.templ="")
+        <span class="sr-only">—</span>
+        <a role="button" class="btn btn-link px-0 ml-1%if;(e.ns=1) text-danger%end;%if;(e.t="Y" or e.csv=1) disabled%end;"
+          title="%if;(e.ns=1)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [note/notes]1 [and] [source/sources]1%if;(e.ns=""). [*colored corner]%end;"
+          href="%if;(e.ns=1)%url_set.ns;%else;%url_set.ns.1;%end;">
+          <i class="far fa-note-sticky fa-flip-vertical fa-lg fa-fw mb-1 mr-1" aria-hidden="true"></i>%nn;
+          <span class="notecolor">[*note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>%nn;
+        </a>
+        %end;
+        %if;(e.m="D" and (e.marr="on" or e.marr_place="on" or e.marr_date="on"))
+          <span class="sr-only">—</span>
+          <a role="button" class="btn btn-link ml-1 px-0"
+             href="%prefix_base_password;%nn;
+                   %foreach;env_binding;
+                     %if;(env.key="t")&t=%if;(e.t="H")I%elseif;(e.t="I")H%end;%nn;
+                     %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
+                   %end;"
+                   title="%if;(e.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]">%nn;
+            <i class="fas fa-user male pr-0" aria-hidden="true"></i><i class="fas fa-user %if;(e.t!="H")fe%end;male pl-0 mr-2" aria-hidden="true"></i>%nn;
+            [*spouses info]%nn;
+          </a>
+        %end;
+        <a role="button" class="btn btn-link px-0 ml-1%if;(e.csv=1 or e.t="Y") disabled%end;"
+          href="%if;(e.hl!=1)%url_set.hl.1;%else;%url_set.hl;%end;">%nn;
+          <i class="fas fa-highlighter fa-lg fa-fw mr-1%if;(e.hl!=1) text-warning%end;" aria-hidden="true"></i>%nn;
+          %if;(e.hl!=1)[*highlight gaps/hide highlighting]0%else;[*highlight gaps/hide highlighting]1%end;%nn;
+        </a>
+      %end;
+      <span class="sr-only">—</span>
+      %if;(e.csv!="on" and e.m="A" and (e.t="Z" or e.t="Y"))
+        <span class="sr-only">—</span>
+        <a role="button" class="btn btn-link px-0 ml-1"
+          href="%prefix_base_password;%access;&m=A%nn;
+                   %foreach;env_binding;
+                     %if;(env.key="t")&t=%if;(e.t!="Y")Y%else;Z%end;%nn;
+                     %elseif;(env.key="v" or env.key="only" or env.key="im" or env.key="gen")&%env.key=%env.val;%end;%nn;
+                     %( TODO: quick fix dans un seul sens, préférer ajouter v0 sur le tableau par couples, changement de v0 intempestif ingérable sinon %)
+                     %if;(env.key="v0")&v0=%if;(env.val=0)1%else;%env.val;%end;%end;%nn;
+                   %end;%nn;
+                   %( ajout des variables par défaut du tableau asc. pour sortir du tableau par couple qui n'en a quasi pas %)
+                   %if;(e.t="Y")&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on%end;"
+          title="[*visualize/show/hide/summary]1 [table] %if;(e.t="Y")[ancestor/ancestors]1%else;[by couple]%end;">%nn;
+            <i class="fa fa-%if;(e.t="Y")table%else;restroom%end; fa-lg fa-fw" aria-hidden="true"></i>%nn;
+            <span class="ml-1 text-primary">[*table] %if;(e.m="A" and e.t="Z")[by couple]0%else;[by couple]1%end;</span>
+        </a>
+      %end;
+      %if;((e.m="D" and (e.t="D" or e.t="I" or e.t="H")) or (e.m="A" and e.t="H" and e.same!=""))
+        <a role="button" class="btn btn-link px-0"%sp;
+          href="%if;(e.implx!="")%url_set.implx.on;%else;%url_set.implx;%end;"
+           title="%if;(e.implx!="on")[*collapse implex]%else;[*display implex]%end;">%nn;
+          <i class="fa fa-shuffle fa-lg fa-fw"></i>%nn;
+        </a>
+      %end;
+      <span class="sr-only">—</span>
+      %if;(e.m="A" and e.t="Z")
+        <span class="sr-only">—</span>
+        <a role="button" class="btn btn-link px-0"
+          href="%if;(e.csv!=1)%url_set.csv.1;%else;%url_set.csv;%end;"
+          title="%if;(e.csv=1)[*visualize/show/hide/summary]2 CSV [and] [visualize/show/hide/summary]1 [table] [ancestor/ancestors]1%else;[*visualize/show/hide/summary]1 CSV%end;">%nn;
+            <i class="fa fa-file-csv fa-lg fa-fw %if;(e.csv=1)text-danger%end;" aria-hidden="true"></i>%nn;
+        </a>
+      %end;
+      <a role="button" class="btn btn-link px-0" title="[*cancel GeneWeb links]" href="%url_set.cgl.on;" target="_blank">%nn;
+        <i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i>%nn;
+      </a>
+      %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
+        <button id="btnshowfilter" type="button" class="btn btn-link ml-1 px-0">
+          <i class="fas fa-filter ml-1" aria-hidden="true"></i>
+          [*filter by::surname/surnames]0</button>
+      %end;
+      %if;(e.m="D" and e.t="D" and has_parents and e.templ="" and not cancel_links)
+        <button type="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#switch_modal">
+        <i class="fa fa-people-arrows"></i> [*extend]</a>
+      %end;
+    </div>
+  </div>
+  %if;(e.t!="X")
+    <div class="input-group ml-2">
+      <div class="input-group-append mt-2">
+        <form method="get" action="%prefix_base_password;" class="d-flex align-items-center ml-2">
+          %foreach;env_binding;
+            %if;(env.key!="v" and env.key!="v0" and env.key!="only" and env.key!="")
+              <input type="hidden" name="%env.key;" value="%env.val.decoded;">
+            %end;
+          %end;
+          <span class="col-auto px-0">[*generation/generations]0</span>
+          %if;not ((e.m="D" and e.t="D") or (e.m="A" and e.t="H"))
+            <div class="input-group ml-2">
+              <div class="input-group-prepend">
+                <label for="input_v0" class="input-group-text" title="v0= (min<=max)">min</label>
+              </div>
+              <input type="number" id="input_v0" name="v0" class="form-control"
+                value="%if;(e.t="Y" and e.v0="")1%elseif;(only=1 or v0>l_v)%l_v;%elseif;(v0!="")%v0;%else;0%end;"
+                placeholder="%if;(e.t="Y")1%else; %end;" min="%if;(e.t="Y")1%else;0%end;"
+                max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" autofocus>
+            </div>
+          %end;
+          <div class="input-group ml-2">
+            <div class="input-group-prepend">
+              <label for="input_v" class="input-group-text" title="v=…">max</label>
+            </div>
+            <input type="number" id="input_v" name="v" class="form-control"
+              value="%e.v;" min="0" max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" required>
+          </div>
+          <button type="submit" class="btn btn-primary ml-2" title="[*validate/delete]0">OK</button>
+        </form>
+        <a role="button" class="btn btn-link px-0%if;(e.v<1) disabled text-muted%end; ml-2"
+           title="[*delete] 1 [generation/generations]0"
+           href="%apply;urlset%with;v%and;%expr(e.v-1)%end;">
+          <i class="fa fa-minus fa-fw fa-lg" aria-hidden="true"></i>
+          <span class="sr-only">-</span>
+        </a>
+        <a role="button" class="btn btn-link px-0
+          %if;((e.m="D" and e.v>=static_max_desc_level) 
+            or (e.m="A" and e.v>static_max_anc_level)) disabled text-muted%end;"
+          title="[*add] 1 [generation/generations]0
+            %if;(e.v < static_max_desc_level and static_max_desc_level > 1) max %static_max_desc_level; [generation/generations]1)%end;" 
+          href="%apply;urlset%with;v%and;%expr(e.v+1)%end;">
+          <i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i>
+          <span class="sr-only">+</span>
+        </a>
+        %if;(e.v!=0 and istable=1)
+          <a role="button" class="btn btn-link px-0 pl-2 ml-1"
+            href="%if;(only=0)%url_set.only_v0.on_;%else;%url_set.only_v0._;%end;"
+            title="%if;(only=0)[*visualize/show/hide/summary]1 [only the generation selected]
+                   %else;[*visualize/show/hide/summary]1%sp;
+                     %if;(e.m="D")
+                       %apply;togend(e.v)
+                     %elseif;(e.m="A")
+                       %apply;togena(e.v)
+                     %end;
+                   %end;">%nn;
+                <i class="fa fa-turn-up%if;(e.m="D") fa-flip-vertical%end; fa-fw fa-lg%if;(e.only!="on") text-danger%end;" aria-hidden="true"></i>%nn;
+                %if;(e.m="D")
+                  %if;(only=0)%if;(e.v!=0)[*only] %end;%apply;gend("v")
+                  %else;%apply;capitalize%with;%apply;togend%with;%if;(e.v="")0%else;%e.v;%end;%end;%end;
+                  %end;
+                %elseif;(e.m="A")
+                  %if;(only=0)[*only] %apply;gen("v")
+                  %else;%apply;capitalize%with;%apply;togena%with;%if;(e.v="")0%else;%e.v;%end;%end;%end;
+                  %end;
+                %end;
+          </a>
+        %elseif;(e.v=0)
+          <span class="btn disabled text-primary pl-0 ml-2">[*specify::generation/generations]0%sp;
+          %if;(e.m="D" and e.t="D") [or] [extend]%end;</span>
+        %end;
+      </div>
+    </div>
+  %end;
+%end;

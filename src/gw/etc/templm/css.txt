@@ -1,0 +1,20 @@
+<!-- $Id: templm/css.txt v7.0 2017/11/11 05:46:40 $ -->
+<link rel="stylesheet" href="%etc_prefix;templm/css%bvar.css;.css" media="all" title="css%bvar.css;"%/>
+
+<script src=%etc_prefix;templm/js.js></script>
+%if;(bvar.uppercase = "yes")
+  <script>
+  <!--
+    %if;(bvar.uppercase = "yes")
+      %if;(bvar.particles != "")
+        var p_a = new Array(%bvar.particles;);
+      %else;
+        var p_a = new Array("AF","AV","D","DAL","DE","DEN","DES","DI","DU","OF","UND","VAN","VON","ZU","ZUR");
+      %end;
+    %end;
+  -->
+  </script>
+  <script src=%etc_prefix;templm/js_uppercase.js></script>
+%else;
+  <script src=%etc_prefix;templm/js_uppercase_no.js></script>
+%end;

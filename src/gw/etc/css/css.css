@@ -1,0 +1,1869 @@
+/* cousins relation table m=C */
+.toggle-button:focus {
+  outline: none; /* On generation picker, hide the toggle +/- button outline+shadow */
+  box-shadow: none;
+}
+
+#quickrel tr {
+  height:2rem;
+}
+
+.lh-2 {
+  line-height: 2rem;
+}
+
+.border-double {
+  border-style: double;
+}
+
+.border-left-5 {
+  border-left-width: 5px;
+}
+
+.border-right-5-black {
+  border-right-width: 5px;
+  border-right-color: black;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll
+}
+
+.bg-linen {
+  background-color: linen
+}
+
+.modal-title-font-size {
+  font-size: 2rem;
+  font-weight: 300;
+}
+
+.h-15p {
+  height: 15px;
+}
+
+.h-5 {
+  height: 5rem;
+}
+
+.z-index1 {
+  z-index:1;
+}
+
+/* Highlight invisible caracters */
+.hl-evilunichar {
+  background-color: #ffd54f;
+  border-radius: 2px;
+}
+
+.hl-nbsp {
+  background-color: #ffe2e2;
+  border-radius: 2px;
+}
+
+.editable-div {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Check data */
+.hl-check-data {
+  background-color: #FFEB3B;
+  border-radius: 2px;
+  white-space: pre;
+}
+
+.hl-check-data.narrow-nbsp {
+  background-color: #ffb300;
+}
+
+.zero-width-char {
+  display: inline-block;
+  min-width: 0.5em;
+  border: 1px dashed #FF5722;
+}
+
+/* Toolbar and characters panel */
+/* Light grey background color highlight for the toolbar characters.txt */
+.ch .hl {
+  background-color: #ffe2e2;
+}
+
+.ch a.hl:hover {
+  background: #ffe69c;
+}
+
+.hl-book {
+  background: #6cb2fd59;
+}
+
+.ch a:hover {
+  background: #e9ecef;
+  transform: scale(1.1);
+}
+
+.dropdown-menu-transl {
+  -webkit-transform: translate(-16%, 0) !important;
+  -o-transform: translate(-16%, 0) !important;
+  transform: translate(-16%, 0) !important;
+}
+
+.dropdown-menu-transl-pmod {
+  -webkit-transform: translate(-10%, 0) !important;
+  -o-transform: translate(-10%, 0) !important;
+  transform: translate(-10%, 0) !important;
+  max-height: 620px; /* fixme! */
+  overflow: scroll;
+  scrollbar-width: none;
+}
+
+.dropdown-menu-transl-pmod::-webkit-scrollbar {
+  display: none; /* hide p_mod scrollbar */
+}
+
+.ancmenu-implex {
+  color: rgb(255,136,46);
+}
+.ancmenu-implex[aria-selected]{
+  color: rgb(255,255,255);
+}
+
+h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
+
+html {
+  font-size: 1rem;
+}
+
+#updform .row{
+  margin-top:0.2rem;
+}
+/* grey empty inputs with placeholder to better see empty fields in forms */
+#updform textarea:placeholder-shown, #updform input:placeholder-shown, #updform select.custom-select {
+  background-color: #f2f2f2;
+}
+#updform input:focus, #updform textarea:focus {
+  background-color: white !important;
+}
+
+/* Upd_ind/fam forms scroll fix */
+#updform {
+  scroll-padding-top: 52px;
+}
+
+/* Ascendant table by couple anchor fix */
+#scrollfix {
+  scroll-padding-top: 48px;
+}
+
+/* Carrousel */
+.text-pre-line {
+  white-space: pre-line;
+}
+
+/* Books */
+/* fix small down-arrow position on books navigation entries */
+.bottom-book-arrow {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translateX(-5px) translateY(1px);
+  z-index: 1000;
+}
+
+/* White overlay for autoSelectLink function when s1 or s2 parameters are present in URL */
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 9999;
+}
+
+/* Light green background for odd-numbered items */
+.src-list-bg li:nth-child(even) {
+  background-color: #e4f5df;
+}
+a.stretched-link.sup-char, a.stretched-link.sub-char {
+    color: #0050a6 !important
+}
+a.stretched-link.sup-char:hover, a.stretched-link.sub-char:hover {
+    color: #003366 !important;
+}
+.sup-char-div {
+    background-color: #cff9ffb0 !important
+}
+.sup-char-div:hover {
+    background-color: #e6f7ff !important;
+}
+.sup-char-div .bottom-book-arrow a:hover .book-arrow {
+    color: #89CAFE !important;
+}
+.arabic-char {
+    background-color: #ccecf1 !important
+}
+.armenian-char {
+    background-color: #27fff32e !important
+}
+.cyrillic-char {
+    background-color: #9ef7c5ab !important
+}
+.ethiopic-char {
+    background-color: #05fb9033 !important
+}
+.georgian-char {
+    background-color: #B0C4DE !important
+}
+.greek-char {
+    background-color: #6edf5e54 !important
+}
+.hebrew-char {
+    background-color: #AFEEEE !important
+}
+.khmer-char {
+    background-color: #a2df7882 !important
+}
+.arabic-char:hover {
+    background-color: #d9f0f7 !important;
+}
+
+.armenian-char:hover {
+    background-color: #33fffa47 !important;
+}
+
+.cyrillic-char:hover {
+    background-color: #b7f7d5ab !important;
+}
+
+.ethiopic-char:hover {
+    background-color: #08fb9047 !important;
+}
+
+.georgian-char:hover {
+    background-color: #c6d9e8 !important;
+}
+
+.greek-char:hover {
+    background-color: #87e07768 !important;
+}
+
+.hebrew-char:hover {
+    background-color: #c6e8e8 !important;
+}
+
+.khmer-char:hover {
+    background-color: #b4df8c99 !important;
+}
+a.book-arrow:hover {
+    color: white;
+}
+
+#book {
+  scroll-padding-top: 4rem;
+}
+.top-book-arrow {
+  z-index: 1000;
+}
+#book-navigation .d-inline-flex > :nth-child(n) {
+  margin-bottom: 1px;
+  margin-top: 1px;
+}
+#book-navigation .d-inline-flex, #subinit div > *:not(:first-child) {
+  border-left: 0px;
+}
+
+.book-input-text, #nx_input {
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+
+/* scrollbar appear as an overlay, thus not affecting the width of the page when appering */
+.book-anchor {
+  scroll-margin-top: 5rem;
+}
+
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1rem;
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.2rem;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1.6rem;
+  }
+}
+
+.modal-backdrop {
+   background-color: #808080;
+}
+
+#content:focus { outline: none; }
+
+/* Remove overused p anchor top margin*/
+p {
+  margin-top:0rem;
+}
+
+/* Relation menu table */
+#quickrel.table td{
+	padding: 0px;
+	line-height:1em;
+	}
+
+.tooltip-inner {
+   min-width: 100px;
+   max-width: 450px;
+   white-space: normal;
+   opacity: 1 !important;
+   padding: 6px 10px;
+   line-height: 1.2;u
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+/*! Small webfont with 50 monospaced glyphs for descending tree view	
+Generated by Font Squirrel https://www.fontsquirrel.com	
+Source file: dejavu-fonts-ttf-2.37/ttf/DejaVuSansMono.ttf	
+Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C,2533,25B6,25B7 */	
+@font-face {
+    font-family: 'dejavu_sans_mono';
+    src: url('../webfonts/dejavusansmono-genewebfont.woff2') format('woff2'),
+         url('../webfonts/dejavusansmono-genewebfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.tt {
+  font-family: 'dejavu_sans_mono';
+}
+
+.deslist, .anclist_hr {
+  line-height:1.1rem;
+  font-size:1rem;
+}
+
+.unselectable {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+*/ deslist hr alternate couple color */
+.ancestor-couple-color {
+  background-color: #D2691E !important;
+}
+
+/* --- Ascendants/Descendants table --- */
+/* Border and background styles for table headers, th and td */
+.asc-desc-table thead, .asc-desc-table th {
+  border: 1px solid #a0a0a0 !important;
+  padding: 0.3rem;
+  font-family: 'Open Sans', Roboto, sans-serif;
+}
+
+.asc-desc-table th.gen-row {
+  border-right-width: 0px !important;
+  border-left-width: 0px !important;
+}
+
+.asc-desc-table tr.even-row:not(:has(th) + tr) {
+  border-top-style: solid !important;
+  border-top-width: 1px !important;
+  border-top-color: #a0a0a0; !important;
+}
+
+.asc-desc-table td {
+  padding: 0.1rem 0.3rem;
+  border: 1px dotted #a0a0a0;
+  font-family: 'Open Sans', Roboto, sans-serif;
+}
+
+.asc-desc-table td.side-border-male {
+  border-right-width: 2px;
+  border-left-width: 2px;
+  border-color: #318CE7;
+}
+
+.asc-desc-table td.side-border-female {
+  border-right-width: 2px;
+  border-left-width: 2px;
+  border-color: #F653A6;
+}
+
+.asc-desc-table thead {
+  background-color: khaki;
+}
+
+#anctable.asc-desc-table thead th:hover:not(.no-hover),
+#destable.asc-desc-table thead th:hover:not(.no-hover) {
+  background-color: #F5F5DC;
+  /* simili-fix FFx pour créer un effet de bordure, mais étend celle droite/basse d'1px */
+  box-shadow: 0 0 0 1px black;
+}
+
+.bg-lg, .bg-lg>td, .bg-lg>th {
+  background-color: rgb(131 131 131 / 13%)
+}
+
+.bg-ly-incomplete, .bg-ly-incomplete>td, .bg-ly-incomplete>th {
+  background-color: rgb(255 238 186 / 45%);
+}
+
+.table-img-max-width {
+  max-width: 200px;
+}
+
+.gen-row:hover {
+  background-color: white;
+}
+
+.divorced-side-border {
+  border-left: 1px dashed #808080 !important;
+  border-right: 1px dashed #808080 !important;
+}
+
+/* Specific hover effect for the link inside the table cell */
+.table_big_cell:hover,
+.ascdesc_table a:hover,
+.ascdesc_table a div:hover {
+  background-color: ivory;
+}
+
+.table_big_cell {
+  overflow: hidden;
+}
+
+.table_big_anchor {
+  display: block;
+  margin: -10em;
+  padding: 10em;
+  z-index: 0;
+}
+
+.click_through {
+  pointer-events: none;
+}
+
+.big_anchor {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_1 {
+  display: block;
+  width: 100%;
+  height: 60%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_1m {
+  display: block;
+  width: 100%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_him {
+  display: block;
+  width: 50%;
+  height: 60%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_her {
+  display: block;
+  width: 50%;
+  height: 60%;
+  position: absolute;
+  text-align: right;
+  top: 0;
+  left: 50%;
+  z-index: 0;
+}
+
+.big_anchor_him_m {
+  display: block;
+  width: 50%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_her_m {
+  display: block;
+  width: 50%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  z-index: 0;
+}
+
+.normal_anchor {
+  position: relative;
+  z-index: 1;
+}
+
+.fade_image {
+   opacity: 1;
+   transition: opacity .25s ease-in-out;
+   -moz-transition: opacity .25s ease-in-out;
+   -webkit-transition: opacity .25s ease-in-out;
+   }
+
+   .fade_image:hover {
+      opacity: 0.7;
+      }
+
+.lh_implex {
+  line-height: 1;
+}
+
+.pb-6 {
+  padding-bottom: 4.5rem;
+}
+
+.mb-6 {
+  margin-bottom: 5rem;
+}
+
+/* Wrapper pour positionner les placeholders flottants */
+.input-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+/* slowly hide placeholder on input focus */
+[placeholder]:focus::-webkit-input-placeholder {
+  transition: opacity 0.25s ease;
+  opacity: 0;
+}
+
+/* Style du placeholder flottant */
+.floating-placeholder {
+  position: absolute;
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  background: white;
+  padding: 0 3px;
+  color: #6c757d;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: 5px;
+  border-top: 1px solid #dee2e6;
+  box-shadow: 1px 0 2px -1px rgba(0, 123, 255, 0.7),
+}
+
+.form-control-lg + .floating-placeholder {
+  left: 12px;
+}
+
+.floating-placeholder.active, .floating-placeholder:focus::-webkit-input-placeholder{
+  opacity: 0.9;
+  transform: translateY(-4px);
+  transition: transform 0.06s ease-out;
+}
+
+/* Clear button */
+.clear-button-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.clear-button-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+input:not(.custom-file-input):focus, select:focus {
+    z-index: 1;
+}
+.clear-button-wrapper:hover .clear-button-icon {
+    pointer-events: auto;
+}
+
+/* Fix navigation buttons to top right corner */
+.fix_top {
+  position: fixed;
+  top: 0px;
+  z-index: 1030;
+}
+
+.fix_left {
+  left:4px;
+}
+
+.home-xs {
+  z-index: 1031;
+}
+
+@media (max-width: 575px) {
+  .home-xs.fix_left {
+    left:2px;
+  }
+  h1 {
+    font-size: 1.8rem;
+  }
+}
+
+.fix_right {
+  right:0px;
+}
+
+div.anchor_upd {
+  position:absolute;
+  top:-57px;
+}
+
+
+/* Make hamburger smaller, reduce navbar icons in small viewports */
+@media (max-width: 767px) {
+  .navbar-toggler-icon {
+    transform: scale(0.6);
+  }
+  .navbar-toggler {
+    border: none;
+    position: absolute;
+    top: 2px;
+    right: -30px;
+  }
+  .navbar-nav .fa, .navbar-nav .fas, .navbar-nav .far {
+    transform: scale(0.4);
+  }
+  .navbar-collapse {
+    position: relative;
+    width: 90%;
+  }
+
+  #searchmodal .modal-dialog {
+    max-width: 90%;
+  }
+  h1 {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 319px) {
+  .navbar-toggler {
+    right: -15px;
+  }
+}
+
+@media (max-width: 991px) {
+  #searchmodal .modal-dialog {
+    max-width: 85%;
+  }
+}
+
+/* Force select2 results padding to 0 */
+.select2-results__option {
+  padding:0px
+}
+
+/* Capitalization unavailable in note from Ocaml 
+> temporary disactivated: too intrusive for notes in popovers, but needed for note in timeline...
+p::first-letter {
+  text-transform: capitalize;
+}
+*/
+
+.pmod::first-letter {
+  font-weight: bold
+}
+
+/* Image popover in p_mod */
+img.image-popover {
+  width: 300px
+}
+
+div.p_mod_builder {
+  width: 3120px;
+}
+
+/* p-mod input group size */
+.p-mod-group {
+  flex: 1;
+}
+
+.p-mod-group .input-wrapper {
+  flex: 1;
+  width: auto;
+}
+
+/* Fixed ancestors image width on modules/arbre_3gen_photo */
+img.image_small_size {
+  height: 70px;
+}
+
+span.image_small_size {
+  border-style: solid;
+  border-width: thin;
+  font-size: 2.7rem;
+  font-weight: 320
+}
+
+/* Fixed image size (width) on modules/parents and modules/unions */
+.big_image{
+  width: 8.5rem;
+}
+
+.small_image{
+  width: 4rem;
+}
+
+.noimage {
+  border-style: solid;
+  border-width: thin
+}
+
+/* Fix dag line height */
+table#dag {
+  empty-cells: show;
+}
+tr#dag, td#dag {
+  font-family:Noto Sans;
+  vertical-align:top;
+}
+
+/* Sex symbol color */
+.male {
+  color: #318CE7;
+}
+
+.male:hover {
+  color: #014c8c;
+}
+.female {
+  color: #F653A6;
+}
+.female:hover {
+  color: red;
+}
+.neuter{
+  color: grey;
+}
+.neuter:hover {
+  color: black;
+}
+
+a.male-underline:hover { border-bottom: 1px solid #318CE7; }
+a.female-underline:hover { border-bottom: 1px solid #F653A6; }
+a.neuter-underline:hover { border-bottom: 1px solid grey; }
+
+/* Fix noword-wrap on long a href */
+a {
+  word-wrap: break-word
+}
+
+/* Welcome language dropdown scrollable */
+.scrollable-lang {
+  height: auto;
+  max-height: 460px;
+  overflow-x: hidden;
+}
+
+.scrollable-lang.short {
+  max-height: 160px;
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.15) !important; /* Légère transparence */
+  color: inherit !important; /* Garde les couleurs d'origine */
+  backdrop-filter: brightness(1.02); /* Légère luminosité */
+}
+
+#banner {
+  background-color: transparent; /* Fond transparent par défaut */
+  transition: background-color 0.15s ease; /* Transition fluide */
+}
+
+#banner.scrolled {
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); /* Légère ombre pour démarquer */
+}
+
+#banner.scrolled, .card-body {
+  background-color: #f8f9fa;
+}
+
+/* Cancel empty margin-left of Bootstrap <dl> */
+dl {
+  margin-left: 1.3rem;
+}
+
+/* Fix tree and pre line-height */
+.tree-vert {
+  line-height: 1.2rem;
+}
+pre {
+  line-height:1rem;
+  overflow:unset;
+  font-size:100%;
+}
+pre a:hover{
+  background-color: #FAFA9A;
+}
+pre a:link, a:visited, a:hover, a:active, a:focus{
+  text-decoration: none;
+}
+
+/* Properties to highlight words generated by GeneWeb. All pages.*/
+.highlight
+{
+  color: #2f6400;
+  font-weight: bold;
+}
+
+.error
+{
+  color: #9c1117;
+}
+
+.with_picto
+{
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding: 4px 4px 4px 20px;
+}
+
+.odd
+{
+  background-color: #FBFBFB;
+}
+
+.even
+{
+  background-color: transparent;
+}
+
+
+/* Properties for the unvisited, visited and mouse over links. All pages. */
+a:link.highlight
+{
+  color: #2f6400;
+}
+
+a:visited.highlight
+{
+  color: #2f6400;
+}
+
+a:hover.highlight
+{
+  color: #2f6400;
+}
+
+a:link.date
+{
+  text-decoration: none;
+  color: black;
+  background-color: transparent;
+}
+
+a:visited.date
+{
+  text-decoration: none;
+  color: black;
+  background-color: transparent;
+}
+
+a:hover.date
+{
+  text-decoration: none;
+  color: black;
+  background-color: transparent;
+}
+
+/* Properties of the trailer block. All pages. */
+#trl
+{
+ text-align: left;
+ margin-left: auto;
+ margin-right: auto;
+ margin-top : 40px;
+}
+
+#trl ul
+{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-align: center;
+}
+
+#trl ul li { display: inline; }
+
+#trl ul li a
+{
+  text-decoration: none;
+  padding: .2em 1em;
+  color: #fff;
+  background-color: #2f6400;
+}
+
+#trl ul li a:hover
+{
+  color: #fff;
+  background-color: #4A9900;
+}
+
+
+/* Properties of the title block. All pages. */
+#title
+{
+ padding-top: 10px;
+ width: 100%;
+ background-color: #e7edb3;
+}
+
+/* Properties of the lang block. Page welcome.txt */
+#lang
+{
+  /*text-align: center;*/
+}
+
+/* Properties of the logo block. Page welcome.txt */
+#logo
+{
+ float: left;
+ width: 160px;
+}
+
+/* Properties of the acces block. Page welcome.txt, perso.txt */
+/* The border property is exported in the template            */
+/* so that the acces menu is not visible if there             */
+/* no password defined for wizard or friends                  */
+#acces
+{
+ float: right;
+ width: 160px;
+ height: 65px;
+ margin-right: 10px;
+ text-align: center;
+}
+
+#acces>ul
+{
+ padding: 0px;
+ padding-top: 5px;
+ margin: 0px;
+ list-style-type: none;
+}
+
+/* Properties of the title in the acces block. Page welcome.txt */
+#acces h3
+{
+ text-align: left;
+ background-color: #6f8301;
+ color: white;
+ margin: 0;
+}
+
+/* Properties of the search block. Page welcome.txt */
+#search
+{
+ width: 750px;
+ border: solid 2px #6f8301;
+ text-align: left;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+/* Properties of the title in the search block. Page welcome.txt */
+#search h3
+{
+ margin: 0;
+ text-align: left;
+ background-color: #6f8301;
+ color: white;
+}
+
+/* Properties of the form in the search block. Page welcome.txt */
+#search form
+{
+ margin-top: 10px;
+ margin-left: 10px;
+}
+
+/* Display the "title and estate" search in  */
+/* one line (search block). Page welcome.txt */
+#form-titles div
+{
+  float: left;
+  margin-right: 3px;
+}
+
+/* "title and estate" search in block search. Page welcome.txt */
+#content fieldset
+{
+  border: 0;
+}
+
+/* Properties of the misc block. Page welcome.txt          */
+/* Trick : to center easily this block, one must add the   */
+/* following properties : align, margin-left, margin-right */
+/* and the trick : overflow: auto.                         */
+#misc
+{
+ width: 750px;
+ border: solid 2px #6f8301;
+ text-align: left;
+ overflow: auto;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+/* Properties of the title in the misc block. Page welcome.txt */
+#misc h3
+{
+ margin: 0;
+ text-align: left;
+ background-color: #6f8301;
+ color: white;
+}
+
+/* Properties of the tools block. Page welcome.txt         */
+/* Trick : to center easily this block, one must add the   */
+/* following properties : align, margin-left, margin-right */
+/* and the trick : overflow: auto.                         */
+#tools
+{
+ width: 750px;
+ border: solid 2px #6f8301;
+ text-align: left;
+ overflow: auto;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+/* Properties of the title in the tools block. Page welcome.txt */
+#tools h3
+{
+ margin: 0;
+ text-align: left;
+ background-color: #6f8301;
+ color: white;
+}
+
+/* Properties of the navigation block. Page perso.txt      */
+/* Trick : to center easily this block, one must add the   */
+/* following properties : align, margin-left, margin-right */
+/* and the trick : overflow: auto.                         */
+#navigation
+{
+ width: 750px;
+ border: solid 2px #6f8301;
+ text-align: left;
+ overflow: auto;
+ margin-left: auto;
+ margin-right: auto;
+ margin-top : 40px;
+}
+
+/* Properties of the title in the navigation block. Page perso.txt */
+#navigation h3
+{
+ text-align: left;
+ background-color: #6f8301;
+ color: white;
+ margin: 0;
+}
+
+/* list_left and list_right allow to display lists in 2 columns.     */
+/* It's applied in the welcome.txt page: "other option" block and    */
+/* in the perso.txt page: "navigation" block.                        */
+/* width specify that this block is half of its parent's block and   */
+/* float specify the position of the list (relative to the parents). */
+/* The text-align property is inherited by the parent's block.       */
+#list_left
+{
+ width: 45%;
+ float: left;
+}
+
+#list_right
+{
+ width: 45%;
+ float: right;
+}
+
+/* perso.txt page: "navigation" block. */
+.li_left
+{
+ width: 25%;
+ float: left;
+}
+
+/* Listes ascendance */
+/* sans parent */
+li.noway
+{
+  list-style-type: circle;
+}
+/* avec parents */
+li.goway
+{
+  list-style-type: disc;
+}
+
+/* liste descendance */
+/* sans conjoint */
+li.nospou
+{
+  list-style-type: circle;
+}
+/* avec conjoint, sans descendance */
+li.nodesc
+{
+  list-style-type: disc
+}
+/* avec descendance */
+li.desc
+{
+  list-style-type: square;
+}
+
+/* Propositions de couleur de background dans certains menus */
+.bg1
+{
+  background-color: #FFC0C0;
+}
+.bg2
+{
+  background-color: #FFFFC0;
+}
+.bg3
+{
+  background-color: #C0FFC0;
+}
+.bg4
+{
+  background-color: #C0FFFF;
+}
+.bg5
+{
+  background-color: #C0C0FF;
+}
+.bg6
+{
+  background-color: #FFC0FF;
+}
+
+
+/* --------------------------- Pyramide des Ã¢ges -------------------------- */
+.pyramid_center
+{
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+
+.pyramid_nb
+{
+  font-style: italic;
+}
+
+
+/* --------------------------------- wiki -------------------------------- */
+div.summary ul
+{
+  padding-left: 0;
+  list-style-type: none
+}
+
+div.summary ul ul
+{
+  padding-left: 1.618em
+}
+
+.subtitle
+{
+  border-bottom: solid 1px #844404;
+}
+
+.found
+{
+  color: black;
+  background-color: #afa;
+  font-weight:bold
+}
+
+
+/* ------------------------------ Biographie ----------------------------- */
+
+#bio_block
+{
+  padding:9px;
+  text-align:justify;
+  text-indent:18px;
+  font-size:1.1em;
+}
+
+#bio_block h6
+{
+  width:50%;
+  border:3px double #2f6400;
+  padding:3px;
+  text-align:left;
+  font-size:1.4em;
+}
+
+#bio_block hr
+{
+  height:3px;
+  color:#2f6400;
+}
+
+#bio_block :first-letter
+{
+  font-weight:900;
+  font-size:1.2em;
+  color:#2f6400;
+}
+
+#bio_right
+{
+  float:right;
+  border:#2f6400 solid 3px;
+  margin:12px;
+  padding:6px;
+  text-align:center;
+  text-indent:0px;
+  font-size:0.9em;
+}
+
+#bio_left
+{
+  float:left;
+  border:#2f6400 solid 3px;
+  margin:12px; padding:6px;
+  text-align:center;
+  text-indent:0px;
+  font-size:0.9em;
+}
+
+
+
+
+/* ---------------------------- perso_short.txt --------------------------- */
+
+.fp_ul_summary
+{
+  list-style: none;
+  padding-left: 0px;
+}
+.fp_ul_summary > li
+{
+  padding: 5px;
+}
+.page_max
+{
+  width: 864px;
+}
+/*
+.fp_date_empty
+{
+  border: solid 1px #999999;
+  width: 60px;
+  display: block;
+}
+*/
+.fp_table
+{
+  width: 100%;
+  margin-top: 10px;
+}
+.fp_table th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%;
+  text-align: left;
+  padding-left: 5px;
+}
+.fp_table td
+{
+  padding: 5px;
+}
+.fp_person
+{
+  width: 100%;
+  border: solid 2px #00794C;
+}
+.fp_person_info
+{
+  margin: 0px;
+  padding: 0px;
+}
+.fp_person_info_ul
+{
+  list-style-type: none;
+  padding : 0px;
+  margin: 0px;
+}
+.fp_person_info_ul li
+{
+  padding : 5px;
+}
+.fp_person_info_ul > li > hr
+{
+  border-top: solid 1px #998C90;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
+}
+.fp_grey td
+{
+  color: #998C90;
+  border-bottom: solid 1px #00794C;
+  font-weight: bold;
+  padding: 2px;
+}
+.fp_grey_italic
+{
+  color: #998C90;
+  font-style: italic;
+  font-weight: bold;
+}
+.fp_table_parent
+{
+  width: 100%;
+  margin-top: 10px;
+}
+.fp_table_parent th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%;
+  text-align: left;
+  padding-left: 5px;
+}
+.fp_table_parent td
+{
+  padding: 5px;
+}
+.fp_table_siblings
+{
+  width: 100%;
+  margin-top: 10px;
+}
+.fp_table_siblings tr td
+{
+  padding: 5px;
+}
+.fp_table_siblings th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%;
+  text-align: left;
+  padding-left: 5px;
+}
+.table_content_siblings > td
+{
+  padding: 2px;
+  padding-left: 0px;
+  border-top: solid 1px #F0ECED;
+}
+.fp_half_siblings
+{
+  background-color: #F0ECED;
+  font-weight: bold;
+}
+.table_content_odd > td
+{
+  background-color: #F0ECED;
+}
+.fp_table_relations
+{
+  width: 100%;
+  margin-top: 10px;
+}
+.fp_table_relations tr td
+{
+  padding: 5px;
+}
+.fp_table_relations th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%;
+  text-align: left;
+  padding-left: 5px;
+}
+.table_content_relations > td
+{
+  padding: 2px;
+  padding-left: 0px;
+  border-top: solid 1px #F0ECED;
+}
+.fp_table_marriage
+{
+  width:100%;
+  margin-top: 10px;
+}
+.fp_table_marriage th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%;
+  text-align: left;
+  padding-left: 5px;
+}
+.fp_table_marriage td
+{
+  padding: 5px;
+}
+.fp_table_marriage table{
+  width:100%;
+}
+.fp_marriage_notes
+{
+  width: 100%;
+  margin-top: 10px;
+}
+.fp_marriage_notes td
+{
+  padding: 10px;
+}
+.fp_marriage_notes td,
+.fp_notes
+{
+  background-color: #F0EDEE;
+}
+.fp_marriage_notes span
+{
+  color: #00794A;
+  font-weight: bold;
+}
+.fp_family_separator
+{
+  width: 100%;
+  border-top-width: 3px;
+  border-top-style: double;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
+}
+.fp_table_children
+{
+  width: 100%;
+}
+.fp_table_children td
+{
+  padding: 5px;
+}
+.fp_source
+{
+  margin: 0px;
+  padding-left: 20px;
+}
+.fp_source > li
+{
+  padding: 2px;
+}
+
+/* ------------------ Display by branch/alphabetic order ------------------ */
+
+table.display_search
+{
+ border:2px solid #F0ECED;
+}
+
+/* ----------------------- Simulate a select button ----------------------- */
+
+div.select
+{
+  display:inline-block;
+  position:relative;
+  border:1px solid #E7ED83;
+  background-color:#6F8301;
+  cursor:pointer;
+  z-index:1;
+  padding-right:5px;
+  padding-left:4px;
+}
+
+div.select > span
+{
+  background-position:center right;
+  background-repeat:no-repeat;
+  padding-right:18px;
+  display:inline-block;
+  background-color:#6F8301;
+  color:white;
+  font-weight:bold;
+  text-align:left;
+  width:200px;
+  padding-top:6px;
+  padding-bottom:4px;
+}
+
+div.select ul
+{
+  position:absolute;
+  display:none;
+  margin:0px;
+  padding:0px;
+  top:24px;
+  white-space:nowrap;
+  text-align:left;
+  background-color:white;
+  left:-1px;
+  border:1px solid #6F8301;
+}
+
+div.select ul li
+{
+  margin:0;
+  line-height:20px;
+  list-style-type:none;
+}
+
+div.select ul li.title
+{
+  background-color:#E7ED83;
+  padding-left:5px;
+  font-weight:bold;
+}
+
+div.select ul a
+{
+  color:black;
+  display:block;
+  padding-left:5px;
+  padding-right:5px;
+  width:217px;
+  text-decoration:none;
+}
+
+div.select ul a
+{
+  color: #2F6400;
+}
+
+div.select ul a:hover
+{
+  text-decoration:underline;
+}
+
+div.select:hover
+{
+  border:1px solid #6F8301;
+}
+
+div.select:hover ul
+{
+  display:block;
+  z-index:100;
+}
+
+/* --- Ascendants/Descendants trees --- */
+table hr
+{
+  border-top: solid 1px black;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
+}
+
+hr.left
+{
+  margin-left:0;
+  margin-right: 50%;
+  width: 50%;
+}
+
+hr.right
+{
+  margin-left: 50%;
+  margin-right: 0;
+  width: 50%;
+}
+
+hr.full
+{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* --- Ascendants/Descendants liste rÃ©digÃ©e --- */
+.asc_notes_src_inline, .desc_notes_src_inline
+{
+  padding-left:15px;
+}
+
+/* --- Ascendants --- */
+.list_eclair_table th, .list_eclair_table td
+{
+  padding:0 2px;
+}
+
+.surname_branch_sort
+{
+  float:left;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+ul.surname_branch_sort > li
+{
+  margin-bottom:15px;
+}
+
+.surname_branch_table
+{
+  border-width:1px;
+  border-style:solid;
+  border-collapse:collapse;
+}
+
+.surname_branch_sort .surname_branch_table
+{
+  width:100%;
+}
+
+.surname_branch_table th,
+.surname_branch_table td
+{
+  border:1px solid black;
+  vertical-align:top;
+  padding:2px 4px;
+}
+
+.missing_ancestors_sort
+{
+  float:left;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+ul.missing_ancestors_sort > li
+{
+  margin-bottom:15px;
+}
+
+
+.missing_ancestors_sort
+{
+  width:100%;
+}
+
+/* --- Descendants --- */
+.descends_aboville_pipe
+{
+  border-left: 1px solid;
+  padding-left: 10px;
+}
+
+/* adjust also colors in destable.txt */
+.note, .implex, .source, .notesource, .notespouse, .sourcespouse, .notesourcespouse {
+    position: relative;
+}
+.note:after, .implex:after, .source:after, .notesource:after, .notespouse:after, .sourcespouse:after, .notesourcespouse:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 0;
+    display: block;
+    border-bottom: 12px solid transparent;
+}
+.implex:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #87CEFA;
+}
+.note:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #87CEFA;
+}
+.source:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #FFD700;
+}
+.notesource:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #90EE90;
+}
+.notespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #87CEFA; 
+}
+.sourcespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #FFD700;
+}
+.notesourcespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #90EE90;
+}
+span.notecolor {
+    color: #87CEFA;
+}
+span.sourcecolor {
+    color: #FFD700;
+}
+span.notesourcecolor {
+    color: #90EE90;
+}
+.popover{
+    word-wrap: break-word;
+    max-width: 40%;
+}
+
+.d-flex.flex-wrap {
+  gap: 0.5rem;
+}
+
+#welcome .flex-wrap {
+  gap: 0.25rem;
+}
+
+.imap-gallery {
+  width: 250px;
+  margin-bottom: 1rem;
+  background: white;
+  border-radius: .25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.imap-gallery a {
+  display: block;
+}
+
+.imap-gallery img {
+  width: 250px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: .25rem .25rem 0 0;
+}
+
+.imap-gallery a + :last-child {
+  padding: .75rem;
+  color: #212529;
+  font-size: .875rem;
+  text-align: center;
+  border-top: 1px solid #dee2e6;
+}
+
+.in { 
+  background-color: coral;
+}
+
+.list_comma li {
+  display: inline;
+}
+
+.list_comma li:not(:last-child):after { 
+  content: ", ";
+}
+
+.list_comma li:last-child:after {
+  content: ".";
+}
+
+/* surname by branch m=N */
+#surname_by_branch {
+    white-space: nowrap;
+}
+#surname_by_branch dt {
+ margin-top: 1.5em;
+}
+#surname_by_branch ul, #surname_by_branch li {
+    list-style: none;
+    margin: 0;
+}
+/* Uncomment to get it event more compact
+#surname_by_branch ul.posterity {
+    display: inline;
+    padding: 0;
+}
+#surname_by_branch ul.posterity li {
+    display: inline;
+}
+*/
+
+.image-arbre-famille {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  object-position: center 35%
+}
+.image-arbre-placeholder {
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+.text-overflow-ellipsis {
+  text-overflow: ellipsis;
+}
+
+.text-truncate-narrow {
+  max-width: min(170px, 100%);
+}
+
+.text-truncate-wide {
+  max-width: min(235px, 100%);
+}
+
+
+.name-container {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1;
+}

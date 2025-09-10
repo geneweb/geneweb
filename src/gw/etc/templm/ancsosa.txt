@@ -1,0 +1,126 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: templm/ancsosa.txt v7.0 2016/02/04 21:20:57 $ -->
+  %let;l_up;%if;(evar.i1 != "" or evar.p1 != "")1%end;%in;
+  <title>%nn;
+    %if;(l_up = 1)
+      [*ancestor/ancestors]1 … [up to] …%nn;
+    %elseif;(evar.t = "N" and evar.only = "on")
+      [*generation/generations]0 %e.v;
+    %else;
+      %apply;a_of_b2%with;
+        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
+      %and;
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") %qualifier;%end;
+        %sp;%surname;
+      %and;
+        %if;(public_name != "")%public_name;%else;%first_name_key;%end;
+      %end;
+    %end;
+  </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+</head>
+
+%( <!-- Begin define --> %)
+  %let;l_v0;%if;(evar.v != "")%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%else;1%end;%in;
+  %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
+  %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+  %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+  %let;l_up;%if;(evar.i1 != "" or evar.p1 != "")1%end;%in;
+
+%define;tothegen(xx)
+  [*upto the %s generation:::xx]%nn;
+%end;
+
+%define;togen1(xx)
+  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[*to the parents]%nn;
+  %elseif;(xx = 3)[*to the grandparents]%nn;
+  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+
+%define;togen()
+  <p>
+    %if;(evar.only != "on")
+      %apply;togen1(l_v)
+    %else;
+      [*generation/generations]0 %l_v;
+    %end;
+  </p>
+%end;
+
+%( <!-- End define --> %)
+
+%(   Main   %)
+<body%body_prop; id="ancsosa">
+%include;hed
+%message_to_wizard;
+
+<h1>%nn;
+  %apply;a_of_b2%with;
+    %if;(evar.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
+  %and;
+    %if;(not cancel_links)<a href="%prefix;%access;">%end;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+      %if;(alias != "") <em>(%alias;)</em>%end;
+    %if;(not cancel_links)</a>%end;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name_key;%end;
+  %end;
+  %sp;%dates;
+</h1>
+<dl>
+  %if;(evar.t = "M")
+    %if;(evar.miss="M2")
+      <dt>[*not found]</dt>
+        <dd>
+          %if;(evar.M2b="b") · %bvar.var_t_BIRTHA;%end;
+          %if;(evar.M2m="m") · %bvar.var_t_MARRIAGEA;%end;
+          %if;(evar.M2d="d") · %bvar.var_t_DEATHA;%end;
+        </dd>
+    %elseif;(evar.miss="M3")
+      <dt>[*date/dates]0 != [exact]</dt>
+        <dd>
+          %if;(evar.M3b="b") · [*birth]%end;
+          %if;(evar.M3m="m") · [*marriage/marriages]0%end;
+          %if;(evar.M3d="d") · [*death]%end;
+        </dd>
+    %end;
+  %end;
+</dl>
+
+%if;(evar.t = "G")
+  %include;ancsosa_tg
+  %elseif;(evar.t = "X" or evar.t = "Y")
+  %include;ancsosa_tdz
+%elseif;(evar.t = "N" and evar.same != "")
+  %include;ancsosa_same
+%elseif;(evar.t = "M")
+  %include;ancsosa_miss
+%elseif;(evar.t = "Z")
+  %include;ancsosa_tab
+%end;
+%if;(not cancel_links and evar.t!="Z")
+  %include;tools
+
+  %apply;tools_ancsosa()
+  %include;trl
+  %include;copyr
+  %query_time;
+%end;
+</body>
+</html>

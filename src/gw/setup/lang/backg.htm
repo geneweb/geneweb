@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: backg.htm,v 7.00 2018-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Background image]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[Background image]
+</h1>
+</div>
+
+<ul>
+
+<li>
+[To specify a background image for the database "%o", you have to write it:]
+
+<pre>
+     background="gwd%t{.exe}?m=IM;v=/[foo.jpg]"
+</pre>
+
+<p />
+
+[replacing "<tt>foo.jpg</tt>" by the real name of your image file.]
+
+<p />
+
+<li>
+[Put the image file in the directory (possibly create it before):]
+
+<pre>
+     gw%/images
+</pre>
+
+</ul>

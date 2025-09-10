@@ -1,0 +1,360 @@
+<!-- $Id: templm/anclist_miss.txt v7.0 2016/02/04 21:21:37 $ -->
+
+%define;link(aa, xx)
+  %if;(cancel_links)xx%else;<a href="%prefix;aa">xx</a>%end;
+%end;
+
+%define;sorted_list_birth(xx)
+  %incr_count;
+  %apply;add_in_sorted_list%with;
+    %ancestor.xx_place;%and;
+    %ancestor.xx_date.year;%and;
+    %ancestor; <small class = "xs top">s%ancestor.anc_sosa;</small>%and;
+    %birth_symbol; %ancestor.xx_date.prec;%and;
+    %ancestor.on_xx_date;%and;
+    %apply;a_of_b%with; 
+      %if;(ancestor.is_male)[*son/daughter/child]0
+      %elseif;(ancestor.is_female)[*son/daughter/child]1
+      %else;[*son/daughter/child]2
+      %end;
+    %and;
+      %if;(ancestor.has_parents)
+          %ancestor.father; &amp; %ancestor.mother;
+      %end;
+    %end;
+    %and;
+    %ancestor.access;
+  %end;
+%end;
+
+%define;sorted_list_death(xx)
+  %incr_count;
+  %apply;add_in_sorted_list%with;
+    %ancestor.xx_place;%and;
+    %ancestor.xx_date.year;%and;
+    %ancestor; <small class = "xs top">s%ancestor.anc_sosa;</small>%and;
+    %if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%ancestor.xx_date.prec;%and;
+    %ancestor.on_xx_date;%and;
+    &amp; %ancestor.spouse;%and;
+    %ancestor.access;
+  %end;
+%end;
+
+%define;sorted_list_marriage()
+  %incr_count;
+  %apply;add_in_sorted_list%with;
+    %marriage_place;%and;
+    %marriage_date.year;%and;
+    %ancestor; <small class = "xs top">s%ancestor.anc_sosa;</small>%and;
+    &amp;%marriage_date.prec;%and;
+    %on_marriage_date;%and;
+    &amp; %spouse;%and;
+    %ancestor.access;
+  %end;
+%end;
+
+%define;M2b_b()
+  %if;(not ancestor.has_linked_page.BIRTHA)
+    %if;(ancestor.has_birth_date)
+      %apply;sorted_list_birth("birth")
+    %elseif;(ancestor.has_baptism_date)
+      %apply;sorted_list_birth("baptism")
+    %end;
+  %end;
+%end;
+
+%define;M2m_m()
+  %if;(ancestor.is_male and not ancestor.has_linked_page.MARRIAGEA)
+    %foreach;ancestor.family
+      %if;(marriage_date.year != "")
+        %apply;sorted_list_marriage()
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;M2d_d()
+  %if;(not ancestor.has_linked_page.DEATHA)
+    %if;(ancestor.has_death_date)
+      %apply;sorted_list_death("death")
+    %elseif;(ancestor.has_burial_date)
+      %apply;sorted_list_death("burial")
+    %elseif;(ancestor.has_cremation_date)
+      %apply;sorted_list_death("cremated")
+    %end;
+  %end;
+%end;
+
+%define;M3b_b()
+  %if;(ancestor.birth_date.prec != "")
+    %apply;sorted_list_birth("birth")
+  %elseif;(ancestor.baptism_date.prec != "")
+    %apply;sorted_list_birth("baptism")
+  %elseif;(ancestor.on_birth_date = "" and ancestor.on_baptism_date = "")
+    %if;(ancestor.has_birth_date)
+      %apply;sorted_list_birth("birth")
+    %elseif;(ancestor.has_baptism_date)
+      %apply;sorted_list_birth("baptism")
+    %else;
+      %apply;sorted_list_birth("birth")
+    %end;
+  %end;
+%end;
+
+%define;M3m_m()
+  %if;(ancestor.is_male)
+    %foreach;ancestor.family
+      %if;(marriage_date.prec != "" or on_marriage_date = "")
+        %apply;sorted_list_marriage()
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;M3d_d()
+  %if;(ancestor.is_dead)
+    %if;(ancestor.death_date.prec != "")
+      %apply;sorted_list_death("death")
+    %elseif;(ancestor.burial_date.prec != "")
+      %apply;sorted_list_death("burial")
+    %elseif;(ancestor.on_death_date = "" and ancestor.burial_date.day = "")
+      %if;(ancestor.has_death_date)
+        %apply;sorted_list_death("death")
+      %elseif;(ancestor.has_burial_date)
+        %apply;sorted_list_death("burial")
+      %else;
+        %apply;sorted_list_death("death")
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;miss_b(xx,bb,mm,dd)
+  %apply;xxb_bb()
+%end;
+%define;miss_m(xx,bb,mm,dd)
+  %apply;xxm_mm()
+%end;
+%define;miss_d(xx,bb,mm,dd)
+  %apply;xxd_dd()
+%end;
+%define;miss_bm(xx,bb,mm,dd)
+  %apply;xxb_bb()
+  %apply;xxm_mm()
+%end;
+%define;miss_bd(xx,bb,mm,dd)
+  %apply;xxb_bb()
+  %apply;xxd_dd()
+%end;
+%define;miss_md(xx,bb,mm,dd)
+  %apply;xxm_mm()
+  %apply;xxd_dd()
+%end;
+%define;miss_bmd(xx,bb,mm,dd)
+  %apply;xxb_bb()
+  %apply;xxm_mm()
+  %apply;xxd_dd()
+%end;
+
+%define;miss1(xx,bb,mm,dd)
+  %if;("bb" = "b" or "mm" = "m" or "dd" = "d")
+    %apply;togen()
+    %empty_sorted_list;
+    %reset_count;
+    %foreach;ancestor_level(l_v)
+      %if;(level > 1 and (evar.only != "on" or level = l_v))
+        %foreach;ancestor;
+          %if;(ancestor.same = "")
+            %apply;miss_bbmmdd("xx","bb","mm","dd")
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;miss2()
+  %if;(count > 100)
+    <p>
+    %foreach;sorted_list_item;
+      %if;(initial(prev_item.1) != initial(item.1))
+        <a href="#a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+      %end;
+    %end;
+    </p>
+  %end;
+  <ul>
+  %foreach;sorted_list_item;
+    <li>%nn;
+      %if;(count > 100 and initial(prev_item.1) != initial(item.1))
+        <a id="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+        <ul><li>%nn;
+      %end;
+      %if;(prev_item.1 != item.1)
+        %item.1;
+        %if;(number_of_subitems > 1)%nl;
+          <ul class="ul_0"><li>%nn;
+        %else;%sp;
+        %end;
+      %end;
+      %item.4;%item.2; · <a href="%prefix;%item.7;">%item.3;</a> · %item.5; · %item.6;
+    </li>
+    %if;(prev_item.1 = item.1 and number_of_subitems = 1 and item.1 != "")
+      </ul></li>
+    %end;
+    %if;(count > 100 and initial(item.1) != initial(next_item.1) and item.1 != "")
+      </ul></li>
+    %end;
+  %end;
+  </ul>
+  <p>[*total] = %count;</p>
+%end;
+
+%( main %)
+%if;(evar.miss = "M1" and evar.al = "on")
+  %( missing ancestors alphabetically %)
+  %apply;togen()
+  %empty_sorted_list;
+  %reset_count;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))%nn;
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %if;(not ancestor.has_parents and
+               ancestor.first_name != "?" and ancestor.surname != "?")
+            %incr_count;
+            %apply;add_in_sorted_list(
+              ancestor.surname_end, ancestor.first_name,
+              ancestor.surname_begin, "0",
+              ancestor.nobility_title, ancestor.access,
+              ancestor.dates, [parents],
+              ancestor.family.marriage_date.year,
+              ancestor.spouse, ancestor.spouse.dates,
+              ancestor.spouse.nobility_title)
+          %elseif;(evar.ms = "on" and ancestor.has_parents)
+            %if;(ancestor.father.first_name = "?" and
+                 ancestor.father.surname = "?")
+              %incr_count;
+              %apply;add_in_sorted_list(
+                ancestor.mother.surname_end, ancestor.mother.first_name,
+                ancestor.mother.surname_begin, "1",
+                ancestor.mother.nobility_title, ancestor.mother.access,
+                ancestor.mother.dates, [husband/wife]0)
+            %end;
+            %if;(ancestor.mother.first_name = "?" and
+                 ancestor.mother.surname = "?")
+              %incr_count;
+              %apply;add_in_sorted_list(
+                ancestor.father.surname_end, ancestor.father.first_name,
+                ancestor.father.surname_begin, "1",
+                ancestor.father.nobility_title, ancestor.father.access,
+                ancestor.father.dates, [husband/wife]1)
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+  %if;(count > 100)
+    %foreach;sorted_list_item;
+      %if;(initial(prev_item.1) != initial(item.1))
+        <a href="#a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+      %end;
+    %end;
+  %end;
+  %if;(evar.ms != "on")
+    <p>
+    %apply;a_of_b([*parents], "…")
+    </p>
+  %end;
+  <ul>
+  %foreach;sorted_list_item;
+    <li>%nn;
+    %if;(count > 100 and initial(prev_item.1) != initial(item.1))
+      <a id="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+      <ul>
+        <li>%nn;
+    %end;
+    %if;(prev_item.1 != item.1)
+      %item.1;
+      %if;(number_of_subitems > 1)%nl;
+        <ul>
+          <li>%nn;
+      %end;
+    %end;
+    %sp;<a href="%prefix;%item.6;">%item.2;</a>%item.3;
+    %if;(item.5 != ""), <em>%item.5;</em>%end;%item.7;
+    %if;(evar.ms != "on")
+      %if;(item.10 != "? ?")
+        %nl;&amp;%nn;
+        %if;(item.9 != "")<span style="font-size:70%%">%item.9;</span>%end;
+        %sp;%item.10;%item.11;
+        %if;(item.12 != ""), <em>%item.12;</em>%end;
+      %end;
+    %else; =&gt; %item.8;%end;
+    </li>
+    %if;(prev_item.1 = item.1 and number_of_subitems = 1)
+      </ul>
+      </li>
+    %end;
+    %if;(count > 100 and initial(item.1) != initial(next_item.1))
+      </ul>
+      </li>
+    %end;
+  %end;
+  </ul>
+  <p>[*total] = %count;</p>
+%elseif;(evar.miss = "M1")
+  %( missing ancestors in ancestors order %)
+  %if;(evar.only != "on")
+    %apply;togen()
+  %end;
+  %if;(evar.ms != "on")
+    <p>%apply;a_of_b([*parents], "…")</p>
+  %end;
+  <ul>
+  %reset_count;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))%nn;
+      %apply;lazy_print%with;
+        <li>%nl;[*generation/generations]0 %level;%nl;
+        <ul>%nl;
+      %end;
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %if;(not ancestor.has_parents 
+               and ancestor.first_name != "?" and ancestor.surname != "?")
+            %incr_count;
+            %lazy_force;
+            <li>%ancestor.anc_sosa.v; -
+            %if;(evar.ms != "on")
+              %apply;link(ancestor.access, ancestor)
+            %else;
+              %apply;a_of_b%with;[parents]%and;
+                %apply;link(ancestor.access, ancestor)
+              %end;
+            %end;
+            %ancestor.title; %ancestor.dates;
+            </li>%nl;
+          %elseif;(evar.ms = "on")
+            %if;(ancestor.first_name = "?" or
+                 ancestor.surname = "?")
+              %incr_count;
+              %lazy_force;
+              <li>%ancestor.anc_sosa.v; -
+                %apply;link(ancestor.access,"??")
+              </li>%nl;
+            %end;
+          %end;
+        %end;
+      %end;
+      %if;lazy_printed;</ul>%nl;</li>%nl;%end;
+    %end;
+  %end;
+  </ul>
+  <p>[*total] = %count;</p>
+%elseif;(evar.miss="M3")
+  %( date != exact %)
+  %apply;miss1(evar.miss,evar.M3b,evar.M3m,evar.M3d)
+  %apply;miss2()
+%end;

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: cleanup1.htm,v 7.00 2018-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Cleanup - Phase 2]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Cleanup]</h1>
+</div>
+<p>
+[We are going to proceed to the cleaning up of the database "%a".]
+<p>
+[Warning: this operation can take some seconds or minutes, depending on the cases. Be patient.]
+<p>
+[Push this button to start][:]
+<p>
+<form method="post" action="cleanup_1">
+%h
+<dl><dt><dd><input type="submit" value="Ok" /></dl>
+</form>
+<p>
+[For information, this operation corresponds to the following commands][:]
+<pre>
+     $ cd "%w"
+     $ %x%/gwu %a -o tmp.gw
+     $ mkdir old
+     [Under Unix][:]
+        $ rm -rf old/%a.gwb
+        $ mv %a.gwb old/.
+     [Under MSdos][:]
+        $ del old\%a.gwb\*.*
+        $ rmdir old\%a.gwb
+        $ move %a.gwb old\.
+     $ %x%/gwc tmp.gw -nofail -o %a > comm.log
+</pre>
+

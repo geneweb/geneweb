@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: anclist.txt v7.1 04/03/2023 09:51:04 $ -->
+  <title>%nn;
+    %if;(e.t = "F")- [*surnames branch] -%nn;
+    %else;
+      %apply;a_of_b%with;
+        %if;(e.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
+      %and;
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") %qualifier;%end;
+        %sp;%surname;
+      %end;
+    %end;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+<div class="container%if;(e.wide="on")-fluid%end;">
+%include;perso_utils
+%if;not cancel_links;
+  %include;menubar
+  %include;buttons
+%end;
+%let;lvl;
+  %if;(b.max_anc_level = "")%apply;min(e.v, max_anc_level, 7)
+  %else;%apply;min(e.v, max_anc_level, b.max_anc_level)%end;
+%in;
+<h3 class="mt-2 ml-3">%nn;
+  %if;(e.t = "F")
+    %apply;a_of_b%with;[*surnames branch]%and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+      %if;(alias != "") <em>(%alias;)</em>%end;<br>    %end;
+  %elseif;(e.t = "E")
+    %apply;a_of_b%with;[*list eclair]%and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+    %end;
+  %else;
+    %apply;a_of_b%with;[*ancestor/ancestors]1%and;
+      %if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %end;
+    %if;(e.t="D")[up to] %pvar.1;
+    %end;
+  %end;%nn;
+  %if;(e.t="H" or e.t="F" or e.t="E") %apply;togena(lvl)%end;
+</h3>
+%( implex count %)
+%if;(has_parents)
+  %reset_count;
+  %foreach;ancestor_level
+    %if;(e.v!="" and level<=e.v)
+      %foreach;ancestor
+        %if;(ancestor.same != "")%incr_count;%end;
+      %end;
+    %end;
+  %end;
+%end;
+%let;implexcnt;%count;%in;
+%define;ancestors_by_list(xx, nnn)
+  %if;(xx.has_parents and nnn > 0)
+    <ul class="fa-ul">
+      <li><span class="fa-li"><i class="fa fa-person male fa-fw mr-1"></i></span><a href="%prefix;
+        %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
+        %apply;ancestors_by_list("xx.father", nnn - 1)</li>
+      <li><span class="fa-li"><i class="fa fa-person-dress female fa-fw mr-1"></i></span><a href="%prefix;
+        %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
+        %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
+    </ul>
+  %end;
+%end;
+%define;anc_row_hr(pp, vv, zz, ss1, ss2, ss3)
+  %if;(vv>=0)
+    %if;(pp.has_parents or (pp.sosa.v!=zz and e.same!=""))
+      %apply;anc_row_hr("pp.father", vv-1, zz*2, "ss1     ", "ss1 ┌──╴", "ss1 |   ")
+    %end;
+    <span data-surname="_%pp.surname;">
+    <span>ss2</span>%nn;
+    <span>%nn;
+      %if;(not cancel_links)<a href="%prefix;%pp.access;"
+        class="sosa_%if;(pp.sosa.v!=zz)implex_%end;%pp.sosa.v;" role="button">%pp;</a>%nn;
+      %else;%pp;%end;%pp.title;%pp.dates;%nn;
+    </span>
+    %if;(pp.sosa.v!="" and pp.sosa.v!=zz)
+      %if;(not cancel_links)
+        <a role="button" onclick="implex('%pp.sosa.v;')"
+          title="[*implex/implexes]0, [see above] [*Sosa] %pp.sosa;">%end;
+          <i class="fa fa-shuffle fa-fw fa-sm mx-1" aria-hidden="true"></i>
+          <span class="sr-only"> (==) </span>
+      %if;(not cancel_links)</a>%end;
+    %end;
+    <br>
+    </span>
+    %if;(pp.has_parents or (e.same!="" and pp.sosa.v!=zz))
+      %apply;anc_row_hr("pp.mother", vv-1, zz*2+1, "ss3 |   ", "ss3 └──╴", "ss3     ")
+    %end;
+  %end;
+%end;
+%define;input(xx)
+  <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
+  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control ml-1%if;(xx!=1) d-none%end;" disabled>
+%end;
+%define;definecujus(pp,nn)
+  %if;(nn=0)[*define Cujus:::pp]0%elseif;(nn=1)[*define Cujus:::pp]1%end;
+%end;
+%if;(e.v="" and e.v=0)
+  [*specify::generation/generations]0.
+%else;
+  %if;(e.t="L")
+    %( by list %)
+    <p>%apply;togena(lvl).</p>
+    %apply;ancestors_by_list("self", lvl)
+  %elseif;(e.t="H")
+    %( horizontal ascendency %)
+    <form id="filterbysurname" class="form-inline mt-2 d-none">
+      <div class="form-control px-0 border-0">[*filter by]</div>
+      <div>%apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)</div>
+      <button id="btnplus" type="button" class="btn btn-primary ml-2" title="[*add filter] (max 4)"><i class="fa fa-plus fa-fw"></i></button>
+      <button id="btnclear" type="button" class="btn btn-danger ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
+    </form>
+    <div class="text-monospace anclist_hr mt-2">
+      %let;sosa_v;%if;(sosa.v!="")%sosa.v;%else;1%end;%in;
+      %if;((e.same="" or e.same=0) and self=sosa_ref)
+        %apply;anc_row_hr("self", lvl, 1, "   ", "──╴", "   ")
+      %else;
+        %apply;anc_row_hr("self", lvl, sosa_v, "   ", "──╴", "   ")
+      %end;
+    </div>
+    %let;pnocz_old;%if;(e.iz!="")izb=%e.iz;%elseif;(e.pz!="" or e.nz!="")pzb=%e.pz;&nzb=%e.nz;%if;(e.ocz!="" and e.ocz!="0")&oczb=%e.ocz;%end;%end;%in;
+    %if;(not cancel_links)
+      %if;(implexcnt>0 and not (e.iz=index or self=sosa_ref))
+          <i class="far fa-circle-dot fa-fw text-success"></i><a role="button" class="mt-3"
+            href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
+                  %else;%apply;url_set%with;iz/same%and;%index;/%implexcnt;%end;%end;&%pnocz_old;">%nn;
+            %apply;definecujus(self,0)</a>
+      %end;
+      %if;(e.same!="" and (e.izb!="" or (e.pzb!="" and e.nzb!="")))
+        <i class="far fa-circle-stop fa-fw text-danger"></i><a role="button" class="mt-3"
+         href="%url_set.iz_pz_nz_ocz_izb_pzb_nzb_oczb_same;%nn;
+           %if;(b.access_by_key="yes")&pz=%e.pzb;&nz=%e.nzb;%if;(e.oczb!="")&ocz=%e.oczb;%end;%else;&iz=%e.izb;%end;">
+           %apply;definecujus%with;%apply;capitalize(e.pzb) %apply;capitalize(e.nzb)%(TODO get name form e.izb%)%and;1%end;</a>
+      %end;
+    %end;
+  %elseif;(e.t="E")
+    %( list eclair by alphabetic/place/date/ind/event order %)
+        %empty_sorted_list;
+    %foreach;ancestor_surname(e.v)
+      %apply;add_in_sorted_list%with;
+        %if;(e.sort="ind")
+          -%ancestor.nb_ind;
+        %elseif;(e.sort="evt")
+          -%ancestor.nb_events;
+        %elseif;(e.sort="plc")
+          %ancestor.place;
+        %elseif;(e.sort="date")
+          %ancestor.date_begin.year;
+        %else;%ancestor.surname_end;
+        %end;
+        %and;%ancestor.surname_end;
+        %and;%ancestor.surname_begin;
+        %and;%ancestor.place;
+        %and;%ancestor.date_begin.prec;
+        %and;%ancestor.date_begin.year;
+        %and;%ancestor.date_end.prec;
+        %and;%ancestor.date_end.year;
+        %and;%ancestor.nb_ind;
+        %and;%ancestor.nb_events;
+      %end;
+    %end;
+    <div class="not_printable">
+      %if;(not cancel_links)
+        <div class="d-inline-flex align-items-center">
+          [*sort by/date begin/alphabetic order/nb individuals/nb events]0
+          <a role="button" href="%url_set.sort;"
+            class="ml-1 btn btn-link%if;(e.sort="") disabled" aria-disabled="true%end;">
+            <i class="fa-solid fa-arrow-down-a-z mr-1"></i>
+            [sort by/date begin/alphabetic order/nb individuals/nb events]2</a>
+          <a role="button" href="%url_set.sort.plc;"
+            class="btn btn-link%if;(e.sort="plc") disabled" aria-disabled="true%end;">
+            <i class="fa-solid fa-arrow-down-a-z mr-1"></i>[place/places]1</a>
+          <a role="button" href="%url_set.sort.date;"
+            class="btn btn-link%if;(e.sort="date") disabled" aria-disabled="true%end;">
+            <i class="fa-regular fa-calendar-days mr-1"></i>
+            [sort by/date begin/alphabetic order/nb individuals/nb events]1</a>
+          <a role="button" href="%url_set.sort.ind;"
+            class="btn btn-link%if;(e.sort="ind") disabled" aria-disabled="true%end;">
+            <i class="fa-solid fa-arrow-down-wide-short mr-1"></i>
+            [sort by/date begin/alphabetic order/nb individuals/nb events]3</a>
+          <a role="button" href="%url_set.sort.evt;"
+            class="btn btn-link%if;(e.sort="evt") disabled" aria-disabled="true%end;">
+            <i class="fa-solid fa-arrow-down-wide-short mr-1"></i>
+            [sort by/date begin/alphabetic order/nb individuals/nb events]4</a>
+        </div>
+      %end;
+    </div>
+    <table class="list_eclair_table table table-bordered table-hover mt-2">
+      <thead>
+      <tr class="list_eclair_table_header">
+        <th>[*surname/surnames]0</th>
+        <th>[*place/places]0</th>
+        <th class="text-center">[*date begin]</th>
+        <th class="text-center">[*date end]</th>
+        <th class="text-center" title="[nb individuals]">#[*person/persons]1</th>
+        <th class="text-center" title="[nb events]">#[*event/events]1</th>
+      </tr>
+      </thead>
+      <tbody>
+      %foreach;sorted_list_item;
+        <tr>
+          <td>%item.2;%item.3</td>
+          <td>%item.4;</td>
+          <td align="center">
+            %if;(item.5 = "&lt;")
+              /%item.6;
+            %elseif;(item.5 = "&gt;")
+              %item.6;/
+            %elseif;(item.5 = "|" or item.5 = "..")
+              %item.6;
+            %else;
+              %item.5;%item.6;
+            %end;
+          </td>
+          <td align="center">
+            %if;(item.7 = "&lt;")
+              /%item.7;
+            %elseif;(item.7 = "&gt;")
+              %item.8;/
+            %elseif;(item.7 = "|" or item.7 = "..")
+              %item.8;
+            %else;
+              %item.7;%item.8;
+            %end;
+          </td>
+          <td align="center">%item.9;</td>
+          <td align="center">%item.10;</td>
+        </tr>
+      %end;
+      </tbody>
+    </table>
+  %elseif;(e.t="F" and e.sort="on")
+    %( surnames branch sorted by number of branches %)
+    %empty_sorted_list;
+    %reset_count;
+    %foreach;ancestor_surname(e.v)
+      %incr_count;
+      %let;neg_ancestor_nb_times;%expr(0-ancestor.nb_times)%in;
+      %apply;add_in_sorted_list(
+        neg_ancestor_nb_times,
+        ancestor.nb_times,
+        ancestor.surname_end,
+        ancestor.surname_begin,
+        ancestor.sosa_access,
+        ancestor.place,
+        ancestor.date_begin.prec,
+        ancestor.date_begin.year,
+        ancestor.date_end.prec,
+        ancestor.date_end.year)
+    %end;
+    %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
+    %if;(count > 100)
+      <p>
+        <span>[*number of branches] : </span>
+        %foreach;sorted_list_item;
+          %if;(prev_item.2 != item.2)
+            <a href="#a_%apply;hexa(item.2)">%item.2;</a>
+          %end;
+        %end;
+      </p>
+    %end;
+
+  %if;(not cancel_links)
+    <div class="">[*help surname branch].</div>
+    <table class="display_search border-0">
+      <tr>
+        <td><b>[*sort by/branch/alphabetic order]0</b></td>
+        <td><img src="%images_prefix;picto_branch.png"></td>
+        <td>[sort by/branch/alphabetic order]1</td>
+        <td><i class="fa-solid fa-arrow-down-a-z ml-2"></i></td>
+        <td>
+          <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">
+            [sort by/branch/alphabetic order]2
+          </a>
+        </td>
+      </tr>
+    </table>
+  %end;
+    <ul class="surname_branch_sort">
+      %if;(count <= 100)
+        <li>%nn;
+        <table class="table table-sm w-auto asc-desc-table mt-2">
+          <thead><tr>
+            <th>[*surname/surnames]0</th>
+            <th>[*nb branches]</th>
+            <th>[*place/places]0</th>
+            <th>[*date/dates]0</th>
+          </tr></thead>
+      %end;
+      %foreach;sorted_list_item;
+        %if;(prev_item.2 != item.2 and count > 100)
+          <li>%nn;
+          <a name="a_%apply;hexa(item.2)">%item.2;</a>
+          <table class="table table-sm w-auto asc-desc-table">
+            <thead><tr>
+              <th>[*surname/surnames]0</th>
+              <th>[*nb branches]</th>
+              <th>[*place/places]0</th>
+              <th>[*date/dates]0</th>
+            </tr></thead>
+        %end;
+        <tr>
+          <td>
+            %item.3;%item.4;
+          </td>
+          <td align="center">
+            %if;(e.cgl != "on")
+              <a href="%prefix;m=DAG&%item.5;&sn=%item.3;%item.4;">%item.2;</a>
+            %else;
+              %item.2;
+            %end;
+          </td>
+          <td>
+            %item.6;
+          </td>
+          <td>
+            %if;(item.7 = "&lt;")
+              /%item.8;
+            %elseif;(item.7 = "&gt;")
+              %item.8;/
+            %elseif;(item.7 = "|" or item.7 = "..")
+              %item.8;
+            %else;
+              %item.7;%item.8;
+            %end;%nn;
+            -%nn;
+            %if;(item.9 = "&lt;")
+              /%item.10;
+            %elseif;(item.9 = "&gt;")
+              %item.10;/
+            %elseif;(item.9 = "|" or item.9 = "..")
+              %item.10;
+            %else;
+              %item.9;%item.10;
+            %end;
+          </td>
+        </tr>
+        %if;(item.2 != next_item.2 and count > 100)
+          </table>
+          </li>
+        %end;
+      %end;
+      %if;(count <= 100)
+        </table>
+        </li>
+      %end;
+    </ul>
+    <p style="clear:both"></p>
+
+  %elseif;(e.t="F")
+    %( surnames branch %)
+    %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
+    %if;(not cancel_links)
+      <div>[*help surname branch].</div>
+      <table class="display_search border-0">
+        <tr>
+          <td><b>[*sort by/branch/alphabetic order]0</b></td>
+          <td><img src="%images_prefix;picto_branch.png"></td>
+          <td>
+            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;&sort=on">
+              [sort by/branch/alphabetic order]1
+            </a>
+          </td>
+          <td><i class="fa-solid fa-arrow-down-a-z ml-2"></i></td>
+          <td>[sort by/branch/alphabetic order]2</td>
+        </tr>
+      </table>
+    %end;
+    <table class="table table-sm w-auto asc-desc-table mt-2">
+      <thead>
+      <tr>
+        <th>[*surname/surnames]0</th>
+        <th>[*nb branches]</th>
+        <th>[*place/places]0</th>
+        <th>[*date/dates]0</th>
+      </tr>
+      </thead>
+      <tbody>
+      %foreach;ancestor_surname(e.v)
+        <tr>
+          <td>
+            %ancestor.surname_end;%ancestor.surname_begin;
+          </td>
+          <td align="center">
+            %if;(e.cgl != "on")
+              <a href="%prefix;m=DAG&%ancestor.sosa_access;&sn=%ancestor.surname;">%ancestor.nb_times;</a>
+            %else;
+              %ancestor.nb_times;
+            %end;
+          </td>
+          <td>
+            %ancestor.place;
+          </td>
+          <td>
+            %if;(ancestor.date_begin.prec = "&#60;")
+              /%ancestor.date_begin.year;%nn;
+            %elseif;(ancestor.date_begin.prec = "&#62;")
+              %ancestor.date_begin.year;/%nn;
+            %elseif;(ancestor.date_begin.prec = "|" or ancestor.date_begin.prec = "..")
+              %ancestor.date_begin.year;%nn;
+            %else;
+              %ancestor.date_begin.prec;%ancestor.date_begin.year;%nn;
+            %end;
+            -%nn;
+            %if;(ancestor.date_end.prec = "&#60;")
+              /%ancestor.date_end.year;%nn;
+            %elseif;(ancestor.date_end.prec = "&#62;")
+              %ancestor.date_end.year;/%nn;
+            %elseif;(ancestor.date_end.prec = "|" or ancestor.date_end.prec = "..")
+              %ancestor.date_end.year;%nn;
+            %else;
+              %ancestor.date_end.prec;%ancestor.date_end.year;%nn;
+            %end;
+          </td>
+        </tr>
+      %end;
+      </tbody>
+    </table>
+  %end;
+%end;
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

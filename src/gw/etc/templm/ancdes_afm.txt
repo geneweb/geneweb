@@ -1,0 +1,144 @@
+<!-- $Id: templm/ancdes_afm.txt v7.0 2014/11/24 16:28:06 $ -->
+
+%( age father mother by generation tf1/tl1 = afm %)
+
+%include;ancdes_stat
+
+%define;stat_a1()
+  %let;l_max_width;180%in;
+  %let;l1;[*age] ([father/mother]0, [father/mother]1)%in;
+  <div class="s1 bcbg2">
+    <span class="s2">%l1;</span>
+    <span class="s3">%count; [date/dates]1</span>
+  </div>
+  <div class="s1 bcbg1" style="height:8.5em;">
+    <span class="sn4" style="top:1em;">70</span>
+    <span class="sn4" style="top:2em;">60</span>
+    <span class="sn4" style="top:3em;">50</span>
+    <span class="sn4" style="top:4em;">40</span>
+    <span class="sn4" style="top:5em;">30</span>
+    <span class="sn4" style="top:6em;">20</span>
+    <span class="sn4" style="top:7em;">10</span>
+    %apply;stat1(1,"sn","bottom",l1)
+  </div>
+%end;
+
+%define;stat_a2()
+  <table class="title" width="100%%"><tr>
+    %if;(evar.m = "A")
+      <td>[*generation/generations]0</td>
+    %end;
+    <td align="center">[*age] ([father/mother]0, [father/mother]1)</td>
+    <td align="right">[*date of birth]</td>
+  </tr></table>
+%end;
+
+%define;anc_a()
+  %empty_sorted_list;
+  %reset_count;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "" and ancestor.has_parents)
+          %let;l_aby;%if;(ancestor.birth_date.year = "" or ancestor.birth_date.prec = ".." or ancestor.birth_date.prec = "|")0%else;%ancestor.birth_date.year;%end;%in;
+          %let;l_fby;%if;(ancestor.father.birth_date.year = "" or ancestor.father.birth_date.prec = ".." or ancestor.father.birth_date.prec = "|")9999%else;%ancestor.father.birth_date.year;%end;%in;
+          %let;l_mby;%if;(ancestor.mother.birth_date.year = "" or ancestor.mother.birth_date.prec = ".." or ancestor.mother.birth_date.prec = "|")9999%else;%ancestor.mother.birth_date.year;%end;%in;
+          %if;(l_aby > l_fby)
+            %incr_count;
+            %let;l_age;%expr((l_aby - l_fby)/10)%in;
+            %apply;add_in_sorted_list(0,l_age,ancestor.father.index,count)
+          %end;
+          %if;(l_aby > l_mby)
+            %incr_count;
+            %let;l_age;%expr((l_aby - l_mby)/10)%in;
+            %apply;add_in_sorted_list(1,l_age,ancestor.mother.index,count)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+  %apply;stat_a1()
+  <div class="stat2 bcbg1">
+    %apply;stat_a2()
+    %foreach;ancestor_level(l_v)
+      %empty_sorted_list;
+      %reset_count;
+      %if;(level > 1 and (evar.only != "on" or level = l_v))
+        %foreach;ancestor;
+          %if;(ancestor.same = "" and ancestor.has_parents)      
+            %let;l_aby;%if;(ancestor.birth_date.year = "" or ancestor.birth_date.prec = ".." or ancestor.birth_date.prec = "|")0%else;%ancestor.birth_date.year;%end;%in;
+            %let;l_fby;%if;(ancestor.father.birth_date.year = "" or ancestor.father.birth_date.prec = ".." or ancestor.father.birth_date.prec = "|")9999%else;%ancestor.father.birth_date.year;%end;%in;
+            %let;l_mby;%if;(ancestor.mother.birth_date.year = "" or ancestor.mother.birth_date.prec = ".." or ancestor.mother.birth_date.prec = "|")9999%else;%ancestor.mother.birth_date.year;%end;%in;
+            %if;(l_aby >= l_fby)
+              %incr_count;
+              %let;l_age;%expr(l_aby - l_fby)%in;
+              %apply;add_in_sorted_list(l_aby,l_age,0,ancestor.index,count)
+            %end;
+            %if;(l_aby >= l_mby)
+              %incr_count;
+              %let;l_age;%expr(l_aby - l_mby)%in;
+              %apply;add_in_sorted_list(l_aby,l_age,1,ancestor.index,count)
+            %end;
+          %end;
+        %end;
+        %apply;stat2()
+      %end;
+    %end;
+  </div>
+%end;
+
+%define;des_a1(curlev, maxlev)
+  %let;l_aby;%if;(birth_date.year = "" or birth_date.prec = ".." or birth_date.prec = "|")0%else;%birth_date.year;%end;%in;
+  %let;l_fby;%if;(has_parents)%if;(father.birth_date.year = "" or father.birth_date.prec = ".." or father.birth_date.prec = "|")9999%else;%father.birth_date.year;%end;%else;9999%end;%in;
+  %let;l_mby;%if;(has_parents)%if;(mother.birth_date.year = "" or mother.birth_date.prec = ".." or mother.birth_date.prec = "|")9999%else;%mother.birth_date.year;%end;%else;9999%end;%in;
+  %if;(l_aby >= l_fby)
+    %incr_count;
+    %let;l_age;%expr((l_aby - l_fby)/10)%in;
+    %apply;add_in_sorted_list(0,l_age,father.index,count)
+  %end;
+  %if;(l_aby >= l_mby)
+    %incr_count;
+    %let;l_age;%expr((l_aby - l_mby)/10)%in;
+    %apply;add_in_sorted_list(1,l_age,mother.index,count)
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;des_a1(curlev+1, maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;des_a2(curlev, maxlev)
+  %let;l_aby;%if;(birth_date.year = "" or birth_date.prec = ".." or birth_date.prec = "|")0%else;%birth_date.year;%end;%in;
+  %let;l_fby;%if;(has_parents)%if;(father.birth_date.year = "" or father.birth_date.prec = ".." or father.birth_date.prec = "|")9999%else;%father.birth_date.year;%end;%else;9999%end;%in;
+  %let;l_mby;%if;(has_parents)%if;(mother.birth_date.year = "" or mother.birth_date.prec = ".." or mother.birth_date.prec = "|")9999%else;%mother.birth_date.year;%end;%else;9999%end;%in;
+  %if;(l_aby >= l_fby)
+    %incr_count;
+    %let;l_age;%expr(l_aby - l_fby)%in;
+    %apply;add_in_sorted_list(l_aby,l_age,0,index,count)
+  %end;
+  %if;(l_aby >= l_mby)
+    %incr_count;
+    %let;l_age;%expr(l_aby - l_mby)%in;
+    %apply;add_in_sorted_list(l_aby,l_age,1,index,count)
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;des_a2(curlev+1, maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+
+%( main %)
+%apply;togen()
+%if;(evar.m = "A")
+  %apply;anc_a()
+%else;
+  %apply;des_a()
+%end;

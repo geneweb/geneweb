@@ -1,0 +1,659 @@
+<!-- $Id: modules/unions.txt v7.1 17/11/2023 10:30:00 $ -->
+%( op_m=1 simple: name %)
+%( op_m=2 photos: simple with photo %)
+%( op_m=3 evolved: spouse parents and children's spouse %)
+%( op_m=4 complete: evolved up to grand-children %)
+%( op_m=5 photos: complete with photos of spouse and children %)
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%define;relations_tree(z1)
+    %reset_count;
+    href="%prefix;spouse=on;m=RLM;image=%evar.image;&%nn;
+      %foreach;witness;
+        %incr_count;i%count;=%witness.index;&%nn;
+        t%count;=[marriage event];%nn;
+        %incr_count;i%count;=z1;%nn;
+      %end;
+      %incr_count;i%count;=%index;&%nn;
+      t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
+      %if;browsing_with_sosa_ref;
+        %incr_count;i%count;=%sosa_ref.index;&t%count;=sosa_1;%nn;
+      %end;
+    " title="[*relations tree]"
+%end;
+%define;list_witness_of_kind(kindx)
+  %reset_count;
+  %foreach;event_witness;
+    %if;(event_witness_kind = [kindx]0)
+      %incr_count;
+    %end;
+  %end;
+  %let;k_cnt;%count;%in;
+  %if;(k_cnt>0)
+    %if;(k_cnt=1)[*kindx]0%else;[*kindx]1%end;[:]%sp;
+  %end;
+  %reset_count;
+  %foreach;event_witness;
+    %if;(event_witness_kind = [kindx]0)
+      %incr_count;
+      %apply;short_display_person("event_witness")
+      %if;(count=k_cnt).
+      %else;
+        %if;(count=k_cnt-1)%sp;[and]%sp;%else;,%sp;%end;
+      %end;
+    %end;
+  %end;
+%end;
+%define;havingaschildren(xx)
+  [having as children:::xx]1%nn;
+%end;
+%define;havingchildren(cc)
+  %if;(cc>1)
+    %apply;havingaschildren%with;%apply;nth%with;[n (number)]%and;cc%end;%end;
+  %else;[having as children]0%nn;
+  %end;
+%end;
+%( Copie des fonctions qui se trouvent dans perso.txt dont la SEULE
+   modification est que la phrase NE commence PAS par une majuscule. %)
+%define;loc_married_to(sexx, date)
+  %if;(sexx = 0 or sexx = 2)
+    %if;are_married;[married%t to:::date]0%nn;
+    %elseif;are_not_married;[relationship%t to:::date]0%nn;
+    %elseif;are_engaged;[engaged%t to:::date]0%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date]0%nn;
+    %elseif;is_no_mention;date [with]%nn;
+    %end;
+  %else;
+    %if;are_married;[married%t to:::date]1%nn;
+    %elseif;are_not_married;[relationship%t to:::date]1%nn;
+    %elseif;are_engaged;[engaged%t to:::date]1%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date]1%nn;
+    %elseif;is_no_mention;date [with]%nn;
+    %end;
+  %end;
+%end;
+%define;loc_long_married(xx)
+  %apply;loc_married_to%with;%xx.sex%and;
+    %if;(on_marriage_date = "")
+    %else; <em>%on_marriage_date;
+      %if;wedding_birthday; ([happy birthday to them!])%end;
+      </em>
+    %end;
+  %end;
+%end;
+%define;picture(xxx,yyy)
+  %if;not cancel_links;<a href="%xxx.yyy_url;" class="align-self-start" target="_blank">%end;
+    <img class="%if;("xxx"="spouse")big%else;small%end;_image fade_image mx-1 rounded" src="%xxx.yyy_url;" alt="[xxx/xxxs]0 [yyy/yyys]0"
+      title="%if;("xxx"="spouse")%xxx; ([spouse/spouses]0)
+             %elseif;("xxx"="parent")%xxx; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)
+             %elseif;("xxx"="child")%count1;. %xxx; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)
+             %end;">
+  %if;not cancel_links;</a>%end;
+%end;
+%( ATTENTION: on n'utilise pas max_desc_level parce que c'est extremement
+   gourmand sur les gros arbre puisqu'on calcule toute la descendance.
+   or on n’a besoin de seulement savoir s’il y a des arrière-petits-
+   enfants, d’où le code ci-dessous :
+   1 si on a des enfants
+   2 si on a des petits-enfants
+   3 si on a des arrières-petits-enfants %)
+%reset_count;
+%if;has_children;
+  %incr_count;
+  %foreach;family;
+    %foreach;child;
+      %foreach;family;
+        %if;child.has_children;
+          %if;(count<2)
+            %incr_count;
+          %end;
+          %foreach;child;
+            %foreach;family;
+              %if;child.has_children;
+                %if;(count<3)
+                  %incr_count;
+                %end;
+              %end;
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+%if;has_families;
+  %foreach;family
+    %reset_count2;
+    %if;(are_married)
+      %incr_count2;
+    %end;
+  %end;
+  <h2 class="mt-2 w-100">
+    %if;(op_m!=1)
+      %if;(count2>0)
+        [*marriage/marriages]f%nn;
+      %else;
+        [*spouse/spouses]f%nn;
+      %end;
+      %if;((op_m=2 or op_m=3 or count>0) and has_children)
+        %sp;[and] [child/children]c%nn;
+      %end;
+    %else;
+      [*family/families]f%nn;
+    %end;
+    %if;(op_m=4 or op_m=5)
+      %if;(count>2)
+        %sp;[to the great-grandchildren]%nn;
+      %elseif;(count>1)
+        %sp;[to the grandchildren]%nn;
+      %end;
+    %end;
+    %if;(not cancel_links and has_children)
+      <span class="ml-2">%nn;
+        <a href="%prefix_base_password;%access;&m=D&t=T&v=1">%nn;
+          <img class="mx-1 mb-1" src="%images_prefix;gui_create.png" height="18" alt="tree desc."
+            title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"></a>
+      </span>
+    %end;
+  </h2>
+%end;
+%if;(op_m=1 and has_families)
+  <ul class="marriage_perso">
+    %( On remet les compteurs à zéro et on commence à compter à 1 - synchro with notes.txt %)
+    %reset_count;
+    %foreach;family;
+      %incr_count;
+      %apply;li_SD("spouse")
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
+        %apply;short_display_person("spouse")
+        %let;prev_count;%count;%in;
+        %if;(has_witnesses)
+          %sp;([witness/witnesses]w[:]
+          %foreach;witness;
+            %if;not is_first;, %end;
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;%nn;
+          %end;
+          %if;(not cancel_links)
+            <a %apply;relations_tree(index)>%nn;
+              <img class="ml-1 mb-1" src="%images_prefix;gui_create.png" height="16" alt="tree">%nn;
+            </a>%nn;
+          %else;
+            <img class="ml-1 mb-1" src="%images_prefix;gui_create.png" height="16" alt="tree">%nn;
+          %end;)%nn;
+        %end;%nn;
+        %apply;init_count(prev_count)
+        %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
+          %if;(not cancel_links)
+             <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count">%nn;
+              <sup>%count;</sup>%nn;
+            </a>%nn;
+          %else;
+             <sup>%count;</sup>
+          %end;
+        %end;
+        %if;are_separated;, [separated] %on_separation_date;%end;
+        %if;are_divorced;, [divorced] %on_divorce_date;%end;
+        %if;has_children;, %apply;havingchildren(nb_children)[:]
+          %( On sauvegarde l'ancienne valeur de count %)
+          %let;prev_count;%count;%in;
+          <ul>
+            %foreach;child;
+              %apply;li_SDC("child")
+                %if;(bvar.always_surname="yes")
+                  %apply;short_display_person("child")
+                %else;
+                  %apply;short_display_person_noname("child")
+                %end;
+              </li>
+            %end;
+          </ul>
+          %( On rétablie l'ancienne valeur de count %)
+          %apply;init_count(prev_count)
+        %end;
+        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+      </li>
+    %end;
+  </ul>
+%elseif;(op_m=2 and has_families)
+  %reset_count;%reset_count2;
+  %foreach;family;
+    %incr_count;
+    %if;(spouse.has_image)%incr_count2;%end;
+    %foreach;child;
+      %if;(child.has_image)%incr_count2;%end;
+    %end;
+    <ul class="pl-4 py-0%if;(wizard and not cancel_links) fa-ul ml-0%end; mb-0">
+    %if;not (wizard and not cancel_links)%apply;li_SD("spouse")
+    %else;<li><span class="fa-li%if;(spouse.has_blason and spouse.has_portrait) pt-1%end;">%apply;marr_wrench_to_bullet("spouse")</span>%end;
+    %if;(spouse.has_blason and spouse.has_portrait)
+      <img src="%spouse.blason_url;" %blason_extra_small_size; alt="[blason/blasons]0 [spouse/spouses]0"
+        class="%if;(op_m=3)align-self-center mx-1%end; mr-2" title="[*blason/blasons]0 [spouse/spouses]0">%nn;
+    %end;
+    <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
+    %apply;short_display_person("spouse")
+    %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
+      %if;(not cancel_links)
+         <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[see] [note/notes]0 %count">%nn;
+          <sup>%count;</sup>%nn;
+        </a>%nn;
+      %else;
+         <sup>%count;</sup>%nn;
+      %end;
+    %end;
+    %if;(count2=0)
+      %if;(spouse.has_parents)
+        <span>%apply;a_of_b%with;, %if;spouse.is_male;[son/daughter/child]0%else;[son/daughter/child]1%end;
+        %and;%apply;short_display_person("spouse.father") [and] %apply;short_display_person("spouse.mother")</span>%end;
+      %end;
+      %if;has_witnesses;
+          %sp;(<span>%apply;a_of_b%with;[witness/witnesses]w%and;[marriage event]0%end;[:]
+          %foreach;witness;
+            %if;not is_first;, %end;%apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+          %end;</span>)%nn;
+      %end;
+      %if;(has_children)%nn;
+        , %apply;havingchildren(nb_children)[:]
+        %foreach;child;
+          <ul>
+            %apply;li_SDC("child")%nn;
+            %if;(bvar.always_surname="yes")
+              %apply;short_display_person("child")
+            %else;
+              %apply;short_display_person_noname("child")
+            %end;
+            </li>
+          </ul>
+        %end;
+      %end;
+    %end;
+    %if;(count2>0)
+      <div class="d-flex">
+        <div class="">
+          <div class="d-flex flex-column mt-1">
+              <div class="d-inline-flex">
+                <div class="align-self-center">
+                  %if;spouse.has_image;
+                    %apply;picture("spouse","image")
+                  %elseif;spouse.has_blason;
+                    %apply;picture("spouse","blason")
+                  %elseif;(b.default_image="yes")
+                    <img class="align-self-start mx-1 my-4" src="%images_prefix;img_unknown_%if;(spouse.is_female)wo%elseif;(spouse.is_male)%else;u_%end;man.png" alt="[missing image]">%nn;
+                  %end;
+                </div>
+              <div class="flex-column align-self-center ml-1">
+                %if;(spouse.has_parents)
+                  <div class="d-inline-flex mt-1 align-self-center">
+                   <div class="ml-1 mr-2 text-center align-self-center">
+                     %apply;a_of_b%with;%if;spouse.is_male;[son/daughter/child]0%nn;
+                       %elseif;spouse.is_female;[son/daughter/child]1%nn;%end;%and;%end;
+                    </div>
+                    <div class="align-self-center mr-1 small">/<br><br><br>\</div>
+                    <div class="flex-wrap flex-column">
+                      %foreach;spouse.parent;
+                        <div class="d-flex %if;(parent.is_male)mb-3%end; px-1">
+                          %if;parent.has_image;
+                            %apply;picture("parent","image")
+                          %elseif;parent.has_blason;
+                            %apply;picture("parent","blason")
+                          %elseif;(b.default_image="yes")
+                            <img class="small_image rounded align-self-center" src="%images_prefix;img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]" title="%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;">%nn;
+                          %end;
+                          <div class="ml-2 align-self-center">
+                            %apply;short_display_person_tree("parent")
+                          </div>
+                        </div>
+                      %end;
+                    </div>
+                  </div>
+                %end;
+              </div>
+            </div>
+          </div>
+          %if;has_children;
+          %let;prev_count;%count;%in;%( on garde la précédente valeur de count %)
+            <div class="d-flex flex-column align-content-start ml-2 mt-1">
+              <div class="w-100">%apply;havingchildren(nb_children)[:]</div>
+              %reset_count1;
+              %foreach;child;
+                %incr_count1;
+                <div class="d-flex flex-row mt-1">%count1;.
+                  %if;child.has_image;
+                    %apply;picture("child","image")
+                  %elseif;child.has_blason_self;
+                    %apply;picture("child","blason")
+                  %elseif;(b.default_image="yes")
+                    <img class="small_image align-self-center rounded ml-2" src="%images_prefix;img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"
+                      title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;">%nn;
+                  %end;
+                  <div class="ml-2 align-self-center">
+                    %if;(count2=0)<ul>%apply;li_SDC("child")%end;%nn;
+                      %apply;short_display_person_noname("child")<br>
+                      %if;(child.public_name!="" and child.public_name!=child.first_name)%child.first_name;<br>%end;
+                      %if;(child.birth_date!="")%if;(child.sex=0) [*born]0%else;[*born]1%end; %child.on_birth_date;%end;
+                      %if;(child.birth_place!="") %in_place; %child.birth_place;%end;
+                    %if;(count2=0)</li></ul>%end;
+                  </div>
+                </div>
+              %end;
+            </div>
+            %apply;init_count(prev_count)%( on rétablie l'ancienne valeur de count %)
+          %end;
+        </div>
+        %if;has_witnesses;
+          <div class="d-flex flex-column flex-wrap mt-1 ml-auto mr-3 small">
+            <span class="ml-1">%apply;a_of_b%with;[*witness/witnesses]w%and;[marriage event]0%end;[:]</span>
+            %foreach;witness;
+              <div class="d-inline-flex flex-row ml-1%if;(not is_first) mt-1%end;">
+                %if;witness.has_image;
+                  %if;(not cancel_links)
+                    <a href="%witness.image_url;" class="align-self-center" target="_blank">
+                      <img class="small_image rounded align-self-center" src="%witness.image_url;" alt="[image/images]0" title="%witness; ([witness/witnesses]0)">
+                    </a>
+                  %else;
+                    <img class="small_image rounded align-self-center" src="%witness.image_url;" alt="[image/images]0" title="%witness; ([witness/witnesses]0)">
+                  %end;
+                %elseif;(bvar.default_image="yes")
+                  <img class="small_image rounded align-self-center ml-2" src="%images_prefix;img_unknown_%if;(witness.is_female)wo%elseif;(witness.is_male)%else;u_%end;man.png" alt="[missing image]" title="[witness/witnesses]0">
+                %(%else;
+                  <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>%)
+                %end;
+                <div class="ml-2 align-self-center">%nn;
+                  %apply;short_display_person_tree("witness")%if;(witness_kind!="") (%witness_kind;)%end;<br>
+                </div>
+              </div>
+            %end;
+          </div>
+        %end;
+      </div>
+      %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+    %end;
+    
+    %if;(are_divorced or are_separated)
+      <div class="mb-1 text-muted">
+        %if;are_separated;[*separated]%if;(on_separation_date!="") %on_separation_date;%end;.%end;
+        %if;are_divorced;[*divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.%end;
+      </div>
+    %end;
+    </li></ul>
+    %reset_count2;
+  %end;
+%elseif;(op_m=3 and has_families)
+  <ul class="marriage_perso">
+    %( On remet les compteurs à zéro et on commence à compter à 1 %)
+    %reset_count;
+    %foreach;family;
+      %incr_count;
+      %apply;li_SD("spouse")
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
+        %apply;short_display_person("spouse")
+        %if;spouse.has_parents; ([parents][:]
+          %apply;short_display_person("spouse.father")%sp;
+          & %apply;short_display_person("spouse.mother"))%nn;
+        %end;
+        %if;has_witnesses;
+          &nbsp;([witness/witnesses]w[:]
+          %foreach;witness;
+            %if;not is_first;, %end;
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+          %end;)%nn;
+        %end;
+        %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
+          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
+        %end;%nn;
+        %if;are_separated;, [separated]0 %on_separation_date;%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
+        %if;has_children;, %apply;havingchildren(nb_children)[:]
+          %( On sauvegarde l'ancienne valeur de count %)
+          %let;prev_count;%count;%in;
+          <ul>
+            %foreach;child;
+              %apply;li_SDC("child")
+                %if;(bvar.always_surname="yes")
+                  %apply;short_display_person("child")
+                %else;
+                  %apply;short_display_person_noname("child")
+                %end;
+                %if;child.has_families;
+                  %foreach;child.family;
+                    %if;(family_cnt!=1)
+                      <img width="13" height="13"%sp; src="%images_prefix;1pixel.png" alt="1px">%sp;
+                      <em>%child;%child.title;%child.dates;</em>
+                    %end;%nn;
+                    , %apply;loc_long_married("child")%sp;
+                    %apply;short_display_person("spouse")<br>
+                  %end;
+                %end;
+              </li>
+            %end;
+          </ul>
+          %( On rétablie l'ancienne valeur de count %)
+          %apply;init_count(prev_count)
+        %end;
+        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+      </li>
+    %end;
+  </ul>
+%elseif;(op_m=4 and has_families)
+  <ul class="marriage_perso">
+    %( On remet les compteurs à zéro et on commence à compter à 1 %)
+    %reset_count;
+    %foreach;family;
+      %incr_count;
+      %apply;li_SD("spouse")
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
+        %apply;long_display_person("spouse")
+        %if;spouse.has_parents;
+          <span style="font-size: 90%%"><em> ([parents][:]
+            %apply;short_display_person("spouse.father") &%sp;
+            %apply;short_display_person("spouse.mother"))</em>%nn;
+          </span>%nn;
+        %end;
+        %if;has_witnesses;
+          &nbsp;([witness/witnesses]w[:]
+          %foreach;witness;
+            %if;not is_first;, %end;
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+          %end;)%nn;
+        %end;%nn;
+        %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
+          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
+        %end;
+        %if;are_separated;, [separated]0 %on_separation_date;%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
+        %if;has_children;, %apply;havingchildren(nb_children)[:]
+          %( On sauvegarde l'ancienne valeur de count %)
+          %let;prev_count;%count;%in;
+          <ul>
+            %foreach;child;
+              %apply;li_SDC("child")
+                %apply;short_display_person("child")
+                %if;child.has_families;
+                  %foreach;child.family;
+                    %if;(family_cnt!=1)
+                      <img width="13" height="13" src="%images_prefix;1pixel.png" alt="1px">
+                      <em>%child;%child.title;%child.dates;</em>%nn;
+                    %end;
+                    <em>, %apply;loc_long_married("child")</em>
+                    %apply;short_display_person("spouse")
+                    %if;has_children;
+                      , %apply;havingchildren(nb_children)[:]
+                      <div style="font-size: 90%%">
+                        <ul>
+                          %foreach;child;
+                            %apply;li_SDC("child")
+                              %apply;short_display_person("child")
+                              %if;child.has_families;
+                                %foreach;child.family;
+                                  %if;(family_cnt!=1)
+                                    <img width="10" height="10" src="%images_prefix;1pixel.png"  alt="1px">
+                                    <em>%child;%child.title;%child.dates;</em>%nn;
+                                  %end;
+                                  <em>&nbsp;%apply;loc_long_married("child")</em>
+                                  %apply;short_display_person("spouse")
+                                  %if;has_children; %apply;havingchildren(nb_children)[:]
+                                    <div style="font-size: 90%%">%nn;
+                                      <ul>
+                                        %foreach;child;
+                                          %apply;li_SDC("child")
+                                            %apply;short_display_person("child")
+                                          </li>
+                                        %end;
+                                      </ul>
+                                    </div>
+                                  %end;
+                                %end;
+                              %end;
+                            </li>
+                          %end;
+                        </ul>
+                      </div>
+                    %else;
+                      <br>
+                    %end;
+                  %end;
+                %end;
+              </li>
+            %end;
+          </ul>
+          %( On rétablie l'ancienne valeur de count %)
+          %apply;init_count(prev_count)
+        %end;
+        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+      </li>
+    %end;
+  </ul>
+%elseif;(op_m=5 and has_families)
+  <ul>
+    %reset_count;
+    %foreach;family;
+      %incr_count;
+      %apply;li_SD("spouse")
+        %if;spouse.has_image;
+          <table style="border-width:%border;">
+            <tr>
+              <td style="vertical-align: middle">
+                %if;(not cancel_links)
+                  <a href="%spouse.image_html_url;">
+                    <img %spouse.image_medium_size;%sp;
+                      src="%spouse.image_url;" style="border: none"%sp;
+                      alt="" title="[image/images]0">
+                  </a>
+                %else;
+                  <img %spouse.image_medium_size;%sp;
+                    src="%spouse.image_url;" style="border: none"%sp;
+                    alt="" title="[image/images]0">
+                %end;
+              </td>
+              <td style="vertical-align: middle">
+        %end;
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
+        %apply;display_horizontal("spouse")
+        <span style="font-size: 90%%">
+          %if;spouse.has_parents;<em> ([parents][:]
+            %apply;short_display_person_f("spouse.father") &%sp;
+            %apply;short_display_person_f("spouse.mother"))</em>%nn;
+          %end;
+        </span>%nn;
+        %if;has_witnesses;
+          &nbsp;([witness/witnesses]w[:]
+          %foreach;witness;
+            %if;not is_first;, %end;
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+          %end;)%nn;
+        %end;%nn;
+        %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
+          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
+        %end;
+        %if;are_separated;, [separated]0 %on_separation_date;%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
+        %if;spouse.has_image;
+              </td>
+            </tr>
+          </table>
+        %end;%nn;
+        %if;has_children; %apply;havingchildren(nb_children)
+          <ul>
+            %foreach;child;
+              %apply;li_SDC("child")
+                %if;child.has_image;
+                  <table style="border-width:%border;">
+                    <tr>
+                      <td style="vertical-align: middle">
+                        %if;(not cancel_links)
+                          <a href="%child.image_html_url;">
+                            <img %child.image_small_size;%sp;
+                            src="%child.image_url;" style="border: none"%sp;
+                            alt="" title="[image/images]0">
+                          </a>
+                        %else;
+                          <img %child.image_small_size;%sp;
+                          src="%child.image_url;" style="border: none"%sp;
+                          alt="" title="[image/images]0">
+                        %end;
+                      </td>
+                      <td style="vertical-align: middle">
+                %end;
+                %apply;short_display_person_f("child")
+                %if;child.has_families;
+                  %foreach;child.family;
+                    %if;(family_cnt!=1)
+                      <img width="13" height="13"%sp;
+                        src="%images_prefix;1pixel.png" alt="1px">%sp;
+                      <em>%child;%child.title;%child.dates;</em>%end;
+                    <em>&nbsp;%apply;married_to("child", 0)</em>
+                    %apply;short_display_person_f("spouse")%nn;
+                    %if;are_separated; [separated]0 %on_separation_date;%end;%nn;
+                    %if;are_divorced; [divorced]0 %on_divorce_date;%end;%nn;
+                    %if;has_children; %apply;havingchildren(nb_children)
+                      %if;(child.has_image and family_cnt=1)</td></tr></table>%end;%nl;
+                      <div style="font-size: 90%%">
+                        <ul>
+                          %foreach;child;
+                            %apply;li_SDC("child")
+                              %apply;short_display_person_f("child")
+                              %if;child.has_families;
+                                %foreach;child.family;
+                                  %if;(family_cnt!=1)
+                                    <br><img width="10" height="10"%sp;
+                                            src="%images_prefix;1pixel.png" alt="1px">
+                                    <em>%child;%child.title;%child.dates;</em>%nl;%end;
+                                  <em>&nbsp;%apply;married_to("child", 0)</em>
+                                  %apply;short_display_person_f("spouse")
+                                  %if;are_separated; [separated]0 %on_separation_date;%end;
+                                  %if;are_divorced; [divorced]0 %on_divorce_date;%end;
+                                  %if;has_children;
+                                    <table style="border-width: %border;"><tr>%nn;
+                                      <td style="font-size: 80%%;padding-left: 18px">%nn;
+                                        %apply;havingchildren(nb_children)[:]
+                                        %foreach;child;
+                                          %if;(child_cnt!=1), %end;
+                                          %apply;short_display_person_f("child")
+                                          %if;(child_cnt=nb_children).%end;
+                                        %end;
+
+                                      </td>
+                                    </tr></table>
+                                  %end;
+                                %end;
+                              %end;
+                            </li>
+                          %end;
+                        </ul>
+                      </div>
+                    %else;
+                      %if;(child.has_image and family_cnt=1)
+                        </td></tr></table>
+                      %else;<br>%nl;%end;
+                    %end;
+                  %end;
+                %else;
+                  %if;child.has_image;</td></tr></table>%nl;%end;
+                %end;
+              </li>
+            %end;
+          </ul>
+        %end;
+        %if;(evar_opt="from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
+      </li>
+    %end;
+  </ul>
+%end;

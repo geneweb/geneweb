@@ -1,0 +1,15 @@
+<!-- $Id: templm/anclist_sb.txt v7.0 2014/11/12 14:41:21 $ -->
+
+  %( surnames branch %)
+  %apply;togen()
+  <ul>
+  %foreach;ancestor_surname(l_v)
+    <li>%nn;
+    %if;(evar.cgl != "on")<a href="%prefix;m=DAG;%ancestor.sosa_access;">%nn;
+    %ancestor.surname_end;%ancestor.surname_begin;</a>%nn;
+    %else;%ancestor.surname_end;%ancestor.surname_begin;%end;
+    %if;(ancestor.nb_times > 1) (%ancestor.nb_times;)%end;
+    ; %ancestor.place;
+    ; %ancestor.date_begin.year;-%ancestor.date_end.year;</li>
+  %end;
+  </ul>

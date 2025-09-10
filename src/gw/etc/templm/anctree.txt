@@ -1,0 +1,252 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: templm/anctree.txt v7.0 2015/12/10 21:34:32 $ -->
+  %let;l_v0;%if;(evar.maxv!="" and evar.v > evar.maxv)%evar.maxv;%else;%evar.v;%end;%in;
+  %let;l_v;%if;(bvar.max_anc_tree = "" or evar.t != "T")%l_v0;%elseif;(bvar.max_anc_tree > l_v0)%l_v0;%else;%bvar.max_anc_tree;%end;%in;
+  <title>%nn;
+    %if;(evar.t = "A" or evar.t1 = "A")[*male line/female line]0%nn;
+    %elseif;(evar.t = "C" or evar.t1 = "C")[*male line/female line]1%nn;
+    %elseif;(evar.t1 = "ht" or evar.t1 = "h")[*htree]
+    %elseif;(evar.t1 = "it" or evar.t1 = "i") [*itree]
+    %elseif;(evar.m = "A") [*ascendants tree]
+    %elseif;(evar.m = "D") [*descendants tree]
+    %elseif;(evar.t1 = "m")mix 9 g
+    %end;
+    %if;(evar.t != "")[:]%sp;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end; %surname;
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+</head>
+
+%define;symbol(xx)
+  <span %if;(xx.has_sosa)class="color_sosa"%end;>│</span>
+%end;
+
+%define;a_tree_line()
+  %if;(not is_first)
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+      %end;
+      <td colspan="%cell.colspan;" align="center">%nn;
+        %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;│%end;
+      </td>
+    %end;
+    </tr>
+  %end;
+  <tr>
+  %foreach;cell;
+    %if;(not is_first)
+      <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+    %end;
+    <td colspan="%cell.colspan;" align="center">%nn;
+    %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
+    %else;
+      %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
+        <table style="border:solid %evar.bd;px; inherit;"><tr>
+        <td align="center"%nn;
+         %if;(evar.color != "") class="%evar.color;"%end;>%nn;
+      %end;
+      %if;(evar.cgl = "on")%cell.person;
+      %else;
+        <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
+      %end;
+      %cell.person.title;%cell.person.dates;
+      %if;(evar.image!="off" and cell.person.has_image)
+        <br>
+        %if;(evar.cgl != "on")
+          <a href="%cell.person.image_html_url;"
+            ><img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0"
+          ></a>
+        %else;
+          <img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0">
+        %end;
+      %end;
+      %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
+        </td>
+        </tr></table>
+      %end;
+    %end;
+    </td>
+  %end;
+  </tr>
+  %if;(not is_last)
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td colspan="1" align="center">%nn;
+        %if;cell.is_right;
+          %if;(evar.marriage = "on" and cell.family.marriage_date.year != "")
+            <i style="font-size:80%%">%nn;
+               &amp;%nn;
+              %if;(cell.family.marriage_date.prec = "&#60;")
+                /%cell.family.marriage_date.year;%nn;
+              %elseif;(cell.family.marriage_date.prec = "&#62;")
+                %cell.family.marriage_date.year;/%nn;
+              %elseif;(cell.family.marriage_date.prec = "|" or cell.family.marriage_date.prec = "..")
+                %cell.family.marriage_date.year;%nn;
+              %else;
+                %cell.family.marriage_date.prec;%cell.family.marriage_date.year;%nn;
+              %end;
+            </i>
+          %else;<tt>&nbsp;</tt>%end;
+        %else;<tt>&nbsp;</tt>%end;
+        </td>
+      %end;
+      <td colspan="%cell.colspan;" align="center">%nn;
+      %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+      %elseif;(evar.cgl = "on")%apply;symbol("cell.person")%nn;
+      %else;
+        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_set.iz;%cell.person.access;&%nn;
+        %foreach;env_binding;
+          %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i" or env.key = "templ")
+          %else;%env.key;=%env.val.decoded;&%nn;
+          %end;
+        %end;">%apply;symbol("cell.person")</a>%nn;
+      %end;
+      </td>
+    %end;
+    </tr>
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td colspan="1" align="center">%nn;
+        %if;(cell.is_right)<hr class="full">%nn;
+        %end;
+        </td>
+      %end;
+      <td colspan="%cell.colspan;" align="%nn;
+         %if;cell.is_left;%right;
+         %elseif;cell.is_right;%left;
+         %else;center%end;">%nn;
+      %if;cell.is_empty;%nn;
+      %elseif;cell.is_left;<hr class="%right;">%nn;
+      %elseif;cell.is_right;<hr class="%left;">%nn;
+      %end;
+      </td>
+    %end;
+    </tr>
+  %end;
+%end;
+
+%define;male_line(xx, nn)
+  %if;(nn > 0)
+    %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
+    %if;(evar.cgl="on")%xx;
+    %else;
+    <a href="%prefix;%xx.access">%xx;</a>
+    %end;
+    %xx.title;%xx.dates;
+    %if;("xx" != "self")<br>│<br>%end;
+  %end;%nl;
+%end;
+
+%define;female_line(xx, nn)
+  %if;(nn > 0)
+    %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
+    %if;(evar.cgl="on")%xx;
+    %else;
+    <a href="%prefix;%xx.access">%xx;</a>
+    %end;
+    %xx.title;%xx.dates;
+    %if;("xx" != "self")<br>│<br>%end;
+  %end;%nl;
+%end;
+
+%define;tree(xx)
+  <table summary="tree" border="%border;" cellspacing="0" cellpadding="0" width="100%%">
+  %foreach;ancestor_tree_line(xx)
+    %apply;a_tree_line()
+  %end;
+  </table>
+%end;
+
+%define;togen1(xx) %( togen1/togen/tothegen needed for HT %)
+  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[*to the parents]%nn;
+  %elseif;(xx = 3)[*to the grandparents]%nn;
+  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+%define;togen()
+  <p>
+    %if;(evar.only != "on")
+      %apply;togen1(l_v)
+    %else;
+      [*generation/generations]0 %l_v;
+    %end;
+  </p>
+%end;
+%define;tothegen(xx)
+  [*upto the %s generation:::xx]%nn;
+%end;
+
+<body%body_prop; id="anctree">
+%include;hed
+%message_to_wizard;
+
+%if;not cancel_links;
+  %if;(evar.t = "T" and evar.t1 != "HT")
+    <div class="menu">
+      %if;has_children;
+        <span>
+        <a title="[tree] (Y)" accesskey="Y" href="%prefix_set.iz;%nn;
+          %foreach;env_binding;
+            %if;(env.key = "m")m=D;%nn;
+            %elseif;(env.key = "templ")
+            %else;%env.key;=%env.val.decoded;&%nn;
+            %end;
+          %end;">[*descendants tree]</a>
+        </span>
+      %end;
+      <span>
+        <a href="%prefix;m=A&t=H&v=%evar.v;&maxv=%max_anc_level;&i=%index;">[*horizontal tree]</a>%nn;
+      <span>
+        <a href="%prefix;%access;&m=A&t=F&fam7=on&tf1=fam73&v=%if;(evar.v=3 or evar.v=4)%evar.v;%else;3%end;&maxv=4">[*family time line]</a>%nn;
+      </span>
+    </div>
+  %end;
+%end;
+
+%define;show_templ(z1)
+  %include;anctree_z1
+%end;
+<div class="container" style="all:unset">
+%if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = ""))
+  %apply;tree(l_v)
+%elseif;(evar.t = "A" or evar.t1 = "A")
+  <div style="text-align: center">%apply;male_line("self",l_v0)</div>
+%elseif;(evar.t = "C" or evar.t1 = "C")
+  <div style="text-align: center">%apply;female_line("self",l_v0)</div>
+%elseif;(evar.t1= "CT")
+  %include;modules/arbre_hi
+%elseif;(evar.t1 = "HT")
+  %include;anclist_hrztl
+%elseif;(evar.t1 != "")
+  %apply;show_templ(evar.t1)
+%end;
+</div>
+
+%if;not cancel_links;
+  %include;tools
+  %apply;tools_anctree()
+  <div style="clear:both;"></div>
+  %include;trl
+  %include;copyr
+  %query_time;
+%end;
+</body>
+</html>

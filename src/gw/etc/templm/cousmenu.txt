@@ -1,0 +1,49 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: cousmenu.txt,v 7.00 2014/12/13 16:55:44 mr Exp $ -->
+  %( used to create list for dag %)
+
+  <title>[*link between] %self; [and]0…</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  %include;favicon
+  %include;css
+  %include;hed
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<h1>[*link between] <a href="%prefix;%access;">%self;</a> %dates; [and]0…</h1>
+<h2>%evar.t;</h2>
+
+%define;list1(zz)
+  %if;(pvar.zz != "" and evar.tzz != evar.t)
+    <li><a href="%prefix;%pvar.zz.access;">%pvar.zz;</a> %pvar.zz.dates;</li>
+    %apply;list1(zz + 1)
+  %end;
+%end;
+
+%define;list()
+  %let;li1;%index;%in;
+  %let;lt1;%if;is_male;[him/her]0%else;[him/her]1%end;%in;
+  %if;(evar.list = "1")
+    <ol>%apply;list1(1)</ol>
+  %end;
+%end;
+
+%apply;list()
+
+<div class="menu" style="position:relative"><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;&%end;
+  %foreach;env_binding;
+    %if;(env.key = "m")m=RLM&%else;%env.key;=%env.val.decoded;&%end;
+  %end;
+">[tree]</a></div>
+<p></p>
+
+%include;trl
+%include;copyr
+%query_time;
+</body>
+</html>

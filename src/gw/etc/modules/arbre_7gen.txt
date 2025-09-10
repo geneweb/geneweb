@@ -1,0 +1,256 @@
+<!-- $Id: modules/arbre_7gen.txt v7.0 27/06/2018 18:47:46 $ -->
+%define;descendants(curlev, maxlev, f_cnt)
+  <ul>
+  %if;(has_families)
+    %foreach;family;
+    <li>
+      %if;(f_cnt>0)x%f_cnt;&nbsp;%end;
+      %if;(family_cnt > 1)X%family_cnt; %end;
+      %if;(not cancel_links)
+        <a href="%prefix;%access;">%first_name;</a>
+      %else;%first_name;
+      %end;
+      %dates; &nbsp;&amp;%marriage_date.year;&nbsp;<br>
+      %if;(not cancel_links)
+        <a href="%prefix;%spouse.access;">%spouse;</a>
+      %else;%spouse;
+      %end;
+      %spouse.dates;
+      </li>
+      %if;(curlev < maxlev)
+        %if;(has_children)
+          %foreach;child;
+            %apply;descendants(curlev+1, maxlev, 0)
+          %end;
+        %end;
+      %end;
+    %end;
+  %else;
+    <li>%if;(f_cnt>0)x%f_cnt;&nbsp;%end;
+    %if;(not cancel_links)
+      <a href="%prefix;%access;">%first_name;</a>
+    %else;%first_name;
+    %end;
+    %dates;</li>
+  %end;
+  </ul>
+%end;
+
+%define;tothegen(xx)
+  [*upto the %s generation:::xx]
+%end;
+
+%define;one_ancestor(xx, coln, bull)
+  <tr>
+   <td colspan="coln" align="right" valign="middle">
+  %xx.dates;&nbsp;
+  %if;(not cancel_links)
+    <a href="%prefix;%xx.access;">%xx;</a>
+  %else;%xx;
+  %end;
+  </td>
+    <td width=1></td>
+    <td width=1 align=center valign=middle><b><small>bull</small></b></td>
+  </tr>
+%end;
+
+%define;one_heading(xx, coln, bull)
+  <td colspan=coln align=right valign=middle>
+    <span class="highlight_hg"><b>%apply;capitalize([xx])</b></span>
+  <small>bull</small>
+  </td>
+%end;
+
+%define;short_display_person_v(xx)
+  %apply;display_sosa("xx")
+  %if;(xx.index=central_index)<b>%xx;</b>%else;
+    %if;(cancel_links or xx.is_restricted)%xx;
+    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  %end;
+  %xx.title;%xx.dates;
+%end;
+
+%( Arbre 7 générations 3+1+3 %)
+%if;(has_parents or has_children)
+%let;gpcol;40%%%in;
+%let;sbcol;20%%%in;
+%let;chcol;40%%%in;
+<h2>[*preview family tree]</h2>
+   <table style="border:0;width:100%%;cellspacing:0;cellpading:0"> %( Titres %)
+     <tr>
+       <td style="width:%gpcol;">
+         <table style="width:100%%;border:0;cellspacing:0;cellpading:0"> %( Titres %)
+           <tr>
+             <td style="width:41%%"></td>
+             <td style="width:41%%"></td>
+             <td style="width:1"></td>
+             <td style="width:5"></td>
+             <td style="width:1"></td>
+             <td style="width:9%%"></td>
+             <td style="width:1"></td>
+             <td style="width:5"></td>
+             <td style="width:1"></td>
+             <td style="width:9%%"></td>
+             <td style="width:1"></td>
+             <td style="width:5"></td>
+             <td style="width:1"></td>
+             <td style="width:5"></td>
+           </tr>
+           <tr>%apply;one_heading("the parents", 10, "&#x25CF;")</tr>
+           <tr>%apply;one_heading("the grandparents", 6, "&#x25C7;")</tr>
+           <tr>%apply;one_heading("the great-grandparents", 2, "&#x25A0;")</tr>
+         </table>
+       </td>
+       <td style="width:%sbcol;">
+         <table style="border:0;width:100%%;cellspacing:0;cellpading:0">
+           <tr><td>&nbsp;</td></tr>
+           <tr>
+             <td style="text-align:center;valign:middle"><b>%self;</b></td>
+           </tr>
+           %if;has_families;
+             %foreach;family;
+           <tr>
+             <td align=center valign=middle>
+               %if;(nb_families>1)%family_cnt;&nbsp;%end;
+               &amp;&nbsp;%marriage_date.year;<br>
+               %if;(nb_families!=1)
+                 %family_cnt;
+               %end;
+               %( <a href="%prefix;%spouse.access;"> %spouse;</a><br>%spouse.dates;&nbsp; %)
+               %apply;short_display_person("spouse")
+             </td>
+           </tr>
+             %end;
+           %end;
+           <tr>
+             <td style="text-align:center;valign:bottom;width:100%%">
+             <span class="highlight_hg"><b>[*siblings]</b></span>
+           </td>
+           </tr>
+           <tr>
+             <td style="text-align:center;valign:bottom;width:100%%"><span class="highlight_hg"><b>|</b></span>
+             </td>
+           </tr>
+         </table>
+       </td>
+
+       <td style="width:%chcol;">
+         <table style="border:0;width:100%%;cellspacing:0;cellpading:0">
+           <tr>
+           <ul><li><span class="highlight_hg"><b>[*the children]</b></span></li>
+             <ul><li><span class="highlight_hg"><b>[*the grandchildren]</b></span></li>
+               <ul><li><span class="highlight_hg"><b>[*the great-grandchildren]</b></span></li>
+               </ul>
+             </ul>
+           </ul>
+           </tr>
+         </table>
+       </td>
+     </tr>
+   </table> %( Titres %)
+
+ <table style="width:100%%;border:0;cellspacing:0;cellpading:0"> %( Listes %)
+   <tr>
+     %( Parents, grand-parents... %)
+     <td style="width=%gpcol;">
+       %if;has_parents;
+       <table style="width:100%%;border:0;cellspacing:0;cellpading:0">
+       <tr>
+         <td style="width:41%%"></td>
+         <td style="width:41%%"></td>
+         <td style="width:1"></td>
+         <td style="width:5"></td>
+         <td style="width:1"></td>
+         <td style="width:9%%"></td>
+         <td style="width:1"></td>
+         <td style="width:5"></td>
+         <td style="width:1"></td>
+         <td style="width:9%%"></td>
+         <td style="width:1"></td>
+         <td style="width:5"></td>
+         <td style="width:1"></td>
+         <td style="width:5"></td>
+       </tr>
+       %if;father.has_parents;
+         %if;father.father.has_parents;
+           %apply;one_ancestor("father.father.father", 2, "&#x25A0;")
+           %apply;one_ancestor("father.father.mother", 2, "&#x25A0;")
+         %end;
+         %apply;one_ancestor("father.father", 6, "&#x25C7;")
+         %if;father.mother.has_parents;
+           %apply;one_ancestor("father.mother.father", 2, "&#x25A0;")
+           %apply;one_ancestor("father.mother.mother", 2, "&#x25A0;")
+         %end;
+         %apply;one_ancestor("father.mother", 6, "&#x25C7;")
+       %end;
+
+       %apply;one_ancestor("father", 10, "&#x25CF;")
+       %apply;one_ancestor("mother", 10, "&#x25CF;")
+
+       %if;mother.has_parents;
+         %apply;one_ancestor("mother.father", 6, "&#x25C7;")
+         %if;mother.father.has_parents;
+           %apply;one_ancestor("mother.father.father", 2, "&#x25A0;")
+           %apply;one_ancestor("mother.father.mother", 2, "&#x25A0;")
+         %end;
+         %apply;one_ancestor("mother.mother", 6, "&#x25C7;")
+         %if;mother.mother.has_parents;
+           %apply;one_ancestor("mother.mother.father", 2, "&#x25A0;")
+           %apply;one_ancestor("mother.mother.mother", 2, "&#x25A0;")
+         %end;
+       %end;
+       </table>
+       %end;
+     </td>
+
+     %(-- Siblings %)
+     <td style="width:%sbcol;;text-align:center">
+       <table style="width:100%%;border:0;cellspacing:0;cellpadding:0">
+         %if;has_siblings;
+           <tr>
+             <td style="width:1"></td>
+             <td style="align:center;valign:middle"><b>|</b></td>
+             <td style="width:1"></td>
+           </tr>
+           %foreach;father.child;
+           <tr>
+             %if;is_self;
+               <td style="width:1"></td>
+               <td style="align:center;valign:middle">%child.child_name;<br>%child.dates;&nbsp;</td>
+               <td style="width:1"></td>
+               %( ajouter mariage en dessous %)
+             %else;
+               <td style="width:1"></td>
+               <td style="align:center;valign:middle">
+               %if;(not cancel_links)
+                 <a href="%prefix;%child.access;">%child.child_name;</a>
+               %else;%child.child_name;
+               %end;
+               <br>%child.dates;&nbsp;</td>
+               <td style="width:1"></td>
+             %end;
+           </tr>
+           %end;
+         %end;
+       </table>
+     </td>
+     %( Enfants, petits-enfants... %)
+     <td style="width:%chcol;">
+       %let;maxlev;2%in;
+       %if;has_families;
+         %foreach;family;
+           %if;(nb_families=1)
+             %foreach;child;
+               %apply;descendants(0, maxlev, 0)
+             %end;
+           %else;
+             %foreach;child;
+               %apply;descendants(0, maxlev, family_cnt)
+             %end;
+           %end;
+         %end;
+       %end;
+     </td>
+   </tr>
+ </table> %( Listes %)
+%end;

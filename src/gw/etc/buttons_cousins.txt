@@ -1,0 +1,95 @@
+<!-- $Id: buttons_cousins.txt v7.1 18/10/2023 18:41:43 $ -->
+%define;url(vvv,ttt)
+  %prefix_base_password;
+  %foreach;env_binding;
+    %if;(env.key="vvv")ttt
+    %elseif;(env.val!="")&%env.key;=%env.val;
+    %end;
+  %end;
+  %if;(e.vvv="")ttt%end;
+%end;
+%define;url2(vvv,ttt,www,uuu)
+  %prefix_base_password;
+  %foreach;env_binding;
+    %if;(env.key="vvv")ttt%nn;
+    %elseif;(env.key="www")uuu%nn;
+    %elseif;(env.val!="" and env.key!="vvv" and env.key!="www")&%env.key;=%env.val;
+    %end;
+  %end;
+  %( no need to test for ="" %)
+%end;
+<div class="row">
+  <div class="form-inline ml-5 mt-1 mb-2">
+     <a role="button" href="?%foreach;env_binding;%if;(env.key!="v1" and env.key!="v2" and env.key!="")&%env.key;=%env.val;%end;%end;">
+       [*select::close family]
+     </a>
+    %let;v12;%if;(evar.v1!="")%if;(e.v2="")%expr(e.v1*2)%else;%expr(e.v1+e.v2)%end;%end;%in;
+    <div class="align-items-center ml-2">| %v12; %if;(v12=0 or v12=1)[degree of kinship]0%else;[degree of kinship]1%end; |</div>
+    <div class="align-items-center ml-1">
+      <a href="%apply;url2%with;v1%and;%if;(e.v1!="" and e.v1>1)&v1=%expr(e.v1-1)%end;
+               %and;v2%and;
+                 %if;(e.v2!="")
+                   %if;(e.v2>1)&v2=%expr(e.v2-1)%end;
+                 %else;
+                   %if;(e.v1!="" and e.v1>1)&v2=%expr(e.v1-1)%end;
+                 %end;
+               %end;"%sp;
+         role="button" class="btn btn-link btn-sm%nn;
+            %if;(e.v1!="" and e.v2!="" and (e.v1<2 or e.v2<2)) disabled%end;" title="-1 [ascending/descending (degree)]0 [and] -1 [ascending/descending (degree)]1 ([both])">%nn;
+              <i class="fas fa-minus fa-lg px-0"></i></a>
+    </div>
+    <div class="d-flex flex-column">
+      <div class="d-flex justify-content-between">
+        <a role="button" href="%apply;url%with;v1%and;%if;(e.v1!="" and e.v1>=1)&v1=%expr(e.v1-1)%end;%end;" title="-1 [ascending/descending (degree)]0"
+          class="btn btn-link btn-sm%if;(e.v1!="" and e.v1<1) disabled%end;"><i class="fas fa-minus fa-sm mt-1"></i></a>
+        <div class="align-self-center">%if;(e.v1!="")%e.v1; %if;(e.v1=0 or e.v1=1)[ascending/descending (degree)]0%else;[ascending/descending (degree)]2%end;</div>
+        <a role="button" href="%apply;url%with;v1%and;&v1=%expr(e.v1+1)%end;" title="+1 [ascending/descending (degree)]0"
+          class="btn btn-link btn-sm%if;(e.v1!="" and e.v1=b.max_cousins_level) disabled%end;"><i class="fas fa-plus fa-sm mt-1"></i></a>
+      </div>
+      <div class="d-flex justify-content-between">
+        <a role="button" href="%apply;url%with;v2%and;
+                    %if;(e.v2!="")
+                      %if;(e.v2>=1)&v2=%expr(e.v2-1)%end;
+                    %else;
+                      %if;(e.v1!="" and e.v1>=1)&v2=%expr(e.v1-1)%end;
+                    %end;
+                  %end;" title="-1 [ascending/descending (degree)]1"
+          class="btn btn-link btn-sm%if;(e.v2!="" and e.v2<1) disabled%end;"><i class="fas fa-minus fa-sm mt-1"></i></a>
+        <span class="align-self-center">%if;(e.v2!="")%e.v2; %if;(e.v2=0 or e.v2=1)[ascending/descending (degree)]1%else;[ascending/descending (degree)]3%end;%else;%e.v1; %if;(e.v1=0 or e.v1=1)[ascending/descending (degree)]1%else;[ascending/descending (degree)]3%end;%end;</span>
+        <a role="button" href="%apply;url%with;v2%and;
+                    %if;(e.v2!="")&v2=%expr(e.v2+1)
+                    %else;&v2=%expr(e.v1+1)%end;
+                  %end;" title="+1 [ascending/descending (degree)]1"
+          class="btn btn-link btn-sm%if;(e.v2!="" and e.v2=b.max_cousins_level) disabled%end;"><i class="fas fa-plus fa-sm mt-1"></i></a>
+      </div>
+    </div>
+    <div class="align-items-center">
+      <a href="%apply;url2%with;v1%and;&v1=%expr(e.v1+1)%and;v2%and;&v2=%expr(e.v2+1)%end;%nn;
+                 %if;(e.v1="" and e.v2="")&v1=1&v2=1%end;"%sp;
+                 class="btn btn-link btn-sm
+            %if;((e.v1!="" and e.v1=b.max_cousins_level) or (e.v2!="" and e.v2=b.max_cousins_level)) disabled%end;"
+            title="+1 [ascending/descending (degree)]0 [and] +1 [ascending/descending (degree)]1 ([both])"><i class="fas fa-plus fa-lg px-0"></i></a>
+    </div>
+    <div>|</div>
+    <div class="btn-group" role="group" aria-label="tool buttons"> 
+      <a role="button" href="%apply;url%with;image%and;%if;(e.image!="off")&image=off%end;%end;"
+        class="btn btn-link px-1 ml-1"
+        title="%if;(e.image="off")[*visualize/show/hide/summary]1%else;%nn;
+          [*visualize/show/hide/summary]2%end; [image/images]1">
+        <i class="fas fa-images fa-fw%if;(e.image!="off") text-danger%end;"></i>
+      </a>
+      <a role="button" href="%apply;url%with;spouse%and;%if;(e.spouse!="on")&spouse=on%end;%end;"
+        class="btn btn-link px-1 ml-1"
+        title="%if;(e.spouse!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [spouse/spouses]1">
+          <span><i class="fa fa-user male p-0"></i>%if;(e.spouse!="on")<i class="fa fa-user female p-0"></i>%end;</span>
+      </a>
+      <a role="button" href="%apply;url%with;paths%and;%if;(e.paths!="on")&paths=on%end;%end;"
+        class="btn btn-link px-1 ml-1"
+        title="%if;(e.paths="on")[*visualize/show/hide/summary]2%else;%nn;
+           [*visualize/show/hide/summary]1%end; [path/paths]1">
+        <i class="fa fa-shoe-prints fa-fw%if;(e.paths="on") text-danger%end;"></i>
+      </a>
+    </div>
+  </div>
+</div>

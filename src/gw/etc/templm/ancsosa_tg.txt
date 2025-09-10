@@ -1,0 +1,155 @@
+<!-- $Id: ancsosa_tg.txt,v 7.00 2014/11/20 11:45:02 mr Exp $ -->
+
+%include;ancsosa_deslist
+
+%define;one_ancestor()
+  %apply;link1("ancestor","ancestor")
+  %apply;somebody_info1("ancestor")
+  %apply;somebody_info2("ancestor")
+%end;
+
+%define;one_child()
+  %let;l1;%child.sosa_in_list;%in;
+  %if;(l1 != "" and evar.only != "on" and level != 2)
+    %apply;link1("child",lchild)
+    %child.title;%child.dates;
+    %sp;(&rArr;
+    <strong>
+      <a href="#s%l1;" title="[see] %l1;">%l1;</a>%nn;
+    </strong>.)%nn;
+  %else;
+    %apply;link1("child",lchild)
+    %apply;somebody_info1("child")
+    %apply;somebody_info2("child")
+    %if;(evar.spouse = "on")
+      %foreach;child.family;
+        <div class="f1">
+          %apply;marriage_info()
+          %apply;link1("spouse","spouse")
+          %apply;somebody_info1("spouse")
+          %apply;somebody_spouse_parent()
+          %apply;somebody_info2("spouse")
+        </div>
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;other_family(z1)
+  %if;(evar.spouse = "on" and evar.siblings = "on" and ancestor.nb_families > 1)
+    <dl class="other_family"><dd>
+    %foreach;ancestor.family;
+      %if;(spouse.index != ancestor.spouse.index)
+        <div><a href="#s%family.z1.sosa_in_list;"><strong>%family.z1.sosa_in_list;</strong></a>
+            -(X%family_cnt;) :
+          %apply;link1("spouse","spouse")
+          %apply;somebody_info1("spouse")
+          %apply;somebody_spouse_parent()
+          %apply;somebody_info2("spouse")
+        </div>
+        %apply;marriage_info()
+        %if;(nb_children > 0)
+          <ol style="list-style-type:lower-latin">
+          %foreach;child;
+            <li class="li_%sex; li_%has_families;%has_sosa;">
+            %apply;one_child()%nn;
+            </li>
+          %end;
+          </ol>
+        %end;
+      %end;
+    %end;
+    </dd></dl>
+  %end;
+%end;
+
+%define;ancestor_families()
+  %if;(ancestor.anc_sosa.v % 2 = 0)
+    %apply;other_family("father")
+  %else;
+    %foreach;ancestor.family;
+      %if;(family.index = ancestor.family.index)
+        %apply;marriage_info()
+        <ol style="list-style-type:lower-latin">
+        %foreach;child;
+          %if;(evar.siblings = "on")
+            <li class="li_%sex; li_%has_families;%has_sosa;">%apply;one_child()</li>
+          %elseif;(child.sosa_in_list != "")
+            <li class="li_%sex; li_%has_families;%has_sosa;">%apply;one_child()</li>
+          %end;
+        %end;
+        </ol>
+      %end;
+    %end;
+    %apply;other_family("mother")
+  %end;
+%end;
+
+%define;tGup()
+  %( ;t=G;i1=index;  up to somebody %)
+  <p>[*up to] %pvar.1; %pvar.1.dates;</p>
+  %reset_count;
+  %pvar.1.mark_descendants;
+  %foreach;ancestor_level;
+    %apply;lazy_print%with;
+      <h3 class="generation">[*generation/generations]0 %level;</h3>
+    %end;
+    %if;(level <= evar.l + 1)
+      %foreach;ancestor;
+        %if;(level != 1 and ancestor.same = "" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
+          %lazy_force;
+          <div %if;(ancestor.anc_sosa.v % 2 = 0)class="ancestor_male"%end;>
+            %apply;link_parents()
+            %nn;.%sp;
+            %apply;one_ancestor()
+          </div>
+          %apply;ancestor_families()
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;tG()
+  %( ;t=G; long display %)
+  %reset_count;
+  %if;(evar.only != "on")
+    %apply;togen()
+  %end;
+  %foreach;ancestor_level(l_v)
+    %if;(level != 1 and (evar.only != "on" or level = l_v))
+      <h3 class="generation">[*generation/generations]0 %level;</h3>
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          <div %if;(ancestor.anc_sosa.v % 2 = 0)class="ancestor_male"%end;>
+            %apply;link_parents()
+            %nn;.%sp;
+            %apply;one_ancestor()
+          </div>
+          %if;(ancestor.index != self.index)
+            %apply;ancestor_families()
+          %end;
+        %else;
+          <p %if;(ancestor.anc_sosa.v % 2 = 0)class="ancestor_male"%end;>
+            <strong><a href="#s%ancestor.same.v;" title="[see] %ancestor.same;">%ancestor.anc_sosa;</a></strong>.
+            %if;(not cancel_links)
+              <a href="%prefix;%ancestor.access;">%ancestor;</a>
+              %ancestor.title;%ancestor.dates; (==
+              <strong><a href="%prefix;em=R&ei=%index;&i=%ancestor.index;&et=M&spouse=on"
+                 title="%ancestor; …[relationship]… %self;">%ancestor.same;</a></strong>.)
+            %else;
+              %ancestor; %ancestor.title;%ancestor.dates; (== <strong>%ancestor.same;</strong>.)
+            %end;
+          </p>
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%( main %)
+  %if;(l_up = 1)
+    %apply;tGup()
+  %else;
+    %apply;tG()
+  %end;

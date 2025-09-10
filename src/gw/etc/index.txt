@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>Base</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+
+%include;css
+
+</head>
+<body%body_prop;>
+<div class="container text-center ">
+<h1 class="mt-5">[*choose a genealogy]</h1>
+
+<div class="mt-4">
+<span>[*input database][:]</span>
+
+<form class="form-inline d-flex justify-content-center mt-2" method="get" action="%prefix;">
+  <input type="hidden" name="lang" value="%evar.lang;">
+  <input name="b" placeholder="%bases_list;" class="form-control col-8">
+  <button type="submit" class="btn btn-outline-secondary ml-2" value="">Ok</button>
+</form>
+
+%( TODO find server name and port number %)
+<div class="mt-4">
+[*available genealogies][:]<br>
+%bases_list_links;
+</div>
+</div>
+
+<h3 class="text-center mt-4">[*select lang][:]</h3>
+<div class="d-flex flex-wrap justify-content-center col-10 mx-auto">
+  <a class="btn btn-outline-secondary" href="?lang=af%if;(evar.templ!="")&templ=%evar.templ;%end;" title="af">Afrikaans</a>
+  <a class="btn btn-outline-secondary" href="?lang=ar%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ar">العربية</a>
+  <a class="btn btn-outline-secondary" href="?lang=bg%if;(evar.templ!="")&templ=%evar.templ;%end;" title="bg">български</a>
+  <a class="btn btn-outline-secondary" href="?lang=br%if;(evar.templ!="")&templ=%evar.templ;%end;" title="br">brezhoneg</a>
+  <a class="btn btn-outline-secondary" href="?lang=ca%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ca">català</a>
+  <a class="btn btn-outline-secondary" href="?lang=co%if;(evar.templ!="")&templ=%evar.templ;%end;" title="co">corsu</a>
+  <a class="btn btn-outline-secondary" href="?lang=cs%if;(evar.templ!="")&templ=%evar.templ;%end;" title="cs">čeština</a>
+  <a class="btn btn-outline-secondary" href="?lang=da%if;(evar.templ!="")&templ=%evar.templ;%end;" title="da">dansk</a>
+  <a class="btn btn-outline-secondary" href="?lang=de%if;(evar.templ!="")&templ=%evar.templ;%end;" title="de">Deutsch</a>
+  <a class="btn btn-outline-secondary" href="?lang=en%if;(evar.templ!="")&templ=%evar.templ;%end;" title="en">English</a>
+  <a class="btn btn-outline-secondary" href="?lang=eo%if;(evar.templ!="")&templ=%evar.templ;%end;" title="eo">esperanto</a>
+  <a class="btn btn-outline-secondary" href="?lang=es%if;(evar.templ!="")&templ=%evar.templ;%end;" title="es">Español</a>
+  <a class="btn btn-outline-secondary" href="?lang=et%if;(evar.templ!="")&templ=%evar.templ;%end;" title="et">eesti</a>
+  <a class="btn btn-outline-secondary" href="?lang=fi%if;(evar.templ!="")&templ=%evar.templ;%end;" title="fi">suomi</a>
+  <a class="btn btn-outline-secondary" href="?lang=fr%if;(evar.templ!="")&templ=%evar.templ;%end;" title="fr">français</a>
+  <a class="btn btn-outline-secondary" href="?lang=he%if;(evar.templ!="")&templ=%evar.templ;%end;" title="he">עברית </a>
+  <a class="btn btn-outline-secondary" href="?lang=is%if;(evar.templ!="")&templ=%evar.templ;%end;" title="is">íslenska</a>
+  <a class="btn btn-outline-secondary" href="?lang=it%if;(evar.templ!="")&templ=%evar.templ;%end;" title="it">italiano</a>
+  <a class="btn btn-outline-secondary" href="?lang=lv%if;(evar.templ!="")&templ=%evar.templ;%end;" title="lv">Latviešu</a>
+  <a class="btn btn-outline-secondary" href="?lang=lv%if;(evar.templ!="")&templ=%evar.templ;%end;" title="lt">Lietuvių</a>
+  <a class="btn btn-outline-secondary" href="?lang=nl%if;(evar.templ!="")&templ=%evar.templ;%end;" title="nl">Nederlands</a>
+  <a class="btn btn-outline-secondary" href="?lang=no%if;(evar.templ!="")&templ=%evar.templ;%end;" title="no">norsk</a>
+  <a class="btn btn-outline-secondary" href="?lang=oc%if;(evar.templ!="")&templ=%evar.templ;%end;" title="oc">occitan</a>
+  <a class="btn btn-outline-secondary" href="?lang=pl%if;(evar.templ!="")&templ=%evar.templ;%end;" title="pl">polski</a>
+  <a class="btn btn-outline-secondary" href="?lang=pt%if;(evar.templ!="")&templ=%evar.templ;%end;" title="pt">Português</a>
+  <a class="btn btn-outline-secondary" href="?lang=pt-br%if;(evar.templ!="")&templ=%evar.templ;%end;" title="pt-br">Português-do-Brasil</a>
+  <a class="btn btn-outline-secondary" href="?lang=ro%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ro">romaneste</a>
+  <a class="btn btn-outline-secondary" href="?lang=ru%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ru">русский</a>
+  <a class="btn btn-outline-secondary" href="?lang=sk%if;(evar.templ!="")&templ=%evar.templ;%end;" title="sk">slovenčina</a>
+  <a class="btn btn-outline-secondary" href="?lang=sl%if;(evar.templ!="")&templ=%evar.templ;%end;" title="sl">slovenščina</a>
+  <a class="btn btn-outline-secondary" href="?lang=sv%if;(evar.templ!="")&templ=%evar.templ;%end;" title="sv">svenska</a>
+  <a class="btn btn-outline-secondary" href="?lang=tr%if;(evar.templ!="")&templ=%evar.templ;%end;" title="tr">turkish</a>
+  <a class="btn btn-outline-secondary" href="?lang=zh%if;(evar.templ!="")&templ=%evar.templ;%end;" title="zh">中文</a>
+</div>
+</div>
+  <div class="btn-group float-right mt-5 mr-5">
+    <span class="align-self-center">GeneWeb v. %version;%sp;
+    &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017 %connections; %sq;</span>
+    <a href="https://github.com/geneweb/geneweb" class="ml-1" target="_blank" title="GeneWeb sources on GitHub">
+    <img src="%images_prefix;logo_bas.png" alt="Logo GeneWeb"></a>
+    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;" target="_blank" title="GeneWeb documentation MediaWiki">
+    <img src="%images_prefix;logo_bas_mw.png" alt="Logo GeneWeb Mediawiki"></a>
+  </div>
+</div>
+</body>
+</html>

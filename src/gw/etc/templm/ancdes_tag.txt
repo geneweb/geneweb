@@ -1,0 +1,227 @@
+<!-- $Id: templm/ancdes_tag.txt v7.0 2015/01/19 20:52:03 $ -->
+
+%define;tool()
+  <script type="text/javascript">
+    <!--
+    function ob()
+    {
+      var a = new Array(12)
+      for (var i=0; i < a.length; ++i)
+      a[i] = document.getElementById("i" + i).value;
+      document.getElementById("s").outerHTML = '\
+      <style id="s" type="text\/css">\n\
+        @page{size:'+a[0]+'mm '+a[1]+'mm;}\n\
+        .d11{width:'+a[2]+'mm;height:'+a[3]+'mm;margin:'+a[4]+'mm;}\n\
+        .d1{font-family:'+a[5]+';}\n\
+        .d11 p:nth-child(1){text-align:'+a[6]+';font-size:'+a[7]+'mm;}\n\
+        .d11 p:nth-child(2){text-align:'+a[8]+';font-size:'+a[9]+'mm;}\n\
+        .d11 p:nth-child(3){text-align:'+a[10]+';font-size:'+a[11]+'mm;}\n\
+        .d1{width:'+a[0]+'mm;height:'+a[1]+'mm;}\n\
+      <\/style>';
+    }
+    -->
+  </script>
+  <style type="text/css">
+    fieldset{margin:10mm 0mm;}
+    input,dl{font-family:monospace;}
+    dl{float:left;margin:5px;padding:5px;background-color:moccasin;}
+    input{text-align:right;width:50px;}
+    .d1{background-color:#CCC;color:#000;}
+    span{font-family:monospace;}
+    .d11{float:left;background-color:ivory;}
+    .d11 p{overflow:hidden;margin:1mm;}
+    .r{width:10mm;border:solid 1px black;text-align:center;margin:0px;padding:0;}
+    @media print
+    {
+      html,body{margin:0;padding:0;}
+      form,h1,.menu2{display:none;}
+    }
+  </style>
+  <style id="s" type="text/css">
+    @page{size:210mm 297mm;}
+    .d1{font-family:serif;}
+    .d11{width:60mm;height:40mm;margin:1mm;}
+    .d11 p:nth-child(1){text-align:center;font-size:5mm;}
+    .d11 p:nth-child(2){text-align:center;font-size:4mm;}
+    .d11 p:nth-child(3){text-align:left;font-size:3mm;}
+    .d1{width:210mm;height:297mm;}\n\
+  </style>
+  
+  <datalist id="align">
+    <option value="left">
+    <option value="center">
+    <option value="right">
+  </datalist>
+  
+  <datalist id="font">
+  <option value="sans serif">
+  <option value="Arial">
+  <option value="Calibri">
+  <option value="Geneva">
+  <option value="Helvetica">
+  <option value="Lucida Sans">
+  <option value="Segoe UI">
+  <option value="Tahoma">
+  <option value="Trebuchet MS">
+  <option value="Verdana">
+  
+  <option value="serif">
+  <option value="Antiqua">
+  <option value="Garamond">
+  <option value="Georgia">
+  <option value="Minion">
+  <option value="Palatino Linotype">
+  <option value="roman">
+  <option value="Times New Roman">
+  
+  <option value="monospace">
+  <option value="Andale Mono">
+  <option value="Courier New">
+  <option value="Lucida Console">
+  <option value="Lucida Sans Typewriter">
+  <option value="modern">
+  
+  <option value="cursive">
+  <option value="Comic Sans MS">
+  <option value="Lucida Calligraphy">
+  <option value="Monotype Corsiva">
+  </datalist>
+  <form>
+  <fieldset>
+    <dl>
+      <dt>Page</dt>
+        <dd><label>        largeur<input id="i0" value="210" onchange="ob()"%/>mm</label></dd>
+        <dd><label>        hauteur<input id="i1" value="297" onchange="ob()"%/>mm</label></dd>
+    </dl>
+    <dl>
+      <dt>Étiquette</dt>
+        <dd><label>         largeur<input id="i2" value="60" onchange="ob()"%/>mm</label></dd>
+        <dd><label>         hauteur<input id="i3" value="40" onchange="ob()"%/>mm</label></dd>
+        <dd><label>           marge<input id="i4" value="1"  onchange="ob()"%/>mm</label></dd>
+        <dd><label>          police<input id="i5" value="serif" onchange="ob()" style="width:200px;" list="font"%/></label></dd>
+    </dl>
+    <div style="clear:both;"></div>
+    <dl>
+      <dt>Identité</dt>
+        <dd><label>alignement<input id="i6" value="center" onchange="ob()" list="align"%/></label></dd>
+        <dd><label>    taille<input id="i7" value="5" onchange="ob()"%/>mm</label></dd>
+    </dl>
+    <dl>
+      <dt>Profession</dt>
+        <dd><label>alignement<input id="i8" value="center" onchange="ob()" list="align"%/></label></dd>
+        <dd><label>    taille<input id="i9" value="4" onchange="ob()"%/>mm</label></dd>
+    </dl>
+    <dl>
+      <dt>Dates</dt>
+        <dd><label>alignement<input id="i10" value="left" onchange="ob()" list="align"%/></label></dd>
+        <dd><label>    taille<input id="i11" value="3" onchange="ob()"%/>mm</label></dd>
+    </dl>
+  </fieldset>
+  </form>
+%end;
+%define;one_tag(xx)
+  <div class="d11">
+    <p> %xx; </p>
+    <p> %apply;capitalize(xx.occupation) </p>
+    <p> 
+      %if;(xx.has_birth_date or xx.has_birth_place)
+        <span>%birth_symbol;</span>%xx.slash_birth_date; %xx.birth_place;
+      %end;
+      <br> 
+      %if;(xx.has_death_date or xx.has_death_place)
+        <span>%death_symbol;</span>%xx.slash_death_date; %xx.death_place;
+      %end;
+     </p>
+  </div>
+%end;
+%define;anc_tag()
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %apply;one_tag("ancestor")
+        %end;
+        %if;(evar.siblings = "on" and ancestor.index != self.index and ancestor.nb_children > 1)
+          %foreach;ancestor.family;
+            %if;(spouse.index != ancestor.spouse.index)
+              %apply;one_tag("spouse")
+              %if;(nb_children > 0)
+                %foreach;child;
+                  %if;(child.sosa_in_list = "")
+                    %apply;one_tag("child")
+                  %end;
+                %end;
+              %end;
+            %end;
+            %if;(ancestor.anc_sosa.v % 2 = 0 and family.index = ancestor.family.index)
+              %foreach;child;
+                %if;(child.sosa_in_list = "")
+                  %apply;one_tag("child")
+                %end;
+              %end;
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+%define;des_tag(curlev,maxlev)
+  %apply;one_tag("self")
+  %let;lev;%expr(l_v - curlev + 1)%in;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %if;(spouse.sosa_in_list = "")
+        %apply;one_tag("spouse")
+      %end;
+      %foreach;child;
+        %apply;des_tag(curlev+1,maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+%( main %)
+%apply;togen()
+%apply;tool()
+<div class="d1">
+  %if;(evar.m = "A")
+    %apply;anc_tag()
+  %else;
+    %apply;des_tag(0,l_v)
+  %end;
+  <div style="width:100%%;clear:both;"> </div>
+</div>
+<div style="width:100%%;clear:both;"> </div>
+<form id="tools" name="tools" method="get" action="%action;">
+  <fieldset>
+    <legend>[*tools]0 <input type="submit" value="Ok" style="width:auto;font-family:arial;"%/></legend>
+    %hidden;
+    <input type="hidden" name="m" value="%evar.m"%/>
+    <input type="hidden" name="t" value="%evar.t;"%/>
+    %if;(evar.p != "" or evar.n != "" or evar.oc != "")
+      <input type="hidden" name="p" value="%evar.p;"%/>
+      <input type="hidden" name="n" value="%evar.n;"%/>
+      <input type="hidden" name="oc" value="%evar.oc;"%/>
+    %end;
+    %if;(evar.i != "")
+      <input type="hidden" name="i" value="%evar.i;"%/>
+    %end;
+    <p>
+      %let;l_bmaxv;%if;(bvar.max_anc_level = "")%evar.maxv;%else;%bvar.max_anc_level;%end;%in;
+      %let;l_emaxv;%if;(evar.maxv = "")%l_bmaxv;%elseif;(evar.maxv < l_bmaxv)%evar.maxv;%else;%l_bmaxv;%end;%in;
+      <input type="hidden" name="maxv" value="%evar.maxv;"%/>
+      <label>[*generation/generations]0 <code>(X)</code> <input id="v" name="v" class="number" size="1" value="%l_v;"
+        autocomplete="off" autocomplete="off" title="[generation/generations]0 (X)" accesskey="X" %/> / %l_emaxv;</label>
+      %if;(evar.tf1 != "")
+        <input type="hidden" name="tf1" value="%evar.tf1;"%/>
+        <label><input type="checkbox" name="only" value="on" %l_on;
+            %if;(evar.only = "on") checked="checked"%end;%/>[only the generation selected]</label>
+        <label><input type="checkbox" name="siblings" value="on" %l_on;
+            %if;(evar.siblings = "on") checked="checked"%end;%/>[siblings]</label>
+      %else;
+        <input type="hidden" name="tl1" value="%evar.tl1;"%/>
+      %end;
+    </p>
+  </fieldset>
+</form>

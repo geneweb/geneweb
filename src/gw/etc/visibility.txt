@@ -1,0 +1,118 @@
+  <!-- $Id: visibility.txt %version; 23/02/2025 05:05:34 $ -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>[*visibility-hlp]</title>
+  %if;(bvar.robot_index="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body>
+<div class="container">
+<h2>[*visibility-hlp]</h2>
+<div class="mb-2">
+[
+en: You are currently logged-is as
+fr: Vous êtes connecté en mode
+] %if;wizard;<span class="text-success">[wizard/wizards/friend/friends/exterior]0</span>%nn;
+  %elseif;friend;<span class="text-success">[wizard/wizards/friend/friends/exterior]2</span>%nn;
+  %else;<span class="text-success">[wizard/wizards/friend/friends/exterior]4</span>%end;.
+</div>
+<div>
+%if;(b.semi_public="yes")
+[
+en: <span class="text-success">Wizards</span> have full visibility
+fr: Les <span class="text-success">magiciens</span> ont la visibilité de toutes les informations
+].<br>
+
+[
+en: For %if;(b.semi_public="yes")<span class="text-success">friends</span> and %end;<span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the vriable "public_if_titles" has been activated for the base
+fr: Pour les %if;(b.semi_public="yes")<span class="text-success">amis</span> et %end;<span class="text-success">visiteurs</span>, une personne peut être visible si elle est marquée "Public", si elle est décédée ou suffisamment agée (selon des paramètres de la base) ou si elle porte un titre et la variable "public_if_titles" est activée pour la base
+].<br>
+%else;
+[
+en: <span class="text-success">Wizards</span> and <span class="text-success">friends</span> have full visibility
+fr: Les <span class="text-success">magiciens</span> et les <span class="text-success">amis</span> ont la visibilité de toutes les informations
+].<br>
+
+[
+en: For <span class="text-success">visitors</span>, a person may be visible if tagged "Public" or if dead or sufficiently old (as controlled by some base parameter) or if the person has a title and the vriable "public_if_titles" has been activated for the base
+fr: Pour les <span class="text-success">visiteurs</span>, une personne peut être visible si elle est marquée "Public", si elle est décédée ou suffisamment agée (selon des paramètres de la base) ou si elle porte un titre et la variable "public_if_titles" est activée pour la base
+].<br>
+
+%end;
+
+[
+en: Anyone cas ask to be tagged as "Private"
+fr: Toute personne peut demander à être marquée "Private" 
+].<br>
+
+[
+en: When logged-in as <span class="text-success">friend</span>, himself is always visible for himself
+fr: Une personne connectée comme <span class="text-success">ami</span>, voit toujours sa fiche personnelle
+].<br>
+
+
+%if;(b.semi_public="yes")
+[
+en: <span class="text-success">Friends</span> who have given their consent see all informations for other consenting <span class="text-success">friends</span>
+fr: Les <span class="text-success">amis</span> qui ont donné leur consentement voient toutes les informations des autres <span class="text-success">amis</span> consentants
+].<br>
+
+[
+en: Data for persons who have not (yet) given their consent is limited to first name, surname and marriages for other <span class="text-success">friends</span>
+fr: Pour les personne n'ayant pas (encore) donné leur consentement, seuls les nom, prénom et alliances sont affichés pour les autres <span class="text-success">amis</span>
+].<br>
+
+[
+en: If a consenting <span class="text-success">friend</span> activates the "family mode" he will see all data for the members of his family, even if they have not (yet) given their consent
+fr: S'il active le mode "famille", un <span class="text-success">ami</span> ayant donné son consentement verra les données des membres de sa famille, même si ceux-ci n'ont pas (encore) donné leur consentement
+].<br>
+
+[
+en: this mode is expensive and should be deactivated (second click on the family mode button) for further navigation
+fr: Ce mode, qui est coûteux, doit être désactivé (deuxième click sur le bouton mode famille) pour la poursuite de la navigation
+].<br>
+
+
+%end;
+
+</div>
+<p class="mt-3">
+
+[
+en: Color code
+fr: Codes couleur
+][:]
+<div>
+  <ul>
+    <li><i class="fa fa-person fa-fw text-muted mr-2"></i>[*iftitles/public/semipublic/private]0[:]
+[
+en: Public if has titles, if <code>public_if_title=yes</code> (parameter in gwf, default yes), otherwise private
+fr: Publique si titré, si <code>public_if_title=yes</code> (paramètre dans .gwf, défaut yes), sinon privé
+];
+    <li><i class="fa fa-person fa-fw text-success mr-2"></i>[*iftitles/public/semipublic/private]1[:] 
+[
+en: Visible for everyone
+fr: Visible pour tout le monde
+];
+%if;(b.semi_public="yes")
+    <li><i class="fa fa-person fa-fw text-warning mr-2"></i>[*iftitles/public/semipublic/private]2[:]
+[
+en: Visible for <span class="text-success">friends</span> having HalfPublic status (consenting), other <span class="text-success">friends</span> see only firstname and surname
+fr: Visible pour les <span class="text-success">amis</span> consentants (marqués SemiPublic), les autre <span class="text-success">amis</span> ne voient que nom et prénom
+];
+%end;
+    <li><i class="fa fa-person fa-fw text-danger mr-2"></i>[*iftitles/public/semipublic/private]3[:]
+[
+en: Never visible except for himself when logged as <span class="text-success">friend</span>
+fr: Invisible pour tous sauf lui même (si connecté comme <span class="text-success">ami</span>)
+];
+  </ul>
+</div>
+</div>
+</body>
+</html>

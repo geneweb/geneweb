@@ -1,0 +1,3 @@
+<!-- $Id: templm/anctree_m.txt v7.0 28/04/2017 09:34:30 $ -->
+
+%include;modules/arbre_8gen

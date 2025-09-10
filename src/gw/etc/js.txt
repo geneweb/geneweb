@@ -1,0 +1,796 @@
+<!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
+%if;(evar.templ="")
+  %if;(bvar.use_cdn="yes")
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
+                       sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
+                       sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha256-GRJrh0oydT1CwS36bBeJK/2TggpaUQC6GzTaTQdZm0k=
+                       sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct
+                       sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
+      <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
+              integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=
+                         sha384-d3UHjPdzJkZuk5H3qKYMLRyWLAQBJbby2yr2Q58hXXtAGF8RSNO9jpLDlKKPv5v3
+                         sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script src="https://cdn.jsdelivr.net/npm/maximize-select2-height@1.0/maximize-select2-height.min.js"
+              integrity="sha256-rOpd4voNU/iOOklhdb2rhwe4OaXfo7vIO3f7Tc8xe0o=
+                         sha384-/Pca3vtmH/c7JiUJVMPvoo2SCkKgnjpJyBqTvCPmkDGYhFzSeIBZp/UJ7PZY7/+G
+                         sha512-NHHjSaRwEJ7OOPdQlvxa0gYbL9Np67IYbl+yJ3jDCTUxCCGKhCNlX77eacvuKmf4RszZBA8Elh71V26SKmElWA=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
+    %if;(e.m="MOD_DATA" and e.s="")
+       <script src="https://cdn.jsdelivr.net/npm/regex@4.4.0/dist/regex.min.js"
+               integrity="sha256-ZEJ/IHdQ3RcAglQ8BH6pHVaHDIVl8rPFjigQN7zKMw0=
+                          sha384-WGmRZZCBcsKBkTrk3hdnP4+wYopCyO9L0GKMBmHnlDLHnyajWYiE/52P3ai/1/1L
+                          sha512-Bb1WXpqE5T4DNZzNLvoK3ABggd1ycVuM5kKvKamvvjc0bD7/9AAWJx1J4lra90R9qGFRH6zbQEFuUk253WNmBw=="
+               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
+  %else;
+    <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
+    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=4.6.1"></script>
+    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
+      <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
+      <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
+    %end;
+    %if;(e.m="MOD_DATA" and e.s="")
+      <script src="%etc_prefix;js/regex.min.js?version=4.4.0"></script>
+    %end;
+  %end;
+  %if;(e.m="A" and e.t="T" and e.t1="CT")
+    <script src="%etc_prefix;js/jquery.line.js"></script>
+  %end;
+%end;
+%if;(not is_welcome and e.m!="MOD_DATA")
+  %if;wizard;
+    %if;(e.m="MOD_DATA_OK" and e.data!="")
+      <script>
+        var htmlTitle = document.title;
+        if (htmlTitle == "[*modification successful]" ||
+            htmlTitle == "[*no modification]") {
+          document.getElementById("reference").focus();
+        }
+      </script>
+    %end;
+    %if;(e.m="MOD_IND_OK" or e.m="MOD_FAM_OK"
+       or e.m="ADD_FAM_OK" or e.m="DEL_FAM_OK"
+       or e.m="SND_IMAGE_OK" or e.m="DEL_IMAGE_OK"
+       or e.m="CHG_EVT_IND_ORD_OK" or e.m="CHG_EVT_FAM_ORD_OK"
+       or e.m="CHG_CHN_OK"
+       or (e.m="MOD_DATA_OK" and e.data=""))
+      <script>
+        var htmlTitle = document.title;
+        if (htmlTitle == "[*person modified]" ||
+            htmlTitle == "[*person added]"    ||
+            htmlTitle == "[*image received]"  ||
+            htmlTitle == "[*image deleted]"   ||
+            htmlTitle == "[*modification successful]") {
+            document.getElementById("i%e.i;").focus();
+        }
+        else if (htmlTitle == "[*family modified]" ||
+                 htmlTitle == "[*family added]"    ||
+                 htmlTitle == "[*family deleted]"  ||
+                 htmlTitle == "[*children's names changed]") {
+            document.getElementById("i%e.ip;").focus();
+        }
+      </script>
+    %end;
+    %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
+    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
+    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK")
+      <script>$('body').scrollspy({ target: '#banner' })</script>
+    %end;
+  %end;
+%end;
+%if;("MOD_IND" in e.m or "MOD_FAM" in e.m or "SND_IMAGE_C" in e.m
+    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
+    or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
+  %if;(b.use_cdn="yes")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js"
+      integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
+  %else;
+     <script src="%etc_prefix;js/autosize.min.js?version=4.0.2"></script>
+   %end;
+  <script>autosize(document.querySelectorAll('textarea'));</script>
+%end;
+%if;(e.m="MOD_FAM" or e.m="MOD_FAM_OK")
+<script>
+  $(document).ready(function() {
+    $('.transfer-btn').click(function() {
+      var commentContent = $('#notes_comments').val();
+      var mariageEvent = $('[data-marr]').attr('id');
+      $('#' + mariageEvent).val(commentContent);
+      $('#notes_comments').val('');
+      autosize.update($('#' + mariageEvent));
+      $(this).hide();
+    });
+  });
+</script>
+%end;
+%if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
+<script%if;(e.templ!="") type="text/javascript"%end;>
+ <!--
+   $("#btnshowfilter").on("click", function() {
+    var nbinput = $('input.filter:text:disabled').length;
+    if (nbinput == 4) {
+      $('#input1').prop('disabled', false);
+      $('#filterbysurname').removeClass("d-none");
+      $('#total').addClass("text-muted");
+      $('#input1').focus(); }
+    else {
+      $('.filter').prop('disabled', true);
+      $('#filterbysurname').addClass("d-none");
+      $('#total').removeClass("text-muted"); }
+  });
+  $("#btnplus").on("click", function() {
+    var len = $('.filter:text:not(:disabled)').length + 1;
+    $('#input'+len).removeClass("d-none").prop('disabled', false).focus();
+    if (len == 5) { $("#btnplus").addClass("disabled").attr('tabindex', '-1'); }
+  });
+  $("#btnclear").on("click", function() {
+    $('.extrafilter').val('').addClass("d-none").prop('disabled', true);
+    $('#input1').val('').focus();
+    $('#btnplus').removeClass('disabled').removeAttr('tabindex');
+    $('*[data-surname]').removeClass("d-none");
+  });
+  $('.filter').on("input", function(e) {
+    var input1 = $("#input1").val();
+    var input2 = $("#input2").val();
+    var input3 = $("#input3").val();
+    var input4 = $("#input4").val();
+    var input5 = $("#input5").val();
+    if (input1 == "") { var input1 = "_"; }
+    $('[data-surname]').addClass("d-none");
+    $('[data-surname*="' + input1 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input2 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input3 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input4 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input5 + '"]').removeClass("d-none");
+  });
+  function implex(xx) {
+    $('[class^="sosa_"]').css("background-color","");
+    $('.sosa_'+xx).add('.sosa_implex_'+xx).css("background-color","#CCFFFF");
+  }
+  function implexdesc(xx) {
+    $('a[data-index]').css("background-color","");
+    $('a[data-index="' + xx + '"]').css("background-color","#CCFFFF");
+  }
+  -->
+</script>
+%end;
+%( Functions for character.txt %)
+%if;("ADD" in e.m or "MOD" in e.m)
+<script>
+  // Attach a click event listener to each anchor element within the character's list container
+  function setupCharacterInsertion() {
+    document.querySelectorAll('.ch a').forEach(function (element) {
+      element.addEventListener('click', function (event) {
+        event.preventDefault();
+        var textarea = document.querySelector('.insert-character-target');
+        insertCharacter(textarea, this.innerText);
+      });
+    });
+  }
+
+  // Function to insert a character at the current cursor position in a textarea
+  function insertCharacter(t, v) {
+    var startPos = t.selectionStart;
+    var endPos = t.selectionEnd;
+    t.value = t.value.substring(0, startPos) + v + t.value.substring(endPos, t.value.length);
+    t.selectionStart = startPos + v.length;
+    t.selectionEnd = t.selectionStart;
+    t.focus();
+  }
+function insertTags(tagOpen, tagClose, sampleText) {
+  const textarea = document.querySelector('textarea#notes_comments');
+  if (!textarea) return false;
+
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const scrollTop = textarea.scrollTop;
+
+  let selectedText = textarea.value.substring(start, end);
+  if (!selectedText) selectedText = sampleText;
+
+  // Remove trailing space if exists
+  if (selectedText.endsWith(' ')) {
+    selectedText = selectedText.slice(0, -1);
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    textarea.value = before + tagOpen + selectedText + tagClose + ' ' + after;
+  } else {
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    textarea.value = before + tagOpen + selectedText + tagClose + after;
+  }
+
+  // Restore scroll position
+  textarea.scrollTop = scrollTop;
+
+  // Set selection
+  if (start === end) {
+    // No text was selected
+    const cursorPos = start + tagOpen.length;
+    textarea.setSelectionRange(cursorPos, cursorPos + sampleText.length);
+  } else {
+    // Text was selected
+    const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+  }
+
+  textarea.focus();
+  return false;
+}
+// Toolbar sticky behavior
+function setupToolbarSticky() {
+  const toolbar = document.querySelector('.toolbar-wrapper');
+  if (!toolbar) return;
+
+  let lastScroll = window.scrollY;
+
+  function handleScroll() {
+    const currentScroll = window.scrollY;
+    if (currentScroll > 0) {
+      toolbar.classList.add('is-sticky');
+    } else {
+      toolbar.classList.remove('is-sticky');
+    }
+    lastScroll = currentScroll;
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+}
+</script>
+%end;
+%( Popover functions for anc/destables %)
+%if;((e.m="A" and e.t="Z") or (e.m="D" and (e.t="H" or e.t="I")))
+<script>
+$('[data-toggle="popover"]').popover({
+  html: true,
+  trigger: "focus",
+  delay: { hide: 250 }
+})
+$('.popover-dismiss').popover({
+  trigger: 'focus'
+})
+$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
+</script>
+%end;
+%( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
+%if;(not is_welcome)
+<script>
+// Enhanced clear button management for dynamic input fields
+// Add clear buttons (X) to input fields and handle DataTable updates
+// Generic clear button functionality for form inputs
+
+function addClearButtonToInputs() {
+    // Utility function to create and setup clear button
+    function createClearButton(element) {
+        const clearButton = document.createElement('i');
+        clearButton.className = 'fas fa-xmark clear-button-icon';
+        clearButton.title = '[*clear input]';
+
+        clearButton.style.cssText = `
+            position: absolute;
+            right: 10px;
+            top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
+            transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
+            cursor: pointer;
+            color: #667fc9;
+            font-size: 1em;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+            pointer-events: auto;
+        `;
+        return clearButton;
+    }
+
+    // Initialize or update a single input
+    function initializeInput(element) {
+        // Skip if already initialized
+        if (element.dataset.clearInitialized) {
+            const existingButton = element.parentNode.querySelector('.clear-button-icon');
+            if (existingButton) {
+                existingButton.style.opacity = element.value ? '1' : '0';
+            }
+            return;
+        }
+
+        // Mark as initialized
+        element.dataset.clearInitialized = 'true';
+
+        // Create wrapper if needed
+        let wrapper = element.parentNode;
+        if (!wrapper.classList.contains('clear-button-wrapper')) {
+            wrapper = document.createElement('div');
+            wrapper.className = 'clear-button-wrapper';
+            wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
+            element.parentNode.insertBefore(wrapper, element);
+            wrapper.appendChild(element);
+        }
+
+        // Add padding for the clear button
+        element.style.paddingRight = '24px';
+
+        // Create and append clear button
+        const clearButton = createClearButton(element);
+        wrapper.appendChild(clearButton);
+
+        // Update clear button visibility
+        const updateVisibility = () => {
+            requestAnimationFrame(() => {
+                clearButton.style.opacity = element.value ? '1' : '0';
+            });
+        };
+
+        // Event listeners
+        element.addEventListener('input', updateVisibility);
+        element.addEventListener('change', updateVisibility);
+        element.addEventListener('focus', updateVisibility);
+
+        // Hover effects
+        clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
+        clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
+
+        // Handle clear button click
+        clearButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Clear the input
+            element.value = '';
+            element.focus();
+            updateVisibility();
+
+            // Trigger events
+            const inputEvent = new CustomEvent('clearButton', {
+                bubbles: true,
+                detail: { element }
+            });
+            element.dispatchEvent(inputEvent);
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        // Initial visibility state
+        updateVisibility();
+    }
+
+    // Process all matching inputs
+    function processInputs() {
+        const selector = `
+            input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
+            input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
+            textarea:not(.no-clear-button):not([readonly]):not([disabled]),
+            .clear-button:not([readonly]):not([disabled])
+        `;
+
+        requestAnimationFrame(() => {
+            document.querySelectorAll(selector).forEach(initializeInput);
+        });
+    }
+
+    // Initial processing
+    processInputs();
+
+    // Monitor DOM changes
+    const observer = new MutationObserver((mutations) => {
+        let shouldProcess = false;
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes.length ||
+                mutation.type === 'attributes' &&
+                (mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
+                shouldProcess = true;
+            }
+        });
+        if (shouldProcess) {
+            processInputs();
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['type', 'class']
+    });
+}
+</script>
+%end;
+<script>
+%if;(wizard and (is_welcome or "ADD_FAM" in e.m or "MOD_" in e.m))
+// Manages enhanced input field behaviors (navigation, interaction)
+const inputToBook = {
+  addNavigation: function() {
+    // Use event delegation for dynamically added inputs
+    $(document).on('mousedown', 'input[data-book]', function(event) {
+      if (event.ctrlKey && event.button === 0) {
+        event.preventDefault();
+        inputToBook.openBook(this.value, $(this).data('book'));
+      }
+    });
+  },
+
+  openBook: function(value, book) {
+    if (!value) return;
+
+    let preVal = value;
+    if (book === "place") {
+      const place = value.split(/\]\s+[-–—]\s+/);
+      preVal = place.length > 1 ? place[1] : value;
+    }
+
+    preVal = preVal.substring(0, Math.min(preVal.length, 12))
+                   .split(/[, ]+/)[0]
+                   .substring(0, Math.floor(value.length / 2));
+
+    const encVal = encodeURIComponent(value);
+    const encPreVal = encodeURIComponent(preVal);
+
+    const url = `%if;cgi;?b=%base.name;%else;?w=w%end;&m=MOD_DATA&data=${book}&s=${encPreVal}&s1=${encVal !== encPreVal ? encVal : ''}`;
+    window.open(url, '_blank');
+  }
+};
+%end;
+%if;(is_welcome and b.propose_titles!="no")
+// Controls unified search functionality with a shared submit button
+// Handles both main person search and optional title search forms
+function initializeWelcomeSearchFunctionality() {
+  const searchForms = {
+    main: document.getElementById('main-search'),
+    title: document.getElementById('title-search')
+  };
+  const searchBtn = document.getElementById('global-search');
+
+  function hasInput(form) {
+    return form && Array.from(form.querySelectorAll('input[type="search"]'))
+                      .some(input => input.value.trim() !== '');
+  }
+  function closeAlertsAndCleanURL() {
+    $('.alert').alert('close');
+    const url = new URL(window.location.href);
+    const bParam = url.searchParams.get('b');
+    url.search = '';
+    if (bParam !== null) {
+      url.searchParams.set('b', bParam); // on remet b=
+    }
+    window.history.replaceState({}, '', url);
+  }
+  function getTooltip() {
+    if (hasInput(searchForms.main)) {
+      return '[*search/case sensitive]0 [person/persons]0';
+    }
+    if (searchForms.title && hasInput(searchForms.title)) {
+      return '[*search/case sensitive]0 [title/titles]0/[estate]0';
+    }
+    return '';
+  }
+
+  $(searchBtn).tooltip({
+    title: getTooltip,
+    trigger: 'hover'
+  });
+
+  Object.values(searchForms).forEach(form => {
+    if (!form) return;
+
+    form.querySelectorAll('input[type="search"]').forEach(input => {
+      input.addEventListener('input', () => {
+        if (hasInput(form)) {
+          closeAlertsAndCleanURL();
+        }
+        $(searchBtn).tooltip('hide')
+                   .attr('data-original-title', getTooltip())
+                   .tooltip('show');
+      });
+    });
+
+    form.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (hasInput(form)) form.submit();
+      }
+    });
+  });
+
+  searchBtn.addEventListener('click', () => {
+    if (hasInput(searchForms.main)) {
+      searchForms.main.submit();
+    }
+    else if (searchForms.title && hasInput(searchForms.title)) {
+      searchForms.title.submit();
+    }
+  });
+}
+%end;
+%if;(not is_welcome and e.m!="MOD_DATA")
+function initializeLazyModules() {
+  $('#load_once_p_mod').one('click', () => $.getScript('%etc_prefix;js/p_mod.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.js%end;'));
+  $('#load_once_copylink').one('click', () => $.getScript('%etc_prefix;js/copylink.js?hash=%apply;hash%with;%etc_prefix;js/copylink.js%end;'));
+  $('#load_once_rlm_builder').one('click', () => $.getScript('%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;'));
+}
+%end;
+%if;(e.templ="" and not is_welcome)
+// Focus on found autofocus input in opening BS modal
+function setupModalAutofocus() {
+  $('.modal').on('shown.bs.modal', function() {
+    $(this).find('[autofocus]').focus();
+  });
+}
+%end;
+%if;(e.m!="MOD_DATA")
+// Floating placeholders for all textual inputs
+function setupFloatingPlaceholders() {
+  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
+
+  inputs.forEach(input => {
+    // Ignore placeholders that are only non-breaking spaces
+    if (input.placeholder.trim() === '') return;
+
+    const hadFocus = document.activeElement === input;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'input-wrapper';
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    const placeholder = document.createElement('span');
+    placeholder.className = 'floating-placeholder';
+    placeholder.textContent = input.placeholder;
+    wrapper.appendChild(placeholder);
+
+    input.addEventListener('focus', () => placeholder.classList.add('active'));
+    input.addEventListener('blur', () => placeholder.classList.remove('active'));
+
+    if (hadFocus || input.hasAttribute('autofocus')) {
+      requestAnimationFrame(() => {
+        input.focus();
+        placeholder.classList.add('active');
+      });
+    }
+  });
+}
+%end;
+%if;(e.templ="")
+%if;(e.m="NOTES" or e.m="WIZNOTES")
+// TOC toggle for NOTES and WIZNOTES
+function setupTocToggle() {
+  const toggleTocText = function() {
+    return $('#toc-content').is(':hidden')
+      ? '([visualize/show/hide/summary]1)'
+      : '([visualize/show/hide/summary]2)';
+  };
+  $('.toc-toggle').on('click', function() {
+    $('#toc-content').toggle();
+    $('.toc-toggle').text(toggleTocText());
+  });
+}
+%end;
+%( Place the cursor at the end an autofocused input %)
+%if;("MOD" in e.m)
+function setupAutofocusInput() {
+  const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
+  if (focusableElement) {
+    focusableElement.focus();
+    if (focusableElement.setSelectionRange) {
+      focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
+    } else if (focusableElement.value) {
+      focusableElement.value = focusableElement.value;
+    }
+  }
+}
+%end;
+%if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
+    or b.datalist_titles=1 or b.datalist_estates=1))
+  or (e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
+  or ("IND" in e.m or "FAM" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1
+    or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
+    or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
+    or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
+// Manages datalist population and updates
+// Simple datalist manager with special handling for DataTables inputs
+const DatalistManager = {
+  // Main populate function for regular form datalists
+  populateDatalist: function(datalistId, cacheFile) {
+    const dataList = document.getElementById(datalistId);
+    if (!dataList) return;
+
+    fetch(cacheFile)
+      .then(response => {
+        const reader = response.body
+          .pipeThrough(new DecompressionStream('gzip'))
+          .getReader();
+        return new ReadableStream({
+          start(controller) {
+            return pump();
+            function pump() {
+              return reader.read().then(({done, value}) => {
+                if (done) {
+                  controller.close();
+                  return;
+                }
+                controller.enqueue(value);
+                return pump();
+              });
+            }
+          }
+        });
+      })
+      .then(stream => new Response(stream))
+      .then(response => response.text())
+      .then(text => {
+        const fragment = document.createDocumentFragment();
+        text.split("\n")
+            .filter(line => line.trim())
+            .forEach(option => {
+              const opt = document.createElement("option");
+              opt.value = option.trim().replace("<option>", "");
+              fragment.appendChild(opt);
+            });
+        dataList.textContent = '';
+        dataList.appendChild(fragment);
+      })
+      .catch(error => console.error(`Error loading ${cacheFile}:`, error));
+  },
+  %if;(e.m="MOD_NOTES")
+  // Special handling for DataTables inputs
+  handleDataTableInput: function(input, listId) {
+    if (!input || !listId) return;
+
+    const dataList = document.getElementById(listId);
+    if (!dataList) return;
+
+    // Store current cursor position and selection
+    const selStart = input.selectionStart;
+    const selEnd = input.selectionEnd;
+    const currentValue = input.value;
+
+    // Let browser handle datalist matching
+    const option = Array.from(dataList.options).find(opt =>
+      opt.value.toLowerCase() === currentValue.toLowerCase()
+    );
+
+    if (option) {
+      // Get row and cell info before any updates
+      const $row = $(input).closest('tr');
+      const $cell = $(input).closest('td');
+      const rowIndex = table.row($row).index();
+      const cellIndex = $cell.index();
+
+      // Preserve case the user typed
+      const finalValue = currentValue;
+
+      // Use requestAnimationFrame to handle focus after redraw
+      requestAnimationFrame(() => {
+        const $newRow = $(table.row(rowIndex).node());
+        const $newCell = $newRow.find(`td:eq(${cellIndex})`);
+        const $newInput = $newCell.find('input');
+
+        if ($newInput.length) {
+          if ($newInput.val() !== finalValue) {
+            $newInput.val(finalValue);
+          }
+          $newInput.focus();
+          // Only select if user had selected the whole content
+          if (selStart === 0 && selEnd === currentValue.length) {
+            $newInput[0].setSelectionRange(0, finalValue.length);
+          } else {
+            $newInput[0].setSelectionRange(selStart, selEnd);
+          }
+        }
+      });
+    } else {
+      // If no match, just maintain cursor position
+      requestAnimationFrame(() => {
+        input.setSelectionRange(selStart, selEnd);
+      });
+    }
+  }
+%end;
+};
+
+function constructCachePath() {
+  const baseName = "%base.name;";
+  %if;cgi;
+    const pathname = window.location.pathname;
+    const segments = pathname.split('/');
+    const prefix = segments[1] || '';
+    return `/${prefix}/bases/etc/${baseName}/cache/${baseName}`;
+  %else;
+    return `${baseName}/cache/${baseName}`;
+  %end;
+}
+
+function populateDatalists() {
+  const path = constructCachePath();
+  const datalists = %[
+  %if;(is_welcome or e.m="MOD_NOTES" or "IND" in e.m or "FAM" in e.m)
+    %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
+    %if;(b.datalist_fnames=1)  { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
+    %if;("IND" in e.m or "FAM" in e.m)
+      %if;(b.datalist_places=1)  { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
+      %if;(b.datalist_occupations=1)  { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
+      %if;(b.datalist_sources=1)  { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
+    %end;
+  %end;
+  %if;(is_welcome or "IND" in e.m)
+    %if;is_welcome;
+      %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
+      %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
+    %else;
+      %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
+      %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
+      %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
+    %end;
+  %end;
+  %];
+
+  datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
+}
+%end;
+
+const initTooltips = () => {
+  const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
+  if (tooltipElements.length > 0) {
+    $(tooltipElements).tooltip({
+      trigger: 'hover',
+      delay: { show: 200, hide: 50 },
+      container: 'body',
+    });
+  }
+};
+
+function safeInitialize(fn) {
+  try {
+    fn();
+  } catch (error) {
+    console.error('Initialization error:', error);
+  }
+}
+
+%( Initialize on DOM Content Loaded %)
+document.addEventListener('DOMContentLoaded', () => {
+%if;is_welcome;
+  %if;(b.propose_titles!="no")
+    initializeWelcomeSearchFunctionality();
+  %end;
+  %if;wizard;
+    inputToBook.addNavigation();
+  %end;
+  %if;(b.datalist_fnames=1 or b.datalist_snames=1)
+    populateDatalists();
+  %end;
+%end;
+%if;(is_welcome or "MOD_DATA" in e.m)
+  initTooltips();
+%end;
+%if;(not is_welcome and e.m!="MOD_DATA")
+  initializeLazyModules();
+%end;
+%if;(e.templ="" and not is_welcome)
+  setupModalAutofocus();
+%end;
+%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D") or (e.m="A" and e.t="H") or "HIST" in e.m))
+  setupFloatingPlaceholders();
+%end;
+%if;("ADD" in e.m or "MOD" in e.m)
+  setupToolbarSticky();
+  setupCharacterInsertion();
+%end;
+%if;(e.m="NOTES" or e.m="WIZNOTES")
+  setupTocToggle();
+%end;
+%if;("MOD" in e.m)
+  setupAutofocusInput();
+%end;
+});
+</script>
+%end;

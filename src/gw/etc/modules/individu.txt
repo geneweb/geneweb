@@ -1,0 +1,477 @@
+<!-- $Id: modules/individu.txt v7.1 19/06/2024 06:41:02 $ -->
+%( options
+0: skip
+1: standard
+2: centered
+3: two columns
+%)
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%define;cousin(l1,l2,dd,cc)
+  %if;([cousin.l1.l2]!="[cousin.l1.l2]")
+    %if;(cc>0)[cousin.l1.l2:::dd]s%else;[*cousin.l1.l2:::dd]s%end;
+  %else;
+    %if;(cc>0)[close family]0
+    %else;[*close family]0
+    %end; (<small class="text-muted">l1/l2</small>)
+  %end;
+%end;
+%define;rela()
+  %if;(count2=1)
+    [*godson/goddaughter/godchild]s
+  %elseif;(count2=2)
+    [*godfather/godmother/godparents]s
+  %end; [and]%sp;
+%end;
+%define;link(xxx,zzz)
+  %if;(not cancel_links)<a href="%prefix;m=zzz&v=%sq;
+    %if;("xxx"=first_name)%first_name_key;%sq;
+    %elseif;("xxx"=surname)%surname_key;%sq;
+    %( how to get (first/sur)_name_alias_keys? %)
+    %else;xxx%sq;
+    %end;">%sq;
+  %end;xxx%if;(not cancel_links)</a>%end;
+%end;
+%define;detailed_names()
+  %if;(has_qualifiers or has_aliases or has_nobility_titles or
+       has_public_name or has_surnames_aliases or has_first_names_aliases or
+       has_linked_page.HEAD or computable_death_age or computable_age)
+    %foreach;qualifier;
+      %if;not is_first;
+        %if;has_public_name;%public_name; %qualifier;
+        %else;%first_name; %qualifier;%end;<br>
+      %end;
+    %end;
+    %if;(has_public_name or has_qualifiers)
+      <span class="font-weight-bold">%apply;link(first_name,"P") %apply;link(surname,"N")</span><br>
+    %end;
+    %if;has_aliases;
+      Alias%sp;
+      %apply;lazy_print("")
+      %foreach;alias;
+        %if;(lazy_printed)/%end;
+        %lazy_force;
+        <b>%alias;</b>%nn;
+      %end;
+      <br>
+    %end;
+    %( Nobility title format:
+         “13ᵉ prince de Monaco (Rainier III, 9 mai 1949–6 avril 2005)” %)
+    %if;has_nobility_titles;
+      %foreach;nobility_title;%nn;
+        %if;not is_first;,%sp;%end;
+        %nobility_title;%nn;
+      %end;<br>
+      %( Currently unused because it lacks concatenation of places in hyperlinks
+      %foreach;nob_title;%nn;
+        %if;not is_first;,%sp;%end;
+        %if;(nob_title.nth!="" and nob_title.nth>0)%apply;nth%with;[nth]%and;%nob_title.nth;%end; %end;%nn;
+        %if;not cancel_links;
+          <a href="%prefix;m=TT&sm=S&t=%apply;uri_encode(nob_title.title)&p=%if;(nob_title.places!="")%apply;uri_encode(nob_title.places)%end;">%nn;
+        %end;
+          %nob_title.title;%if;(nob_title.places!="")%sp;%nob_title.places;%end;%nn;
+        %if;not cancel_links;</a>%end;
+        %if;(nob_title.name!="" or nob_title.date_begin!="" or nob_title.date_end!="")
+          %sp;(%nn;
+          %if;(nob_title.name != "")%nob_title.name;%end;%nn;
+          %if;(nob_title.date_begin != "" or nob_title.date_end != "")
+            %if;(nob_title.name != ""),%sp;%end;%nn;
+            %if;(nob_title.date_begin!="")%nob_title.date_begin;%end;%nn;
+            %if;(nob_title.date_end!="")–%nob_title.date_end;%end;
+          %end;)%nn;
+        %end;
+      %end;%)
+    %end;</br>
+    %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;<br>%end;
+    %if;has_first_names_aliases;
+      %apply;lazy_print("")
+      %apply;link(first_name,"P")/%sq;
+      %foreach;first_name_alias;
+        %if;(lazy_printed)/%end;
+        %lazy_force;
+        %apply;link(first_name_alias,"P")
+      %end;
+      <br>
+    %end;
+    %if;has_surnames_aliases;
+      %apply;lazy_print("")
+      %apply;link(surname,"N")/%sq;
+      %foreach;surname_alias;
+        %if;(lazy_printed)/%end;
+        %lazy_force;
+        %apply;link(surname_alias,"N")
+      %end;
+      <br>
+    %end;
+  %end;
+%end;
+%define;nthgen(xxx)
+  %apply;nth([nth (generation)], xxx) [generation/generations]0%nn;
+%end;
+%define;sosa(ccc)
+  %reset_count;
+  <li class="mt-1"><span class="fa-li"><i class="far fa-circle-dot text-success"></i></span>
+    %if;(sosa=1)[*Sosa 1]
+    %else;
+      %apply;a_of_b%with;<a href="%prefix;%sosa_link;">[Sosa] %sosa;</a> – %nn;
+        %if;(ccc>0)%apply;rela()%end;
+        %if;(sosa.lvl<10)
+          %apply;cousin%with;%expr(sosa.lvl-1)%and;0%and;%and;ccc%end;%nn;
+        %else;
+          %if;(ccc>0)[an ancestor]s%else;[*an ancestor]s%end;
+        %end;
+      %and;
+        %if;(sosa_ref.is_restricted)%sosa_ref;
+        %else;<a href="%prefix;%sosa_ref.access;" title="[Sosa 1]">%sosa_ref;</a>%end;%nn;
+        %if;(sosa.lvl>9) (%apply;nthgen%with;%sosa.lvl;%end;)%end;
+      %end;
+    %end;
+  </li>
+%end;
+%define;ancestor(aaa,bbb,sss,ttt)
+  %if;(cancel_links) aaa
+  %else;
+    <a href="%prefix;bbb"
+      title="%apply;a_of_b%with;Sosa sss%and;%self;%end;&#10;
+             %apply;a_of_b%with;Sosa ttt%and;%sosa_ref;%end;">aaa</a>%nn;
+  %end;
+%end;
+%define;all_link()
+  <a href="%prefix;em=R&et=S&ei=%index;&i=%sosa_ref.index;&dag=on"
+%( autre possibilité %prefix;&m=NG&em=R&et=A&ei=%index;&select=%sosa_ref.index;&spouse=on&long=on" %)
+    title="[*link between] %self; [and] %sosa_ref;">
+    <i class="fas fa-%if;(l1=0)child%else;user-group%end;"></i></a>
+%end;
+%define;from_sosa(ccc)
+  %if;(browsing_with_sosa_ref and has_parents)
+    %reset_count;%reset_count1;
+    %foreach;ancestor_level;
+      %incr_count1;
+      %if;(count < 2 and level <= 15)
+        %foreach;ancestor;
+          %if;(ancestor.has_sosa and ancestor.anc_sosa.v < 16385)
+            %if;(count = 0)
+              %incr_count;
+              %apply;setvar(l1,ancestor.sosa.lvl-1)
+              %apply;setvar(l2,count1-1)
+              %apply;setvar(ancestor1_anc_sosa,ancestor.anc_sosa.v)
+              %apply;setvar(ancestor1_sosa_cujus,ancestor.sosa.v)
+              %apply;setvar(ancestor1_index,ancestor.index)
+              %apply;setvar(ancestor1_access,ancestor.access)
+              %apply;setvar(ancestor1,ancestor)
+            %elseif;(count = 1)
+              %let;a1s;%apply;getvar(ancestor1_anc_sosa)%in;
+              %let;a1sc;%apply;getvar(ancestor1_sosa_cujus)%in;
+              %if;(a1s %2 = 0 and ancestor.anc_sosa.v-a1s = 1
+                and a1sc %2 = 0 and ancestor.sosa.v-a1sc = 1)
+                %incr_count;
+                %apply;setvar(ancestor2_anc_sosa,ancestor.anc_sosa.v)
+                %apply;setvar(ancestor2_sosa_cujus,ancestor.sosa.v)
+                %apply;setvar(ancestor2_access,ancestor.access)
+                %apply;setvar(ancestor2,ancestor)
+              %else;%incr_count;%incr_count;
+              %end;
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+    %let;l1;%apply;getvar(l1)%in;
+    %let;l2;%apply;getvar(l2)%in;
+    %if;(count>0)
+      <li class="mt-2"><span class="fa-li">%apply;all_link()</span>
+        %apply;a_of_b%with;
+          %if;(ccc>0)%apply;rela()%end;
+          <a href="%prefix;m=RL&i=%apply;getvar(ancestor1_index)&i1=%sosa_ref.index;&l1=%l1;&i2=%index;&l2=%l2;&spouse=on&dag=on"
+            title="[*to see the first relationship link] [with] %sosa_ref; (%expr(l1+l2) [degree of kinship]1, %l1;↑%l2;↓)">%nn;
+            %apply;cousin%with;%l1;%and;%l2;%and;%if;(count=3 and l1!=0)[half-relationship]s%else;[half-relationship]3%end;%and;ccc%end;</a>
+        %and;
+          <a href="%prefix;%sosa_ref.access;"
+            title="[Sosa 1]">%sosa_ref;</a>%nn;
+        %end;
+        %if;(l1!=0)%sp;[passing by]
+          %apply;ancestor%with;%apply;getvar(ancestor1)
+                               %and;%apply;getvar(ancestor1_access)
+                               %and;%apply;getvar(ancestor1_anc_sosa)
+                               %and;%apply;getvar(ancestor1_sosa_cujus)%end;
+        %end;
+        %if;(count=2) [and]
+          %apply;ancestor%with;%apply;getvar(ancestor2)
+                               %and;%apply;getvar(ancestor2_access)
+                               %and;%apply;getvar(ancestor2_anc_sosa)
+                               %and;%apply;getvar(ancestor2_sosa_cujus)%end;
+        %end;.
+      </li>
+    %end;
+  %end;
+%end;
+%( Calculs d’âge en années/mois/jours et en jours de Mickael Rouesné %)
+%define;remainder(xxx)
+  %let;tmp;%expr(xxx-((xxx/10/10/10)*1000))%in;
+  %if;(tmp<10)00%tmp;%nn;
+  %elseif;(tmp<100)0%tmp;%nn;
+  %else;%tmp;%end;
+%end;
+%let;l_nbd;
+  %if;(is_dead and computable_death_age
+               and birth_date.day != "" and birth_date.prec = ""
+               and death_date.day != "" and death_date.prec = "")
+    %if;(death_date.julian_day > birth_date.julian_day)
+      %expr(death_date.julian_day - birth_date.julian_day)
+    %else;0%end;
+  %elseif;(computable_age and has_birth_date and birth_date.day != "" and birth_date.prec = "")
+    %if;(today.julian_day > birth_date.julian_day)
+      %expr(today.julian_day - birth_date.julian_day)
+    %else;0%end;
+  %else;0%end;
+%in;
+%define;nb_days(xx)
+  %apply;nth%with;
+    /31/28/31/30/31/30/31/31/30/31/30/31%and;
+    xx%end;
+%end;
+%define;compute_age1(z1,z2,z3)
+  %if;(z1 > 0)z1 %nn;
+    %if;(z1 = 1)[year/month/day]0%else;[years old]%end;
+    %if;(z2 > 0 or z3 > 0), %end;
+  %end;
+  %if;(z2 > 0)z2 %nn;
+    %if;(z2 = 1)[year/month/day]1%else;[months old]%end;
+    %if;(z3 > 0), %end;
+  %end;
+  %if;(z1+z2=0)
+    %if;(z3 >=0)z3 %nn;
+      %if;(z3 = 0 or z3 = 1)[year/month/day]2%else;[days old]%end;
+    %end;
+  %else;
+    %if;(z3 > 0)z3 %nn;
+      %if;(z3 = 1)[year/month/day]2%else;[days old]%end;
+    %end;
+  %end;%if;(lang="en") old%end;
+%end;
+%define;compute_age(z1,z2)
+  %( test for z1.year has been done before call %)
+  %let;l1;%apply;nb_days(z2.month)%in;
+  %if;(z1.month!="" and z2.month!="" and z1.month > z2.month)
+    %if;(z1.day!="" and z2.day!="" and z1.day >= z2.day)
+      %apply;compute_age1(z1.year - z2.year,z1.month - z2.month,z1.day - z2.day)
+    %else;
+      %apply;compute_age1(z1.year - z2.year,z1.month - z2.month - 1,l1 + z1.day - z2.day)
+    %end;
+  %end;
+  %if;(z1.month!="" and z2.month!="" and z1.month = z2.month)
+    %if;(z1.day!="" and z2.day!="" and z1.day >= z2.day)
+      %apply;compute_age1(z1.year - z2.year,0,z1.day - z2.day)
+    %elseif;(z1.year > z2.year)
+      %apply;compute_age1(z1.year - z2.year - 1,11,l1 + z1.day - z2.day)
+    %end;
+  %end;
+  %if;(z1.month!="" and z2.month!="" and z1.month < z2.month and z1.year > z2.year)
+    %if;(z1.day!="" and z2.day!="" and z1.day >= z2.day)
+      %apply;compute_age1(z1.year - z2.year - 1,12 + z1.month - z2.month,z1.day - z2.day)
+    %else;
+      %apply;compute_age1(z1.year - z2.year - 1,11 + z1.month - z2.month,l1 + z1.day - z2.day)
+    %end;
+  %end;
+%end;
+%define;curr_age()
+  %foreach;event;
+    %if;(event.name=[death] and has_death_date and has_birth_date)
+      %if;(death_date.prec="" and birth_date.prec="" and death_date.year!="" and birth_date.year!=""
+      and death_date.year >= birth_date.year)%apply;compute_age("death_date","birth_date")%else;%event.age;%end;
+    %end;
+  %end;
+  %if;(computable_age)
+    %if;(birth_date.year!= "" and today.year >= birth_date.year and l_nbd != "")%apply;compute_age("today","birth_date")%else;%age;%end;
+  %end;
+%end;
+%define;etat_civil()
+  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
+    %if;(has_birth_date or has_birth_place)
+      <li %apply;getvar%with;ns[birth]%end;>
+        <span class="fa-li"><i class="fas fa-baby"></i></span>
+        %if;has_birth_date;[*born]s %on_birth_date;
+          %if;has_birth_place; %in_place; %birth_place;%end;
+        %else;
+          %if;has_birth_place;[*born]s %in_place; %birth_place;
+          %end;
+        %end;
+      </li>
+      %if;birthday;
+        <li>
+          <span class="fa-li"><i class="fa-solid fa-cake-candles"></i></span>
+          [*happy birthday to you!]
+        </li>
+      %end;
+    %end;
+    %if;(has_baptism_date or has_baptism_place)
+      <li %apply;getvar%with;ns[baptism]%end;>
+        <span class="fa-li"><i class="fas fa-dove"></i></span>
+        %if;has_baptism_date;[*baptized]s %on_baptism_date;
+            %if;has_baptism_place; %in_place; %baptism_place;%end;
+        %else;
+          %if;has_baptism_place;[*baptized]s %in_place; %baptism_place;
+          %end;
+        %end;
+      </li>%nl;
+    %end;
+    %if;is_dead;
+      <li class="mt-1" %apply;getvar%with;ns[death]%end;>
+        <span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>
+        %apply;capitalize(died)
+        %if;has_death_date; %on_death_date;%end;
+        %if;has_death_place; %in_place; %death_place;%end;
+        %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
+    %end;
+    %if;(is_buried or is_cremated)
+      <li %if;(is_buried)%apply;getvar%with;ns[burial]%end;%elseif;(is_cremated)%apply;getvar%with;ns[cremation]%end;%end;>
+        <span class="fa-li"><i class="fas fa-cross"></i></span>
+        %if;is_buried;[*buried]s
+          %if;has_burial_date; %on_burial_date;%end;
+          %if;has_burial_place; %in_place; %burial_place;%end;
+        %end;
+        %if;is_cremated;[*cremated]s
+          %if;has_cremation_date; %on_cremation_date;%end;
+          %if;has_cremation_place; %in_place; %cremation_place;%end;
+        %end;
+      </li>%nl;
+    %end;
+    %if;(computable_death_age or computable_age)
+      <li class="mt-1" title="%nn;
+        %if;(is_dead and computable_death_age)[*age at death]
+        %elseif;(not is_dead and computable_age)[*age]
+        %end;
+        = %if;(l_nbd > 999)%expr(l_nbd/10/10/10)[(thousand separator)]%apply;remainder(l_nbd) [days old]%nn;
+        %elseif;(l_nbd > 31)%l_nbd; [days old]%nn;
+        %end;%if;(lang="en") old%end;">
+        <span class="fa-li"><i class="far fa-id-card"></i></span>
+        %if;(is_dead and computable_death_age)
+          %if;(death_date.month!="" and death_date.day!=""
+           and birth_date.month!="" and birth_date.day!="")%apply;curr_age()%else;~ %death_age;%end;
+        %end;
+        %if;(not is_dead and computable_age)
+          %if;(birth_date.month!="" and birth_date.day!="")%apply;curr_age()%else;~ %age;%end;
+        %end;
+      </li>
+    %end;
+    %if;has_occupation;
+      <li class="mt-1" title="[*occupation/occupations]0"><span class="fa-li"><i class="fas fa-user-tie"></i></span>
+        %apply;capitalize(occupation)</li>%nl;
+    %end;
+    %if;(has_linked_page.OCCU and linked_page.OCCU!="")
+      <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
+    %end;
+    %if;(has_consanguinity and b.show_consang!="no")
+      <li class="mt-1" title="[*consanguinity]"><span class="fa-li"><i class="fas fa-percent"></i></span>
+        %if;(cancel_links)
+          [*consanguinity][:] %consanguinity;
+        %else;
+          <a href="%prefix;m=NG&em=R&et=A&ei=%mother.index;&select=%father.index;&spouse=on%if;(e.image!="")&image=%e.image;%end;&long=on"
+             title="[*link between] [the father/the mother/a parent]0 [and] [the father/the mother/a parent]1">[*consanguinity][:] %consanguinity;</a>
+        %end;
+      </li>%nl;
+    %end;
+    %if;not cancel_links;
+      %reset_count2;
+      %if;browsing_with_sosa_ref;
+        %foreach;relation;
+          %if;((has_relation_him and relation_him=sosa_ref)
+            or (has_relation_her and relation_her=sosa_ref))
+            %incr_count2;
+          %end;
+        %end;
+        %foreach;related;
+          %if;(related=sosa_ref)
+            %incr_count2;%incr_count2;
+          %end;
+        %end;
+      %end;
+      %if;has_sosa;
+        %apply;sosa(count2)
+      %else;
+        %apply;from_sosa(count2)
+      %end;
+    %end;
+  </ul>
+%end;
+%define;portrait()
+  %if;(has_image or has_blason or b.default_image="yes")
+    <div class="d-flex align-items-center">
+      %if;has_image;
+        %if;not cancel_links;<a href="%image_url;" target="_blank">%end;
+          <img src="%image_url;"%image_size; class=" %if;(op_m=3)align-self-center mx-1%end; rounded" alt="[image/images]0" title="[him/her]s">%nn;
+        %if;not cancel_links;</a>%end;
+      %elseif;has_blason;
+        %if;not cancel_links;<a href="%blason_url;" target="_blank">%end;
+            <img src="%blason_url;"%blason_size; class="%if;(op_m=3)align-self-center mx-1%end;" alt="[blason/blasons]0">%nn;
+        %if;not cancel_links</a>%end;
+      %elseif;(b.default_image="yes")
+        <img class="%if;(op_m=3)d-flex align-self-center mx-1%end; rounded" src="%images_prefix;img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]">
+      %end;
+    </div>
+  %end;
+%end;
+%define;border()
+  <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
+%end;
+%let;evm;%if;(e.m="F")m=F;%end;%in;
+%let;prefx;%if;(e.m="F")%prefix_set.pmod;%else;%prefix;%end;%in;
+%if;(e.m!="MOD_IND")
+  <div class="col-12">
+  <h1 class="%if;(op_m=2)text-center%else;text-xs-center text-md-left%end;">
+    %if;(has_portrait and has_blason) %(has_portrait is false if no portrait !! TODO: FIXME!%)
+      %if;not cancel_links;<a href="%blason_url;" target="_blank">%end;
+       <img src="%blason_url;"%blason_small_size; class="%if;(op_m=3)align-self-center mx-1%end; mx-2" alt="[blason/blasons]0">%nn;
+      %if;not cancel_links;</a>%end;
+    %end;
+    %if;has_public_name;
+      %if;has_qualifiers;%public_name; <em>%qualifier;</em>
+      %else;%public_name; %surname;%end;
+    %else;
+      %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+      %else;
+        %if;cancel_links;%first_name; %surname;
+        %else;
+          <a href="%prefix;m=P&v=%first_name_key;#i%index;">%first_name;</a>
+          <a href="%prefix;m=N&v=%surname_key;#i%index;">%surname;</a>
+        %end;
+      %end;
+    %end;
+    <span class="font-weight-light small">%dates;</span>
+  </h1>
+  </div> %( closing div just before h1 %)
+
+  %if;((p_mod="zz" or p_mod="") and e.m!="F")
+    <div class="col-lg-8">
+  %end;
+  %if;(op_m=1)
+    %apply;portrait()
+    %apply;etat_civil()
+    <div class="mt-2 mb-1 ml-2">
+      %apply;detailed_names()
+    </div>
+  
+  %elseif;(op_m=2)
+    <div class="col-12 text-center mb-2 mx-2">
+      %apply;portrait()
+    </div>
+    <div class="col-12 text-center mb-2 mx-2">
+      %apply;detailed_names()
+    </div>
+    %apply;etat_civil()
+  
+  %elseif;(op_m=3)
+    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
+      <div>
+        %apply;portrait()
+      </div>
+      <div>
+        <div class="text-center mb-2 mx-2">
+          %apply;detailed_names()
+        </div>
+        %apply;etat_civil()
+      </div>
+    </div>
+  %else;
+  Unavailable option value!
+  %end;
+%end;

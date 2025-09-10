@@ -1,0 +1,9 @@
+* Deutsche Version: "de" eingeben
+* English version: type "en"
+* Version espanola: escribir en el teclado "es"
+* Suomalainen versio: kirjoita "fi"
+* Version francaise: tapez "fr"
+* Versione italiana: digitate "it"
+* Latvieðu versija: type "lv"
+* Svensk version: skriv "sv"
+? 

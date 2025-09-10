@@ -1,0 +1,275 @@
+<!-- $Id: toolbar.txt v7.1 09/03/2025 03:17:13 $ -->
+
+%if;(e.f="new_note")
+  <div class="form-group row ml-1">
+    <label class="col-form-label" for="new_f">[*new note name][:]</label>
+    <div class="col-6">
+      <input type="input" class="form-control" name="new_f" id="new_f">
+    </div>
+  </div>
+%end;
+<style>
+%if;(e.m="MOD_NOTES")
+body {
+  /* Add padding to prevent content from hiding under fixed navbar */
+  padding-top: 54px;
+}
+%end;
+
+.navbar.fixed-top {
+  background-color: rgba(255, 255, 255, 0.95) !important; /* Slightly transparent background */
+  backdrop-filter: blur(5px); /* Blur effect for content underneath */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Navigation elements */
+.nav-link {
+  padding: 0.5rem 0.75rem;
+  color: #495057;
+}
+
+.nav-link:hover {
+  color: #0056b3;
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+}
+
+.format-item {
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.format-item i {
+  width: 1rem;
+  text-align: center;
+}
+
+/* Editor layout */
+.editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+  height: calc(100vh - 120px);
+  margin-top: 1rem;
+}
+
+.editor-main {
+  height: 100%;
+}
+
+#notes_comments {
+  height: calc(100% - 50px);
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.transform-navbar {
+  transform: translateX(-24%%); /* Adjust this value to align with textarea */
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  height: 1px;
+  background: #dee2e6; /* Bootstrap's default border color */
+  z-index: 1;
+}
+
+.navbar {
+  border-bottom: none !important;
+}
+
+.w-95 {
+  width: 95%;
+  margin: 0 auto;
+}
+
+#nav-note {
+  z-index:1030;
+}
+</style>
+<nav id="nav-note" class="navbar navbar-expand-lg navbar-light bg-light %if;(e.m="MOD_NOTES") fixed-top%end; p-0 w-95">
+  <div class="container-fluid">
+    <div class="navbar-nav mx-auto flex-row transform-navbar">
+      <div class="navbar-nav">
+        <!-- HTML Group -->
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="htmlDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            &lt;HTML&gt;
+          </a>
+          <div class="dropdown-menu" aria-labelledby="htmlDropdown">
+            <a class="dropdown-item" onclick="return insertTags('<br>\n','','')" title="= shift + enter">&lt;br/&gt;</a>
+            <a class="dropdown-item" onclick="return insertTags('\n<hr>\n','','')">&lt;hr/&gt; (————————)</a>
+            <a class="dropdown-item" onclick="return insertTags('','<table border>\n<tr>\n<th>A1</th>\n<th>B1</th>\n</tr><tr>\n<td>A2</td>\n<td>B2</td>\n</tr><tr>\n<td>A3</td>\n<td>B3</td>\n</tr>\n</table>','')">&lt;table&gt;</a>
+            <a class="dropdown-item" onclick="return insertTags('&lt;img src=&quot;%%sm=IM;s=xxx.jpg&quot;%/&gt; alt=&quot;?&quot;','','')"><small>&lt;img alt="?" src="%%sm=IM;s=xxx.jpg"/&gt;</small></a>
+            <a class="dropdown-item" onclick="return insertTags('&lt;a href=&quot;%%sm=IMH;s=xxx.jpg&quot;&gt;[*image/images]0&lt;/a&gt;','','')">&lt;a href="%%sm=IMH;s=xxx.jpg"&gt;[image/images]0&lt;/a&gt;</a>
+          </div>
+        </div>
+
+        <!-- Headings Group -->
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="headingsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            h1
+          </a>
+          <div class="dropdown-menu" aria-labelledby="headingsDropdown">
+            <a class="dropdown-item h1" onclick="return insertTags('=','=','x')">=h1=</a>
+            <a class="dropdown-item h2" onclick="return insertTags('==','==','x')">==h2==</a>
+            <a class="dropdown-item h3" onclick="return insertTags('===','===','x')">===h3===</a>
+            <a class="dropdown-item h4" onclick="return insertTags('====','====','x')">====h4====</a>
+            <a class="dropdown-item h5" onclick="return insertTags('=====','=====','x')">=====h5=====</a>
+            <a class="dropdown-item h6" onclick="return insertTags('======','======','x')">======h6======</a>
+          </div>
+        </div>
+
+        <!-- Formatting Group -->
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="formatDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Format
+          </a>
+          <div class="dropdown-menu" aria-labelledby="formatDropdown">
+            <a class="dropdown-item format-item" onclick="return insertTags('\'\'','\'\'','x')">
+              <i class="fas fa-italic"></i> <i>Italic</i>
+            </a>
+            <a class="dropdown-item format-item" onclick="return insertTags('\'\'\'','\'\'\'','x')">
+              <i class="fas fa-bold"></i> <b>Bold</b>
+            </a>
+            <a class="dropdown-item format-item" onclick="return insertTags('__','__','x')">
+              <i class="fas fa-underline"></i> <u>Underline</u>
+            </a>
+            <a class="dropdown-item format-item" onclick="return insertTags('~~','~~','x')">
+              <i class="fas fa-strikethrough"></i> <s>Strike</s>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item format-item" onclick="return insertTags('{','}','x')">
+              <i class="fas fa-highlighter"></i> <span class="highlight">Highlight</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Lists Group -->
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="listsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            ul ol dl pre
+          </a>
+          <div class="dropdown-menu" aria-labelledby="listsDropdown">
+            <a class="dropdown-item" onclick="return insertTags('*','','')">•  *ul li<br>   •  **ul ul li</a>
+            <a class="dropdown-item" onclick="return insertTags('#','','')">1.  #ol li<br>   2.  ##ol ol li</a>
+            <a class="dropdown-item" onclick="return insertTags(';x:x','','')"><strong>;dl dt</strong>:dd</a>
+            <a class="dropdown-item" onclick="return insertTags(':','','')">   :dl dd<br>      ::dl dl dd</a>
+            <a class="dropdown-item font-monospace" onclick="return insertTags('\n\n \n ','\n','')">&nbsp;pre<br>&nbsp;pre<br></a>
+          </div>
+        </div>
+
+        <!-- Miscellaneous notes -->
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="miscDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            [*miscellaneous notes]
+          </a>
+          <div class="dropdown-menu" aria-labelledby="miscDropdown">
+            <a class="dropdown-item" onclick="return insertTags('%[%[%[x:x/x%]%]%]','','')">%[%[%[directory:filename/[text]%]%]%]</a>
+            <a class="dropdown-item" onclick="return insertTags('TITLE=','','')">TITLE=</a>
+            <a class="dropdown-item" onclick="return insertTags('HEAD=','','')">HEAD=[him/her]0/[him/her]1</a>
+            <a class="dropdown-item" onclick="return insertTags('DEATH=','','')">DEATH=</a>
+            <a class="dropdown-item" onclick="return insertTags('OCCU=','','')">OCCU=</a>
+            <a class="dropdown-item" onclick="return insertTags('BNOTE=','','')">BNOTE=</a>
+            <a class="dropdown-item" onclick="return insertTags('NOTE=','','')">NOTE=</a>
+            <a class="dropdown-item" onclick="return insertTags('BIBLIO=','','')">BIBLIO=</a>
+          </div>
+        </div>
+
+        <!-- Visualize/show/hide/summary -->
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="tocDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            [*visualize/show/hide/summary]3
+          </a>
+          <div class="dropdown-menu" aria-labelledby="tocDropdown">
+            <a class="dropdown-item" onclick="return insertTags('__TOC__','','')">__TOC__</a>
+            <a class="dropdown-item" onclick="return insertTags('__SHORT_TOC__','','')">__SHORT_TOC__</a>
+            <a class="dropdown-item" onclick="return insertTags('__NOTOC__','','')">__NOTOC__</a>
+          </div>
+        </div>
+
+        <!-- Person/persons -->
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="personDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            [*person/persons]0
+          </a>
+          <div class="dropdown-menu" aria-labelledby="personDropdown">
+            <a class="dropdown-item" onclick="return insertTags('%[%[w:','%]%]','x')">%[%[w:[wizard/wizards/friend/friends/exterior]0%]%]</a>
+            <a class="dropdown-item" onclick="return insertTags('%[%[x/x%]%]','','')">%[%[[first name/first names]0/[surname/surnames]0%]%]</a>
+            <a class="dropdown-item" onclick="return insertTags('%[%[x/x/9/x%]%]','','')">%[%[[first name/first names]0/[surname/surnames]0/[number]/ [text] href%]%]</a>
+            <a class="dropdown-item" onclick="return insertTags('%[%[x/x/9/x;x%]%]','','')">%[%[[first name/first names]0/[surname/surnames]0/[number]/ [text] href; [person/persons]0 [text] href%]%]</a>
+          </div>
+        </div>
+      %if;(e.m="MOD_NOTES")
+        <!-- Image Map Button -->
+        <div class="nav-item">
+          <a class="nav-link" data-toggle="modal" data-target="#init_gallery" href="javascript:;" onclick="init_tool();" title="Initialise imagemap">
+            <i class="fa fa-images"></i> Imap
+          </a>
+        </div>
+      %end;
+      </div>
+    </div>
+  </div>
+</nav>
+%if;(e.m="MOD_NOTES")
+<div class="modal fade" id="init_gallery" tabindex="-1" role="dialog" aria-labbelledby="init_gallery_label" aria-hidden="true">
+  <div class="modal-dialog role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="init_gallery_label">[*create::image map]</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <label for="page_title" class="col-sm-2 col-form-label">[*title/titles]0</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="page_title" name="page_title">
+            <div class="invalid-feedback">
+              [*title/titles]0 [*is required]
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="fname" class="col-sm-2 col-form-label">[*file]</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="fname" name="fname" list="src_images">
+            <div class="invalid-feedback">
+              [*file] [*is required]
+            </div>
+            <datalist id="src_images">
+              %src_images_list;
+            </datalist>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="init_gallery();">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function init_gallery() {
+  var title = $("#page_title").val();
+  var fname = $("#fname").val();
+  var res = {
+    "title": title,
+    "img": fname,
+  };
+  $("#notes_comments").val( "TITLE=" + title +"\nTYPE=gallery\n" + JSON.stringify(res, null, 2) );
+  $('#init_gallery').modal('hide')
+}
+</script>
+%end;
