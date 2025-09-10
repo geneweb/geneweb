@@ -890,3 +890,9 @@ val print_loading_overlay_js : Config.config -> unit
     the loading overlay: showOverlay() to display it, hideOverlay() to hide it,
     and automatic hiding when the page finishes loading. Works with any overlay
     that has the "loading-overlay" CSS class. *)
+
+type evar_button = { evar : string; text : string }
+
+val evar_buttons : config -> string -> evar_button list -> string -> unit
+(** evar_button conf query_string evar evar_text title_text creates a button to
+    toggle evar *)

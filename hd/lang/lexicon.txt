@@ -14837,15 +14837,15 @@ tr: veya
 
     order
 co: listessu ordine
-de: gleiche Reihenfolge
-en: same order
-fr: même ordre
+de: Reihenfolge
+en: order
+fr: ordre
 
     order hlp
 co: cunservà u listessu ordine
-de: die gleiche Reihenfolge behalten
-en: keep the same order
-fr: conserver le même ordre
+de: alle Permutationen auch suchen
+en: search all permutations too
+fr: chercher aussi toutes les permutations
 
     ordination
 co: ordinazione
@@ -16856,15 +16856,15 @@ fr: personne masquée
 
     not all
 co: un nome
-de: ein Vorname
-en: one first name
-fr: un prénom
+de: einzeln
+en: one only
+fr: un seul
 
     not all hlp
 co: cuntene solu un nome (da predefinizione, cuntene tutti i nomi)
-de: enthält nur einen Vornamen (enthält standardmäßig alle Vornamen)
-en: contains only one first name (contains all first names by default)
-fr: contient un seul prénom (contient tous les prénoms par défaut)
+de: einzeln suchen (alle standardmäßig)
+en: search one by one (all by default)
+fr: chercher un par un (tous par défaut)
 
     not exact
 co: parziale
@@ -18230,6 +18230,10 @@ sk: alias priezviska
 sl: drug priimek
 sv: efternamnalias
 tr: alternatif soyadı
+
+    surname details
+en: detailed view/view details/show the liste of all individuals for those surnames
+fr: vue détaillée/voir détails/afficher la liste de tous les individus pour ces patronymes
 
     surname missing
 af: van ontbreek
