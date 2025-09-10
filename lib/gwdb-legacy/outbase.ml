@@ -457,7 +457,9 @@ let generate_lowercase_first_name_index ~strings_data base =
     Files.rm lowercase_first_name_data_file;
     Sys.rename tmp_fnames_lower_dat lowercase_first_name_data_file;
     Files.rm lowercase_first_name_index_file;
-    Sys.rename tmp_fnames_lower_inx lowercase_first_name_index_file
+    Sys.rename tmp_fnames_lower_inx lowercase_first_name_index_file;
+    Files.set_modification_time_to_now lowercase_first_name_data_file;
+    Files.set_modification_time_to_now lowercase_first_name_index_file
   in
   { commit; rollback = remove_temporary_files }
 
@@ -491,7 +493,9 @@ let generate_lowercase_surname_index ~strings_data base =
     Files.rm lowercase_surname_data_file;
     Sys.rename tmp_snames_lower_dat lowercase_surname_data_file;
     Files.rm lowercase_surname_index_file;
-    Sys.rename tmp_snames_lower_inx lowercase_surname_index_file
+    Sys.rename tmp_snames_lower_inx lowercase_surname_index_file;
+    Files.set_modification_time_to_now lowercase_surname_data_file;
+    Files.set_modification_time_to_now lowercase_surname_index_file
   in
   { commit; rollback = remove_temporary_files }
 
