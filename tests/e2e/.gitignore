@@ -1,0 +1,26 @@
+# Cache pytest
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# Rapports de tests
+reports/*.html
+reports/*.xml
+
+# Logs
+*.log
+
+# Environnement virtuel
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
