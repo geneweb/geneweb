@@ -316,15 +316,13 @@ let print_sosa conf base p link =
             Printf.sprintf
               (Util.fcapitale (Util.ftransl conf "direct ancestor of %s"))
               direct_ancestor
-            ^ Printf.sprintf ", Sosa: %s"
+            ^ Printf.sprintf " (%s %s)" (Util.transl conf "Sosa")
                 (Sosa.to_string_sep
                    (Util.transl conf "(thousand separator)")
                    sosa_num)
         in
-        Output.print_sstring conf {|<img class="mb-1" src="|};
-        Output.print_sstring conf (Util.images_prefix conf);
-        Output.print_sstring conf {|/sosa.png" alt="sosa" title="|};
-        Output.print_string conf (title |> Adef.safe);
-        Output.print_sstring conf {|"> |};
+        Output.printf conf
+          {|<i class="far fa-circle-dot text-success" title="%s"></i>|}
+          (title |> Adef.safe :> string);
         if not link then () else Output.print_sstring conf "</a> "
     | None -> ()

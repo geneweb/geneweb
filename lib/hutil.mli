@@ -61,6 +61,12 @@ val header_with_title :
     @param conf Base configuration
     @param title Title function (bool indicates <title> vs <h1>) *)
 
+val header_with_adaptive_title : ?fluid:bool -> config -> string -> unit
+(** Header with adaptive title size based on content length.
+    @param fluid Use container-fluid if [true] (default: false)
+    @param conf Base configuration
+    @param title_content Title text content (HTML) *)
+
 val header_fluid : config -> (bool -> unit) -> unit
 (** Shortcut for [header_with_title ~fluid:true]. *)
 

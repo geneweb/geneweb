@@ -1823,70 +1823,52 @@ let hexa_string s =
 
 let print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
-  (* No work to do if list is empty *)
   if liste = [] then Output.print_sstring conf "<ul></ul>\n"
   else (
-    (* Print alphabetical index links at the top if we have many items *)
     if len > menu_threshold then (
-      Output.print_sstring conf "<p>\n";
-
-      (* Create index links without duplicates *)
-      let rec print_index seen = function
-        | [] -> ()
-        | e :: rest ->
-            let t = crit e in
-            if not (List.mem t seen) then
-              Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
-            print_index (t :: seen) rest
-      in
-      print_index [] liste;
-      Output.print_sstring conf "</p>\n";
-      Output.print_sstring conf "<ul>\n")
-    else Output.print_sstring conf "<ul>\n";
-    (* Group items by their criteria and print each group *)
-    let rec process_groups current_group current_index = function
-      | [] when current_group != [] ->
-          (* Print the last group *)
-          print_group (List.rev current_group) current_index
-      | [] ->
-          (* Empty list, nothing to do *)
-          ()
-      | e :: rest ->
-          let t = crit e in
-          (* If we're using numerical indexes or have many items, group by criteria *)
-          if len > menu_threshold || is_number t then
-            if current_index = None || Some t <> current_index then
-              (* New group - print previous group if any, then start new group *)
-              let () =
-                if current_group <> [] then
-                  print_group (List.rev current_group) current_index
-              in
-              process_groups [ e ] (Some t) rest
-            else
-              (* Continue same group *)
-              process_groups (e :: current_group) current_index rest
-          else
-            (* Not grouping - print all items together *)
-            print_group (e :: rest) (Some "")
-    (* Print a group of items with the same criteria *)
-    and print_group items index_opt =
-      let index = match index_opt with Some t -> t | None -> "" in
-      (* If we're grouping items, create a container with an anchor *)
-      if len > menu_threshold && index <> "" then (
-        Output.print_sstring conf "<li>\n";
-        Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string index) index;
-        Output.print_sstring conf "<ul>\n");
-      (* Print each item in the group *)
+      let buf = Buffer.create 512 in
+      Buffer.add_string buf "<p>\n";
+      let module StrSet = Set.Make (String) in
+      let seen = ref StrSet.empty in
       List.iter
         (fun e ->
-          Output.print_sstring conf "<li>\n  ";
+          let t = crit e in
+          if not (StrSet.mem t !seen) then (
+            seen := StrSet.add t !seen;
+            Printf.bprintf buf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t))
+        liste;
+      Buffer.add_string buf "</p>\n";
+      Output.print_sstring conf (Buffer.contents buf));
+    Output.print_sstring conf "<ul>\n";
+    let rec process_groups current_group current_index = function
+      | [] when current_group <> [] ->
+          print_group (List.rev current_group) current_index
+      | [] -> ()
+      | e :: rest ->
+          let t = crit e in
+          if len > menu_threshold || is_number t then
+            if current_index = None || Some t <> current_index then (
+              if current_group <> [] then
+                print_group (List.rev current_group) current_index;
+              process_groups [ e ] (Some t) rest)
+            else process_groups (e :: current_group) current_index rest
+          else print_group (e :: rest) (Some "")
+    and print_group items index_opt =
+      let index = match index_opt with Some t -> t | None -> "" in
+      if len > menu_threshold && index <> "" then
+        Output.printf conf
+          "<li class=\"li-none\">\n\
+           <a id=\"ai%s\">%s</a>\n\
+           <ul class=\"fa-ul\">\n"
+          (hexa_string index) index;
+      List.iter
+        (fun e ->
+          Output.print_sstring conf "<li><span class=\"fa-li\">\n";
           print_elem e;
-          Output.print_sstring conf "</li>\n")
+          Output.print_sstring conf "</span></li>\n")
         items;
-      (* Close the container if we opened one *)
-      if len > menu_threshold && index <> "" then (
-        Output.print_sstring conf "</ul>\n";
-        Output.print_sstring conf "</li>\n")
+      if len > menu_threshold && index <> "" then
+        Output.print_sstring conf "</ul>\n</li>\n"
     in
     process_groups [] None liste;
     Output.print_sstring conf "</ul>\n")
@@ -1921,39 +1903,29 @@ let child_of_parent conf base p =
     else gen_person_text ~sn:false conf base fath
   in
   let a = pget conf base (Driver.get_iper p) in
-  let ifam =
-    match Driver.get_parents a with
-    | Some ifam ->
-        let cpl = Driver.foi base ifam in
-        let fath =
-          let fath = pget conf base (Driver.get_father cpl) in
-          if Driver.p_first_name base fath = "?" then None else Some fath
-        in
-        let moth =
-          let moth = pget conf base (Driver.get_mother cpl) in
-          if Driver.p_first_name base moth = "?" then None else Some moth
-        in
-        Some (fath, moth)
-    | None -> None
-  in
-  match ifam with
-  | Some (None, None) | None -> Adef.safe ""
-  | Some (fath, moth) ->
-      let s =
-        match (fath, moth) with
-        | Some fath, None -> print_father fath
-        | None, Some moth -> gen_person_text conf base moth
-        | Some fath, Some moth ->
+  match Driver.get_parents a with
+  | None -> Adef.safe ""
+  | Some ifam ->
+      let cpl = Driver.foi base ifam in
+      let fath = pget conf base (Driver.get_father cpl) in
+      let moth = pget conf base (Driver.get_mother cpl) in
+      let fath_valid = Driver.p_first_name base fath <> "?" in
+      let moth_valid = Driver.p_first_name base moth <> "?" in
+      if (not fath_valid) && not moth_valid then Adef.safe ""
+      else
+        let s =
+          if fath_valid && moth_valid then
             print_father fath ^^^ " " ^<^ transl_nth conf "and" 0 ^<^ " "
             ^<^ gen_person_text conf base moth
-        | _ -> Adef.safe ""
-      in
-      let is = index_of_sex (Driver.get_sex p) in
-      let s = (s :> string) in
-      transl_a_of_gr_eq_gen_lev conf
-        (transl_nth conf "son/daughter/child" is)
-        s s
-      |> translate_eval |> Adef.safe
+          else if fath_valid then print_father fath
+          else gen_person_text conf base moth
+        in
+        let is = index_of_sex (Driver.get_sex p) in
+        transl_a_of_gr_eq_gen_lev conf
+          (transl_nth conf "son/daughter/child" is)
+          (s :> string)
+          (s :> string)
+        |> translate_eval |> Adef.safe
 
 let husband_wife ?(buf : Buffer.t option) conf base p all =
   let families = Driver.get_family p in
@@ -2048,40 +2020,40 @@ let first_child conf base p =
   in
   loop 0
 
-let specify_homonymous conf base p specify_public_name =
-  match (Driver.get_public_name p, Driver.get_qualifiers p) with
-  | n, nn :: _ when Driver.sou base n <> "" && specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ Driver.sou base n);
-      Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ Driver.sou base nn);
-      Output.print_sstring conf "</em>"
-  | _, nn :: _ when specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ Driver.p_first_name base p);
-      Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ Driver.sou base nn);
-      Output.print_sstring conf "</em>"
-  | n, [] when Driver.sou base n <> "" && specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ Driver.sou base n)
-  | _, _ ->
-      (* Le nom public et le qualificatif ne permettent pas de distinguer *)
-      (* la personne, donc on affiche les informations sur les parents,   *)
-      (* le mariage et/ou le premier enfant.                              *)
+let specify_homonymous conf base p pn =
+  let buf = Buffer.create 128 in
+  let pub_name = Driver.get_public_name p in
+  let pub_name_str = Driver.sou base pub_name in
+  let first_name = Driver.p_first_name base p in
+  let qualifiers = Driver.get_qualifiers p in
+  (match qualifiers with
+  | nn :: _ when pn ->
+      Buffer.add_char buf ' ';
+      if pub_name_str <> "" then
+        Buffer.add_string buf (esc pub_name_str :> string)
+      else Buffer.add_string buf (esc first_name :> string);
+      Buffer.add_string buf " <em>";
+      Buffer.add_string buf (esc (Driver.sou base nn) :> string);
+      Buffer.add_string buf "</em>"
+  | [] when pub_name_str <> "" && pn ->
+      if first_name <> pub_name_str then (
+        Buffer.add_char buf ' ';
+        Buffer.add_char buf '(';
+        Buffer.add_string buf (esc pub_name_str :> string);
+        Buffer.add_char buf ')')
+  | _ ->
       let cop = child_of_parent conf base p in
       if (cop :> string) <> "" then (
-        Output.print_sstring conf ", ";
-        Output.print_string conf cop);
+        Buffer.add_string buf ", ";
+        Buffer.add_string buf (cop :> string));
       let hw = husband_wife conf base p true in
       if (hw :> string) = "" then (
         let fc = first_child conf base p in
         if (fc :> string) <> "" then (
-          Output.print_sstring conf ", ";
-          Output.print_string conf fc))
-      else (
-        Output.print_sstring conf ", ";
-        Output.print_string conf hw)
+          Buffer.add_string buf ", ";
+          Buffer.add_string buf (fc :> string)))
+      else Buffer.add_string buf (hw :> string));
+  if Buffer.length buf > 0 then Output.print_sstring conf (Buffer.contents buf)
 
 let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string)
     =
@@ -2892,8 +2864,7 @@ let dispatch_in_columns ncol list order =
   (len_list, ini_list)
 
 let print_in_columns conf ncols len_list list wprint_elem =
-  begin_centered conf;
-  Output.printf conf "<table width=\"95%%\" border=\"%d\">\n" conf.border;
+  Output.printf conf "<table class=\"w-auto\">\n";
   Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.left;
   (let _ =
      List.fold_left
@@ -2906,11 +2877,19 @@ let print_in_columns conf ncols len_list list wprint_elem =
              match list with
              | (kind, ord, elem) :: list ->
                  if n = len then
-                   Output.printf conf "<td width=\"%d\">\n" (100 / ncols)
+                   Output.printf conf "<td width=\"%d%%\">\n" (100 / ncols)
                  else if !kind <> Elem then Output.print_sstring conf "</ul>\n";
                  if !kind <> Elem then (
-                   Output.printf conf "<h3 class=\"subtitle mx-3\">%s%s</h3>\n"
-                     (if ord = "" then "..." else String.make 1 ord.[0])
+                   let letter =
+                     if ord = "" then "…" else String.make 1 ord.[0]
+                   in
+                   let id_attr =
+                     if !kind = HeadElem then Printf.sprintf " id=\"%s\"" letter
+                     else ""
+                   in
+                   Output.printf conf
+                     "<h3%s class=\"subtitle pb-1 mx-3\">%s%s</h3>\n" id_attr
+                     letter
                      (if !kind = HeadElem then ""
                       else " (" ^ transl conf "continued" ^ ")");
                    Output.print_sstring conf "<ul>\n");
@@ -2934,10 +2913,12 @@ let wprint_in_columns conf order wprint_elem list =
     | Some n -> max 1 n
     | None ->
         let len_list = List.length list in
-        if len_list < 10 then 1
-        else if len_list < 100 then 2
-        else if len_list < 200 then 3
-        else 4
+        if len_list < 40 then 1
+        else if len_list < 80 then 2
+        else if len_list < 120 then 3
+        else if len_list < 160 then 4
+        else if len_list < 200 then 5
+        else 6
   in
   let len_list, list = dispatch_in_columns ncols list order in
   print_in_columns conf ncols len_list list wprint_elem
@@ -3454,3 +3435,62 @@ document.addEventListener('DOMContentLoaded', hideOverlay);
 
 let print_loading_overlay_js conf =
   Output.print_sstring conf loading_overlay_js_content
+
+type evar_button = { evar : string; text : string }
+
+(*
+  let evars =
+    List.fold_left ( fun acc {evar; _} ->
+      let include_evar = p_getenv conf.env evar <> None in
+      if include_evar then acc else acc ^ "&" ^ evar) "" evar_l
+  in
+
+*)
+
+let evar_buttons conf query_string evar_l title_text =
+  let remove evar evar_l =
+    List.fold_left (fun acc e -> if e = evar then acc else e :: acc) [] evar_l
+  in
+  let existing_evars =
+    List.fold_left
+      (fun acc { evar; _ } ->
+        let include_evar = p_getenv conf.env evar <> None in
+        if include_evar then evar :: acc else acc)
+      [] evar_l
+  in
+  let buttons =
+    List.fold_left
+      (fun acc { evar; text } ->
+        let include_evar = p_getenv conf.env evar <> None in
+        let evar_l =
+          if include_evar then remove evar existing_evars
+          else evar :: existing_evars
+        in
+        let toggle_url =
+          Printf.sprintf "%sm=SN&n=%s%s"
+            (commd conf :> string)
+            (Mutil.encode query_string :> string)
+            (if evar_l <> [] then "&" ^ String.concat "&" evar_l else "")
+        in
+        let verb = if include_evar then "delete" else "add" in
+        let button_text =
+          transl_nth conf text 0 |> transl_decline conf verb
+          |> Utf8.capitalize_fst
+        in
+        acc
+        ^ Printf.sprintf
+            {|<a href="%s"
+            class="btn btn-outline-secondary btn-sm ml-auto">
+            <i class="fa fa-%s mr-1"></i>%s</a>|}
+            toggle_url
+            (if include_evar then "minus" else "plus")
+            button_text)
+      "" evar_l
+  in
+
+  Output.printf conf
+    {|<div class="d-flex align-items-center mb-3">
+        <h1 class="h2 mb-0">%s</h1>
+        %s
+      </div>|}
+    title_text buttons

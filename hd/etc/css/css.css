@@ -1,9 +1,95 @@
+body, .form-control {
+  color: black !important;
+}
+
 a, .pre {
   white-space: pre;
 }
 
 a:has(i), .deslist a, .ind-notes a {
   white-space: normal;
+}
+
+/* Sosa icon as bullet list icon */
+.fa-circle-dot {
+  font-size: .8em;
+  vertical-align: .05357em;
+}
+
+.bullet {
+  display: inline-block;
+  font-size: 1.2em;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+  top: -0.15em;
+  cursor: default;
+  user-select: none;
+}
+
+.li-none {
+  list-style-type: none;
+}
+
+.fa-li {
+  width: 2.3em;
+}
+
+/* Recherche patronyme liste alphabétique */
+/* Grille principale flexbox */
+.sn-details-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Sections alphabétiques */
+.sn-details-section {
+  flex: 1 1 320px;
+  min-width: 280px;
+  max-width: 420px;
+}
+
+/* En-têtes de sections (A, B, C...) */
+.sn-details-section h6 {
+  background: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+  margin: 0 0 0.75rem 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-left: 4px solid #007bff;
+  color: #495057;
+}
+
+/* Listes de patronymes */
+.sn-details-index {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 0.375rem;
+}
+
+.sn-details-index .badge {
+  font-size: 0.85rem;
+  margin: 0.2rem 0.3rem;
+}
+
+.sn-details-cta {
+  padding: 1rem;
+  background: rgba(23, 162, 184, 0.1);
+  border-left: 4px solid #17a2b8;
+  border-radius: 0.25rem;
+}
+
+.sn-details-cta strong {
+  font-size: 1.1rem;
+  color: #495057;
+}
+
+.sn-details-cta small {
+  color: #6c757d;
+  font-size: 0.9rem;
 }
 
 /* Styles pour les modals de relationMatrix m=RM */

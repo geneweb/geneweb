@@ -1,5 +1,9 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
+let rec list_limit n l =
+  if n <= 0 then []
+  else match l with [] -> [] | x :: xs -> x :: list_limit (n - 1) xs
+
 let bench name fn =
   let pprint_gc gc =
     let open Gc in
