@@ -1,0 +1,3610 @@
+    %s forbidden char
+en: invalid character (%s) used in surname/first name
+fr: caractères interdits (%s) dans le patronyme/prénom
+pl:
+
+    %s modified
+en: %s modified
+fr: %s modifié
+pl:
+
+    %t was witness after his/her death
+en: %t was a witness after their death
+fr: %t était témoin après sa mort
+pl:
+
+    %t was witness before his/her birth
+en: %t was a witness before their birth
+fr: %t était témoin avant sa naissance
+pl:
+
+    %t witnessed the %s after his/her death
+en: %t was a witness at a %s after their own death
+fr: %t a été témoin de %s après sa mort
+pl:
+
+    %t witnessed the %s before his/her birth
+en: %t was a witness at a %s before their own birth
+fr: %t a été témoin de %s avant sa naissance
+pl:
+
+    %t's %s before his/her %s
+en: %t: %s before their %s
+fr: %t : %s avant son/sa %s
+pl:
+
+    a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
+en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
+fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
+pl:
+
+    a child-in-law/children-in-law
+en: one child-in-law/children-in-law
+fr: un bel-enfant/beaux-enfants
+pl:
+
+    a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
+en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
+fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
+pl:
+
+    a half sibling-in-law/half siblings-in-law
+en: one half sibling-in-law/half siblings-in-law
+fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
+pl:
+
+    a sibling-in-law/siblings-in-law
+en: one sibling-in-law/siblings-in-law
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
+pl:
+
+    a stepchild/stepchildren
+en: a stepchild/stepchildren
+fr: un bel-enfant/beaux-enfants
+pl:
+
+    a stepson/stepsons/a stepdaughter/stepdaughters
+en: one stepson/stepsons/one stepdaughter/stepdaughters
+fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
+pl:
+
+    accomplishment
+en: accomplishment
+fr: accomplissement
+pl:
+
+    acquisition
+en: acquisition
+fr: acquisition
+pl:
+
+    activate/suppress
+en: activate/suppress
+fr: activer/supprimer
+pl:
+
+    add filter
+en: add a filter
+fr: ajouter un filtre
+pl:
+
+    add image
+en: add an image
+fr: ajouter une image
+pl:
+
+    add note
+en: add a note
+fr: ajouter une note
+pl:
+
+    add portrait
+en: add a portrait
+fr: ajouter un portrait
+pl:
+
+    add source
+en: add a source
+fr: ajouter une source
+pl:
+
+    add the previous name as a first name alias
+en: add the previous name as a first name alias
+fr: ajouter le nom précédent comme un alias de prénom
+pl:
+
+    add the previous name as a surname alias
+en: add the previous name as a surname alias
+fr: ajouter le nom précédent comme un alias de nom
+pl:
+
+    adhesion
+en: membership
+fr: adhésion
+pl:
+
+    age at %s birth date
+en: age at birth of %s
+fr: âge à la naissance de %s
+pl:
+
+    alert module
+en: Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.
+fr: Module invalide <strong id="alert-module-2"></strong>. Veuillez saisir une initiale de module valide.
+pl:
+
+    alert option
+en: Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.
+fr: Option invalide <strong id="alert-option"></strong> pour le module <strong id="alert-module"></strong>. Veuillez saisir un numéro d’option valide.
+pl:
+
+    all
+en: all
+fr: tous
+pl:
+
+    all the places
+en: all the places
+fr: tous les lieux
+pl:
+
+    allowed characters
+en: allowed characters
+fr: caractères autorisés
+pl:
+
+    ancestors tree of
+en: %s-tree of the ancestors of %s
+fr: %s-arbre des ancêtres d[e |’]%s
+pl:
+
+    annulation
+en: annulment
+fr: annulation
+pl:
+
+    any individual in the base
+en: any individual in the base
+fr: un individu de la base
+pl:
+
+    any place
+en: sub-places
+fr: sous-lieux
+pl:
+
+    any place title
+en: search in the list of sub-places
+fr: rechercher dans la liste des sous-lieux
+pl:
+
+    arbre 8 gen
+en: 8 generations H tree
+fr: arbre en H 8 générations
+pl:
+
+    area code
+en: code
+fr: code postal
+pl:
+
+    ascendants tree
+en: ascending tree
+fr: arbre d’ascendance
+pl:
+
+    ascending/descending (degree)
+en: ascending degree/descending degree/ascending degrees/descending degrees
+fr: degré ascendant/degré descendant/degrés ascendants/degrés descendants
+pl:
+
+    at new location
+en: at new location
+fr: au nouvel emplacement
+pl:
+
+    at old location
+en: at old location
+fr: à l'ancien emplacement
+pl:
+
+    available genealogies
+en: list of available genealogies
+fr: listes des généalogies disponibles
+pl:
+
+    back to index/books
+en: back to alphabetic index/back to the list of books
+fr: retourner à l’index alphabétique/retourner à la liste des dictionnaires
+pl:
+
+    baptism place
+en: place of baptism
+fr: lieu de baptême
+pl:
+
+    baptism src
+en: source of baptism
+fr: source de baptême
+pl:
+
+    baptismLDS
+en: baptism (LDS)
+fr: baptême LDS
+pl:
+
+    bar mitzvah
+en: bar mitzvah
+fr: bar mitzvah
+pl:
+
+    base
+en: base
+fr: base
+pl:
+
+    bat mitzvah
+en: bat Mitzvah
+fr: bat mitzvah
+pl:
+
+    benediction
+en: blessing
+fr: bénédiction
+pl:
+
+    bibliography
+en: bibliography
+fr: bibliographie
+pl:
+
+    birth date and birth place
+en: date and place of birth
+fr: date et lieu de naissance
+pl:
+
+    birth place
+en: place of birth
+fr: lieu de naissance
+pl:
+
+    birth src
+en: source of birth
+fr: source naissance
+pl:
+
+    book of %s
+en: book of %s
+fr: dictionnaire des %s
+pl:
+
+    book of ascendants
+en: ancestry book
+fr: livre d’ascendance
+pl:
+
+    books
+en: books
+fr: dictionnaires
+pl:
+
+    both
+en: both
+fr: les deux
+pl:
+
+    brothers/sisters/siblings
+en: brothers/sisters/siblings
+fr: frères/sœurs/frères et sœurs
+pl:
+
+    browse
+en: browse
+fr: parcourir
+pl:
+
+    burial place
+en: place of burial
+fr: lieu d’inhumation
+pl:
+
+    burial src
+en: source of burial
+fr: source inhumation
+pl:
+
+    by couple
+en: by couple
+fr: par couple
+pl:
+
+    carrousel
+en: carrousel
+fr: carrousel
+pl:
+
+    case sensitive
+en: case sensitive
+fr: capitales et accents
+pl:
+
+    case sensitive title
+en: dont ignore case and accents
+fr: tenir compte des majuscules et accents
+pl:
+
+    celebrities
+en: famous people
+fr: personnes célèbres
+pl:
+
+    change name
+en: change surname
+fr: renommer patronyme
+pl:
+
+    changed order of family's events
+en: change order of family events
+fr: changement de l’ordre des événements familiaux
+pl:
+
+    changed order of marriages
+en: ordering of marriages has been changed
+fr: changement de l’ordre des unions
+pl:
+
+    changed order of person's events
+en: change order of individual events
+fr: changement de l’ordre des événements individu
+pl:
+
+    choose a genealogy
+en: choose a genealogy
+fr: choisir une généalogie
+pl:
+
+    choose an ancestor
+en: choose an ancestor
+fr: choisir un ancêtre
+pl:
+
+    circumcision
+en: circumcision
+fr: circoncision
+pl:
+
+    civil registrar/civil registrar/civil registrar
+en: civil registrar/civil registrar/civil registrar
+fr: officier d'état-civil/officière d'état-civil/officier d'état-civil
+pl:
+
+    civil registrar/civil registrars
+en: civil registrar/civil registrars
+fr: officier d'état-civil/officiers d'état-civil
+pl:
+
+    clear filters
+en: clear every filters
+fr: effacer tous les filtres
+pl:
+
+    close
+en: close
+fr: fermer
+pl:
+
+    close family
+en: a parent
+fr: un parent proche
+pl:
+
+    coefficient of relationship
+en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
+fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
+pl:
+
+    collapse implex
+en: collapse implex
+fr: réduire les implexes
+pl:
+
+    colored corner
+en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
+fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
+pl:
+
+    compact descendants tree
+en: compact descendants tree
+fr: arbre de descendance compact
+pl:
+
+    compact tree
+en: compact tree
+fr: arbre compact
+pl:
+
+    compare
+en: compare
+fr: comparer
+pl:
+
+    compare selected revisions
+en: view revision history
+fr: comparer les révisions sélectionnées
+pl:
+
+    compiled on %s from commit %s
+en: compiled on %s from commit %s
+fr: compilé le %s à partir du commit %s
+pl:
+
+    compute all marriages
+en: compute all marriages
+fr: calculer pour toutes les relations
+pl:
+
+    compute approximatives dates
+en: include unsure dates
+fr: inclure les dates approximatives
+pl:
+
+    confirmation
+en: confirmation
+fr: confirmation
+pl:
+
+    confirmation LDS
+en: confirmation (LDS)
+fr: confirmation LDS
+pl:
+
+    continue
+en: continue
+fr: continuer
+pl:
+
+    copy link %s
+en: copy the link %s to the clipboard
+fr: copier le lien %s dans le presse-papier
+pl:
+
+    copy permalink
+en: copy the permalink
+fr: copier le permalien
+pl:
+
+    country
+en: country
+fr: pays
+pl:
+
+    county
+en: county
+fr: région
+pl:
+
+    couples
+en: couples
+fr: couples
+pl:
+
+    cousin.0.10
+en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
+fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit-fois-arrière-petit-enfant
+pl:
+
+    cousin.0.4
+en: a great-great-grandson/a great-great-granddaughter/a great-great-grandchild
+fr: un arrière-arrière-petit-fils/une arrière-arrière-petite-fille/un arrière-arrière-petit-enfant
+pl:
+
+    cousin.0.5
+en: a three-times-great-grandson/a three-times-great-granddaughter/a three-times-great-grandchild
+fr: un trois-fois-arrière-petit-fils/une trois-fois-arrière-petite-fille/un trois-fois-arrière-petit-enfant
+pl:
+
+    cousin.0.6
+en: a four-times-great-grandson/a four-times-great-granddaughter/a four-times-great-grandchild
+fr: un quatre-fois-arrière-petit-fils/une quatre-fois-arrière-petite-fille/un quatre-fois-arrière-petit-enfant
+pl:
+
+    cousin.0.7
+en: a five-times-great-grandson/a five-times-great-granddaughter/a five-times-great-grandchild
+fr: un cinq-fois-arrière-petit-fils/une cinq-fois-arrière-petite-fille/un cinq-fois-arrière-petit-enfant
+pl:
+
+    cousin.0.8
+en: a six-times-great-grandson/a six-times-great-granddaughter/a six-times-great-grandchild
+fr: un six-fois-arrière-petit-fils/une six-fois-arrière-petite-fille/un six-fois-arrière-petit-enfant
+pl:
+
+    cousin.0.9
+en: a seven-times-great-grandson/a seven-times-great-granddaughter/a seven-times-great-grandchild
+fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept-fois-arrière-petit-enfant
+pl:
+
+    cousin.1.10
+en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
+fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
+pl:
+
+    cousin.1.4
+en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
+fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
+pl:
+
+    cousin.1.5
+en: a %sgreat-great-grandnephew/a %sgreat-great-grandniece/a %sgreat-great-grandnephew
+fr: un %sarrière-arrière-petit-neveu/une %sarrière-arrière-petite-nièce/un %sarrière-arrière-petit-neveu
+pl:
+
+    cousin.1.6
+en: a %sthree-times-great-grandnephew/a %sthree-times-great-grandniece/a %sthree-times-great-grandnephew
+fr: un %strois-fois-arrière-petit-neveu/une %strois-fois-arrière-petite-nièce/un %strois-fois-arrière-petit-neveu
+pl:
+
+    cousin.1.7
+en: a %sfour-times-great-grandnephew/a %sfour-times-great-grandniece/a %sfour-times-great-grandnephew
+fr: un %squatre-fois-arrière-petit-neveu/une %squatre-fois-arrière-petite-nièce/un %squatre-fois-arrière-petit-neveu
+pl:
+
+    cousin.1.8
+en: a %sfive-times-great-grandnephew/a %sfive-times-great-grandniece/a %sfive-times-great-grandnephew
+fr: un %scinq-fois-arrière-petit-neveu/une %scinq-fois-arrière-petite-nièce/un %scinq-fois-arrière-petit-neveu
+pl:
+
+    cousin.1.9
+en: a %ssix-times-great-grandnephew/a %ssix-times-great-grandniece/a %ssix-times-great-grandnephew
+fr: un %ssix-fois-arrière-petit-neveu/une %ssix-fois-arrière-petite-nièce/un %ssix-fois-arrière-petit-neveu
+pl:
+
+    cousin.10.0
+en: a 8th-great-grandfather/a 8th-great-grandmother
+fr: un 8×-arrière-grand-père/une 8×-arrière-grand-mère
+pl:
+
+    cousin.10.1
+en: a %sseventh great-granduncle/a %sseventh great-grandaunt
+fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
+pl:
+
+    cousin.2.10
+fr: un %ssept-fois-arrière-petit-cousin/une %ssept-fois-arrière-petite-cousine
+pl:
+
+    cousin.2.3
+fr: un %spetit-cousin/une %spetite-cousine
+pl:
+
+    cousin.2.4
+fr: un %sarrière-petit-cousin/une %sarrière-petite-cousine
+pl:
+
+    cousin.2.5
+fr: un %sarrière-arrière-petit-cousin/une %sarrière-arrière-petite-cousine
+pl:
+
+    cousin.2.6
+fr: un %strois-fois-arrière-petit-cousin/une %strois-fois-arrière-petite-cousine
+pl:
+
+    cousin.2.7
+fr: un %squatre-fois-arrière-petit-cousin/une %squatre-fois-arrière-petite-cousine
+pl:
+
+    cousin.2.8
+fr: un %scinq-fois-arrière-petit-cousin/une %scinq-fois-arrière-petite-cousine
+pl:
+
+    cousin.2.9
+fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
+pl:
+
+    cousin.3.10
+pl:
+
+    cousin.3.2
+fr: un %soncle à la mode de Bretagne/une %stante à la mode de Bretagne
+pl:
+
+    cousin.3.4
+fr: un petit-cousin au 2<sup>e</sup> degré/une petite-cousine au 2<sup>e</sup> degré
+pl:
+
+    cousin.4.0
+en: a great-great-grandfather/a great-great-grandmother/a great-great-grandparent
+fr: un arrière-arrière-grand-père/une arrière-arrière-grand-mère/un arrière-arrière-grand-parent
+pl:
+
+    cousin.4.1
+en: a %sgreat-granduncle/a %sgreat-grandaunt
+fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
+pl:
+
+    cousin.4.10
+pl:
+
+    cousin.4.2
+fr: un %sarrière-grand-cousin/une %sarrière-grande-cousine
+pl:
+
+    cousin.4.3
+fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</sup> degré
+pl:
+
+    cousin.4.5
+fr: un %spetit-cousin au 3<sup>e</sup> degré/une %spetite-cousine au 3<sup>e</sup> degré
+pl:
+
+    cousin.5.0
+en: a great-great-great-grandfather/a great-great-great-grandmother
+fr: un 3×-arrière-grand-père/une 3×-arrière-grand-mère
+pl:
+
+    cousin.5.1
+en: a %sgreat-great-granduncle/a %sgreat-great-grandaunt
+fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grande-tante
+pl:
+
+    cousin.5.2
+fr: une %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
+pl:
+
+    cousin.5.3
+fr: une %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup>e</sup>
+pl:
+
+    cousin.5.4
+fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
+pl:
+
+    cousin.5.5
+en: a 4th -cousin/
+fr: un cousin au 4e degré/une cousine au 4e degré
+pl:
+
+    cousin.6.0
+en: a 4th-great-grandfather/a 4th-great-grandmother
+fr: un 4×-arrière-grand-père/une 4×-arrière-grand-mère
+pl:
+
+    cousin.6.1
+en: a %sthird great-granduncle/a %sthird great-grandaunt
+fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grande-tante
+pl:
+
+    cousin.6.2
+fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grande-cousine
+pl:
+
+    cousin.6.3
+fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-grande-cousine au 2<sup>e</sup> degré
+pl:
+
+    cousin.6.4
+fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grande-cousine au 3<sup>e</sup> degré
+pl:
+
+    cousin.7.0
+en: a 5th-great-grandfather/a 5th-great-grandmother
+fr: un 5×-arrière-grand-père/une 5×-arrière-grand-mère
+pl:
+
+    cousin.7.1
+en: a %sfourth great-granduncle/a %sfourth great-grandaunt
+fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grande-tante
+pl:
+
+    cousin.8.0
+en: a 6th-great-grandfather/a 6th-great-grandmother
+fr: un 6×-arrière-grand-père/une 6×-arrière-grand-mère
+pl:
+
+    cousin.8.1
+en: a %sfifth great-granduncle/a %sfifth great-grandaunt
+fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grande-tante
+pl:
+
+    cousin.9.0
+en: a 7th-great-grandfather/a 7th-great-grandmother
+fr: un 7×-arrière-grand-père/une 7×-arrière-grand-mère
+pl:
+
+    cousin.9.1
+en: a %ssixth great-granduncle/a %ssixth great-grandaunt
+fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grande-tante
+pl:
+
+    cousins.0.1 tt
+en: sons and daughters
+fr: fils et filles, enfants
+pl:
+
+    cousins.0.10
+en: eight-times-great-grandchild/eight-times-great-grandchildren
+fr: huit-fois-arrière-petit-enfant/huit-fois-arrière-petits-enfants
+pl:
+
+    cousins.0.2
+en: grandchild/grandchildren
+fr: petit-enfant/petits-enfants
+pl:
+
+    cousins.0.2 tt
+en: children of one’s son or daughters
+fr: enfants de son fils ou de sa fille
+pl:
+
+    cousins.0.3
+en: great-grandchild/great-grandchildren
+fr: arrière-petit-enfant/arrière-petits-enfants
+pl:
+
+    cousins.0.3 tt
+en: children of one’s grandson or granddaughter
+fr: enfants de son petit-fils ou de sa petite-fille
+pl:
+
+    cousins.0.4
+en: great-great-grandchild/great-great-grandchildren
+fr: arrière-arrière-petit-enfant/arrière-arrière-petits-enfants
+pl:
+
+    cousins.0.4 tt
+en: children of one’s great-grandson or great-granddaughter
+fr: enfants de son arrière-petit-fils ou de son arrière-petite-fille
+pl:
+
+    cousins.0.5
+en: three-times-great-grandchild/three-times-great-grandchildren
+fr: trois-fois-arrière-petits-enfant/trois-fois-arrière-petits-enfants
+pl:
+
+    cousins.0.6
+en: four-times-great-grandchild/four-times-great-grandchildren
+fr: quatre-fois-arrière-petit-enfant/quatre-fois-arrière-petits-enfants
+pl:
+
+    cousins.0.7
+en: five-times-great-grandchild/five-times-great-grandchildren
+fr: cinq-fois-arrière-petit-enfant/cinq-fois-arrière-petits-enfants
+pl:
+
+    cousins.0.8
+en: six-times-great-grandchild/six-times-great-grandchildren
+fr: six-fois-arrière-petit-enfant/six-fois-arrière-petits-enfants
+pl:
+
+    cousins.0.9
+en: seven-times-great-grandchild/seven-times-great-grandchildren
+fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
+pl:
+
+    cousins.1.0 tt
+en: father and mother
+fr: père et mère<br>géniteur et génitrice
+pl:
+
+    cousins.1.1 tt
+fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
+pl:
+
+    cousins.1.10
+en: seven-times-great-grandnephew/seven-times-great-grandnephews
+fr: sept-fois-arrière-petit-neveu/sept-fois-arrière-petits-neveux
+pl:
+
+    cousins.1.2
+en: nephew and nieces
+fr: neveux et nièces
+pl:
+
+    cousins.1.2 tt
+fr: enfants des frères et sœurs<br>« petits-frères et petites-sœurs »<hr>← cousins germains des enfants
+pl:
+
+    cousins.1.3
+en: great-nephew/great-nephews/great-niece/great-nieces
+fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
+pl:
+
+    cousins.1.3 tt
+en: great-nephews and great-nieces
+fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
+pl:
+
+    cousins.1.4
+en: great-grandnephew/great-grandnephews
+fr: arrière-petit-neveu/arrière-petits-neveux
+pl:
+
+    cousins.1.4 tt
+fr: enfant d’un petit-neveu ou d’une petit-nièce
+pl:
+
+    cousins.1.5
+en: great-great-grandnephew/great-great-grandnephews
+fr: arrière-arrière-petit-neveu/arrière-arrière-petits-neveux
+pl:
+
+    cousins.1.6
+en: three-times-great-grandnephew/three-times-great-grandnephews
+fr: trois-fois-arrière-petit-neveu/trois-fois-arrière-petits-neveux
+pl:
+
+    cousins.1.7
+en: four-times-great-grandnephew/four-times-great-grandnephews
+fr: quatre-fois-arrière-petit-neveu/quatre-fois-arrière-petits-neveux
+pl:
+
+    cousins.1.8
+en: five-times-great-grandnephew/five-times-great-grandnephews
+fr: cinq-fois-arrière-petit-neveu/cinq-fois-arrière-petits-neveux
+pl:
+
+    cousins.1.9
+en: six-times-great-grandnephew/six-times-great-grandnephews
+fr: six-fois-arrière-petit-neveu/six-fois-arrière-petits-neveux
+pl:
+
+    cousins.10.0
+en: 8th-great-grandparents
+fr: 8×-arrière-grands-parents
+pl:
+
+    cousins.10.0 tt
+fr: huit-fois-arrière-grands-parents<br>nonaïeuls
+pl:
+
+    cousins.10.1
+en: seventh great-granduncles
+fr: sept-fois-arrière-grands-oncles
+pl:
+
+    cousins.10.1 tt
+fr: frères et sœurs des nonaïeuls
+pl:
+
+    cousins.10.10
+fr: cousins 9<sup>e</sup>
+pl:
+
+    cousins.10.11
+fr: petits-cousins 9<sup>e</sup>
+pl:
+
+    cousins.10.12
+fr: arrière-petits-cousins 9<sup>e</sup>
+pl:
+
+    cousins.10.13
+fr: arrière-arrière-petits-cousins 9<sup>e</sup>
+pl:
+
+    cousins.10.2
+pl:
+
+    cousins.10.3
+pl:
+
+    cousins.10.4
+pl:
+
+    cousins.10.5
+pl:
+
+    cousins.10.6
+pl:
+
+    cousins.10.7
+pl:
+
+    cousins.10.8
+pl:
+
+    cousins.10.9
+pl:
+
+    cousins.11.0
+en: 9th-great-grandparents
+fr: 9×-arrière-grands-parents
+pl:
+
+    cousins.11.0 tt
+pl:
+
+    cousins.12.0
+en: 10th-great-grandparents
+fr: 10×-arrière-grands-parents
+pl:
+
+    cousins.12.0 tt
+pl:
+
+    cousins.2.0 tt
+fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
+pl:
+
+    cousins.2.1 tt
+fr: frères et sœurs des parents
+pl:
+
+    cousins.2.10
+fr: sept-fois-arrière-petit-cousin/sept-fois-arrière-petits-cousins
+pl:
+
+    cousins.2.2
+en: cousins 1rd
+fr: cousins
+pl:
+
+    cousins.2.2 tt
+fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
+pl:
+
+    cousins.2.3
+en: 1st cousins once removed
+fr: petit-cousin/petits-cousins
+pl:
+
+    cousins.2.3 tt
+fr: petits-cousins au 1<sup>er</sup> degré<br>neveux et nièces à la mode de Bourgogne ou Bretagne<br>neveux et nièces issus de germains<hr>← cousins issus de germains des enfants
+pl:
+
+    cousins.2.4
+fr: arrière-petit-cousin/arrière-petits-cousins
+pl:
+
+    cousins.2.4 tt
+fr: arrière-petits-cousins au 1<sup>er</sup> degré<hr>fils d’un petit-cousin ou d’une petite cousine
+pl:
+
+    cousins.2.5
+fr: arrière-arrière-petit-cousin/arrière-arrière-petits-cousins
+pl:
+
+    cousins.2.5 tt
+fr: deux-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+pl:
+
+    cousins.2.6
+fr: trois-fois-arrière-petit-cousin/trois-fois-arrière-petits-cousins
+pl:
+
+    cousins.2.6 tt
+fr: trois-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+pl:
+
+    cousins.2.7
+fr: quatre-fois-arrière-petit-cousin/quatre-fois-arrière-petits-cousins
+pl:
+
+    cousins.2.7 tt
+fr: sept-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+pl:
+
+    cousins.2.8
+fr: cinq-fois-arrière-petit-cousin/cinq-fois-arrière-petits-cousins
+pl:
+
+    cousins.2.8 tt
+fr: cinq-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+pl:
+
+    cousins.2.9
+fr: six-fois-arrière-petit-cousin/six-fois-arrière-petits-cousins
+pl:
+
+    cousins.2.9 tt
+fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+pl:
+
+    cousins.3.0 tt
+fr: bisaïeul·e·s
+pl:
+
+    cousins.3.1 tt
+fr: frères et sœurs des grand-parents
+pl:
+
+    cousins.3.10
+fr: six-fois-arrière-petits-cousins 2<sup>e</sup>
+pl:
+
+    cousins.3.2
+fr: grands-cousins
+pl:
+
+    cousins.3.2 tt
+fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr><- cousins germains des parents, oncles et tantes
+pl:
+
+    cousins.3.3 tt
+fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)
+pl:
+
+    cousins.3.4
+fr: petits-cousins 2<sup>e</sup>
+pl:
+
+    cousins.3.4 tt
+fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr><- cousins issus d’issus de germains des enfants
+pl:
+
+    cousins.3.5
+fr: arrière-petits-cousins 2<sup>e</sup>
+pl:
+
+    cousins.3.5 tt
+fr: arrière-petits-cousins au 2<sup>e</sup> degré
+pl:
+
+    cousins.3.6
+fr: arrière-arrière-petits-cousins 2<sup>e</sup>
+pl:
+
+    cousins.3.6 tt
+fr: deux-fois-arrière-petits-cousins au deuxième degré
+pl:
+
+    cousins.3.7
+fr: trois-fois-arrière-petits-cousins 2<sup>e</sup>
+pl:
+
+    cousins.3.7 tt
+fr: trois-fois-arrière-petits-cousins au deuxième degré
+pl:
+
+    cousins.3.8
+fr: quatre-fois-arrière-petits-cousins 2<sup>e</sup>
+pl:
+
+    cousins.3.8 tt
+fr: quatre-fois-arrière-petits-cousins au deuxième degré
+pl:
+
+    cousins.3.9
+fr: cinq-fois-arrière-petits-cousins 2<sup>e</sup>
+pl:
+
+    cousins.4.0 tt
+en: 2nd-great-grand-parents
+fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
+pl:
+
+    cousins.4.1 tt
+fr: frères et sœurs des arrière-grands-parents
+pl:
+
+    cousins.4.10
+pl:
+
+    cousins.4.2
+fr: arrière-grands-cousins
+pl:
+
+    cousins.4.2 tt
+fr: grands-oncles et grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins germains des grands-parents, grands oncles et grandes-tantes
+pl:
+
+    cousins.4.3
+fr: grands-cousins 2<sup>e</sup>
+pl:
+
+    cousins.4.3 tt
+fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents et oncles
+pl:
+
+    cousins.4.4 tt
+fr: cousins au 3<sup>e</sup> degré<br>cousins arrière-issus-de-germains
+pl:
+
+    cousins.4.5
+fr: petits-cousins 3<sup>e</sup>
+pl:
+
+    cousins.4.5 tt
+fr: petits-cousins au 3<sup>e</sup> degré<br>petits-cousins issus d’issus de germains
+pl:
+
+    cousins.4.6
+fr: arrière-petits-cousins 3<sup>e</sup>
+pl:
+
+    cousins.4.6 tt
+fr: arrière-petits-cousins au troisième degré
+pl:
+
+    cousins.4.7
+fr: arrière-arrière-petits-cousins 3<sup>e</sup>
+pl:
+
+    cousins.4.7 tt
+fr: deux-fois-arrière-petits-cousins au troisième degré
+pl:
+
+    cousins.4.8
+fr: trois-fois-arrière-petits-cousins 3<sup>e</sup>
+pl:
+
+    cousins.4.8 tt
+fr: trois-fois-arrière-petits-cousins au troisième degré
+pl:
+
+    cousins.4.9
+fr: quatre-fois-arrière-petits-cousins 3<sup>e</sup>
+pl:
+
+    cousins.4.9 tt
+fr: quatre-fois-arrière-petits-cousins au troisième degré
+pl:
+
+    cousins.5.0
+en: great-great-great-grandparent/great-great-great-grandparents
+fr: 3×-arrière-grand-parent/3×-arrière-grands-parents
+pl:
+
+    cousins.5.0 tt
+en: 3rd-great-grandparents
+fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
+pl:
+
+    cousins.5.1
+en: great-great-granduncles
+fr: arrière-arrière-grands-oncles
+pl:
+
+    cousins.5.1 tt
+en: siblings of the great-great-grandparents
+fr: frères et sœurs des trisaïeuls
+pl:
+
+    cousins.5.10
+fr: quatre-fois-arrière-petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.10 tt
+fr: quatre-fois-arrière-petits-cousins au quatrième degré
+pl:
+
+    cousins.5.11
+fr: cinq-fois-arrière-petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.12
+fr: six-fois-arrière-petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.13
+fr: sept-fois-arrière-petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.2
+fr: arrière-arrière-grands-cousins
+pl:
+
+    cousins.5.2 tt
+fr: arrière-grand-oncles et arrière-grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins des arrière-grands-parents et arrière-grands-oncles
+pl:
+
+    cousins.5.3
+fr: arrière-grands-cousins 2<sup>e</sup>
+pl:
+
+    cousins.5.3 tt
+fr: arrière-grands-cousins au deuxième degré<hr><- cousins issus de germains des grands-parents et grands-oncles
+pl:
+
+    cousins.5.4
+fr: grands-cousins 3<sup>e</sup>
+pl:
+
+    cousins.5.4 tt
+fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
+pl:
+
+    cousins.5.5
+en: 4th cousins
+fr: cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.5 tt
+fr: cousins au quatrième degré<br>cousins issus d’issus d’issus de germains<hr><i>arrière-petits-cousins</i>
+pl:
+
+    cousins.5.6
+fr: petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.6 tt
+fr: petits-cousins au quatrième degré
+pl:
+
+    cousins.5.7
+fr: arrière-petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.7 tt
+fr: arrière-petits-cousins au quatrième degré
+pl:
+
+    cousins.5.8
+fr: arrière-arrière-petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.8 tt
+fr: deux-fois-arrière-petits-cousins au quatrième degré
+pl:
+
+    cousins.5.9
+fr: trois-fois-arrière-petits-cousins 4<sup>e</sup>
+pl:
+
+    cousins.5.9 tt
+fr: trois-fois-arrière-petits-cousins au quatrième degré
+pl:
+
+    cousins.6.0
+en: 4th-great-grandparents
+fr: 4×-arrière-grands-parents
+pl:
+
+    cousins.6.0 tt
+fr: quatre-fois-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
+pl:
+
+    cousins.6.1
+en: third great-granduncles
+fr: 3×-arrière-grands-oncles
+pl:
+
+    cousins.6.1 tt
+fr: trois-fois-arrière-grands-oncles<hr>frères et sœurs des quadrisaïeuls
+pl:
+
+    cousins.6.10
+fr: 3×-arrière-petits-cousins 5<sup>e</sup>
+pl:
+
+    cousins.6.10 tt
+fr: trois-fois-arrière-petits-cousins au cinquième degré
+pl:
+
+    cousins.6.11
+fr: 4×-arrière-petits-cousins 5<sup>e</sup>
+pl:
+
+    cousins.6.11 tt
+fr: quatre-fois-arrière-petits-cousins au cinquième degré
+pl:
+
+    cousins.6.2
+fr: 3×-arrière-grands-cousins
+pl:
+
+    cousins.6.2 tt
+fr: arrière-arrière-arrière-grands-cousins au premier degré
+pl:
+
+    cousins.6.3
+fr: arrière-arrière-grands-cousins 2<sup>e</sup>
+pl:
+
+    cousins.6.3 tt
+fr: arrière-arrière-grands-cousins au deuxième degré<br><- cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
+pl:
+
+    cousins.6.4
+fr: arrière-grands-cousins 3<sup>e</sup>
+pl:
+
+    cousins.6.4 tt
+fr: arrière-grands-cousins au troisième degré<br><- cousins issus d’issus de germains des grands-parents et grands-oncles
+pl:
+
+    cousins.6.5
+fr: grands-cousins 4<sup>e</sup>
+pl:
+
+    cousins.6.5 tt
+fr: grands-cousins au quatrième degré
+pl:
+
+    cousins.6.6
+en: fifth cousins
+fr: cousins 5<sup>e</sup>
+pl:
+
+    cousins.6.6 tt
+fr: cousins au cinquième degré
+pl:
+
+    cousins.6.7
+fr: petits-cousins 5<sup>e</sup>
+pl:
+
+    cousins.6.7 tt
+fr: petits-cousins au cinquième degré
+pl:
+
+    cousins.6.8
+fr: arrière-petits-cousins 5<sup>e</sup>
+pl:
+
+    cousins.6.8 tt
+fr: arrière-petits-cousins au cinquième degré
+pl:
+
+    cousins.6.9
+fr: arrière-petits-cousins 5<sup>e</sup>
+pl:
+
+    cousins.6.9 tt
+fr: arrière-arrière-petits-cousins au cinquième degré
+pl:
+
+    cousins.7.0
+en: 5th-great-grandparents
+fr: 5×-arrière-grands-parents
+pl:
+
+    cousins.7.0 tt
+fr: cinq-fois-arrière-grands-parents<br>sext(is)aïeuls
+pl:
+
+    cousins.7.1
+en: fourth great-granduncles
+fr: 4×-arrière-grands-oncles
+pl:
+
+    cousins.7.1 tt
+fr: quatre-fois-arrière-grands-oncles<br>frères et sœurs des quinquisaïeuls
+pl:
+
+    cousins.7.10
+fr: arrière-arrière-petits-cousins 6<sup>e</sup>
+pl:
+
+    cousins.7.10 tt
+fr: arrière-arrière-petits-cousins au sixième degré
+pl:
+
+    cousins.7.11
+fr: 3×-arrière-petits-cousins 6<sup>e</sup>
+pl:
+
+    cousins.7.11 tt
+fr: trois-fois-arrière-petits-cousins au sixième degré
+pl:
+
+    cousins.7.12
+fr: 4×-arrière-petits-cousins 6<sup>e</sup>
+pl:
+
+    cousins.7.12 tt
+fr: quatre-fois-arrière-petits-cousins au sixième degré
+pl:
+
+    cousins.7.2
+fr: 4×-arrière-grands-cousins
+pl:
+
+    cousins.7.2 tt
+fr: quatre-fois-arrière-grands-cousins<br>arrrière-arrière-arrière-arrière-grands-cousins au premier degré
+pl:
+
+    cousins.7.3
+fr: 3×-arrière-grands-cousins 2<sup>e</sup>
+pl:
+
+    cousins.7.3 tt
+fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
+pl:
+
+    cousins.7.4
+fr: arrière-arrière-grands-cousins 3<sup>e</sup>
+pl:
+
+    cousins.7.4 tt
+fr: arrière-arrière-grands-cousins au troisième degré
+pl:
+
+    cousins.7.5
+fr: arrière-grands-cousins 4<sup>e</sup>
+pl:
+
+    cousins.7.5 tt
+fr: arrière-grands-cousins au quatrième degré
+pl:
+
+    cousins.7.6
+fr: grands-cousins 5<sup>e</sup>
+pl:
+
+    cousins.7.6 tt
+fr: grands-cousins au 5e degré
+pl:
+
+    cousins.7.7
+en: 6th cousins
+fr: cousins 6<sup>e</sup>
+pl:
+
+    cousins.7.7 tt
+fr: cousins au sixième degré
+pl:
+
+    cousins.7.8
+fr: petits-cousins 6<sup>e</sup>
+pl:
+
+    cousins.7.8 tt
+fr: petits-cousins au sixième degré
+pl:
+
+    cousins.7.9
+fr: arrière-petits-cousins 6<sup>e</sup>
+pl:
+
+    cousins.7.9 tt
+fr: arrière-petits-cousins au sixième degré
+pl:
+
+    cousins.8.0
+en: 6th-great-grandparents
+fr: 6×-arrière-grands-parents
+pl:
+
+    cousins.8.0 tt
+fr: six-fois-arrière-grands-parents<br>sept(is)aïeuls
+pl:
+
+    cousins.8.1
+en: fifth great-granduncles
+fr: cinq-fois-arrière-grands-oncles
+pl:
+
+    cousins.8.1 tt
+fr: frères et sœurs des septisaïeuls
+pl:
+
+    cousins.8.10
+fr: arrière-petits-cousins 7<sup>e</sup>
+pl:
+
+    cousins.8.10 tt
+fr: arrière-petits-cousins au septième degré
+pl:
+
+    cousins.8.11
+fr: arrière-arrière-petits-cousins 7<sup>e</sup>
+pl:
+
+    cousins.8.11 tt
+fr: arrière-arrière-petits-cousins au septième degré
+pl:
+
+    cousins.8.12
+fr: trois-fois-arrière-petits-cousins 7<sup>e</sup>
+pl:
+
+    cousins.8.12 tt
+fr: trois-fois-arrière-petits-cousins au septième degré
+pl:
+
+    cousins.8.13
+fr: quatre-fois-arrière-petits-cousins 7<sup>e</sup>
+pl:
+
+    cousins.8.13 tt
+fr: quatre-fois-arrière-petits-cousins au septième degré
+pl:
+
+    cousins.8.2
+fr: cinq-fois-arrière-grands-cousins
+pl:
+
+    cousins.8.2 tt
+fr: cinq-fois-arrière-grands-cousins au premier degré
+pl:
+
+    cousins.8.3
+fr: quatre-fois-arrière-grands-cousins 2<sup>e</sup>
+pl:
+
+    cousins.8.3 tt
+fr: quatre-fois-arrière-grands-cousins au deuxième degré
+pl:
+
+    cousins.8.4
+fr: trois-fois-arrière-grands-cousins 3<sup>e</sup>
+pl:
+
+    cousins.8.4 tt
+fr: trois-fois-arrière-grands-cousins au troisième degré
+pl:
+
+    cousins.8.5
+fr: arrière-arrière-grands-cousins 4<sup>e</sup>
+pl:
+
+    cousins.8.5 tt
+fr: arrière-arrière-grands-cousins au quatrième degré
+pl:
+
+    cousins.8.6
+fr: arrière-grands-cousins 5<sup>e</sup>
+pl:
+
+    cousins.8.6 tt
+fr: arrière-grands-cousins au cinquième degré
+pl:
+
+    cousins.8.7
+fr: grands-cousins 6e
+pl:
+
+    cousins.8.7 tt
+fr: grands-cousins au sixième degré
+pl:
+
+    cousins.8.8
+en: 7th cousins
+fr: cousins 7<sup>e</sup>
+pl:
+
+    cousins.8.8 tt
+en: seventh cousins
+fr: cousins au septième degré
+pl:
+
+    cousins.8.9
+fr: petits-cousins 7<sup>e</sup>
+pl:
+
+    cousins.8.9 tt
+fr: petits-cousins au septième degré
+pl:
+
+    cousins.9.0
+en: 7th-great-grandparents
+fr: 7×-arrière-grands-parents
+pl:
+
+    cousins.9.0 tt
+fr: sept-fois-arrière-grands-parents<br>octaïeuls
+pl:
+
+    cousins.9.1
+en: sixth great-granduncles
+fr: six-fois-arrière-grands-oncles
+pl:
+
+    cousins.9.1 tt
+fr: frères et sœurs des octosaïeuls
+pl:
+
+    cousins.9.10
+fr: petits-cousins 8<sup>e</sup>
+pl:
+
+    cousins.9.10 tt
+fr: petits-cousins au huitième degré
+pl:
+
+    cousins.9.11
+fr: arrière-petits-cousins 8<sup>e</sup>
+pl:
+
+    cousins.9.11 tt
+fr: arrière-petits-cousins au huitième degré
+pl:
+
+    cousins.9.12
+fr: arrière-arrière-petits-cousins 8<sup>e</sup>
+pl:
+
+    cousins.9.12 tt
+fr: arrière-arrière-petits-cousins au huitième degré
+pl:
+
+    cousins.9.13
+fr: trois-fois-arrière-petits-cousins 8<sup>e</sup>
+pl:
+
+    cousins.9.13 tt
+fr: arrière-arrière-arrière-petits-cousins au huitième degré
+pl:
+
+    cousins.9.14
+fr: quatre-fois-arrière-petits-cousins 8<sup>e</sup>
+pl:
+
+    cousins.9.14 tt
+fr: quatre-fois-arrière-petits-cousins au huitième degré
+pl:
+
+    cousins.9.2
+fr: 6×-arrière-grands-cousins
+pl:
+
+    cousins.9.2 tt
+fr: six-foix-arrière-grands-cousins au premier degré
+pl:
+
+    cousins.9.3
+fr: 5×-arrière-grands-cousins 2<sup>e</sup>
+pl:
+
+    cousins.9.3 tt
+fr: cinq-fois-arrière-grands-cousins au deuxième degré
+pl:
+
+    cousins.9.4
+fr: 4×-arrière-grands-cousins 3<sup>e</sup>
+pl:
+
+    cousins.9.4 tt
+fr: quatre-fois-arrière-grands-cousins au troisième degré
+pl:
+
+    cousins.9.5
+fr: 3×-arrière-grands-cousins 4<sup>e</sup>
+pl:
+
+    cousins.9.5 tt
+fr: trois-fois-arrière-grands-cousins au quatrième degré
+pl:
+
+    cousins.9.6
+fr: arrière-arrière-grands-cousins 5<sup>e</sup>
+pl:
+
+    cousins.9.6 tt
+fr: deux-fois-arrière-grands-cousins au cinquième degré
+pl:
+
+    cousins.9.7
+fr: arrière-grands-cousins 6<sup>e</sup>
+pl:
+
+    cousins.9.7 tt
+fr: arrière-grands-cousins au sixième degré
+pl:
+
+    cousins.9.8
+fr: grands-cousins 7e
+pl:
+
+    cousins.9.8 tt
+fr: grands-cousins au septième degré
+pl:
+
+    cousins.9.9
+fr: cousins 8<sup>e</sup>
+pl:
+
+    cousins.9.9 tt
+fr: cousins au huitième degré
+pl:
+
+    cremation
+en: cremation
+fr: crémation
+pl:
+
+    custom event
+en: custom event
+fr: événement personnalisé
+pl:
+
+    d'Aboville
+en: d’Aboville
+fr: d’Aboville
+pl:
+
+    dag
+en: fusion implexes
+fr: fusionner les implexes
+pl:
+
+    dag on/dag off
+en: show dag/hide dag
+fr: afficher graphe orienté acyclique (dag)/masquer graphe orienté acyclique (dag)
+pl:
+
+    date begin
+en: from
+fr: date de début
+pl:
+
+    date end
+en: to
+fr: date de fin
+pl:
+
+    date of baptism
+en: date of baptism
+fr: date du baptême
+pl:
+
+    date of birth
+en: date of birth
+fr: date de naissance
+pl:
+
+    date of burial
+en: date of burial
+fr: date de la sépulture
+pl:
+
+    date of death
+en: date of death
+fr: date de décès
+pl:
+
+    date of marriage
+en: date of marriage
+fr: date de l’union
+pl:
+
+    dd/mm/yyyy
+en: dd/mm/yyyy
+fr: jj/mm/aaaa
+pl:
+
+    death date and death place
+en: date and place of death
+fr: date et lieu de décès
+pl:
+
+    death place
+en: place of death
+fr: lieu de décès
+pl:
+
+    death src
+en: source of death
+fr: source décès
+pl:
+
+    decoration
+en: decoration
+fr: décoration
+pl:
+
+    define Cujus
+en: define %s as Sosa 1 to see or reduce the implexes/restore previous Sosa 1 %s
+fr: définir %s comme Sosa 1 pour voir ou réduire les implexes/remettre le précédent Sosa 1 %s
+pl:
+
+    degree of kinship
+en: degree of kinship/degrees of kinship
+fr: degré de parenté/degrés de parenté
+pl:
+
+    delete image
+en: delete image
+fr: supprimer une image
+pl:
+
+    delete image saved
+en: delete saved image
+fr: supprimer une image sauvegardée
+pl:
+
+    delete portrait
+en: delete portrait
+fr: supprimer le portrait
+pl:
+
+    delete portrait saved
+en: delete saved portrait
+fr: supprimer le portrait sauvegardé
+pl:
+
+    deleted
+en: deleted
+fr: supprimé/supprimée
+pl:
+
+    demobilisationMilitaire
+en: demobilization
+fr: démobilisation militaire
+pl:
+
+    descendant tree view
+en: descendant tree view
+fr: arborescence descendante
+pl:
+
+    descendants at the generation
+en: list by name
+fr: descendants à la génération
+pl:
+
+    descendants tree
+en: descendants tree
+fr: arbre de descendance
+pl:
+
+    died at an advanced age
+en: deceased of old age
+fr: est mort à un âge avancé/est morte à un âge avancé/est mort(e) à un âge avancé
+pl:
+
+    difference between the two revisions
+en: difference between the revisions
+fr: différence entre les révisions
+pl:
+
+    diploma
+en: diploma
+fr: certificat
+pl:
+
+    direct ancestor of %s
+en: direct ancestor of %s
+fr: ancêtre direct de %s
+pl:
+
+    display Aboville number
+en: display d’Aboville number
+fr: afficher la numérotation d’Aboville
+pl:
+
+    display border tree
+en: display frame
+fr: afficher les bordures
+pl:
+
+    display by/branch/alphabetic order
+en: display by/line/alphabetical order
+fr: affichage par/branches/ordre alphabétique
+pl:
+
+    display carrousel
+en: display the carrousel of images
+fr: afficher le carrousel d’images
+pl:
+
+    display empty picture
+en: display empty picture
+fr: toujours afficher les images
+pl:
+
+    display generation
+en: display the generations
+fr: afficher les générations
+pl:
+
+    display implex
+en: display implex
+fr: afficher les implexes
+pl:
+
+    display marriage date
+en: display marriage date
+fr: afficher la date de mariage
+pl:
+
+    display notes and sources inline
+en: add notes and sources to content
+fr: inclure notes et sources
+pl:
+
+    display picture
+en: display family picture
+fr: afficher les images
+pl:
+
+    display smallest sosa number relative to ancestor
+en: display pedigree collapse
+fr: afficher les implexes
+pl:
+
+    display spouse
+en: display spouse
+fr: afficher conjoint
+pl:
+
+    display this marriage in this order
+en: change order of marriage
+fr: modifier l’ordre des relations
+pl:
+
+    distinction
+en: rank
+fr: distinction
+pl:
+
+    divorce event
+en: divorce
+fr: divorce
+pl:
+
+    do not
+en: do not
+fr: ne pas
+pl:
+
+    dotation
+en: endowment
+fr: dotation
+pl:
+
+    dotationLDS
+en: endowment (LDS)
+fr: donation LDS
+pl:
+
+    edit family on spouse
+en: edit the families by clicking on the date of marriage of the row of one spouses
+fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
+pl:
+
+    edit tree
+en: edit the graph
+fr: éditer le graphe
+pl:
+
+    education
+en: education
+fr: éducation
+pl:
+
+    election
+en: election
+fr: élection
+pl:
+
+    emigration
+en: emigration
+fr: émigration
+pl:
+
+    engage event
+en: engagement
+fr: fiançailles
+pl:
+
+    event/events
+en: event/events
+fr: événement/événements
+pl:
+
+    events to which %s was witness
+en: events to which %s was witness
+fr: évènements auxquels %s était témoin
+pl:
+
+    events tree
+en: tree of events
+fr: arbre des événements
+pl:
+
+    excommunication
+en: excommunication
+fr: excommunication
+pl:
+
+    extend
+en: extend to a near ancestor
+fr: étendre à un ancêtre proche
+pl:
+
+    family birthday
+en: family birthday
+fr: anniversaires des proches
+pl:
+
+    family history
+en: family History
+fr: autour de l’arbre
+pl:
+
+    family source
+en: family source
+fr: source famille
+pl:
+
+    family time line
+en: time line of the family
+fr: chronologie de la famille
+pl:
+
+    familyLinkLDS
+en: family link (LDS)
+fr: lien parental LDS
+pl:
+
+    fanchart
+en: fanchart
+fr: arbre en éventail
+pl:
+
+    father-in-law/mother-in-law
+en: father-in-law/mother-in-law
+fr: beau-père/belle-mère
+pl:
+
+    field required
+en: input required
+fr: saisie obligatoire
+pl:
+
+    filter
+en: filter
+fr: filtrer
+pl:
+
+    filter by
+en: filter by
+fr: filtrer par
+pl:
+
+    firstCommunion
+en: first communion
+fr: première communion
+pl:
+
+    font size
+en: font size
+fr: taille de police
+pl:
+
+    for/since
+en: for/since
+fr: pendant/depuis
+pl:
+
+    from carrousel
+en: from carrousel
+fr: du carrousel
+pl:
+
+    full tree
+en: full tree
+fr: arbre complet
+pl:
+
+    full width/columns
+en: full width display/columns display
+fr: affichage pleine largeur/affichage sur deux colonnes
+pl:
+
+    funeral
+en: funeral
+fr: funérailles
+pl:
+
+    godparent
+en: godparent
+fr: parrain ou marraine
+pl:
+
+    graduate
+en: graduation
+fr: diplôme
+pl:
+
+    great-great-grandparents
+en: great-great-grandparents
+fr: arrière-arrière-grands-parents
+pl:
+
+    h7-tree
+en: 7 generation H tree
+fr: arbre en H 7 générations
+pl:
+
+    half-brothers/half-sisters/half-siblings
+en: half-brothers/half-sisters/half-siblings
+fr: demi-frères/demi-sœurs/demi-frères et sœurs
+pl:
+
+    half-relationship
+en: half-/half-/half-/ 
+fr: demi-/demi-/demi-/ 
+pl:
+
+    half-siblings
+en: half-siblings
+fr: demi-fratrie
+pl:
+
+    happy birthday to them!
+en: happy birthday to them!
+fr: bon anniversaire !
+pl:
+
+    having a family
+en: spouse and children are known
+fr: ayant une famille
+pl:
+
+    having no family
+en: spouse and children are unknown
+fr: n’ayant pas de famille
+pl:
+
+    help modify data
+en: Be careful! Modifications in the “book” update the corresponding elements in the entire database.
+fr: Toute modification d’une entrée du dictionnaire impacte l'ensemble des données liées.
+pl:
+
+    help surname branch
+en: click a number to view family tree
+fr: pour obtenir l’arbre des branches patronymiques, cliquez sur le nombre de branches
+pl:
+
+    hide portraits
+en: hide portraits
+fr: ne pas afficher les portraits
+pl:
+
+    highlight incomplete data
+en: highlight incomplete data
+fr: surligner les données incomplètes
+pl:
+
+    his/her
+en: his/her
+fr: son/sa
+pl:
+
+    history
+en: history
+fr: historique
+pl:
+
+    home
+en: home
+fr: accueil
+pl:
+
+    horizontal tree
+en: horizontal tree
+fr: arborescence ascendante
+pl:
+
+    hospitalisation
+en: hospitalization
+fr: hospitalisation
+pl:
+
+    htree
+en: H-Tree
+fr: arbre en H
+pl:
+
+    htree 8 gen
+en: compact H-Tree at 7 generations with marker for the 8th
+fr: arbre compact en H à 7 générations avec indication pour la 8e
+pl:
+
+    iftitles/public/private
+en: if titles/public/private
+fr: si titres/public/privé
+pl:
+
+    ignore implex
+en: ignore implex
+fr: ignorer les implexes
+pl:
+
+    illness
+en: disease
+fr: maladie
+pl:
+
+    image note
+en: add a note for the image.
+fr: ajouter une note pour l’image.
+pl:
+
+    image source
+en: add a source for the image.
+fr: ajouter une source pour l’image.
+pl:
+
+    immigration
+en: immigration
+fr: immigration
+pl:
+
+    implex links
+en: link implexes
+fr: relier les implexes
+pl:
+
+    implex/implexes
+en: implex/implexes
+fr: implexe/implexes
+pl:
+
+    in (place)
+en: in
+fr: à
+pl:
+
+    individual notes
+en: individual note
+fr: notes individuelles
+pl:
+
+    informant/informant/informant
+en: informant/informant/informant
+fr: déclarant/déclarante/déclarant(e)
+pl:
+
+    informant/informants
+en: informant/informants
+fr: déclarant/déclarants
+pl:
+
+    inline chronology
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
+pl:
+
+    input database
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
+pl:
+
+    insufficient revision history for %s
+en: no history found for %s
+fr: l’historique des révisions de %s est insuffisant pour réaliser des comparaisons
+pl:
+
+    intermediate revisions not shown
+en: intermediate revisions not shown
+fr: révisions intermédiaires masquées
+pl:
+
+    interval
+en: time interval
+fr: intervalle de temps
+pl:
+
+    is a very old parent
+en: is old
+fr: est vraiment un parent très âgé
+pl:
+
+    itree
+en: I-Tree
+fr: arbre en I
+pl:
+
+    label
+en: label
+fr: étiquette
+pl:
+
+    last diff
+en: last revision
+fr: dernière révision
+pl:
+
+    last sosa level not navigable
+en: last Sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
+pl:
+
+    limit
+en: limit
+fr: limite
+pl:
+
+    link back to parents
+en: link back to parents
+fr: lien retour vers les parents
+pl:
+
+    link to children
+en: link to children
+fr: lien vers les enfants
+pl:
+
+    link to use
+en: link to use
+fr: lien à utiliser
+pl:
+
+    list eclair
+en: list by name, place & date
+fr: liste-éclair
+pl:
+
+    listePassenger
+en: passenger list
+fr: liste des passagers
+pl:
+
+    lists and charts
+en: charts and lists
+fr: arbres, listes et états
+pl:
+
+    lists of books
+en: lists of books
+fr: liste des dictionnaires
+pl:
+
+    living after %s
+en: lived after %s
+fr: vivant après %s
+pl:
+
+    living before %s
+en: lived before %s
+fr: vivant avant %s
+pl:
+
+    living between %s and %s
+en: lived from %s to %s
+fr: vivant de %s à %s
+pl:
+
+    living from/to
+en: lived from/to
+fr: vivant de/à
+pl:
+
+    looking for
+en: check
+fr: éléments à rechercher
+pl:
+
+    male/female/neuter
+en: male/female/neuter&#047;unknown
+fr: homme/femme/neutre&#047;inconnu
+pl:
+
+    marriage bann
+en: marriage bann
+fr: bans de mariage
+pl:
+
+    marriage banns%t to
+en: marriage banns%t with
+fr: bans de mariage%t avec
+pl:
+
+    marriage contract
+en: marriage contract
+fr: contrat de mariage
+pl:
+
+    marriage contract%t with
+en: marriage contract%t with
+fr: contrat de mariage%t avec
+pl:
+
+    marriage date
+en: date of marriage
+fr: date de l’union
+pl:
+
+    marriage event
+en: marriage
+fr: mariage
+pl:
+
+    marriage licence
+en: marriage license
+fr: licence de mariage
+pl:
+
+    marriage notes/marriages notes
+en: marriage notes/marriages notes
+fr: notes concernant l’union/notes concernant les unions
+pl:
+
+    marriage of %t after his/her death
+en: marriage of %t after his/her death
+fr: mariage de %t après son décès
+pl:
+
+    marriage of %t before his/her birth
+en: marriage of %t before his/her birth
+fr: mariage de %t avant sa naissance
+pl:
+
+    marriage place
+en: place of marriage
+fr: lieu de l’union
+pl:
+
+    marriage src
+en: source of marriage
+fr: source mariage
+pl:
+
+    marriage with
+en: marriage with
+fr: union avec
+pl:
+
+    marriages with
+en: relations or marriages with
+fr: relations ou mariages avec
+pl:
+
+    matching
+en: matching
+fr: correspondance
+pl:
+
+    maternal grand-parents
+en: mother’s parents
+fr: grands-parents maternels
+pl:
+
+    max nbr
+en: max rel nbr
+fr: max rel nbr
+pl:
+
+    max nbr title
+en: max number for relation list
+fr: nombre maximum pour les listes de relations
+pl:
+
+    mentioned/mentioned
+en: cited/cited
+fr: mentionné/mentionnés
+pl:
+
+    mentioned/mentioned/mentioned
+en: cited/cited/cited
+fr: mentionné/mentionnée/mentionné(e)
+pl:
+
+    militaryDistinction
+en: military decoration
+fr: distinction militaire
+pl:
+
+    militaryPromotion
+en: military promotion
+fr: promotion militaire
+pl:
+
+    militaryService
+en: conscription
+fr: service militaire
+pl:
+
+    miscellaneous
+en: misc.
+fr: divers
+pl:
+
+    miscellaneous information
+en: other field
+fr: champs divers
+pl:
+
+    missing %s
+en: missing %s
+fr: %s manquant
+pl:
+
+    missing date
+en: no date
+fr: sans date
+pl:
+
+    missing events
+en: missing events
+fr: événements manquants
+pl:
+
+    missing image
+en: missing image
+fr: image manquante
+pl:
+
+    missing parents
+en: parents unknown
+fr: parents manquants
+pl:
+
+    missing sosa
+en: missing Sosa numbers
+fr: Sosa manquants
+pl:
+
+    missing sources
+en: missing sources
+fr: sources manquantes
+pl:
+
+    missing spouse
+en: spouse unknown
+fr: conjoint manquant
+pl:
+
+    mobilisationMilitaire
+en: mobilization
+fr: mobilisation militaire
+pl:
+
+    modification successful
+en: successfully updated
+fr: modification effectuée
+pl:
+
+    modification/modifications
+en: update/updates
+fr: modification/modifications
+pl:
+
+    modify family %s event order
+en: permute the events of family %s
+fr: permuter les événements de la famille %s
+pl:
+
+    modify note
+en: modify the note
+fr: modifier la note
+pl:
+
+    modify person event order
+en: permute personnal events
+fr: permuter les événéments individuels
+pl:
+
+    modify portrait
+en: modify the portrait
+fr: modifier le portrait
+pl:
+
+    modify source
+en: modify the source
+fr: modifier la source
+pl:
+
+    modify the size of images to
+en: modify the size of images to
+fr: modifier la taille des images à
+pl:
+
+    module
+en: module/modules
+fr: module/modules
+pl:
+
+    move up/down
+en: move up/move down/move up cursor/move down cursor
+fr: remonter/descendre/remonter le curseur/descendre le curseur
+pl:
+
+    msg error disconnected
+en: sorry, you can add only families connected to the rest.<br>This restriction has been added by this database owner.
+fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>Cette restriction a été ajoutée par le propriétaire de cette base de données.
+pl:
+
+    multi relations graph
+en: multi relations graph
+fr: graphe de relations multiples
+pl:
+
+    multiple relations
+fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins).
+pl:
+
+    name changed. updated linked pages
+en: The first name, name or occurrence of this person has changed. The pages linked to the old key listed below have been updated.
+fr: Le prénom, nom ou occurrence de cette personne a changé. Les pages ci-dessous liées à l’ancienne clé ont été mises à jour.
+pl:
+
+    naturalisation
+en: naturalization
+fr: naturalisation
+pl:
+
+    navigate on tree
+en: navigate on the tree
+fr: naviguer sur l’arbre
+pl:
+
+    navigation with this individual
+en: navigation in tree with this individual
+fr: naviguer dans l'arbre avec cet individu
+pl:
+
+    nb branches
+en: lines
+fr: nombre de branches
+pl:
+
+    nb children
+en: number of children
+fr: nombre d’enfants
+pl:
+
+    nb events
+en: number of events
+fr: nombre d’événements
+pl:
+
+    nb individuals
+en: number of individuals
+fr: nombre d’individus
+pl:
+
+    NB: you should try another relationship computing mode
+en: you can try another computing option
+fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
+pl:
+
+    new modification
+en: continue edit
+fr: effectuer une nouvelle correction
+pl:
+
+    new name
+en: new name
+fr: nouveau nom
+pl:
+
+    new tree with this individual
+en: new tree with this individual
+fr: nouvel arbre à partir de cet individu
+pl:
+
+    next
+en: next
+fr: suivant
+pl:
+
+    next relationship path
+en: next relationship path
+fr: chemin suivant
+pl:
+
+    no descendants
+en: without posterity
+fr: sans postérité
+pl:
+
+    no line break in names
+en: no line break in names
+fr: afficher les noms sans saut de ligne
+pl:
+
+    no marriage event
+en: not married
+fr: non mariés
+pl:
+
+    no modification
+en: no changes
+fr: aucune modification
+pl:
+
+    no more
+en: no more
+fr: pas d’autres
+pl:
+
+    notes summary
+en: notes summary
+fr: sommaire des notes diverses
+pl:
+
+    number of children
+en: number of children
+fr: nombre d’enfants
+pl:
+
+    number of events
+en: number of events
+fr: nombre d’événements
+pl:
+
+    number of rows
+en: number of rows
+fr: nombre de lignes
+pl:
+
+    n° d’Aboville
+en: d’Aboville number
+fr: n° d’Aboville
+pl:
+
+    n° Sosa
+en: Sosa No.
+fr: nᵒ Sosa
+pl:
+
+    of
+en: of
+fr: de
+pl:
+
+    of (du)
+en: of
+fr: du
+pl:
+
+    of%s
+en: of %s
+fr: d[e |’]%s
+pl:
+
+    officer/officer/officers
+en: officer/officer/officers
+fr: officiant/officiante/officiants
+pl:
+
+    old name
+en: old name
+fr: ancien nom
+pl:
+
+    on %s's siblings side
+en: on %s's siblings side
+fr: du côté des frères et soeurs de %s
+pl:
+
+    one additional generation
+en: one additional generation
+fr: une génération en plus
+pl:
+
+    one ancestor counted
+en: One common ancestor: consanguine and uterine half relationships are included, but their coefficient of parente is half the full equivalent relation.
+fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
+pl:
+
+    only
+en: only
+fr: uniquement
+pl:
+
+    open individual page
+en: open individual page
+fr: ouvrir la page individuelle
+pl:
+
+    open this individual page
+en: open this individual page
+fr: ouvrir la page individuelle
+pl:
+
+    options
+en: options
+fr: options
+pl:
+
+    ordination
+en: ordinance
+fr: ordination
+pl:
+
+    other/other/other
+en: other/other/other
+fr: autre/autre/autre
+pl:
+
+    ou
+en: or
+fr: ou
+pl:
+
+    PACS
+en: civil marriage
+fr: Pacs
+pl:
+
+    pacsed%t to
+en: civil solidarity pact%t with
+fr: Pacs%t avec
+pl:
+
+    parrish registrar/parrish registrar/parrish registrar
+en: parish registrar/parish registrar/parish registrar
+fr: officiant religieux/officiante religieuse/officiant(e) religieux(se)
+pl:
+
+    parrish registrar/parrish registrars
+en: parish registrar/parish registrars 
+fr: officiant religieux/officiants religieux
+pl:
+
+    partial
+en: limited to ancestors and siblings
+fr: limité aux ascendants et leurs frères et soeurs
+pl:
+
+    participant/participant
+en: participant/participant
+fr: participant/participante
+pl:
+
+    passing by
+en: passing by
+fr: en passant par
+pl:
+
+    paternal grand-parents
+en: paternal grandparents
+fr: grands-parents paternels
+pl:
+
+    path between
+en: path between
+fr: chemin entre
+pl:
+
+    path/paths
+en: path/paths
+fr: chemin/chemins
+pl:
+
+    person source
+en: source of individual
+fr: source individu
+pl:
+
+    photos & documents
+en: archive & pictures
+fr: photos & documents
+pl:
+
+    place filter
+en: number of elements kept in places list
+fr: nombre d'éléments à conserver dans la liste des places
+pl:
+
+    plugins
+en: plugins
+fr: plugins
+pl:
+
+    plus
+en: more
+fr: plus
+pl:
+
+    portrait
+en: portrait
+fr: portrait
+pl:
+
+    present/present
+en: present/present
+fr: présent/présents
+pl:
+
+    present/present/present
+en: present/present/present  
+fr: présent/présente/présent(e)
+pl:
+
+    preview family tree
+en: preview family tree
+fr: aperçu de l’arbre
+pl:
+
+    previous
+en: previous
+fr: précédent
+pl:
+
+    previous image
+en: if an image with the same name already exists in the saved, it will be deleted.
+fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
+pl:
+
+    previous portrait
+en: a possible previous version of the saved portrait will be deleted.
+fr: une sauvegarde pré-existante du portrait sera supprimée.
+pl:
+
+    previous/next diff
+en: previous revision/next revision
+fr: révision précédente/révision suivante
+pl:
+
+    property
+en: property
+fr: propriété
+pl:
+
+    random individual
+en: display a random individual
+fr: afficher un individu au hasard
+pl:
+
+    recensement
+en: census
+fr: recensement
+pl:
+
+    reduce/increase
+en: reduce/increase
+fr: réduire/augmenter
+pl:
+
+    region
+en: region
+fr: région
+pl:
+
+    relations of
+en: relations of
+fr: relations de
+pl:
+
+    relations tree
+en: tree of relations
+fr: arbre des relations
+pl:
+
+    relationship by ancestors
+en: ancestry
+fr: liens de parenté
+pl:
+
+    relationship computing mode
+en: computing mode
+fr: mode de calcul
+pl:
+
+    relationship display options
+en: options:
+fr: options d’affichage des arbres :
+pl:
+
+    relationship link between
+en: family link with...
+fr: lien de parenté avec
+pl:
+
+    relationship shortcut
+en: shortcuts:
+fr: raccourcis :
+pl:
+
+    remove %s column
+en: click on this header to remove the column(s) “%s”
+fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
+pl:
+
+    remove last module
+en: remove the last added module
+fr: retirer le dernier module ajouté
+pl:
+
+    reserved to friends or wizards
+en: reserved to friends or wizards
+fr: réservée aux amis et magiciens
+pl:
+
+    reset to
+en: reset to
+fr: restaurer
+pl:
+
+    residence
+en: residence
+fr: résidence
+pl:
+
+    residence%t to
+en: residence%t with
+fr: résidence%t avec
+pl:
+
+    restore
+en: restore
+fr: restaurer
+pl:
+
+    restore image saved
+en: restore saved image
+fr: restaurer une image sauvegardée
+pl:
+
+    restore portrait
+en: restore portrait
+fr: restaurer le portrait
+pl:
+
+    restore portrait saved
+en: restore saved portrait
+fr: restaurer le portrait sauvegardé
+pl:
+
+    restored
+en: restored
+fr: restauré/restaurée
+pl:
+
+    restricted access
+en: Access restricted to friends and wizards of the database!
+fr: Accès réservé aux amis et magiciens de la base de donnée !
+pl:
+
+    retired
+en: retirement
+fr: retraite
+pl:
+
+    revision history
+en: revision history
+fr: historique des révisions
+pl:
+
+    revision of
+en: revision date
+fr: révision du
+pl:
+
+    same ancestor as n° Sosa
+en: same as Sosa #
+fr: identique au n° Sosa
+pl:
+
+    save
+en: save
+fr: sauvegarder
+pl:
+
+    save image
+en: an image with a similar name will moved to
+fr: si une image du même nom existe déjà, elle sera sauvegardée dans
+pl:
+
+    save portrait
+en: the existing portrait will be saved to
+fr: le portrait existant sera sauvegardé dans
+pl:
+
+    saved
+en: saved
+fr: sauvegardé/sauvegardée
+pl:
+
+    saved images
+en: saved image/saved images
+fr: image sauvegardée/images sauvegardées
+pl:
+
+    scale
+en: years by generation
+fr: années par génération
+pl:
+
+    scellentChildLDS
+en: sealing child (LDS)
+fr: scellage d’enfant LDS
+pl:
+
+    scellentParentLDS
+en: sealing parent (LDS)
+fr: scellement aux parents LDS
+pl:
+
+    scellentSpouseLDS
+en: sealing spouse (LDS)
+fr: scellement au conjoint LDS
+pl:
+
+    search %s on Geneanet
+en: search %s on Geneanet
+fr: rechercher %s sur Geneanet
+pl:
+
+    search_exact_fn
+en: exact search
+fr: recherche exacte
+pl:
+
+    search_exact_sn
+en: exact search
+fr: recherche exacte
+pl:
+
+    searching all
+en: search all
+fr: recherche tout
+pl:
+
+    see also
+en: see also
+fr: à voir aussi
+pl:
+
+    see ascendants notes/sources
+en: view notes/sources
+fr: voir les notes et sources
+pl:
+
+    see ascendants pictures
+en: view pictures
+fr: voir les photos
+pl:
+
+    see descendants notes/sources
+en: view notes and sources
+fr: afficher notes et sources
+pl:
+
+    see descendants pictures
+en: view pictures
+fr: voir les photos
+pl:
+
+    see person
+en: individual
+fr: état civil
+pl:
+
+    see portrait
+en: see portrait
+fr: voir le portrait
+pl:
+
+    see portrait saved
+en: see saved portrait
+fr: voir le portrait sauvegardé
+pl:
+
+    select
+en: select
+fr: choisir
+pl:
+
+    select a month to see all the anniversaries
+en: select a month to see all the anniversaries.
+fr: sélectionnez un mois pour voir tous les anniversaires.
+pl:
+
+    select a spouse
+en: select spouse
+fr: choisissez un conjoint :
+pl:
+
+    select input
+en: choose file
+fr: sélect. fichier
+pl:
+
+    select lang
+en: view in:
+fr: afficher en :
+pl:
+
+    select module
+en: Select each module by clicking on the corresponding button (max 15).
+fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
+pl:
+
+    select p_mod
+en: select personalized modules
+fr: selectionner les modules personnalisés
+pl:
+
+    select person to compute relationship
+en: click an individual below to calculate the family link.
+fr: sélectionnez un proche pour obtenir le lien de parenté.
+pl:
+
+    select the two revisions you want to compare
+en: select revisions to view history.
+fr: sélectionnez les deux révisions que vous voulez comparer.
+pl:
+
+    send image with note and source
+en: send selected image with note and source
+fr: envoyer l’image selectionée avec note et source
+pl:
+
+    separate event
+en: separation
+fr: séparation
+pl:
+
+    shortcuts
+en: keyboard shortcuts
+fr: raccourcis clavier
+pl:
+
+    show all
+en: show all
+fr: afficher tous les
+pl:
+
+    show implex
+en: show implex
+fr: identifier les implexes
+pl:
+
+    siblings of the grandparents
+en: granduncles
+fr: grands-oncles
+pl:
+
+    siblings of the great-grandparents
+en: great-granduncles
+fr: arrières-grands-oncles
+pl:
+
+    size
+en: scale
+fr: echelle
+pl:
+
+    sons/daughters/children
+en: sons/daughters/children
+fr: fils/filles/enfants
+pl:
+
+    sort by/branch/alphabetic order
+en: sort by/line/alphabetical order
+fr: trier par/branches/ordre alphabétique
+pl:
+
+    sort by/date begin/alphabetic order/nb individuals/nb events
+en: sort by/date/alphabetical order/number of individuals/number of events
+fr: trier par/date de début/ordre alphabétique/nombre d’individus/nombre d’événements
+pl:
+
+    sort by/generation/alphabetic order
+en: sort by/generation/alphabetical order
+fr: trier par/génération/ordre alphabétique
+pl:
+
+    sosa reference: %t
+en: family tree root: %t
+fr: référence Sosa : %t
+pl:
+
+    spouse/spouses
+en: spouse/spouses
+fr: conjoint/conjoints
+pl:
+
+    spouses info
+en: spouses informations
+fr: informations conjoints
+pl:
+
+    statistics and anniversaries
+en: statistics and anniversaries
+fr: statistiques et anniversaires
+pl:
+
+    store image
+en: the selected image will be copied to
+fr: l’image sélectionnée sera enregistrée dans
+pl:
+
+    subdivision
+en: suburb
+fr: lieu-dit
+pl:
+
+    summary book ascendants
+en: list of individuals
+fr: liste des fiches
+pl:
+
+    surnames branch
+en: lines by name
+fr: branches patronymiques
+pl:
+
+    table
+en: table
+fr: tableau
+pl:
+
+    the database name %s contains a forbidden character.
+en: the database name "%s" contains a forbidden character.
+fr: le nom de la base "%s" contient un caractère interdit.
+pl:
+
+    the difference of age between %t and %t is quite important
+en: date of birth of %t and %t are too far together
+fr: la différence d’âge entre %t et %t est assez importante
+pl:
+
+    the following children of %t and %t are born very close
+en: date of birth of the children of %t and %t are too close together
+fr: les enfants suivants de %t et de %t sont nés très rapprochés
+pl:
+
+    the following children of %t and %t are born very distant
+en: important age gap between the two children %t et %t
+fr: les enfants suivants de %t et de %t ont des naissances très éloignées
+pl:
+
+    the latest %d celebrated marriages
+en: last %d marriages
+fr: les %d dernières unions célébrées
+pl:
+
+    the latest %d registered marriages
+en: last %d marriages
+fr: les %d dernières unions enregistrées
+pl:
+
+    the modification impacted %d persons
+en: %d entries have been successfully updated
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+pl:
+
+    time line
+en: timeline
+fr: chronologie
+pl:
+
+    to carrousel
+en: to carrousel
+fr: au carrousel
+pl:
+
+    to change
+en: edit
+fr: pour changer
+pl:
+
+    to come
+en: to come
+fr: à venir
+pl:
+
+    too much results
+en: too much results
+fr: trop de résultats
+pl:
+
+    tools
+en: tools
+fr: outils
+pl:
+
+    town
+en: town
+fr: commune
+pl:
+
+    tree of witnesses
+en: tree of witnesses
+fr: arbre des témoins
+pl:
+
+    trees & lists
+en: charts & lists
+fr: arbres & listes
+pl:
+
+    try again
+en: retry
+fr: réessayer
+pl:
+
+    try another/relationship computing
+en: try another computing option
+fr: cliquez ici/pour essayer un mode de calcul différent
+pl:
+
+    uncheck
+en: uncheck
+fr: décocher
+pl:
+
+    unfiltered total
+en: unfiltered total
+fr: total non filtré
+pl:
+
+    unknown spouse
+en: unknown spouses
+fr: conjoints manquants
+pl:
+
+    update family
+en: edit family
+fr: gérer les unions
+pl:
+
+    update image note
+en: update image note
+fr: mettre à jour la note de l’image
+pl:
+
+    update image source
+en: update image source
+fr: mettre à jour la source de l’image
+pl:
+
+    uploaded
+en: uploaded
+fr: envoyé/envoyée
+pl:
+
+    url
+en: url
+fr: url
+pl:
+
+    v7 anywhere
+en: match anywhere
+fr: correspondance sans contrainte
+pl:
+
+    v7 approxim match
+en: match with no capitale nor accents
+fr: correspondance sans capitales ni accents
+pl:
+
+    v7 exact match
+en: exact match (upper/lower and accents)
+fr: correspondance exacte (majuscules/minuscules et accents)
+pl:
+
+    v7 hide others
+en: hide other first mames
+fr: cacher les autres prénoms
+pl:
+
+    v7 list too long
+en: list too long (try increasing filter value)
+fr: liste trop longue (augmentez la valeur du filtre)
+pl:
+
+    v7 plugins
+en: plugins
+fr: plugins
+pl:
+
+    v7 refresh fnames cache
+en: refresh fnames cache
+fr: reconstruire le cache des prénoms
+pl:
+
+    v7 show others
+en: show other first names
+fr: afficher les autres prénoms
+pl:
+
+    v7 word boundaries
+en: match full words
+fr: correspondance de mots entiers
+pl:
+
+    venteBien
+en: sale of property
+fr: vente d’un bien
+pl:
+
+    version
+en: version
+fr: version
+pl:
+
+    very short display
+en: very short display
+fr: affichage très court
+pl:
+
+    view source
+en: view source
+fr: voir source
+pl:
+
+    vital record
+en: individual
+fr: fiche
+pl:
+
+    warning refresh
+en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
+fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
+pl:
+
+    where born
+en: where born
+fr: lieu de naissance
+pl:
+
+    where dead
+en: where dead
+fr: lieu de décès
+pl:
+
+    where married
+en: where married
+fr: lieu de l’union
+pl:
+
+    widower/widow
+en: widower/widow
+fr: veuf/veuve
+pl:
+
+    width
+en: width
+fr: largeur
+pl:
+
+    will
+en: will
+fr: testament
+pl:
+
+    with note
+en: with a note
+fr: avec une note
+pl:
+
+    with root, spouses and unknowns
+en: with root ancestor, spouses and unknowns
+fr: avec l’ancêtre racine, les conjoints et les inconnus
+pl:
+
+    without implex display
+en: without implex display
+fr: sans afficher les implexes
+pl:
+
+    witness at %s of
+en: witness at %s of
+fr: témoin au %s de
+pl:
+
+    witness tree
+en: tree of witnesses
+fr: arbre des témoins
+pl:
+
+    witness/witnesses
+en: witness/witnesses
+fr: témoin/témoins
+pl:
+
+    witnesses at his events
+en: witnesses at his events
+fr: témoins à ses évènements
+pl:
+
+    witnesses to events of
+en: witnesses to events of
+fr: témoins aux évènements de
+pl:
+
+    witnesses to my events and godparents
+en: witnesses to my events and godparents
+fr: témoins à mes évènements et parrains/marraines
+pl:
+
+    word match
+en: word match
+fr: mot complet
+pl:
+
+    word match title
+en: match full location name
+fr: comparer avec le nom complet d'un lieu
+pl:
+
+    Y/N
+en: Y/N
+fr: O/N
+pl:
+
+    you are visible/you are not visible
+en: you are visible/you are invisible
+fr: vous êtes visible/vous n’êtes pas visible
+pl:
+
+

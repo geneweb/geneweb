@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: relmenu.txt v7.1 22/12/2024 19:06:29 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>[*link between]%sp;
+    %if;(public_name != "")%public_name;
+    %else;%first_name; %surname;%end; [and]0…%nn;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  %include;favicon
+  %include;css
+</head>
+<body%body_prop; onload="main()">
+%include;hed
+<div class="container">
+%message_to_wizard;
+%include;perso_header
+<h1 class="text-center">[*link between]%sp;
+  %if;(public_name != "")%public_name;%else;%first_name;%end;
+  %if;(qualifier != "") <em>%qualifier;</em>%end;
+  %sp;%surname;
+  %if;(alias != "") <em>(%alias;)</em>%end;
+  %sp;[and]0…%nn;
+</h1>
+<form name="relationship" method="submit" action="%action;">
+  <div class="row">
+    <div id="rel_form_shortcut" class="col-4">
+      <input type="hidden" name="em" value="R">
+      %if;access_by_key;
+        <input type="hidden" name="ep" value="%first_name_key_val;">
+        <input type="hidden" name="en" value="%surname_key_val;">
+        %if;(occ!="0")
+          <input type="hidden" name="eoc" value="%occ;">
+        %end;
+      %else;
+        <input type="hidden" name="ei" value="%index;">
+      %end;
+      <input type="hidden" name="m" value="NG">
+      <span>[*relationship shortcut][:]</span>
+      <div class="mt-1 ml-2">
+        %if;((user.index!="" and not browsing_with_sosa_ref) or (browsing_with_sosa_ref and user.index!=sosa_ref.index))
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_user" name="select" value="%user.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_user">%user.ident; ([user/password/cancel]0)</label>
+          </div>
+        %end;
+        %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index)
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_sosa" name="select" value="%sosa_ref.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_sosa"><b>%sosa_ref;</b> (<i class="far fa-circle-dot fa-xs text-success mr-1"></i>[Sosa] 1)</label>
+          </div>
+        %end;
+        %foreach;family;
+          %if;(spouse!="? ?")
+            <div class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" id="sel_spouse_%spouse.index;" name="select" value="%spouse.index;" onclick="main()">
+              <label class="custom-control-label" for="sel_spouse_%spouse.index;">%spouse;%if;spouse.has_nobility_titles;,%sp;
+                <em>%spouse.nobility_title;</em>%end; ([spouse/spouses]0)</label>
+            </div>
+          %end;
+        %end;
+        %foreach;relation;
+          %if;has_relation_him;
+            <div class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" id="sel_rel_him_%relation_him.index;" name="select" value="%relation_him.index;" onclick="main()">
+              <label class="custom-control-label" for="sel_rel_him_%relation_him.index;">%relation_him;%if;relation_him.has_nobility_titles;,%sp;
+                <em>%relation_him.nobility_title;</em>%end; (%relation_him.type;)</label>
+            </div>
+          %end;
+          %if;has_relation_her;
+            <div class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" id="sel_rel_her_%relation_her.index;" name="select" value="%relation_her.index;" onclick="main()">
+              <label class="custom-control-label" for="sel_rel_her_%relation_her.index;">%relation_her;%if;relation_her.has_nobility_titles;,%sp;
+                <em>%relation_her.nobility_title;</em>%end; (%relation_her.type;)</label>
+            </div>
+          %end;
+        %end;
+        %foreach;related;
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_related_%related.index;" name="select" value="%related.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_related_%related.index;">%related;%if;related.has_nobility_titles;,%sp;
+              <em>%related.nobility_title;</em>%end; (%related.type;)</label>
+          </div>
+        %end;
+        %foreach;event_witness_relation;
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_witness_%event_witness_relation.person.index;" name="select" value="%event_witness_relation.person.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_witness_%event_witness_relation.person.index;">%event_witness_relation.person; ([witness/witnesses]0)</label>
+          </div>
+        %end;
+      </div>
+    </div>
+    <div class="col-4">
+      %hidden;
+      <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
+        <input type="hidden" name="em" value="R">
+        %if;access_by_key;
+          <input type="hidden" name="ep" value="%first_name_key_val;">
+          <input type="hidden" name="en" value="%surname_key_val;">
+          %if;(occ!=0)
+            <input type="hidden" name="eoc" value="%occ;">
+          %end;
+        %else;
+          <input type="hidden" name="ei" value="%index;">
+        %end;
+        <input type="hidden" name="m" value="NG">
+        <div class="custom-control custom-radio">
+          <input type="radio" class="custom-control-input" id="radio_R" name="select" value="input" onclick="main()" checked>
+          <label class="custom-control-label" for="radio_R">[*search/case sensitive]0 [any individual in the base][:]</label>
+        </div>
+        <div>
+          <label class="sr-only" for="n">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
+          <input type="search" id="n" class="form-control mt-2" name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…" autofocus>
+          <label class="sr-only" for="firstname">[*first name/first names]0</label>
+          <input type="search" id="firstname" class="form-control mt-2" name="fn" placeholder="[*first name/first names]0">
+          <label class="sr-only" for="surname">[*surname/surnames]0</label>
+          <input type="search" id="surname" class="form-control mt-2" name="sn" placeholder="[*surname/surnames]0">
+        </div>
+      </div>
+      <div class="text-center my-4">
+        <button type="submit" class="btn btn-outline-primary btn-lg">[*validate/delete]0</button>
+      </div>
+    </div>
+    <div class="col-4 flex-column">
+      <div>
+        <span>[*relationship computing mode][:]</span>
+        <div class="ml-2 mt-1">
+          <div class="custom-control custom-radio" id="rel_shortest_path">
+            <input type="radio" class="custom-control-input" id="etS" name="et" value="S" checked>
+            <label class="custom-control-label" for="etS">[*shortest path]</label>
+          </div>
+          <div class="custom-control custom-radio" id="rel_ancestors">
+            <input type="radio" class="custom-control-input" id="etA" name="et" value="A">
+            <label class="custom-control-label" for="etA">[*relationship by ancestors]</label>
+          </div>
+          <div class="custom-control custom-radio" id="rel_by_marriage">
+            <input type="radio" class="custom-control-input" id="etM" name="et" value="M">
+            <label class="custom-control-label" for="etM">[*relationship by marriage]</label>
+          </div>
+        </div>
+      </div>
+      <div class="mt-2">
+        <span>[*relationship display options][:]</span>
+          <div class="ml-2 mt-1">
+            <div class="custom-control custom-checkbox">
+              <input type=checkbox class="custom-control-input" id="long" name="long">
+              <label class="custom-control-label" for="long">[*long display]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type=checkbox class="custom-control-input" id="spouse" name="sp" value="1">
+              <label class="custom-control-label" for="spouse">[*visualize/show/hide/summary]2 [spouse/spouses]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="image" name="im" value="0">
+              <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1 <span class="text-info">✘</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+%include;trl
+%include;copyr
+</div>
+<script>
+<!--
+  function enable(id) {
+    var inputs = document.getElementById(id).getElementsByTagName('input');
+    for (i=0; i<inputs.length; i++) {
+      inputs[i].disabled = '';
+    }
+  }
+
+  function disable(id) {
+    var inputs = document.getElementById(id).getElementsByTagName('input');
+    for (i=0; i<inputs.length; i++) {
+      if (inputs[i].name != "select") {
+        inputs[i].disabled = 'disabled';
+      }
+    }
+  }
+
+  function main() {
+    %( recherche individu %)
+    if (radio_R.checked == true) {
+      disable("rel_form_shortcut");
+      enable("rel_form_search");
+    }
+    else {
+      disable("rel_form_search");
+      enable("rel_form_shortcut");
+    }
+  }
+-->
+</script>
+%include;js
+%query_time;
+</body>
+</html>

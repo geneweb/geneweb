@@ -1,0 +1,284 @@
+<!-- $Id: modules/arbre_descendants.txt v7.1 01/03/2025 19:03:50 $ -->
+%define;display_person(xxx)
+  <div class="px-0 mx-0 border-0">
+  %if;(not cancel_links)
+    <a href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;/D/V%end;%nn;
+             %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;" title="[*navigation]"></a>
+    </a>
+  %end;
+  %if;(xxx.has_sosa)%apply;display_sosa("xxx")<br>%end;
+  %if;(cancel_links or xxx.is_restricted)
+    %if;(xxx.public_name!="")%xxx.public_name;
+    %else;%xxx.first_name;
+    %end; <span class="text-nowrap">%xxx.surname;</span>
+  %else;
+    <a class="normal_anchor"
+      href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;%end;%nn;
+            %else;%apply;url_set("i/m/t", xxx.index)%end;"
+      title=" %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
+      %if;(xxx.public_name!="")%xxx.public_name;
+      %else;%xxx.first_name;
+      %end; <span class="text-nowrap">%xxx.surname;</span>
+    </a>
+  %end;%nn;
+  %if;(wizard and not cancel_links)
+    <a class="normal_anchor"
+      href="%prefix;m=MOD_IND;i=%xxx.index;"
+      title="[*modify::] %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
+  %end;
+    <span class="font-italic">%nn;
+      %if;(xxx.dates!="")%xxx.dates;%nn;
+      %elseif;(wizard and not cancel_links)-%nn;
+      %elseif;(cancel_links)<br>
+      %end;%nn;
+    </span>%nn;
+  %if;(wizard and not cancel_links)
+    </a>
+  %end;
+  <br>
+  %if;(e_im=1)
+    %if;xxx.has_image;
+      %if;not cancel_links;
+        <a href="%xxx.image_url;" class="normal_anchor" %nn;
+          target="_blank" title="[*image/images]0 %xxx;">%nn;
+      %end;
+        <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0" %nn;
+          src="%xxx.image_url;" alt="[image/images]0">%nn;
+      %if;not cancel_links;</a>%end;
+    %elseif;(bvar.default_image="yes")
+      %if;(wizard and not cancel_links)
+        <a href="%prefix;m=SND_IMAGE;i=%xxx.index;" %nn;
+          class="normal_anchor" target="_blank" %nn;
+          title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%nn;
+      %end;
+      <img class="small_image align-self-center rounded ml-0" style="height:70%%"
+        src="%images_prefix;img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
+        alt="[missing image]">
+      %if;(wizard and not cancel_links)</a>%end;
+    %else;
+      <span class="small_image noimage rounded display-4 text-center%nn;
+        text-muted ml-0 h-100">%bvar.default_image_no;</span>
+    %end;
+  %end;
+  </div>
+%end;
+%define;add_to_count(nnn)
+  %for;i;0;nnn;%incr_count;%end;
+%end;
+%define;nb_column(vvv)
+  %( Width of the descendnace of one person %)
+  %if;has_families;
+    %if;(vvv=0)
+      %let;mmm;%if;(nb_families>1)%nb_families;%else;1%end;%in;
+      %apply;add_to_count(mmm)
+    %else;
+      %foreach;family;
+        %apply;fam_nb_column(vvv)
+      %end;
+    %end;
+  %else;
+    %incr_count;
+  %end;
+%end;
+
+%define;fam_nb_column(vvv)
+  %( Width of the descendnace of one family %)
+  %if;has_children;
+    %foreach;child;
+      %apply;nb_column(vvv-1)
+    %end;
+  %else;
+    %incr_count;
+  %end;
+%end;
+
+%define;multiple_marriages(lll)
+  %reset_count;
+  %if;(nb_families>1)%incr_count;%end;
+  %foreach;descendant_level;
+    %foreach;descendant;
+      %if;(level=lll and descendant.nb_families>1);%incr_count;%end;
+    %end;
+  %end;
+  %count;
+%end;
+
+%(
+Person:                             Root
+if(nb_families>1):                   |
+Hbarspouse:               -----------------------
+                          &                     &
+Spouse:                 Spouse1              Spouse2
+if(has_children):          |                    |
+Hbarchild:           ------------               |
+if(not baseindex):   |          |               |
+Person:            Child1     Child2          Child3
+%)
+%( xxx=descendant, lll=current level (recursion), nnn=target level, sss="skip" or not %)
+%( ttt=text, fff=position (left/right/cenetr/none), www= colspan %)
+%define;descendants_at_level(xxx,lll,nnn,ttt,fff,www)
+  %(one level of descendants (%xxx.first_name;,lll,nnn,ttt,fff,www)<br>%)
+  %(compute family position %)
+  %if;(lll>evarv)
+  %( we are done %)
+  %elseif;(lll<=nnn)
+    %if;(lll=nnn and "xxx"!="")
+      %( Print information at level lll %)
+      %let;has_multiple_marriages;1%in;
+      %if;("ttt"="hbarc" and lll>0 and "xxx"!="self")
+        %( Horizontal bar linking childrens%)
+        %if;("fff"="none")
+          <td colspan="www" class="text-center"></td><td></td>
+        %else;
+          <td colspan="www" class="text-fff"><hr class="fff"></td>
+          <td>%if;("fff"="full" or "fff"="right")<hr class="full">%end;</td>
+        %end;
+      %elseif;("ttt"="vbar" and lll>0 and "xxx"!="self")
+        %if;(nb_children>0)
+          <td colspan="www" class="text-center">│</td><td>&nbsp;</td>
+        %else;
+          <td colspan="www" class="text-center"></td><td>&nbsp;</td>
+        %end;
+      %elseif;("ttt"="person" and "xxx"!="")
+        <td colspan="www" class="text-center align-top">
+        %if;(xxx.index!=baseindex)│%end;%apply;display_person("xxx")
+        %if;(xxx.has_families)
+          %reset_count1;
+          %foreach;family;%if;(nb_children>1)%incr_count1;%end;%end;
+          %(count1=has children%)
+          %if;(not (e_sp=1) and nnn<evarv-1 and count1>0)│%end;
+          %if;((e_sp=1) and lll=nnn)
+            %let;test;%apply;has_relation()%in;
+            %foreach;family; %( TODO verify & expand %)
+              %if;are_pacs;|%nn;
+              %elseif;are_engaged;|%nn;
+              %end;
+            %end;
+          %end;
+        %end;
+        </td><td>&nbsp;</td>
+      %elseif;("ttt"="skip")
+        <td></td><td></td>
+      %end;
+      %if;has_families;
+        %foreach;family;
+          %reset_count;
+          %apply;fam_nb_column(evarv+1-lll)
+          %let;fcount;%expr(2*count-1)%in;
+          %let;fmpos;%nn;
+            %if;(nb_families>1)%nn;
+              %if;(family_cnt=1)right%nn;
+              %elseif;(family_cnt=nb_families)left%nn;
+              %else;center%nn;
+              %end;%nn;
+            %else;none%nn;
+            %end;%nn;
+          %in;
+          %if;("ttt"="hbars" and (e_ma=1 or e_sp=1 or has_multiple_marriages=1))
+            <td colspan="%fcount;" class="text-center">
+              %if;(fmpos="right")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
+              %elseif;(fmpos="center")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
+              %elseif;(fmpos="left")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
+              %elseif;(fmpos="none")
+              %end;
+              <span class="text-nowrap">
+                %if;(e_ma=1 or e_sp=1)
+                  %if;(wizard and not cancel_links)
+                    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
+                      title="[*update::family/families]0 of %first_name; %surname; (%occ;)
+                        [and] %spouse.first_name; %spouse.surname; (%spouse.occ;)"
+                    >&%if;(nb_families>1)<sup>%family_cnt;</sup>%end;</a>
+                  %else;&
+                  %end;
+                  %if;(family.marriage_date.year!="") %marriage_date.year;%else; -%end;
+                %end;
+              </span>
+            </td>
+            <td>&nbsp;</td>
+          %elseif;("ttt"="spouse")
+            <td colspan="%fcount;" class="text-center align-top">
+              %apply;display_person("spouse")
+            </td><td>&nbsp;</td>
+          %elseif;("ttt"="vbars" and 1=2)
+            %if;(has_children)
+              <td colspan="%fcount;" class="text-center">│y</td><td></td>
+            %else;
+              <td colspan="%fcount;" class="text-center">y</td><td></td>
+            %end;
+          %end;
+        %end;
+      %else;
+        %if;("ttt"="spouse" or "ttt"="vbars" or "ttt"="hbars")
+          <td></td><td></td>
+        %end;
+      %end;
+    %elseif;("ttt"!="skip")
+      %( Continue the recursion %)
+      %if;has_families;
+        %foreach;family;
+          %if;has_children;
+            %foreach;child;
+              %let;chpos;%nn;
+                %if;(nb_children>1)%nn;
+                  %if;(child_cnt=1)right%nn;
+                  %elseif;(child_cnt=nb_children)left%nn;
+                  %else;full%nn;
+                  %end;%nn;
+                %else;none%nn;
+                %end;%nn;
+              %in;
+              %reset_count;
+              %apply;nb_column(evarv-lll)
+              %let;pcount;%expr(2*count-1)%in;
+              %apply;descendants_at_level("child",lll+1,nnn,"ttt",chpos,pcount)
+            %end;
+          %else;
+            %apply;descendants_at_level("none",lll+1,nnn,"skip","",0)
+          %end;
+        %end;
+      %else;
+        %( If no family, count 1 slot %)
+        <td></td><td></td>
+      %end;
+    %elseif;("ttt"="skip")
+      %( Continue recursion to level nnn even if no child or no family %)
+      %apply;descendants_at_level("none",lll+1,nnn,"skip","",0)
+    %end;
+  %end;
+%end;
+%let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
+%let;e_sp;%if;(e.sp!="")0%else;1%end;%in;
+%let;e_ma;%if;(e.ma!="")0%else;1%end;%in;
+%let;e_im;%if;(e.im!="")0%else;1%end;%in;
+%let;evarborder;%if;(e.border="" or e.border="0")0%else;1%end;%in;
+%let;baseindex;%index;%in;
+<h3 id="a">[*descendants tree]</h3>
+%include;buttons_dag
+%reset_count;
+%let;evarv;%expr(e_v+1)%in;
+%apply;nb_column(evarv+1)
+%let;icount;%expr(2*count-1)%in;
+<table class="destree_table mt-3 mx-auto">
+%for;v;0;evarv;
+  %( For each level, display all 6 kinds of data (except hbarc and vbar at level 0) %)
+  %if;(v!=0)
+    <tr>
+    %apply;descendants_at_level("self",0,v,"hbarc","center",icount)
+    </tr>
+  %end;
+  <tr>
+    %apply;descendants_at_level("self",0,v,"person","center",icount)
+  </tr>
+  <tr>
+    %apply;descendants_at_level("self",0,v,"hbars","center",icount)
+  </tr>
+  %if;(e_sp=1)
+    <tr>
+      %apply;descendants_at_level("self",0,v,"spouse","center",icount)
+    </tr>
+  %end;
+  <tr>
+    %apply;descendants_at_level("self",0,v,"vbars","center",icount)
+  </tr>
+%end;
+</table>

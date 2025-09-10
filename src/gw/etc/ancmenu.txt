@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: ancmenu.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %apply;a_of_b%with;
+      [*ancestor/ancestors]1%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  %include;favicon
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+<div class="container ml-xs-2">
+%message_to_wizard;
+%include;perso_header
+<script><!--
+
+function no_options () {
+  /* On décoche toutes les options, only/image_off/cgl */
+  $('input[type=checkbox][name!="only"][name!="image"][name!="cgl"]').prop('checked', false);
+}
+function long_display_options () {
+  /* On décoche toutes les options, sauf celles de l’affichage long et only/image_off/cgl. */
+  $('input[type="checkbox"]:not([id^=ld_])[name!="only"][name!="image"][name!="cgl"]').prop('checked', false);
+  /* On coche celles que l’on veut si aucune de l’affichage long n’est cochée. */
+  if ($('input[type=checkbox]:not(:checked)[id^=ld_]').length === $('input[type=checkbox][id^=ld_]').length) {
+    $('input[type="checkbox"][id=ld_siblings]').prop('checked', true);
+    $('input[type="checkbox"][id=ld_notes]').prop('checked', true);
+    $('input[type="checkbox"][id=ld_src]').prop('checked', true);
+  }
+}
+
+function table_options () {
+  /* On décoche toutes les options, sauf celles du tableau et only/image_off/cgl. */
+  $('input[type="checkbox"]:not([id^=t_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
+  /* On coche celles que l’on veut si aucune du tableau n’est cochée. */
+  if ($('input[type=checkbox]:not(:checked)[id^=t_]').length === $('input[type=checkbox][id^=t_]').length) {
+    $('input[type=checkbox][id=t_num]').prop('checked', true);
+    $('input[type=checkbox][id=t_birth_date]').prop('checked', true);
+    $('input[type=checkbox][id=t_birth_place]').prop('checked', true);
+    $('input[type=checkbox][id=t_marr]').prop('checked', true);
+    $('input[type=checkbox][id=t_marr_date]').prop('checked', true);
+    $('input[type=checkbox][id=t_marr_place]').prop('checked', true);
+    $('input[type=checkbox][id=t_child]').prop('checked', true);
+    $('input[type=checkbox][id=t_death_date]').prop('checked', true);
+    $('input[type=checkbox][id=t_death_place]').prop('checked', true);
+    $('input[type=checkbox][id=t_occu]').prop('checked', true);
+    $('input[type=checkbox][id=t_ns]').prop('checked', true);
+    $('input[type=checkbox][id=t_gen]').prop('checked', true);
+    $('input[type=checkbox][id=t_repeat]').prop('checked', true);
+  }
+}
+function book_of_ascendants_options () {
+  /* On décoche toutes les options, sauf celles du livre ascendant et only/image_off/cgl. */
+  $('input[type=checkbox]:not([id^=boa_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
+  /* On coche celles que l’on veut si aucune du tableau n’est cochée. */
+  if ($('input[type=checkbox]:not(:checked)[id^=boa_]').length === $('input[type=checkbox][id^=boa_]').length) {
+    $('input[type=checkbox][id=boa_parents]').prop('checked', true);
+    $('input[type=checkbox][id=boa_siblings]').prop('checked', true);
+    $('input[type=checkbox][id=boa_marr]').prop('checked', true);
+  }
+}
+function tree_options () {
+  /* On décoche toutes les options, image_off/cgl */
+  $('input[type=checkbox]:not([id^=tree_])[name!="image"][name!="cgl"]').prop("checked", false);
+}
+function missing_ancestors_options () {
+  $('input[type=checkbox]:not([id^=ma_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
+  if ($('input[type=checkbox]:not(:checked)[id^=ma_]').length === $('input[type=checkbox][id^=ma_]').length) {
+    $('input[type=checkbox][id=ma_birth]').prop('checked', true);
+    $('input[type=checkbox][id=ma_death]').prop('checked', true);
+  }
+}
+function missing_events_options () {
+  $('input[type=checkbox]:not([id^=me_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
+  if ($('input[type=checkbox]:not(:checked)[id^=me_]').length === $('input[type=checkbox][id^=me_]').length) {
+    $('input[type=checkbox][id=me_date]').prop('checked', true);
+    $('input[type=checkbox][id=me_gen]').prop('checked', true);
+    $('input[type=checkbox][id=me_repeat]').prop('checked', true);
+    /* On active l’input cachée et désactivée pour les évènements manquants. */
+    $('input[type=hidden][name=evt]').prop('disabled', false);
+  }
+}
+%define;ac(xxx)
+  %cousins_cnt.xxx.0;
+%end;
+--></script>
+<h1 class="text-center">%nn;
+  %apply;a_of_b%with;
+    [*ancestor/ancestors]1%nn;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;
+  %end;
+</h1>
+%define;thegen(xx)
+  [the %s generation:::xx]%nn;
+%end;
+%define;ancname(xx)
+  %if;([cousins.xx.0]!="[cousins.xx.0]")[cousins.xx.0]%end;
+%end;
+<form class="needs-validation" novalidate method="get" action="%action;">
+  <div class="d-flex justify-content-around">
+    %hidden;
+    %if;access_by_key;
+      <input type="hidden" name="p" value="%first_name_key_val;">
+      <input type="hidden" name="n" value="%surname_key_val;">
+      %if;(occ!=0)
+        <input type="hidden" name="oc" value="%occ;">
+      %end;
+    %else;
+      <input type="hidden" name="i" value="%index;">
+    %end;
+    <input type="hidden" name="m" value="A">
+    %( à delete ? <input type="hidden" name="sosab" value="10">%)
+    <div class="d-flex flex-column">
+      <div class="d-flex flex-column">
+        <div class="d-flex flex-column was-validated">
+          <label class="sr-only" for="v">[*specify::generation/generations]0[:]</label>
+          <select class="custom-select " id="v" name="v" required title="[up to] 2^n-2 / [only] 2^(n-1)">
+            <option value="" label=" "></option>
+            %foreach;ancestor_level;
+              %if;(level>0)
+                %empty_sorted_list;
+                %(%anc_paths;%foreach;path_at_level quasi identique !%)
+                %foreach;ancestor;
+                  %apply;add_in_sorted_list(ancestor.birth_date.year)
+                  %apply;add_in_sorted_list(ancestor.death_date.year)
+                %end;
+                %let;levelp;%expr(level+1)%in;
+                %let;number_of_ancestors_max;%expr(2^levelp-2)%in;
+                %let;number_of_ancestors_max_at_level;%expr(2^level)%in;
+                %let;dd;%expr(levelp/10)%in;
+                %let;dd_at_level;%expr(level/10)%in;
+                %let;extra_paths;%expr(anc_paths_cnt_raw.v-anc_paths_cnt.v)%in;
+                %let;extra_paths_at_level;%expr(anc_paths_at_level_cnt_raw.v-anc_paths_at_level_cnt.v)%in;
+                %let;percent;%expr(100*anc_paths_cnt.v|number_of_ancestors_max)%in;
+                %let;percent_paths;%expr(100*anc_paths_cnt_raw.v|number_of_ancestors_max)%in;
+                %let;percent_plus;%expr(100*(anc_paths_cnt.v-anc_paths_at_level_cnt.v)|number_of_ancestors_max)%in;
+                %let;percent_at_level;%expr(100*anc_paths_at_level_cnt.v|number_of_ancestors_max_at_level)%in;
+                %let;percent_paths_at_level;%expr(100*anc_paths_at_level_cnt_raw.v|number_of_ancestors_max_at_level)%in;
+                %let;blue;rgba(210,230,255,.5)%in;%let;lred;rgba(255,210,180,.5)%in;%let;whit;rgba(255,255,255,0)%in;
+                <option value="%level;" title="" class="d-flex px-2"
+                  %if;(level<90)(%!temporary limit if long to render at high v%)
+                    data-lex='%apply;ancname(level)'
+                    data-noa='%anc_paths_cnt.v;'
+                    data-noa_l='%anc_paths_at_level_cnt.v;'
+                    %if;(extra_paths!=0)data-path='+%extra_paths;'%end;%sp;
+                    %if;(extra_paths_at_level!=0)data-path_l='+%extra_paths_at_level;'%end;%sp;
+                    data-sty=' style="background:linear-gradient(90deg,
+                      rgba(155,200,255,.5) %percent_plus;%%,%nn;%(lightblue%)
+                      %blue; %percent_plus;%%,%nn;
+                      %blue; %percent;%%,%nn;
+                      %lred; %percent;%%,%nn;
+                      %lred; %percent_paths;%%,%nn;
+                      %whit; %percent_paths;%%"'
+                    data-sty_l=' style="background: linear-gradient(90deg,
+                      rgba(180,200,220,.5) %percent_at_level;%%,%nn;%(lightgrey%)
+                      %lred; %percent_at_level;%%,%nn;
+                      %lred; %percent_paths_at_level;%%,%nn;
+                      %whit; %percent_paths_at_level;%%"'
+                    %( carefull after level 61, number_of_ancestors_max > ocaml max_int;! %)
+                    data-pp='%nn;
+                      %if;(level<61)/%nn;
+                        %if;(level<14)%number_of_ancestors_max;%else;%expr(number_of_ancestors_max|(10^(3*dd)))%end; %nn;
+                        %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
+                        %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
+                        %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;
+                        %if;(percent!=0) (%percent;
+                          %if;(percent_paths!=percent)-%percent_paths;%end; %%)
+                        %else; (%expr(percent*10)
+                          %if;(percent_paths!=percent)-%expr(percent_paths*10)%end; ‰)
+                        %end;
+                      %end;'
+                    data-pp_l='%nn;
+                      %if;(level<61)/%nn;
+                        %if;(level<17)%number_of_ancestors_max_at_level;
+                        %else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end; %nn;
+                        %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
+                        %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
+                        %elseif;(level>39)T%elseif;(level>29)G%elseif;(level>18)M%elseif;(level>16)k%else;%end;
+                        %if;(percent_at_level!=0) (%percent_at_level;
+                          %if;(percent_paths_at_level!=percent_at_level)-%percent_paths_at_level;%end; %%)%end;
+                      %end;'
+                    data-per='%foreach;sorted_list_item;
+                                %if;(prev_item.1 = "")%item.1;%end;
+                                %if;(next_item.1 = "")-%item.1;%end;
+                              %end;'
+                    %end;>%nn;
+                  %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%if;(level<10) %(todo fix margin%) %end;%nn;
+                </option>
+              %end;
+            %end;
+          </select>
+          <div class="invalid-feedback ml-1">
+            <i class="fas fa-triangle-exclamation mr-1"></i>[*specify::generation/generations]0
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <div class="order-2 align-self-center ml-4">
+            <button type="submit" class="btn btn-outline-primary">Ok</button>
+          </div>
+          <div class="order-1">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="only" name="only">
+              <label class="custom-control-label" for="only">[*only the generation selected]<span class="text-primary ml-1">✱</span></label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="image" name="im" value="0">
+              <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1<span class="text-info ml-1">✘</span></label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="cgl" name="cgl">
+              <label class="custom-control-label" for="cgl">[*cancel GeneWeb links]</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex">
+        <div>
+          <hr>
+          <div class="custom-control custom-radio text-nowrap">
+            <input type="radio" class="custom-control-input" id="tN" name="t" value="N" checked onclick="no_options()">
+            <label class="custom-control-label" for="tN"><i class="fa fa-align-left fa-fw mr-1"></i>[*short display] <span class="text-primary">✱</span></label>
+          </div>
+%( Positionne directement l'affiche du numéro sosa en base 10
+      <div>
+        Sosa base
+  <input type="radio" class="custom-control-input" class="form-control" name="sosab" value="8"%/>8</label>
+  <input type="radio" class="custom-control-input" class="form-control" name="sosab" value="10"%/>10</label>
+  <input type="radio" class="custom-control-input" class="form-control" name="sosab" value="16"%/>16</label>
+      </div>
+%)
+          <div class="custom-control custom-radio text-nowrap">
+            <input type="radio" class="custom-control-input" id="tG" name="t" value="G" onclick="long_display_options()">
+            <label class="custom-control-label" for="tG"><i class="fa fa-align-justify fa-fw mr-1"></i>[*long display] <span class="text-primary">✱</span></label>
+          </div>
+          <div class="ml-4">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="ld_siblings" name="siblings">
+              <label class="custom-control-label" for="ld_siblings">[*siblings]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="ld_rel" name="rel">
+              <label class="custom-control-label" for="ld_rel">[*relation/relations]1</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="ld_notes" name="notes">
+              <label class="custom-control-label" for="ld_notes">[*individual notes]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="ld_src" name="src">
+              <label class="custom-control-label" for="ld_src">[*source/sources]1</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="ld_witn" name="relwitn">
+              <label class="custom-control-label" for="ld_witn">[*witness/witnesses]1<span class="text-muted"> ([marriage/marriages]1)</span></label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="ld_comm" name="comm">
+              <label class="custom-control-label" for="ld_comm">[*comment]<span class="text-muted"> ([marriage/marriages]1)</span></label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="ld_inline" name="inline">
+              <label class="custom-control-label" for="ld_inline">[*display notes and sources inline]</label>
+            </div>
+          </div>
+        </div>
+        <div class="ml-1">
+          <hr>
+          <div class="custom-control custom-radio text-nowrap">
+            <input type="radio" class="custom-control-input" id="tP" name="t" value="P" onclick="book_of_ascendants_options()">
+            <label class="custom-control-label" for="tP"><i class="far fa-address-book fa-fw mr-1"></i>[*book of ascendants] <span class="text-primary">✱</span><span class="text-info">✘</span>%sp;</label>
+          </div>
+          <div class="ml-4">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_sosa" name="sosa">
+              <label class="custom-control-label" for="boa_sosa">[*Sosa]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_note" name="note">
+              <label class="custom-control-label" for="boa_note">[*note/notes]1</label>
+            </div>
+             <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_parents" name="parents">
+              <label class="custom-control-label" for="boa_parents">[*parents]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_siblings" name="siblings">
+              <label class="custom-control-label" for="boa_siblings">[*full siblings]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_relations" name="rel">
+              <label class="custom-control-label" for="boa_relations">[*relation/relations]1</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_marr" name="marr">
+              <label class="custom-control-label" for="boa_marr">[*marriage/marriages]1</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_children" name="children">
+              <label class="custom-control-label" for="boa_children">[*child/children]1</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_comm" name="comm">
+              <label class="custom-control-label" for="boa_comm">[*marriage notes/marriages notes]0</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_asc" name="asc">
+              <label class="custom-control-label" for="boa_asc">[*ascendants tree]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="boa_src" name="src">
+              <label class="custom-control-label" for="boa_src">[*source/sources]1</label>
+            </div>
+          </div>
+        </div>
+        <div  class="ml-1">
+          <hr>
+          <div class="custom-control custom-radio text-nowrap">
+            <input type="radio" class="custom-control-input" id="tY" name="t" value="Y" onclick="no_options()">
+            <label class="custom-control-label" for="tY"><i class="fa fa-table fa-fw mr-1"></i>[*table] [by couple]0 <span class="text-primary">✱</span><span class="text-info">✘</span></label>
+          </div>
+          <div class="custom-control custom-radio text-nowrap">
+            <input type="radio" class="custom-control-input" id="tZ" name="t" value="Z" onclick="table_options()">
+            <label class="custom-control-label" for="tZ"><i class="fa fa-table fa-fw mr-1"></i>[*table] <span class="text-primary">✱</span><span class="text-info">✘</span></label>
+          </div>
+          <div class="ml-1">
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_num" name="num">
+                <label class="custom-control-label" for="t_num">[*n° Sosa]</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_tt" name="tt" value="1">
+                <label class="custom-control-label" for="t_tt">[*title/titles]1</label>
+              </div>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="t_fn" name="fn" value="1">
+              <label class="custom-control-label" for="t_fn">[*visualize/show/hide/summary]1 [first name/first names]1</label>
+            </div>
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_marr" name="marr">
+                <label class="custom-control-label" for="t_marr">[*spouse/spouses]1</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_child" name="child">
+                <label class="custom-control-label" for="t_child">[*number of children]</label>
+              </div>
+            </div>
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_birth_date" name="birth">
+                <label class="custom-control-label" for="t_birth_date" title="[*date of birth]">[*date/dates]0</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_birth_place" name="birth_place">
+                <label class="custom-control-label" for="t_birth_place">[*where born]</label>
+              </div>
+            </div>
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_baptism_date" name="baptism">
+                <label class="custom-control-label" for="t_baptism_date" title="[*date of baptism]">[*date/dates]0</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_baptism_place" name="baptism_place">
+                <label class="custom-control-label" for="t_baptism_place">[*baptism place]</label>
+              </div>
+            </div>
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_marr_date" name="marr_date">
+                <label class="custom-control-label" for="t_marr_date" title="[*date of marriage]">[*date/dates]0</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_marr_place" name="marr_place">
+                <label class="custom-control-label" for="t_marr_place">[*where married]</label>
+              </div>
+            </div>
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_death_date" name="death">
+                <label class="custom-control-label" for="t_death_date" title="[*date of death]">[*date/dates]0</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_death_place" name="death_place">
+                <label class="custom-control-label" for="t_death_place">[*where dead]</label>
+              </div>
+            </div>
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_burial_date" name="burial">
+                <label class="custom-control-label" for="t_burial_date" title="[*date of burial]">[*date/dates]0</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_burial_place" name="burial_place">
+                <label class="custom-control-label" for="t_burial_place">[*burial place]</label>
+              </div>
+            </div>
+            <div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_age" name="age">
+                <label class="custom-control-label" for="t_age" title="[*age] [or] [age at death]">[*age]</label>
+              </div>
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input type="checkbox" class="custom-control-input" id="t_occu" name="occu">
+                <label class="custom-control-label" for="t_occu">[*occupation/occupations]1</label>
+              </div>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="t_ns" name="ns" value="1">
+              <label class="custom-control-label" for="t_ns">[*see descendants notes/sources]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="t_gen" name="gen" value="1">
+              <label class="custom-control-label" for="t_gen">[*display generation]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="t_hl" name="hl" value="1">
+              <label class="custom-control-label" for="t_hl">[*highlight gaps/hide highlighting]0</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="t_repeat" name="repeat">
+              <label class="custom-control-label" for="t_repeat">[*display smallest sosa number relative to ancestor]</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <div class="col-auto order-2 p-0 ml-2">
+       %( <input type="radio" class="custom-control-input" name="t1" value="x" onclick="no_options()"><i class="fa fa-person fa-fw mr-1"></i>[*male line/female line]0
+      <input type="radio" class="custom-control-input" name="t1" value="m" onclick="no_options()"><i class="fa fa-person fa-fw mr-1"></span>[*male line/female line]0 %)
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tA" name="t" value="A" onclick="tree_options()">
+        <label class="custom-control-label" for="tA"><i class="fa fa-person fa-fw mr-1"></i>[*male line/female line]0 <span class="text-info">✘</span></label>
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tC" name="t" value="C" onclick="tree_options()">
+        <label class="custom-control-label" for="tC"><i class="fa fa-person-dress fa-fw mr-1"></i>[*male line/female line]1 <span class="text-info">✘</span></label>
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tT" name="t" value="T" onclick="tree_options()">
+        <label class="custom-control-label" for="tT"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>[*ascendants tree] <span class="text-info">✘</span>%nn;
+          <div class="text-muted ml-4">%nn;
+            %if;(bvar.max_anc_tree="" and max_anc_level>=7)
+              ([maximum] 7 [generation/generations]1)
+            %elseif;(bvar.max_anc_tree!="" and max_anc_level>=bvar.max_anc_tree)
+              ([maximum] %bvar.max_anc_tree; [generation/generations]1)
+            %end;
+          </div>%nn;
+        </label>
+      </div>
+      <div class="ml-4">
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="tree_marriage" name="ma" value="0">
+          <label class="custom-control-label" for="tree_marriage">[*visualize/show/hide/summary]2 [marriage date]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="tree_dag" name="dag">
+          <label class="custom-control-label" for="tree_dag">[*dag]<i class="fa fa-shuffle fa-fw ml-1"></i></label>
+        </div>
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tH" name="t" value="H" onclick="tree_options()">
+        <label class="custom-control-label" for="tH"><i class="fa fa-code-branch  fa-rotate-90 fa-fw mr-1"></i>[*horizontal tree] <span class="text-info">✘</span>%nn;
+          <div class="text-muted ml-4">%nn;
+            %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
+              ([maximum] 8 [generation/generations]1)
+            %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
+              <br>([maximum] %bvar.max_anc_level; [generation/generations]1)
+            %end;
+          </div>
+        </label>
+      </div>
+     %( <input name="bd" size="1" maxlength="2" value="0"%/>
+        <label>[*border]</label>
+        <table style="border-width:%border;;border-spacing:0;">
+          <tr>
+            <td class="text-%left;">[*color]</td>
+            <td class="text-%left;">
+              <input type="radio" class="custom-control-input" name="color" value="" checked%/>
+            </td>
+            <td class="bg1">
+              <input type="radio" class="custom-control-input" name="color" value="bg1"%/>
+            </td>
+            <td class="bg2">
+              <input type="radio" class="custom-control-input" name="color" value="bg2"%/>
+            </td>
+            <td class="bg3">
+              <input type="radio" class="custom-control-input" name="color" value="bg3"%/>
+            </td>
+            <td class="bg4">
+              <input type="radio" class="custom-control-input" name="color" value="bg4"%/>
+            </td>
+            <td class="bg5">
+              <input type="radio" class="custom-control-input" name="color" value="bg5"%/>
+            </td>
+            <td class="bg6">
+              <input type="radio" class="custom-control-input" name="color" value="bg6"%/>
+            </td>
+          </tr>
+        </table>%)
+      <hr>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tL" name="t" value="L" onclick="no_options()">
+        <label class="custom-control-label" for="tL"><i class="fa fa-share-nodes fa-fw mr-1"></i>[*list/list (ancestors)]1%sp;
+          <span class="text-muted">%nn;
+            %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
+              ([maximum] 8 [generation/generations]1)
+            %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
+              ([maximum] %bvar.max_anc_level; [generation/generations]1)
+            %end;
+          </span>
+        </label>
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tE" name="t" value="E" onclick="no_options()">
+        <label class="custom-control-label" for="tE"><i class="fa fa-table fa-fw mr-1"></i>[*list eclair]</label>
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tF" name="t" value="F" onclick="no_options()">
+        <label class="custom-control-label" for="tF"><i class="fa fa-table fa-fw mr-1"></i>[*surnames branch]</label>
+      </div>
+      <hr>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tM" name="t" value="M" onclick="missing_ancestors_options()">
+        <label class="custom-control-label" for="tM"><i class="fa fa-question fa-fw mr-1"></i>[*missing ancestors] <span class="text-primary">✱</span></label>
+      </div>
+      <div class="ml-4">
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="ma_birth" name="birth">
+          <label class="custom-control-label" for="ma_birth">[*birth date and birth place]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="ma_death" name="death">
+          <label class="custom-control-label" for="ma_death">[*death date and death place]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="ma_spouse" name="spouse">
+          <label class="custom-control-label" for="ma_spouse">[*spouse/spouses]1</label>
+        </div>
+       %( [*living from/to]0 %sp;
+          <input type="text" name="after" size="4" maxlength="4" value=""%/>
+          [living from/to]1 %sp;
+          <input type="text" name="before" size="4" maxlength="4" value=""%/>%)
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="tMevt" name="t" value="M" onclick="missing_events_options()">
+        <label class="custom-control-label" for="tMevt"><i class="fa fa-question fa-fw mr-1"></i>[*missing events] <span class="text-primary">✱</span></label>
+      </div>
+      <input type="hidden" name="evt" value="on" disabled>
+      <div class="ml-4">
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="me_marr" name="marr">
+          <label class="custom-control-label" for="me_marr">[*compute all marriages]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="me_date" name="date">
+          <label class="custom-control-label" for="me_date">[*compute approximatives dates]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="me_gen" name="gen">
+          <label class="custom-control-label" for="me_gen">[*display generation]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="me_repeat" name="repeat">
+          <label class="custom-control-label" for="me_repeat">[*display smallest sosa number relative to ancestor]</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+%let;redlight2;rgb(255,136,46)%in;
+<script>
+$(document).ready(function() {
+  $("#v").select2({
+    templateResult: function(el) { return '<div' + (($('#only').is(':checked')) ? ($(el.element).data('sty_l') || '') : ($(el.element).data('sty') || '')) + '" class="d-flex justify-content-around text-right ' + ($(el.element).prop('class') || '') + '"><span class="onlycheck pl-2 text-right" title="' + ($(el.element).data('lex') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</span><span class="ml-2 text-nowrap">' + ($(el.element).data('per') || '') + '</span>' + (($('#only').is(':checked')) ? ('') : ('<div class="col-3 ml-auto text-right">+' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span></div>')) + '<span class="col-3 text-right" title="'+ (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + ($(el.element).data('path_l') || '') + ($(el.element).data('pp_l') || '')) : (($(el.element).data('noa') || '') + ($(el.element).data('path') || '') + ($(el.element).data('pp') || ''))) + '">' + (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '')) : (($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || ''))) + '</span></span></div>'; },
+    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span class="ml-auto noa"> ' + (($('#only').is(':checked')) ? ('(' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span>)') : ('(' + ($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || '') + '</span>)')) + '</span><span class=" d-none noa_l"> ' + (($('#only').is(':checked')) ? ('(' + ($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || '') + '</span>)') : ('(' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span>)')) + '</span>'; },
+    escapeMarkup: function(markup) { return markup; },
+    width: "resolve",
+    allowClear: false,
+    placeholder: "… [specify::generation/generations]0 (max %max_anc_level;)",
+    theme: "classic"
+  }).maximizeSelect2Height();
+});
+  $("body").on('change', '#only', function() {
+   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]"), $('.noa').addClass("d-none"), $('.noa_l').removeClass("d-none"))
+                               : ($('.onlycheck').text("[up to]"), $('.noa').removeClass("d-none"), $('.noa_l').addClass("d-none"))
+  });
+</script>
+<script>
+(function () {
+  'use strict';
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation');
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+});
+</script>
+</body>
+</html>

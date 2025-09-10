@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: list.txt v7.1 23/07/2024 00:28:00 $ -->
+  <title>%nn;
+    [*list/list (ancestors)] [of] [person/persons]0%if;(e.surn!="") [by] [surname/surnames]0%end; [by] [place/places]0%nn;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%include;home
+%message_to_wizard;
+<div class="container%if;(e.wide="on")-fluid%end;">
+%include;perso_utils
+%define;get_ip(n)
+  %e.in;
+%end;
+%define;get_var(vv, i)
+  %evar_cur.vv.i;
+%end;
+%define;get_pl(i)
+  %e.pi;
+%end;
+%define;get_sub(nn,ss)
+  %substr_start.nn.ss;
+%end;
+%( %qvar.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)
+%define;get_marriage(myindex)
+  %qvar.myindex.marriage_places;
+%end;
+%define;get_value(myindex,param)
+  %if;("param"="father" or "param"="mother")
+    %if;(qvar.myindex.has_parents)
+      %qvar.myindex.param;
+    %end;
+  %else;
+    %qvar.myindex.param;
+  %end;
+%end;
+%if;(e.data="place")
+  <h1>[*list/list (ancestors)] [of] [person/persons]1%if;(e.surn!="") [by] [surname/surnames]0%end; [by] [place/places]0</h1>
+%else;
+  <h1>[*list/list (ancestors)] [of] [person/persons]1</h1>
+%end;
+<div class="btn-toolbar mt-3 ml-3" role="toolbar" aria-label="Toolbar for list of individuals">
+  <a role="button" href="%if;(e.dates!=0)%url_set.dates.0;%else;%url_set.dates;%end;"
+    class="btn-link%if;(e.dates!=0) text-muted%end;"
+    title="%if;(e.dates!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date/dates]1">
+    <i class="fa fa-calendar-days fa-fw fa-lg mr-1"></i>[*date/dates]1
+  </a>
+  <a role="button" href="%if;(e.parents!=0)%url_set.parents.0;%else;%url_set.parents;%end;"
+    title="%if;(e.parents!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [parents]"
+    class="btn-link ml-3%if;(e.parents!=0) text-muted%end;">
+    <i class="fa-solid fa-user-group fa-fa fa-lg mr-1"></i>[*parents]
+    </a>
+  %if;(e.nb!=1)
+    <a role="button" href="%if;(e.datesort!=1)%url_set.datesort.1;%else;%url_set.datesort;%end;" class="btn-link ml-3">
+      <i class="fa fa-arrow-down-%if;(e.datesort=1)a-z%else;1-9%end; fa-fw fa-lg mr-1"></i>%nn;
+      [*sort by/branch/alphabetic order]0
+      %if;(e.datesort=1)[sort by/date begin/alphabetic order/nb individuals/nb events]2%nn;
+      %else;[date/dates]1%end;%nn;
+    </a>
+  %end;
+</div>
+
+%let;opt;%nn;
+  %if;(e.data="place")
+  %if;(e.bi="on")&bi=on%end;%nn;
+  %if;(e.ba="on")&bp=on%end;%nn;
+  %if;(e.ma="on")&ma=on%end;%nn;
+  %if;(e.de="on")&de=on%end;%nn;
+  %if;(e.bu="on")&bu=on%end;%nn;
+  %if;(e.long="on")&long=on%end;%nn;
+  %if;(e.f_sort="on")&f_sort=on%end;
+  %end;
+  %in;
+%let;k;%if;(e.k!="")%e.k;%end;%in;
+%define;book_of(xx)[*book of %s:::xx]%end;
+%define;evt(vv,tt,ii)
+  %if;("vv"!="bi"), %end;%if;(e.vv!="on")<s>%else;<span>%end;tt ii%if;(e.vv!="on")</s>%else;</span>%end;%nn;
+%end;
+<div class="mt-3">%if;(e.surn!="")[*surname/surnames]0[:] <span class="text-primary">%e.surn;</span>.%end;
+  %if;(e.data="place")
+    [*event/events]1[:]
+    %apply;evt("bi",[birth],"N")
+    %apply;evt("ba",[baptism],"B")
+    %apply;evt("ma",[marriage event],"M")
+    %apply;evt("de",[death],"D")
+    %apply;evt("bu",[burial],"S").
+  %end;
+</div>
+
+%define;nbmds(xx,yy,tt,kk)
+  %if;(xx!="" and xx="kk")yy%nn;
+  %else;%if;("tt"=1)&nbsp;%end;
+  %end;
+%end;
+
+%define;nbmds_m(xx,yy,tt,kk)
+  %if;(xx!="" and ("kk" is_substr xx or xx="kk"))yy%nn;
+  %else;%if;("tt"=1)&nbsp;%end;
+  %end;
+%end;
+
+%define;tags(xx,tt,ss)
+  %let;myindex;xx%in;
+  %let;birthplace;%apply;get_value(myindex, "birth_place_raw")%in;
+  %let;baptismplace;%apply;get_value(myindex, "baptism_place_raw")%in;
+  %let;marriageplace;%apply;get_marriage(myindex)%in;
+  %let;deathplace;%apply;get_value(myindex, "death_place_raw")%in;
+  %let;burialplace;%apply;get_value(myindex, "burial_place_raw")%in;
+  %apply;nbmds("birthplace","N","tt","ss")%nn;
+  %apply;nbmds("baptismplace","B","tt","ss")%nn;
+  %apply;nbmds_m("marriageplace","M","tt","ss")%nn;
+  %apply;nbmds("deathplace","D","tt","ss")%nn;
+  %apply;nbmds("burialplace","S","tt","ss")%nn;
+%end;
+
+%empty_sorted_list
+%if;(e.nb!="")
+%for;i;0;e.nb;
+  %let;myindex;%apply;get_ip(i)%in;
+  %let;first_name;%apply;get_value(myindex, "first_name")%in;
+  %let;surname;%apply;get_value(myindex, "surname")%in;
+  %let;occ;%apply;get_value(myindex, "occ")%in;
+  %(TODO: would we want to sort by event dates? it was "dates_sort" before %)
+  %let;dates;%apply;get_value(myindex, "dates")%in;
+  %let;s;%apply;get_var("p",i)%in;
+  %let;so;%if;(s="")%k;%else;%s;%end;%in;
+  %apply;add_in_sorted_list%with;
+    %so;%and;
+    %if;(e.datesort=1)%dates;%else;%if;(e.surn="")%surname;%end;%first_name;%occ;%end;%and;
+    %myindex;%and;
+    %i;%and;
+  %end;
+%end;
+%end;
+
+<div class="mt-2">
+  %foreach;sorted_list_item;
+    %let;sub;%apply;get_sub(5, item.1)%in; %( was item.2 %)
+    %if;(item.1!=prev_item.1 or prev_item.1="")
+      <div class="mb-2">
+        %if;wizard;
+          <a href="%prefix;m=MOD_DATA&data=%e.data;&s=%sub;#%item.1;"
+            title="%apply;book_of(e.data)[:] [modify::] “%item.1;”">
+            <i class="fa fa-wand-magic-sparkles fa-fw ml-2"></i>
+          </a>
+        %end;
+        %if;(k!="" and e.data="place")<a href="%prefix;m=PPS&k=%item.1;%opt;" title="[place/places]0/[surname/surnames]0">%nn;
+          %item.1;</a>%end; (%e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;,
+          %if;(e.datesort=1)[date/dates]1%else;[sort by/branch/alphabetic order]2%end;)
+      </div>
+    %end;
+    <div class="ml-4">
+      %let;myindex;%item.3;%in;
+      %let;so;%item.1;%in;
+      %let;access;%apply;get_value(myindex, "access")%in;
+      %let;sex;%apply;get_value(myindex, "sex")%in;
+      <span class="text-monospace mr-2">%apply;tags(myindex,"1", item.1)</span>%nn;
+      <a href="%prefix;%access;">%nn;
+      %apply;get_value(myindex, "first_name")%sp;
+      %apply;get_value(myindex, "surname")%nn;
+      %( Occurence number is hidden of those lists at the moment
+      %let;occ;%apply;get_value(myindex, "occ")%in;%nn;
+      %if;(occ!="0")%sp;%[%occ;%]%end;%)</a>%nn;
+      %if;(e.dates!=0)
+        <a href="%prefix;m=MOD_IND&i=%myindex;">%apply;get_value(myindex, "dates")</a>%nn;
+      %end;
+      %if;(e.parents!=0)
+        %let;fa;%apply;get_value(myindex, "father")%in;
+        %let;mo;%apply;get_value(myindex, "mother")%in;
+        %if;(fa!="" or mo!=""), %sp;
+          %let;fa;%if;(fa="")?%else;%fa;%end;%in;
+          %let;mo;%if;(mo="")?%else;%mo;%end;%in;
+          %apply;a_of_b%with;
+            %if;(sex=0)[son/daughter/child]0
+            %elseif;(sex=1)[son/daughter/child]1
+            %else;[son/daughter/child]2%end;
+          %and;%fa; [and] %mo;
+          %end;
+        %end;
+      %end;
+    </div>
+  %end;
+</div>
+%let;max_rlm_nbr;%if;(e.max_rlm_nbr!="")%e.max_rlm_nbr;%elseif;(b.max_rlm_nbr!="")%b.max_rlm_nbr;%else;80%end;%in;
+
+%( RLM commence à i1 et non i0 on décale i(0) en i(nb), à défaut on pourrait aussi tout décaller à i+1 %)
+<div class="ml-2 mt-2">
+  %if;(e.nb!="")
+    %if;(e.nb=1)
+    %elseif;(e.nb>1 and e.nb<max_rlm_nbr)
+      <a role="button" title="Try RLM graph to link all individuals (probably fails if not same list by surname by place)"
+        href="%prefix&m=RLM%nn;
+        %foreach;env_binding;%nn;
+          %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
+           and env.key!="k"
+           and env.key!="bi" and env.key!="ba" and env.key!="ma" and env.key!="de" and env.key!="bu"
+           and env.key!="surn" and env.key!="datesort" and env.key!="i0")&%env.key;=%env.val;%nn;
+          %elseif;(env.key="i0")&i%e.nb;=%env.val;%end;%nn;
+          %end;%nn;
+          %( TODO: fix 3rd var : get_var("p",i) for “complex” places %)
+          %for;i;0;e.nb;
+            %if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%and;%apply;get_var("p",i)%end;
+            %else;&t%expr(e.nb)=%apply;tags%with;%apply;get_ip(0)%and;%and;%apply;get_var("p",i)%end;%end;%end;">
+        <i class="fa fa-bezier-curve mr-2"></i>[*multi relations graph]
+      </a>
+    %else;
+      %e.nb; [person/persons]1[:] [RLM graph impracticable] (max %max_rlm_nbr;)
+    %end;
+  %end;
+</div>
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

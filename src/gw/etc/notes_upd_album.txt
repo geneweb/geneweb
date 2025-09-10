@@ -1,0 +1,720 @@
+<!-- $Id: notes_upd_album.txt v7.1 06/06/2024 08:50:55 $ -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Éditeur d’image cliquable%( TODO: TRANSLATE ME%)</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%image_prefix;favicon_gwd.png">
+  %include;css
+  %if;(b.use_cdn="yes")
+    <link href="https://cdn.datatables.net/v/bs4/dt-2.0.8/datatables.min.css" rel="stylesheet"
+      integrity="sha256-y6SU6t0GR4VzzjinJPC44iKqr2VS/1LiXoNEcUinUso=
+                 sha384-XmEVd94K0LclM0kOoFTUlVfM2pSAwkB1jB4KCcdgPVnVmVg6t06qrCtY0xp22AGz
+                 sha512-/MMf3DMoygI189tqtdyvU1/gJNu4z4dDPX5c4mDz7xcMBTsoPYAvtz4RQvSOF8Gjs6hj0FeKuo1oa0vfdmWnaw=="
+      crossorigin="anonymous" referrerpolicy="no-referrer">
+  %else;
+    <link rel="stylesheet" href="%etc_prefix;css/datatables.min.css?version=2.0.8">
+  %end;
+  <style>
+    .in { background-color: #FFA500 !important; }
+    #selection { border: 2px solid white; background: #1B94E0; opacity: 0.4; filter: alpha(opacity=40); display: none; }
+    .list_comma, .list_comma li { display: inline; }
+    .list_comma li:not(:last-child):after { content: ", "; }
+    .list_comma li:last-child:after { content: "."; }
+    input:invalid { box-shadow: 0 0 1.5px 1px red; }
+    #image { cursor: crosshair; }
+    .type { width: 10em; }
+    input[type=number] { width: 4em; }
+    table.dataTable td { vertical-align: middle; }
+    table.dataTable th { padding-left: 6px; padding-right: 0 }
+  </style>
+  %include;hed
+</head>
+<body%body_prop;>
+<div class="container">
+%include;home
+
+<h1 class="mt-1 ml-2">Éditeur d’image réactives%( TODO: TRANSLATE ME%)</h1>
+
+<div id="fd_error"></div>
+
+<form id="form" class="mt-2" method="post" action="%action;">
+
+  <div class="form-row">
+    <label for="page_title" class="col-form-label col-sm-2">[*title/titles]0</label>
+    <input type="text" class="form-control col-sm" id="page_title">
+  </div>
+  <div class="form-row mt-2">
+    <label for="page_desc" class="col-form-label col-sm-2">Description</label>
+    <textarea class="form-control col-sm" id="page_desc" rows="1"></textarea>
+  </div>
+  <fieldset class="form-group mb-0  mt-2">
+    <div class="form-row">
+      <legend class="col-form-label col-sm-2 pt-2">Chemin</legend>
+      <div class="form-check form-check-inline col-sm pl-2 pr-0">
+        <div class="custom-control custom-radio custom-control-inline">
+          <input id="doc" class="custom-control-input" type="radio" name="path" value="doc" checked>
+          <label for="doc" class="custom-control-label" title="m=DOC&s=…">DOC</label>
+        </div>
+        <div class="custom-control custom-radio custom-control-inline">
+          <input id="public" class="custom-control-input" type="radio" name="path" value="public">
+          <label for="public" class="custom-control-label"
+            title="gallery_path=%b.gallery_path;">[*iftitles/public/private]1</label>
+        </div>
+        <div class="custom-control custom-radio custom-control-inline">
+          <input id="private" class="custom-control-input" type="radio" name="path" value="private">
+          <label for="private" class="custom-control-label"
+            title="gallery_path_private=%b.gallery_path_private;">[*iftitles/public/private]2</label>
+        </div>
+        <div class="custom-control custom-radio custom-control-inline">
+          <input id="other" class="custom-control-input" type="radio" name="path" value="other">
+          <label for="other" class="custom-control-label">Autre</label>
+        </div>
+        <input id="path" type="text" class="form-control flex-fill" placeholder="Autre chemin" disabled>
+      </div>
+    </div>
+  </fieldset>
+  <div class="form-row mt-2">
+    <label for="fname" class="col-form-label col-sm-2">[*file]</label>
+    <div class="d-flex col-sm px-0">
+      <input id="fname" type="text" class="form-control flex-fill">
+      %if(bvar.face_detection = "on")
+      <button id="face_detection" class="btn btn-primary ml-2 text-nowrap " disabled>Détection visages</button>
+      %end;
+    </div>
+  </div>
+
+  <div class="my-2 ml-2 mr-4">
+    <div class="d-flex justify-content-center">
+      <div class="p-2 bd-highlight"><a id="first" href="#" onclick="loadFirstImage(); return false;"><i class="fa-solid fa-backward"></i></a></div>
+      <div class="p-2 bd-highlight"><a id="previous" href="#" onclick="loadPreviousImage(); return false;"><i class="fa-solid fa-caret-left"></i></a> </div>
+      <div class="p-2 bd-highlight"><a id="current"></a> / <a id="imageCount"></a></div>
+      <div class="p-2 bd-highlight"><a id="next" href="#" onclick="loadNextImage(); return false;"><i class="fa-solid fa-caret-right"></i></a></div>
+      <div class="p-2 bd-highlight"><a id="last" href="#" onclick="loadLastImage(); return false;"><i class="fa-solid fa-forward"></i></a></div>
+      <div class="p-2 bd-highlight"><a id="remove_image" href="#" onclick="removeCurrentImage(); return false;"><i class="fa-solid fa-trash-can"></i></a></div>
+      <div class="p-2 bd-highlight"><a id="add_image" href="#" onclick="addImage(); return false;"><i class="fa-solid fa-plus"></i></a></div>
+    </div>
+    <div id="frame" style="width: fit-content;" onmousedown="return false">
+      <map id="map" name="map"></map>
+      <img id="image" usemap="#map">
+      <div id="selection" class="m-0 p-0"></div>
+      <div id="groups" class="m-0 p-0"></div>
+    </div>
+    <ul id="div_legend" class="list_comma list-unstyled pl-0"></ul>
+    <div class="table-responsive-md">
+      <table id="map_table" class="table table-sm w-auto">
+        <thead><tr>
+          <th id="type">Type</th>
+          <th>[*first name/first names]0</th>
+          <th>[*surname/surnames]0</th>
+          <th>#</th>
+          <th>[*group/groups]0</th>
+          <th>[*note/notes]0</th>
+          <th>URL</th>
+          <th>[*comment]</th>
+          <th><i class="fa fa-trash-can mx-1"></i></th>
+        </tr></thead>
+      </table>
+    </div>
+  </div>
+
+  %hidden;
+  <input type="hidden" name="m" value="MOD_NOTES_OK">
+  <input type="hidden" name="f" value="%e.f;">
+  <input type="hidden" name="skip_ok" value="on">
+  <input id="digest" type="hidden" name="digest">
+  <input id="notes" type="hidden" name="notes">
+  <div class="ml-4">
+    <button type="submit" form="form" class="btn btn-primary" title="[*validate/delete]0">OK</button>
+    <a class="btn btn-outline-primary" href="%url_set.notmpl.on;">[*modify] [note/notes]0</a>
+  </div>
+</form>
+
+</div>
+%include;trl
+%include;copyr
+
+</div>
+%include;js
+%query_time;
+%if;(b.use_cdn="yes")
+  <script src="https://cdn.datatables.net/v/bs4/dt-2.0.8/datatables.min.js"
+  integrity="sha256-L8giEO/bNvvREMEyML6g5LLiwxHGT5FJ7aOmmVivU/k=
+             sha384-f4F8uiQ2tF8dSztvc3FlhuLLLszAYYPsFS5JXR2OyfX0mnZotJH1o5PIbC3q5PNy
+             sha512-UJy2UCxUNbuXbEYnIG5IqWyzlgMZSx4+fk4twICYpc+otPn1bq6549abP7wNTvM9OGEO2K9Vb+e4nQD03J1Prg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+%else;
+  <script src="%etc_prefix;js/datatables.min.js?version=2.0.8"></script>
+%end;
+<script src="%etc_prefix;js/jquery.maphilight.js"></script>
+
+
+
+<script>
+  function get( v ) {
+  if( typeof v !== "undefined" ) {
+    return v
+  } else {
+    return ""
+  }
+}
+
+function onOpenCvReady() {
+  $("#face_detection").prop("disabled",false);
+}
+
+var doc_path = "%prefix;m=DOC&s=";
+var public_path = "%b.gallery_path;";
+var private_path = "%b.gallery_path_private;";
+var mouseIsNotOverLegend = true;
+
+var table;
+
+// Selection
+var x1, y1, x2, y2;
+var selection = false;
+var gMOUSEUP = false;
+var gMOUSEDOWN = false;
+$(document).mouseup( function() {
+  gMOUSEUP = true;
+  gMOUSEDOWN = false;
+});
+
+$(document).mousedown( function() {
+  gMOUSEUP = false;
+  gMOUSEDOWN = true;
+});
+
+var global_cnt = 0;
+
+var current=0;
+var imagesCount=0;
+var json;
+
+function add_new_row( x1, y1, x2, y2 ) {
+  if( x2-x1 > 5 && y2-y1 > 5 ) {
+    var cnt = ++global_cnt;
+    var coords = "" + x1 + "," + y1 + "," + x2 + "," + y2;
+    var new_row = table.row.add( {
+      "shape": "rect",
+      "coords": coords
+    }).draw(false);
+    $("#map").append( "<area id='area" + cnt + "' shape='rect' coords='" + coords + "' alt='" + cnt + "' title='" + cnt + "'>" );
+    $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
+    new_row.node().id = "row" + cnt;
+  }
+}
+
+function displayLinks() {
+
+  $("#current").text(current + 1);
+  $("#imageCount").text(imagesCount);
+}
+
+function loadFirstImage() {
+  current = 0;
+  displayLinks();
+  loadCurrentImage();
+}
+
+function loadLastImage() {
+  current = imagesCount - 1;
+  displayLinks();
+  loadCurrentImage();
+}
+
+function loadNextImage() {
+  if(current < imagesCount - 1) {
+    saveCurrentImageToJson();
+    current = current + 1;
+    displayLinks();
+    loadCurrentImage();
+  }
+}
+
+function loadPreviousImage() {
+  if(current > 0) {
+    saveCurrentImageToJson();
+    current = current - 1;
+    displayLinks();
+    loadCurrentImage();
+  }
+}
+
+function addImage() {
+  json.images.push({img: "", map: []});
+  imagesCount = json.images.length;
+  current = json.images.length - 1;
+  displayLinks();
+  loadCurrentImage();
+}
+
+function removeCurrentImage() {
+  if(imagesCount > 1) {
+    json.images.splice(current, 1);
+    imagesCount = json.images.length;
+    if(current >= json.images.length) { current = json.images.length - 1; }
+    displayLinks();
+    loadCurrentImage();
+  }
+}
+
+function initializeTable() {
+  table = $("#map_table").DataTable( {
+    "data": json.images[current].map,
+    "deferRender": true,
+    "columns": %[
+       {
+         "data": "t",
+         "defaultContent": "p",
+         "render": function ( data, type, row, meta ) {
+           var s1 = "", s2 = "", s3 = "", s4 = "";
+           if( data == "m" ) {
+             s2 = " selected";
+           } else if( data == "g" ) {
+             s3 = " selected";
+           } else if( data == "e" ) {
+             s4 = " selected";
+           } else {
+             s1 = " selected";
+           }
+           return( "<select class='form-control update type' row='" + meta.row + "'>" +
+                   "<option value='p'" + s1 + ">[*person/persons]0</option>" +
+                   "<option value='m'" + s2 + ">[*note/notes]0</option>" +
+                   "<option value='g'" + s3 + " title='%prefix; + href'>GeneWeb</option>" +
+                   "<option value='e'" + s4 + " title='href'>Autre</option>" +
+                   "</select>");
+         }
+       },
+       {
+         "data": "fn",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           var disabled = "";
+           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
+           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
+         }
+       },
+       {
+         "data": "sn",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           var disabled = "";
+           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
+           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
+         }
+       },
+       {
+         "data": "oc",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           var disabled = "";
+           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
+           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' max='200' step='1'" + disabled + ">";
+         }
+       },
+       {
+         "data": "group",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           var disabled = "";
+           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
+           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' step='1'" + disabled + ">";
+         }
+       },
+       {
+         "data": "misc",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           var disabled = "";
+           if( row.t != "m" ) { disabled = " disabled"; }
+           return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
+         }
+       },
+       {
+         "data": "href",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           var disabled = "";
+           var placeholder = "";
+           if( row.t != "e" && row.t != "g" ) { disabled = " disabled"; }
+           if( row.t == "e" ) { placeholder = " placeholder='https://…'"; }
+           if( row.t == "g" ) { placeholder = " placeholder='m=…'"; }
+           return "<input class='form-control update' type='text' value='" + get(data) + "'" + placeholder + disabled + ">";
+         }
+       },
+       {
+         "data": "alt",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           return "<input class='form-control update' type='text' value='" + get(data) + "'>";
+         }
+       },
+       { "data": null, "defaultContent": '<a class="fa fa-trash-can text-danger mx-1 remove" title="[*delete]"></a>' }
+     %],
+     "rowCallback": function( row, r ) {
+       var cnt = row.id.replace(/[a-z]/g, "");
+       var txt = get(r.alt);
+       if( get(r.t) == "" || r.t == "p" ) {
+         if( txt != "" ) { txt = " (" + txt + ")"; }
+         txt = get(r.fn) + (r.fn == "" ? "" : " ") + get(r.sn) + txt;
+         if( get(r.fn) != "" && get(r.sn) != "" ) {
+           var oc = get(r.oc);
+           var oc2;
+           if( oc != "" && oc != 0 ) { oc2 = "/" + oc ; oc = "&oc=" + oc; } else { oc2 = "" ; oc = "" }
+           $("#a"+cnt).html( "<span>" + cnt + " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + txt + "</a></span>" );
+           r.gw = "[" + "[" + r.fn + "/" + r.sn + oc2 + "]" + "]";
+         } else {
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( "<span>" + cnt + txt + "</span>" );
+           delete r.gw;
+         }
+       } else if ( r.t == "m" ) {
+         if( get(r.misc) != "" ) {
+           $("#a"+cnt).html( "<pan>" + cnt + " <a href='%prefix;&m=NOTES&f=" + r.misc + "' target='_blank'>" + txt + "</a></span>" );
+           r.gw = "[" + "[" + "[" + r.misc + "]" + "]" + "]";
+         } else {
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( cnt + txt );
+           delete r.gw;
+         }
+       } else if ( r.t == "g" ) {
+         if( get(r.href) != "" ) {
+           $("#a"+cnt).html( "<span>" + cnt + " <a href='%prefix;" + r.href + "' target='_blank'>" + txt + "</a></span>" );
+         } else {
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( cnt + txt );
+         }
+         delete r.gw;
+       } else if ( r.t == "e" ) {
+         if( get(r.href) != "" ) {
+           $("#a"+cnt).html( "<span>" + cnt + " <a href='" + r.href + "' target='_blank'>" + txt + "</a></span>" );
+         } else {
+           if( txt != "" ) { txt = " " + txt; }
+           $("#a"+cnt).html( "<span>" + cnt + txt + "</span>" );
+         }
+         delete r.gw;
+       }
+     },
+     "paging": false,
+     "ordering": false,
+     "searching": false,
+     "info": false,
+     "scrollY": "25vh",
+     "scrollCollapse": true,
+     "language": {
+       "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/[
+af: Afrikaans
+bg: Bulgarian
+br: FIXME
+ca: Catalan
+co: FIXME
+cs: Czech
+da: Danish
+de: German
+en: English
+eo: FIXME
+es: Spaicsh
+et: Estonian
+fi: Finnish
+fr: French
+he: Hebrew
+is: Icelandic
+it: Italian
+lv: Latvian
+nl: Dutch
+no: Norwegian-Nynorsk
+oc: FIXME
+pl: Polish
+pt: Portuguese
+pt-br: Portuguese-Brasil
+ro: Romanian
+ru: Russian
+sk: Slovak
+sl: Slovenian
+sv: Swedish
+zh: Chinese
+].json"
+     },
+    "initComplete": function(settings,j) {
+      initComplete();
+    }
+  });
+}
+
+function initComplete() {
+  if( json.path == "doc" ) {
+    $("#doc").prop( "checked", true );
+  } else if( json.path == "private" ) {
+    $("#private").prop( "checked", true );
+  } else if( json.path == "public" ) {
+    $("#public").prop( "checked", true );
+  } else {
+    $("#other").prop( "checked", true );
+    $("#path")
+    .val( json.path )
+    .prop( "disabled", false );
+  }
+  $("#fname").val( json.images[current].img ).change();
+
+  // Init map and legend from JSON
+  json.images[current].map.forEach( function( r ) {
+    var cnt = ++global_cnt;
+
+    if(get(r.group) != 0)
+      { group = " class='group" + get(r.group) + "' data-maphilight='{\"groupBy\":\".group" + get(r.group) + "\"}'"; }
+    else { group = ""; }
+
+    $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + cnt + "' title='" + cnt + "'" + group + ">" );
+    if( get(r.fn) != "" && get(r.sn) != "" ) {
+      var oc = get(r.oc);
+      if( oc != "" && oc != 0 ) { oc = "&oc=" + oc; } else { oc = "" ; }
+      var txt = "";
+      if( get(r.alt) != "" ) { txt = " (" + r.alt + ")"; }
+      $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>"+ cnt +
+        " <a href='%prefix;&p=" + r.fn + "&n=" + r.sn + oc + "' target='_blank'>" + r.fn + " " + r.sn + txt + "</a></span></li>" );
+    } else {
+      $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
+    }
+
+    // Make sure we can find the row in table
+    table.row(cnt-1).node().id = "row" + cnt;
+  });
+}
+
+function loadCurrentImage() {
+  global_cnt = 0;
+  if(get(table) != "") {
+    table.clear();
+    $("#map").empty();
+    $("#div_legend").empty();
+    table.rows.add(json.images[current].map);
+    table.draw();
+    initComplete();
+  } else {
+    initializeTable();
+  }
+}
+
+$(document).on( "mouseover", "grp_table", function(e) {
+  var n = $(this).attr("id").replace(/[a-z]/g, "");
+  $( "#g" + n ).mouseover();
+  $( "#g" + n ).addClass( "in" );
+});
+$(document).on( "mouseout", "grp_table", function(e) {
+  var n = $(this).attr("id").replace(/[a-z]/g, "");
+  $( "#g" + n ).mouseout();
+  $( "#g" + n ).removeClass( "in" );
+});
+$(document).on( "mouseover", ".legend", function(e) {
+  var n = $(this).attr("id").replace(/[a-z]/g, "");
+  $( "#area" + n ).mouseover();
+  $( "#row" + n ).addClass( "in" );
+});
+$(document).on( "mouseout", ".legend", function(e) {
+  var n = $(this).attr("id").replace(/[a-z]/g, "");
+  $( "#area" + n ).mouseout();
+  $( "#row" + n ).removeClass( "in" );
+});
+$(document).on( "click", "li.legend", function(e) {
+  var n = $(this).attr("id").replace(/[a-z]/g, "");
+  $( "#row" + n ).find("input").first().focus();
+});
+$(document).on( "mouseover", "area", function(e) {
+  var n = $(this).attr("id").replace(/[a-z]/g, "");
+  $( "#a" + n + " span" ).addClass( "in" );
+  $( "#row" + n ).addClass( "in" );
+});
+$(document).on( "mouseout", "area", function(e) {
+  var n = $(this).attr("id").replace(/[a-z]/g, "");
+  $( "#a" + n + " span" ).removeClass( "in" );
+  $( "#row" + n ).removeClass( "in" );
+});
+$(document).on( "mouseover", "tr", function(e) {
+  if( typeof $(this).attr("id") !== "undefined" ) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#area" + n ).mouseover();
+    $( "#a" + n + " span" ).addClass( "in" );
+  }
+});
+$(document).on( "mouseout", "tr", function(e) {
+  if( typeof $(this).attr("id") !== "undefined" ) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#area" + n ).mouseout();
+    $( "#a" + n + " span" ).removeClass( "in" );
+  }
+});
+
+$(document).on( "change", ".update", function() {
+  let td = table.cell( this.closest('td') );
+  let tr = $(this).closest('tr');
+
+  // Propagate change to Datatables
+  td.data( $(this).val() ).draw();
+
+  // This is needed to update rendering on other input fields
+  if( this.nodeName == "SELECT" ) {
+    tr.find("input.update").change();
+  }
+});
+
+$(document).on( "click", ".remove", function (e) {
+  var tr = $(this).closest('tr');
+  var n = tr.attr("id").replace(/[a-z]/g, "");
+
+  $( "#area" + n ).remove();
+  $( "#a" + n ).remove();
+  table.row( tr ).remove().draw();
+});
+
+$("#frame").mousedown( function(e) {
+  // Start a new selection
+  x1 = Math.round(e.pageX);
+  y1 = Math.round(e.pageY);
+  x2 = x1;
+  y2 = y1;
+  selection = true;
+});
+
+$("#frame").mousemove( function(e) {
+  if( selection ) {
+    // Selection in progress
+    x2 = Math.round(e.pageX);
+    y2 = Math.round(e.pageY);
+
+    if( selection ) {
+      var TOP = (y1 < y2) ? y1 : y2;
+      var LEFT = (x1 < x2) ? x1 : x2;
+      var WIDTH = (x1 < x2) ? x2 - x1 : x1 - x2;
+      var HEIGHT = (y1 < y2) ? y2 - y1 : y1 - y2;
+
+      $("#selection").css({
+        position: 'absolute',
+        zIndex: 5000,
+        left: LEFT,
+        top: TOP,
+        width: WIDTH,
+        height: HEIGHT
+      });
+      $("#selection").show();
+    }
+  }
+});
+
+$("#frame").mouseup( function() {
+  // Selection completed
+  selection = false;
+  $("#selection").hide();
+
+  var pos = $("#frame").get(0).getBoundingClientRect();
+  var l_x1 = (x1 < x2) ? x1 : x2 ; l_x1 -= pos.left + pageXOffset;
+  var l_x2 = (x1 < x2) ? x2 : x1 ; l_x2 -= pos.left + pageXOffset;
+  var l_y1 = (y1 < y2) ? y1 : y2 ; l_y1 -= pos.top + pageYOffset;
+  var l_y2 = (y1 < y2) ? y2 : y1 ; l_y2 -= pos.top + pageYOffset;
+  add_new_row( l_x1, l_y1, l_x2, l_y2 );
+});
+
+$("#frame").mouseenter( function() {
+  (gMOUSEDOWN) ? selection = true : selection = false;
+});
+
+$("#selection").mouseenter( function() {
+  (gMOUSEDOWN) ? selection = true : selection = false;
+});
+
+$("#frame").mouseleave( function() {
+  selection = false;
+});
+
+function addNewImagetojson() {
+  json.images.push({ img:"", map: []});
+  current = json.images.length - 1;
+  displayLinks();
+  loadCurrentImage();
+}
+
+function saveCurrentImageToJson() {
+  var title = $("#page_title").val();
+  if( title == "" ) { title = "&hellip;" }
+
+  json.title = title;
+  json.desc = $("#page_desc").val();
+  json.path = $("input[name=path]:checked").val();
+  json.images[current].img = $("#fname").val();
+  json.images[current].map = table.rows().data().toArray();
+
+  // Cleanup data before to save
+  for( i=0, ien=json.images[current].length ; i < ien ; i++ ) {
+    if( json.images[current].t == "p" ) { delete json.images[current].misc ; delete json.images[current].href ; }
+    if( json.images[current].t == "m" ) { delete json.images[current].fn ; delete json.images[current].sn ; delete json.images[current].oc ; delete json.images[current].href ; }
+    if( json.images[current].t == "g" ) { delete json.images[current].fn ; delete json.images[current].sn ; delete json.images[current].oc ; delete json.images[current].misc ; delete json.images[current].gw ; }
+    if( json.images[current].t == "e" ) { delete json.images[current].fn ; delete json.images[current].sn ; delete json.images[current].oc ; delete json.images[current].misc ; delete json.images[current].gw ; }
+    if( json.images[current].t == "" ) { delete json.images[current].t ; }
+    if( json.images[current].fn == "" ) { delete json.images[current].fn ; }
+    if( json.images[current].sn == "" ) { delete json.images[current].sn ; }
+    if( json.images[current].oc == "" ) { delete json.images[current].oc ; }
+    if( json.images[current].misc == "" ) { delete json.images[current].misc ; }
+    if( json.images[current].href == "" ) { delete json.images[current].href ; }
+    if( json.images[current].alt == "" ) { delete json.images[current].alt ; }
+    if( json.images[current].shape == "" ) { delete json.images[current].shape ; }
+    if( json.images[current].coords == "" ) { delete json.images[current].coords ; }
+    if( json.images[current].gw == "" ) { delete json.images[current].gw ; }
+  }
+}
+
+$( "#form" ).submit( function () {
+  event.preventDefault();
+  saveCurrentImageToJson();
+
+  $("#notes").val( "TITLE=" + json.title + "\nTYPE=album\n" + JSON.stringify( json ) );
+  $(this).unbind('submit').submit();
+});
+
+$(document).ready(function() {
+  $("#doc,#public,#private").click( function() {
+   $("#path").prop("disabled",true);
+  });
+  $("#other").click( function() {
+   $("#path").prop("disabled",false);
+  });
+  $("#doc,#public,#private,#other,#path,#fname").change( function() {
+   var path = $("input[name=path]:checked").val();
+   var fname = $("#fname").val();
+   if( fname != "" ) {
+     if( path == "doc" ) {
+       $("#image").attr( "src", doc_path + fname );
+     } else if( path == "private" ) {
+       $("#image").attr( "src", private_path + fname );
+     } else if( path == "public" ) {
+       $("#image").attr( "src", public_path + fname );
+     } else {
+       $("#image").attr( "src", $("#path").val() + fname );
+     }
+     $("#frame").show();
+   } else {
+    $("#frame").hide();
+   }
+   $("#image").maphilight();
+  });
+
+  $.ajax( "%url;&ajax=on" )
+  .done( function(j) {
+    $("#digest").val( j.digest );
+    json = j.r;
+    imagesCount = json.images.length;
+    document.title = json.title;
+
+    $("#page_title").val( json.title );
+    $("#page_desc").val( json.desc );
+
+    displayLinks();
+    loadCurrentImage();
+  })
+  .fail( function() {
+    $("#h1").text( "Erreur de chargement" );
+  })
+} );
+</script>

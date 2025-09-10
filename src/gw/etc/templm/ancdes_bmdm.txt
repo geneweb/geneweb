@@ -1,0 +1,207 @@
+<!-- $Id: templm/ancdes_bmdm.txt v7.0 2015/01/23 14:37:11 $ -->
+
+%( birth death : month week_day moon_age tf1/tl1 = bmdm %)
+
+%let;lm1;[(month)]0%in;
+%let;lm2;[(month)]1%in;
+%let;lm3;[(month)]2%in;
+%let;lm4;[(month)]3%in;
+%let;lm5;[(month)]4%in;
+%let;lm6;[(month)]5%in;
+%let;lm7;[(month)]6%in;
+%let;lm8;[(month)]7%in;
+%let;lm9;[(month)]8%in;
+%let;lm10;[(month)]9%in;
+%let;lm11;[(month)]10%in;
+%let;lm12;[(month)]11%in;
+%let;ld0;[(week day)]0%in;
+%let;ld1;[(week day)]1%in;
+%let;ld2;[(week day)]2%in;
+%let;ld3;[(week day)]3%in;
+%let;ld4;[(week day)]4%in;
+%let;ld5;[(week day)]5%in;
+%let;ld6;[(week day)]6%in;
+
+%define;lex_month(xx)%lmxx;%end;
+%define;lex_week_day(xx)%ldxx;%end;
+
+%define;lex_moon_age(xx)
+  xx
+  %if;(xx = 1), [moon age/new moon/first quarter/full moon/last quarter]1
+  %elseif;(xx = 8), [moon age/new moon/first quarter/full moon/last quarter]2
+  %elseif;(xx = 16), [moon age/new moon/first quarter/full moon/last quarter]3
+  %elseif;(xx = 24), [moon age/new moon/first quarter/full moon/last quarter]4
+  %end;
+%end;
+
+%define;stat_anc(z1,z2)
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %foreach;ancestor;
+        %if;(z1 != "" and z2 != "" and ancestor.same = "")
+          %let;l1;%z2;%in;
+          %incr_count;
+          %apply;add_in_sorted_list(ancestor.sex,l1,ancestor.index)
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;stat_des(z1,z2,curlev,maxlev)
+  %if;(z1 != "" and z2 != "" and sex != 2)
+    %let;l1;%z2;%in;
+    %incr_count;
+    %apply;add_in_sorted_list(sex,l1,index)
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;stat_des("z1","z2",curlev+1,maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;stat1a(z1,z2,z3)
+  %reset_count;
+  %foreach;sorted_list_item;
+    %if;(prev_item.2 != item.2 or prev_item.1 != item.1)
+      %reset_count;%incr_count;
+      <a href="%prefix;spouse=on;i%count;=%item.3;&t%count;=%count;&%nn;
+    %end;
+    %if;(prev_item.2 = item.2 and prev_item.1 = item.1)
+      %incr_count;
+      i%count;=%item.3;&t%count;=%count;&%nn;
+    %end;
+    %if;(next_item.2 != item.2 or next_item.1 != item.1)
+      %let;l1;%expr(item.2 + z1)%in;
+      %let;l2;%if;(count > l_max_width)%l_max_width;%else;%count;%end;%in;
+      %let;l3;z2 = %apply;z3(item.2)%in;
+      %incr_count;
+      i%count;=%index;&t%count;=%l3;&%nn;
+      %if;(count > 10)m=C;list=1;t=%l3;&i=%index;&%else;m=RLM;%end;"
+      class="st5%item.1;" style="top:%l1;em;border-width:%l2;px;">%expr(count - 1)</a>
+    %end;
+  %end;
+%end;
+
+%define;stat1b(z1)
+  %reset_count;
+  %foreach;sorted_list_item;
+    %incr_count;
+    %if;(next_item.2 != item.2 or next_item.1 != item.1)
+      %let;l1;%expr(item.2 + z1)%in;
+      %let;l2;%if;(count > l_max_width)%l_max_width;%else;%count;%end;%in;
+      <span class="st5%item.1;" style="top:%l1;em;border-width:%l2;px;">%count;</span>
+      %reset_count;
+    %end;
+  %end;
+%end;
+
+%define;stat1(z1,z2,z3)
+  %if;(not cancel_links and l_max_dates > count)
+    %apply;stat1a(z1,"z2","z3")
+  %else;
+    %apply;stat1b(z1)
+  %end;
+%end;
+
+%define;stat_month(z1,z2)
+  %if;("z1" = "anc")
+    %apply;stat_anc("ancestor.z2_date.day","ancestor.z2_date.month")
+  %else;
+    %apply;stat_des("z2_date.day","z2_date.month",0,l_v)
+  %end;
+  <div class="s1 bcbg2">
+    <span class="s2">[*z2]</span>
+    <span class="s3">%count; [date/dates]1</span>
+  </div>
+  <div class="s1 bcbg1" style="height:12em;">
+    <span class="st4" style="top:1em;">%lm1;</span>
+    <span class="st4" style="top:2em;">%lm2;</span>
+    <span class="st4" style="top:3em;">%lm3;</span>
+    <span class="st4" style="top:4em;">%lm4;</span>
+    <span class="st4" style="top:5em;">%lm5;</span>
+    <span class="st4" style="top:6em;">%lm6;</span>
+    <span class="st4" style="top:7em;">%lm7;</span>
+    <span class="st4" style="top:8em;">%lm8;</span>
+    <span class="st4" style="top:9em;">%lm9;</span>
+    <span class="st4" style="top:10em;">%lm10;</span>
+    <span class="st4" style="top:11em;">%lm11;</span>
+    <span class="st4" style="top:12em;">%lm12;</span>
+    %let;l_legend;[*z2], [year/month/day]1%in;
+    %apply;stat1(0,l_legend,"lex_month")
+  </div>
+%end;
+
+%define;stat_week_day(z1,z2)
+  %if;("z1" = "anc")
+    %apply;stat_anc("ancestor.z2_date.day","ancestor.z2_date.date.week_day")
+  %else;
+    %apply;stat_des("z2_date.day","z2_date.date.week_day",0,l_v)
+  %end;
+  <div class="s1 bcbg1" style="height:8em;">
+    <span class="st4" style="top:1em;">%ld0;</span>
+    <span class="st4" style="top:2em;">%ld1;</span>
+    <span class="st4" style="top:3em;">%ld2;</span>
+    <span class="st4" style="top:4em;">%ld3;</span>
+    <span class="st4" style="top:5em;">%ld4;</span>
+    <span class="st4" style="top:6em;">%ld5;</span>
+    <span class="st4" style="top:7em;">%ld6;</span>
+    %let;l_legend;[*z2], [year/month/day]2%in;
+    %apply;stat1(1,l_legend,"lex_week_day")
+  </div>
+%end;
+
+%define;stat_moon_age(z1,z2)
+  %if;("z1" = "anc")
+    %apply;stat_anc("ancestor.z2_date.day","ancestor.z2_date.date.moon_age")
+  %else;
+    %apply;stat_des("z2_date.day","z2_date.date.moon_age",0,l_v)
+  %end;
+  <div class="s1 bcbg1" style="height:28em;">
+    <span class="st4" style="top:1em;">[moon age/new moon/first quarter/full moon/last quarter]1</span>
+    <span class="st4" style="top:8em;">[moon age/new moon/first quarter/full moon/last quarter]2</span>
+    <span class="st4" style="top:16em;">[moon age/new moon/first quarter/full moon/last quarter]3</span>
+    <span class="st4" style="top:24em;">[moon age/new moon/first quarter/full moon/last quarter]4</span>
+    %let;l_legend;[*z2], [moon age/new moon/first quarter/full moon/last quarter]0%in;
+    %apply;stat1(0,l_legend,"lex_moon_age")
+  </div>
+%end;
+
+%( main %)
+%let;l_max_width;180%in;
+%apply;togen()
+<table class="bmdm">
+  <tr>
+    %if;(evar.m = "A")
+      <td>%reset_count;%empty_sorted_list;%apply;stat_month("anc","birth")</td>
+      <td>%reset_count;%empty_sorted_list;%apply;stat_month("anc","death")</td>
+    %else;
+      <td>%reset_count;%reset_desc_level;%empty_sorted_list;%apply;stat_month("des","birth")</td>
+      <td>%reset_count;%reset_desc_level;%empty_sorted_list;%apply;stat_month("des","death")</td>
+    %end;
+  </tr>
+  %if;(version = "7.00 - gwmr")
+    <tr>
+      %if;(evar.m = "A")
+        <td>%reset_count;%empty_sorted_list;%apply;stat_week_day("anc","birth")</td>
+        <td>%reset_count;%empty_sorted_list;%apply;stat_week_day("anc","death")</td>
+      %else;
+        <td>%reset_count;%reset_desc_level;%empty_sorted_list;%apply;stat_week_day("des","birth")</td>
+        <td>%reset_count;%reset_desc_level;%empty_sorted_list;%apply;stat_week_day("des","death")</td>
+      %end;
+    </tr>
+    <tr>
+      %if;(evar.m = "A")
+        <td>%reset_count;%empty_sorted_list;%apply;stat_moon_age("anc","birth")</td>
+        <td>%reset_count;%empty_sorted_list;%apply;stat_moon_age("anc","death")</td>
+      %else;
+        <td>%reset_count;%reset_desc_level;%empty_sorted_list;%apply;stat_moon_age("des","birth")</td>
+        <td>%reset_count;%reset_desc_level;%empty_sorted_list;%apply;stat_moon_age("des","death")</td>
+      %end;
+    </tr>
+  %end;
+</table>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>Access refused</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body>
+<div class="container">
+<h1>Access refused</h1>
+
+<p>This address has been considered to be a robot and its access has
+been automatically disconnected.</p>
+<p>Contact the site administrator to restore it.</p>
+
+</div>
+</body>
+</html>

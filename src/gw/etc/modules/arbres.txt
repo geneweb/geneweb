@@ -1,0 +1,20 @@
+<!-- $Id: modules/arbres.txt v7.1 29/04/2024 05:22:08 $ -->
+%(
+Options
+1: arbre vertical ascendant
+2: arbre horizontal ascendant (jusque 6 gen.)
+3: mini-arbre parents/gd-parents avec photos
+4: arbre descendant
+%)
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%let;op_ph;%if;(op_m=1 or op_m=2)1%else;0%end;%in;
+%if;(op_m=1)
+  %include;modules/arbre_vertical
+%elseif;(op_m=2)
+  %include;modules/arbre_horizontal
+%elseif;(op_m=3)
+  %include;modules/arbre_3gen_photo
+%elseif;(op_m=4)
+  %include;modules/arbre_descendants
+%else;
+%end;

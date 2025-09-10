@@ -1,0 +1,173 @@
+<!-- $Id: templm/anclist_csv.txt v7.0 2014/11/12 14:33:31 $ -->
+
+%define;csv_line3(xx,yy,zz)
+  ;%xx.index;
+  ;%family.index;
+  ;%xx.first_name_key_val;
+  ;%xx.surname_key_val;
+  ;%xx.occ;
+  ;%if;(sosa_in_list != "")%sosa_in_list;%end;
+  ;%ancestor.anc_sosa;
+  ;yy.%child_cnt;xzz%nn;
+  ;%xx.sex;
+  ;%consanguinity;
+  ;%xx.first_name;
+  ;%xx.surname;
+  ;%birth_date.prec;
+  ;%birth_date.year;
+  ;%birth_date.month;
+  ;%birth_date.day;
+  ;%xx.birth_place;
+  ;%death_date.prec;
+  ;%death_date.year;
+  ;%death_date.month;
+  ;%death_date.day;
+  ;%xx.death_place;
+  %if;(has_parents)
+    ;%father.first_name;;%father.surname;;%father_age_at_birth;
+    ;%mother.first_name;;%mother.surname;;%mother_age_at_birth;
+  %else;;;;;;;%end;
+  ;%family_cnt;
+  ;%marriage_date.prec;
+  ;%marriage_date.year;
+  ;%marriage_date.month;
+  ;%marriage_date.day;
+  ;%marriage_place;
+  ;%first_name;
+  ;%surname;
+  ;%first_name_key_val;
+  ;%surname_key_val;
+  ;%occ;
+  %nn;
+%end;
+
+%define;csv_line2()
+  ;%family_cnt;
+  ;%marriage_date.prec;
+  ;%marriage_date.year;
+  ;%marriage_date.month;
+  ;%marriage_date.day;
+  ;%marriage_place;
+  ;%spouse.first_name;
+  ;%spouse.surname;
+  ;%spouse.first_name_key_val;
+  ;%spouse.surname_key_val;
+  ;%spouse.occ;
+%end;
+
+%define;csv_line1(yy)
+  ;%index;
+  ;%family.index;
+  ;%first_name_key_val;
+  ;%surname_key_val;
+  ;%occ;
+  ;%if;(sosa_in_list != "")%sosa_in_list;%end;
+  ;%ancestor.anc_sosa;
+  ;yy.%child_cnt;
+  ;%sex;
+  ;%consanguinity;
+  ;%first_name;
+  ;%surname;
+  ;%birth_date.prec;
+  ;%birth_date.year;
+  ;%birth_date.month;
+  ;%birth_date.day;
+  ;%birth_place;
+  ;%death_date.prec;
+  ;%death_date.year;
+  ;%death_date.month;
+  ;%death_date.day;
+  ;%death_place;
+  %if;(has_parents)
+    ;%father.first_name;;%father.surname;;%father_age_at_birth;
+    ;%mother.first_name;;%mother.surname;;%mother_age_at_birth;
+  %else;;;;;;;%end;
+  %nn;
+%end;
+
+%define;csv_line(yy,zz)
+  %foreach;child;
+    %if;(child.has_families)
+      %foreach;child.family;
+        %incr_count;%count;
+        %apply;csv_line1("yy.zz")
+        %apply;csv_line2()
+        <br>
+        %if;(spouse.sosa_in_list = "")
+          %incr_count;%count;
+          %apply;csv_line3("spouse","yy.zz",family_cnt)<br>
+        %end;
+        %if;(evar.cousins="on" and child.has_families and child.sosa_in_list = "")
+          %apply;csv_line("yy.zz",child_cnt)
+        %end;
+      %end;
+    %else;
+      %incr_count;%count;
+      %apply;csv_line1("yy.zz")%nn;
+       ;;;<br>
+    %end;
+  %end;
+%end;
+
+%( csv display full %)
+<p>
+[number]%nn;
+;index%nn;
+;index_family%nn;
+;first_name_key_val%nn;
+;surname_key_val%nn;
+;occ%nn;
+;[Sosa]%nn;
+;[Sosa]_[father/mother]0%nn;
+;[child/children]0_[number]%nn;
+;[sex]%nn;
+;[consanguinity]%nn;
+;[first name/first names]0%nn;
+;[surname/surnames]0%nn;
+;[birth]_[precision]%nn;
+;[birth]_[year/month/day]0%nn;
+;[birth]_[year/month/day]1%nn;
+;[birth]_[year/month/day]2%nn;
+;[birth]_[place/places]0%nn;
+;[death]_[precision]%nn;
+;[death]_[year/month/day]0%nn;
+;[death]_[year/month/day]1%nn;
+;[death]_[year/month/day]2%nn;
+;[death]_[place/places]0%nn;
+;[father/mother]0_[first name/first names]0%nn;
+;[father/mother]0_[surname/surnames]0%nn;
+;[father/mother]0_[age]%nn;
+;[father/mother]1_[first name/first names]0%nn;
+;[father/mother]1_[surname/surnames]0%nn;
+;[father/mother]1_[age]%nn;
+;[family/families]0_[number]%nn;
+;[marriage/marriages]0_[precision]%nn;
+;[marriage/marriages]0_[year/month/day]0%nn;
+;[marriage/marriages]0_[year/month/day]1%nn;
+;[marriage/marriages]0_[year/month/day]2%nn;
+;[marriage/marriages]0_[place/places]0%nn;
+;[marriage/marriages]0_[first name/first names]0%nn;
+;[marriage/marriages]0_[surname/surnames]0%nn;
+;[marriage/marriages]0_first_name_key_val%nn;
+;[marriage/marriages]0_surname_key_val%nn;
+;[marriage/marriages]0_occ%nn;
+<br>
+%reset_count;
+%foreach;ancestor_level(l_v)
+  %if;(level != 1 and evar.only != "on" or level = l_v)
+    %foreach;ancestor;
+      %if;(ancestor.same = "" and ancestor.is_male)
+        %foreach;ancestor.family;
+          %apply;csv_line("","")
+        %end;
+      %elseif;(ancestor.same = "" and ancestor.is_female and ancestor.nb_families > 1)
+        %foreach;ancestor.family;
+          %if;(spouse.index != ancestor.spouse.index)
+            %apply;csv_line("","")
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+</p>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: stats.txt v7.1 27/10/2023 03:33:17 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>[*statistics]</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+<div class="container">
+%( %include;menubar not complete %)
+%include;home
+<h1>[*statistics]</h1>
+
+%define;births(nnn)[the latest %d births:::nnn]%end;
+%define;deaths(nnn)[the latest %t deaths:::nnn]%end;
+%define;marriages(nnn)[the latest %d marriages:::nnn]%end;
+%define;engaged(nnn)
+  [the %d oldest couples perhaps still alive and engaged:::nnn]%nn;
+%end;
+%define;alive(nnn)[the %d oldest perhaps still alive:::nnn]%end;
+%define;lived(nnn)[the %d who lived the longest:::nnn]%end;
+
+%let;n;%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;%in;
+
+<ul>
+%if;(wizard or friend)
+  <li><a href="%prefix;m=LB&k=%n;">%apply;births(n)</a></li>
+  <li><a href="%prefix;m=LD&k=%n;">%apply;deaths(n)</a></li>
+  <li><a href="%prefix;m=LM&k=%n;">%apply;marriages(n)</a></li>
+  <li><a href="%prefix;m=OE&k=%n;">%apply;engaged(n)</a></li>
+  <li><a href="%prefix;m=OA&k=%n;&lim=0">%apply;alive(n)</a></li>
+%end;
+<li><a href="%prefix;m=LL&k=%n;">%apply;lived(n)</a></li>
+</ul>
+
+%if;(wizard or friend)
+  <ul>
+    <li><a href="%prefix;m=POP_PYR">[population pyramid]</a></li>
+  </ul>
+%end;
+
+%include;trl
+%include;copyr
+%query_time;
+</div>
+%include;js
+</body>
+</html>

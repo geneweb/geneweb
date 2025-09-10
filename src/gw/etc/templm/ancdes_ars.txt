@@ -1,0 +1,241 @@
+<!-- $Id: templm/ancdes_ars.txt v7.0 2014/11/24 17:55:26 $ -->
+
+%( ars table day month generation %)
+%( rlm link 2     %) %let;rlm2;i2=%index;&t2=0%in;
+%( rlm link 3     %) %let;rlm3;%if;(browsing_with_sosa_ref)i3=%sosa_ref.index;&t3=sosa_1%end;%in;
+%( font family    %) %let;ff;%if;(evar.ff != "")%evar.ff;%else;arial%end;%in;
+%( initial count  %) %let;ic;%if;(evar.ic >= 0)%evar.ic;%else;400%end;%in;
+%(   font size    %) %let;fs;%if;(evar.fs >= 0)%evar.fs;%else;3%end;%in;
+%(   width        %) %let;width;%if;(evar.width >= 0)%evar.width;%else;2048%end;%in;
+%(   height       %) %let;height;%if;(evar.height >= 0)%evar.height;%else;1536%end;%in;
+%(   left x       %) %let;lx;%expr(width / 35)%in;
+%(   top x        %) %let;tx;%expr(height / 13)%in;
+%(   red          %) %let;red;%if;(evar.red >= 0)%evar.red;%else;10%end;%in;
+%(   green        %) %let;green;%if;(evar.green >= 0)%evar.green;%else;10%end;%in;
+%(   blue         %) %let;blue;%if;(evar.blue >= 0)%evar.blue;%else;10%end;%in;
+%(male birth text %) %let;mbt;%if;(evar.mbt != "")%evar.mbt;%else;%end;%in;
+%(male death text %) %let;mdt;%if;(evar.mdt != "")%evar.mdt;%else;%end;%in;
+%(female birth text %) %let;fbt;%if;(evar.fbt != "")%evar.fbt;%else;%end;%in;
+%(female death text %) %let;fdt;%if;(evar.fdt != "")%evar.fdt;%else;%end;%in;
+%(male birth field%) %let;mbf;%if;(evar.mbf != "")%evar.mbf;%else;first_name%end;%in;
+%(male death field%) %let;mdf;%if;(evar.mdf != "")%evar.mdf;%else;occupation%end;%in;
+%(female birth field%) %let;fbf;%if;(evar.fbf != "")%evar.fbf;%else;surname%end;%in;
+%(female death field%) %let;fdf;%if;(evar.fdf != "")%evar.fdf;%else;dates%end;%in;
+
+%define;tf1_ars(xx)
+  <option value="evar.none"
+        %if;("xx"="evar.none")selected="selected"%end;>-</option>
+  <option value="first_name"
+        %if;("xx"="first_name")selected="selected"%end;>[first name/first names]0</option>
+  <option value="surname"
+        %if;("xx"="surname")selected="selected"%end;>[surname/surnames]0</option>
+  <option value="occupation"
+        %if;("xx"="occupation")selected="selected"%end;>[occupation/occupations]0</option>
+  <option value="dates"
+        %if;("xx"="dates")selected="selected"%end;>[date/dates]1</option>
+  <option value="birth_date.year"
+        %if;("xx"="birth_date.year")selected="selected"%end;>[birth] [year/month/day]0</option>
+  <option value="birth_place"
+        %if;("xx"="birth_place")selected="selected"%end;>[birth] [place/places]0</option>
+  <option value="death_date.year"
+        %if;("xx"="death_date.year")selected="selected"%end;>[death] [year/month/day]0</option>
+  <option value="death_place"
+        %if;("xx"="death_place")selected="selected"%end;>[death] [place/places]0</option>
+%end;
+
+%define;anc_ars(m_bt,m_bf,m_dt,m_df,f_bt,f_bf,f_dt,f_df)
+  %reset_count;
+  %empty_sorted_list;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %let;lev;%expr(l_v - level + 1)%in;
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %incr_count;
+          %let;aad;
+            %if;(ancestor.death_date.year > ancestor.birth_date.year)
+              %expr((ancestor.death_date.year - ancestor.birth_date.year)*2)
+              %else;0%nn;
+            %end;
+          %in;
+          %if;(ancestor.sex = 0)
+            %apply;add_in_sorted_list(
+                   level,ancestor.index,ancestor.sex,
+                   ancestor.birth_date.day,ancestor.birth_date.month,
+                   ancestor.death_date.day,ancestor.death_date.month,
+                   "m_bt",m_bf,"m_dt",m_df,aad,lev)
+          %else;
+            %apply;add_in_sorted_list(
+                   level,ancestor.index,ancestor.sex,
+                   ancestor.birth_date.day,ancestor.birth_date.month,
+                   ancestor.death_date.day,ancestor.death_date.month,
+                   "f_bt",f_bf,"f_dt",f_df,aad,lev)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;des_ars(curlev,maxlev,m_bt,m_bf,m_dt,m_df,f_bt,f_bf,f_dt,f_df)
+  %incr_count;
+  %let;lev;%expr(l_v - curlev + 1)%in;
+  %let;aad;
+    %if;(death_date.year > birth_date.year)
+      %expr((death_date.year - birth_date.year)*2)
+      %else;0%nn;
+    %end;
+  %in;
+  %if;(sex = 0)
+    %apply;add_in_sorted_list(
+           lev,index,sex,
+           birth_date.day,birth_date.month,
+           death_date.day,death_date.month,
+           "m_bt",m_bf,"m_dt",m_df,aad,curlev)
+  %else;
+    %apply;add_in_sorted_list(
+           lev,index,sex,
+           birth_date.day,birth_date.month,
+           death_date.day,death_date.month,
+           "f_bt",f_bf,"f_dt",f_df,aad,curlev)
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;des_ars(curlev+1,maxlev,"m_bt","m_bf","m_dt","m_df","f_bt","f_bf","f_dt","f_df")
+      %end;
+    %end;
+  %end;
+%end;
+
+
+%define;ars()
+  <div class="stat_ars bcbg1" style="width:%width;px;height:%height;px;font-family:%ff;;">
+    %foreach;sorted_list_item;
+      %let;i9;%if;(count > ic)%apply;initial(item.9)%else;%item.9;%end;%in;
+      %let;i11;%if;(count > ic)%apply;initial(item.11)%else;%item.11;%end;%in;
+      %let;fs1;%expr((item.13 + fs) * fs)%in;
+      %let;db;%if;(item.4 = "")%expr((item.2 + 31) % 31 + 1)%else;%item.4;%end;%in;
+      %let;dd;%if;(item.6 = "")%expr((item.2 + 31) % 31 + 1)%else;%item.6;%end;%in;
+      %let;mb;%if;(item.5 = "")%expr((item.2 + 12) % 12 + 1)%else;%item.5;%end;%in;
+      %let;md;%if;(item.7 = "")%expr((item.2 + 12) % 12 + 1)%else;%item.7;%end;%in;
+      %let;dbc;%expr(8 * db)%in;
+      %let;ddc;%expr(8 * dd)%in;
+      %let;mbc;%expr(21 * mb)%in;
+      %let;mdc;%expr(21 * md)%in;
+      %let;pad;%expr(item.13 * 10)%in;
+      %let;aad;%expr(item.12 + green)%in;
+      %if;(item.3 = 0)
+        <a href="%prefix;spouse=on&m=RLM&image=%evar.image;&i1=%item.2;&t1=*&%rlm2;&%rlm3;"
+           style="left:%expr((db * lx) + pad - lx)px;
+                  top:%expr((mb * tx) + pad - tx)px;
+                  font-size:%fs1;px;z-index:%item.1;;
+                  color:rgb(%expr(mdc + red), %aad;, %expr(dbc + blue));">%item.8;%i9;</a>
+        <a href="%prefix;spouse=on&m=RLM&image=%evar.image;&i1=%item.2;&t1=*&%rlm2;&%rlm3;"
+           style="left:%expr((dd * lx) + pad - lx)px;
+                  top:%expr((md * tx) + pad - tx)px;
+                  font-size:%fs1;px;z-index:%item.1;;
+                  color:rgb(%expr(ddc + red), %aad;, %expr(mbc + blue));">%item.10;%i11;</a>
+      %end;
+      %if;(item.3 = 1)
+        <a href="%prefix;spouse=on&m=RLM&image=%evar.image;&i1=%item.2;&t1=*&%rlm2;&%rlm3;"
+           style="left:%expr((db * lx) + pad - lx)px;
+                  top:%expr((mb * tx) + pad - tx)px;
+                  font-size:%fs1;px;z-index:%item.1;;
+                  color:rgb(%expr(dbc + red), %aad;, %expr(mdc + blue));">%item.8;%i9;</a>
+        <a href="%prefix;spouse=on&m=RLM&image=%evar.image;&i1=%item.2;&t1=*&%rlm2;&%rlm3;"
+           style="left:%expr((dd * lx) + pad - lx)px;
+                  top:%expr((md * tx) + pad - tx)px;
+                  font-size:%fs1;px;z-index:%item.1;;
+                  color:rgb(%expr(mbc + red), %aad;, %expr(ddc + blue));">%item.10;%i11;</a>
+      %end;
+    %end;
+  </div>
+  <form id="form_ars" name="form_ars" method="get" action="%action;">
+    <p>
+      %hidden;
+      <input type="hidden" name="m" value="%evar.m;"%/>
+      %if;(evar.m = "A")
+        <input type="hidden" name="t" value="F"%/>
+        <input type="hidden" name="tf1" value="ars"%/>
+      %else;
+        <input type="hidden" name="t" value="L"%/>
+        <input type="hidden" name="tl1" value="ars"%/>
+      %end;
+      %if;access_by_key;
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="oc" value="%occ;"%/>
+        %end;
+      %else;
+        <input type="hidden" name="i" value="%index;"%/>
+      %end;
+    </p>
+    <fieldset>
+      <legend><input type="submit" value="Ok"%/></legend>
+      <ul><li>
+        <label>[*generation/generations]0<input name="v" value="%l_v;" class="number"%/></label>
+      </li><li>
+        <label>Initial count<input name="ic" value="%ic;" class="number"%/></label>
+      </li><li>
+        <label>Font family<input name="ff" value="%ff;"%/></label>
+      </li><li>
+        <label>Font size<input name="fs" value="%fs;" class="number"%/></label>
+      </li><li>
+      </li><li>
+        <label>Width<input name="width" value="%width;" class="number"%/>px</label>
+        <label>Height<input name="height" value="%height;" class="number"%/>px</label>
+      </li><li>
+        <label style="background-color:red">R<input name="red" value="%red;" class="number"%/></label>
+        <label style="background-color:green">G<input name="green" value="%green;" class="number"%/></label>
+        <label style="background-color:blue">B<input name="blue" value="%blue;" class="number"%/></label>
+      </li><ul>
+      <table border>
+      <tr>
+        <th class="bcbg1" colspan="2">[*M/F]0</th><th class="bcbg1" colspan="2">[*M/F]1</th>
+      </tr>
+        <th class="bcbg1">[birth]</th>
+        <td>
+          <label>[text]<input name="mbt" value="%mbt;"%/></label>
+          <select name="mbf">
+            %apply;tf1_ars(mbf)
+          </select>
+        </td>
+        <th class="bcbg1">[birth]</th>
+        <td><label>[text]<input name="fbt" value="%fbt;"%/></label>
+          <select name="fbf">
+            %apply;tf1_ars(fbf)
+          </select>
+        </td>
+      </tr><tr>
+        <th class="bcbg1">[death]</th>
+        <td>
+          <label> [text]<input name="mdt" value="%mdt;"%/></label>
+          <select name="mdf">
+            %apply;tf1_ars(mdf)
+          </select>
+        </td>
+        <th class="bcbg1">[death]</th>
+        <td><label>[text]<input name="fdt" value="%fdt;"%/></label>
+          <select name="fdf">
+            %apply;tf1_ars(fdf)
+          </select>
+        </td>
+      </tr></table>
+    </fieldset>
+  </form>
+%end;
+
+%( main %)
+%if;(evar.m = "A")
+  %let;ambf;%if;(mbf != "evar.none")ancestor.%end;%mbf;%in;
+  %let;amdf;%if;(mdf != "evar.none")ancestor.%end;%mdf;%in;
+  %let;afbf;%if;(fbf != "evar.none")ancestor.%end;%fbf;%in;
+  %let;afdf;%if;(fdf != "evar.none")ancestor.%end;%fdf;%in;
+  %apply;anc_ars(mbt,ambf,mdt,amdf,fbt,afbf,fdt,afdf)
+%else;
+  %apply;des_ars(0,l_v,mbt,mbf,mdt,mdf,fbt,fbf,fdt,fdf)
+%end;
+%apply;ars()

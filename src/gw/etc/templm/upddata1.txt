@@ -1,0 +1,156 @@
+%let;maxl;%if;(evar.data = "src")300%else;200%end;%in;
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: templm/upddata1.txt v7.0 2016/01/31 00:01:16 $ -->
+  <title>%title;</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+  <script type="text/javascript">
+  <!--
+
+  function submitupd()
+  {
+   var x1 = document.getElementById('nx_a');
+   var x2 = "%prefix;m=MOD_DATA_OK&data=%evar.data;&s=%encode.evar.s;"
+   var x3 = x1.title;
+   var x4 = "nx_input=";
+   var x5 = document.getElementById('nx_input').value;
+   var x60 = "%if;(evar.data = "sn")surname_aliases%elseif;(evar.data = "fn")first_name_aliases%end;"
+   var x61 = (x60 == "") ? "": document.getElementById(x60).checked;
+   var x62 = (x61 == true) ? "=yes;": "=;";
+   var x63 = ";" + x60 + x62;
+   var x7 = document.getElementById('nx_span');
+   parent.ifr.location.href = x2 + x3 + x4 + x5 + x63;
+   x1.firstChild.nodeValue = x5;
+   x1.setAttribute("style","color:#C0C0C0;font-style:italic;","false");
+   x1.focus();
+   x7.setAttribute("style","visibility:hidden","false");
+   return false;
+  }
+  function lhr()
+   {
+    var x1 = "%prefix;m=H;v=advanced;focus=occu;occu=";
+    var x2 = document.getElementById('nx_input').value;
+    parent.location.href = x1 + x2;
+   }
+  function upd(zz)
+   {
+    var x1 = document.getElementById('nx_a');
+    x1.removeAttribute("id","false");
+    zz.setAttribute("id","nx_a","false");
+    var x2 = document.getElementById('nx_a');
+    var x3 = x2.getAttribute("style","false");
+    if (x3 == null)
+    {
+      document.getElementById('nx_span').outerHTML = "";
+      var x4 = x2.firstChild.nodeValue;
+      var x5 = "<span id=\"nx_span\" class=\"button\">"
+                +"<input type=\"text\" id=\"nx_input\" name=\"nx_input\" size=\"%if;(evar.data="sn" or evar.data="fn")50%else;80%end;\" maxlength=\"%maxl;\" \/>"
+                %if;(evar.data = "sn")
+                  +"<input type=\"checkbox\" id=\"surname_aliases\" name=\"surname_aliases\" value=\"yes\">[*add the previous name as a surname alias] <\/input>"
+                %elseif;(evar.data = "fn")
+                  +"<input type=\"checkbox\" id=\"first_name_aliases\" name=\"first_name_aliases\" value=\"yes\">[*add the previous first name as a first name alias] <\/input>"
+                %end;
+                +"<input type=\"submit\" value=\"ok\"\/>"
+                %if;(bvar.hide_advanced_request != "yes" and evar.data = "occu")
+                  +"<a href=\"javascript:lhr()\"> [*advanced request]0 <\/a>"
+                %end;
+                +"<\/span>";
+      x2.insertAdjacentHTML("AfterEnd",x5);
+      var x6 = document.getElementById('nx_input');
+      x6.setAttribute("value",x4,"false");
+      x6.focus();
+      return false;
+    }
+   }
+  //-->
+  </script>
+</head>
+
+%define;print_short()
+  <p>[*select a letter] :</p>
+  <p>
+    %foreach;initial;
+      <a href="%prefix;m=MOD_DATA&data=%evar.data;&s=%encode.ini;">%html_encode.ini;</a>
+    %end;
+  </p>
+%end;
+
+%define;print_long1(z1)
+  <p>
+     %foreach;entry;
+       <a href="#%entry_ini;">%html_encode.entry_ini;</a>
+     %end;
+  </p>
+  <form id="updata" method="post" action="%action;" onsubmit="return submitupd()">
+    <dl>
+      %foreach;entry;
+        <dt><a id="%entry_ini;">%html_encode.entry_ini;</a></dt>
+        %foreach;value;
+          <dd>
+            <a href="%prefix;m=AS_OK;z1=%entry_value;"> &gt; </a>
+            <a title="%keys;" href="javascript:void(0);"
+               onclick="javascript:upd(this)">%escape.entry_value;</a></dd>
+        %end;
+      %end;
+    </dl>
+  </form>
+%end;
+
+%define;print_long2()
+  <p>
+     %foreach;entry;
+       <a href="#%entry_ini;">%html_encode.entry_ini;</a>
+     %end;
+  </p>
+  <form id="updata" method="post" action="%action;" onsubmit="return submitupd()">
+    <dl>
+      %foreach;entry;
+        <dt><a id="%entry_ini;">%html_encode.entry_ini;</a></dt>
+        %foreach;value;
+          <dd>
+            <a title="%keys;" href="javascript:void(0);"
+               onclick="javascript:upd(this)">%escape.entry_value;</a></dd>
+        %end;
+      %end;
+    </dl>
+  </form>
+%end;
+
+%define;print_long()
+  <p>[*help modify data]</p>
+  %if;(bvar.hide_advanced_request != "yes" and evar.data = "occu")
+    %apply;print_long1("occu")
+  %else;
+    %apply;print_long2()
+  %end;
+%end;
+
+<body%body_prop;>
+%include;hed
+<div id="nx_span" style="display:none">a</div>
+<div id="nx_a" style="display:none">a</div>
+
+<h1>%title;</h1>
+%if;(not cancel_links and evar.s != "")<p><a href="%prefix;m=MOD_DATA;data=%evar.data;">^^</a></p>%end;
+
+<iframe name="ifr" style="position:fixed;bottom:0px;right:0px;width:400px;height:120px;background-color:#AAA;">
+<p>The browser does not like IFRAME !</p>
+</iframe>
+
+%if;(nb_results > 1000)
+  %apply;print_short()
+%else;
+  %apply;print_long()
+%end;
+%include;trl
+%include;copyr
+%query_time;
+
+</body>
+</html>

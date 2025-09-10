@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwf_ok.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Parameters updated]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[Parameters updated]
+</h1>
+</div>
+<p>
+[Here is an access to your database in order to test your parameters changing][:]
+<p>
+<ul>
+<li><a href="http://%m:%P/%a">http://%m:%P/%a</a>
+</ul>
+<p>
+[For information][:]
+<ul>
+<li>[The parameters are recorded in the text file "%a.gwf" in the directory "%w".]
+<li>[If you gave a text to put in the bottom of the pages, this text is recorded in the file named "%a.trl" in the subdirectory "lang" of the directory "%w".]
+%(
+If you gave a text to put in the bottom of the pages, this text is recorded in
+the file named "%a.trl" in the subdirectory "lang" of the directory "%w".
+%)
+</ul>
+<p>
+[Return to the main menu.] (<a href="gwsetup?lang=%l;v=welcome.htm">welcome</a>)

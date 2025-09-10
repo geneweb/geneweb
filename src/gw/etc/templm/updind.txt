@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="%lang;">
+<head>
+<!-- $Id: templm/updind.txt v7.0 2016/03/21 15:22:41 $ -->
+  <title>%nn;
+    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
+      [*merge::person/persons]1 # %index;
+    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
+      [*modify::person/persons]0 # %index;
+    %else;[*add::person/persons]0%end;
+  </title>
+  <meta name="robots" content="none"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"/>
+  %include;css
+  %include;js_upd
+  %include;updind_updfam
+</head>
+%(<!-- Begin define -->%)
+%let;l_r_father; placeholder="M" %in;
+%let;l_r_mother; placeholder="F" %in;
+%define;load_focus()
+  onload="oL1(); %nn;
+  %if;(evar_m = "MOD_IND")
+    %if;(not is_male and not is_female)
+      sIV('sex1')%nn;
+    %elseif;(birth.prec != "sure")
+      sIV('lpc2')%nn;
+    %elseif;(birth.year < "1900" and death.prec != "sure")
+      sIV('lpc3')%nn;
+    %else;
+      sIV('notes')%nn;
+    %end;
+  %end;
+  "%nn;
+%end;
+%define;one_title(z1)
+  <tr id="tz1">
+    <td class="bg7"><input id="tz1_occ" name="tz1_occ" class="t_occ" maxlength="1" placeholder="&bull;" onkeypress="javascript:return oKP2(event,'t',z1,'_occ','')" onblur="this.value='';"%/></td>
+    <td><input id="t_identz1" name="t_identz1" size="30" value="%title.t_ident;"%/></td>
+    <td><input id="t_placez1" name="t_placez1" size="30" value="%title.t_estate;" %/></td>
+    <td><input id="t_namez1" name="t_namez1" size="30" value="%title.t_name;" %/></td>
+    <td><input autocomplete="off" class="number" id="t_nthz1" name="t_nthz1" size="3" value="%title.t_nth;"%/></td>
+    <td><span class="dmyt">%apply;date("t_date_startz1","title_date_start","","")</span>
+        <span class="dmyt">%apply;date("t_date_endz1","title_date_end","","")</span></td>
+  </tr>
+%end;
+%define;relations(z1)
+  <tr id="rz1">
+    %apply;one_relation("z1","fath","r_father","0")
+    <td rowspan="2" class="bg7">%apply;relation_type("z1")</td>
+  </tr>
+  <tr>
+    %apply;one_relation("z1","moth","r_mother","1")
+  </tr>
+%end;
+%define;relation_type(z1)
+  <select id="rz1_type" name="rz1_type">
+    <option value="GodParent"%if;relation.rt_godparent;%sp;selected="selected"%end;>
+      %sp;[*godfather/godmother/godparents]2</option>
+    <option value="Adoption"%if;relation.rt_adoption; selected="selected"%end;>
+      %sp;[*adoptive father/adoptive mother/adoptive parents]2</option>
+    <option value="Recognition"%if;relation.rt_recognition;%sp;selected="selected"%end;>
+      %sp;[*recognizing father/recognizing mother/recognizing parents]2</option>
+    <option value="CandidateParent"%if;relation.rt_candidate_parent;%sp;selected="selected"%end;>
+      [*candidate father/candidate mother/candidate parents]2</option>
+    <option value="FosterParent"%if;relation.rt_foster_parent;%sp;selected="selected"%end;>
+      %sp;[*foster father/foster mother/foster parents]2</option>
+  </select>
+%end;
+%define;one_relation(z1,z2,z3,z4)
+    %let;l1;rz1_z2%in;
+    <td>
+        <input type="hidden" id="%l1;_p" name="%l1;_p" value="%if;(relation.z3.create)create%else;link%end;"%/>
+        <input id="%l1;_occ" name="%l1;_occ" class="occz4" autocomplete="off" %l_z3; size="3" maxlength="8"
+        value="%if;(relation.z3.link and relation.z3.occ = "")0%else;%relation.z3.occ;%end;"
+        onkeypress="javascript:return oKP2(event,'r',z1,'_fath_occ','')"
+        onblur="oB3('%l1;')"%/></td>
+    <td><input id="%l1;_fn" name="%l1;_fn" class="ar fn" size="30" maxlength="200" value="%relation.z3.first_name;" %l_on3; %l_on8;%/></td>
+    <td><input id="%l1;_sn" name="%l1;_sn" class="sn" size="30" maxlength="200" value="%relation.z3.surname;"
+         %apply;onjq1(l1,z4) %l_on7;%/></td>
+    <td style="width:auto"><span id="%l1;_jq1"></span></td>
+%end;
+%(<!-- End define -->%)
+<body%body_prop; id="upd" %apply;load_focus()>
+%include;hed
+<div class="container-fluid">
+%message_to_wizard;
+<form name="upd" method="post" action="%action;">
+<div id="jq" style="display:none"> </div>
+<p style="display:none;">
+  <span id=dmy>[!dates order]0</span>
+  %hidden;
+  %include;upd_datalist
+  <input type="hidden" name="digest" value="%digest;"%/>
+  <input type="hidden" name="i" value="%index;"%/>
+  %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
+    %if;(evar_i2 != "")
+      <input type="hidden" name="i2" value="%evar_i2;">
+    %end;
+    %if;(evar_ini1 != "" and evar_ini2 != "")
+      <input type="hidden" name="ini1" value="%evar_ini1;"%/>
+      <input type="hidden" name="ini2" value="%evar_ini2;"%/>
+    %end;
+    %if;(evar.iexcl != "" or evar.fexcl != "")
+      <input type="hidden" name="ip" value="%evar.ip;"%/>
+      %if;(evar.iexcl != "")
+        <input type="hidden" name="iexcl" value="%evar.iexcl;"%/>
+      %end;
+      %if;(evar.fexcl != "")
+        <input type="hidden" name="fexcl" value="%evar.fexcl;"%/>
+      %end;
+    %end;
+    <input type="hidden" name="m" value="MRG_MOD_IND_OK"%/>
+  %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
+    <input type="hidden" name="m" value="MOD_IND_OK"%/>
+  %else;
+    <input type="hidden" name="m" value="ADD_IND_OK"%/>
+  %end;
+  %let;l_s;%if;(is_male)M%elseif;(is_female)F%else;N%end;%in;
+  %let;l_s1;%if;(is_male)0%elseif;(is_female)1%else;2%end;%in;
+  %let;l_s2;%if;(is_male)M%elseif;(is_female)F%else;N%end;%in;
+  %let;lt1;<abbr title="%ak1;%ak2;%ak3;%ak7;">#</abbr>%in;
+  %let;lt2;<abbr title="%lta;%ltb;%ltc;">[date/dates]0</abbr>%in;
+  %let;lt3;title="%ak2;"%in;
+  %let;lt4;title="%ak1;%ak3;%ak5;"%in;
+  %let;lt5;title="%ak3;%ak7;"%in;
+  <input id="sex" name="sex" value="%l_s;" %/>
+  %apply;hevent("birth","birth")
+  %apply;hevent("bapt","bapt")
+  %apply;hevent("death","death")
+  %apply;hevent("burial","burial")
+  <input name="death" value=""%/>
+ %( marche pas :
+    "NotDead"
+    "DontKnowIfDead"
+    "Death"
+    "DeadYoung"
+    "OfCourseDead"
+    <input name="death_reason"
+      %if;dr_killed; value="Killed"
+      %elseif;dr_murdered; value="Murdered"
+      %elseif;dr_executed; value="Executed"
+      %elseif;dr_disappeared; value="Disappeared"
+      %elseif;dr_unspecified; value="Unspecified"
+      %end;
+    %/>
+  %)
+</p>
+<fieldset class="f1">
+  <legend>
+    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
+    [*merge::person/persons]1 # %index;
+    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
+      [*modify::person/persons]0 # %index;
+    %else;
+      [*add::person/persons]0
+    %end;
+    &nbsp;&nbsp;<input type="submit" value="Ok"/>
+    <span style="float:right"><label><input id="sex1" name="sex1" class="occ%l_s1;" %lt3; size="2" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
+    <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if;(occ="")0%else;%occ;%end;" id="occ"%/></label></span>
+  </legend>
+  <div class="w1">
+    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3; %l_on8;%/></label>
+    <label>[surname/surnames]0<input id="surname" name="surname" size="30" maxlength="200" value="%surname;" %l_on2; %l_on7;%/></label>
+  </div>
+  <div class="w1">
+    <label>[public name]<input name="public_name" size="30" value="%public_name;" id="public_name" %/></label>
+  </div>
+  <div class="w2">
+    %if;has_qualifiers;
+      %foreach;qualifier;
+        %let;cnt1;%expr(cnt+1)%in;
+        <label>[qualifier]0 %cnt1;<input id="qualifier%cnt;" name="qualifier%cnt;" size="30" value="%qualifier;" list="dlqualifier"%/></label><a href="javascript:addItem('qualifier',%cnt1;,'[qualifier]0')"> + </a>
+      %end;
+    %elseif;(bvar.propose_qualifier != "no")
+      <label>[qualifier]0 1<input id="qualifier0" name="qualifier0" size="30" value="" list="dlqualifier"%/></label><a href="javascript:addItem('qualifier',1,'[qualifier]0')"> + </a>
+    %end;
+    <span id="new_qualifier"></span>
+    %if;has_aliases;
+      %foreach;alias;
+        %let;cnt1;%expr(cnt+1)%in;
+        <label>[alias]0 %cnt1;<input id="alias%cnt;" name="alias%cnt;" size="30" value="%alias;" list="dlalias"%/></label><a href="javascript:addItem('alias',%cnt1;,'[alias]0')"> + </a>
+      %end;
+    %elseif;(bvar.propose_alias != "no")
+      <label>[alias]0 1<input id="alias0" name="alias0" size="30" value="" list="dlalias"%/></label><a href="javascript:addItem('alias',1,'[alias]0')"> + </a>
+    %end;
+    <span id="new_alias"></span>
+    %if;has_first_names_aliases;
+      %foreach;first_name_alias;
+        %let;cnt1;%expr(cnt+1)%in;
+        <label>[first name alias]0 %cnt1;<input id="first_name_alias%cnt;" name="first_name_alias%cnt;" size="30" value="%first_name_alias;" %l_on8;%/></label><a href="javascript:addItem('first_name_alias',%cnt1;,'[first name alias]0')"> + </a>
+      %end;
+    %else;
+      <label>[first name alias]0 1<input id="first_name_alias0" name="first_name_alias0" size="30" value="" %l_on8;%/></label><a href="javascript:addItem('first_name_alias',1,'[first name alias]0')"> + </a>
+    %end;
+    <span id="new_first_name_alias"></span>
+    %if;has_surnames_aliases;
+      %foreach;surname_alias;
+        %let;cnt1;%expr(cnt+1)%in;
+        <label>[surname alias]0 %cnt1;<input id="surname_alias%cnt;" name="surname_alias%cnt;" size="30" value="%surname_alias;" %l_on7;%/></label><a href="javascript:addItem('surname_alias',%cnt1;,'[surname alias]0')"> + </a>
+      %end;
+    %else;
+      <label>[surname alias]0 1<input id="surname_alias0" name="surname_alias0" size="30" value="" %l_on7;%/></label><a href="javascript:addItem('surname_alias',1,'[surname alias]0')"> + </a>
+    %end;
+    <span id="new_surname_alias"></span>
+  </div>
+  <div class="w1">
+    %if;(occupation="")
+    <label>%lpcP; [occupation/occupations]0<input name="occu" rows="1" maxlength="300" id="occu" %lpaP; %l_on4; %l_on1;/></label>
+    %else;
+    <label>%lpcP; [occupation/occupations]0<textarea name="occu" rows="1" maxlength="300" id="occu" %lpaP; %l_on1s;>%occupation;</textarea></label>
+    %end;
+  </div>
+  <div class="w1">
+    <label>[source/sources]0 [person/persons]0
+    %if;(sources="")
+      <input name="src" maxlength="800" id="src" %l_on6; %l_on1s; value="%sources;"/>
+    %else;
+      <textarea name="src" rows="1" maxlength="800" id="src" %l_on1s;>%sources;</textarea>
+    %end;
+    </label>
+    <label>[image/images]0<input name="image" size="36" value="%image;"/></label>
+  </div>
+  <div>
+    [access]0
+    <label><input type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked="checked"%end;%/>[iftitles/public/semipublic/private]0</label>
+    <label><input type="radio" name="access" value="Public"%if;acc_public; checked="checked"%end;%/>[iftitles/public/semipublic/private]1</label>
+    %if;(b.semi_public="yes")
+    <label><input type="radio" name="access" value="SemiPublic"%if;acc_semi_public; checked="checked"%end;%/>[iftitles/public/semipublic/private]2</label>
+    %end;
+    <label><input type="radio" name="access" value="Private"%if;acc_private; checked="checked"%end;%/>[iftitles/public/semipublic/private]3</label>
+  </div>
+</fieldset>
+<fieldset id="notes1">
+  <legend><label style="font-size:inherit;" for="notes" %lpa5;>[*note/notes]1 </label></legend>
+  <textarea name="notes" id="notes">%notes;%sq;</textarea>
+    <div id="accent2">
+      <a style="display:none" id="accent0" href="javascript:accent0()" title="[visualize/show/hide/summary]2 [tools]"> – </a>
+      <a id="accent1" href="javascript:accent1()" title="[full width/columns]0"> … </a>
+    </div>
+    <div id="accent" style="display:none">
+      %include;accent
+    </div>
+</fieldset>
+<fieldset class="event">
+  <legend style="display:inline-block">[*event/events]1 <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %lpaO; title="[*invert::event/events]1 (Alt+%lpcOk;)">⇳</a></legend>
+    %if;(not has_pevent_birth)%apply;one_event(next_pevent,"#birt","witness")%incr_next_pevent;%end;
+    %if;has_pevents;%foreach;pevent;%apply;one_event(cnt,"","witness")%end;%end;
+    %if;(not has_pevent_death)%apply;one_event(next_pevent,"","witness")%incr_next_pevent;%end;
+    <dl id="new_event"></dl>
+    <dl><dt><a href="javascript:addEvent(1,1)" title="(+) [*death]" %lpa4;> + [event/events]0</a> %lpc4; <abbr %lt5;>#</abbr> %lt2; [place/places]0 [note/notes]1 [source/sources]1</dt></dl>
+    %incr_next_pevent;
+</fieldset>
+<fieldset class="f2">
+  <legend>[*relation/relations]1</legend>
+  <table>
+    <tr>
+      <td class="bg7"><abbr %lt4;>#</abbr></td>
+      <td class="bg7">[first name/first names]0</td>
+      <td class="bg7">[surname/surnames]0</td>
+      <td class="bd0"><div style="display:none"><span id="rM">M</span><span id="rF">F</span></div></td>
+      <td style="display:none"></td>
+    </tr>
+    %if;has_relations;
+      %foreach;relation;%apply;relations(cnt)%end;
+    %else;
+      %apply;relations("1")
+    %end;
+    <tr id="new_relation" style="display:none"><td colspan=5></td></tr>
+    <tr><td class="bg7"><a href="javascript:addRelation(1,1)" %lpa6;> + </a></td><td colspan=4 style="display:none"></td></tr>
+  </table>
+</fieldset>
+<fieldset class="t">
+<legend>[*title/titles]1</legend>
+  <table>
+    <tr>
+    <td class="bg7"><abbr %lt5;>#</abbr></td>
+    <td class="bg7">[title/titles]0</td>
+    <td class="bg7">[estate]</td>
+    <td class="bg7">[name]</td>
+    <td class="bg7">[nth]0</td>
+    <td class="bg7">[begin] / [end][:] %lt2;</td>
+    </tr>
+    %if;has_titles;
+      %foreach;title;%apply;one_title(cnt)%end;
+    %else;
+      %apply;one_title("1")
+    %end;
+    <tr id="new_title" style="display:none"><td colspan=6></td></tr>
+    <tr><td class="bg7"><a href="javascript:addTitle(1,1)" %lpa7;> + </a></td><td colspan=5 style="display:none"></td></tr>
+  </table>
+</fieldset>
+</form>
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

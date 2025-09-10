@@ -1,0 +1,34 @@
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: setup.css,v 7.00 2018-04-19 05:35:06 hg Exp $ -->
+  <!-- css file for gwsetup (command: %Vv;, base: %Vanon;)-->
+
+<style>
+* {
+  font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+}
+
+pre {
+  font-family: monospace;
+}
+
+a.j {
+  font-family: monospace;
+}
+
+table.setup {
+  border:1px solid;
+  border-radius:4px;
+  border-color:#5bc0de;
+}
+
+div.welcome {
+  width: 830px;
+  border: solid 2px #5bc0de;
+  border-radius:6px;
+  text-align: left;
+  overflow: auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding:5px;
+}
+</style>

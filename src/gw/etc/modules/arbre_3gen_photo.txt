@@ -1,0 +1,193 @@
+<!-- $Id: modules/arbre_3gen_photo.txt v7.1 22/04/2024 07:27:12 $ -->
+%( Arbre 3 générations vertical avec photos ancêtres, sans individu principal si fratrie %)
+%( barre verticale double si l’ancêtre est un sosa du cujus en cours, simple sinon %)
+%( TODO: W3C warning align and width elements on table are obsolete > use CSS instead %)
+%( op 1 = small tree 85% size | 2 = normal size %)
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+%define;vt(xx,yy,zz,cc)
+  %if;(b.display_sosa="yes" and (("xx"!="" and xx.has_sosa)
+    or ("yy"!="" and yy.has_sosa))
+   and ("zz" in "yy" or "zz" in "yy" or (zz=self and self=sosa_ref or self.has_sosa)))
+    ║%if;(cc=2)<br>║%end;
+  %else;│%if;(cc=2)<br>│%end;
+  %end;
+%end;
+%define;ttl(ss,gg)
+  %if;(ss=0)
+    %if;(gg=2)([a grandfather/a grandmother/a grandparent]0)
+    %else;([father/mother]0)%end;
+  %else;
+    %if;(gg=2)([a grandfather/a grandmother/a grandparent]1)
+    %else;([father/mother]1)%end;
+  %end;
+%end;
+%( vtbr will show 2 vertical bars if one grandparents’ couple is divorced or separated
+   this allows the central column carrying the marriage period for those case not to widen the table %)
+%define;setvar(nnn,vvv)%set_var.nnn.vvv;%end;
+%define;fam_dates(xx)
+  %if;(spouse.access=xx.father.access and family.date_s!="")
+    %apply;setvar%with;mar_xx%and;%family.date_s;%end;
+  %end;
+%end;
+%(%foreach;mother.family;%apply;fam_dates("self")%end;%)
+%if;(has_parents)
+  %if;(father.has_parents)
+    %foreach;father.mother.family;%apply;fam_dates("father")%end;
+  %end;
+  %if;(mother.has_parents)
+    %foreach;mother.mother.family;%apply;fam_dates("mother")%end;
+  %end;
+%end;
+%let;marriage_sep_check;%get_var.mar_father;%get_var.mar_mother;%in;
+%let;vtbr;%if;("-" in marriage_sep_check)2%else;1%end;%in;
+%define;ind(xx,gg)
+  %if;(xx.has_image or xx.has_blason)
+    %if;xx.has_image;
+      %if;(not cancel_links)<a href="%xx.image_url;" target="_blank">%end;
+      <img class="rounded" %xx.image_small_size; src="%xx.image_url;"
+        alt="[image/images]0" title="%xx; %apply;ttl(xx.sex,gg)">
+      %if;(not cancel_links)</a>%end;
+    %elseif;xx.has_blason;
+      %if;(not cancel_links)<a href="%xx.blason_url;" target="_blank">%end;
+      <img class="rounded" %xx.blason_small_size; src="%xx.blason_url;"
+        alt="[image/images]0" title="%xx; %apply;ttl(xx.sex,gg)">
+      %if;(not cancel_links)</a>%end;
+    %end;
+  %elseif;(b.default_image="yes")
+    <img height="75" src="%images_prefix;img_unknown_%if;(xx.sex=1)wo%end;man.png" alt="[missing image]">
+  %(%else;
+    <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted"
+      %if;(father.has_parents and mother.has_image)%father.image_small_size;
+      %elseif;(mother.has_parents and father.has_image)%mother.image_small_size;%end;>?</span>%)
+  %end;
+  %apply;short_display_person_tree("xx")
+%end;
+%if;has_parents;
+  <table class="mt-2 mt-md-0 mx-auto px-0 text-center%if;(op_m=2) small%end;" style="line-height:0.9rem">
+    <tr>%nn;
+      %if;father.has_parents;
+        <td colspan="4" class="align-bottom">%apply;ind("father.father",2)</td>
+        <td></td>
+        <td colspan="4" class="align-bottom">%apply;ind("father.mother",2)</td>
+      %else;
+        <td colspan="9" rowspan="4"></td>
+      %end;
+      <td></td>
+      %if;mother.has_parents;
+        <td colspan="4" class="align-bottom">%apply;ind("mother.father",2)</td>
+        <td></td>
+        <td colspan="4" class="align-bottom">%apply;ind("mother.mother",2)</td>
+      %else;
+        <td colspan="9" rowspan="4"></td>
+      %end;
+    </tr>
+    <tr>
+      %if;father.has_parents;
+        <td></td>
+        <td colspan="2">%apply;vt("father.father","","",vtbr)</td>
+        <td colspan="3" class="small align-text-center text-center font-italic col-1 px-1">%nn;
+          %apply;display_date_marriage_parent("father")</td>
+        <td colspan="2">%apply;vt("father.mother","","",vtbr)</td>
+        <td></td>
+      %end;
+      <td></td>
+      %if;mother.has_parents;
+        <td></td>
+        <td colspan="2">%apply;vt("mother.father","","",vtbr)</td>
+        <td colspan="3" class="small align-text-center text-center font-italic col-1 px-1">%nn;
+          %apply;display_date_marriage_parent("mother")</td>
+        <td colspan="2">%apply;vt("mother.mother","","",vtbr)</td>
+        <td></td>
+      %end;
+    </tr>
+    <tr>
+      %if;father.has_parents;
+        <td></td>
+        <td colspan="2" class="p-0" align="%right;">
+          <hr dir="ltr" width="50%%" align="%right;">
+        </td>
+        <td colspan="3" class="p-0">
+          <hr width="100%%">
+        </td>
+        <td colspan="2" class="p-0" align="%left;">
+          <hr dir="ltr" width="50%%" align="%left;">
+        </td>
+        <td></td>
+      %end;
+      <td></td>
+      %if;mother.has_parents;
+        <td></td>
+        <td colspan="2" class="p-0" align="%right;">
+          <hr dir="ltr" width="50%%" align="%right;">
+        </td>
+        <td colspan="3" class="p-0">
+          <hr width="100%%">
+        </td>
+        <td colspan="2" class="p-0" align="%left;">
+          <hr dir="ltr" width="50%%" align="%left;">
+        </td>
+        <td></td>
+      %end;
+    </tr>
+    <tr>
+      %if;father.has_parents;
+        <td colspan="3"></td>
+        <td colspan="3" class="pt-0">%apply;vt("father.father","father.mother","father",1)</td>
+        <td colspan="3"></td>
+      %end;
+      <td></td>
+      %if;mother.has_parents;
+        <td colspan="3"></td>
+        <td colspan="3" class="pt-0">%apply;vt("mother.father","mother.mother","mother",1)</td>
+        <td colspan="3"></td>
+      %end;
+    </tr>
+    <tr>
+      <td colspan="2"></td>
+      <td colspan="5" class="align-bottom">%apply;ind("father",1)</td>
+      <td colspan="2"></td>
+      <td></td>
+      <td colspan="2"></td>
+      <td colspan="5" class="align-bottom">%apply;ind("mother",1)</td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td colspan="3"></td>
+      <td colspan="3">%apply;vt("father","","",1)</td>
+      <td colspan="1"></td>
+      <td colspan="5" class="small align-text-center text-center font-italic col-1 px-0">%nn;
+        %apply;display_date_marriage_parent("self")%nn;
+      </td>
+      <td colspan="1"></td>
+      <td colspan="3">%apply;vt("mother","","",1)</td>
+      <td colspan="3"></td>
+    </tr>
+    <tr>
+      <td colspan="3"></td>
+      <td colspan="3" class="p-0" align="%right;">
+        <hr dir="ltr" width="50%%" align="%right;">
+      </td>
+      <td colspan="7" class="p-0">
+        <hr width="100%%">
+      </td>
+      <td colspan="3" class="p-0" align="%left;">
+        <hr dir="ltr" width="50%%" align="%left;">
+      </td>
+      <td colspan="3"></td>
+    </tr>
+    <tr>%( hack to justify the whole table, don't use colspan="9" instead %)
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+      <td>%apply;vt("father","mother","self",1)</td>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+    %if;(not has_siblings)
+      <tr>
+        <td colspan="5"></td>
+        <td colspan="9">%nn;
+          %apply;short_display_person_tree("self")
+        </td>
+        <td colspan="5"></td>
+      </tr>
+    %end;
+  </table>
+%end;

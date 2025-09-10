@@ -1,0 +1,124 @@
+    plugin_fixbase_FIXBASE
+co: Avventata di i dati deteriurati
+en: Detect corrupted data
+fr: Détection des données corrompues
+
+    plugin_fixbase_FIXBASE_OK
+co: Currezzione di i dati alterati
+en: Fix corrupted data
+fr: Correction des données corrompues
+
+    plugin_fixbase_description
+co: St’attrezzu vi pò permette di currege certi dati in una basa. Una validazione di i cambiamenti pruposti vi serà dumandata prima d’appiecalli nant’à a basa.
+en: This tool (may) allow you to fix corrupted data in a base. You will be asked to review proposed changes before actually applying them to the base.
+fr: Cet outil permet de corriger certaines données corrompues. Une validation des changements proposés vous sera demandée avant d'appliquer les correctifs à la base.
+
+    plugin_fixbase_f_children
+co: Aghjunghje i genitori assente à quelli arregistrati cum’è zitella(u) d’una famiglia.
+en: Add missing parents to ones recorded as child of a family.
+fr: Ajoute les parents manquants à quelqu'un enregistré comme enfant d'une famille.
+
+    plugin_fixbase_f_parents
+co: Aghjunghje l’unioni assente à quelli arregistrati cum’è genitore d’una famiglia.
+en: Add missing unions to ones recorded as parent of a family.
+fr: Ajoute les unions manquantes aux individus enregistré comme parent d'une famille.
+
+    plugin_fixbase_fevents_witnesses
+co: Aghjunghje e relazioni assente truvate in l’evenimenti famigliali.
+en: Add missing related from family events.
+fr: Ajoute les relations manquantes trouvées dans les événements familiaux.
+
+    plugin_fixbase_invalid_utf8
+co: Currege i testi malcudificati.
+en: Fix wrong UTF8 encoding.
+fr: Corrige les textes mal encodés.
+
+    plugin_fixbase_marriage_divorce
+co: Currege i campi matrimoniu è divorziu secondu à l’evenimenti famigliali.
+en: Fix marriage and divorce field based on family events.
+fr: Corrige les champs mariage et divorce en se basant sur les événements familiaux.
+
+    plugin_fixbase_missing_spouses
+co: Ristureghja e persone viote squassate ma sempre presente in un’unione.
+en: Restore empty persons deleted but still present in an union.
+fr: Restaure les personnes vides supprimées mais toujours renseignées dans une union.
+
+    plugin_fixbase_ok_apply
+co: Appiecà sti cambiamenti.
+en: Apply these changes.
+fr: Appliquer ces modifications.
+
+    plugin_fixbase_ok_base_changed
+co: A basa hè stata mudificata dapoi l’esecuzione di l’analisa.
+en: Base changed after the scanner was ran.
+fr: La base à été modifiée depuis le scan.
+
+    plugin_fixbase_ok_commit_patches
+co: Mudificazioni appiecate.
+en: Changed applied.
+fr: Modifications effectuées.
+
+    plugin_fixbase_ok_nothing
+co: Ùn ci hè nunda à currege per l’ozzioni scelte.
+en: There is nothing to fix, for chosen options.
+fr: Pas d'erreur à corriger pour les options choisies.
+
+    plugin_fixbase_ok_refresh
+co: Attualizà torna.
+en: Refresh.
+fr: Réactualiser.
+
+    plugin_fixbase_ok_return
+co: Ritornu à u furmulariu.
+en: Go back to the form.
+fr: Retourner au formulaire.
+
+    plugin_fixbase_ok_tstab
+co: Squassatura di i schedarii d’impiatta sosa.
+en: Delete sosa cache files.
+fr: Suppression des fichiers de cache sosa.
+
+    plugin_fixbase_p_NBDS
+co: Currege i campi nascita, battesimu, morte è sepultura secondu à l’evenimenti persunali.
+en: Fix birth, baptism, death and burial fields according to what is present in personnal events.
+fr: Corrige les champs naissance, baptême, décès et sépulture en se basant sur les événement personnels.
+
+    plugin_fixbase_p_families
+co: Caccia i duppioni in l’unioni d’una listessa persona.
+en: Remove same unions used more than once for the same person.
+fr: Supprime les doublons dans les unions d'une personne.
+
+    plugin_fixbase_p_key
+co: Currege e chjavi in doppiu mudifichendu u numeru d’occurenza.
+en: Fix duplicate keys by changing the number.
+fr: Corrige les clés en double en modifiant le numéro d'occurence.
+
+    plugin_fixbase_p_parents
+co: Caccia i genitori o aghjunghje un(a) zitellu(a).
+en: Remove parents or add child.
+fr: Supprime les parents ou ajoute un enfant.
+
+    plugin_fixbase_password_missing
+co: Parolla d’intesa assente.
+en: Missing password.
+fr: Mot de passe nécessaire.
+
+    plugin_fixbase_password_submit
+co: Sottumette
+en: Submit
+fr: Soumettre
+
+    plugin_fixbase_pevents_witnesses
+co: Aghjunghje e relazioni assente truvate in l’evenimenti persunali.
+en: Add missing related from personnal events.
+fr: Ajoute les relations manquantes trouvées dans les événements personnels.
+
+    plugin_fixbase_submit
+co: Fà a currezzione
+en: Fix it
+fr: Lancer la correction
+
+    plugin_fixbase_tstab
+co: Caccia certi schedarii d’impiatta impiegati per calculà u numeru sosa.
+en: Remove some cache files involved in sosa computing.
+fr: Supprime les fichiers de cache utilisés pour calculer le numéro sosa.

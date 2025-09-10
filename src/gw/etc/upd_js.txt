@@ -1,0 +1,166 @@
+%( Input datalists and function to populate all datalists %)
+%define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
+%apply;dl("fnames")
+%apply;dl("snames")
+%apply;dl("places")
+%apply;dl("occupations")
+%apply;dl("sources")
+%if;("IND" in e.m)
+  %apply;dl("pub_names")
+  %apply;dl("qualifiers")
+  %apply;dl("aliases")
+  %apply;dl("titles")
+  %apply;dl("estates")
+%end;
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    addClearButtonToInputs();
+    inputToBook.addNavigation();
+    populateDatalists();
+});
+
+%( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)
+$(document).ready(function() {
+  $("[id$=_selct]").on('change', function() {
+    var pre = '#' + this.id;
+    var all = pre + '_data, ' + pre + '_sex';
+    var mod = pre + '_mod';
+    var isLink = this.value === "link";
+    $(all).toggle(!isLink);
+    $(mod).toggle(isLink);
+  }).change();
+});
+
+document.addEventListener("scroll", function () {
+  const banner = document.getElementById("banner");
+  if (window.scrollY > 35) {
+    banner.classList.add("scrolled");
+  } else {
+    banner.classList.remove("scrolled");
+  }
+});
+
+<!--
+function changeCalendar(e,v,m,c) {
+  var mv = m;
+  switch (m) {
+  case "VD": mv = 1; break;
+  case "BR": mv = 2; break;
+  case "FM": mv = 3; break;
+  case "NI": mv = 4; break;
+  case "PL": mv = 5; break;
+  case "VT": mv = 6; break;
+  case "GE": mv = 7; break;
+  case "FL": mv = 8; break;
+  case "PR": mv = 9; break;
+  case "ME": mv = 10; break;
+  case "TH": mv = 11; break;
+  case "FT": mv = 12; break;
+  case "JC": mv = 13; break;
+  }
+  switch(c.options%[c.selectedIndex%].value) {
+  case 'G':
+  case 'J':
+    document.getElementById(e).innerHTML = '\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
+-</option>\
+<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
+[(month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
+[(month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
+[(month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
+[(month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
+[(month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
+[(month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
+[(month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
+[(month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
+[(month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
+[(month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
+[(month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
+[(month)]11</option>\
+</select>\
+';
+    break;
+  case 'F':
+    document.getElementById(e).innerHTML = '\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
+-</option>\
+<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
+[(french revolution month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
+[(french revolution month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
+[(french revolution month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
+[(french revolution month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
+[(french revolution month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
+[(french revolution month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
+[(french revolution month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
+[(french revolution month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
+[(french revolution month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
+[(french revolution month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
+[(french revolution month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
+[(french revolution month)]11</option>\
+<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
+[(french revolution month)]12</option>\
+</select>\
+';
+    break;
+  case 'H':
+    document.getElementById(e).innerHTML = '\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
+-</option>\
+<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
+[(hebrew month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
+[(hebrew month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
+[(hebrew month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
+[(hebrew month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
+[(hebrew month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
+[(hebrew month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
+[(hebrew month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
+[(hebrew month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
+[(hebrew month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
+[(hebrew month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
+[(hebrew month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
+[(hebrew month)]11</option>\
+<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
+[(hebrew month)]12</option>\
+</select>\
+';
+    break;
+  }
+}
+-->
+</script>

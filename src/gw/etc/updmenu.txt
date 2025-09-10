@@ -1,0 +1,87 @@
+%(<!-- $Id: updmenu.txt v7.0 28/04/2017 09:34:30 $ -->%)
+%( used for jquery. old updmenu.txt is in updmenu1.txt %)
+%( track modifications made in templm/updmenu.txt  %)
+%define;jq1()
+  <div id="jql">
+  %if;has_birth_date; %slash_birth_date;
+  %elseif;has_baptism_date; %slash_baptism_date;
+  %end;
+   - %nn;
+  %if;has_death_date;%slash_death_date;
+  %elseif;has_burial_date;%slash_burial_date;
+  %elseif;has_cremation_date;%slash_cremation_date;
+  %end;
+  </div>
+  <div id="jq7">%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end;</div>
+  <div id="jq8">%first_name;</div>
+  <div id="jq9">%surname;</div>
+  <div id="jq10">%index;</div>
+  <div id="jq11">%sex;</div>
+%end;
+%define;jq1a(z1,z2)
+  %let;lbp;
+    %if;z1.has_birth_place;%z1.birth_place;
+    %elseif;z1.has_baptism_place;%z1.baptism_place;
+    %end;
+  %in;
+  %let;ldp;
+    %if;z1.is_dead;
+      %if;z1.has_death_place;%z1.death_place;
+      %elseif;z1.has_burial_place;%z1.burial_place;
+      %elseif;z1.has_cremation_place;%z1.cremation_place;
+      %end;
+    %end;
+  %in;
+  <div id="jql"> </div>
+  <div id="z2jq2">
+    %if;z1.has_birth_date; %z1.slash_birth_date;
+    %elseif;z1.has_baptism_date; %z1.slash_baptism_date;
+    %end;
+     · %lbp;%nn;
+  </div>
+  <div id="z2jq3">
+    %if;z1.is_dead;
+      %if;z1.has_death_date; %z1.slash_death_date;
+      %elseif;z1.has_burial_date; %z1.slash_burial_date;
+      %elseif;z1.has_cremation_date; %z1.slash_cremation_date;
+      %end;
+       · %ldp;%nn;
+    %end;
+  </div>
+  <div id="z2jq4"> %z1.occupation; </div>
+  <div id="z2jq5">%lbp; </div>
+  <div id="z2jq6">%ldp; </div>
+  <div id="z2jq7">%if;(z1.first_name = "?" or z1.surname = "?")%z1.index;%else;%z1.occ;%end;</div>
+  <div id="z2jq8">%z1.first_name;</div>
+  <div id="z2jq9">%z1.surname;</div>
+  <div id="z2jq11">%z1.sex;</div>
+%end;
+%define;jq1b()
+  %apply;jq1a("self","pa1")
+  %if;has_families;
+    %foreach;family()
+      %if;(family.index = evar.ifam)
+        %apply;jq1a("spouse","pa2")
+        %if;has_children;
+          %foreach;child;
+            %let;l1;ch%child_cnt;%in;
+            %apply;jq1a("child",l1)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+%if;(evar.jq1 = "on")
+  %apply;jq1()
+%elseif;(evar.jq1a = "on")
+  %apply;jq1a("self","")
+%elseif;(evar.jq1b = "on")
+  %apply;jq1b()
+%elseif;(evar.upddag = "on")
+  <div class="container">
+    %include;templm/upddag
+  </div>
+%else;
+  %include;updmenu1
+%end;

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwu.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Extract a GeneWeb file]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Extract a GeneWeb file]</h1>
+</div>
+<form method=GET action="gwu">
+<input type=hidden name=opt value="check">
+<input type=hidden name=lang value="%l">
+<ul><li>
+[Select your database by clicking on the associated button][:]
+<p>
+<table class="setup" style="cellspacing=0 cellpadding=1">
+%b{<tr align=left>
+<td><input type=radio name=anon value="%a">   </td>
+<td>%a</td></tr>|
+<tr align=left><td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<table class="setup" style="cellspacing=0 cellpadding=1">
+<tr><td>
+[Enter the name you want to give to your %G source file. Its name must end with the suffix "<tt>.gw</tt>". If you write nothing, its name will be deducted from the name of the database.]
+%(
+Enter the name you want to give to your %G source file. Its name must
+end with the suffix "<tt>.gw</tt>". If you write nothing, its name will
+be deducted from the name of the database.
+%)
+</td></tr>
+<p>
+<tr><td>
+<dl><dt><dd><input type="radio" name="od" value="o" checked>&nbsp;<input name=o size=30></dl>
+</td></tr>
+<p>
+<tr><td>
+<dl><dt><dd>
+[or ask for recreation of files in original directory.<br> If the base was created by <span style="font-family: monospace">gwc -f *.gw</span>,  then <span style="font-family: monospace">gwu -odir .</span> will recreate the source files.]
+%(
+or ask for recreation of files in original directory.<br> If the base was created
+by <span style="font-family: monospace">gwc -f *.gw</span>, then <span style=
+"font-family: monospace">gwu -odir .</span> will recreate the source files.
+%)
+</dl>
+</td></tr>
+<tr><td>
+<dl><dt><dd><input type="radio" name="od" value="odir">&nbsp;<input name=odir size=30 value="." ></dl>
+</td></tr>
+</table>
+</dl>
+<p>
+<li>
+[Select the options you want][:]
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=isolated value="on">   </td>
+<td>[extract isolated persons]</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=all_files value="on">   </td>
+<td>[save all files]</td>
+</tr>
+</table>
+<p>
+
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=mem value="on">   </td>
+<td>[Save memory space during operation (but it will be slower).]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>[Extract only the ancestors of]
+</td></tr>
+<tr align=left><td>[First name]
+</td>
+<td><input name="a1" size=30 maxlength=200></td>
+<td>[Num]
+</td>
+<td><input name="a2" size=5 maxlength=8></td></tr>
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="a3" size=40 maxlength=200></td></tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>[Extract only the descendants of]
+</td></tr>
+<tr align=left><td>[First name]
+</td>
+<td><input name="d1" size=30 maxlength=200></td>
+<td>[Num]
+</td>
+<td><input name="d2" size=5 maxlength=8></td></tr>
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="d3" size=40 maxlength=200></td></tr>
+</table>
+<p>
+[If you use both options above, the intersection is assumed: persons <em>at the same time</em> ancestors of the one and descendants of the other.]
+%(
+If you use both options above, the intersection is assumed: persons <em>at the s
+ame time</em> ancestors of the one and descendants of the other.
+%)
+<p>
+<li>
+[Then click on this button][:]
+<input type=submit value="[Extract]">
+</ul>
+</form>

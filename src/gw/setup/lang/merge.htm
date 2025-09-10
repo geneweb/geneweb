@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: merge.htm,v 7.00 2018-04-20 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Merging databases]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[Merging databases]
+</h1>
+</div>
+
+<form method=GET action="merge">
+<input type=hidden name=lang value="%l">
+
+[All your databases to be merged must be first under %G.]
+<p>
+[If it is not the case, if, for example, some of them are just GEDCOM files or GeneWeb source files, return to the main menu to create them under %G, then go back to this page.]
+%(
+If it is not the case, if, for example, some of them are just GEDCOM files or Ge
+neWeb source files, return to the main menu to create them under %G, then go 
+back to this page.
+%)
+<p>
+<ul><li>
+[Once done, select the databases you want to merge by pushing their associated buttons:]
+<p>
+<table class="setup">
+%b{
+<tr align=left>
+<td><a href="http://%m:%P/%a">%a</a></td>
+<td><input type=checkbox name="%a" value="on_"></td>
+</tr>|
+<tr align=left><td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<li>
+[Indicate the name you want to give to your resulting database:]
+<p>
+<input name=o size=30>
+<p>
+<li>
+[Then click on this button][:]
+<p>
+<input type=submit value="[Merge]
+">
+</ul>
+</form>
+<p>
+[Remark: merging consists on simple concatenation of the databases. There is no research for identical persons. After merging, you therefore have to research the possible doubled persons or families and merge them. See the documentation.]
+(%D)
+%(
+Remark: merging consists on simple concatenation of the databases. There is no r
+esearch for identical persons. After merging, you therefore have to research the
+possible doubled persons or families and merge them. See the documentation.
+%)

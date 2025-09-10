@@ -1,0 +1,80 @@
+<!-- $Id: templm/ancdes_stat.txt v7.0 2014/11/26 19:21:08 $ -->
+
+%define;stat1a(z1,z2,z3,z4)
+  %reset_count;
+  %foreach;sorted_list_item;
+    %if;(prev_item.2 != item.2 or prev_item.1 != item.1)
+      %reset_count;%incr_count;
+      <a href="%prefix;spouse=on;i%count;=%item.3;&t%count;=%count;&%nn;
+    %end;
+    %if;(prev_item.2 = item.2 and prev_item.1 = item.1)
+      %incr_count;
+      i%count;=%item.3;&t%count;=%count;&%nn;
+    %end;
+    %if;(next_item.2 != item.2 or next_item.1 != item.1)
+      %let;l1;%expr(item.2 + z1)%in;
+      %let;l2;%if;(count > l_max_width)%l_max_width;%else;%count;%end;%in;
+      %let;l3;%expr(item.2 * 10) ≥ z4 ≤ %expr(item.2 * 10 + 9);%in;
+      %incr_count;
+      i%count;=%index;&t%count;=%l3;%nn;
+      %if;(count > 10)m=C;list=1;t=%l3;&i=%index;&%else;m=RLM;%end;"
+      class="z25%item.1;" style="z3:%l1;em;border-width:%l2;px;">%expr(count - 1)</a>
+    %end;
+  %end;
+%end;
+
+%define;stat1b(z1,z2,z3)
+  %reset_count;
+  %foreach;sorted_list_item;
+    %incr_count;
+    %if;(next_item.2 != item.2 or next_item.1 != item.1)
+      %let;l1;%expr(item.2 + z1)%in;
+      %let;l2;%if;(count > l_max_width)%l_max_width;%else;%count;%end;%in;
+      <span class="z25%item.1;" style="z3:%l1;em;border-width:%l2;px;">%count;</span>
+      %reset_count;
+    %end;
+  %end;
+%end;
+
+%define;stat1(z1,z2,z3,z4)
+  %if;(not cancel_links and l_max_dates > count)
+    %apply;stat1a(z1,"z2","z3","z4")
+  %else;
+    %apply;stat1b(z1,"z2","z3")
+  %end;
+%end;
+
+%define;stat2()
+  %let;l_height;%expr(40 + (count *2))%in;
+  <div class="body bcbg1" style="height:%l_height;px;">
+    %reset_count;
+    %foreach;sorted_list_item;
+      %incr_count;
+      %let;l1;%expr(20 + (count * 2))%in;
+      %let;l2;%expr(20 + item.2 * 8)%in;
+      %let;l3;%if;(l2 > 840)840%else;%l2;%end;%in;
+      %if;(count = 1)
+        <span class="date">%item.1;</span>
+        <span class="lev">%level;</span>
+      %end;
+      %if;(next_item.1 = "")<span class="date" style="top:%l1;px;">%item.1;</span>%end;
+      <a href="%prefix;i=%item.4;" style="top:%l1;px;left:%l3;px;color:#%if;(item.3 = 0)36C;%else;F6C%end;&">%item.2;</a>
+    %end;
+  </div>
+%end;
+
+%define;des_a()
+  %reset_count;
+  %reset_desc_level;
+  %empty_sorted_list;
+  %apply;des_a1(0,l_v)
+  %apply;stat_a1()
+  <div class="stat2 bcbg1">
+    %apply;stat_a2()
+    %reset_desc_level;
+    %reset_count;
+    %empty_sorted_list;
+    %apply;des_a2(0,l_v)
+    %apply;stat2()
+  </div>
+%end;

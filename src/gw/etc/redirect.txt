@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>Address changed</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+%include;js
+</head>
+<body>
+<div class="container">
+<h1>[
+en: Address changed
+fr: Changement d'adresse
+]
+</h1>
+<p>
+[
+en: The address of this service has changed.
+    Please use now:
+fr: L'adresse du service a changé.
+    Utiliser maintenant:
+it: L'indirizzo di questo service è cambiato.
+    Utilizzate:
+]
+<ul>
+<li><a href="%link;">%link;</a></li>
+</ul>
+</p>
+
+%include;trl
+%include;copyr
+%query_time;
+</div>
+</body>
+</html>

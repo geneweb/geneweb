@@ -1,0 +1,1118 @@
+%(
+   Display livre d'ascendance
+%)
+
+%let;in_place;%if;roglo;-%else;[in (place)]%end;%in;
+
+%( Copie sans majuscules %)
+%define;tothegen(xx)
+  [to the %s generation:::xx]%nn;
+%end;
+
+%define;togen(xx)
+  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[to the parents]%nn;
+  %elseif;(xx = 2)[to the grandparents]%nn;
+  %elseif;(xx = 3)[to the great-grandparents]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+%define;thegen(xx)
+  [the %s generation:::xx]%nn;
+%end;
+%define;gena(xx)
+  %if;(xx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[*the parents]%nn;
+  %elseif;(xx = 2)[*the grandparents]%nn;
+  %elseif;(xx = 3)[*the great-grandparents]%nn;
+  %else;
+    %apply;thegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+%define;on_side(xx)
+  [*on %s's side:::xx]
+%end;
+%define;relation_type_txt(xx, sex)
+  %if;("xx" = [adoptive father/adoptive mother/adoptive parents]2)
+    %apply;capitalize(nth([adoptive father/adoptive mother/adoptive parents], sex))
+  %elseif;("xx" = [recognizing father/recognizing mother/recognizing parents]2)
+    %apply;capitalize(nth([recognizing father/recognizing mother/recognizing parents], sex))
+  %elseif;("xx" = [candidate father/candidate mother/candidate parents]2)
+    %apply;capitalize(nth([candidate father/candidate mother/candidate parents], sex))
+  %elseif;("xx" = [godfather/godmother/godparents]2)
+    %apply;capitalize(nth([godfather/godmother/godparents], sex))
+  %elseif;("xx" = [foster father/foster mother/foster parents]2)
+    %apply;capitalize(nth([foster father/foster mother/foster parents], sex))
+  %else;
+    %apply;capitalize("xx")
+  %end;
+%end;
+
+%define;relation_txt()
+  %if;(on_marriage_date != "" or marriage_place != "")
+    %if;are_married;
+      [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
+    %elseif;are_not_married;
+      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
+    %elseif;are_engaged;
+      [*engaged]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
+    %elseif;is_no_sexes_check;
+      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
+    %elseif;is_no_mention;
+      %apply;capitalize(on_marriage_date)%sp;%if;(marriage_place != "")%sp;%in_place;%sp;%marriage_place;%end;.
+    %end;
+  %end;
+%end;
+
+%define;display_date(xx, with_rowspan)
+  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
+    %if;xx.has_birth_date;%xx.slash_birth_date;
+    %elseif;xx.has_baptism_date;%xx.slash_baptism_date;
+    %else;<span class="fp_date_empty">&nbsp;</span>
+    %end;
+  </td>
+  <td align="center" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
+    %if;(xx.has_birth_date or xx.has_baptism_date or xx.has_death_date or xx.has_burial_date) -
+    %else; &nbsp;
+    %end;
+  </td>
+  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
+    %if;xx.has_death_date;%xx.slash_death_date;
+    %elseif;xx.has_burial_date;%xx.slash_burial_date;
+    %else;<span class="fp_date_empty">&nbsp;</span>
+    %end;
+  </td>
+%end;
+
+%define;display_family_siblings(xx, count)
+  %foreach;xx.family;
+    %if;(family_cnt != 1)
+      <tr>
+        <td>%spouse;</td>
+        <td align="center">%nb_children;</td>
+      </tr>
+    %end;
+  %end;
+%end;
+
+%define;display_siblings(xx, count)
+  <tr %if;(count != 1) class="table_content_siblings" %end;>
+    <td %if;(xx.nb_families > 1) rowspan="%xx.nb_families;" %end;>%apply;image_MF("xx") %xx;</td>
+    %apply;display_date("xx", 1)
+    <td>
+      %foreach;xx.family;
+        %if;(family_cnt = 1)
+          %spouse;
+        %end;
+      %end;
+    </td>
+    <td align="center">
+      %foreach;xx.family;
+        %if;(family_cnt = 1)
+          %nb_children;
+        %end;
+      %end;
+    </td>
+  </tr>
+  %if;(xx.nb_families > 1)
+    %apply;display_family_siblings("xx", count)
+  %end;
+%end;
+
+%define;display_children(xx, count)
+  <tr%if;(count % 2 = 0) class="table_content_odd"%end;>
+    <td>
+      %apply;image_MF("xx")
+      %xx;
+    </td>
+    %apply;display_date("xx", 0)
+    <td>%xx.birth_place;</td>
+  </tr>
+%end;
+
+%define;display_union(xx)
+  <table class="fp_table" cellspacing="0">
+    <tr>
+      <td width="28"><img src="%images_prefix;marriage.png"></td>
+      <td>
+        <table>
+          <tr>
+            <td>
+              <b>%spouse;%sp;</b>
+              %spouse.dates;
+            </td>
+            <td>
+              %if;spouse.has_occupation;
+                <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
+                %spouse.occupation;
+              %end;
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              %apply;relation_txt()
+              %if;xx.computable_marriage_age;
+                %if;(are_married or are_engaged)
+                  %apply;capitalize(nth([groom/bride], xx.sex))[:] %xx.marriage_age;%sp;
+                %else;
+                  %apply;capitalize(nth([conjoint/conjointe], xx.sex))[:] %xx.marriage_age;%sp;
+                %end;
+              %end;
+              %if;(xx.computable_marriage_age and spouse.computable_marriage_age)
+                %sp;-%sp;
+              %end;
+              %if;spouse.computable_marriage_age;
+                %if;(are_married or are_engaged)
+                  %apply;capitalize(nth([groom/bride], spouse.sex))[:] %spouse.marriage_age;
+                %else;
+                  %apply;capitalize(nth([conjoint/conjointe], spouse.sex))[:] %spouse.marriage_age;
+                %end;
+              %end;
+            </td>
+          </tr>
+          %if;(are_divorced or are_separated)
+            <tr>
+              <td colspan="2">
+                %if;are_divorced;[*divorced] %on_divorce_date;. %end;
+                %if;are_separated;[*separated] %on_separation_date;. %end;
+              </td>
+            </tr>
+          %end;
+        </table>
+      </td>
+    </tr>
+  </table><br>
+
+  %if;(evar.children = "on" and has_children)
+    <table class="fp_table_children" cellspacing="0">
+      <tr class="fp_grey">
+        <td>[*child/children]1</td>
+        <td colspan="3">[*date/dates]1</td>
+        <td>[*where born]</td>
+      </tr>
+      %foreach;child;
+        %apply;display_children("child",child_cnt)
+      %end;
+    </table><br>
+  %end;
+
+  %if;(evar.comm = "on" and (has_comment or has_marriage_note))
+    <table class="fp_marriage_notes">
+      <tr>
+        <td>
+          <span class="textcolor">[*marriage notes/marriages notes]0[:]</span> %comment;
+          %if;has_marriage_note;%marriage_note;%end;
+        </td>
+      </tr>
+    </table><br>
+  %end;
+%end;
+
+%define;access_ind(nnn)
+  %nnn;%sp;%nnn.dates;%nl;
+%end;
+
+%define;access(num,nnn)
+  num_
+  %if;("num" = 1)
+    %nnn;%nnn.title;%nnn.dates;<br>
+  %else;
+    %apply;access_ind("nnn")<br>
+  %end;
+%end;
+
+%define;display_tree(xx)
+  %if;xx.father.has_parents;
+    %if;xx.father.father.has_parents;
+      %if;xx.father.father.father.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+        %apply;access("16","xx.father.father.father.father")
+      %end;
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;_____|
+
+      %apply;access("8","xx.father.father.father")
+
+      %if;xx.father.father.father.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        /
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("17","xx.father.father.father.mother")
+      %else;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        /<br>
+      %end;
+    %end;
+  %end;
+
+  %if;xx.father.has_parents;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+    %apply;access("4","xx.father.father")
+  %end;
+
+  %if;xx.father.has_parents;
+    %if;xx.father.father.has_parents;
+      %if;xx.father.father.mother.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+        %apply;access("18","xx.father.father.mother.father")
+      %else;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;\<br>
+      %end;
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;/
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+
+      %apply;access("9","xx.father.father.mother")
+
+      %if;xx.father.father.mother.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("19","xx.father.father.mother.mother")
+      %else;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;/<br>
+      %end;
+    %else;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;/<br>
+    %end;
+  %end;
+
+  |%apply;access("2","xx.father")
+
+  %if;xx.father.has_parents;
+    %if;xx.father.mother.has_parents;
+      %if;xx.father.mother.father.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        \
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;_____|
+        %apply;access("20","xx.father.mother.father.father")
+      %else;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        \<br>
+      %end;
+
+      |
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;\
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+
+      %apply;access("10","xx.father.mother.father")
+
+      %if;xx.father.mother.father.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("21","xx.father.mother.father.mother")
+      %else;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+      %end;
+    %else;
+      |
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;\<br>
+    %end;
+  %end;
+
+  %if;xx.father.has_parents;
+    |
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+    %apply;access("5","xx.father.mother")
+  %end;
+
+  %if;xx.father.has_parents;
+    %if;xx.father.mother.has_parents;
+      %if;xx.father.mother.mother.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+        %apply;access("22","xx.father.mother.mother.father")
+      %else;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
+      %end;
+
+      |
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+
+      %apply;access("11","xx.father.mother.mother")
+
+      %if;xx.father.mother.mother.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("23","xx.father.mother.mother.mother")
+      %end;
+    %end;
+  %end;
+
+  |--%apply;access("1","xx")
+
+  %if;xx.mother.has_parents;
+    %if;xx.mother.father.has_parents;
+      %if;xx.mother.father.father.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+        %apply;access("24","xx.mother.father.father.father")
+      %end;
+
+      |
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+
+      %apply;access("12","xx.mother.father.father")
+
+      %if;xx.mother.father.father.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("25","xx.mother.father.father.mother")
+      %else;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+      %end;
+    %end;
+  %end;
+
+  %if;xx.mother.has_parents;
+    |
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;_____|
+    %apply;access("6","xx.mother.father")
+  %end;
+
+  %if;xx.mother.has_parents;
+    %if;xx.mother.father.has_parents;
+      %if;xx.mother.father.mother.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+        %apply;access("26","xx.mother.father.mother.father")
+      %else;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;\<br>
+      %end;
+
+      |
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;/
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+
+      %apply;access("13","xx.mother.father.mother")
+
+      %if;xx.mother.father.mother.has_parents;
+        |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        /
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("27","xx.mother.father.mother.mother")
+      %end;
+    %else;
+      |
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;/<br>
+    %end;
+  %end;
+
+  |%apply;access("3","xx.mother")
+
+  %if;xx.mother.has_parents;
+    %if;xx.mother.mother.has_parents;
+      %if;xx.mother.mother.father.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;_____|
+        %apply;access("28","xx.mother.mother.father.father")
+      %else;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;\<br>
+      %end;
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;\
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+
+      %apply;access("14","xx.mother.mother.father")
+
+      %if;xx.mother.mother.father.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("29","xx.mother.mother.father.mother")
+      %else;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;\
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+      %end;
+    %else;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;\<br>
+    %end;
+  %end;
+
+  %if;xx.mother.has_parents;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+    %apply;access("7","xx.mother.mother")
+  %end;
+
+  %if;xx.mother.has_parents;
+    %if;xx.mother.mother.has_parents;
+      %if;xx.mother.mother.mother.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        \
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
+        %apply;access("30","xx.mother.mother.mother.father")
+      %else;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        \<br>
+      %end;
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;¯¯¯¯¯|
+
+      %apply;access("15","xx.mother.mother.mother")
+
+      %if;xx.mother.mother.mother.has_parents;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
+        %apply;access("31","xx.mother.mother.mother.mother")
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;print_long_ind(xx)
+  <div class="fp_person">
+    <table width="100%%">
+      <tr>
+        <td>
+          <table>
+            <tr>
+              <td><h2><span class="highlight"><a name="ind_%xx.index;">%xx;</a></span></h2></td>
+              <td>%apply;image_MF("xx")</td>
+            </tr>
+          </table>
+        </td>
+        <td align="right">
+          %if;(evar.sosa = "on" and xx.has_sosa)
+            <span>
+              <img src="%images_prefix;sosa.png" alt="sosa" title="sosa"> [*Sosa] %xx.sosa;
+            </span>
+          %end;
+        </td>
+      </tr>
+    </table>
+    <div class="fp_person_info">
+      %if;(e.im="" and xx.has_image)
+        <table width="100%%">
+          <tr>
+            <td width="30">
+              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" border="0">
+            </td>
+            <td valign="top">
+      %end;
+      <ul class="fp_person_info_ul">
+        %if;xx.has_aliases;
+          <li>
+            <span class="fp_grey_italic">[*alias][:]</span>
+            %foreach;xx.alias;
+              <em>%if;not is_first;,%end;&nbsp;%alias;</em>
+            %end;
+          </li>
+        %end;
+        %if;xx.has_nobility_titles;
+          <li>
+            <span class="fp_grey_italic">[*title/titles]1[:]</span>
+            <em>
+              %foreach;xx.nobility_title;
+                %if;not is_first;,%end;
+                %nobility_title;
+              %end;
+            </em>
+          </li>
+        %end;
+        %if;xx.has_occupation;
+          <li>
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
+            %xx.occupation;
+          </li>
+        %end;
+        %if;((xx.has_aliases or xx.has_nobility_titles or xx.has_occupation) and
+             ((xx.has_birth_date or xx.has_birth_place) or (xx.has_baptism_date or xx.has_baptism_place) or
+             (xx.has_death_date or xx.has_death_place) or (xx.has_burial_date or xx.has_burial_place)))
+          <li><hr></li>
+        %end;
+        %if;(xx.has_birth_date or xx.has_birth_place)
+          <li>
+            <span class="fp_grey_italic">%apply;capitalize(nth([born],xx.sex))</span>
+            %xx.on_birth_date;
+            %if;xx.has_birth_place;%sp;%in_place;%sp;%xx.birth_place;%end;
+          </li>
+        %end;
+        %if;(xx.has_baptism_date or xx.has_baptism_place)
+          <li>
+            <span class="fp_grey_italic">%apply;capitalize(nth([baptized],xx.sex))</span>
+            %xx.on_baptism_date;
+            %if;xx.has_baptism_place;%sp;%in_place;%sp;%xx.baptism_place;%end;
+          </li>
+        %end;
+        %if;(xx.has_death_date or xx.has_death_place)
+          <li>
+            <span class="fp_grey_italic">%apply;capitalize(nth([died],xx.sex))</span>
+            %xx.on_death_date;
+            %if;xx.computable_death_age;%sp;[aged] %xx.death_age;,%end;
+            %if;xx.has_death_place;%sp;%in_place;%sp;%xx.death_place;%end;
+          </li>
+        %end;
+        %if;xx.is_buried;
+          <li>
+            <span class="fp_grey_italic">%apply;capitalize(nth([buried],xx.sex))</span>
+            %xx.on_burial_date;
+            %if;xx.has_burial_place;%sp;%in_place;%sp;%xx.burial_place;%end;
+          </li>
+        %end;
+        %if;xx.is_cremated;
+          <li>
+            <span class="fp_grey_italic">%apply;capitalize(nth([cremated],xx.sex))</span>
+            %xx.on_cremation_date;
+            %if;xx.has_cremation_place;%sp;%in_place;%sp;%xx.cremation_place;%end;
+          </li>
+        %end;
+      </ul>
+      %if;(e.im="" and xx.has_image)
+        </td></tr></table>
+      %end;
+    </div>
+  </div>
+
+  %if;(evar.parents = "on" and xx.has_parents)
+    <table class="fp_table_parent" cellspacing="0">
+      <tr><th colspan="2">[*parents]</th></tr>
+      <tr>
+        <td>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.father.sex))[:]</span>
+          %xx.father;
+          %if;(xx.father_age_at_birth != "")%sp;(%xx.father_age_at_birth;)%end;
+        </td>
+        <td>
+          %if;xx.father.has_occupation;
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
+            %xx.father.occupation;
+          %end;
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.mother.sex))[:]</span>
+          %xx.mother;
+          %if;(xx.mother_age_at_birth != "")%sp;(%xx.mother_age_at_birth;)%end;
+        </td>
+        <td>
+          %if;xx.mother.has_occupation;
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
+            %xx.mother.occupation;
+          %end;
+        </td>
+      </tr>
+    </table>
+  %end;
+
+  %if;(evar.siblings = "on" and (xx.has_siblings or (xx.has_parents and (xx.father.nb_families > 1 or xx.mother.nb_families > 1))))
+    <div style="page-break-inside:avoid;">
+      <table class="fp_table_siblings" cellspacing="0">
+        %if;xx.has_siblings;
+          <tr><th colspan="6">[*full siblings]</th></tr>
+          <tr class="fp_grey">
+            <td>[*name]</td>
+            <td colspan="3">[*date/dates]1</td>
+            <td>[*spouse/spouses]0</td>
+            <td align="center">[*child/children]1</td>
+          </tr>
+          %foreach;xx.father.child;
+            %apply;display_siblings("child", child_cnt)
+          %end;
+        %end;
+
+        %if;xx.has_parents;
+          %if;(xx.father.nb_families > 1 or xx.mother.nb_families > 1)
+            %reset_count;
+            %foreach;xx.father.family;
+              %if;(spouse.index != xx.mother.index)
+                %if;(nb_children > 0)%incr_count;%end;
+              %end;
+            %end;
+            %let;half_father;%count;%in;
+            %reset_count;
+            %foreach;xx.mother.family;
+              %if;(spouse.index != xx.father.index)
+                %if;(nb_children>0)%incr_count;%end;
+              %end;
+            %end;
+            %let;half_mother;%count;%in;
+            %if;(half_father != 0 or half_mother != 0)
+              %if;xx.has_siblings;<tr><td colspan="6">&nbsp;</td></tr>%end;
+              <tr><th colspan="6">[*half-brothers/half-sisters/half-siblings]2</th></tr>
+              <tr class="fp_grey">
+                <td>[*name]</td>
+                <td colspan="3">[*date/dates]1</td>
+                <td>[*spouse/spouses]0</td>
+                <td align="center">[*child/children]1</td>
+              </tr>
+              %if;(half_father != 0)
+                %foreach;xx.father.family;
+                  %if;(spouse.index != xx.mother.index and half_father!=0 and spouse.has_children)
+                    %if;has_children;
+                      <tr class="fp_half_siblings">
+                        <td colspan="6">%apply;on_side%with;%xx.father;%end;%sp;[with] %spouse;</td>
+                      </tr>
+                      %foreach;child;
+                        %apply;display_siblings("child", family_cnt)
+                      %end;
+                    %end;
+                  %end;
+                %end;
+              %end;
+              %if;(half_mother != 0)
+                %foreach;xx.mother.family;
+                  %if;(spouse.index != xx.father.index and half_mother!=0 and spouse.has_children)
+                    %if;has_children;
+                      <tr class="fp_half_siblings">
+                        <td colspan="6">%apply;on_side%with;%xx.mother;%end;%sp;[with] %spouse;</td>
+                      </tr>
+                      %foreach;child;
+                        %apply;display_siblings("child", family_cnt)
+                      %end;
+                    %end;
+                  %end;
+                %end;
+              %end;
+            %end;
+          %end;
+        %end;
+      </table>
+    </div>
+  %end;
+
+  %reset_count;
+  %if;xx.has_families;
+    %foreach;xx.family;
+      %if;has_witnesses;
+        %incr_count;
+      %end;
+    %end;
+  %end;
+  %if;(evar.rel = "on" and (xx.has_relations or count > 0))
+    <div style="page-break-inside:avoid;">
+      <table class="fp_table_relations" cellspacing="0">
+        <tr><th colspan="4" class="background-color">[*relation/relations]1</th></tr>
+        <tr class="fp_grey">
+          <td class="borderna">[*name]</td>
+          <td class="borderna" colspan="3">[*date/dates]1</td>
+        </tr>
+        %foreach;xx.relation;
+          %if;(has_relation_him and has_relation_her)
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_him") %relation_him; %sp;
+                (%apply;relation_type_txt(relation_type, relation_him.sex))
+              </td>
+              %apply;display_date("relation_him", 0)
+            </tr>
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_her") %relation_her; %sp;
+                (%apply;relation_type_txt(relation_type, relation_her.sex))
+              </td>
+              %apply;display_date("relation_her", 0)
+            </tr>
+          %elseif;has_relation_him;
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_him") %relation_him; %sp;
+                (%apply;capitalize(relation_type))
+              </td>
+              %apply;display_date("relation_him", 0)
+            </tr>
+          %elseif;has_relation_her;
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_her") %relation_her; %sp;
+                (%apply;capitalize(relation_type))
+              </td>
+              %apply;display_date("relation_her", 0)
+            </tr>
+          %end;
+        %end;
+        %foreach;xx.related;
+          <tr class="table_content_relations">
+            <td class="borderna">
+              %apply;image_MF("related") %related;  %sp;
+              %if;(related = [foster son/foster daughter/foster child]0)
+                (%apply;capitalize([foster son/foster daughter/foster child]2))
+              %elseif;(related = [foster son/foster daughter/foster child]1)
+                (%apply;capitalize([foster son/foster daughter/foster child]2))
+              %else;
+                (%apply;capitalize(related_type))
+              %end;
+            </td>
+            %apply;display_date("related", 0)
+          </tr>
+        %end;
+        %if;xx.has_families;
+          %foreach;xx.family;
+            %if;has_witnesses;
+              %foreach;witness;
+                <tr>
+                  <td class="borderna">
+                    %apply;image_MF("witness") %witness; %sp;
+                    ([*witness/witnesses]0)
+                  </td>
+                  %apply;display_date("witness", 0)
+                </tr>
+              %end;
+            %end;
+          %end;
+        %end;
+        %foreach;xx.event_witness_relation;
+          <tr class="table_content_relations">
+            <td class="borderna">
+              %apply;image_MF("event_witness_relation.person") %event_witness_relation.person; %sp;
+              %if;(event_witness_relation.event.spouse != "")
+                [and]
+                %apply;image_MF("event_witness_relation.event.spouse") %event_witness_relation.event.spouse; %sp;
+              %end;
+              (%apply;capitalize(event_witness_relation_kind) :%sp;
+              %event_witness_relation.event.name;)
+            </td>
+            %apply;display_date("event_witness_relation.person", 0)
+          </tr>
+        %end;
+      </table>
+    </div>
+  %end;
+
+  %if;(evar.marr = "on" and xx.has_families)
+    <div style="page-break-inside:avoid;">
+      <table class="fp_table_marriage" cellspacing="0">
+        <tr>
+          <th>
+            [*marriage/marriages]f %if;(evar.children = "on" and xx.has_children) [and] [child/children]c%end;
+          </th>
+        </tr>
+        <tr>
+          <td>
+            %foreach;xx.family;
+              %apply;display_union("xx")
+              %if;(family_cnt != xx.nb_families)<hr class="fp_family_separator">%end;
+            %end;
+          </td>
+        </tr>
+      </table>
+    </div>
+  %end;
+
+  %if;(evar.note = "on" and (xx.has_notes or xx.has_event))
+    <div style="page-break-inside:avoid;">
+      <table class="fp_table" cellspacing="0">
+        <tr><th>[*note/notes]1</th></tr>
+        <tr><td class="fp_notes">
+          %xx.notes;
+          %if;xx.has_event;
+            <table>
+              %foreach;xx.event;
+                <tr>
+                  <td valign="top" style="white-space: nowrap;" width="1">
+                    <span class="edate">
+                      %if;event.has_date;%event.date; :
+                      %else;--- :
+                      %end;
+                    </span>
+                  </td>
+                  <td valign="top">
+                    <span>
+                      %apply;capitalize(event.name)%sp;
+                      %if;event.has_spouse;([with] %event.spouse;)%end;
+                      %if;event.has_place; - %event.place; %end;
+                    </span>
+                    %if;event.has_witnesses;
+                      <p style="margin:0;">
+                        %foreach;event_witness;
+                          <span>%apply;capitalize(event_witness_kind)[:]</span>
+                          %apply;short_display_person("event_witness")<br>
+                        %end;
+                      </p>
+                    %end;
+                    %if;event.has_note;<div>%event.note;</div>%end;
+                      %if;event.has_src;<span><em>[*source/sources]1[:] %event.src;</em>.</span>%end;
+                  </td>
+                </tr>
+              %end;
+            </table>
+          %end;
+        </td></tr>
+      </table>
+    </div>
+  %end;
+
+  %if;(evar.asc = "on" and xx.has_parents)
+    <div style="page-break-inside:avoid;">
+      <table class="fp_table" cellspacing="0">
+        <tr><th>[*ascendants tree]</th></tr>
+        <tr><td>%apply;display_tree("xx")</td></tr>
+      </table>
+    </div>
+  %end;
+
+  %if;(evar.src = "on" and xx.has_sources)
+    <div style="page-break-inside:avoid;">
+      <table class="fp_table" cellspacing="0">
+        <tr><th>[*source/sources]1</th></tr>
+        <tr>
+          <td>
+            <ul class="fp_source">
+              %foreach;xx.source;
+                <li>%source_type;[:] %source;</li>
+              %end;
+            </ul>
+          </td>
+        </tr>
+      </table>
+    </div>
+  %end;
+%end;
+
+<div class="page_max">
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
+  %if;(evar.v > 1)
+    <span width=100%%">
+      <hr>
+      %apply;capitalize(nth([summary book ascendants], 3))%nn;
+      %if;(evar.only="on"). [*only] %apply;gena(nb_gen)%else;%sp;%apply;togen(nb_gen)%end;.
+      <hr>
+    </span>
+    <ul class="fp_ul_summary">
+      %foreach;ancestor_level(nb_gen)
+        %if;(level>0)
+          %apply;lazy_print%with;
+            <li><b>[*generation/generations]0 %level;</b></li>
+          %end;
+        %end;
+        %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
+          %foreach;ancestor;
+            %lazy_force;
+            %if;(ancestor.same = "")
+              <li>
+                <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
+                %if;(evar.sosa = "on" and ancestor.has_sosa)
+                  ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
+                %end;
+              </li>
+            %end;
+          %end;
+        %end;
+      %end;
+    </ul>
+    <p style="page-break-after:always;">&nbsp;</p>
+  %end;
+
+  %foreach;ancestor_level(nb_gen)
+    %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %apply;print_long_ind("ancestor")
+          %if;(not (is_last and level = nb_gen))
+            <p style="page-break-after:always;">&nbsp;</p>
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+</div>

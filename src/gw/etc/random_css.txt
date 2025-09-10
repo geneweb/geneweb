@@ -1,0 +1,94 @@
+/* $Id: random_css.txt,v 1.10 2007-01-19 01:53:16 ddr Exp $ */
+/* Copyright (c) 2006-2017 INRIA */
+
+%define;bright_pastel_color()
+  %let;h;%random.255;%in;
+  %let;s;%random.64;%in;
+  %let;v;%expr(192 + random.64)%in;
+  rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
+      %apply;blue_of_hsv(h, s, v))%sq;
+%end;
+
+%define;dark_col()
+  %let;h;%random.255;%in;
+  %let;s;255%in;
+  %let;v;160%in;
+  rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
+      %apply;blue_of_hsv(h, s, v))%sq;
+%end;
+
+%random.init;
+
+%let;h;%random.255;%in;
+%let;s;%random.128;%in;
+%let;v;%expr(160 + random.96)%in;
+%let;bg;
+  rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
+      %apply;blue_of_hsv(h, s, v))%sq;
+%in;
+%let;h;%expr(h - 40 + random.80)%in;
+%let;v;%expr(v + 10 + random.20)%in;
+%let;bg2;
+  rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
+      %apply;blue_of_hsv(h, s, v))%sq;
+%in;
+
+#user-info { float: %right;; padding: 10px }
+%let;fs;%random.3;%in;
+%let;ph;%random.3;%in;
+%let;pv;%random.3;%in;
+#title { text-align: %sq;
+           %if;(ph = 0)%left;%elseif;(ph = 1)%right;%else;center%end;;%sp;
+         vertical-align: %sq;
+           %if;(ph != 1 and pv = 0)top%sq;
+           %elseif;(pv = 1)bottom%sq;
+           %else;middle%end }
+#title { %sq;
+  font-family:%sp;
+    %let;f;%random.8;%in;
+    %if;(f = 0)Times New Roman, serif%sq;
+    %elseif;(f = 1)Trebuchet MS, sans-serif%sq;
+    %elseif;(f = 2)Arial, Helvetica, sans-serif%sq;
+    %elseif;(f = 3)Verdana, Arial, Helvetica, sans-serif%sq;
+    %elseif;(f = 4)Courier New, Courier, monospace%sq;
+    %elseif;(f = 5)Georgia, serif%sq;
+    %elseif;(f = 6)Tahoma, sans-serif%sq;
+    %elseif;(f = 7)Palatino, serif%sq;
+    %end;;%sp;
+  font-style: %if;(random.4 = 0)italic%else;normal%end; }
+#title { %sq;
+  font-variant: %if;(random.5 = 0)small-caps%else;normal%end;;%sp;
+  font-transform: %if;(random.10 = 0)uppercase%else;none%end;;%sp;
+  font-weight: %if;(random.3 = 0)bold%else;normal%end; }
+#title { color: %apply;dark_col(); font-size: %expr(80 + random.80)%% }
+
+body { margin: 0; background: %bg2;; color: %apply;dark_col() }
+:link { color: %apply;dark_col() } :visited { color: %apply;dark_col() }
+
+body {%sp;
+  font-family:%sp;
+    %let;f;%random.8;%in;
+    %if;(f = 0)Times New Roman, serif%sq;
+    %elseif;(f = 1)Trebuchet MS, sans-serif%sq;
+    %elseif;(f = 2)Arial, Helvetica, sans-serif%sq;
+    %elseif;(f = 3)Verdana, Arial, Helvetica, sans-serif%sq;
+    %elseif;(f = 4)Courier New, Courier, monospace%sq;
+    %elseif;(f = 5)Georgia, serif%sq;
+    %elseif;(f = 6)Tahoma, sans-serif%sq;
+    %elseif;(f = 7)Palatino, serif%sq;
+    %end; }
+
+%let;pos1;%if;(random.2 = 0)%left;%else;%right;%end;%in;
+%let;pos2;%if;(random.2 = 0)%left;%else;%right;%end;%in;
+%let;sz;%if;(random.2 = 0)100%else;70%end;%in;
+#lang .title { display: none }
+#lang { width: 12%%; float: %pos1;; text-align: %pos2;; background: %bg; }
+#lang { padding: 30px 10px 10%% 10px }
+#lang a { display: block; font-size: %sz;%% }
+#lang a { text-decoration: none }
+#lang a:hover { text-decoration: underline }
+#lang .item img { display: none }
+#content { margin-%pos1;: 12%%; width: auto;%sp;
+           font-size: %expr(90 + random.30)%% }
+#content .subtitle { text-align: center }
+/* end random_css */

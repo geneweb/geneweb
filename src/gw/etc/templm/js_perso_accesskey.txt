@@ -1,0 +1,37 @@
+<!-- $Id: templm/js_perso_accesskey.txt v7.0 08/02/2016 05:44:54 $ -->
+<script src=%etc_prefix;templm/js_perso_accesskey.js></script>%(
+   To personalize the descriptions of shortcuts, change the character under | column
+trl       |   in accordance with the definitions of shortucts in js_perso_accesskey.js case "_"%)
+%let;laWk;W%in;%( search %)
+%let;laZk;Z%in;%let;laZ;title="[*shortcuts] (Alt+%laZk;)" accesskey="%laZk;"%in;
+%(perso   | %)
+%let;laAk;A%in;%let;laA;title="[*add::family/families]0 (%laAk;)" accesskey="%laAk;"%in;
+%let;laDk;D%in;%let;laD;title="[*difference between the two revisions] (%laDk;)" accesskey="%laDk;"%in;
+%let;laIk;I%in;%let;laI;title="[*send::image/images]0 (%laIk;)" accesskey="%laIk;"%in;
+%let;laLk;L%in;%let;laL;title="[*add::parents] (%laLk;)" accesskey="%laLk;"%in;
+%let;laPk;P%in;%let;laP;title="[*modify::person/persons]0 (%laPk;)" accesskey="%laPk;"%in;
+%let;laRk;R%in;%let;laR;title="[*relationship computing] (%laRk;)" accesskey="%laRk;"%in;
+%let;laSk;S%in;%let;lcS;(%laSk;)%in;%let;laS;accesskey="%laSk;"%in;%( Sosa reference %)
+%let;laXk;X%in;%let;lcX;(%laXk;)%in;%let;laX;autocomplete="off" title="[*generation/generations]0 (%laXk;)" accesskey="%laXk;"%in;%( generation %)
+%let;laYk;Y%in;%let;laY;title="[*tree] (%laYk;)" accesskey="%laYk;"%in;
+%let;laFk;F%in;%( modify family%)
+%let;laGk;G%in;%( modify family 2%)
+%let;laHk;H%in;%( modify family 3%)
+%( Shortcuts Alt+key on forms and their descriptions, change character/key under | column %)
+%(updind                     | %)
+%( prénom       %)%let;lpc1k;1%in;%let;lpc1;<code>(%lpc1k;)</code>%in;%let;lpa1;accesskey="%lpc1k;"%in;
+%( naissance    %)%let;lpc2k;2%in;%let;lpc2;<code id="lpc2">(%lpc2k;)</code>%in;%let;lpa2;accesskey="%lpc2k;"%in;
+%( décès        %)%let;lpc3k;3%in;%let;lpc3;<code id="lpc3">(%lpc3k;)</code>%in;%let;lpa3;accesskey="%lpc3k;"%in;
+%( event        %)%let;lpc4k;4%in;%let;lpc4;<code>(%lpc4k;)</code>%in;%let;lpa4;accesskey="%lpc4k;"%in;
+%( notes        %)%let;lpc5k;5%in;%let;lpc5;<code>(%lpc5k;)</code>%in;%let;lpa5;accesskey="%lpc5k;"%in;
+%( relations    %)%let;lpc6k;6%in;%let;lpc6;<code>(%lpc6k;)</code>%in;%let;lpa6;accesskey="%lpc6k;"%in;
+%( titres       %)%let;lpc7k;7%in;%let;lpc7;<code>(%lpc7k;)</code>%in;%let;lpa7;accesskey="%lpc7k;"%in;
+%( profession   %)%let;lpcPk;P%in;%let;lpcP;<code>(%lpcPk;)</code>%in;%let;lpaP;accesskey="%lpcPk;"%in;
+%( permuter evt %)%let;lpcOk;O%in;%let;lpcO;<code>(%lpcOk;)</code>%in;%let;lpaO;accesskey="%lpcOk;"%in;
+%(updfam                     | %)
+%( prénom père  %)%let;lfc1k;1%in;%let;lfc1;<code>(%lfc1k;)</code>%in;%let;lfa1;accesskey="%lfc1k;"%in;
+%( enfants      %)%let;lfc2k;2%in;%let;lfc2;<code>(%lfc2k;)</code>%in;%let;lfa2;accesskey="%lfc2k;"%in;
+%( mariage      %)%let;lfc3k;3%in;%let;lfc3;<code id="lfc3">(%lfc3k;)</code>%in;%let;lfa3;accesskey="%lfc3k;"%in;
+%( event        %)%let;lfc4k;4%in;%let;lfc4;<code>(%lfc4k;)</code>%in;%let;lfa4;accesskey="%lfc4k;"%in;
+%( commentaire  %)%let;lfc5k;5%in;%let;lfc5;(%lfc5k;)%in;%let;lfa5;accesskey="%lfc5k;"%in;
+%( sources      %)%let;lfc6k;6%in;%let;lfc6;(%lfc6k;)%in;%let;lfa6;accesskey="%lfc6k;"%in;

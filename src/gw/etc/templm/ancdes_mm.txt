@@ -1,0 +1,203 @@
+<!-- $Id: templm/ancdes_mm.txt v7.0 2014/12/01 15:09:00 $ -->
+
+%( tf1/tl1 = mm %)
+
+%define;lex_month(xx)
+  %apply;nth%with;
+    /[(month)]0/[(month)]1/[(month)]2/[(month)]3/[(month)]4/[(month)]5/[(month)]6/[(month)]7/[(month)]8/[(month)]9/[(month)]10/[(month)]11%and;
+    xx%end;
+%end;
+
+%define;leg_month()
+  <span class="st4" style="top:2em;">[(month)]0</span>
+  <span class="st4" style="top:3em;">[(month)]1</span>
+  <span class="st4" style="top:4em;">[(month)]2</span>
+  <span class="st4" style="top:5em;">[(month)]3</span>
+  <span class="st4" style="top:6em;">[(month)]4</span>
+  <span class="st4" style="top:7em;">[(month)]5</span>
+  <span class="st4" style="top:8em;">[(month)]6</span>
+  <span class="st4" style="top:9em;">[(month)]7</span>
+  <span class="st4" style="top:10em;">[(month)]8</span>
+  <span class="st4" style="top:11em;">[(month)]9</span>
+  <span class="st4" style="top:12em;">[(month)]10</span>
+  <span class="st4" style="top:13em;">[(month)]11</span>
+%end;
+
+%define;months(z1,z2)
+  %reset_count;
+  %foreach;sorted_list_item;
+    %if;(prev_item.1 != item.1)
+    <div class="s1 bcbg1" style="height:13em;">
+      <span class="s2">%apply;lex_month(item.1)</span>
+      %apply;leg_month()
+    %end;      
+    %if;(prev_item.1 != item.1 or prev_item.2 != item.2 or prev_item.3 != item.3)
+      %reset_count;%incr_count;
+      <a href="%prefix;spouse=on&m=RLM&i%count;=%item.4;&t%count;=%count;&%nn;
+    %end;
+    %if;(prev_item.1 = item.1 and prev_item.2 = item.2 and prev_item.3 = item.3)
+      %incr_count;
+      i%count;=%item.4;&t%count;=%count;&%nn;
+    %end;
+    %if;(next_item.1 != item.1 or next_item.2 != item.2 or next_item.3 != item.3)
+      %let;l1;%expr(item.3 + 1)%in;
+      %let;l2;%if;(count > l_max_width)%l_max_width;%else;%count;%end;%in;
+      %incr_count;
+      i%count;=%index;&t%count;=z1%apply;lex_month(item.1)--z2%apply;lex_month(item.3)%nn;
+      " class="st5%item.2;" style="top:%l1;em;border-width:%l2;px;">%expr(count - 1)</a>
+      %if;(next_item.1 != item.1)
+        </div>
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;anc_mm1(z1,z2,z3,z4)
+  %reset_count;
+  %empty_sorted_list;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "" and z1 != "" and z3 != "")
+          %incr_count;
+          %apply;add_in_sorted_list(z1,z2,z3,z4)
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;anc_mm()
+  %if;(evar.tf2 = "1")
+    <h3>[year/month/day]1 [birth] = [year/month/day]1 [birth] [spouse/spouses]0 ?</h3>
+    %apply;anc_mm1("ancestor.birth_date.month","ancestor.spouse.sex","ancestor.spouse.birth_date.month","ancestor.spouse.index")
+  %elseif;(evar.tf2 = "2")
+    <h3>[year/month/day]1 [birth] = [year/month/day]1 [death] [spouse/spouses]0 ?</h3>
+    %apply;anc_mm1("ancestor.birth_date.month","ancestor.spouse.sex","ancestor.spouse.death_date.month","ancestor.spouse.index")
+  %elseif;(evar.tf2 = "3")
+    <h3>[year/month/day]1 [death] = [year/month/day]1 [death] [spouse/spouses]0 ?</h3>
+    %apply;anc_mm1("ancestor.death_date.month","ancestor.spouse.sex","ancestor.spouse.death_date.month","ancestor.spouse.index")
+  %elseif;(evar.tf2 = "4")
+    <h3>[year/month/day]1 [death] = [year/month/day]1 [birth] [spouse/spouses]0 ?</h3>
+    %apply;anc_mm1("ancestor.death_date.month","ancestor.spouse.sex","ancestor.spouse.birth_date.month","ancestor.spouse.index")
+  %else;
+    <h3>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</h3>
+    %apply;anc_mm1("ancestor.birth_date.month","ancestor.sex","ancestor.death_date.month","ancestor.index")
+  %end;
+  <p>[*total] = %count; [person/persons]1</p>
+  %let;l_z1;
+    %if;(evar.tf2 = "1" or evar.tf2 = "2")%birth_symbol;
+    %elseif;(evar.tf2 = "3" or evar.tf2 = "4")%death_symbol;
+    %else;%birth_symbol;
+    %end;
+  %in;
+  %let;l_z2;
+    %if;(evar.tf2 = "1" or evar.tf2 = "4")x%birth_symbol;
+    %elseif;(evar.tf2 = "2" or evar.tf2 = "3")x%death_symbol;
+    %else;%death_symbol;
+    %end;
+  %in;
+  %apply;months(l_z1,l_z2)
+%end;
+
+%define;anc_menu()
+  %let;l_url;%prefix;m=A;t=F;i=%index;&v=%l_v;&only=%evar.only;&maxv=%evar.maxv;%in;
+  <div class="menu">
+    <span><a href="%l_url;&tf1=mm&tf2=">%birth_symbol; = %death_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=1">%birth_symbol; = x%birth_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=2">%birth_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=3">%death_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=4">%death_symbol; = x%birth_symbol; ?</a></span>
+  </div>
+%end;
+
+%define;des_mm2(z1,z2,z3,z4,curlev,maxlev)
+  %if;(z1 != "" and z3 != "")
+    %incr_count;
+    %apply;add_in_sorted_list(z1,z2,z3,z4)
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev)
+      %family.set_infinite_desc_level;
+      %if;(has_children)
+        %foreach;child;
+          %apply;des_mm2("z1","z2","z3","z4",curlev+1,maxlev)
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;des_mm1(z1,z2,z3,z4,curlev,maxlev)
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev)
+      %family.set_infinite_desc_level;
+      %if;(z1 != "" and z3 != "")
+        %incr_count;
+        %apply;add_in_sorted_list(z1,z2,z3,z4)
+      %end;
+      %if;(has_children)
+        %foreach;child;
+          %apply;des_mm1("z1","z2","z3","z4",curlev+1,maxlev)
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;des_mm()
+  %reset_count;%reset_desc_level;%empty_sorted_list;
+  %if;(evar.tl2 = "1")
+    <h3>[year/month/day]1 [birth] = [year/month/day]1 [birth] [spouse/spouses]0 ?</h3>
+    %apply;des_mm1("birth_date.month","spouse.sex","spouse.birth_date.month","spouse.index",0,l_v)
+  %elseif;(evar.tl2 = "2")
+    <h3>[year/month/day]1 [birth] = [year/month/day]1 [death] [spouse/spouses]0 ?</h3>
+    %apply;des_mm1("birth_date.month","spouse.sex","spouse.death_date.month","spouse.index",0,l_v)
+  %elseif;(evar.tl2 = "3")
+    <h3>[year/month/day]1 [death] = [year/month/day]1 [death] [spouse/spouses]0 ?</h3>
+    %apply;des_mm1("death_date.month","spouse.sex","spouse.death_date.month","spouse.index",0,l_v)
+  %elseif;(evar.tl2 = "4")
+    <h3>[year/month/day]1 [death] = [year/month/day]1 [birth] [spouse/spouses]0 ?</h3>
+    %apply;des_mm1("death_date.month","spouse.sex","spouse.birth_date.month","spouse.index",0,l_v)
+  %else;
+    <h3>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</h3>
+    %apply;des_mm2("birth_date.month","sex","death_date.month","index",0,l_v)
+  %end;
+  <p>[*total] = %count; [person/persons]1</p>
+  %let;l_z1;
+    %if;(evar.tl2 = "1" or evar.tl2 = "2")%birth_symbol;
+    %elseif;(evar.tl2 = "3" or evar.tl2 = "4")%death_symbol;
+    %else;%birth_symbol;
+    %end;
+  %in;
+  %let;l_z2;
+    %if;(evar.tl2 = "1" or evar.tl2 = "4")x%birth_symbol;
+    %elseif;(evar.tl2 = "2" or evar.tl2 = "3")x%death_symbol;
+    %else;%death_symbol;
+    %end;
+  %in;
+  %apply;months(l_z1,l_z2)
+%end;
+
+%define;des_menu()
+  %let;l_url;%prefix;m=D&t=L&i=%index;&v=%l_v;&maxv=%evar.maxv;%in;
+  <div class="menu">
+    <span><a href="%l_url;&tl1=mm&tl2=">%birth_symbol; = %death_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=1">%birth_symbol; = x%birth_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=2">%birth_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=3">%death_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=4">%death_symbol; = x%birth_symbol; ?</a></span>
+  </div>
+%end;
+
+%( main %)
+
+%let;l_max_width;180%in;
+%apply;togen()
+%if;(evar.m = "A")
+  %apply;anc_mm()
+  %apply;anc_menu()
+%else;
+  %apply;des_mm()
+  %apply;des_menu()
+%end;

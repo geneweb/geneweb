@@ -1,0 +1,22 @@
+<!-- $Id: templm/js_upd.txt v7.0 2014/11/18 10:17:06 $ --> 
+<script src="%etc_prefix;templm/js_upd.js"></script>
+%if;(bvar.jquery = "no")
+  <script src="%etc_prefix;templm/js_upd_jq_no.js"></script>
+%else;
+  <script src="%etc_prefix;templm/js_upd_jq.js"></script>
+  <script src="%etc_prefix;js/jquery.min.js"></script>
+%end;
+%if;(bvar.uppercase = "yes")
+  <script>
+  <!--
+  %if;(bvar.particles != "")
+    var p_a = new Array(%bvar.particles;);
+  %else;
+    var p_a = new Array("AF","AV","D","DAL","DE","DEN","DES","DI","DU","OF","UND","VAN","VON","ZU","ZUR");
+  %end;
+  -->
+  </script>
+  <script src=%etc_prefix;templm/js_uppercase.js></script>
+%else;
+  <script src=%etc_prefix;templm/js_uppercase_no.js></script>
+%end;

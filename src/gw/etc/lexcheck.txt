@@ -1,0 +1,17 @@
+%define;cous(xx,yy)
+<span class="text-muted">— [cousins.xx.yy]0</span><br>
+<span class="text-dark">— [cousins.xx.yy]1</span><br>
+<span class="text-primary">— [cousin.xx.yy:::½-]0</span><br>
+<span class="text-danger">— [cousin.xx.yy:::½-]1</span><br>
+<span class="text-warning">— [cousins.xx.yy tt]</span><br>
+
+
+%end;
+<table class="table-bordered" border="1">
+<tr><th></th>%for;k;0;11;<th>%k</th>%end;</tr>
+%for;j;0;11;<tr><td>%j</td>
+  %for;i;0;11;
+    <td>%apply;cous%with;%i%and;%j%end;</td>
+  %end;</tr>
+%end;
+</table>

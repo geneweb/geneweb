@@ -1,0 +1,233 @@
+<!-- $Id: templm/accent.txt v7.0 2016/02/04 21:32:06 $ -->
+%( How to : Copy this file to bases/etc/ %)
+<script ><!--
+document.getElementsByName("notes")[0].onkeypress = 
+  function(o){o=o||event;if(o.shiftKey && o.keyCode == 13)return insertTags('<br>\n','','');}
+--></script>
+<div style="text-align:left">
+<input type="submit" value="Ok"/>
+<p style="font-size: 120%%;margin:5px;">
+  <a onclick="return insertTags('Á','','')" href="javascript:;">Á</a>
+  <a onclick="return insertTags('á','','')" href="javascript:;">á</a>
+  <a onclick="return insertTags('Â','','')" href="javascript:;">Â</a>
+  <a onclick="return insertTags('â','','')" href="javascript:;">â</a>
+  <a onclick="return insertTags('À','','')" href="javascript:;">À</a>
+  <a onclick="return insertTags('à','','')" href="javascript:;">à</a>
+  <a onclick="return insertTags('Æ','','')" href="javascript:;">Æ</a>
+  <a onclick="return insertTags('æ','','')" href="javascript:;">æ</a>
+  <a onclick="return insertTags('Å','','')" href="javascript:;">Å</a>
+  <a onclick="return insertTags('å','','')" href="javascript:;">å</a>
+  <a onclick="return insertTags('Ä','','')" href="javascript:;">Ä</a>
+  <a onclick="return insertTags('ä','','')" href="javascript:;">ä</a>
+  <a onclick="return insertTags('Ą','','')" href="javascript:;">Ą</a>
+  <a onclick="return insertTags('ą','','')" href="javascript:;">ą</a>
+  &nbsp;
+  <a onclick="return insertTags('Ć','','')" href="javascript:;">Ć</a>
+  <a onclick="return insertTags('ć','','')" href="javascript:;">ć</a>
+  <a onclick="return insertTags('Ç','','')" href="javascript:;">Ç</a>
+  <a onclick="return insertTags('ç','','')" href="javascript:;">ç</a>
+  &nbsp;
+  <a onclick="return insertTags('Ð','','')" href="javascript:;">Ð</a>
+  <a onclick="return insertTags('ð','','')" href="javascript:;">ð</a>
+  &nbsp;
+  <a onclick="return insertTags('É','','')" href="javascript:;">É</a>
+  <a onclick="return insertTags('é','','')" href="javascript:;">é</a>
+  <a onclick="return insertTags('Ê','','')" href="javascript:;">Ê</a>
+  <a onclick="return insertTags('ê','','')" href="javascript:;">ê</a>
+  <a onclick="return insertTags('È','','')" href="javascript:;">È</a>
+  <a onclick="return insertTags('è','','')" href="javascript:;">è</a>
+  <a onclick="return insertTags('Ë','','')" href="javascript:;">Ë</a>
+  <a onclick="return insertTags('ë','','')" href="javascript:;">ë</a>
+  <a onclick="return insertTags('Ę','','')" href="javascript:;">Ę</a>
+  <a onclick="return insertTags('ę','','')" href="javascript:;">ę</a>
+  &nbsp;
+  <a onclick="return insertTags('Í','','')" href="javascript:;">Í</a>
+  <a onclick="return insertTags('í','','')" href="javascript:;">í</a>
+  <a onclick="return insertTags('Î','','')" href="javascript:;">Î</a>
+  <a onclick="return insertTags('î','','')" href="javascript:;">î</a>
+  <a onclick="return insertTags('Ì','','')" href="javascript:;">Ì</a>
+  <a onclick="return insertTags('ì','','')" href="javascript:;">ì</a>
+  <a onclick="return insertTags('Ï','','')" href="javascript:;">Ï</a>
+  <a onclick="return insertTags('ï','','')" href="javascript:;">ï</a>
+  &nbsp;
+  <a onclick="return insertTags('Ł','','')" href="javascript:;">Ł</a>
+  <a onclick="return insertTags('ł','','')" href="javascript:;">ł</a>
+  &nbsp;
+  <a onclick="return insertTags('Ń','','')" href="javascript:;">Ń</a>
+  <a onclick="return insertTags('ń','','')" href="javascript:;">ń</a>
+  <a onclick="return insertTags('Ñ','','')" href="javascript:;">Ñ</a>
+  <a onclick="return insertTags('ñ','','')" href="javascript:;">ñ</a>
+  <br>
+  <a onclick="return insertTags('Ó','','')" href="javascript:;">Ó</a>
+  <a onclick="return insertTags('ó','','')" href="javascript:;">ó</a>
+  <a onclick="return insertTags('Ô','','')" href="javascript:;">Ô</a>
+  <a onclick="return insertTags('ô','','')" href="javascript:;">ô</a>
+  <a onclick="return insertTags('Ò','','')" href="javascript:;">Ò</a>
+  <a onclick="return insertTags('ò','','')" href="javascript:;">ò</a>
+  <a onclick="return insertTags('Œ','','')" href="javascript:;">Œ</a>
+  <a onclick="return insertTags('œ','','')" href="javascript:;">œ</a>
+  <a onclick="return insertTags('Ø','','')" href="javascript:;">Ø</a>
+  <a onclick="return insertTags('ø','','')" href="javascript:;">ø</a>
+  <a onclick="return insertTags('Õ','','')" href="javascript:;">Õ</a>
+  <a onclick="return insertTags('õ','','')" href="javascript:;">õ</a>
+  <a onclick="return insertTags('Ö','','')" href="javascript:;">Ö</a>
+  <a onclick="return insertTags('ö','','')" href="javascript:;">ö</a>
+  &nbsp;
+  <a onclick="return insertTags('Ś','','')" href="javascript:;">Ś</a>
+  <a onclick="return insertTags('ś','','')" href="javascript:;">ś</a>
+  <a onclick="return insertTags('ſ','','')" href="javascript:;">ſ</a>
+  <a onclick="return insertTags('ß','','')" href="javascript:;">ß</a>
+  <a onclick="return insertTags('Þ','','')" href="javascript:;">Þ</a>
+  <a onclick="return insertTags('þ','','')" href="javascript:;">þ</a>
+  &nbsp;
+  <a onclick="return insertTags('Ú','','')" href="javascript:;">Ú</a>
+  <a onclick="return insertTags('ú','','')" href="javascript:;">ú</a>
+  <a onclick="return insertTags('Ù','','')" href="javascript:;">Ù</a>
+  <a onclick="return insertTags('ù','','')" href="javascript:;">ù</a>
+  <a onclick="return insertTags('Û','','')" href="javascript:;">Û</a>
+  <a onclick="return insertTags('û','','')" href="javascript:;">û</a>
+  <a onclick="return insertTags('Ü','','')" href="javascript:;">Ü</a>
+  <a onclick="return insertTags('ü','','')" href="javascript:;">ü</a>
+  &nbsp;
+  <a onclick="return insertTags('Ý','','')" href="javascript:;">Ý</a>
+  <a onclick="return insertTags('ý','','')" href="javascript:;">ý</a>
+  <a onclick="return insertTags('Ÿ','','')" href="javascript:;">Ÿ</a>
+  <a onclick="return insertTags('ÿ','','')" href="javascript:;">ÿ</a>
+  &nbsp;
+  <a onclick="return insertTags('Ź','','')" href="javascript:;">Ź</a>
+  <a onclick="return insertTags('ź','','')" href="javascript:;">ź</a>
+  <a onclick="return insertTags('Ż','','')" href="javascript:;">Ż</a>
+  <a onclick="return insertTags('ż','','')" href="javascript:;">ż</a>
+  <br>
+  <a onclick="return insertTags('½','','')" href="javascript:;">½</a>
+  <a onclick="return insertTags('¼','','')" href="javascript:;">¼</a>
+  <a onclick="return insertTags('¾','','')" href="javascript:;">¾</a>
+  &nbsp;
+  <a onclick="return insertTags('º','','')" href="javascript:;">º</a>
+  <a onclick="return insertTags('¹','','')" href="javascript:;">¹</a>
+  <a onclick="return insertTags('²','','')" href="javascript:;">²</a>
+  <a onclick="return insertTags('³','','')" href="javascript:;">³</a>
+  <a onclick="return insertTags('°','','')" href="javascript:;">°</a>
+  <a onclick="return insertTags('ª','','')" href="javascript:;">ª</a>
+  &nbsp;
+  <a onclick="return insertTags('¡','','')" href="javascript:;">¡</a>
+  <a onclick="return insertTags('¿','','')" href="javascript:;">¿</a>
+  <a onclick="return insertTags('µ','','')" href="javascript:;">µ</a>
+  <a onclick="return insertTags('•','','')" href="javascript:;">•</a>
+  <a onclick="return insertTags('·','','')" href="javascript:;">·</a>
+  <a onclick="return insertTags('–','','')" href="javascript:;">–</a>
+  <a onclick="return insertTags('—','','')" href="javascript:;">—</a>
+  <a onclick="return insertTags('÷','','')" href="javascript:;">÷</a>
+  <a onclick="return insertTags('‰','','')" href="javascript:;">‰</a>
+  <a onclick="return insertTags('€','','')" href="javascript:;">€</a>
+  <a onclick="return insertTags('£','','')" href="javascript:;">£</a>
+  <a onclick="return insertTags('©','','')" href="javascript:;">©</a>
+  <a onclick="return insertTags('®','','')" href="javascript:;">®</a>
+  <a onclick="return insertTags('«','','')" href="javascript:;">«</a>
+  <a onclick="return insertTags('»','','')" href="javascript:;">»</a>
+  <a onclick="return insertTags('¶','','')" href="javascript:;">¶</a>
+  &nbsp;
+  <a onclick="return insertTags('‡','','')" href="javascript:;">‡</a>
+  <a onclick="return insertTags('№','','')" href="javascript:;">№</a>
+  <a onclick="return insertTags('×','','')" href="javascript:;">×</a>
+  <a onclick="return insertTags('†','','')" href="javascript:;">†</a>
+</p>
+%if;(evar.m = "MOD_NOTES" and evar.templ != "templm" and bvar.template != "templm")
+  <style type="text/css">
+  .menu{margin:1em;padding:0;border:0;position:relative;top:0;left:0;font-size:14px;line-height:14px;}
+  .menu span{position:relative;display:inline-block;float:left;}
+  .menu span a{float:left;}
+  .menu span:hover > .s_menu{display:block;position:absolute;left:0;top:24px;z-index:10;background-color:#d1c9cc;}
+  .menu .s_menu{display:none;float:left;margin-left:0;margin-top:0;padding:4px;border:0;width:210px;}
+  .menu .s_menu a{width:200px;}
+  .menu a,.menu1 a{vertical-align:middle;background-color:#e2e2e2;border:solid 1px #cdc3c6;margin:0 -1px -1px 0;padding:4px;color:#51464a;text-decoration:none;}
+  .menu a:hover,.menu1 a:hover{background-color:#d1c9cc;}
+  .menu1{font-size:14px;line-height:24px;}
+  .menu1{clear:both;padding:5px;margin:5px;border-top:solid 1px #888;}
+  .menu1 > span{display:block;margin:10px;}
+  </style>
+%end;
+<div class="menu" style="text-align:left;clear:both;position:relative;margin-bottom:7em;">
+  <span>
+    <a href="#">&lt;html&gt;</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('<br>\n','','')"
+         href="javascript:;" title="= shift + enter">&lt;br/&gt;</a>
+      <a onclick="return insertTags('\n<hr>\n','','')" href="javascript:;">&lt;hr/&gt;
+        (————————)</a>
+      <a onclick="return insertTags('','<table border>\n<tr>\n<th>A1</th>\n<th>B1</th>\n</tr><tr>\n<td>A2</td>\n<td>B2</td>\n</tr><tr>\n<td>A3</td>\n<td>B3</td>\n</tr>\n</table>','')" href="javascript:;">&lt;table&gt;</a>
+      <a onclick="return insertTags('&lt;img alt=&quot;?&quot; src=&quot;%%sm=IM;s=xxx.jpg&quot;%/&gt;','','')"
+         href="javascript:;"><small>&lt;img alt="?" src="%%sm=IM;s=xxx.jpg"/&gt;</small></a>
+      <a onclick="return insertTags('&lt;a href=&quot;%%sm=IMH;s=xxx.jpg&quot;&gt;[*image/images]0&lt;/a&gt;','','')"
+         href="javascript:;">&lt;a href="%%sm=IMH;s=xxx.jpg"&gt; [*image/images]0&lt;/a&gt;</a>
+    </span>
+  </span>
+  <span>
+    <a href="#">h1</a>
+    <span class="s_menu">
+      <a style="border-bottom:1px solid #844404;font-weight:700;font-size:21px;text-align: center;"
+         onclick="return insertTags('=','=','x')" href="javascript:;">=h1=</a>
+      <a style="border-bottom:1px solid #844404;font-weight:700;font-size:21px;"
+         onclick="return insertTags('==','==','x')" href="javascript:;">==h2==</a>
+      <a style="border-bottom:1px solid #844404;font-weight:700;font-size:17px"
+         onclick="return insertTags('===','===','x')" href="javascript:;">===h3===</a>
+      <a style="font-weight:700;font-size:14px"
+         onclick="return insertTags('====','====','x')" href="javascript:;">====h4====</a>
+      <a style="font-weight:700;font-size:11px"
+         onclick="return insertTags('=====','=====','x')" href="javascript:;">=====h5=====</a>
+      <a style="font-weight:700;font-size:9px"
+         onclick="return insertTags('======','======','x')" href="javascript:;">======h6======</a>
+    </span>
+  </span>
+  <span>
+    <a href="#"><i>i</i> <b>b</b></a>
+    <span class="s_menu">
+      <i><a onclick="return insertTags('\'\'','\'\'','x')" href="javascript:;">''i''</a></i>
+      <b><a onclick="return insertTags('\'\'\'','\'\'\'','x')" href="javascript:;">'''b'''</a></b>
+      <i><b><a onclick="return insertTags('\'\'\'\'\'','\'\'\'\'\'','x')" href="javascript:;">'''''i + b'''''</a></b></i>
+      <a onclick="return insertTags('{','}','x')" href="javascript:;"><span class="highlight">{highlight}</span></a>
+    </span>
+  </span>
+  <span><a href="#">ul ol dl pre</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('*','','')" href="javascript:;">•  *ul li<br>   •  **ul ul li</a>
+      <a onclick="return insertTags('#','','')" href="javascript:;">1.  #ol li<br>   2.  ##ol ol li</a>
+      <a onclick="return insertTags(';x:x','','')" href="javascript:;"><strong>;dl dt</strong>:dd</a>
+      <a onclick="return insertTags(':','','')" href="javascript:;">   :dl dd<br>      ::dl dl dd</a>
+      <a style="font-family:'Courier New',Courier,monospace;"
+        onclick="return insertTags('\n\n \n ','\n','')" href="javascript:;">
+        &nbsp;pre<br>&nbsp;pre<br></a>
+    </span>
+  </span>
+  <span><a href="#">[*miscellaneous notes]</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('%[%[%[x:x/x%]%]%]','','')" href="javascript:;">%[%[%[directory:filename/[text]%]%]%]</a>
+      <a onclick="return insertTags('TITLE=','','')" href="javascript:;">TITLE=</a>
+      <a onclick="return insertTags('HEAD=','','')" href="javascript:;">HEAD=[him/her]0/[him/her]1</a>
+      <a onclick="return insertTags('DEATH=','','')" href="javascript:;">DEATH=</a>
+      <a onclick="return insertTags('OCCU=','','')" href="javascript:;">OCCU=</a>
+      <a onclick="return insertTags('BNOTE=','','')" href="javascript:;">BNOTE=</a>
+      <a onclick="return insertTags('NOTE=','','')" href="javascript:;">NOTE=</a>
+      <a onclick="return insertTags('BIBLIO=','','')" href="javascript:;">BIBLIO=</a>
+    </span>
+  </span>
+  <span><a href="#">[*visualize/show/hide/summary]3</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('__TOC__','','')" href="javascript:;">__TOC__</a>
+      <a onclick="return insertTags('__SHORT_TOC__','','')" href="javascript:;">__SHORT_TOC__</a>
+      <a onclick="return insertTags('__NOTOC__','','')" href="javascript:;">__NOTOC__</a>
+    </span>
+  </span>
+  <span><a href="#">[*person/persons]0</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('%[%[w:','%]%]','x')" href="javascript:;">%[%[w:[wizard/wizards/friend/friends/exterior]0%]%]</a>
+      <a onclick="return insertTags('%[%[x/x%]%]','','')" href="javascript:;">
+       %[%[[first name/first names]0/[surname/surnames]0%]%]</a>
+      <a onclick="return insertTags('%[%[x/x/9/x%]%]','','')" href="javascript:;">
+       %[%[[first name/first names]0/[surname/surnames]0/[number]/ [text] href%]%]</a>
+      <a onclick="return insertTags('%[%[x/x/9/x;x%]%]','','')" href="javascript:;">
+       %[%[[first name/first names]0/[surname/surnames]0/[number]/ [text] href; [person/persons]0 [text] href%]%]</a>
+    </span>
+  </span>
+</div>
+</div>

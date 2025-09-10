@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: connex_ok.htm,v 7.00 2018-04-10 05:35:06 hg Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Connected components identified]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;">
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[Connected components identified]
+</h1>
+</div>
+[You may observe results through two means][:]
+<ul>
+<li>
+[By looking at the terminal window if you have not asked for result redirection.]
+<li>
+%Io1;;{
+[Using <b>gwd</b> to visualize the file in the NOTES folder of your base where you have redirected output (%a.gwb/notes_d/connex.txt).<br> This file contains the last set of data stored at this location (which is not necessarily the one you have just computed - see the time stamp at the head of the file).<br> This solution allows you to follow links to designated persons.]
+(<a href="http://%m:%P/%a?w=w;lang=%l;m=NOTES;f=connex">connex.txt</a>)
+%(
+Using <b>gwd</b> to visualize the file in the NOTES folder of your base
+where you have redirected output (%a.gwb/notes_d/connex.txt).<br>
+This file contains the last set of data stored at this location
+(which is not necessarily the one you have just computed -see the
+time stamp at the head of the file).<br>
+This solution allows you to follow links to designated persons.
+%)
+|
+[Using <b>gwsetup</b> to visualize the file in which results were redirected ("%K").]
+(<a href="gwsetup?lang=%l;o=%K;v=bso_log.htm">log</a>)
+}
+</ul>
+<p>
+[Return to the main menu.] (<a href="gwsetup?lang=%l;v=welcome.htm">welcome</a>)

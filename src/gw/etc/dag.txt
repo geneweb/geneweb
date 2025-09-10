@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: dag.txt v7.1 18/08/2023 15:06:13 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %if;(e.slices="on")[*display by slices/slice width/overlap/total width]0%nn;
+    %else;%apply;capitalize(head_title)%end;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+%( TODO include;menubar %index, %foreach;family, do not work in this context %)
+%let;prefix_a;%prefix_base_password&p=%e.p;&n=%e.n;%nn;
+  %if;(e.oc!="")&oc=%e.oc;%end;%in; %( %access; does not work %)
+<div class="container-fluid">
+%include;home
+%define;of(xxx)
+  [of%s:::xxx]
+%end;
+<h3 class="mt-2 ml-3 text-no-wrap">%nn;
+  %if;(e.slices="on")
+    [*display by slices/slice width/overlap/total width]0
+  %elseif;(e.m="D")
+    %if;(e.t="TV")[*compact descendants tree]
+    %else;[*descendants tree]
+    %end;
+  %elseif;(e.m="A")[*ascendants tree]
+  %elseif;(e.m="RLM")[*multi relations graph]
+  %elseif;(e.m="DAG")[*surnames branch][:] %e.sn;
+  %elseif;(e.em="R")[*path between]
+      %person_index.e.first_name; %person_index.e.surname;
+      %sp;[and]
+      %if;(e.select="input" and e.n!="" and e.fn="" and e.sn="")%apply;capitalize_words(e.n)
+      %elseif;(e.select="input" and e.n="" and (e.fn!="" or e.sn!=""))%apply;capitalize_words(e.fn) %apply;capitalize_words(e.sn)
+      %else;%person_index.x.first_name; %person_index.x.surname;%end;
+  %( TODO reorganise evar so that main person is always i= %)
+  %elseif;(e.m="RL")[*path between]
+      %person_index.1.first_name; %person_index.1.surname;
+      %sp;[and]
+      %person_index.2.first_name; %person_index.2.surname;
+  %else;[*shortest path]
+  %end;
+  %if;(e.m="A" or e.m="D")
+    %apply;of%with;%person_index.x.first_name; %person_index.x.surname;%end;
+    %( note that a_of_b/self/to_gend are unavailable on dag %)
+    %if;(e.v=1)[to the children]%nn;
+    %elseif;(e.v=2)[to the grandchildren]%nn;
+    %elseif;(e.v=3)[to the great-grandchildren]%nn;
+    %else;[up to] %e.v; [generation/generations]1%end;
+    %if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;
+  %end;
+</h3>
+%if;(not cancel_links)
+  %if;(e.m="A" or e.m="D")
+    <div class="d-flex justify-content-center">
+      %include;buttons_dag
+    </div>
+  %elseif;(e.m="RL" or e.m="RLM")
+    <div class="row">
+      %include;buttons_rel
+    </div>
+  %end;
+%end;
+%if;(e.m="A" or e.m="D")
+  %if;(e.slices="on")
+    <form method="GET" action="%action;">
+    %hidden;
+    %foreach;env_binding;
+      %if;(env.key != "slices")
+        <input type="hidden" name="%env.key;" value="%env.val.decoded;">
+      %end;
+    %end;
+    <table>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*don't group the common branches together]
+        <input type="checkbox" name="nogroup" value="on">
+        </label>
+      </td>
+    </tr>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*display by slices/slice width/overlap/total width]1
+        <input name="dpos" size="5" value="78">
+        </label>
+      </td>
+    </tr>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*display by slices/slice width/overlap/total width]2
+        <input name="overlap" size="5" value="10">
+        </label>
+      </td>
+    </tr>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*display by slices/slice width/overlap/total width]3
+        (% dag.min_wid;-%dag.max_wid ;)
+        <input name="width" size="5" value="%nn;
+          %if;(dag.max_wid <= 78)%dag.max_wid;
+          %elseif;(dag.min_wid >= 78)%dag.min_wid;
+          %else;78%end;">
+        </label>
+      </td>
+    </tr>
+    </table>
+    <p><input type="submit" value="OK"></p>
+    </form>
+  %end;
+%end;
+%( TODO how to write ind name on navigation link? %dag_cell.index; seems empty?! %)
+%if;(e.slices!="on")
+  %if;(link_next!="" and not cancel_links)
+    %include;buttons_rel
+  %end;
+  %if;(e.notab = "on" or e.pos2 != "")
+    %let;dpos;%if;(e.dpos != "")%e.dpos;%else;78%end;%in;
+    %let;pos1;%if;(e.pos1 != "")%e.pos1;%else;0%end;%in;
+    %let;pos2;%if;(e.pos2 != "")%e.pos2;%else;%dpos;%end;%in;
+    %let;overlap;%if;(e.overlap != "")%e.overlap;%else;10%end;%in;
+    %if;(pos1 != 0 or pos2 < dag.ncol)
+      <div style="text-align:right">
+        %if;(pos1=0)&nbsp;%nn;
+        %else;
+          <a href="%prefix_base_password;%nn;
+            %foreach;env_binding;%nn;
+              %if;(env.key != "pos1" and env.key != "pos2")%env.key;=%env.val;&%end;%nn;
+            %end;%nn;
+            pos1=%expr(pos1+overlap-dpos);%nn;
+            pos2=%expr(pos1+overlap);">&lt;&lt;</a>
+        %end;%nl;
+        %if;(pos2>=dag.ncol)&nbsp;%nn;
+        %else;
+          <a href="%prefix_base_password;%nn;
+            %foreach;env_binding;%nn;
+              %if;(env.key!="pos1" and env.key!="pos2")%env.key;=%env.val;&%end;%nn;
+            %end;%nn;
+            pos1=%expr(pos2-overlap);%nn;
+            pos2=%expr(pos2-overlap+dpos);">&gt;&gt;</a>
+        %end;%nl;
+      </div>
+    %end;
+    <pre>
+    %foreach;dag_line;
+      %foreach;dag_line_pre;
+        %foreach;dag_cell_pre;
+          %dag_cell_pre;%nn;
+        %end;%nl;
+      %end;
+    %end;
+    </pre>
+  %else;
+    <table id="dag" class="mt-2 mb-6 ml-4">
+    %foreach;dag_line;
+      <tr align="left">
+      %foreach;dag_cell;
+        <td class="%if;(e.m="D" or e.m="RL")align-top%elseif;(e.m="A")align-bottom%end; px-0 text-monopace"
+          %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;
+          style="line-height:%if;(dag_cell.item!="")1%nn;
+                             %elseif;dag_cell.is_bar;1%nn;
+                             %elseif;dag_cell.is_nothing;0%else;0%end;;"%nn;
+        %if;(e.im="") valign="bottom"%end;
+        align="%dag_cell.align;">
+        %if;dag_cell.is_nothing;&nbsp;%nn;
+        %elseif;dag_cell.is_bar;
+          %if;(dag_cell.bar_link!="" and not cancel_links)
+             %( added em!=R here condition because first button_rel is static and does the same
+               No! each vbar has a different action, suppressing a particular path %)
+            <a href="%dag_cell.bar_link;" title="[*suppress this path]">│</a>%nn;
+          %else;│%end;
+        %elseif;(dag_cell.text!="")%dag_cell.text;
+        %elseif;(dag_cell.item!="")
+          %if;(line_nbr!=0 and dag_cell.index!="-1")
+            %if;(e.m="RLM" or e.dag="on" or e.em="R")
+              <a href="%prefix;i=%dag_cell.index;" title="[*open this individual page]"></a>
+            %else;
+              %if;(not cancel_links)
+                <div class="position-relative">
+                  <a href="%prefix_set.pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
+                    %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
+                       env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
+                    class="stretched-link" title="[*navigation with this individual]"></a>
+                </div>
+              %end;
+            %end;
+          %end;
+          <div class="d-flex-row flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
+        %else;
+          %( TODO : trouver une condition pour un hr stylisé pour les conjoints %)
+          %if;dag_cell.is_hr_left;
+            <hr class="%left;">%nn;
+          %elseif;dag_cell.is_hr_right;
+            <hr class="%right;">%nn;
+          %else;
+            <hr class="full">%nn;
+          %end;
+        %end;
+        </td>
+      %end;
+      </tr>
+    %end;
+    </table>
+  %end;
+%end;
+%include;trl
+</div>
+%include;js
+%query_time;
+</body>
+</html>

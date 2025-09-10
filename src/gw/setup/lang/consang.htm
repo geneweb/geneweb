@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: consang.htm,v 7.00 2018-04-20 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Consanguinities]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Consanguinities]</h1>
+</div>
+[The initialization of consanguinities is necessary so that the consanguinities are displayed when browsing the database.]
+%(
+The initialization of consanguinities is necessary so that the consanguinities
+are displayed when browsing the database.
+%)
+<p >
+<form method="get" action="consang">
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
+<input type="hidden" name="q" value="on">
+<ul><li>
+[Select your database by clicking on the associated button][:]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td>
+<input type="radio" name="anon" value="%a">   </td>
+<td><a href="http://%m:%P/%a">%a</a></td>
+</tr>|
+<tr align="left">
+<td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<li>
+[Select the options you want][:]
+<p >
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="scratch" value="on" />   </td>
+<td>[Restart the computing from scratch.]
+</td></tr>
+</table>
+<p>
+<li>
+[Then click on this button][:]
+<p>
+<input type="submit" value="[Consang]">
+</ul>
+</form>

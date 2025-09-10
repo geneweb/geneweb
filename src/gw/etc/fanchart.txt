@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+<meta charset="UTF-8">
+<title>Arbre en éventail</title>
+<link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
+<link rel="stylesheet" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;">
+<style title="fc-auto"></style>
+</head>
+
+%define;somebody_fanchart_info(xx,iii)
+"S%xx.anc_sosa.v;":{"fn":"%if;(xx.public_name != "")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key","sn":"%xx.surname","snk":"%xx.surname_key;","oc":"%xx.occ","dates":'%xx.dates;',"birth_place":"%xx.birth_place;","death_place":"%xx.death_place","death_age":"%xx.death_age","has_parents":%if;(xx.has_parents)true%else;false%end;%nn;
+%if;(evar.ba = "on" and xx.baptism_place != ""),"baptism_place":"%xx.baptism_place;"%end;
+%if;(evar.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;
+  %if;(xx.index!=iii and xx.is_male)
+    %foreach;xx.family;
+      %if;(family.index = xx.family.index)
+        ,"marriage_date":"%family.date_s;","marriage_place":"%marriage_place;"
+      %end;
+    %end;
+  %end;
+},
+%end;
+%define;somebody_fanchart_same(xx)
+"S%xx.anc_sosa.v;":{"fn":"=","sn":"%xx.same","fnk":"%xx.first_name_key","snk":"%xx.surname_key;","oc":"","dates":"","has_parents":%if;(xx.has_parents)true%else;false%end;},
+%end;
+
+<body id="body">
+<canvas id="pixel" width="1" height="1" style="display: none;"></canvas>
+<div id="places-list"><ul id="places_list"></ul></div>
+<div id="death-age"><b>Âge au décès</b><ul>
+<li id="DA0"><span class="arrow">&#x1f842;</span><span class="DA0">■</span> 0-14</li>
+<li id="DA1"><span class="arrow">&#x1f842;</span><span class="DA1">■</span> 15-29</li>
+<li id="DA2"><span class="arrow">&#x1f842;</span><span class="DA2">■</span> 30-44</li>
+<li id="DA3"><span class="arrow">&#x1f842;</span><span class="DA3">■</span> 45-59</li>
+<li id="DA4"><span class="arrow">&#x1f842;</span><span class="DA4">■</span> 60-74</li>
+<li id="DA5"><span class="arrow">&#x1f842;</span><span class="DA5">■</span> 75-89</li>
+<li id="DA6"><span class="arrow">&#x1f842;</span><span class="DA6">■</span> 90-104</li>
+<li id="DA7"><span class="arrow">&#x1f842;</span><span class="DA7">■</span> 105+</li>
+</ul>
+</div>
+%if;(e.pdf!="on")
+  <div id="buttons" class="btn-group" role="group" aria-label="button group">
+  <button id="b-home" class="button btn btn-lg" title="Accueil" tabindex="0"><i class="fa fa-house fa-fw"></i></button>
+  <button id="b-refresh" class="button btn btn-lg" title="Ajuster à la fenêtre" tabindex="1"><i class="fa fa-arrow-rotate-right fa-fw"></i></button>
+  <br>
+  <button id="b-zoom-in" class="button btn btn-lg mt-1" title="Zoomer" tabindex="2"><i class="fa fa-magnifying-glass-plus fa-fw"></i></button>
+  <button id="b-zoom-out" class="button btn btn-lg" title="Dézoomer" tabindex="3"><i class="fa fa-magnifying-glass-minus fa-fw"></i></button>
+  <br>
+  <button id="b-gen-add" class="button btn%if;(evar.v >= 10) disabled%end;" title="Ajouter une génération" tabindex="4"><i class="fa fa-plus fa-fw"></i></button>
+  <button id="b-gen-del" class="button btn%if;(evar.v <= 1) disabled%end;" title="Supprimer une génération" tabindex="5"><i class="fa fa-minus fa-fw"></i></button>
+    <br>
+  <button id="b-implex" class="button btn btn-lg" title="%if;(e.implex="")Développer%else;Réduire%end; les implexes" tabindex="6"><i class="fa fa-comment-%if;(e.implex="")dots%else;slash%end; fa-fw"></i></button>
+  <button id="b-places-hl" class="button btn btn-lg" title="Activer la mise en évidence des lieux" tabindex="7"><i class="fa fa-earth-americas fa-fw"></i></button>
+    <br>
+  <button id="b-places-colorise" class="button btn btn-lg" title="Activer la colorisation globale des lieux" tabindex="8"><i class="fa fa-paintbrush fa-fw"></i></button>
+  <input type="checkbox" id="bi" title="N" tabindex="9"><label for="bi">N</label>
+  <input type="checkbox" id="ba" title="B"><label for="ba">B</label>
+  <input type="checkbox" id="ma" title="M" tabindex="10"><label for="ma">M</label>
+  <input type="checkbox" id="de" title="D"><label for="de">D</label>
+  <input type="checkbox" id="bu" title="S" tabindex="11"><label for="bu">S</label>
+  <br>
+  <button id="b-death-age" class="button btn btn-lg" title="Activer la colorisation de l'âge de décès" tabindex="12"><i class="fa fa-cross fa-fw"></i></button>
+  <button id="b-no-tool" class="button btn btn-lg" title="Désactiver les outils" tabindex="13"><i class="fa fa-power-off fa-fw"></i></button>
+  <br>
+  <button id="b-no-buttons" class="button" title="Masquer tous les boutons" tabindex="14"><i class="fa fa-minus fa-fw"></i></button>
+  </div>
+%end;
+<svg id="fanchart" class="bi ba ma de bu%if;(evar.mono = "on") mono%end;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+
+</body>
+
+<script>
+var link_to_person = "%prefix;";
+var link_to_fanchart = "%prefix;m=A&t=FC&%if;(evar.mono != "")mono=%evar.mono;&%end;%if;(evar.implex != "")implex=%evar.implex;&%end;";
+var max_gen = %evar.v;;
+var tool = "%evar.tool;";
+var mono = "%evar.mono;";
+var implex = "%evar.implex;";
+
+var ancestor = {
+%let;root;%index;%in;
+%foreach;ancestor_level(evar.v)
+  %foreach;ancestor;
+    %if;(ancestor.same = "")
+      %apply;somebody_fanchart_info("ancestor", root)
+    %else;
+      %apply;somebody_fanchart_same("ancestor")
+    %end;
+  %end;
+%end;
+};
+</script>
+<script src="%etc_prefix;js/fanchart.js?hash=%apply;hash%with;%etc_prefix;js/fanchart.js%end;"></script>
+</html>

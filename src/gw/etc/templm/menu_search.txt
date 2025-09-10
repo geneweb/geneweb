@@ -1,0 +1,146 @@
+<!-- $Id: templm/menu_search.txt v7.0 08/02/2016 05:44:45 $ -->
+%include;js_perso_accesskey
+%define;lang(x)
+  %apply;nth%with;
+    /af/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
+  %and;x%end;
+%end;
+%define;link_lang()
+  %for;i;1;32;
+    %let;l1;%apply;lang(i)%in;
+    <a href="%url_set.lang.l1;" title="%apply;language_name(l1)"%sp;
+      style="%if;((bvar.default_lang=l1 and e.lang="") or e.lang=l1)background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;%end;">
+       %if;(bvar.show_flag = "yes")<img src="%images_prefix;flags/l-%l1;.jpg" width="20" height="11" alt="flag" id="i%tt;" style="border:0"> %end;
+       %l1; %apply;language_name(l1)</a>
+  %end;
+%end;
+%let;lg;%lang;%end;
+%in;
+%define;bg(xx)
+  %if;(e.templ="xx")style="background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;"%end;
+%end;
+%if;(not cancel_links and e.m != "MOD_DATA_OK" and e.m != "DEL_IND_OK" and e.m != "DEL_FAM_OK" and e.m != "NOTES" and e.m != "MISC_NOTES" and e.templ="templm" and e.m!="RL")
+  <div class="menu3" id="menu_search">
+    %if;(referer != "")
+      <span><a href="%referer;" title="[*back]">⇦</a></span>
+    %end;
+    %if;(e.n != "" or e.i != "" or e.m !="")
+      <span><a href="%prefix;" title="[*home]"> ⇧ </a></span>
+    %end;
+    %if;((e.m="MOD_FAM" or e.m="ADD_FAM" or e.m="MOD_IND" or e.m="S" or e.m="") and (e.n != "" or e.i != "" or e.ip !=""))
+    <form id="ak" method="get" action="%action;">
+      <span><input id="acckey" name="acckey" %laZ; %if;(e.m!="A")autofocus%end; onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"/>
+        <span class="s_menu">
+          %if;(e.m = "MOD_IND")
+          Alt+%lpc1k; [first name/first names]0<br>
+          Alt+%lpc2k; [birth]<br>
+          Alt+%lpc3k; [death]<br>
+          Alt+%lpc4k; [add::event/events]0<br>
+          Alt+%lpc5k; [note/notes]1<br>
+          Alt+%lpc6k; [relation/relations]1<br>
+          Alt+%lpc7k; [title/titles]1<br>
+          Alt+%lpcPk; [occupation/occupations]0<br>
+          Alt+%lpcOk; [invert::event/events]1<br><br>
+          %elseif;(e.m ="MOD_FAM" or e.m ="ADD_FAM")
+          Alt+%lfc1k; [first name/first names]0 [father/mother]0<br>
+          Alt+%lfc2k; [add::child/children]0<br>
+          Alt+%lfc3k; [date of marriage]/[relation/relations]0<br>
+          Alt+%lfc4k; [add::event/events]0<br>
+          Alt+%lfc5k; [marriage notes]<br>
+          Alt+%lfc6k; [source/sources]1<br>
+          Alt+%lpcOk; [invert::event/events]1 [family/families]0<br><br>
+          %else;
+          (0) [spouse/spouses]1<br>
+          (1) [siblings]<br>
+          (2 3 4 5 6 7) [n° Sosa] [ancestor/ancestors]1<br>
+          (8) [child/children]1<br>
+          (9) [child/children]1 Sosa<br>
+          (%laDk;) [difference between the two revisions]<br>
+          (%laRk;) [relationship computing]<br>
+          (%laSk;) [navigation with %t as Sosa reference:::xx]<br>
+          (%laYk;) [tree]<br><br>
+            %if;wizard;
+            (%laAk;) [add::family/families]0<br>
+            (%laFk;) [modify::family/families]0 1<br>
+            (%laGk;) [modify::family/families]0 2<br>
+            (%laHk;) [modify::family/families]0 3<br>
+            (%laIk;) [send::image/images]0<br>
+            (%laLk;) [add::parents]<br>
+            (%laPk;) [modify::person/persons]0<br>
+            %end;
+          %end;
+          (%laWk;) [search/case sensitive]0<br>
+        </span>
+      </span>
+    </form>
+    %end;
+    <form method="get" action="%action;" onsubmit="return oS3();">
+           %hidden;
+           %if;(e.m != "A")<input id="mS" type="hidden" name="m" value="S"/>%end;
+           %if;(e.t = "T")<input id="tT" type="hidden" name="t" value="T"/>
+           <input id="v" type="hidden" name="v" value="%e.v"/>%end;
+           %if;(e.m = "A")<input id="mA" type="hidden" name="m" value="A"/>%end;
+           <input type="text" id="mSn" name="n" maxlength="200" accesskey="%laWk;" %if;((e.i="" and e.p="" and e.n="") or e.p!="" and e.m!="ADD_FAM")autofocus%end;%sp;
+             title="[*search/case sensitive]0[:]%nl;
+                    [surname/surnames]0*%nl;
+                    %if;(e.t != "T")[public name]%nl;[alias]%nl;[n° Sosa]%end;
+                    %nl;%nl;*[begin] [with]"
+%(                   * [father/mother]0%nl;
+                     + [father/mother]1%nl;
+                     / [child/children]0 [Sosa]%nl;
+                     - %apply;a_of_b%with;[spouse/spouses]0%and;[child/children]0 [Sosa]%end;
+                      ×      +%nl;
+                      \   /%nl;
+                        n°     ÷+ = ×-
+                          \   /%nl;
+                            ÷      -
+                              \   /%nl;
+                                ÷÷
+
+═╦════╦════╦════╗
+ ║ /  ║ *  ║ -  ║
+ ║  ÷2║  ×2║÷2+1║
+═╩════╩════╬════╣
+   8*   +9 ║ +  ║
+      4    ║×2+1║
+   2/   -3 ║    ║%)
+             placeholder="[*search/case sensitive]0"
+             onkeypress="javascript:return computeSosa(event,'mSn')" 
+             /><input type="text" id="mSp" name="p" maxlength="200" 
+             title="[*search/case sensitive]0 (%laWk;)[:]%nl;[first name/first names]0*%nl;n° index%nl;* = [starting with]"
+             /><input id="hide_ie" tabindex="-1" type="submit" value="Ok" title="[*search/case sensitive]0 (W)"/>
+    </form>
+    <span class="r_btn">
+    <a href="%if;(bvar.hide_advanced_request != "yes")%prefix;m=H;v=advanced%else;#%end;" 
+    title="[*advanced request]0%nl;%nl;[*select]%nl;%if;(e.templ != "")%e.templ;%else;templ%end;">%if;(bvar.hide_advanced_request != "yes")🔍%else;templ%end;</a>
+    %if;(e.digest = "")
+      <span class="s_menu" id="tpl">
+        <a href="%url_set.templ;" %apply;bg("")>default</a>
+        %( <a href="%url_set.templ.templa;" %apply;bg("templa")>templa</a> %)
+        %if;(wizard or bvar.wizard_passwd = "")
+          <small><a href="%prefix;m=H&v=doc_templm">doc templm</a></small>
+        %end;
+      </span>
+    %end;
+    </span>
+    <span class="r_btn">
+      <a href="%if;(e.i !="" or e.n!="")%url;cgl=on%end;" 
+      title="%if;(e.i !="" or e.n!="")[*cancel GeneWeb links] %nl;%nl;%end;[*select] %nl;%lang; %apply;language_name(lang)">%if;(e.i !="" or e.n!="")⇨%else;%lang;%end;</a>
+      <span class="s_menu" id="lang">%apply;link_lang()</span>
+    </span>
+  </div>
+  %if;(e.em = "R" and (e.et = "A" or e.et = "M") and e.select = "")
+    <div class="menu">
+      <span>
+        <a href="%prefix;em=R&et=%e.et;&i=%e.ei;&ei=%e.i;&image=%e.image;&spouse=%e.spouse;">[*relationship] B &harr; A</a>
+        %if;(e.et = "A")
+          <a href="%prefix;em=R&et=M&i=%e.i;&ei=%e.ei;&image=%e.image;&spouse=%e.spouse;"
+          >[*relationship by marriage]</a>
+        %else;
+          <a href="%prefix;em=R&et=A&i=%e.i;&ei=%e.ei;&image=%e.image;&spouse=%e.spouse;"
+          >[*relationship link/relationship links]1</a>
+        %end;
+      </span>
+    </div>
+  %end;
+%end;

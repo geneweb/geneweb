@@ -1,0 +1,248 @@
+<!-- $Id: templm/anclist_fam7_img.txt v7.0 2015/01/07 11:39:17 $ -->
+
+%let;ref_index;%index;%in;
+%let;ref_sex;%if;(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
+
+%define;fam7_img_somebody1(xx,lexa,lexb,sss)
+  %let;relationship;
+    %if;("lexb" != "")
+      %apply;a_of_b%with;
+        %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+      %and;
+        %if;(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
+      %end;
+    %else;
+      %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+    %end;
+  %in;
+  %apply;add_in_sorted_list(xx.dates,xx,relationship,xx.index,xx.image_url)
+%end;
+
+%define;fam7_img_somebody(xx,lexa,lexb,sss)
+  %if;(xx.has_image)
+    %apply;fam7_img_somebody1("xx","lexa","lexb","sss")
+  %end;
+%end;
+
+%define;fam7_img_cousin(curlev,maxlev,lexa,lexb,sss)
+  %if;(nb_children > 0)
+    %foreach;child;
+      %if;(child.sosa_in_list = "" and child.index != l1i and child.index != l2i and child.index != l3i)
+        %apply;fam7_img_somebody("child","lexa","lexb","sss")
+        %if;(child.has_families)
+          %foreach;child.family;
+            %if;(curlev = 0)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","the spouse","an uncle/an aunt",sex)
+              %end;
+              %apply;fam7_img_cousin(curlev+1,maxlev,"a cousin","","")
+            %elseif;(curlev = 1)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","the spouse","a cousin",sex)
+              %end;
+              %apply;fam7_img_cousin(curlev+1,maxlev,"a son/a daughter/a child","a cousin",sex)
+            %elseif;(curlev = 2)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","a son-in-law/a daughter-in-law","a cousin","sss")
+              %end;
+              %apply;fam7_img_cousin(curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","a cousin","sss")
+            %elseif;(curlev = 3 and maxlev > 3)
+              %apply;fam7_img_cousin(curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a cousin","sss")
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;fam7_img_2nd_cousin(curlev,maxlev,lexa,lexb,sss)
+  %if;(nb_children > 0)
+    %foreach;child;
+      %if;(child.sosa_in_list = "" and child.index != l1i and child.index != l2i and child.index != l3i 
+           and child.index != l4i and child.index != l5i and child.index != l6i and child.index != l7i)
+        %apply;fam7_img_somebody("child","lexa","lexb","sss")
+        %if;(child.has_families)
+          %foreach;child.family;
+            %if;(curlev = 0)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","the spouse","a great-uncle/a great-aunt",sex)
+              %end;
+              %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a cousin","the father/the mother/a parent",2)
+            %elseif;(curlev = 1)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","a son-in-law/a daughter-in-law","a great-uncle/a great-aunt","sss")
+              %end;
+              %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a 2nd cousin","",sex)
+            %elseif;(curlev = 2)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","the spouse","a 2nd cousin",sex)
+              %end;
+              %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a son/a daughter/a child","a 2nd cousin",sex)
+            %elseif;(curlev = 3)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","a son-in-law/a daughter-in-law","a 2nd cousin","sss")
+              %end;
+              %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","a 2nd cousin","sss")
+            %elseif;(curlev = 4)
+              %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a 2nd cousin","sss")
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;fam7_img_children(curlev,maxlev,lexa,lexb,sss)
+  %if;(nb_children > 0)
+    %foreach;child;
+      %apply;fam7_img_somebody("child","lexa","","")
+      %if;(child.has_families)
+        %foreach;child.family;
+          %if;(curlev = 0 and maxlev > 2)
+            %if;(evar.spouse = "on")
+              %apply;fam7_img_somebody("spouse","a son-in-law/a daughter-in-law","","")
+            %end;
+            %apply;fam7_img_children(curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","",sex)
+          %elseif;(curlev = 1 and maxlev > 3)
+            %if;(evar.spouse = "on")
+              %apply;fam7_img_somebody("spouse","the spouse","a grandson/a granddaughter/a grandchild",sex)
+            %end;
+            %apply;fam7_img_children(curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","","")
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;fam7_img_nephew(curlev,maxlev,lexa,lexb,sss)
+  %if;(nb_children > 0)
+    %foreach;child;
+      %if;(child.index != l1i)
+        %apply;fam7_img_somebody("child","lexa","","")
+        %if;(child.has_families)
+          %foreach;child.family;
+            %if;(curlev = 0)
+              %if;(evar.spouse = "on")
+                %if;("lexa" = "a half-brother/a half-sister/a half-sibling")
+                  %apply;fam7_img_somebody("spouse","the spouse","lexa",sex)
+                %else;
+                  %apply;fam7_img_somebody("spouse","a brother-in-law/a sister-in-law","","")
+                %end;
+              %end;
+              %apply;fam7_img_nephew(curlev+1,maxlev,"a nephew/a niece","","")
+            %elseif;(curlev = 1 and maxlev > 2)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","the spouse","lexa",sex)
+              %end;
+              %apply;fam7_img_nephew(curlev+1,maxlev,"a great-nephew/a great-niece","","")
+            %elseif;(curlev = 2 and maxlev > 3)
+              %if;(evar.spouse = "on")
+                %apply;fam7_img_somebody("spouse","the spouse","lexa",sex)
+              %end;
+              %apply;fam7_img_nephew(curlev+1,maxlev,"a son/a daughter/a child","a great-nephew/a great-niece",sex)              
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;fam7_img()
+  %let;lv7;%apply;min(evar.v,4)%in;
+  %empty_sorted_list;
+  %foreach;ancestor_level(lv7)
+    %foreach;ancestor;
+      %if;(level=1)
+        %apply;fam7_img_somebody("ancestor","him/her","","")
+        %foreach;ancestor.family;
+          %if;(evar.spouse = "on")
+            %apply;fam7_img_somebody("spouse","the spouse","","")
+            %if;(spouse.has_parents and evar.v != 1)
+              %foreach;spouse.parent;
+                %apply;fam7_img_somebody("parent","the father-in-law/the mother-in-law","","")
+              %end;
+            %end;
+          %end;
+          %apply;fam7_img_children(0,lv7,"a son/a daughter/a child","","")
+        %end;
+      %elseif;(level=2)
+        %apply;fam7_img_somebody("ancestor","the father/the mother/a parent","","")
+        %if;(evar.cousins = "on")
+          %foreach;ancestor.family;
+            %if;(ancestor.is_male and spouse.index = ancestor.spouse.index)
+            %elseif;(ancestor.nb_families > 1 and spouse.index != ancestor.spouse.index)
+              %apply;fam7_img_nephew(0,lv7,"a half-brother/a half-sister/a half-sibling","","")
+            %else;
+              %apply;fam7_img_nephew(0,lv7,"a brother/a sister/a sibling","","")
+            %end;
+          %end;
+        %end;
+      %elseif;(level=3)
+        %apply;fam7_img_somebody("ancestor","a grandfather/a grandmother/a grandparent","","")
+        %if;(evar.cousins = "on")
+          %foreach;ancestor.family;
+            %apply;fam7_img_cousin(0,lv7,"an uncle/an aunt","","")
+          %end;
+        %end;
+      %elseif;(level=4)
+        %apply;fam7_img_somebody("ancestor","a great-grandfather/a great-grandmother/a great-grandparent","","")
+        %if;(evar.cousins = "on")
+          %foreach;ancestor.family;
+            %apply;fam7_img_2nd_cousin(0,lv7,"a great-uncle/a great-aunt","","")
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%( 7 families with images %)
+%let;l1i;%index;%in;
+%let;l2i;%if;(has_parents)%father.index;%end;%in;
+%let;l3i;%if;(has_parents)%mother.index;%end;%in;
+%let;l4i;%if;(has_parents and father.has_parents)%father.father.index;%end;%in;
+%let;l5i;%if;(has_parents and father.has_parents)%father.mother.index;%end;%in;
+%let;l6i;%if;(has_parents and mother.has_parents)%mother.father.index;%end;%in;
+%let;l7i;%if;(has_parents and mother.has_parents)%mother.mother.index;%end;%in;
+%apply;fam7_img()
+%if;(evar.tf1 = "fam71")
+  %( images (long display) %)
+  %foreach;sorted_list_item;
+    <div class="fam71">
+      <img alt="img" src="%item.5;">
+      <a style="color:transparent;"
+         onfocus="style.color='#000'"
+         onblur="style.color='transparent'"
+         onmouseover="style.color='#000'"
+         onmouseout="style.color='transparent'"
+         %if;(browsing_with_sosa_ref)
+           href="%prefix;m=RLM&et=S&spouse=on&image=%evar.image;&%nn;
+                i1=%ref_index;&
+                i2=%item.4;&t2=%item.3;&%nn;
+                i3=%sosa_ref.index;&t3=sosa_1;&%nn;
+                i4=%ref_index;&t4=%ref_sex;"
+         %else;
+           href="%prefix;em=R&ei=%item.4;&spouse=on&et=S&image=%evar.image;&i=%ref_index;"
+         %end;>%item.2;<span>%item.1;</span></a>
+      <strong>%item.3;</strong>
+    </div>
+  %end;
+%elseif;(evar.tf1 = "fam72")
+  %( images with onmousemove %)
+  <div style="clear:both;height:1080px">
+    %foreach;sorted_list_item;
+      <div class="fam72"
+           onmouseover="style.zIndex=varZIndex++;style.width='200px';style.height='300px';style.fontSize='12px';"
+           onmousemove="style.left=event.clientX - 25 + 'px';style.top=event.clientY - 175 + 'px';"
+           onmouseup="style.zIndex=varZIndex++;style.width='100px';style.height='150px';style.fontSize='0px';">
+        <img alt="img" src="%item.5;">
+        <br>%item.2;<br>%item.1;<br><span>%item.3;</span>
+      </div>
+    %end;
+  </div>
+%else;
+%end;

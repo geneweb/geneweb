@@ -1,0 +1,193 @@
+<!-- $Id: templm/updind_updfam.txt v7.0 2016/03/21 15:24:07 $ -->
+%include;js_perso_accesskey
+%(updind and updfam %)
+%let;ak1;[*link] [any individual in the base] [with][:]
+           [number] occurence (oc=), [first name/first names]0, [surname/surnames]0
+         [or]
+           [number] index (i=)
+
+         [*create]/[add::person/persons]0
+%in;
+%let;ak2;  [*sex], [select a letter][:]
+           (M) [male/female/neuter]0
+           (F) [male/female/neuter]1
+           (N) [male/female/neuter]2
+%in;
+%let;ak3;
+         [*tools] [and] [relationship shortcut][:]
+           (R) [move up/down]0
+           (D) [move up/down]1
+           (H) [move up/down]2
+           (B) [move up/down]3
+           (A) [add::]
+           (I) [insert::]
+%in;
+%let;ak4;  (P) [visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [surname/surnames]0
+%in;
+%let;ak5;  (V) [godfather/godmother/godparents]2
+           (W) [adoptive father/adoptive mother/adoptive parents]2
+           (X) [recognizing father/recognizing mother/recognizing parents]2
+           (Y) [candidate father/candidate mother/candidate parents]2
+           (Z) [foster father/foster mother/foster parents]2
+%in;
+%let;ak6;[link] [any individual in the base] [with][:]
+           [number] occurence oc
+           [number] index i
+%in;
+%let;ak7;  (X) [delete::]
+%in;
+%let;lta;%if;([!dates order]0 = "ddmmyyyy")
+           [year/month/day]2 [year/month/day]1 [year/month/day]0
+         %elseif;([!dates order]0 = "mmddyyyy")
+           [year/month/day]1 [year/month/day]2 [year/month/day]0
+         %else;
+           [year/month/day]0 [year/month/day]1 [year/month/day]2
+         %end;
+%in;
+%let;ltb;[year/month/day]0
+           1789 [exact]0
+           /1789/, //1789 [about (date)]0
+           1789 + 2 = /1791/
+           1789 - 2 = /1787/
+           ?1789, .1789 [possibly (date)]0
+           /1789 [before (date)]0
+           1789/ [after (date)]0
+%in;
+%let;ltc;
+           1789/1791, 1789/12/1791, 1789/31/12/1791 [or]
+           1787.1789, 1787.07/1789, 1787.14/07/1789 [between (date)]
+           [text]
+%in;
+%let;l_on1; onkeydown="if (event.keyCode == 13) javascript:document.upd.submit()"%in;
+%let;l_on1s; onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
+%let;l_on2; onblur="tUC(this)" onkeydown="if(event.keyCode == 13)tUC(this)"%in;
+%let;l_on3; onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"%in;
+%let;l_on4; list="dloccu"%if;(bvar.datalist_occu = 2) onkeyup="ldl(this,'occu',event)"%end;%in;
+%let;l_on5; list="dlplace"%if;(bvar.datalist_place = 2) onkeyup="ldl(this,'place',event)"%end;%in;
+%let;l_on6; list="dlsrc"%if;(bvar.datalist_src = 2) onkeyup="ldl(this,'src',event)"%end;%in;
+%let;l_on7; list="dlsn"%if;(bvar.datalist_sn = 2) onkeyup="tUC(this);ldl(this,'sn',event)"%end;%in;
+%let;l_on8; list="dlfn"%if;(bvar.datalist_fn = 2) onkeyup="tUC1(this);ldl(this,'fn',event)"%end;%in;
+%let;ldmy;%if;([!dates order]0 = "ddmmyyyy")dd%elseif;([!dates order]0 = "mmddyyyy")mm%else;yy%end;%in;
+%define;date(z1,z2,z3,z4)
+  %let;l_dd;%if;(z2.day != "" and z2.day < 10)0%end;%z2.day;%in;
+  %let;l_mm;%if;(z2.month != "" and z2.month < 10)0%end;%z2.month;%in;
+  %let;l_oyy;%z2.oryear;%in;
+  %let;l_omm;%if;(z2.ormonth != "" and z2.ormonth < 10)0%end;%z2.ormonth;%in;
+  %let;l_odd;%if;(z2.orday != "" and z2.orday < 10)0%end;%z2.orday;%in;
+  %let;l1;%z2.prec;%in;
+  %let;l2;%z2.year;%in;
+  %let;l3;
+    %if;(l_oyy != "")
+      %if;(l1 = "oryear")/%elseif;(l1 = "yearint")..%end;
+      %if;(ldmy = "dd")%if;(l_odd != "")%l_odd;/%end;%if;(l_omm != "")%l_omm;/%end;%l_oyy;%nn;
+      %elseif;(ldmy = "mm")%if;(l_omm != "")%l_omm;/%end;%if;(l_odd != "")%l_odd;/%end;%l_oyy;%nn;
+      %else;%l_oyy;%if;(l_omm != "")/%l_omm;%end;%if;(l_odd != "")/%l_odd;%end;%nn;
+      %end;
+    %end;
+  %in;
+  %let;l_yy;
+    %if;(l1 = "sure")%z2.year;%nn;
+    %elseif;(l1 = "about")/%l2;/%nn;
+    %elseif;(l1 = "maybe")?%l2;%nn;
+    %elseif;(l1 = "before")/%l2;%nn;
+    %elseif;(l1 = "after")%l2;/%nn;
+    %elseif;(l3 != "")%l2;%l3;%nn;
+    %elseif;(z2.text != "")%z2.text;%nn;
+    %else;%l2;%nn;
+    %end;
+  %in;
+  %if;(ldmy = "dd")
+    z3<input id=z1_dd name=z1_dd class=d autocomplete=off size=1 maxlength=2 value="%l_dd;" z4 onkeypress="javascript:return oKPdd(event,'z1','_dd','_mm');"
+    %/><input id=z1_mm name=z1_mm class=m autocomplete=off size=1 maxlength=2 value="%l_mm;" list=dlmonth onkeypress="javascript:return oKPmm(event,'z1','_mm','_yy');" onkeydown="javascript:return oKD1(event,'z1_mm','z1_dd')"
+    %/><input id=z1_yy name=z1_yy class=y autocomplete=off size=12 maxlength=50 value="%l_yy;" onkeydown="if(event.keyCode == 13)javascript:evD('z1');return oKD1(event,'z1_yy','z1_mm')" onblur="javascript:evD('z1')"%/>%nn;
+  %elseif;(ldmy = "mm")
+    z3<input id=z1_mm name=z1_mm class=m autocomplete=off size=1 maxlength=2 value="%l_mm;" z4 list=dlmonth onkeypress="javascript:return oKPmm(event,'z1','_mm','_dd');"
+    %/><input id=z1_dd name=z1_dd class=d autocomplete=off size=1 maxlength=2 value="%l_dd;" onkeypress="javascript:return oKPdd(event,'z1','_dd','_yy');" onkeydown="javascript:return oKD1(event,'z1_dd','z1_mm')"
+    %/><input id=z1_yy name=z1_yy class=y autocomplete=off size=12 maxlength=50 value="%l_yy;" onkeydown="if(event.keyCode == 13)javascript:evD('z1');return oKD1(event,'z1_yy','z1_dd')" onblur="javascript:evD('z1')"%/>%nn;
+  %else;
+    z3<input id=z1_yy name=z1_yy class=y autocomplete=off size=12 maxlength=50 value="%l_yy;" z4 onkeypress="javascript:return cF1(event,'z1_mm');" onkeydown="if(event.keyCode == 13)javascript:evD('z1')" onblur="javascript:evD('z1')"
+    %/><input id=z1_mm name=z1_mm class=m autocomplete=off size=1 maxlength=2 value="%l_mm;" list=dlmonth onkeypress="javascript:return oKPmm(event,'z1','_mm','_dd');" onkeydown="javascript:return oKD1(event,'z1_mm','z1_yy')"
+    %/><input id=z1_dd name=z1_dd class=d autocomplete=off size=1 maxlength=2 value="%l_dd;" onkeypress="javascript:return oKPdd(event,'z1','_dd','_place');" onkeydown="javascript:return oKD1(event,'z1_dd','z1_mm')"%/>%nn;
+  %end;
+    <input type="hidden" id="z1_cal" name="z1_cal" value="%z2.calendar;"
+    %/><input type="hidden" id="z1_text" name="z1_text" value="%z2.text;"
+    %/><input type="hidden" id="z1_yyyy" name="z1_yyyy" value="%z2.year;"
+    %/><input type="hidden" id="z1_prec" name="z1_prec" value="%z2.prec;"
+    %/><input type="hidden" id="z1_oryear" name="z1_oryear" value="%z2.oryear;"
+    %/><input type="hidden" id="z1_ormonth" name="z1_ormonth" value="%z2.ormonth;"
+    %/><input type="hidden" id="z1_orday" name="z1_orday" value="%z2.orday;" %/>%nn;
+%end;
+%define;hevent(z1,z2)
+  <input name="z1_cal" value="%z2.calendar;"%/>
+  <input name="z1_dd" value="%z2.day;"%/>
+  <input name="z1_mm" value="%z2.month;"%/>
+  <input name="z1_yyyy" value="%z2.year;"%/>
+  <input name="z1_prec" value="%z2.prec;"%/>
+  <input name="z1_orday" value="%z2.orday;"%/>
+  <input name="z1_ormonth" value="%z2.ormonth;"%/>
+  <input name="z1_oryear" value="%z2.oryear;"%/>
+  <input name="z1_text" value="%z2.text;"%/>
+  %if;("z1" != "div")
+    <input name="z1_place" value="%z2_place;"%/>
+    <input name="z1_note" value="%z2_note;"%/>
+    <input name="z1_src" value="%z2_src;"%/>
+  %end;
+%end;
+%define;onjq1(z1,z2) onkeydown="if(event.keyCode == 13)tUC(this)" onblur="tUC(this);jq1('z1','z2')"%end;
+%define;one_event(z1,z2,z3)
+  %let;l1;%if;("z2" != "")z2%else;%event.e_name;%end;%in;
+  %let;l2;%if;(l1 = "#marr")%lfc3;%elseif;(l1 = "#birt")%lpc2;%elseif;(l1 = "#deat" or l1 = "-")%else;<code>   </code>%end;%in;
+  %let;l3;%if;(l1 = "#marr")%lfa3;%elseif;(l1 = "#birt")%lpa2;%elseif;(l1 = "#deat" or l1 = "-")%end;%in;
+  %let;l4;%if;(l1 = "#deat" or l1 = "-")%lpc3;%end;%in;
+  %let;l5;%if;(l1 = "#deat" or l1 = "-")%lpa3;%end;%in;
+  <dl id="ez1">
+    <dt id="ez1">
+        <input type="hidden" id="e_namez1" name="e_namez1" value="%l1;"
+        %/><input id="ez1_occ" name="ez1_occ" class="e_occ" maxlength="1" placeholder="#" onkeypress="javascript:return oKP2(event,'e',z1,'_occ','')" onblur="this.value='';"
+        %/><input id="e_namez1_dl" name="e_namez1_dl" class="e" size="20" maxlength="200" placeholder="[*event/events]0" value="%l1;" list="dlevent" %l5;
+        %sp;autocomplete="off" onkeypress="javascript:return oKP3(event,this)" onblur="oB6('z1')" onkeydown="if(event.keyCode == 13)oB6('z1')"
+        %/>%l4;%apply;date("e_datez1","event_date",l2,l3)%sp;
+        <input id="e_placez1" name="e_placez1" class="pl" size="70" placeholder="[*place/places]0" value="%event.e_place;" %l_on5;%/>
+    </dt>
+    <dd><textarea id="e_notez1" name="e_notez1" placeholder="[*comment]" rows="1" class="enote" %l_on1s;>%nn;
+      %if;(evar.m = "MOD_FAM" and comment != "" and bvar.move_comment = "yes" and event.e_note = "" and (event.e_name = "#marr" or event.e_name= "#nmar" or event.e_name= "#nmen" or event.e_name ="#enga"))%comment;%end;
+      %event.e_note;%sq;</textarea></dd>
+    <dd>%if;(event.e_src="")
+          <input id="e_srcz1" name="e_srcz1" placeholder="[*source/sources]1" class="esrc" %l_on6; %l_on1;/>
+        %else;
+          <textarea id="e_srcz1" name="e_srcz1" placeholder="[*source/sources]1" rows="1" class="esrc" %l_on1s;>%event.e_src;%sq;</textarea>
+        %end;</dd>
+    %foreach;z3;%apply;one_witness(z1,wcnt,"z3")%end;
+    <dd id="new_ez1_witn"></dd>
+    <dd> <a id="awz1" href="javascript:addWitness(1,1,z1)">+ [witness/witnesses]0</a> %lt1; [first name/first names]0 [surname/surnames]0</dd>
+  </dl>
+%end;
+%define;one_witness(z1,z2,z3)
+  %let;l1;ez1_witnz2%in;
+  <dd id="%l1;"
+      ><input type="hidden" id="%l1;_kind" name="%l1;_kind" value="%if;(z3_kind != "")%z3_kind;%end;"
+      %/><input type="hidden" id="%l1;_sex" name="%l1;_sex" value=""
+      %/><input type="hidden" id="%l1;_p" name="%l1;_p" value="link"
+      %/><input id="%l1;_occ" name="%l1;_occ" class="occ" placeholder="N" autocomplete="off" size="5" maxlength="8"
+       onkeypress="javascript:return oKP2(event,'witn','z2','_occ','z1')" onblur="oB2('%l1;')"
+       %if;(z3.occ="") value="0" %else; value="%z3.occ;" %end;
+      %/><input id="%l1;_fn" name="%l1;_fn" class="fn ar" size="30" maxlength="200" value="%z3.first_name;" %l_on3; %l_on8;
+      %/><input id="%l1;_sn" name="%l1;_sn" class="sn" size="30" maxlength="200" value="%z3.surname;" %apply;onjq1(l1,"") %l_on7;
+      %/><span id="%l1;_jq1"> </span>
+  </dd>
+%end;
+%define;g_oku(z1,z2,z3)
+  var g_z1 = "list=\"dlz1\"%if;(bvar.datalist_z1 = 2) onkeyup=\"%if;("z2" = "yes")z3(this);%end;ldl(this,'z1',event)\"%end;";
+%end;
+<script>
+  <!--
+    var g_prefix = "%prefix;";
+    %apply;g_oku("fn",bvar.uppercase,"tUC1")
+    %apply;g_oku("sn",bvar.uppercase,"tUC")
+    %apply;g_oku("place","no","")
+    %apply;g_oku("occu","no","")
+    %apply;g_oku("src","no","")
+    %apply;g_oku("qualifier","no","")
+    %apply;g_oku("alias","no","")
+  -->
+</script>

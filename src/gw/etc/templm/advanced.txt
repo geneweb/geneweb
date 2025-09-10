@@ -1,0 +1,110 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: templm/advanced.txt v7.0 2015/01/23 14:36:06 $ -->
+  <title>[*advanced request]</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="content-style-type" content="text/css"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+</head>
+%let;ltd; title="[year/month/day]2" class="d" size="2" maxlength="2" %in;
+%let;ltm; title="[year/month/day]1" class="m" size="2" maxlength="2" %in;
+%let;lty; title="[year/month/day]0" class="y" size="5" maxlength="5" %in;
+%let;ltp; size="40" maxlength="200" %in;
+%let;wikiplace;%evar.marriage_place;,%evar.birth_place;,%evar.bapt_place;,%evar.death_place;,%evar.burial_place;%in;
+%let;ol1;%if;(wikiplace != ",,,,")wikiPlace('wikiplace','%lang;','%wikiplace');%end;%in;
+
+%define;date(xx)
+  %if;([!dates order]0 = "ddmmyyyy")
+    <input name="xx_dd" %ltd;%/><input name="xx_mm" %ltm;%/><input id="xx_yyyy" name="xx_yyyy" %lty;%/>
+  %elseif;([!dates order]0 = "mmddyyyy")
+    <input name="xx_mm" %ltm;%/><input name="xx_dd" %ltd;%/><input id="xx_yyyy" name="xx_yyyy" %lty;%/>
+  %else;
+    <input id="xx_yyyy" name="xx_yyyy" %lty;%/></label><input name="xx_mm" %ltm;%/></label><input name="xx_dd" %ltd;%/>
+  %end;
+%end;
+
+%define;event(xx)
+  <dl>
+    <dd style="margin-right:3px;">[after] %apply;date("xx1")</dd>
+    <dd style="margin-right:3px;">[before] %apply;date("xx2")</dd>
+    <dd>[place/places]0<input id="xx_place" name="xx_place" value="%evar.xx_place;" %ltp; %/></dd>
+  </dl>
+%end;
+
+<body%body_prop; id="upd" %if;(evar.focus != "")onload="javascript:document.getElementById('%evar.focus;').focus();%ol1;"%end;>
+%include;hed
+%message_to_wizard;
+
+%if;(evar.birth1_yyyy != "" or evar.death2_yyyy != "")
+  <p class="button">
+  %let;text;
+     [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;%nn;
+  %in;
+  %if;(evar.marriage_place != "")
+    <a href="javascript:changeDate('[*add::]','[*delete::]','%text;','cd','marriage1_yyyy','%evar.birth1_yyyy;','marriage2_yyyy','%evar.death2_yyyy;')"
+       id="cd">[*add::] %text;</a>
+  %else;
+    <a href="javascript:changeDate('[*add::]','[*delete::]','%text;','cd','birth1_yyyy','%evar.birth1_yyyy;','death2_yyyy','%evar.death2_yyyy;')"
+       id="cd">[*add::] %text;</a>
+  %end;
+  </p>
+%end;
+
+%if;(ol1 != "")<div style="clear:both;"><ul><li id="wikiplace"></li></ul></div>%end;
+
+<form name="upd" method="post" action="%action;">
+  <p class="button">
+    %hidden;
+    <input type="hidden" name="m" value="AS_OK"%/>
+  </p>
+  <fieldset>
+    <legend>
+      [*advanced request] <input type="submit" value="Ok"%/>
+    </legend>
+    <p><label>[*maximum] <input name="max" class="number" size="5" value="100" maxlength="5"%/> [person/persons]1</label></p>
+    <p>[sex]
+        <label class="occ0"><input type="radio" id="sexM" name="sex" value="M" %/>M </label>
+        <label class="occ1"><input type="radio" id="sexF" name="sex" value="F" %/>F </label>
+        <label><input type="radio" id="sexU" name="sex" value="N" checked="checked" %/>- </label>
+    </p>
+    <p><label>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%evar.first_name;"%/></label><br
+    %/><label>[surname/surnames]0<input %sp;id="surname" name="surname" size="30" maxlength="200" value="%evar.surname;"%/></label><br
+    %/><label>[occupation/occupations]0<input id="occu" name="occu" size="40" maxlength="200" value="%evar.occu;"%/></label></p>
+  </fieldset>
+  <fieldset>
+    <legend>[*birth]</legend>
+    %apply;event("birth")
+  </fieldset>
+  <fieldset>
+    <legend>[*death]</legend>
+    <p>[died]0
+      <label><input type="radio" name="death" value="Dead"%/>[Y/N]0 </label>
+      <label><input type="radio" name="death" value="NotDead"%/>[Y/N]1 </label>
+      <label><input type="radio" name="death" value="" checked="checked"%/>- </label></p>
+    %apply;event("death")
+  </fieldset>
+  <fieldset>
+    <legend>[*marriage/marriages]0</legend>
+    <p>[married]
+      <label><input type="radio" name="married" id="mY" value="Y"%/>[Y/N]0 </label>
+      <label><input type="radio" name="married" id="mN" value="N"%/>[Y/N]1 </label>
+      <label><input type="radio" name="married" id="mA" value="A" checked="checked"%/>- </label></p>
+    %apply;event("marriage")
+  </fieldset>
+  <fieldset>
+    <legend>[*baptism]</legend>
+    %apply;event("bapt")
+  </fieldset>
+  <fieldset>
+    <legend>[*burial]</legend>
+    %apply;event("burial")
+  </fieldset>
+</form>
+%include;trl
+%include;copyr
+%query_time;
+</body>
+</html>

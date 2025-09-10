@@ -1,0 +1,335 @@
+<!-- $Id: templm/anclist_hrztl.txt v7.0 2015/07/13 15:50:49 $ -->
+
+%define;space(z1)%for;i;0;z1;   %end; %end;
+
+%define;line_a(z1,z2)
+  %if;(z1 > 0)
+    z2      %if;(z2 < 1000) %if;(z2 < 100) %if;(z2 < 10) %end;%end;%end;
+    %apply;line_a(z1 - 1,z2 + 10)
+  %end;
+%end;
+
+%define;line_b(z1)%for;i;0;z1; %end;%end;
+%define;line_c(z1)%for;i;0;z1;_%end;%end;
+%define;line_d(z1)%for;i;0;z1;¯%end;%end;
+
+%define;line_e(z1,z2)
+  %if;(z2 = 1)
+    %for;i;0;z1;‗%end;
+  %else;
+    %for;i;0;z1;_%end;
+  %end;
+%end;
+
+%define;horizontally1(xx,curlev,ss1,ss2,ss3,z1)
+  %if;(curlev > 0)
+    %let;l1;%if;(curlev = evar.v)────%elseif;(xx.is_male)┌──%else;└──%end;%in;
+    %let;l2;
+      %if;(browsing_with_sosa_ref and xx.has_sosa)
+        %if;(xx.has_siblings)▶%elseif;(xx.has_parents)▷%else;◁%end;
+      %else;
+        %if;(xx.has_siblings)▸%elseif;(xx.has_parents)▹%else;◃%end;
+      %end;
+    %in;
+    %let;l3;%if;(evar.sosa = "on")%if;(l_has_sosa) %xx.sosa;%else; z1%end;.%end; %in;
+    %if;(xx.has_parents)
+      %apply;horizontally1("xx.father", curlev - 1,"ss1   ","ss1 ","ss1 │ ",z1 * 2)
+    %end;
+    %if;(not cancel_links)
+      <tt>ss2%l1;<a href="%if;(xx.has_parents)%l_url;%else;%l_url1;%end;i=%xx.index;">%l2;</a></tt>%nn;
+      %if;(xx.has_parents and curlev > 1)
+        %if;(evar.marriage2 = "on")
+          %foreach;xx.father.family;
+            %if;(spouse.index = xx.mother.index and marriage_date.year != "")
+              &amp;<small>%marriage_date.prec;%marriage_date.year;</small> -%nn;
+            %end;
+          %end;
+        %end;
+      %end;
+      %l3;<a href="%prefix;%xx.access;">%xx;</a>%xx.title;%xx.dates;<br>
+    %else;
+      <tt>ss2%l1;%l2;</tt>%nn;
+      %if;(xx.has_parents and curlev > 1)
+        %if;(evar.marriage2 = "on")
+          %foreach;xx.father.family;
+            %if;(spouse.index = xx.mother.index and marriage_date.year != "")
+              &amp;<small>%marriage_date.prec;%marriage_date.year;</small> -%nn;
+            %end;
+          %end;
+        %end;
+      %end;
+      %l3;%xx;%xx.title;%xx.dates;<br>
+    %end;
+    %if;(xx.has_parents)
+      %apply;horizontally1("xx.mother",curlev - 1,"ss3 │ ","ss3 ","ss3   ",z1 * 2 + 1)
+    %end;
+  %end;
+%end;
+
+%define;horizontally2(xx,curlev,ss1,ss2,ss3,z1)
+  %if;(curlev > 1)
+    %let;l1;%if;(curlev = evar.v)───%elseif;(z1 % 4 = 0)┌──%else;└──%end;%in;
+    %let;l2;
+      %if;(browsing_with_sosa_ref and xx.father.has_sosa)
+        %if;(xx.father.has_parents and xx.mother.has_parents)
+          %if;(xx.has_siblings)▶%else;▷%end;
+        %elseif;(xx.father.has_parents)
+          %if;(xx.has_siblings)▲%else;△%end;
+        %elseif;(xx.mother.has_parents)
+          %if;(xx.has_siblings)▼%else;▽%end;
+        %elseif;(xx.has_siblings)◀%else;◁%end;
+      %else;
+        %if;(xx.father.has_parents and xx.mother.has_parents)
+          %if;(xx.has_siblings)▸%else;▹%end;
+        %elseif;(xx.father.has_parents)
+          %if;(xx.has_siblings)▴%else;▵%end;
+        %elseif;(xx.mother.has_parents)
+          %if;(xx.has_siblings)▾%else;▿%end;
+        %elseif;(xx.has_siblings)◂%else;◃%end;
+      %end;
+    %in;
+    %let;l3;
+      %if;(evar.sosa = "on")%if;(l_has_sosa)%xx.father.sosa;%else;z1%end;.%end; %nn;
+    %in;
+    %if;(xx.father.has_parents)
+      %apply;horizontally2(
+        "xx.father", curlev - 1, "ss1   ",
+        "ss1", "ss1│  ", z1 * 2)
+    %end;
+    %if;(not cancel_links)
+      ss2%l1;<a href="%nn;
+        %if;(xx.father.has_parents or xx.mother.has_parents)
+          %l_url;xy=on;i=%xx.index;%nn;
+        %else;
+          %l_url1;i=%xx.father.index;%nn;
+        %end;
+      ">%l2;</a>%l3;%nn;
+      %if;(xx.has_parents and curlev > 1)
+        %foreach;xx.father.family;
+          %if;(spouse.index = xx.mother.index)
+            <a href="%prefix;%xx.father.access;">%xx.father;</a>%nn;
+            %xx.father.title;%xx.father.dates;
+            %sp;&amp;%if;(marriage_date.year != "")%marriage_date.prec;%marriage_date.year;%end;%sp;
+            %xx.mother; %xx.mother.title;%xx.mother.dates;<br>
+            %if;(evar.siblings = "on" and xx.has_siblings)
+              %let;l4;
+                %if;(curlev = evar.v)│%nn;
+                %elseif;(curlev = 2) %nn;
+                %elseif;(xx.mother.has_parents)│%else; %nn;
+                %end;
+                        %nn;
+              %in;
+              %foreach;child;
+                <tt>ss3%l4;%nn;
+                  %if;(child_cnt = nb_children)└%else;├%end;
+                  %if;(child_cnt < 10)─%end;
+                  %child_cnt;
+                  %if;(is_male)──%elseif;(is_female)══%else;◦◦%end;
+                </tt> %child_name; %child.dates;<br>
+              %end;
+            %end;
+          %end;
+        %end;
+      %end;
+    %else;
+      ss2%l1;%l2;%l3;%nn;
+      %if;(xx.has_parents and curlev > 1)
+        %foreach;xx.father.family;
+          %if;(spouse.index = xx.mother.index)
+            %xx.father;
+            %xx.father.title;%xx.father.dates;
+             %sp;&amp;%if;(marriage_date.year != "")%marriage_date.prec;%marriage_date.year;%end;%sp;
+            %xx.mother; %xx.mother.title;%xx.mother.dates;<br>
+          %end;
+        %end;
+      %end;
+    %end;
+    %if;(xx.mother.has_parents)
+      %apply;horizontally2(
+        "xx.mother", curlev - 1, "ss3│  ",
+        "ss3", "ss3   ", z1 * 2 + 2)
+    %end;
+  %end;
+%end;
+
+%define;horizontally3(xx,curlev,ss1,ss2,ss3,z1)
+  %if;(curlev > 1)
+    %let;l1;%if;(curlev = evar.v)───%elseif;(z1 % 4 = 0)┌──%else;└──%end;%in;
+    %let;l2;
+      %if;(xx.has_siblings)▪%else;▫%end;
+      %if;(browsing_with_sosa_ref and xx.father.has_sosa)●%else;─%end;
+      %if;(xx.father.has_parents or xx.mother.has_parents)>%else;<%end;
+    %in;
+    %let;l3;%apply;space(curlev - 2)%in;
+    %let;l4;%if;(evar.sosa = "on")%if;(l_has_sosa)%xx.father.sosa;%else;z1%end;. %end;%in;
+    %let;l5;%if;(xx.father.has_parents and curlev != 2)│  %else;   %end;%in;
+    %let;l6;%if;(xx.mother.has_parents and curlev != 2)│  %else;   %end;%in;
+    %let;l7a;%nn;
+      %if;(xx.father.birth_date.year > l_x0)
+        %xx.father.birth_date.year;%nn;
+      %else;
+        %l_x0;%nn;
+      %end;
+    %in;
+    %let;l7b;%if;(l7a > l_x0)%expr(xx.father.birth_date.year - l_x0)%else;0%end;%in;
+    %let;l7c;%if;(l7b > 0)%apply;line_b(l7b)%end;%in;
+    %let;l7d;%nn;
+      %if;(xx.father.birth_date.year > 0)
+        %if;(l_x0 >= xx.father.death_date.year)
+          %l_x0;%nn;
+        %elseif;(xx.father.computable_age)
+          %today.year;%nn;
+        %elseif;(xx.father.death_date.year >= xx.father.birth_date.year)
+          %xx.father.death_date.year;%nn;
+        %end;
+      %end;
+    %in;
+    %let;l7e;%if;(l7d > l_x0 and l7d >= l7a)%apply;line_c(l7d - l7a + 1)%end;%in;
+    %let;l8a;%nn;
+      %if;(xx.mother.birth_date.year > l_x0)
+        %xx.mother.birth_date.year;%nn;
+      %elseif;(xx.mother.birth_date.year > 0)
+        %l_x0;%nn;
+      %end;
+    %in;
+    %let;l8b;%if;(l8a > l_x0)%apply;line_b(xx.mother.birth_date.year - l_x0)%end;%in;
+    %let;l8c;%if;(xx.birth_date.year > l8a)%apply;line_d(xx.birth_date.year - l8a)°%end;%in;
+    %let;l8d;%nn;
+      %if;(xx.mother.birth_date.year > 0)
+        %if;(l_x0 >= xx.mother.death_date.year)
+          %l_x0;%nn;
+        %elseif;(xx.mother.computable_age)
+          %today.year;%nn;
+        %elseif;(xx.mother.death_date.year >= xx.mother.birth_date.year)
+          %xx.mother.death_date.year;%nn;
+        %end;
+      %end;
+    %in;
+    %let;l8e;%nn;
+      %if;(l8d > l_x0)
+        %if;(l8c != "")
+          %apply;line_d(l8d - xx.birth_date.year)%nn;
+        %elseif;(l8d >= l8a)
+          %apply;line_d(l8d - l8a + 1)%nn;
+        %end;
+      %end;
+    %in;
+    %if;(xx.father.has_parents)
+      %apply;horizontally3("xx.father",curlev - 1,"ss1   ","ss1","ss1│  ",z1 * 2)
+    %end;
+    ss1%l5;%l3;%l7c;%l7e;<br>
+    ss2%l1;%nn;
+    %if;(not cancel_links)
+      <a href="%nn;
+      %if;(xx.father.has_parents or xx.mother.has_parents)
+        %l_url;i=%xx.index;%nn;
+      %else;
+        %l_url1;i=%xx.father.index;%nn;
+      %end;
+      ">%l2;</a>%nn;
+    %else;
+      %l2;%nn;
+    %end;
+    %if;(xx.has_parents and curlev > 1)
+      %l3;%l7c;%l4;%nn;
+      %foreach;xx.father.family;
+        %if;(spouse.index = xx.mother.index)
+          %if;(not cancel_links)
+            <a href="%prefix;%xx.father.access;">%xx.father;</a>%nn;
+          %else;
+            %xx.father;%nn;
+          %end;
+          %xx.father.title;%xx.father.dates;
+          %sp;&amp;<small>%if;(marriage_date.year != "")%marriage_date.prec;%marriage_date.year;%end;</small>
+          %xx.mother;%xx.mother.title;%xx.mother.dates;<br>
+          ss3%l6;%l3;%l8b;%l8c;%l8e;<br>
+          %if;(evar.siblings = "on" and xx.has_siblings)
+            %let;l10;%if;(xx.mother.has_parents and curlev != 2)│ %else;  %end;%in;
+            %foreach;child;
+              %let;l11a;%expr(l_x0 + l7b + 7)%in;
+              %let;l11b;%if;(birth_date.year > l11a)%birth_date.year;%else;%l11a;%end;%in;
+              %let;l11c;%if;(l11b > l11a)%apply;line_b(l11b - l11a)%end;%in;
+              %let;l11d;%nn;
+                %if;(birth_date.year > 0)
+                  %if;(l11a >= death_date.year)
+                    %l11a;%nn;
+                  %elseif;(computable_age)
+                    %today.year;%nn;
+                  %elseif;(death_date.year >= birth_date.year)
+                    %death_date.year;%nn;
+                  %end;
+                %end;
+              %in;
+              %let;l11e;%if;(l11d > l11a and l11d >= l11b)%apply;line_e(l11d - l11b + 1,sex)%end;%in;
+              ss3%l10;%l7c;%l3; │      %l11c;%l11e;<br>
+              ss3%l10;%l7c;%l3;%nn;
+              %if;(child_cnt = nb_children) └%else; ├%end;
+              %if;(child_cnt < 10)─%end;
+              %child_cnt;%nn;
+              %if;(is_male)──%elseif;(is_female)══%else;◦◦%end;
+              %if;(browsing_with_sosa_ref and has_sosa)● %else;  %end;
+              %l11c;%child_name;%child.dates;<br>
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+    %if;(xx.mother.has_parents)
+      %apply;horizontally3("xx.mother",curlev - 1,"ss3│  ","ss3","ss3   ",z1 * 2 + 2)
+    %end;
+  %end;
+%end;
+
+%( main %)
+%let;l_sosa;%if;(evar.sosa = "on")1%else;0%end;%in;
+%let;l_has_sosa;%has_sosa;%in;
+%let;l_url;%prefix;m=A&t=%evar.t;&%if;(evar.t="H")tl1=hrztl&%elseif;(evar.t="T")t1=HT&%end;v=%l_v;&maxv=%evar.maxv;&marriage2=%evar.marriage2;&sosa=%evar.sosa;&xy=%evar.xy;&siblings=%evar.siblings;&timeline=%evar.timeline;&gen=%evar.gen;&%in;
+%let;l_url1;%prefix;m=D&t=L&tl1=hrztl&v=%evar.v;&marriage2=%evar.marriage2;&sosa=%evar.sosa;&xy=%evar.xy;&siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
+%if;(not cancel_links and has_children)
+  <div class="menu">
+    <span>
+      <a href="%l_url1;i=%index;" title="(Y)" accesskey="Y">[*descendant tree view]0</a>
+    </span>
+    <span>
+    <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;" %laY;>[*ascendants tree]</a>%nn;
+    </span>
+    
+  </div>
+%end;
+%apply;togen()
+%if;(evar.timeline = "on")
+  %( horizontally x & y timeline %)
+  %let;l_gen;%if;(evar.gen < 50 and evar.gen > 0)%evar.gen;%else;40%end;%in;
+  %let;l_x0;%nn;
+    %if;(birth_date.year > 0)
+      %expr(10 * ((birth_date.year - ((l_v - 1)* l_gen)) / 10))%nn;
+    %else;
+      1900%nn;
+    %end;
+  %in;
+  %let;l_x1;%expr((110 + (l_v - 1) * l_gen) / 10)%in;
+  %let;l_x2;
+    %if;((l_x0 + (l_x1 *10)) < today.year)
+      %l_x1;%nn;
+    %else;
+      %expr((today.year / 10) - (l_x0 / 10) + 1)%nn;
+    %end;
+  %in;
+  <p style="font-family:monospace;line-height:12pt;font-size:12pt;white-space:nowrap;">
+    %apply;space(l_v)%for;i;0;l_x2;0123456789%end;<br>
+    %apply;space(l_v)%apply;line_a(l_x2,l_x0)<br>
+    %apply;horizontally3("self",l_v,"   ","","   ",2)<br>
+    %apply;space(l_v)%for;i;0;l_x2;0123456789%end;<br>
+    %apply;space(l_v)%apply;line_a(l_x2,l_x0)<br>
+  </p>
+%elseif;(evar.xy = "on")
+  %( horizontally x & y %)
+  <p style="font-family:monospace;line-height:12pt;font-size:12pt;">
+    %apply;horizontally2("self",l_v,"   ","","   ",2)
+  </p>
+%else;
+  %( horizontally %)
+  <p style="line-height:12pt;font-size:12pt;">
+    %apply;horizontally1("self",l_v,"   ","","   ",1)
+  </p>
+%end;
