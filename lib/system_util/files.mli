@@ -90,3 +90,5 @@ val read_or_create_value :
     If it does not, or does not start with [magic], or if unmarshalling raise an exception,
     [create] function is used to produce the value to be marshalled.
 *)
+
+val set_modification_time_to_now : string -> unit
