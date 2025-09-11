@@ -1,3 +1,4 @@
+
 # Guide Détaillé des Options gwb2ged
 
 **Date de création :** 10 septembre 2025  
