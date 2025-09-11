@@ -499,32 +499,58 @@ let generate_lowercase_surname_index ~strings_data base =
   in
   { commit; rollback = remove_temporary_files }
 
+let are_already_initialized base index_files =
+  List.for_all
+    (fun index_file ->
+      let base_file = Filename.concat base.Dbdisk.data.bdir "base" in
+      Sys.file_exists index_file
+      && (Unix.stat index_file).st_mtime > (Unix.stat base_file).st_mtime)
+    (List.map (Filename.concat base.data.bdir) index_files)
+
+let update_modification_times ~base ~kind ~surname_already_initialized
+    ~first_name_already_initialized ~first_name_index_files ~surname_index_files
+    =
+  match (kind, surname_already_initialized, first_name_already_initialized) with
+  | `First_name, true, false ->
+      List.iter Files.set_modification_time_to_now
+        (List.map (Filename.concat base.Dbdisk.data.bdir) surname_index_files)
+  | `Surname, false, true ->
+      List.iter Files.set_modification_time_to_now
+        (List.map (Filename.concat base.data.bdir) first_name_index_files)
+  | (`First_name | `Surname), _, _ -> ()
+
 let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
     ~kind base =
   Lock.control ~onerror:on_lock_error (Files.lock_file base.Dbdisk.data.bdir)
     true (fun () ->
-      let index_files, generate_index =
+      let first_name_index_files =
+        [
+          Database.lowercase_first_name_data_file;
+          Database.lowercase_first_name_index_file;
+        ]
+      in
+      let surname_index_files =
+        [
+          Database.lowercase_surname_data_file;
+          Database.lowercase_surname_index_file;
+        ]
+      in
+      let surname_already_initialized =
+        are_already_initialized base surname_index_files
+      in
+      let first_name_already_initialized =
+        are_already_initialized base first_name_index_files
+      in
+      let index_files, generate_index, already_initialized =
         match kind with
         | `First_name ->
-            ( [
-                Database.lowercase_first_name_data_file;
-                Database.lowercase_first_name_index_file;
-              ],
-              generate_lowercase_first_name_index )
+            ( first_name_index_files,
+              generate_lowercase_first_name_index,
+              first_name_already_initialized )
         | `Surname ->
-            ( [
-                Database.lowercase_surname_data_file;
-                Database.lowercase_surname_index_file;
-              ],
-              generate_lowercase_surname_index )
-      in
-      let already_initialized =
-        List.for_all
-          (fun index_file ->
-            let base_file = Filename.concat base.data.bdir "base" in
-            Sys.file_exists index_file
-            && (Unix.stat index_file).st_mtime > (Unix.stat base_file).st_mtime)
-          (List.map (Filename.concat base.data.bdir) index_files)
+            ( surname_index_files,
+              generate_lowercase_surname_index,
+              surname_already_initialized )
       in
       if not already_initialized then (
         let pending_index_generation =
@@ -537,7 +563,10 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
             raise e
         in
         pending_base_generation.commit ();
-        pending_index_generation.commit ()))
+        pending_index_generation.commit ();
+        update_modification_times ~base ~kind ~surname_already_initialized
+          ~first_name_already_initialized ~first_name_index_files
+          ~surname_index_files))
 
 let output ?(save_mem = false) ?(tasks = []) base =
   (* create database directory *)
