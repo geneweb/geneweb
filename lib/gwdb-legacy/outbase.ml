@@ -507,17 +507,19 @@ let are_already_initialized base index_files =
       && (Unix.stat index_file).st_mtime > (Unix.stat base_file).st_mtime)
     (List.map (Filename.concat base.data.bdir) index_files)
 
-let update_modification_times ~base ~kind ~surname_already_initialized
-    ~first_name_already_initialized ~first_name_index_files ~surname_index_files
-    =
-  match (kind, surname_already_initialized, first_name_already_initialized) with
-  | `First_name, true, false ->
+let update_modification_times ~base ~(kind : [< `First_name | `Surname ])
+    ~surname_already_initialized ~first_name_already_initialized
+    ~first_name_index_files ~surname_index_files =
+  match kind with
+  | `First_name
+    when surname_already_initialized && not first_name_already_initialized ->
       List.iter Files.set_modification_time_to_now
         (List.map (Filename.concat base.Dbdisk.data.bdir) surname_index_files)
-  | `Surname, false, true ->
+  | `Surname
+    when first_name_already_initialized && not surname_already_initialized ->
       List.iter Files.set_modification_time_to_now
         (List.map (Filename.concat base.data.bdir) first_name_index_files)
-  | (`First_name | `Surname), _, _ -> ()
+  | `First_name | `Surname -> ()
 
 let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
     ~kind base =
