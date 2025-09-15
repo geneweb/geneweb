@@ -8520,7 +8520,7 @@ en: family mode
 fr: mode famille
 
     family mode-hlp
-co: stende u statu semipublicu à i membri di a famiglia (attivà/disattivà)
+co: stende u statu semipublicu à i membri di a famiglia (vèrde : attivà, rossu : disattivà)
 de: SemiPublic-Status auf Familienmitglieder ausweiten (zweiter Klick deaktiviert)
 en: extend the SemiPublic status to family members (on/off toggle)
 fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
