@@ -52,3 +52,5 @@ val other_events :
 (** [other_events conf base p] is the list of [p]'s other events
     (i.e. all [p]'s events except birth, , baptism, death, burial and
     marriage).  **)
+
+val map_event_name : ('a -> 'b) -> 'a event_name -> 'b event_name
