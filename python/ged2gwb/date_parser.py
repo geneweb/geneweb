@@ -1,120 +1,67 @@
-from dataclasses import dataclass
-from typing import Optional, List, Tuple
-import re
+from typing import Optional
+from models import DateValue
 
-from .types import Calendar, Precision, Date
+GREGORIAN_MONTHS = {
+    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
+    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12
+}
 
-def is_roman_int(s: str) -> Optional[int]:
-    """Convert roman numeral to int, return None if not roman"""
-    roman_map = {
-        'M': 1000, 'CM': 900, 'D': 500, 'CD': 400,
-        'C': 100, 'XC': 90, 'L': 50, 'XL': 40,
-        'X': 10, 'IX': 9, 'V': 5, 'IV': 4, 'I': 1
-    }
-    s = s.upper()
-    if not re.match(r'^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$', s):
+FRENCH_MONTHS = {
+    "VEND": 1, "BRUM": 2, "FRIM": 3, "NIVO": 4, "PLUV": 5, "VENT": 6,
+    "GERM": 7, "FLOR": 8, "PRAI": 9, "MESS": 10, "THER": 11, "FRUC": 12, "COMP": 13
+}
+
+HEBREW_MONTHS = {
+    "TSH": 1, "CSH": 2, "KSL": 3, "TVT": 4, "SHV": 5, "ADR": 6, "ADS": 7,
+    "NSN": 8, "IYR": 9, "SVN": 10, "TMZ": 11, "AAV": 12, "ELL": 13
+}
+
+month_number_dates = "NoMonthNumberDates"
+no_negative_dates = False
+try_negative_dates = False
+bad_dates_warned = False
+
+def date_of_field(date_str: str) -> Optional[DateValue]:
+    """Parse date from string - placeholder"""
+    if not date_str or date_str.strip() == "":
         return None
 
-    result = 0
-    index = 0
-    while index < len(s):
-        if index + 1 < len(s) and s[index:index+2] in roman_map:
-            result += roman_map[s[index:index+2]]
-            index += 2
-        else:
-            result += roman_map[s[index]]
-            index += 1
-    return result
+    return DateValue(text=date_str)
 
-def parse_number(s: str) -> Optional[int]:
-    """Parse string as number (arabic or roman)"""
-    try:
-        return int(s)
-    except ValueError:
-        return is_roman_int(s)
-
-def parse_month(s: str) -> Optional[int]:
-    """Parse month name to number (1-12)"""
-    months = {
-        'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6,
-        'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10, 'NOV': 11, 'DEC': 12
-    }
-    return months.get(s[:3].upper())
-
-def parse_date_tokens(tokens: List[str]) -> Optional[Date]:
-    """Parse list of tokens into Date structure"""
-    if not tokens:
+def cdate_of_od(date_val: Optional[DateValue]) -> Optional[str]:
+    """Convert DateValue to string - placeholder"""
+    if date_val is None:
         return None
+    return getattr(date_val, 'text', str(date_val))
 
-    # Handle calendar prefix
-    calendar = Calendar.GREGORIAN
-    if tokens[0] in ['@#DFRENCH@', '@#DJULIAN@', '@#DHEBREW@']:
-        calendar = {
-            '@#DFRENCH@': Calendar.FRENCH,
-            '@#DJULIAN@': Calendar.JULIAN,
-            '@#DHEBREW@': Calendar.HEBREW
-        }[tokens[0]]
-        tokens = tokens[1:]
+def compare_date(d1: Optional[DateValue], d2: Optional[DateValue]) -> int:
+    """Compare two dates (-1, 0, 1)"""
+    if d1 is None and d2 is None:
+        return 0
+    if d1 is None:
+        return -1
+    if d2 is None:
+        return 1
 
-    # Handle precision keywords
-    precision = Precision.SURE
-    if tokens[0] in ['ABT', 'EST', 'CAL']:
-        precision = Precision.ABOUT
-        tokens = tokens[1:]
-    elif tokens[0] in ['BEF', 'TO']:
-        precision = Precision.BEFORE
-        tokens = tokens[1:]
-    elif tokens[0] in ['AFT', 'FROM']:
-        precision = Precision.AFTER
-        tokens = tokens[1:]
-    elif tokens[0] == 'BET':
-        precision = Precision.BETWEEN
-        tokens = tokens[1:]
+    y1 = d1.year or 0
+    y2 = d2.year or 0
+    if y1 != y2:
+        return -1 if y1 < y2 else 1
 
-    # Parse date components
-    date = Date(calendar=calendar, precision=precision)
+    m1 = d1.month or 0
+    m2 = d2.month or 0
+    if m1 != m2:
+        return -1 if m1 < m2 else 1
 
-    # Handle day/month/year
-    if len(tokens) >= 1:
-        num = parse_number(tokens[0])
-        if num is not None:
-            if 1 <= num <= 31:
-                date.day = num
-            else:
-                date.year = num
+    d1_day = d1.day or 0
+    d2_day = d2.day or 0
+    if d1_day != d2_day:
+        return -1 if d1_day < d2_day else 1
 
-    if len(tokens) >= 2:
-        month = parse_month(tokens[1])
-        if month is not None:
-            date.month = month
-            if len(tokens) >= 3:
-                year = parse_number(tokens[2])
-                if year is not None:
-                    date.year = year
-        else:
-            # Second token might be year
-            year = parse_number(tokens[1])
-            if year is not None:
-                date.year = year
+    return 0
 
-    return date
-
-def date_of_field(s: str) -> Optional[Date]:
-    """Top-level date parser: string -> Date"""
-    if not s:
+def cdate_to_dmy_opt(date_str: str) -> Optional[DateValue]:
+    """Parse compact date string back to DateValue"""
+    if not date_str:
         return None
-
-    # Split into tokens
-    tokens = s.split()
-
-    # Try parsing as structured date
-    date = parse_date_tokens(tokens)
-    if date:
-        return date
-
-    # Fallback: store as text
-    return Date(
-        calendar=Calendar.GREGORIAN,
-        precision=Precision.SURE,
-        text=s
-    )
+    return date_of_field(date_str)

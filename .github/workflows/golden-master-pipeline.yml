@@ -1,0 +1,73 @@
+name: Golden Master Tests & Deployment
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'python/**'
+      - 'test/**'
+
+jobs:
+  golden-master-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        binary: [gwd, gwc, gwu, consang, update_nldb]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.14.x
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r python/requirements.txt
+          opam install . --deps-only
+
+      - name: Build OCaml reference
+        run: |
+          make clean
+          make
+
+      - name: Build Python version
+        run: |
+          cd python/${{ matrix.binary }}
+          python setup.py build
+
+      - name: Run Golden Master Tests
+        id: golden_tests
+        run: |
+          python test/golden_master_runner.py --binary ${{ matrix.binary }}
+          echo "test_result=$?" >> $GITHUB_OUTPUT
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-${{ matrix.binary }}
+          path: test/results/${{ matrix.binary }}/
+
+      - name: Deploy binary on success
+        if: steps.golden_tests.outputs.test_result == '0'
+        run: |
+          mkdir -p distribution/gw
+          cp python/${{ matrix.binary }}/dist/${{ matrix.binary }} distribution/gw/${{ matrix.binary }}
+
+      - name: Commit updated binary
+        if: steps.golden_tests.outputs.test_result == '0'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add distribution/gw/${{ matrix.binary }}
+          git commit -m "Update ${{ matrix.binary }} binary after successful Golden Master tests" || exit 0
+          git push

@@ -35,3 +35,33 @@ def preg_match(pattern: str, subject: str) -> bool:
 
 def less_greater_escaped(s: str) -> str:
     return s.replace('<', '&lt;').replace('>', '&gt;')
+
+def good_name(name: str) -> bool:
+    """Check if database name is valid - match OCaml exactly"""
+    if not name:
+        return False
+
+    for char in name:
+        if not (char.isalnum() or char == '-'):
+            return False
+
+    return True
+
+def safe_remove_file(filename: str) -> bool:
+    """Safely remove file, return True if successful"""
+    try:
+        import os
+        if os.path.exists(filename):
+            os.remove(filename)
+        return True
+    except OSError:
+        return False
+
+def can_write_file(filename: str) -> bool:
+    """Check if file can be written"""
+    try:
+        import os
+        dir_path = os.path.dirname(filename) or '.'
+        return os.access(dir_path, os.W_OK)
+    except:
+        return False
