@@ -2493,10 +2493,9 @@ let () =
   | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
       Logs.err (fun k ->
           k
-            "Error: the port %d\n\
-             is already used by another GeneWeb daemon or by another \
-             program. Solution: kill the other program or launch GeneWeb with \
-             another port number (option -p)"
+            "Error: the port %d is already used by another GeneWeb daemon or \
+             by another program. Solution: kill the other program or launch \
+             GeneWeb with another port number (option -p)"
             !selected_port)
   | Unix.Unix_error (Unix.ENOTCONN, _, _) when Sys.unix ->
       Logs.syslog `LOG_WARNING
@@ -2505,8 +2504,8 @@ let () =
       Logs.err (fun k ->
           k
             "Error: invalid access to the port %d: users port number less than \
-             1024 are reserved to the system. Please, read the security section \
-             of the documentation."
+             1024 are reserved to the system. Please, read the security \
+             section of the documentation."
             !selected_port)
   | Register_plugin_failure (p, `dynlink_error e) ->
       Logs.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
