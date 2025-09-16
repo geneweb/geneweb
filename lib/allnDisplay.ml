@@ -238,7 +238,7 @@ let print_alphabetic conf base is_surnames =
   then (
     Driver.load_strings_array base;
     let list = Alln.first_letters base is_surnames in
-    let list = List.sort Gutil.alphabetic_order list in
+    let list = List.sort_uniq Gutil.alphabetic_order list in
     print_alphabetic_big conf base is_surnames ini list 1 true)
   else
     let all =
@@ -250,7 +250,7 @@ let print_alphabetic conf base is_surnames =
     in
     match list with
     | Alln.Specify keys ->
-        let keys = List.sort Gutil.alphabetic_order keys in
+        let keys = List.sort_uniq Gutil.alphabetic_order keys in
         let too_big = (not all) && List.length keys > Alln.default_max_cnt in
         print_alphabetic_big conf base is_surnames ini keys len too_big
     | Alln.Result list ->

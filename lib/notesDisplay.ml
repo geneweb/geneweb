@@ -557,8 +557,7 @@ let print_mod conf base =
             conf.bname
             (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
         in
-        Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
-          nenv s
+        Wiki.print_mod_view_page conf true "NOTES" fnotes title nenv s
 
 let print_mod_ok conf base =
   let fname = function
