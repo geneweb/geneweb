@@ -34,20 +34,35 @@ jobs:
             pkg-config \
             libssl-dev \
             libgmp-dev \
-            zlib1g-dev
+            zlib1g-dev \
+            xdot \
+            graphviz \
+            perl
 
       - name: Setup OCaml and OPAM
         run: |
-          opam init --disable-sandboxing --yes
+          opam init --disable-sandboxing --yes --auto-setup
           eval $(opam env)
-          opam install --yes dune ocamlfind camlp5
+
+          # Install dependencies with auto-confirmation
+          opam install --yes --assume-depexts dune ocamlfind camlp5
 
       - name: Configure and build GeneWeb OCaml
         run: |
           eval $(opam env)
+
+          echo "=== OCaml Version ==="
+          ocaml -version
+
+          echo "=== Running configure ==="
           ocaml ./configure.ml
+
+          echo "=== Building GeneWeb ==="
           make clean
           make distrib
+
+          echo "=== Verifying binaries ==="
+          ls -la distribution/gw/
 
       - name: Create test fixtures if missing
         run: |
@@ -71,29 +86,99 @@ jobs:
           EOF
           fi
 
-          # Copy basic.ged to other test files if they don't exist
+          # Create additional test files
           for file in dates.ged names.ged; do
             if [ ! -f "test/fixtures/$file" ]; then
               cp test/fixtures/basic.ged test/fixtures/$file
             fi
           done
 
+          echo "✅ Test fixtures ready:"
+          ls -la test/fixtures/
+
+      - name: Verify environment
+        run: |
+          echo "=== Checking OCaml binaries ==="
+          for binary in ged2gwb gwd gwc; do
+            if [ -f "distribution/gw/$binary" ]; then
+              echo "✅ Found: distribution/gw/$binary"
+              file "distribution/gw/$binary"
+            else
+              echo "❌ Missing: distribution/gw/$binary"
+            fi
+          done
+
+          echo "=== Checking Python implementations ==="
+          if [ -f "python/ged2gwb/ged2gwb.py" ]; then
+            echo "✅ Found: python/ged2gwb/ged2gwb.py"
+          else
+            echo "❌ Missing: python/ged2gwb/ged2gwb.py"
+          fi
+
+          echo "=== Checking test files ==="
+          ls -la test/scena/*.json || echo "No test files found"
+
       - name: Run Golden Master Tests
         run: |
-          # Find all test JSON files and run tests for each binary
+          echo "🧪 Starting Golden Master Tests..."
+
+          # Check if we have any test files
+          if ! ls test/scena/*.json >/dev/null 2>&1; then
+            echo "❌ No test JSON files found in test/scena/"
+            exit 1
+          fi
+
+          # Run tests for each binary
+          success_count=0
+          total_count=0
+
           for test_file in test/scena/*.json; do
             if [ -f "$test_file" ]; then
               binary_name=$(basename "$test_file" .json)
-              echo "🧪 Running Golden Master tests for: $binary_name"
+              total_count=$((total_count + 1))
 
-              python3 test/run_golden_tests.py "$binary_name" || echo "Tests completed with issues for $binary_name"
+              echo ""
+              echo "🧪 Testing binary: $binary_name"
+              echo "================================"
+
+              # Check if OCaml binary exists
+              if [ ! -f "distribution/gw/$binary_name" ]; then
+                echo "❌ OCaml binary not found: distribution/gw/$binary_name"
+                continue
+              fi
+
+              # Run the test
+              if python3 test/run_golden_tests.py "$binary_name"; then
+                echo "✅ $binary_name tests PASSED"
+                success_count=$((success_count + 1))
+              else
+                echo "❌ $binary_name tests FAILED"
+              fi
             fi
           done
+
+          echo ""
+          echo "🏁 FINAL RESULTS"
+          echo "================"
+          echo "Total binaries tested: $total_count"
+          echo "Successful: $success_count"
+          echo "Failed: $((total_count - success_count))"
+
+          if [ $success_count -eq $total_count ] && [ $total_count -gt 0 ]; then
+            echo "🎉 ALL TESTS PASSED!"
+            exit 0
+          else
+            echo "⚠️ Some tests failed or no tests were run"
+            exit 1
+          fi
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: golden-master-test-results
-          path: test/results/
+          path: |
+            test/results/
+            test/scena/
+            distribution/gw/
           retention-days: 30

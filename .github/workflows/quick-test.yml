@@ -1,0 +1,37 @@
+name: Quick Test
+
+on:
+  push:
+    branches: [ged2gwb]
+  workflow_dispatch:
+
+jobs:
+  quick-test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Basic checks
+        run: |
+          echo "🔍 Repository structure:"
+          find . -name "*.json" -o -name "*.py" | head -10
+
+          echo "📁 Python directory:"
+          ls -la python/ || echo "No python directory"
+
+          echo "📁 Test directory:"
+          ls -la test/ || echo "No test directory"
+
+          echo "🧪 Test files:"
+          ls -la test/scena/ || echo "No test/scena directory"
+
+      - name: Test Python
+        run: |
+          python3 --version
+
+          if [ -f "python/ged2gwb/ged2gwb.py" ]; then
+            echo "✅ Python implementation found"
+            python3 python/ged2gwb/ged2gwb.py -help | head -3 || echo "Help test done"
+          else
+            echo "❌ Python implementation not found"
+          fi
