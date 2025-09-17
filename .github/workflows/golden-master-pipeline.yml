@@ -46,26 +46,32 @@ jobs:
           opam init --disable-sandboxing --yes --auto-setup
           eval $(opam env)
 
-          echo "=== Installing all required OCaml packages ==="
+          echo "=== Installing base OCaml tools ==="
+          opam install --yes --assume-depexts dune
+
+      - name: Install GeneWeb dependencies
+        run: |
+          eval $(opam env)
+
+          echo "=== Installing exact GeneWeb dependencies ==="
           opam install --yes --assume-depexts \
-            dune \
-            ocamlfind \
+            uri \
+            camlzip \
             camlp5 \
-            cppo \
+            digestif \
+            camlp-streams \
+            jingoo \
+            ocamlfind \
             ppx_import \
             ppx_deriving \
-            pp_loc \
+            re \
             fmt \
+            pp_loc \
+            uunf \
             markup \
-            calendars \
-            zarith \
-            unidecode \
-            ocurl \
             yojson \
-            lwt \
-            lwt_ssl \
-            digestif \
-            pcre
+            unidecode \
+            calendars
 
       - name: Configure GeneWeb
         run: |
@@ -73,7 +79,9 @@ jobs:
 
           echo "=== OCaml environment ==="
           ocaml -version
-          opam list --installed
+
+          echo "=== Verifying critical packages ==="
+          opam list --installed | grep -E "(uri|camlzip|camlp5|jingoo)" || echo "Some packages might be missing"
 
           echo "=== Running configure ==="
           ocaml ./configure.ml
@@ -89,11 +97,13 @@ jobs:
           echo "=== Verifying build results ==="
           ls -la distribution/gw/
 
-          echo "=== Testing built binaries ==="
-          for binary in distribution/gw/*; do
-            if [ -x "$binary" ]; then
-              echo "Testing $(basename $binary):"
-              "$binary" -help 2>&1 | head -3 || echo "Binary test completed"
+          echo "=== Testing key binaries ==="
+          for binary in ged2gwb gwd gwc; do
+            if [ -f "distribution/gw/$binary" ] && [ -x "distribution/gw/$binary" ]; then
+              echo "✅ Testing $binary:"
+              "./distribution/gw/$binary" -help 2>&1 | head -3 || echo "$binary test completed"
+            else
+              echo "❌ Missing: distribution/gw/$binary"
             fi
           done
 
@@ -133,20 +143,19 @@ jobs:
             fi
           done
 
-          echo "Test fixtures created:"
-          ls -la test/fixtures/
-
       - name: Verify environment before tests
         run: |
           echo "=== Final environment check ==="
 
-          echo "OCaml binaries:"
-          for binary in ged2gwb gwd gwc; do
+          echo "Required OCaml binaries:"
+          required_binaries="ged2gwb gwd gwc"
+          for binary in $required_binaries; do
             if [ -f "distribution/gw/$binary" ] && [ -x "distribution/gw/$binary" ]; then
               echo "✅ distribution/gw/$binary"
-              file "distribution/gw/$binary"
             else
               echo "❌ Missing: distribution/gw/$binary"
+              echo "Available binaries in distribution/gw/:"
+              ls -la distribution/gw/ || echo "No distribution/gw directory"
               exit 1
             fi
           done
@@ -154,13 +163,12 @@ jobs:
           echo "Python implementations:"
           if [ -f "python/ged2gwb/ged2gwb.py" ]; then
             echo "✅ python/ged2gwb/ged2gwb.py"
-            python3 python/ged2gwb/ged2gwb.py -help | head -2 || echo "Python test completed"
           else
             echo "❌ Missing: python/ged2gwb/ged2gwb.py"
             exit 1
           fi
 
-          echo "Test files:"
+          echo "Test configuration:"
           if ls test/scena/*.json >/dev/null 2>&1; then
             echo "✅ Test JSON files found"
             ls -la test/scena/*.json
@@ -197,17 +205,26 @@ jobs:
                 continue
               fi
 
-              # Run the Golden Master test
-              if python3 test/run_golden_tests.py "$binary_name"; then
+              # Run the Golden Master test with timeout
+              if timeout 300 python3 test/run_golden_tests.py "$binary_name"; then
                 echo "✅ $binary_name tests PASSED"
                 success_count=$((success_count + 1))
               else
-                echo "❌ $binary_name tests FAILED"
+                echo "❌ $binary_name tests FAILED or TIMED OUT"
 
-                # Show test results for debugging
+                # Show some debug info
                 if [ -f "test/results/$binary_name/results.json" ]; then
-                  echo "Test results:"
-                  cat "test/results/$binary_name/results.json" | jq '.[] | {name: .name, passed: .passed}' || cat "test/results/$binary_name/results.json"
+                  echo "Test results summary:"
+                  python3 -c "
+          import json
+          try:
+              with open('test/results/$binary_name/results.json') as f:
+                  results = json.load(f)
+              for r in results:
+                  status = '✅' if r.get('passed') else '❌'
+                  print(f'  {status} {r.get(\"name\", \"unknown\")}')
+          except: pass
+          " || echo "Could not parse results"
                 fi
               fi
             fi
