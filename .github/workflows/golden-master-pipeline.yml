@@ -37,34 +37,74 @@ jobs:
             zlib1g-dev \
             xdot \
             graphviz \
-            perl
+            perl \
+            libcurl4-openssl-dev \
+            libpcre3-dev
 
       - name: Setup OCaml and OPAM
         run: |
           opam init --disable-sandboxing --yes --auto-setup
           eval $(opam env)
 
-          # Install dependencies with auto-confirmation
-          opam install --yes --assume-depexts dune ocamlfind camlp5
+          echo "=== Installing all required OCaml packages ==="
+          opam install --yes --assume-depexts \
+            dune \
+            ocamlfind \
+            camlp5 \
+            cppo \
+            ppx_import \
+            ppx_deriving \
+            pp_loc \
+            fmt \
+            markup \
+            calendars \
+            zarith \
+            unidecode \
+            ocurl \
+            yojson \
+            lwt \
+            lwt_ssl \
+            digestif \
+            pcre
 
-      - name: Configure and build GeneWeb OCaml
+      - name: Configure GeneWeb
         run: |
           eval $(opam env)
 
-          echo "=== OCaml Version ==="
+          echo "=== OCaml environment ==="
           ocaml -version
+          opam list --installed
 
           echo "=== Running configure ==="
           ocaml ./configure.ml
+
+      - name: Build GeneWeb with make clean distrib
+        run: |
+          eval $(opam env)
 
           echo "=== Building GeneWeb ==="
           make clean
           make distrib
 
-          echo "=== Verifying binaries ==="
+          echo "=== Verifying build results ==="
           ls -la distribution/gw/
 
-      - name: Create test fixtures if missing
+          echo "=== Testing built binaries ==="
+          for binary in distribution/gw/*; do
+            if [ -x "$binary" ]; then
+              echo "Testing $(basename $binary):"
+              "$binary" -help 2>&1 | head -3 || echo "Binary test completed"
+            fi
+          done
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f python/requirements.txt ]; then
+            pip install -r python/requirements.txt
+          fi
+
+      - name: Create test fixtures
         run: |
           mkdir -p test/fixtures
 
@@ -93,40 +133,45 @@ jobs:
             fi
           done
 
-          echo "✅ Test fixtures ready:"
+          echo "Test fixtures created:"
           ls -la test/fixtures/
 
-      - name: Verify environment
+      - name: Verify environment before tests
         run: |
-          echo "=== Checking OCaml binaries ==="
+          echo "=== Final environment check ==="
+
+          echo "OCaml binaries:"
           for binary in ged2gwb gwd gwc; do
-            if [ -f "distribution/gw/$binary" ]; then
-              echo "✅ Found: distribution/gw/$binary"
+            if [ -f "distribution/gw/$binary" ] && [ -x "distribution/gw/$binary" ]; then
+              echo "✅ distribution/gw/$binary"
               file "distribution/gw/$binary"
             else
               echo "❌ Missing: distribution/gw/$binary"
+              exit 1
             fi
           done
 
-          echo "=== Checking Python implementations ==="
+          echo "Python implementations:"
           if [ -f "python/ged2gwb/ged2gwb.py" ]; then
-            echo "✅ Found: python/ged2gwb/ged2gwb.py"
+            echo "✅ python/ged2gwb/ged2gwb.py"
+            python3 python/ged2gwb/ged2gwb.py -help | head -2 || echo "Python test completed"
           else
             echo "❌ Missing: python/ged2gwb/ged2gwb.py"
+            exit 1
           fi
 
-          echo "=== Checking test files ==="
-          ls -la test/scena/*.json || echo "No test files found"
+          echo "Test files:"
+          if ls test/scena/*.json >/dev/null 2>&1; then
+            echo "✅ Test JSON files found"
+            ls -la test/scena/*.json
+          else
+            echo "❌ No test JSON files found"
+            exit 1
+          fi
 
       - name: Run Golden Master Tests
         run: |
           echo "🧪 Starting Golden Master Tests..."
-
-          # Check if we have any test files
-          if ! ls test/scena/*.json >/dev/null 2>&1; then
-            echo "❌ No test JSON files found in test/scena/"
-            exit 1
-          fi
 
           # Run tests for each binary
           success_count=0
@@ -141,18 +186,29 @@ jobs:
               echo "🧪 Testing binary: $binary_name"
               echo "================================"
 
-              # Check if OCaml binary exists
+              # Verify both versions exist
               if [ ! -f "distribution/gw/$binary_name" ]; then
-                echo "❌ OCaml binary not found: distribution/gw/$binary_name"
+                echo "❌ OCaml binary missing: distribution/gw/$binary_name"
                 continue
               fi
 
-              # Run the test
+              if [ ! -d "python/$binary_name" ]; then
+                echo "❌ Python implementation missing: python/$binary_name"
+                continue
+              fi
+
+              # Run the Golden Master test
               if python3 test/run_golden_tests.py "$binary_name"; then
                 echo "✅ $binary_name tests PASSED"
                 success_count=$((success_count + 1))
               else
                 echo "❌ $binary_name tests FAILED"
+
+                # Show test results for debugging
+                if [ -f "test/results/$binary_name/results.json" ]; then
+                  echo "Test results:"
+                  cat "test/results/$binary_name/results.json" | jq '.[] | {name: .name, passed: .passed}' || cat "test/results/$binary_name/results.json"
+                fi
               fi
             fi
           done
@@ -168,7 +224,7 @@ jobs:
             echo "🎉 ALL TESTS PASSED!"
             exit 0
           else
-            echo "⚠️ Some tests failed or no tests were run"
+            echo "⚠️ Some tests failed"
             exit 1
           fi
 
