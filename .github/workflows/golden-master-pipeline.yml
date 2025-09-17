@@ -1,0 +1,150 @@
+name: Golden Master Tests & Deployment
+
+on:
+  push:
+    branches: [ged2gwb, main, develop]
+    paths:
+      - 'python/**'
+      - 'test/scena/**'
+      - 'test/fixtures/**'
+      - '.github/workflows/golden-master-pipeline.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'python/**'
+      - 'test/scena/**'
+      - 'test/fixtures/**'
+  workflow_dispatch:
+
+jobs:
+  discover-binaries:
+    runs-on: ubuntu-latest
+    outputs:
+      binaries: ${{ steps.find-binaries.outputs.binaries }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find available test binaries
+        id: find-binaries
+        run: |
+          # Vérifier si le dossier existe
+          if [ ! -d "test/scena" ]; then
+            echo "No test/scena directory found"
+            echo "binaries=[]" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Trouver les fichiers JSON
+          binaries=$(ls test/scena/*.json 2>/dev/null | sed 's|test/scena/||g' | sed 's|\.json||g' | jq -R -s -c 'split("\n")[:-1]' || echo '[]')
+          echo "Found binaries: $binaries"
+          echo "binaries=${binaries}" >> $GITHUB_OUTPUT
+
+  golden-master-tests:
+    runs-on: ubuntu-latest
+    needs: discover-binaries
+    if: needs.discover-binaries.outputs.binaries != '[]'
+
+    strategy:
+      matrix:
+        binary: ${{ fromJson(needs.discover-binaries.outputs.binaries) }}
+      fail-fast: false # Continuer même si un binaire échoue
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.14.x
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f python/requirements.txt ]; then
+            pip install -r python/requirements.txt
+          fi
+
+      - name: Install OCaml dependencies
+        run: |
+          if [ -f dune-project ]; then
+            opam install . --deps-only --yes
+          fi
+
+      - name: Build OCaml reference
+        run: |
+          if [ -f Makefile ]; then
+            make clean || true
+            make build-geneweb || make distrib || make
+          else
+            echo "No Makefile found, skipping OCaml build"
+          fi
+
+      - name: Verify OCaml binary exists
+        run: |
+          if [ ! -f "distribution/gw/${{ matrix.binary }}" ]; then
+            echo "OCaml binary not found: distribution/gw/${{ matrix.binary }}"
+            echo "Available files in distribution/gw/:"
+            ls -la distribution/gw/ || echo "distribution/gw/ directory not found"
+            exit 1
+          fi
+
+      - name: Build Python version
+        run: |
+          if [ -d "python/${{ matrix.binary }}" ]; then
+            cd python/${{ matrix.binary }}
+            if [ -f setup.py ]; then
+              python setup.py build || echo "Python build failed, continuing..."
+            fi
+          else
+            echo "Python directory not found: python/${{ matrix.binary }}"
+          fi
+
+      - name: Run Golden Master Tests
+        id: golden_tests
+        run: |
+          # Vérifier que les fichiers de test existent
+          if [ ! -f "test/scena/${{ matrix.binary }}.json" ]; then
+            echo "Test file not found: test/scena/${{ matrix.binary }}.json"
+            exit 1
+          fi
+
+          # Lancer les tests
+          python3 test/run_golden_tests.py ${{ matrix.binary }}
+          echo "test_result=$?" >> $GITHUB_OUTPUT
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.binary }}
+          path: test/results/${{ matrix.binary }}/
+          retention-days: 30
+
+      - name: Deploy binary on success
+        if: steps.golden_tests.outputs.test_result == '0'
+        run: |
+          echo "All tests passed for ${{ matrix.binary }}!"
+          echo "Deployment would happen here..."
+          # Désactiver le déploiement pour éviter les conflits de git
+          # mkdir -p distribution/gw
+          # if [ -f "python/${{ matrix.binary }}/${{ matrix.binary }}" ]; then
+          #   cp python/${{ matrix.binary }}/${{ matrix.binary }} distribution/gw/${{ matrix.binary }}
+          # fi
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [discover-binaries, golden-master-tests]
+    if: always()
+    steps:
+      - name: Test Summary
+        run: |
+          echo "Golden Master Tests Summary"
+          echo "Discovered binaries: ${{ needs.discover-binaries.outputs.binaries }}"
+          echo "Tests completed!"
