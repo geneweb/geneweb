@@ -2,7 +2,7 @@ name: Golden Master Tests & Deployment
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ged2gwb]
     paths:
       - 'python/**'
       - 'test/scena/**'
