@@ -470,6 +470,7 @@ and eval_person_field_var conf base env p = function
       let sn = Driver.sou base (Driver.get_surname p) in
       let occ = Driver.get_occ p in
       VVstring (HistoryDiff.history_file fn sn occ)
+  | [ "index" ] -> Templ.VVstring (Driver.Iper.to_string (Driver.get_iper p))
   | [ "is_invisible" ] ->
       let conf = { conf with wizard = false; friend = false } in
       VVbool (not (Util.authorized_age conf base p))

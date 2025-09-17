@@ -216,8 +216,8 @@
             <a role="button"
               href="%portrait_url;" target="_blank" rel="noopener"%sp;
               data-toggle="tooltip" data-html="true" data-placement="left"
-              title='<strong>[*see portrait]</strong><br><span class="small">%portrait;</span><br>
-                <img class="rounded my-1" src="%portrait_url;" width="185px">'>
+              title="<strong>[*see portrait]</strong><br><span class='small'>%portrait;</span><br>
+                <img class='rounded my-1' src='%portrait_url;' width='185px'>">
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a href="%prefix;m=PORTRAIT_TO_BLASON&i=%index;" class="mx-1"
                title="[*copy portrait to blason]">
@@ -227,8 +227,8 @@
             <a role="button" class="ml-auto"
               href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&file_name=%portrait_name;"
               data-toggle="tooltip" data-html="true" data-placement="left"
-              title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete portrait]</strong><br><span class="small">%portrait;</span><br>
-                <img class="rounded my-1" src="%portrait_url;" width="185px">'>
+              title="<i class='far fa-trash-can text-warning mr-1'></i><strong>[*delete portrait]</strong><br><span class='small'>%portrait;</span><br>
+                <img class='rounded my-1' src='%portrait_url;' width='185px'>">
               <i class="far fa-trash-can text-warning mr-1"></i>%nn;</a>
           </div>
         %end;
@@ -361,13 +361,12 @@
               onclick='editImageNote(%img_cnt;, "%carrousel_img_raw;"); return false;'
               data-source="%carrousel_img_src;" data-note="%carrousel_img_note;"
               data-toggle="tooltip" data-html="true" data-placement="left"
-              title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong><br>
-                <span class="small">%carrousel_img_raw;</span><br>
-                <img class="rounded my-1"
-                  src="%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;"
-                  width="185px">
+              title="<strong><i class='fas fa-images fa-xs mr-1'></i>[*see] [image/images]0</strong><br>
+                <span class='small'>%carrousel_img_raw;</span><br>
+                <img class='rounded my-1' width='185px'
+                  src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;>
                 %if;(carrousel_img_note!="")<br><strong>[*note/notes]0[:]</strong> %carrousel_img_note;%end;
-                %if;(carrousel_img_src!="")<br><strong>[*source/sources]0[:]</strong> %carrousel_img_src;%end;'>
+                %if;(carrousel_img_src!="")<br><strong>[*source/sources]0[:]</strong> %carrousel_img_src;%end;">
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a href="%prefix;m=IMAGE_TO_BLASON&i=%index;&mode=blasons&file_name=%carrousel_img;"
             title="[*copy image to blason]"><i class="fa fa-user-shield text-success"></i></a>
@@ -376,11 +375,10 @@
               <a role="button"
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=carrousel&file_name=%carrousel_img;"
                 data-toggle="tooltip" data-html="true" data-placement="left"
-                title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete image]</strong><br>
-                  <span class="small">%carrousel_img;</span><br>
-                  <img class="rounded my-1"
-                    src="%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;"
-                    width="185px">'>
+                title="<i class='far fa-trash-can text-warning mr-1'></i><strong>[*delete image]</strong><br>
+                  <span class='small'>%carrousel_img_raw;</span><br>
+                  <img class='rounded my-1' width='185px'
+                    src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;>">
                 <i class="far fa-trash-can text-warning"></i></a>
             </div>
           </div>
@@ -398,11 +396,10 @@
             <a role="button"
               href="%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;"
               target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
-              title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [saved images]0</strong><br>
-                <span class="small">%carrousel_img_raw;</span><br>
-                <img class="rounded my-1"
-                  src="%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;"
-                  width="185px">'>
+              title="<strong><i class='fas fa-images fa-xs mr-1'></i>[*see] [saved images]0</strong><br>
+                <span class='small'>%carrousel_img_raw;</span><br>
+                <img class='rounded my-1' width='185px'
+                  src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;>">
               <i class="far fa-file-image fa-fw text-primary"></i></a>
             <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=carrousel&delete=on&file_name=%carrousel_img;"
                %if;(url_in_env!="")%else;data-toggle="tooltip" data-html="true" data-placement="top"%end;
@@ -413,11 +410,10 @@
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index%nn;
                   &mode=carrousel&delete=on&file_name=%carrousel_img;"%sp;
                 data-toggle="tooltip" data-html="true" data-placement="left"
-                title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete saved image]</strong><br>
-                  <span class="small">%carrousel_img;</span><br>
-                  <img class="rounded my-1"
-                    src="%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;"
-                    width="185px">'>
+                title="<i class='far fa-trash-can text-warning mr-1'></i><strong>[*delete saved image]</strong><br>
+                  <span class='small'>%carrousel_img_raw;</span><br>
+                  <img class='rounded my-1' width='185px'
+                    src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;>">
                 <i class="far fa-trash-can text-danger fa-fw text-primary"></i></a>
           </div>
         %end;

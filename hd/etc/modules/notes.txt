@@ -24,9 +24,9 @@
   %if;(count>0 or has_linked_page.BNOTE and linked_page.BNOTE!="")
     <h2 class="mt-2">[*individual notes]</h2>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-      <div class="ml-3">%apply;capitalize(linked_page.BNOTE)</div>
+      <div class="ml-3>%apply;capitalize(linked_page.BNOTE)</div>
     %end;
-    <div class="ml-3">
+    <div class="ml-3 ind-notes">
       %notes;
     </div>
   %end;
@@ -63,7 +63,7 @@
     %end;
     %if;has_notes;
       <h2>[*individual notes]</h2>
-      <blockquote>%notes;</blockquote>
+      <blockquote class="ind-notes">%notes;</blockquote>
     %end;
     %if;has_birth_note;
       <h3>[*birth]</h3>

@@ -912,8 +912,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
     Output.print_sstring conf "</button>");
-  Output.print_sstring conf "</div><div class=\"col mx-2 p-2\"";
-  Templ.output_simple conf env "toolbar";
+  Output.print_sstring conf "</div><div class=\"col mx-2 p-2\">";
   Output.print_sstring conf "</div></div>";
   Output.print_sstring conf "</div></form>";
   Hutil.trailer conf
