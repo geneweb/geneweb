@@ -11,13 +11,18 @@ from typing import Dict, List, Tuple
 class GoldenMasterTester:
     def __init__(self, binary_name: str):
         self.binary_name = binary_name
-        self.test_data_dir = Path("test/data")
+        self.test_data_dir = Path("test/scena")  # Reverted back to test/scena
         self.results_dir = Path(f"test/results/{binary_name}")
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
     def run_ocaml_reference(self, test_case: Dict) -> Tuple[str, str, int]:
         """Exécute la version OCaml de référence"""
-        cmd = [f"./{self.binary_name}"] + test_case.get("args", [])
+        ocaml_binary_path = f"distribution/gw/{self.binary_name}"
+
+        if not os.path.exists(ocaml_binary_path):
+            return "", f"OCAML_BINARY_NOT_FOUND: {ocaml_binary_path}", -1
+
+        cmd = [ocaml_binary_path] + test_case.get("args", [])
 
         try:
             result = subprocess.run(
@@ -30,28 +35,47 @@ class GoldenMasterTester:
             return result.stdout, result.stderr, result.returncode
         except subprocess.TimeoutExpired:
             return "", "TIMEOUT", -1
+        except FileNotFoundError:
+            return "", f"OCAML_BINARY_NOT_FOUND: {ocaml_binary_path}", -1
 
     def run_python_version(self, test_case: Dict) -> Tuple[str, str, int]:
         """Exécute la version Python"""
-        python_binary = f"python/{self.binary_name}/dist/{self.binary_name}"
-        cmd = [python_binary] + test_case.get("args", [])
+        possible_commands = [
+            f"python3 python/{self.binary_name}/{self.binary_name}.py",
+            f"python3 python/{self.binary_name}/run_{self.binary_name}.py",
+            f"python/{self.binary_name}/{self.binary_name}"
+        ]
 
-        try:
-            result = subprocess.run(
-                cmd,
-                input=test_case.get("input", ""),
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
-            return result.stdout, result.stderr, result.returncode
-        except subprocess.TimeoutExpired:
-            return "", "TIMEOUT", -1
+        for cmd_template in possible_commands:
+            if cmd_template.startswith("python3 "):
+                # Split python3 command
+                cmd_parts = cmd_template.split()
+                cmd = cmd_parts + test_case.get("args", [])
+            else:
+                # Single executable
+                if os.path.exists(cmd_template):
+                    cmd = [cmd_template] + test_case.get("args", [])
+                else:
+                    continue
+
+            try:
+                result = subprocess.run(
+                    cmd,
+                    input=test_case.get("input", ""),
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                return result.stdout, result.stderr, result.returncode
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                continue
+
+        # If all methods fail, return error
+        return "", "PYTHON_VERSION_NOT_FOUND", -1
 
     def load_test_cases(self) -> List[Dict]:
         """Charge les cas de test depuis le fichier JSON"""
-        test_file = self.test_data_dir / f"{self.binary_name}_tests.json"
-
+        test_file = self.test_data_dir / f"{self.binary_name}.json"
         if not test_file.exists():
             print(f"Warning: No test file found at {test_file}")
             return []

@@ -5,15 +5,31 @@ on:
     branches: [main, develop]
     paths:
       - 'python/**'
-      - 'test/**'
+      - 'test/scena/**'
+      - 'test/fixtures/**'
 
 jobs:
+  discover-binaries:
+    runs-on: ubuntu-latest
+    outputs:
+      binaries: ${{ steps.find-binaries.outputs.binaries }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find available test binaries
+        id: find-binaries
+        run: |
+          binaries=$(ls test/scena/*.json 2>/dev/null | sed 's|test/scena/||g' | sed 's|\.json||g' | jq -R -s -c 'split("\n")[:-1]')
+          echo "binaries=${binaries}" >> $GITHUB_OUTPUT
+
   golden-master-tests:
     runs-on: ubuntu-latest
+    needs: discover-binaries
 
     strategy:
       matrix:
-        binary: [gwd, gwc, gwu, consang, update_nldb]
+        binary: ${{ fromJson(needs.discover-binaries.outputs.binaries) }}
 
     steps:
       - name: Checkout code
@@ -48,7 +64,7 @@ jobs:
       - name: Run Golden Master Tests
         id: golden_tests
         run: |
-          python test/golden_master_runner.py --binary ${{ matrix.binary }}
+          python test/run_golden_tests.py ${{ matrix.binary }}
           echo "test_result=$?" >> $GITHUB_OUTPUT
 
       - name: Upload test results
@@ -61,7 +77,15 @@ jobs:
         if: steps.golden_tests.outputs.test_result == '0'
         run: |
           mkdir -p distribution/gw
-          cp python/${{ matrix.binary }}/dist/${{ matrix.binary }} distribution/gw/${{ matrix.binary }}
+          # Copy Python binary to distribution/gw/ to replace OCaml version
+          if [ -f "python/${{ matrix.binary }}/${{ matrix.binary }}" ]; then
+            cp python/${{ matrix.binary }}/${{ matrix.binary }} distribution/gw/${{ matrix.binary }}
+          elif [ -f "python/${{ matrix.binary }}/dist/${{ matrix.binary }}" ]; then
+            cp python/${{ matrix.binary }}/dist/${{ matrix.binary }} distribution/gw/${{ matrix.binary }}
+          else
+            echo "Python binary not found for ${{ matrix.binary }}"
+            exit 1
+          fi
 
       - name: Commit updated binary
         if: steps.golden_tests.outputs.test_result == '0'

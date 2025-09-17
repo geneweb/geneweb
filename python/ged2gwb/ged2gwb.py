@@ -30,11 +30,46 @@ no_picture = False
 do_check = True
 
 def print_usage():
-    """Print usage message matching OCaml version"""
-    print("Usage: ged2gwb [<ged>] [options] where options are:")
+    """Print usage message matching OCaml version - VERS STDOUT"""
+    help_text = """Usage: ged2gwb [<ged>] [options] where options are:
+  -bd <DIR>         Specify where the "bases" directory with databases is installed (default if empty is ".").
+  -charset          [ANSEL|ASCII|MSDOS] Force given charset decoding, overriding the possible setting in GEDCOM
+  -dates_dm         Interpret months-numbered dates as day/month/year
+  -dates_md         Interpret months-numbered dates as month/day/year
+  -ds               Set the source field for persons and families without source data
+  -efn              When creating a person, if the GEDCOM first name part holds several names, the first of this names becomes the person "first name" and the complete GEDCOM first name part a "first name alias".
+  -epn              When creating a person, if the GEDCOM first name part looks like a public name, i.e. holds either a number or a roman number, supposed to be a number of a nobility title, or one of the words: "der", "den", "die", "el", "le", "la", "the", supposed to be the beginning of a qualifier, then the GEDCOM first name part becomes the person "public name" and its first word his "first name".
+  -f                Remove database if already existing
+  -fne <be>         When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne '""' or -fne "()".
+  -lf               Convert first names to lowercase letters, with initials in uppercase.
+  -log <file>       Redirect log trace to this file.
+  -ls               Convert surnames to lowercase letters, with initials in uppercase. Try to keep lowercase particles.
+  -nc               No consistency check
+  -no_efn           Cancels the previous option.
+  -no_epn           Cancels the previous option.
+  -no_nd            Don't interpret a year preceded by a minus sign as a negative year
+  -no_pit           Do not consider persons having titles as public
+  -nopicture        Don't extract individual picture.
+  -o <file>         Output database (default: <input file name>.gwb, a.gwb if not available). Alphanumerics and -
+  -particles <FILE> Use the given file as list of particles
+  -reorg            Mode reorg
+  -rs_no_mention    Force relation status to NoMention (default is Married)
+  -tnd              Set negative dates when inconsistency (e.g. birth after death)
+  -trackid          Print gedcom id to gw id matches.
+  -udi x-y          Set the interval for persons whose death part is undefined: If before x years, they are considered as alive. If after y year, they are considered as death. Between x and y year, they are considered as "don't know". Default x is 80 Default y is 120
+  -uin              Put untreated GEDCOM tags in notes
+  -us               Convert surnames to uppercase letters.
+  -help             Display this list of options
+  --help            Display this list of options"""
+    print(help_text)  # STDOUT par défaut
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments matching OCaml speclist"""
+
+    # Gérer -help et --help AVANT argparse
+    if '-help' in sys.argv or '--help' in sys.argv:
+        print_usage()
+        sys.exit(0)
 
     if '-h' in sys.argv:
         print(f"{sys.argv[0]}: unknown option '-h'.", file=sys.stderr)
@@ -132,9 +167,6 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument('-reorg', action='store_true',
                        help='Mode reorg')
 
-    parser.add_argument('--help', action='store_true',
-                       help='Show this help message')
-
     return parser.parse_args()
 
 def print_usage_to_stderr():
@@ -155,36 +187,7 @@ def validate_arguments(args: argparse.Namespace) -> Tuple[str, str]:
     global log_oc, track_ged2gw_id, alive_years, dead_years, try_negative_dates
     global no_negative_dates, untreated_in_notes, default_source, no_picture, do_check
 
-    if args.help:
-        print_usage()
-        print("-bd <DIR>         Specify where the \"bases\" directory with databases is installed (default if empty is \".\").")
-        print("-o <file>         Output database (default: <input file name>.gwb, a.gwb if not available). Alphanumerics and -")
-        print("-f                Remove database if already existing")
-        print("-log <file>       Redirect log trace to this file.")
-        print("-lf               Convert first names to lowercase letters, with initials in uppercase.")
-        print("-trackid          Print gedcom id to gw id matches.")
-        print("-ls               Convert surnames to lowercase letters, with initials in uppercase. Try to keep lowercase particles.")
-        print("-us               Convert surnames to uppercase letters.")
-        print("-fne <be>         When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne '\"\"' or -fne \"()\".")
-        print("-efn              When creating a person, if the GEDCOM first name part holds several names, the first of this names becomes the person \"first name\" and the complete GEDCOM first name part a \"first name alias\".")
-        print("-no_efn           Cancels the previous option.")
-        print("-epn              When creating a person, if the GEDCOM first name part looks like a public name...")
-        print("-no_epn           Cancels the previous option.")
-        print("-no_pit           Do not consider persons having titles as public")
-        print("-tnd              Set negative dates when inconsistency (e.g. birth after death)")
-        print("-no_nd            Don't interpret a year preceded by a minus sign as a negative year")
-        print("-dates_dm         Interpret months-numbered dates as day/month/year")
-        print("-dates_md         Interpret months-numbered dates as month/day/year")
-        print("-nc               No consistency check")
-        print("-nopicture        Don't extract individual picture.")
-        print("-udi <X-Y>        Set the interval for persons whose death part is undefined")
-        print("-uin              Put untreated GEDCOM tags in notes")
-        print("-ds <SOURCE>      Set the source field for persons and families without source data")
-        print("-rs_no_mention    Force relation status to NoMention (default is Married)")
-        print("-charset [ANSEL|ASCII|MSDOS|UTF-8] Force given charset decoding, overriding the possible setting in GEDCOM")
-        print("-particles <FILE> Use the given file as list of particles")
-        print("-reorg            Mode reorg")
-        sys.exit(0)
+    # Plus besoin de gérer --help ici car c'est fait dans parse_arguments()
 
     in_file = args.input_file
 
@@ -302,24 +305,21 @@ def convert_gedcom_file(in_file: str, out_file: str):
             ged_file = base_name
         else:
             print(f"File \"{in_file}.ged\" not found", file=sys.stderr)
-            sys.exit(1)  # Match OCaml exit code for file not found
-
-    print(f"Reading GEDCOM file: {ged_file}", file=log_oc)
+            sys.exit(1)
 
     try:
         gen = create_gen()
 
         parser = GedcomParser(ged_file)
 
-        print("*** pass 1 (note)", file=sys.stderr)
+        print("*** pass 1 (note)", file=sys.stderr)  # STDERR comme OCaml
         parser.build_indices(gen)
 
-        print("*** pass 2 (indi)", file=sys.stderr)
+        print("*** pass 2 (indi)", file=sys.stderr)  # STDERR comme OCaml
         parser.process_persons(gen)
 
-        print("*** pass 3 (fam)", file=sys.stderr)
+        print("*** pass 3 (fam)", file=sys.stderr)  # STDERR comme OCaml
         parser.process_families(gen)
-        # NOTE: "*** Trailer ok" est affiché dans process_families quand TRLR est lu
 
         print("*** saving persons array", file=sys.stderr)
         print("*** saving ascends array", file=sys.stderr)
@@ -355,7 +355,6 @@ def save_database(out_file: str, arrays: Tuple) -> None:
     """Save arrays to GeneWeb database format - match OCaml exactly"""
     try:
         persons_count, families_count, strings_count = create_geneweb_database(out_file, arrays)
-        print(f"Database saved successfully: {persons_count} persons, {families_count} families, {strings_count} strings")
 
     except Exception as e:
         print(f"Error: Failed to create valid GeneWeb database", file=sys.stderr)
@@ -370,6 +369,7 @@ def cleanup():
 def main():
     """Main entry point"""
     try:
+        # Mettre à jour la liste des options valides pour inclure -help et --help
         valid_options = {
             '-bd', '--base-dir', '-o', '--output', '-f', '--force',
             '-log', '--log-file', '-lf', '--lowercase-first-names',
@@ -383,7 +383,7 @@ def main():
             '-nopicture', '--no-picture', '-udi', '--death-interval',
             '-uin', '--untreated-in-notes', '-ds', '--default-source',
             '-rs_no_mention', '--relation-status-no-mention', '-charset',
-            '-particles', '--particles-file', '-reorg', '--help'
+            '-particles', '--particles-file', '-reorg', '-help', '--help'
         }
 
         options_with_args = {'-bd', '-o', '-log', '-fne', '-udi', '-ds', '-charset', '-particles'}
@@ -419,7 +419,7 @@ def main():
             print(f"Error validating arguments: {e}", file=sys.stderr)
             sys.exit(2)
 
-        print(f"Mode: classic, for base ./{out_file}.gwb")
+        print(f"Mode: classic, for base ./{out_file}.gwb", file=sys.stderr)
 
         if not out_file.endswith('.gwb'):
             out_file = out_file + '.gwb'
@@ -438,8 +438,9 @@ def main():
                     print("Check file permissions and try again", file=sys.stderr)
                     sys.exit(1)
             else:
-                print(f'The database "{out_file}" already exists. Use option -f to overwrite it.')
-                sys.exit(0)
+                base_name = out_file[:-4] if out_file.endswith('.gwb') else out_file
+                print(f'The database "{base_name}" already exists. Use option -f to overwrite it.', file=sys.stderr)  # STDERR comme OCaml
+                sys.exit(2)  # Return code 2 comme OCaml
 
         try:
             convert_gedcom_file(in_file, out_file)
