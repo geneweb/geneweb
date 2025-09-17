@@ -181,7 +181,6 @@ jobs:
         run: |
           echo "🧪 Starting Golden Master Tests..."
 
-          # Run tests for each binary
           success_count=0
           total_count=0
 
@@ -194,7 +193,6 @@ jobs:
               echo "🧪 Testing binary: $binary_name"
               echo "================================"
 
-              # Verify both versions exist
               if [ ! -f "distribution/gw/$binary_name" ]; then
                 echo "❌ OCaml binary missing: distribution/gw/$binary_name"
                 continue
