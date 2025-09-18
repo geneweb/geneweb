@@ -33,8 +33,14 @@ val compare_fnames : string -> string -> int
 val compare_snames_i : Dbdisk.base_data -> int -> int -> int
 (** [compare_snames_i base i1 i2] compare two surnames that have indexes [i1] and [i2] inside the [base]. *)
 
+val compare_snames_i_lower : Dbdisk.base_data -> int -> int -> int
+(** [compare_snames_i_lower base i1 i2] compares two lowered versions of surnames that have indexes [i1] and [i2] inside the [base]. *)
+
 val compare_snames : Dbdisk.base_data -> string -> string -> int
 (** [compare_snames_i base s1 s2] compare two surnames according to the principe specified by [Mutil.compare_after_particle]. *)
+
+val compare_snames_lower : string -> string -> int
+(** [compare_snames_lower s1 s2] compares two lowered versions of surnames. *)
 
 val dsk_person_misc_names :
   Dbdisk.dsk_base ->
@@ -120,3 +126,9 @@ val map_family_ps :
     - Generic type used to represent another large part of information of [Def.gen_family]
     into another one.
     If [fd] is present, apply it on it on every date (marriage, divorce, famillial events, etc.).*)
+
+val insert_lowered_name_suffix_istrs :
+  insert_string:(string -> int) ->
+  base_data:Dbdisk.base_data ->
+  istr:int ->
+  int list
