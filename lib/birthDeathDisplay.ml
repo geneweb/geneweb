@@ -379,8 +379,10 @@ let old_print_statistics conf =
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let n =
-    try int_of_string (List.assoc "latest_event" conf.Config.base_env)
-    with Not_found | Failure _ -> 20
+    Option.value ~default:20
+      (Option.bind
+         (List.assoc_opt "latest_event" conf.Config.base_env)
+         int_of_string_opt)
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;

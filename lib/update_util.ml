@@ -36,7 +36,8 @@ let rec reconstitute_sorted_events conf cnt =
   match (get_nth conf "e_id" cnt, get_nth conf "e_pos" cnt) with
   | Some id, Some pos ->
       let id, pos =
-        try (int_of_string id, int_of_string pos) with Failure _ -> (0, 0)
+        ( Option.value ~default:0 (int_of_string_opt id),
+          Option.value ~default:0 (int_of_string_opt pos) )
       in
       let el = reconstitute_sorted_events conf (cnt + 1) in
       (id, pos) :: el
@@ -49,7 +50,10 @@ let reconstitute_somebody removed_string conf var =
   let first_name, surname =
     get_purged_fn_sn removed_string first_name surname
   in
-  let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
+  let occ =
+    try Option.value ~default:0 (int_of_string_opt (getn conf var "occ"))
+    with Failure _ -> 0
+  in
   let sex = getenv_sex conf var in
   let create = getn_p conf var sex in
   (first_name, surname, occ, create, var)
@@ -93,7 +97,7 @@ let eval_default_var conf s =
     let v = extract_var "bvar_" s in
     let v = if v = "" then extract_var "cvar_" s else v in
     if v <> "" then
-      str_val (try List.assoc v conf.Config.base_env with Not_found -> "")
+      str_val (Option.value (List.assoc_opt v conf.Config.base_env) ~default:"")
     else raise Not_found
 
 let eval_date_field = function

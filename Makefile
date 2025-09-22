@@ -21,9 +21,8 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 lib/gwlib.ml:
 	@echo -n "Generating $@..."
-	@echo "let prefix =" > $@
-	@echo "  try Sys.getenv \"GWPREFIX\"" >> $@
-	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
+	@echo -n "let prefix = Option.value (Sys.getenv_opt \"GWPREFIX\")" > $@
+	@echo " ~default:\"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
 lib/dev_config.ml:

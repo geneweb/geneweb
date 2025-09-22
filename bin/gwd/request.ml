@@ -362,7 +362,7 @@ let make_senv conf base =
   | Some vm, None, Some vp, Some vn, voco ->
       let voc =
         match voco with
-        | Some voc -> ( try int_of_string voc with Failure _ -> 0)
+        | Some voc -> Option.value (int_of_string_opt voc) ~default:0
         | None -> 0
       in
       let ip =

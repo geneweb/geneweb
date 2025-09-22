@@ -35,7 +35,7 @@ val surnames_pieces : string -> string list
 val roman_of_arabian : int -> string
 (** Convert arabic number (int) to roman (string). Number should be < 4000. *)
 
-val arabian_of_roman : string -> int
+val arabian_of_roman : string -> int option
 (** Convert roman number (string) to arabic (int). Number should be less or equal
     to MMMCMXCIX (3999). *)
 

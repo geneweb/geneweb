@@ -12,19 +12,20 @@ let read_auth_file fname =
   List.map
     (fun au ->
       let wizname =
-        try
-          let k = String.index au.Util.au_info ':' in
-          String.sub au.Util.au_info 0 k
-        with Not_found -> au.Util.au_user
+        Option.fold
+          (String.index_opt au.Util.au_info ':')
+          ~some:(String.sub au.Util.au_info 0)
+          ~none:au.Util.au_user
       in
       let wizname, wizorder, islash =
-        try
-          let i = String.index wizname '/' in
-          let w1 = String.sub wizname 0 i in
-          let l = String.length wizname in
-          let w2 = String.sub wizname (i + 1) (l - i - 1) in
-          (w1 ^ w2, w2 ^ w1, i)
-        with Not_found -> (wizname, wizname, 0)
+        Option.fold
+          (String.index_opt wizname '/')
+          ~some:(fun i ->
+            let w1 = String.sub wizname 0 i in
+            let l = String.length wizname in
+            let w2 = String.sub wizname (i + 1) (l - i - 1) in
+            (w1 ^ w2, w2 ^ w1, i))
+          ~none:(wizname, wizname, 0)
       in
       (* wizname may contain key: wizname|fn.occ.sn *)
       let wizname =
@@ -330,7 +331,7 @@ let wizard_page_title conf wizname _ = Output.print_string conf wizname
 let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   let wizname =
     let wizdata = read_auth_file auth_file in
-    try fst (List.assoc wz wizdata) with Not_found -> wz
+    match List.assoc_opt wz wizdata with Some v -> fst v | None -> wz
   in
   let edit_opt =
     Some
@@ -341,11 +342,11 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   let title, s =
     try
       let i = Str.search_forward (Str.regexp "TITLE=") s 0 in
-      try
-        let j = String.index s '\n' in
-        ( String.sub s (i + 6) (j - i - 6),
-          String.sub s 0 i ^ String.sub s j (String.length s - j - 1) )
-      with Not_found -> ("", s)
+      Option.fold (String.index_opt s '\n')
+        ~some:(fun j ->
+          ( String.sub s (i + 6) (j - i - 6),
+            String.sub s 0 i ^ String.sub s j (String.length s - j - 1) ))
+        ~none:("", s)
     with Not_found -> ("", s)
   in
   let title =
@@ -695,6 +696,6 @@ let search_text conf base s =
   | None -> print conf base
 
 let print_search conf base =
-  match try Some (List.assoc "s" conf.Config.env) with Not_found -> None with
+  match List.assoc_opt "s" conf.Config.env with
   | Some s -> search_text conf base (Mutil.gen_decode false s)
   | None -> print conf base

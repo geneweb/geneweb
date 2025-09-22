@@ -957,12 +957,13 @@ let multi_relation_next_txt conf pl2 lim assoc_txt =
           (fun (acc, n) p ->
             let acc =
               let open Def in
-              try
-                "&t" ^<^ string_of_int n ^<^ "="
-                ^<^ (Gwdb.get_iper p |> Hashtbl.find assoc_txt |> Mutil.encode
-                      :> Adef.escaped_string)
-                ^^^ acc
-              with Not_found -> acc
+              Option.fold
+                (Gwdb.get_iper p |> Hashtbl.find_opt assoc_txt)
+                ~some:(fun s ->
+                  "&t" ^<^ string_of_int n ^<^ "="
+                  ^<^ (Mutil.encode s :> Adef.escaped_string)
+                  ^^^ acc)
+                ~none:acc
             in
             let acc =
               let open Def in
@@ -1038,12 +1039,10 @@ let print_multi_relation conf base pl lim assoc_txt =
       let open Def in
       DagDisplay.Item
         ( p,
-          try
-            "<b>("
-            ^<^ (Gwdb.get_iper p |> Hashtbl.find assoc_txt |> Util.escape_html
-                  :> Adef.safe_string)
-            ^>^ ")</b>"
-          with Not_found -> Adef.safe "" )
+          match Gwdb.get_iper p |> Hashtbl.find_opt assoc_txt with
+          | Some s ->
+              "<b>(" ^<^ (Util.escape_html s :> Adef.safe_string) ^>^ ")</b>"
+          | None -> Adef.safe "" )
     in
     let vbar_txt _ = Adef.escaped "" in
     let next_txt = multi_relation_next_txt conf pl2 lim assoc_txt in

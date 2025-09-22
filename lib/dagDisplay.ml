@@ -856,8 +856,10 @@ type 'a env =
   | Vnone
 
 let get_env v env =
-  try match List.assoc v env with Vlazy l -> Lazy.force l | x -> x
-  with Not_found -> Vnone
+  match List.assoc_opt v env with
+  | Some (Vlazy l) -> Lazy.force l
+  | Some x -> x
+  | None -> Vnone
 
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x

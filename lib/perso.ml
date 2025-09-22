@@ -339,12 +339,11 @@ let get_cremation_text conf p p_auth =
   cremated ^^^ " " ^<^ on_cremation_date
 
 let limit_desc conf =
-  match
-    Option.map int_of_string
-    @@ List.assoc_opt "max_desc_level" conf.Config.base_env
-  with
-  | Some x -> max 1 x
-  | None -> 12
+  Option.fold
+    (Option.bind
+       (List.assoc_opt "max_desc_level" conf.Config.base_env)
+       int_of_string_opt)
+    ~some:(max 1) ~none:12
 
 let infinite = 10000
 
@@ -730,13 +729,16 @@ let gen_excluded_possible_duplications conf s i_of_string =
         if i >= String.length s then ipl
         else
           let j =
-            try String.index_from s i ',' with Not_found -> String.length s
+            match String.index_from_opt s i ',' with
+            | Some j -> j
+            | None -> String.length s
           in
           if j = String.length s then ipl
           else
             let k =
-              try String.index_from s (j + 1) ','
-              with Not_found -> String.length s
+              match String.index_from_opt s (j + 1) ',' with
+              | Some k -> k
+              | None -> String.length s
             in
             let s1 = String.sub s i (j - i) in
             let s2 = String.sub s (j + 1) (k - j - 1) in
@@ -895,19 +897,22 @@ let build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark =
     let n =
-      try int_of_string (List.assoc "max_ancestor_implex" conf.Config.base_env)
-      with _ -> 5
+      Option.value ~default:5
+        (Option.bind
+           (List.assoc_opt "max_ancestor_implex" conf.Config.base_env)
+           int_of_string_opt)
     in
     Gwdb.iper_marker (Gwdb.ipers base) n
   in
   let auth = conf.Config.wizard || conf.Config.friend in
   let add_surname sosa p surn dp =
     let r =
-      try Hashtbl.find ht surn
-      with Not_found ->
-        let r = ref ((fst dp, p), []) in
-        Hashtbl.add ht surn r;
-        r
+      match Hashtbl.find_opt ht surn with
+      | Some r -> r
+      | None ->
+          let r = ref ((fst dp, p), []) in
+          Hashtbl.add ht surn r;
+          r
     in
     r := (fst !r, sosa :: snd !r)
   in
@@ -990,11 +995,12 @@ let build_list_eclair conf base v p =
     if not (Gwdb.is_empty_string pl) then
       let pl = Util.trimmed_string_of_place (Gwdb.sou base pl) in
       let r =
-        try Hashtbl.find ht (surn, pl)
-        with Not_found ->
-          let r = ref (p, None, None, []) in
-          Hashtbl.add ht (surn, pl) r;
-          r
+        match Hashtbl.find_opt ht (surn, pl) with
+        | Some r -> r
+        | None ->
+            let r = ref (p, None, None, []) in
+            Hashtbl.add ht (surn, pl) r;
+            r
       in
       (* Met la jour le binding : dates et liste des iper. *)
       r :=
@@ -1193,8 +1199,10 @@ let rec compare_ls sl1 sl2 =
       (* soit plus petit que "2". J'espère qu'on ne casse pas  *)
       (* les performances à cause du try..with.                *)
       let c =
-        try Stdlib.compare (int_of_string s1) (int_of_string s2)
-        with Failure _ -> Utf8.alphabetic_order s1 s2
+        match (int_of_string_opt s1, int_of_string_opt s2) with
+        | Some i1, Some i2 -> Stdlib.compare i1 i2
+        | None, None | None, Some _ | Some _, None ->
+            Utf8.alphabetic_order s1 s2
       in
       if c = 0 then compare_ls sl1 sl2 else c
   | _ :: _, [] -> 1
@@ -1278,8 +1286,10 @@ let has_witness_for_event conf base p event_name =
     (Event.events conf base p)
 
 let get_env v env =
-  try match List.assoc v env with Vlazy l -> Lazy.force l | x -> x
-  with Not_found -> Vnone
+  match List.assoc_opt v env with
+  | Some (Vlazy l) -> Lazy.force l
+  | Some x -> x
+  | None -> Vnone
 
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
@@ -2118,7 +2128,7 @@ and eval_item_field_var ell = function
         match ell with
         | el :: _ ->
             let v = int_of_string s in
-            let r = try List.nth el (v - 1) with Failure _ -> "" in
+            let r = Option.value (List.nth_opt el (v - 1)) ~default:"" in
             TemplAst.VVstring r
         | [] -> null_val
       with Failure _ -> raise Not_found)
@@ -3615,7 +3625,7 @@ let event_count events = ("event_count", Vint (List.length events))
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
     let s = eval_expr env ep e in
-    try int_of_string s with Failure _ -> raise Not_found
+    match int_of_string_opt s with Some i -> i | None -> raise Not_found
   in
   let print_foreach_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
@@ -4586,8 +4596,9 @@ let print ?no_headers conf base p =
         | Some ifam -> Gwdb.sou base (Gwdb.get_origin_file (Gwdb.foi base ifam))
         | None -> ""
       in
-      try Some (src, List.assoc ("passwd_" ^ src) conf.Config.base_env)
-      with Not_found -> None
+      Option.map
+        (fun passwd -> (src, passwd))
+        (List.assoc_opt ("passwd_" ^ src) conf.Config.base_env)
   in
   match passwd with
   | Some (src, passwd)
@@ -4597,12 +4608,11 @@ let print ?no_headers conf base p =
   | Some _ | None -> interp_templ ?no_headers "perso" conf base p
 
 let limit_by_tree conf =
-  match
-    Option.map int_of_string
-      (List.assoc_opt "max_anc_tree" conf.Config.base_env)
-  with
-  | Some x -> max 1 x
-  | None -> 7
+  Option.fold
+    (Option.bind
+       (List.assoc_opt "max_anc_tree" conf.Config.base_env)
+       int_of_string_opt)
+    ~some:(max 1) ~none:7
 
 let print_ancestors_dag conf base v p =
   let v = min (limit_by_tree conf) v in

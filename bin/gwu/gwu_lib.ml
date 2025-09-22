@@ -75,11 +75,11 @@ let prepare_free_occ ?(select = fun _ -> true) base =
           if fn = "" || sn = "" then
             let key = fn ^ " #@# " ^ sn in
             let occ = Gwdb.get_occ p in
-            try
-              let l = Hashtbl.find ht_orig_occ key in
-              if List.mem occ l then Hashtbl.add ht_dup_occ ip occ
-              else Hashtbl.replace ht_orig_occ key (occ :: l)
-            with Not_found -> Hashtbl.add ht_orig_occ key [ occ ])
+            match Hashtbl.find_opt ht_orig_occ key with
+            | Some l ->
+                if List.mem occ l then Hashtbl.add ht_dup_occ ip occ
+                else Hashtbl.replace ht_orig_occ key (occ :: l)
+            | None -> Hashtbl.add ht_orig_occ key [ occ ])
     (Gwdb.ipers base);
   Hashtbl.iter
     (fun key l -> Hashtbl.replace ht_orig_occ key (List.sort compare l))
@@ -90,24 +90,25 @@ let prepare_free_occ ?(select = fun _ -> true) base =
       let sn = Gwdb.sou base (Gwdb.get_surname p) in
       let fn = Gwdb.sou base (Gwdb.get_first_name p) in
       let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
-      try
-        let list_occ = Hashtbl.find ht_orig_occ key in
-        let rec loop list init new_list =
-          match list with
-          | x :: y :: l when y - x > 1 ->
-              (succ x, List.rev_append (y :: succ x :: x :: new_list) l)
-          | x :: l -> loop l (succ x) (x :: new_list)
-          | [] -> (init, [ init ])
-        in
-        let new_occ, new_list_occ = loop list_occ 0 [] in
-        Hashtbl.replace ht_dup_occ ip new_occ;
-        Hashtbl.replace ht_orig_occ key new_list_occ
-      with Not_found -> ())
+      Option.iter
+        (fun list_occ ->
+          let rec loop list init new_list =
+            match list with
+            | x :: y :: l when y - x > 1 ->
+                (succ x, List.rev_append (y :: succ x :: x :: new_list) l)
+            | x :: l -> loop l (succ x) (x :: new_list)
+            | [] -> (init, [ init ])
+          in
+          let new_occ, new_list_occ = loop list_occ 0 [] in
+          Hashtbl.replace ht_dup_occ ip new_occ;
+          Hashtbl.replace ht_orig_occ key new_list_occ)
+        (Hashtbl.find_opt ht_orig_occ key))
     ht_dup_occ
 
 let get_new_occ p =
-  try Hashtbl.find ht_dup_occ (Gwdb.get_iper p)
-  with Not_found -> Gwdb.get_occ p
+  match Hashtbl.find_opt ht_dup_occ (Gwdb.get_iper p) with
+  | Some o -> o
+  | None -> Gwdb.get_occ p
 
 type mfam = {
   m_ifam : Gwdb.ifam;
@@ -441,10 +442,7 @@ let add_linked_files gen from s some_linked_files =
       if j > i + 6 then
         let b = String.sub s (i + 3) (j - i - 6) in
         let fname =
-          try
-            let k = String.index b '/' in
-            String.sub b 0 k
-          with Not_found -> b
+          Option.fold (String.index_opt b '/') ~some:(String.sub b 0) ~none:b
         in
         let fname =
           Option.value ~default:fname (List.assoc_opt fname gen.notes_alias)
@@ -952,12 +950,12 @@ let notes_aliases bdir =
         match try Some (input_line ic) with End_of_file -> None with
         | Some s ->
             let list =
-              try
-                let i = String.index s ' ' in
-                ( String.sub s 0 i,
-                  String.sub s (i + 1) (String.length s - i - 1) )
-                :: list
-              with Not_found -> list
+              Option.fold (String.index_opt s ' ')
+                ~some:(fun i ->
+                  ( String.sub s 0 i,
+                    String.sub s (i + 1) (String.length s - i - 1) )
+                  :: list)
+                ~none:list
             in
             loop list
         | None ->
@@ -1587,16 +1585,17 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     if out_dir = "" then (oc, out_oc_first, close)
     else if fname = "" then (oc, out_oc_first, close)
     else
-      try Hashtbl.find src_oc_ht fname
-      with Not_found ->
-        let oc = open_out (Filename.concat out_dir fname) in
-        let ((out, _, _) as x) =
-          (output_string oc, ref true, fun () -> close_out oc)
-        in
-        if not !raw_output then out "encoding: utf-8\n";
-        if !old_gw then out "\n" else out "gwplus\n\n";
-        Hashtbl.add src_oc_ht fname x;
-        x
+      match Hashtbl.find_opt src_oc_ht fname with
+      | Some x -> x
+      | None ->
+          let oc = open_out (Filename.concat out_dir fname) in
+          let ((out, _, _) as x) =
+            (output_string oc, ref true, fun () -> close_out oc)
+          in
+          if not !raw_output then out "encoding: utf-8\n";
+          if !old_gw then out "\n" else out "gwplus\n\n";
+          Hashtbl.add src_oc_ht fname x;
+          x
   in
   let gen =
     let pevents_done = Gwdb.iper_marker (Gwdb.ipers base) false in

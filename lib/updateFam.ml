@@ -43,7 +43,7 @@ type 'a env =
   | Vnone
 
 let bind x v e = (x, v) :: e
-let get_env x e = try List.assoc x e with Not_found -> Vnone
+let get_env x e = Option.value (List.assoc_opt x e) ~default:Vnone
 
 let nth_fevent n e =
   match get_env "fevents" e with
@@ -54,7 +54,7 @@ let get_fevent = function Vevents es -> es | _ -> raise (Failure "get_fevent")
 let bool_val = Update_util.bool_val
 let str_val = Update_util.str_val
 let safe_val = Update_util.safe_val
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = Option.value (List.assoc_opt v env) ~default:Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -539,7 +539,7 @@ let print_foreach print_ast _eval_expr =
   and print_foreach_fwitness env fcd al list =
     match get_env "cnt" env with
     | Vint i -> (
-        match try Some (List.nth list (i - 1)) with Failure _ -> None with
+        match List.nth_opt list (i - 1) with
         | Some e ->
             let rec loop first wcnt = function
               | _ :: l ->

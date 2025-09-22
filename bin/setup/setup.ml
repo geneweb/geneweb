@@ -32,10 +32,12 @@ type config = {
 }
 
 let transl conf w =
-  try Hashtbl.find conf.lexicon w with Not_found -> "[" ^ w ^ "]"
+  match Hashtbl.find_opt conf.lexicon w with
+  | Some s -> s
+  | None -> "[" ^ w ^ "]"
 
 let charset conf =
-  try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
+  Option.value (Hashtbl.find_opt conf.lexicon "!charset") ~default:"utf-8"
 
 let header_no_page_title conf title =
   Geneweb.Output.status printer_conf Def.OK;
@@ -135,10 +137,7 @@ let numbered_key k =
     | _ -> None
 
 let stringify s =
-  try
-    let _ = String.index s ' ' in
-    "\"" ^ s ^ "\""
-  with Not_found -> s
+  if Option.is_some @@ String.index_opt s ' ' then "\"" ^ s ^ "\"" else s
 
 let parameters =
   let rec loop comm = function
@@ -401,7 +400,11 @@ let variables bname =
 
 let nth_field s n =
   let rec loop nth i =
-    let j = try String.index_from s i '|' with Not_found -> String.length s in
+    let j =
+      match String.index_from_opt s i '|' with
+      | Some j -> j
+      | None -> String.length s
+    in
     if nth = n then String.sub s i (j - i)
     else if j = String.length s then s
     else loop (nth + 1) (j + 1)
@@ -440,7 +443,9 @@ let print_selector conf print =
   let sel =
     try getenv conf.env "sel"
     with Not_found -> (
-      try Sys.getenv "HOME" with Not_found -> Sys.getcwd ())
+      match Sys.getenv_opt "HOME" with
+      | Some home -> home
+      | None -> Sys.getcwd ())
   in
   let list =
     try
@@ -886,7 +891,7 @@ let print_default_gwf_file conf =
       "p_mod=";
     ]
   in
-  let bname = try List.assoc "o" conf.env with Not_found -> "" in
+  let bname = Option.value (List.assoc_opt "o" conf.env) ~default:"" in
   let dir = Sys.getcwd () in
   let fname = Filename.concat dir (bname ^ ".gwf") in
   if Sys.file_exists fname then ()
@@ -1395,7 +1400,7 @@ let gwf_1 conf =
 
 let gwd conf =
   let aenv = read_gwd_arg () in
-  let get v = try List.assoc v aenv with Not_found -> "" in
+  let get v = Option.value (List.assoc_opt v aenv) ~default:"" in
   let conf =
     {
       conf with
@@ -1457,7 +1462,7 @@ let update_nldb conf ok_file =
 
 let separate_slashed_filename s =
   let rec loop i =
-    match try Some (String.index_from s i '/') with Not_found -> None with
+    match String.index_from_opt s i '/' with
     | Some j ->
         if j > i then String.sub s i (j - i) :: loop (j + 1) else loop (j + 1)
     | None ->
@@ -1746,11 +1751,11 @@ let setup_available_languages = [ "de"; "en"; "es"; "fr"; "it"; "lv"; "sv" ]
 
 let intro () =
   let default_gwd_lang, default_setup_lang =
-    let s = try Sys.getenv "LANG" with Not_found -> "" in
+    let s = Option.value (Sys.getenv_opt "LANG") ~default:"" in
     if List.mem s Geneweb.Version.available_languages then
       (s, if List.mem s setup_available_languages then s else "en")
     else
-      let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+      let s = Option.value (Sys.getenv_opt "LC_CTYPE") ~default:"" in
       if String.length s >= 2 then
         let s = String.sub s 0 2 in
         if List.mem s Geneweb.Version.available_languages then
