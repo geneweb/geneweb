@@ -179,7 +179,7 @@ class Database:
                 bdir=bname,
                 perm=db.read_only,
             )
-            persons_of_name = lookup.person.ByName(bname, patches.h_name)
+            persons_of_name = lookup.person.ByName(bpath, patches.h_name)
             person_of_key = lookup.person.ByKey(persons, strings, persons_of_name)
             base_func = dbdisk.BaseFunc.build(
                 person_of_key=person_of_key,
