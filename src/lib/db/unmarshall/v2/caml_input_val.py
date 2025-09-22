@@ -6,6 +6,7 @@ from lib.db.unmarshall.header import caml_parse_header_f
 from lib.db.unmarshall.v2.intern_rec import read_bin_caml_input, unmarshall_ocaml_data
 from lib.db.unmarshall.v2.ocaml_input import OCamlInput
 import lib.db.unmarshall.v2.intext as Intext
+from lib.db.v2 import mutil
 
 
 def input_value(oi: Union[OCamlInput, BinaryIO]) -> Any:
@@ -52,12 +53,12 @@ def caml_input_val(chan: BinaryIO) -> Any:
     header = caml_parse_header_f(chan)
     # Read block from channel
     oi = OCamlInput(chan)
-    logger = logging.getLogger("v2.caml_input_val")
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    ch.setFormatter(logging.Formatter("(origin/%(name)s) [%(levelname)s]\t%(message)s"))
-    logger.setLevel(logging.DEBUG)
-    if not logger.hasHandlers():
-        logger.addHandler(ch)
+    logger = mutil.get_logger("v2.caml_input_val")
+    # ch = logging.StreamHandler()
+    # ch.setLevel(logging.DEBUG)
+    # ch.setFormatter(logging.Formatter("(origin/%(name)s) [%(levelname)s]\t%(message)s"))
+    # logger.setLevel(logging.DEBUG)
+    # if not logger.hasHandlers():
+    #     logger.addHandler(ch)
     item = read_bin_caml_input(oi, logger)
     return item
