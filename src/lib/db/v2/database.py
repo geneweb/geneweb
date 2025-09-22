@@ -153,7 +153,7 @@ class Database:
                     return s1 == s2
 
                 def string_of_id(self, id: int) -> str:
-                    return strings[id]
+                    return strings.get(id, safe=True)
 
             db.I = InvertedIndex(StringIndexImpl(), logger=db.logger)
             db.inv_idx = db.I.load(
