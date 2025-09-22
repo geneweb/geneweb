@@ -68,19 +68,6 @@ class Database:
         """Get the Path object for the database directory."""
         return pathlib.Path(self._name)
 
-    @property
-    def empty_patch_ht(self):
-        return {
-            "person": {},
-            "ascend": {},
-            "union": {},
-            "family": {},
-            "couple": {},
-            "descend": {},
-            "string": {},
-            "name": {},
-        }
-
     def __init__(self, name: str, read_only: bool = False):
         """Initialize database access.
 
@@ -769,9 +756,9 @@ class Database:
         """Load patches from the database directory."""
         fname = os.path.join(self.bname, "patches")
         if not os.path.exists(fname):
-            print(f"{fname}: no patches file")
+            self.logger.warning("no patches file")
             self.sync_patches = SynchroPatch(synch_list=[])
-            return self.empty_patch_ht
+            return PatchesHT()
         try:
             with open(fname, "rb") as f:
 
@@ -779,14 +766,11 @@ class Database:
                 self.patches: PatchesHT = unmarshall_ocaml_data(
                     f, log_level=logging.INFO, structure=PatchesHT
                 )
-                # self.patches = self._dereference_strings_in_patches(
-                #     self.patches
-                # )
                 return self.patches
 
         except FileExistsError as e:
             print(f"{fname}: corrupted file ({e})")
-            return self.empty_patch_ht
+            return PatchesHT()
 
     def load_particles(self) -> List[str]:
         """
