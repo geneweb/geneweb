@@ -23,7 +23,11 @@ from typing import (
 from contextlib import contextmanager
 from lib.db.unmarshall.v2 import dbdisk
 from lib.db.unmarshall.v2.caml_input_val import input_value
-from lib.db.unmarshall.v2.intern_rec import read_bin_caml_input, unmarshall_ocaml_data
+from lib.db.unmarshall.v2.intern_rec import (
+    read_bin_caml_input,
+    read_bin_caml_input_rec,
+    unmarshall_ocaml_data,
+)
 from lib.db.unmarshall.v2.make_immutable_record_access import (
     ImmutableRecord,
     make_immutable_record_access,
@@ -33,6 +37,7 @@ from lib.db.unmarshall.v2.stdlib import Ref, StringRef
 from lib.db.v2.defs import (
     Ascend,
     BaseNotes,
+    CDate,
     Couple,
     Descend,
     Family,
@@ -577,6 +582,7 @@ class Database:
                     raise RuntimeError(
                         "this is not a GeneWeb base, or it is a very old version"
                     )
+            self.logger.info(f"Database version detected: {self.version.name}")
             oi = OCamlInput(ic)
             # Read header
             persons_len = oi.read_uint32()
@@ -607,8 +613,12 @@ class Database:
                     persons_array_pos,
                     persons_len,
                     "persons",
-                    input_value,
-                    input_value,
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Person
+                    ),
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Person
+                    ),
                     self.logger,
                 )
                 # shift += persons_len * Iovalue.sizeof_long
@@ -621,8 +631,12 @@ class Database:
                     ascends_array_pos,
                     persons_len,
                     "ascends",
-                    input_value,
-                    input_value,
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Ascend
+                    ),
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Ascend
+                    ),
                     self.logger,
                 )
                 #     shift += persons_len * Iovalue.sizeof_long
@@ -635,8 +649,12 @@ class Database:
                     unions_array_pos,
                     persons_len,
                     "unions",
-                    input_value,
-                    input_value,
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=DskUnion
+                    ),
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=DskUnion
+                    ),
                     self.logger,
                 )
                 #     shift += persons_len * Iovalue.sizeof_long
@@ -649,8 +667,12 @@ class Database:
                     families_array_pos,
                     families_len,
                     "families",
-                    input_value,
-                    input_value,
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Family
+                    ),
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Family
+                    ),
                     self.logger,
                 )
                 #     shift += families_len * Iovalue.sizeof_long
@@ -663,8 +685,12 @@ class Database:
                     couples_array_pos,
                     families_len,
                     "couples",
-                    input_value,
-                    input_value,
+                    lambda x: read_bin_caml_input_rec(
+                        OCamlInput(x), logger=self.logger, structure=Couple
+                    ),
+                    lambda x: read_bin_caml_input_rec(
+                        OCamlInput(x), logger=self.logger, structure=Couple
+                    ),
                     self.logger,
                 )
                 #     shift += families_len * Iovalue.sizeof_long
@@ -677,8 +703,12 @@ class Database:
                     descends_array_pos,
                     families_len,
                     "descends",
-                    input_value,
-                    input_value,
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Descend
+                    ),
+                    lambda f: read_bin_caml_input_rec(
+                        OCamlInput(f), logger=self.logger, structure=Descend
+                    ),
                     self.logger,
                 )
                 #     shift += families_len * Iovalue.sizeof_long
