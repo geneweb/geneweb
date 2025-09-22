@@ -78,6 +78,8 @@ class Database:
         self._name = (
             name if name.endswith(".gwb") else name + ".gwb"
         )  # Path to database
+        self.I: InvertedIndex = None  # Inverted index for strings
+
         self.read_only: dbdisk.Permission = read_only
         self.version: dbdisk.BaseVersion = None
 
@@ -141,7 +143,6 @@ class Database:
             ) = db.load_data()
             if not db.read_only:
                 db.commit_patches(persons)
-
             db._dereference_strings_in_patches(patches, strings)
 
             class StringIndexImpl(StringIndex):
@@ -154,8 +155,8 @@ class Database:
                 def string_of_id(self, id: int) -> str:
                     return strings[id]
 
-            I = InvertedIndex(StringIndexImpl(), logger=db.logger)
-            db.inv_idx = I.load(
+            db.I = InvertedIndex(StringIndexImpl(), logger=db.logger)
+            db.inv_idx = db.I.load(
                 db.version,
                 inx=bpath / "strings.inx",
                 indexes=[patches.h_string[1], db.pending.h_string[1]],

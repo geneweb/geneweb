@@ -5,6 +5,7 @@ from typing import Protocol, Dict, List, Optional
 
 from lib.db.unmarshall.v2.dbdisk import BaseVersion
 from lib.db.unmarshall.v2.ocaml_input import OCamlInput
+from lib.db.v2 import mutil
 
 
 class StringIndex(Protocol):
@@ -41,12 +42,12 @@ class InvertedIndex:
     def __init__(
         self, string_accessor: StringIndex, *, logger: Optional[logging.Logger] = None
     ):
-        self._inx: InvertedIndex.INX = None
+        self._inx: Optional[InvertedIndex.INX] = None
         self._tbl: Dict[int, str] = {}
         self.string_accessor = string_accessor
         self.int_size = 4
         self.logger = (
-            logger.getChild("InvertedIndex") if logger else logging.getLogger(__name__)
+            logger.getChild("InvertedIndex") if logger else mutil.get_logger(__name__)
         )
 
     def _load_inx(self, version: BaseVersion, inx: pathlib.Path):
@@ -77,8 +78,12 @@ class InvertedIndex:
             self.logger.warning(f"Cannot load the inverted index file {inx}")
         self._tbl = {}
         for idx in indexes:
-            for i, s in idx.items():
-                self.insert(s, i)
+            for index, string in idx.items():
+                self.insert(string, index)
+        self.logger.debug(
+            f"Loaded inverted index from {self._inx} with {len(self._tbl)} entries"
+        )
+        self.logger.debug(f"Index entries: {self._tbl}")
         return self
 
     def find(self, s: str) -> int:
