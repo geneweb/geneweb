@@ -702,13 +702,13 @@ def read_bin_caml_input_block_rec(
     oi: OCamlInput, tag: int, size: int, logger: logging.Logger
 ):
     if tag == 0:
-        return list(read_bin_caml_input_rec(oi, logger) for _ in range(size))
+        return list(read_bin_caml_input_rec(oi, logger=logger) for _ in range(size))
     logger.error("non-list blocks not implemented")
     raise NotImplementedError("Reading objects not implemented")
 
 
 def read_bin_caml_input_rec(
-    oi: OCamlInput, *, logger: logging.Logger = None
+    oi: OCamlInput, *, logger: logging.Logger = None, structure: Type = None
 ) -> Union[list, int, str]:
     """Read a binary OCaml input value.
 
@@ -731,7 +731,10 @@ def read_bin_caml_input_rec(
             logger.debug(f"small block {tag=} {size=}")
             # s.read_block(tag, size, top_item.dest)
             # raise NotImplementedError("read_bin_caml_input not implemented yet")
-            return read_bin_caml_input_block_rec(oi, tag, size, logger)
+            block = read_bin_caml_input_block_rec(oi, tag, size, logger)
+            if structure is not None:
+                block = convert_structure(block, structure, logger)
+            return block
         else:  # small int
             # v = val_int(code & 0x3F)
             v = (
@@ -784,9 +787,10 @@ def read_bin_caml_input_rec(
         tag = tag_hd(header)
         size = wosize_hd(header)
         logger.debug(f"block32 + header({tag=} {size=})")
-        # s.read_block(data["tag"], data["size"], top_item.dest)
-        # raise NotImplementedError("read_bin_caml_input not implemented yet")
-        return []
+        block = read_bin_caml_input_block_rec(oi, tag, size, logger)
+        if structure is not None:
+            block = convert_structure(block, structure, logger)
+        return block
     elif code == CODE_BLOCK64:
         logger.error("block64")
     elif code == CODE_STRING8:
