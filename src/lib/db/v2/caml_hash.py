@@ -146,7 +146,9 @@ def caml_hash_mix_string(h: int, s: str) -> int:
                 | (ord(s[i + 3]) << 24)
             )
         else:
-            w = int.from_bytes(s[i : i + 4], byteorder="little", signed=False)
+            w = int.from_bytes(
+                s[i : i + 4].encode("utf-8"), byteorder="little", signed=False
+            )
         h = MIX(h, w)
         i += 4
 
