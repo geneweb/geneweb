@@ -30,50 +30,45 @@ class TypeRef(Generic[TN, T]):
 
 
 @dataclasses.dataclass
-class DMY2:
-    day2: int
-    month2: int
-    year2: int
-    delta2: int
+class CDate:
+    """Compressed date."""
 
+    compressed: int = dataclasses.field(default=None)
+    year: Optional[int] = dataclasses.field(init=False, default=None)
+    month: Optional[int] = dataclasses.field(init=False, default=None)
+    day: Optional[int] = dataclasses.field(init=False, default=None)
+    prec: Optional["CDate.Precision"] = dataclasses.field(init=False, default=None)
 
-Precision = Union[
-    Literal["Sure"],
-    Literal["About"],
-    Literal["Maybe"],
-    Literal["Before"],
-    Literal["After"],
-    DMY2,  # OrYear
-    DMY2,  # YearInt
-]
+    class Precision(enum.Enum):
+        Sure = 0
+        About = 1
+        Maybe = 2
+        Before = 3
+        After = 4
 
+    def __post_init__(self):
+        x = self.compressed
+        self.year, x = x % 2500, x // 2500
+        self.month, x = x % 13, x // 13
+        self.day, x = x % 32, x // 32
+        self.prec: CDate.Precision
+        match x:
+            case 1:
+                self.prec = CDate.Precision.About
+            case 2:
+                self.prec = CDate.Precision.Maybe
+            case 3:
+                self.prec = CDate.Precision.Before
+            case 4:
+                self.prec = CDate.Precision.After
+            case _:
+                self.prec = CDate.Precision.Sure
 
-@dataclasses.dataclass
-class DMY:
-    day: int
-    month: int
-    year: int
-    prec: Precision
-    delta: int
-
-
-Calendar = Union[
-    Literal["Dgregorian"], Literal["Djulian"], Literal["Dfrench"], Literal["Dhebrew"]
-]
-
-Date = Union[Tuple[DMY, Calendar], str]  # Dgreg  # Dtext
-
-
-# CDate = Union[
-#     TypeRef[Literal["Cgregorian"], int],  # Cgregorian
-#     TypeRef[Literal["Cjulian"], int],  # Cjulian
-#     TypeRef[Literal["Cfrench"], int],  # Cfrench
-#     TypeRef[Literal["Chebrew"], int],  # Chebrew
-#     str,  # Ctext
-#     Date,  # Cdate
-#     None,
-# ]
-CDate = StringRef
+    # calendar is only used if date is not None
+    def __str__(self):
+        if self.compressed is None:
+            return "Cnone"
+        return f"{self.day:02}/{self.month:02}/{self.year} {self.prec.name}"
 
 
 @dataclasses.dataclass
