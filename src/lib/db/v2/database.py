@@ -450,7 +450,10 @@ class Database:
                     return d
                 return res
             elif hasattr(structure, "__dataclass_fields__"):
-                fields_name = list(structure.__dataclass_fields__.keys())
+                self.logger.debug(f"Dereferencing dataclass {structure} {d=}")
+                if d is None:
+                    return d
+                fields_name, _ = Mutil.get_dataclass_fields(structure)
                 for key in fields_name:
                     attr = getattr(d, key)
                     field_type = structure.__dataclass_fields__[key].type

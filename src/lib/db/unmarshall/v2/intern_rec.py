@@ -630,10 +630,10 @@ def convert_structure(value: Any, structure: Type, logger: logging.Logger) -> An
             raise OCamlUnmarshalError(
                 f"Expected list for dataclass {structure}, got {type(value)}"
             )
-        field_names = list(structure.__dataclass_fields__.keys())
-        if len(value) != len(field_names):
+        field_names, field_range = Mutil.get_dataclass_fields(structure)
+        if len(value) not in field_range:
             raise OCamlUnmarshalError(
-                f"Expected {len(field_names)} fields for dataclass {structure}, got {len(value)}"
+                f"Expected {field_range.start} <= n < {field_range.stop} fields for dataclass {structure}, got {len(value)}"
             )
         field_values = {
             name: convert_structure(

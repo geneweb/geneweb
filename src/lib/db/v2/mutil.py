@@ -1,4 +1,7 @@
+"""Miscellaneous utilities for GeneWeb database handling."""
+
 from contextlib import contextmanager
+import enum
 import functools
 import io
 import logging
@@ -50,6 +53,29 @@ def get_logger(name: str, *, log_level: int = None) -> logging.Logger:
     else:
         logger.setLevel(VERBOSE.ref * 10)
     return logger
+
+
+def get_dataclass_fields(cls: type) -> tuple[List[str], range]:
+    """Get fields of a dataclass.
+
+    Args:
+        cls: Dataclass type
+
+    Returns:
+        Tuple of:
+        - List of field names
+        - Range of field indices for fields without default values
+    """
+    field_names_range = list(
+        (0, k) if not v.default and not v.default_factory else (1, k)
+        for (k, v) in cls.__dataclass_fields__.items()
+        if v.init
+    )
+    field_names = list(f[1] for f in field_names_range)
+    field_name_range = range(
+        len([f for f in field_names_range if f[0] == 0]), len(field_names_range) + 1
+    )
+    return field_names, field_name_range
 
 
 def default_particles():
@@ -302,3 +328,9 @@ def nominative(s: str) -> str:
         return decline("n", s)
     except ValueError:
         return s
+
+
+def enum_to_string(e: enum.Enum) -> str:
+    """Convert enum to string representation."""
+    s = e.name.split("_")
+    return " ".join([s[0].capitalize()] + [w.lower() for w in s[1:]])
