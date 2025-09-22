@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 import logging
-from typing import TypeVar, Generic, Callable, Any, Optional
-import os
-from pathlib import Path
+from typing import BinaryIO, TypeVar, Generic, Callable, Optional
 
 T = TypeVar("T")  # Generic type for record items
 
@@ -40,14 +38,14 @@ class ImmutableRecord(Generic[T]):
 
 def make_immutable_record_access(
     read_only: bool,
-    input_channel: Any,  # File-like object for main database
-    index_channel: Any,  # File-like object for index
+    input_channel: BinaryIO,  # File-like object for main database
+    index_channel: BinaryIO,  # File-like object for index
     shift: int,  # Offset in index file
     array_pos: int,  # Position in main file
     length: int,  # Length of array
     name: str,  # Name for error messages
-    input_array: Callable[[Any], list[T]],  # Function to read full array
-    input_item: Callable[[Any], T],  # Function to read single item
+    input_array: Callable[[BinaryIO], list[T]],  # Function to read full array
+    input_item: Callable[[BinaryIO], T],  # Function to read single item
     logger: logging.Logger,
 ) -> ImmutableRecord[T]:
     """
@@ -68,18 +66,27 @@ def make_immutable_record_access(
         ImmutableRecord with lazy loading and access functions
     """
     data_ref: Optional[DataArray[T]] = None
+    input_path = getattr(input_channel, "name", None)
+    index_path = getattr(index_channel, "name", None)
+    logger.debug(
+        f"Setting up ImmutableRecord for {name}: "
+        f"{'read-only' if read_only else 'read-write'}, "
+        f"array at {input_path}:{array_pos}, length {length}, "
+        f"index at {index_path} with shift {shift}"
+    )
 
     def load_array() -> DataArray[T]:
         """Lazy load the array data"""
         nonlocal data_ref
         if data_ref is None:
-            try:
-                input_channel.seek(array_pos)
-                data = input_array(input_channel)
-                data_ref = DataArray(data, read_only)
-            except Exception as e:
-                logger.error(f"Error loading {name} array: {e}")
-                raise ValueError(f"Error loading {name} array: {e}")
+            with open(input_path, "rb") as f:
+                try:
+                    f.seek(array_pos)
+                    data = input_array(f)
+                    data_ref = DataArray(data, read_only)
+                except Exception as e:
+                    logger.error(f"Error loading {name} array: {e}")
+                    raise ValueError(f"Error loading {name} array: {e}")
         return data_ref
 
     def get_item(idx: int) -> T:
@@ -89,16 +96,20 @@ def make_immutable_record_access(
             raise IndexError(f"Invalid {name} index: {idx}")
 
         # Try using index for direct access
-        if index_channel is not None:
+        if index_path is not None:
             try:
                 word_size = 4  # Assuming 64-bit offsets
-                index_channel.seek(shift + (idx * word_size))  # 8 bytes per index entry
-                item_pos = int.from_bytes(index_channel.read(word_size), "big")
-                logger.warning(
-                    f"Accessing {name} at index {idx}, position {item_pos}; {shift + (idx * word_size)=}"
-                )
-                input_channel.seek(item_pos)
-                return input_item(input_channel)
+                with (
+                    open(index_path, "rb") as findex,
+                    open(input_path, "rb") as finput,
+                ):
+                    findex.seek(shift + (idx * word_size))  # 8 bytes per index entry
+                    item_pos = int.from_bytes(findex.read(word_size), "big")
+                    logger.debug(
+                        f"Accessing {name} at index {idx}, position {item_pos}; {shift + (idx * word_size)=}"
+                    )
+                    finput.seek(item_pos)
+                    return input_item(finput)
             except Exception as e:
                 logger.warning(f"Index access failed for {name} at {idx}: {e}")
                 raise e
