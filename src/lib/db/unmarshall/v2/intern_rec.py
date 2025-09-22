@@ -603,7 +603,7 @@ def convert_structure(value: Any, structure: Type, logger: logging.Logger) -> An
     elif isinstance(structure, type) and issubclass(structure, TypeEnum):
         if isinstance(value, int) and 0 <= value < len(structure):
             logger.debug(f"Enum value {value} is {list(structure)[value].name}")
-            return list(structure)[value].name
+            return structure(list(structure)[value].value)
         for t in structure:
             logger.debug(f"Checking enum value {t.value}")
             if type(t.value) == type(Literal[Any]):
