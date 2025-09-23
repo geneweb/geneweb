@@ -350,3 +350,71 @@ def enum_to_string(e: enum.Enum) -> str:
     """Convert enum to string representation."""
     s = e.name.split("_")
     return " ".join([s[0].capitalize()] + [w.lower() for w in s[1:]])
+
+
+def get_particle(r: re.Pattern, s: str) -> str:
+    """
+    Get leading particle from string using regex pattern.
+
+    Args:
+        r: Compiled regex pattern for particles
+        s: Input string
+
+    Returns:
+        Leading particle if found, else empty string
+    """
+    m = r.match(s)
+    if m:
+        return m.group(1)
+    return ""
+
+
+def strcmp(s1: str, s2: str) -> int:
+    """
+    Compare two strings lexicographically.
+
+    Args:
+        s1: First string
+        s2: Second string
+
+    Returns:
+        Comparison result:
+        - Negative if s1 < s2
+        - Zero if s1 == s2
+        - Positive if s1 > s2
+    """
+    min_len = min(len(s1), len(s2))
+    for i in range(min_len):
+        if s1[i] != s2[i]:
+            return ord(s1[i]) - ord(s2[i])
+    return len(s1) - len(s2)
+
+
+def compare_after_particle(particles: re.Pattern, s1: str, s2: str) -> int:
+    """
+    Compare two strings after removing leading particles.
+
+    Args:
+        particles: Compiled regex pattern for particles
+        s1: First string
+        s2: Second string
+
+    Returns:
+        Comparison result:
+        - Negative if s1 < s2
+        - Zero if s1 == s2
+        - Positive if s1 > s2
+    """
+    p1 = get_particle(particles, s1)
+    p2 = get_particle(particles, s2)
+    i1 = len(p1)
+    i2 = len(p2)
+    # If neither string has particle, compare normally
+    if i1 == len(s1) and i2 == len(s2):
+        return strcmp(s1, s2)
+    if i1 == len(s1):
+        return -1
+    if i2 == len(s2):
+        return 1
+    # Both strings have particles, compare after particles
+    return strcmp(s1[i1:], s2[i2:])

@@ -1,3 +1,5 @@
+from lib.db.unmarshall.v2.dbdisk import BaseData
+from lib.db.v2 import mutil
 import lib.db.v2.caml_hash as caml_hash
 
 
@@ -26,3 +28,23 @@ def name_index(s: str) -> int:
 
     # Hash string and take modulo to match OCaml's behavior
     return caml_hash.hash(s_lower) % TABLE_SIZE
+
+
+def compare_snames(base_data: BaseData, a: str, b: str) -> int:
+    return mutil.compare_after_particle(base_data.particles, a, b)
+
+
+def compare_snames_id(base_data: BaseData, a: int, b: int) -> int:
+    if a == b:
+        return 0
+    return compare_snames(base_data, base_data.strings.get(a), base_data.strings.get(b))
+
+
+def compare_fnames(a: str, b: str) -> int:
+    return (a > b) - (a < b)
+
+
+def compare_fnames_id(base_data: BaseData, a: int, b: int) -> int:
+    if a == b:
+        return 0
+    return compare_fnames(base_data.strings.get(a), base_data.strings.get(b))

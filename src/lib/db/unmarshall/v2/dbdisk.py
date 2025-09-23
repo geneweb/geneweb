@@ -1,14 +1,19 @@
 import dataclasses
 from enum import Enum
 import enum
+import functools
 from http import HTTPStatus
+import logging
 import os
+from pathlib import Path
 import re
-from urllib.error import HTTPError
-from lib.db.unmarshall.v2.intern_rec import unmarshall_ocaml_data
+from lib.db.unmarshall.v2.intern_rec import (
+    read_bin_caml_input_rec,
+    unmarshall_ocaml_data,
+)
 from lib.db.unmarshall.v2.ocaml_input import OCamlInput
 from lib.db.v2 import mutil as Mutil
-from typing import Any, Callable, Generic, List, Optional, TypeVar
+from typing import Any, Callable, Generic, List, Optional, Tuple, TypeVar
 
 from lib.db.v2.defs import (
     Ascend,
@@ -66,15 +71,6 @@ class RecordAccess(Generic[T]):
     def clear_array(self) -> None:
         """Clear the array and any pending patches."""
         raise NotImplementedError
-
-
-@dataclasses.dataclass
-class StringPersonIndex:
-    """Index for person lookup by string"""
-
-    find: Callable[[int], List[int]]
-    cursor: Callable[[str], int]
-    next: Callable[[int], int]
 
 
 class Permission(Enum):
@@ -174,9 +170,12 @@ class BaseData:
     perm: Permission
 
 
-# @dataclasses.dataclass
+@dataclasses.dataclass
 class BaseFunc:
     """Database operations interface"""
+
+    persons_of_surname: "StringPersonIndex"
+    persons_of_first_name: "StringPersonIndex"
 
     @staticmethod
     def build(
@@ -184,8 +183,8 @@ class BaseFunc:
         persons_of_name: Callable[[str], List[int]],
         strings_of_sname: Callable[[str], List[int]],
         strings_of_fname: Callable[[str], List[int]],
-        persons_of_surname: StringPersonIndex,
-        persons_of_first_name: StringPersonIndex,
+        persons_of_surname: "StringPersonIndex",
+        persons_of_first_name: "StringPersonIndex",
         patch_person: Callable[[int, Person], None],
         patch_ascend: Callable[[int, Ascend], None],
         patch_union: Callable[[int, DskUnion], None],
@@ -201,13 +200,11 @@ class BaseFunc:
         iper_exists: Callable[[int], bool],
         ifam_exists: Callable[[int], bool],
     ) -> "BaseFunc":
-        bf = BaseFunc()
+        bf = BaseFunc(persons_of_surname, persons_of_first_name)
         bf.person_of_key = person_of_key
         bf.persons_of_name = persons_of_name
         bf.strings_of_sname = strings_of_sname
         bf.strings_of_fname = strings_of_fname
-        bf.persons_of_surname = persons_of_surname
-        bf.persons_of_first_name = persons_of_first_name
         bf.patch_person = patch_person
         bf.patch_ascend = patch_ascend
         bf.patch_union = patch_union
@@ -240,16 +237,6 @@ class BaseFunc:
 
     # strings_of_sname: Callable[[str], List[int]]
     def strings_of_fname(self, first_name: str) -> List[int]:
-        """Find person IDs by first name."""
-        ...
-
-    # strings_of_fname: Callable[[str], List[int]]
-    def persons_of_surname(self, surname: str) -> List[int]:
-        """Find person IDs by surname."""
-        ...
-
-    # persons_of_surname: StringPersonIndex
-    def persons_of_first_name(self, first_name: str) -> List[int]:
         """Find person IDs by first name."""
         ...
 
@@ -335,3 +322,320 @@ class DskBase:
     data: BaseData
     func: BaseFunc
     version: BaseVersion
+
+
+@dataclasses.dataclass
+class StringPersonIndex:
+    """Index for person lookup by string"""
+
+    _cmp_str: Callable[[BaseData, str, str], int]
+    _cmp_istr: Callable[[BaseData, int, int], int]
+    _base_data: BaseData
+    _proj: Callable[[Any], int]
+    _person_patches: dict[int, Any]
+    _names_inx: str
+    _names_dat: str
+    _bpath: Path
+    _fname_data: str = dataclasses.field(init=False)
+    # _bt: List[Tuple[int, int]] = dataclasses.field(init=False, default_factory=list)
+    # _patched_cache: List[Tuple[int, List[Any]]] = dataclasses.field(
+    #     init=False, default_factory=list
+    # )
+    logger: logging.Logger = dataclasses.field(kw_only=True, default=None)
+
+    @functools.cached_property
+    def _bt(self) -> List[Tuple[int, int]]:
+        """B-tree index, loading from file if necessary."""
+        with open(self._bpath / self._names_inx, "rb") as f:
+            oi = OCamlInput(f)
+            r = read_bin_caml_input_rec(oi, structure=List[Tuple[int, int]])
+            self.logger.debug(f"Loaded B-tree index with {len(r)} entries")
+            return r
+
+    @functools.cached_property
+    def _patched(self):
+        """
+        Lazy computation of patched entries for cursor/next operations.
+
+        Returns:
+            Sorted array of (string_id, person_list) tuples
+        """
+        # if self._patched_cache is not None:
+        #     return self._patched_cache
+
+        # Create hash table to collect unique string IDs
+        string_ids: dict[int, list[Person]] = {}
+
+        for person_id, person in self._person_patches.items():
+            k = self._proj(person)  # Extract string ID (surname/firstname)
+            if k not in string_ids:
+                string_ids[k] = []
+
+        # Convert to array format: (string_id, empty_list)
+        # Note: The list is empty because patched is only used by cursor/next,
+        # not by find, so we don't need to track person IDs here
+        result = [(k, v) for k, v in string_ids.items()]
+        # Sort by string comparison
+        result.sort(
+            key=functools.cmp_to_key(
+                lambda a, b: self._cmp_istr(self._base_data, a[0], b[0])
+            ),
+        )
+        self.logger.debug(f"Patched index entries: {result}")
+        # self._patched_cache = result
+        return result
+
+    def __post_init__(self):
+        if not self.logger:
+            self.logger = Mutil.get_logger("StringPersonIndex")
+        else:
+            self.logger = Mutil.get_child_logger(self.logger, "StringPersonIndex")
+        self._fname_data = self._bpath / self._names_dat
+
+    def find(self, idx: int) -> List[int]:
+        """Find person IDs by index."""
+        ipera = []
+
+        try:
+            bt = self._bt
+            s = self._base_data.strings.get(idx)
+
+            def cmp(item: tuple[int, Any]) -> int:
+                k, _ = item
+                if k == idx:
+                    return 0
+                return self._cmp_str(self._base_data, s, self._base_data.strings.get(k))
+
+            # Binary search for the string in the index
+            pos = bt[self._binary_search(bt, cmp)][1]
+
+            if pos is not None:
+                # Read person IDs from data file
+                with open(self._fname_data, "rb") as ic_dat:
+                    ic_dat.seek(pos)
+                    oi = OCamlInput(ic_dat)
+                    length = oi.read_int()
+                    ipera = []
+                    for _ in range(length):
+                        iper = oi.read_int()
+                        ipera.append(iper)
+
+        except (FileNotFoundError, IndexError):
+            # If not found or error, start with empty list
+            self.logger.warning("Index or data file not found or error reading")
+            ipera = []
+
+        # Get list of patched person IDs to exclude from main results
+        patched_ids = list(self._person_patches.keys())
+
+        # Filter out patched persons from main results
+        ipera = [i for i in ipera if i not in patched_ids]
+
+        # Add matching persons from patches
+        for person_id, person in self._person_patches.items():
+            istr1 = self._proj(person)
+            if istr1 == idx:
+                if person_id not in ipera:
+                    ipera.append(person_id)
+
+        return ipera
+
+    def cursor(self, s: str) -> int:
+        """Get cursor position for string."""
+        bt = self._bt
+        patched = self._patched
+
+        def cmp(x: Tuple[int, Any]) -> int:
+            k, _ = x
+            return self._cmp_str(
+                self._base_data,
+                s,
+                self._base_data.strings.get(k),
+            )
+
+        try:  # Binary search in main index
+            istr1 = bt[self._binary_search_key_after(bt, cmp)][0]
+        except KeyError:
+            self.logger.debug("Cursor: not found in main index")
+            istr1 = -1
+        try:  # Binary search in patched index
+            istr2 = patched[self._binary_search_key_after(patched, cmp)][0]
+        except KeyError:
+            self.logger.debug("Cursor: not found in patched index")
+            istr2 = -1
+        # Return the lexicographically smallest
+        if istr2 == -1:
+            if istr1 == -1:
+                raise KeyError("Not found")
+            return istr1
+        if istr1 == -1:
+            return istr2
+        if istr1 == istr2:
+            return istr1
+
+        # Compare strings to find smaller one
+        str1 = self._base_data.strings.get(istr1)
+        str2 = self._base_data.strings.get(istr2)
+        if self._cmp_str(self._base_data, str1, str2) < 0:
+            return istr1
+        return istr2
+
+    def next(self, idx: int) -> int:
+        """Get next index position."""
+        bt = self._bt
+        patched = self._patched
+        s = self._base_data.strings.get(idx)
+
+        def cmp(x: Tuple[int, Any]) -> int:
+            k, _ = x
+            if k == idx:
+                return 0
+            return self._cmp_str(
+                self._base_data,
+                s,
+                self._base_data.strings.get(k),
+            )
+
+        try:  # Binary search in main index
+            istr1 = bt[self._binary_search_next(bt, cmp)][0]
+        except KeyError:
+            istr1 = -1
+        try:  # Binary search in patched index
+            istr2 = patched[self._binary_search_next(patched, cmp)][0]
+        except KeyError:
+            istr2 = -1
+        # Return the lexicographically smallest
+        if istr2 == -1:
+            if istr1 == -1:
+                raise KeyError("Not found")
+            return istr1
+        if istr1 == -1:
+            return istr2
+        if istr1 == istr2:
+            return istr1
+
+        # Compare strings to find smaller one
+        str1 = self._base_data.strings.get(istr1)
+        str2 = self._base_data.strings.get(istr2)
+        if self._cmp_str(self._base_data, str1, str2) < 0:
+            return istr1
+        return istr2
+
+    class NotFound(KeyError):
+        """Exception raised when binary search fails"""
+
+        pass
+
+    def _binary_search_key_after(self, arr: List[T], cmp: Callable[[T], int]) -> int:
+        """
+        Binary search for first element where cmp(element) <= 0.
+
+        Args:
+            arr: Sorted array to search
+            cmp: Comparison function returning <0, 0, or >0
+
+        Returns:
+            Index of first element where cmp <= 0
+
+        Raises:
+            NotFound: If no such element exists
+        """
+        if not arr:
+            raise StringPersonIndex.NotFound("Array is empty")
+
+        logger = Mutil.get_child_logger(self.logger, "binary_search")
+        logger.debug(f"Starting binary search in array of length {len(arr)} {arr}")
+
+        def search(acc: Optional[int], low: int, high: int) -> int:
+            if high <= low:
+                logger.debug(f"Binary search range {low} to {high}, acc={acc}")
+                logger.debug(f"Comparing with element {arr[low]}")
+                if cmp(arr[low]) <= 0:
+                    return low
+                elif acc is None:
+                    raise StringPersonIndex.NotFound("No element found")
+                return acc
+            else:
+                mid = (low + high) // 2
+                logger.debug(
+                    f"Binary search range {low} to {high}, mid={mid}, acc={acc}"
+                )
+                logger.debug(f"Comparing with element {arr[mid]}")
+                c = cmp(arr[mid])
+                if c < 0:
+                    return search(mid, low, mid - 1)
+                elif c > 0:
+                    return search(acc, mid + 1, high)
+                else:
+                    return mid
+
+        return search(None, 0, len(arr) - 1)
+
+    def _binary_search_next(self, arr: List[T], cmp: Callable[[T], int]) -> int:
+        """
+        Binary search for first element where cmp(element) < 0.
+
+        Args:
+            arr: Sorted array to search
+            cmp: Comparison function returning <0, 0, or >0
+
+        Returns:
+            Index of first element where cmp < 0
+
+        Raises:
+            NotFound: If no such element exists
+        """
+        if not arr:
+            raise StringPersonIndex.NotFound("Array is empty")
+
+        def search(acc: Optional[int], low: int, high: int) -> int:
+            if high <= low:
+                if cmp(arr[low]) < 0:
+                    return low
+                elif acc is None:
+                    raise StringPersonIndex.NotFound("No element found")
+                return acc
+            else:
+                mid = (low + high) // 2
+                c = cmp(arr[mid])
+                if c < 0:
+                    return search(mid, low, mid - 1)
+                else:
+                    return search(acc, mid + 1, high)
+
+        return search(None, 0, len(arr) - 1)
+
+    def _binary_search(self, arr: List[T], cmp: Callable[[T], int]) -> int:
+        """
+        Standard binary search for exact match.
+
+        Args:
+            arr: Sorted array to search
+            cmp: Comparison function returning <0, 0, or >0
+
+        Returns:
+            Index of element where cmp == 0
+
+        Raises:
+            NotFound: If no exact match found
+        """
+        if not arr:
+            raise StringPersonIndex.NotFound("Array is empty")
+
+        def search(low: int, high: int) -> int:
+            if high <= low:
+                if cmp(arr[low]) == 0:
+                    return low
+                else:
+                    raise StringPersonIndex.NotFound("Element not found")
+            else:
+                mid = (low + high) // 2
+                c = cmp(arr[mid])
+                if c < 0:
+                    return search(low, mid - 1)
+                elif c > 0:
+                    return search(mid + 1, high)
+                else:
+                    return mid
+
+        return search(0, len(arr) - 1)

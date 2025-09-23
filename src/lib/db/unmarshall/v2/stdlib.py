@@ -1,9 +1,10 @@
 import dataclasses
 import enum
-import io
-import logging
 import struct
-from typing import Any, Generic, Literal, Tuple, TypeVar
+from typing import Any, Generic, Optional, TypeVar, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from lib.db.unmarshall.v2.dbdisk import RecordAccess
 
 
 # def input_value(f: io.BufferedReader, data_class: Type):
@@ -25,7 +26,41 @@ class Ref(Generic[T := TypeVar("T")]):
 
 
 class StringRef(Ref[str]):
-    pass
+    _string_registry: Any = None
+
+    def __init__(self, ref: int):
+        super().__init__(ref)
+        self._str: Optional[str] = None
+
+    @staticmethod
+    def set_record_access(strings: "RecordAccess[str]") -> None:
+        StringRef._string_registry = strings
+
+    @staticmethod
+    def get_record_access() -> Any:
+        # print(f"Getting strings: {StringRef.strings=}")
+        return StringRef._string_registry
+
+    def get_str(self):
+        if not self._str:
+            if StringRef.get_record_access() is None:
+                return f"<uninitialized>"
+            if self.ref is None:
+                return ""
+            tmp: str = StringRef.get_record_access().get(self.ref)
+            if tmp is None:
+                return f"<missing {self.ref}>"
+            self._str = str(tmp)
+        return self._str
+
+    def __str__(self):
+        return self.get_str() or "<None>"
+
+    def __repr__(self):
+        return f'StringRef(ref={self.ref}, value="{self.get_str()}")'
+
+    def __hash__(self):
+        return self.ref.__hash__()
 
 
 class TypeEnum(enum.Enum):

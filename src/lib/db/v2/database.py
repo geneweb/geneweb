@@ -37,7 +37,6 @@ from lib.db.unmarshall.v2.stdlib import Ref, StringRef
 from lib.db.v2.defs import (
     Ascend,
     BaseNotes,
-    CDate,
     Couple,
     Descend,
     Family,
@@ -148,7 +147,6 @@ class Database:
             ) = db.load_data()
             if not db.read_only:
                 db.commit_patches(persons)
-            db._dereference_strings_in_patches(patches, strings)
 
             class StringIndexImpl(StringIndex):
                 def hash(self, s: str) -> int:
@@ -169,6 +167,7 @@ class Database:
             bnotes = BaseNotes(norigin_file)
             bnotes.nread = db.read_notes
             bnotes.efiles = db.ext_files
+            StringRef.set_record_access(strings)
             base_data = dbdisk.BaseData(
                 persons=persons,
                 ascends=ascends,
@@ -195,8 +194,8 @@ class Database:
                 strings_of_fname=lookup.strings.ByFirstname(
                     db.version, db.bname, strings, patches.h_person
                 ),
-                persons_of_surname=...,
-                persons_of_first_name=...,
+                persons_of_surname=db.persons_of_surname(base_data),
+                persons_of_first_name=db.persons_of_first_name(base_data),
                 patch_person=db.patch_person,
                 patch_ascend=db.patch_ascend,
                 patch_union=db.patch_union,
@@ -398,77 +397,6 @@ class Database:
         self.pending.h_descend[0].ref = self.patches.h_descend[0].ref
         self.pending.h_string[0].ref = self.patches.h_string[0].ref
 
-    def _dereference_strings_in_patches(
-        self, patches: PatchesHT, strings: dbdisk.RecordAccess[str]
-    ) -> PatchesHT:
-        """Dereference Ref fields in patches to actual values."""
-        logger = self.logger.getChild("dereference_patches")
-        logger.debug("dereference patches")
-
-        def deref(d: Any, structure: Type) -> Dict[int, T]:
-            nonlocal patches, logger
-            logger.debug(f"deref {structure=} {type(d)=}")
-            if hasattr(structure, "__origin__"):
-                origin = structure.__origin__
-                args = structure.__args__
-                if origin is Union:
-                    if not isinstance(d, Ref):
-                        return d
-                    for arg in args:
-                        if arg is type(None):
-                            continue
-                        try:
-                            return deref(d, arg)
-                        except Exception as e:
-                            logger.debug(f"Union deref failed for {arg}: {e}")
-                    raise ValueError(f"Cannot deref union for {d} with args {args}")
-                elif origin is dict:
-                    key_type, value_type = args
-                    if key_type is not int:
-                        raise NotImplementedError(
-                            "Only int keys are supported in deref"
-                        )
-                    return {k: deref(v, value_type) for k, v in d.items()}
-                elif issubclass(origin, Tuple):
-                    logger.debug(
-                        f"origin is tuple {d=} {list((i for (i, item) in enumerate(d)))=}"
-                    )
-                    return origin(deref(item, args[i]) for (i, item) in enumerate(d))
-                elif issubclass(origin, Iterable):
-                    logger.debug(
-                        f"origin is iterable {d=} {list((i for (i, item) in enumerate(d)))=}"
-                    )
-                    return origin(deref(item, args[0]) for (i, item) in enumerate(d))
-
-                elif issubclass(origin, Ref):
-                    logger.debug(f"Dereferencing Ref: {origin=} {d=}")
-                    return d
-            elif structure is StringRef:
-                logger.debug(f"Dereferencing StringRef: {d} {patches.h_string=}")
-                if d.ref in (None, 0, 1):
-                    return ""
-                res = patches.h_string[1].get(d.ref, None) or strings.get(
-                    d.ref, safe=True
-                )
-                logger.debug(f"{res=}")
-                if res is None:
-                    return d
-                return res
-            elif hasattr(structure, "__dataclass_fields__"):
-                self.logger.debug(f"Dereferencing dataclass {structure} {d=}")
-                if d is None:
-                    return d
-                fields_name, _ = Mutil.get_dataclass_fields(structure)
-                for key in fields_name:
-                    attr = getattr(d, key)
-                    field_type = structure.__dataclass_fields__[key].type
-                    logger.debug(f"{key=} {field_type=}")
-                    setattr(d, key, deref(attr, field_type))
-                return d
-            return d
-
-        return deref(patches, PatchesHT)
-
     ############## PUBLIC ##############
 
     def read_nbp_count(self) -> int:
@@ -532,6 +460,64 @@ class Database:
             pass
 
         return files
+
+    def persons_of_surname(
+        self, base_data: dbdisk.BaseData
+    ) -> dbdisk.StringPersonIndex:
+        """Get index of persons by surname."""
+        if self.version == dbdisk.BaseVersion.GnWb0020:
+            raise NotImplementedError(
+                f"persons_of_surname not implemented for {self.version.name}"
+            )
+        return dbdisk.StringPersonIndex(
+            Dutil.compare_snames,
+            Dutil.compare_snames_id,
+            base_data,
+            (lambda p: p.surname.ref),
+            self.patches.h_person[1],
+            "snames.inx",
+            "snames.dat",
+            self.bpath,
+            logger=self.logger,
+        )
+
+    def persons_of_first_name(
+        self, base_data: dbdisk.BaseData
+    ) -> dbdisk.StringPersonIndex:
+        """Get index of persons by first name."""
+        match self.version:
+            case dbdisk.BaseVersion.GnWb0020:
+                raise NotImplementedError(
+                    f"persons_of_first_name not implemented for {self.version.name}"
+                )
+            case (
+                dbdisk.BaseVersion.GnWb0021
+                | dbdisk.BaseVersion.GnWb0022
+                | dbdisk.BaseVersion.GnWb0023
+            ):
+                return dbdisk.StringPersonIndex(
+                    Dutil.compare_snames,
+                    Dutil.compare_snames_id,
+                    base_data,
+                    (lambda p: p.first_name.ref),
+                    self.patches.h_person[1],
+                    "fnames.inx",
+                    "fnames.dat",
+                    self.bpath,
+                    logger=self.logger,
+                )
+            case dbdisk.BaseVersion.GnWb0024:
+                return dbdisk.StringPersonIndex(
+                    (lambda _, a, b: Dutil.compare_fnames(a, b)),
+                    Dutil.compare_fnames_id,
+                    base_data,
+                    (lambda p: p.first_name),
+                    self.patches.h_person[1],
+                    "fnames.inx",
+                    "fnames.dat",
+                    self.bpath,
+                    logger=self.logger,
+                )
 
     def iper_exists(self, i: int) -> bool:
         """Check if person record exists."""

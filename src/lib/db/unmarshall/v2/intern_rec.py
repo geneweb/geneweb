@@ -701,12 +701,23 @@ def convert_dict_from_buckets(
 
 
 def read_bin_caml_input_block_rec(
-    oi: OCamlInput, tag: int, size: int, logger: logging.Logger
+    oi: OCamlInput, tag: int, size: int, structure: Type, logger: logging.Logger
 ):
+    logger.debug(f"block {tag=} {size=} {structure=}")
+    sargs = getattr(structure, "__args__", [None])
+    logger.debug(f"{sargs=}")
     if tag == 0:
-        return list(read_bin_caml_input_rec(oi, logger=logger) for _ in range(size))
+        return list(
+            read_bin_caml_input_rec(oi, logger=logger, structure=sargs[0])
+            for _ in range(size)
+        )
     logger.error("non-list blocks not implemented")
-    raise NotImplementedError("Reading objects not implemented")
+    logger.warning("treat it as a list anyway")
+    # raise NotImplementedError("Reading objects not implemented") # TODO: check if that is allrights
+    return list(
+        read_bin_caml_input_rec(oi, logger=logger, structure=sargs[0])
+        for _ in range(size)
+    )
 
 
 def read_bin_caml_input_rec(
@@ -736,8 +747,9 @@ def read_bin_caml_input_rec(
             logger.debug(f"small block {tag=} {size=}")
             # s.read_block(tag, size, top_item.dest)
             # raise NotImplementedError("read_bin_caml_input not implemented yet")
-            block = read_bin_caml_input_block_rec(oi, tag, size, logger)
+            block = read_bin_caml_input_block_rec(oi, tag, size, structure, logger)
             if structure is not None:
+                logger.debug("converting block structure")
                 block = convert_structure(block, structure, logger)
             return block
         else:  # small int
@@ -792,7 +804,7 @@ def read_bin_caml_input_rec(
         tag = tag_hd(header)
         size = wosize_hd(header)
         logger.debug(f"block32 + header({tag=} {size=})")
-        block = read_bin_caml_input_block_rec(oi, tag, size, logger)
+        block = read_bin_caml_input_block_rec(oi, tag, size, structure, logger)
         if structure is not None:
             block = convert_structure(block, structure, logger)
         return block
