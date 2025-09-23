@@ -381,6 +381,8 @@ def read_bin_caml_input(
     # read a value and set it to top_item.dest
     if not logger:
         logger = Mutil.get_logger(__name__)
+    else:
+        logger = Mutil.get_child_logger(logger, "read_bin_caml_input")
     if data is None:
         data = {}
     code = oi.read_byte()
@@ -722,6 +724,9 @@ def read_bin_caml_input_rec(
     # read a value and set it to top_item.dest
     if not logger:
         logger = Mutil.get_logger(__name__)
+    else:
+        logger = Mutil.get_child_logger(logger, "read_bin_caml_input_rec")
+    logger.debug(f"read_bin_caml_input_rec {structure=}")
     code = oi.read_byte()
     logger.debug(f"{code=:#04x}")  # 0x08 block
     if code >= PREFIX_SMALL_INT:

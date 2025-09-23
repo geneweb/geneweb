@@ -55,6 +55,22 @@ def get_logger(name: str, *, log_level: int = None) -> logging.Logger:
     return logger
 
 
+def get_child_logger(logger: logging.Logger, name: str) -> logging.Logger:
+    """Get a child logger with the specified name.
+
+    Args:
+        logger (logging.Logger): Parent logger.
+        name (str): Name of the child logger.
+
+    Returns:
+        logging.Logger: Child logger instance.
+    """
+    child_logger = logger.getChild(name)
+    if child_logger.hasHandlers() and len(child_logger.handlers) > 1:
+        child_logger.removeHandler(child_logger.handlers[0])
+    return child_logger
+
+
 def get_dataclass_fields(cls: type) -> tuple[List[str], range]:
     """Get fields of a dataclass.
 

@@ -98,7 +98,7 @@ class Database:
         self.inv_idx: InvertedIndex = None
 
         # LOGGER
-        self.logger = Mutil.get_logger(__name__)
+        self.logger = Mutil.get_logger("Database")
 
     ####### STATIC #######
 

@@ -63,7 +63,7 @@ class ByName:
                 f.seek(Iovalue.WORD_SIZE)  # Skip header
                 tmp = read_bin_caml_input_rec(OCamlInput(f))
                 tmp = convert_structure(
-                    tmp, List[List[int]], logger=Mutil.get_logger("ByName")
+                    tmp, List[List[int]], logger=Mutil.get_logger("lookup.ByName")
                 )
                 self.index_cache = tmp
             return self.index_cache[idx]
