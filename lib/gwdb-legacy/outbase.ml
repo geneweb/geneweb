@@ -543,16 +543,12 @@ let initialize_lowercase_name_index ?(on_lock_error = Lock.print_try_again)
       let first_name_already_initialized =
         are_already_initialized base first_name_index_files
       in
-      let index_files, generate_index, already_initialized =
+      let generate_index, already_initialized =
         match kind with
         | `First_name ->
-            ( first_name_index_files,
-              generate_lowercase_first_name_index,
-              first_name_already_initialized )
+            (generate_lowercase_first_name_index, first_name_already_initialized)
         | `Surname ->
-            ( surname_index_files,
-              generate_lowercase_surname_index,
-              surname_already_initialized )
+            (generate_lowercase_surname_index, surname_already_initialized)
       in
       if not already_initialized then (
         let pending_index_generation =
