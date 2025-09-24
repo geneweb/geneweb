@@ -1066,15 +1066,6 @@ let exact_search_by_name_parameters =
   let on = Mutil.encode "on" in
   Config_env.of_list [ ("exact_first_name", on); ("exact_surname", on) ]
 
-let is_exact_search_by_name conf =
-  let search_by_name_mode_parameters =
-    conf.Config.env
-    |> List.filter (fun (key, _) -> is_search_by_name_mode_key key)
-    |> Config_env.of_list
-  in
-  Config_env.equal search_by_name_mode_parameters
-    exact_search_by_name_parameters
-
 let force_exact_search_by_name conf =
   let make_env env =
     Config_env.elements exact_search_by_name_parameters
