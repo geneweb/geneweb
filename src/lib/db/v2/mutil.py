@@ -45,7 +45,7 @@ def get_logger(name: str, *, log_level: int = None) -> logging.Logger:
         Formatter("(%(filename)s:%(lineno)d) - %(name)s - %(levelname)s - %(message)s")
     )
     ch.setLevel(logging.DEBUG)
-    if ch not in logger.handlers:
+    if not logger.handlers:
         logger.addHandler(ch)
     logger.propagate = False
     if log_level is not None:
