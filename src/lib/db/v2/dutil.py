@@ -1,6 +1,7 @@
 from lib.db.unmarshall.v2.dbdisk import BaseData
 from lib.db.v2 import mutil
-import lib.db.v2.caml_hash as caml_hash
+import lib.db.unmarshall.v2.hash as caml_hash
+from lib.util import name
 
 
 magic_GnWb0020 = b"GnWb0020"
@@ -22,12 +23,8 @@ def name_index(s: str) -> int:
     Returns:
         Integer hash value modulo table size
     """
-    # Convert string to lowercase and normalize
-    s_lower = s.lower()
-    # Note: Python's hash function may differ from OCaml's; for consistent results,
-
     # Hash string and take modulo to match OCaml's behavior
-    return caml_hash.hash(s_lower) % TABLE_SIZE
+    return caml_hash.hash(name.crush_lower(s)) % TABLE_SIZE
 
 
 def compare_snames(base_data: BaseData, a: str, b: str) -> int:
