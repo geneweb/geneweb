@@ -41,7 +41,7 @@ outputs:
     value: ${{ steps.collect.outputs.metric }}
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     # Timer Start
     - if: inputs.command == 'start-timer'
@@ -200,7 +200,7 @@ runs:
             else
               test_icon="✅"
             fi
-            
+
             if [ "$tests_skipped" -gt 0 ]; then
               test_display="${test_icon} ${tests_passed}+${tests_skipped}/${tests_total}"
             else

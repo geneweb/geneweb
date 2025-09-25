@@ -57,3 +57,7 @@ lib/gwlib.ml
 /_opam
 
 .direnv/
+
+# gwb files
+*.gwb
+*.gwb.gz

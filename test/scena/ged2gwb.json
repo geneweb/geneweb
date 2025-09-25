@@ -1,0 +1,74 @@
+[
+  {
+    "name": "help_display",
+    "args": ["-help"],
+    "input": "",
+    "description": "Test help output consistency"
+  },
+  {
+    "name": "basic_import",
+    "args": ["test/fixtures/basic.ged"],
+    "input": "",
+    "description": "Basic GEDCOM import without options"
+  },
+  {
+    "name": "force_overwrite",
+    "args": ["-f", "test/fixtures/basic.ged"],
+    "input": "",
+    "description": "Force overwrite existing database"
+  },
+  {
+    "name": "charset_ascii",
+    "args": ["-charset", "ASCII", "test/fixtures/basic.ged"],
+    "input": "",
+    "description": "Force ASCII charset"
+  },
+  {
+    "name": "dates_day_month",
+    "args": ["-dates_dm", "test/fixtures/dates.ged"],
+    "input": "",
+    "description": "Interpret dates as day/month format"
+  },
+  {
+    "name": "dates_month_day",
+    "args": ["-dates_md", "test/fixtures/dates.ged"],
+    "input": "",
+    "description": "Interpret dates as month/day format"
+  },
+  {
+    "name": "lowercase_firstnames",
+    "args": ["-lf", "test/fixtures/names.ged"],
+    "input": "",
+    "description": "Convert first names to lowercase with initials"
+  },
+  {
+    "name": "lowercase_surnames",
+    "args": ["-ls", "test/fixtures/names.ged"],
+    "input": "",
+    "description": "Convert surnames to lowercase with initials"
+  },
+  {
+    "name": "uppercase_surnames",
+    "args": ["-us", "test/fixtures/names.ged"],
+    "input": "",
+    "description": "Convert surnames to uppercase"
+  },
+  {
+    "name": "no_consistency_check",
+    "args": ["-nc", "test/fixtures/basic.ged"],
+    "input": "",
+    "description": "Skip consistency checks"
+  },
+  {
+    "name": "output_custom_name",
+    "args": ["-o", "custombase", "test/fixtures/basic.ged"],
+    "input": "",
+    "description": "Specify custom output database name"
+  },
+  {
+    "name": "track_gedcom_ids",
+    "args": ["-trackid", "test/fixtures/basic.ged"],
+    "input": "",
+    "description": "Print GEDCOM to GeneWeb ID mappings"
+  }
+]

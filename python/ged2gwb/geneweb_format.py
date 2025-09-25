@@ -485,12 +485,12 @@ def write_strings_index(f, strings):
 
         f.write(struct.pack('>I', offset))
 
-        offset += len(s_bytes) + 1  # +1 for null terminator
+        offset += len(s_bytes) + 1
 
     current_size = f.tell()
-    target_size = num_strings * 4 + 4  # 4 bytes per string + header
+    target_size = num_strings * 4 + 4
 
-    while f.tell() < min(target_size * 2, 500):  # Don't exceed reasonable size
+    while f.tell() < min(target_size * 2, 500):
         f.write(b'\xff\xff\xff\xff')  # OCaml-like padding pattern
 
 def create_ocaml_format_files(base_dir: str, persons, ascends, unions, families, couples, descends, strings, bnotes):
@@ -516,8 +516,6 @@ def create_ocaml_format_files(base_dir: str, persons, ascends, unions, families,
         ]
         for particle in particles:
             f.write(particle + '\n')
-
-
 
 def create_notes_files(base_dir: str, bnotes):
     """Create notes files like OCaml"""
