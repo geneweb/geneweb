@@ -26,18 +26,25 @@ class ByName:
         Returns:
             List of person IDs matching name
         """
+        logger = Mutil.get_logger("lookup.ByName")
+        logger.debug(f"Looking up persons with name '{name}'")
         # Calculate name index
         idx = Dutil.name_index(name)
+        logger.debug(f"Name index for '{name}' is {idx}")
 
         # Get array of IDs from index file
         person_ids = self._get_person_ids(idx)
+        logger.debug(f"Found person IDs from index: {person_ids}")
 
         # Check patches
         try:
+            logger.debug(f"Checking patches ({self.patches}) for index {idx}")
             patch_ids = self.patches[idx]
             # Add patched IDs that aren't already in array
+            logger.debug(f"Found patched IDs: {patch_ids}")
             return [pid for pid in patch_ids if pid not in person_ids] + person_ids
         except KeyError:
+            logger.debug(f"No patches found for index {idx}")
             return person_ids
 
     def _get_person_ids(self, idx: int) -> List[int]:
