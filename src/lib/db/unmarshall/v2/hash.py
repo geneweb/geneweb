@@ -7,34 +7,6 @@ import struct
 from typing import Any
 from collections import deque
 
-# Dummy imports - implement these later
-# from .mlvalues_ai import (
-#     # Tag_val,
-#     # Val_int,
-#     # String_tag,
-#     # Double_tag,
-#     # Double_array_tag,
-#     # Abstract_tag,
-#     # Infix_tag,
-#     # Forward_tag,
-#     # Object_tag,
-#     # Custom_tag,
-#     # Closure_tag,
-#     # Cont_tag,
-#     # Wosize,
-#     # Field,
-#     # Double_val,
-#     # Infix_offset_val,
-#     # Forward_val,
-#     # Oid_val,
-#     # cleanhd_hd,
-#     # Hd_val,
-#     # Start_env_closinfo,
-#     # Closinfo_val,
-#     # Double_flat_field,
-#     # Double_wosize,
-# )
-
 # Constants
 HASH_QUEUE_SIZE = 256
 MAX_FORWARD_DEREFERENCE = 1000
