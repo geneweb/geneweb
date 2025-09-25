@@ -24,6 +24,15 @@ def input_binary_int(f):
 class Ref(Generic[T := TypeVar("T")]):
     ref: int
 
+    def __repr__(self):
+        return super().__repr__()
+
+    def __str__(self):
+        return f"Ref({self.ref})"
+
+    def __bool__(self):
+        return self.ref is not None and self.ref >= 0
+
 
 class StringRef(Ref[str]):
     _string_registry: Any = None
@@ -61,6 +70,9 @@ class StringRef(Ref[str]):
 
     def __hash__(self):
         return self.ref.__hash__()
+
+    def __bool__(self):
+        return self.ref is not None and self._str is not None and self._str != ""
 
 
 class TypeEnum(enum.Enum):
