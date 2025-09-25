@@ -1,45 +1,73 @@
 #!/usr/bin/env python3
 
-from pprint import pprint
+from lib.db.unmarshall.v2 import dbdisk
 from lib.db.v2 import mutil
 import lib.db.v2.database as db
 import argparse
 
 
-def print_person(person: db.Person, iper, database: db.Database):
+def print_witness(witness, database: dbdisk.DskBase, indent: str = ""):
+    wid, role = witness
+    person_wit = database.data.persons.get(wid.ref, safe=True)
+    if person_wit is not None:
+        print(f"{indent}- {person_wit.first_name} {person_wit.surname} ({role})")
+    else:
+        print(f"{indent}- [ID {wid} not found] ({role})")
+
+
+def print_person(person: db.Person, iper, database: dbdisk.DskBase):
     print(f"Found Person #{iper or "?"}: {person.first_name} {person.surname}")
-    print(
-        f"  Born: {person.birth} at {person.birth_place}, Died: {person.death} at {person.death_place}"
-    )
-    for parent in person.rparents:
-        if (father := parent.r_fath) is not None:
-            try:
-                f = database.data.persons.get(father.ref)
-                print(f"  Father: {f.first_name} {f.surname}")
-            except IndexError:
-                print("  Father: [ID not found]")
-        if (mother := parent.r_moth) is not None:
-            try:
-                m = database.data.persons.get(mother.ref)
-                print(f"  Mother: {m.first_name} {m.surname}")
-            except IndexError:
-                print("  Mother: [ID not found]")
-        if (rtype := parent.r_type) is not None:
-            print(f"  Parent type: {rtype}")
-    for related in person.related:
-        try:
-            r = database.data.persons.get(related.ref)
-            print(f"  Related: {r.first_name} {r.surname}")
-        except IndexError:
-            print("  Related: [ID not found]")
-    descendants = database.data.descends.get(iper, safe=True)
-    if descendants is not None and descendants.children:
-        for child in descendants.children:
-            try:
-                c = database.data.persons.get(child.ref)
-                print(f"  Child: {c.first_name} {c.surname}")
-            except IndexError:
-                print("  Child: [ID not found]")
+
+    # print all attributes of the person instance
+    print("Person attributes:")
+    for attr, value in vars(person).items():
+        print(f"  {attr}: ", end="")
+        match attr:
+            case "related":
+                print()
+                for rel in person.related:
+                    rper = database.data.persons.get(rel.ref, safe=True)
+                    if rper is not None:
+                        print(f"  - {rper.first_name} {rper.surname}")
+                    else:
+                        print(f"  - [ID {rel.ref} not found]")
+
+            case "aliases" | "qualifiers":
+                print()
+                for alias in value:
+                    print(f"  - {alias}")
+                print("  ===")
+            case "pevents":
+                print()
+                for event in person.pevents:
+                    print(
+                        f"  - {event.epers_name} at {event.epers_place} the {event.epers_date}"
+                    )
+                    if event.epers_reason:
+                        print(f"    reason: {event.epers_reason}")
+                    if event.epers_witnesses:
+                        print("    witnesses:")
+                        for witness in event.epers_witnesses:
+                            print_witness(witness, database, "      ")
+                        print("    ---")
+                    if event.epers_note:
+                        print("    note:")
+                        print(event.epers_note)
+                        print("    ---")
+                    print("  ---")
+                print("  ===")
+            case "death":
+                if isinstance(value, tuple):
+                    print(*value)
+                else:
+                    print("<None>")
+            case "burial":
+                if isinstance(value, tuple):
+                    print(*value)
+                else:
+                    print(value)
+            case _:
+                print(f"{value}")
 
 
 if __name__ == "__main__":
@@ -70,12 +98,15 @@ if __name__ == "__main__":
         while (i := input("> ")) not in ("exit", "quit", ""):
             try:
                 try:
-                    iper = int(i)
+                    ipersons = [int(i)]
                 except ValueError:
-                    continue
+                    print(f"Looking for persons with exact name '{i}':")
+                    ipersons = database.func.persons_of_name(i)
+
                 # iper = database.func.persons_of_surname.cursor(i)
-                person = database.data.persons.get(iper)
-                print_person(person, iper, database)
+                for iper in ipersons:
+                    person = database.data.persons.get(iper)
+                    print_person(person, iper, database)
 
                 # print(f"Next person with surname starting '{i}':")
                 # iper = database.func.persons_of_surname.next(person.surname.ref)
