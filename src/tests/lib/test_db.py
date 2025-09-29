@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 
+
+import os
+
 from lib.db.unmarshall.v2 import dbdisk
-from lib.db.v2 import mutil
+from lib.db.v2 import mutil, defs
 import lib.db.v2.database as db
 import argparse
+
+import pytest
 
 
 def print_witness(witness, database: dbdisk.DskBase, indent: str = ""):
@@ -16,7 +21,7 @@ def print_witness(witness, database: dbdisk.DskBase, indent: str = ""):
 
 
 def print_person(person: db.Person, iper, database: dbdisk.DskBase):
-    print(f"Found Person #{iper or "?"}: {person.first_name} {person.surname}")
+    print(f"Found Person #{iper}: {person.first_name} {person.surname}")
 
     # print all attributes of the person instance
     print("Person attributes:")
@@ -70,6 +75,118 @@ def print_person(person: db.Person, iper, database: dbdisk.DskBase):
                 print(f"{value}")
 
 
+def test_db_open():
+    db_path = os.path.join(os.path.dirname(__file__), "test_data", "base")
+    with db.Database.open(db_path, read_only=True) as database:
+        assert database is not None
+        assert isinstance(database, dbdisk.DskBase)
+
+
+def test_nb_persons():
+    db_path = os.path.join(os.path.dirname(__file__), "test_data", "base")
+    with db.Database.open(db_path, read_only=True) as database:
+        assert database.data.persons.len == 4
+
+
+@pytest.fixture
+def base_db():
+    db_path = os.path.join(os.path.dirname(__file__), "test_data", "base")
+    with db.Database.open(db_path, read_only=True) as database:
+        yield database
+
+
+@pytest.fixture
+def base_persons(base_db):
+    yield list(base_db.data.persons.get(i) for i in range(4))
+
+
+def test_load_person_name(base_persons):
+    """Test loading of person names"""
+
+    def check_person(p: db.Person, fname: str, sname: str):
+        assert p is not None
+        assert str(p.first_name) == fname
+        assert str(p.surname) == sname
+
+    check_person(base_persons[0], "monsieur", "monsieur")
+    check_person(base_persons[1], "madame", "monsieur")
+    check_person(base_persons[2], "garçon", "monsieur")
+    check_person(base_persons[3], "fille", "monsieur")
+
+
+def test_load_person_birth(base_persons):
+    """Test loading of person birth dates"""
+
+    def check_person(p: db.Person, year: int, month: int, day: int):
+        assert p is not None
+        assert p.birth.year == year
+        assert p.birth.month == month
+        assert p.birth.day == day
+
+    check_person(base_persons[0], 1901, 1, 1)
+    check_person(base_persons[1], 1902, 2, 1)
+    check_person(base_persons[2], 1920, 1, 3)
+    check_person(base_persons[3], 1925, 1, 4)
+
+
+def test_load_death(base_persons):
+    """Test loading of person death dates"""
+
+    def check_person(p: db.Person, year: int, month: int = 0, day: int = 0):
+        assert p is not None
+        if isinstance(p.death, tuple):
+            assert p.death[1].year == year
+            assert p.death[1].month == month
+            assert p.death[1].day == day
+        if year is None:
+            assert p.death == defs.Death.NOT_DEAD
+        if year == "?":
+            assert p.death == defs.Death.DEAD_DONT_KNOW_WHEN
+
+    check_person(base_persons[0], "?")
+    check_person(base_persons[1], "?")
+    check_person(base_persons[2], "?")
+    check_person(base_persons[3], 1977, 9, 10)
+
+
+def test_load_burial(base_persons):
+    """Test loading of person burial dates"""
+
+    def check_person(p: db.Person, year: int, month: int = 0, day: int = 0):
+        assert p is not None
+        if isinstance(p.burial, tuple):
+            assert p.burial[1].year == year
+            assert p.burial[1].month == month
+            assert p.burial[1].day == day
+        if year is None:
+            assert p.burial == defs.Burial.UnknownBurial
+
+    check_person(base_persons[0], None)
+    check_person(base_persons[1], None)
+    check_person(base_persons[2], None)
+    check_person(base_persons[3], 1977, 9, 11)
+
+
+def test_load_ascendants(base_persons: list[db.Person], base_db: dbdisk.DskBase):
+    """Test loading of person ascendants"""
+    base_db
+    p3 = base_persons[3]
+
+    ascends = base_db.data.ascends.get(p3.key_index.ref)
+    assert ascends is not None
+    assert base_db.func.ifam_exists(ascends.parents.ref)
+
+
+def test_load_descendants(base_persons: list[db.Person], base_db: dbdisk.DskBase):
+    """Test loading of person descendants"""
+    p3 = base_persons[0]
+
+    descendants = base_db.data.descends.get(p3.key_index.ref)
+    assert descendants is not None
+    for child_ref in descendants.children:
+        assert base_db.func.iper_exists(child_ref.ref)
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Geneweb Database Utility")
@@ -86,7 +203,6 @@ if __name__ == "__main__":
     if args.verbose > 0:
         mutil.VERBOSE.ref = args.verbose
     with db.Database.open(args.database, read_only=True) as database:
-
         print(f"Database '{database.data.bdir}' opened successfully.")
         print(f"Version: {database.version.name}")
         print(f"Number of persons: {database.data.persons.len}")
