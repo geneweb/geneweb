@@ -208,8 +208,8 @@ class Database:
                 commit_notes=db.commit_notes,
                 commit_wiznotes=db.commit_wiznotes,
                 nb_of_real_persons=db.read_nbp_count,
-                iper_exists=db.iper_exists,
-                ifam_exists=db.ifam_exists,
+                iper_exists=db.iper_exists(persons),
+                ifam_exists=db.ifam_exists(families),
             )
             yield dbdisk.DskBase(base_data, base_func, db.version)
         finally:
@@ -287,7 +287,7 @@ class Database:
 
     @staticmethod
     def _make_record_exists(
-        patches: PatchesHT, pending: PatchesHT, length: int, i: int
+        patches: Dict[int, T], pending: Dict[int, T], length: int, i: int
     ) -> bool:
         """
         Check if a record exists in patches, pending, or within valid array bounds.
@@ -301,7 +301,12 @@ class Database:
         Returns:
             bool: True if record exists, False otherwise
         """
-        return i in pending or i in patches or (0 <= i < length)
+        print(f"length={repr(length)}, i={repr(i)}")
+        return (
+            i in (r for (r, _) in pending.items())
+            or i in (r for (r, _) in patches.items())
+            or (0 <= i < length)
+        )
 
     ############## PRIVATE ##############
 
@@ -519,20 +524,32 @@ class Database:
                     logger=self.logger,
                 )
 
-    def iper_exists(self, i: int) -> bool:
+    def iper_exists(self, persons: dbdisk.RecordAccess[Person]) -> bool:
         """Check if person record exists."""
-        return Database._make_record_exists(
-            self.patches.h_person[1], self.pending.h_person[1], self.data.persons.len, i
-        )
+        def inner(i: int) -> bool:
+            try:
+                return Database._make_record_exists(
+                    self.patches.h_person[1], self.pending.h_person[1], persons.len, i
+                )
+            except IndexError:
+                return False
 
-    def ifam_exists(self, i: int) -> bool:
+        return inner
+
+    def ifam_exists(self, families: dbdisk.RecordAccess[Family]) -> bool:
         """Check if family record exists."""
-        return Database._make_record_exists(
-            self.patches.h_family[1],
-            self.pending.h_family[1],
-            self.data.families.len,
-            i,
-        )
+        def inner(i: int) -> bool:
+            try:
+                return Database._make_record_exists(
+                    self.patches.h_family[1],
+                    self.pending.h_family[1],
+                    families.len,
+                    i,
+                )
+            except IndexError:
+                return False
+
+        return inner
 
     ####### LOAD #######
 

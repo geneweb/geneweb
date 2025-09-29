@@ -1,5 +1,5 @@
 # Testing Policy
--e ---
+---
 
 ## Generated Test Documentation
 

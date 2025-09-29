@@ -21,6 +21,9 @@ def print_witness(witness, database: dbdisk.DskBase, indent: str = ""):
 
 
 def print_person(person: db.Person, iper, database: dbdisk.DskBase):
+    if not database.func.iper_exists(iper):
+        print(f"Person ID {iper} does not exist.")
+        return
     print(f"Found Person #{iper}: {person.first_name} {person.surname}")
 
     # print all attributes of the person instance
@@ -183,8 +186,29 @@ def test_load_descendants(base_persons: list[db.Person], base_db: dbdisk.DskBase
 
     descendants = base_db.data.descends.get(p3.key_index.ref)
     assert descendants is not None
+    assert len(descendants.children) == 2
     for child_ref in descendants.children:
         assert base_db.func.iper_exists(child_ref.ref)
+
+
+def test_person_exists(base_db: dbdisk.DskBase):
+    """Test person existence check"""
+    assert base_db.func.iper_exists(0) is True
+    assert base_db.func.iper_exists(1) is True
+    assert base_db.func.iper_exists(2) is True
+    assert base_db.func.iper_exists(3) is True
+    assert base_db.func.iper_exists(4) is False
+    assert base_db.func.iper_exists(100) is False
+    assert base_db.func.iper_exists(-1) is False
+
+
+def test_family_exists(base_db: dbdisk.DskBase):
+    """Test family existence check"""
+    assert base_db.func.ifam_exists(0) is True
+    assert base_db.func.ifam_exists(1) is False
+    assert base_db.func.ifam_exists(2) is False
+    assert base_db.func.ifam_exists(100) is False
+    assert base_db.func.ifam_exists(-1) is False
 
 
 if __name__ == "__main__":

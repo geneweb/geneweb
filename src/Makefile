@@ -44,7 +44,8 @@ tests-cov:
 gen_test_doc:
 	-pytest --cov=. --cov-branch --cov-report=term-missing:skip-covered --junitxml=tests/pytest_report.log
 	sed -i '/^---/,$$d' TESTS.md
-	echo -e "---\n" >> TESTS.md
+	echo "---" >> TESTS.md
+	echo "" >> TESTS.md
 	./tests/gen_doc_all.sh >> TESTS.md
 
 .PHONY: init tests tests-cov gen_test_doc

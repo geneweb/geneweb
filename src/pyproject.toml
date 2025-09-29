@@ -16,6 +16,6 @@ requires = ["flit_core >=3.2,<4"]
 name = "gw"
 
 [tool.pytest.ini_options]
-miniversion = "6.0"
-addopts = ["-ra", "--cov=.", "--cov-branch"]
+minversion = "6.0"
+addopts = ["-ra"]
 testpaths = ["tests"]

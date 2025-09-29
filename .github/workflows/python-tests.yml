@@ -1,4 +1,4 @@
-name: Python Library Tests and Test Documentation Update
+name: Python Library Tests
 
 on:
   push:
@@ -50,7 +50,7 @@ jobs:
             echo "# Testing Policy" > TESTS.md
             echo "---" >> TESTS.md
           fi
-          grep -x -- "---" TESTS.md &> /dev/null || echo -e "\n---" >> TESTS.md
+          grep -x -- "---" TESTS.md &> /dev/null || echo "---" >> TESTS.md
           make gen_test_doc
           mv TESTS.md ../documentation/TESTING_POLICY.md
       - name: Commit and push TESTING_POLICY.md
