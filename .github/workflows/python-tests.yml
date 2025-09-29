@@ -1,4 +1,4 @@
-name: Python Tests
+name: Python Library Tests and Test Documentation Update
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
       run:
         working-directory: ./src
     steps:
-      - name: Checkout repository (only src/ and .github/workflows/)
+      - name: Checkout repository
         uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -41,7 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-cov
-          pip install -e src/
+          pip install -e .
       - name: Generate test documentation
         run: |
           if [ -f ../documentation/TESTING_POLICY.md ]; then
