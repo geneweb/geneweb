@@ -39,7 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-cov
-          pip install -e .
+          pip install -e src/
       - name: Generate test documentation
         run: |
           if [ -f ../documentation/TESTING_POLICY.md ]; then
