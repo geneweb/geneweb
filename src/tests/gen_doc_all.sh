@@ -2,13 +2,13 @@
 
 cd "$(dirname "$0")" || exit 1
 
-echo "# Test Documentation"
+echo "## Generated Test Documentation"
 echo ""
 # Loop over all test_*.py files
 for file in **/test_*.py; do
     if [[ -f "$file" ]]; then
         echo "Generating documentation for $file"
-        echo -n "## Test for: "
+        echo -n "### Test for: "
         output=$(./gen_doc.sh "$file")
         output=$(echo "$output" | sed -E '1s/^# //')
         echo "$output"
