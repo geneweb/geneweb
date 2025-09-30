@@ -1,4 +1,40 @@
-# Testing Policy
+# Test Documentation (lib)
+
+## Testing policy
+
+Our testing policy ensures that all critical functions are covered by automated tests.
+We use unit tests to verify individual components and integration tests for system-wide behavior.
+Tests are run automatically on each commit, and failures must be resolved before merging.
+Documentation for each test is generated to maintain transparency and traceability.
+
+### Writing Tests
+
+To ensure consistency and clarity, tests for the `lib` module should follow this structure:
+
+```python
+def test_<test_name_in_snake_case>():
+    """One-line summary of what the test verifies."""
+    # Test implementation goes here
+```
+
+- Place each test in the corresponding file:
+  `src/tests/lib/test_<module_name_in_snake_case>.py`
+- Use descriptive function names and docstrings to clearly state the purpose of each test.
+- Keep tests focused, isolated, and easy to maintain.
+- Follow existing conventions for setup, teardown, and assertions.
+- Review and update tests regularly to reflect changes in the codebase.
+## Pull Requests
+
+Before submitting a pull request, ensure that:
+
+- All tests pass without regressions.
+- New or modified code is covered by appropriate tests.
+- Test documentation is updated to reflect any changes.
+- The code adheres to project conventions and style guidelines.
+- The pull request description clearly explains the changes and their impact.
+
+Automated checks will run on each pull request to verify test coverage and code quality.
+
 ---
 
 ## Generated Test Documentation
