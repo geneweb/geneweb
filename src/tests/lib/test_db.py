@@ -79,6 +79,7 @@ def print_person(person: db.Person, iper, database: dbdisk.DskBase):
 
 
 def test_db_open():
+    """Test whether or not we can open a database"""
     db_path = os.path.join(os.path.dirname(__file__), "test_data", "base")
     with db.Database.open(db_path, read_only=True) as database:
         assert database is not None
@@ -86,6 +87,7 @@ def test_db_open():
 
 
 def test_nb_persons():
+    """Test whether or not we can count persons in a database"""
     db_path = os.path.join(os.path.dirname(__file__), "test_data", "base")
     with db.Database.open(db_path, read_only=True) as database:
         assert database.data.persons.len == 4

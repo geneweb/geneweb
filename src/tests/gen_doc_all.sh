@@ -2,7 +2,21 @@
 
 cd "$(dirname "$0")" || exit 1
 
+pytest_report="./pytest_report.log"
+
+suite=$(grep -oE '<testsuite name=[^>]+>' "$pytest_report")
+suite_name=$(echo "$suite" | sed -E 's/.* name="([^"]+)".*/\1/')
+suite_errors=$(echo "$suite" | sed -E 's/.*errors="([^"]+)".*/\1/')
+suite_failures=$(echo "$suite" | sed -E 's/.*failures="([^"]+)".*/\1/')
+suite_skipped=$(echo "$suite" | sed -E 's/.*skipped="([^"]+)".*/\1/')
+suite_tests=$(echo "$suite" | sed -E 's/.*tests="([^"]+)".*/\1/')
+suite_time=$(echo "$suite" | sed -E 's/.*time="([^"]+)".*/\1/')
+suite_hostname=$(echo "$suite" | sed -E 's/.*hostname="([^"]+)".*/\1/')
+suite_passed=$((suite_tests - suite_failures - suite_errors - suite_skipped))
+
 echo "## Generated Test Documentation"
+echo "> [!INFO] $suite_name@$suite_hostname ($suite_time s)<br>"
+echo "> completed: $suite_passed/$suite_tests, failed: $suite_failures, errors: $suite_errors, skipped: $suite_skipped"
 echo ""
 # Loop over all test_*.py files
 for file in **/test_*.py; do
