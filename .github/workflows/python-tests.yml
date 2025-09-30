@@ -18,6 +18,9 @@ on:
       - 'src/tests/**.py'
       - '.github/workflows/python-tests.yml'
 
+env:
+  DEFAULT_BRANCH: master
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -41,6 +44,7 @@ jobs:
           pip install pytest pytest-cov
           pip install -e .
       - name: Generate test documentation
+        if: (github.event_name == 'push' && startsWith(github.ref_name, env.DEFAULT_BRANCH)) || (github.event_name == 'pull_request')
         run: |
           if [ -f ../documentation/TESTING_POLICY.md ]; then
             cp ../documentation/TESTING_POLICY.md TESTS.md
@@ -52,6 +56,7 @@ jobs:
           make gen_test_doc
           mv TESTS.md ../documentation/TESTING_POLICY.md
       - name: Commit and push TESTING_POLICY.md
+        if: (github.event_name == 'push' && startsWith(github.ref_name, env.DEFAULT_BRANCH)) || (github.event_name == 'pull_request')
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
