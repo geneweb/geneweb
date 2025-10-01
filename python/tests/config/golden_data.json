@@ -1,0 +1,122 @@
+{
+  "description": "Données de test Golden Master - JSON pour structure précise",
+  "version": "1.0.0",
+  "consang": {
+    "description": "Tests Golden Master pour consang",
+    "test_cases": [
+      {
+        "name": "help_display",
+        "description": "Affichage de l'aide",
+        "args": ["--help"],
+        "expected_exit_code": 0,
+        "stdout_must_contain": [
+          "usage: consang",
+          "-fast",
+          "-mem",
+          "-nolock",
+          "-q",
+          "-scratch"
+        ],
+        "stderr_must_be_empty": true,
+        "timeout": 10
+      },
+      {
+        "name": "no_arguments",
+        "description": "Aucun argument fourni",
+        "args": [],
+        "expected_exit_code": 2,
+        "stdout_must_be_empty": true,
+        "stderr_must_contain": ["Missing file name"],
+        "timeout": 5
+      },
+      {
+        "name": "invalid_option_h",
+        "description": "Option -h invalide",
+        "args": ["-h"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["unknown option '-h'"],
+        "timeout": 5
+      },
+      {
+        "name": "nonexistent_file",
+        "description": "Fichier inexistant",
+        "args": ["nonexistent.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 5
+      },
+      {
+        "name": "quiet_mode",
+        "description": "Mode silencieux",
+        "args": ["-q", "test.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 5
+      },
+      {
+        "name": "very_quiet_mode",
+        "description": "Mode très silencieux",
+        "args": ["-qq", "test.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 5
+      },
+      {
+        "name": "fast_mode",
+        "description": "Mode rapide",
+        "args": ["-fast", "test.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 5
+      },
+      {
+        "name": "memory_mode",
+        "description": "Mode économie mémoire",
+        "args": ["-mem", "test.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 5
+      },
+      {
+        "name": "scratch_mode",
+        "description": "Mode from scratch",
+        "args": ["-scratch", "test.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 5
+      },
+      {
+        "name": "nolock_mode",
+        "description": "Mode sans verrouillage",
+        "args": ["-nolock", "test.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 5
+      },
+      {
+        "name": "combined_options",
+        "description": "Options combinées",
+        "args": ["-q", "-fast", "-mem", "test.gwb"],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["No such file or directory"],
+        "timeout": 10
+      },
+      {
+        "name": "empty_database_name",
+        "description": "Nom de base vide",
+        "args": [""],
+        "expected_exit_code": 2,
+        "stderr_must_contain": ["Missing file name"],
+        "timeout": 5
+      }
+    ],
+    "comparison_rules": {
+      "ignore_whitespace": true,
+      "ignore_timestamps": true,
+      "normalize_paths": true,
+      "ignore_temp_paths": true,
+      "case_sensitive": true,
+      "default_timeout": 30
+    }
+  }
+}

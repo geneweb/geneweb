@@ -1,0 +1,112 @@
+{
+  "binary": "consang",
+  "test_cases": [
+    {
+      "name": "help_display",
+      "args": ["--help"],
+      "expected": {
+        "exit_code": 0,
+        "stdout_contains": ["usage: consang", "-fast", "-mem", "-nolock", "-q", "-scratch"],
+        "stderr_empty": true
+      }
+    },
+    {
+      "name": "no_arguments",
+      "args": [],
+      "expected": {
+        "exit_code": 2,
+        "stdout_empty": true,
+        "stderr_contains": ["Missing file name"]
+      }
+    },
+    {
+      "name": "invalid_option_h",
+      "args": ["-h"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["unknown option '-h'"]
+      }
+    },
+    {
+      "name": "nonexistent_file",
+      "args": ["nonexistent.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "quiet_mode",
+      "args": ["-q", "test.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "very_quiet_mode",
+      "args": ["-qq", "test.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "fast_mode",
+      "args": ["-fast", "test.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "memory_mode",
+      "args": ["-mem", "test.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "scratch_mode",
+      "args": ["-scratch", "test.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "nolock_mode",
+      "args": ["-nolock", "test.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "combined_options",
+      "args": ["-q", "-fast", "-mem", "test.gwb"],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["No such file or directory"]
+      }
+    },
+    {
+      "name": "empty_database_name",
+      "args": [""],
+      "expected": {
+        "exit_code": 2,
+        "stderr_contains": ["Missing file name"]
+      }
+    }
+  ],
+  "comparison_rules": {
+    "ignore_whitespace": true,
+    "ignore_timestamps": true,
+    "normalize_paths": true,
+    "ignore_temp_paths": true,
+    "case_insensitive": false
+  },
+  "timeout": 30,
+  "retries": 1
+}
