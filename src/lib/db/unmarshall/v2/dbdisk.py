@@ -308,11 +308,11 @@ class BaseFunc:
 
 
 class BaseVersion(enum.Enum):
-    GnWb0020 = 0
-    GnWb0021 = 1
-    GnWb0022 = 2
-    GnWb0023 = 3
-    GnWb0024 = 4
+    GnWb0020 = b"GnWb0020"
+    GnWb0021 = b"GnWb0021"
+    GnWb0022 = b"GnWb0022"
+    GnWb0023 = b"GnWb0023"
+    GnWb0024 = b"GnWb0024"
 
 
 @dataclasses.dataclass

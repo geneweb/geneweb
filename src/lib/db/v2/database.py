@@ -12,13 +12,10 @@ from http import HTTPStatus
 from typing import (
     Dict,
     Generator,
-    Iterable,
     List,
     Tuple,
     Any,
-    Type,
     TypeVar,
-    Union,
 )
 from contextlib import contextmanager
 from lib.db.unmarshall.v2 import dbdisk
@@ -566,22 +563,16 @@ class Database:
         fname = os.path.join(self.bname, "base")
         with open(fname, "rb") as ic:
             # Detect version
-            with Mutil.checking_magic(len(Dutil.magic_GnWb0024), ic) as magic_number:
-                if magic_number == Dutil.magic_GnWb0024:
-                    self.version = dbdisk.BaseVersion.GnWb0024
-                elif magic_number == Dutil.magic_GnWb0023:
-                    self.version = dbdisk.BaseVersion.GnWb0023
-                elif magic_number == Dutil.magic_GnWb0022:
-                    self.version = dbdisk.BaseVersion.GnWb0022
-                elif magic_number == Dutil.magic_GnWb0021:
-                    self.version = dbdisk.BaseVersion.GnWb0021
-                elif magic_number == Dutil.magic_GnWb0020:
-                    self.version = dbdisk.BaseVersion.GnWb0020
-                elif magic_number[:4] == b"GnWb":
-                    self.logger.error(
-                        f"this is a GeneWeb base, but not compatible: {magic_number=}"
-                    )
-                else:
+            with Mutil.checking_magic(
+                len(dbdisk.BaseVersion.GnWb0020.value), ic
+            ) as magic_number:
+                try:
+                    self.version = dbdisk.BaseVersion(magic_number)
+                except ValueError:
+                    if magic_number[:4] == b"GnWb":
+                        raise RuntimeError(
+                            f"this is a GeneWeb base, but not compatible: {magic_number=}"
+                        )
                     raise RuntimeError(
                         "this is not a GeneWeb base, or it is a very old version"
                     )
