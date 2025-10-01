@@ -62,7 +62,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add ../documentation/TESTING_POLICY.md -f # Force add because of .gitignore
           git commit -m 'Update TESTING_POLICY.md' || echo "No changes to commit"
-          git push
+          git push origin HEAD:${{ github.ref_name }} || echo "No changes to push"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is automatically provided by GitHub Actions
 
