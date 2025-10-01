@@ -283,3 +283,11 @@ __marimo__/
 .vscode/
 
 src/TESTS.md
+
+# macos file
+.DS_Store
+*.lck
+
+# python cache
+.pytest_cache
+__pycache__
