@@ -1,0 +1,27 @@
+{
+  "stdout": "Pierre.0 DUPONT has no parents but is the child of\n- Jean Baptiste.0 DUPONT\n- Marie Jeanne.0 MARTIN\n=> added parents\n\nSophie.0 DUPONT has no parents but is the child of\n- Jean Baptiste.0 DUPONT\n- Marie Jeanne.0 MARTIN\n=> added parents\n\n",
+  "stderr": "Mode: classic, for base ./sample.gwb\n*** pass 1 (note)\n*** pass 2 (indi)\n*** pass 3 (fam)\n*** Trailer ok\n*** saving persons array\n*** saving ascends array\n*** saving unions array\n*** saving families array\n*** saving couples array\n*** saving descends array\n*** saving strings array\n*** create name index\n*** create strings of sname\n*** create strings of fname\n*** create string index\n*** create surname index\n*** create first name index\n*** ok\n",
+  "returncode": 0,
+  "output_files": {
+    "lang": "DIRECTORY_HASH:d41d8cd98f00b204e9800998ecf8427e",
+    "cnt": "DIRECTORY_HASH:d41d8cd98f00b204e9800998ecf8427e",
+    "sample.gwb": "DIRECTORY_HASH:76c493d260f20dbaeaa1fecf1141c86d",
+    "etc": "DIRECTORY_HASH:d41d8cd98f00b204e9800998ecf8427e",
+    "sample.gwb/notes": "",
+    "sample.gwb/snames.dat": "\u0000\u0000\u0000\u0003\u0000\u0000\u0000\u0003\u0000\u0000\u0000\u0002\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0001",
+    "sample.gwb/base.acc": "BINARY_MD5:da73934aa378e6e45b55b268e15f9532",
+    "sample.gwb/fnames.dat": "\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0002\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0003",
+    "sample.gwb/names.inx": "BINARY_MD5:52ee76c7f5d1da371fdbb8d794987893",
+    "sample.gwb/strings.inx": "BINARY_MD5:35a2a690bd6be615f8f590175b41d72c",
+    "sample.gwb/snames.inx": "BINARY_MD5:dadd220c4116ff62d6626c0ba5bca519",
+    "sample.gwb/fnames.inx": "BINARY_MD5:0cd88f6e3653e130dbcf54224da4d393",
+    "sample.gwb/particles.txt": "af_\nd'\nd’\ndal_\nde_\ndes_\ndi_\ndu_\nof_\nvan_\nvon_und_zu_\nvon_\ny_\nzu_\nzur_\nAF_\nD'\nD’\nDAL_\nDE_\nDES_\nDI_\nDU_\nOF_\nVAN_\nVON_UND_ZU_\nVON_\nY_\nZU_\nZUR_",
+    "sample.gwb/base": "BINARY_MD5:1417385844e52f4ff37fe8faba216c9c",
+    "sample.gwb/names.acc": "BINARY_MD5:78f572ba4eb9d848566f3a9ff5feee24",
+    "sample.gwb/wiznotes": "DIRECTORY_HASH:d41d8cd98f00b204e9800998ecf8427e",
+    "sample.gwb/notes_d": "DIRECTORY_HASH:d41d8cd98f00b204e9800998ecf8427e",
+    "etc/sample": "DIRECTORY_HASH:d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "dir_outputs": {},
+  "success": true
+}
