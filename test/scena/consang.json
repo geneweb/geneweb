@@ -1,0 +1,164 @@
+[
+  {
+    "name": "help_display",
+    "args": ["-help"],
+    "input": "",
+    "description": "Test help output consistency"
+  },
+  {
+    "name": "help_display_long",
+    "args": ["--help"],
+    "input": "",
+    "description": "Test long help option"
+  },
+  {
+    "name": "help_display_short_invalid",
+    "args": ["-h"],
+    "input": "",
+    "description": "Test short help option (should fail as -h is not recognized)"
+  },
+  {
+    "name": "no_arguments_error",
+    "args": [],
+    "input": "",
+    "description": "Test behavior with no arguments - should show missing filename error"
+  },
+  {
+    "name": "nonexistent_database",
+    "args": ["nonexistent_db"],
+    "input": "",
+    "description": "Test with non-existent database file"
+  },
+  {
+    "name": "quiet_mode_nonexistent",
+    "args": ["-q", "nonexistent_db"],
+    "input": "",
+    "description": "Test quiet mode with non-existent database"
+  },
+  {
+    "name": "very_quiet_mode_nonexistent",
+    "args": ["-qq", "nonexistent_db"],
+    "input": "",
+    "description": "Test very quiet mode with non-existent database"
+  },
+  {
+    "name": "fast_mode_nonexistent",
+    "args": ["-fast", "nonexistent_db"],
+    "input": "",
+    "description": "Test fast mode with non-existent database"
+  },
+  {
+    "name": "from_scratch_nonexistent",
+    "args": ["-scratch", "nonexistent_db"],
+    "input": "",
+    "description": "Test scratch mode with non-existent database"
+  },
+  {
+    "name": "save_memory_nonexistent",
+    "args": ["-mem", "nonexistent_db"],
+    "input": "",
+    "description": "Test memory saving mode with non-existent database"
+  },
+  {
+    "name": "no_lock_nonexistent",
+    "args": ["-nolock", "nonexistent_db"],
+    "input": "",
+    "description": "Test no lock mode with non-existent database"
+  },
+  {
+    "name": "empty_database_name",
+    "args": [""],
+    "input": "",
+    "description": "Test with empty string as database name"
+  },
+  {
+    "name": "combined_options_nonexistent",
+    "args": ["-q", "-fast", "nonexistent_db"],
+    "input": "",
+    "description": "Test combination of options with non-existent database"
+  },
+  {
+    "name": "invalid_flag_with_db",
+    "args": ["-invalid", "test_db"],
+    "input": "",
+    "description": "Test invalid flag with database name"
+  },
+  {
+    "name": "multiple_flags_nonexistent",
+    "args": ["-qq", "-mem", "-fast", "nonexistent_db"],
+    "input": "",
+    "description": "Test multiple compatible flags with non-existent database"
+  },
+  {
+    "name": "test_database_normal_mode",
+    "args": ["test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation with normal verbose output"
+  },
+  {
+    "name": "test_database_quiet_mode",
+    "args": ["-q", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation in quiet mode"
+  },
+  {
+    "name": "test_database_very_quiet_mode",
+    "args": ["-qq", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation in very quiet mode"
+  },
+  {
+    "name": "test_database_fast_mode",
+    "args": ["-fast", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation in fast mode"
+  },
+  {
+    "name": "test_database_memory_save_mode",
+    "args": ["-mem", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation in memory saving mode"
+  },
+  {
+    "name": "test_database_no_lock_mode",
+    "args": ["-nolock", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation without database locking"
+  },
+  {
+    "name": "test_database_from_scratch",
+    "args": ["-scratch", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation from scratch (recalculate all)"
+  },
+  {
+    "name": "test_database_fast_quiet_combined",
+    "args": ["-fast", "-q", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation with fast and quiet modes combined"
+  },
+  {
+    "name": "test_database_mem_very_quiet_combined",
+    "args": ["-mem", "-qq", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation with memory save and very quiet modes"
+  },
+  {
+    "name": "test_database_scratch_fast_combined",
+    "args": ["-scratch", "-fast", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation from scratch with fast mode"
+  },
+  {
+    "name": "test_database_all_performance_flags",
+    "args": ["-fast", "-mem", "-nolock", "test-consang-db"],
+    "input": "",
+    "description": "Test consanguinity calculation with all performance flags"
+  },
+  {
+    "name": "test_database_complete_workflow",
+    "args": ["-scratch", "-fast", "-q", "test-consang-db"],
+    "input": "",
+    "description": "Test complete workflow: from scratch, fast, and quiet"
+  }
+]

@@ -172,7 +172,7 @@ def parse_arguments() -> argparse.Namespace:
 def print_usage_to_stderr():
     """Print usage to stderr matching OCaml format exactly"""
     print("Usage: ged2gwb [<ged>] [options] where options are:", file=sys.stderr)
-    print("  -bd <DIR>         Specify where the \"bases\" directory with databases is installed (default if empty is \".\").", file=sys.stderr)
+    print("  -bd <DIR>         Specify where the “bases“ directory with databases is installed (default if empty is “.“).", file=sys.stderr)
     print("  -charset          [ANSEL|ASCII|MSDOS] Force given charset decoding, overriding the possible setting in GEDCOM", file=sys.stderr)
     print("  -dates_dm         Interpret months-numbered dates as day/month/year", file=sys.stderr)
     print("  -dates_md         Interpret months-numbered dates as month/day/year", file=sys.stderr)

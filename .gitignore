@@ -53,3 +53,14 @@ lib/gwlib.ml
 # gwb files
 *.gwb
 *.gwb.gz
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+# mypy
+.mypy_cache/
+.dmypy.json

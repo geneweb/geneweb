@@ -1,0 +1,132 @@
+{
+  "total_tests": 15,
+  "passed_count": 9,
+  "failed_count": 6,
+  "passed_tests": [
+    "nonexistent_database",
+    "quiet_mode_nonexistent",
+    "very_quiet_mode_nonexistent",
+    "fast_mode_nonexistent",
+    "from_scratch_nonexistent",
+    "save_memory_nonexistent",
+    "no_lock_nonexistent",
+    "combined_options_nonexistent",
+    "multiple_flags_nonexistent"
+  ],
+  "failed_tests": [
+    {
+      "test_name": "help_display",
+      "differences": [
+        "STDOUT differs"
+      ],
+      "python_result": {
+        "exit_code": 0,
+        "stdout": "usage: consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+        "stderr": ""
+      },
+      "reference": {
+        "exit_code": 0,
+        "stdout": "usage: ./distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+        "stderr": "",
+        "args": [
+          "--help"
+        ]
+      }
+    },
+    {
+      "test_name": "help_display_long",
+      "differences": [
+        "STDOUT differs"
+      ],
+      "python_result": {
+        "exit_code": 0,
+        "stdout": "usage: consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+        "stderr": ""
+      },
+      "reference": {
+        "exit_code": 0,
+        "stdout": "usage: ./distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+        "stderr": "",
+        "args": [
+          "--help"
+        ]
+      }
+    },
+    {
+      "test_name": "help_display_short_invalid",
+      "differences": [
+        "STDERR differs"
+      ],
+      "python_result": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "consang: unknown option '-h'.\n"
+      },
+      "reference": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "./distribution/gw/consang: unknown option '-h'.\nusage: ./distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+        "args": [
+          "-h"
+        ]
+      }
+    },
+    {
+      "test_name": "no_arguments_error",
+      "differences": [
+        "STDERR differs"
+      ],
+      "python_result": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "Missing file name\n"
+      },
+      "reference": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "Missing file name\nUse option -help for usage@.",
+        "args": []
+      }
+    },
+    {
+      "test_name": "empty_database_name",
+      "differences": [
+        "STDERR differs"
+      ],
+      "python_result": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "Missing file name\n"
+      },
+      "reference": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "Missing file name\nUse option -help for usage@.",
+        "args": [
+          ""
+        ]
+      }
+    },
+    {
+      "test_name": "invalid_flag_with_db",
+      "differences": [
+        "STDERR differs"
+      ],
+      "python_result": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "usage: consang [--help] [-q] [-fast] [-scratch] [-mem] [-nolock] [database]\nconsang: error: unrecognized arguments: -invalid\n"
+      },
+      "reference": {
+        "exit_code": 2,
+        "stdout": "",
+        "stderr": "./distribution/gw/consang: unknown option '-invalid'.\nusage: ./distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+        "args": [
+          "-invalid",
+          "db.gwb"
+        ]
+      }
+    }
+  ],
+  "timestamp": "unknown"
+}
