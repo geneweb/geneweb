@@ -1,8 +1,0 @@
-{
-  "stdout": "Pierre.0 DUPONT has no parents but is the child of\n- Jean Baptiste.0 DUPONT\n- Marie Jeanne.0 MARTIN\n=> added parents\n\nSophie.0 DUPONT has no parents but is the child of\n- Jean Baptiste.0 DUPONT\n- Marie Jeanne.0 MARTIN\n=> added parents\n\n",
-  "stderr": "Mode: classic, for base ./sample.gwb\n*** pass 1 (note)\n*** pass 2 (indi)\n*** pass 3 (fam)\n*** Trailer ok\n*** saving persons array\n*** saving ascends array\n*** saving unions array\n*** saving families array\n*** saving couples array\n*** saving descends array\n*** saving strings array\n*** create name index\n*** create strings of sname\n*** create strings of fname\n*** create string index\n*** create surname index\n*** create first name index\n*** ok\n",
-  "returncode": 0,
-  "success": true,
-  "output_files_count": 18,
-  "dir_outputs_count": 0
-}

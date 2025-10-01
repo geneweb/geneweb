@@ -1,8 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "The database name \"custom_name\" contains a forbidden character.\nAllowed characters: a..z, A..Z, 0..9, -\n",
-  "returncode": 2,
-  "output_files": {},
-  "dir_outputs": {},
-  "success": true
-}
