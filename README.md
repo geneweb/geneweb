@@ -1,6 +1,6 @@
 # GeneWeb
 
-[![build status](https://github.com/geneweb/geneweb/actions/workflows/ci.yml/badge.svg)](https://github.com/geneweb/geneweb/actions/workflows/ci.yml)
+[![build status](https://github.com/geneweb/geneweb/actions/workflows/ci.yml/badge.svg)](https://github.com/geneweb/geneweb/actions/workflows/ci.yml) [![Python Library Tests](https://github.com/math974/geneweb/actions/workflows/python-tests.yml/badge.svg)](https://github.com/math974/geneweb/actions/workflows/python-tests.yml)
 
 GeneWeb is an open source genealogy software written in OCaml. It comes
 with a Web interface and can be used off-line or as a Web service.
