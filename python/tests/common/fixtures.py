@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Dict, Any, List
 import subprocess
 
-from python.geneweb_common import Person, Name, Database, Family, Sex
+from python.common import Person, Name, Database, Family, Sex
 
 
 @pytest.fixture(scope="session")

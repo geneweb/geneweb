@@ -5,14 +5,15 @@ from typing import Dict, List, Optional, Set
 from dataclasses import dataclass
 import time
 
-from geneweb_common import Person, Database
-from geneweb_common.exceptions import CalculationError
+from common import Person, Database
+from common.exceptions import CalculationError
 from .database import GenewebDatabase
 
 
 @dataclass
 class CalculationResult:
     """Result of consanguinity calculation."""
+
     persons_processed: int
     persons_updated: int
     calculation_time: float
@@ -21,9 +22,14 @@ class CalculationResult:
 class ConsanguinityCalculator:
     """Calculate consanguinity coefficients using shared genealogical models."""
 
-    def __init__(self, quiet_level: int = 0, fast_mode: bool = False,
-                 from_scratch: bool = False, save_memory: bool = False,
-                 no_lock: bool = False):
+    def __init__(
+        self,
+        quiet_level: int = 0,
+        fast_mode: bool = False,
+        from_scratch: bool = False,
+        save_memory: bool = False,
+        no_lock: bool = False,
+    ):
         """Initialize calculator with options."""
         self.quiet_level = quiet_level
         self.fast_mode = fast_mode
@@ -46,7 +52,9 @@ class ConsanguinityCalculator:
             if not self.no_lock:
                 database.unlock_database()
 
-    def _perform_calculation(self, database: GenewebDatabase, start_time: float) -> CalculationResult:
+    def _perform_calculation(
+        self, database: GenewebDatabase, start_time: float
+    ) -> CalculationResult:
         """Perform the actual calculation."""
         persons_to_process = self._get_persons_to_process(database)
 
@@ -121,11 +129,15 @@ class ConsanguinityCalculator:
             # Calculate consanguinity based on common ancestors
             consanguinity = 0.0
             for ancestor_id in common_ancestors:
-                father_distance = self._get_generation_distance(father_id, ancestor_id, database.database)
-                mother_distance = self._get_generation_distance(mother_id, ancestor_id, database.database)
+                father_distance = self._get_generation_distance(
+                    father_id, ancestor_id, database.database
+                )
+                mother_distance = self._get_generation_distance(
+                    mother_id, ancestor_id, database.database
+                )
 
                 if father_distance > 0 and mother_distance > 0:
-                    coefficient = (0.5 ** (father_distance + mother_distance + 1))
+                    coefficient = 0.5 ** (father_distance + mother_distance + 1)
                     consanguinity += coefficient
 
             return consanguinity

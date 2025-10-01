@@ -1,7 +1,7 @@
 """Tests pour les modèles geneweb_common."""
 
 import pytest
-from geneweb_common.models import Name, Person, Database
+from common.models import Name, Person, Database
 
 
 @pytest.mark.unit

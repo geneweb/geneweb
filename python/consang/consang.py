@@ -4,6 +4,7 @@
 import sys
 from .cli import ConsangCLI
 
+
 def main():
     """Main entry point."""
     cli = ConsangCLI()

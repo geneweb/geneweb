@@ -1,34 +1,3 @@
-Metadata-Version: 2.4
-Name: geneweb-consang
-Version: 1.0.0
-Summary: Python implementation of genealogical consanguinity calculator
-Author: Geneweb Team
-Classifier: Development Status :: 4 - Beta
-Classifier: Intended Audience :: Science/Research
-Classifier: License :: OSI Approved :: MIT License
-Classifier: Operating System :: OS Independent
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.8
-Classifier: Programming Language :: Python :: 3.9
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Topic :: Scientific/Engineering :: Information Analysis
-Requires-Python: >=3.8
-Description-Content-Type: text/markdown
-Provides-Extra: dev
-Requires-Dist: pytest>=7.0; extra == "dev"
-Requires-Dist: pytest-cov>=4.0; extra == "dev"
-Requires-Dist: black>=22.0; extra == "dev"
-Requires-Dist: flake8>=5.0; extra == "dev"
-Requires-Dist: mypy>=1.0; extra == "dev"
-Dynamic: author
-Dynamic: classifier
-Dynamic: description
-Dynamic: description-content-type
-Dynamic: provides-extra
-Dynamic: requires-python
-Dynamic: summary
-
 # GeneWeb Python Implementation
 
 Implementation Python du module `consang` de GeneWeb avec compatibilité CLI complète avec la version OCaml.

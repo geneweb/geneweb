@@ -6,7 +6,7 @@ import os
 from typing import Optional, List
 from pathlib import Path
 
-from geneweb_common.exceptions import DatabaseError, ArgumentError
+from common.exceptions import DatabaseError, ArgumentError
 from .calculator import ConsanguinityCalculator
 from .database import GenewebDatabase
 from .exceptions import ConsangError
@@ -24,8 +24,8 @@ class ConsangCLI:
         """Return OCaml binary path for usage line if available."""
         possible_paths = [
             Path("../distribution/gw/consang"),  # From python/ directory
-            Path("./distribution/gw/consang"),   # From project root
-            Path("distribution/gw/consang")      # Relative path
+            Path("./distribution/gw/consang"),  # From project root
+            Path("distribution/gw/consang"),  # Relative path
         ]
         if os.getenv("CONSANG_OCAML_HELP") == "1":
             for path in possible_paths:
@@ -39,23 +39,18 @@ class ConsangCLI:
             prog=self.program_name,
             description="Calculate consanguinity in genealogical databases",
             formatter_class=argparse.RawDescriptionHelpFormatter,
-            add_help=False
+            add_help=False,
         )
-        parser.add_argument('-fast', action='store_true',
-                          help='faster, but use more memory')
-        parser.add_argument('-mem', action='store_true',
-                          help='Save memory, but slower when rewritting database')
-        parser.add_argument('-nolock', action='store_true',
-                          help='do not lock database.')
-        parser.add_argument('-q', action='count', default=0,
-                          help='quiet mode')
-        parser.add_argument('-scratch', action='store_true',
-                          help='from scratch')
-        parser.add_argument('--help', action='store_true',
-                          help='show this help message and exit')
+        parser.add_argument("-fast", action="store_true", help="faster, but use more memory")
+        parser.add_argument(
+            "-mem", action="store_true", help="Save memory, but slower when rewritting database"
+        )
+        parser.add_argument("-nolock", action="store_true", help="do not lock database.")
+        parser.add_argument("-q", action="count", default=0, help="quiet mode")
+        parser.add_argument("-scratch", action="store_true", help="from scratch")
+        parser.add_argument("--help", action="store_true", help="show this help message and exit")
 
-        parser.add_argument('database', nargs='?',
-                          help='database file name')
+        parser.add_argument("database", nargs="?", help="database file name")
 
         return parser
 
@@ -78,7 +73,7 @@ class ConsangCLI:
         print(f"{program_label}: unknown option '{option}'.", file=sys.stderr)
 
         # For -h specifically, show help after error (OCaml behavior)
-        if option == '-h':
+        if option == "-h":
             print(self._format_help_message(), file=sys.stderr)
         return 2
 
@@ -101,9 +96,9 @@ class ConsangCLI:
         if not args:
             return self._show_missing_filename_error()
 
-        if '-h' in args:
-            return self._handle_invalid_option('-h')
-        if '-help' in args or '--help' in args:
+        if "-h" in args:
+            return self._handle_invalid_option("-h")
+        if "-help" in args or "--help" in args:
             return self._show_help()
 
         try:
@@ -128,14 +123,16 @@ class ConsangCLI:
                 fast_mode=parsed_args.fast,
                 from_scratch=parsed_args.scratch,
                 save_memory=parsed_args.mem,
-                no_lock=parsed_args.nolock
+                no_lock=parsed_args.nolock,
             )
 
             database = GenewebDatabase(parsed_args.database)
             result = calculator.calculate(database)
 
             if parsed_args.q == 0:  # Not quiet
-                print(f"Processed {result.persons_processed} persons in {result.calculation_time:.2f}s")
+                print(
+                    f"Processed {result.persons_processed} persons in {result.calculation_time:.2f}s"
+                )
 
             try:
                 if result.persons_processed == 0 and database.total_persons == 0:

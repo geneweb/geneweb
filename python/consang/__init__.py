@@ -12,9 +12,16 @@ from .calculator import ConsanguinityCalculator, CalculationResult
 from .database import GenewebDatabase
 from .cli import ConsangCLI
 from .exceptions import ConsangError, CalculationError, DatabaseLockError
-from geneweb_common.exceptions import ArgumentError, DatabaseError
+from common.exceptions import ArgumentError, DatabaseError
 
 __all__ = [
-    "ConsanguinityCalculator", "CalculationResult", "GenewebDatabase", "ConsangCLI",
-    "ConsangError", "CalculationError", "DatabaseLockError", "ArgumentError", "DatabaseError"
+    "ConsanguinityCalculator",
+    "CalculationResult",
+    "GenewebDatabase",
+    "ConsangCLI",
+    "ConsangError",
+    "CalculationError",
+    "DatabaseLockError",
+    "ArgumentError",
+    "DatabaseError",
 ]

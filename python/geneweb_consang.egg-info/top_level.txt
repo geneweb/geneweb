@@ -1,4 +1,0 @@
-consang
-ged2gwb
-geneweb_common
-tests

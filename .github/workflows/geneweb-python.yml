@@ -1,0 +1,165 @@
+name: Test Pipeline Geneweb Python
+
+on:
+  push:
+    branches: [master, dev]
+    paths:
+      - 'python/**'
+      - 'tests/**'
+      - '.github/workflows/golden-master-pipeline.yml'
+  workflow_dispatch:
+
+jobs:
+  test-geneweb-python:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ocaml-nox \
+            opam \
+            build-essential \
+            m4 \
+            pkg-config \
+            libssl-dev \
+            libgmp-dev \
+            zlib1g-dev \
+            xdot \
+            graphviz \
+            perl \
+            libcurl4-openssl-dev \
+            libpcre3-dev
+
+      - name: Setup OCaml and OPAM
+        run: |
+          opam init --disable-sandboxing --yes --auto-setup
+          eval $(opam env)
+          echo "=== Installing base OCaml tools ==="
+          opam install --yes --assume-depexts dune
+
+      - name: Install GeneWeb dependencies
+        run: |
+          eval $(opam env)
+          echo "=== Installing exact GeneWeb dependencies ==="
+          opam install --yes --assume-depexts \
+            uri \
+            camlzip \
+            camlp5 \
+            digestif \
+            camlp-streams \
+            jingoo \
+            ocamlfind \
+            ppx_import \
+            ppx_deriving \
+            re \
+            fmt \
+            pp_loc \
+            uunf \
+            markup \
+            yojson \
+            unidecode \
+            calendars
+
+      - name: Configure and Build GeneWeb
+        run: |
+          eval $(opam env)
+          echo "=== OCaml environment ==="
+          ocaml -version
+          echo "=== Running configure ==="
+          ocaml ./configure.ml
+          echo "=== Building GeneWeb ==="
+          make clean
+          make distrib
+
+      - name: Install Python dependencies
+        run: |
+          cd python
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pip install -e .
+
+      - name: Setup Python development environment
+        run: |
+          cd python
+          echo "Setting up development environment..."
+          make dev-setup
+
+      - name: Run Python tests using Makefile
+        run: |
+          cd python
+          echo "Running all Python tests using Makefile..."
+
+          make test-all
+
+          # Generate coverage report
+          make coverage || echo "Coverage generation completed"
+
+      - name: Run specific test categories
+        run: |
+          cd python
+          echo "Running specific test categories..."
+
+          # Run unit tests
+          make test-unit || echo "Unit tests completed"
+
+          # Run integration tests
+          make test-integration || echo "Integration tests completed"
+
+          # Run compatibility tests
+          make test-compatibility || echo "Compatibility tests completed"
+
+          # Run performance tests
+          make benchmark || echo "Performance tests completed"
+
+      - name: Verify Python package installation
+        run: |
+          echo "=== Verifying Python package ==="
+          cd python
+          make status
+
+      - name: Code quality checks
+        run: |
+          cd python
+          echo "Running code quality checks..."
+
+          # Check code style
+          make lint || echo "Linting completed"
+
+          # Format code (dry run)
+          make format || echo "Formatting check completed"
+
+      - name: Generate comprehensive test report
+        if: always()
+        run: |
+          echo "=== Comprehensive Test Summary ==="
+          cd python
+
+          # Use Makefile status command
+          make status
+
+          echo "OCaml binaries: $(ls ../distribution/gw/ 2>/dev/null | wc -l) found"
+          echo "Fixture files: $(find ../tests/ tests/ -name '*.ged' 2>/dev/null | wc -l) GED files"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: comprehensive-test-results
+          path: |
+            python/tests/reports/
+            python/tests/
+            tests/
+            distribution/gw/
+          retention-days: 30

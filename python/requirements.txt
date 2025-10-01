@@ -1,5 +1,19 @@
+# Testing dependencies
 pytest>=7.0.0
 pytest-cov>=4.0.0
-click>=8.0.0
-requests>=2.28.0
-setuptools>=65.0.0
+pytest-html>=3.1.0
+pytest-benchmark>=4.0.0
+
+# Development dependencies
+black>=22.0.0
+flake8>=5.0.0
+isort>=5.10.0
+
+# Data processing
+PyYAML>=6.0
+
+# Optional: for watch mode
+pytest-watch>=4.2.0
+
+# Optional: for advanced testing
+pytest-xdist>=3.0.0

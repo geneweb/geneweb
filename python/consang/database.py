@@ -1,13 +1,12 @@
 """Database interface for consanguinity calculations."""
 
-from typing import List, Optional, Set, Dict, Any
+from typing import List, Optional, Dict, Any
 from pathlib import Path
 import fcntl
 import os
 
-from geneweb_common import Person, Database
-from geneweb_common.exceptions import DatabaseError
-from .exceptions import ConsangError
+from common import Person
+from common.exceptions import DatabaseError
 
 
 class GenewebDatabase:
@@ -49,7 +48,7 @@ class GenewebDatabase:
             "exists": self.database_path.exists(),
             "is_directory": self.database_path.is_dir() if self.database_path.exists() else False,
             "total_persons": 0,
-            "needs_calculation": 0
+            "needs_calculation": 0,
         }
 
         if info["exists"] and info["is_directory"]:
@@ -73,19 +72,19 @@ class GenewebDatabase:
             return 0
 
     def get_persons_needing_calculation(self) -> List[Any]:
-      """Get persons needing consanguinity calculation."""
-      try:
-        all_persons = self.get_all_persons()
-        # Filter persons needing calculation based on a specific condition
-        # Here, we simulate by checking if the 'consanguinity' attribute is None
-        persons_needing_calc = [
-          person for person in all_persons if getattr(person, "consanguinity", None) is None
-        ]
-        return persons_needing_calc
-      except Exception as e:
-        # Log or handle the exception as needed
-        # For now, return an empty list on error
-        return []
+        """Get persons needing consanguinity calculation."""
+        try:
+            all_persons = self.get_all_persons()
+            # Filter persons needing calculation based on a specific condition
+            # Here, we simulate by checking if the 'consanguinity' attribute is None
+            persons_needing_calc = [
+                person for person in all_persons if getattr(person, "consanguinity", None) is None
+            ]
+            return persons_needing_calc
+        except Exception as e:
+            # Log or handle the exception as needed
+            # For now, return an empty list on error
+            return []
 
     def get_all_persons(self) -> List[Any]:
         """Get all persons from database."""
@@ -95,8 +94,8 @@ class GenewebDatabase:
         """Lock database for exclusive access."""
         try:
             lock_path = self.database_path / "lock"
-            self._lock_file = open(lock_path, 'w')
-            if os.name != 'nt':  # Unix-like systems
+            self._lock_file = open(lock_path, "w")
+            if os.name != "nt":  # Unix-like systems
                 fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
             self._is_locked = True
         except (IOError, OSError) as e:
@@ -112,7 +111,7 @@ class GenewebDatabase:
         """Unlock database."""
         if self._lock_file and self._is_locked:
             try:
-                if os.name != 'nt':  # Unix-like systems
+                if os.name != "nt":  # Unix-like systems
                     fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_UN)
                 self._lock_file.close()
                 self._is_locked = False
