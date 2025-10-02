@@ -1216,7 +1216,7 @@ let make_conf from_addr request script_name env =
       access_by_key =
         (match List.assoc_opt "access_by_key" base_env with
         | Some access_by_key -> access_by_key = "yes"
-        | None -> ar.ar_wizard && ar.ar_friend);
+        | None -> true);
       private_years =
         Option.value ~default:150
           (Option.bind
