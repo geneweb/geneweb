@@ -36,5 +36,4 @@ val exact_matching_surname_aliases :
 val prefix_matching_surname_aliases :
   surname:string -> aliases:string list -> string list
 
-val is_exact_search_by_name : Config.config -> bool
 val force_exact_search_by_name : Config.config -> Config.config
