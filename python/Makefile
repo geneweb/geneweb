@@ -44,10 +44,6 @@ test-integration:
 test-compatibility: ## Run OCaml vs Python compatibility tests
 	@echo "$(YELLOW)Running compatibility tests...$(NC)"
 	$(PYTEST) $(TEST_DIR)/ -k "compatibility" -v --tb=short
-	@if [ -f "$(SCRIPTS_DIR)/run_compatibility_tests.sh" ]; then \
-		chmod +x $(SCRIPTS_DIR)/run_compatibility_tests.sh; \
-		$(SCRIPTS_DIR)/run_compatibility_tests.sh; \
-	fi
 	@echo "$(GREEN)Compatibility tests completed$(NC)"
 
 test-hybrid: ## Run complete hybrid test suite
