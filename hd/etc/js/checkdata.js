@@ -1,16 +1,23 @@
 const CheckData = (() => {
   'use strict';
   
-  // Cache DOM et constantes
   const CACHE = new WeakMap();
   const VALIDATING = new Set();
   const RAF = requestAnimationFrame;
   
-  // Cache des éléments fréquemment accédés
   let _container = null;
   let _okTitle = '';
+  let _errorsCache = null;
+  let _cacheInvalid = true;
   
-  // Optimisation: pré-compiler les sélecteurs
+  const CONFIG = {
+    TEXTAREA_THRESHOLD: 115,
+    NAV_DELAY: 300,
+    POLL_INTERVAL: 500,
+    MAX_POLLS: 120,
+    NOTIFY_DURATION: 4000
+  };
+  
   const SELECTORS = {
     err: '.err',
     editContainer: '.edit-container',
@@ -24,41 +31,14 @@ const CheckData = (() => {
     editing: 'editing'
   };
 
-  const initButtons = () => {
-    if (!_container) return;
-    
-    qa(SELECTORS.bk, _container).forEach(btn => {
-      if (!btn.dataset.init) {
-        btn.className = 'bk btn btn-primary';
-        btn.innerHTML = '<i class="fa fa-book fa-xs"></i>';
-        btn.dataset.init = '1';
-      }
-    });
-    
-    qa(SELECTORS.pl, _container).forEach(btn => {
-      if (!btn.dataset.init) {
-        btn.className = 'pl btn btn-success';
-        btn.innerHTML = '<i class="fa fa-users fa-xs"></i>';
-        btn.target = '_blank';
-        btn.dataset.init = '1';
-      }
-    });
-    
-    qa(SELECTORS.s2, _container).forEach(btn => {
-      if (!btn.dataset.init) {
-        btn.classList.add('btn', 'btn-info');
-        btn.target = '_blank';
-        if (!btn.innerHTML.includes('<i')) {
-          btn.innerHTML = '<i class="fa fa-check"></i>';
-        }
-        btn.dataset.init = '1';
-      }
-    });
-  };
-
-  // Fonctions utilitaires optimisées (éviter confusion avec jQuery)
   const q = (sel, ctx) => (ctx || document).querySelector(sel);
   const qa = (sel, ctx) => Array.from((ctx || document).querySelectorAll(sel));
+  
+  const sanitize = str => {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  };
   
   const isVisible = el => {
     if (!el) return false;
@@ -66,7 +46,50 @@ const CheckData = (() => {
     return s.visibility !== 'hidden' && s.display !== 'none';
   };
 
-  // Gestion des champs d'édition
+  const getUrlParams = href => {
+    const url = new URL(href);
+    return {
+      k: url.searchParams.get('k'),
+      s: url.searchParams.get('s'),
+      s2: url.searchParams.get('s2')
+    };
+  };
+
+  const invalidateCache = () => { _cacheInvalid = true; };
+
+  const getAllErrors = () => {
+    if (_cacheInvalid) {
+      _errorsCache = _container ? qa(SELECTORS.err, _container) : [];
+      _cacheInvalid = false;
+    }
+    return _errorsCache;
+  };
+
+  const initButtons = () => {
+    if (!_container) return;
+    
+    const buttonConfigs = [
+      { sel: SELECTORS.bk, cls: 'btn btn-primary', 
+        icon: 'fa-book fa-xs' },
+      { sel: SELECTORS.pl, cls: 'btn btn-success', 
+        icon: 'fa-users fa-xs', target: true },
+      { sel: SELECTORS.s2, cls: 'btn btn-info', 
+        icon: 'fa-check', target: true }
+    ];
+    
+    buttonConfigs.forEach(cfg => {
+      qa(cfg.sel, _container).forEach(btn => {
+        if (btn.dataset.init) return;
+        btn.className = cfg.sel.slice(1) + ' ' + cfg.cls;
+        if (!btn.innerHTML.includes('<i')) {
+          btn.innerHTML = `<i class="fa ${cfg.icon}"></i>`;
+        }
+        if (cfg.target) btn.target = '_blank';
+        btn.dataset.init = '1';
+      });
+    });
+  };
+
   const createField = (isTextarea, value) => {
     const f = document.createElement(isTextarea ? 'textarea' : 'input');
     f.className = 'form-control';
@@ -81,21 +104,21 @@ const CheckData = (() => {
     
     const orig = document.createElement('div');
     orig.className = 'original-content';
-    orig.innerHTML = btn.innerHTML;
+    orig.textContent = btn.textContent;
     
     c.appendChild(orig);
     c.appendChild(field);
-    CACHE.set(c, { btn });
+    CACHE.set(c, { btn: btn.cloneNode(true) });
     
     return c;
   };
 
-  // Handlers optimisés
   const handleClick = e => {
     const t = e.target;
     const err = t.closest(SELECTORS.err);
     
-    if (err?.classList.contains(SELECTORS.disabled) && !t.closest(SELECTORS.s2)) {
+    if (err?.classList.contains(SELECTORS.disabled) && 
+        !t.closest(SELECTORS.s2)) {
       e.preventDefault();
       return;
     }
@@ -126,7 +149,7 @@ const CheckData = (() => {
     if (key !== 'ArrowDown' && key !== 'ArrowUp') return;
     
     const err = document.activeElement?.closest(SELECTORS.err);
-    if (err && !$(SELECTORS.editContainer, err)) {
+    if (err && !q(SELECTORS.editContainer, err)) {
       e.preventDefault();
       navigate(err, key === 'ArrowUp');
     }
@@ -135,11 +158,11 @@ const CheckData = (() => {
   const handlePersonList = btn => {
     const err = btn.closest(SELECTORS.err);
     const s2Btn = q(SELECTORS.s2, err);
-    const s2Url = new URL(s2Btn.href);
-    const d = s2Url.searchParams.get('d');
-    const s = s2Url.searchParams.get('s'); 
-    const k = s2Url.searchParams.get('k');
-    const baseUrl = `${s2Url.origin}${s2Url.pathname}`;
+    const url = new URL(s2Btn.href);
+    const d = url.searchParams.get('d');
+    const s = url.searchParams.get('s');
+    const k = url.searchParams.get('k');
+    const baseUrl = `${url.origin}${url.pathname}`;
     const newUrl = `${baseUrl}?m=CHK_DATA_L&data=${d}&k=${s}&key=${k}`;
     window.open(newUrl, '_blank');
   };
@@ -158,7 +181,9 @@ const CheckData = (() => {
     
     err.classList.add(SELECTORS.editing);
     
-    const field = createField(val.length > 115 || val.includes('\n'), val);
+    const useTextarea = val.length > CONFIG.TEXTAREA_THRESHOLD || 
+                        val.includes('\n');
+    const field = createField(useTextarea, val);
     const container = createContainer(btn, field);
     
     btn.replaceWith(container);
@@ -166,18 +191,16 @@ const CheckData = (() => {
     RAF(() => {
       field.focus();
       field.setSelectionRange(val.length, val.length);
-      if (field.tagName === 'TEXTAREA' && window.autosize) autosize(field);
+      if (useTextarea && window.autosize) autosize(field);
     });
     
     setupField(field, container, s2, val, hidden);
   };
 
   const setupField = (field, container, s2, origVal, wasHidden) => {
-    // Cache des attributs
     const attrs = { href: s2?.href, title: s2?.title || '' };
     let stored = false;
     
-    // Input handler optimisé
     const handleInput = () => {
       if (!s2) return;
       
@@ -208,7 +231,6 @@ const CheckData = (() => {
       });
     };
     
-    // Keyboard handler optimisé
     const handleKey = e => {
       const key = e.key;
       const err = container.closest(SELECTORS.err);
@@ -228,11 +250,11 @@ const CheckData = (() => {
       }
     };
     
-    // Blur handler
     const handleBlur = e => {
       if (e.relatedTarget === s2) return;
       setTimeout(() => {
-        if (document.activeElement !== field && document.activeElement !== s2) {
+        if (document.activeElement !== field && 
+            document.activeElement !== s2) {
           cancelEdit(container, s2, wasHidden);
         }
       }, 200);
@@ -252,7 +274,7 @@ const CheckData = (() => {
     const cache = CACHE.get(container);
     if (cache?.btn && container.parentNode) {
       try {
-        container.replaceWith(cache.btn.cloneNode(true));
+        container.replaceWith(cache.btn);
       } catch {}
     }
     
@@ -276,7 +298,7 @@ const CheckData = (() => {
       }
     }
     
-    const all = qa(SELECTORS.err);
+    const all = getAllErrors();
     const idx = all.indexOf(current);
     const step = goUp ? -1 : 1;
     
@@ -307,10 +329,48 @@ const CheckData = (() => {
     });
   };
 
+  const handleValidationResult = (result, errEl, s2, orig, val) => {
+    if (!result) {
+      console.error('Invalid validation result:', result);
+      notify('error', 'Erreur: données de validation invalides');
+      return;
+    }
+    if (result.success) {
+      notify('success', `✓ ${result.message}`);
+      completeValidation(errEl, s2, result.after || val);
+      
+      if (result.nb_modified !== null && result.elapsed_time !== null) {
+        const statsDiv = document.createElement('div');
+        statsDiv.className = 'small text-center mr-2';
+        statsDiv.textContent = `+${result.nb_modified}`;
+        statsDiv.insertAdjacentHTML('beforeend', '<br>');
+        statsDiv.insertAdjacentText('beforeend', 
+                                    `${result.elapsed_time.toFixed(1)} s`);
+        
+        const s2Btn = errEl.querySelector('.s2');
+        if (s2Btn) errEl.insertBefore(statsDiv, s2Btn);
+      }
+      
+      setTimeout(() => navigate(errEl), CONFIG.NAV_DELAY);
+    } else {
+      notify('error', `✗ ${result.message}`);
+      s2.innerHTML = '<i class="fa fa-exclamation-triangle"></i>';
+      s2.className = 's2 btn btn-danger';
+      s2.title = result.message;
+      
+      setTimeout(() => {
+        s2.innerHTML = orig;
+        s2.className = 's2 btn btn-warning';
+      }, 2000);
+    }
+  };
+
   const validateEntry = async (s2, errEl) => {
     if (!s2 || !errEl) return;
     
+    const { k, s, s2: s2Val } = getUrlParams(s2.href);
     const key = s2.href;
+    
     if (VALIDATING.has(key)) return;
     VALIDATING.add(key);
     
@@ -342,39 +402,41 @@ const CheckData = (() => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       
       const res = await r.json();
+      handleValidationResult(res, errEl, s2, orig, val);
       
-      if (res.success) {
-        notify('success', `✓ ${res.message}`);
-        completeValidation(errEl, s2, res.after || val);
-        
-        if (res.nb_modified !== null && res.elapsed_time !== null) {
-          const statsDiv = document.createElement('div');
-          statsDiv.className = 'small text-center mr-2';
-          statsDiv.innerHTML = `+${res.nb_modified}<br>${res.elapsed_time.toFixed(1)} s`;
-          
-          const s2Btn = errEl.querySelector('.s2');
-          if (s2Btn) {
-            errEl.insertBefore(statsDiv, s2Btn);
-          }
-        }
-        
-        setTimeout(() => navigate(errEl), 300);
-      } else {
-        notify('error', `✗ ${res.message}`);
-        s2.innerHTML = '<i class="fa fa-exclamation-triangle"></i>';
-        s2.className = 's2 btn btn-danger';
-        s2.title = res.message;
-        
-        setTimeout(() => {
-          s2.innerHTML = orig;
-          s2.className = 's2 btn btn-warning';
-        }, 2000);
-      }
     } catch (e) {
       console.error('AJAX error:', e);
       s2.innerHTML = orig;
       s2.className = 's2 btn btn-warning';
-      window.open(s2.href, '_blank');
+      
+      const validationKey = `chk_validation_${k}_${s}_${s2Val}`;
+      localStorage.removeItem(validationKey);
+      
+      const popup = window.open(s2.href, '_blank');
+      
+      let pollCount = 0;
+      const checkInterval = setInterval(() => {
+        pollCount++;
+        const result = localStorage.getItem(validationKey);
+        
+        if (result) {
+          clearInterval(checkInterval);
+          localStorage.removeItem(validationKey);
+          
+          try {
+            const data = JSON.parse(result);
+            handleValidationResult(data, errEl, s2, orig, val);
+            
+            if (popup && !popup.closed) popup.close();
+          } catch (parseError) {
+            console.error('Parse error:', parseError);
+          }
+        } else if (pollCount >= CONFIG.MAX_POLLS) {
+          clearInterval(checkInterval);
+          localStorage.removeItem(validationKey);
+          notify('error', 'Timeout: validation non reçue');
+        }
+      }, CONFIG.POLL_INTERVAL);
     } finally {
       VALIDATING.delete(key);
     }
@@ -387,49 +449,60 @@ const CheckData = (() => {
       s2.style.pointerEvents = 'none';
       s2.style.visibility = 'visible';
       
-      let c = q(SELECTORS.editContainer, errEl);
+      const c = q(SELECTORS.editContainer, errEl);
       const btn = q(SELECTORS.button, errEl);
       
-      if (c) {
-        const f = q(SELECTORS.inputField, c);
-        if (f && val) {
-          const txt = document.createElement('div');
-          txt.className = 'text-muted';
-          txt.textContent = val;
-          f.replaceWith(txt);
-        }
-      } else if (btn && val) {
-        c = document.createElement('div');
-        c.className = SELECTORS.editContainer.slice(1);
-        
-        const orig = document.createElement('div');
-        orig.className = 'original-content';
-        orig.innerHTML = btn.innerHTML;
-        c.appendChild(orig);
-        
+      const createValidatedText = () => {
         const txt = document.createElement('div');
         txt.className = 'text-muted';
         txt.textContent = val;
-        c.appendChild(txt);
+        return txt;
+      };
+      
+      if (c) {
+        const f = q(SELECTORS.inputField, c);
+        if (f && val) f.replaceWith(createValidatedText());
+      } else if (btn && val) {
+        const newC = document.createElement('div');
+        newC.className = SELECTORS.editContainer.slice(1);
         
-        btn.replaceWith(c);
+        const orig = document.createElement('div');
+        orig.className = 'original-content';
+        orig.textContent = btn.textContent;
+        newC.appendChild(orig);
+        newC.appendChild(createValidatedText());
+        
+        btn.replaceWith(newC);
       }
       
       errEl.classList.add(SELECTORS.disabled, SELECTORS.validated);
       errEl.classList.remove(SELECTORS.editing);
+      invalidateCache();
     });
   };
 
-  const notify = (type, msg, duration = 4000) => {
+  const notify = (type, msg, duration = CONFIG.NOTIFY_DURATION) => {
     qa('.ajax-notification').forEach(n => n.remove());
     
     const n = document.createElement('div');
-    n.className = `alert alert-${type === 'success' ? 'success' : 'danger'} ajax-notification`;
-    n.innerHTML = `
-      <div class="d-flex align-items-center">
-        <span class="flex-grow-1">${msg}</span>
-        <button type="button" class="close ml-2">&times;</button>
-      </div>`;
+    n.className = 
+      `alert alert-${type === 'success' ? 'success' : 'danger'} ajax-notification`;
+    
+    const content = document.createElement('div');
+    content.className = 'd-flex align-items-center';
+    
+    const msgSpan = document.createElement('span');
+    msgSpan.className = 'flex-grow-1';
+    msgSpan.innerHTML = msg;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'close ml-2';
+    closeBtn.innerHTML = '&times;';
+    
+    content.appendChild(msgSpan);
+    content.appendChild(closeBtn);
+    n.appendChild(content);
     
     const remove = () => {
       n.classList.add('removing');
@@ -437,7 +510,7 @@ const CheckData = (() => {
     };
     
     const t = setTimeout(remove, duration);
-    q('.close', n).onclick = () => {
+    closeBtn.onclick = () => {
       clearTimeout(t);
       remove();
     };
@@ -445,15 +518,12 @@ const CheckData = (() => {
     document.body.appendChild(n);
   };
 
-  // Fonctions publiques
   return {
     init() {
-      // Initialiser les fonctions qui doivent marcher même sans résultats
       this.initToggles();
       this.initMaxValidation();
       this.preserveScroll();
       
-      // Initialiser le container et les handlers seulement s'il existe
       _container = q('#cd');
       if (!_container) return;
       
@@ -461,7 +531,6 @@ const CheckData = (() => {
       
       initButtons();
       
-      // Event delegation pour les résultats
       _container.addEventListener('click', handleClick, { passive: false });
       _container.addEventListener('keydown', handleKeydown, { passive: false });
     },

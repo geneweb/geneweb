@@ -4508,6 +4508,10 @@ fr: espaces insécables
 en: error types
 fr: types d’erreur
 
+    chk_data keyboard navigation tooltip
+en: use up/down arrow keys to quickly navigate between answers
+fr: utiliser les touches directionnelles haut/bas pour naviguer rapidement entre les réponses
+
     chk_data limit reached
 en: limit reached
 fr: limite atteinte
@@ -6812,6 +6816,31 @@ pt: cremação
 ru: кремация
 sv: kremering
 tr: ölü yakma
+
+current value
+bg: текуща стойност
+br: talvoud red
+ca: valor actual
+cs: aktuální hodnota
+da: nuværende værdi
+de: aktueller Wert
+en: current value
+eo: nuna valoro
+es: valor actual
+et: praegune väärtus
+fi: nykyinen arvo
+fr: valeur actuelle
+he: ערך נוכחי
+is: núverandi gildi
+it: valore attuale
+lv: pašreizējā vērtība
+nl: huidige waarde
+no: nåværende verdi
+pl: obecna wartość
+pt: valor atual
+pt-br: valor atual
+ru: текущее значение
+sv: nuvarande värde
 
     custom event
 co: evenimentu persunalizatu
