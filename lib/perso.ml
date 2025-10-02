@@ -51,7 +51,12 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     | [] -> (Driver.Istr.empty, [])
     | place :: places_tl -> (place, places_tl)
   in
-  let acc = safe_html (Driver.sou base title ^ " " ^ Driver.sou base place) in
+  let place_str = Driver.sou base place in
+  let title_str = Driver.sou base title in
+  let acc =
+    safe_html
+      (if place_str = "" then title_str else title_str ^ " " ^ place_str)
+  in
   let href place s =
     if link then
       let href =
