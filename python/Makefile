@@ -25,18 +25,18 @@ install: ## Install Python consang package
 	pip install -e .
 	@echo "$(GREEN)Installation completed$(NC)"
 
-dev-setup: ## Setup development environment
+dev-setup:
 	@echo "$(YELLOW)Setting up development environment...$(NC)"
 	@$(MAKE) install
 	pip install -r requirements.txt
 	@echo "$(GREEN)Development environment ready$(NC)"
 
-test-unit: ## Run Python unit tests
+test-unit:
 	@echo "$(YELLOW)Running unit tests...$(NC)"
 	$(PYTEST) $(TEST_DIR)/ -k "unit" -v --tb=short
 	@echo "$(GREEN)Unit tests completed$(NC)"
 
-test-integration: ## Run Python integration tests
+test-integration:
 	@echo "$(YELLOW)Running integration tests...$(NC)"
 	$(PYTEST) $(TEST_DIR)/ -k "integration" -v --tb=short
 	@echo "$(GREEN)Integration tests completed$(NC)"

@@ -285,7 +285,7 @@ __marimo__/
 src/TESTS.md
 
 # macos file
-.DS_Store
+*.DS_Store
 *.lck
 
 # python cache

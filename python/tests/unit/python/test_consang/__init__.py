@@ -1,1 +1,0 @@
-"""Tests unitaires pour consang."""
