@@ -552,8 +552,9 @@ let print conf base =
       </div>
     </div>
     <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0"><i class="fa fa-cog mr-1"></i>%s</h5>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-cog fa-sm mr-2"></i>%s</h5>
+        <abbr title="%s"><i class="fa fa-circle-question mr-1"></i>↑↓</abbr>
       </div>
       <div class="card-body d-flex flex-column">|}
         (Util.commd conf :> string)
@@ -564,7 +565,8 @@ let print conf base =
         (t conf "chk_data error types")
         (List.length params.sel_err_types)
         (render_error_checkboxes conf params.sel_err_types)
-        (t conf "toggle all") (t conf "options");
+        (t conf "toggle all") (t conf "options")
+        (t conf "chk_data keyboard navigation tooltip");
       if not params.is_roglo then
         Output.printf conf
           {|
@@ -647,8 +649,21 @@ let perform_check_modification conf base =
         (Option.map Util.only_printable (Util.p_getenv conf.env "s2"))
     in
     let dict_param = Util.p_getenv conf.env "d" in
-    if Geneweb_db.Driver.sou base k <> s then
-      Error (t conf "modification failed")
+    let current_val = Geneweb_db.Driver.sou base k in
+    if current_val = s2 then
+      Success
+        {
+          before = s;
+          after = s2;
+          cache_updated = false;
+          nb_modified = Some 0;
+          elapsed = Some 0.0;
+        }
+    else if current_val <> s then
+      Error
+        (Printf.sprintf "%s (%s → %s, %s: %s)"
+           (t conf "modification failed")
+           s s2 (t conf "current value") current_val)
     else if s = s2 then Error (t conf "no modification")
     else
       let start_time = Unix.gettimeofday () in
@@ -739,8 +754,8 @@ let build_success_message conf r =
       | _ -> base_msg ^ cache_msg)
   | Error _ -> t conf "modification failed"
 
-let print_chk_ok_json conf base =
-  match perform_check_modification conf base with
+let print_result_as_json conf result =
+  match result with
   | Success r ->
       let msg = build_success_message conf (Success r) in
       let json =
@@ -774,32 +789,60 @@ let print_chk_ok_json conf base =
       Output.header conf "application/json";
       Output.print_sstring conf (Yojson.Basic.to_string json)
 
-let print_status_message conf ~success ~icon ~title_msg ~content =
-  let text_class, alert_class =
-    if success then ("text-success", "alert-success")
-    else ("text-danger", "alert-danger")
+let print_status_message conf ~success ~content =
+  let alert_class = if success then "alert-success" else "alert-danger" in
+  Output.printf conf {|<div class="alert %s">%s</div>|} alert_class content
+
+let send_validation_result_to_opener conf result =
+  let k = (List.assoc "k" conf.env :> string) in
+  let s = Option.value ~default:"" (Util.p_getenv conf.env "s") in
+  let s2 = Option.value ~default:"" (Util.p_getenv conf.env "s2") in
+  let validation_key = Printf.sprintf "chk_validation_%s_%s_%s" k s s2 in
+  let json_data =
+    match result with
+    | Success r ->
+        let msg = build_success_message conf (Success r) in
+        `Assoc
+          [
+            ("success", `Bool true);
+            ("message", `String msg);
+            ("after", `String r.after);
+            ( "nb_modified",
+              match r.nb_modified with Some n -> `Int n | None -> `Null );
+            ( "elapsed_time",
+              match r.elapsed with Some t -> `Float t | None -> `Null );
+          ]
+    | Error msg -> `Assoc [ ("success", `Bool false); ("message", `String msg) ]
   in
   Output.printf conf
-    {|<h3 class="%s">%s %s</h3>
-<div class="alert %s">%s</div>|} text_class icon
-    title_msg alert_class content
+    {|<script>
+(function() {
+  var key = %s;
+  var data = %s;
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch(e) {
+    console.error('localStorage error:', e);
+  }
+})();
+</script>|}
+    (Yojson.Basic.to_string (`String validation_key))
+    (Yojson.Basic.to_string json_data)
 
-let print_chk_ok_html conf base =
-  let result = perform_check_modification conf base in
+let print_result_as_html conf result =
   match result with
   | Success r ->
       Hutil.header conf (fun _ ->
           Output.print_sstring conf
             ("✓ " ^ t conf ~c:0 "modification successful"));
       Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-          print_status_message conf ~success:true ~icon:"✓"
-            ~title_msg:(t conf ~c:0 "modification successful")
+          print_status_message conf ~success:true
             ~content:(t conf "modification successful");
           if r.cache_updated then
             Output.printf conf
               {|<div class="text-muted mt-2"><i class="fa fa-check-circle mr-1"></i>%s</div>|}
               (t conf "cache updated");
-          match (r.nb_modified, r.elapsed) with
+          (match (r.nb_modified, r.elapsed) with
           | Some n, Some time when n > 1 ->
               let modif_word =
                 Util.transl_nth conf "modification/modifications" 1
@@ -808,17 +851,18 @@ let print_chk_ok_html conf base =
                 {|<div class="text-info mt-2"><i class="fa fa-info-circle mr-1"></i>%d %s — %.1f s</div>|}
                 n modif_word time
           | _ -> ());
+          send_validation_result_to_opener conf result);
       Hutil.trailer conf
   | Error msg ->
       Hutil.header conf (fun _ ->
           Output.print_sstring conf ("✗ " ^ t conf ~c:0 "modification failed"));
       Hutil.HtmlBuffer.wrap_measured conf (fun conf ->
-          print_status_message conf ~success:false ~icon:"✗"
-            ~title_msg:(t conf ~c:0 "modification failed")
-            ~content:msg);
+          print_status_message conf ~success:false ~content:msg;
+          send_validation_result_to_opener conf result);
       Hutil.trailer conf
 
 let print_chk_ok conf base =
+  let result = perform_check_modification conf base in
   match Util.p_getenv conf.env "ajax" with
-  | Some _ -> print_chk_ok_json conf base
-  | None -> print_chk_ok_html conf base
+  | Some _ -> print_result_as_json conf result
+  | None -> print_result_as_html conf result
