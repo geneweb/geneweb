@@ -929,7 +929,7 @@ end = struct
   let sex conf = match gets conf "sex" with "M" -> 0 | "F" -> 1 | _ -> 2
 
   let map_field ~conf ~key s =
-    if get_name_search_mode (gets conf) key = `Not_Exact_Prefix then s ^ "(...)"
+    if get_name_search_mode (gets conf) key = `Not_Exact_Prefix then s ^ "..."
     else s
 
   let first_name conf =
