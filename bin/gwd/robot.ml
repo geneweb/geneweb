@@ -94,8 +94,10 @@ let check tm from max_call sec conf suicide =
     | None ->
         purge_who tm xcl sec;
         let r =
-          try (Ext_string.Map.find from xcl.who).acc_times
-          with Not_found -> []
+          Option.fold
+            (Ext_string.Map.find_opt from xcl.who)
+            ~some:(fun who -> who.acc_times)
+            ~none:[]
         in
         let cnt, tml, tm0 =
           let sec = float sec in

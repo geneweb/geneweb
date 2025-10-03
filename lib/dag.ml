@@ -49,14 +49,18 @@ let make_dag conf base set =
       (fun ip ->
         let pare =
           match Gwdb.get_parents (Util.pget conf base ip) with
-          | Some ifam -> (
+          | Some ifam ->
               let c = Gwdb.foi base ifam in
               let l =
-                try [ Gwdb.IperMap.find (Gwdb.get_mother c) map ]
-                with Not_found -> []
+                Option.fold
+                  (Gwdb.IperMap.find_opt (Gwdb.get_mother c) map)
+                  ~some:(fun mother -> [ mother ])
+                  ~none:[]
               in
-              try Gwdb.IperMap.find (Gwdb.get_father c) map :: l
-              with Not_found -> l)
+              Option.fold
+                (Gwdb.IperMap.find_opt (Gwdb.get_father c) map)
+                ~some:(fun father -> father :: l)
+                ~none:l
           | None -> []
         in
         let chil =
@@ -66,7 +70,10 @@ let make_dag conf base set =
               let des = Gwdb.foi base ifam in
               Array.fold_left
                 (fun chil ip ->
-                  try Gwdb.IperMap.find ip map :: chil with Not_found -> chil)
+                  Option.fold
+                    (Gwdb.IperMap.find_opt ip map)
+                    ~some:(fun child -> child :: chil)
+                    ~none:chil)
                 chil (Gwdb.get_children des))
             [] (Gwdb.get_family u)
         in
@@ -88,10 +95,7 @@ let make_dag conf base set =
                 | ifam :: ifaml -> (
                     let cpl = Gwdb.foi base ifam in
                     let isp = Gutil.spouse ip cpl in
-                    let jdo =
-                      try Some (Gwdb.IperMap.find isp map)
-                      with Not_found -> None
-                    in
+                    let jdo = Gwdb.IperMap.find_opt isp map in
                     match jdo with
                     | Some jd ->
                         let j = Dag2html.int_of_idag jd in

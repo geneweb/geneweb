@@ -678,8 +678,9 @@ let print_dag_links conf base p1 p2 rl =
         List.fold_left
           (fun anc_map (p, n) ->
             let pp1, pp2, nn, nt, maxlev =
-              try Gwdb.IperMap.find (Gwdb.get_iper p) anc_map
-              with Not_found -> (pp1, pp2, 0, 0, 0)
+              Option.value
+                (Gwdb.IperMap.find_opt (Gwdb.get_iper p) anc_map)
+                ~default:(pp1, pp2, 0, 0, 0)
             in
             if nn >= max_br then anc_map
             else
