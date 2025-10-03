@@ -204,7 +204,9 @@ and eval_has_fwitness env =
     family_events_opt env >>= fun e ->
     Some (bool_val (e.efam_witnesses <> [||]))
   in
-  try Option.get has_fwitness_opt with Invalid_argument _ -> raise Not_found
+  match has_fwitness_opt with
+  | Some has_fwitness -> has_fwitness
+  | None -> raise Not_found
 
 (* TODO : rewrite, looks bad *)
 and eval_fwitness_kind env =
