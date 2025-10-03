@@ -22,12 +22,13 @@ let dag_ind_list_of_path path =
     List.fold_left
       (fun (indl, prev_ind) (ip, fl) ->
         let ind, indl =
-          try (List.find (fun di -> di.di_val = Some ip) indl, indl)
-          with Not_found ->
-            let rec ind = { di_val = Some ip; di_famc = famc; di_fams = fams }
-            and famc = { df_pare = []; df_chil = [ ind ] }
-            and fams = { df_pare = [ ind ]; df_chil = [] } in
-            (ind, ind :: indl)
+          match List.find_opt (fun di -> di.di_val = Some ip) indl with
+          | Some ind -> (ind, indl)
+          | None ->
+              let rec ind = { di_val = Some ip; di_famc = famc; di_fams = fams }
+              and famc = { df_pare = []; df_chil = [ ind ] }
+              and fams = { df_pare = [ ind ]; df_chil = [] } in
+              (ind, ind :: indl)
         in
         let fam =
           match prev_ind with
