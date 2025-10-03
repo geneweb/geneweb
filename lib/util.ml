@@ -1703,8 +1703,9 @@ let branch_of_sosa conf base sosa p =
   loop [] p (expand [] sosa)
 
 let sosa_of_branch ipl =
-  if ipl = [] then failwith "sosa_of_branch";
-  let ipl = List.tl (List.rev ipl) in
+  let ipl =
+    match List.rev ipl with [] -> failwith "sosa_of_branch" | _ :: tl -> tl
+  in
   List.fold_left
     (fun b p ->
       let b = Sosa.twice b in
