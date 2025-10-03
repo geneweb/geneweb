@@ -83,8 +83,16 @@ let make_error_set = function
 
 (* Split a string into its words, filtering out empty strings *)
 let split_words s =
-  let words = String.split_on_char ' ' s in
-  List.filter (fun w -> w <> "") words
+  let rec collect_words acc start i =
+    if i >= String.length s then
+      if i > start then String.sub s start (i - start) :: acc else acc
+    else if s.[i] = ' ' then
+      if i > start then
+        collect_words (String.sub s start (i - start) :: acc) (i + 1) (i + 1)
+      else collect_words acc (i + 1) (i + 1)
+    else collect_words acc start (i + 1)
+  in
+  List.rev (collect_words [] 0 0)
 
 (* Detect if a word is a Roman numeral with various notations:
    - Basic roman numerals: I, II, III, IV, V, etc.
@@ -178,6 +186,10 @@ let has_multiple_spaces s =
   let len = String.length s in
   let rec find_spaces byte_pos =
     if byte_pos >= len then false
+    else if s.[byte_pos] = ' ' then
+      if byte_pos + 1 < len && s.[byte_pos + 1] = ' ' then true
+      else find_spaces (byte_pos + 1)
+    else if Char.code s.[byte_pos] < 0x80 then find_spaces (byte_pos + 1)
     else if is_any_space s byte_pos then
       let next_pos = Utf8.next s byte_pos in
       if next_pos < len && is_any_space s next_pos then true
@@ -231,23 +243,28 @@ let fix_multiple_spaces s =
   loop 0 false
 
 (* Non-breaking spaces functions *)
-let has_regular_nbsp s i =
-  i + 1 < String.length s && s.[i] = '\xC2' && s.[i + 1] = '\xA0'
-
-let has_narrow_nbsp s i =
-  i + 2 < String.length s
-  && s.[i] = '\xE2'
-  && s.[i + 1] = '\x80'
-  && s.[i + 2] = '\xAF'
-
 let has_non_breaking_space s =
+  let len = String.length s in
   let rec aux i =
-    if i >= String.length s - 1 then false
-    else if has_regular_nbsp s i then
-      if has_roman_after_nbsp s i then false else true
-    else if has_narrow_nbsp s i then
-      if has_roman_after_nbsp s i then false else true
-    else aux (i + 1)
+    if i >= len then false
+    else if s.[i] = '\xC2' then
+      (* Check for nbsp: 0xC2 0xA0 *)
+      if i + 1 < len && s.[i + 1] = '\xA0' then
+        if has_roman_after_nbsp s i then aux (i + 2) else true
+      else aux (i + 2) (* Other 0xC2 char, skip *)
+    else if s.[i] = '\xE2' then
+      (* Check for narrow nbsp: 0xE2 0x80 0xAF *)
+      if i + 2 < len && s.[i + 1] = '\x80' && s.[i + 2] = '\xAF' then
+        if has_roman_after_nbsp s i then aux (i + 3) else true
+      else aux (i + 3) (* Other 0xE2 char, skip 3 bytes *)
+    else
+      (* Everything else: skip based on UTF-8 byte structure *)
+      let c = Char.code s.[i] in
+      if c < 0x80 then aux (i + 1)
+      else if c < 0xE0 then aux (i + 2) (* 2-byte char *)
+      else if c < 0xF0 then aux (i + 3) (* 3-byte char *)
+      else aux (i + 4)
+    (* 4-byte char *)
   in
   aux 0
 
@@ -404,8 +421,19 @@ let has_invisible_chars s =
   let rec aux i =
     if i >= len then false
     else
-      let code, size = Util.get_unicode_point s i in
-      if is_invisible_char code then true else aux (i + size)
+      let c = Char.code s.[i] in
+      if c < 0x20 then if c = 0x09 || c = 0x0A then aux (i + 1) else true
+      else if c = 0x7F then true
+      else if c < 0x80 then aux (i + 1)
+      else if c = 0xC2 then
+        if i + 1 < len then
+          let c2 = Char.code s.[i + 1] in
+          if (c2 >= 0x80 && c2 <= 0x9F) || c2 = 0xAD then true else aux (i + 2)
+        else false
+      else if c >= 0xC3 && c < 0xCC then aux (i + 2)
+      else
+        let code, size = Util.get_unicode_point s i in
+        if is_invisible_char code then true else aux (i + size)
   in
   aux 0
 
@@ -472,13 +500,33 @@ let get_applicable_replacements dict_type =
   in
   base @ specific
 
+let compiled_misc_errors_by_dict =
+  lazy
+    (let build_for_dict dict_type =
+       let replacements = get_applicable_replacements dict_type in
+       let patterns =
+         List.map fst replacements
+         @ [ char_before_parenthesis_pattern; breton_trigram_pattern ]
+       in
+       Re.compile (Re.alt patterns)
+     in
+     [
+       (Fnames, build_for_dict Fnames);
+       (Snames, build_for_dict Snames);
+       (Fnames_alias, build_for_dict Fnames_alias);
+       (Snames_alias, build_for_dict Snames_alias);
+       (Places, build_for_dict Places);
+       (PubNames, build_for_dict PubNames);
+       (Qualifiers, build_for_dict Qualifiers);
+       (Aliases, build_for_dict Aliases);
+       (Occupation, build_for_dict Occupation);
+       (Estates, build_for_dict Estates);
+       (Titles, build_for_dict Titles);
+       (Sources, build_for_dict Sources);
+     ])
+
 let has_misc_typographic_errors dict_type s =
-  let replacements = get_applicable_replacements dict_type in
-  let patterns =
-    List.map fst replacements
-    @ [ char_before_parenthesis_pattern; breton_trigram_pattern ]
-  in
-  let re = Re.compile (Re.alt patterns) in
+  let re = List.assoc dict_type (Lazy.force compiled_misc_errors_by_dict) in
   try
     ignore (Re.exec re s);
     true
@@ -555,84 +603,90 @@ let fix_misc_typographic_errors dict_type s =
          c ^ "ʼ" ^ h)
 
 (* Détermine si un caractère est latin, grec ou cyrillique *)
-let script_class_of_uchar u =
-  match Uucp.Script.script u with
-  | `Latn -> Some `Latin
-  | `Grek -> Some `Greek
-  | `Cyrl -> Some `Cyrillic
-  | _ -> None
+let script_cache = Hashtbl.create 256
 
-(* Vérifie si un mot unique contient des scripts mélangés *)
+let script_class_of_code code =
+  try Hashtbl.find script_cache code
+  with Not_found ->
+    let result =
+      if (code >= 0x0041 && code <= 0x005A) || (code >= 0x0061 && code <= 0x007A)
+      then Some `Latin
+      else
+        let u = Uchar.of_int code in
+        match Uucp.Script.script u with
+        | `Latn -> Some `Latin
+        | `Grek -> Some `Greek
+        | `Cyrl -> Some `Cyrillic
+        | _ -> None
+    in
+    Hashtbl.add script_cache code result;
+    result
+
 let has_mixed_scripts_in_word s =
   let has_latin = ref false in
   let has_greek = ref false in
   let has_cyrillic = ref false in
-  let check_char () _ = function
-    | `Uchar u -> (
-        match script_class_of_uchar u with
-        | Some `Latin ->
-            has_latin := true;
-            ()
-        | Some `Greek ->
-            has_greek := true;
-            ()
-        | Some `Cyrillic ->
-            has_cyrillic := true;
-            ()
-        | _ -> ())
-    | `Malformed _ -> ()
-  in
-  Uutf.String.fold_utf_8 check_char () s;
+  let len = String.length s in
+  let i = ref 0 in
+  while !i < len do
+    let c = Char.code s.[!i] in
+    if c < 0x80 then (
+      if (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A) then
+        has_latin := true;
+      incr i)
+    else
+      let code, size = Util.get_unicode_point s !i in
+      (match script_class_of_code code with
+      | Some `Latin -> has_latin := true
+      | Some `Greek -> has_greek := true
+      | Some `Cyrillic -> has_cyrillic := true
+      | None -> ());
+      i := !i + size
+  done;
   !has_latin && (!has_greek || !has_cyrillic)
 
 let has_mixed_scripts s =
   let words = split_words s in
   List.exists has_mixed_scripts_in_word words
 
-(* Trouve les positions des caractères grecs et cyrilliques *)
 let find_mixed_scripts_positions s =
   let positions = ref [] in
-  let rec find_all_words pos acc =
-    if pos >= String.length s then List.rev acc
-    else if s.[pos] = ' ' || s.[pos] = '\t' || s.[pos] = '\n' || s.[pos] = '\r'
-    then find_all_words (pos + 1) acc
-    else
-      let word_start = pos in
-      let rec find_end p =
-        if p >= String.length s then p
-        else if s.[p] = ' ' || s.[p] = '\t' || s.[p] = '\n' || s.[p] = '\r' then
-          p
-        else find_end (p + 1)
-      in
-      let word_end = find_end pos in
-      let word = String.sub s word_start (word_end - word_start) in
-      find_all_words word_end ((word, word_start, word_end) :: acc)
-  in
-  let all_words = find_all_words 0 [] in
+  let words_with_pos = ref [] in
+  let pos = ref 0 in
+  let len = String.length s in
+  while !pos < len do
+    while !pos < len && s.[!pos] = ' ' do
+      incr pos
+    done;
+    if !pos < len then (
+      let start = !pos in
+      while !pos < len && s.[!pos] <> ' ' do
+        incr pos
+      done;
+      let word = String.sub s start (!pos - start) in
+      words_with_pos := (word, start, !pos) :: !words_with_pos)
+  done;
   List.iter
     (fun (word, start_pos, end_pos) ->
       if has_mixed_scripts_in_word word then
-        (* Parcourir chaque octet du mot *)
-        let pos = ref start_pos in
-        while !pos < end_pos do
-          let char_size = Utf8.nbc s.[!pos] in
-          let char_str = String.sub s !pos (min char_size (end_pos - !pos)) in
-          let mark_it = ref false in
-          let check () _ = function
-            | `Uchar u -> (
-                match script_class_of_uchar u with
-                | Some `Greek | Some `Cyrillic -> mark_it := true
-                | _ -> ())
-            | `Malformed _ -> ()
+        let byte_pos = ref start_pos in
+        while !byte_pos < end_pos do
+          let c = Char.code s.[!byte_pos] in
+          let char_size, code =
+            if c < 0x80 then (1, c)
+            else
+              let code, size = Util.get_unicode_point s !byte_pos in
+              (size, code)
           in
-          Uutf.String.fold_utf_8 check () char_str;
-          if !mark_it then
-            for i = 0 to char_size - 1 do
-              positions := (!pos + i) :: !positions
-            done;
-          pos := !pos + char_size
+          (match script_class_of_code code with
+          | Some `Greek | Some `Cyrillic ->
+              for i = 0 to char_size - 1 do
+                positions := (!byte_pos + i) :: !positions
+              done
+          | _ -> ());
+          byte_pos := !byte_pos + char_size
         done)
-    all_words;
+    (List.rev !words_with_pos);
   List.sort_uniq compare !positions
 
 (* Generic error handling *)
@@ -914,15 +968,21 @@ let collect_dict_strings base = function
 exception Max_results_reached
 
 (* Fonction commune pour analyser les erreurs dans une chaîne *)
-let analyze_string_errors dict_type base s =
-  let add_if cond error acc = if cond then error :: acc else acc in
+let analyze_string_errors dict_type base s check_errors_set =
+  let add_if test error acc =
+    if ErrorSet.mem error check_errors_set && test () then error :: acc else acc
+  in
   []
-  |> add_if (has_non_breaking_space s) NonBreakingSpace
-  |> add_if (has_multiple_spaces s) MultipleSpaces
-  |> add_if (has_invisible_chars s) InvisibleCharacters
-  |> add_if (has_bad_capitalization dict_type base s) BadCapitalization
-  |> add_if (has_misc_typographic_errors dict_type s) MiscTypographicErrors
-  |> add_if (has_mixed_scripts s) MixedScripts
+  |> add_if (fun () -> has_non_breaking_space s) NonBreakingSpace
+  |> add_if (fun () -> has_multiple_spaces s) MultipleSpaces
+  |> add_if (fun () -> has_invisible_chars s) InvisibleCharacters
+  |> add_if
+       (fun () -> has_bad_capitalization dict_type base s)
+       BadCapitalization
+  |> add_if
+       (fun () -> has_misc_typographic_errors dict_type s)
+       MiscTypographicErrors
+  |> add_if (fun () -> has_mixed_scripts s) MixedScripts
 
 let dict_to_cache_name dict_type =
   match dict_type with
@@ -1023,10 +1083,9 @@ let collect_all_errors_from_cache conf dict_type base max_results
     | [], _ -> acc
     | _, Some max when count >= max -> acc
     | (istr, s) :: rest, _ ->
-        let errors = analyze_string_errors dict_type base s in
+        let errors = analyze_string_errors dict_type base s check_errors_set in
         let filtered_errors =
-          if ErrorSet.is_empty check_errors_set then errors
-          else List.filter (fun e -> ErrorSet.mem e check_errors_set) errors
+          if ErrorSet.is_empty check_errors_set then errors else errors
         in
         if filtered_errors = [] then process_entries rest acc count
         else process_entries rest ((istr, s, filtered_errors) :: acc) (count + 1)
@@ -1051,17 +1110,16 @@ let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
        else sel_err_types)
   in
   let add_error istr s err =
-    if ErrorSet.mem err check_error_types_set then
-      match Hashtbl.find_opt istr_errors istr with
-      | Some (stored_s, errs) ->
-          if not (List.mem err errs) then
-            Hashtbl.replace istr_errors istr (stored_s, err :: errs)
-      | None -> (
-          Hashtbl.add istr_errors istr (s, [ err ]);
-          incr unique_istrs;
-          match max_results with
-          | Some max when !unique_istrs >= max -> raise Max_results_reached
-          | _ -> ())
+    match Hashtbl.find_opt istr_errors istr with
+    | Some (stored_s, errs) ->
+        if not (List.mem err errs) then
+          Hashtbl.replace istr_errors istr (stored_s, err :: errs)
+    | None -> (
+        Hashtbl.add istr_errors istr (s, [ err ]);
+        incr unique_istrs;
+        match max_results with
+        | Some max when !unique_istrs >= max -> raise Max_results_reached
+        | _ -> ())
   in
   (try
      Geneweb_db.Collection.iter
@@ -1073,16 +1131,30 @@ let collect_all_errors ?(max_results = None) ?(sel_err_types = []) base dict =
              if not (Driver.Istr.is_empty istr) then
                let s = Driver.sou base istr in
                if s <> "" then (
-                 if has_invisible_chars s then
-                   add_error istr s InvisibleCharacters;
-                 if has_bad_capitalization dict base s then
-                   add_error istr s BadCapitalization;
-                 if has_multiple_spaces s then add_error istr s MultipleSpaces;
-                 if has_non_breaking_space s then
-                   add_error istr s NonBreakingSpace;
-                 if has_misc_typographic_errors dict s then
-                   add_error istr s MiscTypographicErrors;
-                 if has_mixed_scripts s then add_error istr s MixedScripts))
+                 if
+                   ErrorSet.mem InvisibleCharacters check_error_types_set
+                   && has_invisible_chars s
+                 then add_error istr s InvisibleCharacters;
+                 if
+                   ErrorSet.mem BadCapitalization check_error_types_set
+                   && has_bad_capitalization dict base s
+                 then add_error istr s BadCapitalization;
+                 if
+                   ErrorSet.mem MultipleSpaces check_error_types_set
+                   && has_multiple_spaces s
+                 then add_error istr s MultipleSpaces;
+                 if
+                   ErrorSet.mem NonBreakingSpace check_error_types_set
+                   && has_non_breaking_space s
+                 then add_error istr s NonBreakingSpace;
+                 if
+                   ErrorSet.mem MiscTypographicErrors check_error_types_set
+                   && has_misc_typographic_errors dict s
+                 then add_error istr s MiscTypographicErrors;
+                 if
+                   ErrorSet.mem MixedScripts check_error_types_set
+                   && has_mixed_scripts s
+                 then add_error istr s MixedScripts))
            istrs)
        (Driver.ipers base)
    with Max_results_reached -> ());
