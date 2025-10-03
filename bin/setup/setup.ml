@@ -284,10 +284,8 @@ let is_directory x =
 let server_string conf =
   let s = Mutil.extract_param "host: " '\r' conf.request in
   Option.fold s ~none:"127.0.0.1" ~some:(fun s ->
-      try
-        let i = String.rindex s ':' in
-        String.sub s 0 i
-      with Not_found -> "127.0.0.1")
+      Option.fold (String.rindex_opt s ':') ~some:(String.sub s 0)
+        ~none:"127.0.0.1")
 
 let referer conf = Mutil.extract_param "referer: " '\r' conf.request
 
