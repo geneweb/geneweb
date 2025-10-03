@@ -114,15 +114,6 @@ let first_ordinal_re =
             Re.eos;
           ]))
 
-let bad_cap_re =
-  lazy
-    (Re.compile
-       (Re.alt
-          [
-            Re.seq [ Re.rg 'A' 'Z'; Re.rg 'A' 'Z'; Re.rg 'a' 'z' ];
-            Re.seq [ Re.rg 'a' 'z'; Re.rg 'A' 'Z' ];
-          ]))
-
 let nbsp_re =
   lazy
     (Re.compile
@@ -306,7 +297,33 @@ let is_lowercase_allowed word =
    - Uppercase, lowercase, uppercase sequence *)
 (* Bad capitalization functions *)
 let has_bad_capitalization_pattern s =
-  try Re.execp (Lazy.force bad_cap_re) s with _ -> false
+  let len = String.length s in
+  let rec scan i =
+    if i >= len then false
+    else
+      (* Check AAz pattern: [A-Z][A-Z][a-z] *)
+      let has_aaz =
+        i + 2 < len
+        && s.[i] >= 'A'
+        && s.[i] <= 'Z'
+        && s.[i + 1] >= 'A'
+        && s.[i + 1] <= 'Z'
+        && s.[i + 2] >= 'a'
+        && s.[i + 2] <= 'z'
+      in
+      if has_aaz then true
+      else
+        (* Check aZ pattern: [a-z][A-Z] *)
+        let has_az =
+          i + 1 < len
+          && s.[i] >= 'a'
+          && s.[i] <= 'z'
+          && s.[i + 1] >= 'A'
+          && s.[i + 1] <= 'Z'
+        in
+        if has_az then true else scan (i + 1)
+  in
+  scan 0
 
 (* Capitalization check function
    Examines each word for valid patterns for some books
@@ -407,7 +424,8 @@ let _hex_to_int hex = int_of_string ("0x" ^ hex)
 
 let invisible_chars_tbl =
   let codes =
-    Util.get_problem_chars_codes `Invisible
+    Util.get_problem_chars_codes `Control
+    @ Util.get_problem_chars_codes `Invisible
     @ Util.get_problem_chars_codes `ZeroWidth
   in
   let tbl = Hashtbl.create (List.length codes) in
