@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: updhist.txt v7.1 24/6/2024 05:24:40 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>[*history of updates]</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body %body_prop;>
+%include;hed
+%message_to_wizard;
+<div class="container">
+%include;home
+<h1>[*history of updates]</h1>
+%define;search_form()
+  %if;(wizard or friend)
+    <form class="d-flex form-inline mb-2" method="get" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="HIST_SEARCH">
+      %if;(e.m="HIST_SEARCH" and found)
+        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
+      %end;
+      <input type="text" class="form-control col-4" placeholder="[*search/case sensitive]0"
+        name="s" maxlength="40" value="%e.s.ns;">
+      <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
+      <label class="my-1 ml-3 mr-2" for="rows">[*number of rows]</label>
+      <input type="number" class="form-control" id="rows" title="[*number of rows]"
+         name="k" value="%kk;" min="0" max="150" step="10">
+      <div class="custom-control custom-checkbox ml-3">
+        <input type="checkbox" class="custom-control-input" name="c" value="on" id="case"
+          %if;("main"!="true" and e.c="on") checked%end;>
+        <label class="custom-control-label" for="case">[*search/case sensitive]1</label>
+      </div>
+    </form>
+  %end;
+%end;
+
+%let;kk;%if;(e.k="")3%else;%e.k%end;%in;
+%let;wiz;%if;(e.wiz!="" and e.n="")%e.wiz;%end;%in;
+%define;table()
+  <table class="table table-sm table-hover px-1">
+    <thead class="thead-default">
+      <tr>
+        <th>[*date/dates]0</th>
+        <th>[*person/persons]0</th>
+        <th>[*wizard/wizards/friend/friends/exterior]0</th>
+        <th>[*update]</th>
+        %if;(bvar.history_diff="yes")<th class="text-center"><i class="fa fa-clock-rotate-left fa-fw text-dark" title="[*history]"></i></th>%end;
+      </tr>
+    </thead>
+    %foreach;history_line(kk, e.pos, wiz)
+      <tr>
+        <td>%time;</td>
+        <td>
+        %if;is_person;
+          %if;(person.is_private)
+            <i class="fa fa-person text-danger"> </i>%nn;
+          %elseif;(person.is_semi_public)
+            <i class="fa fa-person text-warning"> </i>%nn;
+          %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
+            <i class="fa fa-person text-success"> </i>%nn;
+          %else;
+            <i class="fa fa-person text-muted"> </i>%nn;
+          %end;
+        %else;
+          &nbsp;&nbsp;
+        %end;
+        %if;(first_name!="")
+          <!--%first_name;/%occ;/%surname;-->
+          <a href="%prefix;%person.access;">%person;</a>, %person.title;
+          %person.dates;
+        %elseif;is_note;
+          - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
+          %if;(note.part!="");v=%note.part;%end;">
+          <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
+          </i></a>
+          %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
+            </span>%nn;
+          %end;
+        %else;
+          %key;
+        %end;
+        </td>
+        <td>
+          %if;(user!="")
+            <i>
+              %if;(wiz="")
+                <a href="%prefix;m=HIST&k=%kk;&wiz=%user.v;">%user;</a>%nn;
+              %else;
+                %user;
+              %end;
+            </i>
+          %end;
+        </td>
+        <td>%apply;update_text(update.var)</td>
+        %if;(b.history_diff="yes")
+          <td class="text-center">
+            %if;(first_name!="" and person.has_history)
+              <a href="%prefix;m=HIST_DIFF&t=SUM&f=%person.history_file;">
+                <i class="fa fa-clock-rotate-left fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
+                <span class="sr-only">[history]</span></a>
+            %else;
+              &nbsp;
+            %end;
+          </td>
+        %end;
+      </tr>
+    %end;
+  </table>
+%end;
+
+%( changes in 2 letters labels may create backward incompatibility with
+   old history files.
+%)
+%define;update_text(uu)
+  %if;(uu = "aa")[add::parents]%nn;
+  %elseif;(uu = "ap")[add::person/persons]0%nn;
+  %elseif;(uu = "af")[add::family/families]0%nn;
+  %elseif;(uu = "cb")[copy portrait to blason]0%nn;
+  %elseif;(uu = "cd")[copy image to blason]0%nn;
+  %elseif;(uu = "cn")[change children's names]%nn;
+  %elseif;(uu = "db")[delete::coat of arms]0%nn;
+  %elseif;(uu = "dc")[delete::image/images]0 [from carrousel]%nn;
+  %elseif;(uu = "df")[delete::family/families]0%nn;
+  %elseif;(uu = "dp")[delete::person/persons]0%nn;
+  %elseif;(uu = "dq")[delete::portrait]0%nn;
+  %elseif;(uu = "d?")[delete::unknown]0%nn;
+  %elseif;(uu = "ff")[merge::family/families]1%nn;
+  %elseif;(uu = "fn")[modify::first name/first names]0%nn;
+  %elseif;(uu = "fp")[merge::person/persons]1%nn;
+  %elseif;(uu = "if")[invert::family/families]1%nn;
+  %elseif;(uu = "ma")[modify::alias/aliases]0%nn;
+  %elseif;(uu = "md")[modify::domain/domains]0%nn;
+  %elseif;(uu = "mf")[modify::family/families]0%nn;
+  %elseif;(uu = "mn")[modify::note/notes]1%nn;
+  %elseif;(uu = "mo" or uu = "co")[modify::occupation/occupations]0%nn;
+  %elseif;(uu = "mp")[modify::person/persons]0%nn;
+  %elseif;(uu = "mq" or uu = "cp")[modify::place/places]0%nn;
+  %elseif;(uu = "ms" or uu = "cs")[modify::source/sources]0%nn;
+  %elseif;(uu = "mt")[modify::title/titles]0%nn;
+  %elseif;(uu = "mu")[modify::public name]0%nn;
+  %elseif;(uu = "mx")[modify::qualifier/qualifiers]0%nn;
+  %elseif;(uu = "rb")[restore::coat of arms]0%nn;
+  %elseif;(uu = "rc")[restore::carrousel image]%nn;
+  %elseif;(uu = "rp")[restore::portrait]%nn;
+  %elseif;(uu = "sp")[send::portrait]%nn;
+  %elseif;(uu = "sb")[send::coat of arms]%nn;
+  %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
+  %elseif;(uu = "sf")[send::image/images]0 [to carrousel]%nn;
+  %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
+  %elseif;(uu = "so")[send::note/notes]0 [to carrousel]%nn;
+  %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
+  %elseif;(uu = "sx")[send::unknown]0%nn;
+  %elseif;(uu = "s?")[send::unknown]0%nn;
+  %else;%apply;interp(uu) %nn;
+  %end;
+%end;
+
+%define;nav()
+  %if;(pos!="")
+   <form class="form-inline" method="get" action="%action;">
+     %hidden;
+     <input type="hidden" name="m" value="HIST">
+     <input type="hidden" name="k" value="%e.k;">
+     <input type="hidden" name="pos" value="%pos;">
+     <div class="input-group">
+       <button type="submit" class="btn btn-outline-primary ml-4" title="[*next]"><i class="fa fa-forward fa-fw"></i></button>
+       %if;(wiz!="")
+         <input type="hidden" name="wiz" value="%wiz;">([wizard/wizards/friend/friends/exterior]0[:] %wiz;)
+       %end;
+     </div>
+   </form>
+  %end;
+%end;
+
+%if;(not cancel_links and (e.m!="HIST_SEARCH" or not found))
+  <div class="d-flex justify-content-between mt-2 px-1">
+    <div class="order-1">%apply;search_form()</div>
+    <div class="d-none order-3">%apply;table()</div>
+    <div class="order-2">%apply;nav()</div>
+  </div>
+%end;
+%apply;table()
+
+%if;(e.m="HIST_SEARCH" and found)
+  <div class="d-flex justify-content-between px-1">
+    %apply;search_form()
+    %apply;nav()
+  </div>
+%end;
+
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

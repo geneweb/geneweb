@@ -1,0 +1,174 @@
+<!-- $Id: buttons_places.txt v7.1 12/01/2023 18:54:37 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
+%( Boutons de configurations et d'options %)
+
+<form class="form-group mx-1" name="evt_url" method="get" action="%action;">
+  <input type="hidden" name="m" value="PPS">
+  %if;(e.lang!=default_lang)
+    <input type="hidden" name="lang" value="%e.lang;">
+  %end;
+  %if;cgi;
+    <input type="hidden" name="b" value="%bname_token;">
+  %end;
+  <div class="form-inline">
+    <label class="sr-only" for="k">[*place/places]0 (k)</label>
+    <input type="search" class="form-control col-4 ml-2" name="k"
+      id="k" value="%evar.k;"
+      placeholder="%if;(evar.k!="")%evar.k;%else;[*place/places]0%end;">
+  </div>
+  <div class="form-inline mt-1">
+    <div class="form-group w-100">
+      <span>[*event/events]1[:]</span>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="bi"
+          onclick="test_all()" id="bi" value="on"
+          %if;(evar.bi!="" and evar.bi="on") checked%end;>
+        <label class="custom-control-label" title="[*birth place]"
+          for="bi">[*birth]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="ba"
+          onclick="test_all()" id="ba" value="on"
+          %if;(evar.ba!="" and evar.ba="on") checked%end;>
+        <label class="custom-control-label" title="[*baptism place]"
+          for="ba">[*baptism]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="ma"
+          onclick="test_all()" id="ma" value="on"
+          %if;(evar.ma!="" and evar.ma="on") checked%end;>
+        <label class="custom-control-label" title="[*marriage place]"
+          for="ma">[*marriage/marriages]0</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="de"
+          onclick="test_all()" id="de" value="on"
+          %if;(evar.de!="" and evar.de="on") checked%end;>
+        <label class="custom-control-label" title="[*death place]"
+          for="de">[*death]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-2">
+        <input type="checkbox" class="custom-control-input" name="bu"
+          onclick="test_all()" id="bu" value="on"
+          %if;(evar.bu!="" and evar.bu="on") checked%end;>
+        <label class="custom-control-label" title="[*burial place]"
+          for="bu">[*burial]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-4">
+        <input type="checkbox" class="custom-control-input" name="all"
+          id="all" value="on"
+          %if;((evar.bi!="" and evar.bi="on") and
+          (evar.ba!="" and evar.ba="on") and
+          (evar.ma!="" and evar.ma="on") and
+          (evar.de!="" and evar.de="on") and
+          (evar.bu!="" and evar.bu="on")) checked%end;>
+        <label class="custom-control-label" title="[*all]"
+          for="all">[*all]</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <span>[*matching][:]</span>
+      <div class="custom-control custom-checkbox ml-4">
+        <input type="checkbox" class="custom-control-input" name="word"
+          id="word" value="on"
+          %if;(evar.word!="" and evar.word="on") checked%end;>
+        <label class="custom-control-label" title="[*word match title]"
+          for="word">[*word match]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-4">
+        <input type="checkbox" class="custom-control-input" name="lower"
+          id="lower" value="on"
+          %if;(evar.lower!="" and evar.lower="on") checked%end;>
+        <label class="custom-control-label" title="[*case-hlp]"
+          for="lower">[*case]</label>
+      </div>
+      <div class="custom-control custom-checkbox ml-4">
+        <input type="checkbox" class="custom-control-input" name="any"
+          id="any" value="on"
+          %if;(evar.any!="" and evar.any="on") checked%end;>
+        <label class="custom-control-label" title="[*any place title]"
+          for="any">[*any place]</label>
+      </div>
+      <input type="text" class=" ml-4" size="2"
+        name="max_rlm_nbr" id="max_rlm_nbr" 
+        placeholder=%if;(evar.max_rlm_nbr!="")"%evar.max_rlm_nbr;"
+          %elseif;(bvar.max_rlm_nbr!="")"%bvar.max_rlm_nbr;"
+          %else;"80"%end;>
+      <label class="label ml-1" title="[*max nbr title]">[*max nbr]</label>
+      %if;(evar.display="long")<input type="hidden" name="display" id="display" value="long">%end;
+      <button type="submit" class="btn btn-primary btn-sm ml-4"
+        title="[*search/case sensitive]0 [surname/surnames]1 /
+          [place/places]1 [and] [event/events]1">
+        <i class="fa fa-magnifying-glass mr-2"></i>Search
+      </button>
+    </div>
+  </div>
+</form>
+<div class="d-flex">
+  <div>
+      <a href="%url_set.k;"
+        title="[*all the places]">%nn;
+      [*all the places]</a>
+  </div>
+  <div class="ml-4" >
+  <a role="button" class="ml-auto"
+    href="%apply;url_set%with;f_sort/up/a_sort%and;on/%if;(e.up!="on")on%end;%end;"
+      %sp;title="[*sort by/branch/alphabetic order]0 [frequency]">
+      <i class="fas fa-arrow-down-%if;(e.up!="on")9-1%else;1-9%end;%sp;
+        fa-lg"></i>%nn;
+  </a>%nn;
+  <a role="button" class="ml-auto"
+    href="%apply;url_set%with;a_sort/f_sort/up%and;%if;(e.a_sort!="on")on%end;%end;"
+      %sp;title="[*sort by/branch/alphabetic order]0
+        [sort by/branch/alphabetic order]2">
+      <i class="fas fa-arrow-down-%if;(e.a_sort!="on")a-z%else;z-a%end;%sp;
+        fa-lg"></i>%nn;
+  </a>%nn;
+  %let;ekeep;%if;(e.keep="")1%else;%e.keep;%end;%in;
+  %if;(e.display!="long")
+    <span class="ml-2 mr-2" title="[*place filter]">[*filter][:]</span>
+    <a role="button" class="btn-link ml-auto
+      %if;(ekeep="" or ekeep<2) disabled text-muted%end;"
+      href="%apply;url_set%with;keep%and;%if;(ekeep!="")%expr(ekeep-1)%else;1%end;%end;"
+      title="[*place filter]">
+      <i class="fas fa-minus fa-lg"></i>
+    </a>
+    <span title="[*place filter]">%if;(e.keep="")1%else;%e.keep;%end;</span>
+    <a role="button" class="ml-auto"
+      href="%apply;url_set%with;keep%and;%if;(ekeep!="")%expr(ekeep+1)%else;1%end;%end;"
+      title="[*place filter]">
+      <i class="fas fa-plus fa-lg"></i>
+    </a>
+  %end;
+  </div>
+</div>
+<script>
+
+function toggle (btn, state) {
+  if (state) 
+    { document.getElementById(btn).setAttribute( "value", "on") ;
+      document.getElementById(btn).checked = true; }
+  else
+    { document.getElementById(btn).setAttribute( "value", "") ;
+      document.getElementById(btn).checked = false; } ;
+};
+
+function test_all () {
+  var bi = document.getElementById("bi").checked;
+  var bp = document.getElementById("ba").checked;
+  var ma = document.getElementById("ma").checked;
+  var de = document.getElementById("de").checked;
+  var bu = document.getElementById("bu").checked;
+  var state = bi && bp && ma && de && bp;
+  document.getElementById("all").checked = state;
+};
+
+document.getElementById("all").onclick = function() {
+  var state = document.getElementById("all").checked ;
+  toggle ("bi", state) ;
+  toggle ("ba", state) ;
+  toggle ("ma", state) ;
+  toggle ("de", state) ;
+  toggle ("bu", state) ;
+};
+</script>

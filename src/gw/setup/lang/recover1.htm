@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: recover1.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Recover a database - Phase 2]
+</title>
+%fsetup.css;</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Recover a database]</h1>
+</div>
+<p>
+[Directory]
+<pre>
+  %a
+</pre>
+[Select the database you want to recover][:]
+<p>
+<form method=GET action="recover_1">
+<input type=hidden name=lang value="%l">
+<input type=hidden name=anon value="%a">
+<dl><dt><dd><table style="border:1px solid">
+%y{<tr><td><input type=radio name=i value="%a"></td><td> %a </td></tr>|
+<tr><td>- [there is no databases in this directory]
+</tr></td>}
+</table></dl>
+<p>
+[Write the name you want to give to your database. By default, it will be the same in the new directory.]
+%(
+Write the name you want to give to your database. By default, it will be the sam
+e in the new directory.
+%)
+<p>
+<dl><dt><dd><input name=o size=30></dl>
+<p>
+[You can select an option][:]
+<p>
+<dl><dt><dd><table style="border:1px solid">
+<tr><td><input type=checkbox name=ged value="on">   </td>
+<td>
+[Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work with the normal procedure, try this option.]
+</td>
+%(
+Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work 
+with the normal procedure, try this option.</td>
+%)
+</td>
+</tr>
+</table></dl>
+<p>
+[Then click on this button][:]
+<p>
+<input type=submit value="[Recover]">
+</form>

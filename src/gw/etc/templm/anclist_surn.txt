@@ -1,0 +1,65 @@
+<!-- $Id: anclist_surn.txt v7.0 2014/11/26 21:27:08 $ -->
+
+%( list eclair tf1 = surn %)
+  %apply;togen()
+  %empty_sorted_list;
+  %reset_count;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %if;(ancestor.has_birth_place)
+            %apply;add_in_sorted_list%with;
+              %ancestor.surname; -- %ancestor.birth_place;%and;
+              %ancestor.birth_date.year;%and;
+              %ancestor.index;%and;
+              %ancestor.anc_sosa%end;
+          %elseif;(ancestor.has_baptism_place)
+            %apply;add_in_sorted_list%with;
+              %ancestor.surname; -- %ancestor.baptism_place;%and;
+              %ancestor.baptism_date.year;%and;
+              %ancestor.index;%and;
+              %ancestor.anc_sosa%end;
+          %end;
+          %if;(ancestor.has_death_place)
+            %apply;add_in_sorted_list%with;
+              %ancestor.surname; -- %ancestor.death_place;%and;
+              %ancestor.death_date.year;%and;
+              %ancestor.index;%and;
+              %ancestor.anc_sosa%end;
+          %elseif;(ancestor.has_burial_place)
+            %apply;add_in_sorted_list%with;
+              %ancestor.surname; -- %ancestor.burial_place;%and;
+              %ancestor.burial_date.year;%and;
+              %ancestor.index;%and;
+              %ancestor.anc_sosa%end;
+          %end;
+          %foreach;ancestor.family;
+            %if;(ancestor.spouse.index = spouse.index and marriage_place != "")
+              %apply;add_in_sorted_list%with;
+                %ancestor.surname; -- %marriage_place;%and;
+                %marriage_date.year;%and;
+                %ancestor.index;%and;
+                %ancestor.anc_sosa%end;
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+  <p>[surname/surnames]0 -- [place/place]0;[date begin];([nb events]);[date end]
+  %foreach;sorted_list_item;
+    %if;(prev_item.1 != item.1)
+      %reset_count;%incr_count;
+      <br>%item.1;;%item.2;;<a href="%prefix;spouse=on&i%count;=%item.3;&t%count;=%item.4;&%nn;
+    %end;
+    %if;(prev_item.1 = item.1)
+        %incr_count;
+        i%count;=%item.3;&t%count;=%item.4;&%nn;
+    %end;
+    %if;(next_item.1 != item.1)
+      %incr_count;
+      i%count;=%index;&t%count;=%item.1;&%if;(count > 10)m=C&list=1&t=%item.1;&i=%index;&%else;m=RLM&%end;">(%expr(count - 1))</a>;%item.2;
+    %end;
+  %end;
+  </p>

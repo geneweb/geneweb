@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: clean_ok.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Operation completed]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Operation completed]</h1>
+</div>
+<p>
+[The cleaning up of you database "%a" is completed.]
+<p>
+[Your database has been completely rebuilt: the old version is on the subdirectory "old" of the directory "%w". You can recover it in case of problem.]
+%(
+Your database has been completely rebuilt: the old version is on the subdirector
+y "old" of the directory "%w". You can recover it in case of problem.
+%)
+<p>
+[You can consult your very clean new database][:]
+<p>
+<ul><li><a href="http://%m:%P/%a">http://%m:%P/%a</a></ul>
+<p>
+[Return to the main menu.] (<a href="gwsetup?lang=%l;v=welcome.htm">gesetup</a>)

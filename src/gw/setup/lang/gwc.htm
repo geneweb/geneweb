@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwc.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+  <title>[Import a GeneWeb file]
+</title>
+%fsetup.css;
+</head>
+<body %Vbody_prop;>
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Import a GeneWeb file]</h1>
+</div>
+<p />
+<form method=GET action="gwc">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=%l>
+<ul><li>
+[Select the name of your GeneWeb source file (ending with ".gw");]
+<p>
+<table class="setup">
+<tr align=left><td>
+<ul><li>[Select the source file or navigate in your foldres.]
+%j
+</ul>
+</td></tr>
+<tr align=left><td>
+<ul><li>[or provide directly the name of the GeneWeb source file(s) relative to the path above.<br> If this parameter contains the '*' character, you must provide a unique name for created database.]
+%(
+or provide directly the name of the GeneWeb source file(s) relative to the path 
+above.<br> If this parameter contains the '*' character, you must provide a uniq
+ue name for created database.
+%)
+</ul>
+</td></tr>
+<p>
+<tr align=left><td>
+<dl><dt><dd><input name="fname" size="50" placeholder="file"></dl>
+</td></tr>
+</table>
+<span style="font-size:80%%">
+<table>
+<tr><td valign="top">[Note][:]
+</td>
+<td>[../ allows you to reach the parent directory.<br> In the Windows world, this will be insufficient to change the drive letter (C: -> D:), but you can do this directly in the url in your navigator.]
+%(
+../ allows you to reach the parent directory.<br> In the Windows world, this wil
+l be insufficient to change the drive letter (C: -> D:), but you can do this dir
+ectly in the url in your navigator.
+%)
+</td></tr>
+
+</table>
+</span>
+<p>
+<li>
+[Enter the name of the folder holding databases.]
+<p>
+<span style="font-size:80%%">
+<table class="setup">
+<tr align=left><td>
+<input name=bd size=30 placeholder="." value=".">
+[If you write nothing, it will be taken as "."]
+</td></tr>
+</table>
+</table>
+</span>
+<p>
+<li>
+[Enter the name you want to give to your %G database.]
+<p>
+<table class="setup">
+<tr align=left><td>
+<input name=o size=30>
+[If you write nothing, it will be deducted from the GeneWeb source file.]
+</td></tr>
+</table>
+<p>
+<li>
+[Select the options you want][:]
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=stats value="on">   </td>
+<td>[Display some statistics at the end (they will be visible in the traces).]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=nc value="on">   </td>
+<td>[Do not check the consistency of the data.]
+</td></tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=cg value="on">   </td>
+<td>[End by the initialization of consanguinities.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=f value="on">   </td>
+<td>[Delete database if already existing.]
+</td>
+</tr>
+</table>
+<p>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=gwo value="on">   </td>
+<td>[Kill .gwo files after base creation.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=reorg value="on">   </td>
+<td>[Reorg mode.]
+</td>
+</tr>
+</table>
+<p>
+<li>
+[Then click on this button][:]
+<input type=submit value="Ok">
+</ul>
+</form>

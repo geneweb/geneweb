@@ -1,0 +1,83 @@
+  <!-- $Id: templm/anctree_h.txt v7.0 2015/12/10 16:10:23 $ -->
+
+  <style type="text/css">
+    #htree{position:relative;font-family:monospace;font-size:20pt;width:30cm;height:30cm;border:solid 1px #000;}
+    #htree div{position:absolute;}
+    #htree div a{position:relative;display:block;border:solid 1px #333;margin:-1px;text-align:center;background-color:#DDD;}
+
+    #box{top:0;left:0;width:1cm;height:1cm;}
+
+    #l2{width:100%%;height:100%%;top:325%%;left:300%%;}
+    #l2 div{width:100%%;height:100%%}
+    #l2 div a{background-color:#3FA;width:100%%;height:100%%}
+    #s2{left:0;top:0;}
+
+    #l3,#l3 div,#l3 div a{width:100%%;height:100%%}    
+    #l3{left:100%%;top:325%%;}
+    #l3 div{border-bottom:solid 1px #333;}
+    #l3 div a{background-color:#9FA;}
+    #s4,#s6{top:-50%%;}
+    #s4 a,#s6 a{top:50%%;}
+    #s4{left:100%%}
+    #s6{left:300%%}
+    #s4 a{left:-100%%}
+    #s6 a{left:100%%}
+
+    #l4{width:100%%;height:100%%}
+    #l4{left:150%%;top:200%%;}
+    #l4 div{width:100%%;height:125%%}
+    #l4 div a{width:100%%;height:75%%}    
+    #l4 div{border-left:solid 1px #333;}
+    #l4 div a{background-color:#EB3;}
+    #s8,#s10{left:0}
+    #s12,#s14{left:400%%}
+    #s8,#s12{top:0}
+    #s10,#s14{top:225%%}
+    #s8 a,#s12 a{left:-50%%;top:-77%%}
+    #s10 a,#s14 a{left:-50%%;top:102%%}
+
+    #l5{width:100%%;height:100%%}
+    #l5{left:0%%;top:100%%;}
+    #l5 div{width:100%%;height:100%%}
+    #l5 div a{width:100%%;height:100%%}    
+    #l5 div a{background-color:#55F;}
+    #s16,#s20{left:0}
+    #s18,#s22{left:200%%}
+    #s24,#s28{left:400%%}
+    #s26,#s30{left:600%%}
+    #s16,#s18,#s24,#s26{top:0}
+    #s20,#s22,#s28,#s30{top:450%%}
+
+    #l6{width:100%%;height:100%%}
+    #l6{left:0;top:0;}
+    #l6 div{width:100%%;height:100%%}
+    #l6 div a{width:100%%;height:100%%}    
+    #l6 div a{background-color:#FAA;}
+    #s32,#s34,#s40,#s42{left:0}
+    #s36,#s38,#s44,#s46{left:200%%}
+    #s48,#s50,#s56,#s58{left:400%%}
+    #s52,#s54,#s60,#s62{left:600%%}
+    #s32,#s36,#s48,#s52{top:0}
+    #s34,#s38,#s50,#s54{top:200%%}
+    #s40,#s44,#s56,#s60{top:450%%}
+    #s42,#s46,#s58,#s62{top:650%%}
+  </style>
+
+<div><a href="%prefix;%access;">%self;</a></div>
+<div id="htree">
+  <div id="box">
+  %foreach;ancestor_level(6)
+    <div id="l%level;">
+      %foreach;ancestor
+        %if;(ancestor.anc_sosa.v %2 = 0)
+          <div id="s%ancestor.anc_sosa.v;">
+          <a href="%prefix;%ancestor.access;"
+             title="%ancestor; %if;(ancestor.same = "")& %ancestor.spouse;%else;== %ancestor.same;%end;"
+          >%ancestor.anc_sosa.v;</a></div>
+        %end;
+      %end;
+    </div>
+  %end;
+  </div>
+</div>
+

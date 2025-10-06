@@ -1,0 +1,115 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: templm/updmenu1.txt v7.0 2015/03/25 14:51:55 $ -->
+  <title>[*update]</title>
+  <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+  <style type="text/css">
+    tr {
+     text-align: left;
+    }
+  </style>
+</head>
+<body%body_prop; id="menutxt">
+%include;hed
+%message_to_wizard;
+
+<h1>%nn;
+  [*update]<br>
+  %first_name;
+  .%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end; %surname;
+</h1>
+
+<table border="%border;" width="90%%">
+<tr>
+  <th>[*person/persons]0</th>
+  <th>[*family/families]1</th>
+</tr>
+<tr>
+  <td>
+    <br>
+    <a href="%prefix;m=MOD_IND;i=%index;" title="[*modify::person/persons]0 (P)" accesskey="P">[*modify::] (P)</a>
+    <br>
+    %if;(bvar.can_send_image != "no" and not has_portrait_url
+      and first_name != "?" and surname != "?")
+      <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
+      <br>
+      %if;(auto_image_file_name != "")
+        <a href="%prefix;m=DEL_IMAGE;i=%index;">[*delete::image/images]0</a>
+        <br>
+      %end;
+    %end;
+    <br>
+    <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
+    <br>
+    <br>
+    <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>
+    <br>
+    %if;(not has_parents and first_name != "?" and surname != "?")
+      <br>
+      <a href="%prefix;m=ADD_PAR;ip=%index;">[*add::parents]</a>
+      <br>
+    %end;
+  </td>
+  <td>
+    %foreach;family;
+      %if;(family_cnt != 1)
+        <a href="%prefix;m=INV_FAM&i=%index;&f=%family.index;">[*invert::]</a>
+        <br>
+        %if;(family.father.index = prev_family.father.index
+         and family.mother.index = prev_family.mother.index)
+          <a href=%nn;
+          "%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;">%nn;
+          [*merge::]</a>
+          <br>
+        %end;
+      %end;
+      <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;
+       " %if;(nb_families = 1) title="[*modify::family/families]0 (F)" accesskey="F"%end;>%nn;
+      [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
+      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
+      <br>
+      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index">%nn;
+      [*delete::family/families]0</a>
+      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
+      <br>
+    %end;
+    <br>
+    %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
+    %elseif;(is_male or is_female)
+      <a href="%prefix;m=ADD_FAM;ip=%index;" title="[add::family/families]0 (A)" accesskey="A">%nn;
+      [*add::family/families]0 (A)</a>
+      <br>
+    %end;
+    %if;(nb_children != 0)
+      <br>
+      <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
+    %end;
+    %if;has_possible_duplications;
+      <br>
+      <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
+    %end;
+  </td>
+</tr>
+</table>
+
+%define;hint(xx)
+  [*to add a child to a family, use "%s":::xx]
+%end;
+
+%if;(nb_families != 0)
+  <p>
+    %apply;hint([*modify::family/families]0)
+    <br>
+  </p>
+%end;
+  %include;trl
+  %include;copyr
+  %query_time;
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: templm/welcome.txt v7.0 2015/08/14 16:19:14 $ -->
+  <title>GeneWeb - %apply;capitalize(base.name)</title>
+  <meta name="robots" content="none"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+</head>
+
+%let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%in;
+%let;l_on1;onclick="this.focus()"%in;
+
+%define;book_of(xx)
+  [*book of %s:::xx]
+%end;
+
+%define;sosa_rel(xx)
+  [<em>Sosa number</em> relative to %t:::xx]
+%end;
+
+%define;disconnect(xx,yy)
+  yy[:] %if;(user.ident != "")
+    %if;("xx" = "wizard" and bvar.authorized_wizards_notes = "yes")
+      <a href="%prefix;m=WIZNOTES;v=%user.ident;">%user.ident;</a>
+    %else;
+      %user.ident;
+    %end;
+  %end;
+  <span > (<a href="%prefix;w=">[disconnect]</a>)</span>
+%end;
+
+%define;counter()
+  %if;(bvar.counter != "no")
+    <div>
+    %apply;interp([
+af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
+    aan hierdie blad, sedert %start_date;.
+bg: От %start_date; насам е имало %nb_accesses; посещения, от които
+    %nb_accesses_to_welcome; са на настоящата страница.
+br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :
+    %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
+ca: Hi ha hagut %nb_accesses; consultes, de les quals
+    %nb_accesses_to_welcome; en aquesta pàgina, des del %start_date;.
+cs: %nb_accesses; přístupů, z toho %nb_accesses_to_welcome; na tuto
+    stránku, od %start_date;.
+da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome;
+    af dem på denne side, siden %start_date;.
+de: Seit dem %start_date; gab es %nb_accesses; Zugriffe, davon
+    %nb_accesses_to_welcome; auf diese Seite.
+en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome;%sp;
+    of them to this page, since %start_date;.
+eo: Estis %nb_accesses; alirejoj, el kiuj %nb_accesses_to_welcome; al
+    ĉi tiu paĝo, ekde la %start_date;.
+es: Ha habido %nb_accesses; consultas, de las cuales
+    %nb_accesses_to_welcome; corresponden a esta página, desde
+    el %start_date;.
+et: Alates andmebaasi loomise päevast (%start_date;) on selle poole
+    pöördutud %nb_accesses; korda, neist %nb_accesses_to_welcome; korda
+    sellele lehele.
+fi: Tähän mennessä %nb_accesses; tapahtumaa, joista
+    %nb_accesses_to_welcome; tälle sivulle %start_date; jälkeen.
+fr: Il y a eu %nb_accesses; consultations, dont %nb_accesses_to_welcome; à
+    cette page, depuis le %start_date;.
+he: היו %nb_accesses; כניסות, כולל %nb_accesses_to_welcome;
+    כניסות לעמוד זה, מאז %start_date;.
+is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome;
+    af þeim á þessa síðu, síðan %start_date;.
+it: Dal %start_date; ci sono stati %nb_accesses; accessi,
+    %nb_accesses_to_welcome; dei quali a questa pagina.
+lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
+    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē.
+nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
+    bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
+no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome;
+    av dem til denne siden, siden %start_date;.
+pl: Baza została od %start_date; odwiedzona %nb_accesses; razy (w tym
+    %nb_accesses_to_welcome; razy strona tytułowa).
+pt: Houve %nb_accesses; consultas, das quais %nb_accesses_to_welcome;
+    foram a esta página, desde %start_date;.
+ro: Au avut loc %nb_accesses; accese din care %nb_accesses_to_welcome;
+    pe aceatsa pagina din %start_date;
+ru: Всего было %nb_accesses; обращений, из них %nb_accesses_to_welcome;
+    к этой странице, начиная с %start_date;.
+sl: %nb_accesses; dostopov, %nb_accesses_to_welcome; od teh na to stran,
+    od %start_date;.
+sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
+    av dem till den här sidan, sedan %start_date;.
+zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
+    次访问本主页， 自从 %start_date;。
+])%nl;
+    </div>
+  %end;
+%end;
+
+%define;login()
+  %if;(wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "" or bvar.auth_file != ""))
+    %apply;disconnect("wizard",[*wizard/wizards/friend/friends/exterior]0)
+  %elseif;(friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != "" or bvar.auth_file != ""))
+    %apply;disconnect("friend",[*wizard/wizards/friend/friends/exterior]2)
+  %elseif;(bvar.friend_passwd = "" and bvar.friend_passwd_file = ""
+       and bvar.wizard_passwd = "" and bvar.wizard_passwd_file = "" and bvar.auth_file = "")
+  %else;
+    <form class="login" method="post" action="%action;">
+      %hidden;
+      [*access] [wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0[:] <input name="w" type="password" size="20" maxlength="100" placeholder="[user/password/cancel]0:[user/password/cancel]1" autofocus%/>
+    </form>
+  %end;
+%end;
+
+<body%body_prop; id="welcome">
+%include;hed
+<div class="container">
+<div style="float:right;margin-top:1.8em;margin-right:1.8em;">
+%apply;login()
+</div>
+<div style="margin-top:1.7em;margin-left:1.7em">
+  <img src="%images_prefix;gwlogo.png" width="280" alt="GeneWeb logo">
+</div>
+<div style="margin-left:7.5em">
+%if;(bvar.motd != "")%apply;interp(bvar.motd)%end;
+</div>
+<div>
+%if;just_friend_wizard;
+  <div class="div1" style="color:#FF0000;font-weight:700;">
+    [
+en: Wizard rights are now suspended for maintenance.
+fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
+]
+  </div>
+%end;
+<table style="margin:auto;">
+  <tr>
+    <td style="text-align:center" colspan=3>
+    <h1>
+    %apply;interp([
+af: Genealogiese databasis
+ar: قاعدة المعلومات العائلية (جينيالوجيا)
+bg: Родословна база от данни
+br: Bon roadoù genealogiezh
+ca: Base de dades genealògica
+cs: Genealogická databáze
+da: Genealogisk database
+de: Genealogische Datenbank
+en: Genealogical database
+eo: Datenbazo genealogia
+es: Base de datos genealógica
+et: Genealoogiline andmebaas
+fi: Sukutietokanta
+fr: Base de données généalogique
+he: מאגר מידע תולדותי
+is: Ættfræði gagnagrunnur
+it: Base di dati genealogica
+lv: Ciltsrakstu datu bāze
+nl: Genealogische databank
+no: Genealogisk database
+oc: Basa de donadas genealogica
+pl: Genealogiczna baza danych
+pt: Base de Dados Genealógica
+ro: Baza de date genealogice
+ru: Генеaлогическая база данных
+sl: Genealoška baza podatkov
+sv: Genealogisk databas
+zh: 网络家谱
+]) %apply;capitalize(base.name)</h1>
+<h2>%base.nb_persons; [person/persons]1</h2>
+    %if;(browsing_with_sosa_ref)<h3>%sosa_ref;</h3>%end;
+    %apply;counter()
+    </td>
+  </tr><tr>
+    <td>
+      <ul>
+        %if;base.has_notes;
+          <li>
+            <a href="%prefix;m=NOTES">
+              %if;(bvar.base_notes_title!="")%bvar.base_notes_title;%else;[*base notes]%end;
+            </a>
+          </li>
+        %end;
+        %if;has_misc_notes;
+          <li>
+            <a href="%prefix;m=MISC_NOTES">[*base index notes]</a>
+          </li>
+        %end;
+        %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
+             and (wizard or wiznotes_dir_exists) and
+                 bvar.authorized_wizards_notes = "yes")
+          <li>
+            <a href="%prefix;m=WIZNOTES">%sq;
+            [*base wizard notes]</a>
+          </li>
+        %end;
+        %if;(bvar.disable_forum != "yes")
+          <li><a href="%prefix;m=FORUM">[*database forum]</a></li>
+        %end;
+        <li><a href="%prefix;m=STAT">[*statistics]</a></li>
+        <li><a href="%prefix;m=CAL">[*calendar/calendars]1</a></li>
+        <li><a href="%prefix;m=ANM">[*anniversaries]</a></li>
+      </ul>
+    </td><td>
+      <ul>
+        %if;has_history;%nl;
+          <li><a href="%prefix;m=HIST;k=20">[*history of updates]</a></li>
+        %end;%nl;
+        %if;(not base.has_notes)
+          <li><a href="%prefix;m=MOD_NOTES">[*add base notes]</a></li>
+        %end;
+        %if;(wizard)
+          <li><a href="%prefix;m=MOD_DATA;data=fn">%apply;book_of([first name/first names]1)</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([place/places]1)</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a></li>
+        %end;
+      </ul>
+    </td>
+        <td>
+        <ul>
+          %if;(wizard and bvar.propose_add_family != "no")
+            <li><a href="%prefix;m=ADD_FAM" target="_blank">[*add::family/families]0</a></li>
+          %end;
+        <li>
+          <a href="%prefix;m=P;tri=A" title="[*first name/first names]1, [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*first name/first names]1</a>
+          <a href="%prefix;m=P;tri=F" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">🔢</a></li>
+        <li>
+          <a href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*surname/surnames]1</a>
+          <a href="%prefix;m=N;tri=F" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">🔢</a></li>
+        </ul>%if;(bvar.propose_titles != "no")<form method="get" action="%action;">
+                  %hidden;
+                  <input id="mTT" type="hidden" name="m" value="TT"/>
+                  <ul><li><a href="%prefix;m=TT;t=" title="[*all the titles], [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*title/titles]1</a><input type="text" name="t" size="10" maxlength="100" title="[*search/case sensitive]0 [title/titles]0"%/></li>
+                  <li><a href="%prefix;m=TT;p=*" title="[*all the estates], [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*estate]0s</a><input type="text" name="p" size="10" maxlength="100" title="[*search/case sensitive]0 [estate]0"%/>
+                  <input id="hide_ie2" tabindex="-1" type="submit" value="Ok"/>
+                  </li></ul>
+          </form>
+        %end;
+        </td>
+        </tr><tr>
+        <td colspan="3">
+        %if;(bvar.propose_place_surnames != "no")%nl;
+          <form method="get" action="%prefix;">
+            %hidden;
+            [*place/places]0 / [event/events]1[:]
+            <input type="hidden" name="m" value="PS"%/>
+            <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
+            <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>
+            <label><input type="checkbox" name="de" value="on" checked="checked" %l_on1;%/>[death]</label>
+            <label><input type="checkbox" name="bp" value="on" %l_on1;%/>[baptism]</label>
+            <label><input type="checkbox" name="bu" value="on" %l_on1;%/>[burial]</label>
+            <input type="submit" value="Ok"%/>
+          </form>
+        %end;
+     </td></tr>
+  </table>
+<br>
+%include;trl
+%include;copyr
+</div>
+</div>
+%include;js
+%query_time;
+</body>
+</html>

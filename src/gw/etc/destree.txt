@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<head>
+  <!-- $Id: destree.txt v7.0 28/04/2017 09:34:30 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %first_name; %surname; %if;(occ!="0")(%occ;)%end;[:] [descendants tree]
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+<div class="container%if;(evar.wide="on")-fluid%end;">
+%include;perso_utils
+%include;menubar
+%include;modules/arbre_descendants
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

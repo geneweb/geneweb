@@ -1,0 +1,102 @@
+%( a carousel of all the images in carrousel shown in a basic Bootstrap 4 modal %)
+<!-- begin carrousel_display.txt -->
+<div class="modal fade" id="carousel_modal" tabindex="-1" role="dialog" aria-labelledby="carouselmodal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <h5 class="modal-header d-inline-flex justify-content-between">
+        %if;wizard;
+        <a href="%prefix;m=SND_IMAGE_C&i=%index;"
+          title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%carrousel_img_nbr; %if;(carrousel_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
+        %end;
+          %if;has_portrait;1<i class="fas fa-image-portrait ml-1 mr-2" aria-hidden="true"></i>%end;
+          %carrousel_img_nbr;<i class="far fa-image fa-fw ml-1" aria-hidden="true"></i>%nn;
+        %if;wizard;
+        </a>
+        %end;
+          %if;(public_name!="")%public_name;%else;%first_name;%end; %surname;
+        </span>
+        <div class="btn-group">
+          <a role="button" class="btn btn-link p-0 " href="#carousel" data-slide="prev">
+             <i class="fa fa-chevron-left fa-fw " aria-hidden="true" title="[*previous]"></i>
+            <span class="sr-only">[*previous]</span>
+          </a>%nn;
+          <a role="button" class="btn btn-link p-0" href="#carousel" data-slide="next">
+            <i class="fa fa-chevron-right fa-fw" aria-hidden="true" title="[*next]"></i>
+            <span class="sr-only">[*next]</span>
+          </a>
+        </div>
+      </h5>
+      <div class="modal-body d-flex justify-content-center">
+        <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
+        %(%let;maximg;%if;has_portrait and has_blason;%expr(carrousel_img_nbr+2)%else;%if;has_portrait or has_blason;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%end;%in;
+            <ol class="carousel-indicators">
+            %for;i;0;maximg;
+            <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
+             %end;
+          </ol>%)
+          <div class="carousel-inner">
+            %reset_count;
+            %if;(has_portrait)
+              <div class="carousel-item active">
+                <a href="%prefix;m=IM&i=%index;" target="_blank" rel="noopener">
+                  <img class="img-fluid" src="%prefix;m=IM&i=%index;" alt="[*portrait]">
+                </a>
+                <div class="position-relative d-none d-md-block">
+                  <span>[portrait]</span>
+                </div>
+              </div>
+            %end;
+            %if;(has_blason_self)
+              <div class="carousel-item%if;(not has_portrait)active%end;">
+                %if;("http" in blason_self)
+                  <a href="%blason;" target="_blank" rel="noopener">
+                    <img class="img-fluid" src="%blason;" alt="[*blason/blasons]0 yy">
+                  </a>
+                %else;
+                  <a href="%prefix;m=FIM&i=%index;" target="_blank" rel="noopener">
+                    <img class="img-fluid" src="%prefix;m=FIM&i=%index;" alt="[*blason/blasons] xx">
+                  </a>
+                %end;
+                <div class="position-relative d-none d-md-block">
+                  <span>[blason/blasons]0</span>
+                </div>
+              </div>
+            %end;
+            %if;(carrousel_img_nbr>0)
+              %foreach;img_in_carrousel;%incr_count;
+                <div class="carousel-item%if;(not has_portrait and not has_blason and is_first) active%end;">
+                  %if;("http" in url_in_env)
+                    <a href="%url_in_env;" target="_blank" rel="noopener">
+                      <img class="img-fluid" src="%url_in_env;" alt="%count; slide">
+                    </a>
+                  %else;
+                    <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" target="_blank" rel="noopener">
+                      <img class="img-fluid" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" alt="%count; slide">
+                    </a>
+                  %end;
+                  <div class="position-relative d-inline-flex w-100 d-none d-md-block">
+                    <span>[image/images]0 %count;/%carrousel_img_nbr;[:] </span>
+                    <small class="ml-auto">%carrousel_img; </small>
+                    %if;(carrousel_img_src!="")<br>
+                    <span><strong>[*source/sources]0[:] </strong>%carrousel_img_src;</span>%end;
+                    %if;(carrousel_img_note!="")<br>
+                    <span><strong>[*note/notes]0[:] </strong>%carrousel_img_note;</span>%end;
+                  </div>
+                </div>
+              %end;
+            %end;
+          </div>
+          %(<a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>%)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end carrousel_display.txt -->

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: err_ngw.htm,v 7.00 2018-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[error]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;"><font color=red>[error]</font></h1>
+</div>
+[You selected the directory][:]
+<p>
+<pre>
+     %a
+</pre>
+
+[But it does not hold the command "gwu" required to transfer your database. Are you sure it is a %G distribution directory]
+%(
+But it does not hold the command "gwu" required to transfer your database. Are y
+ou sure it is a %G distribution directory
+%)
+<p>
+[Or else, it may be a very old version of %G where the command "gwu" was called "gwb2gw". If it is the case, rename the file "gwb2gw" into "gwu" in this directory and try again.]
+%(
+Or else, it may be a very old version of %G where the command "gwu" was called "gwb2gw". 
+If it is the case, rename the file "gwb2gw" into "gwu" in this directory and try again.
+%)
+<p>
+[Go back to the previous page.] (<a href="%n">back</a>)

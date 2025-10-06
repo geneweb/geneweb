@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: bsi.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Application of "%d"]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Application of "%d"]</h1>
+</div>
+[The operation "%d" will be applied on your database "%a". Warning: it can take some seconds or some minutes, depending on the case. Be patient.]
+%(
+The operation "%d" will be applied on your database "%a". Warning: it can take s
+ome seconds or some minutes, depending on the case. Be patient.
+%)
+<p>
+[Push this button to start][:]
+<p>
+<form method="post" action="%d">
+%h
+<dl><dt><dd><input type="submit" value="Ok" /></dl>
+</form>
+<p>
+[For information, this operation corresponds to the following commands][:]
+<pre>
+     $ cd "%w"
+     $ %x%/%d%p > comm.log
+</pre>
+[<span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.]
+%(
+<span style="color:#FF0000;">WARNING</span>: The content of file %o will be over
+written.
+%)

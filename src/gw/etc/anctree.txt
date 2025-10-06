@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+<!-- $Id: anctree.txt v7.1 07/09/2023 04:06:52 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
+%define;ttl()
+  %apply;a_of_b%with;
+    %if;(e.t="A")[*male line/female line]0%nn;
+    %elseif;(e.t="C")[*male line/female line]1%nn;
+    %else;[*ascendants tree]%end;%nn;
+  %and;%self;%end; %nn;
+%end;
+  <title>%apply;ttl()</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+%let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
+<div class="container%if;(e_v>3 and e.t!="A" and e.t!="C"))-fluid%end; pb-6">
+%include;perso_utils
+%if;not cancel_links;
+  %include;menubar
+%end;
+%if;(e.t="T" and e.t1="7")
+  %include;modules/arbre_7gen
+%elseif;(e.t="T" and e.t1="h6")
+  %include;modules/arbre_h6
+%elseif;(e.t="T" and e.t1="m") %(m for compatibility with existing arbre_8gen %)
+  %include;modules/arbre_8gen
+%elseif;(e.t="T" and e.t1="CT") %(CT for compatibility with templm %)
+  %(js loaded before because jquery.line.js needs jquery loaded before %)
+  %include;js
+  %include;modules/arbre_hi_tools
+  %include;templm/tools
+  %include;modules/arbre_hi_indexes
+  %include;modules/arbre_hi
+%elseif;(e.t="A" or e.t="C" or e.t="T")
+  <div class="d-flex flex-column ml-3">
+    <h3 class="display-5 ml-3">%nn;
+      %apply;ttl()
+      <%if;(e.t="T" and e.v>2)span%else;div%end; class="text-small text-muted font-weight-lighter">%apply;togena(e.v)</%if;(e.t="T")span%else;div%end;>
+    </h3>
+    %include;modules/arbre_vertical
+  </div>
+%else;
+  This should not happen (probably a bad variable in URL: check t=/t1=)
+%end;
+%include;trl
+%if;(e.t!="T" and e.t!="A" and e.t!="C" and e.t1="")
+%include;copyr
+%end;
+</div>
+%if;(not (e.t="T" and e.t1="CT"))
+%include;js
+%query_time;
+%end;
+</body>
+</html>

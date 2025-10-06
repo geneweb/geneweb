@@ -1,0 +1,71 @@
+<!-- page_test v1 %version 24/12/2023 00:58:22 -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+%include.css
+</head>
+<body>
+<div class="container">
+%include;home
+%define;language(x)
+  %apply;nth%with;
+    af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
+    it/lt/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
+    %and;x%end;
+%end;
+%define;compilation_info(x,y)
+  [*branch %s compiled on %s from commit:::x:y]0%nn;
+%end;
+<h1 class="mt-1 mx-3">%nn;
+  [*geneweb parameters]%nn;
+  <i class="fa fa-hat-wizard fa-xs text-success ml-2"
+     title="[*wizard/wizards/friend/friends/exterior]1"
+     aria-hidden="true" alt="green [*wizard/wizards/friend/friends/exterior]1 icon"></i>%nn;
+</h1>
+<section id="build-info" class="mt-1 mx-3">
+  <h2>[*build information]</h2>
+  <div>%nn;
+    GeneWeb version[:] %version;<br>
+    %apply;compilation_info(branch, compil_date) %commit_id;
+  </div>
+</section>
+
+<section id="user-info"  class="mt-3 mx-3">
+  <h2>[*user and language variables]</h2>
+  <div>%nn;
+    User[:] %user.ident;<br>
+    username[:] %user.name;<br>
+    userkey[:] %user.key;<br>
+    lang: %lang.full; (%lang;)<br>
+    lang fallback: %lang_fallback;<br>
+    default_lang: %default_lang;<br>
+    browser_lang: %browser_lang;<br>
+  </div>
+</section>
+
+<section id="gwd-arguments" class="mt-3 mx-3">
+<h2>[*launch arguments of Gwd server]</h2>
+ <div>%gwd.arglist;</div>
+  <p>
+  Mode: %if;(cgi)CGI%else;Server%end;<br>
+  prefix: %prefix;<br>
+  etc_prefix: %etc_prefix;<br>
+  images_prefix: %images_prefix;<br>
+</section>
+
+<section id="bvar-list" class="mt-3 mx-3">
+  <h2>[*configuration parameters]</h2>
+  <div>
+     Mode: <b>%if;reorg;Reorg%else;Classic%end;</b>[:]%sp;
+    <tt>%if;reorg;%base.name;.gwb%/etc%/%base.name;%else;%base.name;%end;.gwf</tt><br>
+    %bvar.list;
+  </div>
+</section>
+
+%include;trl
+%include;copyr
+%include;js
+%query_time;
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!-- $Id: templm/ancdes_cal.txt v7.0 2014/11/25 21:14:52 $ -->
+
+%( table calendar nb day-month tf1/tl1 = cal %)
+
+%define;color(xx)
+  %apply;nth%with;
+    /666/933/393/339/999/399/939/993/AAA/FAA/AFA/AAF/FFF/AFF/FAF/FFA%and;
+    xx%end;
+%end;
+
+%define;anc_cal()
+  %reset_count;
+  %empty_sorted_list;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %if;(ancestor.birth_date.day != "")
+            %incr_count;
+            %let;mm_dd;%expr(ancestor.birth_date.month+100)_%expr(ancestor.birth_date.day+100)%in;
+            %apply;add_in_sorted_list(mm_dd,ancestor.birth_date.month,ancestor.birth_date.day,ancestor.index,birth_symbol)
+          %end;
+          %if;(ancestor.death_date.day != "")
+            %incr_count;
+            %let;mm_dd;%expr(ancestor.death_date.month+100)_%expr(ancestor.death_date.day+100)%in;
+            %apply;add_in_sorted_list(mm_dd,ancestor.death_date.month,ancestor.death_date.day,ancestor.index,death_symbol)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;des_cal(curlev,maxlev)
+  %if;(birth_date.day != "")
+    %incr_count;
+    %let;mm_dd;%expr(birth_date.month+100)_%expr(birth_date.day+100)%in;
+    %apply;add_in_sorted_list(mm_dd,birth_date.month,birth_date.day,index,birth_symbol)
+  %end;
+  %if;(death_date.day != "")
+    %incr_count;
+    %let;mm_dd;%expr(death_date.month+100)_%expr(death_date.day+100)%in;
+    %apply;add_in_sorted_list(mm_dd,death_date.month,death_date.day,index,death_symbol)
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;des_cal(curlev+1,maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;cal(z1)
+  %if;("z1" = "anc")%apply;anc_cal()%else;%apply;des_cal(0,l_v)%end;
+  <div class="stat_cal bcbg1">
+    <span class="title" style="color:#EEE;">[*calendar/calendars]0</span>
+    <div class="row">
+      %for;i;1;32;
+        <div>%i;</div>
+      %end;
+    </div>
+    <div class="col">
+      [(month)]0<br>[(month)]1<br>[(month)]2<br>[(month)]3<br>
+      [(month)]4<br>[(month)]5<br>[(month)]6<br>[(month)]7<br>
+      [(month)]8<br>[(month)]9<br>[(month)]10<br>[(month)]11
+    </div><br>
+    <div class="body">
+    %reset_count;
+    %foreach;sorted_list_item;
+      %if;(prev_item.1 != item.1)
+        %reset_count;%incr_count;
+        <a href="%prefix;spouse=on&m=RLM&i%count;=%item.4;&t%count;=%item.5;&%nn;
+      %end;
+      %if;(prev_item.1 = item.1)
+        %incr_count;
+        i%count;=%item.4;&t%count;=%item.5;&%nn;
+      %end;
+      %if;(next_item.1 != item.1)
+        %let;top;%expr(item.2 * 30 - 30)%in;
+        %let;left;%expr(item.3 * 28 - 28)%in;
+        %let;colhex;%apply;color(count)%in;
+        %incr_count;
+        i%count;=%index;&t%count;=%item.3; %apply;nth([(month)],item.2-1);%nn;
+        " style="border:solid 1px #%colhex;; color:#%colhex;; top:%top;px; left:%left;px;">%expr(count - 1)</a>
+      %end;
+    %end;
+    </div>
+  </div>
+%end;
+
+%( main %)
+%apply;togen()
+%if;(evar.m = "A")
+   %apply;cal("anc")
+%else;
+   %apply;cal("des")
+%end;

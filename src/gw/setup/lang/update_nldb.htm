@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: update_nldb.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Update_nldb]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Update links page / family chronicle]</h1>
+</div>
+<p>
+<form method="get" action="update_nldb">
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
+<ul><li>
+[Select your database by clicking on the associated button][:]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td>
+<input type="radio" name="anon" value="%a">   </td>
+<td><a href="http://%m:%P/%a">%a</a></td>
+</tr>|
+<tr align="left">
+<td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<li>
+[Then click on this button][:]
+<p>
+<input type="submit" value="[Update_nldb]">
+</ul>
+</form>

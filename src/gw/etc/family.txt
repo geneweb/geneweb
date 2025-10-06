@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<head>
+  <!-- $Id: family.txt v7.1 30/10/2017 13:28:29 -->
+<title>%nn;
+  %if;has_public_name;
+    %if;has_qualifiers;%public_name; %qualifier;
+    %else;%public_name; %surname;%end;
+  %else;
+    %if;has_qualifiers;%first_name; %qualifier;
+    %else;%first_name; %surname;%end;
+  %end;
+</title>
+<meta name="robots" content="none">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+<link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%include;perso_utils
+<a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
+<div class="container%if;(evar.wide="on")-fluid%end;">
+  %include;menubar
+  %message_to_wizard;
+  <div id="content" tabindex="-1">
+    %include;modules/arbre_famille
+  </div>
+  %if;(not cancel_links)
+    %include;trl
+    %include;copyr
+    %query_time;
+  %end;
+</div>
+%include;js
+</body>
+</html>

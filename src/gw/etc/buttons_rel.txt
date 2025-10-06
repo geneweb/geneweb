@@ -1,0 +1,100 @@
+<!-- $Id: buttons_rel.txt v7.1 31/07/2023 10:50:56 $ -->
+%( Boutons de configurations et d’options pour les calculs de relations %)
+%let;e_sp;%if;(e.sp!="")0%else;1%end;%in;
+%let;e_im;%if;(e.im!="")0%else;1%end;%in;
+<div class="btn-toolbar my-2 ml-5" role="toolbar" arial-label="config buttons toolbar">
+  <div class="d-flex">
+    %if;is_printed_by_template; %( because of person_index and link_next %)
+      %( TODO after check. Could be simplified with those two functions
+         returning "" rather than %person_index.x? or %link_next? in templ.ml %)
+      %if;(e.em="R" or ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
+        <a class="%if;(link_next="") disabled%end;%if;(e.et="S") border rounded%end;"
+          href="%if;(link_next!="")%link_next;%nn;
+            %else;%nn;
+              %prefix;&em=R&et=S%nn;
+              %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+              %elseif;(e.ei!="" and e.select!="")&i=%e.select;&ei=%e.ei;%nn;
+              %else;&i=%person_index.1;&ei=%person_index.2;%end;%nn;
+            %end;%nn;
+            %if;(e_im=0)&im=0%end;%nn;
+            %if;(e_sp=0)&sp=0%end;%nn;
+            %if;(e.bd!="")&bd=%e.bd;%end;%nn;
+            %if;(e.color!="")&color=%e.color;%end;"
+          title="[*shortest path]%if;(is_printed_by_template and link_next!=""), [visualize/show/hide/summary]1
+           [next relationship path]%end;" accesskey=">">%nn;
+          <i class="fas fa-bezier-curve fa-fw"></i>%if;(link_next!="")<i class="fas fa-arrow-right fa-fw"></i>%end;%nn;
+        </a>
+      %end;
+    %else;
+      %if;(e.em="R" or ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
+        <a class="disabled %if;(e.et="S") border rounded%end;"
+          href="%prefix;&em=R&et=S%nn;
+                %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+                %elseif;(e.ei!="" and e.select!="")&i=%e.select;&ei=%e.ei;%nn;
+                %else;&i=%person_index.1;&ei=%person_index.2;%end;%nn;
+            %if;(e_im=0)&im=0%end;%nn;
+            %if;(e_sp=0)&sp=0%end;%nn;
+            %if;(e.bd!="")&bd=%e.bd;%end;%nn;
+            %if;(e.color!="")&color=%e.color;%end;"
+          title="[*shortest path]" accesskey=">">%nn;
+          <i class="fas fa-bezier-curve fa-fw"></i><i class="fas fa-arrow-right fa-fw"></i>%nn;
+        </a>
+      %end;
+    %end;
+    %if;(is_printed_by_template and ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
+      <a class="ml-2%if;(e.et="A") border rounded%end;"
+        href="%prefix;&em=R&et=A%nn;
+          %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+          %else;&i=%person_index.1;&ei=%person_index.2;%nn;
+          %end;%nn;
+          %if;(e_im=0)&im=0%end;%nn;
+          %if;(e_sp=0)&sp=0%end;%nn;
+          %if;(e.bd!="")&bd=%e.bd;%end;%nn;
+          %if;(e.color!="")&color=%e.color;%end;%nn;"
+        title="[*relationship link/relationship links]1" accesskey="^">%nn;
+        <i class="fa fa-user-group fa-fw"></i></a>
+      <a class="ml-2%if;(e.et="M") border rounded%end;"
+        href="%prefix;&em=R&et=M
+          %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+          %else;&i=%person_index.1;&ei=%person_index.2;%nn;
+          %end;%nn;
+          %if;(e_im=0)&im=0%end;%nn;
+          %if;(e_sp=0)&sp=0%end;%nn;
+          %if;(e.bd!="")&bd=%e.bd;%end;%nn;
+          %if;(e.color!="")&color=%e.color;%end;"
+        title="[*relationship by marriage]" accesskey="-">%nn;
+        <i class="fa fa-ring fa-fw"></i></a>
+    %end;
+    %if;(e.et="A" or e.et="M")
+      <a class="ml-3" href="%if;(e.long!="on")%url_set.long.on;%else;%url_set.long;%end;"
+        title="%if;(e.long!="on")[*long display]1%else;
+            [*visualize/show/hide/summary]2 [long display]%end; ">%nn;
+        <i class="fa fa-chevron-%if;(e.long="on")up%else;down%end; fa-fw"></i></a>
+    %else;
+      <span class="invisible"><i class="fa fa-chevron-up fa-fw"></i></span>
+    %end;
+  </div>
+  <div class="d-flex col-5 ml-5">
+    <a href="%if;(e_im=1)%url_set.im.0;%else;%url_set.im;%end;"
+      %if;(e.dag="on") class="disabled"%end;
+      title="%if;(e_im=1)[*visualize/show/hide/summary]2%else;
+          [*visualize/show/hide/summary]1%end; [image/images]0">
+      <i class="far fa-image fa-lg%if;(e_im=0) text-danger%end;"></i></a>
+    <a class="ml-2" href="%if;(e_sp=1)%url_set.sp.0;%else;%url_set.sp;%end;"
+       %if;(e.dag="on") class="disabled"%end;
+       title="%if;(e_sp=1)[*visualize/show/hide/summary]2%else;
+          [*visualize/show/hide/summary]1%end; [spouse/spouses]1">
+      <i class="fa fa-user male p-0"></i>%if;(e.sp!="")<i class="fa fa-user female p-0"></i>%end;</a>
+    %if;(e.i!="" and e.ei!="")
+      <a class="ml-2" href="%apply;url_set%with;i/ei%and;%e.ei;/%e.i;%end;"
+        title="[*invert] [person/persons]1"><i class="fa fa-people-arrows fa-fw"></i></a>
+    %elseif;(evar.i1!="" and person_index.1!="" and evar.i2!="" and person_index.2!="")
+      <a class="ml-2" href="%apply;url_set%with;i1/i2/pn%and;%person_index.2;/%person_index.1;%end;"
+        title="[*invert] [person/persons]1"><i class="fas fa-people-arrows fa-lg fa-fw"></i></a>
+    %end;
+    <a class="ml-2" href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;" target="_blank"><i class="fa fa-shuffle fa-fw" title="[*dag]"></i></a>
+    <a class="ml-2" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw" title="[*cancel GeneWeb links]"></i></a>
+    <a class="ml-4" title="[*add/clear/show/edit the graph]3" href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
+      <i class="far fa-pen-to-square fa-lg fa-fw"></i></a>
+  </div>
+</div>

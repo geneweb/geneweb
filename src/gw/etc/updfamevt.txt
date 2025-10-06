@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: updfamevt.txt v7.1 10/01/2023 20:01:49 $ -->
+  <title>[*modify::family/families]0</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+<div class="container">
+%include;home
+<h1>[*changed order of family's events]</h1>
+
+%define;one_fevent(xcnt)
+  <li id="sort_list" class="list-group-item d-flex align-items-center">
+    <input type="hidden" name="e_idxcnt" value="xcnt">
+    <input type="hidden" class="pos" name="e_posxcnt" size="2" maxlength="2" value="xcnt">
+    <button type="button" class="btn btn-primary up mr-2" title="[*move up/down]0">
+      <i class="fa-solid fa-up-long"></i></button>
+    <button type="button" class="btn btn-primary down mr-2" title="[*move up/down]1">
+      <i class="fa-solid fa-down-long"></i></button>
+    %event_str;
+  </li>
+%end;
+
+%define;print_event()
+  <form method="POST" action="%action;">
+    %hidden;
+    %if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;">%nl;%end;
+    %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;">%nl;%end;
+    <input type="hidden" name="m" value="CHG_EVT_FAM_ORD_OK">
+    <ul id="sort_list" class="list-group">
+      %foreach;fevent;
+        %apply;one_fevent(cnt)
+      %end;
+    </ul>
+    <input type="submit" class="btn btn-primary ml-4 mt-2" value="Ok">
+  </form>
+%end;
+
+%apply;print_event()
+
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+<script>
+ $('.up').click(function () {
+   var $li = $(this).parent();
+   $li.find('.pos').val(function(i, old){return --old});
+   $li.prev().find('.pos').val(function(i, old){return ++old});
+   if ($li.is(':first-child'))
+     $('#sort_list').append($li);
+   else
+     $li.insertBefore($li.prev());
+
+   if ($li.is(':first-child')) {
+     $li.find('.up').css('visibility', 'hidden');
+     $li.next().find('.up').css('visibility', 'visible');
+   }
+   if ($li.next().is(':last-child')) {
+     $li.next().find('.down').css('visibility', 'hidden');
+     $li.find('.down').css('visibility', 'visible');
+   }
+ });
+
+ $('.down').click(function () {
+   var $li = $(this).parent();
+   $li.find('.pos').val(function(i, old){return ++old});
+   $li.next().find('.pos').val(function(i, old){return --old});
+   if ($li.is(':last-child'))
+     $('#sort_list').prepend($li);
+   else
+     $li.insertAfter($li.next());
+
+   if ($li.is(':last-child')) {
+     $li.find('.down').css('visibility', 'hidden');
+     $li.prev().find('.down').css('visibility', 'visible');
+   }
+   if ($li.prev().is(':first-child')) {
+     $li.prev().find('.up').css('visibility', 'hidden');
+     $li.find('.up').css('visibility', 'visible');
+   }
+ });
+
+ $(document).ready(function(){
+   $(".up").each(function(){
+     var $li = $(this).parent();
+     if ($li.is(':first-child'))
+       $(this).css('visibility', 'hidden');
+   });
+   $(".down").each(function(){
+     var $li = $(this).parent();
+     if ($li.is(':last-child'))
+       $(this).css('visibility', 'hidden');
+   });
+ });
+</script>
+</body>
+</html>

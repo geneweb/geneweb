@@ -1,0 +1,186 @@
+:root {
+  --fc-stroke-width: 0.1%;
+  --fc-stroke-dasharray: 5px;
+}
+
+@media print {
+  .noprint {
+    display: none;
+  }
+  #place_list {
+    position: static;
+  }
+}
+
+svg .highlight {
+ fill: lightgrey !important;
+}
+svg .text_highlight {
+ fill: black !important;
+}
+
+svg .same_hl .bg {
+ fill: lightgrey !important;
+}
+svg .same_hl .text {
+ fill: black !important;
+}
+
+/* places list */
+body:not(.places-list) #places-list {
+  display: none;
+}
+
+#places-list {
+ overflow: scroll;
+ height: 100%;
+ width: var(--fc-tool-size, 18%);
+ white-space: nowrap;
+}
+/*
+#places-list>ul>li {
+ font-size: 70%;
+}
+*/
+
+ul {
+ list-style: none;
+ margin: 0;
+ margin-left: 5px;
+ margin-top: 5px;
+ padding: 0;
+}
+.hidden {
+  visibility: hidden;
+}
+
+/* Place hilight */
+body.place_hl .square, .square {
+  display: none;
+}
+
+/* Colorise places */
+body.place_color .square { display: inline; color: transparent; }
+
+/* death age */
+#death-age {
+  margin: 5px;
+}
+
+body.death-age svg .DA0  { fill: hsl(30, 100%, 90%)}
+body.death-age svg .DA1  { fill: hsl(30, 100%, 80%)}
+body.death-age svg .DA2  { fill: hsl(30, 100%, 70%)}
+body.death-age svg .DA3  { fill: hsl(30, 100%, 60%)}
+body.death-age svg .DA4  { fill: hsl(30, 100%, 50%)}
+body.death-age svg .DA5  { fill: hsl(30, 100%, 45%)}
+body.death-age svg .DA6  { fill: hsl(30, 100%, 40%)}
+body.death-age svg .DA7  { fill: hsl(30, 100%, 35%)}
+
+body:not(.death-age) #death-age {
+  display: none;
+}
+
+body.death-age span.DA0  { color: hsl(30, 100%, 90%)}
+body.death-age span.DA1  { color: hsl(30, 100%, 80%)}
+body.death-age span.DA2  { color: hsl(30, 100%, 70%)}
+body.death-age span.DA3  { color: hsl(30, 100%, 60%)}
+body.death-age span.DA4  { color: hsl(30, 100%, 50%)}
+body.death-age span.DA5  { color: hsl(30, 100%, 45%)}
+body.death-age span.DA6  { color: hsl(30, 100%, 40%)}
+body.death-age span.DA7  { color: hsl(30, 100%, 35%)}
+
+.arrow {
+  color: transparent;
+}
+body.death-age .hl .arrow {
+  color: black;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+svg .link {
+  cursor: pointer;
+}
+
+path {
+ stroke: transparent;
+ stroke-width: var(--fc-stroke-width);
+ fill: transparent;
+}
+circle, path.contour {
+ stroke: #A0A0A0;
+ stroke-width: var(--fc-stroke-width);
+ fill: transparent;
+}
+path.middle {
+ stroke: #A0A0A0;
+ stroke-dasharray: var(--fc-stroke-dasharray);
+ stroke-width: var(--fc-stroke-width);
+ fill: transparent;
+}
+text {
+ fill: black;
+ text-anchor: middle;
+}
+textPath {
+ dominant-baseline: central;
+}
+.dates { font-size: 80%; }
+.none {
+ display: none;
+}
+
+.icon {
+ fill: transparent;
+}
+.icon:hover {
+ fill: green;
+}
+
+.no-link {
+ fill: transparent;
+}
+.no-link:hover {
+ fill: brown;
+}
+
+#standard {
+ font-size: 100%;
+ fill: transparent;
+}
+
+#places-list, #death-age {
+ position: absolute;
+ right: 0;
+ top: 0;
+}
+svg {
+ position: absolute;
+ left: 0;
+ top: 0;
+}
+
+#buttons {
+ position: absolute;
+ left: 0;
+ top: 0;
+ z-index: 1;
+ margin: 2px;
+}
+.button {
+ font-size: 140%;
+ text-align: center;
+}
+.button:hover {
+ cursor: pointer;
+}
+.disabled {
+  color: lightgrey;
+}
+
+svg.mono text {
+ font-family: monospace;
+}

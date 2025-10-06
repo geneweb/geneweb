@@ -1,0 +1,22 @@
+<!-- $Id: perso_header.txt v7.1 18/04/2024 00:49:55 $ -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>%nn;
+    [*perso header]%sp;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") %qualifier;%end;
+    %sp;%surname;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  %include;favicon
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%include;perso_utils
+%if;(e.m!="CHG_CHN")
+  %include;menubar
+%end;

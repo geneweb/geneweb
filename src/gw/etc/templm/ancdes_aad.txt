@@ -1,0 +1,129 @@
+<!-- $Id: templm/ancdes_aad.txt v7.0 2014/11/24 16:37:55 $ -->
+
+%( age_at_death by generation tf1/tl1 = aad %)
+
+%include;ancdes_stat
+
+%define;stat_a1()
+  %let;l_max_width;180%in;
+  %let;l1;[*age at death]%in;
+  <div class="s1 bcbg2">
+    <span class="s2">%l1;</span>
+    <span class="s3">%count; [date/dates]1</span>
+  </div>
+  <div class="s1 bcbg1" style="height:12em;">
+    <span class="sn4" style="top:1em;">110</span>
+    <span class="sn4" style="top:2em;">100</span>
+    <span class="sn4" style="top:3em;">90</span>
+    <span class="sn4" style="top:4em;">80</span>
+    <span class="sn4" style="top:5em;">70</span>
+    <span class="sn4" style="top:6em;">60</span>
+    <span class="sn4" style="top:7em;">50</span>
+    <span class="sn4" style="top:8em;">40</span>
+    <span class="sn4" style="top:9em;">30</span>
+    <span class="sn4" style="top:10em;">20</span>
+    <span class="sn4" style="top:11em;">10</span>
+    <span class="sn4" style="top:12em;">0</span>
+    %apply;stat1(1,"sn","bottom",l1)
+  </div>
+%end;
+
+%define;stat_a2()
+  <table class="title" width="100%%"><tr>
+    %if;(evar.m = "A")
+      <td>[*generation/generations]0</td>
+    %end;
+    <td align="center">[*age at death]</td>
+    <td align="right">[*date of birth]</td>
+  </tr></table>
+%end;
+
+%define;anc_a()
+  %reset_count;
+  %empty_sorted_list;
+  %foreach;ancestor_level(l_v)
+    %if;(level > 1 and (evar.only != "on" or level = l_v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "" and ancestor.birth_date.year != "" and ancestor.death_date.year != "")
+          %let;l_aby;%if;(ancestor.birth_date.prec = ".." or ancestor.birth_date.prec = "|")9999%else;%ancestor.birth_date.year;%end;%in;
+          %let;l_ady;%if;(ancestor.death_date.prec = ".." or ancestor.death_date.prec = "|")0%else;%ancestor.death_date.year;%end;%in;
+          %if;(l_ady >= l_aby)
+            %incr_count;
+            %let;l_age;%expr((l_ady - l_aby)/10)%in;
+            %apply;add_in_sorted_list(ancestor.sex,l_age,ancestor.index)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+  %apply;stat_a1()
+  <div class="stat2 bcbg1">
+    %apply;stat_a2()
+    %foreach;ancestor_level(l_v)
+      %empty_sorted_list;
+      %reset_count;
+      %if;(level > 1 and (evar.only != "on" or level = l_v))
+        %foreach;ancestor;
+          %if;(ancestor.same = "" and ancestor.birth_date.year != "" and ancestor.death_date.year != "")
+            %let;l_aby;%if;(ancestor.birth_date.prec = ".." or ancestor.birth_date.prec = "|")9999%else;%ancestor.birth_date.year;%end;%in;
+            %let;l_ady;%if;(ancestor.death_date.prec = ".." or ancestor.death_date.prec = "|")0%else;%ancestor.death_date.year;%end;%in;
+            %if;(l_ady >= l_aby)
+              %incr_count;
+              %let;l_age;%expr(l_ady - l_aby)%in;
+              %apply;add_in_sorted_list(l_aby,l_age,ancestor.sex,ancestor.index)
+            %end;
+          %end;
+        %end;
+        %apply;stat2()
+      %end;
+    %end;
+  </div>
+%end;
+
+%define;des_a1(curlev, maxlev)
+  %if;(birth_date.year != "" and death_date.year != "") 
+    %let;l_aby;%if;(birth_date.prec = ".." or birth_date.prec = "|")9999%else;%birth_date.year;%end;%in;
+    %let;l_ady;%if;(death_date.prec = ".." or death_date.prec = "|")0%else;%death_date.year;%end;%in;
+    %if;(computable_death_age and l_ady >= l_aby)
+      %incr_count;
+      %let;l_age;%expr((l_ady - l_aby)/10)%in;
+      %apply;add_in_sorted_list(sex,l_age,index)
+    %end;
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;des_a1(curlev+1, maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;des_a2(curlev, maxlev)
+  %if;(birth_date.year != "" and death_date.year != "") 
+    %let;l_aby;%if;(birth_date.prec = ".." or birth_date.prec = "|")9999%else;%birth_date.year;%end;%in;
+    %let;l_ady;%if;(death_date.prec = ".." or death_date.prec = "|")0%else;%death_date.year;%end;%in;
+    %if;(computable_death_age and l_ady >= l_aby)
+      %incr_count;
+      %let;l_age;%expr(l_ady - l_aby)%in;
+      %apply;add_in_sorted_list(l_aby,l_age,sex,index)
+    %end;
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = curlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;des_a2(curlev+1, maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+
+%( main %)
+%apply;togen()
+%if;(evar.m = "A")
+  %apply;anc_a()
+%else;
+  %apply;des_a()
+%end;

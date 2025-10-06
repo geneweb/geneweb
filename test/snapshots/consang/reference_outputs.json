@@ -1,0 +1,327 @@
+{
+  "help_display": {
+    "command": "distribution/gw/consang -help",
+    "args": [
+      "-help"
+    ],
+    "input": "",
+    "stdout": "usage: distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+    "stderr": "",
+    "returncode": 0,
+    "description": "Test help output consistency"
+  },
+  "help_display_long": {
+    "command": "distribution/gw/consang --help",
+    "args": [
+      "--help"
+    ],
+    "input": "",
+    "stdout": "usage: distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+    "stderr": "",
+    "returncode": 0,
+    "description": "Test long help option"
+  },
+  "help_display_short_invalid": {
+    "command": "distribution/gw/consang -h",
+    "args": [
+      "-h"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "distribution/gw/consang: unknown option '-h'.\nusage: distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+    "returncode": 2,
+    "description": "Test short help option (should fail as -h is not recognized)"
+  },
+  "no_arguments_error": {
+    "command": "distribution/gw/consang",
+    "args": [],
+    "input": "",
+    "stdout": "",
+    "stderr": "Missing file name\nUse option -help for usage@.",
+    "returncode": 2,
+    "description": "Test behavior with no arguments - should show missing filename error"
+  },
+  "nonexistent_database": {
+    "command": "distribution/gw/consang nonexistent_db",
+    "args": [
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test with non-existent database file"
+  },
+  "quiet_mode_nonexistent": {
+    "command": "distribution/gw/consang -q nonexistent_db",
+    "args": [
+      "-q",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test quiet mode with non-existent database"
+  },
+  "very_quiet_mode_nonexistent": {
+    "command": "distribution/gw/consang -qq nonexistent_db",
+    "args": [
+      "-qq",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test very quiet mode with non-existent database"
+  },
+  "fast_mode_nonexistent": {
+    "command": "distribution/gw/consang -fast nonexistent_db",
+    "args": [
+      "-fast",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test fast mode with non-existent database"
+  },
+  "from_scratch_nonexistent": {
+    "command": "distribution/gw/consang -scratch nonexistent_db",
+    "args": [
+      "-scratch",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test scratch mode with non-existent database"
+  },
+  "save_memory_nonexistent": {
+    "command": "distribution/gw/consang -mem nonexistent_db",
+    "args": [
+      "-mem",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test memory saving mode with non-existent database"
+  },
+  "no_lock_nonexistent": {
+    "command": "distribution/gw/consang -nolock nonexistent_db",
+    "args": [
+      "-nolock",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test no lock mode with non-existent database"
+  },
+  "empty_database_name": {
+    "command": "distribution/gw/consang ",
+    "args": [
+      ""
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Missing file name\nUse option -help for usage@.",
+    "returncode": 2,
+    "description": "Test with empty string as database name"
+  },
+  "combined_options_nonexistent": {
+    "command": "distribution/gw/consang -q -fast nonexistent_db",
+    "args": [
+      "-q",
+      "-fast",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test combination of options with non-existent database"
+  },
+  "invalid_flag_with_db": {
+    "command": "distribution/gw/consang -invalid test_db",
+    "args": [
+      "-invalid",
+      "test_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "distribution/gw/consang: unknown option '-invalid'.\nusage: distribution/gw/consang [options] <file_name>\n  -fast     faster, but use more memory\n  -mem      Save memory, but slower when rewritting database\n  -nolock   do not lock database.\n  -q        quiet mode\n  -qq       very quiet mode\n  -scratch  from scratch\n  -help     Display this list of options\n  --help    Display this list of options\n",
+    "returncode": 2,
+    "description": "Test invalid flag with database name"
+  },
+  "multiple_flags_nonexistent": {
+    "command": "distribution/gw/consang -qq -mem -fast nonexistent_db",
+    "args": [
+      "-qq",
+      "-mem",
+      "-fast",
+      "nonexistent_db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "Fatal error: exception Sys_error(\"nonexistent_db.gwb/base: No such file or directory\")\n",
+    "returncode": 2,
+    "description": "Test multiple compatible flags with non-existent database"
+  },
+  "test_database_normal_mode": {
+    "command": "distribution/gw/consang test-consang-db",
+    "args": [
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 12 persons\nComputing consanguinity...     12\b\b\b\b\b\b\b     11\b\b\b\b\b\b\b     10\b\b\b\b\b\b\b\nMax consanguinity 0 for Jean.0 MARTIN...       9\b\b\b\b\b\b\b      8\b\b\b\b\b\b\b      7\b\b\b\b\b\b\b      6\b\b\b\b\b\b\b      5\b\b\b\b\b\b\b      4\b\b\b\b\b\b\b      3\b\b\b\b\b\b\b      2\b\b\b\b\b\b\b\nMax consanguinity 0.25 for Thomas.0 MARTIN...       1\b\b\b\b\b\b\b done   \n*** saving persons array\n*** saving ascends array\n*** saving unions array\n*** saving families array\n*** saving couples array\n*** saving descends array\n*** saving strings array\n*** create name index\n*** create strings of sname\n*** create strings of fname\n*** create string index\n*** create surname index\n*** create first name index\n*** ok\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation with normal verbose output"
+  },
+  "test_database_quiet_mode": {
+    "command": "distribution/gw/consang -q test-consang-db",
+    "args": [
+      "-q",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 0 persons\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation in quiet mode"
+  },
+  "test_database_very_quiet_mode": {
+    "command": "distribution/gw/consang -qq test-consang-db",
+    "args": [
+      "-qq",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "",
+    "returncode": 0,
+    "description": "Test consanguinity calculation in very quiet mode"
+  },
+  "test_database_fast_mode": {
+    "command": "distribution/gw/consang -fast test-consang-db",
+    "args": [
+      "-fast",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 0 persons\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation in fast mode"
+  },
+  "test_database_memory_save_mode": {
+    "command": "distribution/gw/consang -mem test-consang-db",
+    "args": [
+      "-mem",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 0 persons\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation in memory saving mode"
+  },
+  "test_database_no_lock_mode": {
+    "command": "distribution/gw/consang -nolock test-consang-db",
+    "args": [
+      "-nolock",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 0 persons\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation without database locking"
+  },
+  "test_database_from_scratch": {
+    "command": "distribution/gw/consang -scratch test-consang-db",
+    "args": [
+      "-scratch",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 12 persons\nComputing consanguinity...     12\b\b\b\b\b\b\b     11\b\b\b\b\b\b\b     10\b\b\b\b\b\b\b\nMax consanguinity 0 for Jean.0 MARTIN...       9\b\b\b\b\b\b\b      8\b\b\b\b\b\b\b      7\b\b\b\b\b\b\b      6\b\b\b\b\b\b\b      5\b\b\b\b\b\b\b      4\b\b\b\b\b\b\b      3\b\b\b\b\b\b\b      2\b\b\b\b\b\b\b\nMax consanguinity 0.25 for Thomas.0 MARTIN...       1\b\b\b\b\b\b\b done   \n*** saving persons array\n*** saving ascends array\n*** saving unions array\n*** saving families array\n*** saving couples array\n*** saving descends array\n*** saving strings array\n*** create name index\n*** create strings of sname\n*** create strings of fname\n*** create string index\n*** create surname index\n*** create first name index\n*** ok\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation from scratch (recalculate all)"
+  },
+  "test_database_fast_quiet_combined": {
+    "command": "distribution/gw/consang -fast -q test-consang-db",
+    "args": [
+      "-fast",
+      "-q",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 0 persons\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation with fast and quiet modes combined"
+  },
+  "test_database_mem_very_quiet_combined": {
+    "command": "distribution/gw/consang -mem -qq test-consang-db",
+    "args": [
+      "-mem",
+      "-qq",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "",
+    "returncode": 0,
+    "description": "Test consanguinity calculation with memory save and very quiet modes"
+  },
+  "test_database_scratch_fast_combined": {
+    "command": "distribution/gw/consang -scratch -fast test-consang-db",
+    "args": [
+      "-scratch",
+      "-fast",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 12 persons\nComputing consanguinity...     12\b\b\b\b\b\b\b     11\b\b\b\b\b\b\b     10\b\b\b\b\b\b\b\nMax consanguinity 0 for Jean.0 MARTIN...       9\b\b\b\b\b\b\b      8\b\b\b\b\b\b\b      7\b\b\b\b\b\b\b      6\b\b\b\b\b\b\b      5\b\b\b\b\b\b\b      4\b\b\b\b\b\b\b      3\b\b\b\b\b\b\b      2\b\b\b\b\b\b\b\nMax consanguinity 0.25 for Thomas.0 MARTIN...       1\b\b\b\b\b\b\b done   \n*** saving persons array\n*** saving ascends array\n*** saving unions array\n*** saving families array\n*** saving couples array\n*** saving descends array\n*** saving strings array\n*** create name index\n*** create strings of sname\n*** create strings of fname\n*** create string index\n*** create surname index\n*** create first name index\n*** ok\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation from scratch with fast mode"
+  },
+  "test_database_all_performance_flags": {
+    "command": "distribution/gw/consang -fast -mem -nolock test-consang-db",
+    "args": [
+      "-fast",
+      "-mem",
+      "-nolock",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 0 persons\n",
+    "returncode": 0,
+    "description": "Test consanguinity calculation with all performance flags"
+  },
+  "test_database_complete_workflow": {
+    "command": "distribution/gw/consang -scratch -fast -q test-consang-db",
+    "args": [
+      "-scratch",
+      "-fast",
+      "-q",
+      "test-consang-db"
+    ],
+    "input": "",
+    "stdout": "",
+    "stderr": "To do: 12 persons\n............................................................\n#####|\b#####|\b#####|\b#####|\b#####|\b#####|\b#####|\b#####|\b#####|\b#####|\b#####|\b##### \b\n*** saving persons array\n*** saving ascends array\n*** saving unions array\n*** saving families array\n*** saving couples array\n*** saving descends array\n*** saving strings array\n*** create name index\n*** create strings of sname\n*** create strings of fname\n*** create string index\n*** create surname index\n*** create first name index\n*** ok\n",
+    "returncode": 0,
+    "description": "Test complete workflow: from scratch, fast, and quiet"
+  }
+}

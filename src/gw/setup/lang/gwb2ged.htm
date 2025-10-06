@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwb2ged.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>
+[Extract a GEDCOM file]
+</title>
+%fsetup.css;
+</head>
+<body %Vbody_prop;>
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[Extract a GEDCOM file]
+</h1>
+</div>
+
+<form method="get" action="gwb2ged">
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
+<ul><li>
+[Select your database by clicking on the associated button][:]
+<p>
+<table class="setup">
+%b{<tr align="left">
+<td><input type="radio" name="anon" id="anon%a" value="%a">   
+<label for="anon%a">%a</label></td></tr>|
+<tr align="left"><td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<li>
+[Enter the name you want to give to your GEDCOM file. If you write nothing, it will be the name of the database ended by the suffix]
+%(
+Enter the name you want to give to your GEDCOM file. If you write nothing, it wi
+ll be the name of the database ended by the suffix
+%)
+"<tt>.ged</tt>".
+
+<p>
+<table class="setup">
+<tr align=left><td>
+-o&nbsp;&nbsp;
+<input name="o" size="30">
+</td></tr>
+</table>
+<p>
+<li>
+[Select the options you want][:]
+<p>
+<table class="setup">
+<tr><td>-charset</td></tr>
+<tr align="left"><td>
+<input type="radio" name="charset" value="ASCII" id="ASCII"/>   
+<label for="ASCII">[Encode the characters in ASCII.]
+</label></td>
+</tr>
+<tr align="left"><td>
+<input type="radio" name="charset" value="UTF-8" id="UTF-8" checked>   
+<label for="UTF-8">[Encode the characters in UTF-8.]
+</label></td>
+</tr>
+<tr align="left"><td>
+<input type="radio" name="charset" value="ANSEL" id="ANSEL"/>   
+<label for="ANSEL">[Encode the characters in ANSEL.]
+</label></td>
+</tr>
+<tr align="left"><td>
+<input type="radio" name="charset" value="ANSI" id="ANSI"/>&nbsp;&nbsp;&nbsp;
+<label for="ANSI">[Encode the characters in ANSI (ISO 8859-1).]
+</label></td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=mem value="on" id=mem>   
+<label for=mem>-mem</label>[:] [Save the memory space during the operation (but it will be slower).]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=nn id=nn value="on">   
+<label for=nn>-nn</label>[:] [Do not extract notes.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=nopicture id=nopicture value="on">   
+<label for=nopicture>-nopicture</label>[:] [Dont extract individual pictures (portraits).]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=picture-path id=picture-path value="on">   
+<label for=picture-path>-picture-path</label>[:] [Extract individual pictures path (portraits).]
+</td>
+</tr>
+</table>
+<p>
+[In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).]
+<p>
+<table class="setup">
+<tr align=left><td> </td>
+<td colspan=3>
+-a[:] [Extract only the ancestors of]
+</td></tr>
+<tr align=left><td>[First name]
+</td>
+<td><input name="a1" size=30 maxlength=200></td>
+<td>[Num]
+</td>
+<td><input name="a2" size=5 maxlength=8></td>
+</tr>
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="a3" size=40 maxlength=200></td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
+-d[:] [Extract only the descendants of]
+</td>
+</tr>
+<tr align=left><td>[First name]
+</td>
+<td><input name="d1" size=30 maxlength=200></td>
+<td>[Num]
+</td>
+<td><input name="d2" size=5 maxlength=8></td></tr>
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="d3" size=40 maxlength=200></td>
+</tr>
+</table>
+<p>
+[If you use both above options, the intersection is assumed:<br> persons <em>at the same time</em> ancestors of the one and descendants of the other.]
+%(
+If you use both above options, the intersection is assumed:<br> persons <em>at t
+he same time</em> ancestors of the one and descendants of the other.
+%)
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
+-aws[:] [Extract ancestors with siblings of]
+</td>
+</tr>
+<tr align=left><td>[First name]
+</td>
+<td><input name="aws1" size=30 maxlength=200></td>
+<td>[Num]
+</td>
+<td><input name="aws2" size=5 maxlength=8></td></tr>
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="aws3" size=40 maxlength=200></td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
+-s[:] [extract surname (usable several times).]
+</td>
+</tr>
+<tr align=left><td>[Surname]
+</td>
+<td colspan=3><input name="s" size=40 maxlength=200></td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>
+-c[:] [When a person is born less than <num> years ago, it is not exported unless it is Public.<br>  All the spouses and descendants are also censored.]
+%(
+: When a person is born less than <num> years ago, it is not exported unless it 
+is Public.<br>  All the spouses and descendants are also censored.
+%)
+</td>
+</tr>
+<tr align=left><td>[Years]
+</td>
+<td colspan=3><input name="c" size=10 maxlength=200></td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type=checkbox name=nsp id=nsp value="on">   
+<label for=nsp>-nsp</label>[:] [Do not extract spouses' parents (for options -s and -d).]
+</td>
+</tr>
+</table>
+<p>
+<li>
+[Then click on this button][:]
+<input type=submit value="[Extract]">
+</ul>
+</form>

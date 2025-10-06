@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: deslist_hr.txt v7.1 19/05/2024 23:50:44 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*descendants]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+<div class="container%if;(e.v>15)-fluid%end;">
+%include;perso_utils
+%if;not cancel_links;
+  %include;menubar
+  %include;buttons
+%end;
+%define;input(xx)
+  <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
+  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control ml-1%if;(xx!=1) d-none%end;" disabled>
+%end;
+%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;l_v0;%if;(e.v > static_max_desc_level)%static_max_desc_level;%else;%e.v;%end;%in;
+%let;l_v;%if;(b.max_desc_level = "" or b.max_desc_level > l_v0)%l_v0;%else;%b.max_desc_level;%end;%in;
+
+%define;desc1(z1,z2,z3,z4,curlev,maxlev,sp_index)
+  %let;l_v1;%if;(l_v0>=curlev)%expr(l_v0-curlev)%else;%e.v;%end;%in;
+  %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
+  %let;l2;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)%l1;┗%elseif;(z4 = 0)%l1;┣%end;%if;(child_cnt < 10)━%end;%nn;
+      %else;
+        %if;(z4 = 1)%l1;└%elseif;(z4 = 0)%l1;├%end;%if;(child_cnt < 10)─%end;%nn;
+      %end;
+    %end;
+  %in;
+  %let;zl1;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)z1%l1; %else;z1%l1;┃%end;
+      %else;
+        %if;(z4 = 1)z1%l1; %else;z1%l1;│%end;
+      %end;
+    %end;
+  %in;
+  %let;zl2;%sex;%in;
+  %if;(has_families)
+    %let;l21;
+      %if;(curlev != 0)
+        %if;(not cancel_links)
+          <a href="%prefix;%access;&m=D&t=D&v=%l_v1;"  title="[navigate on tree] [with] %child;">%child_cnt;</a>%nn;
+        %else;
+          %child_cnt;%nn;
+        %end;
+      %end;
+    %in;
+    %let;l22;
+      %if;(browsing_with_sosa_ref and has_sosa)
+        %if;(has_siblings)▶%else;▷%end;
+      %end;
+    %in;
+    %foreach;family;
+      %let;l211;%if;(is_male)━%else;─%end;%in;
+      %let;l212;%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%in;
+      %let;ifam;%family.index;%in;
+      %let;zl3;%if;(family_cnt = nb_families)1%else;0%end;%in;
+      <span data-surname="_%surname;" class="text-nowrap"><span class="tt">
+      %if;(nb_families > 1)
+        %let;l3;
+          %if;(curlev != 0 and family_cnt > 1)
+            %if;(z2 = 0)
+              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;┃%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
+            %else;
+              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;│%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
+            %end;
+          %else;
+            %l2;%l21;%nn;
+          %end;
+        %in;
+        z1%l3;%if;(family_cnt>0)%apply;letter(family_cnt)%end;%l212;%l22;%nn;
+      %else;
+        z1%l2;%l21;%l211;%l212;%l22;%nn;
+      %end;
+        </span>
+      %apply;add_in_sorted_list(index)
+      %apply;add_in_sorted_listc(index)
+      %if;(family_cnt > 1 or cancel_links)
+        %self; %dates;%if;(self.title!=""), %self.title;%end;%nn;
+      %elseif;(not cancel_links)
+        <a href="%prefix;%access;" data-index="%index;">%self;</a>
+        %if;wizard;<a href="%prefix;m=MOD_IND&i=%index;"
+        title="[modify::person/persons]0">%dates;</a>%else;%dates;%end;
+        %if;(self.title!=""), %self.title;%end;%nn;
+      %end;%sp;
+      %if;(wizard and not cancel_links)
+        <a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">
+      %end;
+        <span class="small text-muted text-nowrap">%nn;
+          %if;(are_engaged or are_married)&%elseif;are_not_married;X%end;
+          %if;(on_marriage_date!="")%family.date_s;%end;
+        </span>
+      %if;(wizard and not cancel_links)</a>%end;%sp;
+      %if;(not cancel_links)
+        <a href="%prefix;%spouse.access;">%spouse;</a>
+        %if;wizard;<a href="%prefix;m=MOD_IND&i=%spouse.index;" title="[modify::person/persons]0">%spouse.dates;</a>%else;%spouse.dates;%end;
+        %if;(spouse.title!=""), %spouse.title;%end;%nn;
+      %else;
+       %spouse; %spouse.dates;%if;(spouse.title!=""), %spouse.title;%end;%nn;
+      %end;
+      %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
+        %apply;add_in_sorted_list(spouse.index)
+      %end;
+      %if;(spouse.is_descendant and evar.implx="")
+        %if;(not cancel_links)
+          <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span></a>
+        %else;
+          <i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span>
+        %end;
+      %end;
+      </span>
+      <br data-surname="_%surname;">
+      %if;(curlev+1 < maxlev)
+        %reset_count;
+        %foreach;sorted_listb_item;
+          %if;("item.1"="ifam")%incr_count;%end;
+        %end;
+        %reset_count1;
+        %foreach;sorted_listc_item;
+          %if;("item.1"="index")%incr_count1;%end;
+        %end;
+        %if;has_children;
+          %foreach;child;
+            %reset_count2;
+            %foreach;sorted_listc_item;
+              %if;("item.1"="child.index")%incr_count2;%end;
+            %end;
+            %if;(count=0 or count1=0 or count2=0 or evar.implx="")
+              %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
+              %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev,spouse.index)
+            %else;
+              %apply;desc2(zl1,zl2,zl3,zl4,curlev+1,maxlev,spouse.index)
+            %end;
+          %end;
+        %end;
+      %end;
+      %apply;add_in_sorted_listb(ifam)
+    %end;
+  %else;
+    %let;l23;
+      %if;(curlev != 0)
+        %if;(not cancel_links)
+          <a href="%prefix;%access;&m=D&t=D&v=%l_v1;" title="[navigate on tree] [with] %child;">%child_cnt;</a>%nn;
+        %else;
+          %child_cnt;%nn;
+        %end;
+      %end;
+    %in;
+    %let;l231;%if;(is_male)━━%elseif;(is_female)──%else;╍%end;%in;
+    %let;l24;
+      %if;(browsing_with_sosa_ref and has_sosa)
+        %if;(has_siblings)◀%else;◁%end;
+      %end;
+    %in;
+    <span data-surname="_%surname;" class="text-nowrap">
+      <span class="tt">z1%l2;%l23;%l231;%l24;%nn;
+        %reset_count;
+        %foreach;sorted_listc_item;
+          %if;("item.1"="index")%incr_count;%end;
+        %end;
+        %if;(count>0)
+          %l231;%nn;
+        %end;
+      </span>
+      %apply;add_in_sorted_list(index)
+      %apply;add_in_sorted_listc(index)
+      %if;(not cancel_links)
+        <a href="%prefix;%access;" data-index="%index;">%self;</a>%if;(self.title!=""), %self.title;%end;
+      %else;
+        %self;
+      %end; %dates;%nn;
+    </span>
+    <br data-surname="_%surname">
+  %end;
+%end;
+%define;desc2(z1,z2,z3,z4,curlev,maxlev,sp_index)
+  %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
+  %let;l2;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)%l1;┗%elseif;(z4 = 0)%l1;┣%end;%if;(child_cnt < 10)━%end;%nn;
+      %else;
+        %if;(z4 = 1)%l1;└%elseif;(z4 = 0)%l1;├%end;%if;(child_cnt < 10)─%end;%nn;
+      %end;
+    %end;
+  %in;
+  %let;zl1;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)z1%l1; %else;z1%l1;┃%end;
+      %else;
+        %if;(z4 = 1)z1%l1; %else;z1%l1;│%end;
+      %end;
+    %end;
+  %in;
+  %let;zl2;%sex;%in;
+  %let;l231;%if;(is_male)━%elseif;(is_female)─%else;━%end;%in;
+  <span>
+    <span class="tt">z1%l2;</span>
+    %( when there is an offset between implex generations, some descendants may be missing %)
+    %( case: first occurence at generation n is married to generation n-1 spouse and has children %)
+    %( these children will not appear even though asking for desc up to generation n %)
+    %if;(not cancel_links)
+      <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i>%nn;
+        <span class="sr-only"> (==)</span></a>
+    %else;
+      <i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i>%nn;
+      <span class="sr-only"> (==)</span></a>
+    %end;
+  </span>
+%end;
+%define;ancestors_grid(level)
+  %if;(level!=0)
+    <div class="text-center mt-2 mb-1">
+      <h5 class="mb-1">
+        %if;(level=1)[*parents]
+        %elseif;(level=2)[*grand-parents]
+        %elseif;(level=3)[*great-grand-parents]
+        %elseif;(level=4)[*great-great-grandparents]%end;</h5>
+      %reset_count;
+      %foreach;ancestor;
+        %incr_count;
+        %if;(count%2!=0)<div class="row mb-1 couple-row">%end;
+          %let;unknown;%if;(ancestor.first_name="?" and ancestor.surname="?")1%end;%in;
+          <div class="col-6 p%if;(count%2=0)l%else;r%end;-2 d-flex align-content-center">
+            <a role="button" class="btn btn-outline-%if;(count%2!=0)primary%else;success%end; btn-sm w-100 d-flex
+              %if;(unknown=1) border-secondary disabled" tabindex="-1" aria-disabled="true"
+              %else;" title="[*select] %ancestor;"
+                href="%prefix;%ancestor.access;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i" and env.key!="v" and env.key!="")&%env.key=%env.val;%end;%end;&v=%expr(evar.v+level)"
+              %end;>
+              <div class="flex-grow-1 order-%if;(count%2!=0)1%else;2%end; align-self-center">
+                %if;(unknown!=1)<strong>%ancestor.first_name;</strong>
+                  %if;(ancestor.qualifier!="") <em>%ancestor.qualifier;</em>%end;
+                  %sp;<span>%ancestor.surname;</span>
+                  %if;(ancestor.dates!="") <small>%ancestor.dates;</small>%end;
+                %end;
+              </div>
+              <span class="badge badge-pill badge-light small order-%if;(count%2!=0)2 mr-auto%else;1 ml-auto%end; align-self-center" style="min-width: 26px; top: 0px;">%ancestor.anc_sosa;</span>
+            </a>
+          </div>
+        %if;(count%2=0)</div>%end;
+      %end;
+    </div>
+  %end;
+%end;
+%mark_descendants;
+%empty_sorted_list;%( persons %)
+%empty_sorted_listb;%( families %)
+%empty_sorted_listc;%( descendants %)
+%let;maxlvl;%if;(static_max_anc_level>4)4%else;%static_max_anc_level;%end;%in;
+%if;(has_parents and evar.templ="")
+  <div class="modal fade" id="switch_modal" tabindex="-1" aria-labelledby="switch-ancestor-modal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <h4 class="modal-title text-primary" id="switch-ancestor-modal">
+            <i class="fa fa-sitemap fa-fw mr-2"></i>[*choose an ancestor]
+          </h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body pt-1 pb-2">
+          %foreach;ancestor_level(maxlvl)
+            %apply;ancestors_grid(level)
+          %end;
+        </div>
+        <div class="modal-footer py-1 bg-light">
+          <small class="text-muted w-100 text-center">
+            <i class="fa fa-hand-pointer fa-fw"></i>
+            %define;navwith(xx)[*navigate with someone:::xx]%end;
+            %apply;navwith([an ancestor]0)
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;
+<h3 class="mt-2 ml-2">%nn;
+  %let;slf;%if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %dates%in;
+  %if;(l_v=0)%slf;%else;
+    %apply;a_of_b_gr_eq_lev%with;[*descendants]%and;%slf;<small class="font-weight-lighter text-muted"> %apply;togend(l_v)</small>%end;
+  %end;
+</h3>
+<form id="filterbysurname" class="form-inline mt-2 d-none">
+    <div class="form-control ml-3 px-0 border-0">[*filter by]</div>
+    <div class="ml-2">%apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)</div>
+    <button id="btnplus" type="button" class="btn btn-primary ml-2" title="[*add filter] (max 4)"><i class="fa fa-plus fa-fw"></i></button>
+    <button id="btnclear" type="button" class="btn btn-danger ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
+</form>
+<div class="deslist mt-2">
+  %apply;desc1(" 0",sex,"0","0","0",l_v+1,0)
+</div>
+%reset_count;
+%foreach;sorted_list_item;
+  %incr_count;
+%end;
+%if;(l_v>0)
+  <div id="total" class="mt-2 ml-2" title="[unfiltered total]">[*total][:]
+    %apply;desc_count(max_desc_level) [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)</div>
+%end;
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

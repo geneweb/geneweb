@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <!-- $Id: templm/doc_templm.txt v7.0 07/02/2016 23:04:55 $ -->
+  <title>Config templm</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+<h1>Configuration de templm dans /bases/%base.name;.gwf</h1>
+<h2>Documentation en ligne</h2>
+<ul>
+<li><a href="http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;">http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;</a></li>
+<li><a href="http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_suppl.C3.A9mentaires_de_templm%else;#Templm_additional_shortcuts%end;">http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_supplémentaires_de_templm%else;#templm_additional_shortcuts%end;</a></li>
+</ul>
+%let;l1;%if;(bvar.setup_http != "")%bvar.setup_http;%else;http://localhost:2316/%end;%in;
+<p class="button"><a href="%l1;gwf?lang=fr;anon=%base.name;#a_3">[*modify] les options par défaut de %base.name;.gwf [with] gwsetup</a></p>
+<table class="gwf">
+<tr>
+  <td>css=%bvar.css;</td>
+  <td>
+    Feuille de style :
+    <ul>
+      <li>css=  : affichage sur fond gris (css.txt)</li>
+      <li>css=1 : affichage sur fond noir (css1.txt)</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td>datalist_fn=%bvar.datalist_fn;<br>
+      datalist_sn=%bvar.datalist_sn;<br>
+      datalist_occu=%bvar.datalist_occu;<br>
+      datalist_place=%bvar.datalist_place;<br>
+      datalist_src=%bvar.datalist_src;</td>
+  <td>
+    Saisie semi-automatique sur le formulaire individu et famille :
+    <ul>
+      <li>datalist_xx= : ne fait rien</li>
+      <li>datalist_xx=1 : charge toute la liste en une fois</li>
+      <li>datalist_xx=2 : charge la liste filtrée après la saisie de trois caractères</li>
+    </ul>
+    Listes possibles :
+    <ul>
+      <li>datalist_fn : prénoms</li>
+      <li>datalist_sn : patronymes</li>
+      <li>datalist_place : lieux</li>
+      <li>datalist_src : sources</li>
+      <li>datalist_occu : professions</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td>event_age=%bvar.event_age;</td>
+  <td>
+    Sur la page d’une personne, affiche l’âge des parents à la naissance et
+    l’âge de la personne pour chaque événement.
+  </td>
+</tr>
+<tr>
+  <td>jquery=%bvar.jquery;</td>
+  <td>
+    Fonctions jquery :
+    <ol>
+      <li>fiche d'une personne :
+        <ul>
+          <li>affiche le nombre d'ascendants, descendants, implexes</li>
+        </ul>
+      </li>
+      <li>formulaire individu et famille :
+        <ul>
+          <li>recherche des lieux, sources, professions</li>
+          <li>recherche si les témoins existent</li>
+        </ul>
+      </li>
+    </ol>
+  </td>
+</tr>
+<tr>
+  <td>max_dates=%bvar.max_dates;</td>
+  <td>
+    Dans les statistiques, désactive les liens 'chemin le plus court' si plus de n dates
+  </td>
+</tr>
+<tr>
+  <td>maxlev=%bvar.maxlev;</td>
+  <td>
+    Nombre de générations descendantes affichées sur la page d'une personne.
+    Si maxlev est supérieur à 1, alors les arrière-grands-parents s'affichent.
+  </td>
+</tr>
+<tr>
+  <td>menu=%bvar.menu;</td>
+  <td>
+    Sur la page d'une personne :
+    <ul>
+      <li>menu= : affiche le menu déroulant en haut de la page</li>
+      <li>menu=1 : affiche le menu non déroulant en bas de la page</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td>misc=%bvar.misc;</td>
+  <td>
+    Sur la page d'une personne, affiche le lien wiki (prenom/patronyme/0/Prénom PATRONYME)
+    et les différentes manières d'appeler la personne.
+  </td>
+</tr>
+<tr>
+  <td>move_comment=%bvar.move_comment;</td>
+  <td>
+    Sur le formulaire de la famille, si pas de note de mariage,
+    alors la note de l'union se déplace vers la note de mariage.
+  </td>
+</tr>
+<tr>
+  <td>particles=</td>
+  <td>
+    %bvar.particles;
+    <p>Si uppercase=yes, convertit "DE PATRONYME" en "de PATRONYME".</p>
+  </td>
+</tr>
+<tr>
+  <td>setup_http=<i>non affiché</i></td>
+  <td>
+    URL de gwstp. Par défaut : http://localhost:2316/
+  </td>
+</tr>
+<tr>
+  <td>setup_link=%bvar.setup_link;</td>
+  <td>
+    Affiche le menu 'gwstp' sur la page d'une personne.
+  </td>
+</tr>
+<tr>
+  <td>uppercase=%bvar.uppercase;</td>
+  <td>
+    Dans les formulaires, convertit prénom patronyme en Prénom PATRONYME.
+  </td>
+</tr>
+<tr>
+  <td>wide=%bvar.wide;</td>
+  <td>
+    Sur la page d'une personne :
+    <ul>
+      <li>wide=yes : affichage sur une colonne (&divide;)</li>
+      <li>wide=no : affichage sur deux colonnes (&middot;|&middot;)</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td>show_flag=%bvar.show_flag;</td>
+  <td>
+    <ul>
+      <li>show_flag=yes : affiche les drapeaux dans le menu de choix de la langue.</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td>etc_prefix=%etc_prefix;</td>
+  <td>
+    (anciennement static_path)<br>
+    En mode CGI :
+    <ul>
+      <li>remplacé par GW_STATIC_PATH depuis la version  7.1, chemin statique des fichiers CSS et js</li>
+    </ul>
+  </td>
+</tr>
+</table>
+%include;trl
+%include;copyr
+%query_time;
+</body>
+</html>

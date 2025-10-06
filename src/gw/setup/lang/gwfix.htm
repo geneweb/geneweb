@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwfix.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Fix base and recompute index]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[Fix base and recompute index]
+</h1>
+</div>
+
+<form method="GET" action="gwfixbase">
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
+
+<table>
+<tr>
+<td>
+<ul><li>
+[Select your database by clicking on the associated button][:]
+<p>
+<table class="setup">
+%b{<tr align=left>
+<td><input type="radio" name="anon" value="%a">   </td>
+<td>%a</td></tr>|
+<tr align=left><td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<li>
+[Select the options you want][:]
+<br>
+[(no selection is equivalent to select all).]
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type="checkbox" name="dry-run" value="on">   </td>
+<td>[do not commit changes (only traces).]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="q" value="on">   </td>
+<td>[quiet mode.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="qq" value="on">   </td>
+<td>[very quiet mode.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="fast" value="on">   </td>
+<td>[fast mode. Needs more memory]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="families-parents" value="on">   </td>
+<td>[families' parents.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="families-children" value="on">   </td>
+<td>[families' children.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="persons-NBDS" value="on">   </td>
+<td>[persons' NBDS.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="persons-parents" value="on">   </td>
+<td>[persons' parents.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="persons-families" value="on">   </td>
+<td>[persons' families.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="pevents-witnesses" value="on">   </td>
+<td>[pevents' witnesses.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="fevents-witnesses" value=on>   </td>
+<td>[fevents' witnesses.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="marriage-divorce" value="on">   </td>
+<td>[marriage divorce.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="index" value="on">   </td>
+<td>[index. Automatically enabled by any other option]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="help" value="on">   </td>
+<td>[help.]
+</td>
+</tr>
+</table>
+<p>
+<li>
+[Then push this button][:]
+<input type="submit" value="[Fix base]">
+</ul>
+</form>

@@ -1,0 +1,164 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: templm/anclist.txt v7.0 2015/07/05 13:23:34 $ -->
+  <title>%nn;
+    %first_name; %surname;
+    %if;(evar.t = "F" and evar.tf1 = "csv") - CSV -
+    %elseif;(evar.t = "F" and evar.fam7 = "on") - 7 [*family/families]1 -
+    %elseif;(evar.t = "F" and evar.tf1 = "sb") - [*surnames branch] -
+    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "aad") - [*age at death] ([M/F]0, [M/F]1)
+    %elseif;(evar.t = "F" and evar.tf1 = "afm") - [*age] ([father/mother]0, [father/mother]1)
+    %else; - [*ancestor/ancestors]1 -
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %include;css
+  <script type="text/javascript">
+    <!--
+      var varZIndex = 1;
+    //-->
+  </script>
+</head>
+%(<!-- Begin define --> %)
+%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;l_v;%apply;min%with;%b.max_anc_level;%and;%static_max_anc_level;%and;%if;(e.v!="")%e.v;%else;3%end;%end;%in;
+%let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
+%define;tothegen(xxx)
+  [*upto the %s generation:::xxx]%nn;
+%end;
+%define;togen1(xxx)
+  %if;(xxx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xxx = 1)[*to the parents]%nn;
+  %elseif;(xxx = 2)[*to the grandparents]%nn;
+  %elseif;(xxx = 3)[*to the great-grandparents]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xxx)
+    %end;
+  %end;
+%end;
+%define;togen()
+  <p>
+    %if;(evar.only != "on")
+      %apply;togen1(l_v)
+    %else;
+      [*generation/generations]0 %l_v;
+    %end;
+  </p>
+%end;
+%define;ancestors_by_list(xx, nnn)
+  %if;(xx.has_parents and nnn > 1)
+    <ul>
+    <li style="list-style-type:square"><a href="%prefix;
+    %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
+    %apply;ancestors_by_list("xx.father", nnn - 1)</li>
+    <li style="list-style-type:circle"><a href="%prefix;
+    %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
+    %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
+    </ul>
+  %end;
+%end;
+
+%(<!-- End define --> %)
+<body%body_prop; id="anclist">
+%include;hed
+%message_to_wizard;
+<h1>%nn;
+  %if;(evar.tf1 != "csv")
+    %apply;a_of_b%with;
+      %if;(evar.fam7 = "on")7 [family/families]1%else;[*ancestor/ancestors]1%end;
+    %and;
+      %if;(not cancel_links)<a href="%prefix;%access;">%end;
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") <em>%qualifier;</em>%end;
+        %sp;%surname;
+        %if;(alias != "") <em>(%alias;)</em>%end;
+      %if;(not cancel_links)</a>%end;
+    %end;
+      %sp;%dates;<br>
+  %end;
+  %if;(evar.t = "F" and evar.tf1 = "csv")
+    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "sb") - [*surnames branch] -
+    %else;
+  %end;
+</h1>
+%if;(evar.t = "F" and evar.fam7 = "on" and (evar.tf1 = "fam71" or evar.tf1 = "fam72"))
+  %include;anclist_fam7_img
+%elseif;(evar.t = "F" and evar.fam7 = "on" and evar.tf1 = "fam70")
+  %include;anclist_fam7_table
+%elseif;(evar.t = "F" and evar.fam7 = "on" and evar.tf1 = "fam73")
+  %include;anclist_fam7_timeline
+%elseif;(wizard and evar.t = "F" and evar.tf1 = "csv")
+  %include;anclist_csv
+%elseif;(evar.t = "F" and evar.tf1 = "place")
+  %include;anclist_place
+%elseif;(evar.t = "F" and evar.tf1 = "surn")
+  %include;anclist_surn
+%elseif;(evar.t = "F" and evar.tf1 = "tag")
+  %include;ancdes_tag
+%elseif;(evar.t = "F" and evar.tf1 = "bmdm")
+  %include;ancdes_bmdm
+%elseif;(evar.t = "F" and evar.tf1 = "mm")
+  %include;ancdes_mm
+%elseif;(evar.t = "F" and evar.tf1 = "aad")
+  %include;ancdes_aad
+%elseif;(evar.t = "F" and evar.tf1 = "aax")
+  %include;ancdes_aax
+%elseif;(evar.t = "F" and evar.tf1 = "nxd")
+  %include;ancdes_nxd
+%elseif;(evar.t = "F" and evar.tf1 = "afm")
+  %include;ancdes_afm
+%elseif;(evar.t = "F" and evar.tf1 = "cal")
+  %include;ancdes_cal
+%elseif;(evar.t ="F" and evar.tf1 = "ars")
+  %include;ancdes_ars
+%elseif;(evar.t = "F" and evar.tf1 = "sb")
+
+  %include;anclist_sb
+%elseif;(evar.t = "F")
+  %( list tf1 = ? %)
+  %let;l_url;%prefix;m=A&t=F&i=%index;&v=%l_v;&only=%evar.only;&maxv=%evar.maxv;%in;
+  <ul>
+    %if;(wizard)
+      <li><a href="%l_url;&tf1=csv;&cousins=%evar.cousins;"
+          >CSV</a></li>
+    %end;
+    <li><a href="%l_url;&fam7=on&tf1=fam70&cousins=%evar.cousins;">7 [family/families]1</a></li>
+    <li><a href="%l_url;&tf1=sb">[*surnames branch]</a></li>
+    <li><a href="%l_url;&tf1=surn">[*list eclair]0 - [surname/surnames]1 / [place/places]1</a></li>
+    <li><a href="%l_url;&tf1=place">[*list eclair]0 - [place/places]1</a></li>
+    <li><a href="%l_url;&tf1=tag">tag</a></li>
+    <li><a href="%l_url;&tf1=cal">[*calendar/calendars]0</a></li>
+    <li><a href="%l_url;&tf1=bmdm">[*year/month/day]1</a></li>
+    <li><a href="%l_url;&tf1=afm">[*age] ([father/mother]0, [father/mother]1)</a></li>
+    <li><a href="%l_url;&tf1=aad">[*age at death] ([M/F]0, [M/F]1)</a></li>
+    <li><a href="%l_url;&tf1=mm">[*year/month/day]1 [birth] = [year/month/day]1 [death] ?</a></li>
+  </ul>
+%elseif;(evar.t = "L")
+  %( by list %)
+  %apply;togen()
+  %apply;ancestors_by_list("self",l_v)
+%elseif;(evar.t = "H")
+  %include;anclist_hrztl
+%end;
+%if;(evar.tf1 != "csv" and evar.tf1 != "tag")
+  %if;not cancel_links;
+    %include;tools
+    %apply;tools_anclist()
+    %include;trl
+    %include;copyr
+    %query_time;
+  %end;
+%end;
+</body>
+</html>

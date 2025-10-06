@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>%bname; -&gt; %bvar.moved;</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+%include;js
+</head>
+<body>
+<div class="container">
+<h1>%bname; -&gt; %bvar.moved;</h1>
+<p>
+%apply;interp([
+en: The database "%bname;" has moved to:
+fr: La base de données "%bname;" se trouve maintenant à l'adresse:
+])
+<dl><dt><dd>
+<a href="%bvar.moved;">%bvar.moved;</a>
+</dd></dt></dl>
+</p>
+
+%include;trl
+%include;copyr
+%query_time;
+</div>
+</body>
+</html>

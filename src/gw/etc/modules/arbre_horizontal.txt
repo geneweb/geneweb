@@ -1,0 +1,276 @@
+<!-- $Id: modules/arbre_horizontal.txt v7.1 30/12/2021 18:24:51 $ -->
+%( Arbre ascendant horizontal jusqu’à 6 générations %)
+
+%define;urlset(xx,yy)
+  %url_set(xx,yy)
+%end;
+
+%define;access_ind(nnn)
+  %if;(cancel_links or nnn.is_restricted)
+    %nnn;
+  %else;
+    <a %apply;ext_link("nnn") href="%prefix;%nnn.access;">%nnn;</a>%nnn.title;%nn;
+  %end;
+  <span class="text-nowrap small">%nnn.dates;</span>%nn;
+%end;
+
+%define;access(num,nnn)
+  %if;(evars=1)num%end; %apply;display_sosa("nnn")%nn;
+  %if;("num" = 1)
+    %nnn;%nnn.title;%nnn.dates;<br>
+  %else;
+    %apply;access_ind("nnn")<br>
+  %end;
+%end;
+
+%define;vbar(i, sx, mm, f_m)
+  %let;m1;%expr(mm-1)%in;
+  %let;n1;%if;(m1=1)2%elseif;(m1=2)4%elseif;(m1=3)8%elseif;(m1=4)16%elseif;(m1=5)32%end;%in;
+  %let;n2;%expr(n1/2)%in;
+  %let;n4;%expr(n1/4)%in;
+  %let;n8;%expr(n1/8)%in;
+  %let;n16;%expr(n1/16)%in;
+  %let;n32;%expr(n1/32)%in;
+  %if;(i=0)
+    %if;(mm=2)
+      %let;s1;%expr(sx+f_m)%in;
+      %let;min;%expr(n1+1*n2)%in;
+      %if;(s1=min)│%else;&nbsp;%end;
+    %else;
+      %let;min;%expr(n1+1*n4)%in;
+      %let;max;%expr(n1+3*n4)%in;
+      %if;(sx>=min and sx<max)│%else;&nbsp;%end;
+    %end;
+  %elseif;(i=1)
+    %if;(mm=3)
+      %let;s1;%expr(sx+f_m)%in;
+      %let;min1;%expr(n1+1*n4)%in;
+      %let;max1;%expr(n1+3*n4)%in;
+      %if;(s1=min1 or s1=max1)│%else;&nbsp;%end;
+    %else;
+      %let;min1;%expr(n1+1*n8)%in;
+      %let;max1;%expr(n1+3*n8)%in;
+      %let;min2;%expr(n1+5*n8)%in;
+      %let;max2;%expr(n1+7*n8)%in;
+      %if;((sx>=min1 and sx<max1) or
+           (sx>=min2 and sx<max2) )│%else;&nbsp;%end;
+    %end;
+  %elseif;(i=2)
+    %if;(mm=4)
+      %let;s1;%expr(sx+f_m)%in;
+      %let;min1;%expr(n1+1*n8)%in;
+      %let;max1;%expr(n1+3*n8)%in;
+      %let;min2;%expr(n1+5*n8)%in;
+      %let;max2;%expr(n1+7*n8)%in;
+      %if;(s1=min1 or s1=max1 or
+           s1=min2 or s1=max2 )│%else;&nbsp;%end;
+    %else;
+      %let;min1;%expr(n1+1*n16)%in;
+      %let;max1;%expr(n1+3*n16)%in;
+      %let;min2;%expr(n1+5*n16)%in;
+      %let;max2;%expr(n1+7*n16)%in;
+      %let;min3;%expr(n1+9*n16)%in;
+      %let;max3;%expr(n1+11*n16)%in;
+      %let;min4;%expr(n1+13*n16)%in;
+      %let;max4;%expr(n1+15*n16)%in;
+      %if;((sx>=min1 and sx<max1) or
+           (sx>=min2 and sx<max2) or
+           (sx>=min3 and sx<max3) or
+           (sx>=min4 and sx<max4) )│%else;&nbsp;%end;
+    %end;
+  %elseif;(i=3)
+    %if;(mm=5)
+      %let;s1;%expr(sx+f_m)%in;
+      %let;min1;%expr(n1+1*n16)%in;
+      %let;max1;%expr(n1+3*n16)%in;
+      %let;min2;%expr(n1+5*n16)%in;
+      %let;max2;%expr(n1+7*n16)%in;
+      %let;min3;%expr(n1+9*n16)%in;
+      %let;max3;%expr(n1+11*n16)%in;
+      %let;min4;%expr(n1+13*n16)%in;
+      %let;max4;%expr(n1+15*n16)%in;
+      %if;(s1=min1 or s1=max1 or
+           s1=min2 or s1=max2 or
+           s1=min3 or s1=max3 or
+           s1=min4 or s1=max4 )│%else;&nbsp;%end;
+    %else;
+      %let;min1;%expr(n1+1*n32)%in;
+      %let;max1;%expr(n1+3*n32)%in;
+      %let;min2;%expr(n1+5*n32)%in;
+      %let;max2;%expr(n1+7*n32)%in;
+      %let;min3;%expr(n1+9*n32)%in;
+      %let;max3;%expr(n1+11*n32)%in;
+      %let;min4;%expr(n1+13*n32)%in;
+      %let;max4;%expr(n1+15*n32)%in;
+      %let;min5;%expr(n1+17*n32)%in;
+      %let;max5;%expr(n1+19*n32)%in;
+      %let;min6;%expr(n1+21*n32)%in;
+      %let;max6;%expr(n1+23*n32)%in;
+      %let;min7;%expr(n1+25*n32)%in;
+      %let;max7;%expr(n1+27*n32)%in;
+      %let;min8;%expr(n1+29*n32)%in;
+      %let;max8;%expr(n1+31*n32)%in;
+      %if;((sx>=min1 and sx<max1) or
+           (sx>=min2 and sx<max2) or
+           (sx>=min3 and sx<max3) or
+           (sx>=min4 and sx<max4) or
+           (sx>=min5 and sx<max5) or
+           (sx>=min6 and sx<max6) or
+           (sx>=min7 and sx<max7) or
+           (sx>=min8 and sx<max8) )│%else;&nbsp;%end;
+    %end;
+  %elseif;(i=4)
+    %if;(mm=6)
+      %let;s1;%expr(sx+f_m)%in;
+      %let;min1;%expr(n1+1*n32)%in;
+      %let;max1;%expr(n1+3*n32)%in;
+      %let;min2;%expr(n1+5*n32)%in;
+      %let;max2;%expr(n1+7*n32)%in;
+      %let;min3;%expr(n1+9*n32)%in;
+      %let;max3;%expr(n1+11*n32)%in;
+      %let;min4;%expr(n1+13*n32)%in;
+      %let;max4;%expr(n1+15*n32)%in;
+      %let;min5;%expr(n1+17*n32)%in;
+      %let;max5;%expr(n1+19*n32)%in;
+      %let;min6;%expr(n1+21*n32)%in;
+      %let;max6;%expr(n1+23*n32)%in;
+      %let;min7;%expr(n1+25*n32)%in;
+      %let;max7;%expr(n1+27*n32)%in;
+      %let;min8;%expr(n1+29*n32)%in;
+      %let;max8;%expr(n1+37*n32)%in;
+      %if;(s1=min1 or s1=max1 or
+           s1=min2 or s1=max2 or
+           s1=min3 or s1=max3 or
+           s1=min4 or s1=max4 or
+           s1=min5 or s1=max5 or
+           s1=min6 or s1=max6 or
+           s1=min7 or s1=max7 or
+           s1=min8 or s1=max8 )│%else;&nbsp;%end;
+    %else;
+      not done
+    %end;
+  %else;
+    not done yet
+  %end;
+%end;
+
+%define;displ_parent(max, lev, nnn, sx, wid)
+  %if;(max>=7)
+    lvl >=7 not implemented
+  %elseif;(max=0)
+  %else;
+    %let;l1;%expr(lev-1)%in;
+    %let;l2;%if;(lev>=2)%expr(lev-2)%else;0%end;%in;
+    %let;l3;%if;(lev>=3)%expr(lev-3)%else;0%end;%in;
+    %if;(lev=max)
+      %let;sosf;%expr(sx*2)%in;
+      %let;sosm;%expr(sx*2+1)%in;
+      %if;nnn.has_parents;
+        %for;i;0;l1;
+          %apply;vbar(i, sx, max, 0)
+          %for;j;1;wid;&nbsp;%end;
+        %end;
+        ╭%for;i;1;wid;─%end;%nn;
+        %apply;access(sosf, "nnn.father")%nn;
+      %end;
+      %for;i;0;l2;
+        %apply;vbar(i, sx, max, 0)
+        %for;j;1;wid;&nbsp;%end;
+      %end;
+      %let;ds;%expr(sx-sx/2*2)%in;
+      %if;(max>1)%if;(ds=0)╭%else;╰%end;%for;i;1;wid;─%end;%end;%nn;
+      %apply;access(sx, "nnn")%nn;
+      %if;nnn.has_parents;
+        %for;i;0;l1;
+          %apply;vbar(i, sx, max, 1)
+          %for;j;1;wid;&nbsp;%end;
+        %end;
+        ╰%for;i;1;wid;─%end;%nn;
+        %apply;access(sosm, "nnn.mother")%nn;
+      %end;
+    %else;
+      %let;sosf;%expr(sx*2)%in;
+      %let;sosm;%expr(sx*2+1)%in;
+      %if;nnn.has_parents;%apply;displ_parent(max, lev+1, "nnn.father", sosf, wid)%nn;%end;
+      %if;(max=4)
+        %for;i;0;l2;
+          %if;(i=0 and (sx=5 or sx=6))│%else;&nbsp;%end;
+          %for;j;1;wid;&nbsp;%end;
+        %end;
+      %elseif;(max=5)
+        %for;i;0;l2;
+          %if;((i=0 and (sx=5 or sx=6  or (sx>=10 and sx<=13))) or
+               (i=1 and (sx=9 or sx=10 or sx=13 or sx=14)) )│%else;&nbsp;%end;
+          %for;j;1;wid;&nbsp;%end;
+        %end;
+      %elseif;(max=6)
+        %for;i;0;l2;
+          %if;((i=0 and (sx=5 or sx=6  or (sx>=10 and sx<=13) or (sx>=20 and sx<=27))) or
+               (i=1 and (sx=9 or sx=10 or sx=13 or sx=14 or
+                        (sx>=18 and sx<=21) or (sx>=26 and sx<=29))) or
+               (i=2 and (sx=17 or sx=18 or sx=21 or sx=22 or
+                         sx=25 or sx=26 or sx=29 or sx=30)))│%else;&nbsp;%end;
+          %for;j;1;wid;&nbsp;%end;
+        %end;
+      %end;
+      %let;ds;%expr(sx-sx/2*2)%in;
+      %if;(lev>1)%if;(ds=0)╭%else;╰%end;%for;i;1;wid;─%end;%end;%nn;
+      %apply;access(sx, "nnn")%nn;
+      %if;nnn.has_parents;%apply;displ_parent(max, lev+1, "nnn.mother", sosm, wid)%nn;%end;
+    %end;
+  %end;
+%end;
+
+%if;has_parents;
+  %let;evarvh;%if;(evar.vh!="")%evar.vh;%else;3%end;%in;
+  %let;evartw;%if;(evar.twidth!="")%evar.twidth;%else;10%end;%in;
+  %let;evars;%if;(evar.sosa="on")1%else;0%end;%in;
+  <div class="d-flex justify-content-between">
+    <h2>[*preview family tree]</h2>
+    %if;not cancel_links;
+      <div class="form-inline">
+        <div class="btn-group mx-2">
+          %for;i;1;7;
+            <a href="%apply;url_set%with;vh%and;%i;%end;"
+              class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
+              title="%if;(evarvh!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
+              %end;">%i;</a>
+          %end;
+        </div>
+        <div class="mx-2">
+          <a href="%if;(evar.sosa!="on")%url_set.sosa.on%else;%url_set.sosa%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%else;%nn;
+               [*visualize/show/hide/summary]2%end; [half-brothers/half-sisters/half-siblings]2"
+          >Sosa
+            <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
+          </a>
+        </div>
+        <div class="input-group input-group-sm ">
+          <div class="input-group-prepend">
+            %if;(evartw>=6)
+              <a href="%apply;url_set%with;twidth%and;%expr(evartw-2);%end;"
+                class="btn btn-outline-secondary"
+                title="- 2 ([width])"
+              >&nbsp;-</a>
+            %end;
+          </div>
+          <input class="col-3 text-center" title="[*width]" value="%evartw; ─" disabled>
+          <div class="input-group-append">
+              <a href="%apply;url_set%with;twidth%and;%expr(evartw+2);%end;"
+                class="btn btn-outline-secondary"
+                title="+ 2 ([width])"
+              >&nbsp;+</a>
+          </div>
+        </div>
+      </div>
+    %end;
+  </div>
+  <pre class="my-4">
+    %if;(evarvh>0)
+      %apply;displ_parent(evarvh, 1, "self", 1, evartw)
+    %else;
+      %apply;access(1, "self")%nn; 
+    %end;
+  </pre>
+%end;

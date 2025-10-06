@@ -1,0 +1,529 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+ged2gwb.py - Convertisseur de fichiers GEDCOM vers bases de données GeneWeb
+
+Ce programme lit un fichier GEDCOM (.ged) et crée une base de données GeneWeb.
+Basé sur l'original ged2gwb.ml de GeneWeb.
+"""
+
+import os
+import sys
+import re
+import argparse
+import gc
+from enum import Enum
+from typing import List, Dict, Tuple, Optional, Union, Any
+
+# Constantes et types
+class Charset(Enum):
+    ANSEL = 1
+    ANSI = 2
+    ASCII = 3
+    MSDOS = 4
+    MACINTOSH = 5
+    UTF8 = 6
+
+class Case(Enum):
+    NO_CASE = 0
+    LOWER_CASE = 1
+    UPPER_CASE = 2
+
+class MonthNumberDates(Enum):
+    MONTH_DAY_DATES = 1
+    DAY_MONTH_DATES = 2
+    NO_MONTH_NUMBER_DATES = 3
+    MONTH_NUMBER_HAPPENED = 4
+
+class RelationStatus(Enum):
+    MARRIED = 1
+    ENGAGED = 2
+    NO_STATUS = 3
+    MARRIAGE_BANN = 4
+    MARRIAGE_CONTRACT = 5
+    MARRIAGE_LICENSE = 6
+    PACS = 7
+    RESIDENCE = 8
+
+# Configuration globale
+class Config:
+    def __init__(self):
+        self.lowercase_first_names = False
+        self.track_ged2gw_id = False
+        self.case_surnames = Case.NO_CASE
+        self.extract_first_names = False
+        self.extract_public_names = True
+        self.charset_option = None
+        self.charset = Charset.ASCII
+        self.alive_years = 80
+        self.dead_years = 120
+        self.try_negative_dates = False
+        self.no_negative_dates = False
+        self.month_number_dates = MonthNumberDates.NO_MONTH_NUMBER_DATES
+        self.no_public_if_titles = False
+        self.first_names_brackets = None
+        self.untreated_in_notes = False
+        self.default_source = ""
+        self.relation_status = RelationStatus.MARRIED
+        self.no_picture = False
+        self.do_check = True
+        self.particles = ["de", "d'", "du", "le", "la", "des", "von", "di"]
+        self.log_file = sys.stdout
+        self.in_file = ""
+        self.out_file = ""
+        self.line_cnt = 1
+        self.bad_dates_warned = False
+
+# Type pour représenter un enregistrement GEDCOM
+class Record:
+    def __init__(self, label="", value="", content="", sons=None, pos=0):
+        self.label = label
+        self.value = value
+        self.content = content
+        self.sons = sons or []
+        self.pos = pos
+        self.used = False
+
+# Fonctions utilitaires pour la conversion de charset
+def utf8_of_string(s, charset):
+    if charset == Charset.ANSEL:
+        return ansel_to_utf8(s)
+    elif charset == Charset.MSDOS:
+        try:
+            return ascii_of_msdos(s).encode('iso-8859-1').decode('utf-8')
+        except UnicodeError:
+            return s
+    elif charset == Charset.MACINTOSH:
+        try:
+            return ascii_of_macintosh(s).encode('iso-8859-1').decode('utf-8')
+        except UnicodeError:
+            return s
+    elif charset == Charset.UTF8:
+        return s
+    else:  # ASCII, ANSI
+        try:
+            return s
+        except UnicodeError:
+            return s
+
+def ansel_to_utf8(s):
+    # Implémentation simplifiée de la conversion ANSEL vers UTF-8
+    # Dans une implémentation complète, il faudrait gérer tous les caractères ANSEL
+    return s
+
+def ascii_of_msdos(s):
+    # Conversion des caractères spéciaux DOS vers ASCII
+    conversion_map = {
+        0o200: 0o307,
+        0o201: 0o374,
+        # ... autres conversions comme dans le code OCaml
+    }
+    
+    result = ""
+    for c in s:
+        code = ord(c)
+        if code in conversion_map:
+            result += chr(conversion_map[code])
+        else:
+            result += c
+    return result
+
+def ascii_of_macintosh(s):
+    # Conversion des caractères spéciaux MacIntosh vers ASCII
+    conversion_map = {
+        0o200: 0o304,
+        0o201: 0o305,
+        # ... autres conversions comme dans le code OCaml
+    }
+    
+    result = ""
+    for c in s:
+        code = ord(c)
+        if code in conversion_map:
+            result += chr(conversion_map[code])
+        else:
+            result += c
+    return result
+
+# Fonctions de lecture et d'analyse du fichier GEDCOM
+def parse_gedcom_file(file_path, config):
+    """Parse un fichier GEDCOM et retourne une structure d'enregistrements"""
+    config.line_cnt = 1
+    records = []
+    
+    try:
+        # Essayer plusieurs encodages
+        encodings = ['utf-8', 'iso-8859-1', 'cp1252', 'mac_roman']
+        lines = None
+        
+        for encoding in encodings:
+            try:
+                with open(file_path, 'r', encoding=encoding) as f:
+                    lines = f.readlines()
+                print(f"Successfully read file with encoding: {encoding}", file=config.log_file)
+                break
+            except UnicodeDecodeError:
+                continue
+        
+        if lines is None:
+            # Dernier recours : ouvrir en mode binaire et décoder manuellement
+            with open(file_path, 'rb') as f:
+                content = f.read()
+                try:
+                    lines = content.decode('utf-8', errors='replace').splitlines()
+                    print("Using fallback decoding with 'replace' error handling", file=config.log_file)
+                except:
+                    print("Failed to decode file with any encoding", file=config.log_file)
+                    return []
+            
+        # Premier passage pour obtenir les records
+        i = 0
+        while i < len(lines):
+            line = lines[i].rstrip('\n\r')
+            if line:
+                level = 0
+                j = 0
+                while j < len(line) and line[j] == ' ':
+                    j += 1
+                
+                if j < len(line) and line[j].isdigit():
+                    level = int(line[j])
+                    j += 1
+                    
+                    # Passer les espaces
+                    while j < len(line) and line[j] == ' ':
+                        j += 1
+                    
+                    # Lire le tag
+                    tag_start = j
+                    while j < len(line) and line[j] not in [' ', '\t', '\n', '\r']:
+                        j += 1
+                    
+                    tag = line[tag_start:j]
+                    
+                    # Passer les espaces
+                    while j < len(line) and line[j] == ' ':
+                        j += 1
+                    
+                    # Lire la valeur
+                    value = line[j:] if j < len(line) else ""
+                    
+                    # Construire le record
+                    if tag and tag[0] == '@':
+                        # C'est une référence
+                        id_tag = tag
+                        j += 1
+                        while j < len(line) and line[j] != ' ':
+                            j += 1
+                        
+                        while j < len(line) and line[j] == ' ':
+                            j += 1
+                        
+                        tag = line[j:].strip()
+                        value = id_tag
+                    
+                    record = Record(label=tag, value=value, content="", pos=config.line_cnt)
+                    
+                    # Lire les enfants
+                    i += 1
+                    config.line_cnt += 1
+                    child_level = level + 1
+                    
+                    while i < len(lines):
+                        child_line = lines[i].rstrip('\n\r')
+                        if not child_line:
+                            i += 1
+                            config.line_cnt += 1
+                            continue
+                        
+                        j = 0
+                        while j < len(child_line) and child_line[j] == ' ':
+                            j += 1
+                        
+                        if j < len(child_line) and child_line[j].isdigit():
+                            curr_level = int(child_line[j])
+                            if curr_level < child_level:
+                                break
+                            if curr_level == child_level:
+                                child_record = parse_gedcom_line(child_line, config)
+                                if child_record:
+                                    record.sons.append(child_record)
+                        
+                        i += 1
+                        config.line_cnt += 1
+                    
+                    records.append(record)
+                    continue
+            
+            i += 1
+            config.line_cnt += 1
+            
+        return records
+    
+    except Exception as e:
+        print(f"Error parsing GEDCOM file: {e}", file=config.log_file)
+        return []
+
+def parse_gedcom_line(line, config):
+    """Parse une ligne GEDCOM et retourne un Record"""
+    if not line:
+        return None
+    
+    j = 0
+    while j < len(line) and line[j] == ' ':
+        j += 1
+    
+    if j < len(line) and line[j].isdigit():
+        level = int(line[j])
+        j += 1
+        
+        # Passer les espaces
+        while j < len(line) and line[j] == ' ':
+            j += 1
+        
+        # Lire le tag
+        tag_start = j
+        while j < len(line) and line[j] not in [' ', '\t', '\n', '\r']:
+            j += 1
+        
+        tag = line[tag_start:j]
+        
+        # Passer les espaces
+        while j < len(line) and line[j] == ' ':
+            j += 1
+        
+        # Lire la valeur
+        value = line[j:] if j < len(line) else ""
+        
+        return Record(label=tag, value=utf8_of_string(value, config.charset), content="", pos=config.line_cnt)
+    
+    return None
+
+# Fonctions pour la construction de la base GeneWeb
+def make_arrays(gedcom_file, config):
+    """Crée les tableaux de personnes et de familles à partir du fichier GEDCOM"""
+    print(f"Parsing GEDCOM file {gedcom_file}...", file=config.log_file)
+    
+    # Lire le fichier GEDCOM
+    records = parse_gedcom_file(gedcom_file, config)
+    
+    # Structures pour stocker les données
+    persons = {}
+    families = {}
+    
+    # Première passe: collecter les personnes et les familles
+    for record in records:
+        if record.label == "INDI":
+            person_id = record.value.strip('@')
+            persons[person_id] = {
+                "id": person_id,
+                "first_name": "",
+                "surname": "",
+                "birth_date": None,
+                "birth_place": "",
+                "death_date": None,
+                "death_place": "",
+                "sex": 0,  # 0=inconnu, 1=homme, 2=femme
+                "occupation": "",
+                "notes": "",
+                "sources": "",
+                "families": []
+            }
+            
+            # Extraire les informations de la personne
+            for son in record.sons:
+                if son.label == "NAME":
+                    name_parts = son.value.split('/')
+                    if len(name_parts) >= 2:
+                        persons[person_id]["first_name"] = name_parts[0].strip()
+                        persons[person_id]["surname"] = name_parts[1].strip()
+                elif son.label == "SEX":
+                    if son.value == "M":
+                        persons[person_id]["sex"] = 1
+                    elif son.value == "F":
+                        persons[person_id]["sex"] = 2
+                elif son.label == "BIRT":
+                    for birth_data in son.sons:
+                        if birth_data.label == "DATE":
+                            persons[person_id]["birth_date"] = birth_data.value
+                        elif birth_data.label == "PLAC":
+                            persons[person_id]["birth_place"] = birth_data.value
+                elif son.label == "DEAT":
+                    for death_data in son.sons:
+                        if death_data.label == "DATE":
+                            persons[person_id]["death_date"] = death_data.value
+                        elif death_data.label == "PLAC":
+                            persons[person_id]["death_place"] = death_data.value
+                elif son.label == "OCCU":
+                    persons[person_id]["occupation"] = son.value
+                elif son.label == "NOTE":
+                    persons[person_id]["notes"] += son.value + "\n"
+                elif son.label == "SOUR":
+                    persons[person_id]["sources"] += son.value + "\n"
+                elif son.label == "FAMS":
+                    family_id = son.value.strip('@')
+                    if family_id not in persons[person_id]["families"]:
+                        persons[person_id]["families"].append(family_id)
+        
+        elif record.label == "FAM":
+            family_id = record.value.strip('@')
+            families[family_id] = {
+                "id": family_id,
+                "husband": None,
+                "wife": None,
+                "children": [],
+                "marriage_date": None,
+                "marriage_place": "",
+                "divorce": False,
+                "divorce_date": None
+            }
+            
+            # Extraire les informations de la famille
+            for son in record.sons:
+                if son.label == "HUSB":
+                    families[family_id]["husband"] = son.value.strip('@')
+                elif son.label == "WIFE":
+                    families[family_id]["wife"] = son.value.strip('@')
+                elif son.label == "CHIL":
+                    child_id = son.value.strip('@')
+                    if child_id not in families[family_id]["children"]:
+                        families[family_id]["children"].append(child_id)
+                elif son.label == "MARR":
+                    for marr_data in son.sons:
+                        if marr_data.label == "DATE":
+                            families[family_id]["marriage_date"] = marr_data.value
+                        elif marr_data.label == "PLAC":
+                            families[family_id]["marriage_place"] = marr_data.value
+                elif son.label == "DIV":
+                    families[family_id]["divorce"] = True
+                    for div_data in son.sons:
+                        if div_data.label == "DATE":
+                            families[family_id]["divorce_date"] = div_data.value
+    
+    # Deuxième passe: compléter les liens parents-enfants
+    for family_id, family in families.items():
+        # Lier les enfants à leurs parents
+        for child_id in family["children"]:
+            if child_id in persons:
+                if family["husband"] and family["husband"] in persons:
+                    # Lien vers le père
+                    if "father" not in persons[child_id]:
+                        persons[child_id]["father"] = family["husband"]
+                
+                if family["wife"] and family["wife"] in persons:
+                    # Lien vers la mère
+                    if "mother" not in persons[child_id]:
+                        persons[child_id]["mother"] = family["wife"]
+    
+    return {"persons": persons, "families": families}
+
+def finish_base(arrays, config):
+    """Finalise la base et l'écrit dans le fichier de sortie"""
+    print(f"Creating GeneWeb database {config.out_file}...", file=config.log_file)
+    
+    # Implémentation simplifiée de l'écriture de la base GeneWeb
+    # Dans une implémentation réelle, il faudrait utiliser le format de fichier GeneWeb
+    
+    # Écriture des données dans un format JSON pour cette version simplifiée
+    import json
+    
+    with open(f"{config.out_file}.json", 'w', encoding='utf-8') as f:
+        json.dump(arrays, f, indent=2)
+    
+    print(f"GeneWeb database created in {config.out_file}.json", file=config.log_file)
+    
+    # Statistiques
+    persons_count = len(arrays["persons"])
+    families_count = len(arrays["families"])
+    
+    print(f"Statistics:", file=config.log_file)
+    print(f"  Persons: {persons_count}", file=config.log_file)
+    print(f"  Families: {families_count}", file=config.log_file)
+
+def main():
+    """Fonction principale"""
+    config = Config()
+    
+    # Analyse des arguments
+    parser = argparse.ArgumentParser(
+        description="Convert GEDCOM files to GeneWeb database",
+        epilog="Example: python ged2gwb.py myfile.ged -o mybase"
+    )
+    
+    parser.add_argument("input", nargs="?", help="Input GEDCOM file")
+    parser.add_argument("-o", "--output", help="Output GeneWeb database name")
+    parser.add_argument("-f", "--file", help="Input GEDCOM file (alternative way)")
+    parser.add_argument("-fne", "--first-names-not-extracted", action="store_true", 
+                        help="Do not extract first names")
+    parser.add_argument("--lower-first-names", action="store_true", help="Lower case first names")
+    parser.add_argument("--charset", choices=["ansel", "ansi", "ascii", "msdos", "macintosh", "utf8"], 
+                        default="utf8", help="Character set of the GEDCOM file")
+    parser.add_argument("--alive", type=int, default=80, help="Number of years to be alive")
+    parser.add_argument("--dead", type=int, default=120, help="Number of years to be dead")
+    parser.add_argument("--no-check", action="store_true", help="Do not check database")
+    
+    args = parser.parse_args()
+    
+    # Configuration
+    config.in_file = args.input if args.input else ""
+    if args.file:
+        config.in_file = args.file
+    config.out_file = args.output if args.output else ""
+    
+    if config.in_file:
+        if not config.out_file:
+            config.out_file = os.path.splitext(config.in_file)[0]
+    
+    if not config.in_file:
+        print("Error: No input file specified", file=sys.stderr)
+        parser.print_help()
+        sys.exit(1)
+    
+    if not config.out_file:
+        print("Error: No output file specified", file=sys.stderr)
+        parser.print_help()
+        sys.exit(1)
+    
+    # Appliquer les options
+    config.lowercase_first_names = args.lower_first_names
+    config.extract_first_names = not args.first_names_not_extracted
+    
+    if args.charset == "ansel":
+        config.charset = Charset.ANSEL
+    elif args.charset == "ansi":
+        config.charset = Charset.ANSI
+    elif args.charset == "msdos":
+        config.charset = Charset.MSDOS
+    elif args.charset == "macintosh":
+        config.charset = Charset.MACINTOSH
+    elif args.charset == "utf8":
+        config.charset = Charset.UTF8
+    else:
+        config.charset = Charset.ASCII
+    
+    config.alive_years = args.alive
+    config.dead_years = args.dead
+    config.do_check = not args.no_check
+    
+    # Ouvrir le journal
+    if config.log_file != sys.stdout:
+        config.log_file = open(f"{config.out_file}.log", 'w', encoding='utf-8')
+    
+    try:
+        # Traitement
+        arrays = make_arrays(config.in_file, config)
+        gc.collect()  # Nettoyer la mémoire
+        finish_base(arrays, config)
+        
+        if config.log_file != sys.stdout:
+            config.log_file.close()
+            
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        if config.log_file != sys.stdout:
+            config.log_file.close()
+        sys.exit(2)
+
+if __name__ == "__main__":
+    main()

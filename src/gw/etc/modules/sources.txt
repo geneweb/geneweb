@@ -1,0 +1,48 @@
+<!-- $Id: modules/sources.txt v7.0 28/10/2018 23:10:24 $ -->
+%( op_m=1 Sources  %)
+%( op_m=2 Sources complete (events) %)
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
+
+%if;(has_linked_page.BIBLIO and linked_page.BIBLIO!="")
+  <h2>[*bibliography]</h2>
+  <ul>
+    <li>%apply;capitalize(linked_page.BIBLIO)</li>
+  </ul>
+%end;
+%reset_count;
+%if;has_sources;%incr_count;%end;
+%foreach;event;
+  %if;event.has_src;%incr_count;%end;
+%end;
+%if;(count>0)
+  <h2 class="mt-2">%if;(count=1)[*source/sources]0%else;[*source/sources]1%end;</h2>
+  <ul class="pl-4 pY-0">
+  %foreach;source;
+    <li>%apply;capitalize(source_type)[:] %source;.</li>
+  %end;
+  %if;(op_m=2)
+    %reset_count;
+    %foreach;event;
+      %if;event.has_src;
+        %if;(event.name!=[birth] and
+          event.name!=[baptism] and
+          event.name!=[marriage event] and
+          event.name!=[death] and
+          event.name!=[burial] and
+          event.name!=[cremation] and
+          event.name!="special" and
+          event.name!="special1" and
+          event.name!="special2")
+          <li>%apply;capitalize(event.name)[:] %event.src;.</li>
+        %end;
+        %if;((event.name="special" or
+             event.name="special1" or
+             event.name="special2") and count=0)
+          <li>[timeline][:] %linked_page.TIMELINE;
+          %incr_count;
+        %end;
+      %end;
+    %end;
+  %end;
+  </ul>
+%end;

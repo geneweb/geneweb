@@ -1,0 +1,66 @@
+<!-- $Id: modules/arbre_hi_tools.txt v7.0 26/09/2023 04:30:23 $ -->
+%( Boutons pour les arbres ascendats compacts %)
+%let;evarv;%if;(e.v!="")%e.v;%else;7%end;%in;
+%let;evarscl;%if;(e.scale!="")%e.scale;%else;100%end;%in;
+%let;evarfs;%if;(e.fs!="")%e.fs;%else;17%end;%in;
+%let;maxlev;%if;(e.cpl = "on")13%else;12%end;%nn;%in;
+%(evarv;, %evarhi;, %evarim;, %evarso;, %evarma;<br>%)
+%(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
+<div class="d-flex ml-2 mb-2">
+  %if;not cancel_links;
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+      <div class="btn-group mx-2">
+        %if;(evarv>=4)
+          <a href="%apply;url_set%with;v%and;%expr(evarv-1)%end;" class="btn btn-outline-primary"
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1">−</a>
+        %end;
+        <span class="btn btn-outline-primary disabled border-top border-bottom"
+          title="[generation/generations]1">%evarv; gen.</span>
+        %if;(evarv<maxlev-1)
+          <a href="%apply;url_set%with;v%and;%expr(evarv+1)%end;" class="btn btn-outline-primary"
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
+        %end;
+      </div>
+      %(TODO : improve translations, titles and add icons %)
+      <div class="mx-2">
+        <a href="%apply;url_set%with;hi%and;%if;(e.hi="H" or e.hi="")I%end;%end;"
+          class="btn btn-outline-primary">%if;(e.hi="H" or e.hi="")I%else;H%end;-tree</a>
+        <a href="%if;(e.sosa!="on")%url_set.sosa.on;%else;%url_set.sosa;%end;" class="btn btn-outline-primary ml-1"
+          title="[*visualize/show/hide/summary]1 %if;(e.sosa="on")ASCII%else;HTML%end;">
+          %if;(e.sosa!="on")HTML%else;ASCII%end; box drawing</a>
+        <a href="%if;(e.sms!="on")%url_set.sms.on;%else;%url_set.sms;%end;" class="btn btn-outline-primary ml-1"
+          title="%if;(e.sms!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [missing %s:::Sosa]0">·</a>
+        <a href="%if;(e.cpl!="on")%url_set.cpl.on;%else;%url_set.cpl;%end;" class="btn btn-outline-primary ml-1"
+          title="[*visualize/show/hide/summary]1%if;(e.cpl!="on") [couples]%else;[individuals]%end;">
+          %if;(e.cpl!="on")<i class="fa fa-user-plus" aria-hidden="true"></i>%end;<i class="fa fa-user" aria-hidden="true"></i></a>
+        <a href="%if;(e.implx!="on")%url_set.implx.on;%else;%url_set.implx;%end;" class="btn btn-outline-primary ml-1"
+          title="%if;(e.implx!="on")[*implex links]%else;[*do not] [implex links]%end;">
+          <i class="fa fa-shuffle fa-fw"></i></a>
+      </div>
+      %if;(e.sosa="on")
+        <div class="btn-group mx-2">
+          %if;(evarscl>0)
+            <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl-20)/%expr(evarfs-1)%end;"
+              class="btn btn-outline-primary" title="[*reduce/increase]0 [size] (-20 %%)">−</a>
+          %end;
+          <span class="btn btn-outline-primary disabled border-top border-bottom">%evarscl; %%</span>
+          %if;(evarscl<200)
+            <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl+20)/%expr(evarfs+1)%end;"
+              class="btn btn-outline-primary" title="[*reduce/increase]1 [size] (+20 %%)">+</a>
+          %end;
+        </div>
+        <div class="btn-group mx-2">
+          %if;(evarfs>5)
+            <a href="%apply;url_set%with;fs%and;%expr(evarfs-1)%end;" class="btn btn-outline-primary"
+              title="[reduce/increase]0 [font size]">−</a>
+          %end;
+          <span class="btn btn-outline-primary disabled border-top border-bottom">Font %evarfs; px</span>
+          %if;(evarfs<20)
+            <a href="%apply;url_set%with;fs%and;%expr(evarfs+1)%end;" class="btn btn-outline-primary"
+              title="[reduce/increase]1 [font size]">+</a>
+          %end;
+        </div>
+      %end;
+    </div>
+  %end;
+</div>

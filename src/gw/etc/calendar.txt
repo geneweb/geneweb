@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: calendar.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>[*calendar/calendars]1</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body%body_prop;>
+%include;hed
+%include;home
+%message_to_wizard;
+<div class="container">
+
+%define;fun_day(ccc, nnn)
+  <td><button class="btn btn-outline-secondary" type="submit" name="dccc1">&lt;</button></td>
+  <td><input type="number" class="form-control text-center" name="dccc" min="1" max="31" value="%date.nnn.day;"%/></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="dccc2">&gt;</button></td>
+%end;
+
+%define;fun_month(ccc, nnn, vvv, lll)
+  <td><button class="btn btn-outline-secondary" type="submit" name="mccc1">&lt;</button></td>
+  <td><select class="form-control h-100 w-100" style="text-align-last:center;" name="mccc">
+        %foreach;integer_range(1, vvv)
+          <option value="%integer;"%nn;
+           %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
+             %if;(lang="fr")%apply;nth("lll", integer-1)
+           %else;
+             %apply;capitalize%with;%apply;nth("lll", integer-1)%end;
+           %end;
+          </option>
+        %end;
+      </select></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="mccc2">&gt;</button></td>
+%end;
+
+%define;fun_year(ccc, nnn)
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
+  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
+%end;
+
+%define;fun_julian_year(ccc, nnn)
+  %let;year;
+    %if;(date.julian.month < 3 or
+         date.julian.month = 3 and date.julian.day < 25)
+      %expr(date.nnn.year - 1)/%expr(date.nnn.year % 10)
+    %else;%date.nnn.year;%end;
+  %in;
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
+  <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%year;"%/></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
+%end;
+
+%define;calendar(ccc, nnn, vvv, lll, fun_yyy)
+  %if;([!dates order] = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
+    %apply;fun_day("ccc", "nnn")
+    %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_yyy("ccc", "nnn")
+  %elseif;([!dates order] = "mmddyyyy")
+    %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_day("ccc", "nnn")
+    %apply;fun_yyy("ccc", "nnn")
+  %else;
+    %apply;fun_yyy("ccc", "nnn")
+    %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_day("ccc", "nnn")
+  %end;
+  <td><button class="btn btn-outline-success" type="submit" name="tccc">=</button></td>
+%end;
+
+<div class="row mt-4">
+  <div class="mx-auto text-center">
+    <h1>[*calendar/calendars]1</h1>
+    <h3 class="mt-4">%apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
+    %if;(date.julian_day = today.julian_day) - %time;%end;</h3>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="mx-auto text-center">
+    <form method="get" action="%action;">
+      <div class="form-inline">
+        %hidden;
+        <input type="hidden" name="m" value="CAL"%/>
+        <table class="table-sm table-bordered mx-auto">
+          <thead>
+            <tr>
+              <th class="py-2">&nbsp;</th>
+            %if;([!dates order] = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
+              <th class="text-center" colspan="3">[*year/month/day]2</th>
+              <th class="text-center" colspan="3">[*year/month/day]1</th>
+              <th class="text-center" colspan="3">[*year/month/day]0</th>
+            %elseif;([!dates order] = "mmddyyyy")
+              <th class="text-center" colspan="3">[*year/month/day]1</th>
+              <th class="text-center" colspan="3">[*year/month/day]2</th>
+              <th class="text-center" colspan="3">[*year/month/day]0</th>
+            %else;
+              <th class="text-center" colspan="3">[*year/month/day]0</th>
+              <th class="text-center" colspan="3">[*year/month/day]1</th>
+              <th class="text-center" colspan="3">[*year/month/day]2</th>
+            %end;
+            <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th class="px-2" class="mx-1" scope="row">[*gregorian/julian/french/hebrew]0</th>
+              %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
+            </tr>
+            <tr>
+              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]1</th>
+              %apply;calendar("j", "julian", 12, [(month)], "fun_julian_year")
+            </tr>
+            <tr>
+              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]2</th>
+              %apply;calendar("f", "french", 13, [(french revolution month)], "fun_year")
+            </tr>
+            <tr>
+              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]3</th>
+              %apply;calendar("h", "hebrew", 13, [(hebrew month)], "fun_year")
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </form>
+    %if;(date.moon_phase.index != 0)
+      %apply;capitalize%with;
+        %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
+                   date.moon_phase.index) -%sp;
+        <samp>%date.moon_phase.hour;[:]%date.moon_phase.minute;</samp> UT
+      %end;
+    %end;
+    <br>
+    <span>%nn;[*moon age/new moon/first quarter/full moon/last quarter]0[:]%sp;
+      %date.moon_age;</span>
+    <br><br>
+    [*julian day][:]%sp;
+      %if;(date.julian_day < 1000)%date.julian_day;
+      %else;%date.julian_day.sep1000;%end;
+  </div>
+</div>
+
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

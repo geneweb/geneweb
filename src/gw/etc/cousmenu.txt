@@ -1,0 +1,429 @@
+<!-- $Id: cousmenu.txt v7.1 22/05/2024 04:29:29 $ -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>%nn;
+    [*relationship link between]%sp;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") %qualifier;%end;
+    %sp;%surname;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  %include;favicon
+  %include;css
+</head>
+%( TODO :
+* highlight f(%adn)/filter by nbr
+* RLM par chemin vers les mêmes ancêtres / need to fix RLM spouses isolated)
+* discuter quoi afficher comme « comptage des chemins »%)
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+%let;e_v;%if;(e.v!="")%if;(e.v>cousins.max_a)%expr(cousins.max_a-1)%else;%e.v;%end;%else;5%end;%in;
+<div class="container%if;(e_v>6)-fluid%end;">
+  <div class="d-flex flex-column justify-content-center">
+%include;perso_utils
+%include;menubar
+%let;min;%if;(not has_children)1%else;0%end;%in;
+%let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<static_max_anc_level)%bvar.max_anc_level;%else;%max_anc_level;%end;%in;
+%let;maxp;%expr(max+1)%in;
+%define;picklvl(vvv)
+  <a role="button" class="btn btn-sm btn-light%if;(vvv=e_v or (e_v>max and vvv=max)) disabled font-weight-bold text-white bg-dark%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
+  aria-label="select ascending generation level vvv to display ancestors up to that degree."%sp;
+  title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([ascending/descending (degree)]1 [up to] %max_desc_level;)%end;">vvv</a>%nn;
+%end;
+%if;(max!=0 and not (max=1 and not has_children))
+  <div class="d-flex flex-wrap align-self-center btn-toolbar py-0 mx-3 mt-1" role="toolbar" aria-label="buttons to select maximum ascending level v">
+
+    <span>%for;i;min;maxp;%if;(i=13)<span class="high-lev d-none">%end;%apply;picklvl(i)%if;(i=max and max>12)</span>%end;%end;
+      %if;(max>12)
+        <span class="toggle-lev ml-1" data-caution=". [*high generation caution]">
+          <button type="button" class="btn btn-sm btn-danger py-1 m-0" title="[*visualize/show/hide/summary]1 [high generation levels] ([up to] %max;).&#010;[*high generation caution]" ><i class="fa fa-plus"></i></button>
+          <button type="button" class="btn btn-sm btn-light btn-rounded py-1 m-0 d-none" title="[*visualize/show/hide/summary]2 [high generation levels]"><i class="fa fa-minus"></i></button>
+        </span>
+      %end;
+    </span>
+  </div>
+%end;
+%define;cousin_lex_tt(vvv,www)
+  %( condition pour garder la tooltip (title="") vide si elle n'est pas définie pour la langue en cours %)
+  %if;([cousins.vvv.www tt]!="[cousins.vvv.www tt]")[cousins.vvv.www tt]1%else;%end;
+%end;
+%define;cousin_lex(vvv,www)
+  [cousins.vvv.www]1
+%end;
+%( p_of_index gives variable x of person of index i in the database, first individual has index 0 %)
+%define;pindex(iii,xxx)
+  %p_of_index.iii.xxx;
+%end;
+%define;cous_paths_cnt(vvv,www)
+  %cous_paths_cnt.vvv.www;
+%end;
+%define;cousins_cnt(vvv,www)
+  %cousins_cnt.vvv.www;
+%end;
+%define;cous_paths_min_date(vvv,www)
+  %cous_paths_min_date.vvv.www;
+%end;
+%define;cous_paths_max_date(vvv,www)
+  %cous_paths_max_date.vvv.www;
+%end;
+%empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%reset_count3;
+%define;cous_mod(vvv,www)
+  %empty_sorted_list;%empty_sorted_listb;
+  %( min/max = extremum dates for all individuals at v1/v2 | span = period of the generation %)
+  %let;min_date_vvv_www;%cous_paths_min_date.vvv.www;%in;
+  %let;max_date_vvv_www;%cous_paths_max_date.vvv.www;%in;
+  %foreach;cous_path(vvv,www)
+    %let;cous_isdead;%apply;pindex(path_end.index,"is_dead")%in;
+    %let;cous_nodesc;%apply;pindex(path_end.index,"has_children")%in;
+    %let;cous_sex;%apply;pindex(path_end.index,"sex")%in;
+    %( prec &#60=< &#62=> %)
+    %let;birth_jd;%if;(path_end.birth_date.julian_day!="")%path_end.birth_date.julian_day;%end;%in;
+    %let;death_jd;%if;(path_end.death_date.julian_day!="")%path_end.death_date.julian_day;%end;%in;
+    %let;birth_yr;%if;(path_end.birth_date.year!="")%path_end.birth_date.year;%end;%in;
+    %let;death_yr;%if;(path_end.birth_date.year!="")%path_end.death_date.year;%end;%in;
+    %let;birth_pr;%path_end.birth_date.prec;%in;
+    %let;death_pr;%path_end.death_date.prec;%in;
+    %let;jd_age_;%if;(cous_isdead=1)%if;(birth_jd!="" and death_jd!="" and death_jd>=birth_jd)%expr(death_jd-birth_jd)%end;
+                              %else;%if;(birth_jd!="" and today.julian_day>=birth_jd)%expr(today.julian_day-birth_jd)%end;%end;%in;
+    %let;jd_age;%if;(jd_age_!="")%if;(jd_age_<10000)0%end;%if;(jd_age_<1000)0%end;%if;(jd_age_<100)0%end;%if;(jd_age_<10)0%end;%jd_age_;%else;00000%nn;
+      %if;(birth_jd!="")%birth_jd%end;%if;(cous_isdead=0)1%else;0%end;%end;%in;
+    %let;jd_age_sep;%if;(jd_age!="")%apply;1000sep(jd_age)%end;%in;
+    %let;cous_age;%if;(birth_pr="?" or death_pr="?")?%end;%if;(jd_age_!="")%expr(jd_age_/365)%end;%in;
+    %( calculate percent of birth/death “ages” vs span to draw a linear bicolor gradient %)
+    %let;birth_age;%if;((birth_pr="" or birth_pr="<") and birth_yr!="" and max_date_vvv_www>min_date_vvv_www)
+      %expr(100-(100*(max_date_vvv_www-birth_yr)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
+    %let;death_age_;%if;((death_pr="" or death_pr=">") and death_yr!="" and max_date_vvv_www>min_date_vvv_www)
+      %expr(100-(100*(max_date_vvv_www-death_yr)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
+    %( forcing death_age to 1 for individual dead before one year old overwise no marker at all on the gradient %)
+    %let;death_age;%if;(death_age_!="" and birth_age!= "" and death_age_=birth_age and birth_age>0)%expr(birth_age+1)%else;%death_age_;%end;%in;
+    %let;white;%if;(cous_isdead=1)rgba(245,245,235,1)%else;rgba(255,255,255,1)%end;%in;
+    %let;brown;rgba(245,231,216,1)%in;%let;yellow;rgba(255,235,210,1)%in;
+    %let;name_;%path_end.surname_key;%path_end.first_name_key;%in;
+    %let;date_;%if;(birth_yr!="")%birth_yr;%end;%if;(path_end.birth_date.month!="")%if;(path_end.birth_date.month<10)0%end;%path_end.birth_date.month;%else;00%end;%if;(path_end.birth_date.day!="")%if;(path_end.birth_date.day<10)0%end;%path_end.birth_date.day;%else;00%end;%birth_pr%in;
+    %if;(path_end.surname="?" and path_end.first_name="?")%incr_count3;%else;
+      %( storing all cous_paths individual list item with their five buttons in a sorted_list %)
+      %apply;add_in_sorted_list%with;%date_; %name_;%path_end.occ;%and;%nn;
+      <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-bottom-0 mr-2
+        border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end; border-left-5%if;(cous_nodesc!=1) border-double%end;%if;(cous_isdead=1) border-right-5-black%end;"%sp;
+        style="background:linear-gradient(90deg,%sp;
+        %if;(cous_isdead=0 and birth_age!="")%brown; %birth_age;%%, %white; %birth_age;%%);%nn;
+        %else;
+          %if;(birth_age="" and death_age!="" and death_age>0)%yellow; 0%%
+          %else;%brown; %if;(birth_pr="&#60;")0%else;%birth_age;%end;%%, %white; %birth_age;%%%end;,%nn;
+          %if;(death_age="" and birth_age!="" and birth_age>0)%yellow; 100%%
+          %else;%white; %death_age;%%, %brown; %if;(death_pr="&#62;")100%else;%death_age;%end;%%%end;);%nn;
+        %end;" data-surname="%name_;%date_;" data-birth="%date_; %name_;%path_end.occ;" data-age="%jd_age;%birth_yr;%death_yr;%name_;">%nn;
+        <div class="d-flex justify-content-between align-items-start ml-n2">
+          <div class="d-block pl-n2 pr-2 align-self-center order-1 position-relative">
+            <a role="button" href="%prefix;%path_end.access;&m=C&v=%e_v;" title="[navigation] [with]…"
+              class="stretched-link py-3"> </a>
+          </div>
+          <div class="d-flex flex-column align-self-center order-3 m-0 mr-1">
+            <a href="%prefix;em=R&et=A&ei=%self.index;&i=%path_end.index;"><i class="fa-solid fa-link fa-sm"></i></a>
+          %if;(www!=0)
+              <a href="%prefix;m=RL&i=%if;(vvv=0)%self.index;
+                %else;%path_end.anc1.index;%end;&l1=vvv&i1=%self.index;&l2=www&i2=%path_end.index;%nn;
+                %if;(path_end.nbr>1)&dag=on%end;"%sp;
+                title="%apply;a_of_b%with;%if;(path_end.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%path_end.anc1.first_name; %path_end.anc1.surname;%( %path_end.anc1.dates;%)
+                %if;(path_end.anc2!=".....") [and] %path_end.anc2;%end;%end;">
+                %if;(path_end.nbr %2 = 0)<i class="fa-solid fa-user-group fa-fw fa-sm"></i>%else;<i class="fa-solid fa-user fa-fw fa-sm text-%if;(path_end.anc2!=".....")info%else;%if;(path_end.anc1.sex=0)primary%elseif;(path_end.anc1.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
+                %(TODO NBR <span class="small%if;(path_end.nbr>2)mr-1%end;"><sup>%if;(path_end.nbr>2)%path_end.nbr;%else; %end;</sup></span>%)
+              </a>
+          %end;
+          </div>
+          <div class="d-block flex-grow-1 justify-content-start align-self-center order-2 text-truncate text-nowrap px-0">
+            <a class="lh-2" href="%prefix;%path_end.access;"title="%if;(jd_age_!="" and jd_age_>364)%cous_age; [years old] (%jd_age_sep; [days old])%elseif;(jd_age_!="")%if;(jd_age_<365 and jd_age_>1)%jd_age_; [days old]%elseif;(jd_age_=1)[one day old]%elseif;(jd_age_=0)0 [year/month/day]2%end;%end;%if;(path_end.occ!="0")%if;(jd_age_!="") | %end;occ %path_end.occ;%end;"%sp;
+              %(data-anclist="%path_end.anc_f_list;"%)>%(%jd_age; |%birth_age;-%death_age_;| %birth_yr;%birth_pr;%if;(cous_isdead=1)†%else;°%end; %death_yr;%death_pr; || %path_end.nbr; | %path_end.lev_cnt; | %path_end.anc_level; DEBUG %)%path_end.surname; %path_end.first_name;%nn;
+            </a>
+            %if;wizard;<a href="%prefix;&m=MOD_IND&i=%path_end.index;"%else;<span%end; title="%if;wizard;[modify] [person/persons]0%end;">
+              %if;(path_end.dates!="")%path_end.dates;%else;%if;(cous_isdead=1)†%else;°%end;%end;
+            %if;wizard;</a>%else;</span>%end;
+          </div>
+        </div>
+       </li>%and;%path_end.cnt;%and;%path_end.index;%end;
+      %apply;add_in_sorted_listb%with;%path_end.index;%and;%cous_isdead;%and;%cous_nodesc;%end;
+      %apply;add_in_sorted_listc%with;%path_end.index;%and;%cous_isdead;%and;%cous_nodesc;%end;
+    %end;
+  %end;
+  %reset_count;%reset_count2;
+  %foreach;sorted_listb_item;
+    %if;(item.2=0)%incr_count;%end;
+    %if;(item.3=0)%incr_count2;%end;
+  %end;
+  %( overflow-y: scroll is tofix : quick hack to allow scrolling on next modal and not body after dismissing a first modal %)
+  <div class="modal fade px-4 overflow-y-scroll" id="modal_vvv_www" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl w-100" %( modal-dialog-centered%) style="max-width:1500px;%nn;
+      %(%if;(listb_size>127)1600%elseif;(listb_size>31)1200%elseif;(listb_size>9)992%else;600%end;px;%)">
+      <div class="modal-content bg-transparent border-0">
+        <div class="%(modal-header %)position-relative p-2 pb-1 rounded-lg bg-%if;(count!=0)white%else;linen%end;">
+          %let;extrapaths;%expr(cous_paths_cnt.vvv.www-listb_size)%in;
+          <div class="modal-title bg-transparent">
+            <div class="d-flex justify-content-around align-items-center">
+              <div class="d-inline-flex flex-column justify-content-around align-self-center text-left ml-4%if;(www=0) mr-5%end;">
+                <div>%listb_size %if;(cousins_cnt.vvv.www=1)[person/persons]0%else;[person/persons]1%end;
+                %if;(count!=0 and count!=cousins_cnt.vvv.www)
+                  <div>
+                    %if;(2*count<=cousins_cnt.vvv.www)%count; [alive]3
+                    %else;%expr(cousins_cnt.vvv.www-count) [died]3 <span style="background-color: rgba(245,231,216,.7);">  </span>
+                    %end;
+                  </div>
+                %end;
+                </div>
+                %if;(count2>0)
+                  <div>%count2; [no descendants] ║</div>
+                %end;
+                %if;(count3>0)
+                  <div>%count3; [unknown spouse] ? ?</div>
+                %end;
+              </div>
+              <div class="d-flex flex-column mx-auto text-center align-items-center">
+                <a role="button" class="h2 display-4 stretched-link ml-2 modal-title-font-size"
+                  data-toggle="tooltip" data-html="true"
+                  href="%prefix;m=RLM%foreach;sorted_list_item;&i1=%self.index;&i%expr(item.3+1)=%item.4;%end;%if;(vvv+www!=0)&t1=%apply;uri_encode%with;%apply;clean_html_tags([cousins.vvv.www])%end;%end;" title="Graphe RLM c(vvv,www)">%nn;
+                  %if;(vvv+www=0)[him/her]s
+                  %else;
+                   %if;(cousins_cnt.vvv.www=1)[cousins.vvv.www]0%else;[cousins.vvv.www]1%end;%nn;
+                  %end;
+                </a>%nn;
+                <small class="text-muted">%if;(extrapaths!=0) (+ %extrapaths;)%end;</small>
+                %let;span;%min_date_vvv_www;-%max_date_vvv_www;%in;
+                <span class="h4">%if;not (10000 in span);%if;(min_date_vvv_www=max_date_vvv_www)%min_date_vvv_www;%else;%span;%end;%end;</span>
+              </div>
+              %(<div class="flex-grow-1 bg-transparent"> </div>%)
+              %let;cousdown;%apply;cousins_cnt%with;vvv%and;%expr(www+1)%end;%in;
+              <div class="d-flex justify-content-end align-items-end ml-2 z-index1">
+                <div class="d-inline-flex align-self-center">
+                  <div class="d-inline-flex align-items-end mr-1">
+                    %if;(vvv>0 and www=0)
+                      <button type="button" class="btn btn-sm py-0 mb-2 btn-light" data-dismiss="modal" data-toggle="modal" data-target="#modal_%expr(vvv-1)_www"><i class="fa-solid fa-arrow-down-long fa-fw fa-rotate-by" style="--fa-rotate-angle: 45deg;" title="%expr(vvv-1)/0 ancestors at g-1" data-toggle="tooltip"></i></button>
+                    %end;
+                  </div>
+                  <div class="d-inline-flex flex-column mr-2">
+                    <div>
+                      <button type="button" class="btn btn-sm py-0 mt-2 btn-light%if;(vvv=e_v and www=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_%if;(www=0)%expr(vvv+1)_0%else;vvv_%expr(www-1)%end;"><span title="%if;(www=0)%expr(vvv+1)/0%else;vvv/%expr(www-1)%end;" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-up-%if;(www=0)right-dots%else;long%end; fa-fw"></i>vvv</span></button>
+                    </div>
+                    <div>
+                      <button type="button" class="btn btn-sm py-0 mt-1 btn-light%if;(cousdown=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_vvv_%expr(www+1)"><span title="vvv/%expr(www+1)" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-down-long fa-fw"></i>www</span></button>
+                    </div>
+                  </div>
+                  <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www"
+                    class="btn btn-lg btn-light p-2 mr-2 align-self-center">
+                      <span data-toggle="tooltip" data-html="true" title="%expr(vvv+www) %if;(vvv+www<2)[degree of kinship]0%else;[degree of kinship]1%end; ([show all] [relationship link/relationship links]1)">
+                        <i class="fa-solid fa-person-arrow-up-from-line"></i>
+                        <i class="fa-solid fa-person-arrow-down-to-line fa-fw fa-flip-horizontal"></i>
+                      </span>
+                  </a>
+                  <button type="button" class="btn btn-light p-2 flex-shrink-1 mr-2 sortbtn">%nn;
+                    <i class="fa-solid fa-user fa-fw mr-1 sorticon"></i>[sort by/branch/alphabetic order]0<br><span class="sorttype">[surname/surnames]0</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="card-columns"%( style="column-count:
+            %if;(cous_paths_cnt.vvv.www>511)5%nn;
+            %elseif;(cous_paths_cnt.vvv.www>127)4%nn;
+            %elseif;(cous_paths_cnt.vvv.www>31)3
+            %elseif;(cous_paths_cnt.vvv.www>9)2%else;1%end;"%)>
+            <ul class="list-group bg-transparent listitems">
+              %foreach;sorted_list_item;%item.2;%end;
+            </ul>
+          </div>
+        </div>
+      %(<div class="modal-footer">
+          %( TODO extraire les nbr des filtres js par nbr %)
+            %for;i;0;nbr;<a role="button" class="btn btn-light" title="filter by nbr = i">i</a>%end;
+        </div>%)
+      </div>
+    </div>
+  </div>
+%end;
+%define;link_cousin(vvv,www)
+  %let;extra_paths_vvv_www;%expr(cous_paths_cnt.vvv.www-cousins_cnt.vvv.www)%in;
+  %let;width;%expr((100/(e_v+1))*vvv)%in;
+  %let;percent_vvv_www;%expr(100-count*100/cousins_cnt.vvv.www)%in;
+  <button type="button" data-toggle="tooltip" data-html="true"
+    class="p-1 mx-1 btn-light position-relative%if;(vvv+www=0) disabled%end; %if;(percent_vvv_www=0)border-0%end; h-5"
+    %if;(percent_vvv_www=100)style="background-color: rgba(245,231,216,0.9);"%end;
+    title="<span class='h5 pt-2 px-2'>%if;(i=0 and k=0)[him/her]s%else;%apply;cousin_lex(i,k)%end;</span><hr class='bg-light text-white my-2 mx-4'>
+    <div class='d-flex justify-content-center mt-1'>
+      <div class='mr-4 h5'>
+        <i class='fa-solid fa-arrow-up-right-dots fa-fw'></i>
+        <span class='font-weight-heavy'>vvv</span>
+        <i class='fa-solid fa-arrow-down-long'></i>
+        <span class='font-weight-heavy ml-1'>www</span>
+      </div>
+      <div class='ml-4 h5'>
+        <i class='fa-solid fa-dna fa-fw'></i>
+        %if;(vvv=0 or www=0)%expr((100/.(2^(vvv+www))))%else;%expr((100/.(2^(vvv+www-1))))%end; %%
+      </div>
+    </div><hr class='bg-light text-white mt-0 mb-1'>%apply;cousin_lex_tt(i,k)">
+    <div class="d-flex justify-content-around stretched-link h-100"%sp;
+      data-toggle="modal" data-target="#modal_vvv_www"%if;(percent_vvv_www!=0 and percent_vvv_www!=100)%sp;
+      style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vvv_www>1)%expr(percent_vvv_www-1)%else;1%end;%%, rgba(248,249,250,0) %if;(percent_vvv_www<99)%expr(percent_vvv_www+1)%else;100%end;%%)"%end;>
+      <div class="order-2 w-75 align-self-center text-bottom ml-1">
+        %if;(i=0 and k=0)[him/her]s%else;%apply;cousin_lex(i,k)%end;
+      </div>
+      <div class="d-flex justify-content-end align-self-center text-right">
+        <div class="h5 mt-2 py-0 pr-0
+          text-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;">%cousins_cnt.vvv.www;
+          </div>
+          %(%if;(extra_paths_vvv_www!=0)
+            <div class="badge badge-xl badge-info">%extra_paths_vvv_www;</div>
+          %end;%)
+      </div>
+    </div>
+  </button>
+%end;
+%( table of cousins.j-vvv+i.i c(k,i) | table size = v × (v+%cousins.max_d;)
+    == l1 asc./l2 = max_desc (plus longue colonne v2) %)
+%define;table()
+  %let;maxa;%expr(e_v+1)%in;%(todo redefine better maxa%)
+  %let;maxd;%expr(cousins.max_d+maxa)%in;
+  <table id="quickrel" class="table table-responsive-sm mb-0 mt-1 order-3 col-%if;(e_v=1)8%elseif;(e_v=0)4%end;">
+    %for;j;1;maxd;
+      <tr>%nn;
+        %for;i;0;maxa;
+          %let;k;%expr(j+i-maxa)%in;
+          %if;(k>=0 and i<maxa)
+              %let;tot;%apply;cous_paths_cnt%with;%i;%and;%k;%end;%in;
+              %let;tot_next;%apply;cous_paths_cnt%with;%i;%and;%expr(k+1)%end;%in;
+              %if;(i>1 and k=0)
+                <td class="h4 font-weight-light user-select-none text-left align-middle border-top-0 pb-3 pl-3">%nn;
+                  %if;(maxa>4)%expr(maxa-j)%else;%end;
+                </td>
+                %if;(i>2)<td colspan="%expr(i-2)" class="border-0"></td>%end;
+              %end;
+              <td%if;(j=maxa) style="width:%expr(100/maxa)%%"%end;%if;(i>0 and k=0) colspan="2"%end;%sp;
+                class="border-0 border-top-0 border-bottom-0 border-right-0">
+                %if;(tot!=0)
+                  <div class="d-flex flex-column justify-content-center border-0 py-0">
+                    %apply;cous_mod(i,k)
+                    %apply;link_cousin(i,k)
+                    <div class="d-inline-flex py-0">
+                      %if;(i!=0 and k=0)
+                      %( for ancestors c(i,0) border links | self has 2×col-6 and his ancestors 4×col-3
+            prints — only first cell border if c(i-1,0) have no siblings [cousins_cnt.i.1=0] |
+                   — two first even cells borders overwise | |
+                   — nothing if self has no children %)
+                        %let;mx;%if;(i=0)1%else;3%end;%in;
+                        %for;z;0;mx;
+                          %(%let;couscntk1;%apply;cousins_cnt%with;%i%and;1%end;%in;%)
+                         <div class="h-15p col-%if;(i=0)6%else;3%end;
+                           %if;(((tot_next=0 and z=0) or (tot_next!=0 and z%2=0))
+                             and not (i=0 and not has_children)) border-dark border-right%end;"> </div>
+                        %end;
+                      %else;
+                        <div class="col-6 border-dark%if;(tot_next!=0) border-right
+                          border-top-0 border-left-0 border-bottom-0%else; border-0%end; h-15p"></div>
+                        <div class="col-6 border-0"></div>
+                      %end;
+                    </div>
+                  </div>
+                %end;
+              </td>
+          %end;
+        %end;
+        %(<td class="h3 align-top border-0">%if;(j>1)%expr(j-1)%else; %end;</td>%)
+      </tr>
+    %end;
+  </table>
+  <div class="d-flex flex-column justify-items-center order-4 mt-2">
+    <span><i class="fa-solid fa-dna fa-sm mr-1"></i>[coefficient of relationship]</span>
+    <span><i class="fa-solid fa-user fa-sm mr-1"></i>[one ancestor counted]</span>
+    <span><i class="fa-solid fa-triangle-exclamation fa-sm text-danger mr-1"></i>[multiple relations]</span>
+  </div>
+%end;
+
+%apply;table()
+
+%( page title + counts shown at top of page using flex order %)
+    <div class="d-flex justify-content-between order-2 mt-1">%nn;
+      <h3 class="%if;(e_v>6) pl-3%end;">[*link between]
+        %(%let;maxi;%if;(cousins.max_a < e_v)%cousins.max_a;%else;%e_v;%end;%in;%)
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") <em>%qualifier;</em>%end; %surname;%sp;
+        %(%if;(alias != "") <em>(%alias;)</em>%end;%) %dates;%sp;
+        %if;(e_v=0 and not has_parents)[and] [a descendant]0%else;[and] [close family]
+          %(%if;has_parents;<span class="small"> [up to] %maxi; [generation/generations]1</span>%end;%)
+        %end;
+      </h3>
+      <div class="d-flex flex-column justify-content-end align-self-center text-right mr-1">
+        %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
+        %reset_count;
+        %if;has_parents;
+          %for;i;0;e_v;
+            %let;tt;%apply;cousins_cnt%with;%expr(i+1)%and;0%end;%in;
+            %for;j;0;tt;%incr_count;%end;
+          %end;
+        %end;
+        <div><span class="text-muted" title="[ancestor/ancestors]1">%count;A</span>%nn;
+        %reset_count;
+        %if;has_children;
+          %for;i;1;cousins.max_d;
+            %let;tt;%apply;cousins_cnt%with;0%and;%i%end;%in;
+            %for;j;0;tt;%incr_count;%end;
+          %end;
+        %end;
+        <span class="text-muted" title="[descendants]">/%count;D</span></div>
+        %reset_count;%foreach;sorted_listc_item;%if;(item.2=0)%incr_count;%end;%end;
+        <div><span class="text-muted" title="[nb individuals]">%listc_size;P</span><span class="text-muted" title="[number of living persons]">/%count;L</span></div>
+      </div>
+    </div>
+  </div>
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+%( tri décroissant avec order: -1, attention le bouton appelle les icônes et label du type suivant %)
+const sortTypes = %[
+  { type: 'surname', icon: 'fa-arrow-down-9-1', label: '[age]0' },
+  { type: 'age',  order: -1, icon: 'fa-cake-candles', label: '[birth]0' },
+  { type: 'birth', icon: 'fa-user', label: '[surname/surnames]0' }
+%];
+let currentSortIndex = -1;
+function sort(sortType) {
+  $(".listitems").each(function(){
+    $(this).html($(this).children('li').sort(function(a, b){
+      if (sortType.order === -1) {
+        return ($(b).data(sortType.type)) > ($(a).data(sortType.type)) ? 1 : -1;
+      } else {
+        return ($(b).data(sortType.type)) < ($(a).data(sortType.type)) ? 1 : -1;
+      }
+    }));
+  });
+  $('.sorticon').removeClass(sortTypes.map(t => t.icon).join(' ')).addClass(sortType.icon);
+  $('.sorttype').text(sortType.label);
+}
+$(document).on('click', '.sortbtn', function() {
+  currentSortIndex = (currentSortIndex + 1) % sortTypes.length;
+  sort(sortTypes[currentSortIndex]);
+});
+$(document).ready(function() {
+  $(".toggle-lev .btn").click(function() {
+    $(".high-lev, .toggle-lev .btn").toggleClass("d-none");
+  });
+});
+$(document).ready(function() {
+  var caution = $(".toggle-lev").data("caution");
+  $(".high-lev .btn").each(function() {
+    var title = $(this).attr("title");
+    $(this).attr("title", title + caution);
+  });
+});
+</script>
+</body>
+</html>

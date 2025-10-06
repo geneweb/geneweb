@@ -1,0 +1,38 @@
+<-- $Id: buttons_fnames.txt v7.1 $ -->
+%( Boutons de configurations et d'options %)
+<div class="d-flex">
+  <a href="%prefix_base_password;%nn;
+    %foreach;env_binding;%if;(env.val!="" and env.key!="reset" and 
+      env.key!="other" and env.key!="force_fn")%nn;
+     &%env.key=%env.val;%end;%nn;
+    %end;%nn;
+    %if;(evar.other!="on")&other=on%end;%nn;"
+    title="%if;(evar.other!="on")[*v7 show others]%else;[*v7 hide others]%end;">%nn;
+    %if;(evar.other!="on")<i class="fa fa-thumbs-up">%else;<i class="fa fa-thumbs-down">%end;</i>
+  </a>
+  <a class="ml-3"
+    href="%prefix_base_password;%nn;
+    %foreach;env_binding;%if;(env.val!="" and env.key!="reset" and env.key!="t")%nn;
+     &%env.key=%env.val;%end;%nn;
+    %end;%nn;
+    %if;(evar.t!="A")&t=A%end;%nn;"
+    title="%if;(evar.t!="A")[*v7 exact match]%else;[*v7 approxim match]%end;">%nn;
+    %if;(evar.t!="A")<i class="fa fa-equals "></i>%else;<i class="fa fa-less-than-equal"></i>%end;
+  </a>
+  <a class="ml-3"
+    href="%prefix_base_password;%nn;
+    %foreach;env_binding;%if;(env.val!="" and env.key!="reset" and env.key!="word")%nn;
+     &%env.key=%env.val;%end;%nn;
+    %end;%nn;
+    %if;(evar.word!="on")&word=on%end;%nn;"
+    title="%if;(evar.word!="on")[*v7 word boundaries]%else;[*v7 anywhere]%end;">%nn;
+    <i class="fas fa-crop%if;(evar.word!="on")-simple%end;"></i>
+  </a>
+  <a role="button" class="ml-auto mr-2"
+    href="%prefix_base_password;
+    %foreach;env_binding;%if;(env.val!="" and env.key!="reset")%nn;
+      &%env.key=%env.val;%end;%nn;
+    %end;&reset=on" %nn;
+    title="[*v7 refresh fnames cache]"><i class="fa fa-rotate mr-2 mt-2"></i></i>
+  </a>
+</div>

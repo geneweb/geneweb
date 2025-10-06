@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2023 - GeneWeb -->
+  <!-- $Id: bsi_cache_files.htm,v 7.10 2023.11.15 hg Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[Application of "%d"]
+</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Application of "%d"]</h1>
+</div>
+
+[applied operation]
+%(
+en: The operation "%d" will be applied on your database "%a". Warning: it
+    can take some seconds or some minutes, depending on the case. Be
+    patient.
+%)
+
+<p>
+[click on ok]
+<p>
+<form method="post" action="%d">
+%h
+<dl><dt><dd><input type="submit" value="Ok" /></dl>
+</form>
+<p>
+[commands]
+%(
+en: For information, this operation corresponds to the following commands:
+%)
+<pre>
+     $ %x%/%d%S > comm.log
+</pre>

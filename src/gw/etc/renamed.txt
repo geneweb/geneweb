@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>%old; -&gt; %new;</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+%include;css
+</head>
+<body>
+<div class="container">
+<h1>%old; -&gt; %new;</h1>
+
+<p>
+%apply;interp([
+en: The database "%old;" has been renamed "%new;".
+    Please use now:
+fr: La base de données "%old;" est renommée "%new;".
+    Utiliser maintenant:
+it: La base di dati "%old;" ha cambiato nome "%new;".
+    Utilizzate:
+])
+<ul>
+<li>
+<a href="%link;">%link;</a>
+</ul>
+</p>
+
+%include;trl
+%include;copyr
+%query_time;
+</div>
+</body>
+</html>

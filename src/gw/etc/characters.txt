@@ -1,0 +1,190 @@
+<!-- $Id: characters.txt v7.1 30/11/2023 20:52:12 $ -->
+%( Specific linked code in css.txt/js.txt %)
+<!-- $Id: characters.txt v7.1 08/12/2024 09:15:21 $ -->
+<span class="ch text-monospace">
+<a href="#" title="En Dash">–</a>
+<a href="#" title="Em Dash">—</a>
+<a href="#" title="Left Double Angle Quotation Mark">«</a>
+<a href="#" title="No-Break Space" class="hl"> </a>
+<a href="#" title="Right Double Angle Quotation Mark">»</a>
+<a href="#" title="Left Single Quotation Mark">'</a>
+<a href="#" title="Right Single Quotation Mark">'</a>
+<a href="#" title="Double Low-9 Quotation Mark">„</a>
+<a href="#" title="Left Double Quotation Mark">"</a>
+<a href="#" title="Right Double Quotation Mark">"</a>
+<a href="#" title="Narrow No-Break Space" class="hl"> </a>
+<br>
+<a href="#" title="Latin Capital Letter A with Acute">Á</a>
+<a href="#" title="Latin Small Letter A with Acute">á</a>
+<a href="#" title="Latin Capital Letter A with Grave">À</a>
+<a href="#" title="Latin Small Letter A with Grave">à</a>
+<a href="#" title="Latin Capital Letter A with Circumflex">Â</a>
+<a href="#" title="Latin Small Letter A with Circumflex">â</a>
+<a href="#" title="Latin Capital Letter A with Caron">Ǎ</a>
+<a href="#" title="Latin Small Letter A with Caron">ǎ</a>
+<a href="#" title="Latin Capital Letter A with Diaeresis">Ä</a>
+<a href="#" title="Latin Small Letter A with Diaeresis">ä</a>
+<a href="#" title="Latin Capital Letter A with Dot Above">Ȧ</a>
+<a href="#" title="Latin Small Letter A with Dot Above">ȧ</a>
+<a href="#" title="Latin Capital Letter A with Tilde">Ã</a>
+<a href="#" title="Latin Small Letter A with Tilde">ã</a>
+<a href="#" title="Latin Capital Letter A with Macron">Ā</a>
+<a href="#" title="Latin Small Letter A with Macron">ā</a>
+<a href="#" title="Latin Capital Letter A with Breve">Ă</a>
+<a href="#" title="Latin Small Letter A with Breve">ă</a>
+<a href="#" title="Latin Capital Letter A with Ring Above">Å</a>
+<a href="#" title="Latin Small Letter A with Ring Above">å</a>
+<a href="#" title="Latin Capital Letter AE">Æ</a>
+<a href="#" title="Latin Small Letter AE">æ</a>
+<br>
+<a href="#" title="Latin Capital Letter E with Acute">É</a>
+<a href="#" title="Latin Small Letter E with Acute">é</a>
+<a href="#" title="Latin Capital Letter E with Grave">È</a>
+<a href="#" title="Latin Small Letter E with Grave">è</a>
+<a href="#" title="Latin Capital Letter E with Circumflex">Ê</a>
+<a href="#" title="Latin Small Letter E with Circumflex">ê</a>
+<a href="#" title="Latin Capital Letter E with Caron">Ě</a>
+<a href="#" title="Latin Small Letter E with Caron">ě</a>
+<a href="#" title="Latin Capital Letter E with Diaeresis">Ë</a>
+<a href="#" title="Latin Small Letter E with Diaeresis">ë</a>
+<a href="#" title="Latin Capital Letter E with Dot Above">Ė</a>
+<a href="#" title="Latin Small Letter E with Dot Above">ė</a>
+<a href="#" title="Latin Capital Letter E with Tilde">Ẽ</a>
+<a href="#" title="Latin Small Letter E with Tilde">ẽ</a>
+<a href="#" title="Latin Capital Letter E with Macron">Ē</a>
+<a href="#" title="Latin Small Letter E with Macron">ē</a>
+<a href="#" title="Latin Capital Letter Esh">Ʃ</a>
+<a href="#" title="Latin Small Letter Esh">ʃ</a>
+<br>
+<a href="#" title="Latin Capital Letter I with Acute">Í</a>
+<a href="#" title="Latin Small Letter I with Acute">í</a>
+<a href="#" title="Latin Capital Letter I with Grave">Ì</a>
+<a href="#" title="Latin Small Letter I with Grave">ì</a>
+<a href="#" title="Latin Capital Letter I with Circumflex">Î</a>
+<a href="#" title="Latin Small Letter I with Circumflex">î</a>
+<a href="#" title="Latin Capital Letter I with Caron">Ǐ</a>
+<a href="#" title="Latin Small Letter I with Caron">ǐ</a>
+<a href="#" title="Latin Capital Letter I with Diaeresis">Ï</a>
+<a href="#" title="Latin Small Letter I with Diaeresis">ï</a>
+<a href="#" title="Latin Capital Letter I with Dot Above">İ</a>
+<a href="#" title="Latin Small Letter Dotless I">ı</a>
+<a href="#" title="Latin Capital Letter I with Tilde">Ĩ</a>
+<a href="#" title="Latin Small Letter I with Tilde">ĩ</a>
+<a href="#" title="Latin Capital Letter IJ">Ĳ</a>
+<a href="#" title="Latin Small Letter IJ">ĳ</a>
+<br>
+<a href="#" title="Latin Capital Letter O with Acute">Ó</a>
+<a href="#" title="Latin Small Letter O with Acute">ó</a>
+<a href="#" title="Latin Capital Letter O with Grave">Ò</a>
+<a href="#" title="Latin Small Letter O with Grave">ò</a>
+<a href="#" title="Latin Capital Letter O with Circumflex">Ô</a>
+<a href="#" title="Latin Small Letter O with Circumflex">ô</a>
+<a href="#" title="Latin Capital Letter O with Caron">Ǒ</a>
+<a href="#" title="Latin Small Letter O with Caron">ǒ</a>
+<a href="#" title="Latin Capital Letter O with Diaeresis">Ö</a>
+<a href="#" title="Latin Small Letter O with Diaeresis">ö</a>
+<a href="#" title="Latin Capital Letter O with Dot Above">Ȯ</a>
+<a href="#" title="Latin Small Letter O with Dot Above">ȯ</a>
+<a href="#" title="Latin Capital Letter O with Tilde">Õ</a>
+<a href="#" title="Latin Small Letter O with Tilde">õ</a>
+<a href="#" title="Latin Capital Letter O with Double Acute">Ő</a>
+<a href="#" title="Latin Small Letter O with Double Acute">ő</a>
+<a href="#" title="Latin Capital Letter O with Stroke">Ø</a>
+<a href="#" title="Latin Small Letter O with Stroke">ø</a>
+<a href="#" title="Latin Capital Letter OE">Œ</a>
+<a href="#" title="Latin Small Letter OE">œ</a>
+<br>
+<a href="#" title="Latin Capital Letter U with Acute">Ú</a>
+<a href="#" title="Latin Small Letter U with Acute">ú</a>
+<a href="#" title="Latin Capital Letter U with Grave">Ù</a>
+<a href="#" title="Latin Small Letter U with Grave">ù</a>
+<a href="#" title="Latin Capital Letter U with Circumflex">Û</a>
+<a href="#" title="Latin Small Letter U with Circumflex">û</a>
+<a href="#" title="Latin Capital Letter U with Caron">Ǔ</a>
+<a href="#" title="Latin Small Letter U with Caron">ǔ</a>
+<a href="#" title="Latin Capital Letter U with Diaeresis">Ü</a>
+<a href="#" title="Latin Small Letter U with Diaeresis">ü</a>
+<a href="#" title="Latin Capital Letter U with Tilde">Ũ</a>
+<a href="#" title="Latin Small Letter U with Tilde">ũ</a>
+<a href="#" title="Latin Capital Letter U with Ring Above">Ů</a>
+<a href="#" title="Latin Small Letter U with Ring Above">ů</a>
+<a href="#" title="Latin Capital Letter U with Double Acute">Ű</a>
+<a href="#" title="Latin Small Letter U with Double Acute">ű</a>
+<br>
+<a href="#" title="Latin Capital Letter Y with Acute">Ý</a>
+<a href="#" title="Latin Small Letter Y with Acute">ý</a>
+<a href="#" title="Latin Capital Letter Y with Grave">Ỳ</a>
+<a href="#" title="Latin Small Letter Y with Grave">ỳ</a>
+<a href="#" title="Latin Capital Letter Y with Circumflex">Ŷ</a>
+<a href="#" title="Latin Small Letter Y with Circumflex">ŷ</a>
+<a href="#" title="Latin Capital Letter Y with Diaeresis">Ÿ</a>
+<a href="#" title="Latin Small Letter Y with Diaeresis">ÿ</a>
+<a href="#" title="Latin Capital Letter Y with Dot Above">Ẏ</a>
+<a href="#" title="Latin Small Letter Y with Dot Above">ẏ</a>
+<br>
+<a href="#" title="Latin Capital Letter C with Acute">Ć</a>
+<a href="#" title="Latin Small Letter C with Acute">ć</a>
+<a href="#" title="Latin Capital Letter C with Cedilla">Ç</a>
+<a href="#" title="Latin Small Letter C with Cedilla">ç</a>
+<a href="#" title="Latin Capital Letter C with Caron">Č</a>
+<a href="#" title="Latin Small Letter C with Caron">č</a>
+<a href="#" title="Latin Capital Letter D with Caron">Ď</a>
+<a href="#" title="Latin Small Letter D with Caron">ď</a>
+<a href="#" title="Latin Capital Letter Eth">Ð</a>
+<a href="#" title="Latin Small Letter Eth">ð</a>
+<a href="#" title="Latin Capital Letter N with Acute">Ń</a>
+<a href="#" title="Latin Small Letter N with Acute">ń</a>
+<a href="#" title="Latin Capital Letter N with Tilde">Ñ</a>
+<a href="#" title="Latin Small Letter N with Tilde">ñ</a>
+<br>
+<a href="#" title="Latin Capital Letter R with Acute">Ŕ</a>
+<a href="#" title="Latin Small Letter R with Acute">ŕ</a>
+<a href="#" title="Latin Capital Letter R with Caron">Ř</a>
+<a href="#" title="Latin Small Letter R with Caron">ř</a>
+<a href="#" title="Latin Capital Letter S with Acute">Ś</a>
+<a href="#" title="Latin Small Letter S with Acute">ś</a>
+<a href="#" title="Latin Capital Letter S with Caron">Š</a>
+<a href="#" title="Latin Small Letter S with Caron">š</a>
+<a href="#" title="Latin Small Letter Sharp S">ß</a>
+<br>
+<a href="#" title="Latin Capital Letter T with Caron">Ť</a>
+<a href="#" title="Latin Small Letter T with Caron">ť</a>
+<a href="#" title="Latin Capital Letter T with Cedilla">Ţ</a>
+<a href="#" title="Latin Small Letter T with Cedilla">ţ</a>
+<a href="#" title="Latin Capital Letter Thorn">Þ</a>
+<a href="#" title="Latin Small Letter Thorn">þ</a>
+<a href="#" title="Latin Capital Letter Z with Acute">Ź</a>
+<a href="#" title="Latin Small Letter Z with Acute">ź</a>
+<a href="#" title="Latin Capital Letter Z with Caron">Ž</a>
+<a href="#" title="Latin Small Letter Z with Caron">ž</a>
+<a href="#" title="Latin Capital Letter Z with Dot Above">Ż</a>
+<a href="#" title="Latin Small Letter Z with Dot Above">ż</a>
+<br>
+<a href="#" title="Superscript One">¹</a>
+<a href="#" title="Superscript Two">²</a>
+<a href="#" title="Superscript Three">³</a>
+<a href="#" title="Vulgar Fraction One Half">½</a>
+<a href="#" title="Vulgar Fraction One Quarter">¼</a>
+<a href="#" title="Vulgar Fraction Three Quarters">¾</a>
+<a href="#" title="Masculine Ordinal Indicator">º</a>
+<a href="#" title="Feminine Ordinal Indicator">ª</a>
+<br>
+<a href="#" title="Inverted Exclamation Mark">¡</a>
+<a href="#" title="Inverted Question Mark">¿</a>
+<a href="#" title="Bullet">•</a>
+<a href="#" title="Middle Dot">·</a>
+<a href="#" title="Multiplication Sign">×</a>
+<a href="#" title="Division Sign">÷</a>
+<a href="#" title="Euro Sign">€</a>
+<a href="#" title="Pound Sign">£</a>
+<a href="#" title="Copyright Sign">©</a>
+<a href="#" title="Registered Sign">®</a>
+<a href="#" title="Per Mille Sign">‰</a>
+<a href="#" title="Degree Sign">°</a>
+<a href="#" title="Micro Sign">µ</a>
+<a href="#" title="Pilcrow Sign">¶</a>
+<a href="#" title="Section Sign">§</a>
+<a href="#" title="Dagger">†</a>
+<a href="#" title="Double Dagger">‡</a>
+<a href="#" title="Numero Sign">№</a>
+</span>

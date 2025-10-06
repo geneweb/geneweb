@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2023 - GeneWeb -->
+  <!-- $Id: cache_files.htm,v 7.10 2023.11.15 hg Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[cache files]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[cache files title]
+</h1>
+<p>
+</div>
+<div>
+<ul>
+<li>
+<form method="get" action="cache_files">
+<input type=hidden name=opt value=check>
+<input type="hidden" name="lang" value="%l">
+
+[select base]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td><input type="radio" name="anon" value="%a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://%m:%P/%a">%a</a></td>
+</tr>|
+<tr align="left"><td>- [no base provided]</tr></td>}
+</table></dl>
+
+<p>
+<li>
+[Enter the name of the folder holding databases.]
+<p>
+<table class="setup">
+<tr align=left>
+<td><input name="bd" id="bd" size=30 placeholder="." value=".">
+[If you write nothing, it will be taken as "."]
+</td>
+</tr>
+</table></li>
+
+<p>
+<li>
+[select options]
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="fn" id="sn" value="on">
+<label for="fn" style="font-family: monospace">-fn&nbsp;&nbsp;</label>[first_names]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="sn" id="sn" value="on">
+<label for="sn" style="font-family: monospace">-sn&nbsp;&nbsp;</label>[surnames]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="al" id="al" value="on">
+<label for="al" style="font-family: monospace">-al&nbsp;&nbsp;</label>[aliases]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="pu" id="pu" value="on">
+<label for="pu" style="font-family: monospace">-pu&nbsp;&nbsp;</label>[public names]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="qu" id="qu" value="on">
+<label for="qu" style="font-family: monospace">-qu&nbsp;&nbsp;</label>[qualifiers]
+</td>
+</tr>
+</table></dl>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="pl" id="pl" value="on">
+<label for="pl" style="font-family: monospace">-pl&nbsp;&nbsp;</label>[places]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="fna" id="fna" value="on">
+<label for="fna" style="font-family: monospace">-fna&nbsp;&nbsp;</label>[fn alias]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="sna" id="sna" value="on">
+<label for="sna" style="font-family: monospace">-sna&nbsp;&nbsp;</label>[sn alias]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="ti" id="ti" value="on">
+<label for="ti" style="font-family: monospace">-ti&nbsp;&nbsp;</label>[titles]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="es" id="es" value="on">
+<label for="es" style="font-family: monospace">-es&nbsp;&nbsp;</label>[domains]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="ti" id="ti" value="on">
+<label for="ti" style="font-family: monospace">-ti&nbsp;&nbsp;</label>[titles]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="oc" id="oc" value="on">
+<label for="oc" style="font-family: monospace">-oc&nbsp;&nbsp;</label>[occupations]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="so" id="oc" value="on">
+<label for="so" style="font-family: monospace">-so&nbsp;&nbsp;</label>[sources]
+</td>
+</tr>
+</table></dl>
+
+
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="all" id="all" value="on" checked>
+<label for="all" style="font-family: monospace">-all&nbsp;&nbsp;</label>[all]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<td><input type="checkbox" name="prog" id="prog" value="on">
+<label for="prog" style="font-family: monospace">-prog&nbsp;&nbsp;</label>[progress]
+</td>
+</tr>
+</table></dl>
+
+<p>
+<li>
+[ok]
+</li>
+
+<input type="submit" value="Ok">
+</dl>
+</form>
+</ul>
+</div>
