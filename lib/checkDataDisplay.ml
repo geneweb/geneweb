@@ -773,7 +773,7 @@ let print_result_as_json conf result =
               match r.elapsed with Some t -> `Float t | None -> `Null );
           ]
       in
-      Output.header conf "application/json";
+      Output.header conf "Content-type: application/json";
       Output.print_sstring conf (Yojson.Basic.to_string json)
   | Error msg ->
       let json =
@@ -786,7 +786,7 @@ let print_result_as_json conf result =
             ("after", `String "");
           ]
       in
-      Output.header conf "application/json";
+      Output.header conf "Content-type: application/json";
       Output.print_sstring conf (Yojson.Basic.to_string json)
 
 let print_status_message conf ~success ~content =
