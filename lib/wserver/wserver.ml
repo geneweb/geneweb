@@ -106,6 +106,7 @@ let http_redirect_temporarily url =
   http Def.Moved_Temporarily;
   output_string !wserver_oc "Location: ";
   output_string !wserver_oc url;
+  printnl ();
   printnl ()
 
 let buff = ref (Bytes.create 80)
