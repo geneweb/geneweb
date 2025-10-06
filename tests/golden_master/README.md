@@ -1,17 +1,17 @@
-# Golden Master Tests - Framework Générique
+# Golden Master Tests - Generic Framework
 
-Framework générique de tests Golden Master pour **comparer n'importe quels deux exécutables** avec pytest, indépendamment du langage de programmation.
+Generic Golden Master testing framework to **compare any two executables** with pytest, regardless of programming language.
 
-## 🎯 Principe
+## 🎯 Principle
 
-Compare deux exécutables (référence vs candidat) en :
-1. Exécutant la **version de référence** pour créer les golden masters
-2. Exécutant la **version candidate** avec les mêmes paramètres  
-3. Comparant **toutes les sorties** : stdout, stderr, fichiers, codes de retour
+Compares two executables (reference vs candidate) by:
+1. Running the **reference version** to create golden masters
+2. Running the **candidate version** with the same parameters  
+3. Comparing **all outputs**: stdout, stderr, files, return codes
 
-## ⚙️ Configuration Complète (JSON)
+## ⚙️ Complete Configuration (JSON)
 
-Tout est configurable dans `test_config.json` :
+Everything is configurable in `test_config.json`:
 
 ```json
 {
@@ -20,13 +20,13 @@ Tout est configurable dans `test_config.json` :
       "reference": {
         "path": "path/to/old/binary",
         "type": "binary",
-        "description": "Version de référence"
+        "description": "Reference version"
       },
       "candidate": {
         "path": "path/to/new/script.py", 
         "type": "script",
         "interpreter": "python3",
-        "description": "Version candidate"
+        "description": "Candidate version"
       }
     },
     "environment": {
@@ -49,7 +49,7 @@ Tout est configurable dans `test_config.json` :
   "test_cases": [
     {
       "name": "test_basic",
-      "description": "Test basique",
+      "description": "Basic test",
       "input_files": ["input.txt"],
       "args": ["-option", "value"],
       "expected_output_files": ["*.out"],
@@ -59,46 +59,46 @@ Tout est configurable dans `test_config.json` :
 }
 ```
 
-## 🚀 Utilisation
+## 🚀 Usage
 
 ### Installation
 ```bash
-make install       # Installe pytest
-make check-config  # Vérifie la configuration
-make check-executables  # Vérifie que les binaires existent
+make install       # Install pytest
+make check-config  # Check configuration
+make check-executables  # Check that binaries exist
 ```
 
-### Création des Golden Masters
+### Creating Golden Masters
 ```bash
-make update-golden  # Crée tous les golden masters avec la référence
-# ou
-make update-single TEST=nom_du_test  # Un seul test
+make update-golden  # Create all golden masters with reference
+# or
+make update-single TEST=test_name  # Single test
 ```
 
-### Exécution des Tests
+### Running Tests
 ```bash
-make test          # Tous les tests
-make test-single TEST=nom_du_test  # Test spécifique
-make test-verbose  # Mode détaillé
+make test          # All tests
+make test-single TEST=test_name  # Specific test
+make test-verbose  # Detailed mode
 ```
 
-### Avec pytest directement
+### With pytest directly
 ```bash
 pytest -v golden_master.py::TestGenericGoldenMaster
-pytest --update-golden golden_master.py  # Mise à jour
-pytest -k "test_name" golden_master.py   # Test spécifique
+pytest --update-golden golden_master.py  # Update
+pytest -k "test_name" golden_master.py   # Specific test
 ```
 
-### CLI direct (sans pytest)
+### Direct CLI (without pytest)
 ```bash
-python3 golden_master.py                 # Tous les tests
-python3 golden_master.py --update-golden # Mise à jour
-python3 golden_master.py --test nom      # Test spécifique
+python3 golden_master.py                 # All tests
+python3 golden_master.py --update-golden # Update
+python3 golden_master.py --test name     # Specific test
 ```
 
-## 📋 Types d'Exécutables Supportés
+## 📋 Supported Executable Types
 
-### Binaire natif
+### Native binary
 ```json
 "reference": {
   "path": "bin/my_program",
@@ -106,7 +106,7 @@ python3 golden_master.py --test nom      # Test spécifique
 }
 ```
 
-### Script avec interpréteur
+### Script with interpreter
 ```json
 "candidate": {
   "path": "src/my_script.py",
@@ -115,9 +115,9 @@ python3 golden_master.py --test nom      # Test spécifique
 }
 ```
 
-## 🧪 Configuration des Tests
+## 🧪 Test Configuration
 
-### Test simple
+### Simple test
 ```json
 {
   "name": "basic_test",
@@ -128,7 +128,7 @@ python3 golden_master.py --test nom      # Test spécifique
 }
 ```
 
-### Test avec setup
+### Test with setup
 ```json
 {
   "name": "with_setup",
@@ -142,7 +142,7 @@ python3 golden_master.py --test nom      # Test spécifique
 }
 ```
 
-### Test avec capture complète
+### Test with full capture
 ```json
 {
   "name": "full_capture",
@@ -153,33 +153,33 @@ python3 golden_master.py --test nom      # Test spécifique
 }
 ```
 
-## 📊 Comparaison des Résultats
+## 📊 Result Comparison
 
-Le framework compare automatiquement :
-- **Codes de retour** (exit codes)
-- **Stdout** (sortie standard)
-- **Stderr** (erreurs)
-- **Fichiers de sortie** (selon patterns)
+The framework automatically compares:
+- **Return codes** (exit codes)
+- **Stdout** (standard output)
+- **Stderr** (errors)
+- **Output files** (according to patterns)
 
-### Normalisation configurable :
-- Suppression de patterns (timestamps, etc.)
-- Normalisation des espaces/fins de ligne
-- Gestion de la casse
+### Configurable normalization:
+- Pattern removal (timestamps, etc.)
+- Whitespace/line ending normalization
+- Case handling
 
-## 🛠️ Commandes Utiles
+## 🛠️ Useful Commands
 
 ```bash
-make list-tests     # Liste tous les tests
-make show-config    # Affiche la configuration
-make stats          # Statistiques
-make report         # Rapport HTML
-make clean          # Nettoie les temporaires
-make clean-golden   # Supprime les golden masters
+make list-tests     # List all tests
+make show-config    # Display configuration
+make stats          # Statistics
+make report         # HTML report
+make clean          # Clean temporaries
+make clean-golden   # Remove golden masters
 ```
 
-## 🎯 Exemple Concret : ged2gwb
+## 🎯 Concrete Example: ged2gwb
 
-Configuration pour comparer OCaml vs Python :
+Configuration to compare OCaml vs Python:
 
 ```json
 {
@@ -211,13 +211,13 @@ Configuration pour comparer OCaml vs Python :
 }
 ```
 
-## ✅ Avantages
+## ✅ Advantages
 
-1. **100% Générique** - Compare n'importe quels exécutables
-2. **Entièrement Configurable** - Tout dans le JSON
-3. **Pytest Intégré** - Rapports, parallélisation, CI/CD
-4. **Comparaison Complète** - stdout, stderr, fichiers, codes retour
-5. **Normalisation Flexible** - Ignore patterns, espaces, etc.
-6. **Facile à Étendre** - Nouveaux tests = ajout JSON
+1. **100% Generic** - Compare any executables
+2. **Fully Configurable** - Everything in JSON
+3. **Pytest Integrated** - Reports, parallelization, CI/CD
+4. **Complete Comparison** - stdout, stderr, files, return codes
+5. **Flexible Normalization** - Ignore patterns, whitespace, etc.
+6. **Easy to Extend** - New tests = JSON addition
 
-Ce framework peut être réutilisé pour **n'importe quel projet** nécessitant de comparer deux versions d'un programme !
+This framework can be reused for **any project** needing to compare two versions of a program!
