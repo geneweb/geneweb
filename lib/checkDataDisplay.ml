@@ -755,10 +755,10 @@ let build_success_message conf r =
   | Error _ -> t conf "modification failed"
 
 let print_result_as_json conf result =
-  match result with
-  | Success r ->
-      let msg = build_success_message conf (Success r) in
-      let json =
+  let json =
+    match result with
+    | Success r ->
+        let msg = build_success_message conf (Success r) in
         `Assoc
           [
             ("success", `Bool true);
@@ -772,11 +772,7 @@ let print_result_as_json conf result =
             ( "elapsed_time",
               match r.elapsed with Some t -> `Float t | None -> `Null );
           ]
-      in
-      Output.header conf "Content-type: application/json";
-      Output.print_sstring conf (Yojson.Basic.to_string json)
-  | Error msg ->
-      let json =
+    | Error msg ->
         `Assoc
           [
             ("success", `Bool false);
@@ -785,9 +781,10 @@ let print_result_as_json conf result =
             ("before", `String "");
             ("after", `String "");
           ]
-      in
-      Output.header conf "Content-type: application/json";
-      Output.print_sstring conf (Yojson.Basic.to_string json)
+  in
+  Output.header conf "Content-type: application/json";
+  Output.print_sstring conf (Yojson.Basic.to_string json);
+  Output.flush conf
 
 let print_status_message conf ~success ~content =
   let alert_class = if success then "alert-success" else "alert-danger" in
