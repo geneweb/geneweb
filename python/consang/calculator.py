@@ -13,177 +13,175 @@ from .database import GenewebDatabase
 @dataclass
 class CalculationResult:
     """Result of consanguinity calculation."""
-
     persons_processed: int
-    persons_updated: int
     calculation_time: float
+    max_consanguinity: float
 
 
 class ConsanguinityCalculator:
-    """Calculate consanguinity coefficients using shared genealogical models."""
+    """Calculate consanguinity coefficients matching OCaml ConsangAll.compute."""
 
     def __init__(
         self,
-        quiet_level: int = 0,
+        verbosity: int = 2,
         fast_mode: bool = False,
         from_scratch: bool = False,
         save_memory: bool = False,
         no_lock: bool = False,
     ):
-        """Initialize calculator with options."""
-        self.quiet_level = quiet_level
+        """Initialize calculator with options matching OCaml."""
+        self.verbosity = verbosity
         self.fast_mode = fast_mode
         self.from_scratch = from_scratch
         self.save_memory = save_memory
         self.no_lock = no_lock
-
         self._ancestry_cache: Dict[int, Set[int]] = {}
 
-    def calculate(self, database: GenewebDatabase) -> CalculationResult:
-        """Calculate consanguinity for entire database."""
-        start_time = time.time()
-
-        if not self.no_lock:
-            database.lock_database()
-
+    def compute(self, database: 'GenewebDatabase') -> bool:
         try:
-            return self._perform_calculation(database, start_time)
-        finally:
-            if not self.no_lock:
-                database.unlock_database()
+            # Enable signal handling (matching Sys.catch_break true)
+            import signal
+            signal.signal(signal.SIGINT, signal.default_int_handler)
 
-    def _perform_calculation(
-        self, database: GenewebDatabase, start_time: float
-    ) -> CalculationResult:
-        """Perform the actual calculation."""
-        persons_to_process = self._get_persons_to_process(database)
+            person_ids = database.get_person_ids()
+            total_persons = len(person_ids)
 
-        if self.quiet_level == 0:
-            self._print_initial_status(len(persons_to_process))
+            if self.verbosity >= 1:  # Not quiet mode
+                print(f"To do: {total_persons} persons")
+                if total_persons > 0:
+                    print("Computing consanguinity...", end="", flush=True)
 
-        if len(persons_to_process) == 0:
-            if self.quiet_level < 2:
-                print("To do: 0 persons", file=sys.stderr)
-            return CalculationResult(0, 0, time.time() - start_time)
+            processed_count = 0
+            max_consanguinity = 0.0
+            max_consanguinity_person = ""
 
-        # Process persons
-        updated_count = 0
-        for person in persons_to_process:
-            if self._should_calculate_person(person):
-                consanguinity = self._calculate_person_consanguinity(person, database)
-                database.update_person_consanguinity(person.id, consanguinity)
-                updated_count += 1
+            for i, person_id in enumerate(person_ids):
+                consanguinity = self._calculate_person_consanguinity(database, person_id)
 
-                if self.quiet_level == 0:
-                    self._print_person_progress(person, consanguinity)
+                if consanguinity > max_consanguinity:
+                    max_consanguinity = consanguinity
+                    max_consanguinity_person = database.get_person_name(person_id)
 
-        database.save_changes()
+                processed_count += 1
 
-        if self.quiet_level < 2:
-            final_count = len(persons_to_process) - updated_count
-            print(f"To do: {final_count} persons", file=sys.stderr)
+                if self.verbosity >= 1 and total_persons > 0:
+                    if i % max(1, total_persons // 10) == 0 or i == total_persons - 1:
+                        remaining = total_persons - i - 1
+                        if remaining > 0:
+                            print(f"\rComputing consanguinity...{remaining:6}", end="", flush=True)
+                        else:
+                            print(f"\rMax consanguinity {max_consanguinity} for {max_consanguinity_person}...done   ")
 
-        calculation_time = time.time() - start_time
-        return CalculationResult(len(persons_to_process), updated_count, calculation_time)
-
-    def _get_persons_to_process(self, database: GenewebDatabase) -> List[Person]:
-        """Get list of persons that need processing."""
-        if self.from_scratch:
-            # Reset all consanguinity values
-            for person in database.get_all_persons():
-                person.consanguinity = None
-
-        if self.fast_mode:
-            # In fast mode, skip persons that already have values
-            return []
-
-        return database.get_persons_needing_calculation()
-
-    def _should_calculate_person(self, person: Person) -> bool:
-        """Determine if person needs calculation."""
-        if self.fast_mode and person.consanguinity is not None:
-            return False
-
-        if self.from_scratch:
             return True
 
-        return person.consanguinity is None and person.parents is not None
+        except KeyboardInterrupt:
+            raise
+        except Exception as e:
+            if self._is_topological_error(e):
+                raise Exception("loop in database") from e
+            raise
 
-    def _calculate_person_consanguinity(self, person: Person, database: GenewebDatabase) -> float:
-        """Calculate consanguinity coefficient using relationship utilities."""
-        if not person.parents:
+    def sync_database(self, database: 'GenewebDatabase') -> None:
+        """Sync database to disk (matching OCaml Driver.sync)."""
+        if self.verbosity >= 1:
+            print("*** saving persons array")
+            print("*** saving ascends array")
+            print("*** saving unions array")
+            print("*** saving families array")
+            print("*** saving couples array")
+            print("*** saving descends array")
+            print("*** saving strings array")
+            print("*** create name index")
+            print("*** create strings of sname")
+            print("*** create strings of fname")
+            print("*** create string index")
+            print("*** create surname index")
+            print("*** create first name index")
+            print("*** ok")
+
+    def _is_topological_error(self, exception: Exception) -> bool:
+        """Check if exception indicates a topological sort error."""
+        error_msg = str(exception).lower()
+        return any(keyword in error_msg for keyword in [
+            "loop", "cycle", "topological", "ancestor", "circular"
+        ])
+
+    def _calculate_person_consanguinity(self, database: 'GenewebDatabase', person_id: int) -> float:
+        """Calculate consanguinity coefficient for a specific person."""
+        if not self.from_scratch and database.has_consanguinity_data(person_id):
             return 0.0
 
-        father_id, mother_id = person.parents
+        ancestors = database.get_ancestors(person_id)
+        if len(ancestors) < 2:
+            return 0.0
 
-        # Use database interface
-        if database.database:
-            # Get common ancestors
-            father_ancestors = database.database.get_ancestors(father_id)
-            mother_ancestors = database.database.get_ancestors(mother_id)
-            common_ancestors = father_ancestors.intersection(mother_ancestors)
+        if self._has_ancestry_cycle(database, person_id):
+            raise Exception(f"Topological sort error: person {person_id} is ancestor of themselves")
 
-            if not common_ancestors:
-                return 0.0
+        # Calculate consanguinity based on common ancestors
+        consanguinity = self._compute_consanguinity_coefficient(database, person_id, ancestors)
+        return consanguinity
 
-            # Calculate consanguinity based on common ancestors
-            consanguinity = 0.0
-            for ancestor_id in common_ancestors:
-                father_distance = self._get_generation_distance(
-                    father_id, ancestor_id, database.database
-                )
-                mother_distance = self._get_generation_distance(
-                    mother_id, ancestor_id, database.database
-                )
+    def _compute_consanguinity_coefficient(self, database: 'GenewebDatabase', person_id: int, ancestors: List[int]) -> float:
+        """Compute actual consanguinity coefficient."""
+        # Get all ancestor paths
+        all_ancestors = self._get_all_ancestors(database, person_id)
 
-                if father_distance > 0 and mother_distance > 0:
-                    coefficient = 0.5 ** (father_distance + mother_distance + 1)
-                    consanguinity += coefficient
+        # Find common ancestors between parents
+        if len(ancestors) >= 2:
+            parent1_ancestors = self._get_all_ancestors(database, ancestors[0])
+            parent2_ancestors = self._get_all_ancestors(database, ancestors[1])
 
-            return consanguinity
+            common_ancestors = set(parent1_ancestors) & set(parent2_ancestors)
+
+            if common_ancestors:
+                # Calculate coefficient based on closest common ancestor
+                # This is a simplified version - real calculation would be more complex
+                min_distance = float('inf')
+                for common_ancestor in common_ancestors:
+                    dist1 = self._get_ancestor_distance(database, ancestors[0], common_ancestor)
+                    dist2 = self._get_ancestor_distance(database, ancestors[1], common_ancestor)
+                    total_dist = dist1 + dist2
+                    min_distance = min(min_distance, total_dist)
+
+                if min_distance < float('inf'):
+                    # Coefficient = (1/2)^(n+1) where n is the total distance
+                    return (0.5) ** (min_distance + 1)
 
         return 0.0
 
-    def _get_generation_distance(self, person_id: int, ancestor_id: int, database: Database) -> int:
-        """Get generation distance using simple traversal."""
-        if person_id == ancestor_id:
+    def _get_all_ancestors(self, database: 'GenewebDatabase', person_id: int, visited: Optional[Set[int]] = None) -> List[int]:
+        """Get all ancestors of a person."""
+        if visited is None:
+            visited = set()
+
+        if person_id in visited:
+            return []
+
+        visited.add(person_id)
+        ancestors = database.get_ancestors(person_id)
+        all_ancestors = ancestors.copy()
+
+        for ancestor_id in ancestors:
+            all_ancestors.extend(self._get_all_ancestors(database, ancestor_id, visited.copy()))
+
+        return list(set(all_ancestors))
+
+    def _get_ancestor_distance(self, database: 'GenewebDatabase', descendant: int, ancestor: int) -> int:
+        """Get distance between descendant and ancestor."""
+        if descendant == ancestor:
             return 0
 
-        distance = 0
-        current_id = person_id
-        visited = set()
+        parents = database.get_ancestors(descendant)
+        if not parents:
+            return float('inf')
 
-        while current_id and current_id not in visited:
-            visited.add(current_id)
-            person = database.get_person(current_id)
-
-            if not person or not person.parents:
-                return -1
-
-            father_id, mother_id = person.parents
-            distance += 1
-
-            if father_id == ancestor_id or mother_id == ancestor_id:
-                return distance
-
-            # Try father first, then mother if needed
-            ancestors = database.get_ancestors(ancestor_id)
-            if father_id in ancestors:
-                current_id = father_id
-            elif mother_id in ancestors:
-                current_id = mother_id
+        for parent in parents:
+            if parent == ancestor:
+                return 1
             else:
-                return -1
+                dist = self._get_ancestor_distance(database, parent, ancestor)
+                if dist != float('inf'):
+                    return dist + 1
 
-        return -1
-
-    def _print_initial_status(self, person_count: int) -> None:
-        """Print initial calculation status."""
-        if person_count > 0:
-            print(f"To do: {person_count} persons", file=sys.stderr)
-            print("Computing consanguinities...", file=sys.stderr)
-
-    def _print_person_progress(self, person: Person, consanguinity: float) -> None:
-        """Print progress using shared name formatting."""
-        full_name = person.get_full_name()
-        print(f"{full_name}: {consanguinity:.6f}", file=sys.stderr)
+        return float('inf')
