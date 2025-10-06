@@ -671,16 +671,6 @@ let treat_request =
            | "MRG_MOD_IND_OK" ->
                w_wizard @@ w_lock @@ w_base
                @@ Geneweb.MergeIndOkDisplay.print_mod_merge
-           | "N" -> (
-               w_base @@ fun conf base ->
-               match Geneweb.Util.p_getenv conf.env "v" with
-               | Some v ->
-                   let sres =
-                     Geneweb.Search_name_display.search_surname conf base v
-                   in
-                   Geneweb.Search_name_display.surname_print conf base
-                     Geneweb.Search_name_display.surname_not_found sres v
-               | _ -> Geneweb.AllnDisplay.print_surnames conf base)
            | "NG" -> (
                w_base @@ fun conf base ->
                (* Rétro-compatibilité <= 6.06 *)
@@ -747,12 +737,6 @@ let treat_request =
                w_base @@ Geneweb.BirthDeathDisplay.print_oldest_alive
            | "OE" when conf.wizard || conf.friend ->
                w_base @@ Geneweb.BirthDeathDisplay.print_oldest_engagements
-           | "P" -> (
-               w_base @@ fun conf base ->
-               match Geneweb.Util.p_getenv conf.env "v" with
-               | Some v ->
-                   Geneweb.Search_name_display.first_name_print conf base v
-               | None -> Geneweb.AllnDisplay.print_first_names conf base)
            | "POP_PYR" when conf.wizard || conf.friend ->
                w_base @@ Geneweb.BirthDeathDisplay.print_population_pyramid
            | "PS" -> w_base @@ Geneweb.PlaceDisplay.print_all_places_surnames
