@@ -1,457 +1,396 @@
-"""
-Parser GEDCOM complet en Python
-Supporte GEDCOM 5.5 et 5.5.1
-"""
-
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-from datetime import datetime
+from enum import Enum
+import sys
+from typing import Generator, Literal, TextIO, List, Optional, Dict, Any, Union
 import re
 
 
-@dataclass
-class GedcomLine:
-    """Représente une ligne GEDCOM"""
+class GedcomTag(Enum):
+    INDIVIDUAL = "INDI"
+    FAMILY = "FAM"
+    NAME = "NAME"
+    SEX = "SEX"
+    BIRTH = "BIRT"
+    DEATH = "DEAT"
+    MARRIAGE = "MARR"
+    DATE = "DATE"
+    PLACE = "PLAC"
+    NOTE = "NOTE"
+    UNKNOWN = "UNKNOWN"
 
+
+@dataclass
+class GedcomNode:
     level: int
-    xref_id: Optional[str]
-    tag: str
-    value: str
-    children: List["GedcomLine"] = field(default_factory=list)
+    tag: GedcomTag
+    value: Optional[str] = None
+    children: List["GedcomNode"] = field(default_factory=list)
 
 
 @dataclass
-class Individual:
-    """Représente un individu"""
-
-    xref: str
-    name: str = ""
-    given_name: str = ""
-    surname: str = ""
-    sex: str = ""
-    birth_date: str = ""
-    birth_place: str = ""
-    death_date: str = ""
-    death_place: str = ""
-    occupation: str = ""
+class GedcomIndividual:
+    id: str
+    name: Optional[str] = None
+    sex: Optional[str] = None
+    birth: Optional[str] = None
+    death: Optional[str] = None
     notes: List[str] = field(default_factory=list)
-    families_spouse: List[str] = field(default_factory=list)
-    families_child: List[str] = field(default_factory=list)
-    events: List[Dict[str, str]] = field(default_factory=list)
-    attributes: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
-class Family:
-    """Représente une famille"""
-
-    xref: str
+class GedcomFamily:
+    id: str
     husband: Optional[str] = None
     wife: Optional[str] = None
     children: List[str] = field(default_factory=list)
-    marriage_date: str = ""
-    marriage_place: str = ""
-    divorce_date: str = ""
-    events: List[Dict[str, str]] = field(default_factory=list)
+    marriage: Optional[str] = None
     notes: List[str] = field(default_factory=list)
+
+
+class HeaderTag(Enum):
+    SOURCE = "SOUR"
+    VERSION = "VERS"
+    NAME = "NAME"
+    CORPORATION = "CORP"
+    ADDRESS = "ADDR"
+    CONTACT = "CONT"
+    PHONE = "PHON"
+    DESTINATION = "DEST"
+    DATE = "DATE"
+    CHARSET = "CHAR"
+    FILE = "FILE"
+    SUBM = "SUBM"
 
 
 @dataclass
-class Source:
-    """Représente une source"""
+class GEDCOM:
+    version: Optional[str] = None
+    format: Optional[str] = None
 
-    xref: str
-    title: str = ""
-    author: str = ""
-    publication: str = ""
-    repository: str = ""
-    notes: List[str] = field(default_factory=list)
+
+@dataclass
+class Header(Dict[HeaderTag, Optional[str]]):
+    # source: Optional[str] = None
+    # version: Optional[str] = None
+    # name: Optional[str] = None
+    # corporation: Optional[str] = None
+    # address: Optional[str] = None
+    # contact: Optional[str] = None
+    # phone: Optional[str] = None
+    # file: Optional[str] = None
+    # encoding: Optional[str] = None
+    # submitter: Optional[str] = None
+
+    # def __setattr__(self, name: str, value: Any) -> None:
+    #     return self.__setitem__(HeaderTag[name.upper()], value)
+
+    def __setitem__(self, key: Union[HeaderTag, str], value: str | None) -> None:
+        try:
+            key = HeaderTag(key)
+            super().__setitem__(key, value)
+            return
+        except ValueError:
+            super().__setitem__(key, value)
+
+
+@dataclass
+class Block:
+    level: int
+    tag: str
+    pointer: Optional[str] = None
+    value: Optional[str] = None
+    children: List["Block"] = field(default_factory=list)
+    _children_idx: dict[str, int] = field(default_factory=dict)
+    _children_tag_idx: dict[str, List[int]] = field(default_factory=dict)
+    # children: Dict[str, "Block"] = field(default_factory=dict)
+
+    def add_child(self, child: "Block"):
+        self.children.append(child)
+        self._children_idx[child.pointer or child.tag] = len(self.children) - 1
+        if child.tag not in self._children_tag_idx:
+            self._children_tag_idx[child.tag] = []
+        self._children_tag_idx[child.tag].append(len(self.children) - 1)
+        # self.children[child.pointer or child.tag] = child
+
+    def __iter__(self):
+        return iter(self.children)
+
+    def __getitem__(self, key: str) -> List["Block"]:
+        if key in self._children_idx:
+            return [self.children[self._children_idx[key]]]
+        if key in self._children_tag_idx:
+            idxs = self._children_tag_idx[key]
+            return [self.children[i] for i in idxs]
+        raise KeyError(f"No child with key {key}")
+
+    @classmethod
+    def from_block(cls, block: "Block") -> "Block":
+        new_block = cls(block.level, block.tag, block.pointer, block.value)
+        for child in block.children:
+            new_block.add_child(child)
+        return new_block
+
+
+@dataclass
+class GEDIndividual(Block):
+    @property
+    def sex(self) -> Optional[Literal["M", "F", "U", "X"]]:
+        try:
+            return self["SEX"][0].value  # type: ignore
+        except KeyError:
+            return None
+
+    @property
+    def name(self) -> str:
+        try:
+            return self["NAME"][0].value  # type: ignore
+        except KeyError:
+            return None
+
+    @property
+    def spouse(self) -> list[str]:
+        try:
+            return self["FAMS"]
+        except KeyError:
+            return []
+
+    # TODO: continue adding properties
+
+    @classmethod
+    def from_block(cls, block: Block) -> "GEDIndividual":
+        return cls(
+            block.level,
+            block.tag,
+            block.pointer,
+            block.value,
+            block.children,
+            block._children_idx,
+        )
+
+    def __str__(self):
+        return f"Individual {self.name}"
+
+
+@dataclass
+class GEDFamily(Block):
+    pass
+
+
+@dataclass
+class GEDNote(Block):
+    def __str__(self):
+        val = self.value or ""
+        for child in self.children:
+            if child.tag == "CONT":
+                val += "\n" + (child.value or "")
+        return val
+
+    @classmethod
+    def from_block(cls, block: Block) -> "GEDNote":
+        super().from_block(block)
+        # return cls(
+        #     block.level,
+        #     block.tag,
+        #     block.pointer,
+        #     block.value,
+        #     block.children,
+        #     block._children_idx,
+        # )
+
+
+@dataclass
+class GEDSource(Block):
+    pass
+
+
+@dataclass
+class GEDRepository(Block):
+    pass
+
+
+@dataclass
+class GEDMultimedia(Block):
+    pass
+
+
+@dataclass
+class GedcomData:
+    header: Block = field(default_factory=lambda: Block(0, "HEAD"))
+    submitter: Block = field(default_factory=lambda: Block(0, "SUBM"))
+    individuals: Dict[str, Block] = field(default_factory=dict)  # indi
+    families: Dict[str, Block] = field(default_factory=dict)  # fam
+    notes: Dict[str, Block] = field(default_factory=dict)  # note
+    sources: Dict[str, Block] = field(default_factory=dict)  # sour
+    repository: Optional[Block] = None  # repo
+    multimedia: Dict[str, Block] = field(default_factory=dict)  # obje
+
+
+class InvalidDepth(RuntimeError): ...
 
 
 class GedcomParser:
-    """Parser GEDCOM complet"""
-
     def __init__(self):
-        self.individuals: Dict[str, Individual] = {}
-        self.families: Dict[str, Family] = {}
-        self.sources: Dict[str, Source] = {}
-        self.header: Dict[str, Any] = {}
-        self.submitter: Dict[str, str] = {}
-        self.raw_data: List[GedcomLine] = []
+        self.individuals: Dict[str, GedcomIndividual] = {}
+        self.families: Dict[str, GedcomFamily] = {}
+        self.header: Header = Header()
+        self.nodes: List[GedcomNode] = []
 
-    def parse_file(self, filepath: str, encoding: str = "utf-8") -> None:
-        """Parse un fichier GEDCOM"""
-        with open(filepath, "r", encoding=encoding, errors="ignore") as f:
-            content = f.read()
-        self.parse_string(content)
-
-    def parse_string(self, content: str) -> None:
-        """Parse une chaîne GEDCOM"""
-        lines = content.split("\n")
-        self.raw_data = self._parse_lines(lines)
-        self._process_records()
-
-    def _parse_lines(self, lines: List[str]) -> List[GedcomLine]:
-        """Parse les lignes en structure hiérarchique"""
-        stack: List[GedcomLine] = []
-        root_nodes: List[GedcomLine] = []
-
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-
-            gedcom_line = self._parse_line(line)
-            if gedcom_line is None:
-                continue
-
-            # Gestion de la hiérarchie
-            while stack and stack[-1].level >= gedcom_line.level:
-                stack.pop()
-
-            if stack:
-                stack[-1].children.append(gedcom_line)
-            else:
-                root_nodes.append(gedcom_line)
-
-            stack.append(gedcom_line)
-
-        return root_nodes
-
-    def _parse_line(self, line: str) -> Optional[GedcomLine]:
-        """Parse une ligne GEDCOM individuelle"""
-        # Format: LEVEL [XREF] TAG [VALUE]
-        pattern = r"^(\d+)\s+(@\w+@\s+)?(\w+)(\s+(.*))?$"
-        match = re.match(pattern, line)
-
+    @staticmethod
+    def read_line(
+        io: TextIO,
+    ) -> Optional[tuple[Optional[int], Optional[str], Optional[str], Optional[str]]]:
+        line = io.readline()
+        if not line:
+            return None
+        match = re.match(r"^(\d+)\s+(@[^@]+@)?\s*(\w+)(?:\s+(.*))?", line)
         if not match:
             return None
-
         level = int(match.group(1))
-        xref_id = match.group(2).strip() if match.group(2) else None
+        pointer = match.group(2)
         tag = match.group(3)
-        value = match.group(5) if match.group(5) else ""
+        value = match.group(4) if match.group(4) else None
+        return level, pointer, tag, value
 
-        return GedcomLine(level, xref_id, tag, value)
+    def parsed(self, io: TextIO):
+        res = GedcomData()
+        while block := self.parse_block(io, -1):
+            # res[block.pointer or block.tag] = block
+            match block.tag:
+                case "HEAD":
+                    res.header = GedcomParser.specialize_block(block)
+                case "SUBM":
+                    res.submitter = GedcomParser.specialize_block(block)
+                case "INDI":
+                    if block.pointer:
+                        res.individuals[block.pointer] = GedcomParser.specialize_block(
+                            block
+                        )
+                case "FAM":
+                    if block.pointer:
+                        res.families[block.pointer] = GedcomParser.specialize_block(
+                            block
+                        )
+                case "NOTE":
+                    if block.pointer:
+                        res.notes[block.pointer] = GedcomParser.specialize_block(block)
+                case "SOUR":
+                    if block.pointer:
+                        res.sources[block.pointer] = GedcomParser.specialize_block(
+                            block
+                        )
+                case "REPO":
+                    res.repository = GedcomParser.specialize_block(block)
+                case "OBJE":
+                    if block.pointer:
+                        res.multimedia[block.pointer] = GedcomParser.specialize_block(
+                            block
+                        )
+                case "TRLR":
+                    break
+                case _:
+                    print(f"Unknown block: {block.tag}", file=sys.stderr)
+        return res
 
-    def _process_records(self) -> None:
-        """Traite tous les enregistrements"""
-        for node in self.raw_data:
-            if node.tag == "HEAD":
-                self._process_header(node)
-            elif node.tag == "SUBM":
-                self._process_submitter(node)
-            elif node.xref_id and node.tag == "INDI":
-                self._process_individual(node)
-            elif node.xref_id and node.tag == "FAM":
-                self._process_family(node)
-            elif node.xref_id and node.tag == "SOUR":
-                self._process_source(node)
+    def parse_block(
+        self,
+        io: TextIO,
+        root_level: int,
+    ):
+        level = ""
+        i = 0
+        while c := io.read(1):
+            if c == " ":
+                break
+            level += c
+            i += 1
+        io.seek(io.tell() - i - 1)
+        if not level.isdigit():
+            return None
+        level = int(level)
+        if level <= root_level:
+            # print("no go back")
+            return None
+        level, pointer, tag, value = GedcomParser.read_line(io)
+        block = Block(level, tag, pointer, value)
+        while child := self.parse_block(io, level):
+            block.add_child(child)
+        return GedcomParser.specialize_block(block)
 
-    def _process_header(self, node: GedcomLine) -> None:
-        """Traite l'en-tête GEDCOM"""
-        for child in node.children:
-            if child.tag == "SOUR":
-                self.header["source"] = child.value
-                for subchild in child.children:
-                    if subchild.tag == "VERS":
-                        self.header["source_version"] = subchild.value
-                    elif subchild.tag == "NAME":
-                        self.header["source_name"] = subchild.value
-            elif child.tag == "DATE":
-                self.header["date"] = child.value
-            elif child.tag == "CHAR":
-                self.header["charset"] = child.value
-            elif child.tag == "GEDC":
-                for subchild in child.children:
-                    if subchild.tag == "VERS":
-                        self.header["gedcom_version"] = subchild.value
+    @staticmethod
+    def specialize_block(block: Block) -> Block:
+        match block.tag:
+            case "NOTE":
+                return GEDNote.from_block(block)
+            case "INDI":
+                return GEDIndividual.from_block(block)
+            case _:
+                return block
 
-    def _process_submitter(self, node: GedcomLine) -> None:
-        """Traite les informations du soumissionnaire"""
-        for child in node.children:
-            if child.tag == "NAME":
-                self.submitter["name"] = child.value
-            elif child.tag == "ADDR":
-                self.submitter["address"] = child.value
-
-    def _process_individual(self, node: GedcomLine) -> None:
-        """Traite un individu"""
-        individual = Individual(xref=node.xref_id)
-
-        for child in node.children:
-            if child.tag == "NAME":
-                individual.name = child.value
-                # Extraire prénom et nom
-                parts = child.value.split("/")
-                if len(parts) >= 2:
-                    individual.given_name = parts[0].strip()
-                    individual.surname = parts[1].strip()
-                elif len(parts) == 1:
-                    individual.given_name = parts[0].strip()
-
-                # Traiter les sous-tags NAME
-                for subchild in child.children:
-                    if subchild.tag == "GIVN":
-                        individual.given_name = subchild.value
-                    elif subchild.tag == "SURN":
-                        individual.surname = subchild.value
-
-            elif child.tag == "SEX":
-                individual.sex = child.value
-
-            elif child.tag == "BIRT":
-                for subchild in child.children:
-                    if subchild.tag == "DATE":
-                        individual.birth_date = subchild.value
-                    elif subchild.tag == "PLAC":
-                        individual.birth_place = subchild.value
-
-            elif child.tag == "DEAT":
-                for subchild in child.children:
-                    if subchild.tag == "DATE":
-                        individual.death_date = subchild.value
-                    elif subchild.tag == "PLAC":
-                        individual.death_place = subchild.value
-
-            elif child.tag == "OCCU":
-                individual.occupation = child.value
-
-            elif child.tag == "NOTE":
-                individual.notes.append(child.value)
-
-            elif child.tag == "FAMS":
-                individual.families_spouse.append(child.value)
-
-            elif child.tag == "FAMC":
-                individual.families_child.append(child.value)
-
-            # Autres événements (baptême, enterrement, etc.)
-            elif child.tag in [
-                "BAPM",
-                "CHR",
-                "BURI",
-                "CREM",
-                "ADOP",
-                "CONF",
-                "GRAD",
-                "RESI",
-            ]:
-                event = {"type": child.tag}
-                for subchild in child.children:
-                    if subchild.tag == "DATE":
-                        event["date"] = subchild.value
-                    elif subchild.tag == "PLAC":
-                        event["place"] = subchild.value
-                individual.events.append(event)
-
-            # Attributs personnalisés
-            else:
-                individual.attributes[child.tag] = child.value
-
-        self.individuals[individual.xref] = individual
-
-    def _process_family(self, node: GedcomLine) -> None:
-        """Traite une famille"""
-        family = Family(xref=node.xref_id)
-
-        for child in node.children:
-            if child.tag == "HUSB":
-                family.husband = child.value
-            elif child.tag == "WIFE":
-                family.wife = child.value
-            elif child.tag == "CHIL":
-                family.children.append(child.value)
-            elif child.tag == "MARR":
-                for subchild in child.children:
-                    if subchild.tag == "DATE":
-                        family.marriage_date = subchild.value
-                    elif subchild.tag == "PLAC":
-                        family.marriage_place = subchild.value
-            elif child.tag == "DIV":
-                for subchild in child.children:
-                    if subchild.tag == "DATE":
-                        family.divorce_date = subchild.value
-            elif child.tag == "NOTE":
-                family.notes.append(child.value)
-            elif child.tag in ["ENGA", "MARB", "MARC"]:
-                event = {"type": child.tag}
-                for subchild in child.children:
-                    if subchild.tag == "DATE":
-                        event["date"] = subchild.value
-                    elif subchild.tag == "PLAC":
-                        event["place"] = subchild.value
-                family.events.append(event)
-
-        self.families[family.xref] = family
-
-    def _process_source(self, node: GedcomLine) -> None:
-        """Traite une source"""
-        source = Source(xref=node.xref_id)
-
-        for child in node.children:
-            if child.tag == "TITL":
-                source.title = child.value
-            elif child.tag == "AUTH":
-                source.author = child.value
-            elif child.tag == "PUBL":
-                source.publication = child.value
-            elif child.tag == "REPO":
-                source.repository = child.value
-            elif child.tag == "NOTE":
-                source.notes.append(child.value)
-
-        self.sources[source.xref] = source
-
-    def get_individual(self, xref: str) -> Optional[Individual]:
-        """Récupère un individu par sa référence"""
-        return self.individuals.get(xref)
-
-    def get_family(self, xref: str) -> Optional[Family]:
-        """Récupère une famille par sa référence"""
-        return self.families.get(xref)
-
-    def get_parents(
-        self, individual_xref: str
-    ) -> tuple[Optional[Individual], Optional[Individual]]:
-        """Récupère les parents d'un individu (père, mère)"""
-        individual = self.get_individual(individual_xref)
-        if not individual or not individual.families_child:
-            return None, None
-
-        family = self.get_family(individual.families_child[0])
-        if not family:
-            return None, None
-
-        father = self.get_individual(family.husband) if family.husband else None
-        mother = self.get_individual(family.wife) if family.wife else None
-
-        return father, mother
-
-    def get_children(self, individual_xref: str) -> List[Individual]:
-        """Récupère les enfants d'un individu"""
-        individual = self.get_individual(individual_xref)
-        if not individual:
-            return []
-
-        children = []
-        for family_xref in individual.families_spouse:
-            family = self.get_family(family_xref)
-            if family:
-                for child_xref in family.children:
-                    child = self.get_individual(child_xref)
-                    if child:
-                        children.append(child)
-
-        return children
-
-    def get_spouses(self, individual_xref: str) -> List[Individual]:
-        """Récupère les conjoints d'un individu"""
-        individual = self.get_individual(individual_xref)
-        if not individual:
-            return []
-
-        spouses = []
-        for family_xref in individual.families_spouse:
-            family = self.get_family(family_xref)
-            if family:
-                if family.husband and family.husband != individual_xref:
-                    spouse = self.get_individual(family.husband)
-                    if spouse:
-                        spouses.append(spouse)
-                if family.wife and family.wife != individual_xref:
-                    spouse = self.get_individual(family.wife)
-                    if spouse:
-                        spouses.append(spouse)
-
-        return spouses
-
-    def export_summary(self) -> Dict[str, Any]:
-        """Exporte un résumé des données"""
-        return {
-            "header": self.header,
-            "submitter": self.submitter,
-            "individuals_count": len(self.individuals),
-            "families_count": len(self.families),
-            "sources_count": len(self.sources),
-        }
+    @staticmethod
+    def from_file(filepath: str) -> GedcomData:
+        with open(filepath, "r", encoding="utf-8-sig") as f:
+            parser = GedcomParser()
+            return parser.parsed(f)
 
 
-# Exemple d'utilisation
+class GedcomExporter:
+    @staticmethod
+    def export_summary(data: GedcomData) -> Generator[str, None, None]:
+        # head
+        yield from GedcomExporter._export_block(data.header)
+        # subm
+        yield from GedcomExporter._export_block(data.submitter)
+        # indi
+        for indi in data.individuals.values():
+            yield from GedcomExporter._export_block(indi)
+        # fam
+        for fam in data.families.values():
+            yield from GedcomExporter._export_block(fam)
+        # note
+        for note in data.notes.values():
+            yield from GedcomExporter._export_block(note)
+        # sour
+        for sour in data.sources.values():
+            yield from GedcomExporter._export_block(sour)
+        # repo
+        if data.repository:
+            yield from GedcomExporter._export_block(data.repository)
+        # obje
+        for obje in data.multimedia.values():
+            yield from GedcomExporter._export_block(obje)
+        # trlr
+        yield "0 TRLR"
+
+    @staticmethod
+    def _export_block(block: Block) -> Generator[str, None, None]:
+        line = f"{block.level} "
+        if block.pointer:
+            line += f"{block.pointer} "
+        line += block.tag
+        if block.value:
+            line += f" {block.value}"
+        yield line
+        for child in block:
+            yield from GedcomExporter._export_block(child)
+
+
 if __name__ == "__main__":
-    # Créer un exemple de fichier GEDCOM simple
-    sample_gedcom = """0 HEAD
-1 SOUR Family Tree Maker
-2 VERS 1.0
-1 GEDC
-2 VERS 5.5
-1 CHAR UTF-8
-0 @I1@ INDI
-1 NAME Jean /Dupont/
-2 GIVN Jean
-2 SURN Dupont
-1 SEX M
-1 BIRT
-2 DATE 15 JAN 1950
-2 PLAC Paris, France
-1 OCCU Ingénieur
-1 FAMS @F1@
-0 @I2@ INDI
-1 NAME Marie /Martin/
-2 GIVN Marie
-2 SURN Martin
-1 SEX F
-1 BIRT
-2 DATE 20 MAR 1952
-2 PLAC Lyon, France
-1 FAMS @F1@
-0 @I3@ INDI
-1 NAME Pierre /Dupont/
-2 GIVN Pierre
-2 SURN Dupont
-1 SEX M
-1 BIRT
-2 DATE 10 JUL 1975
-2 PLAC Paris, France
-1 FAMC @F1@
-0 @F1@ FAM
-1 HUSB @I1@
-1 WIFE @I2@
-1 CHIL @I3@
-1 MARR
-2 DATE 5 JUN 1974
-2 PLAC Paris, France
-0 TRLR"""
+    path = "/home/nico/Dev/Legacy/geneweb/examples/uk.ged"
+    import pickle
 
-    # Parser le GEDCOM
-    parser = GedcomParser()
-    parser.parse_string(sample_gedcom)
+    r = GedcomParser.from_file(path)
+    print(r.individuals["@I399@"])
+    # print(r.submitter["FAM"])
+    # for l in GedcomExporter.export_summary(r):
+    #     print(l)
 
-    # Afficher le résumé
-    print("=== Résumé ===")
-    summary = parser.export_summary()
-    print(f"Nombre d'individus: {summary['individuals_count']}")
-    print(f"Nombre de familles: {summary['families_count']}")
-    print()
-
-    # Afficher tous les individus
-    print("=== Individus ===")
-    for xref, individual in parser.individuals.items():
-        print(f"{individual.name} ({individual.sex})")
-        if individual.birth_date:
-            print(f"  Né(e): {individual.birth_date} à {individual.birth_place}")
-        if individual.occupation:
-            print(f"  Profession: {individual.occupation}")
-        print()
-
-    # Exemple de navigation dans l'arbre
-    print("=== Relations familiales ===")
-    if "@I3@" in parser.individuals:
-        pierre = parser.get_individual("@I3@")
-        print(f"Enfant: {pierre.name}")
-
-        father, mother = parser.get_parents("@I3@")
-        if father:
-            print(f"  Père: {father.name}")
-        if mother:
-            print(f"  Mère: {mother.name}")
+    # print(r.header["SOUR"]["VERS"])
+    # p = pickle.dumps(r, protocol=4)
+    # print(p)
+    # dp = pickle.loads(p)
+    # print(dp)
+    # print(dp.header["SOUR"]["VERS"])
+    # print(list((b.tag, b.value) for b in r["@SUBM@"]))
+    # print(parser.export())
+    # for i in range(max(0, len(parser.families) - 1)):
+    #     print(list(parser.families.items())[i])
