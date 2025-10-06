@@ -1,0 +1,26 @@
+{
+  "text_files": [
+    "sample.gwb/notes",
+    "sample.gwb/snames.dat",
+    "sample.gwb/fnames.dat",
+    "sample.gwb/particles.txt"
+  ],
+  "binary_files": [
+    "sample.gwb/base.acc",
+    "sample.gwb/names.inx",
+    "sample.gwb/strings.inx",
+    "sample.gwb/snames.inx",
+    "sample.gwb/fnames.inx",
+    "sample.gwb/base",
+    "sample.gwb/names.acc"
+  ],
+  "directories": [
+    "lang",
+    "cnt",
+    "sample.gwb",
+    "etc",
+    "sample.gwb/wiznotes",
+    "sample.gwb/notes_d",
+    "etc/sample"
+  ]
+}
