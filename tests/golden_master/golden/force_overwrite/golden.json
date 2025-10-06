@@ -1,8 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "The database name \"force_test\" contains a forbidden character.\nAllowed characters: a..z, A..Z, 0..9, -\n",
-  "returncode": 2,
-  "success": true,
-  "output_files_count": 0,
-  "dir_outputs_count": 0
-}
