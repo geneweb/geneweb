@@ -24,6 +24,7 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && 'production' || '' }}
     strategy:
       matrix:
         python-version: [3.13] # Add other versions as needed
