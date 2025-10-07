@@ -169,7 +169,7 @@ let speclist =
     ("-v", Arg.Set Gwcomp.verbose, " Verbose");
     ( "-roglo_special",
       Arg.Set Gwcomp.roglo_special,
-      " Spesial treatment for Roglo" );
+      " Special treatment for Roglo (ignore multiple relations definitions)" );
   ]
   |> List.sort compare |> Arg.align
 
@@ -191,6 +191,14 @@ let errmsg =
    and [options] are:"
 
 let main () =
+  let print_duration time_elapsed =
+    flush stderr;
+    flush stdout;
+    Printf.printf "Duration: %d min %d sec\n"
+      (int_of_float (time_elapsed /. 60.0))
+      (int_of_float time_elapsed mod 60)
+  in
+  let start_time = Unix.gettimeofday () in
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
   if Array.mem "-rgpd" Sys.argv then (
@@ -222,6 +230,10 @@ let main () =
   if !Db1link.particules_file = "" then
     Db1link.particules_file := Filename.concat dist_etc_d "particles.txt";
   if not !just_comp then Geneweb.GWPARAM.check_base_exists bname;
+  if !Gwcomp.verbose then
+    if !Gwcomp.rgpd then
+      Printf.eprintf "Rgpd status: True, files in: %s\n" !Gwcomp.rgpd_dir
+    else Printf.eprintf "Rgpd status: False\n";
   let gwo = ref [] in
   List.iter
     (fun (x, separate, bnotes, shift) ->
@@ -235,13 +247,16 @@ let main () =
         gwo := (x, separate, bnotes, shift) :: !gwo
       else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
-  if not !just_comp then
+  if not !just_comp then (
     let bdir = Geneweb.GWPARAM.create_base_and_config bname in
+    let time_elapsed = Unix.gettimeofday () -. start_time in
+    print_duration time_elapsed;
     let lock_file = Mutil.lock_file bdir in
     let on_exn exn bt =
       Format.eprintf "%a@." Lock.pp_exception (exn, bt);
       exit 2
     in
+
     Lock.control ~on_exn ~wait:false ~lock_file (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
         (match !ngrams_arg with
@@ -256,10 +271,13 @@ let main () =
             List.iter
               (fun (x, _separate, _bnotes, _shift) ->
                 if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
-              (List.rev !files))
+              (List.rev !files);
+          let time_elapsed = Unix.gettimeofday () -. start_time in
+          print_duration time_elapsed)
         else (
-          Printf.eprintf "*** database NOT created!\n";
-          flush stderr;
-          exit 2))
+          Printf.eprintf "*** database NOT created\n";
+          let time_elapsed = Unix.gettimeofday () -. start_time in
+          print_duration time_elapsed;
+          exit 2)))
 
 let _ = main ()
