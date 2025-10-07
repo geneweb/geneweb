@@ -48,6 +48,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    environment: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && 'production' || '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -185,6 +186,7 @@ jobs:
   build-results:
     needs: [build]
     runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && 'production' || '' }}
     if: always()
     steps:
       - name: Checkout code

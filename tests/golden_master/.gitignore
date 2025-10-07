@@ -1,0 +1,13 @@
+tests
+__pycache__
+.pytest_cache
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+*.pyzw
+*.pyzwz
+*.pyzwzw
+golden
