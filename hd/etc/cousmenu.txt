@@ -138,8 +138,8 @@
           <div class="d-block flex-grow-1 justify-content-start align-self-center order-2 text-truncate text-nowrap px-0">
             <a class="lh-2" href="%prefix;%path_end.access;"title="%if;(jd_age_!="" and jd_age_>364)%cous_age; [years old] (%jd_age_sep; [days old])%elseif;(jd_age_!="")%if;(jd_age_<365 and jd_age_>1)%jd_age_; [days old]%elseif;(jd_age_=1)[one day old]%elseif;(jd_age_=0)0 [year/month/day]2%end;%end;%if;(path_end.occ!="0")%if;(jd_age_!="") | %end;occ %path_end.occ;%end;"%sp;
               %(data-anclist="%path_end.anc_f_list;"%)>%(%jd_age; |%birth_age;-%death_age_;| %birth_yr;%birth_pr;%if;(cous_isdead=1)†%else;°%end; %death_yr;%death_pr; || %path_end.nbr; | %path_end.lev_cnt; | %path_end.anc_level; DEBUG %)%path_end.surname; %path_end.first_name;%nn;
-            </a>
-            %if;wizard;<a href="%prefix;&m=MOD_IND&i=%path_end.index;"%else;<span%end; title="%if;wizard;[modify] [person/persons]0%end;">
+            </a>%nn;
+            %if;wizard;<a href="%prefix;&m=MOD_IND&i=%path_end.index;"%else;<span%end; title="%if;wizard;[modify] [person/persons]0%end;">%nn;
               %if;(path_end.dates!="")%path_end.dates;%else;%if;(cous_isdead=1)†%else;°%end;%end;
             %if;wizard;</a>%else;</span>%end;
           </div>
