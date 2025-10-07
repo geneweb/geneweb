@@ -246,17 +246,25 @@ let print_redirect_to_list conf base =
             else base_param)
         "" conf.env
     in
-    let redirect_url =
-      Printf.sprintf "%sm=L&nb=%d%s" (base_url :> string) nb params
+    let final_url =
+      if nb = 1 then
+        Printf.sprintf "%s%s%s"
+          (base_url :> string)
+          (Util.acces conf base (List.hd p_list) :> string)
+          params
+      else
+        let redirect_url =
+          Printf.sprintf "%sm=L&nb=%d%s" (base_url :> string) nb params
+        in
+        let person_params =
+          List.mapi
+            (fun i p ->
+              let ip = Geneweb_db.Driver.get_iper p in
+              Printf.sprintf "&i%d=%s" i (Geneweb_db.Driver.Iper.to_string ip))
+            p_list
+        in
+        redirect_url ^ String.concat "" person_params
     in
-    let person_params =
-      List.mapi
-        (fun i p ->
-          let ip = Geneweb_db.Driver.get_iper p in
-          Printf.sprintf "&i%d=%s" i (Geneweb_db.Driver.Iper.to_string ip))
-        p_list
-    in
-    let final_url = redirect_url ^ String.concat "" person_params in
     Wserver.http_redirect_temporarily final_url
   with _ ->
     let error_url = Printf.sprintf "%sm=CHK_DATA" (Util.commd conf :> string) in
