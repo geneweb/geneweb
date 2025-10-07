@@ -7,9 +7,9 @@ type one_cousin =
   * int
 
 type cousins_i_j = one_cousin list
+type cousins_sparse
 
 val cousins_table : cousins_i_j array array
-val cousins_dates_t : (int * int) array array option ref
 
 val default_max_cnt : int
 (** Default number of relatives that could be listed at the same page *)
@@ -70,23 +70,10 @@ val sibling_has_desc_lev :
 *)
 
 val init_cousins_cnt :
-  config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  (Geneweb_db.Driver.iper
-  * Geneweb_db.Driver.ifam list
-  * Geneweb_db.Driver.iper
-  * int)
-  list
-  array
-  array
-  * (int * int) array array
-(** initialise
-    - a 2D array of lists of cousins at l1, l2 for each cousin, record
-    - his family,
-    - his parent (through which he is reached),
-    - the level (possibly multiple levels dut to implex)
-    - a 2D array of tuples (min, max) for dates of cousins at l1, l2 *)
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> cousins_sparse
+(** Initializes a sparse structure of cousins at each l1/l2 level. For each
+    cousin, records their family, parent (through which reached), and level
+    (possibly multiple levels due to implex), along with date ranges *)
 
 val min_max_date :
   config ->
