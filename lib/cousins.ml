@@ -13,6 +13,12 @@ module IperSet = Set.Make (struct
   let compare = Driver.Iper.compare
 end)
 
+module CoordMap = Map.Make (struct
+  type t = int * int
+
+  let compare = compare
+end)
+
 (* le cousin, liste des familles entre lui et l'ancêtre, l'ancêtre, level *)
 (* TODO see if level is the same as List.length ifam list *)
 type one_cousin =
@@ -22,6 +28,30 @@ type one_cousin =
   * int
 
 type cousins_i_j = one_cousin list
+
+type cousins_sparse = {
+  data : one_cousin list CoordMap.t;
+  dates : (int * int) CoordMap.t;
+  max_i : int;
+  max_j : int;
+}
+
+let empty_sparse =
+  { data = CoordMap.empty; dates = CoordMap.empty; max_i = 0; max_j = 0 }
+
+let get_cell sparse i j =
+  CoordMap.find_opt (i, j) sparse.data |> Option.value ~default:[]
+
+let get_dates sparse i j =
+  CoordMap.find_opt (i, j) sparse.dates |> Option.value ~default:(0, 0)
+
+let set_cell sparse i j value dates_val =
+  {
+    data = CoordMap.add (i, j) value sparse.data;
+    dates = CoordMap.add (i, j) dates_val sparse.dates;
+    max_i = max sparse.max_i i;
+    max_j = max sparse.max_j j;
+  }
 
 let default_max_cnt = 2000
 
@@ -96,8 +126,7 @@ let sibling_has_desc_lev conf base lev (ip, _) =
 let cousins_table = Array.make_matrix 1 1 []
 let tm = Unix.localtime (Unix.time ())
 let today_year = tm.Unix.tm_year + 1900
-let cousins_t = ref None
-let cousins_dates_t = ref None
+let cousins_t : cousins_sparse option ref = ref None
 let mal = 12
 let mdl = 12
 
@@ -253,9 +282,9 @@ let descendants_aux base liste1 liste2 =
   in
   loop0 [] liste1
 
-let descendants base cousins_cnt i j =
-  let liste1 = cousins_cnt.(i).(j - 1) in
-  let liste2 = if i > 0 then cousins_cnt.(i - 1).(j - 1) else [] in
+let descendants base sparse i j =
+  let liste1 = get_cell sparse i (j - 1) in
+  let liste2 = if i > 0 then get_cell sparse (i - 1) (j - 1) else [] in
   descendants_aux base liste1 liste2
 
 let init_cousins_cnt conf base p =
@@ -265,176 +294,130 @@ let init_cousins_cnt conf base p =
     | Some v -> int_of_string v
     | None -> max_a_l
   in
-  let max_d_l = max_descendant_level conf base (Driver.get_iper p) mdl in
-  let rec loop0 j cousins_cnt cousins_dates =
-    (* initiate lists of direct descendants *)
-    cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
-    cousins_dates.(0).(j) <- get_min_max_dates base cousins_cnt.(0).(j);
-    if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(0).(j) <> [] then
-      loop0 (j + 1) cousins_cnt cousins_dates
-    else ()
+  let rec loop0 j sparse =
+    let liste = descendants base sparse 0 j in
+    if liste = [] then sparse
+    else
+      let dates = get_min_max_dates base liste in
+      loop0 (j + 1) (set_cell sparse 0 j liste dates)
   in
-  let rec loop1 i cousins_cnt cousins_dates =
-    (* get ascendants *)
-    cousins_cnt.(i).(0) <- ascendants base [] cousins_cnt.(i - 1).(0);
-    cousins_dates.(i).(0) <- get_min_max_dates base cousins_cnt.(i).(0);
-    let rec loop2 i j cousins_cnt cousins_dates =
-      (* get descendants of c1, except persons of previous level (c2) *)
-      cousins_cnt.(i).(j) <- descendants base cousins_cnt i j;
-      cousins_dates.(i).(j) <- get_min_max_dates base cousins_cnt.(i).(j);
-      if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(i).(j) <> [] then
-        loop2 i (j + 1) cousins_cnt cousins_dates
-      else if
-        (* TODO limit construction to l1 *)
-        i < Array.length cousins_cnt - 1 && cousins_cnt.(i).(0) <> []
-      then loop1 (i + 1) cousins_cnt cousins_dates
-      else ()
-    in
-    loop2 i 1 cousins_cnt cousins_dates
+  let rec loop1 i sparse =
+    if i > max_a_l then sparse
+    else
+      let cell = get_cell sparse (i - 1) 0 in
+      if cell = [] then sparse
+      else
+        let liste = ascendants base [] cell in
+        if liste = [] then sparse
+        else
+          let dates = get_min_max_dates base liste in
+          let sparse = set_cell sparse i 0 liste dates in
+          loop2 i 1 sparse
+  and loop2 i j sparse =
+    let cell_prev = get_cell sparse i (j - 1) in
+    if cell_prev = [] then loop1 (i + 1) sparse
+    else
+      let liste = descendants base sparse i j in
+      let dates = get_min_max_dates base liste in
+      let sparse = set_cell sparse i j liste dates in
+      if liste = [] then loop1 (i + 1) sparse else loop2 i (j + 1) sparse
   in
-
   let build_tables key =
     let () = Driver.load_ascends_array base in
     let () = Driver.load_couples_array base in
-    (* +3: there may be more descendants for cousins than my own *)
-    let cousins_cnt =
-      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
-      with Failure _ -> failwith "Cousins table too large for system (1)"
+    let initial_list =
+      [ (Driver.get_iper p, [ Driver.Ifam.dummy ], Driver.Iper.dummy, 0) ]
     in
-    let cousins_dates =
-      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
-      with Failure _ -> failwith "Cousins table too large for system (2)"
-    in
-    cousins_cnt.(0).(0) <-
-      [ (Driver.get_iper p, [ Driver.Ifam.dummy ], Driver.Iper.dummy, 0) ];
-    cousins_dates.(0).(0) <- get_min_max_dates base cousins_cnt.(0).(0);
-    loop0 1 cousins_cnt cousins_dates;
-    loop1 1 cousins_cnt cousins_dates;
-    (key, max_a_l, cousins_cnt, cousins_dates)
+    let initial_dates = get_min_max_dates base initial_list in
+    let sparse = set_cell empty_sparse 0 0 initial_list initial_dates in
+    let sparse = loop0 1 sparse in
+    let sparse = loop1 1 sparse in
+    (key, max_a_l, sparse)
   in
-
-  let expand_tables key v1 max_a_l cousins_cnt cousins_dates =
-    let new_cousins_cnt =
-      try Some (Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) [])
-      with Failure _ -> None
-    in
-    let new_cousins_dates =
-      try Some (Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0))
-      with Failure _ -> None
-    in
-    match (new_cousins_cnt, new_cousins_dates) with
-    | Some new_cousins_cnt, Some new_cousins_dates ->
-        for i = 0 to v1 do
-          new_cousins_cnt.(i) <- cousins_cnt.(i);
-          new_cousins_dates.(i) <- cousins_dates.(i)
-        done;
-        loop0 (max_d_l + v1) cousins_cnt cousins_dates;
-        loop1 v1 cousins_cnt cousins_dates;
-        (key, max_a_l, cousins_cnt, cousins_dates)
-    | _, _ ->
-        Printf.sprintf "Can't expand cousins tables" |> Logs.syslog `LOG_WARNING;
-        build_tables key
-  in
-
   let fn = Name.strip_lower @@ Driver.sou base @@ Driver.get_surname p in
   let sn = Name.strip_lower @@ Driver.sou base @@ Driver.get_first_name p in
   let occ = Driver.get_occ p in
   let key = Format.sprintf "%s.%d.%s" fn occ sn in
-  match (!cousins_t, !cousins_dates_t) with
-  | Some t, Some d_t -> (t, d_t)
-  | _, _ ->
-      let _pnoc, _v1, t', d_t' =
+  match !cousins_t with
+  | Some sparse -> sparse
+  | None ->
+      let sparse =
         let cous_cache_fname =
           Filename.concat (!GWPARAM.bpath conf.bname) "cousins_cache"
         in
         match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
-        | Some "yes" -> (
+        | Some "yes" ->
             flush stderr;
-            let pnoc, v1, t', d_t' =
+            let cached_key, cached_max_a_l, cached_sparse =
               Mutil.read_or_create_value cous_cache_fname (fun () ->
                   build_tables key)
             in
-            match (pnoc, v1) with
-            | pnoc, v1 when pnoc = key && max_a_l <= v1 -> (pnoc, v1, t', d_t')
-            | pnoc, v1 when pnoc = key ->
-                let _pnoc, _v1, t', d_t' =
-                  Mutil.read_or_create_value cous_cache_fname (fun () ->
-                      build_tables key)
-                in
-                Sys.remove cous_cache_fname;
-                Mutil.read_or_create_value cous_cache_fname ~magic:key
-                  (fun () -> expand_tables key v1 max_a_l t' d_t')
-            | _ ->
-                Sys.remove cous_cache_fname;
+            if cached_key = key && max_a_l <= cached_max_a_l then cached_sparse
+            else if cached_key = key then (
+              let sparse = loop1 (cached_max_a_l + 1) cached_sparse in
+              Sys.remove cous_cache_fname;
+              ignore
+                (Mutil.read_or_create_value cous_cache_fname (fun () ->
+                     (key, max_a_l, sparse)));
+              sparse)
+            else (
+              Sys.remove cous_cache_fname;
+              let _, _, sparse =
                 Mutil.read_or_create_value cous_cache_fname (fun () ->
-                    build_tables key))
+                    build_tables key)
+              in
+              sparse)
         | _ ->
             flush stderr;
-            build_tables key
+            let _, _, sparse = build_tables key in
+            sparse
       in
-
-      cousins_t := Some t';
-      cousins_dates_t := Some d_t';
+      cousins_t := Some sparse;
       flush stderr;
-      (t', d_t')
+      sparse
 
 (* for cousins_dates.(l1).(l2) determine min or max date *)
 let min_max_date conf base p min_max l1 l2 =
-  let _cousins_cnt, cousins_dates =
-    match (!cousins_t, !cousins_dates_t) with
-    | Some t, Some d_t -> (t, d_t)
-    | _, _ -> init_cousins_cnt conf base p
+  let sparse =
+    match !cousins_t with Some s -> s | None -> init_cousins_cnt conf base p
   in
   let i = try int_of_string l1 with Failure _ -> -1 in
   let j = try int_of_string l2 with Failure _ -> -1 in
   match (i, j) with
   | -1, _ | _, -1 -> None
   | _, _ ->
-      let min, max =
-        if
-          i + 1 > Array.length cousins_dates
-          || j + 1 > Array.length cousins_dates.(i)
-        then (-1, -1)
-        else cousins_dates.(i).(j)
-      in
-      if min_max then Some min else Some max
+      let min, max = get_dates sparse i j in
+      if min = 0 && max = 0 then None
+      else if min_max then Some min
+      else Some max
 
 (* determine non empty max ancestor level (max_i)
    and non empty max descendant level
 *)
 let max_l1_l2 conf base p =
-  let cousins_cnt, _cousins_dates =
-    match (!cousins_t, !cousins_dates_t) with
-    | Some t, Some d_t -> (t, d_t)
-    | _, _ -> init_cousins_cnt conf base p
+  let sparse =
+    match !cousins_t with Some s -> s | None -> init_cousins_cnt conf base p
   in
-  let max_i = Array.length cousins_cnt - 1 in
-  let max_j = Array.length cousins_cnt.(0) - 1 in
   let max_a =
-    let rec loop0 i =
-      if cousins_cnt.(i).(0) <> [] && i < max_i - 1 then loop0 (i + 1) else i
+    let rec loop i =
+      if i > sparse.max_i then i - 1
+      else if get_cell sparse i 0 <> [] then loop (i + 1)
+      else i - 1
     in
-    loop0 0
+    max 0 (loop 0)
   in
-  let rec loop i j =
-    if cousins_cnt.(i).(j) <> [] then
-      if j < max_j then loop i (j + 1) else (max_a, j - i)
-    else if i < max_i && j < max_j then loop (i + 1) (j + 1)
-    else (max_a, j - i)
+  let max_d =
+    CoordMap.fold (fun (i, j) _cell acc -> max acc (j - i)) sparse.data 0
   in
-  loop 0 0
+  (max_a, max_d)
 
 let cousins_l1_l2_aux conf base l1 l2 p =
   let il1 = int_of_string l1 in
   let il2 = int_of_string l2 in
-  let cousins_cnt, _cousins_dates =
-    match (!cousins_t, !cousins_dates_t) with
-    | Some t, Some d_t -> (t, d_t)
-    | _, _ -> init_cousins_cnt conf base p
+  let sparse =
+    match !cousins_t with Some s -> s | None -> init_cousins_cnt conf base p
   in
-  if il1 < Array.length cousins_cnt && il2 - il1 < Array.length cousins_cnt.(0)
-  then Some cousins_cnt.(il1).(il2)
-  else None
+  Some (get_cell sparse il1 il2)
 
 (* create a new list of (ip, (ifamll, iancl, cnt), lev) from one_cousin list *)
 let cousins_fold l =
@@ -466,15 +449,12 @@ let cousins_fold l =
   loop false [] (Driver.Iper.dummy, ([], [], 0), [ 0 ]) l
 
 let cousins_implex_cnt conf base l1 l2 p =
-  (* warning, this is expensive: two nested loops *)
   let il1 = int_of_string l1 in
   let il2 = int_of_string l2 in
-  let cousins_cnt, _cousins_dates =
-    match (!cousins_t, !cousins_dates_t) with
-    | Some t, Some d_t -> (t, d_t)
-    | _, _ -> init_cousins_cnt conf base p
+  let sparse =
+    match !cousins_t with Some s -> s | None -> init_cousins_cnt conf base p
   in
-  let cousl0 = cousins_fold cousins_cnt.(il1).(il2) in
+  let cousl0 = cousins_fold (get_cell sparse il1 il2) in
   let rec loop0 cousl cnt =
     match cousl with
     | [] -> cnt
@@ -484,7 +464,7 @@ let cousins_implex_cnt conf base l1 l2 p =
              if j = 0 then cnt
              else
                loop1
-                 (let cousl_j = cousins_cnt.(il1).(j) in
+                 (let cousl_j = get_cell sparse il1 j in
                   let rec loop2 cousl_j cnt =
                     match cousl_j with
                     | [] -> cnt
