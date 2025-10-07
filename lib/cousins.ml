@@ -7,6 +7,12 @@ module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 
+module IperSet = Set.Make (struct
+  type t = Driver.iper
+
+  let compare = Driver.Iper.compare
+end)
+
 (* le cousin, liste des familles entre lui et l'ancêtre, l'ancêtre, level *)
 (* TODO see if level is the same as List.length ifam list *)
 type one_cousin =
@@ -222,50 +228,28 @@ let rec ascendants base acc l =
 
 (* descendants des ip de liste1 sauf ceux présents dans liste2 *)
 let descendants_aux base liste1 liste2 =
-  let liste2 =
-    List.map
-      (fun one_cousin ->
-        let ip, _, _, _ = one_cousin in
-        ip)
-      liste2
+  let excluded =
+    List.fold_left
+      (fun set (ip, _, _, _) -> IperSet.add ip set)
+      IperSet.empty liste2
   in
   let rec loop0 acc = function
     | [] -> acc
     | one_cousin :: l ->
         let ip, ifaml, ipar0, lev = one_cousin in
-        let fams = Array.to_list (Driver.get_family (Driver.poi base ip)) in
+        let fams = Driver.get_family (Driver.poi base ip) in
         let chlds =
-          (* accumuler tous les enfants de ip *)
-          let rec loop1 acc fams =
-            (* iterer sur chaque famille *)
-            match fams with
-            | [] -> acc
-            | ifam :: fams ->
-                let children =
-                  let rec loop2 acc2 children =
-                    match children with
-                    | [] -> acc2
-                    | ipch :: children ->
-                        loop2
-                          ((ipch, ifam :: ifaml, ipar0, lev - 1) :: acc2)
-                          children
-                  in
-                  loop2 []
-                    (Array.to_list (Driver.get_children (Driver.foi base ifam)))
-                in
-                (* @ is ok, children is a small list *)
-                loop1 (children @ acc) fams
-          in
-          loop1 [] fams
+          Array.fold_left
+            (fun acc ifam ->
+              let children = Driver.get_children (Driver.foi base ifam) in
+              Array.fold_right
+                (fun ipch acc ->
+                  if IperSet.mem ipch excluded then acc
+                  else (ipch, ifam :: ifaml, ipar0, lev - 1) :: acc)
+                children acc)
+            [] fams
         in
-        let chlds =
-          List.fold_left (* on élimine les enfants présents dans l2 *)
-            (fun acc one_cousin ->
-              let ip, _ifaml, _ipar, _lev = one_cousin in
-              if List.mem ip liste2 then acc else one_cousin :: acc)
-            [] chlds
-        in
-        loop0 (chlds @ acc) l
+        loop0 (List.rev_append chlds acc) l
   in
   loop0 [] liste1
 
@@ -569,7 +553,7 @@ let anc_cnt_aux conf base lev at_to p =
         (* several cousins records with same ip, different faml! *)
         List.iter
           (fun (ip, faml, ianc, lvl) ->
-            Hashtbl.add cous ip (ip, faml, ianc, lvl))
+            Hashtbl.replace cous ip (ip, faml, ianc, lvl))
           asc_cnt.(i);
         loop (i + 1))
     in
@@ -590,7 +574,7 @@ let desc_cnt_aux conf base lev at_to p =
         (* several cousins records with same ip, different faml! *)
         List.iter
           (fun (ip, faml, ianc, lvl) ->
-            Hashtbl.add cous ip (ip, faml, ianc, lvl))
+            Hashtbl.replace cous ip (ip, faml, ianc, lvl))
           desc_cnt.(i);
         loop (i + 1))
     in
