@@ -10,16 +10,19 @@ let tn conf ?(c = 1) l n =
 
 module TranslCache = struct
   let cache = Hashtbl.create 32
-  let max_entries = 256
 
   let get conf key =
-    let cache_key = (conf.lang, key) in
-    match Hashtbl.find_opt cache cache_key with
+    match Hashtbl.find_opt cache (conf.lang, key) with
     | Some v -> v
     | None ->
         let v = t conf key in
-        if Hashtbl.length cache > max_entries then Hashtbl.clear cache;
-        Hashtbl.add cache cache_key v;
+        if Hashtbl.length cache >= 256 then (
+          let to_remove = ref None in
+          Hashtbl.iter
+            (fun k _ -> if !to_remove = None then to_remove := Some k)
+            cache;
+          match !to_remove with Some k -> Hashtbl.remove cache k | None -> ());
+        Hashtbl.add cache (conf.lang, key) v;
         v
 end
 
@@ -130,9 +133,12 @@ module DictInfo = struct
 end
 
 let get_sel_dicts conf =
-  DictInfo.all
-  |> List.filter (fun info -> Util.p_getenv conf.env info.form_param = Some "1")
-  |> List.map (fun info -> info.dict_type)
+  List.filter_map
+    (fun info ->
+      match Util.p_getenv conf.env info.form_param with
+      | Some "1" -> Some info.dict_type
+      | _ -> None)
+    DictInfo.all
 
 type error_info = {
   error_type : CheckData.error_type;
@@ -187,9 +193,12 @@ module ErrorInfo = struct
 end
 
 let get_sel_err_types conf =
-  ErrorInfo.all
-  |> List.filter (fun info -> Util.p_getenv conf.env info.form_param = Some "1")
-  |> List.map (fun info -> info.error_type)
+  List.filter_map
+    (fun info ->
+      match Util.p_getenv conf.env info.form_param with
+      | Some "1" -> Some info.error_type
+      | _ -> None)
+    ErrorInfo.all
 
 let error_type_name conf err_type = t conf (ErrorInfo.get_name err_type)
 
@@ -253,10 +262,8 @@ let print_redirect_to_list conf base =
     let error_url = Printf.sprintf "%sm=CHK_DATA" (Util.commd conf :> string) in
     Wserver.http_redirect_temporarily error_url
 
-let render_error_entry_fast conf base dict_param istr s error_type =
-  let book_title = TranslCache.get conf "book link" in
-  let list_title = TranslCache.get conf "list of linked persons" in
-  let fix_title = TranslCache.get conf "fix error automatically" in
+let render_error_entry_fast conf base dict_param istr s error_type ~book_title
+    ~list_title ~fix_title =
   let hled, url_mod, url_chk, entry, visible =
     CheckData.make_error_html conf base dict_param istr s error_type
   in
@@ -282,6 +289,9 @@ let render_dict_section_streaming conf base dict filtrd_entries sel_err_types =
       </div>
       <div class="card-body">|}
     dict_title;
+  let book_title = TranslCache.get conf "book link" in
+  let list_title = TranslCache.get conf "list of linked persons" in
+  let fix_title = TranslCache.get conf "fix error automatically" in
   List.iter
     (fun error_type ->
       let entries_for_error =
@@ -297,7 +307,8 @@ let render_dict_section_streaming conf base dict filtrd_entries sel_err_types =
         List.iter
           (fun (istr, s, _) ->
             Output.print_sstring conf
-              (render_error_entry_fast conf base dict_param istr s error_type))
+              (render_error_entry_fast conf base dict_param istr s error_type
+                 ~book_title ~list_title ~fix_title))
           entries_for_error;
         Output.print_sstring conf "</div>"))
     sel_err_types;
@@ -307,51 +318,56 @@ let render_error_section conf base dict entries_for_error error_type =
   let dict_param = DictInfo.get_url_param dict in
   let error_count = List.length entries_for_error in
   let error_name = error_type_name conf error_type in
-  let entries_html =
-    entries_for_error
-    |> List.map (fun (istr, s, _) ->
-           render_error_entry_fast conf base dict_param istr s error_type)
-    |> String.concat ""
-  in
-  Printf.sprintf {|<h4>%s (%d)</h4><div class="list-group">%s</div>|} error_name
-    error_count entries_html
+  let book_title = TranslCache.get conf "book link" in
+  let list_title = TranslCache.get conf "list of linked persons" in
+  let fix_title = TranslCache.get conf "fix error automatically" in
+  let buf = Buffer.create (List.length entries_for_error * 200) in
+  Printf.bprintf buf {|<h4>%s (%d)</h4><div class="list-group">|} error_name
+    error_count;
+  List.iter
+    (fun (istr, s, _) ->
+      Buffer.add_string buf
+        (render_error_entry_fast conf base dict_param istr s error_type
+           ~book_title ~list_title ~fix_title))
+    entries_for_error;
+  Buffer.add_string buf "</div>";
+  Buffer.contents buf
 
 let render_dict_section conf base dict filtrd_entries sel_err_types =
   let dict_title = tn conf (DictInfo.get_name dict) 1 in
-  let sections_html =
-    sel_err_types
-    |> List.filter_map (fun error_type ->
-           let entries_for_error =
-             List.filter_map
-               (fun (istr, s, errors) ->
-                 if List.mem error_type errors then Some (istr, s, errors)
-                 else None)
-               filtrd_entries
-           in
-           if entries_for_error <> [] then
-             Some
-               (render_error_section conf base dict entries_for_error error_type)
-           else None)
-    |> String.concat ""
-  in
-  Printf.sprintf
+  let buf = Buffer.create 8192 in
+  Printf.bprintf buf
     {|<div class="card mt-3">
         <div class="card-header">
           <h3 class="font-weight bold mb-0">%s</h3>
         </div>
-        <div class="card-body">%s</div>
-      </div>|}
-    dict_title sections_html
+        <div class="card-body">|}
+    dict_title;
+  List.iter
+    (fun error_type ->
+      let entries_for_error =
+        List.filter_map
+          (fun (istr, s, errors) ->
+            if List.mem error_type errors then Some (istr, s, errors) else None)
+          filtrd_entries
+      in
+      if entries_for_error <> [] then
+        Buffer.add_string buf
+          (render_error_section conf base dict entries_for_error error_type))
+    sel_err_types;
+  Buffer.add_string buf "</div></div>";
+  Buffer.contents buf
 
 let render_missing_cache_warning conf missing_caches =
   if missing_caches = [] then ""
   else
     let buf = Buffer.create 512 in
-    Printf.bprintf buf
+    let msg = tn conf "chk_data cache file not found" 0 ^ t conf ":" in
+    Buffer.add_string buf
       {|<div class="alert alert-danger mt-2">
-          <i class="fa fa-exclamation-triangle mr-2"></i>%s%s |}
-      (tn conf "chk_data cache file not found" 0)
-      (t conf ":");
+          <i class="fa fa-exclamation-triangle mr-2"></i>|};
+    Buffer.add_string buf msg;
+    Buffer.add_string buf " ";
     Buffer.add_string buf
       (missing_caches |> List.rev
       |> List.map CheckData.dict_to_cache_name
@@ -448,29 +464,32 @@ let display_results conf base dicts sel_err_types max_results =
   let total_entries_found = ref 0 in
   let missing_caches = ref [] in
   let sections_buffer = Buffer.create 4096 in
-  let entries_buffer = ref [] in
-  let process_dict dict =
-    if
-      match max_results with
-      | Some max -> !total_entries_found < max
-      | None -> true
-    then (
-      let remaining =
-        match max_results with
-        | Some max -> Some (max - !total_entries_found)
-        | None -> None
-      in
-      let entries =
-        CheckData.collect_all_errors_with_cache ~max_results:remaining
-          ~sel_err_types conf base dict
-      in
-      if use_cache && not (CheckData.cache_file_exists conf dict) then
-        missing_caches := dict :: !missing_caches;
-      if entries <> [] then (
-        entries_buffer := (dict, entries) :: !entries_buffer;
-        total_entries_found := !total_entries_found + List.length entries))
+  let entries_with_dicts =
+    List.fold_right
+      (fun dict acc ->
+        if
+          match max_results with
+          | Some max -> !total_entries_found < max
+          | None -> true
+        then (
+          let remaining =
+            match max_results with
+            | Some max -> Some (max - !total_entries_found)
+            | None -> None
+          in
+          let entries =
+            CheckData.collect_all_errors_with_cache ~max_results:remaining
+              ~sel_err_types conf base dict
+          in
+          if use_cache && not (CheckData.cache_file_exists conf dict) then
+            missing_caches := dict :: !missing_caches;
+          if entries <> [] then (
+            total_entries_found := !total_entries_found + List.length entries;
+            (dict, entries) :: acc)
+          else acc)
+        else acc)
+      dicts []
   in
-  List.iter process_dict dicts;
   List.iter
     (fun (dict, entries) ->
       if List.length entries > 250 then
@@ -478,7 +497,7 @@ let display_results conf base dicts sel_err_types max_results =
       else
         Buffer.add_string sections_buffer
           (render_dict_section conf base dict entries sel_err_types))
-    (List.rev !entries_buffer);
+    entries_with_dicts;
   Output.print_sstring conf (Buffer.contents sections_buffer);
   if !missing_caches <> [] then
     Output.print_sstring conf
