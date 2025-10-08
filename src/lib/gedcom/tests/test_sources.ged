@@ -1,0 +1,265 @@
+0 HEAD
+1 SOUR TestApp
+2 VERS 1.0
+2 NAME Test GEDCOM Parser
+1 DEST TestApp
+1 DATE 1 JAN 2024
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME John /Doe/
+2 GIVN John
+2 SURN Doe
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 1900
+2 PLAC New York, NY, USA
+2 SOUR @S1@
+3 PAGE Page 123
+3 DATA
+4 TEXT Birth certificate data
+4 DATE 1 JAN 1900
+4 PLAC New York, NY, USA
+3 _LINK https://example.com/s1
+3 NOTE Birth certificate note
+2 CONT with continuation
+1 DEAT
+2 DATE 31 DEC 1980
+2 PLAC New York, NY, USA
+2 SOUR @S2@
+3 PAGE Page 456
+3 DATA
+4 TEXT Death certificate data
+4 DATE 31 DEC 1980
+4 PLAC New York, NY, USA
+3 _LINK https://example.com/s2
+3 NOTE Death certificate note
+2 CONT with continuation
+1 MARR
+2 DATE 20 JUN 1925
+2 PLAC New York, NY, USA
+2 SOUR @S3@
+3 PAGE Page 789
+3 DATA
+4 TEXT Marriage certificate data
+4 DATE 20 JUN 1925
+4 PLAC New York, NY, USA
+3 _LINK https://example.com/s3
+3 NOTE Marriage certificate note
+2 CONT with continuation
+1 SOUR @S4@
+2 PAGE Page 101112
+2 DATA
+3 TEXT General information
+3 DATE 1 JAN 1900
+3 PLAC New York, NY, USA
+2 _LINK https://example.com/s4
+2 NOTE General information note
+2 CONT with continuation
+1 OBJE @M1@
+2 SOUR @S5@
+3 PAGE Page 131415
+3 DATA
+4 TEXT Photo information
+4 DATE 1 JAN 1920
+4 PLAC New York, NY, USA
+3 _LINK https://example.com/s5
+3 NOTE Photo note
+2 CONT with continuation
+0 @I2@ INDI
+1 NAME Jane /Smith/
+2 GIVN Jane
+2 SURN Smith
+1 SEX F
+1 BIRT
+2 DATE 15 MAR 1905
+2 PLAC Boston, MA, USA
+2 SOUR @S6@
+3 PAGE Page 161718
+3 DATA
+4 TEXT Birth certificate data
+4 DATE 15 MAR 1905
+4 PLAC Boston, MA, USA
+3 _LINK https://example.com/s6
+3 NOTE Birth certificate note
+2 CONT with continuation
+1 FAMS @F1@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE 20 JUN 1925
+2 PLAC New York, NY, USA
+2 SOUR @S3@
+3 PAGE Page 789
+3 DATA
+4 TEXT Marriage certificate data
+4 DATE 20 JUN 1925
+4 PLAC New York, NY, USA
+3 _LINK https://example.com/s3
+3 NOTE Marriage certificate note
+2 CONT with continuation
+1 SOUR @S7@
+2 PAGE Page 192021
+2 DATA
+3 TEXT Family information
+3 DATE 20 JUN 1925
+3 PLAC New York, NY, USA
+2 _LINK https://example.com/s7
+2 NOTE Family information note
+2 CONT with continuation
+0 @S1@ SOUR
+1 TITL Birth Certificate
+1 AUTH Vital Records Office
+1 PUBL New York State
+1 REPO @R1@
+1 NOTE Birth certificate source
+2 CONT with continuation
+1 OBJE @M2@
+0 @S2@ SOUR
+1 TITL Death Certificate
+1 AUTH Vital Records Office
+1 PUBL New York State
+1 REPO @R1@
+1 NOTE Death certificate source
+2 CONT with continuation
+1 OBJE @M3@
+0 @S3@ SOUR
+1 TITL Marriage Certificate
+1 AUTH Vital Records Office
+1 PUBL New York State
+1 REPO @R1@
+1 NOTE Marriage certificate source
+2 CONT with continuation
+1 OBJE @M4@
+0 @S4@ SOUR
+1 TITL General Information
+1 AUTH Family Member
+1 PUBL Private
+1 REPO @R2@
+1 NOTE General information source
+2 CONT with continuation
+1 OBJE @M5@
+0 @S5@ SOUR
+1 TITL Photo Collection
+1 AUTH Family Member
+1 PUBL Private
+1 REPO @R2@
+1 NOTE Photo source
+2 CONT with continuation
+1 OBJE @M6@
+0 @S6@ SOUR
+1 TITL Birth Certificate
+1 AUTH Vital Records Office
+1 PUBL Massachusetts State
+1 REPO @R3@
+1 NOTE Birth certificate source
+2 CONT with continuation
+1 OBJE @M7@
+0 @S7@ SOUR
+1 TITL Family Records
+1 AUTH Family Member
+1 PUBL Private
+1 REPO @R2@
+1 NOTE Family records source
+2 CONT with continuation
+1 OBJE @M8@
+0 @M1@ OBJE
+1 FILE photo1.jpg
+1 TITL John's Portrait
+1 FORM jpeg
+1 NOTE John's portrait photo
+2 CONT with continuation
+1 SOUR @S5@
+2 PAGE Page 131415
+2 DATA
+3 TEXT Photo information
+3 DATE 1 JAN 1920
+3 PLAC New York, NY, USA
+3 _LINK https://example.com/s5
+3 NOTE Photo note
+2 CONT with continuation
+0 @M2@ OBJE
+1 FILE birth_cert.jpg
+1 TITL Birth Certificate
+1 FORM jpeg
+1 NOTE Birth certificate image
+2 CONT with continuation
+0 @M3@ OBJE
+1 FILE death_cert.jpg
+1 TITL Death Certificate
+1 FORM jpeg
+1 NOTE Death certificate image
+2 CONT with continuation
+0 @M4@ OBJE
+1 FILE marriage_cert.jpg
+1 TITL Marriage Certificate
+1 FORM jpeg
+1 NOTE Marriage certificate image
+2 CONT with continuation
+0 @M5@ OBJE
+1 FILE general_info.pdf
+1 TITL General Information
+1 FORM pdf
+1 NOTE General information document
+2 CONT with continuation
+0 @M6@ OBJE
+1 FILE photo_collection.zip
+1 TITL Photo Collection
+1 FORM zip
+1 NOTE Photo collection archive
+2 CONT with continuation
+0 @M7@ OBJE
+1 FILE birth_cert_ma.jpg
+1 TITL Birth Certificate MA
+1 FORM jpeg
+1 NOTE Birth certificate image MA
+2 CONT with continuation
+0 @M8@ OBJE
+1 FILE family_records.pdf
+1 TITL Family Records
+1 FORM pdf
+1 NOTE Family records document
+2 CONT with continuation
+0 @R1@ REPO
+1 NAME New York State Archives
+1 ADDR
+2 ADR1 9A81 Cultural Education Center
+2 CITY Albany
+2 STAE NY
+2 POST 12230
+2 CTRY USA
+1 PHON (518) 474-8955
+1 EMAIL archinfo@nysed.gov
+1 WWW https://www.archives.nysed.gov
+1 NOTE Official state repository
+2 CONT for New York records
+0 @R2@ REPO
+1 NAME Private Family Collection
+1 ADDR
+2 ADR1 123 Family St
+2 CITY New York
+2 STAE NY
+2 POST 10001
+2 CTRY USA
+1 PHON (555) 123-4567
+1 EMAIL family@example.com
+1 WWW https://family.example.com
+1 NOTE Private family repository
+2 CONT for family records
+0 @R3@ REPO
+1 NAME Massachusetts State Archives
+1 ADDR
+2 ADR1 220 Morrissey Boulevard
+2 CITY Boston
+2 STAE MA
+2 POST 02125
+2 CTRY USA
+1 PHON (617) 727-2816
+1 EMAIL archives@sec.state.ma.us
+1 WWW https://www.sec.state.ma.us/arc
+1 NOTE Official state repository
+2 CONT for Massachusetts records
+0 TRLR

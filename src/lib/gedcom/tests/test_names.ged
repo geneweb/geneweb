@@ -1,0 +1,63 @@
+0 HEAD
+1 SOUR TestApp
+2 VERS 1.0
+2 NAME Test GEDCOM Parser
+1 DEST TestApp
+1 DATE 1 JAN 2024
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME John /Doe/
+2 GIVN John
+2 SURN Doe
+2 NICK Johnny
+2 NPFX Dr.
+2 NSFX Jr.
+2 ROMN Giovanni /Rossi/
+2 FONE JON DOE
+2 TRAN Jean /Dubois/
+2 TYPE birth
+1 NAME Jean /Dubois/
+2 TYPE married
+2 ROMN Jean /Dubois/
+2 FONE JEAN DUBOIS
+2 TRAN Jean /Dubois/
+1 NAME Juan /García/
+2 TYPE nickname
+2 ROMN Juan /García/
+2 FONE JUAN GARCIA
+2 TRAN Juan /García/
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 1900
+2 PLAC New York, NY, USA
+0 @I2@ INDI
+1 NAME Marie /Martin/
+2 GIVN Marie
+2 SURN Martin
+2 NICK Mimi
+2 NPFX Mme.
+2 NSFX III
+2 ROMN Maria /Martini/
+2 FONE MARIE MARTIN
+2 TRAN Marie /Martin/
+2 TYPE birth
+1 NAME Marie /Doe/
+2 TYPE married
+2 ROMN Marie /Doe/
+2 FONE MARIE DOE
+2 TRAN Marie /Doe/
+1 SEX F
+1 BIRT
+2 DATE 15 MAR 1905
+2 PLAC Paris, France
+1 FAMS @F1@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE 20 JUN 1925
+2 PLAC Paris, France
+0 TRLR
