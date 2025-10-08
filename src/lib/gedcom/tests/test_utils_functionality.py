@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from gedcom.parsers.utils import ParserUtils
+from lib.gedcom.parsers.utils import ParserUtils
 
 class TestParserUtils(unittest.TestCase):
     def test_parse_date_simple(self):

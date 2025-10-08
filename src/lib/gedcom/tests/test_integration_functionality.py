@@ -4,9 +4,9 @@ import os
 import io
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from gedcom import create_parser, create_exporter
-from gedcom.parser import GedcomParser
-from gedcom.tokenizer import GedcomTokenizer
+from lib.gedcom import create_parser, create_exporter
+from lib.gedcom.parser import GedcomParser
+from lib.gedcom.tokenizer import GedcomTokenizer
 
 class TestIntegration(unittest.TestCase):
     def setUp(self):
@@ -99,8 +99,8 @@ class TestIntegration(unittest.TestCase):
 
     def test_parser_with_validation_disabled(self):
         # Test parser without validation
-        from gedcom.parser import GedcomParser
-        from gedcom.tokenizer import GedcomTokenizer
+        from lib.gedcom.parser import GedcomParser
+        from lib.gedcom.tokenizer import GedcomTokenizer
 
         class NoValidationParser(GedcomParser):
             def parse_content(self, content: str):

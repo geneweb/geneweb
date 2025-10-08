@@ -18,4 +18,4 @@ name = "gw"
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = ["-ra"]
-testpaths = ["tests"]
+testpaths = ["tests", "lib/gedcom/tests"]

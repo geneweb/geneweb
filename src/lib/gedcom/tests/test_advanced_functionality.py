@@ -4,7 +4,7 @@ import os
 import io
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from gedcom import create_parser, create_exporter
+from lib.gedcom import create_parser, create_exporter
 
 class TestAdvancedFunctionality(unittest.TestCase):
     def setUp(self):

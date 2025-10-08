@@ -3,11 +3,23 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from gedcom.models import (
-    GedcomDatabase, GedcomHeader, GedcomIndividual, GedcomFamily,
-    GedcomEvent, GedcomName, GedcomPlace, GedcomDate, GedcomAddress,
-    GedcomMap, GedcomRepository, GedcomMultimedia, GedcomSubmitter,
-    GedcomNote, GedcomSource, GedcomSourceCitation
+from lib.gedcom.models import (
+    GedcomDatabase,
+    GedcomHeader,
+    GedcomIndividual,
+    GedcomFamily,
+    GedcomEvent,
+    GedcomName,
+    GedcomPlace,
+    GedcomDate,
+    GedcomAddress,
+    GedcomMap,
+    GedcomRepository,
+    GedcomMultimedia,
+    GedcomSubmitter,
+    GedcomNote,
+    GedcomSource,
+    GedcomSourceCitation,
 )
 
 class TestModelsFunctionality(unittest.TestCase):
@@ -63,7 +75,8 @@ class TestModelsFunctionality(unittest.TestCase):
         self.assertEqual(name.suffix, 'Jr.')
 
     def test_gedcom_date_creation(self):
-        from gedcom.parsers.utils import ParserUtils
+        from lib.gedcom.parsers.utils import ParserUtils
+
         date = ParserUtils.parse_date('1 JAN 1900')
         self.assertEqual(date.raw, '1 JAN 1900')
         self.assertEqual(date.year, 1900)
@@ -74,7 +87,8 @@ class TestModelsFunctionality(unittest.TestCase):
         self.assertTrue(date.has_day)
 
     def test_gedcom_date_approximate(self):
-        from gedcom.parsers.utils import ParserUtils
+        from lib.gedcom.parsers.utils import ParserUtils
+
         date = ParserUtils.parse_date('ABT 1 JAN 1900')
         self.assertTrue(date.is_approximate)
         self.assertEqual(date.year, 1900)
@@ -95,7 +109,8 @@ class TestModelsFunctionality(unittest.TestCase):
         self.assertEqual(place.parts, ['New York', 'NY', 'USA'])
 
     def test_gedcom_event_creation(self):
-        from gedcom.parsers.utils import ParserUtils
+        from lib.gedcom.parsers.utils import ParserUtils
+
         event = GedcomEvent(
             tag='BIRT',
             date=ParserUtils.parse_date('1 JAN 1900'),
@@ -118,7 +133,8 @@ class TestModelsFunctionality(unittest.TestCase):
         self.assertEqual(len(family.children), 0)
 
     def test_gedcom_family_with_marriage(self):
-        from gedcom.parsers.utils import ParserUtils
+        from lib.gedcom.parsers.utils import ParserUtils
+
         family = GedcomFamily(
             xref='@F1@',
             husband='I1',
@@ -211,7 +227,8 @@ class TestModelsFunctionality(unittest.TestCase):
         self.assertEqual(len(citation.sub_lines), 0)
 
     def test_gedcom_individual_with_events(self):
-        from gedcom.parsers.utils import ParserUtils
+        from lib.gedcom.parsers.utils import ParserUtils
+
         individual = GedcomIndividual(
             xref='@I1@',
             names=[GedcomName(full='John /Doe/')],

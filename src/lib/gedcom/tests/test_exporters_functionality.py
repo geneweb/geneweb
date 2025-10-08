@@ -4,14 +4,23 @@ import os
 import io
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from gedcom.exporters import (
-    HeaderExporter, IndividualExporter, FamilyExporter,
-    RepositoryExporter, MultimediaExporter, SubmitterExporter,
-    NoteExporter, SourceExporter
+from lib.gedcom.exporters import (
+    HeaderExporter,
+    IndividualExporter,
+    FamilyExporter,
+    RepositoryExporter,
+    MultimediaExporter,
+    SubmitterExporter,
+    NoteExporter,
+    SourceExporter,
 )
-from gedcom.models import (
-    GedcomHeader, GedcomIndividual, GedcomFamily,
-    GedcomName, GedcomEvent, GedcomDate
+from lib.gedcom.models import (
+    GedcomHeader,
+    GedcomIndividual,
+    GedcomFamily,
+    GedcomName,
+    GedcomEvent,
+    GedcomDate,
 )
 
 class TestExporters(unittest.TestCase):

@@ -3,12 +3,17 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from gedcom.parsers import (
-    HeaderParser, IndividualParser, FamilyParser,
-    RepositoryParser, MultimediaParser, SubmitterParser,
-    NoteParser, SourceParser
+from lib.gedcom.parsers import (
+    HeaderParser,
+    IndividualParser,
+    FamilyParser,
+    RepositoryParser,
+    MultimediaParser,
+    SubmitterParser,
+    NoteParser,
+    SourceParser,
 )
-from gedcom.tokenizer import GedcomLine
+from lib.gedcom.tokenizer import GedcomLine
 
 class TestParsers(unittest.TestCase):
     def setUp(self):
