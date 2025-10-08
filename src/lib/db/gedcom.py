@@ -5,7 +5,6 @@ import sys
 from typing import (
     Callable,
     Generator,
-    Iterable,
     Literal,
     TextIO,
     List,
@@ -22,93 +21,6 @@ T = TypeVar("T")
 B = TypeVar("B", bound="Block")
 B2 = TypeVar("B2", bound="Block")
 
-class GedcomTag(Enum):
-    INDIVIDUAL = "INDI"
-    FAMILY = "FAM"
-    NAME = "NAME"
-    SEX = "SEX"
-    BIRTH = "BIRT"
-    DEATH = "DEAT"
-    MARRIAGE = "MARR"
-    DATE = "DATE"
-    PLACE = "PLAC"
-    NOTE = "NOTE"
-    UNKNOWN = "UNKNOWN"
-
-
-@dataclass
-class GedcomNode:
-    level: int
-    tag: GedcomTag
-    value: Optional[str] = None
-    children: List["GedcomNode"] = field(default_factory=list)
-
-
-@dataclass
-class GedcomIndividual:
-    id: str
-    name: Optional[str] = None
-    sex: Optional[str] = None
-    birth: Optional[str] = None
-    death: Optional[str] = None
-    notes: List[str] = field(default_factory=list)
-
-
-@dataclass
-class GedcomFamily:
-    id: str
-    husband: Optional[str] = None
-    wife: Optional[str] = None
-    children: List[str] = field(default_factory=list)
-    marriage: Optional[str] = None
-    notes: List[str] = field(default_factory=list)
-
-
-class HeaderTag(Enum):
-    SOURCE = "SOUR"
-    VERSION = "VERS"
-    NAME = "NAME"
-    CORPORATION = "CORP"
-    ADDRESS = "ADDR"
-    CONTACT = "CONT"
-    PHONE = "PHON"
-    DESTINATION = "DEST"
-    DATE = "DATE"
-    CHARSET = "CHAR"
-    FILE = "FILE"
-    SUBM = "SUBM"
-
-
-@dataclass
-class GEDCOM:
-    version: Optional[str] = None
-    format: Optional[str] = None
-
-
-@dataclass
-class Header(Dict[HeaderTag, Optional[str]]):
-    # source: Optional[str] = None
-    # version: Optional[str] = None
-    # name: Optional[str] = None
-    # corporation: Optional[str] = None
-    # address: Optional[str] = None
-    # contact: Optional[str] = None
-    # phone: Optional[str] = None
-    # file: Optional[str] = None
-    # encoding: Optional[str] = None
-    # submitter: Optional[str] = None
-
-    # def __setattr__(self, name: str, value: Any) -> None:
-    #     return self.__setitem__(HeaderTag[name.upper()], value)
-
-    def __setitem__(self, key: Union[HeaderTag, str], value: str | None) -> None:
-        try:
-            key = HeaderTag(key)
-            super().__setitem__(key, value)
-            return
-        except ValueError:
-            super().__setitem__(key, value)
-
 
 # usage:
 # @dataclass
@@ -119,7 +31,7 @@ def add_structure(
     cls: Type[T],
     property_name: str,
     *,
-    preproc=Callable[[Type[T], list[B2]], Any],
+    preproc=Callable[[Type[T], list["Block"]], Any],
 ) -> Callable[[Type[B]], Type[B]]:
     """Class decorator to add a property to Block that returns an instance of cls
 
@@ -279,10 +191,12 @@ def add_enum_value(tag: str, cls: Type[Enum], property_name: str):
 
     return add_structure(tag, cls, property_name, preproc=pre)
 
+    return add_structure(tag, cls, property_name, preproc=pre)
 
-def add_object_value(tag: str, cls: Type[T], property_name: str):
-    """Class decorator to add a property that returns the value of the block of type `cls`
-    found in its children that matches the `tag`.
+
+def add_single_str(tag: str, property_name: str):
+    """Class decorator to add a property that returns the string value of the block of
+    type `cls` found in its children that matches the `tag`.
 
     ### Property Returns:
         Type[B]: Value of an instance of `cls` loaded with the correct data
@@ -296,10 +210,32 @@ def add_object_value(tag: str, cls: Type[T], property_name: str):
         Type[B2]: The class
     """
 
-    def pre(cls: Type[T], block_list: list[Block]):
-        return cls(block_list[0].value).value
+    def pre(cls: StrBlock, block_list: list[Block]):
+        return str(cls.from_block(block_list[0]))
 
-    return add_structure(tag, cls, property_name, preproc=pre)
+    return add_structure(tag, StrBlock, property_name, preproc=pre)
+
+
+def add_str_list(tag: str, property_name: str):
+    """Class decorator to add a property that returns the list of string values of the
+    blocks of type `StrBlock` found in its children that matches the `tag`.
+
+    ### Property Returns:
+        Type[B]: A list of value of instances of `cls` loaded with the correct data
+
+    Args:
+        tag (str) : Tag that contains the structure
+        cls (Type[B]) : Class of the structure
+        property_name (str) : Name of the new property
+
+    Returns:
+        Type[B2]: The class
+    """
+
+    def pre(cls: StrBlock, block_list: list[Block]):
+        return [str(cls.from_block(b)) for b in block_list]
+
+    return add_structure(tag, StrBlock, property_name, preproc=pre)
 
 
 @dataclass
@@ -327,7 +263,8 @@ class Block:
 
     def add_child(self, child: "Block"):
         self.children_b.append(child)
-        self._children_idx[child.pointer or child.tag] = len(self.children_b) - 1
+        if child.pointer is not None:
+            self._children_idx[child.pointer] = len(self.children_b) - 1
         if child.tag not in self._children_tag_idx:
             self._children_tag_idx[child.tag] = []
         self._children_tag_idx[child.tag].append(len(self.children_b) - 1)
@@ -368,17 +305,25 @@ class Block:
         return iter(self.children_b)
 
     def __getitem__(self, key: str) -> List["Block"]:
-        if key in self._children_idx:
+        if Block.is_pointer(key) and key in self._children_idx:
             return [self.children_b[self._children_idx[key]]]
-        if key in self._children_tag_idx:
+        if not Block.is_pointer(key) and key in self._children_tag_idx:
             idxs = self._children_tag_idx[key]
             return [self.children_b[i] for i in idxs]
         raise KeyError(f"No child with key {key}")
 
     def __setitem__(self, key: str, val: Union["Block", list["Block"]]):
-        if key in self._children_idx and isinstance(val, Block):
+        if (
+            Block.is_pointer(key)
+            and key in self._children_idx
+            and isinstance(val, Block)
+        ):
             self.children_b[self._children_idx[key]] = val
-        if key in self._children_tag_idx and isinstance(val, (list, tuple)):
+        if (
+            not Block.is_pointer(key)
+            and key in self._children_tag_idx
+            and isinstance(val, (list, tuple))
+        ):
             idxs = self._children_tag_idx[key]
             if len(idxs) != len(val):
                 raise IndexError(
@@ -398,6 +343,10 @@ class Block:
         for child in block.children_b:
             new_block.add_child(child)
         return new_block
+
+    @staticmethod
+    def is_pointer(s: str):
+        return re.match(r"^@[\w]+@$", s) is not None
 
 
 @dataclass
@@ -419,7 +368,6 @@ class GEDNotes(StrBlock):
     pass
 
 
-@dataclass
 class GEDMultimediaLink(Block):
 
     @property
@@ -487,14 +435,15 @@ class GEDQuality(Enum):
     """Direct and primary evidence used, or by dominance of the evidence"""
 
 
+@add_single_str("PAGE", "page")
+@add_enum_value("QUAY", GEDQuality, "quality")
+@add_structure_list("OBJE", GEDMultimediaLink, "multimedia_links")
+@add_structure_list("NOTE", GEDNotes, "notes")
 class GEDSourceCitation(Block):
-
-    @property
-    def page(self) -> Optional[str]:
-        try:
-            return str(StrBlock.from_block(self["PAGE"][0]))
-        except KeyError:
-            return None
+    page: Optional[str]
+    quality: Optional[GEDQuality]
+    multimedia_links: Optional[GEDMultimediaLink]
+    notes: Optional[GEDNotes]
 
     @property
     def text(self) -> Optional[str]:
@@ -512,78 +461,25 @@ class GEDSourceCitation(Block):
         except KeyError:
             return None
 
-    @property
-    def quality(self) -> Optional[GEDQuality]:
-        try:
-            return GEDQuality(self["QUAY"][0].value)
-        except (KeyError, ValueError):
-            return None
 
-    @property
-    def multimedia_links(self) -> list[GEDMultimediaLink]:
-        try:
-            return [GEDMultimediaLink.from_block(link) for link in self["OBJE"]]
-        except KeyError:
-            return []
-
-    @property
-    def notes(self) -> list[str]:
-        try:
-            return [str(GEDNotes.from_block(note)) for note in self["NOTE"]]
-        except KeyError:
-            return []
+class GEDRepoCitation(Block): ...
 
 
-@dataclass
+@add_single_str("ADR1", "address1")
+@add_single_str("ADR2", "address2")
+@add_single_str("ADR3", "address3")
+@add_single_str("CITY", "city")
+@add_single_str("STAE", "state")
+@add_single_str("POST", "post_code")
+@add_single_str("CTRY", "country")
 class GEDAddress(Block):
-    @property
-    def address1(self) -> Optional[str]:
-        try:
-            return self["ADR1"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def address2(self) -> Optional[str]:
-        try:
-            return self["ADR2"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def address3(self) -> Optional[str]:
-        try:
-            return self["ADR3"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def city(self) -> Optional[str]:
-        try:
-            return self["CITY"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def state(self) -> Optional[str]:
-        try:
-            return self["STAE"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def post_code(self) -> Optional[str]:
-        try:
-            return self["POST"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def country(self) -> Optional[str]:
-        try:
-            return self["CTRY"][0].value
-        except KeyError:
-            return None
+    address1: Optional[str]
+    address2: Optional[str]
+    address3: Optional[str]
+    city: Optional[str]
+    state: Optional[str]
+    post_code: Optional[str]
+    country: Optional[str]
 
 
 class GEDDate(StrBlock):
@@ -611,10 +507,11 @@ class GEDDate(StrBlock):
 
     @property
     def month(self):
+        """Month (JAN=1 ... DEC=12)"""
         if self.value is None:
             return -1
         s = self.value.split()
-        return int(GEDDate.VALID_MONTHS.index(s[1]))
+        return int(GEDDate.VALID_MONTHS.index(s[1])) + 1
 
     @property
     def day(self):
@@ -633,10 +530,10 @@ class GEDDate(StrBlock):
 @add_structure_list("NOTE", GEDNotes, "notes")
 @add_structure_list("SOUR", GEDSourceCitation, "sources")
 @add_structure_list("OBJE", GEDMultimediaLink, "multimedia_links")
-@add_single_value("OBJE", StrBlock, "multimedia_links")
+@add_single_str("OBJE", "multimedia_links")
 class GEDEventDetail(Block):
     date: Optional[GEDDate]
-    place: Optional[str]
+    place: Optional[GEDPlace]
     address: Optional["GEDAddress"]
     notes: List[GEDNotes]
     sources: List[GEDSourceCitation]
@@ -644,21 +541,11 @@ class GEDEventDetail(Block):
     cause: Optional[str]
 
 
-@dataclass
+@add_single_str("AGE", "age")
+@add_single_str("TYPE", "type")
 class GEDIndiEventDetail(GEDEventDetail):
-    @property
-    def age(self) -> Optional[str]:
-        try:
-            return self["AGE"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def type(self) -> Optional[str]:
-        try:
-            return self["TYPE"][0].value
-        except KeyError:
-            return None
+    age: Optional[str]
+    type: Optional[str]
 
 
 @add_single_value("HUSB", Block, "husband_age")
@@ -668,28 +555,12 @@ class GEDFamEventDetail(GEDEventDetail):
     wife_age: Optional[Block]
 
 
-@dataclass
+@add_single_str("VERS", "version")
+@add_single_str("NAME", "name")
+@add_single_str("CORP", "corporation")
 class GEDHeaderSource(StrBlock):
-    @property
-    def version(self) -> Optional[str]:
-        try:
-            return self["VERS"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def name(self) -> Optional[str]:
-        try:
-            return self["NAME"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def corporation(self) -> Optional[str]:
-        try:
-            return self["CORP"][0].value
-        except KeyError:
-            return None
+    version: Optional[str]
+    name: Optional[str]
 
     @property
     def address(self) -> Optional[str]:
@@ -708,63 +579,27 @@ class GEDHeaderSource(StrBlock):
             return None
 
 
-@dataclass
+@add_single_str("VERS", "version")
 class GEDCOMVersion(Block):
-
-    @property
-    def version(self) -> Optional[str]:
-        try:
-            return self["VERS"][0].value
-        except KeyError:
-            return None
+    version: Optional[str]
 
 
 # @dataclass
 @add_single_structure("SOUR", GEDHeaderSource, "source")
+@add_single_str("DEST", "destination")
+@add_single_str("DATE", "date")
+@add_single_str("CHAR", "encoding")
+@add_single_str("FILE", "file")
+@add_single_structure("SUBM", Block, "submitter")
+@add_single_structure("GEDC", GEDCOMVersion, "gedcom")
 class GEDHeader(Block):
     source: Optional[GEDHeaderSource]
-
-    @property
-    def destination(self) -> Optional[str]:
-        try:
-            return self["DEST"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def date(self) -> Optional[str]:
-        try:
-            return self["DATE"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def encoding(self) -> Optional[str]:
-        try:
-            return self["CHAR"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def file(self) -> Optional[str]:
-        try:
-            return self["FILE"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def submitter(self) -> Optional[str]:
-        try:
-            return self["SUBM"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def gedcom(self) -> Optional[GEDCOMVersion]:
-        try:
-            return GEDCOMVersion.from_block(self["GEDC"][0])
-        except KeyError:
-            return None
+    destination: Optional[str]
+    date: Optional[str]
+    encoding: Optional[str]
+    file: Optional[str]
+    submitter: Optional[Block]
+    gedcom: Optional[GEDCOMVersion]
 
     def __str__(self):
         source = self.source
@@ -781,33 +616,15 @@ class GEDHeader(Block):
         return res
 
 
-@dataclass
+@add_single_str("NAME", "name")
+@add_single_structure("ADDR", GEDAddress, "address")
+@add_single_str("EMAIL", "email")
+@add_structure_list("NOTE", GEDNotes, "notes")
 class GEDSubmitter(Block):
-    @property
-    def name(self) -> str:
-        return self["NAME"][0].value
-
-    @property
-    def address(self) -> Optional[GEDAddress]:
-        try:
-            return GEDAddress.from_block(self["ADDR"][0])
-        except KeyError:
-            return None
-
-    @property
-    def email(self) -> Optional[str]:
-        try:
-            return self["EMAIL"][0].value
-        except KeyError:
-            return None
-
-    @property
-    def notes(self) -> Optional[str]:
-        try:
-            return str(GEDNotes.from_block(self["NOTE"][0]))
-        except KeyError:
-            return None
-
+    name: str
+    address: Optional[GEDAddress]
+    email: Optional[str]
+    notes: list[GEDNotes]
 
 class GEDPedigree(Enum):
     ADOPTED = enum.auto()
@@ -822,7 +639,9 @@ class GEDPedigree(Enum):
     """A value not listed here; should have a PHRASE substructure"""
 
 
+@add_structure_list("NOTE", GEDNotes, "notes")
 class GEDFamilyChild(Block):
+    notes: list[GEDNotes]
     class Status(Enum):
         CHALLENGED = enum.auto()
         """
@@ -862,17 +681,24 @@ class GEDFamilyChild(Block):
         except (KeyError, ValueError):
             return None
 
-    @property
-    def notes(self) -> Optional[str]:
-        try:
-            return str(StrBlock.from_block(self["NOTE"][0]))
-        except KeyError:
-            return None
 
-
-class GEDNameRecord(Block):
-    def __str__(self) -> str:
-        return self.value or "<None>"
+@add_single_str("NPFX", "prefix")
+@add_single_str("GIVN", "given")
+@add_single_str("NICK", "nickname")
+@add_single_str("SPFX", "surname_prefix")
+@add_single_str("SURN", "surname")
+@add_single_str("NSFX", "suffix")
+@add_structure_list("NOTE", GEDNotes, "notes")
+@add_structure_list("SOUR", GEDSourceCitation, "sources")
+class GEDNameRecord(StrBlock):
+    prefix: Optional[str]
+    given: Optional[str]
+    nickname: Optional[str]
+    surname_prefix: Optional[str]
+    surname: Optional[str]
+    suffix: Optional[str]
+    notes: list[GEDNotes]
+    sources: list[GEDSourceCitation]
 
 
 class GEDSex(Enum):
@@ -893,7 +719,7 @@ class GEDSex(Enum):
 @add_structure_list("NOTE", GEDNotes, "notes")
 @add_structure_list("SOUR", GEDSourceCitation, "sources")
 @add_structure_list("OBJE", GEDMultimediaLink, "multimedia_links")
-class GEDIndividual(Block):
+class GEDIndividualRecord(Block):
     name: list[str]
     sex: Optional[Literal["M", "F", "U", "X", "N"]]
     birth: Optional[GEDIndiEventDetail]
@@ -936,48 +762,111 @@ class GEDFamily(Block):
     marriage: Optional[GEDFamEventDetail]
 
 
-@dataclass
-class GEDSharedNotes(StrBlock):
-    pass
+@add_structure_list("SOUR", GEDSourceCitation, "sources")
+class GEDNotesRecord(StrBlock):
+    sources: list[GEDSourceCitation]
 
 
-@dataclass
-class GEDSource(Block):
-    pass
+@add_single_str("AGNC", "agency")
+@add_structure_list("NOTE", GEDNotes, "notes")
+@add_structure_list("EVEN", Block, "events")
+class GEDSourceRecordData(Block):
+    agency: Optional[str]
+    notes: list[GEDNotes]
+    events: list[Block]
 
 
-@dataclass
-class GEDRepository(Block):
-    pass
+@add_single_str("AUTH", "origin")
+@add_single_str("TITL", "title")
+@add_single_str("ABBR", "abbreviation")
+@add_single_str("PUBL", "publication_facts")
+@add_single_str("TEXT", "text")
+@add_structure_list("REPO", GEDRepoCitation, "repositories")
+class GEDSourceRecord(Block):
+    origin: Optional[str]
+    title: Optional[str]
+    abbreviation: Optional[str]
+    publication_facts: Optional[str]
+    text: Optional[str]
+    repositories: list[GEDRepoCitation]
+
+    @property
+    def data(self) -> Optional[GEDSourceRecordData]:
+        try:
+            return GEDSourceRecordData.from_block(self["DATA"][0])
+        except KeyError:
+            return None
 
 
-@dataclass
-class GEDMultimedia(Block):
-    pass
+@add_single_str("NAME", "name")
+@add_single_structure("ADDR", GEDAddress, "address")
+@add_structure_list("NOTE", GEDNotes, "notes")
+@add_str_list("PHON", "phone_number")
+@add_str_list("EMAIL", "email")
+@add_str_list("FAX", "fax")
+@add_str_list("WWW", "web_address")
+class GEDRepositoryRecord(Block):
+    name: str
+    address: Optional[GEDAddress]
+    notes: list[GEDNotes]
+    phone_number: list[str]
+    email: list[str]
+    fax: list[str]
+    web_address: list[str]
+
+
+class GEDMultimediaRecordFile(StrBlock):
+    @property
+    def form(self) -> Optional[str]:
+        try:
+            return self["FORM"][0].value
+        except KeyError:
+            return None
+
+    @property
+    def media_type(self) -> Optional[str]:
+        try:
+            form = self["FORM"][0]
+            return form["TYPE"][0].value
+        except KeyError:
+            return None
+
+    @property
+    def title(self) -> Optional[str]:
+        try:
+            form = self["FORM"][0]
+            return str(StrBlock.from_block(form["TITL"][0]))
+        except KeyError:
+            return None
+
+
+@add_structure_list("NOTE", GEDNotes, "notes")
+@add_structure_list("SOUR", GEDSourceCitation, "sources")
+class GEDMultimediaRecord(Block):
+    notes: list[GEDNotes]
+    sources: list[GEDSourceCitation]
+
+    @property
+    def file(self) -> Optional[GEDMultimediaRecordFile]:
+        try:
+            return GEDMultimediaRecordFile.from_block(self["FILE"][0])
+        except KeyError:
+            return None
 
 
 @dataclass
 class GedcomData:
     header: GEDHeader = field(default_factory=lambda: GEDHeader(0, "HEAD"))
     submitter: GEDSubmitter = field(default_factory=lambda: GEDSubmitter(0, "SUBM"))
-    individuals: Dict[str, GEDIndividual] = field(default_factory=dict)  # indi
+    individuals: Dict[str, GEDIndividualRecord] = field(default_factory=dict)  # indi
     families: Dict[str, GEDFamily] = field(default_factory=dict)  # fam
-    notes: Dict[str, GEDNotes] = field(default_factory=dict)  # note
-    sources: Dict[str, GEDSource] = field(default_factory=dict)  # sour
-    repository: Optional[GEDRepository] = None  # repo
-    multimedia: Dict[str, GEDMultimediaLink] = field(default_factory=dict)  # obje
-
-
-class InvalidDepth(RuntimeError): ...
+    notes: Dict[str, GEDNotesRecord] = field(default_factory=dict)  # note
+    sources: Dict[str, GEDSourceRecord] = field(default_factory=dict)  # sour
+    repository: Optional[GEDRepositoryRecord] = None  # repo
+    multimedia: Dict[str, GEDMultimediaRecord] = field(default_factory=dict)  # obje
 
 
 class GedcomParser:
-    def __init__(self):
-        self.individuals: Dict[str, GedcomIndividual] = {}
-        self.families: Dict[str, GedcomFamily] = {}
-        self.header: Header = Header()
-        self.nodes: List[GedcomNode] = []
-
     @staticmethod
     def read_line(
         io: TextIO,
@@ -1000,38 +889,30 @@ class GedcomParser:
             # res[block.pointer or block.tag] = block
             match block.tag:
                 case "HEAD":
-                    res.header = GedcomParser.specialize_block(block)
+                    res.header = GEDHeader.from_block(block)
                 case "SUBM":
-                    res.submitter = GedcomParser.specialize_block(block)
+                    res.submitter = GEDSubmitter.from_block(block)
                 case "INDI":
                     if block.pointer:
-                        res.individuals[block.pointer] = GedcomParser.specialize_block(
+                        res.individuals[block.pointer] = GEDIndividualRecord.from_block(
                             block
                         )
                 case "FAM":
                     if block.pointer:
-                        res.families[block.pointer] = GedcomParser.specialize_block(
-                            block
-                        )
+                        res.families[block.pointer] = GEDFamily.from_block(block)
                 case "NOTE":
                     if block.pointer:
-                        res.notes[block.pointer] = GEDSharedNotes.from_block(block)
+                        res.notes[block.pointer] = GEDNotesRecord.from_block(block)
                 case "SOUR":
                     if block.pointer:
-                        res.sources[block.pointer] = GedcomParser.specialize_block(
-                            block
-                        )
+                        res.sources[block.pointer] = GEDSourceRecord.from_block(block)
                 case "REPO":
-                    res.repository = GedcomParser.specialize_block(block)
+                    res.repository = GEDRepositoryRecord.from_block(block)
                 case "OBJE":
-                    print(f"Multimedia: {block.pointer}", file=sys.stderr)
                     if block.pointer:
-                        res.multimedia[block.pointer] = GedcomParser.specialize_block(
+                        res.multimedia[block.pointer] = GEDMultimediaRecord.from_block(
                             block
                         )
-                case "FAMS" | "FAMC" | "_PHOTO":
-                    # ignore these, they are inside individuals
-                    pass
                 case "TRLR":
                     break
                 case _:
@@ -1080,15 +961,15 @@ class GedcomParser:
             case "NOTE":
                 return GEDNotes.from_block(block)
             case "INDI":
-                return GEDIndividual.from_block(block)
+                return GEDIndividualRecord.from_block(block)
             case "FAM":
                 return GEDFamily.from_block(block)
             case "SOUR":
-                return GEDSource.from_block(block)
+                return GEDSourceRecord.from_block(block)
             case "REPO":
-                return GEDRepository.from_block(block)
+                return GEDRepositoryRecord.from_block(block)
             case "OBJE":
-                return GEDMultimedia.from_block(block)
+                return GEDMultimediaLink.from_block(block)
             case _:
                 return block
 
