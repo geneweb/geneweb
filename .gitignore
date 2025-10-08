@@ -286,8 +286,13 @@ src/TESTS.md
 
 # macos file
 *.DS_Store
-*.lck
 
 # python cache
 .pytest_cache
 __pycache__
+
+# pyright
+.pyrightconfig.json
+.vscode/
+.vscode/
+
