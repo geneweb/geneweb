@@ -146,6 +146,9 @@ let speclist =
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
     ("-stats", Arg.Set Db1link.pr_stats, " Print statistics");
     ("-v", Arg.Set Gwcomp.verbose, " Verbose");
+    ( "-roglo_special",
+      Arg.Set Gwcomp.roglo_special,
+      " Special treatment for Roglo (ignore multiple relations definitions)" );
   ]
   |> List.sort compare |> Arg.align
 
@@ -167,14 +170,16 @@ let errmsg =
    and [options] are:"
 
 let main () =
-  (try
-     if Sys.is_directory !Gwcomp.rgpd_dir then Gwcomp.rgpd := true
-     else Gwcomp.rgpd := false
-   with Sys_error _ ->
-     Printf.eprintf "Warning: failed testing for %s\n" !Gwcomp.rgpd_dir;
-     Gwcomp.rgpd := false);
+  let start_time = Unix.gettimeofday () in
   Arg.parse speclist anonfun errmsg;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  if Array.mem "-rgpd" Sys.argv then (
+    if
+      not (Sys.file_exists !Gwcomp.rgpd_dir && Sys.is_directory !Gwcomp.rgpd_dir)
+    then (
+      Printf.eprintf "Error: RGPD directory not found\n";
+      exit 2);
+    Gwcomp.rgpd := true);
   in_file :=
     if !in_file <> "" then
       Filename.remove_extension (Filename.basename !in_file)
@@ -201,6 +206,12 @@ let main () =
   if !Gwcomp.rgpd then
     Printf.eprintf "Rgpd status: True, files in: %s\n" !Gwcomp.rgpd_dir
   else Printf.eprintf "Rgpd status: False\n";
+  let print_duration time_elapsed =
+    flush stderr; flush stdout;
+    Printf.printf "Duration: %d min %d sec\n"
+      (int_of_float (time_elapsed /. 60.0))
+      (int_of_float time_elapsed mod 60)
+  in
   let gwo = ref [] in
   List.iter
     (fun (x, separate, bnotes, shift) ->
@@ -214,7 +225,9 @@ let main () =
         gwo := (x, separate, bnotes, shift) :: !gwo
       else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
-  if not !just_comp then (
+  let time_elapsed = Unix.gettimeofday () -. start_time in
+  print_duration time_elapsed;
+  if not !just_comp then
     let bdir = !Geneweb.GWPARAM.bpath bname in
     (* test_base will fail if base exists and force has not been set (-f) *)
     Geneweb.GWPARAM.test_base bname;
@@ -224,6 +237,7 @@ let main () =
       Format.eprintf "%a@." Lock.pp_exception (exn, bt);
       exit 2
     in
+
     Lock.control ~on_exn ~wait:false ~lock_file (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
         if Db1link.link next_family_fun bdir then (
@@ -232,10 +246,13 @@ let main () =
             List.iter
               (fun (x, _separate, _bnotes, _shift) ->
                 if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
-              (List.rev !files))
+              (List.rev !files);
+          let time_elapsed = Unix.gettimeofday () -. start_time in
+          print_duration time_elapsed)
         else (
           Printf.eprintf "*** database not created\n";
-          flush stderr;
-          exit 2)))
+          let time_elapsed = Unix.gettimeofday () -. start_time in
+          print_duration time_elapsed;
+          exit 2))
 
 let _ = main ()
