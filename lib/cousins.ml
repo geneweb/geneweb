@@ -39,6 +39,21 @@ type cousins_sparse = {
 let empty_sparse =
   { data = CoordMap.empty; dates = CoordMap.empty; max_i = 0; max_j = 0 }
 
+let extract_level sparse level =
+  let data = CoordMap.filter (fun (i, _) _ -> i = level) sparse.data in
+  let dates = CoordMap.filter (fun (i, _) _ -> i = level) sparse.dates in
+  let max_j = CoordMap.fold (fun (_, j) _ acc -> max j acc) data 0 in
+  { data; dates; max_i = level; max_j }
+
+let merge_sparse s1 s2 =
+  let data = CoordMap.union (fun _ _ v2 -> Some v2) s1.data s2.data in
+  let dates = CoordMap.union (fun _ _ v2 -> Some v2) s1.dates s2.dates in
+  let max_i = max s1.max_i s2.max_i in
+  let max_j = max s1.max_j s2.max_j in
+  { data; dates; max_i; max_j }
+
+let merge_sparse_list = List.fold_left merge_sparse empty_sparse
+
 let get_cell sparse i j =
   CoordMap.find_opt (i, j) sparse.data |> Option.value ~default:[]
 
@@ -294,35 +309,7 @@ let init_cousins_cnt conf base p =
     | Some v -> int_of_string v
     | None -> max_a_l
   in
-  let rec loop0 j sparse =
-    let liste = descendants base sparse 0 j in
-    if liste = [] then sparse
-    else
-      let dates = get_min_max_dates base liste in
-      loop0 (j + 1) (set_cell sparse 0 j liste dates)
-  in
-  let rec loop1 i sparse =
-    if i > max_a_l then sparse
-    else
-      let cell = get_cell sparse (i - 1) 0 in
-      if cell = [] then sparse
-      else
-        let liste = ascendants base [] cell in
-        if liste = [] then sparse
-        else
-          let dates = get_min_max_dates base liste in
-          let sparse = set_cell sparse i 0 liste dates in
-          loop2 i 1 sparse
-  and loop2 i j sparse =
-    let cell_prev = get_cell sparse i (j - 1) in
-    if cell_prev = [] then loop1 (i + 1) sparse
-    else
-      let liste = descendants base sparse i j in
-      let dates = get_min_max_dates base liste in
-      let sparse = set_cell sparse i j liste dates in
-      if liste = [] then loop1 (i + 1) sparse else loop2 i (j + 1) sparse
-  in
-  let build_tables key =
+  let build_level_0 () =
     let () = Driver.load_ascends_array base in
     let () = Driver.load_couples_array base in
     let initial_list =
@@ -330,51 +317,106 @@ let init_cousins_cnt conf base p =
     in
     let initial_dates = get_min_max_dates base initial_list in
     let sparse = set_cell empty_sparse 0 0 initial_list initial_dates in
-    let sparse = loop0 1 sparse in
-    let sparse = loop1 1 sparse in
-    (key, max_a_l, sparse)
+    let rec loop0 j s =
+      let liste = descendants base s 0 j in
+      if liste = [] then s
+      else
+        let dates = get_min_max_dates base liste in
+        loop0 (j + 1) (set_cell s 0 j liste dates)
+    in
+    loop0 1 sparse
+  in
+
+  let build_level_i cumul_sparse i =
+    let rec loop2 j s =
+      let cell_prev = get_cell s i (j - 1) in
+      if cell_prev = [] then s
+      else
+        let liste = descendants base s i j in
+        let dates = get_min_max_dates base liste in
+        let s = set_cell s i j liste dates in
+        if liste = [] then s else loop2 (j + 1) s
+    in
+    let cell = get_cell cumul_sparse (i - 1) 0 in
+    if cell = [] then cumul_sparse
+    else
+      let liste = ascendants base [] cell in
+      if liste = [] then cumul_sparse
+      else
+        let dates = get_min_max_dates base liste in
+        let s = set_cell cumul_sparse i 0 liste dates in
+        loop2 1 s
   in
   let fn = Name.strip_lower @@ Driver.sou base @@ Driver.get_surname p in
   let sn = Name.strip_lower @@ Driver.sou base @@ Driver.get_first_name p in
   let occ = Driver.get_occ p in
   let key = Format.sprintf "%s.%d.%s" fn occ sn in
-  match !cousins_t with
-  | Some sparse -> sparse
-  | None ->
-      let sparse =
-        let cous_cache_fname =
-          Filename.concat (!GWPARAM.bpath conf.bname) "cousins_cache"
-        in
-        match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
-        | Some "yes" ->
-            flush stderr;
-            let cached_key, cached_max_a_l, cached_sparse =
-              Mutil.read_or_create_value cous_cache_fname (fun () ->
-                  build_tables key)
+  let cache_dir =
+    Filename.concat
+      (Filename.concat (!GWPARAM.bpath conf.bname) "caches")
+      "cousins_levels"
+  in
+
+  let sparse =
+    match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
+    | Some "yes" ->
+        flush stderr;
+        if not (Sys.file_exists cache_dir) then Unix.mkdir cache_dir 0o755;
+
+        let rec load_levels acc level =
+          if level > max_a_l then merge_sparse_list (List.rev acc)
+          else
+            let cache_file =
+              Filename.concat cache_dir (Printf.sprintf "%s_level_%d" key level)
             in
-            if cached_key = key && max_a_l <= cached_max_a_l then cached_sparse
-            else if cached_key = key then (
-              let sparse = loop1 (cached_max_a_l + 1) cached_sparse in
-              Sys.remove cous_cache_fname;
-              ignore
-                (Mutil.read_or_create_value cous_cache_fname (fun () ->
-                     (key, max_a_l, sparse)));
-              sparse)
-            else (
-              Sys.remove cous_cache_fname;
-              let _, _, sparse =
-                Mutil.read_or_create_value cous_cache_fname (fun () ->
-                    build_tables key)
-              in
-              sparse)
-        | _ ->
-            flush stderr;
-            let _, _, sparse = build_tables key in
-            sparse
-      in
-      cousins_t := Some sparse;
-      flush stderr;
-      sparse
+            let level_sparse =
+              try
+                let cached_key, cached_lev, partial =
+                  Mutil.read_or_create_value cache_file (fun () ->
+                      let cumul = merge_sparse_list (List.rev acc) in
+                      let full =
+                        if level = 0 then build_level_0 ()
+                        else build_level_i cumul level
+                      in
+                      let partial = extract_level full level in
+                      (key, level, partial))
+                in
+                if cached_key = key && cached_lev = level then partial
+                else (
+                  Sys.remove cache_file;
+                  let cumul = merge_sparse_list (List.rev acc) in
+                  let full =
+                    if level = 0 then build_level_0 ()
+                    else build_level_i cumul level
+                  in
+                  let partial = extract_level full level in
+                  ignore
+                    (Mutil.read_or_create_value cache_file (fun () ->
+                         (key, level, partial)));
+                  partial)
+              with _ ->
+                if Sys.file_exists cache_file then Sys.remove cache_file;
+                let cumul = merge_sparse_list (List.rev acc) in
+                let full =
+                  if level = 0 then build_level_0 ()
+                  else build_level_i cumul level
+                in
+                extract_level full level
+            in
+            load_levels (level_sparse :: acc) (level + 1)
+        in
+        load_levels [] 0
+    | _ ->
+        flush stderr;
+        let rec build_all i s =
+          if i > max_a_l then s else build_all (i + 1) (build_level_i s i)
+        in
+        build_all 1 (build_level_0 ())
+  in
+
+  cousins_t := Some sparse;
+  flush stderr;
+  sparse
 
 (* for cousins_dates.(l1).(l2) determine min or max date *)
 let min_max_date conf base p min_max l1 l2 =
