@@ -302,6 +302,21 @@ let descendants base sparse i j =
   let liste2 = if i > 0 then get_cell sparse (i - 1) (j - 1) else [] in
   descendants_aux base liste1 liste2
 
+let cleanup_old_cache_files cache_dir ttl_hours =
+  if Sys.file_exists cache_dir then
+    let now = Unix.time () in
+    let ttl_seconds = float_of_int (ttl_hours * 3600) in
+    let files = Sys.readdir cache_dir in
+    Array.iter
+      (fun filename ->
+        let filepath = Filename.concat cache_dir filename in
+        try
+          let stat = Unix.stat filepath in
+          let age = now -. stat.Unix.st_mtime in
+          if age > ttl_seconds then Sys.remove filepath
+        with _ -> ())
+      files
+
 let init_cousins_cnt conf base p =
   let max_a_l = max_ancestor_level conf base (Driver.get_iper p) mal in
   let max_a_l =
@@ -361,7 +376,14 @@ let init_cousins_cnt conf base p =
     match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
     | Some "yes" ->
         flush stderr;
-        if not (Sys.file_exists cache_dir) then Unix.mkdir cache_dir 0o755;
+        Filesystem.create_dir ~parent:true cache_dir;
+
+        let ttl_hours =
+          match List.assoc_opt "cache_cousins_ttl" conf.Config.base_env with
+          | Some s -> ( try int_of_string s with _ -> 1)
+          | None -> 1
+        in
+        if ttl_hours > 0 then cleanup_old_cache_files cache_dir ttl_hours;
 
         let rec load_levels acc level =
           if level > max_a_l then merge_sparse_list (List.rev acc)

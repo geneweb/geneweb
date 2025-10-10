@@ -230,6 +230,13 @@
 # Usefull when self has a lot of relationships.
 #cache_cousins_tool=yes
 
+# Cache configuration for cousins relationship tool (m=C)
+# Enable/disable cache for cousins computation
+cache_cousins_tool=yes
+# Cache time-to-live in hours (files older than this are auto-deleted)
+# Default: 1 hour. Set to 0 to disable auto-cleanup (permanent cache)
+cache_cousins_ttl=1
+
 # Number of latest events (birth, death) displayed in statistics.
 #latest_event=20
 
