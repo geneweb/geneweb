@@ -76,6 +76,7 @@ val init_cousins_cnt :
     (possibly multiple levels due to implex), along with date ranges *)
 
 val min_max_date :
+  cousins_sparse ->
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
@@ -86,11 +87,16 @@ val min_max_date :
 (** for cousins_dates.(l1).(l2) determine min or max date *)
 
 val max_l1_l2 :
-  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> int * int
+  cousins_sparse ->
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  int * int
 (** determine non empty max ancestor level (l1) and non empty max descendant
     level *)
 
 val cousins_l1_l2_aux :
+  cousins_sparse ->
   config ->
   Geneweb_db.Driver.base ->
   string ->
@@ -106,6 +112,7 @@ val cousins_l1_l2_aux :
   option
 
 val cousins_implex_cnt :
+  cousins_sparse ->
   config ->
   Geneweb_db.Driver.base ->
   string ->

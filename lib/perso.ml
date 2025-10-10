@@ -12,6 +12,16 @@ module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module IperSet = Driver.Iper.Set
 
+let get_cousins_sparse =
+  let cache = ref None in
+  fun conf base p ->
+    match !cache with
+    | Some (cached_ip, sparse) when cached_ip = Driver.get_iper p -> sparse
+    | _ ->
+        let sparse = Cousins.init_cousins_cnt conf base p in
+        cache := Some (Driver.get_iper p, sparse);
+        sparse
+
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
@@ -2847,26 +2857,31 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
   | [ "cous_paths_min_date"; l1; l2 ] -> (
-      match Cousins.min_max_date conf base p true l1 l2 with
+      let sparse = get_cousins_sparse conf base p in
+      match Cousins.min_max_date sparse conf base p true l1 l2 with
       | Some min -> VVstring (string_of_int min)
       | None -> raise Not_found)
   | [ "cous_paths_max_date"; l1; l2 ] -> (
-      match Cousins.min_max_date conf base p false l1 l2 with
+      let sparse = get_cousins_sparse conf base p in
+      match Cousins.min_max_date sparse conf base p false l1 l2 with
       | Some max -> VVstring (string_of_int max)
       | None -> raise Not_found)
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l -> VVstring (string_of_int (List.length l))
       | None -> VVstring "-1")
   | [ "cous_paths_cnt"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l ->
           VVstring (string_of_int (List.length (Cousins.cousins_fold l)))
       | None -> VVstring "-1")
   | [ "cous_paths"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l -> (
           match get_env "cousins" env with
@@ -2878,17 +2893,21 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
   | [ "cous_implx_cnt"; l1; l2 ] -> (
       match p_getenv conf.env "c_implex" with
       | Some "on" | Some "1" ->
-          let cnt = Cousins.cousins_implex_cnt conf base l1 l2 p in
+          let sparse = get_cousins_sparse conf base p in
+          let cnt = Cousins.cousins_implex_cnt sparse conf base l1 l2 p in
           VVstring (string_of_int cnt)
       | _ -> VVstring "")
   | [ "cousins"; "max_a" ] ->
-      let max_a, _ = Cousins.max_l1_l2 conf base p in
+      let sparse = get_cousins_sparse conf base p in
+      let max_a, _ = Cousins.max_l1_l2 sparse conf base p in
       VVstring (string_of_int max_a)
   | [ "cousins"; "max_d" ] ->
-      let _, max_d = Cousins.max_l1_l2 conf base p in
+      let sparse = get_cousins_sparse conf base p in
+      let _, max_d = Cousins.max_l1_l2 sparse conf base p in
       VVstring (string_of_int max_d)
   | [ "cousins_cnt"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l ->
           let l =
@@ -5009,9 +5028,10 @@ let print_foreach conf base print_ast eval_expr =
       (level, l1, l2)
     in
     let level, l1, l2 = get_level_info conf env el ep in
+    let sparse = get_cousins_sparse conf base p in
     let l =
-      Cousins.cousins_l1_l2_aux conf base (string_of_int l1) (string_of_int l2)
-        p
+      Cousins.cousins_l1_l2_aux sparse conf base (string_of_int l1)
+        (string_of_int l2) p
     in
     match l with
     | Some l ->
