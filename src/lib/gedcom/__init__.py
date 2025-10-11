@@ -9,7 +9,7 @@ A complete, production-ready GEDCOM parser following clean code principles:
 - Full GEDCOM 5.5.1 compliance
 
 Usage:
-    from gedcom import create_parser
+    from lib.gedcom import create_parser
 
     parser = create_parser()
     database = parser.parse_file(Path("family.ged"))

@@ -80,7 +80,8 @@ class IndividualParser(RecordParser):
                 elif line.tag == 'SOUR':
                     source_xref = line.value.strip('@')
                     individual.sources.append(source_xref)
-                    from gedcom.models import GedcomSourceCitation
+                    from lib.gedcom.models import GedcomSourceCitation
+
                     citation = GedcomSourceCitation(xref=source_xref, sour_level=line.level)
                     scan_index = current_index + 1
                     while scan_index < len(lines):
@@ -140,7 +141,8 @@ class IndividualParser(RecordParser):
                     # SOUR at individual level
                     source_xref = line.value.strip('@')
                     individual.sources.append(source_xref)
-                    from gedcom.models import GedcomSourceCitation
+                    from lib.gedcom.models import GedcomSourceCitation
+
                     citation = GedcomSourceCitation(xref=source_xref, sour_level=line.level)
                     scan_index = current_index + 1
                     while scan_index < len(lines):
@@ -174,7 +176,8 @@ class IndividualParser(RecordParser):
                             current_event.place.longitude = line.value
                     elif line.tag == 'MAP':
                         if current_event.place.map is None:
-                            from gedcom.models import GedcomMap
+                            from lib.gedcom.models import GedcomMap
+
                             current_event.place.map = GedcomMap()
                 elif current_event and current_event.place and current_event.place.map and line.tag in ['LATI', 'LONG']:
                     if line.tag == 'LATI':
@@ -184,7 +187,8 @@ class IndividualParser(RecordParser):
                 elif line.tag == 'SOUR':
                     source_xref = line.value.strip('@')
                     individual.sources.append(source_xref)
-                    from gedcom.models import GedcomSourceCitation
+                    from lib.gedcom.models import GedcomSourceCitation
+
                     citation = GedcomSourceCitation(xref=source_xref, sour_level=line.level)
                     scan_index = current_index + 1
                     while scan_index < len(lines):
@@ -214,7 +218,8 @@ class IndividualParser(RecordParser):
                 elif line.tag == 'SOUR':
                     source_xref = line.value.strip('@')
                     individual.sources.append(source_xref)
-                    from gedcom.models import GedcomSourceCitation
+                    from lib.gedcom.models import GedcomSourceCitation
+
                     citation = GedcomSourceCitation(xref=source_xref, sour_level=line.level)
                     scan_index = current_index + 1
                     while scan_index < len(lines):
@@ -379,7 +384,8 @@ class IndividualParser(RecordParser):
             event.place.longitude = line.value
         elif line.tag == 'MAP' and event.place:
             if event.place.map is None:
-                from gedcom.models import GedcomMap
+                from lib.gedcom.models import GedcomMap
+
                 event.place.map = GedcomMap()
         elif line.tag == 'AGE':
             event.age = line.value
@@ -565,8 +571,8 @@ class IndividualParser(RecordParser):
             place.longitude = line.value
         elif line.tag == 'MAP':
             if place.map is None:
-                from gedcom.models import GedcomMap
+                from lib.gedcom.models import GedcomMap
+
                 place.map = GedcomMap()
             # MAP can have LATI and LONG sub-tags
             # This will be handled by the next level parsing
-
