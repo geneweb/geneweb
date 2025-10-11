@@ -695,18 +695,22 @@ p {
 
 /* Relation menu table */
 #quickrel.table td{
-	padding: 0px;
-	line-height:1em;
-	}
+  padding: 0px;
+  line-height:1em;
+}
 
 .tooltip-inner {
    min-width: 100px;
-   max-width: 450px;
+   max-width: 550px;
    white-space: normal;
    opacity: 1 !important;
-   padding: 6px 10px;
-   line-height: 1.2;
+   padding: 10px 14px;
+   line-height: 1.5;
+   background-color: #faf8f3;
+   color: #2c2c2c;
+   border: 1px solid #d4c5b0;
 }
+
 
 .tooltip.show {
   opacity: 1;
@@ -2317,7 +2321,7 @@ span.notesourcecolor {
   width:1.5em;
   text-align:right;
 }
-.tooltip-inner {
+#rm-table .tooltip-inner {
   background-color: white !important;
   color: black !important;
   border: 1px solid #ddd !important;
