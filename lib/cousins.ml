@@ -1,5 +1,3 @@
-(* Copyright (c) 1998-2007 INRIA *)
-
 open Def
 open Util
 module Logs = Geneweb_logs.Logs
@@ -19,8 +17,6 @@ module CoordMap = Map.Make (struct
   let compare = compare
 end)
 
-(* le cousin, liste des familles entre lui et l'ancêtre, l'ancêtre, level *)
-(* TODO see if level is the same as List.length ifam list *)
 type one_cousin =
   Geneweb_db.Driver.iper
   * Geneweb_db.Driver.ifam list
@@ -146,8 +142,6 @@ let sibling_has_desc_lev conf base lev (ip, _) =
 let cousins_table = Array.make_matrix 1 1 []
 let tm = Unix.localtime (Unix.time ())
 let today_year = tm.Unix.tm_year + 1900
-let mal = 12
-let mdl = 12
 
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
@@ -155,29 +149,26 @@ let update_min_max (min, max) date =
 (* find the max ancestor level for some individual *)
 (* if max_anc_level in .gwf has no value, use supplied parameter *)
 let max_ancestor_level conf base ip max_lvl =
-  let max_lvl =
-    match List.assoc_opt "max_anc_level" conf.Config.base_env with
-    | Some v when v <> "" -> int_of_string v
-    | _ -> max_lvl
+  let limit =
+    if max_lvl > 0 then max_lvl
+    else
+      match List.assoc_opt "max_anc_level" conf.Config.base_env with
+      | Some v when v <> "" -> int_of_string v
+      | _ -> 12
   in
   let x = ref 0 in
-  let mark =
-    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
-  in
+  let mark = Driver.iper_marker (Driver.ipers base) false in
   let rec loop level ip =
-    (* Ne traite pas l'index s'il a déjà été traité. *)
-    (* Pose surement probleme pour des implexes. *)
-    if not @@ Collection.Marker.get mark ip then (
-      (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
+    if level >= limit then ()
+    else if not (Collection.Marker.get mark ip) then (
       Collection.Marker.set mark ip true;
       x := max !x level;
-      if !x <> max_lvl then
-        match Driver.get_parents (pget conf base ip) with
-        | Some ifam ->
-            let cpl = Driver.foi base ifam in
-            loop (succ level) (Driver.get_father cpl);
-            loop (succ level) (Driver.get_mother cpl)
-        | _ -> x := max !x level)
+      match Driver.get_parents (pget conf base ip) with
+      | Some ifam ->
+          let cpl = Driver.foi base ifam in
+          loop (succ level) (Driver.get_father cpl);
+          loop (succ level) (Driver.get_mother cpl)
+      | _ -> ())
   in
   loop 0 ip;
   !x
@@ -185,31 +176,30 @@ let max_ancestor_level conf base ip max_lvl =
 (* find the max descendant level for some individual *)
 (* if max_desc_level in .gwf has no value, use supplied parameter *)
 let max_descendant_level conf base ip max_lvl =
-  let max_lvl =
-    match List.assoc_opt "max_desc_level" conf.Config.base_env with
-    | Some v when v <> "" -> int_of_string v
-    | _ -> max_lvl
+  let limit =
+    if max_lvl > 0 then max_lvl
+    else
+      match List.assoc_opt "max_desc_level" conf.Config.base_env with
+      | Some v when v <> "" -> int_of_string v
+      | _ -> 16
   in
   let childs_of_ip ip =
     let faml = Array.to_list (Driver.get_family (Driver.poi base ip)) in
-    (* accumuler tous les enfants de ip *)
-    let rec loop2 acc faml =
-      match faml with
-      | [] -> acc
-      | ifam :: faml ->
-          let children =
-            Array.to_list (Driver.get_children (Driver.foi base ifam))
-          in
-          loop2 (children @ acc) faml
-    in
-    loop2 [] faml
+    List.fold_left
+      (fun acc ifam ->
+        Array.to_list (Driver.get_children (Driver.foi base ifam)) @ acc)
+      [] faml
   in
-  let rec loop0 acc l lev =
-    match l with
-    | [] -> if lev < max_lvl then loop0 [] acc (lev + 1) else lev
-    | ip :: l -> loop0 (childs_of_ip ip @ acc) l lev
+  let rec loop0 current_level lev =
+    if current_level = [] then lev
+    else if lev >= limit then limit
+    else
+      let next_level =
+        List.fold_left (fun acc ip -> childs_of_ip ip @ acc) [] current_level
+      in
+      if next_level = [] then lev else loop0 next_level (lev + 1)
   in
-  loop0 [] [ ip ] 0
+  loop0 [ ip ] 0
 
 let get_min_max_dates base l =
   let rec loop (min, max) = function
@@ -322,11 +312,14 @@ let cleanup_old_cache_files cache_dir ttl_hours =
       files
 
 let init_cousins_cnt conf base p =
-  let max_a_l = max_ancestor_level conf base (Driver.get_iper p) mal in
-  let max_a_l =
+  let v_param =
     match p_getenv conf.Config.env "v" with
-    | Some v -> int_of_string v
-    | None -> max_a_l
+    | Some v -> ( try int_of_string v with _ -> 0)
+    | None -> 0
+  in
+  let max_a_l =
+    max_ancestor_level conf base (Driver.get_iper p)
+      (if v_param > 0 then v_param + 1 else 0)
   in
   let build_level_0 () =
     let () = Driver.load_ascends_array base in
@@ -514,7 +507,7 @@ let cousins_implex_cnt sparse _conf _base l1 l2 _p =
 
 (* tableau des ascendants de p *)
 let init_asc_cnt conf base p =
-  let max_a_l = max_ancestor_level conf base (Driver.get_iper p) mal in
+  let max_a_l = max_ancestor_level conf base (Driver.get_iper p) 0 in
   let asc_cnt = Array.make (max_a_l + 2) [] in
   asc_cnt.(0) <-
     [ (Driver.get_iper p, [ Driver.Ifam.dummy ], Driver.Iper.dummy, 0) ];
@@ -525,7 +518,7 @@ let init_asc_cnt conf base p =
 
 (* tableau des ascendants de p *)
 let init_desc_cnt conf base p =
-  let max_d_l = max_descendant_level conf base (Driver.get_iper p) mdl in
+  let max_d_l = max_descendant_level conf base (Driver.get_iper p) 0 in
   let desc_cnt = Array.make (max_d_l + 2) [] in
   desc_cnt.(0) <-
     [ (Driver.get_iper p, [ Driver.Ifam.dummy ], Driver.Iper.dummy, 0) ];
@@ -570,5 +563,3 @@ let desc_cnt_aux conf base lev at_to p =
         loop (i + 1))
     in
     loop 0
-
-(* end cousins *)

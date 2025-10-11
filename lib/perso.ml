@@ -5545,9 +5545,7 @@ let eval_predefined_apply conf env f vl =
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = (p, authorized_age conf base p) in
-  let emal =
-    match p_getint conf.env "v" with Some i -> i | None -> Cousins.mal
-  in
+  let emal = match p_getint conf.env "v" with Some i -> i | None -> 0 in
   let env =
     let sosa_ref = Util.find_sosa_ref conf base in
     if sosa_ref <> None then SosaCache.build_sosa_ht conf base;
@@ -5556,41 +5554,57 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       | Some p -> SosaCache.init_sosa_t conf base p
       | None -> None
     in
+    let computed_mal = ref None in
+    let get_mal () =
+      match !computed_mal with
+      | Some v -> v
+      | None ->
+          let v = Cousins.max_ancestor_level conf base (Driver.get_iper p) 0 in
+          computed_mal := Some v;
+          v
+    in
+    let computed_mdl = ref None in
+    let get_mdl () =
+      match !computed_mdl with
+      | Some v -> v
+      | None ->
+          let v =
+            Cousins.max_descendant_level conf base (Driver.get_iper p) 0
+          in
+          computed_mdl := Some v;
+          v
+    in
     let desc_level_table_l =
-      let dlt () = make_desc_level_table conf base emal p in
+      let dlt () =
+        let limit = if emal > 0 then emal else get_mdl () in
+        make_desc_level_table conf base limit p
+      in
       Lazy.from_fun dlt
     in
     let desc_level_table_m =
-      let dlt () = make_desc_level_table conf base Cousins.mdl p in
+      let dlt () = make_desc_level_table conf base (get_mdl ()) p in
       Lazy.from_fun dlt
     in
     let desc_level_table_l_save =
-      let dlt () = make_desc_level_table conf base emal p in
+      let dlt () =
+        let limit = if emal > 0 then emal else get_mdl () in
+        make_desc_level_table conf base limit p
+      in
       Lazy.from_fun dlt
     in
-    let mal () =
-      Vint (Cousins.max_ancestor_level conf base (Driver.get_iper p) (emal + 1))
-    in
-    (* Static max ancestor level *)
+    let mal () = Vint (get_mal ()) in
     let smal () =
-      Vint
-        (Cousins.max_ancestor_level conf base (Driver.get_iper p) Cousins.mal)
+      Vint (Cousins.max_ancestor_level conf base (Driver.get_iper p) 0)
     in
-    (* Sosa_ref max ancestor level *)
     let srmal () =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
           Vint
-            (Cousins.max_ancestor_level conf base (Driver.get_iper sosa_ref)
-               Cousins.mal)
+            (Cousins.max_ancestor_level conf base (Driver.get_iper sosa_ref) 0)
       | None -> Vint 0
     in
     let mcl () = Vint (Cousins.max_cousin_level conf) in
-    (* Récupère le nombre maximal de niveaux de descendance en prenant en
-       compte les liens inter-arbres (limité à 10 générations car
-       problématique en terme de perf). *)
     let mdl () = Vint (max_descendant_level base desc_level_table_l) in
-    (* Static max descendant level *)
     let smdl () = Vint (max_descendant_level base desc_level_table_m) in
     let nldb () =
       let db = Driver.read_nldb base in
