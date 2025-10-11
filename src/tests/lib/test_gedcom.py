@@ -1,4 +1,4 @@
-import lib.db.gedcom as gedcom
+import lib.old_db.gedcom as gedcom
 import pytest
 import os
 

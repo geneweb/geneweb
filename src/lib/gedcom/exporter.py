@@ -10,5 +10,4 @@ This module provides a complete GEDCOM 5.5.1 exporter following clean code princ
 
 from .exporters import GedcomExporter, create_exporter
 
-# Re-export main classes for backward compatibility
 __all__ = ['GedcomExporter', 'create_exporter']

@@ -3,9 +3,9 @@
 
 import os
 
-from lib.db.unmarshall.v2 import dbdisk
-from lib.db.v2 import mutil, defs
-import lib.db.v2.database as db
+from lib.old_db.unmarshall.v2 import dbdisk
+from lib.old_db.v2 import mutil, defs
+import lib.old_db.v2.database as db
 import argparse
 
 import pytest
