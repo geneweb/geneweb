@@ -3,6 +3,13 @@ on:
   push:
     tags:
       - v**
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -15,13 +22,13 @@ jobs:
           ocaml-compiler: 4.14.0
       - name: setup
         run: |
-             opam pin add . -y --no-action
-             opam depext -y geneweb
-             opam install -y ./*.opam --deps-only --with-doc
+          opam pin add . -y --no-action
+          opam depext -y geneweb
+          opam install -y ./*.opam --deps-only --with-doc
       - name: build
         run: |
-             opam exec -- ocaml ./configure.ml
-             opam exec -- make doc
+          opam exec -- ocaml ./configure.ml
+          opam exec -- make doc
       - name: deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:

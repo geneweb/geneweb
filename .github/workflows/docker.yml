@@ -5,6 +5,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
     paths-ignore:
       - 'etc/**'
       - 'hd/**'
@@ -23,6 +30,13 @@ on:
       - 'geneweb.iss'
       - 'geneweb.opam.template'
   pull_request:
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
     paths-ignore:
       - 'etc/**'
       - 'hd/**'
@@ -40,9 +54,9 @@ on:
       - '.ocamlformat-ignore'
       - 'geneweb.iss'
       - 'geneweb.opam.template'
-      
+
 env:
-  IMAGE_NAME: "geneweb"
+  IMAGE_NAME: 'geneweb'
   PUSH_IMAGE: ${{ github.ref == 'refs/heads/master' }}
 
 jobs:

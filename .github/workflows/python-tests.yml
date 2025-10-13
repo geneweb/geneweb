@@ -4,18 +4,18 @@ on:
   push:
     branches: -''
     paths:
-      - 'src/python/lib/old_db/**.py'
-      - 'src/Makefile'
-      - 'src/python/requirements.txt'
-      - 'src/python/tests/**.py'
+      - 'python/lib/old_db/**.py'
+      - 'Makefile'
+      - 'python/requirements.txt'
+      - 'python/tests/**.py'
       - '.github/workflows/python-tests.yml'
   pull_request:
     branches: -''
     paths:
-      - 'src/python/lib/old_db/**.py'
-      - 'src/Makefile'
-      - 'src/python/requirements.txt'
-      - 'src/python/tests/**.py'
+      - 'python/lib/old_db/**.py'
+      - 'Makefile'
+      - 'python/requirements.txt'
+      - 'python/tests/**.py'
       - '.github/workflows/python-tests.yml'
 
 env:
@@ -29,7 +29,7 @@ jobs:
         python-version: [3.13] # Add other versions as needed
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ./src/python
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
