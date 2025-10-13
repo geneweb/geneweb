@@ -4,6 +4,14 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
+
     paths-ignore:
       - 'etc/**'
       - 'hd/**'
@@ -24,6 +32,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
     paths-ignore:
       - 'etc/**'
       - 'hd/**'
@@ -158,7 +173,7 @@ jobs:
           echo "tests_skipped=$SKIPPED" >> $GITHUB_OUTPUT
           echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
 
-      - name: "Test Geneweb daemon with --cache-in-memory"
+      - name: 'Test Geneweb daemon with --cache-in-memory'
         if: env.USE_NNP == 'true'
         run: |
           output=$(distribution/gw/gwd -cache-in-memory testing 2>&1)

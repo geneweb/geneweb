@@ -1,0 +1,83 @@
+name: Branch Quick Check
+
+on:
+  push:
+    branches: [db]
+  workflow_dispatch:
+
+jobs:
+  quick-check:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          cd src/python
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Setup Python development environment
+        run: |
+          cd src/python
+          echo "Setting up development environment..."
+          make dev-setup
+
+      - name: Install development tools
+        run: |
+          cd src/python
+          echo "Installing development tools..."
+          make install-tools
+
+      - name: Quick Code Quality Check
+        run: |
+          cd src/python
+          echo "=== Quick Code Quality Check ==="
+
+          # Format code with ruff
+          make format
+
+          # Auto-fix linting issues
+          make fix
+
+          # Run linting checks
+          make lint
+
+      - name: Quick Test Run
+        run: |
+          cd src/python
+          echo "=== Quick Test Run ==="
+
+          # Run unit tests only (fastest)
+          make test-unit
+
+          # Run integration tests
+          make test-integration
+
+      - name: Final Check
+        run: |
+          cd src/python
+          echo "=== Final Check ==="
+
+          # Run checks without mypy (faster)
+          make check-ruff
+
+          # Show status
+          make status
+
+      - name: Upload quick results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: branch-quick-results
+          path: |
+            src/python/tests/reports/
+          retention-days: 3

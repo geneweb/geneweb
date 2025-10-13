@@ -1,0 +1,82 @@
+0 HEAD
+1 SOUR TestApp
+2 VERS 1.0
+2 NAME Test GEDCOM Parser
+1 DEST TestApp
+1 DATE 1 JAN 2024
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME John /Doe/
+2 GIVN John
+2 SURN Doe
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 1900
+2 PLAC New York, NY, USA
+1 DEAT
+2 DATE 31 DEC 1980
+2 PLAC New York, NY, USA
+1 OCCU Engineer
+1 NOTE This is a test individual
+2 CONT with multiple lines
+1 SOUR @S1@
+2 PAGE Page 123
+1 OBJE @M1@
+1 REFN 12345
+1 _LINK https://example.com
+0 @I2@ INDI
+1 NAME Jane /Smith/
+2 GIVN Jane
+2 SURN Smith
+1 SEX F
+1 BIRT
+2 DATE 15 MAR 1905
+2 PLAC Boston, MA, USA
+1 FAMS @F1@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE 20 JUN 1925
+2 PLAC New York, NY, USA
+1 SOUR @S1@
+2 PAGE Page 456
+0 @S1@ SOUR
+1 TITL Test Source
+1 AUTH Test Author
+1 PUBL Test Publisher
+1 NOTE This is a test source
+2 CONT with multiple lines
+1 OBJE @M1@
+0 @M1@ OBJE
+1 FILE test.jpg
+1 TITL Test Image
+1 FORM jpeg
+1 NOTE Test multimedia object
+0 @N1@ NOTE
+1 CONT This is a standalone note
+2 CONC with concatenated text
+0 @R1@ REPO
+1 NAME Test Repository
+1 ADDR
+2 ADR1 123 Main St
+2 CITY New York
+2 STAE NY
+2 POST 10001
+2 CTRY USA
+1 PHON (555) 123-4567
+1 EMAIL test@example.com
+0 @SUBM@ SUBM
+1 NAME Test Submitter
+1 ADDR
+2 ADR1 456 Oak Ave
+2 CITY Boston
+2 STAE MA
+2 POST 02101
+2 CTRY USA
+1 PHON (555) 987-6543
+1 EMAIL submitter@example.com
+0 TRLR

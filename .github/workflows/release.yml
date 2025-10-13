@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - v**
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
 
 env:
   DUNE_PROFILE: "release"

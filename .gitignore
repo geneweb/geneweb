@@ -36,7 +36,6 @@ test/ref
 *.gwo
 
 # GEDCOM files
-*.ged
 *.gedcom
 *.gedcomx
 *.gedcomx-zip
@@ -286,8 +285,16 @@ src/TESTS.md
 
 # macos file
 *.DS_Store
-*.lck
 
 # python cache
 .pytest_cache
 __pycache__
+
+# pyright
+.pyrightconfig.json
+.vscode/
+.vscode/
+
+# pickle db files
+*.pkl
+*.pkl.gz

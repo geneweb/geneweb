@@ -1,0 +1,83 @@
+0 HEAD
+1 SOUR TestApp
+2 VERS 1.0
+2 NAME Test GEDCOM Parser
+1 DEST TestApp
+1 DATE 1 JAN 2024
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME John /Doe/
+2 GIVN John
+2 SURN Doe
+1 SEX M
+1 ADDR
+2 ADR1 123 Main St
+2 ADR2 Apt 4B
+2 CITY New York
+2 STAE NY
+2 POST 10001
+2 CTRY USA
+1 PHON (555) 123-4567
+1 EMAIL john.doe@example.com
+1 FAX (555) 123-4568
+1 WWW https://johndoe.com
+1 BIRT
+2 DATE 1 JAN 1900
+2 PLAC New York, NY, USA
+0 @I2@ INDI
+1 NAME Jane /Smith/
+2 GIVN Jane
+2 SURN Smith
+1 SEX F
+1 ADDR
+2 ADR1 456 Oak Ave
+2 ADR2 Suite 200
+2 CITY Boston
+2 STAE MA
+2 POST 02101
+2 CTRY USA
+1 PHON (555) 987-6543
+1 EMAIL jane.smith@example.com
+1 FAX (555) 987-6544
+1 WWW https://janesmith.com
+1 BIRT
+2 DATE 15 MAR 1905
+2 PLAC Boston, MA, USA
+1 FAMS @F1@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE 20 JUN 1925
+2 PLAC New York, NY, USA
+0 @SUBM@ SUBM
+1 NAME Test Submitter
+1 ADDR
+2 ADR1 789 Pine St
+2 ADR2 Floor 3
+2 CITY Chicago
+2 STAE IL
+2 POST 60601
+2 CTRY USA
+1 PHON (555) 555-5555
+1 EMAIL submitter@example.com
+1 FAX (555) 555-5556
+1 WWW https://submitter.com
+0 @R1@ REPO
+1 NAME National Archives
+1 ADDR
+2 ADR1 700 Pennsylvania Ave NW
+2 CITY Washington
+2 STAE DC
+2 POST 20408
+2 CTRY USA
+1 PHON (202) 357-5000
+1 EMAIL info@archives.gov
+1 FAX (202) 357-5001
+1 WWW https://www.archives.gov
+1 NOTE Official repository
+2 CONT for government records
+0 TRLR

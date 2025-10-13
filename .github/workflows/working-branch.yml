@@ -1,0 +1,141 @@
+name: Working Branch Checks
+
+on:
+  push:
+    branches:
+      - 'db'
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  task-branch-check:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          cd src/python
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Setup Python development environment
+        run: |
+          cd src/python
+          echo "Setting up development environment..."
+          make dev-setup
+
+      - name: Install development tools
+        run: |
+          cd src/python
+          echo "Installing development tools..."
+          make install-tools
+
+      - name: Code Quality Checks
+        run: |
+          cd src/python
+          echo "=== Running Code Quality Checks ==="
+
+          # Format code with ruff
+          echo "Formatting code..."
+          make format
+
+          # Auto-fix linting issues
+          echo "Auto-fixing linting issues..."
+          make fix
+
+          # Run linting checks
+          echo "Running linting checks..."
+          make lint
+
+      - name: Run All Tests
+        run: |
+          cd src/python
+          echo "=== Running All Tests ==="
+
+          # Run all tests (unit + integration + concrete)
+          make test
+
+          # Generate coverage report
+          make test-coverage
+
+      - name: Run Demonstrations
+        run: |
+          cd src/python
+          echo "=== Running Demonstrations ==="
+
+          # Demo with sample.ged
+          echo "Running demo with sample.ged..."
+          make demo
+
+          # Demo with uk.ged
+          echo "Running demo with uk.ged..."
+          make demo-uk
+
+      - name: Final Verification
+        run: |
+          cd src/python
+          echo "=== Final Verification ==="
+
+          # Run final check
+          make check-ruff
+
+          # Verify package installation
+          echo "Verifying package installation..."
+          python -c "import ged2gwb; print('✓ ged2gwb imported successfully')"
+          python -c "import gedcom; print('✓ gedcom imported successfully')"
+          python -c "import lib.db_pickle; print('✓ db_pickle imported successfully')"
+
+          # Test CLI functionality
+          echo "Testing CLI functionality..."
+          python -m ged2gwb --help > /dev/null && echo "✓ CLI help works"
+
+      - name: Generate Report
+        if: always()
+        run: |
+          echo "=== Task Branch Report ==="
+          cd src/python
+
+          # Show status
+          echo "=== Code Quality Status ==="
+          make status
+
+          # Show issues
+          echo "=== Remaining Issues ==="
+          make issues
+
+          # Show test results
+          echo "=== Test Results ==="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo "Python modules: $(find . -name '*.py' | wc -l) Python files"
+          echo "Test files: $(find . -name 'test_*.py' | wc -l) test files"
+
+      - name: Clean branch name
+        id: clean-branch
+        run: |
+          # Clean branch name for artifact naming
+          CLEAN_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[\/\\:*?"<>|]/_/g')
+          echo "clean-branch-name=$CLEAN_BRANCH" >> $GITHUB_OUTPUT
+          echo "Original branch: ${{ github.ref_name }}"
+          echo "Clean branch: $CLEAN_BRANCH"
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: task-branch-results-${{ steps.clean-branch.outputs.clean-branch-name }}
+          path: |
+            src/python/tests/reports/
+            src/python/tests/
+          retention-days: 7

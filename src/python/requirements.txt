@@ -1,0 +1,41 @@
+# Core dependencies for GED2GWB
+pathlib2>=2.3.7; python_version < "3.4"
+typing-extensions>=4.0.0; python_version < "3.8"
+
+# GEDCOM parsing and processing
+chardet>=5.0.0
+python-dateutil>=2.8.0
+
+# Data serialization and compression
+pickle5>=0.0.12; python_version < "3.8"
+
+# Testing dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-html>=3.1.0
+pytest-benchmark>=4.0.0
+pytest-mock>=3.10.0
+
+# Development dependencies
+black>=22.0.0
+flake8>=5.0.0
+isort>=5.10.0
+mypy>=1.0.0
+
+# Data processing and validation
+PyYAML>=6.0
+jsonschema>=4.0.0
+
+# Optional: for watch mode
+pytest-watch>=4.2.0
+
+# Optional: for advanced testing
+pytest-xdist>=3.0.0
+
+# Optional: for performance profiling
+memory-profiler>=0.60.0
+line-profiler>=4.0.0
+
+# Optional: for documentation
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.0.0

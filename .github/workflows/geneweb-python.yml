@@ -4,9 +4,11 @@ on:
   push:
     branches: [master, dev]
     paths:
-      - 'python/**'
-      - 'tests/**'
-      - '.github/workflows/golden-master-pipeline.yml'
+      - 'src/python/**'
+      - 'src/python/tests/**'
+      - 'src/Makefile'
+      - 'src/python/Makefile'
+      - '.github/workflows/geneweb-python.yml'
   workflow_dispatch:
 
 jobs:
@@ -96,49 +98,111 @@ jobs:
           echo "Setting up development environment..."
           make dev-setup
 
-      - name: Run Python tests using Makefile
+      - name: Code Quality Checks
         run: |
           cd python
-          echo "Running all Python tests using Makefile..."
+          echo "=== Running Code Quality Checks ==="
 
-          make test-all
+          # Format code with ruff
+          echo "Formatting code..."
+          make format
+
+          # Auto-fix linting issues
+          echo "Auto-fixing linting issues..."
+          make fix
+
+          # Run linting checks
+          echo "Running linting checks..."
+          make lint
+
+      - name: Run All Tests
+        run: |
+          cd python
+          echo "=== Running All Tests ==="
+
+          # Run all tests (unit + integration + concrete)
+          make test
 
           # Generate coverage report
-          make coverage || echo "Coverage generation completed"
+          make test-coverage
 
-      - name: Run specific test categories
+      - name: Run Specific Test Categories
         run: |
           cd python
-          echo "Running specific test categories..."
+          echo "=== Running Specific Test Categories ==="
 
           # Run unit tests
-          make test-unit || echo "Unit tests completed"
+          echo "Running unit tests..."
+          make test-unit
 
           # Run integration tests
-          make test-integration || echo "Integration tests completed"
+          echo "Running integration tests..."
+          make test-integration
 
-          # Run compatibility tests
-          make test-compatibility || echo "Compatibility tests completed"
+          # Run concrete tests with real files
+          echo "Running concrete tests..."
+          make test-concrete
 
-          # Run performance tests
-          make benchmark || echo "Performance tests completed"
-
-      - name: Verify Python package installation
+      - name: Complete Code Verification
         run: |
-          echo "=== Verifying Python package ==="
           cd python
+          echo "=== Complete Code Verification ==="
+
+          # Run all checks (format + lint + test)
+          make check
+
+      - name: Check Code Quality Status
+        run: |
+          cd python
+          echo "=== Code Quality Status ==="
+
+          # Show linting status
           make status
 
-      - name: Code quality checks
+          # Show remaining issues
+          make issues
+
+      - name: Run Demonstrations
         run: |
           cd python
-          echo "Running code quality checks..."
+          echo "=== Running Demonstrations ==="
 
-          # Check code style
-          make lint || echo "Linting completed"
+          # Demo with sample.ged
+          echo "Running demo with sample.ged..."
+          make demo
 
-          # Format code (dry run)
-          make format || echo "Formatting check completed"
+          # Demo with uk.ged
+          echo "Running demo with uk.ged..."
+          make demo-uk
+
+      - name: Advanced Code Cleanup
+        run: |
+          cd python
+          echo "=== Advanced Code Cleanup ==="
+
+          # Complete code cleanup
+          make clean-code
+
+          # Check if any issues remain
+          make check-ruff
+
+      - name: Final Verification
+        run: |
+          cd python
+          echo "=== Final Verification ==="
+
+          # Run final check without mypy (faster)
+          make check-ruff
+
+          # Verify package installation
+          echo "Verifying package installation..."
+          python -c "import ged2gwb; print('✓ ged2gwb imported successfully')"
+          python -c "import gedcom; print('✓ gedcom imported successfully')"
+          python -c "import lib.db_pickle; print('✓ db_pickle imported successfully')"
+
+          # Test CLI functionality
+          echo "Testing CLI functionality..."
+          python -m ged2gwb --help > /dev/null && echo "✓ CLI help works"
 
       - name: Generate comprehensive test report
         if: always()
@@ -146,11 +210,26 @@ jobs:
           echo "=== Comprehensive Test Summary ==="
           cd python
 
-          # Use Makefile status command
+          # Final status check
+          echo "=== Final Code Quality Status ==="
           make status
 
+          # Show any remaining issues
+          echo "=== Remaining Issues ==="
+          make issues
+
+          # Show test results summary
+          echo "=== Test Results Summary ==="
+          echo "Unit tests: $(make test-unit 2>&1 | grep -c 'PASS\|FAIL' || echo '0')"
+          echo "Integration tests: $(make test-integration 2>&1 | grep -c 'PASS\|FAIL' || echo '0')"
+          echo "Concrete tests: $(make test-concrete 2>&1 | grep -c 'PASS\|FAIL' || echo '0')"
+
+          # Show project statistics
+          echo "=== Project Statistics ==="
           echo "OCaml binaries: $(ls ../distribution/gw/ 2>/dev/null | wc -l) found"
           echo "Fixture files: $(find ../tests/ tests/ -name '*.ged' 2>/dev/null | wc -l) GED files"
+          echo "Python modules: $(find . -name '*.py' | wc -l) Python files"
+          echo "Test files: $(find . -name 'test_*.py' | wc -l) test files"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
