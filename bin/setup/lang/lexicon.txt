@@ -148,11 +148,13 @@ fr: Les fichiers cache de noms et places pour l'auto-completion.
 
     extract isolated persons
 aa: gwu.htm
+co: Arregistrà e persone isulate.
 en: Save isolated persons.
 fr: Sauvegarder les personnes isolées.
 
     save all files
 aa: gwu.htm
+co: Arregistrà tutti i schedarii di notes_d, includendu quelli senza liami Wiki.
 en: Save all files in notes_d, including those without Wiki links.
 fr: Sauvegarder tous les fichiers de notes_d, y compris ceux sans liens Wiki.
 
