@@ -9,8 +9,8 @@ from pathlib import Path
 # Add the src directory to the path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from lib.ged2gwb.cli.main import Ged2GwbCLI
-from lib.ged2gwb.utils.options import ConversionOptions
+from ged2gwb.cli.main import Ged2GwbCLI
+from ged2gwb.utils.options import ConversionOptions
 
 
 def test_option_parsing():

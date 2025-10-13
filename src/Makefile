@@ -12,8 +12,6 @@ endif
 
 init: $(VIRTUAL_ENV)_installed
 	pip install -r requirements.txt
-# 	only install in editable mode if not already installed
-# 	this allows to update the package without reinstalling it
 	pip show geneweb &>/dev/null || pip install -e .
 
 %_installed:

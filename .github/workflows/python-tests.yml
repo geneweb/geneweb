@@ -5,9 +5,9 @@ on:
     branches:
       - '**'
     paths:
-      - 'src/**.py'
+      - 'src/python/**.py'
       - 'src/Makefile'
-      - 'src/tests/**.py'
+      - 'src/python/tests/**.py'
       - '.github/workflows/python-tests.yml'
   pull_request:
     branches:
@@ -69,4 +69,3 @@ jobs:
       - name: Run tests
         run: |
           make tests-cov
-
