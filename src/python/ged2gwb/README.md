@@ -20,13 +20,13 @@ This tool provides a complete conversion pipeline from GEDCOM 5.5.1 files to Gen
 
 ```bash
 # Basic conversion
-python3 -m lib.ged2gwb family.ged family
+python3 -m ged2gwb family.ged family
 
 # With options
-python3 -m lib.ged2gwb family.ged family --compress --verbose
+python3 -m ged2gwb family.ged family --compress --verbose
 
 # Load existing database
-python3 -m lib.ged2gwb --load family.pkl
+python3 -m ged2gwb --load family.pkl
 ```
 
 ### Programmatic Usage
