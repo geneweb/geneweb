@@ -1,4 +1,12 @@
+module AliasCache : sig
+  val clear : unit -> unit
+  val add_alias : Geneweb_db.Driver.Iper.t -> string -> unit
+  val add_direct : Geneweb_db.Driver.Iper.t -> unit
+  val get_alias : Geneweb_db.Driver.Iper.t -> string option
+end
+
 val surname_not_found : Config.config -> string -> unit
+val name_unaccent : string -> string
 
 val persons_of_fsname :
   Config.config ->
@@ -24,18 +32,22 @@ val persons_of_fsname :
     id of [str] and [iperl] is a list of persons found that has [istr] as a
     first/surname such that [str = inj x]*)
 
-val search_surname :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  string ->
-  Geneweb_db.Driver.iper list
-
 val search_surname_print :
   Config.config ->
   Geneweb_db.Driver.base ->
   (Config.config -> string -> unit) ->
   string ->
   unit
+
+val print_surname_details :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  string ->
+  (string * Geneweb_db.Driver.person list) list ->
+  unit
+(** [print_multiple_display conf base query surnames_groups] displays multiple
+    surname groups with their associated persons. Used when a search returns
+    multiple surname matches. *)
 
 val search_first_name :
   Config.config ->
@@ -52,4 +64,11 @@ val first_name_print_list :
   string ->
   Mutil.StrSet.t ->
   (string * Geneweb_db.Driver.person list) list ->
+  unit
+
+val print_several_possible_surnames :
+  string ->
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  'a * (string * Geneweb_db.Driver.person list) list ->
   unit

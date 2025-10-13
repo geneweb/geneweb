@@ -276,6 +276,8 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
           s_list father_titles_places
     in
     let list = Mutil.list_rev_map_append sou aliases list in
+    let list = Mutil.list_rev_map_append sou first_names_aliases list in
+    let list = Mutil.list_rev_map_append sou surnames_aliases list in
     list
 
 let rec eq_lists eq l1 l2 =

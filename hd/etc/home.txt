@@ -14,7 +14,7 @@
 %let;random_index;%if;(nb_persons.v!=0)%apply;get_random(nb_persons.v)%end;%in;
 %if;(not cancel_links and e.templ="")
   <div class="d-flex flex-column fix_top fix_left home-xs">
-    <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">
+    <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">%nn;
       <i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <i class="sr-only">[*home]</i>%nn;
     </a>
@@ -51,7 +51,7 @@
           %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w" and env.key!="file")&%env.key;=%env.val;%end;%end;"
         title="[*go to alt base]0%sp;
           %if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?…
-          %if;(e.i!="")[go to alt base]1%end;">
+          %if;(e.i!="")[go to alt base]1%end;">%nn;
        <i class="fa fa-arrow-right%if;wizard; text-success%end; fa-fw fa-xs p-0"></i>
       </a>
     %end;
@@ -69,7 +69,7 @@
                 %if;(browsing_with_sosa_ref)
                   <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
-                <label class="sr-only" for="pn">Search person name</label>
+                <label class="sr-only" for="fullname">Search person name</label>
                 <input type="search" id="fullname" class="form-control form-control-lg no-clear-button mb-2"
                   name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end; [or] [key]0"
                   autofocus tabindex="4">

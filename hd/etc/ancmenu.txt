@@ -140,24 +140,28 @@ function missing_events_options () {
                   %apply;add_in_sorted_list(ancestor.birth_date.year)
                   %apply;add_in_sorted_list(ancestor.death_date.year)
                 %end;
+-               %let;b_max_implex_lev;%if;(b.max_implex_lev!="")%b.max_implex_lev;%else;20%end;%in;
                 %let;levelp;%expr(level+1)%in;
                 %let;number_of_ancestors_max;%expr(2^levelp-2)%in;
                 %let;number_of_ancestors_max_at_level;%expr(2^level)%in;
                 %let;dd;%expr(levelp/10)%in;
                 %let;dd_at_level;%expr(level/10)%in;
-                %let;extra_paths;%expr(anc_paths_cnt_raw.v-anc_paths_cnt.v)%in;
-                %let;extra_paths_at_level;%expr(anc_paths_at_level_cnt_raw.v-anc_paths_at_level_cnt.v)%in;
-                %let;percent;%expr(100*anc_paths_cnt.v|number_of_ancestors_max)%in;
-                %let;percent_paths;%expr(100*anc_paths_cnt_raw.v|number_of_ancestors_max)%in;
-                %let;percent_plus;%expr(100*(anc_paths_cnt.v-anc_paths_at_level_cnt.v)|number_of_ancestors_max)%in;
-                %let;percent_at_level;%expr(100*anc_paths_at_level_cnt.v|number_of_ancestors_max_at_level)%in;
-                %let;percent_paths_at_level;%expr(100*anc_paths_at_level_cnt_raw.v|number_of_ancestors_max_at_level)%in;
+                %let;anc_paths_c;%if;(level<b_max_implex_lev)%anc_paths_cnt.v;%else;%number_of_ancestors.v;%end;%in;
+                %let;anc_paths_c_r;%if;(level<b_max_implex_lev)%anc_paths_cnt_raw.v;%else;%number_of_ancestors.v;%end;%in;
+                %let;anc_paths_c_l;%if;(level<b_max_implex_lev)%anc_paths_at_level_cnt.v;%else;%number_of_ancestors_at_level.v;%end;%in;
+                %let;anc_paths_c_l_r;%if;(level<b_max_implex_lev)%anc_paths_at_level_cnt_raw.v;%else;%number_of_ancestors_at_level.v;%end;%in;
+                %let;extra_paths;%expr(anc_paths_c_r-anc_paths_c)%in;
+                %let;extra_paths_at_level;%if;(level<b_max_implex_lev)%expr(anc_paths_c_l_r-anc_paths_c_l)%else;0%end;%in;
+                %let;percent;%expr(100*anc_paths_c|number_of_ancestors_max)%in;
+                %let;percent_paths;%expr(100*anc_paths_c_r|number_of_ancestors_max)%in;
+                %let;percent_plus;%expr(100*(anc_paths_c-anc_paths_c_l)|number_of_ancestors_max)%in;
+                %let;percent_at_level;%expr(100*anc_paths_c_l|number_of_ancestors_max_at_level)%in;
+                %let;percent_paths_at_level;%expr(100*anc_paths_c_l_r|number_of_ancestors_max_at_level)%in;
                 %let;blue;rgba(210,230,255,.5)%in;%let;lred;rgba(255,210,180,.5)%in;%let;whit;rgba(255,255,255,0)%in;
                 <option value="%level;" title="" class="d-flex px-2"
-                  %if;(level<90)(%!temporary limit if long to render at high v%)
                     data-lex='%apply;ancname(level)'
-                    data-noa='%anc_paths_cnt.v;'
-                    data-noa_l='%anc_paths_at_level_cnt.v;'
+                    data-noa='%anc_paths_c;'
+                    data-noa_l='%anc_paths_c_l;'
                     %if;(extra_paths!=0)data-path='+%extra_paths;'%end;%sp;
                     %if;(extra_paths_at_level!=0)data-path_l='+%extra_paths_at_level;'%end;%sp;
                     data-sty=' style="background:linear-gradient(90deg,
@@ -199,7 +203,7 @@ function missing_events_options () {
                                 %if;(prev_item.1 = "")%item.1;%end;
                                 %if;(next_item.1 = "")-%item.1;%end;
                               %end;'
-                    %end;>%nn;
+                    >%nn;
                   %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%if;(level<10) %(todo fix margin%) %end;%nn;
                 </option>
               %end;

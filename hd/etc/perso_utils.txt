@@ -40,10 +40,10 @@
 
 %define;marr_wrench_to_bullet(xx)
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%nn;>
-      <i class="fa fa-wrench fa-sm text-success"%sp;
-        title="[*modify::family/families]0 %self; &%sp;
-        %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;%sp;
+    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
+      <i class="fa fa-wrench fa-sm text-success"
+        title="[*modify::family/families]0 %self; &
+        %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;
         %spouse.surname; ([wizard/wizards/friend/friends/exterior]0)"></i>%nn;
     </a>
   %end;
@@ -53,7 +53,7 @@
   %if;not cancel_links;
     %if;wizard;%nn;
       <a href="%prefix;m=MOD_IND&i=%xxx.index;"%sp;
-        title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;">
+        title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;">%nn;
     %end;<i%sp;
   %end;
   %if;xxx.is_male;
@@ -576,8 +576,8 @@
 %end;
 
 %define;short_display_siblings()
-  %apply;li_SDC("child")
-    %apply;short_display_person("child")%nn;
+  %apply;li_SDC("child")%nn;
+    %apply;short_display_person("child")
   </li>
 %end;
 

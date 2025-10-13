@@ -50,5 +50,4 @@ val print :
   Geneweb_db.Driver.person list ->
   Geneweb_db.Driver.person list ->
   unit) ->
-  (config -> string -> unit) ->
   unit

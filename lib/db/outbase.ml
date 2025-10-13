@@ -80,11 +80,40 @@ let make_strings_of_fsname_aux split get base =
       a)
     t
 
+(* Index surnames using surname pieces grouping, preserves particles *)
+let make_strings_of_sname_with_pieces base =
+  let t = Array.make Dutil.table_size IntSet.empty in
+  let add_name (key : string) (value : int) =
+    let key = Dutil.name_index key in
+    let set = Array.get t key in
+    let set' = IntSet.add value set in
+    if set == set' then () else Array.set t key set'
+  in
+  for i = 0 to base.data.persons.len - 1 do
+    let p = Dutil.poi base i in
+    if p.surname <> 1 then (
+      let s = base.data.strings.get p.surname in
+      add_name s p.surname;
+      List.iter
+        (fun piece -> add_name piece p.surname)
+        (Mutil.surnames_pieces s))
+  done;
+  Array.map
+    (fun set ->
+      let a = Array.make (IntSet.cardinal set) 0 in
+      let i = ref 0 in
+      IntSet.iter
+        (fun e ->
+          Array.set a !i e;
+          incr i)
+        set;
+      a)
+    t
+
 let make_strings_of_fname =
   make_strings_of_fsname_aux Name.split_fname_callback (fun p -> p.first_name)
 
-let make_strings_of_sname =
-  make_strings_of_fsname_aux Name.split_sname_callback (fun p -> p.surname)
+let make_strings_of_sname = make_strings_of_sname_with_pieces
 
 let create_strings_of_sname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_sname base)
