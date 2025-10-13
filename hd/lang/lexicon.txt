@@ -1827,6 +1827,7 @@ sv: lägg till noteringar
 tr: not ekle
 
     add coat of arms
+co: aghjunghje un’armuratura
 de: ein Wappen hinzufügen
 en: add a coat of arms
 fr: ajouter un blason
@@ -4397,26 +4398,31 @@ sv: ändrade ordningen för personhändelser
 tr: bireysel etkinliklerin sırasını değiştir
 
     chk_data invisible characters
+co: Caratteri invisibile
 de: Unsichtbare Zeichen
 en: Invisible characters
 fr: Caractères invisibles
 
     chk_data bad capitalization
+co: Messa in capitale gattiva
 de: Fehlerhafte Großschreibung
 en: Bad capitalization
 fr: Capitalisation erronée
 
     chk_data multiple spaces
+co: Spazii multiplice
 de: Mehrere Leerzeichen
 en: Multiple spaces
 fr: Espaces multiples
 
     chk_data mutiples characters
+co: Caratteri multiplice
 de: Mehrere Zeichen
 en: Multiple characters
 fr: Caractères multiples
 
     chk_data non-breaking spaces
+co: Spazii nonspezzevule
 de: Geschützte Leerzeichen
 en: Non-breaking spaces
 fr: Espaces insécables
@@ -4673,6 +4679,7 @@ sv: en släkting
 tr: bir ebeveyn
 
     blason/blasons
+co: armuratura/armurature
 de: Wappen/Wappen
 en: coat of arms/coats of arms
 fr: blason/blasons
@@ -5097,6 +5104,7 @@ sv: forts
 tr: devam eden
 
     copied/copied
+co: cupiatu/cupiata
 de: kopiert/kopiert
 en: copied/copied
 fr: copié/copiée
@@ -5161,6 +5169,7 @@ tr: çiftler
 ->: son/daughter/child
 
     cousin.0.10
+co: un ottu volte arcifigliulinu/un’ottu volte arcifigliulina/un ottu volte arcizitellucciu
 de: ein Achtfach-Urenkel/eine Achtfach-Urenkelin/ein Achtfach-Urenkel
 en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
 fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit-fois-arrière-petit-enfant
@@ -5172,31 +5181,37 @@ fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit
 ->: a great-grandson/a great-granddaughter/a great-grandchild
 
     cousin.0.4
+co: un arciarcifigliulinu/un’arciarcifigliulina/un arciarcizitellucciu
 de: ein Ur-Ur-Enkel/eine Ur-Ur-Enkelin/Ur-Ur-Enkel
 en: a great-great-grandson/a great-great-granddaughter/a great-great-grandchild
 fr: un arrière-arrière-petit-fils/une arrière-arrière-petite-fille/un arrière-arrière-petit-enfant
 
     cousin.0.5
+co: un trè volte arcifigliulinu/un’trè volte arcifigliulina/un trè volte arcizitellucciu
 de: ein Ur-Ur-Ur-Enkel/eine Ur-Ur-Ur-Enkelin/Ur-Ur-Ur-Enkel
 en: a three-times-great-grandson/a three-times-great-granddaughter/a three-times-great-grandchild
 fr: un trois-fois-arrière-petit-fils/une trois-fois-arrière-petite-fille/un trois-fois-arrière-petit-enfant
 
     cousin.0.6
+co: un quattru volte arcifigliulinu/un’quattru volte arcifigliulina/un quattru volte arcizitellucciu
 de: ein vierfacher Ur-Enkel/eine vierfache Ur-Enkelin/vierfacher Ur-Enkel
 en: a four-times-great-grandson/a four-times-great-granddaughter/a four-times-great-grandchild
 fr: un quatre-fois-arrière-petit-fils/une quatre-fois-arrière-petite-fille/un quatre-fois-arrière-petit-enfant
 
     cousin.0.7
+co: un cinque volte arcifigliulinu/un’cinque volte arcifigliulina/un cinque volte arcizitellucciu
 de: ein fünffacher Ur-Enkel/eine fünffache Ur-Enkelin/fünffacher Ur-Enkel
 en: a five-times-great-grandson/a five-times-great-granddaughter/a five-times-great-grandchild
 fr: un cinq-fois-arrière-petit-fils/une cinq-fois-arrière-petite-fille/un cinq-fois-arrière-petit-enfant
 
     cousin.0.8
+co: un sei volte arcifigliulinu/un’sei volte arcifigliulina/un sei volte arcizitellucciu
 de: ein sechsfacher Ur-Enkel/eine sechsfache Ur-Enkelin/sechsfacher Ur-Enkel
 en: a six-times-great-grandson/a six-times-great-granddaughter/a six-times-great-grandchild
 fr: un six-fois-arrière-petit-fils/une six-fois-arrière-petite-fille/un six-fois-arrière-petit-enfant
 
     cousin.0.9
+co: un sette volte arcifigliulinu/un’sette volte arcifigliulina/un sette volte arcizitellucciu
 de: ein siebenfacher Ur-Enkel/eine siebenfache Ur-Enkelin/siebenfacher Ur-Enkel
 en: a seven-times-great-grandson/a seven-times-great-granddaughter/a seven-times-great-grandchild
 fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept-fois-arrière-petit-enfant
@@ -5208,6 +5223,7 @@ fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept
 ->: a brother/a sister/a sibling
 
     cousin.1.10
+co: un %ssette volte arciniputinu/una %ssette volte arciniputina/un %ssette volte arciniputinu
 de: ein %sUr<sup>(x7)</sup>-Großneffe/eine %sUr<sup>(x7)</sup>-Großnichte/ein %sUr<sup>(x7)</sup>-Großneffe
 en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
 fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
@@ -5225,36 +5241,43 @@ en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
 fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
 
     cousin.1.5
+co: un %sarciarciniputinu/una %sarciarciniputina/un %sarciarciniputinu
 de: ein %sUr-Ur-Großneffe/eine %sUr-Ur-Großnichte/ein %sUr-Ur-Großneffe
 en: a %sgreat-great-grandnephew/a %sgreat-great-grandniece/a %sgreat-great-grandnephew
 fr: un %sarrière-arrière-petit-neveu/une %sarrière-arrière-petite-nièce/un %sarrière-arrière-petit-neveu
 
     cousin.1.6
+co: un %strè volte arciniputinu/una %strè volte arciniputina/un %strè volte arciniputinu
 de: ein %sUr-Ur-Ur-Großneffe/eine %sUr-Ur-Ur-Großnichte/ein %sUr-Ur-Ur-Großneffe
 en: a %sthree-times-great-grandnephew/a %sthree-times-great-grandniece/a %sthree-times-great-grandnephew
 fr: un %strois-fois-arrière-petit-neveu/une %strois-fois-arrière-petite-nièce/un %strois-fois-arrière-petit-neveu
 
     cousin.1.7
+co: un %squattru volte arciniputinu/una %squattru volte arciniputina/un %squattru volte arciniputinu
 de: ein %sUr<sup>(x4)</sup>-Großneffe/eine %sUr<sup>(x4)</sup>-Großnichte/ein %sUr<sup>(x4)</sup>-Großneffe
 en: a %sfour-times-great-grandnephew/a %sfour-times-great-grandniece/a %sfour-times-great-grandnephew
 fr: un %squatre-fois-arrière-petit-neveu/une %squatre-fois-arrière-petite-nièce/un %squatre-fois-arrière-petit-neveu
 
     cousin.1.8
+co: un %scinque volte arciniputinu/una %scinque volte arciniputina/un %scinque volte arciniputinu
 de: ein %sUr<sup>(x5)</sup>-Großneffe/eine %sUr<sup>(x5)</sup>-Großnichte/ein %sUr<sup>(x5)</sup>-Großneffe
 en: a %sfive-times-great-grandnephew/a %sfive-times-great-grandniece/a %sfive-times-great-grandnephew
 fr: un %scinq-fois-arrière-petit-neveu/une %scinq-fois-arrière-petite-nièce/un %scinq-fois-arrière-petit-neveu
 
     cousin.1.9
+co: un %ssei volte arciniputinu/una %ssei volte arciniputina/un %ssei volte arciniputinu
 de: ein %sUr<sup>(×6)</sup>-Großneffe/eine %sUr<sup>(×6)</sup>-Großnichte/ein %sUr<sup>(×6)</sup>-Großneffe
 en: a %ssix-times-great-grandnephew/a %ssix-times-great-grandniece/a %ssix-times-great-grandnephew
 fr: un %ssix-fois-arrière-petit-neveu/une %ssix-fois-arrière-petite-nièce/un %ssix-fois-arrière-petit-neveu
 
     cousin.10.0
+co: un 8<sup>u</sup> volte arcicaccaru/una 8<sup>u</sup> volte arcicaccara
 de: ein achtfacher Urgroßvater/eine achtfache Urgroßmutter
 en: a 8th-great-grandfather/a 8th-great-grandmother
 fr: un 8×-arrière-grand-père/une 8×-arrière-grand-mère
 
     cousin.10.1
+co: un %ssette volte arcizione/una %ssette volte arciziona
 de: ein %sUr<sup>(×7)</sup>-Großonkel/eine %sUr<sup>(×7)</sup>-Großtante
 en: a %sseventh great-granduncle/a %sseventh great-grandaunt
 fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
@@ -5348,6 +5371,7 @@ en: a great-great-grandfather/a great-great-grandmother/a great-great-grandparen
 fr: un arrière-arrière-grand-père/une arrière-arrière-grand-mère/un arrière-arrière-grand-parent
 
     cousin.4.1
+co: un %sarcizione/una %sarciziona
 de: ein %sUrgroßonkel/eine %sUrgroßtante
 en: a %sgreat-granduncle/a %sgreat-grandaunt
 fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
@@ -5388,6 +5412,7 @@ de: ein %sUr-Ur-Urgroßneffe 4. Grades/eine %sUr-Ur-Urgroßnichte 4. Grades
 fr: un %s4×arrière-petit-cousin au 3<sup>e</sup> degré/une %s4×arrière-petite-cousine au 3<sup>e</sup> degré
 
     cousin.5.0
+co: un arciarcicaccarone/una arciarcicaccarona
 de: ein:d:+em Ur-Ur-Urgroßvater/eine:d:+r Ur-Ur-Urgroßmutter
 en: a great-great-great-grandfather/a great-great-great-grandmother
 fr: un 3×-arrière-grand-père/une 3×-arrière-grand-mère
@@ -5416,11 +5441,13 @@ en: a %s4th cousin
 fr: un %scousin au 4e degré/une %scousine au 4e degré
 
     cousin.6.0
+co: un 4<sup>u</sup> volte arcicaccaru/una 4<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×4)</sup>-Großvater/eine Ur<sup>(×4)</sup>-Großmutter
 en: a 4th-great-grandfather/a 4th-great-grandmother
 fr: un 4×-arrière-grand-père/une 4×-arrière-grand-mère
 
     cousin.6.1
+co: un %s3<sup>u</sup> volte arcizione/una %s3<sup>u</sup> volte arciziona
 de: ein %sUr-Ur-Urgroßonkel/eine %sUr-Ur-Urgroßtante
 en: a %sthird great-granduncle/a %sthird great-grandaunt
 fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grande-tante
@@ -5438,31 +5465,37 @@ de: ein %sGroßonkel 4. Grades/eine %sGroßtante 4. Grades
 fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grande-cousine au 3<sup>e</sup> degré
 
     cousin.7.0
+co: un 5<sup>u</sup> volte arcicaccaru/una 5<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×5)</sup>-Großvater/eine Ur<sup>(×5)</sup>-Großmutter
 en: a 5th-great-grandfather/a 5th-great-grandmother
 fr: un 5×-arrière-grand-père/une 5×-arrière-grand-mère
 
     cousin.7.1
+co: un %s4<sup>u</sup> volte arcizione/una %s4<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×4)</sup>-Großonkel/eine %sUr<sup>(×5)</sup>-Großtante
 en: a %sfourth great-granduncle/a %sfourth great-grandaunt
 fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grande-tante
 
     cousin.8.0
+co: un 6<sup>u</sup> volte arcicaccaru/una 6<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×6)</sup>-Großvater/eine Ur<sup>(×6)</sup>-Großmutter
 en: a 6th-great-grandfather/a 6th-great-grandmother
 fr: un 6×-arrière-grand-père/une 6×-arrière-grand-mère
 
     cousin.8.1
+co: un %s6<sup>u</sup> volte arcizione/una %s6<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×5)</sup>-Großonkel/eine %sUr<sup>(×5)</sup>-Großtante
 en: a %sfifth great-granduncle/a %sfifth great-grandaunt
 fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grande-tante
 
     cousin.9.0
+co: un 7<sup>u</sup> volte arcicaccaru/una 7<sup>u</sup> volte arcicaccara
 de: ein Ur<sup>(×7)</sup>-Großvater/eine Ur<sup>(×7)</sup>-Großmutter
 en: a 7th-great-grandfather/a 7th-great-grandmother
 fr: un 7×-arrière-grand-père/une 7×-arrière-grand-mère
 
     cousin.9.1
+co: un %s6<sup>u</sup> volte arcizione/una %s6<sup>u</sup> volte arciziona
 de: ein %sUr<sup>(×6)</sup>-Großonkel/eine %sUr<sup>(×6)</sup>-Großtante
 en: a %ssixth great-granduncle/a %ssixth great-grandaunt
 fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grande-tante
@@ -5541,6 +5574,7 @@ en: sons and daughters
 fr: fils et filles, enfants
 
     cousins.0.10
+co: 8<sup>u</sup> volte arcizitellucciu/8<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×8)</sup>-Enkel
 en: eight-times-great-grandchild/eight-times-great-grandchildren
 fr: huit-fois-arrière-petit-enfant/huit-fois-arrière-petits-enfants
@@ -5570,36 +5604,43 @@ en: children of one’s grandson or granddaughter
 fr: enfants de son petit-fils ou de sa petite-fille
 
     cousins.0.4
+co: arciarcizitellucciu/arciarcizitellucci
 de: Ur-Urenkel
 en: great-great-grandchild/great-great-grandchildren
 fr: arrière-arrière-petit-enfant/arrière-arrière-petits-enfants
 
     cousins.0.4 tt
+co: zitelli d’un arcifigliulinu o d’una arcifigliulina
 de: Kinder des Urenkels oder der Urenkelin
 en: children of one’s great-grandson or great-granddaughter
 fr: enfants de son arrière-petit-fils ou de son arrière-petite-fille
 
     cousins.0.5
+co: 3<sup>u</sup> volte arcizitellucciu/3<sup>u</sup> volte arcizitellucci
 de: Ur-Ur-Urenkel
 en: three-times-great-grandchild/three-times-great-grandchildren
 fr: trois-fois-arrière-petits-enfant/trois-fois-arrière-petits-enfants
 
     cousins.0.6
+co: 4<sup>u</sup> volte arcizitellucciu/4<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×4)</sup>-Enkel
 en: four-times-great-grandchild/four-times-great-grandchildren
 fr: quatre-fois-arrière-petit-enfant/quatre-fois-arrière-petits-enfants
 
     cousins.0.7
+co: 5<sup>u</sup> volte arcizitellucciu/5<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×5)</sup>-Enkel
 en: five-times-great-grandchild/five-times-great-grandchildren
 fr: cinq-fois-arrière-petit-enfant/cinq-fois-arrière-petits-enfants
 
     cousins.0.8
+co: 6<sup>u</sup> volte arcizitellucciu/6<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×6)</sup>-Enkel
 en: six-times-great-grandchild/six-times-great-grandchildren
 fr: six-fois-arrière-petit-enfant/six-fois-arrière-petits-enfants
 
     cousins.0.9
+co: 7<sup>u</sup> volte arcizitellucciu/7<sup>u</sup> volte arcizitellucci
 de: Ur<sup>(×7)</sup>-Enkel
 en: seven-times-great-grandchild/seven-times-great-grandchildren
 fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
@@ -5620,6 +5661,7 @@ fr: père et mère<br>géniteur et génitrice
 fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
 
     cousins.1.10
+co: 7<sup>u</sup> volte arciniputinu/7<sup>u</sup> volte arciniputini
 de: Ur<sup>(×7)</sup>-Großneffe/Ur<sup>(×7)</sup>-Großneffen
 en: seven-times-great-grandnephew/seven-times-great-grandnephews
 fr: sept-fois-arrière-petit-neveu/sept-fois-arrière-petits-neveux
@@ -5641,11 +5683,13 @@ en: great-nephew/great-nephews/great-niece/great-nieces
 fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
 
     cousins.1.3 tt
+co: niputini è niputine
 de: Großneffen und Großnichten
 en: great-nephews and great-nieces
 fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
 
     cousins.1.4
+co: arciniputinu/arciniputini
 de: Ur-Großneffe/Ur-Großneffen
 en: great-grandnephew/great-grandnephews
 fr: arrière-petit-neveu/arrière-petits-neveux
@@ -5655,31 +5699,37 @@ de: Kind eines Neffen oder einer Nichte
 fr: enfant d’un petit-neveu ou d’une petit-nièce
 
     cousins.1.5
+co: arciarciniputinu/arciarciniputini
 de: Ur-Ur-Großneffe/Ur-Ur-Großneffen&#47; -nichten
 en: great-great-grandnephew/great-great-grandnephews
 fr: arrière-arrière-petit-neveu/arrière-arrière-petits-neveux
 
     cousins.1.6
+co: 3<sup>u</sup> volte arciniputinu/3<sup>u</sup> volte arciniputini
 de: Ur-Ur-Ur-Großneffe/Ur-Ur-Ur-Großneffen&#47; -nichten
 en: three-times-great-grandnephew/three-times-great-grandnephews
 fr: trois-fois-arrière-petit-neveu/trois-fois-arrière-petits-neveux
 
     cousins.1.7
+co: 4<sup>u</sup> volte arciniputinu/4<sup>u</sup> volte arciniputini
 de: Ur<sup>(×4)</sup>-Großneffe/Ur<sup>(×4)</sup>-Großneffen&#47; -nichten
 en: four-times-great-grandnephew/four-times-great-grandnephews
 fr: quatre-fois-arrière-petit-neveu/quatre-fois-arrière-petits-neveux
 
     cousins.1.8
+co: 5<sup>u</sup> volte arciniputinu/5<sup>u</sup> volte arciniputini
 de: Ur<sup>(×5)</sup>-Großneffe/Ur<sup>(×5)</sup>-Großneffen&#47; -nichten
 en: five-times-great-grandnephew/five-times-great-grandnephews
 fr: cinq-fois-arrière-petit-neveu/cinq-fois-arrière-petits-neveux
 
     cousins.1.9
+co: 6<sup>u</sup> volte arciniputinu/6<sup>u</sup> volte arciniputini
 de: Ur<sup>(×6)</sup>-Großneffe/Ur<sup>(×6)</sup>-Großneffen&#47; -nichten
 en: six-times-great-grandnephew/six-times-great-grandnephews
 fr: six-fois-arrière-petit-neveu/six-fois-arrière-petits-neveux
 
     cousins.10.0
+co: 8<sup>u</sup> arcicaccari
 de: Ur<sup>(×8)</sup>-Großeltern
 en: 8th-great-grandparents
 fr: 8×-arrière-grands-parents
@@ -5689,6 +5739,7 @@ de: Stammeltern
 fr: huit-fois-arrière-grands-parents<br>nonaïeuls
 
     cousins.10.1
+co: 7<sup>u</sup> arcizioni
 de: Ur<sup>(×7)</sup>-Großtanten und -onkel
 en: seventh great-granduncles
 fr: sept-fois-arrière-grands-oncles
@@ -5738,6 +5789,7 @@ de: Großtanten&#47; -onkel 8. Grades
 de: Tanten und Onkel 9. Grades
 
     cousins.11.0
+co: 9<sup>u</sup> arcicaccari
 de: Ur<sup>(×9)</sup>-Großeltern
 en: 9th-great-grandparents
 fr: 9×-arrière-grands-parents
@@ -5747,6 +5799,7 @@ de: Stammgroßeltern
 fr: neuf-fois-arrière-grands-parents<br>décaïeuls
 
     cousins.12.0
+co: 10<sup>u</sup> arcicaccari
 de: Ur<sup>(×10)</sup>-Großeltern
 en: 10th-great-grandparents
 fr: 10×-arrière-grands-parents
@@ -5783,6 +5836,7 @@ de: Cousins 1. Grades<hr>(Halb- oder Voll)
 fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
 
     cousins.2.3
+co: cugini à u 2<sup>u</sup> gradu
 de: Neffe und Nichte 2. Grades/Neffen und Nichten 2. Grades
 en: 1st cousins once removed
 fr: petit-cousin/petits-cousins
@@ -5912,6 +5966,7 @@ fr: cinq-fois-arrière-petits-cousins 2<sup>e</sup>
 ->: great-great-grandparents
 
     cousins.4.0 tt
+co: arciarcicaccari
 de: Alteltern
 en: 2nd-great-grand-parents
 fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
@@ -5981,21 +6036,25 @@ fr: quatre-fois-arrière-petits-cousins 3<sup>e</sup>
 fr: quatre-fois-arrière-petits-cousins au troisième degré
 
     cousins.5.0
+co: 3<sup>u</sup> arcicaccari
 de: Ur-Ur-Urgroßeltern
 en: great-great-great-grandparents
 fr: 3×-arrière-grands-parents
 
     cousins.5.0 tt
+co: 3<sup>u</sup> arcicaccari
 de: Altgroßeltern
 en: 3rd-great-grandparents
 fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
 
     cousins.5.1
+co: arciarcizione
 de: Ur-Urgroßtanten und -onkel
 en: great-great-granduncles
 fr: arrière-arrière-grands-oncles
 
     cousins.5.1 tt
+co: fratelli è surelle di l’arciarcicaccari
 en: siblings of the great-great-grandparents
 fr: frères et sœurs des trisaïeuls
 
@@ -6040,6 +6099,7 @@ fr: grands-cousins 3<sup>e</sup>
 fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
 
     cousins.5.5
+co: cugini à u 4<sup>u</sup> gradu
 de: Cousins 4. Grades
 en: 4th cousins
 fr: cousins 4<sup>e</sup>
@@ -6076,6 +6136,7 @@ fr: trois-fois-arrière-petits-cousins 4<sup>e</sup>
 fr: trois-fois-arrière-petits-cousins au quatrième degré
 
     cousins.6.0
+co: 4<sup>u</sup> arcicaccari
 de: Ur<sup>(×4)</sup>-Großeltern
 en: 4th-great-grandparents
 fr: 4×-arrière-grands-parents
@@ -6085,6 +6146,7 @@ de: Alturgroßeltern
 fr: quatre-fois-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
 
     cousins.6.1
+co: 3<sup>u</sup> arcizioni
 de: Ur-Ur-Urgroßtanten und -onkel
 en: third great-granduncles
 fr: 3×-arrière-grands-oncles
@@ -6135,6 +6197,7 @@ fr: grands-cousins 4<sup>e</sup>
 fr: grands-cousins au quatrième degré
 
     cousins.6.6
+co: cugini à u 5<sup>u</sup> gradu
 de: Cousins 5. Grades
 en: fifth cousins
 fr: cousins 5<sup>e</sup>
@@ -6164,6 +6227,7 @@ fr: arrière-petits-cousins 5<sup>e</sup>
 fr: arrière-arrière-petits-cousins au cinquième degré
 
     cousins.7.0
+co: 5<sup>u</sup> arcicaccari
 de: Ur<sup>(×5)</sup>-Großeltern
 en: 5th-great-grandparents
 fr: 5×-arrière-grands-parents
@@ -6173,6 +6237,7 @@ de: Obereltern
 fr: cinq-fois-arrière-grands-parents<br>sext(is)aïeuls
 
     cousins.7.1
+co: 4<sup>u</sup> arcizioni
 de: Ur<sup>(×4)</sup>-Großtanten und -onkel
 en: fourth great-granduncles
 fr: 4×-arrière-grands-oncles
@@ -6237,6 +6302,7 @@ fr: grands-cousins 5<sup>e</sup>
 fr: grands-cousins au 5e degré
 
     cousins.7.7
+co: cugini à u 6<sup>u</sup> gradu
 de: Cousins 6. Grades
 en: 6th cousins
 fr: cousins 6<sup>e</sup>
@@ -6259,6 +6325,7 @@ fr: arrière-petits-cousins 6<sup>e</sup>
 fr: arrière-petits-cousins au sixième degré
 
     cousins.8.0
+co: 6<sup>u</sup> arcicaccari
 de: Ur<sup>(×6)</sup>-Großeltern
 en: 6th-great-grandparents
 fr: 6×-arrière-grands-parents
@@ -6268,6 +6335,7 @@ de: Obergroßeltern
 fr: six-fois-arrière-grands-parents<br>sept(is)aïeuls
 
     cousins.8.1
+co: 5<sup>u</sup> arcizioni
 de: Ur<sup>(×5)</sup>-Großtanten und -onkel
 en: fifth great-granduncles
 fr: cinq-fois-arrière-grands-oncles
@@ -6346,11 +6414,13 @@ fr: grands-cousins 6e
 fr: grands-cousins au sixième degré
 
     cousins.8.8
+co: cugini à u 7<sup>u</sup> gradu
 de: Cousins 7. Grades
 en: 7th cousins
 fr: cousins 7<sup>e</sup>
 
     cousins.8.8 tt
+co: cugini à u 7<sup>u</sup> gradu
 en: seventh cousins
 fr: cousins au septième degré
 
@@ -6363,6 +6433,7 @@ de: Cousins siebten Grades
 fr: petits-cousins au septième degré
 
     cousins.9.0
+co: 7<sup>u</sup> arcicaccari
 de: Ur<sup>(×7)</sup>-Großeltern
 en: 7th-great-grandparents
 fr: 7×-arrière-grands-parents
@@ -6372,6 +6443,7 @@ de: Oberurgroßeltern
 fr: sept-fois-arrière-grands-parents<br>octaïeuls
 
     cousins.9.1
+co: 6<sup>u</sup> arcizioni
 de: Ur<sup>(×6)</sup>-Großtanten und -onkel
 en: sixth great-granduncles
 fr: six-fois-arrière-grands-oncles
@@ -6610,7 +6682,7 @@ ar: شجرة العائل
 bg: семейно дърво
 br: bon roadoù
 ca: base de dades
-co: basa geneologica
+co: basa di dati genealogica
 cs: rodokmen
 da: family Tree
 de: Stammbaum
@@ -6980,11 +7052,13 @@ sv: ta bort
 tr: sil
 
     delete coat of arms
+co: squassà l’armuratura
 de: lösche das Wappen
 en: delete the coat of arms
 fr: supprimer le blason
 
     delete saved coat of arms
+co: squassà l’armuratura arregistrata
 de: lösche das gespeicherte Wappen
 en: delete the saved coat of arms
 fr: supprimer le blason sauvegardé
@@ -8207,11 +8281,13 @@ sv: utöver släktträdet
 tr: aile öyküsü
 
     family mode
+co: modu di famiglia
 de: Familienmodus
 en: family mode
 fr: mode famille
 
     family mode-hlp
+co: stende u statu semipublicu à i membri di a famiglia (attivà/disattivà)
 de: SemiPublic-Status auf Familienmitglieder ausweiten (zweiter Klick deaktiviert)
 en: extend the SemiPublic status to family members (on/off toggle)
 fr: étendre le statut SemiPublic aux membres de la famille (deuxième click désactive)
@@ -8678,6 +8754,7 @@ sv: för listan över sista ändringsdatum
 tr: son değişiklik tarihine göre sıralanmış liste için
 
     for url only
+co: per e fiure definite da un indirizzu web
 de: für Bilder, die durch eine URL definiert sind
 en: for URL defined images
 fr: pour les images définies par une URL
@@ -9021,6 +9098,7 @@ tr: GeneWeb parametreleri
 zh: GeneWeb 参数
 
     go to alt base
+co: andà versu a basa di dati/&#10;Fate casu à u numeru d’indice in a richiesta !
 de: gehe zur Datenbank/&#10;Sei vorsichtig mit der Indexnummer in der Anfrage!
 en: go to the database/&#10;Be carefull to the index number in the query!
 fr: aller vers la base de données/&#10;Attention au numéro d’index dans la requête !
@@ -9445,6 +9523,7 @@ sv: har ingen familj
 tr: eş ve çocuklar bilinmiyor
 
     help merge
+co: s’è nisuna hè selezziunata, e duie entrate seranu cuncatinate
 de: Bei Nichtauswahl werden die beiden Einträge verkettet
 en: if none is checked, both entries will be concatenated
 fr: en cas de non selection, les deux entrées seront concaténées
@@ -9522,16 +9601,19 @@ sv: dölj personbilder
 tr: portreleri gizle
 
     hiddden person
+co: persona piattata
 de: versteckte Person
 en: hidden person
 fr: individu masqué
 
     hiddden first_name
+co: nome piattatu
 de: versteckter Vorname
 en: hidden first name
 fr: prénom masqué
 
     hiddden surname
+co: casata piattata
 de: versteckter Nachname
 en: hidden surname
 fr: patronyme masqué
@@ -9957,6 +10039,7 @@ en: add a note for the image.
 fr: ajouter une note pour l’image.
 
     image map
+co: una fiura reattiva
 de: eine klickbare Grafik
 en: an image map
 fr: une image réactive
@@ -10399,7 +10482,7 @@ sv: förteckning över makarna (icke ättlingar)
 tr: eşler dizini (nesil yok)
 
     individual notes
-co: note individuale
+co: note nant’à l’individuu
 de: Hinweise zur Person
 en: individual notes
 es: nota individual
@@ -10802,6 +10885,7 @@ sv: juliansk dag
 tr: jülyen günü
 
     key
+co: chjave/chjave d’individuu
 de: Schlüssel
 en: key/individual key
 fr: clé/clé personne
@@ -11072,20 +11156,24 @@ tr: bağlantılı resimler
 zh: 关联图像
 
     linked albums help
+co: albumi o gallerie induve a persona hè referenzata
 de: Alben oder Gallerien, wo die Person verlinkt ist
 en: albums or galleries where person is referenced
 fr: albums ou galleries où la personne est citée
 
     linked albums
+co: albumi o gallerie ligati
 en: linked albums or galleries
 fr: albums ou galleries liés
 
     linked pages (pages) help
+co: pagine o note induve a pagina hè referenzata
 de: Seiten oder Notizen, wo die Seite referenziert wird
 en: pages or notes where page is referenced
 fr: pages ou notes où la page est citée
 
     linked pages help
+co: note, pagine, albumi o gallerie induve a persona hè referenzata
 de: Notizen, Seiten, Alben oder Gallerien, wo die Person erwähnt wird
 en: notes, pages, albums or galleries where person is referenced
 fr: notes, pages, albums ou galleries où la personne est citée
@@ -12232,6 +12320,7 @@ sv: blandade noteringar
 tr: çeşitli notlar
 
     miscellaneous notes help
+co: pagine esterne referenzate in a basa sottu a forma [[[schedariu]]]
 en: external pages referenced in the base as [[[filename]]]
 fr: pages externes réfécencées dans la base sous la forme [[[fichier]]]
 
@@ -12455,6 +12544,7 @@ sv: ändra
 tr: güncelleme
 
     modify coat of arms
+co: mudificà l’armuratura
 de: das Wappen ändern
 en: modify the coat of arms
 fr: modifier le blason
@@ -12469,6 +12559,7 @@ sv: ändra ordningen för %s familjehändelser
 tr: %s ailesinin etkinliklerini değiştir
 
     modify all note
+co: mudificà a nota sana/sezzione precedente/sezzione seguente
 de: die ganze Notiz bearbeiten/vorheriger Abschnitt/nächster Abschnitt
 en: modify all the note/previous section/next section
 fr: éditer toute la note/section précédente/section suivante
@@ -12480,6 +12571,7 @@ en: modify the note
 fr: modifier la note
 
     modify note section %d
+co: mudificà a sezzione %d
 de: den Abschnitt %d bearbeiten
 en: modify the section %d
 fr: modifier la section %d
@@ -12536,11 +12628,13 @@ en: modify the portrait
 fr: modifier le portrait
 
     copy portrait to blason
+co: impiegà u ritrattu cum’è armuratura
 de: das Portrait als Wappen verwenden
 en: use portrait as coats of arme
 fr: utiliser le portrait comme blason
 
     copy image to blason
+co: impiegà a fiura cum’è armuratura
 de: das Bild als Wappen verwenden
 en: use image as coats of arme
 fr: utiliser l'image comme blason
@@ -12664,6 +12758,7 @@ sv: fler än %d svar
 tr: %d cevaptan daha fazla
 
     move coat of arms to
+co: dispiazzà l’armuratura versu/cullà l’armuratura à u primu antenatu cunnisciutu chì l’hà purtata
 de: das Wappen verschieben zu/das Wappen zum ersten bekannten Vorfahren zurückführen, der es getragen hat
 en: move the coat of arms to/raise the coat of arms to first known holder who bored it
 fr: déplacer le blason vers/remonter le blason au premier ancêtre connu l’ayant porté
@@ -12862,7 +12957,7 @@ sv: namn %s används redan av %tdenna person%t
 tr: %s adı zaten %tbu kişi%t tarafından kullanılıyor
 
     name changed. updated linked pages
-co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l’anziana chjave inghjò.
+co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. E pagine quaghjò assuciate à l’anziana chjave sò state mudificate.
 de: Vorname, Name oder Vorkommen dieser Person hat sich geändert. Bitte aktualisieren Sie die unten aufgeführten Seiten, die mit dem alten Schlüssel verknüpft sind.
 en: The first name, name or occurrence of this person has changed. The pages linked to the old key listed below have been updated.
 fr: Le prénom, nom ou occurrence de cette personne a changé. Les pages ci-dessous liées à l’ancienne clé ont été mises à jour.
@@ -12962,6 +13057,7 @@ en: navigation in tree with this individual
 fr: naviguer dans l’arbre avec cet individu
 
     navigate with someone
+co: fà un cliccu nant’à %s per cambià l’individuu di a radica
 en: click on %s to change the root individual
 fr: cliquer sur %s pour changer l’individu racine
 
@@ -13014,7 +13110,7 @@ sv: antal händelser
 tr: etkinliklerin sayısı
 
     nb individuals
-co: numeru d’individu
+co: numeru d’individui
 de: Anzahl der Individuen
 en: number of individuals
 es: número de individuos
@@ -13072,6 +13168,7 @@ sv: nytt namn
 tr: yeni ad
 
     new note name
+co: nome di a nota nova
 de: Name der neuen Notiz
 en: name of the new note
 fr: nom de la nouvelle note
@@ -13354,7 +13451,7 @@ en: no more
 fr: pas d’autres
 
     no user key
-co: u liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu `.auth`
+co: stu liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu `.auth`
 de: dieser Link kann zu einem Homonym führen oder sogar fehlschlagen, weil der Nutzerschlüssel nicht in der `.auth` Datei definiert ist
 en: this link may lead to a homonym or even fail because the user key is not defined in the `.auth` file
 fr: ce lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier `.auth`
@@ -13902,6 +13999,7 @@ sv: annummer med som proband (Kekules system)
 tr: Sosa'ya göre
 
     occ
+co: numeru d’occurrenze/occurrenza
 de: Vorkommen-Zahl/Vorkommen
 en: occurence number/occurence
 fr: numéro d’occurrence/occurence
@@ -14378,11 +14476,13 @@ sv: eller
 tr: veya
 
     order
+co: listessu ordine
 de: gleiche Reihenfolge
 en: same order
 fr: même ordre
 
     order hlp
+co: cunservà u listessu ordine
 de: die gleiche Reihenfolge behalten
 en: keep the same order
 fr: conserver le même ordre
@@ -14444,6 +14544,7 @@ pt: outro/outra/outro
 sv: annat/annat/annat
 
     other possibilities
+co: altre pussibilità
 de: andere Möglichkeiten
 en: other possibilities
 fr: autres possibilités
@@ -15026,6 +15127,7 @@ en: previous
 fr: précédent
 
     previous coat of arms
+co: una salvaguardia preesistente di l’armuratura serà squassata.
 de: eine mögliche vorherige Version des gespeicherten Wappens wird gelöscht.
 en: a possible previous version of the saved coat of arms will be deleted.
 fr: une sauvegarde pré-existante du blason sera supprimée.
@@ -15830,6 +15932,7 @@ en: restore
 fr: restaurer
 
     restore coat of arms saved
+co: risturà l’armuratura
 de: gespeichertes Wappen wiederherstellen
 en: restore coat of arms
 fr: restaurer le blason
@@ -16027,10 +16130,12 @@ en: saved image/saved images
 fr: sauvegarde/sauvegardes
 
     save help
+co: schedarii micca referenzati à u furmatu [[[schedariu]]] o referenzati da persone non videvule ; seranu quantunque arregistrati da gwu
 en: files not referenced as [[[filename]]] or referenced by persons not visible; Will nonetheless be saved by gwu
 fr: fichiers non référencés au format [[[fichier]]] ou référencés par des personnes non visibles; Seront néanmoins sauvegardés par gwu
 
     files not in db
+co: schedarii micca referenzati
 en: files not referenced
 fr: fichiers non référencés 
 
@@ -16085,26 +16190,31 @@ sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
 
     mentions legales
+co: infurmazione legale
 de: rechtlich
 en: legal
 fr: mentions légales
 
     path to
+co: chjassu versu mè/chjassu versu u Sosa n<sup>u</sup> 1
 de: Weg zu mir/Weg zur Sosa N<sup>o</sup> 1
 en: path to me/path to the Sosa n<sup>o</sup> 1
 fr: chemin vers moi/chemin vers le Sosa n<sup>o</sup> 1
 
     path to me
+co: chjassu u più cortu trà mè è st’individuu
 de: kürzester Weg zwischen dieser Person und mir
 en: shortest path between this individual and me
 fr: chemin le plus court entre cet individu et moi
 
     path to Sosa 1
+co: chjassu u più cortu trà st’individuu è u Sosa n<sup>u</sup> 1
 de: kürzester Weg zwischen dieser Person und Sosa Nº 1
 en: shortest path between this individual and the Sosa nº 1
 fr: chemin le plus court entre cet individu et le Sosa nº 1
 
     search format
+co: furmati di ricerca
 de: Suchformat
 en: search formats
 fr: formats de recherche
@@ -16122,6 +16232,7 @@ en: search %s on matchID
 fr: recherche %s sur matchID
 
     search Insee
+co: ricerca di currispundenze in i schedarii di i morti di l’Insee
 de: suche Treffer in den Insee Sterbeindex Daten
 en: search matches in the Insee death index files
 fr: recherche de correspondances dans les fichiers des décès de l’Insee
@@ -16157,50 +16268,60 @@ sv: sök/skiftlägeskänslig
 tr: arama/büyük küçük harfe duyarlı
 
     other base
+co: altra basa
 de: andere Datenbank
 en: other base
 fr: autre base
 
     hidden first_name
+co: nome piattatu
 de: versteckter Vorname
 en: hidden first name
 fr: prénom masqué
 
     hidden surname
+co: casata piattata
 de: versteckter Nachname
 en: hidden surname
 fr: patronyme masqué
 
     hidden person
+co: persona piattata
 de: versteckte Person
 en: hidden person
 fr: personne masquée
 
     not all
+co: un nome
 de: ein Vorname
 en: one first name
 fr: un prénom
 
     not all hlp
+co: cuntene solu un nome (da predefinizione, cuntene tutti i nomi)
 de: enthält nur einen Vornamen (enthält standardmäßig alle Vornamen)
 en: contains only one first name (contains all first names by default)
 fr: contient un seul prénom (contient tous les prénoms par défaut)
 
     not exact
+co: parziale
 de: teilweise
 en: partial
 fr: partiel
 
     not exact hlp
+co: currispundenza parziale (da predefinizione, currispundenza esatta)
 de: teilweise passend (standardmäßig exakt passend)
 en: partial matching (exact matching by default)
 fr: correspondance partielle (correspondance exacte par défaut)
 
     note is restricted
+co: l’accessu à sta pagina hè limitatu
 en: access to this page is restricted
 fr: l'accès à cette page est restreint
 
     optional/mandatory
+co: ozzionale/ubblicatoriu
 de: optional/obligatorisch
 en: optional/mandatory
 fr: facultatif/obligatoire
@@ -16363,6 +16484,7 @@ sv: se bilder
 tr: resimleri görüntüle
 
     see coat of arms
+co: vede l’armuratura
 de: siehe das Wappen
 en: see the coat of arms
 fr: voir le blason
@@ -16559,7 +16681,7 @@ ar: بإمكانك إختيار لغة أخرى من بين اللغات الت�
 bg: можете да изберете друг език за съобщения измежду следните
 br: dibab a c'hellit ur yezh all etre ar re-mañ
 ca: podeu seleccionar una altre llengua, hi ha disponibles les següents
-co: affissà in
+co: selezziunà a lingua
 cs: zvolte jazyk pro prohlížení databáze
 da: du kan vælge fremstilling på et andet sprog blandt de følgende
 de: Sprache auswählen
@@ -17107,7 +17229,7 @@ sv: visas efter:/grenar/alfabetisk ordning
 tr: satır/alfabetik sıraya göre sırala
 
     sort by/date begin/alphabetic order/nb individuals/nb events
-co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’evenimenti
+co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individui/numeru d’evenimenti
 de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Ereignisse
 en: sort by/date/alphabetical order/number of individuals/number of events
 es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
@@ -17464,6 +17586,7 @@ tr: bu araç üzerinde kalırken
 zh: 在此工具上停留时
 
     stop using the coat of arms of
+co: piantà l’adopru di l’armuratura di/st’individuu hà piantatu l’adopru di l’armuratura di u so antenatu
 de: das Wappen dieser Person nicht mehr verwenden/diese Person hat aufgehört, das Wappen ihres Vorfahren zu verwenden
 en: stop using the coat of arms of/this individual stopped using his ancestor coat of arms
 fr: arrêter d’utiliser le blason de/cet individu a arrêté d’utiliser le blason de son ancêtre
@@ -17475,6 +17598,7 @@ en: the selected image will be copied to
 fr: l’image sélectionnée sera enregistrée dans
 
     subplace help
+co: fate casu, a sintassa di i sottulochi hè « sottulocu – locu » cù una lineetta chì pò esse n (–) o M (—).
 de: Seien Sie vorsichtig, die Syntax von Ortsteilen ist "[Ortsteil] – Ort" mit einem Gedanken- oder Bindestrich.
 en: be carefull, the syntax of subplaces is “[subplace] – place” with a dash that can be emdash or endash.
 fr: attention, la syntaxe des sous-lieux est « [sous-lieu] – lieu » avec un tiret qui peut être cadratin ou demi-cadratin.
@@ -18843,7 +18967,7 @@ af: titel/titels
 bg: титла/титли
 br: titl/titloù
 ca: títol/títols
-co: titulu/tituli
+co: titulu/tituli/titulu(i)
 cs: titul/tituly
 da: titel/titler (nob.)
 de: Titel/Titel/Titel
@@ -19497,6 +19621,7 @@ sv: försök ett annat beräkningssätt
 tr: başka bir hesaplama seçeneği deneyin
 
     data typographic checker
+co: verificadore tipograficu di i dati
 de: Typografischer Daten-Checker
 en: Data typographic checker
 fr: Vérificateur typographique des données
@@ -19581,14 +19706,17 @@ en: unfiltered total
 fr: total non filtré
 
     unknown first_name
+co: nome scunnisciutu
 en: unknown first name
 fr: prénom inconnu
 
     unknown surname
+co: casata scunnisciuta
 en: unknown surname
 fr: patronyme inconnu
 
     unknown index
+co: indice scunnisciutu
 en: unknown index
 fr: index inconnu
 
@@ -19751,7 +19879,7 @@ sv: redigera familj
 tr: aileyi Düzenle
 
     update image note
-co: mudificà a nota di a fiura
+co: mudificà a fiura
 de: Bildnotiz aktualisieren
 en: update image
 fr: mettre à jour l’image
@@ -19814,6 +19942,7 @@ sv: använd "länk" istället för "skapa"
 tr: "oluştur" yerine "bağlantı" kullanın
 
     use coat of arms of
+co: impiegà l’armuratura di
 de: verwende das Wappen von
 en: use the coat of arms of
 fr: utilise le blason de
@@ -20012,11 +20141,13 @@ sv: se källa
 tr: kaynağı görüntüle
 
     visibility
+co: visibilità
 de: Sichtbarkeit
 en: visibility
 fr: visibilité
 
     visibility-hlp
+co: aiutu per a visibilità di l’individui
 de: Hilfe zur Sichtbarkeit von Personen
 en: help for visibility of individuals
 fr: aide pour la visibilité des individus
@@ -20259,6 +20390,7 @@ sv: med rot, partners och okända
 tr: kök atası, eşler ve bilinmeyenler ile
 
     with spouse name
+co: cù u nome di u so cunghjuntu
 de: mit dem Namen des Ehegatten
 en: with spouse's name
 fr: avec le nom de son conjoint
@@ -20418,6 +20550,7 @@ sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
 
     word/words
+co: solu una parolla/casata sana
 de: nur ein Wort/kompletter Nachname
 en: only one word/full surname
 fr: un seul mot/patronyme complet
@@ -20673,6 +20806,7 @@ sv: ditt meddelande väntar på godkännande
 tr: mesajınız doğrulama için bekliyor
 
     zero-width character
+co: stu caratteru senza caccia hè statu allargatu per esse videvule
 de: Dieses Zeichen mit der Breite Null wurde vergrößert, damit es sichtbar ist
 en: this zero-width character has been widened to be visible
 fr: ce caractère sans chasse a été élargi pour être visible
