@@ -1,7 +1,7 @@
 # Makefile for GED2GWB module
 # Professional test organization and automation
 
-PYTHON = python3
+PYTHON = ../.venv/bin/python
 MODULE_PATH = .
 TEST_PATH = $(MODULE_PATH)/tests
 EXAMPLES_PATH = $(MODULE_PATH)/examples

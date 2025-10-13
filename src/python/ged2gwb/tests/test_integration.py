@@ -108,6 +108,7 @@ def test_cli_help():
             print(f"FAIL: Missing {option} in help")
             raise AssertionError("Test failed")
     # Test passed successfully
+    return True
 
 
 def test_cli_parsing():
@@ -153,6 +154,7 @@ def test_cli_parsing():
         print(f"FAIL: CLI parsing failed: {e}")
         raise AssertionError("Test failed")
     # Test passed successfully
+    return True
 
 
 def test_end_to_end_conversion():
@@ -226,6 +228,8 @@ def test_end_to_end_conversion():
         if "actual_output_file" in locals() and actual_output_file.exists():
             actual_output_file.unlink()
 
+    return True
+
 
 def test_error_scenarios():
     """Test various error scenarios."""
@@ -256,6 +260,7 @@ def test_error_scenarios():
         print("PASS: Correctly handled invalid UDI format")
 
     # Test passed successfully
+    return True
 
 
 def main():

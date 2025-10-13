@@ -23,8 +23,13 @@ from lib.db_pickle.io.reader import PickleReader
 def get_gedcom_path(filename: str) -> Path | None:
     """Helper to find GEDCOM files."""
     possible_paths = [
+        Path(f"../gedcom/ged/{filename}"),  # From ged2gwb directory
         Path(f"python/gedcom/ged/{filename}"),
         Path(f"./gedcom/ged/{filename}"),
+        Path(f"lib/gedcom/ged/{filename}"),
+        Path(f"src/lib/gedcom/ged/{filename}"),
+        Path(f"../../lib/gedcom/ged/{filename}"),
+        Path(f"../../../lib/gedcom/ged/{filename}"),
     ]
     for path in possible_paths:
         if path.exists():
@@ -112,6 +117,8 @@ def test_with_sample_ged():
         if actual_file.exists():
             actual_file.unlink()
 
+    return True
+
 
 def test_with_uk_ged():
     """Test conversion with the real uk.ged file."""
@@ -187,6 +194,8 @@ def test_with_uk_ged():
             output_file.unlink()
         if actual_file.exists():
             actual_file.unlink()
+
+    return True
 
 
 def test_cli_functionality():
@@ -265,6 +274,8 @@ def test_cli_functionality():
         if actual_file and actual_file.exists():
             actual_file.unlink()
 
+    return True
+
 
 def test_load_functionality():
     """Test the --load functionality."""
@@ -313,6 +324,8 @@ def test_load_functionality():
         if actual_file.exists():
             actual_file.unlink()
 
+    return True
+
 
 def test_error_handling():
     """Test error handling with concrete scenarios."""
@@ -332,20 +345,7 @@ def test_error_handling():
 
     # Test with invalid database name
     try:
-        # Try multiple possible paths
-        possible_paths = [
-            Path("lib/gedcom/ged/sample.ged"),
-            Path("src/lib/gedcom/ged/sample.ged"),
-            Path("../lib/gedcom/ged/sample.ged"),
-            Path("../../lib/gedcom/ged/sample.ged"),
-        ]
-
-        sample_ged = None
-        for path in possible_paths:
-            if path.exists():
-                sample_ged = path
-                break
-
+        sample_ged = get_gedcom_path("sample.ged")
         if sample_ged:
             options = ConversionOptions(
                 input_file=sample_ged,
@@ -387,6 +387,7 @@ def test_error_handling():
             existing_file.unlink()
 
     # Test passed successfully
+    return True
 
 
 def main():
