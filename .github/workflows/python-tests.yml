@@ -2,8 +2,7 @@ name: Python Library Tests
 
 on:
   push:
-    branches:
-      - '**'
+    branches: -''
     paths:
       - 'src/python/**.py'
       - 'src/Makefile'
@@ -11,7 +10,7 @@ on:
       - '.github/workflows/python-tests.yml'
   pull_request:
     branches:
-      - '**'
+      - 'master'
     paths:
       - 'src/**.py'
       - 'src/Makefile'

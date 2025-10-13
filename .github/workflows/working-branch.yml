@@ -34,6 +34,12 @@ jobs:
           echo "Setting up development environment..."
           make dev-setup
 
+      - name: Install development tools
+        run: |
+          cd src/python
+          echo "Installing development tools..."
+          make install-tools
+
       - name: Code Quality Checks
         run: |
           cd src/python
