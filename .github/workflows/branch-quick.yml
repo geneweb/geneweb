@@ -2,7 +2,7 @@ name: Branch Quick Check
 
 on:
   push:
-    branches: [db]
+    branches: '*'
   workflow_dispatch:
 
 jobs:
