@@ -2,8 +2,7 @@ name: Working Branch Checks
 
 on:
   push:
-    branches:
-      - 'db'
+    branches: '*'
   pull_request:
     branches: [master]
   workflow_dispatch:
