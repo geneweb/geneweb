@@ -10,8 +10,7 @@ on:
       - 'src/python/tests/**.py'
       - '.github/workflows/python-tests.yml'
   pull_request:
-    branches:
-      - 'master'
+    branches: -''
     paths:
       - 'src/python/lib/old_db/**.py'
       - 'src/Makefile'
