@@ -24,9 +24,7 @@ def get_gedcom_path(filename: str) -> Path | None:
     """Helper to find GEDCOM files."""
     possible_paths = [
         Path(f"python/gedcom/ged/{filename}"),
-        Path(f"../gedcom/ged/{filename}"),
-        Path(f"../../python/gedcom/ged/{filename}"),
-        Path(f"../../../python/gedcom/ged/{filename}"),
+        Path(f"./gedcom/ged/{filename}"),
     ]
     for path in possible_paths:
         if path.exists():
@@ -195,20 +193,7 @@ def test_cli_functionality():
     """Test CLI functionality with real files."""
     print("\n=== Testing CLI Functionality ===\n")
 
-    # Try multiple possible paths
-    possible_paths = [
-        Path("python/gedcom/ged/sample.ged"),
-        Path("../gedcom/ged/sample.ged"),
-        Path("../../python/gedcom/ged/sample.ged"),
-        Path("../../../python/gedcom/ged/sample.ged"),
-    ]
-
-    sample_ged = None
-    for path in possible_paths:
-        if path.exists():
-            sample_ged = path
-            break
-
+    sample_ged = get_gedcom_path("sample.ged")
     if not sample_ged:
         print("SKIP: sample.ged not found in any expected location")
         pytest.skip("sample.ged not found")
@@ -285,20 +270,7 @@ def test_load_functionality():
     """Test the --load functionality."""
     print("\n=== Testing Load Functionality ===\n")
 
-    # Try multiple possible paths
-    possible_paths = [
-        Path("python/gedcom/ged/sample.ged"),
-        Path("../gedcom/ged/sample.ged"),
-        Path("../../python/gedcom/ged/sample.ged"),
-        Path("../../../python/gedcom/ged/sample.ged"),
-    ]
-
-    sample_ged = None
-    for path in possible_paths:
-        if path.exists():
-            sample_ged = path
-            break
-
+    sample_ged = get_gedcom_path("sample.ged")
     if not sample_ged:
         print("SKIP: sample.ged not found in any expected location")
         pytest.skip("sample.ged not found")
@@ -395,20 +367,7 @@ def test_error_handling():
     # Test with existing output file (without force)
     existing_file = None
     try:
-        # Try multiple possible paths
-        possible_paths = [
-            Path("lib/gedcom/ged/sample.ged"),
-            Path("src/lib/gedcom/ged/sample.ged"),
-            Path("../lib/gedcom/ged/sample.ged"),
-            Path("../../lib/gedcom/ged/sample.ged"),
-        ]
-
-        sample_ged = None
-        for path in possible_paths:
-            if path.exists():
-                sample_ged = path
-                break
-
+        sample_ged = get_gedcom_path("sample.ged")
         if sample_ged:
             # Create existing file
             existing_file = Path("existing_output.pkl")

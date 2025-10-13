@@ -131,9 +131,9 @@ class ParserUtils:
             surname_raw = match.group(2).strip()
             suffix = match.group(3).strip() or None
             if surname_raw == "":
-                surname = ""
+                surname: str = ""
             else:
-                surname = surname_raw or None
+                surname = surname_raw or ""
 
             return GedcomName(
                 full=name_value, given=given, surname=surname, suffix=suffix

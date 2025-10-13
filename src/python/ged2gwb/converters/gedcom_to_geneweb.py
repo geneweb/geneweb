@@ -31,8 +31,8 @@ class GedcomToGenewebConverter:
         """Initialize converter with options."""
         self.options = options
         self.logger = logging.getLogger(__name__)
-        self.warnings = []
-        self.errors = []
+        self.warnings: list[str] = []
+        self.errors: list[str] = []
 
     def convert(self, gedcom_database: GedcomDatabase) -> Dict[str, Any]:
         """

@@ -387,7 +387,7 @@ def read_bin_caml_input(
         if code >= PREFIX_SMALL_BLOCK:
             data["tag"] = code & 0xF
             data["size"] = (code >> 4) & 0x7
-            logger.debug(f"small block {data["tag"]=} {data["size"]=}")
+            logger.debug(f"small block {data['tag']=} {data['size']=}")
             # s.read_block(tag, size, top_item.dest)
             # raise NotImplementedError("read_bin_caml_input not implemented yet")
             return []

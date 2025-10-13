@@ -203,7 +203,7 @@ class Ged2GwbCLI:
         if args.verbose:
             log_level = logging.DEBUG
 
-        handlers = [logging.StreamHandler()]
+        handlers: list[logging.Handler] = [logging.StreamHandler()]
         if args.log:
             handlers.append(logging.FileHandler(args.log))
 
@@ -283,7 +283,8 @@ class Ged2GwbCLI:
                 return 1
 
             if args.load:
-                return self.load_database(args.load)
+                result = self.load_database(args.load)
+                return 0 if result is not None else 1
 
             if args.nc:
                 args.no_consistency_check = True

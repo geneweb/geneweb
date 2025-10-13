@@ -17,7 +17,7 @@ class RepositoryParser(RecordParser):
         if start_index >= len(lines):
             raise GedcomParseError("Unexpected end of file")
 
-        repository = GedcomRepository(xref=lines[start_index].xref_id)
+        repository = GedcomRepository(xref=lines[start_index].xref_id or "")
         current_index = start_index + 1
         base_level = lines[start_index].level
 

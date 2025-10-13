@@ -17,7 +17,7 @@ class SubmitterParser(RecordParser):
         if start_index >= len(lines):
             raise GedcomParseError("Unexpected end of file")
 
-        submitter = GedcomSubmitter(xref=lines[start_index].xref_id)
+        submitter = GedcomSubmitter(xref=lines[start_index].xref_id or "")
         current_index = start_index + 1
         base_level = lines[start_index].level
 

@@ -145,7 +145,7 @@ class SemanticValidator(Validator):
         errors = []
 
         # Collect all valid XREFs
-        valid_xrefs = set()
+        valid_xrefs: set[str] = set()
         valid_xrefs.update(database.individuals.keys())
         valid_xrefs.update(database.families.keys())
         valid_xrefs.update(database.notes.keys())
@@ -341,7 +341,7 @@ class GedcomValidator:
         Returns:
             Dictionary with validation results
         """
-        results = {"structure_errors": [], "semantic_errors": []}
+        results: dict[str, list[str]] = {"structure_errors": [], "semantic_errors": []}
 
         try:
             self.validate_structure(lines)

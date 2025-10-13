@@ -17,7 +17,7 @@ class NoteParser(RecordParser):
         if start_index >= len(lines):
             raise GedcomParseError("Unexpected end of file")
 
-        note = GedcomNote(xref=lines[start_index].xref_id)
+        note = GedcomNote(xref=lines[start_index].xref_id or "")
         current_index = start_index + 1
         base_level = lines[start_index].level
 

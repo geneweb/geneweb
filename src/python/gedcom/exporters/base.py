@@ -5,7 +5,7 @@ This module contains the base classes for GEDCOM exporting.
 """
 
 from abc import ABC, abstractmethod
-from typing import TextIO
+from typing import TextIO, Any
 
 
 class RecordExporter(ABC):
@@ -17,7 +17,7 @@ class RecordExporter(ABC):
         pass
 
     @abstractmethod
-    def export(self, file: TextIO, xref: str, record: object) -> None:
+    def export(self, file: TextIO, xref: str, record: Any) -> None:
         """Export record to file.
 
         Args:

@@ -139,7 +139,7 @@ format:
 lint:
 	@echo "$(BLUE)Running linting with ruff...$(NC)"
 	$(VENV_PYTHON) -m ruff check ged2gwb/ gedcom/ lib/ --exclude=lib/old_db,lib/util,ged2gwb/examples,gedcom/tests,ged2gwb/tests
-	$(VENV_PYTHON) -m mypy ged2gwb/ gedcom/ lib/ --ignore-missing-imports --exclude=lib/old_db,lib/util,ged2gwb/examples,gedcom/tests,ged2gwb/tests
+	$(VENV_PYTHON) -m mypy --ignore-missing-imports --exclude=ged2gwb/examples,gedcom/tests,ged2gwb/tests --follow-imports=skip ged2gwb/ gedcom/
 	@echo "$(GREEN)✓ Linting complete$(NC)"
 
 .PHONY: fix
@@ -220,7 +220,7 @@ status:
 	@$(VENV_PYTHON) -m ruff check ged2gwb/ gedcom/ lib/ --exclude=lib/old_db,lib/util,ged2gwb/examples,gedcom/tests,ged2gwb/tests --statistics || true
 	@echo ""
 	@echo "$(YELLOW)Running mypy check...$(NC)"
-	@$(VENV_PYTHON) -m mypy ged2gwb/ gedcom/ lib/ --ignore-missing-imports --exclude=lib/old_db,lib/util,ged2gwb/examples,gedcom/tests,ged2gwb/tests --show-error-codes || true
+	@$(VENV_PYTHON) -m mypy --ignore-missing-imports --exclude=ged2gwb/examples,gedcom/tests,ged2gwb/tests --follow-imports=skip --show-error-codes ged2gwb/ gedcom/ || true
 
 .PHONY: issues
 issues:

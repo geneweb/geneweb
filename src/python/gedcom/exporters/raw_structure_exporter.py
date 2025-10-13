@@ -26,3 +26,4 @@ class RawStructureExporter(RecordExporter):
 
     def _get_record_tag(self, record: object) -> str:
         """Get record tag from record type."""
+        return "UNKNOWN"
