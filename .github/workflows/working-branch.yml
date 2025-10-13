@@ -121,11 +121,20 @@ jobs:
           echo "Python modules: $(find . -name '*.py' | wc -l) Python files"
           echo "Test files: $(find . -name 'test_*.py' | wc -l) test files"
 
+      - name: Clean branch name
+        id: clean-branch
+        run: |
+          # Clean branch name for artifact naming
+          CLEAN_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[\/\\:*?"<>|]/_/g')
+          echo "clean-branch-name=$CLEAN_BRANCH" >> $GITHUB_OUTPUT
+          echo "Original branch: ${{ github.ref_name }}"
+          echo "Clean branch: $CLEAN_BRANCH"
+
       - name: Upload results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: task-branch-results-${{ github.ref_name }}
+          name: task-branch-results-${{ steps.clean-branch.outputs.clean-branch-name }}
           path: |
             src/python/tests/reports/
             src/python/tests/
