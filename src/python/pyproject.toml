@@ -1,0 +1,46 @@
+[project]
+name = "geneweb-python"
+version = "0.0.1"
+description = "A python transcription of GeneWeb with GED2GWB converter"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "GeneWeb Team"}
+]
+keywords = ["genealogy", "gedcom", "geneweb", "family-tree", "converter"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "chardet>=5.0.0",
+    "python-dateutil>=2.8.0",
+    "PyYAML>=6.0",
+    "jsonschema>=4.0.0",
+]
+
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
+
+[project.scripts]
+ged2gwb = "ged2gwb.__main__:main"
+
+[tool.flit.module]
+name = "ged2gwb"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = ["-ra"]
+testpaths = ["ged2gwb/tests", "gedcom/tests"]

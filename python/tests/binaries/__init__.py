@@ -1,1 +1,0 @@
-"""Tests organized by binary."""

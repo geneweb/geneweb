@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""
+GED2GWB - GEDCOM to GeneWeb Database Converter
+Command line launcher script
+"""
+
+import os
+import sys
+from pathlib import Path
+
+# Add the project root to Python path
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+# Import and run the main CLI
+try:
+    from ged2gwb.cli.main import main
+    main()
+except ImportError as e:
+    print(f"Error importing ged2gwb: {e}")
+    print("Make sure you're running this from the project root directory")
+    sys.exit(1)
+except Exception as e:
+    print(f"Error running ged2gwb: {e}")
+    sys.exit(1)
