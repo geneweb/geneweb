@@ -164,7 +164,7 @@ class TestGed2GwbConverter:
         converter = Ged2GwbConverter(self.options)
 
         # Test without base_dir
-        path = converter._get_output_file_path()
+        path = converter._get_output_path()
         assert path == Path("test_converter.pkl")
 
         # Test with base_dir
@@ -175,7 +175,7 @@ class TestGed2GwbConverter:
             compress=False,
         )
         converter_with_base_dir = Ged2GwbConverter(options_with_base_dir)
-        path = converter_with_base_dir._get_output_file_path()
+        path = converter_with_base_dir._get_output_path()
         assert path == Path("/tmp/test.pkl")
 
     def test_get_conversion_info(self):
@@ -265,7 +265,7 @@ class TestGed2GwbConverter:
 
             stats = converter.convert()
 
-            assert stats["compression"] is True
+            assert stats["compressed"] is True
             assert stats["file_path"] == "test_compressed.pkl.gz"
 
     @patch("ged2gwb.core.converter.GedcomToGenewebConverter")

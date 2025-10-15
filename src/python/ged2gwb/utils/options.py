@@ -10,7 +10,7 @@ class ConversionOptions:
     """Options for GEDCOM to GeneWeb conversion."""
 
     input_file: Path
-    output_file: Path = Path("a.pkl")
+    output_file: Path = Path("base.pkl")
     base_dir: Optional[Path] = None  # Base directory for databases
 
     charset: Optional[str] = None  # ANSEL, ASCII, MSDOS

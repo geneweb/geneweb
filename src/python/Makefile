@@ -36,10 +36,14 @@ help:
 	@echo "  uninstall      Uninstall package"
 	@echo ""
 	@echo "$(GREEN)Testing:$(NC)"
-	@echo "  test           Run all tests (unit + integration + concrete)"
-	@echo "  test-unit      Run unit tests only"
-	@echo "  test-integration Run integration tests only"
-	@echo "  test-concrete  Run concrete tests with real files"
+	@echo "  test           Run all tests (GEDCOM + ged2gwb + lib)"
+	@echo "  test-all       Run all tests (GEDCOM + ged2gwb + lib)"
+	@echo "  test-ged2gwb   Run ged2gwb tests only"
+	@echo "  test-gedcom    Run GEDCOM tests only"
+	@echo "  test-lib       Run lib tests only"
+	@echo "  test-unit      Run unit tests only (ged2gwb)"
+	@echo "  test-integration Run integration tests only (ged2gwb)"
+	@echo "  test-concrete  Run concrete tests with real files (ged2gwb)"
 	@echo "  test-coverage  Run tests with coverage report"
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
@@ -104,8 +108,28 @@ uninstall:
 
 # Testing
 .PHONY: test
-test: test-unit test-integration test-concrete
+test: test-all
 	@echo "$(GREEN)✓ All tests completed$(NC)"
+
+.PHONY: test-all
+test-all:
+	@echo "$(BLUE)Running all Python tests (GEDCOM + ged2gwb + lib)...$(NC)"
+	$(VENV_PYTHON) -m pytest ged2gwb/tests/ gedcom/tests/ lib/ -v --tb=short
+
+.PHONY: test-ged2gwb
+test-ged2gwb:
+	@echo "$(BLUE)Running ged2gwb tests...$(NC)"
+	$(VENV_PYTHON) -m pytest ged2gwb/tests/ -v
+
+.PHONY: test-gedcom
+test-gedcom:
+	@echo "$(BLUE)Running GEDCOM tests...$(NC)"
+	$(VENV_PYTHON) -m pytest gedcom/tests/ -v
+
+.PHONY: test-lib
+test-lib:
+	@echo "$(BLUE)Running lib tests...$(NC)"
+	$(VENV_PYTHON) -m pytest lib/ -v
 
 .PHONY: test-unit
 test-unit:

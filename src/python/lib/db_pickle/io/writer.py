@@ -57,7 +57,6 @@ class PickleWriter:
         final_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Serialize data
-        self.trace("serializing database to pickle")
         if compress:
             with gzip.open(final_path, "wb", compresslevel=6) as f:
                 pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)

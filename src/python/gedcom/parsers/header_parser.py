@@ -10,13 +10,14 @@ from ..exceptions import GedcomParseError
 from ..models import GedcomHeader
 from ..tokenizer import GedcomLine
 from .base import RecordParser
+from ..tags import TAGS
 
 
 class HeaderParser(RecordParser):
     """Parser for GEDCOM header."""
 
     def can_parse(self, tag: str) -> bool:
-        return tag == "HEAD"
+        return tag == TAGS.HEAD
 
     def parse(
         self, lines: List[GedcomLine], start_index: int
@@ -35,19 +36,19 @@ class HeaderParser(RecordParser):
             if line.level <= base_level:
                 break
             header.raw_lines.append((line.level, line.tag, line.value))
-            if line.tag == "SOUR":
+            if line.tag == TAGS.SOUR:
                 header.source = line.value
-            elif line.tag == "DEST":
+            elif line.tag == TAGS.DEST:
                 header.destination = line.value
-            elif line.tag == "DATE":
+            elif line.tag == TAGS.DATE:
                 header.date = line.value
-            elif line.tag == "FILE":
+            elif line.tag == TAGS.FILE:
                 header.filename = line.value
-            elif line.tag == "CHAR":
+            elif line.tag == TAGS.CHAR:
                 header.charset = line.value
-            elif line.tag == "SUBM":
+            elif line.tag == TAGS.SUBM:
                 header.submitter = line.value
-            elif line.tag == "VERS":
+            elif line.tag == TAGS.VERS:
                 header.version = line.value
 
             current_index += 1

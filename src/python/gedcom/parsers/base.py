@@ -28,7 +28,6 @@ class DefaultFileReader:
             with open(filepath, "r", encoding=encoding, errors="replace") as f:
                 return f.read()
         except UnicodeDecodeError:
-            # Fallback to latin-1 for legacy files
             with open(filepath, "r", encoding="latin-1", errors="replace") as f:
                 return f.read()
 

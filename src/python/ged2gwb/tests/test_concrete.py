@@ -117,7 +117,6 @@ def test_with_sample_ged():
         if actual_file.exists():
             actual_file.unlink()
 
-    return True
 
 
 def test_with_uk_ged():
@@ -195,7 +194,6 @@ def test_with_uk_ged():
         if actual_file.exists():
             actual_file.unlink()
 
-    return True
 
 
 def test_cli_functionality():
@@ -274,7 +272,6 @@ def test_cli_functionality():
         if actual_file and actual_file.exists():
             actual_file.unlink()
 
-    return True
 
 
 def test_load_functionality():
@@ -324,7 +321,6 @@ def test_load_functionality():
         if actual_file.exists():
             actual_file.unlink()
 
-    return True
 
 
 def test_error_handling():
@@ -387,7 +383,6 @@ def test_error_handling():
             existing_file.unlink()
 
     # Test passed successfully
-    return True
 
 
 def main():

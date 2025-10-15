@@ -4,13 +4,14 @@ from ..exceptions import GedcomParseError
 from ..models import GedcomMultimedia
 from ..tokenizer import GedcomLine
 from .base import RecordParser
+from ..tags import TAGS
 
 
 class MultimediaParser(RecordParser):
     """Parser for GEDCOM multimedia."""
 
     def can_parse(self, tag: str) -> bool:
-        return tag == "OBJE"
+        return tag == TAGS.OBJE
 
     def parse(self, lines: List[GedcomLine], start_index: int) -> tuple:
         """Parse multimedia record."""
@@ -29,20 +30,20 @@ class MultimediaParser(RecordParser):
                 break
             multimedia.raw_structure.append((line.level, line.tag, line.value))
 
-            if line.tag == "FILE":
+            if line.tag == TAGS.FILE:
                 multimedia.file_path = line.value
                 current_text_field = "file_path"
-            elif line.tag == "FORM":
+            elif line.tag == TAGS.FORM:
                 multimedia.format = line.value
-            elif line.tag == "TITL":
+            elif line.tag == TAGS.TITL:
                 multimedia.title = line.value
                 current_text_field = "title"
-            elif line.tag == "NOTE":
+            elif line.tag == TAGS.NOTE:
                 multimedia.notes.append(line.value)
                 current_text_field = "notes"
-            elif line.tag == "SOUR":
+            elif line.tag == TAGS.SOUR:
                 multimedia.sources.append(line.value.strip("@"))
-            elif line.tag == "CONC":
+            elif line.tag == TAGS.CONC:
                 # CONC continues the previous text field
                 if current_text_field == "file_path" and multimedia.file_path:
                     multimedia.file_path += line.value
@@ -50,7 +51,7 @@ class MultimediaParser(RecordParser):
                     multimedia.title += line.value
                 elif current_text_field == "notes" and multimedia.notes:
                     multimedia.notes[-1] += line.value
-            elif line.tag == "CONT":
+            elif line.tag == TAGS.CONT:
                 # CONT continues the previous text field with newline
                 if current_text_field == "file_path" and multimedia.file_path:
                     multimedia.file_path += "\n" + line.value
