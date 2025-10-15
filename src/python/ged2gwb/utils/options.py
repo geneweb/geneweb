@@ -43,7 +43,7 @@ class ConversionOptions:
 
     uin: bool = False  # Put untreated GEDCOM tags in notes
 
-    compress: bool = True  # Use gzip compression
+    compress: bool = False  # Use gzip compression
     force: bool = False  # Overwrite existing files
 
     log_file: Optional[Path] = None

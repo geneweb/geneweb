@@ -31,8 +31,8 @@ class Ged2GwbCLI:
             "-o",
             "--output",
             type=Path,
-            default=Path("base.pkl"),
-            help="Output database file (default: base.pkl)",
+            default=Path("a.pkl"),
+            help="Output database file (default: a.pkl)",
         )
 
         parser.add_argument(

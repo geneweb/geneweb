@@ -2,8 +2,7 @@
 GEDCOM to GeneWeb format converter.
 
 This module handles the conversion from GEDCOM data structures to
-GeneWeb data structures. Currently, this is a placeholder for future
-conversion logic.
+GeneWeb data structures.
 """
 
 import logging
@@ -14,14 +13,13 @@ from typing import Any, Dict
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from gedcom.models import GedcomDatabase
-from lib.db_pickle.core.enums import DivorceStatus, RelationKind, Sex
-from lib.db_pickle.core.types import Ifam, Iper
-from lib.db_pickle.models.events import Date
-from lib.db_pickle.models.family import GenFamily
-from lib.db_pickle.models.person import GenPerson
+from lib.db_pickle.core.types import Ifam, Iper, dummy_iper
 from lib.db_pickle.models.relations import GenCouple
 
 from ..utils.options import ConversionOptions
+from .validation import GedcomValidator
+from .conversion import GedcomConverter
+from .relationship_checker import RelationshipChecker
 
 
 class GedcomToGenewebConverter:
@@ -31,8 +29,15 @@ class GedcomToGenewebConverter:
         """Initialize converter with options."""
         self.options = options
         self.logger = logging.getLogger(__name__)
-        self.warnings: list[str] = []
-        self.errors: list[str] = []
+
+        # Initialize helper classes
+        self.validator = GedcomValidator(self.logger, self.options)
+        self.converter = GedcomConverter(self.logger, self.options)
+        self.relationship_checker = RelationshipChecker(self.logger, self.options)
+
+        # Keep backward compatibility
+        self.warnings = self.validator.warnings
+        self.errors = self.validator.errors
 
     def convert(self, gedcom_database: GedcomDatabase) -> Dict[str, Any]:
         """
@@ -45,15 +50,29 @@ class GedcomToGenewebConverter:
             Dictionary with conversion statistics
         """
         from lib.db_pickle.database.base_data import PickleBaseData
-        from lib.db_pickle.models.relations import GenDescend
+        from lib.db_pickle.models.relations import GenDescend, GenAscend
+
+        # Display parsing steps like OCaml
+        self.logger.info("*** pass 1 (note)")
+        self._process_notes(gedcom_database)
+
+        self.logger.info("*** pass 2 (indi)")
+        self._process_individuals(gedcom_database)
+
+        self.logger.info("*** pass 3 (fam)")
+        self._process_families(gedcom_database)
+
+        self.logger.info("*** Trailer ok")
 
         geneweb_data = PickleBaseData()
 
-        print("*** saving persons array")
+        # Convert persons
+        self.logger.info("*** saving persons array")
         for xref, individual in gedcom_database.individuals.items():
             try:
-                geneweb_person = self._convert_individual(individual)
-                self._validate_person_data(individual, geneweb_person)
+                geneweb_person = self.converter.convert_individual(individual)
+                self.validator.validate_person_data(individual, geneweb_person)
+
                 # Convert xref to Iper
                 if xref.startswith("@I") and xref.endswith("@"):
                     person_id = Iper(int(xref[2:-1]))
@@ -61,310 +80,159 @@ class GedcomToGenewebConverter:
                     person_id = Iper(hash(xref) % 1000000)
                 geneweb_data.persons[person_id] = geneweb_person
             except Exception as e:
-                print(f"Error processing person {xref}: {e}")
+                self.logger.error(f"Error processing person {xref}: {e}")
                 continue
 
-        print("*** saving ascends array")
-        # Ascends are handled during person conversion
-        for person_id in geneweb_data.persons.keys():
+        self.logger.info("*** saving strings array")
+        for person_id, person in geneweb_data.persons.items():
+            if person.first_name not in geneweb_data.strings:
+                geneweb_data.strings[person.first_name] = person.first_name
+            if person.surname not in geneweb_data.strings:
+                geneweb_data.strings[person.surname] = person.surname
+
+        self.logger.info("*** saving descends array")
+        family_children: dict[Ifam, list[Iper]] = {}
+        for xref, individual in gedcom_database.individuals.items():
+            for famc_ref in individual.famc:
+                if famc_ref.startswith("@F") and famc_ref.endswith("@"):
+                    family_id = Ifam(int(famc_ref[2:-1]))
+                else:
+                    family_id = Ifam(hash(famc_ref) % 1000000)
+
+                if individual.xref.startswith("@I") and individual.xref.endswith("@"):
+                    person_id = Iper(int(individual.xref[2:-1]))
+                else:
+                    person_id = Iper(hash(individual.xref) % 1000000)
+
+                if family_id not in family_children:
+                    family_children[family_id] = []
+                family_children[family_id].append(person_id)
+
+        for family_id, children in family_children.items():
+            geneweb_data.descends[family_id] = GenDescend(children=children)
+            if family_id not in geneweb_data.couples:
+                father_id = dummy_iper
+                mother_id = dummy_iper
+
+                for xref, family in gedcom_database.families.items():
+                    if xref.startswith("@F") and xref.endswith("@"):
+                        gedcom_family_id = Ifam(int(xref[2:-1]))
+                    else:
+                        gedcom_family_id = Ifam(hash(xref) % 1000000)
+
+                    if gedcom_family_id == family_id:
+                        if family.husband:
+                            if family.husband.startswith(
+                                "@I"
+                            ) and family.husband.endswith("@"):
+                                father_id = Iper(int(family.husband[2:-1]))
+                            else:
+                                father_id = Iper(hash(family.husband) % 1000000)
+                        if family.wife:
+                            if family.wife.startswith("@I") and family.wife.endswith(
+                                "@"
+                            ):
+                                mother_id = Iper(int(family.wife[2:-1]))
+                            else:
+                                mother_id = Iper(hash(family.wife) % 1000000)
+                        break
+
+                geneweb_data.couples[family_id] = GenCouple(
+                    father=father_id, mother=mother_id
+                )
+
+        # Create ascends (parent relationships)
+        self.logger.info("*** saving ascends array")
+        for person_id, person in geneweb_data.persons.items():
+            parents = None
+            parent_families = []
+            for family_id, descend in geneweb_data.descends.items():
+                if person_id in descend.children:
+                    parent_families.append(family_id)
+
+            if parent_families:
+                parents = parent_families[0]
+                if len(parent_families) > 1:
+                    person.additional_parents = parent_families[1:]
+
+            geneweb_data.ascends[person_id] = GenAscend(parents=parents)
+
+        # Process unions
+        self.logger.info("*** saving unions array")
+        for family_id in geneweb_data.descends.keys():
             pass
 
-        print("*** saving unions array")
-        for xref, family in gedcom_database.families.items():
-            geneweb_family, couple, children = self._convert_family(family)
-            if xref.startswith("@F") and xref.endswith("@"):
-                family_id = Ifam(int(xref[2:-1]))
-            else:
-                family_id = Ifam(hash(xref) % 1000000)
-            geneweb_data.descends[family_id] = GenDescend(children=children)
-
-        print("*** saving families array")
+        # Convert families
+        self.logger.info("*** saving families array")
         for xref, family in gedcom_database.families.items():
             try:
-                geneweb_family, couple, children = self._convert_family(family)
-                self._validate_family_data(family, children)
+                geneweb_family, couple, children = self.converter.convert_family(family)
+                self.validator.validate_family_data(family, children)
+
                 if xref.startswith("@F") and xref.endswith("@"):
                     family_id = Ifam(int(xref[2:-1]))
                 else:
                     family_id = Ifam(hash(xref) % 1000000)
                 geneweb_data.families[family_id] = geneweb_family
             except Exception as e:
-                print(f"Error processing family {xref}: {e}")
+                self.logger.error(f"Error processing family {xref}: {e}")
                 continue
 
-        print("*** saving couples array")
+        # Convert couples
+        self.logger.info("*** saving couples array")
         for xref, family in gedcom_database.families.items():
             try:
-                geneweb_family, couple, children = self._convert_family(family)
+                geneweb_family, couple, children = self.converter.convert_family(family)
                 if xref.startswith("@F") and xref.endswith("@"):
                     family_id = Ifam(int(xref[2:-1]))
                 else:
                     family_id = Ifam(hash(xref) % 1000000)
                 geneweb_data.couples[family_id] = couple
             except Exception as e:
-                print(f"Error processing couple {xref}: {e}")
+                self.logger.error(f"Error processing couple {xref}: {e}")
                 continue
 
-        print("*** saving descends array")
+        # Descends already created
+        self.logger.info("*** saving descends array")
         for family_id in geneweb_data.descends.keys():
             pass
 
-        print("*** saving strings array")
+        # Strings already created
+        self.logger.info("*** saving strings array")
         for string_id in geneweb_data.strings.keys():
             pass
 
+        # Build indexes
         geneweb_data.build_indexes()
 
-        self._print_warnings_and_errors()
+        # Check parent-child relationships
+        self.relationship_checker.check_parents_children(geneweb_data)
 
-        print("*** ok")
+        # Print warnings and errors
+        self.validator.print_warnings_and_errors()
+
+        self.logger.info("*** ok")
 
         conversion_stats = {
             "individuals_converted": geneweb_data.persons_count,
             "families_converted": geneweb_data.families_count,
             "notes_converted": len(gedcom_database.notes),
             "sources_converted": len(gedcom_database.sources),
-            "warnings_count": len(self.warnings),
-            "errors_count": len(self.errors),
+            "warnings_count": len(self.validator.warnings),
+            "errors_count": len(self.validator.errors),
             "conversion_applied": True,
             "geneweb_data": geneweb_data,
         }
         return conversion_stats
 
-    def _convert_individual(self, individual) -> GenPerson:
-        """Convert GEDCOM individual to GenPerson."""
-        try:
-            first_name = ""
-            surname = ""
+    def _process_notes(self, gedcom_database: GedcomDatabase) -> None:
+        """Process notes (pass 1) - like OCaml pass1."""
+        self.validator.check_undefined_sources(gedcom_database)
 
-            if individual.names:
-                name = individual.names[0]
-                first_name = name.given or ""
-                surname = name.surname or ""
+    def _process_individuals(self, gedcom_database: GedcomDatabase) -> None:
+        """Process individuals (pass 2) - like OCaml pass2."""
+        self.validator.check_undefined_individuals(gedcom_database)
 
-            sex = Sex.NEUTER
-            if hasattr(individual, "sex") and individual.sex:
-                sex_value = (
-                    individual.sex.value
-                    if hasattr(individual.sex, "value")
-                    else str(individual.sex)
-                )
-                if sex_value == "M":
-                    sex = Sex.MALE
-                elif sex_value == "F":
-                    sex = Sex.FEMALE
-
-            person = GenPerson(first_name=first_name, surname=surname, occ=0, sex=sex)
-            for event in individual.events:
-                try:
-                    if event.tag == "BIRT" and event.date:
-                        person.birth = self._convert_date(event.date)
-                    elif event.tag == "DEAT" and event.date:
-                        person.death = self._convert_date(event.date)
-                    elif event.tag == "BAPM" and event.date:
-                        person.baptism = self._convert_date(event.date)
-                    elif event.tag == "BURI" and event.date:
-                        person.burial = self._convert_date(event.date)
-                except Exception as e:
-                    print(f"Error processing event {event.tag}: {e}")
-                    continue
-            return person
-        except Exception as e:
-            print(f"Error converting individual: {e}")
-            raise
-
-    def _convert_family(self, family) -> tuple[GenFamily, GenCouple, list]:
-        """Convert GEDCOM family to GenFamily."""
-        from lib.db_pickle.core.types import dummy_iper
-
-        husband = dummy_iper()
-        wife = dummy_iper()
-
-        if hasattr(family, "husband") and family.husband:
-            # Convert husband xref to Iper
-            if family.husband.startswith("@I") and family.husband.endswith("@"):
-                husband = Iper(int(family.husband[2:-1]))
-            else:
-                husband = Iper(hash(family.husband) % 1000000)
-        if hasattr(family, "wife") and family.wife:
-            # Convert wife xref to Iper
-            if family.wife.startswith("@I") and family.wife.endswith("@"):
-                wife = Iper(int(family.wife[2:-1]))
-            else:
-                wife = Iper(hash(family.wife) % 1000000)
-
-        geneweb_family = GenFamily(relation=RelationKind.MARRIED)
-        couple = GenCouple(father=husband, mother=wife)
-
-        children = []
-        if hasattr(family, "children") and family.children:
-            # Convert children xrefs to Iper
-            for child_xref in family.children:
-                if child_xref.startswith("@I") and child_xref.endswith("@"):
-                    child_id = Iper(int(child_xref[2:-1]))
-                else:
-                    child_id = Iper(hash(child_xref) % 1000000)
-                children.append(child_id)
-
-        for event in family.events:
-            if event.tag == "MARR" and event.date:
-                geneweb_family.marriage = self._convert_date(event.date)
-            elif event.tag == "DIV" and event.date:
-                geneweb_family.divorce = DivorceStatus.DIVORCED
-        return geneweb_family, couple, children
-
-    def _convert_date(self, gedcom_date) -> Date:
-        """Convert GEDCOM date to GeneWeb Date."""
-        if not gedcom_date:
-            return Date.none()
-
-        try:
-            year = (
-                int(gedcom_date.year)
-                if gedcom_date.year and str(gedcom_date.year).strip()
-                else 0
-            )
-        except (ValueError, TypeError):
-            year = 0
-
-        try:
-            month = (
-                int(gedcom_date.month)
-                if gedcom_date.month and str(gedcom_date.month).strip()
-                else 0
-            )
-        except (ValueError, TypeError):
-            month = 0
-
-        try:
-            day = (
-                int(gedcom_date.day)
-                if gedcom_date.day and str(gedcom_date.day).strip()
-                else 0
-            )
-        except (ValueError, TypeError):
-            day = 0
-
-        return Date(year=year, month=month, day=day)
-
-    def _add_warning(self, message: str):
-        """Add a warning message."""
-        self.warnings.append(message)
-        print(f"Warning: {message}", file=sys.stderr)
-
-    def _add_error(self, message: str):
-        """Add an error message."""
-        self.errors.append(message)
-        print(f"Error: {message}", file=sys.stderr)
-
-    def _print_warnings_and_errors(self):
-        """Print all warnings and errors."""
-        if self.warnings:
-            print(
-                f"\n{len(self.warnings)} warnings generated during conversion",
-                file=sys.stderr,
-            )
-        if self.errors:
-            print(
-                f"\n{len(self.errors)} errors generated during conversion",
-                file=sys.stderr,
-            )
-
-    def _validate_person_data(self, individual, person: GenPerson):
-        """Validate person data and add warnings/errors."""
-        # Check for sex inconsistencies
-        if hasattr(individual, "sex") and individual.sex:
-            sex_value = (
-                individual.sex.value
-                if hasattr(individual.sex, "value")
-                else str(individual.sex)
-            )
-            if sex_value == "F" and person.sex == Sex.MALE:
-                self._add_warning(
-                    f"Wife with male sex: {person.first_name} {person.surname}"
-                )
-            elif sex_value == "M" and person.sex == Sex.FEMALE:
-                self._add_warning(
-                    f"Husband with female sex: {person.first_name} {person.surname}"
-                )
-
-        # Check for death before baptism
-        if person.death and person.baptism:
-            if self._date_compare(person.death, person.baptism) < 0:
-                self._add_warning(
-                    f"{person.first_name} {person.surname}'s death before his/her baptism"
-                )
-
-        # Check for advanced age at death
-        if person.birth and person.death:
-            age = self._calculate_age(person.birth, person.death)
-            if age > 100:
-                self._add_warning(
-                    f"{person.first_name} {person.surname} died at the advanced age of {age} years old"
-                )
-
-        # Check for parent at advanced age
-        if person.birth:
-            birth_year = getattr(person.birth, "year", 0) or 0
-            if birth_year > 0:
-                current_year = 2024  # Approximate current year
-                if current_year - birth_year > 70:
-                    self._add_warning(
-                        f"{person.first_name} {person.surname} was parent at age of {current_year - birth_year}"
-                    )
-
-    def _validate_family_data(self, family, children):
-        """Validate family data and add warnings/errors."""
-        if len(children) > 1:
-            self._check_children_birth_order(children)
-
-    def _check_children_birth_order(self, children):
-        """Check if children are born in reasonable order."""
-        if len(children) > 5:
-            self._add_warning(
-                f"Family has {len(children)} children - check birth order"
-            )
-
-    def _date_compare(self, date1, date2):
-        """Compare two dates. Returns -1 if date1 < date2, 0 if equal, 1 if date1 > date2."""
-        if not date1 or not date2:
-            return 0
-
-        year1 = getattr(date1, "year", 0) or 0
-        year2 = getattr(date2, "year", 0) or 0
-
-        if year1 < year2:
-            return -1
-        elif year1 > year2:
-            return 1
-
-        month1 = getattr(date1, "month", 0) or 0
-        month2 = getattr(date2, "month", 0) or 0
-
-        if month1 < month2:
-            return -1
-        elif month1 > month2:
-            return 1
-
-        day1 = getattr(date1, "day", 0) or 0
-        day2 = getattr(date2, "day", 0) or 0
-
-        if day1 < day2:
-            return -1
-        elif day1 > day2:
-            return 1
-
-        return 0
-
-    def _calculate_age(self, birth_date, death_date):
-        """Calculate age at death."""
-        if not birth_date or not death_date:
-            return 0
-
-        birth_year = getattr(birth_date, "year", 0) or 0
-        death_year = getattr(death_date, "year", 0) or 0
-
-        if birth_year > 0 and death_year > 0:
-            return death_year - birth_year
-
-        return 0
+    def _process_families(self, gedcom_database: GedcomDatabase) -> None:
+        """Process families (pass 3) - like OCaml pass3."""
+        self.validator.check_undefined_families(gedcom_database)
