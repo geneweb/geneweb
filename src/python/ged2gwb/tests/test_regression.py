@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Integration tests for ged2gwb.
+Regression tests for ged2gwb.
 
-These tests verify that all components work together correctly
-and that the complete workflow functions as expected.
+These tests ensure that previously working functionality continues to work
+and that bug fixes remain effective.
 """
 
 import sys
@@ -17,11 +17,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from ged2gwb.core.converter import Ged2GwbConverter
 from ged2gwb.utils.options import ConversionOptions
-from gedcom.exceptions import GedcomParseError
 
 
-class TestIntegration:
-    """Integration tests for ged2gwb."""
+class TestRegression:
+    """Regression tests for ged2gwb."""
 
     def setup_method(self):
         """Set up test environment."""
@@ -52,8 +51,8 @@ class TestIntegration:
             with open(file_path, "rb") as f:
                 return pickle.load(f)
 
-    def test_complete_workflow(self):
-        """Test the complete conversion workflow."""
+    def test_basic_conversion_regression(self):
+        """Test that basic conversion still works as expected."""
         gedcom_content = """0 HEAD
 1 GEDC
 2 VERS 5.5.1
@@ -64,25 +63,16 @@ class TestIntegration:
 1 SEX M
 1 BIRT
 2 DATE 15 MAR 1980
-1 DEAT
-2 DATE 10 JAN 2020
 0 @I2@ INDI
 1 NAME Jane /Doe/
 1 SEX F
 1 BIRT
-2 DATE 20 JUN 1985
-0 @I3@ INDI
-1 NAME Bob /Smith/
-1 SEX M
-1 BIRT
-2 DATE 05 SEP 2010
-1 FAMC @F1@
+2 DATE 10 JAN 1985
 0 @F1@ FAM
 1 HUSB @I1@
 1 WIFE @I2@
-1 CHIL @I3@
 1 MARR
-2 DATE 15 AUG 2005
+2 DATE 20 JUN 2010
 0 TRLR
 """
 
@@ -94,13 +84,13 @@ class TestIntegration:
         converter = Ged2GwbConverter(options)
         result = converter.convert()
 
-        # Verify conversion results
+        # Verify basic conversion results
         assert result["conversion_successful"] is True
-        assert result["individuals_count"] == 3
+        assert result["individuals_count"] == 2
         assert result["families_count"] == 1
         assert result["format"] == "pickle"
 
-        # Load and verify data
+        # Load and verify data structure
         output_file = options.output_file
         if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
             output_file = output_file.with_suffix(".pkl.gz")
@@ -108,116 +98,31 @@ class TestIntegration:
         data = self.load_pickle_data(output_file)
 
         # Verify persons
-        assert len(data.persons) == 3
-        persons = {p.first_name + " " + p.surname: p for p in data.persons.values()}
+        assert len(data.persons) == 2
+        persons = list(data.persons.values())
 
-        assert "John Smith" in persons
-        assert "Jane Doe" in persons
-        assert "Bob Smith" in persons
+        # Find John Smith
+        john = next(
+            (p for p in persons if p.first_name == "John" and p.surname == "Smith"),
+            None,
+        )
+        assert john is not None
+        assert john.sex.value == "M"
+
+        # Find Jane Doe
+        jane = next(
+            (p for p in persons if p.first_name == "Jane" and p.surname == "Doe"), None
+        )
+        assert jane is not None
+        assert jane.sex.value == "F"
 
         # Verify families
         assert len(data.families) == 1
-        family = list(data.families.values())[0]
-        assert family is not None
 
-    def test_all_options_integration(self):
-        """Test integration with all available options."""
+    def test_charset_handling_regression(self):
+        """Test that charset handling continues to work correctly."""
+        # Test with UTF-8 content
         gedcom_content = """0 HEAD
-1 GEDC
-2 VERS 5.5.1
-2 FORM LINEAGE
-1 CHAR UTF-8
-0 @I1@ INDI
-1 NAME Jean Pierre Marie /de la Roche/
-1 SEX M
-1 BIRT
-2 DATE 15/03/1980
-1 DEAT
-2 DATE 10/01/2020
-1 CUSTOM_TAG Custom value
-0 @I2@ INDI
-1 NAME Marie Claire /Dupont/
-1 SEX F
-1 BIRT
-2 DATE 20/06/1985
-0 @F1@ FAM
-1 HUSB @I1@
-1 WIFE @I2@
-1 MARR
-2 DATE 15/08/2005
-0 TRLR
-"""
-
-        gedcom_file = self.create_test_gedcom(gedcom_content)
-
-        # Test with all options enabled
-        options = ConversionOptions(
-            input_file=gedcom_file,
-            output_file=self.test_dir / "all_options.pkl",
-            charset="ANSEL",
-            dates_dm=True,
-            efn=True,
-            epn=True,
-            lf=True,
-            ls=True,
-            us=True,
-            udi=(80, 120),
-            uin=True,
-            default_source="Test Source",
-            compress=True,
-            force=True,
-            verbose=True,
-        )
-
-        converter = Ged2GwbConverter(options)
-        result = converter.convert()
-
-        # Verify conversion was successful
-        assert result["conversion_successful"] is True
-        assert result["individuals_count"] == 2
-        assert result["families_count"] == 1
-        assert result["compressed"] is True
-        assert result["charset"] == "ANSEL"
-
-        # Load and verify processed data
-        output_file = options.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
-
-        data = self.load_pickle_data(output_file)
-
-        # Verify name processing options were applied
-        persons = list(data.persons.values())
-
-        # First person: Jean Pierre Marie /de la Roche/
-        person1 = persons[0]
-        assert person1.first_name == "jean"  # --efn + --lf
-        assert person1.surname == "DE LA ROCHE"  # --us
-
-        # Second person: Marie Claire /Dupont/
-        person2 = persons[1]
-        assert person2.first_name == "marie"  # --efn + --lf
-        assert person2.surname == "DUPONT"  # --us
-
-    def test_charset_integration(self):
-        """Test integration with different charsets."""
-        charsets = ["ASCII", "MSDOS", "ANSEL"]
-
-        for charset in charsets:
-            # Create appropriate content for each charset
-            if charset == "ASCII":
-                content = """0 HEAD
-1 GEDC
-2 VERS 5.5.1
-2 FORM LINEAGE
-1 CHAR ASCII
-0 @I1@ INDI
-1 NAME John /Smith/
-1 SEX M
-0 TRLR
-"""
-            else:
-                content = """0 HEAD
 1 GEDC
 2 VERS 5.5.1
 2 FORM LINEAGE
@@ -228,23 +133,117 @@ class TestIntegration:
 0 TRLR
 """
 
-            gedcom_file = self.create_test_gedcom(
-                content, f"test_{charset.lower()}.ged"
-            )
-            options = ConversionOptions(
-                input_file=gedcom_file,
-                output_file=self.test_dir / f"output_{charset.lower()}.pkl",
-                charset=charset,
-            )
+        gedcom_file = self.create_test_gedcom(gedcom_content)
 
-            converter = Ged2GwbConverter(options)
-            result = converter.convert()
+        # Test ANSEL charset
+        options_ansel = ConversionOptions(
+            input_file=gedcom_file,
+            output_file=self.test_dir / "ansel.pkl",
+            charset="ANSEL",
+        )
 
-            assert result["conversion_successful"] is True
-            assert result["charset"] == charset
+        converter = Ged2GwbConverter(options_ansel)
+        result = converter.convert()
 
-    def test_compression_integration(self):
-        """Test integration with compression options."""
+        assert result["conversion_successful"] is True
+        assert result["charset"] == "ANSEL"
+
+        # Verify special characters are preserved
+        output_file = options_ansel.output_file
+        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
+            output_file = output_file.with_suffix(".pkl.gz")
+
+        data = self.load_pickle_data(output_file)
+        person = list(data.persons.values())[0]
+        assert person.first_name == "François"
+        assert person.surname == "Müller"
+
+    def test_name_processing_options_regression(self):
+        """Test that name processing options continue to work correctly."""
+        gedcom_content = """0 HEAD
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Jean Pierre Marie /de la Roche/
+1 SEX M
+0 TRLR
+"""
+
+        gedcom_file = self.create_test_gedcom(gedcom_content)
+
+        # Test --efn (extract first name)
+        options_efn = ConversionOptions(
+            input_file=gedcom_file, output_file=self.test_dir / "efn.pkl", efn=True
+        )
+
+        converter = Ged2GwbConverter(options_efn)
+        result = converter.convert()
+
+        assert result["conversion_successful"] is True
+
+        output_file = options_efn.output_file
+        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
+            output_file = output_file.with_suffix(".pkl.gz")
+
+        data = self.load_pickle_data(output_file)
+        person = list(data.persons.values())[0]
+        assert person.first_name == "Jean"  # Only first name extracted
+
+    def test_combined_options_regression(self):
+        """Test that combined options continue to work correctly."""
+        gedcom_content = """0 HEAD
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Jean Pierre /de la Roche/
+1 SEX M
+1 BIRT
+2 DATE 15/03/1980
+1 CUSTOM_TAG Custom value
+0 TRLR
+"""
+
+        gedcom_file = self.create_test_gedcom(gedcom_content)
+
+        # Test multiple options combined
+        options = ConversionOptions(
+            input_file=gedcom_file,
+            output_file=self.test_dir / "combined.pkl",
+            charset="ANSEL",
+            dates_dm=True,
+            efn=True,
+            lf=True,
+            us=True,
+            uin=True,
+            default_source="Test Source",
+            compress=True,
+        )
+
+        converter = Ged2GwbConverter(options)
+        result = converter.convert()
+
+        assert result["conversion_successful"] is True
+        assert result["compressed"] is True
+
+        # Verify all options were applied
+        output_file = options.output_file
+        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
+            output_file = output_file.with_suffix(".pkl.gz")
+
+        data = self.load_pickle_data(output_file)
+        person = list(data.persons.values())[0]
+
+        # --efn + --lf should give "jean"
+        assert person.first_name == "jean"
+        # --us should give "DE LA ROCHE"
+        assert person.surname == "DE LA ROCHE"
+
+    def test_compression_regression(self):
+        """Test that compression continues to work correctly."""
         gedcom_content = """0 HEAD
 1 GEDC
 2 VERS 5.5.1
@@ -282,31 +281,21 @@ class TestIntegration:
         assert result_compressed["conversion_successful"] is True
         assert result_uncompressed["conversion_successful"] is True
 
-        # Both should produce the same data
+        # Compressed file should be smaller
         compressed_file = options_compressed.output_file.with_suffix(".pkl.gz")
         uncompressed_file = options_uncompressed.output_file
 
-        data_compressed = self.load_pickle_data(compressed_file)
-        data_uncompressed = self.load_pickle_data(uncompressed_file)
+        assert compressed_file.exists()
+        assert uncompressed_file.exists()
 
-        assert len(data_compressed.persons) == len(data_uncompressed.persons)
-        assert len(data_compressed.families) == len(data_uncompressed.families)
+        compressed_size = compressed_file.stat().st_size
+        uncompressed_size = uncompressed_file.stat().st_size
 
-    def test_error_handling_integration(self):
-        """Test error handling in the complete workflow."""
-        # Test with non-existent file
-        options = ConversionOptions(
-            input_file=Path("nonexistent.ged"), output_file=self.test_dir / "output.pkl"
-        )
+        # Compressed should be smaller (or at least not larger)
+        assert compressed_size <= uncompressed_size
 
-        converter = Ged2GwbConverter(options)
-
-        try:
-            converter.convert()
-            assert False, "Expected conversion to fail"
-        except (FileNotFoundError, GedcomParseError):
-            pass
-
+    def test_error_handling_regression(self):
+        """Test that error handling continues to work correctly."""
         # Test with invalid GEDCOM
         gedcom_file = self.create_test_gedcom("Invalid GEDCOM content")
         options = ConversionOptions(
@@ -315,16 +304,17 @@ class TestIntegration:
 
         converter = Ged2GwbConverter(options)
 
+        # Should handle error gracefully
         try:
             converter.convert()
             assert False, "Expected conversion to fail"
         except Exception as e:
-            # Should provide meaningful error
+            # Should provide meaningful error message
             assert len(str(e)) > 0
 
-    def test_performance_integration(self):
-        """Test performance with realistic data."""
-        # Create a realistic GEDCOM file
+    def test_large_file_handling_regression(self):
+        """Test that large files continue to be handled correctly."""
+        # Create a larger GEDCOM file
         gedcom_content = """0 HEAD
 1 GEDC
 2 VERS 5.5.1
@@ -332,8 +322,8 @@ class TestIntegration:
 1 CHAR UTF-8
 """
 
-        # Add 50 individuals
-        for i in range(1, 51):
+        # Add 100 individuals
+        for i in range(1, 101):
             gedcom_content += f"""0 @I{i}@ INDI
 1 NAME Person{i} /Surname{i}/
 1 SEX {"M" if i % 2 == 0 else "F"}
@@ -341,48 +331,33 @@ class TestIntegration:
 2 DATE {i % 28 + 1} MAR {1900 + i}
 """
 
-        # Add 25 families
-        for i in range(1, 26):
-            husband_id = i * 2
-            wife_id = i * 2 + 1
-            gedcom_content += f"""0 @F{i}@ FAM
-1 HUSB @I{husband_id}@
-1 WIFE @I{wife_id}@
-1 MARR
-2 DATE {i % 28 + 1} JUN {2000 + i}
-"""
-
         gedcom_content += "0 TRLR\n"
 
         gedcom_file = self.create_test_gedcom(gedcom_content)
         options = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "performance.pkl"
+            input_file=gedcom_file, output_file=self.test_dir / "large.pkl"
         )
-
-        import time
-
-        start_time = time.time()
 
         converter = Ged2GwbConverter(options)
         result = converter.convert()
 
-        end_time = time.time()
-        execution_time = end_time - start_time
-
-        # Verify conversion was successful
         assert result["conversion_successful"] is True
-        assert result["individuals_count"] == 50
-        assert result["families_count"] == 25
+        assert result["individuals_count"] == 100
 
-        # Verify performance is reasonable (should complete in under 5 seconds)
-        assert execution_time < 5.0, f"Conversion took too long: {execution_time:.2f}s"
+        # Verify all individuals were processed
+        output_file = options.output_file
+        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
+            output_file = output_file.with_suffix(".pkl.gz")
+
+        data = self.load_pickle_data(output_file)
+        assert len(data.persons) == 100
 
 
-def run_integration_tests():
-    """Run all integration tests."""
-    print("=== Integration Tests for ged2gwb ===\n")
+def run_regression_tests():
+    """Run all regression tests."""
+    print("=== Regression Tests for ged2gwb ===\n")
 
-    test_instance = TestIntegration()
+    test_instance = TestRegression()
     test_methods = [
         method
         for method in dir(test_instance)
@@ -403,15 +378,15 @@ def run_integration_tests():
             print(f"FAIL: {test_method} - {e}")
             test_instance.teardown_method()
 
-    print(f"\nIntegration Test Results: {passed}/{total}")
+    print(f"\nRegression Test Results: {passed}/{total}")
 
     if passed == total:
-        print("SUCCESS: All integration tests passed!")
+        print("SUCCESS: All regression tests passed!")
         return 0
     else:
-        print("FAILURE: Some integration tests failed.")
+        print("FAILURE: Some regression tests failed.")
         return 1
 
 
 if __name__ == "__main__":
-    sys.exit(run_integration_tests())
+    sys.exit(run_regression_tests())

@@ -1,7 +1,7 @@
-"""Test suite for GED2GWB module."""
+"""
+Test suite for ged2gwb.
 
-from .test_conversion import main as test_conversion
-from .test_integration import main as test_integration
-from .test_options import main as test_options
+This package contains comprehensive tests for the ged2gwb tool.
+"""
 
-__all__ = ["test_options", "test_conversion", "test_integration"]
+__version__ = "1.0.0"
