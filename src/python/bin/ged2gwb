@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# GeneWeb GED2GWB Converter
+# Bash wrapper for the Python ged2gwb binary
+#
+# This script provides a convenient way to run ged2gwb from anywhere
+# without needing to activate the virtual environment manually.
+#
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Set up Python path
+export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
+
+# Check if virtual environment exists
+VENV_PATH="$PROJECT_ROOT/.venv"
+if [ -d "$VENV_PATH" ]; then
+    # Activate virtual environment
+    source "$VENV_PATH/bin/activate"
+else
+    echo "Warning: Virtual environment not found at $VENV_PATH" >&2
+    echo "Running with system Python..." >&2
+fi
+
+# Run the Python module
+exec python3 -m ged2gwb "$@"

@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# GeneWeb Python Generic Runner
+# Bash wrapper for any Python module in the GeneWeb project
+#
+# Usage: geneweb-python <module_name> [args...]
+# Example: geneweb-python ged2gwb --help
+# Example: geneweb-python gedcom --version
+#
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Set up Python path
+export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
+
+# Check if virtual environment exists
+VENV_PATH="$PROJECT_ROOT/.venv"
+if [ -d "$VENV_PATH" ]; then
+    # Activate virtual environment
+    source "$VENV_PATH/bin/activate"
+else
+    echo "Warning: Virtual environment not found at $VENV_PATH" >&2
+    echo "Running with system Python..." >&2
+fi
+
+# Check if module name is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <module_name> [args...]" >&2
+    echo "Available modules:" >&2
+    echo "  ged2gwb    - GEDCOM to GeneWeb converter" >&2
+    echo "  gedcom     - GEDCOM parser and utilities" >&2
+    echo "  lib.db_pickle - Pickle database manager" >&2
+    exit 1
+fi
+
+# Run the specified Python module
+exec python3 -m "$@"
