@@ -4,13 +4,14 @@ from ..exceptions import GedcomParseError
 from ..models import GedcomNote
 from ..tokenizer import GedcomLine
 from .base import RecordParser
+from ..tags import TAGS
 
 
 class NoteParser(RecordParser):
     """Parser for GEDCOM note records."""
 
     def can_parse(self, tag: str) -> bool:
-        return tag == "NOTE"
+        return tag == TAGS.NOTE
 
     def parse(self, lines: List[GedcomLine], start_index: int) -> tuple:
         """Parse note record."""
@@ -29,13 +30,13 @@ class NoteParser(RecordParser):
 
             note.raw_structure.append((line.level, line.tag, line.value))
 
-            if line.tag == "CONC":
+            if line.tag == TAGS.CONC:
                 # Continue previous line
                 note.text += line.value
-            elif line.tag == "CONT":
+            elif line.tag == TAGS.CONT:
                 # New line
                 note.text += "\n" + line.value
-            elif line.tag == "SOUR":
+            elif line.tag == TAGS.SOUR:
                 note.sources.append(line.value.strip("@"))
 
             current_index += 1
