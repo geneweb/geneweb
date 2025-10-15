@@ -30,7 +30,7 @@ class PickleWriter:
             print(f"*** {message}")
 
     def save_database(
-        self, data: PickleBaseData, filepath: Path, compress: bool = True
+        self, data: PickleBaseData, filepath, compress: bool = False
     ) -> Dict[str, Any]:
         """
         Save pickle database to file.
@@ -47,11 +47,21 @@ class PickleWriter:
 
         start_time = time.time()
 
+        # Convert to Path if needed
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+
         # Determine final filepath
         if compress:
-            final_path = filepath.with_suffix(".pkl.gz")
+            if filepath.suffix == ".gz" or filepath.name.endswith(".pkl.gz"):
+                final_path = filepath
+            else:
+                final_path = filepath.with_suffix(".pkl.gz")
         else:
-            final_path = filepath.with_suffix(".pkl")
+            if filepath.suffix == ".pkl":
+                final_path = filepath
+            else:
+                final_path = filepath.with_suffix(".pkl")
 
         # Create output directory if needed
         final_path.parent.mkdir(parents=True, exist_ok=True)

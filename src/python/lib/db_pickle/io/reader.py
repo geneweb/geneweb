@@ -28,7 +28,7 @@ class PickleReader:
         if self.verbose:
             print(f"*** {message}")
 
-    def load_database(self, filepath: Path) -> PickleBaseData:
+    def load_database(self, filepath) -> PickleBaseData:
         """
         Load pickle database from file.
 
@@ -41,6 +41,10 @@ class PickleReader:
         import time
 
         start_time = time.time()
+
+        # Convert to Path if needed
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
 
         # Determine if file is compressed
         if filepath.suffix == ".gz" or filepath.name.endswith(".pkl.gz"):
@@ -58,3 +62,10 @@ class PickleReader:
         )
 
         return data
+
+    def is_compressed(self, filepath) -> bool:
+        """Check if file is compressed."""
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+
+        return filepath.suffix == ".gz" or filepath.name.endswith(".pkl.gz")

@@ -1,11 +1,11 @@
-# Makefile for GeneWeb Python Project
-# Professional project management and automation
+## Makefile for GeneWeb Python Project
 
 PYTHON = python3
 PROJECT_ROOT = .
 GED2GWB_PATH = $(PROJECT_ROOT)/ged2gwb
 GEDCOM_PATH = $(PROJECT_ROOT)/gedcom
 LIB_PATH = $(PROJECT_ROOT)/lib
+DB_PICKLE_PATH = $(LIB_PATH)/db_pickle
 VENV_DIR = .venv
 VENV_PYTHON = $(VENV_DIR)/bin/python
 VENV_PIP = $(VENV_DIR)/bin/pip
@@ -41,6 +41,7 @@ help:
 	@echo "  test-ged2gwb   Run ged2gwb tests only"
 	@echo "  test-gedcom    Run GEDCOM tests only"
 	@echo "  test-lib       Run lib tests only"
+	@echo "  test-db-pickle Run db_pickle tests only"
 	@echo "  test-unit      Run unit tests only (ged2gwb)"
 	@echo "  test-integration Run integration tests only (ged2gwb)"
 	@echo "  test-concrete  Run concrete tests with real files (ged2gwb)"
@@ -130,6 +131,11 @@ test-gedcom:
 test-lib:
 	@echo "$(BLUE)Running lib tests...$(NC)"
 	$(VENV_PYTHON) -m pytest lib/ -v
+
+.PHONY: test-db-pickle
+test-db-pickle:
+	@echo "$(BLUE)Running db_pickle tests...$(NC)"
+	cd $(DB_PICKLE_PATH) && $(MAKE) test
 
 .PHONY: test-unit
 test-unit:

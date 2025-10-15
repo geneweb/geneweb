@@ -104,19 +104,137 @@ class PickleBaseData:
             results.extend(self.first_name_index[search_name])
 
         for stored_name, person_ids in self.first_name_index.items():
-            if search_name in stored_name:
+            if search_name in stored_name and search_name != stored_name:
                 results.extend(person_ids)
 
-        return results
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_results = []
+        for person_id in results:
+            if person_id not in seen:
+                seen.add(person_id)
+                unique_results.append(person_id)
+
+        return unique_results
 
     def search_persons_by_surname(self, surname: str) -> List[Iper]:
-        """Search persons by surname (case-insensitive)."""
-        return self.surname_index.get(surname.lower().strip(), [])
+        """Search persons by surname (case-insensitive, partial match)."""
+        search_surname = surname.lower().strip()
+        results = []
+
+        # Exact match
+        if search_surname in self.surname_index:
+            results.extend(self.surname_index[search_surname])
+
+        # Partial match
+        for stored_surname, person_ids in self.surname_index.items():
+            if search_surname in stored_surname and search_surname != stored_surname:
+                results.extend(person_ids)
+
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_results = []
+        for person_id in results:
+            if person_id not in seen:
+                seen.add(person_id)
+                unique_results.append(person_id)
+
+        return unique_results
 
     def search_persons_by_full_name(self, full_name: str) -> List[Iper]:
-        """Search persons by full name (case-insensitive)."""
-        return self.full_name_index.get(full_name.lower().strip(), [])
+        """Search persons by full name (case-insensitive, partial match)."""
+        search_full_name = full_name.lower().strip()
+        results = []
+
+        # Exact match
+        if search_full_name in self.full_name_index:
+            results.extend(self.full_name_index[search_full_name])
+
+        # Partial match
+        for stored_full_name, person_ids in self.full_name_index.items():
+            if search_full_name in stored_full_name and search_full_name != stored_full_name:
+                results.extend(person_ids)
+
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_results = []
+        for person_id in results:
+            if person_id not in seen:
+                seen.add(person_id)
+                unique_results.append(person_id)
+
+        return unique_results
 
     def search_strings_by_content(self, content: str) -> List[Istr]:
-        """Search strings by content (case-insensitive)."""
-        return self.string_content_index.get(content.lower().strip(), [])
+        """Search strings by content (case-insensitive, partial match)."""
+        search_content = content.lower().strip()
+        results = []
+
+        # Exact match
+        if search_content in self.string_content_index:
+            results.extend(self.string_content_index[search_content])
+
+        # Partial match
+        for stored_content, string_ids in self.string_content_index.items():
+            if search_content in stored_content and search_content != stored_content:
+                results.extend(string_ids)
+
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_results = []
+        for string_id in results:
+            if string_id not in seen:
+                seen.add(string_id)
+                unique_results.append(string_id)
+
+        return unique_results
+
+    def validate(self) -> List[str]:
+        """Validate database integrity and return list of errors."""
+        errors = []
+
+        # Check for orphaned references in couples
+        for family_id, couple in self.couples.items():
+            if couple.father not in self.persons:
+                errors.append(f"Family {family_id} references non-existent father {couple.father}")
+            if couple.mother not in self.persons:
+                errors.append(f"Family {family_id} references non-existent mother {couple.mother}")
+
+        # Check for orphaned references in descends
+        for family_id, descend in self.descends.items():
+            for child_id in descend.children:
+                if child_id not in self.persons:
+                    errors.append(f"Family {family_id} references non-existent child {child_id}")
+
+        return errors
+
+    def get_statistics(self) -> Dict[str, int]:
+        """Get database statistics."""
+        return {
+            'persons': len(self.persons),
+            'families': len(self.families),
+            'couples': len(self.couples),
+            'descends': len(self.descends),
+            'strings': len(self.strings),
+            'ascends': len(self.ascends),
+            'unions': len(self.unions)
+        }
+
+    def clear(self) -> None:
+        """Clear all data from the database."""
+        self.persons.clear()
+        self.families.clear()
+        self.ascends.clear()
+        self.unions.clear()
+        self.couples.clear()
+        self.descends.clear()
+        self.strings.clear()
+        self.first_name_index.clear()
+        self.surname_index.clear()
+        self.full_name_index.clear()
+        self.string_content_index.clear()
+
+    def copy(self) -> 'PickleBaseData':
+        """Create a deep copy of the database."""
+        import copy
+        return copy.deepcopy(self)
