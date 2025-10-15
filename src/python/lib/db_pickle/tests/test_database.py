@@ -2,7 +2,6 @@
 Tests for db_pickle database operations.
 """
 
-import pytest
 from lib.db_pickle.database.base_data import PickleBaseData
 from lib.db_pickle.models.person import GenPerson
 from lib.db_pickle.models.family import GenFamily
@@ -31,7 +30,7 @@ class TestPickleBaseData:
             first_name="John",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=3, day=15)
+            birth=Date(year=1980, month=3, day=15),
         )
 
         db.persons[1] = person
@@ -63,10 +62,10 @@ class TestPickleBaseData:
         db = populated_database
 
         # Indexes should be built in the fixture
-        assert hasattr(db, 'first_name_index')
-        assert hasattr(db, 'surname_index')
-        assert hasattr(db, 'full_name_index')
-        assert hasattr(db, 'string_content_index')
+        assert hasattr(db, "first_name_index")
+        assert hasattr(db, "surname_index")
+        assert hasattr(db, "full_name_index")
+        assert hasattr(db, "string_content_index")
 
     def test_search_persons_by_first_name(self, populated_database):
         """Test searching persons by first name."""
@@ -161,7 +160,7 @@ class TestPickleBaseData:
             first_name="John Michael",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1985, month=1, day=1)
+            birth=Date(year=1985, month=1, day=1),
         )
         db.build_indexes()
 
@@ -201,11 +200,11 @@ class TestPickleBaseData:
 
         stats = db.get_statistics()
 
-        assert stats['persons'] == 4
-        assert stats['families'] == 1
-        assert stats['couples'] == 1
-        assert stats['descends'] == 1
-        assert stats['strings'] == 0
+        assert stats["persons"] == 4
+        assert stats["families"] == 1
+        assert stats["couples"] == 1
+        assert stats["descends"] == 1
+        assert stats["strings"] == 0
 
     def test_database_clear(self, populated_database):
         """Test clearing the database."""
@@ -240,7 +239,7 @@ class TestPickleBaseData:
             first_name="New",
             surname="Person",
             sex=Sex.MALE,
-            birth=Date(year=2000, month=1, day=1)
+            birth=Date(year=2000, month=1, day=1),
         )
 
         assert len(db.persons) == 4

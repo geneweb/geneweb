@@ -2,9 +2,6 @@
 Tests for db_pickle models.
 """
 
-import pytest
-from datetime import datetime
-
 from lib.db_pickle.models.person import GenPerson
 from lib.db_pickle.models.family import GenFamily
 from lib.db_pickle.models.relations import GenCouple, GenDescend
@@ -21,7 +18,7 @@ class TestGenPerson:
             first_name="John",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=3, day=15)
+            birth=Date(year=1980, month=3, day=15),
         )
 
         assert person.first_name == "John"
@@ -40,7 +37,7 @@ class TestGenPerson:
             surname="Doe",
             sex=Sex.FEMALE,
             birth=Date(year=1950, month=1, day=1),
-            death=Date(year=2020, month=12, day=31)
+            death=Date(year=2020, month=12, day=31),
         )
 
         assert person.death is not None
@@ -55,7 +52,7 @@ class TestGenPerson:
             surname="Johnson",
             sex=Sex.MALE,
             birth=Date(year=1940, month=6, day=15),
-            burial=Date(year=2010, month=7, day=20)
+            burial=Date(year=2010, month=7, day=20),
         )
 
         assert person.burial is not None
@@ -69,14 +66,14 @@ class TestGenPerson:
             first_name="John",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=3, day=15)
+            birth=Date(year=1980, month=3, day=15),
         )
 
         person2 = GenPerson(
             first_name="John",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=3, day=15)
+            birth=Date(year=1980, month=3, day=15),
         )
 
         assert person1 == person2
@@ -87,14 +84,14 @@ class TestGenPerson:
             first_name="John",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=3, day=15)
+            birth=Date(year=1980, month=3, day=15),
         )
 
         person2 = GenPerson(
             first_name="Jane",
             surname="Smith",
             sex=Sex.FEMALE,
-            birth=Date(year=1980, month=3, day=15)
+            birth=Date(year=1980, month=3, day=15),
         )
 
         assert person1 != person2

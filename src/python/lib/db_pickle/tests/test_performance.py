@@ -2,7 +2,6 @@
 Performance tests for db_pickle module.
 """
 
-import pytest
 import time
 from lib.db_pickle.database.base_data import PickleBaseData
 from lib.db_pickle.models.person import GenPerson
@@ -25,7 +24,7 @@ class TestPerformance:
                 first_name=f"Person{i}",
                 surname=f"Surname{i % 50}",  # 50 different surnames
                 sex=Sex.MALE if i % 2 == 0 else Sex.FEMALE,
-                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1)
+                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1),
             )
 
         end_time = time.time()
@@ -65,7 +64,7 @@ class TestPerformance:
                 first_name=f"Person{i}",
                 surname=f"Surname{i % 50}",
                 sex=Sex.MALE if i % 2 == 0 else Sex.FEMALE,
-                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1)
+                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1),
             )
 
         db.build_indexes()
@@ -100,7 +99,7 @@ class TestPerformance:
                 first_name=f"Person{i}",
                 surname=f"Surname{i % 50}",
                 sex=Sex.MALE if i % 2 == 0 else Sex.FEMALE,
-                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1)
+                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1),
             )
 
         db.build_indexes()
@@ -123,11 +122,13 @@ class TestPerformance:
         # Simulate concurrent searches
         search_operations = []
         for i in range(10):
-            search_operations.extend([
-                db.search_persons_by_surname(f"Surname{i}"),
-                db.search_persons_by_first_name(f"Person{i}"),
-                db.search_persons_by_full_name(f"Person{i} Surname{i}")
-            ])
+            search_operations.extend(
+                [
+                    db.search_persons_by_surname(f"Surname{i}"),
+                    db.search_persons_by_first_name(f"Person{i}"),
+                    db.search_persons_by_full_name(f"Person{i} Surname{i}"),
+                ]
+            )
 
         end_time = time.time()
         total_time = end_time - start_time
@@ -180,7 +181,7 @@ class TestPerformance:
 
         # Statistics calculation should be fast (less than 0.1 seconds)
         assert stats_time < 0.1
-        assert stats['persons'] == 100
+        assert stats["persons"] == 100
 
     def test_string_operations_performance(self):
         """Test performance of string operations."""
@@ -224,7 +225,7 @@ class TestPerformance:
                 first_name=f"NewPerson{i}",
                 surname=f"NewSurname{i}",
                 sex=Sex.MALE if i % 2 == 0 else Sex.FEMALE,
-                birth=Date(year=2000 + i, month=1, day=1)
+                birth=Date(year=2000 + i, month=1, day=1),
             )
 
             # Add string
@@ -243,5 +244,7 @@ class TestPerformance:
 
         # Mixed operations should complete in reasonable time (less than 2 seconds)
         assert total_time < 2.0
-        assert len(db.persons) == 149  # 100 + 49 new (starts from index 1, adds 100-149)
+        assert (
+            len(db.persons) == 149
+        )  # 100 + 49 new (starts from index 1, adds 100-149)
         assert len(db.strings) == 50

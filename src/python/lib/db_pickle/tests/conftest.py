@@ -5,7 +5,6 @@ Pytest configuration and fixtures for db_pickle tests.
 import pytest
 import tempfile
 import os
-from pathlib import Path
 
 from lib.db_pickle.database.base_data import PickleBaseData
 from lib.db_pickle.models.person import GenPerson
@@ -13,6 +12,7 @@ from lib.db_pickle.models.family import GenFamily
 from lib.db_pickle.models.relations import GenCouple, GenDescend
 from lib.db_pickle.core.enums import Sex, RelationKind
 from lib.db_pickle.models.events import Date
+
 
 @pytest.fixture
 def sample_person_data():
@@ -34,7 +34,7 @@ def sample_family_data():
         "relation": RelationKind.MARRIED,
         "father": 1,
         "mother": 2,
-        "children": [3, 4]
+        "children": [3, 4],
     }
 
 
@@ -55,26 +55,25 @@ def populated_database(sample_person_data, sample_family_data):
         first_name="Jane",
         surname="Smith",
         sex=Sex.FEMALE,
-        birth=Date(year=1982, month=5, day=20)
+        birth=Date(year=1982, month=5, day=20),
     )
     db.persons[3] = GenPerson(
         first_name="Alice",
         surname="Smith",
         sex=Sex.FEMALE,
-        birth=Date(year=2010, month=8, day=10)
+        birth=Date(year=2010, month=8, day=10),
     )
     db.persons[4] = GenPerson(
         first_name="Bob",
         surname="Smith",
         sex=Sex.MALE,
-        birth=Date(year=2012, month=12, day=25)
+        birth=Date(year=2012, month=12, day=25),
     )
 
     # Add family
     db.families[1] = GenFamily(relation=sample_family_data["relation"])
     db.couples[1] = GenCouple(
-        father=sample_family_data["father"],
-        mother=sample_family_data["mother"]
+        father=sample_family_data["father"], mother=sample_family_data["mother"]
     )
     db.descends[1] = GenDescend(children=sample_family_data["children"])
 
@@ -87,7 +86,7 @@ def populated_database(sample_person_data, sample_family_data):
 @pytest.fixture
 def temp_file():
     """Create a temporary file for testing I/O operations."""
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl') as f:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
         temp_path = f.name
     yield temp_path
     # Cleanup
@@ -98,7 +97,7 @@ def temp_file():
 @pytest.fixture
 def temp_compressed_file():
     """Create a temporary compressed file for testing I/O operations."""
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl.gz') as f:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl.gz") as f:
         temp_path = f.name
     yield temp_path
     # Cleanup
@@ -117,7 +116,7 @@ def large_database():
             first_name=f"Person{i}",
             surname=f"Surname{i % 10}",  # 10 different surnames
             sex=Sex.MALE if i % 2 == 0 else Sex.FEMALE,
-            birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1)
+            birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1),
         )
 
     # Build indexes

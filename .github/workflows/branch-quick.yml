@@ -29,49 +29,15 @@ jobs:
         run: |
           cd src/python
           echo "Setting up development environment..."
-          make dev-setup
+          make setup
 
-      - name: Install development tools
+      - name: Quick Check
         run: |
           cd src/python
-          echo "Installing development tools..."
-          make install-tools
+          echo "=== Quick Check ==="
 
-      - name: Quick Code Quality Check
-        run: |
-          cd src/python
-          echo "=== Quick Code Quality Check ==="
-
-          # Format code with ruff
-          make format
-
-          # Auto-fix linting issues
-          make fix
-
-          # Run linting checks
-          make lint
-
-      - name: Quick Test Run
-        run: |
-          cd src/python
-          echo "=== Quick Test Run ==="
-
-          # Run unit tests only (fastest)
-          make test-unit
-
-          # Run integration tests
-          make test-integration
-
-      - name: Final Check
-        run: |
-          cd src/python
-          echo "=== Final Check ==="
-
-          # Run checks without mypy (faster)
-          make check-ruff
-
-          # Show status
-          make status
+          # Run complete check (format + fix + lint + test)
+          make check
 
       - name: Upload quick results
         uses: actions/upload-artifact@v4

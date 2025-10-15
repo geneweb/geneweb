@@ -2,7 +2,6 @@
 Tests for db_pickle search functionality.
 """
 
-import pytest
 from lib.db_pickle.models.person import GenPerson
 from lib.db_pickle.core.enums import Sex
 from lib.db_pickle.models.events import Date
@@ -33,7 +32,7 @@ class TestSearchFunctionality:
             first_name="John Michael",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1985, month=1, day=1)
+            birth=Date(year=1985, month=1, day=1),
         )
         db.build_indexes()
 
@@ -84,7 +83,7 @@ class TestSearchFunctionality:
             first_name="Alice",
             surname="Smith-Jones",
             sex=Sex.FEMALE,
-            birth=Date(year=1990, month=1, day=1)
+            birth=Date(year=1990, month=1, day=1),
         )
         db.build_indexes()
 
@@ -132,7 +131,7 @@ class TestSearchFunctionality:
             first_name="John Michael",
             surname="Smith-Jones",
             sex=Sex.MALE,
-            birth=Date(year=1985, month=1, day=1)
+            birth=Date(year=1985, month=1, day=1),
         )
         db.build_indexes()
 
@@ -238,7 +237,7 @@ class TestSearchFunctionality:
             first_name="José",
             surname="García-López",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=1, day=1)
+            birth=Date(year=1980, month=1, day=1),
         )
         db.build_indexes()
 
@@ -264,7 +263,7 @@ class TestSearchFunctionality:
             first_name="John2",
             surname="Smith3",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=1, day=1)
+            birth=Date(year=1980, month=1, day=1),
         )
         db.build_indexes()
 

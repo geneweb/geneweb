@@ -2,10 +2,8 @@
 Integration tests for db_pickle module.
 """
 
-import pytest
 import tempfile
 import os
-from pathlib import Path
 
 from lib.db_pickle.database.base_data import PickleBaseData
 from lib.db_pickle.models.person import GenPerson
@@ -31,7 +29,7 @@ class TestDatabaseIntegration:
             surname="Smith",
             sex=Sex.MALE,
             birth=Date(year=1920, month=1, day=1),
-            death=Date(year=2000, month=12, day=31)
+            death=Date(year=2000, month=12, day=31),
         )
 
         db.persons[2] = GenPerson(
@@ -39,7 +37,7 @@ class TestDatabaseIntegration:
             surname="Smith",
             sex=Sex.FEMALE,
             birth=Date(year=1925, month=3, day=15),
-            death=Date(year=2005, month=6, day=20)
+            death=Date(year=2005, month=6, day=20),
         )
 
         # Add parents
@@ -48,14 +46,14 @@ class TestDatabaseIntegration:
             surname="Smith",
             sex=Sex.MALE,
             birth=Date(year=1950, month=7, day=10),
-            death=Date(year=2020, month=3, day=5)
+            death=Date(year=2020, month=3, day=5),
         )
 
         db.persons[4] = GenPerson(
             first_name="Sarah",
             surname="Johnson",
             sex=Sex.FEMALE,
-            birth=Date(year=1955, month=9, day=25)
+            birth=Date(year=1955, month=9, day=25),
         )
 
         # Add children
@@ -63,14 +61,14 @@ class TestDatabaseIntegration:
             first_name="Michael",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=4, day=12)
+            birth=Date(year=1980, month=4, day=12),
         )
 
         db.persons[6] = GenPerson(
             first_name="Emily",
             surname="Smith",
             sex=Sex.FEMALE,
-            birth=Date(year=1982, month=8, day=30)
+            birth=Date(year=1982, month=8, day=30),
         )
 
         # Add grandchildren
@@ -78,14 +76,14 @@ class TestDatabaseIntegration:
             first_name="James",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=2010, month=11, day=15)
+            birth=Date(year=2010, month=11, day=15),
         )
 
         db.persons[8] = GenPerson(
             first_name="Emma",
             surname="Smith",
             sex=Sex.FEMALE,
-            birth=Date(year=2012, month=2, day=28)
+            birth=Date(year=2012, month=2, day=28),
         )
 
         # Create families
@@ -131,15 +129,15 @@ class TestDatabaseIntegration:
 
         # Test statistics
         stats = db.get_statistics()
-        assert stats['persons'] == 8
-        assert stats['families'] == 3
-        assert stats['couples'] == 3
-        assert stats['descends'] == 3
-        assert stats['strings'] == 3
+        assert stats["persons"] == 8
+        assert stats["families"] == 3
+        assert stats["couples"] == 3
+        assert stats["descends"] == 3
+        assert stats["strings"] == 3
 
     def test_save_load_complete_workflow(self, populated_database):
         """Test complete save/load workflow."""
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl') as f:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
             temp_file = f.name
 
         try:
@@ -165,10 +163,10 @@ class TestDatabaseIntegration:
             assert results[0] == 1
 
             # Verify indexes are preserved
-            assert hasattr(loaded_db, 'first_name_index')
-            assert hasattr(loaded_db, 'surname_index')
-            assert hasattr(loaded_db, 'full_name_index')
-            assert hasattr(loaded_db, 'string_content_index')
+            assert hasattr(loaded_db, "first_name_index")
+            assert hasattr(loaded_db, "surname_index")
+            assert hasattr(loaded_db, "full_name_index")
+            assert hasattr(loaded_db, "string_content_index")
 
         finally:
             if os.path.exists(temp_file):
@@ -176,7 +174,7 @@ class TestDatabaseIntegration:
 
     def test_compressed_save_load_workflow(self, populated_database):
         """Test compressed save/load workflow."""
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl.gz') as f:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl.gz") as f:
             temp_file = f.name
 
         try:
@@ -212,7 +210,7 @@ class TestDatabaseIntegration:
                 first_name=f"Person{i}",
                 surname=f"Surname{i % 25}",  # 25 different surnames
                 sex=Sex.MALE if i % 2 == 0 else Sex.FEMALE,
-                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1)
+                birth=Date(year=1900 + (i % 100), month=(i % 12) + 1, day=(i % 28) + 1),
             )
 
         # Add some families
@@ -224,7 +222,9 @@ class TestDatabaseIntegration:
             if father < 500 and mother < 500:
                 db.families[family_id] = GenFamily(relation=RelationKind.MARRIED)
                 db.couples[family_id] = GenCouple(father=father, mother=mother)
-                db.descends[family_id] = GenDescend(children=[father + 100, mother + 100])
+                db.descends[family_id] = GenDescend(
+                    children=[father + 100, mother + 100]
+                )
 
         # Add strings
         for i in range(100):
@@ -238,7 +238,7 @@ class TestDatabaseIntegration:
         assert len(smiths) == 20  # 500/25 = 20 persons per surname
 
         # Test save/load
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl') as f:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
             temp_file = f.name
 
         try:
@@ -273,7 +273,7 @@ class TestDatabaseIntegration:
             first_name="John",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=1, day=1)
+            birth=Date(year=1980, month=1, day=1),
         )
 
         # Add family with invalid references
@@ -289,7 +289,7 @@ class TestDatabaseIntegration:
         assert any("777" in error for error in errors)
 
         # Test save/load still works despite errors
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl') as f:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
             temp_file = f.name
 
         try:
@@ -321,14 +321,14 @@ class TestDatabaseIntegration:
             first_name="John",
             surname="Smith",
             sex=Sex.MALE,
-            birth=Date(year=1980, month=1, day=1)
+            birth=Date(year=1980, month=1, day=1),
         )
 
         db2.persons[1] = GenPerson(
             first_name="Jane",
             surname="Doe",
             sex=Sex.FEMALE,
-            birth=Date(year=1985, month=6, day=15)
+            birth=Date(year=1985, month=6, day=15),
         )
 
         # Build indexes for both
@@ -364,7 +364,7 @@ class TestDatabaseIntegration:
             first_name="New",
             surname="Person",
             sex=Sex.MALE,
-            birth=Date(year=2000, month=1, day=1)
+            birth=Date(year=2000, month=1, day=1),
         )
 
         # Verify original is unchanged

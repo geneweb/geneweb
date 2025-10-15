@@ -27,7 +27,7 @@ class TestPickleWriter:
         assert os.path.exists(temp_file)
 
         # Check file is not compressed
-        with open(temp_file, 'rb') as f:
+        with open(temp_file, "rb") as f:
             # Try to read as gzip, should fail
             try:
                 gzip.decompress(f.read())
@@ -46,7 +46,7 @@ class TestPickleWriter:
         assert os.path.exists(temp_compressed_file)
 
         # Check file is compressed
-        with open(temp_compressed_file, 'rb') as f:
+        with open(temp_compressed_file, "rb") as f:
             try:
                 gzip.decompress(f.read())
                 # If we get here, file is compressed
@@ -189,7 +189,7 @@ class TestPickleReader:
         reader = PickleReader()
 
         # Create a corrupted file
-        with open(temp_file, 'w') as f:
+        with open(temp_file, "w") as f:
             f.write("This is not a valid pickle file")
 
         with pytest.raises((pickle.UnpicklingError, EOFError)):
@@ -208,10 +208,10 @@ class TestPickleReader:
         loaded_db = reader.load_database(temp_file)
 
         # Verify indexes are preserved
-        assert hasattr(loaded_db, 'first_name_index')
-        assert hasattr(loaded_db, 'surname_index')
-        assert hasattr(loaded_db, 'full_name_index')
-        assert hasattr(loaded_db, 'string_content_index')
+        assert hasattr(loaded_db, "first_name_index")
+        assert hasattr(loaded_db, "surname_index")
+        assert hasattr(loaded_db, "full_name_index")
+        assert hasattr(loaded_db, "string_content_index")
 
         # Test that search still works
         results = loaded_db.search_persons_by_first_name("John")
@@ -261,7 +261,9 @@ class TestIOIntegration:
         assert loaded_db.descends == original_db.descends
         assert loaded_db.strings == original_db.strings
 
-    def test_compressed_vs_uncompressed_size(self, populated_database, temp_file, temp_compressed_file):
+    def test_compressed_vs_uncompressed_size(
+        self, populated_database, temp_file, temp_compressed_file
+    ):
         """Test that compressed files are smaller than uncompressed."""
         writer = PickleWriter()
 

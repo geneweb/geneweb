@@ -31,13 +31,7 @@ jobs:
         run: |
           cd src/python
           echo "Setting up development environment..."
-          make dev-setup
-
-      - name: Install development tools
-        run: |
-          cd src/python
-          echo "Installing development tools..."
-          make install-tools
+          make setup
 
       - name: Code Quality Checks
         run: |
@@ -61,7 +55,7 @@ jobs:
           cd src/python
           echo "=== Running All Tests ==="
 
-          # Run all tests (unit + integration + concrete)
+          # Run all tests
           make test
 
           # Generate coverage report
@@ -86,7 +80,7 @@ jobs:
           echo "=== Final Verification ==="
 
           # Run final check
-          make check-ruff
+          make check
 
           # Verify package installation
           echo "Verifying package installation..."
@@ -103,14 +97,6 @@ jobs:
         run: |
           echo "=== Task Branch Report ==="
           cd src/python
-
-          # Show status
-          echo "=== Code Quality Status ==="
-          make status
-
-          # Show issues
-          echo "=== Remaining Issues ==="
-          make issues
 
           # Show test results
           echo "=== Test Results ==="

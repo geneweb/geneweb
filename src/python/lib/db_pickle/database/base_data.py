@@ -152,7 +152,10 @@ class PickleBaseData:
 
         # Partial match
         for stored_full_name, person_ids in self.full_name_index.items():
-            if search_full_name in stored_full_name and search_full_name != stored_full_name:
+            if (
+                search_full_name in stored_full_name
+                and search_full_name != stored_full_name
+            ):
                 results.extend(person_ids)
 
         # Remove duplicates while preserving order
@@ -196,28 +199,34 @@ class PickleBaseData:
         # Check for orphaned references in couples
         for family_id, couple in self.couples.items():
             if couple.father not in self.persons:
-                errors.append(f"Family {family_id} references non-existent father {couple.father}")
+                errors.append(
+                    f"Family {family_id} references non-existent father {couple.father}"
+                )
             if couple.mother not in self.persons:
-                errors.append(f"Family {family_id} references non-existent mother {couple.mother}")
+                errors.append(
+                    f"Family {family_id} references non-existent mother {couple.mother}"
+                )
 
         # Check for orphaned references in descends
         for family_id, descend in self.descends.items():
             for child_id in descend.children:
                 if child_id not in self.persons:
-                    errors.append(f"Family {family_id} references non-existent child {child_id}")
+                    errors.append(
+                        f"Family {family_id} references non-existent child {child_id}"
+                    )
 
         return errors
 
     def get_statistics(self) -> Dict[str, int]:
         """Get database statistics."""
         return {
-            'persons': len(self.persons),
-            'families': len(self.families),
-            'couples': len(self.couples),
-            'descends': len(self.descends),
-            'strings': len(self.strings),
-            'ascends': len(self.ascends),
-            'unions': len(self.unions)
+            "persons": len(self.persons),
+            "families": len(self.families),
+            "couples": len(self.couples),
+            "descends": len(self.descends),
+            "strings": len(self.strings),
+            "ascends": len(self.ascends),
+            "unions": len(self.unions),
         }
 
     def clear(self) -> None:
@@ -234,7 +243,8 @@ class PickleBaseData:
         self.full_name_index.clear()
         self.string_content_index.clear()
 
-    def copy(self) -> 'PickleBaseData':
+    def copy(self) -> "PickleBaseData":
         """Create a deep copy of the database."""
         import copy
+
         return copy.deepcopy(self)

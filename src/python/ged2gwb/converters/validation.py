@@ -30,20 +30,24 @@ class GedcomValidator:
         self.logger.error(message)
 
     def print_warnings_and_errors(self):
-        """Print all warnings and errors."""
+        """Print all warnings and errors with detailed explanations."""
         if self.warnings:
-            self.logger.warning(f"Total warnings: {len(self.warnings)}")
-            for warning in self.warnings[:10]:
-                self.logger.warning(f"  - {warning}")
+            self.logger.warning(f"VALIDATION WARNINGS ({len(self.warnings)} issues found):")
+            self.logger.warning("=" * 50)
+            for i, warning in enumerate(self.warnings[:10], 1):
+                self.logger.warning(f"  {i:2d}. {warning}")
             if len(self.warnings) > 10:
-                self.logger.warning(f"  ... and {len(self.warnings) - 10} more")
+                self.logger.warning(f"  ... and {len(self.warnings) - 10} more warnings")
+            self.logger.warning("=" * 50)
 
         if self.errors:
-            self.logger.error(f"Total errors: {len(self.errors)}")
-            for error in self.errors[:10]:
-                self.logger.error(f"  - {error}")
+            self.logger.error(f"CRITICAL ERRORS ({len(self.errors)} issues found):")
+            self.logger.error("=" * 50)
+            for i, error in enumerate(self.errors[:10], 1):
+                self.logger.error(f"  {i:2d}. {error}")
             if len(self.errors) > 10:
-                self.logger.error(f"  ... and {len(self.errors) - 10} more")
+                self.logger.error(f"  ... and {len(self.errors) - 10} more errors")
+            self.logger.error("=" * 50)
 
     def check_undefined_sources(self, gedcom_database: GedcomDatabase) -> None:
         """Check for undefined source references like OCaml."""
@@ -71,12 +75,18 @@ class GedcomValidator:
 
         for family in gedcom_database.families.values():
             if family.husband and family.husband not in defined_individuals:
-                self.logger.warning(f"Warning: undefined person {family.husband}")
+                self.add_warning(
+                    f"Missing person: Family {family.xref} references undefined husband @{family.husband}@"
+                )
             if family.wife and family.wife not in defined_individuals:
-                self.logger.warning(f"Warning: undefined person {family.wife}")
+                self.add_warning(
+                    f"Missing person: Family {family.xref} references undefined wife @{family.wife}@"
+                )
             for child in family.children:
                 if child not in defined_individuals:
-                    self.logger.warning(f"Warning: undefined person {child}")
+                    self.add_warning(
+                        f"Missing person: Family {family.xref} references undefined child @{child}@"
+                    )
 
     def check_undefined_families(self, gedcom_database: GedcomDatabase) -> None:
         """Check for undefined family references like OCaml."""
@@ -85,10 +95,14 @@ class GedcomValidator:
         for individual in gedcom_database.individuals.values():
             for family_ref in individual.famc:
                 if family_ref not in defined_families:
-                    self.logger.warning(f"Warning: undefined family {family_ref}")
+                    self.add_warning(
+                        f"Missing family: Person {individual.xref} references undefined parent family @{family_ref}@"
+                    )
             for family_ref in individual.fams:
                 if family_ref not in defined_families:
-                    self.logger.warning(f"Warning: undefined family {family_ref}")
+                    self.add_warning(
+                        f"Missing family: Person {individual.xref} references undefined spouse family @{family_ref}@"
+                    )
 
     def validate_person_data(self, individual, person: GenPerson):
         """Validate person data for consistency."""
@@ -100,7 +114,7 @@ class GedcomValidator:
                     if birth_date.year and death_date.year:
                         if birth_date.year > death_date.year:
                             self.add_warning(
-                                f"Person {individual.xref}: birth after death"
+                                f"Timeline error: Person {individual.xref} born {birth_date.year} but died {death_date.year}"
                             )
 
         if individual.baptism and individual.death:
@@ -111,7 +125,7 @@ class GedcomValidator:
                     if baptism_date.year and death_date.year:
                         if baptism_date.year > death_date.year:
                             self.add_warning(
-                                f"Person {individual.xref}: baptism after death"
+                                f"Timeline error: Person {individual.xref} baptized {baptism_date.year} but died {death_date.year}"
                             )
 
         if individual.birth and individual.death:
@@ -123,7 +137,7 @@ class GedcomValidator:
                         age_at_death = death_date.year - birth_date.year
                         if age_at_death > 120:
                             self.add_warning(
-                                f"Person {individual.xref}: advanced age at death ({age_at_death} years)"
+                                f"Unrealistic age: Person {individual.xref} died at age {age_at_death} years"
                             )
 
         # Handle --udi: undefined death interval
@@ -153,7 +167,7 @@ class GedcomValidator:
         """Validate family data for consistency."""
         if len(children) > 20:
             self.add_warning(
-                f"Family {family.xref}: unusually large number of children ({len(children)})"
+                f"Unusual family size: Family {family.xref} has {len(children)} children"
             )
 
     def check_children_birth_order(self, children):

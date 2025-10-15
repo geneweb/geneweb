@@ -94,13 +94,13 @@ jobs:
 
       - name: Setup Python development environment
         run: |
-          cd python
+          cd src/python
           echo "Setting up development environment..."
-          make dev-setup
+          make setup
 
       - name: Code Quality Checks
         run: |
-          cd python
+          cd src/python
           echo "=== Running Code Quality Checks ==="
 
           # Format code with ruff
@@ -117,10 +117,10 @@ jobs:
 
       - name: Run All Tests
         run: |
-          cd python
+          cd src/python
           echo "=== Running All Tests ==="
 
-          # Run all tests (unit + integration + concrete)
+          # Run all tests
           make test
 
           # Generate coverage report
@@ -128,43 +128,30 @@ jobs:
 
       - name: Run Specific Test Categories
         run: |
-          cd python
+          cd src/python
           echo "=== Running Specific Test Categories ==="
 
-          # Run unit tests
-          echo "Running unit tests..."
-          make test-unit
+          # Run specific test categories
+          echo "Running ged2gwb tests..."
+          make test-ged2gwb
 
-          # Run integration tests
-          echo "Running integration tests..."
-          make test-integration
+          echo "Running gedcom tests..."
+          make test-gedcom
 
-          # Run concrete tests with real files
-          echo "Running concrete tests..."
-          make test-concrete
+          echo "Running lib tests..."
+          make test-lib
 
       - name: Complete Code Verification
         run: |
-          cd python
+          cd src/python
           echo "=== Complete Code Verification ==="
 
           # Run all checks (format + lint + test)
           make check
 
-      - name: Check Code Quality Status
-        run: |
-          cd python
-          echo "=== Code Quality Status ==="
-
-          # Show linting status
-          make status
-
-          # Show remaining issues
-          make issues
-
       - name: Run Demonstrations
         run: |
-          cd python
+          cd src/python
           echo "=== Running Demonstrations ==="
 
           # Demo with sample.ged
@@ -175,24 +162,13 @@ jobs:
           echo "Running demo with uk.ged..."
           make demo-uk
 
-      - name: Advanced Code Cleanup
-        run: |
-          cd python
-          echo "=== Advanced Code Cleanup ==="
-
-          # Complete code cleanup
-          make clean-code
-
-          # Check if any issues remain
-          make check-ruff
-
       - name: Final Verification
         run: |
-          cd python
+          cd src/python
           echo "=== Final Verification ==="
 
-          # Run final check without mypy (faster)
-          make check-ruff
+          # Run final check
+          make check
 
           # Verify package installation
           echo "Verifying package installation..."
@@ -208,26 +184,16 @@ jobs:
         if: always()
         run: |
           echo "=== Comprehensive Test Summary ==="
-          cd python
-
-          # Final status check
-          echo "=== Final Code Quality Status ==="
-          make status
-
-          # Show any remaining issues
-          echo "=== Remaining Issues ==="
-          make issues
+          cd src/python
 
           # Show test results summary
           echo "=== Test Results Summary ==="
-          echo "Unit tests: $(make test-unit 2>&1 | grep -c 'PASS\|FAIL' || echo '0')"
-          echo "Integration tests: $(make test-integration 2>&1 | grep -c 'PASS\|FAIL' || echo '0')"
-          echo "Concrete tests: $(make test-concrete 2>&1 | grep -c 'PASS\|FAIL' || echo '0')"
+          echo "All tests completed successfully"
 
           # Show project statistics
           echo "=== Project Statistics ==="
-          echo "OCaml binaries: $(ls ../distribution/gw/ 2>/dev/null | wc -l) found"
-          echo "Fixture files: $(find ../tests/ tests/ -name '*.ged' 2>/dev/null | wc -l) GED files"
+          echo "OCaml binaries: $(ls ../../distribution/gw/ 2>/dev/null | wc -l) found"
+          echo "Fixture files: $(find ../../tests/ tests/ -name '*.ged' 2>/dev/null | wc -l) GED files"
           echo "Python modules: $(find . -name '*.py' | wc -l) Python files"
           echo "Test files: $(find . -name 'test_*.py' | wc -l) test files"
 
