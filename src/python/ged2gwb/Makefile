@@ -55,35 +55,66 @@ help:
 .PHONY: test
 test:
 	@echo "$(BLUE)Running all GED2GWB test suites...$(NC)"
-	@$(PYTHON) -m tests.run_tests
+	@$(PYTHON) -m pytest tests/ -v
 
 # Run unit tests
 .PHONY: test-unit
 test-unit:
 	@echo "$(BLUE)Running unit tests...$(NC)"
-	@$(PYTHON) -m tests.unit.run_unit_tests
+	@$(PYTHON) -m pytest tests/test_unit_converter.py tests/test_unit_options.py -v
 
 # Run integration tests
 .PHONY: test-integration
 test-integration:
 	@echo "$(BLUE)Running integration tests...$(NC)"
-	@$(PYTHON) -m tests.test_integration
+	@$(PYTHON) -m pytest tests/test_integration.py -v
 
 # Run concrete tests with real GEDCOM files
 .PHONY: test-concrete
 test-concrete:
 	@echo "$(BLUE)Running concrete tests with real files...$(NC)"
-	@$(PYTHON) -m tests.test_concrete
+	@$(PYTHON) -m pytest tests/test_option_verification.py -v
+
+# Run legacy compatibility tests
+.PHONY: test-legacy
+test-legacy:
+	@echo "$(BLUE)Running legacy compatibility tests...$(NC)"
+	@$(PYTHON) -m pytest tests/test_legacy_compatibility.py -v
 
 # Run tests with coverage
 .PHONY: test-coverage
 test-coverage:
 	@echo "$(BLUE)Running tests with coverage...$(NC)"
-	@if command -v coverage >/dev/null 2>&1; then \
-		coverage run -m tests.run_tests && coverage report; \
-	else \
-		echo "$(YELLOW)Coverage not installed. Install with: pip install coverage$(NC)"; \
-	fi
+	@$(PYTHON) -m pytest tests/ --cov=ged2gwb --cov-report=html --cov-report=term
+
+# Run all pytest tests
+.PHONY: test-pytest
+test-pytest:
+	@echo "$(BLUE)Running all pytest tests...$(NC)"
+	@$(PYTHON) -m pytest tests/ -v
+
+# Run file placement tests
+.PHONY: test-file-placement
+test-file-placement:
+	@echo "$(BLUE)Running file placement tests...$(NC)"
+	@$(PYTHON) -m pytest tests/test_file_placement.py -v
+
+# Run base-dir behavior tests
+.PHONY: test-base-dir
+test-base-dir:
+	@echo "$(BLUE)Running base-dir behavior tests...$(NC)"
+	@$(PYTHON) -m pytest tests/test_base_dir_behavior.py -v
+
+# Run specific test categories
+.PHONY: test-unit-pytest
+test-unit-pytest:
+	@echo "$(BLUE)Running unit tests with pytest...$(NC)"
+	@$(PYTHON) -m pytest tests/test_converter_pytest.py -v -m unit
+
+.PHONY: test-legacy-pytest
+test-legacy-pytest:
+	@echo "$(BLUE)Running legacy tests with pytest...$(NC)"
+	@$(PYTHON) -m pytest tests/test_legacy_compatibility.py -v -m legacy
 
 # =============================================================================
 # DEVELOPMENT TARGETS
