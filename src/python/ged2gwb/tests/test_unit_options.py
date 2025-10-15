@@ -23,7 +23,7 @@ class TestConversionOptions:
         options = ConversionOptions(input_file=Path("test.ged"))
 
         assert options.input_file == Path("test.ged")
-        assert options.output_file == Path("a.pkl")
+        assert options.output_file == Path("base.pkl")
         assert options.charset is None
         assert options.dates_dm is False
         assert options.dates_md is False
@@ -44,7 +44,7 @@ class TestConversionOptions:
         assert options.udi is None
         assert options.uin is False
         assert options.tnd is False
-        assert options.compress is False
+        assert options.compress is True
         assert options.force is False
         assert options.verbose is False
         assert options.track_id is False
