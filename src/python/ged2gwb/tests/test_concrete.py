@@ -118,7 +118,6 @@ def test_with_sample_ged():
             actual_file.unlink()
 
 
-
 def test_with_uk_ged():
     """Test conversion with the real uk.ged file."""
     print("\n=== Testing with uk.ged ===\n")
@@ -193,7 +192,6 @@ def test_with_uk_ged():
             output_file.unlink()
         if actual_file.exists():
             actual_file.unlink()
-
 
 
 def test_cli_functionality():
@@ -273,7 +271,6 @@ def test_cli_functionality():
             actual_file.unlink()
 
 
-
 def test_load_functionality():
     """Test the --load functionality."""
     print("\n=== Testing Load Functionality ===\n")
@@ -320,7 +317,6 @@ def test_load_functionality():
             output_file.unlink()
         if actual_file.exists():
             actual_file.unlink()
-
 
 
 def test_error_handling():

@@ -2,94 +2,101 @@
 """
 Main test runner for ged2gwb.
 
-This script executes all test suites in a professional manner.
+This script executes all test suites using pytest in a professional manner.
 """
 
 import sys
 import os
 import time
+import subprocess
 from pathlib import Path
 
 # Add the src directory to the path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 
-def run_unit_converter_tests():
-    """Run unit tests for the converter."""
-    print("=== Unit Tests - Converter ===")
+def run_pytest_tests(test_path, test_name):
+    """Run pytest tests for a specific path."""
+    print(f"=== {test_name} ===")
 
     try:
-        from ged2gwb.tests.test_unit_converter import run_unit_tests
+        # Use absolute path for test file
+        test_file = Path(__file__).parent / test_path
+        if not test_file.exists():
+            print(f"ERROR: Test file not found: {test_file}")
+            return 1
 
-        return run_unit_tests()
+        result = subprocess.run(
+            [sys.executable, '-m', 'pytest', str(test_file), '-v', '--tb=short'],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent.parent.parent.parent
+        )
+
+        if result.returncode == 0:
+            # Count passed tests
+            test_count = len([line for line in result.stdout.split('\n')
+                            if 'PASSED' in line or 'FAILED' in line])
+            print(f"✓ {test_name}: {test_count} tests passed")
+            return 0
+        else:
+            print(f"✗ {test_name}: Tests failed")
+            print(result.stdout)
+            if result.stderr:
+                print("STDERR:", result.stderr)
+            return 1
+
     except Exception as e:
-        print(f"ERROR: Failed to run unit converter tests: {e}")
+        print(f"ERROR: Failed to run {test_name}: {e}")
         return 1
 
 
-def run_unit_options_tests():
-    """Run unit tests for the options."""
-    print("=== Unit Tests - Options ===")
+def run_unit_tests():
+    """Run all unit tests."""
+    print("=== Unit Tests ===")
 
-    try:
-        from ged2gwb.tests.test_unit_options import run_unit_tests
+    unit_tests = [
+        ("unit/test_converter.py", "Converter Unit Tests"),
+        ("unit/test_options.py", "Options Unit Tests"),
+        ("unit/test_cli.py", "CLI Unit Tests"),
+    ]
 
-        return run_unit_tests()
-    except Exception as e:
-        print(f"ERROR: Failed to run unit options tests: {e}")
-        return 1
+    results = []
+    for test_file, test_name in unit_tests:
+        result = run_pytest_tests(test_file, test_name)
+        results.append(result)
 
-
-def run_regression_tests():
-    """Run regression tests."""
-    print("=== Regression Tests ===")
-
-    try:
-        from ged2gwb.tests.test_regression import run_regression_tests
-
-        return run_regression_tests()
-    except Exception as e:
-        print(f"ERROR: Failed to run regression tests: {e}")
-        return 1
+    return 0 if all(r == 0 for r in results) else 1
 
 
 def run_integration_tests():
     """Run integration tests."""
-    print("=== Integration Tests ===")
+    return run_pytest_tests("test_integration.py", "Integration Tests")
 
-    try:
-        from ged2gwb.tests.test_integration import run_integration_tests
 
-        return run_integration_tests()
-    except Exception as e:
-        print(f"ERROR: Failed to run integration tests: {e}")
-        return 1
+def run_regression_tests():
+    """Run regression tests."""
+    return run_pytest_tests("test_regression.py", "Regression Tests")
 
 
 def run_option_verification_tests():
     """Run option verification tests."""
-    print("=== Option Verification Tests ===")
-
-    try:
-        from ged2gwb.tests.test_option_verification import run_option_verification_tests
-
-        return run_option_verification_tests()
-    except Exception as e:
-        print(f"ERROR: Failed to run option verification tests: {e}")
-        return 1
+    return run_pytest_tests("test_option_verification.py", "Option Verification Tests")
 
 
 def run_performance_tests():
     """Run performance tests."""
-    print("=== Performance Tests ===")
+    return run_pytest_tests("test_performance.py", "Performance Tests")
 
-    try:
-        from ged2gwb.tests.test_performance import run_performance_tests
 
-        return run_performance_tests()
-    except Exception as e:
-        print(f"ERROR: Failed to run performance tests: {e}")
-        return 1
+def run_concrete_tests():
+    """Run concrete tests with real files."""
+    return run_pytest_tests("test_concrete.py", "Concrete Tests")
+
+
+def run_conversion_tests():
+    """Run conversion tests."""
+    return run_pytest_tests("test_conversion.py", "Conversion Tests")
 
 
 def main():
@@ -103,12 +110,13 @@ def main():
 
     # Execute all test suites
     test_suites = [
-        ("Unit Tests - Converter", run_unit_converter_tests),
-        ("Unit Tests - Options", run_unit_options_tests),
-        ("Regression Tests", run_regression_tests),
+        ("Unit Tests", run_unit_tests),
         ("Integration Tests", run_integration_tests),
+        ("Regression Tests", run_regression_tests),
         ("Option Verification Tests", run_option_verification_tests),
         ("Performance Tests", run_performance_tests),
+        ("Concrete Tests", run_concrete_tests),
+        ("Conversion Tests", run_conversion_tests),
     ]
 
     results = []

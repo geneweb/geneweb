@@ -209,7 +209,7 @@ class Ged2GwbCLI:
 
         logging.basicConfig(
             level=log_level,
-            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            format="%(levelname)s - %(message)s",
             handlers=handlers,
         )
 

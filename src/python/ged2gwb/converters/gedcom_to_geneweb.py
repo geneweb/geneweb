@@ -30,6 +30,9 @@ class GedcomToGenewebConverter:
         self.options = options
         self.logger = logging.getLogger(__name__)
 
+        if not self.logger.handlers:
+            self.logger.setLevel(logging.WARNING)
+
         # Initialize helper classes
         self.validator = GedcomValidator(self.logger, self.options)
         self.converter = GedcomConverter(self.logger, self.options)
