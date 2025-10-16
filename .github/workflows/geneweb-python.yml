@@ -85,7 +85,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          cd python
+          cd src/python
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
@@ -125,29 +125,6 @@ jobs:
 
           # Generate coverage report
           make test-coverage
-
-      - name: Run Specific Test Categories
-        run: |
-          cd src/python
-          echo "=== Running Specific Test Categories ==="
-
-          # Run specific test categories
-          echo "Running ged2gwb tests..."
-          make test-ged2gwb
-
-          echo "Running gedcom tests..."
-          make test-gedcom
-
-          echo "Running lib tests..."
-          make test-lib
-
-      - name: Complete Code Verification
-        run: |
-          cd src/python
-          echo "=== Complete Code Verification ==="
-
-          # Run all checks (format + lint + test)
-          make check
 
       - name: Run Demonstrations
         run: |
@@ -203,8 +180,8 @@ jobs:
         with:
           name: comprehensive-test-results
           path: |
-            python/tests/reports/
-            python/tests/
+            src/python/tests/reports/
+            src/python/tests/
             tests/
             distribution/gw/
           retention-days: 30
