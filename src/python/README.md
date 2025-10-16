@@ -1,224 +1,176 @@
-# GeneWeb Python
+# GeneWeb Python Tools
 
-Python implementation of GeneWeb with GED2GWB converter for genealogical data processing.
+Python tools for GeneWeb genealogy software, including GEDCOM parsing, database utilities, and conversion tools.
 
-## Quick Start
-
-```bash
-# Install
-make install-dev
-
-# Convert GEDCOM to pickle database
-python3 -m ged2gwb input.ged --output database.pkl
-
-# Load database
-python3 -m ged2gwb --load database.pkl
-```
-
-## Project Structure
-
-```
-src/python/
-├── ged2gwb/          # GED2GWB converter
-├── gedcom/           # GEDCOM 5.5.1 parser
-├── lib/db_pickle/    # Pickle database system
-├── pyproject.toml    # Package configuration
-└── Makefile         # Project automation
-```
-
-## Development
-
-### Setup & Installation
+## 🚀 Quick Start
 
 ```bash
+# Install in development mode
+cd src/python
+pip install -e .
+
+# Run tests
+make test
+
+# Run all checks
+make check
+```
+
+## 📦 Components
+
+- **ged2gwb**: GEDCOM to GeneWeb converter
+- **gedcom**: GEDCOM file parser
+- **lib.db_pickle**: Database pickle utilities for GeneWeb
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Python 3.8+
+- pip
+- make (optional, for using Makefile)
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/geneweb/geneweb.git
+cd geneweb/src/python
+
 # Create virtual environment
-make venv
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install in development mode
-make install-dev
+pip install -e .
 
-# Install development tools (ruff, pytest, etc.)
+# Install development tools
 make install-tools
 ```
 
-### Code Quality & Testing
+### Available Commands
 
 ```bash
-# Format code with ruff
-make format
+# Setup
+make setup          # Complete development setup
+make venv           # Create virtual environment
+make install        # Install package
+make install-tools  # Install dev tools
 
-# Fix linting issues automatically
-make fix
+# Testing
+make test           # Run all tests
+make test-ged2gwb   # Run ged2gwb tests
+make test-gedcom    # Run GEDCOM tests
+make test-lib       # Run lib tests
+make test-coverage  # Run with coverage
 
-# Run all checks (format + lint + test)
-make check
+# Development
+make format         # Format code with ruff
+make lint           # Run linting (ruff + mypy)
+make fix            # Auto-fix linting issues
+make check          # Format + lint + test
 
-# Run tests only
+# Utilities
+make clean          # Clean temporary files
+make demo           # Run demo with sample.ged
+make demo-uk        # Run demo with uk.ged
+```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
 make test
 
-# Run specific test types
-make test-unit
-make test-integration
-make test-concrete
+# Run specific test categories
+make test-ged2gwb
+make test-gedcom
+make test-lib
 
-# Check code quality status
-make status
-make issues
-```
-
-### Advanced Development
-
-```bash
-# Complete code cleanup (format + fix + lint)
-make clean-code
-
-# Fix all issues including unsafe fixes
-make fix-all
-
-# Run tests with coverage
+# Run with coverage
 make test-coverage
-
-# Generate documentation
-make docs
 ```
 
-### Utilities
+## 📋 CI/CD
+
+### GitHub Actions Workflows
+
+1. **geneweb-python.yml**: Full Integration Pipeline
+
+   - Runs on master/dev branches
+   - Full GeneWeb OCaml build + Python tests
+   - Code quality checks (ruff, mypy)
+   - Comprehensive testing with Makefile
+   - Demo runs with sample GEDCOM files
+
+2. **python-deploy.yml**: Deployment (optional)
+   - Runs on tags `python-v*` (e.g., `python-v1.0.0`)
+   - Builds Python package
+   - Publishes to PyPI
+   - Creates GitHub release
+
+### Deployment
+
+To deploy a new version:
 
 ```bash
-# Demo with sample files
-make demo
-make demo-uk
+# Create and push a tag
+git tag python-v1.0.0
+git push origin python-v1.0.0
 
-# Clean temporary files
-make clean
-make clean-all
-
-# Remove virtual environment
-make clean-venv
+# This will trigger the deployment workflow
 ```
 
-## Features
+## 🔧 Configuration
 
-- **GEDCOM 5.5.1** parsing and validation
-- **Pickle serialization** with gzip compression
-- **Search indexing** for fast lookups
-- **30 CLI options** matching GeneWeb documentation
-- **Comprehensive testing** with real GEDCOM files
-- **Automated code quality** with ruff and pytest
-- **Virtual environment management** with Makefile
-- **Professional development workflow**
+### pyproject.toml
 
-## Code Quality Tools
+The project uses `pyproject.toml` for configuration:
 
-### Ruff (Linting & Formatting)
+- **Build system**: setuptools
+- **Code formatting**: ruff
+- **Type checking**: mypy
+- **Testing**: pytest
+- **Coverage**: pytest-cov
 
-- **Fast Python linter** and formatter
-- **Automatic fixes** for common issues
-- **Zero configuration** required
-- **Compatible with black, isort, flake8**
+### Makefile
 
-### Pytest (Testing)
+The Makefile provides convenient commands for development:
 
-- **129 comprehensive tests** (unit, integration, concrete)
-- **Real GEDCOM file testing** with sample.ged and uk.ged
-- **Coverage reporting** with html output
-- **Professional test structure** with proper assertions
+- Uses virtual environment (`.venv/`)
+- Consistent command interface
+- Colorized output
+- Error handling
 
-### Development Workflow
+## 📚 Usage Examples
 
-```bash
-# 1. Start development
-make dev-setup
+### GEDCOM to GeneWeb Conversion
 
-# 2. Make changes to code
-# ... edit files ...
+```python
+from ged2gwb import convert_gedcom_to_geneweb
 
-# 3. Quick quality check
-make fix
-
-# 4. Run tests
-make test
-
-# 5. Full verification
-make check
-
-# 6. Clean up
-make clean
+# Convert GEDCOM file
+result = convert_gedcom_to_geneweb('family.ged', 'output.pkl')
+print(f"Converted {result.individuals} individuals and {result.families} families")
 ```
 
-## Troubleshooting & Maintenance
+### GEDCOM Parsing
 
-### Common Issues
+```python
+from gedcom import GedcomParser
 
-```bash
-# Check current status
-make status
-
-# View remaining issues
-make issues
-
-# Fix all fixable issues
-make fix-all
-
-# Clean everything and start fresh
-make clean-all
-make dev-setup
+# Parse GEDCOM file
+parser = GedcomParser('family.ged')
+individuals = parser.get_individuals()
+families = parser.get_families()
 ```
 
-### Performance Monitoring
+### Database Operations
 
-```bash
-# Run tests with coverage
-make test-coverage
+```python
+from lib.db_pickle import PickleBase
 
-# Check specific test categories
-make test-unit      # Fast unit tests
-make test-concrete  # Real file tests
+# Load database
+db = PickleBase('database.pkl')
+individuals = db.get_individuals()
 ```
-
-### Environment Management
-
-```bash
-# Recreate virtual environment
-make clean-venv
-make venv
-make install-dev
-
-# Update dependencies
-make install-tools
-```
-
-## Requirements
-
-- Python 3.10+
-- See `requirements.txt` for dependencies
-
-## Available Makefile Targets
-
-| Target             | Description                            |
-| ------------------ | -------------------------------------- |
-| `venv`             | Create virtual environment             |
-| `install-dev`      | Install in development mode            |
-| `install-tools`    | Install development tools              |
-| `format`           | Format code with ruff                  |
-| `fix`              | Auto-fix linting issues                |
-| `fix-all`          | Fix all issues (including unsafe)      |
-| `clean-code`       | Complete code cleanup                  |
-| `check`            | Run all checks (format + lint + test)  |
-| `check-ruff`       | Run checks without mypy                |
-| `test`             | Run all tests                          |
-| `test-unit`        | Run unit tests only                    |
-| `test-integration` | Run integration tests only             |
-| `test-concrete`    | Run concrete tests with real files     |
-| `test-coverage`    | Run tests with coverage report         |
-| `status`           | Show linting status                    |
-| `issues`           | Show remaining issues                  |
-| `demo`             | Run demo with sample.ged               |
-| `demo-uk`          | Run demo with uk.ged                   |
-| `clean`            | Clean temporary files                  |
-| `clean-all`        | Clean everything including **pycache** |
-| `clean-venv`       | Remove virtual environment             |
-
----
-
-**GeneWeb Python** - Professional genealogical data processing
