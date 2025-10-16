@@ -125,3 +125,7 @@ let read_or_create_value ?magic ?wait fname create =
     v
   in
   try read_or_create_channel ?magic ?wait fname read write with _ -> create ()
+
+let set_modification_time_to_now fname =
+  let now = Unix.gettimeofday () in
+  Unix.utimes fname now now
