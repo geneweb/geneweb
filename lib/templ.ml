@@ -137,11 +137,11 @@ let not_impl func x = "Templ." ^ func ^ ": not impl " ^ TemplAst.show_ast x
 let setup_link conf =
   let s = Mutil.extract_param "host: " '\r' conf.Config.request in
   Option.fold s ~none:"" ~some:(fun s ->
-      try
-        let i = String.rindex s ':' in
-        let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
-        "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
-      with Not_found -> "")
+      Option.fold (String.rindex_opt s ':')
+        ~some:(fun i ->
+          let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
+          "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>")
+        ~none:"")
 
 let esc s = (Util.escape_html s :> string)
 

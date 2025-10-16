@@ -336,12 +336,7 @@ let sosa_of_persons conf base =
   loop 1
 
 let print_anniv conf base p dead_people level =
-  let s_mem x m =
-    try
-      let _ = Gwdb.IperMap.find x m in
-      true
-    with Not_found -> false
-  in
+  let s_mem x m = Option.is_some @@ Gwdb.IperMap.find_opt x m in
   let rec insert_desc set up_sosa down_br n ip =
     if s_mem ip set then set
     else

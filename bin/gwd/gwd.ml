@@ -1361,10 +1361,9 @@ let auth_err request auth_file =
                 if auth = input_line ic then (
                   close_in ic;
                   let s =
-                    try
-                      let i = String.rindex auth ':' in
-                      String.sub auth 0 i
-                    with Not_found -> "..."
+                    Option.fold
+                      (String.rindex_opt auth ':')
+                      ~some:(String.sub auth 0) ~none:"..."
                   in
                   (false, s))
                 else loop ()
