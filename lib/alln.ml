@@ -6,6 +6,30 @@ let default_max_cnt = 2000
 
 type t = Result of (string * string * int) list | Specify of string list
 
+let first_letters base is_surnames =
+  let name_index =
+    if is_surnames then Gwdb.persons_of_surname base
+    else Gwdb.persons_of_first_name base
+  in
+  try
+    let rec loop istr list =
+      let list =
+        if Gwdb.is_empty_string istr then list
+        else
+          let s = Translate.eval (Mutil.nominative (Gwdb.sou base istr)) in
+          let k = Util.name_key base s in
+          let c = Utf8.sub k 0 1 in
+          match list with
+          | hd :: _ -> if hd = c then list else c :: list
+          | [] -> [ c ]
+      in
+      match Gwdb.spi_next name_index istr with
+      | istr -> loop istr list
+      | exception Not_found -> list
+    in
+    loop (Gwdb.spi_first name_index "") []
+  with Not_found -> []
+
 let select_names conf base is_surnames ini limit =
   let inilen = Utf8.length ini + 1 in
   let cut k = Utf8.sub k 0 (min (Utf8.length k) inilen) in

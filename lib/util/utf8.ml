@@ -320,8 +320,3 @@ let unaccent s =
       copy j (Buff.mstore len t)
   in
   copy 0 0
-
-let uchar_to_string c =
-  let buffer = Buffer.create 4 in
-  Buffer.add_utf_8_uchar buffer c;
-  Buffer.contents buffer
