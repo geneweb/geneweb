@@ -224,7 +224,7 @@ let print_frequency conf base is_surnames =
   let list = Alln.groupby_count list in
   print_frequency_any conf base is_surnames list len
 
-let print_alphabetic conf base is_surnames =
+let print_alphabetic ~index conf base is_surnames =
   let ini =
     match Util.p_getenv conf.Config.env "k" with Some k -> k | _ -> ""
   in
@@ -234,8 +234,9 @@ let print_alphabetic conf base is_surnames =
     && ini = ""
   then (
     Gwdb.load_strings_array base;
-    let list = Alln.first_letters base is_surnames in
-    let list = List.sort Utf8.alphabetic_order list in
+    let list =
+      List.sort Utf8.alphabetic_order (List.map Utf8.uchar_to_string index)
+    in
     print_alphabetic_big conf base is_surnames ini list 1 true)
   else
     let all =
@@ -318,17 +319,3 @@ let print_short conf base is_surnames =
   | Alln.Result list, len ->
       let list = Alln.groupby_ini (Utf8.length ini + 1) list in
       print_alphabetic_short conf base is_surnames ini list len
-
-(* main *)
-
-let print_surnames conf base =
-  match Util.p_getenv conf.Config.env "tri" with
-  | Some "F" -> print_frequency conf base true
-  | Some "S" -> print_short conf base true
-  | _ -> print_alphabetic conf base true
-
-let print_first_names conf base =
-  match Util.p_getenv conf.Config.env "tri" with
-  | Some "F" -> print_frequency conf base false
-  | Some "S" -> print_short conf base false
-  | _ -> print_alphabetic conf base false

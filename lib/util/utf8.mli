@@ -111,3 +111,4 @@ val filter_map :
   string
 
 val unaccent : string -> string
+val uchar_to_string : Uchar.t -> string
