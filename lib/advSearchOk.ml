@@ -490,8 +490,8 @@ let get_name_search_mode gets key =
   let key_pfx = key ^ "_prefix" in
   let value_pfx = gets key_pfx in
   let value = gets key in
-  if value_pfx = "on" then `Not_Exact_Prefix
-  else if value = "on" then `Exact
+  if value = "on" then `Exact
+  else if value_pfx = "on" then `Not_Exact_Prefix
   else if value = "pfx" then `Not_Exact_Prefix
   else `Not_Exact
 
