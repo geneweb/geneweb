@@ -4,7 +4,7 @@ Simple test to understand gwb2ged OCaml behavior
 """
 
 import sys
-from tools.test_utils import *
+from tools.test_utils import get_absolute_path, check_file_exists, run_command
 
 def test_basic_export():
     """Test basic export without options - minimal compliance checks."""
