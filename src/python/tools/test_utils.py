@@ -26,12 +26,11 @@ def get_absolute_path(relative_path: str) -> str:
     project_root = get_project_root()
     return str(project_root / relative_path)
 
-def run_command(cmd: str, timeout: int = 30) -> Tuple[int, str, str]:
-    """Execute a command and return the result"""
+def run_command(cmd: list, timeout: int = 30) -> Tuple[int, str, str]:
+    """Execute a command (as a list of arguments) and return the result"""
     try:
         result = subprocess.run(
             cmd,
-            shell=True,
             capture_output=True,
             text=True,
             timeout=timeout
