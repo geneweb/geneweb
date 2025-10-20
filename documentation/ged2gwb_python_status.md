@@ -14,7 +14,7 @@
 - Load to validate:
   - `PYTHONPATH=src/python python -m ged2gwb --load tmp/test-ci-ged2gwb.pkl`
 
-## Limitation
+## Limitations
 
 - `gwd` reads `<base>.gwb` (directory) and cannot read `.pkl`.
 - Therefore, `.pkl` produced by Python is not directly usable by the classic web UI.
