@@ -5,6 +5,7 @@ let rec eval_date_var conf jd = function
   | "french" :: sl -> eval_dmy_var (Date.french_of_sdn ~prec:Sure jd) sl
   | "gregorian" :: sl -> eval_dmy_var (Date.gregorian_of_sdn ~prec:Sure jd) sl
   | "hebrew" :: sl -> eval_dmy_var (Date.hebrew_of_sdn ~prec:Sure jd) sl
+  | "islamic" :: sl -> eval_dmy_var (Date.islamic_of_sdn ~prec:Sure jd) sl
   | "julian" :: sl -> eval_dmy_var (Date.julian_of_sdn ~prec:Sure jd) sl
   | [ "julian_day" ] -> TemplAst.VVstring (string_of_int jd)
   | [ "julian_day"; "sep1000" ] ->

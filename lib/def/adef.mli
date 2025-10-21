@@ -23,7 +23,7 @@ val no_consang : fix
 type date = Dgreg of dmy * calendar | Dtext of string
 
 (** Supported calendars *)
-and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and calendar = Dgregorian | Djulian | Dfrench | Dhebrew | Dislamic
 
 and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
 (** Concrete date with precision. *)
@@ -50,6 +50,7 @@ type cdate =
   | Ctext of string
   | Cdate of date
   | Cnone
+  | Cislamic of int
 
 type 'person gen_couple
 (** Polymorphic type to represent a family's couple.

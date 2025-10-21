@@ -195,6 +195,7 @@ let eval_julian_day conf =
       ("j", Djulian, 12);
       ("f", Dfrench, 13);
       ("h", Dhebrew, 13);
+      ("i", Dislamic, 12);
     ]
 
 (* *)

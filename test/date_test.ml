@@ -121,6 +121,11 @@ let v =
              (Date.hebrew_of_sdn ~prec:Date.Sure)
              (Date.to_sdn ~from:Date.Dhebrew)
              data_sure);
+        Alcotest.test_case "Date islamic <-> sdn" `Quick
+          (round_trip
+             (Date.islamic_of_sdn ~prec:Date.Sure)
+             (Date.to_sdn ~from:Date.Dislamic)
+             data_sure);
       ] );
     ( "date-greg",
       [
@@ -139,6 +144,11 @@ let v =
              (Date.convert ~from:Date.Dgregorian ~to_:Date.Dhebrew)
              (Date.convert ~from:Date.Dhebrew ~to_:Date.Dgregorian)
              (data_sure @ data_oryear));
+        Alcotest.test_case "Date gregorian <-> islamic" `Quick
+          (round_trip
+             (Date.convert ~from:Date.Dgregorian ~to_:Date.Dislamic)
+             (Date.convert ~from:Date.Dislamic ~to_:Date.Dgregorian)
+             (data_sure @ data_oryear));
       ] );
     ( "date-incomplete",
       [
@@ -154,5 +164,9 @@ let v =
           (incomplete_date
              (Date.convert ~from:Date.Dgregorian ~to_:Date.Dhebrew)
              (Date.convert ~from:Date.Dhebrew ~to_:Date.Dgregorian));
+        Alcotest.test_case "Date incomplete gregorian <-> islamic" `Quick
+          (incomplete_date
+             (Date.convert ~from:Date.Dgregorian ~to_:Date.Dislamic)
+             (Date.convert ~from:Date.Dislamic ~to_:Date.Dgregorian));
       ] );
   ]

@@ -10,7 +10,7 @@ type date =
   (* textual form of the date *)
   | Dtext of string
 
-and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and calendar = Dgregorian | Djulian | Dfrench | Dhebrew | Dislamic
 and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
 and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 
@@ -127,6 +127,9 @@ val french_of_sdn : prec:precision -> int -> dmy
 
 val hebrew_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to [dmy] in hebrew calendar *)
+
+val islamic_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to [dmy] in Islamic calendar *)
 
 val partial_date_lower_bound :
   day:int -> month:int -> year:int -> int * int * int

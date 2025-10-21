@@ -14,6 +14,11 @@ val code_hebrew_date : Config.config -> int -> int -> int -> string
     translated to the current language.
 *)
 
+val code_islamic_date : Config.config -> int -> int -> int -> string
+(** Returns textual representation of a day / month / year in the Islamic calendar
+    translated to the current language.
+*)
+
 val string_of_dmy : Config.config -> Date.dmy -> Adef.safe_string
 (** Converts and translate date to the textual representation for the giving language. Considers precision. *)
 
@@ -34,6 +39,10 @@ val string_of_on_french_dmy : Config.config -> Date.dmy -> Adef.safe_string
 
 val string_of_on_hebrew_dmy : Config.config -> Date.dmy -> Adef.safe_string
 (** Translate a date in the hebrew calendar
+    with prefix "on" before dates (changes for other languages). *)
+
+val string_of_on_islamic_dmy : Config.config -> Date.dmy -> Adef.safe_string
+(** Translate a date in the Islamic calendar
     with prefix "on" before dates (changes for other languages). *)
 
 val string_slash_of_date : Config.config -> Date.date -> Adef.safe_string
