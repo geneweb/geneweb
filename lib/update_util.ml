@@ -127,6 +127,7 @@ let eval_date_var od s =
       | Some (Dgreg (_, Djulian)) -> "julian"
       | Some (Dgreg (_, Dfrench)) -> "french"
       | Some (Dgreg (_, Dhebrew)) -> "hebrew"
+      | Some (Dgreg (_, Dislamic)) -> "islamic"
       | _ -> "")
   | "day" -> (
       match eval_date_field od with
@@ -189,6 +190,7 @@ let eval_date_var od s =
   | "cal_french" -> eval_is_cal Dfrench od
   | "cal_gregorian" -> eval_is_cal Dgregorian od
   | "cal_hebrew" -> eval_is_cal Dhebrew od
+  | "cal_islamic" -> eval_is_cal Dislamic od
   | "cal_julian" -> eval_is_cal Djulian od
   | "prec_no" -> if od = None then "1" else ""
   | "prec_sure" -> eval_is_prec (function Sure -> true | _ -> false) od

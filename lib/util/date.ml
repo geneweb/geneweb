@@ -6,9 +6,16 @@ type cdate = Adef.cdate =
   | Ctext of string
   | Cdate of Adef.date
   | Cnone
+  | Cislamic of int
 
 type date = Adef.date = Dgreg of dmy * calendar | Dtext of string
-and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+
+and calendar = Adef.calendar =
+  | Dgregorian
+  | Djulian
+  | Dfrench
+  | Dhebrew
+  | Dislamic
 
 and dmy = Adef.dmy = {
   day : int;
@@ -70,6 +77,7 @@ let date_of_cdate = function
   | Cjulian i -> Dgreg (uncompress i, Djulian)
   | Cfrench i -> Dgreg (uncompress i, Dfrench)
   | Chebrew i -> Dgreg (uncompress i, Dhebrew)
+  | Cislamic i -> Dgreg (uncompress i, Dislamic)
   | Cdate d -> d
   | Ctext t -> Dtext t
   | Cnone -> failwith "date_of_cdate"
@@ -85,7 +93,8 @@ let cdate_of_date d =
           | Dgregorian -> Cgregorian i
           | Djulian -> Cjulian i
           | Dfrench -> Cfrench i
-          | Dhebrew -> Chebrew i))
+          | Dhebrew -> Chebrew i
+          | Dislamic -> Cislamic i))
 
 let cdate_of_od = function Some d -> cdate_of_date d | None -> Cnone
 
@@ -261,7 +270,9 @@ let date_of_burial burial = Option.bind (cdate_of_burial burial) od_of_cdate
 (* Calendars library wrapper *)
 
 let max_month_of cal =
-  match cal with Dgregorian | Djulian -> 12 | Dfrench | Dhebrew -> 13
+  match cal with
+  | Dgregorian | Djulian | Dislamic -> 12
+  | Dfrench | Dhebrew -> 13
 
 let partial_date_upper_bound ~from ~day ~month ~year =
   let day, month, year =
@@ -307,6 +318,7 @@ let to_sdn ~from ?(lower = true) d =
   | Djulian -> make Julian
   | Dfrench -> make French
   | Dhebrew -> make Hebrew
+  | Dislamic -> make Islamic
 
 let of_calendars_raw ~prec date =
   let { Calendars.day; month; year; delta; _ } = date in
@@ -323,6 +335,9 @@ let french_of_sdn ~prec sdn =
 
 let hebrew_of_sdn ~prec sdn =
   Calendars.hebrew_of_sdn sdn |> of_calendars_raw ~prec
+
+let islamic_of_sdn ~prec sdn =
+  Calendars.islamic_of_sdn sdn |> of_calendars_raw ~prec
 
 (* Geneweb uses day|month=0 for partially known dates, this makes converting dates troublesome
    In the case of partial date we use dmy.delta to define an interval:
@@ -344,6 +359,7 @@ let convert ~from ~to_ dmy =
       | Djulian -> Calendars.julian_of_sdn sdn |> to_tuple
       | Dfrench -> Calendars.french_of_sdn sdn |> to_tuple
       | Dhebrew -> Calendars.hebrew_of_sdn sdn |> to_tuple
+      | Dislamic -> Calendars.islamic_of_sdn sdn |> to_tuple
     in
     (* code addapted from Calendars *)
     let convert_aux ~from ~to_ ~day ~month ~year ~delta =

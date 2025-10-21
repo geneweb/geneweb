@@ -12,7 +12,7 @@ external fix_repr : fix -> int = "%identity"
 let no_consang = fix (-1)
 
 type date = Dgreg of dmy * calendar | Dtext of string
-and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and calendar = Dgregorian | Djulian | Dfrench | Dhebrew | Dislamic
 and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
 and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 
@@ -33,6 +33,7 @@ type cdate =
   | Ctext of string
   | Cdate of date
   | Cnone
+  | Cislamic of int
 
 type 'person gen_couple = { father : 'person; mother : 'person }
 

@@ -29,6 +29,7 @@ A [calendar] is one of these [string]:
 - `"Djulian"`
 - `"Dfrench"`
 - `"Dhebrew"`
+- `"Dislamic"`
 
 ## date
 

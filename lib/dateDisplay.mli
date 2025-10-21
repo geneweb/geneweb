@@ -14,6 +14,11 @@ val code_hebrew_date : Config.config -> int -> int -> int -> string
     translated to the current language.
 *)
 
+val code_islamic_date : Config.config -> int -> int -> int -> string
+(** Returns textual representation of a day / month / year in the Islamic calendar
+    translated to the current language.
+*)
+
 val string_of_dmy :
   ?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string
 (** Converts and translate date to the textual representation for the giving language. Considers precision. *)
@@ -29,7 +34,7 @@ val string_of_ondate : Config.config -> Date.date -> Adef.safe_string
 
 val string_of_on_calendar_dmy :
   ?with_gregorian_precisions:bool ->
-  calendar:[< `Julian | `French | `Hebrew ] ->
+  calendar:[< `Julian | `French | `Hebrew | `Islamic ] ->
   Config.config ->
   Date.dmy ->
   Adef.safe_string
