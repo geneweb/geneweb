@@ -500,20 +500,6 @@ class GedcomNote:
 
 
 @dataclass
-class GedcomNote:
-    """GEDCOM note record."""
-
-    xref: str
-    text: str = ""
-    sources: List[str] = field(default_factory=list)
-    raw_structure: List[Tuple[int, str, str]] = field(default_factory=list)
-
-    def __str__(self) -> str:
-        """String representation of the note."""
-        return self.text[:50] + "..." if len(self.text) > 50 else self.text
-
-
-@dataclass
 class GedcomSource:
     """GEDCOM source record."""
 

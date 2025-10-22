@@ -213,7 +213,11 @@ class IndividualParser(RecordParser):
                     if line.tag == TAGS.CONT:
                         individual.notes[current_note_index] += "\n" + line.value
                     elif line.tag == TAGS.CONC:
-                        last_char = individual.notes[current_note_index][-1] if individual.notes[current_note_index] else ""
+                        last_char = (
+                            individual.notes[current_note_index][-1]
+                            if individual.notes[current_note_index]
+                            else ""
+                        )
                         if last_char and last_char not in " \n":
                             individual.notes[current_note_index] += " " + line.value
                         else:

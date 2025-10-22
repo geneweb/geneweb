@@ -65,7 +65,11 @@ class FamilyParser(RecordParser):
                     if line.tag == TAGS.CONT:
                         family.notes[current_note_index] += "\n" + line.value
                     elif line.tag == TAGS.CONC:
-                        last_char = family.notes[current_note_index][-1] if family.notes[current_note_index] else ""
+                        last_char = (
+                            family.notes[current_note_index][-1]
+                            if family.notes[current_note_index]
+                            else ""
+                        )
                         if last_char and last_char not in " \n":
                             family.notes[current_note_index] += " " + line.value
                         else:

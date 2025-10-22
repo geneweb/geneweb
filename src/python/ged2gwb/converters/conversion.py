@@ -61,20 +61,28 @@ class GedcomConverter:
             notes_text = ""
             if hasattr(individual, "notes") and individual.notes:
                 notes_text = "\n".join(individual.notes)
-                self.logger.info(f"Converted notes for {first_name} {surname}: {notes_text}")
+                self.logger.info(
+                    f"Converted notes for {first_name} {surname}: {notes_text}"
+                )
 
             sources_text = ""
             if hasattr(individual, "sources") and individual.sources:
                 sources_text = "\n".join(individual.sources)
-                self.logger.info(f"Converted sources for {first_name} {surname}: {sources_text}")
-            elif hasattr(individual, "source_citations") and individual.source_citations:
+                self.logger.info(
+                    f"Converted sources for {first_name} {surname}: {sources_text}"
+                )
+            elif (
+                hasattr(individual, "source_citations") and individual.source_citations
+            ):
                 # Convert source citations to text
                 source_citations = []
                 for citation in individual.source_citations:
                     if hasattr(citation, "source") and citation.source:
                         source_citations.append(citation.source)
                 sources_text = "\n".join(source_citations)
-                self.logger.info(f"Converted source citations for {first_name} {surname}: {sources_text}")
+                self.logger.info(
+                    f"Converted source citations for {first_name} {surname}: {sources_text}"
+                )
 
             person = GenPerson(
                 first_name=first_name,
@@ -95,7 +103,9 @@ class GedcomConverter:
 
                 if not has_sources:
                     if person.notes:
-                        person.notes += f"\nDefault source: {self.options.default_source}"
+                        person.notes += (
+                            f"\nDefault source: {self.options.default_source}"
+                        )
                     else:
                         person.notes = f"Default source: {self.options.default_source}"
 

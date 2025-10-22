@@ -4,7 +4,7 @@ from ..exceptions import GedcomParseError
 from ..models import GedcomSource
 from ..tokenizer import GedcomLine
 from .base import RecordParser
-from ..tags import TAGS, GROUPS
+from ..tags import TAGS
 
 
 class SourceParser(RecordParser):
@@ -45,7 +45,11 @@ class SourceParser(RecordParser):
                 source.text = line.value
             elif line.tag == TAGS.CONC:
                 if current_note_index is not None:
-                    last_char = source.notes[current_note_index][-1] if source.notes[current_note_index] else ""
+                    last_char = (
+                        source.notes[current_note_index][-1]
+                        if source.notes[current_note_index]
+                        else ""
+                    )
                     if last_char and last_char not in " \n":
                         source.notes[current_note_index] += " " + line.value
                     else:
