@@ -1,9 +1,9 @@
-"""Data models for genealogical information."""
+"""Data models for pickle database."""
 
 from .events import Date, Event, Title
 from .family import GenFamily
 from .person import GenPerson
-from .relations import GenAscend, GenCouple, GenDescend, GenUnion, Relation
+from .relations import GenAscend, GenCouple, GenDescend, GenUnion
 
 __all__ = [
     "GenPerson",
@@ -15,5 +15,4 @@ __all__ = [
     "Date",
     "Event",
     "Title",
-    "Relation",
 ]

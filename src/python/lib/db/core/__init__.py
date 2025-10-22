@@ -1,14 +1,12 @@
-"""Core types and foundational components."""
+"""Core types and foundational components for pickle database."""
 
 from .enums import Access, BurialType, DeathType, DivorceStatus, RelationKind, Sex
-from .indexed import Indexed
 from .types import Ifam, Iper, Istr
 
 __all__ = [
     "Iper",
     "Ifam",
     "Istr",
-    "Indexed",
     "Sex",
     "Access",
     "DeathType",

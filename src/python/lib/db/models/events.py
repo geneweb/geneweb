@@ -1,55 +1,51 @@
 """
-Event and date models.
+Event models for pickle database.
 
-Contains classes for:
-- Date: Calendar date with precision
-- Event: Life events (birth, marriage, etc.)
-- Title: Nobility titles
+Defines date, event, and title models.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
-
-from ..core.types import Istr
+from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
 class Date:
-    """Represents a calendar date with precision."""
+    """Date model matching OCaml implementation."""
 
-    year: Optional[int] = None
-    month: Optional[int] = None
-    day: Optional[int] = None
-    precision: str = "exact"
+    year: int = 0
+    month: int = 0
+    day: int = 0
+    prec: int = 0  # Precision
+    delta: int = 0  # Delta for approximate dates
 
     @classmethod
     def none(cls) -> "Date":
-        """Create empty/unknown date."""
+        """Create empty date."""
         return cls()
 
-
-@dataclass
-class Title:
-    """Nobility title of a person."""
-
-    name: int
-    title: str
-    place: int
-    date_start: Date = field(default_factory=Date.none)
-    date_end: Date = field(default_factory=Date.none)
-    nth: int = 0
+    def is_empty(self) -> bool:
+        """Check if date is empty."""
+        return self.year == 0 and self.month == 0 and self.day == 0
 
 
 @dataclass
 class Event:
-    """Generic event (birth, death, marriage, etc.)."""
+    """Event model for person/family events."""
 
-    name: str
-    date: Date = field(default_factory=Date.none)
-    place: int = Istr.empty()
-    reason: int = Istr.empty()  # String ID
-    note: int = Istr.empty()  # String ID
-    source: int = Istr.empty()  # String ID
-    witnesses: List[Tuple[int, str]] = field(
-        default_factory=list
-    )  # (iper, witness_kind)
+    name: str = ""
+    date: Optional[Date] = None
+    place: str = ""
+    note: str = ""
+    src: str = ""
+    witness: str = ""
+
+
+@dataclass
+class Title:
+    """Title model for person titles."""
+
+    name: str = ""
+    title: str = ""
+    date_begin: Optional[Date] = None
+    date_end: Optional[Date] = None
+    nth: int = 0

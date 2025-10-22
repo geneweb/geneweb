@@ -5,7 +5,7 @@ import logging
 import sys
 from pathlib import Path
 
-from lib.db_pickle.database.base import PickleBase
+from lib.db.database.base import Base
 
 from ..core.converter import Ged2GwbConverter
 from ..utils.options import ConversionOptions
@@ -20,7 +20,7 @@ class Ged2GwbCLI:
     def create_parser(self) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(
             prog="ged2gwb",
-            description="Convert GEDCOM 5.5.1 files to GeneWeb pickle databases",
+            description="Convert GEDCOM 5.5.1 files to GeneWeb MessagePack databases",
             formatter_class=argparse.RawDescriptionHelpFormatter,
         )
 
@@ -31,8 +31,8 @@ class Ged2GwbCLI:
             "-o",
             "--output",
             type=Path,
-            default=Path("base.pkl"),
-            help="Output database file (default: base.pkl)",
+            default=Path("base.msgpack"),
+            help="Output database file (default: base.msgpack)",
         )
 
         parser.add_argument(
@@ -157,15 +157,6 @@ class Ged2GwbCLI:
         )
 
         parser.add_argument(
-            "--compress",
-            action="store_true",
-            default=False,
-            help="Compress output with gzip (default: False)",
-        )
-        parser.add_argument(
-            "--no-compress", action="store_true", help="Do not compress output"
-        )
-        parser.add_argument(
             "--force",
             "-f",
             action="store_true",
@@ -175,7 +166,7 @@ class Ged2GwbCLI:
             "--load",
             type=str,
             metavar="<file>",
-            help="Load existing pickle database and display information",
+            help="Load existing MessagePack database and display information",
         )
 
         parser.add_argument(
@@ -222,10 +213,10 @@ class Ged2GwbCLI:
         except ValueError as e:
             raise argparse.ArgumentTypeError(f"Invalid UDI format: {e}")
 
-    def load_database(self, filepath: str) -> PickleBase:
-        """Load and display pickle database information using PickleReader."""
-        from lib.db_pickle import PickleBase, create_pickle_base_func
-        from lib.db_pickle.io.reader import PickleReader
+    def load_database(self, filepath: str) -> Base:
+        """Load and display MessagePack database information using MessagePackReader."""
+        from lib.db.database.base import Base
+        from lib.db.io.msgpack import MessagePackReader
 
         try:
             file_path = Path(filepath)
@@ -233,29 +224,26 @@ class Ged2GwbCLI:
                 print(f"Error: File not found: {filepath}", file=sys.stderr)
                 return None
 
-            print(f"Loading pickle database: {filepath}")
+            print(f"Loading MessagePack database: {filepath}")
 
-            # Use PickleReader to load the database
-            reader = PickleReader(verbose=True)
-            data = reader.load_database(file_path)
+            reader = MessagePackReader(str(file_path.parent))
+            data = reader.load_database(file_path.stem)
 
             # Create base and functions
-            pickle_base = PickleBase(data)
-            func = create_pickle_base_func(data)
+            messagepack_base = Base(data)
 
             # Display database statistics
             print("\n=== Database Statistics ===")
-            print(f"Persons: {func.nb_of_persons()}")
-            print(f"Families: {func.nb_of_families()}")
-            print(f"Strings: {func.nb_of_strings()}")
-            print(f"Real persons: {func.nb_of_real_persons()}")
+            print(f"Persons: {messagepack_base.nb_of_persons()}")
+            print(f"Families: {messagepack_base.nb_of_families()}")
+            print(f"Strings: {messagepack_base.nb_of_strings()}")
 
             # Additional statistics
-            print(f"Couples: {len(data.couples)}")
-            print(f"Descendants: {len(data.descends)}")
+            print(f"Couples: {len(messagepack_base.data.couples)}")
+            print(f"Descendants: {len(messagepack_base.data.descends)}")
 
             print("\nDatabase loaded successfully!")
-            return pickle_base
+            return messagepack_base
 
         except Exception as e:
             print(f"Error loading database: {e}", file=sys.stderr)
@@ -267,9 +255,6 @@ class Ged2GwbCLI:
         args = parser.parse_args(args)
 
         self.setup_logging(args)
-
-        if args.no_compress:
-            args.compress = False
 
         if args.udi:
             args.udi = self.parse_udi(args.udi)

@@ -213,7 +213,11 @@ class IndividualParser(RecordParser):
                     if line.tag == TAGS.CONT:
                         individual.notes[current_note_index] += "\n" + line.value
                     elif line.tag == TAGS.CONC:
-                        individual.notes[current_note_index] += line.value
+                        last_char = individual.notes[current_note_index][-1] if individual.notes[current_note_index] else ""
+                        if last_char and last_char not in " \n":
+                            individual.notes[current_note_index] += " " + line.value
+                        else:
+                            individual.notes[current_note_index] += line.value
             elif line.level == base_level + 3:
                 if current_event and current_event.place:
                     if GROUPS.is_coordinate_tag(line.tag):

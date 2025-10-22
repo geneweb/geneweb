@@ -1,33 +1,39 @@
 """
-Family data model.
+Family model for pickle database.
 
-Contains the GenFamily dataclass representing complete family information.
+Defines the GenFamily dataclass matching OCaml implementation.
 """
 
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
+from typing import List, Optional
 
 from ..core.enums import DivorceStatus, RelationKind
-from ..core.types import Ifam, Istr
+from ..core.types import Ifam
 from .events import Date, Event
 
 
 @dataclass
 class GenFamily:
-    """
-    Complete family record.
-    This is the gen_family structure from OCaml.
-    """
+    """Family model matching OCaml implementation."""
 
-    marriage: Date = field(default_factory=Date.none)
-    marriage_place: int = Istr.empty()
-    marriage_note: int = Istr.empty()
-    marriage_src: int = Istr.empty()
-    witnesses: List[int] = field(default_factory=list)  # List of iper
+    marriage: Optional[Date] = None
+    marriage_place: str = ""
+    marriage_src: str = ""
+    marriage_note: str = ""
     relation: RelationKind = RelationKind.MARRIED
     divorce: DivorceStatus = DivorceStatus.NOT_DIVORCED
-    fevents: List[Event] = field(default_factory=list)
-    comment: int = Istr.empty()
-    origin_file: int = Istr.empty()
-    fsources: int = Istr.empty()
-    fam_index: int = Ifam.dummy()  # ifam - family's unique ID
+    divorce_date: Optional[Date] = None
+    divorce_place: str = ""
+    divorce_src: str = ""
+    divorce_note: str = ""
+    events: List[Event] = None
+    notes: str = ""
+    sources: str = ""
+    fam_index: Ifam = None
+
+    def __post_init__(self):
+        """Initialize default values after dataclass creation."""
+        if self.events is None:
+            self.events = []
+        if self.fam_index is None:
+            self.fam_index = Ifam(0)

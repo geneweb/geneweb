@@ -126,20 +126,8 @@ def basic_conversion_options(sample_gedcom_file: Path) -> ConversionOptions:
     """Basic conversion options for testing."""
     return ConversionOptions(
         input_file=sample_gedcom_file,
-        output_file=Path("test-basic.pkl"),
-        compress=False,
+        output_file=Path("test-basic.msgpack"),
         verbose=False,
-    )
-
-
-@pytest.fixture
-def compressed_conversion_options(sample_gedcom_file: Path) -> ConversionOptions:
-    """Compressed conversion options for testing."""
-    return ConversionOptions(
-        input_file=sample_gedcom_file,
-        output_file=Path("test-compressed.pkl"),
-        compress=True,
-        verbose=True,
     )
 
 
@@ -152,16 +140,12 @@ def converter(basic_conversion_options: ConversionOptions) -> Ged2GwbConverter:
 @pytest.fixture
 def temp_output_file() -> Generator[Path, None, None]:
     """Create a temporary output file path."""
-    temp_path = Path(tempfile.mktemp(suffix=".pkl"))
+    temp_path = Path(tempfile.mktemp(suffix=".msgpack"))
     yield temp_path
 
     # Cleanup
     if temp_path.exists():
         temp_path.unlink()
-    # Also cleanup compressed version
-    compressed_path = Path(str(temp_path) + ".gz")
-    if compressed_path.exists():
-        compressed_path.unlink()
 
 
 @pytest.fixture
@@ -213,27 +197,26 @@ def cleanup_test_files():
 
     # Cleanup common test files
     test_files = [
-        "test_basic.pkl",
-        "test_compressed.pkl",
-        "test_legacy.pkl",
-        "test_structure.pkl",
-        "test_perf.pkl",
-        "test_empty.pkl",
-        "test_malformed.pkl",
-        "test_integration.pkl",
-        "test_sample_concrete.pkl",
-        "test_uk_concrete.pkl",
-        "test_cli_concrete.pkl",
-        "test_load_concrete.pkl",
-        "base.pkl",
+        "test_basic.msgpack",
+        "test_legacy.msgpack",
+        "test_structure.msgpack",
+        "test_perf.msgpack",
+        "test_empty.msgpack",
+        "test_malformed.msgpack",
+        "test_integration.msgpack",
+        "test_sample_concrete.msgpack",
+        "test_uk_concrete.msgpack",
+        "test_cli_concrete.msgpack",
+        "test_load_concrete.msgpack",
+        "base.msgpack",
     ]
 
     for file_name in test_files:
         file_path = Path(file_name)
         if file_path.exists():
-            file_path.unlink()
+            if file_path.is_dir():
+                import shutil
+                shutil.rmtree(file_path)
+            else:
+                file_path.unlink()
 
-        # Also cleanup compressed versions
-        compressed_path = Path(str(file_path) + ".gz")
-        if compressed_path.exists():
-            compressed_path.unlink()

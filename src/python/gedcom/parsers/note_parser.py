@@ -22,6 +22,9 @@ class NoteParser(RecordParser):
         current_index = start_index + 1
         base_level = lines[start_index].level
 
+        if lines[start_index].value:
+            note.text = lines[start_index].value
+
         while current_index < len(lines):
             line = lines[current_index]
 
@@ -30,14 +33,18 @@ class NoteParser(RecordParser):
 
             note.raw_structure.append((line.level, line.tag, line.value))
 
-            if line.tag == TAGS.CONC:
-                # Continue previous line
-                note.text += line.value
-            elif line.tag == TAGS.CONT:
-                # New line
-                note.text += "\n" + line.value
-            elif line.tag == TAGS.SOUR:
-                note.sources.append(line.value.strip("@"))
+            if line.level == base_level + 1:
+                if line.tag == TAGS.NOTE:
+                    note.text = line.value
+                elif line.tag == TAGS.CONT:
+                    note.text = line.value
+                elif line.tag == TAGS.SOUR:
+                    note.sources.append(line.value.strip("@"))
+            elif line.level == base_level + 2:
+                if line.tag == TAGS.CONC:
+                    note.text += line.value
+                elif line.tag == TAGS.CONT:
+                    note.text += "\n" + line.value
 
             current_index += 1
 

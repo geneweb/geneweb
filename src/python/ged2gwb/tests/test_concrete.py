@@ -6,7 +6,6 @@ These tests use actual GEDCOM files and verify real functionality.
 """
 
 import sys
-import tempfile
 from pathlib import Path
 import pytest
 
@@ -16,8 +15,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "python"))
 from ged2gwb.cli.main import Ged2GwbCLI
 from ged2gwb.core.converter import Ged2GwbConverter
 from ged2gwb.utils.options import ConversionOptions
-from lib.db_pickle import create_pickle_base_func
-from lib.db_pickle.io.reader import PickleReader
+from lib.db import create_base_func
+from lib.db.io.msgpack import MessagePackReader
 
 
 def get_gedcom_path(filename: str) -> Path | None:
@@ -51,7 +50,7 @@ def test_with_sample_ged():
     try:
         # Create options
         options = ConversionOptions(
-            input_file=sample_ged, output_file=output_file, compress=True, verbose=True
+            input_file=sample_ged, output_file=output_file, verbose=True
         )
 
         # Convert
@@ -73,9 +72,9 @@ def test_with_sample_ged():
             print("FAIL: Output file missing or empty")
             raise AssertionError("Test failed")
         # Load and verify data
-        reader = PickleReader(verbose=False)
-        data = reader.load_database(actual_file)
-        func = create_pickle_base_func(data)
+        reader = MessagePackReader(".")
+        data = reader.load_database(actual_file.stem)
+        func = create_base_func(data)
 
         print(f"PASS: Database loaded successfully")
         print(f"   Persons: {func.nb_of_persons()}")
@@ -115,7 +114,11 @@ def test_with_sample_ged():
         if output_file.exists():
             output_file.unlink()
         if actual_file.exists():
-            actual_file.unlink()
+            if actual_file.is_dir():
+                import shutil
+                shutil.rmtree(actual_file)
+            else:
+                actual_file.unlink()
 
 
 def test_with_uk_ged():
@@ -131,7 +134,7 @@ def test_with_uk_ged():
     try:
         # Create options
         options = ConversionOptions(
-            input_file=uk_ged, output_file=output_file, compress=True, verbose=True
+            input_file=uk_ged, output_file=output_file, verbose=True
         )
 
         # Convert
@@ -153,9 +156,9 @@ def test_with_uk_ged():
             print("FAIL: Output file missing or empty")
             raise AssertionError("Test failed")
         # Load and verify data
-        reader = PickleReader(verbose=False)
-        data = reader.load_database(actual_file)
-        func = create_pickle_base_func(data)
+        reader = MessagePackReader(".")
+        data = reader.load_database(actual_file.stem)
+        func = create_base_func(data)
 
         print(f"PASS: Database loaded successfully")
         print(f"   Persons: {func.nb_of_persons()}")
@@ -191,7 +194,11 @@ def test_with_uk_ged():
         if output_file.exists():
             output_file.unlink()
         if actual_file.exists():
-            actual_file.unlink()
+            if actual_file.is_dir():
+                import shutil
+                shutil.rmtree(actual_file)
+            else:
+                actual_file.unlink()
 
 
 def test_cli_functionality():
@@ -221,7 +228,6 @@ def test_cli_functionality():
             str(sample_ged),
             "--output",
             str(output_file),
-            "--compress",
             "--verbose",
             "--efn",
             "--epn",
@@ -268,7 +274,11 @@ def test_cli_functionality():
         if output_file.exists():
             output_file.unlink()
         if actual_file and actual_file.exists():
-            actual_file.unlink()
+            if actual_file.is_dir():
+                import shutil
+                shutil.rmtree(actual_file)
+            else:
+                actual_file.unlink()
 
 
 def test_load_functionality():
@@ -284,7 +294,7 @@ def test_load_functionality():
     try:
         # First create a database
         options = ConversionOptions(
-            input_file=sample_ged, output_file=output_file, compress=True
+            input_file=sample_ged, output_file=output_file
         )
 
         converter = Ged2GwbConverter(options)
@@ -316,7 +326,11 @@ def test_load_functionality():
         if output_file.exists():
             output_file.unlink()
         if actual_file.exists():
-            actual_file.unlink()
+            if actual_file.is_dir():
+                import shutil
+                shutil.rmtree(actual_file)
+            else:
+                actual_file.unlink()
 
 
 def test_error_handling():

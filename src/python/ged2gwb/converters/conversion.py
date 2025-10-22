@@ -5,12 +5,12 @@ This module contains all conversion functions from GEDCOM to GeneWeb data struct
 """
 
 from typing import List, Tuple
-from lib.db_pickle.core.enums import DivorceStatus, RelationKind, Sex
-from lib.db_pickle.core.types import Iper, dummy_iper
-from lib.db_pickle.models.events import Date
-from lib.db_pickle.models.family import GenFamily
-from lib.db_pickle.models.person import GenPerson
-from lib.db_pickle.models.relations import GenCouple
+from lib.db.core.enums import DivorceStatus, RelationKind, Sex
+from lib.db.core.types import Iper, dummy_iper
+from lib.db.models.events import Date
+from lib.db.models.family import GenFamily
+from lib.db.models.person import GenPerson
+from lib.db.models.relations import GenCouple
 
 
 class GedcomConverter:
@@ -57,6 +57,25 @@ class GedcomConverter:
             if individual.burial and individual.burial.date:
                 burial_date = self.convert_date(individual.burial.date)
 
+            # Convert notes and sources
+            notes_text = ""
+            if hasattr(individual, "notes") and individual.notes:
+                notes_text = "\n".join(individual.notes)
+                self.logger.info(f"Converted notes for {first_name} {surname}: {notes_text}")
+
+            sources_text = ""
+            if hasattr(individual, "sources") and individual.sources:
+                sources_text = "\n".join(individual.sources)
+                self.logger.info(f"Converted sources for {first_name} {surname}: {sources_text}")
+            elif hasattr(individual, "source_citations") and individual.source_citations:
+                # Convert source citations to text
+                source_citations = []
+                for citation in individual.source_citations:
+                    if hasattr(citation, "source") and citation.source:
+                        source_citations.append(citation.source)
+                sources_text = "\n".join(source_citations)
+                self.logger.info(f"Converted source citations for {first_name} {surname}: {sources_text}")
+
             person = GenPerson(
                 first_name=first_name,
                 surname=surname,
@@ -65,39 +84,31 @@ class GedcomConverter:
                 baptism=baptism_date,
                 death=death_date,
                 burial=burial_date,
+                notes=notes_text,
+                sources=sources_text,
             )
 
             # Apply default source if specified and no sources exist
             if self.options and self.options.default_source:
                 # Check if individual has any sources
-                has_sources = False
-                if hasattr(individual, "sources") and individual.sources:
-                    has_sources = True
-                if (
-                    hasattr(individual, "source_citations")
-                    and individual.source_citations
-                ):
-                    has_sources = True
+                has_sources = bool(sources_text)
 
                 if not has_sources:
-                    if not hasattr(person, "notes"):
-                        person.notes = []
-                    if not isinstance(person.notes, list):
-                        person.notes = []
-                    person.notes.append(
-                        f"Default source: {self.options.default_source}"
-                    )
+                    if person.notes:
+                        person.notes += f"\nDefault source: {self.options.default_source}"
+                    else:
+                        person.notes = f"Default source: {self.options.default_source}"
 
             # Handle --uin: put untreated GEDCOM tags in notes
             if self.options and self.options.uin:
                 # Process untreated GEDCOM tags and add them as notes
                 untreated_tags = self._extract_untreated_tags(individual)
                 if untreated_tags:
-                    if not hasattr(person, "notes"):
-                        person.notes = []
-                    if not isinstance(person.notes, list):
-                        person.notes = []
-                    person.notes.extend(untreated_tags)
+                    untreated_text = "\n".join(untreated_tags)
+                    if person.notes:
+                        person.notes += f"\n{untreated_text}"
+                    else:
+                        person.notes = untreated_text
 
             return person
         except Exception as e:
@@ -115,14 +126,14 @@ class GedcomConverter:
             if family.divorce:
                 divorce_status = DivorceStatus.DIVORCED
 
-            husband_id = dummy_iper
+            husband_id = dummy_iper()
             if family.husband:
                 if family.husband.startswith("@I") and family.husband.endswith("@"):
                     husband_id = Iper(int(family.husband[2:-1]))
                 else:
                     husband_id = Iper(hash(family.husband) % 1000000)
 
-            wife_id = dummy_iper
+            wife_id = dummy_iper()
             if family.wife:
                 if family.wife.startswith("@I") and family.wife.endswith("@"):
                     wife_id = Iper(int(family.wife[2:-1]))
@@ -137,10 +148,21 @@ class GedcomConverter:
                     child_id = Iper(hash(child_ref) % 1000000)
                 children_ids.append(child_id)
 
+            # Convert notes and sources
+            notes_text = ""
+            if hasattr(family, "notes") and family.notes:
+                notes_text = "\n".join(family.notes)
+
+            sources_text = ""
+            if hasattr(family, "sources") and family.sources:
+                sources_text = "\n".join(family.sources)
+
             geneweb_family = GenFamily(
                 marriage=marriage_date,
                 divorce=divorce_status,
                 relation=RelationKind.MARRIED,
+                notes=notes_text,
+                sources=sources_text,
             )
 
             couple = GenCouple(father=husband_id, mother=wife_id)
@@ -151,7 +173,7 @@ class GedcomConverter:
             self.logger.error(f"Error converting family: {e}")
             return (
                 GenFamily(relation=RelationKind.MARRIED),
-                GenCouple(father=dummy_iper, mother=dummy_iper),
+                GenCouple(father=dummy_iper(), mother=dummy_iper()),
                 [],
             )
 

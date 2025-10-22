@@ -9,7 +9,6 @@ and that bug fixes remain effective.
 import sys
 import os
 import tempfile
-import pickle
 from pathlib import Path
 
 # Add the src directory to the path
@@ -40,16 +39,11 @@ class TestRegression:
             f.write(content)
         return file_path
 
-    def load_pickle_data(self, file_path: Path):
-        """Load pickle data, handling compression."""
-        if file_path.suffix == ".gz":
-            import gzip
-
-            with gzip.open(file_path, "rb") as f:
-                return pickle.load(f)
-        else:
-            with open(file_path, "rb") as f:
-                return pickle.load(f)
+    def load_msgpack_data(self, file_path: Path):
+        """Load MessagePack data."""
+        from lib.db.io.msgpack import MessagePackReader
+        reader = MessagePackReader(str(file_path.parent))
+        return reader.load_database(file_path.stem)
 
     def test_basic_conversion_regression(self):
         """Test that basic conversion still works as expected."""
@@ -78,7 +72,7 @@ class TestRegression:
 
         gedcom_file = self.create_test_gedcom(gedcom_content)
         options = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "output.pkl"
+            input_file=gedcom_file, output_file=self.test_dir / "output.msgpack"
         )
 
         converter = Ged2GwbConverter(options)
@@ -88,14 +82,14 @@ class TestRegression:
         assert result["conversion_successful"] is True
         assert result["individuals_count"] == 2
         assert result["families_count"] == 1
-        assert result["format"] == "pickle"
+        assert result["format"] == "messagepack"
 
         # Load and verify data structure
         output_file = options.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
+        if not output_file.exists() and output_file.with_suffix(".msgpack").exists():
+            output_file = output_file.with_suffix(".msgpack")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
 
         # Verify persons
         assert len(data.persons) == 2
@@ -138,7 +132,7 @@ class TestRegression:
         # Test ANSEL charset
         options_ansel = ConversionOptions(
             input_file=gedcom_file,
-            output_file=self.test_dir / "ansel.pkl",
+            output_file=self.test_dir / "ansel.msgpack",
             charset="ANSEL",
         )
 
@@ -150,10 +144,8 @@ class TestRegression:
 
         # Verify special characters are preserved
         output_file = options_ansel.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
         person = list(data.persons.values())[0]
         assert person.first_name == "François"
         assert person.surname == "Müller"
@@ -175,7 +167,7 @@ class TestRegression:
 
         # Test --efn (extract first name)
         options_efn = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "efn.pkl", efn=True
+            input_file=gedcom_file, output_file=self.test_dir / "efn.msgpack", efn=True
         )
 
         converter = Ged2GwbConverter(options_efn)
@@ -184,10 +176,8 @@ class TestRegression:
         assert result["conversion_successful"] is True
 
         output_file = options_efn.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
         person = list(data.persons.values())[0]
         assert person.first_name == "Jean"  # Only first name extracted
 
@@ -212,7 +202,7 @@ class TestRegression:
         # Test multiple options combined
         options = ConversionOptions(
             input_file=gedcom_file,
-            output_file=self.test_dir / "combined.pkl",
+            output_file=self.test_dir / "combined.msgpack",
             charset="ANSEL",
             dates_dm=True,
             efn=True,
@@ -220,21 +210,17 @@ class TestRegression:
             us=True,
             uin=True,
             default_source="Test Source",
-            compress=True,
         )
 
         converter = Ged2GwbConverter(options)
         result = converter.convert()
 
         assert result["conversion_successful"] is True
-        assert result["compressed"] is True
 
         # Verify all options were applied
         output_file = options.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
         person = list(data.persons.values())[0]
 
         # --efn + --lf should give "jean"
@@ -242,64 +228,13 @@ class TestRegression:
         # --us should give "DE LA ROCHE"
         assert person.surname == "DE LA ROCHE"
 
-    def test_compression_regression(self):
-        """Test that compression continues to work correctly."""
-        gedcom_content = """0 HEAD
-1 GEDC
-2 VERS 5.5.1
-2 FORM LINEAGE
-1 CHAR UTF-8
-0 @I1@ INDI
-1 NAME Test /Person/
-1 SEX M
-0 TRLR
-"""
-
-        gedcom_file = self.create_test_gedcom(gedcom_content)
-
-        # Test with compression
-        options_compressed = ConversionOptions(
-            input_file=gedcom_file,
-            output_file=self.test_dir / "compressed.pkl",
-            compress=True,
-        )
-
-        converter = Ged2GwbConverter(options_compressed)
-        result_compressed = converter.convert()
-
-        # Test without compression
-        options_uncompressed = ConversionOptions(
-            input_file=gedcom_file,
-            output_file=self.test_dir / "uncompressed.pkl",
-            compress=False,
-        )
-
-        converter = Ged2GwbConverter(options_uncompressed)
-        result_uncompressed = converter.convert()
-
-        # Both should succeed
-        assert result_compressed["conversion_successful"] is True
-        assert result_uncompressed["conversion_successful"] is True
-
-        # Compressed file should be smaller
-        compressed_file = options_compressed.output_file.with_suffix(".pkl.gz")
-        uncompressed_file = options_uncompressed.output_file
-
-        assert compressed_file.exists()
-        assert uncompressed_file.exists()
-
-        compressed_size = compressed_file.stat().st_size
-        uncompressed_size = uncompressed_file.stat().st_size
-
-        # Compressed should be smaller (or at least not larger)
-        assert compressed_size <= uncompressed_size
 
     def test_error_handling_regression(self):
         """Test that error handling continues to work correctly."""
         # Test with invalid GEDCOM
         gedcom_file = self.create_test_gedcom("Invalid GEDCOM content")
         options = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "output.pkl"
+            input_file=gedcom_file, output_file=self.test_dir / "output.msgpack"
         )
 
         converter = Ged2GwbConverter(options)
@@ -335,7 +270,7 @@ class TestRegression:
 
         gedcom_file = self.create_test_gedcom(gedcom_content)
         options = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "large.pkl"
+            input_file=gedcom_file, output_file=self.test_dir / "large.msgpack"
         )
 
         converter = Ged2GwbConverter(options)
@@ -346,10 +281,8 @@ class TestRegression:
 
         # Verify all individuals were processed
         output_file = options.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
         assert len(data.persons) == 100
 
 

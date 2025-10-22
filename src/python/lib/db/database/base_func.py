@@ -1,37 +1,53 @@
 """
-BaseFunc container for database operations.
+BaseFunc container for MessagePack database operations.
 
 Holds all operation functions (searching, patching, etc.)
-that work on the database.
+that work on the MessagePack database.
 """
 
 from dataclasses import dataclass
 from typing import Callable, List, Optional
 
+from ..core.types import Ifam, Iper, Istr
 from ..models.family import GenFamily
 from ..models.person import GenPerson
 from ..models.relations import GenAscend, GenCouple, GenDescend, GenUnion
-from .search_index import SearchIndex
 
 
 @dataclass
 class BaseFunc:
-    """Container for database operations."""
+    """Container for MessagePack database operations."""
 
-    person_of_key: Callable[[str, str, int], Optional[int]]
-    persons_of_name: Callable[[str], List[int]]
-    strings_of_fname: Callable[[str], List[int]]
-    strings_of_sname: Callable[[str], List[int]]
-    persons_of_surname: SearchIndex
-    persons_of_first_name: SearchIndex
-    patch_person: Callable[[int, GenPerson], None]
-    patch_ascend: Callable[[int, GenAscend], None]
-    patch_union: Callable[[int, GenUnion], None]
-    patch_family: Callable[[int, GenFamily], None]
-    patch_couple: Callable[[int, GenCouple], None]
-    patch_descend: Callable[[int, GenDescend], None]
-    insert_string: Callable[[str], int]
+    # Search functions
+    person_of_key: Callable[[str, str, int], Optional[Iper]]
+    persons_of_name: Callable[[str], List[Iper]]
+    strings_of_fname: Callable[[str], List[Istr]]
+    strings_of_sname: Callable[[str], List[Istr]]
+    persons_of_surname: Callable[[str], List[Iper]]
+    persons_of_first_name: Callable[[str], List[Iper]]
+    families_of_marriage_date: Callable[[int], List[Ifam]]
+
+    # Patch functions
+    patch_person: Callable[[Iper, GenPerson], None]
+    patch_ascend: Callable[[Iper, GenAscend], None]
+    patch_union: Callable[[Iper, GenUnion], None]
+    patch_family: Callable[[Ifam, GenFamily], None]
+    patch_couple: Callable[[Ifam, GenCouple], None]
+    patch_descend: Callable[[Ifam, GenDescend], None]
+
+    # String functions
+    insert_string: Callable[[str], Istr]
+    get_string: Callable[[Istr], str]
+
+    # Commit function
     commit_patches: Callable[[], None]
+
+    # Existence checks
+    iper_exists: Callable[[Iper], bool]
+    ifam_exists: Callable[[Ifam], bool]
+
+    # Statistics
     nb_of_real_persons: Callable[[], int]
-    iper_exists: Callable[[int], bool]
-    ifam_exists: Callable[[int], bool]
+    nb_of_persons: Callable[[], int]
+    nb_of_families: Callable[[], int]
+    nb_of_strings: Callable[[], int]

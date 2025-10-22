@@ -13,8 +13,8 @@ from typing import Any, Dict
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from gedcom.models import GedcomDatabase
-from lib.db_pickle.core.types import Ifam, Iper, dummy_iper
-from lib.db_pickle.models.relations import GenCouple
+from lib.db.core.types import Ifam, Iper, dummy_iper
+from lib.db.models.relations import GenCouple
 
 from ..utils.options import ConversionOptions
 from .validation import GedcomValidator
@@ -52,8 +52,8 @@ class GedcomToGenewebConverter:
         Returns:
             Dictionary with conversion statistics
         """
-        from lib.db_pickle.database.base_data import PickleBaseData
-        from lib.db_pickle.models.relations import GenDescend, GenAscend
+        from lib.db.database.base_data import BaseData
+        from lib.db.models.relations import GenDescend, GenAscend
 
         # Display parsing steps like OCaml
         self.logger.info("*** pass 1 (note)")
@@ -67,7 +67,7 @@ class GedcomToGenewebConverter:
 
         self.logger.info("*** Trailer ok")
 
-        geneweb_data = PickleBaseData()
+        geneweb_data = BaseData()
 
         # Convert persons
         self.logger.info("*** saving persons array")
@@ -87,11 +87,6 @@ class GedcomToGenewebConverter:
                 continue
 
         self.logger.info("*** saving strings array")
-        for person_id, person in geneweb_data.persons.items():
-            if person.first_name not in geneweb_data.strings:
-                geneweb_data.strings[person.first_name] = person.first_name
-            if person.surname not in geneweb_data.strings:
-                geneweb_data.strings[person.surname] = person.surname
 
         self.logger.info("*** saving descends array")
         family_children: dict[Ifam, list[Iper]] = {}
@@ -114,8 +109,8 @@ class GedcomToGenewebConverter:
         for family_id, children in family_children.items():
             geneweb_data.descends[family_id] = GenDescend(children=children)
             if family_id not in geneweb_data.couples:
-                father_id = dummy_iper
-                mother_id = dummy_iper
+                father_id = dummy_iper()
+                mother_id = dummy_iper()
 
                 for xref, family in gedcom_database.families.items():
                     if xref.startswith("@F") and xref.endswith("@"):

@@ -10,7 +10,7 @@ class ConversionOptions:
     """Options for GEDCOM to GeneWeb conversion."""
 
     input_file: Path
-    output_file: Path = Path("base.pkl")
+    output_file: Path = Path("base.msgpack")
     base_dir: Optional[Path] = None  # Base directory for databases
 
     charset: Optional[str] = None  # ANSEL, ASCII, MSDOS
@@ -43,7 +43,6 @@ class ConversionOptions:
 
     uin: bool = False  # Put untreated GEDCOM tags in notes
 
-    compress: bool = True  # Use gzip compression
     force: bool = False  # Overwrite existing files
 
     log_file: Optional[Path] = None
@@ -101,7 +100,6 @@ class ConversionOptions:
                 )
             ),
             uin=args.uin,
-            compress=args.compress,
             force=args.force,
             log_file=args.log,
             verbose=args.verbose,

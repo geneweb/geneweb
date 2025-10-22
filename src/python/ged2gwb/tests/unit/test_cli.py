@@ -55,7 +55,6 @@ class TestGed2GwbCLI:
             "--lf",
             "--ls",
             "--output",
-            "--compress",
             "--force",
             "--verbose",
         ]
@@ -70,8 +69,7 @@ class TestGed2GwbCLI:
         # Test with minimal arguments
         args = parser.parse_args(["test.ged"])
         assert str(args.gedcom_file) == "test.ged"
-        assert str(args.output) == "base.pkl"
-        assert args.compress is False
+        assert str(args.output) == "base.msgpack"
 
     def test_all_options_parsing(self):
         """Test parsing of all available options."""
@@ -88,10 +86,9 @@ class TestGed2GwbCLI:
             "--ls",
             "--udi",
             "80-120",
-            "--compress",
             "--verbose",
             "--output",
-            "output.pkl",
+            "output.msgpack",
         ]
 
         args = parser.parse_args(test_args)
@@ -104,9 +101,8 @@ class TestGed2GwbCLI:
         assert args.lf is True
         assert args.ls is True
         assert args.udi == "80-120"
-        assert args.compress is True
         assert args.verbose is True
-        assert str(args.output) == "output.pkl"
+        assert str(args.output) == "output.msgpack"
 
     def test_udi_validation(self):
         """Test UDI format validation."""
@@ -135,8 +131,8 @@ class TestGed2GwbCLI:
         """Test short option aliases."""
         parser = self.cli.create_parser()
 
-        args = parser.parse_args(["test.ged", "-o", "output.pkl", "-v", "-f"])
-        assert str(args.output) == "output.pkl"
+        args = parser.parse_args(["test.ged", "-o", "output.msgpack", "-v", "-f"])
+        assert str(args.output) == "output.msgpack"
         assert args.verbose is True
         assert args.force is True
 
@@ -184,22 +180,20 @@ class TestConversionOptions:
                 "--epn",
                 "--udi",
                 "80-120",
-                "--compress",
                 "--output",
-                "output.pkl",
+                "output.msgpack",
             ]
         )
 
         options = ConversionOptions.from_args(args)
 
         assert options.input_file == Path("test.ged")
-        assert options.output_file == Path("output.pkl")
+        assert options.output_file == Path("output.msgpack")
         assert options.charset == "ASCII"
         assert options.dates_dm is True
         assert options.efn is True
         assert options.epn is True
         assert options.udi == (80, 120)
-        assert options.compress is True
 
     def test_default_values(self):
         """Test default values."""
@@ -208,9 +202,8 @@ class TestConversionOptions:
 
         options = ConversionOptions.from_args(args)
 
-        assert options.output_file == Path("base.pkl")
+        assert options.output_file == Path("base.msgpack")
         assert options.charset is None
-        assert options.compress is False
         assert options.verbose is False
         assert options.force is False
 
@@ -232,7 +225,6 @@ class TestConversionOptions:
                 "--epn",
                 "--lf",
                 "--ls",
-                "--compress",
                 "--verbose",
                 "--force",
             ]
@@ -244,7 +236,6 @@ class TestConversionOptions:
         assert options.epn is True
         assert options.lf is True
         assert options.ls is True
-        assert options.compress is True
         assert options.verbose is True
         assert options.force is True
 

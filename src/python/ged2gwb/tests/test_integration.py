@@ -9,7 +9,6 @@ and that the complete workflow functions as expected.
 import sys
 import os
 import tempfile
-import pickle
 from pathlib import Path
 
 # Add the src directory to the path
@@ -17,6 +16,53 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from ged2gwb.core.converter import Ged2GwbConverter
 from ged2gwb.utils.options import ConversionOptions
+
+
+def verify_msgpack_database_structure(output_dir: Path) -> bool:
+    """Verify that all required MessagePack database files and directories exist."""
+    required_files = [
+        "base",           # Main database file
+        "base.acc",       # Access file
+        "names.inx",      # Names index
+        "fnames.inx",     # First names index
+        "fnames.dat",     # First names data
+        "snames.inx",     # Surnames index
+        "snames.dat",     # Surnames data
+        "strings.inx",    # Strings index
+        "nb_persons",     # Number of persons
+        "notes",          # Notes file
+        "particles.txt",  # Particles file
+        "patches",        # Patches file
+        "synchro_patches", # Synchronization patches
+    ]
+
+    required_dirs = [
+        "notes_d",        # Notes directory
+        "wiznotes",       # Wiznotes directory
+    ]
+
+    missing_files = []
+    for file_name in required_files:
+        if not (output_dir / file_name).exists():
+            missing_files.append(file_name)
+
+    missing_dirs = []
+    for dir_name in required_dirs:
+        if not (output_dir / dir_name).exists() or not (output_dir / dir_name).is_dir():
+            missing_dirs.append(dir_name)
+
+    if missing_files:
+        print(f"FAIL: Missing required files: {missing_files}")
+        return False
+
+    if missing_dirs:
+        print(f"FAIL: Missing required directories: {missing_dirs}")
+        return False
+
+    print("PASS: All required MessagePack database files created")
+    return True
+
+
 from gedcom.exceptions import GedcomParseError
 
 
@@ -41,16 +87,20 @@ class TestIntegration:
             f.write(content)
         return file_path
 
-    def load_pickle_data(self, file_path: Path):
-        """Load pickle data, handling compression."""
-        if file_path.suffix == ".gz":
-            import gzip
+    def load_msgpack_data(self, file_path: Path):
+        """Load MessagePack data from directory."""
+        from lib.db.io.msgpack import MessagePackReader
 
-            with gzip.open(file_path, "rb") as f:
-                return pickle.load(f)
+        # MessagePack creates directories, so we need to load from the directory
+        if file_path.is_dir():
+            reader = MessagePackReader(str(file_path.parent))
+            db_name = file_path.stem
+            return reader.load_database(db_name)
         else:
-            with open(file_path, "rb") as f:
-                return pickle.load(f)
+            # Fallback for file-based loading
+            reader = MessagePackReader(str(file_path.parent))
+            db_name = file_path.stem
+            return reader.load_database(db_name)
 
     def test_complete_workflow(self):
         """Test the complete conversion workflow."""
@@ -88,7 +138,7 @@ class TestIntegration:
 
         gedcom_file = self.create_test_gedcom(gedcom_content)
         options = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "output.pkl"
+            input_file=gedcom_file, output_file=self.test_dir / "output.msgpack"
         )
 
         converter = Ged2GwbConverter(options)
@@ -98,14 +148,18 @@ class TestIntegration:
         assert result["conversion_successful"] is True
         assert result["individuals_count"] == 3
         assert result["families_count"] == 1
-        assert result["format"] == "pickle"
+        assert result["format"] == "messagepack"
+
+        # Verify MessagePack database structure
+        output_dir = Path(result["file_path"])
+        assert verify_msgpack_database_structure(output_dir), "MessagePack database structure verification failed"
 
         # Load and verify data
         output_file = options.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
+        if not output_file.exists() and output_file.with_suffix(".msgpack").exists():
+            output_file = output_file.with_suffix(".msgpack")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
 
         # Verify persons
         assert len(data.persons) == 3
@@ -164,7 +218,6 @@ class TestIntegration:
             udi=(80, 120),
             uin=True,
             default_source="Test Source",
-            compress=True,
             force=True,
             verbose=True,
         )
@@ -176,7 +229,6 @@ class TestIntegration:
         assert result["conversion_successful"] is True
         assert result["individuals_count"] == 2
         assert result["families_count"] == 1
-        assert result["compressed"] is True
         assert result["charset"] == "ANSEL"
 
         # Load and verify processed data
@@ -184,7 +236,7 @@ class TestIntegration:
         if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
             output_file = output_file.with_suffix(".pkl.gz")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
 
         # Verify name processing options were applied
         persons = list(data.persons.values())
@@ -243,54 +295,6 @@ class TestIntegration:
             assert result["conversion_successful"] is True
             assert result["charset"] == charset
 
-    def test_compression_integration(self):
-        """Test integration with compression options."""
-        gedcom_content = """0 HEAD
-1 GEDC
-2 VERS 5.5.1
-2 FORM LINEAGE
-1 CHAR UTF-8
-0 @I1@ INDI
-1 NAME Test /Person/
-1 SEX M
-0 TRLR
-"""
-
-        gedcom_file = self.create_test_gedcom(gedcom_content)
-
-        # Test with compression
-        options_compressed = ConversionOptions(
-            input_file=gedcom_file,
-            output_file=self.test_dir / "compressed.pkl",
-            compress=True,
-        )
-
-        converter = Ged2GwbConverter(options_compressed)
-        result_compressed = converter.convert()
-
-        # Test without compression
-        options_uncompressed = ConversionOptions(
-            input_file=gedcom_file,
-            output_file=self.test_dir / "uncompressed.pkl",
-            compress=False,
-        )
-
-        converter = Ged2GwbConverter(options_uncompressed)
-        result_uncompressed = converter.convert()
-
-        # Both should succeed
-        assert result_compressed["conversion_successful"] is True
-        assert result_uncompressed["conversion_successful"] is True
-
-        # Both should produce the same data
-        compressed_file = options_compressed.output_file.with_suffix(".pkl.gz")
-        uncompressed_file = options_uncompressed.output_file
-
-        data_compressed = self.load_pickle_data(compressed_file)
-        data_uncompressed = self.load_pickle_data(uncompressed_file)
-
-        assert len(data_compressed.persons) == len(data_uncompressed.persons)
-        assert len(data_compressed.families) == len(data_uncompressed.families)
 
     def test_error_handling_integration(self):
         """Test error handling in the complete workflow."""
@@ -310,7 +314,7 @@ class TestIntegration:
         # Test with invalid GEDCOM
         gedcom_file = self.create_test_gedcom("Invalid GEDCOM content")
         options = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "output.pkl"
+            input_file=gedcom_file, output_file=self.test_dir / "output.msgpack"
         )
 
         converter = Ged2GwbConverter(options)
