@@ -61,19 +61,6 @@ jobs:
           # Generate coverage report
           make test-coverage
 
-      - name: Run Demonstrations
-        run: |
-          cd src/python
-          echo "=== Running Demonstrations ==="
-
-          # Demo with sample.ged
-          echo "Running demo with sample.ged..."
-          make demo
-
-          # Demo with uk.ged
-          echo "Running demo with uk.ged..."
-          make demo-uk
-
       - name: Final Verification
         run: |
           cd src/python
