@@ -104,6 +104,26 @@ let default_hebrew_month =
   in
   fun m -> tab.(m)
 
+(* i18n TODO *)
+let default_islamic_month =
+  let tab =
+    [|
+      "Janvier";
+      "Février";
+      "Mars";
+      "Avril";
+      "Mai";
+      "Juin";
+      "Juillet";
+      "Août";
+      "Septembre";
+      "Octobre";
+      "Novembre";
+      "Décembre";
+    |]
+  in
+  fun m -> tab.(m)
+
 let french_month conf m =
   let r = Util.transl_nth conf "(french revolution month)" m in
   if r = "[(french revolution month)]" then "[" ^ default_french_month m ^ "]"
@@ -112,6 +132,11 @@ let french_month conf m =
 let hebrew_month conf m =
   let r = Util.transl_nth conf "(hebrew month)" m in
   if r = "[(hebrew month)]" then "[" ^ default_hebrew_month m ^ "]" else r
+
+(* i18n TODO *)
+let islamic_month conf m =
+  let r = Util.transl_nth conf "(month)" m in
+  if r = "[(month)]" then "[" ^ default_islamic_month m ^ "]" else r
 
 let code_french_year conf y =
   Util.transl_nth conf "year/month/day" 3
@@ -134,6 +159,14 @@ let code_hebrew_date conf d m y =
   let s =
     if m = 0 then ""
     else s ^ (if s = "" then "" else " ") ^ hebrew_month conf (m - 1)
+  in
+  s ^ (if s = "" then "" else " ") ^ string_of_int y
+
+let code_islamic_date conf d m y =
+  let s = if d = 0 then "" else string_of_int d in
+  let s =
+    if m = 0 then ""
+    else s ^ (if s = "" then "" else " ") ^ islamic_month conf (m - 1)
   in
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 
@@ -214,6 +247,16 @@ let string_of_on_hebrew_dmy conf d =
   in
   string_of_on_prec_dmy conf sy sy2 d
 
+let string_of_on_islamic_dmy conf d =
+  let sy = code_islamic_date conf d.Date.day d.Date.month d.Date.year in
+  let sy2 =
+    match d.Date.prec with
+    | Date.OrYear d2 | Date.YearInt d2 ->
+        code_islamic_date conf d2.Date.day2 d2.Date.month2 d2.Date.year2
+    | _ -> ""
+  in
+  string_of_on_prec_dmy conf sy sy2 d
+
 let string_of_prec_dmy conf s s2 d =
   Adef.safe
   @@
@@ -270,6 +313,11 @@ let translate_dmy conf (fst, snd, trd) cal short =
           String.uppercase_ascii
             (String.sub (hebrew_month conf (int_of_string m)) 0 2)
         else hebrew_month conf (int_of_string m)
+    | Date.Dislamic when m <> "" ->
+        if short then
+          String.uppercase_ascii
+            (String.sub (islamic_month conf (int_of_string m)) 0 2)
+        else islamic_month conf (int_of_string m)
     | _ -> m
   in
   let translate_year y =
@@ -407,6 +455,13 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
           | Date.Sure | Date.About | Date.Before | Date.After | Date.Maybe ->
               let open Def in
               s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
+          | Date.OrYear _ | Date.YearInt _ -> s)
+      | Date.Dislamic -> (
+          let s = string_of_on_islamic_dmy conf d1 in
+          match d.Date.prec with
+          | Date.Sure | Date.About | Date.Before | Date.After | Date.Maybe ->
+              let open Def in
+              s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
           | Date.OrYear _ | Date.YearInt _ -> s))
 
 let string_of_ondate ?link conf d =
@@ -467,7 +522,13 @@ let string_slash_of_date conf date =
             d1
           ^ " ("
           ^ Util.transl_nth conf "gregorian/julian/french/hebrew" 3
-          ^ ")")
+          ^ ")"
+      | Date.Dislamic ->
+          (* i18n TODO *)
+          slashify_dmy
+            (translate_dmy conf (decode_dmy conf d1) Date.Dislamic true)
+            d1
+          ^ " (" ^ "musulman" ^ ")")
 
 let string_of_age conf a =
   Adef.safe

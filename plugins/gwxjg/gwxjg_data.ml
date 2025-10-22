@@ -233,6 +233,7 @@ and mk_date = function
         | Djulian -> Jingoo.Jg_types.Tsafe "Djulian"
         | Dfrench -> Jingoo.Jg_types.Tsafe "Dfrench"
         | Dhebrew -> Jingoo.Jg_types.Tsafe "Dhebrew"
+        | Dislamic -> Jingoo.Jg_types.Tsafe "Dislamic"
       in
       Jingoo.Jg_types.Tpat
         (function
@@ -302,6 +303,7 @@ and to_gregorian_aux calendar d =
   | "Djulian" -> Date.convert ~from:Djulian ~to_:Dgregorian d
   | "Dfrench" -> Date.convert ~from:Dfrench ~to_:Dgregorian d
   | "Dhebrew" -> Date.convert ~from:Dhebrew ~to_:Dgregorian d
+  | "Dislamic" -> Date.convert ~from:Dislamic ~to_:Dgregorian d
   | _ -> assert false
 
 and of_calendar d =
@@ -310,6 +312,7 @@ and of_calendar d =
   | Jingoo.Jg_types.Tsafe "Djulian" -> Date.Djulian
   | Jingoo.Jg_types.Tsafe "Dfrench" -> Date.Dfrench
   | Jingoo.Jg_types.Tsafe "Dhebrew" -> Date.Dhebrew
+  | Jingoo.Jg_types.Tsafe "Dislamic" -> Date.Dislamic
   | _ -> assert false
 
 and module_DATE conf =
@@ -367,6 +370,7 @@ and module_DATE conf =
         | "Djulian" -> convert (Date.convert ~from:Dgregorian ~to_:Djulian)
         | "Dfrench" -> convert (Date.convert ~from:Dgregorian ~to_:Dfrench)
         | "Dhebrew" -> convert (Date.convert ~from:Dgregorian ~to_:Dhebrew)
+        | "Dislamic" -> convert (Date.convert ~from:Dgregorian ~to_:Dislamic)
         | s -> failwith @@ "Unknown calendar: " ^ s)
   in
   Jingoo.Jg_types.Tpat
