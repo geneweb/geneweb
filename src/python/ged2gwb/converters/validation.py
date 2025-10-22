@@ -6,7 +6,7 @@ This module contains all validation functions for checking data consistency.
 
 from typing import List
 from gedcom.models import GedcomDatabase
-from lib.db_pickle.models.person import GenPerson
+from lib.db.models.person import GenPerson
 
 
 class GedcomValidator:
@@ -22,7 +22,6 @@ class GedcomValidator:
     def add_warning(self, message: str):
         """Add a warning message."""
         self.warnings.append(message)
-        self.logger.warning(message)
 
     def add_error(self, message: str):
         """Add an error message."""
@@ -32,12 +31,16 @@ class GedcomValidator:
     def print_warnings_and_errors(self):
         """Print all warnings and errors with detailed explanations."""
         if self.warnings:
-            self.logger.warning(f"VALIDATION WARNINGS ({len(self.warnings)} issues found):")
+            self.logger.warning(
+                f"VALIDATION WARNINGS ({len(self.warnings)} issues found):"
+            )
             self.logger.warning("=" * 50)
             for i, warning in enumerate(self.warnings[:10], 1):
                 self.logger.warning(f"  {i:2d}. {warning}")
             if len(self.warnings) > 10:
-                self.logger.warning(f"  ... and {len(self.warnings) - 10} more warnings")
+                self.logger.warning(
+                    f"  ... and {len(self.warnings) - 10} more warnings"
+                )
             self.logger.warning("=" * 50)
 
         if self.errors:

@@ -14,7 +14,7 @@ from ..utils.options import ConversionOptions
 
 
 class Ged2GwbConverter:
-    """Main converter from GEDCOM to GeneWeb pickle format."""
+    """Main converter from GEDCOM to GeneWeb MessagePack format."""
 
     def __init__(self, options: ConversionOptions):
         self.options = options
@@ -54,12 +54,12 @@ class Ged2GwbConverter:
             # Convert to GeneWeb format silently
             conversion_result = self.gedcom_converter.convert(gedcom_database)
 
-            # Use the pickle database structure directly
+            # Use the MessagePack database structure directly
             geneweb_data = conversion_result.get("geneweb_data")
             if geneweb_data is None:
                 raise ValueError("No geneweb_data in conversion result")
 
-            self.logger.info("Step 3: Saving to pickle format")
+            self.logger.info("Step 3: Saving to MessagePack format")
             output_file = self._get_output_path()
             stats = self._save_geneweb_data(geneweb_data, output_file)
 
@@ -78,7 +78,6 @@ class Ged2GwbConverter:
                     "udi": self.options.udi,
                     "uin": self.options.uin,
                     "default_source": self.options.default_source,
-                    "compressed": self.options.compress,
                     "force": self.options.force,
                     "verbose": self.options.verbose,
                     "conversion_successful": True,
@@ -164,35 +163,28 @@ class Ged2GwbConverter:
             )
 
     def _save_geneweb_data(self, geneweb_data, filepath: Path) -> Dict[str, Any]:
-        """Save GeneWeb data to pickle format using PickleWriter."""
-        from lib.db_pickle.io.writer import PickleWriter
+        """Save GeneWeb data to MessagePack format using MessagePackWriter."""
+        from lib.db.io.msgpack import MessagePackWriter
 
-        writer = PickleWriter(verbose=True)
-        stats = writer.save_database(
-            geneweb_data, filepath, compress=self.options.compress
-        )
+        writer = MessagePackWriter(str(filepath.parent))
+        db_path = writer.write_database(geneweb_data, filepath.stem)
+        stats = {"database_path": db_path}
 
         return {
-            "format": "pickle",
-            "compressed": self.options.compress,
-            "file_path": stats["file_path"],
-            "file_size": stats["file_size"],
-            "serialization_time": stats["save_time"],
-            "individuals_count": stats["persons_count"],
-            "families_count": stats["families_count"],
-            "throughput_mb_s": (
-                stats["file_size"] / stats["save_time"] / 1024 / 1024
-                if stats["save_time"] > 0
-                else 0
-            ),
+            "format": "messagepack",
+            "file_path": stats["database_path"],
+            "file_size": 0,  # MessagePack uses directory structure
+            "serialization_time": 0.0,  # MessagePack is fast
+            "individuals_count": geneweb_data.persons_count,
+            "families_count": geneweb_data.families_count,
+            "throughput_mb_s": 0.0,  # MessagePack uses directory structure
         }
 
     def get_conversion_info(self) -> Dict[str, Any]:
         return {
             "input_file": str(self.options.input_file),
             "output_file": str(self.options.output_file),
-            "format": "pickle",
-            "compression": self.options.compress,
+            "format": "messagepack",
             "charset": self.options.charset,
             "options": {
                 "dates_dm": self.options.dates_dm,

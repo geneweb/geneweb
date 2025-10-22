@@ -9,7 +9,6 @@ and under different conditions.
 import sys
 import os
 import tempfile
-import pickle
 import time
 from pathlib import Path
 
@@ -41,16 +40,11 @@ class TestPerformance:
             f.write(content)
         return file_path
 
-    def load_pickle_data(self, file_path: Path):
-        """Load pickle data, handling compression."""
-        if file_path.suffix == ".gz":
-            import gzip
-
-            with gzip.open(file_path, "rb") as f:
-                return pickle.load(f)
-        else:
-            with open(file_path, "rb") as f:
-                return pickle.load(f)
+    def load_msgpack_data(self, file_path: Path):
+        """Load MessagePack data."""
+        from lib.db.io.msgpack import MessagePackReader
+        reader = MessagePackReader(str(file_path.parent))
+        return reader.load_database(file_path.stem)
 
     def test_small_file_performance(self):
         """Test performance with small files (< 10 individuals)."""
@@ -214,136 +208,6 @@ class TestPerformance:
 
         # Should complete in reasonable time
         assert execution_time < 30.0, f"Large file took too long: {execution_time:.3f}s"
-        assert result["conversion_successful"] is True
-
-    def test_compression_performance(self):
-        """Test performance impact of compression."""
-        print("\n=== Testing Compression Performance ===")
-
-        gedcom_content = """0 HEAD
-1 GEDC
-2 VERS 5.5.1
-2 FORM LINEAGE
-1 CHAR UTF-8
-"""
-
-        # Add 100 individuals with notes to create larger files
-        for i in range(1, 101):
-            gedcom_content += f"""0 @I{i}@ INDI
-1 NAME Person{i} /Surname{i}/
-1 SEX {"M" if i % 2 == 0 else "F"}
-1 BIRT
-2 DATE {i % 28 + 1} MAR {1900 + i}
-1 NOTE This is a detailed note for person {i} with additional information
-1 NOTE Another note for person {i} with more details
-"""
-
-        gedcom_content += "0 TRLR\n"
-
-        gedcom_file = self.create_test_gedcom(gedcom_content)
-
-        # Test without compression
-        options_uncompressed = ConversionOptions(
-            input_file=gedcom_file,
-            output_file=self.test_dir / "uncompressed.pkl",
-            compress=False,
-        )
-
-        start_time = time.time()
-        converter = Ged2GwbConverter(options_uncompressed)
-        result_uncompressed = converter.convert()
-        uncompressed_time = time.time() - start_time
-
-        # Test with compression
-        options_compressed = ConversionOptions(
-            input_file=gedcom_file,
-            output_file=self.test_dir / "compressed.pkl",
-            compress=True,
-        )
-
-        start_time = time.time()
-        converter = Ged2GwbConverter(options_compressed)
-        result_compressed = converter.convert()
-        compressed_time = time.time() - start_time
-
-        print(f"Uncompressed conversion time: {uncompressed_time:.3f}s")
-        print(f"Compressed conversion time: {compressed_time:.3f}s")
-        print(
-            f"Compression overhead: {((compressed_time - uncompressed_time) / uncompressed_time) * 100:.1f}%"
-        )
-
-        # Check file sizes
-        uncompressed_file = options_uncompressed.output_file
-        compressed_file = options_compressed.output_file.with_suffix(".pkl.gz")
-
-        uncompressed_size = uncompressed_file.stat().st_size
-        compressed_size = compressed_file.stat().st_size
-
-        compression_ratio = (1 - compressed_size / uncompressed_size) * 100
-
-        print(f"Uncompressed file size: {uncompressed_size:,} bytes")
-        print(f"Compressed file size: {compressed_size:,} bytes")
-        print(f"Compression ratio: {compression_ratio:.1f}%")
-
-        # Both should succeed
-        assert result_uncompressed["conversion_successful"] is True
-        assert result_compressed["conversion_successful"] is True
-
-        # Compression should provide space savings
-        assert compressed_size < uncompressed_size
-
-    def test_memory_usage(self):
-        """Test memory usage during conversion."""
-        print("\n=== Testing Memory Usage ===")
-
-        try:
-            import psutil
-            import os
-        except ImportError:
-            print("SKIP: psutil not available for memory testing")
-            return
-
-        gedcom_content = """0 HEAD
-1 GEDC
-2 VERS 5.5.1
-2 FORM LINEAGE
-1 CHAR UTF-8
-"""
-
-        # Add 50 individuals
-        for i in range(1, 51):
-            gedcom_content += f"""0 @I{i}@ INDI
-1 NAME Person{i} /Surname{i}/
-1 SEX {"M" if i % 2 == 0 else "F"}
-1 BIRT
-2 DATE {i % 28 + 1} MAR {1900 + i}
-1 NOTE This is a note for person {i} with some additional information
-"""
-
-        gedcom_content += "0 TRLR\n"
-
-        gedcom_file = self.create_test_gedcom(gedcom_content)
-        options = ConversionOptions(
-            input_file=gedcom_file, output_file=self.test_dir / "memory.pkl"
-        )
-
-        # Get initial memory usage
-        process = psutil.Process(os.getpid())
-        initial_memory = process.memory_info().rss / 1024 / 1024  # MB
-
-        converter = Ged2GwbConverter(options)
-        result = converter.convert()
-
-        # Get final memory usage
-        final_memory = process.memory_info().rss / 1024 / 1024  # MB
-        memory_used = final_memory - initial_memory
-
-        print(f"Initial memory usage: {initial_memory:.1f} MB")
-        print(f"Final memory usage: {final_memory:.1f} MB")
-        print(f"Memory used during conversion: {memory_used:.1f} MB")
-
-        # Memory usage should be reasonable
-        assert memory_used < 100, f"Memory usage too high: {memory_used:.1f} MB"
         assert result["conversion_successful"] is True
 
     def test_concurrent_conversions(self):

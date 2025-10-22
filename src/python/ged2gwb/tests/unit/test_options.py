@@ -23,7 +23,7 @@ class TestConversionOptions:
         options = ConversionOptions(input_file=Path("test.ged"))
 
         assert options.input_file == Path("test.ged")
-        assert options.output_file == Path("base.pkl")
+        assert options.output_file == Path("base.msgpack")
         assert options.charset is None
         assert options.dates_dm is False
         assert options.dates_md is False
@@ -44,7 +44,6 @@ class TestConversionOptions:
         assert options.udi is None
         assert options.uin is False
         assert options.tnd is False
-        assert options.compress is True
         assert options.force is False
         assert options.verbose is False
         assert options.track_id is False
@@ -56,7 +55,7 @@ class TestConversionOptions:
         """Test custom initialization values."""
         options = ConversionOptions(
             input_file=Path("input.ged"),
-            output_file=Path("output.pkl"),
+            output_file=Path("output.msgpack"),
             charset="ASCII",
             dates_dm=True,
             efn=True,
@@ -64,14 +63,13 @@ class TestConversionOptions:
             lf=True,
             ls=True,
             udi=(90, 130),
-            compress=True,
             verbose=True,
             force=True,
             base_dir=Path("/tmp"),
         )
 
         assert options.input_file == Path("input.ged")
-        assert options.output_file == Path("output.pkl")
+        assert options.output_file == Path("output.msgpack")
         assert options.charset == "ASCII"
         assert options.dates_dm is True
         assert options.efn is True
@@ -79,7 +77,6 @@ class TestConversionOptions:
         assert options.lf is True
         assert options.ls is True
         assert options.udi == (90, 130)
-        assert options.compress is True
         assert options.verbose is True
         assert options.force is True
         assert options.base_dir == Path("/tmp")
@@ -89,7 +86,7 @@ class TestConversionOptions:
         # Mock parsed arguments
         args = MagicMock()
         args.gedcom_file = Path("test.ged")
-        args.output = Path("output.pkl")
+        args.output = Path("output.msgpack")
         args.charset = None
         args.dates_dm = True
         args.dates_md = False
@@ -110,7 +107,6 @@ class TestConversionOptions:
         args.udi = "80-120"
         args.uin = False
         args.tnd = False
-        args.compress = True
         args.force = True
         args.verbose = True
         args.trackid = False
@@ -121,7 +117,7 @@ class TestConversionOptions:
         options = ConversionOptions.from_args(args)
 
         assert options.input_file == Path("test.ged")
-        assert options.output_file == Path("output.pkl")
+        assert options.output_file == Path("output.msgpack")
         assert options.charset is None
         assert options.dates_dm is True
         assert options.efn is True
@@ -129,7 +125,6 @@ class TestConversionOptions:
         assert options.lf is True
         assert options.ls is True
         assert options.udi == (80, 120)
-        assert options.compress is True
         assert options.force is True
         assert options.verbose is True
         assert options.base_dir == Path("/tmp")
@@ -162,7 +157,6 @@ class TestConversionOptions:
             "nopicture",
             "uin",
             "tnd",
-            "compress",
             "force",
             "verbose",
             "trackid",
@@ -190,7 +184,7 @@ class TestConversionOptions:
         try:
             options = ConversionOptions(
                 input_file=Path("test.ged"),
-                output_file=Path("output.pkl"),
+                output_file=Path("output.msgpack"),
                 udi="invalid-format",  # This should cause validation error
             )
             assert False, "Should have raised ValueError for invalid UDI format"
@@ -206,7 +200,7 @@ class TestConversionOptions:
         """Test boolean options mapping from args."""
         args = MagicMock()
         args.gedcom_file = Path("test.ged")
-        args.output = Path("output.pkl")
+        args.output = Path("output.msgpack")
         args.charset = None
         args.dates_dm = True
         args.dates_md = False
@@ -227,7 +221,6 @@ class TestConversionOptions:
         args.udi = "80-120"
         args.uin = True
         args.tnd = True
-        args.compress = True
         args.force = True
         args.verbose = True
         args.trackid = True
@@ -252,7 +245,6 @@ class TestConversionOptions:
         assert options.no_picture is True
         assert options.uin is True
         assert options.tnd is True
-        assert options.compress is True
         assert options.force is True
         assert options.verbose is True
         assert options.track_id is True
@@ -284,7 +276,6 @@ class TestConversionOptions:
         args.udi = "80-120"
         args.uin = False
         args.tnd = False
-        args.compress = False
         args.force = False
         args.verbose = False
         args.trackid = False
@@ -322,7 +313,6 @@ class TestConversionOptions:
         args.udi = "80-120"
         args.uin = False
         args.tnd = False
-        args.compress = False
         args.force = False
         args.verbose = False
         args.trackid = False
@@ -364,7 +354,6 @@ class TestConversionOptions:
         args.udi = "80-120"
         args.uin = False
         args.tnd = False
-        args.compress = False
         args.force = False
         args.verbose = False
         args.trackid = False

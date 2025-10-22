@@ -39,3 +39,4 @@ line-profiler>=4.0.0
 # Optional: for documentation
 sphinx>=5.0.0
 sphinx-rtd-theme>=1.0.0
+msgpack>=1.0.0

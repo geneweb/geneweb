@@ -29,6 +29,7 @@ class FamilyParser(RecordParser):
         current_index = start_index + 1
         base_level = start_line.level
         current_event = None
+        current_note_index = None
 
         while current_index < len(lines):
             line = lines[current_index]
@@ -48,13 +49,31 @@ class FamilyParser(RecordParser):
                     self._assign_event_to_family(family, current_event, line.tag)
                 elif line.tag == TAGS.NOTE:
                     family.notes.append(line.value)
+                    current_note_index = len(family.notes) - 1
                 elif line.tag == TAGS.SOUR:
                     family.sources.append(line.value.strip("@"))
                 else:
                     current_event = None
 
-            elif line.level == base_level + 2 and current_event:
-                self._parse_event_details(current_event, line)
+            elif line.level == base_level + 2:
+                if current_event:
+                    self._parse_event_details(current_event, line)
+                elif (
+                    GROUPS.is_note_continuation(line.tag)
+                    and current_note_index is not None
+                ):
+                    if line.tag == TAGS.CONT:
+                        family.notes[current_note_index] += "\n" + line.value
+                    elif line.tag == TAGS.CONC:
+                        last_char = (
+                            family.notes[current_note_index][-1]
+                            if family.notes[current_note_index]
+                            else ""
+                        )
+                        if last_char and last_char not in " \n":
+                            family.notes[current_note_index] += " " + line.value
+                        else:
+                            family.notes[current_note_index] += line.value
 
             current_index += 1
 

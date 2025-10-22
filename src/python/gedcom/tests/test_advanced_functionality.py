@@ -239,7 +239,7 @@ class TestAdvancedFunctionality(unittest.TestCase):
         # Test standalone note
         self.assertEqual(len(database.notes), 1)
         note = database.notes["@N1@"]
-        self.assertEqual(note.text, "\nThis is a standalone notewith concatenated text")
+        self.assertEqual(note.text, "This is a standalone notewith concatenated text")
 
     def test_repository_parsing(self):
         """Test parsing of repository records"""

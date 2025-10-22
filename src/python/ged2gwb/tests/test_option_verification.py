@@ -9,7 +9,6 @@ and produces the expected results with detailed verification.
 import sys
 import os
 import tempfile
-import pickle
 from pathlib import Path
 
 # Add the src directory to the path
@@ -40,16 +39,11 @@ class TestOptionVerification:
             f.write(content)
         return file_path
 
-    def load_pickle_data(self, file_path: Path):
-        """Load pickle data, handling compression."""
-        if file_path.suffix == ".gz":
-            import gzip
-
-            with gzip.open(file_path, "rb") as f:
-                return pickle.load(f)
-        else:
-            with open(file_path, "rb") as f:
-                return pickle.load(f)
+    def load_msgpack_data(self, file_path: Path):
+        """Load MessagePack data."""
+        from lib.db.io.msgpack import MessagePackReader
+        reader = MessagePackReader(str(file_path.parent))
+        return reader.load_database(file_path.stem)
 
     def convert_and_verify(
         self, gedcom_content: str, options: ConversionOptions, expected_checks: dict
@@ -66,10 +60,8 @@ class TestOptionVerification:
 
         # Load and verify data
         output_file = options.output_file
-        if not output_file.exists() and output_file.with_suffix(".pkl.gz").exists():
-            output_file = output_file.with_suffix(".pkl.gz")
 
-        data = self.load_pickle_data(output_file)
+        data = self.load_msgpack_data(output_file)
 
         # Perform expected checks
         for check_name, check_func in expected_checks.items():
@@ -98,7 +90,7 @@ class TestOptionVerification:
 
         options_ansel = ConversionOptions(
             input_file=Path("dummy.ged"),  # Will be overridden in convert_and_verify
-            output_file=self.test_dir / "ansel.pkl",
+            output_file=self.test_dir / "ansel.msgpack",
             charset="ANSEL",
         )
 
@@ -127,7 +119,7 @@ class TestOptionVerification:
 
         options_ascii = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "ascii.pkl",
+            output_file=self.test_dir / "ascii.msgpack",
             charset="ASCII",
         )
 
@@ -156,7 +148,7 @@ class TestOptionVerification:
 
         options_msdos = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "msdos.pkl",
+            output_file=self.test_dir / "msdos.msgpack",
             charset="MSDOS",
         )
 
@@ -193,7 +185,7 @@ class TestOptionVerification:
         # Test --dates-dm
         options_dm = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "dates_dm.pkl",
+            output_file=self.test_dir / "dates_dm.msgpack",
             dates_dm=True,
         )
 
@@ -211,7 +203,7 @@ class TestOptionVerification:
         # Test --dates-md
         options_md = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "dates_md.pkl",
+            output_file=self.test_dir / "dates_md.msgpack",
             dates_md=True,
         )
 
@@ -247,7 +239,7 @@ class TestOptionVerification:
         # Test --efn (extract first name)
         options_efn = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "efn.pkl",
+            output_file=self.test_dir / "efn.msgpack",
             efn=True,
         )
 
@@ -275,7 +267,7 @@ class TestOptionVerification:
         # Test --epn (extract public name)
         options_epn = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "epn.pkl",
+            output_file=self.test_dir / "epn.msgpack",
             epn=True,
         )
 
@@ -297,7 +289,7 @@ class TestOptionVerification:
 
         # Test --lf (lowercase first names)
         options_lf = ConversionOptions(
-            input_file=Path("dummy.ged"), output_file=self.test_dir / "lf.pkl", lf=True
+            input_file=Path("dummy.ged"), output_file=self.test_dir / "lf.msgpack", lf=True
         )
 
         def verify_lf(data, result):
@@ -317,7 +309,7 @@ class TestOptionVerification:
 
         # Test --ls (lowercase surnames with particles)
         options_ls = ConversionOptions(
-            input_file=Path("dummy.ged"), output_file=self.test_dir / "ls.pkl", ls=True
+            input_file=Path("dummy.ged"), output_file=self.test_dir / "ls.msgpack", ls=True
         )
 
         def verify_ls(data, result):
@@ -342,7 +334,7 @@ class TestOptionVerification:
 
         # Test --us (uppercase surnames)
         options_us = ConversionOptions(
-            input_file=Path("dummy.ged"), output_file=self.test_dir / "us.pkl", us=True
+            input_file=Path("dummy.ged"), output_file=self.test_dir / "us.msgpack", us=True
         )
 
         def verify_us(data, result):
@@ -378,7 +370,7 @@ class TestOptionVerification:
         # Test --efn + --lf + --us
         options_combined = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "combined.pkl",
+            output_file=self.test_dir / "combined.msgpack",
             efn=True,
             lf=True,
             us=True,
@@ -422,7 +414,7 @@ class TestOptionVerification:
 
         options_udi = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "udi.pkl",
+            output_file=self.test_dir / "udi.msgpack",
             udi=(80, 120),
         )
 
@@ -455,7 +447,7 @@ class TestOptionVerification:
 
         options_uin = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "uin.pkl",
+            output_file=self.test_dir / "uin.msgpack",
             uin=True,
         )
 
@@ -469,57 +461,6 @@ class TestOptionVerification:
 
         self.convert_and_verify(gedcom_content, options_uin, {"UIN Option": verify_uin})
 
-    def test_compression_option(self):
-        """Test --compress option."""
-        print("\n=== Testing Compression Option ===")
-
-        gedcom_content = """0 HEAD
-1 GEDC
-2 VERS 5.5.1
-2 FORM LINEAGE
-1 CHAR UTF-8
-0 @I1@ INDI
-1 NAME John /Smith/
-1 SEX M
-0 TRLR
-"""
-
-        # Test with compression
-        options_compressed = ConversionOptions(
-            input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "compressed.pkl",
-            compress=True,
-        )
-
-        def verify_compressed(data, result):
-            assert result["compressed"] is True
-            assert len(data.persons) == 1
-            # Verify compressed file was created
-            compressed_file = options_compressed.output_file.with_suffix(".pkl.gz")
-            assert compressed_file.exists()
-
-        self.convert_and_verify(
-            gedcom_content, options_compressed, {"Compression": verify_compressed}
-        )
-
-        # Test without compression
-        options_uncompressed = ConversionOptions(
-            input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "uncompressed.pkl",
-            compress=False,
-        )
-
-        def verify_uncompressed(data, result):
-            assert result["compressed"] is False
-            assert len(data.persons) == 1
-            # Verify uncompressed file was created
-            assert options_uncompressed.output_file.exists()
-
-        self.convert_and_verify(
-            gedcom_content,
-            options_uncompressed,
-            {"No Compression": verify_uncompressed},
-        )
 
     def test_verbose_option(self):
         """Test --verbose option."""
@@ -538,7 +479,7 @@ class TestOptionVerification:
 
         options_verbose = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "verbose.pkl",
+            output_file=self.test_dir / "verbose.msgpack",
             verbose=True,
         )
 
@@ -569,7 +510,7 @@ class TestOptionVerification:
 
         options_force = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "force.pkl",
+            output_file=self.test_dir / "force.msgpack",
             force=True,
         )
 
@@ -600,7 +541,7 @@ class TestOptionVerification:
 
         options_ds = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "ds.pkl",
+            output_file=self.test_dir / "ds.msgpack",
             default_source="Test Source",
         )
 
@@ -644,7 +585,7 @@ class TestOptionVerification:
 
         options_all = ConversionOptions(
             input_file=Path("dummy.ged"),
-            output_file=self.test_dir / "all_options.pkl",
+            output_file=self.test_dir / "all_options.msgpack",
             charset="ANSEL",
             dates_dm=True,
             efn=True,
@@ -655,7 +596,6 @@ class TestOptionVerification:
             udi=(80, 120),
             uin=True,
             default_source="Test Source",
-            compress=True,
             force=True,
             verbose=True,
         )
@@ -672,7 +612,6 @@ class TestOptionVerification:
             assert result["udi"] == (80, 120)
             assert result["uin"] is True
             assert result["default_source"] == "Test Source"
-            assert result["compressed"] is True
             assert result["force"] is True
             assert result["verbose"] is True
 

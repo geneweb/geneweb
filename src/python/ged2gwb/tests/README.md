@@ -32,7 +32,7 @@ The test suite is organized into several categories:
 
 - **`test_performance.py`**: Tests for performance characteristics
 - Tests with different file sizes (small, medium, large)
-- Tests compression performance and memory usage
+- Tests performance and memory usage
 - Tests concurrent conversions and error handling performance
 
 ## Running Tests
@@ -128,7 +128,7 @@ python3 -m ged2gwb.tests.test_performance
 - Measure execution time
 - Test memory usage
 - Test concurrent operations
-- Test compression performance
+- Test conversion performance
 
 ## Test Results
 
@@ -145,7 +145,7 @@ The test suite requires:
 
 - Python 3.7+
 - `psutil` (for memory usage testing)
-- Standard library modules (tempfile, pickle, time, etc.)
+- Standard library modules (tempfile, time, etc.)
 
 ## Contributing
 

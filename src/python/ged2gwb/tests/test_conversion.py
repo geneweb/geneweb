@@ -16,6 +16,51 @@ from ged2gwb.core.converter import Ged2GwbConverter
 from ged2gwb.utils.options import ConversionOptions
 
 
+def verify_msgpack_database_structure(output_dir: Path) -> bool:
+    """Verify that all required MessagePack database files and directories exist."""
+    required_files = [
+        "base",           # Main database file
+        "base.acc",       # Access file
+        "names.inx",      # Names index
+        "fnames.inx",     # First names index
+        "fnames.dat",     # First names data
+        "snames.inx",     # Surnames index
+        "snames.dat",     # Surnames data
+        "strings.inx",    # Strings index
+        "nb_persons",     # Number of persons
+        "notes",          # Notes file
+        "particles.txt",  # Particles file
+        "patches",        # Patches file
+        "synchro_patches", # Synchronization patches
+    ]
+
+    required_dirs = [
+        "notes_d",        # Notes directory
+        "wiznotes",       # Wiznotes directory
+    ]
+
+    missing_files = []
+    for file_name in required_files:
+        if not (output_dir / file_name).exists():
+            missing_files.append(file_name)
+
+    missing_dirs = []
+    for dir_name in required_dirs:
+        if not (output_dir / dir_name).exists() or not (output_dir / dir_name).is_dir():
+            missing_dirs.append(dir_name)
+
+    if missing_files:
+        print(f"FAIL: Missing required files: {missing_files}")
+        return False
+
+    if missing_dirs:
+        print(f"FAIL: Missing required directories: {missing_dirs}")
+        return False
+
+    print("PASS: All required MessagePack database files created")
+    return True
+
+
 def create_sample_gedcom() -> Path:
     """Create a sample GEDCOM file for testing."""
     sample_gedcom = """0 HEAD
@@ -59,19 +104,18 @@ def create_sample_gedcom() -> Path:
 
 
 def test_basic_conversion():
-    """Test basic GEDCOM to pickle conversion."""
+    """Test basic GEDCOM to MessagePack conversion."""
     print("=== Testing Basic Conversion ===\n")
 
     # Create sample GEDCOM
     gedcom_file = create_sample_gedcom()
-    output_file = Path("test-output.pkl")
+    output_file = Path("test-output.msgpack")
 
     try:
         # Create options
         options = ConversionOptions(
             input_file=gedcom_file,
             output_file=output_file,
-            compress=False,  # No compression for easier testing
         )
 
         # Create converter
@@ -87,12 +131,16 @@ def test_basic_conversion():
         print(f"   File size: {stats['file_size']:,} bytes")
         print(f"   Individuals: {stats['individuals_count']}")
         print(f"   Families: {stats['families_count']}")
+        # Verify output directory exists (MessagePack creates directories)
+        output_dir = Path(stats["file_path"])
+        if output_dir.exists() and output_dir.is_dir():
+            print("PASS: Output directory created")
 
-        # Verify output file exists
-        if output_file.exists():
-            print("PASS: Output file created")
+            # Verify all required MessagePack database files exist
+            if not verify_msgpack_database_structure(output_dir):
+                raise AssertionError("MessagePack database structure verification failed")
         else:
-            print("FAIL: Output file not found")
+            print("FAIL: Output directory not found")
             raise AssertionError("Test failed")
         # Test passed successfully
     except Exception as e:
@@ -103,50 +151,11 @@ def test_basic_conversion():
         if gedcom_file.exists():
             gedcom_file.unlink()
         if output_file.exists():
-            output_file.unlink()
-
-
-def test_compressed_conversion():
-    """Test conversion with compression."""
-    print("\n=== Testing Compressed Conversion ===\n")
-
-    # Create sample GEDCOM
-    gedcom_file = create_sample_gedcom()
-    output_file = Path("test-output.pkl.gz")
-
-    try:
-        # Create options with compression
-        options = ConversionOptions(
-            input_file=gedcom_file, output_file=output_file, compress=True
-        )
-
-        # Create converter
-        converter = Ged2GwbConverter(options)
-
-        # Perform conversion
-        stats = converter.convert()
-        print("PASS: Compressed conversion completed successfully")
-        print(f"   File size: {stats['file_size']:,} bytes")
-        print(f"   Compressed: {stats['compressed']}")
-        actual_output_file = Path(stats["file_path"])
-        if actual_output_file.exists():
-            print("PASS: Compressed output file created")
-        else:
-            print("FAIL: Compressed output file not found")
-            raise AssertionError("Test failed")
-        # Test passed successfully
-    except Exception as e:
-        print(f"FAIL: Compressed conversion failed: {e}")
-        raise AssertionError("Test failed")
-    finally:
-        # Cleanup
-        if gedcom_file.exists():
-            gedcom_file.unlink()
-        # Clean up both possible output files
-        if output_file.exists():
-            output_file.unlink()
-        if "actual_output_file" in locals() and actual_output_file.exists():
-            actual_output_file.unlink()
+            if output_file.is_dir():
+                import shutil
+                shutil.rmtree(output_file)
+            else:
+                output_file.unlink()
 
 
 def test_name_processing_options():
@@ -155,7 +164,7 @@ def test_name_processing_options():
 
     # Create sample GEDCOM
     gedcom_file = create_sample_gedcom()
-    output_file = Path("test-name-processing.pkl")
+    output_file = Path("test-name-processing.msgpack")
 
     try:
         # Create options with name processing
@@ -166,7 +175,6 @@ def test_name_processing_options():
             epn=True,
             lf=True,
             ls=True,
-            compress=False,
         )
 
         # Create converter
@@ -188,7 +196,11 @@ def test_name_processing_options():
         if gedcom_file.exists():
             gedcom_file.unlink()
         if output_file.exists():
-            output_file.unlink()
+            if output_file.is_dir():
+                import shutil
+                shutil.rmtree(output_file)
+            else:
+                output_file.unlink()
 
 
 def test_error_handling():
@@ -235,7 +247,6 @@ def main():
 
     tests = [
         test_basic_conversion,
-        test_compressed_conversion,
         test_name_processing_options,
         test_error_handling,
     ]

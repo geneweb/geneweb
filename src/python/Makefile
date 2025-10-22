@@ -33,8 +33,11 @@ help:
 	@echo "  test           Run all tests"
 	@echo "  test-ged2gwb   Run ged2gwb tests only"
 	@echo "  test-gedcom    Run GEDCOM tests only"
-	@echo "  test-lib       Run lib tests (db_pickle + util)"
+	@echo "  test-lib       Run lib tests (db + util)"
+	@echo "  test-db-ops    Run database operations tests"
+	@echo "  test-msgpack   Run MessagePack database tests"
 	@echo "  test-coverage  Run tests with coverage report"
+	@echo "  validate       Validate MessagePack implementation"
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
 	@echo "  format         Format code with ruff"
@@ -44,15 +47,12 @@ help:
 	@echo ""
 	@echo "$(GREEN)Utilities:$(NC)"
 	@echo "  clean          Clean temporary files"
-	@echo "  demo           Run demo with sample.ged"
-	@echo "  demo-uk        Run demo with uk.ged"
 	@echo ""
 
 # Setup & Installation
 .PHONY: setup
 setup: venv install install-tools
 	@echo "$(GREEN)✓ Complete development setup ready$(NC)"
-	@echo "$(YELLOW)Run 'make demo' to test with sample.ged$(NC)"
 
 .PHONY: venv
 venv:
@@ -73,7 +73,7 @@ install: venv
 .PHONY: install-tools
 install-tools: venv
 	@echo "$(BLUE)Installing development tools...$(NC)"
-	$(VENV_PIP) install ruff mypy pytest pytest-cov
+	$(VENV_PIP) install ruff mypy pytest pytest-cov msgpack
 	@echo "$(GREEN)✓ Development tools installed$(NC)"
 
 # Testing
@@ -85,7 +85,7 @@ test:
 	@echo "$(BLUE)Testing gedcom...$(NC)"
 	$(VENV_PYTHON) -m pytest gedcom/tests/ -v --tb=short
 	@echo "$(BLUE)Testing lib...$(NC)"
-	$(VENV_PYTHON) -m pytest lib/db_pickle/tests/ -v --tb=short
+	$(VENV_PYTHON) -m pytest lib/db/tests/ -v --tb=short
 	$(VENV_PYTHON) -m pytest lib/util/ -v --tb=short || echo "$(YELLOW)No tests found in lib/util$(NC)"
 	@echo "$(GREEN)✓ All tests completed$(NC)"
 
@@ -102,13 +102,38 @@ test-gedcom:
 .PHONY: test-lib
 test-lib:
 	@echo "$(BLUE)Running lib tests...$(NC)"
-	$(VENV_PYTHON) -m pytest lib/db_pickle/tests/ -v --tb=short
+	$(VENV_PYTHON) -m pytest lib/db/tests/ -v --tb=short
 	$(VENV_PYTHON) -m pytest lib/util/ -v --tb=short || echo "$(YELLOW)No tests found in lib/util$(NC)"
+
+.PHONY: test-db-ops
+test-db-ops:
+	@echo "$(BLUE)Running database operations tests...$(NC)"
+	$(VENV_PYTHON) -m pytest ged2gwb/tests/test_database_operations.py -v --tb=short
+
+.PHONY: test-msgpack
+test-msgpack:
+	@echo "$(BLUE)Running MessagePack database tests...$(NC)"
+	$(VENV_PYTHON) -m pytest lib/db/tests/test_msgpack_io.py -v --tb=short
+	$(VENV_PYTHON) -m pytest lib/db/tests/test_integration.py -v --tb=short
+	$(VENV_PYTHON) -m pytest ged2gwb/tests/test_database_operations.py -v --tb=short
 
 .PHONY: test-coverage
 test-coverage:
 	@echo "$(BLUE)Running tests with coverage...$(NC)"
 	$(VENV_PYTHON) -m pytest --cov=ged2gwb --cov=gedcom --cov=lib --cov-report=html --cov-report=term
+
+.PHONY: validate
+validate:
+	@echo "$(BLUE)Validating MessagePack implementation...$(NC)"
+	@echo "$(YELLOW)Running MessagePack database tests...$(NC)"
+	$(VENV_PYTHON) -m pytest lib/db/tests/test_msgpack_io.py -v --tb=short
+	@echo "$(YELLOW)Running MessagePack integration tests...$(NC)"
+	$(VENV_PYTHON) -m pytest lib/db/tests/test_integration.py -v --tb=short
+	@echo "$(YELLOW)Running database operations tests...$(NC)"
+	$(VENV_PYTHON) -m pytest ged2gwb/tests/test_database_operations.py -v --tb=short
+	@echo "$(YELLOW)Running ged2gwb conversion tests...$(NC)"
+	$(VENV_PYTHON) -m pytest ged2gwb/tests/test_concrete.py -v --tb=short
+	@echo "$(GREEN)✓ MessagePack implementation validated$(NC)"
 
 # Development
 .PHONY: format
@@ -144,19 +169,9 @@ clean:
 	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	@find . -type f -name "*.pkl" -delete 2>/dev/null || true
 	@find . -type f -name "*.pkl.gz" -delete 2>/dev/null || true
+	@find . -type f -name "*.msgpack" -delete 2>/dev/null || true
+	@find . -type d -name "*.msgpack" -exec rm -rf {} + 2>/dev/null || true
 	@find . -type f -name ".coverage" -delete 2>/dev/null || true
 	@find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
 	@find . -type d -name "htmlcov" -exec rm -rf {} + 2>/dev/null || true
 	@echo "$(GREEN)✓ Cleanup completed$(NC)"
-
-.PHONY: demo
-demo:
-	@echo "$(BLUE)Running demo with sample.ged...$(NC)"
-	$(VENV_PYTHON) -m ged2gwb gedcom/ged/sample.ged --output demo-sample.pkl --verbose
-	@echo "$(GREEN)✓ Demo complete - check demo-sample.pkl$(NC)"
-
-.PHONY: demo-uk
-demo-uk:
-	@echo "$(BLUE)Running demo with uk.ged...$(NC)"
-	$(VENV_PYTHON) -m ged2gwb gedcom/ged/uk.ged --output demo-uk.pkl --verbose
-	@echo "$(GREEN)✓ Demo complete - check demo-uk.pkl$(NC)"

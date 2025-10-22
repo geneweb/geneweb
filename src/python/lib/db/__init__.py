@@ -1,79 +1,48 @@
 """
-GeneWeb - Genealogical Database System in Python
-Complete implementation of GeneWeb database driver.
+GeneWeb database library.
+MessagePack format for genealogical data.
 """
 
-from .collections import Collection, Marker
-from .core import (
-    Access,
-    BurialType,
-    DeathType,
-    DivorceStatus,
-    Ifam,
-    Iper,
-    Istr,
-    RelationKind,
-    Sex,
-)
-from .database import Base, BaseData, BaseFunc, RecordAccess, SearchIndex
-from .io import DatabaseWriter
-from .models import (
-    Date,
-    Event,
-    GenAscend,
-    GenCouple,
-    GenDescend,
-    GenFamily,
-    GenPerson,
-    GenUnion,
-    Relation,
-    Title,
-)
-from .utils import NameUtils
-from .wrappers.family import Family
-from .wrappers.person import Person
+# Import MessagePack components
+from .io.msgpack import MessagePackWriter, MessagePackReader
+from .database.base import Base as Database
+from .database.base import Base
+from .database.base_data import BaseData
+from .database.base_func import BaseFunc
+from .database.search_index import SearchIndex
+from .database.patches import Patches
+from .database.func_factory import FuncFactory
+from .database.func_creator import create_base_func
 
-__version__ = "1.0.0"
+# Import shared models
+from .models.person import GenPerson
+from .models.family import GenFamily
+from .models.events import Date, Event, Title
+from .core.types import Iper, Ifam, Istr
+from .core.enums import Sex, RelationKind, DivorceStatus
 
 __all__ = [
-    # Core types
+    # MessagePack classes
+    "MessagePackWriter",
+    "MessagePackReader",
+    "Database",
+    "Base",
+    "BaseData",
+    "BaseFunc",
+    "SearchIndex",
+    "Patches",
+    "FuncFactory",
+    "create_base_func",
+    # Shared model classes
+    "GenPerson",
+    "GenFamily",
+    "Date",
+    "Event",
+    "Title",
     "Iper",
     "Ifam",
     "Istr",
-    # Enums
     "Sex",
-    "Access",
-    "DeathType",
-    "BurialType",
     "RelationKind",
     "DivorceStatus",
-    # Models
-    "Date",
-    "Title",
-    "Event",
-    "Relation",
-    "GenPerson",
-    "GenAscend",
-    "GenUnion",
-    "GenFamily",
-    "GenCouple",
-    "GenDescend",
-    # Collections
-    "Collection",
-    "Marker",
-    # Database
-    "RecordAccess",
-    "BaseData",
-    "SearchIndex",
-    "BaseFunc",
-    "Base",
-    "Person",
-    "Family",
-    # Utils
-    "NameUtils",
-    "BinarySearch"
-    # IO
-    "FileReader",
-    "DatabaseWriter",
-    "GedcomParser",
 ]

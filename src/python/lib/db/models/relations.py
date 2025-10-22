@@ -1,55 +1,50 @@
 """
-Relationship data models.
+Relation models for pickle database.
 
-Contains dataclasses for family relationships:
-- GenAscend: Parent information
-- GenUnion: Family memberships as parent
-- GenCouple: Father and mother pair
-- GenDescend: Children information
-- Relation: Non-biological parent relationships
+Defines relationship models for families and persons.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
-from ..core.types import Istr
-
-
-@dataclass
-class Relation:
-    """Relationship to non-biological parents."""
-
-    father: Optional[int] = None  # iper
-    mother: Optional[int] = None  # iper
-    source: int = Istr.empty()
-    relation_type: str = "rparent_adoption"
+from ..core.types import Ifam, Iper
 
 
 @dataclass
 class GenAscend:
-    """Ascendant information (parents)."""
+    """Ascendants model for person parents."""
 
-    parents: Optional[int] = None  # ifam - family where this person is a child
-    consang: float = 0.0  # Consanguinity coefficient
+    parents: Optional[List[Iper]] = None
+    consang: float = 0.0
 
 
 @dataclass
 class GenUnion:
-    """Union information (families where person is a parent)."""
+    """Union model for person families."""
 
-    family: List[int] = field(default_factory=list)  # List of ifam
+    family: List[Ifam] = None
+
+    def __post_init__(self):
+        """Initialize default values after dataclass creation."""
+        if self.family is None:
+            self.family = []
 
 
 @dataclass
 class GenCouple:
-    """Couple in a family (father and mother)."""
+    """Couple model for family parents."""
 
-    father: int  # iper
-    mother: int  # iper
+    father: Iper = Iper(0)
+    mother: Iper = Iper(0)
 
 
 @dataclass
 class GenDescend:
-    """Descendant information (children)."""
+    """Descendants model for family children."""
 
-    children: List[int] = field(default_factory=list)  # List of iper
+    children: List[Iper] = None
+
+    def __post_init__(self):
+        """Initialize default values after dataclass creation."""
+        if self.children is None:
+            self.children = []

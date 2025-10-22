@@ -1,6 +1,10 @@
-"""Input/Output operations for GeneWeb."""
+"""IO components for MessagePack databases."""
 
-from .reader import FileReader
-from .writer import DatabaseWriter
+# MessagePack components
+from .msgpack import MessagePackWriter, MessagePackReader
 
-__all__ = ["FileReader", "DatabaseWriter"]
+__all__ = [
+    # MessagePack classes
+    "MessagePackWriter",
+    "MessagePackReader",
+]

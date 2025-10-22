@@ -26,7 +26,6 @@ class TestGed2GwbConverter:
         self.options = ConversionOptions(
             input_file=self.sample_gedcom,
             output_file=Path("test_converter.pkl"),
-            compress=False,
         )
 
     def teardown_method(self):
@@ -172,7 +171,6 @@ class TestGed2GwbConverter:
             input_file=self.sample_gedcom,
             output_file=Path("test.pkl"),
             base_dir=Path("/tmp"),
-            compress=False,
         )
         converter_with_base_dir = Ged2GwbConverter(options_with_base_dir)
         path = converter_with_base_dir._get_output_path()
@@ -186,12 +184,10 @@ class TestGed2GwbConverter:
         assert "input_file" in info
         assert "output_file" in info
         assert "format" in info
-        assert "compression" in info
         assert "charset" in info
         assert "options" in info
 
-        assert info["format"] == "pickle"
-        assert info["compression"] is False
+        assert info["format"] == "messagepack"
         assert info["charset"] is None
 
     @patch("ged2gwb.core.converter.GedcomToGenewebConverter")
@@ -213,8 +209,7 @@ class TestGed2GwbConverter:
         # Mock the save method
         with patch.object(converter, "_save_geneweb_data") as mock_save:
             mock_save.return_value = {
-                "format": "pickle",
-                "compressed": False,
+                "format": "messagepack",
                 "file_path": "test_converter.pkl",
                 "file_size": 1000,
                 "serialization_time": 0.1,
@@ -231,42 +226,7 @@ class TestGed2GwbConverter:
             assert "input_file" in stats
             assert "output_file" in stats
             assert "format" in stats
-            assert "compressed" in stats
 
-    @patch("ged2gwb.core.converter.GedcomToGenewebConverter")
-    @patch("ged2gwb.core.converter.create_parser")
-    def test_convert_with_compression(self, mock_parser_class, mock_converter_class):
-        """Test conversion with compression."""
-        options = ConversionOptions(
-            input_file=self.sample_gedcom,
-            output_file=Path("test_compressed.pkl"),
-            compress=True,
-        )
-
-        # Mock the parser
-        mock_parser = MagicMock()
-        mock_parser_class.return_value = mock_parser
-        mock_parser.parse_file.return_value = MagicMock()
-
-        # Mock the converter
-        mock_converter = MagicMock()
-        mock_converter_class.return_value = mock_converter
-        mock_converter.convert.return_value = {"geneweb_data": MagicMock()}
-
-        converter = Ged2GwbConverter(options)
-
-        # Mock the save method
-        with patch.object(converter, "_save_geneweb_data") as mock_save:
-            mock_save.return_value = {
-                "file_path": "test_compressed.pkl.gz",
-                "file_size": 500,
-                "serialization_time": 0.05,
-            }
-
-            stats = converter.convert()
-
-            assert stats["compressed"] is True
-            assert stats["file_path"] == "test_compressed.pkl.gz"
 
     @patch("ged2gwb.core.converter.GedcomToGenewebConverter")
     @patch("ged2gwb.core.converter.create_parser")
@@ -303,23 +263,17 @@ class TestGed2GwbConverter:
         mock_data.strings = {}
 
         # Mock the writer
-        with patch("lib.db_pickle.io.writer.PickleWriter") as mock_writer_class:
+        with patch("lib.db.io.msgpack.MessagePackWriter") as mock_writer_class:
             mock_writer = MagicMock()
             mock_writer_class.return_value = mock_writer
-            mock_writer.save_database.return_value = {
-                "file_path": "test_converter.pkl",
-                "file_size": 1000,
-                "save_time": 0.1,
-                "persons_count": 3,
-                "families_count": 2,
-            }
+            mock_writer.write_database.return_value = "test_converter.msgpack"
 
-            result = converter._save_geneweb_data(mock_data, Path("test.pkl"))
+            result = converter._save_geneweb_data(mock_data, Path("test.msgpack"))
 
             assert "file_path" in result
-            assert "file_size" in result
+            assert result["format"] == "messagepack"
             assert "serialization_time" in result
-            mock_writer.save_database.assert_called_once()
+            mock_writer.write_database.assert_called_once()
 
 
 def main():
