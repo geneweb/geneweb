@@ -1,6 +1,6 @@
 let add b f l = if b then f :: l else l
 
-let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
+let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~f_spouses ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
     ~invalid_strings ~key bname =
   let v1 = !verbosity >= 1 in
@@ -21,6 +21,9 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   in
   let family_fixes =
     add !f_children Geneweb.Fixbase.fix_family_children family_fixes
+  in
+  let family_fixes =
+    add !f_spouses Geneweb.Fixbase.fix_family_spouses family_fixes
   in
   let person_fixes =
     add !p_parents Geneweb.Fixbase.fix_person_parents person_fixes
@@ -113,6 +116,7 @@ let verbosity = ref 2
 let fast = ref false
 let f_parents = ref false
 let f_children = ref false
+let f_spouses = ref false
 let p_parents = ref false
 let p_families = ref false
 let p_NBDS = ref false
@@ -132,6 +136,7 @@ let speclist =
     ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
     ("-families-parents", Arg.Set f_parents, " missing doc");
     ("-families-children", Arg.Set f_children, " missing doc");
+    ("-families-spouses", Arg.Set f_spouses, " missing doc");
     ("-persons-NBDS", Arg.Set p_NBDS, " missing doc");
     ("-persons-parents", Arg.Set p_parents, " missing doc");
     ("-persons-families", Arg.Set p_families, " missing doc");
@@ -157,13 +162,14 @@ let main () =
   Lock.control (Files.lock_file !bname) false ~onerror:Lock.print_try_again
   @@ fun () ->
   if
-    !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
-    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_strings
-    || !key || !index
+    !f_parents || !f_children || !f_spouses || !p_parents || !p_families
+    || !pevents_witnesses || !fevents_witnesses || !marriage_divorce || !p_NBDS
+    || !invalid_strings || !key || !index
   then ()
   else (
     f_parents := true;
     f_children := true;
+    f_spouses := true;
     p_parents := true;
     p_families := true;
     pevents_witnesses := true;
@@ -172,8 +178,8 @@ let main () =
     p_NBDS := true;
     invalid_strings := true;
     key := true);
-  check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
-    ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_strings ~key !bname
+  check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~f_spouses ~p_NBDS
+    ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
+    ~marriage_divorce ~invalid_strings ~key !bname
 
 let () = main ()
