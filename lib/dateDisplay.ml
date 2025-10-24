@@ -145,10 +145,10 @@ let replace_spaces_by_nbsp s =
   in
   loop 0 0
 
-let string_of_prec_dmy conf s s2 d =
+let string_of_prec_dmy conf s s2 precision =
   Adef.safe
   @@
-  match d.Date.prec with
+  match precision with
   | Date.Sure -> Mutil.nominative s
   | Date.About -> Util.transl_decline conf "about (date)" s
   | Date.Before -> Util.transl_decline conf "before (date)" s
@@ -220,7 +220,11 @@ let string_of_on_prec_dmy conf sy sy2 d =
   replace_spaces_by_nbsp r
 
 let string_of_on_dmy conf d = string_of_dmy_aux string_of_on_prec_dmy conf d
-let string_of_dmy conf d = string_of_dmy_aux string_of_prec_dmy conf d
+
+let string_of_dmy conf d =
+  string_of_dmy_aux
+    (fun conf s s2 d -> string_of_prec_dmy conf s s2 d.Date.prec)
+    conf d
 
 let gregorian_precision conf d =
   if d.Date.delta = 0 then string_of_dmy conf d
@@ -425,7 +429,7 @@ let string_slash_of_date conf date =
         ^ " " ^ sy2
     | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After ->
         let sy = code fst snd trd in
-        (string_of_prec_dmy conf sy "" d :> string)
+        (string_of_prec_dmy conf sy "" d.Date.prec :> string)
   in
   match date with
   | Date.Dtext t -> (Util.escape_html t :> Adef.safe_string)

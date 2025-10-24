@@ -103,10 +103,9 @@ val string_of_prec_dmy :
   Config.config ->
   Adef.safe_string ->
   Adef.safe_string ->
-  Date.dmy ->
+  Date.precision ->
   Adef.safe_string
-(** [string_of_prec_dmy conf s s2 d]
+(** [string_of_prec_dmy conf s s2 precision]
     Takes two date representations (as strings) [s] and [s2] and
-    returns translated phrase according to prec of [d].
-    [d] is only used to determine the precision
+    returns translated phrase according to the given [precision].
  *)
