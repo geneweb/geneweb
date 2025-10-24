@@ -227,7 +227,7 @@ let string_of_dmy conf d =
     conf d
 
 let gregorian_precision conf d =
-  if d.Date.delta = 0 then string_of_dmy conf d
+  if d.Date.delta = 0 then string_of_dmy conf { d with Date.prec = Date.Sure }
   else
     let d2 =
       let sdn = d.Date.delta + Date.to_sdn ~from:Date.Dgregorian d in
@@ -236,11 +236,11 @@ let gregorian_precision conf d =
     Adef.safe
     @@ Util.transl conf "between (date)"
     ^ " "
-    ^ (string_of_on_dmy conf d :> string)
+    ^ (string_of_on_dmy conf { d with Date.prec = Date.Sure } :> string)
     ^ " "
     ^ Util.transl_nth conf "and" 0
     ^ " "
-    ^ (string_of_on_dmy conf d2 :> string)
+    ^ (string_of_on_dmy conf { d2 with Date.prec = Date.Sure } :> string)
 
 let string_of_on_french_dmy conf d =
   let sy = code_french_date conf d.Date.day d.Date.month d.Date.year in
