@@ -137,6 +137,39 @@ let code_hebrew_date conf d m y =
   in
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 
+let replace_spaces_by_nbsp s =
+  let rec loop i len =
+    if i = String.length s then Buff.get len
+    else if s.[i] = ' ' then loop (i + 1) (Buff.mstore len "&nbsp;")
+    else loop (i + 1) (Buff.store len s.[i])
+  in
+  loop 0 0
+
+let string_of_prec_dmy conf s s2 d =
+  Adef.safe
+  @@
+  match d.Date.prec with
+  | Date.Sure -> Mutil.nominative s
+  | Date.About -> Util.transl_decline conf "about (date)" s
+  | Date.Before -> Util.transl_decline conf "before (date)" s
+  | Date.After -> Util.transl_decline conf "after (date)" s
+  | Date.Maybe -> Util.transl_decline conf "possibly (date)" s
+  | Date.OrYear _ -> s ^ " " ^ Util.transl conf "or" ^ " " ^ Mutil.nominative s2
+  | Date.YearInt _ ->
+      Util.transl conf "between (date)"
+      ^ " " ^ s ^ " "
+      ^ Util.transl_nth conf "and" 0
+      ^ " " ^ Mutil.nominative s2
+
+let string_of_dmy_aux fn conf d =
+  let sy = code_dmy conf d in
+  let sy2 =
+    match d.Date.prec with
+    | Date.OrYear d2 | Date.YearInt d2 -> code_dmy conf (Date.dmy_of_dmy2 d2)
+    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
+  in
+  fn conf sy sy2 d
+
 let string_of_on_prec_dmy_aux conf sy sy2 d =
   let string_of_dmy d m s =
     if d = 0 && m = 0 then Util.transl conf "in (year)" ^ " " ^ s
@@ -180,19 +213,30 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
       ^ Util.transl_nth conf "and" 0
       ^ " " ^ Mutil.nominative s2
 
-let replace_spaces_by_nbsp s =
-  let rec loop i len =
-    if i = String.length s then Buff.get len
-    else if s.[i] = ' ' then loop (i + 1) (Buff.mstore len "&nbsp;")
-    else loop (i + 1) (Buff.store len s.[i])
-  in
-  loop 0 0
-
 let string_of_on_prec_dmy conf sy sy2 d =
   Adef.safe
   @@
   let r = string_of_on_prec_dmy_aux conf sy sy2 d in
   replace_spaces_by_nbsp r
+
+let string_of_on_dmy conf d = string_of_dmy_aux string_of_on_prec_dmy conf d
+let string_of_dmy conf d = string_of_dmy_aux string_of_prec_dmy conf d
+
+let gregorian_precision conf d =
+  if d.Date.delta = 0 then string_of_dmy conf d
+  else
+    let d2 =
+      let sdn = d.Date.delta + Date.to_sdn ~from:Date.Dgregorian d in
+      Date.gregorian_of_sdn ~prec:d.Date.prec sdn
+    in
+    Adef.safe
+    @@ Util.transl conf "between (date)"
+    ^ " "
+    ^ (string_of_on_dmy conf d :> string)
+    ^ " "
+    ^ Util.transl_nth conf "and" 0
+    ^ " "
+    ^ (string_of_on_dmy conf d2 :> string)
 
 let string_of_on_french_dmy conf d =
   let sy = code_french_date conf d.Date.day d.Date.month d.Date.year in
@@ -213,34 +257,6 @@ let string_of_on_hebrew_dmy conf d =
     | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
   string_of_on_prec_dmy conf sy sy2 d
-
-let string_of_prec_dmy conf s s2 d =
-  Adef.safe
-  @@
-  match d.Date.prec with
-  | Date.Sure -> Mutil.nominative s
-  | Date.About -> Util.transl_decline conf "about (date)" s
-  | Date.Before -> Util.transl_decline conf "before (date)" s
-  | Date.After -> Util.transl_decline conf "after (date)" s
-  | Date.Maybe -> Util.transl_decline conf "possibly (date)" s
-  | Date.OrYear _ -> s ^ " " ^ Util.transl conf "or" ^ " " ^ Mutil.nominative s2
-  | Date.YearInt _ ->
-      Util.transl conf "between (date)"
-      ^ " " ^ s ^ " "
-      ^ Util.transl_nth conf "and" 0
-      ^ " " ^ Mutil.nominative s2
-
-let string_of_dmy_aux fn conf d =
-  let sy = code_dmy conf d in
-  let sy2 =
-    match d.Date.prec with
-    | Date.OrYear d2 | Date.YearInt d2 -> code_dmy conf (Date.dmy_of_dmy2 d2)
-    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
-  in
-  fn conf sy sy2 d
-
-let string_of_on_dmy conf d = string_of_dmy_aux string_of_on_prec_dmy conf d
-let string_of_dmy conf d = string_of_dmy_aux string_of_prec_dmy conf d
 
 (* ************************************************************************ *)
 (* [Fonc] translate_dmy : config -> (string * string * string) ->
@@ -333,22 +349,6 @@ let decode_dmy conf d =
           let d = Printf.sprintf "%02d" day in
           let m = Printf.sprintf "%02d" month in
           (d, m, string_of_int year))
-
-let gregorian_precision conf d =
-  if d.Date.delta = 0 then string_of_dmy conf d
-  else
-    let d2 =
-      let sdn = d.Date.delta + Date.to_sdn ~from:Date.Dgregorian d in
-      Date.gregorian_of_sdn ~prec:d.Date.prec sdn
-    in
-    Adef.safe
-    @@ Util.transl conf "between (date)"
-    ^ " "
-    ^ (string_of_on_dmy conf d :> string)
-    ^ " "
-    ^ Util.transl_nth conf "and" 0
-    ^ " "
-    ^ (string_of_on_dmy conf d2 :> string)
 
 let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = Adef.safe " ") conf =
   function
