@@ -200,7 +200,7 @@ let string_of_on_french_dmy conf d =
     match d.Date.prec with
     | Date.OrYear d2 | Date.YearInt d2 ->
         code_french_date conf d2.Date.day2 d2.Date.month2 d2.Date.year2
-    | _ -> ""
+    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
   string_of_on_prec_dmy conf sy sy2 d
 
@@ -210,7 +210,7 @@ let string_of_on_hebrew_dmy conf d =
     match d.Date.prec with
     | Date.OrYear d2 | Date.YearInt d2 ->
         code_hebrew_date conf d2.Date.day2 d2.Date.month2 d2.Date.year2
-    | _ -> ""
+    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
   string_of_on_prec_dmy conf sy sy2 d
 
@@ -235,7 +235,7 @@ let string_of_dmy_aux fn conf d =
   let sy2 =
     match d.Date.prec with
     | Date.OrYear d2 | Date.YearInt d2 -> code_dmy conf (Date.dmy_of_dmy2 d2)
-    | _ -> ""
+    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
   fn conf sy sy2 d
 
@@ -270,14 +270,14 @@ let translate_dmy conf (fst, snd, trd) cal short =
           String.uppercase_ascii
             (String.sub (hebrew_month conf (int_of_string m)) 0 2)
         else hebrew_month conf (int_of_string m)
-    | _ -> m
+    | Date.Dgregorian | Date.Djulian | Date.Dfrench | Date.Dhebrew -> m
   in
   let translate_year y =
     match cal with
     | Date.Dfrench ->
         let y1 = int_of_string y in
         if y1 >= 1 && y1 < 4000 then Mutil.roman_of_arabian y1 else y
-    | _ -> y
+    | Date.Dgregorian | Date.Djulian | Date.Dhebrew -> y
   in
   match Util.transl conf "!dates order" with
   | "yymmdd" | "yyyymmdd" -> (translate_year fst, translate_month snd, trd)
@@ -423,7 +423,7 @@ let string_slash_of_date conf date =
         ^ " " ^ sy ^ " "
         ^ Util.transl_nth conf "and" 0
         ^ " " ^ sy2
-    | _ ->
+    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After ->
         let sy = code fst snd trd in
         (string_of_prec_dmy conf sy "" d :> string)
   in
@@ -529,7 +529,9 @@ let year_text d =
       string_of_int d.Date.year ^ "/" ^ string_of_int d2.Date.year2
   | Date.YearInt d2 when d.Date.year <> d2.Date.year2 ->
       string_of_int d.Date.year ^ ".." ^ string_of_int d2.Date.year2
-  | _ -> string_of_int d.Date.year
+  | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After
+  | Date.OrYear _ | Date.YearInt _ ->
+      string_of_int d.Date.year
 
 (* ************************************************************************ *)
 (*  [Fonc] prec_year_text : config -> Date.dmy -> string                     *)
@@ -553,10 +555,14 @@ let prec_year_text conf d =
         | s -> s)
     | Date.Maybe -> "?"
     | Date.Before -> "/"
-    | _ -> ""
+    | Date.Sure | Date.After | Date.OrYear _ | Date.YearInt _ -> ""
   in
   let s = s ^ year_text d in
-  match d.Date.prec with Date.After -> s ^ "/" | _ -> s
+  match d.Date.prec with
+  | Date.After -> s ^ "/"
+  | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.OrYear _
+  | Date.YearInt _ ->
+      s
 
 (* ********************************************************************** *)
 (*  [Fonc] short_dates_text : config -> base -> person -> string          *)
