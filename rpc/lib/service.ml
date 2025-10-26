@@ -1,6 +1,7 @@
 module Y = Yojson.Safe
 module U = Yojson.Safe.Util
 module MS = Map.Make (String)
+module Compat = Geneweb_compat
 open Lwt.Infix
 
 type error = [ Encoding.error | `Bad_arity ]
@@ -67,4 +68,43 @@ module PingPong = struct
       (fun s -> Lwt_result.return s)
 
   let srv = empty |> add ping |> add echo
+end
+
+module Index = Geneweb_search.Index.Default
+module Analyze = Geneweb_search.Analyze
+
+module Search = struct
+  let lookup idx =
+    decl "lookup"
+      Desc.Syntax.(tup2 string string @-> ret (list string))
+      (fun (name, s) ->
+        match List.assoc name idx with
+        | exception Not_found ->
+            (* TODO: Methods could fail and emit errors. We can implement
+               this by changing the return type of method into Lwt_result.t *)
+            Lwt_result.return []
+        | i ->
+            let words =
+              List.map
+                (fun Analyze.{ content; _ } -> content)
+                (Analyze.preprocess s)
+            in
+            (* We look up for entries in the following order of priority:
+                1. Entries that exactly match all the [words].
+                2. Entries that match prefixes of all the [words].
+                3. Entries that match prefixes of all the [words] up to
+                   Levenshtein distance of 1. *)
+            let r =
+              List.of_seq @@ Compat.Seq.take 10 @@ Compat.Seq.concat
+              (* BUG: We can introduce duplicate in the output here. *)
+              @@ List.to_seq
+                   [
+                     Index.search words i;
+                     Index.search_prefix words i;
+                     Index.fuzzy_search ~max_dist:1 words i;
+                   ]
+            in
+            Lwt_result.return r)
+
+  let make idx = empty |> add (lookup idx)
 end
