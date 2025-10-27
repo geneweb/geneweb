@@ -27,7 +27,7 @@ val string_of_ondate : Config.config -> Date.date -> Adef.safe_string
     Date precision is much more verbose then with [string_of_date]. Decline phrase if needed. *)
 
 val string_of_on_calendar_dmy :
-  calendar:[< `French | `Hebrew ] ->
+  calendar:[< `Julian | `French | `Hebrew ] ->
   Config.config ->
   Date.dmy ->
   Adef.safe_string

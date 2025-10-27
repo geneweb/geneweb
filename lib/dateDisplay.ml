@@ -259,11 +259,17 @@ and gregorian_precision conf d =
     ^ " "
     ^ (string_of_on_dmy conf { d2 with Date.prec = Date.Sure } :> string)
 
-let to_calendar = function `French -> Date.Dfrench | `Hebrew -> Date.Dhebrew
+let to_calendar = function
+  | `Julian -> Date.Djulian
+  | `French -> Date.Dfrench
+  | `Hebrew -> Date.Dhebrew
 
 let string_of_on_calendar_dmy ~calendar conf d =
   let format_date ~conf d =
     match calendar with
+    | `Julian ->
+        Printf.sprintf "%s %s" (code_dmy conf d)
+          (Util.transl_nth conf "gregorian/julian/french/hebrew" 1)
     | `French -> code_french_date conf d.Date.day d.Date.month d.Date.year
     | `Hebrew -> code_hebrew_date conf d.Date.day d.Date.month d.Date.year
   in
@@ -389,25 +395,7 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = Adef.safe " ") conf =
       match calendar with
       | Date.Dgregorian -> dmy conf d
       | Date.Djulian ->
-          let cal_prec =
-            if d.Date.year < 1582 then Adef.safe ""
-            else
-              let open Def in
-              " (" ^<^ gregorian_precision conf d ^>^ ")"
-          in
-          (* Julian calendar new year's date changes across time and space *)
-          let year_prec =
-            if
-              (d1.Date.month > 0 && d1.Date.month < 3)
-              || (d1.Date.month = 3 && d1.Date.day > 0 && d1.Date.day < 25)
-            then
-              Printf.sprintf " (%d/%d)" (d1.Date.year - 1) (d1.Date.year mod 10)
-            else ""
-          in
-          let open Def in
-          dmy conf d1 ^^^ year_prec ^<^ sep
-          ^^^ Util.transl_nth conf "gregorian/julian/french/hebrew" 1
-          ^<^ cal_prec
+          format_date_with_gregorian_precisions ~sep ~conf ~calendar:`Julian d1
       | Date.Dfrench ->
           format_date_with_gregorian_precisions ~sep ~conf ~calendar:`French d1
       | Date.Dhebrew ->
