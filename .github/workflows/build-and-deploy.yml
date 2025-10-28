@@ -1,0 +1,59 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  # Run Python tests first to determine if we can use Python binaries
+  python-tests:
+    uses: ./.github/workflows/working-branch.yml
+    secrets: inherit
+
+  # Run OCaml CI tests in parallel
+  ci-tests:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  # Build Docker image based on test results
+  docker-build:
+    needs: [python-tests, ci-tests]
+    if: always() && github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/docker.yml
+    with:
+      use_python_binaries: ${{ needs.python-tests.outputs.use-python-binaries == 'true' && needs.ci-tests.result == 'success' }}
+    secrets: inherit
+
+  # Deploy notification
+  deploy-status:
+    needs: [python-tests, ci-tests, docker-build]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/master'
+    steps:
+      - name: Deployment Status
+        run: |
+          echo "=== Deployment Summary ==="
+          echo "Python Tests Result: ${{ needs.python-tests.result }}"
+          echo "CI Tests Result: ${{ needs.ci-tests.result }}"
+          echo "Use Python Binaries: ${{ needs.python-tests.outputs.use-python-binaries }}"
+          echo "Docker Build Result: ${{ needs.docker-build.result }}"
+          
+          if [[ "${{ needs.python-tests.outputs.use-python-binaries }}" == "true" && "${{ needs.ci-tests.result }}" == "success" ]]; then
+            echo "✅ Docker image built with Python binaries (all tests passed)"
+          else
+            echo "🔄 Docker image built with OCaml binaries (fallback)"
+            if [[ "${{ needs.python-tests.result }}" != "success" ]]; then
+              echo "   → Python tests failed"
+            fi
+            if [[ "${{ needs.ci-tests.result }}" != "success" ]]; then
+              echo "   → OCaml CI tests failed"
+            fi
+          fi
+          
+          if [[ "${{ needs.docker-build.result }}" == "success" ]]; then
+            echo "🚀 Docker image successfully pushed to registry"
+          else
+            echo "❌ Docker build failed"
+          fi

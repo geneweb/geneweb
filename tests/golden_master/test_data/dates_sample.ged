@@ -1,0 +1,29 @@
+0 HEAD
+1 SOUR Test Dates
+1 GEDC
+2 VERS 5.5
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Test /DATES/
+1 SEX M
+1 BIRT
+2 DATE 01/15/1950
+2 PLAC Test Place
+1 NOTE Test avec dates numériques ambiguës
+0 @I2@ INDI
+1 NAME Test2 /DATES/
+1 SEX F
+1 BIRT
+2 DATE 12/03/1955
+2 PLAC Test Place 2
+1 NOTE Autre test avec dates numériques
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 MARR
+2 DATE 06/20/1975
+2 PLAC Test Marriage Place
+0 TRLR
+
+

@@ -2,7 +2,7 @@ name: Working Branch Checks
 
 on:
   push:
-    branches: '*'
+    branches: '*'  # Include master - this workflow contains the Python tests
   pull_request:
     branches: [master]
   workflow_dispatch:
@@ -10,6 +10,9 @@ on:
 jobs:
   task-branch-check:
     runs-on: ubuntu-22.04
+    outputs:
+      python-tests-passed: ${{ steps.test-results.outputs.python-tests-passed }}
+      use-python-binaries: ${{ steps.test-results.outputs.use-python-binaries }}
 
     steps:
       - name: Checkout code
@@ -111,3 +114,18 @@ jobs:
             src/python/tests/reports/
             src/python/tests/
           retention-days: 7
+
+      - name: Capture Test Results
+        id: test-results
+        if: always()
+        run: |
+          # Check if all previous steps succeeded
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "python-tests-passed=true" >> $GITHUB_OUTPUT
+            echo "use-python-binaries=true" >> $GITHUB_OUTPUT
+            echo "✅ All Python tests passed - Python binaries can be used"
+          else
+            echo "python-tests-passed=false" >> $GITHUB_OUTPUT
+            echo "use-python-binaries=false" >> $GITHUB_OUTPUT
+            echo "❌ Python tests failed - OCaml binaries will be used as fallback"
+          fi

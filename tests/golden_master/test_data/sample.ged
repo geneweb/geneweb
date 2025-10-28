@@ -1,0 +1,71 @@
+0 HEAD
+1 SOUR GeneWeb Golden Master Test
+2 VERS 1.0
+1 DEST ANY
+1 DATE 01 JAN 2024
+1 SUBM @SUBM1@
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @SUBM1@ SUBM
+1 NAME Test Submitter
+1 ADDR Test Address
+2 CONT Line 2
+2 CITY Test City
+2 POST 12345
+2 CTRY France
+0 @I1@ INDI
+1 NAME Jean Baptiste /DUPONT/
+2 GIVN Jean Baptiste
+2 SURN DUPONT
+1 SEX M
+1 BIRT
+2 DATE 01 JAN 1950
+2 PLAC Paris, Île-de-France, France
+1 DEAT
+2 DATE 31 DEC 2020
+2 PLAC Lyon, Auvergne-Rhône-Alpes, France
+1 OCCU Ingénieur
+1 RELI Catholique
+1 NOTE Personne de test pour Golden Master
+0 @I2@ INDI
+1 NAME Marie Jeanne /MARTIN/
+2 GIVN Marie Jeanne
+2 SURN MARTIN
+1 SEX F
+1 BIRT
+2 DATE 15 JUN 1955
+2 PLAC Marseille, Provence-Alpes-Côte d'Azur, France
+1 OCCU Professeure
+1 NOTE Épouse de Jean Baptiste DUPONT
+0 @I3@ INDI
+1 NAME Pierre /DUPONT/
+2 GIVN Pierre
+2 SURN DUPONT
+1 SEX M
+1 BIRT
+2 DATE 20 MAR 1980
+2 PLAC Nice, Provence-Alpes-Côte d'Azur, France
+1 NOTE Fils de Jean Baptiste et Marie Jeanne
+0 @I4@ INDI
+1 NAME Sophie /DUPONT/
+2 GIVN Sophie
+2 SURN DUPONT
+1 SEX F
+1 BIRT
+2 DATE 12 SEP 1982
+2 PLAC Toulouse, Occitanie, France
+1 NOTE Fille de Jean Baptiste et Marie Jeanne
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 CHIL @I3@
+1 CHIL @I4@
+1 MARR
+2 DATE 10 JUL 1975
+2 PLAC Nice, Provence-Alpes-Côte d'Azur, France
+1 NOTE Mariage principal de la famille test
+0 TRLR
+
+

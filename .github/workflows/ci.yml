@@ -1,6 +1,14 @@
 name: GeneWeb CI
 on:
   workflow_dispatch:
+  workflow_call:
+    outputs:
+      all-tests-passed:
+        description: "Whether all tests passed"
+        value: ${{ jobs.build-results.outputs.all-tests-passed }}
+      use-python-binaries:
+        description: "Whether to use Python binaries"
+        value: ${{ jobs.build-results.outputs.use-python-binaries }}
   pull_request:
     branches:
       - master
@@ -29,33 +37,7 @@ on:
       - '.ocamlformat-ignore'
       - 'geneweb.iss'
       - 'geneweb.opam.template'
-  push:
-    branches:
-      - master
-    paths:
-      - '**/*.ml'
-      - '**/*.mli'
-      - '.ocamlformat'
-      - 'dune'
-      - 'dune-project'
-      - '**/*.opam'
-    paths-ignore:
-      - 'etc/**'
-      - 'hd/**'
-      - 'man/**'
-      - '**/*.md'
-      - 'geneweb_colab.ipynb'
-      - 'ICHANGES'
-      - 'INSTALL'
-      - 'LICENSE'
-      - 'CHANGES'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.git-blame-ignore-revs'
-      - '.ocamlformat'
-      - '.ocamlformat-ignore'
-      - 'geneweb.iss'
-      - 'geneweb.opam.template'
+  # Removed push trigger for master - now only called by build-and-deploy.yml
 
 env:
   OPAMYES: true
@@ -203,9 +185,26 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && 'production' || '' }}
     if: always()
+    outputs:
+      all-tests-passed: ${{ steps.check-tests.outputs.all-tests-passed }}
+      use-python-binaries: ${{ steps.check-tests.outputs.use-python-binaries }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
+      - name: Check Overall Test Results
+        id: check-tests
+        run: |
+          # Check if all builds succeeded and all tests passed
+          if [[ "${{ needs.build.result }}" == "success" ]]; then
+            echo "all-tests-passed=true" >> $GITHUB_OUTPUT
+            echo "use-python-binaries=true" >> $GITHUB_OUTPUT
+            echo "✅ All tests passed - Python binaries will be used"
+          else
+            echo "all-tests-passed=false" >> $GITHUB_OUTPUT
+            echo "use-python-binaries=false" >> $GITHUB_OUTPUT
+            echo "❌ Tests failed - OCaml binaries will be used as fallback"
+          fi
 
       - name: Generate Build Summary
         uses: ./.github/actions/ci-utils

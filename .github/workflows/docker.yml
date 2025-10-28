@@ -2,41 +2,31 @@ name: Build GeneWeb Docker image
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - '**/*.ml'
-      - '**/*.mli'
-      - '.ocamlformat'
-      - 'dune'
-      - 'dune-project'
-      - '**/*.opam'
-    paths-ignore:
-      - 'etc/**'
-      - 'hd/**'
-      - 'man/**'
-      - '**/*.md'
-      - 'geneweb_colab.ipynb'
-      - 'ICHANGES'
-      - 'INSTALL'
-      - 'LICENSE'
-      - 'CHANGES'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.git-blame-ignore-revs'
-      - '.ocamlformat'
-      - '.ocamlformat-ignore'
-      - 'geneweb.iss'
-      - 'geneweb.opam.template'
+    inputs:
+      use_python_binaries:
+        description: 'Use Python binaries instead of OCaml'
+        required: false
+        default: 'false'
+        type: boolean
+  workflow_call:
+    inputs:
+      use_python_binaries:
+        description: 'Use Python binaries instead of OCaml'
+        required: false
+        default: false
+        type: boolean
+  # Removed push trigger for master - now only called by build-and-deploy.yml
   pull_request:
     paths:
       - '**/*.ml'
       - '**/*.mli'
+      - '**/*.py'
       - '.ocamlformat'
       - 'dune'
       - 'dune-project'
       - '**/*.opam'
+      - 'src/python/**'
+      - 'docker/**'
     paths-ignore:
       - 'etc/**'
       - 'hd/**'
@@ -58,6 +48,7 @@ on:
 env:
   IMAGE_NAME: 'geneweb'
   PUSH_IMAGE: ${{ github.ref == 'refs/heads/master' }}
+  USE_PYTHON_BINARIES: ${{ inputs.use_python_binaries || 'false' }}
 
 jobs:
   build-amd64:
@@ -120,6 +111,7 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
             BUILDKIT_PROGRESS=plain
             FAST_BUILD=${{ github.ref != 'refs/heads/master' && '1' || '0' }}
+            USE_PYTHON_BINARIES=${{ env.USE_PYTHON_BINARIES }}
 
   build-arm64:
     runs-on: ubuntu-latest
@@ -183,3 +175,4 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
             BUILDKIT_PROGRESS=plain
             FAST_BUILD=${{ github.ref != 'refs/heads/master' && '1' || '0' }}
+            USE_PYTHON_BINARIES=${{ env.USE_PYTHON_BINARIES }}
