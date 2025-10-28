@@ -26,12 +26,12 @@ val string_of_ondate : Config.config -> Date.date -> Adef.safe_string
     before dates (changes for other languages).
     Date precision is much more verbose then with [string_of_date]. Decline phrase if needed. *)
 
-val string_of_on_french_dmy : Config.config -> Date.dmy -> Adef.safe_string
-(** Translate a date in the french calendar
-    with prefix "on" before dates (changes for other languages). *)
-
-val string_of_on_hebrew_dmy : Config.config -> Date.dmy -> Adef.safe_string
-(** Translate a date in the hebrew calendar
+val string_of_on_calendar_dmy :
+  calendar:[< `French | `Hebrew ] ->
+  Config.config ->
+  Date.dmy ->
+  Adef.safe_string
+(** Translate a date in the [calendar]
     with prefix "on" before dates (changes for other languages). *)
 
 val string_slash_of_date : Config.config -> Date.date -> Adef.safe_string

@@ -278,25 +278,33 @@ and gregorian_precision conf d =
   in
   Adef.safe s
 
-let string_of_on_french_dmy conf d =
-  let sy = code_french_date conf d.Date.day d.Date.month d.Date.year in
-  let sy2 =
-    match d.Date.prec with
-    | Date.OrYear d2 | Date.YearInt d2 ->
-        code_french_date conf d2.Date.day2 d2.Date.month2 d2.Date.year2
-    | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
-  in
-  string_of_on_prec_dmy ~calendar:Date.Dfrench conf sy sy2 d
+let to_calendar = function `French -> Date.Dfrench | `Hebrew -> Date.Dhebrew
 
-let string_of_on_hebrew_dmy conf d =
-  let sy = code_hebrew_date conf d.Date.day d.Date.month d.Date.year in
+let string_of_on_calendar_dmy ~calendar conf d =
+  let format_date ~conf d =
+    match calendar with
+    | `French -> code_french_date conf d.Date.day d.Date.month d.Date.year
+    | `Hebrew -> code_hebrew_date conf d.Date.day d.Date.month d.Date.year
+  in
+  let sy = format_date ~conf d in
   let sy2 =
     match d.Date.prec with
     | Date.OrYear d2 | Date.YearInt d2 ->
-        code_hebrew_date conf d2.Date.day2 d2.Date.month2 d2.Date.year2
+        format_date ~conf (Date.dmy_of_dmy2 d2)
     | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
-  string_of_on_prec_dmy ~calendar:Date.Dhebrew conf sy sy2 d
+  string_of_on_prec_dmy ~calendar:(to_calendar calendar) conf sy sy2 d
+
+let format_date_with_gregorian_precisions ~sep ~conf ~calendar d =
+  let s = string_of_on_calendar_dmy ~calendar conf d in
+  match d.Date.prec with
+  | Date.Sure | Date.About | Date.Before | Date.After | Date.Maybe ->
+      let open Def in
+      s ^^^ sep ^^^ " ("
+      ^<^ gregorian_precision conf
+            (Date.convert ~from:(to_calendar calendar) ~to_:Date.Dgregorian d)
+      ^>^ ")"
+  | Date.OrYear _ | Date.YearInt _ -> s
 
 (* ************************************************************************ *)
 (* [Fonc] translate_dmy : config -> (string * string * string) ->
@@ -419,20 +427,10 @@ let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = Adef.safe " ") conf =
           dmy conf d1 ^^^ year_prec ^<^ sep
           ^^^ Util.transl_nth conf "gregorian/julian/french/hebrew" 1
           ^<^ cal_prec
-      | Date.Dfrench -> (
-          let s = string_of_on_french_dmy conf d1 in
-          match d.Date.prec with
-          | Date.Sure | Date.About | Date.Before | Date.After | Date.Maybe ->
-              let open Def in
-              s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
-          | Date.OrYear _ | Date.YearInt _ -> s)
-      | Date.Dhebrew -> (
-          let s = string_of_on_hebrew_dmy conf d1 in
-          match d.Date.prec with
-          | Date.Sure | Date.About | Date.Before | Date.After | Date.Maybe ->
-              let open Def in
-              s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
-          | Date.OrYear _ | Date.YearInt _ -> s))
+      | Date.Dfrench ->
+          format_date_with_gregorian_precisions ~sep ~conf ~calendar:`French d1
+      | Date.Dhebrew ->
+          format_date_with_gregorian_precisions ~sep ~conf ~calendar:`Hebrew d1)
 
 let string_of_ondate conf d =
   (string_of_date_aux ~dmy:string_of_on_dmy conf d :> string)
