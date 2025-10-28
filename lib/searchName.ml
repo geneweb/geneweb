@@ -895,9 +895,12 @@ let rec extract_name_components conf =
 (* Parse person name string into structured components *)
 and parse_person_name pn =
   let find_char c = try Some (String.index pn c) with Not_found -> None in
+  let find_last_char c =
+    try Some (String.rindex pn c) with Not_found -> None
+  in
   let slash_pos = find_char '/' in
   let dot_pos = find_char '.' in
-  let space_pos = find_char ' ' in
+  let space_pos = find_last_char ' ' in
   match (slash_pos, dot_pos, space_pos) with
   | None, None, None ->
       {
