@@ -240,6 +240,9 @@ function buildUrl(mode = 'RLM') {
   var params = new URLSearchParams();
   params.set('m', mode);
   if (mode === 'TP') params.set('v', 'updRLM');
+  var currentParams = new URLSearchParams(window.location.search);
+  var b = currentParams.get('b');
+  if (b) params.set('b', b);
   $('tbody tr:visible').each(function() {
     var $row = $(this);
     var firstName = $row.find("input[name='p']").val().trim();
