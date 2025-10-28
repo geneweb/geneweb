@@ -1,6 +1,6 @@
 # Deployment Strategy - OCaml to Python Migration
 
-## 🎯 Project Overview
+## Project Overview
 
 This document outlines the deployment strategy for migrating GeneWeb from OCaml to Python while maintaining system reliability and ensuring zero-downtime deployments.
 
@@ -10,11 +10,11 @@ This document outlines the deployment strategy for migrating GeneWeb from OCaml 
 - **Quality Assurance**: Maintain functionality through comprehensive testing
 - **Infrastructure**: Deploy using simple VMs on Google Cloud Platform with Terraform
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 The deployment strategy follows a three-tier approach: Development branches feed into the Master branch, which then deploys to Production. Each stage includes comprehensive testing with automatic fallback mechanisms to ensure system stability.
 
-## 🔄 Deployment Pipeline
+## Deployment Pipeline
 
 ### Phase 1: Development & Testing
 
@@ -40,7 +40,7 @@ The system automatically decides whether to use Python or OCaml binaries based o
 #### 3.2 Fallback Mechanism
 The deployment strategy prioritizes Python implementations as the primary choice while maintaining OCaml binaries as a reliable fallback. Decision criteria include Golden Master test results, performance benchmarks, integration test outcomes, and real-time error rates to ensure system stability.
 
-## 🐳 Docker Strategy
+## Docker Strategy
 
 ### 4.1 Multi-Stage Docker Build
 The Docker build process uses multi-stage builds to create containers that include both Python and OCaml implementations. This approach allows for runtime decision-making about which implementation to use based on test results and system health.
@@ -48,7 +48,7 @@ The Docker build process uses multi-stage builds to create containers that inclu
 ### 4.2 Container Strategy
 The containerization strategy employs base images optimized for both Python and OCaml environments. Health checks are integrated to monitor application status continuously. The system supports graceful degradation by automatically switching to OCaml implementations when Python versions encounter issues. Resource management is optimized to ensure efficient memory and CPU utilization across both implementations.
 
-## ☁️ Google Cloud Platform Deployment
+## Google Cloud Platform Deployment
 
 ### 5.1 Simple Infrastructure Components
 The GCP infrastructure uses a simplified approach with a VPC network containing public subnets for web servers and private subnets for database access. Compute Engine VMs serve as the primary deployment targets, with separate staging and production instances. An HTTP(S) Load Balancer provides high availability and traffic distribution. The Artifact Registry stores Docker images and application packages, while Cloud SQL provides managed database services. Comprehensive monitoring and logging are implemented through Cloud Monitoring, Cloud Logging, and Uptime Checks.
@@ -62,7 +62,7 @@ The infrastructure uses two primary VM configurations: a staging environment wit
 ### 5.4 VM Setup and Services
 Virtual machines are automatically configured with Docker for containerization, monitoring agents for observability, and systemd services for application management. The Python service runs on the primary port while the OCaml fallback service operates on an alternative port, allowing for seamless switching between implementations based on system health and test results.
 
-## 🚀 Deployment Workflow
+## Deployment Workflow
 
 ### 6.1 Automated Deployment Pipeline
 The deployment process begins when code is pushed to the master branch, automatically triggering the CI/CD pipeline. The system runs a complete test suite including Golden Master tests, builds Docker images for both Python and OCaml implementations, and pushes them to the Artifact Registry. New versions are first deployed to the staging VM for validation through smoke tests, then promoted to production with load balancer health check updates and continuous monitoring.
@@ -74,7 +74,7 @@ The deployment process begins when code is pushed to the master branch, automati
 - **Health Monitoring**: Uptime checks and automatic failover
 - **Deployment Method**: Docker containers on VMs with systemd services
 
-## 📊 Monitoring & Observability
+## Monitoring & Observability
 
 ### 7.1 Key Metrics
 The monitoring strategy tracks comprehensive performance metrics including response times at various percentiles, system throughput, error rates, and resource utilization. Database performance and user experience metrics provide insights into system health. Business metrics focus on feature adoption rates between Python and OCaml implementations, system reliability measurements, migration progress tracking, and cost optimization achievements.
@@ -84,7 +84,7 @@ The monitoring strategy tracks comprehensive performance metrics including respo
 - **Warning Alerts**: Performance degradation, resource limits
 - **Info Alerts**: Deployment status, migration milestones
 
-## 🔒 Security & Compliance
+## Security & Compliance
 
 ### 8.1 Security Measures
 - **Container Scanning**: Vulnerability assessment for all images
@@ -98,7 +98,7 @@ The monitoring strategy tracks comprehensive performance metrics including respo
 - **Backup Strategy**: Automated backups with point-in-time recovery
 - **Disaster Recovery**: Multi-region deployment capability
 
-## 🎛️ Configuration Management
+## Configuration Management
 
 ### 9.1 Environment Configuration
 Environment configurations are tailored for each deployment stage. Development environments enable Python implementations with OCaml fallback and debug mode for troubleshooting. Staging environments maintain Python enablement with fallback capabilities and enhanced performance monitoring. Production environments use automatic Python enablement based on test results while ensuring OCaml fallback is always available, with comprehensive monitoring across all systems.
@@ -108,7 +108,7 @@ Environment configurations are tailored for each deployment stage. Development e
 - **A/B Testing**: Compare Python vs OCaml performance
 - **Emergency Switches**: Instant fallback mechanisms
 
-## 📈 Migration Phases
+## Migration Phases
 
 ### Phase 1: Foundation (Weeks 1-4)
 - [ ] Set up CI/CD pipeline
@@ -134,7 +134,7 @@ Environment configurations are tailored for each deployment stage. Development e
 - [ ] Cost optimization
 - [ ] Documentation and knowledge transfer
 
-## 🔧 Troubleshooting & Rollback
+## Troubleshooting & Rollback
 
 ### 10.1 Rollback Scenarios
 1. **Automatic Rollback**: Failed health checks, high error rates
@@ -144,7 +144,7 @@ Environment configurations are tailored for each deployment stage. Development e
 ### 10.2 Rollback Procedure
 Emergency rollback procedures involve stopping the Python service and starting the OCaml fallback service on the production VM. The system verifies the rollback success by checking service status and updates load balancer health checks to route traffic to the OCaml implementation. Alternative rollback methods include direct Docker container management for immediate service switching.
 
-## 📚 Success Criteria
+## Success Criteria
 
 ### Technical Success Metrics
 - [ ] 100% Golden Master test pass rate
@@ -160,7 +160,7 @@ Emergency rollback procedures involve stopping the Python service and starting t
 - [ ] Cost optimization achieved
 - [ ] Team knowledge transfer completed
 
-## 🤝 Team Responsibilities
+## Team Responsibilities
 
 ### Development Team
 - Python implementation development
@@ -180,7 +180,7 @@ Emergency rollback procedures involve stopping the Python service and starting t
 - Performance testing
 - User acceptance testing
 
-## 📋 Risk Mitigation
+## Risk Mitigation
 
 ### High-Risk Scenarios
 1. **Python Performance Issues**: OCaml fallback ready
@@ -193,15 +193,6 @@ Emergency rollback procedures involve stopping the Python service and starting t
 - **Gradual Migration**: Phased approach with validation
 - **Monitoring**: Real-time system health tracking
 - **Rollback Plans**: Tested and automated procedures
-
----
-
-## 📞 Support & Contacts
-
-- **Technical Lead**: [Name] - [Email]
-- **DevOps Lead**: [Name] - [Email]
-- **Project Manager**: [Name] - [Email]
-- **Emergency Contact**: [On-call rotation]
 
 ---
 
