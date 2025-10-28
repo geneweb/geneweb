@@ -1120,11 +1120,22 @@ let execute_search_method conf base query method_ fn_options =
       results
   | ApproxKey ->
       let persons = search_approx_key conf base query in
-      (* split result if exact match on alias ?? *)
-      let results = List.map Driver.get_iper persons in
+      let exact_matches, partial_matches =
+        List.partition
+          (fun p ->
+            let iper = Driver.get_iper p in
+            match Some.AliasCache.get_alias iper with
+            | Some _ -> true
+            | None -> false)
+          persons
+      in
+      let exact_ipers = List.map Driver.get_iper exact_matches in
+      let partial_ipers = List.map Driver.get_iper partial_matches in
       Logs.debug (fun k ->
-          k "    Method ApproxKey: %d results" (List.length results));
-      { exact = []; partial = results; spouse = [] }
+          k "    Method ApproxKey: %d exact, %d partial"
+            (List.length exact_ipers)
+            (List.length partial_ipers));
+      { exact = exact_ipers; partial = partial_ipers; spouse = [] }
   | PartialKey ->
       let results = search_partial_key conf base query in
       Logs.debug (fun k ->
@@ -1152,7 +1163,6 @@ let dispatch_search_methods conf base query search_order fn_options =
         })
       all_results search_order
   in
-  (* Remove duplicates *)
   let results =
     {
       exact = List.sort_uniq compare combined_results.exact;
@@ -1163,36 +1173,42 @@ let dispatch_search_methods conf base query search_order fn_options =
   let deduplicated = remove_duplicates results in
   (deduplicated, !firstname_variants)
 
-(* Cleaner search result handling *)
 let rec handle_search_results conf base query fn_options components specify
     results =
   let { exact; partial; spouse } = results in
-  let all_persons = exact @ partial @ spouse in
-  match all_persons with
-  | [] -> SrcfileDisplay.print_welcome conf base
-  | [ single_person ] ->
-      record_visited conf single_person;
-      Perso.print conf base (Driver.poi base single_person)
-  | _multiple_persons -> (
-      let exact_persons = List.map (Driver.poi base) exact in
-      let partial_persons = List.map (Driver.poi base) partial in
-      let spouse_persons = List.map (Driver.poi base) spouse in
-      match components.case with
-      | FirstNameOnly fn ->
-          display_firstname_results conf base query fn exact_persons
-            partial_persons spouse_persons
-      | SurnameOnly sn -> display_surname_results conf base query sn all_persons
-      | FirstNameSurname (_fn, _sn) ->
-          specify conf base query exact_persons partial_persons spouse_persons
-      | ParsedName { format = `Space; _ }
-        when fn_options.exact1 && fn_options.all
-             && List.length exact_persons = 1 ->
-          let person = List.hd exact_persons in
-          record_visited conf (Driver.get_iper person);
-          Perso.print conf base person
-      (* FIXME are there other situations where a single person should be shown *)
-      | _ ->
-          specify conf base query exact_persons partial_persons spouse_persons)
+  match exact with
+  | [ single_exact ] ->
+      record_visited conf single_exact;
+      Perso.print conf base (Driver.poi base single_exact)
+  | _ -> (
+      let all_persons = exact @ partial @ spouse in
+      match all_persons with
+      | [] -> SrcfileDisplay.print_welcome conf base
+      | [ single_person ] ->
+          record_visited conf single_person;
+          Perso.print conf base (Driver.poi base single_person)
+      | _multiple_persons -> (
+          let exact_persons = List.map (Driver.poi base) exact in
+          let partial_persons = List.map (Driver.poi base) partial in
+          let spouse_persons = List.map (Driver.poi base) spouse in
+          match components.case with
+          | FirstNameOnly fn ->
+              display_firstname_results conf base query fn exact_persons
+                partial_persons spouse_persons
+          | SurnameOnly sn ->
+              display_surname_results conf base query sn all_persons
+          | FirstNameSurname (_fn, _sn) ->
+              specify conf base query exact_persons partial_persons
+                spouse_persons
+          | ParsedName { format = `Space; _ }
+            when fn_options.exact1 && fn_options.all
+                 && List.length exact_persons = 1 ->
+              let person = List.hd exact_persons in
+              record_visited conf (Driver.get_iper person);
+              Perso.print conf base person
+          | _ ->
+              specify conf base query exact_persons partial_persons
+                spouse_persons))
 
 (* Helper functions for displaying results *)
 and display_firstname_results conf base query _firstname exact partial spouse =
