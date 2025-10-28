@@ -162,8 +162,10 @@ const CheckData = (() => {
     const d = url.searchParams.get('d');
     const s = url.searchParams.get('s');
     const k = url.searchParams.get('k');
+    const b = url.searchParams.get('b');
     const baseUrl = `${url.origin}${url.pathname}`;
-    const newUrl = `${baseUrl}?m=CHK_DATA_L&data=${d}&k=${s}&key=${k}`;
+    const bParam = b ? `b=${b}&` : '';
+    const newUrl = `${baseUrl}?${bParam}m=CHK_DATA_L&data=${d}&k=${s}&key=${k}`;
     window.open(newUrl, '_blank');
   };
 

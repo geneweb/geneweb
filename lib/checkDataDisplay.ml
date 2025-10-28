@@ -550,6 +550,7 @@ let print conf base =
       Util.print_loading_overlay conf ();
       Output.printf conf
         {|<form method="get" action="%s" class="mt-2" id="chk-data-form">
+  %s
   <input type="hidden" name="m" value="CHK_DATA">
   <div class="d-flex justify-content-center mb-3">
     <div class="card">
@@ -585,6 +586,13 @@ let print conf base =
       </div>
       <div class="card-body d-flex flex-column">|}
         (Util.commd conf :> string)
+        (if conf.cgi then
+           let b_value =
+             if conf.cgi_passwd = "" then conf.bname
+             else conf.bname ^ "_" ^ conf.cgi_passwd
+           in
+           Printf.sprintf {|<input type="hidden" name="b" value="%s">|} b_value
+         else "")
         (t conf "chk_data books to check")
         (List.length params.selected_dicts)
         (render_dict_checkboxes_two_columns conf params.selected_dicts)

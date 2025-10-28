@@ -3436,10 +3436,9 @@ let normalize_person_pool_url conf base target_module assoc_txt_opt =
       loop (i + 1))
   in
   loop 1;
-  Printf.sprintf "%s?m=%s&%s"
-    (conf.command :> string)
-    target_module
-    (String.concat "&" (List.rev !converted_params))
+  (prefix_base_password conf :> string)
+  ^ "m=" ^ target_module ^ "&"
+  ^ String.concat "&" (List.rev !converted_params)
 
 (* Génère un overlay de chargement avec traduction possible *)
 let print_loading_overlay conf ?custom_translation_key () =

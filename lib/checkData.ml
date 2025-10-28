@@ -876,7 +876,7 @@ let simple_prefix s =
 let make_error_html conf base data istr entry error_type =
   let dict_type = data_to_dict_type data in
   let istr_ = Driver.Istr.to_string istr in
-  let commd = (Util.commd conf :> string) in
+  let prefix = (Util.prefix_base_password conf :> string) in
   let entry_modified =
     match data with
     | "sn" | "domain" -> UpdateData.move_particle base entry
@@ -902,11 +902,11 @@ let make_error_html conf base data istr entry error_type =
   in
   let hl = make_highlight_html entry highlight_info error_type conf in
   let url_mod =
-    Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" commd data istr_ s s2_p
+    Printf.sprintf "%sm=MOD_DATA&data=%s&key=%s&s=%s%s" prefix data istr_ s s2_p
   in
   let url_chk =
-    Printf.sprintf "%sm=CHK_DATA_OK&d=%s&k=%s&s=%s&s2=%s" commd data istr_ s_ori
-      s2
+    Printf.sprintf "%sm=CHK_DATA_OK&d=%s&k=%s&s=%s&s2=%s" prefix data istr_
+      s_ori s2
   in
   (hl, url_mod, url_chk, entry_escaped, s2_auto)
 
