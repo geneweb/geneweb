@@ -1,14 +1,13 @@
 name: Working Branch Checks
 
 on:
-  workflow_call:
-    outputs:
-      python-tests-passed:
-        description: "Whether Python tests passed"
-        value: ${{ jobs.task-branch-check.outputs.python-tests-passed }}
-      use-python-binaries:
-        description: "Whether to use Python binaries"  
-        value: ${{ jobs.task-branch-check.outputs.use-python-binaries }}
+  push:
+    branches:
+      - master
+      - 55-feature-request-create-a-docker-artifact-with-the-new-python-code
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -132,4 +131,40 @@ jobs:
             echo "python-tests-passed=false" >> $GITHUB_OUTPUT
             echo "use-python-binaries=false" >> $GITHUB_OUTPUT
             echo "❌ Python tests failed - OCaml binaries will be used as fallback"
+          fi
+
+  # Build Docker image based on test results (only on master)
+  docker-build:
+    needs: [task-branch-check]
+    if: always() && github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/docker.yml
+    with:
+      use_python_binaries: ${{ needs.task-branch-check.outputs.use-python-binaries == 'true' }}
+    secrets: inherit
+
+  # Deploy notification (only on master)
+  deploy-status:
+    needs: [task-branch-check, docker-build]
+    runs-on: ubuntu-latest
+    environment: production
+    if: always() && github.ref == 'refs/heads/master'
+    steps:
+      - name: Deployment Status
+        run: |
+          echo "=== Deployment Summary ==="
+          echo "Python Tests Result: ${{ needs.task-branch-check.result }}"
+          echo "Use Python Binaries: ${{ needs.task-branch-check.outputs.use-python-binaries }}"
+          echo "Docker Build Result: ${{ needs.docker-build.result }}"
+          
+          if [[ "${{ needs.task-branch-check.outputs.use-python-binaries }}" == "true" ]]; then
+            echo "✅ Docker image built with Python binaries (all tests passed)"
+          else
+            echo "🔄 Docker image built with OCaml binaries (fallback)"
+            echo "   → Python tests failed"
+          fi
+          
+          if [[ "${{ needs.docker-build.result }}" == "success" ]]; then
+            echo "🚀 Docker image successfully pushed to registry"
+          else
+            echo "❌ Docker build failed"
           fi
