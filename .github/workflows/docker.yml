@@ -27,23 +27,6 @@ on:
       - '**/*.opam'
       - 'src/python/**'
       - 'docker/**'
-    paths-ignore:
-      - 'etc/**'
-      - 'hd/**'
-      - 'man/**'
-      - '**/*.md'
-      - 'geneweb_colab.ipynb'
-      - 'ICHANGES'
-      - 'INSTALL'
-      - 'LICENSE'
-      - 'CHANGES'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.git-blame-ignore-revs'
-      - '.ocamlformat'
-      - '.ocamlformat-ignore'
-      - 'geneweb.iss'
-      - 'geneweb.opam.template'
 
 env:
   IMAGE_NAME: 'geneweb'

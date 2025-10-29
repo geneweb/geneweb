@@ -19,24 +19,6 @@ on:
       - 'dune'
       - 'dune-project'
       - '**/*.opam'
-
-    paths-ignore:
-      - 'etc/**'
-      - 'hd/**'
-      - 'man/**'
-      - '**/*.md'
-      - 'geneweb_colab.ipynb'
-      - 'ICHANGES'
-      - 'INSTALL'
-      - 'LICENSE'
-      - 'CHANGES'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.git-blame-ignore-revs'
-      - '.ocamlformat'
-      - '.ocamlformat-ignore'
-      - 'geneweb.iss'
-      - 'geneweb.opam.template'
   # Removed push trigger for master - now only called by build-and-deploy.yml
 
 env:
