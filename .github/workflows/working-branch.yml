@@ -1,6 +1,12 @@
 name: Working Branch Checks
 
 on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
   workflow_call:
     outputs:
       python-tests-passed:
