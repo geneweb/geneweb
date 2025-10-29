@@ -21,12 +21,10 @@ val string_of_date : Config.config -> Date.date -> Adef.safe_string
 (** If date is [Dgreg] calls for [string_of_dmy] to convert date to the string else returns content of [Dtext].
     Difference between calendars is not taken into the acount. *)
 
-val string_of_ondate :
-  ?link:bool -> Config.config -> Date.date -> Adef.safe_string
+val string_of_ondate : Config.config -> Date.date -> Adef.safe_string
 (** Converts and translate date with considering different calendars with prefix "on"
     before dates (changes for other languages).
-    Date precision is much more verbose then with [string_of_date]. Decline phrase if needed.
-    If [link] is true then encapsulates result in HTML link to the page calendar's date converter. *)
+    Date precision is much more verbose then with [string_of_date]. Decline phrase if needed. *)
 
 val string_of_on_french_dmy : Config.config -> Date.dmy -> Adef.safe_string
 (** Translate a date in the french calendar
@@ -85,7 +83,6 @@ val code_french_year : Config.config -> int -> string
 (** Returns roman number of the year of French calendar *)
 
 val string_of_date_aux :
-  ?link:bool ->
   ?dmy:(Config.config -> Date.dmy -> Adef.safe_string) ->
   ?sep:Adef.safe_string ->
   Config.config ->

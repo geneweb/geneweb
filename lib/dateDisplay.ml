@@ -350,16 +350,7 @@ let gregorian_precision conf d =
     ^ " "
     ^ (string_of_on_dmy conf d2 :> string)
 
-let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
-    ?(sep = Adef.safe " ") conf =
-  let mk_link c d (s : Adef.safe_string) =
-    Adef.safe
-    @@ Printf.sprintf
-         {|<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
-         (Util.commd conf :> string)
-         c d.Date.year c d.Date.month c d.Date.day c
-         (s :> string)
-  in
+let string_of_date_aux ?(dmy = string_of_dmy) ?(sep = Adef.safe " ") conf =
   function
   | Date.Dtext t ->
       let open Def in
@@ -367,9 +358,7 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
   | Date.Dgreg (d, calendar) -> (
       let d1 = Date.convert ~from:Date.Dgregorian ~to_:calendar d in
       match calendar with
-      | Date.Dgregorian ->
-          let s = dmy conf d in
-          if link && d.Date.day > 0 then mk_link 'g' d s else s
+      | Date.Dgregorian -> dmy conf d
       | Date.Djulian ->
           let cal_prec =
             if d.Date.year < 1582 then Adef.safe ""
@@ -386,16 +375,12 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
               Printf.sprintf " (%d/%d)" (d1.Date.year - 1) (d1.Date.year mod 10)
             else ""
           in
-          let s =
-            let open Def in
-            dmy conf d1 ^^^ year_prec ^<^ sep
-            ^^^ Util.transl_nth conf "gregorian/julian/french/hebrew" 1
-            ^<^ cal_prec
-          in
-          if link && d1.Date.day > 0 then mk_link 'j' d1 s else s
+          let open Def in
+          dmy conf d1 ^^^ year_prec ^<^ sep
+          ^^^ Util.transl_nth conf "gregorian/julian/french/hebrew" 1
+          ^<^ cal_prec
       | Date.Dfrench -> (
           let s = string_of_on_french_dmy conf d1 in
-          let s = if link && d1.Date.day > 0 then mk_link 'f' d1 s else s in
           match d.Date.prec with
           | Date.Sure | Date.About | Date.Before | Date.After | Date.Maybe ->
               let open Def in
@@ -409,8 +394,8 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
               s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
           | Date.OrYear _ | Date.YearInt _ -> s))
 
-let string_of_ondate ?link conf d =
-  (string_of_date_aux ?link ~dmy:string_of_on_dmy conf d :> string)
+let string_of_ondate conf d =
+  (string_of_date_aux ~dmy:string_of_on_dmy conf d :> string)
   |> Util.translate_eval |> Adef.safe
 
 let string_of_date conf = function

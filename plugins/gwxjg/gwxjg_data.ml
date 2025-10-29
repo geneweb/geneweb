@@ -343,7 +343,7 @@ and module_DATE conf =
   in
   let string_of_date = string_of_date_aux Geneweb.DateDisplay.string_of_date in
   let string_of_ondate =
-    string_of_date_aux (Geneweb.DateDisplay.string_of_ondate ~link:false)
+    string_of_date_aux Geneweb.DateDisplay.string_of_ondate
   in
   let code_french_year =
     Jingoo.Jg_types.func_arg1_no_kw (fun i ->
