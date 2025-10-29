@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - 55-feature-request-create-a-docker-artifact-with-the-new-python-code
+      - "*"
   pull_request:
     branches:
       - master
