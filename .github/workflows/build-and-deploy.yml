@@ -2,11 +2,9 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - '*'
+    branches: '*'  # Include master - this workflow contains the Python tests
   pull_request:
-    branches:
-      - master
+    branches: [master]
   workflow_dispatch:
 
 jobs:
