@@ -1,10 +1,14 @@
 name: Working Branch Checks
 
 on:
-  push:
-    branches: '*'  # Include master - this workflow contains the Python tests
-  pull_request:
-    branches: [master]
+  workflow_call:
+    outputs:
+      python-tests-passed:
+        description: "Whether Python tests passed"
+        value: ${{ jobs.task-branch-check.outputs.python-tests-passed }}
+      use-python-binaries:
+        description: "Whether to use Python binaries"
+        value: ${{ jobs.task-branch-check.outputs.use-python-binaries }}
   workflow_dispatch:
 
 jobs:
