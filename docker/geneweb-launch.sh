@@ -83,8 +83,16 @@ start() {
 
 	gwlaunch_log "Launch complete! -------------------------------------------------------"
 
-	tail -f ${GENEWEB_HOME}/log/gwsetup.log | sed "s/^/$(date +%Y-%m-%d_%H:%M:%S) gwsetup: /" & \
-	tail -f ${GENEWEB_HOME}/log/gwd.log | sed "s/^/$(date +%Y-%m-%d_%H:%M:%S) gwd: /"
+	# Wait a bit for log files to be created
+	sleep 2
+	
+	# Ensure log files exist and are readable
+	touch ${GENEWEB_HOME}/log/gwsetup.log ${GENEWEB_HOME}/log/gwd.log
+	chmod 644 ${GENEWEB_HOME}/log/gwsetup.log ${GENEWEB_HOME}/log/gwd.log
+	
+	# Follow logs with error handling
+	(tail -f ${GENEWEB_HOME}/log/gwsetup.log 2>/dev/null | sed "s/^/$(date +%Y-%m-%d_%H:%M:%S) gwsetup: /" || echo "gwsetup log not available") & \
+	(tail -f ${GENEWEB_HOME}/log/gwd.log 2>/dev/null | sed "s/^/$(date +%Y-%m-%d_%H:%M:%S) gwd: /" || echo "gwd log not available")
 
 }
 
