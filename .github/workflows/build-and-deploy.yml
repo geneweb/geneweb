@@ -2,21 +2,33 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - '**'  # Toutes les branches
   pull_request:
     branches:
       - master
   workflow_dispatch:
 
 jobs:
+  # Test job to verify workflow triggers
+  test-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow Triggered Successfully
+        run: |
+          echo "🎉 Build and Deploy workflow triggered!"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Actor: ${{ github.actor }}"
+
   # Run Python tests first to determine if we can use Python binaries
   python-tests:
+    needs: test-trigger
     uses: ./.github/workflows/working-branch.yml
     secrets: inherit
 
   # Run OCaml CI tests in parallel
   ci-tests:
+    needs: test-trigger
     uses: ./.github/workflows/ci.yml
     secrets: inherit
 
