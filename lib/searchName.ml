@@ -32,6 +32,24 @@ type opts = {
   all_in : bool; (* all first_names should match one of the typed first_names *)
 }
 
+let opts_str opts =
+  let bool_to_string b = if b then "true" else "false" in
+  Printf.sprintf "order=%s, all=%s, case=%s, exact=%s, all_in=%s"
+    (bool_to_string opts.order)
+    (bool_to_string opts.all)
+    (bool_to_string opts.case)
+    (bool_to_string opts.exact1)
+    (bool_to_string opts.all_in)
+
+let opts_set env =
+  {
+    order = p_getenv env "p_order" = Some "on";
+    all = p_getenv env "p_all" = Some "on";
+    case = false;
+    exact1 = p_getenv env "p_exact" = Some "on";
+    all_in = true;
+  }
+
 type search_results = {
   exact : Driver.Iper.t list; (* résultats exacts *)
   partial : Driver.Iper.t list; (* résultats partiels *)
@@ -345,13 +363,7 @@ let rec list_drop n = function
 
 let search_for_multiple_fn conf base fn pl opts batch_size =
   Logs.debug (fun k -> k "        search_for_multiple_fn: %s" fn);
-  let bool_to_string b = if b then "true" else "false" in
-  Logs.debug (fun k ->
-      k "          order: %s, all: %s, case: %s, exact: %s, all_in: %s"
-        (bool_to_string opts.order)
-        (bool_to_string opts.all) (bool_to_string opts.case)
-        (bool_to_string opts.exact1)
-        (bool_to_string opts.all_in));
+  Logs.debug (fun k -> k "          %s" (opts_str opts));
   let fn_l = cut_words fn in
   let result =
     let rec process_batch acc remaining =
@@ -1069,6 +1081,28 @@ let remove_duplicates results =
     spouse = spouse_filtered;
   }
 
+let check_fn_order base exact query =
+  Logs.debug (fun k -> k "    check_fn_order: %s" (String.concat ", " query));
+  let rec appears_in_order lst1 lst2 =
+    match lst1, lst2 with
+    | [], _ -> true  (* All items from lst1 found *)
+    | _, [] -> false (* Items remaining in lst1 but lst2 exhausted *)
+    | h1 :: t1, h2 :: t2 -> (
+        Logs.debug (fun k -> k "h1=%s, h2=%s" h1 h2);
+        if h1 = h2 then
+          appears_in_order t1 t2  (* Found match, advance both *)
+        else
+          appears_in_order lst1 t2)  (* Skip current item in lst2 *)
+  in
+  List.fold_left (fun acc ip ->
+    Logs.debug (fun k -> k "Person %s" (Gutil.designation base (Driver.poi base ip)));
+    let fn = Driver.sou base (Driver.get_first_name (Driver.poi base ip))
+      |> Name.lower
+    in
+    let fn = cut_words (fn) in
+    if appears_in_order query fn then (ip :: acc) else acc
+    ) [] exact
+
 (* Simplified search method dispatcher *)
 type search_method =
   | Sosa
@@ -1079,7 +1113,7 @@ type search_method =
   | ApproxKey
   | PartialKey
 
-let execute_search_method conf base query method_ fn_options =
+let execute_search_method conf base query method_ opts =
   match method_ with
   | Sosa ->
       let results = search_sosa_opt conf base query in
@@ -1098,7 +1132,13 @@ let execute_search_method conf base query method_ fn_options =
       { exact; partial; spouse = [] }
   | FirstName ->
       let exact, partial, _variants =
-        search_firstname_with_cache conf base query fn_options
+        search_firstname_with_cache conf base query opts
+      in
+      let query = cut_words query in
+      let exact =
+        if opts.order && not opts.all
+          && (List.length query > 1) then check_fn_order base exact query
+        else exact
       in
       Logs.debug (fun k ->
           k "    Method FirstName: %d exact, %d partial" (List.length exact)
@@ -1250,6 +1290,7 @@ and display_surname_results conf base _query surname all_persons =
 (* Main search entry point *)
 let search conf base query search_order fn_options specify =
   Logs.debug (fun k -> k "Search %s" query);
+  Logs.debug (fun k -> k "  %s" (opts_str fn_options));
   Some.AliasCache.clear ();
   (* Handle apostrophe variants if needed *)
   let variants =
@@ -1312,43 +1353,35 @@ let case_str case =
 *)
 let print conf base specify =
   let components = extract_name_components conf in
-  let fn_options =
-    {
-      order = p_getenv conf.env "p_order" = Some "on";
-      all = p_getenv conf.env "p_all" <> Some "off";
-      case = false;
-      exact1 = p_getenv conf.env "p_exact" <> Some "off";
-      all_in = false;
-    }
-  in
+  let fn_options = opts_set conf.env in
   let case = components.case in
   match case with
   | FirstNameSurname (fn, sn) ->
+      Logs.debug (fun k -> k "Print case FirstNameSurname (%s, %s)" fn sn);
       let order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
-      search conf base (fn ^ " " ^ sn) order fn_options specify;
-      Logs.debug (fun k -> k "Print case FirstNameSurname (%s, %s)" fn sn)
+      search conf base (fn ^ " " ^ sn) order fn_options specify
   | PersonName pn ->
+      Logs.debug (fun k -> k "Print case PersonName (%s)" pn);
       let order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
-      search conf base pn order fn_options specify;
-      Logs.debug (fun k -> k "Print case PersonName (%s)" pn)
+      search conf base pn order fn_options specify
   | FirstNameOnly fn ->
+      Logs.debug (fun k -> k "Print case FirstNameOnly (%s)" fn);
       let order = [ FirstName ] in
-      search conf base fn order fn_options specify;
-      Logs.debug (fun k -> k "Print case FirstNameOnly (%s)" fn)
+      search conf base fn order fn_options specify
   | SurnameOnly sn ->
+      Logs.debug (fun k -> k "Print case SurnameOnly (%s)" sn);
       let order = [ Surname ] in
-      search conf base sn order fn_options specify;
-      Logs.debug (fun k -> k "Print case SurnameOnly (%s)" sn)
+      search conf base sn order fn_options specify
   | ParsedName { first_name = fn; surname = sn; oc; format; _ } -> (
       match (fn, sn) with
       | Some fn, None when fn <> "" ->
+          Logs.debug (fun k -> k "Print case ParsedName (fn = %s)" fn);
           let order = [ FirstName ] in
-          search conf base fn order fn_options specify;
-          Logs.debug (fun k -> k "Print case ParsedName (fn = %s)" fn)
+          search conf base fn order fn_options specify
       | None, Some sn when sn <> "" ->
+          Logs.debug (fun k -> k "Print case ParsedName (sn = %s)" sn);
           let order = [ Surname; ApproxKey ] in
-          search conf base sn order fn_options specify;
-          Logs.debug (fun k -> k "Print case ParsedName (sn = %s)" sn)
+          search conf base sn order fn_options specify
       | _ -> (
           let order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
           let fn = Option.value fn ~default:"" in
@@ -1356,33 +1389,33 @@ let print conf base specify =
           let oc = Option.value oc ~default:"" in
           match format with
           | `Dot ->
+              Logs.debug (fun k -> k "Print format %s" (format_str format));
               search conf base
                 (Printf.sprintf "%s %s" fn sn)
-                order fn_options specify;
-              Logs.debug (fun k -> k "Print format %s" (format_str format))
+                order fn_options specify
           | `DotOc ->
+              Logs.debug (fun k -> k "Print format %s" (format_str format));
               search conf base
                 (Printf.sprintf "%s.%s %s" fn oc sn)
-                order fn_options specify;
-              Logs.debug (fun k -> k "Print format %s" (format_str format))
+                order fn_options specify
           | `Space ->
+              Logs.debug (fun k -> k "Print format %s" (format_str format));
               search conf base
                 (Printf.sprintf "%s %s" fn sn)
-                order fn_options specify;
-              Logs.debug (fun k -> k "Print format %s" (format_str format))
+                order fn_options specify
           | `Slash ->
+              Logs.debug (fun k -> k "Print format %s" (format_str format));
               search conf base
                 (Printf.sprintf "%s %s" fn sn)
-                order fn_options specify;
-              Logs.debug (fun k -> k "Print format %s" (format_str format))
+                order fn_options specify
           | `SlashSurname ->
+              Logs.debug (fun k -> k "Print format %s" (format_str format));
               let order = [ Surname; ApproxKey ] in
-              search conf base sn order fn_options specify;
-              Logs.debug (fun k -> k "Print format %s" (format_str format))
+              search conf base sn order fn_options specify
           | `SlashFirstName ->
+              Logs.debug (fun k -> k "Print format %s" (format_str format));
               let order = [ FirstName ] in
-              search conf base fn order fn_options specify;
-              Logs.debug (fun k -> k "Print format %s" (format_str format))))
+              search conf base fn order fn_options specify))
   | _ ->
-      SrcfileDisplay.print_welcome conf base;
-      Logs.debug (fun k -> k "Print case default (%s)" (case_str case))
+      Logs.debug (fun k -> k "Print case default (%s)" (case_str case));
+      SrcfileDisplay.print_welcome conf base
