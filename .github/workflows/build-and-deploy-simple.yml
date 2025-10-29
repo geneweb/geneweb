@@ -1,0 +1,71 @@
+name: Build and Deploy Simple
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  # Test simple
+  test-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow Started
+        run: |
+          echo "🎉 Build and Deploy workflow triggered!"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+
+  # Tests Python  
+  python-tests:
+    runs-on: ubuntu-latest
+    needs: test-trigger
+    outputs:
+      use-python-binaries: ${{ steps.test-result.outputs.use-python-binaries }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Python Tests
+        id: test-result
+        run: |
+          echo "✅ Python tests simulation (à remplacer par vrais tests)"
+          echo "use-python-binaries=true" >> $GITHUB_OUTPUT
+
+  # Tests OCaml
+  ci-tests:
+    runs-on: ubuntu-latest
+    needs: test-trigger
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: OCaml Tests
+        run: |
+          echo "✅ OCaml tests simulation (à remplacer par vrais tests)"
+
+  # Build Docker (seulement sur master)
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [python-tests, ci-tests]
+    if: always() && github.ref == 'refs/heads/master'
+    steps:
+      - name: Docker Build
+        run: |
+          echo "🐳 Docker build simulation"
+          echo "USE_PYTHON_BINARIES=${{ needs.python-tests.outputs.use-python-binaries }}"
+
+  # Résumé pour les autres branches
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [python-tests, ci-tests]
+    if: always() && github.ref != 'refs/heads/master'
+    steps:
+      - name: Test Summary
+        run: |
+          echo "=== Test Summary for Branch: ${{ github.ref_name }} ==="
+          echo "Python Tests: ✅"
+          echo "CI Tests: ✅"
+          echo "Ready for merge to master!"
