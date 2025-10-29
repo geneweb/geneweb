@@ -2,12 +2,7 @@ name: Working Branch Checks
 
 on:
   push:
-    branches:
-      - master
-      - 55-feature-request-create-a-docker-artifact-with-the-new-python-code
-  pull_request:
-    branches:
-      - master
+    branches: '*'
   workflow_dispatch:
 
 jobs:
@@ -132,7 +127,6 @@ jobs:
             echo "use-python-binaries=false" >> $GITHUB_OUTPUT
             echo "❌ Python tests failed - OCaml binaries will be used as fallback"
           fi
-
   # Build Docker image based on test results (only on master)
   docker-build:
     needs: [task-branch-check]
@@ -168,3 +162,4 @@ jobs:
           else
             echo "❌ Docker build failed"
           fi
+
