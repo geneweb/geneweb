@@ -183,7 +183,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   in
   (l, name_inj)
 
-let print_elem conf base is_surname ?(rev=false) (p, xl) =
+let print_elem conf base is_surname ?(rev = false) (p, xl) =
   Mutil.list_iter_first
     (fun first x ->
       let iper = Driver.get_iper x in
@@ -295,7 +295,7 @@ let first_name_print_sections conf base listes ~rev =
 
 let print_firstname_variants conf variants_set =
   if not (StrSet.is_empty variants_set) then (
-    Output.print_sstring conf {|<div class="mb-3">|};
+    Output.print_sstring conf {|<div class="font-weight-bold mb-3">|};
     Mutil.list_iter_first
       (fun first fn ->
         if not first then Output.print_sstring conf ", ";
@@ -326,8 +326,7 @@ let first_name_print_list_multi conf base x1 xl sections_groups =
         Output.print_sstring conf
           (transl conf "other possibilities" |> Utf8.capitalize_fst);
         Output.print_sstring conf " (";
-        Output.print_sstring conf
-          (transl conf "phonetic variants");
+        Output.print_sstring conf (transl conf "phonetic variants");
         Output.print_sstring conf ")</h3>\n";
         print_firstname_variants conf variants_set);
       first_name_print_sections conf base sections ~rev)

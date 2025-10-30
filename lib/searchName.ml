@@ -545,9 +545,16 @@ let search_firstname_with_aliases conf base query =
   in
   direct_with_info @ alias_with_info
 
-let search_firstname_phonetic_split conf base query_words =
-  let query_lower = List.map Name.lower query_words in
-  let phonetic_iperl =
+let normalize_for_phonetic s =
+  let buf = Buffer.create (String.length s) in
+  String.iter (function ' ' | '-' -> () | c -> Buffer.add_char buf c) s;
+  Buffer.contents buf
+
+let search_firstname_phonetic_split conf base query =
+  let query_lower = Name.lower query in
+  let query_norm = normalize_for_phonetic query_lower in
+  let query_words = cut_words query_lower in
+  let phonetic_iperl_words =
     List.flatten
       (List.map
          (fun word ->
@@ -555,6 +562,18 @@ let search_firstname_phonetic_split conf base query_words =
            search_firstname_phonetic conf base crushed)
          query_words)
   in
+  (* Cette partie n'est plus nécessaire avec l'index corrigé,
+     mais ne fait pas de mal pour compatibilité *)
+  let phonetic_iperl_hyphen =
+    if List.length query_words >= 2 then
+      let first = List.hd query_words in
+      let second = List.nth query_words 1 in
+      let hyphenated = first ^ "-" ^ second in
+      let crushed = Name.crush_lower hyphenated in
+      search_firstname_phonetic conf base crushed
+    else []
+  in
+  let all_iperl = phonetic_iperl_words @ phonetic_iperl_hyphen in
   let seen = Hashtbl.create 1000 in
   let exact_matches = ref [] in
   let variant_matches = ref [] in
@@ -567,21 +586,18 @@ let search_firstname_phonetic_split conf base query_words =
         let p = Driver.poi base iper in
         let fn = Driver.sou base (Driver.get_first_name p) in
         let fn_lower = Name.lower fn in
-        let fn_words = cut_words fn_lower in
-        let is_direct_match =
-          List.exists
-            (fun fn_word ->
-              List.exists
-                (fun q_word -> Mutil.contains fn_word q_word)
-                query_lower)
-            fn_words
-        in
+        let fn_norm = normalize_for_phonetic fn_lower in
+        let is_direct_match = Mutil.contains fn_norm query_norm in
         if is_direct_match then (
           exact_matches := iper :: !exact_matches;
           if fn <> "" then
             firstname_variants := Mutil.StrSet.add fn !firstname_variants)
-        else variant_matches := iper :: !variant_matches))
-    phonetic_iperl;
+        else
+          let fn_norm_crushed = Name.crush fn_norm in
+          let query_norm_crushed = Name.crush query_norm in
+          if Mutil.contains fn_norm_crushed query_norm_crushed then
+            variant_matches := iper :: !variant_matches))
+    all_iperl;
   let exact = List.rev !exact_matches in
   let partial = List.rev !variant_matches in
   Logs.debug (fun k ->
@@ -608,9 +624,7 @@ let search_firstname_with_cache conf base query opts =
      
      Note: Requires significant refactoring to avoid duplicating the
      permutation/union logic that currently exists only in the else branch.*)
-  if not opts.exact1 then
-    let query_words = cut_words query in
-    search_firstname_phonetic_split conf base query_words
+  if not opts.exact1 then search_firstname_phonetic_split conf base query
   else
     let query_words = cut_words query in
     let all_results =
