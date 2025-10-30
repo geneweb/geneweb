@@ -593,5 +593,3 @@ let base_visible_get base fct i =
       visible_ref := Some visible;
       status
   | Some b -> b
-
-include Gwdb_gc
