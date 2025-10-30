@@ -63,8 +63,11 @@ let make_strings_of_fsname_aux split get base =
     let aux istr =
       if istr <> 1 then (
         let s = base.data.strings.get istr in
-        add_name s istr;
-        split (fun i j -> add_name (String.sub s i j) istr) s)
+        let s_normalized = String.map (fun c -> if c = '-' then ' ' else c) s in
+        add_name s_normalized istr;
+        split
+          (fun i j -> add_name (String.sub s_normalized i j) istr)
+          s_normalized)
     in
     aux (get p)
   done;
