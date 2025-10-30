@@ -306,17 +306,18 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 <div class="d-flex flex-row flex-md-column justify-content-start mb-3 mb-md-0">
                   <div class="align-self-md-start font-weight-bold mr-3 mr-md-0 mb-0 mb-md-1">[*first name/first names]1[:]</div>
                   <div class="d-flex flex-row flex-md-column">
+                    <div class="custom-control custom-checkbox" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*not exact hlp]">
+                      <input class="custom-control-input" type="checkbox" name="p_exact" id="p_exact" value="off" tabindex="4">
+                      <label class="custom-control-label d-flex align-items-center" for="p_exact">[*not exact]</label>
+                    </div>
+                    -------------
                     <div class="custom-control custom-checkbox mr-3 mr-md-0 mb-md-1" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*not all hlp]">
-                      <input class="custom-control-input" type="checkbox" name="p_all" id="p_all" value="off" tabindex="4">
+                      <input class="custom-control-input" type="checkbox" name="p_all" id="p_all" value="off" tabindex="5">
                       <label class="custom-control-label d-flex align-items-center" for="p_all">[*not all]</label>
                     </div>
                     <div class="custom-control custom-checkbox mr-3 mr-md-0 mb-md-1" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*order hlp]">
-                      <input class="custom-control-input" type="checkbox" name="p_order" id="p_order" value="on" tabindex="5">
+                      <input class="custom-control-input" type="checkbox" name="p_order" id="p_order" value="on" tabindex="6">
                       <label class="custom-control-label d-flex align-items-center" for="p_order">[*order]</label>
-                    </div>
-                    <div class="custom-control custom-checkbox" data-toggle="tooltip" data-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*not exact hlp]">
-                      <input class="custom-control-input" type="checkbox" name="p_exact" id="p_exact" value="off" tabindex="6">
-                      <label class="custom-control-label d-flex align-items-center" for="p_exact">[*not exact]</label>
                     </div>
                   </div>
                 </div>

@@ -1829,7 +1829,7 @@ let hexa_string s =
   done;
   Bytes.unsafe_to_string s'
 
-let print_alphab_list conf crit print_elem liste =
+let print_alphab_list conf ?(prefix = "") crit print_elem liste =
   let len = List.length liste in
   if liste = [] then Output.print_sstring conf "<ul></ul>\n"
   else (
@@ -1843,7 +1843,8 @@ let print_alphab_list conf crit print_elem liste =
           let t = crit e in
           if not (StrSet.mem t !seen) then (
             seen := StrSet.add t !seen;
-            Printf.bprintf buf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t))
+            Printf.bprintf buf "<a href=\"#%sai%s\">%s</a>\n" prefix
+              (hexa_string t) t))
         liste;
       Buffer.add_string buf "</p>\n";
       Output.print_sstring conf (Buffer.contents buf));
@@ -1866,9 +1867,9 @@ let print_alphab_list conf crit print_elem liste =
       if len > menu_threshold && index <> "" then
         Output.printf conf
           "<li class=\"li-none\">\n\
-           <a id=\"ai%s\">%s</a>\n\
+           <a id=\"%sai%s\">%s</a>\n\
            <ul class=\"fa-ul\">\n"
-          (hexa_string index) index;
+          prefix (hexa_string index) index;
       List.iter
         (fun e ->
           Output.print_sstring conf "<li><span class=\"fa-li\">\n";
