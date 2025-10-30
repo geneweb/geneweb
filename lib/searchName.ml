@@ -857,6 +857,18 @@ and parse_person_name pn =
         case = InvalidFormat pn;
       }
 
+and make_parsed_component ?first_name ?surname ?oc original format =
+  let fn_opt = if first_name = Some "" then None else first_name in
+  let sn_opt = if surname = Some "" then None else surname in
+  {
+    first_name = fn_opt;
+    surname = sn_opt;
+    oc;
+    person_name = None;
+    case =
+      ParsedName { first_name = fn_opt; surname = sn_opt; oc; original; format };
+  }
+
 and parse_slash_separated pn slash_pos =
   let fn_part = String.sub pn 0 slash_pos in
   let sn_part =
@@ -864,54 +876,9 @@ and parse_slash_separated pn slash_pos =
     |> String.trim
   in
   match (fn_part, sn_part) with
-  | "", sn ->
-      {
-        first_name = None;
-        surname = Some sn;
-        oc = None;
-        person_name = None;
-        case =
-          ParsedName
-            {
-              first_name = None;
-              surname = Some sn;
-              oc = None;
-              original = pn;
-              format = `SlashSurname;
-            };
-      }
-  | fn, "" ->
-      {
-        first_name = Some fn;
-        surname = None;
-        oc = None;
-        person_name = None;
-        case =
-          ParsedName
-            {
-              first_name = Some fn;
-              surname = None;
-              oc = None;
-              original = pn;
-              format = `SlashFirstName;
-            };
-      }
-  | fn, sn ->
-      {
-        first_name = Some fn;
-        surname = Some sn;
-        oc = None;
-        person_name = None;
-        case =
-          ParsedName
-            {
-              first_name = Some fn;
-              surname = Some sn;
-              oc = None;
-              original = pn;
-              format = `Slash;
-            };
-      }
+  | "", sn -> make_parsed_component ~surname:sn pn `SlashSurname
+  | fn, "" -> make_parsed_component ~first_name:fn pn `SlashFirstName
+  | fn, sn -> make_parsed_component ~first_name:fn ~surname:sn pn `Slash
 
 and parse_dot_separated pn dot_pos =
   let fn_part = String.sub pn 0 dot_pos in
@@ -923,37 +890,8 @@ and parse_dot_separated pn dot_pos =
         String.sub rest (space_pos + 1) (String.length rest - space_pos - 1)
         |> String.trim
       in
-      {
-        first_name = Some fn_part;
-        surname = Some sn_part;
-        oc = Some oc;
-        person_name = None;
-        case =
-          ParsedName
-            {
-              first_name = Some fn_part;
-              surname = Some sn_part;
-              oc = Some oc;
-              original = pn;
-              format = `DotOc;
-            };
-      }
-  | None ->
-      {
-        first_name = Some fn_part;
-        surname = Some rest;
-        oc = None;
-        person_name = None;
-        case =
-          ParsedName
-            {
-              first_name = Some fn_part;
-              surname = Some rest;
-              oc = None;
-              original = pn;
-              format = `Dot;
-            };
-      }
+      make_parsed_component ~first_name:fn_part ~surname:sn_part ~oc pn `DotOc
+  | None -> make_parsed_component ~first_name:fn_part ~surname:rest pn `Dot
 
 (* ========================================================================= *)
 (* Section 5: Search Orchestration                                          *)
