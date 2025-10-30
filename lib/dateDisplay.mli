@@ -109,3 +109,5 @@ val string_of_prec_dmy :
     Takes two date representations (as strings) [s] and [s2] and
     returns translated phrase according to the given [precision].
  *)
+
+val code_french_date : Config.config -> int -> int -> int -> string
