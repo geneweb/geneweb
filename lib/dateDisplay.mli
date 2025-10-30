@@ -4,7 +4,7 @@ val get_wday : Config.config -> Date.date -> string
 (** [get_wday conf date]
     Return the day of the week for this [date] *)
 
-val code_dmy : Config.config -> Date.dmy -> string
+val code_dmy : ?with_short_month:bool -> Config.config -> Date.dmy -> string
 (** Returns textual representation of the date translated to the current language.
     Uses different encodings depending on day's, month's and year's accessibility.
     Doesn't consider precision. *)
@@ -14,7 +14,8 @@ val code_hebrew_date : Config.config -> int -> int -> int -> string
     translated to the current language.
 *)
 
-val string_of_dmy : Config.config -> Date.dmy -> Adef.safe_string
+val string_of_dmy :
+  ?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string
 (** Converts and translate date to the textual representation for the giving language. Considers precision. *)
 
 val string_of_date : Config.config -> Date.date -> Adef.safe_string
@@ -27,6 +28,7 @@ val string_of_ondate : Config.config -> Date.date -> Adef.safe_string
     Date precision is much more verbose then with [string_of_date]. Decline phrase if needed. *)
 
 val string_of_on_calendar_dmy :
+  ?with_gregorian_precisions:bool ->
   calendar:[< `Julian | `French | `Hebrew ] ->
   Config.config ->
   Date.dmy ->
@@ -83,7 +85,7 @@ val code_french_year : Config.config -> int -> string
 (** Returns roman number of the year of French calendar *)
 
 val string_of_date_aux :
-  ?dmy:(Config.config -> Date.dmy -> Adef.safe_string) ->
+  ?dmy:(?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string) ->
   ?sep:Adef.safe_string ->
   Config.config ->
   Date.date ->

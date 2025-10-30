@@ -15,10 +15,13 @@ let get_wday conf = function
 let death_symbol conf =
   Option.value (List.assoc_opt "death_symbol" conf.Config.base_env) ~default:"†"
 
-let code_date conf encoding d m y =
+let code_date ?(with_short_month = false) conf encoding d m y =
   let apply_date_code = function
     | 'd' -> string_of_int d
-    | 'm' -> Util.transl_nth conf "(month)" (m - 1)
+    | 'm' ->
+        Util.transl_nth conf
+          (if with_short_month then "(short month)" else "(month)")
+          (m - 1)
     | 'y' -> string_of_int y
     | c -> "%" ^ String.make 1 c
   in
@@ -52,7 +55,7 @@ let code_date conf encoding d m y =
   in
   loop 0
 
-let code_dmy conf d =
+let code_dmy ?with_short_month conf d =
   let encoding =
     let n =
       if d.Date.day = 1 then 0
@@ -62,7 +65,7 @@ let code_dmy conf d =
     in
     Util.transl_nth conf "(date)" n
   in
-  code_date conf encoding d.Date.day d.Date.month d.Date.year
+  code_date ?with_short_month conf encoding d.Date.day d.Date.month d.Date.year
 
 let default_french_month =
   let tab =
@@ -165,23 +168,27 @@ let string_of_prec_dmy conf s s2 precision =
       ^ Util.transl_nth conf "and" 0
       ^ " " ^ Mutil.nominative s2
 
-let string_of_dmy_aux fn conf d =
-  let sy = code_dmy conf d in
+let string_of_dmy_aux ?with_short_month fn conf d =
+  let sy = code_dmy ?with_short_month conf d in
   let sy2 =
     match d.Date.prec with
-    | Date.OrYear d2 | Date.YearInt d2 -> code_dmy conf (Date.dmy_of_dmy2 d2)
+    | Date.OrYear d2 | Date.YearInt d2 ->
+        code_dmy ?with_short_month conf (Date.dmy_of_dmy2 d2)
     | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
   fn conf sy sy2 d
 
-let rec string_of_on_prec_dmy_aux ~calendar conf sy sy2 d =
+let rec string_of_on_prec_dmy_aux ?(with_gregorian_precisions = true) ~calendar
+    conf sy sy2 d =
   let string_of_dmy d m s =
     if d = 0 && m = 0 then Util.transl conf "in (year)" ^ " " ^ s
     else if d = 0 then Util.transl_decline conf "in (month year)" s
     else Util.transl_decline conf "on (day month year)" s
   in
   let gregorian_precision d =
-    Ext_option.return_if (calendar <> Date.Dgregorian) (fun () ->
+    Ext_option.return_if
+      (with_gregorian_precisions && calendar <> Date.Dgregorian)
+      (fun () ->
         Adef.as_string
         @@ gregorian_precision conf
              (Date.convert ~from:calendar ~to_:Date.Dgregorian d))
@@ -233,23 +240,28 @@ let rec string_of_on_prec_dmy_aux ~calendar conf sy sy2 d =
       ^ Option.fold ~none:"" ~some:(Printf.sprintf " (%s)")
           (gregorian_precision (Date.dmy_of_dmy2 d2))
 
-and string_of_on_prec_dmy ~calendar conf sy sy2 d =
+and string_of_on_prec_dmy ?with_gregorian_precisions ~calendar conf sy sy2 d =
   Adef.safe
   @@
-  let r = string_of_on_prec_dmy_aux ~calendar conf sy sy2 d in
+  let r =
+    string_of_on_prec_dmy_aux ?with_gregorian_precisions ~calendar conf sy sy2 d
+  in
   replace_spaces_by_nbsp r
 
-and string_of_on_dmy conf d =
-  string_of_dmy_aux (string_of_on_prec_dmy ~calendar:Date.Dgregorian) conf d
+and string_of_on_dmy ?with_short_month conf d =
+  string_of_dmy_aux ?with_short_month
+    (string_of_on_prec_dmy ~calendar:Date.Dgregorian)
+    conf d
 
-and string_of_dmy conf d =
-  string_of_dmy_aux
+and string_of_dmy ?with_short_month conf d =
+  string_of_dmy_aux ?with_short_month
     (fun conf s s2 d -> string_of_prec_dmy conf s s2 d.Date.prec)
     conf d
 
-and gregorian_precision conf d =
+and gregorian_precision ?with_short_month conf d =
   let format_date d =
-    if d.Date.delta = 0 then Adef.as_string @@ string_of_dmy conf d
+    if d.Date.delta = 0 then
+      Adef.as_string @@ string_of_dmy ?with_short_month conf d
     else
       let d2 =
         let sdn = d.Date.delta + Date.to_sdn ~from:Date.Dgregorian d in
@@ -258,11 +270,11 @@ and gregorian_precision conf d =
 
       Util.transl conf "between (date)"
       ^ " "
-      ^ (string_of_on_dmy conf d :> string)
+      ^ (string_of_on_dmy ?with_short_month conf d :> string)
       ^ " "
       ^ Util.transl_nth conf "and" 0
       ^ " "
-      ^ (string_of_on_dmy conf d2 :> string)
+      ^ (string_of_on_dmy ?with_short_month conf d2 :> string)
   in
   let s =
     match d.Date.prec with
@@ -287,7 +299,7 @@ let to_calendar = function
   | `French -> Date.Dfrench
   | `Hebrew -> Date.Dhebrew
 
-let string_of_on_calendar_dmy ~calendar conf d =
+let string_of_on_calendar_dmy ?with_gregorian_precisions ~calendar conf d =
   let format_date ~conf d =
     match calendar with
     | `Julian -> code_julian_date conf d
@@ -301,7 +313,8 @@ let string_of_on_calendar_dmy ~calendar conf d =
         format_date ~conf (Date.dmy_of_dmy2 d2)
     | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
-  string_of_on_prec_dmy ~calendar:(to_calendar calendar) conf sy sy2 d
+  string_of_on_prec_dmy ?with_gregorian_precisions
+    ~calendar:(to_calendar calendar) conf sy sy2 d
 
 let format_date_with_gregorian_precisions ~sep ~conf ~calendar d =
   let s = string_of_on_calendar_dmy ~calendar conf d in
