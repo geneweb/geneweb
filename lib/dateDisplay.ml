@@ -164,11 +164,12 @@ let string_of_prec_dmy conf s s2 precision =
       ^ Util.transl_nth conf "and" 0
       ^ " " ^ Mutil.nominative s2
 
-let string_of_dmy_aux fn conf d =
-  let sy = code_dmy conf d in
+let string_of_dmy_aux ?with_short_month fn conf d =
+  let sy = code_dmy ?with_short_month conf d in
   let sy2 =
     match d.Date.prec with
-    | Date.OrYear d2 | Date.YearInt d2 -> code_dmy conf (Date.dmy_of_dmy2 d2)
+    | Date.OrYear d2 | Date.YearInt d2 ->
+        code_dmy ?with_short_month conf (Date.dmy_of_dmy2 d2)
     | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
   fn conf sy sy2 d
@@ -238,16 +239,19 @@ and string_of_on_prec_dmy ~calendar conf sy sy2 d =
   let r = string_of_on_prec_dmy_aux ~calendar conf sy sy2 d in
   replace_spaces_by_nbsp r
 
-and string_of_on_dmy conf d =
-  string_of_dmy_aux (string_of_on_prec_dmy ~calendar:Date.Dgregorian) conf d
+and string_of_on_dmy ?with_short_month conf d =
+  string_of_dmy_aux ?with_short_month
+    (string_of_on_prec_dmy ~calendar:Date.Dgregorian)
+    conf d
 
-and string_of_dmy conf d =
-  string_of_dmy_aux
+and string_of_dmy ?with_short_month conf d =
+  string_of_dmy_aux ?with_short_month
     (fun conf s s2 d -> string_of_prec_dmy conf s s2 d.Date.prec)
     conf d
 
-and gregorian_precision conf d =
-  if d.Date.delta = 0 then string_of_dmy conf { d with Date.prec = Date.Sure }
+and gregorian_precision ?with_short_month conf d =
+  if d.Date.delta = 0 then
+    string_of_dmy ?with_short_month conf { d with Date.prec = Date.Sure }
   else
     let d2 =
       let sdn = d.Date.delta + Date.to_sdn ~from:Date.Dgregorian d in
@@ -256,11 +260,13 @@ and gregorian_precision conf d =
     Adef.safe
     @@ Util.transl conf "between (date)"
     ^ " "
-    ^ (string_of_on_dmy conf { d with Date.prec = Date.Sure } :> string)
+    ^ (string_of_on_dmy ?with_short_month conf { d with Date.prec = Date.Sure }
+        :> string)
     ^ " "
     ^ Util.transl_nth conf "and" 0
     ^ " "
-    ^ (string_of_on_dmy conf { d2 with Date.prec = Date.Sure } :> string)
+    ^ (string_of_on_dmy ?with_short_month conf { d2 with Date.prec = Date.Sure }
+        :> string)
 
 let to_calendar = function
   | `Julian -> Date.Djulian

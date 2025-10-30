@@ -14,7 +14,8 @@ val code_hebrew_date : Config.config -> int -> int -> int -> string
     translated to the current language.
 *)
 
-val string_of_dmy : Config.config -> Date.dmy -> Adef.safe_string
+val string_of_dmy :
+  ?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string
 (** Converts and translate date to the textual representation for the giving language. Considers precision. *)
 
 val string_of_date : Config.config -> Date.date -> Adef.safe_string
@@ -83,7 +84,7 @@ val code_french_year : Config.config -> int -> string
 (** Returns roman number of the year of French calendar *)
 
 val string_of_date_aux :
-  ?dmy:(Config.config -> Date.dmy -> Adef.safe_string) ->
+  ?dmy:(?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string) ->
   ?sep:Adef.safe_string ->
   Config.config ->
   Date.date ->
@@ -111,3 +112,6 @@ val string_of_prec_dmy :
  *)
 
 val code_french_date : Config.config -> int -> int -> int -> string
+
+val gregorian_precision :
+  ?with_short_month:bool -> Config.config -> Date.dmy -> Adef.safe_string
