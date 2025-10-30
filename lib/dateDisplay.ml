@@ -251,8 +251,10 @@ and string_of_dmy ?with_short_month conf d =
 
 and gregorian_precision ?with_short_month conf d =
   if d.Date.delta = 0 then
+    let () = GWPARAM.syslog `LOG_DEBUG __LOC__ in
     string_of_dmy ?with_short_month conf { d with Date.prec = Date.Sure }
   else
+    let () = GWPARAM.syslog `LOG_DEBUG __LOC__ in
     let d2 =
       let sdn = d.Date.delta + Date.to_sdn ~from:Date.Dgregorian d in
       Date.gregorian_of_sdn ~prec:d.Date.prec sdn
