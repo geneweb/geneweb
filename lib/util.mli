@@ -664,7 +664,7 @@ val end_centered : config -> unit
 *)
 
 val print_alphab_list :
-  config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
+  config -> ?prefix:string -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
 
 val short_f_month : int -> string
 

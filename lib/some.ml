@@ -183,7 +183,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   in
   (l, name_inj)
 
-let print_elem conf base is_surname (p, xl) =
+let print_elem conf base is_surname ?(rev=false) (p, xl) =
   Mutil.list_iter_first
     (fun first x ->
       let iper = Driver.get_iper x in
@@ -199,13 +199,29 @@ let print_elem conf base is_surname (p, xl) =
         (commd conf :> string)
         (acces conf base x :> string)
         (Driver.Iper.to_string iper :> string);
-      if is_surname then (
-        Buffer.add_string buf
-          (escape_html @@ surname_without_particle base p :> string);
-        Buffer.add_string buf (escape_html @@ surname_particle base p :> string);
-        Buffer.add_string buf " ";
-        Buffer.add_string buf
-          (escape_html @@ Driver.sou base (Driver.get_first_name x) :> string))
+      if is_surname then
+        let fn = escape_html @@ Driver.sou base (Driver.get_first_name x) in
+        let sn_particle =
+          if rev then
+            escape_html @@ surname_particle base (Driver.p_surname base x)
+          else escape_html @@ surname_particle base p
+        in
+        let sn_without =
+          if rev then
+            escape_html
+            @@ surname_without_particle base (Driver.p_surname base x)
+          else escape_html @@ surname_without_particle base p
+        in
+        if rev then (
+          Buffer.add_string buf (fn :> string);
+          Buffer.add_string buf " ";
+          Buffer.add_string buf (sn_without :> string);
+          Buffer.add_string buf (sn_particle :> string))
+        else (
+          Buffer.add_string buf (sn_without :> string);
+          Buffer.add_string buf (sn_particle :> string);
+          Buffer.add_string buf " ";
+          Buffer.add_string buf (fn :> string))
       else
         Buffer.add_string buf
           (if p = "" then (Adef.escaped "?" :> string)
@@ -226,45 +242,40 @@ let first_char s =
     let len = Utf8.next s 0 in
     if len < String.length s then String.sub s 0 len else s
 
-let first_name_print_list conf base x1 xl listes =
-  let surnames_liste l =
-    List.fold_left
-      (fun l x ->
-        let px = Driver.p_surname base x in
-        match l with
-        | (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
-        | _ -> (px, [ x ]) :: l)
-      [] l
+let first_name_print_sections conf base listes ~rev =
+  let group_persons l =
+    if rev then
+      (* Grouper par prénom *)
+      List.fold_left
+        (fun l x ->
+          let px = Driver.p_first_name base x in
+          match l with
+          | (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
+          | _ -> (px, [ x ]) :: l)
+        [] l
+    else
+      (* Grouper par patronyme *)
+      List.fold_left
+        (fun l x ->
+          let px = Driver.p_surname base x in
+          match l with
+          | (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
+          | _ -> (px, [ x ]) :: l)
+        [] l
   in
-  (if p_getenv conf.env "t" = Some "A" then
-     let title _ = Output.print_string conf (escape_html x1) in
-     Hutil.header conf title
-   else
-     let buf = Buffer.create 256 in
-     Mutil.list_iter_first
-       (fun first x ->
-         if not first then Buffer.add_string buf ", ";
-         Printf.bprintf buf {|<a href="%sm=P&t=A&v=%s">%s</a>|}
-           (commd conf :> string)
-           (Mutil.encode x :> string)
-           (escape_html x :> string))
-       (StrSet.elements xl);
-     let title_content = Buffer.contents buf in
-     Hutil.header_with_adaptive_title conf title_content);
-  (* Si on est dans un calcul de parenté, on affiche *)
-  (* l'aide sur la sélection d'un individu. *)
   Util.print_tips_relationship conf;
-
   List.iter
     (fun (str, liste) ->
       if liste <> [] then (
-        let list = surnames_liste liste in
+        let list = group_persons liste in
         let list =
           List.rev_map
             (fun (sn, ipl) ->
               let txt =
-                Util.surname_without_particle base sn
-                ^ Util.surname_particle base sn
+                if rev then sn
+                else
+                  Util.surname_without_particle base sn
+                  ^ Util.surname_particle base sn
               in
               let ord = name_unaccent txt in
               (ord, txt, ipl))
@@ -272,15 +283,60 @@ let first_name_print_list conf base x1 xl listes =
         in
         let list = List.sort compare list in
         if str <> "" then (
-          Output.print_sstring conf {|<div class="my-3">|};
+          Output.print_sstring conf {|<h1 class="h3 mt-4">|};
           Output.print_sstring conf str;
-          Output.print_sstring conf "</div>\n");
-        print_alphab_list conf
+          Output.print_sstring conf "</h1>\n");
+        let prefix = if rev then "v-" else "" in
+        print_alphab_list conf ~prefix
           (fun (ord, _, _) -> first_char ord)
-          (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl))
+          (fun (_, txt, ipl) -> print_elem conf base true ~rev (txt, ipl))
           list))
-    listes;
+    listes
+
+let print_firstname_variants conf variants_set =
+  if not (StrSet.is_empty variants_set) then (
+    Output.print_sstring conf {|<div class="mb-3">|};
+    Mutil.list_iter_first
+      (fun first fn ->
+        if not first then Output.print_sstring conf ", ";
+        Output.print_sstring conf {|<a href="|};
+        Output.print_string conf (commd conf);
+        Output.print_sstring conf "m=P&v=";
+        Output.print_string conf (Mutil.encode fn);
+        Output.print_sstring conf {|">|};
+        Output.print_string conf (escape_html fn);
+        Output.print_sstring conf "</a>")
+      (StrSet.elements variants_set);
+    Output.print_sstring conf "</div>\n")
+
+let first_name_print_list_multi conf base x1 xl sections_groups =
+  let title _ =
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "search_exact_fn"));
+    Output.print_sstring conf (transl conf ":");
+    Output.print_sstring conf " ";
+    Output.print_string conf (escape_html x1)
+  in
+  Hutil.header conf title;
+  if not (StrSet.is_empty xl) then print_firstname_variants conf xl;
+  List.iter
+    (fun (sections, rev, variants_set) ->
+      if not (StrSet.is_empty variants_set) then (
+        Output.print_sstring conf {|<h3 class="mt-4 mb-2">|};
+        Output.print_sstring conf
+          (transl conf "other possibilities" |> Utf8.capitalize_fst);
+        Output.print_sstring conf " (";
+        Output.print_sstring conf
+          (transl conf "phonetic variants");
+        Output.print_sstring conf ")</h3>\n";
+        print_firstname_variants conf variants_set);
+      first_name_print_sections conf base sections ~rev)
+    sections_groups;
   Hutil.trailer conf
+
+let first_name_print_list conf base x1 xl listes ~rev =
+  first_name_print_list_multi conf base x1 xl
+    [ (listes, rev, Mutil.StrSet.empty) ]
 
 let mk_specify_title conf kw n _ =
   Output.print_sstring conf (Utf8.capitalize_fst kw);
@@ -1187,5 +1243,5 @@ let search_first_name_print conf base x =
             else pl)
           rev_pl []
       in
-      first_name_print_list conf base x strl [ ("", pl) ]
+      first_name_print_list conf base x strl [ ("", pl) ] ~rev:false
   | _ -> select_first_name conf x list

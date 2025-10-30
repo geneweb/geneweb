@@ -15255,6 +15255,10 @@ sl: osebe z istim imenom
 sv: personer med samma namn
 tr: aynı adı taşıyan kişiler
 
+    phonetic variants
+en: phonetic variants
+fr: variantes phonétiques
+
     photos & documents
 co: ducumenti è fiure
 de: Fotos & Dokumente
@@ -16921,10 +16925,10 @@ fr: facultatif/obligatoire
     search_exact_fn
 co: ricerca esatta
 de: genaue Suche
-en: exact search
+en: first name(s) exact search
 es: búsqueda exacta
 fi: tarkka haku
-fr: recherche exacte
+fr: recherche exacte prénom(s)
 it: ricerca esatta
 nl: exact zoeken
 no: eksakt søk
