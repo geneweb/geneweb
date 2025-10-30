@@ -4,7 +4,7 @@ val get_wday : Config.config -> Date.date -> string
 (** [get_wday conf date]
     Return the day of the week for this [date] *)
 
-val code_dmy : Config.config -> Date.dmy -> string
+val code_dmy : ?with_short_month:bool -> Config.config -> Date.dmy -> string
 (** Returns textual representation of the date translated to the current language.
     Uses different encodings depending on day's, month's and year's accessibility.
     Doesn't consider precision. *)

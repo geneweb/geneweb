@@ -15,10 +15,13 @@ let get_wday conf = function
 let death_symbol conf =
   Option.value (List.assoc_opt "death_symbol" conf.Config.base_env) ~default:"†"
 
-let code_date conf encoding d m y =
+let code_date ?(with_short_month = false) conf encoding d m y =
   let apply_date_code = function
     | 'd' -> string_of_int d
-    | 'm' -> Util.transl_nth conf "(month)" (m - 1)
+    | 'm' ->
+        Util.transl_nth conf
+          (if with_short_month then "(short month)" else "(month)")
+          (m - 1)
     | 'y' -> string_of_int y
     | c -> "%" ^ String.make 1 c
   in
@@ -52,7 +55,7 @@ let code_date conf encoding d m y =
   in
   loop 0
 
-let code_dmy conf d =
+let code_dmy ?with_short_month conf d =
   let encoding =
     let n =
       if d.Date.day = 1 then 0
@@ -62,7 +65,7 @@ let code_dmy conf d =
     in
     Util.transl_nth conf "(date)" n
   in
-  code_date conf encoding d.Date.day d.Date.month d.Date.year
+  code_date ?with_short_month conf encoding d.Date.day d.Date.month d.Date.year
 
 let default_french_month =
   let tab =
