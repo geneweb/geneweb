@@ -16,6 +16,7 @@ let main () =
     Arg.parse options
       (fun database ->
         let database =
+          let () = Secure.set_base_dir @@ Filename.dirname database in
           try Gwdb.open_base database
           with e ->
             Printexc.raise_with_backtrace e (Printexc.get_raw_backtrace ())
