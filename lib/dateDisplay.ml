@@ -250,6 +250,10 @@ and string_of_dmy ?with_short_month conf d =
     conf d
 
 and gregorian_precision ?with_short_month conf d =
+  let () =
+    GWPARAM.syslog `LOG_DEBUG
+    @@ Printf.sprintf "%s: %s" __LOC__ (Def_show.show_dmy d)
+  in
   if d.Date.delta = 0 then
     let () = GWPARAM.syslog `LOG_DEBUG __LOC__ in
     string_of_dmy ?with_short_month conf d
