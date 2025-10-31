@@ -37,3 +37,14 @@ val print :
 (** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
       trouver la meilleure combinaison de résultat pour afficher la réponse
       la plus probable.                                                     *)
+
+val persons_starting_with :
+  conf:Config.config ->
+  base:Gwdb.base ->
+  filter:(Gwdb.person -> bool) ->
+  first_name_prefix:string ->
+  surname_prefix:string ->
+  limit:int ->
+  Gwdb.iper list
+
+val search_by_sosa_in_env : Config.config -> Gwdb.base -> Gwdb.person option
