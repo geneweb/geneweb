@@ -174,14 +174,17 @@ let string_of_dmy_aux ?with_short_month fn conf d =
   in
   fn conf sy sy2 d
 
-let rec string_of_on_prec_dmy_aux ~calendar conf sy sy2 d =
+let rec string_of_on_prec_dmy_aux ?(with_gregorian_precisions = true) ~calendar
+    conf sy sy2 d =
   let string_of_dmy d m s =
     if d = 0 && m = 0 then Util.transl conf "in (year)" ^ " " ^ s
     else if d = 0 then Util.transl_decline conf "in (month year)" s
     else Util.transl_decline conf "on (day month year)" s
   in
   let gregorian_precision d =
-    Ext_option.return_if (calendar <> Date.Dgregorian) (fun () ->
+    Ext_option.return_if
+      (with_gregorian_precisions && calendar <> Date.Dgregorian)
+      (fun () ->
         Adef.as_string
         @@ gregorian_precision conf
              {
@@ -236,10 +239,12 @@ let rec string_of_on_prec_dmy_aux ~calendar conf sy sy2 d =
       ^ Option.fold ~none:"" ~some:(Printf.sprintf " (%s)")
           (gregorian_precision (Date.dmy_of_dmy2 d2))
 
-and string_of_on_prec_dmy ~calendar conf sy sy2 d =
+and string_of_on_prec_dmy ?with_gregorian_precisions ~calendar conf sy sy2 d =
   Adef.safe
   @@
-  let r = string_of_on_prec_dmy_aux ~calendar conf sy sy2 d in
+  let r =
+    string_of_on_prec_dmy_aux ?with_gregorian_precisions ~calendar conf sy sy2 d
+  in
   replace_spaces_by_nbsp r
 
 and string_of_on_dmy ?with_short_month conf d =
@@ -282,7 +287,7 @@ let to_calendar = function
   | `French -> Date.Dfrench
   | `Hebrew -> Date.Dhebrew
 
-let string_of_on_calendar_dmy ~calendar conf d =
+let string_of_on_calendar_dmy ?with_gregorian_precisions ~calendar conf d =
   let format_date ~conf d =
     match calendar with
     | `Julian ->
@@ -298,7 +303,8 @@ let string_of_on_calendar_dmy ~calendar conf d =
         format_date ~conf (Date.dmy_of_dmy2 d2)
     | Date.Sure | Date.About | Date.Maybe | Date.Before | Date.After -> ""
   in
-  string_of_on_prec_dmy ~calendar:(to_calendar calendar) conf sy sy2 d
+  string_of_on_prec_dmy ?with_gregorian_precisions
+    ~calendar:(to_calendar calendar) conf sy sy2 d
 
 let format_date_with_gregorian_precisions ~sep ~conf ~calendar d =
   let s = string_of_on_calendar_dmy ~calendar conf d in
