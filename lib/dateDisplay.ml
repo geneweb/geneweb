@@ -140,6 +140,10 @@ let code_hebrew_date conf d m y =
   in
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 
+let code_julian_date conf d =
+  Printf.sprintf "%s %s" (code_dmy conf d)
+    (Util.transl_nth conf "gregorian/julian/french/hebrew" 1)
+
 let replace_spaces_by_nbsp s =
   let rec loop i len =
     if i = String.length s then Buff.get len
@@ -290,9 +294,7 @@ let to_calendar = function
 let string_of_on_calendar_dmy ?with_gregorian_precisions ~calendar conf d =
   let format_date ~conf d =
     match calendar with
-    | `Julian ->
-        Printf.sprintf "%s %s" (code_dmy conf d)
-          (Util.transl_nth conf "gregorian/julian/french/hebrew" 1)
+    | `Julian -> code_julian_date conf d
     | `French -> code_french_date conf d.Date.day d.Date.month d.Date.year
     | `Hebrew -> code_hebrew_date conf d.Date.day d.Date.month d.Date.year
   in
