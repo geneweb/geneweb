@@ -563,7 +563,6 @@ let treat_request =
                | _ -> Geneweb.BirthdayDisplay.print_menu_marriage conf base)
            | "AS_OK" -> w_base @@ Geneweb.AdvSearchOkDisplay.print
            | "C" -> w_base @@ w_person @@ Geneweb.CousinsDisplay.print
-           | "CAL" -> fun conf _ -> Geneweb.Hutil.print_calendar conf
            | "CHG_CHN" when conf.wizard ->
                w_wizard @@ w_base @@ Geneweb.ChangeChildrenDisplay.print
            | "CHG_CHN_OK" ->
@@ -618,14 +617,9 @@ let treat_request =
            | "KILL_ANC" ->
                w_wizard @@ w_lock @@ w_base
                @@ Geneweb.MergeIndDisplay.print_kill_ancestors
-           | "LB" when conf.wizard || conf.friend ->
-               w_base @@ Geneweb.BirthDeathDisplay.print_birth
            | "LD" when conf.wizard || conf.friend ->
                w_base @@ Geneweb.BirthDeathDisplay.print_death
            | "LINKED" -> w_base @@ w_person @@ Geneweb.Perso.print_what_links
-           | "LL" -> w_base @@ Geneweb.BirthDeathDisplay.print_longest_lived
-           | "LM" when conf.wizard || conf.friend ->
-               w_base @@ Geneweb.BirthDeathDisplay.print_marriage
            | "MISC_NOTES" -> w_base @@ Geneweb.NotesDisplay.print_misc_notes
            | "MISC_NOTES_SEARCH" ->
                w_base @@ Geneweb.NotesDisplay.print_misc_notes_search
@@ -733,12 +727,6 @@ let treat_request =
                    relation_print conf base
                      (Geneweb.Util.pget conf base (Gwdb.iper_of_string i)))
            | "NOTES" -> w_base @@ Geneweb.NotesDisplay.print
-           | "OA" when conf.wizard || conf.friend ->
-               w_base @@ Geneweb.BirthDeathDisplay.print_oldest_alive
-           | "OE" when conf.wizard || conf.friend ->
-               w_base @@ Geneweb.BirthDeathDisplay.print_oldest_engagements
-           | "POP_PYR" when conf.wizard || conf.friend ->
-               w_base @@ Geneweb.BirthDeathDisplay.print_population_pyramid
            | "PS" -> w_base @@ Geneweb.PlaceDisplay.print_all_places_surnames
            | "R" -> w_base @@ w_person @@ relation_print
            | "REQUEST" ->

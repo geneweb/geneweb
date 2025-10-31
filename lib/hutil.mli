@@ -73,7 +73,3 @@ val interp_no_header :
   'a Templ.env ->
   'b ->
   unit
-
-val print_calendar : Config.config -> unit
-(** Displays the calendar; if no key is set, it will use today's date.
-    Based on template file calendar.txt *)

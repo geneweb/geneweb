@@ -11,6 +11,7 @@
             geneweb_core
             geneweb_def
             geneweb_def_ord
+            geneweb_def_show
             geneweb_gwdb
             geneweb_util
 	    geneweb_system_util
