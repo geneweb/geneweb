@@ -184,7 +184,10 @@ let rec string_of_on_prec_dmy_aux ~calendar conf sy sy2 d =
     Ext_option.return_if (calendar <> Date.Dgregorian) (fun () ->
         Adef.as_string
         @@ gregorian_precision conf
-             (Date.convert ~from:calendar ~to_:Date.Dgregorian d))
+             {
+               (Date.convert ~from:calendar ~to_:Date.Dgregorian d) with
+               Date.prec = Date.Sure;
+             })
   in
   match d.Date.prec with
   | Date.Sure -> string_of_dmy d.Date.day d.Date.month sy
