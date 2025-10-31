@@ -266,25 +266,7 @@ and gregorian_precision ?with_short_month conf d =
     GWPARAM.syslog `LOG_DEBUG
     @@ Printf.sprintf "%s: %s" __LOC__ (Def_show.show_dmy d)
   in
-  if d.Date.delta = 0 then
-    let () = GWPARAM.syslog `LOG_DEBUG __LOC__ in
-    string_of_dmy ?with_short_month conf d
-  else
-    let () = GWPARAM.syslog `LOG_DEBUG __LOC__ in
-    let d2 =
-      let sdn = d.Date.delta + Date.to_sdn ~from:Date.Dgregorian d in
-      Date.gregorian_of_sdn ~prec:d.Date.prec sdn
-    in
-    Adef.safe
-    @@ Util.transl conf "between (date)"
-    ^ " "
-    ^ (string_of_on_dmy ?with_short_month conf { d with Date.prec = Date.Sure }
-        :> string)
-    ^ " "
-    ^ Util.transl_nth conf "and" 0
-    ^ " "
-    ^ (string_of_on_dmy ?with_short_month conf { d2 with Date.prec = Date.Sure }
-        :> string)
+  string_of_dmy ?with_short_month conf d
 
 let to_calendar = function
   | `Julian -> Date.Djulian
