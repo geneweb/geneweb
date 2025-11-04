@@ -89,6 +89,7 @@ let print_callstack ?(max = 5) () =
   Printexc.(print_raw_backtrace stderr @@ get_callstack max)
 
 let verbose = ref true
+let particles_file = ref ""
 let rm fname = if Sys.file_exists fname then Sys.remove fname
 let mv src dst = if Sys.file_exists src then Sys.rename src dst
 
@@ -219,8 +220,13 @@ let input_particles fname =
     let rec loop list len =
       match input_char ic with
       | '_' -> loop list (Buff.store len ' ')
-      | '\n' -> loop (if len = 0 then list else Buff.get len :: list) 0
+      | '\n' ->
+          if len = 0 then loop list 0
+          else
+            let particle = Buff.get len in
+            loop (particle :: Utf8.uppercase particle :: list) 0
       | '\r' -> loop list len
+      | '#' -> loop list len
       | c -> loop list (Buff.store len c)
       | exception End_of_file ->
           close_in ic;

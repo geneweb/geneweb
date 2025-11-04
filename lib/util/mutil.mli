@@ -1,6 +1,11 @@
 (* Copyright (c) 2006-2007 INRIA *)
 val list_limit : int -> 'a list -> 'a list
 
+val particles_file : string ref
+(** File containing particles definitions. Default is etc/particles.txt
+    priorities: 1/ particles.txt if exists in bname.gwb 2/ value of -particles
+    argument 3/ etc/particles.txt *)
+
 val verbose : bool ref
 (** Global variable that indicates either servers should be in verbose mode. *)
 
