@@ -972,7 +972,11 @@ let with_database ?(read_only = false) bname k =
         (empty_patch_ht (), RDONLY)
   in
   let synchro = input_synchro bname in
-  let particles = Mutil.input_particles (bname // "particles.txt") in
+  let fname = bname // "particles.txt" in
+  let particles =
+    if Sys.file_exists fname then Mutil.input_particles fname
+    else Mutil.input_particles !Mutil.particles_file
+  in
   Secure.with_open_in_bin (bname // "base") @@ fun ic ->
   let version =
     if Mutil.check_magic Dutil.magic_GnWb0024 ic then GnWb0024

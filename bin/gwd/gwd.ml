@@ -2300,6 +2300,9 @@ let main () =
       ( "-add_lexicon",
         Arg.String (Mutil.list_ref_append lexicon_list),
         "<FILE> Add file as lexicon." );
+      ( "-particles",
+        Arg.String (fun x -> Mutil.particles_file := x),
+        "<FILE> Particles file." );
       ( "-log",
         Arg.String set_log_file,
         {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|}
@@ -2445,6 +2448,9 @@ let main () =
      in
      images_prefix := "file://" ^ slashify abs_dir);
   GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
+  let dist_etc_d = Filename.concat (Filename.dirname Sys.argv.(0)) "etc" in
+  if !Mutil.particles_file = "" then
+    Mutil.particles_file := Filename.concat dist_etc_d "particles.txt";
   Wserver.stop_server :=
     List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
   let query, cgi =
