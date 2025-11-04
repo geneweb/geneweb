@@ -3,8 +3,12 @@ let initialize_search_indexes database =
     Lock.print_try_again ();
     raise Exit
   in
+  Gwdb.load_persons_array database;
+  Gwdb.load_strings_array database;
   Gwdb.initialize_lowercase_name_index ~on_lock_error ~kind:`First_name database;
-  Gwdb.initialize_lowercase_name_index ~on_lock_error ~kind:`Surname database
+  Gwdb.initialize_lowercase_name_index ~on_lock_error ~kind:`Surname database;
+  Gwdb.clear_persons_array database;
+  Gwdb.clear_strings_array database
 
 let main () =
   let options = [] in

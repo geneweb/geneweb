@@ -13,7 +13,8 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   let nb_ind = Gwdb.nb_of_persons base in
   if fast then (
     Gwdb.load_strings_array base;
-    Gwdb.load_persons_array base);
+    Gwdb.load_persons_array base;
+    Gwdb.load_families_array base);
   let person_fixes = [] in
   let family_fixes = [] in
   let family_fixes =
@@ -78,9 +79,6 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     Geneweb.Fixbase.perform_fixes ~report ~progress ~base ~person_fixes
       ~family_fixes;
   if v1 then ProgrBar.finish ();
-  if fast then (
-    Gwdb.clear_strings_array base;
-    Gwdb.clear_persons_array base);
   if not !dry_run then (
     if !fix <> 0 then (
       Gwdb.commit_patches base;
@@ -104,7 +102,11 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
       base;
     if v1 then (
       Printf.printf "Done";
-      flush stdout))
+      flush stdout));
+  if fast then (
+    Gwdb.clear_strings_array base;
+    Gwdb.clear_persons_array base;
+    Gwdb.clear_families_array base)
 
 (**/**)
 
