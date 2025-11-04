@@ -24,3 +24,9 @@ val output :
     - {i notes_d} directory containing .txt for each extended page.
     - {i particles.txt} text file with autorised name's particles.
     *)
+
+val initialize_lowercase_name_index :
+  ?on_lock_error:(unit -> unit) ->
+  kind:[< `First_name | `Surname ] ->
+  Dbdisk.dsk_base ->
+  unit
