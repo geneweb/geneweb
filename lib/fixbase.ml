@@ -532,7 +532,6 @@ let perform_fixes ~(report : (patch -> unit) option) ~progress ~base
     ~(person_fixes : person_fix list) ~(family_fixes : family_fix list) =
   if person_fixes = [] && family_fixes = [] then 0
   else
-    let persons = Gwdb.persons base in
     let n_persons = Gwdb.nb_of_persons base in
     let n_families = Gwdb.nb_of_families base in
     let end_progress = if person_fixes <> [] then n_persons else 0 in
@@ -541,19 +540,22 @@ let perform_fixes ~(report : (patch -> unit) option) ~progress ~base
       else (0, end_progress)
     in
     let nb_fixes = ref 0 in
-    Gwdb.Collection.iteri
-      (fun i person ->
-        progress i end_progress;
-        List.iter
-          (fun fix -> if fix ~report ~base ~person then incr nb_fixes)
-          person_fixes)
-      persons;
-    let families = Gwdb.families base in
-    Gwdb.Collection.iteri
-      (fun i family ->
-        progress (fstart_progress + i) end_progress;
-        List.iter
-          (fun fix -> if fix ~report ~base ~family then incr nb_fixes)
-          family_fixes)
-      families;
+    (if person_fixes <> [] then
+     let persons = Gwdb.persons base in
+     Gwdb.Collection.iteri
+       (fun i person ->
+         progress i end_progress;
+         List.iter
+           (fun fix -> if fix ~report ~base ~person then incr nb_fixes)
+           person_fixes)
+       persons);
+    (if family_fixes <> [] then
+     let families = Gwdb.families base in
+     Gwdb.Collection.iteri
+       (fun i family ->
+         progress (fstart_progress + i) end_progress;
+         List.iter
+           (fun fix -> if fix ~report ~base ~family then incr nb_fixes)
+           family_fixes)
+       families);
     !nb_fixes
