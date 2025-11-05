@@ -94,6 +94,23 @@ let next_family_fun_templ gwo_list fi =
     in
     loop ()
 
+(* Parse -ngrams argument: <bi>[,<tri>[,<quad>]] *)
+let parse_ngrams s =
+  match String.split_on_char ',' s with
+  | [ bi_str ] ->
+      let bi = int_of_string bi_str in
+      let tri = max 10 (bi / 25) in
+      let quad = max 5 (bi / 50) in
+      (bi, tri, quad)
+  | [ bi_str; tri_str ] ->
+      let bi = int_of_string bi_str in
+      let tri = int_of_string tri_str in
+      let quad = max 5 (tri / 2) in
+      (bi, tri, quad)
+  | [ bi_str; tri_str; quad_str ] ->
+      (int_of_string bi_str, int_of_string tri_str, int_of_string quad_str)
+  | _ -> failwith "Invalid -ngrams format. Use: <bi>[,<tri>[,<quad>]]"
+
 let just_comp = ref false
 let in_file = ref ""
 let separate = ref false
@@ -102,6 +119,7 @@ let shift = ref 0
 let files = ref []
 let kill_gwo = ref false
 let no_warn = ref false
+let ngrams_arg = ref None
 
 let speclist =
   [
@@ -126,6 +144,10 @@ let speclist =
     ("-mem", Arg.Set Geneweb_db.Outbase.save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear Db1link.do_check, " No consistency check");
     ("-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error");
+    ( "-ngrams",
+      Arg.String (fun s -> ngrams_arg := Some (parse_ngrams s)),
+      "<bi>[,<tri>[,<quad>]] N-gram indexing thresholds (e.g., '500,20,10' or \
+       '500')" );
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
     ( "-nopicture",
       Arg.Set Gwcomp.no_picture,
@@ -219,6 +241,13 @@ let main () =
     in
     Lock.control ~on_exn ~wait:false ~lock_file (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
+        (match !ngrams_arg with
+        | Some (bi, tri, quad) ->
+            Geneweb_db.Outbase.set_ngram_thresholds bi tri quad;
+            Printf.eprintf "N-grams enabled: bi≥%d, tri≥%d, quad≥%d\n" bi tri
+              quad;
+            flush stderr
+        | None -> ());
         if Db1link.link ~no_warn:!no_warn next_family_fun bdir then (
           if !kill_gwo then
             List.iter
