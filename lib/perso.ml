@@ -2906,7 +2906,10 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                             || Event.has_witnesses event_item
                           then true
                           else loop events nb_principal_pevents nb_marr
-                      | _ -> true))
+                      | Def.Efam_Annulation | Def.Efam_MarriageBann
+                      | Def.Efam_MarriageContract | Def.Efam_MarriageLicense
+                      | Def.Efam_PACS | Def.Efam_Residence | Def.Efam_Name _ ->
+                          true))
             in
             let rec loop' = function
               | [] -> false
