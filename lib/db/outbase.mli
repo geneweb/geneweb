@@ -1,6 +1,11 @@
 val save_mem : bool ref
 (** Flag that enables memory saving by calling gc sometimes *)
 
+val set_ngram_thresholds : int -> int -> int -> unit
+(** [set_ngram_thresholds bi tri quad] Configure n-gram indexing with minimum
+    occurrence thresholds for bigrams, trigrams and quadrigrams. Call before
+    rebuild to enable n-gram enrichment of names.inx index. *)
+
 val output : Dbdisk.dsk_base -> unit
 (** [output base] uses data section of the [base] to store database on the disk
     in the files:
