@@ -896,3 +896,6 @@ type evar_button = { evar : string; text : string }
 val evar_buttons : config -> string -> evar_button list -> string -> unit
 (** evar_button conf query_string evar evar_text title_text creates a button to
     toggle evar *)
+
+val url_set_aux : config -> string -> string list -> string list -> string
+(** *)
