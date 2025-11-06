@@ -8902,6 +8902,10 @@ sv: förnamn/förnamn
 tr: ilk ad/ilk adlar/ilk ad(lar)
 zh: 名
 
+    first names exact/included
+en: identical first names/first names included
+fr: prénoms identiques/prénoms inclus
+
     firstCommunion
 co: prima cumunione
 de: erste Kommunion
@@ -16925,10 +16929,10 @@ fr: facultatif/obligatoire
     search_exact_fn
 co: ricerca esatta
 de: genaue Suche
-en: first name(s) exact search
+en: exact search
 es: búsqueda exacta
 fi: tarkka haku
-fr: recherche exacte prénom(s)
+fr: recherche exacte
 it: ricerca esatta
 nl: exact zoeken
 no: eksakt søk
@@ -16949,6 +16953,10 @@ no: eksakt søk
 pt: pesquisa exata
 sv: exakt sökning
 tr: tam arama
+
+    search_partial_fn
+en: partial search
+fr: recherche partielle
 
     searching all
 co: ricerca tutti l’individui

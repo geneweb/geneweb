@@ -293,49 +293,176 @@ let first_name_print_sections conf base listes ~rev =
           list))
     listes
 
-let print_firstname_variants conf variants_set =
-  if not (StrSet.is_empty variants_set) then (
-    Output.print_sstring conf {|<div class="font-weight-bold mb-3">|};
-    Mutil.list_iter_first
-      (fun first fn ->
-        if not first then Output.print_sstring conf ", ";
-        Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (commd conf);
-        Output.print_sstring conf "m=P&v=";
-        Output.print_string conf (Mutil.encode fn);
-        Output.print_sstring conf {|">|};
-        Output.print_string conf (escape_html fn);
-        Output.print_sstring conf "</a>")
-      (StrSet.elements variants_set);
-    Output.print_sstring conf "</div>\n")
+let print_firstname_variants conf ?(filter = true) variants_set =
+  if not (StrSet.is_empty variants_set) then
+    let query =
+      match p_getenv conf.env "p" with
+      | Some q -> Name.lower q
+      | None -> (
+          match p_getenv conf.env "v" with Some q -> Name.lower q | None -> "")
+    in
+    let filtered_variants =
+      if filter && query <> "" then
+        StrSet.filter
+          (fun fn ->
+            let fn_lower = Name.lower fn in
+            Mutil.contains fn_lower query)
+          variants_set
+      else variants_set
+    in
+    if not (StrSet.is_empty filtered_variants) then (
+      Output.print_sstring conf {|<div class="font-weight-bold mb-3">|};
+      Mutil.list_iter_first
+        (fun first fn ->
+          if not first then Output.print_sstring conf ", ";
+          Output.print_sstring conf {|<a href="|};
+          Output.print_string conf (commd conf);
+          Output.print_sstring conf "m=P&v=";
+          Output.print_string conf (Mutil.encode fn);
+          Output.print_sstring conf {|&t=A">|};
+          Output.print_string conf (escape_html fn);
+          Output.print_sstring conf "</a>")
+        (StrSet.elements filtered_variants);
+      Output.print_sstring conf "</div>\n")
 
-let first_name_print_list_multi conf base x1 xl sections_groups =
-  let title _ =
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "search_exact_fn"));
-    Output.print_sstring conf (transl conf ":");
-    Output.print_sstring conf " ";
-    Output.print_string conf (escape_html x1)
+let make_toggle_button conf ~evar ~is_on ~on ~off ~label =
+  let value = if is_on then off else on in
+  let url =
+    Util.url_set_aux conf (Util.commd conf :> string) [ evar ] [ value ]
   in
-  Hutil.header conf title;
-  if not (StrSet.is_empty xl) then print_firstname_variants conf xl;
+  let icon = if is_on then "check" else "xmark" in
+  Printf.sprintf
+    {|<a href="%s" class="btn btn-outline-primary btn-sm">
+        <i class="fa fa-%s mr-1"></i>%s
+      </a>|}
+    url icon
+    (Utf8.capitalize_fst label)
+
+let first_name_print_list_multi conf base x1 sections_groups =
+  let make_anchor_button anchor label =
+    Printf.sprintf
+      {|<a href="#%s" class="btn btn-outline-secondary btn-sm">
+          <i class="fa fa-arrow-down mr-1"></i>%s
+        </a>|}
+      anchor label
+  in
+  let print_section_header id title count =
+    Output.printf conf {|<h2 class="h3 mt-4 mb-2" id="%s">%s (%d)</h2>|} id
+      title count
+  in
+  let has_section section_id =
+    List.exists (fun (id, _, _, _) -> id = section_id) sections_groups
+  in
+  let include_aliases = p_getenv conf.env "fna" <> None in
+  let is_partial = p_getenv conf.env "p_exact" = Some "off" in
+  let main_count =
+    match sections_groups with
+    | (_, sections, _, _) :: _ ->
+        List.fold_left
+          (fun acc (_, persons) -> acc + List.length persons)
+          0 sections
+    | [] -> 0
+  in
+  let title_key =
+    if is_partial then "search_partial_fn" else "search_exact_fn"
+  in
+  let query_words = Util.cut_words (Name.lower x1) in
+  let has_multiple_words = List.length query_words > 1 in
+  let p_exact_on = p_getenv conf.env "p_exact" <> Some "off" in
+  let p_all_on = p_getenv conf.env "p_all" = Some "on" in
+  let p_order_on = p_getenv conf.env "p_order" = Some "on" in
+  Hutil.header_without_title conf;
+  Output.printf conf
+    {|<div class="d-flex align-items-center mb-3">
+        <h1 class="mb-0">%s "%s"</h1>
+        <div class="ml-auto">%s</div>
+      </div>|}
+    (Utf8.capitalize_fst (transl conf title_key))
+    (escape_html x1 :> string)
+    (make_toggle_button conf ~evar:"fna" ~is_on:include_aliases ~on:"1" ~off:""
+       ~label:(transl_nth conf "first name alias" 1));
+  let anchor_buttons =
+    List.filter_map
+      (fun (id, anchor, label_fn) ->
+        if has_section id then Some (make_anchor_button anchor (label_fn ()))
+        else None)
+      [
+        ( 1,
+          "alias",
+          fun () -> transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst
+        );
+        ( 2,
+          "included-variants",
+          fun () ->
+            transl_nth conf "first names exact/included" 1
+            |> Utf8.capitalize_fst );
+        ( 3,
+          "phonetic-variants",
+          fun () -> transl conf "phonetic variants" |> Utf8.capitalize_fst );
+      ]
+  in
+  let option_buttons =
+    make_toggle_button conf ~evar:"p_exact" ~is_on:p_exact_on ~on:"" ~off:"off"
+      ~label:(transl conf "not exact")
+    ::
+    (if has_multiple_words then
+       [
+         make_toggle_button conf ~evar:"p_all" ~is_on:p_all_on ~on:"on"
+           ~off:"" ~label:(transl conf "not all");
+         make_toggle_button conf ~evar:"p_order" ~is_on:p_order_on ~on:""
+           ~off:"off"
+           ~label:(transl conf "order");
+       ]
+     else [])
+  in
+  if anchor_buttons <> [] || option_buttons <> [] then
+    Output.printf conf
+      {|<div class="d-flex align-items-center mb-3">
+          <div>%s</div>
+          <div class="ml-auto">%s</div>
+        </div>|}
+      (String.concat "\n" anchor_buttons)
+      (String.concat "\n" option_buttons);
+  Output.printf conf {|<h2 class="h3 my-2">%s (%d)</h2>|}
+    (transl_nth conf "first names exact/included" 0 |> Utf8.capitalize_fst)
+    main_count;
   List.iter
-    (fun (sections, rev, variants_set) ->
-      if not (StrSet.is_empty variants_set) then (
-        Output.print_sstring conf {|<h3 class="mt-4 mb-2">|};
-        Output.print_sstring conf
-          (transl conf "other possibilities" |> Utf8.capitalize_fst);
-        Output.print_sstring conf " (";
-        Output.print_sstring conf (transl conf "phonetic variants");
-        Output.print_sstring conf ")</h3>\n";
-        print_firstname_variants conf variants_set);
+    (fun (section_id, sections, rev, variants_set) ->
+      let section_count =
+        List.fold_left
+          (fun acc (_, persons) -> acc + List.length persons)
+          0 sections
+      in
+      (match section_id with
+      | 0 ->
+          if main_count > 1 && not (StrSet.is_empty variants_set) then
+            print_firstname_variants conf variants_set
+      | 1 when include_aliases ->
+          print_section_header "alias"
+            (transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst)
+            section_count;
+          if not (StrSet.is_empty variants_set) then
+            print_firstname_variants conf ~filter:false variants_set
+      | 2 when section_count > 0 ->
+          print_section_header "included-variants"
+            (transl_nth conf "first names exact/included" 1
+            |> Utf8.capitalize_fst)
+            section_count;
+          if not (StrSet.is_empty variants_set) then
+            print_firstname_variants conf variants_set
+      | 3 when section_count > 0 ->
+          Output.printf conf
+            {|<h2 class="h3 mt-4 mb-2" id="phonetic-variants">%s (%d)</h2>|}
+            (transl conf "phonetic variants" |> Utf8.capitalize_fst)
+            section_count;
+          print_firstname_variants conf ~filter:false variants_set
+      | _ -> ());
       first_name_print_sections conf base sections ~rev)
     sections_groups;
   Hutil.trailer conf
 
 let first_name_print_list conf base x1 xl listes ~rev =
-  first_name_print_list_multi conf base x1 xl
-    [ (listes, rev, Mutil.StrSet.empty) ]
+  first_name_print_list_multi conf base x1 [ (0, listes, rev, xl) ]
 
 let mk_specify_title conf kw n _ =
   Output.print_sstring conf (Utf8.capitalize_fst kw);
@@ -1227,7 +1354,6 @@ let search_first_name conf base x =
 
 let search_first_name_print conf base x =
   let list = search_first_name conf base x in
-  (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match list with
   | [] -> first_name_not_found conf x
