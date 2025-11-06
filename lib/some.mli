@@ -65,14 +65,12 @@ val first_name_print_sections :
   rev:bool ->
   unit
 
-val print_firstname_variants : Config.config -> Mutil.StrSet.t -> unit
-
 val first_name_print_list_multi :
   Config.config ->
   Geneweb_db.Driver.base ->
   string ->
-  Mutil.StrSet.t ->
-  ((string * Geneweb_db.Driver.person list) list * bool * Mutil.StrSet.t) list ->
+  (int * (string * Geneweb_db.Driver.person list) list * bool * Mutil.StrSet.t)
+  list ->
   unit
 
 val first_name_print_list :
