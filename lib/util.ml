@@ -3535,3 +3535,110 @@ let evar_buttons conf query_string evar_l title_text =
         %s
       </div>|}
     title_text buttons
+
+let order =
+  [
+    "b";
+    "lang";
+    "templ";
+    "iz";
+    "pz";
+    "nz";
+    "ocz";
+    "m";
+    "em";
+    "t";
+    "et";
+    "i";
+    "p";
+    "n";
+    "oc";
+    "wide";
+    "im";
+    "sp";
+    "ma";
+    "v";
+  ]
+
+let reorder (conf : Config.config) url_env =
+  (* Determine if lang parameter should be included *)
+  let should_keep_lang =
+    match List.assoc_opt "lang" url_env with
+    | None -> false
+    | Some lang -> conf.default_lang <> lang
+  in
+
+  (* Check if a parameter should be included in the URL *)
+  let should_include_param k v =
+    match k with
+    | "lang" -> should_keep_lang
+    | "oc" | "ocz" -> v <> "" && v <> "0"
+    | _ -> v <> ""
+  in
+
+  (* Process parameters in the specified order *)
+  let ordered_params, processed_keys =
+    List.fold_left
+      (fun (params, keys) k ->
+        match List.assoc_opt k url_env with
+        | None -> (params, keys)
+        | Some v when should_include_param k v ->
+            (Format.sprintf "%s=%s" k v :: params, k :: keys)
+        | Some _ -> (params, keys))
+      ([], []) order
+  in
+
+  (* Process remaining parameters not in order *)
+  let unordered_params =
+    List.fold_left
+      (fun acc (k, v) ->
+        if List.mem k processed_keys || not (should_include_param k v) then acc
+        else Format.sprintf "%s=%s" k v :: acc)
+      [] url_env
+  in
+
+  String.concat "&" (List.rev ordered_params @ List.rev unordered_params)
+
+let url_set_aux conf url evar_l str_l =
+  (* Extract base URL before query string *)
+  let href =
+    match String.split_on_char '?' url with
+    | [] ->
+        Logs.syslog `LOG_WARNING "Empty Url\n";
+        ""
+    | server :: _ -> server
+  in
+
+  (* Pad str_l to match evar_l length with empty strings *)
+  let str_l =
+    List.mapi
+      (fun i _ -> if i < List.length str_l then List.nth str_l i else "")
+      evar_l
+  in
+
+  (* Merge and deduplicate conf environment lists (latest values take precedence) *)
+  let all_conf_env = conf.henv @ conf.senv @ conf.env in
+  let conf_map =
+    List.fold_left
+      (fun acc (k, v) -> (k, v) :: List.remove_assoc k acc)
+      [] all_conf_env
+  in
+
+  (* Build URL parameters from evar_l and str_l *)
+  let url_env =
+    List.fold_left2
+      (fun acc evar str -> if str <> "" then (evar, str) :: acc else acc)
+      [] evar_l str_l
+    |> List.rev
+  in
+
+  (* Add remaining conf parameters not in evar_l *)
+  let url_env =
+    List.fold_left
+      (fun acc (k, v) ->
+        if List.mem k evar_l then acc else (k, Adef.as_string v) :: acc)
+      url_env conf_map
+    |> List.rev
+  in
+
+  Format.sprintf "%s?%s" href (reorder conf url_env)

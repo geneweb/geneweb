@@ -140,76 +140,6 @@ let url_aux ?(pwd = true) (conf : Config.config) =
   if conf.cgi then prefix ^ "?" ^ conf.bname ^ String.concat "&" l
   else prefix ^ String.concat "&" l
 
-let order =
-  [
-    "b";
-    "lang";
-    "templ";
-    "iz";
-    "pz";
-    "nz";
-    "ocz";
-    "m";
-    "em";
-    "t";
-    "et";
-    "i";
-    "p";
-    "n";
-    "oc";
-    "wide";
-    "im";
-    "sp";
-    "ma";
-    "v";
-  ]
-
-let reorder (conf : Config.config) url_env =
-  let new_lang =
-    match List.assoc "lang" url_env with exception Not_found -> "" | l -> l
-  in
-  let keep_lang =
-    (* same condition in Util.commd and copyr.txt *)
-    conf.default_lang <> new_lang
-  in
-  (* process evars from order *)
-  let env1, ok =
-    let rec loop (acc1, acc2) order =
-      match order with
-      | [] -> (acc1, acc2)
-      | k :: order ->
-          let v =
-            match List.assoc k url_env with exception Not_found -> "" | v -> v
-          in
-          if
-            List.mem_assoc k url_env
-            &&
-            match (k, v) with
-            | "lang", _ -> keep_lang
-            | "oc", v when v = "" || v = "0" -> false
-            | "ocz", v when v = "" || v = "0" -> false
-            | _, v when v <> "" -> true
-            | _, _ -> false
-          then loop (Format.sprintf "%s=%s" k v :: acc1, k :: acc2) order
-          else loop (acc1, acc2) order
-    in
-    loop ([], []) order
-  in
-  (* process other evars from env *)
-  let env2 =
-    List.fold_left
-      (fun acc (k, v) ->
-        if
-          List.mem k ok
-          || (k = "lang" && not keep_lang)
-          || ((k = "oc" || k = "ocz") && (v = "" || v = "0"))
-          || v = ""
-        then acc
-        else Format.sprintf "%s=%s" k v :: acc)
-      [] url_env
-  in
-  String.concat "&" (List.rev env1 @ List.rev env2)
-
 let find_sosa_ref (conf : Config.config) =
   let env = conf.henv @ conf.senv @ conf.env in
   let get_env evar env =
@@ -220,50 +150,6 @@ let find_sosa_ref (conf : Config.config) =
   let ocz = get_env "ocz" env in
   let iz = get_env "iz" env in
   (iz, pz, nz, ocz)
-
-(* url_set_aux can reset several evar from evar_l in one call *)
-let url_set_aux conf evar_l str_l =
-  let str_l =
-    List.mapi
-      (fun i _evar -> if i < List.length str_l then List.nth str_l i else "")
-      evar_l
-  in
-  let href =
-    match String.split_on_char '?' (Util.commd conf :> string) with
-    | [] ->
-        Logs.syslog `LOG_WARNING "Empty Url\n";
-        ""
-    | s :: _l -> s
-  in
-  let conf_l = conf.henv @ conf.senv @ conf.env in
-  let k_l = List.map (fun (k, _v) -> k) conf_l in
-
-  let conf_l = List.map (fun k -> (k, List.assoc k conf_l)) k_l |> List.rev in
-
-  (* process evar_l *)
-  let url_env =
-    let rec loop i acc evar_l =
-      match evar_l with
-      | [] -> acc
-      | evar :: evar_l ->
-          let str = List.nth str_l i in
-          if str <> "" then loop (i + 1) ((evar, str) :: acc) evar_l
-          else loop (i + 1) acc evar_l
-    in
-    loop 0 [] evar_l
-  in
-  (* process the remainder of conf_l *)
-  let url_env =
-    let rec loop acc conf_l =
-      match conf_l with
-      | [] -> acc
-      | (k, _v) :: conf_l when List.mem k evar_l -> loop acc conf_l
-      | (k, v) :: conf_l -> loop ((k, Adef.as_string v) :: acc) conf_l
-    in
-    loop url_env conf_l
-  in
-  (* reorder *)
-  Format.sprintf "%s?%s" href (reorder conf url_env)
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -399,10 +285,10 @@ let rec eval_variable (conf : Config.config) = function
   | [ "url_set"; evar_l; str_l ] ->
       let evar_l = String.split_on_char '_' evar_l in
       let str_l = String.split_on_char '_' str_l in
-      url_set_aux conf evar_l str_l
+      Util.url_set_aux conf (Util.commd conf :> string) evar_l str_l
   | [ "url_set"; evar_l ] ->
       let evar_l = String.split_on_char '_' evar_l in
-      url_set_aux conf evar_l []
+      Util.url_set_aux conf (Util.commd conf :> string) evar_l []
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "index" ] -> (
       match conf.user_iper with
@@ -1275,11 +1161,11 @@ let rec eval conf ifun env =
             Util.uri_encode s
         | "url_set", [ (None, VVstring s1) ] ->
             let s1 = String.split_on_char '/' s1 in
-            url_set_aux conf s1 []
+            Util.url_set_aux conf (Util.commd conf :> string) s1 []
         | "url_set", [ (None, VVstring s1); (None, VVstring s2) ] ->
             let s1 = String.split_on_char '/' s1 in
             let s2 = String.split_on_char '/' s2 in
-            url_set_aux conf s1 s2
+            Util.url_set_aux conf (Util.commd conf :> string) s1 s2
         | "nth", [ (None, VVstring s1); (None, VVstring s2) ] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             Util.translate_eval (Util.nth_field s1 n)
