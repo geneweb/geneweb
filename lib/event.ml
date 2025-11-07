@@ -275,3 +275,108 @@ let other_events conf base p =
         true
   in
   p |> events conf base |> List.filter is_other_event
+
+type ('string, 'person) main_family_events = {
+  main_union :
+    (Def.relation_kind
+    * Adef.cdate
+    * 'string
+    * 'string
+    * 'string
+    * ('person * Def.witness_kind * 'string) array)
+    option;
+  main_separation : Def.divorce option;
+}
+
+let get_main_family_events fevents =
+  (* On tri les évènements pour être sûr. *)
+  let fevents =
+    sort_events
+      (fun evt -> Fevent evt.Def.efam_name)
+      (fun evt -> evt.efam_date)
+      fevents
+  in
+
+  let found_marriage :
+      (Def.relation_kind
+      * Def.cdate
+      * 'string
+      * 'string
+      * 'string
+      * ('person * Def.witness_kind * 'string) array)
+      option
+      ref =
+    ref None
+  in
+
+  let found_divorce : Def.divorce option ref = ref None in
+  let mk_marr evt kind =
+    let e =
+      Some
+        ( kind,
+          evt.Def.efam_date,
+          evt.efam_place,
+          evt.efam_note,
+          evt.efam_src,
+          evt.efam_witnesses )
+    in
+    match !found_marriage with
+    | None -> found_marriage := e
+    | Some ((NoMention | Residence), _, _, _, _, _)
+      when kind <> NoMention && kind <> Residence ->
+        found_marriage := e
+    | Some (Married, _, _, _, _, _) when kind <> Married -> ()
+    | _ -> if kind = Married then found_marriage := e
+  in
+  let mk_div kind =
+    match !found_divorce with
+    | None -> found_divorce := Some kind
+    | Some _ -> ()
+  in
+  (* Marriage is more important than any other relation.
+     For other cases, latest event is the most important,
+     except for NotMention and Residence. *)
+  (* FIXME: For now, we ignore Annulation since it gives a wrong date
+     (relation on [annulation date] makes no sense) *)
+  let rec loop = function
+    | [] -> ()
+    | evt :: l -> (
+        match evt.Def.efam_name with
+        | Efam_Engage ->
+            mk_marr evt Engaged;
+            loop l
+        | Efam_Marriage ->
+            mk_marr evt Married;
+            loop l
+        | Efam_MarriageContract ->
+            mk_marr evt MarriageContract;
+            loop l
+        | Efam_NoMention ->
+            mk_marr evt NoMention;
+            loop l
+        | Efam_MarriageBann ->
+            mk_marr evt MarriageBann;
+            loop l
+        | Efam_MarriageLicense ->
+            mk_marr evt MarriageLicense;
+            loop l
+        | Efam_PACS ->
+            mk_marr evt Pacs;
+            loop l
+        | Efam_Residence ->
+            mk_marr evt Residence;
+            loop l
+        | Efam_NoMarriage ->
+            mk_marr evt NotMarried;
+            loop l
+        | Efam_Divorce ->
+            mk_div (Divorced evt.efam_date);
+            loop l
+        | Efam_Separated ->
+            mk_div Separated;
+            loop l
+        | Efam_Annulation -> loop l
+        | Efam_Name _ -> loop l)
+  in
+  loop (List.rev fevents);
+  { main_union = !found_marriage; main_separation = !found_divorce }
