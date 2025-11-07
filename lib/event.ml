@@ -304,9 +304,7 @@ let get_main_family_events fevents =
       (fun evt -> evt.efam_date)
       fevents
   in
-
   let found_marriage = ref None in
-
   let found_divorce = ref None in
   let mk_marr evt kind =
     let e =
