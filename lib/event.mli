@@ -53,15 +53,23 @@ val other_events :
     (i.e. all [p]'s events except birth, , baptism, death, burial and
     marriage).  **)
 
+type ('string, 'person) witness = private {
+  person : 'person;
+  kind : Def.witness_kind;
+  note : 'string;
+}
+
+type ('string, 'person) union = private {
+  kind : Def.relation_kind;
+  date : Adef.cdate;
+  place : 'string;
+  note : 'string;
+  source : 'string;
+  witnesses : ('string, 'person) witness array;
+}
+
 type ('string, 'person) main_family_events = private {
-  main_union :
-    (Def.relation_kind
-    * Adef.cdate
-    * 'string
-    * 'string
-    * 'string
-    * ('person * Def.witness_kind * 'string) array)
-    option;
+  main_union : ('string, 'person) union option;
   main_separation : Def.divorce option;
 }
 

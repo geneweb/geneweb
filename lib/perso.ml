@@ -1395,7 +1395,10 @@ let get_marriage_witnesses_and_notes fam =
     Event.get_main_family_events (Gwdb.gen_family_of_family fam).Def.fevents
   in
   Option.fold ~none:[||]
-    ~some:(fun (_, _, _, _, _, witnesses) -> witnesses)
+    ~some:(fun union ->
+      Array.map
+        (fun { Event.person; kind; note } -> (person, kind, note))
+        union.Event.witnesses)
     main_family_events.Event.main_union
 
 let get_nb_marriage_witnesses_of_kind fam wk =

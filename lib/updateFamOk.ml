@@ -307,7 +307,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
             empty_string,
             empty_string ),
           [||] )
-    | Some (kind, date, place, note, src, wit) ->
+    | Some { Event.kind; date; place; note; source = src; witnesses = wit } ->
         ((kind, date, place, note, src), wit)
   in
   (* Parents de même sexe. *)
@@ -326,7 +326,9 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
     else marr
   in
   let div = Option.value ~default:Def.NotDivorced main_separation in
-  (marr, div, wit)
+  ( marr,
+    div,
+    Array.map (fun { Event.person; kind; note } -> (person, kind, note)) wit )
 
 let reconstitute_family conf base nsck =
   let events, ext = reconstitute_events ~base conf false 1 in

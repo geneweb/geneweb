@@ -276,15 +276,23 @@ let other_events conf base p =
   in
   p |> events conf base |> List.filter is_other_event
 
+type ('string, 'person) witness = {
+  person : 'person;
+  kind : Def.witness_kind;
+  note : 'string;
+}
+
+type ('string, 'person) union = {
+  kind : Def.relation_kind;
+  date : Adef.cdate;
+  place : 'string;
+  note : 'string;
+  source : 'string;
+  witnesses : ('string, 'person) witness array;
+}
+
 type ('string, 'person) main_family_events = {
-  main_union :
-    (Def.relation_kind
-    * Adef.cdate
-    * 'string
-    * 'string
-    * 'string
-    * ('person * Def.witness_kind * 'string) array)
-    option;
+  main_union : ('string, 'person) union option;
   main_separation : Def.divorce option;
 }
 
@@ -303,19 +311,24 @@ let get_main_family_events fevents =
   let mk_marr evt kind =
     let e =
       Some
-        ( kind,
-          evt.Def.efam_date,
-          evt.efam_place,
-          evt.efam_note,
-          evt.efam_src,
-          evt.efam_witnesses )
+        {
+          kind;
+          date = evt.Def.efam_date;
+          place = evt.efam_place;
+          note = evt.efam_note;
+          source = evt.efam_src;
+          witnesses =
+            Array.map
+              (fun (person, kind, note) -> { person; kind; note })
+              evt.efam_witnesses;
+        }
     in
-    match !found_marriage with
+    match Option.map (fun (union : _ union) -> union.kind) !found_marriage with
     | None -> found_marriage := e
-    | Some ((Def.NoMention | Residence), _, _, _, _, _)
+    | Some (Def.NoMention | Residence)
       when kind <> NoMention && kind <> Residence ->
         found_marriage := e
-    | Some (Married, _, _, _, _, _) when kind <> Married -> ()
+    | Some Married when kind <> Married -> ()
     | _ -> if kind = Married then found_marriage := e
   in
   let mk_div kind =
