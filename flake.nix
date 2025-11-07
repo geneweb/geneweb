@@ -14,7 +14,7 @@
         ancient = ocaml-ancient.outputs.packages.${system}.default;
         fetchFromGitHub = pkgs.fetchFromGitHub;
 
-        ocamlPackages = pkgs.ocaml-ng.ocamlPackages.overrideScope (final: super: {
+        ocamlPackages = pkgs.ocaml-ng.ocamlPackages_4_14.overrideScope (final: super: {
           # Add frame pointers for better profiling with Perf.
           ocaml = super.ocaml.override { framePointerSupport = true; };
         });
@@ -111,6 +111,7 @@
             ocaml-lsp
             ocamlformat_0_27_0
             patdiff
+            memtrace
           ]);
 
           inputsFrom = [
