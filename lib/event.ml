@@ -297,19 +297,9 @@ let get_main_family_events fevents =
       fevents
   in
 
-  let found_marriage :
-      (Def.relation_kind
-      * Def.cdate
-      * 'string
-      * 'string
-      * 'string
-      * ('person * Def.witness_kind * 'string) array)
-      option
-      ref =
-    ref None
-  in
+  let found_marriage = ref None in
 
-  let found_divorce : Def.divorce option ref = ref None in
+  let found_divorce = ref None in
   let mk_marr evt kind =
     let e =
       Some
@@ -322,7 +312,7 @@ let get_main_family_events fevents =
     in
     match !found_marriage with
     | None -> found_marriage := e
-    | Some ((NoMention | Residence), _, _, _, _, _)
+    | Some ((Def.NoMention | Residence), _, _, _, _, _)
       when kind <> NoMention && kind <> Residence ->
         found_marriage := e
     | Some (Married, _, _, _, _, _) when kind <> Married -> ()
@@ -370,7 +360,7 @@ let get_main_family_events fevents =
             mk_marr evt NotMarried;
             loop l
         | Efam_Divorce ->
-            mk_div (Divorced evt.efam_date);
+            mk_div (Def.Divorced evt.efam_date);
             loop l
         | Efam_Separated ->
             mk_div Separated;
