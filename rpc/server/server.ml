@@ -217,10 +217,18 @@ let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
     (fun () ->
       match%lwt resolve_addr interface port with
       | Unix.{ ai_addr = sockaddr; _ } :: _ ->
-          let%lwt (_ : Lwt_io.server) =
+          (* FIXME: It seems there is a bug in lwt_ppx with type annotations.
+             We should write:
+             ```ocaml
+             let%lwt (_ : Lwt_io.server) = ...
+             ```
+             See issue https://github.com/ocsigen/lwt/issues/1085
+          *)
+          let%lwt server =
             Lwt_io.establish_server_with_client_socket ~no_close:true sockaddr
               (connection_handler fd_manager)
           in
+          let _ : Lwt_io.server = server in
           Logs_lwt.info (fun k ->
               k "Server listening on %a..." Util.pp_sockaddr sockaddr)
       | _ -> Logs_lwt.err (fun k -> k "Cannot resolve %s:%d..." interface port))
