@@ -54,8 +54,6 @@ val get_cremation_text :
 val get_marriage_date_text :
   Config.config -> Gwdb.family -> bool -> Adef.safe_string
 
-val get_marriage_witnesses : Gwdb.family -> (Gwdb.iper * Def.witness_kind) array
-
 val get_marriage_witnesses_and_notes :
   Gwdb.family -> (Gwdb.iper * Def.witness_kind * Gwdb.istr) array
 
