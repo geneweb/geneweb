@@ -69,6 +69,7 @@ type firstname_results = {
   aliases : firstname_section;
   included : firstname_section;
   phonetic : firstname_section;
+  permuted : firstname_section;
 }
 
 (* ========================================================================= *)
@@ -186,6 +187,59 @@ end
 (* ========================================================================= *)
 (* Section 3: Core Search Functions                                         *)
 (* ========================================================================= *)
+
+let generate_permutations query =
+  let normalized = Mutil.tr '-' ' ' query in
+  let words =
+    List.filter (fun w -> w <> "") (String.split_on_char ' ' normalized)
+  in
+  match List.length words with
+  | 2 ->
+      let w1 = List.nth words 0 in
+      let w2 = List.nth words 1 in
+      [ w2 ^ " " ^ w1 ]
+  | 3 ->
+      let w1 = List.nth words 0 in
+      let w2 = List.nth words 1 in
+      let w3 = List.nth words 2 in
+      [
+        w1 ^ " " ^ w3 ^ " " ^ w2;
+        w2 ^ " " ^ w3 ^ " " ^ w1;
+        w2 ^ " " ^ w1 ^ " " ^ w3;
+        w3 ^ " " ^ w1 ^ " " ^ w2;
+        w3 ^ " " ^ w2 ^ " " ^ w1;
+      ]
+  | 4 ->
+      let w1 = List.nth words 0 in
+      let w2 = List.nth words 1 in
+      let w3 = List.nth words 2 in
+      let w4 = List.nth words 3 in
+      [
+        w1 ^ " " ^ w2 ^ " " ^ w4 ^ " " ^ w3;
+        w1 ^ " " ^ w3 ^ " " ^ w2 ^ " " ^ w4;
+        w1 ^ " " ^ w3 ^ " " ^ w4 ^ " " ^ w2;
+        w1 ^ " " ^ w4 ^ " " ^ w2 ^ " " ^ w3;
+        w1 ^ " " ^ w4 ^ " " ^ w3 ^ " " ^ w2;
+        w2 ^ " " ^ w1 ^ " " ^ w3 ^ " " ^ w4;
+        w2 ^ " " ^ w1 ^ " " ^ w4 ^ " " ^ w3;
+        w2 ^ " " ^ w3 ^ " " ^ w1 ^ " " ^ w4;
+        w2 ^ " " ^ w3 ^ " " ^ w4 ^ " " ^ w1;
+        w2 ^ " " ^ w4 ^ " " ^ w1 ^ " " ^ w3;
+        w2 ^ " " ^ w4 ^ " " ^ w3 ^ " " ^ w1;
+        w3 ^ " " ^ w1 ^ " " ^ w2 ^ " " ^ w4;
+        w3 ^ " " ^ w1 ^ " " ^ w4 ^ " " ^ w2;
+        w3 ^ " " ^ w2 ^ " " ^ w1 ^ " " ^ w4;
+        w3 ^ " " ^ w2 ^ " " ^ w4 ^ " " ^ w1;
+        w3 ^ " " ^ w4 ^ " " ^ w1 ^ " " ^ w2;
+        w3 ^ " " ^ w4 ^ " " ^ w2 ^ " " ^ w1;
+        w4 ^ " " ^ w1 ^ " " ^ w2 ^ " " ^ w3;
+        w4 ^ " " ^ w1 ^ " " ^ w3 ^ " " ^ w2;
+        w4 ^ " " ^ w2 ^ " " ^ w1 ^ " " ^ w3;
+        w4 ^ " " ^ w2 ^ " " ^ w3 ^ " " ^ w1;
+        w4 ^ " " ^ w3 ^ " " ^ w1 ^ " " ^ w2;
+        w4 ^ " " ^ w3 ^ " " ^ w2 ^ " " ^ w1;
+      ]
+  | _ -> []
 
 let person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
@@ -715,37 +769,20 @@ let search_firstname_with_aliases_and_ngrams conf base query =
         (List.length !phonetic_results));
   (alias_results, !phonetic_results)
 
-(* TODO: Support combining exact1=false (phonetic) with order/all options.
-   Current behavior:
-   - exact1=false → phonetic only, ignores order/all
-   - exact1=true  → exact search, uses order/all
-   Desired behavior:
-   - exact1=false + order=true → phonetic with word order validation
-   - exact1=false + all=true → phonetic requiring all query words present
-   Implementation approach:
-   - Extract search_method as parameter (exact vs phonetic function)
-   - Refactor order/all logic into apply_search_options(method, opts)
-   - Reuse same combination logic for both exact and phonetic modes
-   Note: Requires significant refactoring to avoid duplicating the
-   permutation/union logic that currently exists only in the else branch.*)
-
 let search_firstname_with_cache conf base query opts =
   let include_aliases = p_getenv conf.env "fna" <> None in
   Logs.debug (fun k ->
       k "Search p=FirstNameOnly '%s' [all=%b, order=%b, exact=%b, fna=%b]" query
         opts.all opts.order opts.exact1 include_aliases);
-
   if opts.exact1 then (
     let direct_results = search_firstname_direct conf base query in
     List.iter (fun ip -> Some.AliasCache.add_direct ip) direct_results;
-
     let alias_results =
       if include_aliases then search_firstname_aliases conf base query else []
     in
     List.iter
       (fun (ip, alias) -> Some.AliasCache.add_alias ip alias)
       alias_results;
-
     let exact_variants =
       List.fold_left
         (fun acc ip ->
@@ -754,7 +791,6 @@ let search_firstname_with_cache conf base query opts =
           if fn <> "" then Mutil.StrSet.add fn acc else acc)
         Mutil.StrSet.empty direct_results
     in
-
     let alias_variants =
       List.fold_left
         (fun acc (ip, _alias) ->
@@ -763,19 +799,48 @@ let search_firstname_with_cache conf base query opts =
           if fn <> "" then Mutil.StrSet.add fn acc else acc)
         Mutil.StrSet.empty alias_results
     in
-
+    let permuted_persons, permuted_variants =
+      if opts.order then
+        let permutations = generate_permutations query in
+        List.fold_left
+          (fun (acc_persons, acc_vars) perm_query ->
+            let perm_direct = search_firstname_direct conf base perm_query in
+            List.iter (fun ip -> Some.AliasCache.add_direct ip) perm_direct;
+            let perm_alias =
+              if include_aliases then
+                search_firstname_aliases conf base perm_query
+              else []
+            in
+            List.iter
+              (fun (ip, alias) -> Some.AliasCache.add_alias ip alias)
+              perm_alias;
+            let perm_all = perm_direct @ List.map fst perm_alias in
+            let perm_vars =
+              List.fold_left
+                (fun acc ip ->
+                  let p = Driver.poi base ip in
+                  let fn = Driver.sou base (Driver.get_first_name p) in
+                  if fn <> "" then Mutil.StrSet.add fn acc else acc)
+                acc_vars perm_all
+            in
+            (acc_persons @ perm_all, perm_vars))
+          ([], Mutil.StrSet.empty) permutations
+      else ([], Mutil.StrSet.empty)
+    in
     Logs.debug (fun k ->
-        k "  → %d results (%d direct, %d alias)"
-          (List.length direct_results + List.length alias_results)
+        k "  → %d results (%d direct, %d alias, %d permuted)"
+          (List.length direct_results + List.length alias_results
+          + List.length permuted_persons)
           (List.length direct_results)
-          (List.length alias_results));
-
+          (List.length alias_results)
+          (List.length permuted_persons));
     {
       direct = { persons = direct_results; variants = exact_variants };
       aliases =
         { persons = List.map fst alias_results; variants = alias_variants };
       included = { persons = []; variants = Mutil.StrSet.empty };
       phonetic = { persons = []; variants = Mutil.StrSet.empty };
+      permuted = { persons = permuted_persons; variants = permuted_variants };
     })
   else
     let all_direct = search_firstname_direct conf base query in
@@ -783,7 +848,6 @@ let search_firstname_with_cache conf base query opts =
     let query_norm = normalize_for_phonetic query_lower in
     let direct_exact = ref [] in
     let direct_included = ref [] in
-
     List.iter
       (fun ip ->
         Some.AliasCache.add_direct ip;
@@ -794,31 +858,24 @@ let search_firstname_with_cache conf base query opts =
         if fn_norm = query_norm then direct_exact := ip :: !direct_exact
         else direct_included := ip :: !direct_included)
       all_direct;
-
     let direct_results = List.rev !direct_exact in
     let direct_included_results = List.rev !direct_included in
-
     let alias_results, phonetic_ngrams =
       if include_aliases then
         search_firstname_with_aliases_and_ngrams conf base query
       else ([], [])
     in
-
     let exact_phonetic, partial_phonetic, _ =
       if not include_aliases then
         search_firstname_phonetic_split conf base query
       else ([], [], Mutil.StrSet.empty)
     in
-
     let all_phonetic = phonetic_ngrams @ exact_phonetic in
-
     let contains_query = ref [] in
     let other_phonetic = ref [] in
     let seen = Hashtbl.create 1000 in
-
     List.iter (fun ip -> Hashtbl.add seen ip ()) direct_results;
     List.iter (fun (ip, _) -> Hashtbl.add seen ip ()) alias_results;
-
     List.iter
       (fun ip ->
         if not (Hashtbl.mem seen ip) then (
@@ -831,14 +888,12 @@ let search_firstname_with_cache conf base query opts =
             contains_query := ip :: !contains_query
           else other_phonetic := ip :: !other_phonetic))
       all_phonetic;
-
     List.iter
       (fun ip ->
         if not (Hashtbl.mem seen ip) then (
           Hashtbl.add seen ip ();
           other_phonetic := ip :: !other_phonetic))
       partial_phonetic;
-
     let exact_variants =
       List.fold_left
         (fun acc ip ->
@@ -847,7 +902,6 @@ let search_firstname_with_cache conf base query opts =
           if fn <> "" then Mutil.StrSet.add fn acc else acc)
         Mutil.StrSet.empty direct_results
     in
-
     let alias_variants =
       List.fold_left
         (fun acc (ip, _alias) ->
@@ -856,7 +910,6 @@ let search_firstname_with_cache conf base query opts =
           if fn <> "" then Mutil.StrSet.add fn acc else acc)
         Mutil.StrSet.empty alias_results
     in
-
     let included_iper = direct_included_results @ List.rev !contains_query in
     let included_variants =
       List.fold_left
@@ -866,7 +919,6 @@ let search_firstname_with_cache conf base query opts =
           if fn <> "" then Mutil.StrSet.add fn acc else acc)
         Mutil.StrSet.empty included_iper
     in
-
     let phonetic_iper = List.rev !other_phonetic in
     let phonetic_variants =
       List.fold_left
@@ -876,7 +928,6 @@ let search_firstname_with_cache conf base query opts =
           if fn <> "" then Mutil.StrSet.add fn acc else acc)
         Mutil.StrSet.empty phonetic_iper
     in
-
     Logs.debug (fun k ->
         k "  → %d results (%d exact, %d alias, %d included, %d phonetic)"
           (List.length direct_results + List.length alias_results
@@ -885,13 +936,13 @@ let search_firstname_with_cache conf base query opts =
           (List.length alias_results)
           (List.length included_iper)
           (List.length phonetic_iper));
-
     {
       direct = { persons = direct_results; variants = exact_variants };
       aliases =
         { persons = List.map fst alias_results; variants = alias_variants };
       included = { persons = included_iper; variants = included_variants };
       phonetic = { persons = phonetic_iper; variants = phonetic_variants };
+      permuted = { persons = []; variants = Mutil.StrSet.empty };
     }
 
 let group_by_surname base ipers =
@@ -1190,8 +1241,10 @@ let execute_search_method conf base query method_ fn_options =
   | FirstName ->
       let fn_results = search_firstname_with_cache conf base query fn_options in
       {
-        exact = fn_results.direct.persons @ fn_results.included.persons;
-        partial = fn_results.phonetic.persons;
+        exact =
+          fn_results.direct.persons @ fn_results.aliases.persons
+          @ fn_results.included.persons;
+        partial = fn_results.phonetic.persons @ fn_results.permuted.persons;
         spouse = [];
       }
   | FullName ->
@@ -1286,7 +1339,6 @@ let rec handle_search_results conf base query fn_options components specify
           let partial_persons = List.map (Driver.poi base) partial in
           let spouse_persons = List.map (Driver.poi base) spouse in
           match components.case with
-          | FirstNameOnly _fn -> display_firstname_results conf base query
           | SurnameOnly sn ->
               display_surname_results conf base query sn all_persons
           | FirstNameSurname (_fn, _sn) ->
@@ -1302,13 +1354,9 @@ let rec handle_search_results conf base query fn_options components specify
               specify conf base query exact_persons partial_persons
                 spouse_persons))
 
-and display_firstname_results conf base query =
-  let is_partial = p_getenv conf.env "p_exact" = Some "off" in
-  let results =
-    let opts = { order = false; all = false; exact1 = not is_partial } in
-    search_firstname_with_cache conf base query opts
-  in
+and display_firstname_results conf base query results =
   let include_aliases = p_getenv conf.env "fna" <> None in
+  let is_partial = p_getenv conf.env "p_exact" = Some "off" in
   let sections_exact =
     if results.direct.persons <> [] then
       [ ("", List.map (Driver.poi base) results.direct.persons) ]
@@ -1329,10 +1377,16 @@ and display_firstname_results conf base query =
       [ ("", List.map (Driver.poi base) results.phonetic.persons) ]
     else []
   in
+  let sections_permuted =
+    if results.permuted.persons <> [] then
+      [ ("", List.map (Driver.poi base) results.permuted.persons) ]
+    else []
+  in
   let sections_groups =
     [
       (0, sections_exact, false, results.direct.variants);
       (1, sections_aliases, false, results.aliases.variants);
+      (4, sections_permuted, false, results.permuted.variants);
       (2, sections_included, false, results.included.variants);
       (3, sections_partial, true, results.phonetic.variants);
     ]
@@ -1340,6 +1394,7 @@ and display_firstname_results conf base query =
            match i with
            | 0 -> secs <> []
            | 1 -> include_aliases
+           | 4 -> secs <> []
            | 2 | 3 -> is_partial && secs <> []
            | _ -> false)
   in
@@ -1431,8 +1486,8 @@ let print conf base specify =
       let order = [ Key; FullName; ApproxKey; PartialKey; Surname ] in
       search conf base pn order fn_options specify
   | FirstNameOnly fn ->
-      let order = [ FirstName ] in
-      search conf base fn order fn_options specify
+      let results = search_firstname_with_cache conf base fn fn_options in
+      display_firstname_results conf base fn results
   | SurnameOnly sn ->
       Logs.debug (fun k -> k "Search n=SurnameOnly '%s'" sn);
       let order = [ Surname ] in

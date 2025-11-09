@@ -325,19 +325,6 @@ let print_firstname_variants conf ?(filter = true) variants_set =
         (StrSet.elements filtered_variants);
       Output.print_sstring conf "</div>\n")
 
-let make_toggle_button conf ~evar ~is_on ~on ~off ~label =
-  let value = if is_on then off else on in
-  let url =
-    Util.url_set_aux conf (Util.commd conf :> string) [ evar ] [ value ]
-  in
-  let icon = if is_on then "check" else "xmark" in
-  Printf.sprintf
-    {|<a href="%s" class="btn btn-outline-primary btn-sm">
-        <i class="fa fa-%s mr-1"></i>%s
-      </a>|}
-    url icon
-    (Utf8.capitalize_fst label)
-
 let first_name_print_list_multi conf base x1 sections_groups =
   let make_anchor_button anchor label =
     Printf.sprintf
@@ -356,31 +343,45 @@ let first_name_print_list_multi conf base x1 sections_groups =
   let include_aliases = p_getenv conf.env "fna" <> None in
   let is_partial = p_getenv conf.env "p_exact" = Some "off" in
   let main_count =
-    match sections_groups with
-    | (_, sections, _, _) :: _ ->
+    match List.find_opt (fun (id, _, _, _) -> id = 0) sections_groups with
+    | Some (_, sections, _, _) ->
         List.fold_left
           (fun acc (_, persons) -> acc + List.length persons)
           0 sections
-    | [] -> 0
+    | None -> 0
   in
   let title_key =
     if is_partial then "search_partial_fn" else "search_exact_fn"
   in
   let query_words = Util.cut_words (Name.lower x1) in
-  let has_multiple_words = List.length query_words > 1 in
+  let nb_words = List.length query_words in
+  let can_permute = nb_words > 1 && nb_words < 5 in
   let p_exact_on = p_getenv conf.env "p_exact" <> Some "off" in
-  let p_all_on = p_getenv conf.env "p_all" = Some "on" in
   let p_order_on = p_getenv conf.env "p_order" = Some "on" in
   Hutil.header_without_title conf;
+  let fna_button =
+    let fna_url =
+      Util.url_set_aux conf
+        (Util.commd conf :> string)
+        [ "fna" ]
+        [ (if include_aliases then "" else "1") ]
+    in
+    Printf.sprintf
+      {|<a href="%s" class="btn btn-outline-primary btn-sm">
+          <i class="fa fa-%s mr-1"></i>%s
+        </a>|}
+      fna_url
+      (if include_aliases then "minus" else "plus")
+      (Utf8.capitalize_fst (transl_nth conf "first name alias" 1))
+  in
   Output.printf conf
-    {|<div class="d-flex align-items-center mb-3">
-        <h1 class="mb-0">%s "%s"</h1>
+    {|<div class="d-flex align-items-center mb-2">
+        <h1>%s "%s"</h1>
         <div class="ml-auto">%s</div>
       </div>|}
     (Utf8.capitalize_fst (transl conf title_key))
     (escape_html x1 :> string)
-    (make_toggle_button conf ~evar:"fna" ~is_on:include_aliases ~on:"1" ~off:""
-       ~label:(transl_nth conf "first name alias" 1));
+    fna_button;
   let anchor_buttons =
     List.filter_map
       (fun (id, anchor, label_fn) ->
@@ -391,10 +392,15 @@ let first_name_print_list_multi conf base x1 sections_groups =
           "alias",
           fun () -> transl_nth conf "first name alias" 1 |> Utf8.capitalize_fst
         );
+        ( 4,
+          "permuted-variants",
+          fun () ->
+            transl_nth conf "first names exact/included/permuted" 2
+            |> Utf8.capitalize_fst );
         ( 2,
           "included-variants",
           fun () ->
-            transl_nth conf "first names exact/included" 1
+            transl_nth conf "first names exact/included/permuted" 1
             |> Utf8.capitalize_fst );
         ( 3,
           "phonetic-variants",
@@ -402,29 +408,59 @@ let first_name_print_list_multi conf base x1 sections_groups =
       ]
   in
   let option_buttons =
-    make_toggle_button conf ~evar:"p_exact" ~is_on:p_exact_on ~on:"" ~off:"off"
-      ~label:(transl conf "not exact")
-    ::
-    (if has_multiple_words then
-       [
-         make_toggle_button conf ~evar:"p_all" ~is_on:p_all_on ~on:"on"
-           ~off:"" ~label:(transl conf "not all");
-         make_toggle_button conf ~evar:"p_order" ~is_on:p_order_on ~on:""
-           ~off:"off"
-           ~label:(transl conf "order");
-       ]
-     else [])
+    let exact_url =
+      if p_exact_on then
+        Util.url_set_aux conf
+          (Util.commd conf :> string)
+          [ "p_exact"; "p_order" ] [ "off"; "" ]
+      else
+        Util.url_set_aux conf
+          (Util.commd conf :> string)
+          [ "p_exact"; "p_order" ] [ ""; "" ]
+    in
+    let exact_button =
+      Printf.sprintf
+        {|<a href="%s" class="btn btn-outline-primary btn-sm" title="%s">
+            <i class="fa fa-%s mr-1"></i>%s</a>|}
+        exact_url
+        (Utf8.capitalize_fst (transl conf "not exact hlp"))
+        (if p_exact_on then "check" else "xmark")
+        (Utf8.capitalize_fst (transl conf "not exact"))
+    in
+    if can_permute then
+      let order_url =
+        if p_order_on then
+          Util.url_set_aux conf
+            (Util.commd conf :> string)
+            [ "p_exact"; "p_order" ] [ ""; "" ]
+        else
+          Util.url_set_aux conf
+            (Util.commd conf :> string)
+            [ "p_exact"; "p_order" ] [ ""; "on" ]
+      in
+      let order_button =
+        Printf.sprintf
+          {|<a href="%s" class="btn btn-outline-primary btn-sm" title="%s">
+              <i class="fa fa-%s mr-1"></i>%s</a>|}
+          order_url
+          (Utf8.capitalize_fst (transl conf "order hlp"))
+          (if p_order_on then "xmark" else "check")
+          (Utf8.capitalize_fst (transl conf "order"))
+      in
+      [ exact_button; order_button ]
+    else [ exact_button ]
   in
   if anchor_buttons <> [] || option_buttons <> [] then
     Output.printf conf
-      {|<div class="d-flex align-items-center mb-3">
+      {|<div class="d-flex align-items-center">
           <div>%s</div>
           <div class="ml-auto">%s</div>
         </div>|}
       (String.concat "\n" anchor_buttons)
       (String.concat "\n" option_buttons);
   Output.printf conf {|<h2 class="h3 my-2">%s (%d)</h2>|}
-    (transl_nth conf "first names exact/included" 0 |> Utf8.capitalize_fst)
+    (transl_nth conf "first names exact/included/permuted" 0
+    |> Utf8.capitalize_fst)
     main_count;
   List.iter
     (fun (section_id, sections, rev, variants_set) ->
@@ -445,7 +481,7 @@ let first_name_print_list_multi conf base x1 sections_groups =
             print_firstname_variants conf ~filter:false variants_set
       | 2 when section_count > 0 ->
           print_section_header "included-variants"
-            (transl_nth conf "first names exact/included" 1
+            (transl_nth conf "first names exact/included/permuted" 1
             |> Utf8.capitalize_fst)
             section_count;
           if not (StrSet.is_empty variants_set) then
@@ -456,6 +492,13 @@ let first_name_print_list_multi conf base x1 sections_groups =
             (transl conf "phonetic variants" |> Utf8.capitalize_fst)
             section_count;
           print_firstname_variants conf ~filter:false variants_set
+      | 4 when section_count > 0 ->
+          print_section_header "permuted-variants"
+            (transl_nth conf "first names exact/included/permuted" 2
+            |> Utf8.capitalize_fst)
+            section_count;
+          if not (StrSet.is_empty variants_set) then
+            print_firstname_variants conf ~filter:false variants_set
       | _ -> ());
       first_name_print_sections conf base sections ~rev)
     sections_groups;

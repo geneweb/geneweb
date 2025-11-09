@@ -1848,7 +1848,9 @@ let print_alphab_list conf ?(prefix = "") crit print_elem liste =
         liste;
       Buffer.add_string buf "</p>\n";
       Output.print_sstring conf (Buffer.contents buf));
-    Output.print_sstring conf "<ul>\n";
+    if len > menu_threshold then
+      Output.print_sstring conf "<ul class=\"pl-0\">\n"
+    else Output.print_sstring conf "<ul class=\"pl-4\">\n";
     let rec process_groups current_group current_index = function
       | [] when current_group <> [] ->
           print_group (List.rev current_group) current_index

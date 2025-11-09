@@ -8902,9 +8902,9 @@ sv: förnamn/förnamn
 tr: ilk ad/ilk adlar/ilk ad(lar)
 zh: 名
 
-    first names exact/included
-en: identical first names/first names included
-fr: prénoms identiques/prénoms inclus
+    first names exact/included/permuted
+en: identical first names/first names included/first names permuted
+fr: prénoms identiques/prénoms inclus/prénoms permutés
 
     firstCommunion
 co: prima cumunione
@@ -14871,14 +14871,14 @@ tr: veya
     order
 co: listessu ordine
 de: Reihenfolge
-en: order
-fr: ordre
+en: permutated
+fr: permutés
 
     order hlp
-co: cunservà u listessu ordine
-de: alle Permutationen auch suchen
-en: search all permutations too
-fr: chercher aussi toutes les permutations
+co: circà tutte e permutazioni (2 à 4 prenomi)
+de: alle Permutationen suchen (2 bis 4 Vornamen)
+en: search all permutations (2 to 4 first names)
+fr: chercher toutes les permutations (2 à 4 prénoms)
 
     ordination
 co: ordinazione
@@ -16910,10 +16910,10 @@ en: partial
 fr: partiel
 
     not exact hlp
-co: currispundenza parziale (da predefinizione, currispundenza esatta)
-de: teilweise passend (standardmäßig exakt passend)
-en: partial matching (exact matching by default)
-fr: correspondance partielle (correspondance exacte par défaut)
+co: currispundenza parziale (esatta da predefinizione), caricamentu longu!
+de: teilweise passend (standardmäßig exakt), lädt länger!
+en: partial matching (exact by default), quite long to load!
+fr: correspondance partielle (exacte par défaut), chargement long !
 
     note is restricted
 co: l’accessu à sta pagina hè limitatu
