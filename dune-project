@@ -65,7 +65,7 @@
     lwt
     lwt_ppx
     tls-lwt
-    cmdliner
+    (cmdliner (>= "2.0.0"))
     logs
     digestif
     httpun
