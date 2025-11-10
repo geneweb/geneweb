@@ -45,8 +45,8 @@ let load_dictionaries path =
 
 let () =
   Logs.set_reporter @@ Util.lwt_reporter ();
-  match Cmdliner.Cmd.eval_value Cmd.cfg with
-  | Ok (`Ok cfg) ->
+  match Cmdliner.Cmd.eval_value' Cmd.cfg with
+  | `Ok cfg ->
       set_levels cfg.dflags;
       if Option.is_none cfg.tls then
         Logs.warn (fun k ->
@@ -68,7 +68,4 @@ let () =
       let forever, _ = Lwt.wait () in
       Lwt_main.run forever;
       exit (if Logs.err_count () > 0 then 1 else 0)
-  | Ok (`Version | `Help) -> exit 0
-  | Error `Parse -> exit 124
-  | Error `Exn -> exit 125
-  | Error `Term -> exit 1
+  | `Exit code -> exit code
