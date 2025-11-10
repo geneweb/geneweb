@@ -1342,6 +1342,11 @@ let rec handle_search_results conf base query fn_options components specify
           match components.case with
           | SurnameOnly sn ->
               display_surname_results conf base query sn all_persons
+          | ParsedName { first_name = None; surname = Some sn; _ } ->
+              display_surname_results conf base query sn all_persons
+          | ParsedName { first_name = Some fn; surname = None; _ } ->
+              display_firstname_results conf base fn 
+                (search_firstname_with_cache conf base fn fn_options)
           | FirstNameSurname (_fn, _sn) ->
               specify conf base query exact_persons partial_persons
                 spouse_persons
@@ -1501,7 +1506,7 @@ let print conf base specify =
           search conf base fn order fn_options specify
       | None, Some sn when sn <> "" ->
           Logs.debug (fun k -> k "Print case ParsedName (sn = %s)" sn);
-          let order = [ Surname; ApproxKey ] in
+          let order = [ Surname ] in
           search conf base sn order fn_options specify
       | _ -> (
           let order = [ Sosa; Key; FullName; ApproxKey; PartialKey; Surname ] in
