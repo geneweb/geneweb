@@ -45,26 +45,30 @@ let load_dictionaries path =
 
 let () =
   Logs.set_reporter @@ Util.lwt_reporter ();
-  let cfg = Cmd.parse () in
-  set_levels cfg.dflags;
-  if Option.is_none cfg.tls then
-    Logs.warn (fun k ->
-        k
-          "The server is starting without TLS support. WebSocket connections@ \
-           will be insecure and may be rejected by browsers. To ensure secure@ \
-           connections, please provide valid TLS certificate and private key@ \
-           files.");
-  Logs.info (fun k -> k "Loading dictionaries in %s..." cfg.base_dir);
-  let dicts = load_dictionaries cfg.base_dir in
-  Logs.info (fun k -> k "%d indexes generated." (List.length dicts));
-  Server.start ~interface:cfg.interface ~port:cfg.port
-    ?max_connection:cfg.max_connection ?idle_timeout:cfg.idle_timeout
-    ?task_timeout:cfg.task_timeout
-  @@ Route.route
-       [
-         Route.path "/pingpong" Service.PingPong.srv;
-         Route.path "/search" (Service.Search.make dicts);
-       ];
-  let forever, _ = Lwt.wait () in
-  Lwt_main.run forever;
-  exit (if Logs.err_count () > 0 then 1 else 0)
+  match Cmdliner.Cmd.eval_value Cmd.cfg with
+  | Ok (`Ok cfg) ->
+      set_levels cfg.dflags;
+      if Option.is_none cfg.tls then
+        Logs.warn (fun k ->
+            k
+              "The server is starting without TLS support. WebSocket \
+               connections@ will be insecure and may be rejected by browsers. \
+               To ensure secure@ connections, please provide valid TLS \
+               certificate and private key@ files.");
+      Logs.info (fun k -> k "Loading dictionaries in %s..." cfg.base_dir);
+      let dicts = load_dictionaries cfg.base_dir in
+      Rpc.start ~interface:cfg.interface ~port:cfg.port
+        ?max_connection:cfg.max_connection ?idle_timeout:cfg.idle_timeout
+        ?task_timeout:cfg.task_timeout
+      @@ Route.route
+           [
+             Route.path "/pingpong" Service.PingPong.srv;
+             Route.path "/search" (Service.Search.make dicts);
+           ];
+      let forever, _ = Lwt.wait () in
+      Lwt_main.run forever;
+      exit (if Logs.err_count () > 0 then 1 else 0)
+  | Ok (`Version | `Help) -> exit 0
+  | Error `Parse -> exit 124
+  | Error `Exn -> exit 125
+  | Error `Term -> exit 1
