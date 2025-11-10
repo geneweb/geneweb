@@ -340,8 +340,6 @@ let first_name_print_list_multi conf base x1 sections_groups =
   let has_section section_id =
     List.exists (fun (id, _, _, _) -> id = section_id) sections_groups
   in
-  let include_aliases = p_getenv conf.env "fna" <> None in
-  let is_partial = p_getenv conf.env "p_exact" = Some "off" in
   let main_count =
     match List.find_opt (fun (id, _, _, _) -> id = 0) sections_groups with
     | Some (_, sections, _, _) ->
@@ -350,38 +348,17 @@ let first_name_print_list_multi conf base x1 sections_groups =
           0 sections
     | None -> 0
   in
-  let title_key =
-    if is_partial then "search_partial_fn" else "search_exact_fn"
-  in
   let query_words = Util.cut_words (Name.lower x1) in
   let nb_words = List.length query_words in
   let can_permute = nb_words > 1 && nb_words < 5 in
+  let include_aliases = p_getenv conf.env "fna" <> None in
   let p_exact_on = p_getenv conf.env "p_exact" <> Some "off" in
   let p_order_on = p_getenv conf.env "p_order" = Some "on" in
   Hutil.header_without_title conf;
-  let fna_button =
-    let fna_url =
-      Util.url_set_aux conf
-        (Util.commd conf :> string)
-        [ "fna" ]
-        [ (if include_aliases then "" else "1") ]
-    in
-    Printf.sprintf
-      {|<a href="%s" class="btn btn-outline-primary btn-sm">
-          <i class="fa fa-%s mr-1"></i>%s
-        </a>|}
-      fna_url
-      (if include_aliases then "minus" else "plus")
-      (Utf8.capitalize_fst (transl_nth conf "first name alias" 1))
-  in
-  Output.printf conf
-    {|<div class="d-flex align-items-center mb-2">
-        <h1>%s "%s"</h1>
-        <div class="ml-auto">%s</div>
-      </div>|}
-    (Utf8.capitalize_fst (transl conf title_key))
-    (escape_html x1 :> string)
-    fna_button;
+  Output.printf conf {|<h1>%s%s “%s”</h1>|}
+    (Utf8.capitalize_fst (transl conf "search_by_firstnames"))
+    (transl conf ":")
+    (escape_html x1 :> string);
   let anchor_buttons =
     List.filter_map
       (fun (id, anchor, label_fn) ->
@@ -408,56 +385,73 @@ let first_name_print_list_multi conf base x1 sections_groups =
       ]
   in
   let option_buttons =
+    let fna_url =
+      Util.url_set_aux conf
+        (Util.commd conf :> string)
+        [ "fna" ]
+        [ (if include_aliases then "" else "1") ]
+    in
+    let fna_button =
+      Printf.sprintf
+        {|<a href="%s" class="btn btn-%sprimary btn-sm" title="%s">
+            <i class="fa fa-%s mr-1"></i>%s
+          </a>|}
+        fna_url
+        (if include_aliases then "" else "outline-")
+        (Utf8.capitalize_fst (transl_nth conf "first name alias" 0))
+        (if include_aliases then "xmark" else "check")
+        (Utf8.capitalize_fst (transl_nth conf "first name alias" 1))
+    in
+    let order_button_opt =
+      if can_permute then
+        let order_url =
+          Util.url_set_aux conf
+            (Util.commd conf :> string)
+            [ "p_order" ]
+            [ (if p_order_on then "" else "on") ]
+        in
+        Some
+          (Printf.sprintf
+             {|<a href="%s" class="btn btn-%sprimary btn-sm" title="%s">
+                 <i class="fa fa-%s mr-1"></i>%s</a>|}
+             order_url
+             (if p_order_on then "" else "outline-")
+             (Utf8.capitalize_fst (transl conf "order hlp"))
+             (if p_order_on then "xmark" else "check")
+             (Utf8.capitalize_fst
+                (transl_nth conf "first names exact/included/permuted" 2)))
+      else None
+    in
     let exact_url =
-      if p_exact_on then
-        Util.url_set_aux conf
-          (Util.commd conf :> string)
-          [ "p_exact"; "p_order" ] [ "off"; "" ]
-      else
-        Util.url_set_aux conf
-          (Util.commd conf :> string)
-          [ "p_exact"; "p_order" ] [ ""; "" ]
+      Util.url_set_aux conf
+        (Util.commd conf :> string)
+        [ "p_exact" ]
+        [ (if p_exact_on then "off" else "") ]
     in
     let exact_button =
       Printf.sprintf
-        {|<a href="%s" class="btn btn-outline-primary btn-sm" title="%s">
-            <i class="fa fa-%s mr-1"></i>%s</a>|}
+        {|<a href="%s" class="btn btn-%sprimary btn-sm" title="%s, %s %s">
+            <i class="fa fa-%s mr-1"></i>%s (!)</a>|}
         exact_url
+        (if p_exact_on then "outline-" else "")
+        (Utf8.capitalize_fst
+           (transl_nth conf "first names exact/included/permuted" 1))
+        (transl conf "phonetic variants")
         (Utf8.capitalize_fst (transl conf "not exact hlp"))
         (if p_exact_on then "check" else "xmark")
-        (Utf8.capitalize_fst (transl conf "not exact"))
+        (Utf8.capitalize_fst (transl_nth conf "not exact" 1))
     in
-    if can_permute then
-      let order_url =
-        if p_order_on then
-          Util.url_set_aux conf
-            (Util.commd conf :> string)
-            [ "p_exact"; "p_order" ] [ ""; "" ]
-        else
-          Util.url_set_aux conf
-            (Util.commd conf :> string)
-            [ "p_exact"; "p_order" ] [ ""; "on" ]
-      in
-      let order_button =
-        Printf.sprintf
-          {|<a href="%s" class="btn btn-outline-primary btn-sm" title="%s">
-              <i class="fa fa-%s mr-1"></i>%s</a>|}
-          order_url
-          (Utf8.capitalize_fst (transl conf "order hlp"))
-          (if p_order_on then "xmark" else "check")
-          (Utf8.capitalize_fst (transl conf "order"))
-      in
-      [ exact_button; order_button ]
-    else [ exact_button ]
+    match order_button_opt with
+    | Some order_button -> [ fna_button; order_button; exact_button ]
+    | None -> [ fna_button; exact_button ]
   in
-  if anchor_buttons <> [] || option_buttons <> [] then
-    Output.printf conf
-      {|<div class="d-flex align-items-center">
-          <div>%s</div>
-          <div class="ml-auto">%s</div>
-        </div>|}
-      (String.concat "\n" anchor_buttons)
-      (String.concat "\n" option_buttons);
+  Output.printf conf
+    {|<div class="d-flex flex-column align-items-center">
+        <div>%s</div>
+        <div class="mt-1">%s</div>
+      </div>|}
+    (String.concat "\n" option_buttons)
+    (String.concat "\n" anchor_buttons);
   Output.printf conf {|<h2 class="h3 my-2">%s (%d)</h2>|}
     (transl_nth conf "first names exact/included/permuted" 0
     |> Utf8.capitalize_fst)
