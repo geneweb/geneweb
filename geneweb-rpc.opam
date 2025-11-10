@@ -28,6 +28,7 @@ depends: [
   "fmt"
   "odoc" {with-doc}
 ]
+dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
   ["dune" "subst"] {dev}
   [
@@ -43,5 +44,9 @@ build: [
     "@doc" {with-doc}
   ]
   ["dune" "install" "-p" name "--create-install-files" name]
+  ["cmdliner" "install" "tool-support"
+              "--update-opam-install=%{_:name}%.install"
+              "_build/install/default/bin/geneweb-rpc.server" {os-family != "windows"}
+              "_build/install/default/bin/geneweb-rpc.server.exe" {os-family = "windows"}
+              "_build/cmdliner-install"]
 ]
-dev-repo: "git+https://github.com/geneweb/geneweb.git"
