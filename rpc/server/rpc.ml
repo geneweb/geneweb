@@ -3,7 +3,7 @@ module Headers = Httpun.Headers
 module Reqd = Httpun.Reqd
 module Response = Httpun.Response
 module Status = Httpun.Status
-module Server = Httpun_lwt_unix.Server
+module S = Httpun_lwt_unix.Server
 module Y = Yojson.Safe
 module U = Yojson.Safe.Util
 module Json_rpc = Geneweb_rpc.Json_rpc
@@ -176,11 +176,11 @@ let start ~interface ~port ?max_connection ?idle_timeout ?task_timeout
     match (tls, certfile, keyfile) with
     | true, Some certfile, Some keyfile ->
         fun request_handler ->
-          Server.TLS.create_connection_handler_with_default ~certfile ~keyfile
+          S.TLS.create_connection_handler_with_default ~certfile ~keyfile
             ?config:None ~request_handler ~error_handler:http_error_handler
     | false, _, _ ->
         fun request_handler ->
-          Server.create_connection_handler ?config:None ~request_handler
+          S.create_connection_handler ?config:None ~request_handler
             ~error_handler:http_error_handler
     | _ -> Fmt.invalid_arg "start"
   in
