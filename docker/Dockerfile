@@ -19,7 +19,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Update local opam repository
 USER opam
 WORKDIR /home/opam/opam-repository
-RUN git fetch origin master && git checkout 2ca36230be22748ea153057760524e23defe5fc7 && opam update
+RUN git fetch origin master && git checkout 21f97b2e6d7c617fc0a79cc8e59b2e10690960e1 && opam update
 
 # Initialize OPAM
 WORKDIR /home/opam
