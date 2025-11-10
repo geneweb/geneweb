@@ -130,8 +130,8 @@ val print :
 
     {b Search options:}
 
-    Options [&p_all], [&p_order], [&p_exact] only apply to first name searches
-    ([&p] and [&pn] with first name component). See {!type:opts} for details.
+    Options [&p_order], [&p_exact] only apply to first name searches ([&p] and
+    [&pn] with first name component). See {!type:opts} for details.
 
     {b Result handling:}
     - Single exact match: Display person directly (calls [Perso.print])
