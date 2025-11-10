@@ -13,21 +13,21 @@ let () =
   Logs.set_reporter @@ Util.lwt_reporter ();
   match Cmdliner.Cmd.eval_value Cmd.cfg with
   | Ok (`Ok cfg) ->
-    set_levels cfg.dflags;
-    if Option.is_none cfg.tls then
-      Logs.warn (fun k ->
-          k
-            "The server is starting without TLS support. WebSocket connections@ \
-             will be insecure and may be rejected by browsers. To ensure secure@ \
-             connections, please provide valid TLS certificate and private key@ \
-             files.");
-    Rpc.start ~interface:cfg.interface ~port:cfg.port
-      ?max_connection:cfg.max_connection ?idle_timeout:cfg.idle_timeout
-      ?task_timeout:cfg.task_timeout
-    @@ Route.route [ Route.path "/pingpong" Service.PingPong.srv ];
-    let forever, _ = Lwt.wait () in
-    Lwt_main.run forever;
-    exit (if Logs.err_count () > 0 then 1 else 0)
+      set_levels cfg.dflags;
+      if Option.is_none cfg.tls then
+        Logs.warn (fun k ->
+            k
+              "The server is starting without TLS support. WebSocket \
+               connections@ will be insecure and may be rejected by browsers. \
+               To ensure secure@ connections, please provide valid TLS \
+               certificate and private key@ files.");
+      Rpc.start ~interface:cfg.interface ~port:cfg.port
+        ?max_connection:cfg.max_connection ?idle_timeout:cfg.idle_timeout
+        ?task_timeout:cfg.task_timeout
+      @@ Route.route [ Route.path "/pingpong" Service.PingPong.srv ];
+      let forever, _ = Lwt.wait () in
+      Lwt_main.run forever;
+      exit (if Logs.err_count () > 0 then 1 else 0)
   | Ok (`Version | `Help) -> exit 0
   | Error `Parse -> exit 124
   | Error `Exn -> exit 125

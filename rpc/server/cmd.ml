@@ -41,8 +41,7 @@ let interface =
 let port =
   let doc =
     Fmt.str
-      "Specify the port to listen on. Defaults: %d without TLS and %d with \
-       TLS"
+      "Specify the port to listen on. Defaults: %d without TLS and %d with TLS"
       default_port default_tls_port
   in
   C.Arg.(value & opt (some int) None & info [ "p"; "port" ] ~docv:"PORT" ~doc)
@@ -67,13 +66,11 @@ let idle_timeout =
 
 let crt =
   let doc = "Path to the TLS certificate file." in
-  C.Arg.(
-    value & opt (some string) None & info [ "c"; "crt" ] ~docv:"PATH" ~doc)
+  C.Arg.(value & opt (some string) None & info [ "c"; "crt" ] ~docv:"PATH" ~doc)
 
 let key =
   let doc = "Path to the private key file for TLS." in
-  C.Arg.(
-    value & opt (some string) None & info [ "k"; "key" ] ~docv:"PATH" ~doc)
+  C.Arg.(value & opt (some string) None & info [ "k"; "key" ] ~docv:"PATH" ~doc)
 
 (* TODO: add a custom parser to emit an error if the user only specify
    a certificate key or a private key. *)
@@ -124,12 +121,13 @@ let cfg =
   let open Cmdliner in
   let open Cmdliner.Term.Syntax in
   let doc = "Remote Procedure Call (RPC) server for Geneweb" in
-  Cmd.make (Cmd.info "geneweb-rpc-server" ~version:"%%VERSION%%" ~doc) @@
-  let+ (interface, port, max_connection, idle_timeout, tls) = conn
-  and+ base_dir
-  and+ index_dir
-  and+ task_timeout
-  and+ dflags in
+  Cmd.make (Cmd.info "geneweb-rpc-server" ~version:"%%VERSION%%" ~doc)
+  @@
+  let+ interface, port, max_connection, idle_timeout, tls = conn
+  and+ base_dir = base_dir
+  and+ index_dir = index_dir
+  and+ task_timeout = task_timeout
+  and+ dflags = dflags in
   {
     interface;
     port;
