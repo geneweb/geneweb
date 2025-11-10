@@ -259,6 +259,7 @@ and string_of_dmy ?with_short_month conf d =
     conf d
 
 and gregorian_precision ?with_short_month conf d =
+  let d = Date.normalize_interval ~calendar:Date.Dgregorian d in
   let format_date d =
     if d.Date.delta = 0 then
       Adef.as_string @@ string_of_dmy ?with_short_month conf d
