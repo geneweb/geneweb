@@ -12,4 +12,4 @@ type cfg = private {
   dflags : dflag list;
 }
 
-val parse : unit -> cfg
+val cfg : cfg Cmdliner.Cmd.t
