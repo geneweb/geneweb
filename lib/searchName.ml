@@ -957,6 +957,7 @@ let group_by_surname base ipers =
   Hashtbl.fold (fun sn persons acc -> (sn, List.rev persons) :: acc) groups []
 
 let search_fullname conf base fn sn =
+  let fn = String.map (fun c -> if c = '-' then ' ' else c) fn in
   let conf_sn =
     {
       conf with
