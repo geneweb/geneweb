@@ -404,3 +404,24 @@ let convert ~from ~to_ dmy =
           delta;
           prec = YearInt (convert_dmy2 ~from ~to_ dmy2);
         }
+
+let normalize_interval ~calendar date =
+  let to_interval ~calendar date =
+    if date.delta = 0 then date
+    else
+      let date' =
+        gregorian_of_sdn ~prec:date.prec
+          (to_sdn ~from:calendar date + date.delta)
+      in
+      { date with delta = 0; prec = YearInt (dmy2_of_dmy date') }
+  in
+  match date.prec with
+  | OrYear _ -> date
+  | Sure | About | Maybe | Before | After -> to_interval ~calendar date
+  | YearInt date' ->
+      {
+        (to_interval ~calendar (dmy_of_dmy2 date')) with
+        day = date.day;
+        month = date.month;
+        year = date.year;
+      }
