@@ -18,7 +18,7 @@ module IperSet = Set.Make (struct
   let compare = compare
 end)
 
-type opts = { order : bool; all : bool; exact1 : bool }
+type opts = { order : bool; exact1 : bool; incl_aliases : bool }
 
 type search_results = {
   exact : Driver.Iper.t list;
@@ -369,14 +369,9 @@ let match_fn_lists fn_l fn1_l opts =
     if opts.exact1 then q = p else Mutil.contains p q
   in
   let passes_basic_test =
-    if opts.all then
-      List.for_all
-        (fun query_term -> List.exists (word_matches query_term) fn1_l)
-        fn_l
-    else
-      List.exists
-        (fun query_term -> List.exists (word_matches query_term) fn1_l)
-        fn_l
+    List.for_all
+      (fun query_term -> List.exists (word_matches query_term) fn1_l)
+      fn_l
   in
   let passes_order_test =
     if opts.order then
@@ -402,9 +397,8 @@ let search_for_multiple_fn conf base fn pl opts batch_size =
   Logs.debug (fun k -> k "        search_for_multiple_fn: %s" fn);
   let bool_to_string b = if b then "true" else "false" in
   Logs.debug (fun k ->
-      k "          order: %s, all: %s, exact: %s"
+      k "          order: %s, exact: %s"
         (bool_to_string opts.order)
-        (bool_to_string opts.all)
         (bool_to_string opts.exact1));
   let fn_l = cut_words fn in
   let result =
@@ -764,186 +758,164 @@ let search_firstname_with_aliases_and_ngrams conf base query =
           phonetic_results := ip :: !phonetic_results)))
     phonetic_iper;
   Logs.debug (fun k ->
-      k "  Phonetic+ngrams: %d candidates → %d filtered"
+      k
+        "  Phonetic + ngrams: %d candidates → %d after dedup (will be split \
+         into included/phonetic)"
         (List.length phonetic_iper)
         (List.length !phonetic_results));
   (alias_results, !phonetic_results)
 
 let search_firstname_with_cache conf base query opts =
-  let include_aliases = p_getenv conf.env "fna" <> None in
+  let query_lower = Name.lower query in
+  let query_norm = normalize_for_phonetic query_lower in
+  let query_words = cut_words query in
+  let nb_words = List.length query_words in
   Logs.debug (fun k ->
-      k "Search p=FirstNameOnly '%s' [all=%b, order=%b, exact=%b, fna=%b]" query
-        opts.all opts.order opts.exact1 include_aliases);
-  if opts.exact1 then (
-    let direct_results = search_firstname_direct conf base query in
-    List.iter (fun ip -> Some.AliasCache.add_direct ip) direct_results;
-    let alias_results =
-      if include_aliases then search_firstname_aliases conf base query else []
-    in
-    List.iter
-      (fun (ip, alias) -> Some.AliasCache.add_alias ip alias)
-      alias_results;
-    let exact_variants =
-      List.fold_left
-        (fun acc ip ->
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          if fn <> "" then Mutil.StrSet.add fn acc else acc)
-        Mutil.StrSet.empty direct_results
-    in
-    let alias_variants =
-      List.fold_left
-        (fun acc (ip, _alias) ->
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          if fn <> "" then Mutil.StrSet.add fn acc else acc)
-        Mutil.StrSet.empty alias_results
-    in
-    let permuted_persons, permuted_variants =
-      if opts.order then
-        let permutations = generate_permutations query in
-        List.fold_left
-          (fun (acc_persons, acc_vars) perm_query ->
-            let perm_direct = search_firstname_direct conf base perm_query in
-            List.iter (fun ip -> Some.AliasCache.add_direct ip) perm_direct;
-            let perm_alias =
-              if include_aliases then
-                search_firstname_aliases conf base perm_query
-              else []
-            in
-            List.iter
-              (fun (ip, alias) -> Some.AliasCache.add_alias ip alias)
-              perm_alias;
-            let perm_all = perm_direct @ List.map fst perm_alias in
-            let perm_vars =
-              List.fold_left
-                (fun acc ip ->
-                  let p = Driver.poi base ip in
-                  let fn = Driver.sou base (Driver.get_first_name p) in
-                  if fn <> "" then Mutil.StrSet.add fn acc else acc)
-                acc_vars perm_all
-            in
-            (acc_persons @ perm_all, perm_vars))
-          ([], Mutil.StrSet.empty) permutations
-      else ([], Mutil.StrSet.empty)
-    in
-    Logs.debug (fun k ->
-        k "  → %d results (%d direct, %d alias, %d permuted)"
-          (List.length direct_results + List.length alias_results
-          + List.length permuted_persons)
-          (List.length direct_results)
-          (List.length alias_results)
-          (List.length permuted_persons));
-    {
-      direct = { persons = direct_results; variants = exact_variants };
-      aliases =
-        { persons = List.map fst alias_results; variants = alias_variants };
-      included = { persons = []; variants = Mutil.StrSet.empty };
-      phonetic = { persons = []; variants = Mutil.StrSet.empty };
-      permuted = { persons = permuted_persons; variants = permuted_variants };
-    })
-  else
-    let all_direct = search_firstname_direct conf base query in
-    let query_lower = Name.lower query in
-    let query_norm = normalize_for_phonetic query_lower in
-    let direct_exact = ref [] in
-    let direct_included = ref [] in
-    List.iter
-      (fun ip ->
-        Some.AliasCache.add_direct ip;
+      k "Search p=%s FirstNameOnly [aliases=%b, order=%b, exact=%b]" query
+        opts.incl_aliases opts.order opts.exact1);
+  let direct_results = search_firstname_direct conf base query in
+  List.iter (fun ip -> Some.AliasCache.add_direct ip) direct_results;
+  let direct_exact = ref [] in
+  let direct_included = ref [] in
+  List.iter
+    (fun ip ->
+      let p = Driver.poi base ip in
+      let fn = Driver.sou base (Driver.get_first_name p) in
+      let fn_lower = Name.lower fn in
+      let fn_norm = normalize_for_phonetic fn_lower in
+      if fn_norm = query_norm then direct_exact := ip :: !direct_exact
+      else direct_included := ip :: !direct_included)
+    direct_results;
+  let direct_exact_results = List.rev !direct_exact in
+  let exact_variants =
+    List.fold_left
+      (fun acc ip ->
         let p = Driver.poi base ip in
         let fn = Driver.sou base (Driver.get_first_name p) in
-        let fn_lower = Name.lower fn in
-        let fn_norm = normalize_for_phonetic fn_lower in
-        if fn_norm = query_norm then direct_exact := ip :: !direct_exact
-        else direct_included := ip :: !direct_included)
-      all_direct;
-    let direct_results = List.rev !direct_exact in
-    let direct_included_results = List.rev !direct_included in
-    let alias_results, phonetic_ngrams =
-      if include_aliases then
-        search_firstname_with_aliases_and_ngrams conf base query
-      else ([], [])
-    in
-    let exact_phonetic, partial_phonetic, _ =
-      if not include_aliases then
-        search_firstname_phonetic_split conf base query
-      else ([], [], Mutil.StrSet.empty)
-    in
-    let all_phonetic = phonetic_ngrams @ exact_phonetic in
-    let contains_query = ref [] in
-    let other_phonetic = ref [] in
-    let seen = Hashtbl.create 1000 in
-    List.iter (fun ip -> Hashtbl.add seen ip ()) direct_results;
-    List.iter (fun (ip, _) -> Hashtbl.add seen ip ()) alias_results;
-    List.iter
-      (fun ip ->
-        if not (Hashtbl.mem seen ip) then (
-          Hashtbl.add seen ip ();
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          let fn_lower = Name.lower fn in
-          let fn_norm = normalize_for_phonetic fn_lower in
-          if Mutil.contains fn_norm query_norm then
-            contains_query := ip :: !contains_query
-          else other_phonetic := ip :: !other_phonetic))
-      all_phonetic;
-    List.iter
-      (fun ip ->
-        if not (Hashtbl.mem seen ip) then (
-          Hashtbl.add seen ip ();
-          other_phonetic := ip :: !other_phonetic))
-      partial_phonetic;
-    let exact_variants =
+        if fn <> "" then Mutil.StrSet.add fn acc else acc)
+      Mutil.StrSet.empty direct_exact_results
+  in
+  let alias_results, alias_variants =
+    if opts.incl_aliases then (
+      let aliases = search_firstname_aliases conf base query in
+      List.iter (fun (ip, alias) -> Some.AliasCache.add_alias ip alias) aliases;
+      let variants =
+        List.fold_left
+          (fun acc (ip, _alias) ->
+            let p = Driver.poi base ip in
+            let fn = Driver.sou base (Driver.get_first_name p) in
+            if fn <> "" then Mutil.StrSet.add fn acc else acc)
+          Mutil.StrSet.empty aliases
+      in
+      (List.map fst aliases, variants))
+    else ([], Mutil.StrSet.empty)
+  in
+  let permuted_persons, permuted_variants =
+    if opts.order && nb_words > 1 && nb_words < 5 then
+      let permutations = generate_permutations query in
       List.fold_left
-        (fun acc ip ->
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          if fn <> "" then Mutil.StrSet.add fn acc else acc)
-        Mutil.StrSet.empty direct_results
-    in
-    let alias_variants =
-      List.fold_left
-        (fun acc (ip, _alias) ->
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          if fn <> "" then Mutil.StrSet.add fn acc else acc)
-        Mutil.StrSet.empty alias_results
-    in
-    let included_iper = direct_included_results @ List.rev !contains_query in
-    let included_variants =
-      List.fold_left
-        (fun acc ip ->
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          if fn <> "" then Mutil.StrSet.add fn acc else acc)
-        Mutil.StrSet.empty included_iper
-    in
-    let phonetic_iper = List.rev !other_phonetic in
-    let phonetic_variants =
-      List.fold_left
-        (fun acc ip ->
-          let p = Driver.poi base ip in
-          let fn = Driver.sou base (Driver.get_first_name p) in
-          if fn <> "" then Mutil.StrSet.add fn acc else acc)
-        Mutil.StrSet.empty phonetic_iper
-    in
-    Logs.debug (fun k ->
-        k "  → %d results (%d exact, %d alias, %d included, %d phonetic)"
-          (List.length direct_results + List.length alias_results
-         + List.length included_iper + List.length phonetic_iper)
-          (List.length direct_results)
-          (List.length alias_results)
-          (List.length included_iper)
-          (List.length phonetic_iper));
-    {
-      direct = { persons = direct_results; variants = exact_variants };
-      aliases =
-        { persons = List.map fst alias_results; variants = alias_variants };
-      included = { persons = included_iper; variants = included_variants };
-      phonetic = { persons = phonetic_iper; variants = phonetic_variants };
-      permuted = { persons = []; variants = Mutil.StrSet.empty };
-    }
+        (fun (acc_persons, acc_vars) perm_query ->
+          let perm_direct = search_firstname_direct conf base perm_query in
+          List.iter (fun ip -> Some.AliasCache.add_direct ip) perm_direct;
+          let perm_alias =
+            if opts.incl_aliases then
+              search_firstname_aliases conf base perm_query
+            else []
+          in
+          List.iter
+            (fun (ip, alias) -> Some.AliasCache.add_alias ip alias)
+            perm_alias;
+          let perm_all = perm_direct @ List.map fst perm_alias in
+          let perm_vars =
+            List.fold_left
+              (fun acc ip ->
+                let p = Driver.poi base ip in
+                let fn = Driver.sou base (Driver.get_first_name p) in
+                if fn <> "" then Mutil.StrSet.add fn acc else acc)
+              acc_vars perm_all
+          in
+          (acc_persons @ perm_all, perm_vars))
+        ([], Mutil.StrSet.empty) permutations
+    else ([], Mutil.StrSet.empty)
+  in
+  let included_iper, included_variants, phonetic_iper, phonetic_variants =
+    if not opts.exact1 then (
+      let direct_included_results = List.rev !direct_included in
+      let phonetic_ngrams =
+        if opts.incl_aliases then
+          snd (search_firstname_with_aliases_and_ngrams conf base query)
+        else []
+      in
+      let exact_phonetic, partial_phonetic, _ =
+        if not opts.incl_aliases then
+          search_firstname_phonetic_split conf base query
+        else ([], [], Mutil.StrSet.empty)
+      in
+      let all_phonetic = phonetic_ngrams @ exact_phonetic in
+      let contains_query = ref [] in
+      let other_phonetic = ref [] in
+      let seen = Hashtbl.create 1000 in
+      List.iter (fun ip -> Hashtbl.add seen ip ()) direct_exact_results;
+      List.iter (fun ip -> Hashtbl.add seen ip ()) alias_results;
+      List.iter
+        (fun ip ->
+          if not (Hashtbl.mem seen ip) then (
+            Hashtbl.add seen ip ();
+            let p = Driver.poi base ip in
+            let fn = Driver.sou base (Driver.get_first_name p) in
+            let fn_lower = Name.lower fn in
+            let fn_norm = normalize_for_phonetic fn_lower in
+            if Mutil.contains fn_norm query_norm then
+              contains_query := ip :: !contains_query
+            else other_phonetic := ip :: !other_phonetic))
+        all_phonetic;
+      List.iter
+        (fun ip ->
+          if not (Hashtbl.mem seen ip) then (
+            Hashtbl.add seen ip ();
+            other_phonetic := ip :: !other_phonetic))
+        partial_phonetic;
+      let included_iper = direct_included_results @ List.rev !contains_query in
+      let included_variants =
+        List.fold_left
+          (fun acc ip ->
+            let p = Driver.poi base ip in
+            let fn = Driver.sou base (Driver.get_first_name p) in
+            if fn <> "" then Mutil.StrSet.add fn acc else acc)
+          Mutil.StrSet.empty included_iper
+      in
+      let phonetic_iper = List.rev !other_phonetic in
+      let phonetic_variants =
+        List.fold_left
+          (fun acc ip ->
+            let p = Driver.poi base ip in
+            let fn = Driver.sou base (Driver.get_first_name p) in
+            if fn <> "" then Mutil.StrSet.add fn acc else acc)
+          Mutil.StrSet.empty phonetic_iper
+      in
+      (included_iper, included_variants, phonetic_iper, phonetic_variants))
+    else ([], Mutil.StrSet.empty, [], Mutil.StrSet.empty)
+  in
+  Logs.debug (fun k ->
+      k
+        "  → %d results (%d exact, %d alias, %d permuted, %d included, %d \
+         phonetic)"
+        (List.length direct_exact_results
+        + List.length alias_results
+        + List.length permuted_persons
+        + List.length included_iper + List.length phonetic_iper)
+        (List.length direct_exact_results)
+        (List.length alias_results)
+        (List.length permuted_persons)
+        (List.length included_iper)
+        (List.length phonetic_iper));
+  {
+    direct = { persons = direct_exact_results; variants = exact_variants };
+    aliases = { persons = alias_results; variants = alias_variants };
+    included = { persons = included_iper; variants = included_variants };
+    phonetic = { persons = phonetic_iper; variants = phonetic_variants };
+    permuted = { persons = permuted_persons; variants = permuted_variants };
+  }
 
 let group_by_surname base ipers =
   let groups = Hashtbl.create 10 in
@@ -974,7 +946,7 @@ let search_fullname conf base fn sn =
   | [] -> { exact = []; partial = []; spouse = [] }
   | [ p ] -> { exact = [ Driver.get_iper p ]; partial = []; spouse = [] }
   | pl ->
-      let opts = { order = false; all = true; exact1 = true } in
+      let opts = { order = false; exact1 = true; incl_aliases = false } in
       let exact = search_for_multiple_fn conf base fn pl opts 1000 in
       let opts_partial = { opts with exact1 = false } in
       let partial = search_for_multiple_fn conf base fn pl opts_partial 1000 in
@@ -1024,7 +996,7 @@ let search_partial_key conf base query =
       let persons, _ = AdvSearchOk.advanced_search conf base max_int in
       if persons = [] then { exact = []; partial = []; spouse = [] }
       else
-        let opts = { order = false; all = true; exact1 = false } in
+        let opts = { order = false; exact1 = false; incl_aliases = false } in
         let opts_exact = { opts with exact1 = true } in
         let opts_partial = { opts with exact1 = false } in
         let exact =
@@ -1345,14 +1317,13 @@ let rec handle_search_results conf base query fn_options components specify
           | ParsedName { first_name = None; surname = Some sn; _ } ->
               display_surname_results conf base query sn all_persons
           | ParsedName { first_name = Some fn; surname = None; _ } ->
-              display_firstname_results conf base fn 
+              display_firstname_results conf base fn fn_options
                 (search_firstname_with_cache conf base fn fn_options)
           | FirstNameSurname (_fn, _sn) ->
               specify conf base query exact_persons partial_persons
                 spouse_persons
           | ParsedName { format = `Space; _ }
-            when fn_options.exact1 && fn_options.all
-                 && List.length exact_persons = 1 ->
+            when fn_options.exact1 && List.length exact_persons = 1 ->
               let person = List.hd exact_persons in
               record_visited conf (Driver.get_iper person);
               Perso.print conf base person
@@ -1360,9 +1331,9 @@ let rec handle_search_results conf base query fn_options components specify
               specify conf base query exact_persons partial_persons
                 spouse_persons))
 
-and display_firstname_results conf base query results =
-  let include_aliases = p_getenv conf.env "fna" <> None in
-  let is_partial = p_getenv conf.env "p_exact" = Some "off" in
+and display_firstname_results conf base query fn_options results =
+  let include_aliases = fn_options.incl_aliases in
+  let is_partial = not fn_options.exact1 in
   let sections_exact =
     if results.direct.persons <> [] then
       [ ("", List.map (Driver.poi base) results.direct.persons) ]
@@ -1477,8 +1448,8 @@ let print conf base specify =
   let fn_options =
     {
       order = p_getenv conf.env "p_order" = Some "on";
-      all = p_getenv conf.env "p_all" <> Some "off";
       exact1 = p_getenv conf.env "p_exact" <> Some "off";
+      incl_aliases = p_getenv conf.env "fna" <> None;
     }
   in
   let case = components.case in
@@ -1493,7 +1464,7 @@ let print conf base specify =
       search conf base pn order fn_options specify
   | FirstNameOnly fn ->
       let results = search_firstname_with_cache conf base fn fn_options in
-      display_firstname_results conf base fn results
+      display_firstname_results conf base fn fn_options results
   | SurnameOnly sn ->
       Logs.debug (fun k -> k "Search n=SurnameOnly '%s'" sn);
       let order = [ Surname ] in
