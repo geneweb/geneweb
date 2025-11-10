@@ -35,14 +35,16 @@
       in
       {
         packages = rec {
-          default = geneweb;
           unidecode = ocamlPackages.callPackage ./nix/unidecode.nix { };
           calendars = ocamlPackages.callPackage ./nix/calendars.nix { };
           syslog = ocamlPackages.callPackage ./nix/syslog.nix { };
           not-ocamlfind =
             ocamlPackages.callPackage ./nix/not-ocamlfind.nix { inherit ocamlPackages; };
+          cmdliner = ocamlPackages.callPackage ./nix/cmdliner.nix { };
+          alcotest = ocamlPackages.alcotest.override { inherit cmdliner; };
+          queck-alcotest = ocamlPackages.qcheck-alcotest.override { inherit alcotest; };
 
-          geneweb = ocamlPackages.buildDunePackage {
+          default = ocamlPackages.buildDunePackage {
             pname = "geneweb";
             version = "dev";
             duneVersion = "3";
@@ -54,6 +56,9 @@
               unidecode
               calendars
               syslog
+              cmdliner
+              alcotest
+              queck-alcotest
             ] ++ (with pkgs; [
               bash
               gcc
@@ -85,9 +90,7 @@
               zarith
               digestif
               pcre2
-              alcotest
               qcheck
-              qcheck-alcotest
               ojs
               js_of_ocaml
               js_of_ocaml-ppx
@@ -117,7 +120,7 @@
           ]);
 
           inputsFrom = [
-            self.packages.${system}.geneweb
+            self.packages.${system}.default
           ];
         };
       });
