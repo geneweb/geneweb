@@ -46,7 +46,7 @@
     digestif
     pp_loc
     (utop :with-dev-setup)
-    (ocamlformat (and :with-dev-setup (= "0.27.0")))
+    (ocamlformat (and :with-dev-setup (= "0.28.1")))
   )
   (depopts
     ocaml-option-nnp
